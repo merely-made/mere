@@ -22,7 +22,6 @@
 //! depends on those.
 
 pub mod authorities;
-pub mod command_palette;
 pub mod command_surface_telemetry;
 pub mod frame_model;
 pub mod host_intent;

@@ -11,7 +11,7 @@ use std::sync::Arc;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use zbus::message::{Header, Message};
 use zbus::names::ErrorName;
-use zbus::zvariant::{OwnedObjectPath, OwnedValue, Signature, Type};
+use zbus::zvariant::{OwnedObjectPath, OwnedValue, Signature, Type, Value};
 use zbus::{Connection, DBusError};
 use zeroize::Zeroizing;
 
@@ -20,10 +20,13 @@ use super::{
 };
 
 mod objects;
+mod prompt;
 mod service;
 mod state;
+mod vault;
 
 pub use state::{SecretServiceAccessPolicy, SecretServiceCaller, SecretServiceOperation};
+pub use vault::SecretServiceVault;
 
 use objects::{CollectionInterface, ItemInterface};
 use service::ServiceInterface;
@@ -75,6 +78,13 @@ impl<'de> Deserialize<'de> for SecretBytes {
 /// Running Secret Service name and object tree.
 pub struct SecretServiceServer {
     connection: Connection,
+    lock_watch: tokio::task::JoinHandle<()>,
+}
+
+impl Drop for SecretServiceServer {
+    fn drop(&mut self) {
+        self.lock_watch.abort();
+    }
 }
 
 impl SecretServiceServer {
@@ -98,15 +108,19 @@ pub enum SecretServiceStartError {
 /// Serve one persona's collections as Freedesktop Secret Service 0.2.
 ///
 /// The standard bus name is requested without replacement. Startup therefore
-/// fails when another keyring already owns the desktop surface.
+/// fails when another keyring already owns the desktop surface. Every
+/// collection and item follows `vault`'s lock (vault lock rulings 10, 67,
+/// 68); serve while it is unlocked, so the snapshot a locked service answers
+/// from has something in it.
 pub async fn serve(
     store: SecretServiceStore,
     policy: Arc<dyn SecretServiceAccessPolicy>,
     default_collection_label: &str,
+    vault: Arc<dyn SecretServiceVault>,
 ) -> Result<SecretServiceServer, SecretServiceStartError> {
     store.ensure_default_collection(default_collection_label, now_unix_secs())?;
     let limits = store.limits();
-    let state = Arc::new(ServiceState::new(store, limits, policy));
+    let state = Arc::new(ServiceState::new(store, limits, policy, vault));
     let connection = zbus::connection::Builder::session()?
         .name(SERVICE_NAME)?
         .serve_at(SERVICE_PATH, ServiceInterface::new(Arc::clone(&state)))?
@@ -123,7 +137,63 @@ pub async fn serve(
         register_alias(&connection, Arc::clone(&state), &alias, collection).await?;
     }
 
-    Ok(SecretServiceServer { connection })
+    let lock_watch = watch_lock(connection.clone(), state);
+    Ok(SecretServiceServer {
+        connection,
+        lock_watch,
+    })
+}
+
+/// Follow the vault: retake the snapshot on each unlock and announce
+/// `Locked` on every object at each change.
+fn watch_lock(connection: Connection, state: Arc<ServiceState>) -> tokio::task::JoinHandle<()> {
+    let mut lock = state.vault.watch();
+    tokio::spawn(async move {
+        while lock.changed().await.is_ok() {
+            let locked = *lock.borrow_and_update();
+            if !locked {
+                state.refresh_snapshot();
+            }
+            if let Err(error) = announce_lock(&connection, &state, locked).await {
+                tracing::warn!(%error, "Secret Service lock change not announced");
+            }
+        }
+    })
+}
+
+/// `PropertiesChanged` for `Locked` on each collection and item, and the
+/// service's `CollectionChanged` for each collection.
+async fn announce_lock(
+    connection: &Connection,
+    state: &ServiceState,
+    locked: bool,
+) -> zbus::Result<()> {
+    let snapshot = state.snapshot();
+    let changed = HashMap::from([("Locked", Value::from(locked))]);
+    let announce = |path: OwnedObjectPath, interface: &'static str| {
+        let changed = &changed;
+        async move {
+            connection
+                .emit_signal(
+                    None::<()>,
+                    path,
+                    "org.freedesktop.DBus.Properties",
+                    "PropertiesChanged",
+                    &(interface, changed, Vec::<String>::new()),
+                )
+                .await
+        }
+    };
+    let service = zbus::object_server::SignalEmitter::new(connection, SERVICE_PATH)?;
+    for collection in snapshot.collections() {
+        let path = collection_path(collection.id);
+        announce(path.clone(), "org.freedesktop.Secret.Collection").await?;
+        service::ServiceInterface::collection_changed(&service, path).await?;
+        for item in snapshot.items(collection.id).unwrap_or_default() {
+            announce(item_path(item.id), "org.freedesktop.Secret.Item").await?;
+        }
+    }
+    Ok(())
 }
 
 async fn register_collection(

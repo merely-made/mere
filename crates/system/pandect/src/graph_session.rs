@@ -54,6 +54,9 @@ use crate::manifest::{GraphSessionManifest, TrashMark};
 use crate::scene_facets::copy_scene_facets;
 use crate::view_intent_store::ViewIntent;
 
+/// Product-owned validation of a complete candidate before graph/history installation.
+pub type GraphValidator = Arc<dyn Fn(&Graph) -> Result<(), String> + Send + Sync>;
+
 /// Where a mere keeps its sessions.
 pub const SESSIONS_PREFIX: &str = "sessions";
 /// How many journal entries may accrue before the session writes a
@@ -86,6 +89,8 @@ pub enum SessionError {
     },
     /// A component fork's seed names no node.
     NoSuchNode(Uuid),
+    ReadOnly(SessionId),
+    Validation(String),
     Store(StoreError),
 }
 
@@ -100,6 +105,12 @@ impl std::fmt::Display for SessionError {
                 write!(f, "cursor {} lies past the journal's {}", cursor.0, live.0)
             },
             Self::NoSuchNode(id) => write!(f, "no node {id} to fork from"),
+            Self::ReadOnly(id) => write!(
+                f,
+                "session {} is a read-only codicil thaw; fork before editing",
+                id.as_uuid()
+            ),
+            Self::Validation(reason) => write!(f, "candidate graph refused: {reason}"),
             Self::Store(error) => write!(f, "store: {error}"),
         }
     }
@@ -145,6 +156,12 @@ pub enum ChangeKind {
     },
     Trashed,
     Restored,
+    Archived {
+        codicil: String,
+    },
+    OpenedCodicil {
+        codicil: String,
+    },
 }
 
 /// One view of one application over a session: `views/<app>/<view>`.
@@ -337,6 +354,7 @@ impl Pending {
 /// `_now` ones wait for [`flush`](Self::flush).
 pub struct GraphSession<B> {
     slots: JsonSlots<B>,
+    validator: Option<GraphValidator>,
     keys: Keys,
     manifest: GraphSessionManifest,
     baseline: Graph,
@@ -387,6 +405,7 @@ impl<B: Backend> GraphSession<B> {
         record_into(&mut graph, &pending);
         Self {
             slots: JsonSlots::new(backend),
+            validator: None,
             keys: Keys::new(manifest.session_id),
             manifest,
             baseline,
@@ -453,6 +472,7 @@ impl<B: Backend> GraphSession<B> {
 
         let mut session = Self {
             slots,
+            validator: None,
             keys,
             manifest,
             baseline,
@@ -514,6 +534,27 @@ impl<B: Backend> GraphSession<B> {
 
     /// The live graph. Edits go through [`apply`](Self::apply), so every one is
     /// journaled.
+    /// Attach product authority, refusing an already invalid graph.
+    pub fn with_validator(mut self, validator: GraphValidator) -> Result<Self, SessionError> {
+        validator(&self.graph).map_err(SessionError::Validation)?;
+        self.validator = Some(validator);
+        Ok(self)
+    }
+
+    fn validate(&self, graph: &Graph) -> Result<(), SessionError> {
+        if let Some(validator) = &self.validator {
+            validator(graph).map_err(SessionError::Validation)?;
+        }
+        Ok(())
+    }
+
+    pub fn ensure_writable(&self) -> Result<(), SessionError> {
+        if self.manifest.codicil_read_only {
+            return Err(SessionError::ReadOnly(self.id()));
+        }
+        Ok(())
+    }
+
     pub fn graph(&self) -> &Graph {
         &self.graph
     }
@@ -565,6 +606,7 @@ impl<B: Backend> GraphSession<B> {
         author: Author,
         edits: Vec<CapturedDelta>,
     ) -> Result<Applied, SessionError> {
+        self.ensure_writable()?;
         let deltas = edits
             .iter()
             .map(|edit| {
@@ -577,7 +619,7 @@ impl<B: Backend> GraphSession<B> {
                 for delta in deltas {
                     let _ = apply_graph_delta(graph, delta);
                 }
-            })
+            })?
             .1)
     }
 
@@ -589,7 +631,8 @@ impl<B: Backend> GraphSession<B> {
         &mut self,
         author: Author,
         edit: impl FnOnce(&mut Graph) -> R,
-    ) -> (R, Applied) {
+    ) -> Result<(R, Applied), SessionError> {
+        self.ensure_writable()?;
         self.edit_as(author, ChangeKind::Edit, edit)
     }
 
@@ -598,10 +641,28 @@ impl<B: Backend> GraphSession<B> {
         author: Author,
         kind: ChangeKind,
         edit: impl FnOnce(&mut Graph) -> R,
-    ) -> (R, Applied) {
+    ) -> Result<(R, Applied), SessionError> {
+        self.ensure_writable()?;
+        let mut candidate = self.graph.clone();
+        let captured = Arc::default();
+        record_into(&mut candidate, &captured);
+        let result = kernel::graph::with_isolated_capture(|| edit(&mut candidate));
+        self.validate(&candidate)?;
+        let recorded = std::mem::take(&mut *captured.lock().expect("candidate recorder buffer"));
+        let mut replay = self.graph.clone();
+        replay_captured_deltas_onto(&mut replay, recorded.iter().map(|entry| entry.clone()));
+        let state = |graph: &Graph| {
+            serde_json::to_value((graph.to_snapshot(), graph.facets()))
+                .map_err(|e| SessionError::NotReplayable(e.to_string()))
+        };
+        if state(&replay)? != state(&candidate)? {
+            return Err(SessionError::NotReplayable(
+                "candidate changed graph truth outside the journaled mutation path".into(),
+            ));
+        }
+        self.graph = candidate;
+        record_into(&mut self.graph, &self.pending);
         let first = self.journal.live_cursor();
-        let result = edit(&mut self.graph);
-        let recorded = std::mem::take(&mut *self.pending.lock().expect("recorder buffer"));
         for delta in recorded {
             self.journal.record_as(author.clone(), delta);
         }
@@ -620,7 +681,7 @@ impl<B: Backend> GraphSession<B> {
             end,
             revision: self.revision,
         };
-        (result, applied)
+        Ok((result, applied))
     }
 
     async fn apply_as(
@@ -629,11 +690,12 @@ impl<B: Backend> GraphSession<B> {
         kind: ChangeKind,
         deltas: Vec<GraphDelta>,
     ) -> Result<Applied, SessionError> {
+        self.ensure_writable()?;
         let (_, applied) = self.edit_as(author, kind, |graph| {
             for delta in deltas {
                 let _ = apply_graph_delta(graph, delta);
             }
-        });
+        })?;
         self.store(wall_clock_now(), Vec::new(), false).await?;
         Ok(applied)
     }
@@ -677,6 +739,7 @@ impl<B: Backend> GraphSession<B> {
     }
 
     fn pending_with(&self, at: SystemTime, checkpoint: bool) -> Result<Pending, SessionError> {
+        self.validate(&self.graph)?;
         let journal = self.journal.live_cursor();
         let changes = self.changes.next_seq();
         let updated_at = (changes > self.changes_saved).then_some(at);
@@ -785,6 +848,7 @@ impl<B: Backend> GraphSession<B> {
     /// for a host that writes its batches itself ([`pending`](Self::pending),
     /// then [`stored`](Self::stored)).
     pub fn undo_now(&mut self, author: Author) -> Result<Option<Reverted>, SessionError> {
+        self.ensure_writable()?;
         let Some(of) = self.stacks(&author).0.last().copied() else {
             return Ok(None);
         };
@@ -801,6 +865,7 @@ impl<B: Backend> GraphSession<B> {
 
     /// [`redo`](Self::redo), journaled but not stored until the next flush.
     pub fn redo_now(&mut self, author: Author) -> Result<Option<Reverted>, SessionError> {
+        self.ensure_writable()?;
         let Some(of) = self.stacks(&author).1.last().copied() else {
             return Ok(None);
         };
@@ -884,7 +949,7 @@ impl<B: Backend> GraphSession<B> {
             for delta in deltas {
                 let _ = apply_graph_delta(graph, delta);
             }
-        });
+        })?;
         Ok(Reverted { of, applied, kept })
     }
 
@@ -956,13 +1021,19 @@ impl<B: Backend> GraphSession<B> {
         key: ViewKey,
         state: ViewIntent,
     ) -> Result<(), SessionError> {
-        self.set_view_now(author, key, state);
+        self.set_view_now(author, key, state)?;
         self.store(wall_clock_now(), Vec::new(), false).await
     }
 
     /// [`set_view`](Self::set_view), not stored until the next batch, which
     /// writes the view with the journal it names (Scenograph editor plan, SE31).
-    pub fn set_view_now(&mut self, author: Author, key: ViewKey, state: ViewIntent) {
+    pub fn set_view_now(
+        &mut self,
+        author: Author,
+        key: ViewKey,
+        state: ViewIntent,
+    ) -> Result<(), SessionError> {
+        self.ensure_writable()?;
         let cursor = self.journal.live_cursor();
         let view = self.views.entry(key).or_default();
         view.log.append(ViewEntry {
@@ -971,6 +1042,51 @@ impl<B: Backend> GraphSession<B> {
             state: state.clone(),
         });
         view.current = state;
+        Ok(())
+    }
+
+    /// Freeze graph, facets and the source's complete parallel histories.
+    pub fn codicil_payload(&self) -> crate::graph_codicil::GraphCodicil {
+        use crate::graph_codicil::{ArchivedSession, ArchivedView, GraphCodicil};
+        GraphCodicil {
+            snapshot: self.graph.to_snapshot(),
+            facets: self.graph.facets().clone(),
+            sessions: vec![ArchivedSession {
+                manifest: self.manifest.clone(),
+                baseline: self.baseline.to_snapshot(),
+                baseline_facets: self.baseline.facets().clone(),
+                journal: self.journal.log().entries().to_vec(),
+                changes: self.changes.entries().to_vec(),
+                views: self
+                    .views
+                    .iter()
+                    .map(|(key, view)| ArchivedView {
+                        app: key.app.clone(),
+                        view: key.view.clone(),
+                        state: view.current.clone(),
+                        log: view.log.entries().to_vec(),
+                    })
+                    .collect(),
+            }],
+        }
+    }
+
+    /// Record an archive receipt under the resident-supplied author.
+    pub async fn archived(
+        &mut self,
+        author: Author,
+        codicil: eidetic::ManifestId,
+    ) -> Result<(), SessionError> {
+        self.manifest
+            .record_consolidation(crate::manifest::CodicilId(codicil.to_string()));
+        self.record(
+            author,
+            ChangeKind::Archived {
+                codicil: codicil.to_string(),
+            },
+            wall_clock_now(),
+        )
+        .await
     }
 
     /// Put the session in the trash: its manifest is marked, its keys stay.
@@ -1112,6 +1228,66 @@ impl<B: Backend + Clone> MereSessions<B> {
             .await
     }
 
+    /// Open an archive as a new read-only session after checking the complete candidate.
+    /// The immutable codicil retains original histories; the new journal starts at its graph.
+    pub async fn open_codicil_checked(
+        &self,
+        id: eidetic::ManifestId,
+        author: Author,
+        validate: impl FnOnce(&Graph) -> Result<(), String>,
+    ) -> Result<GraphSessionManifest, SessionError>
+    where
+        B: eidetic::Store,
+    {
+        let mut store = self.backend.clone();
+        self.open_codicil_from_checked(&mut store, id, author, validate)
+            .await
+    }
+
+    /// The owning resident supplies its Eidetic store; session files keep their
+    /// existing backend and layout. The complete candidate is checked before writes.
+    pub async fn open_codicil_from_checked(
+        &self,
+        store: &mut dyn eidetic::Store,
+        id: eidetic::ManifestId,
+        author: Author,
+        validate: impl FnOnce(&Graph) -> Result<(), String>,
+    ) -> Result<GraphSessionManifest, SessionError> {
+        let payload = crate::graph_codicil::load_graph_codicil(store, id)
+            .await
+            .map_err(|e| SessionError::Corrupt(e.to_string()))?
+            .ok_or_else(|| SessionError::Corrupt(format!("no codicil {id} in this mere")))?;
+        let graph = payload.clone().into_graph();
+        validate(&graph).map_err(SessionError::Validation)?;
+        let mut manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
+        manifest.display_name = payload
+            .sessions
+            .first()
+            .and_then(|source| source.manifest.display_name.clone());
+        manifest.source_codicil = Some(crate::manifest::CodicilId(id.to_string()));
+        let mut session = GraphSession::new(
+            self.backend.clone(),
+            manifest,
+            Some(graph),
+            author.clone(),
+            ChangeKind::OpenedCodicil {
+                codicil: id.to_string(),
+            },
+        );
+        // Compose keeps the first source's view for each app/name, matching its graph base.
+        for source in &payload.sessions {
+            for view in &source.views {
+                let key = ViewKey::new(&view.app, &view.view)?;
+                if session.view(&key).is_none() {
+                    session.set_view_now(author.clone().via(&view.app), key, view.state.clone())?;
+                }
+            }
+        }
+        session.manifest.codicil_read_only = true;
+        session.flush(wall_clock_now()).await?;
+        Ok(session.manifest().clone())
+    }
+
     /// Fork `parent` at journal cursor `at`: a new session whose baseline is
     /// the parent's graph there and whose journal starts empty.
     pub async fn fork_at(
@@ -1120,11 +1296,47 @@ impl<B: Backend + Clone> MereSessions<B> {
         at: Seq,
         author: Author,
     ) -> Result<GraphSessionManifest, SessionError> {
-        let live = parent.journal().live_cursor();
-        let graph = parent
-            .graph_at(at)
-            .ok_or(SessionError::CursorOutOfRange { cursor: at, live })?;
-        self.create_fork(parent, at, &graph, author).await
+        let mut session = self.begin_fork_at(parent, at, author)?;
+        session.flush(wall_clock_now()).await?;
+        Ok(session.manifest().clone())
+    }
+
+    /// Stage an independent fork without writing it. The caller can validate
+    /// and apply its first edit, then flush the entire new session in one batch.
+    pub fn begin_fork_at(
+        &self,
+        parent: &GraphSession<B>,
+        at: Seq,
+        author: Author,
+    ) -> Result<GraphSession<B>, SessionError> {
+        let graph = parent.graph_at(at).ok_or(SessionError::CursorOutOfRange {
+            cursor: at,
+            live: parent.journal().live_cursor(),
+        })?;
+        let mut manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
+        manifest.parent_session = Some(parent.id());
+        manifest.forked_at = Some(at.0);
+        manifest.display_name = parent.manifest().display_name.clone();
+        manifest.source_codicil = parent.manifest().source_codicil.clone();
+        let mut session = GraphSession::new(
+            self.backend.clone(),
+            manifest,
+            Some(graph),
+            author.clone(),
+            ChangeKind::Forked {
+                from: parent.id(),
+                at,
+            },
+        );
+        for key in parent.views.keys() {
+            if let Some(state) = parent.view_at(key, at) {
+                session.set_view_now(author.clone().via(key.app()), key.clone(), state.clone())?;
+            }
+        }
+        if let Some(validator) = &parent.validator {
+            session = session.with_validator(Arc::clone(validator))?;
+        }
+        Ok(session)
     }
 
     /// Fork the connected component around node `seed` out of `parent`
@@ -1144,33 +1356,17 @@ impl<B: Backend + Clone> MereSessions<B> {
             *fork_graph_id.as_uuid(),
         )
         .ok_or(SessionError::NoSuchNode(seed))?;
+        parent.validate(&graph)?;
         let at = parent.journal().live_cursor();
         let mut manifest = GraphSessionManifest::new(SessionId::new(), fork_graph_id);
         manifest.parent_session = Some(parent.id());
         manifest.forked_at = Some(at.0);
+        manifest.source_codicil = parent.manifest().source_codicil.clone();
         let kind = ChangeKind::Forked {
             from: parent.id(),
             at,
         };
         self.create(manifest, Some(&graph), author, kind).await
-    }
-
-    async fn create_fork(
-        &self,
-        parent: &GraphSession<B>,
-        at: Seq,
-        graph: &Graph,
-        author: Author,
-    ) -> Result<GraphSessionManifest, SessionError> {
-        let mut manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
-        manifest.parent_session = Some(parent.id());
-        manifest.forked_at = Some(at.0);
-        manifest.display_name = parent.manifest().display_name.clone();
-        let kind = ChangeKind::Forked {
-            from: parent.id(),
-            at,
-        };
-        self.create(manifest, Some(graph), author, kind).await
     }
 
     /// Write a new session's manifest, baseline and first change as one batch.
@@ -1262,6 +1458,362 @@ mod tests {
             .collect();
         edges.sort();
         (nodes, edges)
+    }
+
+    async fn stored_bytes(store: &muniment::MemoryBackend) -> Vec<(String, Vec<u8>)> {
+        let mut keys = store.list("").await.unwrap();
+        keys.sort();
+        let mut bytes = Vec::new();
+        for key in keys {
+            bytes.push((key.clone(), store.get(&key).await.unwrap().unwrap()));
+        }
+        bytes
+    }
+
+    #[test]
+    fn archive_reopens_exactly_and_public_writes_require_a_fork() {
+        pollster::block_on(async {
+            use crate::graph_codicil::{load_graph_codicil, save_session_codicil_checked};
+            let mut store = muniment::MemoryBackend::default();
+            let sessions = MereSessions::new(store.clone());
+            let id = sessions
+                .mint(person(), Some("Kept reading".into()))
+                .await
+                .unwrap()
+                .session_id;
+            let mut live = sessions.open(id).await.unwrap();
+            live.apply(person(), vec![add(1), add(2), relate(1, 2)])
+                .await
+                .unwrap();
+            let key = ViewKey::new("cleromancy", "scene").unwrap();
+            let view = ViewIntent {
+                focus: Some("https://1.example".into()),
+                camera: Some(crate::CameraSnapshot {
+                    coefficients: [1.0, 0.0, 0.0, 1.0, 42.0, 17.0],
+                }),
+                ..Default::default()
+            };
+            live.set_view(person(), key.clone(), view.clone())
+                .await
+                .unwrap();
+            let payload = live.codicil_payload();
+            let archived = save_session_codicil_checked(
+                &mut store,
+                payload.clone(),
+                eidetic::Timestamp(42),
+                |_| Ok(()),
+            )
+            .await
+            .unwrap();
+            let before_browse = stored_bytes(&store).await;
+            let kept = load_graph_codicil(&mut store, archived)
+                .await
+                .unwrap()
+                .unwrap();
+            assert_eq!(
+                serde_json::to_value(&payload).unwrap(),
+                serde_json::to_value(&kept).unwrap()
+            );
+            assert_eq!(
+                stored_bytes(&store).await,
+                before_browse,
+                "browsing writes nothing"
+            );
+            let thaw_id = sessions
+                .open_codicil_checked(archived, knot(), |_| Ok(()))
+                .await
+                .unwrap()
+                .session_id;
+            assert_ne!(thaw_id, id);
+            let mut thaw = sessions.open(thaw_id).await.unwrap();
+            assert_eq!(
+                whole(live.graph()),
+                whole(thaw.graph()),
+                "snapshot and facets exactly retained"
+            );
+            assert_eq!(thaw.view(&key), Some(&view));
+            assert_eq!(
+                thaw.manifest().source_codicil.as_ref().unwrap().0,
+                archived.to_string()
+            );
+            assert!(thaw.manifest().codicil_read_only);
+            let frozen = stored_bytes(&store).await;
+            assert!(matches!(
+                thaw.apply(person(), vec![retitle(1, "bad")]).await,
+                Err(SessionError::ReadOnly(_))
+            ));
+            assert!(matches!(
+                thaw.apply_deltas(person(), Vec::new()).await,
+                Err(SessionError::ReadOnly(_))
+            ));
+            assert!(matches!(
+                thaw.edit_now(person(), |_| panic!("must not execute")),
+                Err(SessionError::ReadOnly(_))
+            ));
+            assert!(matches!(
+                thaw.undo(person()).await,
+                Err(SessionError::ReadOnly(_))
+            ));
+            assert!(matches!(
+                thaw.redo(person()).await,
+                Err(SessionError::ReadOnly(_))
+            ));
+            assert!(matches!(
+                thaw.set_view(person(), key.clone(), ViewIntent::default())
+                    .await,
+                Err(SessionError::ReadOnly(_))
+            ));
+            assert_eq!(stored_bytes(&store).await, frozen);
+            let mut fork = sessions
+                .begin_fork_at(&thaw, thaw.journal().live_cursor(), knot())
+                .unwrap();
+            fork.apply_now(knot(), vec![retitle(1, "Edited fork")])
+                .unwrap();
+            fork.flush(wall_clock_now()).await.unwrap();
+            assert_eq!(fork.manifest().parent_session, Some(thaw_id));
+            assert_eq!(
+                fork.manifest().source_codicil,
+                thaw.manifest().source_codicil
+            );
+            assert_eq!(fork.view(&key), Some(&view));
+            assert!(!fork.manifest().codicil_read_only);
+            assert_eq!(
+                whole(live.graph()),
+                whole(sessions.open(thaw_id).await.unwrap().graph())
+            );
+            assert_ne!(whole(fork.graph()), whole(thaw.graph()));
+            let fork_codicil = save_session_codicil_checked(
+                &mut store,
+                fork.codicil_payload(),
+                eidetic::Timestamp(43),
+                |_| Ok(()),
+            )
+            .await
+            .unwrap();
+            let manifest = eidetic::manifest::load_manifest(&mut store, fork_codicil)
+                .await
+                .unwrap()
+                .unwrap();
+            assert_eq!(
+                manifest.provenance.upstream,
+                [archived],
+                "a saved edit fork retains its immutable source in Eidetic lineage"
+            );
+        });
+    }
+
+    #[test]
+    fn whole_graph_validation_refuses_without_graph_history_or_storage_changes() {
+        pollster::block_on(async {
+            let store = muniment::MemoryBackend::default();
+            let sessions = MereSessions::new(store.clone());
+            let id = sessions.mint(person(), None).await.unwrap().session_id;
+            let validator: GraphValidator = Arc::new(|graph| {
+                if graph.nodes().any(|(_, node)| node.title == "Forbidden") {
+                    Err("forbidden title".into())
+                } else {
+                    Ok(())
+                }
+            });
+            let mut session = sessions
+                .open(id)
+                .await
+                .unwrap()
+                .with_validator(validator.clone())
+                .unwrap();
+            session.apply(person(), vec![add(1)]).await.unwrap();
+            let before = (
+                whole(session.graph()),
+                session.changes().to_vec(),
+                session.revision(),
+                stored_bytes(&store).await,
+            );
+            assert!(matches!(
+                session.apply(person(), vec![retitle(1, "Forbidden")]).await,
+                Err(SessionError::Validation(_))
+            ));
+            assert!(matches!(
+                session.edit_now(person(), |graph| {
+                    let key = graph.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
+                    apply_graph_delta(
+                        graph,
+                        GraphDelta::SetNodeTitle {
+                            key,
+                            title: "Forbidden".into(),
+                        },
+                    );
+                }),
+                Err(SessionError::Validation(_))
+            ));
+            let observed = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+            let counter = observed.clone();
+            kernel::graph::set_captured_delta_hook(Some(Arc::new(move |_| {
+                counter.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+            })));
+            assert!(
+                session
+                    .apply_now(person(), vec![retitle(1, "Forbidden")])
+                    .is_err()
+            );
+            assert!(matches!(
+                session.edit_now(person(), |graph| {
+                    graph
+                        .facets_mut()
+                        .set(
+                            Uuid::from_u128(1),
+                            chartulary::FacetId::new("unlogged.truth"),
+                            serde_json::json!(true),
+                            &chartulary::AcceptAll,
+                        )
+                        .unwrap();
+                }),
+                Err(SessionError::NotReplayable(_))
+            ));
+            kernel::graph::set_captured_delta_hook(None);
+            assert_eq!(
+                observed.load(std::sync::atomic::Ordering::SeqCst),
+                0,
+                "candidate edits cannot reach source thread observers"
+            );
+            assert_eq!(
+                (
+                    whole(session.graph()),
+                    session.changes().to_vec(),
+                    session.revision(),
+                    stored_bytes(&store).await
+                ),
+                before
+            );
+            session
+                .apply(person(), vec![retitle(1, "Allowed")])
+                .await
+                .unwrap();
+            // A changed product authority can refuse undo and redo too.
+            let refuse_old: GraphValidator = Arc::new(|graph| {
+                if graph.nodes().any(|(_, n)| n.title != "Allowed") {
+                    Err("old state refused".into())
+                } else {
+                    Ok(())
+                }
+            });
+            session = session.with_validator(refuse_old).unwrap();
+            let before = (
+                whole(session.graph()),
+                session.changes().to_vec(),
+                stored_bytes(&store).await,
+            );
+            assert!(matches!(
+                session.undo(person()).await,
+                Err(SessionError::Validation(_))
+            ));
+            assert_eq!(
+                (
+                    whole(session.graph()),
+                    session.changes().to_vec(),
+                    stored_bytes(&store).await
+                ),
+                before
+            );
+            session = session.with_validator(validator).unwrap();
+            session.undo(person()).await.unwrap().unwrap();
+            session = session
+                .with_validator(Arc::new(|graph| {
+                    if graph.nodes().any(|(_, n)| n.title == "Allowed") {
+                        Err("redo state refused".into())
+                    } else {
+                        Ok(())
+                    }
+                }))
+                .unwrap();
+            let before = (
+                whole(session.graph()),
+                session.changes().to_vec(),
+                stored_bytes(&store).await,
+            );
+            assert!(matches!(
+                session.redo(person()).await,
+                Err(SessionError::Validation(_))
+            ));
+            assert_eq!(
+                (
+                    whole(session.graph()),
+                    session.changes().to_vec(),
+                    stored_bytes(&store).await
+                ),
+                before
+            );
+        });
+    }
+
+    #[test]
+    fn archive_compose_retains_both_sources_and_checks_before_writing() {
+        pollster::block_on(async {
+            use crate::graph_codicil::{
+                compose_graph_codicils_checked, load_graph_codicil, save_session_codicil_checked,
+            };
+            let mut store = muniment::MemoryBackend::default();
+            let sessions = MereSessions::new(store.clone());
+            let mut ids = Vec::new();
+            for n in [1, 2] {
+                let mut s = sessions.begin(person(), None);
+                s.apply(person(), vec![add(n)]).await.unwrap();
+                ids.push(
+                    save_session_codicil_checked(
+                        &mut store,
+                        s.codicil_payload(),
+                        eidetic::Timestamp(n as u64),
+                        |_| Ok(()),
+                    )
+                    .await
+                    .unwrap(),
+                );
+            }
+            let before = stored_bytes(&store).await;
+            assert!(
+                compose_graph_codicils_checked(&mut store, &ids, eidetic::Timestamp(3), |_| Err(
+                    "no union".into()
+                ))
+                .await
+                .is_err()
+            );
+            assert!(
+                sessions
+                    .open_codicil_checked(ids[0], person(), |_| Err("no thaw".into()))
+                    .await
+                    .is_err()
+            );
+            assert_eq!(stored_bytes(&store).await, before);
+            let composed =
+                compose_graph_codicils_checked(&mut store, &ids, eidetic::Timestamp(3), |_| Ok(()))
+                    .await
+                    .unwrap()
+                    .unwrap();
+            let manifest = eidetic::manifest::load_manifest(&mut store, composed)
+                .await
+                .unwrap()
+                .unwrap();
+            assert_eq!(manifest.provenance.upstream, ids);
+            let payload = load_graph_codicil(&mut store, composed)
+                .await
+                .unwrap()
+                .unwrap();
+            assert_eq!(payload.sessions.len(), 2);
+            assert_eq!(payload.snapshot.nodes.len(), 2);
+            let thaw = sessions
+                .open_codicil_checked(composed, person(), |_| Ok(()))
+                .await
+                .unwrap();
+            assert_eq!(
+                sessions
+                    .open(thaw.session_id)
+                    .await
+                    .unwrap()
+                    .graph()
+                    .nodes()
+                    .count(),
+                2
+            );
+        });
     }
 
     #[test]
@@ -1606,14 +2158,16 @@ mod tests {
                 person(),
                 ChangeKind::Minted,
             );
-            let (key, applied) = session.edit_now(person(), |graph| {
-                kernel::graph::apply::add_node(
-                    graph,
-                    Some(Uuid::from_u128(2)),
-                    "https://2.test/".into(),
-                    Point2D::new(0.0, 0.0),
-                )
-            });
+            let (key, applied) = session
+                .edit_now(person(), |graph| {
+                    kernel::graph::apply::add_node(
+                        graph,
+                        Some(Uuid::from_u128(2)),
+                        "https://2.test/".into(),
+                        Point2D::new(0.0, 0.0),
+                    )
+                })
+                .unwrap();
             assert!(session.graph().get_node(key).is_some());
             assert_eq!(applied.first, Seq(0));
             assert!(
@@ -1761,14 +2315,16 @@ mod tests {
             assert!(!session.has_unstored());
             let key = ViewKey::new("graphshell", "commands").unwrap();
             let menu = ViewIntent {
-                commands: Some(crate::CommandMenuView {
+                commands: Some(command_menu::CommandChoices {
                     added: vec!["add-address".into()],
                     removed: vec!["zoom-out".into()],
                     recent: vec!["zoom-in".into()],
                 }),
                 ..ViewIntent::default()
             };
-            session.set_view_now(person(), key.clone(), menu.clone());
+            session
+                .set_view_now(person(), key.clone(), menu.clone())
+                .unwrap();
             assert_eq!(session.view(&key), Some(&menu));
             assert!(session.has_unstored(), "the view waits for a batch");
             assert_eq!(

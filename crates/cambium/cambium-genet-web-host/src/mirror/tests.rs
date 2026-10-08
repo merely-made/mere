@@ -9,7 +9,7 @@ use document_session_api::{
     DocumentA11yToggled,
 };
 use genet_scripted_dom::{NodeId, ScriptedDom};
-use layout_dom_api::{LayoutDom, LocalName, Namespace};
+use layout_dom_api::{LayoutDom, LayoutDomMut, LocalName, Namespace};
 
 use super::*;
 
@@ -108,6 +108,57 @@ fn each_control_on_the_page_lowers_to_its_aria_role_and_name() {
     assert!(
         with_role(&mirror, "button")[0].focusable,
         "a button takes a reader's focus"
+    );
+}
+
+#[test]
+fn app_textbox_marker_runs_through_the_browser_mirror_as_a_leaf() {
+    let mut dom = ScriptedDom::new();
+    let root = dom.document();
+    dom.set_inner_html(
+        root,
+        "<div id=\"app-field\" role=\"textbox\" aria-label=\"Draft\" aria-multiline=\"true\" data-cambium-text-value=\"Café 👩🏽‍🚀\nSecond line\" style=\"display:block;width:240px;height:40px\">painted value<span> ghost</span><span>preedit</span><span>│</span></div><div id=\"ordinary-field\" role=\"textbox\" aria-label=\"Ordinary\" style=\"display:block;width:240px;height:32px\">ordinary<span> child</span></div>",
+    );
+    let app_field = element_with_id(&dom, dom.document(), "app-field")
+        .expect("the fixture has its marked app textbox");
+    let ordinary_field = element_with_id(&dom, dom.document(), "ordinary-field")
+        .expect("the fixture has its ordinary textbox");
+    let app_id = dom.opaque_id(app_field);
+    let ordinary_id = dom.opaque_id(ordinary_field);
+    let drawn_children: Vec<_> = dom.dom_children(app_field).map(|child| dom.opaque_id(child)).collect();
+    let layout =
+        cambium_rootstock::OwnedLayout::new(&dom, &[""], 320.0, 180.0, &[], &Default::default());
+    let projection = cambium_rootstock::document_projection(
+        &cambium_rootstock::WindowDom::document(&dom),
+        &layout,
+        Some(app_id),
+    );
+    let mirror = plan(&projection, 1.0, |_, _| None);
+    let flat_mirror = flat(&mirror);
+    let app = flat_mirror
+        .iter()
+        .find(|node| node.id == app_id)
+        .expect("the app textbox is mirrored");
+    assert_eq!(attr(app, "role"), Some("textbox"));
+    assert_eq!(attr(app, "aria-label"), Some("Draft"));
+    assert_eq!(app.text.as_deref(), Some("Café 👩🏽‍🚀\nSecond line"));
+    assert!(app.children.is_empty(), "the app textbox is a mirror leaf");
+    assert!(app.focusable, "the app textbox keeps its focus action");
+    assert!(app.rect.is_some(), "the textbox keeps its painted bounds");
+    assert_eq!(
+        dom.dom_children(app_field).map(|child| dom.opaque_id(child)).collect::<Vec<_>>(),
+        drawn_children,
+        "the browser accessibility pipeline leaves drawing DOM children intact"
+    );
+
+    let ordinary = flat_mirror
+        .iter()
+        .find(|node| node.id == ordinary_id)
+        .expect("the ordinary textbox remains mirrored");
+    assert_eq!(attr(ordinary, "role"), Some("textbox"));
+    assert!(
+        !ordinary.children.is_empty(),
+        "unmarked textboxes keep their generic descendants"
     );
 }
 

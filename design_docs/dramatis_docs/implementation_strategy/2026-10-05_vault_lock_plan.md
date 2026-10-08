@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-08)**: rulings 1 to 61 in §3; the threat statement is
+**Status (2026-10-08)**: rulings 1 to 70 in §3; the threat statement is
 still open. L1 landed (`2556a20c`). L2's checkpoints A (`7c588deb`) and B
 (`ec1768ab`) landed. Still to come in L2: the Secret Service on the
 ThinkPad, ruling 42 (Linux starts locked), ruling 44 (Distillery's
@@ -727,6 +727,102 @@ leaves none, and Mere's wiring adds none.* Options:
 Mark: **"Ledger only (Recommended)"**. Follows: ruling 42 is next (ruling
 56's order).
 
+Rulings 62 to 65 were asked on 2026-10-08 from ruling 42's assessment (§6).
+
+**Ruling 62** *(ruling 42's scope).* *Ruling 42 names Linux. Ruling 7
+forbids the environment passphrase for any resident that locks, and the
+Windows test harness uses it.* Options:
+- every resident on the passphrase vault starts locked: Linux always,
+  Windows when it uses that vault, while DPAPI Windows still auto-unlocks;
+- Linux only, keeping the Windows environment path as a recorded exception.
+
+Mark: **"Every passphrase vault (Recommended)"**. Follows: djinn no longer
+reads `PERSONAE_PASSPHRASE`, and the path is tested here on the passphrase
+vault.
+
+**Ruling 63** *(the first unlock).* *A resident admits door sessions only
+with the door keys, which come from the vault (rulings 40 and 46). Before
+its first unlock it has none, so `djinn --unlock` cannot reach it.*
+Options:
+- the resident's own prompt at start (the native box where the desktop
+  has a dialog provider, else its terminal), with no doors until it
+  succeeds, and a cancel exiting;
+- the same plus an owner-only pre-door unlock socket;
+- the resident's own prompt, with a cancel re-showing it (with backoff)
+  instead of exiting.
+
+Mark: **"Prompt, and re-prompt on cancel"**. *Reading, not ruled:*
+- a cancel or a wrong passphrase re-prompts;
+- with no dialog provider and no terminal there is nothing to re-show, so
+  the resident exits with an error naming both.
+
+**Ruling 64** *(first run).* *No vault exists, and nothing creates a
+passphrase vault without the environment (`--enroll-passphrase` enrols
+only over the sealed DPAPI vault).* Options: a `djinn --create-vault`
+terminal command; the start prompt creates it. Mark: **"The start prompt
+creates it"**. *Reading, not ruled:* it asks twice, and a mismatch
+re-prompts.
+
+**Ruling 65** *(the harness).* *With the environment gone, the harness
+cannot type into `rpassword`, which reads only the console or tty.*
+Options:
+- `--passphrase-fd N` (GnuPG's convention), compiled only under a test or
+  receipt feature;
+- the same in release builds;
+- the environment kept, harness only.
+
+Mark: **"Passphrase over an fd (Recommended)"**.
+
+**Ruling 66** *(what "starts locked" builds; asked 2026-10-08).* *A vault
+object opened locked would have no master public key, but
+`IdentityProvider::master_public_key()` is infallible, with about 200
+calls. Under ruling 63 nothing reaches the vault before the first unlock.*
+Options:
+- wait before the vault: the resident prompts before building any
+  storage key, profile, door or lane, then opens the passphrase vault as
+  today; `open` already rejects a wrong passphrase and creates a missing
+  vault;
+- a locked vault object, with personae's `open_locked` constructors and a
+  fallible master key.
+
+Mark: **"Wait before the vault (Recommended)"**. Follows: personae is
+unchanged, and the first done-condition of ruling 42's build is
+superseded (§6, 2026-10-08). *Reading, not ruled:* without the
+environment, djinn picks the passphrase vault when the platform has no OS
+root, when `--passphrase-fd` is given, or when the vault directory holds
+`vault.json`; otherwise DPAPI. The installed resident's directory holds
+only `auto-unlock-root.json` and `profiles`, so it stays on DPAPI.
+
+Rulings 67 to 69 were asked on 2026-10-08 from the Secret Service's
+assessment (§6).
+
+**Ruling 67** *(the Secret Service's Prompt).* *While the vault is locked,
+a client's `Unlock` gets a Prompt object (ruling 10).* Options: the
+Prompt shows the resident's native unlock (ruling 47's prompt), handed in
+by the resident, with a cancel completing as dismissed; the Prompt shows
+nothing and completes when the vault is unlocked by any route. Mark:
+**"Show the native unlock (Recommended)"**.
+
+**Ruling 68** *(a client's `Lock`).* Options:
+- any `Lock` engages the whole vault lock, as `ssh-add -x` does (ruling 9);
+- per-object flips under the vault lock;
+- refused.
+
+Mark: **"Locks the whole vault (Recommended)"**.
+
+**Ruling 69** *(who serves it).* *gnome-keyring already owns
+`org.freedesktop.secrets` on the ThinkPad.* Options: test-served for this
+checkpoint, proven under a disposable bus, with djinn's wiring and the
+hand-over from gnome-keyring as later items; djinn serves it now behind an
+owner setting that is off by default. Mark: **"Test-served for now
+(Recommended)"**.
+
+**Ruling 70** *(the Linux residue; asked 2026-10-08).* *On Linux, personae's
+`no_residue` finds the sealed root key in a 564-byte block freed uncleared
+during `save` (3 of 3 runs; clean on Windows at the same commit).* Options:
+trace it now, with ruling 42's Linux proof waiting; ruling 42's proof
+first; record it and go on to L3. Mark: **"Trace it now (Recommended)"**.
+
 Still open: a threat statement naming hibernation and the pagefile.
 
 ## 4. Phases
@@ -753,9 +849,10 @@ made, and carried out since under the later rulings.
   - [x] `CastellanResident` drops its keys, so items and the OTP gate return
         `Locked`;
   - [x] the snapshot reports Locked, and Unlock is native-only;
-  - [ ] Secret Service collections report Locked, `GetSecret(s)` refuses,
+  - [x] Secret Service collections report Locked, `GetSecret(s)` refuses,
         and `Unlock` returns a Prompt, proven on the ThinkPad with
-        `secret-tool` under a disposable bus.
+        `secret-tool` under a disposable bus. *(2026-10-08, `aac67a85`;
+        §6.)*
 - **L3 — triggers.** Done when:
   - [ ] each ruled trigger is proven, idle with an injected clock;
   - [ ] there are real receipts for Windows `Win+L` and suspend, and for
@@ -1178,3 +1275,179 @@ unlock follow-through, and non-Windows startup unlock backends, from the
 - **Dev-dependency:** `iroh-mdns-address-lookup = "=0.6.0"`, the version
   p2panda-net already locks. `cargo_mode.py verify` passes.
 - **Ruling 61:** ledger only. Next: ruling 42.
+
+**2026-10-08, ruling 42 assessed** (at `19de6eab`).
+- **What exists:**
+  - the passphrase vault locks and unlocks;
+  - Linux has the native prompt: graphshell's `SystemNativeIdentityUi`
+    uses `light-file-dialog`'s password box, through whatever graphical
+    dialog provider the desktop offers;
+  - `djinn --unlock` and `--native` (rulings 41 and 47);
+  - the door keys captured at first unlock (ruling 46).
+- **What is missing:**
+  - **Nothing opens locked.** `PassphraseEncryptedStorage::open` and
+    `IdentityVault::{open, with_profile}` all need the secret.
+  - **djinn's `run()` does everything after an unlocked open:** the
+    profile load, the door keys, a second vault open in
+    `DjinnResident::open` (which re-reads the environment), and the Knot,
+    Distillery, reservoir and sync lanes.
+  - **No door before the first unlock.** `admit_local_client` asks the
+    door for its keys before it admits anything, so the first unlock can
+    only be the resident's own prompt (ruling 63).
+  - **No first-run path off DPAPI.** `--enroll-passphrase` opens the
+    sealed vault only (ruling 64).
+  - **The environment in the harness.** djinn-testkit sets
+    `PERSONAE_PASSPHRASE` (ruling 65).
+- **Not in this scope:** `personae-agent` and `personae-vault` still use
+  `Unlock::from_env()`. The standalone agent is Linux's deployed agent
+  until the pairing plan's D2.
+- **The build. Done when:**
+  - [ ] personae opens a passphrase vault locked (salt only, profile id
+        only). Every guard refuses until a passphrase unlock loads the
+        profile; a wrong passphrase stays locked; tests cover each.
+        *2026-10-08: superseded by ruling 66. The resident waits before
+        building the vault, so personae is unchanged.*
+  - [x] djinn's resident path reads no passphrase from the environment
+        (measured by search). A control resident given
+        `PERSONAE_PASSPHRASE` and nothing else stays locked.
+        *2026-10-08: the search is clean for djinn and djinn-testkit. The
+        control resident is not run: on Windows the native box is always
+        available, so it would open a real dialog on the desktop mid-test.
+        The live tests stand in for it: they pass with no environment.*
+  - [x] A passphrase-vault resident starts locked, prompts, re-prompts on
+        a cancel or a wrong passphrase, and serves its doors only after
+        the unlock. The door keys, lanes and second open follow the
+        unlock. *2026-10-08: the prompt logic by scripted unit tests; a
+        live resident's events run `started, waiting-for-unlock,
+        vault-created, listening, ready`. The real native box and terminal
+        are Mark's attended step.*
+  - [x] With no vault, the start prompt asks twice and creates it.
+  - [x] `--passphrase-fd` exists only under the test or receipt feature,
+        and the harness, its receipts and djinn's tests use it. *A plain
+        build answers "unknown argument: --passphrase-fd".*
+  - [ ] Gates: personae, castellan and djinn tests, the receipt, and
+        `cargo_mode.py verify`. The Linux build and runtime proof go to
+        the ThinkPad with the Secret Service (ruling 56).
+
+**2026-10-08, ruling 42 built** (`55ff58e4`, branch `start-locked`).
+- **What changed:**
+  - djinn's new `startup_vault` chooses the vault and holds the prompt
+    loop;
+  - `run()` and the pairing commands open through it;
+  - `--passphrase-fd 0` sits behind the `passphrase-fd` feature, which the
+    tests turn on through djinn's dev-dependency on itself;
+  - djinn-testkit hands the passphrase over on standard input;
+  - graphshell's `NativeIdentityUi` gains `ask_vault_passphrase(message)`;
+  - personae gains a named constant, `PASSPHRASE_VAULT_FILE`, and no other
+    change.
+- ***Readings, not ruled:***
+  - any refused open asks again, with the reason shown, rather than matching
+    personae's "incorrect passphrase" string;
+  - only fd 0 is read, since Windows has no other inherited descriptor
+    numbers;
+  - the passphrase is kept in zeroizing memory only for Distillery's second
+    open of the same directory.
+- **Verified in the worktree:**
+  - djinn's tests, startup_vault's 8 included; personae, djinn-testkit and
+    castellan (32 suites, 346 passed);
+  - graphshell's tests compile;
+  - the live tests: `harness` 4 of 4, `lock_agent` and the two-resident
+    directory test;
+  - `cargo_mode.py verify`.
+- **Finding, not this change's:** `mdns_first_contact_two_instance` fails
+  at "a restarted: contact within 90s", 3 of 3 runs on the branch and 1 of
+  1 on its base `19de6eab`, at the same step. It belongs to the device
+  pairing plan's D1b receipts.
+- **Still open:**
+  - the Linux build and runtime proof on the ThinkPad, with the Secret
+    Service (ruling 56);
+  - the real native box and terminal prompt, which are Mark's attended
+    step;
+  - outside djinn, `Unlock::from_env()` remains in `personae-agent`,
+    `personae-vault`, `distillery-installed`, graphshell's `profile.rs`
+    and its web-extension smoke host.
+
+**2026-10-08, the Secret Service assessed** (L2 checkpoint B, at
+`18404a4c`).
+- **What exists:**
+  - castellan's D-Bus server (about 1,460 lines, Linux-only);
+  - the store under it refuses while the resident is locked;
+  - `secret_service_linux.rs` drives `secret-tool` (store, lookup, clear)
+    under `dbus-run-session`.
+- **What is missing** (§2's survey still holds):
+  - `Locked` is a label flip on sets that start empty, not the vault's
+    state;
+  - `Unlock` never prompts;
+  - no lock or unlock change reaches D-Bus;
+  - nothing serves it in production.
+- *Reading, not ruled:* ruling 11's secret-free snapshot covers the Secret
+  Service's metadata (collections, labels, lookup attributes and content
+  types, which the specification treats as not secret). So a locked search
+  still answers and reports its items locked, and the client's `Unlock`
+  meets ruling 67's prompt. Under ruling 66 a Linux resident builds nothing
+  before its first unlock, so a snapshot exists whenever the service is
+  served.
+- **The ThinkPad.** It is at `192.168.4.32`, with ED25519 key
+  `SHA256:9kM6RpW0UxjYmEdg5ngHw1JL8J7Hm7B8QXXJGKWkB7o`, as recorded. Rust
+  1.98.1, `secret-tool`, `dbus-run-session`, `gdbus` and `zenity` are there.
+  Another session's checkout and builds are left alone; this work runs in
+  a worktree of its own.
+- **The build. Done when:**
+  - [x] collections and items report `Locked` exactly when the vault is
+        locked, and a lock or unlock emits the property change;
+  - [x] while locked, a search answers from the snapshot with every item
+        locked, `GetSecrets` returns nothing, and `Item.GetSecret` fails
+        `IsLocked`;
+  - [x] `Unlock` while locked returns a Prompt. Its `Prompt()` runs the
+        handed-in unlock: success completes with the unlocked objects, and
+        a cancel completes as dismissed with the vault still locked;
+  - [x] a client `Lock` of any object locks the vault;
+  - [x] proven on the ThinkPad under `dbus-run-session`: `secret-tool
+        lookup` on a locked vault brings up the scripted prompt and
+        returns the secret, and with a cancel returns nothing. The
+        properties and refusals are read with `gdbus`. The existing
+        receipt still passes. *2026-10-08: the reads use the receipt's
+        own bus connection instead of `gdbus`. Each `gdbus` call is a new
+        connection, so it cannot hold the transfer session `GetSecret`
+        needs.*
+  - [x] castellan's tests pass on Windows and Linux.
+
+**2026-10-08, the Secret Service built and proven** (`aac67a85`, branch
+`secret-lock`; checkpoint B's Secret Service).
+- **What changed:**
+  - castellan's store gains `MetadataSnapshot`, ruling 11's snapshot for
+    the Secret Service, held in memory and never written;
+  - `serve()` takes the host's `SecretServiceVault` (is locked, a watch,
+    lock, the native unlock prompt);
+  - `Locked` follows it, and a watcher announces each change as
+    `PropertiesChanged` on every object;
+  - while locked, reads answer from the snapshot;
+  - `Unlock` returns a Prompt object (`prompt.rs`);
+  - a client `Lock` of any collection, alias or item locks the vault.
+- ***Reading, not ruled:*** the snapshot is retaken at serve, at each
+  unlock and after each write made through the service. An edit made
+  through another surface while unlocked shows in the locked view after
+  the next of those.
+- **Verified on the ThinkPad (Fedora 44, under `dbus-run-session`):**
+  - the new receipt: Lock, the announcement, the locked reads, the
+    refusals, a cancelled prompt and an unlocking one through
+    `secret-tool lookup`;
+  - the existing store, lookup and clear receipt;
+  - castellan with all features (5 suites, 127 passed);
+  - **control:** `locked()` hard-wired to false fails the receipt at the
+    collection's `Locked`. The first draft read that property through a
+    caching proxy, which answered from the very signal under test; every
+    read is uncached now.
+- **Verified on Windows:** castellan by default (67) and with
+  `secret-service` (18), and `cargo_mode.py verify`.
+- **Fixed in passing:** personae's `ssh_ca_live` (`#![cfg(unix)]`, behind
+  `ssh`) had not compiled since `7926d3a8`, which moved the proofs to
+  insigne; it lacked `use personae::delegation::Issue`.
+- **Finding, Linux only:** personae's `no_residue` fails "sealed vault
+  locked". The sealed root key, raw, is in a 564-byte block freed
+  uncleared, allocated during `save`. This happened in 3 of 3 runs on the
+  ThinkPad. On Windows, at the same commit, every scenario is clean. L1's
+  instrument has not been run on Linux before, so L1's residue condition
+  holds on Windows only. Not yet traced.
+- **Still open:** djinn's wiring and the hand-over from gnome-keyring
+  (ruling 69); ruling 42's Linux runtime proof; the Linux residue above.

@@ -296,6 +296,7 @@ impl MutationRouter {
                 DomMutation::Removed { former_parent, .. } => vec![*former_parent],
                 DomMutation::AttributeChanged { node, .. }
                 | DomMutation::CharacterDataChanged { node }
+                | DomMutation::FormControlStateChanged { node }
                 | DomMutation::SubtreeReplaced { node } => vec![*node],
                 DomMutation::Moved {
                     from_parent,

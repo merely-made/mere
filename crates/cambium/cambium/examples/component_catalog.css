@@ -166,23 +166,21 @@
     background-color: var(--catalog-border);
 }
 
-.catalog-row > input,
-.catalog-row > textarea {
+.catalog-row > [role="textbox"] {
     display: block;
     margin-top: 0.25rem;
 }
 
 .catalog-button,
 .select-box,
-input,
-textarea {
+[role="textbox"] {
     background-color: var(--catalog-panel);
     border: 1px solid var(--catalog-control-border);
     color: var(--catalog-text);
     padding: 0.5rem 0.75rem;
 }
 
-textarea {
+[role="textbox"][aria-multiline="true"] {
     min-height: 5rem;
     box-sizing: border-box;
     max-width: 100%;

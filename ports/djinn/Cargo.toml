@@ -12,6 +12,11 @@ categories = ["command-line-utilities", "authentication"]
 [features]
 default = ["personal-sync"]
 personal-sync = []
+# `--passphrase-fd 0` for the harness and its receipts (vault lock ruling 65):
+# a passphrase read once from standard input, never the environment. Tests turn
+# it on through the dev-dependency on this package below; release builds keep
+# the prompt only.
+passphrase-fd = []
 # The Distillery trainer resource, composed into the works lane
 # (`src/resident_distillery.rs`). Gated because it pulls the burn stack into
 # the desktop resident: a default build must stay light, and a lane whose
@@ -145,6 +150,9 @@ path = "src/bin/distillery_chronicle_receipt_host.rs"
 required-features = ["distillery-chronicle-receipt-host"]
 
 [dev-dependencies]
+# This package with `passphrase-fd`, so the binary the tests spawn reads the
+# harness's passphrase (ruling 65).
+djinn = { path = ".", default-features = false, features = ["passphrase-fd"] }
 # The shared resident harness (djinn test harness plan): path only, unpublished,
 # so packaging drops it.
 djinn-testkit = { path = "../../crates/system/djinn-testkit" }

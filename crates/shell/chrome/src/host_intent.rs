@@ -74,7 +74,7 @@ pub enum HostIntent {
     /// Spine row's inline action). The runtime sets
     /// `focused_node_hint = Some(node_key)` *before* running the
     /// per-action handler, so handlers that operate on focused
-    /// selection (`NodePinToggle`, `NodeMarkTombstone`, etc.) act on
+    /// selection (`NodePinToggle`, `NodeDelete`, etc.) act on
     /// the named node instead of whatever happened to be focused.
     ActionOnNode {
         action_id: ActionId,
@@ -108,7 +108,7 @@ mod tests {
     #[test]
     fn action_serde_roundtrip() {
         let intent = HostIntent::Action {
-            action_id: ActionId::WorkbenchOpenSettingsPane,
+            action_id: ActionId::PaneSettings,
         };
         let json = serde_json::to_string(&intent).expect("serialize");
         let back: HostIntent = serde_json::from_str(&json).expect("deserialize");

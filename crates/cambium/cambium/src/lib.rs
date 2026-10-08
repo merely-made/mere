@@ -29,7 +29,6 @@ use layout_dom_api::{LocalName, Namespace, QualName};
 mod action_list;
 mod arrangement;
 mod atlas;
-mod command_set;
 mod command_surface;
 mod command_menu_bar;
 mod component;
@@ -98,7 +97,8 @@ pub use atlas::{
     GraphCanvasAtlasField, GraphCanvasAtlasPaint, GraphCanvasAtlasProjectedCompoundPath,
     GraphCanvasAtlasProjectedShape, GraphCanvasAtlasRoute, GraphCanvasAtlasView,
 };
-pub use command_set::{Command, CommandChoices, CommandSet};
+// The command set lives in its own crate so hosts without Cambium share it (SE45 to SE48).
+pub use ::command_menu::{Command, CommandChoices, CommandSet, MenuSession, catalogue};
 pub use command_surface::{
     CommandEvent, CommandItem, CommandState, CommandSurfaceKind, command_menu, command_palette,
     command_picker, command_surface,

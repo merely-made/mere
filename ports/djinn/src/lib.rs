@@ -15,6 +15,7 @@
 #![doc(html_no_source)]
 
 pub mod conditions;
+pub mod embedded_reservoir;
 pub mod enrollment;
 pub mod pairing;
 pub mod personal_sync;
@@ -29,3 +30,4 @@ pub mod resident_reservoir;
 pub mod resident_site;
 pub mod resident_status;
 pub mod settings;
+pub mod startup_vault;

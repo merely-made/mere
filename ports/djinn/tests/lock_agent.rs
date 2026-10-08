@@ -360,8 +360,18 @@ fn ssh_add_locks_the_resident_like_openssh_and_the_wire_unlock_is_refused() {
     drop(runtime);
     r.stop(STOP);
     let events: Vec<String> = r.events().into_iter().map(|e| e.event).collect();
+    // The vault is created at the first start, before any door (rulings 63 to 65).
     let expected = [
-        "started", "listening", "ready", "locked", "unlocked", "locked", "stopping", "stopped",
+        "started",
+        "waiting-for-unlock",
+        "vault-created",
+        "listening",
+        "ready",
+        "locked",
+        "unlocked",
+        "locked",
+        "stopping",
+        "stopped",
     ];
     run.require(
         "the event file runs the lock, the unlock, the relock and the stop",
