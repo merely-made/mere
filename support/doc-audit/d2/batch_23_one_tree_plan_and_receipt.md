@@ -40,6 +40,16 @@ root and standalone Genet manifests, repeated test/build logs and the headed
 receipt. It preserves the failed pixel gate and labels intermediate texture
 sampling as diagnostic evidence, without claiming visual or live-site readiness.
 
+The unmodified `0051258e4` viewer then passed the original grouped and flat
+scenario pixel gates on Chrome's SwiftShader WebGPU adapter. All three group
+captures, the flat capture, keyboard/breadcrumb capture and 420×800 narrow
+capture were inspected; their PNG hashes are in the receipt. Three pinned
+native Netrender rectangle controls also pass. The plan keeps this software
+acceptance separate from the still-failed default Radeon adapter, and records
+the offscreen graph content and substantial narrow-screen control area as
+remaining usability work. It does not claim the exact renderer fault, site
+deployment or a performance measurement.
+
 The totals above remain the original 2026-09-26 audit, not a new full census.
 The plan's status now records phase 3 under headed verification and preserves
 Mark's timing ruling as the gate before phase 4. The clean dependency repin
