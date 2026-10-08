@@ -1,6 +1,5 @@
 use cubecl::{
-    TestRuntime,
-    ir::{ElemType, FloatKind, StorageType},
+    ir::{ElemType, FloatKind},
     prelude::*,
     std::tensor::TensorHandle,
     zspace::{Shape, Strides},
@@ -25,8 +24,8 @@ pub struct TestCase {
     pub stride: Strides,
     pub axis: Option<usize>,
     pub strategy: ReduceStrategy,
-    pub input_dtype: StorageType,
-    pub accumulation_dtype: StorageType,
+    pub input_dtype: ElemType,
+    pub accumulation_dtype: ElemType,
     custom_input: Option<Vec<f32>>,
 }
 
@@ -51,16 +50,16 @@ impl TestCase {
         strategy: ReduceStrategy,
     ) -> Self
     where
-        P::EI: CubePrimitive,
-        P::EA: CubePrimitive,
+        P::EI: Scalar,
+        P::EA: Scalar,
     {
         Self {
             shape,
             stride,
             axis,
             strategy,
-            input_dtype: <P::EI as CubePrimitive>::as_type_native_unchecked().storage_type(),
-            accumulation_dtype: <P::EA as CubePrimitive>::as_type_native_unchecked().storage_type(),
+            input_dtype: <P::EI as Scalar>::elem_type_native(),
+            accumulation_dtype: <P::EA as Scalar>::elem_type_native(),
             custom_input: None,
         }
     }
@@ -135,7 +134,7 @@ impl TestCase {
         // request (u32 is the one flag storage every test runtime supports), so
         // the in-kernel flag conversion is covered for every input dtype of the
         // matrix.
-        let u32_dtype = u32::as_type_native_unchecked().storage_type();
+        let u32_dtype = u32::elem_type_native();
         self.run_reduce_test_with(
             |input, axis| reference_any(input, axis, None),
             u32_dtype,
@@ -148,7 +147,7 @@ impl TestCase {
     pub fn test_all(&self) {
         // Mirror of `test_any`: p ≈ 1 - 1.5/axis_len makes ~22% of slices
         // all-ones (all = 1) and the rest contain a zero (all = 0).
-        let u32_dtype = u32::as_type_native_unchecked().storage_type();
+        let u32_dtype = u32::elem_type_native();
         self.run_reduce_test_with(
             |input, axis| reference_all(input, axis, None),
             u32_dtype,
@@ -166,7 +165,7 @@ impl TestCase {
     }
 
     pub fn test_argmax(&self) {
-        let u32_dtype = u32::as_type_native_unchecked().storage_type();
+        let u32_dtype = u32::elem_type_native();
         self.run_reduce_test(
             |input, axis| reference_argmax(input, axis, None),
             u32_dtype,
@@ -176,7 +175,7 @@ impl TestCase {
     }
 
     pub fn test_argmin(&self) {
-        let u32_dtype = u32::as_type_native_unchecked().storage_type();
+        let u32_dtype = u32::elem_type_native();
         self.run_reduce_test(
             |input, axis| reference_argmin(input, axis, None),
             u32_dtype,
@@ -186,7 +185,7 @@ impl TestCase {
     }
 
     pub fn test_argtopk(&self, k: usize) {
-        let u32_dtype = u32::as_type_native_unchecked().storage_type();
+        let u32_dtype = u32::elem_type_native();
         self.run_reduce_test(
             move |input, axis| reference_argtopk(input, axis, k, None),
             u32_dtype,
@@ -240,9 +239,9 @@ impl TestCase {
         values_reference: impl FnOnce(&HostData, usize) -> HostData,
         indices_reference: impl FnOnce(&HostData, usize) -> HostData,
     ) {
-        let client = TestRuntime::client(&Default::default());
+        let client = cubecl::test_device().client();
         let axis = self.axis.unwrap();
-        let u32_dtype = u32::as_type_native_unchecked().storage_type();
+        let u32_dtype = u32::elem_type_native();
 
         let input = TestInput::builder(client.clone(), self.shape.clone())
             .dtype(self.input_dtype)
@@ -276,19 +275,23 @@ impl TestCase {
         let values_binding = values_handle.clone().binding();
         let indices_binding = indices_handle.clone().binding();
 
-        let outcome = launch_and_capture_outcome(&client, |c| {
-            reduce_with_indices::<TestRuntime>(
-                c,
-                input_binding,
-                values_binding,
-                indices_binding,
-                axis,
-                strategy,
-                config,
-                dtypes,
-            )
-            .into()
-        });
+        let outcome = launch_and_capture_outcome(
+            &client,
+            &[&values_handle.handle, &indices_handle.handle],
+            |c| {
+                reduce_with_indices(
+                    c,
+                    input_binding,
+                    values_binding,
+                    indices_binding,
+                    axis,
+                    strategy,
+                    config,
+                    dtypes,
+                )
+                .into()
+            },
+        );
 
         let outcome = match outcome {
             ExecutionOutcome::Executed => {
@@ -303,10 +306,10 @@ impl TestCase {
                     ValidationResult::Pass => {
                         assert_equals_approx(&actual_indices, &expected_indices, 0.0)
                             .as_test_outcome()
-                    }
+                    },
                     failed => failed.as_test_outcome(),
                 }
-            }
+            },
             ExecutionOutcome::CompileError(e) => TestOutcome::CompileError(e),
         };
         self.enforce_outcome(outcome);
@@ -315,7 +318,7 @@ impl TestCase {
     fn run_reduce_test(
         &self,
         reference: impl FnOnce(&HostData, usize) -> HostData,
-        output_dtype: StorageType,
+        output_dtype: ElemType,
         config: ReduceOperationConfig,
         epsilon: f32,
     ) {
@@ -331,12 +334,12 @@ impl TestCase {
     fn run_reduce_test_with(
         &self,
         reference: impl FnOnce(&HostData, usize) -> HostData,
-        output_dtype: StorageType,
+        output_dtype: ElemType,
         config: ReduceOperationConfig,
         epsilon: f32,
         distribution: Distribution,
     ) {
-        let client = TestRuntime::client(&Default::default());
+        let client = cubecl::test_device().client();
         let axis = self.axis.unwrap();
 
         let input = TestInput::builder(client.clone(), self.shape.clone())
@@ -363,8 +366,8 @@ impl TestCase {
         };
         let input_binding = input_handle.binding();
         let output_binding = output_handle.clone().binding();
-        let outcome = launch_and_capture_outcome(&client, |c| {
-            reduce::<TestRuntime>(
+        let outcome = launch_and_capture_outcome(&client, &[&output_handle.handle], |c| {
+            reduce(
                 c,
                 input_binding,
                 output_binding,
@@ -381,7 +384,7 @@ impl TestCase {
                 let actual =
                     HostData::from_tensor_handle(&client, output_handle, HostDataType::F32);
                 assert_equals_approx(&actual, &expected, epsilon).as_test_outcome()
-            }
+            },
             ExecutionOutcome::CompileError(e) => TestOutcome::CompileError(e),
         };
         self.enforce_outcome(outcome);
@@ -403,17 +406,17 @@ impl TestCase {
 
     fn build_output_tensor(
         &self,
-        client: &cubecl::client::ComputeClient<TestRuntime>,
-        output_dtype: StorageType,
+        client: &cubecl::client::Client,
+        output_dtype: ElemType,
         output_shape: &Shape,
         config: &ReduceOperationConfig,
-    ) -> TensorHandle<TestRuntime> {
+    ) -> TensorHandle {
         let axis = self.axis.unwrap();
         let is_parallel = self.stride[axis] == 1;
         let strides = match config {
             ReduceOperationConfig::ArgTopK(k) | ReduceOperationConfig::TopK(k) if is_parallel => {
                 parallel_multiple_output_strides(self.shape.as_slice(), &self.stride, axis, *k)
-            }
+            },
             _ => contiguous_strides(output_shape.as_slice()),
         };
         TestInput::builder(client.clone(), output_shape.clone())
@@ -455,14 +458,14 @@ fn parallel_multiple_output_strides(
 /// Cast expected values through the GPU output dtype so comparisons account for
 /// the precision loss that occurs when the kernel stores to a narrower type
 /// (e.g. an f32 accumulator overflows once written to an f16 output).
-fn cast_host_through_dtype(mut host: HostData, dtype: StorageType) -> HostData {
+fn cast_host_through_dtype(mut host: HostData, dtype: ElemType) -> HostData {
     if let HostDataVec::F32(values) = &host.data {
         let casted = match dtype {
-            StorageType::Scalar(ElemType::Float(FloatKind::F16)) => values
+            ElemType::Float(FloatKind::F16) => values
                 .iter()
                 .map(|&x| half::f16::from_f32(x).to_f32())
                 .collect(),
-            StorageType::Scalar(ElemType::Float(FloatKind::BF16)) => values
+            ElemType::Float(FloatKind::BF16) => values
                 .iter()
                 .map(|&x| half::bf16::from_f32(x).to_f32())
                 .collect(),

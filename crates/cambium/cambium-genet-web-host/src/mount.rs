@@ -112,7 +112,7 @@ where
     } = init(&window, &s.commands.clone(), &wake);
     let dom = Rc::new(RefCell::new(ScriptedDom::new()));
 
-    s.sheet = sheet;
+    s.shared.sheet = sheet;
     s.set_resources(fonts, images);
     s.runner = Some(Runner::new(dom, logic, state));
     let a11y = DomAccessibility::new(canvas.clone(), label)?;
@@ -120,6 +120,7 @@ where
     s.a11y = Some(Box::new(a11y));
     s.files = Some(Box::new(WebFileChooser::new(&canvas)?));
     s.window = Some(Box::new(window.clone()));
+    s.shared.render_core = Some(surface.shared_core());
     s.surface = Some(Box::new(surface));
 
     let host = Rc::new(RefCell::new(Host::new(options, None, hooks, s, wake)));
@@ -431,9 +432,9 @@ where
         "click",
         web_sys::MouseEvent,
         move |e: web_sys::MouseEvent| {
-            if let Some(node) = m.target_of(e.target()) {
+            if let Some(target) = m.request_target_of(e.target()) {
                 let action = A11yAction::Click;
-                reader_act(&h, A11yRequest { action, node });
+                reader_act(&h, A11yRequest { action, target });
             }
         }
     );
@@ -448,9 +449,9 @@ where
             if m.moving.get() {
                 return;
             }
-            if let Some(node) = m.target_of(e.target()) {
+            if let Some(target) = m.request_target_of(e.target()) {
                 let action = A11yAction::Focus;
-                reader_act(&h, A11yRequest { action, node });
+                reader_act(&h, A11yRequest { action, target });
             }
         }
     );

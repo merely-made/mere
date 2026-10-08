@@ -1,10 +1,13 @@
 # Generic Graph Substrate Plan
 
 **Date:** 2026-07-08
-**Status:** planning. Decisions below locked with Mark 2026-07-08; the substrate
-crate name is the one open pick. Home is mere's design_docs because mere is the
-donor of the model and the largest eventual consumer, but the substrate itself
-will be a standalone repo (the muniment/codicil pattern), not a mere crate.
+**Status (2026-10-06):** G0 to G2 have landed; G3 is met in substance
+(woodshed's practice history is a stemma), pending a ruling on its reworded
+clause; G4 has only its export half (`chartulary::rdf`); G5 has begun from the
+top, with eleven mere crates depending on chartulary. The substrate is
+`chartulary` 0.2.2 (the name was decided in §8), and its home is
+`crates/eidetic/chartulary` inside mere, not a standalone repo; woodshed
+consumes it from mere.git. Decisions locked with Mark 2026-07-08.
 
 ## 1. Decisions locked
 
@@ -43,6 +46,15 @@ content     notes / tags / lists (the commonplace layer)              [Tier 2]
 
 Consumers: isometry (entity/world graph), woodshed (notes, tags, practice
 sets), strophe (session relations), mere (the full web graph, at re-base).
+
+**Corrected 2026-10-06 (S14 pass):** two layers of this stack, and the codicil
+named in §1 and §5, no longer name current mechanisms. The edit log is
+`muniment::Journal`: chartulary's `GraphLog` journals into it
+(`crates/eidetic/chartulary/src/spine.rs`, lines 7 and 34), and "codicil" now
+names Eidetic's renamed engrams (`c51b9704`, 2026-08-31;
+`crates/eidetic/eidetic-core/src/codicil.rs`). The RDF projection is
+`chartulary::rdf`, folded from the standalone scholia crate (`275448cd`,
+2026-08-31; `crates/eidetic/chartulary/src/rdf.rs`).
 
 ## 3. The generic core
 
@@ -169,6 +181,11 @@ credited, and two done conditions can no longer be met as written.
 `commit`, `facet`, `content_class`, `nested`, and `stemma`, the last folded in
 from the standalone crate on 2026-07-12.
 
+**Corrected 2026-10-06 (S14 pass):** `GraphLog` journals into
+`muniment::Journal`, not codicil (`crates/eidetic/chartulary/src/spine.rs`,
+lines 7 and 34). chartulary 0.2.2 also ships `rdf`, the folded scholia
+(`275448cd`).
+
 **G3: three consumers exist outside mere, and none of them meets the written
 done condition.** The rung reads "user-authored content lives in a substrate
 graph through muniment". What is actually true:
@@ -209,6 +226,12 @@ docs name the remainder as roadmap and say linked-data's losslessness gate has
 citing a mere document, has nothing blocking it now that woodshed is on the
 substrate.
 
+**Corrected 2026-10-06 (S14 pass):** there is no separate scholia crate.
+`275448cd` (2026-08-31) folded it into `chartulary::rdf`, which ships
+`to_quads`, `to_jsonld` and `to_nquads` (`crates/eidetic/chartulary/src/rdf.rs`,
+lines 120, 144 and 188). Its module docs (lines 7-25) still list losslessness,
+compact JSON-LD and SPARQL as future work, so the G4 reading above holds.
+
 **G5's done condition is unmeetable as written.** It reads "Done when meerkat
 runs on the substrate graph with no behavior change." Meerkat was decomposed
 into mere's crates and then turnstone, so nothing can satisfy that sentence.
@@ -216,6 +239,16 @@ Note also that mere's own adoption, which is what G5 describes, has already
 begun: `graph-kernel`, `session-runtime`, `graphshell`, `commons`, `gemot`,
 `servitor`, `signals`, `seiche`, and `eidetic-core` all depend on chartulary.
 The ladder is being climbed from the top as well as the bottom.
+
+**Corrected 2026-10-06 (S14 pass):** the dependent list has moved with the
+consolidations. At `535bca11` the mere crates that depend on chartulary are
+graph-kernel, pandect, graphshell, commons, gemot, servitor, pictograph,
+seiche, eidetic-core, alembic and athanor.
+
+**Open, raised by the S14 pass (2026-10-06):** this section's recommendation to
+credit G3 and reword "through muniment" was never ruled, and G5's meerkat
+clause cannot be met. How are the two rungs settled? Options: restate both
+rungs in place; move G5 into a mere re-base plan.
 
 ## 8. The name: chartulary, "chart" for short
 
@@ -259,3 +292,12 @@ Grounded in 2026-07-08 reads of mere's `graph/edge_taxonomy.rs`,
 `node-lineage/src/lib.rs`, the muniment/codicil founding proposals
 (repos/muniment, repos/codicil), and the tiering + decisions conversation with
 Mark (fully generic; fresh core, mere last; one history spine; stemma).
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_50_s14_phase_b12.md: the status records G0 to G2
+  as landed and the in-mere `crates/eidetic/chartulary` home, codicil and
+  scholia are corrected to `muniment::Journal` and `chartulary::rdf`, and the
+  unruled G3 and G5 restatements are raised as an open question.

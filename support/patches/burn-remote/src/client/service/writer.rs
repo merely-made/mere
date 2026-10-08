@@ -52,7 +52,7 @@ impl SubmitWriter {
                     Err(err) => {
                         log::error!("Failed to serialize outgoing task batch: {err:?}; dropping");
                         continue;
-                    }
+                    },
                 };
                 if let Err(err) = channel.send(bytes).await {
                     log::warn!("Remote submit writer send failed: {err:?}; closing writer");
@@ -79,7 +79,7 @@ impl SubmitWriter {
             return;
         };
         match tx.try_send(batch) {
-            Ok(()) => {}
+            Ok(()) => {},
             Err(mpsc::error::TrySendError::Full(batch)) => {
                 // Backpressure: wait for the writer to drain a slot. FIFO order is preserved
                 // because this runs on the single runner thread, after the fast-path sends.
@@ -88,7 +88,7 @@ impl SubmitWriter {
                         "Remote submit writer task has exited (server disconnected?); dropping outgoing batch"
                     );
                 }
-            }
+            },
             // The writer task exits if a socket send fails (server gone / connection reset).
             // Drop the batch with a warning rather than panicking on the runner thread, which
             // would crash the caller's thread instead of surfacing a recoverable disconnect.
@@ -96,7 +96,7 @@ impl SubmitWriter {
                 log::warn!(
                     "Remote submit writer task has exited (server disconnected?); dropping outgoing batch"
                 );
-            }
+            },
         }
     }
 

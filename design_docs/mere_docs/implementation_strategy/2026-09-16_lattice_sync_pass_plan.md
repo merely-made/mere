@@ -2,10 +2,18 @@
 
 **Date**: 2026-09-16
 
-**Status: in progress, 2026-09-20.** Mark authorized the reviewed sequence:
-establish local and portable resolution in Mere and Turnstone first, then move
-that pair onto a tested published Genet revision. Broader consumers follow the
-same procedure once qualified. The September 16 counts below remain historical.
+**Status (2026-10-06):** in progress; the pass continues (ruling S43 of the
+[stack seams plan](2026-10-04_stack_seams_plan.md)). The reviewed sequence's
+two stages are met. Landed: L1 (genet `532f1fadc53`); L2 pass A (2026-09-20,
+published as `68f78873`) and pass B (`2a35077e`, 2026-09-22); the consumer
+round on 2026-09-23 (knot-editor `44f0519`, turnstone `ab6ff4e`); portable CI
+(`.github/workflows/portable.yml`, `40670801`, 2026-09-23); and a two-row
+unused-patch baseline, `boa_engine` and `boa_gc`, since `a5543904`
+(2026-10-03). Open: L5 (knot-editor still split between root `562353aa` and
+`ports/djinn` `ea3e99ef`); the L3 and L6/L7 consumers beyond Turnstone; P2's
+cleanup (branch `burn-pre3-repin` still present, tag
+`archive/burn-pre3-repin-20260916` absent); and P4. The September 16 counts
+below remain historical.
 
 ## Execution amendment (2026-09-20)
 
@@ -26,6 +34,9 @@ same procedure once qualified. The September 16 counts below remain historical.
   incompatible duplicate identities rather than chasing repository heads.
 - Genet target is `9976945058b921437ea59cd95b112bd1da910013`, verified published
   on September 20. Root portable baselines are being checked before repinning.
+  **Corrected 2026-10-06 (S14 pass):** that check is finished and the repin
+  landed: L2 pass B moved Mere to Genet `532f1fadc53` (`2a35077e`,
+  2026-09-22).
 - Cleanup is owned by the concurrently active disk-cleanup task. Preserve this
   pass's `Code/work/lattice-sync-20260920` checkouts/receipts and
   `C:\t\lattice-sync-20260920` build outputs while checks run.
@@ -50,6 +61,15 @@ local state is removed.
 3. The seven redirect repos carry `resolver.lockfile-path` locally, ignore
    `.cargo/local/` in git, and commit a lock with no path package from outside
    the repository.
+   **Corrected 2026-10-06 (S14 pass):** the 2026-09-20 Execution amendment
+   superseded this mechanism, and the code follows the amendment:
+   `scripts/cargo_mode.py local` supplies the lock path
+   (`.cargo/local/Cargo.lock`) as a command-line override
+   (`scripts/cargo_mode.py:136`), and portable mode refuses any config
+   carrying `resolver.lockfile-path` (`scripts/cargo_mode.py:61`). Read the
+   condition as: each redirect repo's local mode keeps its lock under the
+   ignored `.cargo/local/`, and the committed lock carries no path package
+   from outside the repository.
 4. Each supported workspace passes its recorded check command on 1.98.1 from a
    redirect-free checkout, with no new unexplained unused-patch row. The host
    default-feature gate is `cargo +1.98.1 check --workspace --all-targets
@@ -84,6 +104,12 @@ which does not record the filesystem path of a path package.
   cleromancy, mer3ly, woodshed) set `resolver.lockfile-path` in their untracked
   config and commit a clean lock, including the four that ignore theirs today
   (mere, genet, cleromancy, turnstone).
+  **Corrected 2026-10-06 (S14 pass):** the mechanism changed under the
+  Execution amendment: the launcher passes the lock path on the command line
+  (`scripts/cargo_mode.py:136`) and portable mode refuses a config carrying
+  `resolver.lockfile-path` (`scripts/cargo_mode.py:61`). The committed lock
+  beside an ignored local one is what landed in Mere: `.gitignore` tracks
+  `/Cargo.lock` and ignores `**/.cargo/local/`.
 - **Toolchain.** Everything moves to 1.98.1; the 294.1 MB download is approved.
 - **Scope.** Every consumer, including the far-behind ones, now.
 - **Cycle.** "Up to date" means at head, less the pass's own pin-only commits.
@@ -113,6 +139,9 @@ which does not record the filesystem path of a path package.
   that carried the OS-IPC dependencies is gone outright. Mark ruled
   2026-09-23: the row and its comment are removed, and the unused-patch rows
   return to the baseline three.
+  **Corrected 2026-10-06 (S14 pass):** `a5543904` (2026-10-03) removed the
+  `iroh-mdns-address-lookup` row, so the baseline stop rule 3 compares against
+  is now two rows, `boa_engine` and `boa_gc` (`Cargo.toml:734-735`).
 - **2026-09-22, shared working tree:** during L2 another session ran an
   unlocked `cargo check` in Mere's tree and then `git checkout -- Cargo.lock`
   to undo what it took for its own resolver changes, reverting L2's uncommitted
@@ -595,6 +624,10 @@ wrong source. Report to Mark; change nothing.
   The next integration must account for Knot and Redshank's actual shared type
   boundaries; this slice does not claim the whole lattice or Turnstone repin
   complete.
+  **Corrected 2026-10-06 (S14 pass):** Turnstone no longer retains that set:
+  turnstone `5d2c910` (2026-09-22) repinned Mere `0e031fa5`, and `ab6ff4e`
+  (2026-09-23, on origin/main) aligned it to Mere `250fd238`, Genet
+  `532f1fad`, knot-editor `44f0519` and woodshed `95d1085`.
 - **CI publication limitation:** the portable workflow files are prepared
   locally in Mere and Turnstone, but GitHub rejected the Mere push because the
   OAuth credential lacks `workflow` scope. The unpublished commit was amended
@@ -602,6 +635,9 @@ wrong source. Report to Mark; change nothing.
   installed by these commits; publish the prepared workflows with a credential
   authorized for workflow changes. Do not infer continuous enforcement from
   the successful local receipts.
+  **Corrected 2026-10-06 (S14 pass):** Mere's workflow is published:
+  `.github/workflows/portable.yml` ("Portable dependency graph") landed in
+  `40670801` (2026-09-23), on origin/main.
 - **Unused-patch audit for this slice:** Mere's Boa patches target crates.io,
   while the selected Boa packages are directly pinned Git sources. Its unused
   mDNS patch is version 0.4.0 while the graph selects 0.5.0. Turnstone's unused
@@ -647,3 +683,54 @@ wrong source. Report to Mark; change nothing.
   `OpenPredicate`) sat broken without failing it. Both are fixed (`4b33a963`,
   `bc7121ae`), and `cargo check --workspace --all-targets --keep-going` now
   fails nowhere. Mark ruled the change.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_35_s14_phase_a1.md; the status records what
+  landed through the 2026-09-23 consumer round, CI and the two-row patch
+  baseline and names the open L5, L3/L6/L7, P2-cleanup and P4 items (ruling
+  S43), and done-condition 3 and the local-locks ruling are read through the
+  Execution amendment.
+- **2026-10-06. Portable CI had never passed; its first gate step is
+  repaired.** All 164 runs of `portable.yml`, from the first on 2026-09-24
+  (`c1e7ad7f`), failed at "Exercise local lock isolation" on one assertion.
+  `test_local_config_keeps_relative_patch_base` compared Cargo's
+  `manifest_path` after `.resolve()` with a `tempfile` path that was not
+  resolved. The windows-latest runner's TEMP is the 8.3 short form
+  (`C:\Users\RUNNER~1\...`), which `.resolve()` expands to `runneradmin`.
+  Every later step, the portable verify and the three WASI guest builds, was
+  skipped on every run. So the S14 correction above, that the workflow is
+  published, is true, but the workflow has enforced nothing yet. Reproduced
+  locally with TEMP pointed at an 8.3 short path (same test, line and
+  assertion) and fixed by resolving both sides, in the commit that adds this
+  entry; the four tests pass under the short and the long TEMP.
+  `cargo_mode.py` resolves `repo`, the workspace root and each package's
+  manifest path before comparing them, so the script itself has no such
+  mismatch. The later steps first run on CI at the next push, and whether
+  they pass is not yet known.
+- **2026-10-07. The guest build scripts do not deadlock; a git checkout
+  stalled the machine.** On 2026-10-06 a fresh-target `cargo check
+  --workspace --locked` stopped advancing at about 1,010 units while the
+  `document-host` and `app-host` build scripts ran their nested guest `cargo
+  build`, and every new cargo command on the machine waited on the
+  package-cache lock for about twenty minutes. The license sweep plan's §6
+  suspected a deadlock between the outer and the nested build. It is not
+  one. A minimal model, an outer crate whose build script runs a nested
+  `cargo build --locked` the way those scripts do, sharing one private
+  `CARGO_HOME`, finishes in about a second. Its positive control, the nested
+  build given the outer's target directory, hangs on "Blocking waiting for
+  file lock on build directory" until killed, so the model does show a
+  deadlock when there is one. With the real scripts, `cargo check --locked
+  -p document-host -p app-host` on a fresh worktree and target at
+  `e4d5cd7d` passes in 3m10s: both nested builds produce artifacts while the
+  outer is still checking, all three guests are built, and the outer passes
+  `wasmtime-wasi`, where the stalled run had stopped. The stall was another
+  lane's build fetching new git revisions. Turnstone's lock at `4e217ef`
+  pins genet `679d831`, whose checkout in `~/.cargo/git/checkouts` ran from
+  22:43:58 to 22:59:29 local time (187,770 files), followed by knot-editor
+  and woodshed to 22:59:41. Cargo holds the package-cache lock exclusively
+  while it checks out a git dependency, so every resolution on the machine
+  waits as long as a genet checkout takes. Cargo's automatic cache GC was
+  ruled out (it last ran at 19:53). The finding that follows: the first
+  build at each new genet revision stalls every session on the machine for
+  about a quarter of an hour. A CI runner has no other sessions, so this
+  does not bear on `portable.yml`'s later steps.

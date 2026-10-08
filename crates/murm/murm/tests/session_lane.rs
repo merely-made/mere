@@ -287,13 +287,13 @@ mod p2panda {
         client_identity: &InMemoryProvider,
     ) -> (P2pandaTransport, P2pandaTransport, PeerID, PeerID) {
         let client =
-            P2pandaTransport::builder_from_seed(client_identity.master_keypair().to_seed())
+            P2pandaTransport::builder_from_seed_ref(&client_identity.master_keypair().to_seed())
                 .alpns(vec![alpn()])
                 .bind()
                 .await
                 .expect("bind Murm client");
-        let server = P2pandaTransport::builder_from_seed(
-            InMemoryProvider::from_seed([8; 32])
+        let server = P2pandaTransport::builder_from_seed_ref(
+            &InMemoryProvider::from_seed([8; 32])
                 .master_keypair()
                 .to_seed(),
         )

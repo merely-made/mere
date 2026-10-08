@@ -97,12 +97,7 @@ fn the_model_on_the_host_device_shares_it_and_records_purity() {
     );
     let device = physics_device_for(&handles);
     let in_use = || {
-        device
-            .client()
-            .compute_client()
-            .memory_usage()
-            .expect("the host client's memory usage")
-            .bytes_in_use
+        device.client().bytes_in_use()
     };
 
     // One device: the engine's is the one the physics device registered.

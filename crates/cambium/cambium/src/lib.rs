@@ -55,8 +55,6 @@ mod key;
 mod keyed;
 mod menu;
 mod multi;
-#[cfg(feature = "nematic")]
-pub mod nematic;
 mod optional_action;
 mod overlay;
 mod overlay_surface;
@@ -115,7 +113,7 @@ pub use disclosure::{
     TreeSelectionMode, TreeState, accordion, accordion_with, disclosure, disclosure_with,
     tree_view,
 };
-pub use editor::{EditHistory, pair_close, wrap_selection};
+pub use editor::{EditHistory, History, pair_close, wrap_selection};
 pub use graph_canvas::{
     GRAPH_CANVAS_SWATCH_CSS, GraphAtlasEvent, GraphCanvasEdge, GraphCanvasEvent, GraphCanvasNode,
     GraphCanvasNodeDrag, GraphCanvasNodeFootprint, GraphCanvasNodeRegion, GraphCanvasRelation,
@@ -168,7 +166,7 @@ pub use reorderable_list::{
     ReorderItem, ReorderMove, ReorderState, reorderable_list, reorderable_list_with,
 };
 pub use resize_handle::{RESIZE_HANDLE_CSS, ResizeBounds, ResizeHandleEvent, resize_handle};
-pub use runner::GenetAppRunner;
+pub use runner::{FocusExit, GenetAppRunner};
 pub use select::{SelectState, select};
 pub use selection_bar::{
     Orientation, SelectionBarConfig, SelectionBarKind, SelectionItem, SelectionState,
@@ -207,8 +205,8 @@ pub use status_bar::{
     StatusView, status_bar,
 };
 pub use surface::{
-    ResolvedSurfaceEvent, RetainedSurfaceSession, RunnerSurfaceSession, SurfaceEffect,
-    SurfaceViewport,
+    ContainedSession, ResolvedSurfaceEvent, RetainedSurfaceSession, RunnerSurfaceSession,
+    SessionFailure, SurfaceEffect, SurfaceViewport,
 };
 pub use tabs::{
     TabAccentColors, TabBar, TabBarNames, TabItem, TabMark, TabStrip, tab_bar_view, tab_strip,

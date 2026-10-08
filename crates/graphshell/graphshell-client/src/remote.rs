@@ -44,7 +44,7 @@ use sceno::InstanceId;
 use crate::action_draft::{ActionDraft, ActionDraftTarget};
 use crate::core::{Outcome, Progress};
 use crate::driver::{Advance, SessionDriver};
-use crate::{ClientState, MountedScene};
+use crate::{AccessibilityTree, ClientState, LocalActionError, LocalActions, MountedScene};
 
 /// The operation whose answer is awaited.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -345,6 +345,29 @@ impl RemoteSession {
             (Some(client), Some(session)) => advertised_actions(client, session, &self.profile),
             _ => Vec::new(),
         }
+    }
+
+    /// The mounted scene's accessibility tree, each item also carrying the
+    /// host's own actions on it (dynamics grammar plan, F64).
+    pub fn accessibility_tree_with(&self, local: &dyn LocalActions) -> Option<AccessibilityTree> {
+        let (client, session) = (self.client()?, self.session.as_ref()?);
+        client
+            .accessibility_tree_with(session, &self.profile, local)
+            .ok()
+    }
+
+    /// Carry out the host's local action `intent` on `instance` (F64): the
+    /// host's handler runs, and nothing is written for the endpoint.
+    pub fn invoke_local(
+        &self,
+        instance: InstanceId,
+        intent: &chirograph::IntentReference,
+        local: &mut dyn LocalActions,
+    ) -> Result<bool, LocalActionError> {
+        let (Some(client), Some(session)) = (self.client(), self.session.as_ref()) else {
+            return Err(LocalActionError::UnknownSession);
+        };
+        client.invoke_local(session, instance, intent, local)
     }
 
     pub fn card_labels(&self) -> Vec<String> {

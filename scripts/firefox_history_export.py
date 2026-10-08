@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+
+# Copyright 2026 Mark Alan Boykin
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# SPDX-License-Identifier: MPL-2.0
+
 """Export a Firefox `places.sqlite` copy as `import::ImportedHistoryVisitItem` JSON.
 
 Mere cannot take a SQLite crate, so the read side of a Firefox history import

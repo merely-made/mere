@@ -1,17 +1,17 @@
 # Ranged Fetch Plan
 
 **Date:** 2026-09-20  
-**Status:** **plan accepted 2026-09-20 with D1 to D7 decided; lane F merged and pushed 2026-09-20; lane R pushed as Woodshed `bf5923d`; T1 and T3 pushed/built in Turnstone 2026-09-22; M1 built in Mere; T2 waits on the next lattice round.**  
+**Status (2026-10-06):** **F, R, T1, M1 and T3 landed and pushed; T2 open and unblocked.** Plan accepted 2026-09-20 with D1 to D7 decided. F is Mere `c0463e98`, `ba4f4951`, `e35898d1`; R is Woodshed `a1ebf6d`, `bf5923d`; T1 is Turnstone `2c451d2`, `77b7ece`; M1 is Mere `b3d52c74`; T3 is Turnstone `3671ad3`. Turnstone took M1 in `ab6ff4e` (2026-09-23, the lattice consumer round), but its shell still builds one store set from `fetch::session_stores()`, so T2 is undone.  
 **Authority:** the implementation home for rulings 2 to 4 of lane R3 in the
 [family composition thesis](../../2026-08-12_family_composition_thesis_brief.md#r3-resource-resolution-opened-2026-09-20).
 The research, probes and rulings stay there; this plan owns the work.  
 **Companions:** the [netfetcher plan](../../archive_docs/2026-06-09_completed_plans/2026-05-25_netfetcher_plan.md)
 (Mere owns networking, hosts run the fetcher, Genet consumes bytes), the
 [session store plan](2026-06-23_native_session_store_plan.md) (one session
-substrate per persona), the [engine profile boundary plan](2026-05-14_engine_profile_boundary_plan.md)
+substrate per persona), the [engine profile boundary plan](../../archive_docs/2026-10-06_retired_plans/2026-05-14_engine_profile_boundary_plan.md)
 (a session's profile binding is persona, session or graph scoped), the
 [net-media plan](2026-05-26_net_media_plan.md) (the likely second consumer), and
-the [R3 receipt](../testing/receipts/2026-09-20_resource_resolution_probes/RECEIPT.md).
+the [R3 receipt](../testing/receipts/2026-09-20_resource_resolution_probes/2026-09-20_resource_resolution_receipt.md).
 Cross-repo: `woodshed/design_docs/2026-09-01_listening_annotation_port_plan.md`
 and `turnstone/design_docs/2026-09-14_redshank_episode_surface_plan.md` gate 1.
 
@@ -150,6 +150,9 @@ so that it can answer a range from a stored body. The page-side media element.
     with only `actor`, 7 with defaults off, and `mere-crawl` checks. The three
     unused-patch warnings (boa twice, iroh-mdns) are the inherited baseline the
     lattice sync pass plan owns under its P4.
+    **Corrected 2026-10-06 (S14 pass):** since `a5543904` (2026-10-03) the
+    baseline is two rows, `boa_engine` and `boa_gc`; the iroh-mdns row is
+    gone.
   - **Lane F merged to main by fast-forward and pushed with Mark's sign-off**
     (`c0463e98`, `ba4f4951`, `e35898d1`). Lanes R, T and I pin from here; their
     pin moves belong with the [lattice sync pass](2026-09-16_lattice_sync_pass_plan.md),
@@ -206,6 +209,8 @@ so that it can answer a range from a stored body. The page-side media element.
   host chains it ahead of the small-web fetcher. Tested served, refused,
   redirected, capped, chained, and cookie-sharing. 20 tests, 9 with defaults
   off, Clippy clean both ways.
+  **Corrected 2026-10-06 (S14 pass):** `b3d52c74` is on main and
+  origin/main, and Turnstone consumes it (`ab6ff4e`).
 - **2026-09-22, T2 waits:** Turnstone taking M1 is a Mere pin move, which by
   the lattice pass's stop rule 4 means knot-editor realigns first. The cascade
   session reports the Genet roadmap session is about to bump Mere to Genet
@@ -213,6 +218,11 @@ so that it can answer a range from a stored body. The page-side media element.
   revision carrying both changes is the plan. Rulings for T2 (Mark,
   2026-09-22): one shared set with an in-memory HTTP cache, so pages, images
   and episodes obey one cache policy.
+  **Corrected 2026-10-06 (S14 pass):** the round ran: turnstone `ab6ff4e`
+  (2026-09-23, origin/main) took Mere `250fd238`, which carries M1. T2 is
+  unblocked but undone: Turnstone's shell module still builds one store set
+  from `fetch::session_stores()` under the comment "Keying the set by persona
+  is lane T2".
 - **2026-09-22, T3 built (Turnstone, local):** `cookie_custody` opens a fjall
   store under `<data_root>/cookies`, loads it into the session jar at start and
   flushes after each drain. Rulings (Mark, 2026-09-22): the built-in default
@@ -220,3 +230,10 @@ so that it can answer a range from a stored body. The page-side media element.
   profile-level store rather than the session bin. Test: a cookie set in one
   run is there in the next. The session store plan's persist-trigger gap is
   closed for Turnstone.
+  **Corrected 2026-10-06 (S14 pass):** T3 is pushed: turnstone `3671ad3`
+  ("Keep the session cookie jar on disk again", 2026-09-22), on origin/main.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_35_s14_phase_a1.md; the status records F, R,
+  T1, M1 and T3 landed and pushed, Turnstone's take of M1 in `ab6ff4e`, and
+  T2 open and unblocked.

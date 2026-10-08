@@ -360,6 +360,20 @@ controlled improvement/regression comparison against the earlier runs, which
 used different physics advancement and earlier stack revisions. GPU timestamp
 spans continue to include queue idle.
 
+*Annotation, 2026-10-06 (S14 pass):* the 2,000-node run had finished when
+this section was committed (`108647cb`, 2026-09-30 07:26). Its raw receipt,
+`tree_final_live_2000/` (written 02:42, with `scenario.done` reading
+`RESULT ok`), records a visible 14-frame live window with no errors, the same
+seed and logical and physical sizes as the 512-node run, all 2,000 nodes
+visible, 14,003 paint items before and after culling, three steps in every
+frame, and discarded debt of 1,483,300 to 2,483,300 microseconds per frame.
+The figures are read from that `result.json`, not rerun, and carry the same
+dev-build qualifications as the row above.
+
+| Moving nodes | Interval p50 / p95 ms | Physics p50 ms | Mutation/restyle p50 ms | DOM frame p50 ms |
+| --- | --- | --- | --- | --- |
+| 2,000 | 2217.3 / 2486.2 | 81.5 | 1535.7 | 461.8 |
+
 Mark reports that current physics feels slightly laggy but acceptable. His
 observation is separate from the generated-graph timings above. His hypothesis
 that different layouts and physics laws can yield different results at

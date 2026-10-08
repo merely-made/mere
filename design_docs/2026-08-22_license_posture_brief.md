@@ -10,7 +10,7 @@ the [license sweep plan](mere_docs/implementation_strategy/2026-08-22_license_sw
 **Scope:** cross-cutting, every repository Mark owns. Supersedes the founding
 license convention of 2026-07-08 (MIT OR Apache-2.0 by default, MPL-2.0 only
 for Servo-derived code), which survived only in memory and in the
-[repo consolidation plan](mere_docs/implementation_strategy/2026-07-23_repo_consolidation_plan.md)
+[repo consolidation plan](archive_docs/2026-10-06_completed_plans/2026-07-23_repo_consolidation_plan.md)
 §4. Absorbs the radio-household ruling of 2026-07-23 and the games-wing
 ruling of 2026-07-31, both of which become instances of the default.
 

@@ -1,14 +1,11 @@
+use crate::ops::numeric::empty_device_dtype;
 use crate::tensor::CubeTensor;
-use crate::{CubeRuntime, ops::numeric::empty_device_dtype};
 use alloc::{vec, vec::Vec};
 use burn_backend::cubecl::dtype_to_storage_type;
 use burn_backend::{DType, TensorMetadata};
 
 /// Convert the tensor back to a higher precision data type.
-pub fn dequantize<R>(tensor: CubeTensor<R>, dtype: DType) -> CubeTensor<R>
-where
-    R: CubeRuntime,
-{
+pub fn dequantize(tensor: CubeTensor, dtype: DType) -> CubeTensor {
     let scheme = match tensor.dtype {
         DType::QFloat(scheme) => scheme,
         _ => return tensor,
@@ -46,13 +43,18 @@ where
         tensor.shape(),
         dtype,
     );
+    let global = tensor.global();
     let (values, params) = tensor.quantized_handles().unwrap();
+
+    // Innermost first: the block scales, then the per-tensor scale they are normalized against.
+    let mut scales = vec![params.binding()];
+    scales.extend(global.map(|g| g.binding()));
 
     cubek::quantization::dequantize::launch_ref(
         &output.client,
         values.binding(),
         output.clone().binding(),
-        params.binding(),
+        &scales,
         &scheme,
         dtype_to_storage_type(dtype),
     )

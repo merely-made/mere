@@ -2,13 +2,31 @@
 
 *Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate is crates/graph/subgraph (code renamed 2026-09-12).*
 
+**Corrected 2026-10-06 (S14 pass):** that crate path no longer exists. The
+subgraph crate was folded into mere in `61894570` (2026-09-23);
+`SessionSubgraphs` is in `crates/mere/src/subgraph.rs`.
+
 **Date**: 2026-06-05
-**Status**: Implementation plan — pre-build
+**Status (2026-10-06):** historical (meerkat/orrery era). The (b) anchor
+migration landed 2026-06-06 and survives in graph-kernel:
+`SharedNavigationMemory` (`crates/graph/graph-kernel/src/graph/history.rs`) on
+`Graph.nav`, with `node_can_back`, `node_current_url` and
+`node_history_back`/`node_history_forward`
+(`crates/graph/graph-kernel/src/graph/mod.rs`,
+`crates/graph/graph-kernel/src/graph/apply.rs`). Phases 1 to 4 wire the
+meerkat/orrery live path, which no longer exists (meerkat was retired
+2026-07-18, `c5f01064`); they have no host. §1's model stays live, amended by
+the graph semantics plan's ruling 2 (2026-10-04).
 **Scope**: Drive the already-built per-node navigation-lineage substrate from the live navigation path, so navigating the focused tile changes *that node* in place (within-node history), an explicit gesture mints a new node (a new browsing surface) with a typed lineage edge back to its origin, and the two histories (within-node back/forward, across-node previous/next) become real. This is a **wiring + finish** job: the model is decided and the substrate exists; the live path never drives it.
 
 > **Historical note (2026-09-05):** This is a Meerkat/Orrery-era wiring proposal.
 > Its code-path and substrate claims are retained as rationale, not a current
 > implementation map; verify current ownership before resuming the work.
+
+**Corrected 2026-10-06 (S14 pass):** §1's model is more than rationale: the
+graph semantics plan's ruling 2 amendment (2026-10-04, under §1) treats it as
+live, and the shared navigation memory its (b) anchor needs is in graph-kernel
+(see the status). The meerkat and orrery code paths are the historical part.
 
 ## Supersedes / builds on
 
@@ -114,6 +132,13 @@ Mark chose the **full shared-`GraphMemory`** option (over defer / visit-id-on-ed
 
 ## Progress
 
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_47_s14_phase_b9.md: the "pre-build" status
+  replaced (the (b) anchor migration landed 2026-06-06 and survives in
+  graph-kernel; the meerkat host phases have no host), the dead subgraph path
+  corrected, and the 2026-09-05 historical note reconciled with the live §1
+  model.
 - **2026-06-06** — (b) **landed**. `SharedNavigationMemory` (one visit space, owner per node) on `Graph.nav`; `Graph::branch_history(child, parent)` spawns the child owner under the parent's current visit before its first visit; history read via `Graph::node_*` methods; `Node.navigation_memory` removed; persistence moved to a graph-level `navigation` snapshot (`#[serde(default)]`, old per-node field ignored → graceful empty on old graphs). orrery-host `mint_node` anchors via `branch_history`. Green: kernel 241 / orrery-host 20 / platen 45 / meerkat 44+26. **Caveats:** (1) `remove_node` keeps the removed node's owner (lineage persists so descendants' anchors stay valid; prune later / scope to `eidetic`) — this also sidesteps a latent **node-lineage `delete_owner` GC bug** (leaves a binding referencing the deleted owner → `to_snapshot` panics; fix in node-lineage when delete is needed). (2) per-op rehydrate is now over the whole graph's history; optimize to a live memory if it bites.
 - **2026-06-06** — (b) signed off (full shared-GraphMemory). Design above; implementing.
 - **2026-06-05** — Plan written. Investigation confirmed: `node-lineage` + `Node.navigation_memory` built and persisted but dormant; live nav (`orrery.visit`) still URL-dedup + mint-node; across-node MRU is net-new; two prior plans (05-11, 05-18) architecture-stale. Smolweb transport (`errand`) landed earlier same session and is unrelated except both touch the navigation/fetch path.

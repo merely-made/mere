@@ -57,7 +57,8 @@
 //! resident approval. [`otp::OtpAdmittedSession`] binds remote petitions to one
 //! exact credential and the Notochord transcript that admitted their carrier.
 //! [`resident::CastellanResident`] retains the process-wide sealed-record
-//! authority. Feature `secret-service` adds the Linux desktop adapter, and
+//! authority, and [`lock`] is how the vault's lock reaches it. Feature
+//! `secret-service` adds the Linux desktop adapter, and
 //! [`otp::SteamGuard`] is an explicitly nonstandard Valve compatibility shape.
 //! CXF import remains follow-on work; see the castellan OTP plan and the keeper
 //! founding plan in mere's design docs.
@@ -70,6 +71,7 @@ pub mod authority;
 #[cfg(feature = "keeper")]
 mod sealed_storage;
 pub mod items;
+pub mod lock;
 pub mod otp;
 #[cfg(feature = "keeper")]
 pub mod projection;

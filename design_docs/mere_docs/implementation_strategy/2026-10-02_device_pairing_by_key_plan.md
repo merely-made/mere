@@ -1,14 +1,20 @@
 # Device Pairing by Key Plan
 
 **Date**: 2026-10-02
-**Status (2026-10-04)**: in progress. Assessed and ruled by Mark from 2026-10-01
-to 2026-10-04 (rulings 1 to 74 below). D1 landed (`4963b489`); D1b's mere fix (M1)
-landed (`177b927c`) and its fork fix (F1) shipped in the 0.7.5 repin, pushed
-2026-10-04 (fork `1bec457e`, Knot `92367ec`, mere `031b3dcc`). `connected`
-follows the gossip overlay (ruling 31) and, off it, open connections
-(rulings 47 to 56). The overlay's gap after restarts has a ruled fix in
-iroh-gossip, held until its next release (rulings 64 to 72). Paused
-before D2 while chatelaine P4a runs (ruling 73).
+**Status (2026-10-06)**: in progress, paused before D2. Rulings 1 to 74.
+- D1 landed (`4963b489`).
+- D1b's mere fix (M1) landed (`177b927c`); its fork fix (F1) shipped in the
+  0.7.5 repin, pushed 2026-10-04 (fork `1bec457e`, Knot `92367ec`, mere
+  `031b3dcc`).
+- `connected` follows the gossip overlay (ruling 31, `fdb02bd3`) and, off
+  it, open connections (rulings 47 to 56, `005e27ad`).
+- The overlay's gap after restarts has a ruled fix in iroh-gossip, held
+  until its next release (rulings 64 to 72).
+
+The pause of ruling 73 (for chatelaine P4a) has lapsed: P4a landed as
+`007fbe7c`. The identity work then moved to the vault lock plan. D2 has
+not been put back to Mark, and its restart waits on his word (see §7,
+2026-10-06).
 **Scope**: Mark's machines find, reach and trust each other by device
 identity, not by address: the stack's own peers already do on one network;
 SSH, the path Mark uses daily, does not. Pairing a device becomes one
@@ -1308,3 +1314,25 @@ nothing downloaded:
 rounds (rulings 1 to 13); the load-bearing claims re-checked in code; the
 machines' CAs read from their agents. Nothing built. Next: Mark's go to
 start D1.
+
+**2026-10-06, progress since 2026-10-02.** The tree recorded in one place,
+since this section stopped at the assessment:
+- D1, the paired-device directory route and CLI: `4963b489`.
+- D1b's mere fix M1, mDNS-only first contact in mere-transport:
+  `177b927c`.
+- `connected` by gossip while subscribed (rulings 30, 31, 36 to 39):
+  `fdb02bd3`.
+- Open-connection liveness off the overlay (rulings 47 to 55):
+  `005e27ad`.
+- The 0.7.5 repin: mere's lock `031b3dcc`, Knot `92367ec`, the fork
+  `1bec457e`.
+
+*Reading, not ruled:* restarting D2 now touches decisions made since, in
+the vault lock plan:
+- its ruling 17 (djinn hosts the agent; the standalone `personae-agent`
+  and its installers retire after D2);
+- its ruling 22 (macOS joins with D2);
+- its ruling 42 (a Linux resident starts locked and waits for a prompt).
+
+So D2's assessment should start from the vault lock's state. The order
+is Mark's to set.

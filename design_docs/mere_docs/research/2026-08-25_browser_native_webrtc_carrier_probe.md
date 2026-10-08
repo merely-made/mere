@@ -41,7 +41,7 @@ decides what is disclosed and which intents are admitted.
 The tree is closer to this shape than the older browser-hosting discussion
 suggested.
 
-- The [Graphshell remote projection plan](../implementation_strategy/2026-07-22_graphshell_remote_projection_host_plan.md)
+- The [Graphshell remote projection plan](../../archive_docs/2026-10-06_completed_plans/2026-07-22_graphshell_remote_projection_host_plan.md)
   already keeps carrier, admission, application protocol, and product
   authority separate. Its native G5 path is landed. The browser profile is
   explicitly unclaimed until a headed browser-to-native reconnect exists.

@@ -1,0 +1,148 @@
+{
+  "schema": "distillery.stable-browser-verification-summary/v1",
+  "observed_schema": "distillery.burn-browser-embedding-repro/v3",
+  "date": "2026-10-06",
+  "browser": "Codex in-app browser",
+  "platform": "macOS / native WebGPU",
+  "burn": "0.22.0",
+  "cubecl": "0.11.0",
+  "cubek": "0.3.0",
+  "rust": "1.98.1",
+  "receipt_scope": "Summary transcribed from the completed headed browser result; numeric output arrays omitted.",
+  "wasm_sha256": "d089e350fe4f8bbf44faf876ddb5740b08ef912d35cd8b4ccd11dcf592b959a3",
+  "cases": [
+    {
+      "name": "tiny-mixed",
+      "matches_expected": true,
+      "all_finite": true,
+      "input_round_trip_matches": true,
+      "first_mismatch_index": null
+    },
+    {
+      "name": "bert-width-mixed",
+      "matches_expected": true,
+      "all_finite": true,
+      "input_round_trip_matches": true,
+      "first_mismatch_index": null
+    },
+    {
+      "name": "bert-width-zeros",
+      "matches_expected": true,
+      "all_finite": true,
+      "input_round_trip_matches": true,
+      "first_mismatch_index": null
+    },
+    {
+      "name": "bert-width-after-bulk-uploads",
+      "matches_expected": true,
+      "all_finite": true,
+      "input_round_trip_matches": true,
+      "first_mismatch_index": null
+    },
+    {
+      "name": "minilm-word-table-after-model-sized-uploads",
+      "matches_expected": true,
+      "all_finite": true,
+      "input_round_trip_matches": true,
+      "first_mismatch_index": null
+    },
+    {
+      "name": "minilm-word-table-with-queued-consumers",
+      "matches_expected": true,
+      "all_finite": true,
+      "input_round_trip_matches": true,
+      "first_mismatch_index": null
+    },
+    {
+      "name": "minilm-word-table-through-param-module",
+      "matches_expected": true,
+      "all_finite": true,
+      "input_round_trip_matches": true,
+      "first_mismatch_index": null
+    },
+    {
+      "name": "minilm-word-table-after-small-fragment-uploads",
+      "matches_expected": true,
+      "all_finite": true,
+      "input_round_trip_matches": true,
+      "first_mismatch_index": null
+    },
+    {
+      "name": "grouped-minilm-word",
+      "matches_expected": true,
+      "all_finite": true,
+      "input_round_trip_matches": true,
+      "first_mismatch_index": null
+    },
+    {
+      "name": "grouped-minilm-position",
+      "matches_expected": true,
+      "all_finite": true,
+      "input_round_trip_matches": true,
+      "first_mismatch_index": null
+    },
+    {
+      "name": "grouped-minilm-token-type",
+      "matches_expected": true,
+      "all_finite": true,
+      "input_round_trip_matches": true,
+      "first_mismatch_index": null
+    }
+  ],
+  "graph_cases": [
+    {
+      "name": "burn-unit-mean-dim",
+      "matches_expected": true,
+      "maximum_abs_error": 1.4901161e-08
+    },
+    {
+      "name": "burn-unit-centered",
+      "matches_expected": true,
+      "maximum_abs_error": 5.9604645e-08
+    },
+    {
+      "name": "burn-unit-raw-add-shared",
+      "matches_expected": true,
+      "maximum_abs_error": 0
+    },
+    {
+      "name": "burn-unit-raw-mul-scalar",
+      "matches_expected": true,
+      "maximum_abs_error": 0
+    },
+    {
+      "name": "burn-unit-raw-mul-shared",
+      "matches_expected": true,
+      "maximum_abs_error": 0
+    },
+    {
+      "name": "burn-unit-raw-mul-independent",
+      "matches_expected": true,
+      "maximum_abs_error": 0
+    },
+    {
+      "name": "burn-unit-variance",
+      "matches_expected": true,
+      "maximum_abs_error": 1.1920929e-07
+    },
+    {
+      "name": "burn-unit-variance-independent",
+      "matches_expected": true,
+      "maximum_abs_error": 1.1920929e-07
+    },
+    {
+      "name": "burn-unit-layer-norm-fresh",
+      "matches_expected": true,
+      "maximum_abs_error": 5.9604645e-08
+    },
+    {
+      "name": "bert-width-layer-norm-fresh",
+      "matches_expected": true,
+      "maximum_abs_error": 4.7683716e-07
+    }
+  ],
+  "all_cases_match": true,
+  "gpu_errors": [],
+  "gate_failures": [],
+  "passed": true
+}

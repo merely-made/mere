@@ -21,7 +21,7 @@ The engine argument holds. Four things around it are wrong or under-argued.
 ### 1.1 Page text was indexed once; the wiring died with meerkat
 
 The brief reports that nothing supplies `text_for`, and that is true at HEAD.
-It is not a design fact. The [capture plan](../../mere_docs/implementation_strategy/2026-06-26_capture_provenance_consent_plan.md)'s
+It is not a design fact. The [capture plan](../../archive_docs/2026-10-06_completed_plans/2026-06-26_capture_provenance_consent_plan.md)'s
 C5 built and headed-verified body-text recall on 2026-06-28 (commit
 `8b8b039`): meerkat's `>recall` verb pulled each page's `main_text` from the
 content cache and re-minted the index with it. Meerkat was obviated by

@@ -1,17 +1,13 @@
 use cubecl::features::Plane;
 use cubecl::frontend::CompilationArg;
-use cubecl::frontend::CubePrimitive;
-use cubecl::{
-    CubeCount, CubeDim, Runtime, TestRuntime, cube, ir::StorageType, prelude::*,
-    std::tensor::TensorHandle, zspace::Shape,
-};
+use cubecl::{CubeCount, CubeDim, cube, prelude::*, std::tensor::TensorHandle, zspace::Shape};
 use cubek_reduce::components::instructions::{Value, plane_topk_insert, plane_topk_merge};
 use cubek_reduce::eval::cpu_reference::contiguous_strides;
 use cubek_test_utils::{InputDataType, StridedLayout, TestInput};
 
 #[test]
 fn test_topk_plane_reduce_inplace() {
-    let client = TestRuntime::client(&Default::default());
+    let client = cubecl::test_device().client();
     if !client.properties().features.plane.contains(Plane::Ops) {
         return;
     }
@@ -25,16 +21,16 @@ fn test_topk_plane_reduce_inplace() {
     let shape = Shape::new([total_vectors]);
     let stride = contiguous_strides(&shape);
 
-    let dtype = f32::as_type_native_unchecked().storage_type();
+    let dtype = f32::elem_type_native();
     let input_dtype = InputDataType::Standard(dtype);
 
     #[rustfmt::skip]
     let data = vec![
         // Thread 0
-        99.0, 99.1, 99.2, 99.3,
-        10.0, 10.1, 10.2, 10.3,
+        99.0, 99.1, 99.2, 99.3, 
+        10.0, 10.1, 10.2, 10.3, 
         // Thread 1
-        88.0, 88.1, 102.2, 88.3,
+        88.0, 88.1, 102.2, 88.3, 
         55.0, 55.1, 101.2, 55.3,
     ];
 
@@ -44,11 +40,11 @@ fn test_topk_plane_reduce_inplace() {
         .custom(data.clone())
         .generate_with_f32_host_data();
 
-    let storage_type = f32::as_type_native_unchecked().storage_type();
+    let storage_type = f32::elem_type_native();
 
     let output_handle = build_output_tensor(&client, storage_type, &shape);
 
-    launch_plane_reduce_inplace::launch::<TestRuntime>(
+    launch_plane_reduce_inplace::launch(
         &client,
         CubeCount::Static(1, 1, 1),
         CubeDim::new(&client, num_threads),
@@ -65,10 +61,10 @@ fn test_topk_plane_reduce_inplace() {
 }
 
 fn build_output_tensor(
-    client: &cubecl::client::ComputeClient<TestRuntime>,
-    output_dtype: StorageType,
+    client: &cubecl::client::Client,
+    output_dtype: ElemType,
     output_shape: &Shape,
-) -> TensorHandle<TestRuntime> {
+) -> TensorHandle {
     let strides = contiguous_strides(output_shape);
     TestInput::builder(client.clone(), output_shape.clone())
         .dtype(output_dtype)
@@ -82,7 +78,7 @@ fn launch_plane_reduce_inplace<N: Numeric, S: Size>(
     input: &Tensor<Vector<N, S>>,
     output: &mut Tensor<Vector<N, S>>,
     #[comptime] k: usize,
-    #[define(N)] _dtype: StorageType,
+    #[define(N)] _dtype: ElemType,
     #[define(S)] _vector_size: usize,
 ) {
     let mut elements = Array::new(k);
@@ -111,18 +107,18 @@ fn assert_plane_topk_custom_values(
 ) {
     let mut expected_topk = vec![0.0; k * vector_size];
 
-    // Sort each lane independently
-    for lane in 0..vector_size {
-        let mut lane_values = Vec::new();
+    // Sort each unit independently
+    for plane_unit in 0..vector_size {
+        let mut unit_values = Vec::new();
         for i in 0..(num_threads * k) {
-            lane_values.push(input_host[i * vector_size + lane]);
+            unit_values.push(input_host[i * vector_size + plane_unit]);
         }
 
-        // Sort descending for this specific lane
-        lane_values.sort_by(|a, b| b.partial_cmp(a).unwrap());
+        // Sort descending for this specific unit
+        unit_values.sort_by(|a, b| b.partial_cmp(a).unwrap());
 
         for i in 0..k {
-            expected_topk[i * vector_size + lane] = lane_values[i];
+            expected_topk[i * vector_size + plane_unit] = unit_values[i];
         }
     }
 
@@ -135,7 +131,7 @@ fn assert_plane_topk_custom_values(
 
 #[test]
 fn test_topk_plane_topk_insert() {
-    let client = TestRuntime::client(&Default::default());
+    let client = cubecl::test_device().client();
     if !client.properties().features.plane.contains(Plane::Ops) {
         return;
     }
@@ -165,7 +161,7 @@ fn test_topk_plane_topk_insert() {
     let item_shape = Shape::new([num_threads * vector_size]);
     let item_stride = contiguous_strides(&item_shape);
 
-    let dtype = f32::as_type_native_unchecked().storage_type();
+    let dtype = f32::elem_type_native();
     let input_dtype = InputDataType::Standard(dtype);
 
     let (acc_handle, _acc_host) = TestInput::builder(client.clone(), acc_shape.clone())
@@ -184,9 +180,9 @@ fn test_topk_plane_topk_insert() {
         .custom(item_data.clone())
         .generate_with_f32_host_data();
 
-    let storage_type = f32::as_type_native_unchecked().storage_type();
+    let storage_type = f32::elem_type_native();
 
-    launch_plane_topk_insert::launch::<TestRuntime>(
+    launch_plane_topk_insert::launch(
         &client,
         CubeCount::Static(1, 1, 1),
         CubeDim::new(&client, num_threads),
@@ -200,7 +196,7 @@ fn test_topk_plane_topk_insert() {
     let bytes = client.read_one(acc_handle.handle).unwrap();
     let actual = f32::from_bytes(&bytes);
 
-    assert_lane_topk_insert(&acc_data, &item_data, actual, num_threads, k, vector_size);
+    assert_unit_topk_insert(&acc_data, &item_data, actual, num_threads, k, vector_size);
 }
 
 #[cube(launch)]
@@ -208,29 +204,29 @@ fn launch_plane_topk_insert<N: Numeric, S: Size>(
     accumulator: &mut Tensor<Vector<N, S>>,
     new_item: &Tensor<Vector<N, S>>,
     #[comptime] k: usize,
-    #[define(N)] _dtype: StorageType,
+    #[define(N)] _dtype: ElemType,
     #[define(S)] _vector_size: usize,
 ) {
     let mut elements = Array::new(k);
-    let lane = UNIT_POS_X as usize;
-    let offset = lane * k;
+    let plane_unit = UNIT_POS_X as usize;
+    let offset = plane_unit * k;
 
-    // The launch rounds the requested unit count up to a full plane, so lanes past the
+    // The launch rounds the requested unit count up to a full plane, so units past the
     // input data read out of bounds. Read at a clamped index and mask them to the
     // reduction identity (min_value) so they never win the plane-wide top-k, mirroring
     // the null_input masking the production reader does.
-    let valid = lane < new_item.len();
+    let valid = plane_unit < new_item.len();
     let valid_v = Vector::new(valid);
     let null = Vector::new(N::min_value());
     let safe_offset = offset * usize::cast_from(valid);
-    let safe_lane = lane * usize::cast_from(valid);
+    let safe_unit = plane_unit * usize::cast_from(valid);
 
     #[unroll]
     for i in 0..k {
         elements[i] = select_many(valid_v, accumulator[safe_offset + i], null);
     }
 
-    let item = select_many(valid_v, new_item[safe_lane], null);
+    let item = select_many(valid_v, new_item[safe_unit], null);
     let args = Value::new_None();
     let mut coordinates = Value::new_None();
 
@@ -244,7 +240,7 @@ fn launch_plane_topk_insert<N: Numeric, S: Size>(
     }
 }
 
-fn assert_lane_topk_insert(
+fn assert_unit_topk_insert(
     initial_acc: &[f32],
     new_items: &[f32],
     actual_gpu: &[f32],
@@ -252,10 +248,10 @@ fn assert_lane_topk_insert(
     k: usize,
     vector_size: usize,
 ) {
-    let mut plane_items_per_lane: Vec<Vec<f32>> = vec![Vec::new(); vector_size];
+    let mut plane_items_per_unit: Vec<Vec<f32>> = vec![Vec::new(); vector_size];
     for unit in 0..num_threads {
         for s in 0..vector_size {
-            plane_items_per_lane[s].push(new_items[unit * vector_size + s]);
+            plane_items_per_unit[s].push(new_items[unit * vector_size + s]);
         }
     }
 
@@ -267,17 +263,17 @@ fn assert_lane_topk_insert(
                 candidates.push(initial_acc[(unit * k + i) * vector_size + s]);
             }
 
-            candidates.extend_from_slice(&plane_items_per_lane[s]);
+            candidates.extend_from_slice(&plane_items_per_unit[s]);
 
             candidates.sort_by(|a, b| b.partial_cmp(a).unwrap());
-            let expected_lane_topk = &candidates[..k];
+            let expected_unit_topk = &candidates[..k];
 
             for i in 0..k {
                 let actual_val = actual_gpu[(unit * k + i) * vector_size + s];
                 assert_eq!(
-                    actual_val, expected_lane_topk[i],
-                    "Mismatch at Thread {}, Lane {}, Rank {}. Expected {}, got {}",
-                    unit, s, i, expected_lane_topk[i], actual_val
+                    actual_val, expected_unit_topk[i],
+                    "Mismatch at Thread {}, Unit {}, Rank {}. Expected {}, got {}",
+                    unit, s, i, expected_unit_topk[i], actual_val
                 );
             }
         }

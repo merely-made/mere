@@ -659,6 +659,13 @@ impl<B: Backend> GraphSession<B> {
     /// session begun in memory, new journal entries and changes, and a
     /// checkpoint once enough entries have accrued. New changes stamp the
     /// manifest `updated_at` with `at` (reservoir plan §7 item 28).
+    /// Whether anything waits for the next store, without building the batch.
+    pub fn has_unstored(&self) -> bool {
+        !self.head_stored
+            || self.journal.live_cursor() > self.saved
+            || self.changes.next_seq() > self.changes_saved
+    }
+
     pub fn pending(&self, at: SystemTime) -> Result<Pending, SessionError> {
         self.pending_with(at, false)
     }
@@ -745,23 +752,35 @@ impl<B: Backend> GraphSession<B> {
     /// changed since goes back; the rest is kept and reported with who changed
     /// it (reservoir plan §7 item 17). `None` when there is nothing to undo.
     pub async fn undo(&mut self, author: Author) -> Result<Option<Reverted>, SessionError> {
+        let reverted = self.undo_now(author)?;
+        self.store(wall_clock_now(), Vec::new(), false).await?;
+        Ok(reverted)
+    }
+
+    /// [`undo`](Self::undo), journaled but not stored until the next flush,
+    /// for a host that writes its batches itself ([`pending`](Self::pending),
+    /// then [`stored`](Self::stored)).
+    pub fn undo_now(&mut self, author: Author) -> Result<Option<Reverted>, SessionError> {
         let Some(of) = self.stacks(&author).0.last().copied() else {
             return Ok(None);
         };
-        self.revert(author, of, ChangeKind::Undo { of })
-            .await
-            .map(Some)
+        self.revert(author, of, ChangeKind::Undo { of }).map(Some)
     }
 
     /// Redo `author`'s most recent undo, unless an edit of theirs since has
     /// cleared it (§7 item 18). `None` when there is nothing to redo.
     pub async fn redo(&mut self, author: Author) -> Result<Option<Reverted>, SessionError> {
+        let reverted = self.redo_now(author)?;
+        self.store(wall_clock_now(), Vec::new(), false).await?;
+        Ok(reverted)
+    }
+
+    /// [`redo`](Self::redo), journaled but not stored until the next flush.
+    pub fn redo_now(&mut self, author: Author) -> Result<Option<Reverted>, SessionError> {
         let Some(of) = self.stacks(&author).1.last().copied() else {
             return Ok(None);
         };
-        self.revert(author, of, ChangeKind::Redo { of })
-            .await
-            .map(Some)
+        self.revert(author, of, ChangeKind::Redo { of }).map(Some)
     }
 
     /// `author`'s undo and redo stacks, rebuilt from the change log: an edit
@@ -802,7 +821,8 @@ impl<B: Backend> GraphSession<B> {
     }
 
     /// Revert change `of` as `kind`, recording what was kept and by whom.
-    async fn revert(
+    /// Journaled, not stored.
+    fn revert(
         &mut self,
         author: Author,
         of: Seq,
@@ -836,7 +856,11 @@ impl<B: Backend> GraphSession<B> {
                     .ok_or_else(|| SessionError::NotReplayable(format!("{edit:?}")))
             })
             .collect::<Result<Vec<_>, _>>()?;
-        let applied = self.apply_as(author, kind, deltas).await?;
+        let (_, applied) = self.edit_as(author, kind, |graph| {
+            for delta in deltas {
+                let _ = apply_graph_delta(graph, delta);
+            }
+        });
         Ok(Reverted { of, applied, kept })
     }
 
@@ -1577,6 +1601,7 @@ mod tests {
                 store.list(SESSIONS_PREFIX).await.unwrap().is_empty(),
                 "nothing is written before the flush"
             );
+            assert!(session.has_unstored());
 
             let at = SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(1_800_000_000);
             session.flush(at).await.unwrap();
@@ -1588,6 +1613,7 @@ mod tests {
                 session.pending(at).unwrap().is_empty(),
                 "a flush with nothing new writes nothing"
             );
+            assert!(!session.has_unstored(), "and nothing waits for one");
         });
     }
 

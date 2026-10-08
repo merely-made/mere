@@ -15,12 +15,16 @@
 use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
+use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use crate::vault::{CredentialLineage, IdentitySlot, ProtocolKey, SecretBytes, UnlockTier};
 
 /// Plaintext inner shape — what a backend serializes then encrypts.
-#[derive(Debug, Serialize, Deserialize)]
+///
+/// Zeroizes on drop (vault lock ruling 6): every load and save builds one.
+#[derive(Debug, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub(crate) struct PlaintextProfile {
+    #[zeroize(skip)]
     pub(crate) display_name: String,
     /// 32-byte master signing-key seed.
     pub(crate) master_seed: [u8; 32],
@@ -31,16 +35,24 @@ pub(crate) struct PlaintextProfile {
 /// Plaintext slot — same structural shape as [`IdentitySlot`] but with
 /// `Vec<u8>` for the secret payload (since `SecretBytes` doesn't impl
 /// serde).
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub(crate) struct PlaintextSlot {
+    #[zeroize(skip)]
     pub(crate) mod_id: String,
+    #[zeroize(skip)]
     pub(crate) instance: Option<String>,
+    #[zeroize(skip)]
     pub(crate) kind: String,
+    #[serde(deserialize_with = "crate::zeroizing_json::bytes")]
     pub(crate) payload: Vec<u8>,
     /// Set iff Bootstrap-category slot. None for Direct.
+    #[zeroize(skip)]
     pub(crate) state_dir: Option<PathBuf>,
+    #[zeroize(skip)]
     pub(crate) is_bootstrap: bool,
+    #[zeroize(skip)]
     pub(crate) lineage: CredentialLineage,
+    #[zeroize(skip)]
     pub(crate) unlock_tier: UnlockTier,
 }
 
@@ -80,15 +92,18 @@ pub(crate) fn slot_to_plaintext(key: &ProtocolKey, slot: &IdentitySlot) -> Plain
     }
 }
 
-pub(crate) fn plaintext_to_slot(p: &PlaintextSlot) -> (ProtocolKey, IdentitySlot) {
+/// Moves the payload out rather than copying it, so no uncleared copy is
+/// freed; what is left in `p` zeroizes when it drops.
+pub(crate) fn plaintext_to_slot(p: &mut PlaintextSlot) -> (ProtocolKey, IdentitySlot) {
     let key = ProtocolKey {
         mod_id: p.mod_id.clone(),
         instance: p.instance.clone(),
     };
+    let payload = SecretBytes::new(std::mem::take(&mut p.payload));
     let slot = if p.is_bootstrap {
         IdentitySlot::Bootstrap {
             kind: p.kind.clone(),
-            bootstrap: SecretBytes::new(p.payload.clone()),
+            bootstrap: payload,
             state_dir: p.state_dir.clone().unwrap_or_else(|| PathBuf::from(".")),
             lineage: p.lineage,
             unlock_tier: p.unlock_tier,
@@ -96,7 +111,7 @@ pub(crate) fn plaintext_to_slot(p: &PlaintextSlot) -> (ProtocolKey, IdentitySlot
     } else {
         IdentitySlot::Direct {
             kind: p.kind.clone(),
-            payload: SecretBytes::new(p.payload.clone()),
+            payload,
             lineage: p.lineage,
             unlock_tier: p.unlock_tier,
         }

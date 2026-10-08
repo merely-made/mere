@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-10
 **Kind:** research brief (design probe; nothing here is scheduled)
-**Anchors:** [dramatis tier plan](../implementation_strategy/2026-08-10_dramatis_tier_plan.md) (D4),
+**Anchors:** [dramatis tier plan](../../archive_docs/2026-10-06_completed_plans/2026-08-10_dramatis_tier_plan.md) (D4),
 [contact identity model brief](2026-06-15_contact_identity_model_brief.md),
 the 2026-07-22 vault/agent plan, the participant gate + packs plan.
 

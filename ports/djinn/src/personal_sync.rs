@@ -120,6 +120,10 @@ pub struct PersonalSyncStarted {
     pub surface: DeviceSurfaceHandle,
     /// The paired-device directory, read live from this host.
     pub directory: DeviceDirectorySource,
+    /// This device's personal-graph node id, hex.
+    pub node_id: String,
+    /// The ticket this start listens on, as the status route reports it.
+    pub ticket: String,
 }
 
 /// Start personal sync for a profile, or return `None` when the owner has not
@@ -257,11 +261,13 @@ pub async fn start<P: IdentityProvider + ?Sized>(
     // disclosed on request through `pairing_facts` rather than written here on
     // every start. A peer learns it from the attestation on the wire anyway;
     // that is a different surface from a plaintext file.
+    let node_id = owner_settings::hex32(&host.node_id());
+    let ticket = host.ticket().await?;
     tracing::info!(
         graph = %owner_settings::hex32(&graph),
-        node_id = %owner_settings::hex32(&host.node_id()),
+        node_id = %node_id,
         paired = sync.paired_devices.len(),
-        ticket = %host.ticket().await?,
+        ticket = %ticket,
         "personal graph sync listening"
     );
     // Name any device that can reach this graph but cannot write to it. The
@@ -334,7 +340,12 @@ pub async fn start<P: IdentityProvider + ?Sized>(
         graphshell::receipts::inbox_dir(&data_root),
     );
     spawn_accept_watch(host, Arc::clone(&surface));
-    Ok(Some(PersonalSyncStarted { surface, directory }))
+    Ok(Some(PersonalSyncStarted {
+        surface,
+        directory,
+        node_id,
+        ticket,
+    }))
 }
 
 /// Run the one-shot blob operations the operator asked for on this start.
@@ -521,7 +532,7 @@ fn spawn_pairing_watch(
     // tuple deliberately: a peer going silent while keeping its address is a
     // change worth logging, and was previously invisible.
     let mut reported: Option<Vec<(String, bool, bool)>> = None;
-    tokio::spawn(async move {
+    graphshell::native::tasks::spawn_tracked(async move {
         loop {
             tokio::time::sleep(PAIRING_POLL).await;
             let reloaded = match OwnerSettings::load(&settings_file) {
@@ -953,7 +964,7 @@ async fn refresh_dial_hint(
 /// offer stays on the graph, so the person can accept again once whatever
 /// blocked it (a peer that is offline, bytes that are too large) has changed.
 fn spawn_accept_watch(host: Arc<PersonalSyncHost>, surface: DeviceSurfaceHandle) {
-    tokio::spawn(async move {
+    graphshell::native::tasks::spawn_tracked(async move {
         loop {
             tokio::time::sleep(std::time::Duration::from_secs(1)).await;
             // Take the queue handle out first, so the surface lock is not held
@@ -1024,7 +1035,7 @@ fn spawn_card_refresh(host: Arc<PersonalSyncHost>, surface: DeviceSurfaceHandle)
     // operator can see. Report the size when it changes, so convergence is
     // observable rather than merely asserted.
     let mut reported: Option<usize> = None;
-    tokio::spawn(async move {
+    graphshell::native::tasks::spawn_tracked(async move {
         loop {
             tokio::time::sleep(std::time::Duration::from_secs(1)).await;
             match host.supplemental_cards().await {
@@ -1102,7 +1113,7 @@ const RECEIPT_POLL: std::time::Duration = std::time::Duration::from_secs(10);
 /// runs into a turn would make a later reader unable to tell which events
 /// belonged to which.
 fn spawn_receipt_intake(host: Arc<PersonalSyncHost>, inbox: PathBuf) {
-    tokio::spawn(async move {
+    graphshell::native::tasks::spawn_tracked(async move {
         loop {
             tokio::time::sleep(RECEIPT_POLL).await;
             let waiting = match graphshell::receipts::pending(&inbox) {

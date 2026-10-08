@@ -4,8 +4,10 @@ use cubecl::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::components::instructions::AccumulatorFormat;
+
 use crate::components::instructions::plane_topk_insert;
 use crate::components::instructions::plane_topk_merge;
+use crate::components::instructions::reaches;
 use crate::components::instructions::{Accumulator, Item, Value, ValueExpand};
 use crate::{
     ReduceFamily, ReduceInstruction, ReducePrecision,
@@ -46,6 +48,9 @@ impl ReduceWithIndicesFamily for TopK {
 ///
 /// Ties break towards the lower coordinate, matching the CPU reference. A
 /// coordinate-less candidate emits no index arithmetic at all.
+///
+/// A candidate that reaches no component's last kept slot changes nothing and skips
+/// the `k`-slot walk — over a long row, almost every candidate.
 #[cube]
 pub(crate) fn topk_insert<N: Numeric, S: Size>(
     elements: &mut Array<Vector<N, S>>,
@@ -54,38 +59,40 @@ pub(crate) fn topk_insert<N: Numeric, S: Size>(
     insert_coord: &Value<Vector<u32, S>>,
     #[comptime] k: usize,
 ) {
-    let mut insert_val = insert_val;
+    if reaches(insert_val, elements[k - 1]) {
+        let mut insert_val = insert_val;
 
-    match insert_coord {
-        Value::None => {
-            for j in 0..k {
-                let to_keep = elements[j].greater_than(&insert_val);
-                let next_val = select_many(to_keep, insert_val, elements[j]);
-                elements[j] = select_many(to_keep, elements[j], insert_val);
-                insert_val = next_val;
-            }
+        match insert_coord {
+            Value::None => {
+                for j in 0..k {
+                    let to_keep = elements[j].greater_than(&insert_val);
+                    let next_val = select_many(to_keep, insert_val, elements[j]);
+                    elements[j] = select_many(to_keep, elements[j], insert_val);
+                    insert_val = next_val;
+                }
+            },
+            Value::Single(coord) => {
+                let mut insert_coord = coord.unwrap();
+                let coords = coordinates.multiple_mut();
+
+                for j in 0..k {
+                    let to_keep = select_many(
+                        elements[j].equal(&insert_val),
+                        coords[j].less_than(&insert_coord),
+                        elements[j].greater_than(&insert_val),
+                    );
+
+                    let next_val = select_many(to_keep, insert_val, elements[j]);
+                    elements[j] = select_many(to_keep, elements[j], insert_val);
+                    insert_val = next_val;
+
+                    let next_coord = select_many(to_keep, insert_coord, coords[j]);
+                    coords[j] = select_many(to_keep, coords[j], insert_coord);
+                    insert_coord = next_coord;
+                }
+            },
+            Value::Multiple(_) => panic!("a top-k candidate carries at most one coordinate"),
         }
-        Value::Single(coord) => {
-            let mut insert_coord = coord.unwrap();
-            let coords = coordinates.multiple_mut();
-
-            for j in 0..k {
-                let to_keep = select_many(
-                    elements[j].equal(&insert_val),
-                    coords[j].less_than(&insert_coord),
-                    elements[j].greater_than(&insert_val),
-                );
-
-                let next_val = select_many(to_keep, insert_val, elements[j]);
-                elements[j] = select_many(to_keep, elements[j], insert_val);
-                insert_val = next_val;
-
-                let next_coord = select_many(to_keep, insert_coord, coords[j]);
-                coords[j] = select_many(to_keep, coords[j], insert_coord);
-                insert_coord = next_coord;
-            }
-        }
-        Value::Multiple(_) => panic!("a top-k candidate carries at most one coordinate"),
     }
 }
 
@@ -242,7 +249,7 @@ impl<P: ReducePrecision> ReduceInstruction<P> for TopK {
                     &item.args,
                     this.k,
                 );
-            }
+            },
             ReduceStep::Identity => {
                 topk_insert::<P::EA, P::SI>(
                     elements,
@@ -251,7 +258,7 @@ impl<P: ReducePrecision> ReduceInstruction<P> for TopK {
                     &item.args,
                     this.k,
                 );
-            }
+            },
         }
     }
 
@@ -291,7 +298,7 @@ impl<P: ReducePrecision> ReduceInstruction<P> for TopK {
             Value::None => {
                 let values = topk_finalize_values::<P, Out>(&accumulator, this.k);
                 (Value::new_Multiple(values), Value::new_None())
-            }
+            },
             Value::Multiple(_) => {
                 let (values, coords) = topk_finalize_with_coords::<P>(&accumulator, this.k);
 
@@ -307,7 +314,7 @@ impl<P: ReducePrecision> ReduceInstruction<P> for TopK {
                     Value::new_Multiple(out_values),
                     Value::new_Multiple(out_indices),
                 )
-            }
+            },
             Value::Single(_) => panic!("top-k accumulator coordinates are one slice per slot"),
         }
     }
@@ -333,7 +340,7 @@ impl<P: ReducePrecision> ReduceInstruction<P> for TopK {
                     out_indices[i] = Vector::cast_from(acc_args[i]);
                 }
                 Value::new_Multiple(out_indices)
-            }
+            },
             Value::Single(_) => panic!("top-k accumulator coordinates are one slice per slot"),
         };
 
@@ -354,7 +361,7 @@ fn topk_finalize_values<P: ReducePrecision, Out: Numeric>(
     #[comptime] k: usize,
 ) -> Array<Out> {
     let vals = accumulator.elements.multiple();
-    let vector_size = vals[0].size().comptime();
+    let vector_size = vals[0].vector_size().comptime();
 
     let mut topk = Array::new(k);
     #[unroll]
@@ -362,13 +369,13 @@ fn topk_finalize_values<P: ReducePrecision, Out: Numeric>(
         topk[slot] = Out::min_value();
     }
 
-    #[unroll]
+    #[unroll(k * k * vector_size <= crate::components::instructions::TOPK_UNROLL_BUDGET)]
     for i in 0..k {
         #[unroll]
         for j in 0..vector_size {
             let mut element = Out::cast_from(vals[i].extract(j));
 
-            #[unroll]
+            #[unroll(k * k * vector_size <= crate::components::instructions::TOPK_UNROLL_BUDGET)]
             for slot in 0..k {
                 let current = topk[slot];
                 let keep = current > element;
@@ -394,7 +401,7 @@ fn topk_finalize_with_coords<P: ReducePrecision>(
 ) -> (Array<P::EA>, Array<u32>) {
     let vals = accumulator.elements.multiple();
     let coords = accumulator.args.multiple();
-    let vector_size = coords[0].size().comptime();
+    let vector_size = coords[0].vector_size().comptime();
 
     let mut topk_vals = Array::new(k);
     let mut topk_coords = Array::new(k);
@@ -405,14 +412,14 @@ fn topk_finalize_with_coords<P: ReducePrecision>(
         topk_coords[slot] = u32::MAX;
     }
 
-    #[unroll]
+    #[unroll(k * k * vector_size <= crate::components::instructions::TOPK_UNROLL_BUDGET)]
     for i in 0..k {
         #[unroll]
         for j in 0..vector_size {
             let mut value = vals[i].extract(j);
             let mut coordinate = coords[i].extract(j);
 
-            #[unroll]
+            #[unroll(k * k * vector_size <= crate::components::instructions::TOPK_UNROLL_BUDGET)]
             for slot in 0..k {
                 let current_value = topk_vals[slot];
                 let current_coordinate = topk_coords[slot];

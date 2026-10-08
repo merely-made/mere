@@ -14,6 +14,9 @@ readme.workspace = true
 repository = "https://github.com/tracel-ai/cubek/tree/main/crates/cubek-reduce"
 version.workspace = true
 
+[lints]
+workspace = true
+
 [features]
 default = ["std", "cubecl/default"]
 std = ["cubecl/std", "thiserror/std"]
@@ -29,18 +32,20 @@ cpu-reference = ["dep:cubek-test-utils"]
 benchmarks = ["cpu-reference", "cubecl/test-runtime"]
 
 [dependencies]
-cubecl = { workspace = true }
-cubek-std = { path = "../cubek-std", version = "=0.3.0-pre.2", default-features = false }
-cubek-test-utils = { path = "./../cubek-test-utils/", version = "=0.3.0-pre.2", default-features = false, optional = true }
+cubek-std = { workspace = true }
+cubek-test-utils = { workspace = true, optional = true }
 
-num-traits = "0.2.19"
-pretty_assertions = { workspace = true, optional = true }
+cubecl = { workspace = true }
+
+num-traits = { workspace = true }
 serde = { workspace = true }
 half = { workspace = true }
 thiserror = { workspace = true }
 
 [dev-dependencies]
+# Enable reference helpers for tests without publishing a versioned self-dependency.
+cubek-reduce = { path = ".", default-features = false, features = ["cpu-reference"] }
+cubek-test-utils = { workspace = true }
+
 cubecl = { workspace = true, features = ["test-runtime"] }
 cubecl-common = { workspace = true }
-cubek-reduce = { path = ".", features = ["cpu-reference"] }
-cubek-test-utils = { path = "./../cubek-test-utils/", version = "=0.3.0-pre.2" }

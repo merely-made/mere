@@ -4,11 +4,12 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! The single-root Cambium desktop host.
+//! The Cambium desktop host: one window through [`run`], or several over one
+//! application state through [`run_windows`].
 //!
 //! Every Cambium desktop application so far has hand-assembled the same
 //! machinery: a winit `ApplicationHandler` owning one window, a genet
-//! [`SurfaceHost`] presenting a `netrender` scene, a retained
+//! [`RenderCore`] and window surface presenting a `netrender` scene, a retained
 //! owned Livery/Buckram layout over the runner's `ScriptedDom`, logical-coordinate
 //! hit testing, pointer/keyboard/IME/wheel routing into a
 //! [`cambium::GenetAppRunner`], overlay-scrollbar fade policy, and the
@@ -16,11 +17,17 @@
 //! extracted once, from the woodshed-genet donor.
 //!
 //! Deliberately **not** here, per the Signalman desktop scope (retinue,
-//! 2026-08-09): no async runtime, no application trait, no multi-window,
-//! docking, navigation, persistence, or command system. The application
-//! supplies plain closures ([`HostHooks`]) and keeps its own state in their
-//! environment; the host owns lifecycle, layout, paint, input routing, and
-//! accessibility synchronization, and nothing above them.
+//! 2026-08-09): no async runtime, no application trait, docking, navigation,
+//! persistence, or command system. The application supplies plain closures
+//! ([`HostHooks`]) and keeps its own state in their environment; the host owns
+//! lifecycle, layout, paint, input routing, and accessibility synchronization,
+//! and nothing above them.
+//!
+//! That scope also ruled out multi-window. Mere's stack seams plan brought it
+//! in on 2026-10-05 (rulings S2 and S23 to S26) as an additive entry beside
+//! `run`: [`run_windows`] runs one state over a forest document, one render
+//! core and a native window per projection, each a lens over the state, every
+//! window through the same per-window pipeline `run` drives.
 //!
 //! ```ignore
 //! let options = HostOptions { title: "App".into(), ..Default::default() };
@@ -30,7 +37,7 @@
 use std::sync::Arc;
 
 use cambium_winit_a11y::A11yHost;
-use genet_winit_host::SurfaceHost;
+use genet_render_host::{RenderCore, WindowSurface};
 use winit::application::ApplicationHandler;
 use winit::event::{ElementState, MouseButton, WindowEvent};
 use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
@@ -43,6 +50,9 @@ use std::{cell::RefCell, rc::Rc};
 mod decorations;
 mod files;
 mod harness;
+#[cfg(test)]
+mod headed_tests;
+mod windows;
 #[cfg(target_os = "windows")]
 mod windows_snap;
 #[cfg(target_os = "windows")]
@@ -56,15 +66,16 @@ pub use cambium_rootstock::{
     Host, HostFont, HostHooks, HostImage, HostOptions, HostPointer, HostWake, HostWindow,
     IdlePolicy, Init, Key, KeyInterceptHook, KeyPress, Modifiers, NamedKey, PaintCaptureFn,
     RelayoutProfile, Runner, ScrollAlign, ScrollIntoView, Surface, WindowCommand, WindowCommands,
-    WindowFrame, WindowGeometry, ZOOM_LADDER, fit_zoom, ladder_step, read_frame,
+    WindowFrame, WindowGeometry, WindowTree, ZOOM_LADDER, fit_zoom, ladder_step, read_frame,
 };
 pub use files::{DialogFileChooser, read_file};
 pub use harness::{Harness, inert_hooks};
+pub use windows::{WindowHooks, WindowHost, WindowsInit, run_windows};
 // Scenario execution lives in Mesquite; applications implement mesquite::Product.
 
 pub use cambium_rootstock::Instant;
 use cambium_rootstock::meristem_bounds::RootView;
-use cambium_rootstock::{Hook, HostState, env_size};
+use cambium_rootstock::{Hook, HostState, HostTree, env_size};
 pub use cambium_rootstock::{
     ProducedTexture, ProducerContext, ProducerError, ProducerFrameInfo, ProducerFrameStats,
     ProducerRegistrationError, ProducerRegistry, ResolvedAppearance, SourceAlpha, SourceEncoding,
@@ -192,27 +203,31 @@ impl HostWindow for WinitWindow {
         crate::decorations::titlebar_insets(&self.0)
     }
 }
-/// The winit window's presentation surface, as the neutral seam sees it.
+/// The winit window's presentation surface, as the neutral seam sees it: the
+/// host's shared render core and this window's swapchain made from it.
 ///
-/// A newtype because neither [`Surface`] nor `SurfaceHost` is local to this
-/// crate, so the implementation cannot be written directly on it. The wrapper
-/// costs nothing and gives the winit surface a name on this side of the seam.
-pub struct WinitSurface(pub SurfaceHost);
+/// The core is shared, not owned: every window's surface is made from the one
+/// core the host boots (stack seams S2), and a resume makes a new surface from
+/// that same core rather than booting another device.
+pub struct WinitSurface {
+    core: Arc<RenderCore>,
+    surface: WindowSurface,
+}
 impl Surface for WinitSurface {
-    fn core(&self) -> &genet_render_host::RenderCore {
-        self.0.core()
+    fn core(&self) -> &RenderCore {
+        &self.core
     }
 
     fn format(&self) -> wgpu::TextureFormat {
-        self.0.format()
+        self.surface.format()
     }
 
     fn resize(&mut self, width: u32, height: u32) {
-        self.0.resize(width, height);
+        self.surface.resize(&self.core, width, height);
     }
 
     fn acquire(&self) -> Option<wgpu::SurfaceTexture> {
-        self.0.acquire()
+        self.surface.acquire(&self.core)
     }
 }
 /// Convert a winit named key into the host's neutral vocabulary.
@@ -301,12 +316,12 @@ mod menu_entry_key_tests {
 /// is the same host with a native window attached. Adapter code reads core
 /// state through the deref and its own state directly, and the split stays
 /// visible in the field list rather than in every call site.
-pub struct WinitHost<State: 'static, Logic, V>
+pub struct WinitHost<State: 'static, Logic, V, T = Runner<State, Logic, V>>
 where
     Logic: FnMut(&State) -> V,
     V: RootView<State>,
 {
-    pub(crate) core: Host<State, Logic, V>,
+    pub(crate) core: Host<State, Logic, V, T>,
     /// Win32's `WM_NCHITTEST` bridge for the application-drawn maximize
     /// control. Declared before the window so its subclass is removed first.
     #[cfg(target_os = "windows")]
@@ -331,19 +346,25 @@ where
     /// Every window verb performed this run, for tests. The only way a
     /// windowless harness can prove the frame did what the gesture asked.
     pub(crate) performed: Vec<WindowCommand>,
+    /// How many render cores this host has booted: one for its whole life,
+    /// whatever suspends and resumes. The receipt for S2's one device.
+    pub(crate) core_boots: u32,
+    /// Under the multi-window entry, a redraw this window asked for, issued
+    /// at the next idle turn with every other window's (see `windows.rs`).
+    pub(crate) paced: Option<std::rc::Rc<std::cell::Cell<bool>>>,
 }
-impl<State, Logic, V> std::ops::Deref for WinitHost<State, Logic, V>
+impl<State, Logic, V, T> std::ops::Deref for WinitHost<State, Logic, V, T>
 where
     Logic: FnMut(&State) -> V,
     V: RootView<State>,
 {
-    type Target = Host<State, Logic, V>;
+    type Target = Host<State, Logic, V, T>;
 
     fn deref(&self) -> &Self::Target {
         &self.core
     }
 }
-impl<State, Logic, V> std::ops::DerefMut for WinitHost<State, Logic, V>
+impl<State, Logic, V, T> std::ops::DerefMut for WinitHost<State, Logic, V, T>
 where
     Logic: FnMut(&State) -> V,
     V: RootView<State>,
@@ -352,14 +373,15 @@ where
         &mut self.core
     }
 }
-impl<State, Logic, V> WinitHost<State, Logic, V>
+impl<State, Logic, V, T> WinitHost<State, Logic, V, T>
 where
     State: 'static,
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
+    T: HostTree<State>,
 {
     /// Wrap a host for the desktop event loop.
-    pub(crate) fn new(core: Host<State, Logic, V>) -> Self {
+    pub(crate) fn new(core: Host<State, Logic, V, T>) -> Self {
         Self {
             core,
             #[cfg(target_os = "windows")]
@@ -371,22 +393,39 @@ where
             #[cfg(target_os = "linux")]
             published_frame_scale: None,
             performed: Vec::new(),
+            core_boots: 0,
+            paced: None,
         }
     }
 
+    /// The host's render core, booted on first use and kept for the host's
+    /// life. Booting from the options factory rather than a stashed value is
+    /// why `HostOptions::netrender` is a closure.
+    fn render_core(&mut self) -> Result<Arc<RenderCore>, String> {
+        if let Some(core) = self.s.shared.render_core.as_ref() {
+            return Ok(core.clone());
+        }
+        let core = Arc::new(RenderCore::boot((self.options.netrender)())?);
+        self.core_boots += 1;
+        self.s.shared.render_core = Some(core.clone());
+        Ok(core)
+    }
+
+    /// A surface for `window`, made from the host's one render core.
     fn boot_surface(
-        &self,
+        &mut self,
         window: Arc<Window>,
         width: u32,
         height: u32,
-    ) -> Result<SurfaceHost, String> {
-        SurfaceHost::boot_with_transparency(
+    ) -> Result<WinitSurface, String> {
+        let core = self.render_core()?;
+        let surface = core.create_surface_with_transparency(
             window,
             width,
             height,
-            (self.options.netrender)(),
             self.options.app_frame_is_transparent(),
-        )
+        )?;
+        Ok(WinitSurface { core, surface })
     }
 
     /// Draw one frame, then project any application-owned native hit regions
@@ -405,7 +444,10 @@ where
             let dom = runner.dom();
             let dom_ref = dom.borrow();
             decorations::window_control_rect(
-                &*dom_ref,
+                &cambium_rootstock::WindowDom::new(
+                    &dom_ref,
+                    cambium_rootstock::HostTree::mount(runner),
+                ),
                 runner.root(),
                 layout,
                 &self.options.maximize_control_label,
@@ -565,11 +607,12 @@ pub fn edge_cursor(dir: winit::window::ResizeDirection) -> winit::window::Cursor
         R::NorthWest | R::SouthEast => C::NwseResize,
     }
 }
-impl<State, Logic, V> WinitHost<State, Logic, V>
+impl<State, Logic, V, T> WinitHost<State, Logic, V, T>
 where
     State: 'static,
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
+    T: HostTree<State>,
 {
     /// CSD only: the resize edge under the cursor, when the window is
     /// floating.
@@ -625,34 +668,44 @@ where
         }
     }
 }
-impl<State, Logic, V> ApplicationHandler<HostEvent> for WinitHost<State, Logic, V>
+impl<State, Logic, V, T> WinitHost<State, Logic, V, T>
 where
     State: 'static,
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
+    T: HostTree<State>,
 {
-    fn resumed(&mut self, event_loop: &ActiveEventLoop) {
-        // Resume after a suspend. The window, the runner, the retained layout,
-        // and every scrap of application state survived; only the drawing
-        // surface was taken away, so boot a new one against the same window
-        // and repaint. Booting from the options factory rather than a stashed
-        // value is why `HostOptions::netrender` is a closure: the second
-        // surface must have the same renderer configuration as the first.
-        if let Some(window) = self.native_window.clone() {
-            if self.s.surface.is_none() {
-                let size = window.inner_size();
-                match self.boot_surface(window.clone(), size.width.max(1), size.height.max(1)) {
-                    Ok(surface) => {
-                        self.s.surface = Some(Box::new(WinitSurface(surface)));
-                        // The surface is new, so nothing is cached in it: force
-                        // a full repaint rather than an incremental one.
-                        self.redraw();
-                    },
-                    Err(e) => eprintln!("[cambium-host] surface re-boot failed: {e}"),
-                }
+    /// Resume after a suspend. The window, the tree, the retained layout, the
+    /// render core and every scrap of application state survived; only the
+    /// drawing surface was taken away, so make a new one from the same core
+    /// against the same window and repaint. No device is created. `false`
+    /// when the window was never opened, which is a first resume's job.
+    pub(crate) fn resume_surface(&mut self) -> bool {
+        let Some(window) = self.native_window.clone() else {
+            return false;
+        };
+        if self.s.surface.is_none() {
+            let size = window.inner_size();
+            match self.boot_surface(window.clone(), size.width.max(1), size.height.max(1)) {
+                Ok(surface) => {
+                    self.s.surface = Some(Box::new(surface));
+                    // The surface is new, so nothing is cached in it: force
+                    // a full repaint rather than an incremental one.
+                    self.redraw();
+                },
+                Err(e) => eprintln!("[cambium-host] surface re-boot failed: {e}"),
             }
-            return;
         }
+        true
+    }
+
+    /// Create this host's native window from its options, hidden until its
+    /// accessibility adapter is installed. Returns it with the restored
+    /// geometry it was placed at, if any.
+    pub(crate) fn open_native_window(
+        &mut self,
+        event_loop: &ActiveEventLoop,
+    ) -> (Arc<Window>, Option<WindowGeometry>) {
         // Start comfortably on a large desktop, but never assume one. A
         // receipt's explicit size wins over application-restored geometry.
         let size_overridden = self
@@ -802,32 +855,23 @@ where
                 self.options.app_frame_is_transparent(),
             );
         }
+        (window, restored)
+    }
+
+    /// Install a window just opened: its surface from the host's one core,
+    /// its accessibility adapter, file chooser, geometry, fit and frame
+    /// extents. The caller then gives it a tree and draws the first frame.
+    pub(crate) fn install_window(
+        &mut self,
+        window: Arc<Window>,
+        restored: Option<WindowGeometry>,
+    ) -> Result<(), String> {
         let size = window.inner_size();
-        let surface = self
-            .boot_surface(window.clone(), size.width.max(1), size.height.max(1))
-            .expect("boot genet host");
-        let init = self.init.take().expect("resumed once");
-        // The application takes its end of the window-verb seam here, stores
-        // it in its own state, and calls it from ordinary click handlers.
-        let Init {
-            state,
-            logic,
-            sheet,
-            fonts,
-            images,
-        } = init(
-            &WinitWindow(window.clone()),
-            &self.s.commands.clone(),
-            &self.wake,
-        );
-        let dom = Rc::new(RefCell::new(ScriptedDom::new()));
-        let runner = Runner::new(dom, logic, state);
+        let surface = self.boot_surface(window.clone(), size.width.max(1), size.height.max(1))?;
         let mut a11y = A11yHost::new(self.a11y_waker());
         a11y.attach(window.clone());
         self.s.a11y = Some(Box::new(a11y));
         self.s.files = Some(Box::new(DialogFileChooser));
-        self.s.sheet = sheet;
-        self.s.set_resources(fonts, images);
         self.native_window = Some(window.clone());
         self.s.window = Some(Box::new(WinitWindow(window)));
         self.restored_geometry = restored;
@@ -839,63 +883,52 @@ where
         // The fit factor just moved the layout scale off the device scale the
         // extents were published at above, and no event will arrive to notice.
         self.sync_app_frame_extents();
-        self.s.surface = Some(Box::new(WinitSurface(surface)));
-        self.s.runner = Some(runner);
-        // Drive the first frame synchronously while the window is hidden:
-        // lay out, install the a11y tree, then reveal. A hidden winit window
-        // may not receive a deferred redraw.
+        self.s.surface = Some(Box::new(surface));
+        Ok(())
+    }
+
+    /// Drive the first frame synchronously while the window is hidden: lay
+    /// out, install the a11y tree, then reveal. A hidden winit window may not
+    /// receive a deferred redraw.
+    pub(crate) fn first_frame(&mut self) {
         self.redraw();
         self.sync_a11y();
     }
 
     /// The platform is taking the drawing surface away (Android, iOS; never on
     /// the desktop backends). Drop the surface and nothing else: the window
-    /// handle, the runner's state, the retained layout, the accessibility tree,
-    /// and the leaf registry all survive, so `resumed` re-boots a surface and
-    /// repaints the same application rather than restarting it.
-    fn suspended(&mut self, _event_loop: &ActiveEventLoop) {
+    /// handle, the tree's state, the retained layout, the accessibility tree,
+    /// the leaf registry and the render core all survive, so a resume makes a
+    /// new surface from the same core and repaints the same application rather
+    /// than restarting it. The renderer's retained leaf fragments live in that
+    /// core, so they survive too.
+    pub(crate) fn suspend_surface(&mut self) {
         self.suspend_producers();
         self.s.surface = None;
-        // Fragment IDs belong to the renderer that just died. Redraw returns
-        // early without a surface, so retire these here before resume installs
-        // a fresh renderer. The application leaf registry itself survives.
-        self.s.leaf_fragments.clear();
     }
 
-    fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
-        match self.idle_policy(cambium_rootstock::Instant::now()) {
-            IdlePolicy::A11yWake => {
-                if let Some(window) = self.s.window.as_ref() {
-                    window.request_redraw();
-                }
-                // Come straight back: the flag was consumed, and the next idle
-                // turn settles on the real policy once the action is drained.
-                event_loop.set_control_flow(ControlFlow::Poll);
-            },
-            IdlePolicy::Animate(after) => {
-                if let Some(window) = self.s.window.as_ref() {
-                    window.request_redraw();
-                }
-                event_loop.set_control_flow(ControlFlow::wait_duration(after));
-            },
-            IdlePolicy::Wait => event_loop.set_control_flow(ControlFlow::Wait),
+    /// This window's idle policy, with the redraw it asks for requested.
+    pub(crate) fn idle_turn(&mut self) -> IdlePolicy {
+        let policy = self.idle_policy(cambium_rootstock::Instant::now());
+        if matches!(policy, IdlePolicy::A11yWake | IdlePolicy::Animate(_)) {
+            if let Some(window) = self.s.window.as_ref() {
+                window.request_redraw();
+            }
         }
+        policy
     }
 
-    fn user_event(&mut self, event_loop: &ActiveEventLoop, event: HostEvent) {
-        match event {
-            HostEvent::Wake => {
-                self.process_wake();
-            },
-        }
+    /// A worker woke the application: drain it, then run what the drain
+    /// queued for the window.
+    pub(crate) fn wake_turn(&mut self) {
+        self.process_wake();
         self.sync_app_frame_extents();
         self.run_window_commands();
-        if self.s.close_requested {
-            event_loop.exit();
-        }
     }
 
-    fn window_event(&mut self, event_loop: &ActiveEventLoop, _id: WindowId, event: WindowEvent) {
+    /// One window event, through the host's routing, and the window verbs it
+    /// queued. Whether the window should now close is in `s.close_requested`.
+    pub(crate) fn handle_window_event(&mut self, event: WindowEvent) {
         match event {
             WindowEvent::CloseRequested => {
                 self.refresh_geometry();
@@ -1013,6 +1046,77 @@ where
         // performing a verb needs the native window, so the drain lives here.
         self.sync_app_frame_extents();
         self.run_window_commands();
+    }
+}
+
+/// What an idle turn's policy asks of the event loop.
+pub(crate) fn control_flow(policy: IdlePolicy) -> ControlFlow {
+    match policy {
+        // Come straight back: the flag was consumed, and the next idle turn
+        // settles on the real policy once the action is drained.
+        IdlePolicy::A11yWake => ControlFlow::Poll,
+        IdlePolicy::Animate(after) => ControlFlow::wait_duration(after),
+        IdlePolicy::Wait => ControlFlow::Wait,
+    }
+}
+
+impl<State, Logic, V> ApplicationHandler<HostEvent> for WinitHost<State, Logic, V>
+where
+    State: 'static,
+    Logic: FnMut(&State) -> V + 'static,
+    V: RootView<State>,
+{
+    fn resumed(&mut self, event_loop: &ActiveEventLoop) {
+        if self.resume_surface() {
+            return;
+        }
+        let (window, restored) = self.open_native_window(event_loop);
+        // The core boots before the application's init, as it always has, so
+        // a machine with no usable device fails before any app state exists.
+        self.render_core().expect("boot genet host");
+        let init = self.init.take().expect("resumed once");
+        // The application takes its end of the window-verb seam here, stores
+        // it in its own state, and calls it from ordinary click handlers.
+        let Init {
+            state,
+            logic,
+            sheet,
+            fonts,
+            images,
+        } = init(
+            &WinitWindow(window.clone()),
+            &self.s.commands.clone(),
+            &self.wake,
+        );
+        let dom = Rc::new(RefCell::new(ScriptedDom::new()));
+        let runner = Runner::new(dom, logic, state);
+        self.s.shared.sheet = sheet;
+        self.s.set_resources(fonts, images);
+        self.install_window(window, restored)
+            .expect("boot genet host");
+        self.s.runner = Some(runner);
+        self.first_frame();
+    }
+
+    fn suspended(&mut self, _event_loop: &ActiveEventLoop) {
+        self.suspend_surface();
+    }
+
+    fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
+        event_loop.set_control_flow(control_flow(self.idle_turn()));
+    }
+
+    fn user_event(&mut self, event_loop: &ActiveEventLoop, event: HostEvent) {
+        match event {
+            HostEvent::Wake => self.wake_turn(),
+        }
+        if self.s.close_requested {
+            event_loop.exit();
+        }
+    }
+
+    fn window_event(&mut self, event_loop: &ActiveEventLoop, _id: WindowId, event: WindowEvent) {
+        self.handle_window_event(event);
         if self.s.close_requested {
             event_loop.exit();
         }

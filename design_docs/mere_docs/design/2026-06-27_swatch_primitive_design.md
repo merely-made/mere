@@ -20,7 +20,7 @@ as the Navigator; this realizes it),
 (owns the per-window instance machinery + subgraphs),
 [graph signals layer plan](../../archive_docs/2026-08-20_completed_plans/2026-06-22_graph_signals_layer_plan.md)
 (owns the gloss swatch lens),
-[petgraph / RDF plan](../implementation_strategy/2026-06-18_petgraph_rdf_plan.md)
+[petgraph / RDF plan](../../archive_docs/2026-10-06_completed_plans/2026-06-18_petgraph_rdf_plan.md)
 (owns edge multigraph storage + the collapse-as-LOD ruling),
 [scriptable field regions plan](../implementation_strategy/2026-06-13_scriptable_field_regions_plan.md)
 (owns field-region edge visibility).
@@ -162,7 +162,7 @@ What flattens them is purely the orrery draw, "one undirected line per pair"
 3. **Per-cell hit-test**: selection resolves to the specific relation, which is the
    per-edge selection the subgraph-wiring open item #1 deferred.
 
-This aligns with the [petgraph / RDF plan](../implementation_strategy/2026-06-18_petgraph_rdf_plan.md),
+This aligns with the [petgraph / RDF plan](../../archive_docs/2026-10-06_completed_plans/2026-06-18_petgraph_rdf_plan.md),
 which rules that the multigraph is logical (one statement per fact, enumerated as
 `SemanticStatement` records inside the pair-local `EdgePayload` bucket, each with its
 own `StatementId` — the statement-bucket revision 2026-07-04) and visual edge-collapse

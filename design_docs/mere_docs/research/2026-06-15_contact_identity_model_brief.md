@@ -3,7 +3,7 @@
 **Date**: 2026-06-15
 **Status**: Research brief. Settles the *remote* side of identity (contacts: how a
 peer is named, resolved, and trusted across protocols) that the
-[comms shell plan](../implementation_strategy/2026-06-05_comms_shell_plan.md)
+[comms shell plan](../../archive_docs/2026-10-06_completed_plans/2026-06-05_comms_shell_plan.md)
 deferred and the [persona model brief](2026-05-14_persona_model_brief.md) left out
 of scope. Pairs with the persona brief: that one is *me*, this one is *them*.
 **Scope**: the kith/kin contact record; whether a contact is rooted on a handle or
@@ -16,7 +16,7 @@ frames decisions for a later phase.
   "persona ≈ DIDs this persona controls."
 - [murm p2p landscape brief](2026-05-31_murm_p2p_landscape_brief.md) — §2/§6 already
   name WebFinger + NIP-05 + back-claim proof + the previous-handle chain.
-- [comms shell plan](../implementation_strategy/2026-06-05_comms_shell_plan.md) —
+- [comms shell plan](../../archive_docs/2026-10-06_completed_plans/2026-06-05_comms_shell_plan.md) —
   open point "the identity model (one persona, many protocol handles), settle in
   P5"; decision 3 (misfin receive = run a server).
 - [daemon split research brief](2026-05-14_daemon_split_research_brief.md) — the

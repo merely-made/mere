@@ -1,5 +1,53 @@
 # Burn 0.22 prerelease closure receipt
 
+**2026-10-06 S16 annotation (S14 pass):** S16 ran on 2026-10-05. Main merged
+the pre.4 branch at `cec0b3a4` and was pushed, origin/main then at `07db35e2`
+([migration plan](../implementation_strategy/2026-08-09_burn_0_22_migration_plan.md)
+§13.44). Main's production row is now Burn `=0.22.0-pre.4`, CubeCL
+`=0.11.0-pre.4` and Cubek `=0.3.0-pre.4`. The 2026-10-03 annotation's "Main
+stays on pre.2 until S16", and the pre.2 production row in the 2026-08-20
+Status and Remaining gate below, describe main before S16. The pre.2 receipts
+stay historical, and stable publication remains gated.
+
+**2026-10-03 S15 closure annotation:** on the pre.4 migration branch the
+row is Burn `=0.22.0-pre.4`, CubeCL `=0.11.0-pre.4` and Cubek `=0.3.0-pre.4`,
+exact-pinned in every consumer manifest, with one version per crate in the root
+and graphshell-web graphs and no Turso or SQLite. Every S13 receipt passes on
+that branch; the 2026-10-03 section below has the patch table and receipt
+index. Main stays on pre.2 until S16, which waits on ruling 534's quiet GPU-on
+A/B, and stable publication remains gated as before. Earlier annotations and
+the dated text below keep their original scope.
+
+**2026-09-30 allocator stop:** four local `burn-cubecl` selectors were retired
+at `124fc42b` after ruling 410's controls. Remaining numerical/matrix/build
+checks passed, but remote reclaim left ten allocations / 5,323,776 active bytes
+against zero. Ruling 411 authorized bounded diagnosis. Explicit post-failure
+GPU completion polling released active allocations; both diagnostic runs kept
+the original failure, and source bytes/timestamps were restored. This is not a
+repaired lifecycle pass. See migration plan §13.29 and
+[the diagnosis receipt](2026-09-30_pre4_allocator_diagnosis.md).
+The patch-design fork, zero-baseline requirement and remaining acceptance/main
+promotion holds remain. Historical text below retains its original scope.
+
+**2026-09-29 later S13 annotation:** the native comparison and all 21 patched
+browser cases pass. Pristine upstream pre.4 also passes all 21 cases, with no
+GPU errors. This triggers migration-plan §13.8(2), rather than satisfying the
+expected-failure control. See §13.26 and the committed `2026-09-29_pre4_*`
+browser receipts. Source bytes were restored exactly; patch retirement or
+retention awaits Mark. Extrema, remote lifecycle and main promotion remain held.
+
+**2026-09-29 pre.4 reconciliation annotation:** migration plan §13.25 records
+the exact published-main integration through `99e44853` / Genet `19c20687`,
+coherent locked graphs and fresh affected compile/runtime verification.
+Conatus and ESP were rerun after dependency-source review invalidated their
+initial carry assumption; only Numen carries unchanged-closure execution
+evidence. This does not change the historical pre.2 production receipts below.
+S13 (all ten graph plus eleven embedding cases, native comparison, unpatched
+control, extrema and remote lifecycle), S15 closure and main promotion remain
+held behind their own gates. See `pre4-semantic-reconcile` under
+`Code/testing/mere/receipts/2026-09-29` for commands, logs and source seals.
+
+
 **Date:** 2026-08-20
 
 **Status:** The explicitly chosen `0.22.0-pre.2` migration remains the production
@@ -155,3 +203,63 @@ composition, and on-demand Burnpack tensor streaming. These justify a fresh
 native LoRA receipt and a bounded `burn-pack` streaming probe when portable
 checkpoint export becomes an active requirement. They do not change the
 current ModelSession/ordinary PEFT claim or authorize a production repin.
+
+## 2026-09-29: historical control supports conditional patch retirement
+
+Ruling 410 authorizes the historical comparison, then retirement if supported.
+Migration plan §13.27 records reconstructed pre.2 failing five graph cases while
+all eleven embedding controls pass; upstream pre.4 passes all 21 cases in the
+same current browser session. GPU errors are empty in both. Historical source
+provenance is qualified explicitly; this does not identify a specific upstream
+fix. Exact source restoration and fresh served-asset checks are recorded.
+
+Nine native unfused launcher controls are now prepared in the embedding fixture
+for patched/upstream comparison. Selectors remain patched and retirement,
+remaining headed/lifecycle gates and main promotion are not accepted yet.
+
+## 2026-09-29: burn-cubecl retirement on the migration branch
+
+Ruling 410's condition is satisfied by the same-browser pre.2/pre.4 comparison
+and nine native unfused launcher cases passing identically with and without
+the patch. Plan §13.28 records independent source, numerical and fault-control
+review. Four selectors now choose pristine registry pre.4, preserving all lock
+versions/edges and the root's distinct-source duplicate name/version entries.
+The vendored source and its six-field guard receipts remain historical evidence.
+
+Three independent patch selectors remain: cubecl-runtime persistence policy,
+cubek-reduce extrema handling and burn-remote lifecycle control. Earlier tables
+retain their dated counts. Affected production checks, remaining S13 and main
+promotion still require acceptance; this is not stable-release closure.
+
+## 2026-10-03: the pre.4 row at S15
+
+The branch's selected patches against published pre.4 (migration plan §13):
+
+| Patch | Selected by | What it changes | Remove when |
+| --- | --- | --- | --- |
+| `cubecl-runtime` | root, graphshell-web, probe, remote fixture, both repros | manifest only: `persistence` leaves the default features (ruling 375) | upstream makes persistence opt-in or drops the defaults-on `cubecl-cpp` edge |
+| `burn-remote` | root, remote fixture | lease-bound targeted close (§13.17); close waits for teardown completion and reports failures (ruling 508, §13.32) | an upstream release has equivalent session control and passes the lifecycle receipt |
+| `cubek-reduce` | probe, extrema repro | extrema identities as runtime values, not literal infinity bits | a released row passes the headed extrema receipt without it |
+| `burn-cubecl` | none | vendored pre.4 source kept as provenance; selectors retired under ruling 410 (§13.28, and graphshell-web's row in §13.30) | delete with the provenance it documents |
+
+graphshell-web's start function runs the module's static constructors once
+(ruling 509, §13.33). Ruling 532 moves that into one shared stack helper,
+ruling 536 puts it in `cambium-genet-web-host`, and ruling 533 adds
+Distillery's model probe. The probe cannot yet depend on that crate because
+of conflicting exact `wasm-bindgen` pins (§13.35). The repros stay
+command-linked.
+
+Receipts on the branch:
+
+| Gate | Result | Record |
+| --- | --- | --- |
+| S13 (a)/(a') same-allocation and LayerNorm | upstream pre.4 passes all 21; patch retired (ruling 410) | §13.26 to §13.28 |
+| S13 (b) extrema, headed | four cases, `gpu_errors: []` | §13.30, §13.33 |
+| S13 (c) two-peer lifecycle | zero baseline, strict ceiling, exact recovery, second live lease | §13.32 |
+| S13 (d) existing device, conatus resident | pass in release | §13.30 |
+| S13 (e) ESP WGPU parity and real MiniLM | pass | §13.30 |
+| Native, wasm, Distillery, Djinn, workspace | pass | §13.25, §13.30 |
+| P5 web settle and 14 law receipts | pass on the constructor-fixed bundle | §13.33 |
+
+Stable 0.22 is still unpublished, so ESP publication and the stable closure
+named in this receipt's first sections remain gated.

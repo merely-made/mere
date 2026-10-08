@@ -378,12 +378,7 @@ fn the_leading_models_cost_on_the_host_device() {
         netrender::boot_shared(backend.into(), None, &needs).expect("a greedy boot (F31)");
     let device = physics_device_for(&handles);
     let in_use = || {
-        device
-            .client()
-            .compute_client()
-            .memory_usage()
-            .expect("the host client's memory usage")
-            .bytes_in_use
+        device.client().bytes_in_use()
     };
     let titles = arxiv_titles();
     let refs: Vec<&str> = titles.iter().map(String::as_str).collect();

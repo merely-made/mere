@@ -1,13 +1,15 @@
 # Commons Calls Plan
 
 **Date:** 2026-07-27  
-**Status:** A0 complete and promoted at `crates/moot/commons` 2026-07-28;
-A1-A6 not started. Turnstone is the fixed first consumer for A1, gated on
-**T5** of the
-[place-port plan](../../../../turnstone/design_docs/2026-07-28_turnstone_place_port_plan.md):
-the headed two-window receipt, not merely the existence of a place port or a
-`place.json`. Named as a rung rather than a capability because "can open a
-shared place" was already true at T2, when nothing was live.
+**Status (2026-10-06):** A0 complete and promoted at `crates/moot/commons`
+2026-07-28; A1-A6 not started. Turnstone is the fixed first consumer for A1,
+gated on **T5** of the
+[place-port plan](../../../../turnstone/design_docs/2026-07-28_turnstone_place_port_plan.md).
+T5 now has receipts: T5a (2026-09-13), T5b (2026-09-14) and T5c (2026-09-15),
+with the reframe's step 5 receipted "at the strength of a founder-held document
+on a loopback place". Whether that meets A1's gate is open (see A1), and A1
+also waits on the open question at the end of this plan: which noun owns a
+call.
 **Depends on:** the
 [Commons profile](../design/2026-07-27_commons_profile_v1.md), the
 [Notochord session spine](../../archive_docs/2026-08-06_completed_plans/2026-07-26_notochord_session_policy_spine_plan.md),
@@ -215,6 +217,17 @@ A1 starts only after the place-port plan's **T5** headed receipt, not merely
 when Turnstone can open a place. It must not found a second generic call host
 to keep the proof inside Mere.
 
+**Corrected 2026-10-06 (S14 pass):** the T5 receipts exist. Turnstone's
+place-port plan records T5a (2026-09-13), T5b (2026-09-14) and T5c
+(2026-09-15), after which "reframe steps 1 through 7 are now each receipted";
+step 5 only at the strength of a founder-held document on a loopback place.
+The same plan still names T5 as the gate A1 waits on.
+
+**Open, raised by the S14 pass (2026-10-06):** does T5's loopback-strength
+step 5 satisfy A1's gate? Options: yes, the gate is met and A1 waits only on
+the noun question below; no, A1 waits for a step-5 receipt beyond a loopback
+place.
+
 Accept `mere/commons-call/v1`, convert `AcceptedSession` through the existing
 audited adapter, then call `notochord::admit_session` before decoding call
 control.
@@ -300,3 +313,19 @@ already sans-I/O and carries no Commons-specific state beyond the space id, so
 extracting it is cheap now and expensive once A1 has a wire.
 
 Decide before A1 writes its first frame. Do not decide by starting A1.
+
+**Open, raised by the S14 pass (2026-10-06):** Turnstone's place-port plan
+made a product composition correction on 2026-09-13: Gemot is the community
+surface, with murmurs, moots and coop, and Turnstone hosts it. That bears on
+this question, which is still unanswered anywhere. Who answers it now?
+Options: Gemot's lane, as owner of the community surface; this plan's lane,
+here, before A1.
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  `support/doc-audit/d2/batch_42_s14_phase_b4.md`: the status and A1 record
+  Turnstone's T5a-T5c receipts and their loopback qualifier, and the two
+  forks the record raised (whether T5 meets A1's gate, and who answers the
+  noun question after the Gemot correction) are written in.

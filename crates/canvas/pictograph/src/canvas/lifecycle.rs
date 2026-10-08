@@ -208,6 +208,8 @@ impl Canvas {
             meaning: Default::default(),
             physics_mass_source: crate::canvas::PhysicsMassSource::Degree,
             physics_depth_source: crate::canvas::PhysicsDepthSource::Roots,
+            physics_composition: None,
+            schedule: None,
             #[cfg(test)]
             law_rebuilds: 0,
             restored_score_hold: None,

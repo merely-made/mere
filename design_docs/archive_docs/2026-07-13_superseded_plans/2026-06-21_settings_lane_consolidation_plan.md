@@ -1,7 +1,7 @@
 # Settings / Config Consolidation via the pelt Settings lane
 
 > **SUPERSEDED 2026-08-06** by the
-> [configuration_ownership_settings_projection_plan](../../mere_docs/implementation_strategy/2026-08-06_configuration_ownership_settings_projection_plan.md).
+> [configuration_ownership_settings_projection_plan](../2026-10-06_completed_plans/2026-08-06_configuration_ownership_settings_projection_plan.md).
 > The P1-P3 work below landed in meerkat, which was deleted at the Turnstone
 > founding; the settings-as-nodes model (P1) was ruled out by the pane-taxonomy
 > revision (turnstone/src/apparatus_pane.rs header). The durable pieces (the

@@ -114,6 +114,14 @@ pub trait TextureProducer {
     fn semantics(&mut self) -> Option<ProducerSemantics> {
         None
     }
+
+    /// A reader invoked action `id` of the drawn node `key` (a
+    /// [`ProducerNode`]'s own [`ProducerAction`]). Returns whether the producer
+    /// carried it out; `false`, the default, for one it does not know.
+    fn act(&mut self, key: u64, id: &str) -> bool {
+        let _ = (key, id);
+        false
+    }
 }
 
 /// A producer's accessible description of its slot. See
@@ -131,11 +139,39 @@ pub struct ProducerSemantics {
 /// One thing drawn in a producer's slot.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ProducerNode {
+    /// The producer's stable name for the node, so a reader's request
+    /// reaches it however the list is ordered when the reader acts.
+    pub key: u64,
     pub role: ProducerRole,
     pub name: String,
     /// Where it is drawn, `[x, y, width, height]` in the slot's own logical
     /// (layout) pixels, from the slot's top-left corner.
     pub rect: [f32; 4],
+    /// What a reader may do to it, each lowered to a button of its own
+    /// ([`TextureProducer::act`] carries one out).
+    pub actions: Vec<ProducerAction>,
+}
+
+/// One action a drawn node offers a reader. Neutral: a host maps its own
+/// action model onto it, and the id comes back through
+/// [`TextureProducer::act`].
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ProducerAction {
+    pub id: String,
+    /// The button's name.
+    pub label: String,
+    /// What the action does, a reader's description of the button.
+    pub description: String,
+}
+
+/// A drawn node's action, as a reader's request names it: the producer's
+/// slot (its registry key), the node's [`ProducerNode::key`] and the action's
+/// [`ProducerAction::id`].
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct ProducedAction {
+    pub slot: u64,
+    pub key: u64,
+    pub id: String,
 }
 
 /// The roles a producer's slot and its nodes can take. A small, neutral set
@@ -178,6 +214,9 @@ impl<P: TextureProducer> TextureProducer for Rc<RefCell<P>> {
     }
     fn semantics(&mut self) -> Option<ProducerSemantics> {
         self.borrow_mut().semantics()
+    }
+    fn act(&mut self, key: u64, id: &str) -> bool {
+        self.borrow_mut().act(key, id)
     }
 }
 

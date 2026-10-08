@@ -10,7 +10,7 @@ D-gate measurement for its hot fields.
 (D0 executes its phase 2; its phase 1 store is built), the
 [boundary pass plan](../../mere_docs/implementation_strategy/2026-07-09_mere_turnstone_boundary_pass_plan.md) (slice C
 invented the sidecar pattern), the
-[participant gate + packs plan](../../mere_docs/implementation_strategy/2026-07-17_participant_gate_packs_plan.md)
+[participant gate + packs plan](../2026-10-06_completed_plans/2026-07-17_participant_gate_packs_plan.md)
 (packs ship custom content classes; facet grants join its scope vocabulary),
 and the north star as amended.
 **Status:** complete 2026-07-27. Lane F, Lane S, and D0-D4 are closed; F2
@@ -19,7 +19,7 @@ remains deliberately trigger-gated in the participant plan.
 **2026-07-22 boundary amendment:** S0's extracted numen/quint/seiche stack has
 since consolidated into `repos/conatus`. The trigger-gated wholesale canvas
 promotion is replaced by the
-[Graphshell remote projection host plan](../../mere_docs/implementation_strategy/2026-07-22_graphshell_remote_projection_host_plan.md):
+[Graphshell remote projection host plan](../2026-10-06_completed_plans/2026-07-22_graphshell_remote_projection_host_plan.md):
 arrangements migrate to `scenomise`, kernel-aware canvas stays in Mere, and
 shared interaction moves through Cambium/Sprigging under the Woodshed consumer.
 

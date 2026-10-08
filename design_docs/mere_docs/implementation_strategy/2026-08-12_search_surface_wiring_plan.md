@@ -1,12 +1,16 @@
 # Search Surface Wiring Plan
 
 **Date**: 2026-08-12
-**Status**: open. W4's lexical n-gram input probe, W5's deterministic fusion
-probe, and the V3 tokenized-URL repair completed 2026-08-31. Turnstone's live
-trail-fusion caller and private captured-trail evaluation harness are
-implemented on paired feature branches as of 2026-09-02. W4 canvas host wiring
-remains open. W5 has an executable promotion gate, but the active profile does
-not yet admit a real training/held-out selection. Spun out of the
+**Status (2026-10-06):** open. W1 (turnstone `539dacc`, `f22f61f`), W2,
+W6a to W6e, the engine swap and the candidate index have landed on both mains
+(mere `5231ae3e`, `7a5b7e19`, `fc0c9e8c`; turnstone `c863b8e`, `696bc2f`), as
+have the live trail-fusion caller (turnstone `7d6e348`, mere `7b6ced78`) and
+the captured-trail harness (turnstone `57faef4`). The hashed vector lane was
+retired from recall on 2026-09-08: Turnstone's recall fuses a lexical and a
+behavioural lane, and Turnstone has no direct esp dependency. Open: W4's canvas
+wiring (`canvas_search` and `field_bridge` are referenced only from
+pictograph's `canvas.rs`), and W5, whose slice the retirement overtook (a fork,
+under §2's W5). W3's reports have no Progress entry. Spun out of the
 [leverage census](../../2026-08-10_leverage_census_brief.md) (step 2), and
 carries the census's audit answer for `mere-embed` inside it.
 
@@ -98,10 +102,21 @@ anchor embed's lib.rs cites).
   `VectorIndex` via eidetic. Start on the lexical embedding provider
   (deterministic, no Burn), `bert` behind its existing feature per esp's
   target matrix. *(Paths updated 2026-08-12 by the
-  [eidetic reorg](2026-08-12_eidetic_reorg_plan.md): the modules now live in
+  [eidetic reorg](../../archive_docs/2026-10-06_completed_plans/2026-08-12_eidetic_reorg_plan.md): the modules now live in
   the crates that will use them, not in the deleted `mere-embed`.)*
 - **W5 — fusion.** `fuse()` merges W2's lexical ranking with W4's vector
   ranking in the omnibar. Gated on both.
+
+  **Corrected 2026-10-06 (S14 pass):** the 2026-09-08 entry in §5 retired the
+  hashed vector lane from recall, so this slice no longer matches the tree:
+  Turnstone's `RecallIndex` fuses a lexical and a behavioural lane, its
+  `recall.phrase_order` and `recall.phrase_influence` settings are gone, and
+  Turnstone has no direct esp dependency (it reaches esp's lock entry only
+  transitively, through pictograph, mere-mesh and knot-editor).
+
+  **Open, raised by the S14 pass (2026-10-06):** what becomes of W5 now that
+  the vector lane is retired from recall? Options: retire W5; keep it parked
+  for a future semantic embedder.
 
 ## 3. Non-goals
 
@@ -606,6 +621,12 @@ store, not fixtures only.
   write it never reads. Turnstone's W6c host half is `c863b8e`, the corpus
   harness `696bc2f`; mere's W6c stack half `5231ae3e`, engine `7a5b7e19`,
   corpus `fc0c9e8c`. All unpushed pending the family re-pin.
+
+  **Corrected 2026-10-06 (S14 pass):** all five have since landed. Turnstone
+  `c863b8e` and `696bc2f` are on turnstone's main and origin/main, and mere
+  `5231ae3e`, `7a5b7e19` and `fc0c9e8c` are ancestors of `535bca11`. The
+  2026-09-01 caller (turnstone `7d6e348`, mere `7b6ced78`) and the 2026-09-02
+  harness (turnstone `57faef4`) left their feature branches the same way.
 - **2026-09-07 — candidate index for the behavioural lane.** W6e found the
   lane substring-scanning all 41,822 pages per keystroke. `eidetic-search::
   candidates::CandidateIndex` is a token-prefix lookup over the shared
@@ -713,4 +734,10 @@ store, not fixtures only.
   Tests: esp 81 plus the 9 parity tests, canvas 199, mesh 122. The lane was
   finished by a sonnet agent after an opus agent hit the session limit,
   then reviewed and verified here.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_50_s14_phase_b12.md: the status records W1, W2,
+  W6, the engine swap and the vector-lane retirement as landed on both mains,
+  the 2026-09-07 "unpushed" line is corrected, and W5's fate after the
+  retirement is raised as an open question at §2.
 

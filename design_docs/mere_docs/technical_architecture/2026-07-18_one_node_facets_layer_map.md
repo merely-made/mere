@@ -5,7 +5,7 @@
 [unifying-graph north star](2026-07-08_mere_as_the_unifying_graph.md): resolves
 its open question 5.4, retargets 5.1, and answers "is mere still too
 browser-shaped?" with a concrete dissolution program. Companion to the
-[participant gate + packs plan](../implementation_strategy/2026-07-17_participant_gate_packs_plan.md)
+[participant gate + packs plan](../../archive_docs/2026-10-06_completed_plans/2026-07-17_participant_gate_packs_plan.md)
 (whose facet/pack/gate machinery this doc leans on) and the
 [boundary pass plan](../implementation_strategy/2026-07-09_mere_turnstone_boundary_pass_plan.md) *(historical citation)* <!-- doc-audit: historical-link -->
 (whose slice C invented the sidecar pattern this doc generalizes).
@@ -13,7 +13,7 @@ browser-shaped?" with a concrete dissolution program. Companion to the
 **2026-07-22 boundary amendment:** Conatus has since landed as the family repo
 for numen, quint, and seiche. The former plan to promote Mere's entire canvas
 family as one unit is superseded by the
-[Graphshell remote projection host plan](../implementation_strategy/2026-07-22_graphshell_remote_projection_host_plan.md):
+[Graphshell remote projection host plan](../../archive_docs/2026-10-06_completed_plans/2026-07-22_graphshell_remote_projection_host_plan.md):
 generic arrangements move to `scenomise`, kernel-neutral scene contracts move
 to `sceno`, the shared interactive view grows through Cambium/Sprigging under a
 real Woodshed consumer, and the kernel-aware `mere-canvas` remains in Mere.

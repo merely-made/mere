@@ -1,0 +1,62 @@
+{
+  "schema": "mere.pre4-shared-input-browser-comparison/v1",
+  "source_commit": "6b52297f5852059735dff6073f20741e67ce1b81",
+  "status": "STOP RULE 13.8(2): upstream passes; patch retirement or retention awaits Mark.",
+  "browser": "Visible Codex in-app browser; fresh localhost origins for the two variants.",
+  "native_comparison": {
+    "qualified_test": "tests::shared_binary_and_layer_norm_pass_native_wgpu",
+    "passed": 1,
+    "failed": 0,
+    "ignored": 0
+  },
+  "patched": {
+    "cases": 21,
+    "passed": 21,
+    "gpu_errors": [],
+    "wasm_sha256": "a5cefb75d094af022caf739a2497437eacffe153b3f46bc13ad6e79caaaa2e62",
+    "served_files": {
+      "index.html": "b55601c42d997f779472b244c2653f01de038cd4b76062214dbe916e560a5cb8",
+      "worker.js": "4291940e4e88d5f005c80d3d8914549b07fc2ff61353d5f202703fdbe597244d",
+      "pkg\\burn_browser_embedding_repro.d.ts": "6f80af0cf78f46a0b70277dd0326a2cedefa33fc4e036f5fb56733011a87420f",
+      "pkg\\burn_browser_embedding_repro.js": "566261325004459b581478e8cfb560231fc2348afec94005a981e52f7fd5d386",
+      "pkg\\burn_browser_embedding_repro_bg.wasm": "77c298600358a4777785600311d9893e46379aa613b10a05948be7c99138f46d",
+      "pkg\\burn_browser_embedding_repro_bg.wasm.d.ts": "23464aefee9ba24de0ec6e0f440ffb1989c630d03d9518b068812d61f525ba81"
+    }
+  },
+  "unpatched": {
+    "cases": 21,
+    "passed": 21,
+    "gpu_errors": [],
+    "wasm_sha256": "b36a9f71f6b3c20b92012515b33125e7c3e437cd32dd76dee8dcfbbe0cdf419b",
+    "served_files": {
+      "index.html": "b55601c42d997f779472b244c2653f01de038cd4b76062214dbe916e560a5cb8",
+      "worker.js": "4291940e4e88d5f005c80d3d8914549b07fc2ff61353d5f202703fdbe597244d",
+      "pkg\\burn_browser_embedding_repro.d.ts": "6f80af0cf78f46a0b70277dd0326a2cedefa33fc4e036f5fb56733011a87420f",
+      "pkg\\burn_browser_embedding_repro.js": "566261325004459b581478e8cfb560231fc2348afec94005a981e52f7fd5d386",
+      "pkg\\burn_browser_embedding_repro_bg.wasm": "b264399ca546c3074fa754f7fde2beeea12e7999686b00c92e90d9b1a84757ad",
+      "pkg\\burn_browser_embedding_repro_bg.wasm.d.ts": "23464aefee9ba24de0ec6e0f440ffb1989c630d03d9518b068812d61f525ba81"
+    },
+    "package_count": 552,
+    "pristine_registry_files": 122
+  },
+  "raw_browser_results_byte_identical": true,
+  "admitted_difference": "Only the burn-cubecl patch row was removed. Its lock entry gained the exact registry source/checksum; all versions and dependency edges were preserved.",
+  "restoration": "Exact manifest/lock bytes and all released source/config hashes restored before this documentation batch; both test servers stopped.",
+  "scope": "These 21 cases pass on pre.4/current IAB. This does not identify whether Burn/CubeCL or the browser/backend changed, and does not cover every guarded launcher shape.",
+  "reading_not_ruled": "Compare historical unpatched pre.2 under this current browser before deciding patch retirement.",
+  "remaining": [
+    "Mark ruling",
+    "extrema browser receipt",
+    "remote MiniLM lifecycle receipt",
+    "S15 closure",
+    "main promotion",
+    "downstream handoffs"
+  ],
+  "raw_artifacts": {
+    "2026-09-29_pre4_patched_iab.json": "fb80ef683c83e08ca6f7b3412a96988cc8dff1e66af9efb215aeec74feaa7688",
+    "2026-09-29_pre4_unpatched_iab.json": "fb80ef683c83e08ca6f7b3412a96988cc8dff1e66af9efb215aeec74feaa7688",
+    "2026-09-29_pre4_patched_iab.png": "ec168f73e6300c4c6c4fb4609529de7940ea4c6878ecc087ae59f470308c7b2d",
+    "2026-09-29_pre4_unpatched_iab.png": "ec168f73e6300c4c6c4fb4609529de7940ea4c6878ecc087ae59f470308c7b2d"
+  },
+  "external_evidence": "Code/testing/mere/receipts/2026-09-29/pre4-s13"
+}

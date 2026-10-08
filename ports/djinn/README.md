@@ -13,8 +13,20 @@ when they use persona-held state.
 ## Run
 
 ```text
-cargo run -p djinn --bin djinn -- --dir <personae-vault> --data-root <data-root>
+cargo run -p djinn --bin djinn -- --dir <personae-vault> --data-root <data-root> \
+  --receipt-agent-endpoint <endpoint> --browser-endpoint <endpoint> --app-endpoint <endpoint>
 ```
+
+The standard SSH agent endpoint and the default browser and app endpoints
+belong to the installed resident, which the installer launches with
+`--installed`. Any other run refuses them and names its own.
+
+`--log-filter <directives>` sets the tracing filter (`info` by default, for
+example `info,iroh_gossip=debug`). `--events-file <path>` appends one JSON line
+per lifecycle event: `started`, `listening`, `ready`, `stopping` and `stopped`
+with its reason. `djinn --resident-status` prints a running resident's status
+from its app door, and `djinn --stop-resident` stops it the way Ctrl-C does;
+both routes are owner-only.
 
 The default configuration continues to read the existing Graphshell
 application directory. That is a compatibility bridge for selected profiles,

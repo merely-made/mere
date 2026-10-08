@@ -1,8 +1,8 @@
 # Moot Object M1 — a moot you can declare, join, and share into
 
 **Date**: 2026-06-12
-**Status (2026-09-06)**: Historical M1 landed as recorded below. The active
-continuation is [Community collections and author-offline publishing](#community-collections-and-author-offline-publishing-2026-09-04). Its same-machine live-peer process proof passed with stable-Persona binding and current Gemot command authority. Production publication/hosting records, historical authority proof, the Persona-to-device adapter, and a two-machine receipt remain open.
+**Status (2026-10-06)**: Historical M1 landed as recorded below. The active
+continuation is [Community collections and author-offline publishing](#community-collections-and-author-offline-publishing-2026-09-04). Its same-machine live-peer process proof passed with stable-Persona binding and current Gemot command authority. P3b (contribution withdrawal, `b99e532a`) and P3d (collection lineage, `6f1f73bf`) landed in Gemot on 2026-09-09. Turnstone has landed P3a's source capture (`b4e69ce`), the P3c collection consumer (`6b77e34`) and collection-scoped search (`aa515bd`) on 2026-09-09 and 2026-09-10; its page capture plan (`turnstone/design_docs/2026-08-28_page_capture_plan.md`) calls P3a in progress. Production publication/hosting records, historical authority proof, the Persona-to-device adapter, and a two-machine receipt remain open.
 The original M1 body preserves its dated vocabulary and ownership. Current owners
 are Gemot for community authority and recognition, Commons for shared graph
 operations, and Stickleback for accepted-operation replication. Historical
@@ -23,7 +23,7 @@ object. The object lane lands in **`moothold::moot`**, beside the tessera
 lane it composes with; `mooting` keeps its adapter charter untouched.
 **Related**: the [mesh M1 plan](../../archive_docs/2026-06-15_completed_plans/2026-06-12_mesh_m1_plan.md) *(archived — M1 done)*
 (this is the third lap of the proven wire/state/sync recipe);
-the [eidetic browsing derivation plan](../../eidetic_docs/implementation_strategy/2026-06-12_eidetic_browsing_derivation_plan.md)
+the [eidetic browsing derivation plan](../../archive_docs/2026-10-06_completed_plans/2026-06-12_eidetic_browsing_derivation_plan.md)
 (the flora is where a shared `SearchIndex` reference would land — the
 federation demo seed, and the consume half's eventual trigger);
 the communal-compute tiers brief (a moot is ring 2's container).
@@ -325,11 +325,13 @@ management require their own subsequent consumer receipts.
   16 anchors, a changed paragraph, independent journal forks and body-text queries.
   It exercised neither p2panda transport nor service commitments. Its sources and
   reproducible command are local artifacts, not checked-in shipping evidence.
-- Concurrent untracked `crates/moot/commons/examples/commons_practice_peer.rs` *(planned target)* <!-- doc-audit: planned-path -->
+- Concurrent untracked `crates/moot/commons/examples/commons_practice_peer.rs`
   describes a line-JSON retained Woodshed space with one redb store per process and
   explicitly no transport implementation. `ports/graphshell/web/co_op.*` and
   related projection work are another active lane. Their presence is not a landed
   co-op receipt and this planning pass does not modify or absorb them.
+  **Corrected 2026-10-06 (S14 pass):** the example is no longer untracked; it was
+  committed in `534ae1c6` (2026-09-06) and is present at mere `535bca11`.
 
 ### Progress
 
@@ -346,11 +348,15 @@ management require their own subsequent consumer receipts.
   proof-local policy rejected unauthorized publication and hosting candidates;
   an unpublished path returned Gemini `51`. The concurrent proof artifact is
   not yet committed; its target and exact ids are:
-  [author-offline community publication proof](../research/2026-09-05_author_offline_publication_proof.md) *(planned target)* <!-- doc-audit: planned-link -->
+  [author-offline community publication proof](../research/2026-09-05_author_offline_publication_proof.md)
   P1 remains partial: candidate publication/hosting records and explicit fixture
   policy must become production authority. Current `Shared` and Standing folds
   also need attested outer-signer binding to stable Personae roots. The
   Persona-to-device-key adapter and a two-machine receipt remain open.
+  **Corrected 2026-10-06 (S14 pass):** the proof artifact is committed: the linked
+  proof document and its receipt
+  `design_docs/moothold_docs/research/receipts/2026-09-05_author_offline_publication.json`
+  landed in `b9e9078f` (2026-09-06) and are present at mere `535bca11`.
 
 - **2026-09-06:** the first P3 preservation slice passed and its cross-repository
   adoption landed. Genet Fleece 0.5 at `9e8f9dc2f3ddc0af1658580bb51964462a03923f`
@@ -518,6 +524,18 @@ management require their own subsequent consumer receipts.
   WARC-grade custody, near-duplicate grouping, distributed indexes, corpus-cost
   measurement and relevance admission remain later gates.
 
+  **Corrected 2026-10-06 (S14 pass):** Turnstone has since landed P3a's source
+  capture (`b4e69ce`, "capture explicit page sources with Fleece", 2026-09-09), the
+  P3c collection consumer (`6b77e34`, "project local Fleece captures into places",
+  2026-09-09) and collection-scoped search (`aa515bd`, 2026-09-10). They are recorded
+  in Turnstone's page capture plan (`turnstone/design_docs/2026-08-28_page_capture_plan.md`,
+  which calls P3a in progress), not in this plan, so this plan records P3d (below)
+  without a P3c consumer; Turnstone's consumer landed the same day as P3d.
+
+  **Open, raised by the S14 pass (2026-10-06):** where are P3a and P3c tracked from
+  here? Options: record Turnstone's P3a and P3c progress in this plan; point to
+  Turnstone's page capture plan as the authority for those lanes.
+
   **2026-09-09: P3b landed in the Gemot records lane.** `MootEvent::Withdrawn`
   is a signed, upgraded-peer wire event carrying the original `Shared`
   operation hash and withdrawal time. The roster retains every distinct signed
@@ -564,3 +582,9 @@ management require their own subsequent consumer receipts.
   Moot membership, capability grants, delegations, key epochs, Standing facts,
   leases, hosting promises, or capture payloads; its wire type contains only
   the parent version and contribution references.
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere
+  535bca11, from the D2 record in support/doc-audit/d2/batch_45_s14_phase_b7.md. The
+  status records P3b and P3d as landed and Turnstone's P3a and P3c work; the two stale
+  planned-target markers are removed with annotations; where P3a and P3c are tracked is
+  left open.

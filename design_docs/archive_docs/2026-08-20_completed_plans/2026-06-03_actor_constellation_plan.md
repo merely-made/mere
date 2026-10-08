@@ -33,7 +33,7 @@ fits the shape: an armillary sphere is a frame of rings around a central point,
 which is exactly this structure, the kernel at the center with the actor rings
 (its constellation) around it.
 
-Related: [modular integration plan](../../mere_docs/implementation_strategy/2026-06-02_modular_integration_plan.md) (the
+Related: [modular integration plan](../2026-10-06_superseded_plans/2026-06-02_modular_integration_plan.md) (the
 host model and S-phases), [linked-data ingest plan](../2026-06-09_completed_plans/2026-05-22_linked_data_ingest_export_plan.md)
 (the contribution boundary + v5 identity), [netfetcher plan](../2026-06-09_completed_plans/2026-05-25_netfetcher_plan.md)
 (the network I/O actor). The concurrency ground truth (wasm-in-browser, browser

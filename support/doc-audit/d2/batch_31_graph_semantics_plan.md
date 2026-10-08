@@ -22,7 +22,7 @@ This batch exists because the document is new.
 ## mere_docs/implementation_strategy/2026-10-04_graph_semantics_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-04): plan. Rounds 1 to 4 ruled (rulings 1 to 17); phases final; checkpoints C1 to C4 ruled, C5 to C8 open (§5). No code." — accurate: yes
+- status line: "Status (2026-10-05): in progress. Rulings 1 to 19; P1 implemented on branch `graph-semantics` (`459cad84`), not merged; P2 under way on that branch, whose plan copy predates rulings 9 to 19 (§3). C5 to C8 open (§5)." — accurate: yes
 - claims checked: 29 — holds: 29, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -74,4 +74,7 @@ Imported, Provenance and Arrangement sub-kind lists behind the placement
 table (`edge_taxonomy.rs`). Round 4 adds no code claims: its inventory is of
 document vocabulary (TERMINOLOGY, the swatch and ambiance designs, the family
 composition thesis), and "aspect" appears in code only as `AspectRatio` and
-wgpu's `TextureAspect`.
+wgpu's `TextureAspect`. Round 5 checked against branch `graph-semantics` (its
+base `36893553`, its C1, C2 and C3 records at `9ec20ffb`, `5666943e`,
+`4025f55f` and `2bf393ac`, and its C4 fork text) and `SurfaceId` at
+`graph-kernel/src/accessibility.rs` 49.

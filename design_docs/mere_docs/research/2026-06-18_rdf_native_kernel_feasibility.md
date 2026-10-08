@@ -13,7 +13,7 @@ Cross-refs:
 - [statements_over_schema_stance](../technical_architecture/2026-05-22_statements_over_schema_stance.md)
   — the open-predicate model; position 1/2/3; canonicalization deferred with
   federation.
-- [graph_query_layer_plan](../implementation_strategy/2026-06-18_graph_query_layer_plan.md)
+- [graph_query_layer_plan](../../archive_docs/2026-10-06_completed_plans/2026-06-18_graph_query_layer_plan.md)
   — the shipped node_quads projection + ephemeral SPARQL this would subsume.
 - [interaction_model_spine](../technical_architecture/2026-06-18_interaction_model_spine.md)
   §6 (made-semantic).
@@ -154,4 +154,4 @@ direction). Either way the spike is small and decision-bounded.
   identical (~0.6 ns/edge). Verdict: keep petgraph as truth, RDF as a lossless
   on-demand projection + a `QueryableDataset` SPARQL adapter (no held quads), with
   an interned slotmap kernel as a gated endgame. Continued in
-  [petgraph_rdf_plan](../implementation_strategy/2026-06-18_petgraph_rdf_plan.md).
+  [petgraph_rdf_plan](../../archive_docs/2026-10-06_completed_plans/2026-06-18_petgraph_rdf_plan.md).

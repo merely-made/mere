@@ -3,12 +3,14 @@
 **This repository: MPL-2.0.** Every file Mark wrote carries Exhibit A and the
 SPDX tag `MPL-2.0`, per the
 [license posture brief](design_docs/2026-08-22_license_posture_brief.md) of
-2026-08-22. The full text is in [`LICENSE`](LICENSE).
+2026-08-22, except the frozen evidence below, which carries it through this
+ledger and the root licence. The full text is in [`LICENSE`](LICENSE).
 
 This file is the provenance ledger. It is the authority for what the relicense
-tool skips: `scripts/relicense_headers.py` reads the backtick-quoted paths
-below and never touches them. Provenance comes before license — a file gets
-Exhibit A only if Mark wrote it.
+tool skips: `scripts/relicense_headers.py` reads the backtick-quoted paths in
+the first column of the Retained licenses and Frozen evidence tables and never
+touches them. Provenance comes before license — a file gets Exhibit A only if
+Mark wrote it.
 
 ## Retained licenses
 
@@ -57,6 +59,23 @@ arXiv e-prints under the terms of the Creative Commons Universal (CC0 1.0)
 Public Domain Declaration." CC0 asks for no notice; the row and the
 provenance note record where the bytes came from (SHA-256 `942a7716…`).
 
+## Frozen evidence
+
+Mark's own sources whose bytes a recorded receipt pins by SHA-256. They are
+MPL-2.0 like everything else he wrote, but a per-file header would change the
+bytes and break the receipt, so they carry none. Exhibit A allows the notice
+to sit where a recipient would look for it when a per-file notice is not
+desirable; for these paths that place is the root `LICENSE` and this ledger.
+The tool skips them, as it skips Retained licenses.
+
+| Path | Pinned by | Ruled |
+|---|---|---|
+| `design_docs/mere_docs/testing/receipts/2026-09-08_stack_pillar_probes` | `artifact-sha256.json` at its root and in `custody-backend/`, and the arena's run JSONs; its `.gitattributes` keeps the bytes so the digests survive checkout | 2026-10-06, ruling S79 of the [stack seams plan](design_docs/mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md) |
+
+A receipt that does not pin its sources' bytes is not frozen evidence: its
+sources take the header like any other (so the 2026-09-20 resource resolution
+probes do, under the same ruling).
+
 ## Derivatives carrying MPL-2.0 with an upstream notice retained
 
 These are **not** skipped. Each file receives Exhibit A and Mark's copyright
@@ -76,8 +95,9 @@ Apache-2.0); that version keeps its grant permanently and MPL-2.0 ships at its
 next functional bump, per the sweep plan's invariant 8.
 
 **This section is deliberately not the skip list.** The tool reads only the
-`## Retained licenses` table above. Adding a path here documents a disposition;
-it does not exempt the path from receiving a header.
+`## Retained licenses` and `## Frozen evidence` tables above. Adding a path
+here documents a disposition; it does not exempt the path from receiving a
+header.
 
 ## Published grants that arrived with a crate
 
@@ -85,18 +105,18 @@ A published version keeps the grant it shipped with, permanently; MPL-2.0
 reaches it at its next functional bump, per the sweep plan's invariant 8. That
 rule already governs `crates/system/luggage` above. It governs the
 engine-management layer too, which arrived from genet on 2026-09-03 under the
-[platform boundary plan](design_docs/mere_docs/implementation_strategy/2026-09-02_platform_boundary_and_repository_topology_plan.md)'s
+[platform boundary plan](design_docs/archive_docs/2026-10-06_completed_plans/2026-09-02_platform_boundary_and_repository_topology_plan.md)'s
 P3, after genet's own 2026-08-27 ruling had already put every source in these
 crates under Exhibit A and every manifest on `MPL-2.0`.
 
 | Crate | Path | Published version's grant | In-tree notice files |
 |---|---|---|---|
-| `inker` | `crates/inker/inker` | 0.1.1, MIT OR Apache-2.0 | `LICENSE-MIT`, `LICENSE-APACHE` (carried over from `verso-tile` 0.1.0 when it folded into `inker::flip`, 2026-09-05) |
+| `inker` | `crates/inker/inker` | 0.1.1, MIT OR Apache-2.0 | — (the pair carried over from `verso-tile` 0.1.0 was dropped by merge `0a8198ba`, 2026-09-06, and stays removed under ruling S40) |
 | `document-canvas` | `crates/inker/document-canvas` | 0.1.0 | — |
 | `nematic` | `crates/nematic/nematic` | 0.1.1 | — |
 | `illume` | `crates/nematic/illume` | 0.0.2 | — |
 | `errand` | `crates/system/errand` | 0.3.4, MIT OR Apache-2.0 | — |
-| `tinct` | `crates/cambium/tinct` | 0.1.2, MIT OR Apache-2.0 | `LICENSE-MIT`, `LICENSE-APACHE` |
+| `tinct` | `crates/cambium/tinct` | 0.1.2, MIT OR Apache-2.0 | — (deleted by Mark's ruling, `642ca2d7`, 2026-09-24) |
 
 Each arrived from genet 2026-09-03 under its own published grant; relicensing
 is the sweep plan's call at the next bump. Nothing here was relicensed on the
@@ -106,6 +126,12 @@ already on crates.io. This is the same disposition genet's own ledger records,
 which names `sprigging` 0.2.1, `illume` 0.0.2, `errand` 0.3.4, `tinct` 0.1.2
 and `inker` 0.1.1 explicitly and keeps the ruling as the precedent the sweep was
 decided on.
+
+**Amended 2026-10-06** (stack seams plan, ruling S40): both notice-file pairs
+are gone. tinct's was deleted by Mark's ruling (`642ca2d7`, 2026-09-24);
+inker's was dropped by merge `0a8198ba` (2026-09-06) and stays deleted, since
+inker is MPL-2.0 like the rest of the workspace. The versions already on
+crates.io keep the grant they were published under.
 
 The three engine adapters — `scrying-engine`, `graft-engine` and `weld-engine`
 — are `publish = false` and have no published version, so nothing is held open

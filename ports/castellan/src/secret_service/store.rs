@@ -220,6 +220,7 @@ impl From<ItemStoreError> for SecretServiceError {
     fn from(error: ItemStoreError) -> Self {
         match error {
             ItemStoreError::Storage(error) => Self::Storage(error),
+            ItemStoreError::Locked => Self::Storage(IdentityError::Locked),
             ItemStoreError::UnsupportedRecordVersion(version) => {
                 Self::UnsupportedRecordVersion(version)
             },

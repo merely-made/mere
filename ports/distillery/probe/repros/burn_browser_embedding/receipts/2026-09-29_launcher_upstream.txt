@@ -1,0 +1,23 @@
+
+running 9 tests
+test atan2_broadcast_alias ... BroadcastAlias atan2=true: expected=[-2.3561945, -1.1071488, -0.38050637, 2.6779451, 0.7853982, 0.19739556, 1.9513026, 1.3734008, 0.7853982] actual=[-2.3561945, -1.1071488, -0.38050637, 2.6779451, 0.7853982, 0.19739556, 1.9513028, 1.3734008, 0.7853982]
+ok
+test atan2_same_shape_alias ... SameShapeAlias atan2=true: expected=[-2.3561945, 0.7853982, 0.7853982] actual=[-2.3561945, 0.7853982, 0.7853982]
+ok
+test atan2_separate ... Separate atan2=true: expected=[-0.5880026, -2.6779451, -0.7853982, 0.32175055, 2.896614, 0.4636476, 1.0303768, 2.2455373, 1.19029] actual=[-0.5880026, -2.6779451, -0.7853982, 0.32175055, 2.896614, 0.4636476, 1.0303769, 2.2455373, 1.19029]
+ok
+test sub_broadcast_alias ... BroadcastAlias atan2=false: expected=[0.0, -3.0, -7.0, 3.0, 0.0, -4.0, 7.0, 4.0, 0.0] actual=[0.0, -3.0, -7.0, 3.0, 0.0, -4.0, 7.0, 4.0, 0.0]
+ok
+test sub_same_shape_alias ... SameShapeAlias atan2=false: expected=[0.0, 0.0, 0.0] actual=[0.0, 0.0, 0.0]
+ok
+test sub_separate ... Separate atan2=false: expected=[-5.0, 2.0, -4.0, -2.0, 5.0, -1.0, 2.0, 9.0, 3.0] actual=[-5.0, 2.0, -4.0, -2.0, 5.0, -1.0, 2.0, 9.0, 3.0]
+ok
+test xor_broadcast_alias ... BroadcastAlias xor: expected=[0, 5, 15, 5, 0, 10, 15, 10, 0] actual=[0, 5, 15, 5, 0, 10, 15, 10, 0]
+ok
+test xor_same_shape_alias ... SameShapeAlias xor: expected=[0, 0, 0] actual=[0, 0, 0]
+ok
+test xor_separate ... Separate xor: expected=[1, 4, 8, 4, 1, 13, 14, 11, 7] actual=[1, 4, 8, 4, 1, 13, 14, 11, 7]
+ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.22s
+

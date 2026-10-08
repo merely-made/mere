@@ -99,14 +99,14 @@ Four sharper correspondences:
 3. **Rendering memory cap ≈ the actor budget.** BEK's hard cap + memory attribution on the rendering
    extension mirrors the physics/render actor budgeting Mere already reasons about; the
    content→render attribution maps onto who owns a Scene's GPU memory in the
-   [scrying](../implementation_strategy/2026-06-10_scrying_tile_plan.md) / netrender path.
+   [scrying](../../archive_docs/2026-10-06_completed_plans/2026-06-10_scrying_tile_plan.md) / netrender path.
 4. **Cross-process a11y is solved-shape.** `BEAccessibilityRemoteElement` is the pattern for surfacing
    the content process's a11y tree in the host - the same problem Mere's DOM-sourced a11y faces once
    content is a separate actor/process.
 
 **Strategic fork.** BEK = "ship genet as a real iOS/iPadOS browser engine," a *more sovereign* and
 heavier commitment than the
-[browser_extension_companion_plan](../implementation_strategy/2026-06-23_browser_extension_companion_plan.md)'s
+[browser_extension_companion_plan](../../archive_docs/2026-10-06_superseded_plans/2026-06-23_browser_extension_companion_plan.md)'s
 "ride inside someone else's browser as an extension / PWA." They are two different cross-platform
 strategies; BEK is the one where Mere *is* the engine. It is also entitlement-gated (EU/Japan,
 owned-engine), so it is a deliberate, applied-for path, not a default.

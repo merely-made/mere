@@ -1,6 +1,6 @@
 use super::{
-    ArgAccumulator, ReduceFamily, ReduceInstruction, min_identity, plane_argmin_propagating_nan,
-    plane_min_propagating_nan, select_argmin, select_min,
+    ArgAccumulator, ReduceFamily, ReduceInstruction, advance_argmin, min_identity,
+    plane_argmin_propagating_nan, plane_min_propagating_nan, select_argmin, select_min,
 };
 use crate::components::{
     instructions::{
@@ -30,6 +30,31 @@ impl ReduceWithIndicesFamily for Min {
     type Config = ReduceOutputMode;
 }
 
+/// As [`min_insert`], for a candidate that comes after everything the
+/// accumulator has seen. Only the per-element path can promise that.
+#[cube]
+fn min_advance<T: Numeric, N: Size>(
+    elements: &mut Value<Vector<T, N>>,
+    coordinates: &mut Value<Vector<u32, N>>,
+    candidate: Vector<T, N>,
+    candidate_coord: &Value<Vector<u32, N>>,
+) {
+    let acc = elements.item();
+
+    match candidate_coord {
+        Value::None => elements.assign(&Value::new_single(select_min(acc, candidate))),
+        Value::Single(coord) => {
+            let candidate_coord = coord.unwrap();
+            let acc_coord = coordinates.item();
+            let (selected, selected_coord) =
+                advance_argmin(acc, acc_coord, candidate, candidate_coord);
+            elements.assign(&Value::new_single(selected));
+            coordinates.assign(&Value::new_single(selected_coord));
+        },
+        Value::Multiple(_) => panic!("a min candidate carries at most one coordinate"),
+    }
+}
+
 /// Fold `candidate` into the accumulator, keeping the smaller item per vector
 /// element (and its coordinate, when the candidate carries one).
 ///
@@ -53,7 +78,7 @@ fn min_insert<T: Numeric, N: Size>(
                 select_argmin(acc, acc_coord, candidate, candidate_coord);
             elements.assign(&Value::new_single(selected));
             coordinates.assign(&Value::new_single(selected_coord));
-        }
+        },
         Value::Multiple(_) => panic!("a min candidate carries at most one coordinate"),
     }
 }
@@ -70,7 +95,7 @@ fn plane_min_candidate<T: Numeric, N: Size>(
         Value::Single(coord) => {
             let (winning, winning_coord) = plane_argmin_propagating_nan(item, coord.unwrap());
             (winning, Value::new_single(winning_coord))
-        }
+        },
         Value::Multiple(_) => panic!("a min candidate carries at most one coordinate"),
     }
 }
@@ -122,7 +147,7 @@ impl<P: ReducePrecision> ReduceInstruction<P> for Min {
             ReduceStep::Identity => (item.elements, item.args),
         };
 
-        min_insert(
+        min_advance(
             &mut accumulator.elements,
             &mut accumulator.args,
             Vector::cast_from(candidate),
@@ -165,23 +190,23 @@ impl<P: ReducePrecision> ReduceInstruction<P> for Min {
                 let acc = accumulator.elements.item();
                 let mut min = min_identity::<P::EA>();
                 #[unroll]
-                for k in 0..acc.size() {
+                for k in 0..acc.vector_size() {
                     let candidate = acc.extract(k);
                     min = select_min(
                         Vector::<P::EA, Const<1>>::new(candidate),
                         Vector::<P::EA, Const<1>>::new(min),
                     )
-                    .extract(0);
+                    .extract(0usize);
                 }
                 (Value::new_single(Out::cast_from(min)), Value::new_None())
-            }
+            },
             Value::Single(_) => {
                 let (min, coordinate) = min_finalize_with_coords::<P>(&accumulator);
                 (
                     Value::new_single(Out::cast_from(min)),
                     Value::new_single(Idx::cast_from(coordinate)),
                 )
-            }
+            },
             Value::Multiple(_) => panic!("a min accumulator holds at most one coordinate vector"),
         }
     }
@@ -203,14 +228,14 @@ impl<P: ReducePrecision> ReduceInstruction<P> for Min {
 
 impl<P: ReducePrecision> ReduceWithIndices<P> for Min {}
 
-/// Collapse the vectorized accumulator lanes down to the final minimum and its
+/// Collapse the vectorized accumulator components down to the final minimum and its
 /// coordinate, for the parallel layout.
 ///
 /// Ties break towards the lower coordinate, matching the CPU reference. The
 /// accumulator must have been built with coordinate tracking on.
 #[cube]
 fn min_finalize_with_coords<P: ReducePrecision>(accumulator: &Accumulator<P>) -> (P::EA, u32) {
-    let vector_size = accumulator.elements.item().size().comptime();
+    let vector_size = accumulator.elements.item().vector_size().comptime();
 
     if vector_size > 1 {
         let mut min = min_identity::<P::EA>();
@@ -228,15 +253,15 @@ fn min_finalize_with_coords<P: ReducePrecision>(accumulator: &Accumulator<P>) ->
                 Vector::<u32, Const<1>>::new(acc_coordinate),
             );
 
-            min = selected.extract(0);
-            coordinate = selected_coordinate.extract(0);
+            min = selected.extract(0usize);
+            coordinate = selected_coordinate.extract(0usize);
         }
 
         (min, coordinate)
     } else {
         (
-            accumulator.elements.item().extract(0),
-            accumulator.args.item().extract(0),
+            accumulator.elements.item().extract(0usize),
+            accumulator.args.item().extract(0usize),
         )
     }
 }

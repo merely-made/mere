@@ -7,7 +7,7 @@ use crate::{
     launch::{calculate_plane_count_per_cube, support_plane},
     routines::{BlueprintStrategy, PlaneMergeStrategy, PlaneReduceBlueprint, Routine},
 };
-use cubecl::{CubeCount, CubeDim, Runtime, features::Plane, prelude::ComputeClient};
+use cubecl::{CubeCount, CubeDim, features::Plane, prelude::Client};
 use cubek_std::cube_count::cube_count_spread_with_total;
 
 #[derive(Debug, Clone)]
@@ -23,9 +23,9 @@ impl Routine for PlaneRoutine {
     type Strategy = PlaneStrategy;
     type Blueprint = PlaneReduceBlueprint;
 
-    fn prepare<R: Runtime>(
+    fn prepare(
         &self,
-        client: &ComputeClient<R>,
+        client: &Client,
         problem: ReduceProblem,
         settings: ReduceVectorSettings,
         strategy: BlueprintStrategy<Self>,
@@ -66,7 +66,7 @@ impl Routine for PlaneRoutine {
             }
             BlueprintStrategy::Inferred(strategy) => {
                 let (blueprint, cube_dim, cube_count) =
-                    generate_blueprint::<R>(client, problem, &settings, strategy)?;
+                    generate_blueprint(client, problem, &settings, strategy)?;
                 (blueprint, cube_dim, cube_count)
             }
         };
@@ -82,8 +82,8 @@ impl Routine for PlaneRoutine {
     }
 }
 
-fn generate_blueprint<R: Runtime>(
-    client: &ComputeClient<R>,
+fn generate_blueprint(
+    client: &Client,
     problem: ReduceProblem,
     settings: &ReduceVectorSettings,
     strategy: PlaneStrategy,
@@ -104,13 +104,13 @@ fn generate_blueprint<R: Runtime>(
 
     // The blueprint is comptime: every field forks a compiled kernel variant.
     // The problem sizes here are *raw* runtime lengths, while kernel selection
-    // is cached per anchored autotune key — a variant choice derived from a
+    // is cached per anchored autotune key: a variant choice derived from a
     // raw property (divisibility, exact launch fit) re-splits the anchored
     // bucket and keeps compiling "new" kernels long after a warmup covered
     // every key. The unchecked fast paths are therefore only taken when the
     // selection says raw shapes are their own keys
     // ([`ReduceStrategy::autotune_level`](crate::ReduceStrategy)); otherwise
-    // the guarded variants — valid for every length sharing the key — run,
+    // the guarded variants (valid for every length sharing the key) run,
     // and the tuner benchmarks candidates with them, keeping the ranking
     // honest.
     let unchecked = settings.unchecked_fast_paths;
@@ -121,7 +121,7 @@ fn generate_blueprint<R: Runtime>(
     };
     // Out-of-range units come from the reduce-axis tail *and* from over-launched
     // (idle) planes; both need a bound check. When the input read has a write
-    // side effect (fuse-on-read), that check must branch rather than mask — a
+    // side effect (fuse-on-read), that check must branch rather than mask: a
     // mask clamps the index to 0 and still performs the side-effecting read,
     // clobbering position 0.
     let tail_bounds = !(unchecked && work_size.is_multiple_of(plane_size as usize));

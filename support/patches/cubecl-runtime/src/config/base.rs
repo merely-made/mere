@@ -53,6 +53,7 @@ impl RuntimeConfig for CubeClRuntimeConfig {
 
     fn on_loaded(&self) {
         cubecl_environment::stream::set_policy_from_config(self.streaming.policy);
+        cubecl_environment::records::configure(self.environment.records);
         // Before any device is initialized, so every cache opened afterwards
         // lands in the chosen environment.
         cubecl_environment::environment::activate(&self.environment.name);
@@ -70,7 +71,7 @@ impl RuntimeConfig for CubeClRuntimeConfig {
 
     #[cfg(std_io)]
     fn override_from_env(mut self) -> Self {
-        use super::compilation::CompilationLogLevel;
+        use super::compilation::{CompilationLogLevel, F16Evaluation};
         use crate::config::{
             autotune::{AutotuneLevel, AutotuneLogLevel},
             profiling::ProfilingLogLevel,
@@ -86,28 +87,28 @@ impl RuntimeConfig for CubeClRuntimeConfig {
                     self.compilation.logger.stdout = true;
                     self.profiling.logger.stdout = true;
                     self.autotune.logger.stdout = true;
-                }
+                },
                 "stderr" => {
                     self.compilation.logger.stderr = true;
                     self.profiling.logger.stderr = true;
                     self.autotune.logger.stderr = true;
-                }
+                },
                 "1" | "true" => {
                     let file_path = "/tmp/cubecl.log";
                     self.compilation.logger.file = Some(file_path.into());
                     self.profiling.logger.file = Some(file_path.into());
                     self.autotune.logger.file = Some(file_path.into());
-                }
+                },
                 "0" | "false" => {
                     self.compilation.logger.level = CompilationLogLevel::Disabled;
                     self.profiling.logger.level = ProfilingLogLevel::Disabled;
                     self.autotune.logger.level = AutotuneLogLevel::Disabled;
-                }
+                },
                 file_path => {
                     self.compilation.logger.file = Some(file_path.into());
                     self.profiling.logger.file = Some(file_path.into());
                     self.autotune.logger.file = Some(file_path.into());
-                }
+                },
             }
         };
 
@@ -117,22 +118,22 @@ impl RuntimeConfig for CubeClRuntimeConfig {
                     self.compilation.logger.level = CompilationLogLevel::Full;
                     self.profiling.logger.level = ProfilingLogLevel::Medium;
                     self.autotune.logger.level = AutotuneLogLevel::Full;
-                }
+                },
                 "debug-full" => {
                     self.compilation.logger.level = CompilationLogLevel::Full;
                     self.profiling.logger.level = ProfilingLogLevel::Full;
                     self.autotune.logger.level = AutotuneLogLevel::Full;
-                }
+                },
                 "profile" => {
                     self.profiling.logger.level = ProfilingLogLevel::Basic;
-                }
+                },
                 "profile-medium" => {
                     self.profiling.logger.level = ProfilingLogLevel::Medium;
-                }
+                },
                 "profile-full" => {
                     self.profiling.logger.level = ProfilingLogLevel::Full;
-                }
-                _ => {}
+                },
+                _ => {},
             }
         };
 
@@ -140,17 +141,32 @@ impl RuntimeConfig for CubeClRuntimeConfig {
             match val.as_str() {
                 "minimal" | "0" => {
                     self.autotune.level = AutotuneLevel::Minimal;
-                }
+                },
                 "balanced" | "1" => {
                     self.autotune.level = AutotuneLevel::Balanced;
-                }
+                },
                 "extensive" | "2" => {
                     self.autotune.level = AutotuneLevel::Extensive;
-                }
+                },
                 "full" | "3" => {
                     self.autotune.level = AutotuneLevel::Full;
-                }
-                _ => {}
+                },
+                _ => {},
+            }
+        }
+
+        if let Ok(val) = std::env::var("CUBECL_CPU_F16_EVAL") {
+            match val.as_str() {
+                "per-operation" => {
+                    self.compilation.f16_evaluation = Some(F16Evaluation::PerOperation);
+                },
+                "chain" => {
+                    self.compilation.f16_evaluation = Some(F16Evaluation::Chain);
+                },
+                "accumulators" => {
+                    self.compilation.f16_evaluation = Some(F16Evaluation::Accumulators);
+                },
+                _ => {},
             }
         }
 
@@ -160,6 +176,17 @@ impl RuntimeConfig for CubeClRuntimeConfig {
 
         if let Ok(val) = std::env::var("CUBECL_ENVIRONMENT") {
             self.environment.name = val;
+        }
+
+        if let Ok(val) = std::env::var("CUBECL_ENVIRONMENT_RECORDS") {
+            use cubecl_environment::records::RecordLevel;
+
+            match val.as_str() {
+                "off" | "0" => self.environment.records.level = RecordLevel::Off,
+                "basic" | "1" => self.environment.records.level = RecordLevel::Basic,
+                "full" | "2" => self.environment.records.level = RecordLevel::Full,
+                _ => {},
+            }
         }
 
         if let Some(enabled) = env_bool("CUBECL_AUTOTUNE_CACHE") {
@@ -212,7 +239,7 @@ pub fn type_name_format(name: &str, level: TypeNameFormatLevel) -> String {
             } else {
                 name.to_string()
             }
-        }
+        },
         TypeNameFormatLevel::Balanced => {
             let mut split = name.split("<");
             let before_generic = split.next();
@@ -237,13 +264,13 @@ pub fn type_name_format(name: &str, level: TypeNameFormatLevel) -> String {
                         val += s;
                     }
                     val
-                }
+                },
             };
 
             let inside = type_name_list_format(&inside_generic, level);
 
             format!("{before_generic}{inside}")
-        }
+        },
     }
 }
 

@@ -1,7 +1,14 @@
 # Runtime Mod Authoring Loop Plan
 
 **Date**: 2026-06-30  
-**Status**: Planned.  
+**Status (2026-10-06):** not started, and its host is gone. Meerkat, which held
+the Rhai omnibar lane this plan builds on, the mod pane and every Meerkat
+done-condition, was removed 2026-07-18 (`c5f01064`). None of the plan's objects
+exist (`install_mod`, `CommandModManifest`, `ModProject`, `meerkat.mod.*`). The
+Wasm-side grounding holds: `DocumentScript`, import gating before
+instantiation, and the settings-lane grant UI in the archived follow-ons plan.
+Open: every phase, and whether the Rhai half and the pane move to a living host
+(see Current Grounding).  
 **Related**:
 [`2026-06-21_command_registry_configurable_menus_plan.md`](../../archive_docs/2026-09-02_retired_plans/2026-06-21_command_registry_configurable_menus_plan.md),
 [`2026-06-21_document_script_substrate_plan.md`](../../archive_docs/2026-07-03_completed_plans/2026-06-21_document_script_substrate_plan.md),
@@ -33,6 +40,20 @@ The command side already has the right shape.
 - `crates/script/rhai/src/lib.rs` provides the shared sandboxed base engine;
   the note-evaluator lane registers no host bindings.
 
+**Corrected 2026-10-06 (S14 pass):** the omnibar Rhai lane left with Meerkat
+(`c5f01064`, 2026-07-18). At mere `535bca11` crates, ports and apps have no
+`ShellContext`, `ShellOutcome` or `Command::ALL`; of the three script requests
+only a doc comment naming `attach_script` survives
+(`crates/system/pandect/src/script_bindings_store.rs:12`). The shared Rhai
+engine in `crates/script/rhai/src/lib.rs` still holds.
+
+**Open, raised by the S14 pass (2026-10-06):** Meerkat, the host of the Rhai
+command lane and of the authoring pane, is gone. Where does this plan's Rhai
+half and pane live now? Options: retarget them onto a living host (Turnstone or
+Cambium, with the registry's `mod_loader`); keep the plan as a historical
+design record in place, as the authoring-ergonomics source that the graph
+behaviors and participant gate packs plans cite.
+
 The Wasm side also has a live seed:
 
 - `DocumentScript` attaches a Wasm component to a focused page.
@@ -40,6 +61,13 @@ The Wasm side also has a live seed:
 - Installed mods under `<mere_root>/mods/` can auto-bind as DocumentScripts.
 - The follow-on docs already carry the settings-lane grant UI and `net.fetch`
   hardening path.
+
+**Corrected 2026-10-06 (S14 pass):** nothing auto-binds installed mods today.
+`discover_wasm_mods_in_dir`
+(`crates/system/registry/src/mod_loader/loader/free_fns.rs:149`, re-exported
+at `mod_loader.rs:57`) has no production caller in Mere or Turnstone; only its
+tests call it (`loader/tests.rs:108`, `:139`), and nothing names a
+`<mere_root>/mods/` path. The other three Wasm-side lines hold.
 
 This plan connects those pieces into a mod authoring loop.
 
@@ -278,8 +306,18 @@ P5: Native adapter boundary.
 - A model can patch a mod project and drive the same check/build/run loop the
   user sees.
 
+**Corrected 2026-10-06 (S14 pass):** the conditions naming Meerkat ("without
+restarting Meerkat", "from one Meerkat pane") cannot be met as written: the
+host was removed 2026-07-18 (`c5f01064`). They wait on the host question under
+Current Grounding.
+
 ## Progress
 
 - **2026-06-30** - Created from the Rhai/Wasm trust-boundary discussion. This
   plan preserves Rhai as the local command language while assigning the portable
   untrusted extension boundary to Wasm components and WIT worlds.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_49_s14_phase_b11.md: the status records the plan
+  as unstarted with its Meerkat host gone, the Rhai-lane grounding and the
+  `mods/` auto-bind claim are corrected, and the host question is opened.

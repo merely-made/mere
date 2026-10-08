@@ -10,9 +10,11 @@ use std::pin::Pin;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
+use burn::backend::Backend;
 use burn::tensor::Device;
-use burn_wgpu::{AutoCompiler, Wgpu, WgpuDevice, WgpuRuntime};
-use cubecl::Runtime;
+use burn_wgpu::{Wgpu, WgpuDevice};
+use cubecl::wgpu::WgpuDeviceKind;
+use distillery::mesh_host::{HostConfig, ManualClock, MeshHost, ObservedConditions, Step};
 use distillery::{
     BURN_REMOTE_RESOURCE, BlobCustody, Distillery, RemoteSessionService, RemoteSessionSettings,
     RetentionSettings,
@@ -22,10 +24,9 @@ use esp::embed::bert::{BertEmbeddingProvider, load_cpu};
 use identity::{IdentityProvider, InMemoryProvider};
 use mesh::{
     DeterminismClass, DeviceConditions, HostFacts, JobId, JobSpec, LeaseId, LeasePolicy,
-    LeaseTerms, MESH_AUTHOR_SALT, MemoryBlobSpace, MeshEvent, MeshStore, RemoteSessionClaim,
-    ResourceId, ResourceRegistry, SyncedMesh,
+    LeaseTerms, MESH_AUTHOR_SALT, MemoryBlobSpace, MeshEvent, MeshStore, ReclaimReason,
+    RemoteSessionClaim, ResourceId, ResourceRegistry, SyncedMesh,
 };
-use distillery::mesh_host::{HostConfig, ManualClock, MeshHost, ObservedConditions, Step};
 use muniment::MemoryBackend;
 use serde::Serialize;
 use serde_json::{Value, json};
@@ -90,9 +91,10 @@ struct AllocatorSnapshot {
 
 impl AllocatorSnapshot {
     fn capture(device: &WgpuDevice) -> Result<Self, String> {
-        let usage = <WgpuRuntime<AutoCompiler> as Runtime>::client(device)
-            .memory_usage()
-            .map_err(|error| format!("read CubeCL allocator telemetry: {error}"))?;
+        let usage = cubecl::Device::from(device.clone())
+            .client()
+            .memory_report(cubecl::MemoryScope::Device)
+            .usage();
         Ok(Self {
             number_allocs: usage.number_allocs,
             bytes_in_use: usage.bytes_in_use,
@@ -168,6 +170,9 @@ fn max_abs_error(left: &[f32], right: &[f32]) -> Result<f32, String> {
             left.len(),
             right.len()
         ));
+    }
+    if !left.iter().chain(right).all(|value| value.is_finite()) {
+        return Err("numerical comparison contains a non-finite value".to_string());
     }
     Ok(left
         .iter()
@@ -265,6 +270,92 @@ async fn reclaim(
     ))
 }
 
+/// Owner reclaim of every run on the device, for shutdown. Unlike [`reclaim`] it does not
+/// assert stop-before-fact ordering, which the first reclaim already proves; it waits for
+/// `run`'s lease to end and its sessions to close.
+async fn reclaim_for_shutdown(
+    works: &mut Works,
+    conditions: &ObservedConditions,
+    service: &RemoteSessionService<Wgpu>,
+    run: &ActiveRun,
+) -> Result<bool, String> {
+    conditions.in_use();
+    let mut observed = Vec::new();
+    let mut ended = false;
+    for _ in 0..400 {
+        let steps = works.tick().await.map_err(|error| error.to_string())?;
+        ended |= steps.iter().any(|step| {
+            matches!(step, Step::Reclaimed { job, lease, .. } | Step::Completed { job, lease: Some(lease) }
+                if *job == run.job && *lease == run.lease)
+        });
+        observed.extend(steps);
+        if ended && service.session_count(run.job, run.lease).await == 0 {
+            return Ok(true);
+        }
+        tokio::time::sleep(Duration::from_millis(10)).await;
+    }
+    Err(format!(
+        "shutdown reclaim did not end the kept lease: {observed:#?}"
+    ))
+}
+
+async fn post_job(
+    works: &Works,
+    poster_key: &identity::Ed25519Keypair,
+    request: &mesh::BlobRef,
+    nonce: u64,
+) -> Result<JobId, String> {
+    let posted = works
+        .host()
+        .synced()
+        .author(
+            poster_key,
+            &MeshEvent::JobPostedV2 {
+                spec: Box::new(
+                    JobSpec::simple(
+                        ResourceId::parse(BURN_REMOTE_RESOURCE)
+                            .map_err(|error| error.to_string())?,
+                        "request",
+                        request.clone(),
+                        "receipt",
+                        512,
+                        DeterminismClass::Observed,
+                    )
+                    .leased(LeaseTerms::new(600_000, 60_000)),
+                ),
+                nonce,
+                at_ms: NOW_MS,
+            },
+        )
+        .await
+        .map_err(|error| error.to_string())?;
+    Ok(JobId(*posted.hash.as_bytes()))
+}
+
+/// Tick until the host has lost `run`'s lease and no Burn session remains on it.
+async fn await_lease_lost(
+    works: &mut Works,
+    service: &RemoteSessionService<Wgpu>,
+    run: &ActiveRun,
+) -> Result<Vec<Step>, String> {
+    let mut observed = Vec::new();
+    let mut lost = false;
+    for _ in 0..400 {
+        let steps = works.tick().await.map_err(|error| error.to_string())?;
+        lost |= steps.iter().any(
+            |step| matches!(step, Step::LeaseLost { job, lease } if *job == run.job && *lease == run.lease),
+        );
+        observed.extend(steps);
+        if lost && service.session_count(run.job, run.lease).await == 0 {
+            return Ok(observed);
+        }
+        tokio::time::sleep(Duration::from_millis(10)).await;
+    }
+    Err(format!(
+        "the revoked lease was not lost and closed: {observed:#?}"
+    ))
+}
+
 async fn remote_provider(
     client: &P2pandaTransport,
     server: &P2pandaTransport,
@@ -272,7 +363,7 @@ async fn remote_provider(
     poster_key: &identity::Ed25519Keypair,
     run: &ActiveRun,
     model_dir: &Path,
-) -> Result<(Arc<BertEmbeddingProvider>, f64), String> {
+) -> Result<(Arc<BertEmbeddingProvider>, f64, Device), String> {
     let credential = RemoteSessionClaim::signed(
         poster_key,
         MESH,
@@ -293,13 +384,20 @@ async fn remote_provider(
         .endpoint_addr()
         .await
         .map_err(|error| error.to_string())?;
-    let device = Device::remote_iroh_authorized(&endpoint, server_addr, 0, credential);
+    let host = burn::remote::RemoteHost::iroh(
+        burn::remote::IrohHost::new(server_addr).with_endpoint(endpoint),
+    )
+    .with_credential(credential);
+    let device = Device::remote_options(&host)
+        .init()
+        .map_err(|error| error.to_string())?;
     let started = Instant::now();
-    let provider = BertEmbeddingProvider::load(model_dir, device)
+    let provider = BertEmbeddingProvider::load(model_dir, device.clone())
         .map_err(|error| format!("load remote provider: {error}"))?;
     Ok((
         Arc::new(provider),
         started.elapsed().as_secs_f64() * 1_000.0,
+        device,
     ))
 }
 
@@ -437,7 +535,7 @@ async fn run_remote(
     cancellation_batch: usize,
 ) -> Result<(), String> {
     report_stage("allocator-baseline");
-    let server_device = WgpuDevice::DiscreteGpu(0);
+    let server_device = WgpuDevice::new(WgpuDeviceKind::DiscreteGpu(0));
     let allocator_baseline = AllocatorSnapshot::capture(&server_device)?;
     report_stage("bind-peers");
     let poster_provider = InMemoryProvider::from_seed([31; 32]);
@@ -476,7 +574,7 @@ async fn run_remote(
     let clock = Arc::new(ManualClock::at(NOW_MS));
     let service = RemoteSessionService::<Wgpu>::mount(
         &server_transport,
-        vec![server_device.clone()],
+        vec![cubecl::Device::Wgpu(server_device.clone())],
         MESH,
         server_key.public_key().to_bytes(),
         clock.clone(),
@@ -512,6 +610,9 @@ async fn run_remote(
         gpu: true,
     };
     config.policy = mesh::DevicePolicy::conservative();
+    // Room for the second-live-lease stage: its two leases plus a re-grant of the first job.
+    // The earlier stages post one job at a time, so they are unaffected.
+    config.policy.max_concurrent_jobs = 3;
     config.lease = LeasePolicy { max_skew_ms: 0 };
     let host = MeshHost::new(synced, server_key.clone(), config);
     let mut works = Distillery::new(host, Arc::new(NoCustody), RetentionSettings::default());
@@ -558,7 +659,7 @@ async fn run_remote(
                         ResourceId::parse(BURN_REMOTE_RESOURCE)
                             .map_err(|error| error.to_string())?,
                         "request",
-                        request,
+                        request.clone(),
                         "receipt",
                         512,
                         DeterminismClass::Observed,
@@ -575,7 +676,7 @@ async fn run_remote(
     let first_run = await_run(&mut works, &service, job, 0).await?;
     report_stage("first-lease-active");
 
-    let (remote, remote_load_ms) = remote_provider(
+    let (remote, remote_load_ms, _) = remote_provider(
         &client_transport,
         &server_transport,
         &service,
@@ -656,7 +757,7 @@ async fn run_remote(
     if recovery_run.lease == first_run.lease {
         return Err("recovery reused the reclaimed lease".into());
     }
-    let (recovered, recovery_load_ms) = remote_provider(
+    let (recovered, recovery_load_ms, _) = remote_provider(
         &client_transport,
         &server_transport,
         &service,
@@ -704,6 +805,137 @@ async fn run_remote(
         return Err("CubeCL allocator lifecycle gate failed".into());
     }
 
+    // Second live lease (ruling 508): close one lease while another stays live on the same
+    // device. The live lease must keep its lease, its session and its tensor values, and the
+    // allocator must return to a baseline that still contains it.
+    conditions.set(DeviceConditions::spare());
+    let kept_job = post_job(&works, &poster_key, &request, 2).await?;
+    let kept_run = await_run(&mut works, &service, kept_job, 0).await?;
+    let (kept, kept_load_ms, kept_device) = remote_provider(
+        &client_transport,
+        &server_transport,
+        &service,
+        &poster_key,
+        &kept_run,
+        &model_dir,
+    )
+    .await?;
+    let kept_output = tokio::time::timeout(Duration::from_secs(30), kept.embed_one_async(&input))
+        .await
+        .map_err(|_| "kept-lease MiniLM execution timed out".to_string())?
+        .map_err(|error| error.to_string())?;
+    let kept_numerical = numerical_receipt(&kept_output, &native_output)?;
+    report_stage("kept-lease-executed");
+    // Readback completion can precede the remote client's queued tensor deregistrations.
+    // Flush the remote FIFO before settling GPU memory, so the baseline contains the model's
+    // retained tensors rather than inference temporaries. Only this baseline gets fixture-side
+    // cleanup; the close under test below is observed without any fixture-side sync or cleanup.
+    kept_device
+        .sync()
+        .map_err(|error| format!("kept remote baseline barrier failed: {error:?}"))?;
+    <Wgpu as Backend>::memory_cleanup(&cubecl::Device::from(server_device.clone()));
+    cubecl::Device::from(server_device.clone())
+        .client()
+        .sync()
+        .await
+        .map_err(|error| format!("baseline settle sync failed: {error:?}"))?;
+    let allocator_kept_baseline = AllocatorSnapshot::capture(&server_device)?;
+    if !allocator_kept_baseline.active_exceeds(&allocator_baseline) {
+        return Err(format!(
+            "the kept lease holds no observable CubeCL allocations: baseline={allocator_baseline:?}, kept={allocator_kept_baseline:?}"
+        ));
+    }
+
+    let closed_job = post_job(&works, &poster_key, &request, 3).await?;
+    let closed_run = await_run(&mut works, &service, closed_job, 0).await?;
+    let (closed, closed_load_ms, _) = remote_provider(
+        &client_transport,
+        &server_transport,
+        &service,
+        &poster_key,
+        &closed_run,
+        &model_dir,
+    )
+    .await?;
+    let closed_output =
+        tokio::time::timeout(Duration::from_secs(30), closed.embed_one_async(&input))
+            .await
+            .map_err(|_| "closed-lease MiniLM execution timed out".to_string())?
+            .map_err(|error| error.to_string())?;
+    let closed_numerical = numerical_receipt(&closed_output, &native_output)?;
+    let allocator_with_both = AllocatorSnapshot::capture(&server_device)?;
+    if !allocator_with_both.active_exceeds(&allocator_kept_baseline) {
+        return Err(format!(
+            "the second lease added no observable CubeCL allocations: kept={allocator_kept_baseline:?}, both={allocator_with_both:?}"
+        ));
+    }
+    report_stage("second-lease-executed");
+
+    // Close the second lease alone: its holder revokes it, the host loses that lease, and
+    // Distillery closes its sessions through burn-remote's targeted close.
+    works
+        .host()
+        .synced()
+        .author(
+            &server_key,
+            &MeshEvent::LeaseRevokedByOwner {
+                job: closed_job.0,
+                lease: closed_run.lease.0,
+                reason: ReclaimReason::Manual,
+                at_ms: NOW_MS,
+            },
+        )
+        .await
+        .map_err(|error| error.to_string())?;
+    let close_steps = await_lease_lost(&mut works, &service, &closed_run).await?;
+    drop(closed);
+    let allocator_immediate_after_close = AllocatorSnapshot::capture(&server_device)?;
+    let (allocator_after_close, close_wait_ms) = await_allocator_baseline(
+        &server_device,
+        &allocator_kept_baseline,
+        "second-lease close",
+    )
+    .await?;
+    report_stage("second-lease-closed");
+
+    let kept_disturbed = close_steps.iter().any(|step| {
+        matches!(step, Step::LeaseLost { job, .. } | Step::Reclaimed { job, .. } if *job == kept_job)
+    });
+    let kept_still_active = service.is_active(kept_job, kept_run.lease);
+    let kept_sessions_after_close = service.session_count(kept_job, kept_run.lease).await;
+    let closed_sessions_after_close = service.session_count(closed_job, closed_run.lease).await;
+    if kept_disturbed || !kept_still_active || kept_sessions_after_close != 1 {
+        return Err(format!(
+            "closing one lease disturbed the other: disturbed={kept_disturbed}, active={kept_still_active}, sessions={kept_sessions_after_close}"
+        ));
+    }
+    let kept_again = tokio::time::timeout(Duration::from_secs(30), kept.embed_one_async(&input))
+        .await
+        .map_err(|_| "kept-lease MiniLM re-execution timed out".to_string())?
+        .map_err(|error| error.to_string())?;
+    let kept_again_numerical = numerical_receipt(&kept_again, &native_output)?;
+    let kept_vs_before = max_abs_error(&kept_again, &kept_output)?;
+    if kept_vs_before != 0.0 {
+        return Err(format!(
+            "the kept lease's output changed after the other lease closed: {kept_vs_before}"
+        ));
+    }
+    report_stage("kept-lease-intact");
+
+    let kept_reclaimed = reclaim_for_shutdown(&mut works, &conditions, &service, &kept_run).await?;
+    drop(kept);
+    let allocator_immediate_after_final = AllocatorSnapshot::capture(&server_device)?;
+    let (allocator_after_final, final_cleanup_wait_ms) =
+        await_allocator_baseline(&server_device, &allocator_baseline, "final reclaim").await?;
+    report_stage("final-reclaim-clean");
+    let second_lease_passes = allocator_after_close.active_matches(&allocator_kept_baseline)
+        && allocator_after_final.active_matches(&allocator_baseline)
+        && closed_sessions_after_close == 0
+        && kept_reclaimed;
+    if !second_lease_passes {
+        return Err("second-live-lease gate failed".into());
+    }
+
     works.shutdown().await.map_err(|error| error.to_string())?;
     client_transport
         .close()
@@ -739,7 +971,7 @@ async fn run_remote(
                 "server_peer": server_endpoint.id().to_string(),
                 "client_peer": client_endpoint.id().to_string(),
                 "same_endpoint": false,
-                "server_backend": format!("burn-wgpu 0.22.0-pre.2 Wgpu/AutoCompiler DiscreteGpu(0), {}", backend_profile()),
+                "server_backend": format!("burn-wgpu 0.22.0 Wgpu/AutoCompiler DiscreteGpu(0), {}", backend_profile()),
                 "client_backend": "Burn Dispatch Remote over authorized Iroh"
             },
             "first_run": {
@@ -779,6 +1011,39 @@ async fn run_remote(
                 "final_session_count": final_session_count,
                 "passes": recovery_reclaimed && final_session_count == 0
             },
+            "second_live_lease": {
+                "scope": "one lease closed by its holder's revoke while another stays live on the same server device",
+                "kept_job": hex(&kept_job.0),
+                "kept_lease": hex(&kept_run.lease.0),
+                "closed_job": hex(&closed_job.0),
+                "closed_lease": hex(&closed_run.lease.0),
+                "close_steps": close_steps.iter().map(|step| format!("{step:?}")).collect::<Vec<_>>(),
+                "closed_sessions_after_close": closed_sessions_after_close,
+                "kept_disturbed_by_close": kept_disturbed,
+                "kept_still_active_after_close": kept_still_active,
+                "kept_sessions_after_close": kept_sessions_after_close,
+                "kept_numerical": kept_numerical,
+                "closed_numerical": closed_numerical,
+                "kept_after_close_numerical": kept_again_numerical,
+                "kept_max_abs_error_vs_before_close": kept_vs_before,
+                "kept_reclaimed_for_shutdown": kept_reclaimed,
+                "allocator": {
+                    "kept_baseline_settled_by_fixture_sync": allocator_kept_baseline,
+                    "kept_baseline_settlement": ["remote FIFO barrier", "server memory cleanup", "server sync"],
+                    "with_both": allocator_with_both,
+                    "immediate_after_close": allocator_immediate_after_close,
+                    "after_close": allocator_after_close,
+                    "close_wait_ms": close_wait_ms,
+                    "immediate_after_final_reclaim": allocator_immediate_after_final,
+                    "after_final_reclaim": allocator_after_final,
+                    "final_cleanup_wait_ms": final_cleanup_wait_ms
+                },
+                "timings_ms": {
+                    "kept_remote_load": kept_load_ms,
+                    "closed_remote_load": closed_load_ms
+                },
+                "passes": second_lease_passes
+            },
             "physical_gpu_allocation_release": {
                 "measured": false,
                 "allocator_level_measured": true,
@@ -810,4 +1075,88 @@ async fn run_remote(
         .map_err(|error| error.to_string())?
     );
     Ok(())
+}
+
+#[cfg(test)]
+mod verification_tests {
+    use super::*;
+
+    fn finite_receipt_fixture() -> Vec<f32> {
+        let mut output = vec![0.0; 384];
+        output[..8].copy_from_slice(&REFERENCE_FIRST_8);
+        let first_8_squared = REFERENCE_FIRST_8
+            .iter()
+            .map(|value| value * value)
+            .sum::<f32>();
+        assert!(first_8_squared < 1.0);
+        output[8] = (1.0 - first_8_squared).sqrt();
+        output
+    }
+
+    #[test]
+    fn error_accepts_finite_equal_lengths() {
+        assert_eq!(max_abs_error(&[0.0, -1.0], &[0.0, -0.5]).unwrap(), 0.5);
+    }
+
+    #[test]
+    fn error_rejects_non_finite_values_on_either_side() {
+        for value in [f32::NAN, f32::INFINITY, f32::NEG_INFINITY] {
+            assert!(
+                max_abs_error(&[value], &[0.0])
+                    .unwrap_err()
+                    .contains("non-finite")
+            );
+            assert!(
+                max_abs_error(&[0.0], &[value])
+                    .unwrap_err()
+                    .contains("non-finite")
+            );
+        }
+    }
+
+    #[test]
+    fn error_rejects_unequal_lengths() {
+        assert!(
+            max_abs_error(&[0.0], &[])
+                .unwrap_err()
+                .contains("length mismatch")
+        );
+        assert!(
+            max_abs_error(&[], &[0.0])
+                .unwrap_err()
+                .contains("length mismatch")
+        );
+    }
+
+    #[test]
+    fn receipt_accepts_finite_native_reference() {
+        let output = finite_receipt_fixture();
+        let receipt = numerical_receipt(&output, &output).unwrap();
+        assert_eq!(receipt["dimensions"], 384);
+        assert_eq!(receipt["native_reference_max_abs_error"], 0.0);
+        assert_eq!(receipt["passes"], true);
+    }
+
+    #[test]
+    fn receipt_rejects_non_finite_native_reference_beyond_first_eight() {
+        let output = finite_receipt_fixture();
+        for value in [f32::NAN, f32::INFINITY, f32::NEG_INFINITY] {
+            let mut reference = output.clone();
+            reference[383] = value;
+            assert!(
+                numerical_receipt(&output, &reference)
+                    .unwrap_err()
+                    .contains("non-finite")
+            );
+        }
+    }
+
+    #[test]
+    fn receipt_rejects_wrong_lengths_including_equal_truncation() {
+        let output = finite_receipt_fixture();
+        assert!(numerical_receipt(&output, &output[..383]).is_err());
+        assert!(numerical_receipt(&output[..383], &output).is_err());
+        assert!(numerical_receipt(&output[..383], &output[..383]).is_err());
+        assert!(numerical_receipt(&[], &[]).is_err());
+    }
 }

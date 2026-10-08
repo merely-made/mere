@@ -19,7 +19,7 @@ pub(crate) fn parse_init_handshake(bytes: &[u8]) -> Result<SessionInit, String> 
                 ));
             }
             Ok(init)
-        }
+        },
         other => Err(format!(
             "Init handshake expected a single RemoteMessage::Init, got {other:?}"
         )),
