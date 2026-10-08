@@ -152,11 +152,6 @@ fn relationship_snapshot(
             "source has fewer disclosed occurrences than the recipe requires",
         ));
     }
-    let ids: HashSet<_> = dataset
-        .occurrences
-        .iter()
-        .map(|occurrence| occurrence.occurrence_id.as_str())
-        .collect();
     let mut orders = HashSet::new();
     for occurrence in &dataset.occurrences {
         let valid_order = number(occurrence, "order").filter(|order| {
@@ -176,65 +171,10 @@ fn relationship_snapshot(
             "reserved recipe layout row must not be disclosed as source truth",
         ));
     }
-    let mut relationship_ids = HashSet::new();
-    for relationship in &disclosed.relationships {
-        let prefix = format!("relationships.{}", relationship.id);
-        if relationship.id.trim().is_empty() || !relationship_ids.insert(&relationship.id) {
-            issues.push(CompileIssue::new(
-                format!("{prefix}.id"),
-                "relationship identities must be nonempty and unique",
-            ));
-        }
-        if !ids.contains(relationship.from_occurrence.as_str())
-            || !ids.contains(relationship.to_occurrence.as_str())
-            || relationship.from_occurrence == relationship.to_occurrence
-        {
-            issues.push(CompileIssue::new(
-                format!("{prefix}.endpoints"),
-                "a relationship must name two distinct disclosed occurrence identities",
-            ));
-        }
-        for (field, value) in [
-            ("kind", &relationship.kind),
-            ("label", &relationship.label),
-            ("explanation", &relationship.explanation),
-            ("provenance.method", &relationship.provenance.method),
-            ("provenance.provider", &relationship.provenance.provider),
-        ] {
-            if value.trim().is_empty() {
-                issues.push(CompileIssue::new(
-                    format!("{prefix}.{field}"),
-                    "disclosed meaning and method provenance cannot be empty",
-                ));
-            }
-        }
-        if relationship.provenance.method_version == 0 {
-            issues.push(CompileIssue::new(
-                format!("{prefix}.provenance.method_version"),
-                "a positive disclosed method version is required",
-            ));
-        }
-        if relationship.provenance.source != dataset.source
-            || relationship.provenance.source_revision != dataset.revision
-        {
-            issues.push(CompileIssue::new(
-                format!("{prefix}.provenance.source_revision"),
-                "relationship provenance must match the exact disclosed source and public revision",
-            ));
-        }
-        if relationship.provenance.evidence.is_empty()
-            || relationship
-                .provenance
-                .evidence
-                .iter()
-                .any(|source| source.adapter.trim().is_empty() || source.id.trim().is_empty())
-        {
-            issues.push(CompileIssue::new(
-                format!("{prefix}.provenance.evidence"),
-                "relationship evidence needs exact source references",
-            ));
-        }
-    }
+    issues.extend(relationship_disclosure_issues(
+        dataset,
+        &disclosed.relationships,
+    ));
     let relationships: Vec<_> = disclosed
         .relationships
         .iter()
@@ -333,6 +273,83 @@ fn relationship_snapshot(
         relationships: compiled,
         selected_relationship: snapshot.selected_relationship.clone(),
     })
+}
+
+/// The checks every disclosed relationship meets against its dataset: a
+/// unique identity, two distinct disclosed endpoints, stated meaning, and
+/// method provenance at the dataset's exact source and public revision. The
+/// relationship compiler and the host dataset boundary
+/// ([`crate::host_dataset`]) share this one validator.
+pub(crate) fn relationship_disclosure_issues(
+    dataset: &ProjectionDataset,
+    relationships: &[DisclosedRelationship],
+) -> Vec<CompileIssue> {
+    let mut issues = Vec::new();
+    let ids: HashSet<_> = dataset
+        .occurrences
+        .iter()
+        .map(|occurrence| occurrence.occurrence_id.as_str())
+        .collect();
+    let mut relationship_ids = HashSet::new();
+    for relationship in relationships {
+        let prefix = format!("relationships.{}", relationship.id);
+        if relationship.id.trim().is_empty() || !relationship_ids.insert(&relationship.id) {
+            issues.push(CompileIssue::new(
+                format!("{prefix}.id"),
+                "relationship identities must be nonempty and unique",
+            ));
+        }
+        if !ids.contains(relationship.from_occurrence.as_str())
+            || !ids.contains(relationship.to_occurrence.as_str())
+            || relationship.from_occurrence == relationship.to_occurrence
+        {
+            issues.push(CompileIssue::new(
+                format!("{prefix}.endpoints"),
+                "a relationship must name two distinct disclosed occurrence identities",
+            ));
+        }
+        for (field, value) in [
+            ("kind", &relationship.kind),
+            ("label", &relationship.label),
+            ("explanation", &relationship.explanation),
+            ("provenance.method", &relationship.provenance.method),
+            ("provenance.provider", &relationship.provenance.provider),
+        ] {
+            if value.trim().is_empty() {
+                issues.push(CompileIssue::new(
+                    format!("{prefix}.{field}"),
+                    "disclosed meaning and method provenance cannot be empty",
+                ));
+            }
+        }
+        if relationship.provenance.method_version == 0 {
+            issues.push(CompileIssue::new(
+                format!("{prefix}.provenance.method_version"),
+                "a positive disclosed method version is required",
+            ));
+        }
+        if relationship.provenance.source != dataset.source
+            || relationship.provenance.source_revision != dataset.revision
+        {
+            issues.push(CompileIssue::new(
+                format!("{prefix}.provenance.source_revision"),
+                "relationship provenance must match the exact disclosed source and public revision",
+            ));
+        }
+        if relationship.provenance.evidence.is_empty()
+            || relationship
+                .provenance
+                .evidence
+                .iter()
+                .any(|source| source.adapter.trim().is_empty() || source.id.trim().is_empty())
+        {
+            issues.push(CompileIssue::new(
+                format!("{prefix}.provenance.evidence"),
+                "relationship evidence needs exact source references",
+            ));
+        }
+    }
+    issues
 }
 
 fn relationship_bounds(
