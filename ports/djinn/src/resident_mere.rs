@@ -8,7 +8,9 @@
 //!
 //! Each mere the reservoir holds is served on `mere/<domain>` (§7 items 20 and
 //! 30): registered when the lane opens and whenever a mere is ensured, and
-//! granted to the first-party applications the reservoir route is. An admitted
+//! available by default to every application the owner admits. Recorded
+//! per-mere denials override this default, and `ambient/mere/<domain>` is a
+//! separate read-only route requiring per-application opt-in. An admitted
 //! session attaches to one of the mere's sessions, the live one changed last
 //! unless it asks for another (§7 item 24), and sees two projections: the
 //! mere's sessions, with the lifecycle as intents that name their session by
@@ -22,9 +24,10 @@
 use std::collections::{BTreeMap, HashMap};
 use std::path::PathBuf;
 use std::sync::Arc;
-use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+use crate::resident_reservoir::ResidentReservoir;
 use chirograph::{
     AdvertisedAction, BoundsRelationship, CachePolicy, CardValueV1, CarrierNotice, ContentHash,
     EndpointDescriptor, IntentEffect, IntentInvocation, IntentReference, IntentResult,
@@ -37,7 +40,7 @@ use graphshell::access::AccessContext;
 use graphshell::handlers::HandlerRegistry;
 use graphshell::lifecycle::AdmittedEndpointContext;
 use graphshell::mere_host::{MereHost, SelectedPersonaRef};
-use graphshell::native::app_admission::{AppId, AppRouteGrants};
+use graphshell::native::app_admission::{AppId, AppRequest, AppRouteGrants, AppRouteId};
 use graphshell::native::app_broker::AppEndpointCatalog;
 use graphshell::native::endpoint_catalog::ResidentEndpointRoute;
 use graphshell::session_item::{
@@ -50,7 +53,8 @@ use graphshell_endpoint::{
 };
 use muniment::DirectoryBackend;
 use pandect::{
-    Author, GraphSessionManifest, MereRecord, MereSessions, SessionId, open_mere_backend,
+    Author, GraphSessionManifest, MereApplicationAccess, MereId, MereRecord, MereSessions,
+    SessionId, open_mere_backend,
 };
 use personae::PersonaId;
 use sceno::{
@@ -68,6 +72,11 @@ const SESSIONS_EPOCH: SceneEpoch = SceneEpoch(1);
 /// The route a mere is served on (§7 item 30).
 pub fn mere_route_id(domain: &str) -> String {
     format!("mere/{domain}")
+}
+
+/// A separately opted-in, read-only ambient crossing of a mere.
+pub fn ambient_mere_route_id(domain: &str) -> String {
+    format!("ambient/mere/{domain}")
 }
 
 /// Run `operation` to completion from the synchronous endpoint traits.
@@ -96,6 +105,8 @@ struct Routes {
     grants: AppRouteGrants,
     apps: Vec<AppId>,
     served: Mutex<BTreeMap<String, Arc<MereShared>>>,
+    access: Mutex<BTreeMap<(MereId, AppId), MereApplicationAccess>>,
+    access_loaded: AtomicBool,
 }
 
 impl MereRoutes {
@@ -116,13 +127,100 @@ impl MereRoutes {
                 grants,
                 apps,
                 served: Mutex::new(BTreeMap::new()),
+                access: Mutex::new(BTreeMap::new()),
+                access_loaded: AtomicBool::new(false),
             }),
         }
+    }
+
+    /// Load the durable decisions before serving routes. This is mandatory
+    /// at resident composition, including an embedded resident.
+    pub async fn load_access(&self, reservoir: &ResidentReservoir) -> Result<(), String> {
+        if reservoir.persona() != self.inner.persona {
+            return Err("mere routes and reservoir belong to different personas".into());
+        }
+        let mut access = self.inner.access.lock().await;
+        let meres = reservoir.meres().await;
+        for (mere, app, decision) in reservoir.access_decisions().await {
+            let record = meres
+                .iter()
+                .find(|record| record.id == mere)
+                .ok_or("access names an unknown mere")?;
+            self.publish_access(&record.domain.to_string(), &app, &decision);
+            access.insert((mere, app), decision);
+        }
+        self.inner.access_loaded.store(true, Ordering::SeqCst);
+        Ok(())
+    }
+
+    /// Commit first, then publish an atomic door update. A failed storage
+    /// write changes no grant; a restarted resident replays the committed
+    /// decisions before it opens any routes.
+    pub async fn set_access(
+        &self,
+        reservoir: &ResidentReservoir,
+        mere: MereId,
+        app: AppId,
+        denied: bool,
+        ambient: bool,
+        via: AppId,
+    ) -> Result<(), String> {
+        if reservoir.persona() != self.inner.persona {
+            return Err("mere routes and reservoir belong to different personas".into());
+        }
+        let grants = self.inner.grants.current();
+        if !grants.is_admitted(&app) || !grants.is_admitted(&via) {
+            return Err("access decisions name an application this door does not admit".into());
+        }
+        let mut access = self.inner.access.lock().await;
+        let record = reservoir
+            .meres()
+            .await
+            .into_iter()
+            .find(|record| record.id == mere)
+            .ok_or("access names an unknown mere")?;
+        reservoir
+            .record_access(mere, app.clone(), denied, ambient, via)
+            .await?;
+        let decision = reservoir
+            .access_decisions()
+            .await
+            .into_iter()
+            .find(|(id, application, _)| *id == mere && *application == app)
+            .ok_or("the committed access decision is missing")?
+            .2;
+        self.publish_access(record.domain.as_str(), &app, &decision);
+        access.insert((mere, app), decision);
+        Ok(())
+    }
+
+    fn publish_access(&self, domain: &str, app: &AppId, access: &MereApplicationAccess) {
+        let explicit = AppRouteId::new(mere_route_id(domain)).expect("valid mere route");
+        let ambient = ResidentEndpointRoute::new(ambient_mere_route_id(domain), MERE_NOTICE_POLL)
+            .expect("valid ambient route");
+        let ambient_id = AppRouteId::new(ambient.id()).expect("valid ambient route");
+        self.inner.grants.update(|grants| {
+            grants.set_denied(app.clone(), explicit, access.denied);
+            grants.set_denied(app.clone(), ambient_id.clone(), access.denied);
+            if access.ambient && grants.is_admitted(app) {
+                grants.grant(app.clone(), ambient);
+            } else {
+                grants.revoke(app, &ambient_id);
+            }
+        });
     }
 
     /// Serve `mere` on `mere/<domain>`: open its store, register its route and
     /// grant it, unless it is served already.
     pub async fn serve(&self, mere: &MereRecord) -> Result<ResidentEndpointRoute, String> {
+        if !self.inner.access_loaded.load(Ordering::SeqCst) {
+            return Err("load reservoir access decisions before serving mere routes".into());
+        }
+        if mere.persona != self.inner.persona
+            || mere.id != MereId::derive(mere.persona, &mere.domain)
+        {
+            return Err("mere does not belong to this reservoir persona/domain".into());
+        }
         let domain = mere.domain.to_string();
         let route = ResidentEndpointRoute::new(mere_route_id(&domain), MERE_NOTICE_POLL)
             .map_err(|error| error.to_string())?;
@@ -140,20 +238,162 @@ impl MereRoutes {
             lifecycle: AtomicU64::new(1),
         });
         let opened = Arc::clone(&shared);
+        let ambient_opened = Arc::clone(&shared);
+        let explicit_grants = self.inner.grants.clone();
+        let ambient_grants = self.inner.grants.clone();
+        let explicit_id = route.id().to_string();
+        let ambient = ResidentEndpointRoute::new(ambient_mere_route_id(&domain), MERE_NOTICE_POLL)
+            .map_err(|error| error.to_string())?;
+        let ambient_id = ambient.id().to_string();
         self.inner
             .catalog
             .update(|catalog| {
-                catalog.register_notifying(route.id(), format!("Mere: {domain}"), move |context| {
-                    MereEndpoint::open(Arc::clone(&opened), context)
-                })
+                catalog.register_notifying(
+                    route.id(),
+                    format!("Mere: {domain}"),
+                    move |context| {
+                        AccessEndpoint::open(
+                            Arc::clone(&opened),
+                            context,
+                            explicit_grants.clone(),
+                            &explicit_id,
+                            false,
+                        )
+                    },
+                )?;
+                catalog.register_notifying(
+                    ambient.id(),
+                    format!("Ambient mere: {domain}"),
+                    move |context| {
+                        AccessEndpoint::open(
+                            Arc::clone(&ambient_opened),
+                            context,
+                            ambient_grants.clone(),
+                            &ambient_id,
+                            true,
+                        )
+                    },
+                )
             })
             .await
             .map_err(|error| error.to_string())?;
         for app in &self.inner.apps {
             self.inner.grants.grant(app.clone(), route.clone());
         }
+        self.inner.grants.grant_default(route.clone());
+        for ((id, app), access) in self.inner.access.lock().await.iter() {
+            if *id == mere.id {
+                self.publish_access(&domain, app, access);
+            }
+        }
         served.insert(domain, shared);
         Ok(route)
+    }
+}
+
+/// Recheck live owner policy before factory construction and on every read
+/// or write. Existing sessions cannot keep reading after a denial or ambient
+/// opt-out. Ambient routes offer graph reads only and accept no intents.
+struct AccessEndpoint {
+    endpoint: MereEndpoint,
+    grants: AppRouteGrants,
+    request: AppRequest,
+    ambient: bool,
+}
+
+impl AccessEndpoint {
+    fn open(
+        shared: Arc<MereShared>,
+        context: &AdmittedEndpointContext,
+        grants: AppRouteGrants,
+        route: &str,
+        ambient: bool,
+    ) -> Result<Self, String> {
+        let app = context
+            .application()
+            .ok_or("mere access requires an admitted application")?;
+        let request = AppRequest {
+            app: AppId::new(app),
+            route: AppRouteId::new(route).map_err(|error| error.to_string())?,
+        };
+        grants
+            .current()
+            .admit(&request)
+            .map_err(|error| error.to_string())?;
+        Ok(Self {
+            endpoint: MereEndpoint::open_mode(shared, context, ambient)?,
+            grants,
+            request,
+            ambient,
+        })
+    }
+    fn check(&self) -> Result<(), String> {
+        self.grants
+            .current()
+            .admit(&self.request)
+            .map(|_| ())
+            .map_err(|error| error.to_string())
+    }
+}
+
+impl ProjectionCatalog for AccessEndpoint {
+    fn describe(&self) -> EndpointDescriptor {
+        let mut descriptor = self.endpoint.describe();
+        if self.ambient {
+            descriptor
+                .projections
+                .retain(|offer| offer.request.session.0 == MERE_GRAPH);
+        }
+        descriptor
+    }
+}
+impl ProjectionSource for AccessEndpoint {
+    type Error = String;
+    fn snapshot(&mut self, request: ProjectionRequest) -> Result<ProjectionSnapshot, String> {
+        self.check()?;
+        if self.ambient && request.session.0 != MERE_GRAPH {
+            return Err("ambient routes expose graph material only".into());
+        }
+        let mut snapshot = self.endpoint.snapshot(request)?;
+        if self.ambient {
+            for offers in snapshot.presentation.offers.values_mut() {
+                for offer in offers {
+                    offer.semantics.actions.clear();
+                }
+            }
+        }
+        Ok(snapshot)
+    }
+}
+impl PresentationSource for AccessEndpoint {
+    type Error = String;
+    fn resource(&mut self, request: ResourceRequest) -> Result<ResourceResponse, String> {
+        self.check()?;
+        if self.ambient && request.session.0 != MERE_GRAPH {
+            return Err("ambient routes expose graph material only".into());
+        }
+        self.endpoint.resource(request)
+    }
+}
+impl IntentSink for AccessEndpoint {
+    type Error = String;
+    fn invoke(&mut self, intent: IntentInvocation) -> Result<IntentResult, String> {
+        self.check()?;
+        if self.ambient {
+            return Ok(IntentResult::Rejected {
+                reason: "ambient mere access is read-only; open the mere explicitly to edit it"
+                    .into(),
+            });
+        }
+        self.endpoint.invoke(intent)
+    }
+}
+impl ProjectionNoticeSource for AccessEndpoint {
+    type Error = String;
+    fn poll_notice(&mut self) -> Result<Option<CarrierNotice>, String> {
+        self.check()?;
+        let notice = self.endpoint.poll_notice()?;
+        Ok(notice.filter(|notice| !self.ambient || notice.session.0 == MERE_GRAPH))
     }
 }
 
@@ -270,13 +510,27 @@ struct MereEndpoint {
 }
 
 impl MereEndpoint {
-    fn open(shared: Arc<MereShared>, context: &AdmittedEndpointContext) -> Result<Self, String> {
+    fn open_mode(
+        shared: Arc<MereShared>,
+        context: &AdmittedEndpointContext,
+        ambient: bool,
+    ) -> Result<Self, String> {
         let app = context
             .application()
             .ok_or("a mere's route serves admitted applications only")?
             .to_string();
         run(async {
-            let attached = shared.latest(&app).await?;
+            let attached = if ambient {
+                shared
+                    .sessions()
+                    .latest_live()
+                    .await
+                    .map_err(|error| error.to_string())?
+                    .ok_or("this mere has no live material for ambient reading")?
+                    .session_id
+            } else {
+                shared.latest(&app).await?
+            };
             let host = shared.host(attached).await?;
             let seen_graph = {
                 let host = host.lock().await;
@@ -817,6 +1071,7 @@ mod tests {
         catalog: AppEndpointCatalog,
         grants: AppRouteGrants,
         route: String,
+        routes: MereRoutes,
     }
 
     async fn fixture(persona_n: u128, domain: &str) -> Fixture {
@@ -834,7 +1089,7 @@ mod tests {
             vec![AppId::new("turnstone"), AppId::new("knot-editor")],
         );
         catalog
-            .update(|catalog| reservoir.register(catalog, Some(routes)))
+            .update(|catalog| reservoir.register(catalog, Some(routes.clone())))
             .await
             .unwrap();
         let mut door = catalog
@@ -858,6 +1113,7 @@ mod tests {
             catalog,
             grants,
             route: mere_route_id(domain),
+            routes,
         }
     }
 
@@ -1384,5 +1640,278 @@ mod tests {
             panic!("{fork_log:?}")
         };
         assert_eq!((*from, forked_via), (parent, &knot_editor));
+    }
+    #[tokio::test(flavor = "multi_thread")]
+    async fn access_is_default_for_admitted_apps_and_ambient_is_independent() {
+        let fixture = fixture(24, "divination").await;
+        let mere = fixture.reservoir.meres().await.remove(0);
+        // Admission can precede or follow serving; no per-mere grant needed.
+        fixture.grants.grant(
+            AppId::new("cleromancy"),
+            ResidentEndpointRoute::new("identity", MERE_NOTICE_POLL).unwrap(),
+        );
+        let mut explicit = fixture.attach("cleromancy").await;
+        let before = graph(&mut explicit);
+        let ambient_id = ambient_mere_route_id("divination");
+        let request = |app: &str, route: &str| AppRequest {
+            app: AppId::new(app),
+            route: AppRouteId::new(route).unwrap(),
+        };
+        assert!(
+            fixture
+                .grants
+                .current()
+                .admit(&request("cleromancy", &fixture.route))
+                .is_ok()
+        );
+        assert!(
+            fixture
+                .grants
+                .current()
+                .admit(&request("unknown", &fixture.route))
+                .is_err()
+        );
+        assert!(
+            fixture
+                .grants
+                .current()
+                .admit(&request("cleromancy", &ambient_id))
+                .is_err()
+        );
+        assert!(
+            fixture
+                .routes
+                .set_access(
+                    &fixture.reservoir,
+                    mere.id,
+                    AppId::new("unknown"),
+                    false,
+                    true,
+                    AppId::new("turnstone")
+                )
+                .await
+                .is_err()
+        );
+
+        fixture
+            .routes
+            .set_access(
+                &fixture.reservoir,
+                mere.id,
+                AppId::new("cleromancy"),
+                false,
+                true,
+                AppId::new("turnstone"),
+            )
+            .await
+            .unwrap();
+        assert!(
+            fixture
+                .grants
+                .current()
+                .admit(&request("knot-editor", &ambient_id))
+                .is_err()
+        );
+        let mut ambient = fixture
+            .catalog
+            .update(|catalog| catalog.open(&ambient_id, &context("cleromancy")))
+            .await
+            .unwrap();
+        assert_eq!(ambient.describe().projections.len(), 1);
+        let read = projection(&mut ambient, 0);
+        assert!(
+            read.presentation
+                .offers
+                .values()
+                .flatten()
+                .all(|offer| offer.semantics.actions.is_empty())
+        );
+        for intent in [
+            MINT_SESSION_INTENT,
+            FORK_SESSION_INTENT,
+            TRASH_SESSION_INTENT,
+            session_item::SET_VIEW_INTENT,
+            session_item::APPLY_EDITS_INTENT,
+        ] {
+            let mut invocation = apply(&read, vec![node(31)]);
+            invocation.intent = intent.into();
+            assert!(matches!(
+                ambient.invoke(invocation).unwrap(),
+                IntentResult::Rejected { .. }
+            ));
+        }
+        // No opt-in on another domain and no access through the sessions path.
+        assert!(
+            fixture
+                .grants
+                .current()
+                .admit(&request("cleromancy", &ambient_mere_route_id("notes")))
+                .is_err()
+        );
+        let sessions = MereEndpoint::sessions_request();
+        assert!(ambient.snapshot(sessions).is_err());
+
+        fixture
+            .routes
+            .set_access(
+                &fixture.reservoir,
+                mere.id,
+                AppId::new("cleromancy"),
+                true,
+                true,
+                AppId::new("turnstone"),
+            )
+            .await
+            .unwrap();
+        assert!(
+            fixture
+                .grants
+                .current()
+                .admit(&request("cleromancy", &fixture.route))
+                .unwrap_err()
+                .to_string()
+                .contains("explicitly denied")
+        );
+        assert!(
+            fixture
+                .grants
+                .current()
+                .admit(&request("cleromancy", &ambient_id))
+                .is_err()
+        );
+        assert!(explicit.invoke(apply(&before, vec![node(32)])).is_err());
+        assert!(ambient.snapshot(read_request(&ambient)).is_err());
+        assert!(
+            fixture
+                .catalog
+                .update(|catalog| catalog.open(&fixture.route, &context("cleromancy")))
+                .await
+                .is_err()
+        );
+        // A denied application cannot enumerate or ensure the hidden mere.
+        let mut reservoir = fixture
+            .catalog
+            .update(|catalog| catalog.open(RESIDENT_RESERVOIR_ROUTE, &context("cleromancy")))
+            .await
+            .unwrap();
+        let listed = projection(&mut reservoir, 0);
+        assert_eq!(listed.presentation.bindings.len(), 1);
+        let ensure = IntentInvocation {
+            session: listed.session.clone(),
+            target: InstanceId(0),
+            observed_epoch: listed.scene.epoch,
+            observed_revision: listed.scene.revision,
+            intent: RESERVOIR_ENSURE_MERE_INTENT.into(),
+            payload: serde_json::to_vec(&EnsureMereV1::new("divination")).unwrap(),
+        };
+        assert!(matches!(
+            reservoir.invoke(ensure).unwrap(),
+            IntentResult::Rejected { .. }
+        ));
+
+        // Removing the denial retains the separately recorded ambient opt-in.
+        fixture
+            .routes
+            .set_access(
+                &fixture.reservoir,
+                mere.id,
+                AppId::new("cleromancy"),
+                false,
+                true,
+                AppId::new("turnstone"),
+            )
+            .await
+            .unwrap();
+        assert!(
+            fixture
+                .grants
+                .current()
+                .admit(&request("cleromancy", &ambient_id))
+                .is_ok()
+        );
+        fixture
+            .routes
+            .set_access(
+                &fixture.reservoir,
+                mere.id,
+                AppId::new("cleromancy"),
+                false,
+                false,
+                AppId::new("turnstone"),
+            )
+            .await
+            .unwrap();
+        assert!(ambient.snapshot(read_request(&ambient)).is_err());
+        assert!(
+            fixture
+                .grants
+                .current()
+                .admit(&request("cleromancy", &fixture.route))
+                .is_ok()
+        );
+        let decisions = fixture.reservoir.access_decisions().await;
+        assert_eq!(decisions.len(), 1);
+        assert_eq!(decisions[0].2.author.via.as_deref(), Some("turnstone"));
+    }
+
+    fn read_request(endpoint: &ResidentEndpointSession) -> ProjectionRequest {
+        endpoint.describe().projections[0].request.clone()
+    }
+    #[tokio::test(flavor = "multi_thread")]
+    async fn reservoir_access_intent_records_the_admitted_author_and_validates_payload() {
+        use crate::resident_reservoir::{RESERVOIR_SET_ACCESS_INTENT, SetMereAccessV1};
+        let fixture = fixture(25, "divination").await;
+        let mere = fixture.reservoir.meres().await.remove(0);
+        let mut control = fixture
+            .catalog
+            .update(|catalog| catalog.open(RESIDENT_RESERVOIR_ROUTE, &context("turnstone")))
+            .await
+            .unwrap();
+        let snapshot = projection(&mut control, 0);
+        let payload = SetMereAccessV1::new(mere.id, &AppId::new("knot-editor"), true, false);
+        let invoke = |bytes| IntentInvocation {
+            session: snapshot.session.clone(),
+            target: InstanceId(0),
+            observed_epoch: snapshot.scene.epoch,
+            observed_revision: snapshot.scene.revision,
+            intent: RESERVOIR_SET_ACCESS_INTENT.into(),
+            payload: bytes,
+        };
+        let mut spoofed = serde_json::to_value(&payload).unwrap();
+        spoofed["author"] = "a different person".into();
+        assert!(matches!(
+            control
+                .invoke(invoke(serde_json::to_vec(&spoofed).unwrap()))
+                .unwrap(),
+            IntentResult::Rejected { .. }
+        ));
+        assert!(fixture.reservoir.access_decisions().await.is_empty());
+        assert_eq!(
+            control
+                .invoke(invoke(serde_json::to_vec(&payload).unwrap()))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        assert!(matches!(
+            control
+                .invoke(invoke(serde_json::to_vec(&payload).unwrap()))
+                .unwrap(),
+            IntentResult::Stale { .. }
+        ));
+        let decisions = fixture.reservoir.access_decisions().await;
+        assert_eq!(decisions.len(), 1);
+        assert_eq!(decisions[0].1, AppId::new("knot-editor"));
+        assert!(decisions[0].2.denied && !decisions[0].2.ambient);
+        assert_eq!(decisions[0].2.author.via.as_deref(), Some("turnstone"));
+        assert!(
+            fixture
+                .grants
+                .current()
+                .admit(&AppRequest {
+                    app: AppId::new("knot-editor"),
+                    route: AppRouteId::new(&fixture.route).unwrap()
+                })
+                .is_err()
+        );
     }
 }

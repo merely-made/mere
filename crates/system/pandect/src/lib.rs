@@ -212,8 +212,8 @@ pub use persona_settings_store::{
     persona_settings_path, save_persona_settings,
 };
 pub use reservoir::{
-    DomainId, MERE_RECORD_SCHEMA, MERES_DIR, MereId, MereRecord, RESERVOIR_DB_FILENAME,
-    RESERVOIR_DIR, ReservoirError, ReservoirStore, mere_dir, reservoir_dir,
+    DomainId, MERE_RECORD_SCHEMA, MERES_DIR, MereApplicationAccess, MereId, MereRecord,
+    RESERVOIR_DB_FILENAME, RESERVOIR_DIR, ReservoirError, ReservoirStore, mere_dir, reservoir_dir,
 };
 #[cfg(not(target_arch = "wasm32"))]
 pub use reservoir::{open_mere_backend, open_reservoir_backend};
