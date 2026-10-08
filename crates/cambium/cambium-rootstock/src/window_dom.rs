@@ -13,8 +13,8 @@
 
 use genet_scripted_dom::{NodeId, ScriptedDom};
 use layout_dom_api::{
-    AttributeView, DoctypeView, LayoutDom, LocalName, Namespace, NodeKind, QualName, QuirksMode,
-    ShadowRootInit,
+    AttributeView, DoctypeView, FormControlState, LayoutDom, LocalName, Namespace, NodeKind,
+    QualName, QuirksMode, ShadowRootInit,
 };
 
 /// A window's subtree of `dom`, rooted at `root`.
@@ -198,6 +198,14 @@ impl LayoutDom for WindowDom<'_> {
         }
     }
 
+    fn form_control_state(&self, id: NodeId) -> Option<FormControlState> {
+        if self.is_root(id) {
+            None
+        } else {
+            self.dom.form_control_state(id)
+        }
+    }
+
     fn doctype_data(&self, id: NodeId) -> Option<DoctypeView<'_>> {
         self.dom.doctype_data(id)
     }
@@ -233,6 +241,39 @@ mod tests {
         ));
         dom.append_child(parent, node);
         node
+    }
+
+    #[test]
+    fn native_form_state_reads_through_the_window_view() {
+        let mut dom = ScriptedDom::new();
+        let doc = dom.document();
+        let window = element(&mut dom, doc);
+        let input = dom.create_element(cambium::html_qual("input"));
+        dom.set_attribute(input, cambium::attr_qual("value"), "default");
+        dom.append_child(window, input);
+        dom.set_form_control_value(input, "current").unwrap();
+
+        let view = WindowDom::new(&dom, window);
+        let state = view
+            .form_control_state(input)
+            .expect("the live arena state");
+        assert_eq!(state, dom.form_control_state(input).unwrap());
+        assert_eq!(state.value, "current");
+        assert_eq!(
+            view.attribute(input, &Namespace::from(""), &LocalName::from("value")),
+            Some("default")
+        );
+        assert!(
+            WindowDom::document(&dom)
+                .form_control_state(input)
+                .is_some()
+        );
+        assert!(
+            WindowDom::new(&dom, input)
+                .form_control_state(input)
+                .is_none(),
+            "a window root is exposed as a document, not as a control"
+        );
     }
 
     /// A shadow tree nested in another: the whole document passes every shadow

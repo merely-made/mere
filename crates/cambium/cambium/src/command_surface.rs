@@ -22,6 +22,20 @@ pub struct CommandItem {
     pub children: Vec<CommandItem>,
 }
 
+/// A registered command drawn as a row.
+impl From<&::command_menu::Command> for CommandItem {
+    fn from(command: &::command_menu::Command) -> Self {
+        let mut item = CommandItem::new(command.label.clone()).with_id(command.id.clone());
+        if let Some(shortcut) = &command.shortcut {
+            item = item.with_shortcut(shortcut.clone());
+        }
+        if let Some(reason) = &command.disabled_reason {
+            item = item.disabled_because(reason.clone());
+        }
+        item
+    }
+}
+
 impl CommandItem {
     pub fn new(label: impl Into<String>) -> Self {
         let label = label.into();

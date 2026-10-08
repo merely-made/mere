@@ -35,7 +35,7 @@ keeper = [
 ]
 # Freedesktop Secret Service 0.2 adapter. The portable sealed collection model
 # compiles everywhere; the D-Bus server is Linux-only.
-secret-service = ["dep:thiserror", "dep:tokio", "dep:zbus"]
+secret-service = ["dep:thiserror", "dep:tokio", "dep:tracing", "dep:zbus"]
 
 [dependencies]
 # The check conclusions and faults, named directly (insigne proofs plan, B).
@@ -70,6 +70,8 @@ tokio = { version = "1", features = ["macros", "net", "rt", "sync", "time"], opt
 zbus = { version = "5.19", default-features = false, features = ["tokio"], optional = true }
 
 [dev-dependencies]
+# The Linux Secret Service receipt reads its lock signal as a stream.
+futures-util = "0.3"
 gaz = { workspace = true, features = ["muniment"] }
 gazette.workspace = true
 muniment = { workspace = true, features = ["postcard", "redb"] }

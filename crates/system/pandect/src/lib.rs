@@ -240,9 +240,7 @@ pub use switcher_thumbnail::{
     SwitcherThumbnail, SwitcherThumbnailOptions, ThumbnailEdge, ThumbnailNode,
     build_switcher_thumbnail_with,
 };
-pub use view_intent_store::{
-    CameraSnapshot, CommandMenuView, HiddenRelationRecord, VIEW_INTENT_DIR, ViewIntent,
-};
+pub use view_intent_store::{CameraSnapshot, HiddenRelationRecord, VIEW_INTENT_DIR, ViewIntent};
 pub use wallet_grant::{
     BlindedSlotId, DEVICE_GRANT_SCHEMA_VERSION, DeviceGrantError, EnrollmentBundleError,
     GrantStanding, PairedRemoteAuthGrantSpec, PairingCodeError, PairingMaterialError,

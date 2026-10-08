@@ -2,17 +2,24 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-//! One command set behind every command surface (Scenograph editor plan,
-//! track C1, SE28 to SE30).
+//! One home for commands (Scenograph editor plan, track C2, SE45 to SE48).
 //!
-//! A host registers its commands; the person's choices ride beside them as
-//! [`CommandChoices`]: commands added to and removed from the defaults, and the
-//! recently used ones. [`CommandSet::menu`] composes what a surface shows, in
-//! one order every surface shares: the commands for where it was opened lead
-//! (Turnstone's rule, harvested at SE32), then the defaults, then the recent
-//! ones. A query searches every command instead. Storage is the host's.
+//! A host registers its commands in a [`CommandSet`]; the person's choices
+//! ride beside them as [`CommandChoices`]: commands added to and removed from
+//! the defaults, and the recently used ones. [`CommandSet::menu`] composes
+//! what a surface shows, in one order every surface shares: the commands for
+//! where it was opened lead (Turnstone's rule, harvested at SE32), then the
+//! kept ones, then the recent ones. A query searches every command instead.
+//! [`MenuSession`] is a palette's state while it is open, and [`catalogue`]
+//! holds the ids hosts share. Storage and drawing
+//! are the host's; Cambium draws a command as a `CommandItem`.
 
-use crate::CommandItem;
+pub mod catalogue;
+mod session;
+
+use serde::{Deserialize, Serialize};
+
+pub use session::MenuSession;
 
 /// A command a host offers.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -47,17 +54,6 @@ impl Command {
         self
     }
 
-    fn item(&self) -> CommandItem {
-        let mut item = CommandItem::new(self.label.clone()).with_id(self.id.clone());
-        if let Some(shortcut) = &self.shortcut {
-            item = item.with_shortcut(shortcut.clone());
-        }
-        if let Some(reason) = &self.disabled_reason {
-            item = item.disabled_because(reason.clone());
-        }
-        item
-    }
-
     fn matches(&self, query: &str) -> bool {
         [&self.label, &self.category, &self.id]
             .iter()
@@ -66,11 +62,17 @@ impl Command {
 }
 
 /// The person's choices: commands added to the defaults, defaults removed,
-/// and the recently used commands, most recent first.
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+/// and the recently used commands, most recent first. Ids are the host's.
+/// Hosts store it as a view, not graph truth (SE31); each list defaults to
+/// empty, so what pandect's `CommandMenuView` or Turnstone's `CommandMenuV1`
+/// wrote reads back unchanged.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CommandChoices {
+    #[serde(default)]
     pub added: Vec<String>,
+    #[serde(default)]
     pub removed: Vec<String>,
+    #[serde(default)]
     pub recent: Vec<String>,
 }
 
@@ -169,7 +171,7 @@ impl CommandSet {
         choices: &CommandChoices,
         context: Option<&str>,
         query: &str,
-    ) -> Vec<CommandItem> {
+    ) -> Vec<&Command> {
         let query = query.trim().to_lowercase();
         let contextual = self
             .commands
@@ -194,7 +196,6 @@ impl CommandSet {
                 seen.push(&command.id);
                 fresh
             })
-            .map(Command::item)
             .collect()
     }
 
@@ -253,7 +254,7 @@ mod tests {
         set
     }
 
-    fn ids(items: &[CommandItem]) -> Vec<&str> {
+    fn ids<'a>(items: &[&'a Command]) -> Vec<&'a str> {
         items.iter().map(|item| item.id.as_str()).collect()
     }
 
@@ -351,7 +352,27 @@ mod tests {
         let mut set = set();
         set.set_disabled("save-projection", Some("nothing to save".into()));
         let menu = set.menu(&CommandChoices::default(), None, "save");
-        assert!(menu[0].disabled);
+        assert!(menu[0].disabled_reason.is_some());
         assert_eq!(menu[0].disabled_reason.as_deref(), Some("nothing to save"));
+    }
+
+    #[test]
+    fn choices_read_what_the_older_stores_wrote() {
+        // pandect's `CommandMenuView` and Turnstone's `CommandMenuV1` wrote
+        // these field names, each list optional.
+        let full: CommandChoices =
+            serde_json::from_str(r#"{"added":["a"],"removed":["b"],"recent":["c","a"]}"#)
+                .expect("reads");
+        assert_eq!(full.added, ["a"]);
+        assert_eq!(full.removed, ["b"]);
+        assert_eq!(full.recent, ["c", "a"]);
+        let sparse: CommandChoices = serde_json::from_str(r#"{"recent":["c"]}"#).expect("reads");
+        assert_eq!(sparse.recent, ["c"]);
+        assert!(sparse.added.is_empty() && sparse.removed.is_empty());
+        let written = serde_json::to_string(&full).expect("writes");
+        assert_eq!(
+            written,
+            r#"{"added":["a"],"removed":["b"],"recent":["c","a"]}"#
+        );
     }
 }

@@ -38,6 +38,7 @@ use insigne::delegation::{
     SignedDelegationRevocation,
 };
 use personae::carry::{ACTION_SSH_LOGIN, ACTION_SSH_PTY, DeviceId, device_capability_scope};
+use personae::delegation::Issue;
 use personae::ssh_ca::{SshCertAuthority, UserCertRequest, serial_for_device};
 use personae::ssh_krl::RevocationLedger;
 use personae::{IdentityProvider, InMemoryProvider};

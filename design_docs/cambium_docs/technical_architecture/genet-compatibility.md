@@ -62,6 +62,317 @@ rendering engine.
 
 ## Current Mere-owned compatibility
 
+### 2026-10-07 Forms field ownership migration
+
+**Status, 2026-10-08:** the permanent Genet Forms repin at Mere `632c1d29`
+qualifies against public Git sources on ThinkPad: 362 package passes, 63
+native-host passes and a Wasm accessibility-example compile, with zero failures
+and two existing ignored doctests. F6's accessible leaves are included. The
+older F5 public-pin sibling gates pass; their refreshed integration gates and
+publication are tracked separately in the Forms plan.
+The implementation plan and numbered rulings live in Genet's
+[dated Forms plan](https://github.com/merely-made/genet/blob/main/design_docs/2026-10-07_forms_value_validation_submission_plan.md).
+F3 authorizes this Mere migration and verified repin. The current modern Genet
+family pins published `e84f9c7f9aec23320c539784961d1465f8a53a9b`; published
+Knot retains its two explicit Genet `965b64e2` identities. The dated receipts
+below retain their original source boundaries.
+
+F6 preserves the app textbox's identity, existing name, committed value,
+geometry, state, actions and focus while excluding its decorative accessibility
+descendants in the neutral projection and the native AccessKit adapter. The
+browser mirror inherits that neutral topology. Drawing children stay in the
+DOM. F5 limits sibling edits to selectors, caret routing and existing labels in
+Turnstone and Cleromancy; unnamed fields stay unnamed. The numbered rulings in
+the Forms plan own these decisions; their qualified local gates are recorded below.
+
+Native HTML inputs and textareas now keep live values in Genet's form-control
+arena. Cambium's `TextInput` owns app editing and paints highlighted committed
+runs, IME preedit, ghosts and carets as children. Those fields therefore use
+ordinary `div` elements with `role=textbox`, rather than native HTML form tags.
+Multiline fields carry `aria-multiline=true`; public field view APIs stay the
+same. Existing field CSS, caret lookup and semantic tests follow the app marker.
+Known visible labels are attached explicitly to the textbox, since a `div`
+cannot inherit a native input's wrapping-label association.
+
+`data-cambium-text-value` carries only `TextInput::text()`. Rootstock's existing
+neutral `document_projection` and the native AccessKit adapter read that
+Mere-owned marker on explicit textboxes. They preserve node identity, labels,
+geometry, focus and actions while exposing committed value and multiline/editable
+state. Preedit, ghost and caret children remain in drawing and are excluded from
+the accessible value. Genet receives no Cambium marker contract. Text-valued
+accessibility SetValue routing remains a separate existing gap.
+
+Qualification uses the focused Cambium, Rootstock, native adapter and native
+host package tests, including single-line editing, IME/caret routing, Unicode
+committed-value projection, catalog behavior and the browser accessibility
+example. A local consumer run must identify the exact candidate Genet source and
+lock; the later published-source repin must separately verify coherent family
+identities and repeat the affected gates. Human assistive-technology acceptance
+and standalone browser-hosted operation are not inferred from unit tests.
+
+Preparation against committed Genet `b8a3ec1d6abe88e07438ca4d53b9ca4d2b92111d`
+preserves all 1,688 locked package versions, dependency arrays and checksums.
+Only 33 current Genet, nine Boa and three Vano source revisions move; the two
+legacy Knot-owned Genet identities stay unchanged. The default resolved graph
+does not activate either JavaScript engine. The candidate lock is frozen as
+`testing/genet/forms/mere-forms-lock-preparation.Cargo.lock` under the Code root.
+The catalog acceptance program passes and regenerates both HTML receipts with
+the app textboxes and their existing names; this is artifact preparation, with
+fresh consumer tests still pending. Each run restores the original manifest and
+lock and checks all tracked source bytes and mtimes outside its owned outputs.
+The optional Cambium `highlight` feature also needs its own library test gate.
+
+The first four-package consumer build fails before tests: Rootstock's
+`MutationRouter` exhaustively matches the old mutation enum. The compatibility
+repair routes `FormControlStateChanged` by its node to the owning window and
+forwards arena state through `WindowDom`, preserving the root's document view.
+Two fixtures cover live value versus default attribute and settled layouts in
+two windows. Independent controls will disable routing and forwarding before a
+fresh restored run. These changes require the candidate seam and are not claimed
+to compile against the retained starting Genet pin; publication must carry the
+verified repin with this migration.
+
+The owned-snapshot correction qualifies four packages: Cambium 252, Rootstock
+72, native accessibility 22 and browser mirror nine passing tests, with zero
+failures and two existing ignored doctests. The native routing target then
+finds a missing trait import in its migrated fixture before tests; that import
+is corrected for the next gate. Catalog and highlight qualification and the
+independent negative controls remain pending.
+
+The mirror review finds a separate accessible-tree fork. Genet projects
+descendant elements beneath app DIV textboxes; Rootstock decorates only the
+parent's committed value, and the browser mirror lowers both that value and
+the projected children. Current full-pipeline tests use an empty field and
+check its name/role, while decorated-value fixtures stop at the neutral/native
+adapters. Mark is asked whether to expose app textboxes as accessible leaves
+across adapters or prune children only in the browser mirror. No pruning policy
+is implemented before that ruling; drawn children stay app-owned in either case.
+
+The focused native gate executes 59 passes and one failure before stopping:
+an unsized app field shrinks to its child text (87px for short text, 400px for
+long text), whereas the former native input has a value-independent 20-column
+width. The repair gives single-line fields a font-relative substitute intrinsic
+width through `contain-intrinsic-size`, preserving Genet's existing half-em
+column metric. `--cambium-field-intrinsic-width` lets the host override that
+fallback, and explicit host CSS widths retain priority. The new fallback and
+its host override require fresh native, component and catalog gates.
+
+The attempted substitute does not qualify: the fresh six-target native run
+executes 61 passes and two failures, with the same 87px short field and 400px
+long field. Sources are stable and the starting manifest/lock are restored
+exactly. The host harness now exposes its existing live computed-style reader
+so these regressions report resolved sizing properties before any further
+layout repair is chosen. The width contract remains open.
+
+The diagnostic run confirms the live host resolves the requested containment
+and substitute sizes correctly, including the host's 12em override; six other
+field cases pass. The remaining width failure reaches Genet's CSS layout
+handoff, so a bounded repair awaits an explicit checkpoint. Independent
+Rootstock native-state bridge controls proceed while that ruling, accessible
+leaf policy and sibling scope are pending without response deadlines.
+
+Mark approves the bounded Genet layout repair as F4 in the dated Forms plan.
+Mere's width contract remains unqualified until its repaired candidate passes
+fresh consumer gates. The other two questions remain pending.
+
+The first disabled-routing attempt executes 71 passes and the intended single
+failure, but is not qualified: this note changed during its guarded run, and
+the end-of-run process scan could not inspect a compiler that then exited.
+The starting manifest, lock and router are restored. Preserve that attempt;
+a committed-source retry must establish the control and a fresh restored pass.
+
+The bounded Genet repair is qualified at `e84f9c7f`: 841 passes across Livery,
+documents, render and WPT, with zero failures and nine existing ignores. Its
+substitute route retains Block/Leaf root admission. Mere's frozen revised lock
+changes 33 source revisions and 31 dependency source references without moving
+versions, graph shape/checksums or the two legacy Knot identities. Locked
+metadata resolution and actual native-field tests remain required here.
+
+Locked resolution now verifies the same 1,564-node default graph after source
+revision and checkout-path normalization. It resolves 28 of 33 locked current
+Genet packages, preserves both legacy identities and activates neither engine.
+The uncached Git revision is fetched from the primary checkout using only the
+process-local rewrite. All six native targets then pass 63 tests, including
+the repaired default and configurable widths and existing caret/scroll/routing
+behavior. Exact manifest/lock restoration and unowned source bytes/mtimes are
+verified. Catalog and bridge-control qualification follow; the two outstanding
+policy/scope questions still await Mark's answers.
+
+Fresh catalog generation at the repaired candidate changes only the two
+single-line textbox styles in each HTML receipt, adding the configured
+containment substitute. Its guarded transaction preserves all other tracked
+source bytes and mtimes and restores the starting manifest and lock. Generation
+is not a catalog test pass. A read-only multiline review finds no newline or
+multiline-state loss through neutral, native or browser lowering; the existing
+fixtures cover those seams separately, rather than as one full-pipeline case.
+
+The fresh native bridge controls each produce 71 passes and exactly their
+intended failure when routing or forwarding is disabled. A fresh restored
+Rootstock library run passes all 72 tests. Catalog acceptance passes both tests,
+the optional highlighting library passes 254, and the browser accessibility
+example compiles for `wasm32-unknown-unknown` with the existing getrandom setting.
+All use the frozen `e84f9c7f` candidate lock and restore the starting inputs.
+The routing receipt also has an independent post-restoration source audit;
+later runs perform that second scan inside the guarded helper. These are local
+automated receipts, not browser-hosted operation or human AT acceptance. The
+accessible-leaf and sibling-scope questions remain pending.
+
+The final restored four-package gate at Mere `ee699000` passes 355 tests:
+Cambium 252, Rootstock 72, native accessibility 22 and browser mirror nine,
+with zero failures and two existing ignored doctests. The disabled committed-
+value control has exactly two intended failures and 74 other passes. Its first
+attempt is retained as unqualified because the helper expected the native test
+under `tests` rather than its actual `dpi_tests` module; the corrected fresh
+run validates, restores both producers with fresh mtimes, and precedes the
+restored pass. All guarded inputs remain unchanged outside owned restoration.
+
+Genet's fresh optimized runner passes all 15 value-model fixtures on both
+engines and its CSS guard reports `unexpected=0`; all sixteen summary counts
+match the starting guard and expectation files remain unchanged. The qualified
+product stays `e84f9c7f`; its frozen runner head is the documentation descendant
+`79a7f011`. This completed the gates authorized before F5 and F6; their
+implementation receipts follow below before final acceptance and the verified repin.
+
+The downstream audit found old tag checks in Turnstone and Cleromancy. F5 now
+authorizes their mechanical selector/caret/existing-label edits, committed in
+Turnstone `c951afa` and Cleromancy `523d54d` plus fixture correction `b6b521d`.
+Turnstone's corrected public-pin library passes 674 tests with zero failures
+and nine existing ignores. Cleromancy's `85c8f77` passes 12 library and three
+DOM checks with zero failures or ignores; its independent routing control
+produces 11 passes and exactly the intended marked-DIV failure.
+Consumers do not stamp
+Mere's marker or duplicate its committed-value projection; unnamed fields keep
+that state. Existing native-tag support preserves the current public pins.
+
+F6 is implemented and locally qualified at Mere `7d133ddc`. Neutral and native
+projections prune app textbox descendants; the browser mirror consumes the
+neutral topology. Native pruning follows producer decoration and removes hidden
+action routes. Nested descendant focus resolves to the surviving outer textbox.
+The drawing DOM remains intact. Unicode/newline fixtures, nested native focus
+and the full neutral-to-browser lowering cover these seams. Generated pseudo
+rows are traversed, without a separate pseudo fixture in this slice.
+
+`mere-forms-accessible-leaves-disabled` preserves committed-value decoration
+but disables pruning: 83 passes and exactly four intended failures across the
+neutral, native and browser libraries. The first restored run retains a Windows
+DLL-initialization launch failure before native tests (`0xc0000142`), so it is
+unqualified. The unchanged restored retry passes 357 tests: Cambium 252,
+Rootstock 72, native accessibility 23 and browser mirror 10, with zero failures
+and two existing ignored doctests. The fresh Wasm accessibility-example compile
+also passes. Guards verify unchanged unowned source bytes/mtimes and restore
+the starting manifest/lock. The same frozen `e84f9c7f` lock is used throughout.
+No published-source repin or human AT/browser operation is inferred.
+
+Published main `45f5a80c` is integrated locally at `2a89d8dc`, preserving its
+command/edit-history work. Fresh starting/candidate metadata qualify the
+combined graph: 1,566 packages, equal versions, dependency definitions, edges
+and features after authorized revision/checkout normalization, both legacy
+Knot identities retained and neither JavaScript engine active. The integrated
+1,690-row lock SHA256 is
+`06BCF3765C5FDA5282F24C4D675A919E297A3587AA4D9BFFCB0CB928DB4D1EF9`.
+The three leaf production/fixture files match the accepted negative control
+byte-for-byte. Fresh integrated positive gates pass Cambium 257, Rootstock 72,
+native accessibility 23 and browser mirror 10, with zero failures and two
+existing ignored doctests. All six native host targets pass 63 tests, and the
+Wasm accessibility example compiles. Guarded transactions preserve unowned
+bytes/mtimes and restore the live starting manifest/lock. The then-qualified
+repin patch is `Code/testing/genet/forms/mere-forms-integrated-repin.patch`;
+the later published Knot integration below supersedes this proposal.
+Publication and verification against the published Git source remain pending.
+Shared unpublished main also contains four other-owner Vault/Lattice
+documentation commits; a normal main push would carry them.
+
+Published Mere `f67f5080` is now integrated at `9105b1ef`, preserving Pelt,
+dataset and Knot-owner work. Its Knot `eabd4434` repin changes the source
+boundary: the starting graph has 1,564 packages; the Forms candidate has 1,566,
+with separate protected Fleece 0.5.0 and LayoutDom 0.1.1 at Knot's explicit
+Genet `965b64e2`. Mere's modern 33-package Genet family moves to `e84f9c7f`.
+Versions, package definitions, modern edges and features are preserved after
+revision mapping. Knot's edges remain at its published revision; LayoutDom's
+capture feature stays on the modern identity and neither JavaScript engine
+activates. The candidate's 1,690-row lock SHA256 is
+`3537E6067130E1D8993DAC7DB2F143CB9AA60099879F20EBD654DAE79CA97735`.
+
+Fresh current-source gates pass Cambium 257, Rootstock 72, native accessibility
+23 and browser mirror 10, with zero failures and two existing ignored doctests;
+all six native-host targets pass 63 tests and the Wasm accessibility example
+compiles. The first two-thread package run stalls after three GPU cases; only
+its owned test executable is terminated. Its guards restore all source/config/
+lock inputs, but the attempt remains unqualified. The unchanged full suite
+passes with one test thread, including every GPU case. Leaf production/fixture
+hashes still match the accepted four-failure negative control. Current receipts
+are `mere-forms-current-knot-packages-serial-retry`,
+`mere-forms-current-knot-native`, and `mere-forms-current-knot-wasm-a11y` under
+`Code/testing/genet/forms`. All guards preserve unowned bytes/mtimes and restore
+the starting inputs. The review patch
+`mere-forms-current-knot-repin-review.patch` passes `git apply --check`; its
+review-proposal JSON records the exact candidate manifest/lock byte hashes.
+The earlier raw-checkout patch and integration receipts remain historical.
+Publication and public-source verification still precede a permanent repin.
+
+Cleromancy's older public `OnKey` has no `.attr` method. Its bounded local
+`NamedText` view attaches only an existing visible name to Mere's produced node
+and forwards the field lifecycle/messages. It adds a direct import of
+already-locked Meristem 0.2.0 from the same Mere `8106c7c` family. The 1,005 lock
+packages retain their versions, sources and checksums; all 668 resolved package
+identities/features remain, with only the direct root edge added. Both public
+families remain unchanged: Mere `8106c7c`, Genet `34626a6c`. The final generic
+DOM setter avoids a test-only node import. Interim compile failures remain
+unqualified evidence. These checks prepare the sibling for app fields; family
+adoption remains a separate gate.
+
+Existing target `C:/t/cargo-targets/mere` is reused without another live owner;
+Genet's qualification retains its borrowed `C:/t/cargo-targets/genet-encoding`
+and `C:/t/cargo-homes/genet-streams` for the recorded gate owner. No new isolated
+target, Cargo home or worktree is created in this slice. The helper's generated
+bytecode under `Code/testing/genet/forms/__pycache__` was removed on 2026-10-08
+after Mark explicitly authorized cleanup. Its earlier automatic-review
+rejection ("blocked by policy") remains historical. Mark also authorized
+publication and push, and requested remaining serial tests on ThinkPad.
+
+### 2026-10-08 public-source Forms qualification on ThinkPad
+
+Mere `632c1d298dee1ecd5c3dfe00879c95d4a012f8ea` adopts Genet
+`e84f9c7f9aec23320c539784961d1465f8a53a9b` after integrating published Mere
+`4fd2f3f1`. The permanent manifest and lock preserve package versions,
+checksums, owner edges and resolved features after the authorized revision
+mapping. Metadata moves from 1,566 to 1,568 packages because published Knot
+`eabd4434` retains separate Fleece 0.5.0 and LayoutDom 0.1.1 identities at
+Genet `965b64e2`. The five selected Cambium roots retain the same 605-package
+dependency closure, which activates neither JavaScript engine. The committed
+lock SHA256 is
+`69eb637d64e7387179cda95b1a2e80768e076d95da29c24b9203d0c573551cd5`.
+
+On Fedora ThinkPad, Cargo 1.98.1 runs with one build job and one test thread.
+The four-package gate passes Cambium 257, Rootstock 72, native accessibility
+23 and browser mirror 10, with zero failures and two existing ignored doctests.
+All six native-host integration targets pass 63 tests; the Wasm `a11y_page`
+example compiles with its existing getrandom setting. These are automated
+tests and compilation, without a new physical window, browser operation or
+human assistive-technology receipt. Source, manifest and lock are stable across
+each run. The first package compile is interrupted when a separate Cargo owner
+appears; it runs no tests and remains unqualified. The unchanged serial retry
+supplies the complete result.
+
+Normal Cargo Git checkouts contain the exact clean published Genet and Knot
+commits. The audit finds no local source replacements or Git URL rewrites.
+Raw receipts use prefixes `thinkpad-forms-20261008-mere-packages-retry1`,
+`thinkpad-forms-20261008-mere-native-host` and
+`thinkpad-forms-20261008-mere-web-wasm` under
+`Code/testing/genet/forms/thinkpad`. Graph and provenance qualification are
+`thinkpad-forms-graph-qualification.json` and
+`thinkpad-forms-20261008-provenance.json` under `Code/testing/genet/forms`.
+The later merge of published Mere `9ed44a5e` changes only documentation and
+packages outside the tested closure; its manifests, lock and tested closure
+remain identical. Mark's publication authorization includes the normal main
+push carrying the preserved shared history.
+
+The remote Mere worktree is required by an existing primary-checkout Knot
+lane; Turnstone's worktree protects primary untracked receipts. Both use
+stable repository targets. Worktrees can be removed after publication and
+evidence transfer when they have no live owner. The primary work and other
+agents' targets remain preserved.
+
 ### 2026-09-29 generated accessible-name adoption
 
 **Status:** implemented and verified against the published source. All 207 tests

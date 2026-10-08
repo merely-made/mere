@@ -12,6 +12,7 @@ use zbus::message::Header;
 use zbus::object_server::{ObjectServer, SignalEmitter};
 use zbus::zvariant::{OwnedObjectPath, OwnedValue, Value};
 
+use super::prompt::{PromptInterface, prompt_path};
 use super::state::{SecretServiceOperation, ServiceState};
 use super::{
     COLLECTION_LABEL_PROPERTY, DbusSecret, SecretBytes, SecretDbusError, alias_path,
@@ -107,6 +108,7 @@ impl ServiceInterface {
         } else {
             emitter.collection_changed(path.clone()).await?;
         }
+        self.state.refresh_snapshot();
         Ok((path, root_path()))
     }
 
@@ -120,27 +122,41 @@ impl ServiceInterface {
             .authorize(connection, &header, SecretServiceOperation::Search)
             .await?;
         let attributes = attributes.into_iter().collect::<BTreeMap<_, _>>();
-        let items = self.state.store.search(&attributes)?;
-        self.state
-            .split_locked(items.into_iter().map(|item| item.id))
+        let items = self.state.search(&attributes)?;
+        Ok(self
+            .state
+            .split_locked(items.into_iter().map(|item| item.id)))
     }
 
+    /// Unlocked already: the objects, no prompt. Locked: a Prompt that runs
+    /// the resident's native unlock (ruling 67).
     async fn unlock(
         &self,
         objects: Vec<OwnedObjectPath>,
         #[zbus(header)] header: Header<'_>,
         #[zbus(connection)] connection: &Connection,
+        #[zbus(object_server)] server: &ObjectServer,
     ) -> Result<(Vec<OwnedObjectPath>, OwnedObjectPath), SecretDbusError> {
         self.state
             .authorize(connection, &header, SecretServiceOperation::Unlock)
             .await?;
-        let mut unlocked = Vec::new();
+        let mut held = Vec::new();
         for object in objects {
-            if self.state.unlock_object(&object)? {
-                unlocked.push(object);
+            if self.state.holds(&object)? {
+                held.push(object);
             }
         }
-        Ok((unlocked, root_path()))
+        if !self.state.locked() {
+            return Ok((held, root_path()));
+        }
+        let path = prompt_path();
+        server
+            .at(
+                path.clone(),
+                PromptInterface::new(Arc::clone(&self.state), path.clone(), held),
+            )
+            .await?;
+        Ok((Vec::new(), path))
     }
 
     async fn lock(
@@ -154,9 +170,13 @@ impl ServiceInterface {
             .await?;
         let mut locked = Vec::new();
         for object in objects {
-            if self.state.lock_object(&object)? {
+            if self.state.holds(&object)? {
                 locked.push(object);
             }
+        }
+        // Any object's lock is the whole vault's (ruling 68).
+        if !locked.is_empty() {
+            self.state.lock_vault()?;
         }
         Ok((locked, root_path()))
     }
@@ -178,7 +198,7 @@ impl ServiceInterface {
             let id = super::parse_item_path(&path).ok_or_else(|| {
                 SecretDbusError::NoSuchObject(format!("{path} is not a Secret Service item"))
             })?;
-            if self.state.item_locked(id)? {
+            if self.state.locked() {
                 continue;
             }
             self.state
@@ -209,7 +229,6 @@ impl ServiceInterface {
             .await?;
         Ok(self
             .state
-            .store
             .read_alias(name)?
             .map(collection_path)
             .unwrap_or_else(root_path))
@@ -243,6 +262,7 @@ impl ServiceInterface {
         if let Some(collection) = collection {
             register_alias(connection, Arc::clone(&self.state), name, collection).await?;
         }
+        self.state.refresh_snapshot();
         Ok(())
     }
 
@@ -260,7 +280,6 @@ impl ServiceInterface {
             .await?;
         Ok(self
             .state
-            .store
             .collections()?
             .into_iter()
             .map(|collection| collection_path(collection.id))

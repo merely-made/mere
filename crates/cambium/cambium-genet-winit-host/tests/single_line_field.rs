@@ -31,11 +31,11 @@ type Host = Harness<Field, Logic, Child>;
 
 const LONG: &str = "C:/Users/someone/AppData/Local/Temp/a/very/long/folder/structure/that/keeps/going/document.djot";
 
-const SIZED: &str = "input { position:absolute; left:10px; top:10px; width:200px; \
+const SIZED: &str = "[role=\"textbox\"] { position:absolute; left:10px; top:10px; width:200px; \
      padding:4px 8px; border:1px solid black; font-size:16px; }";
 
 /// No width anywhere: the field's width is its own default.
-const UNSIZED: &str = "input { position:absolute; left:10px; top:10px; \
+const UNSIZED: &str = "[role=\"textbox\"] { position:absolute; left:10px; top:10px; \
      padding:4px 8px; border:1px solid black; font-size:16px; }";
 
 fn root(_: &Field) -> Child {
@@ -54,13 +54,18 @@ fn host(value: &str, sheet: &str) -> Host {
             let focused = runner.focus()?;
             let dom = runner.dom();
             let dom_ref = dom.borrow();
-            (LayoutDom::element_name(&*dom_ref, focused)?.local.as_ref() == "input").then(|| {
-                FocusedTextSlot {
+            dom_ref
+                .attribute(
+                    focused,
+                    &layout_dom_api::Namespace::from(""),
+                    &layout_dom_api::LocalName::from("data-cambium-text-value"),
+                )
+                .is_some()
+                .then(|| FocusedTextSlot {
                     node: focused,
                     get: Box::new(|field: &Field| &field.text),
                     get_mut: Box::new(|field: &mut Field| &mut field.text),
-                }
-            })
+                })
         }),
         ..inert_hooks()
     };
@@ -84,8 +89,12 @@ fn host(value: &str, sheet: &str) -> Host {
 fn field(host: &Host) -> NodeId {
     fn find(dom: &ScriptedDom, node: NodeId) -> Option<NodeId> {
         if dom
-            .element_name(node)
-            .is_some_and(|name| name.local.as_ref() == "input")
+            .attribute(
+                node,
+                &layout_dom_api::Namespace::from(""),
+                &layout_dom_api::LocalName::from("data-cambium-text-value"),
+            )
+            .is_some()
         {
             return Some(node);
         }
@@ -98,6 +107,19 @@ fn field(host: &Host) -> NodeId {
 fn size(host: &Host) -> (f32, f32) {
     let (_, _, width, height) = host.painted_rect(field(host)).expect("the field paints");
     (width, height)
+}
+
+fn sizing_style(host: &Host) -> Vec<(&'static str, Option<String>)> {
+    [
+        "position",
+        "width",
+        "contain",
+        "contain-intrinsic-size",
+        "font-size",
+    ]
+    .into_iter()
+    .map(|property| (property, host.computed_value(field(host), property)))
+    .collect()
 }
 
 /// Focus the field with a click near its left edge.
@@ -130,10 +152,29 @@ fn a_long_value_stays_on_one_line_at_the_width_the_sheet_sets() {
 
 #[test]
 fn a_field_with_no_width_keeps_its_own_whatever_the_value() {
-    let short = size(&host("notes.djot", UNSIZED));
-    let long = size(&host(LONG, UNSIZED));
-    assert!(short.0 > 18.0, "the field has a width of its own");
+    let short_host = host("notes.djot", UNSIZED);
+    let long_host = host(LONG, UNSIZED);
+    let short = size(&short_host);
+    let long = size(&long_host);
+    assert_eq!(
+        short.0,
+        178.0,
+        "the former 20-column default plus padding and border; resolved {:?}",
+        sizing_style(&short_host)
+    );
     assert_eq!(long, short, "the value does not set the field's size");
+}
+
+#[test]
+fn a_host_can_set_the_unsized_fields_intrinsic_width() {
+    let sheet = format!("{UNSIZED} [role=\"textbox\"] {{ --cambium-field-intrinsic-width:12em; }}");
+    let host = host(LONG, &sheet);
+    assert_eq!(
+        size(&host).0,
+        210.0,
+        "the host's 12em fallback plus padding and border; resolved {:?}",
+        sizing_style(&host)
+    );
 }
 
 #[test]

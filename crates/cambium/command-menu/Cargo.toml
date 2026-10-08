@@ -1,0 +1,23 @@
+[package]
+name = "command-menu"
+version = "0.1.0"
+description = "The commands a host offers, the person's choices among them, and a palette's in-progress state."
+authors.workspace = true
+edition.workspace = true
+rust-version = "1.92"
+license = "MPL-2.0"
+repository.workspace = true
+keywords = ["commands", "palette", "menu"]
+categories = ["gui"]
+# Unclaimed on crates.io; publishing is a separate decision (Scenograph editor
+# plan, SE13, SE46).
+publish = false
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+serde = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
