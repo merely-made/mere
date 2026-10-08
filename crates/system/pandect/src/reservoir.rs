@@ -267,6 +267,28 @@ pub fn open_mere_backend(
     })
 }
 
+/// Eidetic's existing colon-bearing keys cannot be filenames in the portable
+/// session directory backend. The resident therefore owns one redb archive
+/// beside each mere's session files, through Eidetic's normal Store seam.
+#[cfg(not(target_arch = "wasm32"))]
+pub fn open_mere_archive_backend(
+    shared_root: &Path,
+    persona: PersonaId,
+    mere: MereId,
+) -> Result<muniment::RedbBackend, ReservoirError> {
+    let path = mere_dir(shared_root, persona, mere).join("archive.redb");
+    std::fs::create_dir_all(path.parent().expect("mere directory")).map_err(|e| {
+        ReservoirError::Open {
+            path: path.clone(),
+            reason: e.to_string(),
+        }
+    })?;
+    muniment::RedbBackend::open(&path).map_err(|e| ReservoirError::Open {
+        path,
+        reason: e.to_string(),
+    })
+}
+
 /// A persona's reservoir index, persisted through a muniment backend.
 pub struct ReservoirStore<B> {
     slots: JsonSlots<B>,
