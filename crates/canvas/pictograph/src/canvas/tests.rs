@@ -22,6 +22,7 @@ mod affinity;
 mod arrangement_roles;
 mod camera;
 mod combinators;
+mod dynamics_spec;
 mod density;
 mod density_admits;
 mod density_probe;
