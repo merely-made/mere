@@ -263,6 +263,7 @@ fn density_wander_springs_control() {
                 mass: PhysicsMassSource::Degree,
                 depth: crate::canvas::PhysicsDepthSource::Roots,
                 focus: None,
+                seed: crate::canvas::physics_catalog::LAW_SEED,
             },
         );
         canvas.physics.set_forces(forces);

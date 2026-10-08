@@ -26,6 +26,18 @@
 //! bridge nodes are one channel, `groups.bridges`, whose metric (betweenness
 //! or articulation) is the canvas's chosen bridge metric rather than part of
 //! the id (F85, "groups.bridges").
+//!
+//! **The two degree ids name two roles over two computations** (F147,
+//! correcting F144). `mass.degree` is a body's mass, what Gravity (Orbit)
+//! and Density move by and the hub overlays weigh by: each node's degree over
+//! the physics view's edges, the visible relation cells, so a pair joined by
+//! two relations counts twice and a hidden edge not at all
+//! (`LawInputs::mass_values`; Orbit and Density read 1 + it, the hub
+//! overlays `ln(1 + degree)`). `weight.degree` is an arrangement's weight,
+//! what Radial spreads its rings by: 1 + each node's undirected neighbours
+//! over every kernel edge, hidden ones included (the registry's
+//! `degree_weights`). They agree on a simple graph with nothing hidden and
+//! may differ elsewhere; neither value moved when the ids were ruled.
 
 use kernel::graph::{Graph, Node, NodeKey};
 
@@ -49,7 +61,8 @@ pub enum ChannelFamily {
     /// A group per node, unfolded: Group pull, and G3's grouped laws; and
     /// the bridge nodes (`groups.bridges`), a member set.
     Groups,
-    /// A weight per node: Orbit's masses, the hub overlays' weights.
+    /// A weight per node: a body's mass, Orbit's and Density's, and the hub
+    /// overlays' weights, over the physics view's edges (F147).
     Mass,
     /// A depth per node: the Depth overlay.
     Depth,

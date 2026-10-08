@@ -245,6 +245,9 @@ impl Canvas {
             return Err(refusal);
         }
         self.physics_composition = composition;
+        // A composition picked takes over from a schedule, run or recorded.
+        self.schedule = None;
+        self.dynamics.schedule = None;
         self.rebuild_law_forces();
         self.settle_physics(if self.physics_never_rests() {
             u32::MAX

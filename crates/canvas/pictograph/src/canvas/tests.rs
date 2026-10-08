@@ -21,6 +21,7 @@ use std::collections::HashMap;
 mod affinity;
 pub(crate) mod arrangement_goldens;
 mod arrangement_roles;
+mod binding;
 mod camera;
 mod combinators;
 mod dynamics_spec;

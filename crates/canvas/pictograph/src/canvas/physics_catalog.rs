@@ -717,6 +717,9 @@ pub(crate) struct LawSources {
     pub depth: PhysicsDepthSource,
     /// The focused node, for the Focus depth source.
     pub focus: Option<NodeKey>,
+    /// The seed Kinds' matrix and Anneal's walk draw from: the spec's
+    /// (F156), [`LAW_SEED`] by default, so no default run moves.
+    pub seed: u64,
 }
 
 impl LawSources {
@@ -729,6 +732,7 @@ impl LawSources {
             mass: PhysicsMassSource::Degree,
             depth: PhysicsDepthSource::Roots,
             focus: None,
+            seed: LAW_SEED,
         }
     }
 }
@@ -1282,7 +1286,7 @@ impl<'a> LawInputs<'a> {
                 let (kinds, kind_count) = self.kinds(sources.kind);
                 vec![
                     Box::new(NodeExclusion::default()),
-                    Box::new(ParticleLife::seeded(kinds, kind_count, LAW_SEED)),
+                    Box::new(ParticleLife::seeded(kinds, kind_count, sources.seed)),
                 ]
             },
             PhysicsLaw::Flock => vec![
@@ -1302,7 +1306,7 @@ impl<'a> LawInputs<'a> {
                 Box::new(MagneticSpring::default()),
                 Box::new(Boundary::default()),
             ],
-            PhysicsLaw::Anneal => vec![Box::new(Anneal::seeded(LAW_SEED))],
+            PhysicsLaw::Anneal => vec![Box::new(Anneal::seeded(sources.seed))],
             // Held, not empty: with no force at all rapier's contact solver
             // blasts an overlapping seed apart (the Still receipt found it).
             PhysicsLaw::Still => vec![Box::new(Hold)],
@@ -1404,6 +1408,7 @@ impl Canvas {
     pub fn set_physics_law(&mut self, law: PhysicsLaw) -> Result<(), OverlayRefusal> {
         self.physics_composition = None;
         self.schedule = None;
+        self.dynamics.schedule = None;
         self.physics_law = law;
         let refused = self.refuse_overlays();
         self.rebuild_law_forces();
@@ -1420,6 +1425,9 @@ impl Canvas {
     ) -> Result<(), OverlayRefusal> {
         let mut seen = HashSet::new();
         self.physics_overlays = overlays.into_iter().filter(|o| seen.insert(*o)).collect();
+        // An overlay edit takes over from a schedule (G4b1, F157).
+        self.schedule = None;
+        self.dynamics.schedule = None;
         let refused = self.refuse_overlays();
         self.rebuild_law_forces();
         self.settle_for_law();
@@ -1526,6 +1534,7 @@ impl Canvas {
     ) -> Result<(), OverlayRefusal> {
         self.physics_composition = None;
         self.schedule = None;
+        self.dynamics.schedule = None;
         self.physics_kind_source = choice.kind;
         self.physics_group_source = choice.groups;
         self.physics_mass_source = choice.mass;
@@ -1551,6 +1560,7 @@ impl Canvas {
         };
         self.physics_composition = None;
         self.schedule = None;
+        self.dynamics.schedule = None;
         self.physics_law = profile.law;
         self.physics_overlays = profile.overlays.to_vec();
         self.rebuild_law_forces();
@@ -1597,6 +1607,7 @@ impl Canvas {
             mass: self.physics_mass_source,
             depth: self.physics_depth_source,
             focus: self.focused_key(),
+            seed: self.dynamics.seed,
         }
     }
 
