@@ -20,6 +20,10 @@
 
 use std::collections::HashMap;
 
+use cartography::{
+    COORDS_SPECTRAL, ImportanceWeights, IntelligenceSignals, NodeEmbeddings, NodeOrder, NodeRings,
+    ORDER_TIMELINE, RINGS_FOCUS, Signal, WEIGHT_DEGREE,
+};
 use kernel::graph::{Graph, NodeKey};
 
 use super::producers::{self, Recency};
@@ -282,4 +286,51 @@ impl ChannelRegistry {
         self.sites
             .fresh_value((graph.revision(), graph.url_grouping_revision()))
     }
+
+    /// The keyed signals a projection request carries for `channels`
+    /// (cartography's ids, `adapters::channels_read`), each read from this
+    /// registry once per key (dynamics grammar plan, F84 and F86). Rings need
+    /// `focus`; an id the registry does not compute, or rings without a
+    /// focus, is left out, and the adapter reading it reports it missing.
+    pub fn disclose(
+        &mut self,
+        graph: &Graph,
+        channels: &[&str],
+        focus: Option<NodeKey>,
+    ) -> IntelligenceSignals {
+        let mut signals = IntelligenceSignals::new();
+        for &id in channels {
+            let signal = match id {
+                ORDER_TIMELINE => Signal::Order(NodeOrder {
+                    order: self.enumeration(graph).to_vec(),
+                }),
+                COORDS_SPECTRAL => {
+                    let iterations = cartography::adapters::SpectralAdapter::default().iterations;
+                    Signal::Coords(NodeEmbeddings {
+                        coords: in_key_order(self.spectral(graph, iterations)),
+                    })
+                },
+                WEIGHT_DEGREE => Signal::Weights(ImportanceWeights {
+                    weights: in_key_order(self.degree_weights(graph)),
+                }),
+                RINGS_FOCUS => match focus {
+                    Some(focus) => Signal::Rings(NodeRings {
+                        rings: in_key_order(self.rings(graph, focus)),
+                    }),
+                    None => continue,
+                },
+                _ => continue,
+            };
+            signals.insert(id, signal);
+        }
+        signals
+    }
+}
+
+/// A fact's values in node-key order, so a request reads the same whatever
+/// the hash order.
+fn in_key_order<V: Copy>(values: &HashMap<NodeKey, V>) -> Vec<(NodeKey, V)> {
+    let mut values: Vec<(NodeKey, V)> = values.iter().map(|(key, value)| (*key, *value)).collect();
+    values.sort_by_key(|(key, _)| key.index());
+    values
 }

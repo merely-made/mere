@@ -163,6 +163,8 @@ fn extents(keys: &[NodeKey]) -> HashMap<NodeKey, (f32, f32)> {
 /// Every arrangement's `(name, positions hash, score hash)` on `graph`.
 pub(crate) fn arrangement_hashes(graph: &Graph, keys: &[NodeKey]) -> Vec<(String, u64, u64)> {
     let extents = extents(keys);
+    // One registry for the one graph, as a host holds it across calls (F87).
+    let mut registry = crate::signals::ChannelRegistry::new();
     let mut out = Vec::new();
     let mut record = |name: String, projection: crate::canvas::CanvasStrategyProjection| {
         let score = projection.score.as_ref().map(score_hash).unwrap_or(0);
@@ -209,32 +211,23 @@ pub(crate) fn arrangement_hashes(graph: &Graph, keys: &[NodeKey]) -> Vec<(String
     );
     // Radial's weighted policy is the one reader of the degree weights, and
     // no canvas strategy picks it, so it is projected through cartography,
-    // handed the rings and the weights from a channel registry as a host does
-    // (G2b moved both producers out of cartography).
+    // handed the order, the rings and the weights from the registry as a host
+    // does (G2b moved the producers out of cartography; F84 and F86 key them).
     {
         use cartography::LayoutStrategy;
-        let mut registry = crate::signals::ChannelRegistry::new();
-        let signals = cartography::IntelligenceSignals {
-            degree_weights: Some(cartography::ImportanceWeights {
-                weights: registry
-                    .degree_weights(graph)
-                    .iter()
-                    .map(|(key, weight)| (*key, *weight))
-                    .collect(),
-            }),
-            ..cartography::IntelligenceSignals::default()
-        };
+        let signals = registry.disclose(
+            graph,
+            &[
+                cartography::ORDER_TIMELINE,
+                cartography::RINGS_FOCUS,
+                cartography::WEIGHT_DEGREE,
+            ],
+            Some(keys[0]),
+        );
         let mut options = crate::canvas::CartographySceneOptions::canvas_pixels(WIDTH, HEIGHT)
             .with_focus(keys[0]);
         options.extents = Some(extents.clone());
-        let mut request = crate::canvas::build_projection_request(graph, &signals, &options);
-        request.intent.axis_values = Some(
-            registry
-                .rings(graph, keys[0])
-                .iter()
-                .map(|(key, ring)| (*key, cartography::AxisValue::Numeric(f64::from(*ring))))
-                .collect(),
-        );
+        let request = crate::canvas::build_projection_request(graph, &signals, &options);
         let projection = cartography::adapters::RadialAdapter {
             config: sceno::Radial {
                 angular_policy: sceno::RadialAngularPolicy::Weighted,

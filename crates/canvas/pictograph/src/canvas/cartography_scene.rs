@@ -176,11 +176,13 @@ pub struct CanvasStrategyProjection {
 /// an unknown or not-yet-wired id, or radial without a focus. Only the graph-only analytic
 /// strategies in [`CANVAS_LAYOUT_STRATEGIES`] are dispatched here.
 ///
-/// Every fact an arrangement reads comes from `registry` (dynamics grammar plan, G2b): the sites
-/// (`groups.site`) and the partition (`groups.cluster`, unless `clusters` hands one in) as Columns'
-/// axes, the enumeration order (`order.timeline`) as Timeline's, the rings from the focus
-/// (`rings.focus`) as Radial's, and the spectral coordinates (`coords.spectral`). Cartography
-/// computes none of them.
+/// Every fact an arrangement reads comes from `registry` (dynamics grammar plan, G2b). The request
+/// carries the registry's facts keyed by channel id (F86): the enumeration order every score's
+/// ordinal follows (`order.timeline`, F84), the rings from the focus (`rings.focus`) and the
+/// spectral coordinates (`coords.spectral`), as `cartography::adapters::channels_read` names them.
+/// The host's axes stay on the intent as view configuration: the sites (`groups.site`) and the
+/// partition (`groups.cluster`, unless `clusters` hands one in) as Columns', and the enumeration
+/// order as Timeline's. Cartography computes none of them.
 #[allow(clippy::too_many_arguments)]
 fn project_canvas_dispatch(
     registry: &mut ChannelRegistry,
@@ -193,7 +195,7 @@ fn project_canvas_dispatch(
     extents: Option<&HashMap<NodeKey, (f32, f32)>>,
     recent_first: bool,
 ) -> cartography::Projection {
-    use cartography::adapters::{KanbanAdapter, RadialAdapter, SpectralAdapter, TimelineAdapter};
+    use cartography::adapters::{KanbanAdapter, RadialAdapter, TimelineAdapter, channels_read};
     let mut options = CartographySceneOptions::canvas_pixels(width, height);
     options.extents = extents.cloned();
     // P3's Spiral is the product-free score path, not an arrangements adapter.
@@ -202,7 +204,6 @@ fn project_canvas_dispatch(
     if id == "phyllotaxis.default" {
         return spiral_in(registry, graph, extents, focus, recent_first, 1.0, None).projection;
     }
-    let mut signals = IntelligenceSignals::default();
     // The axis an axis-driven arrangement reads, threaded on the intent (where `axis_values`
     // lives), from the registry's channel.
     let axis: Option<HashMap<NodeKey, AxisValue>> = match id {
@@ -243,34 +244,19 @@ fn project_canvas_dispatch(
                 .map(|(i, key)| (*key, AxisValue::Numeric(i as f64)))
                 .collect(),
         ),
-        // Focus-driven: rings outward from `focus` (the pane's selection). Without a focus there
-        // is no layout to compute, so leave the canvas as-is.
+        // Focus-driven: rings outward from `focus` (the pane's selection), which the request
+        // carries as `rings.focus`. Without a focus there is no layout to compute, so leave the
+        // canvas as-is.
         "radial.default" => {
             let Some(focus) = focus else {
                 return cartography::Projection::empty();
             };
             options.focus = Some(focus);
-            Some(
-                registry
-                    .rings(graph, focus)
-                    .iter()
-                    .map(|(key, ring)| (*key, AxisValue::Numeric(f64::from(*ring))))
-                    .collect(),
-            )
-        },
-        SpectralAdapter::PROJECTION_ID => {
-            let iterations = SpectralAdapter::default().iterations;
-            signals.spectral = Some(cartography::NodeEmbeddings {
-                coords: registry
-                    .spectral(graph, iterations)
-                    .iter()
-                    .map(|(key, xy)| (*key, *xy))
-                    .collect(),
-            });
             None
         },
         _ => None,
     };
+    let signals = registry.disclose(graph, channels_read(id), focus);
     let mut intent = options.to_view_intent();
     intent.axis_values = axis;
     let request = ProjectionRequest {

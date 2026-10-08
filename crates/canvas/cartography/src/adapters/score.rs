@@ -22,6 +22,7 @@ use sceno::{Arrangement, Footprint, Representation, Score, ScoreItem, Size2, Sou
 use crate::projection::{PositionedEdge, PositionedNode, Projection, ProjectionMetadata};
 use crate::request::{AxisValue, ProjectionRequest};
 use crate::scene_out::MERE_GRAPH_ADAPTER;
+use crate::signals::{ORDER_TIMELINE, SignalFault};
 use kernel::geometry::{PortablePoint, PortableRect, PortableSize};
 
 /// What a producer computed and is disclosing to the solver.
@@ -70,20 +71,29 @@ fn axis_to_sceno(value: &AxisValue) -> sceno::AxisValue {
     }
 }
 
-/// Build a score over every node in the request's graph.
+/// Build a score over the nodes of the request's order.
 ///
-/// Ordinal follows graph enumeration order, which is what the analytic families
-/// place by. The returned key vector is in score order so the caller can map the
-/// solved scene back without re-deriving anything.
+/// Ordinal follows the enumeration order the host's registry computed and the
+/// request carries (`order.timeline`, dynamics grammar plan, F84), which is
+/// what the analytic families place by; a node the order names and the graph
+/// lacks is skipped. The returned key vector is in score order so the caller
+/// can map the solved scene back without re-deriving anything. Without the
+/// order, or with another kind of signal under its id, the fault comes back
+/// for the adapter to report.
 pub fn score_from_request(
     request: &ProjectionRequest<'_>,
     arrangement: Arrangement,
     disclosures: &Disclosures,
-) -> (Score, Vec<NodeKey>) {
+) -> Result<(Score, Vec<NodeKey>), SignalFault> {
+    let order = request.signals.order(ORDER_TIMELINE)?;
     let mut score = Score::new(arrangement);
     let mut keys = Vec::new();
 
-    for (ordinal, (key, node)) in request.graph.nodes().enumerate() {
+    let nodes = order
+        .order
+        .iter()
+        .filter_map(|key| Some((*key, request.graph.get_node(*key)?)));
+    for (ordinal, (key, node)) in nodes.enumerate() {
         let (width, height) = request
             .intent
             .extents
@@ -124,7 +134,32 @@ pub fn score_from_request(
         keys.push(key);
     }
 
-    (score, keys)
+    Ok((score, keys))
+}
+
+/// Score the request's order under `arrangement` and solve it: the path every
+/// adapter takes. `faults` are the channels the adapter itself could not read;
+/// with any, or without the order, the projection places nothing and reports
+/// them (dynamics grammar plan, F84 and F86).
+pub fn project_arrangement(
+    strategy_id: &str,
+    request: &ProjectionRequest<'_>,
+    arrangement: Arrangement,
+    disclosures: &Disclosures,
+    mut faults: Vec<SignalFault>,
+) -> Projection {
+    let scored = score_from_request(request, arrangement, disclosures);
+    if let Err(fault) = &scored {
+        faults.push(fault.clone());
+    }
+    if !faults.is_empty() {
+        return faulted_projection(strategy_id, faults);
+    }
+    let (score, keys) = scored.expect("no fault above");
+    if keys.is_empty() {
+        return empty_projection(strategy_id);
+    }
+    project_score(strategy_id, request, &score, &keys)
 }
 
 /// Solve `score` and translate the resulting scene into a projection.
@@ -153,6 +188,14 @@ pub fn project_score(
     projection_from_positions(strategy_id, request, positions)
 }
 
+/// A projection that places nothing and reports why: the channels the
+/// strategy needed and could not read (dynamics grammar plan, F86).
+pub fn faulted_projection(strategy_id: &str, faults: Vec<SignalFault>) -> Projection {
+    let mut projection = empty_projection(strategy_id);
+    projection.metadata.faults = faults;
+    projection
+}
+
 /// An empty projection that still names the strategy that produced it, so a
 /// caller can tell "this strategy had nothing to place" from "no strategy ran".
 pub fn empty_projection(strategy_id: &str) -> Projection {
@@ -160,6 +203,7 @@ pub fn empty_projection(strategy_id: &str) -> Projection {
         metadata: ProjectionMetadata {
             strategy_id: Some(strategy_id.to_string()),
             settled: true,
+            faults: Vec::new(),
         },
         ..Projection::empty()
     }
@@ -190,6 +234,7 @@ pub fn projection_from_positions(
         metadata: ProjectionMetadata {
             strategy_id: Some(strategy_id.to_string()),
             settled: true,
+            faults: Vec::new(),
         },
     }
 }
