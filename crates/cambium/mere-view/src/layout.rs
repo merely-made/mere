@@ -6,10 +6,8 @@
 
 use std::collections::HashMap;
 
-use cartography::adapters::{SpectralAdapter, project_graph_only};
-use cartography::{
-    IntelligenceSignals, NodeEmbeddings, Projection, ProjectionRequest, TargetSize, ViewIntent,
-};
+use cartography::adapters::{channels_read, project_graph_only};
+use cartography::{Projection, ProjectionRequest, TargetSize, ViewIntent};
 use kernel::geometry::PortablePoint;
 use kernel::graph::apply::{add_node, assert_relation};
 use kernel::graph::{EdgeAssertion, Graph, SemanticSubKind};
@@ -78,20 +76,14 @@ pub fn lay_out(
         assert_relation(&mut scratch, from, to, link);
     }
 
-    // Every fact a layout reads comes from the channel registry; cartography
-    // computes none (dynamics grammar plan, G2b, F53). Only Spectral reads one.
-    let mut signals = IntelligenceSignals::default();
-    let spectral = SpectralAdapter::default();
-    if [layout, DEFAULT_LAYOUT].contains(&SpectralAdapter::PROJECTION_ID) {
-        let mut registry = ChannelRegistry::new();
-        signals.spectral = Some(NodeEmbeddings {
-            coords: registry
-                .spectral(&scratch, spectral.iterations)
-                .iter()
-                .map(|(key, xy)| (*key, *xy))
-                .collect(),
-        });
-    }
+    // Every fact a layout reads comes from the channel registry, keyed by
+    // channel id; cartography computes none (dynamics grammar plan, G2b, F53,
+    // F84, F86). The scratch graph is built for this call, so the registry is
+    // too: one registry serves one graph.
+    let mut registry = ChannelRegistry::new();
+    let mut channels: Vec<&str> = channels_read(layout).to_vec();
+    channels.extend(channels_read(DEFAULT_LAYOUT));
+    let signals = registry.disclose(&scratch, &channels, None);
     let request = ProjectionRequest {
         graph: &scratch,
         signals: &signals,

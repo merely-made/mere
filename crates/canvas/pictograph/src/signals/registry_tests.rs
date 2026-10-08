@@ -11,10 +11,8 @@
 
 use std::collections::HashMap;
 
-use cartography::{
-    AxisValue, IntelligenceSignals, LayoutStrategy, NodeEmbeddings, ProjectionRequest, TargetSize,
-    ViewIntent,
-};
+use cartography::adapters::channels_read;
+use cartography::{LayoutStrategy, ORDER_TIMELINE, ProjectionRequest, TargetSize, ViewIntent};
 use kernel::geometry::PortablePoint;
 use kernel::graph::apply::{GraphDelta, add_node, apply_graph_delta};
 use kernel::graph::fixtures::GraphFixtures;
@@ -84,13 +82,11 @@ fn spectral_from_the_registry_matches_the_pre_migration_placement() {
     let (graph, keys) = parity_fixture();
     let mut registry = ChannelRegistry::new();
     let adapter = cartography::adapters::SpectralAdapter::default();
-    let coords = registry.spectral(&graph, adapter.iterations);
-    let signals = IntelligenceSignals {
-        spectral: Some(NodeEmbeddings {
-            coords: coords.iter().map(|(k, xy)| (*k, *xy)).collect(),
-        }),
-        ..IntelligenceSignals::default()
-    };
+    let signals = registry.disclose(
+        &graph,
+        channels_read(cartography::adapters::SpectralAdapter::PROJECTION_ID),
+        None,
+    );
     let projection = adapter.project(&ProjectionRequest {
         graph: &graph,
         signals: &signals,
@@ -120,23 +116,21 @@ fn spectral_from_the_registry_matches_the_pre_migration_placement() {
 fn radial_from_the_registry_matches_the_pre_migration_placement() {
     let (graph, keys) = parity_fixture();
     let mut registry = ChannelRegistry::new();
-    let rings: HashMap<NodeKey, AxisValue> = registry
-        .rings(&graph, keys[0])
-        .iter()
-        .map(|(key, ring)| (*key, AxisValue::Numeric(f64::from(*ring))))
-        .collect();
     assert_eq!(
-        rings.len(),
+        registry.rings(&graph, keys[0]).len(),
         4,
         "the hub and its spokes; the rest unreachable"
     );
-    let signals = IntelligenceSignals::default();
+    let signals = registry.disclose(
+        &graph,
+        channels_read(cartography::adapters::RadialAdapter::PROJECTION_ID),
+        Some(keys[0]),
+    );
     let projection = cartography::adapters::RadialAdapter::default().project(&ProjectionRequest {
         graph: &graph,
         signals: &signals,
         intent: ViewIntent {
             target_size: TargetSize::default(),
-            axis_values: Some(rings),
             focus: Some(keys[0]),
             ..ViewIntent::default()
         },
@@ -382,9 +376,10 @@ fn an_offered_partition_counts_once_and_goes_stale_with_structure() {
     );
 }
 
-/// One enumeration order: the registry's `order.timeline` is the order a
-/// score built from the graph gives its ordinals, which the Timeline's axis
-/// and the Spiral's graph order now both read.
+/// One enumeration order, computed once by the registry and carried in the
+/// request (F84): a score's ordinals follow `order.timeline` as the request
+/// carries it, which the Timeline's axis and the Spiral's graph order also
+/// read.
 #[test]
 fn the_enumeration_channel_is_the_order_every_score_ordinal_follows() {
     let (mut graph, keys) = parity_fixture();
@@ -397,7 +392,7 @@ fn the_enumeration_channel_is_the_order_every_score_ordinal_follows() {
     );
     let mut registry = ChannelRegistry::new();
     let order = registry.enumeration(&graph).to_vec();
-    let signals = IntelligenceSignals::default();
+    let signals = registry.disclose(&graph, &[ORDER_TIMELINE], None);
     let request = ProjectionRequest {
         graph: &graph,
         signals: &signals,
@@ -407,6 +402,12 @@ fn the_enumeration_channel_is_the_order_every_score_ordinal_follows() {
         &request,
         sceno::Arrangement::Grid(sceno::Grid::default()),
         &cartography::adapters::Disclosures::default(),
+    )
+    .expect("the request carries the order");
+    assert_eq!(
+        registry.runs().enumeration,
+        1,
+        "one computation, read twice"
     );
     assert_eq!(
         score_keys, order,

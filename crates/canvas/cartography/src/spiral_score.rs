@@ -160,6 +160,7 @@ pub fn project_spiral_score_for_view(
         metadata: ProjectionMetadata {
             strategy_id: Some("phyllotaxis.default".to_string()),
             settled: true,
+            faults: Vec::new(),
         },
     };
     MereSpiralProjection { score, projection }

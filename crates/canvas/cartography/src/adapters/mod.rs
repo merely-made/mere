@@ -24,14 +24,18 @@ use kernel::graph::NodeKey;
 use sceno::Arrangement;
 
 use crate::projection::Projection;
-use crate::request::ProjectionRequest;
+use crate::request::{AxisValue, ProjectionRequest};
+use crate::signals::{COORDS_HOST, COORDS_SPECTRAL, ORDER_TIMELINE, RINGS_FOCUS, WEIGHT_DEGREE};
 use crate::strategy::LayoutStrategy;
 
 #[cfg(test)]
 mod parity;
 pub mod score;
 
-pub use score::{Disclosures, empty_projection, project_score, score_from_request};
+pub use score::{
+    Disclosures, empty_projection, faulted_projection, project_arrangement, project_score,
+    score_from_request,
+};
 
 /// Declare an adapter whose whole job is a config, an id, and the disclosures
 /// it reads from the request.
@@ -56,15 +60,13 @@ macro_rules! analytic_adapter {
             }
 
             fn project(&self, request: &ProjectionRequest<'_>) -> Projection {
-                let (score, keys) = score_from_request(
+                project_arrangement(
+                    Self::PROJECTION_ID,
                     request,
                     $variant(self.config.clone()),
                     &Disclosures::from_intent(request),
-                );
-                if keys.is_empty() {
-                    return empty_projection(Self::PROJECTION_ID);
-                }
-                project_score(Self::PROJECTION_ID, request, &score, &keys)
+                    Vec::new(),
+                )
             }
         }
     };
@@ -135,8 +137,12 @@ impl LayoutStrategy for GridAdapter {
     }
 
     fn project(&self, request: &ProjectionRequest<'_>) -> Projection {
-        let count = request.graph.nodes().count();
-        let (score, keys) = score_from_request(
+        let count = request
+            .signals
+            .order(ORDER_TIMELINE)
+            .map_or(0, |order| order.order.len());
+        project_arrangement(
+            Self::PROJECTION_ID,
             request,
             Arrangement::Grid(sceno::Grid {
                 origin: self.origin,
@@ -145,11 +151,8 @@ impl LayoutStrategy for GridAdapter {
                 gap: self.pitch,
             }),
             &Disclosures::from_intent(request),
-        );
-        if keys.is_empty() {
-            return empty_projection(Self::PROJECTION_ID);
-        }
-        project_score(Self::PROJECTION_ID, request, &score, &keys)
+            Vec::new(),
+        )
     }
 }
 
@@ -233,9 +236,43 @@ pub fn project_graph_only(id: &str, request: &ProjectionRequest<'_>) -> Option<P
 // re-derived against whatever that caller actually needs. Add it when something
 // asks.
 
+/// The coordinates under `id` as the arrangement reads them, or the fault.
+fn read_coords(
+    request: &ProjectionRequest<'_>,
+    id: &str,
+) -> (
+    HashMap<NodeKey, sceno::Vec2>,
+    Vec<crate::signals::SignalFault>,
+) {
+    match request.signals.coords(id) {
+        Ok(coords) => (
+            coords
+                .coords
+                .iter()
+                .map(|(key, (x, y))| (*key, sceno::Vec2::new(*x, *y)))
+                .collect(),
+            Vec::new(),
+        ),
+        Err(fault) => (HashMap::new(), vec![fault]),
+    }
+}
+
+/// The channels an arrangement reads from the request's signals, by
+/// projection id: the order every score takes (F84), and the arrangement's
+/// own, under each adapter's default configuration (Radial's weighted policy
+/// also reads `weight.degree`). A host discloses these before projecting.
+pub fn channels_read(id: &str) -> &'static [&'static str] {
+    match id {
+        SpectralAdapter::PROJECTION_ID => &[ORDER_TIMELINE, COORDS_SPECTRAL],
+        SemanticEmbeddingAdapter::PROJECTION_ID => &[ORDER_TIMELINE, COORDS_HOST],
+        RadialAdapter::PROJECTION_ID => &[ORDER_TIMELINE, RINGS_FOCUS],
+        _ => &[ORDER_TIMELINE],
+    }
+}
+
 /// Placement at coordinates a dimensionality reduction produced.
 ///
-/// Reads `IntelligenceSignals::embeddings` — a host-run UMAP, t-SNE, or PCA.
+/// Reads `coords.host` — a host-run UMAP, t-SNE, or PCA.
 /// The arrangement it emits is the same one [`SpectralAdapter`] emits; only the
 /// producer differs.
 #[derive(Debug, Clone, Default, PartialEq)]
@@ -253,28 +290,14 @@ impl LayoutStrategy for SemanticEmbeddingAdapter {
     }
 
     fn project(&self, request: &ProjectionRequest<'_>) -> Projection {
-        let embedding: HashMap<NodeKey, sceno::Vec2> = request
-            .signals
-            .embeddings
-            .as_ref()
-            .map(|embeddings| {
-                embeddings
-                    .coords
-                    .iter()
-                    .map(|(key, (x, y))| (*key, sceno::Vec2::new(*x, *y)))
-                    .collect()
-            })
-            .unwrap_or_default();
-
-        let (score, keys) = score_from_request(
+        let (embedding, faults) = read_coords(request, COORDS_HOST);
+        project_arrangement(
+            Self::PROJECTION_ID,
             request,
             Arrangement::Embedded(self.config.clone()),
             &Disclosures::default().with_embedding(embedding),
-        );
-        if keys.is_empty() {
-            return empty_projection(Self::PROJECTION_ID);
-        }
-        project_score(Self::PROJECTION_ID, request, &score, &keys)
+            faults,
+        )
     }
 }
 
@@ -282,9 +305,10 @@ impl LayoutStrategy for SemanticEmbeddingAdapter {
 /// reflects connectivity: clusters separate spatially and a path unrolls into a
 /// line.
 ///
-/// The coordinates are a disclosure (`IntelligenceSignals::spectral`), which
-/// the host's channel registry computes once per structural revision; with
-/// none disclosed, every node rings out (dynamics grammar plan, G2b).
+/// The coordinates are a disclosure (`coords.spectral`), which the host's
+/// channel registry computes once per structural revision (dynamics grammar
+/// plan, G2b). An edgeless or symmetric graph's are empty, and every node
+/// rings out; without the channel the projection reports it missing (F86).
 #[derive(Debug, Clone, PartialEq)]
 pub struct SpectralAdapter {
     pub config: sceno::Embedded,
@@ -319,7 +343,9 @@ impl LayoutStrategy for SpectralAdapter {
     }
 
     fn project(&self, request: &ProjectionRequest<'_>) -> Projection {
-        let (score, keys) = score_from_request(
+        let (embedding, faults) = read_coords(request, COORDS_SPECTRAL);
+        project_arrangement(
+            Self::PROJECTION_ID,
             request,
             Arrangement::Embedded(sceno::Embedded {
                 // An edgeless or perfectly symmetric graph discloses no
@@ -328,35 +354,19 @@ impl LayoutStrategy for SpectralAdapter {
                 fallback: sceno::EmbeddingFallback::RingOutside,
                 ..self.config.clone()
             }),
-            &Disclosures::default().with_embedding(
-                request
-                    .signals
-                    .spectral
-                    .as_ref()
-                    .map(|spectral| {
-                        spectral
-                            .coords
-                            .iter()
-                            .map(|(key, (x, y))| (*key, sceno::Vec2::new(*x, *y)))
-                            .collect()
-                    })
-                    .unwrap_or_default(),
-            ),
-        );
-        if keys.is_empty() {
-            return empty_projection(Self::PROJECTION_ID);
-        }
-        project_score(Self::PROJECTION_ID, request, &score, &keys)
+            &Disclosures::default().with_embedding(embedding),
+            faults,
+        )
     }
 }
 
 /// Concentric rings around `ViewIntent::focus`.
 ///
-/// Reads each node's ring from `ViewIntent::axis_values` (a numeric ring
-/// index, as Timeline reads its axis), which the host's channel registry walks
-/// from the focus (`rings.focus`), and the weighted policy's weights from
-/// `IntelligenceSignals::degree_weights` (`weight.degree`). Without a focus
-/// there is nothing to ring around, and the projection is empty.
+/// Reads each node's ring from `rings.focus`, which the host's channel
+/// registry walks from the focus, and the weighted policy's weights from
+/// `weight.degree` (dynamics grammar plan, F86: Radial's rings are a signal,
+/// not view configuration). Without a focus there is nothing to ring around,
+/// and the projection is empty.
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct RadialAdapter {
     pub config: sceno::Radial,
@@ -376,21 +386,39 @@ impl LayoutStrategy for RadialAdapter {
             return empty_projection(Self::PROJECTION_ID);
         }
 
-        let mut disclosures = Disclosures::from_intent(request);
-        // Only the weighted policy reads it.
+        let mut faults = Vec::new();
+        let mut disclosures = Disclosures::default();
+        match request.signals.rings(RINGS_FOCUS) {
+            Ok(rings) => {
+                disclosures = disclosures.with_axis(
+                    rings
+                        .rings
+                        .iter()
+                        .map(|(key, ring)| (*key, AxisValue::Numeric(f64::from(*ring))))
+                        .collect(),
+                );
+            },
+            Err(fault) => faults.push(fault),
+        }
+        // Only the weighted policy reads them.
         if matches!(
             self.config.angular_policy,
             sceno::RadialAngularPolicy::Weighted
-        ) && let Some(weights) = &request.signals.degree_weights
-        {
-            disclosures = disclosures.with_weight(weights.weights.iter().copied().collect());
+        ) {
+            match request.signals.weights(WEIGHT_DEGREE) {
+                Ok(weights) => {
+                    disclosures =
+                        disclosures.with_weight(weights.weights.iter().copied().collect());
+                },
+                Err(fault) => faults.push(fault),
+            }
         }
-
-        let (score, keys) =
-            score_from_request(request, Arrangement::Radial(self.config), &disclosures);
-        if keys.is_empty() {
-            return empty_projection(Self::PROJECTION_ID);
-        }
-        project_score(Self::PROJECTION_ID, request, &score, &keys)
+        project_arrangement(
+            Self::PROJECTION_ID,
+            request,
+            Arrangement::Radial(self.config),
+            &disclosures,
+            faults,
+        )
     }
 }
