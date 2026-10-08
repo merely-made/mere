@@ -1,14 +1,14 @@
 # Graph semantics plan: assertions, resources, saved queries, residency
 
 **Date:** 2026-10-04
-**Status (2026-10-07):** in progress; scope bounded by Mark's "Bound it."
+**Status (2026-10-08):** in progress; scope bounded by Mark's "Bound it."
 Five phases remain. P2 closes against the six requirements in §4; independent
 archive cleanup is deferred. C5/C6 are settled; no planned design question remains.
 The bounded plan is recorded; saved work and accepted rulings remain retained.
 No new fork is being put to Mark.
 The accepted C30/C31 P2 slices and literal attribution repair pass their fresh
 full unit, dependent, locked workspace and wasm32 gates. Their source remains
-uncommitted; P2 remains incomplete. P3–P5 have not begun.
+ready for an authorized branch checkpoint; P2 remains incomplete. P3–P5 have not begun.
 P1 implemented and gated on
 `graph-semantics`, with the ruling-9 exact-journal and legacy-checkpoint
 attribution repair complete after the original `459cad84` receipt. Those
@@ -2606,6 +2606,17 @@ binding; this list no longer grows as a running implementation checklist.
   transactional qualification and sealed wrapper support in this lane.
 
 ## 6. Progress
+
+- **2026-10-08. Qualified source checkpoint authorized; local continuation.**
+  Mark authorized commit/push and permitted continuation on this machine.
+  Retain the existing lane worktree and reusable target; main integration still
+  awaits review. The unchanged C30/C31, exact translated receipt and literal
+  attribution source uses the fresh October 7 receipts below. Read-only audits
+  locate remaining production routing in `graph/edge_ops.rs` and `graph/apply.rs`,
+  resource metadata in the kernel facet writers/readers, profile propagation in
+  Pandect and Graphshell, and capture references beside Eidetic's existing page
+  text store. These remain inside the six P2 closure requirements. No new
+  checkpoint, phase, dependency or sibling edit is introduced.
 
 - **2026-10-07. Bounded C30/C31 and literal fixes pass fresh full suites.**
   Final JSON-LD source, including the split nine-test control modules, passes

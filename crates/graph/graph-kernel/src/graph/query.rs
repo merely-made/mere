@@ -719,8 +719,9 @@ impl Graph {
         components
     }
 
-    /// The connected component of `seed` — it plus every node reachable through relations
-    /// (undirected), breadth-first. Empty if `seed` is not in the graph. `selectors` is the
+    /// Surfaces reachable from `seed` through either stratum's undirected relations.
+    /// Shown bindings join at zero hops, including through unshown resources.
+    /// Empty if `seed` is not a surface in the graph. `selectors` is the
     /// **edge projection**: only edges matching a selector are followed (an empty slice
     /// follows every family). So the *same* nodes can be one Component under one projection
     /// and a different one under another. The **Component** subgraph's derivation. (Subgraph
@@ -733,8 +734,9 @@ impl Graph {
         self.bfs_members(seed, None, selectors)
     }
 
-    /// The **Ego** neighborhood of `seed`: itself plus every node within `radius`
-    /// undirected hops, breadth-first (`radius` 0 = just the seed), over the `selectors`
+    /// The **Ego** neighborhood of `seed`: surfaces within `radius` undirected
+    /// relation hops across both strata. Shown bindings cost zero, so radius 0
+    /// also includes surfaces showing the seed's resource. Uses the `selectors`
     /// edge projection (empty = all families). The Ego subgraph's derivation. (Subgraph
     /// derivation, Phase 3 — selectors.)
     pub fn ego_members(
@@ -746,10 +748,7 @@ impl Graph {
         self.bfs_members(seed, Some(radius), selectors)
     }
 
-    /// Breadth-first member uuids from `seed` over undirected neighbors, bounded to
-    /// `max_depth` hops (`None` = unbounded = the whole component) and to the `selectors`
-    /// edge projection. Shared by [`component_members`](Self::component_members) and
-    /// [`ego_members`](Self::ego_members).
+    /// Collapse zero-hop shown bindings, then walk relation hops breadth-first.
     fn bfs_members(
         &self,
         seed: uuid::Uuid,
@@ -759,25 +758,88 @@ impl Graph {
         let Some((start, _)) = self.get_node_by_id(seed) else {
             return Vec::new();
         };
+        #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        enum WalkNode {
+            Surface(NodeKey),
+            Resource(Uuid),
+        }
+        let owner = |surface| {
+            self.shown_resource_id(surface)
+                .filter(|resource| self.resource(*resource).is_some())
+                .map(WalkNode::Resource)
+                .unwrap_or(WalkNode::Surface(surface))
+        };
+        let mut shown = HashMap::<Uuid, Vec<NodeKey>>::new();
+        for (key, _) in self.nodes() {
+            if let WalkNode::Resource(resource) = owner(key) {
+                shown.entry(resource).or_default().push(key);
+            }
+        }
+        for surfaces in shown.values_mut() {
+            surfaces.sort_by_key(|key| key.index());
+        }
+        let start = owner(start);
         let mut seen = HashSet::new();
         let mut order = Vec::new();
-        let mut queue = std::collections::VecDeque::new();
+        let mut queue = VecDeque::new();
         seen.insert(start);
-        queue.push_back((start, 0u8));
-        while let Some((key, depth)) = queue.pop_front() {
-            if let Some(node) = self.get_node(key) {
-                order.push(node.id);
+        queue.push_back((start, 0usize));
+        while let Some((current, depth)) = queue.pop_front() {
+            let surfaces = match current {
+                WalkNode::Surface(key) => vec![key],
+                WalkNode::Resource(resource) => shown.get(&resource).cloned().unwrap_or_default(),
+            };
+            if current == start {
+                order.push(seed);
             }
-            if max_depth.is_some_and(|m| depth >= m) {
+            for key in &surfaces {
+                let id = self.get_node(*key).expect("walk surface exists").id;
+                if id != seed {
+                    order.push(id);
+                }
+            }
+            if max_depth.is_some_and(|m| depth >= usize::from(m)) {
                 continue;
             }
-            for neighbor in self.neighbors_undirected_sorted(key) {
-                // Edge projection: only follow an edge matching a selector (empty = all
-                // families). This is what makes the same nodes derive a different shape
-                // under a different relation projection. (Subgraph derivation — selectors.)
-                if !selectors.is_empty() && !self.edge_matches_selectors(key, neighbor, selectors) {
-                    continue;
+            let mut neighbors = Vec::new();
+            for key in surfaces {
+                for neighbor in self.neighbors_undirected_sorted(key) {
+                    if selectors.is_empty() || self.edge_matches_selectors(key, neighbor, selectors)
+                    {
+                        neighbors.push(owner(neighbor));
+                    }
                 }
+            }
+            if let WalkNode::Resource(resource) = current {
+                let key = self
+                    .resources
+                    .key_of(&resource)
+                    .expect("walk resource exists");
+                for direction in [Direction::Outgoing, Direction::Incoming] {
+                    for edge in self.resources.inner().edges_directed(key, direction) {
+                        if !selectors.is_empty()
+                            && !selectors
+                                .iter()
+                                .any(|&selector| edge.weight().has_relation(selector))
+                        {
+                            continue;
+                        }
+                        let neighbor = match direction {
+                            Direction::Outgoing => edge.target(),
+                            Direction::Incoming => edge.source(),
+                        };
+                        neighbors.push(WalkNode::Resource(
+                            self.resources
+                                .node(neighbor)
+                                .expect("resource endpoint exists")
+                                .id(),
+                        ));
+                    }
+                }
+            }
+            neighbors.sort_unstable();
+            neighbors.dedup();
+            for neighbor in neighbors {
                 if seen.insert(neighbor) {
                     queue.push_back((neighbor, depth + 1));
                 }
@@ -828,6 +890,111 @@ mod derivation_tests {
     use super::*;
     use crate::graph::SemanticSubKind;
     use euclid::default::Point2D;
+
+    #[test]
+    fn shown_joins_cost_zero_and_hidden_resources_carry_relation_hops() {
+        use crate::graph::{EdgeFamily, NavigationTrigger, ResourceNode, SemanticStatement};
+        use crate::persistence::PersistedResourceRecord;
+        use crate::types::GraphScope;
+
+        let mut graph = Graph::new();
+        let [ra, hidden, rc] = ["a", "hidden", "c"].map(|name| {
+            let iri = format!("https://resource.test/{name}");
+            let resource = ResourceNode::for_term(&iri);
+            assert!(graph.set_resource_record(
+                resource.id(),
+                Some(PersistedResourceRecord {
+                    canonical_iri: iri,
+                    facets: vec![],
+                })
+            ));
+            resource.id()
+        });
+        let [a, alias, c, d, isolated] = std::array::from_fn::<_, 5, _>(|i| {
+            // Equal UUIDs in different strata must not join accidentally.
+            let id = if i == 3 {
+                hidden
+            } else {
+                Uuid::from_u128(100 + i as u128)
+            };
+            graph.add_node_with_id(id, format!("https://surface.test/{i}"), Default::default())
+        });
+        let ids = [a, alias, c, d, isolated].map(|key| graph.get_node(key).unwrap().id);
+        for (key, resource) in [(a, ra), (alias, ra), (c, rc)] {
+            assert!(graph.set_shown_resource(graph.get_node(key).unwrap().id, Some(resource)));
+        }
+        for (from, to, kinds) in [
+            (
+                ra,
+                hidden,
+                vec![SemanticSubKind::Cites, SemanticSubKind::Quotes],
+            ),
+            (rc, hidden, vec![SemanticSubKind::Cites]),
+            (hidden, hidden, vec![SemanticSubKind::Cites]),
+        ] {
+            let records: Vec<_> = kinds
+                .into_iter()
+                .enumerate()
+                .map(|(i, kind)| {
+                    let mut payload = EdgePayload::new();
+                    payload.push_persisted_semantic_statement(SemanticStatement {
+                        statement_id: format!("walk:{from}:{to}:{i}"),
+                        predicate: crate::graph::predicate_iri(kind).into(),
+                        recognized_sub_kind: Some(kind),
+                        label: Some("retained".into()),
+                        graph_scope: GraphScope::Custom("https://scope.test/walk".into()),
+                        provenance_iri: Some("https://author.test/walk".into()),
+                        asserted_at_ms: Some(17),
+                    });
+                    super::super::snapshot::persisted_edge_for_ids(from, to, &payload)
+                })
+                .collect();
+            assert!(graph.set_resource_edges_between(from, to, &records));
+        }
+        assert!(graph.append_traversal(c, d, NavigationTrigger::LinkClick, Some(19)));
+        let before = graph.to_snapshot();
+        let revision = graph.revision();
+        let [a_id, alias_id, c_id, d_id, isolated_id] = ids;
+        let semantic = [RelationSelector::Family(EdgeFamily::Semantic)];
+        let traversal = [RelationSelector::Family(EdgeFamily::Traversal)];
+        assert_eq!(graph.ego_members(a_id, 0, &[]), vec![a_id, alias_id]);
+        assert_eq!(graph.ego_members(alias_id, 0, &[]), vec![alias_id, a_id]);
+        assert_eq!(graph.ego_members(a_id, 1, &[]), vec![a_id, alias_id]);
+        assert_eq!(graph.ego_members(a_id, 2, &[]), vec![a_id, alias_id, c_id]);
+        assert_eq!(
+            graph.ego_members(a_id, 3, &[]),
+            vec![a_id, alias_id, c_id, d_id]
+        );
+        assert_eq!(
+            graph.component_members(a_id, &semantic),
+            vec![a_id, alias_id, c_id]
+        );
+        assert_eq!(
+            graph.component_members(a_id, &traversal),
+            vec![a_id, alias_id]
+        );
+        assert_eq!(
+            graph.component_members(a_id, &[RelationSelector::Semantic(SemanticSubKind::Quotes)]),
+            vec![a_id, alias_id]
+        );
+        assert_eq!(
+            graph.component_members(c_id, &semantic),
+            vec![c_id, a_id, alias_id]
+        );
+        assert_eq!(
+            graph.component_members(a_id, &[]),
+            vec![a_id, alias_id, c_id, d_id]
+        );
+        assert_eq!(graph.component_members(isolated_id, &[]), vec![isolated_id]);
+        assert!(graph.component_members(Uuid::nil(), &[]).is_empty());
+        assert_eq!(graph.resource_relations().count(), 4);
+        assert_eq!(
+            serde_json::to_value(graph.to_snapshot()).unwrap(),
+            serde_json::to_value(before).unwrap(),
+            "walking retains all stored assertions"
+        );
+        assert_eq!(graph.revision(), revision, "walking is read-only");
+    }
 
     /// An A–B–C chain plus an isolated D. Returns the graph and `[a, b, c, d]` uuids.
     fn chain_plus_isolate() -> (Graph, [uuid::Uuid; 4]) {

@@ -330,6 +330,107 @@ fn checked_rejection(snapshot: &GraphSnapshot) -> ResourceSnapshotError {
 }
 
 #[test]
+fn checked_snapshot_recorded_loader_preserves_same_host_resource_containment_and_surface_handles() {
+    let mut graph = Graph::new();
+    let parent = graph.add_node_with_id(
+        Uuid::from_u128(1),
+        "https://a.test/".into(),
+        Point2D::zero(),
+    );
+    let child = graph.add_node_with_id(
+        Uuid::from_u128(2),
+        "https://a.test/child".into(),
+        Point2D::zero(),
+    );
+    let parent_resource = ResourceNode::new("https://a.test/");
+    let child_resource = ResourceNode::new("https://a.test/child");
+    for resource in [&parent_resource, &child_resource] {
+        assert!(graph.set_resource_record(
+            resource.id(),
+            Some(PersistedResourceRecord {
+                canonical_iri: resource.canonical_iri().into(),
+                facets: vec![],
+            })
+        ));
+    }
+    assert!(graph.set_shown_resource(Uuid::from_u128(1), Some(parent_resource.id())));
+    assert!(graph.set_shown_resource(Uuid::from_u128(2), Some(child_resource.id())));
+    let mut resource_relation = EdgePayload::new();
+    for sub_kind in [ContainmentSubKind::Domain, ContainmentSubKind::UrlPath] {
+        resource_relation.assert_relation(EdgeAssertion::Containment { sub_kind });
+    }
+    assert!(graph.set_resource_edges_between(
+        child_resource.id(),
+        parent_resource.id(),
+        &[persisted_edge_for_ids(
+            child_resource.id(),
+            parent_resource.id(),
+            &resource_relation
+        ),]
+    ));
+    for (id, author, time) in [
+        ("held-a", "https://alice.test/", 11),
+        ("held-b", "https://bob.test/", 22),
+    ] {
+        let mut payload = EdgePayload::new();
+        payload.push_persisted_semantic_statement(SemanticStatement {
+            statement_id: id.into(),
+            predicate: predicate_iri(SemanticSubKind::UserGrouped).into(),
+            recognized_sub_kind: Some(SemanticSubKind::UserGrouped),
+            label: Some(id.into()),
+            graph_scope: GraphScope::User,
+            provenance_iri: Some(author.into()),
+            asserted_at_ms: Some(time),
+        });
+        graph.inner.connect(child, parent, payload);
+    }
+    let snapshot = graph.to_snapshot();
+    let recorded = Graph::try_from_recorded_snapshot(&snapshot).unwrap();
+    assert_eq!(
+        recorded.to_snapshot().resource_edges,
+        snapshot.resource_edges
+    );
+    assert_eq!(
+        recorded.to_snapshot().edges,
+        snapshot.edges,
+        "parallel held surface records remain exact"
+    );
+    assert_eq!(recorded.inner.edge_count(), 2);
+    assert!(
+        recorded
+            .relations()
+            .all(|row| !matches!(row.kind, RelationKind::Containment(_))),
+        "recorded resource containment does not acquire Surface authority"
+    );
+    let legacy = Graph::try_from_snapshot(&snapshot).unwrap();
+    for kind in [ContainmentSubKind::Domain, ContainmentSubKind::UrlPath] {
+        assert!(
+            legacy
+                .relations()
+                .any(|row| row.kind == RelationKind::Containment(kind)),
+            "the existing loader still derives legacy containment"
+        );
+    }
+    assert_eq!(legacy.to_snapshot().resource_edges, snapshot.resource_edges);
+    let mut invalid = snapshot.clone();
+    invalid.resource_edges[0].from_node_id = Uuid::from_u128(99).to_string();
+    let before = serde_json::to_value(&invalid).unwrap();
+    let legacy_error = Graph::try_from_snapshot(&invalid)
+        .err()
+        .expect("legacy checked boundary rejects invalid resource");
+    let recorded_error = Graph::try_from_recorded_snapshot(&invalid)
+        .err()
+        .expect("recorded checked boundary rejects invalid resource");
+    assert_eq!(legacy_error, recorded_error);
+    assert!(matches!(
+        recorded_error,
+        ResourceSnapshotError::MissingResource { .. }
+    ));
+    assert_eq!(serde_json::to_value(&invalid).unwrap(), before);
+    assert!(Graph::try_from_recorded_snapshot(&snapshot).is_ok());
+}
+
+#[test]
 fn checked_snapshot_compatibility_wrappers_stop_before_partial_materialization() {
     let (valid, surface, from, to) = resource_snapshot_fixture();
     assert_resource_snapshot_restores(&valid, surface, from, to);

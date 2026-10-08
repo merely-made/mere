@@ -32,7 +32,7 @@
 //! The sample graph, simulation, node-children pool, and the small paint/DOM
 //! helpers live in [`mod@build`].
 
-use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};
+use std::collections::{BTreeMap, HashMap, HashSet};
 
 use crate::canvas::scene_paint::{Camera, ScenePaintStyle};
 use euclid::default::{Box2D, Point2D};

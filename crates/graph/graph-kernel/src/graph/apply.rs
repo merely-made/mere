@@ -1404,9 +1404,16 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
         },
         GraphDelta::AppendNodeProperty { key, property } => {
             let node_id = graph.get_node(key).map(|node| node.id);
-            let capture_property = property.clone();
-            let updated = graph.append_node_property(key, property);
+            let updated = graph.append_node_property(key, property.clone());
             if updated && let Some(node_id) = node_id {
+                let capture_property = graph
+                    .node_properties(key)
+                    .and_then(|properties| {
+                        properties
+                            .into_iter()
+                            .find(|stored| stored.content_eq(&property))
+                    })
+                    .expect("updated property remains stored");
                 graph.record_delta(&CapturedDelta::ReplayAppendNodePropertyById {
                     node_id: node_id.to_string(),
                     property: capture_property,

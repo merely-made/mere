@@ -14,6 +14,7 @@ pub mod assertions;
 pub mod edge_taxonomy;
 pub mod filter;
 pub mod legacy_assertions;
+pub mod literal_assertions;
 pub mod nodes_and_edges;
 pub mod queries_and_address;
 pub mod snapshot_basic;

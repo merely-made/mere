@@ -54,6 +54,14 @@ impl Graph {
     }
 
     pub(super) fn from_snapshot_unchecked(snapshot: &GraphSnapshot) -> Self {
+        Self::materialize_snapshot(snapshot, true)
+    }
+
+    pub(super) fn from_recorded_snapshot_unchecked(snapshot: &GraphSnapshot) -> Self {
+        Self::materialize_snapshot(snapshot, false)
+    }
+
+    fn materialize_snapshot(snapshot: &GraphSnapshot, legacy_derived_containment: bool) -> Self {
         let mut graph = Graph::new();
         // Restore the shared navigation history (one visit space, owner per node)
         // before the node loop, so each node's restored current page reads from it.
@@ -190,6 +198,20 @@ impl Graph {
                 .ok()
                 .and_then(|id| graph.get_node_key_by_id(id));
             if let (Some(from), Some(to)) = (from_key, to_key) {
+                if !legacy_derived_containment {
+                    let mut payload = payload_from_persisted(pedge);
+                    if let Some(data) = &mut payload.semantic {
+                        for statement in &mut data.statements {
+                            statement.normalize_legacy_asserter();
+                        }
+                    }
+                    if !payload.is_empty() || pedge.semantic.is_some() || pedge.traversal.is_some()
+                    {
+                        graph.inner.connect(from, to, payload);
+                        graph.bump_revision();
+                    }
+                    continue;
+                }
                 graph.restore_persisted_edge(from, to, pedge);
                 if let Some(key) = graph.find_edge_key(from, to)
                     && let Some(payload) = graph.inner.edge_mut(key)
@@ -321,7 +343,9 @@ impl Graph {
             graph.sync_node_import_provenance_from_records();
         }
 
-        graph.rebuild_derived_containment_relations();
+        if legacy_derived_containment {
+            graph.rebuild_derived_containment_relations();
+        }
 
         graph
     }

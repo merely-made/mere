@@ -270,7 +270,7 @@ impl Graph {
     }
 
     /// Append an open literal property, deduplicating the full literal record
-    /// `(predicate, value, datatype, lang)`. Returns whether the property was
+    /// `(predicate, value, datatype, lang, scope, asserter)`. Returns whether the property was
     /// newly added. The sanctioned write path for `Node::properties` — the
     /// linked-data ingest previously pushed through `get_node_mut` (write-path
     /// migration, 2026-07-01).
@@ -284,10 +284,7 @@ impl Graph {
             .iter_mut()
             .find(|existing| existing.content_eq(&property))
         {
-            if existing.provenance_iri != property.provenance_iri
-                || existing.asserted_at_ms != property.asserted_at_ms
-            {
-                existing.provenance_iri = property.provenance_iri;
+            if existing.asserted_at_ms != property.asserted_at_ms {
                 existing.asserted_at_ms = property.asserted_at_ms;
                 return self.set_node_facet(key, SEMANTIC_PROPERTIES, &properties);
             }

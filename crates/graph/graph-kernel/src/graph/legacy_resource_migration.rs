@@ -4,9 +4,8 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Explicit legacy Semantic replay. Ordinary replay keeps its recorded stores.
+//! Explicit legacy replay. Ordinary replay keeps its recorded stores.
 //! The caller must establish a legacy placement profile before using this adapter.
-//! Aggregate families remain on surfaces until their identity protocol is ruled.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
@@ -25,6 +24,87 @@ use crate::persistence::{
 
 /// Baseline claims lack a retained minting event; the current endpoints are a fallback.
 pub const LEGACY_RESOURCE_MIGRATION_FACET: &str = "semantic.legacy-resource-migration/v1";
+pub const LEGACY_AGGREGATE_MIGRATION_FACET: &str = "semantic.legacy-aggregate-migration/v1";
+
+/// A legacy aggregate has no carried handle or assertion timestamp.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct LegacyAggregateMigrationNote {
+    pub from_surface_id: String,
+    pub to_surface_id: String,
+    pub from_resource_id: String,
+    pub to_resource_id: String,
+    pub from_url: String,
+    pub to_url: String,
+    pub kind: super::RelationKind,
+    pub author: Option<super::Author>,
+    pub uncertainty: String,
+}
+
+/// An explicit endpoint choice for an ambiguous carried handle. No raw handle is aliased.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct LegacyResourceOriginResolution {
+    pub statement_id: String,
+    pub from_resource_id: Uuid,
+    pub to_resource_id: Uuid,
+}
+
+/// Validate against all retained, qualified legacy entries before reading shorter prefixes.
+pub fn validate_legacy_origin_resolutions(
+    baseline: &Graph,
+    entries: &[AttributedDelta],
+    resolutions: &[LegacyResourceOriginResolution],
+) -> Result<(), LegacyMigrationError> {
+    validated_resolutions(&probe_legacy_mint_links(baseline, entries)?, resolutions).map(|_| ())
+}
+
+fn validated_resolutions(
+    diagnostics: &[LegacyMintLinkDiagnostic],
+    resolutions: &[LegacyResourceOriginResolution],
+) -> Result<BTreeMap<String, Pair>, LegacyMigrationError> {
+    let mut candidates = BTreeMap::<String, BTreeSet<Pair>>::new();
+    for diagnostic in diagnostics {
+        let pairs = candidates
+            .entry(diagnostic.statement_id.clone())
+            .or_default();
+        for pair in [
+            &diagnostic.earlier_resource_pair,
+            &diagnostic.current_resource_pair,
+        ] {
+            pairs.insert((parse_id(&pair.0)?, parse_id(&pair.1)?));
+        }
+    }
+    let mut selected = BTreeMap::new();
+    for resolution in resolutions {
+        let pair = (resolution.from_resource_id, resolution.to_resource_id);
+        if !candidates
+            .get(&resolution.statement_id)
+            .is_some_and(|pairs| pairs.contains(&pair))
+        {
+            return Err(LegacyMigrationError(format!(
+                "checkpoint C28: invalid resource origin for {}",
+                resolution.statement_id
+            )));
+        }
+        if let Some(previous) = selected.insert(resolution.statement_id.clone(), pair)
+            && previous != pair
+        {
+            return Err(LegacyMigrationError(format!(
+                "checkpoint C28: conflicting resource origins for {}",
+                resolution.statement_id
+            )));
+        }
+    }
+    if candidates.keys().any(|id| !selected.contains_key(id)) {
+        return Err(LegacyMigrationError(format!(
+            "checkpoint C28: {} unresolved legacy mint-link handles",
+            candidates
+                .keys()
+                .filter(|id| !selected.contains_key(*id))
+                .count()
+        )));
+    }
+    Ok(selected)
+}
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct LegacyMigrationNote {
@@ -92,10 +172,21 @@ pub fn probe_legacy_mint_links(
                         continue;
                     }
                     let identity = ClaimIdentity::from(statement);
-                    if raw_semantic_edit(&entry.delta) {
+                    if matches!(entry.delta, CapturedDelta::ReplaySetEdgesByIds { .. })
+                        && !known.contains(&statement.statement_id)
+                        && statement.recognized_sub_kind.is_none()
+                        && super::built_in_predicate_stratum(&statement.predicate).is_none()
+                    {
+                        source.effective_predicate_stratum(&statement.predicate).map_err(|error|
+                            LegacyMigrationError(format!("checkpoint C22: new carried handle {} has unresolved placement: {error}", statement.statement_id)))?;
+                    }
+                    let resource_placed =
+                        historical_statement_stratum(&source, statement) == GraphStratum::Resource;
+                    if raw_semantic_edit(&entry.delta) && resource_placed {
                         raw.push((index, pair, identity, endpoints));
                     } else if let CapturedDelta::ReplaySetEdgesByIds { edges, .. } = &entry.delta
                         && !known.contains(&statement.statement_id)
+                        && resource_placed
                     {
                         let explicit = edges
                             .iter()
@@ -184,6 +275,9 @@ struct Replay {
     attribution: ReplayAttribution,
     origins: BTreeMap<String, Origin>,
     active: BTreeMap<String, Membership>,
+    aggregate_origins: BTreeMap<(Pair, u32), Pair>,
+    aggregate_active: BTreeMap<(Pair, u32), Membership>,
+    resolutions: BTreeMap<String, Pair>,
     authored_declarations: BTreeSet<String>,
 }
 
@@ -196,19 +290,26 @@ pub fn migrate_legacy_prefix(
     baseline: &Graph,
     entries: &[AttributedDelta],
 ) -> Result<MigratedReplay, LegacyMigrationError> {
+    migrate_legacy_prefix_with_resolutions(baseline, entries, &[])
+}
+
+/// Replay with explicit, evidenced choices for every ambiguous carried handle in this prefix.
+pub fn migrate_legacy_prefix_with_resolutions(
+    baseline: &Graph,
+    entries: &[AttributedDelta],
+    resolutions: &[LegacyResourceOriginResolution],
+) -> Result<MigratedReplay, LegacyMigrationError> {
     let diagnostics = probe_legacy_mint_links(baseline, entries)?;
-    if !diagnostics.is_empty() {
-        return Err(LegacyMigrationError(format!(
-            "checkpoint C28: {} unresolved legacy mint-link candidates",
-            diagnostics.len()
-        )));
-    }
+    let resolutions = validated_resolutions(&diagnostics, resolutions)?;
     let mut replay = Replay {
         source: baseline.clone(),
         output: baseline.clone(),
         attribution: ReplayAttribution::from_baseline(baseline),
         origins: BTreeMap::new(),
         active: BTreeMap::new(),
+        aggregate_origins: BTreeMap::new(),
+        aggregate_active: BTreeMap::new(),
+        resolutions,
         authored_declarations: baseline
             .to_snapshot()
             .resources
@@ -223,16 +324,25 @@ pub fn migrate_legacy_prefix(
             .collect(),
     };
     let before = replay.output.to_snapshot();
-    replay.sync(&Pairs::new(), true)?;
-    let baseline_effects = effects_between(&before, &replay.output.to_snapshot())?;
+    let before_facets = replay.output.facets().clone();
+    replay.sync(&Pairs::new(), true, None)?;
+    let mut baseline_effects = effects_between(&before, &replay.output.to_snapshot())?;
+    baseline_effects.extend(facet_effects_between(
+        &before_facets,
+        replay.output.facets(),
+    ));
     let mut entry_effects = Vec::with_capacity(entries.len());
     for entry in entries {
         let before = replay.output.to_snapshot();
+        let before_facets = replay.output.facets().clone();
         let old_pairs = surface_pairs(&replay.source)?;
         let typed_pair = typed_resource_pair(&entry.delta)?;
         if let Some(pair) = typed_pair {
             // This explicit replacement supersedes only this resource pair's old membership.
             replay.active.retain(|_, member| member.resource != pair);
+            replay
+                .aggregate_active
+                .retain(|_, member| member.resource != pair);
             let delta = replay
                 .attribution
                 .replay_delta(&entry.delta, &entry.author)
@@ -272,7 +382,7 @@ pub fn migrate_legacy_prefix(
                 .authored_declarations
                 .insert(record.canonical_iri.clone());
         }
-        replay.sync(&old_pairs, false)?;
+        replay.sync(&old_pairs, false, Some(&entry.author))?;
         if let Some(surface) = lifecycle_surface(&entry.delta)?
             && replay.source.get_node_key_by_id(surface).is_some()
         {
@@ -284,6 +394,10 @@ pub fn migrate_legacy_prefix(
             effective.push(entry.delta.clone());
         }
         effective.extend(effects_between(&before, &replay.output.to_snapshot())?);
+        effective.extend(facet_effects_between(
+            &before_facets,
+            replay.output.facets(),
+        ));
         entry_effects.push(effective);
     }
     // The same checked boundary used by ordinary loads verifies final cross-store handles.
@@ -391,8 +505,13 @@ impl Replay {
                 identity: statement.into(),
             });
         }
-        let (from, from_url) = self.ensure_resource(pair.0)?;
-        let (to, to_url) = self.ensure_resource(pair.1)?;
+        let (current_from, from_url) = self.ensure_resource(pair.0)?;
+        let (current_to, to_url) = self.ensure_resource(pair.1)?;
+        let (from, to) = self
+            .resolutions
+            .get(id)
+            .copied()
+            .unwrap_or((current_from, current_to));
         if baseline {
             let edge = persisted_edge_for_ids(pair.0, pair.1, payload);
             let statement = edge
@@ -456,17 +575,109 @@ impl Replay {
         Ok(())
     }
 
-    fn sync(&mut self, before: &Pairs, baseline: bool) -> Result<(), LegacyMigrationError> {
+    fn first_aggregate_origin(
+        &mut self,
+        pair: Pair,
+        kind: super::RelationKind,
+        author: Option<&super::Author>,
+    ) -> Result<Pair, LegacyMigrationError> {
+        let (from, from_url) = self.ensure_resource(pair.0)?;
+        let (to, to_url) = self.ensure_resource(pair.1)?;
+        let note = LegacyAggregateMigrationNote {
+            from_surface_id: pair.0.to_string(),
+            to_surface_id: pair.1.to_string(),
+            from_resource_id: from.to_string(),
+            to_resource_id: to.to_string(),
+            from_url,
+            to_url,
+            kind,
+            author: author.cloned(),
+            uncertainty: if author.is_some() {
+                "legacy_pair_kind_identity_without_assertion_handle_or_time"
+            } else {
+                "baseline_current_resources_without_mint_event_handle_or_time"
+            }
+            .into(),
+        };
+        let mut record = self.output.resource_record(from).expect("resource ensured");
+        let mut notes: Vec<LegacyAggregateMigrationNote> = record
+            .facets
+            .iter()
+            .find(|facet| facet.facet == LEGACY_AGGREGATE_MIGRATION_FACET)
+            .map(|facet| serde_json::from_str(&facet.value_json))
+            .transpose()
+            .map_err(|error| {
+                LegacyMigrationError(format!("invalid aggregate migration note: {error}"))
+            })?
+            .unwrap_or_default();
+        if notes.contains(&note) {
+            return Ok((from, to));
+        }
+        notes.push(note);
+        record
+            .facets
+            .retain(|facet| facet.facet != LEGACY_AGGREGATE_MIGRATION_FACET);
+        record.facets.push(PersistedResourceFacet {
+            facet: LEGACY_AGGREGATE_MIGRATION_FACET.into(),
+            value_json: serde_json::to_string(&notes).expect("aggregate note serializes"),
+        });
+        if !self.output.set_resource_record(from, Some(record)) {
+            return Err(LegacyMigrationError(
+                "aggregate migration note insertion was refused".into(),
+            ));
+        }
+        Ok((from, to))
+    }
+
+    fn sync(
+        &mut self,
+        before: &Pairs,
+        baseline: bool,
+        author: Option<&super::Author>,
+    ) -> Result<(), LegacyMigrationError> {
         let after = surface_pairs(&self.source)?;
         let previous = self.active.clone();
+        let aggregate_previous = self.aggregate_active.clone();
         let present = statement_ids(&after.values().flatten().cloned().collect::<Vec<_>>());
         self.active.retain(|id, _| present.contains(id));
         let mut seen = BTreeMap::new();
         let mut next = BTreeMap::<String, Membership>::new();
+        let mut aggregate_next = BTreeMap::<(Pair, u32), Membership>::new();
         for (&pair, edges) in &after {
             let old_ids = statement_ids(before.get(&pair).map(Vec::as_slice).unwrap_or(&[]));
+            let old_kinds: BTreeSet<_> = before
+                .get(&pair)
+                .into_iter()
+                .flatten()
+                .flat_map(|edge| aggregate_kinds(&payload_from_persisted(edge)))
+                .map(super::RelationKind::tag)
+                .collect();
             for edge in edges {
                 let mut payload = payload_from_persisted(edge);
+                for kind in aggregate_kinds(&payload).into_iter().filter(|kind| {
+                    super::built_in_relation_stratum(*kind) == GraphStratum::Resource
+                }) {
+                    let key = (pair, kind.tag());
+                    if !self.aggregate_origins.contains_key(&key) {
+                        let resource = self.first_aggregate_origin(pair, kind, author)?;
+                        self.aggregate_origins.insert(key, resource);
+                    }
+                    if self.aggregate_active.contains_key(&key) || !old_kinds.contains(&kind.tag())
+                    {
+                        let resource = self.aggregate_origins[&key];
+                        let mut claim = EdgePayload::new();
+                        claim.assert_relation(aggregate_assertion(kind));
+                        aggregate_next
+                            .entry(key)
+                            .or_insert_with(|| Membership {
+                                surface: pair,
+                                resource,
+                                edges: Vec::new(),
+                            })
+                            .edges
+                            .push(persisted_edge_for_ids(resource.0, resource.1, &claim));
+                    }
+                }
                 if let Some(semantic) = &mut payload.semantic {
                     for statement in &mut semantic.statements {
                         statement.normalize_legacy_asserter();
@@ -529,6 +740,7 @@ impl Replay {
             }
         }
         self.active = next;
+        self.aggregate_active = aggregate_next;
         // Remove surface authority first, before the exact resource handle admission check.
         for pair in before
             .keys()
@@ -537,11 +749,12 @@ impl Replay {
             .collect::<BTreeSet<_>>()
         {
             let edges = after.get(&pair).map(Vec::as_slice).unwrap_or(&[]);
-            let filtered = filter_edges(pair, edges, |id| {
+            let semantic_filtered = filter_edges(pair, edges, |id| {
                 self.origins
                     .get(id)
                     .is_some_and(|origin| origin.resource.is_some())
             });
+            let filtered = filter_resource_aggregates(pair, &semantic_filtered);
             let (Some(from), Some(to)) = (
                 self.output.get_node_key_by_id(pair.0),
                 self.output.get_node_key_by_id(pair.1),
@@ -557,7 +770,7 @@ impl Replay {
                 );
             }
         }
-        let affected: BTreeSet<_> = previous
+        let mut affected: BTreeSet<_> = previous
             .keys()
             .chain(self.active.keys())
             .filter(|id| previous.get(*id) != self.active.get(*id))
@@ -569,6 +782,19 @@ impl Replay {
                     .map(|member| member.resource)
             })
             .collect();
+        affected.extend(
+            aggregate_previous
+                .keys()
+                .chain(self.aggregate_active.keys())
+                .filter(|key| aggregate_previous.get(*key) != self.aggregate_active.get(*key))
+                .flat_map(|key| {
+                    aggregate_previous
+                        .get(key)
+                        .into_iter()
+                        .chain(self.aggregate_active.get(key))
+                        .map(|member| member.resource)
+                }),
+        );
         for pair in affected {
             let old_ids: BTreeSet<_> = previous
                 .iter()
@@ -577,8 +803,28 @@ impl Replay {
                 .collect();
             let existing = self.output.persisted_resource_edges_between(pair.0, pair.1);
             let mut desired = filter_edges(pair, &existing, |id| old_ids.contains(id));
+            // Remove only owned copies, preserving same-kind claims from other sources.
+            for edge in aggregate_previous
+                .values()
+                .filter(|member| member.resource == pair)
+                .flat_map(|member| &member.edges)
+            {
+                if let Some(index) = desired.iter().position(|held| held == edge) {
+                    desired.remove(index);
+                } else {
+                    return Err(LegacyMigrationError(
+                        "managed aggregate copy is absent".into(),
+                    ));
+                }
+            }
             desired.extend(
                 self.active
+                    .values()
+                    .filter(|member| member.resource == pair)
+                    .flat_map(|member| member.edges.iter().cloned()),
+            );
+            desired.extend(
+                self.aggregate_active
                     .values()
                     .filter(|member| member.resource == pair)
                     .flat_map(|member| member.edges.iter().cloned()),
@@ -613,6 +859,87 @@ impl Replay {
 
 fn parse_id(id: &str) -> Result<Uuid, LegacyMigrationError> {
     Uuid::parse_str(id).map_err(|error| LegacyMigrationError(error.to_string()))
+}
+
+fn historical_statement_stratum(
+    graph: &Graph,
+    statement: &super::SemanticStatement,
+) -> GraphStratum {
+    statement
+        .recognized_sub_kind
+        .map(|kind| super::built_in_relation_stratum(super::RelationKind::Semantic(kind)))
+        .or_else(|| super::built_in_predicate_stratum(&statement.predicate))
+        .unwrap_or_else(|| {
+            graph
+                .effective_predicate_stratum(&statement.predicate)
+                .unwrap_or(GraphStratum::Resource)
+        })
+}
+
+fn aggregate_kinds(payload: &EdgePayload) -> Vec<super::RelationKind> {
+    let mut kinds = Vec::new();
+    if let Some(data) = &payload.containment {
+        kinds.extend(
+            data.sub_kinds
+                .iter()
+                .copied()
+                .map(super::RelationKind::Containment),
+        );
+    }
+    if let Some(data) = &payload.imported {
+        kinds.extend(
+            data.sub_kinds
+                .iter()
+                .copied()
+                .map(super::RelationKind::Imported),
+        );
+    }
+    if let Some(data) = &payload.provenance {
+        kinds.extend(
+            data.sub_kinds
+                .iter()
+                .copied()
+                .map(super::RelationKind::Provenance),
+        );
+    }
+    kinds
+}
+
+fn aggregate_assertion(kind: super::RelationKind) -> super::EdgeAssertion {
+    match kind {
+        super::RelationKind::Containment(sub_kind) => {
+            super::EdgeAssertion::Containment { sub_kind }
+        },
+        super::RelationKind::Imported(sub_kind) => super::EdgeAssertion::Imported { sub_kind },
+        super::RelationKind::Provenance(sub_kind) => super::EdgeAssertion::Provenance { sub_kind },
+        _ => unreachable!("aggregate family"),
+    }
+}
+
+fn filter_resource_aggregates(pair: Pair, edges: &[PersistedEdge]) -> Vec<PersistedEdge> {
+    edges
+        .iter()
+        .filter_map(|edge| {
+            let mut payload = payload_from_persisted(edge);
+            for kind in aggregate_kinds(&payload)
+                .into_iter()
+                .filter(|kind| super::built_in_relation_stratum(*kind) == GraphStratum::Resource)
+            {
+                let selector = match kind {
+                    super::RelationKind::Containment(kind) => {
+                        super::RelationSelector::Containment(kind)
+                    },
+                    super::RelationKind::Imported(kind) => super::RelationSelector::Imported(kind),
+                    super::RelationKind::Provenance(kind) => {
+                        super::RelationSelector::Provenance(kind)
+                    },
+                    _ => unreachable!("aggregate family"),
+                };
+                payload.retract_relation(selector);
+            }
+            (!payload.is_empty()).then(|| persisted_edge_for_ids(pair.0, pair.1, &payload))
+        })
+        .collect()
 }
 
 fn record_value(
@@ -745,11 +1072,14 @@ fn effects_between(
         .iter()
         .map(|record| (ResourceNode::for_term(&record.canonical_iri).id(), record))
         .collect();
-    for id in before_records
-        .keys()
-        .chain(after_records.keys())
-        .copied()
-        .collect::<BTreeSet<_>>()
+    // Preserve materialized resource insertion order in the exact reconstruction.
+    let mut seen_records = BTreeSet::new();
+    for id in after
+        .resources
+        .iter()
+        .chain(&before.resources)
+        .map(|record| ResourceNode::for_term(&record.canonical_iri).id())
+        .filter(|id| seen_records.insert(*id))
     {
         if before_records.get(&id) != after_records.get(&id) {
             effects.push(CapturedDelta::ReplaySetResourceRecordById {
@@ -814,6 +1144,42 @@ fn effects_between(
     Ok(effects)
 }
 
+fn facet_effects_between(
+    before: &super::node_facets::NodeFacetStore,
+    after: &super::node_facets::NodeFacetStore,
+) -> Vec<CapturedDelta> {
+    let values = |store: &super::node_facets::NodeFacetStore| -> BTreeMap<_, _> {
+        store
+            .iter()
+            .flat_map(|(node, facets)| {
+                facets
+                    .iter()
+                    .map(move |(facet, value)| ((*node, facet.as_str().to_owned()), value.clone()))
+            })
+            .collect()
+    };
+    let before = values(before);
+    let after = values(after);
+    before
+        .keys()
+        .chain(after.keys())
+        .collect::<BTreeSet<_>>()
+        .into_iter()
+        .filter(|key| before.get(*key) != after.get(*key))
+        .map(|(node, facet)| match after.get(&(*node, facet.clone())) {
+            Some(value) => CapturedDelta::ReplaySetNodeFacetById {
+                node_id: node.to_string(),
+                facet: facet.clone(),
+                value_json: serde_json::to_string(value).expect("facet value serializes"),
+            },
+            None => CapturedDelta::ReplayRemoveNodeFacetById {
+                node_id: node.to_string(),
+                facet: facet.clone(),
+            },
+        })
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::super::{
@@ -871,6 +1237,512 @@ mod tests {
         (ResourceNode::new(a).id(), ResourceNode::new(b).id())
     }
 
+    fn persisted_aggregate_tags(edges: &[PersistedEdge]) -> Vec<u32> {
+        edges
+            .iter()
+            .flat_map(|edge| aggregate_kinds(&payload_from_persisted(edge)))
+            .map(super::super::RelationKind::tag)
+            .collect()
+    }
+
+    #[test]
+    fn legacy_resource_migration_exact_facet_effects_freeze_birth_clock_and_unknown_values() {
+        let baseline = baseline(&["https://a.test/", "https://b.test/"]);
+        let born = Uuid::from_u128(3);
+        let mut journal = GraphJournal::new();
+        let author = Author::person("legacy-author");
+        journal.record_as(
+            author.clone(),
+            CapturedDelta::ReplayAddNodeWithIdIfMissing {
+                id: born.to_string(),
+                url: "https://c.test/".into(),
+                position: [0.0, 0.0],
+            },
+        );
+        journal.record_as(
+            author.clone(),
+            CapturedDelta::ReplayAssertRelationByIds {
+                from_id: Uuid::from_u128(1).to_string(),
+                to_id: born.to_string(),
+                assertion: EdgeAssertion::Semantic {
+                    sub_kind: SemanticSubKind::UserGrouped,
+                    label: None,
+                    decay_progress: None,
+                },
+            },
+        );
+        journal.record_as(
+            author.clone(),
+            CapturedDelta::ReplaySetNodeFacetById {
+                node_id: born.to_string(),
+                facet: "foreign.opaque".into(),
+                value_json: r#"{"raw":"KeepCase#Exact","nested":[null,17,{"x":true}]}"#.into(),
+            },
+        );
+        journal.record_as(
+            author.clone(),
+            CapturedDelta::ReplaySetNodeFacetById {
+                node_id: born.to_string(),
+                facet: "foreign.removed".into(),
+                value_json: "[1,2]".into(),
+            },
+        );
+        journal.record_as(
+            author,
+            CapturedDelta::ReplayRemoveNodeFacetById {
+                node_id: born.to_string(),
+                facet: "foreign.removed".into(),
+            },
+        );
+        let input = serde_json::to_vec(journal.entries()).unwrap();
+        let translated = migrate_legacy_prefix(&baseline, journal.entries()).unwrap();
+        assert!(translated.entry_effects[0].iter().any(|delta| matches!(delta,
+            CapturedDelta::ReplaySetNodeFacetById { node_id, facet, .. }
+                if node_id == &born.to_string() && facet == super::super::node_facets::VISIT_HISTORY)));
+        assert!(
+            translated.entry_effects[4]
+                .iter()
+                .any(|delta| matches!(delta,
+            CapturedDelta::ReplayRemoveNodeFacetById { node_id, facet }
+                if node_id == &born.to_string() && facet == "foreign.removed"))
+        );
+        let snapshot_value = |graph: &Graph| {
+            let mut value = serde_json::to_value(graph.to_snapshot()).unwrap();
+            value["timestamp_secs"] = serde_json::json!(0);
+            value
+        };
+        let mut recreated = baseline.clone();
+        replay_captured_deltas_onto(&mut recreated, translated.baseline_effects.clone());
+        for effects in &translated.entry_effects {
+            replay_captured_deltas_onto(&mut recreated, effects.iter().cloned());
+        }
+        assert_eq!(
+            snapshot_value(&recreated),
+            snapshot_value(&translated.graph)
+        );
+        assert_eq!(recreated.facets(), translated.graph.facets());
+        let mut reordered_baseline = translated.baseline_effects.clone();
+        let records: Vec<_> = reordered_baseline
+            .iter()
+            .enumerate()
+            .filter_map(|(index, delta)| {
+                matches!(
+                    delta,
+                    CapturedDelta::ReplaySetResourceRecordById {
+                        record: Some(_),
+                        ..
+                    }
+                )
+                .then_some(index)
+            })
+            .collect();
+        assert_eq!(records.len(), 2);
+        for (destination, source) in records.iter().zip(records.iter().rev()) {
+            reordered_baseline[*destination] = translated.baseline_effects[*source].clone();
+        }
+        let mut reordered = baseline.clone();
+        replay_captured_deltas_onto(&mut reordered, reordered_baseline);
+        for effects in &translated.entry_effects {
+            replay_captured_deltas_onto(&mut reordered, effects.iter().cloned());
+        }
+        assert_eq!(
+            reordered.to_snapshot().edges,
+            translated.graph.to_snapshot().edges,
+            "changing record creation order does not change the carried statement handle"
+        );
+        assert_ne!(
+            reordered.to_snapshot().resources,
+            translated.graph.to_snapshot().resources,
+            "exact frozen reconstruction also preserves resource record order"
+        );
+        let mut fresh_clock = baseline.clone();
+        replay_captured_deltas_onto(&mut fresh_clock, translated.baseline_effects.clone());
+        for effects in &translated.entry_effects {
+            replay_captured_deltas_onto(&mut fresh_clock, effects.iter().filter(|delta| !matches!(delta,
+                CapturedDelta::ReplaySetNodeFacetById { node_id, facet, .. }
+                    if node_id == &born.to_string() && facet == super::super::node_facets::VISIT_HISTORY)).cloned());
+        }
+        let key = translated.graph.get_node_key_by_id(born).unwrap();
+        let frozen_ms = translated
+            .graph
+            .node_last_visited(key)
+            .unwrap()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_millis() as u64;
+        // A controlled later replay clock makes the negative independent of clock resolution.
+        replay_captured_deltas_onto(
+            &mut fresh_clock,
+            [CapturedDelta::ReplayTouchNodeLastVisitedById {
+                node_id: born.to_string(),
+                timestamp_ms: frozen_ms.saturating_add(1),
+            }],
+        );
+        assert_eq!(
+            snapshot_value(&fresh_clock),
+            snapshot_value(&translated.graph),
+            "the snapshot alone does not include the authoritative visit facet"
+        );
+        assert_ne!(
+            fresh_clock.facets(),
+            translated.graph.facets(),
+            "an unfrozen replay clock is observably different"
+        );
+        assert_eq!(serde_json::to_vec(journal.entries()).unwrap(), input);
+        assert_eq!(
+            statement_ids(&recreated.to_snapshot().edges),
+            statement_ids(&translated.graph.to_snapshot().edges)
+        );
+    }
+
+    #[test]
+    fn legacy_resource_migration_surface_placed_claims_need_no_resource_origin_resolution() {
+        let baseline = baseline(&["https://a.test/old", "https://b.test/"]);
+        for predicate in [
+            predicate_iri(SemanticSubKind::UserGrouped),
+            "https://vocab.test/custom",
+        ] {
+            let mut entries = Vec::new();
+            let author = Author::person("mint-author");
+            entries.push(AttributedDelta {
+                author: author.clone(),
+                delta: CapturedDelta::ReplayAssertSemanticPredicateByIds {
+                    from_id: Uuid::from_u128(1).to_string(),
+                    to_id: Uuid::from_u128(2).to_string(),
+                    predicate: predicate.into(),
+                },
+            });
+            entries.push(AttributedDelta {
+                author: author.clone(),
+                delta: CapturedDelta::ReplaySetNodeUrlById {
+                    node_id: Uuid::from_u128(1).to_string(),
+                    new_url: "https://a.test/new".into(),
+                },
+            });
+            if predicate.starts_with("https://vocab.test/") {
+                let mut declarations = Graph::new();
+                declarations
+                    .declare_predicate(predicate, GraphStratum::Surface)
+                    .unwrap();
+                let id = ResourceNode::for_term(predicate).id();
+                entries.push(AttributedDelta {
+                    author: author.clone(),
+                    delta: CapturedDelta::ReplaySetResourceRecordById {
+                        resource_id: id.to_string(),
+                        record: declarations.resource_record(id),
+                    },
+                });
+            }
+            let mut carried = payload("surface-carried", predicate, Some(&author.asserter_iri()));
+            carried.semantic.as_mut().unwrap().statements[0].graph_scope = GraphScope::Default;
+            entries.push(AttributedDelta {
+                author,
+                delta: exact(1, 2, &carried),
+            });
+            assert!(
+                probe_legacy_mint_links(&baseline, &entries)
+                    .unwrap()
+                    .is_empty()
+            );
+            let result = migrate_legacy_prefix(&baseline, &entries).unwrap();
+            assert_eq!(
+                statement_ids(&result.graph.to_snapshot().edges),
+                BTreeSet::from(["surface-carried".into()])
+            );
+            assert!(statement_ids(&result.graph.to_snapshot().resource_edges).is_empty());
+        }
+    }
+
+    #[test]
+    fn legacy_resource_migration_new_carried_conflicted_placement_refuses_with_known_handle_controls()
+     {
+        let baseline = baseline(&["https://a.test/old", "https://b.test/"]);
+        let predicate = "https://vocab.test/conflicted";
+        let author = Author::person("mint");
+        let mut declarations = Graph::new();
+        let resource_choice = declarations
+            .declare_predicate(predicate, GraphStratum::Resource)
+            .unwrap();
+        let surface_choice = declarations
+            .declare_predicate(predicate, GraphStratum::Surface)
+            .unwrap();
+        let resource_id = ResourceNode::for_term(predicate).id();
+        let mut conflict = declarations.resource_record(resource_id).unwrap();
+        let facet = conflict
+            .facets
+            .iter_mut()
+            .find(|facet| facet.facet == PREDICATE_DECLARATIONS_FACET)
+            .unwrap();
+        let mut choices: super::super::PredicateDeclarations =
+            serde_json::from_str(&facet.value_json).unwrap();
+        choices.selected = None;
+        facet.value_json = serde_json::to_string(&choices).unwrap();
+        let mut journal = GraphJournal::new();
+        journal.record_as(
+            author.clone(),
+            CapturedDelta::ReplayAssertSemanticPredicateByIds {
+                from_id: Uuid::from_u128(1).to_string(),
+                to_id: Uuid::from_u128(2).to_string(),
+                predicate: predicate.into(),
+            },
+        );
+        journal.record(CapturedDelta::ReplaySetNodeUrlById {
+            node_id: Uuid::from_u128(1).to_string(),
+            new_url: "https://a.test/new".into(),
+        });
+        journal.record(CapturedDelta::ReplaySetResourceRecordById {
+            resource_id: resource_id.to_string(),
+            record: Some(conflict.clone()),
+        });
+        let mut carried = payload("new-carried", predicate, Some(&author.asserter_iri()));
+        carried.semantic.as_mut().unwrap().statements[0].graph_scope = GraphScope::Default;
+        journal.record(exact(1, 2, &carried));
+        let before = serde_json::to_vec(journal.entries()).unwrap();
+        let error = migrate_legacy_prefix(&baseline, journal.entries())
+            .err()
+            .unwrap();
+        assert!(error.to_string().contains("checkpoint C22"));
+        let mut checkpoint = baseline.clone();
+        let revision = checkpoint.revision();
+        assert!(
+            journal
+                .migrated_replay_from_with_baseline(Seq(0), &mut checkpoint, &baseline)
+                .is_err()
+        );
+        assert_eq!(checkpoint.to_snapshot().edges, baseline.to_snapshot().edges);
+        assert_eq!(checkpoint.revision(), revision);
+        assert_eq!(serde_json::to_vec(journal.entries()).unwrap(), before);
+        for (selected, stratum) in [
+            (resource_choice, GraphStratum::Resource),
+            (surface_choice, GraphStratum::Surface),
+        ] {
+            choices.selected = Some(selected);
+            let mut record = conflict.clone();
+            record
+                .facets
+                .iter_mut()
+                .find(|facet| facet.facet == PREDICATE_DECLARATIONS_FACET)
+                .unwrap()
+                .value_json = serde_json::to_string(&choices).unwrap();
+            let mut entries = journal.entries().to_vec();
+            entries[2].delta = CapturedDelta::ReplaySetResourceRecordById {
+                resource_id: resource_id.to_string(),
+                record: Some(record),
+            };
+            let diagnostics = probe_legacy_mint_links(&baseline, &entries).unwrap();
+            let resolutions = if stratum == GraphStratum::Resource {
+                assert_eq!(diagnostics.len(), 1);
+                vec![LegacyResourceOriginResolution {
+                    statement_id: "new-carried".into(),
+                    from_resource_id: parse_id(&diagnostics[0].earlier_resource_pair.0).unwrap(),
+                    to_resource_id: parse_id(&diagnostics[0].earlier_resource_pair.1).unwrap(),
+                }]
+            } else {
+                assert!(diagnostics.is_empty());
+                vec![]
+            };
+            let result =
+                migrate_legacy_prefix_with_resolutions(&baseline, &entries, &resolutions).unwrap();
+            assert_eq!(
+                statement_ids(&result.graph.to_snapshot().resource_edges).contains("new-carried"),
+                stratum == GraphStratum::Resource
+            );
+            assert_eq!(
+                statement_ids(&result.graph.to_snapshot().edges).contains("new-carried"),
+                stratum == GraphStratum::Surface
+            );
+        }
+        // An already observed handle keeps its owning Resource store across the conflict.
+        let mut known = GraphJournal::new();
+        known.record(exact(1, 2, &carried));
+        known.record(CapturedDelta::ReplaySetResourceRecordById {
+            resource_id: resource_id.to_string(),
+            record: Some(conflict),
+        });
+        known.record(exact(1, 2, &carried));
+        let result = migrate_legacy_prefix(&baseline, known.entries()).unwrap();
+        assert_eq!(
+            statement_ids(&result.graph.to_snapshot().resource_edges),
+            BTreeSet::from(["new-carried".into()])
+        );
+        assert!(result.graph.effective_predicate_stratum(predicate).is_err());
+    }
+
+    #[test]
+    fn legacy_resource_migration_aggregate_catalog_places_all_23_kinds_with_uncertainty() {
+        let baseline = baseline(&["https://a.test/old", "https://b.test/"]);
+        let kinds: Vec<_> = [(2u32, 7), (4, 7), (5, 9)]
+            .into_iter()
+            .flat_map(|(family, count)| (0..count).map(move |sub| (family << 24) | sub))
+            .map(|tag| super::super::RelationKind::from_tag(tag).unwrap())
+            .collect();
+        assert_eq!(kinds.len(), 23);
+        let mut all = EdgePayload::new();
+        for kind in &kinds {
+            all.assert_relation(aggregate_assertion(*kind));
+        }
+        let mut journal = GraphJournal::new();
+        let author = Author::engine("legacy-import", "v7").via("reader");
+        journal.record_as(author.clone(), exact(1, 2, &all));
+        let result = migrate_legacy_prefix(&baseline, journal.entries()).unwrap();
+        let resource_tags = persisted_aggregate_tags(&result.graph.to_snapshot().resource_edges);
+        let surface_tags = persisted_aggregate_tags(&result.graph.to_snapshot().edges);
+        assert_eq!(resource_tags.len(), 16);
+        assert_eq!(surface_tags.len(), 7);
+        for kind in kinds {
+            let in_resource =
+                super::super::built_in_relation_stratum(kind) == GraphStratum::Resource;
+            assert_eq!(resource_tags.contains(&kind.tag()), in_resource);
+            assert_eq!(surface_tags.contains(&kind.tag()), !in_resource);
+        }
+        let from = ResourceNode::new("https://a.test/old").id();
+        let notes: Vec<LegacyAggregateMigrationNote> = serde_json::from_str(
+            &result
+                .graph
+                .resource_record(from)
+                .unwrap()
+                .facets
+                .iter()
+                .find(|facet| facet.facet == LEGACY_AGGREGATE_MIGRATION_FACET)
+                .unwrap()
+                .value_json,
+        )
+        .unwrap();
+        assert_eq!(notes.len(), 16);
+        assert!(
+            notes
+                .iter()
+                .all(|note| note.author.as_ref() == Some(&author)
+                    && note.uncertainty
+                        == "legacy_pair_kind_identity_without_assertion_handle_or_time")
+        );
+        let mut effective = baseline.clone();
+        replay_captured_deltas_onto(&mut effective, result.baseline_effects);
+        for effects in result.entry_effects {
+            replay_captured_deltas_onto(&mut effective, effects);
+        }
+        assert_eq!(
+            effective.to_snapshot().resource_edges,
+            result.graph.to_snapshot().resource_edges
+        );
+        assert_eq!(
+            effective.to_snapshot().edges,
+            result.graph.to_snapshot().edges
+        );
+    }
+
+    #[test]
+    fn legacy_resource_migration_aggregate_original_pair_survives_withdrawal_and_typed_takeover() {
+        let baseline = baseline(&[
+            "https://a.test/old",
+            "https://a.test/old",
+            "https://b.test/",
+        ]);
+        let mut claim = EdgePayload::new();
+        claim.assert_relation(EdgeAssertion::Provenance {
+            sub_kind: ProvenanceSubKind::ClippedFrom,
+        });
+        let mint = Author::person("mint");
+        let mut journal = GraphJournal::new();
+        journal.record_as(mint.clone(), exact(1, 3, &claim));
+        journal.record_as(Author::person("alias"), exact(2, 3, &claim));
+        journal.record(CapturedDelta::ReplaySetNodeUrlById {
+            node_id: Uuid::from_u128(1).to_string(),
+            new_url: "https://a.test/new".into(),
+        });
+        journal.record(clear(1, 3));
+        let pair = resource_pair("https://a.test/old", "https://b.test/");
+        let withdrawn = migrate_legacy_prefix(&baseline, journal.entries()).unwrap();
+        assert_eq!(
+            persisted_aggregate_tags(
+                &withdrawn
+                    .graph
+                    .persisted_resource_edges_between(pair.0, pair.1)
+            )
+            .len(),
+            1,
+            "withdrawal preserves the other original surface pair"
+        );
+        journal.record_as(Author::person("restorer"), exact(1, 3, &claim));
+        let restored = migrate_legacy_prefix(&baseline, journal.entries()).unwrap();
+        assert_eq!(
+            persisted_aggregate_tags(
+                &restored
+                    .graph
+                    .persisted_resource_edges_between(pair.0, pair.1)
+            )
+            .len(),
+            2
+        );
+        assert!(
+            restored
+                .graph
+                .persisted_resource_edges_between(
+                    ResourceNode::new("https://a.test/new").id(),
+                    pair.1
+                )
+                .is_empty()
+        );
+        let notes: Vec<LegacyAggregateMigrationNote> = serde_json::from_str(
+            &restored
+                .graph
+                .resource_record(pair.0)
+                .unwrap()
+                .facets
+                .iter()
+                .find(|facet| facet.facet == LEGACY_AGGREGATE_MIGRATION_FACET)
+                .unwrap()
+                .value_json,
+        )
+        .unwrap();
+        assert_eq!(notes.len(), 2);
+        assert_eq!(
+            notes
+                .iter()
+                .find(|note| note.from_surface_id == Uuid::from_u128(1).to_string())
+                .unwrap()
+                .author,
+            Some(mint)
+        );
+        let typed = vec![persisted_edge_for_ids(pair.0, pair.1, &claim)];
+        journal.record(CapturedDelta::ReplaySetResourceEdgesByIds {
+            from_resource_id: pair.0.to_string(),
+            to_resource_id: pair.1.to_string(),
+            edges: typed.clone(),
+        });
+        journal.record(CapturedDelta::ReplaySetNodeTitleById {
+            node_id: Uuid::from_u128(2).to_string(),
+            title: "unrelated".into(),
+        });
+        let taken = migrate_legacy_prefix(&baseline, journal.entries()).unwrap();
+        assert_eq!(
+            taken.graph.persisted_resource_edges_between(pair.0, pair.1),
+            typed,
+            "explicit pair ownership is not repopulated by an unrelated edit"
+        );
+        journal.record(clear(1, 3));
+        journal.record(exact(1, 3, &claim));
+        let new_member = migrate_legacy_prefix(&baseline, journal.entries()).unwrap();
+        assert_eq!(
+            persisted_aggregate_tags(
+                &new_member
+                    .graph
+                    .persisted_resource_edges_between(pair.0, pair.1)
+            )
+            .len(),
+            2,
+            "a later legacy reappearance adds its own copy without erasing the typed copy"
+        );
+        journal.record(clear(1, 3));
+        let final_state = migrate_legacy_prefix(&baseline, journal.entries()).unwrap();
+        assert_eq!(
+            final_state
+                .graph
+                .persisted_resource_edges_between(pair.0, pair.1),
+            typed
+        );
+    }
+
     #[test]
     fn legacy_resource_migration_preserves_baseline_handles_and_uncertainty_with_surface_controls()
     {
@@ -906,7 +1778,11 @@ mod tests {
             .graph
             .persisted_resource_edges_between(pair.0, pair.1);
         assert_eq!(statement_ids(&claims), BTreeSet::from(["unknown".into()]));
-        let claim = &claims[0].semantic.as_ref().unwrap().statements[0];
+        let claim = &claims
+            .iter()
+            .find_map(|edge| edge.semantic.as_ref())
+            .unwrap()
+            .statements[0];
         assert_eq!(claim.asserted_at_ms, Some(100));
         assert_eq!(
             claim.provenance_iri.as_deref(),
@@ -918,9 +1794,11 @@ mod tests {
             BTreeSet::from(["group".into()])
         );
         assert_eq!(held_surface[0].imported, before.edges[0].imported);
-        assert_eq!(
-            held_surface[0].provenance, before.edges[0].provenance,
-            "resource-nature aggregate retained pending identity ruling"
+        assert!(held_surface[0].provenance.is_none());
+        assert!(
+            claims
+                .iter()
+                .any(|edge| edge.provenance == before.edges[0].provenance)
         );
         assert_eq!(
             held_surface[0].semantic.as_ref().unwrap().statements[0]
@@ -956,6 +1834,34 @@ mod tests {
         assert_eq!(
             effective.to_snapshot().edges,
             replay.graph.to_snapshot().edges
+        );
+        let aggregate_notes: Vec<LegacyAggregateMigrationNote> = serde_json::from_str(
+            &record
+                .facets
+                .iter()
+                .find(|facet| facet.facet == LEGACY_AGGREGATE_MIGRATION_FACET)
+                .unwrap()
+                .value_json,
+        )
+        .unwrap();
+        assert_eq!(aggregate_notes.len(), 1);
+        assert!(aggregate_notes[0].author.is_none());
+        assert_eq!(
+            aggregate_notes[0].uncertainty,
+            "baseline_current_resources_without_mint_event_handle_or_time"
+        );
+        let mut noted_baseline = baseline.clone();
+        for record in &replay.graph.to_snapshot().resources {
+            assert!(noted_baseline.set_resource_record(
+                ResourceNode::for_term(&record.canonical_iri).id(),
+                Some(record.clone())
+            ));
+        }
+        let repeated = migrate_legacy_prefix(&noted_baseline, &[]).unwrap();
+        assert_eq!(
+            repeated.graph.resource_record(pair.0),
+            replay.graph.resource_record(pair.0),
+            "an existing identical uncertainty note is a valid no-op"
         );
     }
 
@@ -1613,6 +2519,114 @@ mod tests {
             serde_json::to_vec(journal.entries()).unwrap(),
             source_before
         );
+        for candidate in [
+            &diagnostic.earlier_resource_pair,
+            &diagnostic.current_resource_pair,
+        ] {
+            let choice = LegacyResourceOriginResolution {
+                statement_id: "carried".into(),
+                from_resource_id: parse_id(&candidate.0).unwrap(),
+                to_resource_id: parse_id(&candidate.1).unwrap(),
+            };
+            validate_legacy_origin_resolutions(&baseline, journal.entries(), &[choice.clone()])
+                .unwrap();
+            let resolved = migrate_legacy_prefix_with_resolutions(
+                &baseline,
+                journal.entries(),
+                &[choice.clone()],
+            )
+            .unwrap();
+            let exact = resolved
+                .graph
+                .persisted_resource_edges_between(choice.from_resource_id, choice.to_resource_id);
+            assert_eq!(statement_ids(&exact), BTreeSet::from(["carried".into()]));
+            let claim = &exact
+                .iter()
+                .find_map(|edge| edge.semantic.as_ref())
+                .unwrap()
+                .statements[0];
+            assert_eq!(
+                claim,
+                &persisted_edge_for_ids(Uuid::from_u128(1), Uuid::from_u128(2), &carried)
+                    .semantic
+                    .unwrap()
+                    .statements[0],
+                "resolution preserves carried ID, time and source"
+            );
+            let prefix = journal
+                .migrated_prefix_at_from_with_resolutions(&baseline, Seq(1), &[choice.clone()])
+                .unwrap()
+                .unwrap();
+            assert!(
+                !statement_ids(&prefix.graph.to_snapshot().resource_edges).contains("carried"),
+                "future resolution does not invent a handle in an earlier prefix"
+            );
+            let mut effective = baseline.clone();
+            replay_captured_deltas_onto(&mut effective, resolved.baseline_effects);
+            for effects in resolved.entry_effects {
+                replay_captured_deltas_onto(&mut effective, effects);
+            }
+            assert_eq!(
+                effective.to_snapshot().resource_edges,
+                resolved.graph.to_snapshot().resource_edges
+            );
+            let mut checkpoint = baseline.clone();
+            journal
+                .migrated_replay_from_with_baseline_and_resolutions(
+                    Seq(1),
+                    &mut checkpoint,
+                    &baseline,
+                    &[choice],
+                )
+                .unwrap();
+            assert_eq!(
+                statement_ids(&checkpoint.to_snapshot().resource_edges),
+                BTreeSet::from(["carried".into()])
+            );
+        }
+        let invalid = LegacyResourceOriginResolution {
+            statement_id: "carried".into(),
+            from_resource_id: ResourceNode::new("https://third.test/").id(),
+            to_resource_id: parse_id(&diagnostic.current_resource_pair.1).unwrap(),
+        };
+        let mut unknown = invalid.clone();
+        unknown.statement_id = "absent-handle".into();
+        let earlier = LegacyResourceOriginResolution {
+            statement_id: "carried".into(),
+            from_resource_id: parse_id(&diagnostic.earlier_resource_pair.0).unwrap(),
+            to_resource_id: parse_id(&diagnostic.earlier_resource_pair.1).unwrap(),
+        };
+        let later = LegacyResourceOriginResolution {
+            from_resource_id: parse_id(&diagnostic.current_resource_pair.0).unwrap(),
+            ..earlier.clone()
+        };
+        for choices in [vec![invalid], vec![unknown], vec![earlier, later]] {
+            assert!(
+                migrate_legacy_prefix_with_resolutions(&baseline, journal.entries(), &choices)
+                    .is_err()
+            );
+            assert!(
+                journal
+                    .migrated_snapshot_at_from_with_resolutions(&baseline, Seq(1), &choices)
+                    .is_err()
+            );
+            let mut checkpoint = baseline.clone();
+            let original = checkpoint.to_snapshot();
+            let revision = checkpoint.revision();
+            assert!(
+                journal
+                    .migrated_replay_from_with_baseline_and_resolutions(
+                        Seq(0),
+                        &mut checkpoint,
+                        &baseline,
+                        &choices
+                    )
+                    .is_err()
+            );
+            assert_eq!(checkpoint.to_snapshot().edges, original.edges);
+            assert_eq!(checkpoint.to_snapshot().resources, original.resources);
+            assert_eq!(checkpoint.revision(), revision);
+        }
         let error = migrate_legacy_prefix(&baseline, journal.entries())
             .err()
             .expect("direct adapter must hold unresolved linkage");

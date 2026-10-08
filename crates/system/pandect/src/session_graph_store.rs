@@ -26,6 +26,16 @@ use kernel::graph::Graph;
 use kernel::persistence::GraphSnapshot;
 
 use crate::engine_profile_store::SESSIONS_DIR;
+use crate::graph_placement::PlacementProfile;
+
+/// Snapshot input with explicit placement; absent metadata stays unqualified.
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ProfiledGraphSnapshot {
+    #[serde(flatten)]
+    pub snapshot: GraphSnapshot,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub placement: Option<PlacementProfile>,
+}
 
 /// The graph sidecar file name under a session directory.
 pub const GRAPH_FILE: &str = "graph.json";
@@ -54,13 +64,34 @@ pub fn save(path: &Path, graph: &Graph) -> io::Result<()> {
     fs::write(path, json)
 }
 
+/// Save caller-qualified placement with its snapshot in one recoverable replacement.
+pub fn save_profiled(
+    path: &Path,
+    graph: &Graph,
+    placement: Option<PlacementProfile>,
+) -> io::Result<()> {
+    let input = ProfiledGraphSnapshot {
+        snapshot: graph.to_snapshot(),
+        placement,
+    };
+    let bytes = serde_json::to_vec_pretty(&input)
+        .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
+    crate::atomic_file::write_bytes_with_backup(path, &bytes)
+}
+
 /// Load a graph from `path`, or `Ok(None)` when the file does not exist (a fresh
 /// session). A malformed file surfaces as an error so the host can decide whether
 /// to fall back to a fresh graph rather than silently discard the session.
 pub fn load(path: &Path) -> io::Result<Option<Graph>> {
-    load_snapshot(path)?
-        .map(|snapshot| {
-            Graph::try_from_snapshot(&snapshot)
+    load_profiled_snapshot(path)?
+        .map(|input| {
+            if input.placement == Some(PlacementProfile::LegacySurfaceV1) {
+                return Err(io::Error::new(
+                    io::ErrorKind::InvalidData,
+                    "legacy graph placement requires qualified replay",
+                ));
+            }
+            Graph::try_from_snapshot(&input.snapshot)
                 .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))
         })
         .transpose()
@@ -74,12 +105,28 @@ pub fn load(path: &Path) -> io::Result<Option<Graph>> {
 /// (see `GraphSnapshot::legacy_image_count`). Hosts with nothing to do in
 /// between should call [`load`].
 pub fn load_snapshot(path: &Path) -> io::Result<Option<GraphSnapshot>> {
+    load_profiled_snapshot(path)?
+        .map(|input| {
+            if input.placement == Some(PlacementProfile::LegacySurfaceV1) {
+                return Err(io::Error::new(
+                    io::ErrorKind::InvalidData,
+                    "legacy graph placement requires qualified replay",
+                ));
+            }
+            Ok(input.snapshot)
+        })
+        .transpose()
+}
+
+/// Read placement without inferring it from columns, claims or declarations.
+/// Materialization and any legacy migration remain the caller's qualified step.
+pub fn load_profiled_snapshot(path: &Path) -> io::Result<Option<ProfiledGraphSnapshot>> {
     let json = match fs::read_to_string(path) {
         Ok(json) => json,
         Err(e) if e.kind() == io::ErrorKind::NotFound => return Ok(None),
         Err(e) => return Err(e),
     };
-    let snapshot: GraphSnapshot =
+    let snapshot: ProfiledGraphSnapshot =
         serde_json::from_str(&json).map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
     Ok(Some(snapshot))
 }
@@ -90,6 +137,72 @@ mod tests {
     use euclid::default::Point2D;
     use kernel::graph::fixtures::GraphFixtures;
     use uuid::Uuid;
+
+    #[test]
+    fn explicit_file_profiles_and_bare_resource_inputs_remain_distinct() {
+        use kernel::persistence::PersistedResourceRecord;
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("graph.json");
+        let graph = Graph::new();
+        for placement in [
+            None,
+            Some(PlacementProfile::RecordedStrataV1),
+            Some(PlacementProfile::LegacySurfaceV1),
+        ] {
+            save_profiled(&path, &graph, placement).unwrap();
+            assert_eq!(
+                load_profiled_snapshot(&path).unwrap().unwrap().placement,
+                placement
+            );
+            if placement == Some(PlacementProfile::LegacySurfaceV1) {
+                assert_eq!(
+                    load_snapshot(&path).err().unwrap().kind(),
+                    io::ErrorKind::InvalidData
+                );
+                assert_eq!(
+                    load(&path).err().unwrap().kind(),
+                    io::ErrorKind::InvalidData
+                );
+            } else {
+                assert!(load_snapshot(&path).unwrap().unwrap().nodes.is_empty());
+                assert!(load(&path).unwrap().is_some());
+            }
+        }
+        let mut bare = graph.to_snapshot();
+        bare.resources.push(PersistedResourceRecord {
+            canonical_iri: "https://resource.test/".into(),
+            facets: vec![],
+        });
+        fs::write(&path, serde_json::to_vec(&bare).unwrap()).unwrap();
+        let input = load_profiled_snapshot(&path).unwrap().unwrap();
+        assert_eq!(
+            input.placement, None,
+            "resources do not establish placement history"
+        );
+        assert_eq!(input.snapshot.resources, bare.resources);
+        assert!(
+            load(&path)
+                .unwrap()
+                .unwrap()
+                .resource_nodes()
+                .next()
+                .is_some()
+        );
+        let mut invalid = serde_json::to_value(&bare).unwrap();
+        invalid["placement"] = serde_json::json!("future-placement-v9");
+        let bytes = serde_json::to_vec(&invalid).unwrap();
+        fs::write(&path, &bytes).unwrap();
+        assert_eq!(
+            load_profiled_snapshot(&path).unwrap_err().kind(),
+            io::ErrorKind::InvalidData
+        );
+        assert_eq!(fs::read(&path).unwrap(), bytes);
+        save(&path, &graph).unwrap();
+        assert_eq!(
+            load_profiled_snapshot(&path).unwrap().unwrap().placement,
+            None
+        );
+    }
 
     #[test]
     fn round_trips_a_graph_through_json() {

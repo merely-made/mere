@@ -32,12 +32,18 @@ use kernel::types::ImageRole;
 use uuid::Uuid;
 
 use crate::NodeFacetStore;
+use crate::graph_placement::PlacementProfile;
 use eidetic::manifest::load_manifest;
 
 /// Schema id bytes for the graph-snapshot codicil schema. The [`SchemaRef`] is the
 /// BLAKE3 of these bytes, so it is stable across builds and machines.
 pub const GRAPH_SNAPSHOT_SCHEMA_ID: &[u8] = b"mere.graph-snapshot/v2";
 const LEGACY_GRAPH_SNAPSHOT_SCHEMA_ID: &[u8] = b"mere.graph-snapshot/v1";
+pub const PROFILED_GRAPH_SNAPSHOT_SCHEMA_ID: &[u8] = b"mere.graph-snapshot/v3";
+
+pub fn profiled_graph_snapshot_schema_ref() -> SchemaRef {
+    SchemaRef::from_id(ManifestId::of_blob(PROFILED_GRAPH_SNAPSHOT_SCHEMA_ID))
+}
 
 /// The content-addressed schema reference every graph codicil is tagged with.
 ///
@@ -63,6 +69,21 @@ pub struct GraphCodicil {
     pub snapshot: GraphSnapshot,
     #[serde(default)]
     pub facets: NodeFacetStore,
+}
+
+/// Placement belongs to the input envelope, never to inferred graph contents.
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ProfiledGraphCodicil {
+    #[serde(flatten)]
+    pub codicil: GraphCodicil,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub placement: Option<PlacementProfile>,
+}
+
+impl TypedPayload for ProfiledGraphCodicil {
+    fn schema_ref() -> SchemaRef {
+        profiled_graph_snapshot_schema_ref()
+    }
 }
 
 impl TypedPayload for GraphCodicil {
@@ -268,6 +289,31 @@ pub async fn save_graph_snapshot_codicil_sealed(
     .await
 }
 
+/// Freeze caller-qualified placement with its snapshot and facets under v3.
+pub async fn save_profiled_graph_codicil_sealed(
+    store: &mut dyn Store,
+    sealer: Option<&dyn PayloadSealer>,
+    mut input: ProfiledGraphCodicil,
+    redaction: RedactionPolicy,
+    created_at: Timestamp,
+) -> Result<ManifestId> {
+    Graph::try_from_snapshot(&input.codicil.snapshot)
+        .map_err(|error| Error::new(format!("invalid graph codicil snapshot: {error}")))?;
+    redaction.apply(&mut input.codicil.snapshot);
+    redaction.apply_facets(&mut input.codicil.facets);
+    save_typed_sealed(
+        store,
+        sealer,
+        &input,
+        Vec::<BlobSource>::new(),
+        PrivacyClass::LocalOnly,
+        graph_codicil_provenance(created_at),
+        TrustEnvelope::self_asserted(),
+        created_at,
+    )
+    .await
+}
+
 /// Thaw a stored graph codicil back into a live [`Graph`]. `Ok(None)` if no codicil
 /// is stored under `id`.
 ///
@@ -300,36 +346,18 @@ pub async fn open_codicil_as_session_sealed(
     sealer: Option<&dyn PayloadSealer>,
     id: ManifestId,
 ) -> Result<Option<Graph>> {
-    let mut fetcher = NoFetcher;
-    let Some(manifest) = load_manifest(store, id).await? else {
-        return Ok(None);
-    };
-    if manifest.schema == graph_snapshot_schema_ref() {
-        let payload = load_typed_sealed::<GraphCodicil>(store, &mut fetcher, sealer, id).await?;
-        return payload.map(GraphCodicil::into_graph).transpose();
-    }
-    if manifest.schema == legacy_graph_snapshot_schema_ref() {
-        let payload =
-            load_typed_sealed::<LegacyGraphCodicil>(store, &mut fetcher, sealer, id).await?;
-        return payload
-            .map(|codicil| {
-                Graph::try_from_snapshot(&codicil.0).map_err(|error| {
-                    Error::new(format!("invalid legacy graph codicil snapshot: {error}"))
-                })
-            })
-            .transpose();
-    }
-    Err(Error::new(format!(
-        "manifest {} is not a graph codicil",
-        id
-    )))
+    load_graph_codicil_sealed(store, sealer, id)
+        .await?
+        .map(GraphCodicil::into_graph)
+        .transpose()
 }
 
-/// List manifests for current v2 and readable legacy v1 graph codicils. Order is
+/// List manifests for v1/v2 and explicitly profiled v3 graph codicils. Order is
 /// store-defined; callers that want newest-first should sort on `created_at`.
 pub async fn list_graph_codicils(store: &mut dyn Store) -> Result<Vec<BlobManifest>> {
     let mut manifests = list_typed::<GraphCodicil>(store).await?;
     manifests.extend(list_typed::<LegacyGraphCodicil>(store).await?);
+    manifests.extend(list_typed::<ProfiledGraphCodicil>(store).await?);
     Ok(manifests)
 }
 
@@ -404,17 +432,48 @@ async fn load_graph_codicil_sealed(
     sealer: Option<&dyn PayloadSealer>,
     id: ManifestId,
 ) -> Result<Option<GraphCodicil>> {
+    load_profiled_graph_codicil_sealed(store, sealer, id)
+        .await?
+        .map(|input| {
+            if input.placement == Some(PlacementProfile::LegacySurfaceV1) {
+                return Err(Error::new(
+                    "legacy graph placement requires qualified replay",
+                ));
+            }
+            Ok(input.codicil)
+        })
+        .transpose()
+}
+
+/// Read the explicit input profile. v1/v2 remain unqualified regardless of columns.
+pub async fn load_profiled_graph_codicil_sealed(
+    store: &mut dyn Store,
+    sealer: Option<&dyn PayloadSealer>,
+    id: ManifestId,
+) -> Result<Option<ProfiledGraphCodicil>> {
     let Some(manifest) = load_manifest(store, id).await? else {
         return Ok(None);
     };
     let mut fetcher = NoFetcher;
+    if manifest.schema == profiled_graph_snapshot_schema_ref() {
+        let payload =
+            load_typed_sealed::<ProfiledGraphCodicil>(store, &mut fetcher, sealer, id).await?;
+        if let Some(input) = &payload {
+            Graph::try_from_snapshot(&input.codicil.snapshot)
+                .map_err(|error| Error::new(format!("invalid graph codicil snapshot: {error}")))?;
+        }
+        return Ok(payload);
+    }
     if manifest.schema == graph_snapshot_schema_ref() {
         let payload = load_typed_sealed::<GraphCodicil>(store, &mut fetcher, sealer, id).await?;
         if let Some(codicil) = &payload {
             Graph::try_from_snapshot(&codicil.snapshot)
                 .map_err(|error| Error::new(format!("invalid graph codicil snapshot: {error}")))?;
         }
-        return Ok(payload);
+        return Ok(payload.map(|codicil| ProfiledGraphCodicil {
+            codicil,
+            placement: None,
+        }));
     }
     if manifest.schema == legacy_graph_snapshot_schema_ref() {
         return load_typed_sealed::<LegacyGraphCodicil>(store, &mut fetcher, sealer, id)
@@ -423,9 +482,12 @@ async fn load_graph_codicil_sealed(
                 let graph = Graph::try_from_snapshot(&legacy.0).map_err(|error| {
                     Error::new(format!("invalid legacy graph codicil snapshot: {error}"))
                 })?;
-                Ok(GraphCodicil {
-                    snapshot: graph.to_snapshot(),
-                    facets: graph.facets().clone(),
+                Ok(ProfiledGraphCodicil {
+                    codicil: GraphCodicil {
+                        snapshot: graph.to_snapshot(),
+                        facets: graph.facets().clone(),
+                    },
+                    placement: None,
                 })
             })
             .transpose();
@@ -497,6 +559,105 @@ mod tests {
         graph.add_node("https://b.example".to_string(), Point2D::new(3.0, 4.0));
         set_pinned(&mut graph, "https://a.example", true);
         graph
+    }
+
+    #[test]
+    fn codicil_profiles_are_explicit_and_legacy_inputs_require_qualified_replay() {
+        pollster::block_on(async {
+            let mut store = InMemoryStore::default();
+            let graph = sample_graph();
+            let mut snapshot = graph.to_snapshot();
+            snapshot
+                .resources
+                .push(kernel::persistence::PersistedResourceRecord {
+                    canonical_iri: "urn:mere:placement-control".into(),
+                    facets: Vec::new(),
+                });
+            let mut ids = Vec::new();
+            for placement in [
+                None,
+                Some(PlacementProfile::RecordedStrataV1),
+                Some(PlacementProfile::LegacySurfaceV1),
+            ] {
+                let input = ProfiledGraphCodicil {
+                    codicil: GraphCodicil {
+                        snapshot: snapshot.clone(),
+                        facets: graph.facets().clone(),
+                    },
+                    placement,
+                };
+                let id = save_profiled_graph_codicil_sealed(
+                    &mut store,
+                    None,
+                    input,
+                    RedactionPolicy::include_all(),
+                    Timestamp(1),
+                )
+                .await
+                .unwrap();
+                ids.push(id);
+                let loaded = load_profiled_graph_codicil_sealed(&mut store, None, id)
+                    .await
+                    .unwrap()
+                    .unwrap();
+                assert_eq!(loaded.placement, placement);
+                assert_eq!(loaded.codicil.snapshot.resources, snapshot.resources);
+                if placement == Some(PlacementProfile::LegacySurfaceV1) {
+                    assert!(open_codicil_as_session(&mut store, id).await.is_err());
+                    assert!(load_graph_codicil(&mut store, id).await.is_err());
+                } else {
+                    assert_eq!(
+                        open_codicil_as_session(&mut store, id)
+                            .await
+                            .unwrap()
+                            .unwrap()
+                            .to_snapshot()
+                            .resources,
+                        snapshot.resources
+                    );
+                }
+            }
+            for version in [1, 2] {
+                let id = if version == 1 {
+                    save_typed_sealed(
+                        &mut store,
+                        None,
+                        &LegacyGraphCodicil(snapshot.clone()),
+                        Vec::<BlobSource>::new(),
+                        PrivacyClass::LocalOnly,
+                        graph_codicil_provenance(Timestamp(1)),
+                        TrustEnvelope::self_asserted(),
+                        Timestamp(1),
+                    )
+                    .await
+                    .unwrap()
+                } else {
+                    save_graph_snapshot_codicil(
+                        &mut store,
+                        snapshot.clone(),
+                        graph.facets().clone(),
+                        RedactionPolicy::include_all(),
+                        Timestamp(1),
+                    )
+                    .await
+                    .unwrap()
+                };
+                let input = load_profiled_graph_codicil_sealed(&mut store, None, id)
+                    .await
+                    .unwrap()
+                    .unwrap();
+                assert_eq!(
+                    input.placement, None,
+                    "v1/v2 resource columns do not prove legacy or recorded placement"
+                );
+                assert_eq!(input.codicil.snapshot.resources, snapshot.resources);
+                ids.push(id);
+            }
+            let listed = list_graph_codicils(&mut store).await.unwrap();
+            for id in ids {
+                assert!(listed.iter().any(|manifest| manifest.id == id));
+            }
+        });
     }
 
     #[test]
