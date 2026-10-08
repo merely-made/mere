@@ -35,6 +35,7 @@
 
 pub mod catalog;
 mod families;
+pub mod grouping;
 pub mod host_dataset;
 pub mod projection;
 pub mod registry;
