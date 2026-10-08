@@ -2,11 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-//! The desktop's file chooser: the platform's open dialog, through
+//! The desktop's file choosers: platform open and save-path dialogs, through
 //! `light-file-dialog`, the dialog crate Graphshell's desktop already uses.
 //!
 //! The dialog is modal and answers before [`FileChooser::open`] returns. A
 //! machine with no graphical dialog backend answers with nothing chosen.
+
+use std::path::PathBuf;
 
 use cambium::{FileEvent, FileRequest, OpenedFile};
 use cambium_rootstock::{FileAnswer, FileChooser};
@@ -24,12 +26,9 @@ impl FileChooser for DialogFileChooser {
 }
 
 fn choose(request: &FileRequest) -> Vec<OpenedFile> {
-    use light_file_dialog::dialog::{Dialog, DialogBackend, OpenFileDialog};
+    use light_file_dialog::dialog::{Dialog, OpenFileDialog};
 
-    light_file_dialog::set_verbose(0);
-    light_file_dialog::set_silent(1);
-    light_file_dialog::set_force_console(0);
-    if !DialogBackend::query().graphic {
+    if !graphical_dialog_available() {
         return Vec::new();
     }
     let patterns: Vec<String> = request
@@ -54,6 +53,40 @@ fn choose(request: &FileRequest) -> Vec<OpenedFile> {
                 .collect()
         })
         .unwrap_or_default()
+}
+
+/// Choose an output path through the platform's modal save dialog.
+///
+/// `extensions` contains suffixes without a leading dot, as in `&["json"]`.
+/// Cancellation or an unavailable graphical backend returns `None`. This
+/// chooses only a path: validation, replacement policy and writing remain the
+/// caller's responsibility.
+pub fn choose_save_path(title: &str, suggested_name: &str, extensions: &[&str]) -> Option<PathBuf> {
+    use light_file_dialog::dialog::{Dialog, SaveFileDialog};
+
+    if !graphical_dialog_available() {
+        return None;
+    }
+    let patterns: Vec<String> = extensions
+        .iter()
+        .map(|extension| format!("*.{extension}"))
+        .collect();
+    let patterns: Vec<&str> = patterns.iter().map(String::as_str).collect();
+    SaveFileDialog::new(title)
+        .default_path(suggested_name)
+        .filter(&patterns)
+        .show()
+        .filter(|path| !path.is_empty())
+        .map(PathBuf::from)
+}
+
+fn graphical_dialog_available() -> bool {
+    use light_file_dialog::dialog::DialogBackend;
+
+    light_file_dialog::set_verbose(0);
+    light_file_dialog::set_silent(1);
+    light_file_dialog::set_force_console(0);
+    DialogBackend::query().graphic
 }
 
 /// A file on disk as an [`OpenedFile`], or `None` when it cannot be read.

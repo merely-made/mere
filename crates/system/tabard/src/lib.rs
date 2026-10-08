@@ -18,10 +18,14 @@
 #![doc(html_no_source)]
 #![forbid(unsafe_code)]
 
+pub mod artifact;
 pub mod library;
+pub mod portable;
 pub mod smolweb;
 pub mod theme;
 pub mod workshop;
+
+pub use artifact::{DtcgModeDocument, DtcgModeProvenance, ModeExportError, ModePalette};
 
 use std::collections::BTreeMap;
 
@@ -64,9 +68,10 @@ pub const LAGRANGE_V1_21_1_IGNORED_LABELS: [&str; 2] = ["yellow", "magenta"];
 /// theme file or settings entry); built-ins carry it too, so editing one can
 /// fork a user copy from its seeds.
 ///
-/// The exports below derive the normal-contrast palette selected by
-/// `Seeds::dark`; high-contrast profiles, syntax palettes and product roles
-/// in the exports remain follow-on work.
+/// The legacy no-argument exports derive raw authored seeds at normal
+/// contrast, selected by `Seeds::dark`. Explicit-mode exports apply harmony
+/// and the selected canonical contrast profile; see [`Theme::palette_for_mode`].
+/// Product roles are outside the current CSS/DTCG color artifact.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Theme {
     pub id: String,
@@ -153,24 +158,7 @@ impl Theme {
     /// roles as --tabard-syntax-keyword and the like. A host may append
     /// ordinary author rules which use them through var().
     pub fn css_custom_properties(&self) -> String {
-        let mut stylesheet = String::from(":root {\n");
-        for role in color_roles(self.palette()) {
-            stylesheet.push_str("  --tabard-color-");
-            stylesheet.push_str(role.name);
-            stylesheet.push_str(": ");
-            stylesheet.push_str(&css_color(role.value));
-            stylesheet.push_str(";\n");
-        }
-        let syntax = self.syntax_palette();
-        for role in SyntaxRole::ALL {
-            stylesheet.push_str("  --tabard-syntax-");
-            stylesheet.push_str(role.name());
-            stylesheet.push_str(": ");
-            stylesheet.push_str(&css_color(syntax.role(role)));
-            stylesheet.push_str(";\n");
-        }
-        stylesheet.push_str("}\n");
-        stylesheet
+        custom_properties(self.palette(), self.syntax_palette())
     }
 
     /// Emit Lagrange's documented UI `palette.txt` artifact for both modes.
@@ -183,6 +171,26 @@ impl Theme {
     pub fn lagrange_palette_txt(&self) -> LagrangePaletteExport {
         LagrangePaletteExport::from_theme(self)
     }
+}
+
+fn custom_properties(palette: Palette, syntax: SyntaxPalette) -> String {
+    let mut stylesheet = String::from(":root {\n");
+    for role in color_roles(palette) {
+        stylesheet.push_str("  --tabard-color-");
+        stylesheet.push_str(role.name);
+        stylesheet.push_str(": ");
+        stylesheet.push_str(&css_color(role.value));
+        stylesheet.push_str(";\n");
+    }
+    for role in SyntaxRole::ALL {
+        stylesheet.push_str("  --tabard-syntax-");
+        stylesheet.push_str(role.name());
+        stylesheet.push_str(": ");
+        stylesheet.push_str(&css_color(syntax.role(role)));
+        stylesheet.push_str(";\n");
+    }
+    stylesheet.push_str("}\n");
+    stylesheet
 }
 
 /// A generated Lagrange `palette.txt` plus explicit diagnostics about the
@@ -649,6 +657,24 @@ impl From<SyntaxPalette> for DtcgSyntaxGroup {
 
 impl DtcgColorGroup {
     fn from_theme(theme: &Theme, palette: Palette) -> Self {
+        Self::from_palettes(
+            theme,
+            palette,
+            theme.syntax_palette(),
+            DtcgDerivation {
+                crate_name: "tinct".to_owned(),
+                function: "derive_palette".to_owned(),
+                profile: "normal-contrast".to_owned(),
+            },
+        )
+    }
+
+    fn from_palettes(
+        theme: &Theme,
+        palette: Palette,
+        syntax: SyntaxPalette,
+        derivation: DtcgDerivation,
+    ) -> Self {
         let mut extensions = BTreeMap::new();
         extensions.insert(
             TABARD_EXTENSION_KEY.to_owned(),
@@ -657,11 +683,7 @@ impl DtcgColorGroup {
                     name: theme.name.clone(),
                     seeds: theme.seeds,
                 },
-                derivation: DtcgDerivation {
-                    crate_name: "tinct".to_owned(),
-                    function: "derive_palette".to_owned(),
-                    profile: "normal-contrast".to_owned(),
-                },
+                derivation,
             },
         );
 
@@ -684,7 +706,7 @@ impl DtcgColorGroup {
             on_tertiary: palette.on_tertiary.into(),
             success: palette.success.into(),
             danger: palette.danger.into(),
-            syntax: theme.syntax_palette().into(),
+            syntax: syntax.into(),
         }
     }
 }

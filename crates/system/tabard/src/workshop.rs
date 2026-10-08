@@ -9,6 +9,7 @@
 //! preview rendering and applying a theme to their own surfaces.
 
 use crate::Theme;
+use crate::library::{validate_definition, validate_user_theme};
 use crate::theme::registry::{Harmony, Mode, ThemeRegistry, ThemeSource, ThemeTokenSet};
 use crate::theme::seed::derive_from_def_for_mode;
 use tinct::Seeds;
@@ -20,6 +21,9 @@ pub enum Edit {
     Seeds(Seeds),
     Harmony(Harmony),
     HighContrast(bool),
+    /// Set the authored canonical default as one undoable edit. Preview mode
+    /// remains local to the host; custom modes cannot be encoded by these flags.
+    DefaultMode(Mode),
     /// Empty rules remove the override and restore derived appearance.
     ModeSheet {
         mode: Mode,
@@ -94,10 +98,39 @@ impl ThemeDraft {
         id: &str,
         name: &str,
     ) -> Result<Self, WorkshopError> {
-        let mut theme = registry
+        let theme = registry
             .theme_def(source_id)
             .ok_or(WorkshopError::UnknownTheme)?
             .clone();
+        Self::fork_theme(registry, &theme, id, name)
+    }
+
+    /// Create a new, unregistered draft from a user definition. A colliding
+    /// built-in identity or built-in provenance must be forked explicitly.
+    /// Commit still checks the destination registry for any user-ID collision.
+    pub fn from_theme(mut theme: Theme) -> Result<Self, WorkshopError> {
+        theme.id = theme.id.trim().to_ascii_lowercase();
+        if theme.id.is_empty() || theme.name.trim().is_empty() {
+            return Err(WorkshopError::InvalidIdentity);
+        }
+        if theme.source != ThemeSource::User {
+            return Err(WorkshopError::BuiltInRequiresFork);
+        }
+        if ThemeRegistry::default().theme_def(&theme.id).is_some() {
+            return Err(WorkshopError::IdentityInUse);
+        }
+        validate_user_theme(&theme).map_err(WorkshopError::InvalidTheme)?;
+        Ok(Self::new(theme, None))
+    }
+
+    /// Copy any validated definition into a fresh user identity, preserving
+    /// seeds, harmony, contrast and mode sheets without inserting the source.
+    pub fn fork_theme(
+        registry: &ThemeRegistry,
+        source: &Theme,
+        id: &str,
+        name: &str,
+    ) -> Result<Self, WorkshopError> {
         let id = id.trim().to_ascii_lowercase();
         if id.is_empty() || name.trim().is_empty() {
             return Err(WorkshopError::InvalidIdentity);
@@ -105,10 +138,12 @@ impl ThemeDraft {
         if registry.theme_def(&id).is_some() {
             return Err(WorkshopError::IdentityInUse);
         }
+        validate_definition(source).map_err(WorkshopError::InvalidTheme)?;
+        let mut theme = source.clone();
         theme.id = id;
         theme.name = name.to_owned();
         theme.source = ThemeSource::User;
-        Ok(Self::new(theme, None))
+        Self::from_theme(theme)
     }
 
     fn new(theme: Theme, registered: Option<Theme>) -> Self {
@@ -137,6 +172,13 @@ impl ThemeDraft {
             Edit::Seeds(seeds) => next.seeds = seeds,
             Edit::Harmony(harmony) => next.harmony = harmony,
             Edit::HighContrast(high_contrast) => next.high_contrast = high_contrast,
+            Edit::DefaultMode(mode) => {
+                if matches!(mode, Mode::Custom(_)) {
+                    return false;
+                }
+                next.seeds.dark = mode.dark();
+                next.high_contrast = mode.high_contrast();
+            },
             Edit::ModeSheet { mode, rules } => {
                 if rules.is_empty() {
                     next.mode_sheets.remove(&mode.as_key());
@@ -201,6 +243,7 @@ impl ThemeDraft {
             None if current.is_some() => return Err(WorkshopError::IdentityInUse),
             _ => {},
         }
+        validate_user_theme(&self.draft).map_err(WorkshopError::InvalidTheme)?;
         registry
             .add_user_theme(self.draft.clone())
             .map_err(WorkshopError::InvalidTheme)?;

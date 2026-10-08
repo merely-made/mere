@@ -5,14 +5,15 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use cambium::{
-    AnyView, GenetCtx, GenetElement, PointerClick, button, custom_leaf, el, highlighted_code, lens,
-    map_message_result, slider, text_field_typed,
+    AnyView, FileEvent, FileFilter, GenetCtx, GenetElement, PointerClick, button, custom_leaf, el,
+    highlighted_code, lens, map_message_result, open_file, slider, text_field_typed,
+    textarea_typed,
 };
-use tabard::theme::registry::{Harmony, Mode};
+use tabard::theme::registry::Harmony;
 use tabard::theme::seed::{derive_from_def_for_mode, harmonized_seeds};
 use tinct::Srgb;
 
-use crate::{READER_LEAF_KEY, SeedRole, WorkshopState};
+use crate::{ExportFormat, READER_LEAF_KEY, STYLESHEET_LEAF_KEY, SeedRole, WorkshopState};
 
 pub type WorkshopView = Box<dyn AnyView<WorkshopState, (), GenetCtx, GenetElement>>;
 
@@ -25,9 +26,54 @@ pub const WORKSHOP_CODE_SAMPLE: &str = "// A little colour, everywhere\nfn garde
 
 pub fn workshop_view(state: &WorkshopState) -> WorkshopView {
     Box::new(
-        el("main", vec![header(state), body(state), footer(state)])
-            .attr("class", "tabard-workshop")
-            .attr("data-surface", "tabard.workshop.v1"),
+        el(
+            "main",
+            vec![
+                header(state),
+                close_confirmation(state),
+                body(state),
+                footer(state),
+            ],
+        )
+        .attr("class", "tabard-workshop")
+        .attr("data-surface", "tabard.workshop.v1"),
+    )
+}
+
+fn close_confirmation(state: &WorkshopState) -> WorkshopView {
+    if !state.close_requested() {
+        return Box::new(el("div", ()).attr("hidden", ""));
+    }
+    Box::new(
+        el(
+            "section",
+            (
+                el(
+                    "p",
+                    format!(
+                        "Save changes to {} before closing?",
+                        state.draft_theme().name
+                    ),
+                ),
+                button(
+                    "Save and close",
+                    |s: &mut WorkshopState, _: PointerClick| s.save_and_close(),
+                )
+                .attr("data-action", "save-close"),
+                button(
+                    "Close without saving",
+                    |s: &mut WorkshopState, _: PointerClick| s.discard_and_close(),
+                )
+                .attr("data-action", "discard-close"),
+                button("Keep editing", |s: &mut WorkshopState, _: PointerClick| {
+                    s.cancel_close()
+                })
+                .attr("data-action", "cancel-close"),
+            ),
+        )
+        .attr("class", "confirmation close-confirmation")
+        .attr("role", "group")
+        .attr("aria-label", "Unsaved theme close confirmation"),
     )
 }
 
@@ -76,6 +122,194 @@ fn header(state: &WorkshopState) -> WorkshopView {
 
 fn body(state: &WorkshopState) -> WorkshopView {
     Box::new(el("div", vec![editor(state), previews(state)]).attr("class", "workshop-body"))
+}
+
+fn text_control(
+    key: &'static str,
+    label: &'static str,
+    multiline: bool,
+    invalid: bool,
+) -> WorkshopView {
+    Box::new(lens(
+        move |input: &mut cambium::TextInput| {
+            let field = if multiline {
+                textarea_typed(input)
+            } else {
+                text_field_typed(input)
+            };
+            field
+                .attr("role", "textbox")
+                .attr("aria-label", label)
+                .attr("data-field", key)
+                .attr("aria-invalid", if invalid { "true" } else { "false" })
+        },
+        move |s: &mut WorkshopState| s.text_field_mut(key).expect("registered workshop field"),
+    ))
+}
+
+fn export_controls(state: &WorkshopState) -> WorkshopView {
+    let formats: Vec<WorkshopView> = ExportFormat::ALL
+        .into_iter()
+        .map(|format| {
+            Box::new(
+                button(
+                    format.label(),
+                    move |s: &mut WorkshopState, _: PointerClick| s.set_export_format(format),
+                )
+                .attr("data-export-format", format.as_key())
+                .attr(
+                    "aria-pressed",
+                    if state.export_format() == format {
+                        "true"
+                    } else {
+                        "false"
+                    },
+                ),
+            ) as WorkshopView
+        })
+        .collect();
+    let mut children: Vec<WorkshopView> = vec![
+        Box::new(el("h3", "Take your theme with you")),
+        Box::new(
+            el("div", formats)
+                .attr("class", "export-formats")
+                .attr("role", "group")
+                .attr("aria-label", "Export format"),
+        ),
+        Box::new(
+            el(
+                "p",
+                match state.export_format() {
+                    ExportFormat::ThemeJson => {
+                        "Complete editable theme, including harmony and mode stylesheets."
+                    },
+                    ExportFormat::Css => {
+                        "CSS color variables for the selected standard preview mode."
+                    },
+                    ExportFormat::Dtcg => "Design tokens for the selected standard preview mode.",
+                },
+            )
+            .attr("class", "control-note"),
+        ),
+        Box::new(
+            button("Export…", |s: &mut WorkshopState, _: PointerClick| {
+                s.request_export()
+            })
+            .attr("data-action", "export")
+            .attr("class", "primary-button"),
+        ),
+    ];
+    if let Some(path) = state.replacement_path() {
+        children.push(Box::new(
+            el(
+                "div",
+                (
+                    el(
+                        "p",
+                        format!("{} already exists. Replace that file?", path.display()),
+                    ),
+                    button("Replace file", |s: &mut WorkshopState, _: PointerClick| {
+                        s.replace_export()
+                    })
+                    .attr("data-action", "replace-export"),
+                    button(
+                        "Keep existing file",
+                        |s: &mut WorkshopState, _: PointerClick| s.cancel_export(),
+                    )
+                    .attr("data-action", "cancel-export"),
+                ),
+            )
+            .attr("class", "confirmation")
+            .attr("role", "group")
+            .attr("aria-label", "Replace exported file confirmation"),
+        ));
+    }
+    Box::new(el("section", children).attr("class", "control-group export-controls"))
+}
+
+fn stylesheet_panel(state: &WorkshopState) -> WorkshopView {
+    let preview = state.stylesheet_preview();
+    let name = preview.borrow().accessible_name().to_owned();
+    let diagnostics = preview.borrow().diagnostics();
+    let mut children: Vec<WorkshopView> = vec![
+        Box::new(el("h3", "Application stylesheet")),
+        Box::new(
+            el(
+                "p",
+                "An isolated application document using the exact selected stylesheet.",
+            )
+            .attr("class", "control-note"),
+        ),
+        Box::new(
+            custom_leaf(STYLESHEET_LEAF_KEY, 550, 330)
+                .attr("style", "display:block;width:100%;height:330px;")
+                .attr("class", "application-canvas")
+                .attr("data-view-kind", "application-stylesheet")
+                .attr("role", "img")
+                .attr("aria-label", name),
+        ),
+        Box::new(
+            button(
+                "Use preview as default",
+                |s: &mut WorkshopState, _: PointerClick| s.use_preview_as_default(),
+            )
+            .attr("data-action", "default-mode"),
+        ),
+        Box::new(
+            button(
+                if state.advanced_open {
+                    "Hide stylesheet editor"
+                } else {
+                    "Edit this mode's stylesheet"
+                },
+                |s: &mut WorkshopState, _: PointerClick| s.advanced_open = !s.advanced_open,
+            )
+            .attr("data-action", "toggle-stylesheet")
+            .attr(
+                "aria-expanded",
+                if state.advanced_open { "true" } else { "false" },
+            ),
+        ),
+    ];
+    if state.advanced_open {
+        children.push(Box::new(el("p", "CSS applies to the application document. Try body, .toolbar, .address-field, button, h1, p, a or .token-keyword. Empty CSS restores this mode's derived colors. Save includes applied and staged CSS.").attr("class", "control-note")));
+        children.push(text_control(
+            "mode-sheet",
+            "Mode stylesheet CSS",
+            true,
+            false,
+        ));
+        children.push(Box::new(
+            el(
+                "div",
+                (
+                    button(
+                        "Apply to preview",
+                        |s: &mut WorkshopState, _: PointerClick| s.apply_stylesheet(),
+                    )
+                    .attr("data-action", "apply-stylesheet"),
+                    button(
+                        "Clear to derived",
+                        |s: &mut WorkshopState, _: PointerClick| s.clear_stylesheet(),
+                    )
+                    .attr("data-action", "clear-stylesheet"),
+                ),
+            )
+            .attr("class", "stylesheet-actions"),
+        ));
+    }
+    for diagnostic in diagnostics {
+        children.push(Box::new(
+            el("p", diagnostic)
+                .attr("class", "field-error")
+                .attr("role", "status"),
+        ));
+    }
+    Box::new(
+        el("section", children)
+            .attr("class", "stylesheet-panel")
+            .attr("aria-label", "Application stylesheet preview"),
+    )
 }
 
 fn editor(state: &WorkshopState) -> WorkshopView {
@@ -208,11 +442,12 @@ fn editor(state: &WorkshopState) -> WorkshopView {
                                 css_color(state.seed_role().color(state.draft_theme()))
                             ),
                         ),
-                        el(
-                            "span",
-                            tinct::color_to_hex(state.seed_role().color(state.draft_theme())),
-                        )
-                        .attr("class", "hex-value"),
+                        text_control(
+                            "seed-hex",
+                            "Seed hex color",
+                            false,
+                            state.hex_error.is_some(),
+                        ),
                     ),
                 )
                 .attr("class", "seed-value"),
@@ -220,6 +455,19 @@ fn editor(state: &WorkshopState) -> WorkshopView {
         )
         .attr("class", "control-group"),
     ));
+    controls.push(Box::new(
+        button("Apply color", |s: &mut WorkshopState, _: PointerClick| {
+            s.apply_hex();
+        })
+        .attr("data-action", "apply-hex"),
+    ));
+    if let Some(error) = &state.hex_error {
+        controls.push(Box::new(
+            el("p", error.clone())
+                .attr("class", "field-error")
+                .attr("role", "alert"),
+        ));
+    }
     let harmony = state.draft_theme().harmony;
     let active = match harmony {
         Harmony::Custom => "custom",
@@ -317,6 +565,49 @@ fn editor(state: &WorkshopState) -> WorkshopView {
         )
         .attr("class", "library-actions"),
     ));
+    controls.push(Box::new(open_file(
+        button(
+            "Import theme…",
+            |s: &mut WorkshopState, _: PointerClick| s.request_import(),
+        )
+        .attr("data-action", "import"),
+        state.import_requested(),
+        FileFilter::extensions(["json"]),
+        |s: &mut WorkshopState, event: FileEvent| s.accept_import(event),
+    )));
+    controls.push(Box::new(
+        button(
+            "Delete theme…",
+            |s: &mut WorkshopState, _: PointerClick| s.request_delete(),
+        )
+        .attr("data-action", "delete"),
+    ));
+    if state.delete_requested() {
+        controls.push(Box::new(
+            el(
+                "div",
+                (
+                    el(
+                        "p",
+                        format!("Delete {} from your library?", state.draft_theme().name),
+                    ),
+                    button(
+                        "Delete permanently",
+                        |s: &mut WorkshopState, _: PointerClick| s.confirm_delete(),
+                    )
+                    .attr("data-action", "confirm-delete"),
+                    button("Keep theme", |s: &mut WorkshopState, _: PointerClick| {
+                        s.cancel_delete()
+                    })
+                    .attr("data-action", "cancel-delete"),
+                ),
+            )
+            .attr("class", "confirmation")
+            .attr("role", "group")
+            .attr("aria-label", "Delete theme confirmation"),
+        ));
+    }
+    controls.push(export_controls(state));
     Box::new(
         el("aside", controls)
             .attr("class", "theme-editor")
@@ -325,7 +616,8 @@ fn editor(state: &WorkshopState) -> WorkshopView {
 }
 
 fn previews(state: &WorkshopState) -> WorkshopView {
-    let mode_buttons: Vec<WorkshopView> = [Mode::Light, Mode::Dark, Mode::HcLight, Mode::HcDark]
+    let mode_buttons: Vec<WorkshopView> = state
+        .available_modes()
         .into_iter()
         .map(|mode| {
             let selected = &mode == state.mode();
@@ -360,10 +652,11 @@ fn previews(state: &WorkshopState) -> WorkshopView {
         .attr("class", "preview-heading"),
     )];
     if state.draft_theme().mode_sheet(state.mode()).is_some() {
-        panels.push(Box::new(el("p", "This mode has an authored stylesheet. These specimens show the derived seed palette; the stylesheet needs its own application preview.").attr("class", "preview-notice").attr("role", "status")));
+        panels.push(Box::new(el("p", "The application stylesheet preview renders this mode's authored CSS. Reader, syntax and graph specimens show the seed-derived appearance.").attr("class", "preview-notice").attr("role", "status")));
     }
     panels.push(specimen_grid(state));
     panels.push(palette_strip(state));
+    panels.push(stylesheet_panel(state));
     Box::new(
         el("section", panels)
             .attr("class", "preview-area")
