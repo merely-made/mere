@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-07)**: rulings 1 to 60 in §3; the threat statement is
+**Status (2026-10-08)**: rulings 1 to 61 in §3; the threat statement is
 still open. L1 landed (`2556a20c`). L2's checkpoints A (`7c588deb`) and B
 (`ec1768ab`) landed. Still to come in L2: the Secret Service on the
 ThinkPad, ruling 42 (Linux starts locked), ruling 44 (Distillery's
@@ -716,6 +716,17 @@ Options:
 
 Mark: **"Vault lock item + test (Recommended)"**.
 
+**Ruling 61** *(p2panda-net's mDNS copies; asked 2026-10-08).* *Ruling 60's
+measurement puts the 4 blocks in p2panda-net's mDNS layer: our
+`mere-p2panda-net` 0.7.5 fork, with mDNS on by default. iroh's own lookup
+leaves none, and Mere's wiring adds none.* Options:
+- ledger only, as item 11's other p2panda-net blocks are;
+- mDNS off in the default host policy;
+- trace them, then carry a minimal patch in the fork.
+
+Mark: **"Ledger only (Recommended)"**. Follows: ruling 42 is next (ruling
+56's order).
+
 Still open: a threat statement naming hibernation and the pagefile.
 
 ## 4. Phases
@@ -1147,3 +1158,23 @@ unlock follow-through, and non-Windows startup unlock backends, from the
     rerun used `-j 4`.
 - **Next:** ruling 60's default-policy run in mere-transport's
   `seed_residue.rs`, then ruling 42 (ruling 56's order).
+
+**2026-10-08, ruling 60: the mDNS copies are p2panda-net's.**
+- **mere-transport's `seed_residue.rs`** gains a third shape. The transport
+  is built through `P2pandaHostPolicy::default()`, gossip on, and judged
+  against p2panda-net alone with `MdnsDiscovery` (Active) spawned in the
+  transport's order. It passes: the transport adds nothing beyond
+  p2panda-net in any of the three shapes.
+- **Attribution, measured and reported:**
+  - iroh's own `MdnsAddressLookup`, built from the public id without
+    p2panda, adds nothing beyond iroh alone;
+  - p2panda-net's mDNS layer adds exactly the 4 blocks (472, 568, 784,
+    2424).
+
+  So they are p2panda-net's, in its `MdnsActor` layer, and not Mere's
+  wiring. They are recorded in the upstream candidates ledger, item 11.
+  The mechanism (ractor boxing a stack that still held key bytes) is
+  inferred, not traced.
+- **Dev-dependency:** `iroh-mdns-address-lookup = "=0.6.0"`, the version
+  p2panda-net already locks. `cargo_mode.py verify` passes.
+- **Ruling 61:** ledger only. Next: ruling 42.
