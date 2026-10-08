@@ -488,6 +488,21 @@ impl<F: 'static> PeltController<F> {
         }
     }
 
+    /// The active session's neutral seam, for host features this controller
+    /// does not wrap yet (document find, subresource delivery, a host's own
+    /// pointer path). Loading, navigation and history belong to the
+    /// controller ([`Self::input`], [`Self::command`], [`Self::open`]); a host
+    /// that drives the session directly owns any navigation that results.
+    pub fn session(&self) -> &dyn DocumentSession<F> {
+        self.session.as_ref()
+    }
+
+    /// Mutable access to the active session's neutral seam. See
+    /// [`Self::session`].
+    pub fn session_mut(&mut self) -> &mut dyn DocumentSession<F> {
+        self.session.as_mut()
+    }
+
     /// The active document session's concrete observation surface.
     ///
     /// Engine-specific behavior stays behind [`DocumentSession`]. This is for
