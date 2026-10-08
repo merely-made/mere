@@ -112,7 +112,8 @@ pub use crate::startup_unlock::{
 pub use crate::unlock::{OsPresence, UnlockMethod, UnlockMethods};
 pub use crate::vault::{
     CredentialLineage, IdentitySlot, IdentityStorage, IdentityVault, InMemoryStorage, Profile,
-    ProfileId, ProfileSummary, ProtocolKey, PublicProfile, SecretBytes, SlotSummary, UnlockTier,
+    ProfileId, ProfileSummary, ProtocolKey, PublicProfile, SecretBytes, SlotMap, SlotSummary,
+    UnlockTier,
 };
 
 /// Identity of a persona — the user's mode-scoped identity boundary.

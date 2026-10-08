@@ -143,7 +143,7 @@ impl IdentityStorage for SealedProfileStorage {
                 id.0, record.id
             )));
         }
-        let mut slots = std::collections::HashMap::with_capacity(record.profile.slots.len());
+        let mut slots = crate::SlotMap::with_capacity(record.profile.slots.len());
         for s in &mut record.profile.slots {
             let (k, slot) = plaintext_to_slot(s);
             slots.insert(k, slot);
