@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-08)**: rulings 1 to 65 in §3; the threat statement is
+**Status (2026-10-08)**: rulings 1 to 66 in §3; the threat statement is
 still open. L1 landed (`2556a20c`). L2's checkpoints A (`7c588deb`) and B
 (`ec1768ab`) landed. Still to come in L2: the Secret Service on the
 ThinkPad, ruling 42 (Linux starts locked), ruling 44 (Distillery's
@@ -773,6 +773,26 @@ Options:
 
 Mark: **"Passphrase over an fd (Recommended)"**.
 
+**Ruling 66** *(what "starts locked" builds; asked 2026-10-08).* *A vault
+object opened locked would have no master public key, but
+`IdentityProvider::master_public_key()` is infallible, with about 200
+calls. Under ruling 63 nothing reaches the vault before the first unlock.*
+Options:
+- wait before the vault: the resident prompts before building any
+  storage key, profile, door or lane, then opens the passphrase vault as
+  today; `open` already rejects a wrong passphrase and creates a missing
+  vault;
+- a locked vault object, with personae's `open_locked` constructors and a
+  fallible master key.
+
+Mark: **"Wait before the vault (Recommended)"**. Follows: personae is
+unchanged, and the first done-condition of ruling 42's build is
+superseded (§6, 2026-10-08). *Reading, not ruled:* without the
+environment, djinn picks the passphrase vault when the platform has no OS
+root, when `--passphrase-fd` is given, or when the vault directory holds
+`vault.json`; otherwise DPAPI. The installed resident's directory holds
+only `auto-unlock-root.json` and `profiles`, so it stays on DPAPI.
+
 Still open: a threat statement naming hibernation and the pagefile.
 
 ## 4. Phases
@@ -1254,6 +1274,8 @@ unlock follow-through, and non-Windows startup unlock backends, from the
   - [ ] personae opens a passphrase vault locked (salt only, profile id
         only). Every guard refuses until a passphrase unlock loads the
         profile; a wrong passphrase stays locked; tests cover each.
+        *2026-10-08: superseded by ruling 66. The resident waits before
+        building the vault, so personae is unchanged.*
   - [ ] djinn's resident path reads no passphrase from the environment
         (measured by search). A control resident given
         `PERSONAE_PASSPHRASE` and nothing else stays locked.
