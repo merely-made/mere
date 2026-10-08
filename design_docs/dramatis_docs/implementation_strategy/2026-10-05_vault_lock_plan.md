@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-08)**: rulings 1 to 78 in §3; the threat statement is
+**Status (2026-10-08)**: rulings 1 to 80 in §3; the threat statement is
 still open. L1 landed (`2556a20c`). L2's checkpoints A (`7c588deb`) and B
 (`ec1768ab`) landed. Still to come in L2: the Secret Service on the
 ThinkPad, ruling 42 (Linux starts locked), ruling 44 (Distillery's
@@ -892,6 +892,41 @@ injected signals and clock and prove it in tests, then one attended
 session for `Win+L`, `loginctl lock-session` and suspend on both machines;
 run the ThinkPad's lock-session receipt unattended while building. Mark:
 **"Build first, one attended run (Recommended)"**.
+
+*2026-10-08 annotation to ruling 78:* Mark: **"Do the lock and sleep after
+this crop of runs. Don't interrupt anything, please."** The attended
+receipts wait for his word that the other sessions' runs are done.
+
+**Ruling 79** *(where the persisted lock's marker lives).* *The loaders see
+only a root file's path. The vault's root, pandect's wallet roots (Knot's
+and Retinue's seeds) and signalman's station roots all pass through
+them.* Options:
+- one marker per user, beside the default vault, which every identity
+  AutoOs root obeys;
+- a marker beside each root;
+- one per vault directory, with pandect's loaders told the vault
+  directory.
+
+Mark: **"One per user (Recommended)"**.
+
+**Ruling 80** *(amends ruling 79; asked the same day).* Mark: **"Would one
+per vault be such a big refactor?"**
+- **Measured:**
+  - for the vault, nothing: its root sits in the vault directory, so a
+    marker beside it is free;
+  - pandect's wallets have their own roots under an app's data root and
+    know no vault. Ten public wallet functions take only `data_root`, and
+    `load_identity_seed` has four callers in mere besides Knot's.
+- **Options:**
+  - per vault by a middle path: the marker beside the vault's root, and
+    each wallet checking the marker of the vault its own settings name
+    (the default vault when none is named), with no signature changes;
+  - per user, as ruled;
+  - per vault, threading the directory through pandect's signatures
+    across mere, Knot and Retinue.
+
+Mark: **"Per vault, middle path (Recommended)"**. Follows: signalman's
+station roots are no vault's and pass untouched.
 
 Still open: a threat statement naming hibernation and the pagefile.
 
