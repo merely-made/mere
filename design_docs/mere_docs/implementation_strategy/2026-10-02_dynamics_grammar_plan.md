@@ -347,6 +347,10 @@ Mark's words are quoted as the physics catalog plan records them (§3, P7, and �
 
 **F166, a receipt or golden that moves (2026-10-08).** Options: stop and report each with its figures and the likely changelog cause, Mark ruling before a bar or golden changes; re-record small moves within a stated tolerance. Mark: **"Stop and report (Recommended)"**.
 
+**F167, the downloads the move needs (2026-10-08).** Question: Mark allowed one crates.io-only resolution ("Allow, crates.io only (Recommended)"); the lane found five new crates whose sources sit unpacked from nexus's builds but whose checksummed archives are not cached (num-derive 0.5.1, parry2d and parry3d 0.31.1, rapier2d and rapier3d 0.36.0, about 17 MB unpacked). Options: allow one locked fetch of exactly these; Mark fetches; hold. Mark: **"Allow these five (Recommended)"**.
+
+**F168, the lock (2026-10-08).** Question: cargo's raw resolution also re-paired 12 edges unrelated to physics onto versions already locked (the oxigraph family's thiserror 2 to 1, data-encoding-macro-internal's syn 3 to 1, platen's hashbrown 0.17 to 0.13); the lane reversed them into a minimal lock that cargo accepts as a fixed point. Options: the minimal lock; cargo's raw lock. Mark: **"Cargo's raw lock"**. *Follows:* the lock is cargo's own resolution (`root-lock-cargo-raw.lock`), the 12 re-pairings included.
+
 **F40, G7 (2026-10-03).** Question: approve G7, arrangement roles (§2, proposed at `784ce5b5`), which carries out F18 to F30, and place it. Options: approve, with G7 before G3; approve, after G2; amend first. Mark: **"Approve; G7 before G3"**. *Follows:* G7 starts now beside G2's open work, and G3 follows it, since G3's schedules use captures with a role (F27).
 
 **F41, the README's text (2026-10-03).** Question: the design-vocabulary section F13 placed in the README, its projection half in Mark's words and its dynamics half drafted from the rulings, placed after Status. Options: use the text as shown; the projection half only; edit the wording. Mark: **"Use this text"**. *Follows:* the section is committed as shown.
