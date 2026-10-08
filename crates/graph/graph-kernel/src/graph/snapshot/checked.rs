@@ -175,6 +175,13 @@ fn validate_resource_columns(snapshot: &GraphSnapshot) -> Result<(), ResourceSna
                 detail: error.to_string(),
             },
         )?;
+        crate::graph::resource_content::validate_content_record(record).map_err(|error| {
+            ResourceSnapshotError::InvalidFacet {
+                resource_id: id,
+                facet: "semantic content".into(),
+                detail: error.to_string(),
+            }
+        })?;
         let mut facets = BTreeMap::new();
         for facet in &record.facets {
             let value =
@@ -277,6 +284,62 @@ fn validate_resource_columns(snapshot: &GraphSnapshot) -> Result<(), ResourceSna
                 }
             } else {
                 assertions.insert(&statement.statement_id, ((from, to), statement));
+            }
+        }
+    }
+
+    let surface_literals: BTreeSet<_> = snapshot
+        .nodes
+        .iter()
+        .filter(|node| Uuid::parse_str(&node.node_id).is_ok())
+        .flat_map(|node| {
+            node.properties
+                .iter()
+                .map(|property| property.statement_id.as_str())
+        })
+        .collect();
+    for (handle, (pair, _)) in &assertions {
+        if surface_literals.contains(handle) {
+            return Err(ResourceSnapshotError::InvalidFacet {
+                resource_id: pair.0,
+                facet: crate::graph::resource_content::RESOURCE_PROPERTIES.into(),
+                detail: format!(
+                    "resource assertion handle {handle:?} reuses an active surface literal"
+                ),
+            });
+        }
+    }
+    let mut literal_owners = BTreeMap::new();
+    for record in &snapshot.resources {
+        let resource = chartulary::resource_id_from_canonical_iri(&record.canonical_iri);
+        for facet in &record.facets {
+            if facet.facet != crate::graph::resource_content::RESOURCE_PROPERTIES {
+                continue;
+            }
+            let properties: Vec<crate::types::NodeProperty> =
+                serde_json::from_str(&facet.value_json).expect("typed content validated above");
+            for property in properties {
+                let error = || ResourceSnapshotError::InvalidFacet {
+                    resource_id: resource,
+                    facet: facet.facet.clone(),
+                    detail: format!(
+                        "literal assertion handle {:?} has conflicting ownership or payload",
+                        property.statement_id
+                    ),
+                };
+                if surface_assertions.contains(property.statement_id.as_str())
+                    || assertions.contains_key(property.statement_id.as_str())
+                    || surface_literals.contains(property.statement_id.as_str())
+                {
+                    return Err(error());
+                }
+                if let Some((owner, held)) = literal_owners.get(&property.statement_id) {
+                    if *owner != resource || held != &property {
+                        return Err(error());
+                    }
+                } else {
+                    literal_owners.insert(property.statement_id.clone(), (resource, property));
+                }
             }
         }
     }

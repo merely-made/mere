@@ -780,7 +780,7 @@ mod tests {
         let b = source.get_node_key_by_id(Uuid::from_u128(2)).unwrap();
         let source_iri = "https://source.test/page";
         source
-            .assert_semantic_statement(
+            .assert_surface_semantic_statement(
                 a,
                 b,
                 super::super::SemanticStatementSpec {
@@ -833,7 +833,7 @@ mod tests {
             let from = template.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
             let to = template.get_node_key_by_id(Uuid::from_u128(2)).unwrap();
             template
-                .assert_semantic_statement(
+                .assert_surface_semantic_statement(
                     from,
                     to,
                     SemanticStatementSpec {
@@ -936,7 +936,7 @@ mod tests {
             replay_captured_deltas([add(1, "https://a.test/"), add(2, "https://b.test/")]);
         let from = template.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
         let to = template.get_node_key_by_id(Uuid::from_u128(2)).unwrap();
-        template.assert_semantic_statement(
+        template.assert_surface_semantic_statement(
             from,
             to,
             SemanticStatementSpec {
@@ -1019,7 +1019,7 @@ mod tests {
             replay_captured_deltas([add(1, "https://a.test/"), add(2, "https://b.test/")]);
         let from = template.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
         let to = template.get_node_key_by_id(Uuid::from_u128(2)).unwrap();
-        template.assert_semantic_statement(
+        template.assert_surface_semantic_statement(
             from,
             to,
             SemanticStatementSpec {
@@ -1315,13 +1315,28 @@ mod tests {
             graph.get_node_key_by_id(id).unwrap()
         };
         for (from, to) in [(a, b), (b, a)] {
+            let resource_pair = (
+                live.shown_resource_id(from).unwrap(),
+                live.shown_resource_id(to).unwrap(),
+            );
+            assert!(live.persisted_edges_between(from, to).is_empty());
             assert!(
-                !live.persisted_edges_between(from, to).is_empty(),
-                "the live graph holds a minted statement there"
+                !live
+                    .persisted_resource_edges_between(resource_pair.0, resource_pair.1)
+                    .is_empty(),
+                "the live Resource graph holds a minted statement there"
             );
             assert_eq!(
-                replayed.persisted_edges_between(key_of(&replayed, from), key_of(&replayed, to)),
-                live.persisted_edges_between(from, to),
+                replayed.shown_resource_id(key_of(&replayed, from)),
+                Some(resource_pair.0)
+            );
+            assert_eq!(
+                replayed.shown_resource_id(key_of(&replayed, to)),
+                Some(resource_pair.1)
+            );
+            assert_eq!(
+                replayed.persisted_resource_edges_between(resource_pair.0, resource_pair.1),
+                live.persisted_resource_edges_between(resource_pair.0, resource_pair.1),
                 "statement ids survive replay"
             );
         }

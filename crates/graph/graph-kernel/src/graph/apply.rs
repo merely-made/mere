@@ -574,19 +574,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             assertion,
             asserter_iri,
         } => {
-            let semantic = matches!(assertion, EdgeAssertion::Semantic { .. });
-            let capture_assertion = assertion.clone();
             let edge = graph.assert_relation_as(from, to, assertion, asserter_iri, None);
-            if !semantic
-                && edge.is_some()
-                && let (Some(from_node), Some(to_node)) = (graph.get_node(from), graph.get_node(to))
-            {
-                graph.record_delta(&CapturedDelta::ReplayAssertRelationByIds {
-                    from_id: from_node.id.to_string(),
-                    to_id: to_node.id.to_string(),
-                    assertion: capture_assertion,
-                });
-            }
             GraphDeltaResult::EdgeAdded(edge)
         },
         GraphDelta::RemoveNode { key } => {
@@ -679,18 +667,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             GraphDeltaResult::TraversalAppended(appended)
         },
         GraphDelta::RetractRelations { from, to, selector } => {
-            let from_id = graph.get_node(from).map(|node| node.id);
-            let to_id = graph.get_node(to).map(|node| node.id);
             let removed = graph.retract_relations(from, to, selector);
-            if removed > 0
-                && let (Some(from_id), Some(to_id)) = (from_id, to_id)
-            {
-                graph.record_delta(&CapturedDelta::ReplayRetractRelationsByIds {
-                    from_id: from_id.to_string(),
-                    to_id: to_id.to_string(),
-                    selector,
-                });
-            }
             GraphDeltaResult::EdgesRemoved(removed)
         },
         GraphDelta::AppendTraversal {
@@ -1240,7 +1217,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
         GraphDelta::ReplayInsertNodeTagById { node_id, tag } => {
             let updated = graph
                 .get_node_key_by_id(node_id)
-                .is_some_and(|key| graph.insert_node_tag(key, tag.clone()));
+                .is_some_and(|key| graph.legacy_insert_node_tag(key, tag.clone()));
             if updated {
                 graph.record_delta(&CapturedDelta::ReplayInsertNodeTagById {
                     node_id: node_id.to_string(),
@@ -1250,21 +1227,12 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             GraphDeltaResult::NodeMetadataUpdated(updated)
         },
         GraphDelta::InsertNodeTag { key, tag } => {
-            let node_id = graph.get_node(key).map(|node| node.id);
-            let capture_tag = tag.clone();
-            let updated = graph.insert_node_tag(key, tag);
-            if updated && let Some(node_id) = node_id {
-                graph.record_delta(&CapturedDelta::ReplayInsertNodeTagById {
-                    node_id: node_id.to_string(),
-                    tag: capture_tag,
-                });
-            }
-            GraphDeltaResult::NodeMetadataUpdated(updated)
+            GraphDeltaResult::NodeMetadataUpdated(graph.insert_shown_tag(key, tag))
         },
         GraphDelta::ReplayRemoveNodeTagById { node_id, tag } => {
             let updated = graph
                 .get_node_key_by_id(node_id)
-                .is_some_and(|key| graph.remove_node_tag(key, &tag));
+                .is_some_and(|key| graph.legacy_remove_node_tag(key, &tag));
             if updated {
                 graph.record_delta(&CapturedDelta::ReplayRemoveNodeTagById {
                     node_id: node_id.to_string(),
@@ -1274,15 +1242,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             GraphDeltaResult::NodeMetadataUpdated(updated)
         },
         GraphDelta::RemoveNodeTag { key, tag } => {
-            let node_id = graph.get_node(key).map(|node| node.id);
-            let updated = graph.remove_node_tag(key, &tag);
-            if updated && let Some(node_id) = node_id {
-                graph.record_delta(&CapturedDelta::ReplayRemoveNodeTagById {
-                    node_id: node_id.to_string(),
-                    tag,
-                });
-            }
-            GraphDeltaResult::NodeMetadataUpdated(updated)
+            GraphDeltaResult::NodeMetadataUpdated(graph.remove_shown_tag(key, &tag))
         },
         GraphDelta::ReplaySetNodeBodyById { node_id, body } => {
             let updated = graph
@@ -1393,7 +1353,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
         GraphDelta::ReplayAppendNodePropertyById { node_id, property } => {
             let updated = graph
                 .get_node_key_by_id(node_id)
-                .is_some_and(|key| graph.append_node_property(key, property.clone()));
+                .is_some_and(|key| graph.legacy_append_node_property(key, property.clone()));
             if updated {
                 graph.record_delta(&CapturedDelta::ReplayAppendNodePropertyById {
                     node_id: node_id.to_string(),
@@ -1402,32 +1362,16 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
         },
-        GraphDelta::AppendNodeProperty { key, property } => {
-            let node_id = graph.get_node(key).map(|node| node.id);
-            let updated = graph.append_node_property(key, property.clone());
-            if updated && let Some(node_id) = node_id {
-                let capture_property = graph
-                    .node_properties(key)
-                    .and_then(|properties| {
-                        properties
-                            .into_iter()
-                            .find(|stored| stored.content_eq(&property))
-                    })
-                    .expect("updated property remains stored");
-                graph.record_delta(&CapturedDelta::ReplayAppendNodePropertyById {
-                    node_id: node_id.to_string(),
-                    property: capture_property,
-                });
-            }
-            GraphDeltaResult::NodeMetadataUpdated(updated)
-        },
+        GraphDelta::AppendNodeProperty { key, property } => GraphDeltaResult::NodeMetadataUpdated(
+            graph.append_shown_properties(key, vec![property]),
+        ),
         GraphDelta::ReplayAddNodeClassificationById {
             node_id,
             classification,
         } => {
             let updated = graph
                 .get_node_key_by_id(node_id)
-                .is_some_and(|key| graph.add_node_classification(key, classification.clone()));
+                .is_some_and(|key| graph.legacy_add_node_classification(key, classification.clone()));
             if updated {
                 graph.record_delta(&CapturedDelta::ReplayAddNodeClassificationById {
                     node_id: node_id.to_string(),
@@ -1439,18 +1383,9 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
         GraphDelta::AddNodeClassification {
             key,
             classification,
-        } => {
-            let node_id = graph.get_node(key).map(|node| node.id);
-            let capture_classification = classification.clone();
-            let updated = graph.add_node_classification(key, classification);
-            if updated && let Some(node_id) = node_id {
-                graph.record_delta(&CapturedDelta::ReplayAddNodeClassificationById {
-                    node_id: node_id.to_string(),
-                    classification: capture_classification,
-                });
-            }
-            GraphDeltaResult::NodeMetadataUpdated(updated)
-        },
+        } => GraphDeltaResult::NodeMetadataUpdated(
+            graph.add_shown_classifications(key, vec![classification]),
+        ),
         GraphDelta::ReplayRemoveNodeClassificationById {
             node_id,
             scheme,
@@ -1458,7 +1393,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
         } => {
             let updated = graph
                 .get_node_key_by_id(node_id)
-                .is_some_and(|key| graph.remove_node_classification(key, &scheme, &value));
+                .is_some_and(|key| graph.legacy_remove_node_classification(key, &scheme, &value));
             if updated {
                 graph.record_delta(&CapturedDelta::ReplayRemoveNodeClassificationById {
                     node_id: node_id.to_string(),
@@ -1469,17 +1404,15 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             GraphDeltaResult::NodeMetadataUpdated(updated)
         },
         GraphDelta::RemoveNodeClassification { key, scheme, value } => {
-            let node_id = graph.get_node(key).map(|node| node.id);
-            let capture_scheme = scheme.clone();
-            let capture_value = value.clone();
-            let updated = graph.remove_node_classification(key, &scheme, &value);
-            if updated && let Some(node_id) = node_id {
-                graph.record_delta(&CapturedDelta::ReplayRemoveNodeClassificationById {
-                    node_id: node_id.to_string(),
-                    scheme: capture_scheme,
-                    value: capture_value,
+            let updated = graph
+                .unique_shown_classification(key, &scheme, &value)
+                .ok()
+                .flatten()
+                .is_some_and(|(id, variant)| {
+                    graph
+                        .remove_resource_classification(id, &variant)
+                        .unwrap_or(false)
                 });
-            }
             GraphDeltaResult::NodeMetadataUpdated(updated)
         },
         GraphDelta::ReplaySetNodeClassificationStatusById {
@@ -1489,7 +1422,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             status,
         } => {
             let updated = graph.get_node_key_by_id(node_id).is_some_and(|key| {
-                graph.set_node_classification_status(key, &scheme, &value, status.clone())
+                graph.legacy_set_node_classification_status(key, &scheme, &value, status.clone())
             });
             if updated {
                 graph.record_delta(&CapturedDelta::ReplaySetNodeClassificationStatusById {
@@ -1507,19 +1440,15 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             value,
             status,
         } => {
-            let node_id = graph.get_node(key).map(|node| node.id);
-            let capture_scheme = scheme.clone();
-            let capture_value = value.clone();
-            let capture_status = status.clone();
-            let updated = graph.set_node_classification_status(key, &scheme, &value, status);
-            if updated && let Some(node_id) = node_id {
-                graph.record_delta(&CapturedDelta::ReplaySetNodeClassificationStatusById {
-                    node_id: node_id.to_string(),
-                    scheme: capture_scheme,
-                    value: capture_value,
-                    status: capture_status,
+            let updated = graph
+                .unique_shown_classification(key, &scheme, &value)
+                .ok()
+                .flatten()
+                .is_some_and(|(id, variant)| {
+                    graph
+                        .edit_resource_classification(id, &variant, Some(status), None)
+                        .unwrap_or(false)
                 });
-            }
             GraphDeltaResult::NodeMetadataUpdated(updated)
         },
         GraphDelta::ReplaySetNodePrimaryClassificationById {
@@ -1529,7 +1458,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
         } => {
             let updated = graph
                 .get_node_key_by_id(node_id)
-                .is_some_and(|key| graph.set_node_primary_classification(key, &scheme, &value));
+                .is_some_and(|key| graph.legacy_set_node_primary_classification(key, &scheme, &value));
             if updated {
                 graph.record_delta(&CapturedDelta::ReplaySetNodePrimaryClassificationById {
                     node_id: node_id.to_string(),
@@ -1540,17 +1469,15 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             GraphDeltaResult::NodeMetadataUpdated(updated)
         },
         GraphDelta::SetNodePrimaryClassification { key, scheme, value } => {
-            let node_id = graph.get_node(key).map(|node| node.id);
-            let capture_scheme = scheme.clone();
-            let capture_value = value.clone();
-            let updated = graph.set_node_primary_classification(key, &scheme, &value);
-            if updated && let Some(node_id) = node_id {
-                graph.record_delta(&CapturedDelta::ReplaySetNodePrimaryClassificationById {
-                    node_id: node_id.to_string(),
-                    scheme: capture_scheme,
-                    value: capture_value,
+            let updated = graph
+                .unique_shown_classification(key, &scheme, &value)
+                .ok()
+                .flatten()
+                .is_some_and(|(id, variant)| {
+                    graph
+                        .edit_resource_classification(id, &variant, None, Some(true))
+                        .unwrap_or(false)
                 });
-            }
             GraphDeltaResult::NodeMetadataUpdated(updated)
         },
         GraphDelta::ReplayRecordNodeDerivationById {

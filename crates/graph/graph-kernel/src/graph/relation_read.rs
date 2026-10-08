@@ -354,7 +354,14 @@ mod tests {
         let source = surface(&mut graph, "https://surface.test/source");
         let target = surface(&mut graph, "urn:mere:bnode:document:_:author");
         let legacy = surface(&mut graph, "urn:mere:bnode:document:_:publisher");
-        graph.assert_semantic_predicate(source, legacy, "https://schema.org/publisher".into());
+        graph.assert_surface_semantic_statement(
+            source,
+            legacy,
+            super::super::SemanticStatementSpec {
+                predicate: "https://schema.org/publisher".into(),
+                ..Default::default()
+            },
+        );
         assert_eq!(graph.node_display_label(legacy), "publisher");
         let from = resource(&mut graph, "https://resource.test/page");
         let to = resource(&mut graph, "urn:mere:bnode:document:_:author");

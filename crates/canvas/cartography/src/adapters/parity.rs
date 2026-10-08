@@ -41,6 +41,10 @@ const EPSILON: f32 = 0.01;
 /// for spectral, and a node count (7) whose square root is not an integer so
 /// the grid's auto columns have to round.
 fn fixture() -> (Graph, Vec<NodeKey>) {
+    fixture_in_store(false)
+}
+
+fn fixture_in_store(legacy_surface: bool) -> (Graph, Vec<NodeKey>) {
     let mut graph = Graph::new();
     let keys: Vec<NodeKey> = (0..7u8)
         .map(|i| {
@@ -59,10 +63,31 @@ fn fixture() -> (Graph, Vec<NodeKey>) {
         label: None,
         decay_progress: None,
     };
+    let mut assert = |from, to| {
+        if legacy_surface {
+            let from_id = graph.get_node(from).unwrap().id.to_string();
+            let to_id = graph.get_node(to).unwrap().id.to_string();
+            kernel::graph::replay_captured_deltas_onto(
+                &mut graph,
+                [kernel::graph::CapturedDelta::ReplayAssertRelationByIds {
+                    from_id,
+                    to_id,
+                    assertion: hyperlink(),
+                }],
+            );
+        } else {
+            graph.assert_relation(from, to, hyperlink());
+        }
+    };
     for spoke in 1..=3 {
-        graph.assert_relation(keys[0], keys[spoke], hyperlink());
+        assert(keys[0], keys[spoke]);
     }
-    graph.assert_relation(keys[4], keys[5], hyperlink());
+    assert(keys[4], keys[5]);
+    assert_eq!(graph.edge_count(), if legacy_surface { 4 } else { 0 });
+    assert_eq!(
+        graph.resource_relations().count(),
+        if legacy_surface { 0 } else { 4 }
+    );
     (graph, keys)
 }
 
@@ -234,27 +259,29 @@ fn spectral_matches_the_pre_migration_placement() {
     // hub and its spokes coincide and the bridge pair coincides. That is the
     // pre-migration behaviour, preserved deliberately: the layout separates
     // components, and within a component it says nothing.
-    let (graph, keys) = fixture();
-    let signals = IntelligenceSignals::default();
-    let projection = SpectralAdapter::default().project(&ProjectionRequest {
-        graph: &graph,
-        signals: &signals,
-        intent: intent(None, None),
-    });
-    assert_golden(
-        "spectral",
-        &keys,
-        &projection,
-        &[
-            (146.7027, 34.4556),
-            (146.7027, 34.4556),
-            (146.7027, 34.4556),
-            (146.7027, 34.4556),
-            (-152.6299, -228.9111),
-            (-152.6299, -228.9111),
-            (-281.5509, 320.0),
-        ],
-    );
+    for legacy_surface in [false, true] {
+        let (graph, keys) = fixture_in_store(legacy_surface);
+        let signals = IntelligenceSignals::default();
+        let projection = SpectralAdapter::default().project(&ProjectionRequest {
+            graph: &graph,
+            signals: &signals,
+            intent: intent(None, None),
+        });
+        assert_golden(
+            "spectral",
+            &keys,
+            &projection,
+            &[
+                (146.7027, 34.4556),
+                (146.7027, 34.4556),
+                (146.7027, 34.4556),
+                (146.7027, 34.4556),
+                (-152.6299, -228.9111),
+                (-152.6299, -228.9111),
+                (-281.5509, 320.0),
+            ],
+        );
+    }
 }
 
 #[test]
@@ -312,27 +339,29 @@ fn kanban_matches_the_pre_migration_placement() {
 fn radial_matches_the_pre_migration_placement() {
     // Ring 0 is the hub, ring 1 its three spokes, and the three nodes the walk
     // never reaches land on ring 2 — max reachable plus one.
-    let (graph, keys) = fixture();
-    let signals = IntelligenceSignals::default();
-    let projection = RadialAdapter::default().project(&ProjectionRequest {
-        graph: &graph,
-        signals: &signals,
-        intent: intent(None, Some(keys[0])),
-    });
-    assert_golden(
-        "radial",
-        &keys,
-        &projection,
-        &[
-            (0.0, 0.0),
-            (120.0, 0.0),
-            (-60.0, 103.9230),
-            (-60.0, -103.9230),
-            (240.0, 0.0),
-            (-120.0, 207.8461),
-            (-120.0, -207.8461),
-        ],
-    );
+    for legacy_surface in [false, true] {
+        let (graph, keys) = fixture_in_store(legacy_surface);
+        let signals = IntelligenceSignals::default();
+        let projection = RadialAdapter::default().project(&ProjectionRequest {
+            graph: &graph,
+            signals: &signals,
+            intent: intent(None, Some(keys[0])),
+        });
+        assert_golden(
+            "radial",
+            &keys,
+            &projection,
+            &[
+                (0.0, 0.0),
+                (120.0, 0.0),
+                (-60.0, 103.9230),
+                (-60.0, -103.9230),
+                (240.0, 0.0),
+                (-120.0, 207.8461),
+                (-120.0, -207.8461),
+            ],
+        );
+    }
 }
 
 #[test]
@@ -525,4 +554,64 @@ fn the_graph_only_table_dispatches_each_strategy_it_lists_and_no_other() {
     ] {
         assert!(project_graph_only(other, &request).is_none(), "{other}");
     }
+}
+
+#[test]
+fn topology_producers_combine_resource_and_surface_buckets() {
+    let (mut graph, keys) = fixture();
+    let resource = graph.shown_resource_id(keys[1]).unwrap();
+    let alias = graph.add_node_with_id(
+        Uuid::from_u128(99),
+        "https://parity.example/1#alias".into(),
+        PortablePoint::new(0.0, 0.0),
+    );
+    // Live lifecycle is deliberately explicit in this raw fixture.
+    let alias_id = graph.get_node(alias).unwrap().id.to_string();
+    kernel::graph::replay_captured_deltas_onto(
+        &mut graph,
+        [kernel::graph::CapturedDelta::ReplaySetShownResourceById {
+            surface_id: alias_id,
+            resource_id: Some(resource.to_string()),
+        }],
+    );
+    graph.assert_relation(
+        keys[0],
+        keys[1],
+        EdgeAssertion::Semantic {
+            sub_kind: SemanticSubKind::UserGrouped,
+            label: None,
+            decay_progress: None,
+        },
+    );
+    graph.assert_relation(
+        keys[3],
+        keys[6],
+        EdgeAssertion::Semantic {
+            sub_kind: SemanticSubKind::UserGrouped,
+            label: None,
+            decay_progress: None,
+        },
+    );
+    let rings = radial_rings(&graph, keys[0]);
+    assert_eq!(rings[&keys[0]], 0);
+    for key in [keys[1], keys[2], keys[3], alias] {
+        assert_eq!(rings[&key], 1);
+    }
+    assert_eq!(rings[&keys[6]], 2);
+    assert!(!rings.contains_key(&keys[4]));
+    let weights = degree_weights(&graph);
+    assert_eq!(
+        weights[&keys[0]], 6.0,
+        "three resource buckets plus alias lift and one Surface bucket"
+    );
+    assert_eq!(
+        weights[&keys[1]], 3.0,
+        "Resource and Surface multiplicity both count"
+    );
+    assert_eq!(weights[&alias], 2.0, "content lifts to the alias once");
+    assert_eq!(
+        weights[&keys[6]], 2.0,
+        "Surface-only neighbor remains visible"
+    );
+    assert_eq!(spectral_coords(&graph, 200).len(), graph.node_count());
 }

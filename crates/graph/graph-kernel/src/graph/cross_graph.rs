@@ -320,7 +320,9 @@ mod tests {
             k1,
             k2,
             EdgeAssertion::Semantic {
-                sub_kind: SemanticSubKind::Hyperlink,
+                // This API copies a Surface component. Shared Resource content
+                // travels through the qualified graph-codicil composition path.
+                sub_kind: SemanticSubKind::UserGrouped,
                 label: None,
                 decay_progress: None,
             },

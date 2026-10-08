@@ -151,7 +151,35 @@ pub fn apply_contribution_with_identity(
         // points read each facet once and record the same per-item captured
         // deltas the `GraphDelta` path would have, so the journal is unchanged
         // — which is also why they must not be wrapped in `apply_graph_delta`.
-        let _ = graph.insert_node_tags(key, node.tags.clone());
+        // Imported curated tags belong to the explicit agent, else their RDF source.
+        let attributed: std::collections::BTreeSet<_> = contribution
+            .edges
+            .iter()
+            .filter(|edge| {
+                edge.subject == node.id
+                    && edge.predicate == "http://www.w3.org/ns/prov#wasAttributedTo"
+            })
+            .map(|edge| edge.object.as_str())
+            .collect();
+        let source = if attributed.len() == 1 {
+            *attributed.first().unwrap()
+        } else {
+            node.id.as_str()
+        };
+        if let Some(id) = graph.shown_resource_id(key) {
+            for label in &node.tags {
+                let concept_iri = kernel::graph::resource_tags::tag_concept_iri(source, label);
+                let _ = graph.tag_resource_with_asserter(
+                    id,
+                    &concept_iri,
+                    kernel::graph::resource_tags::TagConcept {
+                        owner_iri: source.into(),
+                        label: label.clone(),
+                    },
+                    source.into(),
+                );
+            }
+        }
         let _ = graph.append_node_properties(key, node.properties.clone());
         // `@type` IRIs become `rdf:type` classifications (kernel dedups them).
         let _ = graph.add_node_classifications(
@@ -161,6 +189,55 @@ pub fn apply_contribution_with_identity(
                 .map(|type_iri| rdf_type_classification(type_iri))
                 .collect(),
         );
+        // Interpret only the complete, unambiguous SKOS tag profile. Foreign partial
+        // descriptions remain ordinary RDF properties and edges.
+        if node
+            .types
+            .iter()
+            .any(|iri| iri == "http://www.w3.org/2004/02/skos/core#Concept")
+        {
+            let descriptions: Vec<_> = node
+                .properties
+                .iter()
+                .filter(|property| {
+                    property.predicate == "http://www.w3.org/2004/02/skos/core#prefLabel"
+                        && property.graph_scope == kernel::types::GraphScope::Default
+                })
+                .collect();
+            let labels: std::collections::BTreeSet<_> = descriptions
+                .iter()
+                .map(|property| property.value.as_str())
+                .collect();
+            let supported_labels = descriptions.iter().all(|property| {
+                property.lang.is_none()
+                    && property.datatype.as_deref().is_none_or(|datatype| {
+                        datatype == "http://www.w3.org/2001/XMLSchema#string"
+                    })
+            });
+            let owners: std::collections::BTreeSet<_> = contribution
+                .edges
+                .iter()
+                .filter(|edge| {
+                    edge.subject == node.id
+                        && edge.predicate == "http://www.w3.org/ns/prov#wasAttributedTo"
+                        && edge.graph_scope == kernel::types::GraphScope::Default
+                })
+                .map(|edge| edge.object.as_str())
+                .collect();
+            if supported_labels
+                && labels.len() == 1
+                && owners.len() == 1
+                && let Some(id) = graph.shown_resource_id(key)
+            {
+                let _ = graph.define_tag_concept(
+                    id,
+                    kernel::graph::resource_tags::TagConcept {
+                        owner_iri: (*owners.first().unwrap()).into(),
+                        label: (*labels.first().unwrap()).into(),
+                    },
+                );
+            }
+        }
         key_for.insert(node.id.as_str(), key);
     }
 

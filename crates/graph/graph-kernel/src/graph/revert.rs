@@ -1158,7 +1158,7 @@ mod resource_revert_tests {
         let mut source = Graph::new();
         let a = source.add_node_with_id(from, "https://a.test".into(), Default::default());
         let b = source.add_node_with_id(to, "https://b.test".into(), Default::default());
-        source.assert_persisted_semantic_statement(
+        source.assert_surface_persisted_semantic_statement(
             a,
             b,
             SemanticStatement {

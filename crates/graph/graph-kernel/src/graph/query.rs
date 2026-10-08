@@ -534,21 +534,25 @@ impl Graph {
         }
 
         for (from, to) in url_parent_edges {
-            let _ = self.assert_relation(
+            let _ = self.assert_surface_relation_as(
                 from,
                 to,
                 EdgeAssertion::Containment {
                     sub_kind: ContainmentSubKind::UrlPath,
                 },
+                self.write_author().asserter_iri(),
+                None,
             );
         }
         for (from, to) in domain_edges {
-            let _ = self.assert_relation(
+            let _ = self.assert_surface_relation_as(
                 from,
                 to,
                 EdgeAssertion::Containment {
                     sub_kind: ContainmentSubKind::Domain,
                 },
+                self.write_author().asserter_iri(),
+                None,
             );
         }
     }
@@ -1114,11 +1118,21 @@ mod derivation_tests {
             },
         );
         assert!(g.append_traversal(n2, n1, NavigationTrigger::LinkClick, Some(1_000_000)));
-        assert_eq!(g.edge_count(), 2, "two arcs, one per direction");
-        let pair: Vec<_> = g.edges_between_undirected(n1, n2).collect();
+        assert_eq!(g.edge_count(), 1, "Traversal remains Surface");
+        assert_eq!(
+            g.resource_relations().count(),
+            1,
+            "Hyperlink belongs to Resource"
+        );
+        let pair: Vec<_> = g
+            .projected_relations_between(n1, n2)
+            .chain(g.projected_relations_between(n2, n1))
+            .collect();
         assert_eq!(pair.len(), 2, "the pair primitive sees both arcs");
         assert_eq!(
-            g.edges_between_undirected(n2, n1).count(),
+            g.projected_relations_between(n2, n1)
+                .chain(g.projected_relations_between(n1, n2))
+                .count(),
             2,
             "and from the other end"
         );
@@ -1158,15 +1172,22 @@ mod row_family_parity_tests {
 
     fn row_families(
         g: &Graph,
-    ) -> Vec<(NodeKey, NodeKey, BTreeSet<EdgeFamily>, BTreeSet<EdgeFamily>)> {
-        g.inner
-            .inner()
-            .edge_references()
-            .map(|e| {
-                let rows = relation_rows(e.source(), e.target(), e.weight());
-                let from_rows: BTreeSet<EdgeFamily> =
-                    rows.iter().map(|r| r.kind.family()).collect();
-                (e.source(), e.target(), e.weight().families(), from_rows)
+    ) -> Vec<(
+        RelationKey,
+        NodeKey,
+        NodeKey,
+        BTreeSet<EdgeFamily>,
+        BTreeSet<EdgeFamily>,
+    )> {
+        g.nodes()
+            .flat_map(|(from, _)| {
+                g.projected_outgoing_relations(from)
+                    .map(move |(to, key, payload)| {
+                        let rows = relation_rows(from, to, payload);
+                        let from_rows: BTreeSet<EdgeFamily> =
+                            rows.iter().map(|r| r.kind.family()).collect();
+                        (key, from, to, payload.families(), from_rows)
+                    })
             })
             .collect()
     }
@@ -1226,9 +1247,16 @@ mod row_family_parity_tests {
                 sub_kind: ProvenanceSubKind::ClippedFrom,
             },
         );
-        // Mixed: recognized statement + open statement + traversal on one edge.
-        g.assert_relation(hub, mixed, sem());
-        g.assert_semantic_predicate(hub, mixed, "https://example.org/related".to_string());
+        // Historical mixed Surface payload remains readable beside live Resource claims.
+        g.assert_surface_relation_as(hub, mixed, sem(), g.write_author().asserter_iri(), None);
+        g.assert_surface_semantic_statement(
+            hub,
+            mixed,
+            crate::graph::SemanticStatementSpec {
+                predicate: "https://example.org/related".into(),
+                ..Default::default()
+            },
+        );
         assert!(g.append_traversal(hub, mixed, NavigationTrigger::Back, Some(2)));
 
         // The open-predicate edge yields exactly one OpenPredicate row.
@@ -1239,7 +1267,7 @@ mod row_family_parity_tests {
         );
 
         // Live graph: every edge agrees.
-        for (from, to, families, from_rows) in row_families(&g) {
+        for (_, from, to, families, from_rows) in row_families(&g) {
             assert_eq!(families, from_rows, "live edge {from:?}->{to:?}");
         }
 
@@ -1266,12 +1294,9 @@ mod row_family_parity_tests {
         // what it pins. Parity is checked on every edge that survives.
         let mut saw_event_free_traversal = 0;
         let mut saw_open_predicate = 0;
-        for (from, to, families, from_rows) in row_families(&restored) {
+        for (key, from, to, families, from_rows) in row_families(&restored) {
             assert_eq!(families, from_rows, "restored edge {from:?}->{to:?}");
-            let payload = restored
-                .find_edge_key(from, to)
-                .and_then(|k| restored.get_edge(k))
-                .unwrap();
+            let payload = restored.get_relation(key).unwrap();
             if families.contains(&EdgeFamily::Traversal) {
                 assert!(payload.traversals().is_empty());
                 assert_eq!(payload.metrics().total_navigations, 0);

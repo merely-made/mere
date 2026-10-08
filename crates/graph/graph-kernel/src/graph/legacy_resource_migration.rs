@@ -10,6 +10,8 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
 
+pub use super::legacy_content_migration::LegacyContentContext;
+
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -279,6 +281,8 @@ struct Replay {
     aggregate_active: BTreeMap<(Pair, u32), Membership>,
     resolutions: BTreeMap<String, Pair>,
     authored_declarations: BTreeSet<String>,
+    content: super::legacy_content_migration::ContentReplay,
+    content_context: Option<super::legacy_content_migration::LegacyContentContext>,
 }
 
 /// Replay a caller-qualified legacy baseline and its retained prefix atomically.
@@ -299,6 +303,31 @@ pub fn migrate_legacy_prefix_with_resolutions(
     entries: &[AttributedDelta],
     resolutions: &[LegacyResourceOriginResolution],
 ) -> Result<MigratedReplay, LegacyMigrationError> {
+    migrate_legacy_prefix_with_content_context(baseline, entries, resolutions, None)
+}
+
+/// Supply the original mere namespace for unattributed legacy tag concepts.
+pub fn migrate_legacy_prefix_with_content_context(
+    baseline: &Graph,
+    entries: &[AttributedDelta],
+    resolutions: &[LegacyResourceOriginResolution],
+    context: Option<&super::legacy_content_migration::LegacyContentContext>,
+) -> Result<MigratedReplay, LegacyMigrationError> {
+    if let Some(context) = context {
+        let iri = url::Url::parse(&context.original_mere_iri).map_err(|_| {
+            LegacyMigrationError("original-mere content namespace must be an absolute IRI".into())
+        })?;
+        if iri.scheme().is_empty()
+            || context
+                .original_mere_iri
+                .chars()
+                .any(|c| c.is_whitespace() || c.is_control())
+        {
+            return Err(LegacyMigrationError(
+                "invalid original-mere content namespace".into(),
+            ));
+        }
+    }
     let diagnostics = probe_legacy_mint_links(baseline, entries)?;
     let resolutions = validated_resolutions(&diagnostics, resolutions)?;
     let mut replay = Replay {
@@ -310,6 +339,8 @@ pub fn migrate_legacy_prefix_with_resolutions(
         aggregate_origins: BTreeMap::new(),
         aggregate_active: BTreeMap::new(),
         resolutions,
+        content: Default::default(),
+        content_context: context.cloned(),
         authored_declarations: baseline
             .to_snapshot()
             .resources
@@ -326,17 +357,25 @@ pub fn migrate_legacy_prefix_with_resolutions(
     let before = replay.output.to_snapshot();
     let before_facets = replay.output.facets().clone();
     replay.sync(&Pairs::new(), true, None)?;
-    let mut baseline_effects = effects_between(&before, &replay.output.to_snapshot())?;
-    baseline_effects.extend(facet_effects_between(
-        &before_facets,
+    replay.content.sync(
+        &replay.source,
+        &mut replay.output,
+        replay.content_context.as_ref(),
+        None,
+    )?;
+    let mut baseline_effects = facet_effects_between(&before_facets, replay.output.facets());
+    baseline_effects.extend(effects_between(
+        &before,
+        &replay.output.to_snapshot(),
         replay.output.facets(),
-    ));
+    )?);
     let mut entry_effects = Vec::with_capacity(entries.len());
     for entry in entries {
         let before = replay.output.to_snapshot();
         let before_facets = replay.output.facets().clone();
         let old_pairs = surface_pairs(&replay.source)?;
         let typed_pair = typed_resource_pair(&entry.delta)?;
+        replay.content.typed_record(&entry.delta);
         if let Some(pair) = typed_pair {
             // This explicit replacement supersedes only this resource pair's old membership.
             replay.active.retain(|_, member| member.resource != pair);
@@ -382,7 +421,15 @@ pub fn migrate_legacy_prefix_with_resolutions(
                 .authored_declarations
                 .insert(record.canonical_iri.clone());
         }
+        let after_original = replay.output.to_snapshot();
+        let after_original_facets = replay.output.facets().clone();
         replay.sync(&old_pairs, false, Some(&entry.author))?;
+        replay.content.sync(
+            &replay.source,
+            &mut replay.output,
+            replay.content_context.as_ref(),
+            Some(&entry.author),
+        )?;
         if let Some(surface) = lifecycle_surface(&entry.delta)?
             && replay.source.get_node_key_by_id(surface).is_some()
         {
@@ -393,11 +440,24 @@ pub fn migrate_legacy_prefix_with_resolutions(
         if !legacy_edge_edit(&entry.delta) {
             effective.push(entry.delta.clone());
         }
-        effective.extend(effects_between(&before, &replay.output.to_snapshot())?);
         effective.extend(facet_effects_between(
             &before_facets,
             replay.output.facets(),
         ));
+        effective.extend(effects_between(
+            &before,
+            &replay.output.to_snapshot(),
+            replay.output.facets(),
+        )?);
+        // Retained raw writes can transiently touch Surface content that the
+        // migration clears back to its previous value.
+        let mut corrections = facet_effects_between(&after_original_facets, replay.output.facets());
+        corrections.extend(effects_between(
+            &after_original,
+            &replay.output.to_snapshot(),
+            replay.output.facets(),
+        )?);
+        effective.extend(corrections);
         entry_effects.push(effective);
     }
     // The same checked boundary used by ordinary loads verifies final cross-store handles.
@@ -1060,8 +1120,48 @@ fn lifecycle_surface(delta: &CapturedDelta) -> Result<Option<Uuid>, LegacyMigrat
 fn effects_between(
     before: &GraphSnapshot,
     after: &GraphSnapshot,
+    after_facets: &super::node_facets::NodeFacetStore,
 ) -> Result<Vec<CapturedDelta>, LegacyMigrationError> {
     let mut effects = Vec::new();
+    let before_nodes: BTreeMap<_, _> = before
+        .nodes
+        .iter()
+        .map(|node| (node.node_id.as_str(), node))
+        .collect();
+    // Content migration removes Surface tags; replay must carry that removal.
+    for node in &after.nodes {
+        if let Some(previous) = before_nodes.get(node.node_id.as_str()) {
+            let mut removed = false;
+            for tag in &previous.tags {
+                if !node.tags.contains(tag) {
+                    removed = true;
+                    effects.push(CapturedDelta::ReplayRemoveNodeTagById {
+                        node_id: node.node_id.clone(),
+                        tag: tag.clone(),
+                    });
+                }
+            }
+            if removed {
+                // Raw removal prunes presentation. Migration retains it for the
+                // same labels now shown through the Resource.
+                let facet = super::node_facets::PRESENTATION_TAGS;
+                let id = parse_id(&node.node_id)?;
+                effects.push(
+                    match after_facets.get(&id, &chartulary::FacetId::new(facet)) {
+                        Some(value) => CapturedDelta::ReplaySetNodeFacetById {
+                            node_id: node.node_id.clone(),
+                            facet: facet.into(),
+                            value_json: serde_json::to_string(value).expect("facet serializes"),
+                        },
+                        None => CapturedDelta::ReplayRemoveNodeFacetById {
+                            node_id: node.node_id.clone(),
+                            facet: facet.into(),
+                        },
+                    },
+                );
+            }
+        }
+    }
     let before_records: BTreeMap<_, _> = before
         .resources
         .iter()

@@ -1927,6 +1927,12 @@ mod tests {
                 ..Default::default()
             },
         );
+        let historical_statement = graph
+            .resource_relations()
+            .flat_map(|(_, _, _, payload)| payload.semantic_statements())
+            .find(|statement| statement.predicate == "https://schema.org/author")
+            .unwrap()
+            .clone();
         let _ = crate::graph::apply::apply_graph_delta(
             &mut graph,
             GraphDelta::AppendTraversal {
@@ -2322,7 +2328,9 @@ mod tests {
             .count();
         let minted = captured
             .iter()
-            .filter(|delta| matches!(delta, CapturedDelta::ReplaySetEdgesByIds { .. }))
+            .filter(|delta| matches!(delta, CapturedDelta::ReplaySetResourceEdgesByIds { edges, .. }
+                if edges.iter().filter_map(|edge| edge.semantic.as_ref()).flat_map(|semantic| &semantic.statements)
+                    .any(|statement| statement.predicate != crate::graph::resource::TAGGED_WITH_IRI)))
             .count();
         assert_eq!(
             (stamps, minted),
@@ -2373,7 +2381,8 @@ mod tests {
             )
         });
         let actual_records = captured.iter().enumerate().filter_map(|(index, delta)| match delta {
-            CapturedDelta::ReplaySetResourceRecordById { resource_id, record: Some(record) } => {
+            CapturedDelta::ReplaySetResourceRecordById { resource_id, record: Some(record) }
+                if record.facets.is_empty() && expected_records.iter().any(|(id, _)| id == resource_id) => {
                 assert!(record.facets.is_empty());
                 let shown = captured.iter().position(|delta| matches!(delta,
                     CapturedDelta::ReplaySetShownResourceById { resource_id: Some(id), .. } if id == resource_id)).unwrap();
@@ -2396,11 +2405,79 @@ mod tests {
         );
         let replayed = replay_captured_deltas(captured.iter().cloned());
         let expected = graph.to_snapshot();
-        let actual = replayed.to_snapshot();
+        let mut actual = replayed.to_snapshot();
+        actual.timestamp_secs = expected.timestamp_secs;
+        let canonical = |snapshot: &crate::persistence::GraphSnapshot| {
+            let mut value = serde_json::to_value(snapshot).unwrap();
+            let navigation = &mut value["navigation"]["snapshot"];
+            for owner in navigation["owners"].as_array_mut().unwrap() {
+                owner["owned_visits"]
+                    .as_array_mut()
+                    .unwrap()
+                    .sort_by_key(|id| id.as_u64().unwrap());
+            }
+            for visit in navigation["visits"].as_array_mut().unwrap() {
+                visit["bindings"]
+                    .as_array_mut()
+                    .unwrap()
+                    .sort_by_key(|binding| binding["owner"].as_u64().unwrap());
+            }
+            value
+        };
+        assert_eq!(canonical(&actual), canonical(&expected));
+        assert_eq!(replayed.facets(), graph.facets());
         assert_eq!(actual.resources, expected.resources);
         assert_eq!(actual.resource_edges, expected.resource_edges);
         assert_eq!(actual.shown_resources, expected.shown_resources);
         assert!(replayed.get_node_key_by_id(Uuid::from_u128(22)).is_none());
+        assert_eq!(
+            graph
+                .find_semantic_statement(&historical_statement.statement_id)
+                .unwrap()
+                .1,
+            &historical_statement,
+            "navigation and Surface removal leave the original Resource assertion held"
+        );
+        assert!(graph.node_content_tags(a).unwrap().contains("paper"));
+        assert!(!graph.node_content_tags(a).unwrap().contains("research"));
+        assert_eq!(graph.node_properties(a).unwrap().len(), 1);
+        let classes = graph.node_classifications(a).unwrap();
+        assert_eq!(classes.len(), 2);
+        assert!(
+            classes
+                .iter()
+                .any(|classification| classification.value == "article"
+                    && classification.status == ClassificationStatus::Verified)
+        );
+        assert!(
+            classes
+                .iter()
+                .any(|classification| classification.value == "essay"
+                    && classification.primary
+                    && classification.status == ClassificationStatus::Suggested)
+        );
+        let content_records: Vec<_> = captured
+            .iter()
+            .filter_map(|delta| match delta {
+                CapturedDelta::ReplaySetResourceRecordById {
+                    record: Some(record),
+                    ..
+                } if !record.facets.is_empty() => Some(record),
+                _ => None,
+            })
+            .collect();
+        for facet in [
+            crate::graph::resource_content::TAG_CONCEPT,
+            crate::graph::resource_content::RESOURCE_PROPERTIES,
+            crate::graph::resource_content::RESOURCE_CLASSIFICATIONS,
+        ] {
+            assert!(
+                content_records
+                    .iter()
+                    .any(|record| record.facets.iter().any(|entry| entry.facet == facet)),
+                "{facet} is captured exactly"
+            );
+        }
         let mut out = Vec::new();
         for (index, delta) in captured.iter().enumerate() {
             let stamp = index > 0
@@ -2413,6 +2490,7 @@ mod tests {
                 && !matches!(
                     delta,
                     CapturedDelta::ReplaySetEdgesByIds { .. }
+                        | CapturedDelta::ReplaySetResourceEdgesByIds { .. }
                         | CapturedDelta::ReplaySetResourceRecordById { .. }
                         | CapturedDelta::ReplaySetShownResourceById { .. }
                 )
@@ -2420,7 +2498,7 @@ mod tests {
                 out.push(delta.clone());
             }
         }
-        assert_eq!(out.len(), 49);
+        assert_eq!(out.len(), 38);
         assert!(matches!(
             out[0],
             CapturedDelta::ReplayAddNodeWithIdIfMissing { .. }
@@ -2460,149 +2538,105 @@ mod tests {
         ));
         assert!(matches!(
             out[10],
-            CapturedDelta::ReplayInsertNodeTagById { .. }
-        ));
-        assert!(matches!(
-            out[11],
-            CapturedDelta::ReplayRemoveNodeTagById { .. }
-        ));
-        assert!(matches!(
-            out[12],
             CapturedDelta::ReplaySetNodeBodyById { .. }
         ));
         assert!(matches!(
-            out[13],
+            out[11],
             CapturedDelta::ReplayTouchNodeLastVisitedById { .. }
         ));
         assert!(matches!(
-            out[14],
-            CapturedDelta::ReplayInsertNodeTagById { .. }
-        ));
-        assert!(matches!(
-            out[15],
+            out[12],
             CapturedDelta::ReplaySetNodeTagIconOverrideById { .. }
         ));
         assert!(matches!(
-            out[16],
+            out[13],
             CapturedDelta::ReplayNavigateNodeById { .. }
         ));
         assert!(matches!(
-            out[17],
+            out[14],
             CapturedDelta::ReplayNavigateNodeById { .. }
         ));
         assert!(matches!(
-            out[18],
+            out[15],
             CapturedDelta::ReplayNodeHistoryBackById { .. }
         ));
         assert!(matches!(
-            out[19],
+            out[16],
             CapturedDelta::ReplayNodeHistoryForwardById { .. }
         ));
         assert!(matches!(
-            out[20],
+            out[17],
             CapturedDelta::ReplayBranchHistoryByIds { .. }
         ));
         assert!(matches!(
-            out[21],
+            out[18],
             CapturedDelta::ReplayNavigateNodeById { .. }
         ));
-        assert!(matches!(out[22], CapturedDelta::ReplayAddField { .. }));
-        assert!(matches!(out[23], CapturedDelta::ReplayAddCoupling { .. }));
+        assert!(matches!(out[19], CapturedDelta::ReplayAddField { .. }));
+        assert!(matches!(out[20], CapturedDelta::ReplayAddCoupling { .. }));
         assert!(matches!(
-            out[24],
+            out[21],
             CapturedDelta::ReplaySetFieldCouplingStrengthByFieldId { .. }
         ));
         assert!(matches!(
-            out[25],
+            out[22],
             CapturedDelta::ReplayRetireFieldById { .. }
         ));
         assert!(matches!(
-            out[26],
+            out[23],
             CapturedDelta::ReplayActivateFieldById { .. }
         ));
         assert!(matches!(
-            out[27],
+            out[24],
             CapturedDelta::ReplayRetractCouplingById { .. }
         ));
-        assert!(matches!(out[28], CapturedDelta::ReplayAddCoupling { .. }));
+        assert!(matches!(out[25], CapturedDelta::ReplayAddCoupling { .. }));
         assert!(matches!(
-            out[29],
+            out[26],
             CapturedDelta::ReplaySetFieldCouplingStrengthByFieldId { .. }
         ));
         assert!(matches!(
-            out[30],
-            CapturedDelta::ReplayAppendNodePropertyById { .. }
-        ));
-        assert!(matches!(
-            out[31],
-            CapturedDelta::ReplayAddNodeClassificationById { .. }
-        ));
-        assert!(matches!(
-            out[32],
-            CapturedDelta::ReplayAddNodeClassificationById { .. }
-        ));
-        assert!(matches!(
-            out[33],
-            CapturedDelta::ReplayAddNodeClassificationById { .. }
-        ));
-        assert!(matches!(
-            out[34],
-            CapturedDelta::ReplaySetNodeClassificationStatusById { .. }
-        ));
-        assert!(matches!(
-            out[35],
-            CapturedDelta::ReplaySetNodePrimaryClassificationById { .. }
-        ));
-        assert!(matches!(
-            out[36],
-            CapturedDelta::ReplayRemoveNodeClassificationById { .. }
-        ));
-        assert!(matches!(
-            out[37],
+            out[27],
             CapturedDelta::ReplayRecordNodeDerivationById { .. }
         ));
         assert!(matches!(
-            out[38],
+            out[28],
             CapturedDelta::ReplayAppendFrameLayoutHintById { .. }
         ));
         assert!(matches!(
-            out[39],
+            out[29],
             CapturedDelta::ReplayAppendFrameLayoutHintById { .. }
         ));
         assert!(matches!(
-            out[40],
+            out[30],
             CapturedDelta::ReplayMoveFrameLayoutHintById { .. }
         ));
         assert!(matches!(
-            out[41],
+            out[31],
             CapturedDelta::ReplayRemoveFrameLayoutHintById { .. }
         ));
         assert!(matches!(
-            out[42],
+            out[32],
             CapturedDelta::ReplaySetFrameSplitOfferSuppressedById { .. }
         ));
         assert!(matches!(
-            out[43],
+            out[33],
             CapturedDelta::ReplayUpdateNodeHistoryById { .. }
         ));
         assert!(matches!(
-            out[44],
+            out[34],
             CapturedDelta::ReplaySetImportRecords { .. }
         ));
         assert!(matches!(
-            out[45],
+            out[35],
             CapturedDelta::ReplaySetImportRecords { .. }
         ));
         assert!(matches!(
-            out[46],
+            out[36],
             CapturedDelta::ReplaySetImportRecords { .. }
         ));
         assert!(matches!(
-            out[47],
-            CapturedDelta::ReplayRetractRelationsByIds { .. }
-        ));
-        assert!(matches!(
-            out[48],
+            out[37],
             CapturedDelta::ReplayRemoveNodeById { .. }
         ));
     }
@@ -2640,7 +2674,7 @@ mod resource_capture_tests {
                 graph.add_node_with_id(from, "https://surface-a.test".into(), Default::default());
             let target =
                 graph.add_node_with_id(to, "https://surface-b.test".into(), Default::default());
-            graph.assert_persisted_semantic_statement(
+            graph.assert_surface_persisted_semantic_statement(
                 source,
                 target,
                 SemanticStatement {
@@ -2713,7 +2747,7 @@ mod resource_capture_tests {
             graph.add_node_with_id(from, "https://surface.test/a".into(), Default::default());
         let target =
             graph.add_node_with_id(to, "https://surface.test/b".into(), Default::default());
-        graph.assert_persisted_semantic_statement(
+        graph.assert_surface_persisted_semantic_statement(
             source,
             target,
             SemanticStatement {

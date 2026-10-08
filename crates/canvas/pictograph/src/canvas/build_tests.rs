@@ -38,7 +38,38 @@ fn computed_value(
 fn sample_graph_has_nodes_and_edges() {
     let g = sample_graph();
     assert_eq!(g.nodes().count(), 12, "the ring has twelve nodes");
-    assert!(g.relations().count() >= 12, "at least the ring edges");
+    assert_eq!(
+        g.relations().count(),
+        0,
+        "content links live in the Resource graph"
+    );
+    assert_eq!(
+        g.resource_relations().count(),
+        16,
+        "twelve ring links and four spokes"
+    );
+    assert_eq!(
+        g.projected_relations().count(),
+        16,
+        "each Resource link lifts once to this ring"
+    );
+    for i in 0..12 {
+        let from = g.get_node_by_url(&format!("mere://node/{i}")).unwrap().0;
+        let to = g
+            .get_node_by_url(&format!("mere://node/{}", (i + 1) % 12))
+            .unwrap()
+            .0;
+        let from_resource = g.shown_resource_id(from).unwrap();
+        let to_resource = g.shown_resource_id(to).unwrap();
+        assert_ne!(from_resource, to_resource);
+        let (handle, payload) = g.projected_relations_between(from, to).next().unwrap();
+        assert!(matches!(handle, kernel::graph::RelationKey::Resource(_)));
+        assert!(payload.has_relation(RelationSelector::Semantic(SemanticSubKind::Hyperlink)));
+        assert!(
+            g.find_resource_edge_key(from_resource, to_resource)
+                .is_some()
+        );
+    }
 }
 
 #[test]

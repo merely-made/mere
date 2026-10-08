@@ -9,11 +9,23 @@ use crate::graph::apply::{GraphDelta, apply_graph_delta};
 use crate::graph::capture::{CapturedDelta, replay_captured_deltas_onto};
 use std::sync::{Arc, Mutex};
 
+fn resource_statements(graph: &Graph, from: NodeKey, to: NodeKey) -> &[SemanticStatement] {
+    let key = graph
+        .find_resource_edge_key(
+            graph.shown_resource_id(from).unwrap(),
+            graph.shown_resource_id(to).unwrap(),
+        )
+        .unwrap();
+    graph.get_resource_edge(key).unwrap().semantic_statements()
+}
+
 #[test]
 fn assertion_updates_and_precise_retractions_replay_exactly() {
     let mut graph = Graph::new();
     let from = graph.add_node("https://a.test/".into(), Default::default());
     let to = graph.add_node("https://b.test/".into(), Default::default());
+    graph.ensure_surface_resource(from).unwrap();
+    graph.ensure_surface_resource(to).unwrap();
     let mut replayed = graph.clone();
     let captured = Arc::new(Mutex::new(Vec::new()));
     let sink = captured.clone();
@@ -57,17 +69,15 @@ fn assertion_updates_and_precise_retractions_replay_exactly() {
     assert!(
         captured
             .iter()
-            .all(|delta| matches!(delta, CapturedDelta::ReplaySetEdgesByIds { .. }))
+            .all(|delta| matches!(delta, CapturedDelta::ReplaySetResourceEdgesByIds { .. }))
     );
     replay_captured_deltas_onto(&mut replayed, captured.iter().cloned());
     assert_eq!(
         serde_json::to_value(graph.to_snapshot()).unwrap(),
         serde_json::to_value(replayed.to_snapshot()).unwrap()
     );
-    let remaining = replayed
-        .get_edge(replayed.find_edge_key(from, to).unwrap())
-        .unwrap()
-        .semantic_statements();
+    assert!(replayed.find_edge_key(from, to).is_none());
+    let remaining = resource_statements(&replayed, from, to);
     assert_eq!(remaining.len(), 1);
     assert_eq!(remaining[0].statement_id, bob.statement_id);
     assert_eq!(remaining[0].asserted_at_ms, Some(20));
@@ -78,6 +88,8 @@ fn predicate_replacement_mints_an_id_and_preserves_the_other_asserter_on_replay(
     let mut graph = Graph::new();
     let from = graph.add_node("https://a.test/".into(), Default::default());
     let to = graph.add_node("https://b.test/".into(), Default::default());
+    graph.ensure_surface_resource(from).unwrap();
+    graph.ensure_surface_resource(to).unwrap();
     let mut replayed = graph.clone();
     let captured = Arc::new(Mutex::new(Vec::new()));
     let sink = captured.clone();
@@ -105,10 +117,7 @@ fn predicate_replacement_mints_an_id_and_preserves_the_other_asserter_on_replay(
             spec("https://vocab.test/old", "https://people.test/bob", 20),
         )
         .unwrap();
-    let other_before = graph
-        .get_edge(graph.find_edge_key(from, to).unwrap())
-        .unwrap()
-        .semantic_statements()
+    let other_before = resource_statements(&graph, from, to)
         .iter()
         .find(|statement| statement.statement_id == other.statement_id)
         .unwrap()
@@ -135,10 +144,8 @@ fn predicate_replacement_mints_an_id_and_preserves_the_other_asserter_on_replay(
         serde_json::to_value(graph.to_snapshot()).unwrap(),
         serde_json::to_value(replayed.to_snapshot()).unwrap()
     );
-    let statements = replayed
-        .get_edge(replayed.find_edge_key(from, to).unwrap())
-        .unwrap()
-        .semantic_statements();
+    assert!(replayed.find_edge_key(from, to).is_none());
+    let statements = resource_statements(&replayed, from, to);
     assert_eq!(statements.len(), 2);
     assert!(
         !statements
@@ -174,7 +181,7 @@ fn exact_replay_normalizes_legacy_buckets_and_aggregate_predicates() {
         ("unknown-two", "https://people.test/two", 20),
         ("known", "https://people.test/known", 30),
     ] {
-        source.assert_persisted_semantic_statement(
+        source.assert_surface_persisted_semantic_statement(
             from,
             to,
             SemanticStatement {
@@ -314,10 +321,8 @@ fn asserting_deltas_carry_source_attribution() {
             predicate: "https://example.test/rel".into(),
         },
     );
-    let statements = graph
-        .get_edge(graph.find_edge_key(from, to).unwrap())
-        .unwrap()
-        .semantic_statements();
+    assert!(graph.find_edge_key(from, to).is_none());
+    let statements = resource_statements(&graph, from, to);
     assert_eq!(statements.len(), 2);
     assert_eq!(
         statements[0].provenance_iri.as_deref(),
@@ -364,10 +369,8 @@ fn reingest_updates_the_same_asserter_without_replacing_its_id() {
         to,
         statement("new-id", "https://page.test/", 30),
     );
-    let statements = graph
-        .get_edge(graph.find_edge_key(from, to).unwrap())
-        .unwrap()
-        .semantic_statements();
+    assert!(graph.find_edge_key(from, to).is_none());
+    let statements = resource_statements(&graph, from, to);
     assert_eq!(statements.len(), 2);
     assert_eq!(statements[0].statement_id, "first");
     assert_eq!(statements[0].asserted_at_ms, Some(30));
@@ -405,7 +408,22 @@ fn open_predicate_assertion_supplies_attribution_on_an_existing_pair() {
             asserter_iri: "https://source.test/".into(),
         },
     );
-    let statements = graph.get_relation(edge).unwrap().semantic_statements();
+    assert!(
+        graph
+            .get_relation(edge)
+            .unwrap()
+            .semantic_statements()
+            .is_empty()
+    );
+    assert!(
+        graph
+            .get_relation(edge)
+            .unwrap()
+            .has_relation(RelationSelector::Containment(
+                ContainmentSubKind::UserFolder
+            ))
+    );
+    let statements = resource_statements(&graph, from, to);
     assert_eq!(statements.len(), 1);
     assert_eq!(statements[0].predicate, "https://example.test/rel");
     assert_eq!(

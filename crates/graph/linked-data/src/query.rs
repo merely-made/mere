@@ -316,12 +316,12 @@ mod tests {
         "SELECT ?s ?p ?o WHERE { ?s ?p ?o }",
         "SELECT ?g ?s ?p ?o WHERE { GRAPH ?g { ?s ?p ?o } }",
         "SELECT ?name WHERE { <https://a.test/> <https://schema.org/name> ?name }",
-        "SELECT ?t WHERE { GRAPH <https://mere.computer/ns/graph#user> { <https://a.test/> <https://mere.computer/ns/rel#cites> ?t } }",
+        "SELECT ?t WHERE { GRAPH <https://mere.computer/ns/graph#user> { <https://a.test> <https://mere.computer/ns/rel#cites> ?t } }",
         "SELECT ?stmt ?prov WHERE { GRAPH ?g { ?stmt <http://www.w3.org/ns/prov#wasAttributedTo> ?prov } }",
-        "SELECT ?v WHERE { <https://a.test/> <https://schema.org/abstract> ?v FILTER(lang(?v) = 'fr') }",
+        "SELECT ?v WHERE { <https://a.test> <https://schema.org/abstract> ?v FILTER(lang(?v) = 'fr') }",
         "SELECT (COUNT(?s) AS ?n) WHERE { ?s a <https://mere.computer/ns/core#Node> }",
-        "ASK { <https://b.test/> <https://example.test/vocab#refutes> <https://c.test/> }",
-        "ASK { <https://b.test/> <https://example.test/vocab#refutes> <https://a.test/> }",
+        "ASK { <https://b.test> <https://example.test/vocab#refutes> <https://c.test> }",
+        "ASK { <https://b.test> <https://example.test/vocab#refutes> <https://a.test> }",
     ];
 
     /// Phase 3 gate (a): the spareval mainline returns the same solutions as
@@ -341,6 +341,13 @@ mod tests {
             assert!(
                 !mainline.rows.is_empty(),
                 "parity query must exercise rows: {query}"
+            );
+        }
+        for (query, expected) in [(PARITY_QUERIES[7], "true"), (PARITY_QUERIES[8], "false")] {
+            assert_eq!(
+                sparql(&graph, query).unwrap().rows,
+                vec![vec![Some(expected.to_string())]],
+                "canonical resource ASK control: {query}"
             );
         }
     }
@@ -456,13 +463,35 @@ mod tests {
                 },
             );
         }
+        assert!(graph.find_edge_key(a, b).is_none());
+        let key = graph
+            .find_resource_edge_key(
+                graph.shown_resource_id(a).unwrap(),
+                graph.shown_resource_id(b).unwrap(),
+            )
+            .expect("live claims belong to the shown resources");
+        let statements = graph.get_resource_edge(key).unwrap().semantic_statements();
+        assert_eq!(statements.len(), 2);
+        let mut sources: Vec<_> = statements
+            .iter()
+            .map(|statement| {
+                assert_eq!(statement.graph_scope, GraphScope::User);
+                assert_eq!(statement.asserted_at_ms, Some(42));
+                statement.provenance_iri.as_deref().unwrap()
+            })
+            .collect();
+        sources.sort();
+        assert_eq!(
+            sources,
+            ["https://people.test/alice", "https://people.test/bob"]
+        );
         let controls = [
             (
                 "SELECT ?title WHERE { <https://same.test/> <https://schema.org/name> ?title }",
                 1,
             ),
             (
-                "SELECT ?target WHERE { GRAPH <https://mere.computer/ns/graph#user> { <https://same.test/> <https://example.test/claims> ?target } }",
+                "SELECT ?target WHERE { GRAPH <https://mere.computer/ns/graph#user> { <https://same.test> <https://example.test/claims> ?target } }",
                 1,
             ),
             (
@@ -479,12 +508,28 @@ mod tests {
                 sorted(baseline::sparql_store(&graph, query).unwrap())
             );
         }
-        let absent = "ASK { GRAPH <https://mere.computer/ns/graph#user> { <https://same.test/> <https://example.test/claims> <https://absent.test/> } }";
-        assert_eq!(
-            sparql(&graph, absent).unwrap().rows,
-            vec![vec![Some("false".to_string())]]
-        );
-        assert_eq!(sparql(&graph, absent), sparql_materialized(&graph, absent));
+        for (query, expected) in [
+            (
+                "ASK { GRAPH <https://mere.computer/ns/graph#user> { <https://same.test> <https://example.test/claims> <https://target.test> } }",
+                "true",
+            ),
+            (
+                "ASK { GRAPH <https://mere.computer/ns/graph#user> { <https://same.test> <https://example.test/claims> <https://absent.test> } }",
+                "false",
+            ),
+            (
+                "ASK { GRAPH <https://mere.computer/ns/graph#user> { <https://same.test/> <https://example.test/claims> <https://target.test/> } }",
+                "false",
+            ),
+        ] {
+            assert_eq!(
+                sparql(&graph, query).unwrap().rows,
+                vec![vec![Some(expected.to_string())]],
+                "canonical resource and raw Surface control: {query}"
+            );
+            assert_eq!(sparql(&graph, query), sparql_materialized(&graph, query));
+            assert_eq!(sparql(&graph, query), baseline::sparql_store(&graph, query));
+        }
     }
 
     #[test]

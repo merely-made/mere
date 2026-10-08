@@ -17,7 +17,7 @@ fn legacy_statement_load_preserves_ids_times_and_known_attribution() {
         ("https://author.test/second", 20),
     ] {
         graph
-            .assert_semantic_statement(
+            .assert_surface_semantic_statement(
                 a,
                 b,
                 SemanticStatementSpec {
@@ -63,19 +63,20 @@ fn aggregate_only_snapshots_receive_unknown_attribution_for_both_predicate_forms
         let a = graph.add_node("https://a.test/".into(), Point2D::new(0.0, 0.0));
         let b = graph.add_node("https://b.test/".into(), Point2D::new(0.0, 0.0));
         let mut snapshot = graph.to_snapshot();
-        if recognized {
-            graph.assert_relation(
-                a,
-                b,
-                EdgeAssertion::Semantic {
-                    sub_kind: SemanticSubKind::Cites,
-                    label: Some("old citation".into()),
-                    decay_progress: None,
+        graph.assert_surface_semantic_statement(
+            a,
+            b,
+            SemanticStatementSpec {
+                predicate: if recognized {
+                    predicate_iri(SemanticSubKind::Cites).into()
+                } else {
+                    "https://example.test/relates".into()
                 },
-            );
-        } else {
-            graph.assert_semantic_predicate(a, b, "https://example.test/relates".into());
-        }
+                recognized_sub_kind: recognized.then_some(SemanticSubKind::Cites),
+                label: Some("old citation".into()),
+                ..Default::default()
+            },
+        );
         snapshot.edges = graph.to_snapshot().edges;
         snapshot.edges[0]
             .semantic

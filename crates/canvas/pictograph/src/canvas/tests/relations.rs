@@ -115,7 +115,11 @@ fn retract_selected_edge_cell_removes_only_that_relation() {
     });
 
     assert_eq!(canvas.retract_selected_relation(), 1);
-    let remaining: Vec<_> = canvas.graph().relations().map(|r| r.kind).collect();
+    let remaining: Vec<_> = canvas
+        .graph()
+        .projected_relations()
+        .map(|(_, r)| r.kind)
+        .collect();
     assert_eq!(
         remaining,
         vec![RelationKind::Semantic(SemanticSubKind::Quotes)],

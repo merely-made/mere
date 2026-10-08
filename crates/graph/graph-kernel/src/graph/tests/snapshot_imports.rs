@@ -95,7 +95,19 @@ fn test_snapshot_roundtrip_preserves_imported_and_provenance_edge_sub_kinds() {
     let payload = restored.get_edge(edge_key).expect("restored payload");
 
     assert!(payload.has_relation(RelationSelector::Imported(ImportedSubKind::BookmarkFolder)));
-    assert!(payload.has_relation(RelationSelector::Provenance(ProvenanceSubKind::ClippedFrom)));
+    assert!(!payload.has_relation(RelationSelector::Provenance(ProvenanceSubKind::ClippedFrom)));
+    let resource = restored
+        .find_resource_edge_key(
+            restored.shown_resource_id(from).unwrap(),
+            restored.shown_resource_id(to).unwrap(),
+        )
+        .unwrap();
+    assert!(
+        restored
+            .get_resource_edge(resource)
+            .unwrap()
+            .has_relation(RelationSelector::Provenance(ProvenanceSubKind::ClippedFrom))
+    );
 }
 
 #[test]

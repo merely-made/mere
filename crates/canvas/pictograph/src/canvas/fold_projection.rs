@@ -274,8 +274,9 @@ impl Canvas {
 /// explicit repair or removal action.
 /// Every node reachable from `root` through relations of `hierarchy_family`
 /// in `direction`, `root` included. Each frontier node visits only its own
-/// incident edges on the requested side, so the walk costs O(reachable ×
-/// degree) rather than rescanning the whole relation table per node.
+/// incident edges on the requested side. Surface adjacency costs O(reachable ×
+/// degree); lifting each incident Resource bucket additionally scans the shown
+/// bindings to find its Surface aliases.
 fn hierarchy_closure(
     graph: &Graph,
     root: NodeKey,
@@ -288,15 +289,15 @@ fn hierarchy_closure(
         let incident: Box<dyn Iterator<Item = NodeKey>> = match direction {
             FoldTraversalDirection::Outgoing => Box::new(
                 graph
-                    .outgoing_relations(current)
-                    .filter(|relation| relation.kind.family() == hierarchy_family)
-                    .map(|relation| relation.to),
+                    .projected_outgoing_relations(current)
+                    .filter(|(_, _, payload)| payload.families().contains(&hierarchy_family))
+                    .map(|(neighbor, _, _)| neighbor),
             ),
             FoldTraversalDirection::Incoming => Box::new(
                 graph
-                    .incoming_relations(current)
-                    .filter(|relation| relation.kind.family() == hierarchy_family)
-                    .map(|relation| relation.from),
+                    .projected_incoming_relations(current)
+                    .filter(|(_, _, payload)| payload.families().contains(&hierarchy_family))
+                    .map(|(neighbor, _, _)| neighbor),
             ),
         };
         for next in incident {
@@ -452,7 +453,7 @@ mod tests {
         );
         assert_eq!(graph.nodes().count(), 3, "the source graph stays intact");
         assert_eq!(
-            graph.relations().count(),
+            graph.projected_relations().count(),
             4,
             "projection does not remove cells"
         );
@@ -501,7 +502,7 @@ mod tests {
             },
         );
         let source_nodes = graph.nodes().count();
-        let source_relations = graph.relations().count();
+        let source_relations = graph.projected_relations().count();
         let mut canvas = Canvas::with_graph(graph);
 
         let id = canvas
@@ -525,7 +526,10 @@ mod tests {
         assert_eq!(projection.boundary_bundles[0].outside, linked);
         assert_eq!(projection.boundary_bundles[0].family, EdgeFamily::Semantic);
         assert_eq!(canvas.graph().nodes().count(), source_nodes);
-        assert_eq!(canvas.graph().relations().count(), source_relations);
+        assert_eq!(
+            canvas.graph().projected_relations().count(),
+            source_relations
+        );
         assert!(canvas.undo_fold(), "collapse is a reversible view action");
         assert!(canvas.active_fold_projection().is_none());
         assert!(canvas.redo_fold(), "redo restores the same hierarchy fold");
@@ -541,10 +545,11 @@ mod tests {
         hierarchy_family: EdgeFamily,
         direction: FoldTraversalDirection,
     ) -> BTreeSet<NodeKey> {
+        let relations: Vec<_> = graph.projected_relations().map(|(_, row)| row).collect();
         let mut members = BTreeSet::from([root]);
         let mut pending = VecDeque::from([root]);
         while let Some(current) = pending.pop_front() {
-            for relation in graph.relations() {
+            for relation in &relations {
                 if relation.kind.family() != hierarchy_family {
                     continue;
                 }
@@ -624,7 +629,7 @@ mod tests {
     fn incident_edge_walk_matches_brute_force_closure_on_large_hierarchy() {
         let (graph, chain) = large_hierarchy_fixture(300, 300);
         assert!(
-            graph.relations().count() > 2_000,
+            graph.projected_relations().count() > 2_000,
             "the fixture must carry many unrelated relations"
         );
         let root = chain[0];
@@ -730,5 +735,80 @@ mod tests {
         assert_ne!(down_members, up_members);
         let overlap: BTreeSet<NodeKey> = down_members.intersection(&up_members).copied().collect();
         assert_eq!(overlap, BTreeSet::from([mid]));
+    }
+    #[test]
+    fn hierarchy_closure_keeps_legacy_surface_and_resource_families_distinct() {
+        let mut graph = Graph::new();
+        let root = graph.add_node("https://fold.test/root".into(), Point2D::zero());
+        let child = graph.add_node("https://fold.test/child".into(), Point2D::zero());
+        let grandchild = graph.add_node("https://fold.test/grandchild".into(), Point2D::zero());
+        let linked = graph.add_node("https://fold.test/linked".into(), Point2D::zero());
+        let from_id = graph.get_node(root).unwrap().id.to_string();
+        let to_id = graph.get_node(child).unwrap().id.to_string();
+        kernel::graph::replay_captured_deltas_onto(
+            &mut graph,
+            [kernel::graph::CapturedDelta::ReplayAssertRelationByIds {
+                from_id,
+                to_id,
+                assertion: EdgeAssertion::Containment {
+                    sub_kind: ContainmentSubKind::Domain,
+                },
+            }],
+        );
+        let resource = graph
+            .assert_relation(
+                child,
+                grandchild,
+                EdgeAssertion::Containment {
+                    sub_kind: ContainmentSubKind::Domain,
+                },
+            )
+            .unwrap();
+        assert!(matches!(resource, kernel::graph::RelationKey::Resource(_)));
+        graph.assert_relation(
+            root,
+            linked,
+            EdgeAssertion::Semantic {
+                sub_kind: SemanticSubKind::Cites,
+                label: None,
+                decay_progress: None,
+            },
+        );
+        assert_eq!(
+            graph.relations().count(),
+            1,
+            "legacy Surface hierarchy remains held"
+        );
+        assert_eq!(graph.projected_relations().count(), 3);
+        let before = graph.to_snapshot();
+        let expected = BTreeSet::from([root, child, grandchild]);
+        for (start, direction) in [
+            (root, FoldTraversalDirection::Outgoing),
+            (grandchild, FoldTraversalDirection::Incoming),
+        ] {
+            assert_eq!(
+                hierarchy_closure(&graph, start, EdgeFamily::Containment, direction),
+                expected
+            );
+            assert_eq!(
+                brute_force_hierarchy_closure(&graph, start, EdgeFamily::Containment, direction),
+                expected
+            );
+        }
+        assert_eq!(
+            hierarchy_closure(
+                &graph,
+                root,
+                EdgeFamily::Semantic,
+                FoldTraversalDirection::Outgoing
+            ),
+            BTreeSet::from([root, linked])
+        );
+        let mut after = graph.to_snapshot();
+        after.timestamp_secs = before.timestamp_secs;
+        assert_eq!(
+            serde_json::to_value(after).unwrap(),
+            serde_json::to_value(before).unwrap()
+        );
     }
 }

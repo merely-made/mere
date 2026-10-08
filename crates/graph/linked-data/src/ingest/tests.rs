@@ -376,16 +376,30 @@ fn apply_materializes_recognized_and_raw_edges() {
     assert_eq!(outcome.edges_asserted, 2);
     assert_eq!(outcome.edges_skipped, 0);
 
-    // Curated literals landed on the subject node.
+    // Presentation stays on the surface; shared content belongs to its exact RDF resource.
     let (a, node_a) = graph.get_node_by_url("https://a.test/").expect("node a");
     assert_eq!(node_a.title, "Article A");
-    assert!(node_a.tags.contains("research"));
+    assert!(node_a.tags.is_empty());
+    assert!(graph.node_content_tags(a).unwrap().contains("research"));
     let (b, _) = graph.get_node_by_url("https://b.test/").expect("node b");
     let (c, _) = graph.get_node_by_url("https://c.test/").expect("node c");
+    let a_resource = graph.shown_resource_id(a).unwrap();
+    let b_resource = graph.shown_resource_id(b).unwrap();
+    let c_resource = graph.shown_resource_id(c).unwrap();
+    assert_eq!(
+        graph.resource(a_resource).unwrap().canonical_iri(),
+        "https://a.test/"
+    );
+    assert!(graph.find_edge_key(a, b).is_none());
+    assert!(graph.find_edge_key(a, c).is_none());
 
     // Recognized predicate → typed Semantic edge with canonical IRI.
     let cites = graph
-        .get_edge(graph.find_edge_key(a, b).expect("a→b"))
+        .get_resource_edge(
+            graph
+                .find_resource_edge_key(a_resource, b_resource)
+                .expect("a→b"),
+        )
         .unwrap();
     assert!(cites.has_relation(RelationSelector::Semantic(SemanticSubKind::Cites)));
     assert_eq!(
@@ -395,7 +409,11 @@ fn apply_materializes_recognized_and_raw_edges() {
 
     // Raw predicate → open-predicate Semantic edge (no sub-kinds).
     let citation = graph
-        .get_edge(graph.find_edge_key(a, c).expect("a→c"))
+        .get_resource_edge(
+            graph
+                .find_resource_edge_key(a_resource, c_resource)
+                .expect("a→c"),
+        )
         .unwrap();
     assert!(citation.has_relation(RelationSelector::Family(EdgeFamily::Semantic)));
     assert!(
@@ -723,8 +741,16 @@ fn every_ingest_assertion_path_supplies_source_or_author() {
                 assert_eq!(outcome.edges_skipped, 0);
                 let from = graph.get_node_by_url("https://a.test/").unwrap().0;
                 let to = graph.get_node_by_url("https://b.test/").unwrap().0;
+                assert!(graph.find_edge_key(from, to).is_none());
                 let statements = graph
-                    .get_edge(graph.find_edge_key(from, to).unwrap())
+                    .get_resource_edge(
+                        graph
+                            .find_resource_edge_key(
+                                graph.shown_resource_id(from).unwrap(),
+                                graph.shown_resource_id(to).unwrap(),
+                            )
+                            .unwrap(),
+                    )
                     .unwrap()
                     .semantic_statements();
                 assert_eq!(statements.len(), 1);
@@ -734,6 +760,13 @@ fn every_ingest_assertion_path_supplies_source_or_author() {
                     Some(source.unwrap_or(&fallback))
                 );
                 assert_eq!(statements[0].graph_scope, GraphScope::Source);
+                assert_eq!(
+                    statements[0].label.as_deref(),
+                    (metadata == 1).then_some("label")
+                );
+                if metadata == 2 {
+                    assert_eq!(statements[0].statement_id, "imported");
+                }
             }
         }
     }

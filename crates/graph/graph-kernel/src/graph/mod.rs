@@ -56,6 +56,7 @@ pub mod cross_graph;
 /// the graph (the substrate's append-only-log primitive over mere's own edit
 /// vocabulary). See `graph/journal.rs`.
 pub mod journal;
+pub mod legacy_content_migration;
 pub mod legacy_resource_migration;
 pub use cross_graph::ComponentCopy;
 mod assertion_write;
@@ -79,6 +80,12 @@ pub mod predicate_declarations;
 pub mod predicate_registry;
 mod relation_read;
 pub mod resource;
+pub mod resource_classifications;
+pub mod resource_content;
+#[cfg(test)]
+mod resource_content_tests;
+pub mod resource_properties;
+pub mod resource_tags;
 /// Reverting one change: undo's edits and the parts it keeps (reservoir plan V2).
 pub mod revert;
 pub mod source_time;

@@ -22,6 +22,7 @@ fn property(id: &str, asserter: &str, time: u64) -> NodeProperty {
 fn assert_literal_writers_keep_asserters_and_first_ids(batched: bool) {
     let mut graph = Graph::new();
     let key = graph.add_node("https://literal.test/".into(), Default::default());
+    let resource = graph.ensure_surface_resource(key).unwrap();
     let baseline = graph.clone();
     let captures = Arc::new(Mutex::new(Vec::new()));
     let sink = captures.clone();
@@ -58,10 +59,21 @@ fn assert_literal_writers_keep_asserters_and_first_ids(batched: bool) {
     updated.asserted_at_ms = Some(30);
     let expected = vec![updated.clone(), bob];
     assert_eq!(graph.node_properties(key).unwrap(), expected);
+    assert!(graph.legacy_node_properties(key).unwrap().is_empty());
     assert_eq!(captures.lock().unwrap().len(), 3);
     match captures.lock().unwrap().last().unwrap() {
-        CapturedDelta::ReplayAppendNodePropertyById { property, .. } => {
-            assert_eq!(property, &updated, "capture names the stored first handle");
+        CapturedDelta::ReplaySetResourceRecordById {
+            resource_id,
+            record: Some(record),
+        } => {
+            assert_eq!(resource_id, &resource.to_string());
+            let facet = record
+                .facets
+                .iter()
+                .find(|facet| facet.facet == crate::graph::resource_content::RESOURCE_PROPERTIES)
+                .unwrap();
+            let properties: Vec<NodeProperty> = serde_json::from_str(&facet.value_json).unwrap();
+            assert_eq!(properties, expected, "capture preserves both exact handles");
         },
         other => panic!("unexpected literal capture: {other:?}"),
     }

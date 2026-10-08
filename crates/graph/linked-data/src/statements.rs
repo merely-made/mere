@@ -155,8 +155,14 @@ mod tests {
         assert!(outcome.pending_targets.is_empty());
         assert!(outcome.unrecognized.is_empty());
 
-        let key = graph.find_edge_key(source, target).expect("edge created");
-        let payload = graph.get_edge(key).expect("edge payload");
+        assert!(graph.find_edge_key(source, target).is_none());
+        let key = graph
+            .find_resource_edge_key(
+                graph.shown_resource_id(source).expect("source resource"),
+                graph.shown_resource_id(target).expect("target resource"),
+            )
+            .expect("resource edge created");
+        let payload = graph.get_resource_edge(key).expect("resource edge payload");
         assert!(payload.has_relation(RelationSelector::Semantic(SemanticSubKind::Cites)));
         assert_eq!(payload.semantic_statements().len(), 1);
         assert_eq!(

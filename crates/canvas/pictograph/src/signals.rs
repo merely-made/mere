@@ -56,8 +56,13 @@ impl TopologyView for Graph {
     }
 
     fn neighbors_undirected(&self, key: NodeKey) -> impl Iterator<Item = NodeKey> + '_ {
-        // The inherent method (inherent wins over the trait method of the same name).
-        Graph::neighbors_undirected(self, key)
+        // A self-loop bucket appears in both directions; count it once.
+        self.projected_outgoing_relations(key)
+            .chain(
+                self.projected_incoming_relations(key)
+                    .filter(move |(neighbor, _, _)| *neighbor != key),
+            )
+            .map(|(neighbor, _, _)| neighbor)
     }
 }
 

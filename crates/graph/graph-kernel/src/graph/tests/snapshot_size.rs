@@ -41,7 +41,7 @@ fn snapshot_len(graph: &Graph) -> usize {
 }
 
 fn facet_len(graph: &Graph) -> usize {
-    serde_json::to_vec(graph.facets())
+    serde_json::to_vec(graph.resource_facets())
         .expect("a facet store is always serializable")
         .len()
 }
@@ -59,6 +59,7 @@ fn bare_nodes(count: usize) -> (Graph, Vec<NodeKey>) {
 fn common_case_property_metadata_stays_cheap_in_the_facet_sidecar() {
     const N: usize = 50;
 
+    // Resource content facets carry these properties; Surface facets remain separate.
     // Baseline: N isolated nodes, no properties.
     let (bare, _) = bare_nodes(N);
     let bare_len = facet_len(&bare);
@@ -172,7 +173,7 @@ fn common_case_semantic_statement_stays_cheap_in_the_snapshot() {
     );
     let snapshot = plain.to_snapshot();
     let claims: Vec<_> = snapshot
-        .edges
+        .resource_edges
         .iter()
         .filter_map(|edge| edge.semantic.as_ref())
         .flat_map(|semantic| &semantic.statements)
