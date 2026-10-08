@@ -246,6 +246,7 @@ pub fn project_tree_with_actions<D: LayoutDom<NodeId = NodeId>>(
     );
     let mut action_map = HashMap::new();
     let mut produced = Vec::new();
+    let mut app_textboxes = Vec::new();
     walk(dom, root, &mut |node| {
         let id = id_of(dom, node);
         action_map.insert(id, node);
@@ -276,6 +277,7 @@ pub fn project_tree_with_actions<D: LayoutDom<NodeId = NodeId>>(
                 .iter_mut()
                 .find(|(candidate, _)| *candidate == id)
         {
+            app_textboxes.push(id);
             // Cambium paints committed text alongside ephemeral preedit,
             // ghost and caret nodes. The owner marker carries only the model
             // value, so platform accessibility never mistakes painted
@@ -309,7 +311,58 @@ pub fn project_tree_with_actions<D: LayoutDom<NodeId = NodeId>>(
     for (slot, key, semantics) in produced {
         add_producer_semantics(&mut tree, slot, key, semantics, &mut produced_map);
     }
+    prune_app_textbox_descendants(
+        dom,
+        &mut tree,
+        &mut action_map,
+        &mut produced_map,
+        &app_textboxes,
+    );
     (tree, action_map, produced_map)
+}
+
+/// App textboxes expose their committed value as a leaf. Decoration and
+/// painted text remain in the drawing DOM, while their accessibility rows and
+/// routes are removed after all producer semantics have been added.
+fn prune_app_textbox_descendants(
+    dom: &impl LayoutDom<NodeId = NodeId>,
+    tree: &mut TreeUpdate,
+    action_map: &mut HashMap<A11yNodeId, NodeId>,
+    produced_map: &mut HashMap<A11yNodeId, ProducedAction>,
+    textboxes: &[A11yNodeId],
+) {
+    let children: HashMap<_, Vec<_>> = tree
+        .nodes
+        .iter()
+        .map(|(id, node)| (*id, node.children().to_vec()))
+        .collect();
+    let mut hidden = HashMap::new();
+    for textbox in textboxes {
+        if let Some(owner) = find_opaque(dom, dom.document(), textbox.0) {
+            let mut pending: Vec<_> = dom.dom_children(owner).collect();
+            while let Some(child) = pending.pop() {
+                hidden
+                    .entry(A11yNodeId(dom.opaque_id(child)))
+                    .or_insert(*textbox);
+                pending.extend(dom.dom_children(child));
+            }
+        }
+        let mut pending = children.get(textbox).cloned().unwrap_or_default();
+        while let Some(child) = pending.pop() {
+            hidden.entry(child).or_insert(*textbox);
+            pending.extend(children.get(&child).into_iter().flatten().copied());
+        }
+        if let Some((_, node)) = tree.nodes.iter_mut().find(|(id, _)| id == textbox) {
+            node.set_children(Vec::new());
+        }
+    }
+    if let Some(owner) = hidden.get(&tree.focus) {
+        tree.focus = *owner;
+    }
+    let hidden_ids: std::collections::HashSet<_> = hidden.keys().copied().collect();
+    tree.nodes.retain(|(id, _)| !hidden_ids.contains(id));
+    action_map.retain(|id, _| !hidden_ids.contains(id));
+    produced_map.retain(|id, _| !hidden_ids.contains(id));
 }
 
 /// Write a producer's own semantics onto its slot's node, and what it draws
@@ -525,16 +578,42 @@ mod dpi_tests {
         let root = dom.document();
         dom.set_inner_html(
             root,
-            r#"<div aria-label="Notes" role="textbox" aria-multiline="true" data-cambium-text-value="Café 👩🏽‍🚀" style="width:240px;height:40px">Café 👩🏽‍🚀<span> ghost</span><span>preedit</span><span>│</span></div><div aria-label="Title" role="textbox" data-cambium-text-value="Résumé 🇫🇷" style="width:240px;height:32px">Résumé 🇫🇷<span>ghost</span></div><div role="button" data-cambium-text-value="not a field">Button</div>"#,
+            "<div aria-label=\"Notes\" role=\"textbox\" aria-multiline=\"true\" data-cambium-text-value=\"Café 👩🏽‍🚀\nSecond line\" style=\"width:240px;height:40px\">Café 👩🏽‍🚀<span> ghost</span><span>preedit</span><span>│</span></div><div aria-label=\"Title\" role=\"textbox\" data-cambium-text-value=\"Résumé 🇫🇷\" style=\"width:240px;height:32px\">Résumé 🇫🇷<span>ghost</span></div><div role=\"button\" data-cambium-text-value=\"not a field\">Button</div>",
         );
+        let mut pending = vec![dom.document()];
+        let mut field_dom = None;
+        while let Some(node) = pending.pop() {
+            if dom.attribute(node, &Namespace::default(), &LocalName::from("aria-label"))
+                == Some("Notes")
+            {
+                field_dom = Some(node);
+                break;
+            }
+            pending.extend(dom.dom_children(node));
+        }
+        let field_dom = field_dom.expect("the fixture has its app textbox");
+        let focus = dom.opaque_id(field_dom);
+        let drawn_children: Vec<_> = dom.dom_children(field_dom).collect();
+        let drawn_descendants: Vec<_> = drawn_children
+            .iter()
+            .flat_map(|child| {
+                let mut pending = vec![*child];
+                let mut ids = Vec::new();
+                while let Some(node) = pending.pop() {
+                    ids.push(A11yNodeId(dom.opaque_id(node)));
+                    pending.extend(dom.dom_children(node));
+                }
+                ids
+            })
+            .collect();
         let layout = OwnedLayout::new(&dom, &[""], 320.0, 180.0, &[], &HashMap::new());
         let mut leaves = LeafRegistry::new();
-        let (tree, _) = project_tree(
+        let (tree, action_map, _) = project_tree_with_actions(
             &dom,
             &layout,
             &mut leaves,
             &mut ProducerRegistry::new(),
-            None,
+            Some(focus),
         );
         let field = tree
             .nodes
@@ -542,9 +621,17 @@ mod dpi_tests {
             .find(|(_, node)| node.role() == Role::MultilineTextInput)
             .map(|(_, node)| node)
             .expect("the field has multiline textbox semantics");
-        assert_eq!(field.value(), Some("Café 👩🏽‍🚀"));
+        assert_eq!(field.value(), Some("Café 👩🏽‍🚀\nSecond line"));
         assert_eq!(field.label(), Some("Notes"));
         assert!(!field.is_read_only(), "text fields remain editable");
+        assert!(field.children().is_empty(), "app textboxes are leaves");
+        assert_eq!(tree.focus, A11yNodeId(focus), "focus stays on the textbox");
+        assert!(drawn_children.len() >= 4, "painting DOM remains intact");
+        assert!(
+            drawn_descendants
+                .iter()
+                .all(|id| !action_map.contains_key(id))
+        );
         let title = tree
             .nodes
             .iter()
@@ -560,6 +647,64 @@ mod dpi_tests {
             .map(|(_, node)| node)
             .expect("the non-field marker preserves its button role");
         assert_eq!(button.value(), None);
+    }
+
+    #[test]
+    fn focus_inside_a_nested_marked_textbox_resolves_to_the_surviving_outer_leaf() {
+        let mut dom = ScriptedDom::new();
+        let root = dom.document();
+        dom.set_inner_html(
+            root,
+            "<div id=\"outer\" aria-label=\"Outer\" role=\"textbox\" data-cambium-text-value=\"outer value\" style=\"display:block;width:240px;height:60px\"><div id=\"inner\" aria-label=\"Inner\" role=\"textbox\" data-cambium-text-value=\"inner value\" style=\"display:block;width:200px;height:32px\"><span id=\"focused-child\">preedit</span></div></div>",
+        );
+        let find_id = |wanted: &str| {
+            let mut pending = vec![dom.document()];
+            while let Some(node) = pending.pop() {
+                if dom.attribute(node, &Namespace::default(), &LocalName::from("id"))
+                    == Some(wanted)
+                {
+                    return node;
+                }
+                pending.extend(dom.dom_children(node));
+            }
+            panic!("missing fixture node with id {wanted}");
+        };
+        let outer = find_id("outer");
+        let inner = find_id("inner");
+        let focused_child = find_id("focused-child");
+        let outer_id = A11yNodeId(dom.opaque_id(outer));
+        let inner_id = A11yNodeId(dom.opaque_id(inner));
+        let focused_opaque = dom.opaque_id(focused_child);
+        let focused_id = A11yNodeId(focused_opaque);
+        let outer_drawn_children: Vec<_> = dom.dom_children(outer).collect();
+        let layout = OwnedLayout::new(&dom, &[""], 320.0, 180.0, &[], &HashMap::new());
+        let mut leaves = LeafRegistry::new();
+        let (tree, action_map, _) = project_tree_with_actions(
+            &dom,
+            &layout,
+            &mut leaves,
+            &mut ProducerRegistry::new(),
+            Some(focused_opaque),
+        );
+
+        let outer_node = tree
+            .nodes
+            .iter()
+            .find(|(id, _)| *id == outer_id)
+            .map(|(_, node)| node)
+            .expect("the outer textbox survives");
+        assert_eq!(outer_node.value(), Some("outer value"));
+        assert!(outer_node.children().is_empty());
+        assert_eq!(tree.focus, outer_id);
+        assert!(!tree.nodes.iter().any(|(id, _)| *id == inner_id));
+        assert!(action_map.contains_key(&outer_id));
+        assert!(!action_map.contains_key(&inner_id));
+        assert!(!action_map.contains_key(&focused_id));
+        assert_eq!(
+            dom.dom_children(outer).collect::<Vec<_>>(),
+            outer_drawn_children,
+            "accessibility pruning leaves drawing DOM intact"
+        );
     }
 
     /// A producer's slot is named by the producer, and each thing it draws

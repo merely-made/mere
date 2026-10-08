@@ -64,13 +64,22 @@ rendering engine.
 
 ### 2026-10-07 Forms field ownership migration
 
-**Status:** local consumer gates pass; accessible-tree and sibling-scope
-rulings and a verified published-source Genet repin remain pending.
+**Status:** local consumer gates pass. F5 authorizes bounded sibling changes;
+F6 chooses app textboxes as accessibility leaves across projections. Those
+implementation gates and a verified published-source Genet repin remain pending.
 The implementation plan and numbered rulings live in Genet's
 [dated Forms plan](https://github.com/merely-made/genet/blob/main/design_docs/2026-10-07_forms_value_validation_submission_plan.md).
 F3 authorizes this Mere migration and the later verified repin. The current
 source still pins Genet `965b64e206a47d1c8808472de9aa461233638768`; its older
 receipts do not qualify the Forms candidate.
+
+F6 preserves the app textbox's identity, existing name, committed value,
+geometry, state, actions and focus while excluding its decorative accessibility
+descendants in the neutral projection and the native AccessKit adapter. The
+browser mirror inherits that neutral topology. Drawing children stay in the
+DOM. F5 limits sibling edits to selectors, caret routing and existing labels in
+Turnstone and Cleromancy; unnamed fields stay unnamed. The numbered rulings in
+the Forms plan own these decisions, with fresh implementation gates to follow.
 
 Native HTML inputs and textareas now keep live values in Genet's form-control
 arena. Cambium's `TextInput` owns app editing and paints highlighted committed
