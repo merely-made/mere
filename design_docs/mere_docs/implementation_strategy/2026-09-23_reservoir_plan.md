@@ -1,24 +1,15 @@
 # Reservoir plan: shared meres held by the device resident
 
 **Date:** 2026-09-23
-**Status (2026-10-06):** in progress. V1 is complete and on main: the pandect
-index, wallet-persona resolution, djinn's reservoir lane and route, and a real
-two-process receipt; it reached origin with `5364dfa0` on 2026-09-24. V2 is
-complete and on origin: steps 1 to 3 (muniment, graph-kernel, pandect) landed
-on 2026-09-24, and step 3b (undo with exact replay), step 4 (`MereHost` on
-`GraphSession` in Graphshell) and step 5 (djinn's routes, meeting V2's
-done-conditions, §8) on 2026-09-25. Step 4's browser receipt (§7 item 29)
-still awaits its headed scenario verdicts. V2b, the mere view: steps 1 to 3
-(the component, its headed proof and the route adapter) landed and reached
-origin on 2026-09-25. Step 4, Graphshell on one Cambium tree, runs in
-[its own plan](2026-09-25_graphshell_one_tree_plan.md), whose status is the
-authority: at mere 535bca11 its phases 1 and 2 were done on 2026-09-26, phase
-3 has headed correctness receipts, and Mark approved phase 4 on 2026-09-27.
-Open: V2b steps 4 and 5 (Graphshell's panel), V3, V4 and V5.
-**Open, raised by the S14 pass (2026-10-06):** should this status keep
-restating the one-tree plan's position, the duplication that went stale here,
-or only point to that plan's status? Options: keep restating it; point to
-that plan's status instead.
+**Status (2026-10-07):** in progress, reviewed against published Mere
+`cd3ebf26d`. V1 landed 2026-09-24; V2 landed 2026-09-24/25 with journal,
+replay/undo, resident routes and recorded two-process receipts. V2b steps 1–3
+(the shared mere view, headed harness and route adapter) landed 2026-09-25.
+Open: V2b steps 4–5, V3, V4 and V5. V2 step 4's recorded browser run still
+does not close its headed scenario verdicts (§7 item 29). Current Graphshell
+cutover status belongs only to the [one-tree plan](2026-09-25_graphshell_one_tree_plan.md);
+§2 below names the reservoir's own remaining acceptance gates. No new runtime
+checks were run for this documentation refresh.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -109,6 +100,54 @@ sessions.
   - It runs its own resident authority, `CleromancySessionAuthority`
     (`repos/cleromancy/src/admitted.rs`).
   - No store exists at that default root on the primary development machine.
+
+### Current implementation and consumer handoff (2026-10-07)
+
+The earlier findings above are dated history. The following was checked from
+source at Mere `cd3ebf26d` and Cleromancy `32a4b948`; historical receipts are
+retained evidence rather than fresh qualification on these revisions.
+
+| Target | Available source | Remaining acceptance |
+| --- | --- | --- |
+| V1: shared meres and one owner | `pandect::reservoir`, Djinn's reservoir lane/route and `ports/djinn/tests/reservoir_two_process.rs` | Landed. Preserve domain-id reuse, persona scope and refusal of a second owner when adapting consumers. |
+| V2: sessions, journal and routes | `pandect::GraphSession`, `graphshell::MereHost`, Djinn's `resident_mere` and `ports/djinn/tests/mere_two_process.rs` | Landed native/session contract; the previously recorded browser scenario verdicts remain explicitly open. |
+| V2b: shared view | `crates/cambium/mere-view` and `graphshell::mere_route` | Steps 1–3 are landed. Step 4 uses the one-tree plan's complete cutover gate; step 5 mounts the session panel and proves its lifecycle/graph behavior. Consumer embedding is an additional proof. |
+| V3: archive | `crates/system/pandect/src/graph_codicil.rs` supplies freeze/thaw machinery | Wire archive actions into reservoir sessions and qualify save/open/fork/compose lineage. The generic codicil library does not establish this integration. |
+| V4: access and ambient crossing | `MereRoutes::serve` grants initial routes to its first-party application list | Persist and enforce recorded denials, and add per-mere, per-app ambient grants. Initial route grants do not establish the complete V4 contract. |
+| V5: standalone ownership | Djinn's resident and reservoir sources supply the owning side | Provide and qualify embedded operation when Djinn is absent, client attachment when present, and clear refusal of simultaneous ownership. |
+| Cleromancy C1 | Existing Cleromancy graph, replay validator and resident endpoint adapter | Compose the domain validator into the resident so every application's write is checked. Replace its private snapshot persistence and qualify its shared view, archive, grants and standalone behavior. |
+
+**How the work reached this point.** V1–V2 and V2b's first three steps landed
+on 2026-09-24/25. The ruled "one tree first" decision made Graphshell's cutover
+a V2b step, and its lane then built canvas/control integration, elapsed-time
+physics, editing and remote-session support. Those receipts belong to the
+one-tree plan and its linked inventory. They did not close V2b's panel or
+V3–V5. The committed record contains no cancellation or replacement of this
+plan and no completion entry for V3–V5.
+
+**Dependency boundaries.** Graphshell's full browser cutover is the acceptance
+gate for V2b step 4 and precedes its panel in step 5. V3–V5 have their own
+storage/resident contracts and non-UI receipts; this plan does not make every
+such implementation wait for retirement of Graphshell's old page. When taking
+one up, name its actual session, route, identity or owner dependency and the
+proof it adds. The sequence of newly parallel implementation lanes is not
+decided by this documentation refresh.
+
+Cleromancy's plan still requires V1–V5 for full C1 acceptance. Its named
+dependency map separates source-backed preparation of narration, typed data
+and scene bindings from completing the resident migration. No application
+may bypass its domain validator, invent a second durable owner or call a
+successful local snapshot reopen reservoir adoption.
+
+**Status ownership.** This plan owns reservoir completion and consumer handoff;
+the one-tree plan owns Graphshell cutover; the
+[dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md) owns motion/channel,
+portable-spec and replay status; the
+[Scenograph editor plan](2026-10-07_scenograph_editor_plan.md) owns its shared
+editing contracts. A shared capability's landing is followed by a tested
+consumer adaptation, not reciprocal pin-only updates. Status lines link to
+these owners instead of repeating their phase summaries, resolving the
+2026-10-06 S14 status-duplication maintenance question.
 
 ### V2 findings (verified 2026-09-24)
 
@@ -1419,3 +1458,9 @@ V2b's rulings, all 2026-09-25:
   follows the one-tree plan's own status (phase 3 receipted, phase 4 approved
   2026-09-27) instead of "phase 3 is next", and the headed verdicts stay
   explicitly open.
+- 2026-10-07: source/history refresh against Mere `cd3ebf26d` and Cleromancy
+  `32a4b948`. Added the available-source/remaining-acceptance map and the
+  V2b-to-one-tree history, removed duplicated child-plan status from the header,
+  and made consumer authority/ownership gates explicit. V2b steps 4–5 and
+  V3–V5 remain open; historical browser verdicts are not upgraded. Documentation
+  only: no runtime gates, shared-contract changes or consumer repins.
