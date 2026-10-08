@@ -16,7 +16,7 @@ switch path).
 
 ## Tabard small-web adapters (2026-09-13 scope)
 
-**Current code:** `ports/tabard/src/lib.rs::Theme` derives a Tinct palette and
+**Current code:** `Theme` in `crates/system/tabard/src/lib.rs` derives a Tinct palette and
 emits DTCG color JSON, deterministic CSS custom properties, and
 `lagrange_palette_txt()` with typed mapping diagnostics. It is a library. The recorded Pelt chrome/Reader preview
 receipts prove consumer mappings, not installed user settings. In Mere,
@@ -38,7 +38,7 @@ reader overrides their appearance. Gemtext needs no styling extension.
 1. **Native reader adapter.** Map existing Tabard roles into the shared reader
    palette/style sheet, with Knot and Turnstone owning selection, persistence
    and precedence over site-derived defaults. Knot's current
-   `apps/desktop/src/appearance.rs` derives its own Tinct palette; its consumer
+   `knot-editor/apps/desktop/src/appearance.rs` derives its own Tinct palette; its consumer
    can reuse Tabard while keeping editor appearance separate from published CSS.
    Done when one theme is selected, previewed and restored in both apps, while
    document bytes, history, selection and viewport remain held; ordinary,
@@ -79,10 +79,44 @@ consumer evidence before entering implementation. The shared Micron presentation
 scope lives in the
 [fidelity plan](../../nematic_docs/implementation_strategy/2026-07-01_smolweb_fidelity_plan.md#micron-completion-scope-2026-09-13).
 
-**Open, raised by the S14 pass (2026-10-06):** the "tabard fill" commits of
-2026-09-24 (T2a to T4, among them `7f133433` and `d16f055f`) have no plan in
-Mere's design_docs. Which plan owns the Tabard scope? Options: this plan
-absorbs it; a separate Tabard plan owns it.
+**Ownership clarified 2026-10-07:** the September T1–T5 theme consolidation
+is owned by [crate consolidation, C2a](2026-09-23_crate_consolidation_plan.md#c2a-filling-tabard).
+That plan also records Tabard's move to `crates/system/tabard` to restore its
+shared-library dependency direction. This plan owns theme modes and the
+remaining consumer adapter and exporter acceptance work above.
+
+## Appearance workshop (2026-10-07)
+
+**Status (2026-10-07):** W1 implemented; W2–W3 open. Mark asked to start Tabard's larger authoring role,
+with the browser's SC step 2 proceeding independently. The suite census owns
+its product charter: an appearance workshop with authored themes and live
+preview, shared by a standalone host and Turnstone.
+
+- **W1 — Draft authoring model.** An isolated draft supports typed edits,
+  undo/redo, discard, canonical-mode previews, and explicit commit to the theme
+  registry. Built-ins require a fork; a commit refuses a destination collision
+  or a concurrently changed/deleted source. Previewing does not activate a
+  theme or rewrite reader content. Done when tests prove those boundaries.
+- **W2 — Visible authoring surface.** Compose W1 into the reusable Cambium
+  surface with seed controls, mode selection and representative chrome,
+  reader, syntax and graph specimens. Select the first host and scope with
+  Mark; no host integration is claimed by W1.
+- **W3 — Artifact fidelity and persistence.** Keep authored definitions
+  distinct from exports and host appearance preferences; carry explicit modes,
+  harmony and unsupported-role diagnostics through preview/export adapters.
+  Current CSS/DTCG methods still use their documented normal-contrast profile.
+
+**Findings (2026-10-07):** `ThemeRegistry` already supports CRUD, but editing
+through it writes immediately. `derive_from_def_for_mode` supplies canonical
+previews; custom modes need a calculator or authored sheet and must not be
+presented as a successful canonical fallback by the authoring model.
+
+**Progress (2026-10-07):** W1 is implemented in
+`crates/system/tabard/src/workshop.rs`. All 49 Tabard tests pass (34 unit,
+10 artifact integration, 5 workshop integration). The new tests cover
+non-mutating preview, built-in protection, concurrent-edit/deletion/collision
+refusal, undo/redo branching, discard, and stylesheet/custom-mode handling.
+No visible authoring surface or new disk-persistence path is claimed.
 
 ## The model (decision record)
 

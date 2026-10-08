@@ -31,7 +31,7 @@ The port law ([composition thesis](2026-08-12_family_composition_thesis_brief.md
 - **ortet** — Genet's raw host: one window, one document, no chrome (`genet/ports/ortet`). The original individual a clonal colony descends from; the one headed port that proves Genet runs with no Mere crate in its dependency cone (`assert_ortet_cone`). Distinct from pelt, which composes Mere.
 - **Scrying** — external web content through the system webview (WebView2 first; engine ID `scrying.web`): the webview's GPU frames imported into the host's wgpu device and composited at the tile rect via the external-texture pass. The mechanism by which Wry reaches the screen; a host concern, never a reader.
 - **fleece** — Genet's render-free extractor: walks the profile-neutral LayoutDom in document order and mints the readable article plus Web Annotation selectors (`TextQuoteSelector`, `TextPositionSelector`) and text-fragment anchors. An engine capability, not an application port; its `Article` shape is deliberately proprietary because no standard for "the readable article" exists.
-- **tabard** — the design-token port: the derived palette as a DTCG (Design Tokens Format Module 2025.10) token tree, from which the CSS custom-property emitter and the host theme-struct emitter are both derived.
+- **tabard** — the shared theme and design-token library: the derived palette as a DTCG (Design Tokens Format Module 2025.10) token tree, from which the CSS custom-property emitter and the host theme-struct emitter are both derived.
 
 ## Substrate (graph truth, persistence, motion)
 

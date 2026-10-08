@@ -335,7 +335,7 @@ running wasm-bindgen into its `pkg` directory (an isolated copied asset director
 also works):
 
 ```powershell
-cargo build -p commons-spine --example commons_practice_peer -j 1 --target-dir <isolated-target>
+cargo build -p mere-moot --example commons_practice_peer -j 1 --target-dir <isolated-target>
 python ports/graphshell/web/co_op_receipt.py --binary <isolated-target>/debug/examples/commons_practice_peer.exe --comparison ../woodshed/scenarios/woodshed_musical_comparison.json --assets ports/graphshell/web --output <new-receipt-directory>
 ```
 
