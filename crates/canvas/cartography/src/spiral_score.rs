@@ -100,7 +100,8 @@ pub fn project_spiral_score_for_view(
             .and_then(|items| items.get(key).copied())
             .unwrap_or((0.0, 0.0));
         let source = SourceRef::new(MERE_GRAPH_ADAPTER, node.id.to_string());
-        let profile = registry.resolve_classes(node.tags.iter().map(String::as_str));
+        let tags = graph.node_content_tags(*key).unwrap_or_default();
+        let profile = registry.resolve_classes(tags.iter().map(String::as_str));
         let state = RepresentationState {
             screen_width: extent.0 * zoom_level,
             screen_height: extent.1 * zoom_level,

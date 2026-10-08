@@ -103,13 +103,12 @@ mod tests {
     /// triple term), a raw predicate, a scoped + typed property, rdf:type.
     fn rich_graph() -> Graph {
         let mut graph = Graph::new();
-        let a = graph.add_node("https://a.test/".to_string(), Default::default());
-        let b = graph.add_node("https://b.test/".to_string(), Default::default());
-        let c = graph.add_node("https://c.test/".to_string(), Default::default());
+        let a = graph.add_node("https://a.test".to_string(), Default::default());
+        let b = graph.add_node("https://b.test".to_string(), Default::default());
+        let c = graph.add_node("https://c.test".to_string(), Default::default());
 
         graph.get_node_mut(a).expect("a").title = "Article A".to_string();
-        graph.get_node_mut(a).expect("a").tags =
-            std::collections::HashSet::from(["research".to_string()]);
+        assert!(graph.insert_node_tags(a, vec!["research".into()]));
 
         assert_semantic_relation_in_scope(
             &mut graph,
@@ -120,9 +119,13 @@ mod tests {
             GraphScope::Source,
         );
         // Attach reifier metadata so a triple term must survive file I/O.
-        let edge = graph.find_edge_key(a, b).expect("edge");
+        let edge = graph
+            .projected_relations_between(a, b)
+            .next()
+            .expect("edge")
+            .0;
         let statement = graph
-            .get_edge_mut(edge)
+            .get_relation_mut(edge)
             .and_then(|p| p.semantic.as_mut())
             .and_then(|s| s.statements.iter_mut().next())
             .expect("statement");

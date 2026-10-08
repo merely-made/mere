@@ -152,17 +152,22 @@ mod tests {
             }],
         });
         let path = graph_path(&dir);
+        let content = valid
+            .resources
+            .iter()
+            .position(|record| record.canonical_iri == "urn:mere:test:store")
+            .unwrap();
         fs::write(&path, serde_json::to_vec(&valid).unwrap()).unwrap();
         let loaded = load_graph(&dir).unwrap().unwrap();
         assert_eq!(loaded.to_snapshot().resources, valid.resources);
         for conflict in [false, true] {
             let mut invalid = valid.clone();
             if conflict {
-                let mut record = invalid.resources[0].clone();
+                let mut record = invalid.resources[content].clone();
                 record.facets[0].value_json = "false".into();
                 invalid.resources.push(record);
             } else {
-                invalid.resources[0].facets[0].value_json = "{".into();
+                invalid.resources[content].facets[0].value_json = "{".into();
             }
             let bytes = serde_json::to_vec(&invalid).unwrap();
             fs::write(&path, &bytes).unwrap();

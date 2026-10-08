@@ -244,7 +244,31 @@ impl Graph {
         self.inner
             .inner()
             .edges_connecting(from, to)
-            .map(|edge| self.persisted_edge(from, to, edge.weight()))
+            .map(|edge| {
+                let mut persisted = self.persisted_edge(from, to, edge.weight());
+                // Exact captures and undo retain session arrangements too.
+                persisted.arrangement =
+                    edge.weight()
+                        .arrangement_data()
+                        .map(|data| PersistedArrangementEdgeData {
+                            sub_kinds: data
+                                .sub_kinds
+                                .iter()
+                                .map(|kind| match kind {
+                                    ArrangementSubKind::FrameMember => {
+                                        PersistedArrangementSubKind::FrameMember
+                                    },
+                                    ArrangementSubKind::TileGroup => {
+                                        PersistedArrangementSubKind::TileGroup
+                                    },
+                                    ArrangementSubKind::SplitPair => {
+                                        PersistedArrangementSubKind::SplitPair
+                                    },
+                                })
+                                .collect(),
+                        });
+                persisted
+            })
             .collect()
     }
 }

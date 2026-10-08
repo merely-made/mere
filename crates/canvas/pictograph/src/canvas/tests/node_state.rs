@@ -73,7 +73,7 @@ fn hide_selected_edges_then_show_all_round_trips() {
     assert_eq!(canvas.hidden_edges.len(), 1);
     // The relation itself survives (hiding is display-only).
     assert!(
-        canvas.graph().relations().count() >= 1,
+        canvas.graph().projected_relations().count() >= 1,
         "the relation is not deleted"
     );
 

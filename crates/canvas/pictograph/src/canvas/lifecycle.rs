@@ -622,6 +622,152 @@ impl Canvas {
         true
     }
 
+    /// Refresh exact hosted content without restarting layout or physics.
+    pub fn refresh_recorded_metadata(
+        &mut self,
+        deltas: &[kernel::graph::CapturedDelta],
+    ) -> Result<bool, String> {
+        use kernel::graph::CapturedDelta;
+        let mut expected = self.graph.to_snapshot();
+        let uuid = |value: &str| uuid::Uuid::parse_str(value).map_err(|error| error.to_string());
+        for delta in deltas {
+            match delta {
+                CapturedDelta::ReplaySetResourceRecordById {
+                    resource_id,
+                    record,
+                } => {
+                    let id = uuid(resource_id)?;
+                    let index = expected.resources.iter().position(|record| {
+                        chartulary::resource_id_from_canonical_iri(&record.canonical_iri) == id
+                    });
+                    match (index, record) {
+                        (Some(index), Some(record)) => expected.resources[index] = record.clone(),
+                        (None, Some(record)) => expected.resources.push(record.clone()),
+                        (Some(index), None) => {
+                            expected.resources.remove(index);
+                        },
+                        (None, None) => {},
+                    }
+                    if let Some(record) = record
+                        && chartulary::resource_id_from_canonical_iri(&record.canonical_iri) != id
+                    {
+                        return Err("recorded resource identity does not match its record".into());
+                    }
+                },
+                CapturedDelta::ReplaySetResourceEdgesByIds {
+                    from_resource_id,
+                    to_resource_id,
+                    edges,
+                } => {
+                    let from = uuid(from_resource_id)?;
+                    let to = uuid(to_resource_id)?;
+                    expected.resource_edges.retain(|edge| {
+                        uuid(&edge.from_node_id).ok() != Some(from)
+                            || uuid(&edge.to_node_id).ok() != Some(to)
+                    });
+                    if edges.iter().any(|edge| {
+                        uuid(&edge.from_node_id).ok() != Some(from)
+                            || uuid(&edge.to_node_id).ok() != Some(to)
+                    }) {
+                        return Err("recorded resource pair does not match its endpoints".into());
+                    }
+                    expected.resource_edges.extend(edges.iter().cloned());
+                },
+                CapturedDelta::ReplaySetShownResourceById {
+                    surface_id,
+                    resource_id,
+                } => {
+                    let surface = uuid(surface_id)?;
+                    if !expected
+                        .nodes
+                        .iter()
+                        .any(|node| uuid(&node.node_id).ok() == Some(surface))
+                    {
+                        return Err("recorded content names an absent Surface".into());
+                    }
+                    expected
+                        .shown_resources
+                        .retain(|shown| uuid(&shown.surface_id).ok() != Some(surface));
+                    if let Some(resource) = resource_id {
+                        uuid(resource)?;
+                        expected.shown_resources.push(
+                            kernel::persistence::PersistedShownResource {
+                                surface_id: surface.to_string(),
+                                resource_id: resource.clone(),
+                            },
+                        );
+                    }
+                },
+                CapturedDelta::ReplaySetNodeTitleById { node_id, title } => {
+                    let id = uuid(node_id)?;
+                    let node = expected
+                        .nodes
+                        .iter_mut()
+                        .find(|node| uuid(&node.node_id).ok() == Some(id))
+                        .ok_or("recorded title names an absent Surface")?;
+                    node.title = title.clone();
+                },
+                _ => {
+                    return Err(
+                        "canvas metadata refresh requires recorded content or title captures"
+                            .into(),
+                    );
+                },
+            }
+        }
+        let expected = Graph::try_from_recorded_snapshot(&expected)
+            .map_err(|error| error.to_string())?
+            .to_snapshot();
+        let mut scratch = self.graph.clone();
+        kernel::graph::replay_captured_deltas_onto(&mut scratch, deltas.iter().cloned());
+        scratch
+            .validate_active_resource_assertion_handles()
+            .map_err(|error| error.to_string())?;
+        let actual = scratch.to_snapshot();
+        let content = |snapshot: &kernel::persistence::GraphSnapshot| {
+            let mut records: Vec<_> = snapshot
+                .resources
+                .iter()
+                .map(|record| serde_json::to_string(record).unwrap())
+                .collect();
+            let mut pairs: Vec<_> = snapshot
+                .resource_edges
+                .iter()
+                .map(|edge| serde_json::to_string(edge).unwrap())
+                .collect();
+            let mut shown = snapshot.shown_resources.clone();
+            records.sort();
+            pairs.sort();
+            shown.sort_by(|a, b| a.surface_id.cmp(&b.surface_id));
+            (records, pairs, shown)
+        };
+        if content(&actual) != content(&expected)
+            || actual
+                .nodes
+                .iter()
+                .map(|node| (&node.node_id, &node.title))
+                .collect::<Vec<_>>()
+                != expected
+                    .nodes
+                    .iter()
+                    .map(|node| (&node.node_id, &node.title))
+                    .collect::<Vec<_>>()
+        {
+            return Err("canvas metadata captures did not reproduce their recorded content".into());
+        }
+        let titles_changed = self.graph.nodes().any(|(_, node)| {
+            scratch
+                .get_node_by_id(node.id)
+                .is_none_or(|(_, updated)| updated.title != node.title)
+        });
+        let changed = scratch.revision() != self.graph.revision() || titles_changed;
+        if changed {
+            self.graph = scratch;
+            self.reconcile_derived();
+        }
+        Ok(changed)
+    }
+
     /// Stamp a fetched favicon (RGBA8 + dimensions) onto the node currently at
     /// `url`, if one exists. A metadata-only change: unlike [`ingest_graph`], it
     /// neither reconciles the derived views nor disturbs the spatial layout (no node

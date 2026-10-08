@@ -9,6 +9,16 @@
 
 use super::super::*;
 
+fn resource_payload(graph: &Graph, from: NodeKey, to: NodeKey) -> &EdgePayload {
+    let key = graph
+        .find_resource_edge_key(
+            graph.shown_resource_id(from).unwrap(),
+            graph.shown_resource_id(to).unwrap(),
+        )
+        .expect("resource edge survives");
+    graph.get_resource_edge(key).unwrap()
+}
+
 fn hyperlink() -> EdgeAssertion {
     EdgeAssertion::Semantic {
         sub_kind: SemanticSubKind::Hyperlink,
@@ -65,11 +75,11 @@ fn open_predicate_only_edge_survives_snapshot_roundtrip() {
 
     let restored = Graph::from_snapshot(&graph.to_snapshot());
 
-    assert_eq!(restored.edge_count(), 1);
+    assert_eq!(restored.edge_count(), 0);
+    assert_eq!(restored.resource_relations().count(), 1);
     let (ra, _) = restored.get_node_by_url("https://a.test/").unwrap();
     let (rb, _) = restored.get_node_by_url("https://b.test/").unwrap();
-    let key = restored.find_edge_key(ra, rb).expect("edge restored");
-    let payload = restored.get_edge(key).expect("payload");
+    let payload = resource_payload(&restored, ra, rb);
     assert!(payload.has_relation(RelationSelector::Family(EdgeFamily::Semantic)));
     assert_eq!(
         payload.semantic_data().and_then(|d| d.predicate.as_deref()),
@@ -119,8 +129,8 @@ fn statement_bucket_survives_snapshot_roundtrip() {
         "https://schema.org/citation".to_string(),
         crate::types::GraphScope::Source,
     );
-    let edge_key = graph.find_edge_key(a, b).expect("edge key");
-    let payload = graph.get_edge_mut(edge_key).expect("payload");
+    let edge_key = graph.projected_relations_between(a, b).next().unwrap().0;
+    let payload = graph.get_relation_mut(edge_key).expect("payload");
     let statements = &mut payload.semantic.as_mut().expect("semantic").statements;
     statements[0].statement_id = "stmt-edge-1".to_string();
     statements[0].provenance_iri = Some("https://people.test/alice".to_string());
@@ -133,8 +143,7 @@ fn statement_bucket_survives_snapshot_roundtrip() {
 
     let (ra, _) = restored.get_node_by_url("https://a.test/").unwrap();
     let (rb, _) = restored.get_node_by_url("https://b.test/").unwrap();
-    let key = restored.find_edge_key(ra, rb).expect("edge restored");
-    let payload = restored.get_edge(key).expect("payload");
+    let payload = resource_payload(&restored, ra, rb);
     assert_eq!(payload.semantic_statements().len(), 2);
     assert!(payload.semantic_statements().iter().any(|statement| {
         statement.recognized_sub_kind == Some(SemanticSubKind::Cites)
@@ -210,7 +219,8 @@ fn test_snapshot_roundtrip() {
     restored.overlay_facets(facets);
 
     assert_eq!(restored.node_count(), 2);
-    assert_eq!(restored.edge_count(), 1);
+    assert_eq!(restored.edge_count(), 0);
+    assert_eq!(restored.resource_relations().count(), 1);
 
     let (_, ra) = restored.get_node_by_url("https://a.com").unwrap();
     assert_eq!(ra.title, "Site A");
@@ -362,14 +372,11 @@ fn test_snapshot_preserves_edge_types() {
     let snapshot = graph.to_snapshot();
     let restored = Graph::from_snapshot(&snapshot);
 
-    assert_eq!(restored.edge_count(), 3);
+    assert_eq!(restored.edge_count(), 2);
+    assert_eq!(restored.resource_relations().count(), 1);
 
-    let has_hyperlink = restored
-        .find_edge_key(n1, n2)
-        .and_then(|edge_key| restored.get_edge(edge_key))
-        .is_some_and(|payload| {
-            payload.has_relation(RelationSelector::Semantic(SemanticSubKind::Hyperlink))
-        });
+    let has_hyperlink = resource_payload(&restored, n1, n2)
+        .has_relation(RelationSelector::Semantic(SemanticSubKind::Hyperlink));
     let has_history = restored
         .find_edge_key(n2, n1)
         .and_then(|edge_key| restored.get_edge(edge_key))
@@ -422,12 +429,7 @@ fn test_snapshot_preserves_generic_semantic_relations() {
 
     let snapshot = graph.to_snapshot();
     let restored = Graph::from_snapshot(&snapshot);
-    let edge_key = restored
-        .find_edge_key(from, to)
-        .expect("semantic edge should restore");
-    let payload = restored
-        .get_edge(edge_key)
-        .expect("semantic payload should restore");
+    let payload = resource_payload(&restored, from, to);
     assert!(payload.has_relation(RelationSelector::Semantic(
         SemanticSubKind::CanonicalMirrorOf,
     )));
@@ -785,7 +787,7 @@ fn every_authored_containment_sub_kind_survives_snapshot_roundtrip() {
     let key = restored
         .find_edge_key(rparent, rchild)
         .expect("the authored containment edge survives the round trip");
-    let restored_sub_kinds = restored
+    let surface_sub_kinds = restored
         .get_edge(key)
         .expect("payload survives")
         .containment_data()
@@ -794,6 +796,16 @@ fn every_authored_containment_sub_kind_survives_snapshot_roundtrip() {
         .clone();
 
     for sub_kind in authored {
+        let restored_sub_kinds =
+            match built_in_relation_stratum(RelationKind::Containment(sub_kind)) {
+                GraphStratum::Surface => &surface_sub_kinds,
+                GraphStratum::Resource => {
+                    &resource_payload(&restored, rparent, rchild)
+                        .containment_data()
+                        .unwrap()
+                        .sub_kinds
+                },
+            };
         assert!(
             restored_sub_kinds.contains(&sub_kind),
             "{sub_kind:?} was dropped by the snapshot loader"

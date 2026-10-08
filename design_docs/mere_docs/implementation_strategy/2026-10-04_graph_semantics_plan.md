@@ -1,73 +1,22 @@
 # Graph semantics plan: assertions, resources, saved queries, residency
 
 **Date:** 2026-10-04
-**Status (2026-10-08):** in progress; scope bounded by Mark's "Bound it."
-Five phases remain. P2 closes against the six requirements in §4; independent
-archive cleanup is deferred. C5/C6 are settled; no planned design question remains.
-The bounded plan is recorded; saved work and accepted rulings remain retained.
-No new fork is being put to Mark.
-The accepted C30/C31 P2 slices and literal attribution repair pass their fresh
-full unit, dependent, locked workspace and wasm32 gates. Their source remains
-ready for an authorized branch checkpoint; P2 remains incomplete. P3–P5 have not begun.
-P1 implemented and gated on
-`graph-semantics`, with the ruling-9 exact-journal and legacy-checkpoint
-attribution repair complete after the original `459cad84` receipt. Those
-receipts covered IRI-safe handles; the C19 opaque-id gap is now repaired
-and its expanded RDF round-trip gate passes.
-Reconciled main `62219dd1` rulings 9–19 before P2 source edits. A resumed
-read-only check of main `26857eaf` finds new S53 received obligations;
-phase-changing drift is recorded below before further implementation.
-A1/B1/C1 selected by "All 1";
-`ResourceNode`/`SurfaceNode` are settled by ruling 19, and B1/C1 remain
-approved. Mark authorized P2 after the P1 repair at `4bc9ae96`, then
-selected C7 identity namespaces with future moot aggregation and C8 resource
-classification records (rulings 20–21), then accepted C9–C12 option 1
-(rulings 22–25). Shared canonicalization, the `SurfaceNode`/`SurfaceNodeKey`
-names, the common resource UUID helper, `ResourceNode` identity and affirmative
-classification readers are implemented. Resource graph population, conflict
-migration remain incomplete. Mark authorized Turnstone coordination; typed
-resource storage, captures and undo pass the full kernel gate; the prepared
-Turnstone consumer patch passes its bounded source gate. Mark accepted C13–C17 recommendations with "go ahead?" (rulings 26–30).
-The independent composition/export, exact vocabulary identity, checked load
-and borrowed query-adapter checkpoint passes its gates. Production predicate
-routing remains incomplete. C18/C19 option 1 is accepted (rulings 31–32).
-Typed edge handles and projection readers are implemented; their checkpoint
-gates pass (Graphshell serial; initial parallel carrier timeout recorded).
-The reversible codec is integrated in production. Mark selected C20 option 1
-(ruling 33); malformed reserved v1 IDs fail ingest atomically and all 50
-linked-data/query tests pass. The workspace and documentation gates pass.
-Mark selected C21 "With the mere, proceed" (ruling 34): custom placement
-declarations belong to the mere and govern subsequent writes after reopening.
-The built-in placement catalog is implemented and gated (367 kernel tests,
-workspace and wasm32 checks, documentation audit).
-Mark selected C22/C23 option 1 with "1 & 1" (rulings 35–36): retain
-conflicting declarations and origins, require selection before new writes,
-and apply nature changes to new assertions while preserving held handles.
-Durable declaration storage, composition/export, checked assertion writers,
-page bindings and canvas lifting are qualified for a branch checkpoint.
-Final qualification also repairs the legacy predicate revision seam, canvas
-footprint cache lifecycle, enforcement of the pending C28 checkpoint and
-checked resource codicil imports. All touched-crate, workspace and wasm32
-gates pass; receipts are recorded in Progress. The prior 384-test receipt is
-historical. This checkpoint does not complete P2.
-Mark resumed with "Ok, proceed, orchestrating", then accepted option 1 for
-C24–C28 with "Agreed. Proceed." (rulings 37–41). Stable aggregate origins,
-zero-hop shown joins, explicit RDF identity intent, a durable boundary profile
-and explicit mixed-history origin resolution now govern the next P2 slice.
-Their source is implemented; dependent gates are in progress. Durable neutral
-profiles do not yet activate legacy replay. C29 option 1 is accepted (ruling
-42): persist exact translated effects bound to the retained source. Its session
-integration is in progress. C30 selects standard RDF reification and C31 selects
-extending the wallet-sealed transaction wrapper (rulings 43–44). Both are now
-in implementation; classic reification input handling follows the bounded
-conservative rules in §4.
-S53's RDF-profile fidelity and serialization checks remain P2 work. Its
-independent vocabulary remapping and older dependency/oracle retirement are
-deferred under the dated scope boundary in §4.
-Resource population and conflict migration remain incomplete.
-Replay-first migration and per-predicate placement govern P2. The committed
-identity/lifecycle slice and recreation repair pass their gates; P2 is incomplete.
-P3–P5 have not begun. Main integration awaits Mark's review.
+**Status (2026-10-08):** in progress, bounded to P1–P5 and the six P2
+closure requirements in §4. P1 is complete. Rulings 1–46 remain authoritative;
+C5/C6 are settled and no planned design question remains. P3–P5 have not begun.
+The previously qualified C30/C31 and literal-attribution source is committed
+and pushed on `graph-semantics` at `6399fe6c`. The remaining P2 routing,
+shared resource content, profile propagation, capture association and Resource
+RDF metadata changes are implemented in the lane and undergoing fresh qualification.
+Earlier receipts remain historical, as recorded in Progress. The fresh full
+kernel gate passes 430 tests plus its compile-fail type check; one doc example
+remains ignored. Independent dependent-crate qualification continues. RDF tag
+metadata exposes one mandatory representation gap; the consolidated scope
+exception below is pending Mark's answer.
+Turnstone's owner has prepared reader adoption at its current pin; that is not
+qualification against this final supplier source. Consumer integration and Mere
+main integration remain held for Mark's review. Independent vocabulary/oracle
+cleanup is deferred under §4.
 
 Four questions were put to Mark from outside the project: what a link records,
 what makes two things the same thing, what a saved query can become, and how
@@ -1855,6 +1804,157 @@ answered user decision. Existing C20 and RDF semantics must be checked before
 presenting any new input-policy fork. Review must separate original required
 work, explicitly added work and avoidable decision churn before continuation.
 
+### RDF import representation exception (2026-10-08)
+
+The required exact profile comparison catches a distinction lost at an existing
+public boundary. `crates/graph/linked-data/src/ingest.rs` creates a generated
+NodeProperty handle for a plain literal (544), then replaces it with the exact
+carried handle for a reified assertion (700). Both may have absent source/time.
+`NodeContribution` (61–70) does not carry which path produced the property.
+A complete tag concept projects plain SKOS prefLabel and attributed owner
+metadata; applying the current contribution both reconstructs that facet and
+mints ordinary assertions for those descriptions. Re-export therefore adds
+reifiers absent from the original. ID syntax is not a safe discriminator:
+caller-selected UUID-shaped, empty and opaque IDs remain valid.
+
+The fresh full RDF gate passes 62 tests and fails four exact round-trip checks
+in `C:/t/cargo-targets/mere/graph-semantics-p2-rdf-exception-controls.log`.
+Resource-only expanded JSON-LD grows from 21 rows/four reifiers to 26 rows/six
+reifiers (25 distinct rows). N-Quads and TriG grow from 19 rows/four reifiers to
+24 rows/six reifiers (23 distinct rows). The full-profile apply counts six
+edges where the five carried relation/tagging assertions are expected. No
+comparison filters those additions out. The Resource-only four-format gate
+compares every normalized quad, retaining exact property/tagging metadata and
+foreign partial/ambiguous SKOS controls
+(`linked-data/src/resource_metadata.rs`). The existing full-profile and file
+round-trip gates also retain their exact dataset comparisons. This is a required
+P2 fidelity defect, not optional RDF vocabulary cleanup. The single consolidated
+scope-exception question asks Mark to choose an additive import envelope/API,
+a contribution DTO extension with consumer adaptation, or explicit assertion
+semantics for tag definitions. None is implemented pending his answer. No new
+numbered checkpoint is added; accepted rulings remain unchanged.
+
+### Remaining P2 seams and current consumer boundary (2026-10-08)
+
+The live writer paths now route the fixed families and custom declarations to
+Resource or Surface truth (`graph/edge_ops.rs`, `assertion_write.rs`). Exact
+captures preserve all Arrangement kinds; only the durable snapshot retains its
+existing Session-kind filter (`graph/snapshot/to.rs::persisted_edges_between`).
+Raw replay explicitly uses legacy Surface writers; live tag, literal and
+classification writers use the shown resource (`resource_content.rs`,
+`node_props.rs`, `apply.rs`). Property-handle checks include the Surface facet
+sidecar after overlay (`resource_content.rs`, Pandect `graph_placement.rs`).
+Unknown administrative facets and retained origin notes remain preserved.
+Switcher thumbnails and Cartography's radial/spectral producers now consume
+projected Resource and Surface topology (`pandect/src/switcher_thumbnail.rs`,
+`cartography/src/adapters/producers.rs`). The initial Cartography run passed
+42 tests and failed two unchanged placement goldens because the producers read
+only Surface neighbors. The repair retains every golden and its tolerance,
+adds raw Surface and mixed-store controls, and passes all 45 tests in the fresh
+gate. Canvas signals and fold traversal now read the same projected topology
+(`pictograph/src/signals.rs`, `canvas/fold_projection.rs`); algorithm goldens
+remain unchanged. Resource rebindings invalidate cached topology even when
+the displayed URL's hostname is unchanged (`canvas/tests/rings.rs`).
+The first full canvas run passed 252, failed 48, and ignored 13 tests. Its
+failures exposed Surface-only readers and fixtures; the saved repairs include
+mixed-store, alias, parallel-bucket and self-loop controls. A private helper
+call in the fold repair was replaced with the public classifier API before
+the final rerun, which passes 303 tests with 13 ignored.
+The large fold reference oracle now materializes its immutable projected rows
+once, then retains the full-row scan at every frontier. Rebuilding the same
+Resource-to-Surface projection for each of 600 members added repeated binding
+scans; the interrupted run is retained in
+`graph-semantics-p2-pictograph-oracle-slow.log`. Fixture sizes, member counts,
+direction controls and goldens are unchanged. This is test setup only; the
+production walk still uses incident relations.
+The next full run passed 302, failed one cache control and ignored 13. That
+control intended to isolate URL grouping while its live content link changed
+the visible topology on navigation. It now explicitly holds its fixture link
+on Surfaces; the separate Resource-rebinding test keeps the positive topology
+invalidation control (`canvas/tests/rings.rs`). The failure receipt is
+`graph-semantics-p2-pictograph-cache-control.log`; the final rerun passes
+303 tests with 13 ignored.
+
+Shared content retains owner-scoped tag concepts, separate tagging asserters,
+full classification variants and original Surface origins. Divergent review
+versions survive composition and require precise record edits. Legacy unknown
+tag qualification needs the original mere IRI, carried in the source-bound
+translation receipt; the destination and Surface identity are not substitutes
+(`legacy_content_migration.rs`, Pandect `graph_session_content_tests.rs`).
+The fresh session gate exposed missing Surface-tag clearing in translated
+effects. A retained raw tag/property write can also disappear during migration
+without a net pre-entry change. Translation now carries those transient-write
+corrections and restores the final tag presentation, while retaining the
+original birth-clock captures (`legacy_resource_migration.rs::effects_between`,
+`legacy_content_tests.rs`). Baseline and historical controls compare complete
+snapshots and facet stores, including retained tag presentation.
+Recorded-profile session reopening now uses the exact loader rather than
+recreating URL-derived Surface relations (`graph_session.rs`). Existing host,
+native codicil and product-transfer boundaries carry an additive local profile;
+absent profiles remain unqualified and the remote protocol is unchanged.
+Final replay and historical reads now recheck active Resource assertion handles
+after journal edits (`graph_session.rs`, `graph_placement.rs`). A valid baseline
+cannot authorize a later colliding Surface sidecar. Supplied host graphs are
+checked before replacing a session or advancing its epoch (`mere_host.rs`).
+Replication also preflights and merges Resource truth when every transferred
+Surface ID already exists (`transfer.rs`); Surface presence alone cannot prove
+that Resource records or assertions were received. Controls retain permissive
+Surface-only legacy handles, exact new Resource assertions, unchanged identical
+retries and zero writes on a destination conflict. The final Pandect gate passes
+344 tests and its wasm32 check exits 0; Graphshell's final gate remains pending.
+The first executing Graphshell gate passed 329, failed 16 and ignored four
+(`graph-semantics-p2-graphshell-reader-controls.log`). Surface-only assertion
+readers and convergence counts missed Resource truth; the legacy sync
+withdrawal also missed Resource handles (`personal_sync.rs`,
+`personal_sync/assertions.rs::retract_legacy`). The repair reads both stores
+and retains Author filtering and exact per-handle withdrawal, with mixed-store
+peer-preservation controls. Transfer fixtures retain the protocol's Surface
+edge count while checking full Resource payloads, shown bindings and copy
+provenance (`transfer.rs`, `native/transfer_staging.rs`, `product.rs`).
+Hosted metadata controls now edit under the actual actor and retain peer claims
+(`local_edit/tests.rs`). Canvas refresh publishes title-only changes by comparing
+titles directly; Graph's revision remains structural, and identical refresh
+remains a no-op (`pictograph/src/canvas/lifecycle.rs`). The fresh final Canvas
+gate passes 303 tests, with 13 ignored, after this repair.
+Graphshell's next full run passes 345 and fails only the new mixed-store
+retraction fixture, with four ignored. That fixture asserted that legacy/raw
+claims had timestamps without supplying them (`personal_sync.rs:2209`);
+explicit timestamped fixture inputs are now supplied, with exact peer records
+still checked. Fresh qualification remains pending. The failed receipt
+is retained as `graph-semantics-p2-graphshell-timestamp-control.log`. The prior
+16 failures are resolved; workspace checking has not yet run in this sequence.
+Read-only admission review found that a translated checkpoint's receipt marker
+does not prove its graph and facets match receipt replay at the checkpoint
+cursor (`graph_session.rs::open`). A valid metadata or facet edit can escape the
+handle check and disagree with historical reconstruction. Exact comparison to
+the retained receipt is a repair within the existing replay requirement;
+`translated_checkpoint_rejects_valid_truth_changes_before_admission` reproduces
+both admissions before the repair, while intact and restored checkpoints pass
+and persisted bytes remain unchanged in the same run
+(`graph-semantics-p2-pandect-checkpoint-negative.log`: refusal flags were
+`[false, false]`, expected `[true, true]`). Admission now compares complete
+`FrozenGraph` truth with receipt replay at the same cursor before journal-tail
+replay or session publication. Ordinary checkpoint admission is unchanged.
+The full Pandect and dependent gates are running after this repair.
+
+Eidetic already holds immutable text blobs with a mutable current-URL reference.
+The additive `browsing/captures.rs` ledger associates those existing hashes with
+the common resource ID. Acquired capture bytes and normalized page text remain
+distinct kinds. Fleece's existing annotation save path records the actual capture
+hash (`document-lanes/src/eidetic_bridge.rs`); navigation preserves earlier
+resource associations. Resource RDF metadata includes SKOS concepts, attributable
+tagging and typed/language literals (`linked-data/src/resource_metadata.rs`).
+Imported keyword tags use their unique explicit attributed agent, else RDF subject.
+
+The Turnstone owner reports prepared Inspector/Roster/recycle reader adoption in
+`78a59e1` and notes in `eeb4a50`. Its nine ThinkPad tests pass against the existing
+`3ded2cd7` pin, with the resource patches unexecuted. That receipt does not qualify
+this supplier. Existing Keep/feed labels act as Surface/session controls
+(Turnstone `src/app/node_arms.rs:125`, `src/app/feed_arms.rs:44,70,98,236,279`);
+reader preparation leaves those behaviors and pins unchanged. Consumer repinning
+and integration are held, with adoption owned by that lane. No sibling files were
+edited here, and no new numbered checkpoint is introduced.
+
 ### Bounded scope audit (2026-10-07)
 
 Mark instructed: **"Bound it."** Three read-only inventories found a finite
@@ -2607,11 +2707,51 @@ binding; this list no longer grows as a running implementation checklist.
 
 ## 6. Progress
 
+- **2026-10-08. Remaining P2 source and fresh qualification in progress.**
+  Production routing, shared content, replay/profile guards, existing immutable
+  capture association and projection readers are saved in the existing lane.
+  Full final kernel/store: 430 passed plus one compile-fail doctest, one example
+  ignored. Pandect: 344 passed after final journal-tail admission repairs.
+  Exact migration controls now compare complete
+  snapshots and facet stores for both baseline and retained raw content writes.
+  Eidetic/Fjall: 118 passed, two doc examples ignored. Linked-data/query:
+  62 passed, four round-trip failures on redundant SKOS definition assertions.
+  One consolidated representation exception is awaiting Mark's answer; its
+  three alternatives are recorded in Findings. No answer is inferred from
+  elapsed time. Document-lanes with both bridge features passes 17 units and one
+  peer-transfer test. Kernel and Pandect wasm32 checks exit 0. Cartography
+  passes all 45 tests with unchanged goldens and added mixed-store controls.
+  Canvas's first full run passed 252, failed 48 and ignored 13; after the reader
+  repairs it passed 302 and failed one remaining URL-grouping fixture. That
+  fixture repair retains distinct Surface and Resource cache controls. The
+  canvas suite passed 303 tests, with 13 ignored. The next Graphshell run passed
+  329, failed 16 and ignored four; mixed-store reader and exact-retraction
+  repairs, actor-correct metadata controls and title-only Canvas publication
+  are now saved. Fresh canvas passes 303 tests with 13 ignored. Graphshell
+  passes 345, fails its new timestamp fixture and ignores four; the 16 prior
+  failures are resolved. Workspace checking has not run in this sequence.
+  Read-only review found a translated
+  checkpoint consistency gap; exact checkpoint-versus-receipt comparison and
+  its admission controls are implemented within the replay closure requirement.
+  The control fails on both valid altered payloads before the guard; full
+  qualification after the guard is in progress.
+  Current receipts are `graph-semantics-p2-kernel-final.log`,
+  `graph-semantics-p2-pandect-final-qualified.log`,
+  `graph-semantics-resource-capture-eidetic-final.log` and
+  `graph-semantics-p2-rdf-exception-controls.log` in the reusable Mere target.
+  Intermediate doc audit and diff check exit 0. A branch checkpoint preserves
+  this in-progress source under Mark's commit/push authorization. Final Pandect,
+  Graphshell and workspace validation after the latest repairs is pending;
+  Cargo is waiting on the shared package-cache lock. P2 is incomplete, and
+  P3–P5 have not begun. Final supplier compatibility is
+  unqualified at Turnstone; its existing-pin receipt remains separate.
+
 - **2026-10-08. Qualified source checkpoint authorized; local continuation.**
   Mark authorized commit/push and permitted continuation on this machine.
   Retain the existing lane worktree and reusable target; main integration still
-  awaits review. The unchanged C30/C31, exact translated receipt and literal
-  attribution source uses the fresh October 7 receipts below. Read-only audits
+  awaits review. Commit `6399fe6c`, pushed on `graph-semantics`, contains the
+  qualified C30/C31, exact translated receipt and literal attribution source
+  covered by the fresh October 7 receipts below. Read-only audits
   locate remaining production routing in `graph/edge_ops.rs` and `graph/apply.rs`,
   resource metadata in the kernel facet writers/readers, profile propagation in
   Pandect and Graphshell, and capture references beside Eidetic's existing page

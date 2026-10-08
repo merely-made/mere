@@ -32,7 +32,7 @@ use kernel::types::ImageRole;
 use uuid::Uuid;
 
 use crate::NodeFacetStore;
-use crate::graph_placement::PlacementProfile;
+use crate::graph_placement::{PlacementProfile, materialize_snapshot};
 use eidetic::manifest::load_manifest;
 
 /// Schema id bytes for the graph-snapshot codicil schema. The [`SchemaRef`] is the
@@ -80,6 +80,18 @@ pub struct ProfiledGraphCodicil {
     pub placement: Option<PlacementProfile>,
 }
 
+impl ProfiledGraphCodicil {
+    pub fn into_graph(self) -> Result<Graph> {
+        let mut graph = materialize_snapshot(&self.codicil.snapshot, self.placement)
+            .map_err(|error| Error::new(format!("invalid graph codicil snapshot: {error}")))?;
+        graph.overlay_facets(self.codicil.facets);
+        graph
+            .validate_active_resource_assertion_handles()
+            .map_err(|error| Error::new(format!("invalid graph codicil facets: {error}")))?;
+        Ok(graph)
+    }
+}
+
 impl TypedPayload for ProfiledGraphCodicil {
     fn schema_ref() -> SchemaRef {
         profiled_graph_snapshot_schema_ref()
@@ -111,6 +123,9 @@ impl GraphCodicil {
         let mut graph = Graph::try_from_snapshot(&self.snapshot)
             .map_err(|error| Error::new(format!("invalid graph codicil snapshot: {error}")))?;
         graph.overlay_facets(self.facets);
+        graph
+            .validate_active_resource_assertion_handles()
+            .map_err(|error| Error::new(format!("invalid graph codicil facets: {error}")))?;
         Ok(graph)
     }
 }
@@ -346,9 +361,9 @@ pub async fn open_codicil_as_session_sealed(
     sealer: Option<&dyn PayloadSealer>,
     id: ManifestId,
 ) -> Result<Option<Graph>> {
-    load_graph_codicil_sealed(store, sealer, id)
+    load_profiled_graph_codicil_sealed(store, sealer, id)
         .await?
-        .map(GraphCodicil::into_graph)
+        .map(ProfiledGraphCodicil::into_graph)
         .transpose()
 }
 
@@ -392,19 +407,30 @@ pub async fn compose_graph_codicils_sealed(
     if ids.is_empty() {
         return Ok(None);
     }
-    let mut acc: Option<GraphCodicil> = None;
+    let mut acc: Option<ProfiledGraphCodicil> = None;
     for id in ids {
-        let Some(codicil) = load_graph_codicil_sealed(store, sealer, *id).await? else {
+        let Some(codicil) = load_profiled_graph_codicil_sealed(store, sealer, *id).await? else {
             return Ok(None);
         };
+        codicil.clone().into_graph()?;
         acc = Some(match acc {
             None => codicil,
-            Some(base) => merge_graph_codicils(base, codicil)?,
+            Some(base) => ProfiledGraphCodicil {
+                placement: match (base.placement, codicil.placement) {
+                    (
+                        Some(PlacementProfile::RecordedStrataV1),
+                        Some(PlacementProfile::RecordedStrataV1),
+                    ) => Some(PlacementProfile::RecordedStrataV1),
+                    _ => None,
+                },
+                codicil: merge_graph_codicils(base.codicil, codicil.codicil)?,
+            },
         });
     }
     let mut codicil = acc.expect("ids is non-empty, so acc is Some");
-    redaction.apply(&mut codicil.snapshot);
-    redaction.apply_facets(&mut codicil.facets);
+    redaction.apply(&mut codicil.codicil.snapshot);
+    redaction.apply_facets(&mut codicil.codicil.facets);
+    codicil.clone().into_graph()?;
     let provenance = ProvenanceRecord {
         origin: ProvenanceOrigin::Derived,
         upstream: ids.to_vec(),
@@ -413,17 +439,31 @@ pub async fn compose_graph_codicils_sealed(
         ),
         generated_at: created_at,
     };
-    let id = save_typed_sealed(
-        store,
-        sealer,
-        &codicil,
-        Vec::<BlobSource>::new(),
-        PrivacyClass::LocalOnly,
-        provenance,
-        TrustEnvelope::self_asserted(),
-        created_at,
-    )
-    .await?;
+    let id = if codicil.placement.is_some() {
+        save_typed_sealed(
+            store,
+            sealer,
+            &codicil,
+            Vec::<BlobSource>::new(),
+            PrivacyClass::LocalOnly,
+            provenance,
+            TrustEnvelope::self_asserted(),
+            created_at,
+        )
+        .await?
+    } else {
+        save_typed_sealed(
+            store,
+            sealer,
+            &codicil.codicil,
+            Vec::<BlobSource>::new(),
+            PrivacyClass::LocalOnly,
+            provenance,
+            TrustEnvelope::self_asserted(),
+            created_at,
+        )
+        .await?
+    };
     Ok(Some(id))
 }
 
@@ -538,6 +578,120 @@ mod tests {
     // The in-memory test store is muniment's (2026-07-12): the
     // hand-rolled one was the same map behind the same seam.
     use muniment::MemoryBackend as InMemoryStore;
+
+    #[test]
+    fn codicil_recorded_profile_survives_thaw_and_composition_with_unqualified_controls() {
+        pollster::block_on(async {
+            let mut store = InMemoryStore::new();
+            let graph = crate::graph_placement::placement_test_graph();
+            let input = ProfiledGraphCodicil {
+                placement: Some(PlacementProfile::RecordedStrataV1),
+                codicil: GraphCodicil {
+                    snapshot: graph.to_snapshot(),
+                    facets: graph.facets().clone(),
+                },
+            };
+            let id = save_profiled_graph_codicil_sealed(
+                &mut store,
+                None,
+                input.clone(),
+                RedactionPolicy::include_all(),
+                Timestamp(1),
+            )
+            .await
+            .unwrap();
+            let loaded = open_codicil_as_session(&mut store, id)
+                .await
+                .unwrap()
+                .unwrap();
+            assert_eq!(loaded.to_snapshot().edges, input.codicil.snapshot.edges);
+            assert_eq!(
+                loaded.to_snapshot().resource_edges,
+                input.codicil.snapshot.resource_edges
+            );
+            let composed = compose_graph_codicils(
+                &mut store,
+                &[id, id],
+                RedactionPolicy::include_all(),
+                Timestamp(2),
+            )
+            .await
+            .unwrap()
+            .unwrap();
+            let result = load_profiled_graph_codicil_sealed(&mut store, None, composed)
+                .await
+                .unwrap()
+                .unwrap();
+            assert_eq!(result.placement, Some(PlacementProfile::RecordedStrataV1));
+            assert_eq!(result.codicil.snapshot.edges, input.codicil.snapshot.edges);
+            assert_eq!(
+                result.clone().into_graph().unwrap().to_snapshot().edges,
+                input.codicil.snapshot.edges
+            );
+            let bare = save_graph_snapshot_codicil(
+                &mut store,
+                input.codicil.snapshot.clone(),
+                input.codicil.facets.clone(),
+                RedactionPolicy::include_all(),
+                Timestamp(3),
+            )
+            .await
+            .unwrap();
+            let mixed = compose_graph_codicils(
+                &mut store,
+                &[id, bare],
+                RedactionPolicy::include_all(),
+                Timestamp(4),
+            )
+            .await
+            .unwrap()
+            .unwrap();
+            assert_eq!(
+                load_profiled_graph_codicil_sealed(&mut store, None, mixed)
+                    .await
+                    .unwrap()
+                    .unwrap()
+                    .placement,
+                None
+            );
+            let mut legacy = input.clone();
+            legacy.placement = Some(PlacementProfile::LegacySurfaceV1);
+            let legacy_id = save_profiled_graph_codicil_sealed(
+                &mut store,
+                None,
+                legacy,
+                RedactionPolicy::include_all(),
+                Timestamp(5),
+            )
+            .await
+            .unwrap();
+            let before = store.list("").await.unwrap();
+            assert!(
+                open_codicil_as_session(&mut store, legacy_id)
+                    .await
+                    .is_err()
+            );
+            assert!(
+                compose_graph_codicils(
+                    &mut store,
+                    &[id, legacy_id],
+                    RedactionPolicy::include_all(),
+                    Timestamp(6)
+                )
+                .await
+                .is_err()
+            );
+            assert_eq!(store.list("").await.unwrap(), before);
+            assert_eq!(
+                load_profiled_graph_codicil_sealed(&mut store, None, legacy_id)
+                    .await
+                    .unwrap()
+                    .unwrap()
+                    .placement,
+                Some(PlacementProfile::LegacySurfaceV1)
+            );
+        });
+    }
 
     fn set_pinned(graph: &mut Graph, url: &str, pinned: bool) {
         let (_, node) = graph.get_node_by_url(url).unwrap();
@@ -1013,6 +1167,103 @@ mod tests {
                     .is_none(),
                 "no sources -> nothing composed",
             );
+        });
+    }
+
+    #[test]
+    fn codicil_surface_sidecars_cannot_reuse_resource_handles() {
+        pollster::block_on(async {
+            let mut graph = sample_graph();
+            let (surface, surface_id) = graph
+                .nodes()
+                .next()
+                .map(|(key, node)| (key, node.id))
+                .unwrap();
+            let mut property =
+                kernel::types::NodeProperty::new("urn:test:predicate".into(), "exact".into())
+                    .with_metadata(Some("urn:test:source".into()), Some(42));
+            property.statement_id = "resource-literal-handle".into();
+            assert!(graph.append_node_properties(surface, vec![property.clone()]));
+            let original = graph.to_snapshot();
+            let mut store = InMemoryStore::default();
+            for collision in [false, true] {
+                let mut facets = graph.facets().clone();
+                let mut carried = property.clone();
+                if !collision {
+                    carried.statement_id = "surface-literal-handle".into();
+                }
+                facets
+                    .set(
+                        surface_id,
+                        chartulary::FacetId::new(kernel::graph::node_facets::SEMANTIC_PROPERTIES),
+                        serde_json::to_value(vec![carried.clone(), carried]).unwrap(),
+                        &chartulary::AcceptAll,
+                    )
+                    .unwrap();
+                facets
+                    .set(
+                        surface_id,
+                        chartulary::FacetId::new("extension.origin-note"),
+                        serde_json::json!({"statement_id": "resource-literal-handle"}),
+                        &chartulary::AcceptAll,
+                    )
+                    .unwrap();
+                let codicil = GraphCodicil {
+                    snapshot: original.clone(),
+                    facets: facets.clone(),
+                };
+                assert_eq!(codicil.clone().into_graph().is_err(), collision);
+                assert_eq!(
+                    ProfiledGraphCodicil {
+                        codicil,
+                        placement: Some(PlacementProfile::RecordedStrataV1)
+                    }
+                    .into_graph()
+                    .is_err(),
+                    collision
+                );
+                let id = save_graph_snapshot_codicil(
+                    &mut store,
+                    original.clone(),
+                    facets,
+                    RedactionPolicy::default(),
+                    Timestamp(2),
+                )
+                .await
+                .unwrap();
+                assert_eq!(
+                    open_codicil_as_session(&mut store, id).await.is_err(),
+                    collision
+                );
+                let count = list_graph_codicils(&mut store).await.unwrap().len();
+                let composed = compose_graph_codicils(
+                    &mut store,
+                    &[id, id],
+                    RedactionPolicy::default(),
+                    Timestamp(3),
+                )
+                .await;
+                assert_eq!(composed.is_err(), collision);
+                if collision {
+                    assert_eq!(list_graph_codicils(&mut store).await.unwrap().len(), count);
+                } else {
+                    let restored = open_codicil_as_session(&mut store, composed.unwrap().unwrap())
+                        .await
+                        .unwrap()
+                        .unwrap();
+                    assert_eq!(
+                        restored.resource_properties(graph.shown_resource_id(surface).unwrap()),
+                        vec![property.clone()]
+                    );
+                    assert_eq!(
+                        restored.facets().get(
+                            &surface_id,
+                            &chartulary::FacetId::new("extension.origin-note")
+                        ),
+                        Some(&serde_json::json!({"statement_id": "resource-literal-handle"}))
+                    );
+                }
+            }
         });
     }
 

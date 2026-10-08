@@ -122,13 +122,17 @@ impl Graph {
         selector: &'a NodeSelector,
     ) -> impl Iterator<Item = NodeKey> + 'a {
         self.inner.inner().node_indices().filter(move |&key| {
-            let Some(node) = self.inner.node(key) else {
+            if self.inner.node(key).is_none() {
                 return false;
-            };
+            }
             match selector {
                 NodeSelector::All => true,
-                NodeSelector::Tagged(tag) => node.tags.contains(tag),
-                NodeSelector::NotTagged(tag) => !node.tags.contains(tag),
+                NodeSelector::Tagged(tag) => self
+                    .node_content_tags(key)
+                    .is_some_and(|tags| tags.contains(tag)),
+                NodeSelector::NotTagged(tag) => !self
+                    .node_content_tags(key)
+                    .is_some_and(|tags| tags.contains(tag)),
                 NodeSelector::Kind(kind) => self.node_classifications(key).is_some_and(|classes| {
                     classes
                         .iter()
@@ -248,6 +252,75 @@ mod tests {
             .nodes_matching(&NodeSelector::Kind("paper".into()))
             .collect();
         assert!(no_kind.is_empty());
+    }
+
+    #[test]
+    fn content_tag_selectors_and_facets_follow_shared_resource_after_navigation() {
+        use crate::graph::apply::{GraphDelta, apply_graph_delta};
+        use crate::graph::facet_projection::facet_projection_for_node;
+        use crate::graph::filter::{FacetScalar, FacetValue, facet_keys};
+
+        let mut graph = Graph::new();
+        let a = graph.add_node("https://shared.test/".into(), Point2D::zero());
+        let alias = graph.add_node("https://shared.test/".into(), Point2D::zero());
+        graph.ensure_surface_resource(a).unwrap();
+        graph.ensure_surface_resource(alias).unwrap();
+        apply_graph_delta(
+            &mut graph,
+            GraphDelta::InsertNodeTag {
+                key: a,
+                tag: "important".into(),
+            },
+        );
+        assert_eq!(
+            graph
+                .nodes_matching(&NodeSelector::Tagged("important".into()))
+                .collect::<Vec<_>>(),
+            vec![a, alias]
+        );
+        assert!(
+            graph
+                .nodes_matching(&NodeSelector::NotTagged("important".into()))
+                .next()
+                .is_none()
+        );
+        for key in [a, alias] {
+            assert!(!graph.get_node(key).unwrap().tags.contains("important"));
+            let facets = facet_projection_for_node(&graph, key).unwrap();
+            assert_eq!(
+                facets[facet_keys::UDC_CLASSES],
+                FacetValue::Collection(vec![FacetScalar::Text("important".into())])
+            );
+        }
+        apply_graph_delta(
+            &mut graph,
+            GraphDelta::NavigateNode {
+                key: a,
+                url: "https://later.test/".into(),
+            },
+        );
+        assert_eq!(
+            graph
+                .nodes_matching(&NodeSelector::Tagged("important".into()))
+                .collect::<Vec<_>>(),
+            vec![alias]
+        );
+        assert_eq!(
+            graph
+                .nodes_matching(&NodeSelector::NotTagged("important".into()))
+                .collect::<Vec<_>>(),
+            vec![a]
+        );
+        assert!(
+            !facet_projection_for_node(&graph, a)
+                .unwrap()
+                .contains_key(facet_keys::UDC_CLASSES)
+        );
+        assert!(
+            facet_projection_for_node(&graph, alias)
+                .unwrap()
+                .contains_key(facet_keys::UDC_CLASSES)
+        );
     }
 
     #[test]

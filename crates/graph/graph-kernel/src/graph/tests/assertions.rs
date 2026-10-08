@@ -73,6 +73,8 @@ fn separate_asserters_keep_their_own_assertions_and_retract_alone() {
     assert_eq!(statements, &[bob_before_update]);
     assert!(graph.retract_semantic_statement(source, target, &second.statement_id));
     assert!(graph.find_edge_key(source, target).is_none());
+    assert!(graph.get_relation(edge).is_none());
+    assert_eq!(graph.resource_relations().count(), 0);
 }
 
 #[test]

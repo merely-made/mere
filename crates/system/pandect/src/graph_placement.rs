@@ -21,6 +21,21 @@ pub enum PlacementProfile {
     RecordedStrataV1,
 }
 
+/// Materialize only the placement carried by the input boundary.
+pub fn materialize_snapshot(
+    snapshot: &GraphSnapshot,
+    placement: Option<PlacementProfile>,
+) -> Result<Graph, String> {
+    match placement {
+        Some(PlacementProfile::RecordedStrataV1) => Graph::try_from_recorded_snapshot(snapshot),
+        None => Graph::try_from_snapshot(snapshot),
+        Some(PlacementProfile::LegacySurfaceV1) => {
+            return Err("legacy graph placement requires qualified replay".into());
+        },
+    }
+    .map_err(|error| error.to_string())
+}
+
 /// The retained baseline and the permanently qualified legacy journal prefix.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -96,6 +111,9 @@ impl FrozenGraph {
         let mut graph =
             Graph::try_from_recorded_snapshot(&self.graph).map_err(|error| error.to_string())?;
         *graph.facets_mut() = self.facets.clone();
+        graph
+            .validate_active_resource_assertion_handles()
+            .map_err(|error| error.to_string())?;
         Ok(graph)
     }
 }
@@ -110,6 +128,8 @@ pub(crate) struct LegacyTranslationReceipt {
     pub placement: SessionPlacement,
     pub baseline: FrozenGraph,
     pub entry_effects: Vec<Vec<CapturedDelta>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub content_context: Option<kernel::graph::legacy_resource_migration::LegacyContentContext>,
     legacy_final: FrozenGraph,
 }
 
@@ -128,6 +148,7 @@ impl LegacyTranslationReceipt {
             placement,
             baseline,
             entry_effects,
+            content_context: None,
             legacy_final,
         };
         receipt.translation_digest = receipt.digest()?;
@@ -135,16 +156,31 @@ impl LegacyTranslationReceipt {
     }
 
     fn digest(&self) -> Result<String, String> {
-        let bytes = serde_json::to_vec(&(
+        let payload = (
             self.version,
             &self.source_digest,
             &self.placement,
             &self.baseline,
             &self.entry_effects,
             &self.legacy_final,
-        ))
+        );
+        let bytes = if let Some(context) = &self.content_context {
+            serde_json::to_vec(&(payload, context))
+        } else {
+            // Preserve the checksum of receipts written before content context.
+            serde_json::to_vec(&payload)
+        }
         .map_err(|error| error.to_string())?;
         Ok(blake3::hash(&bytes).to_hex().to_string())
+    }
+
+    pub fn bind_content_context(
+        &mut self,
+        context: Option<&kernel::graph::legacy_resource_migration::LegacyContentContext>,
+    ) -> Result<(), String> {
+        self.content_context = context.cloned();
+        self.translation_digest = self.digest()?;
+        Ok(())
     }
 
     pub fn validate(
@@ -208,7 +244,13 @@ impl LegacyTranslationReceipt {
         let Some(journal) = self.journal(entries, cursor) else {
             return Ok(None);
         };
-        Ok(journal.snapshot_at_from(&self.baseline.materialize()?, journal.live_cursor()))
+        let graph = journal.snapshot_at_from(&self.baseline.materialize()?, journal.live_cursor());
+        if let Some(graph) = &graph {
+            graph
+                .validate_active_resource_assertion_handles()
+                .map_err(|error| error.to_string())?;
+        }
+        Ok(graph)
     }
 
     pub fn effect_cursor(&self, cursor: Seq) -> Seq {
@@ -277,9 +319,116 @@ pub(crate) fn source_digest(
 }
 
 #[cfg(test)]
+pub(crate) fn placement_test_graph() -> Graph {
+    let mut graph = kernel::graph::replay_captured_deltas((1..=2).map(|id| {
+        CapturedDelta::ReplayAddNodeWithIdIfMissing {
+            id: uuid::Uuid::from_u128(id).to_string(),
+            url: if id == 1 {
+                "https://profile.test/".into()
+            } else {
+                "https://profile.test/child".into()
+            },
+            position: [id as f32, 0.0],
+        }
+    }));
+    kernel::graph::replay_captured_deltas_onto(
+        &mut graph,
+        [CapturedDelta::ReplayAssertRelationByIds {
+            from_id: uuid::Uuid::from_u128(1).to_string(),
+            to_id: uuid::Uuid::from_u128(2).to_string(),
+            assertion: kernel::graph::EdgeAssertion::Semantic {
+                sub_kind: kernel::graph::SemanticSubKind::UserGrouped,
+                label: Some("held surface".into()),
+                decay_progress: None,
+            },
+        }],
+    );
+    let mut snapshot = graph.to_snapshot();
+    let semantic = snapshot.edges[0].semantic.as_mut().unwrap();
+    semantic.sub_kinds.clear();
+    semantic.predicate = Some("urn:mere:profile:held-custom".into());
+    let claim = &mut semantic.statements[0];
+    claim.statement_id = "held-profile-handle".into();
+    claim.recognized_sub_kind = None;
+    claim.predicate = semantic.predicate.clone().unwrap();
+    claim.provenance_iri = Some("urn:mere:profile:source".into());
+    claim.asserted_at_ms = Some(42);
+    let mut recorded = Graph::try_from_recorded_snapshot(&snapshot).unwrap();
+    *recorded.facets_mut() = graph.facets().clone();
+    recorded
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
     use uuid::Uuid;
+
+    #[test]
+    fn frozen_materialization_checks_active_sidecar_handles_and_preserves_retained_notes() {
+        let mut graph = placement_test_graph();
+        let (surface, _) = graph.nodes().next().unwrap();
+        let mut property =
+            kernel::types::NodeProperty::new("urn:predicate:literal".into(), "held".into());
+        property.statement_id = "opaque\nshared handle".into();
+        assert!(graph.append_node_properties(surface, vec![property.clone()]));
+        let valid = FrozenGraph::of(&graph);
+        assert_eq!(FrozenGraph::of(&valid.materialize().unwrap()), valid);
+        let surface_id = graph.get_node(surface).unwrap().id;
+        kernel::graph::replay_captured_deltas_onto(
+            &mut graph,
+            [CapturedDelta::ReplayAppendNodePropertyById {
+                node_id: surface_id.to_string(),
+                property,
+            }],
+        );
+        let conflicting = FrozenGraph::of(&graph);
+        assert!(conflicting.materialize().is_err());
+        assert_eq!(
+            FrozenGraph::of(&graph),
+            conflicting,
+            "refusal preserves input"
+        );
+        let mut retained = valid.clone();
+        retained
+            .facets
+            .set(
+                surface_id,
+                chartulary::FacetId::new("foreign.retained-note"),
+                serde_json::json!({"statement_id": "opaque\nshared handle"}),
+                &chartulary::AcceptAll,
+            )
+            .unwrap();
+        assert_eq!(FrozenGraph::of(&retained.materialize().unwrap()), retained);
+    }
+
+    #[test]
+    fn explicit_profile_dispatch_preserves_held_claims_and_never_infers_legacy() {
+        let graph = placement_test_graph();
+        let snapshot = graph.to_snapshot();
+        let recorded =
+            materialize_snapshot(&snapshot, Some(PlacementProfile::RecordedStrataV1)).unwrap();
+        assert_eq!(recorded.to_snapshot().edges, snapshot.edges);
+        assert_eq!(
+            recorded.to_snapshot().resource_edges,
+            snapshot.resource_edges
+        );
+        assert!(materialize_snapshot(&snapshot, Some(PlacementProfile::LegacySurfaceV1)).is_err());
+        let unqualified = materialize_snapshot(&snapshot, None).unwrap().to_snapshot();
+        assert!(
+            unqualified.edges.len() + unqualified.resource_edges.len()
+                > snapshot.edges.len() + snapshot.resource_edges.len(),
+            "unqualified loader retains its existing URL derivation"
+        );
+        assert!(
+            unqualified
+                .edges
+                .iter()
+                .flat_map(|edge| edge.semantic.iter())
+                .flat_map(|bucket| &bucket.statements)
+                .any(|claim| claim.statement_id == "held-profile-handle")
+        );
+        assert_eq!(snapshot.edges, recorded.to_snapshot().edges);
+    }
 
     #[test]
     fn recorded_receipt_preserves_same_host_resource_containment_without_surface_duplicates() {

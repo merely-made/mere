@@ -24,7 +24,7 @@ use crate::types::GraphScope;
 use super::edge_data::Traversal;
 use super::edge_data::{SemanticStatement, SemanticStatementSpec, StatementAssert};
 use super::edge_payload::EdgePayload;
-use super::edge_taxonomy::{EdgeAssertion, RelationSelector, SemanticSubKind};
+use super::edge_taxonomy::{EdgeAssertion, RelationKind, RelationSelector, SemanticSubKind};
 use super::identity::{EdgeKey, NodeKey, RelationKey};
 use super::{DissolvedTraversalRecord, Graph};
 use crate::persistence::PersistedEdge;
@@ -72,7 +72,22 @@ impl Graph {
                 )
                 .and_then(|(edge, outcome)| outcome.changed.then_some(edge));
         }
-        self.assert_surface_relation_as(from, to, assertion, asserter_iri, asserted_at_ms)
+        let kind = match &assertion {
+            EdgeAssertion::Containment { sub_kind } => RelationKind::Containment(*sub_kind),
+            EdgeAssertion::Arrangement { sub_kind } => RelationKind::Arrangement(*sub_kind),
+            EdgeAssertion::Imported { sub_kind } => RelationKind::Imported(*sub_kind),
+            EdgeAssertion::Provenance { sub_kind } => RelationKind::Provenance(*sub_kind),
+            EdgeAssertion::Semantic { .. } => unreachable!(),
+        };
+        let key = self
+            .relation_bucket(from, to, super::built_in_relation_stratum(kind))
+            .ok()?;
+        if !self.get_relation_mut(key)?.assert_relation(assertion) {
+            return None;
+        }
+        self.bump_revision();
+        self.capture_statement_bucket(key);
+        Some(key)
     }
 
     pub(crate) fn assert_surface_relation_as(
@@ -223,7 +238,7 @@ impl Graph {
         let Some(to_key) = self.get_node_key_by_id(to_id) else {
             return 0;
         };
-        self.retract_relations(from_key, to_key, selector)
+        self.retract_surface_relations(from_key, to_key, selector)
     }
 
     pub(crate) fn replay_assert_relation_by_ids(
@@ -234,7 +249,13 @@ impl Graph {
     ) -> Option<RelationKey> {
         let from_key = self.get_node_key_by_id(from_id)?;
         let to_key = self.get_node_key_by_id(to_id)?;
-        self.assert_relation(from_key, to_key, assertion)
+        self.assert_surface_relation_as(
+            from_key,
+            to_key,
+            assertion,
+            self.write_author().asserter_iri(),
+            None,
+        )
     }
 
     pub(crate) fn replay_set_edge_semantic_predicate_by_ids(
@@ -350,7 +371,7 @@ impl Graph {
         to: NodeKey,
         spec: SemanticStatementSpec,
     ) -> Option<(RelationKey, StatementAssert)> {
-        self.assert_surface_semantic_statement(from, to, spec)
+        self.try_assert_semantic_statement(from, to, spec).ok()
     }
 
     pub(crate) fn assert_surface_semantic_statement(
@@ -390,7 +411,8 @@ impl Graph {
         to: NodeKey,
         statement: SemanticStatement,
     ) -> Option<RelationKey> {
-        self.assert_surface_persisted_semantic_statement(from, to, statement)
+        self.try_assert_persisted_semantic_statement(from, to, statement)
+            .ok()
     }
 
     pub(crate) fn assert_surface_persisted_semantic_statement(
@@ -430,40 +452,18 @@ impl Graph {
         to: NodeKey,
         statement_id: &str,
     ) -> bool {
-        let resource_match = self
-            .shown_resource_id(from)
-            .zip(self.shown_resource_id(to))
-            .is_some_and(|pair| {
-                self.resource_relations()
-                    .any(|(_, source, target, payload)| {
-                        pair == (source, target)
-                            && payload
-                                .semantic_statements()
-                                .iter()
-                                .any(|statement| statement.statement_id == statement_id)
-                    })
-            });
-        if resource_match {
-            return self.retract_assertion(statement_id);
-        }
-        let Some(edge_key) = self.find_edge_key(from, to) else {
+        let Some((owner, _)) = self.find_semantic_statement(statement_id) else {
             return false;
         };
-        let (removed, now_empty) = {
-            let Some(payload) = self.inner.edge_mut(edge_key) else {
-                return false;
-            };
-            let removed = payload.retract_semantic_statement(statement_id);
-            (removed, removed && payload.is_empty())
-        };
-        if now_empty {
-            let _ = self.inner.disconnect(edge_key);
+        if matches!(owner, RelationKey::Resource(_)) {
+            return self.retract_assertion(statement_id);
         }
-        if removed {
-            self.bump_revision();
-            self.capture_semantic_pair(from, to);
+        if let RelationKey::Surface(key) = owner
+            && self.inner.inner().edge_endpoints(key) == Some((from, to))
+        {
+            return self.retract_assertion(statement_id);
         }
-        removed
+        false
     }
 
     /// Keep assertion ids and metadata exact through journal replay and undo.
@@ -479,6 +479,48 @@ impl Graph {
     }
 
     pub(crate) fn retract_relations(
+        &mut self,
+        from: NodeKey,
+        to: NodeKey,
+        selector: RelationSelector,
+    ) -> usize {
+        let mut removed = self.retract_surface_relations(from, to, selector);
+        if removed > 0 {
+            self.capture_semantic_pair(from, to);
+        }
+        let Some((source, target)) = self.shown_resource_id(from).zip(self.shown_resource_id(to))
+        else {
+            return removed;
+        };
+        let keys: Vec<_> = self
+            .resource_relations()
+            .filter(|(_, a, b, payload)| {
+                (*a, *b) == (source, target) && payload.has_relation(selector)
+            })
+            .map(|(key, _, _, _)| key)
+            .collect();
+        let mut resource_removed = 0;
+        for key in keys {
+            let payload = self
+                .resources
+                .edge_mut(key.raw())
+                .expect("resource relation");
+            if payload.retract_relation(selector) {
+                resource_removed += 1;
+                if payload.is_empty() {
+                    self.resources.disconnect(key.raw());
+                }
+            }
+        }
+        if resource_removed > 0 {
+            self.bump_revision();
+            self.capture_resource_pair(source, target);
+            removed += resource_removed;
+        }
+        removed
+    }
+
+    fn retract_surface_relations(
         &mut self,
         from: NodeKey,
         to: NodeKey,

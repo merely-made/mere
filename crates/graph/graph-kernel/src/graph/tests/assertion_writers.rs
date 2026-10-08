@@ -131,8 +131,9 @@ fn statement_writers_all_record_the_current_author() {
         let mut graph = Graph::new();
         let (from, to) = pair(&mut graph);
         graph.write_as(author.clone(), |graph| write(graph, from, to));
-        let edge = graph.find_edge_key(from, to).expect(name);
-        let statements = graph.get_edge(edge).unwrap().semantic_statements();
+        assert!(graph.find_edge_key(from, to).is_none(), "{name}");
+        let (_, _, _, payload) = graph.resource_relations().next().expect(name);
+        let statements = payload.semantic_statements();
         assert_eq!(statements.len(), 1, "{name} must produce a real assertion");
         assert_eq!(
             statements[0].provenance_iri.as_deref(),
@@ -195,8 +196,9 @@ fn explicit_source_overrides_writer_fallback_on_both_statement_apis() {
             .unwrap();
         graph.assert_semantic_statement(from, to, spec()).unwrap();
     });
-    let edge = graph.find_edge_key(from, to).unwrap();
-    let statements = graph.get_edge(edge).unwrap().semantic_statements();
+    assert!(graph.find_edge_key(from, to).is_none());
+    let (_, _, _, payload) = graph.resource_relations().next().unwrap();
+    let statements = payload.semantic_statements();
     assert_eq!(statements.len(), 3);
     assert_eq!(statements[0].provenance_iri.as_deref(), Some(source));
     assert_eq!(statements[1].provenance_iri.as_deref(), Some(source));

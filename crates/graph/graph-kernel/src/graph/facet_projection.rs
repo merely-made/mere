@@ -75,19 +75,15 @@ pub fn facet_projection_for_node(graph: &Graph, key: NodeKey) -> Option<FacetPro
 
     // --- Energy (edge-derived) ---
 
-    let out_edges: Vec<_> = graph.inner.inner().edges(key).collect();
-    let in_edges: Vec<_> = graph
-        .inner
-        .inner()
-        .edges_directed(key, Direction::Incoming)
-        .collect();
+    let out_edges: Vec<_> = graph.projected_outgoing_relations(key).collect();
+    let in_edges: Vec<_> = graph.projected_incoming_relations(key).collect();
 
     let out_degree = out_edges.len();
     let in_degree = in_edges.len();
 
     let mut edge_kind_labels: HashSet<&'static str> = HashSet::new();
-    for e in out_edges.iter().chain(in_edges.iter()) {
-        for family in e.weight().families() {
+    for (_, _, payload) in out_edges.iter().chain(in_edges.iter()) {
+        for family in payload.families() {
             edge_kind_labels.insert(edge_family_label(family));
         }
     }
@@ -156,10 +152,11 @@ pub fn facet_projection_for_node(graph: &Graph, key: NodeKey) -> Option<FacetPro
     // scheme-prefixed format (e.g. "udc:519.6") so they slot directly into the same
     // collection facet.
     {
-        let mut udc_values: Vec<FacetScalar> = node
-            .tags
-            .iter()
-            .map(|t| FacetScalar::Text(t.clone()))
+        let mut udc_values: Vec<FacetScalar> = graph
+            .node_content_tags(key)
+            .unwrap_or_default()
+            .into_iter()
+            .map(FacetScalar::Text)
             .collect();
         for c in graph.node_classifications(key).unwrap_or_default() {
             if c.status.is_affirmative() {
@@ -272,6 +269,36 @@ mod tests {
         assert_eq!(
             proj_b[facet_keys::IN_DEGREE],
             FacetValue::Scalar(FacetScalar::Number(1.0))
+        );
+        assert!(
+            graph.find_edge_key(a, b).is_none(),
+            "Hyperlink belongs to Resource"
+        );
+        apply_graph_delta(
+            &mut graph,
+            GraphDelta::AppendTraversal {
+                from: a,
+                to: b,
+                trigger: crate::graph::NavigationTrigger::LinkClick,
+                timestamp_ms: Some(100),
+            },
+        );
+        assert!(
+            graph.find_edge_key(a, b).is_some(),
+            "Traversal remains Surface"
+        );
+        let projected = facet_projection_for_node(&graph, a).unwrap();
+        assert_eq!(
+            projected[facet_keys::OUT_DEGREE],
+            FacetValue::Scalar(FacetScalar::Number(2.0))
+        );
+        assert_eq!(
+            projected[facet_keys::TRAVERSAL_COUNT],
+            FacetValue::Scalar(FacetScalar::Number(1.0))
+        );
+        assert_eq!(
+            facet_projection_for_node(&graph, b).unwrap()[facet_keys::IN_DEGREE],
+            FacetValue::Scalar(FacetScalar::Number(2.0))
         );
     }
 

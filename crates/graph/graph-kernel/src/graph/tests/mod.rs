@@ -16,6 +16,7 @@ pub mod filter;
 pub mod legacy_assertions;
 pub mod literal_assertions;
 pub mod nodes_and_edges;
+pub mod production_routing;
 pub mod queries_and_address;
 pub mod snapshot_basic;
 pub mod snapshot_imports;

@@ -23,6 +23,9 @@ use kernel::graph::Graph;
 use kernel::graph::predicate_declarations::{
     PREDICATE_DECLARATIONS_FACET, merge_predicate_declarations,
 };
+use kernel::graph::resource_classifications::merge_classification_variants;
+use kernel::graph::resource_content::{RESOURCE_CLASSIFICATIONS, RESOURCE_PROPERTIES};
+use kernel::graph::resource_properties::merge_resource_properties;
 use kernel::persistence::{GraphSnapshot, PersistedEdge};
 
 /// What [`merge_snapshots`] did, for the Athanor proposal / diagnostics. Never a
@@ -186,6 +189,49 @@ pub(crate) fn merge_snapshots_with_remap(
                             merge_predicate_declarations(&target.canonical_iri, &old, &new)
                                 .map_err(|error| Error::new(error.to_string()))?;
                         existing.value_json = serde_json::to_string(&declarations)
+                            .map_err(|error| Error::new(error.to_string()))?;
+                    } else if facet.facet == RESOURCE_CLASSIFICATIONS {
+                        let old: Vec<
+                            kernel::graph::resource_classifications::ClassificationVariant,
+                        > = serde_json::from_value(old)
+                            .map_err(|error| Error::new(error.to_string()))?;
+                        let new: Vec<
+                            kernel::graph::resource_classifications::ClassificationVariant,
+                        > = serde_json::from_value(new)
+                            .map_err(|error| Error::new(error.to_string()))?;
+                        let variants = merge_classification_variants(&old, &new)
+                            .map_err(|error| Error::new(error.to_string()))?;
+                        existing.value_json = serde_json::to_string(&variants)
+                            .map_err(|error| Error::new(error.to_string()))?;
+                    } else if facet.facet == RESOURCE_PROPERTIES {
+                        let old: Vec<kernel::types::NodeProperty> = serde_json::from_value(old)
+                            .map_err(|error| Error::new(error.to_string()))?;
+                        let new: Vec<kernel::types::NodeProperty> = serde_json::from_value(new)
+                            .map_err(|error| Error::new(error.to_string()))?;
+                        let properties = merge_resource_properties(&old, &new)
+                            .map_err(|error| Error::new(error.to_string()))?;
+                        existing.value_json = serde_json::to_string(&properties)
+                            .map_err(|error| Error::new(error.to_string()))?;
+                    } else if facet.facet
+                        == kernel::graph::legacy_content_migration::LEGACY_CONTENT_ORIGINS
+                    {
+                        let mut notes: Vec<
+                            kernel::graph::legacy_content_migration::LegacyContentOrigin,
+                        > = serde_json::from_value(old)
+                            .map_err(|error| Error::new(error.to_string()))?;
+                        let incoming: Vec<
+                            kernel::graph::legacy_content_migration::LegacyContentOrigin,
+                        > = serde_json::from_value(new)
+                            .map_err(|error| Error::new(error.to_string()))?;
+                        for note in incoming {
+                            if !notes.contains(&note) {
+                                notes.push(note);
+                            }
+                        }
+                        notes.sort_by_cached_key(|note| {
+                            serde_json::to_string(note).expect("origin encodes")
+                        });
+                        existing.value_json = serde_json::to_string(&notes)
                             .map_err(|error| Error::new(error.to_string()))?;
                     } else if old != new {
                         return Err(Error::new(format!(

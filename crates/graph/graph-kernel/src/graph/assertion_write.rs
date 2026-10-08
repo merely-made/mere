@@ -345,6 +345,19 @@ fn matches_spec(statement: &SemanticStatement, spec: &SemanticStatementSpec) -> 
 }
 
 impl Graph {
+    pub(crate) fn literal_statement_exists(&self, statement_id: &str) -> bool {
+        self.resource_nodes().any(|resource| {
+            self.resource_properties(resource.id())
+                .iter()
+                .any(|property| property.statement_id == statement_id)
+        }) || self.nodes().any(|(key, _)| {
+            self.legacy_node_properties(key)
+                .into_iter()
+                .flatten()
+                .any(|property| property.statement_id == statement_id)
+        })
+    }
+
     /// Locate a held handle in its recorded store, independent of current nature.
     pub fn find_semantic_statement(
         &self,
@@ -426,6 +439,18 @@ impl Graph {
         let stratum = self
             .effective_predicate_stratum(predicate)
             .map_err(StatementWriteError::Declaration)?;
+        self.relation_bucket(from, to, stratum)
+    }
+
+    pub(crate) fn relation_bucket(
+        &mut self,
+        from: NodeKey,
+        to: NodeKey,
+        stratum: GraphStratum,
+    ) -> Result<RelationKey, StatementWriteError> {
+        if self.get_node(from).is_none() || self.get_node(to).is_none() {
+            return Err(StatementWriteError::MissingEndpoint);
+        }
         match stratum {
             GraphStratum::Surface => Ok(RelationKey::Surface(
                 self.find_edge_key(from, to)
@@ -510,6 +535,9 @@ impl Graph {
     ) -> Result<RelationKey, StatementWriteError> {
         if self.get_node(from).is_none() || self.get_node(to).is_none() {
             return Err(StatementWriteError::MissingEndpoint);
+        }
+        if self.literal_statement_exists(&statement.statement_id) {
+            return Err(StatementWriteError::HandleCollision(statement.statement_id));
         }
         if statement.provenance_iri.is_none() {
             statement.provenance_iri = Some(self.write_author().asserter_iri());
@@ -620,7 +648,7 @@ impl Graph {
         true
     }
 
-    fn capture_statement_bucket(&self, key: RelationKey) {
+    pub(crate) fn capture_statement_bucket(&self, key: RelationKey) {
         match key {
             RelationKey::Surface(key) => {
                 if let Some((from, to)) = self.inner.inner().edge_endpoints(key) {

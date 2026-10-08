@@ -26,7 +26,7 @@ use kernel::graph::Graph;
 use kernel::persistence::GraphSnapshot;
 
 use crate::engine_profile_store::SESSIONS_DIR;
-use crate::graph_placement::PlacementProfile;
+use crate::graph_placement::{PlacementProfile, materialize_snapshot};
 
 /// Snapshot input with explicit placement; absent metadata stays unqualified.
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
@@ -85,13 +85,7 @@ pub fn save_profiled(
 pub fn load(path: &Path) -> io::Result<Option<Graph>> {
     load_profiled_snapshot(path)?
         .map(|input| {
-            if input.placement == Some(PlacementProfile::LegacySurfaceV1) {
-                return Err(io::Error::new(
-                    io::ErrorKind::InvalidData,
-                    "legacy graph placement requires qualified replay",
-                ));
-            }
-            Graph::try_from_snapshot(&input.snapshot)
+            materialize_snapshot(&input.snapshot, input.placement)
                 .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))
         })
         .transpose()
@@ -137,6 +131,44 @@ mod tests {
     use euclid::default::Point2D;
     use kernel::graph::fixtures::GraphFixtures;
     use uuid::Uuid;
+
+    #[test]
+    fn native_recorded_profile_preserves_held_edges_with_legacy_and_absent_controls() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("graph.json");
+        let graph = crate::graph_placement::placement_test_graph();
+        let snapshot = graph.to_snapshot();
+        save_profiled(&path, &graph, Some(PlacementProfile::RecordedStrataV1)).unwrap();
+        let loaded = load(&path).unwrap().unwrap().to_snapshot();
+        assert_eq!(loaded.edges, snapshot.edges);
+        assert_eq!(loaded.resource_edges, snapshot.resource_edges);
+        assert_eq!(
+            load_profiled_snapshot(&path).unwrap().unwrap().placement,
+            Some(PlacementProfile::RecordedStrataV1)
+        );
+        save_profiled(&path, &graph, Some(PlacementProfile::LegacySurfaceV1)).unwrap();
+        let untouched = fs::read(&path).unwrap();
+        let error = match load(&path) {
+            Err(error) => error,
+            Ok(_) => panic!("declared legacy session was loaded without qualification"),
+        };
+        assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+        assert_eq!(fs::read(&path).unwrap(), untouched);
+        assert_eq!(
+            load_profiled_snapshot(&path).unwrap().unwrap().placement,
+            Some(PlacementProfile::LegacySurfaceV1)
+        );
+        save(&path, &graph).unwrap();
+        assert_eq!(
+            load_profiled_snapshot(&path).unwrap().unwrap().placement,
+            None
+        );
+        let unqualified = load(&path).unwrap().unwrap().to_snapshot();
+        assert!(
+            unqualified.edges.len() + unqualified.resource_edges.len()
+                > snapshot.edges.len() + snapshot.resource_edges.len()
+        );
+    }
 
     #[test]
     fn explicit_file_profiles_and_bare_resource_inputs_remain_distinct() {

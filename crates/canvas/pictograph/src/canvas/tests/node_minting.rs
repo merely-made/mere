@@ -27,10 +27,18 @@ fn visit_adds_a_linked_node_and_selects_it() {
         canvas.selected.contains(&b) && !canvas.selected.contains(&a),
         "selection moves to the newly visited node",
     );
-    assert!(
-        canvas.graph.relations().count() >= 1,
-        "an edge links the browse trail"
-    );
+    let from = canvas.graph.shown_resource_id(a).unwrap();
+    let to = canvas.graph.shown_resource_id(b).unwrap();
+    assert_ne!(from, to);
+    let (handle, payload) = canvas
+        .graph
+        .projected_relations_between(a, b)
+        .next()
+        .unwrap();
+    assert!(matches!(handle, kernel::graph::RelationKey::Resource(_)));
+    assert!(payload.has_relation(RelationSelector::Semantic(SemanticSubKind::Hyperlink)));
+    assert!(canvas.graph.find_resource_edge_key(from, to).is_some());
+    assert!(canvas.graph.find_edge_key(a, b).is_none());
     assert_eq!(
         canvas.view.len(),
         2,
@@ -77,7 +85,8 @@ fn open_as_new_node_mints_distinct_node_with_navigated_from_edge() {
     let a = canvas.visit("https://example.com");
     let a_id = canvas.graph().get_node(a).unwrap().id;
     let before_nodes = canvas.graph().nodes().count();
-    let before_edges = canvas.graph().relations().count();
+    let before_edges = canvas.graph().resource_relations().count();
+    let origin_resource = canvas.graph().shown_resource_id(a).unwrap();
 
     // Opening the *same* URL as a new node mints a distinct surface (no dedup)
     // plus a navigated-from edge from the origin.
@@ -92,7 +101,7 @@ fn open_as_new_node_mints_distinct_node_with_navigated_from_edge() {
         "a node was minted"
     );
     assert_eq!(
-        canvas.graph().relations().count(),
+        canvas.graph().resource_relations().count(),
         before_edges + 1,
         "a navigated-from edge links it back to the origin",
     );
@@ -104,17 +113,35 @@ fn open_as_new_node_mints_distinct_node_with_navigated_from_edge() {
     // The new node opens on its URL — its own within-node history is seeded.
     let (new_key, _) = canvas.graph().get_node_by_id(new_id).unwrap();
     assert_eq!(
+        canvas.graph().shown_resource_id(new_key),
+        Some(origin_resource)
+    );
+    let (handle, payload) = canvas
+        .graph()
+        .projected_relations_between(a, new_key)
+        .next()
+        .unwrap();
+    assert!(matches!(handle, kernel::graph::RelationKey::Resource(_)));
+    assert!(payload.has_relation(RelationSelector::Semantic(SemanticSubKind::Hyperlink)));
+    assert!(
+        canvas
+            .graph()
+            .find_resource_edge_key(origin_resource, origin_resource)
+            .is_some()
+    );
+    assert!(canvas.graph().find_edge_key(a, new_key).is_none());
+    assert_eq!(
         canvas.graph().node_current_url(new_key).as_deref(),
         Some("https://example.com"),
         "the minted node carries its opening page as its first visit",
     );
 
     // No origin → an unlinked node (a subgraph candidate), no extra edge.
-    let edges_now = canvas.graph().relations().count();
+    let edges_now = canvas.graph().resource_relations().count();
     let orphan = canvas.open_member_as_new_node(None, "https://orphan.example");
     assert_ne!(orphan, new_id);
     assert_eq!(
-        canvas.graph().relations().count(),
+        canvas.graph().resource_relations().count(),
         edges_now,
         "an origin-less open mints no navigated-from edge",
     );
@@ -314,44 +341,94 @@ fn tag_selected_inserts_the_trimmed_tag_on_every_selected_node() {
         "both nodes newly tagged"
     );
     assert_eq!(canvas.tag_selected("reading"), 0, "re-tag is idempotent");
-    assert!(canvas.graph().node_tags(ak).unwrap().contains("reading"));
-    assert!(canvas.graph().node_tags(bk).unwrap().contains("reading"));
+    assert_ne!(
+        canvas.graph().shown_resource_id(ak),
+        canvas.graph().shown_resource_id(bk)
+    );
+    assert!(
+        canvas
+            .graph()
+            .node_content_tags(ak)
+            .unwrap()
+            .contains("reading")
+    );
+    assert!(
+        canvas
+            .graph()
+            .node_content_tags(bk)
+            .unwrap()
+            .contains("reading")
+    );
+    assert!(canvas.graph().node_tags(ak).unwrap().is_empty());
+    assert!(canvas.graph().node_tags(bk).unwrap().is_empty());
     // An all-whitespace tag is a no-op.
     assert_eq!(canvas.tag_selected("   "), 0, "blank tag is ignored");
 }
 
 #[test]
-fn member_tagging_does_not_guess_between_duplicate_urls() {
+fn member_tagging_shares_content_between_duplicate_urls() {
     let mut canvas = Canvas::new();
     let first = canvas.open_member_as_new_node(None, "https://same.test");
     let second = canvas.open_member_as_new_node(None, "https://same.test");
+    let other = canvas.open_member_as_new_node(None, "https://other.test");
 
     assert!(canvas.tag_node(second, "unread"));
     let first_key = canvas.graph().get_node_by_id(first).unwrap().0;
     let second_key = canvas.graph().get_node_by_id(second).unwrap().0;
+    let other_key = canvas.graph().get_node_by_id(other).unwrap().0;
+    let shared = canvas.graph().shown_resource_id(first_key).unwrap();
+    assert_ne!(first, second);
+    assert_eq!(canvas.graph().shown_resource_id(second_key), Some(shared));
+    assert_ne!(canvas.graph().shown_resource_id(other_key), Some(shared));
     assert!(
-        !canvas
+        canvas
             .graph()
-            .node_tags(first_key)
+            .node_content_tags(first_key)
             .unwrap()
             .contains("unread")
     );
     assert!(
         canvas
             .graph()
-            .node_tags(second_key)
+            .node_content_tags(second_key)
             .unwrap()
             .contains("unread")
+    );
+    assert!(
+        !canvas
+            .graph()
+            .node_content_tags(other_key)
+            .unwrap()
+            .contains("unread")
+    );
+    assert!(canvas.graph().node_tags(first_key).unwrap().is_empty());
+    assert!(canvas.graph().node_tags(second_key).unwrap().is_empty());
+    assert!(!canvas.tag_node(uuid::Uuid::new_v4(), "unknown"));
+    assert!(
+        !canvas
+            .graph()
+            .node_content_tags(first_key)
+            .unwrap()
+            .contains("unknown")
     );
 
     assert!(canvas.untag_node(second, "unread"));
     assert!(
         !canvas
             .graph()
-            .node_tags(second_key)
+            .node_content_tags(second_key)
             .unwrap()
             .contains("unread")
     );
+    assert!(
+        !canvas
+            .graph()
+            .node_content_tags(first_key)
+            .unwrap()
+            .contains("unread")
+    );
+    assert_eq!(canvas.graph().shown_resource_id(first_key), Some(shared));
+    assert_eq!(canvas.graph().shown_resource_id(second_key), Some(shared));
 }
 
 #[test]
@@ -359,6 +436,8 @@ fn recover_node_restores_the_original_identity() {
     let mut canvas = Canvas::new();
     // A real node lives, dies, and its bin record carries its identity.
     let original = canvas.open_member_as_new_node(None, "https://recovered.test");
+    let original_key = canvas.graph().get_node_by_id(original).unwrap().0;
+    let original_resource = canvas.graph().shown_resource_id(original_key).unwrap();
     canvas.remove_focused().expect("the fresh node is focused");
     assert!(
         canvas.graph().get_node_by_id(original).is_none(),
@@ -381,7 +460,12 @@ fn recover_node_restores_the_original_identity() {
     let (key, node) = canvas.graph().get_node_by_id(original).unwrap();
     assert_eq!(node.url(), "https://recovered.test", "the url is restored");
     assert_eq!(node.title, "Recovered Page", "the title is restored");
-    let tags = canvas.graph().node_tags(key).unwrap();
+    assert_eq!(
+        canvas.graph().shown_resource_id(key),
+        Some(original_resource)
+    );
+    assert!(canvas.graph().node_tags(key).unwrap().is_empty());
+    let tags = canvas.graph().node_content_tags(key).unwrap();
     assert!(
         tags.contains("reading") && tags.contains("archived"),
         "both tags restored"

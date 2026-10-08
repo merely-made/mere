@@ -11,6 +11,9 @@ use kernel::geometry::PortablePoint;
 use kernel::graph::Graph;
 use kernel::graph::fixtures::GraphFixtures;
 
+#[path = "projection_tests.rs"]
+mod projection;
+
 /// The cluster id that `set` assigns `key`, for partition-structure assertions.
 fn community_of(set: &ClusterSet, key: NodeKey) -> Option<&str> {
     set.clusters

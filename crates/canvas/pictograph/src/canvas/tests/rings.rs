@@ -174,19 +174,19 @@ fn strategy_cache_tracks_replayed_raw_predicate_edits_with_identical_classifier_
     let mut graph = Graph::new();
     let a = graph.add_node("https://a.test/".into(), Default::default());
     let b = graph.add_node("https://b.test/".into(), Default::default());
-    graph
-        .assert_semantic_statement(
-            a,
-            b,
-            kernel::graph::SemanticStatementSpec {
-                predicate: OLD.into(),
-                provenance_iri: Some(SOURCE.into()),
-                ..Default::default()
-            },
-        )
-        .unwrap();
     let from_id = graph.get_node(a).unwrap().id;
     let to_id = graph.get_node(b).unwrap().id;
+    // This cache regression exercises the retained raw Surface replay grammar.
+    apply_graph_delta(
+        &mut graph,
+        GraphDelta::ReplayAssertSemanticPredicateByIds {
+            from_id,
+            to_id,
+            predicate: OLD.into(),
+            asserter_iri: SOURCE.into(),
+        },
+    );
+    assert!(graph.to_snapshot().resource_edges.is_empty());
     let mut canvas = Canvas::with_graph(graph);
     let rows: Vec<_> = canvas
         .graph()
@@ -218,6 +218,10 @@ fn strategy_cache_tracks_replayed_raw_predicate_edits_with_identical_classifier_
         .get_edge(canvas.graph().find_edge_key(a, b).unwrap())
         .unwrap();
     assert_eq!(payload.semantic_statements()[0].predicate, NEW);
+    assert_eq!(
+        payload.semantic_statements()[0].provenance_iri.as_deref(),
+        Some(SOURCE)
+    );
     assert!(
         canvas.needs_strategy_recompute("grid.default", 800, 600, None),
         "replay payload edit invalidates warm cache"
@@ -318,7 +322,20 @@ fn arrangement_recompute_is_gated_on_its_inputs() {
         "https://b.example".to_string(),
         PortablePoint::new(1.0, 0.0),
     );
-    graph.assert_semantic_predicate(a, b, "links".to_string());
+    // This control holds topology on Surfaces while only URL grouping changes.
+    let from_id = graph.get_node(a).unwrap().id;
+    let to_id = graph.get_node(b).unwrap().id;
+    kernel::graph::apply::apply_graph_delta(
+        &mut graph,
+        kernel::graph::apply::GraphDelta::ReplayAssertSemanticPredicateByIds {
+            from_id,
+            to_id,
+            predicate: "links".into(),
+            asserter_iri: "urn:mere:test:surface-cache".into(),
+        },
+    );
+    assert_eq!(graph.relations().count(), 1);
+    assert_eq!(graph.resource_relations().count(), 0);
     let mut canvas = Canvas::with_graph(graph);
     let ak = canvas
         .graph()
