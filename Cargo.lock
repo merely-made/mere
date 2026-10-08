@@ -2086,6 +2086,7 @@ dependencies = [
 name = "cambium"
 version = "0.3.3"
 dependencies = [
+ "command-menu",
  "edit-history",
  "genet-scripted-dom",
  "genet-text",
@@ -2655,6 +2656,14 @@ checksum = "cfc320937d09e6de266b31b9afb480f197d7a861be86be7cb2ea7e5d1bfffc5e"
 dependencies = [
  "bytes",
  "memchr",
+]
+
+[[package]]
+name = "command-menu"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
@@ -12119,6 +12128,7 @@ dependencies = [
  "chacha20poly1305 0.11.0",
  "chartulary",
  "ciborium",
+ "command-menu",
  "dirs 5.0.1",
  "eidetic",
  "euclid",
