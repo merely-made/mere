@@ -64,7 +64,7 @@ rendering engine.
 
 ### 2026-10-07 Forms field ownership migration
 
-**Status, 2026-10-08:** integrated local consumer gates pass, including F6's accessibility
+**Status, 2026-10-08:** current `9105b1ef` integration consumer gates pass, including F6's accessibility
 leaves across projections. Both F5 public-pin sibling gates pass; publication
 and a verified published-source Genet repin remain pending.
 The implementation plan and numbered rulings live in Genet's
@@ -271,11 +271,40 @@ byte-for-byte. Fresh integrated positive gates pass Cambium 257, Rootstock 72,
 native accessibility 23 and browser mirror 10, with zero failures and two
 existing ignored doctests. All six native host targets pass 63 tests, and the
 Wasm accessibility example compiles. Guarded transactions preserve unowned
-bytes/mtimes and restore the live starting manifest/lock. The exact qualified
-repin patch is `Code/testing/genet/forms/mere-forms-integrated-repin.patch`.
+bytes/mtimes and restore the live starting manifest/lock. The then-qualified
+repin patch is `Code/testing/genet/forms/mere-forms-integrated-repin.patch`;
+the later published Knot integration below supersedes this proposal.
 Publication and verification against the published Git source remain pending.
 Shared unpublished main also contains four other-owner Vault/Lattice
 documentation commits; a normal main push would carry them.
+
+Published Mere `f67f5080` is now integrated at `9105b1ef`, preserving Pelt,
+dataset and Knot-owner work. Its Knot `eabd4434` repin changes the source
+boundary: the starting graph has 1,564 packages; the Forms candidate has 1,566,
+with separate protected Fleece 0.5.0 and LayoutDom 0.1.1 at Knot's explicit
+Genet `965b64e2`. Mere's modern 33-package Genet family moves to `e84f9c7f`.
+Versions, package definitions, modern edges and features are preserved after
+revision mapping. Knot's edges remain at its published revision; LayoutDom's
+capture feature stays on the modern identity and neither JavaScript engine
+activates. The candidate's 1,690-row lock SHA256 is
+`3537E6067130E1D8993DAC7DB2F143CB9AA60099879F20EBD654DAE79CA97735`.
+
+Fresh current-source gates pass Cambium 257, Rootstock 72, native accessibility
+23 and browser mirror 10, with zero failures and two existing ignored doctests;
+all six native-host targets pass 63 tests and the Wasm accessibility example
+compiles. The first two-thread package run stalls after three GPU cases; only
+its owned test executable is terminated. Its guards restore all source/config/
+lock inputs, but the attempt remains unqualified. The unchanged full suite
+passes with one test thread, including every GPU case. Leaf production/fixture
+hashes still match the accepted four-failure negative control. Current receipts
+are `mere-forms-current-knot-packages-serial-retry`,
+`mere-forms-current-knot-native`, and `mere-forms-current-knot-wasm-a11y` under
+`Code/testing/genet/forms`. All guards preserve unowned bytes/mtimes and restore
+the starting inputs. The review patch
+`mere-forms-current-knot-repin-review.patch` passes `git apply --check`; its
+review-proposal JSON records the exact candidate manifest/lock byte hashes.
+The earlier raw-checkout patch and integration receipts remain historical.
+Publication and public-source verification still precede a permanent repin.
 
 Cleromancy's older public `OnKey` has no `.attr` method. Its bounded local
 `NamedText` view attaches only an existing visible name to Mere's produced node
