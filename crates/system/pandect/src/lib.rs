@@ -183,8 +183,8 @@ pub use facet_store::{
 #[cfg(not(target_arch = "wasm32"))]
 pub use graph_session::fork_component_graph;
 pub use graph_session::{
-    Applied, Change, ChangeKind, DEFAULT_CHECKPOINT_INTERVAL, GraphSession, Kept, MereSessions,
-    Pending, Reverted, SESSIONS_PREFIX, SessionError, ViewEntry, ViewKey,
+    Applied, Change, ChangeKind, DEFAULT_CHECKPOINT_INTERVAL, GraphSession, GraphValidator, Kept,
+    MereSessions, Pending, Reverted, SESSIONS_PREFIX, SessionError, ViewEntry, ViewKey,
 };
 pub use identity::{StartupUnlockMode, auto_unlock_backend_available};
 pub use wallet_sealed_backend::WalletSealedBackend;
@@ -212,11 +212,11 @@ pub use persona_settings_store::{
     persona_settings_path, save_persona_settings,
 };
 pub use reservoir::{
-    DomainId, MERE_RECORD_SCHEMA, MERES_DIR, MereId, MereRecord, RESERVOIR_DB_FILENAME,
-    RESERVOIR_DIR, ReservoirError, ReservoirStore, mere_dir, reservoir_dir,
+    DomainId, MERE_RECORD_SCHEMA, MERES_DIR, MereApplicationAccess, MereId, MereRecord,
+    RESERVOIR_DB_FILENAME, RESERVOIR_DIR, ReservoirError, ReservoirStore, mere_dir, reservoir_dir,
 };
 #[cfg(not(target_arch = "wasm32"))]
-pub use reservoir::{open_mere_backend, open_reservoir_backend};
+pub use reservoir::{open_mere_archive_backend, open_mere_backend, open_reservoir_backend};
 pub use scene_facets::{
     DEFAULT_PHYSICS_DAMPING, SCENE_IMPORTANCE_METRIC, SCENE_PHYSICS_DAMPING, SCENE_SIZE_BY_DEGREE,
     SCENE_SIZE_BY_IMPORTANCE, SceneFacets, copy_scene_facets, read_scene_facets,

@@ -21,18 +21,22 @@
 //! (it speaks the `Store` trait), so it is not filesystem-gated like the
 //! `graph.json` sidecar — a wasm host's OPFS store works the same way.
 
+pub use eidetic::ManifestId;
 use eidetic::{
-    BlobManifest, BlobSource, Error, ManifestId, NoFetcher, PayloadSealer, PrivacyClass,
-    ProvenanceOrigin, ProvenanceRecord, Result, SchemaRef, Store, Timestamp, TrustEnvelope,
-    TypedPayload, list_typed, load_typed_sealed, save_typed_sealed,
+    BlobManifest, BlobSource, Error, NoFetcher, PayloadSealer, PrivacyClass, ProvenanceOrigin,
+    ProvenanceRecord, Result, SchemaRef, Store, Timestamp, TrustEnvelope, TypedPayload, list_typed,
+    load_typed_sealed, save_typed_sealed,
 };
 use kernel::graph::Graph;
+/// Complete candidate graph passed to product-owned validators.
+pub type GraphCandidate = Graph;
 use kernel::persistence::GraphSnapshot;
 use kernel::types::ImageRole;
 use uuid::Uuid;
 
-use crate::NodeFacetStore;
+use crate::{Change, GraphSessionManifest, NodeFacetStore, ViewEntry, ViewIntent};
 use eidetic::manifest::load_manifest;
+use kernel::graph::AttributedDelta;
 
 /// Schema id bytes for the graph-snapshot codicil schema. The [`SchemaRef`] is the
 /// BLAKE3 of these bytes, so it is stable across builds and machines.
@@ -63,6 +67,29 @@ pub struct GraphCodicil {
     pub snapshot: GraphSnapshot,
     #[serde(default)]
     pub facets: NodeFacetStore,
+    /// Optional reservoir history. Graph-only v2 codicils decode unchanged.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub sessions: Vec<ArchivedSession>,
+}
+
+/// One immutable source session's complete graph and parallel histories.
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ArchivedSession {
+    pub manifest: GraphSessionManifest,
+    pub baseline: GraphSnapshot,
+    pub baseline_facets: NodeFacetStore,
+    pub journal: Vec<AttributedDelta>,
+    pub changes: Vec<Change>,
+    pub views: Vec<ArchivedView>,
+}
+
+/// One source application's view and its full parallel stream.
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ArchivedView {
+    pub app: String,
+    pub view: String,
+    pub state: ViewIntent,
+    pub log: Vec<ViewEntry>,
 }
 
 impl TypedPayload for GraphCodicil {
@@ -86,9 +113,9 @@ impl TypedPayload for LegacyGraphCodicil {
 }
 
 impl GraphCodicil {
-    fn into_graph(self) -> Graph {
+    pub(crate) fn into_graph(self) -> Graph {
         let mut graph = Graph::from_snapshot(&self.snapshot);
-        graph.overlay_facets(self.facets);
+        *graph.facets_mut() = self.facets;
         graph
     }
 }
@@ -257,7 +284,11 @@ pub async fn save_graph_snapshot_codicil_sealed(
     save_typed_sealed(
         store,
         sealer,
-        &GraphCodicil { snapshot, facets },
+        &GraphCodicil {
+            snapshot,
+            facets,
+            sessions: Vec::new(),
+        },
         Vec::<BlobSource>::new(),
         PrivacyClass::LocalOnly,
         graph_codicil_provenance(created_at),
@@ -326,6 +357,102 @@ pub async fn list_graph_codicils(store: &mut dyn Store) -> Result<Vec<BlobManife
     Ok(manifests)
 }
 
+/// Parse Eidetic's self-describing id (and its legacy bare BLAKE3 digest).
+pub fn parse_codicil_id(id: &str) -> std::result::Result<ManifestId, String> {
+    eidetic::Hash::parse(id)
+        .map(ManifestId)
+        .map_err(|e| e.to_string())
+}
+
+/// The archive timestamp, using the kernel browser-safe clock.
+pub fn archive_timestamp() -> Timestamp {
+    Timestamp(
+        kernel::time::wall_clock_now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_millis() as u64,
+    )
+}
+
+/// Save a complete local reservoir archive. No redaction is applied: the session
+/// must reopen exactly; sharing/redaction remains a separate explicit operation.
+/// Validation runs before any Eidetic write.
+pub async fn save_session_codicil_checked(
+    store: &mut dyn Store,
+    payload: GraphCodicil,
+    created_at: Timestamp,
+    validate: impl FnOnce(&Graph) -> std::result::Result<(), String>,
+) -> Result<ManifestId> {
+    validate(&payload.clone().into_graph()).map_err(Error::new)?;
+    let mut provenance = graph_codicil_provenance(created_at);
+    for source in &payload.sessions {
+        if let Some(source) = &source.manifest.source_codicil {
+            let id = parse_codicil_id(&source.0).map_err(Error::new)?;
+            if !provenance.upstream.contains(&id) {
+                provenance.upstream.push(id);
+            }
+        }
+    }
+    if !provenance.upstream.is_empty() {
+        provenance.origin = ProvenanceOrigin::Derived;
+    }
+    save_typed_sealed(
+        store,
+        None,
+        &payload,
+        Vec::<BlobSource>::new(),
+        PrivacyClass::LocalOnly,
+        provenance,
+        TrustEnvelope::self_asserted(),
+        created_at,
+    )
+    .await
+}
+
+/// Compose complete local archives after validating the merged candidate. Both
+/// source ids are recorded in Eidetic lineage, and source histories remain intact.
+pub async fn compose_graph_codicils_checked(
+    store: &mut dyn Store,
+    ids: &[ManifestId],
+    created_at: Timestamp,
+    validate: impl FnOnce(&Graph) -> std::result::Result<(), String>,
+) -> Result<Option<ManifestId>> {
+    if ids.is_empty() {
+        return Ok(None);
+    }
+    let mut acc = None;
+    for id in ids {
+        let Some(payload) = load_graph_codicil(store, *id).await? else {
+            return Ok(None);
+        };
+        acc = Some(match acc {
+            None => payload,
+            Some(base) => merge_graph_codicils(base, payload),
+        });
+    }
+    let payload = acc.expect("nonempty sources");
+    validate(&payload.clone().into_graph()).map_err(Error::new)?;
+    save_typed_sealed(
+        store,
+        None,
+        &payload,
+        Vec::<BlobSource>::new(),
+        PrivacyClass::LocalOnly,
+        ProvenanceRecord {
+            origin: ProvenanceOrigin::Derived,
+            upstream: ids.to_vec(),
+            tooling: Some(
+                concat!("pandect/graph-codicil-compose@", env!("CARGO_PKG_VERSION")).into(),
+            ),
+            generated_at: created_at,
+        },
+        TrustEnvelope::self_asserted(),
+        created_at,
+    )
+    .await
+    .map(Some)
+}
+
 /// Compose several graph codicils into one by URL-identity merge (Alembic tail B7 /
 /// decision #1). Thaws each id's snapshot, folds them with
 /// [`merge_snapshots`](crate::snapshot_merge::merge_snapshots) (the first id is the
@@ -372,6 +499,11 @@ pub async fn compose_graph_codicils_sealed(
     let mut codicil = acc.expect("ids is non-empty, so acc is Some");
     redaction.apply(&mut codicil.snapshot);
     redaction.apply_facets(&mut codicil.facets);
+    // Histories can carry private values removed from the current snapshot.
+    // A redacted/shareable composition therefore omits the private session history.
+    if redaction != RedactionPolicy::include_all() {
+        codicil.sessions.clear();
+    }
     let provenance = ProvenanceRecord {
         origin: ProvenanceOrigin::Derived,
         upstream: ids.to_vec(),
@@ -415,6 +547,7 @@ async fn load_graph_codicil_sealed(
                     GraphCodicil {
                         snapshot: graph.to_snapshot(),
                         facets: graph.facets().clone(),
+                        sessions: Vec::new(),
                     }
                 }),
         );
@@ -447,7 +580,13 @@ fn merge_graph_codicils(a: GraphCodicil, b: GraphCodicil) -> GraphCodicil {
             }
         }
     }
-    GraphCodicil { snapshot, facets }
+    let mut sessions = a.sessions;
+    sessions.extend(b.sessions);
+    GraphCodicil {
+        snapshot,
+        facets,
+        sessions,
+    }
 }
 
 #[cfg(test)]

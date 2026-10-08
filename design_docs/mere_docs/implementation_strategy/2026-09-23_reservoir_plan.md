@@ -1,15 +1,15 @@
 # Reservoir plan: shared meres held by the device resident
 
 **Date:** 2026-09-23
-**Status (2026-10-07):** in progress, reviewed against published Mere
-`cd3ebf26d`. V1 landed 2026-09-24; V2 landed 2026-09-24/25 with journal,
-replay/undo, resident routes and recorded two-process receipts. V2b steps 1–3
-(the shared mere view, headed harness and route adapter) landed 2026-09-25.
-Open: V2b steps 4–5, V3, V4 and V5. V2 step 4's recorded browser run still
-does not close its headed scenario verdicts (§7 item 29). Current Graphshell
-cutover status belongs only to the [one-tree plan](2026-09-25_graphshell_one_tree_plan.md);
-§2 below names the reservoir's own remaining acceptance gates. No new runtime
-checks were run for this documentation refresh.
+**Status (2026-10-08):** in progress. V1–V2 and V2b steps 1–3 landed earlier;
+V3 archive, V4 access/ambient route enforcement and V5 client-first embedded
+ownership now have integrated resident implementations and process fixtures
+(§8). V2b steps 4–5, consumer adaptation, product ambient presentation and
+installed-daemon/product qualification remain open. V2 step 4's recorded
+browser run still does not close its headed scenario verdicts (§7 item 29).
+Current Graphshell cutover status belongs to the
+[one-tree plan](2026-09-25_graphshell_one_tree_plan.md); §2 distinguishes the
+resident contracts from the remaining consumer gates.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -101,37 +101,58 @@ sessions.
     (`repos/cleromancy/src/admitted.rs`).
   - No store exists at that default root on the primary development machine.
 
-### Current implementation and consumer handoff (2026-10-07)
+### Current implementation and consumer handoff (2026-10-08)
 
 The earlier findings above are dated history. The following was checked from
-source at Mere `cd3ebf26d` and Cleromancy `32a4b948`; historical receipts are
-retained evidence rather than fresh qualification on these revisions.
+source at Mere's integration of the three reservoir lanes, based on
+`05b7357de`, and Cleromancy `4df166d`. The 2026-10-07 refresh used Mere
+`cd3ebf26d` and Cleromancy `32a4b948`. Historical receipts stay dated; §8
+records the new isolated and integrated checks and their limitations.
 
 | Target | Available source | Remaining acceptance |
 | --- | --- | --- |
 | V1: shared meres and one owner | `pandect::reservoir`, Djinn's reservoir lane/route and `ports/djinn/tests/reservoir_two_process.rs` | Landed. Preserve domain-id reuse, persona scope and refusal of a second owner when adapting consumers. |
 | V2: sessions, journal and routes | `pandect::GraphSession`, `graphshell::MereHost`, Djinn's `resident_mere` and `ports/djinn/tests/mere_two_process.rs` | Landed native/session contract; the previously recorded browser scenario verdicts remain explicitly open. |
 | V2b: shared view | `crates/cambium/mere-view` and `graphshell::mere_route` | Steps 1–3 are landed. Step 4 uses the one-tree plan's complete cutover gate; step 5 mounts the session panel and proves its lifecycle/graph behavior. Consumer embedding is an additional proof. |
-| V3: archive | `crates/system/pandect/src/graph_codicil.rs` supplies freeze/thaw machinery | Wire archive actions into reservoir sessions and qualify save/open/fork/compose lineage. The generic codicil library does not establish this integration. |
-| V4: access and ambient crossing | `MereRoutes::serve` grants initial routes to its first-party application list | Persist and enforce recorded denials, and add per-mere, per-app ambient grants. Initial route grants do not establish the complete V4 contract. |
-| V5: standalone ownership | Djinn's resident and reservoir sources supply the owning side | Provide and qualify embedded operation when Djinn is absent, client attachment when present, and clear refusal of simultaneous ownership. |
-| Cleromancy C1 | Existing Cleromancy graph, replay validator and resident endpoint adapter | Compose the domain validator into the resident so every application's write is checked. Replace its private snapshot persistence and qualify its shared view, archive, grants and standalone behavior. |
+| V3: archive | Session archive payload in graph codicil v2; reservoir save/open/fork/compose intents and archive projection; per-mere `archive.redb` | Resident contract qualified by route and real-process fixtures. Consumer UI must expose these actions; installed/product acceptance remains separate. |
+| V4: access and ambient crossing | Durable per-mere/per-app denial and independent ambient choice; explicit and read-only ambient routes; live endpoint rechecks | Route enforcement is qualified. Trusted owner controls and actual opted-in material in a product's ambient tier remain consumer work. |
+| V5: standalone ownership | `djinn::embedded_reservoir::ReservoirAttachment` attaches first and embeds the existing resident source only on endpoint absence | Library process fixtures qualify ownership, attachment and refusal. Each consumer must supply the same domain registration in daemon and embedded composition and qualify its actual startup. |
+| Cleromancy C1 | Pure `validate_divination_graph` in Cleromancy; shared `GraphValidator`, checked session/archive APIs and `MereRoutes::with_domain_validator` in Mere | Register Cleromancy's validator in both resident compositions, admit its application, repin/adapt the consumer and retire private snapshot persistence. V2b and Cleromancy's native shared-view/reopen gates still precede full C1 acceptance. |
 
 **How the work reached this point.** V1–V2 and V2b's first three steps landed
 on 2026-09-24/25. The ruled "one tree first" decision made Graphshell's cutover
 a V2b step, and its lane then built canvas/control integration, elapsed-time
 physics, editing and remote-session support. Those receipts belong to the
 one-tree plan and its linked inventory. They did not close V2b's panel or
-V3–V5. The committed record contains no cancellation or replacement of this
-plan and no completion entry for V3–V5.
+V3–V5. The 2026-10-08 orchestration now implements their resident contracts
+in separate owner lanes and integrates them together. No ruling cancels this
+plan or replaces its browser and consumer gates.
 
 **Dependency boundaries.** Graphshell's full browser cutover is the acceptance
 gate for V2b step 4 and precedes its panel in step 5. V3–V5 have their own
 storage/resident contracts and non-UI receipts; this plan does not make every
 such implementation wait for retirement of Graphshell's old page. When taking
 one up, name its actual session, route, identity or owner dependency and the
-proof it adds. The sequence of newly parallel implementation lanes is not
-decided by this documentation refresh.
+proof it adds. Mark's 2026-10-08 instruction to push and orchestrate authorized
+the V3, V4 and V5 lanes; their first integration is recorded in §8.
+
+**Authority and storage at this handoff.** Complete candidate graphs are
+validated before installation or journal writes, including archive imports,
+composition and the first edit of a read-only thaw. Rejection creates no fork.
+Codicils keep their source history immutable and a thaw starts a fresh live
+journal. The optional session payload extends graph codicil v2; older payloads
+remain readable. Eidetic's `manifest:<hash>` keys cannot use the directory
+backend's portable filenames, so the resident exclusively owns the existing
+Redb backend at each mere's `archive.redb`. This adds no payload format.
+
+An admitted application label grants route access, not permission-management
+authority. `MereRoutes::set_access` is trusted owner configuration; the broker
+exposes no policy-edit action, and `via` is provenance. Explicit denial wins
+over default and ambient grants, even for an attached endpoint. Ambient routes
+offer graph reads only and do not mint a session in an empty mere. Embedded
+selection preserves admission, policy, persona, lock and protocol refusals;
+only endpoint absence permits ownership. The installed Djinn application's
+allowlist and product-domain registrations still need consumer adaptation.
 
 Cleromancy's plan still requires V1–V5 for full C1 acceptance. Its named
 dependency map separates source-backed preparation of narration, typed data
@@ -615,6 +636,9 @@ consumer:
 Wire pandect's graph codicils into the reservoir: save a session as a codicil,
 open a codicil as a session, fork on edit, and compose.
 
+**2026-10-08:** resident implementation and focused process contract qualified;
+see §8. The shared panel and consumer archive controls remain separate gates.
+
 **Done when:**
 - a session saved as a codicil reopens byte-for-byte as a new session;
 - browsing a codicil is read-only;
@@ -627,6 +651,9 @@ Default-on application-to-route grants for the identity's first-party
 applications, with explicit, recorded denials as the exception. Add a separate
 per-mere, per-app grant for ambient crossing.
 
+**2026-10-08:** persistence and explicit/ambient route enforcement implemented
+and qualified; owner controls and ambient product presentation remain open.
+
 **Done when:**
 - any admitted first-party application opens any mere with no prior grant;
 - a recorded denial refuses the route before any product endpoint opens;
@@ -636,6 +663,10 @@ per-mere, per-app grant for ambient crossing.
 ### V5. Embedded resident
 
 A standalone application embeds the resident library when no daemon is running.
+
+**2026-10-08:** reusable client-first attachment implemented and qualified in
+separate-process library compositions. Actual consumer and installed-daemon
+startup are still acceptance work.
 
 **Done when:**
 - a standalone application opens its mere with djinn absent;
@@ -909,6 +940,61 @@ V2b's rulings, all 2026-09-25:
     them onto the three.
 
 ## 8. Progress
+
+- 2026-10-08: Mark authorized publication and orchestration. The plan refresh
+  was pushed as `05b7357de` after incorporating current main, including shared
+  editor and G2/G4a contracts. Three isolated reservoir lanes were integrated
+  as `00a4e6bff`, `60715e414`, `df0e08047` and `5f611cfb3`:
+  - V3 extends the existing graph-codicil v2 payload with session graph,
+    facets, views, cursor and source history. Resident archive actions save,
+    open read-only, fork on the first accepted typed edit, and compose with
+    both source IDs. The owner holds per-mere `archive.redb`. Registered
+    complete-candidate validation precedes session installation, journal and
+    archive writes; rejected imports, compositions and first edits persist
+    nothing. A candidate's captured replay must also reproduce its graph.
+  - V4 records denial and independent ambient consent in the existing
+    reservoir index. Denial applies before endpoint construction and is
+    rechecked on attached endpoints; ambient routes expose graph reads only.
+    Review found and removed a proposed broker policy-edit action that let
+    an admitted client clear its own denial. The regression test now proves
+    refusal; policy updates use the trusted `MereRoutes::set_access` API.
+  - V5 attaches to the application door first. Only an absent endpoint may
+    invoke the lazy identity factory and embed the same resident sources.
+    Wrong persona, policy/admission refusal, locks and non-absence transport
+    errors never fall back. `open_with` installs domain callbacks before
+    serving; embedded ownership requires a multi-thread Tokio runtime and
+    releases on explicit close or identity lock.
+  Integrated source measured at `393a6125c` (identical Rust files to
+  published implementation `5f611cfb3` after a documentation-only upstream
+  rebase) passed 299 Pandect tests, 207 default
+  Graphshell tests, 19 kernel capture tests and 40 Djinn resident tests.
+  Archive, shared edits, access reopening, competing ownership and
+  embedded/daemon transitions passed eight parent process tests using real
+  children; child-only entrypoints are intentionally ignored in parent runs.
+  The expanded Graphshell suite passed 365 tests with four intentional
+  ignores and one excluded personal-sync reopen test. That test had waited
+  over two minutes in the isolated V3 lane; its cause is unresolved and the
+  expanded gate is not complete. Source gates use isolated build targets,
+  with `TMPDIR=/tmp` for socket tests. Shared-cache diagnostic runs are
+  excluded. Logs and commands are in
+  `Code/testing/mere/reservoir-integrated-20261008/integrated-gates.json`;
+  the three lane receipts remain alongside their own source revisions.
+  Follow-up regression `dff9eaf28` adds a ninth parent process test: identical
+  per-domain registration survives embedded → daemon → fresh embedded
+  ownership. A valid complete batch may contain a temporarily invalid
+  intermediate delta; a forbidden final candidate changes no projection or
+  durable session/checkpoint/journal/view byte in any mode. An unregistered
+  control domain remains independent. Its committed-source lane receipt and
+  root's integration receipt record the separate qualification.
+  Scoped formatting, MPL headers, whitespace and local Markdown links pass;
+  documentation-audit findings match the pre-wave baseline. These are native
+  source/library process fixtures, not installed Djinn, product UI, browser
+  cutover, package or release receipts. Cleromancy published its pure domain
+  validator as `4df166d` with the locked core gate repaired, but its old pin,
+  private snapshot store and authority remain until tested C1 adaptation.
+  Next: complete the one-tree product/page cutover, qualify the V2b panel,
+  then repin and compose Cleromancy's authority in both resident modes and
+  qualify the actual shared lifecycle, archive and opted-in ambient view.
 
 - 2026-09-23: Plan written from the ambiance rulings, the device resident plan,
   pandect, the graph journal and the Turnstone and Knot precedents. No code.
