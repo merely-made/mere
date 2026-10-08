@@ -1192,8 +1192,26 @@ fn validate_arrangement(
                 issues.extend(option_issues(refused));
             }
         },
-        // A custom solver judges its own configuration when it solves.
-        Some(Target::Custom(_)) => {},
+        // A registered solver's options are judged against what it declares,
+        // before it solves (SE8).
+        Some(Target::Custom(id)) => {
+            let declared = compiler
+                .registry
+                .resolve(id)
+                .map(|solver| solver.capability().options)
+                .unwrap_or_default();
+            for (key, value) in &definition.arrangement.options {
+                let field = format!("arrangement.options.{key}");
+                match declared.iter().find(|spec| &spec.key == key) {
+                    None => issues.push(CompileIssue::new(field, format!("{id} does not read this option"))),
+                    Some(spec) => {
+                        if let Some(refusal) = spec.kind.refusal(value) {
+                            issues.push(CompileIssue::new(field, refusal));
+                        }
+                    },
+                }
+            }
+        },
     }
     if definition.arrangement.direction != COORDINATES_DIRECTION {
         issues.push(CompileIssue::new(
