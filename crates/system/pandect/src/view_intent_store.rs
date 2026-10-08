@@ -146,6 +146,23 @@ pub struct ViewIntent {
     /// the open tiles, never persisted). `false` by default. (Workbench mirror.)
     #[serde(default)]
     pub mirror_tiles: bool,
+    /// A host's command menu as the person keeps it (Scenograph editor plan,
+    /// SE31). `None` for views that are not a menu; absent from older views.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub commands: Option<CommandMenuView>,
+}
+
+/// A command menu as a person keeps it: commands added to the host's
+/// defaults, defaults removed, and the recently used ones, most recent first.
+/// Ids are the host's own command ids.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CommandMenuView {
+    #[serde(default)]
+    pub added: Vec<String>,
+    #[serde(default)]
+    pub removed: Vec<String>,
+    #[serde(default)]
+    pub recent: Vec<String>,
 }
 
 impl ViewIntent {
@@ -163,6 +180,7 @@ impl ViewIntent {
             && self.focus.is_none()
             && self.strategy.is_none()
             && !self.mirror_tiles
+            && self.commands.is_none()
     }
 }
 
