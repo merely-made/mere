@@ -7,48 +7,33 @@
 //! The grouped layout through the canvas (dynamics grammar plan, G3):
 //! Charge's repulsion between groups at weight 16, Springs within (F71), on
 //! a graph whose topics no edge structure discloses, read against Springs
-//! alone and shuffled topics.
+//! alone and shuffled groups.
 //!
-//! The fixture crosses three partitions, as G2's quick topic fixture does
-//! (`grammar-g2`, `tests/meaning_topics.rs`, `topic_graph`): node `i` has
-//! topic `i / 8`, site `i % 4`, and sits in structural community
-//! `(i / 2) % 4` (a ring of eight with four diameters per community, four
-//! bridges between). Main has no Meaning channel until G2 merges, so the
-//! topics are handed in as the partition (F70); when G2 merges, rows on
-//! `groups.meaning` join and G2's `topic_graph` replaces this copy. Every run
-//! starts from one seeded scatter, placed as a seeded arrangement, and is
-//! read when the bodies rest (F46) or after 6 000 frames. The within-group
-//! stress is reported and not asserted: its bar waits on a fixture whose
-//! topics have more structure inside them (F72).
+//! The fixture is G2's quick topic fixture (`meaning_topics::topic_graph`,
+//! F70): node `i` has topic `i / 8`, site `i % 4`, and sits in structural
+//! community `(i / 2) % 4` (a ring of eight with four diameters per
+//! community, four bridges between), with a title per topic. The topics are
+//! handed in as the partition, the receipt's ground truth (F70); the rows on
+//! `groups.meaning` read the Meaning channel through the law inputs, lexical
+//! on the CPU here and the pinned model on the host's GPU in the ignored row.
+//! Every run starts from one seeded scatter, placed as a seeded arrangement,
+//! and is read when the bodies rest (F46) or after 6 000 frames. The
+//! within-group stress is reported and not asserted: its bar waits on a
+//! fixture whose topics have more structure inside them (F72).
 
+use std::sync::Arc;
+
+use super::meaning_topics::topic_graph;
 use super::*;
-use crate::canvas::composition::{PhysicsComposition, PhysicsGrouping};
+use crate::canvas::composition::{GroupSource, PhysicsComposition, PhysicsGrouping};
+use crate::canvas::meaning::MeaningEngine;
+use crate::canvas::physics_catalog::PhysicsKindSource;
 use seiche::observe::{Separation, group_stress, group_stress_each, separation};
 
 const N: usize = 32;
 
 fn topic(i: usize) -> u32 {
     (i / 8) as u32
-}
-
-fn community(i: usize) -> usize {
-    (i / 2) % 4
-}
-
-/// The fixture's edges, as index pairs.
-fn crossed_pairs() -> Vec<(usize, usize)> {
-    let mut pairs = Vec::new();
-    for c in 0..4 {
-        let members: Vec<usize> = (0..N).filter(|&i| community(i) == c).collect();
-        for k in 0..members.len() {
-            pairs.push((members[k], members[(k + 1) % members.len()]));
-        }
-        for (a, b) in [(0, 4), (1, 5), (2, 6), (3, 7)] {
-            pairs.push((members[a], members[b]));
-        }
-    }
-    pairs.extend([(0, 2), (3, 5), (6, 12), (15, 1)]);
-    pairs
 }
 
 /// A seeded scatter in a disc of 300, one point per node index.
@@ -68,26 +53,16 @@ fn scatter() -> Vec<PortablePoint> {
         .collect()
 }
 
-/// The graph over `members` (node indices) and the edges among them.
+/// The topic fixture over `members` (node indices): the whole graph with the
+/// other nodes removed, so the edges among the members stay.
 fn graph_of(members: &[usize]) -> (Graph, Vec<NodeKey>) {
-    let sites = ["news", "wiki", "blog", "forum"];
-    let mut graph = Graph::new();
-    let keys: Vec<NodeKey> = members
-        .iter()
-        .map(|&i| {
-            graph.add_node(
-                format!("https://{}.example/{i}", sites[i % 4]),
-                PortablePoint::new(0.0, 0.0),
-            )
-        })
-        .collect();
-    let at: HashMap<usize, NodeKey> = members.iter().copied().zip(keys.iter().copied()).collect();
-    for (a, b) in crossed_pairs() {
-        if let (Some(&ka), Some(&kb)) = (at.get(&a), at.get(&b)) {
-            graph.assert_relation(ka, kb, hyperlink());
+    let (mut graph, keys, _) = topic_graph();
+    for (i, &key) in keys.iter().enumerate() {
+        if !members.contains(&i) {
+            graph.remove_node(key);
         }
     }
-    (graph, keys)
+    (graph, members.iter().map(|&i| keys[i]).collect())
 }
 
 /// `labels` dealt out again by a fixed shuffle, each as often as before.
@@ -103,14 +78,17 @@ fn shuffled(keys: &[NodeKey], labels: &HashMap<NodeKey, u32>) -> HashMap<NodeKey
     keys.iter().copied().zip(values).collect()
 }
 
-/// What a run leaves: positions, and how many frames it took to rest.
+/// A group per node.
+type Groups = HashMap<NodeKey, u32>;
+
+/// What a run leaves: positions, how many frames it took to rest, the
+/// Meaning channel's groups as the canvas held them, and its run count.
 struct Rest {
     positions: Vec<(NodeKey, (f64, f64))>,
     frames: usize,
+    meaning: Groups,
+    meaning_runs: u64,
 }
-
-/// A group per node.
-type Groups = HashMap<NodeKey, u32>;
 
 /// How the law slot is filled for a run.
 enum Slot {
@@ -120,10 +98,14 @@ enum Slot {
     Composition(PhysicsComposition),
 }
 
-/// Run `slot` over the graph on `members` from the scatter until rest.
-fn rest(members: &[usize], slot: Slot) -> Rest {
+/// Run `slot` over the graph on `members` from the scatter until rest, with
+/// `engine` as the canvas's Meaning engine (its lexical default if none).
+fn rest_on(members: &[usize], slot: Slot, engine: Option<Arc<dyn MeaningEngine>>) -> Rest {
     let (graph, keys) = graph_of(members);
     let mut canvas = Canvas::with_graph(graph);
+    if let Some(engine) = engine {
+        canvas.set_meaning_engine(engine);
+    }
     canvas.resize(1400, 900);
     canvas.set_physics_paused(true);
     canvas.set_layout_strategy(Some("test.scatter".to_string()));
@@ -139,6 +121,14 @@ fn rest(members: &[usize], slot: Slot) -> Rest {
         canvas.step_layout();
         frames += 1;
     }
+    let meaning = if canvas.meaning().is_some() {
+        canvas
+            .channel_groups(PhysicsKindSource::Meaning)
+            .into_iter()
+            .collect()
+    } else {
+        HashMap::new()
+    };
     Rest {
         positions: canvas
             .view
@@ -146,7 +136,13 @@ fn rest(members: &[usize], slot: Slot) -> Rest {
             .map(|(k, p)| (k, (f64::from(p.x), f64::from(p.y))))
             .collect(),
         frames,
+        meaning,
+        meaning_runs: canvas.meaning_runs(),
     }
+}
+
+fn rest(members: &[usize], slot: Slot) -> Rest {
+    rest_on(members, slot, None)
 }
 
 fn all() -> Vec<usize> {
@@ -159,13 +155,18 @@ fn sorted(groups: &HashMap<NodeKey, u32>) -> Vec<(NodeKey, u32)> {
     list
 }
 
-/// Charge's repulsion between groups at `weight`, Springs within, through
+/// Charge's repulsion between `groups` at `weight`, Springs within, through
 /// the catalog: F71's reading, ruled at weight 16.
-fn charge_between(groups: &HashMap<NodeKey, u32>, weight: f32) -> Slot {
+fn charge_between(groups: GroupSource, weight: f32) -> Slot {
     Slot::Composition(PhysicsComposition::Grouped(PhysicsGrouping {
         outer_weight: weight,
-        ..PhysicsGrouping::charge_between(sorted(groups))
+        ..PhysicsGrouping::charge_between(groups)
     }))
+}
+
+/// Charge between a partition the host hands in.
+fn charge_between_given(groups: &HashMap<NodeKey, u32>, weight: f32) -> Slot {
+    charge_between(GroupSource::Given(sorted(groups)), weight)
 }
 
 fn show(v: Option<f64>) -> String {
@@ -195,8 +196,8 @@ fn line(name: &str, run: &Rest, against: &HashMap<NodeKey, u32>) -> Separation {
     s
 }
 
-/// The partitions on main, by node key of the full fixture (keys are dense
-/// in index order).
+/// The partitions by node key of the full fixture: the topics, the sites,
+/// Louvain's clusters, and the topics shuffled.
 fn partitions() -> (Groups, Groups, Groups, Groups) {
     let (graph, keys) = graph_of(&all());
     let topics = keys
@@ -251,18 +252,13 @@ fn charge_between_topics_and_springs_within_separates_them() {
     let springs = rest(&all(), Slot::Law);
     let base = line("springs alone, against topics", &springs, &topics);
     let structural = line("springs alone, against clusters", &springs, &clusters);
-    let by_topics = rest(
-        &all(),
-        Slot::Composition(PhysicsComposition::Grouped(
-            PhysicsGrouping::charge_between(sorted(&topics)),
-        )),
-    );
+    let by_topics = rest(&all(), charge_between_given(&topics, 16.0));
     let grouped = line(
         "charge between topics at 16, against topics",
         &by_topics,
         &topics,
     );
-    let by_shuffled = rest(&all(), charge_between(&shuffled_topics, 16.0));
+    let by_shuffled = rest(&all(), charge_between_given(&shuffled_topics, 16.0));
     let control = line(
         "charge between shuffled topics at 16, against topics",
         &by_shuffled,
@@ -290,7 +286,113 @@ fn charge_between_topics_and_springs_within_separates_them() {
     );
 }
 
-/// The ruled reading at other weights and on main's other partitions, for
+/// F70's rows on `groups.meaning`: the grouping reads the Meaning channel
+/// through the law inputs (`GroupSource::Channel`), so the outer law acts
+/// between the groups one Meaning run gave. The bars are the topic row's:
+/// the grouped layout separates its own groups, Springs alone does not, and
+/// the same composition over those groups shuffled does not. Read against
+/// the topics as well, for the record.
+fn meaning_rows(engine: Option<Arc<dyn MeaningEngine>>) {
+    let (topics, _, _, _) = partitions();
+    let by_meaning = rest_on(
+        &all(),
+        charge_between(GroupSource::Channel(PhysicsKindSource::Meaning), 16.0),
+        engine,
+    );
+    let meaning = by_meaning.meaning.clone();
+    assert_eq!(
+        meaning.len(),
+        N,
+        "the channel's partition covers the fixture"
+    );
+    assert_eq!(
+        by_meaning.meaning_runs, 1,
+        "one Meaning run feeds the grouping"
+    );
+    let groups = sorted(&meaning)
+        .iter()
+        .map(|(_, g)| *g)
+        .collect::<std::collections::BTreeSet<_>>()
+        .len();
+    let labels: HashMap<NodeKey, usize> = topics.iter().map(|(k, t)| (*k, *t as usize)).collect();
+    println!(
+        "groups.meaning: {groups} groups, F {:.3} against the topics",
+        super::meaning_topics::f_measure(&sorted(&meaning), &labels)
+    );
+    let grouped = line(
+        "charge between groups.meaning at 16, against groups.meaning",
+        &by_meaning,
+        &meaning,
+    );
+    line(
+        "charge between groups.meaning at 16, against topics",
+        &by_meaning,
+        &topics,
+    );
+    let springs = rest(&all(), Slot::Law);
+    let base = line("springs alone, against groups.meaning", &springs, &meaning);
+    let keys: Vec<NodeKey> = sorted(&meaning).iter().map(|(k, _)| *k).collect();
+    let by_shuffled = rest(
+        &all(),
+        charge_between_given(&shuffled(&keys, &meaning), 16.0),
+    );
+    let control = line(
+        "charge between shuffled groups.meaning at 16, against groups.meaning",
+        &by_shuffled,
+        &meaning,
+    );
+    assert!(
+        grouped.ratio > 1.0,
+        "grouping by groups.meaning separates its groups: {grouped:?}"
+    );
+    assert!(
+        base.ratio < 1.0,
+        "Springs alone does not separate the meaning groups: {base:?}"
+    );
+    assert!(
+        control.ratio < 1.0,
+        "shuffled meaning groups do not separate the real ones: {control:?}"
+    );
+}
+
+/// The `groups.meaning` rows on the canvas's default engine, the lexical
+/// fallback on the CPU.
+#[test]
+fn charge_between_meaning_groups_separates_them_on_the_lexical_fallback() {
+    meaning_rows(None);
+}
+
+/// The `groups.meaning` rows on the pinned model (e5-base-v2, F56) on the
+/// host's GPU, booted greedy (F31).
+///
+/// `ESP_MODELS_DIR=<repo>/models cargo test --release -p pictograph --features
+/// meaning-gpu --lib grouped -- --ignored --nocapture --test-threads=1`
+#[cfg(feature = "meaning-gpu")]
+#[test]
+#[ignore = "requires the local models directory (ESP_MODELS_DIR) and a wgpu adapter"]
+fn charge_between_meaning_groups_separates_them_on_the_pinned_model() {
+    use crate::canvas::meaning_device::DeviceMeaning;
+    use crate::canvas::physics_device_for;
+    let models = std::env::var_os("ESP_MODELS_DIR")
+        .map(std::path::PathBuf::from)
+        .expect("ESP_MODELS_DIR names the local models directory");
+    let adapter = netrender::boot().expect("a wgpu adapter");
+    let backend = adapter.adapter.get_info().backend;
+    drop(adapter);
+    let needs = netrender::TenantNeeds {
+        greedy: true,
+        label: Some("grouped meaning receipt host"),
+        ..Default::default()
+    };
+    let handles = netrender::boot_shared(backend.into(), None, &needs)
+        .expect("a device for a JIT compute tenant");
+    let device = physics_device_for(&handles);
+    let engine = DeviceMeaning::load_pinned(&models, &device).expect("the pinned model loads");
+    println!("engine: {:?}", engine.backend());
+    meaning_rows(Some(Arc::new(engine)));
+}
+
+/// The ruled reading at other weights and on the other partitions, for
 /// the record. Printed only.
 #[test]
 #[ignore = "a probe beside G3's grouped receipt; prints its table"]
@@ -298,7 +400,7 @@ fn probe_grouped_readings() {
     let (topics, sites, clusters, shuffled_topics) = partitions();
     for weight in [1.0, 4.0, 16.0, 64.0] {
         for (name, groups) in [("topics", &topics), ("shuffled topics", &shuffled_topics)] {
-            let run = rest(&all(), charge_between(groups, weight));
+            let run = rest(&all(), charge_between_given(groups, weight));
             line(
                 &format!("charge between {name} at {weight}, against topics"),
                 &run,
@@ -307,7 +409,7 @@ fn probe_grouped_readings() {
         }
     }
     for (name, groups) in [("clusters", &clusters), ("sites", &sites)] {
-        let run = rest(&all(), charge_between(groups, 16.0));
+        let run = rest(&all(), charge_between_given(groups, 16.0));
         line(
             &format!("charge between {name} at 16, against topics"),
             &run,
@@ -319,4 +421,66 @@ fn probe_grouped_readings() {
             groups,
         );
     }
+}
+
+/// F49's key, alongside (F70): a group override reads the chosen `groups.*`
+/// channel. Under `groups.cluster` a role set on one Louvain cluster's label
+/// holds that cluster's members and no other node; the same label under the
+/// default `groups.site` matches no node (the control); back on the site,
+/// a site's override reads as before.
+#[test]
+fn a_group_role_reads_the_chosen_groups_channel() {
+    use seiche::Role;
+    let (graph, keys, _) = topic_graph();
+    let clusters: HashMap<NodeKey, u32> = crate::signals::community_louvain(&graph)
+        .clusters
+        .iter()
+        .enumerate()
+        .flat_map(|(c, cluster)| cluster.members.iter().map(move |&m| (m, c as u32)))
+        .collect();
+    let mut canvas = Canvas::with_graph(graph);
+    canvas.resize(1400, 900);
+    canvas.set_physics_paused(true);
+    canvas.set_layout_strategy(Some("test.scatter".to_string()));
+    let scatter = scatter();
+    canvas.apply_strategy_positions(&keys.iter().copied().zip(scatter).collect::<Vec<_>>());
+    assert_eq!(canvas.role_group_source(), PhysicsKindSource::Site);
+
+    canvas.set_role_group_source(PhysicsKindSource::Cluster);
+    let label = canvas.role_group_of(keys[0]).expect("a cluster label");
+    assert!(label.starts_with("groups.cluster#"), "{label}");
+    canvas.set_group_role(&label, Some(Role::Pinned));
+    for key in &keys {
+        let same = clusters[key] == clusters[&keys[0]];
+        assert_eq!(
+            canvas.role_group_of(*key).as_deref() == Some(label.as_str()),
+            same,
+            "the label is the partition's"
+        );
+        assert_eq!(
+            canvas.arrangement_role_of(*key),
+            if same { Role::Pinned } else { Role::Seeded },
+            "node {}",
+            key.index()
+        );
+    }
+
+    // The control: the same override under the site matches no node.
+    canvas.set_role_group_source(PhysicsKindSource::Site);
+    assert!(
+        keys.iter()
+            .all(|key| canvas.arrangement_role_of(*key) == Role::Seeded)
+    );
+    let site = canvas.role_group_of(keys[0]).expect("a site");
+    canvas.set_group_role(&site, Some(Role::Anchored));
+    assert_eq!(
+        canvas.arrangement_role_of(keys[4]),
+        Role::Anchored,
+        "same site"
+    );
+    assert_eq!(
+        canvas.arrangement_role_of(keys[1]),
+        Role::Seeded,
+        "another site"
+    );
 }

@@ -17,9 +17,11 @@
 //!
 //! A composition runs in the law slot instead of the picked law, overlays
 //! still after it. The pickers do not express one yet (G4's `PhysicsChoice`
-//! fields), so a pick replaces it. A grouping takes its partition from the
-//! host (the fixture's topics, F70) until G2's `groups.*` channels merge, and
-//! between groups an outer law acts by its repulsion alone (F71).
+//! fields), so a pick replaces it. A grouping reads its partition from a
+//! `groups.*` channel through the law inputs (`groups.meaning` among them),
+//! or takes one the host hands in, as the separation receipt hands in its
+//! topics (F70), and between groups an outer law acts by its repulsion alone
+//! (F71).
 
 use std::collections::HashMap;
 
@@ -28,7 +30,8 @@ use seiche::{Admission, Currency, Force, Grouped, Partition, Weighted, compose};
 
 use super::Canvas;
 use super::physics_catalog::{
-    DENSITY_ADMITS, DENSITY_REFUSAL, LawInputs, LawSources, PhysicsLaw, PhysicsOverlay,
+    DENSITY_ADMITS, DENSITY_REFUSAL, LawInputs, LawSources, PhysicsKindSource, PhysicsLaw,
+    PhysicsOverlay,
 };
 
 impl PhysicsLaw {
@@ -78,13 +81,23 @@ impl PhysicsComposition {
 /// 2026-10-06, F71, "Repulsion only, weight 16").
 pub const CHARGE_BETWEEN_WEIGHT: f32 = 16.0;
 
+/// Where a grouping's partition comes from.
+#[derive(Clone, Debug, PartialEq)]
+pub enum GroupSource {
+    /// A `groups.*` channel, read through the law inputs at each rebuild, so
+    /// the partition follows the channel (F70).
+    Channel(PhysicsKindSource),
+    /// A partition the host hands in, a group per node: the separation
+    /// receipt's topics, its ground truth.
+    Given(Vec<(NodeKey, u32)>),
+}
+
 /// Groups: Charge between them and Springs within is the first instance
 /// ([`Self::charge_between`]).
 #[derive(Clone, Debug, PartialEq)]
 pub struct PhysicsGrouping {
-    /// Each node's group, from the host: the fixture's topics until G2's
-    /// `groups.*` channels merge (F70).
-    pub groups: Vec<(NodeKey, u32)>,
+    /// Each node's group: a channel's, or the host's.
+    pub groups: GroupSource,
     /// The law whose repulsion acts between groups, over their centroids:
     /// its repulsion alone, the rest of the law left out (F71).
     pub outer: PhysicsLaw,
@@ -96,7 +109,7 @@ pub struct PhysicsGrouping {
 
 impl PhysicsGrouping {
     /// Charge's repulsion between groups at weight 16, Springs within (F71).
-    pub fn charge_between(groups: Vec<(NodeKey, u32)>) -> Self {
+    pub fn charge_between(groups: GroupSource) -> Self {
         Self {
             groups,
             outer: PhysicsLaw::Charge,
@@ -184,7 +197,11 @@ impl LawInputs<'_> {
         grouping: &PhysicsGrouping,
         sources: LawSources,
     ) -> Box<dyn Force> {
-        let partition = Partition::new(grouping.groups.iter().copied(), self.edges());
+        let groups = match &grouping.groups {
+            GroupSource::Channel(source) => self.groups(*source),
+            GroupSource::Given(groups) => groups.clone(),
+        };
+        let partition = Partition::new(groups, self.edges());
         let (keys, edges) = partition.outer_graph();
         let outer = repulsion_terms(
             LawInputs::from_parts(keys, edges, HashMap::new()).law_forces(grouping.outer, sources),

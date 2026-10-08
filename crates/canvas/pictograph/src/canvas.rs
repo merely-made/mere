@@ -208,7 +208,7 @@ pub use board_scene::{
     BoardTransform,
     backdrop_color,
 };
-pub use composition::{CompositionRefusal, PhysicsComposition, PhysicsGrouping};
+pub use composition::{CompositionRefusal, GroupSource, PhysicsComposition, PhysicsGrouping};
 pub use physics_board::{BoardItem, PhysicsBoard, PhysicsChoice};
 pub use physics_catalog::{
     CANVAS_PHYSICS_DEPTH_SOURCES, CANVAS_PHYSICS_KIND_SOURCES, CANVAS_PHYSICS_LAWS,

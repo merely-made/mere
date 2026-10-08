@@ -13,7 +13,7 @@ use seiche::instruments::{Probe, Vector};
 use seiche::{Admission, Currency, Declared, Force, ForceContext, Term, compose, scale};
 
 use super::*;
-use crate::canvas::composition::{PhysicsComposition, PhysicsGrouping};
+use crate::canvas::composition::{GroupSource, PhysicsComposition, PhysicsGrouping};
 use crate::canvas::physics_catalog::{
     LawInputs, LawSources, PhysicsKindSource, PhysicsLaw, PhysicsMassSource, PhysicsOverlay,
 };
@@ -184,7 +184,7 @@ fn a_composition_takes_force_laws_only_and_a_pick_replaces_it() {
     assert_eq!(refusal.law, PhysicsLaw::Still);
     assert_eq!(refusal.reason, compose::UNWEIGHTED);
     let grouped = PhysicsComposition::Grouped(PhysicsGrouping {
-        groups: Vec::new(),
+        groups: GroupSource::Given(Vec::new()),
         outer: PhysicsLaw::Charge,
         inner: PhysicsLaw::Anneal,
         outer_weight: 1.0,
