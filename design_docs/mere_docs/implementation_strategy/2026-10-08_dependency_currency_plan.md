@@ -1,7 +1,7 @@
 # Dependency Currency Plan
 
 **Date:** 2026-10-08
-**Status (2026-10-08):** surveyed; rapier and parry moving on branch `rapier-036` (dynamics grammar plan F163 to F168), with mere's ten compatible updates folded in (D2). The breaking families wait on their order (§4).
+**Status (2026-10-08):** surveyed, and set as the [workspace upstream refresh](../../../../mer3ly/docs/2026-10-08_workspace_upstream_refresh.md)'s owner-specific stage for mere, genet and netrender (D8); rapier and parry moving on branch `rapier-036` (dynamics grammar plan F163 to F168), with mere's ten compatible updates folded in (D2). The breaking families wait on their order (§4).
 **Scope:** bring mere, genet and netrender's crates.io dependencies to current releases; the rest of the workspace follows through repins (D1). Size and footprint are the [dependency footprint brief](../../2026-07-04_dependency_footprint_brief.md)'s; this plan is about currency.
 
 ## 1. How it was measured
@@ -52,9 +52,13 @@ A family moves together because its crates pin each other.
 
 **D7, where this plan lands (2026-10-08).** Options: push the docs branch now; land it with rapier. Mark: **"Land with rapier"**.
 
+**D8, how this plan fits the workspace upstream refresh (2026-10-08).** Question: Mark's workspace upstream refresh (mer3ly `docs/2026-10-08_workspace_upstream_refresh.md`, `f151b45`) already ran the compatible pass across 22 repositories (netrender's pollster 1.0, Turquet's sha2 0.11, Boa v0.22) and lists as deliberate boundaries the "registry API families" (accessibility, text shaping and glyph types, crypto and random, HTTP and storage, runtime) that "need owner-specific migrations and tests"; netrender's Vello lane (`netrender-notes/2026-10-08_vello_upstream_lane.md`) forbids bumping glyph-facing Skrifa across Classic's boundary independently. Options: this plan is the refresh's next stage, its owner-specific migrations for mere, genet and netrender, the text family going to the Vello lane; hand everything but rapier and parry to the refresh; keep both separate. Mark: **"Mine is the refresh's next stage (Recommended)"**. *Follows:* this plan carries the refresh's boundaries for mere, genet and netrender, citing them rather than repeating them. Linebender text (parley, parley_data, skrifa, read-fonts, harfrust) leaves this plan for the Vello lane, which owns glyph-facing types (D5's text tick is carried there, not here). The refresh's constraints hold here: provider before consumer, never a one-sided repin of the shared Netrender family, and toolchain ownership kept explicit (genet declares Rust 1.86).
+
+**D9, coordinating with the refresh's owner (2026-10-08).** Mark: the refresh is **"The Codex agent"**'s. *Follows:* the coordinator writes the note and Mark relays it.
+
 ## 4. Order
 
-Upstream first (D6): netrender (Linebender text, sha2, its compatible updates), then genet (Linebender text, accessibility, the small ones, the parsers if taken), then mere's own groups (security-sensitive, accessibility, data and Meaning, other), one mere lane at a time, each taking the genet and netrender repins as they land. Constraints:
+Upstream first (D6): netrender (sha2 and its compatible updates; its text family is the Vello lane's, D8), then genet (accessibility, the small ones, the parsers if taken; its text family is the Vello lane's), then mere's own groups (security-sensitive, accessibility, data and Meaning, other), one mere lane at a time, each taking the genet and netrender repins as they land. Constraints:
 - every mere lane rewrites `Cargo.lock`, so mere lanes run one at a time;
 - genet and netrender lanes can run beside a mere lane, but mere takes them only through a repin, netrender first (genet depends on it), then genet, then mere;
 - at most three lanes at once (`~/.claude/CLAUDE.md`, Concurrency).
