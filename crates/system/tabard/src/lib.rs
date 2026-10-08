@@ -20,6 +20,7 @@
 
 pub mod smolweb;
 pub mod theme;
+pub mod workshop;
 
 use std::collections::BTreeMap;
 

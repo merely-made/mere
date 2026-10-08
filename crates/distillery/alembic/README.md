@@ -37,8 +37,10 @@ The package is `mere-alembic` because crates.io `alembic` is the Linux
 Foundation's VFX-format binding; the library keeps the product name.
 
 Lives in the [mere](https://github.com/merely-made/mere) workspace at
-`ports/distillery/alembic`, beside `ports/distillery/athanor`. No
-implementation yet.
+`crates/distillery/alembic`. Its shared recall implementation moved out of
+the port directory on 2026-10-07 so Pandect can consume it without depending
+on a port. Athanor remains at `ports/distillery/athanor`; Distillery continues
+to own the workshop domain.
 
 The distillation plan intends to accept a Fleece `Article` rather than raw page
 bytes, but the reservation has no Article-consuming code and deliberately has
