@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-08)**: rulings 1 to 66 in §3; the threat statement is
+**Status (2026-10-08)**: rulings 1 to 69 in §3; the threat statement is
 still open. L1 landed (`2556a20c`). L2's checkpoints A (`7c588deb`) and B
 (`ec1768ab`) landed. Still to come in L2: the Secret Service on the
 ThinkPad, ruling 42 (Linux starts locked), ruling 44 (Distillery's
@@ -793,6 +793,30 @@ root, when `--passphrase-fd` is given, or when the vault directory holds
 `vault.json`; otherwise DPAPI. The installed resident's directory holds
 only `auto-unlock-root.json` and `profiles`, so it stays on DPAPI.
 
+Rulings 67 to 69 were asked on 2026-10-08 from the Secret Service's
+assessment (§6).
+
+**Ruling 67** *(the Secret Service's Prompt).* *While the vault is locked,
+a client's `Unlock` gets a Prompt object (ruling 10).* Options: the
+Prompt shows the resident's native unlock (ruling 47's prompt), handed in
+by the resident, with a cancel completing as dismissed; the Prompt shows
+nothing and completes when the vault is unlocked by any route. Mark:
+**"Show the native unlock (Recommended)"**.
+
+**Ruling 68** *(a client's `Lock`).* Options:
+- any `Lock` engages the whole vault lock, as `ssh-add -x` does (ruling 9);
+- per-object flips under the vault lock;
+- refused.
+
+Mark: **"Locks the whole vault (Recommended)"**.
+
+**Ruling 69** *(who serves it).* *gnome-keyring already owns
+`org.freedesktop.secrets` on the ThinkPad.* Options: test-served for this
+checkpoint, proven under a disposable bus, with djinn's wiring and the
+hand-over from gnome-keyring as later items; djinn serves it now behind an
+owner setting that is off by default. Mark: **"Test-served for now
+(Recommended)"**.
+
 Still open: a threat statement naming hibernation and the pagefile.
 
 ## 4. Phases
@@ -1335,3 +1359,45 @@ unlock follow-through, and non-Windows startup unlock backends, from the
   - outside djinn, `Unlock::from_env()` remains in `personae-agent`,
     `personae-vault`, `distillery-installed`, graphshell's `profile.rs`
     and its web-extension smoke host.
+
+**2026-10-08, the Secret Service assessed** (L2 checkpoint B, at
+`18404a4c`).
+- **What exists:**
+  - castellan's D-Bus server (about 1,460 lines, Linux-only);
+  - the store under it refuses while the resident is locked;
+  - `secret_service_linux.rs` drives `secret-tool` (store, lookup, clear)
+    under `dbus-run-session`.
+- **What is missing** (§2's survey still holds):
+  - `Locked` is a label flip on sets that start empty, not the vault's
+    state;
+  - `Unlock` never prompts;
+  - no lock or unlock change reaches D-Bus;
+  - nothing serves it in production.
+- *Reading, not ruled:* ruling 11's secret-free snapshot covers the Secret
+  Service's metadata (collections, labels, lookup attributes and content
+  types, which the specification treats as not secret). So a locked search
+  still answers and reports its items locked, and the client's `Unlock`
+  meets ruling 67's prompt. Under ruling 66 a Linux resident builds nothing
+  before its first unlock, so a snapshot exists whenever the service is
+  served.
+- **The ThinkPad.** It is at `192.168.4.32`, with ED25519 key
+  `SHA256:9kM6RpW0UxjYmEdg5ngHw1JL8J7Hm7B8QXXJGKWkB7o`, as recorded. Rust
+  1.98.1, `secret-tool`, `dbus-run-session`, `gdbus` and `zenity` are there.
+  Another session's checkout and builds are left alone; this work runs in
+  a worktree of its own.
+- **The build. Done when:**
+  - [ ] collections and items report `Locked` exactly when the vault is
+        locked, and a lock or unlock emits the property change;
+  - [ ] while locked, a search answers from the snapshot with every item
+        locked, `GetSecrets` returns nothing, and `Item.GetSecret` fails
+        `IsLocked`;
+  - [ ] `Unlock` while locked returns a Prompt. Its `Prompt()` runs the
+        handed-in unlock: success completes with the unlocked objects, and
+        a cancel completes as dismissed with the vault still locked;
+  - [ ] a client `Lock` of any object locks the vault;
+  - [ ] proven on the ThinkPad under `dbus-run-session`: `secret-tool
+        lookup` on a locked vault brings up the scripted prompt and
+        returns the secret, and with a cancel returns nothing. The
+        properties and refusals are read with `gdbus`. The existing
+        receipt still passes;
+  - [ ] castellan's tests pass on Windows and Linux.
