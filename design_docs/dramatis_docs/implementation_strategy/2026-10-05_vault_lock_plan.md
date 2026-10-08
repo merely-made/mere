@@ -1515,3 +1515,36 @@ unlock follow-through, and non-Windows startup unlock backends, from the
     231). It fails the same way at `origin/main` without this change, as a
     control. It belongs to that lane.
 - **Next:** ruling 42's Linux runtime proof on the ThinkPad, then L3.
+
+**2026-10-08, ruling 42 proven on Linux** (ThinkPad, Fedora 44; djinn
+built plain at `fc3da34c`).
+- **The plain build** answers "unknown argument: --passphrase-fd", as on
+  Windows.
+- **Terminal path.** Each run used isolated roots and endpoints, as
+  djinn-testkit isolates them. A small Python pty driver typed each answer
+  only when its prompt appeared, since the ThinkPad has no `script(1)`:
+  - **no vault:** `started, waiting-for-unlock, vault-created, listening,
+    ready`. The terminal asked "No identity vault yet. Choose a passphrase
+    for a new one." then "Type the new vault passphrase again.", and
+    `vault.json` was created;
+  - **a wrong passphrase, then the right one:** `started,
+    waiting-for-unlock, unlock-refused, unlocked-at-start, listening,
+    ready`, with the reason shown before asking again. The status route
+    reported `startup_unlock` and `protection` as `passphrase`;
+  - **environment control** (`PERSONAE_PASSPHRASE` set, nothing typed): it
+    stays at `started, waiting-for-unlock`, the terminal waiting, never
+    ready.
+  - Each resident stopped through its own door.
+- **Native path** (Mark at the ThinkPad). The resident ran with no
+  terminal, only the desktop's display (`DISPLAY=:0` and the Xwayland
+  authority). GNOME's passphrase box came up. Eleven refused attempts were
+  each answered by the box again, then the right passphrase gave
+  `unlocked-at-start, listening, ready`, and later `stopping, stopped`. The
+  box's own Cancel was not exercised natively; the scripted unit test
+  covers it.
+- **Testing note:** with `XDG_RUNTIME_DIR` redirected to a scratch root,
+  GTK's box started the document portal's FUSE mount and `gvfsd-fuse` in
+  it. Both outlive the resident and must be unmounted and stopped
+  afterwards; they were.
+- **L2's last condition** (the Secret Service on the ThinkPad) and this
+  proof, which ruling 56 pairs with it, are done. Next: L3, the triggers.
