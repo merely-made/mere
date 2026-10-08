@@ -365,6 +365,14 @@ Mark's words are quoted as the physics catalog plan records them (§3, P7, and �
 
 **F152, whether physics plays on open (2026-10-08; G4b1's fork G).** Options: `physics_paused` stays a scene field, view state like the camera; it goes into the spec (spec version 2). Mark: **"Stays a scene field (Recommended)"**.
 
+**F153, a v3 scene with both flat fields and a spec (2026-10-08; G4b1's fork H).** Question: only hand-made ones can exist, since nothing wrote a spec before G4b (F100). Options: the spec wins for physics and the flat fields fill only what it lacks (the target when it has none, damping when the realization leaves it unset); the spec wins outright; the open fails if they disagree. Mark: **"Spec wins, flat fills gaps (Recommended)"**.
+
+**F154, unknown legacy source ids (2026-10-08; G4b1's fork I).** Question: F143 named laws and overlays; unknown kind, groups, mass and depth sources fall back to defaults today. Options: fail the open naming the id; keep the fallback for sources. Mark: **"Fail the open (Recommended)"**. *Follows:* converting a legacy scene, an unknown source id fails the open with its id, as F97 and F143 do.
+
+**F155, who runs raw terms, per-term overrides and root weights (2026-10-08; G4b1's fork J).** Question: G4a's `derive` refuses them "until G4b", F141 gave them to neither G4b lane, no current choice makes one, and G2c (F149) makes their input channels resolvable. Options: a lane of their own after G2c; G4b2; G4b1. Mark: **"Their own lane after G2c (Recommended)"**. *Follows:* G4b1 and G4b2 leave `derive`'s refusal in place; a raw-terms lane follows G2c, its order beside G4b2 to be set when G2c reports.
+
+**F156, the spec's seed at run time (2026-10-08; G4b1's fork K).** Question: Kinds and Anneal are seeded from `LAW_SEED`, so a spec with another seed would run on `LAW_SEED` silently. Options: pass the spec's seed through `LawSources`; refuse a non-default seed until G8. Mark: **"Pass it through (Recommended)"**. *Follows:* the seed reaches Kinds and Anneal through `LawSources`, defaulting to `LAW_SEED`, so no default run moves.
+
 **F40, G7 (2026-10-03).** Question: approve G7, arrangement roles (§2, proposed at `784ce5b5`), which carries out F18 to F30, and place it. Options: approve, with G7 before G3; approve, after G2; amend first. Mark: **"Approve; G7 before G3"**. *Follows:* G7 starts now beside G2's open work, and G3 follows it, since G3's schedules use captures with a role (F27).
 
 **F41, the README's text (2026-10-03).** Question: the design-vocabulary section F13 placed in the README, its projection half in Mark's words and its dynamics half drafted from the rulings, placed after Status. Options: use the text as shown; the projection half only; edit the wording. Mark: **"Use this text"**. *Follows:* the section is committed as shown.
