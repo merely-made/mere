@@ -1116,3 +1116,34 @@ unlock follow-through, and non-Windows startup unlock backends, from the
   nothing beyond the baselines with mDNS off, and 4 sizes with it on
   (ruling 60).
 - **Rulings 59 and 60.** Next: the join baseline.
+
+**2026-10-07, ruling 49 landed in Knot and Mere.**
+- **The join baseline (ruling 59)** binds the overlay host under the default
+  policy and calls Knot's `store.join` with the seed held by the test. It
+  accounts for the six mid-size blocks exactly.
+- **The last block was the run's own future.** In every run, the one large
+  block matched that run's future size exactly: iroh alone 7720, the join
+  6904, the sync host 7568. That copy sits in the run's outer frame, whose
+  size changes with nesting, so the test compares outer frames by presence,
+  not by size. The overlay host alone (future 2264) has no copy in its
+  outer frame, so the copy comes from the join, awaited inline, below Knot.
+- **Verdicts.** Against `ae3352e` the test fails: `author` leaves 4256, and
+  the sync host leaves 7632 beside its 7616 outer frame. Against the fix it
+  passes. *Reading, not ruled:* this outer-frame rule implements ruling 59.
+  A Knot copy held only in its own outer frame could not be told apart from
+  the join's copy; the strict paths still catch a seed taken by value.
+- **Knot `eabd443`** is the fix rebased onto Knot `14cd06e`, which repins
+  every Mere row to `f1d169c7`; pushed with Mark's OK.
+  - Gates: the workspace check, `knot-editor`, `knot-desktop` and
+    `knot-document` tests (33 suites, 565 passed).
+  - One `knot-editor` lib test hung once in an earlier full run (6 hours,
+    14 s of CPU). It passed alone and in a full rerun (149 in 17 s), so it
+    is recorded as a one-off.
+- **Mere repins Knot once (ruling 58)**: `knot-editor`, `knot-document`
+  and djinn's `knot-site` are at `eabd4434`.
+  - Gates: `cargo_mode.py verify`, and djinn's tests (20 suites, 116
+    passed, `knot_residue` included, with no patch).
+  - A first run hit a rustc out-of-memory on the shared machine; the
+    rerun used `-j 4`.
+- **Next:** ruling 60's default-policy run in mere-transport's
+  `seed_residue.rs`, then ruling 42 (ruling 56's order).
