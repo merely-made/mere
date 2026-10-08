@@ -18,11 +18,11 @@ use super::{ProbeFailure, UxProbe};
 /// Asserts that every [`UxEvent::ActionDispatched`] for a destructive
 /// `ActionId` is preceded (as the most recent ConfirmDialog event) by
 /// a `ConfirmDialog` Confirmed dismissal. Covers the §4.10 guarantee
-/// that destructive actions (Tombstone, Remove edge, ...) always carry
+/// that destructive actions (Delete node, Retract relation, ...) always carry
 /// a confirmation step.
 ///
 /// The probe is parameterised by the list of `ActionId`s the caller
-/// considers destructive. Today the iced host marks `NodeMarkTombstone`
+/// considers destructive. Today the iced host marks `NodeDelete`
 /// destructive in `items_for_target`; future destructive actions are
 /// added by extending this list (and the corresponding
 /// `ContextMenuEntry::destructive()` flag).
@@ -47,7 +47,7 @@ impl DestructiveActionGateProbe {
     /// Default wiring with the iced host's currently-known destructive
     /// actions. Extend this list as new destructive actions land.
     pub fn iced_default() -> Self {
-        Self::new(vec![ActionId::NodeMarkTombstone])
+        Self::new(vec![ActionId::NodeDelete])
     }
 }
 

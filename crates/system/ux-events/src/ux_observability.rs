@@ -287,7 +287,7 @@ mod tests {
             reason: DismissReason::Cancelled,
         });
         observers.emit(UxEvent::ActionDispatched {
-            action_id: ActionId::GraphTogglePhysics,
+            action_id: ActionId::PhysicsToggle,
             target: None,
         });
 

@@ -325,7 +325,7 @@ mod tests {
     #[test]
     fn action_dispatched_carries_action_key_and_targeted_flag() {
         let untargeted = event_channel(&UxEvent::ActionDispatched {
-            action_id: ActionId::GraphTogglePhysics,
+            action_id: ActionId::PhysicsToggle,
             target: None,
         });
         assert_eq!(untargeted.channel_id, "ux.action.dispatched");
@@ -334,7 +334,7 @@ mod tests {
                 .note
                 .as_deref()
                 .unwrap()
-                .contains("action=graph:toggle_physics")
+                .contains("action=physics:toggle")
         );
         assert!(
             untargeted

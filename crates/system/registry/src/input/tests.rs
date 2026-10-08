@@ -8,19 +8,8 @@ use super::action_id;
 use super::binding_id;
 use super::defaults::*;
 use super::*;
+use command_menu::catalogue::{self, ids};
 use std::collections::HashMap;
-
-fn is_namespaced_action_id(action_id: &str) -> bool {
-    let mut segments = action_id.split(':');
-    let Some(namespace) = segments.next() else {
-        return false;
-    };
-    let Some(name) = segments.next() else {
-        return false;
-    };
-
-    !namespace.is_empty() && !name.is_empty() && segments.next().is_none()
-}
 
 #[test]
 fn input_registry_resolves_toolbar_submit_binding() {
@@ -50,24 +39,15 @@ fn input_registry_resolves_toolbar_nav_bindings() {
 
     let back = registry.resolve(&toolbar_nav_back_binding(), InputContext::DetailView);
     assert!(back.matched);
-    assert_eq!(
-        back.action_id.as_deref(),
-        Some(action_id::toolbar::NAV_BACK)
-    );
+    assert_eq!(back.action_id.as_deref(), Some(ids::NAV_BACK));
 
     let forward = registry.resolve(&toolbar_nav_forward_binding(), InputContext::DetailView);
     assert!(forward.matched);
-    assert_eq!(
-        forward.action_id.as_deref(),
-        Some(action_id::toolbar::NAV_FORWARD)
-    );
+    assert_eq!(forward.action_id.as_deref(), Some(ids::NAV_FORWARD));
 
     let reload = registry.resolve(&toolbar_nav_reload_binding(), InputContext::DetailView);
     assert!(reload.matched);
-    assert_eq!(
-        reload.action_id.as_deref(),
-        Some(action_id::toolbar::NAV_RELOAD)
-    );
+    assert_eq!(reload.action_id.as_deref(), Some(ids::NAV_RELOAD));
 }
 
 #[test]
@@ -117,10 +97,7 @@ fn input_registry_legacy_binding_ids_resolve_through_typed_map() {
     let resolution = registry.resolve_binding_id(binding_id::toolbar::NAV_RELOAD);
     assert!(resolution.matched);
     assert_eq!(resolution.context, InputContext::DetailView);
-    assert_eq!(
-        resolution.action_id.as_deref(),
-        Some(action_id::toolbar::NAV_RELOAD)
-    );
+    assert_eq!(resolution.action_id.as_deref(), Some(ids::NAV_RELOAD));
 }
 
 #[test]
@@ -160,7 +137,7 @@ fn input_registry_remap_binding_replaces_existing_binding() {
             .resolve(&new, InputContext::DetailView)
             .action_id
             .as_deref(),
-        Some(action_id::toolbar::NAV_BACK)
+        Some(ids::NAV_BACK)
     );
 }
 
@@ -179,7 +156,7 @@ fn input_registry_remap_binding_detects_target_conflicts() {
             .resolve(&toolbar_nav_back_binding(), InputContext::DetailView)
             .action_id
             .as_deref(),
-        Some(action_id::toolbar::NAV_BACK)
+        Some(ids::NAV_BACK)
     );
 }
 
@@ -200,7 +177,7 @@ fn input_registry_with_remaps_replays_on_top_of_defaults() {
             .resolve(&remaps[0].new, InputContext::DetailView)
             .action_id
             .as_deref(),
-        Some(action_id::toolbar::NAV_BACK)
+        Some(ids::NAV_BACK)
     );
 }
 
@@ -220,10 +197,10 @@ fn input_registry_describes_bindable_actions_with_current_and_default_bindings()
     let descriptors = registry.describe_bindable_actions();
     let command_palette = descriptors
         .iter()
-        .find(|entry| entry.action_id == action_id::graph::COMMAND_PALETTE_OPEN)
+        .find(|entry| entry.action_id == ids::PALETTE_OPEN)
         .expect("command palette binding descriptor should exist");
 
-    assert_eq!(command_palette.display_name, "Open Command Palette");
+    assert_eq!(command_palette.display_name, "Open command palette");
     assert_eq!(command_palette.context, InputContext::GraphView);
     assert_eq!(
         command_palette
@@ -249,16 +226,12 @@ fn input_registry_uses_ctrl_modified_default_zoom_bindings() {
     let descriptors = registry.describe_bindable_actions();
     let zoom_in = descriptors
         .iter()
-        .find(|entry| entry.action_id == action_id::graph::ZOOM_IN)
+        .find(|entry| entry.action_id == ids::VIEW_ZOOM_IN)
         .expect("zoom-in binding descriptor should exist");
     let zoom_out = descriptors
         .iter()
-        .find(|entry| entry.action_id == action_id::graph::ZOOM_OUT)
+        .find(|entry| entry.action_id == ids::VIEW_ZOOM_OUT)
         .expect("zoom-out binding descriptor should exist");
-    let zoom_reset = descriptors
-        .iter()
-        .find(|entry| entry.action_id == action_id::graph::ZOOM_RESET)
-        .expect("zoom-reset binding descriptor should exist");
 
     assert_eq!(
         zoom_in
@@ -276,81 +249,24 @@ fn input_registry_uses_ctrl_modified_default_zoom_bindings() {
             .as_deref(),
         Some("Ctrl+-")
     );
-    assert_eq!(
-        zoom_reset
-            .default_binding
-            .as_ref()
-            .map(InputBinding::display_label)
-            .as_deref(),
-        Some("Ctrl+0")
-    );
 }
 
 #[test]
-fn input_registry_action_ids_follow_namespace_name_format() {
-    for action_id in [
-        action_id::toolbar::SUBMIT,
-        action_id::toolbar::NAV_BACK,
-        action_id::toolbar::NAV_FORWARD,
-        action_id::toolbar::NAV_RELOAD,
-        action_id::graph::VIEW_CONFIRM,
-        action_id::graph::CYCLE_FOCUS_REGION,
-        action_id::graph::COMMAND_PALETTE_OPEN,
-        action_id::graph::RADIAL_MENU_OPEN,
-        action_id::graph::NODE_EDIT_TAGS,
-        action_id::graph::TOGGLE_PHYSICS,
-        action_id::graph::REHEAT_PHYSICS,
-        action_id::graph::ZOOM_IN,
-        action_id::graph::ZOOM_OUT,
-        action_id::graph::ZOOM_RESET,
-        action_id::graph::TOGGLE_POSITION_FIT_LOCK,
-        action_id::graph::TOGGLE_ZOOM_FIT_LOCK,
-        action_id::graph::NODE_NEW,
-        action_id::graph::EDGE_CONNECT_PAIR,
-        action_id::graph::EDGE_CONNECT_BOTH,
-        action_id::graph::EDGE_REMOVE_USER,
-        action_id::graph::NODE_PIN_SELECTED,
-        action_id::graph::NODE_UNPIN_SELECTED,
-        action_id::graph::NODE_PIN_TOGGLE,
-        action_id::graph::NODE_DELETE,
-        action_id::graph::CLEAR,
-        action_id::graph::SELECT_ALL,
-        action_id::graph::SELECT_VISIBLE,
-        action_id::graph::SELECT_VISIBLE,
-        action_id::workbench::HELP_OPEN,
-        action_id::workbench::TOGGLE_WORKBENCH_OVERLAY,
-        action_id::workbench::OPEN_HISTORY_MANAGER,
-        action_id::workbench::OPEN_PHYSICS_SETTINGS,
-        action_id::workbench::OPEN_CAMERA_CONTROLS,
-        action_id::workbench::TOGGLE_SEMANTIC_TAB_GROUP,
-        action_id::workbench::UNDO,
-        action_id::workbench::REDO,
-        action_id::radial_menu::CATEGORY_PREVIOUS,
-        action_id::radial_menu::CATEGORY_NEXT,
-        action_id::radial_menu::SELECTION_PREVIOUS,
-        action_id::radial_menu::SELECTION_NEXT,
-        action_id::radial_menu::CONFIRM,
-        action_id::radial_menu::CANCEL,
-    ] {
-        assert!(is_namespaced_action_id(action_id), "{action_id}");
+fn every_default_binding_names_a_catalogue_command() {
+    let specs = default_binding_specs();
+    assert_eq!(
+        specs.len(),
+        21,
+        "SE50: the bindings that land on shared ids"
+    );
+    for spec in &specs {
+        assert!(
+            catalogue::label(spec.action_id).is_some(),
+            "{} is not a shared command",
+            spec.action_id
+        );
     }
-}
-
-#[test]
-fn input_registry_exposes_ctrl_shift_a_for_select_visible() {
-    let registry = InputRegistry::default();
-    let descriptors = registry.describe_bindable_actions();
-    let select_visible = descriptors
-        .iter()
-        .find(|entry| entry.action_id == action_id::graph::SELECT_VISIBLE)
-        .expect("select-visible binding descriptor should exist");
-
-    assert_eq!(
-        select_visible
-            .default_binding
-            .as_ref()
-            .map(InputBinding::display_label)
-            .as_deref(),
-        Some("Ctrl+Shift+A")
-    );
+    for input_action in [action_id::toolbar::SUBMIT, action_id::graph::VIEW_CONFIRM] {
+        assert!(catalogue::is_well_formed(input_action), "{input_action}");
+    }
 }

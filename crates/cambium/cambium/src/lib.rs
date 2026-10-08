@@ -98,7 +98,7 @@ pub use atlas::{
     GraphCanvasAtlasProjectedShape, GraphCanvasAtlasRoute, GraphCanvasAtlasView,
 };
 // The command set lives in its own crate so hosts without Cambium share it (SE45 to SE48).
-pub use ::command_menu::{Command, CommandChoices, CommandSet, MenuSession};
+pub use ::command_menu::{Command, CommandChoices, CommandSet, MenuSession, catalogue};
 pub use command_surface::{
     CommandEvent, CommandItem, CommandState, CommandSurfaceKind, command_menu, command_palette,
     command_picker, command_surface,

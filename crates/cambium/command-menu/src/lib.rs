@@ -10,9 +10,11 @@
 //! what a surface shows, in one order every surface shares: the commands for
 //! where it was opened lead (Turnstone's rule, harvested at SE32), then the
 //! kept ones, then the recent ones. A query searches every command instead.
-//! [`MenuSession`] is a palette's state while it is open. Storage and drawing
+//! [`MenuSession`] is a palette's state while it is open, and [`catalogue`]
+//! holds the ids hosts share. Storage and drawing
 //! are the host's; Cambium draws a command as a `CommandItem`.
 
+pub mod catalogue;
 mod session;
 
 use serde::{Deserialize, Serialize};
