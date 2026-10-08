@@ -1358,7 +1358,7 @@ fn number(occurrence: &ProjectionOccurrence, field: &str) -> Option<f64> {
         .and_then(ProjectionValue::number)
 }
 
-fn stable_generation(dataset: &ProjectionDataset) -> u64 {
+pub(crate) fn stable_generation(dataset: &ProjectionDataset) -> u64 {
     let mut value = 0xcbf2_9ce4_8422_2325u64;
     for byte in dataset.revision.bytes().chain([0]) {
         value ^= u64::from(byte);
