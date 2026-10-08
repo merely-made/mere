@@ -466,6 +466,13 @@ impl Resident {
     /// before spawning when the start would cross a wall.
     pub fn start(&mut self, extra: &[&str]) -> Result<Instant, HarnessError> {
         assert!(self.live.is_none(), "{} is already running", self.name);
+        // A test resident reads the real session's input and lock, so its
+        // lock triggers stay off unless the test wrote its own lock.toml.
+        let lock_settings = self.app_dir().join("lock.toml");
+        if !lock_settings.exists() {
+            std::fs::create_dir_all(self.app_dir())?;
+            std::fs::write(&lock_settings, "session_lock = false\nsuspend = false\nidle = false\n")?;
+        }
         self.starts += 1;
         let args = self.resident_args(extra);
         let mut command = match self.guarded(SpawnKind::Resident, &self.shared.binary, &args) {

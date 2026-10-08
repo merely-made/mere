@@ -478,3 +478,51 @@ fn opening_an_existing_auto_os_root_never_mints_one() {
         );
     }
 }
+
+/// The persisted lock (rulings 5, 76, 80): under the marker the AutoOs open
+/// refuses; the vault opens locked and only a user act opens it; clearing the
+/// marker restores the unattended open.
+#[test]
+fn a_persisted_lock_holds_the_auto_os_root_until_a_user_act() {
+    let dir = tempdir().unwrap();
+    let Some(storage) = SealedProfileStorage::open_auto_os(dir.path()).unwrap() else {
+        // No AutoOs backend on this platform.
+        return;
+    };
+    storage.save_profile(&profile("work", 0x55)).unwrap();
+    storage.enroll_passphrase(PASSPHRASE).unwrap();
+    drop(storage);
+    crate::persist_lock(dir.path()).unwrap();
+
+    assert!(matches!(
+        SealedProfileStorage::open_auto_os(dir.path()),
+        Err(IdentityError::Locked)
+    ));
+    assert!(matches!(
+        SealedProfileStorage::open_existing_auto_os(dir.path()),
+        Err(IdentityError::Locked)
+    ));
+
+    let locked = SealedProfileStorage::open_locked(dir.path());
+    assert!(locked.is_locked());
+    assert!(is_locked_error(locked.load_profile(&ProfileId("work".into()))));
+    assert!(locked.unlock(UnlockMethod::Passphrase(b"wrong")).is_err());
+    assert!(locked.is_locked());
+    locked.unlock(UnlockMethod::Passphrase(PASSPHRASE)).unwrap();
+    let back = locked.load_profile(&ProfileId("work".into())).unwrap();
+    assert_eq!(back.master.to_seed(), [0x55; 32]);
+
+    // Presence passes the marker too.
+    let by_presence = SealedProfileStorage::open_locked(dir.path());
+    by_presence
+        .unlock(UnlockMethod::OsPresence(OsPresence::mint()))
+        .unwrap();
+    assert!(!by_presence.is_locked());
+
+    crate::clear_persisted_lock(dir.path()).unwrap();
+    assert!(
+        SealedProfileStorage::open_auto_os(dir.path())
+            .unwrap()
+            .is_some()
+    );
+}

@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-08)**: rulings 1 to 70 in §3; the threat statement is
+**Status (2026-10-08)**: rulings 1 to 81 in §3; the threat statement is
 still open. L1 landed (`2556a20c`). L2's checkpoints A (`7c588deb`) and B
 (`ec1768ab`) landed. Still to come in L2: the Secret Service on the
 ThinkPad, ruling 42 (Linux starts locked), ruling 44 (Distillery's
@@ -823,6 +823,121 @@ during `save` (3 of 3 runs; clean on Windows at the same commit).* Options:
 trace it now, with ruling 42's Linux proof waiting; ruling 42's proof
 first; record it and go on to L3. Mark: **"Trace it now (Recommended)"**.
 
+Rulings 71 and 72 were asked on 2026-10-08 from ruling 70's trace (§6).
+
+**Ruling 71** *(the slot table).* *On lock the vault frees its profile's
+slot `HashMap` uncleared. Values moved into it carry stale stack bytes in
+their padding, the master seed among them: Linux, 3 of 4 runs, depending
+on layout.* Options:
+- the slots move to `Vec` storage that `zeroize` wipes whole, padding and
+  spare capacity included, on drop and on growth;
+- clear only at lock;
+- ledger it.
+
+Mark: **"Zeroizing Vec storage (Recommended)"**.
+
+**Ruling 72** *(the test fixture).* *The original Linux hit was
+`no_residue`'s own canary profile, built inside the measured window. Its
+`HashMap` caught half the root key from the test's stack copy.* Options:
+build the fixtures unarmed and drop them after disarming, as the
+passphrase scenario does; keep them armed. Mark: **"Build fixtures unarmed
+(Recommended)"**.
+
+Rulings 73 to 78 were asked on 2026-10-08 from L3's assessment (§6).
+
+**Ruling 73** *(the Linux idle source).* *On the ThinkPad, GNOME's
+`org.gnome.Mutter.IdleMonitor` read the idle time exactly (237 s). logind's
+`IdleHint` is never set there, because GNOME's `idle-delay` is 0, so a
+logind-only reading would say "active" forever.* Options:
+- Mutter's monitor, else logind's `IdleSinceHint`, else unknown;
+- logind only;
+- Mutter only.
+
+Mark: **"Mutter, then logind (Recommended)"**.
+
+**Ruling 74** *(what "idle fails closed" does, ruling 3).* Options:
+- unknown counts as idle, so the vault locks once a full window passes
+  with no reading of activity;
+- lock at the first unreadable sample;
+- idle locking reported unavailable on a device with no source.
+
+Mark: **"Unknown counts as idle (Recommended)"**.
+
+**Ruling 75** *(suspend).* Options: lock before sleep (Windows' suspend
+notification; on Linux a logind delay inhibitor); lock on resume. Mark:
+**"Before sleep (Recommended)"**.
+
+**Ruling 76** *(amends ruling 38: a resident restarted under the persisted
+lock).* *Before its first unlock a resident admits no door session (the
+door keys come from the vault), so ruling 38's Locked card cannot be
+served.* Options:
+- it waits before the vault at its native prompt (Hello, then the
+  passphrase box), as ruling 66 does, serving nothing until unlocked;
+- the door keys sealed under DPAPI apart from the root;
+- it exits and the launcher stops restarting it.
+
+Mark: **"Wait at its prompt (Recommended)"**.
+
+**Ruling 77** *(where the per-device lock settings live).* Options:
+- a person-edited `lock.toml` in djinn's app directory, per device,
+  read at start and watched, with an absent or malformed file meaning the
+  defaults (all on, 15 minutes), never "no locking";
+- a section of each profile's owner settings JSON;
+- the TOML file plus a castellan card intent.
+
+Mark: **"Device lock.toml (Recommended)"**.
+
+**Ruling 78** *(the real receipts).* Options: build every trigger with
+injected signals and clock and prove it in tests, then one attended
+session for `Win+L`, `loginctl lock-session` and suspend on both machines;
+run the ThinkPad's lock-session receipt unattended while building. Mark:
+**"Build first, one attended run (Recommended)"**.
+
+*2026-10-08 annotation to ruling 78:* Mark: **"Do the lock and sleep after
+this crop of runs. Don't interrupt anything, please."** The attended
+receipts wait for his word that the other sessions' runs are done.
+
+**Ruling 79** *(where the persisted lock's marker lives).* *The loaders see
+only a root file's path. The vault's root, pandect's wallet roots (Knot's
+and Retinue's seeds) and signalman's station roots all pass through
+them.* Options:
+- one marker per user, beside the default vault, which every identity
+  AutoOs root obeys;
+- a marker beside each root;
+- one per vault directory, with pandect's loaders told the vault
+  directory.
+
+Mark: **"One per user (Recommended)"**.
+
+**Ruling 80** *(amends ruling 79; asked the same day).* Mark: **"Would one
+per vault be such a big refactor?"**
+- **Measured:**
+  - for the vault, nothing: its root sits in the vault directory, so a
+    marker beside it is free;
+  - pandect's wallets have their own roots under an app's data root and
+    know no vault. Ten public wallet functions take only `data_root`, and
+    `load_identity_seed` has four callers in mere besides Knot's.
+- **Options:**
+  - per vault by a middle path: the marker beside the vault's root, and
+    each wallet checking the marker of the vault its own settings name
+    (the default vault when none is named), with no signature changes;
+  - per user, as ruled;
+  - per vault, threading the directory through pandect's signatures
+    across mere, Knot and Retinue.
+
+Mark: **"Per vault, middle path (Recommended)"**. Follows: signalman's
+station roots are no vault's and pass untouched.
+
+**Ruling 81** *(amends ruling 80's pandect half).* Mark: **"So wait, is
+pandect gonna need vault awareness?"**, then **"Or d8 will handle it?"**
+Options:
+- leave pandect vault-unaware and record the wallets' unattended reopen
+  after a restart as a gap that D8 (the wallet's secrets into castellan,
+  in DR-B) closes;
+- the small check now, removed again when D8 lands.
+
+Mark: **"Leave it to D8 (Recommended)"**.
+
 Still open: a threat statement naming hibernation and the pagefile.
 
 ## 4. Phases
@@ -1451,3 +1566,179 @@ unlock follow-through, and non-Windows startup unlock backends, from the
   holds on Windows only. Not yet traced.
 - **Still open:** djinn's wiring and the hand-over from gnome-keyring
   (ruling 69); ruling 42's Linux runtime proof; the Linux residue above.
+
+**2026-10-08, ruling 70's trace.**
+- **Method:** on the ThinkPad, a temporary trap (`int3`) in the tracker's
+  allocator fired at the 564-byte allocation during `save`, and `gdb`
+  printed its stack. A temporary hex dump showed the block's contents.
+  Both were reverted.
+- **The block** was the `HashMap` table of `no_residue`'s own
+  `canary_profile()`, allocated inside the measured window. Beside heap
+  and stack pointers it held 16 bytes of the root key. The key was the
+  test's own stack local, passed by value to `open_with_key` and picked up
+  through padding when slot values were moved into the table.
+- **Building the fixture unarmed** clears "sealed vault locked" (7 of 7
+  runs). It then shows "passphrase vault locked" failing in 3 of 4 runs:
+  the master seed in a 564-byte block allocated at open and freed at lock.
+  That is the vault's own slot table, by the same mechanism, in personae's
+  code. Rulings 71 and 72 settle both.
+
+**2026-10-08, rulings 71 and 72 built** (`8eab9fcf`).
+- **`Profile::slots` is a `SlotMap`.** It is a small vector whose whole
+  buffer, padding and spare capacity included, is zeroed (with `zeroize`,
+  volatile) on drop, after a removal, and before an outgrown buffer is
+  freed. It keeps the `HashMap` methods callers use, and personae, castellan,
+  pandect, graphshell and djinn compile unchanged. The three loaders build it
+  with the slot count up front, so loading never grows it.
+- **`no_residue`'s `sealed_lock`** builds its canary profile unarmed and
+  drops it after disarming.
+- **Verified on Linux (ThinkPad):**
+  - `no_residue` clean 10 of 10 (with only the fixture fix: 1 of 4);
+  - personae with all features (207, three full runs) and castellan with all
+    features.
+- **Verified on Windows:** personae and castellan with all features, `no_residue`
+  clean (10 suites, 345 passed).
+- **So L1's no-residue condition now holds on Linux as well as Windows.**
+- **Seen in passing, neither from this change:**
+  - personae's `authoritative_opening_is_exclusive_until_every_clone_drops`
+    failed once in four full Linux runs ("authority is already held").
+    It passed 5 of 5 alone and the next three full runs. It is probably a
+    child process from the cross-process sibling test briefly holding the
+    lock across fork; not traced.
+  - djinn's `embedded_reservoir_two_process`, added today (`df0e0804`),
+    fails 3 tests on Windows with "All pipe instances are busy" (os error
+    231). It fails the same way at `origin/main` without this change, as a
+    control. It belongs to that lane.
+- **Next:** ruling 42's Linux runtime proof on the ThinkPad, then L3.
+
+**2026-10-08, ruling 42 proven on Linux** (ThinkPad, Fedora 44; djinn
+built plain at `fc3da34c`).
+- **The plain build** answers "unknown argument: --passphrase-fd", as on
+  Windows.
+- **Terminal path.** Each run used isolated roots and endpoints, as
+  djinn-testkit isolates them. A small Python pty driver typed each answer
+  only when its prompt appeared, since the ThinkPad has no `script(1)`:
+  - **no vault:** `started, waiting-for-unlock, vault-created, listening,
+    ready`. The terminal asked "No identity vault yet. Choose a passphrase
+    for a new one." then "Type the new vault passphrase again.", and
+    `vault.json` was created;
+  - **a wrong passphrase, then the right one:** `started,
+    waiting-for-unlock, unlock-refused, unlocked-at-start, listening,
+    ready`, with the reason shown before asking again. The status route
+    reported `startup_unlock` and `protection` as `passphrase`;
+  - **environment control** (`PERSONAE_PASSPHRASE` set, nothing typed): it
+    stays at `started, waiting-for-unlock`, the terminal waiting, never
+    ready.
+  - Each resident stopped through its own door.
+- **Native path** (Mark at the ThinkPad). The resident ran with no
+  terminal, only the desktop's display (`DISPLAY=:0` and the Xwayland
+  authority). GNOME's passphrase box came up. Eleven refused attempts were
+  each answered by the box again, then the right passphrase gave
+  `unlocked-at-start, listening, ready`, and later `stopping, stopped`. The
+  box's own Cancel was not exercised natively; the scripted unit test
+  covers it.
+- **Testing note:** with `XDG_RUNTIME_DIR` redirected to a scratch root,
+  GTK's box started the document portal's FUSE mount and `gvfsd-fuse` in
+  it. Both outlive the resident and must be unmounted and stopped
+  afterwards; they were.
+- **L2's last condition** (the Secret Service on the ThinkPad) and this
+  proof, which ruling 56 pairs with it, are done. Next: L3, the triggers.
+
+**2026-10-08, L3 assessed** (at `2dff736e`).
+- **What exists:**
+  - the explicit intent (castellan's lock intent and `ssh-add -x`);
+  - djinn's Windows idle probe (`conditions.rs`, `GetLastInputInfo`; Linux
+    reads nothing);
+  - `StartupUnlockMode::Locked` as an unused variant.
+- **What does not exist:** no session-lock or suspend listener, no idle
+  trigger, no persisted lock, and no lock settings.
+- **On the ThinkPad:**
+  - logind offers the session's `Lock` signal and `LockedHint`, plus
+    `PrepareForSleep` and `Inhibit` (a delay lock lets a process lock
+    before sleep);
+  - GNOME's idle monitor reads idle exactly; logind's `IdleHint` never
+    moves (ruling 73).
+- **On Windows:** `Win+L` arrives as a WTS session notification (it needs a
+  message-only window), and suspend through
+  `PowerRegisterSuspendResumeNotification` (no window).
+- **The build, in checkpoints:**
+  - **A, the persisted lock (rulings 5, 32, 76):**
+    - a marker beside the vault written at lock (no secret, advisory);
+    - `startup_unlock`'s loaders refuse while it is present;
+    - a loader that takes `OsPresence` passes;
+    - an unlock clears it;
+    - a sealed vault opens locked (ruling 38's constructor);
+    - djinn's DPAPI start waits at its prompt under the marker.
+  - **B, the triggers' core:**
+    - `lock.toml` (ruling 77);
+    - the idle rule with an injected clock (rulings 20, 74);
+    - a dispatcher that locks on session lock and before sleep (ruling 75),
+      from injected signals.
+  - **C, Windows sources:** idle, `Win+L` and suspend.
+  - **D, Linux sources:** Mutter, then logind, for idle; logind's `Lock`;
+    `PrepareForSleep` under a delay inhibitor.
+  - **E, the attended run (ruling 78).**
+- **L3 done when** (§4, plus):
+  - [x] the idle rule fires after the window, resets on activity, and
+        counts unknown as idle (unit tests with an injected clock);
+  - [x] settings absent or malformed mean the defaults; each trigger can
+        be turned off;
+  - [x] the dispatcher locks on an injected session lock and before an
+        injected suspend acknowledges;
+  - [x] a resident locked, then killed, comes back waiting at its prompt
+        and opens only on an unlock (a receipt), while one never locked
+        auto-unlocks as before;
+  - [ ] the attended receipts: Windows `Win+L` and suspend, Fedora
+        `loginctl lock-session` and suspend.
+
+**2026-10-08, L3 checkpoints A to D built** (`ed1de0f7`, branch `l3`).
+- **A, the persisted lock:**
+  - personae: `persist_lock`, `clear_persisted_lock` and `lock_persisted`
+    (the marker `locked` beside the vault's root);
+  - the loaders refuse under it, and a loader that takes `OsPresence`
+    passes;
+  - `SealedProfileStorage::open_locked`;
+  - castellan: `ResidentLock` writes the marker on every lock, `ssh-add -x`
+    included, and clears it on unlock, but only for a host made with
+    `with_persisted_lock`, which only djinn's resident is;
+  - djinn: a DPAPI start under the marker waits at its prompt (Hello, then
+    the passphrase) and clears it.
+  - *Reading, not ruled:* a handed-over passphrase (`--passphrase-fd`) now
+    selects the passphrase vault only where no OS-rooted vault exists yet;
+    beside one, it answers the persisted lock (refines ruling 66's
+    reading).
+- **B, the policy:** `lock_triggers`: `LockSettings` from `lock.toml`, the
+  `IdleRule`, `Triggers`, and a `TriggerHost` that locks synchronously and
+  does nothing while locked.
+- **C, Windows:**
+  - `Win+L` through WTS session notifications to a message-only window;
+  - suspend through `PowerRegisterSuspendResumeNotification`, whose
+    callback locks before it returns;
+  - idle from `GetLastInputInfo`.
+- **D, Linux:**
+  - logind's session `Lock`, found through `User.Display`;
+  - `PrepareForSleep` under a delay inhibitor, released after the lock and
+    taken again on wake;
+  - idle from Mutter's monitor, else logind's `IdleSinceHint` (0 means
+    unknown).
+- **Test residents** start with every trigger off unless the test writes
+  its own `lock.toml`, because they read the real session's input and
+  lock.
+- **Verified on Windows:**
+  - personae (211), castellan (122 and its suites), djinn's unit tests
+    (the new 7 included);
+  - `locked_restart`, which passes; its control (no persisted lock) fails
+    at "the lock persists beside the vault";
+  - `lock_agent` and `harness`.
+  - `harness`'s graceful-stop test was refused a stop once in a long serial
+    run, then passed 2 of 2 alone; it is intermittent.
+  - The reservoir two-process failures are the ones already on main.
+- **Verified on Linux (ThinkPad):**
+  - djinn compiles with no warnings of its own; the triggers' 7 and
+    personae's persisted-lock tests pass;
+  - a scratch resident with its triggers on read `lock.toml`, found the
+    graphical session, and held "djinn · sleep · Lock the identity vault
+    before sleep · delay" in `systemd-inhibit --list`, with no warnings.
+- **Still to do: E**, the attended receipts (`Win+L` and suspend on
+  Windows; `loginctl lock-session` and suspend on Fedora). They wait for
+  Mark's word (ruling 78's annotation).
