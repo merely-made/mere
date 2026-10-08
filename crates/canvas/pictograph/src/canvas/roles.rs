@@ -20,6 +20,8 @@
 
 use super::actions::{ArrangementAction, PermittedActions};
 use super::at_rest::AtRest;
+use super::channels::Channel;
+use super::physics_catalog::{LawInputs, PhysicsKindSource};
 use super::reader::KeyMove;
 use super::*;
 use seiche::{Role, RoleTable};
@@ -42,6 +44,9 @@ pub struct StopReturn {
 #[derive(Clone, Debug)]
 pub(crate) struct ArrangementRoles {
     pub(crate) table: RoleTable,
+    /// The `groups.*` channel a group override is read from: the site by
+    /// default, any groups channel since G2 (F49, "Site, then G2 channels").
+    group_source: PhysicsKindSource,
     /// The anchored role's return stiffness ([`seiche::AnchorSpring`]).
     pub(crate) stiffness: f32,
     /// Bodies the table holds kinematic, so a role change can free them.
@@ -65,6 +70,7 @@ impl Default for ArrangementRoles {
     fn default() -> Self {
         Self {
             table: RoleTable::default(),
+            group_source: PhysicsKindSource::Site,
             stiffness: seiche::DEFAULT_ANCHOR_STIFFNESS,
             pinned: HashSet::new(),
             resume_after_pick: false,
@@ -100,8 +106,9 @@ impl Canvas {
         self.settle_physics(SETTLE_TICKS);
     }
 
-    /// A group's role (`None` clears it). Groups are sites: the URL host,
-    /// [`Self::role_group_of`].
+    /// A group's role (`None` clears it), by the group's label under the
+    /// role group source ([`Self::role_group_of`]): a site's URL host, or
+    /// `groups.<source>#<index>` for another groups channel.
     pub fn set_group_role(&mut self, group: &str, role: Option<Role>) {
         match role {
             Some(role) => self.roles.table.groups.insert(group.to_string(), role),
@@ -130,11 +137,98 @@ impl Canvas {
         true
     }
 
-    /// The group a node's role override is read from: its site.
+    /// The `groups.*` channel group overrides are read from (F49).
+    pub fn role_group_source(&self) -> PhysicsKindSource {
+        self.roles.group_source
+    }
+
+    /// Read group overrides from `source`'s groups (F49): `groups.site` by
+    /// default, or any groups channel, `groups.cluster` and `groups.meaning`
+    /// among them, as Group pull's source is chosen. Overrides keep their
+    /// labels; a label the new source does not name matches no node.
+    pub fn set_role_group_source(&mut self, source: PhysicsKindSource) {
+        if self.roles.group_source != source {
+            self.roles.group_source = source;
+            self.sync_arrangement_roles();
+            self.settle_physics(SETTLE_TICKS);
+        }
+    }
+
+    /// Bring the role group source's partition up to the graph: the
+    /// registry's Louvain partition, or a Meaning run.
+    fn refresh_role_groups(&mut self) {
+        match self.roles.group_source {
+            PhysicsKindSource::Cluster => self.ensure_community_fresh(),
+            PhysicsKindSource::Meaning => {
+                self.refresh_meaning();
+            },
+            _ => {},
+        }
+    }
+
+    /// Every node's group label under a source other than the site, from the
+    /// law inputs (the registry's partition and the Meaning snapshot as they
+    /// stand); `None` under the site, whose label each node reads alone.
+    fn role_group_labels(&self) -> Option<HashMap<NodeKey, String>> {
+        let source = self.roles.group_source;
+        if source == PhysicsKindSource::Site {
+            return None;
+        }
+        let channel = Channel::Groups(source).id();
+        let inputs = LawInputs::new(
+            &self.graph,
+            &self.hidden_edges,
+            self.channels.community_held(),
+            self.channels.sites_fresh(&self.graph),
+        )
+        .with_meaning(self.meaning.snapshot());
+        Some(
+            inputs
+                .groups(source)
+                .into_iter()
+                .map(|(key, group)| (key, format!("{channel}#{group}")))
+                .collect(),
+        )
+    }
+
+    /// `key`'s group label, read from `labels` (the role group source's) or,
+    /// under the site, from the node.
+    fn role_group_in(
+        &self,
+        key: NodeKey,
+        labels: &Option<HashMap<NodeKey, String>>,
+    ) -> Option<String> {
+        match labels {
+            Some(labels) => labels.get(&key).cloned(),
+            None => self
+                .graph
+                .get_node(key)
+                .map(|node| Graph::url_grouping_key(node.url()).to_string()),
+        }
+    }
+
+    /// The group a node's role override is read from, under the role group
+    /// source: its site by default (F49).
     pub fn role_group_of(&self, key: NodeKey) -> Option<String> {
-        self.graph
-            .get_node(key)
-            .map(|node| Graph::url_grouping_key(node.url()).to_string())
+        self.role_group_in(key, &self.role_group_labels())
+    }
+
+    /// The role `key` plays, its group read from `labels`.
+    fn role_in(&self, key: NodeKey, labels: &Option<HashMap<NodeKey, String>>) -> Role {
+        if self.pinned_nodes.contains(&key) {
+            return Role::Pinned;
+        }
+        self.roles
+            .table
+            .role(key, self.role_group_in(key, labels).as_deref())
+    }
+
+    /// Every slot's role, the group labels read once.
+    fn roles_of(&self, keys: impl IntoIterator<Item = NodeKey>) -> HashMap<NodeKey, Role> {
+        let labels = self.role_group_labels();
+        keys.into_iter()
+            .map(|key| (key, self.role_in(key, &labels)))
+            .collect()
     }
 
     /// One member's own role, when it overrides its group's and the recipe's
@@ -146,12 +240,7 @@ impl Canvas {
 
     /// The role `key` plays now: an explicit pin first, then the table.
     pub fn arrangement_role_of(&self, key: NodeKey) -> Role {
-        if self.pinned_nodes.contains(&key) {
-            return Role::Pinned;
-        }
-        self.roles
-            .table
-            .role(key, self.role_group_of(key).as_deref())
+        self.role_in(key, &self.role_group_labels())
     }
 
     /// How firmly an anchored item returns ([`seiche::AnchorSpring`]'s
@@ -180,17 +269,19 @@ impl Canvas {
     /// at their positions, anchored items on springs while playing, seeded
     /// items left alone. With no arrangement nothing is held but explicit pins.
     pub(crate) fn sync_arrangement_roles(&mut self) {
+        self.refresh_role_groups();
         let playing = !self.physics_paused;
         let mut pinned = HashSet::new();
         let mut anchors = Vec::new();
         let dragged = self.drag.map(|d| d.node);
         if let Some(slots) = self.strategy_positions.clone() {
+            let roles = self.roles_of(slots.iter().map(|(key, _)| *key));
             for (key, at) in slots {
                 // Explicit pins and the body under the pointer are input's.
                 if self.pinned_nodes.contains(&key) {
                     continue;
                 }
-                let role = self.arrangement_role_of(key);
+                let role = roles[&key];
                 if dragged == Some(key) {
                     if role == Role::Pinned {
                         pinned.insert(key);
@@ -259,10 +350,11 @@ impl Canvas {
         from: &[(NodeKey, PortablePoint)],
     ) -> Vec<(NodeKey, PortablePoint)> {
         let mut moved = false;
+        let roles = self.roles_of(from.iter().map(|(key, _)| *key));
         let to: Vec<_> = from
             .iter()
             .map(|&(key, at)| {
-                if self.arrangement_role_of(key) == Role::Anchored
+                if roles[&key] == Role::Anchored
                     && let Some(home) = self.arrangement_slot(key)
                 {
                     moved |= home != at;
@@ -360,11 +452,12 @@ impl Canvas {
 
     /// At rest, every anchored item away from its position starts home.
     fn start_home(&mut self) {
+        let roles = self.roles_of(self.view.positions().map(|(key, _)| key));
         let glide: Vec<_> = self
             .view
             .positions()
             .filter(|&(key, _)| {
-                !self.pinned_nodes.contains(&key) && self.arrangement_role_of(key) == Role::Anchored
+                !self.pinned_nodes.contains(&key) && roles.get(&key) == Some(&Role::Anchored)
             })
             .filter_map(|(key, at)| Some((key, at, self.arrangement_slot(key)?)))
             .collect();
@@ -379,18 +472,8 @@ impl Canvas {
     /// A disturbance (a settle request, a drag, a pause or play) releases
     /// the items held at home and stops a glide, so the spring acts again.
     pub(crate) fn unpark(&mut self) {
-        let pinned = &self.pinned_nodes;
-        let table = &self.roles.table;
-        let graph = &self.graph;
-        let keep = |key: NodeKey| {
-            pinned.contains(&key)
-                || table.role(
-                    key,
-                    graph
-                        .get_node(key)
-                        .map(|node| Graph::url_grouping_key(node.url())),
-                ) == Role::Pinned
-        };
+        let roles = self.roles_of(self.view.positions().map(|(key, _)| key));
+        let keep = |key: NodeKey| roles.get(&key) == Some(&Role::Pinned);
         self.roles.rest.release(&mut self.physics, keep);
     }
 

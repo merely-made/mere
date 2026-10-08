@@ -1641,11 +1641,17 @@ impl Canvas {
     /// Whether the live law or overlays read `source` through the kind or the
     /// groups channel.
     pub(crate) fn physics_reads(&self, source: PhysicsKindSource) -> bool {
+        use super::composition::{GroupSource, PhysicsComposition};
         (self.physics_law == PhysicsLaw::Kinds && self.physics_kind_source == source)
             || (self.physics_group_source == source
                 && self
                     .physics_overlays
                     .contains(&PhysicsOverlay::DomainCluster))
+            || matches!(
+                &self.physics_composition,
+                Some(PhysicsComposition::Grouped(grouping))
+                    if grouping.groups == GroupSource::Channel(source)
+            )
     }
 
     /// The settle a law switch earns: a living law runs until paused, the rest
