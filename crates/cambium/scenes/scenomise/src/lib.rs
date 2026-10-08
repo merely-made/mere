@@ -35,6 +35,7 @@
 
 pub mod catalog;
 mod families;
+pub mod history;
 pub mod host_dataset;
 pub mod matrix;
 pub mod projection;
