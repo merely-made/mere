@@ -261,6 +261,14 @@ Mark's words are quoted as the physics catalog plan records them (§3, P7, and �
 
 **F127, labels (2026-10-08; fork F).** Options: plain `String` with one `label(kind, parts)` helper fixing the grammar `kind:a/b`; plain `String` only; a structured `Label { kind, path }`. Mark: **"String + label() helper (Recommended)"**.
 
+**F128, raw-byte entries (2026-10-08; fork H).** Question: `seiche-repeat` hashes packed float slices directly, and the same data hashed as a serde value differs (a postcard `Vec` carries a length prefix). Options: `insert_bytes` beside `insert`; serde values only. Mark: **"insert_bytes too (Recommended)"**. *Follows:* both, the docs saying the two forms do not agree.
+
+**F129, the exported hash surface (2026-10-08; fork I).** Options: `hash_bytes` and `hash_value`, the latter streamed through a postcard flavor without allocating and proven equal to `hash_bytes(to_allocvec(..))`; also a public streaming `Fnv64`; `hash_bytes` only. Mark: **"hash_bytes + hash_value (Recommended)"**.
+
+**F130, std or no_std (2026-10-08; fork J).** Question: the lane recommended `no_std` with `alloc`, but F125 added mere-framing, a std crate. Options: std; a `no_std` core with framing behind a std feature; `no_std` with framing changed to match. Mark: **"std (Recommended)"**. *Follows:* a std crate; the wasm32 check stays in its gates.
+
+**F131, dev-dependencies (2026-10-08; fork K).** Options: `serde_json` as a dev-dependency, a test pinning the JSON shape Isocosm stores, `u64` digests included; none. Mark: **"serde_json dev-dep (Recommended)"**.
+
 **F40, G7 (2026-10-03).** Question: approve G7, arrangement roles (§2, proposed at `784ce5b5`), which carries out F18 to F30, and place it. Options: approve, with G7 before G3; approve, after G2; amend first. Mark: **"Approve; G7 before G3"**. *Follows:* G7 starts now beside G2's open work, and G3 follows it, since G3's schedules use captures with a role (F27).
 
 **F41, the README's text (2026-10-03).** Question: the design-vocabulary section F13 placed in the README, its projection half in Mark's words and its dynamics half drafted from the rulings, placed after Status. Options: use the text as shown; the projection half only; edit the wording. Mark: **"Use this text"**. *Follows:* the section is committed as shown.
