@@ -357,6 +357,14 @@ Mark's words are quoted as the physics catalog plan records them (§3, P7, and �
 
 **F148, what a round-trip without loss means (2026-10-08; G4b1's fork D).** Question: the 20 profiles are (law, overlays) pairs recognised by order-sensitive equality, and no scene stores a profile id. Options: choice to spec to choice exact for every admitted (law, overlay subset) pair in catalog and reversed order across the 216 source combinations, every profile naming itself after reopen, spec to choice to spec equal and an opened spec re-saved unchanged; store the profile id (spec version 2); profiles as catalog presets. Mark: **"Pairs, profiles self-name (Recommended)"**.
 
+**F149, a channel id the registry does not produce (2026-10-08; G4b1's fork B).** Question: the brief said several ids lack producers; the assessment found every id a `PhysicsChoice` slot can name already resolves on a canvas through `LawInputs` (`distances.hops` included), only the registry's caching is missing, and the skeleton has no id. Options: resolve through `LawInputs`, family-checked per slot, an unreadable id failing by slot and id; move the physics channels into the registry first; fall back with a report. Mark first asked: "Will we need to do 2 eventually? Scope, and if so, let's plan it. If not, 1". The coordinator's answer: yes, since F21's follow-on already has the registry produce the physics channels, and G2 moved only the disclosures; scoped as G2c (§2). Put again as where G2c runs: after G4b1 and before G4b2; beside G4b1 now; after G4b2. Mark: **"After G4b1, before G4b2 (Recommended)"**. *Follows:* G4b1 resolves through `LawInputs`, family-checked per slot, an id that does not parse or that its slot cannot read (`groups.bridges`, `weight.degree` in the mass slot) failing the open by slot and id; G2c follows G4b1, and G4b2 follows G2c.
+
+**F150, the remote board's mirror (2026-10-08; G4b1's fork E).** Question: the mirror is an in-process call (`RemoteBoard::sync` with a `PhysicsChoice`), with no wire; under a composition today's board runs the canvas's dormant law. Options: the board mirrors the canvas's live stage (law, overlays, sources and composition; a mix graph-free, a grouping by site; the canvas drives the schedule); the board takes the whole spec and runs its own schedule; as today, compositions a recorded gap. Mark: **"Mirror the live stage (Recommended)"**.
+
+**F151, the saved scene's struct (2026-10-08; G4b1's fork F).** Question: struct versions lag facet versions by one (`SavedSceneV1` is facet v2, `SavedSceneV2` is facet v3). Options: a new `SavedSceneV3` for `saved-scene/v4`, `SavedSceneV2` kept as the read-only v2 and v3 reader; `SavedSceneV4`; keep `SavedSceneV2`'s name for the new shape. Mark: **"SavedSceneV3 (Recommended)"**.
+
+**F152, whether physics plays on open (2026-10-08; G4b1's fork G).** Options: `physics_paused` stays a scene field, view state like the camera; it goes into the spec (spec version 2). Mark: **"Stays a scene field (Recommended)"**.
+
 **F40, G7 (2026-10-03).** Question: approve G7, arrangement roles (§2, proposed at `784ce5b5`), which carries out F18 to F30, and place it. Options: approve, with G7 before G3; approve, after G2; amend first. Mark: **"Approve; G7 before G3"**. *Follows:* G7 starts now beside G2's open work, and G3 follows it, since G3's schedules use captures with a role (F27).
 
 **F41, the README's text (2026-10-03).** Question: the design-vocabulary section F13 placed in the README, its projection half in Mark's words and its dynamics half drafted from the rulings, placed after Status. Options: use the text as shown; the projection half only; edit the wording. Mark: **"Use this text"**. *Follows:* the section is committed as shown.
@@ -494,6 +502,19 @@ View state is not a graph fact and stays with the host: the focus, measured exte
 - the eleven law receipts and G2's receipts: see Progress, G2b.
 
 *Annotation, 2026-10-08:* F84 to F87 change how the disclosures travel (sixth round, Findings). `IntelligenceSignals` is keyed by channel id: the spectral coordinates are `coords.spectral`, the degree weights `weight.degree`, Radial's rings `rings.focus` (no longer `ViewIntent::axis_values`), and every score takes `order.timeline` from the request. The free projection functions take the registry serving the graph. Every arrangement's golden and mere-view's five layouts hold.
+
+### G2c — the physics channels into the registry (F21's remainder, F149)
+
+F21's follow-on has G2's registry produce "cartography's disclosures and the physics channels from one computation". G2 and G2b moved the disclosures; the physics channels are still computed by the catalog on each rebuild (`physics_catalog.rs`: `mass_values`, `masses`, `kinds`, `depths`, `weighted_distances`, read through `LawInputs`). G2c moves them into `signals::ChannelRegistry`, keyed by structure with run counters as G2b's are, and `LawInputs` reads them there.
+
+- **Channels:** `mass.degree` and `mass.pagerank`; the three depths (`depth.roots`, by layer, `depth.focus`, the dominator depth); kinds by colouring, island and degree band beside `groups.site` and `groups.cluster`; `distances.hops`; the skeleton (the spanning tree Stress's overlay reads), which gets its first id. F147 holds: `mass.degree` and `weight.degree` stay two computations.
+- **Placed:** after G4b1 lands and before G4b2 (F149), so no other lane edits `physics_catalog.rs` meanwhile, and G4b2 starts with every channel cached; it meets graph-semantics' change to the physics view's edge set (`projected_relations`) wherever that has landed.
+
+*Done when:*
+- each channel above is produced by the registry, one computation per key, asserted by its run counter;
+- every law receipt, the release receipts and the arrangement goldens read identical values;
+- the skeleton has an id that resolves;
+- a raw term's input slot can resolve against the registry, though running raw terms stays where its own ruling puts it.
 
 ### G3 — combinators and currencies
 
