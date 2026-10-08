@@ -87,6 +87,22 @@ these failed receipts do not replace the earlier five successful captures.
 [Concise native evidence and structured receipt projections](../../../ports/tabard/desktop/receipts/2026-10-08_stack/presentation_wait/README.md)
 preserve the exact results without attributing the failure to authored state.
 
+**macOS visual acceptance follow-up (2026-10-08):** the production binary from
+`7d2a5f3cfe97174058368073d2bae809fffbf902` succeeds when launched as a normal
+application through LaunchServices. No renderer, host or occlusion override was
+needed. The reusable `scripts/run_macos_scenario.py` launches an isolated
+temporary bundle and checks Mesquite's receipt in addition to the launcher's
+exit. Three standalone lanes pass with 192 presentations and 15 nonblank
+captures: four modes, shared reader/syntax/graph, keyboard seed edit/undo,
+authored CSS, resizing and fresh-process reopen. All images were inspected.
+[Complete acceptance artifacts](../../../ports/tabard/desktop/receipts/2026-10-08_stack/launchservices/README.md)
+supersede the open macOS presentation claim for this launch path, while keeping
+the failed background-child receipts. Woodshed has separately qualified its
+embedded workshop with four seed/reopen lanes, 132 presentations and 14
+nonblank images on its `2fa89ca61d75a9a03bf5e301eb658e696d74e44f` source.
+Other consumers, Windows/Linux headed behavior, native OS decorations and live
+screen-reader acceptance still require their own evidence.
+
 ## Tabard small-web adapters (2026-09-13 scope)
 
 **Current code:** `Theme` in `crates/system/tabard/src/lib.rs` derives a Tinct palette and
