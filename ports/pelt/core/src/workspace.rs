@@ -12,17 +12,16 @@ use inker::routing::{
     WorkspaceRouteId, is_surface_engine,
 };
 use inker::{
-    A11yCapability, ContentReport, DocumentClipArtifactRole, EngineProfileBinding, FocusReason,
-    KeyboardEvent, KeyboardModifiers, MouseButton, MouseEvent, MouseEventKind, NativeSurfaceHost,
-    PhysicalPosition, SessionButtonState, SessionInput, SessionKey, SessionNavigationCommand,
-    SessionPointerButton, SessionRegistry, SessionScrollKey, SessionSpawnRequest,
-    SurfaceEngineRegistry, SurfaceFrame, SurfaceProducer, SurfaceSpawnRequest, WebSurfaceEvent,
+    A11yCapability, ContentReport, EngineProfileBinding, NativeSurfaceHost, SessionInput,
+    SessionNavigationCommand, SessionRegistry, SessionScrollKey, SessionSpawnRequest,
+    SurfaceEngineRegistry, SurfaceFrame, WebSurfaceEvent,
 };
 use workbench::{
     ContentSource, Tile, TileEvent, TileId, TileTree, Workbench, WorkbenchEffect, WorkbenchOutcome,
 };
 
-use crate::{PeltClock, PeltController, PeltControllerConfig, PeltHostEffect};
+use crate::content::{PeltContent, PeltLane, PeltLayer};
+use crate::{PeltClock, PeltController, PeltHostEffect};
 
 /// Host-long-lived engine factories and routing policy shared by every tile.
 pub struct PeltRegistries<F> {
@@ -32,6 +31,7 @@ pub struct PeltRegistries<F> {
     workspace_id: WorkspaceRouteId,
     fallback_document_engine: String,
     surface_profile: EngineProfileBinding,
+    host_loading: bool,
 }
 
 impl<F> Clone for PeltRegistries<F> {
@@ -43,6 +43,7 @@ impl<F> Clone for PeltRegistries<F> {
             workspace_id: self.workspace_id.clone(),
             fallback_document_engine: self.fallback_document_engine.clone(),
             surface_profile: self.surface_profile.clone(),
+            host_loading: self.host_loading,
         }
     }
 }
@@ -63,7 +64,19 @@ impl<F> PeltRegistries<F> {
             workspace_id: WorkspaceRouteId::new(workspace_id),
             fallback_document_engine: fallback_document_engine.into(),
             surface_profile,
+            host_loading: false,
         }
+    }
+
+    /// Every document controller opened through these registries lets the
+    /// host's transport fetch (see [`crate::PeltLoadMode::Host`]).
+    pub fn with_host_loading(mut self) -> Self {
+        self.host_loading = true;
+        self
+    }
+
+    pub fn host_loading(&self) -> bool {
+        self.host_loading
     }
 
     pub fn sessions(&self) -> &SessionRegistry<F> {
@@ -74,36 +87,104 @@ impl<F> PeltRegistries<F> {
         &self.surfaces
     }
 
-    fn route(&self, tile: TileId, request: &PeltTileRequest) -> PeltTileRoute {
+    pub fn surface_profile(&self) -> &EngineProfileBinding {
+        &self.surface_profile
+    }
+
+    pub(crate) fn sessions_arc(&self) -> Arc<SessionRegistry<F>> {
+        Arc::clone(&self.sessions)
+    }
+
+    pub(crate) fn surfaces_arc(&self) -> Arc<SurfaceEngineRegistry> {
+        Arc::clone(&self.surfaces)
+    }
+
+    /// Route one load. A pinned engine is kept visible even when unavailable,
+    /// so the host can explain the active fallback; automatic routing filters
+    /// unavailable lanes. `documents_only` restricts the choice to document
+    /// engines, for a body whose address already chose the document lane.
+    pub(crate) fn choose(
+        &self,
+        address: &str,
+        content_type: Option<&str>,
+        engine_override: Option<&str>,
+        documents_only: bool,
+    ) -> Result<LoadRoute, String> {
         let route_request = EngineRouteRequest {
             workspace_id: self.workspace_id.clone(),
             view: None,
             node: None,
-            address: request.request.address.clone(),
-            content_type: request.request.content_type.clone(),
-            pinned_engine: request.engine_override.clone(),
+            address: address.to_owned(),
+            content_type: content_type.map(str::to_owned),
+            pinned_engine: engine_override.map(str::to_owned),
         };
-        let source = if request.engine_override.is_some() {
+        let source = if engine_override.is_some() {
             PeltRouteSource::UserOverride
         } else {
             PeltRouteSource::Automatic
         };
-        let decision = if request.engine_override.is_some() {
-            // Keep an unavailable user choice visible so the host can explain
-            // the active fallback. Automatic routing filters unavailable lanes.
+        let decision = if engine_override.is_some() {
             self.policy.route(&route_request)
         } else {
             self.policy.route_filtered(&route_request, |engine| {
-                self.sessions.contains(engine) || self.surfaces.contains(engine)
+                self.sessions.contains(engine)
+                    || (!documents_only && self.surfaces.contains(engine))
             })
         };
-        PeltTileRoute {
-            tile,
+        let selected = decision.engine_id.clone();
+        let mut route = PeltRoute {
             decision,
             source,
             state: PeltRouteState::Document,
+        };
+        if self.sessions.contains(&selected) {
+            return Ok(LoadRoute::Document {
+                engine_id: selected,
+                route: Some(route),
+            });
         }
+        if !documents_only
+            && self.surfaces.contains(&selected)
+            && route.decision.surface_contract.mode == SurfaceContractMode::CompositedTexture
+        {
+            route.state = PeltRouteState::Surface;
+            return Ok(LoadRoute::Surface(route));
+        }
+        let fallback = self.fallback_document_engine.clone();
+        if !self.sessions.contains(&fallback) {
+            return Err(format!(
+                "selected engine {selected} is unavailable and fallback engine {fallback} is not registered"
+            ));
+        }
+        let reason = if self.surfaces.contains(&selected) {
+            format!(
+                "surface contract {:?} needs an embedding adapter",
+                route.decision.surface_contract.mode
+            )
+        } else if is_surface_engine(&selected) {
+            "surface engine is not registered on this host".to_owned()
+        } else {
+            "document engine is not registered on this host".to_owned()
+        };
+        route.state = PeltRouteState::Fallback {
+            active_engine: fallback.clone(),
+            reason,
+        };
+        Ok(LoadRoute::Document {
+            engine_id: fallback,
+            route: Some(route),
+        })
     }
+}
+
+/// One load's lane. A document choice without a route is an unrouted
+/// controller keeping its own engine.
+pub(crate) enum LoadRoute {
+    Document {
+        engine_id: String,
+        route: Option<PeltRoute>,
+    },
+    Surface(PeltRoute),
 }
 
 /// Inputs that select one tile's lane. A source-capable document session can
@@ -113,25 +194,31 @@ impl<F> PeltRegistries<F> {
 pub struct PeltTileRequest {
     pub request: SessionSpawnRequest,
     pub engine_override: Option<String>,
+    /// The profile a surface lane opens with, when it is not the registries'
+    /// shared one (Turnstone keeps one web profile per node).
+    pub surface_profile: Option<EngineProfileBinding>,
 }
 
 impl PeltTileRequest {
     pub fn new(address: impl Into<String>, viewport: (u32, u32)) -> Self {
-        Self {
-            request: SessionSpawnRequest::new(address).with_viewport(viewport.0, viewport.1),
-            engine_override: None,
-        }
+        Self::from_request(SessionSpawnRequest::new(address).with_viewport(viewport.0, viewport.1))
     }
 
     pub fn from_request(request: SessionSpawnRequest) -> Self {
         Self {
             request,
             engine_override: None,
+            surface_profile: None,
         }
     }
 
     pub fn with_engine_override(mut self, engine_id: impl Into<String>) -> Self {
         self.engine_override = Some(engine_id.into());
+        self
+    }
+
+    pub fn with_surface_profile(mut self, profile: EngineProfileBinding) -> Self {
+        self.surface_profile = Some(profile);
         self
     }
 }
@@ -150,6 +237,36 @@ pub enum PeltRouteState {
         active_engine: String,
         reason: String,
     },
+}
+
+/// Selected route plus the lane that is actually active.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PeltRoute {
+    pub decision: EngineRouteDecision,
+    pub source: PeltRouteSource,
+    pub state: PeltRouteState,
+}
+
+impl PeltRoute {
+    pub fn selected_engine(&self) -> &str {
+        &self.decision.engine_id
+    }
+
+    pub fn active_engine(&self) -> &str {
+        match &self.state {
+            PeltRouteState::Fallback { active_engine, .. } => active_engine,
+            PeltRouteState::Document | PeltRouteState::Surface => &self.decision.engine_id,
+        }
+    }
+
+    pub fn for_tile(&self, tile: TileId) -> PeltTileRoute {
+        PeltTileRoute {
+            tile,
+            decision: self.decision.clone(),
+            source: self.source,
+            state: self.state.clone(),
+        }
+    }
 }
 
 /// Selected route plus the lane that is actually active for the tile.
@@ -213,7 +330,7 @@ impl WorkspaceRect {
         (x - self.x, y - self.y)
     }
 
-    fn viewport(self) -> (u32, u32) {
+    pub(crate) fn viewport(self) -> (u32, u32) {
         (
             self.width.max(1.0).ceil() as u32,
             self.height.max(1.0).ceil() as u32,
@@ -269,93 +386,23 @@ impl PeltWorkspaceOutcome {
     }
 }
 
-struct PeltSurfaceController {
-    producer: Box<dyn SurfaceProducer>,
-    viewport: (u32, u32),
-    offset: Option<(i32, i32)>,
-}
-
-impl PeltSurfaceController {
-    fn frame(
-        &mut self,
-        rect: WorkspaceRect,
-        scale_factor: f32,
-    ) -> Result<Option<SurfaceFrame>, String> {
-        let viewport = (
-            physical_extent(rect.width, scale_factor),
-            physical_extent(rect.height, scale_factor),
-        );
-        if viewport != self.viewport {
-            self.producer
-                .resize(viewport.0, viewport.1)
-                .map_err(|error| format!("surface resize failed: {error}"))?;
-            self.viewport = viewport;
-        }
-        let offset = (
-            physical_offset(rect.x, scale_factor),
-            physical_offset(rect.y, scale_factor),
-        );
-        if Some(offset) != self.offset {
-            self.producer
-                .set_offset(offset.0, offset.1)
-                .map_err(|error| format!("surface placement failed: {error}"))?;
-            self.offset = Some(offset);
-        }
-        self.producer
-            .acquire_frame()
-            .map_err(|error| format!("surface frame failed: {error}"))
-    }
-
-    fn mouse(&mut self, event: MouseEvent) -> PeltHostEffect {
-        match self.producer.send_mouse_input(event) {
-            Ok(()) => PeltHostEffect {
-                handled: true,
-                redraw: true,
-                ..Default::default()
-            },
-            Err(error) => PeltHostEffect {
-                error: Some(format!("surface input failed: {error}")),
-                ..Default::default()
-            },
-        }
-    }
-
-    fn keyboard(&mut self, event: KeyboardEvent) -> PeltHostEffect {
-        match self.producer.send_keyboard_input(event) {
-            Ok(()) => PeltHostEffect {
-                handled: true,
-                redraw: true,
-                ..Default::default()
-            },
-            Err(error) => PeltHostEffect {
-                error: Some(format!("surface input failed: {error}")),
-                ..Default::default()
-            },
-        }
-    }
-
-    fn focus(&mut self) {
-        let _ = self.producer.move_focus(FocusReason::Programmatic);
-    }
-}
-
 struct RoutedWorkspace<F> {
     registries: PeltRegistries<F>,
-    requests: HashMap<TileId, PeltTileRequest>,
     base_titles: HashMap<TileId, String>,
     clock_for: Arc<dyn Fn() -> Box<dyn PeltClock>>,
 }
 
 /// Pelt's window-neutral recursive workspace.
 ///
-/// `Workbench` wraps the arrangement authority. Every document tile owns a
-/// live controller, including inactive tabs; Frisket content-hole rectangles
-/// arrive from the embedding host and are the only geometry used for routing
-/// and frame sizing.
+/// `Workbench` wraps the arrangement authority. Every document tile owns one
+/// live [`PeltContent`], including inactive tabs; Frisket content-hole
+/// rectangles arrive from the embedding host and are the only geometry used
+/// for routing and frame sizing.
 pub struct PeltWorkspace<F> {
     workbench: Workbench,
-    controllers: HashMap<TileId, PeltController<F>>,
-    surfaces: HashMap<TileId, PeltSurfaceController>,
+    contents: HashMap<TileId, PeltContent<F>>,
+    /// Each tile's route, refreshed whenever its content may have changed lane
+    /// or engine, so hosts can borrow it.
     routes: HashMap<TileId, PeltTileRoute>,
     content_rects: HashMap<TileId, WorkspaceRect>,
     focused: Option<TileId>,
@@ -374,7 +421,7 @@ impl<F: 'static> PeltWorkspace<F> {
         tree: TileTree,
         mut controller_for: impl FnMut(&Tile) -> Result<PeltController<F>, String>,
     ) -> Result<Self, String> {
-        let mut controllers = HashMap::new();
+        let mut contents = HashMap::new();
         let mut tile_ids = HashSet::new();
         for tile in tree.tiles() {
             if !tile_ids.insert(tile.id) {
@@ -383,52 +430,24 @@ impl<F: 'static> PeltWorkspace<F> {
             if matches!(tile.content, ContentSource::Document(_)) {
                 let controller = controller_for(tile)
                     .map_err(|error| format!("could not open tile {}: {error}", tile.id.0))?;
-                controllers.insert(tile.id, controller);
+                let route = PeltRoute {
+                    decision: EngineRouteDecision {
+                        engine_id: controller.engine_id().to_owned(),
+                        surface_contract: inker::routing::SurfaceContract {
+                            target: inker::routing::SurfaceTargetId::new(format!(
+                                "pelt:tile:{}",
+                                tile.id.0
+                            )),
+                            mode: SurfaceContractMode::CompositedTexture,
+                        },
+                    },
+                    source: PeltRouteSource::UserOverride,
+                    state: PeltRouteState::Document,
+                };
+                contents.insert(tile.id, PeltContent::from_controller(controller, route));
             }
         }
-        let focused = active_tiles(&tree)
-            .into_iter()
-            .find(|id| controllers.contains_key(id));
-        let routes = controllers
-            .iter()
-            .map(|(tile, controller)| {
-                (
-                    *tile,
-                    PeltTileRoute {
-                        tile: *tile,
-                        decision: EngineRouteDecision {
-                            engine_id: controller.engine_id().to_owned(),
-                            surface_contract: inker::routing::SurfaceContract {
-                                target: inker::routing::SurfaceTargetId::new(format!(
-                                    "pelt:tile:{}",
-                                    tile.0
-                                )),
-                                mode: SurfaceContractMode::CompositedTexture,
-                            },
-                        },
-                        source: PeltRouteSource::UserOverride,
-                        state: PeltRouteState::Document,
-                    },
-                )
-            })
-            .collect();
-        let mut workspace = Self {
-            workbench: Workbench::new(tree),
-            controllers,
-            surfaces: HashMap::new(),
-            routes,
-            content_rects: HashMap::new(),
-            focused,
-            pointer_capture: None,
-            surface_scale_factor: 1.0,
-            routed: None,
-            surface_resource_policy: crate::SurfaceResourcePolicy::default(),
-            surface_frame_index: 0,
-            surface_refresh_cursor: 0,
-        };
-        workspace.sync_tile_metadata();
-        workspace.sync_visibility();
-        Ok(workspace)
+        Self::assemble(tree, contents, None)
     }
 
     /// Route every document tile through one pair of shared registries. A
@@ -441,54 +460,62 @@ impl<F: 'static> PeltWorkspace<F> {
         mut request_for: impl FnMut(&Tile) -> Result<PeltTileRequest, String>,
         clock_for: impl Fn() -> Box<dyn PeltClock> + 'static,
     ) -> Result<Self, String> {
+        let clock_for: Arc<dyn Fn() -> Box<dyn PeltClock>> = Arc::new(clock_for);
         let mut tile_ids = HashSet::new();
-        let mut requests = HashMap::new();
+        let mut requests = Vec::new();
         let mut base_titles = HashMap::new();
         for tile in tree.tiles() {
             if !tile_ids.insert(tile.id) {
                 return Err(format!("duplicate tile id {}", tile.id.0));
             }
             if matches!(tile.content, ContentSource::Document(_)) {
-                requests.insert(
+                requests.push((
                     tile.id,
                     request_for(tile)
                         .map_err(|error| format!("could not route tile {}: {error}", tile.id.0))?,
-                );
+                ));
                 base_titles.insert(tile.id, tile.title.clone());
             }
         }
-        let active = active_tiles(&tree);
-        let focused = active.iter().copied().find(|id| requests.contains_key(id));
+        let mut contents = HashMap::new();
+        for (tile, request) in requests {
+            contents.insert(
+                tile,
+                PeltContent::routed(registries.clone(), request, Arc::clone(&clock_for))?,
+            );
+        }
+        Self::assemble(
+            tree,
+            contents,
+            Some(RoutedWorkspace {
+                registries,
+                base_titles,
+                clock_for,
+            }),
+        )
+    }
+
+    fn assemble(
+        tree: TileTree,
+        contents: HashMap<TileId, PeltContent<F>>,
+        routed: Option<RoutedWorkspace<F>>,
+    ) -> Result<Self, String> {
+        let focused = active_tiles(&tree)
+            .into_iter()
+            .find(|id| contents.contains_key(id));
         let mut workspace = Self {
             workbench: Workbench::new(tree),
-            controllers: HashMap::new(),
-            surfaces: HashMap::new(),
+            contents,
             routes: HashMap::new(),
             content_rects: HashMap::new(),
             focused,
             pointer_capture: None,
             surface_scale_factor: 1.0,
-            routed: Some(RoutedWorkspace {
-                registries,
-                requests,
-                base_titles,
-                clock_for: Arc::new(clock_for),
-            }),
+            routed,
             surface_resource_policy: crate::SurfaceResourcePolicy::default(),
             surface_frame_index: 0,
             surface_refresh_cursor: 0,
         };
-        let ids = workspace
-            .routed
-            .as_ref()
-            .expect("routed workspace")
-            .requests
-            .keys()
-            .copied()
-            .collect::<Vec<_>>();
-        for id in ids {
-            workspace.install_route(id)?;
-        }
         workspace.sync_tile_metadata();
         workspace.sync_visibility();
         Ok(workspace)
@@ -509,12 +536,32 @@ impl<F: 'static> PeltWorkspace<F> {
         self.pointer_capture.is_some()
     }
 
+    /// One tile's routed content, whichever lane is live.
+    pub fn content(&self, tile: TileId) -> Option<&PeltContent<F>> {
+        self.contents.get(&tile)
+    }
+
+    /// Mutate one tile's content directly. Call [`Self::sync_tile`] after a
+    /// change that can move its route or address.
+    pub fn content_mut(&mut self, tile: TileId) -> Option<&mut PeltContent<F>> {
+        self.contents.get_mut(&tile)
+    }
+
+    /// Refresh one tile's route, title and address after a direct content
+    /// change.
+    pub fn sync_tile(&mut self, tile: TileId) {
+        self.sync_one_tile_metadata(tile);
+        self.sync_visibility();
+    }
+
     pub fn controller(&self, tile: TileId) -> Option<&PeltController<F>> {
-        self.controllers.get(&tile)
+        self.contents.get(&tile).and_then(PeltContent::document)
     }
 
     pub fn controller_mut(&mut self, tile: TileId) -> Option<&mut PeltController<F>> {
-        self.controllers.get_mut(&tile)
+        self.contents
+            .get_mut(&tile)
+            .and_then(PeltContent::document_mut)
     }
 
     /// Move a live composited surface producer to another native host while
@@ -522,18 +569,25 @@ impl<F: 'static> PeltWorkspace<F> {
     /// leave the prior host in place. `HostMigrationIndeterminate` is terminal:
     /// the host must transfer custody to the destination and keep its visual
     /// shell alive rather than resuming source presentation.
+    ///
+    /// # Safety
+    /// `host` must name a live native host the producer may attach to.
     pub unsafe fn rehost_surface(
         &mut self,
         tile: TileId,
         host: NativeSurfaceHost,
     ) -> Result<(), inker::SurfaceError> {
-        let surface = self.surfaces.get_mut(&tile).ok_or_else(|| {
-            inker::SurfaceError::Unsupported(format!(
-                "tile {} has no live surface producer",
-                tile.0
-            ))
-        })?;
-        unsafe { surface.producer.rehost(host) }
+        let content = self
+            .contents
+            .get_mut(&tile)
+            .filter(|content| content.lane() == PeltLane::Surface)
+            .ok_or_else(|| {
+                inker::SurfaceError::Unsupported(format!(
+                    "tile {} has no live surface producer",
+                    tile.0
+                ))
+            })?;
+        unsafe { content.rehost_surface(host) }
     }
 
     /// Identity generation of a tile's current successfully opened document
@@ -543,9 +597,9 @@ impl<F: 'static> PeltWorkspace<F> {
     /// tile id and clear that state when a successful navigation, reload, or
     /// history traversal replaces the session.
     pub fn document_session_generation(&self, tile: TileId) -> Option<u64> {
-        self.controllers
+        self.contents
             .get(&tile)
-            .map(PeltController::session_generation)
+            .and_then(PeltContent::session_generation)
     }
 
     /// Process-unique controller identity plus its retained-session
@@ -553,9 +607,9 @@ impl<F: 'static> PeltWorkspace<F> {
     /// this rather than generation alone because route reconstruction creates
     /// a fresh controller at generation one.
     pub fn document_session_identity(&self, tile: TileId) -> Option<super::PeltSessionIdentity> {
-        self.controllers
+        self.contents
             .get(&tile)
-            .map(PeltController::session_identity)
+            .and_then(PeltContent::session_identity)
     }
 
     pub fn route(&self, tile: TileId) -> Option<&PeltTileRoute> {
@@ -571,28 +625,7 @@ impl<F: 'static> PeltWorkspace<F> {
     /// capability and report are authoritative. A live surface instead exposes
     /// only the capability declared by its registered surface engine.
     pub fn inspection(&self, tile: TileId) -> Option<PeltTileInspection> {
-        let route = self.routes.get(&tile)?;
-        match &route.state {
-            PeltRouteState::Document | PeltRouteState::Fallback { .. } => {
-                let controller = self.controllers.get(&tile)?;
-                Some(PeltTileInspection {
-                    capability: controller.a11y_capability(),
-                    report: controller.inspect(),
-                })
-            },
-            PeltRouteState::Surface => {
-                let routed = self.routed.as_ref()?;
-                let capability = routed
-                    .registries
-                    .surfaces
-                    .engine(route.active_engine())?
-                    .a11y_capability();
-                Some(PeltTileInspection {
-                    capability,
-                    report: None,
-                })
-            },
-        }
+        self.contents.get(&tile)?.inspection()
     }
 
     /// Drain the next ordered web event from one routed surface. Document
@@ -602,14 +635,12 @@ impl<F: 'static> PeltWorkspace<F> {
         &mut self,
         tile: TileId,
     ) -> Result<Option<WebSurfaceEvent>, String> {
-        let Some(surface) = self.surfaces.get_mut(&tile) else {
-            return Ok(None);
-        };
-        let web = surface
-            .producer
-            .as_web_surface()
-            .ok_or_else(|| format!("tile {} surface has no web event plane", tile.0))?;
-        Ok(web.poll_web_event())
+        match self.contents.get_mut(&tile) {
+            Some(content) => content
+                .poll_web_event()
+                .map_err(|error| format!("tile {} {error}", tile.0)),
+            None => Ok(None),
+        }
     }
 
     /// Configure polling pressure without changing activation, visibility, or
@@ -630,121 +661,18 @@ impl<F: 'static> PeltWorkspace<F> {
         tile: TileId,
         engine_id: Option<String>,
     ) -> Result<bool, String> {
-        let Some(routed) = self.routed.as_mut() else {
+        if self.routed.is_none() {
             return Err("this workspace was built without capability routing".to_owned());
-        };
-        let Some(request) = routed.requests.get_mut(&tile) else {
+        }
+        let Some(content) = self.contents.get_mut(&tile) else {
             return Err(format!("tile {} has no routed content", tile.0));
         };
-        if request.engine_override == engine_id {
-            return Ok(false);
+        let changed = content.set_route_override(engine_id)?;
+        if changed {
+            self.sync_one_tile_metadata(tile);
+            self.sync_visibility();
         }
-        let previous_request = request.clone();
-        request.engine_override = engine_id;
-        let previous_controller = self.controllers.remove(&tile);
-        let previous_surface = self.surfaces.remove(&tile);
-        let previous_route = self.routes.remove(&tile);
-        if let Err(error) = self.install_route(tile) {
-            self.routed
-                .as_mut()
-                .expect("routed workspace")
-                .requests
-                .insert(tile, previous_request);
-            if let Some(controller) = previous_controller {
-                self.controllers.insert(tile, controller);
-            }
-            if let Some(surface) = previous_surface {
-                self.surfaces.insert(tile, surface);
-            }
-            if let Some(route) = previous_route {
-                self.routes.insert(tile, route);
-            }
-            return Err(error);
-        }
-        self.sync_one_tile_metadata(tile);
-        self.sync_visibility();
-        Ok(true)
-    }
-
-    fn install_route(&mut self, tile: TileId) -> Result<(), String> {
-        let routed = self.routed.as_ref().expect("routed workspace");
-        let request = routed
-            .requests
-            .get(&tile)
-            .cloned()
-            .ok_or_else(|| format!("tile {} has no route request", tile.0))?;
-        let mut route = routed.registries.route(tile, &request);
-        let selected = route.decision.engine_id.clone();
-        if routed.registries.sessions.contains(&selected) {
-            let controller = PeltController::new_shared_boxed(
-                routed.registries.sessions.clone(),
-                routed.registries.surfaces.clone(),
-                PeltControllerConfig::from_request(selected, request.request),
-                (routed.clock_for)(),
-            )?;
-            self.controllers.insert(tile, controller);
-            self.routes.insert(tile, route);
-            return Ok(());
-        }
-
-        if routed.registries.surfaces.contains(&selected)
-            && route.decision.surface_contract.mode == SurfaceContractMode::CompositedTexture
-        {
-            let viewport = request.request.viewport;
-            let spawn = SurfaceSpawnRequest {
-                url: request.request.address.clone(),
-                width: viewport.0,
-                height: viewport.1,
-                profile: routed.registries.surface_profile.clone(),
-                fence_handle: None,
-            };
-            let producer = routed
-                .registries
-                .surfaces
-                .spawn(&route.decision, &spawn)
-                .map_err(|error| format!("could not spawn surface {selected}: {error}"))?;
-            route.state = PeltRouteState::Surface;
-            self.surfaces.insert(
-                tile,
-                PeltSurfaceController {
-                    producer,
-                    viewport,
-                    offset: None,
-                },
-            );
-            self.routes.insert(tile, route);
-            return Ok(());
-        }
-
-        let fallback = routed.registries.fallback_document_engine.clone();
-        if !routed.registries.sessions.contains(&fallback) {
-            return Err(format!(
-                "selected engine {selected} is unavailable and fallback engine {fallback} is not registered"
-            ));
-        }
-        let reason = if routed.registries.surfaces.contains(&selected) {
-            format!(
-                "surface contract {:?} needs an embedding adapter",
-                route.decision.surface_contract.mode
-            )
-        } else if is_surface_engine(&selected) {
-            "surface engine is not registered on this host".to_owned()
-        } else {
-            "document engine is not registered on this host".to_owned()
-        };
-        route.state = PeltRouteState::Fallback {
-            active_engine: fallback.clone(),
-            reason,
-        };
-        let controller = PeltController::new_shared_boxed(
-            routed.registries.sessions.clone(),
-            routed.registries.surfaces.clone(),
-            PeltControllerConfig::from_request(fallback, request.request),
-            (routed.clock_for)(),
-        )?;
-        self.controllers.insert(tile, controller);
-        self.routes.insert(tile, route);
-        Ok(())
+        Ok(changed)
     }
 
     pub fn content_rect(&self, tile: TileId) -> Option<WorkspaceRect> {
@@ -795,12 +723,10 @@ impl<F: 'static> PeltWorkspace<F> {
             .into_iter()
             .map(|tile| tile.id)
             .collect::<HashSet<_>>();
-        self.controllers.retain(|id, _| retained.contains(id));
-        self.surfaces.retain(|id, _| retained.contains(id));
+        self.contents.retain(|id, _| retained.contains(id));
         self.routes.retain(|id, _| retained.contains(id));
         self.content_rects.retain(|id, _| retained.contains(id));
         if let Some(routed) = &mut self.routed {
-            routed.requests.retain(|id, _| retained.contains(id));
             routed.base_titles.retain(|id, _| retained.contains(id));
         }
         if self
@@ -853,18 +779,11 @@ impl<F: 'static> PeltWorkspace<F> {
         // it here makes content custody a single synchronous transfer.
         let removed = self.workbench.apply(&TileEvent::Closed(tile));
         debug_assert!(matches!(removed, WorkbenchOutcome::Applied));
-        let controller = self.controllers.remove(&tile);
-        let surface = self.surfaces.remove(&tile);
+        let content = self.contents.remove(&tile);
         let route = self.routes.remove(&tile);
         let content_rect = self.content_rects.remove(&tile);
         let routed = self.routed.as_mut().map(|source| RoutedWorkspace {
             registries: source.registries.clone(),
-            requests: source
-                .requests
-                .remove(&tile)
-                .map(|request| (tile, request))
-                .into_iter()
-                .collect::<HashMap<_, _>>(),
             base_titles: source
                 .base_titles
                 .remove(&tile)
@@ -905,11 +824,7 @@ impl<F: 'static> PeltWorkspace<F> {
 
         let mut destination = Self {
             workbench: Workbench::new(TileTree::single(tile_record)),
-            controllers: controller
-                .map(|controller| (tile, controller))
-                .into_iter()
-                .collect(),
-            surfaces: surface.map(|surface| (tile, surface)).into_iter().collect(),
+            contents: content.map(|content| (tile, content)).into_iter().collect(),
             routes: route.map(|route| (tile, route)).into_iter().collect(),
             content_rects: content_rect.map(|rect| (tile, rect)).into_iter().collect(),
             focused: None,
@@ -927,7 +842,13 @@ impl<F: 'static> PeltWorkspace<F> {
     }
 
     fn has_content(&self, tile: TileId) -> bool {
-        self.controllers.contains_key(&tile) || self.surfaces.contains_key(&tile)
+        self.contents.contains_key(&tile)
+    }
+
+    fn is_surface(&self, tile: TileId) -> bool {
+        self.contents
+            .get(&tile)
+            .is_some_and(|content| content.lane() == PeltLane::Surface)
     }
 
     /// Produce one frame for every active document hole, sized to that hole.
@@ -958,24 +879,19 @@ impl<F: 'static> PeltWorkspace<F> {
     ) -> Option<PeltWorkspaceFrame<F>> {
         let mut tiles = Vec::new();
         let mut surfaces = Vec::new();
-        if let Some(controller) = self.controllers.get_mut(&tile) {
-            let (width, height) = rect.viewport();
-            tiles.push(PeltTileFrame {
+        let route = self.routes.get(&tile).cloned();
+        match self
+            .contents
+            .get_mut(&tile)?
+            .frame(rect, self.surface_scale_factor)
+        {
+            PeltLayer::Document(frame) => tiles.push(PeltTileFrame { tile, rect, frame }),
+            PeltLayer::Surface(frame) => surfaces.push(PeltSurfaceLayer {
                 tile,
                 rect,
-                frame: controller.frame(width, height),
-            });
-        } else if let Some(surface) = self.surfaces.get_mut(&tile) {
-            let frame = surface.frame(rect, self.surface_scale_factor);
-            let route = self.routes.get(&tile)?.clone();
-            surfaces.push(PeltSurfaceLayer {
-                tile,
-                rect,
-                route,
+                route: route?,
                 frame,
-            });
-        } else {
-            return None;
+            }),
         }
         self.sync_one_tile_metadata(tile);
         Some(PeltWorkspaceFrame { tiles, surfaces })
@@ -990,7 +906,7 @@ impl<F: 'static> PeltWorkspace<F> {
         let surface_ids = active
             .iter()
             .copied()
-            .filter(|id| self.surfaces.contains_key(id))
+            .filter(|id| self.is_surface(*id))
             .collect::<Vec<_>>();
         let mut refresh_ids = std::collections::HashSet::new();
         if poll_surfaces && !surface_ids.is_empty() {
@@ -1015,14 +931,7 @@ impl<F: 'static> PeltWorkspace<F> {
             let Some(rect) = self.content_rects.get(&tile).copied() else {
                 continue;
             };
-            if let Some(controller) = self.controllers.get_mut(&tile) {
-                let (width, height) = rect.viewport();
-                tiles.push(PeltTileFrame {
-                    tile,
-                    rect,
-                    frame: controller.frame(width, height),
-                });
-            } else if let Some(surface) = self.surfaces.get_mut(&tile) {
+            if self.is_surface(tile) {
                 let frame = if poll_surfaces
                     && refresh_ids.contains(&tile)
                     && self
@@ -1030,7 +939,15 @@ impl<F: 'static> PeltWorkspace<F> {
                         .admits(frame_index, surface_refreshes)
                 {
                     surface_refreshes += 1;
-                    surface.frame(rect, self.surface_scale_factor)
+                    match self
+                        .contents
+                        .get_mut(&tile)
+                        .expect("surface tile has content")
+                        .frame(rect, self.surface_scale_factor)
+                    {
+                        PeltLayer::Surface(frame) => frame,
+                        PeltLayer::Document(_) => unreachable!("checked surface lane"),
+                    }
                 } else {
                     Ok(None)
                 };
@@ -1042,6 +959,10 @@ impl<F: 'static> PeltWorkspace<F> {
                         frame,
                     });
                 }
+            } else if let Some(content) = self.contents.get_mut(&tile) {
+                if let PeltLayer::Document(frame) = content.frame(rect, self.surface_scale_factor) {
+                    tiles.push(PeltTileFrame { tile, rect, frame });
+                }
             }
         }
         self.sync_tile_metadata();
@@ -1051,14 +972,14 @@ impl<F: 'static> PeltWorkspace<F> {
     /// Advance visible sessions. Hidden tabs retain state without driving the
     /// foreground frame loop.
     pub fn pump(&mut self) -> bool {
-        let active = active_tiles(self.workbench.tree());
-        // Surface producers do not expose a settled bit. Keep polling every
-        // visible producer so a frame that arrives after the first acquire is
-        // not stranded until unrelated document activity causes a redraw.
-        let mut more = active.iter().any(|id| self.surfaces.contains_key(id));
-        for id in active {
-            if let Some(controller) = self.controllers.get_mut(&id) {
-                more |= controller.pump();
+        let mut more = false;
+        for id in active_tiles(self.workbench.tree()) {
+            // Surface producers do not expose a settled bit. Keep polling every
+            // visible producer so a frame that arrives after the first acquire
+            // is not stranded until unrelated document activity causes a
+            // redraw.
+            if let Some(content) = self.contents.get_mut(&id) {
+                more |= content.pump();
             }
         }
         more
@@ -1070,8 +991,8 @@ impl<F: 'static> PeltWorkspace<F> {
     /// their loading state until their own first visible composition.
     pub fn mark_visible_documents_presented(&mut self) {
         for id in active_tiles(self.workbench.tree()) {
-            if let Some(controller) = self.controllers.get_mut(&id) {
-                controller.mark_document_presented();
+            if let Some(content) = self.contents.get_mut(&id) {
+                content.mark_presented();
             }
         }
     }
@@ -1127,13 +1048,11 @@ impl<F: 'static> PeltWorkspace<F> {
             },
         };
 
-        let effect = if let Some(controller) = self.controllers.get_mut(&target) {
-            controller.input(local_input)
-        } else if let Some(surface) = self.surfaces.get_mut(&target) {
-            surface_input(surface, local_input, self.surface_scale_factor)
-        } else {
+        let scale_factor = self.surface_scale_factor;
+        let Some(content) = self.contents.get_mut(&target) else {
             return PeltHostEffect::default();
         };
+        let effect = content.input(local_input, scale_factor);
         if let Some(capture) = effect.pointer_capture {
             self.pointer_capture = capture.then_some(target);
         }
@@ -1152,33 +1071,19 @@ impl<F: 'static> PeltWorkspace<F> {
             return false;
         };
         let (x, y) = rect.local(x, y);
-        if let Some(controller) = self.controllers.get_mut(&tile) {
-            return controller.scroll_at(x, y, dx, dy);
-        }
-        self.surfaces.get_mut(&tile).is_some_and(|surface| {
-            surface
-                .mouse(MouseEvent {
-                    position: PhysicalPosition {
-                        x: x * self.surface_scale_factor,
-                        y: y * self.surface_scale_factor,
-                    },
-                    button: None,
-                    kind: MouseEventKind::ScrollPixels {
-                        delta_x: dx * self.surface_scale_factor,
-                        delta_y: dy * self.surface_scale_factor,
-                    },
-                })
-                .handled
-        })
+        let scale_factor = self.surface_scale_factor;
+        self.contents
+            .get_mut(&tile)
+            .is_some_and(|content| content.scroll_at(x, y, dx, dy, scale_factor))
     }
 
     pub fn scroll_for_key(&mut self, key: SessionScrollKey) -> bool {
         let Some(tile) = self.focused else {
             return false;
         };
-        self.controllers
+        self.contents
             .get_mut(&tile)
-            .is_some_and(|controller| controller.scroll_for_key(key))
+            .is_some_and(|content| content.scroll_for_key(key))
     }
 
     pub fn command(&mut self, command: SessionNavigationCommand) -> PeltHostEffect {
@@ -1193,54 +1098,10 @@ impl<F: 'static> PeltWorkspace<F> {
         tile: TileId,
         command: SessionNavigationCommand,
     ) -> PeltHostEffect {
-        let Some(controller) = self.controllers.get_mut(&tile) else {
-            let Some(surface) = self.surfaces.get_mut(&tile) else {
-                return PeltHostEffect::default();
-            };
-            let result = match command {
-                SessionNavigationCommand::Address(address) => surface
-                    .producer
-                    .as_web_surface()
-                    .ok_or_else(|| "surface has no web navigation plane".to_owned())
-                    .and_then(|web| {
-                        web.navigate_to_url(&address)
-                            .map_err(|error| error.to_string())
-                    }),
-                SessionNavigationCommand::Reload => surface
-                    .producer
-                    .as_web_surface()
-                    .ok_or_else(|| "surface has no web navigation plane".to_owned())
-                    .and_then(|web| web.reload().map_err(|error| error.to_string())),
-                SessionNavigationCommand::Back => surface
-                    .producer
-                    .as_web_surface()
-                    .ok_or_else(|| "surface has no web navigation plane".to_owned())
-                    .and_then(|web| web.go_back().map_err(|error| error.to_string())),
-                SessionNavigationCommand::Forward => surface
-                    .producer
-                    .as_web_surface()
-                    .ok_or_else(|| "surface has no web navigation plane".to_owned())
-                    .and_then(|web| web.go_forward().map_err(|error| error.to_string())),
-                SessionNavigationCommand::Stop => surface
-                    .producer
-                    .as_web_surface()
-                    .ok_or_else(|| "surface has no web navigation plane".to_owned())
-                    .and_then(|web| web.stop().map_err(|error| error.to_string())),
-            };
-            return match result {
-                Ok(()) => PeltHostEffect {
-                    handled: true,
-                    redraw: true,
-                    navigated: true,
-                    ..Default::default()
-                },
-                Err(error) => PeltHostEffect {
-                    error: Some(error),
-                    ..Default::default()
-                },
-            };
+        let Some(content) = self.contents.get_mut(&tile) else {
+            return PeltHostEffect::default();
         };
-        let effect = controller.command(command);
+        let effect = content.command(command);
         if effect.navigated {
             self.sync_one_tile_metadata(tile);
             self.sync_visibility();
@@ -1260,14 +1121,12 @@ impl<F: 'static> PeltWorkspace<F> {
         if self.focused == Some(tile) {
             return;
         }
-        if let Some(old) = self.focused.and_then(|id| self.controllers.get_mut(&id)) {
-            let _ = old.input(SessionInput::Focus(false));
+        if let Some(old) = self.focused.and_then(|id| self.contents.get_mut(&id)) {
+            old.focus(false);
         }
         self.focused = Some(tile);
-        if let Some(new) = self.controllers.get_mut(&tile) {
-            let _ = new.input(SessionInput::Focus(true));
-        } else if let Some(new) = self.surfaces.get_mut(&tile) {
-            new.focus();
+        if let Some(new) = self.contents.get_mut(&tile) {
+            new.focus(true);
         }
     }
 
@@ -1275,47 +1134,29 @@ impl<F: 'static> PeltWorkspace<F> {
         let active = active_tiles(self.workbench.tree())
             .into_iter()
             .collect::<HashSet<_>>();
-        for (id, controller) in &mut self.controllers {
-            controller.set_hidden(!active.contains(id));
+        for (id, content) in &mut self.contents {
+            content.set_hidden(!active.contains(id));
         }
     }
 
     fn sync_tile_metadata(&mut self) {
-        let ids = self.routes.keys().copied().collect::<Vec<_>>();
+        let ids = self.contents.keys().copied().collect::<Vec<_>>();
         for id in ids {
             self.sync_one_tile_metadata(id);
         }
     }
 
     fn sync_one_tile_metadata(&mut self, id: TileId) {
-        let controller_metadata = self.controllers.get(&id).map(|controller| {
-            let request = controller.request().clone();
-            let source = request.body.is_none().then(|| {
-                controller.clip().and_then(|clip| {
-                    clip.artifacts
-                        .into_iter()
-                        .find(|artifact| artifact.role == DocumentClipArtifactRole::SourceResponse)
-                })
-            });
-            (request, controller.title(), source.flatten())
-        });
-        if let Some((request, _, source)) = &controller_metadata
-            && let Some(routed) = &mut self.routed
-            && let Some(tile_request) = routed.requests.get_mut(&id)
-        {
-            tile_request.request = request.clone();
-            if let Some(source) = source {
-                tile_request.request.address =
-                    retained_source_address(&source.canonical_uri, &tile_request.request.address);
-                tile_request.request.body =
-                    Some(String::from_utf8_lossy(&source.bytes).into_owned());
-                tile_request.request.content_type = Some(source.media_type.clone());
-            }
-        }
-        let route = self.routes.get(&id);
-        let base_title = controller_metadata
-            .as_ref()
-            .and_then(|(_, title, _)| title.clone())
+        let Some(content) = self.contents.get_mut(&id) else {
+            return;
+        };
+        content.refresh_held_request();
+        let route = content.route().for_tile(id);
+        let document_address = content
+            .document()
+            .map(|controller| controller.address().to_owned());
+        let base_title = content
+            .title()
             .filter(|title| !title.trim().is_empty())
             .or_else(|| {
                 self.routed
@@ -1323,140 +1164,22 @@ impl<F: 'static> PeltWorkspace<F> {
                     .and_then(|routed| routed.base_titles.get(&id).cloned())
             });
         if let Some(tile) = self.workbench.tree_mut().tile_mut(id) {
-            if let Some((request, _, _)) = controller_metadata {
-                tile.content = ContentSource::Document(workbench::DocumentRef(request.address));
+            if let Some(address) = document_address {
+                tile.content = ContentSource::Document(workbench::DocumentRef(address));
             }
-            if let Some(route) = route {
-                let selected = route.selected_engine();
-                let suffix = match &route.state {
-                    PeltRouteState::Fallback { active_engine, .. } => {
-                        format!("[{selected} → {active_engine}]")
-                    },
-                    PeltRouteState::Document | PeltRouteState::Surface => {
-                        format!("[{selected}]")
-                    },
-                };
-                tile.title = format!("{} {suffix}", base_title.as_deref().unwrap_or(selected));
-            } else if let Some(title) = base_title {
-                tile.title = title;
-            }
+            let selected = route.selected_engine();
+            let suffix = match &route.state {
+                PeltRouteState::Fallback { active_engine, .. } => {
+                    format!("[{selected} → {active_engine}]")
+                },
+                PeltRouteState::Document | PeltRouteState::Surface => {
+                    format!("[{selected}]")
+                },
+            };
+            tile.title = format!("{} {suffix}", base_title.as_deref().unwrap_or(selected));
         }
+        self.routes.insert(id, route);
     }
-}
-
-fn retained_source_address(canonical_uri: &str, requested_address: &str) -> String {
-    if canonical_uri.contains('#') {
-        return canonical_uri.to_owned();
-    }
-    requested_address.split_once('#').map_or_else(
-        || canonical_uri.to_owned(),
-        |(_, fragment)| format!("{canonical_uri}#{fragment}"),
-    )
-}
-
-fn surface_input(
-    surface: &mut PeltSurfaceController,
-    input: SessionInput,
-    scale_factor: f32,
-) -> PeltHostEffect {
-    match input {
-        SessionInput::PointerMoved { x, y, .. } => surface.mouse(MouseEvent {
-            position: PhysicalPosition {
-                x: x * scale_factor,
-                y: y * scale_factor,
-            },
-            button: None,
-            kind: MouseEventKind::Moved,
-        }),
-        SessionInput::PointerButton {
-            x,
-            y,
-            button,
-            state,
-            ..
-        } => surface.mouse(MouseEvent {
-            position: PhysicalPosition {
-                x: x * scale_factor,
-                y: y * scale_factor,
-            },
-            button: Some(match button {
-                SessionPointerButton::Primary => MouseButton::Left,
-                SessionPointerButton::Secondary => MouseButton::Right,
-                SessionPointerButton::Auxiliary => MouseButton::Middle,
-            }),
-            kind: match state {
-                SessionButtonState::Pressed => MouseEventKind::Pressed,
-                SessionButtonState::Released => MouseEventKind::Released,
-            },
-        }),
-        SessionInput::Key {
-            key,
-            state,
-            modifiers,
-            ..
-        } => surface.keyboard(KeyboardEvent {
-            key_code: surface_key_code(&key),
-            scan_code: 0,
-            modifiers: KeyboardModifiers {
-                shift: modifiers.shift,
-                ctrl: modifiers.control,
-                alt: modifiers.alt,
-                meta: modifiers.meta,
-            },
-            pressed: state == SessionButtonState::Pressed,
-            text: match (state, key) {
-                (SessionButtonState::Pressed, SessionKey::Character(text)) => Some(text),
-                (SessionButtonState::Pressed, SessionKey::Space) => Some(" ".to_owned()),
-                _ => None,
-            },
-        }),
-        SessionInput::Text(text) => surface.keyboard(KeyboardEvent {
-            key_code: 0,
-            scan_code: 0,
-            modifiers: KeyboardModifiers::default(),
-            pressed: true,
-            text: Some(text),
-        }),
-        SessionInput::Focus(true) => {
-            surface.focus();
-            PeltHostEffect {
-                handled: true,
-                ..Default::default()
-            }
-        },
-        SessionInput::Focus(false)
-        | SessionInput::FocusMove(_)
-        | SessionInput::Ime(_)
-        | SessionInput::Cancel => PeltHostEffect::default(),
-    }
-}
-
-fn surface_key_code(key: &SessionKey) -> u32 {
-    match key {
-        SessionKey::Enter => 13,
-        SessionKey::Tab => 9,
-        SessionKey::Backspace => 8,
-        SessionKey::Delete => 46,
-        SessionKey::Escape => 27,
-        SessionKey::Space => 32,
-        SessionKey::ArrowLeft => 37,
-        SessionKey::ArrowUp => 38,
-        SessionKey::ArrowRight => 39,
-        SessionKey::ArrowDown => 40,
-        SessionKey::Home => 36,
-        SessionKey::End => 35,
-        SessionKey::PageUp => 33,
-        SessionKey::PageDown => 34,
-        SessionKey::Character(_) | SessionKey::Unidentified => 0,
-    }
-}
-
-fn physical_extent(logical: f32, scale_factor: f32) -> u32 {
-    ((logical.max(1.0) * scale_factor.max(1.0)).round() as u32).max(1)
-}
-
-fn physical_offset(logical: f32, scale_factor: f32) -> i32 {
-    (logical * scale_factor.max(1.0)).round() as i32
 }
 
 fn active_tiles(tree: &TileTree) -> Vec<TileId> {
