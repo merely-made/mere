@@ -30,7 +30,10 @@ pub use scenotime::{Revision, SceneDiff, SceneEpoch, SceneSnapshot};
 
 // Portable projection captures, apart from the live wire they snapshot.
 mod capture;
-pub use capture::{PROJECTION_CAPTURE_VERSION, ProjectionCaptureError, ProjectionCaptureV1};
+pub use capture::{
+    CaptureAuthorityV1, PROJECTION_CAPTURE_V2, PROJECTION_CAPTURE_VERSION, ProjectionCaptureError,
+    ProjectionCaptureV1, ProjectionCaptureV2,
+};
 
 /// The first compatible Graphshell wire version.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
