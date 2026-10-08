@@ -145,7 +145,7 @@ export behavior remain compatible. Derived specimens explicitly disclose an
 attached mode sheet; rendering/editing that sheet, custom calculators,
 portable import/export controls and Turnstone mounting remain open.
 
-**Validation (2026-10-07, macOS x86_64):** 55 shared Tabard tests, 8 retained
+**Initial surface validation (2026-10-07, macOS x86_64):** 55 shared Tabard tests, 8 retained
 workshop tests, 4 desktop tests and 17 Tinct tests pass, plus Tinct's doctest.
 The surface tests operate real pointer/keyboard controls and assert laid-out
 specimen styles, all four profiles, history, native text synchronization,
@@ -169,6 +169,63 @@ strict dependency linting remains blocked by existing Meristem type-complexity
 and shared Tabard documentation/large-enum/filter-map lints. The documentation
 judgment audit reports inherited snapshot-digest and browser-receipt coverage
 errors (257/258 active documents); this slice creates no active design document.
+
+### Shared-component specimens (2026-10-07)
+
+**Status (2026-10-07):** implemented. Mark confirmed that the workshop should
+exercise the existing stack and authorized extending existing crates as needed.
+Cambium now exposes Illume-backed `code_styles`/`highlighted_code`, shared
+read-only styled runs, local syntax palette CSS and explicit-mode syntax CSS.
+The existing editor APIs retain their behavior; invalid UTF-8 style boundaries
+are ignored by the common run builder. The workshop uses these APIs instead of
+manually assigned token roles.
+
+The reader extracts the checked-in HTML through Fleece, lowers it to the shared
+Inker document and uses document-lanes/document-canvas for shaping and reflow.
+Mode and seed changes preserve the source packet. The native producer uses the
+host's existing render core/device and invalidates its retained texture when
+the library replaces the reader instance. The graph uses Cambium's actual
+`GraphCanvasSwatch` and Sprigging leaf, including pointer, hover, focus and
+keyboard selection. Its lower-62-bit key follows the shared leaf/producer
+namespace. `workshop_stylesheet()` composes the shared component rules.
+
+Native inspection exposed a document-canvas font identity bug: regular and
+bold faces in the same collection shared a blob ID and collapsed to the first
+face. `FontInterner` now keys by both blob ID and collection index. Its new
+regression proves separate faces and same-face clone deduplication; fresh
+native reader images show a bold heading followed by regular body text.
+
+**Validation:** Cambium's highlight-enabled suite passes 263 unit tests and its
+compile-fail doctest (one existing editor doctest remains ignored). The workshop
+passes 6 specimen unit tests and 12 retained surface/component tests; the desktop
+passes 4 tests. The mounted tests prove real Rust lexer spans, all 16 syntax
+variables in all four modes, stable reader source and real graph selection
+without authored-theme mutation. Shared graph tests check paint/target geometry.
+Strict Clippy with `--no-deps` passes for both Tabard packages; Cambium's broader
+lint run succeeds with existing warnings outside the changed highlighting files.
+Port boundaries and scoped formatting pass. Cambium's root module has inherited
+ordering differences under rustfmt, left untouched.
+
+The wider document-canvas suite reports 85 passes and one table-wrapping failure
+(`normal_width_table_wraps_unbroken_link_inside_its_cell`). A controlled comparison
+against the original `HEAD` font interner reproduces the same assertion; the
+fixed interner's two identity tests pass. This inherited geometry failure remains
+open. The documentation judgment audit retains its initial 257/258 coverage and
+snapshot/browser-receipt errors; no active design document was added.
+
+Before the font correction, all four native Mesquite scenarios pass: shared
+components (9 captures), authoring (8), fresh-process reopen (1) and narrow (3),
+with 181 scenario frames and no blank captures. These prove all four modes,
+real graph selection, seed edit/undo, save/reopen and narrow composition. Fresh
+font-corrected light/dark images confirm the typography fix. Subsequent full
+recapture attempts hit surface occlusion before pending captures could present;
+the failed receipts are retained and do not constitute passing scenario runs.
+Representative images and receipts are retained in
+[`ports/tabard/desktop/receipts/2026-10-07_shared_components`](../../../ports/tabard/desktop/receipts/2026-10-07_shared_components).
+
+This is a bounded read-only reader appearance and selectable graph specimen.
+Reader link activation/session accessibility, source editing, full graph
+workspace behavior and host appearance activation remain separate capabilities.
 
 ## The model (decision record)
 
