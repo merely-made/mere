@@ -29,6 +29,7 @@ use layout_dom_api::{LocalName, Namespace, QualName};
 mod action_list;
 mod arrangement;
 mod atlas;
+mod command_set;
 mod command_surface;
 mod command_menu_bar;
 mod component;
@@ -97,6 +98,7 @@ pub use atlas::{
     GraphCanvasAtlasField, GraphCanvasAtlasPaint, GraphCanvasAtlasProjectedCompoundPath,
     GraphCanvasAtlasProjectedShape, GraphCanvasAtlasRoute, GraphCanvasAtlasView,
 };
+pub use command_set::{Command, CommandChoices, CommandSet};
 pub use command_surface::{
     CommandEvent, CommandItem, CommandState, CommandSurfaceKind, command_menu, command_palette,
     command_picker, command_surface,
@@ -113,7 +115,7 @@ pub use disclosure::{
     TreeSelectionMode, TreeState, accordion, accordion_with, disclosure, disclosure_with,
     tree_view,
 };
-pub use editor::{EditHistory, pair_close, wrap_selection};
+pub use editor::{EditHistory, History, pair_close, wrap_selection};
 pub use graph_canvas::{
     GRAPH_CANVAS_SWATCH_CSS, GraphAtlasEvent, GraphCanvasEdge, GraphCanvasEvent, GraphCanvasNode,
     GraphCanvasNodeDrag, GraphCanvasNodeFootprint, GraphCanvasNodeRegion, GraphCanvasRelation,

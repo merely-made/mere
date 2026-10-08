@@ -188,14 +188,15 @@ impl Canvas {
             }
         }
         // Pan inertia: glide + decay when not actively middle-dragging.
-        let gliding = self.middle_drag.is_none()
+        let hand_panning = self.middle_drag.is_some() || self.left_panning();
+        let gliding = !hand_panning
             && (self.pan_velocity.0.abs() > 0.05 || self.pan_velocity.1.abs() > 0.05);
         if gliding {
             self.camera.offset.0 += self.pan_velocity.0;
             self.camera.offset.1 += self.pan_velocity.1;
             self.pan_velocity.0 *= PAN_DECAY;
             self.pan_velocity.1 *= PAN_DECAY;
-        } else if self.middle_drag.is_none() {
+        } else if !hand_panning {
             self.pan_velocity = (0.0, 0.0);
         }
         // Following the layout: ease toward fit-to-content while physics plays.

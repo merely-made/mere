@@ -2086,6 +2086,7 @@ dependencies = [
 name = "cambium"
 version = "0.3.3"
 dependencies = [
+ "edit-history",
  "genet-scripted-dom",
  "genet-text",
  "illume",
@@ -4830,6 +4831,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "edit-history"
+version = "0.1.0"
+
+[[package]]
 name = "eidetic"
 version = "0.0.2"
 dependencies = [
@@ -6546,6 +6551,7 @@ dependencies = [
  "chartulary",
  "chirograph",
  "distillery",
+ "edit-history",
  "eidetic",
  "getrandom 0.3.4",
  "graphshell-client",
@@ -9204,6 +9210,7 @@ dependencies = [
  "errand",
  "genet-host-api",
  "inker",
+ "mere-page-load",
  "netfetcher",
  "pandect",
  "pollster",
@@ -9349,6 +9356,10 @@ dependencies = [
  "tokio-util",
  "tracing",
 ]
+
+[[package]]
+name = "mere-page-load"
+version = "0.0.1"
 
 [[package]]
 name = "mere-persona-picker"
@@ -12356,6 +12367,7 @@ version = "0.2.0"
 dependencies = [
  "genet-host-api",
  "inker",
+ "mere-page-load",
  "url",
  "workbench",
 ]
