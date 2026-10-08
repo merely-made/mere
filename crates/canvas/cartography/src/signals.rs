@@ -26,6 +26,10 @@ use serde::{Deserialize, Serialize};
 /// The enumeration order every score's ordinal follows (F84): the order is
 /// computed once, by the host's registry, and travels in the request.
 pub const ORDER_TIMELINE: &str = "order.timeline";
+/// Most recently visited first, the Spiral's order when recency leads.
+pub const ORDER_RECENCY: &str = "order.recency";
+/// Each node's recency in `0..=1`, which picks its Spiral rung (F132).
+pub const WEIGHT_RECENCY: &str = "weight.recency";
 /// The graph Laplacian's coordinates, which Spectral places by.
 pub const COORDS_SPECTRAL: &str = "coords.spectral";
 /// Coordinates a host's own projection produced (UMAP, t-SNE, PCA), which

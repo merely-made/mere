@@ -13,7 +13,7 @@ use kernel::graph::apply::{GraphDelta, apply_graph_delta};
 use kernel::graph::fixtures::GraphFixtures;
 
 use super::arrangement_goldens::topic_fixture;
-use crate::canvas::channels::{Channel, OrderSource};
+use crate::canvas::channels::{Channel, OrderSource, WeightSource};
 use crate::canvas::{Canvas, PhysicsChoice, PhysicsKindSource, PhysicsLaw, PhysicsOverlay};
 use crate::signals::{ImportanceMetric, RegistryRuns};
 
@@ -41,7 +41,8 @@ fn read_everything(canvas: &mut Canvas) {
             Channel::Order(OrderSource::Timeline),
             Channel::Rings,
             Channel::Coords,
-            Channel::Weight,
+            Channel::Weight(WeightSource::Degree),
+            Channel::Weight(WeightSource::Recency),
             Channel::Importance(ImportanceMetric::Betweenness),
             Channel::Bridges,
         ] {

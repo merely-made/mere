@@ -10,8 +10,9 @@
 //! not: it places the graph in the order it is handed, chooses the browser's
 //! LOD rungs from the recency it is handed, and maps `NodeKey`s back into the
 //! local canvas projection. That is the boundary P3 exists to prove. The order
-//! and the recency are the host's channel registry's (`order.recency`,
-//! `order.timeline`; dynamics grammar plan, G2b).
+//! and the recency are the host's channel registry's, read from keyed signals
+//! like every other arrangement's facts (`order.recency` or `order.timeline`,
+//! and `weight.recency`; dynamics grammar plan, G2b and F132).
 
 use std::collections::HashMap;
 
@@ -23,7 +24,10 @@ use sceno::{
 
 use crate::representation::{RepresentationState, default_graph_representation_registry};
 use crate::scene_out::MERE_GRAPH_ADAPTER;
+use crate::signals::{IntelligenceSignals, SignalFault, WEIGHT_RECENCY};
 use crate::{PositionedEdge, PositionedNode, Projection, ProjectionMetadata};
+
+const SPIRAL_ID: &str = "phyllotaxis.default";
 
 /// The persisted score plus the ordinary Mere canvas projection it realizes.
 #[derive(Clone, Debug, PartialEq)]
@@ -34,19 +38,21 @@ pub struct MereSpiralProjection {
 
 /// Build and realize Mere's P3 pane-spiral score.
 ///
-/// `extents` are the host's measured node faces. `ordered` is the order the
-/// spiral places the nodes in, most recent first or the graph's own order, and
-/// `recency` each node's recency in `0..=1`, which picks its rung; the host's
-/// channel registry produces both. The portable score retains only the
-/// ordinal, never a Mere timestamp.
+/// `signals` carry what the host's channel registry computed: the order the
+/// spiral places the nodes in, under `order` (`order.recency`, most recent
+/// first, or `order.timeline`, the graph's own), and each node's recency in
+/// `0..=1` under `weight.recency`, which picks its rung (F132). `extents` are
+/// the host's measured node faces. The portable score retains only the
+/// ordinal, never a Mere timestamp. A channel missing or of another kind is
+/// reported on the projection's faults, with nothing placed.
 pub fn project_spiral_score(
     graph: &Graph,
+    signals: &IntelligenceSignals,
+    order: &str,
     extents: Option<&HashMap<NodeKey, (f32, f32)>>,
     focus: Option<NodeKey>,
-    ordered: &[NodeKey],
-    recency: &HashMap<NodeKey, f32>,
 ) -> MereSpiralProjection {
-    project_spiral_score_for_view(graph, extents, focus, ordered, recency, 1.0, None)
+    project_spiral_score_for_view(graph, signals, order, extents, focus, 1.0, None)
 }
 
 /// Build and realize Mere's P3 pane-spiral score for one declared view.
@@ -56,13 +62,35 @@ pub fn project_spiral_score(
 /// hysteresis; it never changes source identity, order, placement, or geometry.
 pub fn project_spiral_score_for_view(
     graph: &Graph,
+    signals: &IntelligenceSignals,
+    order: &str,
     extents: Option<&HashMap<NodeKey, (f32, f32)>>,
     focus: Option<NodeKey>,
-    ordered: &[NodeKey],
-    recency: &HashMap<NodeKey, f32>,
     zoom_level: f32,
     previous: Option<&Score>,
 ) -> MereSpiralProjection {
+    let order = signals.order(order);
+    let weights = signals.weights(WEIGHT_RECENCY);
+    let (ordered, recency) = match (order, weights) {
+        (Ok(order), Ok(weights)) => (
+            order.order.as_slice(),
+            weights
+                .weights
+                .iter()
+                .copied()
+                .collect::<HashMap<NodeKey, f32>>(),
+        ),
+        (order, weights) => {
+            let faults: Vec<SignalFault> =
+                [order.err(), weights.err()].into_iter().flatten().collect();
+            let mut projection = crate::adapters::empty_projection(SPIRAL_ID);
+            projection.metadata.faults = faults;
+            return MereSpiralProjection {
+                score: Score::new(Arrangement::Spiral(Spiral::default())),
+                projection,
+            };
+        },
+    };
     let registry = default_graph_representation_registry();
     let previous: HashMap<&str, &Representation> = previous
         .into_iter()
@@ -158,7 +186,7 @@ pub fn project_spiral_score_for_view(
             PortableSize::new(scene.bounds.size.w, scene.bounds.size.h),
         ),
         metadata: ProjectionMetadata {
-            strategy_id: Some("phyllotaxis.default".to_string()),
+            strategy_id: Some(SPIRAL_ID.to_string()),
             settled: true,
             faults: Vec::new(),
         },
@@ -197,10 +225,79 @@ mod tests {
         (graph, keys)
     }
 
-    /// The registry's recency (`order.recency`) is computed host-side; these
-    /// tests hand the spiral the order and the values it would produce.
-    fn newest(keys: &[NodeKey]) -> HashMap<NodeKey, f32> {
-        keys.iter().map(|key| (*key, 1.0)).collect()
+    use crate::signals::{
+        ImportanceWeights, NodeOrder, ORDER_RECENCY, ORDER_TIMELINE, Signal, SignalKind,
+    };
+
+    /// The registry's recency (`order.recency`, `weight.recency`) is computed
+    /// host-side; these tests hand the spiral the signals it would produce.
+    fn keyed(ordered: &[NodeKey], recency: &HashMap<NodeKey, f32>) -> IntelligenceSignals {
+        IntelligenceSignals::new()
+            .with(
+                ORDER_RECENCY,
+                Signal::Order(NodeOrder {
+                    order: ordered.to_vec(),
+                }),
+            )
+            .with(
+                WEIGHT_RECENCY,
+                Signal::Weights(ImportanceWeights {
+                    weights: recency.iter().map(|(k, v)| (*k, *v)).collect(),
+                }),
+            )
+    }
+
+    fn newest(keys: &[NodeKey]) -> IntelligenceSignals {
+        keyed(keys, &keys.iter().map(|key| (*key, 1.0)).collect())
+    }
+
+    /// F132: the Spiral reports a missing order or recency, or one of another
+    /// kind, and places nothing; with both it places every node (the control).
+    #[test]
+    fn the_spiral_reports_a_missing_or_mistyped_channel_and_places_nothing() {
+        let (graph, keys) = fixture(1..=3);
+        let whole = newest(&keys);
+        let placed = project_spiral_score(&graph, &whole, ORDER_RECENCY, None, None);
+        assert_eq!(placed.projection.nodes.len(), 3);
+        assert!(placed.projection.metadata.faults.is_empty());
+
+        let no_timeline = project_spiral_score(&graph, &whole, ORDER_TIMELINE, None, None);
+        assert!(no_timeline.projection.nodes.is_empty());
+        assert!(no_timeline.score.items.is_empty());
+        assert_eq!(
+            no_timeline.projection.metadata.faults,
+            vec![SignalFault::Missing {
+                id: ORDER_TIMELINE.into()
+            }]
+        );
+
+        let mistyped = IntelligenceSignals::new()
+            .with(
+                ORDER_RECENCY,
+                Signal::Order(NodeOrder {
+                    order: keys.clone(),
+                }),
+            )
+            .with(
+                WEIGHT_RECENCY,
+                Signal::Order(NodeOrder {
+                    order: keys.clone(),
+                }),
+            );
+        let wrong = project_spiral_score(&graph, &mistyped, ORDER_RECENCY, None, None);
+        assert!(wrong.projection.nodes.is_empty());
+        assert_eq!(
+            wrong.projection.metadata.faults,
+            vec![SignalFault::Mistyped {
+                id: WEIGHT_RECENCY.into(),
+                expected: SignalKind::Weights,
+                found: SignalKind::Order,
+            }]
+        );
+        assert_eq!(
+            wrong.projection.metadata.strategy_id.as_deref(),
+            Some(SPIRAL_ID)
+        );
     }
 
     #[test]
@@ -219,8 +316,13 @@ mod tests {
             (keys[2], (80.0, 80.0)),
             (keys[3], (88.0, 88.0)),
         ]);
-        let projected =
-            project_spiral_score(&graph, Some(&extents), Some(keys[3]), &ordered, &recency);
+        let projected = project_spiral_score(
+            &graph,
+            &keyed(&ordered, &recency),
+            ORDER_RECENCY,
+            Some(&extents),
+            Some(keys[3]),
+        );
         assert_eq!(
             projected.score.items[0].source.id,
             Uuid::from_u128(4).to_string()
@@ -252,23 +354,24 @@ mod tests {
         let (newest_key, oldest) = (keys[0], keys[1]);
         let ordered = [newest_key, oldest];
         let recency = HashMap::from([(newest_key, 1.0), (oldest, 0.0)]);
+        let signals = keyed(&ordered, &recency);
         let extents = HashMap::from([(newest_key, (64.0, 64.0)), (oldest, (64.0, 64.0))]);
 
         let near = project_spiral_score_for_view(
             &graph,
+            &signals,
+            ORDER_RECENCY,
             Some(&extents),
             None,
-            &ordered,
-            &recency,
             1.0,
             None,
         );
         let far = project_spiral_score_for_view(
             &graph,
+            &signals,
+            ORDER_RECENCY,
             Some(&extents),
             None,
-            &ordered,
-            &recency,
             0.5,
             None,
         );
@@ -283,8 +386,15 @@ mod tests {
     #[test]
     fn an_unmeasured_item_does_not_claim_a_card() {
         let (graph, keys) = fixture(1..=1);
-        let projected =
-            project_spiral_score_for_view(&graph, None, None, &keys, &newest(&keys), 2.0, None);
+        let projected = project_spiral_score_for_view(
+            &graph,
+            &newest(&keys),
+            ORDER_RECENCY,
+            None,
+            None,
+            2.0,
+            None,
+        );
         assert_eq!(
             projected.score.items[0].representation,
             Representation::Glyph
@@ -296,34 +406,41 @@ mod tests {
     fn prior_score_supplies_hysteresis_and_focus_stays_live() {
         let (graph, keys) = fixture(1..=1);
         let key = keys[0];
-        let recency = newest(&keys);
+        let signals = newest(&keys);
         let extents = HashMap::from([(key, (64.0, 64.0))]);
-        let card =
-            project_spiral_score_for_view(&graph, Some(&extents), None, &keys, &recency, 1.0, None);
-        let retained = project_spiral_score_for_view(
+        let card = project_spiral_score_for_view(
             &graph,
+            &signals,
+            ORDER_RECENCY,
             Some(&extents),
             None,
-            &keys,
-            &recency,
+            1.0,
+            None,
+        );
+        let retained = project_spiral_score_for_view(
+            &graph,
+            &signals,
+            ORDER_RECENCY,
+            Some(&extents),
+            None,
             0.95,
             Some(&card.score),
         );
         let released = project_spiral_score_for_view(
             &graph,
+            &signals,
+            ORDER_RECENCY,
             Some(&extents),
             None,
-            &keys,
-            &recency,
             0.89,
             Some(&retained.score),
         );
         let focused = project_spiral_score_for_view(
             &graph,
+            &signals,
+            ORDER_RECENCY,
             Some(&extents),
             Some(key),
-            &keys,
-            &recency,
             0.2,
             Some(&released.score),
         );
