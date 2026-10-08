@@ -6593,6 +6593,7 @@ dependencies = [
  "accesskit",
  "chirograph",
  "genet-scripted-dom",
+ "incipit",
  "layout-dom-api",
  "sceno",
  "scenomise",

@@ -12,9 +12,9 @@
 //!
 //! The fixture is scenotime's copy of the mer3ly site build's
 //! `projection-scene.json`; its provenance is recorded in
-//! `scenotime/tests/site_projection.rs`. The shelfmark third of the
-//! decomposition is not exercised here: graphshell-client has no `incipit`
-//! edge.
+//! `scenotime/tests/site_projection.rs`. The third sibling, a shelfmark,
+//! cites the capture by its content address and the authority's generation;
+//! the check is written here as a host would write it, not shipped.
 
 use std::collections::HashMap;
 
@@ -23,6 +23,7 @@ use chirograph::{
     SceneSnapshot, Sha256NamedInformation,
 };
 use graphshell_client::frozen::FrozenScene;
+use incipit::{ShelfmarkAuthorityV1, ShelfmarkInputV1, ShelfmarkV1};
 use sceno::{InstanceId, Score};
 use scenotime::{SceneDiff, SceneTrace, TraceStep};
 use serde::Deserialize;
@@ -157,4 +158,99 @@ fn the_site_artifact_decomposes_into_a_capture_and_a_sibling_trace() {
     let head = trace.head();
     let after = FrozenScene::freeze_snapshot(&head, "Repository graph", &names(&head, &artifact));
     assert_eq!(after.relations.len() + 1, frozen.relations.len());
+}
+
+/// The shelfmark a host would write beside a capture: the projection is the
+/// capture's content address, and the authority input names the authority's
+/// digest and the generation it expects.
+fn cite(capture: &ProjectionCaptureV2) -> ShelfmarkV1 {
+    let authority = capture.authority.as_ref().expect("authority");
+    let mut shelfmark = ShelfmarkV1::new(
+        capture
+            .content_address()
+            .expect("the capture has an address")
+            .to_string(),
+    );
+    shelfmark.inputs.insert(
+        "authority".to_owned(),
+        ShelfmarkInputV1 {
+            authority: ShelfmarkAuthorityV1 {
+                adapter: authority.adapter.clone(),
+                record: authority.sha256.to_string(),
+            },
+            reading: authority.schema.clone(),
+            reading_parameters: None,
+            arrangement: None,
+            expects_generation: authority.generation.to_string(),
+        },
+    );
+    shelfmark
+}
+
+/// A host's check of a shelfmark against the capture it is handed.
+fn check(shelfmark: &ShelfmarkV1, capture: &ProjectionCaptureV2) -> Result<(), String> {
+    shelfmark.validate().map_err(|error| format!("{error:?}"))?;
+    let address = capture
+        .content_address()
+        .map_err(|error| error.to_string())?;
+    if shelfmark.projection != address.to_string() {
+        return Err(format!(
+            "address: cited {}, capture is {address}",
+            shelfmark.projection
+        ));
+    }
+    let authority = capture
+        .authority
+        .as_ref()
+        .ok_or("capture has no authority")?;
+    let input = shelfmark
+        .inputs
+        .get("authority")
+        .ok_or("shelfmark cites no authority")?;
+    if input.authority.adapter != authority.adapter
+        || input.authority.record != authority.sha256.to_string()
+    {
+        return Err("authority: cited a different authority".to_owned());
+    }
+    if input.expects_generation != authority.generation.to_string() {
+        return Err(format!(
+            "generation: cited {}, capture is {}",
+            input.expects_generation, authority.generation
+        ));
+    }
+    Ok(())
+}
+
+#[test]
+fn a_shelfmark_cites_the_capture_by_address_and_generation() {
+    let artifact = artifact();
+    let bytes = capture(&artifact).encode().expect("the capture encodes");
+    let capture = ProjectionCaptureV2::decode(&bytes).expect("the capture decodes");
+    let shelfmark = cite(&capture);
+
+    // The shelfmark travels as its own artifact and still matches.
+    let wire = serde_json::to_string(&shelfmark).expect("serializes");
+    let shelfmark: ShelfmarkV1 = serde_json::from_str(&wire).expect("reads back");
+    assert_eq!(check(&shelfmark, &capture), Ok(()));
+    assert_eq!(
+        shelfmark.projection,
+        chirograph::ContentHash::of(&bytes).to_string(),
+        "the cited address is the capture's bytes"
+    );
+
+    // A different capture: one later revision of the same scene.
+    let mut moved = capture.clone();
+    moved.scene.revision.0 += 1;
+    let refused = check(&shelfmark, &moved).expect_err("another capture");
+    assert!(refused.starts_with("address"), "{refused}");
+
+    // The same capture, cited at another generation.
+    let mut stale = shelfmark.clone();
+    stale
+        .inputs
+        .get_mut("authority")
+        .expect("authority input")
+        .expects_generation = (artifact.score.generation - 1).to_string();
+    let refused = check(&stale, &capture).expect_err("another generation");
+    assert!(refused.starts_with("generation"), "{refused}");
 }
