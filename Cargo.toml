@@ -14,6 +14,8 @@ members = [
     "crates/system/fetch",
     "crates/system/page-load",
     "crates/system/framing",
+    # The labelled state witness G8 and Isocosm share (F116 to F131).
+    "crates/system/state-witness",
     "crates/system/content-contract",
     "crates/system/proofs",
     "crates/system/shell-state",
@@ -271,6 +273,7 @@ blake3 = "1"
 mere = { path = "crates/mere" }
 
 fetch = { package = "mere-fetch", version = "0.0.1", path = "crates/system/fetch" }
+framing = { package = "mere-framing", version = "0.0.1", path = "crates/system/framing" }
 page-load = { package = "mere-page-load", version = "0.0.1", path = "crates/system/page-load" }
 content-contract = { path = "crates/system/content-contract" }
 proofs = { package = "mere-proofs", version = "0.1.0", path = "crates/system/proofs" }
