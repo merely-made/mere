@@ -12,7 +12,7 @@ name = "registry"
 [features]
 default = ["diagnostics", "input", "knowledge", "layout", "lens", "mod-loader", "protocol", "viewer"]
 diagnostics = ["dep:log"]
-input = ["dep:serde"]
+input = ["dep:serde", "dep:command-menu"]
 knowledge = ["dep:nucleo", "dep:parking_lot", "dep:serde", "dep:serde_json", "dep:tincture"]
 layout = ["dep:serde"]
 lens = ["dep:kernel", "dep:petgraph", "dep:serde", "dep:tabard", "dep:tincture"]
@@ -25,6 +25,8 @@ pdf = ["viewer"]
 test-utils = ["mod-loader"]
 
 [dependencies]
+# Default key bindings name the shared command ids (Scenograph editor plan, SE50).
+command-menu = { workspace = true, optional = true }
 http = { version = "1.4", optional = true }
 infer = { version = "0.19", optional = true }
 inventory = { version = "0.3", optional = true }

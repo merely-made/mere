@@ -272,7 +272,7 @@ impl IdentityStorage for PassphraseEncryptedStorage {
         let mut plain: PlaintextProfile = serde_json::from_slice(&plaintext_bytes)
             .map_err(|e| IdentityError::Backend(format!("decode plaintext: {e}")))?;
 
-        let mut slots = HashMap::with_capacity(plain.slots.len());
+        let mut slots = crate::SlotMap::with_capacity(plain.slots.len());
         for s in &mut plain.slots {
             let (k, slot) = plaintext_to_slot(s);
             slots.insert(k, slot);

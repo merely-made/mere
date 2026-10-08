@@ -266,8 +266,9 @@ pub struct Profile {
     /// Master keypair. Used for Mere-native derivation
     /// ([`IdentityProvider::derive_keypair`]) and for transport identity.
     pub master: Ed25519Keypair,
-    /// Per-protocol slots keyed by [`ProtocolKey`].
-    pub slots: HashMap<ProtocolKey, IdentitySlot>,
+    /// Per-protocol slots keyed by [`ProtocolKey`], wiped whole when freed
+    /// (vault lock ruling 71).
+    pub slots: SlotMap,
 }
 
 impl Profile {
@@ -277,7 +278,7 @@ impl Profile {
             id,
             display_name: display_name.into(),
             master,
-            slots: HashMap::new(),
+            slots: SlotMap::new(),
         }
     }
 
@@ -767,7 +768,7 @@ impl IdentityStorage for InMemoryStorage {
         let bytes = guard
             .get(id)
             .ok_or_else(|| IdentityError::Backend(format!("profile not found: {:?}", id)))?;
-        let mut slots = HashMap::with_capacity(bytes.slots.len());
+        let mut slots = SlotMap::with_capacity(bytes.slots.len());
         for (k, s) in &bytes.slots {
             slots.insert(k.clone(), deserialize_slot(s));
         }
@@ -829,6 +830,10 @@ impl IdentityStorage for InMemoryStorage {
         Ok(())
     }
 }
+
+mod slot_map;
+
+pub use slot_map::SlotMap;
 
 #[cfg(test)]
 mod tests;

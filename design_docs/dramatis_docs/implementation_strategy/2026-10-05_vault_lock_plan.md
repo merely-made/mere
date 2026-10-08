@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-08)**: rulings 1 to 66 in §3; the threat statement is
+**Status (2026-10-08)**: rulings 1 to 72 in §3; the threat statement is
 still open. L1 landed (`2556a20c`). L2's checkpoints A (`7c588deb`) and B
 (`ec1768ab`) landed. Still to come in L2: the Secret Service on the
 ThinkPad, ruling 42 (Linux starts locked), ruling 44 (Distillery's
@@ -793,6 +793,56 @@ root, when `--passphrase-fd` is given, or when the vault directory holds
 `vault.json`; otherwise DPAPI. The installed resident's directory holds
 only `auto-unlock-root.json` and `profiles`, so it stays on DPAPI.
 
+Rulings 67 to 69 were asked on 2026-10-08 from the Secret Service's
+assessment (§6).
+
+**Ruling 67** *(the Secret Service's Prompt).* *While the vault is locked,
+a client's `Unlock` gets a Prompt object (ruling 10).* Options: the
+Prompt shows the resident's native unlock (ruling 47's prompt), handed in
+by the resident, with a cancel completing as dismissed; the Prompt shows
+nothing and completes when the vault is unlocked by any route. Mark:
+**"Show the native unlock (Recommended)"**.
+
+**Ruling 68** *(a client's `Lock`).* Options:
+- any `Lock` engages the whole vault lock, as `ssh-add -x` does (ruling 9);
+- per-object flips under the vault lock;
+- refused.
+
+Mark: **"Locks the whole vault (Recommended)"**.
+
+**Ruling 69** *(who serves it).* *gnome-keyring already owns
+`org.freedesktop.secrets` on the ThinkPad.* Options: test-served for this
+checkpoint, proven under a disposable bus, with djinn's wiring and the
+hand-over from gnome-keyring as later items; djinn serves it now behind an
+owner setting that is off by default. Mark: **"Test-served for now
+(Recommended)"**.
+
+**Ruling 70** *(the Linux residue; asked 2026-10-08).* *On Linux, personae's
+`no_residue` finds the sealed root key in a 564-byte block freed uncleared
+during `save` (3 of 3 runs; clean on Windows at the same commit).* Options:
+trace it now, with ruling 42's Linux proof waiting; ruling 42's proof
+first; record it and go on to L3. Mark: **"Trace it now (Recommended)"**.
+
+Rulings 71 and 72 were asked on 2026-10-08 from ruling 70's trace (§6).
+
+**Ruling 71** *(the slot table).* *On lock the vault frees its profile's
+slot `HashMap` uncleared. Values moved into it carry stale stack bytes in
+their padding, the master seed among them: Linux, 3 of 4 runs, depending
+on layout.* Options:
+- the slots move to `Vec` storage that `zeroize` wipes whole, padding and
+  spare capacity included, on drop and on growth;
+- clear only at lock;
+- ledger it.
+
+Mark: **"Zeroizing Vec storage (Recommended)"**.
+
+**Ruling 72** *(the test fixture).* *The original Linux hit was
+`no_residue`'s own canary profile, built inside the measured window. Its
+`HashMap` caught half the root key from the test's stack copy.* Options:
+build the fixtures unarmed and drop them after disarming, as the
+passphrase scenario does; keep them armed. Mark: **"Build fixtures unarmed
+(Recommended)"**.
+
 Still open: a threat statement naming hibernation and the pagefile.
 
 ## 4. Phases
@@ -819,9 +869,10 @@ made, and carried out since under the later rulings.
   - [x] `CastellanResident` drops its keys, so items and the OTP gate return
         `Locked`;
   - [x] the snapshot reports Locked, and Unlock is native-only;
-  - [ ] Secret Service collections report Locked, `GetSecret(s)` refuses,
+  - [x] Secret Service collections report Locked, `GetSecret(s)` refuses,
         and `Unlock` returns a Prompt, proven on the ThinkPad with
-        `secret-tool` under a disposable bus.
+        `secret-tool` under a disposable bus. *(2026-10-08, `aac67a85`;
+        §6.)*
 - **L3 — triggers.** Done when:
   - [ ] each ruled trigger is proven, idle with an injected clock;
   - [ ] there are real receipts for Windows `Win+L` and suspend, and for
@@ -1335,3 +1386,165 @@ unlock follow-through, and non-Windows startup unlock backends, from the
   - outside djinn, `Unlock::from_env()` remains in `personae-agent`,
     `personae-vault`, `distillery-installed`, graphshell's `profile.rs`
     and its web-extension smoke host.
+
+**2026-10-08, the Secret Service assessed** (L2 checkpoint B, at
+`18404a4c`).
+- **What exists:**
+  - castellan's D-Bus server (about 1,460 lines, Linux-only);
+  - the store under it refuses while the resident is locked;
+  - `secret_service_linux.rs` drives `secret-tool` (store, lookup, clear)
+    under `dbus-run-session`.
+- **What is missing** (§2's survey still holds):
+  - `Locked` is a label flip on sets that start empty, not the vault's
+    state;
+  - `Unlock` never prompts;
+  - no lock or unlock change reaches D-Bus;
+  - nothing serves it in production.
+- *Reading, not ruled:* ruling 11's secret-free snapshot covers the Secret
+  Service's metadata (collections, labels, lookup attributes and content
+  types, which the specification treats as not secret). So a locked search
+  still answers and reports its items locked, and the client's `Unlock`
+  meets ruling 67's prompt. Under ruling 66 a Linux resident builds nothing
+  before its first unlock, so a snapshot exists whenever the service is
+  served.
+- **The ThinkPad.** It is at `192.168.4.32`, with ED25519 key
+  `SHA256:9kM6RpW0UxjYmEdg5ngHw1JL8J7Hm7B8QXXJGKWkB7o`, as recorded. Rust
+  1.98.1, `secret-tool`, `dbus-run-session`, `gdbus` and `zenity` are there.
+  Another session's checkout and builds are left alone; this work runs in
+  a worktree of its own.
+- **The build. Done when:**
+  - [x] collections and items report `Locked` exactly when the vault is
+        locked, and a lock or unlock emits the property change;
+  - [x] while locked, a search answers from the snapshot with every item
+        locked, `GetSecrets` returns nothing, and `Item.GetSecret` fails
+        `IsLocked`;
+  - [x] `Unlock` while locked returns a Prompt. Its `Prompt()` runs the
+        handed-in unlock: success completes with the unlocked objects, and
+        a cancel completes as dismissed with the vault still locked;
+  - [x] a client `Lock` of any object locks the vault;
+  - [x] proven on the ThinkPad under `dbus-run-session`: `secret-tool
+        lookup` on a locked vault brings up the scripted prompt and
+        returns the secret, and with a cancel returns nothing. The
+        properties and refusals are read with `gdbus`. The existing
+        receipt still passes. *2026-10-08: the reads use the receipt's
+        own bus connection instead of `gdbus`. Each `gdbus` call is a new
+        connection, so it cannot hold the transfer session `GetSecret`
+        needs.*
+  - [x] castellan's tests pass on Windows and Linux.
+
+**2026-10-08, the Secret Service built and proven** (`aac67a85`, branch
+`secret-lock`; checkpoint B's Secret Service).
+- **What changed:**
+  - castellan's store gains `MetadataSnapshot`, ruling 11's snapshot for
+    the Secret Service, held in memory and never written;
+  - `serve()` takes the host's `SecretServiceVault` (is locked, a watch,
+    lock, the native unlock prompt);
+  - `Locked` follows it, and a watcher announces each change as
+    `PropertiesChanged` on every object;
+  - while locked, reads answer from the snapshot;
+  - `Unlock` returns a Prompt object (`prompt.rs`);
+  - a client `Lock` of any collection, alias or item locks the vault.
+- ***Reading, not ruled:*** the snapshot is retaken at serve, at each
+  unlock and after each write made through the service. An edit made
+  through another surface while unlocked shows in the locked view after
+  the next of those.
+- **Verified on the ThinkPad (Fedora 44, under `dbus-run-session`):**
+  - the new receipt: Lock, the announcement, the locked reads, the
+    refusals, a cancelled prompt and an unlocking one through
+    `secret-tool lookup`;
+  - the existing store, lookup and clear receipt;
+  - castellan with all features (5 suites, 127 passed);
+  - **control:** `locked()` hard-wired to false fails the receipt at the
+    collection's `Locked`. The first draft read that property through a
+    caching proxy, which answered from the very signal under test; every
+    read is uncached now.
+- **Verified on Windows:** castellan by default (67) and with
+  `secret-service` (18), and `cargo_mode.py verify`.
+- **Fixed in passing:** personae's `ssh_ca_live` (`#![cfg(unix)]`, behind
+  `ssh`) had not compiled since `7926d3a8`, which moved the proofs to
+  insigne; it lacked `use personae::delegation::Issue`.
+- **Finding, Linux only:** personae's `no_residue` fails "sealed vault
+  locked". The sealed root key, raw, is in a 564-byte block freed
+  uncleared, allocated during `save`. This happened in 3 of 3 runs on the
+  ThinkPad. On Windows, at the same commit, every scenario is clean. L1's
+  instrument has not been run on Linux before, so L1's residue condition
+  holds on Windows only. Not yet traced.
+- **Still open:** djinn's wiring and the hand-over from gnome-keyring
+  (ruling 69); ruling 42's Linux runtime proof; the Linux residue above.
+
+**2026-10-08, ruling 70's trace.**
+- **Method:** on the ThinkPad, a temporary trap (`int3`) in the tracker's
+  allocator fired at the 564-byte allocation during `save`, and `gdb`
+  printed its stack. A temporary hex dump showed the block's contents.
+  Both were reverted.
+- **The block** was the `HashMap` table of `no_residue`'s own
+  `canary_profile()`, allocated inside the measured window. Beside heap
+  and stack pointers it held 16 bytes of the root key. The key was the
+  test's own stack local, passed by value to `open_with_key` and picked up
+  through padding when slot values were moved into the table.
+- **Building the fixture unarmed** clears "sealed vault locked" (7 of 7
+  runs). It then shows "passphrase vault locked" failing in 3 of 4 runs:
+  the master seed in a 564-byte block allocated at open and freed at lock.
+  That is the vault's own slot table, by the same mechanism, in personae's
+  code. Rulings 71 and 72 settle both.
+
+**2026-10-08, rulings 71 and 72 built** (`8eab9fcf`).
+- **`Profile::slots` is a `SlotMap`.** It is a small vector whose whole
+  buffer, padding and spare capacity included, is zeroed (with `zeroize`,
+  volatile) on drop, after a removal, and before an outgrown buffer is
+  freed. It keeps the `HashMap` methods callers use, and personae, castellan,
+  pandect, graphshell and djinn compile unchanged. The three loaders build it
+  with the slot count up front, so loading never grows it.
+- **`no_residue`'s `sealed_lock`** builds its canary profile unarmed and
+  drops it after disarming.
+- **Verified on Linux (ThinkPad):**
+  - `no_residue` clean 10 of 10 (with only the fixture fix: 1 of 4);
+  - personae with all features (207, three full runs) and castellan with all
+    features.
+- **Verified on Windows:** personae and castellan with all features, `no_residue`
+  clean (10 suites, 345 passed).
+- **So L1's no-residue condition now holds on Linux as well as Windows.**
+- **Seen in passing, neither from this change:**
+  - personae's `authoritative_opening_is_exclusive_until_every_clone_drops`
+    failed once in four full Linux runs ("authority is already held").
+    It passed 5 of 5 alone and the next three full runs. It is probably a
+    child process from the cross-process sibling test briefly holding the
+    lock across fork; not traced.
+  - djinn's `embedded_reservoir_two_process`, added today (`df0e0804`),
+    fails 3 tests on Windows with "All pipe instances are busy" (os error
+    231). It fails the same way at `origin/main` without this change, as a
+    control. It belongs to that lane.
+- **Next:** ruling 42's Linux runtime proof on the ThinkPad, then L3.
+
+**2026-10-08, ruling 42 proven on Linux** (ThinkPad, Fedora 44; djinn
+built plain at `fc3da34c`).
+- **The plain build** answers "unknown argument: --passphrase-fd", as on
+  Windows.
+- **Terminal path.** Each run used isolated roots and endpoints, as
+  djinn-testkit isolates them. A small Python pty driver typed each answer
+  only when its prompt appeared, since the ThinkPad has no `script(1)`:
+  - **no vault:** `started, waiting-for-unlock, vault-created, listening,
+    ready`. The terminal asked "No identity vault yet. Choose a passphrase
+    for a new one." then "Type the new vault passphrase again.", and
+    `vault.json` was created;
+  - **a wrong passphrase, then the right one:** `started,
+    waiting-for-unlock, unlock-refused, unlocked-at-start, listening,
+    ready`, with the reason shown before asking again. The status route
+    reported `startup_unlock` and `protection` as `passphrase`;
+  - **environment control** (`PERSONAE_PASSPHRASE` set, nothing typed): it
+    stays at `started, waiting-for-unlock`, the terminal waiting, never
+    ready.
+  - Each resident stopped through its own door.
+- **Native path** (Mark at the ThinkPad). The resident ran with no
+  terminal, only the desktop's display (`DISPLAY=:0` and the Xwayland
+  authority). GNOME's passphrase box came up. Eleven refused attempts were
+  each answered by the box again, then the right passphrase gave
+  `unlocked-at-start, listening, ready`, and later `stopping, stopped`. The
+  box's own Cancel was not exercised natively; the scripted unit test
+  covers it.
+- **Testing note:** with `XDG_RUNTIME_DIR` redirected to a scratch root,
+  GTK's box started the document portal's FUSE mount and `gvfsd-fuse` in
+  it. Both outlive the resident and must be unmounted and stopped
+  afterwards; they were.
+- **L2's last condition** (the Secret Service on the ThinkPad) and this
+  proof, which ruling 56 pairs with it, are done. Next: L3, the triggers.

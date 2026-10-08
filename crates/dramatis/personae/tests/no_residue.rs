@@ -159,17 +159,19 @@ fn sealed_lock(report: &mut Report, root: &std::path::Path, seed: [u8; 32], payl
     let key: [u8; 32] = canary_bytes(96);
     personae::save_passphrase_root(dir.join(PASSPHRASE_ROOT_FILE), &key, b"lock").unwrap();
     plant(2, "sealed root key", &key, false);
+    // The fixture is built unarmed and dropped after disarming, so the scan
+    // measures personae and not the test's own profile (ruling 72).
+    let profile = canary_profile(seed, payload);
     arm();
     phase(1);
     let storage = SealedProfileStorage::open_with_key(&dir, key);
-    storage
-        .save_profile(&canary_profile(seed, payload))
-        .unwrap();
+    storage.save_profile(&profile).unwrap();
     phase(2);
     let mut vault = IdentityVault::open(storage, &ProfileId("work".into())).unwrap();
     phase(3);
     vault.lock().unwrap();
     let (hits, overflow) = disarm();
+    drop(profile);
     report.check(
         "sealed vault locked",
         &["setup", "save", "open", "lock"],
