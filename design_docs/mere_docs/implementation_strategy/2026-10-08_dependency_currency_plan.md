@@ -56,9 +56,11 @@ A family moves together because its crates pin each other.
 
 **D9, coordinating with the refresh's owner (2026-10-08).** Mark: the refresh is **"The Codex agent"**'s. *Follows:* the coordinator writes the note and Mark relays it.
 
+**D10, the Servo parsers (2026-10-08; from D5).** Options: include them in genet's stage, the WPT and DOM suites as their gate; leave them. Mark: **"Include them (Recommended)"**.
+
 ## 4. Order
 
-Upstream first (D6): netrender (sha2 and its compatible updates; its text family is the Vello lane's, D8), then genet (accessibility, the small ones, the parsers if taken; its text family is the Vello lane's), then mere's own groups (security-sensitive, accessibility, data and Meaning, other), one mere lane at a time, each taking the genet and netrender repins as they land. Constraints:
+Upstream first (D6): netrender (sha2 and its compatible updates; its text family is the Vello lane's, D8), then genet (accessibility, the small ones, the Servo parsers (D10); its text family is the Vello lane's), then mere's own groups (security-sensitive, accessibility, data and Meaning, other), one mere lane at a time, each taking the genet and netrender repins as they land. Constraints:
 - every mere lane rewrites `Cargo.lock`, so mere lanes run one at a time;
 - genet and netrender lanes can run beside a mere lane, but mere takes them only through a repin, netrender first (genet depends on it), then genet, then mere;
 - at most three lanes at once (`~/.claude/CLAUDE.md`, Concurrency).
