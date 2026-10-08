@@ -237,6 +237,14 @@ Mark's words are quoted as the physics catalog plan records them (§3, P7, and �
 
 **F92, what runs beside G2's rework (2026-10-07).** Question: the order of G4 to G6 was left until G3 reported. Options: G4, the `DynamicsSpec`; G8, determinism; G6, satisfaction reports; nothing yet. Mark: **"G4, the DynamicsSpec (Recommended)"**. *Follows:* once G3 lands, G2's rework (F84 to F89 and its conflicts with G3) and G4 run as two lanes. G4 carries F78's composition pickers.
 
+**F116, carving the labelled digest out of G8 (2026-10-08; requested by the Isocosm lane under wing ruling 647).** Question: Isocosm's H2 (labelled entries and a first-divergence report) waits on the one labelled digest ruling 609 places in mere, while G8 is unbriefed and G2's rework and G4a run; a third lane reaches the three-task cap. Isocosm needs string labels, entries hashed from serde values consistent with its FNV-1a witness over postcard bytes (`isometer_core::snapshot::hash_bytes`), a first-divergence report, and nothing per frame; none of G8's float half. Options: now, as a third lane; after G4a lands; with G8 as a whole. Mark: **"Now, as a third lane (Recommended)"**. *Follows:* a small lane, G8a, builds the crate; the rest of G8 stays unbriefed.
+
+**F117, the crate's home (2026-10-08).** Options: a leaf crate in `crates/conatus/`, beside seiche; a leaf crate in `crates/system/`, with general infrastructure; a module of seiche, which would make Isocosm depend on the physics crate. Mark: **"Leaf crate, crates/system/"**. *Follows:* `crates/system/state-witness`, depending on serde and postcard alone.
+
+**F118, its name and tier (2026-10-08).** Question: published crates take family names and unpublished support crates plain ones, one hyphen at most; seiche is published (0.0.6), so if G8 later has seiche depend on the crate it must be published too. Options: `state-witness`, unpublished (Isocosm's plan calls it the state witness); `labelled-digest`, unpublished; published under a family name after a naming round. Mark: **"state-witness, unpublished (Recommended)"**. *Follows:* `publish = false`; Isocosm pins mere by revision. If G8 has seiche take the crate, a family-name round and a publish come then.
+
+**F119, retiring Isocosm's copy (2026-10-08).** Question: ruling 609 says no second copy sits beside `isometer_core::snapshot::hash_bytes`. Options: the crate owns the witness, proven equal to isometer's byte for byte, and the isometry lane switches `isometer_core` over; the crate takes the hash as a parameter and owns none. Mark: **"Crate exports it; isometry retires (Recommended)"**. *Follows:* `state-witness` owns `hash_bytes` (FNV-1a 64), with a test that it equals isometer's on fixed inputs; retiring isometer's copy is the isometry lane's change. *Reading, not ruled:* mere's own hand-written FNV-1a copies (about ten: mesh, esp, gaz, pictograph, cambium, linked-data and others) are noted, not moved; moving them is a separate question.
+
 **F40, G7 (2026-10-03).** Question: approve G7, arrangement roles (§2, proposed at `784ce5b5`), which carries out F18 to F30, and place it. Options: approve, with G7 before G3; approve, after G2; amend first. Mark: **"Approve; G7 before G3"**. *Follows:* G7 starts now beside G2's open work, and G3 follows it, since G3's schedules use captures with a role (F27).
 
 **F41, the README's text (2026-10-03).** Question: the design-vocabulary section F13 placed in the README, its projection half in Mark's words and its dynamics half drafted from the rulings, placed after Status. Options: use the text as shown; the projection half only; edit the wording. Mark: **"Use this text"**. *Follows:* the section is committed as shown.
@@ -439,6 +447,9 @@ From `2026-10-04_stack_seams_plan.md` §3.2, which hands it to this plan. It ext
 
   *Reading, not ruled:* G8 shapes the crate. Its name and home (a new crate,
   or a module of an existing one) go to Mark when G8 is briefed.
+  *Annotation, 2026-10-08:* carved out ahead of G8 at the Isocosm lane's
+  request (F116 to F119): `crates/system/state-witness`, unpublished, owning
+  the FNV-1a witness, built as G8a.
 
 ### G10 — input record and replay (balaur review fork E, 2026-10-06)
 
