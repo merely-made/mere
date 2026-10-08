@@ -313,6 +313,7 @@ pub fn document_projection(
     focus: Option<u64>,
 ) -> DocumentA11yProjection {
     use layout_dom_api::{LayoutDom as _, LocalName, Namespace, NodeKind};
+    let focused_opaque = focus;
     let focus = focus.and_then(|opaque| find_opaque(dom, dom.document(), opaque));
     let projection = genet_render::document_a11y_projection_with_style(
         dom,
@@ -327,8 +328,8 @@ pub fn document_projection(
     );
 
     // Cambium fields paint committed text and transient decoration as DOM
-    // children. Preserve Genet's generic projection, then replace only the
-    // value of explicit Cambium textboxes from their app-owned marker.
+    // children. Preserve Genet's generic projection, then make explicitly
+    // marked app textboxes accessible leaves with their app-owned value.
     let mut markers = std::collections::HashMap::new();
     let mut pending = vec![dom.document()];
     while let Some(node) = pending.pop() {
@@ -355,7 +356,33 @@ pub fn document_projection(
         return projection;
     }
 
-    let mut nodes = projection.nodes().to_vec();
+    let children: std::collections::HashMap<_, _> = projection
+        .nodes()
+        .iter()
+        .map(|node| (node.id, node.children.clone()))
+        .collect();
+    let mut descendants = std::collections::HashMap::new();
+    for id in markers.keys().copied() {
+        let mut found = Vec::new();
+        let mut pending = children
+            .get(&document_session_api::DocumentA11yNodeId::new(id))
+            .into_iter()
+            .flatten()
+            .copied()
+            .collect::<Vec<_>>();
+        while let Some(child) = pending.pop() {
+            found.push(child);
+            pending.extend(children.get(&child).into_iter().flatten().copied());
+        }
+        descendants.insert(id, found);
+    }
+    let hidden: std::collections::HashSet<_> = descendants.values().flatten().copied().collect();
+    let mut nodes: Vec<_> = projection
+        .nodes()
+        .iter()
+        .filter(|node| !hidden.contains(&node.id))
+        .cloned()
+        .collect();
     for node in &mut nodes {
         let Some((value, multiline)) = markers.get(&node.id.get()) else {
             continue;
@@ -363,6 +390,10 @@ pub fn document_projection(
         node.value = Some(value.clone());
         node.state.multiline = *multiline;
         node.state.editable = !node.state.disabled && !node.state.read_only;
+        node.children.clear();
+        node.state.focused |= descendants
+            .get(&node.id.get())
+            .is_some_and(|ids| ids.iter().any(|id| focused_opaque == Some(id.get())));
     }
     DocumentA11yProjection::new(
         projection.revision(),
@@ -735,22 +766,36 @@ mod tests {
         let root = dom.document();
         dom.set_inner_html(
             root,
-            r#"<div role="textbox" aria-label="Draft" aria-multiline="true" data-cambium-text-value="Café 👩🏽‍🚀" style="display:block;width:240px;height:40px">Café 👩🏽‍🚀<span> ghost</span><span>preedit</span><span>│</span></div><div role="textbox" aria-label="Title" data-cambium-text-value="Résumé 🇫🇷" style="display:block;width:240px;height:32px">Résumé 🇫🇷</div><div role="button" data-cambium-text-value="not a field">Button</div>"#,
+            "<div role=\"textbox\" aria-label=\"Draft\" aria-multiline=\"true\" data-cambium-text-value=\"Café 👩🏽‍🚀\nSecond line\" style=\"display:block;width:240px;height:40px\">Café 👩🏽‍🚀<span> ghost</span><span>preedit</span><span>│</span></div><div role=\"textbox\" aria-label=\"Title\" data-cambium-text-value=\"Résumé 🇫🇷\" style=\"display:block;width:240px;height:32px\">Résumé 🇫🇷</div><div role=\"button\" data-cambium-text-value=\"not a field\">Button</div>",
         );
-        let opaque_for = |needle: &str| {
+        let node_for = |needle: &str| {
             let mut pending = vec![dom.document()];
             while let Some(node) = pending.pop() {
                 if dom.attribute(node, &Namespace::default(), &LocalName::from("aria-label"))
                     == Some(needle)
                 {
-                    return dom.opaque_id(node);
+                    return node;
                 }
                 pending.extend(dom.dom_children(node));
             }
             panic!("missing fixture node named {needle}");
         };
-        let focused = opaque_for("Draft");
-        let title = opaque_for("Title");
+        let draft_node = node_for("Draft");
+        let focused = dom.opaque_id(draft_node);
+        let title = dom.opaque_id(node_for("Title"));
+        let drawn_children: Vec<_> = dom.dom_children(draft_node).collect();
+        let hidden_ids: std::collections::HashSet<_> = drawn_children
+            .iter()
+            .flat_map(|child| {
+                let mut pending = vec![*child];
+                let mut ids = Vec::new();
+                while let Some(node) = pending.pop() {
+                    ids.push(dom.opaque_id(node));
+                    pending.extend(dom.dom_children(node));
+                }
+                ids
+            })
+            .collect();
         let layout = OwnedLayout::new(&dom, &[""], 320.0, 180.0, &[], &Default::default());
         let projection = document_projection(&WindowDom::document(&dom), &layout, Some(focused));
         let field = projection
@@ -758,13 +803,22 @@ mod tests {
             .iter()
             .find(|node| node.id.get() == focused)
             .expect("the focused textbox remains in the projection");
-        assert_eq!(field.value.as_deref(), Some("Café 👩🏽‍🚀"));
+        assert_eq!(field.value.as_deref(), Some("Café 👩🏽‍🚀\nSecond line"));
         assert_eq!(field.name.as_deref(), Some("Draft"));
         assert_eq!(
             field.role,
             document_session_api::DocumentA11yRole::TextField
         );
         assert!(field.state.focused);
+        assert!(field.children.is_empty(), "app textboxes are leaves");
+        assert!(drawn_children.len() >= 4, "painting DOM remains intact");
+        assert!(
+            projection
+                .nodes()
+                .iter()
+                .all(|node| !hidden_ids.contains(&node.id.get())),
+            "painted descendants are absent from the accessibility projection"
+        );
         assert!(field.state.editable);
         assert!(field.state.multiline);
         assert!(field.bounds.is_some());
