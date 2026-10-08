@@ -23,12 +23,12 @@ mod store;
 mod dbus;
 
 pub use store::{
-    NewSecretItem, SecretCollection, SecretCollectionId, SecretItem, SecretItemId,
-    SecretServiceError, SecretServiceLimits, SecretServiceStore,
+    MetadataSnapshot, NewSecretItem, SecretCollection, SecretCollectionId, SecretItem,
+    SecretItemId, SecretServiceError, SecretServiceLimits, SecretServiceStore,
 };
 
 #[cfg(target_os = "linux")]
 pub use dbus::{
     SecretServiceAccessPolicy, SecretServiceCaller, SecretServiceOperation, SecretServiceServer,
-    SecretServiceStartError, serve,
+    SecretServiceStartError, SecretServiceVault, serve,
 };

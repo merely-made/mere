@@ -263,6 +263,56 @@ fn a_change_only_one_window_shows_rebuilds_only_that_windows_layout() {
     assert!(rebuilt(&mut multi, b));
 }
 
+#[test]
+fn native_form_state_change_rebuilds_only_its_owning_window() {
+    let (mut multi, a, b) = multi();
+    let dom = multi.dom();
+    let root_a = multi.window_root(a).unwrap();
+    let input = {
+        let mut d = dom.borrow_mut();
+        let input = d.create_element(html_qual("input"));
+        d.set_attribute(input, attr_qual("value"), "default");
+        d.set_attribute(
+            input,
+            attr_qual("style"),
+            "display:block;width:120px;height:20px",
+        );
+        d.append_child(root_a, input);
+        input
+    };
+    for _ in 0..2 {
+        layout_at(&mut multi, a, 400.0, 300.0);
+        layout_at(&mut multi, b, 300.0, 600.0);
+    }
+    let rebuilt =
+        |multi: &mut Multi, id| multi.with_window(id, |h| h.s.last_layout_rebuilt).unwrap();
+    assert!(!rebuilt(&mut multi, a) && !rebuilt(&mut multi, b));
+
+    dom.borrow_mut()
+        .set_form_control_value(input, "current")
+        .unwrap();
+    assert_eq!(
+        dom.borrow().attribute(
+            input,
+            &layout_dom_api::Namespace::from(""),
+            &layout_dom_api::LocalName::from("value")
+        ),
+        Some("default"),
+        "the live-value change produces no value attribute change"
+    );
+    assert_eq!(multi.touched_windows(), HashSet::from([a]));
+    layout_at(&mut multi, a, 400.0, 300.0);
+    layout_at(&mut multi, b, 300.0, 600.0);
+    assert!(
+        rebuilt(&mut multi, a),
+        "the owning window consumes the form-state event"
+    );
+    assert!(
+        !rebuilt(&mut multi, b),
+        "the other window keeps its settled layout"
+    );
+}
+
 /// An accessibility bridge that records the node ids of the tree the host
 /// hands it, so the test reads what the host's own sync path projected.
 struct Recording(Rc<std::cell::RefCell<HashSet<u64>>>);

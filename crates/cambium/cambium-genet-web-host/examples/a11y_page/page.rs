@@ -9,7 +9,7 @@
 
 use cambium::{
     AnyView, FileEvent, FileFilter, GenetCtx, GenetElement, PointerClick, SelectState, TabStrip,
-    TextInput, button, checkbox, el, lens, open_file, select, tab_strip, text_field,
+    TextInput, button, checkbox, el, lens, open_file, select, tab_strip, text_field_typed,
 };
 
 pub const COLOURS: [&str; 3] = ["Red", "Green", "Blue"];
@@ -50,7 +50,7 @@ pub const SHEET: &str = "\
     main { display: flex; flex-direction: column; gap: 10px; padding: 16px; } \
     h1 { font-size: 20px; margin: 0; } \
     label { display: flex; gap: 8px; align-items: center; } \
-    input { width: 200px; height: 24px; border: 1px solid #888; } \
+    [role=\"textbox\"] { width: 200px; height: 24px; border: 1px solid #888; } \
     ul { margin: 0; } \
     .select-list { display: flex; flex-direction: column; }";
 
@@ -83,7 +83,7 @@ pub fn page(page: &Page) -> Child {
                 (
                     "Name",
                     lens(
-                        |input: &mut TextInput| text_field(input),
+                        |input: &mut TextInput| text_field_typed(input).attr("aria-label", "Name"),
                         |page: &mut Page| &mut page.name,
                     ),
                 ),

@@ -528,15 +528,18 @@ fn exercise_editor_click(selector: taproot::Selector) {
             let node = runner.focus()?;
             let dom = runner.dom();
             let dom = dom.borrow();
-            (layout_dom_api::LayoutDom::element_name(&*dom, node)?
-                .local
-                .as_ref()
-                == "textarea")
-                .then(|| FocusedTextSlot {
-                    node,
-                    get: Box::new(|editor: &Editor| &editor.text),
-                    get_mut: Box::new(|editor: &mut Editor| &mut editor.text),
-                })
+            (layout_dom_api::LayoutDom::attribute(
+                &*dom,
+                node,
+                &layout_dom_api::Namespace::from(""),
+                &layout_dom_api::LocalName::from("data-cambium-text-value"),
+            )
+            .is_some())
+            .then(|| FocusedTextSlot {
+                node,
+                get: Box::new(|editor: &Editor| &editor.text),
+                get_mut: Box::new(|editor: &mut Editor| &mut editor.text),
+            })
         }),
         ..inert_hooks()
     };
@@ -547,7 +550,7 @@ fn exercise_editor_click(selector: taproot::Selector) {
             },
             logic: editor_root as EditorLogic,
             sheet: "body { margin:0; } .toolbar { height:40px; } \
-                .editor { margin-top:110px; } textarea { display:block; width:300px; height:360px; }"
+                .editor { margin-top:110px; } [role=\"textbox\"] { display:block; width:300px; height:360px; }"
                 .into(),
             fonts: vec![],
             images: vec![],

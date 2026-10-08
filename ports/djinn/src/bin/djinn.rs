@@ -37,6 +37,7 @@ use djinn::resident_status::{
 };
 #[cfg(feature = "personal-sync")]
 use djinn::settings::{self as owner_settings, SyncOverrides};
+use djinn::startup_vault;
 use graphshell::browser_carrier::AllowedExtensions;
 use graphshell::identity::{VaultLockView, VaultProtectionView};
 use graphshell::native::app_admission::{
@@ -58,7 +59,7 @@ use graphshell::native::personae_host::PersonaeHost;
 use graphshell::native::personae_host::STANDARD_WINDOWS_AGENT_ENDPOINT;
 use graphshell::native::tasks::ResidentTasks;
 use graphshell::profile::{default_vault_dir, resolve_selected_profile};
-use personae::bootstrap::{self, PASSPHRASE_ENV, Unlock};
+use personae::bootstrap;
 use personae::{IdentityVault, ProfileId};
 use serde_json::json;
 use ssh_agent_lib::agent::listen;
@@ -106,6 +107,10 @@ struct Args {
     unlock: bool,
     /// With `--unlock`: have the resident show its own prompt instead.
     native: bool,
+    /// `--passphrase-fd 0`: the harness's passphrase on standard input
+    /// (vault lock ruling 65).
+    #[cfg(feature = "passphrase-fd")]
+    passphrase_fd: Option<u32>,
     /// Command-line overrides folded over the profile's stored settings.
     #[cfg(feature = "personal-sync")]
     sync_overrides: SyncOverrides,
@@ -338,6 +343,8 @@ fn parse_args() -> Result<Args, String> {
     let mut enroll_passphrase = false;
     let mut unlock = false;
     let mut native = false;
+    #[cfg(feature = "passphrase-fd")]
+    let mut passphrase_fd = None;
     #[cfg(feature = "personal-sync")]
     let mut sync_graph = None;
     #[cfg(feature = "personal-sync")]
@@ -426,6 +433,11 @@ fn parse_args() -> Result<Args, String> {
             "--enroll-passphrase" => enroll_passphrase = true,
             "--unlock" => unlock = true,
             "--native" => native = true,
+            #[cfg(feature = "passphrase-fd")]
+            "--passphrase-fd" => {
+                let fd = argv.next().ok_or("--passphrase-fd needs a value")?;
+                passphrase_fd = Some(fd.parse().map_err(|_| "--passphrase-fd takes a number")?);
+            },
             #[cfg(feature = "personal-sync")]
             "--sync-graph" => {
                 sync_graph = Some(argv.next().ok_or("--sync-graph needs a value")?);
@@ -561,6 +573,8 @@ fn parse_args() -> Result<Args, String> {
         enroll_passphrase,
         unlock,
         native,
+        #[cfg(feature = "passphrase-fd")]
+        passphrase_fd,
         #[cfg(feature = "personal-sync")]
         sync_overrides: SyncOverrides {
             graph: sync_graph,
@@ -600,8 +614,7 @@ fn parse_args() -> Result<Args, String> {
 /// running and holding the store's lock.
 #[cfg(feature = "personal-sync")]
 fn report_pairing_facts(args: &Args) -> Result<String, String> {
-    let opened = bootstrap::open_storage(&args.vault_dir, Unlock::from_env())
-        .map_err(|error| error.to_string())?;
+    let opened = cli_open(args)?;
     let profile_id =
         resolve_selected_profile(&*opened.storage, &args.vault_dir, args.profile.as_ref())
             .map_err(|error| error.to_string())?;
@@ -658,8 +671,7 @@ fn unpair_device(args: &Args, node_id: &str) -> Result<String, String> {
 /// the vault. The open exists only for the family ladder's sole-persona rung.
 #[cfg(feature = "personal-sync")]
 fn resolve_cli_profile(args: &Args) -> Result<ProfileId, String> {
-    let opened = bootstrap::open_storage(&args.vault_dir, Unlock::from_env())
-        .map_err(|error| error.to_string())?;
+    let opened = cli_open(args)?;
     resolve_selected_profile(&*opened.storage, &args.vault_dir, args.profile.as_ref())
         .map_err(|error| error.to_string())
 }
@@ -777,8 +789,83 @@ fn init_logging(path: Option<&Path>, filter: &str) -> Result<(), std::io::Error>
     Ok(())
 }
 
+/// Open the vault before anything else exists: a passphrase vault waits on
+/// the resident's own prompt (vault lock rulings 42, 62 to 66).
+async fn start_vault(args: &Args, events: &EventLog) -> Result<startup_vault::Started, String> {
+    let given = given_passphrase(args)?;
+    let choice = startup_vault::choose(&args.vault_dir, given.is_some());
+    let vault_dir = args.vault_dir.clone();
+    let events = events.clone();
+    // A dialog or a terminal read blocks; it gets a thread of its own.
+    tokio::task::spawn_blocking(move || {
+        let mut waiting = |event: &str, fields: serde_json::Value| events.emit(event, fields);
+        let mut sleep = std::thread::sleep;
+        match given {
+            Some(passphrase) => startup_vault::open(
+                &vault_dir,
+                choice,
+                &mut startup_vault::Given::new(passphrase),
+                &mut waiting,
+                &mut sleep,
+            ),
+            None => startup_vault::open(
+                &vault_dir,
+                choice,
+                &mut startup_vault::NativeOrTerminal {
+                    native: SystemNativeIdentityUi::default(),
+                },
+                &mut waiting,
+                &mut sleep,
+            ),
+        }
+    })
+    .await
+    .map_err(|error| error.to_string())?
+}
+
+/// The harness's passphrase, when this build reads one (ruling 65).
+fn given_passphrase(args: &Args) -> Result<Option<zeroize::Zeroizing<String>>, String> {
+    #[cfg(feature = "passphrase-fd")]
+    return args
+        .passphrase_fd
+        .map(startup_vault::read_passphrase_fd)
+        .transpose();
+    #[cfg(not(feature = "passphrase-fd"))]
+    {
+        let _ = args;
+        Ok(None)
+    }
+}
+
+/// A one-shot command's open: the same choice, asked at the terminal.
+#[cfg(feature = "personal-sync")]
+fn cli_open(args: &Args) -> Result<bootstrap::OpenedStorage, String> {
+    let given = given_passphrase(args)?;
+    let choice = startup_vault::choose(&args.vault_dir, given.is_some());
+    let mut quiet = |_: &str, _: serde_json::Value| {};
+    let started = match given {
+        Some(passphrase) => startup_vault::open(
+            &args.vault_dir,
+            choice,
+            &mut startup_vault::Given::new(passphrase),
+            &mut quiet,
+            &mut std::thread::sleep,
+        ),
+        None => startup_vault::open(
+            &args.vault_dir,
+            choice,
+            &mut startup_vault::NativeOrTerminal {
+                native: graphshell::native::identity_ui::UnavailableNativeIdentityUi,
+            },
+            &mut quiet,
+            &mut std::thread::sleep,
+        ),
+    };
+    started.map(|started| started.into_parts().0)
+}
+
 async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Error>> {
-    let opened = bootstrap::open_storage(&args.vault_dir, Unlock::from_env())?;
+    let (opened, choice, second_unlock) = start_vault(&args, &events).await?.into_parts();
     tracing::info!(storage = %opened.description, "Personae storage open");
     let profile_id =
         resolve_selected_profile(&*opened.storage, &args.vault_dir, args.profile.as_ref())?;
@@ -786,10 +873,13 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
     if created {
         tracing::warn!(profile = %profile_id.0, "selected profile was created");
     }
-    let (protection, startup_unlock) = if std::env::var_os(PASSPHRASE_ENV).is_some() {
-        (VaultProtectionView::Passphrase, StartupUnlockV1::Passphrase)
-    } else {
-        (VaultProtectionView::OsProtected, StartupUnlockV1::AutoOs)
+    let (protection, startup_unlock) = match choice {
+        startup_vault::VaultChoice::Passphrase => {
+            (VaultProtectionView::Passphrase, StartupUnlockV1::Passphrase)
+        },
+        startup_vault::VaultChoice::AutoOs => {
+            (VaultProtectionView::OsProtected, StartupUnlockV1::AutoOs)
+        },
     };
     let status = ResidentStatusSource::new(ResidentStatusV1 {
         schema: STATUS_SCHEMA.into(),
@@ -887,12 +977,13 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         owner,
         &args.vault_dir,
         // The lane derives a mesh author from the profile's vault, so it opens
-        // the same vault directory a second time under the same unlock. `Unlock`
-        // is not `Clone` (it holds zeroizing bytes), so this reads the
-        // environment again rather than keeping a copy of the passphrase alive.
-        Unlock::from_env(),
+        // the same vault directory a second time under the same unlock: the
+        // start's passphrase, kept for this open alone and dropped with it.
+        second_unlock,
     )
     .await?;
+    #[cfg(not(feature = "personal-sync"))]
+    drop(second_unlock);
     // The credential keys follow the vault's lock (vault lock ruling 1).
     #[cfg(feature = "personal-sync")]
     personae.register_lock_holder(resident.credential_lock_holder());
@@ -1070,8 +1161,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                 })
                 .await?;
             resident_status::grant(&grants, route);
-            // V1 grants the reservoir to the first-party clients this door
-            // already knows; V4 makes it default-on for every one of them. Each
+            // The reservoir admits this door's first-party clients. Each
             // mere goes to the same clients on its own route (V2, step 5):
             // those the reservoir holds now, and each one ensured later.
             let first_party = vec![AppId::new("turnstone"), AppId::new("knot-editor")];
@@ -1093,6 +1183,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                 }
             }
             if let (Some(routes), Some(reservoir)) = (&routes, resident.reservoir().reservoir()) {
+                routes.load_access(reservoir).await?;
                 for mere in reservoir.meres().await {
                     match routes.serve(&mere).await {
                         Ok(route) => tracing::info!(route = route.id(), "mere route open"),

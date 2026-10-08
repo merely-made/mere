@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! Input binding registry — keyboard / mouse / pad bindings keyed by
-//! `action_id` strings, late-bound via `register_binding` and resolved
+//! shared command ids (`command_menu::catalogue`), late-bound via `register_binding` and resolved
 //! via `resolve_binding_id`.
 //!
 //! Extracted from `shell/desktop/runtime/registries/input.rs` per
@@ -26,59 +26,16 @@ pub mod binding_id {
     }
 }
 
+/// Input-level actions with no shared command: Enter submits the omnibar and
+/// confirms in the graph view. Every other default binding names a shared
+/// command id from `command_menu::catalogue` (Scenograph editor plan, SE50).
 pub mod action_id {
     pub mod toolbar {
         pub const SUBMIT: &str = "toolbar:submit";
-        pub const NAV_BACK: &str = "toolbar:navigate_back";
-        pub const NAV_FORWARD: &str = "toolbar:navigate_forward";
-        pub const NAV_RELOAD: &str = "toolbar:navigate_reload";
     }
 
     pub mod graph {
         pub const VIEW_CONFIRM: &str = "graph:view_confirm";
-        pub const CYCLE_FOCUS_REGION: &str = "graph:cycle_focus_region";
-        pub const TOGGLE_OVERVIEW_PLANE: &str = "graph:toggle_overview_plane";
-        pub const COMMAND_PALETTE_OPEN: &str = "workbench:command_palette_open";
-        pub const RADIAL_MENU_OPEN: &str = "workbench:radial_menu_open";
-        pub const NODE_EDIT_TAGS: &str = "graph:node_edit_tags";
-        pub const TOGGLE_PHYSICS: &str = "graph:toggle_physics";
-        pub const REHEAT_PHYSICS: &str = "graph:reheat_physics";
-        pub const ZOOM_IN: &str = "graph:zoom_in";
-        pub const ZOOM_OUT: &str = "graph:zoom_out";
-        pub const ZOOM_RESET: &str = "graph:zoom_reset";
-        pub const TOGGLE_POSITION_FIT_LOCK: &str = "graph:toggle_position_fit_lock";
-        pub const TOGGLE_ZOOM_FIT_LOCK: &str = "graph:toggle_zoom_fit_lock";
-        pub const NODE_NEW: &str = "graph:node_new";
-        pub const EDGE_CONNECT_PAIR: &str = "graph:edge_connect_pair";
-        pub const EDGE_CONNECT_BOTH: &str = "graph:edge_connect_both";
-        pub const EDGE_REMOVE_USER: &str = "graph:edge_remove_user";
-        pub const NODE_PIN_SELECTED: &str = "graph:node_pin_selected";
-        pub const NODE_UNPIN_SELECTED: &str = "graph:node_unpin_selected";
-        pub const NODE_PIN_TOGGLE: &str = "graph:node_pin_toggle";
-        pub const NODE_DELETE: &str = "graph:node_delete";
-        pub const CLEAR: &str = "graph:clear";
-        pub const SELECT_ALL: &str = "graph:select_all";
-        pub const SELECT_VISIBLE: &str = "graph:select_visible";
-    }
-
-    pub mod workbench {
-        pub const HELP_OPEN: &str = "workbench:help_open";
-        pub const TOGGLE_WORKBENCH_OVERLAY: &str = "workbench:toggle_workbench_overlay";
-        pub const OPEN_HISTORY_MANAGER: &str = "workbench:open_history_manager";
-        pub const OPEN_PHYSICS_SETTINGS: &str = "workbench:open_physics_settings";
-        pub const OPEN_CAMERA_CONTROLS: &str = "workbench:open_camera_controls";
-        pub const TOGGLE_SEMANTIC_TAB_GROUP: &str = "workbench:toggle_semantic_tab_group";
-        pub const UNDO: &str = "workbench:undo";
-        pub const REDO: &str = "workbench:redo";
-    }
-
-    pub mod radial_menu {
-        pub const CATEGORY_PREVIOUS: &str = "radial_menu:category_previous";
-        pub const CATEGORY_NEXT: &str = "radial_menu:category_next";
-        pub const SELECTION_PREVIOUS: &str = "radial_menu:selection_previous";
-        pub const SELECTION_NEXT: &str = "radial_menu:selection_next";
-        pub const CONFIRM: &str = "radial_menu:confirm";
-        pub const CANCEL: &str = "radial_menu:cancel";
     }
 }
 

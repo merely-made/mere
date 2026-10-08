@@ -189,19 +189,24 @@ pub fn caret_field_children<State: 'static, Action: 'static>(
 /// from the buffer (for example at view build) and passes them in.
 pub fn styled_textarea(input: &TextInput, styles: &[StyleRange]) -> crate::TextField {
     on_key(
-        el::<_, TextInput, ()>("textarea", field_children(input, styles)),
+        el::<_, TextInput, ()>("div", field_children(input, styles))
+            .attr("role", "textbox")
+            .attr("aria-multiline", "true")
+            .attr("data-cambium-text-value", input.text()),
         edit_multiline as fn(&mut TextInput, KeyEvent),
     )
 }
 
 /// A single-line text field with per-range highlighting from `styles` — the
-/// [`text_field`](crate::text_field) sibling (the `edit` handler and an `<input>`
-/// tag). Same caret / IME behaviour as the plain field; only the rendering carries
+/// [`text_field`](crate::text_field) sibling (the `edit` handler and single-line
+/// textbox metadata). Same caret / IME behaviour as the plain field; only the rendering carries
 /// the classes. Lets a host highlight the omnibar (urls, command tokens) the way the
 /// editor highlights a note.
 pub fn styled_text_field(input: &TextInput, styles: &[StyleRange]) -> crate::TextField {
     on_key(
-        el::<_, TextInput, ()>("input", field_children(input, styles)),
+        el::<_, TextInput, ()>("div", field_children(input, styles))
+            .attr("role", "textbox")
+            .attr("data-cambium-text-value", input.text()),
         edit as fn(&mut TextInput, KeyEvent),
     )
 }
@@ -219,7 +224,9 @@ pub fn styled_text_field(input: &TextInput, styles: &[StyleRange]) -> crate::Tex
 /// this constructor when focused, [`styled_text_field`] when not.
 pub fn caret_text_field(input: &TextInput, styles: &[StyleRange]) -> crate::TextField {
     on_key(
-        el::<_, TextInput, ()>("input", caret_field_children(input, styles)),
+        el::<_, TextInput, ()>("div", caret_field_children(input, styles))
+            .attr("role", "textbox")
+            .attr("data-cambium-text-value", input.text()),
         edit as fn(&mut TextInput, KeyEvent),
     )
 }
@@ -301,5 +308,128 @@ mod tests {
             Some(super::FIELD_CARET_CLASS)
         );
         assert_eq!(dom.text(kids[2]), Some("cd"));
+    }
+
+    #[test]
+    fn textbox_metadata_contains_committed_text_while_visual_runs_keep_transients() {
+        use std::cell::RefCell;
+        use std::rc::Rc;
+
+        use genet_scripted_dom::ScriptedDom;
+        use layout_dom_api::{LayoutDom, LocalName, Namespace, NodeKind};
+
+        use crate::runner::GenetAppRunner;
+        use crate::{DomHandle, TextField};
+
+        let mut input = TextInput::new("abc");
+        input.set_caret_byte(1, false);
+        input.set_preedit("XY");
+        input.set_ghost("ghost");
+        fn view(input: &TextInput) -> TextField {
+            super::styled_text_field(
+                input,
+                &[StyleRange {
+                    range: 0..3,
+                    class: "syntax-token".into(),
+                }],
+            )
+        }
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let runner = GenetAppRunner::new(dom.clone(), view, input);
+        let dom = runner.dom();
+        let dom = dom.borrow();
+        let field = runner.root();
+        assert_eq!(
+            dom.attribute(field, &Namespace::from(""), &LocalName::from("role")),
+            Some("textbox")
+        );
+        assert_eq!(
+            dom.attribute(
+                field,
+                &Namespace::from(""),
+                &LocalName::from("data-cambium-text-value")
+            ),
+            Some("abc"),
+            "preedit and ghost text do not enter the accessible committed value"
+        );
+        let children: Vec<_> = dom.dom_children(field).collect();
+        assert_eq!(
+            children.len(),
+            4,
+            "highlighted before/after, preedit, ghost"
+        );
+        assert_eq!(dom.kind(children[0]), NodeKind::Element);
+        assert_eq!(
+            dom.attribute(children[0], &Namespace::from(""), &LocalName::from("class")),
+            Some("syntax-token")
+        );
+        assert_eq!(
+            dom.attribute(children[1], &Namespace::from(""), &LocalName::from("class")),
+            Some(FIELD_PREEDIT_CLASS)
+        );
+        assert_eq!(
+            dom.dom_children(children[1])
+                .filter_map(|child| dom.text(child))
+                .collect::<String>(),
+            "XY"
+        );
+        assert_eq!(
+            dom.dom_children(children[3])
+                .filter_map(|child| dom.text(child))
+                .collect::<String>(),
+            "ghost"
+        );
+        fn all_text(dom: &ScriptedDom, node: genet_scripted_dom::NodeId, out: &mut String) {
+            if dom.kind(node) == NodeKind::Text {
+                out.push_str(dom.text(node).unwrap_or(""));
+            }
+            for child in dom.dom_children(node) {
+                all_text(dom, child, out);
+            }
+        }
+        let mut rendered = String::new();
+        all_text(&dom, field, &mut rendered);
+        assert_eq!(rendered, "aXYbcghost");
+    }
+
+    #[test]
+    fn multiline_textbox_exposes_multiline_semantics() {
+        use std::cell::RefCell;
+        use std::rc::Rc;
+
+        use genet_scripted_dom::ScriptedDom;
+        use layout_dom_api::{LayoutDom, LocalName, Namespace};
+
+        use crate::runner::GenetAppRunner;
+        use crate::{DomHandle, TextField};
+
+        fn view(input: &TextInput) -> TextField {
+            super::styled_textarea(input, &[])
+        }
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let runner = GenetAppRunner::new(dom.clone(), view, TextInput::new("first\nsecond"));
+        let dom = runner.dom();
+        let dom = dom.borrow();
+        let field = runner.root();
+        assert_eq!(
+            dom.attribute(field, &Namespace::from(""), &LocalName::from("role")),
+            Some("textbox")
+        );
+        assert_eq!(
+            dom.attribute(
+                field,
+                &Namespace::from(""),
+                &LocalName::from("aria-multiline")
+            ),
+            Some("true")
+        );
+        assert_eq!(
+            dom.attribute(
+                field,
+                &Namespace::from(""),
+                &LocalName::from("data-cambium-text-value")
+            ),
+            Some("first\nsecond")
+        );
     }
 }

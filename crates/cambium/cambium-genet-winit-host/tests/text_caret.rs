@@ -17,7 +17,7 @@ use cambium::{
 };
 use cambium_genet_winit_host::{FocusedTextSlot, Harness, HostHooks, Init, inert_hooks};
 use genet_scripted_dom::{NodeId, ScriptedDom};
-use layout_dom_api::LayoutDom;
+use layout_dom_api::{LayoutDom, LocalName, Namespace};
 
 struct Field {
     text: TextInput,
@@ -27,7 +27,7 @@ type Child = Box<dyn AnyView<Field, (), GenetCtx, GenetElement>>;
 type Logic = fn(&Field) -> Child;
 type Host = Harness<Field, Logic, Child>;
 
-const SHEET: &str = "textarea { position:absolute; left:10px; top:10px; width:300px; \
+const SHEET: &str = "[role=\"textbox\"] { position:absolute; left:10px; top:10px; width:300px; \
      height:200px; padding:0px; border:0px; font-size:16px; line-height:20px; \
      white-space:pre-wrap; }";
 
@@ -60,13 +60,18 @@ fn host() -> Host {
             let focused = runner.focus()?;
             let dom = runner.dom();
             let dom_ref = dom.borrow();
-            (LayoutDom::element_name(&*dom_ref, focused)?.local.as_ref() == "textarea").then(|| {
-                FocusedTextSlot {
+            dom_ref
+                .attribute(
+                    focused,
+                    &Namespace::from(""),
+                    &LocalName::from("data-cambium-text-value"),
+                )
+                .is_some()
+                .then(|| FocusedTextSlot {
                     node: focused,
                     get: Box::new(|field: &Field| &field.text),
                     get_mut: Box::new(|field: &mut Field| &mut field.text),
-                }
-            })
+                })
         }),
         ..inert_hooks()
     };
@@ -85,7 +90,7 @@ fn host() -> Host {
     host.layout_at(400.0, 300.0);
     let textarea = host
         .with_dom(|dom| find(dom, dom.document()))
-        .expect("the textarea");
+        .expect("the textbox");
     let (x, y, _, _) = host.painted_rect(textarea).expect("it paints");
     host.click_at(x + 4.0, y + 4.0);
     assert!(host.focus().is_some(), "the click focused the textarea");
@@ -94,8 +99,12 @@ fn host() -> Host {
 
 fn find(dom: &ScriptedDom, node: NodeId) -> Option<NodeId> {
     if dom
-        .element_name(node)
-        .is_some_and(|name| name.local.as_ref() == "textarea")
+        .attribute(
+            node,
+            &Namespace::from(""),
+            &LocalName::from("data-cambium-text-value"),
+        )
+        .is_some()
     {
         return Some(node);
     }

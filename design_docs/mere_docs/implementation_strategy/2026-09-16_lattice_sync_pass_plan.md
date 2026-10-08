@@ -734,3 +734,33 @@ wrong source. Report to Mark; change nothing.
   build at each new genet revision stalls every session on the machine for
   about a quarter of an hour. A CI runner has no other sessions, so this
   does not bear on `portable.yml`'s later steps.
+
+  **Corrected 2026-10-07, by Mark:** the quarter hour is not the
+  checkout's own cost. Mark: "dude, it's a windows security prompt. i gotta
+  run back to clear it every time." The stall lasts until he clears a
+  Windows security prompt, so its length measures his trip back to the
+  machine, not genet's size, and the finding above about each new genet
+  revision is withdrawn. The Defender, Code Integrity and SmartScreen logs
+  for the period do not show the prompt, so what raises it is not
+  identified here. *Reading, not ruled*: a stall of this shape, with every
+  cargo on the machine waiting on the package-cache lock behind an idle
+  holder, goes to Mark before anyone diagnoses it.
+
+  **Amended 2026-10-07, on the firewall log:** Mark: "It's usually the
+  network access prompt." The Windows Defender Firewall log shows that
+  prompt is real and frequent. From 2026-10-06 16:31 to 2026-10-07 06:47,
+  21 rules were created, each for a freshly built test executable (djinn,
+  transport, knot_residue, turnstone, knot_editor) at a new hashed path, and
+  the same binary asks again from a new target directory
+  (`transport-4c4b46669f453a20.exe` from `vault-lock-l2`'s target at 19:46
+  and from `mere-verify-target` at 20:27). The log shows none between 21:21
+  and 23:32 on 2026-10-06, while the stall matched the genet checkout to the
+  second. Put to Mark with three options (the checkout itself with the
+  prompts a separate stall; keep the prompt reading; leave both open), he
+  chose **"Checkout, prompts separate (Recommended)"**. So the 2026-10-06
+  stall was the genet checkout itself, fifteen and a half minutes under the
+  exclusive package-cache lock, and the finding withdrawn above stands
+  again: the first build at each new genet revision stalls every cargo
+  command on the machine for about that long. The network prompt is a
+  separate, recurring cost: each new test-binary path raises it again, and
+  Mark has to clear it by hand.

@@ -1847,6 +1847,17 @@ mod controls {
             .find_map(|c| find_element_by_name(dom, c, name))
     }
 
+    /// The app-owned text control container, identified by its semantic role.
+    fn find_textbox(dom: &ScriptedDom, node: NodeId) -> Option<NodeId> {
+        if dom.kind(node) == NodeKind::Element
+            && dom.attribute(node, &Namespace::from(""), &LocalName::from("role"))
+                == Some("textbox")
+        {
+            return Some(node);
+        }
+        dom.dom_children(node).find_map(|c| find_textbox(dom, c))
+    }
+
     fn ch(s: &str) -> KeyEvent {
         KeyEvent::new(Key::Character(s.to_string()))
     }
@@ -1890,7 +1901,7 @@ mod controls {
 
     /// A `text_field` over bare `TextInput` state: focus it, type the sequence,
     /// and assert the buffer reads `"hi y"` with the caret at the end, and the
-    /// `<input>` DOM text is the clean buffer (the caret is painted, not in text).
+    /// textbox publishes the clean buffer in app-owned metadata.
     #[test]
     fn text_field_edits_its_own_buffer() {
         let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
@@ -1902,10 +1913,10 @@ mod controls {
         );
         let root = runner.root();
 
-        // The field renders an <input> (the focusable element).
+        // The app-owned textbox is the focusable element.
         let input = {
             let d = dom.borrow();
-            find_element_by_name(&d, root, "input").expect("the field renders an <input>")
+            find_textbox(&d, root).expect("the field renders a textbox")
         };
 
         runner.set_focus(Some(input));
@@ -1920,7 +1931,16 @@ mod controls {
         assert_eq!(
             field_text(&dom.borrow(), runner.root()),
             "hi y",
-            "the <input> DOM text is the clean buffer"
+            "the rendered children match the clean buffer"
+        );
+        assert_eq!(
+            dom.borrow().attribute(
+                input,
+                &Namespace::from(""),
+                &LocalName::from("data-cambium-text-value")
+            ),
+            Some("hi y"),
+            "the semantic value contains committed text"
         );
     }
 
@@ -1938,7 +1958,7 @@ mod controls {
         );
         let input = {
             let d = dom.borrow();
-            find_element_by_name(&d, runner.root(), "input").expect("an <input>")
+            find_textbox(&d, runner.root()).expect("a textbox")
         };
         runner.set_focus(Some(input));
 
@@ -2040,7 +2060,7 @@ mod controls {
 
         let input = {
             let d = dom.borrow();
-            find_element_by_name(&d, root, "input").expect("the field renders an <input>")
+            find_textbox(&d, root).expect("the field renders a textbox")
         };
 
         runner.set_focus(Some(input));
@@ -2059,7 +2079,7 @@ mod controls {
         assert_eq!(
             text_child(&dom.borrow(), input).as_deref(),
             Some("hi y"),
-            "the rebuild reflected the edits into the lensed field's <input> text"
+            "the rebuild reflected edits into the lensed field's rendered text"
         );
     }
 
@@ -2075,7 +2095,7 @@ mod controls {
         );
         let input = {
             let d = dom.borrow();
-            find_element_by_name(&d, runner.root(), "input").expect("an <input>")
+            find_textbox(&d, runner.root()).expect("a textbox")
         };
         runner.set_focus(Some(input));
 
@@ -3050,7 +3070,7 @@ mod controls {
         );
         let input = {
             let d = dom.borrow();
-            find_element_by_name(&d, runner.root(), "input").expect("an <input>")
+            find_textbox(&d, runner.root()).expect("a textbox")
         };
         runner.set_focus(Some(input));
 

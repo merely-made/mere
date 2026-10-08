@@ -9,12 +9,10 @@
 //! The M4 runtime extraction bundles per-subsystem mutable references
 //! into `*AuthorityMut<'a>` structs so phase-pipeline functions can
 //! accept one handle per subsystem instead of threading each field
-//! individually. Three of the four bundles are now fully portable:
+//! individually. Two of the three bundles are now fully portable:
 //!
 //! - [`GraphSearchAuthorityMut`] — five `&mut T` refs where every `T`
 //!   is portable (`bool`, `String`, `Vec<NodeKey>`, `Option<usize>`).
-//! - [`CommandAuthorityMut`] — toggle flag + a reference to the
-//!   portable [`CommandPaletteSession`].
 //! - [`FocusAuthorityMut`] — focused-node hint + focus-ring animation
 //!   bookkeeping. `focus_ring_started_at` uses
 //!   [`PortableInstant`](crate::time::PortableInstant); the host
@@ -39,7 +37,6 @@
 //!
 //! [`latch_ring`]: FocusAuthorityMut::latch_ring
 
-use crate::command_palette::{CommandPaletteSession, SearchPaletteScope};
 use kernel::graph::NodeKey;
 use kernel::time::PortableInstant;
 
@@ -131,63 +128,6 @@ impl<'a> GraphSearchAuthorityMut<'a> {
 
     pub fn set_active_match_index(&mut self, value: Option<usize>) {
         *self.active_match_index = value;
-    }
-}
-
-/// Host-facing mutation handle for runtime-owned command-palette state.
-///
-/// Per the M4 runtime extraction (§3.2 Command routing), the palette's
-/// toggle request and its session state (search query, scope filter,
-/// selection cursor, focus-on-open flag) live on `GraphshellRuntime`.
-/// The widget mutates them through this bundle instead of stashing
-/// search state in `egui::Context::data_mut(...)` persistent storage,
-/// the pre-M4 pattern that did not survive a host migration.
-///
-/// The palette's **open flag** (`show_command_palette`) deliberately
-/// stays on `graph_app.workspace.chrome_ui`, not on the runtime, and
-/// is NOT a member of this bundle. It's one of eight mutually-
-/// exclusive modal flags that `app::ux_navigation` manages as a
-/// coordinated cluster; lifting any one flag in isolation would split
-/// the cluster. Future work: a "modal surface extraction" session
-/// lifts the whole cluster to the runtime as a coherent bundle; until
-/// then the widget and callers continue to read/write the open flag
-/// directly through `graph_app`.
-pub struct CommandAuthorityMut<'a> {
-    pub toggle_requested: &'a mut bool,
-    pub session: &'a mut CommandPaletteSession,
-}
-
-impl<'a> CommandAuthorityMut<'a> {
-    pub fn reborrow(&mut self) -> CommandAuthorityMut<'_> {
-        CommandAuthorityMut {
-            toggle_requested: &mut *self.toggle_requested,
-            session: &mut *self.session,
-        }
-    }
-
-    pub fn toggle_requested(&self) -> bool {
-        *self.toggle_requested
-    }
-
-    pub fn clear_toggle_request(&mut self) {
-        *self.toggle_requested = false;
-    }
-
-    /// Arm the session for a fresh open: reset query/scope/selection
-    /// and request keyboard focus for the search field on the next
-    /// frame. The palette's visibility flag (`show_command_palette`)
-    /// lives on workspace state and is flipped by the caller; this
-    /// method only touches runtime-owned session state.
-    pub fn prime_fresh_open(&mut self, default_scope: SearchPaletteScope) {
-        self.session.open_fresh(default_scope);
-    }
-
-    pub fn session(&self) -> &CommandPaletteSession {
-        self.session
-    }
-
-    pub fn session_mut(&mut self) -> &mut CommandPaletteSession {
-        self.session
     }
 }
 
@@ -382,47 +322,6 @@ mod tests {
     }
 
     #[test]
-    fn command_authority_prime_fresh_open_resets_session_state() {
-        let mut toggle = false;
-        let mut session = CommandPaletteSession::default();
-        session.query = "stale".into();
-        session.selected_index = Some(3);
-
-        let mut authority = CommandAuthorityMut {
-            toggle_requested: &mut toggle,
-            session: &mut session,
-        };
-
-        authority.prime_fresh_open(SearchPaletteScope::ActivePane);
-
-        assert_eq!(authority.session().scope, SearchPaletteScope::ActivePane);
-        assert!(authority.session().query.is_empty());
-        assert_eq!(authority.session().selected_index, None);
-        assert!(authority.session().focus_search_on_next_frame);
-    }
-
-    #[test]
-    fn command_authority_clear_toggle_request_clears_one_shot_flag() {
-        // The toggle-requested flag is a one-shot signal: set by the
-        // keyboard handler, observed by the palette widget, then
-        // cleared. Pin that clear is idempotent.
-        let mut toggle = true;
-        let mut session = CommandPaletteSession::default();
-
-        let mut authority = CommandAuthorityMut {
-            toggle_requested: &mut toggle,
-            session: &mut session,
-        };
-
-        assert!(authority.toggle_requested());
-        authority.clear_toggle_request();
-        assert!(!authority.toggle_requested());
-        // Idempotent — clearing an already-clear flag is a no-op.
-        authority.clear_toggle_request();
-        assert!(!authority.toggle_requested());
-    }
-
-    #[test]
     fn focus_authority_latch_ring_is_noop_when_nothing_changed() {
         let mut focused_node_hint = Some(NodeKey::new(5));
         let mut focus_ring_node_key = Some(NodeKey::new(1));
@@ -502,25 +401,5 @@ mod tests {
         // Match: hint cleared, returns true.
         assert!(authority.clear_hint_if_matches(NodeKey::new(7)));
         assert_eq!(*authority.focused_node_hint, None);
-    }
-
-    #[test]
-    fn command_authority_reborrow_yields_distinct_handle_on_same_backing() {
-        let mut toggle = false;
-        let mut session = CommandPaletteSession::default();
-
-        let mut outer = CommandAuthorityMut {
-            toggle_requested: &mut toggle,
-            session: &mut session,
-        };
-
-        {
-            let inner = outer.reborrow();
-            *inner.toggle_requested = true;
-        }
-
-        // Outer still observes the mutation because the reborrow
-        // pointed at the same backing storage, not a separate copy.
-        assert!(outer.toggle_requested());
     }
 }

@@ -43,6 +43,8 @@ eidetic.workspace = true
 # metadata). session-runtime persists a `FacetStore<Uuid>` beside the session
 # graph — the durable home the per-node sidecars (browser/participant) converge onto.
 chartulary.workspace = true
+# The command menu's stored choices, kept as a view (Scenograph editor plan, SE45).
+command-menu.workspace = true
 
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

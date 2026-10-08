@@ -14,6 +14,8 @@ highlight = ["dep:illume", "dep:tinct"]
 [dependencies]
 # The generic undo History; EditHistory is the text field's instance of it.
 edit-history = { workspace = true }
+# The command set, the person's choices and a palette's state (SE45 to SE48).
+command-menu = { workspace = true }
 meristem = { version = "0.2.0", path = "../meristem" }
 sprigging = { version = "0.2.0", path = "../sprigging" }
 sceno = { workspace = true }
