@@ -12,7 +12,7 @@ use super::*;
 /// synchronous default (connection count); `Betweenness` is the structural broker metric (how
 /// often a node lies on shortest paths) — a node bridging two clusters scores high even at
 /// modest degree. Both normalize to `0..=1` against the graph's max. (Graph signals.)
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
 pub enum ImportanceMetric {
     /// Undirected degree (the cheapest proxy; the default).
     #[default]

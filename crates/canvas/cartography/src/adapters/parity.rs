@@ -27,7 +27,10 @@ use uuid::Uuid;
 use super::*;
 use crate::projection::Projection;
 use crate::request::{AxisValue, TargetSize, ViewIntent};
-use crate::signals::IntelligenceSignals;
+use crate::signals::{
+    COORDS_HOST, COORDS_SPECTRAL, IntelligenceSignals, NodeEmbeddings, NodeOrder, NodeRings,
+    ORDER_TIMELINE, RINGS_FOCUS, Signal, SignalFault,
+};
 
 /// Positions differing by less than this are the same placement. Generous
 /// enough for f32 reassociation across the rewrite, far tighter than any
@@ -64,6 +67,29 @@ fn fixture() -> (Graph, Vec<NodeKey>) {
     }
     graph.assert_relation(keys[4], keys[5], hyperlink());
     (graph, keys)
+}
+
+/// The signals every score reads: the graph's enumeration order under
+/// `order.timeline`, as a host's registry computes it (dynamics grammar plan,
+/// F84). Cartography computes no fact; this is the test's own copy.
+fn ordered(graph: &Graph) -> IntelligenceSignals {
+    IntelligenceSignals::new().with(
+        ORDER_TIMELINE,
+        Signal::Order(NodeOrder {
+            order: graph.nodes().map(|(key, _)| key).collect(),
+        }),
+    )
+}
+
+/// Coordinates `(i / 6 - 0.5, 0.25)` per node, by index.
+fn coords(keys: &[NodeKey]) -> Signal {
+    Signal::Coords(NodeEmbeddings {
+        coords: keys
+            .iter()
+            .enumerate()
+            .map(|(i, key)| (*key, (i as f32 / 6.0 - 0.5, 0.25)))
+            .collect(),
+    })
 }
 
 fn intent(axis: Option<HashMap<NodeKey, AxisValue>>, focus: Option<NodeKey>) -> ViewIntent {
@@ -128,7 +154,7 @@ fn kanban_axis(keys: &[NodeKey]) -> HashMap<NodeKey, AxisValue> {
 fn grid_matches_the_pre_migration_placement() {
     // Auto columns over 7 nodes is 3, at a pitch of 120.
     let (graph, keys) = fixture();
-    let signals = IntelligenceSignals::default();
+    let signals = ordered(&graph);
     let projection = GridAdapter::default().project(&ProjectionRequest {
         graph: &graph,
         signals: &signals,
@@ -153,7 +179,7 @@ fn grid_matches_the_pre_migration_placement() {
 #[test]
 fn phyllotaxis_matches_the_pre_migration_placement() {
     let (graph, keys) = fixture();
-    let signals = IntelligenceSignals::default();
+    let signals = ordered(&graph);
     let projection = PhyllotaxisAdapter::default().project(&ProjectionRequest {
         graph: &graph,
         signals: &signals,
@@ -181,7 +207,7 @@ fn penrose_matches_the_pre_migration_placement() {
     // exactly why this golden still holds. See `off_centre_penrose_*` below for
     // the case where it does not.
     let (graph, keys) = fixture();
-    let signals = IntelligenceSignals::default();
+    let signals = ordered(&graph);
     let projection = PenroseAdapter::default().project(&ProjectionRequest {
         graph: &graph,
         signals: &signals,
@@ -206,7 +232,7 @@ fn penrose_matches_the_pre_migration_placement() {
 #[test]
 fn lsystem_matches_the_pre_migration_placement() {
     let (graph, keys) = fixture();
-    let signals = IntelligenceSignals::default();
+    let signals = ordered(&graph);
     let projection = LSystemAdapter::default().project(&ProjectionRequest {
         graph: &graph,
         signals: &signals,
@@ -228,39 +254,130 @@ fn lsystem_matches_the_pre_migration_placement() {
     );
 }
 
+// Spectral's and Radial's pre-migration goldens moved with their producers to
+// pictograph's channel registry (`signals::registry_tests`), where the
+// coordinates and rings are computed and handed in (dynamics grammar plan,
+// G2b). Here each adapter is shown placing what it is handed.
+
 #[test]
-fn spectral_matches_the_pre_migration_placement() {
-    // Nodes inside one connected component share an eigenvector value, so the
-    // hub and its spokes coincide and the bridge pair coincides. That is the
-    // pre-migration behaviour, preserved deliberately: the layout separates
-    // components, and within a component it says nothing.
+fn spectral_places_the_coordinates_it_is_handed_and_rings_out_without_them() {
     let (graph, keys) = fixture();
-    let signals = IntelligenceSignals::default();
+    let signals = ordered(&graph).with(COORDS_SPECTRAL, coords(&keys));
     let projection = SpectralAdapter::default().project(&ProjectionRequest {
         graph: &graph,
         signals: &signals,
         intent: intent(None, None),
     });
-    assert_golden(
-        "spectral",
-        &keys,
-        &projection,
-        &[
-            (146.7027, 34.4556),
-            (146.7027, 34.4556),
-            (146.7027, 34.4556),
-            (146.7027, 34.4556),
-            (-152.6299, -228.9111),
-            (-152.6299, -228.9111),
-            (-281.5509, 320.0),
-        ],
+    let first = projection
+        .nodes
+        .iter()
+        .find(|node| node.node == keys[0])
+        .expect("placed")
+        .position;
+    // Scale 320 about the origin: -0.5 lands at -160, 0.25 at 80.
+    assert!((first.x + 160.0).abs() < EPSILON, "{first:?}");
+    assert!((first.y - 80.0).abs() < EPSILON, "{first:?}");
+
+    // Empty coordinates (an edgeless or symmetric graph's): every node still
+    // lands, on the fallback ring.
+    let empty = ordered(&graph).with(COORDS_SPECTRAL, Signal::Coords(NodeEmbeddings::default()));
+    let fallback = SpectralAdapter::default().project(&ProjectionRequest {
+        graph: &graph,
+        signals: &empty,
+        intent: intent(None, None),
+    });
+    assert_eq!(fallback.nodes.len(), keys.len());
+    assert!(fallback.metadata.faults.is_empty());
+}
+
+/// F84 and F86: an adapter reports a channel it needs and cannot read. With
+/// no order every score refuses; with no coordinates Spectral does; with the
+/// coordinates under their id as another kind, it reports the kind. Each
+/// places nothing and still names its strategy.
+#[test]
+fn an_adapter_reports_a_missing_or_mistyped_channel_and_places_nothing() {
+    let (graph, keys) = fixture();
+    let project = |signals: &IntelligenceSignals| {
+        SpectralAdapter::default().project(&ProjectionRequest {
+            graph: &graph,
+            signals,
+            intent: intent(None, None),
+        })
+    };
+    let no_order = project(&IntelligenceSignals::new().with(COORDS_SPECTRAL, coords(&keys)));
+    assert!(no_order.nodes.is_empty());
+    assert_eq!(
+        no_order.metadata.faults,
+        vec![SignalFault::Missing {
+            id: ORDER_TIMELINE.into()
+        }]
     );
+    assert_eq!(
+        no_order.metadata.strategy_id.as_deref(),
+        Some(SpectralAdapter::PROJECTION_ID)
+    );
+    let no_coords = project(&ordered(&graph));
+    assert!(no_coords.nodes.is_empty());
+    assert_eq!(
+        no_coords.metadata.faults,
+        vec![SignalFault::Missing {
+            id: COORDS_SPECTRAL.into()
+        }]
+    );
+    let mistyped = project(&ordered(&graph).with(
+        COORDS_SPECTRAL,
+        Signal::Rings(NodeRings {
+            rings: vec![(keys[0], 0)],
+        }),
+    ));
+    assert!(mistyped.nodes.is_empty());
+    assert_eq!(
+        mistyped.metadata.faults,
+        vec![SignalFault::Mistyped {
+            id: COORDS_SPECTRAL.into(),
+            expected: crate::signals::SignalKind::Coords,
+            found: crate::signals::SignalKind::Rings,
+        }]
+    );
+    // The control: the same adapter with both channels places every node.
+    let whole = project(&ordered(&graph).with(COORDS_SPECTRAL, coords(&keys)));
+    assert_eq!(whole.nodes.len(), keys.len());
+    assert!(whole.metadata.faults.is_empty());
+}
+
+/// F84: the score's ordinals follow the order the request carries, not the
+/// graph's enumeration. Reversed, the grid places the last node where the
+/// first was.
+#[test]
+fn the_score_takes_its_ordinals_from_the_request_order() {
+    let (graph, keys) = fixture();
+    let place = |signals: &IntelligenceSignals| -> HashMap<NodeKey, PortablePoint> {
+        GridAdapter::default()
+            .project(&ProjectionRequest {
+                graph: &graph,
+                signals,
+                intent: intent(None, None),
+            })
+            .nodes
+            .iter()
+            .map(|node| (node.node, node.position))
+            .collect()
+    };
+    let forward = place(&ordered(&graph));
+    let mut reversed: Vec<NodeKey> = keys.clone();
+    reversed.reverse();
+    let backward = place(
+        &IntelligenceSignals::new()
+            .with(ORDER_TIMELINE, Signal::Order(NodeOrder { order: reversed })),
+    );
+    assert_eq!(backward[&keys[6]], forward[&keys[0]]);
+    assert_eq!(backward[&keys[0]], forward[&keys[6]]);
 }
 
 #[test]
 fn timeline_matches_the_pre_migration_placement() {
     let (graph, keys) = fixture();
-    let signals = IntelligenceSignals::default();
+    let signals = ordered(&graph);
     let projection = TimelineAdapter::default().project(&ProjectionRequest {
         graph: &graph,
         signals: &signals,
@@ -286,7 +403,7 @@ fn timeline_matches_the_pre_migration_placement() {
 fn kanban_matches_the_pre_migration_placement() {
     // Three tags, no configured order: each earns a column, alphabetically.
     let (graph, keys) = fixture();
-    let signals = IntelligenceSignals::default();
+    let signals = ordered(&graph);
     let projection = KanbanAdapter::default().project(&ProjectionRequest {
         graph: &graph,
         signals: &signals,
@@ -309,11 +426,19 @@ fn kanban_matches_the_pre_migration_placement() {
 }
 
 #[test]
-fn radial_matches_the_pre_migration_placement() {
+fn radial_matches_the_pre_migration_placement_from_the_rings_it_is_handed() {
     // Ring 0 is the hub, ring 1 its three spokes, and the three nodes the walk
-    // never reaches land on ring 2 — max reachable plus one.
+    // never reaches land on ring 2 — max reachable plus one. The rings are
+    // the registry's breadth-first walk from the hub, handed in as
+    // `rings.focus` (F86).
     let (graph, keys) = fixture();
-    let signals = IntelligenceSignals::default();
+    let rings = NodeRings {
+        rings: [(0, 0), (1, 1), (2, 1), (3, 1)]
+            .into_iter()
+            .map(|(i, ring)| (keys[i], ring))
+            .collect(),
+    };
+    let signals = ordered(&graph).with(RINGS_FOCUS, Signal::Rings(rings));
     let projection = RadialAdapter::default().project(&ProjectionRequest {
         graph: &graph,
         signals: &signals,
@@ -338,7 +463,7 @@ fn radial_matches_the_pre_migration_placement() {
 #[test]
 fn radial_without_a_focus_places_nothing() {
     let (graph, _) = fixture();
-    let signals = IntelligenceSignals::default();
+    let signals = ordered(&graph);
     let projection = RadialAdapter::default().project(&ProjectionRequest {
         graph: &graph,
         signals: &signals,
@@ -365,7 +490,7 @@ fn divergence_penrose_runs_centre_out_from_the_tiling_not_the_configured_centre(
     // first ordinal is nearest the configured centre, which is what centre-out
     // was always supposed to mean.
     let (graph, keys) = fixture();
-    let signals = IntelligenceSignals::default();
+    let signals = ordered(&graph);
     let centre = sceno::Vec2::new(1000.0, -500.0);
     let projection = PenroseAdapter {
         config: sceno::Penrose {
@@ -401,7 +526,7 @@ fn divergence_timeline_zero_span_places_rather_than_producing_nan() {
     // original. There is no span to normalize against, so the axis origin is
     // the only honest answer, and coincident items stack.
     let (graph, keys) = fixture();
-    let signals = IntelligenceSignals::default();
+    let signals = ordered(&graph);
     let axis: HashMap<NodeKey, AxisValue> = keys
         .iter()
         .map(|key| (*key, AxisValue::Numeric(7.0)))
@@ -428,7 +553,7 @@ fn divergence_leave_in_place_resolves_to_the_disclosed_coordinate() {
     // coordinate the score disclosed — and with none disclosed, the
     // arrangement's own origin.
     let (graph, keys) = fixture();
-    let signals = IntelligenceSignals::default();
+    let signals = ordered(&graph);
     let origin = sceno::Vec2::new(50.0, -25.0);
     let projection = TimelineAdapter {
         config: sceno::Timeline {
@@ -466,14 +591,7 @@ fn the_embedded_merge_places_both_producers_identically() {
     // Spectral and semantic embedding are one arrangement now. Handed the same
     // coordinates they must place identically, or the merge changed something.
     let (graph, keys) = fixture();
-    let mut signals = IntelligenceSignals::default();
-    signals.embeddings = Some(crate::signals::NodeEmbeddings {
-        coords: keys
-            .iter()
-            .enumerate()
-            .map(|(i, key)| (*key, (i as f32 / 6.0 - 0.5, 0.25)))
-            .collect(),
-    });
+    let signals = ordered(&graph).with(COORDS_HOST, coords(&keys));
     let projection = SemanticEmbeddingAdapter::default().project(&ProjectionRequest {
         graph: &graph,
         signals: &signals,
@@ -494,7 +612,7 @@ fn the_embedded_merge_places_both_producers_identically() {
 #[test]
 fn the_graph_only_table_dispatches_each_strategy_it_lists_and_no_other() {
     let (graph, keys) = fixture();
-    let signals = IntelligenceSignals::default();
+    let signals = ordered(&graph).with(COORDS_SPECTRAL, Signal::Coords(NodeEmbeddings::default()));
     let request = ProjectionRequest {
         graph: &graph,
         signals: &signals,

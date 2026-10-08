@@ -71,7 +71,7 @@ fn build_affinity_spring(scores: &crate::signals::AffinityScores) -> AffinitySpr
 /// **content** (cosine over node embeddings) — when both are available under the
 /// [`cluster_by_affinity`](Canvas::set_cluster_by_affinity) toggle. (burn brief Lane 5 — P6,
 /// blended affinity.)
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub enum AffinityBlend {
     /// Draw a pair together if *either* signal likes it, harder if both — a noisy-OR of the two
     /// weights (`1 − (1−s)(1−c)`, bounded to `0..=1`). Topology and meaning as complementary
@@ -135,6 +135,9 @@ pub mod sprite_hull;
 /// The canvas scene-paint underlay (edges + demoted node rects + overlays).
 pub mod underlay;
 
+/// The channel registry the free projection functions read their facts from
+/// (dynamics grammar plan, F87).
+pub use crate::signals::ChannelRegistry;
 pub use ::cartography::MERE_GRAPH_ADAPTER;
 pub use cartography_scene::{
     CANVAS_LAYOUT_STRATEGIES, CanvasStrategyProjection, CartographySceneOptions,
@@ -203,12 +206,15 @@ pub mod physics_catalog;
 /// Schedules of compositions, each stage to its stop, with captures taken by
 /// role. (Dynamics grammar plan, G3.)
 pub mod schedule;
+/// The dynamics spec over this catalog: seiche's portable spec, with the
+/// laws and overlays as its presets. (Dynamics grammar plan, G4a.)
+pub mod dynamics_spec;
 pub use board_scene::{
     BoardBackdrop, BoardCard, BoardFit, BoardFootprint, BoardRect, BoardScene, BoardText,
     BoardTransform,
     backdrop_color,
 };
-pub use composition::{CompositionRefusal, PhysicsComposition, PhysicsGrouping};
+pub use composition::{CompositionRefusal, GroupSource, PhysicsComposition, PhysicsGrouping};
 pub use physics_board::{BoardItem, PhysicsBoard, PhysicsChoice};
 pub use physics_catalog::{
     CANVAS_PHYSICS_DEPTH_SOURCES, CANVAS_PHYSICS_KIND_SOURCES, CANVAS_PHYSICS_LAWS,
@@ -216,6 +222,25 @@ pub use physics_catalog::{
     OverlayRefusal,
     PhysicsDepthSource, PhysicsKindSource, PhysicsLaw, PhysicsMassSource, PhysicsOverlay,
     PhysicsProfile,
+};
+/// The channel registry: every source the laws, overlays and slots read, by
+/// id. (Dynamics grammar plan, G2.)
+pub mod channels;
+/// The Meaning channel: what the nodes say, as one snapshot. (G2.)
+pub mod meaning;
+/// A sentence model on the host's own device for the Meaning channel.
+#[cfg(feature = "meaning-gpu")]
+pub mod meaning_device;
+/// The Meaning channel's sentence model, pinned: model, revision, licence,
+/// pooling, prefix and hashes (F56, F58).
+#[cfg(feature = "meaning-gpu")]
+pub mod meaning_model;
+mod meaning_job;
+mod meaning_lane;
+pub use channels::{Channel, ChannelFamily, ChannelValues};
+pub use meaning::{
+    Embedded, LexicalMeaning, MeaningBackend, MeaningEngine, MeaningParams, MeaningSnapshot,
+    ProviderMeaning,
 };
 pub use schedule::{CAPTURED_ARRANGEMENT, PhysicsStage, StageStop};
 
@@ -236,6 +261,9 @@ pub use seiche::TICK_DT;
 /// long tail of weakly-similar pairs so the force list stays lean and only meaningful clusters
 /// pull. (Graph signals — P4.)
 const AFFINITY_MIN_SIMILARITY: f32 = 0.1;
+/// The normalized betweenness at or above which a node counts as a bridge (the bridge rings and
+/// the gloss's bridge emphasis). (Graph signals — bridges.)
+const BRIDGE_THRESHOLD: f32 = 0.5;
 /// Gloss ring radii as multiples of the gloss swatch's node size, and the cluster-halo alpha. The
 /// bridge ring is larger so it reads outside a cluster halo when a broker sits in a community.
 /// (Graph signals — P6b, gloss overlays.)
@@ -481,38 +509,15 @@ pub struct Canvas {
     /// the freshest node hits the cap. Loses to a manual override and to size-by-importance; wins
     /// over size-by-degree. Default off. (Projection proofs — P3, recency.)
     size_by_recency: bool,
-    /// The cached per-node recency (normalized `0..=1`, newest = `1.0`), recomputed from
-    /// `last_visited` whenever geometry is pushed while [`size_by_recency`](Self::size_by_recency)
-    /// is on. Unlike importance this needs no dirty flag: it is cheap (one O(N) min/max + map) and
-    /// recomputed each push so a visit's fresh timestamp always reads current. Empty when off.
-    node_recency: HashMap<NodeKey, f32>,
     /// Which metric [`size_by_importance`](Self::size_by_importance) reads: degree (cheap default)
     /// or betweenness (structural brokerage). A per-scene choice. (Graph signals — importance metric.)
     importance_metric: crate::signals::ImportanceMetric,
-    /// The cached per-node importance (normalized `0..=1`), refreshed from `signals` whenever
-    /// geometry is pushed while [`size_by_importance`](Self::size_by_importance) is on (the
-    /// normalization needs all nodes, so it is computed once per change, not per `node_size`
-    /// call). Empty when the mode is off. (Graph signals — importance encoding.)
-    node_importance: HashMap<NodeKey, f32>,
-    /// Whether [`node_importance`](Self::node_importance) is stale and must be recomputed before
-    /// the next read. Set by [`reconcile_derived`](Self::reconcile_derived) (the topology-change
-    /// hook) and on enabling the mode; cleared after a recompute. The cheap-signal cache: degree
-    /// importance recomputes only on a topology change, not on every geometry push (a size-only
-    /// change does not dirty it). The generation + per-signal-dirty-bit + background-lane cache
-    /// the plan describes is the *expensive*-signal substrate (betweenness / communities), built
-    /// when those land. (Graph signals — the cheap-signal cache.)
-    importance_dirty: bool,
-    /// The cached **community partition** (Louvain) — the genuinely expensive structural signal.
-    /// `None` until first computed; refreshed by [`refresh_community_cache`](Self::refresh_community_cache)
-    /// only when the active strategy needs it and the kernel's [`Graph::revision`](kernel::graph::Graph::revision)
-    /// has advanced past [`community_cache_revision`](Self::community_cache_revision). Gating on the
-    /// kernel revision (bumped at the mutation source) rather than a host hook means a non-structural
-    /// event (a selection change) cannot invalidate it. The off-thread armillary lane is a drop-in
-    /// behind this same accessor (native-only, like physics offload). (Graph signals — P3.)
-    community_cache: Option<crate::signals::ClusterSet>,
-    /// The [`Graph::revision`](kernel::graph::Graph::revision) [`community_cache`](Self::community_cache)
-    /// was computed at, so a stale partition is recomputed and a fresh one reused. (Graph signals.)
-    community_cache_revision: u64,
+    /// The channel registry: every graph fact an arrangement, a law or an overlay reads — the
+    /// Louvain partition, the bridges, structural affinity, importance per metric, the recency
+    /// and enumeration orders, sites, spectral coordinates, rings and degree weights — each
+    /// computed once per key, the kernel's revisions among them. Reset with the graph.
+    /// (Dynamics grammar plan, G2b; F38, F53.)
+    pub(crate) channels: crate::signals::ChannelRegistry,
     /// The inputs the active analytic layout was last computed for: strategy id, structural graph
     /// revision, URL-authority grouping revision, Canvas footprint revision, viewport, and focus. The
     /// host gates its per-frame `project_canvas_strategy` call on these via
@@ -529,9 +534,8 @@ pub struct Canvas {
     /// when the analytic extent input actually changed.
     strategy_footprints: HashMap<NodeKey, f32>,
     /// Scene toggle: when on, each node wears a halo in the colour of its Louvain community, so the
-    /// partition reads as spatial clusters under any layout. Drives the same generation-gated
-    /// [`community_cache`](Self::community_cache) the cluster-kanban strategy uses. Default off.
-    /// (Graph signals — community to a ring.)
+    /// partition reads as spatial clusters under any layout. Reads the registry's partition, the
+    /// one the cluster-kanban strategy uses. Default off. (Graph signals — community to a ring.)
     show_community_rings: bool,
     /// The host's off-thread wake (it pokes the on-demand render loop when a worker result lands),
     /// captured from [`offload_physics`](Self::offload_physics). `Some` means we are native +
@@ -544,15 +548,9 @@ pub struct Canvas {
     /// Scene toggle: when on, the structural **bridge** nodes (high-betweenness brokers) wear a bold
     /// ring, so the graph's key connectors stand out. Default off. (Graph signals — bridges.)
     show_bridge_rings: bool,
-    /// The cached bridge set + the [`Graph::revision`](kernel::graph::Graph::revision) it was computed
-    /// at. Betweenness is cheap (O(V·E), like degree at current scale), so this is computed inline,
-    /// gated on the revision so it is not redone per frame. (Graph signals — bridges.)
-    bridge_cache: Option<crate::signals::BridgeNodes>,
-    bridge_cache_revision: u64,
     /// Which notion of "critical connector" the bridge ring highlights: betweenness brokers (default)
-    /// or articulation points (cut vertices). Changing it invalidates [`bridge_cache`](Self::bridge_cache)
-    /// so the next [`ensure_bridges_fresh`](Self::ensure_bridges_fresh) recomputes under the new
-    /// metric. (Graph signals — bridges / articulation points.)
+    /// or articulation points (cut vertices). The registry keys its bridge set by it, so a change
+    /// recomputes under the new metric. (Graph signals — bridges / articulation points.)
     bridge_metric: crate::signals::BridgeMetric,
     /// Scene toggle: when on, a pairwise **affinity force** (a weighted, attract-only seiche spring
     /// over structural-Jaccard similarity) runs on top of the force-directed layout, drawing
@@ -560,11 +558,6 @@ pub struct Canvas {
     /// visible under force-directed (an analytic strategy overrides the physics snapshot).
     /// (Graph signals — P4, the affinity force.)
     cluster_by_affinity: bool,
-    /// The cached affinity signal + the [`Graph::revision`](kernel::graph::Graph::revision) it was
-    /// computed at. Jaccard is cheap (like betweenness at current scale), so it is computed inline,
-    /// revision-gated so it is not redone per frame. (Graph signals — P4.)
-    affinity_cache: Option<crate::signals::AffinityScores>,
-    affinity_cache_revision: u64,
     /// The graph revision the affinity force currently installed in the sim was built from, or
     /// `None` when no force is installed. Lets [`sync_affinity_force`](Self::sync_affinity_force)
     /// rebuild the force only when the signal actually changed (or the toggle flips), not per frame.
@@ -695,6 +688,11 @@ pub struct Canvas {
     /// Where the Kinds law reads a node's kind from (site, cluster, degree) —
     /// the host's choice per scene. (Physics catalog — P1.)
     physics_kind_source: PhysicsKindSource,
+    /// Where Group pull reads its groups from: any kind channel, site by
+    /// default. (Dynamics grammar plan, G2.)
+    physics_group_source: PhysicsKindSource,
+    /// The Meaning channel's engine, snapshot and lane. (G2.)
+    meaning: meaning::MeaningState,
     /// Where Orbit's masses and the hub overlays' weights come from (degree,
     /// PageRank). (Physics catalog — P1b.)
     physics_mass_source: PhysicsMassSource,
@@ -774,4 +772,4 @@ pub use seiche::{Axes, DEFAULT_ANCHOR_STIFFNESS, Role, RoleTable};
 pub use source_time::{SourceTimeCanvas, SourceTimeSelection};
 
 #[cfg(test)]
-mod tests;
+pub(crate) mod tests;

@@ -1019,6 +1019,17 @@ is that objective's assessment.
 - Separately, A4's text here runs together two histories that the assessment
   separates: authority-revision history, the site's checkpoint slider, and
   scene-edit history, `projection-proof`'s chained trace.
+- *Added 2026-10-08:* the scene-edit history now has a portable form.
+  scenotime's `SceneTrace` (`src/trace.rs`, `SCENE_TRACE_VERSION = 1`) is a
+  pure record of a base and steps (a label, an optional `SceneDiff`, an opaque
+  host note), validated as a chain and replayed by `snapshot_at(n)`; moving
+  through it and truncating on commit is `edit_history::History<SceneTrace>`
+  (scenotime `tests/history.rs`), so the Scenograph editor plan's one history
+  serves it. A capture of it travels beside chirograph's `ProjectionCaptureV2`
+  (`capture.rs`: an optional `score` and a `CaptureAuthorityV1`). Landed by the
+  mer3ly site session as its S4 and S6, ending at `a6014bcb`; its Rulings 130
+  to 133 are in mer3ly's `docs/2026-09-30_graphshell_site_canvas_plan.md`. The
+  authority-revision history stays apart from it.
 
 ## Progress
 

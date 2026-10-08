@@ -259,6 +259,7 @@ fn density_wander_springs_control() {
             PhysicsLaw::Springs,
             LawSources {
                 kind: crate::canvas::PhysicsKindSource::Site,
+                groups: crate::canvas::PhysicsKindSource::Site,
                 mass: PhysicsMassSource::Degree,
                 depth: crate::canvas::PhysicsDepthSource::Roots,
                 focus: None,

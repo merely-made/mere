@@ -348,14 +348,13 @@ impl Canvas {
     /// (Graph signals — P3.)
     pub(crate) fn ensure_community_fresh(&mut self) {
         let revision = self.graph.revision();
-        // Already fresh for this revision (cache or an in-flight request) — nothing to do.
-        if self.community_cache.is_some() && self.community_cache_revision == revision {
+        // Already fresh for this revision — nothing to do.
+        if self.channels.community_is_fresh(&self.graph) {
             return;
         }
         let Some(wake) = self.offthread_wake.clone() else {
             // Inline path (wasm / tests / physics not offloaded): compute synchronously.
-            self.community_cache = Some(crate::signals::community_louvain(&self.graph));
-            self.community_cache_revision = revision;
+            self.channels.community(&self.graph);
             return;
         };
         // Off-thread path: spin up the worker lazily on first need, then dispatch this revision.
@@ -381,16 +380,29 @@ impl Canvas {
         };
         let Some(update) = update else { return };
         if update.revision == self.graph.revision() {
-            self.community_cache = Some(update.clusters);
-            self.community_cache_revision = update.revision;
+            self.channels
+                .offer_community(update.revision, update.clusters);
         }
     }
 
-    /// The cached community partition, or `None` if none has been computed (no cluster strategy has
+    /// How many partitions the registry has computed: one per structural
+    /// revision that something read, shared by the cluster arrangement, Kinds
+    /// and Group pull. (Dynamics grammar plan, G2; F21, "Two slots, one
+    /// binding".)
+    pub fn community_runs(&self) -> u64 {
+        self.channels.runs().community
+    }
+
+    /// Every registry producer's run count. (Dynamics grammar plan, G2b.)
+    pub fn channel_runs(&self) -> crate::signals::RegistryRuns {
+        self.channels.runs()
+    }
+
+    /// The community partition held, or `None` if none has been computed (no cluster strategy has
     /// run this session, or the canvas was cleared). The host threads it into the cluster-kanban
     /// projection so Louvain is not re-run per frame. (Graph signals — P3.)
     pub fn community(&self) -> Option<&crate::signals::ClusterSet> {
-        self.community_cache.as_ref()
+        self.channels.community_held()
     }
 
     /// Toggle the community-ring overlay: a halo per node in its community's colour, in any layout.
@@ -426,7 +438,7 @@ impl Canvas {
     pub fn set_bridge_metric(&mut self, metric: crate::signals::BridgeMetric) {
         if self.bridge_metric != metric {
             self.bridge_metric = metric;
-            self.bridge_cache = None;
+            self.channels.forget_bridges();
         }
     }
 
@@ -436,21 +448,13 @@ impl Canvas {
     /// redo, and [`set_bridge_metric`](Self::set_bridge_metric) clears the cache on a metric change.
     /// (Graph signals — bridges.)
     pub(crate) fn ensure_bridges_fresh(&mut self) {
-        let revision = self.graph.revision();
-        if self.bridge_cache.is_some() && self.bridge_cache_revision == revision {
-            return;
-        }
-        self.bridge_cache = Some(crate::signals::bridges(
-            &self.graph,
-            self.bridge_metric,
-            0.5,
-        ));
-        self.bridge_cache_revision = revision;
+        self.channels
+            .bridges(&self.graph, self.bridge_metric, BRIDGE_THRESHOLD);
     }
 
-    /// The cached bridge set, if computed. (Graph signals — bridges.)
+    /// The bridge set held, if computed. (Graph signals — bridges.)
     pub fn bridges(&self) -> Option<&crate::signals::BridgeNodes> {
-        self.bridge_cache.as_ref()
+        self.channels.bridges_held(self.bridge_metric)
     }
 
     /// Refresh the revision-gated weighted-edge memo (cache generalization C): recompute the
@@ -540,15 +544,8 @@ impl Canvas {
     /// betweenness at current scale), so this stays inline; the revision gate avoids the per-frame
     /// redo. (Graph signals — P4.)
     pub(crate) fn ensure_affinity_fresh(&mut self) {
-        let revision = self.graph.revision();
-        if self.affinity_cache.is_some() && self.affinity_cache_revision == revision {
-            return;
-        }
-        self.affinity_cache = Some(crate::signals::structural_affinity(
-            &self.graph,
-            AFFINITY_MIN_SIMILARITY,
-        ));
-        self.affinity_cache_revision = revision;
+        self.channels
+            .structural_affinity(&self.graph, AFFINITY_MIN_SIMILARITY);
     }
 
     /// Install / refresh / clear the affinity force to match the toggle + the current signal, once
@@ -580,7 +577,10 @@ impl Canvas {
                 // Nothing that feeds the live force moved; leave it (no per-frame rebuild).
             } else {
                 let structural = use_structural
-                    .then(|| self.affinity_cache.as_ref())
+                    .then(|| {
+                        self.channels
+                            .structural_affinity_fresh(&self.graph, AFFINITY_MIN_SIMILARITY)
+                    })
                     .flatten();
                 let content = use_content
                     .then(|| self.content_affinity.as_deref())

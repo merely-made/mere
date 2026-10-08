@@ -819,6 +819,9 @@ async fn boot(root: Element) -> Result<(), String> {
         remote_shown: Cell::new(false),
         plant: controls::reader_plant()?,
     });
+    if let Some(slice) = controls::meaning_slice()? {
+        shared.canvas.borrow_mut().set_meaning_slice(slice);
+    }
     crate::web_speed::apply(
         &mut shared.canvas.borrow_mut(),
         shared.speed,

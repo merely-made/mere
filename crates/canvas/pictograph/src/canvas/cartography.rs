@@ -183,14 +183,10 @@ impl Canvas {
         size_by_importance: bool,
     ) {
         self.size_by_degree = size_by_degree;
-        // Restore size-by-importance before `push_node_geometry` below, and force the cache stale
-        // so the push actually recomputes: on a reused canvas (a session switch) `importance_dirty`
-        // may already be clean, which would otherwise leave the restored mode with an empty map and
-        // every node at the default size. (Graph signals — restore the importance encoding.)
+        // Restore size-by-importance before `push_node_geometry` below, which reads the
+        // registry's importance for the current structure. (Graph signals — restore the importance
+        // encoding.)
         self.size_by_importance = size_by_importance;
-        if size_by_importance {
-            self.importance_dirty = true;
-        }
         for (id, size) in sizes {
             if let Some((key, _)) = self.graph.get_node_by_id(id) {
                 self.node_sizes.insert(key, size.clamp(16.0, 160.0));
@@ -443,14 +439,22 @@ impl Canvas {
         // importance (0..=1) maps to DEFAULT..=MAX, so the most important node hits the cap and
         // the rest scale relative to it. An un-scored node reads 0 -> DEFAULT. (Graph signals.)
         if self.size_by_importance {
-            let importance = self.node_importance.get(&key).copied().unwrap_or(0.0);
+            let importance = self
+                .channels
+                .importance_held(self.importance_metric)
+                .and_then(|weights| weights.get(&key).copied())
+                .unwrap_or(0.0);
             return DEFAULT + importance * (MAX - DEFAULT);
         }
-        // Recency (temporal channel): newest reads at the cap, oldest at the default. An
-        // un-cached node (mode just enabled, before the next push) reads 0 -> DEFAULT.
-        // (Projection proofs — P3, recency.)
+        // Recency (temporal channel, the registry's `order.recency` values): newest reads at the
+        // cap, oldest at the default. An unscored node reads 0 -> DEFAULT. (Projection proofs —
+        // P3, recency; G2b, one recency.)
         if self.size_by_recency {
-            let recency = self.node_recency.get(&key).copied().unwrap_or(0.0);
+            let recency = self
+                .channels
+                .recency_held()
+                .and_then(|recency| recency.values.get(&key).copied())
+                .unwrap_or(0.0);
             return DEFAULT + recency * (MAX - DEFAULT);
         }
         if self.size_by_degree {
@@ -499,14 +503,7 @@ impl Canvas {
     pub fn set_size_by_importance(&mut self, on: bool) {
         self.size_by_importance = on;
         if on {
-            self.importance_dirty = true; // force a fresh compute on enable
             self.recompute_importance();
-        } else {
-            // Clear the cache, but mark it dirty (not clean-empty): the **gloss** size-by-importance
-            // encoding may still read it, and `recompute_importance` only repopulates a dirty cache —
-            // a clean-empty map would silently render every gloss node at the uniform floor factor.
-            self.node_importance.clear();
-            self.importance_dirty = true;
         }
         self.resettle_for_size();
     }
@@ -526,8 +523,6 @@ impl Canvas {
         self.size_by_recency = on;
         if on {
             self.recompute_recency();
-        } else {
-            self.node_recency.clear();
         }
         self.resettle_for_size();
     }
@@ -542,7 +537,6 @@ impl Canvas {
     /// effect when off. (Graph signals — importance metric.)
     pub fn set_importance_metric(&mut self, metric: ImportanceMetric) {
         self.importance_metric = metric;
-        self.importance_dirty = true;
         if self.size_by_importance {
             self.recompute_importance();
             self.resettle_for_size();
@@ -561,69 +555,23 @@ impl Canvas {
     /// persistence.)
     pub fn apply_cartography_importance_metric(&mut self, code: &str) {
         self.importance_metric = ImportanceMetric::from_code(code);
-        self.importance_dirty = true;
     }
 
-    /// Recompute the cached per-node importance from `signals` (degree-based, normalized
-    /// `0..=1`). Called when geometry is pushed under size-by-importance; the generation +
-    /// dirty-bit cache that gates this is a later graph-signals slice. (Graph signals.)
+    /// Bring the registry's importance under the active metric up to the current structure (one
+    /// computation per structural revision and metric; `importance.degree`,
+    /// `importance.betweenness`). Size by importance and the gloss read it. (Graph signals; G2b.)
     pub(crate) fn recompute_importance(&mut self) {
-        // The cheap-signal cache: only recompute when the graph topology changed since the last
-        // compute (the dirty flag), so a size-only geometry push does not redo the O(N) degree
-        // pass. (Graph signals — the cheap-signal cache.)
-        if !self.importance_dirty {
-            return;
-        }
-        self.node_importance = crate::signals::importance(&self.graph, self.importance_metric)
-            .weights
-            .into_iter()
-            .collect();
-        self.importance_dirty = false;
+        self.channels
+            .importance(&self.graph, self.importance_metric);
     }
 
-    /// Recompute the cached per-node recency (normalized `0..=1`, newest = `1.0`) from each node's
-    /// `last_visited`. One O(N) min/max pass, then one map — cheap enough to run each geometry push
-    /// under size-by-recency (no dirty flag). A graph with a single distinct timestamp reads every
-    /// node as newest (`1.0`), so a fresh session is uniform, not collapsed. (Projection proofs — P3.)
+    /// Bring the registry's recency (`order.recency`) up to the current structure and visits (one
+    /// computation per structural and visit revision, F54), the values size by recency reads: the
+    /// Spiral's `f64` arithmetic (F51). A graph with a single distinct timestamp reads every node
+    /// as newest (`1.0`), so a fresh session is uniform, not collapsed. (Projection proofs — P3;
+    /// G2b, one recency.)
     pub(crate) fn recompute_recency(&mut self) {
-        let times: Vec<(NodeKey, std::time::SystemTime)> = self
-            .graph
-            .nodes()
-            .map(|(key, _)| {
-                (
-                    key,
-                    self.graph
-                        .node_last_visited(key)
-                        .unwrap_or(std::time::SystemTime::UNIX_EPOCH),
-                )
-            })
-            .collect();
-        let (Some(oldest), Some(newest)) = (
-            times.iter().map(|(_, t)| *t).min(),
-            times.iter().map(|(_, t)| *t).max(),
-        ) else {
-            self.node_recency.clear();
-            return;
-        };
-        let span = newest
-            .duration_since(oldest)
-            .map(|d| d.as_secs_f32())
-            .unwrap_or(0.0);
-        self.node_recency = times
-            .into_iter()
-            .map(|(key, t)| {
-                // No span (all equal) -> everything newest.
-                let recency = if span <= f32::EPSILON {
-                    1.0
-                } else {
-                    t.duration_since(oldest)
-                        .map(|d| d.as_secs_f32())
-                        .unwrap_or(0.0)
-                        / span
-                };
-                (key, recency)
-            })
-            .collect();
+        self.channels.recency(&self.graph);
     }
 
     /// A node's render height (px above the ground plane) for the isometric float: `0`

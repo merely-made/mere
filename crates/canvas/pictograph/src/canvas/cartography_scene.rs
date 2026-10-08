@@ -41,6 +41,8 @@ use cartography::{
 use kernel::geometry::PortablePoint;
 use kernel::graph::{EdgeAssertion, Graph, NodeKey, SemanticSubKind};
 
+use crate::signals::ChannelRegistry;
+
 /// Inputs the host supplies for a cartography projection.
 ///
 /// Signals default to empty (`IntelligenceSignals::default()`), so
@@ -173,7 +175,17 @@ pub struct CanvasStrategyProjection {
 /// are added by [`project_canvas_lens`]). [`Projection::empty`](cartography::Projection::empty) for
 /// an unknown or not-yet-wired id, or radial without a focus. Only the graph-only analytic
 /// strategies in [`CANVAS_LAYOUT_STRATEGIES`] are dispatched here.
+///
+/// Every fact an arrangement reads comes from `registry` (dynamics grammar plan, G2b). The request
+/// carries the registry's facts keyed by channel id (F86): the enumeration order every score's
+/// ordinal follows (`order.timeline`, F84), the rings from the focus (`rings.focus`) and the
+/// spectral coordinates (`coords.spectral`), as `cartography::adapters::channels_read` names them.
+/// The host's axes stay on the intent as view configuration: the sites (`groups.site`) and the
+/// partition (`groups.cluster`, unless `clusters` hands one in) as Columns', and the enumeration
+/// order as Timeline's. Cartography computes none of them.
+#[allow(clippy::too_many_arguments)]
 fn project_canvas_dispatch(
+    registry: &mut ChannelRegistry,
     id: &str,
     graph: &Graph,
     focus: Option<NodeKey>,
@@ -183,56 +195,32 @@ fn project_canvas_dispatch(
     extents: Option<&HashMap<NodeKey, (f32, f32)>>,
     recent_first: bool,
 ) -> cartography::Projection {
-    use cartography::adapters::{KanbanAdapter, RadialAdapter, TimelineAdapter};
-    // The real signal snapshot from intel/signals (degree-based importance for now), replacing
-    // the empty `::default()` — the producer -> snapshot -> strategy spine. Strategies that read
-    // `signals.importance` now see it; the rest ignore it (additive contract). The generation +
-    // dirty-bit cache that gates this per-frame recompute is the next slice. (Graph signals — P1.)
-    let signals = crate::signals::produce_cheap_signals(graph);
+    use cartography::adapters::{KanbanAdapter, RadialAdapter, TimelineAdapter, channels_read};
     let mut options = CartographySceneOptions::canvas_pixels(width, height);
     options.extents = extents.cloned();
     // P3's Spiral is the product-free score path, not an arrangements adapter.
-    // Its ordinal carries local recency, its score carries measured footprints,
-    // and `scenomise` is the only generic solver that realizes it.
+    // Its ordinal carries the registry's recency order, its score carries measured
+    // footprints, and `scenomise` is the only generic solver that realizes it.
     if id == "phyllotaxis.default" {
-        return cartography::project_spiral_score(graph, extents, focus, recent_first).projection;
+        return spiral_in(registry, graph, extents, focus, recent_first, 1.0, None).projection;
     }
-    let projection = match id {
-        // Axis-driven: the host derives the per-node axis (graph-only first pass) and threads it on
-        // the intent, since `axis_values` lives on `ViewIntent`, not `CartographySceneOptions`.
-        // Kanban groups by URL host (a categorical column per site). (Arrangements — kanban.)
-        "kanban.default" => {
-            let axis = graph
-                .nodes()
-                .map(|(key, node)| {
-                    (
-                        key,
-                        AxisValue::Categorical(Graph::url_grouping_key(node.url()).to_string()),
-                    )
-                })
-                .collect::<HashMap<_, _>>();
-            let mut intent = options.to_view_intent();
-            intent.axis_values = Some(axis);
-            KanbanAdapter::default().project(&ProjectionRequest {
-                graph,
-                signals: &signals,
-                intent,
-            })
-        },
-        // Same kanban adapter, but the column key is the graph-structural **community** (the
-        // Louvain partition) instead of the URL host — so the board groups by how the graph
-        // actually clusters, not by site. Community is the expensive signal, so it is computed
-        // here only when this strategy is active. (Graph signals — community to columns, P3.)
+    // The axis an axis-driven arrangement reads, threaded on the intent (where `axis_values`
+    // lives), from the registry's channel.
+    let axis: Option<HashMap<NodeKey, AxisValue>> = match id {
+        // Columns by site: a categorical column per URL authority.
+        "kanban.default" => Some(
+            registry
+                .sites(graph)
+                .iter()
+                .map(|(key, site)| (*key, AxisValue::Categorical(site.clone())))
+                .collect(),
+        ),
+        // Columns by cluster: the column key is the registry's Louvain partition, the one Kinds
+        // and Group pull by cluster read, so the board groups by how the graph clusters.
         "kanban.community" => {
-            // Prefer the host's generation-gated community cache; fall back to an inline compute
-            // (tests, or the first frame before the cache fills) so the board is never empty.
-            let computed;
             let clusters = match clusters {
-                Some(cached) => cached,
-                None => {
-                    computed = crate::signals::community_louvain(graph);
-                    &computed
-                },
+                Some(handed) => handed,
+                None => registry.community(graph),
             };
             let mut axis: HashMap<NodeKey, AxisValue> = HashMap::new();
             for (i, cluster) in clusters.clusters.iter().enumerate() {
@@ -244,54 +232,69 @@ fn project_canvas_dispatch(
                     axis.insert(member, AxisValue::Categorical(label.clone()));
                 }
             }
-            let mut intent = options.to_view_intent();
-            intent.axis_values = Some(axis);
-            KanbanAdapter::default().project(&ProjectionRequest {
-                graph,
-                signals: &signals,
-                intent,
-            })
+            Some(axis)
         },
-        // Timeline orders nodes along the horizontal axis by creation order (their enumeration
-        // index) — a stand-in until a real per-node timestamp is plumbed. (Arrangements — timeline.)
-        "timeline.default" => {
-            let axis = graph
-                .nodes()
+        // Timeline lays nodes along the enumeration order, the order every score's ordinal
+        // follows.
+        "timeline.default" => Some(
+            registry
+                .enumeration(graph)
+                .iter()
                 .enumerate()
-                .map(|(i, (key, _node))| (key, AxisValue::Numeric(i as f64)))
-                .collect::<HashMap<_, _>>();
-            let mut intent = options.to_view_intent();
-            intent.axis_values = Some(axis);
-            TimelineAdapter::default().project(&ProjectionRequest {
-                graph,
-                signals: &signals,
-                intent,
-            })
-        },
-        // Focus-driven: centers on `focus` (the pane's selection), BFS rings outward.
-        // Without a focus there is no layout to compute, so leave the canvas as-is.
+                .map(|(i, key)| (*key, AxisValue::Numeric(i as f64)))
+                .collect(),
+        ),
+        // Focus-driven: rings outward from `focus` (the pane's selection), which the request
+        // carries as `rings.focus`. Without a focus there is no layout to compute, so leave the
+        // canvas as-is.
         "radial.default" => {
-            if focus.is_none() {
+            let Some(focus) = focus else {
                 return cartography::Projection::empty();
-            }
-            let focused = CartographySceneOptions {
-                focus,
-                ..options.clone()
             };
-            project_with(graph, &signals, &focused, &RadialAdapter::default())
+            options.focus = Some(focus);
+            None
         },
-        // Grid, Spectral, Penrose and L-system lay out from the graph alone.
-        // Cartography keeps their table, shared with the mere view; Spectral is
-        // the expensive one the arrangement cache covers. (Graph signals — P5.)
-        other => {
-            let request = build_projection_request(graph, &signals, &options);
-            match cartography::adapters::project_graph_only(other, &request) {
-                Some(projection) => projection,
-                None => return cartography::Projection::empty(),
-            }
-        },
+        _ => None,
     };
-    projection
+    let signals = registry.disclose(graph, channels_read(id), focus);
+    let mut intent = options.to_view_intent();
+    intent.axis_values = axis;
+    let request = ProjectionRequest {
+        graph,
+        signals: &signals,
+        intent,
+    };
+    match id {
+        "kanban.default" | "kanban.community" => KanbanAdapter::default().project(&request),
+        "timeline.default" => TimelineAdapter::default().project(&request),
+        "radial.default" => RadialAdapter::default().project(&request),
+        // Grid, Spectral, Penrose and L-system: cartography keeps their table, shared with the
+        // mere view.
+        other => cartography::adapters::project_graph_only(other, &request)
+            .unwrap_or_else(cartography::Projection::empty),
+    }
+}
+
+/// The Spiral over the registry's recency: recent first (`order.recency`), or in the enumeration
+/// order (`order.timeline`), its rungs by `weight.recency`, all handed in as keyed signals (F132).
+fn spiral_in(
+    registry: &mut ChannelRegistry,
+    graph: &Graph,
+    extents: Option<&HashMap<NodeKey, (f32, f32)>>,
+    focus: Option<NodeKey>,
+    recent_first: bool,
+    zoom_level: f32,
+    previous: Option<&sceno::Score>,
+) -> cartography::MereSpiralProjection {
+    let order = if recent_first {
+        cartography::ORDER_RECENCY
+    } else {
+        cartography::ORDER_TIMELINE
+    };
+    let signals = registry.disclose(graph, &[order, cartography::WEIGHT_RECENCY], focus);
+    cartography::project_spiral_score_for_view(
+        graph, &signals, order, extents, focus, zoom_level, previous,
+    )
 }
 
 /// The signal-driven **overlays** for a lens, in the cartography [`Overlay`](cartography::Overlay)
@@ -330,8 +333,11 @@ pub fn signal_overlays(
 /// from [`signal_overlays`]). The gloss is the first consumer of the overlay channel: it paints the
 /// overlays at its own lens positions, so a second lens can show the clusters/brokers under a
 /// different layout than the main view. Positions-only callers use [`project_canvas_strategy`].
-/// (Graph signals — P6b, the overlay pipe.)
+/// (Graph signals — P6b, the overlay pipe.) The facts come from `registry`, the one serving `graph`
+/// (dynamics grammar plan, F87).
+#[allow(clippy::too_many_arguments)]
 pub fn project_canvas_lens(
+    registry: &mut ChannelRegistry,
     id: &str,
     graph: &Graph,
     focus: Option<NodeKey>,
@@ -340,8 +346,9 @@ pub fn project_canvas_lens(
     clusters: Option<&cartography::ClusterSet>,
     bridges: Option<&cartography::BridgeNodes>,
 ) -> cartography::Projection {
-    let mut projection =
-        project_canvas_dispatch(id, graph, focus, width, height, clusters, None, false);
+    let mut projection = project_canvas_dispatch(
+        registry, id, graph, focus, width, height, clusters, None, false,
+    );
     projection.overlays = signal_overlays(clusters, bridges);
     projection
 }
@@ -415,22 +422,39 @@ pub fn project_canvas_subgraph(
         .and_then(|n| sub.get_node_key_by_id(n.id));
     // Project the subgraph, then remap each position back to the original graph via the node id.
     // Extents are keyed by the original graph's NodeKeys, which do not survive the subgraph
-    // re-add, so the subgraph path stays unmeasured for now; recency ordering likewise off.
-    project_canvas_strategy(id, &sub, sub_focus, width, height, None, None, false)
-        .into_iter()
-        .filter_map(|(sub_key, pos)| {
-            let nid = sub.get_node(sub_key)?.id;
-            let main_key = graph.get_node_key_by_id(nid)?;
-            Some((main_key, pos))
-        })
-        .collect()
+    // re-add, so the subgraph path stays unmeasured for now; recency ordering likewise off. The
+    // subgraph is a graph of its own, built for this call, so its facts come from a registry of
+    // its own: one registry serves one graph (F87; *Reading, not ruled*).
+    project_canvas_strategy(
+        &mut ChannelRegistry::new(),
+        id,
+        &sub,
+        sub_focus,
+        width,
+        height,
+        None,
+        None,
+        false,
+    )
+    .into_iter()
+    .filter_map(|(sub_key, pos)| {
+        let nid = sub.get_node(sub_key)?.id;
+        let main_key = graph.get_node_key_by_id(nid)?;
+        Some((main_key, pos))
+    })
+    .collect()
 }
 
 /// Compute an canvas layout strategy's node positions: the `(NodeKey, position)` pairs the canvas
 /// applies through [`Canvas::apply_strategy_positions`](../../canvas). Empty for an unknown or
 /// not-yet-wired id (the host then leaves the layout unchanged). The positions-only path the main
-/// view uses; the gloss uses [`project_canvas_lens`] when it also needs the overlay channel.
+/// view uses; the gloss uses [`project_canvas_lens`] when it also needs the overlay channel. The
+/// facts come from `registry`, the one serving `graph`: a canvas's own
+/// ([`Canvas::registry_and_graph`](crate::canvas::Canvas::registry_and_graph)), or one a host
+/// without a canvas holds across calls (dynamics grammar plan, F87).
+#[allow(clippy::too_many_arguments)]
 pub fn project_canvas_strategy(
+    registry: &mut ChannelRegistry,
     id: &str,
     graph: &Graph,
     focus: Option<NodeKey>,
@@ -441,6 +465,7 @@ pub fn project_canvas_strategy(
     recent_first: bool,
 ) -> Vec<(NodeKey, PortablePoint)> {
     project_canvas_dispatch(
+        registry,
         id,
         graph,
         focus,
@@ -459,7 +484,9 @@ pub fn project_canvas_strategy(
 /// Like [`project_canvas_strategy`], with the product-free score when the
 /// selected strategy has one. Mere builds the score; `scenomise` alone solves
 /// its placement.
+#[allow(clippy::too_many_arguments)]
 pub fn project_canvas_strategy_with_score(
+    registry: &mut ChannelRegistry,
     id: &str,
     graph: &Graph,
     focus: Option<NodeKey>,
@@ -470,6 +497,7 @@ pub fn project_canvas_strategy_with_score(
     recent_first: bool,
 ) -> CanvasStrategyProjection {
     project_canvas_strategy_with_score_for_view(
+        registry,
         id,
         graph,
         focus,
@@ -483,10 +511,83 @@ pub fn project_canvas_strategy_with_score(
     )
 }
 
+impl crate::canvas::Canvas {
+    /// This canvas's channel registry and the graph it serves, for the free projection functions
+    /// (dynamics grammar plan, F87, "Registry argument": a canvas passes its own).
+    pub fn registry_and_graph(&mut self) -> (&mut ChannelRegistry, &Graph) {
+        (&mut self.channels, &self.graph)
+    }
+
+    /// Project arrangement `id` over this canvas's graph with the facts its
+    /// channel registry holds: every disclosure the arrangement reads, the
+    /// Louvain partition Kinds and Group pull by cluster read among them, each
+    /// computed once per key. The host's entry for an arrangement, so a
+    /// scene's arrangement and its dynamics read one binding. (Dynamics
+    /// grammar plan, G2 and G2b; F21, "Two slots, one binding".)
+    #[allow(clippy::too_many_arguments)]
+    pub fn project_arrangement_for_view(
+        &mut self,
+        id: &str,
+        width: u32,
+        height: u32,
+        extents: Option<&HashMap<NodeKey, (f32, f32)>>,
+        recent_first: bool,
+        zoom_level: f32,
+        previous_score: Option<&sceno::Score>,
+    ) -> CanvasStrategyProjection {
+        let focus = self.focused_key();
+        project_strategy_in(
+            &mut self.channels,
+            id,
+            &self.graph,
+            focus,
+            width,
+            height,
+            None,
+            extents,
+            recent_first,
+            zoom_level,
+            previous_score,
+        )
+    }
+}
+
 /// Like [`project_canvas_strategy_with_score`], evaluated for the host's
 /// current zoom and prior score. These two view facts affect only the selected
 /// representation rung and its hysteresis; placement remains score-driven.
+/// Reads its facts from `registry`, the one serving `graph` (F87).
+#[allow(clippy::too_many_arguments)]
 pub fn project_canvas_strategy_with_score_for_view(
+    registry: &mut ChannelRegistry,
+    id: &str,
+    graph: &Graph,
+    focus: Option<NodeKey>,
+    width: u32,
+    height: u32,
+    clusters: Option<&cartography::ClusterSet>,
+    extents: Option<&HashMap<NodeKey, (f32, f32)>>,
+    recent_first: bool,
+    zoom_level: f32,
+    previous_score: Option<&sceno::Score>,
+) -> CanvasStrategyProjection {
+    project_strategy_in(
+        registry,
+        id,
+        graph,
+        focus,
+        width,
+        height,
+        clusters,
+        extents,
+        recent_first,
+        zoom_level,
+        previous_score,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn project_strategy_in(
+    registry: &mut ChannelRegistry,
     id: &str,
     graph: &Graph,
     focus: Option<NodeKey>,
@@ -499,7 +600,8 @@ pub fn project_canvas_strategy_with_score_for_view(
     previous_score: Option<&sceno::Score>,
 ) -> CanvasStrategyProjection {
     if id == "phyllotaxis.default" {
-        let result = cartography::project_spiral_score_for_view(
+        let result = spiral_in(
+            registry,
             graph,
             extents,
             focus,
@@ -518,7 +620,8 @@ pub fn project_canvas_strategy_with_score_for_view(
         };
     }
     CanvasStrategyProjection {
-        positions: project_canvas_strategy(
+        positions: project_canvas_dispatch(
+            registry,
             id,
             graph,
             focus,
@@ -527,7 +630,11 @@ pub fn project_canvas_strategy_with_score_for_view(
             clusters,
             extents,
             recent_first,
-        ),
+        )
+        .nodes
+        .iter()
+        .map(|n| (n.node, n.position))
+        .collect(),
         score: None,
     }
 }
@@ -563,6 +670,7 @@ mod tests {
     fn project_spiral_uses_the_portable_score_solver() {
         let (graph, _) = triangle_graph();
         let projection = project_canvas_dispatch(
+            &mut ChannelRegistry::new(),
             "phyllotaxis.default",
             &graph,
             None,
@@ -592,6 +700,7 @@ mod tests {
             graph.assert_semantic_predicate(n[a], n[b], "links".to_string());
         }
         let positions = project_canvas_strategy(
+            &mut ChannelRegistry::new(),
             "kanban.community",
             &graph,
             None,
@@ -623,6 +732,7 @@ mod tests {
         let (graph, [a, _, _]) = triangle_graph();
         // With a focus, radial lays out the whole graph (focus at center).
         let with_focus = project_canvas_strategy(
+            &mut ChannelRegistry::new(),
             "radial.default",
             &graph,
             Some(a),
@@ -643,8 +753,17 @@ mod tests {
             "the focus sits at the radial center"
         );
         // Without a focus there is nothing to center on, so it leaves the layout alone.
-        let no_focus =
-            project_canvas_strategy("radial.default", &graph, None, 800, 600, None, None, false);
+        let no_focus = project_canvas_strategy(
+            &mut ChannelRegistry::new(),
+            "radial.default",
+            &graph,
+            None,
+            800,
+            600,
+            None,
+            None,
+            false,
+        );
         assert!(no_focus.is_empty(), "radial without a selection no-ops");
     }
 
@@ -702,6 +821,7 @@ mod tests {
         }
         let clusters = crate::signals::community_louvain(&graph);
         let lens = project_canvas_lens(
+            &mut ChannelRegistry::new(),
             "spectral.default",
             &graph,
             None,
@@ -719,6 +839,7 @@ mod tests {
         assert_eq!(halos, 2, "two communities => two halos ride the projection");
         // The positions-only path is unchanged (it drops the overlays).
         let positions = project_canvas_strategy(
+            &mut ChannelRegistry::new(),
             "spectral.default",
             &graph,
             None,

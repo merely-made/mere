@@ -736,6 +736,59 @@ mod tests {
         }
     }
 
+    /// A static viewer renders a portable V2 capture from its bytes alone: the
+    /// score rides along for whoever wants it, but freezing the scene never
+    /// runs the compiler (site canvas plan, S6).
+    #[test]
+    fn a_v2_capture_freezes_without_the_compiler() {
+        use chirograph::{
+            CaptureAuthorityV1, PROJECTION_CAPTURE_V2, PresentationManifest, ProjectionCaptureV2,
+            Sha256NamedInformation,
+        };
+        use scenotime::{Revision, SceneEpoch, SceneSnapshot};
+
+        let score: Score = serde_json::from_str(include_str!(
+            "../../../cambium/scenes/scenomise/fixtures/coastal_map.json"
+        ))
+        .expect("the coastal map fixture parses");
+        let scene = scenomise::solve(&score);
+        let names = named(&[("fixture.map", "harbor", "Harbor")]);
+        let dense = FrozenScene::freeze(&scene, "Coastal map", &names);
+
+        let capture = ProjectionCaptureV2 {
+            version: PROJECTION_CAPTURE_V2,
+            scene: SceneSnapshot::from_dense(SceneEpoch(1), Revision(0), scene).expect("snapshot"),
+            presentation: PresentationManifest::default(),
+            authority: Some(CaptureAuthorityV1 {
+                adapter: "fixture.map".to_owned(),
+                schema: "fixture.map/v1".to_owned(),
+                sha256: Sha256NamedInformation::of(b"coastal authority"),
+                generation: score.generation,
+            }),
+            score: Some(score),
+        };
+        let bytes = capture.encode().expect("capture encodes");
+
+        let reopened = ProjectionCaptureV2::decode(&bytes).expect("capture decodes");
+        let instance_names = reopened
+            .scene
+            .tables
+            .items
+            .iter()
+            .enumerate()
+            .filter_map(|(index, item)| {
+                let source =
+                    reopened.scene.tables.sources[item.as_ref()?.source.0 as usize].as_ref()?;
+                Some((InstanceId(index as u32), names.get(source)?.clone()))
+            })
+            .collect::<HashMap<_, _>>();
+        let frozen = FrozenScene::freeze_snapshot(&reopened.scene, "Coastal map", &instance_names);
+
+        assert_eq!(frozen.instances.len(), dense.instances.len());
+        assert_eq!(frozen.rows(), dense.rows());
+        assert!(frozen.to_html("capture").contains("Harbor"));
+    }
+
     #[test]
     fn the_summary_counts_what_the_listing_shows() {
         let scene = coastal();

@@ -38,10 +38,10 @@
 //! Inputs:
 //!
 //! - [`kernel::graph::Graph`] — read-only reference.
-//! - [`IntelligenceSignals`] — clusters, affinity, hot regions, bridge
-//!   nodes, importance hints. Produced by `embed`
-//!   and consumed through this narrow contract type, not a direct
-//!   dependency on the crate's internals.
+//! - [`IntelligenceSignals`] — the facts a host's channel registry
+//!   computed, keyed by channel id (an order, coordinates, rings, weights,
+//!   clusters, pairs, bridge nodes), consumed through this narrow contract
+//!   type, not a direct dependency on the producer's internals.
 //! - [`ViewIntent`] — what the user is trying to see right now: scale,
 //!   dimension, focus, filter, form factor (orrery root, workbench
 //!   swatch, volvelle radial, astroid hub-collapse, minimap thumbnail).
@@ -97,8 +97,9 @@ pub use request::{
 };
 pub use scene_out::{MERE_GRAPH_ADAPTER, scene_from_projection};
 pub use signals::{
-    AffinityScores, BridgeNodes, Cluster, ClusterSet, ImportanceWeights, IntelligenceSignals,
-    NodeEmbeddings,
+    AffinityScores, BridgeNodes, COORDS_HOST, COORDS_SPECTRAL, Cluster, ClusterSet,
+    ImportanceWeights, IntelligenceSignals, NodeEmbeddings, NodeOrder, NodeRings, ORDER_RECENCY,
+    ORDER_TIMELINE, RINGS_FOCUS, Signal, SignalFault, SignalKind, WEIGHT_DEGREE, WEIGHT_RECENCY,
 };
 pub use spiral_score::{MereSpiralProjection, project_spiral_score, project_spiral_score_for_view};
 pub use strategy::LayoutStrategy;

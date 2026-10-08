@@ -181,6 +181,7 @@ where
         metadata: ProjectionMetadata {
             strategy_id: Some(strategy_id.to_string()),
             settled,
+            faults: Vec::new(),
         },
         ..Projection::empty()
     }

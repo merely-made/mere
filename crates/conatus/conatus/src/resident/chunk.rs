@@ -469,6 +469,17 @@ impl ResidentClient {
         &self.compute
     }
 
+    /// Bytes in use on this client's device, every stream of it: what a
+    /// model loaded onto the host's device adds (the Meaning receipt's
+    /// single-device check). CubeCL 0.11 reads memory through its report,
+    /// where pre.4 had `memory_usage`.
+    pub fn bytes_in_use(&self) -> u64 {
+        self.compute
+            .memory_report(cubecl::MemoryScope::Device)
+            .usage()
+            .bytes_in_use
+    }
+
     pub fn device(&self) -> &WgpuDevice {
         &self.device
     }

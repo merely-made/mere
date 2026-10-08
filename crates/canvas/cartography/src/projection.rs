@@ -51,6 +51,11 @@ pub struct ProjectionMetadata {
     /// (force-directed converged, tree fully placed, etc.).
     /// Hosts can use this to suppress redundant re-projection.
     pub settled: bool,
+    /// The channels the strategy needed and could not read, each missing or
+    /// of the wrong kind (dynamics grammar plan, F86). A projection with a
+    /// fault places nothing.
+    #[serde(default)]
+    pub faults: Vec<crate::signals::SignalFault>,
 }
 
 /// One node with a positioned point.

@@ -99,6 +99,7 @@ impl Graph {
 
         self.url_to_nodes.entry(url).or_default().push(key);
         self.bump_revision();
+        self.bump_content_revision();
         key
     }
 

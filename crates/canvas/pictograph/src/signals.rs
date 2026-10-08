@@ -7,18 +7,16 @@
 //! Graph-structural **signal producer** — the graph-signals-layer plan's `intel/signals`.
 //!
 //! Computes per-node / per-pair signals from the kernel [`Graph`] and hands them to
-//! cartography's narrow [`IntelligenceSignals`] contract. This crate OWNS the production
+//! cartography's narrow [`cartography::IntelligenceSignals`] contract. This crate OWNS the production
 //! lifecycle; cartography keeps only the contract (so cartography never depends on a producer).
 //!
-//! First signal: **degree-based importance** — a cheap, synchronous signal computed inline. The
-//! generation + per-signal dirty-bit **cache** (that gates recomputation and backgrounds the
-//! expensive signals: betweenness / communities / affinity) and those richer signals land in
-//! later slices; this slice is the spine (producer -> snapshot -> `project_orrery_strategy`).
-//! (Graph signals — P1.)
+//! The [`ChannelRegistry`] holds every one of them, and the disclosures cartography's
+//! arrangements read (spectral coordinates, rings, degree weights, the recency and
+//! enumeration orders, sites), computed once per key (dynamics grammar plan, G2b).
 
 use std::collections::{HashMap, VecDeque};
 
-use cartography::{ImportanceWeights, IntelligenceSignals};
+use cartography::ImportanceWeights;
 use kernel::graph::{Graph, NodeKey};
 
 pub use cartography::{AffinityScores, BridgeNodes, Cluster, ClusterSet, Overlay};
@@ -27,6 +25,15 @@ mod affinity;
 mod bridges;
 mod community;
 mod importance;
+mod producers;
+mod registry;
+#[cfg(test)]
+mod registry_tests;
+
+pub use producers::{
+    Recency, degree_weights, enumeration_order, radial_rings, recency, spectral_coords,
+};
+pub use registry::{ChannelRegistry, RegistryRuns};
 
 pub use affinity::*;
 pub use bridges::*;
@@ -73,17 +80,6 @@ impl<N: chartulary::Identified, E> TopologyView for chartulary::Graph<N, E> {
 
 #[cfg(test)]
 mod tests;
-
-/// Produce the cheap, synchronous signal snapshot for `graph`: degree-based importance. The
-/// other contract fields (clusters / affinity / bridges / embeddings) stay `None` until their
-/// producers land. Recomputed on call — degree is cheap enough to run inline; the cache that
-/// gates recomputation is a later slice. (Graph signals — P1, the spine.)
-pub fn produce_cheap_signals(graph: &impl TopologyView) -> IntelligenceSignals {
-    IntelligenceSignals {
-        importance: Some(degree_importance(graph)),
-        ..IntelligenceSignals::default()
-    }
-}
 
 #[cfg(test)]
 mod substrate_tests {

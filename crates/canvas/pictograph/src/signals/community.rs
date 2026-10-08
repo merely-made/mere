@@ -52,6 +52,35 @@ impl CommunitySnapshot {
             .collect();
         Self { nodes, adjacency }
     }
+
+    /// A weighted similarity graph over `nodes`: one undirected edge per pair
+    /// (weights of a repeated pair summed, self-pairs and unknown keys
+    /// dropped). Louvain over it partitions by similarity rather than by
+    /// topology, as the Meaning channel does with embedding pairs.
+    pub fn from_weighted_pairs(nodes: Vec<NodeKey>, pairs: &[(NodeKey, NodeKey, f32)]) -> Self {
+        let index: HashMap<NodeKey, usize> =
+            nodes.iter().enumerate().map(|(i, &k)| (k, i)).collect();
+        let mut adj: Vec<HashMap<usize, f64>> = vec![HashMap::new(); nodes.len()];
+        for &(a, b, w) in pairs {
+            let (Some(&i), Some(&j)) = (index.get(&a), index.get(&b)) else {
+                continue;
+            };
+            if i == j || w <= 0.0 {
+                continue;
+            }
+            *adj[i].entry(j).or_insert(0.0) += f64::from(w);
+            *adj[j].entry(i).or_insert(0.0) += f64::from(w);
+        }
+        let adjacency = adj
+            .into_iter()
+            .map(|row| {
+                let mut row: Vec<(usize, f64)> = row.into_iter().collect();
+                row.sort_unstable_by_key(|&(j, _)| j);
+                row
+            })
+            .collect();
+        Self { nodes, adjacency }
+    }
 }
 
 /// One pass of Louvain **local moving** on a weighted graph with self-loops: each node starts in its
@@ -59,7 +88,13 @@ impl CommunitySnapshot {
 /// no move improves it. `adj[i]` is the inter-node adjacency (no self-loops); `self_loops[i]` is i's
 /// self-loop weight (intra-community weight folded in at a coarser level). Returns `comm[i]` = i's
 /// community. Candidates are visited in sorted order so a modularity tie breaks deterministically.
-fn louvain_local_moving(adj: &[Vec<(usize, f64)>], self_loops: &[f64]) -> Vec<usize> {
+/// `resolution` is the modularity's resolution γ (Reichardt and Bornholdt 2006): the gain of a move
+/// is `w_ic − γ·Σ_tot·k_i / 2m`, so above 1 it favours smaller communities and below 1 larger ones.
+fn louvain_local_moving(
+    adj: &[Vec<(usize, f64)>],
+    self_loops: &[f64],
+    resolution: f64,
+) -> Vec<usize> {
     let n = adj.len();
     // Degree k[i] = incident inter-node weight + 2× the self-loop (an undirected self-loop touches
     // the node at both ends), so the modularity is preserved across aggregation levels.
@@ -90,9 +125,9 @@ fn louvain_local_moving(adj: &[Vec<(usize, f64)>], self_loops: &[f64]) -> Vec<us
             candidates.sort_unstable();
             let mut best_c = ci;
             let mut best_gain =
-                neigh_w.get(&ci).copied().unwrap_or(0.0) - sigma_tot[ci] * ki / two_m;
+                neigh_w.get(&ci).copied().unwrap_or(0.0) - resolution * sigma_tot[ci] * ki / two_m;
             for &c in &candidates {
-                let gain = neigh_w[&c] - sigma_tot[c] * ki / two_m;
+                let gain = neigh_w[&c] - resolution * sigma_tot[c] * ki / two_m;
                 if gain > best_gain {
                     best_gain = gain;
                     best_c = c;
@@ -173,6 +208,18 @@ fn louvain_aggregate(
 /// singleton). Deterministic (sorted tie-breaks + first-seen compaction) and `Graph`-independent, so
 /// it runs inline or on the background worker. (Graph signals — community detection, P3 + multi-level.)
 pub fn community_louvain_on_snapshot(snapshot: &CommunitySnapshot) -> ClusterSet {
+    community_louvain_on_snapshot_at(snapshot, 1.0)
+}
+
+/// [`community_louvain_on_snapshot`] at modularity resolution `resolution` (γ; 1 is classical
+/// modularity, and returns exactly what [`community_louvain_on_snapshot`] does). The Meaning
+/// channel's partition takes it from its tuning. (Dynamics grammar plan, G2, F50.)
+pub fn community_louvain_on_snapshot_at(
+    snapshot: &CommunitySnapshot,
+    resolution: f64,
+) -> ClusterSet {
+    #[cfg(test)]
+    LOUVAIN_RUNS.with(|runs| runs.set(runs.get() + 1));
     let nodes = &snapshot.nodes;
     let n = nodes.len();
     if n == 0 {
@@ -206,7 +253,7 @@ pub fn community_louvain_on_snapshot(snapshot: &CommunitySnapshot) -> ClusterSet
     let mut super_of: Vec<usize> = (0..n).collect();
 
     loop {
-        let comm = louvain_local_moving(&adj, &self_loops);
+        let comm = louvain_local_moving(&adj, &self_loops, resolution);
         let (compact, num_comms) = compact_communities(&comm);
         // Carry every original node through this level's merge.
         for s in super_of.iter_mut() {
@@ -240,6 +287,18 @@ pub fn community_louvain_on_snapshot(snapshot: &CommunitySnapshot) -> ClusterSet
             })
             .collect(),
     }
+}
+
+#[cfg(test)]
+thread_local! {
+    static LOUVAIN_RUNS: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
+}
+
+/// Every Louvain run on this thread, wherever it was called from. Test
+/// instrument: inline runs happen on the test's own thread.
+#[cfg(test)]
+pub(crate) fn louvain_runs_on_this_thread() -> u64 {
+    LOUVAIN_RUNS.with(std::cell::Cell::get)
 }
 
 /// Community detection on `graph`: extract a [`CommunitySnapshot`] then run Louvain inline. The

@@ -321,6 +321,23 @@ pub struct Graph {
     /// nodes by authority must depend on this narrower signal instead.
     url_grouping_revision: u64,
 
+    /// A monotonic **content revision**: bumped when a node's text may have
+    /// changed (a node added, copied in or removed, its title set, its
+    /// primary URL moved). Structure, visits, tags, images and facets leave it
+    /// alone. A consumer keyed to node text, such as the canvas's Meaning
+    /// channel, recomputes only when it moves. Not persisted, like
+    /// [`revision`](Self::revision). (Dynamics grammar plan, G2, F33.)
+    content_revision: u64,
+
+    /// A monotonic **visit revision**: bumped whenever a node's visit history
+    /// (`visit.history`) may have changed, through any kernel writer of it, a
+    /// generic facet delta naming it, a sidecar overlay, or mutable facet
+    /// access. Structure and text leave it alone. A consumer keyed to recency,
+    /// such as the channel registry's recency order, recomputes only when it or
+    /// the structural revision moves. Not persisted. (Dynamics grammar plan,
+    /// G2b, F54.)
+    visit_revision: u64,
+
     /// The current app-launch session number, set once by the host via
     /// [`set_current_session`](Self::set_current_session) right after construction/
     /// restore. `0` (the default) means "not wired" — [`navigate_node`](Self::navigate_node)
@@ -348,6 +365,8 @@ impl Graph {
             nav: SharedNavigationMemory::empty(),
             revision: 0,
             url_grouping_revision: 0,
+            content_revision: 0,
+            visit_revision: 0,
             current_session: 0,
             recorder: capture::Recorder::default(),
         }
@@ -388,6 +407,19 @@ impl Graph {
         self.url_grouping_revision
     }
 
+    /// The current content revision (see the field's doc): it advances on a
+    /// node's title or primary URL changing and on a node joining or leaving,
+    /// never on an edge or relation change.
+    pub fn content_revision(&self) -> u64 {
+        self.content_revision
+    }
+
+    /// The current visit revision (see the field's doc): it advances when a
+    /// node's visit history may have changed, never on structure or text.
+    pub fn visit_revision(&self) -> u64 {
+        self.visit_revision
+    }
+
     /// The categorical site key used by URL-grouped projections: the authority
     /// after `://` and before a path, query, or fragment, or the whole hostless
     /// input. It deliberately retains ports and opaque values.
@@ -407,6 +439,14 @@ impl Graph {
 
     fn bump_url_grouping_revision(&mut self) {
         self.url_grouping_revision = self.url_grouping_revision.wrapping_add(1);
+    }
+
+    pub(crate) fn bump_content_revision(&mut self) {
+        self.content_revision = self.content_revision.wrapping_add(1);
+    }
+
+    pub(crate) fn bump_visit_revision(&mut self) {
+        self.visit_revision = self.visit_revision.wrapping_add(1);
     }
 
     // Single-write-path boundary (Phase 6.5 — ENFORCED as of the 2026-07-01
@@ -477,6 +517,7 @@ impl Graph {
 
         self.url_to_nodes.entry(url).or_default().push(key);
         self.bump_revision();
+        self.bump_content_revision();
         key
     }
 
@@ -505,6 +546,7 @@ impl Graph {
             self.import_records
                 .retain(|record| !record.memberships.is_empty());
             self.bump_revision();
+            self.bump_content_revision();
             true
         } else {
             false
@@ -534,10 +576,14 @@ impl Graph {
         if let Some(primary) = node.addresses.first_mut() {
             *primary = new_primary_address;
         }
+        let url_changed = old_url != new_url;
         self.remove_url_mapping(&old_url, key);
         self.url_to_nodes.entry(new_url).or_default().push(key);
         if site_group_changed {
             self.bump_url_grouping_revision();
+        }
+        if url_changed {
+            self.bump_content_revision();
         }
         Some(old_url)
     }

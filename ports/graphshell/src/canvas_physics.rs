@@ -15,7 +15,6 @@ use std::collections::HashMap;
 
 use mere::canvas::{
     CANVAS_LAYOUT_STRATEGIES, Canvas, LayoutStats, PhysicsChoice, PhysicsOverlay,
-    project_canvas_strategy_with_score_for_view,
 };
 use mere::kernel::geometry::PortablePoint;
 use mere::kernel::graph::NodeKey;
@@ -191,16 +190,16 @@ pub fn apply_arrangement(
     }
     let previous_score = canvas.projection_score().cloned();
     let extents = canvas.strategy_extents();
-    let projection = project_canvas_strategy_with_score_for_view(
+    // The canvas is the binding: the arrangement reads its channel
+    // registry's facts (the cluster partition Kinds and Group pull read).
+    let zoom = canvas.camera().zoom;
+    let projection = canvas.project_arrangement_for_view(
         layout_id,
-        canvas.graph(),
-        canvas.focused_key(),
         viewport.0,
         viewport.1,
-        None,
         Some(&extents),
         true,
-        canvas.camera().zoom,
+        zoom,
         previous_score.as_ref(),
     );
     let transition = ArrangementTransition::between(canvas, &projection.positions)?;
@@ -520,6 +519,7 @@ mod tests {
                 )
             }),
             kind: PhysicsKindSource::Degree,
+            groups: PhysicsKindSource::Cluster,
             mass: PhysicsMassSource::PageRank,
             depth: PhysicsDepthSource::Focus,
         };
@@ -763,15 +763,9 @@ mod tests {
         let mut canvas = Canvas::with_graph(app.host.graph().clone());
         canvas.resize(width, height);
         canvas.set_layout_strategy(Some(SPIRAL.to_string()));
+        let (registry, graph) = canvas.registry_and_graph();
         let positions = mere::canvas::project_canvas_strategy(
-            SPIRAL,
-            canvas.graph(),
-            None,
-            width,
-            height,
-            None,
-            None,
-            true,
+            registry, SPIRAL, graph, None, width, height, None, None, true,
         );
         canvas.apply_strategy_positions(&positions);
         canvas.fit_to_content();

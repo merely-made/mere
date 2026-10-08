@@ -48,7 +48,11 @@ impl Graph {
     ///
     /// Kernel-owned facet families should still use their typed graph methods;
     /// this surface exists for host-defined and unknown-forward namespaces.
+    ///
+    /// A write through it may touch visit history, so taking it advances the
+    /// [visit revision](Graph::visit_revision).
     pub fn facets_mut(&mut self) -> &mut NodeFacetStore {
+        self.bump_visit_revision();
         &mut self.facets
     }
 
@@ -59,6 +63,7 @@ impl Graph {
     /// stores preserve unrelated namespaces.
     pub fn overlay_facets(&mut self, facets: NodeFacetStore) {
         self.facets.overlay(facets);
+        self.bump_visit_revision();
     }
 
     pub(crate) fn node_facet<T: DeserializeOwned>(
@@ -101,6 +106,9 @@ impl Graph {
         self.facets
             .set(node_id, facet_id, value, &chartulary::AcceptAll)
             .expect("AcceptAll cannot reject a kernel facet");
+        if facet == VISIT_HISTORY {
+            self.bump_visit_revision();
+        }
         true
     }
 

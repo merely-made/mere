@@ -31,6 +31,9 @@ use crate::{Ed25519Keypair, IdentityError, PassphraseEncryptedStorage, SealedPro
 /// Environment variable that selects the portable passphrase vault.
 pub const PASSPHRASE_ENV: &str = "PERSONAE_PASSPHRASE";
 
+/// The passphrase vault's file inside a vault directory.
+pub const PASSPHRASE_VAULT_FILE: &str = "vault.json";
+
 /// How the vault's at-rest key is unlocked.
 pub enum Unlock {
     /// OS-protected local root (Windows DPAPI today).
@@ -94,7 +97,7 @@ pub fn open_storage(dir: &Path, unlock: Unlock) -> Result<OpenedStorage, Identit
         .map_err(|err| IdentityError::Backend(format!("create vault dir {dir:?}: {err}")))?;
     match unlock {
         Unlock::Passphrase(passphrase) => {
-            let path = dir.join("vault.json");
+            let path = dir.join(PASSPHRASE_VAULT_FILE);
             let storage = PassphraseEncryptedStorage::open(&path, &passphrase)?;
             Ok(OpenedStorage {
                 storage: Box::new(storage),

@@ -55,6 +55,8 @@ ports/graphshell/docs/receipts/*.html text eol=lf
 ports/graphshell/docs/receipts/*.json text eol=lf
 ports/distillery/tests/fixtures/** text eol=lf
 ports/tabard/tests/fixtures/** text eol=lf
+# Fixtures whose digests graphshell's web tests pin (site export, practice dataset).
+ports/graphshell/web/fixtures/** text eol=lf
 # OpenSSH key fixtures whose slot bytes a test compares to a pre-P4a baseline.
 crates/dramatis/personae/tests/fixtures/** text eol=lf
 
@@ -62,6 +64,11 @@ crates/dramatis/personae/tests/fixtures/** text eol=lf
 # captures byte for byte; autocrlf must not rewrite them on checkout (2026-09-03).
 design_docs/cambium_docs/testing/receipts/*.html text eol=lf
 crates/cambium/cambium/examples/component_catalog.css text eol=lf
+
+# The Meaning receipt's arXiv corpus (CC0) is pinned by SHA-256 in its
+# provenance note; autocrlf must not rewrite its bytes (dynamics grammar plan,
+# G2, F43, 2026-10-03).
+crates/canvas/pictograph/src/canvas/tests/data/** text eol=lf
 
 # Preserve raw allocator diagnostic log bytes across checkout.
 ports/distillery/probe/receipts/2026-09-29_pre4_allocator_stop.log -text

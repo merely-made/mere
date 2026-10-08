@@ -28,6 +28,7 @@ use sceno::{
     TimelineFallback, UnusedVertexPolicy, Vec2,
 };
 use scenograph::dataset::ProjectionFieldType;
+use scenograph::options::{OptionDefault, OptionKind, OptionSpec};
 
 use crate::projection::{GRID_ARRANGEMENT_ID, SCATTER_ARRANGEMENT_ID};
 use crate::registry::{Disclosure, SolverCapability};
@@ -187,21 +188,237 @@ impl Family {
         }
     }
 
+    /// The options this family reads, declared as data: one declaration for
+    /// refusal and for an editor's rows (Scenograph editor plan, ruling B, SE7).
+    pub fn options(self) -> Vec<OptionSpec> {
+        let finite = |key: &str, label: &str, default: f32| {
+            OptionSpec::new(
+                key,
+                label,
+                OptionKind::Finite,
+                OptionDefault::Value(default.to_string()),
+            )
+        };
+        let measured = |key: &str, label: &str, kind: OptionKind, words: &str| {
+            OptionSpec::new(key, label, kind, OptionDefault::Measured(words.to_owned()))
+        };
+        let flag = |key: &str, label: &str, default: bool| {
+            OptionSpec::new(
+                key,
+                label,
+                OptionKind::Flag,
+                OptionDefault::Value(default.to_string()),
+            )
+        };
+        fn choice<T: PartialEq + Default>(
+            key: &str,
+            label: &str,
+            table: &[(&str, T)],
+        ) -> OptionSpec {
+            let default = T::default();
+            let name = table
+                .iter()
+                .find(|(_, value)| *value == default)
+                .map(|(name, _)| (*name).to_owned())
+                .expect("a choice table names its default");
+            OptionSpec::new(
+                key,
+                label,
+                OptionKind::Choice {
+                    names: table.iter().map(|(name, _)| (*name).to_owned()).collect(),
+                },
+                OptionDefault::Value(name),
+            )
+        }
+        let auto_depth = |key: &str, label: &str| {
+            OptionSpec::new(key, label, OptionKind::Depth, OptionDefault::Auto)
+        };
+        let spacing = "the recipe's spacing";
+        match self {
+            Self::Spiral => vec![
+                finite(
+                    "angle_radians",
+                    "Turn per item",
+                    Spiral::default().angle_radians,
+                ),
+                choice("curve", "Curve", SPIRAL_CURVES),
+            ],
+            Self::Grid => vec![
+                measured(
+                    "cell_width",
+                    "Cell width",
+                    OptionKind::Positive,
+                    "the largest item's width",
+                ),
+                measured(
+                    "cell_height",
+                    "Cell height",
+                    OptionKind::Positive,
+                    "the largest item's height",
+                ),
+                measured(
+                    "columns",
+                    "Columns",
+                    OptionKind::Count,
+                    "the side of the square that holds every item",
+                ),
+            ],
+            Self::Geographic | Self::Hulls => vec![
+                measured(
+                    "units_per_coordinate",
+                    "Units per coordinate",
+                    OptionKind::Positive,
+                    spacing,
+                ),
+                flag("invert_y", "Invert y", false),
+            ],
+            Self::Stack => vec![
+                measured(
+                    "layer_gap",
+                    "Layer gap",
+                    OptionKind::Positive,
+                    "the largest item's height plus spacing",
+                ),
+                measured(
+                    "row_gap",
+                    "Row gap",
+                    OptionKind::Positive,
+                    "the largest item's width plus spacing",
+                ),
+            ],
+            Self::Penrose => vec![
+                choice("variant", "Variant", PENROSE_VARIANTS),
+                auto_depth("subdivisions", "Subdivisions"),
+                choice(
+                    "unused_vertices",
+                    "Unused vertices",
+                    PENROSE_UNUSED_VERTICES,
+                ),
+                measured(
+                    "tile_scale",
+                    "Tile scale",
+                    OptionKind::Positive,
+                    "an item's pitch, scaled so the tiling's disc holds every item",
+                ),
+            ],
+            Self::LSystem => vec![
+                choice("grammar", "Grammar", LSYSTEM_GRAMMARS),
+                auto_depth("depth", "Depth"),
+                measured(
+                    "size",
+                    "Size",
+                    OptionKind::Positive,
+                    "the side of the square that holds every item, times an item's pitch",
+                ),
+                finite("rotation", "Rotation", 0.0),
+                flag("reverse_order", "Reverse order", false),
+            ],
+            Self::Timeline => vec![
+                measured(
+                    "axis_length",
+                    "Axis length",
+                    OptionKind::Positive,
+                    "the item count times an item's width plus spacing",
+                ),
+                measured(
+                    "row_gap",
+                    "Row gap",
+                    OptionKind::Positive,
+                    "the largest item's height plus spacing",
+                ),
+                choice("fallback", "Fallback", TIMELINE_FALLBACKS),
+            ],
+            Self::Kanban => vec![
+                measured(
+                    "column_gap",
+                    "Column gap",
+                    OptionKind::Positive,
+                    "the largest item's width plus spacing",
+                ),
+                measured(
+                    "row_gap",
+                    "Row gap",
+                    OptionKind::Positive,
+                    "the largest item's height plus spacing",
+                ),
+                OptionSpec::new(
+                    "column_order",
+                    "Column order",
+                    OptionKind::List,
+                    OptionDefault::Empty,
+                ),
+                flag("include_other_column", "Include an other column", true),
+            ],
+            Self::Embedded => vec![
+                measured("scale", "Scale", OptionKind::Positive, spacing),
+                finite("rotation", "Rotation", 0.0),
+                choice("fallback", "Fallback", EMBEDDING_FALLBACKS),
+            ],
+            Self::Radial => vec![
+                measured(
+                    "ring_spacing",
+                    "Ring spacing",
+                    OptionKind::Positive,
+                    "an item's pitch",
+                ),
+                choice("angular_policy", "Angular policy", RADIAL_ANGULAR_POLICIES),
+                finite("rotation_offset", "Rotation offset", 0.0),
+                choice(
+                    "unreachable_policy",
+                    "Unreachable items",
+                    RADIAL_UNREACHABLE_POLICIES,
+                ),
+            ],
+        }
+    }
+
     /// What the family advertises to pickers. Every built-in family is closed
     /// form, so every one replays.
     pub fn capability(self) -> SolverCapability {
         let (name, description, tags): (&str, &str, &[&str]) = match self {
             Self::Spiral => ("Spiral", "Items wind outward in order.", &["organic"]),
             Self::Grid => ("Grid", "Items take ranked cells.", &["spatial-memory"]),
-            Self::Geographic => ("Geographic", "Items sit at their coordinates.", &["spatial-memory"]),
-            Self::Hulls => ("Hulls", "Each item owns its nearest region.", &["spatial-memory"]),
-            Self::Stack => ("Stack", "Items layer by an integral rank.", &["hierarchical"]),
-            Self::Penrose => ("Penrose", "Items take aperiodic tiling vertices in order.", &["organic"]),
-            Self::LSystem => ("L-system", "Items follow a fractal path in order.", &["organic"]),
-            Self::Timeline => ("Timeline", "Items place along a numeric axis.", &["time-axis"]),
+            Self::Geographic => (
+                "Geographic",
+                "Items sit at their coordinates.",
+                &["spatial-memory"],
+            ),
+            Self::Hulls => (
+                "Hulls",
+                "Each item owns its nearest region.",
+                &["spatial-memory"],
+            ),
+            Self::Stack => (
+                "Stack",
+                "Items layer by an integral rank.",
+                &["hierarchical"],
+            ),
+            Self::Penrose => (
+                "Penrose",
+                "Items take aperiodic tiling vertices in order.",
+                &["organic"],
+            ),
+            Self::LSystem => (
+                "L-system",
+                "Items follow a fractal path in order.",
+                &["organic"],
+            ),
+            Self::Timeline => (
+                "Timeline",
+                "Items place along a numeric axis.",
+                &["time-axis"],
+            ),
             Self::Kanban => ("Kanban", "Items sort into named columns.", &[]),
-            Self::Embedded => ("Embedded", "Items sit at computed 2D coordinates.", &["spatial-memory"]),
-            Self::Radial => ("Radial", "Items ring outward by a numeric index.", &["hierarchical"]),
+            Self::Embedded => (
+                "Embedded",
+                "Items sit at computed 2D coordinates.",
+                &["spatial-memory"],
+            ),
+            Self::Radial => (
+                "Radial",
+                "Items ring outward by a numeric index.",
+                &["hierarchical"],
+            ),
         };
         let mut capability = SolverCapability::new(self.id(), name);
         capability.description = Some(description.into());
@@ -213,6 +430,7 @@ impl Family {
             ChannelUse::Cells | ChannelUse::Coordinate | ChannelUse::Order => Vec::new(),
         };
         capability.tags = tags.iter().map(|tag| (*tag).to_owned()).collect();
+        capability.options = self.options();
         capability
     }
 
@@ -222,20 +440,33 @@ impl Family {
         options: &BTreeMap<String, String>,
         measure: &Measure,
     ) -> Result<Arrangement, Vec<OptionIssue>> {
-        let mut read = Options::new(options);
-        let arrangement = match self {
+        let mut read = Options::new(options, self.options());
+        let arrangement = self.read_arrangement(&mut read, measure);
+        read.finish(self)?;
+        Ok(arrangement)
+    }
+
+    /// What each option is when the author leaves it out, for these items:
+    /// the declaration's measured defaults resolved to numbers (SE43).
+    pub fn resolved_defaults(self, measure: &Measure) -> BTreeMap<String, String> {
+        let empty = BTreeMap::new();
+        let mut read = Options::new(&empty, self.options());
+        let _ = self.read_arrangement(&mut read, measure);
+        read.resolved
+            .into_iter()
+            .map(|(key, value)| (key.to_owned(), value))
+            .collect()
+    }
+
+    fn read_arrangement(self, read: &mut Options, measure: &Measure) -> Arrangement {
+        match self {
             Self::Spiral => {
                 let default = Spiral::default();
                 Arrangement::Spiral(Spiral {
                     center: Vec2::ZERO,
                     spacing: measure.spacing,
                     angle_radians: read.finite("angle_radians", default.angle_radians),
-                    curve: read.choice("curve", default.curve, &[
-                        ("square_root", SpiralCurve::SquareRoot),
-                        ("linear", SpiralCurve::Linear),
-                        ("quadratic", SpiralCurve::Quadratic),
-                        ("logarithmic", SpiralCurve::Logarithmic),
-                    ]),
+                    curve: read.choice("curve", default.curve, SPIRAL_CURVES),
                 })
             },
             Self::Grid => Arrangement::Grid(Grid {
@@ -268,19 +499,16 @@ impl Family {
                 center: Vec2::ZERO,
             }),
             Self::Penrose => Arrangement::Penrose(Penrose {
-                variant: read.choice("variant", PenroseVariant::default(), &[
-                    ("rhombus", PenroseVariant::Rhombus),
-                    ("kite_dart", PenroseVariant::KiteDart),
-                ]),
+                variant: read.choice("variant", PenroseVariant::default(), PENROSE_VARIANTS),
                 subdivision_count: match read.depth("subdivisions") {
                     Some(depth) => SubdivisionCount::Explicit(depth),
                     None => SubdivisionCount::Auto,
                 },
-                unused_vertices: read.choice("unused_vertices", UnusedVertexPolicy::default(), &[
-                    ("leave_empty", UnusedVertexPolicy::LeaveEmpty),
-                    ("clip_to_hull", UnusedVertexPolicy::ClipToHull),
-                    ("hide_tiling", UnusedVertexPolicy::HideTiling),
-                ]),
+                unused_vertices: read.choice(
+                    "unused_vertices",
+                    UnusedVertexPolicy::default(),
+                    PENROSE_UNUSED_VERTICES,
+                ),
                 center: Vec2::ZERO,
                 // The tiling fills a disc: give each item a pitch-sized share of it.
                 tile_scale: read.positive(
@@ -289,11 +517,7 @@ impl Family {
                 ),
             }),
             Self::LSystem => Arrangement::LSystem(LSystem {
-                grammar: read.choice("grammar", LSystemGrammar::default(), &[
-                    ("hilbert", LSystemGrammar::Hilbert),
-                    ("koch", LSystemGrammar::Koch),
-                    ("dragon", LSystemGrammar::Dragon),
-                ]),
+                grammar: read.choice("grammar", LSystemGrammar::default(), LSYSTEM_GRAMMARS),
                 iteration_depth: match read.depth("depth") {
                     Some(depth) => IterationDepth::Explicit(depth),
                     None => IterationDepth::Auto,
@@ -306,13 +530,12 @@ impl Family {
             }),
             Self::Timeline => Arrangement::Timeline(Timeline {
                 origin: Vec2::ZERO,
-                axis_length: read.positive("axis_length", measure.count.max(1) as f32 * measure.pitch_w()),
+                axis_length: read.positive(
+                    "axis_length",
+                    measure.count.max(1) as f32 * measure.pitch_w(),
+                ),
                 row_gap: read.positive("row_gap", measure.pitch_h()),
-                fallback: read.choice("fallback", TimelineFallback::default(), &[
-                    ("leave_in_place", TimelineFallback::LeaveInPlace),
-                    ("stack_below_origin", TimelineFallback::StackBelowOrigin),
-                    ("stack_past_end", TimelineFallback::StackPastEnd),
-                ]),
+                fallback: read.choice("fallback", TimelineFallback::default(), TIMELINE_FALLBACKS),
             }),
             Self::Kanban => Arrangement::Kanban(Kanban {
                 origin: Vec2::ZERO,
@@ -325,43 +548,88 @@ impl Family {
                 origin: Vec2::ZERO,
                 scale: read.positive("scale", measure.spacing),
                 rotation: read.finite("rotation", 0.0),
-                fallback: read.choice("fallback", EmbeddingFallback::default(), &[
-                    ("leave_in_place", EmbeddingFallback::LeaveInPlace),
-                    ("collapse_to_origin", EmbeddingFallback::CollapseToOrigin),
-                    ("ring_outside", EmbeddingFallback::RingOutside),
-                ]),
+                fallback: read.choice(
+                    "fallback",
+                    EmbeddingFallback::default(),
+                    EMBEDDING_FALLBACKS,
+                ),
             }),
             Self::Radial => Arrangement::Radial(Radial {
                 center: Vec2::ZERO,
                 ring_spacing: read.positive("ring_spacing", measure.pitch()),
-                angular_policy: read.choice("angular_policy", RadialAngularPolicy::default(), &[
-                    ("uniform", RadialAngularPolicy::Uniform),
-                    ("weighted", RadialAngularPolicy::Weighted),
-                    ("hash_sorted", RadialAngularPolicy::HashSorted),
-                ]),
+                angular_policy: read.choice(
+                    "angular_policy",
+                    RadialAngularPolicy::default(),
+                    RADIAL_ANGULAR_POLICIES,
+                ),
                 rotation_offset: read.finite("rotation_offset", 0.0),
                 unreachable_policy: read.choice(
                     "unreachable_policy",
                     RadialUnreachablePolicy::default(),
-                    &[
-                        ("outer_ring", RadialUnreachablePolicy::OuterRing),
-                        ("center", RadialUnreachablePolicy::Center),
-                        ("leave_in_place", RadialUnreachablePolicy::LeaveInPlace),
-                    ],
+                    RADIAL_UNREACHABLE_POLICIES,
                 ),
             }),
-        };
-        read.finish(self)?;
-        Ok(arrangement)
+        }
     }
 }
+
+const SPIRAL_CURVES: &[(&str, SpiralCurve)] = &[
+    ("square_root", SpiralCurve::SquareRoot),
+    ("linear", SpiralCurve::Linear),
+    ("quadratic", SpiralCurve::Quadratic),
+    ("logarithmic", SpiralCurve::Logarithmic),
+];
+
+const PENROSE_VARIANTS: &[(&str, PenroseVariant)] = &[
+    ("rhombus", PenroseVariant::Rhombus),
+    ("kite_dart", PenroseVariant::KiteDart),
+];
+
+const PENROSE_UNUSED_VERTICES: &[(&str, UnusedVertexPolicy)] = &[
+    ("leave_empty", UnusedVertexPolicy::LeaveEmpty),
+    ("clip_to_hull", UnusedVertexPolicy::ClipToHull),
+    ("hide_tiling", UnusedVertexPolicy::HideTiling),
+];
+
+const LSYSTEM_GRAMMARS: &[(&str, LSystemGrammar)] = &[
+    ("hilbert", LSystemGrammar::Hilbert),
+    ("koch", LSystemGrammar::Koch),
+    ("dragon", LSystemGrammar::Dragon),
+];
+
+const TIMELINE_FALLBACKS: &[(&str, TimelineFallback)] = &[
+    ("leave_in_place", TimelineFallback::LeaveInPlace),
+    ("stack_below_origin", TimelineFallback::StackBelowOrigin),
+    ("stack_past_end", TimelineFallback::StackPastEnd),
+];
+
+const EMBEDDING_FALLBACKS: &[(&str, EmbeddingFallback)] = &[
+    ("leave_in_place", EmbeddingFallback::LeaveInPlace),
+    ("collapse_to_origin", EmbeddingFallback::CollapseToOrigin),
+    ("ring_outside", EmbeddingFallback::RingOutside),
+];
+
+const RADIAL_ANGULAR_POLICIES: &[(&str, RadialAngularPolicy)] = &[
+    ("uniform", RadialAngularPolicy::Uniform),
+    ("weighted", RadialAngularPolicy::Weighted),
+    ("hash_sorted", RadialAngularPolicy::HashSorted),
+];
+
+const RADIAL_UNREACHABLE_POLICIES: &[(&str, RadialUnreachablePolicy)] = &[
+    ("outer_ring", RadialUnreachablePolicy::OuterRing),
+    ("center", RadialUnreachablePolicy::Center),
+    ("leave_in_place", RadialUnreachablePolicy::LeaveInPlace),
+];
 
 /// The region Hulls tiles: the disclosed coordinates in scene units, with room
 /// for an item beyond the outermost ones.
 fn hull_bounds(measure: &Measure, units: f32, invert_y: bool) -> Rect {
     let margin = measure.pitch();
     let Some((min, max)) = measure.coordinates else {
-        return Rect::new(Vec2::new(-margin, -margin), Size2::new(margin * 2.0, margin * 2.0));
+        return Rect::new(
+            Vec2::new(-margin, -margin),
+            Size2::new(margin * 2.0, margin * 2.0),
+        );
     };
     let flip = if invert_y { -1.0 } else { 1.0 };
     let (y0, y1) = (min.y * units * flip, max.y * units * flip);
@@ -376,25 +644,41 @@ fn hull_bounds(measure: &Measure, units: f32, invert_y: bool) -> Rect {
     )
 }
 
-/// Reads named options, recording what it refused and what it never asked for.
+/// Reads named options against the family's declaration, recording what it
+/// refused, what it read, and each default it used.
 struct Options<'a> {
     raw: &'a BTreeMap<String, String>,
+    declared: Vec<OptionSpec>,
     read: Vec<&'static str>,
+    /// The defaults used for options left out, in the option's own spelling.
+    resolved: Vec<(&'static str, String)>,
     issues: Vec<OptionIssue>,
 }
 
 impl<'a> Options<'a> {
-    fn new(raw: &'a BTreeMap<String, String>) -> Self {
+    fn new(raw: &'a BTreeMap<String, String>, declared: Vec<OptionSpec>) -> Self {
         Self {
             raw,
+            declared,
             read: Vec::new(),
+            resolved: Vec::new(),
             issues: Vec::new(),
         }
     }
 
     fn get(&mut self, key: &'static str) -> Option<&'a str> {
+        debug_assert!(
+            self.declared.iter().any(|spec| spec.key == key),
+            "a family reads `{key}` without declaring it"
+        );
         self.read.push(key);
         self.raw.get(key).map(String::as_str)
+    }
+
+    fn default_used(&mut self, key: &'static str, value: impl ToString) {
+        if !self.raw.contains_key(key) {
+            self.resolved.push((key, value.to_string()));
+        }
     }
 
     fn refuse(&mut self, key: &str, message: &str) {
@@ -405,6 +689,7 @@ impl<'a> Options<'a> {
     }
 
     fn finite(&mut self, key: &'static str, default: f32) -> f32 {
+        self.default_used(key, default);
         match self.get(key).map(str::parse::<f32>) {
             None => default,
             Some(Ok(value)) if value.is_finite() => value,
@@ -416,6 +701,7 @@ impl<'a> Options<'a> {
     }
 
     fn positive(&mut self, key: &'static str, default: f32) -> f32 {
+        self.default_used(key, default);
         match self.get(key).map(str::parse::<f32>) {
             None => default,
             Some(Ok(value)) if value.is_finite() && value > 0.0 => value,
@@ -427,6 +713,7 @@ impl<'a> Options<'a> {
     }
 
     fn count(&mut self, key: &'static str, default: u32) -> u32 {
+        self.default_used(key, default.max(1));
         match self.get(key).map(str::parse::<u32>) {
             None => default.max(1),
             Some(Ok(value)) if value > 0 => value,
@@ -438,6 +725,7 @@ impl<'a> Options<'a> {
     }
 
     fn depth(&mut self, key: &'static str) -> Option<u8> {
+        self.default_used(key, "auto");
         match self.get(key).map(str::parse::<u8>) {
             None => None,
             Some(Ok(value)) => Some(value),
@@ -449,6 +737,7 @@ impl<'a> Options<'a> {
     }
 
     fn flag(&mut self, key: &'static str, default: bool) -> bool {
+        self.default_used(key, default);
         match self.get(key) {
             None => default,
             Some("true") => true,
@@ -460,7 +749,15 @@ impl<'a> Options<'a> {
         }
     }
 
-    fn choice<T: Clone>(&mut self, key: &'static str, default: T, table: &[(&str, T)]) -> T {
+    fn choice<T: Clone + PartialEq>(
+        &mut self,
+        key: &'static str,
+        default: T,
+        table: &[(&str, T)],
+    ) -> T {
+        if let Some((name, _)) = table.iter().find(|(_, value)| *value == default) {
+            self.default_used(key, name);
+        }
         let Some(value) = self.get(key) else {
             return default;
         };
@@ -475,6 +772,7 @@ impl<'a> Options<'a> {
     }
 
     fn list(&mut self, key: &'static str) -> Vec<String> {
+        self.default_used(key, "");
         self.get(key)
             .map(|value| {
                 value
@@ -488,13 +786,13 @@ impl<'a> Options<'a> {
     }
 
     fn finish(mut self, family: Family) -> Result<(), Vec<OptionIssue>> {
-        let unread: Vec<_> = self
+        let undeclared: Vec<_> = self
             .raw
             .keys()
-            .filter(|key| !self.read.contains(&key.as_str()))
+            .filter(|key| !self.declared.iter().any(|spec| &spec.key == *key))
             .cloned()
             .collect();
-        for key in unread {
+        for key in undeclared {
             self.refuse(&key, &format!("{} does not read this option", family.id()));
         }
         if self.issues.is_empty() {
@@ -502,5 +800,79 @@ impl<'a> Options<'a> {
         } else {
             Err(self.issues)
         }
+    }
+}
+
+#[cfg(test)]
+mod option_tests {
+    use super::*;
+
+    fn measure() -> Measure {
+        Measure {
+            largest: Size2::new(164.0, 68.0),
+            count: 9,
+            spacing: 16.0,
+            coordinates: Some((Vec2::ZERO, Vec2::new(10.0, 10.0))),
+        }
+    }
+
+    /// One declaration for refusal and for an editor's rows only holds if each
+    /// family reads exactly what it declares (ruling B).
+    #[test]
+    fn every_family_reads_exactly_what_it_declares() {
+        for family in FAMILIES {
+            let empty = BTreeMap::new();
+            let mut read = Options::new(&empty, family.options());
+            let _ = family.read_arrangement(&mut read, &measure());
+            let mut reads: Vec<&str> = read.read.clone();
+            reads.sort_unstable();
+            reads.dedup();
+            let mut declared: Vec<String> =
+                family.options().into_iter().map(|spec| spec.key).collect();
+            declared.sort_unstable();
+            assert_eq!(reads, declared, "{}", family.id());
+        }
+    }
+
+    #[test]
+    fn every_option_left_out_resolves_to_a_default() {
+        for family in FAMILIES {
+            let resolved = family.resolved_defaults(&measure());
+            for spec in family.options() {
+                assert!(
+                    resolved.contains_key(&spec.key),
+                    "{}: {}",
+                    family.id(),
+                    spec.key
+                );
+                if let OptionDefault::Value(value) = &spec.default {
+                    assert_eq!(&resolved[&spec.key], value, "{}: {}", family.id(), spec.key);
+                }
+            }
+        }
+        let grid = Family::Grid.resolved_defaults(&measure());
+        assert_eq!(grid["cell_width"], "164");
+        assert_eq!(grid["columns"], "3");
+        assert_eq!(
+            Family::Spiral.resolved_defaults(&measure())["curve"],
+            "square_root"
+        );
+        assert_eq!(
+            Family::LSystem.resolved_defaults(&measure())["depth"],
+            "auto"
+        );
+    }
+
+    #[test]
+    fn an_undeclared_key_is_refused_in_the_familys_words() {
+        let options = BTreeMap::from([("stride".to_string(), "2".to_string())]);
+        let refused = Family::Grid.arrangement(&options, &measure()).unwrap_err();
+        assert_eq!(
+            refused,
+            [OptionIssue {
+                field: "arrangement.options.stride".into(),
+                message: "grid does not read this option".into(),
+            }]
+        );
     }
 }

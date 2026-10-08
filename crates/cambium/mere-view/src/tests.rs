@@ -615,3 +615,83 @@ fn minting_heads_the_sessions_list() {
     let bar = find(&dom, root, "class", "mere-view-bar").expect("bar");
     assert!(find(&dom, bar, "data-request", "mint").is_none());
 }
+
+/// G2b's goldens for the mere view (dynamics grammar plan, G2b, step 1): each
+/// graph-only layout on a fixed 40-node graph, hashed (FNV-1a over the keys
+/// and the normalized positions' `f32` bits, in key order) before the
+/// spectral coordinates move out of cartography into the channel registry.
+#[test]
+fn the_graph_only_layouts_match_their_goldens() {
+    let nodes: Vec<NodeEntry> = (0..40)
+        .map(|i| {
+            node(
+                &format!("n{i:02}"),
+                &format!("Node {i}"),
+                NodeState::Available,
+            )
+        })
+        .collect();
+    let mut relations = Vec::new();
+    for i in 1..40usize {
+        let parent = (i * 7 + 3) % i;
+        relations.push(relation(
+            &format!("t{i}"),
+            &format!("n{i:02}"),
+            &format!("n{parent:02}"),
+            Provenance::Extracted,
+        ));
+    }
+    for i in 0..12usize {
+        let (a, b) = ((i * 11) % 40, (i * 17 + 5) % 40);
+        if a != b {
+            relations.push(relation(
+                &format!("c{i}"),
+                &format!("n{a:02}"),
+                &format!("n{b:02}"),
+                Provenance::Authored,
+            ));
+        }
+    }
+    let graph = GraphModel { nodes, relations };
+    let hash = |laid: &std::collections::HashMap<String, (f32, f32)>| {
+        let mut sorted: Vec<_> = laid.iter().collect();
+        sorted.sort_by(|a, b| a.0.cmp(b.0));
+        let mut hash: u64 = 0xcbf2_9ce4_8422_2325;
+        for (key, (x, y)) in sorted {
+            for byte in key
+                .bytes()
+                .chain(x.to_bits().to_le_bytes())
+                .chain(y.to_bits().to_le_bytes())
+            {
+                hash ^= u64::from(byte);
+                hash = hash.wrapping_mul(0x0000_0100_0000_01b3);
+            }
+        }
+        hash
+    };
+    #[rustfmt::skip]
+    const GOLDENS: &[(&str, u64)] = &[
+        ("phyllotaxis.default", 0x3c67e1f148c0d711),
+        ("grid.default", 0xfb33676b42ee1dae),
+        ("spectral.default", 0x32662ebd01212de7),
+        ("penrose.default", 0x5e0e955f65e4443a),
+        ("lsystem.default", 0xbf7a15341f05086f),
+    ];
+    let mut taken = Vec::new();
+    for id in cartography::adapters::GRAPH_ONLY_STRATEGIES {
+        let laid = lay_out(&graph, id, 680, 560);
+        assert_eq!(laid.len(), 40, "{id} places every node");
+        println!("        (\"{id}\", 0x{:016x}),", hash(&laid));
+        taken.push((*id, hash(&laid)));
+    }
+    assert_eq!(
+        hash(&lay_out(&graph, "spectral.default", 680, 560)),
+        taken[2].1,
+        "the same layout twice"
+    );
+    assert!(
+        !GOLDENS.is_empty(),
+        "no goldens recorded yet: paste the lines above"
+    );
+    assert_eq!(taken, GOLDENS, "a graph-only layout moved from its golden");
+}

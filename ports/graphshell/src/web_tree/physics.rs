@@ -31,6 +31,8 @@ pub(super) struct PhysicsPanel {
     pub(super) kind: SelectState,
     pub(super) mass: SelectState,
     pub(super) depth: SelectState,
+    /// Group pull's channel (any kind source; F37).
+    pub(super) groups: SelectState,
     /// Index 0 is custom; profile `i` is at `i + 1`.
     pub(super) profile: SelectState,
     /// One per `CANVAS_PHYSICS_OVERLAYS` entry, in catalog order.
@@ -68,6 +70,7 @@ impl PhysicsPanel {
             kind: SelectState::new(0).with_label("Kinds"),
             mass: SelectState::new(0).with_label("Mass"),
             depth: SelectState::new(0).with_label("Depth"),
+            groups: SelectState::new(0).with_label("Groups"),
             profile: SelectState::new(0).with_label("Profile"),
             overlays: vec![false; CANVAS_PHYSICS_OVERLAYS.len()],
             layout_id: layout_id.to_string(),
@@ -91,6 +94,7 @@ impl PhysicsPanel {
         self.kind.selected = index_of(PhysicsKindSource::ALL, live.kind);
         self.mass.selected = index_of(PhysicsMassSource::ALL, live.mass);
         self.depth.selected = index_of(PhysicsDepthSource::ALL, live.depth);
+        self.groups.selected = index_of(PhysicsKindSource::ALL, live.groups);
         for (checked, overlay) in self.overlays.iter_mut().zip(PhysicsOverlay::ALL) {
             *checked = live.overlays.contains(&overlay);
         }
@@ -119,6 +123,8 @@ impl PhysicsPanel {
                         .is_some_and(|index| self.overlays[index])
             }),
             kind: PhysicsKindSource::ALL[self.kind.selected.min(PhysicsKindSource::ALL.len() - 1)],
+            groups: PhysicsKindSource::ALL
+                [self.groups.selected.min(PhysicsKindSource::ALL.len() - 1)],
             mass: PhysicsMassSource::ALL[self.mass.selected.min(PhysicsMassSource::ALL.len() - 1)],
             depth: PhysicsDepthSource::ALL
                 [self.depth.selected.min(PhysicsDepthSource::ALL.len() - 1)],
@@ -347,6 +353,9 @@ pub(super) fn section(page: &TreePage) -> Child {
         overlay_group(page),
         picker("Kinds", labels(CANVAS_PHYSICS_KIND_SOURCES), |page| {
             &mut page.physics.kind
+        }),
+        picker("Groups", labels(CANVAS_PHYSICS_KIND_SOURCES), |page| {
+            &mut page.physics.groups
         }),
         picker("Mass", labels(CANVAS_PHYSICS_MASS_SOURCES), |page| {
             &mut page.physics.mass

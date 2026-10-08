@@ -29,3 +29,4 @@ pub mod resident_reservoir;
 pub mod resident_site;
 pub mod resident_status;
 pub mod settings;
+pub mod startup_vault;
