@@ -22,7 +22,7 @@ use std::collections::HashMap;
 
 use cartography::{
     COORDS_SPECTRAL, ImportanceWeights, IntelligenceSignals, NodeEmbeddings, NodeOrder, NodeRings,
-    ORDER_TIMELINE, RINGS_FOCUS, Signal, WEIGHT_DEGREE,
+    ORDER_RECENCY, ORDER_TIMELINE, RINGS_FOCUS, Signal, WEIGHT_DEGREE, WEIGHT_RECENCY,
 };
 use kernel::graph::{Graph, NodeKey};
 
@@ -303,6 +303,12 @@ impl ChannelRegistry {
             let signal = match id {
                 ORDER_TIMELINE => Signal::Order(NodeOrder {
                     order: self.enumeration(graph).to_vec(),
+                }),
+                ORDER_RECENCY => Signal::Order(NodeOrder {
+                    order: self.recency(graph).order.clone(),
+                }),
+                WEIGHT_RECENCY => Signal::Weights(ImportanceWeights {
+                    weights: in_key_order(&self.recency(graph).values),
                 }),
                 COORDS_SPECTRAL => {
                     let iterations = cartography::adapters::SpectralAdapter::default().iterations;

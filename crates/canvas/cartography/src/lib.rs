@@ -98,8 +98,8 @@ pub use request::{
 pub use scene_out::{MERE_GRAPH_ADAPTER, scene_from_projection};
 pub use signals::{
     AffinityScores, BridgeNodes, COORDS_HOST, COORDS_SPECTRAL, Cluster, ClusterSet,
-    ImportanceWeights, IntelligenceSignals, NodeEmbeddings, NodeOrder, NodeRings, ORDER_TIMELINE,
-    RINGS_FOCUS, Signal, SignalFault, SignalKind, WEIGHT_DEGREE,
+    ImportanceWeights, IntelligenceSignals, NodeEmbeddings, NodeOrder, NodeRings, ORDER_RECENCY,
+    ORDER_TIMELINE, RINGS_FOCUS, Signal, SignalFault, SignalKind, WEIGHT_DEGREE, WEIGHT_RECENCY,
 };
 pub use spiral_score::{MereSpiralProjection, project_spiral_score, project_spiral_score_for_view};
 pub use strategy::LayoutStrategy;

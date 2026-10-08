@@ -21,7 +21,8 @@
 //! families"): Columns (by site) and (by cluster) read `groups.site` and
 //! `groups.cluster`, and the rest take families of their own,
 //! `order.recency`, `order.timeline`, `rings.focus`, `coords.spectral`,
-//! `weight.degree`, `importance.degree` and `importance.betweenness`. The
+//! `weight.degree`, `weight.recency` (F132, the Spiral's rungs),
+//! `importance.degree` and `importance.betweenness`. The
 //! bridge nodes are one channel, `groups.bridges`, whose metric (betweenness
 //! or articulation) is the canvas's chosen bridge metric rather than part of
 //! the id (F85, "groups.bridges").
@@ -62,7 +63,8 @@ pub enum ChannelFamily {
     Rings,
     /// Coordinates per node: Spectral's.
     Coords,
-    /// A weight per node an arrangement spreads by: Radial's weighted policy.
+    /// A weight per node an arrangement reads: Radial's weighted policy, the
+    /// Spiral's rungs.
     Weight,
     /// Normalized importance per node: size by importance, the gloss.
     Importance,
@@ -108,6 +110,13 @@ pub enum OrderSource {
     Timeline,
 }
 
+/// Which weight: degree plus one, or recency in `0..=1`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum WeightSource {
+    Degree,
+    Recency,
+}
+
 /// One channel of the registry.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum Channel {
@@ -126,8 +135,8 @@ pub enum Channel {
     Rings,
     /// The graph Laplacian's coordinates.
     Coords,
-    /// Degree plus one, over every edge.
-    Weight,
+    /// Degree plus one over every edge, or each node's recency.
+    Weight(WeightSource),
     /// Importance by degree or betweenness, normalized.
     Importance(ImportanceMetric),
     /// The bridge nodes, under the canvas's bridge metric (betweenness
@@ -136,6 +145,14 @@ pub enum Channel {
 }
 
 const ORDERS: [OrderSource; 2] = [OrderSource::Recency, OrderSource::Timeline];
+const WEIGHTS: [WeightSource; 2] = [WeightSource::Degree, WeightSource::Recency];
+
+fn weight_option(weight: WeightSource) -> &'static str {
+    match weight {
+        WeightSource::Degree => "degree",
+        WeightSource::Recency => "recency",
+    }
+}
 const IMPORTANCE: [ImportanceMetric; 2] = [ImportanceMetric::Degree, ImportanceMetric::Betweenness];
 
 fn order_option(order: OrderSource) -> &'static str {
@@ -170,7 +187,8 @@ impl Channel {
         all.extend(PAIRS.map(Channel::Pairs));
         all.push(Channel::Distances);
         all.extend(ORDERS.map(Channel::Order));
-        all.extend([Channel::Rings, Channel::Coords, Channel::Weight]);
+        all.extend([Channel::Rings, Channel::Coords]);
+        all.extend(WEIGHTS.map(Channel::Weight));
         all.extend(IMPORTANCE.map(Channel::Importance));
         all.push(Channel::Bridges);
         all
@@ -187,7 +205,7 @@ impl Channel {
             Channel::Order(_) => ChannelFamily::Order,
             Channel::Rings => ChannelFamily::Rings,
             Channel::Coords => ChannelFamily::Coords,
-            Channel::Weight => ChannelFamily::Weight,
+            Channel::Weight(_) => ChannelFamily::Weight,
             Channel::Importance(_) => ChannelFamily::Importance,
             Channel::Bridges => ChannelFamily::Groups,
         }
@@ -204,7 +222,7 @@ impl Channel {
             Channel::Order(order) => order_option(order),
             Channel::Rings => "focus",
             Channel::Coords => "spectral",
-            Channel::Weight => "degree",
+            Channel::Weight(weight) => weight_option(weight),
             Channel::Importance(metric) => metric.as_code(),
             Channel::Bridges => "bridges",
         }
@@ -235,7 +253,10 @@ impl Channel {
                 .map(Channel::Order),
             "rings" => (option == "focus").then_some(Channel::Rings),
             "coords" => (option == "spectral").then_some(Channel::Coords),
-            "weight" => (option == "degree").then_some(Channel::Weight),
+            "weight" => WEIGHTS
+                .into_iter()
+                .find(|weight| weight_option(*weight) == option)
+                .map(Channel::Weight),
             "importance" => IMPORTANCE
                 .into_iter()
                 .find(|metric| metric.as_code() == option)
@@ -313,9 +334,14 @@ impl Canvas {
                     self.channels.spectral(&self.graph, iterations),
                 ));
             },
-            Channel::Weight => {
+            Channel::Weight(WeightSource::Degree) => {
                 return ChannelValues::Weights(in_key_order(
                     self.channels.degree_weights(&self.graph),
+                ));
+            },
+            Channel::Weight(WeightSource::Recency) => {
+                return ChannelValues::Weights(in_key_order(
+                    &self.channels.recency(&self.graph).values,
                 ));
             },
             Channel::Importance(metric) => {
@@ -368,7 +394,7 @@ impl Canvas {
             Channel::Order(_)
             | Channel::Rings
             | Channel::Coords
-            | Channel::Weight
+            | Channel::Weight(_)
             | Channel::Importance(_)
             | Channel::Bridges => unreachable!("resolved from the registry above"),
         }

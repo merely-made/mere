@@ -275,7 +275,8 @@ fn project_canvas_dispatch(
     }
 }
 
-/// The Spiral over the registry's recency: recent first, or in the enumeration order.
+/// The Spiral over the registry's recency: recent first (`order.recency`), or in the enumeration
+/// order (`order.timeline`), its rungs by `weight.recency`, all handed in as keyed signals (F132).
 fn spiral_in(
     registry: &mut ChannelRegistry,
     graph: &Graph,
@@ -285,20 +286,14 @@ fn spiral_in(
     zoom_level: f32,
     previous: Option<&sceno::Score>,
 ) -> cartography::MereSpiralProjection {
-    let ordered: Vec<NodeKey> = if recent_first {
-        registry.recency(graph).order.clone()
+    let order = if recent_first {
+        cartography::ORDER_RECENCY
     } else {
-        registry.enumeration(graph).to_vec()
+        cartography::ORDER_TIMELINE
     };
-    let recency = registry.recency(graph);
+    let signals = registry.disclose(graph, &[order, cartography::WEIGHT_RECENCY], focus);
     cartography::project_spiral_score_for_view(
-        graph,
-        extents,
-        focus,
-        &ordered,
-        &recency.values,
-        zoom_level,
-        previous,
+        graph, &signals, order, extents, focus, zoom_level, previous,
     )
 }
 
