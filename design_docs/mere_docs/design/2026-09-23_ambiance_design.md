@@ -12,6 +12,12 @@ memory design. No code.
 **Status (2026-09-23):** recorded; every question raised while writing it was
 ruled the same day (§9).
 
+**Continuation (2026-10-07):** §10 proposes a shared interaction for
+focus-driven relation lenses, using the company site's project dependencies as
+the first bounded consumer. It records the user's direction and distinguishes
+new design choices from the established rulings. No implementation or new
+portable-contract acceptance is claimed.
+
 The rulings in §2 are Mark's. Quoted text is verbatim. Several rulings were
 choices Mark made among options offered to him, and the text says so where it
 reports them. Sections marked *analysis* are the assistant's reading of the
@@ -608,3 +614,202 @@ for the plan that builds it. The
 implements the per-domain meres, their sessions and archive, and the access and
 ambient grants. Alembic's own open decisions stand, including the
 event log's shape (its §10, item 5).
+
+## 10. Proposal: focus-driven relation lenses (2026-10-07)
+
+**Status:** proposed design, not a new set of rulings. In the site conversation,
+Mark described selecting a project and choosing Foundations, Dependencies or
+Rust crates to disclose background material, then withdrawing material which
+is no longer relevant when the subject is deselected. He raised comparison,
+scenes and arrangements as questions. The following makes that interaction
+concrete without treating the answers as already ruled. Implementation belongs
+to a consumer's existing plan; this is the single shared design home.
+
+### 10.1 Established boundaries
+
+The laws in §§2–6 continue to apply. Reveal reads; it does not author domain
+membership or claims. Examination can enter short-term memory, keeping is a
+separate promotion, and withdrawing a projection is neither forgetting nor
+deletion. Cross-mere automatic context requires the per-mere/per-app opt-in.
+
+The [projection-scenes direction](../../2026-08-23_projection_scenes_and_graph_native_platform.md)
+§§4–5 separates scope-producing queries from scenes, and source identity from
+projected instance identity. A lens selects or derives a disclosed scope and
+reading; a scene determines what its entities and relations become. The
+[relationship adoption plan](../implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md)
+already requires source revisions, explained relationships and occurrence-safe
+selection. Those contracts are reused, not replaced by a second context graph.
+
+The [Scenograph editor plan](../implementation_strategy/2026-10-07_scenograph_editor_plan.md)
+SE11–SE22 distinguishes working draft history from attributed session saves;
+SE31 puts command preferences in the view plane. Transient lens activation
+should not dirty an authored recipe. Editing and explicitly saving a recipe
+remain separate operations through the owner's existing path. This is an
+application of those boundaries, not a claim that an ambient controller exists.
+
+### 10.2 Selected subjects, inspection and reasons
+
+**Proposed behavior.** Keep the selected comparison subjects separate from the
+one item currently inspected and from pointer/keyboard focus. Inspecting a
+dependency explains it; it does not silently replace the selected projects or
+make that dependency a new traversal root. Explore from here is an explicit
+command when the person wants to change the root.
+
+For each selected subject, evaluate the enabled lenses against the same
+disclosed binding and revision. A contextual item has all of its applicable
+reasons: which subject and lens introduced it, the source statement or derived
+path, and the conditions under which that reason holds. A result arriving after
+its subject, lens or binding revision changed cannot reinstate the old view.
+Loading, refusal and stale input are visible states, not empty successful sets.
+
+Within one scene, two reasons for the same owner-disclosed semantic identity
+produce one contextual item with two reasons. Do not merge equal labels:
+package versions/configurations can differ, and authored occurrences remain
+distinct even when they refer to one source. If an item is already a primary
+subject, emphasize that instance and its reasons instead of adding a duplicate.
+Several scenes may have separate projected instances with one source mapping.
+
+| Action | Proposed display result | Keeping/source effect |
+| --- | --- | --- |
+| Select A, enable a lens | Disclose A's bounded context and reasons. | No implicit saved membership or source claim. |
+| Add B to the selected subjects | Disclose the union; one shared item retains both reasons. | Same read-side boundary. |
+| Deselect A | Remove A's reasons; retain every item still justified by B or an explicit view-retention choice. | Do not erase examined or saved memory. |
+| Clear selected subjects | Withdraw temporary context; return inspection/focus to a surviving control or base item. | Do not forget Recent, retract claims or delete Saved. |
+| Keep in view | Add an explicit view-local reason independent of current subject selection. | Not long-term keeping; session/view persistence follows an explicit save choice. |
+| Save or add to a domain collection | Submit the named owner action and expose its result/refusal. | Uses the domain's authority and attributed retention path. |
+| Hold position | Apply a permitted placement constraint. | Does not itself keep the item visible, save it or author a relation. |
+
+The action names above are proposals. Avoid a single Pin command with all
+three meanings: view membership, long-term retention and held coordinates.
+
+### 10.3 Lens meaning, provenance and coverage
+
+The site adapter supplies domain facts and scope; the shared interaction only
+controls their disclosure. Proposed first lenses:
+
+| Lens | Meaning and explanation |
+| --- | --- |
+| Foundations | An editorial selection of important supporting projects, with the curator, reason and source revision. Importance is an authored reading, not inferred from degree or dependency count. |
+| Dependencies | Declared or resolved dependency relationships, labelled by source and scope. The adapter states direct/transitive treatment and included dependency kinds. |
+| Rust crates | Cargo-derived relationships. A manifest declaration and a lockfile/resolver result are different evidence; disclose revision, versions, target/features and dependency kinds where known. |
+
+“All dependencies” means all within the stated coverage, never an unsupported
+claim about an entire ecosystem. Each result carries the limiting layer and
+any breadth/traversal budget, following [graph-semantics ruling 4](../implementation_strategy/2026-10-04_graph_semantics_plan.md).
+Not loaded, undisclosed, unavailable, unsupported, stale and truncated are
+different from a known empty result. Identity, evidence and freshness remain
+inspectable in spatial and list presentations. Multiple attributed assertions
+may support one drawn relationship; hiding one reason does not retract others.
+
+**Proposed comparison modes:** All shows the union; Shared shows members
+returned for every selected subject; Differences shows those absent from at
+least one subject's returned set, labelled by subject. An unknown absence must
+remain unknown. With incomplete coverage, say shared/different *among disclosed
+results* and identify the incomplete subjects rather than certifying exclusivity.
+With one subject, Shared and Differences explain why comparison is unavailable.
+The mode filters disclosure, not source membership or the underlying reasons.
+
+Show incident relationships for inspected or selected material prominently.
+Other disclosed context-to-context routes remain available through inspection
+or expansion, following Woodshed's connected exploration precedent. Edge
+density can be reduced, with a visible count/filter and an equivalent list;
+visual reduction does not mean the relationships are absent. Domain measures
+and unavailable values stay separate rather than becoming one unexplained
+relevance score.
+
+### 10.4 Scenes and placement
+
+**Proposed first realization:** retain the primary graph's existing positions
+as context expands. Preserve surviving contextual positions and remembered
+coordinates when the same material returns. Add context without repeatedly
+fitting the camera or solving a new placement for everything. Reframe or change
+the scene explicitly. A bounded disclosure budget states its limits and offers
+Show more or Explore from here; automatic budget reduction protects selected,
+inspected and explicitly retained material, and asks before replacing it.
+
+Placement must respect the selected reading. A topology view can permit free
+placement; a Matrix compares projects against dependencies; a Provenance view
+can explain declarations, resolutions and derived paths. These are applications
+of the scene catalog, not new scene names or completed portable surfaces.
+Foundations is not an arrangement, and one generic halo cannot substitute for
+the meaningful coordinates of a musical or quantitative reading.
+
+The seeded/anchored/pinned roles and encoded-axis constraints remain as ruled
+in the [projection grammar catalog](../research/2026-08-15_projection_grammar_catalog.md).
+An encoded axis does not allow dragging a value into a false position. Report
+unsupported placement or an unmet constraint; offer inspection or another
+presentation. A held coordinate in a free topology view does not force an item
+onto that coordinate in a different scene. Changing scenes preserves selected
+source identities and explanations where applicable, not incompatible geometry.
+
+### 10.5 Equivalent controls and ownership
+
+Lens activation, adding/removing subjects, comparison, inspection, expansion,
+view retention and any granted owner action need keyboard-operable controls
+through the host's command/focus system. Do not make modifier-drag the only way
+to compare. A list or table exposes the same subject identities, reasons,
+coverage and actions. Removing the inspected item deliberately returns focus
+and announces the changed context; an asynchronous refresh cannot steal focus.
+
+At narrow widths, keep the foreground readable and put context controls and
+explanations in a reachable adjacent/stacked surface. Context can be collapsed
+without clearing subjects or saving anything. Static and reduced-motion
+presentations retain membership, selection, reasons and owner actions; motion
+and hover are not the only way to discover a relation. Frozen publication
+preserves source mapping, evidence and coverage for its recorded selection;
+it makes no claim to execute dynamic selection or newly authorized writes.
+
+| Responsibility | Existing boundary applied to this proposal |
+| --- | --- |
+| Domain adapter/owner | Identity and occurrence semantics, statements, revisions, domain calculations, disclosed actions and retention authority. |
+| Mere scope/context layer | Selected scope, derived membership and reasons, coverage, cross-mere grant enforcement; no second truth store. |
+| Scenograph/Scenomise | Portable source mapping, recipe validation and projection; no project-specific Cargo parser, music calculation or owner store. |
+| Cambium/host | Commands, keyboard and pointer focus, cancellation, announcements and responsive realization. |
+| View state | Active lenses, subjects, comparison mode, inspection, visibility/breadth, camera and permitted placement overrides. |
+| Owner-authored session state | Explicit saved material, recipe or query definitions and attributed source/domain actions. |
+
+Saving a query shares its spec; freezing records members and revision under
+graph-semantics ruling 3. Neither a saved view nor a recipe grants access to a
+mere, enables a provider/model, or authorizes script execution. Local-only
+published site exploration must not pretend that a disabled Save action has
+durable session authority.
+
+### 10.6 Bounded proof and open product choices
+
+**Recommended first proof, not run:** two disclosed site projects, one shared
+foundation and one unique foundation each; one explicit Foundations lens, one
+topology view and its equivalent list. Use declared source revisions and
+editorial reasons, not a live ecosystem crawl. Select A, add B, deselect A and
+clear all. Verify one shared contextual identity and both reasons, preservation
+of B's context, withdrawal after clear, stable primary placement and unchanged
+source/collection state. Inspect a candidate separately; repeat with Keep in
+view and with Hold position to prove that neither conflates the other or Save.
+
+Add controls for incomplete coverage, same label/different identity, repeated
+authored occurrences, stale asynchronous completion, budget reduction and a
+refused owner action. Exercise keyboard and narrow/static presentations. No
+receipt here advances S1, a browser storage gate or native accessibility
+acceptance. A second heterogeneous consumer over Woodshed or Knot data must
+prove the lifecycle without project-specific shared code before claiming a
+general ambient interaction contract. Their existing proofs are precedents,
+not acceptance of this proposal:
+`repos/woodshed/design_docs/2026-09-04_musical_projections_plan.md`,
+`repos/woodshed/design_docs/2026-07-11_stage_set_tools_plan.md`, and
+`repos/knot-editor/design_docs/2026-09-30_composition_mere_retention.md`.
+
+Open product choices for the first consumer:
+
+- Whether Foundations starts enabled when a subject is selected, or requires
+  deliberate activation; the proof should activate it explicitly until ruled.
+- Whether enabled lenses apply to all selected subjects together or can differ
+  per subject; a single shared lens set is the proposed first cut.
+- The default breadth and comparison mode; All is the proposed first mode,
+  with no universal numeric budget chosen here.
+- The user-facing names and persistence of view retention versus owner Save
+  versus held placement; terminology must not collapse these actions.
+- Exact dependency coverage: direct declarations versus resolved transitives,
+  feature/target selection and dependency kinds. Foundations can precede that
+  extraction decision.
+
+This continuation opens these interaction choices without reopening §9's ruled
+state model or claiming its engine-registry and reservoir follow-ons complete.
