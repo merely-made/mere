@@ -1,7 +1,7 @@
 # Scenograph Editor Plan
 
 **Date:** 2026-10-07
-**Status (2026-10-07):** in progress. Rulings SE1 to SE9 recorded (§1). E1, the generic history, landed on main 2026-10-07 (`de06e4f0`) and moves into the `edit-history` leaf crate (SE10, SE13). E2, undo in the projection editor, landed 2026-10-07 with its headed check. E2b, saving into the mere session (SE11, SE12, SE14 to SE22), landed 2026-10-07 with headed checks in Chrome and Firefox; Safari is open. Track C1 (drag to pan, right-drag select, and a command context menu; SE23 to SE33) landed 2026-10-07 with headed checks in Chrome and Firefox. A Turnstone follow-up (SE32) and E3 are next.
+**Status (2026-10-07):** in progress. Rulings SE1 to SE9 recorded (§1). E1, the generic history, landed on main 2026-10-07 (`de06e4f0`) and moves into the `edit-history` leaf crate (SE10, SE13). E2, undo in the projection editor, landed 2026-10-07 with its headed check. E2b, saving into the mere session (SE11, SE12, SE14 to SE22), landed 2026-10-07 with headed checks in Chrome and Firefox; Safari is open. Track C1 (drag to pan, right-drag select, and a command context menu; SE23 to SE33) landed 2026-10-07 with headed checks in Chrome and Firefox. E3 and E4 wait for the site session's S1 to land (SE34); the Turnstone follow-up (SE32) goes first.
 **Scope:** the editor foundation that Scenograph's editing surfaces stand on: one undo history in Cambium, and arrangement options declared as data. Carries out the balaur review's rulings A and B. The projection editor in Graphshell is the first consumer of both.
 
 Not in scope, mapped in §3 and opened by later rounds:
@@ -103,6 +103,8 @@ Mark, on SE30: **"Uhhh, just to say, remember the scope of meerkat was different
 **SE32, Turnstone.** Mark: "We should apply this to turnstone, or harvest from it…". Evidence put: Turnstone's right-click on a graph pane selects the node under it and opens the omnibar's `>` command lane (`src/shell/input.rs`); its catalog (`src/app/palette.rs`, `available_actions`) puts contextual rows ahead of the static registry in one composition read by palette, snapshot and automation; it has no recents or adds and removes, and it takes the right press before the canvas. Options: harvest now, apply next; apply in this track; harvest only. Mark: **"Harvest now, apply next (Recommended)"**. *Follows:* the Cambium set takes Turnstone's ordering rule; a follow-up in Turnstone moves its catalog onto the set and opens its palette on right release, so right-drag selects there too.
 
 **SE33, how the page draws the menu.** Evidence put: Graphshell's top bar and nav are painted by a Cambium view under transparent DOM hit targets, while its panels are ordinary DOM; Cambium's `command_surface` renders a Genet DOM. Options: page DOM like its panels; Cambium's `command_surface`, painted. Mark: **"Page DOM, like its panels (Recommended)"**. *Follows:* the page renders the rows; Cambium supplies the set and the order.
+
+**SE34, the order after C1 (2026-10-07).** Evidence put: S1 (a versioned host dataset envelope, `scenomise::host_dataset`, `pub(crate)` on the relationship helpers) was checked file by file against E4 and does not collide. Options: E3 and E4 beside S1; the Turnstone follow-up first; pause E3 and E4 until S1 lands. Mark: **"Pause E3/E4 until S1 lands"**. *Follows:* the Turnstone follow-up runs meanwhile.
 
 ## 2. Tracks
 
