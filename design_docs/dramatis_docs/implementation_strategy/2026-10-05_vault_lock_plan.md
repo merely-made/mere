@@ -1276,16 +1276,62 @@ unlock follow-through, and non-Windows startup unlock backends, from the
         profile; a wrong passphrase stays locked; tests cover each.
         *2026-10-08: superseded by ruling 66. The resident waits before
         building the vault, so personae is unchanged.*
-  - [ ] djinn's resident path reads no passphrase from the environment
+  - [x] djinn's resident path reads no passphrase from the environment
         (measured by search). A control resident given
         `PERSONAE_PASSPHRASE` and nothing else stays locked.
-  - [ ] A passphrase-vault resident starts locked, prompts, re-prompts on
+        *2026-10-08: the search is clean for djinn and djinn-testkit. The
+        control resident is not run: on Windows the native box is always
+        available, so it would open a real dialog on the desktop mid-test.
+        The live tests stand in for it: they pass with no environment.*
+  - [x] A passphrase-vault resident starts locked, prompts, re-prompts on
         a cancel or a wrong passphrase, and serves its doors only after
         the unlock. The door keys, lanes and second open follow the
-        unlock.
-  - [ ] With no vault, the start prompt asks twice and creates it.
-  - [ ] `--passphrase-fd` exists only under the test or receipt feature,
-        and the harness, its receipts and djinn's tests use it.
+        unlock. *2026-10-08: the prompt logic by scripted unit tests; a
+        live resident's events run `started, waiting-for-unlock,
+        vault-created, listening, ready`. The real native box and terminal
+        are Mark's attended step.*
+  - [x] With no vault, the start prompt asks twice and creates it.
+  - [x] `--passphrase-fd` exists only under the test or receipt feature,
+        and the harness, its receipts and djinn's tests use it. *A plain
+        build answers "unknown argument: --passphrase-fd".*
   - [ ] Gates: personae, castellan and djinn tests, the receipt, and
         `cargo_mode.py verify`. The Linux build and runtime proof go to
         the ThinkPad with the Secret Service (ruling 56).
+
+**2026-10-08, ruling 42 built** (`55ff58e4`, branch `start-locked`).
+- **What changed:**
+  - djinn's new `startup_vault` chooses the vault and holds the prompt
+    loop;
+  - `run()` and the pairing commands open through it;
+  - `--passphrase-fd 0` sits behind the `passphrase-fd` feature, which the
+    tests turn on through djinn's dev-dependency on itself;
+  - djinn-testkit hands the passphrase over on standard input;
+  - graphshell's `NativeIdentityUi` gains `ask_vault_passphrase(message)`;
+  - personae gains a named constant, `PASSPHRASE_VAULT_FILE`, and no other
+    change.
+- ***Readings, not ruled:***
+  - any refused open asks again, with the reason shown, rather than matching
+    personae's "incorrect passphrase" string;
+  - only fd 0 is read, since Windows has no other inherited descriptor
+    numbers;
+  - the passphrase is kept in zeroizing memory only for Distillery's second
+    open of the same directory.
+- **Verified in the worktree:**
+  - djinn's tests, startup_vault's 8 included; personae, djinn-testkit and
+    castellan (32 suites, 346 passed);
+  - graphshell's tests compile;
+  - the live tests: `harness` 4 of 4, `lock_agent` and the two-resident
+    directory test;
+  - `cargo_mode.py verify`.
+- **Finding, not this change's:** `mdns_first_contact_two_instance` fails
+  at "a restarted: contact within 90s", 3 of 3 runs on the branch and 1 of
+  1 on its base `19de6eab`, at the same step. It belongs to the device
+  pairing plan's D1b receipts.
+- **Still open:**
+  - the Linux build and runtime proof on the ThinkPad, with the Secret
+    Service (ruling 56);
+  - the real native box and terminal prompt, which are Mark's attended
+    step;
+  - outside djinn, `Unlock::from_env()` remains in `personae-agent`,
+    `personae-vault`, `distillery-installed`, graphshell's `profile.rs`
+    and its web-extension smoke host.
