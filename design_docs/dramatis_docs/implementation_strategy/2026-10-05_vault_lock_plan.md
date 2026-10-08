@@ -1487,3 +1487,31 @@ unlock follow-through, and non-Windows startup unlock backends, from the
   the master seed in a 564-byte block allocated at open and freed at lock.
   That is the vault's own slot table, by the same mechanism, in personae's
   code. Rulings 71 and 72 settle both.
+
+**2026-10-08, rulings 71 and 72 built** (`8eab9fcf`).
+- **`Profile::slots` is a `SlotMap`.** It is a small vector whose whole
+  buffer, padding and spare capacity included, is zeroed (with `zeroize`,
+  volatile) on drop, after a removal, and before an outgrown buffer is
+  freed. It keeps the `HashMap` methods callers use, and personae, castellan,
+  pandect, graphshell and djinn compile unchanged. The three loaders build it
+  with the slot count up front, so loading never grows it.
+- **`no_residue`'s `sealed_lock`** builds its canary profile unarmed and
+  drops it after disarming.
+- **Verified on Linux (ThinkPad):**
+  - `no_residue` clean 10 of 10 (with only the fixture fix: 1 of 4);
+  - personae with all features (207, three full runs) and castellan with all
+    features.
+- **Verified on Windows:** personae and castellan with all features, `no_residue`
+  clean (10 suites, 345 passed).
+- **So L1's no-residue condition now holds on Linux as well as Windows.**
+- **Seen in passing, neither from this change:**
+  - personae's `authoritative_opening_is_exclusive_until_every_clone_drops`
+    failed once in four full Linux runs ("authority is already held").
+    It passed 5 of 5 alone and the next three full runs. It is probably a
+    child process from the cross-process sibling test briefly holding the
+    lock across fork; not traced.
+  - djinn's `embedded_reservoir_two_process`, added today (`df0e0804`),
+    fails 3 tests on Windows with "All pipe instances are busy" (os error
+    231). It fails the same way at `origin/main` without this change, as a
+    control. It belongs to that lane.
+- **Next:** ruling 42's Linux runtime proof on the ThinkPad, then L3.
