@@ -1,7 +1,7 @@
 # Scenograph Editor Plan
 
 **Date:** 2026-10-07
-**Status (2026-10-08):** tracks E1 to E5 and C1 complete, each with headed checks in Chrome and Firefox (Safari not run). Rulings SE1 to SE46 (§1). Waiting: genet branch `value-engine` (SE39 to SE42) for Mark or genet's lane to land, then mere's rhai `ValueEngine` and the rule runner after a coordinated repin. The Turnstone follow-up (SE32, SE35) is on Turnstone main at `d0775a1` (§3). Mapped, not opened: wallpapers and props, the style editors, authored motion (§3).
+**Status (2026-10-08):** tracks E1 to E5 and C1 complete, C2 opened (SE45 to SE47), each with headed checks in Chrome and Firefox (Safari not run). Rulings SE1 to SE47 (§1). Waiting: genet branch `value-engine` (SE39 to SE42) for Mark or genet's lane to land, then mere's rhai `ValueEngine` and the rule runner after a coordinated repin. The Turnstone follow-up (SE32, SE35) is on Turnstone main at `d0775a1` (§3). Mapped, not opened: wallpapers and props, the style editors, authored motion (§3).
 **Scope:** the editor foundation that Scenograph's editing surfaces stand on: one undo history in Cambium, and arrangement options declared as data. Carries out the balaur review's rulings A and B. The projection editor in Graphshell is the first consumer of both.
 
 Not in scope, mapped in §3 and opened by later rounds:
@@ -132,6 +132,8 @@ Mark chose the scripting comparison (SE3) while E3 and E4 wait. Evidence put: th
 
 **SE46, where the hoisted type lives, and its name (2026-10-08).** Question 1: cambium's `CommandChoices` matches `CommandMenuView` field for field but has no serde, cambium has no serde dependency, and pandect does not depend on cambium (46 crates, SE10); both serialize to the same field names, so stored sessions keep loading. Options: a leaf crate holding the choices only (recommended); a leaf crate holding the whole set (`Command`, `CommandChoices`, `CommandSet`, with cambium keeping the drawing as `CommandItem`); pandect takes cambium. Mark: **"Think about it this way: what apps shouldn't have this capability? Commands feel pretty fundamental. Are choices (1) sufficient?"** Question 2, the crate's name. Options: `command-choices`; `command-set`; `command-menu`. Mark: **"command-menu"**. *Follows:* the crate is `command-menu`. Question 1 is answered by evidence and put back. *Reading, not ruled:* choices alone are not sufficient. Without the set, a host with commands but no cambium has to rebuild the composition (context first, then kept, then recent, with a query searching everything) to use the stored choices, and nine of the ten ports under `ports/` do not depend on cambium, nor does Graphshell's native build. Earlier portable runs at the same thing exist: graph-kernel's `ActionId` (`crates/graph/graph-kernel/src/actions.rs`), a closed enum of about 130 actions read by ux-events' diagnostics and probes, and mere-chrome's `CommandPaletteSession` (`crates/shell/chrome/src/command_palette.rs`, 332 lines), which no crate in mere's tree depends on.
 
+**SE47, what `command-menu` holds, where, and the older runs (2026-10-08).** Question 1: what goes in. Options: the whole set (recommended: `Command`, `CommandChoices` with serde, `CommandSet`, with cambium keeping the drawing as `CommandItem`); the set plus a palette session (the in-progress query, cursor and scope that mere-chrome's `CommandPaletteSession` held for the egui-era host), so a host only draws; the choices only. Mark: **"Set plus palette session"**. Question 2: where. Options: `crates/cambium/` beside `edit-history` (recommended); `crates/system/` beside pandect. Mark: **"crates/cambium/ (Recommended)"**. Question 3: graph-kernel's `ActionId` and mere-chrome's `CommandPaletteSession`. Options: note them and map them for later (recommended); fold them in during the hoist; leave them be. Mark: **"Note, map, then fold in depending on the results. We don't need duplicate commands or anything"**. *Follows:* track C2 (§2). `crates/cambium/command-menu` holds the command set, the stored choices and a palette session; cambium re-exports it and keeps the drawing; pandect's `CommandMenuView` becomes the crate's choices type. The two older runs are mapped against it first, and what folds in follows from the map, with no command defined twice.
+
 ## 2. Tracks
 
 E1 and E2 carry ruling A; E3 to E5 carry ruling B. E2 needs E1; E4 needs E3; E5 needs E2 and E4. *Added 2026-10-07:* E2b carries SE11 and SE12, after E2.
@@ -184,6 +186,19 @@ Done when:
 - the canvas tests cover the pan, its momentum, the bare click, the right-drag select and the right click;
 - the command set's tests cover ranking, recents, adds and removes, and search over every command;
 - a headed check drags to pan, right-drags to select, and right-clicks to a menu whose search finds a command, in Chrome and Firefox.
+
+### C2 — `command-menu`, one home for commands (SE45 to SE47)
+
+- **Map first.** graph-kernel's `ActionId` and its readers, mere-chrome's `CommandPaletteSession`, Turnstone's palette state and Graphshell's web menu state, each set against the set and the session: what each carries, what overlaps, what would be defined twice. What folds in, and how, comes back as a round.
+- **The crate** (`crates/cambium/command-menu`, serde its only dependency): `Command`, `CommandChoices` (serde, the same field names as `CommandMenuView`), `CommandSet` with `menu` returning commands, and a palette session (query, cursor and whatever else the map shows a palette needs). cambium re-exports it and keeps the conversion to `CommandItem`.
+- **pandect** stores `CommandChoices` where `CommandMenuView` was; Graphshell repoints.
+- **Turnstone** is briefed to store the same type in its sidecar and read its palette state through the session, at its next coordinated repin.
+
+Done when:
+- the set's five tests and the session's tests pass in the new crate, and cambium's tests pass unchanged in count;
+- a session stored before the change, with `CommandMenuView`, loads unchanged (a test over its JSON);
+- no command is defined in two places, by the map's own list;
+- the Graphshell web scenarios `canvas_commands.scn` and `canvas_commands_reopen.scn` pass headed in Chrome and Firefox.
 
 ### E3 — the option declaration type (B, SE7)
 
