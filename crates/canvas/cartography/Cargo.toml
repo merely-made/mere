@@ -15,9 +15,11 @@ name = "cartography"
 path = "src/lib.rs"
 
 # The `graph-canvas-adapters` feature retired 2026-05-18 when its
-# adapters moved to the new `graph-layout` sibling crate. Cartography
-# stays contract-only; consumers needing strategy impls depend on
-# `graph-layout` directly.
+# adapters moved to the new `graph-layout` sibling crate. Cartography is no
+# longer contract-only: it depends on `sceno` and `scenomise`, and its
+# `adapters` module hands scores, matrix axes, and revision pairs to the
+# scenes family, which owns placement and the pure derivations (site canvas
+# plan, Ruling 142).
 [features]
 default = []
 
