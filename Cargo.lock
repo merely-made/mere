@@ -16177,6 +16177,36 @@ dependencies = [
 ]
 
 [[package]]
+name = "tabard-desktop"
+version = "0.1.0"
+dependencies = [
+ "cambium",
+ "cambium-genet-winit-host",
+ "dirs 5.0.1",
+ "layout-dom-api 0.1.1 (git+https://github.com/merely-made/genet.git?rev=965b64e206a47d1c8808472de9aa461233638768)",
+ "mesquite",
+ "tabard-workshop",
+ "taproot",
+ "tempfile",
+]
+
+[[package]]
+name = "tabard-workshop"
+version = "0.0.1"
+dependencies = [
+ "accesskit",
+ "cambium",
+ "cambium-genet-winit-host",
+ "genet-scripted-dom",
+ "layout-dom-api 0.1.1 (git+https://github.com/merely-made/genet.git?rev=965b64e206a47d1c8808472de9aa461233638768)",
+ "tabard",
+ "taproot",
+ "tempfile",
+ "tinct",
+ "winit",
+]
+
+[[package]]
 name = "taffy"
 version = "0.11.0-experimental-cache-fix.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
