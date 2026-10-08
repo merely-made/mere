@@ -18,6 +18,7 @@ use std::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
 
 pub mod dataset;
+pub mod options;
 pub mod relationship;
 
 /// The stable schema version for authored projection definitions.

@@ -1816,11 +1816,25 @@ impl WorkspaceApp {
                     address: address.clone(),
                     message: Some(message.clone()),
                 }),
+                // The current document stays on screen while the host fetches.
+                PeltDocumentState::Fetching { .. } => None,
+                // Pelt has no conversation UI yet; the typed need is shown
+                // as a diagnostic so it is never silently dropped.
+                PeltDocumentState::Awaiting { address, failure } => Some(ChromeDocument {
+                    kind: ChromeDocumentKind::Error,
+                    tile,
+                    rect,
+                    address: address.clone(),
+                    message: Some(failure.to_string()),
+                }),
             }
         });
         let status = match controller.map(PeltController::document_state) {
-            Some(PeltDocumentState::Loading { .. }) => "Loading".to_owned(),
+            Some(PeltDocumentState::Loading { .. } | PeltDocumentState::Fetching { .. }) => {
+                "Loading".to_owned()
+            },
             Some(PeltDocumentState::Error { message, .. }) => message.clone(),
+            Some(PeltDocumentState::Awaiting { failure, .. }) => failure.to_string(),
             Some(PeltDocumentState::Ready) | None => self.chrome_status.label(),
         };
         WorkspaceChrome {

@@ -204,3 +204,39 @@ fn caller_owned_target_drives_the_same_retained_controller_as_desktop() {
     assert_eq!(spawns[3].body.as_deref(), Some("held reader source"));
     assert_eq!(spawns[3].viewport, (800, 600));
 }
+
+#[test]
+fn the_session_seam_reaches_the_live_session_and_follows_replacement() {
+    let spawns = Arc::new(Mutex::new(Vec::new()));
+    let pumps = Arc::new(Mutex::new(Vec::new()));
+    let mut sessions = SessionRegistry::new();
+    sessions.register(Box::new(FakeEngine {
+        spawns: spawns.clone(),
+        pumps,
+    }));
+    let mut controller = PeltController::new(
+        sessions,
+        SurfaceEngineRegistry::new(),
+        PeltControllerConfig::new("fake", "docs/index.html", (800, 600)),
+        TestClock(0.0),
+    )
+    .unwrap();
+    assert_eq!(
+        controller
+            .session()
+            .inspect()
+            .and_then(|report| report.title)
+            .as_deref(),
+        Some("docs/index.html")
+    );
+    assert_eq!(
+        controller.session_mut().frame(10, 10),
+        "docs/index.html@10x10"
+    );
+    controller.command(SessionNavigationCommand::Address("other.html".to_owned()));
+    assert_eq!(
+        controller.session_mut().frame(10, 10),
+        "docs/other.html@10x10",
+        "the seam always names the current session"
+    );
+}
