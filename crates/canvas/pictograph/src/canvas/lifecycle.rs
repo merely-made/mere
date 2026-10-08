@@ -200,6 +200,8 @@ impl Canvas {
             weighted_edges_rebuilds: 0,
             height_by_degree: false,
             marquee: None,
+            empty_press: None,
+            context_request: None,
             ctrl: false,
             shift: false,
             alt: false,
