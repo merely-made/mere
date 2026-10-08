@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-08)**: rulings 1 to 80 in §3; the threat statement is
+**Status (2026-10-08)**: rulings 1 to 81 in §3; the threat statement is
 still open. L1 landed (`2556a20c`). L2's checkpoints A (`7c588deb`) and B
 (`ec1768ab`) landed. Still to come in L2: the Secret Service on the
 ThinkPad, ruling 42 (Linux starts locked), ruling 44 (Distillery's
@@ -928,6 +928,16 @@ per vault be such a big refactor?"**
 Mark: **"Per vault, middle path (Recommended)"**. Follows: signalman's
 station roots are no vault's and pass untouched.
 
+**Ruling 81** *(amends ruling 80's pandect half).* Mark: **"So wait, is
+pandect gonna need vault awareness?"**, then **"Or d8 will handle it?"**
+Options:
+- leave pandect vault-unaware and record the wallets' unattended reopen
+  after a restart as a gap that D8 (the wallet's secrets into castellan,
+  in DR-B) closes;
+- the small check now, removed again when D8 lands.
+
+Mark: **"Leave it to D8 (Recommended)"**.
+
 Still open: a threat statement naming hibernation and the pagefile.
 
 ## 4. Phases
@@ -1669,14 +1679,66 @@ built plain at `fc3da34c`).
     `PrepareForSleep` under a delay inhibitor.
   - **E, the attended run (ruling 78).**
 - **L3 done when** (§4, plus):
-  - [ ] the idle rule fires after the window, resets on activity, and
+  - [x] the idle rule fires after the window, resets on activity, and
         counts unknown as idle (unit tests with an injected clock);
-  - [ ] settings absent or malformed mean the defaults; each trigger can
+  - [x] settings absent or malformed mean the defaults; each trigger can
         be turned off;
-  - [ ] the dispatcher locks on an injected session lock and before an
+  - [x] the dispatcher locks on an injected session lock and before an
         injected suspend acknowledges;
-  - [ ] a resident locked, then killed, comes back waiting at its prompt
+  - [x] a resident locked, then killed, comes back waiting at its prompt
         and opens only on an unlock (a receipt), while one never locked
         auto-unlocks as before;
   - [ ] the attended receipts: Windows `Win+L` and suspend, Fedora
         `loginctl lock-session` and suspend.
+
+**2026-10-08, L3 checkpoints A to D built** (`ed1de0f7`, branch `l3`).
+- **A, the persisted lock:**
+  - personae: `persist_lock`, `clear_persisted_lock` and `lock_persisted`
+    (the marker `locked` beside the vault's root);
+  - the loaders refuse under it, and a loader that takes `OsPresence`
+    passes;
+  - `SealedProfileStorage::open_locked`;
+  - castellan: `ResidentLock` writes the marker on every lock, `ssh-add -x`
+    included, and clears it on unlock, but only for a host made with
+    `with_persisted_lock`, which only djinn's resident is;
+  - djinn: a DPAPI start under the marker waits at its prompt (Hello, then
+    the passphrase) and clears it.
+  - *Reading, not ruled:* a handed-over passphrase (`--passphrase-fd`) now
+    selects the passphrase vault only where no OS-rooted vault exists yet;
+    beside one, it answers the persisted lock (refines ruling 66's
+    reading).
+- **B, the policy:** `lock_triggers`: `LockSettings` from `lock.toml`, the
+  `IdleRule`, `Triggers`, and a `TriggerHost` that locks synchronously and
+  does nothing while locked.
+- **C, Windows:**
+  - `Win+L` through WTS session notifications to a message-only window;
+  - suspend through `PowerRegisterSuspendResumeNotification`, whose
+    callback locks before it returns;
+  - idle from `GetLastInputInfo`.
+- **D, Linux:**
+  - logind's session `Lock`, found through `User.Display`;
+  - `PrepareForSleep` under a delay inhibitor, released after the lock and
+    taken again on wake;
+  - idle from Mutter's monitor, else logind's `IdleSinceHint` (0 means
+    unknown).
+- **Test residents** start with every trigger off unless the test writes
+  its own `lock.toml`, because they read the real session's input and
+  lock.
+- **Verified on Windows:**
+  - personae (211), castellan (122 and its suites), djinn's unit tests
+    (the new 7 included);
+  - `locked_restart`, which passes; its control (no persisted lock) fails
+    at "the lock persists beside the vault";
+  - `lock_agent` and `harness`.
+  - `harness`'s graceful-stop test was refused a stop once in a long serial
+    run, then passed 2 of 2 alone; it is intermittent.
+  - The reservoir two-process failures are the ones already on main.
+- **Verified on Linux (ThinkPad):**
+  - djinn compiles with no warnings of its own; the triggers' 7 and
+    personae's persisted-lock tests pass;
+  - a scratch resident with its triggers on read `lock.toml`, found the
+    graphical session, and held "djinn · sleep · Lock the identity vault
+    before sleep · delay" in `systemd-inhibit --list`, with no warnings.
+- **Still to do: E**, the attended receipts (`Win+L` and suspend on
+  Windows; `loginctl lock-session` and suspend on Fedora). They wait for
+  Mark's word (ruling 78's annotation).
