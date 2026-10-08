@@ -7,7 +7,7 @@
 use cambium::{
     AnyView, FileEvent, FileFilter, GenetCtx, GenetElement, PointerClick, button, custom_leaf, el,
     highlighted_code, lens, map_message_result, open_file, slider, text_field_typed,
-    textarea_typed,
+    textarea_typed, title_bar,
 };
 use tabard::theme::registry::Harmony;
 use tabard::theme::seed::{derive_from_def_for_mode, harmonized_seeds};
@@ -25,11 +25,18 @@ pub const WORKSHOP_CSS: &str = include_str!("workshop.css");
 pub const WORKSHOP_CODE_SAMPLE: &str = "// A little colour, everywhere\nfn garden() {\n    let season = \"spring\";\n    grow(season, 24);\n}";
 
 pub fn workshop_view(state: &WorkshopState) -> WorkshopView {
+    workshop_view_with_captions(state, Box::new(el("div", ())))
+}
+
+/// Mount the same authoring surface with host-supplied window controls.
+/// The host keeps command and close-policy ownership; the workshop supplies
+/// the title, ornament and ordinary authoring actions.
+pub fn workshop_view_with_captions(state: &WorkshopState, captions: WorkshopView) -> WorkshopView {
     Box::new(
         el(
             "main",
             vec![
-                header(state),
+                header(state, captions),
                 close_confirmation(state),
                 body(state),
                 footer(state),
@@ -77,46 +84,41 @@ fn close_confirmation(state: &WorkshopState) -> WorkshopView {
     )
 }
 
-fn header(state: &WorkshopState) -> WorkshopView {
+fn header(state: &WorkshopState, captions: WorkshopView) -> WorkshopView {
     let save_text = if state.is_dirty() {
         "Unsaved theme"
     } else {
         "Saved theme"
     };
-    Box::new(
-        el(
-            "header",
-            (
-                el(
-                    "div",
-                    (
-                        el("div", "T")
-                            .attr("class", "tabard-mark")
-                            .attr("aria-hidden", "true"),
-                        el("div", (el("h1", "Tabard"), el("p", "Appearance workshop")))
-                            .attr("class", "brand-title"),
-                    ),
-                )
-                .attr("class", "brand"),
-                el(
-                    "div",
-                    (
-                        el("span", save_text).attr("class", "save-state"),
-                        button("Undo", |s: &mut WorkshopState, _: PointerClick| s.undo())
-                            .attr("data-action", "undo"),
-                        button("Redo", |s: &mut WorkshopState, _: PointerClick| s.redo())
-                            .attr("data-action", "redo"),
-                        button("Save theme", |s: &mut WorkshopState, _: PointerClick| {
-                            s.save()
-                        })
-                        .attr("data-action", "save")
-                        .attr("class", "primary-button"),
-                    ),
-                )
-                .attr("class", "header-actions"),
-            ),
-        )
-        .attr("class", "workshop-header"),
+    title_bar(
+        Box::new(
+            el("div", "T")
+                .attr("class", "tabard-mark")
+                .attr("aria-hidden", "true"),
+        ),
+        Box::new(
+            el("div", (el("h1", "Tabard"), el("p", "Appearance workshop")))
+                .attr("class", "brand-title"),
+        ),
+        Box::new(
+            el(
+                "div",
+                (
+                    el("span", save_text).attr("class", "save-state"),
+                    button("Undo", |s: &mut WorkshopState, _: PointerClick| s.undo())
+                        .attr("data-action", "undo"),
+                    button("Redo", |s: &mut WorkshopState, _: PointerClick| s.redo())
+                        .attr("data-action", "redo"),
+                    button("Save theme", |s: &mut WorkshopState, _: PointerClick| {
+                        s.save()
+                    })
+                    .attr("data-action", "save")
+                    .attr("class", "primary-button"),
+                ),
+            )
+            .attr("class", "header-actions"),
+        ),
+        captions,
     )
 }
 

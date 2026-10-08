@@ -108,7 +108,7 @@ library separately from the host's appearance choice. It validates user
 definitions, refuses stale/busy writers and replaces the file atomically;
 failed writes leave its loaded snapshot intact.
 
-The reusable [Cambium workshop](../../../ports/tabard) composes that draft and
+The reusable [Cambium workshop](../../cambium/tabard-workshop) composes that draft and
 library into seed/harmony controls, mode previews, history and explicit Save,
 Discard and Reopen actions. Its [desktop host](../../../ports/tabard/desktop)
 mounts the same surface. Hosts still own applying appearance; stylesheet

@@ -6,6 +6,7 @@ license.workspace = true
 repository.workspace = true
 publish = false
 description = "Tabard's reusable appearance workshop surface and authored-theme workflow"
+readme = "README.md"
 
 [dependencies]
 tabard.workspace = true

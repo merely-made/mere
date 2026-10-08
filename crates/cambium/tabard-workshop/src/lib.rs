@@ -18,12 +18,15 @@ pub use interchange::{ExportArtifact, ExportFormat};
 pub use reader::{READER_LEAF_KEY, ReaderSpecimen};
 pub use state::{SeedRole, WorkshopState};
 pub use stylesheet::{APPLICATION_SOURCE, PreviewScene, STYLESHEET_LEAF_KEY, StylesheetSpecimen};
-pub use surface::{WORKSHOP_CODE_SAMPLE, WORKSHOP_CSS, WorkshopView, workshop_view};
+pub use surface::{
+    WORKSHOP_CODE_SAMPLE, WORKSHOP_CSS, WorkshopView, workshop_view, workshop_view_with_captions,
+};
 
 /// The shared component sheets and the workshop frame, in cascade order.
 pub fn workshop_stylesheet() -> String {
     format!(
-        "{}\n{}\n{}",
+        "{}\n{}\n{}\n{}",
+        cambium::TITLE_BAR_CSS,
         cambium::GRAPH_CANVAS_SWATCH_CSS,
         cambium::SYNTAX_HIGHLIGHT_CSS,
         WORKSHOP_CSS
