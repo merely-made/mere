@@ -27,7 +27,7 @@ A family moves together because its crates pin each other.
   - sha2 0.10 to 0.11 (netrender's `paint_list_render`).
 - **Linebender text** (netrender and genet): parley and parley_data 0.10 to 0.11, skrifa 0.42 and 0.44 to 0.48, read-fonts 0.39 and 0.41 to 0.45, harfrust 0.8 to 0.14.
 - **Accessibility** (genet and mere): accesskit 0.24 to 0.25, accesskit_consumer (three versions locked) to 0.39, accesskit_winit 0.32 to 0.34, accesskit_macos 0.26 to 0.27, accesskit_unix 0.21 to 0.24, accesskit_windows 0.32 to 0.35.
-- **Servo parsers** (genet): html5ever, markup5ever and xml5ever 0.39 to 0.40, and cssparser 0.37 to 0.38, which has to agree with the Stylo genet carries.
+- **Servo parsers** (genet): html5ever, markup5ever and xml5ever 0.39 to 0.40 (genet-static-dom, genet-scripted-dom, layout-dom-api, script-runtime-api, servo-xpath), and cssparser 0.37 to 0.38 (livery, cadency, genet-livery). *Corrected 2026-10-08:* the survey's first note said cssparser had to agree with a Stylo genet carries; genet has no Stylo dependency, so no such coupling holds.
 - **Data and Meaning** (mere):
   - fjall 2.11 to 3.1 (eidetic; its on-disk format changes);
   - jsonschema 0.18 to 0.58 (eidetic);
@@ -46,9 +46,15 @@ A family moves together because its crates pin each other.
 
 **D4, downloads (2026-10-08).** Options: crates.io for this program only; ask per lane; the ten compatible updates only. Mark: **"crates.io, this program only (Recommended)"**. *Follows:* this program's lanes fetch from crates.io only, never git or other registries, and log every new crate and version in their lock diff.
 
+**D5, the families the genet and netrender survey added (2026-10-08).** Options: Linebender text; Servo parsers; the small ones (sha2, tokio-tungstenite, windows-core, and genet's and netrender's compatible updates). Mark ticked **"Linebender text, Small ones"** and asked of the parsers: **"We kept the servo parsers?"** The coordinator's answer: yes, genet uses the crates.io html5ever, markup5ever and xml5ever 0.39 and cssparser 0.37, and has no Stylo coupling (§2, corrected). The parsers go back to Mark.
+
+**D6, the order (2026-10-08).** Options: security first; upstream first (netrender, then genet, then mere's own groups, so each mere repin takes everything at once); accessibility first. Mark: **"Upstream first"**.
+
+**D7, where this plan lands (2026-10-08).** Options: push the docs branch now; land it with rapier. Mark: **"Land with rapier"**.
+
 ## 4. Order
 
-Open; goes to Mark. Constraints:
+Upstream first (D6): netrender (Linebender text, sha2, its compatible updates), then genet (Linebender text, accessibility, the small ones, the parsers if taken), then mere's own groups (security-sensitive, accessibility, data and Meaning, other), one mere lane at a time, each taking the genet and netrender repins as they land. Constraints:
 - every mere lane rewrites `Cargo.lock`, so mere lanes run one at a time;
 - genet and netrender lanes can run beside a mere lane, but mere takes them only through a repin, netrender first (genet depends on it), then genet, then mere;
 - at most three lanes at once (`~/.claude/CLAUDE.md`, Concurrency).
