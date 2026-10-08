@@ -64,9 +64,9 @@ rendering engine.
 
 ### 2026-10-07 Forms field ownership migration
 
-**Status:** local consumer gates pass, including F6's accessibility leaves
-across projections. F5 sibling source is committed; its consumer gates and a
-verified published-source Genet repin remain pending.
+**Status, 2026-10-08:** integrated local consumer gates pass, including F6's accessibility
+leaves across projections. Both F5 public-pin sibling gates pass; publication
+and a verified published-source Genet repin remain pending.
 The implementation plan and numbered rulings live in Genet's
 [dated Forms plan](https://github.com/merely-made/genet/blob/main/design_docs/2026-10-07_forms_value_validation_submission_plan.md).
 F3 authorizes this Mere migration and the later verified repin. The current
@@ -79,7 +79,7 @@ descendants in the neutral projection and the native AccessKit adapter. The
 browser mirror inherits that neutral topology. Drawing children stay in the
 DOM. F5 limits sibling edits to selectors, caret routing and existing labels in
 Turnstone and Cleromancy; unnamed fields stay unnamed. The numbered rulings in
-the Forms plan own these decisions, with fresh implementation gates to follow.
+the Forms plan own these decisions; their qualified local gates are recorded below.
 
 Native HTML inputs and textareas now keep live values in Genet's form-control
 arena. Cambium's `TextInput` owns app editing and paints highlighted committed
@@ -232,7 +232,11 @@ implementation receipts follow below before final acceptance and the verified re
 The downstream audit found old tag checks in Turnstone and Cleromancy. F5 now
 authorizes their mechanical selector/caret/existing-label edits, committed in
 Turnstone `c951afa` and Cleromancy `523d54d` plus fixture correction `b6b521d`.
-Their locked public-source gates remain in progress. Consumers do not stamp
+Turnstone's corrected public-pin library passes 674 tests with zero failures
+and nine existing ignores. Cleromancy's `85c8f77` passes 12 library and three
+DOM checks with zero failures or ignores; its independent routing control
+produces 11 passes and exactly the intended marked-DIV failure.
+Consumers do not stamp
 Mere's marker or duplicate its committed-value projection; unnamed fields keep
 that state. Existing native-tag support preserves the current public pins.
 
@@ -254,6 +258,35 @@ and two existing ignored doctests. The fresh Wasm accessibility-example compile
 also passes. Guards verify unchanged unowned source bytes/mtimes and restore
 the starting manifest/lock. The same frozen `e84f9c7f` lock is used throughout.
 No published-source repin or human AT/browser operation is inferred.
+
+Published main `45f5a80c` is integrated locally at `2a89d8dc`, preserving its
+command/edit-history work. Fresh starting/candidate metadata qualify the
+combined graph: 1,566 packages, equal versions, dependency definitions, edges
+and features after authorized revision/checkout normalization, both legacy
+Knot identities retained and neither JavaScript engine active. The integrated
+1,690-row lock SHA256 is
+`06BCF3765C5FDA5282F24C4D675A919E297A3587AA4D9BFFCB0CB928DB4D1EF9`.
+The three leaf production/fixture files match the accepted negative control
+byte-for-byte. Fresh integrated positive gates pass Cambium 257, Rootstock 72,
+native accessibility 23 and browser mirror 10, with zero failures and two
+existing ignored doctests. All six native host targets pass 63 tests, and the
+Wasm accessibility example compiles. Guarded transactions preserve unowned
+bytes/mtimes and restore the live starting manifest/lock. The exact qualified
+repin patch is `Code/testing/genet/forms/mere-forms-integrated-repin.patch`.
+Publication and verification against the published Git source remain pending.
+Shared unpublished main also contains four other-owner Vault/Lattice
+documentation commits; a normal main push would carry them.
+
+Cleromancy's older public `OnKey` has no `.attr` method. Its bounded local
+`NamedText` view attaches only an existing visible name to Mere's produced node
+and forwards the field lifecycle/messages. It adds a direct import of
+already-locked Meristem 0.2.0 from the same Mere `8106c7c` family. The 1,005 lock
+packages retain their versions, sources and checksums; all 668 resolved package
+identities/features remain, with only the direct root edge added. Both public
+families remain unchanged: Mere `8106c7c`, Genet `34626a6c`. The final generic
+DOM setter avoids a test-only node import. Interim compile failures remain
+unqualified evidence. These checks prepare the sibling for app fields; family
+adoption remains a separate gate.
 
 Existing target `C:/t/cargo-targets/mere` is reused without another live owner;
 Genet's qualification retains its borrowed `C:/t/cargo-targets/genet-encoding`
