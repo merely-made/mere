@@ -1,6 +1,6 @@
 {
   "schema": "graphshell.nested-host-groups-receipt/v1",
-  "recorded_at": "2026-10-08T16:53:34.864020+00:00",
+  "recorded_at": "2026-10-08T20:30:03.289931+00:00",
   "source_base": "4c796590cc922da21db96c9971bdd521e8f603e4",
   "scope": "Explicit containment over a bounded manifest-declaration dataset; view-local expansion and entry; no saved-scene or portable-fold claim.",
   "fixture": {
@@ -66,6 +66,22 @@
     "ports/graphshell/src/web_tree/grouping.rs": "e6b5f54832f2ad6d250f11c2eab5401d8c5002b93e376c0cdbed0576e3cdeee6",
     "ports/graphshell/src/web_tree.rs": "5d445e4e8116d3d98b05a96a8963baa01466cd07af6a0e6946823b8bc064fab1",
     "ports/graphshell/web/fixtures/grouped-manifest-components.json": "5b853515896c986a5347a72100794b8b698718c572462725a72e2e18ae51f48d",
-    "scripts/export_grouped_cargo.py": "f06f7c3e78648d61502b03ca3fa84e2fdd318dbb7da5126a7526a152044de243"
+    "scripts/export_grouped_cargo.py": "f06f7c3e78648d61502b03ca3fa84e2fdd318dbb7da5126a7526a152044de243",
+    "ports/graphshell/web/Cargo.toml": "d20189276eb7ceb06d28725a6fb7ae4bca30ad932c8cda478b1a9f089a0fb11f"
+  },
+  "qualification_base": "7ec9c4503 (merges origin/main 42d6f17f6)",
+  "integration": {
+    "genet_revision": "e84f9c7f9aec23320c539784961d1465f8a53a9b",
+    "root_and_standalone_web_agree": true,
+    "repeat_native_and_wasm_checks": "passed; same test counts",
+    "repeat_browser_capture_gate": "failed; unchanged black captures on grouped and flat routes"
+  },
+  "diagnostics": {
+    "direct_webgpu_clear": "passed in headed Chrome; magenta GPU canvas and ordinary page colors visible",
+    "intermediate_texture_samples": "12 samples across scene and image-staging textures were transparent RGBA 0,0,0,0 at their centres",
+    "compute_dispatch": "nonzero coarse and fine dispatches at nonzero render dimensions",
+    "gpu_errors": "none reported in the unmodified instrumented page",
+    "bump_failure_counter": 0,
+    "interpretation": "Rendering failure localized before final composition; exact cause still under investigation. Sampled centres are not a full pixel census."
   }
 }

@@ -35,6 +35,11 @@ an incremental check of that added target; the original census totals below
 are not a fresh whole-document audit. Validation outcomes are recorded in
 the plan's Progress section after execution.
 
+The current-main continuation was checked against merge `7ec9c4503`, the
+root and standalone Genet manifests, repeated test/build logs and the headed
+receipt. It preserves the failed pixel gate and labels intermediate texture
+sampling as diagnostic evidence, without claiming visual or live-site readiness.
+
 The totals above remain the original 2026-09-26 audit, not a new full census.
 The plan's status now records phase 3 under headed verification and preserves
 Mark's timing ruling as the gate before phase 4. The clean dependency repin
