@@ -16182,12 +16182,15 @@ version = "0.1.0"
 dependencies = [
  "cambium",
  "cambium-genet-winit-host",
+ "cambium-rootstock",
  "dirs 5.0.1",
  "layout-dom-api 0.1.1 (git+https://github.com/merely-made/genet.git?rev=965b64e206a47d1c8808472de9aa461233638768)",
  "mesquite",
+ "netrender",
  "tabard-workshop",
  "taproot",
  "tempfile",
+ "wgpu",
 ]
 
 [[package]]
@@ -16198,7 +16201,11 @@ dependencies = [
  "cambium",
  "cambium-genet-winit-host",
  "genet-scripted-dom",
+ "inker",
  "layout-dom-api 0.1.1 (git+https://github.com/merely-made/genet.git?rev=965b64e206a47d1c8808472de9aa461233638768)",
+ "mere-document-lanes",
+ "netrender",
+ "sprigging",
  "tabard",
  "taproot",
  "tempfile",

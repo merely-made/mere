@@ -16,7 +16,7 @@ use cambium_genet_winit_host::Harness;
 use genet_scripted_dom::NodeId;
 use layout_dom_api::LayoutDom;
 use tabard::theme::registry::ThemeSource;
-use tabard_workshop::{WORKSHOP_CSS, WorkshopState, WorkshopView, workshop_view};
+use tabard_workshop::{WorkshopState, WorkshopView, workshop_stylesheet, workshop_view};
 use taproot::Selector;
 use winit::keyboard::NamedKey;
 
@@ -24,7 +24,7 @@ type Host = Harness<WorkshopState, fn(&WorkshopState) -> WorkshopView, WorkshopV
 
 fn host(state: WorkshopState) -> Host {
     let mut host = Harness::new(
-        WORKSHOP_CSS,
+        workshop_stylesheet(),
         state,
         workshop_view as fn(&WorkshopState) -> WorkshopView,
     );

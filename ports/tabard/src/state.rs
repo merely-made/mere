@@ -6,6 +6,7 @@
 
 use std::io;
 use std::path::{Path, PathBuf};
+use std::{cell::RefCell, rc::Rc};
 
 use cambium::{Slider, TextInput};
 use tabard::Theme;
@@ -16,6 +17,8 @@ use tabard::theme::registry::{
 use tabard::theme::seed::{default_mode_for_def, harmonized_seeds};
 use tabard::workshop::{Edit, ThemeDraft};
 use tinct::{Palette, Srgb, SyntaxPalette};
+
+use crate::{ReaderSpecimen, graph::GraphSpecimen};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum SeedRole {
@@ -70,6 +73,8 @@ pub struct WorkshopState {
     pub(crate) name: TextInput,
     pub(crate) channels: [Slider; 3],
     status: String,
+    pub(crate) graph: GraphSpecimen,
+    reader: Rc<RefCell<ReaderSpecimen>>,
 }
 
 impl WorkshopState {
@@ -125,6 +130,8 @@ impl WorkshopState {
             name: TextInput::new(""),
             channels: [Slider::default(), Slider::default(), Slider::default()],
             status: "Choose a seed and shape your theme.".into(),
+            graph: GraphSpecimen::default(),
+            reader: Rc::new(RefCell::new(ReaderSpecimen::default())),
         };
         state.refresh_controls();
         Ok(state)
@@ -388,6 +395,23 @@ impl WorkshopState {
                 high_contrast: self.mode.high_contrast(),
             },
         )
+    }
+
+    /// A shared renderer appearance of the held extracted article.
+    pub fn reader_preview(&self) -> Rc<RefCell<ReaderSpecimen>> {
+        self.reader
+            .borrow_mut()
+            .set_palette(ReaderSpecimen::palette_for_state(self));
+        self.reader.clone()
+    }
+
+    /// The same graph leaf whose native targets the workshop view mounts.
+    pub fn graph_leaf(&self) -> cambium::GraphCanvas {
+        self.graph.paint_leaf(self.draft_theme(), self.mode())
+    }
+
+    pub fn selected_graph_node(&self) -> Option<u8> {
+        self.graph.swatch.selected
     }
 }
 

@@ -5,20 +5,23 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use cambium::{
-    AnyView, GenetCtx, GenetElement, PointerClick, button, el, lens, map_message_result, slider,
-    text_field_typed,
+    AnyView, GenetCtx, GenetElement, PointerClick, button, custom_leaf, el, highlighted_code, lens,
+    map_message_result, slider, text_field_typed,
 };
 use tabard::theme::registry::{Harmony, Mode};
 use tabard::theme::seed::{derive_from_def_for_mode, harmonized_seeds};
-use tinct::{Srgb, SyntaxRole};
+use tinct::Srgb;
 
-use crate::{SeedRole, WorkshopState};
+use crate::{READER_LEAF_KEY, SeedRole, WorkshopState};
 
 pub type WorkshopView = Box<dyn AnyView<WorkshopState, (), GenetCtx, GenetElement>>;
 
 /// The workshop frame stays neutral while each specimen receives the draft's
-/// derived appearance. Hosts mount this sheet and the shared view as-is.
+/// derived appearance. This is the frame sheet; hosts mount
+/// [`crate::workshop_stylesheet`] to include the shared component sheets.
 pub const WORKSHOP_CSS: &str = include_str!("workshop.css");
+
+pub const WORKSHOP_CODE_SAMPLE: &str = "// A little colour, everywhere\nfn garden() {\n    let season = \"spring\";\n    grow(season, 24);\n}";
 
 pub fn workshop_view(state: &WorkshopState) -> WorkshopView {
     Box::new(
@@ -436,43 +439,41 @@ fn specimen_grid(state: &WorkshopState) -> WorkshopView {
             ),
         ),
     ) as WorkshopView;
-    let reader_body = Box::new(el("article", (
-        el("span", "FIELD NOTES / 04").attr("class", "specimen-eyebrow").attr("style", format!("color: {};", css_color(palette.text_dim))),
-        el("h3", "The garden after rain").attr("class", "reader-title").attr("style", format!("color: {};", css_color(palette.text_header))),
-        el("p", "Every path begins with a small act of attention. The leaves hold yesterday’s weather; the ground makes room for what comes next.").attr("class", "reader-copy"),
-        el("div", (el("span", "Continue reading →").attr("class", "reader-link").attr("style", format!("color: {};", css_color(state.preview_syntax().link))), el("span", "  A path already visited").attr("style", format!("color: {};", css_color(state.preview_syntax().verbatim))))),
-    )).attr("id", "reader-specimen").attr("class", "specimen reader-specimen").attr("style", format!("background: {}; color: {};", css_color(palette.bg), css_color(palette.text)))) as WorkshopView;
+    let reader = state.reader_preview();
+    let reader_name = reader.borrow().accessible_name().to_owned();
     let syntax = state.preview_syntax();
-    let spans: Vec<WorkshopView> = [
-        ("// A little colour, everywhere\n", SyntaxRole::Comment),
-        ("fn ", SyntaxRole::Keyword),
-        ("garden", SyntaxRole::Function),
-        ("() {\n    ", SyntaxRole::Punctuation),
-        ("let ", SyntaxRole::Keyword),
-        ("season", SyntaxRole::Type),
-        (" = ", SyntaxRole::Punctuation),
-        ("\"spring\"", SyntaxRole::String),
-        (";\n    ", SyntaxRole::Punctuation),
-        ("grow", SyntaxRole::Function),
-        ("(season, ", SyntaxRole::Punctuation),
-        ("24", SyntaxRole::Number),
-        (");\n}", SyntaxRole::Punctuation),
-    ]
-    .into_iter()
-    .map(|(text, role)| {
-        Box::new(
-            el("span", text).attr("style", format!("color: {};", css_color(syntax.role(role)))),
-        ) as WorkshopView
-    })
-    .collect();
+    let reader_body = Box::new(
+        el(
+            "article",
+            custom_leaf(READER_LEAF_KEY, 280, 215)
+                .attr("style", "display:block;width:100%;height:215px;")
+                .attr("class", "reader-canvas")
+                .attr("data-view-kind", "shared-reader")
+                .attr("role", "img")
+                .attr("aria-label", reader_name),
+        )
+        .attr("id", "reader-specimen")
+        .attr("class", "specimen reader-specimen")
+        .attr(
+            "style",
+            format!(
+                "background: {}; color: {};",
+                css_color(syntax.surface),
+                css_color(syntax.emphasis)
+            ),
+        ),
+    ) as WorkshopView;
     let syntax_body = Box::new(
         el(
             "div",
             (
                 el("div", "garden.rs")
                     .attr("class", "code-filename")
-                    .attr("style", format!("color: {};", css_color(palette.text_dim))),
-                el("pre", spans).attr("class", "syntax-code"),
+                    .attr("style", format!("color: {};", css_color(syntax.comment))),
+                highlighted_code::<WorkshopState, ()>(WORKSHOP_CODE_SAMPLE, "rust", &syntax)
+                    .attr("id", "syntax-code")
+                    .attr("class", "syntax-highlight syntax-code")
+                    .attr("aria-label", "Read-only Rust syntax preview"),
             ),
         )
         .attr("id", "syntax-specimen")
@@ -482,7 +483,7 @@ fn specimen_grid(state: &WorkshopState) -> WorkshopView {
             format!(
                 "background: {}; color: {};",
                 css_color(syntax.surface),
-                css_color(palette.text)
+                css_color(syntax.emphasis)
             ),
         ),
     ) as WorkshopView;
@@ -493,41 +494,10 @@ fn specimen_grid(state: &WorkshopState) -> WorkshopView {
                 el("div", "Ideas find their neighbours").attr("class", "graph-heading"),
                 el(
                     "div",
-                    (
-                        graph_node(
-                            "Notes",
-                            "A thought to return to",
-                            tokens.graph_node_chrome.workspace_badge_background,
-                            tokens.graph_node_chrome.workspace_badge_text,
-                            tokens.graph_node_focus_ring,
-                        ),
-                        el("span", "— relates to →")
-                            .attr("class", "graph-edge")
-                            .attr("style", format!("color: {};", css_color(palette.text_dim))),
-                        graph_node(
-                            "Garden",
-                            "Collected observations",
-                            palette.secondary,
-                            palette.on_secondary,
-                            tokens.graph_node_selection,
-                        ),
-                    ),
+                    state.graph.view(|s: &mut WorkshopState| &mut s.graph),
                 )
-                .attr("class", "graph-row"),
-                el(
-                    "div",
-                    (
-                        el("span", "Selected").attr("class", "graph-tag").attr(
-                            "style",
-                            format!(
-                                "background: {}; color: {};",
-                                css_color(tokens.selection_highlight_background),
-                                css_color(tokens.selection_highlight_text)
-                            ),
-                        ),
-                        el("span", "  Pinned · linked · remembered").attr("class", "graph-caption"),
-                    ),
-                ),
+                .attr("class", "graph-component"),
+                el("p", "Select a node to inspect its emphasis.").attr("class", "graph-caption"),
             ),
         )
         .attr("id", "graph-specimen")
@@ -552,28 +522,6 @@ fn specimen_grid(state: &WorkshopState) -> WorkshopView {
             ],
         )
         .attr("class", "specimen-grid"),
-    )
-}
-
-fn graph_node(title: &str, detail: &str, bg: Srgb, fg: Srgb, ring: Srgb) -> WorkshopView {
-    Box::new(
-        el(
-            "div",
-            (
-                el("strong", title.to_owned()),
-                el("span", detail.to_owned()),
-            ),
-        )
-        .attr("class", "graph-node")
-        .attr(
-            "style",
-            format!(
-                "background: {}; color: {}; border: 2px solid {};",
-                css_color(bg),
-                css_color(fg),
-                css_color(ring)
-            ),
-        ),
     )
 }
 
