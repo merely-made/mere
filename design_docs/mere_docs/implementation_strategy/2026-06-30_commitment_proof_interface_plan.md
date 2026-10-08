@@ -1,12 +1,18 @@
 # Commitment Proof Interface Plan
 
 **Date**: 2026-06-30  
-**Status**: Shared type interface landed 2026-07-13; proof backends remain planned.
+**Status (2026-10-06):** the shared type interface landed 2026-07-13
+(`2fb78c43`, `crates/system/proofs`); the proof types, the verifiers and the
+backends remain planned. Done-conditions 1–3 are unbuilt: no
+`MootEpochHeader`, `RoleWitness` or `DelegationProof` exists, and condition
+3's kith grants belong to a plan retired 2026-09-02 (see the open question
+under Done Conditions). Conditions 4 and 5 could not be confirmed by the S14
+pass.
 **Related**:
 [`../research/2026-06-04_resource_coordination_brief.md`](../research/2026-06-04_resource_coordination_brief.md),
 [`2026-06-30_kith_capability_sharing_plan.md`](../../archive_docs/2026-09-02_retired_plans/2026-06-30_kith_capability_sharing_plan.md),
 [`2026-06-30_mesh_lease_scheduler_plan.md`](../../archive_docs/2026-08-09_completed_plans/2026-06-30_mesh_lease_scheduler_plan.md),
-[`../../moothold_docs/implementation_strategy/2026-06-30_bounty_verification_economy_plan.md`](../../moothold_docs/implementation_strategy/2026-06-30_bounty_verification_economy_plan.md)
+[`../../archive_docs/2026-10-06_retired_plans/2026-06-30_bounty_verification_economy_plan.md`](../../archive_docs/2026-10-06_retired_plans/2026-06-30_bounty_verification_economy_plan.md)
 
 This plan owns the proof interface for moot epochs, tessera receipts, kith
 grants, storage checkpoints, and mesh result evidence. The interface is shaped
@@ -60,6 +66,13 @@ pub struct Commitment {
     pub digest: Digest,
 }
 ```
+
+**Corrected 2026-10-06 (S14 pass):** the code samples in this plan are
+illustrative, not compile-ready. The landed types are in
+`crates/system/proofs/src/lib.rs`: `CommitmentScheme` adds `DigestV1` (a
+direct digest over canonical bytes, no tree claim), and `CommitmentDomain` has
+`StandingReceipts` where this sample has `TesseraReceipts`, which survives only
+as a serde alias after the 2026-08-31 terminology ruling (`50b39f95`).
 
 The `DigestAlg` names the digest family. The `CommitmentScheme` names how the
 digest should be interpreted as a proof root. This prevents three meanings from
@@ -204,6 +217,20 @@ Do not:
 - p2panda wire docs say that commitments live in event bodies and projections,
   not operation headers.
 
+**Corrected 2026-10-06 (S14 pass):** none of `InclusionProof`, `AppendProof`,
+`SetRelationProof`, `MootEpochHeader`, `RoleWitness` or `DelegationProof`
+exists in any `.rs` file, so conditions 1 and 2 are unbuilt. Condition 3 and
+the ownership sentence at the top name kith grants, but the kith capability
+sharing plan was retired on 2026-09-02, its subject deleted or abandoned.
+Retention checkpoints bind a `BlobRef` plus a `StorageCheckpoints` commitment;
+`StorageChunks` is unused, so condition 4 is a judgment call, and no p2panda
+wire statement for condition 5 was found.
+
+**Open, raised by the S14 pass (2026-10-06):** what does condition 3 target
+now that kith is retired? Options: drop it; re-target it to the capability
+model's servitor grants; hold it until a grant surface names a delegation
+commitment.
+
 ## Progress
 
 - **2026-06-30** - Created after reviewing Merkle alternatives. The plan keeps
@@ -216,3 +243,4 @@ Do not:
   false Merkle claim. Mesh retention checkpoints now bind both a content
   reference and a `StorageCheckpoints` commitment while keeping their p2panda
   operation identity separate. Scheme-specific proof verification remains.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11, from the D2 record in support/doc-audit/d2/batch_41_s14_phase_b3.md: the status now names done-conditions 1–3 as unbuilt, the code samples are labelled illustrative against `crates/system/proofs/src/lib.rs`, and condition 3's retired kith target raised as an open question.

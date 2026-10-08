@@ -82,3 +82,12 @@ tempfile = "3"
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "net", "process"] }
 # The moved authority tests verify real signatures off the agent wire.
 signature = "2"
+
+# Vault lock ruling 6's no-residue instrument over the resident's lock path
+# (L2). Personae's tracker installs its own global allocator, so this runs
+# outside libtest's harness, on one thread.
+[[test]]
+name = "no_residue"
+path = "tests/no_residue.rs"
+harness = false
+required-features = ["keeper"]

@@ -621,6 +621,14 @@ fn append_block_text(block: &Block, out: &mut String) {
                 }
             }
         },
+        Block::Menu { rows } => {
+            for row in rows {
+                push_text(out, &inker::inline_text(&row.label));
+            }
+        },
+        // A kind this extractor does not know yet leaves a named marker
+        // rather than vanishing from the clip's text.
+        other => push_text(out, &format!("[unsupported block: {}]", other.kind_name())),
     }
 }
 
@@ -683,11 +691,20 @@ fn collect_block_links(block: &Block, links: &mut Vec<String>) {
                 }
             }
         },
+        Block::Menu { rows } => {
+            for row in rows {
+                push_optional_link(&row.target, links);
+                collect_span_links(&row.label, links);
+            }
+        },
         Block::CodeBlock { .. }
         | Block::Preformatted { .. }
         | Block::Rule
         | Block::MetadataRow { .. }
         | Block::Badge { .. } => {},
+        // No links to take from a kind this extractor does not know yet; its
+        // text keeps a named marker (see `append_block_text`).
+        _ => {},
     }
 }
 

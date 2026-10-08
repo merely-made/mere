@@ -24,7 +24,7 @@ tier under construction).
 > as a true zero and turned out to carry one: `eidetic-search` dev-depends
 > on it for the `eidetic-recall` example, the same bin that produced the
 > search plan's W1 receipt. Nothing was lost — the
-> [eidetic reorg](mere_docs/implementation_strategy/2026-08-12_eidetic_reorg_plan.md)
+> [eidetic reorg](archive_docs/2026-10-06_completed_plans/2026-08-12_eidetic_reorg_plan.md)
 > repointed it — but **every "zero consumers" row below carries this
 > caveat**. Re-run the census including dev edges before acting on another
 > one, and read a zero as "no library consumer", not "no consumer".
@@ -54,7 +54,7 @@ tier under construction).
 |---|---|---|
 | ~~`mere-mesh-host`~~ | **Resolved 2026-08-12.** Distillery v0 now embeds H0's supervisor and owns its first retention-maintenance projection | Keep Turnstone as the second-consumer proof when it needs the same authority |
 | `mere-eidetic-search` | BM25 + fast-fields + hybrid-fusion seam, unconsumed | **Owned 2026-08-12** by the [search surface wiring plan](mere_docs/implementation_strategy/2026-08-12_search_surface_wiring_plan.md); the found precondition is capture (nothing authors `BrowsingTrace` yet) |
-| `mere-embed` | **Audited 2026-08-12: not a husk.** The esp re-export plus three built-but-unwired glue modules (persistence, field bridge, canvas search) | Keep; wires in as W4 of the search surface wiring plan |
+| `mere-embed` | **Audited 2026-08-12: not a husk.** The esp re-export plus three built-but-unwired glue modules (persistence, field bridge, canvas search) | Keep; wires in as W4 of the search surface wiring plan. **Annotated 2026-10-06 (S14 pass):** the [eidetic reorg](archive_docs/2026-10-06_completed_plans/2026-08-12_eidetic_reorg_plan.md) landed 2026-08-12 (`8595cd38`) and dissolved the crate: persistence is `esp::embed::persistence`, and the field bridge and canvas search are in pictograph's canvas (`crates/canvas/pictograph/src/canvas/`); no `mere-embed` package remains |
 | `mere-crawl` | Host-neutral frontier, nobody drives it | Hold as capability; census again after the gazette feed pipeline lands (crawl is its natural engine) |
 | `moothold` | The t1–t3 federation home, while gemot/mooting/commons carry the live moot work | Reconcile with the moot cluster: absorb, or state the tier boundary that keeps it |
 | `register-input`, `register-knowledge`, `register-protocol` | Three of nine registry crates unwired | Registry-cluster audit: wire or fold into the six that are |
@@ -74,7 +74,7 @@ deprecated shims (vates, sibylla), the young dramatis tier
 | `verso-tile` | Unconsumed anywhere, on both sides | The Blitz/Serval-convergence decision owns it: retire or re-seat after the netrender cut comparison |
 | `genet-scripted-worker` | The worker lane, unwired | Verify against the browser/PWA scripting doctrine; wire under pelt scripted or hold |
 | `genet-static-html` | **Verified 2026-08-12: truly bare.** A 38-line MPL shell (no module doc, no consumers, no reference beyond the members list); the static lane landed in `genet-static-dom` + `genet-documents`, which never mentions it | Retire or absorb into `genet-static-dom`; nothing hides behind features |
-| `cambium-nematic` | **Verified 2026-08-12: bypassed.** Pelt's smolweb lane lowers through genet-documents → nematic → `EngineDocument`; "Cambium-native views and themes for Nematic smolweb content" has no taker | Hold, named destination: the first cambium app embedding smolweb natively (signalman, or a turnstone pane); retire at the convergence checkpoint if unclaimed |
+| `cambium-nematic` | **Verified 2026-08-12: bypassed.** Pelt's smolweb lane lowers through genet-documents → nematic → `EngineDocument`; "Cambium-native views and themes for Nematic smolweb content" has no taker | Hold, named destination: the first cambium app embedding smolweb natively (signalman, or a turnstone pane); retire at the convergence checkpoint if unclaimed. **Annotated 2026-10-06 (WS4 R0):** retired. It folded into `cambium` as feature `nematic` on 2026-09-25 and was removed with its views on 2026-10-06, unclaimed (Mere stack seams plan, ruling S66; [smolweb fidelity plan](nematic_docs/implementation_strategy/2026-07-01_smolweb_fidelity_plan.md) WS4). The published 0.3.1 stays on crates.io |
 
 By-design zeros: pelt and genet-wpt (ports), tabard and fleece (today's
 stubs), test shims (`*_tests`, `servo-media-examples`,

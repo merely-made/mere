@@ -12,6 +12,9 @@
 //! they rest, a short glide takes it exactly to its position, as a kinematic
 //! body so its neighbours respond, and it holds there until the next
 //! disturbance releases it to the spring again (F45, "Spring, then home").
+//! A settle budget that ends while the bodies still move starts the same
+//! glide, so an anchored item always finishes at its position (F63, "Home
+//! at budget end too"); only the speed floor counts as a settle.
 
 use std::collections::HashSet;
 
@@ -37,9 +40,20 @@ pub(crate) struct AtRest {
     frame: u32,
     /// Items held at home after a return, until a disturbance.
     parked: HashSet<NodeKey>,
+    /// Whether the backend was stepping last frame, so a budget's end is
+    /// noted once (F63).
+    stepping: bool,
 }
 
 impl AtRest {
+    /// Fold one frame's stepping state in: true on the frame a settle
+    /// budget runs out (F63).
+    pub(crate) fn budget_ended(&mut self, stepping: bool) -> bool {
+        let ended = self.stepping && !stepping;
+        self.stepping = stepping;
+        ended
+    }
+
     /// Fold one frame's rms speed in: true on the frame the bodies come to
     /// rest after moving, once per rest.
     pub(crate) fn rested(&mut self, speed: f32) -> bool {

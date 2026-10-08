@@ -11,9 +11,14 @@ repository.workspace = true
 # from genet.git by branch.
 publish = false
 
+[features]
+default = ["image-decode"]
+# Forwards genet-livery's image decoding (mer3ly Ruling 111); on by default.
+image-decode = ["cambium-rootstock/image-decode", "mesquite/image-decode"]
+
 [dependencies]
 # The stock this is grafted onto. Everything below is what a browser adds.
-cambium-rootstock = { version = "0.1.0", path = "../cambium-rootstock" }
+cambium-rootstock = { version = "0.1.0", path = "../cambium-rootstock", default-features = false }
 cambium = { version = "0.3.3", path = "../cambium" }
 genet-render-host = { workspace = true }
 genet-scripted-dom = { workspace = true }
@@ -29,7 +34,7 @@ layout_dom_api = { workspace = true }
 # The browser itself. Declared for wasm32 only, so a native build of the
 # workspace resolves none of it.
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-mesquite = { path = "../mesquite" }
+mesquite = { path = "../mesquite", default-features = false }
 js-sys = "0.3"
 wasm-bindgen = "=0.2.129"
 # Reading a chosen file's bytes, which the browser hands over asynchronously.
@@ -70,4 +75,11 @@ console_error_panic_hook = "0.1"
 [[example]]
 name = "a11y_page"
 path = "examples/a11y_page/main.rs"
+crate-type = ["cdylib"]
+
+# The one-run fixture for run_static_constructors_once; examples/ctor_once/run.mjs
+# loads it in Node.
+[[example]]
+name = "ctor_once"
+path = "examples/ctor_once/main.rs"
 crate-type = ["cdylib"]

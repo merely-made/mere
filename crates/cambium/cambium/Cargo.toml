@@ -10,10 +10,10 @@ publish = true
 
 [features]
 highlight = ["dep:illume", "dep:tinct"]
-# Reactive views over Errand's smolweb ASTs; formerly the cambium-nematic crate.
-nematic = ["dep:errand", "dep:tabard"]
 
 [dependencies]
+# The generic undo History; EditHistory is the text field's instance of it.
+edit-history = { workspace = true }
 meristem = { version = "0.2.0", path = "../meristem" }
 sprigging = { version = "0.2.0", path = "../sprigging" }
 sceno = { workspace = true }
@@ -28,7 +28,3 @@ layout_dom_api = { workspace = true }
 genet-text = { workspace = true }
 illume = { workspace = true, optional = true }
 tinct = { workspace = true, optional = true }
-# `workspace = true`, not a bare version: a bare errand version resolved to
-# the published crate rather than this workspace's copy.
-errand = { workspace = true, optional = true }
-tabard = { workspace = true, optional = true }

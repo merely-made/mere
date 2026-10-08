@@ -36,7 +36,7 @@ use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 
 use cambium_rootstock::{
-    A11yRequest, Accessibility, LeafRegistry, NodeId, OwnedLayout, ScriptedDom, document_projection,
+    A11yRequest, Accessibility, LeafRegistry, NodeId, OwnedLayout, WindowDom, document_projection,
 };
 use layout_dom_api::{LayoutDom as _, LocalName, Namespace, NodeKind};
 use wasm_bindgen::JsCast;
@@ -61,17 +61,32 @@ pub(crate) struct MirrorHandle {
 struct Shared {
     /// Each mirrored node's DOM node, as of the last sync.
     targets: HashMap<u64, NodeId>,
+    /// Each drawn node's action button, by its mirror id, as of the last
+    /// sync: the action a reader's click on it names.
+    produced: HashMap<u64, cambium_rootstock::ProducedAction>,
     /// The tree's focus as of the last sync, and its element when mirrored.
     focused: Option<HtmlElement>,
 }
 
 impl MirrorHandle {
-    /// The DOM node behind the mirror element an event reached, if any.
-    pub fn target_of(&self, event_target: Option<web_sys::EventTarget>) -> Option<NodeId> {
+    /// What a reader's request on the mirror element an event reached lands
+    /// on: its DOM node, or the drawn node's action its button stands for.
+    pub fn request_target_of(
+        &self,
+        event_target: Option<web_sys::EventTarget>,
+    ) -> Option<cambium_rootstock::A11yTarget> {
         let element = event_target?.dyn_into::<Element>().ok()?;
         let element = element.closest(&format!("[{NODE_ATTR}]")).ok()??;
         let id: u64 = element.get_attribute(NODE_ATTR)?.parse().ok()?;
-        self.shared.borrow().targets.get(&id).copied()
+        let shared = self.shared.borrow();
+        if let Some(node) = shared.targets.get(&id) {
+            return Some(cambium_rootstock::A11yTarget::Node(*node));
+        }
+        shared
+            .produced
+            .get(&id)
+            .cloned()
+            .map(cambium_rootstock::A11yTarget::Produced)
     }
 
     /// Put DOM focus in the mirror: on the focused node's element, or on the
@@ -287,7 +302,7 @@ fn update(document: &Document, mirrored: &mut Mirrored, wanted: &Written) {
 
 /// Every DOM node by its opaque id, and each leaf's key.
 fn walk(
-    dom: &ScriptedDom,
+    dom: &WindowDom<'_>,
     node: NodeId,
     targets: &mut HashMap<u64, NodeId>,
     leaves: &mut HashMap<u64, u64>,
@@ -312,7 +327,7 @@ fn walk(
 impl Accessibility for DomAccessibility {
     fn sync(
         &mut self,
-        dom: &ScriptedDom,
+        dom: &WindowDom<'_>,
         layout: &OwnedLayout,
         leaves: &mut LeafRegistry<u64>,
         producers: &mut cambium_rootstock::ProducerRegistry,
@@ -332,7 +347,7 @@ impl Accessibility for DomAccessibility {
             let key = leaf_keys.get(&id)?;
             // A producer that describes its slot speaks for it.
             if let Some(semantics) = producers.semantics(*key) {
-                return Some(mirror::LeafSemantics::from_producer(semantics));
+                return Some(mirror::LeafSemantics::from_producer(*key, semantics));
             }
             let leaf = leaves.get_mut(key)?;
             let mut scratch = accesskit::Node::new(accesskit::Role::Unknown);
@@ -359,6 +374,7 @@ impl Accessibility for DomAccessibility {
         {
             let mut shared = self.handle.shared.borrow_mut();
             shared.targets = targets;
+            shared.produced = mirror::produced_actions(&plan).into_iter().collect();
             shared.focused = focused;
         }
         if focus != self.focus {

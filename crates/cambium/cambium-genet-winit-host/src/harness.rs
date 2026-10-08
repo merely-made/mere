@@ -60,15 +60,7 @@ where
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
 {
-    HostHooks {
-        frame: Box::new(|_| false),
-        after_dispatch: Box::new(|_| {}),
-        after_frame: Box::new(|_| {}),
-        after_wake: Box::new(|_| {}),
-        close_request: Box::new(|_, _| crate::CloseDisposition::Exit),
-        focused_text: Box::new(|_| None),
-        key_intercept: Box::new(|_, _| false),
-    }
+    HostHooks::inert()
 }
 
 impl<State, Logic, V> Harness<State, Logic, V>
@@ -193,7 +185,7 @@ where
         let dom = std::rc::Rc::new(std::cell::RefCell::new(
             genet_scripted_dom::ScriptedDom::new(),
         ));
-        s.sheet = sheet;
+        s.shared.sheet = sheet;
         s.set_resources(fonts, images);
         s.runner = Some(Runner::new(dom, logic, state));
         let wake = HostWake::new(s.wake_pending.clone(), std::sync::Arc::new(|| {}));
@@ -412,7 +404,7 @@ where
             name: "harness",
             dom: &dom_ref,
             rect: [0.0, 0.0, w, h],
-            sheet: &self.host.s.sheet,
+            sheet: &self.host.s.shared.sheet,
         }])
     }
 
@@ -427,12 +419,14 @@ where
             .map(|(x, y, width, height)| (x + width / 2.0, y + height / 2.0))
     }
 
-    /// The first element `selector` matches that paints.
+    /// The first element `selector` matches that is rendered and paints.
     fn resolve_node(&self, selector: &Selector) -> Option<NodeId> {
         let dom = self.runner().dom();
         let dom_ref = dom.borrow();
+        let layout = self.host.s.layout.as_ref()?;
         taproot::matching(&dom_ref, selector)
             .into_iter()
+            .filter(|node| layout.rendered_visible(&*dom_ref, *node))
             .find(|node| self.painted_rect(*node).is_some())
     }
 
@@ -659,10 +653,10 @@ where
         let dom = runner.dom();
         let dom_ref = dom.borrow();
         cambium_winit_a11y::project_tree(
-            &dom_ref,
+            &*dom_ref,
             layout,
-            &mut core.s.leaves,
-            &mut core.s.producers,
+            &mut core.s.shared.leaves,
+            &mut core.s.shared.producers,
             core.s.last_focus,
         )
     }
@@ -676,7 +670,11 @@ where
         };
         let dom = runner.dom();
         let dom_ref = dom.borrow();
-        cambium_rootstock::document_projection(&dom_ref, layout, core.s.last_focus)
+        cambium_rootstock::document_projection(
+            &cambium_rootstock::WindowDom::document(&dom_ref),
+            layout,
+            core.s.last_focus,
+        )
     }
 
     /// Answer the application's file requests with `files`, a test's own
@@ -714,7 +712,40 @@ where
     /// minus the OS adapter no test can supply.
     pub fn a11y_request(&mut self, action: A11yAction, node: NodeId) {
         self.host
-            .apply_a11y_requests(&[A11yRequest { action, node }]);
+            .apply_a11y_requests(&[A11yRequest::node(action, node)]);
+        self.relayout();
+    }
+
+    /// The drawn nodes' action buttons in this frame's projected tree: each
+    /// button's AccessKit id and the action a reader's click on it names.
+    pub fn a11y_produced_actions(
+        &mut self,
+    ) -> std::collections::HashMap<accesskit::NodeId, cambium_rootstock::ProducedAction> {
+        let core = &mut self.host.core;
+        let (Some(runner), Some(layout)) = (core.s.runner.as_ref(), core.s.layout.as_ref()) else {
+            panic!("a11y_produced_actions needs a laid-out harness: call layout_at first");
+        };
+        let dom = runner.dom();
+        let dom_ref = dom.borrow();
+        let (_, _, produced) = cambium_winit_a11y::project_tree_with_actions(
+            &*dom_ref,
+            layout,
+            &mut core.s.shared.leaves,
+            &mut core.s.shared.producers,
+            core.s.last_focus,
+        );
+        produced
+    }
+
+    /// Route a reader's request on a drawn node's action button through the
+    /// host's accessibility path, as a drained one would be.
+    pub fn a11y_produced_request(
+        &mut self,
+        action: A11yAction,
+        produced: cambium_rootstock::ProducedAction,
+    ) {
+        self.host
+            .apply_a11y_requests(&[A11yRequest::produced(action, produced)]);
         self.relayout();
     }
 
@@ -734,7 +765,7 @@ where
         let (mut tree, _) = self.a11y_tree();
         let dom = self.runner().dom();
         let dom_ref = dom.borrow();
-        cambium_winit_a11y::scale_tree_to_window(&mut tree, &dom_ref, layout_scale);
+        cambium_winit_a11y::scale_tree_to_window(&mut tree, &*dom_ref, layout_scale);
         drop(dom_ref);
         tree
     }

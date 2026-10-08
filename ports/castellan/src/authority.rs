@@ -15,6 +15,16 @@
 //! This host deliberately starts in `StandaloneRetained`: H4 may exercise the
 //! shared vault and approval boundary without stealing the user's standard SSH
 //! agent endpoint before restart and real-login proofs exist.
+//!
+//! ## The lock (vault lock plan, rulings 1, 9 to 14, 27, 31)
+//!
+//! [`PersonaeHost::lock_vault`] locks the vault, then runs every registered
+//! [`VaultLockHolder`] before it returns; observers watch
+//! [`PersonaeHost::lock_state`]. The agent's `ssh-add -x` engages the same
+//! lock. While locked, every secret-reaching surface refuses with
+//! [`IdentityIntentError::Locked`], and the snapshot shows the public view kept
+//! at lock time. Unlocking takes [`PersonaeHost::unlock_vault`], a native call:
+//! no intent carries the credential.
 
 use std::io;
 use std::path::PathBuf;
@@ -23,21 +33,26 @@ use std::time::Duration;
 
 use insigne::DerivedKeyAttestation;
 use pandect::{DeviceId, PersonaId, WalletEpochSealer, revoke_remote_auth_device};
-use personae::agent::VaultAgent;
+use personae::agent::{VaultAgent, VaultLockRequest};
 use personae::signing::{ApprovalBroker, DecisionError, RememberApproval, SigningDecision};
 use personae::ssh_slot;
 use personae::{
     CredentialLineage, Ed25519Keypair, Ed25519PublicKey, IdentityError, IdentityProvider,
-    IdentityStorage, IdentityVault, ProfileId, ProtocolKey, UnlockTier, roster,
+    IdentityStorage, IdentityVault, ProfileId, ProtocolKey, RetainedKeys, UnlockMethod,
+    UnlockTier, roster,
 };
 use serde::{Deserialize, Serialize};
 use ssh_key::{Algorithm, PrivateKey, PublicKey};
+use tokio::sync::watch;
 use uuid::Uuid;
+
+use crate::lock::VaultLockHolder;
 
 use crate::projection::{
     CreateProfileIntentV1, DEVICE_REVOKE_INTENT, GenerateSshKeyIntentV1,
     ImportSshKeyNativeIntentV1, PROFILE_CREATE_INTENT, PROFILE_SWITCH_INTENT, RemoveSshKeyIntentV1,
-    RevokeDeviceIntentV1, SIGNING_APPROVE_IDLE_INTENT, SIGNING_APPROVE_ONCE_INTENT,
+    RevokeDeviceIntentV1, LockVaultIntentV1, VAULT_LOCK_INTENT, VAULT_UNLOCK_INTENT,
+    SIGNING_APPROVE_IDLE_INTENT, SIGNING_APPROVE_ONCE_INTENT,
     SIGNING_DENY_INTENT, SSH_GENERATE_INTENT, SSH_IMPORT_NATIVE_INTENT, SSH_REMOVE_INTENT,
     SigningDecisionIntentV1, SshUnlockPolicyIntentV1, SwitchProfileIntentV1,
 };
@@ -50,6 +65,29 @@ const MAX_SHORT_TTL_SECONDS: u32 = 24 * 60 * 60;
 #[cfg(windows)]
 pub const STANDARD_WINDOWS_AGENT_ENDPOINT: &str = r"\\.\pipe\openssh-ssh-agent";
 
+/// Whether `endpoint` is this user's `SSH_AUTH_SOCK`.
+#[cfg(not(windows))]
+fn is_standard_unix_agent(endpoint: &str) -> bool {
+    same_socket(endpoint, std::env::var_os("SSH_AUTH_SOCK").as_deref())
+}
+
+/// The same path, or the same file once links resolve.
+#[cfg(any(not(windows), test))]
+fn same_socket(endpoint: &str, standard: Option<&std::ffi::OsStr>) -> bool {
+    let Some(standard) = standard.filter(|s| !s.is_empty()) else {
+        return false;
+    };
+    let (endpoint, standard) = (
+        std::path::Path::new(endpoint),
+        std::path::Path::new(standard),
+    );
+    endpoint == standard
+        || matches!(
+            (endpoint.canonicalize(), standard.canonicalize()),
+            (Ok(a), Ok(b)) if a == b
+        )
+}
+
 /// Rejected Graphshell identity action.
 #[derive(Debug, thiserror::Error)]
 pub enum IdentityIntentError {
@@ -60,7 +98,13 @@ pub enum IdentityIntentError {
     #[error("signing decision rejected: {0}")]
     Decision(#[from] DecisionError),
     #[error("identity vault operation failed: {0}")]
-    Identity(#[from] IdentityError),
+    Identity(IdentityError),
+    /// Refused while the vault is locked (ruling 10).
+    #[error("the vault is locked")]
+    Locked,
+    /// Unlock is native: no intent carries the credential (ruling 9).
+    #[error("unlocking takes the resident's own surface; no intent carries the credential")]
+    UnlockNativeOnly,
     #[error("SSH key generation failed")]
     KeyGeneration,
     #[error("SSH public key encoding failed")]
@@ -88,6 +132,18 @@ pub enum IdentityIntentError {
     CarryUnavailable,
     #[error("device revocation failed ({0:?})")]
     DeviceRevocation(std::io::ErrorKind),
+    /// Refused at import, with personae's reason (ruling 56).
+    #[error("the agent cannot sign this SSH key: {0}")]
+    UnsignableKey(String),
+}
+
+impl From<IdentityError> for IdentityIntentError {
+    fn from(error: IdentityError) -> Self {
+        match error {
+            IdentityError::Locked => Self::Locked,
+            error => Self::Identity(error),
+        }
+    }
 }
 
 /// Public result of a native SSH key mutation.
@@ -98,6 +154,8 @@ pub struct SshKeyMutationReceipt {
     pub comment: String,
     pub public_openssh: String,
     pub unlock_policy: String,
+    /// The fingerprint was already held. Since ruling 54 the held slot is
+    /// left untouched, and comment and unlock policy describe it as held.
     pub replaced_existing: bool,
 }
 
@@ -118,6 +176,8 @@ pub enum IdentityIntentOutcome {
     DeviceRevocation(DeviceRevocationReceipt),
     ProfileSwitch(ProfileSwitchReceipt),
     ProfileCreated(ProfileCreatedReceipt),
+    /// The vault and every holder locked.
+    VaultLocked,
 }
 
 /// Public facts produced by minting a persona. No key material: the master
@@ -162,8 +222,170 @@ pub struct PersonaeHost<S: IdentityStorage> {
     /// beside, so `None` switches without remembering.
     vault_dir: Option<PathBuf>,
     protection: VaultProtectionView,
-    lock: VaultLockView,
+    lock: Arc<ResidentLock<S>>,
     listener: Arc<Mutex<AgentListenerView>>,
+    /// Keys the lock leaves in place, one set per purpose (rulings 40, 46).
+    retained: Mutex<Vec<Arc<RetainedKeys>>>,
+}
+
+/// What stays visible while locked (ruling 11): the profile and SSH key
+/// views, kept when the lock is taken. Secret-free by their types.
+#[derive(Clone)]
+struct KeptView {
+    profiles: Vec<ProfileView>,
+    ssh_keys: Vec<SshKeyView>,
+}
+
+/// The resident's lock: the shared vault, the holders that obey it, the
+/// state observers watch, and the view kept at lock time.
+struct ResidentLock<S: IdentityStorage> {
+    vault: Arc<Mutex<IdentityVault<S>>>,
+    holders: Mutex<Vec<Arc<dyn VaultLockHolder>>>,
+    state: watch::Sender<VaultLockView>,
+    kept: Mutex<Option<KeptView>>,
+}
+
+impl<S: IdentityStorage + 'static> ResidentLock<S> {
+    /// The vault first, so a refusal (ruling 27) changes nothing; then
+    /// every holder, before anyone is told.
+    fn lock(&self) -> Result<(), IdentityError> {
+        let mut vault = self.vault.lock().unwrap();
+        if vault.is_locked() {
+            return Ok(());
+        }
+        let kept = public_views(&vault).ok();
+        vault.lock()?;
+        let holders = self.holders.lock().unwrap().clone();
+        for holder in &holders {
+            holder.lock();
+        }
+        *self.kept.lock().unwrap() = kept;
+        drop(vault);
+        self.state.send_replace(VaultLockView::Locked);
+        tracing::info!(holders = holders.len(), "vault locked");
+        Ok(())
+    }
+
+    /// The vault, then every holder re-derives; a holder failing relocks
+    /// everything, so nothing is left half unlocked.
+    fn unlock(&self, method: UnlockMethod<'_>) -> Result<(), IdentityError> {
+        let mut vault = self.vault.lock().unwrap();
+        if !vault.is_locked() {
+            return Ok(());
+        }
+        vault.unlock(method)?;
+        let holders = self.holders.lock().unwrap().clone();
+        for holder in &holders {
+            if let Err(error) = holder.unlock(&*vault) {
+                tracing::error!(holder = holder.name(), %error, "holder could not re-derive; relocking");
+                for holder in &holders {
+                    holder.lock();
+                }
+                if let Err(relock) = vault.lock() {
+                    tracing::error!(%relock, "the vault could not relock");
+                }
+                return Err(error);
+            }
+        }
+        *self.kept.lock().unwrap() = None;
+        drop(vault);
+        self.state.send_replace(VaultLockView::Unlocked);
+        tracing::info!(holders = holders.len(), "vault unlocked");
+        Ok(())
+    }
+
+    /// A holder joining a locked vault drops its keys at once.
+    fn register(&self, holder: Arc<dyn VaultLockHolder>) {
+        let vault = self.vault.lock().unwrap();
+        if vault.is_locked() {
+            holder.lock();
+        }
+        self.holders.lock().unwrap().push(holder);
+    }
+}
+
+impl<S: IdentityStorage + 'static> VaultLockRequest for ResidentLock<S> {
+    fn lock_vault(&self) -> Result<(), IdentityError> {
+        self.lock()
+    }
+}
+
+/// The secret-free profile and SSH key views of an unlocked vault.
+fn public_views<S: IdentityStorage>(vault: &IdentityVault<S>) -> io::Result<KeptView> {
+    let profile = vault.current_profile().map_err(io::Error::other)?;
+    let current_id = profile.id.0.clone();
+    let mut profiles: Vec<_> = vault
+        .storage()
+        .list_profiles()
+        .unwrap_or_default()
+        .into_iter()
+        .map(|summary| ProfileView {
+            selected: summary.id == profile.id,
+            id: summary.id.0,
+            display_name: summary.display_name,
+            slot_count: summary.slot_count,
+            master_public_fingerprint: "unknown until profile is selected".to_string(),
+        })
+        .collect();
+
+    let master_fingerprint = format!(
+        "blake3:{}",
+        blake3::hash(&profile.master.public_key().to_bytes()).to_hex()
+    );
+    if let Some(current) = profiles.iter_mut().find(|entry| entry.selected) {
+        current.master_public_fingerprint = master_fingerprint.clone();
+    } else {
+        profiles.push(ProfileView {
+            id: current_id.clone(),
+            display_name: profile.display_name.clone(),
+            selected: true,
+            slot_count: profile.slots.len(),
+            master_public_fingerprint: master_fingerprint,
+        });
+    }
+    profiles.sort_by(|left, right| left.id.cmp(&right.id));
+
+    let mut ssh_keys = Vec::new();
+    for slot in ssh_slot::ssh_slots(profile) {
+        let source = profile
+            .slots
+            .get(&slot.key)
+            .expect("ssh_slots only returns profile-owned slots");
+        let lineage = source.lineage();
+        ssh_keys.push(SshKeyView {
+            profile: current_id.clone(),
+            fingerprint: slot.fingerprint(),
+            comment: slot.private.comment().to_string(),
+            public_openssh: slot
+                .public()
+                .to_openssh()
+                .unwrap_or_else(|_| "public key encoding unavailable".to_string()),
+            lineage: lineage_label(lineage).to_string(),
+            device_loss_note: lineage.device_loss_note().to_string(),
+            unlock_policy: unlock_label(source.unlock_tier()),
+        });
+    }
+    ssh_keys.sort_by(|left, right| left.fingerprint.cmp(&right.fingerprint));
+    Ok(KeptView { profiles, ssh_keys })
+}
+
+/// A locked vault with no view kept (never unlocked here): the vault's own
+/// public profile, and no keys.
+fn bare_view<S: IdentityStorage>(vault: &IdentityVault<S>) -> KeptView {
+    let public = vault.public_profile();
+    KeptView {
+        profiles: vec![ProfileView {
+            id: public.id.0.clone(),
+            display_name: public.display_name.clone(),
+            selected: true,
+            slot_count: public.slots.len(),
+            master_public_fingerprint: format!(
+                "blake3:{}",
+                blake3::hash(&public.master_public_key.to_bytes()).to_hex()
+            ),
+        }],
+        ssh_keys: Vec::new(),
+    }
 }
 
 impl<S: IdentityStorage + 'static> PersonaeHost<S> {
@@ -183,18 +405,30 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         protection: VaultProtectionView,
         decision_timeout: Duration,
     ) -> Self {
+        let initial = match vault.is_locked() {
+            true => VaultLockView::Locked,
+            false => VaultLockView::Unlocked,
+        };
         let vault = Arc::new(Mutex::new(vault));
+        let lock = Arc::new(ResidentLock {
+            vault: Arc::clone(&vault),
+            holders: Mutex::new(Vec::new()),
+            state: watch::channel(initial).0,
+            kept: Mutex::new(None),
+        });
         let approval = ApprovalBroker::new(decision_timeout);
         let agent =
-            VaultAgent::from_shared_vault(Arc::clone(&vault), approval.clone(), "graphshell.ssh");
+            VaultAgent::from_shared_vault(Arc::clone(&vault), approval.clone(), "graphshell.ssh")
+                .with_vault_lock(Arc::clone(&lock) as Arc<dyn VaultLockRequest>);
         Self {
             vault,
             agent,
             approval,
             data_root,
             protection,
-            lock: VaultLockView::Unlocked,
+            lock,
             listener: Arc::new(Mutex::new(AgentListenerView::StandaloneRetained)),
+            retained: Mutex::new(Vec::new()),
             vault_dir: None,
         }
     }
@@ -204,6 +438,63 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
     pub fn with_vault_dir(mut self, dir: PathBuf) -> Self {
         self.vault_dir = Some(dir);
         self
+    }
+
+    /// Lock the vault and every registered holder (ruling 1): when this
+    /// returns, no holder keeps a vault-derived key. Refused while no unlock
+    /// method is available (ruling 27). Any surface may ask.
+    pub fn lock_vault(&self) -> Result<(), IdentityIntentError> {
+        Ok(self.lock.lock()?)
+    }
+
+    /// Unlock by a user act on this resident's own surface; never reachable
+    /// through an intent or the agent protocol (ruling 9). A wrong credential
+    /// leaves everything locked.
+    pub fn unlock_vault(&self, method: UnlockMethod<'_>) -> Result<(), IdentityIntentError> {
+        Ok(self.lock.unlock(method)?)
+    }
+
+    /// Whether the vault is locked.
+    pub fn is_locked(&self) -> bool {
+        self.vault.lock().unwrap().is_locked()
+    }
+
+    /// The lock state, for observers (ruling 31): a UI, the status route.
+    pub fn lock_state(&self) -> watch::Receiver<VaultLockView> {
+        self.lock.state.subscribe()
+    }
+
+    /// Have `holder` drop its keys with every lock and re-derive them with
+    /// every unlock. Registered while locked, it locks at once.
+    pub fn register_lock_holder(&self, holder: Arc<dyn VaultLockHolder>) {
+        self.lock.register(holder);
+    }
+
+    /// A restricted provider for exactly `salts` that the lock leaves in
+    /// place (rulings 40, 46): captured from the vault the first time it is
+    /// asked for while unlocked, then served as kept, locked or not. It
+    /// derives nothing else. Locked with nothing kept, it is `Locked`.
+    pub fn retained_keys(&self, salts: &[Vec<u8>]) -> Result<Arc<RetainedKeys>, IdentityError> {
+        let vault = self.vault.lock().unwrap();
+        let master = IdentityProvider::master_public_key(&*vault);
+        let mut retained = self.retained.lock().unwrap();
+        if let Some(kept) = retained
+            .iter()
+            .find(|kept| kept.master_public_key() == master && kept.holds(salts))
+        {
+            return Ok(Arc::clone(kept));
+        }
+        let captured = Arc::new(RetainedKeys::capture(&*vault, salts)?);
+        retained.retain(|kept| kept.master_public_key() == master);
+        retained.push(Arc::clone(&captured));
+        Ok(captured)
+    }
+
+    fn ensure_unlocked(&self) -> Result<(), IdentityIntentError> {
+        match self.is_locked() {
+            true => Err(IdentityIntentError::Locked),
+            false => Ok(()),
+        }
     }
 
     /// A fresh per-connection SSH agent session over the resident vault.
@@ -234,6 +525,9 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
     }
 
     /// Bind an isolated Unix socket for acceptance testing.
+    ///
+    /// The user's own `SSH_AUTH_SOCK` is refused, as the OpenSSH pipe is on
+    /// Windows: it belongs to the agent the user already runs.
     #[cfg(not(windows))]
     pub fn bind_receipt_listener(
         &self,
@@ -243,6 +537,12 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::InvalidInput,
                 "the receipt SSH agent socket path is empty",
+            ));
+        }
+        if is_standard_unix_agent(endpoint) {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::PermissionDenied,
+                "receipt listener cannot bind the standard SSH agent endpoint",
             ));
         }
         let listener = tokio::net::UnixListener::bind(endpoint)?;
@@ -327,15 +627,30 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         operation: SshKeyMutationKind,
     ) -> Result<SshKeyMutationReceipt, IdentityIntentError> {
         let key = ssh_slot::protocol_key_for(&private);
-        let slot = ssh_slot::slot_for(&private, tier)?;
         let public = PublicKey::from(&private);
         let fingerprint = public.fingerprint(ssh_key::HashAlg::Sha256).to_string();
         let public_openssh = public
             .to_openssh()
             .map_err(|_| IdentityIntentError::PublicEncoding)?;
-        let comment = private.comment().to_string();
         let mut vault = self.vault.lock().unwrap();
-        let replaced_existing = vault.current_profile().slots.contains_key(&key);
+        // Ruling 54: a held key is never rewritten; the receipt describes the
+        // slot as held, comment and tier included.
+        if let Some(held) = vault.current_profile()?.slots.get(&key) {
+            let held_private = ssh_slot::private_key_from_slot(held)?;
+            return Ok(SshKeyMutationReceipt {
+                operation,
+                fingerprint,
+                comment: held_private.comment().to_string(),
+                public_openssh,
+                unlock_policy: unlock_label(held.unlock_tier()),
+                replaced_existing: true,
+            });
+        }
+        // Ruling 56: only keys the agent can sign are taken in.
+        personae::ssh_sign::check_signable(private.key_data())
+            .map_err(|refused| IdentityIntentError::UnsignableKey(refused.to_string()))?;
+        let slot = ssh_slot::slot_for(&private, tier)?;
+        let comment = private.comment().to_string();
         vault.add_slot(key, slot)?;
         Ok(SshKeyMutationReceipt {
             operation,
@@ -343,7 +658,7 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
             comment,
             public_openssh,
             unlock_policy: unlock_label(tier),
-            replaced_existing,
+            replaced_existing: false,
         })
     }
 
@@ -357,7 +672,7 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         }
         let key = ProtocolKey::new(ssh_slot::SSH_MOD_ID, Some(request.fingerprint.clone()));
         let mut vault = self.vault.lock().unwrap();
-        let Some(slot) = vault.current_profile().slots.get(&key) else {
+        let Some(slot) = vault.current_profile()?.slots.get(&key) else {
             return Err(IdentityIntentError::KeyNotFound);
         };
         let private = ssh_slot::private_key_from_slot(slot)?;
@@ -394,6 +709,12 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
     /// refuses on `None`; one that does not writes cleartext, which is what
     /// every caller does today.
     pub fn payload_sealer(&self, persona: PersonaId) -> io::Result<Option<WalletEpochSealer>> {
+        if self.is_locked() {
+            return Err(io::Error::new(
+                io::ErrorKind::PermissionDenied,
+                "the vault is locked",
+            ));
+        }
         let Some(data_root) = self.data_root.as_deref() else {
             return Ok(None);
         };
@@ -408,6 +729,7 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         if !request.confirmed {
             return Err(IdentityIntentError::DeviceRevocationConfirmationRequired);
         }
+        self.ensure_unlocked()?;
         let data_root = self
             .data_root
             .as_deref()
@@ -430,63 +752,22 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         })
     }
 
-    /// Secret-free Graphshell read model.
+    /// Secret-free Graphshell read model. While locked it reports Locked
+    /// with the public view kept at lock time (ruling 11).
     pub fn snapshot(&self) -> std::io::Result<IdentitySurfaceSnapshot> {
         let vault = self.vault.lock().unwrap();
-        let profile = vault.current_profile();
-        let current_id = profile.id.0.clone();
-        let mut profiles: Vec<_> = vault
-            .storage()
-            .list_profiles()
-            .unwrap_or_default()
-            .into_iter()
-            .map(|summary| ProfileView {
-                selected: summary.id == profile.id,
-                id: summary.id.0,
-                display_name: summary.display_name,
-                slot_count: summary.slot_count,
-                master_public_fingerprint: "unknown until profile is selected".to_string(),
-            })
-            .collect();
-
-        let master_fingerprint = format!(
-            "blake3:{}",
-            blake3::hash(&profile.master.public_key().to_bytes()).to_hex()
-        );
-        if let Some(current) = profiles.iter_mut().find(|entry| entry.selected) {
-            current.master_public_fingerprint = master_fingerprint.clone();
-        } else {
-            profiles.push(ProfileView {
-                id: current_id.clone(),
-                display_name: profile.display_name.clone(),
-                selected: true,
-                slot_count: profile.slots.len(),
-                master_public_fingerprint: master_fingerprint,
-            });
-        }
-        profiles.sort_by(|left, right| left.id.cmp(&right.id));
-
-        let mut ssh_keys = Vec::new();
-        for slot in ssh_slot::ssh_slots(profile) {
-            let source = profile
-                .slots
-                .get(&slot.key)
-                .expect("ssh_slots only returns profile-owned slots");
-            let lineage = source.lineage();
-            ssh_keys.push(SshKeyView {
-                profile: current_id.clone(),
-                fingerprint: slot.fingerprint(),
-                comment: slot.private.comment().to_string(),
-                public_openssh: slot
-                    .public()
-                    .to_openssh()
-                    .unwrap_or_else(|_| "public key encoding unavailable".to_string()),
-                lineage: lineage_label(lineage).to_string(),
-                device_loss_note: lineage.device_loss_note().to_string(),
-                unlock_policy: unlock_label(source.unlock_tier()),
-            });
-        }
-        ssh_keys.sort_by(|left, right| left.fingerprint.cmp(&right.fingerprint));
+        let (lock, view) = match vault.is_locked() {
+            true => (
+                VaultLockView::Locked,
+                self.lock
+                    .kept
+                    .lock()
+                    .unwrap()
+                    .clone()
+                    .unwrap_or_else(|| bare_view(&vault)),
+            ),
+            false => (VaultLockView::Unlocked, public_views(&vault)?),
+        };
         drop(vault);
 
         let carry = match &self.data_root {
@@ -500,11 +781,11 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         Ok(IdentitySurfaceSnapshot {
             vault: VaultView {
                 protection: self.protection,
-                lock: self.lock,
+                lock,
                 agent: self.listener.lock().unwrap().clone(),
             },
-            profiles,
-            ssh_keys,
+            profiles: view.profiles,
+            ssh_keys: view.ssh_keys,
             carry,
             pending_signing: self.approval.pending(),
             signing_history: self.approval.history(),
@@ -550,6 +831,19 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
     ) -> Result<ProfileSwitchReceipt, IdentityIntentError> {
         let id = ProfileId(payload.profile);
         self.vault.lock().unwrap().switch_profile(&id)?;
+        // The kept sets follow the persona now speaking.
+        let salts: Vec<Vec<Vec<u8>>> = self
+            .retained
+            .lock()
+            .unwrap()
+            .iter()
+            .map(|kept| kept.salts())
+            .collect();
+        for set in salts {
+            if let Err(error) = self.retained_keys(&set) {
+                tracing::warn!(%error, "kept keys not recaptured after the switch");
+            }
+        }
         let remembered = match &self.vault_dir {
             Some(dir) => match roster::remember_profile(dir, &id) {
                 Ok(()) => true,
@@ -667,6 +961,12 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
                 self.create_profile(payload)
                     .map(IdentityIntentOutcome::ProfileCreated)
             },
+            VAULT_LOCK_INTENT => {
+                let _: LockVaultIntentV1 = serde_json::from_slice(payload)?;
+                self.lock_vault()?;
+                Ok(IdentityIntentOutcome::VaultLocked)
+            },
+            VAULT_UNLOCK_INTENT => Err(IdentityIntentError::UnlockNativeOnly),
             _ => Err(IdentityIntentError::UnknownIntent),
         }
     }
@@ -735,6 +1035,24 @@ mod tests {
     use ssh_key::{Algorithm, LineEnding};
 
     use super::*;
+
+    /// The Unix receipt wall: the user's `SSH_AUTH_SOCK`, by path or by a
+    /// link to it, is the standard endpoint; any other socket is not.
+    #[test]
+    fn the_users_agent_socket_is_the_standard_endpoint() {
+        let dir = tempfile::tempdir().unwrap();
+        let sock = dir.path().join("agent.sock");
+        std::fs::write(&sock, b"").unwrap();
+        let standard = Some(sock.as_os_str());
+        assert!(same_socket(&sock.display().to_string(), standard));
+        assert!(!same_socket(
+            &dir.path().join("receipt.sock").display().to_string(),
+            standard
+        ));
+        assert!(!same_socket(&sock.display().to_string(), None));
+        let dotted = dir.path().join(".").join("agent.sock");
+        assert!(same_socket(&dotted.display().to_string(), standard));
+    }
 
     #[test]
     fn snapshot_discloses_public_ssh_material_but_not_the_private_slot() {
@@ -1167,6 +1485,274 @@ mod tests {
         let _ = server.await;
     }
 
+    /// personae's test-only `ssh-keygen` fixtures.
+    fn fixture(name: &str) -> PrivateKey {
+        let text = match name {
+            "ed25519" => {
+                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/ed25519")
+            },
+            "rsa2048" => {
+                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/rsa2048")
+            },
+            "rsa4096" => {
+                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/rsa4096")
+            },
+            "ecdsa256" => {
+                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/ecdsa256")
+            },
+            "ecdsa384" => {
+                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/ecdsa384")
+            },
+            "ecdsa521" => {
+                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/ecdsa521")
+            },
+            "rsa1024" => {
+                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/rsa1024")
+            },
+            "rsa2560" => {
+                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/rsa2560")
+            },
+            "rsa8192" => {
+                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/rsa8192")
+            },
+            "rsa2048e3" => {
+                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/rsa2048e3")
+            },
+            "dsa" => include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/dsa"),
+            other => panic!("no fixture {other}"),
+        };
+        PrivateKey::from_openssh(text).unwrap()
+    }
+
+    const P4A_KEYS: [&str; 4] = ["rsa2048", "rsa4096", "ecdsa256", "ecdsa384"];
+
+    /// Ruling 54: re-importing a held key, even asking for another tier and
+    /// carrying another comment, rewrites nothing and says it is held.
+    #[test]
+    fn reimporting_a_held_key_rewrites_nothing() {
+        let host = PersonaeHost::new(
+            IdentityVault::with_profile(
+                InMemoryStorage::new(),
+                Profile::new(
+                    ProfileId("research".to_string()),
+                    "Research",
+                    Ed25519Keypair::from_seed([0x4c; 32]),
+                ),
+            ),
+            None,
+            VaultProtectionView::Ephemeral,
+        );
+        for name in ["ed25519", "rsa2048", "ecdsa256"] {
+            let mut first = fixture(name);
+            first.set_comment("as first imported");
+            let key = protocol_key_for(&first);
+            let per_use = ImportSshKeyNativeIntentV1 {
+                unlock_policy: SshUnlockPolicyIntentV1::PerUse,
+            };
+            let imported = host.import_ssh_private(first, per_use).unwrap();
+            assert!(!imported.replaced_existing, "{name}");
+            let before = slot_parts(&host, &key);
+
+            let mut again = fixture(name);
+            again.set_comment("a different comment");
+            let receipt = host.import_ssh_private(again, session_import()).unwrap();
+            assert!(receipt.replaced_existing, "{name}: reported as held");
+            assert_eq!(receipt.comment, "as first imported", "{name}");
+            assert_eq!(receipt.unlock_policy, imported.unlock_policy, "{name}");
+            assert_eq!(slot_parts(&host, &key), before, "{name}: byte for byte");
+            assert_eq!(slot_parts(&host, &key).3, UnlockTier::PerUse, "{name}");
+        }
+    }
+
+    /// Rulings 55 and 56: import refuses what the agent cannot sign, naming
+    /// why, and stores nothing.
+    #[test]
+    fn native_import_refuses_unsignable_keys_with_the_reason() {
+        let host = PersonaeHost::new(
+            IdentityVault::with_profile(
+                InMemoryStorage::new(),
+                Profile::new(
+                    ProfileId("research".to_string()),
+                    "Research",
+                    Ed25519Keypair::from_seed([0x4d; 32]),
+                ),
+            ),
+            None,
+            VaultProtectionView::Ephemeral,
+        );
+        for name in [
+            "rsa1024",
+            "rsa2560",
+            "rsa8192",
+            "rsa2048e3",
+            "dsa",
+            "ecdsa521",
+        ] {
+            let error = host
+                .import_ssh_private(fixture(name), session_import())
+                .unwrap_err();
+            let IdentityIntentError::UnsignableKey(reason) = &error else {
+                panic!("{name}: {error}");
+            };
+            assert!(
+                reason.contains("2048 to 4096 bits")
+                    || reason.contains("ssh-dss")
+                    || reason.contains("P-521"),
+                "{name}: {reason}"
+            );
+        }
+        assert!(host.snapshot().unwrap().ssh_keys.is_empty());
+    }
+
+    fn slot_parts(
+        host: &PersonaeHost<InMemoryStorage>,
+        key: &ProtocolKey,
+    ) -> (String, Vec<u8>, CredentialLineage, UnlockTier) {
+        let vault = host.vault.lock().unwrap();
+        match vault.current_profile().unwrap().slots.get(key).expect("slot held") {
+            personae::IdentitySlot::Direct {
+                kind,
+                payload,
+                lineage,
+                unlock_tier,
+            } => (
+                kind.clone(),
+                payload.as_slice().to_vec(),
+                *lineage,
+                *unlock_tier,
+            ),
+            _ => panic!("ssh slots are Direct"),
+        }
+    }
+
+    fn session_import() -> ImportSshKeyNativeIntentV1 {
+        ImportSshKeyNativeIntentV1 {
+            unlock_policy: SshUnlockPolicyIntentV1::Session,
+        }
+    }
+
+    /// P4a, ruling 20: RSA and ECDSA keys land in new fingerprint-keyed slots
+    /// and the Ed25519 slot already held is untouched, byte for byte.
+    #[test]
+    fn native_import_holds_rsa_and_ecdsa_beside_an_untouched_ed25519_slot() {
+        let ed25519 = fixture("ed25519");
+        let ed_key = protocol_key_for(&ed25519);
+        let mut profile = Profile::new(
+            ProfileId("research".to_string()),
+            "Research",
+            Ed25519Keypair::from_seed([0x4a; 32]),
+        );
+        profile.slots.insert(
+            ed_key.clone(),
+            slot_for(&ed25519, UnlockTier::PerUse).unwrap(),
+        );
+        let host = PersonaeHost::new(
+            IdentityVault::with_profile(InMemoryStorage::new(), profile),
+            None,
+            VaultProtectionView::Ephemeral,
+        );
+        let before = slot_parts(&host, &ed_key);
+
+        for name in P4A_KEYS {
+            let key = fixture(name);
+            let public = PublicKey::from(&key);
+            let fingerprint = public.fingerprint(ssh_key::HashAlg::Sha256).to_string();
+            let receipt = host.import_ssh_private(key, session_import()).unwrap();
+            assert_eq!(receipt.fingerprint, fingerprint, "{name}");
+            assert!(!receipt.replaced_existing, "{name} is a new slot");
+            let held = slot_parts(
+                &host,
+                &ProtocolKey::new(ssh_slot::SSH_MOD_ID, Some(fingerprint)),
+            );
+            assert_eq!(held.0, ssh_slot::SSH_MOD_ID, "{name}");
+            let stored = PrivateKey::from_openssh(&held.1).unwrap();
+            assert_eq!(
+                PublicKey::from(&stored).key_data(),
+                public.key_data(),
+                "{name}"
+            );
+        }
+
+        assert_eq!(slot_parts(&host, &ed_key), before, "the Ed25519 slot");
+        assert_eq!(host.snapshot().unwrap().ssh_keys.len(), 1 + P4A_KEYS.len());
+    }
+
+    /// The resident's agent signs each imported key over the named-pipe wire,
+    /// RSA as the request's flags ask, and refuses a flagless RSA request.
+    #[cfg(windows)]
+    #[tokio::test]
+    async fn imported_rsa_and_ecdsa_keys_sign_over_the_named_pipe_wire() {
+        use ssh_agent_lib::client::Client;
+        use ssh_key::{EcdsaCurve, HashAlg};
+        use tokio::net::windows::named_pipe::ClientOptions;
+
+        let host = PersonaeHost::with_decision_timeout(
+            IdentityVault::with_profile(
+                InMemoryStorage::new(),
+                Profile::new(
+                    ProfileId("research".to_string()),
+                    "Research",
+                    Ed25519Keypair::from_seed([0x4b; 32]),
+                ),
+            ),
+            None,
+            VaultProtectionView::Ephemeral,
+            Duration::from_secs(2),
+        );
+        for name in P4A_KEYS {
+            host.import_ssh_private(fixture(name), session_import())
+                .unwrap();
+        }
+        let endpoint = format!(r"\\.\pipe\castellan-p4a-receipt-{}", Uuid::new_v4());
+        let listener = host.bind_receipt_listener(&endpoint).unwrap();
+        let server = tokio::spawn(ssh_agent_lib::agent::listen(listener, host.agent_session()));
+        let mut client = Client::new(ClientOptions::new().open(&endpoint).unwrap());
+        assert_eq!(
+            client.request_identities().await.unwrap().len(),
+            2 * P4A_KEYS.len()
+        );
+
+        let rsa = |hash| Algorithm::Rsa { hash: Some(hash) };
+        let ecdsa = |curve| Algorithm::Ecdsa { curve };
+        for (name, flags, expected) in [
+            ("rsa2048", 0x02, rsa(HashAlg::Sha256)),
+            ("rsa2048", 0x04, rsa(HashAlg::Sha512)),
+            ("rsa4096", 0x02, rsa(HashAlg::Sha256)),
+            ("rsa4096", 0x04, rsa(HashAlg::Sha512)),
+            ("ecdsa256", 0, ecdsa(EcdsaCurve::NistP256)),
+            ("ecdsa384", 0, ecdsa(EcdsaCurve::NistP384)),
+        ] {
+            let public = PublicKey::from(&fixture(name));
+            let signature = client
+                .sign(SignRequest {
+                    credential: public.key_data().clone().into(),
+                    data: b"castellan-p4a-wire".to_vec(),
+                    flags,
+                })
+                .await
+                .unwrap();
+            assert_eq!(signature.algorithm(), expected, "{name} flags {flags}");
+            public
+                .key_data()
+                .verify(b"castellan-p4a-wire", &signature)
+                .unwrap();
+        }
+        let flagless = client
+            .sign(SignRequest {
+                credential: PublicKey::from(&fixture("rsa2048"))
+                    .key_data()
+                    .clone()
+                    .into(),
+                data: b"castellan-p4a-wire".to_vec(),
+                flags: 0,
+            })
+            .await;
+        assert!(flagless.is_err(), "ssh-rsa (SHA-1) is never signed");
+
+        server.abort();
+        let _ = server.await;
+    }
+
     #[test]
     fn typed_generation_and_confirmed_removal_mutate_the_shared_vault() {
         let profile = Profile::new(
@@ -1260,3 +1846,7 @@ mod tests {
         assert_eq!(host.snapshot().unwrap().ssh_keys.len(), 1);
     }
 }
+
+#[cfg(test)]
+#[path = "authority_lock_tests.rs"]
+mod lock_tests;

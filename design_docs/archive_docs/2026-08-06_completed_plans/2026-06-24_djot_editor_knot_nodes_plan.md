@@ -34,8 +34,8 @@ intentional:
 | Concern | Current home | Disposition |
 | --- | --- | --- |
 | Text editing, highlighting, outline/fold derivation, and preview readout | Genet: Cambium's editor primitives plus `components/inker/knot-editor-host` | Built. `ports/knot::KnotEditor` consumes this stack. Do not build another editor core in Mere or Turnstone. |
-| File identity, source truth, format-aware writes, vaults, search, sync, conflicts, and communal encryption | Mere `ports/knot` | K0 through K7 are complete under the [Knot port plan](../../mere_docs/implementation_strategy/2026-07-25_knot_port_plan.md). Files and vault documents replace the old inline `Node.body` store. |
-| Product composition and authoring UX | [Knot authoring consumer plan](../../mere_docs/implementation_strategy/2026-07-27_knot_authoring_consumer_plan.md): Graphshell protocol with a Turnstone/Cambium pane | Open. The live Knot endpoint discloses a read-only directory and rejects intents. The dedicated plan owns the authorized editable resource, Save intent, retained session, pane, and receipts. |
+| File identity, source truth, format-aware writes, vaults, search, sync, conflicts, and communal encryption | Mere `ports/knot` | K0 through K7 are complete under the [Knot port plan](../2026-10-06_completed_plans/2026-07-25_knot_port_plan.md). Files and vault documents replace the old inline `Node.body` store. |
+| Product composition and authoring UX | [Knot authoring consumer plan](../2026-10-06_completed_plans/2026-07-27_knot_authoring_consumer_plan.md): Graphshell protocol with a Turnstone/Cambium pane | Open. The live Knot endpoint discloses a read-only directory and rejects intents. The dedicated plan owns the authorized editable resource, Save intent, retained session, pane, and receipts. |
 | Semantic web clipping and `ClippedFrom` provenance | Mere `crates/import::web_clip`; Turnstone Inspector/content lane | The host-neutral producer survived. The Meerkat command did not. A current Inspector selection-to-Knot write path is open. |
 | Outline and folds in the product | Genet readout plus a consumer-pulled Cambium tree/outline; Turnstone Gloss/Inspector | Outline data exists; a Knot authoring consumer and interactive tree are open. This is shared component work, not a Knot parser fork. |
 | Query, agent, diagram, and Wasm blocks | polyglot block resolver plan (`design_docs/nematic_docs/implementation_strategy/2026-06-13_polyglot_block_resolver_plan.md`) | Separate resolver work. It is not unfinished Phase 3 editor work. |
@@ -44,7 +44,7 @@ intentional:
 
 ### Surviving product slices
 
-The [Knot authoring consumer plan](../../mere_docs/implementation_strategy/2026-07-27_knot_authoring_consumer_plan.md)
+The [Knot authoring consumer plan](../2026-10-06_completed_plans/2026-07-27_knot_authoring_consumer_plan.md)
 is the executable owner for these slices. This list records how the historical
 plan decomposed; it is not a second queue.
 
@@ -810,10 +810,10 @@ This plan extends, and does not re-scope, the following owners:
   it.
 - [2026-06-21 command registry configurable menus plan](../2026-09-02_retired_plans/2026-06-21_command_registry_configurable_menus_plan.md):
   every editor action and the clip gesture register as command ids here.
-- [2026-06-10 scrying tile plan](../../mere_docs/implementation_strategy/2026-06-10_scrying_tile_plan.md) and
-  [2026-06-23 render ladder and extraction plan](../../mere_docs/implementation_strategy/2026-06-23_render_ladder_and_extraction_plan.md):
+- [2026-06-10 scrying tile plan](../2026-10-06_completed_plans/2026-06-10_scrying_tile_plan.md) and
+  [2026-06-23 render ladder and extraction plan](../2026-10-06_completed_plans/2026-06-23_render_ladder_and_extraction_plan.md):
   own the live tile and the parse-and-extract axis the clip path draws on.
-- [2026-06-23 browser extension companion plan](../../mere_docs/implementation_strategy/2026-06-23_browser_extension_companion_plan.md):
+- [2026-06-23 browser extension companion plan](../2026-10-06_superseded_plans/2026-06-23_browser_extension_companion_plan.md):
   the consented-capture sink; the web clip is one driver of it.
 - [2026-06-15 in-the-wings and browser-bar audit](../../mere_docs/research/2026-06-15_in_the_wings_and_browser_bar_audit.md),
   synergy 4: names the new-note wire as the dominant gap.
@@ -1151,7 +1151,7 @@ Code-verified anchors from the 2026-06-24 sweeps, kept for the next session:
   the views into a `ScriptedDom` via a `GenetAppRunner`, lays out, lowers to a
   `netrender::Scene` through the chrome's `scene_from_session` path; a test renders
   `mere://welcome` end to end; mere `3d7c7ea`). The
-  native smolweb rendering plan (`design_docs/nematic_docs/implementation_strategy/2026-06-27_native_smolweb_rendering_plan.md`)
+  native smolweb rendering plan (`design_docs/archive_docs/2026-10-06_completed_plans/2026-06-27_native_smolweb_rendering_plan.md`)
   (2026-06-27) frames this mapper as its **Phase D**, the document family: djot/knot,
   markdown, and reader-mode HTML all ride this one mapper (so it is not note-specific —
   its doc + eventual name should read "document-family"). The **smolweb family**

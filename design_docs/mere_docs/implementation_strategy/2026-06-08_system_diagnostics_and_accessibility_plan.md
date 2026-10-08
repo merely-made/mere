@@ -266,6 +266,12 @@ matching retains its existing behavior. The shared host fixture compares
 selection and accessibility activation of the same referenced-name button and
 rejects targets hidden or renamed while a click waits.
 
+**Corrected 2026-10-06 (S14 pass):** this subsection's "in progress" status is
+closed. Its own "Final integration" paragraph below closes the source
+integration and machine-verification gates (`32edc2ad` merged), and the
+2026-09-30 section supersedes it, qualifying contributed semantics at
+Turnstone `b2ead70`. Human AT and custom-leaf parity stay open there.
+
 Mere's isolated integration passed the standalone Graphshell Wasm check,
 60 focused tests and the native smoke
 (32 frames, three distinct nonblank captures, AccessKit installed with 15 nodes).
@@ -396,6 +402,12 @@ failure-control, loss and publication evidence lives in
 has no immutable diagnostic-state/pixel seal yet; its behavioral captures do not
 close that gate. The existing root docs were updated without a functional repin.
 
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_47_s14_phase_b9.md: the status holds; the
+  2026-09-29 semantic subsection's "in progress" status marked closed and
+  superseded by the 2026-09-30 section.
+
 ### Remaining owner gates after the first consumers
 
 The current inventory finds real seams, rather than a need for another universal
@@ -459,7 +471,7 @@ current plan. Preserve it as evidence; use the September design above for new wo
 
 **Date**: 2026-06-08
 **Status**: Planning. Follow-on to the apparatus pane/theme switcher pass.
-**Related**: [apparatus pane + runtime theme switcher](2026-06-08_apparatus_pane_and_theme_switcher_plan.md), [frame tree in meerkat](../../archive_docs/2026-06-09_completed_plans/2026-06-08_frame_tree_in_meerkat_plan.md), [peripheral panes architecture](../technical_architecture/2026-06-06_peripheral_panes_architecture.md), [Graphshell harvest brief](../research/2026-05-17_graphshell_harvest_brief.md), [Graphshell docs full harvest](../research/2026-05-27_graphshell_docs_full_harvest.md), [spatial chrome IR brief](../../archive_docs/2026-06-09_pivot_superseded/2026-05-15_spatial_chrome_ir_brief.md), [spatial chrome modular adoption plan](../../archive_docs/2026-06-09_pivot_superseded/2026-05-15_spatial_chrome_modular_adoption_plan.md).
+**Related**: [apparatus pane + runtime theme switcher](../../archive_docs/2026-10-06_completed_plans/2026-06-08_apparatus_pane_and_theme_switcher_plan.md), [frame tree in meerkat](../../archive_docs/2026-06-09_completed_plans/2026-06-08_frame_tree_in_meerkat_plan.md), [peripheral panes architecture](../technical_architecture/2026-06-06_peripheral_panes_architecture.md), [Graphshell harvest brief](../research/2026-05-17_graphshell_harvest_brief.md), [Graphshell docs full harvest](../research/2026-05-27_graphshell_docs_full_harvest.md), [spatial chrome IR brief](../../archive_docs/2026-06-09_pivot_superseded/2026-05-15_spatial_chrome_ir_brief.md), [spatial chrome modular adoption plan](../../archive_docs/2026-06-09_pivot_superseded/2026-05-15_spatial_chrome_modular_adoption_plan.md).
 
 Build one host observability spine for **diagnostics, tracing, UX events,
 UxTree/accessibility, probes, and agent harnesses**. The near-term user surface is

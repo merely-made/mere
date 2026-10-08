@@ -1,10 +1,15 @@
 # Graphshell Reference Host Plan
 
 **Date:** 2026-07-27
-**Status:** product boundary ruled with Mark; H0-H3 complete; H4 operational
-follow-ons remain; H5-H7 complete; H8 not started; H9's first-party
-application door and Turnstone receipts client are complete, while its AI and
-MCP surfaces remain open.
+**Status (2026-10-06):** product boundary ruled with Mark; H0-H3 complete; H4
+operational follow-ons remain (real sign-out or reboot recovery, and retiring
+the disabled Personae task); H5-H7 complete, with the H6 addendum's S3 still
+open (recovery pins and the blob-reference-set intent pair); H8 not started;
+H9's first-party application door and Turnstone receipts client are complete,
+while its AI and MCP surfaces remain open; H10's landed half moved to R0 of the
+[reachability rungs plan](2026-08-03_reachability_rungs_and_privacy_lanes_plan.md)
+on 2026-09-01, and its DNS-SD half remains open here. The desktop resident
+host moved from Graphshell to djinn on 2026-08-22 (`1a3dcf6f`).
 **Scope:** Make Graphshell Mere's useful, WASM-safe reference host: a graph
 portal, Personae identity-vault surface, browser-extension companion,
 application launcher, and personal cross-device surface for addressed things.
@@ -15,16 +20,21 @@ the first desktop composition of the product-neutral logical resident. Knot is
 the second consumer. See the
 [device resident consolidation plan](2026-08-20_device_resident_consolidation_plan.md).
 
+**Corrected 2026-10-06 (S14 pass):** the first desktop composition is djinn,
+not an installed Graphshell device host. `1a3dcf6f` (2026-08-22, "make
+resident composition the desktop owner") moved the device host to
+`ports/djinn` (`ports/djinn/src/bin/djinn.rs`).
+
 This plan amends the product center of the
-[Graphshell remote projection host plan](2026-07-22_graphshell_remote_projection_host_plan.md).
+[Graphshell remote projection host plan](../../archive_docs/2026-10-06_completed_plans/2026-07-22_graphshell_remote_projection_host_plan.md).
 That plan's portable session crates, projection/presentation/intent planes,
 admission boundary, and G1-G5 receipts remain. Its statement that Graphshell's
 local truth is only remote-scene curation does not: Graphshell now also owns and
 hosts the user's local Mere graph.
 
 It absorbs the live parts of the
-[capture-first browser lane](2026-06-24_orrery_browser_lane_plan.md) and the
-[extension/companion plan](2026-06-23_browser_extension_companion_plan.md).
+[capture-first browser lane](../../archive_docs/2026-10-06_superseded_plans/2026-06-24_orrery_browser_lane_plan.md) and the
+[extension/companion plan](../../archive_docs/2026-10-06_superseded_plans/2026-06-23_browser_extension_companion_plan.md).
 Those plans remain historical evidence for capture APIs, browser delivery, and
 the companion split; their old Merecat/orrery product framing is superseded.
 
@@ -32,11 +42,11 @@ Related boundaries:
 
 - [one node, atomic facets](../technical_architecture/2026-07-18_one_node_facets_layer_map.md)
 - [Mere as the unifying graph](../technical_architecture/2026-07-08_mere_as_the_unifying_graph.md)
-- [repo consolidation](2026-07-23_repo_consolidation_plan.md)
-- [Knot port](2026-07-25_knot_port_plan.md)
+- [repo consolidation](../../archive_docs/2026-10-06_completed_plans/2026-07-23_repo_consolidation_plan.md)
+- [Knot port](../../archive_docs/2026-10-06_completed_plans/2026-07-25_knot_port_plan.md)
 - [low-power radio and managed network](2026-07-24_low_power_managed_network_plan.md)
-- [identity vault and SSH agent](2026-07-22_identity-vault-ssh-agent_plan.md)
-- [persona wallet carry layer](2026-06-25_persona_wallet_carry_layer_plan.md)
+- [identity vault and SSH agent](../../archive_docs/2026-10-06_completed_plans/2026-07-22_identity-vault-ssh-agent_plan.md)
+- [persona wallet carry layer](../../archive_docs/2026-10-06_completed_plans/2026-06-25_persona_wallet_carry_layer_plan.md)
 
 ---
 
@@ -60,6 +70,19 @@ It is:
 - a cross-device surface for copying or moving addresses, files, graph
   selections, and scenes while preserving their relations and provenance;
 - a WASM application suitable for a browser extension or PWA.
+
+**Corrected 2026-10-06 (S14 pass):** Graphshell is no longer the permanent
+resident host. `1a3dcf6f` (2026-08-22) moved the device host to
+`ports/djinn` (`ports/djinn/src/bin/djinn.rs`), and Graphshell ships no
+device-host binary; its README now reads "The desktop resident is djinn, not a
+Graphshell binary": djinn owns the persona-held stores and exposes
+Graphshell's session brokers.
+
+**Open, raised by the S14 pass (2026-10-06):** how should this ruling's
+"permanent resident host" bullet be carried? Options: amend the ruling to
+name djinn as the resident and Graphshell as the GUI and session brokers it
+composes; supersede the bullet with a pointer to the
+[device resident consolidation plan](2026-08-20_device_resident_consolidation_plan.md).
 
 It is not a web browser. Turnstone, formerly Merecat, owns browsing: Genet
 engine hosting, page lifecycle, HTML/CSS/script behavior, WPT, media, downloads,
@@ -395,6 +418,16 @@ canvas rewrite.
 
 ## 9. Implementation sequence
 
+**Received 2026-10-06 (S14 archive pass):** G6, composing several
+applications (one saved Graphshell workspace reopens two endpoint
+applications, keeps their truths separate, and preserves its own
+arrangement and links), and G7, product pulls and constrained management
+(Woodshed, Hocket and radio-management adapters with task receipts, and a
+constrained profile with measured byte budgets), to be taken up in this
+H-series, from the archived
+[Graphshell remote projection host plan](../../archive_docs/2026-10-06_completed_plans/2026-07-22_graphshell_remote_projection_host_plan.md)
+(ruling S61 of the [stack seams plan](2026-10-04_stack_seams_plan.md)).
+
 ### H0. Seal the WASM product cone
 
 **Files:**
@@ -590,7 +623,7 @@ device-local facet exclusion. See the
 ### H4. Make Personae visible and usable
 
 **Absorbs G8** from the
-[remote projection host plan](2026-07-22_graphshell_remote_projection_host_plan.md),
+[remote projection host plan](../../archive_docs/2026-10-06_completed_plans/2026-07-22_graphshell_remote_projection_host_plan.md),
 which was written the same day to carry the 2026-07-22 ruling that the agent's
 resident home is Graphshell. Three things that entry made explicit and this
 one should not lose:
@@ -611,15 +644,20 @@ one should not lose:
 - `ports/graphshell/src/identity_projection.rs` (new)
 - `ports/graphshell/src/native/personae_host.rs` (new)
 - `ports/graphshell/src/native/device_broker.rs` (new)
-- `ports/graphshell/src/bin/graphshell_device_host.rs` *(planned target)* <!-- doc-audit: planned-path --> (new)
+- `ports/graphshell/src/bin/graphshell_device_host.rs` *(historical citation)* <!-- doc-audit: historical-path --> (new)
 - `ports/graphshell/src/bin/graphshell_native_host.rs` (new relay)
-- `ports/graphshell/install-device-host-windows.ps1` *(planned target)* <!-- doc-audit: planned-path --> (new)
+- `ports/graphshell/install-device-host-windows.ps1` *(historical citation)* <!-- doc-audit: historical-path --> (new)
 - `ports/graphshell/src/session_loop.rs`
 - `crates/dramatis/personae/src/agent.rs`
 - `crates/dramatis/personae/src/signing.rs` (new only if the approval seam is
   independently useful outside Graphshell)
 - current `crates/system/session-runtime/src/wallet_store.rs` *(historical citation)* <!-- doc-audit: historical-path --> and
   `wallet_grant.rs` carry sources, through a narrow read/intent adapter
+
+**Corrected 2026-10-06 (S14 pass):** the device-host binary and its Windows
+installer were built here and then moved to djinn in `1a3dcf6f` (2026-08-22),
+as `ports/djinn/src/bin/djinn.rs` and `ports/djinn/install-windows.ps1`; their
+two entries above are historical rather than planned.
 
 Move the resident Personae host into native Graphshell and add a plain
 **Identity** surface. It presents:
@@ -805,6 +843,12 @@ remote-login done-condition is closed. Real sign-out or reboot recovery and
 final retirement of the disabled Personae task remain open. See the
 [H4i remote SSH login receipt](../../../ports/graphshell/docs/2026-07-29_h4i_remote_ssh_login_receipt.md).
 
+**Open, raised by the S14 pass (2026-10-06):** H4's two remaining
+operational items (real sign-out or reboot recovery, and retiring the
+disabled Personae task) concern the resident host, which moved to djinn in
+`1a3dcf6f`. Where do they live now? Options: move them to the Djinn plan; keep
+them here as H4's open tail.
+
 This is the first integrated reference-host cut: the graph, identity vault, and
 native capability broker work as one product.
 
@@ -866,6 +910,13 @@ Proving that injection in a second host remains an integration follow-on.
 Favicon intake is a separate optional `tabs` permission and retention feature,
 not an H5 completion condition. See the
 [H5b cross-browser capture and controls receipt](../../../ports/graphshell/docs/2026-07-28_h5b_cross_browser_capture_controls_receipt.md).
+
+**Received 2026-10-06 (S14 archive pass):** a C4 consent gate for live
+capture, with its open question of the default (the archived plan's C4
+shipped `Full`; this H5's `HistoryCapturePolicy` is disabled by default),
+shared with Turnstone's page capture plan for its trail memory, from the
+archived [capture provenance consent plan](../../archive_docs/2026-10-06_completed_plans/2026-06-26_capture_provenance_consent_plan.md)
+(ruling S55).
 
 ### H6. Move one selection between two devices
 
@@ -1861,9 +1912,19 @@ browser, two-device network, and real RF are different claims.
    `graph`, `linked-data`, `canvas`, and `workbench` are working names.
 2. Whether the browser store starts on OPFS or IndexedDB. Measure transaction
    behavior and service-worker recovery; do not decide from API fashion.
+
+   **Corrected 2026-10-06 (S14 pass):** closed by H5a, which built a full
+   IndexedDB `muniment::Backend`; it is now muniment's IndexedDB backend
+   (`crates/eidetic/muniment/src/indexeddb_backend.rs`).
 3. Whether Graphshell's browser presenter directly owns the wgpu surface or a
    thin Genet host adapter does. Keep it local until the first headed receipt
    shows the real seam.
+
+   **Corrected 2026-10-06 (S14 pass):** closed by the current tree on the
+   thin-adapter side: `genet_render_host::RenderCore` boots wgpu and
+   configures the surface, and Graphshell keeps only its content-over-chrome
+   composition (`ports/graphshell/src/web_gpu.rs`). H2 itself only made
+   `graphshell-web` a separate package.
 4. The provisional AccessRecord schema fields beyond the minimum above.
    Freeze them through Graphshell plus Turnstone evidence, not conversation
    alone.
@@ -2110,3 +2171,13 @@ browser, two-device network, and real RF are different claims.
 
 None of these decisions changes the product boundary or requires a new
 repository.
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  `support/doc-audit/d2/batch_42_s14_phase_b4.md`: the status names H4's two
+  operational items, the H6 addendum's open S3 and H10's split; §1 and the
+  2026-08-20 addendum record the resident's move to djinn (`1a3dcf6f`), with
+  H4's device-host entries re-marked historical; §12's decisions 2 and 3 are
+  closed against the tree.

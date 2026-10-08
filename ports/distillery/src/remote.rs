@@ -10,17 +10,17 @@ use std::collections::BTreeSet;
 use std::sync::{Arc, RwLock};
 use std::time::Duration;
 
+use crate::mesh_host::Clock;
 use burn_backend::tensor::Device;
 use burn_ir::BackendIr;
 use burn_remote::BURN_REMOTE_ALPN;
-use burn_remote::server::{AuthorizationRequest, IrohRemoteProtocol, PeerAuthorizer};
+use burn_remote::server::{AuthorizationRequest, ClientId, IrohRemoteProtocol, PeerAuthorizer};
 use burn_remote::telemetry::TelemetryProbe;
 use mesh::{
     ComputeClass, ImplementationId, JobBoard, JobControl, JobId, JobNamespaceView, LeaseId,
     LeasePolicy, MeshResource, Prepared, RemoteAdmission, RemoteSessionClaim, ResourceDescriptor,
     ResourceError, ResourceId, ResourceRequirements, RunContext, VerificationClass,
 };
-use crate::mesh_host::Clock;
 use transport::P2pandaTransport;
 
 use crate::authority::RemoteSessionProjection;
@@ -28,7 +28,7 @@ use crate::authority::RemoteSessionProjection;
 /// Mesh resource implemented by the Burn Remote session lane.
 pub const BURN_REMOTE_RESOURCE: &str = "esp.remote.burn/v1";
 
-const BURN_REMOTE_IMPLEMENTATION: &str = "distillery.burn-remote-pre2/v1";
+const BURN_REMOTE_IMPLEMENTATION: &str = "distillery.burn-remote-0.22/v1";
 const RECEIPT_CONTEXT: &[u8] = b"mere/distillery/remote-session-receipt/v1\0";
 
 /// Owner-selected behavior of a remote compute offer.
@@ -112,8 +112,12 @@ struct RemoteAuthorizer {
 
 impl PeerAuthorizer for RemoteAuthorizer {
     fn authorize(&self, request: AuthorizationRequest<'_>) -> Result<(), String> {
-        let claim =
-            RemoteSessionClaim::decode(request.credential).map_err(|error| error.to_string())?;
+        let ClientId::Iroh(peer) = request.client else {
+            return Err("remote-session admission requires an Iroh peer".to_string());
+        };
+        let connected_peer = *peer.as_bytes();
+        let claim = RemoteSessionClaim::decode(request.credential.as_bytes())
+            .map_err(|error| error.to_string())?;
         let state = self
             .state
             .read()
@@ -135,7 +139,7 @@ impl PeerAuthorizer for RemoteAuthorizer {
                 board,
                 server_author: self.server_author,
                 server_peer: self.server_peer,
-                connected_peer: *request.peer.as_bytes(),
+                connected_peer,
                 requested_device: request.device_index,
                 offered_devices: &self.offered_devices,
                 expected_resource: &self.expected_resource,
@@ -192,13 +196,14 @@ impl<B: BackendIr> RemoteSessionService<B> {
             clock,
             lease_policy,
         });
-        let protocol = IrohRemoteProtocol::new(
+        let protocol = IrohRemoteProtocol::from_endpoint(
             raw,
             devices,
             authorizer,
             TelemetryProbe::disabled(),
             Default::default(),
-        );
+        )
+        .map_err(|error| RemoteSessionError::Endpoint(error.to_string()))?;
         endpoint
             .accept_raw(BURN_REMOTE_ALPN, protocol.clone())
             .await
@@ -382,15 +387,15 @@ mod tests {
     use std::future::Future;
     use std::pin::Pin;
 
+    use crate::mesh_host::{HostConfig, ManualClock, MeshHost, ObservedConditions, Step};
     use burn_backend::{TensorData, ops::FloatTensorOps};
     use burn_flex::Flex;
-    use burn_remote::{RemoteBackend, RemoteDevice};
+    use burn_remote::RemoteBackend;
     use mesh::{
         DeterminismClass, DeviceConditions, HostFacts, JobSpec, LeaseTerms, MESH_AUTHOR_SALT,
         MemoryBlobSpace, MeshEvent, MeshStore, ResourceRegistry, RunError, SyncedMesh, run_job_for,
         to_operation,
     };
-    use crate::mesh_host::{HostConfig, ManualClock, MeshHost, ObservedConditions, Step};
     use personae::{IdentityProvider, InMemoryProvider};
 
     use crate::{BlobCustody, Distillery, RetentionSettings};
@@ -555,12 +560,13 @@ mod tests {
             .endpoint()
             .await
             .unwrap();
-        let remote = RemoteDevice::iroh_authorized(
-            &client_endpoint,
-            server_transport.endpoint_addr().await.unwrap(),
-            0,
-            credential,
-        );
+        let remote = burn_remote::HostSpec::iroh(
+            burn_remote::IrohHost::new(server_transport.endpoint_addr().await.unwrap())
+                .with_endpoint(client_endpoint),
+        )
+        .with_credential(credential)
+        .connect(0)
+        .unwrap();
         let input = <RemoteBackend as FloatTensorOps<RemoteBackend>>::float_from_data(
             TensorData::from([1.0f32, 2.0, 3.0]),
             &remote,
@@ -572,7 +578,7 @@ mod tests {
         .await
         .expect("remote tensor operation did not hang")
         .unwrap();
-        assert_eq!(data.to_vec::<f32>().unwrap(), vec![1.0, 2.0, 3.0]);
+        assert_eq!(data.try_to_vec::<f32>().unwrap(), vec![1.0, 2.0, 3.0]);
         assert_eq!(service.session_count(job, lease).await, 1);
 
         handle.cancel();
@@ -742,12 +748,13 @@ mod tests {
             .endpoint()
             .await
             .unwrap();
-        let remote = RemoteDevice::iroh_authorized(
-            &client_endpoint,
-            server_transport.endpoint_addr().await.unwrap(),
-            0,
-            credential,
-        );
+        let remote = burn_remote::HostSpec::iroh(
+            burn_remote::IrohHost::new(server_transport.endpoint_addr().await.unwrap())
+                .with_endpoint(client_endpoint),
+        )
+        .with_credential(credential)
+        .connect(0)
+        .unwrap();
         let input = <RemoteBackend as FloatTensorOps<RemoteBackend>>::float_from_data(
             TensorData::from([8.0f32, 13.0, 21.0]),
             &remote,
@@ -759,7 +766,7 @@ mod tests {
         .await
         .expect("live leased session responds")
         .unwrap();
-        assert_eq!(data.to_vec::<f32>().unwrap(), vec![8.0, 13.0, 21.0]);
+        assert_eq!(data.try_to_vec::<f32>().unwrap(), vec![8.0, 13.0, 21.0]);
         assert_eq!(service.session_count(job, lease).await, 1);
 
         conditions.set(DeviceConditions::spare().in_use());

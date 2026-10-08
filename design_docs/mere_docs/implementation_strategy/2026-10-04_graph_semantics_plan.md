@@ -1,8 +1,9 @@
 # Graph semantics plan: assertions, resources, saved queries, residency
 
 **Date:** 2026-10-04
-**Status (2026-10-04):** plan. Rounds 1 to 4 ruled (rulings 1 to 17); phases
-final; checkpoints C1 to C4 ruled, C5 to C8 open (§5). No code.
+**Status (2026-10-05):** in progress. Rulings 1 to 19; P1 implemented on branch
+`graph-semantics` (`459cad84`), not merged; P2 under way on that branch, whose
+plan copy predates rulings 9 to 19 (§3). C5 to C8 open (§5).
 
 Four questions were put to Mark from outside the project: what a link records,
 what makes two things the same thing, what a saved query can become, and how
@@ -12,7 +13,7 @@ verbatim; anything beyond his words is marked *Reading, not ruled*.
 
 Parents: the [statements-over-schema stance](../technical_architecture/2026-05-22_statements_over_schema_stance.md),
 the [statement kernel brief](../technical_architecture/2026-06-19_statement_kernel_brief.md),
-the [petgraph-RDF plan](2026-06-18_petgraph_rdf_plan.md), the
+the [petgraph-RDF plan](../../archive_docs/2026-10-06_completed_plans/2026-06-18_petgraph_rdf_plan.md), the
 [node navigation lineage plan](2026-06-05_node_navigation_lineage_wiring_plan.md),
 the [ambiance design](../design/2026-09-23_ambiance_design.md) and the
 [family composition thesis](../../2026-08-12_family_composition_thesis_brief.md)
@@ -289,6 +290,43 @@ meaning; text written before keeps its words, under a dated note. Cleromancy's
 and Isocosm's design records also say "ambient tier"; they are outside this
 repository and are left for their own sessions.
 
+Round 5, 2026-10-05. The lane carrying this plan works on branch
+`graph-semantics`, cut at `36893553`, before rulings 9 to 17 reached main.
+It put C1, C2 and C3 to Mark again there, and was about to put C4. Its C1
+("1", a legacy marker for missing provenance, with author-aware journal
+replay in the code) and its C2 ("1", the fixed containment split) agree with
+rulings 9, 10 and 14. Its C3 ("1", the currently shown resource for every
+old claim, with a migration record) did not offer replay, which ruling 11
+had chosen.
+
+**Ruling 18 (C3 reconciled).** *Which C3 stands: ruling 11 on main, or the
+branch's current resource for all?* Options: replay first, as on main;
+current for all, as on the branch. Mark: **"Replay first, as on main
+(Recommended)"**. Follows: ruling 11 stands. Claims inside a retained journal
+land on the resource their node showed when they were minted; only claims the
+journal cannot reach (baseline-era) fall back to the currently shown resource.
+The branch's migration record (original endpoints, ids, times, asserters, an
+uncertainty mark) applies to those fallback cases.
+
+**Ruling 19 (C4 amended).** *Which names?* Options: resource and surface;
+resource and node. Mark first asked why resource and surface had been the
+first proposal, and said he did not mind using them (free text: **"Hm.
+Resource and surface were your first instincts too. Tell me why, and I don't
+mind using those."**). Answered: the record's own model calls the node "a
+browsing surface" (2026-05-18 brief, 2026-06-05 lineage plan); the pair is
+symmetric; and with two strata "node" naturally means any graph element, so
+reserving it for one kind needs "resource node versus node" qualification.
+Against it: 52 public types use "surface" in the UI sense and `SurfaceId`
+already names chrome and accessibility elements (`graph-kernel/src/accessibility.rs`
+49); "node" is the product's commonest word. The lane's form, `ResourceNode`
+and `SurfaceNode` in code with `Node` and `NodeKey` kept as compatibility
+names, answers both. Mark: **"Resource and surface (Recommended)"**. Follows:
+amends rulings 12 and 13. Prose says resource and surface; code gets
+`ResourceNode` and `SurfaceNode`, with `Node` and `NodeKey` kept as
+compatibility names for surfaces; "node" means any graph element in either
+stratum; gnode is unchanged; `SurfaceId` is not reused. The strata are the
+resource stratum under the surface stratum.
+
 ## 4. Phases
 
 ### Placement by stratum (rulings 10, 14, 15)
@@ -384,6 +422,12 @@ In order; each phase lands green before the next starts. Code samples: none.
   statement is retracted at the source (and a live `Linked` subgraph over the
   same spec does change, the control); a frozen selection opened where a member
   resource is absent reports it through P3's coverage.
+
+  **Received 2026-10-06 (S14 archive pass):** backlog #3, `CONSTRUCT` /
+  `DESCRIBE` output into a subgraph (ruling 3 had already placed it here),
+  and the error `query.rs` returns today for `QueryResults::Graph`, from the
+  archived [graph query layer plan](../../archive_docs/2026-10-06_completed_plans/2026-06-18_graph_query_layer_plan.md)
+  (ruling S53 of the [stack seams plan](2026-10-04_stack_seams_plan.md)).
 - **P5. Partial residency (rulings 4, 7).** Muniment stores both graphs
   addressably, keyed by id (resource id for resources), so one node and its
   statements load without the whole snapshot. The resident set is k hops (a
@@ -396,6 +440,14 @@ In order; each phase lands green before the next starts. Code samples: none.
   restores its relations exactly (snapshot-equal to the full-residency load);
   with full residency set, the same tests report no residency coverage; the
   IndexedDB backend passes the same residency tests as redb.
+
+**Received 2026-10-06 (S14 archive pass):** the JSON-LD shaper gaps, the
+`skip_serializing_if` follow-up, the `ExampleOf` and `Summarizes`
+vocabulary rows, the raw-IRI `Semantic` edge path, dropping
+`dep:oxigraph`, and the open question whether its Phase 3 is done on the
+shipped spareval path (with ruling 6's adapter a new P2 requirement) or
+reopens, carried by P2, from the archived
+[petgraph-RDF plan](../../archive_docs/2026-10-06_completed_plans/2026-06-18_petgraph_rdf_plan.md) (ruling S53).
 
 ## 5. Checkpoints
 

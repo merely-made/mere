@@ -22,12 +22,16 @@ mod affinity;
 pub(crate) mod arrangement_goldens;
 mod arrangement_roles;
 mod camera;
+mod combinators;
 mod density;
+mod density_admits;
 mod density_probe;
 mod density_wander;
 mod face_on_body;
 mod fold_and_source_time;
 mod gloss;
+mod grouped;
+mod home_at_budget_end;
 mod layout_and_drag;
 mod live_physics;
 mod meaning;
@@ -35,17 +39,21 @@ pub(crate) mod meaning_topics;
 mod node_face;
 mod node_minting;
 mod node_state;
+mod permitted_actions;
 mod physics_catalog;
 mod physics_terms;
+mod reader;
 mod registry_readers;
 mod relations;
 mod restore_and_queries;
 mod retained_layout;
 mod rings;
+mod schedule;
 mod scope_and_cartography;
 mod score_and_physics;
 mod selection;
 mod sizing;
+mod speed;
 
 fn first_edge_cell_between(
     canvas: &Canvas,

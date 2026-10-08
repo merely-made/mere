@@ -232,6 +232,20 @@ Murm, Comms, and Meerkat consumer checks are green. Compatibility re-exports in
 `transport` and `mooting`, plus mesh's direct transport/p2panda dependencies,
 still keep this phase from being cleanly closed.
 
+**Corrected 2026-10-06 (S14 pass):** the first blocker is gone. Neither crate
+has a `pub use` of the replication crate any more: `mooting`'s went in
+`be99eadb` (2026-07-15), and `crates/moot/mooting/src/lib.rs` now exports only
+recognition; `transport`'s `synced_space` re-export module was deleted in
+`6d1187a7` (2026-07-27). Read against the tree at mere 535bca11, the
+done-conditions below are met. The second blocker remains: mesh still depends
+directly on `p2panda-core`, `p2panda-store` and `p2panda-net`
+(`crates/mesh/mesh/Cargo.toml`, l.18, 30 and 44), though `transport` is now a
+dev-dependency only.
+
+**Open, raised by the S14 pass (2026-10-06):** is Phase A closed? Options:
+declare it closed on `6d1187a7`, its done-conditions being met; keep it open
+until mesh's remaining direct p2panda dependencies go.
+
 Create `murm-replication` in the current workspace. Move, rather than copy:
 
 1. `SyncedSpace`, `SyncStatus`, and `SyncRound` from `transport`;
@@ -329,6 +343,9 @@ per-user comms directory. Epoch-aware native-drop key rotation preserves
 `CabalId`; group authorization and key distribution remain external. The
 signed-operation grammar is now part of `murm`; the `murmuring` package has been
 removed from the workspace.
+
+**Corrected 2026-10-06 (S14 pass):** "Meerkat selects that redb backend" no
+longer holds: meerkat left the workspace in `c5f01064` (2026-07-18).
 
 ### Phase D: rebase Moot as a domain service
 
@@ -453,10 +470,22 @@ Done when:
 - a headed receipt shows honest connected, catching-up, retained, body-erased,
   and prefix-pruned states.
 
+**Corrected 2026-10-06 (S14 pass):** turnstone now has a peer lane, so the
+first criterion is no longer vacuous. Turnstone's Cargo.toml (l.69-83, at
+turnstone HEAD c3b14cb) depends directly on commons, transport, gemot,
+mere-moot, stickleback and muniment, and its place worker (src/place/worker.rs)
+reads the authorized Moot view. p2panda appears only under `[patch.crates-io]`
+(l.318 on), so the criterion holds, but not vacuously.
+
+**Open, raised by the S14 pass (2026-10-06):** should Phase F be restated now
+that turnstone has a live peer lane? Options: restate it as non-vacuous, with
+turnstone's place worker as the consumer the criteria are held against; leave
+it as written, with the correction above.
+
 ### Phase G: promote the corrected families (WITHDRAWN 2026-07-23)
 
 **This phase is void, and nothing replaces it.** The
-[repo consolidation ruling](2026-07-23_repo_consolidation_plan.md) settled that
+[repo consolidation ruling](../../archive_docs/2026-10-06_completed_plans/2026-07-23_repo_consolidation_plan.md) settled that
 Mere is the platform and its extracted families stay its components, with the
 bar for a separate repository being coherent identity apart from the six
 primaries. It withdraws the murm/moot promotion by name. `repos/murm` *(historical citation)* <!-- doc-audit: historical-path --> and
@@ -540,6 +569,9 @@ never leave a criterion pointing at something that no longer exists.
   forward constraint: when turnstone grows that lane it consumes services from
   the start. Its first criterion is true vacuously today and earns its keep by
   still holding once the lane exists.
+
+  **Corrected 2026-10-06 (S14 pass):** the lane now exists and the criterion
+  still holds, non-vacuously; see the correction under Phase F.
 - **Phase G is void.** The 2026-07-23 consolidation ruling withdrew the
   murm/moot promotion by name, so its standalone-clone conditions describe
   repositories that will never be founded. Marked withdrawn rather than
@@ -626,7 +658,7 @@ dependency out of gemot that was never out. And the posture worth holding is
 about **source**: gemot's code names no session type, which is now enforced by
 the two-file import result above, rather than about a build graph that stopped
 being clean some time ago. The general lesson is the [cambium-winit
-one](2026-07-23_repo_consolidation_plan.md) in a new place: a manifest comment
+one](../../archive_docs/2026-10-06_completed_plans/2026-07-23_repo_consolidation_plan.md) in a new place: a manifest comment
 is a claim about the graph, and only `cargo tree` settles it.
 
 **Receipts:** 228 tests green across the four crates, run before and after the
@@ -751,7 +783,7 @@ was just written to prevent one section above — and I nearly did it here.
 `cargo test -p murm-replication` "again stalled during workspace dependency
 resolution before compilation and was stopped", leaving Murm, Moot, and mesh
 package tests pending "a normal workspace rerun after that resolver state is
-repaired". The [repo consolidation](2026-07-23_repo_consolidation_plan.md) did
+repaired". The [repo consolidation](../../archive_docs/2026-10-06_completed_plans/2026-07-23_repo_consolidation_plan.md) did
 repair it — every one of them now runs from a normal workspace command:
 
 | package | result |
@@ -824,7 +856,7 @@ not one.
 ### 2026-07-24: a moot's commons is unauthorized, and there is no shared-graph record
 
 Surveyed on entering this lane from the [capability model
-round](2026-07-23_capability_model_plan.md), which had just made a moot peer's
+round](../../archive_docs/2026-10-06_completed_plans/2026-07-23_capability_model_plan.md), which had just made a moot peer's
 petition authorizable (`gemot::MootAuthority`). Two structural facts, both
 verified against the tree rather than inferred:
 
@@ -880,6 +912,11 @@ not the log.
 Remaining in this thread: no surface reads the authorized view yet (the product
 call of which view a UI shows), and admission still accepts any well-formed
 `Shared`, which is now deliberate rather than an oversight.
+
+**Corrected 2026-10-06 (S14 pass):** surfaces now read the authorized view.
+Three sites call `authorized_fauna`: `ports/moot/src/captured_web.rs` (l.83) in
+mere, and turnstone's src/place/worker.rs (l.1918) and
+src/place/captured_collection.rs (l.160).
 
 
 ### 2026-07-12: library extraction changes the useful purity rule
@@ -1038,3 +1075,19 @@ protocol design.
   founder-rooted genesis and amendments fold through a muniment-backed store;
   the accepted revision and governed signer set construct the authority. It
   still intentionally cannot infer authority from roster membership.
+
+  **Corrected 2026-10-06 (S14 pass):** this entry repeats the constitution
+  producer entry two bullets above ("Added the native Moot constitution
+  producer"); it records one landing, not two.
+
+### 2026-10-06
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_46_s14_phase_b8.md: Phase A's re-export blocker is
+  annotated as gone (`be99eadb`, `6d1187a7`) with mesh's direct p2panda
+  dependencies still standing, Phase F and its finding are annotated as
+  non-vacuous now that turnstone has a peer lane, the authorized-view readers
+  are recorded, the meerkat mention in Phase C is annotated, the duplicated
+  constitution-producer entry is marked, and two open questions (closing Phase
+  A, restating Phase F) are written in.

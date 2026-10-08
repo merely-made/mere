@@ -80,7 +80,7 @@ impl<B: BackendIr> IrohTransfer<B> {
         capability: TransferCapability,
         remote: iroh::EndpointId,
     ) -> Result<bytes::Bytes, String> {
-        super::time::timeout(TRANSFER_WAIT_TIMEOUT, async {
+        crate::time::timeout(TRANSFER_WAIT_TIMEOUT, async {
             loop {
                 let notified = self.exposed_notify.notified();
                 tokio::pin!(notified);
@@ -129,7 +129,7 @@ impl<B: BackendIr> IrohTransfer<B> {
 
         let exposed = self.exposed.clone();
         crate::server::spawn::spawn_detached(async move {
-            super::time::sleep(TRANSFER_CAPABILITY_TTL).await;
+            crate::time::sleep(TRANSFER_CAPABILITY_TTL).await;
             exposed.lock().await.remove(&capability);
         });
     }
@@ -155,7 +155,7 @@ impl<B: BackendIr> TensorTransfer<B> for IrohTransfer<B> {
             Err(err) => {
                 log::error!("Failed to encode tensor transfer {capability:?}: {err}");
                 return;
-            }
+            },
         };
         self.expose_response(bytes, max_downloads, capability, target)
             .await;
@@ -167,12 +167,12 @@ impl<B: BackendIr> TensorTransfer<B> for IrohTransfer<B> {
         capability: TransferCapability,
     ) -> Option<TensorData> {
         match &remote {
-            PeerAddr::Iroh(_) => {}
+            PeerAddr::Iroh(_) => {},
             #[cfg(feature = "websocket")]
             PeerAddr::WebSocket(_) => {
                 log::error!("An Iroh compute node cannot download from a non-Iroh peer");
                 return None;
-            }
+            },
         }
         let (mut send, mut recv) = match self
             .node
@@ -181,16 +181,16 @@ impl<B: BackendIr> TensorTransfer<B> for IrohTransfer<B> {
         {
             Ok(streams) => streams,
             Err(err) => {
-                log::error!("{err}");
+                log::error!("Cannot open a tensor-transfer stream to {remote}: {err}");
                 return None;
-            }
+            },
         };
         let request = match rmp_serde::to_vec(&TransferMessage::Request(capability)) {
             Ok(request) => request,
             Err(err) => {
                 log::error!("Failed to encode tensor-transfer request: {err}");
                 return None;
-            }
+            },
         };
         if let Err(err) = send_frame(&mut send, &request).await {
             log::error!("{err}");
@@ -202,26 +202,26 @@ impl<B: BackendIr> TensorTransfer<B> for IrohTransfer<B> {
             Ok(None) => {
                 log::error!("Tensor-transfer peer closed without a response");
                 return None;
-            }
+            },
             Err(err) => {
                 log::error!("{err}");
                 return None;
-            }
+            },
         };
         match rmp_serde::from_slice(&response) {
             Ok(TransferMessage::Tensor(data)) => Some(data),
             Ok(TransferMessage::Denied(reason)) => {
                 log::error!("Tensor transfer denied: {reason}");
                 None
-            }
+            },
             Ok(TransferMessage::Request(_)) => {
                 log::error!("Tensor-transfer peer returned a request instead of tensor data");
                 None
-            }
+            },
             Err(err) => {
                 log::error!("Invalid tensor-transfer response: {err}");
                 None
-            }
+            },
         }
     }
 
@@ -234,7 +234,7 @@ impl<B: BackendIr> TensorTransfer<B> for IrohTransfer<B> {
             Err(err) => {
                 log::error!("Failed to encode tensor-transfer failure: {err}");
                 return;
-            }
+            },
         };
         self.expose_response(bytes, 1, capability, target).await;
     }

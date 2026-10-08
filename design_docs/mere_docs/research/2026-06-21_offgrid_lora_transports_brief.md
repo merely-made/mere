@@ -15,7 +15,7 @@ Mere's existing transport seam. Pairs with, and sits beside, the broader p2p sur
 - [`../implementation_strategy/2026-05-07_event_dag_substrate_brief.md`](../implementation_strategy/2026-05-07_event_dag_substrate_brief.md)
   — sync-as-projection, and the Pattern A native (`mooting-*`) vs Pattern B outbound
   bridge (`mere-bridge-*`) split this brief leans on.
-- [`../implementation_strategy/2026-06-03_host_p2p_wiring_plan.md`](../implementation_strategy/2026-06-03_host_p2p_wiring_plan.md)
+- [`../../archive_docs/2026-10-06_superseded_plans/2026-06-03_host_p2p_wiring_plan.md`](../../archive_docs/2026-10-06_superseded_plans/2026-06-03_host_p2p_wiring_plan.md)
   — the honest discovery/bootstrap gap in the live host (gossip + mDNS + tickets).
 - [`2026-06-15_contact_identity_model_brief.md`](2026-06-15_contact_identity_model_brief.md)
   — key-rooted identity (petname → stable key → endpoints), which all three stacks align with.

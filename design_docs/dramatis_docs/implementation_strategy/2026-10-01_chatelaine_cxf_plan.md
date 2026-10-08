@@ -2,14 +2,14 @@
 
 **Date**: 2026-10-01
 **Status (2026-10-04)**: in progress. Shape ruled by Mark on 2026-10-01
-(rulings 7 and 10 to 15 in the dramatis tier architecture; rulings 16 to 62
+(rulings 7 and 10 to 15 in the dramatis tier architecture; rulings 16 to 65
 below). P0 met; P1 landed on `main` (`da3c50bc`); P2 landed (`3e4992ec`); P3
 landed (`ff68e86c`), meeting the Mere 0.4 baseline's chatelaine condition.
-The review stop ended 2026-10-04 (ruling 51). P4a's first build signs RSA
-through `ring` and ECDSA, proven on the ThinkPad; its second round carries
-rulings 54 to 58 (no re-import overwrite, P-521 refused, unsignable keys
-refused, and the RSA key built once by the `rsa` crate, ring signing:
-rulings 58, 59).
+The review stop ended 2026-10-04 (ruling 51), and P4a landed
+(`007fbe7c`, rulings 51 to 63): the agent signs RSA through ring and ECDSA
+(P-256, P-384) beside Ed25519; held keys are never rewritten; unsignable
+keys and P-521 are refused at all three doors. P4 (CXF import) waits for
+the vault lock, in its own plan (rulings 64, 65).
 **Scope**: found `chatelaine` as the tier's plain secret-item taxonomy; move
 castellan's OTP items and its Secret Service store onto it; then import
 (and finally export) the FIDO Credential Exchange Format through castellan.
@@ -22,9 +22,9 @@ castellan's OTP items and its Secret Service store onto it; then import
   C5: the Mere 0.4 baseline waits on chatelaine's taxonomy landing.
 - [standards survey](../../2026-08-24_standards_survey_brief.md) §2.3: CXF
   ADOPT (import first), CXP WATCH, the plaintext hazard.
-- [castellan OTP plan](../../mere_docs/implementation_strategy/2026-08-10_castellan_otp_plan.md):
+- [castellan OTP plan](../../archive_docs/2026-10-06_completed_plans/2026-08-10_castellan_otp_plan.md):
   the RFC-vector-verified OTP core this plan re-homes, not rewrites.
-- [insigne proofs plan](2026-09-23_insigne_proofs_plan.md): the precedent for
+- [insigne proofs plan](../../archive_docs/2026-10-06_completed_plans/2026-09-23_insigne_proofs_plan.md): the precedent for
   a plain-data core with no cryptography, checked by a wasm build.
 
 ---
@@ -439,6 +439,29 @@ key is removed or the profile switches (castellan's remove and switch paths
 included). Recorded: this keeps a second, long-lived in-memory copy of each
 RSA private key, which ring frees without clearing.
 
+**Ruling 63.** *Is the cache secured? It would not be: plain process memory,
+not locked against swap or excluded from dumps, and ring frees it without
+clearing. Verifying a secured cache to the crates' standard is not
+possible for us (clearing ring's copy needs unsafe code or a ring fork, and
+a zeroing, page-locking allocator would be our own mechanism, backed by our
+tests rather than audits); and the vault never locks, so a cache would live
+as long as the agent. What now for RSA?* Options: defer RSA; per signature,
+no cache; keep the cache. Mark: **"Per signature, no cache"**. Follows:
+ruling 62 is withdrawn. The `rsa` crate builds the key on each RSA
+signature, when the agent decodes it from the vault, and ring signs; no
+long-lived copy is held.
+
+**Ruling 64.** *The vault cannot lock (no lock or close method; castellan
+always reports `Unlocked`), and decrypted keys stay in memory until the
+process exits. Locking is its own objective. When?* Options: before P4;
+beside P4; after P4. Mark: **"Before P4 (Recommended)"**. Follows: P4 waits
+for the vault lock, since CXF import brings passwords, cards and OTP secrets
+into the same vault.
+
+**Ruling 65.** *Where does the lock work live?* Options: its own dated plan
+under `dramatis_docs`, assessed by a read-only lane first; a chatelaine
+phase before P4. Mark: **"Its own plan (Recommended)"**.
+
 ## 3. Phases
 
 Each phase lands with its own tests and gates and keeps the workspace green.
@@ -533,15 +556,18 @@ build.
 - **P4a — the agent learns RSA and ECDSA (ruling 25).** personae's SSH slots
   and agent, and castellan's SSH import, accept RSA and ECDSA keys beside
   Ed25519. Waits for Mark's review after P3 (ruling 28). Done when:
-  - [ ] the agent signs with RSA using SHA-2 (`rsa-sha2-256` and
+  - [x] the agent signs with RSA using SHA-2 (`rsa-sha2-256` and
         `rsa-sha2-512`, honouring the agent protocol's signature flags) and
         with ECDSA on the curves `ssh-key` supports;
-  - [ ] the RustSec advisory database is checked for every crate the new
+        *2026-10-06 annotation:* P-256 and P-384 only. P-521 is refused
+        until `ssh-key` decodes it (ruling 55), so "the curves `ssh-key`
+        supports" is met as ruling 55 narrowed it.
+  - [x] the RustSec advisory database is checked for every crate the new
         algorithms pull in (the `rsa` crate included), and any open advisory
         comes back to Mark before this phase lands;
-  - [ ] every existing Ed25519 slot is byte-identical afterwards, and an
+  - [x] every existing Ed25519 slot is byte-identical afterwards, and an
         Ed25519 signature from the new agent verifies exactly as before;
-  - [ ] the new agent is proven against a real `sshd` while running beside
+  - [x] the new agent is proven against a real `sshd` while running beside
         the installed one, on its own socket or pipe; no lane replaces an
         installed agent, and where the end-to-end receipt runs is put to
         Mark at this phase's start, since it means a test key in some
@@ -886,6 +912,41 @@ merged).
   `secret-service` check pass. The portable gate fails only on the known
   worktree-depth `include_str!` errors. Clippy is unchanged.
 
+**2026-10-04: P4a landed** as `007fbe7c` (lane commits `2d2a36c6`,
+`62e69f13`, `4c4ce3bc`, `dfee134a`), after verification at normal depth on
+`main` `ff78acca` (merge `eb79b36e`):
+
+- `cargo metadata --locked`, personae and castellan with every feature (294
+  tests), djinn's 15 test binaries, the linux `secret-service` check, and
+  the full portable gate (1542 packages) passed.
+- The control: RSA signed by the `rsa` crate's own PKCS#1 signer fails the
+  tripwire and the bounds test.
+- PID 53336 was untouched. The merged code differs from the verified tree
+  only in `dfee134a`'s comments.
+
+Round two built the rest:
+
+- The `rsa` crate's standard construction and PKCS#8 export hand ring the
+  key, and the crypto-bigint derivation is gone.
+- Ruling 54's no-op and ruling 56's refusals hold at castellan's import,
+  `ssh-add` and `personae-vault add-ssh`.
+- P-521 is refused.
+- A P-256 or P-384 key that ssh-key's decoder refuses over `ssh-add` still
+  shows only "communication with agent failed", since `ssh-agent-lib`
+  decodes before our code runs.
+- The ThinkPad receipt passed again (RSA-SHA2-256 and -512, P-256, P-384;
+  P-521 and DSA refused) with `authorized_keys` byte-identical. Its native
+  `keeper` and djinn checks pass, after fetching lock-pinned sources there
+  (ruling 61).
+
+**2026-10-04: the vault never locks.** `IdentityVault` has no lock or close
+method; castellan's `PersonaeHost` sets `lock: VaultLockView::Unlocked`
+(`ports/castellan/src/authority.rs:201`), and nothing sets `Locked`, which
+appears only as a label (`projection.rs:614`). Once unlocked, every key's
+decrypted bytes stay in the vault's `SecretBytes` (zeroized on drop, not
+memory-locked) until the process ends. Mark, the same day: "Hey wait, we
+need to be able to lock the vault lmao. Otherwise it's just a big room".
+
 ## 6. Running it
 
 As ruled (26 to 29), with the workspace's lane rules:
@@ -924,3 +985,12 @@ As ruled (26 to 29), with the workspace's lane rules:
   compiles. `--tests` and `--all-features` fail on `ring`'s C build script,
   reached only through castellan's dev-dependency on gazette (`reqwest`,
   `rustls`), so tests are compiled on the ThinkPad.
+
+**2026-10-06, tails inherited from the S14 archive pass** (recorded in the
+[archived plan tails plan](../../mere_docs/implementation_strategy/2026-07-03_archived_plan_tails_plan.md), "2026-10-06 archive pass"). This plan
+now owns:
+- **V4, broader item types**, from the
+  [identity vault SSH agent plan](../../archive_docs/2026-10-06_completed_plans/2026-07-22_identity-vault-ssh-agent_plan.md).
+  S56 answered that plan's question: V4 moves here.
+- **CXF import**, from the castellan OTP plan. That is this plan's P4
+  already, so nothing new.

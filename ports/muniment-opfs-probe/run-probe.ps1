@@ -22,6 +22,10 @@ param(
 $ErrorActionPreference = 'Stop'
 $probeRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $mereRoot = (Resolve-Path (Join-Path $probeRoot '..\..')).Path
+# The repository's pinned toolchain (rust-toolchain.toml; burn plan 13.45),
+# not whatever rustup picks in the neutral directory below.
+. (Join-Path $mereRoot 'scripts\repo-toolchain.ps1')
+Use-RepoToolchain -MereRoot $mereRoot
 $manifest = Join-Path $probeRoot 'Cargo.toml'
 $munimentRoot = Join-Path $mereRoot 'crates\eidetic\muniment'
 $env:CARGO_TARGET_DIR = $TargetDir
@@ -107,8 +111,8 @@ Write-Host "muniment src  sha256: $env:MUNIMENT_OPFS_PROBE_MUNIMENT_SHA256"
 Write-Host "Cargo.lock    sha256: $env:MUNIMENT_OPFS_PROBE_LOCK_SHA256"
 
 $bindgenVersion = (& $WasmBindgen --version).Trim()
-if ($bindgenVersion -ne 'wasm-bindgen 0.2.126') {
-    throw "The probe pins wasm-bindgen 0.2.126; got '$bindgenVersion'. Pass -WasmBindgen with the matching executable."
+if ($bindgenVersion -ne 'wasm-bindgen 0.2.129') {
+    throw "The probe pins wasm-bindgen 0.2.129; got '$bindgenVersion'. Pass -WasmBindgen with the matching executable."
 }
 
 # Build from the neutral directory so `--locked` holds.
@@ -116,7 +120,9 @@ Push-Location $NeutralDir
 try {
     cargo fmt --manifest-path $manifest --check
     if ($LASTEXITCODE -ne 0) { throw 'cargo fmt --check failed; run cargo fmt.' }
-    cargo build --locked --manifest-path $manifest --lib --release --target wasm32-unknown-unknown
+    # The committed wasm cfg (.cargo/config.toml, ruling 558); the neutral
+    # directory would not find it.
+    cargo build --locked --manifest-path $manifest --config (Join-Path $probeRoot '.cargo\config.toml') --lib --release --target wasm32-unknown-unknown
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     cargo test --locked --manifest-path $manifest --release
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

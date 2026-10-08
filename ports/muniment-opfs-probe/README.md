@@ -1,7 +1,7 @@
 # muniment OPFS probe
 
 The executable half of the
-[redb-over-OPFS feasibility plan](../../design_docs/eidetic_docs/implementation_strategy/2026-08-22_redb_opfs_feasibility_plan.md):
+[redb-over-OPFS feasibility plan](../../design_docs/archive_docs/2026-10-06_completed_plans/2026-08-22_redb_opfs_feasibility_plan.md):
 can redb 4.2 run over an OPFS sync-access handle as a muniment backend, inside
 a dedicated browser worker, keeping redb's storage contract and recovery
 guarantees, without an `unsafe` thread claim and without browser authority
@@ -44,7 +44,7 @@ ports/muniment-opfs-probe/run-probe.ps1
 ```
 
 This builds the wasm, writes `fixtures/portability.redb` natively, runs
-wasm-bindgen 0.2.126 (the CLI on this machine; pass `-WasmBindgen` for another
+wasm-bindgen 0.2.129 (the CLI the tree pins; pass `-WasmBindgen` for another
 path), and serves the mere root on port 8733. Open the printed URL in a headed
 Chromium and press **Run every lane**, or drive it:
 

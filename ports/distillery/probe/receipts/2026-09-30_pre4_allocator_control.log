@@ -1,0 +1,8 @@
+distillery-remote-minilm stage: allocator-baseline
+distillery-remote-minilm stage: bind-peers
+distillery-remote-minilm stage: service-mounted
+distillery-remote-minilm stage: first-lease-active
+distillery-remote-minilm stage: first-provider-loaded
+distillery-remote-minilm stage: first-remote-executed
+distillery-remote-minilm stage: native-control-passed
+Error: "CubeCL allocator did not return to baseline after first reclaim: baseline=AllocatorSnapshot { number_allocs: 0, bytes_in_use: 0, bytes_padding: 0, bytes_reserved: 0 }, last=AllocatorSnapshot { number_allocs: 10, bytes_in_use: 5323776, bytes_padding: 0, bytes_reserved: 41943040 }"

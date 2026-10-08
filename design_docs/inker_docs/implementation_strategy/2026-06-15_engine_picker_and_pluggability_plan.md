@@ -1,18 +1,23 @@
 # Engine picker + pluggability — implementation plan
 
 **Date**: 2026-06-15
-**Status**: **Phases 0–3 shipped + verified** (route → activate → manage → pick):
-meerkat now routes both altitudes through `EngineRoutePolicy` (0a/0b), and the
-activation model (global default + per-session override), the apparatus engine
-manager, and the per-node picker all landed. **Remaining:** Phase 4 (no-handler UX +
-local-file sniff), Phase 2b (per-host overrides + per-session toggle), Phase 5
-(verso flip), and the register-viewer harvest. *(The §2 "Findings" below are the
-point-in-time pre-Phase-0 state; the "gap" it names is now closed, see the Progress
-log.)*
-**Page capture P1 (2026-08-30): landed at the Inker boundary.** The shared
-contract now has host-minted request ids, viewport-only requests, typed PNG
-outputs, explicit unknown CSS facts, and a correlated hosted completion event.
-No engine declares capture support yet; adapters remain honestly unsupported.
+**Status (2026-10-06):** Phases 0 to 3 (route, activate, manage, pick) landed
+in meerkat on 2026-06-15 (`d4a1350`, `1966183`, `e90825e`, `b4706c6`,
+`c5f63d8`, `a7e609e`), retired with it 2026-07-18 (`c5f01064`);
+`EngineActivation`, `engine_pins` and `route_document_engine` left with it.
+Surviving library parts: `EngineRoutePolicy` (`route_filtered`,
+`per_host_overrides`) and `is_surface_engine` in `inker::routing`, consumed by
+Pelt, `crates/import`'s web clip, the `mere::routing` facade and Turnstone;
+pandect's `disabled_engines` settings field, with no consumer outside pandect;
+and the graft and weld `SurfaceEngine` impls (`f5c3d9cb`). Page capture P1
+landed at the Inker boundary on 2026-08-30 (host-minted request ids,
+viewport-only requests, typed PNG outputs, explicit unknown CSS facts, a
+correlated hosted completion event); no engine declares capture support yet.
+Open: Phase 2b (per-host override editor, per-session toggle), Phase 4
+(no-handler UX, local-file sniff), Phase 5 (the verso flip and the
+`ScryingTileEngine`/`ProducerFactory` registry fold-in) and the register-viewer
+harvest, none of which has had a host since meerkat left. *(The §2 "Findings"
+below are the pre-Phase-0 state.)*
 **Scope**: The user-facing engine **picker** (an inker affordance), the
 **pluggability / extension model** that makes engines build-, session-, and
 activation-managable, the no-handler fallback, local-file ingestion, and the
@@ -23,9 +28,9 @@ sequenced here as the final phase.
 **Related**:
 
 - [verso compatibility-view charter](../../verso_docs/technical_architecture/2026-06-10_compatibility_view_charter.md) — ownership split (picker = inker, flip = verso), one-hop invariant, sequencing gate. This plan is the picker half of that charter's step 2.
-- engine profile boundary plan (`mere/design_docs/mere_docs/implementation_strategy/2026-05-14_engine_profile_boundary_plan.md`) — `EngineProfileBinding` (Persona/Session/Graph scoping). The activation model here mirrors that tiering.
+- engine profile boundary plan (`mere/design_docs/archive_docs/2026-10-06_retired_plans/2026-05-14_engine_profile_boundary_plan.md`) — `EngineProfileBinding` (Persona/Session/Graph scoping). The activation model here mirrors that tiering.
 - browser multiplexer framing (`mere/design_docs/mere_docs/research/2026-05-11_browser_multiplexer_framing.md`) §5.4, §7, §8 — engines as replaceable producers; "engine route override" capability; `engine.route_chosen` / `engine.route_degraded` diagnostics.
-- modular integration plan (`mere/design_docs/mere_docs/implementation_strategy/2026-06-02_modular_integration_plan.md`) §1.9, §6 — the `register-viewer` vs `inker::routing` dual-routing reconcile, gated on "meerkat first routes >1 content engine."
+- modular integration plan (`mere/design_docs/archive_docs/2026-10-06_superseded_plans/2026-06-02_modular_integration_plan.md`) §1.9, §6 — the `register-viewer` vs `inker::routing` dual-routing reconcile, gated on "meerkat first routes >1 content engine."
 - engine peers + scrying library brief (`mere/design_docs/mere_docs/research/2026-05-11_engine_peers_and_scrying_library_brief.md`) — `scrying.web` / `wry.web` as opt-in engines.
 
 ---
@@ -64,7 +69,7 @@ The scry tier-2 engine is real: [`ScryingTileEngine`](../../../crates/inker/engi
 
 **The gap.** *(Closed by Phase 0, shipped 2026-06-15; this paragraph is the
 pre-Phase-0 record, kept for the Findings narrative.)* meerkat does **not** route
-through `EngineRoutePolicy` at all. It registers `nematic::engines()` only for snapshot cards, drives live content through the constellation, and runs scry through an ad-hoc `compat_pins: HashSet<GraphMemberId>` bool (the path the 2026-06-15 multi-tile work extended). The modular integration plan §6 (`mere/design_docs/mere_docs/implementation_strategy/2026-06-02_modular_integration_plan.md`) names the same gap: `register-viewer` (mime→viewer) duplicates `inker::routing`; reconcile when meerkat first routes >1 content engine. That moment is Phase 0.
+through `EngineRoutePolicy` at all. It registers `nematic::engines()` only for snapshot cards, drives live content through the constellation, and runs scry through an ad-hoc `compat_pins: HashSet<GraphMemberId>` bool (the path the 2026-06-15 multi-tile work extended). The modular integration plan §6 (`mere/design_docs/archive_docs/2026-10-06_superseded_plans/2026-06-02_modular_integration_plan.md`) names the same gap: `register-viewer` (mime→viewer) duplicates `inker::routing`; reconcile when meerkat first routes >1 content engine. That moment is Phase 0.
 
 ## 3. Architecture decisions
 
@@ -153,6 +158,16 @@ that is `engine_available`, the current choice ✓-marked; picking writes `engin
 menu shows Auto ✓ / Genet / System WebView (Wry filtered out); clicking System
 WebView flips the node from genet to a live WebView2.
 
+**Corrected 2026-10-06 (S14 pass):** Phases 0 to 3 were built in meerkat, which
+was deleted in `c5f01064` (2026-07-18): `EngineActivation`, `engine_pins` and
+`route_document_engine` have no hits in code at mere 535bca11. What
+survives is the library half: `EngineRoutePolicy` and `is_surface_engine` in
+`crates/inker/inker/src/routing.rs`, consumed by Pelt
+(`ports/pelt/core/src/workspace.rs`), `crates/import/src/web_clip.rs`, the
+`mere::routing` facade (`crates/mere/src/routing.rs`) and Turnstone; and
+pandect's `disabled_engines` settings field, which nothing outside pandect
+reads.
+
 **Phase 4 — no-handler UX + local files**
 - Surface `route_degraded` in the picker; "open externally" affordance. Content-sniffer for `file://` feeding `content_type`; genet as the web-standard default for local files.
 - *Done when:* opening a local `.md` routes to nematic.markdown, a local `.html` to genet, and an unhandled scheme shows the explicit "no engine / open externally" state.
@@ -172,11 +187,43 @@ WebView flips the node from genet to a live WebView2.
 
 ## Findings
 
+- 2026-10-06: Turnstone's direct Welding 0.15 consumer exposed two input gaps
+  in `crates/inker/engines/weld-engine/src/welding_0_15.rs`: mouse
+  `PointerEvent` always entered the touch-only mapper, and raw key events did
+  not deliver composed text through CEF's separate CHAR path. Native lowercase
+  input needs the character code in CHAR's `windows_key_code`; virtual A (65)
+  inserts uppercase A even when the supplied text is lowercase a.
+
 - 2026-06-15: Routing precedence, `pinned_engine`, `per_host_overrides`, `route_filtered`, and the `host.external-protocol` fallback are all already implemented in [routing.rs](../../../crates/inker/inker/src/routing.rs). The two registries ([engine.rs](../../../crates/inker/inker/src/engine.rs), [surface_engine.rs](../../../crates/inker/inker/src/surface_engine.rs)) cleanly encode the user's two-tier model, and that split coincides with the charter's glass/black-box fidelity axis and the wasm/native build axis. The single missing piece for a picker is consumption: meerkat routes nothing through the policy today.
 - 2026-06-15: The verso charter (Mark, 2026-06-10) already assigns the picker to inker and reserves verso for the flip. The user's "verso = engine switcher" framing resolves to picker (inker) + flip (verso) composed.
 - 2026-06-15: meerkat's content routing is **two-altitude**, and that is inherent, not accidental: at nav time the host has the url (scheme + pin) but not the content-type, which only the off-thread actor learns post-fetch. The policy is built for this (scheme/pin first pass, content-type second pass), so Phase 0 splits cleanly into 0a (UI-thread tier + pin) and 0b (actor content-type), both consulting one `route_policy`. The `is_available` closure must report *true* for the lanes meerkat handles without a document-registry entry (genet html, mere:// internal, external-protocol, linked-data) or an http node would wrongly fall through to the OS hand-off.
 
 ## Progress
+
+- **2026-10-06, shared Weld input follow-up, in progress.** The direct adapter
+  routes mouse pointers through `send_mouse_input`, retaining changed buttons,
+  keyboard modifiers and the held primary/secondary/auxiliary button mask.
+  Touch/pen retain their native contact route. Raw down/up keep virtual and
+  scan codes; pressed composed text follows raw down as separate CHAR events
+  in string order. A producer failure stops the remaining input sequence.
+  Ordered browser completions and owned native-frame custody are unchanged.
+  Library validation: `cargo test --offline --locked -p weld-engine --features
+  welding-0-15 --target-dir C:/t/cargo-targets/mere` passed 11 tests and zero
+  doctests. The five new dispatch tests cover lowercase/BMP text,
+  down/up ordering, failures, rich mouse input, contact routing and the same
+  ordered completion queue. The feature-disabled package's three tests passed
+  too. The full active-doc audit retains 55 missing known-root paths and seven
+  stale historical annotations elsewhere; focused HEAD/working audits of this
+  plan both report zero findings. Consumer done-condition: immutable adapter source
+  adoption with one Inker type identity passes Turnstone's real two-page
+  input/find/zoom, permission and teardown scenarios before removing its host
+  bridge. Broader Mere/Genet repins remain a separate integration decision.
+  Supplementary Unicode is not qualified: pinned Welding's
+  `cef_input::send_key` casts a Rust scalar directly to `u16`; native UTF-16
+  delivery and OS IME require separate supplier/host work. Native consumer
+  evidence lives at
+  `turnstone/docs/receipts/browser_scry_windows_20261006/`; this library pass
+  does not extend those receipts to its new source.
 
 - 2026-08-30: **Page capture P1 contract landed.** Removed the old synchronous
   `SurfaceProducer::capture_snapshot_png` seam without a compatibility shim.
@@ -198,3 +245,93 @@ WebView flips the node from genet to a live WebView2.
 - 2026-06-15: **Phase 1 shipped + verified (meerkat e90825e).** `engine_available` = `engine_present && engine_active`; `EngineActivation` (global default from `settings.json` `disabled_engines` + in-memory per-session override); host lanes exempt. Verified: engine_activation 4/4, settings_store 7/7; headed, `scrying.web` disabled → `>compat_view` node falls back to genet with no producer, re-enable spawns it again.
 - 2026-06-15: **Phases 1b / 3 / 2 shipped + verified (b4706c6, c5f63d8, a7e609e).** 1b: the constellation passes its deactivated set to each spawned actor, which registers only enabled engines (disabled `nematic.gemtext` → synthesized fallback). 3: the single-node context menu offers Auto + "Open in \<engine\>" (✓-marked), writing `engine_pins`; clicking System WebView flips a node to a live WebView2. 2: the apparatus "Engines" section toggles each engine's global activation, persisted to `settings.json`. **The whole picker arc (route → activate → manage → pick) is in and verified. Remaining: Phase 4 (no-handler / local files), Phase 5 (weld/graft + verso flip), Phase 2b (per-host overrides + per-session toggle), register-viewer harvest.**
 - 2026-06-24: the cross-repo grand audit (`genet/docs/2026-06-24_grand_audit.md`) (§5 sidequest 4) endorses registering graft(Servo) + weld(CEF) as tier-2 `SurfaceEngine` impls over the existing `wgpu-graft` / `wgpu-weld` texture-import producers — this is **Phase 5** here (weld/graft, distinct from the verso flip). The audit also re-confirms a still-open item the picker's Phase 0 did *not* close: meerkat's shipped scry pool routes its *pin* through the policy (Phase 0a/0b) but still binds `PlatformWebSurfaceProducer` **concretely** for frame transport, bypassing the `SurfaceEngine` registry (the WebView2 handle-handoff protocol the type-erased lane drops). Folding the producer construction into the registry is the natural Phase-5 companion to graft/weld.
+
+  **Corrected 2026-10-06 (S14 pass):** Phase 5's weld and graft half has
+  landed: `GraftEngine` (`crates/inker/engines/graft-engine/src/engine.rs`)
+  and `WeldEngine` (`crates/inker/engines/weld-engine/src/engine.rs`)
+  implement `SurfaceEngine` (added `f5c3d9cb`). The verso flip and the registry
+  fold-in remain. The [scrying tile plan](../../archive_docs/2026-10-06_completed_plans/2026-06-10_scrying_tile_plan.md)
+  calls that fold-in this plan's Phase 0; Phase 0 routed only the pin, and the
+  fold-in is the Phase-5 companion named here.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_47_s14_phase_b9.md: Phases 0 to 3 recorded as
+  landed in meerkat and retired with it (`c5f01064`), the surviving routing,
+  settings and engine parts named, the graft and weld `SurfaceEngine` impls
+  recorded as landed, and the Phase 0 versus Phase-5 naming of the registry
+  fold-in reconciled with the scrying tile plan.
+
+- **2026-10-06 Graft ordered host events.** `GraftSurface::poll_web_event`
+  now permits a host's single delegate queue to preserve ordering across
+  navigation, title/address changes, messages and correlated completions.
+  `GraftProducer` forwards that queue directly. The default retains the old
+  separate navigation/message polling behavior for existing implementers.
+  Four focused Graft library tests pass, including a mixed-kind ordering
+  regression whose legacy queue hooks reject accidental splitting.
+  The frame seam now describes owned payload custody, per-paint synchronization,
+  content generation versus allocation identity, and WebView-owned resize.
+  This is a shared adapter qualification, not an upstream Servo construction
+  or headed consumer receipt. Turnstone's process-owned Servo host and native
+  page/input/resize/teardown gates remain separate implementation work.
+
+- **2026-10-06, qualified browser compatibility ancestry.** The immutable Mere
+  `db4ee31258b23c86572c429388c5d10bd4de9dc3` revision retains Turnstone's
+  qualified `3d1cdacc` dependency family and carries only the reviewed Weld
+  input and ordered Graft adapter fixes with their existing-plan progress.
+  A two-parent ancestry merge makes that maintenance revision reachable from
+  published main while preserving current main's source and dependency graph;
+  the three adapter source blobs already match. This deliberately preserves
+  unrelated newer main work rather than replaying the maintenance baseline.
+  Turnstone's exact-source Scry/Weld production executable passed the four
+  Windows input, Scry restart and CEF permission gates with native exit zero
+  and `RESULT ok`. Its frozen source/archive evidence is owned by
+  `turnstone/docs/receipts/browser_supplier_integration_20261006/`.
+  The ordered Graft host contract remains library-qualified; the upstream
+  Servo native consumer and supplementary Unicode/OS IME gates are separate.
+
+- **2026-10-07, current upstream and coordinated consumer family, in progress.**
+  Mark explicitly requests upstream Servo 0.7 (`aac43a3f`) and today's
+  CEF `154.5.0+154.0.34`, then a refreshed U9 family rather than the old
+  hash list. Current Mere main `d041cc69` already contains the shared Weld
+  input and ordered Graft fixes; the compatibility branch's only unique
+  source change is its older Genet pin. Its integration takes main's current
+  manifests and adopts published Genet `965b64e2`, whose bounded decoder
+  repair matches the earlier `679d8314` repair without copying its divergent
+  history. All 28 root Genet rows and the three Distillery-probe and seven
+  Graphshell-web rows move together. The initial resolver and locked
+  `mere,graft-engine --all-targets` check pass on Rust 1.98.1; this still
+  preceded the new Weld source pin. The final source pair also passes the
+  locked all-target Mere/Graft/Weld neutral check and all seven adapter
+  tests. Weld `c4dd593b` independently qualifies current CEF on Windows
+  with sandboxed native import pixel samples; the CEF-enabled Mere adapter
+  and combined Turnstone executable remain downstream gates.
+  Receipts: `../testing/receipts/2026-10-07_current_browser_family/`.
+  Mere's optional Djinn Knot dependency remains its independently selected
+  revision; its dormant older Genet packages in the full workspace lock
+  are not proof of a second enabled Turnstone type family. Verify the
+  selected consumer graph after Knot, Redshank and Turnstone repin, in that
+  order. Knot main has independently landed S77's preview fallback and
+  FeedEntry rest handling; unpublished identity seed work is not inferred.
+  Windows native pixels and foreign accessibility remain distinct gates.
+
+- **2026-10-07, foreign accessibility producer seam, library qualified.**
+  Inker's native `SurfaceProducer` now has additive object-safe activation,
+  ordered AccessKit update polling, resynchronization and typed action delivery.
+  Public aliases retain the existing workspace AccessKit 0.24 types without
+  translating tree/node identities or action data. `GraftSurface` exposes the
+  same defaults; the erased producer spawned by `GraftEngine` forwards them
+  unchanged. Legacy producers return no updates and explicit Unsupported
+  control/action errors. Engine/factory accessibility remains Opaque unless
+  its owner separately qualifies and declares a concrete capability.
+  Three focused regressions cover legacy default refusals, nested updates with
+  duplicate local node IDs, FIFO, exact typed action data/refusal propagation,
+  replacement-root resync and deactivation independently of GPU acquisition.
+  On Windows, `cargo test --offline --locked -p inker -p graft-engine --lib
+  -j 1` passed 123 Inker tests and 6 Graft tests on the stable Mere target,
+  at BelowNormal priority. Only Inker's runtime AccessKit edge and Graft's
+  test-only edge are added; Cargo.lock records those two dependency edges
+  without changing package versions or root pins. Turnstone owns graft admission,
+  generation/current-node validation, pane bounds, action policy and idle OS
+  publication. Existing `uxtree::graft` and E1/session work are consumed rather
+  than duplicated. Supplier export/action support, Servo GPU synchronization
+  and native Windows/macOS/Linux assistive-technology walks remain separate.

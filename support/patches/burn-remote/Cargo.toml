@@ -12,7 +12,7 @@
 [package]
 edition = "2024"
 name = "burn-remote"
-version = "0.22.0-pre.2"
+version = "0.22.0"
 authors = ["nathanielsimard <nathaniel.simard.42@gmail.com>"]
 build = false
 autolib = false
@@ -21,7 +21,7 @@ autoexamples = false
 autotests = false
 autobenches = false
 description = "Backend router decorator over the network."
-documentation = "https://docs.rs/burn-router-remote"
+documentation = "https://docs.rs/burn-remote"
 readme = "README.md"
 keywords = [
     "deep-learning",
@@ -30,8 +30,7 @@ keywords = [
 ]
 categories = ["science"]
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/tracel-ai/burn/tree/main/crates/burn-router-remote"
-resolver = "2"
+repository = "https://github.com/tracel-ai/burn/tree/main/crates/burn-remote"
 
 [package.metadata.docs.rs]
 features = ["doc"]
@@ -41,7 +40,10 @@ rustdoc-args = [
 ]
 
 [features]
-client = ["tokio/sync"]
+client = [
+    "tokio/sync",
+    "tokio/rt",
+]
 default = [
     "client",
     "server",
@@ -57,8 +59,15 @@ fusion = [
 iroh = [
     "dep:iroh",
     "tokio/io-util",
+    "dep:tempfile",
 ]
-server = ["tokio/sync", "tokio/macros"]
+server = [
+    "tokio/sync",
+    "tokio/rt",
+    "dep:tracing-subscriber",
+    "dep:blake3",
+    "dep:tokio-util",
+]
 tracing = [
     "burn-communication?/tracing",
     "burn-ir/tracing",
@@ -71,7 +80,7 @@ websocket = [
     "dep:burn-communication",
     "burn-communication/websocket",
     "burn-communication/data-service",
-    "dep:tokio-util",
+    "tokio/net",
 ]
 
 [lib]
@@ -82,8 +91,16 @@ path = "src/lib.rs"
 name = "iroh"
 path = "tests/iroh.rs"
 
+[[test]]
+name = "websocket"
+path = "tests/websocket.rs"
+
+[dependencies.blake3]
+version = "1.8"
+optional = true
+
 [dependencies.burn-backend]
-version = "=0.22.0-pre.2"
+version = "0.22.0"
 features = [
     "default",
     "serde",
@@ -91,44 +108,44 @@ features = [
 default-features = false
 
 [dependencies.burn-communication]
-version = "=0.22.0-pre.2"
+version = "0.22.0"
 optional = true
 default-features = false
 
 [dependencies.burn-fusion]
-version = "=0.22.0-pre.2"
+version = "0.22.0"
 optional = true
 default-features = false
 
 [dependencies.burn-ir]
-version = "=0.22.0-pre.2"
+version = "0.22.0"
 features = ["default"]
 default-features = false
 
 [dependencies.burn-router]
-version = "=0.22.0-pre.2"
+version = "0.22.0"
 features = ["default"]
 default-features = false
 
 [dependencies.burn-std]
-version = "=0.22.0-pre.2"
+version = "0.22.0"
 features = ["default"]
 default-features = false
 
 [dependencies.bytes]
-version = "1.11.1"
+version = "1.12.1"
 default-features = false
 
 [dependencies.iroh]
-version = "1.0.0"
+version = "1.3.0"
 optional = true
 
 [dependencies.log]
-version = "0.4.29"
+version = "0.4.34"
 default-features = false
 
 [dependencies.rand]
-version = "0.10.1"
+version = "0.10.3"
 features = ["std_rng"]
 default-features = false
 
@@ -137,7 +154,7 @@ version = "1.3.1"
 default-features = false
 
 [dependencies.serde]
-version = "1.0.228"
+version = "1.0.229"
 features = [
     "derive",
     "alloc",
@@ -146,12 +163,12 @@ features = [
 default-features = false
 
 [dependencies.serde_bytes]
-version = "0.11.18"
+version = "0.11.19"
 features = ["alloc"]
 default-features = false
 
 [dependencies.tokio]
-version = "1.51.1"
+version = "1.53.1"
 features = [
     "rt",
     "macros",
@@ -163,22 +180,35 @@ features = [
 version = "0.7"
 optional = true
 
-[dev-dependencies]
-burn-flex = { version = "=0.22.0-pre.2", features = ["default"] }
-burn-tensor = { version = "=0.22.0-pre.2", features = ["default", "remote-websocket"] }
+[dependencies.tracing-subscriber]
+version = "0.3.23"
+features = [
+    "default",
+    "fmt",
+    "env-filter",
+]
+optional = true
+
+[dev-dependencies.iroh-relay]
+version = "1.3.0"
+features = ["server"]
 
 [target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies.futures-util]
 version = "0.3"
 
 [target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies.gloo-timers]
-version = "0.3"
+version = "0.4"
 features = ["futures"]
 
 [target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies.wasm-bindgen-futures]
 version = "0.4"
 
+[target.'cfg(not(target_family = "wasm"))'.dependencies.tempfile]
+version = "3.27.0"
+optional = true
+
 [target.'cfg(not(target_family = "wasm"))'.dependencies.tokio]
-version = "1.51.1"
+version = "1.53.1"
 features = [
     "rt",
     "macros",
@@ -188,12 +218,17 @@ features = [
 ]
 
 [lints.clippy]
+redundant_field_names = "allow"
 
 [lints.rustdoc]
 broken_intra_doc_links = "deny"
 invalid_html_tags = "deny"
 
+[dev-dependencies.burn-flex]
+version = "=0.22.0"
+[dev-dependencies.burn-tensor]
+version = "=0.22.0"
+features = ["flex", "remote"]
+[workspace]
 [patch.crates-io]
 burn-remote = { path = "." }
-
-[workspace]
