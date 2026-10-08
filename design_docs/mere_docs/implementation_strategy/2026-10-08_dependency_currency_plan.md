@@ -1,7 +1,7 @@
 # Dependency Currency Plan
 
 **Date:** 2026-10-08
-**Status (2026-10-08):** surveyed, and set as the [workspace upstream refresh](../../../../mer3ly/docs/2026-10-08_workspace_upstream_refresh.md)'s owner-specific stage for mere, genet and netrender (D8); rapier and parry moving on branch `rapier-036` (dynamics grammar plan F163 to F168), with mere's ten compatible updates folded in (D2). The breaking families wait on their order (§4).
+**Status (2026-10-08):** surveyed, and set as the workspace upstream refresh (`mer3ly/docs/2026-10-08_workspace_upstream_refresh.md`)'s owner-specific stage for mere, genet and netrender (D8); rapier and parry moving on branch `rapier-036` (dynamics grammar plan F163 to F168), with mere's ten compatible updates folded in (D2). The breaking families wait on their order (§4).
 **Scope:** bring mere, genet and netrender's crates.io dependencies to current releases; the rest of the workspace follows through repins (D1). Size and footprint are the [dependency footprint brief](../../2026-07-04_dependency_footprint_brief.md)'s; this plan is about currency.
 
 ## 1. How it was measured
