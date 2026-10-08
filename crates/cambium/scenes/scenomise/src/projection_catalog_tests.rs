@@ -9,6 +9,7 @@ use std::sync::Arc;
 use super::*;
 use crate::catalog::FAMILIES;
 use crate::registry::{SolveError, Solver, SolverCapability};
+use scenograph::options::{OptionDefault, OptionKind, OptionSpec};
 use scenograph::{
     Appearance, Arrangement, Encoding, Interaction, Provenance, Reading, RevisionEvidence,
     SelectionMode,
@@ -224,7 +225,14 @@ struct Line;
 
 impl Solver for Line {
     fn capability(&self) -> SolverCapability {
-        SolverCapability::new("test.line", "Line")
+        let mut capability = SolverCapability::new("test.line", "Line");
+        capability.options = vec![OptionSpec::new(
+            "step",
+            "Step",
+            OptionKind::Positive,
+            OptionDefault::Value("10".into()),
+        )];
+        capability
     }
 
     fn place(
@@ -258,6 +266,41 @@ fn a_registered_solver_compiles_through_the_registry() {
         .compile(&recipe, &dataset())
         .unwrap_err();
     assert!(fields(&issues).contains(&"arrangement.kind"));
+}
+
+/// A registered solver's options are judged against its declaration when the
+/// projection compiles, before it solves (SE8).
+#[test]
+fn a_solvers_options_are_judged_against_its_declaration() {
+    let mut registry = SolverRegistry::new();
+    registry.register(Arc::new(Line)).unwrap();
+    let compiler = ProjectionCompiler::with_registry(sizes(164.0, 68.0), registry);
+    let issues_for = |key: &str, value: &str| {
+        let mut recipe = definition("test.line", "x");
+        recipe.arrangement.options.insert(key.into(), value.into());
+        compiler
+            .compile(&recipe, &dataset())
+            .err()
+            .unwrap_or_default()
+            .into_iter()
+            .map(|issue| (issue.field, issue.message))
+            .collect::<Vec<_>>()
+    };
+    assert_eq!(issues_for("step", "25"), Vec::new());
+    assert_eq!(
+        issues_for("step", "-1"),
+        [(
+            "arrangement.options.step".to_string(),
+            "needs a positive finite number".to_string()
+        )]
+    );
+    assert_eq!(
+        issues_for("stride", "2"),
+        [(
+            "arrangement.options.stride".to_string(),
+            "test.line does not read this option".to_string()
+        )]
+    );
 }
 
 #[test]

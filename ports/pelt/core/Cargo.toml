@@ -16,4 +16,5 @@ readme = "README.md"
 genet-host-api = { workspace = true }
 workbench = { workspace = true }
 inker = { workspace = true }
+page-load = { workspace = true }
 url = "2.5"
