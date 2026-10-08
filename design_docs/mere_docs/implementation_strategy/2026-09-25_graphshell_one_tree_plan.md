@@ -1018,3 +1018,23 @@ this tree.
   native/browser and performance limits. The reservoir panel remains V2b step
   5; shared editor and dynamics status is linked to its owning plans. No new
   runtime verification or phase-completion claim.
+- 2026-10-08: bounded Genet livery lookup repair adopted at published Genet
+  `15713014e2e23b887360471552f75f60684f5384`. All 38 current Genet rows move
+  from `e84f9c7f9aec23320c539784961d1465f8a53a9b` across the root, standalone
+  Graphshell web, and Distillery probe manifests; root and probe locks are
+  refreshed. Root still resolves the separately pinned Knot Genet `965b64e`
+  `fleece` and `layout-dom-api` packages as a second source; the optional Knot
+  pin is intentionally unchanged under ruling 58.
+  Locked Cambium library (251), Mesquite library (19), and rootstock
+  `no-default-features,image-decode` checks pass. This is dependency adoption
+  evidence, not a headed/browser or feature-completion claim; command logs are
+  under `/Users/markik/Code/testing/genet-boundary-20261008.R85RvP/evidence/`.
+  All three commands use the isolated worktree based on `daf08a3f` and
+  `CARGO_TARGET_DIR=/Users/markik/Code/testing/genet-boundary-20261008.R85RvP/mere-target`:
+  `cargo test --locked -p cambium --lib`,
+  `cargo test --locked -p mesquite --lib`, and
+  `cargo check --locked -p cambium-rootstock --no-default-features --features image-decode`.
+  Final gates rerun after unrelated resolver-edge cleanup; no probe compile or
+  Graphshell web build is claimed. Genet's wider gate retains three failures
+  reproduced on its untouched base (two float cases and one table-glyph case);
+  consumer checks do not establish a wholly green upstream suite.
