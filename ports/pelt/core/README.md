@@ -1,11 +1,24 @@
 # pelt-core
 
-`pelt-core` is the embeddable controller of the Pelt reference browser. A
-`PeltController` owns one retained document session, its engine registries,
-navigation history, host-neutral input effects, target size, and frame
-production. `PeltWorkspace` arranges one controller per document tile through
-the shared `TileTree`, retaining inactive tabs and routing Frisket content-hole
-geometry without adding a window or paint dependency.
+`pelt-core` is the embeddable controller of the Pelt reference browser.
+
+- A `PeltController` owns one retained document session, its engine
+  registries, navigation history, host-neutral input effects, target size,
+  and frame production.
+- A `PeltContent` is one routed piece of browsing content: a document lane
+  (a `PeltController`) or a surface lane (a live web-engine producer), behind
+  one command, input, frame and routing API. Every new load is routed through
+  the shared `PeltRegistries`:
+  - A document lane changes engine as its addresses and response media types
+    require. History reopens each entry with the engine it was shown with.
+  - A load that routes to a surface swaps lanes, and a surface asked for a
+    document address swaps back. History does not cross lanes.
+- `PeltWorkspace` arranges one `PeltContent` per document tile through the
+  shared `TileTree`, retaining inactive tabs and routing Frisket content-hole
+  geometry, without adding a window or paint dependency.
+
+A host with its own arrangement holds `PeltContent` directly, keyed however
+it likes.
 
 Concrete engines receive resource policy when the caller registers them.
 The controller receives a caller-owned clock and returns the engine's generic
