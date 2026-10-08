@@ -938,6 +938,19 @@ V2b's rulings, all 2026-09-25:
     extracted, authored and suggested apart waits until a mere holds Knot's
     catalog. The alternative added sub-kinds to the route's labels and mapped
     them onto the three.
+44. **Undo restores a node's visit stamp** (2026-10-08). The kernel test
+    `a_removed_node_comes_back_whole` flaked: undo's node recreation compared
+    the removed node with a newly born one, and birth stamps `visit.history`
+    from the clock, so a node made in the millisecond its revert was computed
+    looked already right and came back restamped. Forced into that timing it
+    failed 19 of 19. Asked "Which fix?", Mark chose "Kernel fix": recreation
+    never counts the born visit stamp as already right, so the original is
+    always written back. The alternatives were normalizing the stamp in the
+    test, which ruling 19 had already declined for undo, or both.
+45. **A test that forces the timing** (2026-10-08). Mark chose "Add
+    forced-timing test": `a_restored_node_keeps_its_visit_stamp_across_a_clock_tick`
+    waits for the clock to tick between computing a revert and applying it.
+    The alternative relied on repeated runs to catch the flake by chance.
 
 ## 8. Progress
 
@@ -1550,3 +1563,9 @@ V2b's rulings, all 2026-09-25:
   and made consumer authority/ownership gates explicit. V2b steps 4–5 and
   V3–V5 remain open; historical browser verdicts are not upgraded. Documentation
   only: no runtime gates, shared-contract changes or consumer repins.
+- 2026-10-08: rulings 44 and 45 landed in `revert.rs`. `recreate` marks the
+  born `visit.history` as never matching, and the forced-timing test failed 5
+  of 5 with that line removed. With the fix, the `revert` filter passed in a
+  50-run loop. A control damaged a restored node's title, tag and custom
+  facet, and added an edge: each showed in the fingerprint's half it belongs
+  to. No clock seam was added.
