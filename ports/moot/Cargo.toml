@@ -37,3 +37,17 @@ serde_json = { workspace = true }
 eidetic = { workspace = true }
 fleece = { workspace = true }
 genet-static-dom = { workspace = true }
+
+# The Commons + Moot coop proof is a port consumer; shared Commons must not
+# depend back on a port, even to build this example.
+commons-spine.workspace = true
+chartulary.workspace = true
+gemot.workspace = true
+insigne = { workspace = true, features = ["verify"] }
+muniment = { workspace = true, features = ["redb"] }
+personae.workspace = true
+servitor.workspace = true
+stickleback.workspace = true
+p2panda-core = "0.7.0"
+hex = "0.4"
+tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread"] }
