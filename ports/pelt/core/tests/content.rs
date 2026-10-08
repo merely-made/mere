@@ -399,3 +399,33 @@ fn an_engine_pin_holds_across_navigations() {
         "the held address survives reconstruction"
     );
 }
+
+#[test]
+fn host_history_content_hands_links_up_and_opens_entries_in_either_lane() {
+    let fixture = fixture(false);
+    let mut content = open(
+        fixture.registries.with_host_history(),
+        PeltTileRequest::new(CAPSULE, (640, 480)),
+    );
+    assert_eq!(
+        content.document().unwrap().history_mode(),
+        pelt_core::PeltHistoryMode::Host
+    );
+    let back = content.command(SessionNavigationCommand::Back);
+    assert!(!back.handled, "document Back belongs to the host");
+
+    let surface = content.open(SessionSpawnRequest::new("web://site.test/"));
+    assert!(surface.navigated);
+    assert_eq!(content.lane(), PeltLane::Surface);
+
+    let document = content.open(SessionSpawnRequest::new("gemini://capsule.test/next.gmi"));
+    assert!(document.navigated);
+    assert_eq!(content.lane(), PeltLane::Document);
+    assert_eq!(content.address(), Some("gemini://capsule.test/next.gmi"));
+    let controller = content.document().unwrap();
+    assert_eq!(controller.history_mode(), pelt_core::PeltHistoryMode::Host);
+    assert!(
+        !controller.can_go_back(),
+        "the swap opens one entry, not a history"
+    );
+}
