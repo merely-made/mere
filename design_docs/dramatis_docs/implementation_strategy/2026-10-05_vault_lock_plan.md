@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-08)**: rulings 1 to 69 in §3; the threat statement is
+**Status (2026-10-08)**: rulings 1 to 70 in §3; the threat statement is
 still open. L1 landed (`2556a20c`). L2's checkpoints A (`7c588deb`) and B
 (`ec1768ab`) landed. Still to come in L2: the Secret Service on the
 ThinkPad, ruling 42 (Linux starts locked), ruling 44 (Distillery's
@@ -816,6 +816,12 @@ checkpoint, proven under a disposable bus, with djinn's wiring and the
 hand-over from gnome-keyring as later items; djinn serves it now behind an
 owner setting that is off by default. Mark: **"Test-served for now
 (Recommended)"**.
+
+**Ruling 70** *(the Linux residue; asked 2026-10-08).* *On Linux, personae's
+`no_residue` finds the sealed root key in a 564-byte block freed uncleared
+during `save` (3 of 3 runs; clean on Windows at the same commit).* Options:
+trace it now, with ruling 42's Linux proof waiting; ruling 42's proof
+first; record it and go on to L3. Mark: **"Trace it now (Recommended)"**.
 
 Still open: a threat statement naming hibernation and the pagefile.
 
