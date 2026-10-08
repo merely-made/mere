@@ -10,7 +10,11 @@ description = "Tabard's reusable appearance workshop surface and authored-theme 
 [dependencies]
 tabard.workspace = true
 tinct.workspace = true
-cambium.workspace = true
+cambium = { workspace = true, features = ["highlight"] }
+sprigging.workspace = true
+mere-document-lanes.workspace = true
+inker.workspace = true
+netrender.workspace = true
 
 [dev-dependencies]
 cambium-genet-winit-host.workspace = true

@@ -7,8 +7,23 @@
 //! Tabard's appearance workshop: one retained product model and Cambium
 //! surface for standalone and embedding hosts.
 
+mod graph;
+mod reader;
 mod state;
 mod surface;
 
+pub use reader::{READER_LEAF_KEY, ReaderSpecimen};
 pub use state::{SeedRole, WorkshopState};
-pub use surface::{WORKSHOP_CSS, WorkshopView, workshop_view};
+pub use surface::{WORKSHOP_CODE_SAMPLE, WORKSHOP_CSS, WorkshopView, workshop_view};
+
+/// The shared component sheets and the workshop frame, in cascade order.
+pub fn workshop_stylesheet() -> String {
+    format!(
+        "{}\n{}\n{}",
+        cambium::GRAPH_CANVAS_SWATCH_CSS,
+        cambium::SYNTAX_HIGHLIGHT_CSS,
+        WORKSHOP_CSS
+    )
+}
+
+pub const GRAPH_LEAF_KEY: u64 = graph::GRAPH_LEAF_KEY;
