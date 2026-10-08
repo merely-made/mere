@@ -501,6 +501,12 @@ pub fn validate_policy_coverage(
 
 // ─── The OS-facing half ─────────────────────────────────────────────────────
 
+/// The time since the last keyboard or mouse input in this session, where
+/// the OS says (Windows); `None` when it cannot.
+pub fn input_idle() -> Option<std::time::Duration> {
+    sensed::idle_ms().map(std::time::Duration::from_millis)
+}
+
 #[cfg(windows)]
 mod sensed {
     use mesh::NetworkClass;
