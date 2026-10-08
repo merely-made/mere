@@ -318,6 +318,8 @@ pub struct Pending {
     changes: Seq,
     checkpoint: Option<Seq>,
     updated_at: Option<SystemTime>,
+    /// Views written, with the log position each was written through.
+    views: Vec<(ViewKey, Seq)>,
 }
 
 impl Pending {
@@ -664,6 +666,10 @@ impl<B: Backend> GraphSession<B> {
         !self.head_stored
             || self.journal.live_cursor() > self.saved
             || self.changes.next_seq() > self.changes_saved
+            || self
+                .views
+                .values()
+                .any(|view| view.log.next_seq() > view.saved)
     }
 
     pub fn pending(&self, at: SystemTime) -> Result<Pending, SessionError> {
@@ -705,17 +711,35 @@ impl<B: Backend> GraphSession<B> {
                 pretty(self.keys.at(CHECKPOINT), &Checkpoint { cursor: journal })?,
             ]);
         }
+        let mut views = Vec::new();
+        for (key, view) in &self.views {
+            let through = view.log.next_seq();
+            if through > view.saved {
+                ops.push(pretty(self.keys.view(key), &view.current)?);
+                ops.extend(
+                    view.log
+                        .entry_writes::<JsonCodec>(&self.keys.view_log(key), view.saved)?,
+                );
+                views.push((key.clone(), through));
+            }
+        }
         Ok(Pending {
             ops,
             journal,
             changes,
             checkpoint,
             updated_at,
+            views,
         })
     }
 
     /// Mark a [`Pending`] batch as stored, once it has committed.
     pub fn stored(&mut self, pending: Pending) {
+        for (key, through) in pending.views {
+            if let Some(view) = self.views.get_mut(&key) {
+                view.saved = view.saved.max(through);
+            }
+        }
         self.head_stored = true;
         self.saved = self.saved.max(pending.journal);
         self.changes_saved = self.changes_saved.max(pending.changes);
@@ -932,26 +956,21 @@ impl<B: Backend> GraphSession<B> {
         key: ViewKey,
         state: ViewIntent,
     ) -> Result<(), SessionError> {
+        self.set_view_now(author, key, state);
+        self.store(wall_clock_now(), Vec::new(), false).await
+    }
+
+    /// [`set_view`](Self::set_view), not stored until the next batch, which
+    /// writes the view with the journal it names (Scenograph editor plan, SE31).
+    pub fn set_view_now(&mut self, author: Author, key: ViewKey, state: ViewIntent) {
         let cursor = self.journal.live_cursor();
-        let mut pending = self.pending(wall_clock_now())?;
-        let current = self.keys.view(&key);
-        let log_key = self.keys.view_log(&key);
-        let view = self.views.entry(key.clone()).or_default();
+        let view = self.views.entry(key).or_default();
         view.log.append(ViewEntry {
             author,
             cursor,
             state: state.clone(),
         });
-        pending.ops.push(pretty(current, &state)?);
-        pending
-            .ops
-            .extend(view.log.entry_writes::<JsonCodec>(&log_key, view.saved)?);
-        self.slots.backend().apply(&pending.ops).await?;
-        self.stored(pending);
-        let view = self.views.get_mut(&key).expect("the view was just written");
         view.current = state;
-        view.saved = view.log.next_seq();
-        Ok(())
     }
 
     /// Put the session in the trash: its manifest is marked, its keys stay.
@@ -1729,6 +1748,42 @@ mod tests {
             assert_eq!(reopened.view_at(&key, Seq(0)), Some(&spectral));
             assert!(ViewKey::new("Knot", "main").is_err());
             assert!(ViewKey::new("knot", "../main").is_err());
+        });
+    }
+
+    #[test]
+    fn a_view_set_now_waits_for_the_next_batch() {
+        pollster::block_on(async {
+            let store = MemoryBackend::new();
+            let mere = MereSessions::new(store.clone());
+            let id = mere.mint(person(), None).await.unwrap().session_id;
+            let mut session = mere.open(id).await.unwrap();
+            assert!(!session.has_unstored());
+            let key = ViewKey::new("graphshell", "commands").unwrap();
+            let menu = ViewIntent {
+                commands: Some(crate::CommandMenuView {
+                    added: vec!["add-address".into()],
+                    removed: vec!["zoom-out".into()],
+                    recent: vec!["zoom-in".into()],
+                }),
+                ..ViewIntent::default()
+            };
+            session.set_view_now(person(), key.clone(), menu.clone());
+            assert_eq!(session.view(&key), Some(&menu));
+            assert!(session.has_unstored(), "the view waits for a batch");
+            assert_eq!(
+                mere.open(id).await.unwrap().view(&key),
+                None,
+                "not stored yet"
+            );
+
+            let pending = session.pending(wall_clock_now()).unwrap();
+            store.apply(pending.ops()).await.unwrap();
+            session.stored(pending);
+            assert!(!session.has_unstored());
+            assert!(session.pending(wall_clock_now()).unwrap().is_empty());
+            assert_eq!(mere.open(id).await.unwrap().view(&key), Some(&menu));
+            assert_eq!(session.journal().len(), 0, "a view is not graph truth");
         });
     }
 

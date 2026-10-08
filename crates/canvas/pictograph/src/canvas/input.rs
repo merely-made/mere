@@ -21,8 +21,8 @@ use super::build::hyperlink;
 use super::edge_cells::{edge_cell_hit_test, edge_cells_in_rect};
 use super::seiche_bridge::seed_cluster;
 use super::{
-    CLICK_SLOP, Canvas, Drag, EDGE_PICK_TOL, ORBIT_TILT_PER_PX, ORBIT_YAW_PER_PX, PointerButton,
-    SETTLE_TICKS, WHEEL_PAN_SCALE, ZOOM_STEP,
+    CLICK_SLOP, Canvas, ContextRequest, Drag, EDGE_PICK_TOL, EmptyPress, ORBIT_TILT_PER_PX,
+    ORBIT_YAW_PER_PX, PointerButton, SETTLE_TICKS, WHEEL_PAN_SCALE, ZOOM_STEP,
 };
 use seiche::Role;
 
@@ -69,6 +69,23 @@ impl Canvas {
             self.pan_velocity = d;
             self.middle_drag = Some(new);
             redraw = true;
+        }
+        if let Some(mut press) = self.empty_press {
+            if !press.panning && (new.0 - press.press.0).hypot(new.1 - press.press.1) > CLICK_SLOP {
+                // A left-drag on empty canvas pans, as a middle-drag does (SE23).
+                press.panning = true;
+                self.follow = false;
+                self.pan_velocity = (0.0, 0.0);
+            }
+            if press.panning {
+                let d = (new.0 - press.last.0, new.1 - press.last.1);
+                self.camera.offset.0 += d.0;
+                self.camera.offset.1 += d.1;
+                self.pan_velocity = d;
+                press.last = new;
+                redraw = true;
+            }
+            self.empty_press = Some(press);
         }
         if let Some(prev) = self.orbit_drag {
             // Alt+left orbit: horizontal drag yaws the view, vertical drag reclines the tilt
@@ -175,7 +192,9 @@ impl Canvas {
 
     /// A pointer button pressed at screen px `(x, y)`. Middle begins a pan; left
     /// grabs the node under the cursor (via [`pick_at`](Self::pick_at), projection-aware)
-    /// or, on empty space, begins a marquee.
+    /// or, on empty space, begins a press that becomes a pan past the slop; right
+    /// begins a marquee that a release within the slop turns into a context-menu
+    /// request (SE23, SE26).
     pub fn pointer_down(&mut self, button: PointerButton, x: f32, y: f32) -> bool {
         self.cursor = (x, y);
         match button {
@@ -202,18 +221,35 @@ impl Canvas {
                     // Grabbed a field's box edge (move) or corner (resize) — the deep
                     // interior fell through, so no marquee starts. (Field regions.)
                 } else {
-                    self.marquee = Some(self.cursor);
+                    self.empty_press = Some(EmptyPress {
+                        press: self.cursor,
+                        last: self.cursor,
+                        panning: false,
+                    });
                 }
             },
-            PointerButton::Right => {},
+            PointerButton::Right => {
+                self.marquee = Some(self.cursor);
+            },
         }
         false
     }
 
-    /// A pointer button released at screen px `(x, y)`. Ends a middle-pan; drops a
-    /// dragged node (re-settling its neighborhood) or selects a clicked node; ends
-    /// a marquee (rect-select) or, on a bare empty click, picks the nearest edge
-    /// within tolerance, else clears the selection.
+    /// Whether a left-drag on empty canvas is panning (SE23).
+    pub fn left_panning(&self) -> bool {
+        self.empty_press.is_some_and(|press| press.panning)
+    }
+
+    /// Take the right click waiting for the host's context menu, if any (SE26).
+    pub fn take_context_request(&mut self) -> Option<ContextRequest> {
+        self.context_request.take()
+    }
+
+    /// A pointer button released at screen px `(x, y)`. Ends a middle-pan or a
+    /// left pan; drops a dragged node (re-settling its neighborhood) or selects a
+    /// clicked node; on a bare empty click, picks the nearest edge within
+    /// tolerance, else clears the selection. A right release ends a marquee
+    /// (rect-select), or within the slop asks for the host's context menu.
     pub fn pointer_up(&mut self, button: PointerButton, x: f32, y: f32) -> bool {
         self.cursor = (x, y);
         match button {
@@ -252,56 +288,74 @@ impl Canvas {
                         self.select_only(d.node);
                     }
                     true
-                } else if let Some(origin) = self.marquee.take() {
-                    let dragged =
-                        (self.cursor.0 - origin.0).hypot(self.cursor.1 - origin.1) > CLICK_SLOP;
-                    if dragged {
-                        let region = Box2D::from_points([
-                            self.screen_to_world(origin),
-                            self.screen_to_world(self.cursor),
-                        ]);
-                        let sel = self.view.rect_select(region);
-                        self.selected = sel
-                            .nodes
-                            .into_iter()
-                            .filter(|&key| self.node_visible_in_canvas(key))
-                            .collect();
-                        self.selected_edges =
-                            edge_cells_in_rect(&self.graph, &self.view, &self.hidden_edges, region)
-                                .into_iter()
-                                .filter(|cell| {
-                                    self.node_visible_in_canvas(cell.from)
-                                        && self.node_visible_in_canvas(cell.to)
-                                })
-                                .collect();
-                    } else if !self.shift {
-                        // A bare empty click clears the selection (and may pick an
-                        // edge under the cursor). With Shift held it is a no-op, so a
-                        // multi-select in progress is preserved.
-                        let world = self.screen_to_world(self.cursor);
-                        let tol = EDGE_PICK_TOL / self.camera.zoom.max(f32::EPSILON);
-                        self.selected.clear();
-                        self.selected_edges.clear();
-                        if let Some(cell) = edge_cell_hit_test(
-                            &self.graph,
-                            &self.view,
-                            &self.hidden_edges,
-                            world,
-                            tol,
-                        )
-                        .filter(|cell| {
-                            self.node_visible_in_canvas(cell.from)
-                                && self.node_visible_in_canvas(cell.to)
-                        }) {
-                            self.selected_edges.insert(cell);
-                        }
+                } else if let Some(press) = self.empty_press.take() {
+                    // A pan already moved the camera live; its momentum glides on.
+                    if !press.panning && !self.shift {
+                        self.bare_empty_click();
                     }
                     true
                 } else {
                     false
                 }
             },
-            PointerButton::Right => false,
+            PointerButton::Right => {
+                let Some(origin) = self.marquee.take() else {
+                    return false;
+                };
+                if (self.cursor.0 - origin.0).hypot(self.cursor.1 - origin.1) > CLICK_SLOP {
+                    self.rect_select(origin);
+                    true
+                } else {
+                    self.context_request = Some(ContextRequest {
+                        at: self.cursor,
+                        node: self
+                            .pick_at(self.cursor)
+                            .and_then(|key| self.graph.get_node(key))
+                            .map(|node| node.id),
+                    });
+                    false
+                }
+            },
+        }
+    }
+
+    /// Select what a marquee from `origin` to the cursor covers (SE23).
+    fn rect_select(&mut self, origin: (f32, f32)) {
+        let region = Box2D::from_points([
+            self.screen_to_world(origin),
+            self.screen_to_world(self.cursor),
+        ]);
+        let sel = self.view.rect_select(region);
+        self.selected = sel
+            .nodes
+            .into_iter()
+            .filter(|&key| self.node_visible_in_canvas(key))
+            .collect();
+        self.selected_edges =
+            edge_cells_in_rect(&self.graph, &self.view, &self.hidden_edges, region)
+                .into_iter()
+                .filter(|cell| {
+                    self.node_visible_in_canvas(cell.from) && self.node_visible_in_canvas(cell.to)
+                })
+                .collect();
+    }
+
+    /// A bare empty click clears the selection and may pick an edge under the
+    /// cursor. The caller skips it with Shift held, so a multi-select in
+    /// progress is preserved.
+    fn bare_empty_click(&mut self) {
+        let world = self.screen_to_world(self.cursor);
+        let tol = EDGE_PICK_TOL / self.camera.zoom.max(f32::EPSILON);
+        self.selected.clear();
+        self.selected_edges.clear();
+        if let Some(cell) =
+            edge_cell_hit_test(&self.graph, &self.view, &self.hidden_edges, world, tol).filter(
+                |cell| {
+                    self.node_visible_in_canvas(cell.from) && self.node_visible_in_canvas(cell.to)
+                },
+            )
+        {
+            self.selected_edges.insert(cell);
         }
     }
 
