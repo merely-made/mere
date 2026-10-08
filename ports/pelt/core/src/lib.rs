@@ -4,8 +4,8 @@
 
 //! Window-neutral Pelt host controller.
 
-mod workspace;
 mod surface_policy;
+mod workspace;
 
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -18,26 +18,103 @@ use inker::{
     SessionRegistry, SessionScrollKey, SessionSpawnRequest, SurfaceEngineRegistry,
 };
 
+pub use page_load::{
+    FetchFailure, FetchOutcome, FetchRequestId, Fetched, LoadPhase, LoadedDocument, PageProgress,
+};
+use page_load::{LoadAnswer, PageLoad};
+pub use surface_policy::SurfaceResourcePolicy;
 pub use workspace::{
     PeltRegistries, PeltRouteSource, PeltRouteState, PeltSurfaceLayer, PeltTileFrame,
     PeltTileInspection, PeltTileRequest, PeltTileRoute, PeltWorkspace, PeltWorkspaceFrame,
     PeltWorkspaceOutcome, WorkspaceRect,
 };
-pub use surface_policy::SurfaceResourcePolicy;
 
 /// Host-neutral state for a controller's document presentation.
 ///
-/// A controller spawn is synchronous today, so [`Self::Loading`] does not
-/// describe transport progress. It records that a replacement session needs
-/// one host-composed frame before the host can call
-/// [`PeltController::mark_document_presented`]. A failed replacement leaves
+/// [`Self::Loading`] does not describe transport progress. It records that a
+/// replacement session needs one host-composed frame before the host can call
+/// [`PeltController::mark_document_presented`]. Transport progress is
+/// [`Self::Fetching`], which only a host-loading controller enters; the
+/// current session stays on screen while it lasts. A failed replacement leaves
 /// the current session and history intact while exposing the attempted address
 /// and error to the host's own diagnostic document.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum PeltDocumentState {
     Ready,
-    Loading { address: String },
-    Error { address: String, message: String },
+    Loading {
+        address: String,
+    },
+    Error {
+        address: String,
+        message: String,
+    },
+    /// The host's transport is fetching `address` for exact `request`.
+    Fetching {
+        address: String,
+        request: FetchRequestId,
+    },
+    /// The transport needs the host before `address` can load: an input
+    /// prompt, a client identity, or a changed certificate. The conversation
+    /// and its stores are the host's; the current session stays intact.
+    Awaiting {
+        address: String,
+        failure: FetchFailure,
+    },
+}
+
+/// Who fetches a controller's top-level documents.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub enum PeltLoadMode {
+    /// The document engine loads through the fetcher it was registered with,
+    /// synchronously inside its spawn. Pelt's original mode.
+    #[default]
+    Engine,
+    /// The host's transport fetches. The controller queues
+    /// [`PeltLoadCommand`]s (drained with
+    /// [`PeltController::take_load_commands`]) and takes the answers back
+    /// through [`PeltController::accept_progress`] and
+    /// [`PeltController::accept_outcome`], gated on their exact request.
+    Host,
+}
+
+/// One command for the host's transport.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum PeltLoadCommand {
+    Fetch {
+        request: FetchRequestId,
+        url: String,
+    },
+    /// Abort one exact request; the controller has already retired it.
+    Cancel { request: FetchRequestId },
+}
+
+/// A response the controller will not render. The host stores it.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct PeltDownload {
+    pub url: String,
+    pub fetched: Fetched,
+}
+
+/// Replace a live session's body in place while a transfer streams. Engines
+/// that cannot do so return `false`; the controller then shows the complete
+/// document when the transfer settles.
+pub type PeltBodyReplacer<F> = fn(&mut dyn DocumentSession<F>, &str, &str) -> bool;
+
+/// A host-loading controller's in-flight load and how it commits to history.
+#[derive(Clone, Debug)]
+struct PendingLoad {
+    request: FetchRequestId,
+    entry: SessionSpawnRequest,
+    commit: HistoryCommit,
+    /// A session for this load has been installed from a streamed prefix.
+    live: bool,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum HistoryCommit {
+    Push,
+    Replace,
+    Traverse(usize),
 }
 
 /// Identity of one live Pelt document session. The controller instance never
@@ -70,6 +147,7 @@ pub trait PeltClock: 'static {
 pub struct PeltControllerConfig {
     pub engine_id: String,
     pub request: SessionSpawnRequest,
+    pub load_mode: PeltLoadMode,
 }
 
 impl PeltControllerConfig {
@@ -91,7 +169,16 @@ impl PeltControllerConfig {
         Self {
             engine_id: engine_id.into(),
             request,
+            load_mode: PeltLoadMode::Engine,
         }
+    }
+
+    /// Let the host's transport fetch top-level documents. A request without a
+    /// held body opens on an empty document of the same engine and queues its
+    /// first fetch.
+    pub fn with_host_loading(mut self) -> Self {
+        self.load_mode = PeltLoadMode::Host;
+        self
     }
 }
 
@@ -105,6 +192,8 @@ pub struct PeltHostEffect {
     pub editable: bool,
     pub navigated: bool,
     pub error: Option<String>,
+    /// A host-loading controller's response that is a download, not a page.
+    pub download: Option<PeltDownload>,
 }
 
 /// Pelt's reusable one-session browser controller.
@@ -126,6 +215,11 @@ pub struct PeltController<F> {
     document_state: PeltDocumentState,
     instance_id: u64,
     session_generation: u64,
+    load_mode: PeltLoadMode,
+    load: PageLoad,
+    pending: Option<PendingLoad>,
+    load_commands: Vec<PeltLoadCommand>,
+    body_replacer: Option<PeltBodyReplacer<F>>,
 }
 
 impl<F: 'static> PeltController<F> {
@@ -162,10 +256,18 @@ impl<F: 'static> PeltController<F> {
     ) -> Result<Self, String> {
         let engine_id = config.engine_id;
         let viewport = config.request.viewport;
+        // A host-loading controller without a held body opens on an empty
+        // document of the same engine; the engine never fetches.
+        let fetch_first = config.load_mode == PeltLoadMode::Host && config.request.body.is_none();
+        let opening = if fetch_first {
+            config.request.clone().with_body("")
+        } else {
+            config.request.clone()
+        };
         let session = session_engines
-            .spawn(&engine_id, &config.request)
+            .spawn(&engine_id, &opening)
             .map_err(|error| format!("could not spawn engine {engine_id}: {error}"))?;
-        Ok(Self {
+        let mut controller = Self {
             session_engines,
             surface_engines,
             engine_id,
@@ -179,7 +281,49 @@ impl<F: 'static> PeltController<F> {
             // Generation zero is reserved as "no successfully opened
             // session" for hosts that retain child trees across tiles.
             session_generation: 1,
-        })
+            load_mode: config.load_mode,
+            load: PageLoad::default(),
+            pending: None,
+            load_commands: Vec::new(),
+            body_replacer: None,
+        };
+        if fetch_first {
+            let entry = controller.history[0].clone();
+            controller.begin_load(entry, HistoryCommit::Replace);
+        }
+        Ok(controller)
+    }
+
+    pub fn load_mode(&self) -> PeltLoadMode {
+        self.load_mode
+    }
+
+    /// Install how this host's engines replace a live body while a transfer
+    /// streams. Without one, a streamed document shows its first prefix and
+    /// then its complete body.
+    pub fn set_body_replacer(&mut self, replacer: PeltBodyReplacer<F>) {
+        self.body_replacer = Some(replacer);
+    }
+
+    /// Drain the commands queued for the host's transport.
+    pub fn take_load_commands(&mut self) -> Vec<PeltLoadCommand> {
+        std::mem::take(&mut self.load_commands)
+    }
+
+    /// The exact request a host-loading controller is waiting on.
+    pub fn pending_request(&self) -> Option<FetchRequestId> {
+        self.pending.as_ref().map(|pending| pending.request)
+    }
+
+    /// Transfer phase of the current or last host load.
+    pub fn load_phase(&self) -> Option<&LoadPhase> {
+        self.load.phase()
+    }
+
+    /// The retained response of the last host load and its request address.
+    /// Source capture deposits these exact bytes.
+    pub fn loaded_document(&self) -> Option<(&str, &LoadedDocument)> {
+        self.load.document()
     }
 
     pub fn engine_id(&self) -> &str {
@@ -399,8 +543,7 @@ impl<F: 'static> PeltController<F> {
             cursor,
             pointer_capture: capture,
             editable,
-            navigated: false,
-            error: None,
+            ..PeltHostEffect::default()
         };
         match effect {
             SessionEffect::Navigate(target) => self.navigate_effect(target, &mut host_effect),
@@ -424,6 +567,9 @@ impl<F: 'static> PeltController<F> {
     }
 
     pub fn command(&mut self, command: SessionNavigationCommand) -> PeltHostEffect {
+        if self.load_mode == PeltLoadMode::Host {
+            return self.host_load_command(command);
+        }
         let mut host_effect = PeltHostEffect::default();
         match command {
             SessionNavigationCommand::Address(address) => {
@@ -463,10 +609,240 @@ impl<F: 'static> PeltController<F> {
         host_effect
     }
 
+    /// Take one streamed fragment for the pending load. The first renderable
+    /// prefix opens the document and commits it to history; later prefixes
+    /// replace its body in place where the engine can.
+    pub fn accept_progress(
+        &mut self,
+        progress: PageProgress,
+        admitted_at_ms: u64,
+    ) -> PeltHostEffect {
+        let mut host_effect = PeltHostEffect::default();
+        let Some(pending) = self
+            .pending
+            .clone()
+            .filter(|pending| pending.request == progress.request)
+        else {
+            return host_effect;
+        };
+        let url = progress.url.clone();
+        if self
+            .load
+            .accept_progress(progress, admitted_at_ms)
+            .is_none()
+        {
+            return host_effect;
+        }
+        let document = self
+            .load
+            .fetched(&url)
+            .cloned()
+            .expect("an accepted fragment retains its prefix");
+        if pending.live {
+            host_effect.redraw = self.replace_live_body(&url, &document.body);
+            host_effect.handled = host_effect.redraw;
+            return host_effect;
+        }
+        match self.open_loaded(&pending, &document) {
+            Ok(()) => {
+                if let Some(pending) = self.pending.as_mut() {
+                    pending.live = true;
+                }
+                self.document_state = PeltDocumentState::Loading { address: url };
+                host_effect.handled = true;
+                host_effect.redraw = true;
+                host_effect.navigated = true;
+            },
+            Err(error) => {
+                // The prefix could not open; the complete body gets one more
+                // attempt when the transfer settles.
+                host_effect.error = Some(error);
+            },
+        }
+        host_effect
+    }
+
+    /// Take the pending load's terminal answer. Answers for any other request
+    /// change nothing.
+    pub fn accept_outcome(&mut self, outcome: FetchOutcome, admitted_at_ms: u64) -> PeltHostEffect {
+        let mut host_effect = PeltHostEffect::default();
+        if self.pending_request() != Some(outcome.request) {
+            return host_effect;
+        }
+        let pending = self.pending.take().expect("checked pending request");
+        let url = outcome.url.clone();
+        match self.load.accept_outcome(outcome, admitted_at_ms) {
+            LoadAnswer::Stale => {},
+            LoadAnswer::Document => {
+                let document = self
+                    .load
+                    .fetched(&url)
+                    .cloned()
+                    .expect("a settled document is retained");
+                if pending.live && self.replace_live_body(&url, &document.body) {
+                    host_effect.handled = true;
+                    host_effect.redraw = true;
+                    return host_effect;
+                }
+                match self.open_loaded(&pending, &document) {
+                    Ok(()) => {
+                        self.document_state = PeltDocumentState::Loading { address: url };
+                        host_effect.handled = true;
+                        host_effect.redraw = true;
+                        host_effect.navigated = !pending.live;
+                    },
+                    Err(error) => self.document_error(url, error, &mut host_effect),
+                }
+            },
+            LoadAnswer::Download(fetched) => {
+                self.settle_document_state(pending.live);
+                host_effect.handled = true;
+                host_effect.download = Some(PeltDownload { url, fetched });
+            },
+            LoadAnswer::Failed(FetchFailure::Failed(message)) => {
+                self.document_error(url, message, &mut host_effect);
+            },
+            LoadAnswer::Failed(FetchFailure::Cancelled) => {
+                self.settle_document_state(pending.live);
+                host_effect.redraw = true;
+            },
+            LoadAnswer::Failed(failure) => {
+                host_effect.error = Some(failure.to_string());
+                host_effect.handled = true;
+                host_effect.redraw = true;
+                self.document_state = PeltDocumentState::Awaiting {
+                    address: url,
+                    failure,
+                };
+            },
+        }
+        host_effect
+    }
+
+    fn host_load_command(&mut self, command: SessionNavigationCommand) -> PeltHostEffect {
+        let mut host_effect = PeltHostEffect::default();
+        match command {
+            SessionNavigationCommand::Address(address) => {
+                self.navigate_effect(address, &mut host_effect);
+            },
+            SessionNavigationCommand::Reload => {
+                // A reload is a new request for the same entry: the retained
+                // body is dropped so the transport fetches it again.
+                let entry = self.history[self.history_index].clone();
+                self.load.forget_fetched();
+                self.begin_load(entry, HistoryCommit::Replace);
+                host_effect.handled = true;
+                host_effect.redraw = true;
+            },
+            SessionNavigationCommand::Back => {
+                if self.can_go_back() {
+                    self.begin_traverse(self.history_index - 1, &mut host_effect);
+                }
+            },
+            SessionNavigationCommand::Forward => {
+                if self.can_go_forward() {
+                    self.begin_traverse(self.history_index + 1, &mut host_effect);
+                }
+            },
+            SessionNavigationCommand::Stop => {
+                if let Some(pending) = self.pending.take() {
+                    if let Some(request) = self.load.stop_active() {
+                        self.load_commands.push(PeltLoadCommand::Cancel { request });
+                    }
+                    self.settle_document_state(pending.live);
+                    host_effect.redraw = true;
+                }
+                host_effect.handled = true;
+            },
+        }
+        host_effect
+    }
+
+    fn begin_traverse(&mut self, index: usize, host_effect: &mut PeltHostEffect) {
+        let entry = self.history[index].clone();
+        self.begin_load(entry, HistoryCommit::Traverse(index));
+        host_effect.handled = true;
+        host_effect.redraw = true;
+        host_effect.editable = false;
+    }
+
+    /// Start one host fetch, superseding any load still in flight.
+    fn begin_load(&mut self, mut entry: SessionSpawnRequest, commit: HistoryCommit) {
+        entry.body = None;
+        entry.content_type = None;
+        let request = page_load::next_fetch_request_id();
+        if let Some(superseded) = self.load.begin(request) {
+            self.load_commands.push(PeltLoadCommand::Cancel {
+                request: superseded,
+            });
+        }
+        self.load_commands.push(PeltLoadCommand::Fetch {
+            request,
+            url: entry.address.clone(),
+        });
+        self.document_state = PeltDocumentState::Fetching {
+            address: entry.address.clone(),
+            request,
+        };
+        self.pending = Some(PendingLoad {
+            request,
+            entry,
+            commit,
+            live: false,
+        });
+    }
+
+    /// Open a host-held document for `pending` and commit it to history.
+    fn open_loaded(
+        &mut self,
+        pending: &PendingLoad,
+        document: &LoadedDocument,
+    ) -> Result<(), String> {
+        let mut request = pending.entry.clone().with_body(document.body.clone());
+        request.content_type = document.content_type.clone();
+        let session = self.spawn(&request)?;
+        self.install_session(session);
+        if !pending.live {
+            let entry = pending.entry.clone();
+            match pending.commit {
+                HistoryCommit::Push => {
+                    self.history.truncate(self.history_index + 1);
+                    self.history.push(entry);
+                    self.history_index += 1;
+                },
+                HistoryCommit::Replace => self.history[self.history_index] = entry,
+                HistoryCommit::Traverse(index) => self.history_index = index,
+            }
+        }
+        Ok(())
+    }
+
+    fn replace_live_body(&mut self, url: &str, body: &str) -> bool {
+        self.body_replacer
+            .is_some_and(|replace| replace(self.session.as_mut(), url, body))
+    }
+
+    /// After a load ends without opening anything more, the current session
+    /// stands. A streamed prefix already set its own presentation state, which
+    /// the host may since have presented, so only a load that never opened
+    /// leaves `Fetching` here.
+    fn settle_document_state(&mut self, live: bool) {
+        if !live {
+            self.document_state = PeltDocumentState::Ready;
+        }
+    }
+
     fn navigate_effect(&mut self, target: String, host_effect: &mut PeltHostEffect) {
         let target = resolve_href(self.address(), &target);
         let request =
             SessionSpawnRequest::new(target).with_viewport(self.viewport.0, self.viewport.1);
+        if self.load_mode == PeltLoadMode::Host {
+            self.begin_load(request, HistoryCommit::Push);
+            host_effect.handled = true;
+            host_effect.redraw = true;
+            host_effect.editable = false;
+            return;
+        }
         match self.spawn(&request) {
             Ok(session) => {
                 let address = request.address.clone();
