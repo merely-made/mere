@@ -384,10 +384,12 @@ fn columns_by_cluster_and_kinds_by_cluster_read_one_computation() {
         "Kinds read the same partition"
     );
 
-    // Positive control: the graph-only path, which hosts took before the
-    // canvas became the binding, runs a Louvain of its own.
+    // Positive control: the graph-only path with a registry other than the
+    // canvas's, as hosts took before the canvas became the binding, runs a
+    // Louvain of its own.
     let before = louvain_runs_on_this_thread();
     let _ = crate::canvas::project_canvas_strategy(
+        &mut crate::signals::ChannelRegistry::new(),
         "kanban.community",
         canvas.graph(),
         None,
