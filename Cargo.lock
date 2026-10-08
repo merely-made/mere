@@ -2678,7 +2678,6 @@ dependencies = [
  "gemot",
  "hex",
  "insigne",
- "mere-moot",
  "mere-p2panda-net",
  "mere-proofs",
  "mere-transport",
@@ -9357,15 +9356,24 @@ dependencies = [
 name = "mere-moot"
 version = "0.0.1"
 dependencies = [
+ "chartulary",
+ "commons-spine",
  "eidetic",
  "eidetic-search",
  "fleece 0.5.0 (git+https://github.com/merely-made/genet.git?rev=15713014e2e23b887360471552f75f60684f5384)",
  "gemot",
  "genet-static-dom",
+ "hex",
+ "insigne",
  "mere-document-lanes",
+ "muniment",
+ "p2panda-core",
+ "personae",
  "serde",
  "serde_json",
  "servitor",
+ "stickleback",
+ "tokio",
 ]
 
 [[package]]

@@ -1,13 +1,18 @@
 # tabard
 
-Tabard is the theme-authoring port of the Genet engine.
+Tabard is Mere's shared theme-authoring library, consumed by platform crates
+and application ports.
 
-A tabard is the garment that displays a household's livery. This port is where
+A tabard is the garment that displays a household's livery. This library is where
 a household's livery gets authored: seeds in, liveries out. It composes what
 already interlocks: [tinct](https://crates.io/crates/tinct) derives the full
 palette from a few seed colours, [illume](https://crates.io/crates/illume)
 emits syntax spans that the derived syntax palette colours, and palette-aware
 icons can recolour at render time.
+
+Tabard lives in `crates/system/tabard`: the shared theme model, palettes and
+persistence are platform capabilities. Dependencies continue to flow from ports
+into crates, with no exception for Tabard.
 
 Tabard authors portable theme artifacts. Livery consumes stylesheets Tabard
 emits. Pelt has an optional named preview receipt for those artifacts, but does
@@ -87,6 +92,20 @@ roles as --tabard-syntax-* properties.
 
 Icon policy, imports, a DTCG resolver and a Geopard exporter are not here yet;
 the host theme model and its persistence arrived with the theme module.
+
+## Authoring workspace
+
+`workshop::ThemeDraft` provides the first host-independent workshop model:
+open a user theme or fork any theme into an unregistered draft, apply typed
+edits, undo/redo, discard, and explicitly commit to the in-memory registry.
+It protects built-ins and refuses save conflicts. Canonical-mode previews
+use the existing theme derivation; authored stylesheet previews are returned
+as sheets, and unresolved custom calculators are reported explicitly.
+
+Draft previews never change the active theme. Registry commits do not write
+files; a host owns persistence, rendering and applying appearance. A visible
+Cambium workshop surface and mode-aware export parity remain follow-ups in
+the theme modes plan.
 
 ## License
 
