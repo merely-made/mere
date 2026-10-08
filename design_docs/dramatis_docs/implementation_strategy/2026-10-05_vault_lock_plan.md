@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-08)**: rulings 1 to 72 in §3; the threat statement is
+**Status (2026-10-08)**: rulings 1 to 78 in §3; the threat statement is
 still open. L1 landed (`2556a20c`). L2's checkpoints A (`7c588deb`) and B
 (`ec1768ab`) landed. Still to come in L2: the Secret Service on the
 ThinkPad, ruling 42 (Linux starts locked), ruling 44 (Distillery's
@@ -843,6 +843,56 @@ build the fixtures unarmed and drop them after disarming, as the
 passphrase scenario does; keep them armed. Mark: **"Build fixtures unarmed
 (Recommended)"**.
 
+Rulings 73 to 78 were asked on 2026-10-08 from L3's assessment (§6).
+
+**Ruling 73** *(the Linux idle source).* *On the ThinkPad, GNOME's
+`org.gnome.Mutter.IdleMonitor` read the idle time exactly (237 s). logind's
+`IdleHint` is never set there, because GNOME's `idle-delay` is 0, so a
+logind-only reading would say "active" forever.* Options:
+- Mutter's monitor, else logind's `IdleSinceHint`, else unknown;
+- logind only;
+- Mutter only.
+
+Mark: **"Mutter, then logind (Recommended)"**.
+
+**Ruling 74** *(what "idle fails closed" does, ruling 3).* Options:
+- unknown counts as idle, so the vault locks once a full window passes
+  with no reading of activity;
+- lock at the first unreadable sample;
+- idle locking reported unavailable on a device with no source.
+
+Mark: **"Unknown counts as idle (Recommended)"**.
+
+**Ruling 75** *(suspend).* Options: lock before sleep (Windows' suspend
+notification; on Linux a logind delay inhibitor); lock on resume. Mark:
+**"Before sleep (Recommended)"**.
+
+**Ruling 76** *(amends ruling 38: a resident restarted under the persisted
+lock).* *Before its first unlock a resident admits no door session (the
+door keys come from the vault), so ruling 38's Locked card cannot be
+served.* Options:
+- it waits before the vault at its native prompt (Hello, then the
+  passphrase box), as ruling 66 does, serving nothing until unlocked;
+- the door keys sealed under DPAPI apart from the root;
+- it exits and the launcher stops restarting it.
+
+Mark: **"Wait at its prompt (Recommended)"**.
+
+**Ruling 77** *(where the per-device lock settings live).* Options:
+- a person-edited `lock.toml` in djinn's app directory, per device,
+  read at start and watched, with an absent or malformed file meaning the
+  defaults (all on, 15 minutes), never "no locking";
+- a section of each profile's owner settings JSON;
+- the TOML file plus a castellan card intent.
+
+Mark: **"Device lock.toml (Recommended)"**.
+
+**Ruling 78** *(the real receipts).* Options: build every trigger with
+injected signals and clock and prove it in tests, then one attended
+session for `Win+L`, `loginctl lock-session` and suspend on both machines;
+run the ThinkPad's lock-session receipt unattended while building. Mark:
+**"Build first, one attended run (Recommended)"**.
+
 Still open: a threat statement naming hibernation and the pagefile.
 
 ## 4. Phases
@@ -1548,3 +1598,50 @@ built plain at `fc3da34c`).
   afterwards; they were.
 - **L2's last condition** (the Secret Service on the ThinkPad) and this
   proof, which ruling 56 pairs with it, are done. Next: L3, the triggers.
+
+**2026-10-08, L3 assessed** (at `2dff736e`).
+- **What exists:**
+  - the explicit intent (castellan's lock intent and `ssh-add -x`);
+  - djinn's Windows idle probe (`conditions.rs`, `GetLastInputInfo`; Linux
+    reads nothing);
+  - `StartupUnlockMode::Locked` as an unused variant.
+- **What does not exist:** no session-lock or suspend listener, no idle
+  trigger, no persisted lock, and no lock settings.
+- **On the ThinkPad:**
+  - logind offers the session's `Lock` signal and `LockedHint`, plus
+    `PrepareForSleep` and `Inhibit` (a delay lock lets a process lock
+    before sleep);
+  - GNOME's idle monitor reads idle exactly; logind's `IdleHint` never
+    moves (ruling 73).
+- **On Windows:** `Win+L` arrives as a WTS session notification (it needs a
+  message-only window), and suspend through
+  `PowerRegisterSuspendResumeNotification` (no window).
+- **The build, in checkpoints:**
+  - **A, the persisted lock (rulings 5, 32, 76):**
+    - a marker beside the vault written at lock (no secret, advisory);
+    - `startup_unlock`'s loaders refuse while it is present;
+    - a loader that takes `OsPresence` passes;
+    - an unlock clears it;
+    - a sealed vault opens locked (ruling 38's constructor);
+    - djinn's DPAPI start waits at its prompt under the marker.
+  - **B, the triggers' core:**
+    - `lock.toml` (ruling 77);
+    - the idle rule with an injected clock (rulings 20, 74);
+    - a dispatcher that locks on session lock and before sleep (ruling 75),
+      from injected signals.
+  - **C, Windows sources:** idle, `Win+L` and suspend.
+  - **D, Linux sources:** Mutter, then logind, for idle; logind's `Lock`;
+    `PrepareForSleep` under a delay inhibitor.
+  - **E, the attended run (ruling 78).**
+- **L3 done when** (§4, plus):
+  - [ ] the idle rule fires after the window, resets on activity, and
+        counts unknown as idle (unit tests with an injected clock);
+  - [ ] settings absent or malformed mean the defaults; each trigger can
+        be turned off;
+  - [ ] the dispatcher locks on an injected session lock and before an
+        injected suspend acknowledges;
+  - [ ] a resident locked, then killed, comes back waiting at its prompt
+        and opens only on an unlock (a receipt), while one never locked
+        auto-unlocks as before;
+  - [ ] the attended receipts: Windows `Win+L` and suspend, Fedora
+        `loginctl lock-session` and suspend.
