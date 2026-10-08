@@ -157,7 +157,7 @@ fn productive_selection_palette_with_action_dispatch_passes() {
         reason: DismissReason::Confirmed,
     });
     observers.emit(UxEvent::ActionDispatched {
-        action_id: ActionId::GraphTogglePhysics,
+        action_id: ActionId::PhysicsToggle,
         target: None,
     });
 
@@ -195,7 +195,7 @@ fn productive_selection_finder_must_emit_open_node() {
     // ActionDispatched is NOT a productive outcome for NodeFinder —
     // only OpenNodeDispatched satisfies the rule.
     observers.emit(UxEvent::ActionDispatched {
-        action_id: ActionId::GraphTogglePhysics,
+        action_id: ActionId::PhysicsToggle,
         target: None,
     });
 
@@ -268,7 +268,7 @@ fn destructive_gate_passes_when_confirm_dialog_grants() {
         reason: DismissReason::Confirmed,
     });
     observers.emit(UxEvent::ActionDispatched {
-        action_id: ActionId::NodeMarkTombstone,
+        action_id: ActionId::NodeDelete,
         target: None,
     });
 
@@ -283,13 +283,13 @@ fn destructive_gate_flags_unconfirmed_destructive() {
 
     // Destructive action fires without any preceding ConfirmDialog.
     observers.emit(UxEvent::ActionDispatched {
-        action_id: ActionId::NodeMarkTombstone,
+        action_id: ActionId::NodeDelete,
         target: None,
     });
 
     let failures = probe.drain_failures();
     assert_eq!(failures.len(), 1);
-    assert!(failures[0].description.contains("NodeMarkTombstone"));
+    assert!(failures[0].description.contains("NodeDelete"));
 }
 
 #[test]
@@ -305,12 +305,12 @@ fn destructive_gate_consumes_grant_after_one_destructive() {
         reason: DismissReason::Confirmed,
     });
     observers.emit(UxEvent::ActionDispatched {
-        action_id: ActionId::NodeMarkTombstone,
+        action_id: ActionId::NodeDelete,
         target: None,
     });
     // First passed; second fires without a fresh confirm.
     observers.emit(UxEvent::ActionDispatched {
-        action_id: ActionId::NodeMarkTombstone,
+        action_id: ActionId::NodeDelete,
         target: None,
     });
 
@@ -329,7 +329,7 @@ fn destructive_gate_cancelled_confirm_does_not_grant() {
         reason: DismissReason::Cancelled,
     });
     observers.emit(UxEvent::ActionDispatched {
-        action_id: ActionId::NodeMarkTombstone,
+        action_id: ActionId::NodeDelete,
         target: None,
     });
 
@@ -345,7 +345,7 @@ fn destructive_gate_ignores_non_destructive_actions() {
 
     // Non-destructive action without a confirm — fine.
     observers.emit(UxEvent::ActionDispatched {
-        action_id: ActionId::GraphTogglePhysics,
+        action_id: ActionId::PhysicsToggle,
         target: None,
     });
 
@@ -367,11 +367,11 @@ fn destructive_gate_intervening_action_consumes_grant() {
         reason: DismissReason::Confirmed,
     });
     observers.emit(UxEvent::ActionDispatched {
-        action_id: ActionId::GraphTogglePhysics,
+        action_id: ActionId::PhysicsToggle,
         target: None,
     });
     observers.emit(UxEvent::ActionDispatched {
-        action_id: ActionId::NodeMarkTombstone,
+        action_id: ActionId::NodeDelete,
         target: None,
     });
 

@@ -4,9 +4,10 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
+use command_menu::catalogue::ids;
+
 use super::{
-    InputBinding, InputBindingSection, InputContext, Keycode, ModifierMask, NamedKey, action_id,
-    binding_id,
+    InputBinding, InputBindingSection, InputContext, Keycode, ModifierMask, NamedKey, binding_id,
 };
 
 pub(super) fn toolbar_submit_binding() -> InputBinding {
@@ -51,7 +52,6 @@ pub(super) fn binding_label(binding: &InputBinding, context: InputContext) -> St
 #[derive(Clone)]
 pub(super) struct DefaultBindingSpec {
     pub(super) action_id: &'static str,
-    pub(super) display_name: &'static str,
     pub(super) section: InputBindingSection,
     pub(super) context: InputContext,
     pub(super) binding: InputBinding,
@@ -60,18 +60,7 @@ pub(super) struct DefaultBindingSpec {
 pub(super) fn default_binding_specs() -> Vec<DefaultBindingSpec> {
     vec![
         DefaultBindingSpec {
-            action_id: action_id::graph::TOGGLE_OVERVIEW_PLANE,
-            display_name: "Toggle Overview Plane",
-            section: InputBindingSection::Graph,
-            context: InputContext::GraphView,
-            binding: InputBinding::Key {
-                modifiers: ModifierMask::CTRL | ModifierMask::SHIFT,
-                keycode: Keycode::Char('o'),
-            },
-        },
-        DefaultBindingSpec {
-            action_id: action_id::graph::NODE_EDIT_TAGS,
-            display_name: "Edit Node Tags",
+            action_id: ids::NODE_EDIT,
             section: InputBindingSection::Graph,
             context: InputContext::GraphView,
             binding: InputBinding::Key {
@@ -80,8 +69,7 @@ pub(super) fn default_binding_specs() -> Vec<DefaultBindingSpec> {
             },
         },
         DefaultBindingSpec {
-            action_id: action_id::graph::TOGGLE_PHYSICS,
-            display_name: "Toggle Physics Simulation",
+            action_id: ids::PHYSICS_TOGGLE,
             section: InputBindingSection::Graph,
             context: InputContext::GraphView,
             binding: InputBinding::Key {
@@ -90,18 +78,7 @@ pub(super) fn default_binding_specs() -> Vec<DefaultBindingSpec> {
             },
         },
         DefaultBindingSpec {
-            action_id: action_id::graph::REHEAT_PHYSICS,
-            display_name: "Reheat Physics Simulation",
-            section: InputBindingSection::Graph,
-            context: InputContext::GraphView,
-            binding: InputBinding::Key {
-                modifiers: ModifierMask::NONE,
-                keycode: Keycode::Char('r'),
-            },
-        },
-        DefaultBindingSpec {
-            action_id: action_id::graph::ZOOM_IN,
-            display_name: "Zoom In",
+            action_id: ids::VIEW_ZOOM_IN,
             section: InputBindingSection::Graph,
             context: InputContext::GraphView,
             binding: InputBinding::Key {
@@ -110,8 +87,7 @@ pub(super) fn default_binding_specs() -> Vec<DefaultBindingSpec> {
             },
         },
         DefaultBindingSpec {
-            action_id: action_id::graph::ZOOM_OUT,
-            display_name: "Zoom Out",
+            action_id: ids::VIEW_ZOOM_OUT,
             section: InputBindingSection::Graph,
             context: InputContext::GraphView,
             binding: InputBinding::Key {
@@ -120,38 +96,7 @@ pub(super) fn default_binding_specs() -> Vec<DefaultBindingSpec> {
             },
         },
         DefaultBindingSpec {
-            action_id: action_id::graph::ZOOM_RESET,
-            display_name: "Reset Zoom",
-            section: InputBindingSection::Graph,
-            context: InputContext::GraphView,
-            binding: InputBinding::Key {
-                modifiers: ModifierMask::CTRL,
-                keycode: Keycode::Named(NamedKey::Num0),
-            },
-        },
-        DefaultBindingSpec {
-            action_id: action_id::graph::TOGGLE_POSITION_FIT_LOCK,
-            display_name: "Toggle Position-Fit Lock",
-            section: InputBindingSection::Graph,
-            context: InputContext::GraphView,
-            binding: InputBinding::Key {
-                modifiers: ModifierMask::NONE,
-                keycode: Keycode::Char('c'),
-            },
-        },
-        DefaultBindingSpec {
-            action_id: action_id::graph::TOGGLE_ZOOM_FIT_LOCK,
-            display_name: "Toggle Zoom-Fit Lock",
-            section: InputBindingSection::Graph,
-            context: InputContext::GraphView,
-            binding: InputBinding::Key {
-                modifiers: ModifierMask::NONE,
-                keycode: Keycode::Char('z'),
-            },
-        },
-        DefaultBindingSpec {
-            action_id: action_id::graph::NODE_NEW,
-            display_name: "Create Node",
+            action_id: ids::NODE_NEW,
             section: InputBindingSection::Graph,
             context: InputContext::GraphView,
             binding: InputBinding::Key {
@@ -160,8 +105,7 @@ pub(super) fn default_binding_specs() -> Vec<DefaultBindingSpec> {
             },
         },
         DefaultBindingSpec {
-            action_id: action_id::graph::EDGE_CONNECT_PAIR,
-            display_name: "Connect Selected Pair",
+            action_id: ids::RELATION_ADD,
             section: InputBindingSection::Graph,
             context: InputContext::GraphView,
             binding: InputBinding::Key {
@@ -170,8 +114,7 @@ pub(super) fn default_binding_specs() -> Vec<DefaultBindingSpec> {
             },
         },
         DefaultBindingSpec {
-            action_id: action_id::graph::EDGE_CONNECT_BOTH,
-            display_name: "Connect Both Directions",
+            action_id: ids::RELATION_ADD_BOTH,
             section: InputBindingSection::Graph,
             context: InputContext::GraphView,
             binding: InputBinding::Key {
@@ -180,8 +123,7 @@ pub(super) fn default_binding_specs() -> Vec<DefaultBindingSpec> {
             },
         },
         DefaultBindingSpec {
-            action_id: action_id::graph::EDGE_REMOVE_USER,
-            display_name: "Remove User Edge",
+            action_id: ids::RELATION_RETRACT,
             section: InputBindingSection::Graph,
             context: InputContext::GraphView,
             binding: InputBinding::Key {
@@ -190,8 +132,7 @@ pub(super) fn default_binding_specs() -> Vec<DefaultBindingSpec> {
             },
         },
         DefaultBindingSpec {
-            action_id: action_id::graph::NODE_PIN_SELECTED,
-            display_name: "Pin Selected Node(s)",
+            action_id: ids::NODE_PIN,
             section: InputBindingSection::Graph,
             context: InputContext::GraphView,
             binding: InputBinding::Key {
@@ -200,8 +141,7 @@ pub(super) fn default_binding_specs() -> Vec<DefaultBindingSpec> {
             },
         },
         DefaultBindingSpec {
-            action_id: action_id::graph::NODE_UNPIN_SELECTED,
-            display_name: "Unpin Selected Node(s)",
+            action_id: ids::NODE_UNPIN,
             section: InputBindingSection::Graph,
             context: InputContext::GraphView,
             binding: InputBinding::Key {
@@ -210,8 +150,7 @@ pub(super) fn default_binding_specs() -> Vec<DefaultBindingSpec> {
             },
         },
         DefaultBindingSpec {
-            action_id: action_id::graph::NODE_PIN_TOGGLE,
-            display_name: "Toggle Primary Node Pin",
+            action_id: ids::NODE_PIN_TOGGLE,
             section: InputBindingSection::Graph,
             context: InputContext::GraphView,
             binding: InputBinding::Key {
@@ -220,8 +159,7 @@ pub(super) fn default_binding_specs() -> Vec<DefaultBindingSpec> {
             },
         },
         DefaultBindingSpec {
-            action_id: action_id::graph::NODE_DELETE,
-            display_name: "Delete Selected Nodes",
+            action_id: ids::NODE_DELETE,
             section: InputBindingSection::Graph,
             context: InputContext::GraphView,
             binding: InputBinding::Key {
@@ -230,48 +168,7 @@ pub(super) fn default_binding_specs() -> Vec<DefaultBindingSpec> {
             },
         },
         DefaultBindingSpec {
-            action_id: action_id::graph::CLEAR,
-            display_name: "Clear Graph",
-            section: InputBindingSection::Graph,
-            context: InputContext::GraphView,
-            binding: InputBinding::Key {
-                modifiers: ModifierMask(ModifierMask::CTRL.0 | ModifierMask::SHIFT.0),
-                keycode: Keycode::Named(NamedKey::Delete),
-            },
-        },
-        DefaultBindingSpec {
-            action_id: action_id::graph::SELECT_ALL,
-            display_name: "Select All Nodes",
-            section: InputBindingSection::Graph,
-            context: InputContext::GraphView,
-            binding: InputBinding::Key {
-                modifiers: ModifierMask::CTRL,
-                keycode: Keycode::Char('a'),
-            },
-        },
-        DefaultBindingSpec {
-            action_id: action_id::graph::SELECT_VISIBLE,
-            display_name: "Select Visible Nodes",
-            section: InputBindingSection::Graph,
-            context: InputContext::GraphView,
-            binding: InputBinding::Key {
-                modifiers: ModifierMask(ModifierMask::CTRL.0 | ModifierMask::SHIFT.0),
-                keycode: Keycode::Char('a'),
-            },
-        },
-        DefaultBindingSpec {
-            action_id: action_id::workbench::HELP_OPEN,
-            display_name: "Toggle Help Panel",
-            section: InputBindingSection::Workbench,
-            context: InputContext::GraphView,
-            binding: InputBinding::Key {
-                modifiers: ModifierMask::NONE,
-                keycode: Keycode::Named(NamedKey::F1),
-            },
-        },
-        DefaultBindingSpec {
-            action_id: action_id::graph::COMMAND_PALETTE_OPEN,
-            display_name: "Open Command Palette",
+            action_id: ids::PALETTE_OPEN,
             section: InputBindingSection::Workbench,
             context: InputContext::GraphView,
             binding: InputBinding::Key {
@@ -280,18 +177,7 @@ pub(super) fn default_binding_specs() -> Vec<DefaultBindingSpec> {
             },
         },
         DefaultBindingSpec {
-            action_id: action_id::graph::RADIAL_MENU_OPEN,
-            display_name: "Toggle Radial Palette",
-            section: InputBindingSection::Workbench,
-            context: InputContext::GraphView,
-            binding: InputBinding::Key {
-                modifiers: ModifierMask::NONE,
-                keycode: Keycode::Named(NamedKey::F3),
-            },
-        },
-        DefaultBindingSpec {
-            action_id: action_id::workbench::OPEN_PHYSICS_SETTINGS,
-            display_name: "Open Physics Settings",
+            action_id: ids::PHYSICS_SETTINGS,
             section: InputBindingSection::Workbench,
             context: InputContext::GraphView,
             binding: InputBinding::Key {
@@ -300,18 +186,7 @@ pub(super) fn default_binding_specs() -> Vec<DefaultBindingSpec> {
             },
         },
         DefaultBindingSpec {
-            action_id: action_id::workbench::OPEN_CAMERA_CONTROLS,
-            display_name: "Open Camera Controls",
-            section: InputBindingSection::Workbench,
-            context: InputContext::GraphView,
-            binding: InputBinding::Key {
-                modifiers: ModifierMask::NONE,
-                keycode: Keycode::Named(NamedKey::F9),
-            },
-        },
-        DefaultBindingSpec {
-            action_id: action_id::workbench::OPEN_HISTORY_MANAGER,
-            display_name: "Open History Manager",
+            action_id: ids::PANE_TRAIL,
             section: InputBindingSection::Workbench,
             context: InputContext::GraphView,
             binding: InputBinding::Key {
@@ -320,18 +195,7 @@ pub(super) fn default_binding_specs() -> Vec<DefaultBindingSpec> {
             },
         },
         DefaultBindingSpec {
-            action_id: action_id::workbench::TOGGLE_SEMANTIC_TAB_GROUP,
-            display_name: "Toggle Semantic Tab Group",
-            section: InputBindingSection::Workbench,
-            context: InputContext::GraphView,
-            binding: InputBinding::Key {
-                modifiers: ModifierMask(ModifierMask::CTRL.0 | ModifierMask::ALT.0),
-                keycode: Keycode::Char('t'),
-            },
-        },
-        DefaultBindingSpec {
-            action_id: action_id::workbench::UNDO,
-            display_name: "Undo",
+            action_id: ids::SESSION_UNDO,
             section: InputBindingSection::Workbench,
             context: InputContext::GraphView,
             binding: InputBinding::Key {
@@ -340,8 +204,7 @@ pub(super) fn default_binding_specs() -> Vec<DefaultBindingSpec> {
             },
         },
         DefaultBindingSpec {
-            action_id: action_id::workbench::REDO,
-            display_name: "Redo",
+            action_id: ids::SESSION_REDO,
             section: InputBindingSection::Workbench,
             context: InputContext::GraphView,
             binding: InputBinding::Key {
@@ -350,18 +213,7 @@ pub(super) fn default_binding_specs() -> Vec<DefaultBindingSpec> {
             },
         },
         DefaultBindingSpec {
-            action_id: action_id::graph::CYCLE_FOCUS_REGION,
-            display_name: "Cycle Focus Region",
-            section: InputBindingSection::Workbench,
-            context: InputContext::GraphView,
-            binding: InputBinding::Key {
-                modifiers: ModifierMask::NONE,
-                keycode: Keycode::Named(NamedKey::F6),
-            },
-        },
-        DefaultBindingSpec {
-            action_id: action_id::workbench::TOGGLE_WORKBENCH_OVERLAY,
-            display_name: "Toggle Workbench Overlay",
+            action_id: ids::PANE_WORKBENCH,
             section: InputBindingSection::Workbench,
             context: InputContext::GraphView,
             binding: InputBinding::Key {
@@ -370,22 +222,19 @@ pub(super) fn default_binding_specs() -> Vec<DefaultBindingSpec> {
             },
         },
         DefaultBindingSpec {
-            action_id: action_id::toolbar::NAV_BACK,
-            display_name: "Navigate Back",
+            action_id: ids::NAV_BACK,
             section: InputBindingSection::Navigation,
             context: InputContext::DetailView,
             binding: toolbar_nav_back_binding(),
         },
         DefaultBindingSpec {
-            action_id: action_id::toolbar::NAV_FORWARD,
-            display_name: "Navigate Forward",
+            action_id: ids::NAV_FORWARD,
             section: InputBindingSection::Navigation,
             context: InputContext::DetailView,
             binding: toolbar_nav_forward_binding(),
         },
         DefaultBindingSpec {
-            action_id: action_id::toolbar::NAV_RELOAD,
-            display_name: "Reload",
+            action_id: ids::NAV_RELOAD,
             section: InputBindingSection::Navigation,
             context: InputContext::DetailView,
             binding: toolbar_nav_reload_binding(),

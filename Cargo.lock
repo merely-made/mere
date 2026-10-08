@@ -9266,6 +9266,7 @@ dependencies = [
  "cbor4ii",
  "chartulary",
  "ciborium",
+ "command-menu",
  "crossbeam-channel",
  "euclid",
  "futures-util",
@@ -9396,6 +9397,7 @@ dependencies = [
 name = "mere-registry"
 version = "0.0.1"
 dependencies = [
+ "command-menu",
  "http",
  "infer",
  "inventory",

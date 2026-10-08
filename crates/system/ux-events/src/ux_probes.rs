@@ -45,8 +45,8 @@
 //!   [`UxEvent::ActionDispatched`] for a configured-destructive
 //!   `ActionId` must be preceded (as the most-recent ConfirmDialog
 //!   event) by a Confirmed dismissal of `ConfirmDialog`. Covers the
-//!   §4.10 guarantee that destructive actions (Tombstone, Remove
-//!   edge, ...) always carry a confirmation step.
+//!   §4.10 guarantee that destructive actions (Delete node, Retract
+//!   relation, ...) always carry a confirmation step.
 //!
 //! ## Extensibility
 //!
