@@ -75,7 +75,6 @@ impl SecretServiceStore {
         Ok(index.aliases.get(alias).copied().map(SecretCollectionId))
     }
 
-    #[cfg(any(test, target_os = "linux"))]
     pub(in crate::secret_service) fn aliases(
         &self,
     ) -> Result<std::collections::BTreeMap<String, SecretCollectionId>, SecretServiceError> {

@@ -92,7 +92,7 @@ impl CollectionInterface {
         server
             .remove::<CollectionInterface, _>(collection_path(self.id))
             .await?;
-        self.state.forget_collection(self.id, items);
+        self.state.refresh_snapshot();
         Ok(root_path())
     }
 
@@ -108,7 +108,6 @@ impl CollectionInterface {
         let attributes = attributes.into_iter().collect::<BTreeMap<_, _>>();
         Ok(self
             .state
-            .store
             .search(&attributes)?
             .into_iter()
             .filter(|item| item.collection == self.id)
@@ -171,6 +170,7 @@ impl CollectionInterface {
             register_item(connection, Arc::clone(&self.state), item.id).await?;
             emitter.item_created(path.clone()).await?;
         }
+        self.state.refresh_snapshot();
         Ok((path, root_path()))
     }
 
@@ -190,7 +190,6 @@ impl CollectionInterface {
             .await?;
         Ok(self
             .state
-            .store
             .items(self.id)?
             .into_iter()
             .map(|item| item_path(item.id))
@@ -211,7 +210,7 @@ impl CollectionInterface {
                 SecretServiceOperation::ReadCollection(self.id),
             )
             .await?;
-        Ok(self.state.store.collection(self.id)?.label)
+        Ok(self.state.collection(self.id)?.label)
     }
 
     #[zbus(property)]
@@ -233,6 +232,7 @@ impl CollectionInterface {
         self.state
             .store
             .set_collection_label(self.id, label, now_unix_secs())?;
+        self.state.refresh_snapshot();
         let emitter = SignalEmitter::new(connection, SERVICE_PATH)?;
         ServiceInterface::collection_changed(&emitter, collection_path(self.id)).await?;
         Ok(())
@@ -245,7 +245,7 @@ impl CollectionInterface {
         #[zbus(connection)] connection: &Connection,
     ) -> zbus::fdo::Result<bool> {
         self.authorize_read(header, connection).await?;
-        Ok(self.state.collection_locked(self.id))
+        Ok(self.state.locked())
     }
 
     #[zbus(property)]
@@ -255,7 +255,7 @@ impl CollectionInterface {
         #[zbus(connection)] connection: &Connection,
     ) -> zbus::fdo::Result<u64> {
         self.authorize_read(header, connection).await?;
-        Ok(self.state.store.collection(self.id)?.created)
+        Ok(self.state.collection(self.id)?.created)
     }
 
     #[zbus(property)]
@@ -265,7 +265,7 @@ impl CollectionInterface {
         #[zbus(connection)] connection: &Connection,
     ) -> zbus::fdo::Result<u64> {
         self.authorize_read(header, connection).await?;
-        Ok(self.state.store.collection(self.id)?.modified)
+        Ok(self.state.collection(self.id)?.modified)
     }
 
     #[zbus(signal)]
@@ -298,7 +298,8 @@ impl ItemInterface {
     }
 
     async fn emit_changed(&self, connection: &Connection) -> Result<(), SecretDbusError> {
-        let collection = self.state.store.item(self.id)?.collection;
+        self.state.refresh_snapshot();
+        let collection = self.state.item(self.id)?.collection;
         let emitter = SignalEmitter::new(connection, collection_path(collection))?;
         CollectionInterface::item_changed(&emitter, item_path(self.id)).await?;
         Ok(())
@@ -344,7 +345,7 @@ impl ItemInterface {
         server
             .remove::<ItemInterface, _>(item_path(self.id))
             .await?;
-        self.state.forget_item(self.id);
+        self.state.refresh_snapshot();
         Ok(root_path())
     }
 
@@ -408,7 +409,7 @@ impl ItemInterface {
         #[zbus(connection)] connection: &Connection,
     ) -> zbus::fdo::Result<bool> {
         self.authorize_read(header, connection).await?;
-        Ok(self.state.item_locked(self.id)?)
+        Ok(self.state.locked())
     }
 
     #[zbus(property)]
@@ -418,13 +419,7 @@ impl ItemInterface {
         #[zbus(connection)] connection: &Connection,
     ) -> zbus::fdo::Result<HashMap<String, String>> {
         self.authorize_read(header, connection).await?;
-        Ok(self
-            .state
-            .store
-            .item(self.id)?
-            .attributes
-            .into_iter()
-            .collect())
+        Ok(self.state.item(self.id)?.attributes.into_iter().collect())
     }
 
     #[zbus(property)]
@@ -458,7 +453,7 @@ impl ItemInterface {
         #[zbus(connection)] connection: &Connection,
     ) -> zbus::fdo::Result<String> {
         self.authorize_read(header, connection).await?;
-        Ok(self.state.store.item(self.id)?.label)
+        Ok(self.state.item(self.id)?.label)
     }
 
     #[zbus(property)]
@@ -490,7 +485,7 @@ impl ItemInterface {
         #[zbus(connection)] connection: &Connection,
     ) -> zbus::fdo::Result<u64> {
         self.authorize_read(header, connection).await?;
-        Ok(self.state.store.item(self.id)?.created)
+        Ok(self.state.item(self.id)?.created)
     }
 
     #[zbus(property)]
@@ -500,7 +495,7 @@ impl ItemInterface {
         #[zbus(connection)] connection: &Connection,
     ) -> zbus::fdo::Result<u64> {
         self.authorize_read(header, connection).await?;
-        Ok(self.state.store.item(self.id)?.modified)
+        Ok(self.state.item(self.id)?.modified)
     }
 }
 
