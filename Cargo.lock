@@ -9422,6 +9422,7 @@ dependencies = [
  "insigne",
  "iroh",
  "iroh-blobs",
+ "iroh-mdns-address-lookup",
  "iroh-tickets",
  "mere-p2panda-net",
  "muniment",

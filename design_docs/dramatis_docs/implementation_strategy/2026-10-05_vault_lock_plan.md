@@ -1147,3 +1147,24 @@ unlock follow-through, and non-Windows startup unlock backends, from the
     rerun used `-j 4`.
 - **Next:** ruling 60's default-policy run in mere-transport's
   `seed_residue.rs`, then ruling 42 (ruling 56's order).
+
+**2026-10-08, ruling 60: the mDNS copies are p2panda-net's.**
+- **mere-transport's `seed_residue.rs`** gains a third shape. The transport
+  is built through `P2pandaHostPolicy::default()`, gossip on, and judged
+  against p2panda-net alone with `MdnsDiscovery` (Active) spawned in the
+  transport's order. It passes: the transport adds nothing beyond
+  p2panda-net in any of the three shapes.
+- **Attribution, measured and reported:**
+  - iroh's own `MdnsAddressLookup`, built from the public id without
+    p2panda, adds nothing beyond iroh alone;
+  - p2panda-net's mDNS layer adds exactly the 4 blocks (472, 568, 784,
+    2424).
+
+  So they are p2panda-net's, in its `MdnsActor` layer, and not Mere's
+  wiring. They are recorded in the upstream candidates ledger, item 11.
+  The mechanism (ractor boxing a stack that still held key bytes) is
+  inferred, not traced.
+- **Dev-dependency:** `iroh-mdns-address-lookup = "=0.6.0"`, the version
+  p2panda-net already locks. `cargo_mode.py verify` passes.
+- **Still open:** what to do about the 4 blocks, since `mere-p2panda-net`
+  is our fork. Then ruling 42.

@@ -101,6 +101,9 @@ insigne = { workspace = true, features = ["verify"] }
 serde_json.workspace = true
 zeroize = "1"
 notochord = { workspace = true, features = ["tokio"] }
+# The seed residue test's iroh-level mDNS baseline (vault lock ruling 60), the
+# version p2panda-net's `iroh_mdns` already locks.
+iroh-mdns-address-lookup = "=0.6.0"
 # A scratch root for the disk-backed blob store's reopen test.
 tempfile = "3"
 tokio = { version = "1", features = ["io-util", "sync", "macros", "rt", "rt-multi-thread", "time"] }

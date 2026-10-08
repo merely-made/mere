@@ -25,6 +25,10 @@
 //! enum, unused bytes included) can copy them to the heap; whether it does
 //! depends on stack depth, so a shallower baseline would hide it.
 //!
+//! The default host policy turns mDNS on, so a third shape binds through it,
+//! against p2panda-net with gossip and mDNS spawned in the transport's order
+//! (ruling 60).
+//!
 //! No libtest harness: the allocator is process-wide.
 
 #[path = "../../../dramatis/personae/tests/residue/mod.rs"]
@@ -38,10 +42,11 @@ use muniment::{JsonCodec, MemoryBackend};
 use p2panda_core::SigningKey;
 use p2panda_net::address_book::AddressBookStoreHandle;
 use p2panda_net::gossip::Gossip;
-use p2panda_net::{AddressBook, Endpoint};
+use p2panda_net::iroh_mdns::MdnsDiscoveryMode;
+use p2panda_net::{AddressBook, Endpoint, MdnsDiscovery};
 use residue::*;
 use stickleback::MunimentAddressBook;
-use transport::{P2pandaTransport, Transport};
+use transport::{P2pandaHostPolicy, P2pandaTransport, Transport};
 
 const RUNS: usize = 5;
 
@@ -104,16 +109,36 @@ fn spawn_endpoint(
     )
 }
 
-type Bound = (Box<Endpoint>, Option<Box<Gossip>>);
-
-/// Two async layers, as the transport's `bind` and `bind_inner`.
-async fn bind_outer(address_book: AddressBook, seed: &'static [u8; 32], gossip: bool) -> Bound {
-    bind_like(address_book, seed, gossip).await
+/// What a run turns on: gossip, and mDNS in the mode the default host
+/// policy uses (ruling 60).
+#[derive(Clone, Copy)]
+struct Shape {
+    gossip: bool,
+    mdns: bool,
 }
 
-async fn bind_like(address_book: AddressBook, seed: &'static [u8; 32], gossip: bool) -> Bound {
+type Bound = (Box<Endpoint>, Option<Box<MdnsDiscovery>>, Option<Box<Gossip>>);
+
+/// Two async layers, as the transport's `bind` and `bind_inner`.
+async fn bind_outer(address_book: AddressBook, seed: &'static [u8; 32], shape: Shape) -> Bound {
+    bind_like(address_book, seed, shape).await
+}
+
+async fn bind_like(address_book: AddressBook, seed: &'static [u8; 32], shape: Shape) -> Bound {
     let endpoint = Box::new(spawn_endpoint(address_book.clone(), seed).await.unwrap());
-    let overlay = match gossip {
+    // The transport spawns mDNS before gossip.
+    let mdns = match shape.mdns {
+        true => {
+            let spawn = Box::pin(
+                MdnsDiscovery::builder(address_book.clone(), (*endpoint).clone())
+                    .mode(MdnsDiscoveryMode::Active)
+                    .spawn(),
+            );
+            Some(Box::new(spawn.await.unwrap()))
+        },
+        false => None,
+    };
+    let overlay = match shape.gossip {
         true => {
             let spawn =
                 Box::pin(Gossip::builder(address_book.clone(), (*endpoint).clone()).spawn());
@@ -121,7 +146,7 @@ async fn bind_like(address_book: AddressBook, seed: &'static [u8; 32], gossip: b
         },
         false => None,
     };
-    (endpoint, overlay)
+    (endpoint, mdns, overlay)
 }
 
 /// The transport's `close`, line for line.
@@ -135,24 +160,30 @@ async fn close_like(endpoint: &Endpoint) -> Result<(), String> {
 }
 
 /// The baseline: p2panda-net built, nested and dropped as the transport does.
-async fn p2panda_net(seed: &'static [u8; 32], gossip: bool) {
+async fn p2panda_net(seed: &'static [u8; 32], shape: Shape) {
     let store = AddressBookStoreHandle::new(MunimentAddressBook::<MemoryBackend, JsonCodec>::new(
         MemoryBackend::new(),
     ));
     let address_book = AddressBook::builder().store(store).spawn().await.unwrap();
-    let (endpoint, overlay) = bind_outer(address_book.clone(), seed, gossip).await;
+    let (endpoint, mdns, overlay) = bind_outer(address_book.clone(), seed, shape).await;
     close_like(&endpoint).await.unwrap();
     // The transport's field order.
-    drop((endpoint, address_book, overlay));
+    drop((endpoint, address_book, mdns, overlay));
 }
 
 /// The transport, awaited inline and held by value, as residents hold it.
 /// Between bind and close it asks each question that reads iroh's endpoint
 /// (ruling 54), so a message to p2panda's actor from any of them shows here.
-async fn transport(seed: &'static [u8; 32], gossip: bool) {
+/// With `mdns`, the builder goes through the default host policy, as every
+/// overlay host's does (ruling 60).
+async fn transport(seed: &'static [u8; 32], shape: Shape) {
     let builder = P2pandaTransport::builder_from_seed_ref(seed);
-    let builder = match gossip {
+    let builder = match shape.gossip {
         true => builder.gossip(),
+        false => builder,
+    };
+    let builder = match shape.mdns {
+        true => P2pandaHostPolicy::default().configure(builder),
         false => builder,
     };
     let bound = builder.bind().await.unwrap();
@@ -163,6 +194,27 @@ async fn transport(seed: &'static [u8; 32], gossip: bool) {
     bound.peer_paths(me).await.unwrap();
     bound.close().await.unwrap();
     drop(bound);
+}
+
+/// iroh alone; with `mdns`, iroh's own mDNS lookup built as p2panda-net
+/// builds it (from the public id, advertising), with no p2panda actor.
+async fn iroh_alone(seed: &'static [u8; 32], mdns: bool) {
+    let endpoint = iroh::Endpoint::builder(iroh::endpoint::presets::Minimal)
+        .secret_key(iroh::SecretKey::from_bytes(seed))
+        .bind()
+        .await
+        .unwrap();
+    let lookup = match mdns {
+        true => Some(
+            iroh_mdns_address_lookup::MdnsAddressLookup::builder()
+                .advertise(true)
+                .build(endpoint.id())
+                .unwrap(),
+        ),
+        false => None,
+    };
+    endpoint.close().await;
+    drop(lookup);
 }
 
 /// Blocks, `(live, size)`, in every transport run and in no baseline run.
@@ -194,27 +246,43 @@ fn main() {
     let seed: &'static [u8; 32] = Box::leak(Box::new(seed));
     plant(0, "transport seed", seed, true);
 
-    let iroh = measure(&rt, "iroh endpoint alone", || async {
-        let endpoint = iroh::Endpoint::builder(iroh::endpoint::presets::Minimal)
-            .secret_key(iroh::SecretKey::from_bytes(seed))
-            .bind()
-            .await
-            .unwrap();
-        endpoint.close().await;
+    let iroh = measure(&rt, "iroh endpoint alone", || iroh_alone(seed, false));
+    let iroh_mdns = measure(&rt, "iroh endpoint alone, mDNS", || iroh_alone(seed, true));
+    let [plain, gossip, policy] = [
+        Shape { gossip: false, mdns: false },
+        Shape { gossip: true, mdns: false },
+        Shape { gossip: true, mdns: true },
+    ];
+    let net = measure(&rt, "p2panda-net alone", || p2panda_net(seed, plain));
+    let net_gossip = measure(&rt, "p2panda-net alone, gossip", || p2panda_net(seed, gossip));
+    let net_policy = measure(&rt, "p2panda-net alone, gossip, mDNS", || {
+        p2panda_net(seed, policy)
     });
-    let net = measure(&rt, "p2panda-net alone", || p2panda_net(seed, false));
-    let net_gossip = measure(&rt, "p2panda-net alone, gossip", || p2panda_net(seed, true));
-    let bare = measure(&rt, "transport", || transport(seed, false));
-    let gossip = measure(&rt, "transport, gossip", || transport(seed, true));
+    let bare = measure(&rt, "transport", || transport(seed, plain));
+    let with_gossip = measure(&rt, "transport, gossip", || transport(seed, gossip));
+    let with_policy = measure(&rt, "transport, default host policy", || {
+        transport(seed, policy)
+    });
     clear_canaries();
     drop(rt);
 
     // iroh's own blocks are reported above, never failed on: they are its.
-    drop(iroh);
+    // Which of the default policy's blocks iroh's mDNS lookup accounts for,
+    // and which p2panda-net's mDNS actor adds (ruling 60), reported only.
+    println!(
+        "seed residue iroh mDNS lookup: blocks beyond iroh alone {:?}",
+        transports_own(&iroh_mdns, &iroh)
+    );
+    println!(
+        "seed residue p2panda-net mDNS: blocks beyond p2panda-net with gossip {:?}",
+        transports_own(&net_policy, &net_gossip)
+    );
+    drop((iroh, iroh_mdns));
     let mut failures = Vec::new();
     for (name, runs, baseline) in [
         ("transport", &bare, &net),
-        ("transport, gossip", &gossip, &net_gossip),
+        ("transport, gossip", &with_gossip, &net_gossip),
+        ("transport, default host policy", &with_policy, &net_policy),
     ] {
         let own = transports_own(runs, baseline);
         println!("seed residue {name}: blocks (live, size) beyond p2panda-net {own:?}");
