@@ -17,6 +17,13 @@
 //!
 //! Relationships are the relationship recipe's [`DisclosedRelationship`], and
 //! they are checked by the same validator the relationship compiler runs.
+//! They are routed onto whatever projection the dataset compiles to (site
+//! canvas plan, Ruling 128): [`HostDatasetV1::compile`] compiles the host's
+//! own definition as usual and then draws each relationship between its two
+//! occurrences where that arrangement placed them. No semantic facet and no
+//! layout is required of the dataset, and a dataset without relationships
+//! compiles exactly as it would without the envelope. The relationship
+//! recipe's compiler, which does require them, is untouched.
 
 use std::collections::HashSet;
 use std::fmt;
@@ -25,9 +32,10 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::projection::{
-    CompileIssue, DisclosedRelationship, ProjectionDataset, relationship_disclosure_issues,
+    CompileIssue, CompiledProjection, CompiledRelationship, DisclosedRelationship,
+    ProjectionCompiler, ProjectionDataset, relationship_disclosure_issues, stable_generation,
 };
-use scenograph::PublicSourceRevision;
+use scenograph::{ProjectionDefinition, PublicSourceRevision};
 
 /// The schema tag of the first host dataset envelope.
 pub const HOST_DATASET_SCHEMA_V1: &str = "scenomise.host-dataset/v1";
@@ -159,6 +167,117 @@ pub fn parse_host_dataset(json: &str) -> Result<HostDatasetV1, HostDatasetError>
         return Err(HostDatasetError::Relationships(issues));
     }
     Ok(envelope)
+}
+
+/// A host dataset compiled through a host's definition, its disclosed
+/// relationships routed onto the arrangement that definition chose.
+#[derive(Debug)]
+pub struct HostProjection {
+    /// The projection; its `scene.relations` holds one routed relation per
+    /// disclosed relationship, in relationship id order.
+    pub projection: CompiledProjection,
+    /// Each relationship with the instances it joins, in the same order.
+    pub relationships: Vec<CompiledRelationship>,
+}
+
+impl HostDatasetV1 {
+    /// Compile `definition` against the dataset and route its relationships.
+    pub fn compile(
+        &self,
+        compiler: &ProjectionCompiler,
+        definition: &ProjectionDefinition,
+    ) -> Result<HostProjection, Vec<CompileIssue>> {
+        self.routed(compiler.compile(definition, &self.dataset)?)
+    }
+
+    /// As [`ProjectionCompiler::refresh`], reusing `previous`'s placement when
+    /// its solver inputs are unchanged, then routing the relationships afresh.
+    pub fn refresh(
+        &self,
+        compiler: &ProjectionCompiler,
+        previous: &CompiledProjection,
+        definition: &ProjectionDefinition,
+    ) -> Result<HostProjection, Vec<CompileIssue>> {
+        self.routed(compiler.refresh(previous, definition, &self.dataset)?)
+    }
+
+    fn routed(
+        &self,
+        mut projection: CompiledProjection,
+    ) -> Result<HostProjection, Vec<CompileIssue>> {
+        let relationships =
+            route_relationships(&mut projection, &self.dataset, &self.relationships)?;
+        Ok(HostProjection {
+            projection,
+            relationships,
+        })
+    }
+}
+
+/// Route disclosed relationships onto a projection compiled from `dataset`,
+/// replacing its `scene.relations`.
+///
+/// Each relation runs between the placed positions of its two occurrences, so
+/// it follows whichever arrangement the projection's definition chose. The
+/// relationships are checked by the validator the relationship compiler runs,
+/// and a projection compiled from any other dataset or revision is refused.
+pub fn route_relationships(
+    projection: &mut CompiledProjection,
+    dataset: &ProjectionDataset,
+    relationships: &[DisclosedRelationship],
+) -> Result<Vec<CompiledRelationship>, Vec<CompileIssue>> {
+    let mut issues = relationship_disclosure_issues(dataset, relationships);
+    if projection.score.generation != stable_generation(dataset) {
+        issues.push(CompileIssue {
+            field: "projection".into(),
+            message: "the projection was compiled from another dataset or revision".into(),
+        });
+    }
+    if !issues.is_empty() {
+        return Err(issues);
+    }
+    let mut ordered: Vec<_> = relationships.iter().collect();
+    ordered.sort_by(|a, b| a.id.cmp(&b.id));
+    let mut routed = Vec::with_capacity(ordered.len());
+    let mut compiled = Vec::with_capacity(ordered.len());
+    for relationship in ordered {
+        let endpoint = |occurrence: &str| {
+            projection
+                .instance_by_occurrence
+                .get(occurrence)
+                .copied()
+                .ok_or_else(|| {
+                    vec![CompileIssue {
+                        field: format!("relationships.{}.endpoints", relationship.id),
+                        message: "the projection does not place this occurrence".into(),
+                    }]
+                })
+        };
+        let (from, to) = (
+            endpoint(&relationship.from_occurrence)?,
+            endpoint(&relationship.to_occurrence)?,
+        );
+        let at = |instance: sceno::InstanceId| {
+            projection.scene.items[instance.0 as usize]
+                .transform
+                .translate
+        };
+        routed.push(sceno::RoutedRelation {
+            from,
+            to,
+            space: sceno::Scene::WORLD,
+            points: vec![at(from), at(to)],
+            kind: Some(relationship.kind.clone()),
+            weight: None,
+        });
+        compiled.push(CompiledRelationship {
+            disclosure: relationship.clone(),
+            from,
+            to,
+        });
+    }
+    projection.scene.relations = routed;
+    Ok(compiled)
 }
 
 fn check_revisions(envelope: &HostDatasetV1) -> Result<(), HostDatasetError> {
