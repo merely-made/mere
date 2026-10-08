@@ -25,6 +25,13 @@ path-workspace patch tables make Cargo reorder semantically identical
 `patch.unused` entries. The checked-in package selections and exact
 wasm-bindgen CLI pin remain the reproducibility boundary.
 
+The e5-base-v2 row names a manifest instead of carrying its own pin: its
+revision, licence, pooling, dimensions and artifact hashes are read from ESP's
+`crates/intel/esp/src/embed/meaning_model.json`, the one copy of that pin,
+which Mere's Meaning channel reads too (dynamics grammar plan, F89). The row
+keeps its fetch path and its reference output. The fetch script, the reference
+script and the page each resolve it the same way.
+
 Open the printed URL in a headed Chromium browser and select **Run configured
 matrix**. `window.distilleryModelProbe.runSuite(modelId)` runs one configured
 embedding row, `runMatrix()` runs those rows in ascending artifact size,

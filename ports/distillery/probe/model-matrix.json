@@ -79,22 +79,8 @@
       }
     },
     {
-      "model_id": "intfloat/e5-base-v2",
-      "revision": "f52bf8ec8c7124536f0efb74aca902b2995e5bcd",
+      "manifest": "crates/intel/esp/src/embed/meaning_model.json",
       "model_base_url": "/models/e5-base-v2",
-      "architecture": "bert",
-      "license": "MIT",
-      "pooling": "mean",
-      "expected_dimensions": 768,
-      "artifacts": {
-        "config": { "bytes": 650, "sha256": "01cc39aa39538a8179aa131c8a16adc03b506c92009f091502e4eb0c702f5f78" },
-        "tokenizer": { "bytes": 711396, "sha256": "d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66" },
-        "weights": {
-          "bytes": 437955512,
-          "dtype": "F32",
-          "sha256": "d0d559c47d5f71b1d280b13b62a2657f3e3bc70c0786f9ab91a36545e6a8f693"
-        }
-      },
       "reference": {
         "source": "PyTorch 2.11.0+cpu / Transformers 5.8.0",
         "tolerance": 0.0001,

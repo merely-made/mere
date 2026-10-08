@@ -7,8 +7,9 @@
 //! The Meaning channel's sentence model, pinned (dynamics grammar plan, G2,
 //! F56 and F58): which model, at which published revision, under which
 //! licence, with the pooling and prefix its card asks for, and every
-//! artifact's size and hashes. The manifest is `meaning_model.json` beside
-//! this file, in the shape of distillery's `decoder-model.json`.
+//! artifact's size and hashes. The manifest is ESP's, the one copy of the
+//! pin (F89, "One manifest in ESP"): `esp::embed::MEANING_MODEL_MANIFEST`,
+//! in the shape of distillery's `decoder-model.json`.
 //!
 //! The weights stay outside the tree, in a models directory the host names;
 //! loading checks each artifact is present at its pinned size. The hashes
@@ -24,7 +25,7 @@ use serde::Deserialize;
 
 use super::meaning::{MeaningBackend, ProviderMeaning};
 
-const MANIFEST: &str = include_str!("meaning_model.json");
+const MANIFEST: &str = esp::embed::MEANING_MODEL_MANIFEST;
 
 #[derive(Debug, Deserialize)]
 struct Manifest {
@@ -75,8 +76,8 @@ impl MeaningModel {
         static PINNED: OnceLock<MeaningModel> = OnceLock::new();
         PINNED.get_or_init(|| {
             let manifest: Manifest =
-                serde_json::from_str(MANIFEST).expect("meaning_model.json parses");
-            assert_eq!(manifest.schema, "pictograph.meaning-model/v1");
+                serde_json::from_str(MANIFEST).expect("ESP's meaning_model.json parses");
+            assert_eq!(manifest.schema, "esp.meaning-model/v1");
             manifest.model
         })
     }
