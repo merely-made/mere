@@ -843,9 +843,10 @@ made, and carried out since under the later rulings.
   - [x] `CastellanResident` drops its keys, so items and the OTP gate return
         `Locked`;
   - [x] the snapshot reports Locked, and Unlock is native-only;
-  - [ ] Secret Service collections report Locked, `GetSecret(s)` refuses,
+  - [x] Secret Service collections report Locked, `GetSecret(s)` refuses,
         and `Unlock` returns a Prompt, proven on the ThinkPad with
-        `secret-tool` under a disposable bus.
+        `secret-tool` under a disposable bus. *(2026-10-08, `aac67a85`;
+        §6.)*
 - **L3 — triggers.** Done when:
   - [ ] each ruled trigger is proven, idle with an injected clock;
   - [ ] there are real receipts for Windows `Win+L` and suspend, and for
@@ -1386,18 +1387,61 @@ unlock follow-through, and non-Windows startup unlock backends, from the
   Another session's checkout and builds are left alone; this work runs in
   a worktree of its own.
 - **The build. Done when:**
-  - [ ] collections and items report `Locked` exactly when the vault is
+  - [x] collections and items report `Locked` exactly when the vault is
         locked, and a lock or unlock emits the property change;
-  - [ ] while locked, a search answers from the snapshot with every item
+  - [x] while locked, a search answers from the snapshot with every item
         locked, `GetSecrets` returns nothing, and `Item.GetSecret` fails
         `IsLocked`;
-  - [ ] `Unlock` while locked returns a Prompt. Its `Prompt()` runs the
+  - [x] `Unlock` while locked returns a Prompt. Its `Prompt()` runs the
         handed-in unlock: success completes with the unlocked objects, and
         a cancel completes as dismissed with the vault still locked;
-  - [ ] a client `Lock` of any object locks the vault;
-  - [ ] proven on the ThinkPad under `dbus-run-session`: `secret-tool
+  - [x] a client `Lock` of any object locks the vault;
+  - [x] proven on the ThinkPad under `dbus-run-session`: `secret-tool
         lookup` on a locked vault brings up the scripted prompt and
         returns the secret, and with a cancel returns nothing. The
         properties and refusals are read with `gdbus`. The existing
-        receipt still passes;
-  - [ ] castellan's tests pass on Windows and Linux.
+        receipt still passes. *2026-10-08: the reads use the receipt's
+        own bus connection instead of `gdbus`. Each `gdbus` call is a new
+        connection, so it cannot hold the transfer session `GetSecret`
+        needs.*
+  - [x] castellan's tests pass on Windows and Linux.
+
+**2026-10-08, the Secret Service built and proven** (`aac67a85`, branch
+`secret-lock`; checkpoint B's Secret Service).
+- **What changed:**
+  - castellan's store gains `MetadataSnapshot`, ruling 11's snapshot for
+    the Secret Service, held in memory and never written;
+  - `serve()` takes the host's `SecretServiceVault` (is locked, a watch,
+    lock, the native unlock prompt);
+  - `Locked` follows it, and a watcher announces each change as
+    `PropertiesChanged` on every object;
+  - while locked, reads answer from the snapshot;
+  - `Unlock` returns a Prompt object (`prompt.rs`);
+  - a client `Lock` of any collection, alias or item locks the vault.
+- ***Reading, not ruled:*** the snapshot is retaken at serve, at each
+  unlock and after each write made through the service. An edit made
+  through another surface while unlocked shows in the locked view after
+  the next of those.
+- **Verified on the ThinkPad (Fedora 44, under `dbus-run-session`):**
+  - the new receipt: Lock, the announcement, the locked reads, the
+    refusals, a cancelled prompt and an unlocking one through
+    `secret-tool lookup`;
+  - the existing store, lookup and clear receipt;
+  - castellan with all features (5 suites, 127 passed);
+  - **control:** `locked()` hard-wired to false fails the receipt at the
+    collection's `Locked`. The first draft read that property through a
+    caching proxy, which answered from the very signal under test; every
+    read is uncached now.
+- **Verified on Windows:** castellan by default (67) and with
+  `secret-service` (18), and `cargo_mode.py verify`.
+- **Fixed in passing:** personae's `ssh_ca_live` (`#![cfg(unix)]`, behind
+  `ssh`) had not compiled since `7926d3a8`, which moved the proofs to
+  insigne; it lacked `use personae::delegation::Issue`.
+- **Finding, Linux only:** personae's `no_residue` fails "sealed vault
+  locked". The sealed root key, raw, is in a 564-byte block freed
+  uncleared, allocated during `save`. This happened in 3 of 3 runs on the
+  ThinkPad. On Windows, at the same commit, every scenario is clean. L1's
+  instrument has not been run on Linux before, so L1's residue condition
+  holds on Windows only. Not yet traced.
+- **Still open:** djinn's wiring and the hand-over from gnome-keyring
+  (ruling 69); ruling 42's Linux runtime proof; the Linux residue above.
