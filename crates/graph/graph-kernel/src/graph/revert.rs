@@ -388,7 +388,10 @@ impl Revert {
                 position: Point2D::new(0.0, 0.0),
             },
         );
-        let born = node_state(&scratch, id).expect("the scratch node exists");
+        let mut born = node_state(&scratch, id).expect("the scratch node exists");
+        // Birth stamps visits with the clock, so never count them as already right.
+        born.facets
+            .insert(super::node_facets::VISIT_HISTORY.to_string(), Value::Null);
         self.node_parts(id, before, &born, &born);
     }
 }
@@ -709,6 +712,27 @@ pub(super) mod tests {
         let mut live = after.clone();
         let revert = revert_change(&made, &before, &after, &live);
         assert!(revert.kept.is_empty(), "{:?}", revert.kept);
+        apply_all(&mut live, &revert.edits);
+        assert_eq!(fingerprint(&live), fingerprint(&before));
+    }
+
+    #[test]
+    fn a_restored_node_keeps_its_visit_stamp_across_a_clock_tick() {
+        // Birth stamps visits with the clock. Make the node and the revert in
+        // one millisecond and apply it in the next: the stamp must still be the
+        // original, not the moment of the restore.
+        let tick = |from: u64| while crate::time::unix_epoch_millis() == from {};
+        let (before, after, revert, at) = (0..100)
+            .find_map(|_| {
+                tick(crate::time::unix_epoch_millis());
+                let at = crate::time::unix_epoch_millis();
+                let (before, made, after) = scene(&[add(1), add(2), relate(1, 2)], &[remove(2)]);
+                let revert = revert_change(&made, &before, &after, &after);
+                (crate::time::unix_epoch_millis() == at).then_some((before, after, revert, at))
+            })
+            .expect("a scene and its revert fit in one millisecond");
+        tick(at);
+        let mut live = after;
         apply_all(&mut live, &revert.edits);
         assert_eq!(fingerprint(&live), fingerprint(&before));
     }
