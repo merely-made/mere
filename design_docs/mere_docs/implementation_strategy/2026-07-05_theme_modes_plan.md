@@ -93,8 +93,9 @@ remaining consumer adapter and exporter acceptance work above.
 
 ## Appearance workshop (2026-10-07)
 
-**Status (2026-10-07):** W1–W2 implemented; W3 authored-library persistence implemented,
-with stylesheet/custom-calculator rendering and export parity still open. Mark asked to start Tabard's larger authoring role,
+**Status (2026-10-08):** W1–W2 implemented; W3 authored-library persistence, portable
+interchange, isolated stylesheet authoring and canonical-mode export parity implemented.
+Custom-calculator authoring and Turnstone mounting remain open. Mark asked to start Tabard's larger authoring role,
 with the browser's SC step 2 proceeding independently. The suite census owns
 its product charter: an appearance workshop with authored themes and live
 preview, shared by a standalone host and Turnstone.
@@ -114,8 +115,10 @@ preview, shared by a standalone host and Turnstone.
   harmony and unsupported-role diagnostics through preview/export adapters.
   Done for the library when versioned authored definitions survive save/reload
   and stale/busy/failed writes cannot advance the editing save point. Current
-  CSS/DTCG methods still use their documented normal-contrast profile; explicit
-  mode-profile syntax derivation is available for the live workshop preview.
+  Legacy CSS/DTCG methods retain their documented normal-contrast profile. The
+  workshop uses explicit-mode artifact APIs sharing its exact harmony, base
+  palette and syntax derivation; selected stylesheet overrides/custom modes
+  refuse a derived color export and can be preserved as authored theme JSON.
 
 **Findings (2026-10-07):** `ThemeRegistry` already supports CRUD, but editing
 through it writes immediately. `derive_from_def_for_mode` supplies canonical
@@ -232,6 +235,65 @@ Representative images and receipts are retained in
 This is a bounded read-only reader appearance and selectable graph specimen.
 Reader link activation/session accessibility, source editing, full graph
 workspace behavior and host appearance activation remain separate capabilities.
+
+### Standalone authoring and interchange (2026-10-08)
+
+The existing surface now supports direct six-digit RGB entry alongside HSL;
+Apply preserves authored alpha, invalid/incomplete text stays visible, and
+Save/export/navigation cannot silently drop staged color input. The selected
+canonical mode can become the theme's authored default in one undoable edit.
+
+A separate application document uses the existing ScriptedDom/Livery cascade,
+layout and paint translation. Exact authored mode CSS replaces the derived
+sheet in that document; Apply, Clear, parser diagnostics and ordinary selectors
+are available through Cambium's shared text input. Editor styles never enter
+that document, and authored rules never enter the editor's cascade. Its scene
+and the reader share one generic adapter on the native host's existing render
+core/device. The typed reader, syntax and graph continue to show derived seed
+appearance, with that boundary stated on the surface.
+
+Portable theme JSON preserves authored fields, provenance, harmony and all
+mode sheets. Import validates first and forks built-in/colliding identities;
+it remains unpublished until Save. The shared crate owns this validation,
+draft construction and atomic artifact writer. CSS and DTCG export use the
+selected canonical mode and the same effective seeds/contrast/syntax profiles
+as the preview. Arbitrary stylesheet overrides and custom calculators cannot
+be represented as these derived color artifacts; exporting the full theme
+preserves their source. Existing legacy exports retain their behavior.
+
+The desktop chooses export destinations through its existing platform dialog
+backend. An occupied destination requires an explicit replacement; export
+captures the authored bytes before opening the chooser, never advances the
+save point and cannot replace the active library, editor preferences or their
+locks through lexical/symlink aliases. Delete validates a candidate library,
+persists it, then changes the editor. Failed writes preserve draft/history and
+registered definitions. Last selected saved theme and preview mode use the
+existing host-choice store in a separate `.workshop.json` sidecar; they do not
+activate an appearance in another host. Closing offers Save and close, Close
+without saving, or Keep editing, including unfinished fields and unchanged
+imported/copied definitions.
+
+**Validation (macOS x86_64):** shared Tabard 70 tests, workshop 40 tests and
+native desktop 9 tests pass. Retained acceptance uses actual control dispatch,
+native text/file/close hooks and real temporary-file writes. It verifies exact
+computed CSS and editor-cascade isolation, RGB/alpha/history, default flags,
+import collisions, explicit replacement and protected destinations (including
+missing files through parent symlinks and case aliases), transactional deletion,
+choice restoration and invalid-input/failed-save recovery. The ordinary native
+run composes the same close policy with its scenario lifecycle.
+
+Headed authoring passes 95 frames / 5 captures, then a fresh process passes
+18 frames / 1 capture; all six are nonblank. Native wide and narrow images,
+authored fixture data and receipts are retained in
+[`ports/tabard/desktop/receipts/2026-10-08_usable`](../../../ports/tabard/desktop/receipts/2026-10-08_usable).
+The host file-routing suite passes 4 tests; strict Clippy with `--no-deps`
+passes for both ports, and the shared crate completes with its existing warnings.
+Port boundaries and scoped formatting pass. The documentation audit retains
+its inherited digest/browser-receipt errors (257/258 active documents).
+OS dialog panels and live screen-reader interaction were not automated.
+
+Custom calculator creation/editing, Turnstone activation, editable content,
+full graph workspaces and live screen-reader validation remain open.
 
 ## The model (decision record)
 
