@@ -1,0 +1,17 @@
+/* Fixed application structure and semantic variable consumers. Zero-specificity
+   selectors let ordinary author rules override this fixture. The selected
+   mode sheet supplies variables or overrides these ordinary selectors. */
+:where(html), :where(body) { margin: 0; padding: 0; min-height: 100%; }
+:where(body) { font-family: sans-serif; font-size: 14px; line-height: 1.4; background-color: var(--tabard-color-bg, #ffffff); color: var(--tabard-color-text, #202020); }
+:where(.application-shell) { padding: 16px; }
+:where(.toolbar) { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px; background-color: var(--tabard-color-surface-2, #eeeeee); }
+:where(.control) { padding: 6px 12px; border: 1px solid currentColor; border-radius: 4px; font: inherit; background-color: var(--tabard-color-primary, #404040); color: var(--tabard-color-on-primary, #ffffff); }
+:where(.address-field) { margin: 10px 0; padding: 8px 10px; border: 1px solid currentColor; border-radius: 4px; background-color: var(--tabard-color-surface, #f7f7f7); color: var(--tabard-color-text-dim, #555555); }
+:where(.panel) { padding: 12px; background-color: var(--tabard-color-surface, #f7f7f7); }
+:where(h1) { margin: 0 0 12px; font-size: 22px; color: var(--tabard-color-text-header, #202020); }
+p { margin: 0 0 12px; }
+:where(.reader-link) { text-decoration: underline; color: var(--tabard-syntax-link, #333333); }
+:where(pre) { font-family: monospace; font-size: 13px; margin: 14px 0 0; white-space: pre-wrap; color: var(--tabard-syntax-emphasis, #202020); }
+:where(.token-keyword) { color: var(--tabard-syntax-keyword, #202020); }
+:where(.token-string) { color: var(--tabard-syntax-string, #202020); }
+:where(.token-number) { color: var(--tabard-syntax-number, #202020); }

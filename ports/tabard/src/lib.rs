@@ -8,12 +8,16 @@
 //! surface for standalone and embedding hosts.
 
 mod graph;
+mod interchange;
 mod reader;
 mod state;
+mod stylesheet;
 mod surface;
 
+pub use interchange::{ExportArtifact, ExportFormat};
 pub use reader::{READER_LEAF_KEY, ReaderSpecimen};
 pub use state::{SeedRole, WorkshopState};
+pub use stylesheet::{APPLICATION_SOURCE, PreviewScene, STYLESHEET_LEAF_KEY, StylesheetSpecimen};
 pub use surface::{WORKSHOP_CODE_SAMPLE, WORKSHOP_CSS, WorkshopView, workshop_view};
 
 /// The shared component sheets and the workshop frame, in cascade order.
