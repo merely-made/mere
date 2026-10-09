@@ -14,7 +14,7 @@
 //! ```ignore
 //! let mut spec = canvas.dynamics_spec()?;
 //! let (choice, refusal) = picked.admitted();
-//! choice.write_into(&mut spec);
+//! choice.write_into(&mut spec, &PhysicsChoice::live(&canvas));
 //! canvas.set_dynamics_spec(&spec)?;
 //! ```
 //!
@@ -62,27 +62,30 @@ impl PhysicsChoice {
     /// The choice as a spec: its law and overlays at the root, every slot
     /// written, the default seed, no target (F146).
     pub fn into_spec(&self) -> DynamicsSpec {
-        let mut spec = DynamicsSpec::new(Node::preset(self.law.id()));
-        self.write_into(&mut spec);
+        let mut spec = DynamicsSpec::new(self.law_node());
+        spec.channels = self.sources().channels();
         spec
     }
 
     /// Write this choice into `spec`, keeping its seed, bars, realization and
     /// target: a picker's edit of the record (F146). Every slot takes these
-    /// sources; the root becomes this law and its overlays unless the spec's
-    /// own view already shows them, so a source edit keeps a composition or
-    /// a schedule as a source setter did, and a law or overlay edit replaces
-    /// it as a law pick did.
-    pub fn write_into(&self, spec: &mut DynamicsSpec) {
+    /// sources. The root becomes this law and its overlays unless they are
+    /// what `running` shows, the canvas's [`live`](Self::live) view (F171):
+    /// a source edit keeps a mix, a grouping or a schedule at any stage, and
+    /// a law or overlay edit replaces it.
+    pub fn write_into(&self, spec: &mut DynamicsSpec, running: &PhysicsChoice) {
         spec.channels = self.sources().channels();
-        let shown = Self::view(spec)
-            .is_ok_and(|view| view.law == self.law && view.overlays == self.overlays);
-        if !shown {
-            let mut root = Node::preset(self.law.id());
-            root.overlays_mut()
-                .extend(self.overlays.iter().map(|o| Node::preset(o.id())));
-            spec.root = root;
+        if self.law != running.law || self.overlays != running.overlays {
+            spec.root = self.law_node();
         }
+    }
+
+    /// This law and its overlays as a root.
+    fn law_node(&self) -> Node {
+        let mut root = Node::preset(self.law.id());
+        root.overlays_mut()
+            .extend(self.overlays.iter().map(|o| Node::preset(o.id())));
+        root
     }
 
     /// The flat view of a spec, checked as the canvas checks it: derived,

@@ -40,7 +40,7 @@ pub fn snapshot_on(engine: Arc<dyn MeaningEngine>) -> (MeaningSnapshot, u64) {
         kind: PhysicsKindSource::Meaning,
         ..PhysicsChoice::live(&canvas)
     }
-    .write_into(&mut spec);
+    .write_into(&mut spec, &PhysicsChoice::live(&canvas));
     canvas.set_dynamics_spec(&spec).expect("not refused");
     let snapshot = canvas.meaning().expect("a snapshot at build").clone();
     (snapshot, canvas.meaning_runs())

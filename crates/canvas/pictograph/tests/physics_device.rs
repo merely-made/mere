@@ -61,7 +61,7 @@ fn the_canvas_stages_its_repulsion_on_the_device_and_keeps_it_across_a_law_switc
         law: PhysicsLaw::Stress,
         ..PhysicsChoice::live(&canvas)
     }
-    .write_into(&mut spec);
+    .write_into(&mut spec, &PhysicsChoice::live(&canvas));
     canvas.set_dynamics_spec(&spec).expect("Stress binds");
     frames(&mut canvas, 60);
     let stress = canvas.repulsion_stats().unwrap();

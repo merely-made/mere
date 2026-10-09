@@ -476,3 +476,72 @@ fn roles_ride_the_target_and_a_given_partition_has_no_spec() {
     assert_eq!(to.dynamics_spec().unwrap(), before);
     assert!(bind(&saved).is_ok());
 }
+
+/// F171: a picker's edit is judged against what runs now. A source edit
+/// keeps a mix, a grouping and a schedule in its first stage or a later
+/// one; a law change replaces each.
+#[test]
+fn a_source_edit_keeps_what_runs_and_a_law_change_replaces_it() {
+    let mix = PhysicsComposition::Mix(vec![(PhysicsLaw::Springs, 0.5), (PhysicsLaw::Energy, 2.0)]);
+    let grouped = PhysicsComposition::Grouped(PhysicsGrouping::charge_between(
+        GroupSource::Channel(PhysicsKindSource::Cluster),
+    ));
+    for composition in [mix, grouped] {
+        let (mut canvas, _) = super::binding::canvas();
+        canvas.pick_composition(Some(composition.clone())).unwrap();
+        canvas.pick_mass(PhysicsMassSource::PageRank);
+        assert_eq!(canvas.physics_composition(), Some(&composition), "kept");
+        assert_eq!(canvas.view().mass, PhysicsMassSource::PageRank);
+        canvas.pick_law(PhysicsLaw::Stress).unwrap();
+        assert_eq!(
+            canvas.physics_composition(),
+            None,
+            "{composition:?} replaced"
+        );
+        assert_eq!(canvas.view().law, PhysicsLaw::Stress);
+    }
+    let is_schedule = |c: &Canvas| matches!(c.dynamics_spec().unwrap().root, Node::Schedule { .. });
+    // A schedule in its first stage.
+    let (mut canvas, _) = super::binding::canvas();
+    canvas.pick_schedule(vec![
+        PhysicsStage::law(PhysicsLaw::Stress, StageStop::Frames(10_000)),
+        PhysicsStage::law(PhysicsLaw::Springs, StageStop::Rest),
+    ]);
+    canvas.pick_kind(PhysicsKindSource::Degree);
+    assert_eq!(canvas.physics_schedule_stage(), Some(0));
+    assert!(is_schedule(&canvas), "the first stage kept the recipe");
+    canvas.pick_law(PhysicsLaw::Charge).unwrap();
+    assert_eq!(canvas.physics_schedule_stage(), None);
+    assert!(!is_schedule(&canvas), "a law change replaced it");
+    // A schedule in a later stage, where the stage's law is not the first.
+    let (mut canvas, _) = super::binding::canvas();
+    canvas.pick_schedule(vec![
+        PhysicsStage::law(PhysicsLaw::Stress, StageStop::Frames(5)),
+        PhysicsStage::law(PhysicsLaw::Springs, StageStop::Frames(10_000)),
+    ]);
+    for _ in 0..6 {
+        canvas.step_layout();
+    }
+    assert_eq!(canvas.physics_schedule_stage(), Some(1));
+    assert_eq!(canvas.view().law, PhysicsLaw::Springs);
+    // The control: judged against the spec's own first-stage view, as
+    // before F171, the same source edit would have replaced the recipe.
+    let edit = PhysicsChoice {
+        groups: PhysicsKindSource::Meaning,
+        ..canvas.view()
+    };
+    let mut spec = canvas.dynamics_spec().unwrap();
+    let first_stage = PhysicsChoice::view(&spec).unwrap();
+    edit.write_into(&mut spec, &first_stage);
+    assert!(
+        matches!(spec.root, Node::Preset { .. }),
+        "the first-stage judgment replaces"
+    );
+    canvas.pick_groups(PhysicsKindSource::Meaning);
+    assert_eq!(canvas.physics_schedule_stage(), Some(1), "still under way");
+    assert!(is_schedule(&canvas), "a later stage kept the recipe");
+    assert_eq!(canvas.view().groups, PhysicsKindSource::Meaning);
+    canvas.pick_law(PhysicsLaw::Charge).unwrap();
+    assert_eq!(canvas.physics_schedule_stage(), None);
+    assert!(!is_schedule(&canvas));
+}

@@ -171,7 +171,7 @@ fn the_model_on_the_host_device_shares_it_and_records_purity() {
         kind: PhysicsKindSource::Meaning,
         ..PhysicsChoice::live(&canvas)
     }
-    .write_into(&mut spec);
+    .write_into(&mut spec, &PhysicsChoice::live(&canvas));
     canvas.set_dynamics_spec(&spec).expect("not refused");
     // The build dispatched the run; frames go on while it is in flight.
     let dispatched = Instant::now();
