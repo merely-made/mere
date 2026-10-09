@@ -564,6 +564,7 @@ impl Canvas {
     /// reconcile it. (Swatch-primitive P5 — hiding relaxes the spring in that instance
     /// only; graph truth, membership, and every other instance are unaffected.)
     fn resync_edge_springs(&mut self) {
+        self.physics_view_revision += 1;
         self.physics
             .sync_edges(visible_relation_edges(&self.graph, &self.hidden_edges));
         self.settle_physics(SETTLE_TICKS / 3);

@@ -418,6 +418,10 @@ pub struct Canvas {
     /// spring persist; this is display-only. Persistence rides view-intent's
     /// `hidden_relations`.
     hidden_edges: HashSet<EdgeCell>,
+    /// The physics view's revision (F178): bumped whenever a hide or show
+    /// changes the visible relation cells, so the registry's physics channels
+    /// key by it beside the graph's structural revision.
+    physics_view_revision: u64,
     /// The field the cursor is over (hover) — drives box-on-interaction: a field's
     /// dashed extent box draws only while it is the active field; the soft disk well
     /// is always shown. `None` when the cursor is over no field. (Field regions.)

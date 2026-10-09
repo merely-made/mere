@@ -16,6 +16,9 @@ serde.workspace = true
 # the only feature, and it adds no crate beyond serde itself.
 uuid = { version = "1", default-features = false, features = ["serde"] }
 
+# An OTP tile holds the code it shows, cleared on drop (ruling D29).
+zeroize = "1"
+
 [dev-dependencies]
 # The binary codec muniment stores with, so the binary serde path is tested
 # beside JSON, as gaz and insigne test theirs.

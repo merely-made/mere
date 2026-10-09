@@ -45,6 +45,8 @@ insigne = { workspace = true, features = ["verify"] }
 base64.workspace = true
 # The secret-free item taxonomy; the OTP display enums are defined there.
 chatelaine.workspace = true
+# The identity surface's plain types (dramatis repo plan, DR-A).
+dramatis.workspace = true
 hmac = "0.13"
 notochord.workspace = true
 personae.workspace = true
@@ -88,6 +90,11 @@ signature = "2"
 # Vault lock ruling 6's no-residue instrument over the resident's lock path
 # (L2). Personae's tracker installs its own global allocator, so this runs
 # outside libtest's harness, on one thread.
+[[test]]
+name = "snapshot_golden"
+path = "tests/snapshot_golden.rs"
+required-features = ["keeper"]
+
 [[test]]
 name = "no_residue"
 path = "tests/no_residue.rs"

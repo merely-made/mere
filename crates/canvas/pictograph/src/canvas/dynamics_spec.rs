@@ -27,6 +27,12 @@
 //! a mix or a grouping with overlays, or a schedule of those (the shapes
 //! derive admits today).
 //!
+//! **Raw terms' inputs** (G2c; F155, F181). A raw term names its
+//! graph-derived inputs by slot ([`RawTerm::inputs`]); [`raw_input_channel`]
+//! checks each against what its slot may read, as the preset slots are
+//! checked, and [`Canvas::resolve_raw_input`] reads it from the registry.
+//! Running a raw term stays refused: [`bind`] still refuses a raw node.
+//!
 //! The canvas holds the spec as its record (`dynamics_record`,
 //! [`Canvas::dynamics_spec`]): the
 //! root and the channels are what it runs, a schedule as authored (F157, "the
@@ -43,7 +49,8 @@ pub use seiche::Observable;
 pub use seiche::spec::*;
 use seiche::{Admission, Force, Role};
 
-use super::channels::Channel;
+use super::Canvas;
+use super::channels::{Channel, ChannelValues};
 use super::composition::{GroupSource, PhysicsComposition, PhysicsGrouping};
 use super::physics_catalog::{
     LawInputs, LawSources, PhysicsDepthSource, PhysicsKindSource, PhysicsLaw, PhysicsMassSource,
@@ -182,6 +189,80 @@ pub fn resolve_channels(channels: &BTreeMap<String, String>) -> Result<BoundSour
         }
     }
     Ok(sources)
+}
+
+/// Raw terms' input slots (seiche's [`RawTerm::inputs`]).
+pub const RAW_SLOT_PAIRS: &str = "pairs";
+pub const RAW_SLOT_MASSES: &str = "masses";
+pub const RAW_SLOT_KINDS: &str = "kinds";
+pub const RAW_SLOT_GROUPS: &str = "groups";
+pub const RAW_SLOT_DEPTHS: &str = "depths";
+pub const RAW_SLOT_RADII: &str = "radii";
+/// Every slot a raw term's inputs name.
+pub const RAW_SLOTS: [&str; 6] = [
+    RAW_SLOT_PAIRS,
+    RAW_SLOT_MASSES,
+    RAW_SLOT_KINDS,
+    RAW_SLOT_GROUPS,
+    RAW_SLOT_DEPTHS,
+    RAW_SLOT_RADII,
+];
+
+/// The channel a raw term's input slot names, checked against what the slot
+/// may read (F181, "Match the preset slots"): masses read `mass.*`, kinds
+/// `kind.*`, groups `groups.*` but not `groups.bridges`, depths `depth.*`,
+/// and pairs `distances.*` and `edges.*`, Stress's two inputs; no family
+/// carries radii. `None` for an optional slot left empty. A required slot
+/// left empty, an unknown id, or one the slot cannot read is refused at
+/// `{place}.{slot}`, naming the id.
+pub fn raw_input_channel(place: &str, input: &InputSlot<'_>) -> Result<Option<Channel>, BindError> {
+    let here = format!("{place}.{}", input.slot);
+    if !RAW_SLOTS.contains(&input.slot) {
+        return Err(unbound(
+            here,
+            format!("no raw term reads a slot named {}", input.slot),
+        ));
+    }
+    let Some(id) = input.channel else {
+        if input.required {
+            return Err(unbound(
+                here,
+                format!("the {} slot needs a channel", input.slot),
+            ));
+        }
+        return Ok(None);
+    };
+    let channel =
+        Channel::parse(id).ok_or_else(|| unbound(&here, format!("unknown channel {id}")))?;
+    let readable = match input.slot {
+        RAW_SLOT_MASSES => matches!(channel, Channel::Mass(_)),
+        RAW_SLOT_KINDS => matches!(channel, Channel::Kind(_)),
+        RAW_SLOT_GROUPS => matches!(channel, Channel::Groups(_)),
+        RAW_SLOT_DEPTHS => matches!(channel, Channel::Depth(_)),
+        RAW_SLOT_PAIRS => matches!(channel, Channel::Distances | Channel::Edges(_)),
+        _ => false,
+    };
+    if !readable {
+        return Err(unbound(
+            here,
+            format!("the {} slot cannot read {id}", input.slot),
+        ));
+    }
+    Ok(Some(channel))
+}
+
+impl Canvas {
+    /// A raw term's input slot resolved against the registry (G2c, F181):
+    /// the values of the channel it names, `None` for an optional slot left
+    /// empty, or the refusal [`raw_input_channel`] gives. Resolving only:
+    /// running a raw term stays refused (F155).
+    pub fn resolve_raw_input(
+        &mut self,
+        place: &str,
+        input: &InputSlot<'_>,
+    ) -> Result<Option<ChannelValues>, BindError> {
+        Ok(raw_input_channel(place, input)?.map(|channel| self.channel_values(channel)))
+    }
 }
 
 /// A `groups.*` channel the canvas resolves to a kind source: a grouping's

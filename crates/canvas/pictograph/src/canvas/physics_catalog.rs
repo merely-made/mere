@@ -33,17 +33,9 @@
 //!
 //! Plan: `design_docs/mere_docs/implementation_strategy/2026-09-02_physics_catalog_plan.md`.
 
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::collections::{HashMap, HashSet};
 
 use kernel::graph::{Graph, NodeKey};
-use petgraph::Direction;
-use petgraph::algo::{
-    dijkstra, dominators, dsatur_coloring, greedy_feedback_arc_set, min_spanning_tree, page_rank,
-    tarjan_scc, toposort,
-};
-use petgraph::data::Element;
-use petgraph::graph::{DiGraph, EdgeIndex, NodeIndex, UnGraph};
-use petgraph::visit::EdgeRef;
 use seiche::{
     Anneal, BarnesHutRepulsion, Boids, Boundary, CounterDamping, DegreeRepulsion, Density,
     DepthGravity, DomainCluster, EdgeSpring, Force, Gravity, GravityLocus, GridSnap, Hold,
@@ -52,13 +44,12 @@ use seiche::{
 
 use crate::canvas::seiche_bridge::visible_relation_edges;
 use crate::canvas::{Canvas, SETTLE_TICKS};
+use crate::signals::ChannelRegistry;
+use crate::signals::physics::{self, PhysicsView, PhysicsViewKey};
 
 /// The seed every seeded law (Kinds' rule matrix, Anneal's walk) starts from,
 /// so a scene reopens to the same rules.
 pub(crate) const LAW_SEED: u64 = 0x5EED_CA7A_1064;
-/// PageRank's damping and iteration budget.
-const PAGE_RANK_DAMPING: f32 = 0.85;
-const PAGE_RANK_ITERATIONS: usize = 50;
 /// The Skeleton overlay's tree-edge stiffness, against `EdgeSpring`'s 10.
 const SKELETON_STIFFNESS: f32 = 60.0;
 /// Charge's repulsion, calibrated so that at contact (a node diameter, 36)
@@ -737,60 +728,16 @@ impl LawSources {
     }
 }
 
-/// A petgraph view of the visible topology: the directed multigraph (one
-/// edge per visible relation cell) for PageRank, layering, dominators and
-/// components; the undirected simple graph (one edge per pair, cost
-/// `1 / multiplicity`) for the colouring, the spanning tree and the
-/// shortest paths. Built per force rebuild; linear in the graph.
-pub(crate) struct TopologyView {
-    directed: DiGraph<NodeKey, f32>,
-    undirected: UnGraph<NodeKey, f32>,
-    index_of: HashMap<NodeKey, NodeIndex>,
-}
-
-impl TopologyView {
-    fn new(nodes: &[NodeKey], edges: &[(NodeKey, NodeKey)]) -> Self {
-        let mut directed = DiGraph::new();
-        let mut undirected = UnGraph::new_undirected();
-        let mut index_of = HashMap::with_capacity(nodes.len());
-        for &key in nodes {
-            let d = directed.add_node(key);
-            let u = undirected.add_node(key);
-            debug_assert_eq!(d, u);
-            index_of.insert(key, d);
-        }
-        let mut multiplicity: HashMap<(NodeIndex, NodeIndex), u32> = HashMap::new();
-        for &(a, b) in edges {
-            let (Some(&ia), Some(&ib)) = (index_of.get(&a), index_of.get(&b)) else {
-                continue;
-            };
-            if ia == ib {
-                continue;
-            }
-            directed.add_edge(ia, ib, 1.0);
-            let pair = if ia < ib { (ia, ib) } else { (ib, ia) };
-            *multiplicity.entry(pair).or_default() += 1;
-        }
-        let mut pairs: Vec<_> = multiplicity.into_iter().collect();
-        pairs.sort_by_key(|((a, b), _)| (a.index(), b.index()));
-        for ((a, b), m) in pairs {
-            undirected.add_edge(a, b, 1.0 / m as f32);
-        }
-        Self {
-            directed,
-            undirected,
-            index_of,
-        }
-    }
-
-    fn key(&self, index: NodeIndex) -> NodeKey {
-        self.directed[index]
-    }
-}
-
 /// The graph inputs a law or overlay snapshots at build: the node set, the
-/// visible spring edges, and (on demand) degree, the site grouping, the
-/// Louvain partition, the Meaning snapshot and the petgraph view.
+/// visible spring edges, and (on demand) the site grouping, the Louvain
+/// partition, the Meaning snapshot and the physics view's channels.
+///
+/// The physics channels come from the producers in
+/// [`signals::physics`](crate::signals::physics). Over the physics view,
+/// handed a registry and the view's key ([`Self::with_registry`]), they are
+/// the registry's, one computation per key (G2c; F178, F179); over anything
+/// else (a grouping's subgraphs, the board's items, the catalog's nominal)
+/// they are computed here.
 pub(crate) struct LawInputs<'a> {
     nodes: Vec<NodeKey>,
     edges: Vec<(NodeKey, NodeKey)>,
@@ -800,6 +747,8 @@ pub(crate) struct LawInputs<'a> {
     sites: std::borrow::Cow<'a, HashMap<NodeKey, String>>,
     clusters: Option<&'a crate::signals::ClusterSet>,
     meaning: Option<&'a crate::canvas::meaning::MeaningSnapshot>,
+    /// The registry serving the physics view, and the view's key.
+    registry: Option<(&'a ChannelRegistry, PhysicsViewKey)>,
 }
 
 impl<'a> LawInputs<'a> {
@@ -843,6 +792,7 @@ impl<'a> LawInputs<'a> {
             sites: std::borrow::Cow::Owned(sites),
             clusters: None,
             meaning: None,
+            registry: None,
         }
     }
 
@@ -855,8 +805,29 @@ impl<'a> LawInputs<'a> {
         self
     }
 
-    pub(crate) fn topology(&self) -> TopologyView {
-        TopologyView::new(&self.nodes, &self.edges)
+    /// Read the physics channels from `registry`, these inputs being the
+    /// physics view at `key` (F178).
+    pub(crate) fn with_registry(
+        mut self,
+        registry: &'a ChannelRegistry,
+        key: PhysicsViewKey,
+    ) -> Self {
+        self.registry = Some((registry, key));
+        self
+    }
+
+    /// The registry and the view it serves, when these inputs are the view.
+    fn served(&self) -> Option<(&'a ChannelRegistry, PhysicsView<'_>)> {
+        self.registry.map(|(registry, key)| {
+            (
+                registry,
+                PhysicsView {
+                    key,
+                    nodes: &self.nodes,
+                    edges: &self.edges,
+                },
+            )
+        })
     }
 
     /// The visible spring edges the forces pull along.
@@ -867,15 +838,6 @@ impl<'a> LawInputs<'a> {
     /// Each node's site, for inputs built over a subset of the nodes.
     pub(crate) fn sites(&self) -> &HashMap<NodeKey, String> {
         &self.sites
-    }
-
-    fn degrees(&self) -> HashMap<NodeKey, u32> {
-        let mut degree: HashMap<NodeKey, u32> = HashMap::new();
-        for (a, b) in &self.edges {
-            *degree.entry(*a).or_default() += 1;
-            *degree.entry(*b).or_default() += 1;
-        }
-        degree
     }
 
     /// Every node's group by site, as a dense id in first-seen order.
@@ -920,22 +882,10 @@ impl<'a> LawInputs<'a> {
 
     /// Degree bands: isolated, leaf, connected, hub.
     fn degree_groups(&self) -> Vec<(NodeKey, u32)> {
-        let degree = self.degrees();
-        self.nodes
-            .iter()
-            .map(|&key| {
-                let d = degree.get(&key).copied().unwrap_or(0);
-                (
-                    key,
-                    match d {
-                        0 => 0,
-                        1 => 1,
-                        2..=4 => 2,
-                        _ => 3,
-                    },
-                )
-            })
-            .collect()
+        match self.served() {
+            Some((registry, view)) => registry.groups_degree(view),
+            None => physics::degree_bands(&self.nodes, &self.edges),
+        }
     }
 
     /// The groups channel: every node's group from any kind channel, as a
@@ -959,62 +909,27 @@ impl<'a> LawInputs<'a> {
     /// A proper colouring of the visible graph (DSATUR): adjacent nodes never
     /// share a group.
     pub(crate) fn coloring_groups(&self) -> Vec<(NodeKey, u32)> {
-        let view = self.topology();
-        let (colors, _) = dsatur_coloring(&view.undirected);
-        self.nodes
-            .iter()
-            .map(|&key| {
-                let color = view
-                    .index_of
-                    .get(&key)
-                    .and_then(|index| colors.get(index))
-                    .copied()
-                    .unwrap_or(0);
-                (key, color as u32)
-            })
-            .collect()
+        match self.served() {
+            Some((registry, view)) => registry.groups_coloring(view),
+            None => physics::coloring_groups(&self.nodes, &self.edges),
+        }
     }
 
     /// Every node's connected component (island), as a dense id.
     pub(crate) fn component_groups(&self) -> Vec<(NodeKey, u32)> {
-        let view = self.topology();
-        // The strongly-connected components of an undirected graph are its
-        // connected components.
-        let mut of: HashMap<NodeKey, u32> = HashMap::new();
-        let mut components = tarjan_scc(&view.undirected);
-        components.sort_by_key(|members| members.iter().map(|i| i.index()).min());
-        for (i, members) in components.iter().enumerate() {
-            for &member in members {
-                of.insert(view.key(member), i as u32);
-            }
+        match self.served() {
+            Some((registry, view)) => registry.groups_component(view),
+            None => physics::component_groups(&self.nodes, &self.edges),
         }
-        self.nodes
-            .iter()
-            .map(|&key| (key, of.get(&key).copied().unwrap_or(0)))
-            .collect()
     }
 
     /// PageRank over the directed view, scaled so the mean weight is one
     /// (comparable to log degree on a sparse graph).
     pub(crate) fn page_rank_weights(&self) -> Vec<(NodeKey, f32)> {
-        let view = self.topology();
-        let n = view.directed.node_count();
-        if n == 0 {
-            return Vec::new();
+        match self.served() {
+            Some((registry, view)) => registry.mass_pagerank(view),
+            None => physics::page_rank_weights(&self.nodes, &self.edges),
         }
-        let ranks = page_rank(&view.directed, PAGE_RANK_DAMPING, PAGE_RANK_ITERATIONS);
-        self.nodes
-            .iter()
-            .map(|&key| {
-                let rank = view
-                    .index_of
-                    .get(&key)
-                    .and_then(|index| ranks.get(index.index()))
-                    .copied()
-                    .unwrap_or(0.0);
-                (key, rank * n as f32)
-            })
-            .collect()
     }
 
     /// The mass channel's values before any reader's transform: degree, or
@@ -1022,12 +937,9 @@ impl<'a> LawInputs<'a> {
     /// overlays read `ln(1 + degree)` (seiche's default) or the rank itself.
     pub(crate) fn mass_values(&self, source: PhysicsMassSource) -> Vec<(NodeKey, f32)> {
         match source {
-            PhysicsMassSource::Degree => {
-                let degree = self.degrees();
-                self.nodes
-                    .iter()
-                    .map(|&key| (key, degree.get(&key).copied().unwrap_or(0) as f32))
-                    .collect()
+            PhysicsMassSource::Degree => match self.served() {
+                Some((registry, view)) => registry.mass_degree(view),
+                None => physics::mass_degree(&self.nodes, &self.edges),
             },
             PhysicsMassSource::PageRank => self.page_rank_weights(),
         }
@@ -1045,20 +957,10 @@ impl<'a> LawInputs<'a> {
     /// Masses for Orbit and Density: `1 + degree`, or `1 + rank` with the
     /// mean rank one.
     pub(crate) fn masses(&self, source: PhysicsMassSource) -> Vec<(NodeKey, f32)> {
-        match source {
-            PhysicsMassSource::Degree => {
-                let degree = self.degrees();
-                self.nodes
-                    .iter()
-                    .map(|&key| (key, 1.0 + degree.get(&key).copied().unwrap_or(0) as f32))
-                    .collect()
-            },
-            PhysicsMassSource::PageRank => self
-                .page_rank_weights()
-                .into_iter()
-                .map(|(key, rank)| (key, 1.0 + rank))
-                .collect(),
-        }
+        self.mass_values(source)
+            .into_iter()
+            .map(|(key, value)| (key, 1.0 + value))
+            .collect()
     }
 
     /// A kind per node for the Kinds law, from the chosen source, plus how many
@@ -1083,104 +985,32 @@ impl<'a> LawInputs<'a> {
     /// BFS depth from the roots — the nodes with no incoming visible edge, or
     /// every node when the graph is all cycles.
     pub(crate) fn root_depths(&self) -> Vec<(NodeKey, u32)> {
-        let mut incoming: HashSet<NodeKey> = HashSet::new();
-        let mut out: HashMap<NodeKey, Vec<NodeKey>> = HashMap::new();
-        for (a, b) in &self.edges {
-            incoming.insert(*b);
-            out.entry(*a).or_default().push(*b);
+        match self.served() {
+            Some((registry, view)) => registry.depth_roots(view),
+            None => physics::root_depths(&self.nodes, &self.edges),
         }
-        let mut roots: Vec<NodeKey> = self
-            .nodes
-            .iter()
-            .copied()
-            .filter(|k| !incoming.contains(k))
-            .collect();
-        if roots.is_empty() {
-            roots = self.nodes.clone();
-        }
-        let mut depth: HashMap<NodeKey, u32> = HashMap::new();
-        let mut queue: VecDeque<NodeKey> = VecDeque::new();
-        for root in roots {
-            depth.insert(root, 0);
-            queue.push_back(root);
-        }
-        while let Some(key) = queue.pop_front() {
-            let d = depth[&key];
-            if let Some(children) = out.get(&key) {
-                for &child in children {
-                    if !depth.contains_key(&child) {
-                        depth.insert(child, d + 1);
-                        queue.push_back(child);
-                    }
-                }
-            }
-        }
-        // A node reachable only through a cycle off the roots gets depth one,
-        // so nothing is left unplaced.
-        self.nodes
-            .iter()
-            .map(|&key| (key, depth.get(&key).copied().unwrap_or(1)))
-            .collect()
     }
 
     /// Sugiyama's layer step: cut a greedy feedback arc set so the directed
     /// view is acyclic, then longest-path layering in topological order.
     pub(crate) fn layer_depths(&self) -> Vec<(NodeKey, u32)> {
-        let view = self.topology();
-        let mut dag = view.directed.clone();
-        let cut: HashSet<EdgeIndex> = greedy_feedback_arc_set(&dag).map(|e| e.id()).collect();
-        dag.retain_edges(|_, e| !cut.contains(&e));
-        let Ok(order) = toposort(&dag, None) else {
-            return self.root_depths();
-        };
-        let mut layer: HashMap<NodeIndex, u32> = HashMap::with_capacity(order.len());
-        for v in order {
-            let l = dag
-                .neighbors_directed(v, Direction::Incoming)
-                .filter_map(|u| layer.get(&u).map(|d| d + 1))
-                .max()
-                .unwrap_or(0);
-            layer.insert(v, l);
+        match self.served() {
+            Some((registry, view)) => registry.depth_layers(view),
+            None => physics::layer_depths(&self.nodes, &self.edges),
         }
-        self.nodes
-            .iter()
-            .map(|&key| {
-                let d = view
-                    .index_of
-                    .get(&key)
-                    .and_then(|index| layer.get(index))
-                    .copied()
-                    .unwrap_or(0);
-                (key, d)
-            })
-            .collect()
     }
 
     /// Dominator-tree depth from `focus`: the number of nodes every path from
     /// the focus must pass through. Unreachable nodes sit one level below the
     /// deepest reachable one; without a focus, the roots.
     pub(crate) fn focus_depths(&self, focus: Option<NodeKey>) -> Vec<(NodeKey, u32)> {
-        let view = self.topology();
-        let Some(root) = focus.and_then(|key| view.index_of.get(&key).copied()) else {
+        let Some(focus) = focus else {
             return self.root_depths();
         };
-        let dom = dominators::simple_fast(&view.directed, root);
-        let mut depth: HashMap<NodeKey, u32> = HashMap::new();
-        let mut deepest = 0;
-        for &key in &self.nodes {
-            let Some(index) = view.index_of.get(&key) else {
-                continue;
-            };
-            if let Some(chain) = dom.dominators(*index) {
-                let d = chain.count().saturating_sub(1) as u32;
-                deepest = deepest.max(d);
-                depth.insert(key, d);
-            }
+        match self.served() {
+            Some((registry, view)) => registry.depth_focus(view, focus),
+            None => physics::focus_depths(&self.nodes, &self.edges, focus),
         }
-        self.nodes
-            .iter()
-            .map(|&key| (key, depth.get(&key).copied().unwrap_or(deepest + 1)))
-            .collect()
     }
 
     fn depths(&self, source: PhysicsDepthSource, focus: Option<NodeKey>) -> Vec<(NodeKey, u32)> {
@@ -1192,37 +1022,22 @@ impl<'a> LawInputs<'a> {
     }
 
     /// The minimum spanning tree's edges over the undirected view (a pair
-    /// with more relations is a shorter edge, so the tree prefers it).
+    /// with more relations is a shorter edge, so the tree prefers it):
+    /// `edges.spanning`, Stress's skeleton.
     pub(crate) fn skeleton_edges(&self) -> Vec<(NodeKey, NodeKey)> {
-        let view = self.topology();
-        min_spanning_tree(&view.undirected)
-            .filter_map(|element| match element {
-                Element::Edge { source, target, .. } => Some((
-                    view.key(NodeIndex::new(source)),
-                    view.key(NodeIndex::new(target)),
-                )),
-                Element::Node { .. } => None,
-            })
-            .collect()
+        match self.served() {
+            Some((registry, view)) => registry.edges_spanning(view),
+            None => physics::spanning_edges(&self.nodes, &self.edges),
+        }
     }
 
     /// Shortest-path distances in hops over the undirected view, each hop
     /// costing `1 / multiplicity`, every connected pair once.
     pub(crate) fn weighted_distances(&self) -> Vec<(NodeKey, NodeKey, f32)> {
-        let view = self.topology();
-        let mut out = Vec::new();
-        for (i, &a) in self.nodes.iter().enumerate() {
-            let Some(&ia) = view.index_of.get(&a) else {
-                continue;
-            };
-            let reach = dijkstra(&view.undirected, ia, None, |e| *e.weight());
-            for &b in &self.nodes[i + 1..] {
-                if let Some(d) = view.index_of.get(&b).and_then(|ib| reach.get(ib)) {
-                    out.push((a, b, *d));
-                }
-            }
+        match self.served() {
+            Some((registry, view)) => registry.distances_hops(view),
+            None => physics::hop_distances(&self.nodes, &self.edges),
         }
-        out
     }
 
     /// The law's forces when `overlays` join it: Density's conversion is on
@@ -1414,7 +1229,8 @@ impl Canvas {
                 },
                 self.channels.sites_fresh(&self.graph),
             )
-            .with_meaning(self.meaning.snapshot());
+            .with_meaning(self.meaning.snapshot())
+            .with_registry(&self.channels, self.physics_view_key());
             self.composed_forces(&inputs, sources)
         };
         #[cfg(test)]
@@ -1533,9 +1349,20 @@ impl Canvas {
         }
     }
 
-    /// The attribute builders over the current graph and visible edges.
+    /// The attribute builders over the current graph and visible edges,
+    /// the physics channels read from the registry.
     fn law_inputs_now(&self) -> LawInputs<'_> {
         LawInputs::new(&self.graph, &self.hidden_edges, None, None)
+            .with_registry(&self.channels, self.physics_view_key())
+    }
+
+    /// The physics view's key: the graph's structure and the view revision
+    /// (F178).
+    pub(crate) fn physics_view_key(&self) -> PhysicsViewKey {
+        PhysicsViewKey {
+            structure: self.graph.revision(),
+            view: self.physics_view_revision,
+        }
     }
 
     /// The number of forces in the live law slot (inline backend only). Test introspection.
@@ -1553,7 +1380,7 @@ impl Canvas {
     /// The attribute builders over the current graph. Test introspection.
     #[cfg(test)]
     pub(crate) fn law_inputs(&self) -> LawInputs<'_> {
-        LawInputs::new(&self.graph, &self.hidden_edges, None, None)
+        self.law_inputs_now()
     }
 
     /// [`Self::layout_stats`] without `stretch` (zero here), for graphs too
