@@ -2305,6 +2305,7 @@ dependencies = [
  "blake3",
  "chatelaine",
  "chirograph",
+ "dramatis",
  "futures-util",
  "gaz",
  "gazette",
@@ -4696,6 +4697,10 @@ checksum = "fd8e701084c37e7ef62d3f9e453b618130cbc0ef3573847785952a3ac3f746bf"
 [[package]]
 name = "dramatis"
 version = "0.0.2"
+dependencies = [
+ "serde",
+ "uuid",
+]
 
 [[package]]
 name = "dtoa"
