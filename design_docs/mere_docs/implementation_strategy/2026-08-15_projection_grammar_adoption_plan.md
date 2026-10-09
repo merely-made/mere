@@ -1021,9 +1021,10 @@ is that objective's assessment.
   `adapters/matrix.rs` re-exports them and adds a `two-reading-matrix`
   profile beside the unchanged one-authority `matrix` profile.
   graphshell-client's `frozen.rs` gains `FrozenGrid`, the two-axis table.
-  Gazette's `ledger.rs` stays for now: `tests/ledger_parity.rs` holds it to
-  the shared derivation (site Ruling 143), so its retirement under the
-  removal-on-promotion rule is still to come. Landed by the mer3ly site
+  Gazette's `ledger.rs` stays until the dramatis split (the dramatis repo
+  plan's D7), held to the shared derivation by `tests/ledger_parity.rs`; at
+  the split it retires onto `scenomise::matrix` and `FrozenGrid` (site
+  Ruling 143). Landed by the mer3ly site
   session as its S2, `96fbe064` to `3620cd3b`; its Rulings 142 to 147 are in
   mer3ly's `docs/2026-09-30_graphshell_site_canvas_plan.md`.
 - Separately, A4's text here runs together two histories that the assessment
