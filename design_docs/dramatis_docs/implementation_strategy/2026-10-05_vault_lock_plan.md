@@ -969,11 +969,12 @@ made, and carried out since under the later rulings.
         `secret-tool` under a disposable bus. *(2026-10-08, `aac67a85`;
         §6.)*
 - **L3 — triggers.** Done when:
-  - [ ] each ruled trigger is proven, idle with an injected clock;
-  - [ ] there are real receipts for Windows `Win+L` and suspend, and for
+  - [x] each ruled trigger is proven, idle with an injected clock;
+  - [x] there are real receipts for Windows `Win+L` and suspend, and for
         Fedora `loginctl lock-session` and suspend;
-  - [ ] an unknown idle fails closed;
-  - [ ] a locked resident restarted by the launcher comes back as ruled.
+  - [x] an unknown idle fails closed;
+  - [x] a locked resident restarted by the launcher comes back as ruled.
+        *(2026-10-08, `79fbbeb7`; §6, L3 checkpoint E.)*
 - **L4 — docs and gates.** Done when:
   - [ ] `UnlockTier`'s docs, the protocol plan's §3.6 and §3.7, and the
         tier invariants match the rulings;
@@ -1688,7 +1689,7 @@ built plain at `fc3da34c`).
   - [x] a resident locked, then killed, comes back waiting at its prompt
         and opens only on an unlock (a receipt), while one never locked
         auto-unlocks as before;
-  - [ ] the attended receipts: Windows `Win+L` and suspend, Fedora
+  - [x] the attended receipts: Windows `Win+L` and suspend, Fedora
         `loginctl lock-session` and suspend.
 
 **2026-10-08, L3 checkpoints A to D built** (`ed1de0f7`, branch `l3`).
@@ -1742,3 +1743,45 @@ built plain at `fc3da34c`).
 - **Still to do: E**, the attended receipts (`Win+L` and suspend on
   Windows; `loginctl lock-session` and suspend on Fedora). They wait for
   Mark's word (ruling 78's annotation).
+
+**2026-10-08, L3 checkpoint E, the attended receipts.** Mark's word:
+**"let's do it"**. djinn built from mere main (`463c8d40`, which carries
+L3's `79fbbeb7`) on both machines.
+- **Method:** two scratch residents per machine, each with its own vault
+  and a `lock.toml`. A has only `session_lock` on and B only `suspend`, so
+  each leg's other resident is its control. A lock is read from the
+  events file (`lock-trigger` with its reason, then `locked`) and from the
+  marker `vault/locked`.
+- **Fedora (ThinkPad, GNOME on Wayland, session 8):**
+  - `loginctl lock-session 8` (over ssh): A locked, reason `session-lock`,
+    marker written; B stayed open.
+  - Suspend (Mark's hands; polkit refuses `systemctl suspend` from an ssh
+    session): B locked, reason `suspend`, at 21:17:49.389.
+    `systemd-suspend` started at 21:17:50.451, and the kernel entered
+    suspend at 21:17:50.493, so the lock came 1.06 s ahead of the sleep.
+  - After the wake, both residents had taken their delay inhibitors again.
+- **Windows (Modern Standby, S0 low-power idle; sign-in after sleep is
+  immediate, `DelayLockInterval` 0):**
+  - `Win+L`: A locked, reason `session-lock`, at 21:38:44.594, marker
+    written; B stayed open.
+  - Lid closed, A already locked: Kernel-Power 506 (entering Modern
+    Standby) at 21:38:54.492. B locked, reason `suspend`, at 21:38:59.557,
+    5.1 s later, and 0.1 s before the next standby phase (566, 1 to 2, at
+    21:38:59.654).
+  - Lid closed with no `Win+L`, fresh residents: 506 at 22:08:43.332.
+    B locked, `suspend`, at 22:08:43.718; A locked, `session-lock`, at
+    22:08:43.737, because Windows locks the session as standby begins. The
+    next phase (566, 6 to 7) came at 22:08:43.982.
+- **Findings:**
+  - On Modern Standby, `PBT_APMSUSPEND` arrives when standby leaves its
+    first phase, not at lid close: 0.4 s once and 5.1 s once in these
+    runs. Under the defaults, the session lock lands at standby entry, so
+    there is no gap. A resident with only `suspend` on can stay unlocked
+    for those seconds with the screen off. *Reading, not ruled:* left
+    as is, since the default settings cover it.
+  - The Linux source takes its sleep delay whatever `suspend` says, so a
+    resident with `suspend` off still lists an inhibitor; it lets go as
+    soon as the signal arrives, and a settings reload needs no new one.
+    *Reading, not ruled:* harmless, left as is.
+- L3 is done; the scratch residents are stopped and their directories
+  removed.
