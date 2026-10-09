@@ -4,21 +4,21 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-use std::collections::BTreeSet;
-
 use chartulary::stemma::TransitionKind;
 use euclid::default::Point2D;
 use uuid::Uuid;
 
 use super::{
-    Coupling, CouplingId, EdgeAssertion, EdgeKey, Field, FieldId, FrameLayoutHint, Graph,
-    NavigationTrigger, NodeKey, RelationSelector, SemanticSubKind,
+    Coupling, CouplingId, EdgeAssertion, Field, FieldId, FrameLayoutHint, Graph, NavigationTrigger,
+    NodeKey, RelationKey, RelationSelector, SemanticSubKind,
     capture::{
         CapturedDelta, coupling_from_persisted, field_from_persisted,
         persisted_coupling_from_coupling, persisted_field_from_field,
     },
 };
-use crate::persistence::{PersistedCoupling, PersistedEdge, PersistedField};
+use crate::persistence::{
+    PersistedCoupling, PersistedEdge, PersistedField, PersistedResourceRecord,
+};
 use crate::types::{
     BadgeIcon, ClassificationScheme, ClassificationStatus, GraphScope, ImageRef, ImageRole,
     ImportRecord, NodeClassification, NodeDerivation, NodeImportProvenance, NodeProperty,
@@ -35,6 +35,7 @@ pub enum GraphDelta {
         from: NodeKey,
         to: NodeKey,
         assertion: EdgeAssertion,
+        asserter_iri: String,
     },
     RemoveNode {
         key: NodeKey,
@@ -48,6 +49,7 @@ pub enum GraphDelta {
         from_id: Uuid,
         to_id: Uuid,
         assertion: EdgeAssertion,
+        asserter_iri: String,
     },
     ReplayRemoveNodeById {
         node_id: Uuid,
@@ -169,11 +171,13 @@ pub enum GraphDelta {
         from_id: Uuid,
         to_id: Uuid,
         predicate: Option<String>,
+        asserter_iri: String,
     },
     ReplayAssertSemanticPredicateByIds {
         from_id: Uuid,
         to_id: Uuid,
         predicate: String,
+        asserter_iri: String,
     },
     ReplayAppendFrameLayoutHintById {
         node_id: Uuid,
@@ -206,6 +210,19 @@ pub enum GraphDelta {
         from_id: Uuid,
         to_id: Uuid,
         edges: Vec<PersistedEdge>,
+    },
+    ReplaySetResourceRecordById {
+        resource_id: Uuid,
+        record: Option<PersistedResourceRecord>,
+    },
+    ReplaySetResourceEdgesByIds {
+        from_resource_id: Uuid,
+        to_resource_id: Uuid,
+        edges: Vec<PersistedEdge>,
+    },
+    ReplaySetShownResourceById {
+        surface_id: Uuid,
+        resource_id: Option<Uuid>,
     },
     ReplayTouchNodeLastVisitedById {
         node_id: Uuid,
@@ -399,17 +416,13 @@ pub enum GraphDelta {
         tag: String,
         icon: Option<BadgeIcon>,
     },
-    /// Set (or clear) the canonical semantic-predicate IRI on an existing edge.
-    SetEdgeSemanticPredicate {
-        edge: EdgeKey,
-        predicate: Option<String>,
-    },
     /// Assert a plain semantic edge carrying a raw predicate IRI (the
     /// unrecognized-predicate ingest path), creating the edge if absent.
     AssertSemanticPredicate {
         from: NodeKey,
         to: NodeKey,
         predicate: String,
+        asserter_iri: String,
     },
     ReplayAddField {
         field: PersistedField,
@@ -465,7 +478,7 @@ pub enum GraphDelta {
 pub enum GraphDeltaResult {
     NodeAdded(NodeKey),
     NodeMaybeAdded(Option<NodeKey>),
-    EdgeAdded(Option<EdgeKey>),
+    EdgeAdded(Option<RelationKey>),
     NodeRemoved(bool),
     EdgesRemoved(usize),
     TraversalAppended(bool),
@@ -499,34 +512,6 @@ fn capture_visit_stamp(graph: &Graph, key: NodeKey) {
             timestamp_ms,
         });
     }
-}
-
-/// The statement ids on every relation from `from` to `to`.
-fn statement_ids(graph: &Graph, from: NodeKey, to: NodeKey) -> BTreeSet<String> {
-    graph
-        .persisted_edges_between(from, to)
-        .into_iter()
-        .filter_map(|edge| edge.semantic)
-        .flat_map(|semantic| semantic.statements)
-        .map(|statement| statement.statement_id)
-        .collect()
-}
-
-/// Journal the exact relations from `from` to `to` when an edit minted a
-/// statement id there: replay would mint a different one, so the journal
-/// keeps the ids this graph holds.
-fn capture_minted_statements(graph: &Graph, from: NodeKey, to: NodeKey, before: &BTreeSet<String>) {
-    if statement_ids(graph, from, to).is_subset(before) {
-        return;
-    }
-    let (Some(from_node), Some(to_node)) = (graph.get_node(from), graph.get_node(to)) else {
-        return;
-    };
-    graph.record_delta(&CapturedDelta::ReplaySetEdgesByIds {
-        from_id: from_node.id.to_string(),
-        to_id: to_node.id.to_string(),
-        edges: graph.persisted_edges_between(from, to),
-    });
 }
 
 fn capture_resolved_import_records(graph: &Graph) {
@@ -588,28 +573,16 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             capture_visit_stamp(graph, key);
+            graph.refresh_surface_resource(key);
             GraphDeltaResult::NodeAdded(key)
         },
         GraphDelta::AssertRelation {
             from,
             to,
             assertion,
+            asserter_iri,
         } => {
-            let from_id = graph.get_node(from).map(|node| node.id);
-            let to_id = graph.get_node(to).map(|node| node.id);
-            let capture_assertion = assertion.clone();
-            let minted_before = statement_ids(graph, from, to);
-            let edge = graph.assert_relation(from, to, assertion);
-            if edge.is_some()
-                && let (Some(from_id), Some(to_id)) = (from_id, to_id)
-            {
-                graph.record_delta(&CapturedDelta::ReplayAssertRelationByIds {
-                    from_id: from_id.to_string(),
-                    to_id: to_id.to_string(),
-                    assertion: capture_assertion,
-                });
-                capture_minted_statements(graph, from, to, &minted_before);
-            }
+            let edge = graph.assert_relation_as(from, to, assertion, asserter_iri, None);
             GraphDeltaResult::EdgeAdded(edge)
         },
         GraphDelta::RemoveNode { key } => {
@@ -640,24 +613,22 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             from_id,
             to_id,
             assertion,
+            asserter_iri,
         } => {
             let capture_assertion = assertion.clone();
-            let pair = graph
+            let semantic = matches!(assertion, EdgeAssertion::Semantic { .. });
+            let edge = graph
                 .get_node_key_by_id(from_id)
-                .zip(graph.get_node_key_by_id(to_id));
-            let minted_before = pair
-                .map(|(from, to)| statement_ids(graph, from, to))
-                .unwrap_or_default();
-            let edge = graph.replay_assert_relation_by_ids(from_id, to_id, assertion);
-            if edge.is_some() {
+                .zip(graph.get_node_key_by_id(to_id))
+                .and_then(|(from, to)| {
+                    graph.assert_surface_relation_as(from, to, assertion, asserter_iri, None)
+                });
+            if edge.is_some() && !semantic {
                 graph.record_delta(&CapturedDelta::ReplayAssertRelationByIds {
                     from_id: from_id.to_string(),
                     to_id: to_id.to_string(),
                     assertion: capture_assertion,
                 });
-                if let Some((from, to)) = pair {
-                    capture_minted_statements(graph, from, to, &minted_before);
-                }
             }
             GraphDeltaResult::EdgeAdded(edge)
         },
@@ -704,18 +675,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             GraphDeltaResult::TraversalAppended(appended)
         },
         GraphDelta::RetractRelations { from, to, selector } => {
-            let from_id = graph.get_node(from).map(|node| node.id);
-            let to_id = graph.get_node(to).map(|node| node.id);
             let removed = graph.retract_relations(from, to, selector);
-            if removed > 0
-                && let (Some(from_id), Some(to_id)) = (from_id, to_id)
-            {
-                graph.record_delta(&CapturedDelta::ReplayRetractRelationsByIds {
-                    from_id: from_id.to_string(),
-                    to_id: to_id.to_string(),
-                    selector,
-                });
-            }
             GraphDeltaResult::EdgesRemoved(removed)
         },
         GraphDelta::AppendTraversal {
@@ -791,6 +751,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                     node_id: node_id.to_string(),
                     new_url: capture_url,
                 });
+                graph.refresh_surface_resource(key);
             }
             GraphDeltaResult::NodeUrlUpdated(updated)
         },
@@ -1142,6 +1103,44 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             });
             GraphDeltaResult::Applied
         },
+        GraphDelta::ReplaySetResourceRecordById {
+            resource_id,
+            record,
+        } => {
+            if graph.set_resource_record(resource_id, record) {
+                graph.record_delta(&CapturedDelta::ReplaySetResourceRecordById {
+                    resource_id: resource_id.to_string(),
+                    record: graph.resource_record(resource_id),
+                });
+            }
+            GraphDeltaResult::Applied
+        },
+        GraphDelta::ReplaySetResourceEdgesByIds {
+            from_resource_id,
+            to_resource_id,
+            edges,
+        } => {
+            if graph.set_resource_edges_between(from_resource_id, to_resource_id, &edges) {
+                graph.record_delta(&CapturedDelta::ReplaySetResourceEdgesByIds {
+                    from_resource_id: from_resource_id.to_string(),
+                    to_resource_id: to_resource_id.to_string(),
+                    edges: graph.persisted_resource_edges_between(from_resource_id, to_resource_id),
+                });
+            }
+            GraphDeltaResult::Applied
+        },
+        GraphDelta::ReplaySetShownResourceById {
+            surface_id,
+            resource_id,
+        } => {
+            if graph.set_shown_resource(surface_id, resource_id) {
+                graph.record_delta(&CapturedDelta::ReplaySetShownResourceById {
+                    surface_id: surface_id.to_string(),
+                    resource_id: resource_id.map(|id| id.to_string()),
+                });
+            }
+            GraphDeltaResult::Applied
+        },
         GraphDelta::ReplayTouchNodeLastVisitedById {
             node_id,
             timestamp_ms,
@@ -1175,6 +1174,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 timestamp_ms,
                 last_session_visited,
             });
+            graph.refresh_surface_resource(key);
             GraphDeltaResult::Applied
         },
         GraphDelta::BranchHistory { child, parent } => {
@@ -1202,6 +1202,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                     node_id: node_id.to_string(),
                     timestamp_ms,
                 });
+                graph.refresh_surface_resource(key);
             }
             GraphDeltaResult::HistoryStepped(stepped)
         },
@@ -1217,13 +1218,14 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                     node_id: node_id.to_string(),
                     timestamp_ms,
                 });
+                graph.refresh_surface_resource(key);
             }
             GraphDeltaResult::HistoryStepped(stepped)
         },
         GraphDelta::ReplayInsertNodeTagById { node_id, tag } => {
             let updated = graph
                 .get_node_key_by_id(node_id)
-                .is_some_and(|key| graph.insert_node_tag(key, tag.clone()));
+                .is_some_and(|key| graph.legacy_insert_node_tag(key, tag.clone()));
             if updated {
                 graph.record_delta(&CapturedDelta::ReplayInsertNodeTagById {
                     node_id: node_id.to_string(),
@@ -1233,21 +1235,12 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             GraphDeltaResult::NodeMetadataUpdated(updated)
         },
         GraphDelta::InsertNodeTag { key, tag } => {
-            let node_id = graph.get_node(key).map(|node| node.id);
-            let capture_tag = tag.clone();
-            let updated = graph.insert_node_tag(key, tag);
-            if updated && let Some(node_id) = node_id {
-                graph.record_delta(&CapturedDelta::ReplayInsertNodeTagById {
-                    node_id: node_id.to_string(),
-                    tag: capture_tag,
-                });
-            }
-            GraphDeltaResult::NodeMetadataUpdated(updated)
+            GraphDeltaResult::NodeMetadataUpdated(graph.insert_shown_tag(key, tag))
         },
         GraphDelta::ReplayRemoveNodeTagById { node_id, tag } => {
             let updated = graph
                 .get_node_key_by_id(node_id)
-                .is_some_and(|key| graph.remove_node_tag(key, &tag));
+                .is_some_and(|key| graph.legacy_remove_node_tag(key, &tag));
             if updated {
                 graph.record_delta(&CapturedDelta::ReplayRemoveNodeTagById {
                     node_id: node_id.to_string(),
@@ -1257,15 +1250,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             GraphDeltaResult::NodeMetadataUpdated(updated)
         },
         GraphDelta::RemoveNodeTag { key, tag } => {
-            let node_id = graph.get_node(key).map(|node| node.id);
-            let updated = graph.remove_node_tag(key, &tag);
-            if updated && let Some(node_id) = node_id {
-                graph.record_delta(&CapturedDelta::ReplayRemoveNodeTagById {
-                    node_id: node_id.to_string(),
-                    tag,
-                });
-            }
-            GraphDeltaResult::NodeMetadataUpdated(updated)
+            GraphDeltaResult::NodeMetadataUpdated(graph.remove_shown_tag(key, &tag))
         },
         GraphDelta::ReplaySetNodeBodyById { node_id, body } => {
             let updated = graph
@@ -1376,7 +1361,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
         GraphDelta::ReplayAppendNodePropertyById { node_id, property } => {
             let updated = graph
                 .get_node_key_by_id(node_id)
-                .is_some_and(|key| graph.append_node_property(key, property.clone()));
+                .is_some_and(|key| graph.legacy_append_node_property(key, property.clone()));
             if updated {
                 graph.record_delta(&CapturedDelta::ReplayAppendNodePropertyById {
                     node_id: node_id.to_string(),
@@ -1385,25 +1370,16 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
         },
-        GraphDelta::AppendNodeProperty { key, property } => {
-            let node_id = graph.get_node(key).map(|node| node.id);
-            let capture_property = property.clone();
-            let updated = graph.append_node_property(key, property);
-            if updated && let Some(node_id) = node_id {
-                graph.record_delta(&CapturedDelta::ReplayAppendNodePropertyById {
-                    node_id: node_id.to_string(),
-                    property: capture_property,
-                });
-            }
-            GraphDeltaResult::NodeMetadataUpdated(updated)
-        },
+        GraphDelta::AppendNodeProperty { key, property } => GraphDeltaResult::NodeMetadataUpdated(
+            graph.append_shown_properties(key, vec![property]),
+        ),
         GraphDelta::ReplayAddNodeClassificationById {
             node_id,
             classification,
         } => {
             let updated = graph
                 .get_node_key_by_id(node_id)
-                .is_some_and(|key| graph.add_node_classification(key, classification.clone()));
+                .is_some_and(|key| graph.legacy_add_node_classification(key, classification.clone()));
             if updated {
                 graph.record_delta(&CapturedDelta::ReplayAddNodeClassificationById {
                     node_id: node_id.to_string(),
@@ -1415,18 +1391,9 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
         GraphDelta::AddNodeClassification {
             key,
             classification,
-        } => {
-            let node_id = graph.get_node(key).map(|node| node.id);
-            let capture_classification = classification.clone();
-            let updated = graph.add_node_classification(key, classification);
-            if updated && let Some(node_id) = node_id {
-                graph.record_delta(&CapturedDelta::ReplayAddNodeClassificationById {
-                    node_id: node_id.to_string(),
-                    classification: capture_classification,
-                });
-            }
-            GraphDeltaResult::NodeMetadataUpdated(updated)
-        },
+        } => GraphDeltaResult::NodeMetadataUpdated(
+            graph.add_shown_classifications(key, vec![classification]),
+        ),
         GraphDelta::ReplayRemoveNodeClassificationById {
             node_id,
             scheme,
@@ -1434,7 +1401,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
         } => {
             let updated = graph
                 .get_node_key_by_id(node_id)
-                .is_some_and(|key| graph.remove_node_classification(key, &scheme, &value));
+                .is_some_and(|key| graph.legacy_remove_node_classification(key, &scheme, &value));
             if updated {
                 graph.record_delta(&CapturedDelta::ReplayRemoveNodeClassificationById {
                     node_id: node_id.to_string(),
@@ -1445,17 +1412,15 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             GraphDeltaResult::NodeMetadataUpdated(updated)
         },
         GraphDelta::RemoveNodeClassification { key, scheme, value } => {
-            let node_id = graph.get_node(key).map(|node| node.id);
-            let capture_scheme = scheme.clone();
-            let capture_value = value.clone();
-            let updated = graph.remove_node_classification(key, &scheme, &value);
-            if updated && let Some(node_id) = node_id {
-                graph.record_delta(&CapturedDelta::ReplayRemoveNodeClassificationById {
-                    node_id: node_id.to_string(),
-                    scheme: capture_scheme,
-                    value: capture_value,
+            let updated = graph
+                .unique_shown_classification(key, &scheme, &value)
+                .ok()
+                .flatten()
+                .is_some_and(|(id, variant)| {
+                    graph
+                        .remove_resource_classification(id, &variant)
+                        .unwrap_or(false)
                 });
-            }
             GraphDeltaResult::NodeMetadataUpdated(updated)
         },
         GraphDelta::ReplaySetNodeClassificationStatusById {
@@ -1465,7 +1430,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             status,
         } => {
             let updated = graph.get_node_key_by_id(node_id).is_some_and(|key| {
-                graph.set_node_classification_status(key, &scheme, &value, status.clone())
+                graph.legacy_set_node_classification_status(key, &scheme, &value, status.clone())
             });
             if updated {
                 graph.record_delta(&CapturedDelta::ReplaySetNodeClassificationStatusById {
@@ -1483,19 +1448,15 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             value,
             status,
         } => {
-            let node_id = graph.get_node(key).map(|node| node.id);
-            let capture_scheme = scheme.clone();
-            let capture_value = value.clone();
-            let capture_status = status.clone();
-            let updated = graph.set_node_classification_status(key, &scheme, &value, status);
-            if updated && let Some(node_id) = node_id {
-                graph.record_delta(&CapturedDelta::ReplaySetNodeClassificationStatusById {
-                    node_id: node_id.to_string(),
-                    scheme: capture_scheme,
-                    value: capture_value,
-                    status: capture_status,
+            let updated = graph
+                .unique_shown_classification(key, &scheme, &value)
+                .ok()
+                .flatten()
+                .is_some_and(|(id, variant)| {
+                    graph
+                        .edit_resource_classification(id, &variant, Some(status), None)
+                        .unwrap_or(false)
                 });
-            }
             GraphDeltaResult::NodeMetadataUpdated(updated)
         },
         GraphDelta::ReplaySetNodePrimaryClassificationById {
@@ -1505,7 +1466,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
         } => {
             let updated = graph
                 .get_node_key_by_id(node_id)
-                .is_some_and(|key| graph.set_node_primary_classification(key, &scheme, &value));
+                .is_some_and(|key| graph.legacy_set_node_primary_classification(key, &scheme, &value));
             if updated {
                 graph.record_delta(&CapturedDelta::ReplaySetNodePrimaryClassificationById {
                     node_id: node_id.to_string(),
@@ -1516,17 +1477,15 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             GraphDeltaResult::NodeMetadataUpdated(updated)
         },
         GraphDelta::SetNodePrimaryClassification { key, scheme, value } => {
-            let node_id = graph.get_node(key).map(|node| node.id);
-            let capture_scheme = scheme.clone();
-            let capture_value = value.clone();
-            let updated = graph.set_node_primary_classification(key, &scheme, &value);
-            if updated && let Some(node_id) = node_id {
-                graph.record_delta(&CapturedDelta::ReplaySetNodePrimaryClassificationById {
-                    node_id: node_id.to_string(),
-                    scheme: capture_scheme,
-                    value: capture_value,
+            let updated = graph
+                .unique_shown_classification(key, &scheme, &value)
+                .ok()
+                .flatten()
+                .is_some_and(|(id, variant)| {
+                    graph
+                        .edit_resource_classification(id, &variant, None, Some(true))
+                        .unwrap_or(false)
                 });
-            }
             GraphDeltaResult::NodeMetadataUpdated(updated)
         },
         GraphDelta::ReplayRecordNodeDerivationById {
@@ -1587,24 +1546,18 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             from_id,
             to_id,
             predicate,
+            asserter_iri,
         } => {
             let pair = graph
                 .get_node_key_by_id(from_id)
                 .zip(graph.get_node_key_by_id(to_id));
-            let minted_before = pair
-                .map(|(from, to)| statement_ids(graph, from, to))
-                .unwrap_or_default();
-            let updated =
-                graph.replay_set_edge_semantic_predicate_by_ids(from_id, to_id, predicate.clone());
-            if updated {
-                graph.record_delta(&CapturedDelta::ReplaySetEdgeSemanticPredicateByIds {
-                    from_id: from_id.to_string(),
-                    to_id: to_id.to_string(),
-                    predicate,
+            let updated = pair
+                .and_then(|(from, to)| graph.find_edge_key(from, to))
+                .is_some_and(|edge| {
+                    graph.set_edge_semantic_predicate_as(edge, predicate.clone(), asserter_iri)
                 });
-                if let Some((from, to)) = pair {
-                    capture_minted_statements(graph, from, to, &minted_before);
-                }
+            if updated && let Some((from, to)) = pair {
+                graph.capture_semantic_pair(from, to);
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
         },
@@ -1612,68 +1565,49 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             from_id,
             to_id,
             predicate,
+            asserter_iri,
         } => {
-            let pair = graph
+            let edge = graph
                 .get_node_key_by_id(from_id)
-                .zip(graph.get_node_key_by_id(to_id));
-            let minted_before = pair
-                .map(|(from, to)| statement_ids(graph, from, to))
-                .unwrap_or_default();
-            let edge =
-                graph.replay_assert_semantic_predicate_by_ids(from_id, to_id, predicate.clone());
-            if edge.is_some() {
-                graph.record_delta(&CapturedDelta::ReplayAssertSemanticPredicateByIds {
-                    from_id: from_id.to_string(),
-                    to_id: to_id.to_string(),
-                    predicate,
+                .zip(graph.get_node_key_by_id(to_id))
+                .and_then(|(from, to)| {
+                    graph
+                        .assert_surface_semantic_statement(
+                            from,
+                            to,
+                            super::SemanticStatementSpec {
+                                predicate,
+                                recognized_sub_kind: None,
+                                label: None,
+                                graph_scope: GraphScope::Default,
+                                provenance_iri: Some(asserter_iri),
+                                asserted_at_ms: None,
+                            },
+                        )
+                        .and_then(|(edge, outcome)| outcome.changed.then_some(edge))
                 });
-                if let Some((from, to)) = pair {
-                    capture_minted_statements(graph, from, to, &minted_before);
-                }
-            }
             GraphDeltaResult::EdgeAdded(edge)
-        },
-        GraphDelta::SetEdgeSemanticPredicate { edge, predicate } => {
-            let pair = graph.inner.inner().edge_endpoints(edge);
-            let endpoints = pair
-                .and_then(|(from, to)| Some((graph.get_node(from)?.id, graph.get_node(to)?.id)));
-            let minted_before = pair
-                .map(|(from, to)| statement_ids(graph, from, to))
-                .unwrap_or_default();
-            let capture_predicate = predicate.clone();
-            let updated = graph.set_edge_semantic_predicate(edge, predicate);
-            if updated && let Some((from_id, to_id)) = endpoints {
-                graph.record_delta(&CapturedDelta::ReplaySetEdgeSemanticPredicateByIds {
-                    from_id: from_id.to_string(),
-                    to_id: to_id.to_string(),
-                    predicate: capture_predicate,
-                });
-                if let Some((from, to)) = pair {
-                    capture_minted_statements(graph, from, to, &minted_before);
-                }
-            }
-            GraphDeltaResult::NodeMetadataUpdated(updated)
         },
         GraphDelta::AssertSemanticPredicate {
             from,
             to,
             predicate,
+            asserter_iri,
         } => {
-            let from_id = graph.get_node(from).map(|node| node.id);
-            let to_id = graph.get_node(to).map(|node| node.id);
-            let capture_predicate = predicate.clone();
-            let minted_before = statement_ids(graph, from, to);
-            let edge = graph.assert_semantic_predicate(from, to, predicate);
-            if edge.is_some()
-                && let (Some(from_id), Some(to_id)) = (from_id, to_id)
-            {
-                graph.record_delta(&CapturedDelta::ReplayAssertSemanticPredicateByIds {
-                    from_id: from_id.to_string(),
-                    to_id: to_id.to_string(),
-                    predicate: capture_predicate,
-                });
-                capture_minted_statements(graph, from, to, &minted_before);
-            }
+            let edge = graph
+                .assert_semantic_statement(
+                    from,
+                    to,
+                    super::SemanticStatementSpec {
+                        predicate,
+                        recognized_sub_kind: None,
+                        label: None,
+                        graph_scope: GraphScope::Default,
+                        provenance_iri: Some(asserter_iri),
+                        asserted_at_ms: None,
+                    },
+                )
+                .and_then(|(edge, outcome)| outcome.changed.then_some(edge));
             GraphDeltaResult::EdgeAdded(edge)
         },
         GraphDelta::ReplayAddField { field } => {
@@ -1890,13 +1824,15 @@ pub fn assert_relation(
     from: NodeKey,
     to: NodeKey,
     assertion: EdgeAssertion,
-) -> Option<EdgeKey> {
+) -> Option<RelationKey> {
+    let asserter_iri = graph.write_author().asserter_iri();
     match apply_graph_delta(
         graph,
         GraphDelta::AssertRelation {
             from,
             to,
             assertion,
+            asserter_iri,
         },
     ) {
         GraphDeltaResult::EdgeAdded(key) => key,
@@ -1912,7 +1848,7 @@ pub fn assert_semantic_relation_in_scope(
     sub_kind: SemanticSubKind,
     label: Option<String>,
     graph_scope: GraphScope,
-) -> Option<EdgeKey> {
+) -> Option<RelationKey> {
     graph.assert_semantic_relation_in_scope(from, to, sub_kind, label, graph_scope)
 }
 
@@ -1923,7 +1859,7 @@ pub fn assert_semantic_predicate_in_scope(
     to: NodeKey,
     predicate: String,
     graph_scope: GraphScope,
-) -> Option<EdgeKey> {
+) -> Option<RelationKey> {
     graph.assert_semantic_predicate_in_scope(from, to, predicate, graph_scope)
 }
 

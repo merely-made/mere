@@ -115,23 +115,29 @@ impl Graph {
 
     /// Resolve a coupling's [`NodeSelector`] to the matching nodes, against node
     /// tags and classifications. `Kind(k)` matches a node carrying any
-    /// classification whose value is `k` (the v1 interpretation; a
+    /// affirmative classification whose value is `k` (the v1 interpretation; a
     /// scheme-qualified match can refine it later).
     pub fn nodes_matching<'a>(
         &'a self,
         selector: &'a NodeSelector,
     ) -> impl Iterator<Item = NodeKey> + 'a {
         self.inner.inner().node_indices().filter(move |&key| {
-            let Some(node) = self.inner.node(key) else {
+            if self.inner.node(key).is_none() {
                 return false;
-            };
+            }
             match selector {
                 NodeSelector::All => true,
-                NodeSelector::Tagged(tag) => node.tags.contains(tag),
-                NodeSelector::NotTagged(tag) => !node.tags.contains(tag),
-                NodeSelector::Kind(kind) => self
-                    .node_classifications(key)
-                    .is_some_and(|classes| classes.iter().any(|c| &c.value == kind)),
+                NodeSelector::Tagged(tag) => self
+                    .node_content_tags(key)
+                    .is_some_and(|tags| tags.contains(tag)),
+                NodeSelector::NotTagged(tag) => !self
+                    .node_content_tags(key)
+                    .is_some_and(|tags| tags.contains(tag)),
+                NodeSelector::Kind(kind) => self.node_classifications(key).is_some_and(|classes| {
+                    classes
+                        .iter()
+                        .any(|c| c.status.is_affirmative() && &c.value == kind)
+                }),
             }
         })
     }
@@ -246,5 +252,118 @@ mod tests {
             .nodes_matching(&NodeSelector::Kind("paper".into()))
             .collect();
         assert!(no_kind.is_empty());
+    }
+
+    #[test]
+    fn content_tag_selectors_and_facets_follow_shared_resource_after_navigation() {
+        use crate::graph::apply::{GraphDelta, apply_graph_delta};
+        use crate::graph::facet_projection::facet_projection_for_node;
+        use crate::graph::filter::{FacetScalar, FacetValue, facet_keys};
+
+        let mut graph = Graph::new();
+        let a = graph.add_node("https://shared.test/".into(), Point2D::zero());
+        let alias = graph.add_node("https://shared.test/".into(), Point2D::zero());
+        graph.ensure_surface_resource(a).unwrap();
+        graph.ensure_surface_resource(alias).unwrap();
+        apply_graph_delta(
+            &mut graph,
+            GraphDelta::InsertNodeTag {
+                key: a,
+                tag: "important".into(),
+            },
+        );
+        assert_eq!(
+            graph
+                .nodes_matching(&NodeSelector::Tagged("important".into()))
+                .collect::<Vec<_>>(),
+            vec![a, alias]
+        );
+        assert!(
+            graph
+                .nodes_matching(&NodeSelector::NotTagged("important".into()))
+                .next()
+                .is_none()
+        );
+        for key in [a, alias] {
+            assert!(!graph.get_node(key).unwrap().tags.contains("important"));
+            let facets = facet_projection_for_node(&graph, key).unwrap();
+            assert_eq!(
+                facets[facet_keys::UDC_CLASSES],
+                FacetValue::Collection(vec![FacetScalar::Text("important".into())])
+            );
+        }
+        apply_graph_delta(
+            &mut graph,
+            GraphDelta::NavigateNode {
+                key: a,
+                url: "https://later.test/".into(),
+            },
+        );
+        assert_eq!(
+            graph
+                .nodes_matching(&NodeSelector::Tagged("important".into()))
+                .collect::<Vec<_>>(),
+            vec![alias]
+        );
+        assert_eq!(
+            graph
+                .nodes_matching(&NodeSelector::NotTagged("important".into()))
+                .collect::<Vec<_>>(),
+            vec![a]
+        );
+        assert!(
+            !facet_projection_for_node(&graph, a)
+                .unwrap()
+                .contains_key(facet_keys::UDC_CLASSES)
+        );
+        assert!(
+            facet_projection_for_node(&graph, alias)
+                .unwrap()
+                .contains_key(facet_keys::UDC_CLASSES)
+        );
+    }
+
+    #[test]
+    fn kind_selection_uses_affirmative_classifications_and_retains_review_records() {
+        use crate::types::{
+            ClassificationProvenance, ClassificationScheme, ClassificationStatus,
+            NodeClassification,
+        };
+
+        for scheme in [
+            ClassificationScheme::ContentKind,
+            ClassificationScheme::Udc,
+            ClassificationScheme::Custom("rdf:type".into()),
+        ] {
+            for (status, selected) in [
+                (ClassificationStatus::Accepted, true),
+                (ClassificationStatus::Verified, true),
+                (ClassificationStatus::Imported, true),
+                (ClassificationStatus::Suggested, false),
+                (ClassificationStatus::Rejected, false),
+            ] {
+                let mut graph = Graph::new();
+                let key = graph.add_node("https://example.test/".into(), Point2D::zero());
+                let record = NodeClassification {
+                    scheme: scheme.clone(),
+                    value: "article".into(),
+                    label: Some("Article".into()),
+                    confidence: 0.8,
+                    provenance: ClassificationProvenance::UserAuthored,
+                    status,
+                    primary: true,
+                };
+                assert!(graph.add_node_classification(key, record.clone()));
+                let actual: Vec<_> = graph
+                    .nodes_matching(&NodeSelector::Kind("article".into()))
+                    .collect();
+                assert_eq!(
+                    actual,
+                    if selected { vec![key] } else { vec![] },
+                    "{record:?}"
+                );
+                assert_eq!(graph.node_classifications(key).unwrap(), vec![record]);
+            }
+        }
     }
 }

@@ -2491,6 +2491,7 @@ dependencies = [
  "serde",
  "serde_json",
  "slotmap",
+ "uuid",
 ]
 
 [[package]]
@@ -15660,7 +15661,7 @@ dependencies = [
  "regex",
  "rustc-hash 2.1.3",
  "sha1 0.11.0",
- "sha2 0.10.9",
+ "sha2 0.11.0",
  "sparesults",
  "spargebra",
  "sparopt",

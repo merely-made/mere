@@ -317,10 +317,14 @@ fn test_assert_relation() {
     graph.assert_relation(node1, node2, hyperlink()).unwrap();
 
     // Check adjacency via graph methods
-    assert!(graph.has_edge_between(node1, node2));
+    assert_eq!(graph.projected_relations_between(node1, node2).count(), 1);
+    assert!(
+        !graph.has_edge_between(node1, node2),
+        "Surface adjacency remains explicit"
+    );
     assert!(!graph.has_edge_between(node2, node1));
-    assert_eq!(graph.out_neighbors(node1).count(), 1);
-    assert_eq!(graph.in_neighbors(node2).count(), 1);
+    assert_eq!(graph.projected_outgoing_relations(node1).count(), 1);
+    assert_eq!(graph.projected_incoming_relations(node2).count(), 1);
 }
 
 #[test]
@@ -353,13 +357,13 @@ fn test_assert_multiple_relations() {
     graph.assert_relation(node1, node3, hyperlink()).unwrap();
     graph.assert_relation(node2, node3, hyperlink()).unwrap();
 
-    assert_eq!(graph.edge_count(), 3);
+    assert_eq!(graph.resource_relations().count(), 3);
 
     // Check node1 has 2 outgoing neighbors
-    assert_eq!(graph.out_neighbors(node1).count(), 2);
+    assert_eq!(graph.projected_outgoing_relations(node1).count(), 2);
 
     // Check node3 has 2 incoming neighbors
-    assert_eq!(graph.in_neighbors(node3).count(), 2);
+    assert_eq!(graph.projected_incoming_relations(node3).count(), 2);
 }
 
 #[test]
@@ -377,9 +381,12 @@ fn test_retract_relation_by_sub_kind_between_nodes() {
         RelationSelector::Semantic(SemanticSubKind::UserGrouped),
     );
     assert_eq!(removed, 1);
-    assert_eq!(graph.edge_count(), 1);
-    let edge_key = graph.find_edge_key(a, b).expect("remaining hyperlink edge");
-    let payload = graph.get_edge(edge_key).expect("remaining edge payload");
+    assert_eq!(graph.edge_count(), 0);
+    let (edge_key, payload) = graph
+        .projected_relations_between(a, b)
+        .next()
+        .expect("remaining Resource hyperlink");
+    assert!(matches!(edge_key, RelationKey::Resource(_)));
     assert!(payload.has_relation(RelationSelector::Semantic(SemanticSubKind::Hyperlink)));
     assert!(!payload.has_relation(RelationSelector::Semantic(SemanticSubKind::UserGrouped)));
 }
@@ -418,7 +425,14 @@ fn statement_assert_dedups_by_content_and_retracts_by_id() {
     assert_eq!(edge, edge2, "one pair bucket");
     assert!(second.changed);
     assert_ne!(first.statement_id, second.statement_id);
-    assert_eq!(graph.get_edge(edge).unwrap().semantic_statements().len(), 2);
+    assert_eq!(
+        graph
+            .get_relation(edge)
+            .unwrap()
+            .semantic_statements()
+            .len(),
+        2
+    );
 
     // Exact re-assert dedups to the same handle, no change.
     let (_, again) = graph
@@ -439,25 +453,32 @@ fn statement_assert_dedups_by_content_and_retracts_by_id() {
     // Precise retract: the other statement survives; retracting the last
     // semantic statement (with no other family payload) removes the edge.
     assert!(graph.retract_semantic_statement(a, b, &first.statement_id));
-    assert_eq!(graph.get_edge(edge).unwrap().semantic_statements().len(), 1);
+    assert_eq!(
+        graph
+            .get_relation(edge)
+            .unwrap()
+            .semantic_statements()
+            .len(),
+        1
+    );
     assert!(
         !graph.retract_semantic_statement(a, b, &first.statement_id),
         "retract is idempotent per id"
     );
     assert!(graph.retract_semantic_statement(a, b, &second.statement_id));
     assert!(
-        graph.find_edge_key(a, b).is_none(),
-        "an emptied payload removes the petgraph edge"
+        graph.get_relation(edge).is_none() && graph.resource_relations().count() == 0,
+        "an emptied Resource payload removes its exact bucket"
     );
 }
 
 #[test]
-fn test_assert_relation_merges_semantics_on_single_stored_edge() {
+fn test_assert_relation_keeps_surface_and_resource_semantics_separate() {
     let mut graph = Graph::new();
     let a = graph.add_node("https://a.com".to_string(), Point2D::new(0.0, 0.0));
     let b = graph.add_node("https://b.com".to_string(), Point2D::new(1.0, 1.0));
 
-    graph.assert_relation(a, b, hyperlink()).unwrap();
+    let resource = graph.assert_relation(a, b, hyperlink()).unwrap();
     graph
         .assert_relation(a, b, user_grouped(Some("tab-group")))
         .unwrap();
@@ -465,11 +486,15 @@ fn test_assert_relation_merges_semantics_on_single_stored_edge() {
     assert_eq!(graph.edge_count(), 1);
     let edge_key = graph.find_edge_key(a, b).unwrap();
     let payload = graph.get_edge(edge_key).unwrap();
-    assert!(payload.has_relation(RelationSelector::Semantic(SemanticSubKind::Hyperlink)));
+    assert!(!payload.has_relation(RelationSelector::Semantic(SemanticSubKind::Hyperlink)));
+    let content = graph.get_relation(resource).unwrap();
+    assert!(content.has_relation(RelationSelector::Semantic(SemanticSubKind::Hyperlink)));
+    assert!(!content.has_relation(RelationSelector::Semantic(SemanticSubKind::UserGrouped)));
     assert!(payload.has_relation(RelationSelector::Semantic(SemanticSubKind::UserGrouped)));
     assert_eq!(payload.label(), Some("tab-group"));
-    // Two semantic sub-kinds on the same stored edge → two relation rows.
-    assert_eq!(graph.relations().count(), 2);
+    assert_eq!(graph.relations().count(), 1);
+    assert_eq!(graph.resource_relations().count(), 1);
+    assert_eq!(graph.projected_relations().count(), 2);
 }
 
 #[test]
@@ -478,14 +503,14 @@ fn test_statement_bucket_keeps_multiple_predicates_on_one_stored_edge() {
     let a = graph.add_node("https://a.com".to_string(), Point2D::new(0.0, 0.0));
     let b = graph.add_node("https://b.com".to_string(), Point2D::new(1.0, 1.0));
 
-    graph.assert_relation(a, b, cites()).unwrap();
+    let key = graph.assert_relation(a, b, cites()).unwrap();
     graph
         .assert_semantic_predicate(a, b, "https://schema.org/citation".to_string())
         .unwrap();
 
-    assert_eq!(graph.edge_count(), 1);
-    let edge_key = graph.find_edge_key(a, b).unwrap();
-    let payload = graph.get_edge(edge_key).unwrap();
+    assert_eq!(graph.edge_count(), 0);
+    assert_eq!(graph.resource_relations().count(), 1);
+    let payload = graph.get_relation(key).unwrap();
     assert_eq!(payload.semantic_statements().len(), 2);
     assert!(payload.semantic_statements().iter().any(|statement| {
         statement.recognized_sub_kind == Some(SemanticSubKind::Cites)
@@ -503,7 +528,7 @@ fn test_assert_relation_preserves_generic_semantic_subkind() {
     let a = graph.add_node("https://a.com".to_string(), Point2D::new(0.0, 0.0));
     let b = graph.add_node("https://b.com".to_string(), Point2D::new(1.0, 1.0));
 
-    graph
+    let edge_key = graph
         .assert_relation(
             a,
             b,
@@ -515,21 +540,22 @@ fn test_assert_relation_preserves_generic_semantic_subkind() {
         )
         .expect("semantic relation should be asserted");
 
-    let edge_key = graph
-        .find_edge_key(a, b)
-        .expect("semantic edge should exist");
+    assert!(matches!(edge_key, RelationKey::Resource(_)));
+    assert!(graph.find_edge_key(a, b).is_none());
     let payload = graph
-        .get_edge(edge_key)
+        .get_relation(edge_key)
         .expect("semantic payload should exist");
     assert!(payload.has_relation(RelationSelector::Semantic(SemanticSubKind::SameEntityAs)));
     assert_eq!(payload.label(), Some("identity"));
 
-    let semantic_edges = graph.semantic_edges().collect::<Vec<_>>();
+    let semantic_edges = graph
+        .projected_relations()
+        .map(|(_, row)| row)
+        .collect::<Vec<_>>();
     assert!(semantic_edges.iter().any(|edge| {
         edge.from == a
             && edge.to == b
-            && edge.sub_kind == SemanticSubKind::SameEntityAs
-            && edge.label.as_deref() == Some("identity")
+            && edge.kind == RelationKind::Semantic(SemanticSubKind::SameEntityAs)
     }));
 }
 
@@ -538,7 +564,8 @@ fn test_remove_node() {
     let mut graph = Graph::new();
     let n1 = graph.add_node("https://a.com".to_string(), Point2D::new(0.0, 0.0));
     let n2 = graph.add_node("https://b.com".to_string(), Point2D::new(1.0, 1.0));
-    let _ = graph.assert_relation(n1, n2, hyperlink());
+    let resource = graph.assert_relation(n1, n2, hyperlink()).unwrap();
+    graph.assert_relation(n1, n2, user_grouped(None)).unwrap();
 
     assert_eq!(graph.node_count(), 2);
     assert_eq!(graph.edge_count(), 1);
@@ -549,6 +576,14 @@ fn test_remove_node() {
     assert!(graph.get_node(n1).is_none());
     assert!(graph.get_node_by_url("https://a.com").is_none());
 
+    assert!(
+        graph
+            .get_relation(resource)
+            .unwrap()
+            .has_relation(RelationSelector::Semantic(SemanticSubKind::Hyperlink)),
+        "removing a Surface leaves Resource content held"
+    );
+    assert_eq!(graph.resource_relations().count(), 1);
     // n2 still exists
     assert!(graph.get_node(n2).is_some());
 }
@@ -583,12 +618,15 @@ fn test_relations_iterator() {
     let _ = graph.assert_relation(node1, node2, hyperlink());
     let _ = graph.assert_relation(node1, node3, hyperlink());
 
-    let relation_count = graph.relations().count();
+    graph
+        .assert_relation(node2, node3, user_grouped(None))
+        .unwrap();
+    assert_eq!(graph.relations().count(), 1);
+    let relation_count = graph.resource_relations().count();
     assert_eq!(relation_count, 2);
 
-    assert!(graph.inner.inner().edge_references().all(|edge| {
-        edge.weight()
-            .has_relation(RelationSelector::Semantic(SemanticSubKind::Hyperlink))
+    assert!(graph.resource_relations().all(|(_, _, _, payload)| {
+        payload.has_relation(RelationSelector::Semantic(SemanticSubKind::Hyperlink))
     }));
 }
 
@@ -625,8 +663,15 @@ fn test_edge_count() {
     assert_eq!(graph.edge_count(), 0);
 
     let _ = graph.assert_relation(node1, node2, hyperlink());
-    assert_eq!(graph.edge_count(), 1);
+    assert_eq!(graph.edge_count(), 0);
+    assert_eq!(graph.resource_relations().count(), 1);
 
     let _ = graph.assert_relation(node2, node1, hyperlink());
-    assert_eq!(graph.edge_count(), 2);
+    assert_eq!(graph.edge_count(), 0);
+    assert_eq!(graph.resource_relations().count(), 2);
+    graph
+        .assert_relation(node1, node2, user_grouped(None))
+        .unwrap();
+    assert_eq!(graph.edge_count(), 1);
+    assert_eq!(graph.resource_relations().count(), 2);
 }

@@ -10,9 +10,10 @@
 
 use super::super::*;
 
-fn hyperlink() -> EdgeAssertion {
+// These connectivity APIs deliberately traverse Surface topology.
+fn surface_group() -> EdgeAssertion {
     EdgeAssertion::Semantic {
-        sub_kind: SemanticSubKind::Hyperlink,
+        sub_kind: SemanticSubKind::UserGrouped,
         label: None,
         decay_progress: None,
     }
@@ -155,9 +156,22 @@ fn hop_distances_shortest_path_and_reachability_use_undirected_connectivity() {
     let c = graph.add_node("https://c.com".to_string(), Point2D::new(2.0, 0.0));
     let d = graph.add_node("https://d.com".to_string(), Point2D::new(3.0, 0.0));
 
-    let _ = graph.assert_relation(a, b, hyperlink());
-    let _ = graph.assert_relation(b, c, hyperlink());
+    let _ = graph.assert_relation(a, b, surface_group());
+    let _ = graph.assert_relation(b, c, surface_group());
 
+    let content = graph
+        .assert_relation(
+            a,
+            d,
+            EdgeAssertion::Semantic {
+                sub_kind: SemanticSubKind::Hyperlink,
+                label: None,
+                decay_progress: None,
+            },
+        )
+        .unwrap();
+    assert!(matches!(content, RelationKey::Resource(_)));
+    assert_eq!(graph.projected_relations_between(a, d).count(), 1);
     let hops = graph.hop_distances_from(a);
     assert_eq!(hops.get(&a).copied(), Some(0));
     assert_eq!(hops.get(&b).copied(), Some(1));
@@ -181,8 +195,8 @@ fn orphan_and_weak_component_accessors_report_expected_partitions() {
     let d = graph.add_node("https://d.com".to_string(), Point2D::new(3.0, 0.0));
     let e = graph.add_node("https://e.com".to_string(), Point2D::new(4.0, 0.0));
 
-    let _ = graph.assert_relation(a, b, hyperlink());
-    let _ = graph.assert_relation(d, e, hyperlink());
+    let _ = graph.assert_relation(a, b, surface_group());
+    let _ = graph.assert_relation(d, e, surface_group());
 
     let mut orphans = graph.orphan_node_keys();
     orphans.sort_by_key(|k| k.index());
@@ -218,10 +232,10 @@ fn sorted_neighbor_and_connected_import_accessors_are_stable() {
         Point2D::new(3.0, 0.0),
     );
 
-    let _ = graph.assert_relation(seed, right, hyperlink());
-    let _ = graph.assert_relation(left, seed, hyperlink());
-    let _ = graph.assert_relation(left, shared, hyperlink());
-    let _ = graph.assert_relation(right, shared, hyperlink());
+    let _ = graph.assert_relation(seed, right, surface_group());
+    let _ = graph.assert_relation(left, seed, surface_group());
+    let _ = graph.assert_relation(left, shared, surface_group());
+    let _ = graph.assert_relation(right, shared, surface_group());
 
     let sorted_neighbors = graph.neighbors_undirected_sorted(seed);
     assert_eq!(sorted_neighbors, vec![left, right]);
@@ -246,10 +260,10 @@ fn strongly_connected_components_reports_cycle_partition() {
     let c = graph.add_node("https://c.com".to_string(), Point2D::new(2.0, 0.0));
     let d = graph.add_node("https://d.com".to_string(), Point2D::new(3.0, 0.0));
 
-    let _ = graph.assert_relation(a, b, hyperlink());
-    let _ = graph.assert_relation(b, c, hyperlink());
-    let _ = graph.assert_relation(c, a, hyperlink());
-    let _ = graph.assert_relation(c, d, hyperlink());
+    let _ = graph.assert_relation(a, b, surface_group());
+    let _ = graph.assert_relation(b, c, surface_group());
+    let _ = graph.assert_relation(c, a, surface_group());
+    let _ = graph.assert_relation(c, d, surface_group());
 
     let mut sizes: Vec<usize> = graph
         .strongly_connected_components()
@@ -277,6 +291,59 @@ fn removing_tag_prunes_stale_icon_override() {
             .node_tag_presentation(key)
             .is_some_and(|presentation| presentation.icon_overrides.is_empty())
     );
+
+    let alice = crate::graph::journal::Author::person("alice");
+    let bob = crate::graph::journal::Author::person("bob");
+    graph.write_as(alice.clone(), |graph| {
+        assert!(graph.insert_node_tag(key, "research".into()));
+    });
+    graph.write_as(bob.clone(), |graph| {
+        assert!(graph.insert_node_tag(key, "research".into()));
+    });
+    let icon = crate::types::BadgeIcon::Emoji("🔬".into());
+    assert!(graph.set_node_tag_icon_override(key, "research", Some(icon.clone())));
+    let mut replayed = graph.clone();
+    let captures = std::sync::Arc::new(std::sync::Mutex::new(Vec::new()));
+    let sink = captures.clone();
+    graph.set_recorder(Some(std::sync::Arc::new(move |delta| {
+        sink.lock().unwrap().push(delta.clone());
+    })));
+    graph.write_as(alice, |graph| {
+        assert!(graph.remove_node_tag(key, "research"));
+    });
+    assert!(graph.node_content_tags(key).unwrap().contains("research"));
+    assert_eq!(
+        graph
+            .node_tag_presentation(key)
+            .unwrap()
+            .icon_overrides
+            .get("research"),
+        Some(&icon),
+        "another tagger's visible label retains the Surface icon"
+    );
+    graph.write_as(bob, |graph| {
+        assert!(graph.remove_node_tag(key, "research"));
+    });
+    assert!(!graph.node_content_tags(key).unwrap().contains("research"));
+    assert!(
+        graph
+            .node_tag_presentation(key)
+            .unwrap()
+            .icon_overrides
+            .is_empty()
+    );
+    let captures = captures.lock().unwrap().clone();
+    assert_eq!(captures.iter().filter(|delta| matches!(delta, crate::graph::capture::CapturedDelta::ReplaySetNodeFacetById { facet, .. } if facet == crate::graph::node_facets::PRESENTATION_TAGS)).count(), 1, "only the final withdrawal captures the presentation prune");
+    crate::graph::capture::replay_captured_deltas_onto(&mut replayed, captures);
+    assert_eq!(
+        replayed.node_content_tags(key),
+        graph.node_content_tags(key)
+    );
+    assert_eq!(
+        replayed.node_tag_presentation(key),
+        graph.node_tag_presentation(key)
+    );
+    assert_eq!(replayed.facets(), graph.facets());
 }
 
 #[test]

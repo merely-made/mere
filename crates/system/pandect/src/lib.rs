@@ -96,6 +96,7 @@ pub mod scene_facets;
 // filesystem). Save redacts private fields by default; open thaws read-only.
 pub mod codicil_seal;
 pub mod graph_codicil;
+pub mod graph_placement;
 // A mere's sessions over one muniment store: the session schema, the live
 // session core and the lifecycle (reservoir plan V2).
 pub mod graph_session;
@@ -107,6 +108,8 @@ pub mod live_view;
 // compose op (`graph_codicil::compose_graph_codicils`) layers on top.
 #[cfg(not(target_arch = "wasm32"))]
 pub mod notochord_policy_store;
+#[cfg(test)]
+mod resource_content_merge_tests;
 pub mod snapshot_merge;
 // The frame.json pane-layout store moved OUT with the pane model at
 // meerkat's deletion (2026-07-18): it lives in turnstone's `frisket::store`

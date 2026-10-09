@@ -16,7 +16,7 @@ fn member_addressed_relation_editing_targets_one_relation_cell() {
     assert!(canvas.assert_relation_between_members(a, b, SemanticSubKind::Cites));
     assert!(canvas.assert_relation_between_members(a, b, SemanticSubKind::Quotes));
     assert_eq!(
-        canvas.graph().relations().count(),
+        canvas.graph().projected_relations().count(),
         2,
         "the directed bundle carries both relation cells",
     );
@@ -30,7 +30,11 @@ fn member_addressed_relation_editing_targets_one_relation_cell() {
         1,
         "only the selected relation cell is removed",
     );
-    let remaining: Vec<_> = canvas.graph().relations().map(|r| r.kind).collect();
+    let remaining: Vec<_> = canvas
+        .graph()
+        .projected_relations()
+        .map(|(_, r)| r.kind)
+        .collect();
     assert_eq!(
         remaining,
         vec![RelationKind::Semantic(SemanticSubKind::Quotes)]

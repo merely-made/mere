@@ -75,19 +75,15 @@ pub fn facet_projection_for_node(graph: &Graph, key: NodeKey) -> Option<FacetPro
 
     // --- Energy (edge-derived) ---
 
-    let out_edges: Vec<_> = graph.inner.inner().edges(key).collect();
-    let in_edges: Vec<_> = graph
-        .inner
-        .inner()
-        .edges_directed(key, Direction::Incoming)
-        .collect();
+    let out_edges: Vec<_> = graph.projected_outgoing_relations(key).collect();
+    let in_edges: Vec<_> = graph.projected_incoming_relations(key).collect();
 
     let out_degree = out_edges.len();
     let in_degree = in_edges.len();
 
     let mut edge_kind_labels: HashSet<&'static str> = HashSet::new();
-    for e in out_edges.iter().chain(in_edges.iter()) {
-        for family in e.weight().families() {
+    for (_, _, payload) in out_edges.iter().chain(in_edges.iter()) {
+        for family in payload.families() {
             edge_kind_labels.insert(edge_family_label(family));
         }
     }
@@ -156,13 +152,16 @@ pub fn facet_projection_for_node(graph: &Graph, key: NodeKey) -> Option<FacetPro
     // scheme-prefixed format (e.g. "udc:519.6") so they slot directly into the same
     // collection facet.
     {
-        let mut udc_values: Vec<FacetScalar> = node
-            .tags
-            .iter()
-            .map(|t| FacetScalar::Text(t.clone()))
+        let mut udc_values: Vec<FacetScalar> = graph
+            .node_content_tags(key)
+            .unwrap_or_default()
+            .into_iter()
+            .map(FacetScalar::Text)
             .collect();
         for c in graph.node_classifications(key).unwrap_or_default() {
-            udc_values.push(FacetScalar::Text(c.value.clone()));
+            if c.status.is_affirmative() {
+                udc_values.push(FacetScalar::Text(c.value.clone()));
+            }
         }
         if !udc_values.is_empty() {
             proj.insert(
@@ -249,6 +248,7 @@ mod tests {
         apply_graph_delta(
             &mut graph,
             GraphDelta::AssertRelation {
+                asserter_iri: crate::graph::journal::Author::user().asserter_iri(),
                 from: a,
                 to: b,
                 assertion: crate::graph::EdgeAssertion::Semantic {
@@ -269,6 +269,36 @@ mod tests {
         assert_eq!(
             proj_b[facet_keys::IN_DEGREE],
             FacetValue::Scalar(FacetScalar::Number(1.0))
+        );
+        assert!(
+            graph.find_edge_key(a, b).is_none(),
+            "Hyperlink belongs to Resource"
+        );
+        apply_graph_delta(
+            &mut graph,
+            GraphDelta::AppendTraversal {
+                from: a,
+                to: b,
+                trigger: crate::graph::NavigationTrigger::LinkClick,
+                timestamp_ms: Some(100),
+            },
+        );
+        assert!(
+            graph.find_edge_key(a, b).is_some(),
+            "Traversal remains Surface"
+        );
+        let projected = facet_projection_for_node(&graph, a).unwrap();
+        assert_eq!(
+            projected[facet_keys::OUT_DEGREE],
+            FacetValue::Scalar(FacetScalar::Number(2.0))
+        );
+        assert_eq!(
+            projected[facet_keys::TRAVERSAL_COUNT],
+            FacetValue::Scalar(FacetScalar::Number(1.0))
+        );
+        assert_eq!(
+            facet_projection_for_node(&graph, b).unwrap()[facet_keys::IN_DEGREE],
+            FacetValue::Scalar(FacetScalar::Number(2.0))
         );
     }
 
@@ -315,7 +345,7 @@ mod tests {
     }
 
     #[test]
-    fn projection_udc_classes_merges_tags_and_classifications() {
+    fn projection_udc_classes_keeps_suggested_classifications_for_review() {
         use crate::graph::{
             ClassificationProvenance, ClassificationScheme, ClassificationStatus,
             NodeClassification,
@@ -342,6 +372,56 @@ mod tests {
             panic!("expected Collection");
         };
         assert!(items.contains(&FacetScalar::Text("udc:51".to_string())));
-        assert!(items.contains(&FacetScalar::Text("udc:519.6".to_string())));
+        assert!(!items.contains(&FacetScalar::Text("udc:519.6".to_string())));
+        let retained = graph.node_classifications(key).unwrap();
+        assert_eq!(retained.len(), 1);
+        assert_eq!(retained[0].status, ClassificationStatus::Suggested);
+    }
+
+    #[test]
+    fn classification_facets_include_affirmative_statuses_without_discarding_review() {
+        use crate::types::{
+            ClassificationProvenance, ClassificationScheme, ClassificationStatus,
+            NodeClassification,
+        };
+
+        for scheme in [
+            ClassificationScheme::Udc,
+            ClassificationScheme::ContentKind,
+            ClassificationScheme::Custom("rdf:type".into()),
+        ] {
+            for (status, projected) in [
+                (ClassificationStatus::Accepted, true),
+                (ClassificationStatus::Verified, true),
+                (ClassificationStatus::Imported, true),
+                (ClassificationStatus::Suggested, false),
+                (ClassificationStatus::Rejected, false),
+            ] {
+                let mut graph = Graph::new();
+                let key = build_node(&mut graph, "https://example.test/");
+                graph.insert_node_tag(key, "retained-tag".into());
+                let record = NodeClassification {
+                    scheme: scheme.clone(),
+                    value: "classification-value".into(),
+                    label: Some("Classification".into()),
+                    confidence: 0.8,
+                    provenance: ClassificationProvenance::UserAuthored,
+                    status,
+                    primary: true,
+                };
+                assert!(graph.add_node_classification(key, record.clone()));
+                let facets = facet_projection_for_node(&graph, key).unwrap();
+                let FacetValue::Collection(values) = &facets[facet_keys::UDC_CLASSES] else {
+                    panic!("expected classification collection");
+                };
+                assert!(values.contains(&FacetScalar::Text("retained-tag".into())));
+                assert_eq!(
+                    values.contains(&FacetScalar::Text(record.value.clone())),
+                    projected,
+                    "{record:?}"
+                );
+                assert_eq!(graph.node_classifications(key).unwrap(), vec![record]);
+            }
+        }
     }
 }

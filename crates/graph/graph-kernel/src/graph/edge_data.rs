@@ -71,6 +71,9 @@ impl Default for EdgeMetrics {
     }
 }
 
+/// Attribution for stored assertions whose original asserter is unknown.
+pub const UNKNOWN_LEGACY_ASSERTER_IRI: &str = "https://mere.computer/ns/agent#unknown-legacy";
+
 #[derive(Debug, Clone, PartialEq, Eq, Archive, Serialize, Deserialize)]
 pub struct SemanticStatement {
     pub statement_id: String,
@@ -83,6 +86,15 @@ pub struct SemanticStatement {
 }
 
 impl SemanticStatement {
+    /// Normalize missing attribution on a legacy record without inventing authorship.
+    pub fn normalize_legacy_asserter(&mut self) -> bool {
+        if self.provenance_iri.is_some() {
+            return false;
+        }
+        self.provenance_iri = Some(UNKNOWN_LEGACY_ASSERTER_IRI.to_string());
+        true
+    }
+
     pub fn new(
         predicate: String,
         recognized_sub_kind: Option<SemanticSubKind>,
@@ -155,7 +167,7 @@ impl SemanticData {
     }
 
     /// Statement-aware assert: content-dedup on
-    /// `(recognized_sub_kind, predicate, graph_scope)` (same key as
+    /// `(recognized_sub_kind, predicate, graph_scope, provenance_iri)` (same key as
     /// [`insert_statement`](Self::insert_statement)), updating the deduped
     /// statement's metadata in place; a miss mints a device-safe id and
     /// appends. Always returns the fact handle.
@@ -164,14 +176,13 @@ impl SemanticData {
             statement.recognized_sub_kind == spec.recognized_sub_kind
                 && statement.predicate == spec.predicate
                 && statement.graph_scope == spec.graph_scope
+                && statement.provenance_iri == spec.provenance_iri
         }) {
-            let changed = existing.label != spec.label
-                || existing.provenance_iri != spec.provenance_iri
-                || existing.asserted_at_ms != spec.asserted_at_ms;
+            let changed =
+                existing.label != spec.label || existing.asserted_at_ms != spec.asserted_at_ms;
             let statement_id = existing.statement_id.clone();
             if changed {
                 existing.label = spec.label;
-                existing.provenance_iri = spec.provenance_iri;
                 existing.asserted_at_ms = spec.asserted_at_ms;
                 self.rebuild_compat();
             }
@@ -224,13 +235,10 @@ impl SemanticData {
             statement.recognized_sub_kind == recognized_sub_kind
                 && statement.predicate == predicate
                 && statement.graph_scope == graph_scope
+                && statement.provenance_iri == provenance_iri
         }) {
-            if existing.label != label
-                || existing.provenance_iri != provenance_iri
-                || existing.asserted_at_ms != asserted_at_ms
-            {
+            if existing.label != label || existing.asserted_at_ms != asserted_at_ms {
                 existing.label = label;
-                existing.provenance_iri = provenance_iri;
                 existing.asserted_at_ms = asserted_at_ms;
                 self.rebuild_compat();
                 return true;
@@ -250,6 +258,27 @@ impl SemanticData {
         true
     }
 
+    pub(crate) fn upsert_persisted_statement(&mut self, statement: SemanticStatement) -> bool {
+        if let Some(existing) = self.statements.iter_mut().find(|existing| {
+            existing.recognized_sub_kind == statement.recognized_sub_kind
+                && existing.predicate == statement.predicate
+                && existing.graph_scope == statement.graph_scope
+                && existing.provenance_iri == statement.provenance_iri
+        }) {
+            if existing.label == statement.label
+                && existing.asserted_at_ms == statement.asserted_at_ms
+            {
+                return false;
+            }
+            existing.label = statement.label;
+            existing.asserted_at_ms = statement.asserted_at_ms;
+            self.rebuild_compat();
+            return true;
+        }
+        self.push_persisted_statement(statement)
+    }
+
+    /// Exact restore preserves every stored handle, including legacy records.
     pub fn push_persisted_statement(&mut self, statement: SemanticStatement) -> bool {
         if self
             .statements
@@ -305,7 +334,7 @@ impl SemanticData {
         self.rebuild_compat();
     }
 
-    fn rebuild_compat(&mut self) {
+    pub(crate) fn rebuild_compat(&mut self) {
         self.sub_kinds = self
             .statements
             .iter()

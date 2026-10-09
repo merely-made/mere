@@ -27,7 +27,8 @@
 
 use inker::LinkStatement;
 use kernel::graph::{
-    EdgeAssertion, Graph, NodeKey, REL_VOCAB, SemanticSubKind, predicate_iri, sub_kind_from_iri,
+    Graph, NodeKey, REL_VOCAB, SemanticStatementSpec, SemanticSubKind, predicate_iri,
+    sub_kind_from_iri,
 };
 
 /// Resolve a knot `rel` to a recognized Mere relation: its [`SemanticSubKind`]
@@ -61,8 +62,8 @@ pub struct StatementOutcome {
 /// Apply predicate-bearing link statements to `graph` as `Semantic` edges from
 /// `source`. For each statement whose `rel` resolves to a recognized relation
 /// and whose target node already exists, asserts
-/// `EdgeAssertion::Semantic { sub_kind, .. }` and stamps the canonical predicate
-/// IRI via `EdgePayload::set_semantic_predicate`. Compose with inker's walk:
+/// a statement with the canonical predicate IRI, attributed to the source page
+/// in source scope. Compose with inker's walk:
 /// `apply_link_statements(graph, source, &inker::link_statements(&doc))`. See
 /// [`StatementOutcome`] and the module docs for the (intentional) deferrals.
 pub fn apply_link_statements(
@@ -71,6 +72,9 @@ pub fn apply_link_statements(
     statements: &[LinkStatement],
 ) -> StatementOutcome {
     let mut outcome = StatementOutcome::default();
+    let Some(asserter) = graph.get_node(source).map(|node| node.url().to_owned()) else {
+        return outcome;
+    };
     for stmt in statements {
         let Some((sub_kind, predicate)) = resolve_rel(&stmt.rel) else {
             outcome.unrecognized.push(stmt.clone());
@@ -82,24 +86,19 @@ pub fn apply_link_statements(
             outcome.pending_targets.push(stmt.target_url.clone());
             continue;
         };
-        let edge = kernel::graph::apply::assert_relation(
-            graph,
+        let edge = graph.assert_semantic_statement(
             source,
             target,
-            EdgeAssertion::Semantic {
-                sub_kind,
+            SemanticStatementSpec {
+                predicate: predicate.into(),
+                recognized_sub_kind: Some(sub_kind),
                 label: None,
-                decay_progress: None,
+                graph_scope: kernel::types::GraphScope::Source,
+                provenance_iri: Some(asserter.clone()),
+                asserted_at_ms: None,
             },
         );
-        if let Some(key) = edge {
-            let _ = kernel::graph::apply::apply_graph_delta(
-                graph,
-                kernel::graph::apply::GraphDelta::SetEdgeSemanticPredicate {
-                    edge: key,
-                    predicate: Some(predicate.to_string()),
-                },
-            );
+        if edge.is_some_and(|(_, assertion)| assertion.changed) {
             outcome.edges_asserted += 1;
         }
     }
@@ -156,9 +155,25 @@ mod tests {
         assert!(outcome.pending_targets.is_empty());
         assert!(outcome.unrecognized.is_empty());
 
-        let key = graph.find_edge_key(source, target).expect("edge created");
-        let payload = graph.get_edge(key).expect("edge payload");
+        assert!(graph.find_edge_key(source, target).is_none());
+        let key = graph
+            .find_resource_edge_key(
+                graph.shown_resource_id(source).expect("source resource"),
+                graph.shown_resource_id(target).expect("target resource"),
+            )
+            .expect("resource edge created");
+        let payload = graph.get_resource_edge(key).expect("resource edge payload");
         assert!(payload.has_relation(RelationSelector::Semantic(SemanticSubKind::Cites)));
+        assert_eq!(payload.semantic_statements().len(), 1);
+        assert_eq!(
+            payload.semantic_statements()[0].provenance_iri.as_deref(),
+            Some("knot:test")
+        );
+        assert_eq!(
+            payload.semantic_statements()[0].graph_scope,
+            kernel::types::GraphScope::Source
+        );
+
         assert_eq!(
             payload.semantic_data().and_then(|d| d.predicate.as_deref()),
             Some("https://mere.computer/ns/rel#cites")
