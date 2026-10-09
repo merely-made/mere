@@ -31,7 +31,7 @@ pub use scenomise::matrix::{
     MatrixRole, derive_matrix,
 };
 
-use scenomise::history::{ComparedFields, RevisionView, classify_revisions};
+use scenomise::history::{Comparison, RevisionView, classify_revisions};
 
 use crate::reading::{ActorScope, GraphReadingProfile, ReadingEmphasis, ReadingSurface};
 
@@ -69,7 +69,9 @@ pub struct ReadingAxis<'a> {
     pub record: &'a str,
     /// The reading, which must select actors (a spatial reading).
     pub profile: &'a GraphReadingProfile,
-    /// The focus occurrence, for a focus reading.
+    /// The focus occurrence, for a focus reading. Required by a focus
+    /// reading and never guessed; a host supplies its own default (Ruling
+    /// 147a).
     pub focus: Option<&'a str>,
     /// The revision read: the authority's current dataset and relationships.
     pub dataset: &'a ProjectionDataset,
@@ -89,6 +91,8 @@ pub enum MatrixReadingError {
     /// The axis's profile is itself a matrix, not a reading of actors.
     NotAnActorReading { axis: MatrixRole, reading: String },
     /// A focus reading without a focus that names a disclosed occurrence.
+    /// There is deliberately no fallback (site canvas plan, Ruling 147a): a
+    /// host that wants a default focus, as the site does, supplies it.
     MissingFocus { axis: MatrixRole },
     /// The shared derivation refused the axes.
     Matrix(MatrixError),
@@ -181,7 +185,7 @@ fn read_axis(input: &ReadingAxis<'_>, role: MatrixRole) -> Result<MatrixAxis, Ma
                 dataset: input.dataset,
                 relationships: input.relationships,
             };
-            let changes = classify_revisions(input.previous, current, &ComparedFields::All);
+            let changes = classify_revisions(input.previous, current, &Comparison::default());
             let mut by_id = input
                 .previous
                 .iter()

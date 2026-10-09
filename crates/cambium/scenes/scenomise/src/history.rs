@@ -16,14 +16,17 @@
 //!   incident relationship that differs;
 //! - **stable**: present in both, with neither;
 //! - **removed**: present before, absent now. A removed relationship is
-//!   reported only when both of its endpoints are among the classified
-//!   occurrences, current or removed, which is the site's rule.
+//!   reported only when both of its endpoints still exist in the current
+//!   revision (Ruling 147b): one that vanished with an endpoint is told by
+//!   that endpoint's removal.
 //!
 //! Occurrences are matched by `occurrence_id` and relationships by `id`. By
 //! default every disclosed field is compared (Ruling 145); a host may narrow
 //! that to the fields its readers treat as change. A relationship is compared
-//! by everything it discloses except the revision it was disclosed at, since
-//! that differs between any two revisions by construction.
+//! by default on everything it discloses except the revision it was
+//! disclosed at, since that differs between any two revisions by
+//! construction; a host may narrow that too, to parts named in
+//! [`RELATIONSHIP_FIELDS`] (Ruling 146).
 //!
 //! Current occurrences come first, in the current dataset's order, then
 //! removed ones in the predecessor's order; relationships likewise.
@@ -70,6 +73,43 @@ impl ComparedFields {
         match self {
             Self::All => true,
             Self::Only(fields) => fields.contains(field),
+        }
+    }
+}
+
+/// The parts of a relationship a host may compare (Ruling 146). Its `id` is
+/// its identity and always counts; its source binding and source revision
+/// never do.
+pub const RELATIONSHIP_FIELDS: &[&str] = &[
+    "endpoints",
+    "kind",
+    "label",
+    "explanation",
+    "provenance.method",
+    "provenance.method_version",
+    "provenance.provider",
+    "provenance.evidence",
+];
+
+/// What decides an update: occurrence fields, and the compared parts of
+/// incident relationships.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct Comparison {
+    /// The occurrence fields compared.
+    pub fields: ComparedFields,
+    /// The relationship parts compared, named from [`RELATIONSHIP_FIELDS`].
+    pub relationship_fields: ComparedFields,
+}
+
+impl Comparison {
+    /// What a history declares, defaulting each half to everything.
+    pub fn of(history: &HostDatasetV2) -> Self {
+        Self {
+            fields: ComparedFields::of(history),
+            relationship_fields: match &history.compared_relationship_fields {
+                Some(parts) => ComparedFields::Only(parts.iter().cloned().collect()),
+                None => ComparedFields::All,
+            },
         }
     }
 }
@@ -147,8 +187,12 @@ impl RevisionChanges {
 pub fn classify_revisions(
     previous: Option<RevisionView<'_>>,
     current: RevisionView<'_>,
-    fields: &ComparedFields,
+    comparison: &Comparison,
 ) -> RevisionChanges {
+    let fields = &comparison.fields;
+    let signature = |relationship: &DisclosedRelationship| {
+        signature(relationship, &comparison.relationship_fields)
+    };
     let before = previous
         .map(|view| {
             view.dataset
@@ -158,8 +202,8 @@ pub fn classify_revisions(
                 .collect::<HashMap<_, _>>()
         })
         .unwrap_or_default();
-    let before_incident = incident(previous.map_or(&[], |view| view.relationships));
-    let after_incident = incident(current.relationships);
+    let before_incident = incident(previous.map_or(&[], |view| view.relationships), &signature);
+    let after_incident = incident(current.relationships, &signature);
     let current_ids = current
         .dataset
         .occurrences
@@ -235,10 +279,6 @@ pub fn classify_revisions(
         })
         .collect::<Vec<_>>();
     if let Some(previous) = previous {
-        let classified = occurrences
-            .iter()
-            .map(|entry| entry.occurrence_id.as_str())
-            .collect::<HashSet<_>>();
         let current_relationships = current
             .relationships
             .iter()
@@ -250,8 +290,8 @@ pub fn classify_revisions(
                 .iter()
                 .filter(|relationship| {
                     !current_relationships.contains(relationship.id.as_str())
-                        && classified.contains(relationship.from_occurrence.as_str())
-                        && classified.contains(relationship.to_occurrence.as_str())
+                        && current_ids.contains(relationship.from_occurrence.as_str())
+                        && current_ids.contains(relationship.to_occurrence.as_str())
                 })
                 .map(|relationship| RelationshipChange {
                     id: relationship.id.clone(),
@@ -287,7 +327,7 @@ impl HostDatasetV2 {
         Some(classify_revisions(
             previous.map(RevisionView::from),
             current.into(),
-            &ComparedFields::of(self),
+            &Comparison::of(self),
         ))
     }
 }
@@ -307,9 +347,9 @@ fn changed_fields(
         .collect()
 }
 
-/// Everything a relationship discloses except the revision it was disclosed
-/// at: its source binding and source revision.
-fn signature(relationship: &DisclosedRelationship) -> String {
+/// A relationship's identity and its compared parts. Its source binding and
+/// source revision are never compared.
+fn signature(relationship: &DisclosedRelationship, parts: &ComparedFields) -> String {
     let provenance = &relationship.provenance;
     let evidence = provenance
         .evidence
@@ -317,23 +357,35 @@ fn signature(relationship: &DisclosedRelationship) -> String {
         .map(|source| format!("{}\u{1f}{}", source.adapter, source.id))
         .collect::<Vec<_>>()
         .join("\u{1e}");
-    [
-        relationship.id.as_str(),
-        &relationship.from_occurrence,
-        &relationship.to_occurrence,
-        &relationship.kind,
-        &relationship.label,
-        &relationship.explanation,
-        &provenance.method,
-        &provenance.method_version.to_string(),
-        &provenance.provider,
-        &evidence,
-    ]
-    .join("\u{1f}\u{1f}")
+    let endpoints = format!(
+        "{}\u{1f}{}",
+        relationship.from_occurrence, relationship.to_occurrence
+    );
+    let version = provenance.method_version.to_string();
+    let mut signature = relationship.id.clone();
+    for (part, value) in [
+        ("endpoints", endpoints.as_str()),
+        ("kind", &relationship.kind),
+        ("label", &relationship.label),
+        ("explanation", &relationship.explanation),
+        ("provenance.method", &provenance.method),
+        ("provenance.method_version", &version),
+        ("provenance.provider", &provenance.provider),
+        ("provenance.evidence", &evidence),
+    ] {
+        signature.push_str("\u{1f}\u{1f}");
+        if parts.compares(part) {
+            signature.push_str(value);
+        }
+    }
+    signature
 }
 
 /// Each occurrence's incident relationship signatures, sorted.
-fn incident(relationships: &[DisclosedRelationship]) -> HashMap<&str, Vec<String>> {
+fn incident<'a>(
+    relationships: &'a [DisclosedRelationship],
+    signature: &impl Fn(&DisclosedRelationship) -> String,
+) -> HashMap<&'a str, Vec<String>> {
     let mut by_occurrence = HashMap::<&str, Vec<String>>::new();
     for relationship in relationships {
         let signature = signature(relationship);

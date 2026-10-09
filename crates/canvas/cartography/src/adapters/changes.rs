@@ -17,8 +17,8 @@
 use std::fmt;
 
 pub use scenomise::history::{
-    Change, ComparedFields, OccurrenceChange, RelationshipChange, RevisionChanges, RevisionView,
-    classify_revisions,
+    Change, ComparedFields, Comparison, OccurrenceChange, RELATIONSHIP_FIELDS, RelationshipChange,
+    RevisionChanges, RevisionView, classify_revisions,
 };
 pub use scenomise::host_dataset::{
     HOST_DATASET_SCHEMA_V2, HostDatasetRevisionV2, HostDatasetV2, parse_host_history,

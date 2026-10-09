@@ -63,15 +63,27 @@ fn revision(
 }
 
 fn envelope(revisions: Vec<Value>, compared: Option<&[&str]>) -> HostDatasetV2 {
+    envelope_comparing(revisions, compared, None)
+}
+
+fn envelope_comparing(
+    revisions: Vec<Value>,
+    compared: Option<&[&str]>,
+    relationship_parts: Option<&[&str]>,
+) -> HostDatasetV2 {
     let mut value = json!({ "schema": HOST_DATASET_SCHEMA_V2, "revisions": revisions });
     if let Some(fields) = compared {
         value["compared_fields"] = json!(fields);
     }
+    if let Some(parts) = relationship_parts {
+        value["compared_relationship_fields"] = json!(parts);
+    }
     parse_host_history(&value.to_string()).unwrap()
 }
 
-/// a's link to c moves to d; b is renamed; c is removed; d is added; e is
-/// untouched; f's note changes and nothing else does.
+/// a's link to c moves to d and its link to b goes; b is renamed; c is
+/// removed; d is added; e is untouched; f's note changes and nothing else
+/// does.
 fn history(compared: Option<&[&str]>) -> HostDatasetV2 {
     envelope(
         vec![
@@ -86,6 +98,7 @@ fn history(compared: Option<&[&str]>) -> HostDatasetV2 {
                     occurrence("f", "Phi", "draft"),
                 ],
                 vec![
+                    relationship("a-b", "a", "b", "links", "r1"),
                     relationship("a-c", "a", "c", "links", "r1"),
                     relationship("e-f", "e", "f", "links", "r1"),
                 ],
@@ -139,7 +152,11 @@ fn every_occurrence_is_added_updated_stable_or_removed() {
     assert!(a.fields.is_empty());
     let b = &changes.occurrences[1];
     assert_eq!(b.fields, ["label"]);
-    assert!(!b.relationships_differ);
+    // a-b went, so b's incident relationships differ too.
+    assert!(b.relationships_differ);
+    let f = &changes.occurrences[4];
+    assert_eq!(f.fields, ["note"]);
+    assert!(!f.relationships_differ);
     assert_eq!(
         changes.counts(),
         BTreeMap::from([
@@ -152,7 +169,7 @@ fn every_occurrence_is_added_updated_stable_or_removed() {
 }
 
 #[test]
-fn relationships_are_classified_and_a_removed_one_is_kept_with_its_endpoints() {
+fn a_removed_relationship_is_reported_only_between_current_endpoints() {
     let changes = history(None).changes();
     let relationships = changes
         .relationships
@@ -160,13 +177,14 @@ fn relationships_are_classified_and_a_removed_one_is_kept_with_its_endpoints() {
         .map(|entry| (entry.id.as_str(), entry.change))
         .collect::<Vec<_>>();
     // e-f was disclosed again at r2; its new provenance revision is not a
-    // change.
+    // change. a-b went while both ends remain, so it is removed; a-c went
+    // with c, whose removal already tells it (Ruling 147b).
     assert_eq!(
         relationships,
         [
             ("a-d", Change::Added),
             ("e-f", Change::Stable),
-            ("a-c", Change::Removed),
+            ("a-b", Change::Removed),
         ]
     );
 }
@@ -363,7 +381,13 @@ fn the_sites_narrowed_fields_reproduce_its_checkpoint_classes_exactly() {
         ])
     );
 
-    // The site lists current edges unmarked and appends removed ones.
+    // The site lists current edges unmarked and appends removed ones. This
+    // deliberately diverges from the site's diff_graphs as written, which
+    // checked endpoints against current-plus-removed nodes and so kept every
+    // removed edge (8 for this pair, all of them touching a removed
+    // repository). Ruling 147b reports a removed relationship only between
+    // endpoints that still exist, as the site's comment intended; the
+    // fixture's expectations follow the ruling, so none remain here.
     let expected_edges = fixture["expected"]["edges"]
         .as_array()
         .unwrap()
@@ -383,7 +407,7 @@ fn the_sites_narrowed_fields_reproduce_its_checkpoint_classes_exactly() {
     assert_eq!(actual_edges, expected_edges);
     assert_eq!(
         actual_edges.iter().filter(|(_, removed)| *removed).count(),
-        8
+        0
     );
 }
 
@@ -408,4 +432,61 @@ fn comparing_every_field_reads_the_same_checkpoints_more_broadly() {
             .iter()
             .any(|entry| entry.fields == ["order"])
     );
+}
+
+/// a and b at two revisions with one relationship between them, whose
+/// label names b and whose explanation dates its verification.
+fn renamed_and_reverified(parts: Option<&[&str]>) -> RevisionChanges {
+    let link = |revision: &str, b_label: &str, verified: &str| {
+        let mut value = relationship("a-b", "a", "b", "links", revision);
+        value["label"] = json!(format!("Alpha links {b_label}"));
+        value["explanation"] = json!(format!("Verified on {verified}."));
+        value
+    };
+    envelope_comparing(
+        vec![
+            revision(
+                1,
+                "r1",
+                vec![occurrence("a", "Alpha", ""), occurrence("b", "Beta", "")],
+                vec![link("r1", "Beta", "2026-09-01")],
+            ),
+            revision(
+                2,
+                "r2",
+                vec![
+                    occurrence("a", "Alpha", ""),
+                    occurrence("b", "Beta two", ""),
+                ],
+                vec![link("r2", "Beta two", "2026-10-01")],
+            ),
+        ],
+        Some(&["label"]),
+        parts,
+    )
+    .changes()
+}
+
+#[test]
+fn by_default_a_rename_or_reverification_updates_the_relationship() {
+    let changes = renamed_and_reverified(None);
+    assert_eq!(
+        classes(&changes),
+        [("a", Change::Updated), ("b", Change::Updated)]
+    );
+    assert!(changes.occurrences[0].relationships_differ);
+    assert_eq!(changes.relationships[0].change, Change::Updated);
+}
+
+#[test]
+fn a_host_may_narrow_what_counts_in_a_relationship() {
+    let changes = renamed_and_reverified(Some(&["endpoints", "kind"]));
+    // b was renamed, so b alone is updated; its neighbour a is stable, and
+    // the relationship's new label and verification date do not count.
+    assert_eq!(
+        classes(&changes),
+        [("a", Change::Stable), ("b", Change::Updated)]
+    );
+    assert!(!changes.occurrences[1].relationships_differ);
+    assert_eq!(changes.relationships[0].change, Change::Stable);
 }

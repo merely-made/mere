@@ -80,6 +80,7 @@ fn history() -> Value {
             ),
         ],
         "compared_fields": ["label"],
+        "compared_relationship_fields": ["endpoints", "kind"],
     })
 }
 
@@ -365,4 +366,28 @@ fn refuses_oversized_and_malformed_histories() {
     let mut value = history();
     value["revisions"][0]["sequence"] = json!("first");
     assert!(matches!(parse(&value), Err(HostDatasetError::Malformed(_))));
+}
+
+#[test]
+fn refuses_empty_repeated_or_unknown_compared_relationship_fields() {
+    for (parts, problem) in [
+        (json!([]), "are empty"),
+        (json!(["kind", "kind"]), "name kind twice"),
+        (
+            json!(["provenance.source_revision"]),
+            "name provenance.source_revision, which is not a relationship field",
+        ),
+    ] {
+        let mut value = history();
+        value["compared_relationship_fields"] = parts;
+        assert_eq!(
+            parse(&value).unwrap_err(),
+            HostDatasetError::ComparedRelationshipFields(problem.into())
+        );
+    }
+    let parsed = parse(&history()).unwrap();
+    assert_eq!(
+        parsed.compared_relationship_fields,
+        Some(vec!["endpoints".to_owned(), "kind".to_owned()])
+    );
 }

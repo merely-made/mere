@@ -44,6 +44,7 @@ fn site_history(compared: Option<&[&str]>) -> HostDatasetV2 {
         schema: HOST_DATASET_SCHEMA_V2.into(),
         revisions,
         compared_fields: compared.map(|fields| fields.iter().map(|f| f.to_string()).collect()),
+        compared_relationship_fields: None,
     };
     parse_host_history(&serde_json::to_string(&history).unwrap()).unwrap()
 }
@@ -86,13 +87,15 @@ fn the_changes_reading_reproduces_the_sites_checkpoint_classes() {
             (Change::Removed, 5),
         ])
     );
+    // Every relationship that went touched a removed repository, so none is
+    // reported (Ruling 147b); the site's diff_graphs as written kept all 8.
     assert_eq!(
         changes
             .relationships
             .iter()
             .filter(|entry| entry.change == Change::Removed)
             .count(),
-        8
+        0
     );
 }
 
