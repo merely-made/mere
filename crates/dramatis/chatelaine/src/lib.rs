@@ -111,6 +111,7 @@ mod otp;
 mod otp_tile;
 #[cfg(test)]
 mod samples;
+mod secret_metadata;
 mod value;
 
 pub use disposition::{Disposition, disposition};
@@ -119,6 +120,10 @@ pub use item::{AndroidApp, AppCertificate, Collection, Credential, Item, ItemSta
 pub use kind::{CXF_V1_TYPES, CredentialKind, WifiSecurity};
 pub use otp::{OtpAlgorithm, OtpCodeStyle, OtpMode};
 pub use otp_tile::{OtpCodeTile, OtpCredential, OtpFields, OtpTimeRing};
+pub use secret_metadata::{
+    MetadataLookupError, MetadataSnapshot, SecretCollection, SecretCollectionId, SecretItem,
+    SecretItemId,
+};
 pub use value::{
     CountryCode, Date, LastFour, SourceId, SshFingerprint, SubdivisionCode, ValueError, YearMonth,
 };
