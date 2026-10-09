@@ -1,27 +1,21 @@
 # Graph semantics plan: assertions, resources, saved queries, residency
 
 **Date:** 2026-10-04
-**Status (2026-10-08):** in progress, bounded to P1–P5 and the six P2
-closure requirements in §4. P1 is complete. Rulings 1–46 remain authoritative;
+**Status (2026-10-08):** P1 and the six bounded P2 closure requirements
+are implemented and qualified locally. Rulings 1–46 remain authoritative;
 C5/C6 are settled and no planned design question remains. P3–P5 have not begun.
-The previously qualified C30/C31 and literal-attribution source is committed
-and pushed on `graph-semantics` at `6399fe6c`. The remaining P2 routing,
-shared resource content, profile propagation, capture association and Resource
-RDF metadata changes are implemented in the lane and undergoing fresh qualification.
-Earlier receipts remain historical, as recorded in Progress. The fresh full
-kernel gate passes 430 tests plus its compile-fail type check; one doc example
-remains ignored. Pandect passes 345 tests, Canvas 303 and Graphshell 346 plus
-five integration tests after the final admission and fixture repairs. The
-locked workspace check exits 0. RDF tag
-metadata exposed one mandatory representation gap. Mark selected the additive
-import envelope and matching parse/apply APIs below. Fresh-chat continuation
-from `c49e3e0b` repairs exact Surface replay and qualifies the envelope with
-70 passing RDF/query tests. The direct replay gate passes 431 kernel/store
-tests plus its compile-fail check. Final dependent, workspace and wasm gates
-remain in progress; P2 is not yet declared complete. The original frozen-WIP
-handoff below remains historical.
-Turnstone's owner has prepared reader adoption at its current pin; that is not
-qualification against this final supplier source. Consumer integration and Mere
+The Linux continuation from `c49e3e0b` closes the RDF import-envelope
+representation gap and exact Surface replay defect. Final receipts pass:
+kernel/store 431 plus its compile-fail doctest; RDF/query 70; document-lanes
+18 units plus one peer-transfer integration; Pandect 335 Linux tests;
+Canvas 303; Cartography 45; Graphshell 345 units plus five integrations;
+locked workspace and kernel wasm checks. Ignored tests remain unrun.
+Earlier Windows receipts and the frozen-WIP handoff below remain historical.
+The repair is qualified locally and held for Mark's source-push review;
+Mark separately authorized updating and pushing this plan. GitHub login
+refresh is required before the documentation push can succeed.
+Turnstone's prepared reader adoption at its current pin is separate from
+qualification against this final supplier source. Consumer repinning and Mere
 main integration remain held for Mark's review. Independent vocabulary/oracle
 cleanup is deferred under §4.
 
@@ -2236,14 +2230,47 @@ RDF/query gate passes all 70 tests.
 The final document-lanes gate passes 18 units and one peer-transfer integration.
 Pandect passes all 335 Linux tests. Its earlier Windows total was 345: 11
 Windows-only wallet tests versus one non-Windows control account for the
-difference; no test was removed or weakened. Graphshell, Canvas, Cartography,
-workspace and wasm qualification is still running serially, root-only, one
-build job and one test thread. Mark has removed the offline restriction;
-missing locked dependencies may be downloaded without another permission stop. Gate
-logs are named `graph-semantics-linux-*.log` in the stable shared target;
-failed controls are retained alongside successful receipts. Final P2 status,
-remaining limitations and the branch commit will be recorded after these
-gates. P3–P5, consumer repinning, push and main integration have not begun.
+difference; no test was removed or weakened. Graphshell passes 345 units and
+five integrations, with four explicitly ignored units. Canvas passes 303
+units, with 13 explicitly ignored units; Cartography passes all 45. These
+are current Linux counts, distinct from the historical Windows receipts.
+Graphshell first stopped at two missing `include_str!` fixture paths. A
+symlink at `/home/markik/Code/worktrees/woodshed` to the existing clean
+Woodshed checkout supplies the unchanged fixture; no sibling file was edited.
+The missing-fixture log is retained. The locked workspace check initially
+needed additional uncached dependencies, then passed online and passed its
+warm offline repeat. The final kernel/store rerun passes 431 units and the
+compile-fail doctest; one doc example is ignored. The kernel
+`wasm32-unknown-unknown` check exits 0.
+
+All Cargo gates ran serially, root-only, with one build job and one test
+thread where applicable. Mark removed the offline restriction; locked
+cache fills were authorized without another permission stop. Manifests and
+`Cargo.lock` remain unchanged. Gate logs are named
+`graph-semantics-linux-*.log` in `/home/markik/Code/target`; failed controls
+are retained alongside successful receipts. The twelve changed Rust-file
+hashes in `graph-semantics-linux-qualified-source.sha256` match the qualified
+source. Documentation audit adds no findings: six existing broken Woodshed links
+now resolve through the fixture symlink, reducing that count from 46 to 40;
+all other findings match the baseline. The audit's planted-defect self-test
+passes, and diff checks pass.
+
+P2's bounded supplier work is complete locally. P3–P5, consumer repinning
+and main integration have not begun. Ignored/headed/browser/device tests,
+final supplier sibling builds, and consumer adoption against this source
+remain unrun. Eidetic/Fjall 118 and Pandect wasm receipts remain historical;
+the unchanged Eidetic crate is not a kernel dependent. This continuation
+reruns the affected kernel dependents rather than claiming those historical
+receipts as current Linux executions.
+
+The documentation-only checkpoint `792e3ea91` records qualification progress;
+this final receipt supersedes its pending gates. Both documentation updates
+are authorized for push. HTTPS push failed because the existing GitHub CLI
+token is invalid; the existing SSH agent is not accepted by GitHub, and the
+connected GitHub integration denies tree writes. Login refresh is pending.
+No new SSH identity was created. The qualified repair and controls remain
+local for a separate source commit and Mark's source-push review. Retain the
+worktree and shared target for review and receipts.
 
 ## 3. Rulings
 
