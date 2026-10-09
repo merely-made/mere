@@ -14718,6 +14718,7 @@ version = "0.0.4"
 dependencies = [
  "sceno",
  "scenograph",
+ "scenotime",
  "serde",
  "serde_json",
 ]
