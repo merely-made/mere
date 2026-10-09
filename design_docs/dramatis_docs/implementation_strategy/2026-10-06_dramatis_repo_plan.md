@@ -1,7 +1,7 @@
 # Dramatis Repo Plan
 
 **Date**: 2026-10-06
-**Status (2026-10-09)**: assessed; rulings D1 to D34 (§3). Nothing built; DR-A is next (D34).
+**Status (2026-10-09)**: assessed; rulings D1 to D34 (§3). DR-A in progress: A0 and A1 landed, A2 and A3 gated (§6).
 D18's condition is met: the vault lock's L2 to L4 landed on 2026-10-08.
 DR-A's assessment is being refreshed against today's code before its
 forks are put to Mark (§6).
@@ -596,3 +596,41 @@ forks ruled (D24 to D33).**
     since `71a91267`;
   - DR-A's file list missed `authority.rs` and `secret_service/`;
   - the Secret Service plan said the service itself moves.
+
+**2026-10-09, DR-A's A0 to A3.** Worktree `mere-dra`, with its own build
+directory (F183). The test inventories are in `Code/testing/mere/dra/`.
+- **A0, the baseline** (`f469b836`, on main):
+  - `ports/castellan/tests/snapshot_golden.rs` pins three hand-built
+    snapshots (unlocked with every signing result, locked and kept,
+    ephemeral), each pretty and compact. They are built through
+    castellan's old paths.
+  - The goldens are LF-pinned in `.gitattributes`, and Windows and Fedora
+    produce the same bytes.
+  - A control that renames one field fails the two snapshots that carry
+    it.
+  - The by-name inventories, Windows / Fedora:
+    - castellan default 67/67, `keeper` 113/110, `secret-service` 85/88,
+      all features 133/133;
+    - personae 148/146, with `agent` 220/222;
+    - graphshell's library 208/207, djinn 155/150, chatelaine 53/53,
+      dramatis 0/0.
+- **A1, the intents** (`7af0aec1`, on main): `dramatis::intents` holds the
+  18 names and nine payloads verbatim, and `castellan::projection`
+  re-exports them. The inventories are identical by name on both machines,
+  the goldens pass, and djinn and graphshell compile unedited. The lock
+  gains five lines of dependency edges.
+- **A2, the OTP display types** (gated on Windows): `chatelaine::otp_tile`
+  takes `OtpCredential`, `OtpCodeTile`, `OtpTimeRing` and `OtpFields`, with
+  public constructors (D29). The tile's two tests moved with it, and every
+  other name is unchanged. The lock gains chatelaine's zeroize edge.
+- **A3, the signing records** (gated on Windows): `personae::signing` is
+  ungated, and its broker and tests moved to `signing/broker.rs`, behind
+  `agent`. Paths are unchanged.
+  - personae builds and passes without `agent` (148 tests) and with it
+    (220).
+  - The broker's four tests moved path with their names intact.
+  - graphshell's four new `projection_compare` tests came from upstream
+    through the rebase, not from DR-A.
+- **Rebases:** main moved twice while A0 and A1 waited, once with 253 lock
+  lines. Each time `cargo metadata --locked` confirmed the lock, and the
+  gate reran on the rebased tip before the push.
