@@ -967,6 +967,24 @@ V2b's rulings, all 2026-09-25:
     forced-timing test": `a_restored_node_keeps_its_visit_stamp_across_a_clock_tick`
     waits for the clock to tick between computing a revert and applying it.
     The alternative relied on repeated runs to catch the flake by chance.
+46. **Who fixes the same-millisecond replay gap** (2026-10-08). Under heavy
+    load, pandect's session replay check failed node creations as
+    `NotReplayable` in four tests across the physics coordinator's lanes
+    (G4a's and G4b1's scene tests, main's `browser_host_seeds_once…`,
+    graphshell's `h4_exportable_identity_cards…`), each passing on rerun.
+    The likely mechanism is the one §8 recorded for
+    `capture_hook_receives_replayable_apply_events` and answered only with a
+    2 ms wait: node creation stamps a visit time and a touch records only on a
+    new millisecond, so the touch ruling 19 journals can be dropped and replay
+    restamps the node. Asked who takes it, Mark first answered "uhhh you can do
+    it, but wouldn't that be the projection grammar handoff or original
+    projection grammar agent?"; that session owns projection grammar and the
+    Scenograph editor, not this plan, and relayed Mark's ruling
+    **"Coordinator's small lane"**. *Follows:* a lane on branch `replay-touch`
+    fixes the journaling in the kernel, as ruling 44 fixed undo, and locks it
+    with a forced-timing test, as ruling 45 did; normalizing the stamp in the
+    comparison stays declined (ruling 19). A fix that needs a different
+    reading of ruling 19 goes to Mark first.
 
 ## 8. Progress
 
