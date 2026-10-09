@@ -142,6 +142,17 @@ fn every_channel_id_round_trips_and_resolves_over_every_node() {
             ChannelValues::Nodes(nodes) => {
                 assert!(nodes.iter().all(|k| keys.contains(k)), "{id}")
             },
+            ChannelValues::Edges(edges) => {
+                assert_eq!(channel.family(), ChannelFamily::Edges, "{id}");
+                // A spanning forest: some edges, fewer than the nodes.
+                assert!(!edges.is_empty() && edges.len() < keys.len(), "{id}");
+                assert!(
+                    edges
+                        .iter()
+                        .all(|(a, b)| keys.contains(a) && keys.contains(b)),
+                    "{id}"
+                );
+            },
             ChannelValues::Pairs(values) => {
                 assert!(
                     matches!(
@@ -168,6 +179,11 @@ fn every_channel_id_round_trips_and_resolves_over_every_node() {
         "bridges.betweenness",
         "bridges.articulation",
         "kind.bridges",
+        // F174: the skeleton is `edges.spanning`, nothing else.
+        "edges.skeleton",
+        "edges.dominator",
+        "tree.spanning",
+        "pairs.skeleton",
         "",
     ] {
         assert_eq!(Channel::parse(bad), None, "{bad:?} is no channel");
