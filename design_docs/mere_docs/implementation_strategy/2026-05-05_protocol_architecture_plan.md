@@ -354,6 +354,20 @@ Unlock methods (the *how* of any tier):
 
 Combinations are valid (passphrase + passkey 2FA on `PassphraseEncryptedStorage`). Per [`feedback_configurability_over_opinionated_defaults`](<user-home>\.claude\projects\c--Users-mark--Code\memory\feedback_configurability_over_opinionated_defaults.md): tier and method are user-overridable per slot; defaults aim for "good enough for a credential of that lineage."
 
+**Annotated 2026-10-08 (vault lock plan L4):** what holds now, per the
+[vault lock plan](../../dramatis_docs/implementation_strategy/2026-10-05_vault_lock_plan.md)'s rulings.
+- **The tiers are consent, not custody** (ruling 12). The approval broker
+  asks once per signature for Per-use and caches an approval for Short-TTL.
+  Every slot is decrypted while the vault is unlocked.
+- **The custody control is the vault-wide lock.** It is triggered by an
+  explicit intent, the OS session lock, suspend, and 15 minutes idle
+  (rulings 3 and 20). It persists across a restart (ruling 5), and
+  unlocking takes a user act on the resident's own surface.
+- **Of the unlock methods**, the first build carries the passphrase and
+  Windows Hello (ruling 21). Linux uses the passphrase alone, and its
+  resident starts locked (ruling 42). The passkey and hardware-token rows
+  are unbuilt.
+
 ### 3.7 Isolation and capability scoping (stated threat model)
 
 **This plan's vault assumes all mods are trusted within the Mere process.** A compromised Matrix mod can read the Nostr `nsec` slot in this single-process model. The vault's at-rest encryption + per-session unlock + audit log do NOT prevent in-process credential theft; they raise the cost of *passive* attack surfaces (disk theft, swap leakage), not active ones inside the process.
@@ -369,6 +383,12 @@ Phase 2C ships level 0 (single-process, all mods trusted). Phase 3 ships level 2
 A future doc under `mere_docs/technical_architecture/` will own the full threat model; this plan defines the surface and names the level-0 assumption explicitly.
 
 **Corrected 2026-10-06 (S14 pass):** the [vault lock plan](../../dramatis_docs/implementation_strategy/2026-10-05_vault_lock_plan.md)'s ruling 12 rules `UnlockTier` consent, not custody: §3.6's tiers are approval policy, not custody tiers, and that plan records that this section's swap-leakage defence is not true today.
+
+**Annotated 2026-10-08 (vault lock plan L4, ruling 82):** the
+[vault threat statement](../../dramatis_docs/technical_architecture/2026-10-08_vault_threat_statement.md) now owns the vault's part of the threat model
+this section promised. Swap is not defended: a page written to the
+pagefile or the hibernation file while the vault is unlocked survives the
+lock. The lock defends a locked device, and the disk alone.
 
 ### 3.7 Phase boundary
 

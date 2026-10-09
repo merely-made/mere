@@ -580,6 +580,15 @@ impl Resident {
         let asked = Instant::now();
         let output = self.output(&self.shared.binary.clone(), &["--stop-resident".into()]);
         let accepted = output.as_ref().is_ok_and(|output| output.status.success());
+        // What the stop command said, so a refusal is legible (ruling 85).
+        let said = match &output {
+            Ok(output) => json!({
+                "exit": output.status.code(),
+                "stdout": tail(&output.stdout),
+                "stderr": tail(&output.stderr),
+            }),
+            Err(error) => json!({ "error": error.to_string() }),
+        };
         let deadline = asked + patience;
         let status = loop {
             if let Some(status) = self.exited() {
@@ -609,7 +618,12 @@ impl Resident {
             ),
             Bound::Relative,
             json!({ "accepted": true, "within_ms": patience.as_millis() as u64 }),
-            json!({ "accepted": accepted, "took_ms": took.as_millis() as u64, "pid": pid }),
+            json!({
+                "accepted": accepted,
+                "took_ms": took.as_millis() as u64,
+                "pid": pid,
+                "command": said,
+            }),
             accepted && status.is_some(),
         );
         if judge_exit {
@@ -658,4 +672,12 @@ impl Drop for Resident {
     fn drop(&mut self) {
         self.kill();
     }
+}
+
+/// The last 400 characters of a command's output, for a receipt.
+fn tail(bytes: &[u8]) -> String {
+    let text = String::from_utf8_lossy(bytes);
+    let text = text.trim();
+    let start = text.char_indices().rev().nth(399).map_or(0, |(at, _)| at);
+    text[start..].to_string()
 }

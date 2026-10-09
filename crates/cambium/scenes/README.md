@@ -28,9 +28,9 @@ interaction structure; a scene is a projection of content.
 
 | Crate | Contents |
 | --- | --- |
-| [sceno](sceno/) | Core contracts. `SourceRef` / `SourceIx`, `Space` / `SpaceId`, `InstanceId`, `Backdrop`, `Footprint`, `Representation`, `ProjectedItem`, `RoutedRelation`, `Region`, `Scene`, plus the persisted `Score` / `ScoreItem` / `Arrangement` / `Placement` / `SCORE_VERSION` vocabulary and the geometry types `Vec2`, `Size2`, `Rect`, `Transform2`. |
+| [sceno](sceno/) | Core contracts. `SourceRef` / `SourceIx`, `Space` / `SpaceId`, `InstanceId`, `Backdrop`, `Footprint`, `Representation`, `ProjectedItem`, `RoutedRelation`, `Region`, `Fold` (with `StandIn`, `FoldRule`, `FoldBoundary` and the derived `FoldEffect`), `Scene`, plus the persisted `Score` / `ScoreItem` / `Arrangement` / `Placement` / `SCORE_VERSION` vocabulary and the geometry types `Vec2`, `Size2`, `Rect`, `Transform2`. |
 | [scenomise](scenomise/) | Choreography. `solve(&Score) -> Scene` realizes the arrangements; `relax(&mut Scene, &Relaxation)` is a dependency-free repulsion / spring / arrangement-pull pass for surfaces without their own physics sim, including static collision against collidable backdrops. |
-| [scenotime](scenotime/) | Runtime. `SceneSnapshot` / `SceneTables` with tombstoned slots, `SceneEpoch` / `Revision` / `BackdropId` / `RelationId` / `RegionId`, `SceneDiff` / `SceneOp` / `apply_diff` returning `ApplyOutcome`, `TransitionSpec` / `TransitionSchedule` with pure host-time sampling, `SceneTrace` (a base snapshot and labelled steps, each an optional diff plus an opaque host annotation, chain-checked and replayed with `snapshot_at`; no cursor, which is host policy), and `pick(world) -> Option<InstanceId>`. |
+| [scenotime](scenotime/) | Runtime. `SceneSnapshot` / `SceneTables` with tombstoned slots, `SceneEpoch` / `Revision` / `BackdropId` / `RelationId` / `RegionId` / `FoldId`, `SceneDiff` / `SceneOp` / `apply_diff` returning `ApplyOutcome`, `TransitionSpec` / `TransitionSchedule` with pure host-time sampling, `SceneTrace` (a base snapshot and labelled steps, each an optional diff plus an opaque host annotation, chain-checked and replayed with `snapshot_at`; no cursor, which is host policy), and `pick(world) -> Option<InstanceId>`. |
 | [scenograph](scenograph/) | Host-neutral authoring model. Durable projection definitions, local validation, reusable definition binding and variants, deterministic JSON, public source revisions, and opaque runtime witness binding. It owns neither a widget UI, a source authority, a solver, nor a renderer. |
 
 ## Vocabulary
@@ -41,8 +41,8 @@ interaction structure; a scene is a projection of content.
 - `Representation`: `Glyph`, `Card`, `Sprite`, `Snapshot`, `LivePane`,
   `Open { kind }`.
 - `SceneOp`: add / update / tombstone for sources, spaces, backdrops, items,
-  relations and regions, plus `SetItemLayer`, `SetItemOrder`, `SetBounds`,
-  `SetGeneration`.
+  relations, regions and folds, plus `SetItemLayer`, `SetItemOrder`,
+  `SetFoldStandIn`, `SetBounds`, `SetGeneration`.
 - `TransitionSpec`: duration, easing, and enter / update / exit stage windows;
   `TransitionSchedule` derives stable item windows from one validated diff and
   samples them at host-supplied elapsed time.
@@ -55,6 +55,14 @@ A `Backdrop` carries source provenance, space, transform, footprint, an open
 appearance kind, visibility, and collision participation. Backdrops paint in
 table order behind graph content and remain pointer-transparent. Interactive
 features stay ordinary items over the environment.
+
+A `Fold` draws two or more member instances as one stand-in: either a member,
+which stays drawn with a "+N" of the others, or a synthetic summary at the
+members' centroid. The fact alone hides the members (`FoldEffect`; no item's
+`visible` changes), so unfolding is tombstoning the fold. It may record how the
+host chose its members (`FoldRule::Selection` or `Descendants { root, family,
+direction }`) and optional boundary accounting. Two active folds never share an
+instance. A scene or snapshot without folds writes no `folds` key.
 
 `SceneSnapshot::from_dense` starts an epoch from a one-shot `Scene`;
 `SceneTables::pick` resolves a world point to the topmost live instance

@@ -1006,6 +1006,32 @@ is that objective's assessment.
   consumer. Mere's native canvas, through pictograph's existing
   `forme::FoldRecord` projection plus a product trigger and folds in
   `MereHost` scenes, is the second (Ruling 11).
+- *Ruled 2026-10-08, the fold fact's promotion (site S5, Rulings 149 to 153
+  there).* Two questions put to Mark when the site began S5, the fold fact's
+  data layer, with the native canvas left to a later phase (its Ruling 152).
+  **A pending second consumer.** The catalog's promotion rule says every
+  promoted addition "still requires the second heterogeneous consumer"; the
+  native canvas, named by Ruling 11, comes in the native phase. Options:
+  promote, the record naming the native canvas and marking it pending until
+  the native phase (recommended); land it provisional, promoted only when the
+  native canvas consumes it; hold promotion until then. Mark: **"Promote,
+  marked pending (Recommended)"**. *Follows:* the catalog's addition record
+  names the native canvas as pending and is checked again when the native
+  phase lands; the rule carries a dated note.
+  **Whether `forme::FoldRecord` is a duplicate.** The rule removes "the old
+  duplicated implementation" on promotion; FoldRecord stays, moving to a
+  view-curation leaf crate in the native phase (Ruling 153). Its members are
+  kernel graph-member UUIDs and it persists as view curation (pandect
+  `ViewIntent.folds`); the fact's members are scene `InstanceId`s and it
+  belongs to a served scene and its trace; a host lowers the one into the
+  other (Ruling 149). Options: not a duplicate, the authored record and its
+  realization (recommended); a duplicate whose retirement the native phase
+  plans. Mark: **"Not a duplicate (Recommended)"**. *Follows:* the record
+  names mer3ly's copies as the duplicates that retire (`visibility_diff` in
+  `crates/repo-graph`, the `["fold",1]` channel, the `+N` count in
+  `assets/projection-proof.js`), in the site's follow-up to S5. *Open:*
+  pictograph's `FoldProjection` summary logic overlaps the fact's summary
+  stand-in; whether it retires is native-phase work, not yet ruled.
 - The two-reading matrix's contract types go into cartography, and its
   derivation into a cartography sibling crate. Both mer3ly's copy and
   `ports/gazette/src/ledger.rs` retire, as the catalog's
@@ -1016,6 +1042,17 @@ is that objective's assessment.
   pattern. Cartography's "stays contract-only" comment (`Cargo.toml:18`)
   predates `graph-layout`'s retirement at `739c87f4` and is stale. The fold
   fact names its stand-in: either a member or a synthetic summary.
+- *Added 2026-10-08 (site Ruling 142):* the types move too. The matrix's
+  types and its pure derivation are `scenomise::matrix`; cartography's
+  `adapters/matrix.rs` re-exports them and adds a `two-reading-matrix`
+  profile beside the unchanged one-authority `matrix` profile.
+  graphshell-client's `frozen.rs` gains `FrozenGrid`, the two-axis table.
+  Gazette's `ledger.rs` stays until the dramatis split (the dramatis repo
+  plan's D7), held to the shared derivation by `tests/ledger_parity.rs`; at
+  the split it retires onto `scenomise::matrix` and `FrozenGrid` (site
+  Ruling 143). Landed by the mer3ly site
+  session as its S2, `96fbe064` to `3620cd3b`; its Rulings 142 to 147 are in
+  mer3ly's `docs/2026-09-30_graphshell_site_canvas_plan.md`.
 - Separately, A4's text here runs together two histories that the assessment
   separates: authority-revision history, the site's checkpoint slider, and
   scene-edit history, `projection-proof`'s chained trace.
@@ -1030,6 +1067,12 @@ is that objective's assessment.
   mer3ly site session as its S4 and S6, ending at `a6014bcb`; its Rulings 130
   to 133 are in mer3ly's `docs/2026-09-30_graphshell_site_canvas_plan.md`. The
   authority-revision history stays apart from it.
+- *Added 2026-10-08:* the authority-revision history has its form too:
+  `scenomise.host-dataset/v2` carries a dataset per revision (v1 stays
+  readable), `scenomise::history` classes each item as added, updated, stable
+  or removed between revisions, and cartography's `adapters/changes.rs`
+  reads it. It stays apart from `SceneTrace`. Landed by the mer3ly site
+  session as its S3, `1a53836b` to `1adedb50`.
 
 ## Progress
 

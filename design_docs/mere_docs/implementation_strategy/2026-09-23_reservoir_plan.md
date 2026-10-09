@@ -967,6 +967,59 @@ V2b's rulings, all 2026-09-25:
     forced-timing test": `a_restored_node_keeps_its_visit_stamp_across_a_clock_tick`
     waits for the clock to tick between computing a revert and applying it.
     The alternative relied on repeated runs to catch the flake by chance.
+46. **Who fixes the same-millisecond replay gap** (2026-10-08). Under heavy
+    load, pandect's session replay check failed node creations as
+    `NotReplayable` in four tests across the physics coordinator's lanes
+    (G4a's and G4b1's scene tests, main's `browser_host_seeds_once…`,
+    graphshell's `h4_exportable_identity_cards…`), each passing on rerun.
+    The likely mechanism is the one §8 recorded for
+    `capture_hook_receives_replayable_apply_events` and answered only with a
+    2 ms wait: node creation stamps a visit time and a touch records only on a
+    new millisecond, so the touch ruling 19 journals can be dropped and replay
+    restamps the node. Asked who takes it, Mark first answered "uhhh you can do
+    it, but wouldn't that be the projection grammar handoff or original
+    projection grammar agent?"; that session owns projection grammar and the
+    Scenograph editor, not this plan, and relayed Mark's ruling
+    **"Coordinator's small lane"**. *Follows:* a lane on branch `replay-touch`
+    fixes the journaling in the kernel, as ruling 44 fixed undo, and locks it
+    with a forced-timing test, as ruling 45 did; normalizing the stamp in the
+    comparison stays declined (ruling 19). A fix that needs a different
+    reading of ruling 19 goes to Mark first.
+47. **The replay check's clock-free state** (2026-10-08; amends 46). The lane
+    found ruling 46's premise wrong: ruling 19's touch is journaled after
+    every added node with no millisecond condition (`capture_visit_stamp`,
+    `graph/apply.rs`), and "a touch records only on a new millisecond" is a
+    true no-op, an explicit touch inside the birth millisecond writing the
+    same value. The flake is the snapshot envelope: `to_snapshot()` stamps
+    `timestamp_secs` from the wall clock (`graph/snapshot/to.rs`), and
+    pandect's `edit_as` builds the replay's and the candidate's state from two
+    separate calls, so a second ticking between them fails a good edit; with
+    that field zeroed, 0 of 20,000 runs differed idle and 0 of 5,000 under
+    load, while a forced tick differed 20 of 20. Pandect's own test helper
+    `whole()` already compares undated, and the archive gate excludes the same
+    field. Options: a clock-free state in the kernel (`to_snapshot_at`), both
+    states built with one timestamp; zero the field in pandect alone; stop
+    `to_snapshot` reading the clock. Mark: **"Clock-free state in kernel
+    (Recommended)"**. *Follows:* `Graph::to_snapshot_at(timestamp_secs)`, with
+    `to_snapshot()` calling it with the clock; `edit_as` builds both states
+    with one timestamp, so the check never reads the clock; a forced test
+    shows state taken across a second tick compares equal. Visit stamps and
+    every other field keep their exact comparison, as ruling 19 holds. The
+    2 ms wait in `capture_hook_receives_replayable_apply_events` stays: it
+    makes that test's explicit touch change something, which is test setup,
+    not a replay workaround.
+48. **Landing ruling 47** (2026-10-08). The coordinator checked the lane:
+    `edit_as` builds both states with one fixed date, 0 (`replay_state`), so
+    the check reads no clock, and visit stamps and every other field still
+    compare exactly. The forced-tick tests passed 20 of 20, with the old form
+    as their control differing 20 of 20. The suites are green (kernel 298,
+    pandect 310, graphshell `personal-sync` 372), and the merge onto
+    `origin/main` (`526cbb3b`, two docs-only commits newer) is clean, so
+    under F138 (dynamics grammar plan) nothing re-gates. Options: merge and
+    push now; hold to land beside G4b1; hold for review. Mark: **"Merge and
+    push now (Recommended)"**. *Follows:* `replay-touch` merges onto
+    `origin/main` and goes to mere main; its worktree, branch and target go
+    once it lands.
 
 ## 8. Progress
 
@@ -1585,3 +1638,54 @@ V2b's rulings, all 2026-09-25:
   50-run loop. A control damaged a restored node's title, tag and custom
   facet, and added an edge: each showed in the fingerprint's half it belongs
   to. No clock seam was added.
+- 2026-10-08: ruling 47 landed on `replay-touch`. Kernel `c8204e6e` adds
+  `Graph::to_snapshot_at(timestamp_secs)`, which `to_snapshot()` now calls
+  with the clock; no other caller changed. Pandect `8e12677d` builds the
+  replay check's two states with `to_snapshot_at(0)`, so the check reads no
+  clock, and visit stamps and every other field still compare exactly.
+  - Before: the lane's probe of the old check differed 20 of 20 across a
+    forced second tick, while a stamp-zeroed probe differed 0 of 20,000 idle
+    and 0 of 5,000 under load. After: both new forced-tick tests,
+    `a_dated_snapshot_compares_equal_across_a_second_tick` (kernel) and
+    `the_replay_check_compares_equal_across_a_second_tick` (pandect), passed
+    20 of 20. Each also asserts, as its control, that the old clock-dated
+    form differs across the same tick.
+  - Graphshell (`personal-sync` lib tests), 20 runs per target with 8 busy
+    loops added to the other lanes' load (51–100% CPU):
+    | Target | Before | After |
+    | --- | --- | --- |
+    | `a_refused_spec_fails_the_open_by_name_and_place` | 20/20 | 20/20 |
+    | `product::tests::dynamics::` | 19/20 | 20/20 |
+    | `browser_host_seeds_once_then_reopens_the_stored_graph` | 20/20 | 20/20 |
+    | `h4_exportable_identity_cards…` | 20/20 | 20/20 |
+
+    The `dynamics` module stood in for G4b1's
+    `an_unknown_flat_id_fails_the_open_with_it`, which is not on this branch.
+    The one failure before the fix was
+    `a_spec_refused_while_read_names_its_path_at_the_open` failing with this
+    `NotReplayable`, at 87% load. Twenty runs cannot by themselves separate
+    so rare a flake; the forced tests carry the proof.
+  - Gates:
+    - mere-kernel: 298 of 298 (297 plus the new test), and its
+      `wasm32-unknown-unknown` check passes.
+    - pandect: 310 of 310 lib tests, plus 2 process tests (1 intentionally
+      ignored).
+    - graphshell `--features personal-sync --lib`: 372 passed, 4 ignored, in
+      one complete run with no hang.
+  - The 2 ms wait in `capture_hook_receives_replayable_apply_events` stays,
+    as ruled. Logs are in `Code/testing/mere/replay-touch/`.
+
+**2026-10-08, V5's two process fixtures pass on Windows** (the
+[vault lock plan](../../dramatis_docs/implementation_strategy/2026-10-05_vault_lock_plan.md)'s
+ruling 84).
+- **The failure:** `embedded_reservoir_two_process` and
+  `embedded_reservoir_validation` failed on Windows with error 231 ("All
+  pipe instances are busy").
+- **The cause** (read): the listener keeps one waiting pipe instance and
+  makes the next only after a connect. `connect_local` opened once, and
+  `EmbeddedOwner::start`'s probe-then-connect landed between the two
+  instances.
+- **The fix:** `connect_local` now retries error 231 for up to 2 s, as
+  tokio's named-pipe documentation advises. Both fixtures pass on Windows
+  (3 and 1, each with its child entrypoint ignored); on the same commit
+  without the fix, both fail.

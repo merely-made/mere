@@ -1,0 +1,3687 @@
+{
+ "note": "Generated from merelyllc.com a812e7d (site build of 2026-10-08): the site default matrix request (graph-sandbox.js matrixRequest) over the live authority at checkpoint a812e7d and the heterogeneous specimen, run through the site's own matrix_projection. Graphs keep only the fields the site matrix reads.",
+ "site_revision": "a812e7df929c5f5fea7031e6718eb41558eb5b44",
+ "rows": {
+  "dataset": "live",
+  "record": "{\"source\":\"merely-made/merelyllc.com\",\"commit\":\"a812e7df929c5f5fea7031e6718eb41558eb5b44\",\"committed_at\":\"2026-10-08T19:33:00-04:00\"}",
+  "reading": "neighbors",
+  "focus": "mere",
+  "graph": {
+   "nodes": [
+    {
+     "id": "org-profile",
+     "name": "Merely organization profile",
+     "class": "tool",
+     "status": "reference",
+     "pushed_at": "2026-09-24T11:45:13Z"
+    },
+    {
+     "id": "mer3ly",
+     "name": "Mer3ly",
+     "class": "product",
+     "status": "active",
+     "pushed_at": "2026-09-11T18:16:25Z"
+    },
+    {
+     "id": "genet",
+     "name": "Genet",
+     "class": "platform",
+     "status": "active",
+     "pushed_at": "2026-09-23T12:05:08Z"
+    },
+    {
+     "id": "mere",
+     "name": "Mere",
+     "class": "platform",
+     "status": "active",
+     "pushed_at": "2026-09-24T11:36:39Z"
+    },
+    {
+     "id": "retinue",
+     "name": "Retinue",
+     "class": "platform",
+     "status": "active",
+     "pushed_at": "2026-09-21T18:00:08Z"
+    },
+    {
+     "id": "netrender",
+     "name": "Netrender",
+     "class": "foundation",
+     "status": "active",
+     "pushed_at": "2026-09-17T03:09:30Z"
+    },
+    {
+     "id": "smolweb",
+     "name": "Smolweb",
+     "class": "foundation",
+     "status": "active",
+     "pushed_at": "2026-09-11T08:15:34Z"
+    },
+    {
+     "id": "wavicle",
+     "name": "Wavicle",
+     "class": "foundation",
+     "status": "active",
+     "pushed_at": "2026-09-03T05:29:02Z"
+    },
+    {
+     "id": "wgpu-graft",
+     "name": "wgpu-graft",
+     "class": "foundation",
+     "status": "research",
+     "pushed_at": "2026-09-05T03:53:35Z"
+    },
+    {
+     "id": "wgpu-scry",
+     "name": "wgpu-scry",
+     "class": "foundation",
+     "status": "research",
+     "pushed_at": "2026-09-11T19:30:04Z"
+    },
+    {
+     "id": "wgpu-weld",
+     "name": "wgpu-weld",
+     "class": "foundation",
+     "status": "research",
+     "pushed_at": "2026-09-05T03:23:05Z"
+    },
+    {
+     "id": "turnstone",
+     "name": "Turnstone",
+     "class": "product",
+     "status": "prototype",
+     "pushed_at": "2026-09-23T11:15:10Z"
+    },
+    {
+     "id": "knot-editor",
+     "name": "Knot Editor",
+     "class": "product",
+     "status": "active",
+     "pushed_at": "2026-09-24T10:21:29Z"
+    },
+    {
+     "id": "woodshed",
+     "name": "Woodshed",
+     "class": "product",
+     "status": "active",
+     "pushed_at": "2026-09-23T11:01:04Z"
+    },
+    {
+     "id": "isocosm",
+     "name": "Isocosm",
+     "class": "product",
+     "status": "prototype",
+     "pushed_at": "2026-09-24T11:45:08Z"
+    },
+    {
+     "id": "vano",
+     "name": "Vano",
+     "class": "foundation",
+     "status": "active",
+     "pushed_at": "2026-09-12T23:52:06Z"
+    },
+    {
+     "id": "cleromancy",
+     "name": "Cleromancy",
+     "class": "product",
+     "status": "active",
+     "pushed_at": "2026-09-15T07:39:05Z"
+    },
+    {
+     "id": "emblem",
+     "name": "Emblem",
+     "class": "foundation",
+     "status": "active",
+     "pushed_at": "2026-09-05T05:13:45Z"
+    },
+    {
+     "id": "mora",
+     "name": "Mora",
+     "class": "foundation",
+     "status": "active",
+     "pushed_at": "2026-09-05T03:22:22Z"
+    },
+    {
+     "id": "pipit",
+     "name": "Pipit",
+     "class": "foundation",
+     "status": "active",
+     "pushed_at": "2026-09-05T03:22:38Z"
+    },
+    {
+     "id": "turquet",
+     "name": "Turquet",
+     "class": "foundation",
+     "status": "active",
+     "pushed_at": "2026-09-11T19:10:30Z"
+    }
+   ],
+   "edges": [
+    {
+     "id": "genet-depends-on-netrender",
+     "source": "genet",
+     "target": "netrender",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "genet-depends-on-vano",
+     "source": "genet",
+     "target": "vano",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "genet-depends-on-wgpu-scry",
+     "source": "genet",
+     "target": "wgpu-scry",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "isocosm-depends-on-genet",
+     "source": "isocosm",
+     "target": "genet",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "isocosm-depends-on-mere",
+     "source": "isocosm",
+     "target": "mere",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "isocosm-depends-on-netrender",
+     "source": "isocosm",
+     "target": "netrender",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "knot-editor-depends-on-genet",
+     "source": "knot-editor",
+     "target": "genet",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "knot-editor-depends-on-mere",
+     "source": "knot-editor",
+     "target": "mere",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "mere-depends-on-knot-editor",
+     "source": "mere",
+     "target": "knot-editor",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "mere-depends-on-genet",
+     "source": "mere",
+     "target": "genet",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "mere-depends-on-netrender",
+     "source": "mere",
+     "target": "netrender",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "mere-depends-on-retinue",
+     "source": "mere",
+     "target": "retinue",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "turnstone-depends-on-genet",
+     "source": "turnstone",
+     "target": "genet",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "turnstone-depends-on-mere",
+     "source": "turnstone",
+     "target": "mere",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "turnstone-depends-on-netrender",
+     "source": "turnstone",
+     "target": "netrender",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "turnstone-depends-on-knot-editor",
+     "source": "turnstone",
+     "target": "knot-editor",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "turnstone-hosts-mere",
+     "source": "turnstone",
+     "target": "mere",
+     "kind": "host_for",
+     "provenance": "curated"
+    },
+    {
+     "id": "woodshed-depends-on-genet",
+     "source": "woodshed",
+     "target": "genet",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "woodshed-depends-on-mere",
+     "source": "woodshed",
+     "target": "mere",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "woodshed-depends-on-netrender",
+     "source": "woodshed",
+     "target": "netrender",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "wgpu-scry-depends-on-wgpu-graft",
+     "source": "wgpu-scry",
+     "target": "wgpu-graft",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "wgpu-weld-depends-on-wgpu-graft",
+     "source": "wgpu-weld",
+     "target": "wgpu-graft",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "genet-renders-with-netrender",
+     "source": "genet",
+     "target": "netrender",
+     "kind": "renders_with",
+     "provenance": "curated"
+    },
+    {
+     "id": "mere-renders-with-genet",
+     "source": "mere",
+     "target": "genet",
+     "kind": "renders_with",
+     "provenance": "curated"
+    },
+    {
+     "id": "cleromancy-depends-on-mere",
+     "source": "cleromancy",
+     "target": "mere",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "cleromancy-depends-on-genet",
+     "source": "cleromancy",
+     "target": "genet",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "cleromancy-depends-on-turquet",
+     "source": "cleromancy",
+     "target": "turquet",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "mere-depends-on-emblem",
+     "source": "mere",
+     "target": "emblem",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "mere-depends-on-mora",
+     "source": "mere",
+     "target": "mora",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "retinue-depends-on-pipit",
+     "source": "retinue",
+     "target": "pipit",
+     "kind": "depends_on",
+     "provenance": "derived"
+    }
+   ]
+  },
+  "expected_sources": [
+   [
+    "mer3ly.repository-graph/v1",
+    "genet",
+    "Genet"
+   ],
+   [
+    "mer3ly.repository-graph/v1",
+    "mere",
+    "Mere"
+   ],
+   [
+    "mer3ly.repository-graph/v1",
+    "retinue",
+    "Retinue"
+   ],
+   [
+    "mer3ly.repository-graph/v1",
+    "netrender",
+    "Netrender"
+   ],
+   [
+    "mer3ly.repository-graph/v1",
+    "turnstone",
+    "Turnstone"
+   ],
+   [
+    "mer3ly.repository-graph/v1",
+    "knot-editor",
+    "Knot Editor"
+   ],
+   [
+    "mer3ly.repository-graph/v1",
+    "woodshed",
+    "Woodshed"
+   ],
+   [
+    "mer3ly.repository-graph/v1",
+    "isocosm",
+    "Isocosm"
+   ],
+   [
+    "mer3ly.repository-graph/v1",
+    "cleromancy",
+    "Cleromancy"
+   ],
+   [
+    "mer3ly.repository-graph/v1",
+    "emblem",
+    "Emblem"
+   ],
+   [
+    "mer3ly.repository-graph/v1",
+    "mora",
+    "Mora"
+   ]
+  ]
+ },
+ "columns": {
+  "dataset": "specimen",
+  "record": "{\"source\":\"mer3ly/specimen\",\"commit\":\"authored\",\"committed_at\":\"static\"}",
+  "reading": "changes",
+  "focus": null,
+  "graph": {
+   "nodes": [
+    {
+     "id": "merecat",
+     "name": "merecat",
+     "class": "product",
+     "status": "live",
+     "pushed_at": "2026-08-11T16:20:00Z"
+    },
+    {
+     "id": "mere",
+     "name": "Mere",
+     "class": "platform",
+     "status": "live",
+     "pushed_at": "2026-08-10T09:12:00Z"
+    },
+    {
+     "id": "turnstone",
+     "name": "Turnstone",
+     "class": "device",
+     "status": "present",
+     "pushed_at": "2026-08-07T14:30:00Z"
+    },
+    {
+     "id": "ashland",
+     "name": "Ashland",
+     "class": "place",
+     "status": "present",
+     "pushed_at": "2026-07-29T12:00:00Z"
+    },
+    {
+     "id": "merely-made",
+     "name": "merely-made",
+     "class": "community",
+     "status": "live",
+     "pushed_at": "2026-08-11T15:42:00Z"
+    },
+    {
+     "id": "mark",
+     "name": "Mark",
+     "class": "person",
+     "status": "present",
+     "pushed_at": "2026-08-11T15:00:00Z"
+    },
+    {
+     "id": "field-notes",
+     "name": "Field notes",
+     "class": "document",
+     "status": "draft",
+     "pushed_at": "2026-08-09T18:05:00Z"
+    },
+    {
+     "id": "radio-session",
+     "name": "Radio session",
+     "class": "event",
+     "status": "past",
+     "pushed_at": "2026-08-05T20:00:00Z"
+    },
+    {
+     "id": "relay",
+     "name": "Neighborhood relay",
+     "class": "device",
+     "status": "present",
+     "pushed_at": "2026-08-06T08:30:00Z"
+    },
+    {
+     "id": "message",
+     "name": "Shared message",
+     "class": "note",
+     "status": "received",
+     "pushed_at": "2026-08-06T08:33:00Z"
+    },
+    {
+     "id": "strophe",
+     "name": "Strophe",
+     "class": "software",
+     "status": "research",
+     "pushed_at": "2026-08-08T11:14:00Z"
+    },
+    {
+     "id": "old-mock",
+     "name": "Old mock",
+     "class": "page",
+     "status": "retired",
+     "pushed_at": "2026-07-18T10:10:00Z"
+    }
+   ],
+   "edges": [
+    {
+     "id": "merecat-uses-mere",
+     "source": "merecat",
+     "target": "mere",
+     "kind": "uses",
+     "provenance": "curated"
+    },
+    {
+     "id": "turnstone-hosts-merecat",
+     "source": "turnstone",
+     "target": "merecat",
+     "kind": "hosts",
+     "provenance": "curated"
+    },
+    {
+     "id": "mark-builds-mere",
+     "source": "mark",
+     "target": "mere",
+     "kind": "builds",
+     "provenance": "curated"
+    },
+    {
+     "id": "mark-member-merely",
+     "source": "mark",
+     "target": "merely-made",
+     "kind": "member_of",
+     "provenance": "curated"
+    },
+    {
+     "id": "merely-publishes-mere",
+     "source": "merely-made",
+     "target": "mere",
+     "kind": "publishes",
+     "provenance": "derived"
+    },
+    {
+     "id": "strophe-shares-mere",
+     "source": "strophe",
+     "target": "mere",
+     "kind": "shares_stack",
+     "provenance": "curated"
+    },
+    {
+     "id": "session-occurs-ashland",
+     "source": "radio-session",
+     "target": "ashland",
+     "kind": "occurs_in",
+     "provenance": "curated"
+    },
+    {
+     "id": "mark-attends-session",
+     "source": "mark",
+     "target": "radio-session",
+     "kind": "participates",
+     "provenance": "curated"
+    },
+    {
+     "id": "session-produces-notes",
+     "source": "radio-session",
+     "target": "field-notes",
+     "kind": "produces",
+     "provenance": "curated"
+    },
+    {
+     "id": "relay-carries-message",
+     "source": "relay",
+     "target": "message",
+     "kind": "carries",
+     "provenance": "derived"
+    },
+    {
+     "id": "message-recorded-notes",
+     "source": "message",
+     "target": "field-notes",
+     "kind": "recorded_in",
+     "provenance": "curated"
+    },
+    {
+     "id": "relay-near-ashland",
+     "source": "relay",
+     "target": "ashland",
+     "kind": "located_in",
+     "provenance": "curated"
+    },
+    {
+     "id": "old-mock-replaced-merecat",
+     "source": "old-mock",
+     "target": "merecat",
+     "kind": "replaced_by",
+     "provenance": "curated"
+    }
+   ]
+  },
+  "expected_sources": [
+   [
+    "mer3ly.repository-graph/v1",
+    "merecat",
+    "merecat"
+   ],
+   [
+    "mer3ly.repository-graph/v1",
+    "mere",
+    "Mere"
+   ],
+   [
+    "mer3ly.repository-graph/v1",
+    "turnstone",
+    "Turnstone"
+   ],
+   [
+    "mer3ly.repository-graph/v1",
+    "ashland",
+    "Ashland"
+   ],
+   [
+    "mer3ly.repository-graph/v1",
+    "merely-made",
+    "merely-made"
+   ],
+   [
+    "mer3ly.repository-graph/v1",
+    "mark",
+    "Mark"
+   ],
+   [
+    "mer3ly.repository-graph/v1",
+    "field-notes",
+    "Field notes"
+   ],
+   [
+    "mer3ly.repository-graph/v1",
+    "radio-session",
+    "Radio session"
+   ],
+   [
+    "mer3ly.repository-graph/v1",
+    "relay",
+    "Neighborhood relay"
+   ],
+   [
+    "mer3ly.repository-graph/v1",
+    "message",
+    "Shared message"
+   ],
+   [
+    "mer3ly.repository-graph/v1",
+    "strophe",
+    "Strophe"
+   ],
+   [
+    "mer3ly.repository-graph/v1",
+    "old-mock",
+    "Old mock"
+   ]
+  ]
+ },
+ "expected_cells": [
+  [
+   "genet",
+   "merecat",
+   "absence",
+   "no relation",
+   "No direct relation from Genet to merecat",
+   "mer3ly.matrix-derivation/v1",
+   "absence:genet:merecat",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "genet",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "merecat",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "genet",
+   "mere",
+   "absence",
+   "no relation",
+   "No direct relation from Genet to Mere",
+   "mer3ly.matrix-derivation/v1",
+   "absence:genet:mere",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "genet",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "mere",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "genet",
+   "turnstone",
+   "absence",
+   "no relation",
+   "No direct relation from Genet to Turnstone",
+   "mer3ly.matrix-derivation/v1",
+   "absence:genet:turnstone",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "genet",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "turnstone",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "genet",
+   "ashland",
+   "absence",
+   "no relation",
+   "No direct relation from Genet to Ashland",
+   "mer3ly.matrix-derivation/v1",
+   "absence:genet:ashland",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "genet",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "ashland",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "genet",
+   "merely-made",
+   "absence",
+   "no relation",
+   "No direct relation from Genet to merely-made",
+   "mer3ly.matrix-derivation/v1",
+   "absence:genet:merely-made",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "genet",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "merely-made",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "genet",
+   "mark",
+   "absence",
+   "no relation",
+   "No direct relation from Genet to Mark",
+   "mer3ly.matrix-derivation/v1",
+   "absence:genet:mark",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "genet",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "mark",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "genet",
+   "field-notes",
+   "absence",
+   "no relation",
+   "No direct relation from Genet to Field notes",
+   "mer3ly.matrix-derivation/v1",
+   "absence:genet:field-notes",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "genet",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "field-notes",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "genet",
+   "radio-session",
+   "absence",
+   "no relation",
+   "No direct relation from Genet to Radio session",
+   "mer3ly.matrix-derivation/v1",
+   "absence:genet:radio-session",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "genet",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "radio-session",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "genet",
+   "relay",
+   "absence",
+   "no relation",
+   "No direct relation from Genet to Neighborhood relay",
+   "mer3ly.matrix-derivation/v1",
+   "absence:genet:relay",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "genet",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "relay",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "genet",
+   "message",
+   "absence",
+   "no relation",
+   "No direct relation from Genet to Shared message",
+   "mer3ly.matrix-derivation/v1",
+   "absence:genet:message",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "genet",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "message",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "genet",
+   "strophe",
+   "absence",
+   "no relation",
+   "No direct relation from Genet to Strophe",
+   "mer3ly.matrix-derivation/v1",
+   "absence:genet:strophe",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "genet",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "strophe",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "genet",
+   "old-mock",
+   "absence",
+   "no relation",
+   "No direct relation from Genet to Old mock",
+   "mer3ly.matrix-derivation/v1",
+   "absence:genet:old-mock",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "genet",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "old-mock",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "mere",
+   "merecat",
+   "absence",
+   "no relation",
+   "No direct relation from Mere to merecat",
+   "mer3ly.matrix-derivation/v1",
+   "absence:mere:merecat",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "mere",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "merecat",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "mere",
+   "mere",
+   "identity_match",
+   "same source",
+   "Mere is present in both readings",
+   "mer3ly.matrix-derivation/v1",
+   "identity:mere",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "mere",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "mere",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "mere",
+   "turnstone",
+   "absence",
+   "no relation",
+   "No direct relation from Mere to Turnstone",
+   "mer3ly.matrix-derivation/v1",
+   "absence:mere:turnstone",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "mere",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "turnstone",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "mere",
+   "ashland",
+   "absence",
+   "no relation",
+   "No direct relation from Mere to Ashland",
+   "mer3ly.matrix-derivation/v1",
+   "absence:mere:ashland",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "mere",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "ashland",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "mere",
+   "merely-made",
+   "absence",
+   "no relation",
+   "No direct relation from Mere to merely-made",
+   "mer3ly.matrix-derivation/v1",
+   "absence:mere:merely-made",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "mere",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "merely-made",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "mere",
+   "mark",
+   "absence",
+   "no relation",
+   "No direct relation from Mere to Mark",
+   "mer3ly.matrix-derivation/v1",
+   "absence:mere:mark",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "mere",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "mark",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "mere",
+   "field-notes",
+   "absence",
+   "no relation",
+   "No direct relation from Mere to Field notes",
+   "mer3ly.matrix-derivation/v1",
+   "absence:mere:field-notes",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "mere",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "field-notes",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "mere",
+   "radio-session",
+   "absence",
+   "no relation",
+   "No direct relation from Mere to Radio session",
+   "mer3ly.matrix-derivation/v1",
+   "absence:mere:radio-session",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "mere",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "radio-session",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "mere",
+   "relay",
+   "absence",
+   "no relation",
+   "No direct relation from Mere to Neighborhood relay",
+   "mer3ly.matrix-derivation/v1",
+   "absence:mere:relay",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "mere",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "relay",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "mere",
+   "message",
+   "absence",
+   "no relation",
+   "No direct relation from Mere to Shared message",
+   "mer3ly.matrix-derivation/v1",
+   "absence:mere:message",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "mere",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "message",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "mere",
+   "strophe",
+   "absence",
+   "no relation",
+   "No direct relation from Mere to Strophe",
+   "mer3ly.matrix-derivation/v1",
+   "absence:mere:strophe",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "mere",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "strophe",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "mere",
+   "old-mock",
+   "absence",
+   "no relation",
+   "No direct relation from Mere to Old mock",
+   "mer3ly.matrix-derivation/v1",
+   "absence:mere:old-mock",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "mere",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "old-mock",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "retinue",
+   "merecat",
+   "absence",
+   "no relation",
+   "No direct relation from Retinue to merecat",
+   "mer3ly.matrix-derivation/v1",
+   "absence:retinue:merecat",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "retinue",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "merecat",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "retinue",
+   "mere",
+   "absence",
+   "no relation",
+   "No direct relation from Retinue to Mere",
+   "mer3ly.matrix-derivation/v1",
+   "absence:retinue:mere",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "retinue",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "mere",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "retinue",
+   "turnstone",
+   "absence",
+   "no relation",
+   "No direct relation from Retinue to Turnstone",
+   "mer3ly.matrix-derivation/v1",
+   "absence:retinue:turnstone",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "retinue",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "turnstone",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "retinue",
+   "ashland",
+   "absence",
+   "no relation",
+   "No direct relation from Retinue to Ashland",
+   "mer3ly.matrix-derivation/v1",
+   "absence:retinue:ashland",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "retinue",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "ashland",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "retinue",
+   "merely-made",
+   "absence",
+   "no relation",
+   "No direct relation from Retinue to merely-made",
+   "mer3ly.matrix-derivation/v1",
+   "absence:retinue:merely-made",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "retinue",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "merely-made",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "retinue",
+   "mark",
+   "absence",
+   "no relation",
+   "No direct relation from Retinue to Mark",
+   "mer3ly.matrix-derivation/v1",
+   "absence:retinue:mark",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "retinue",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "mark",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "retinue",
+   "field-notes",
+   "absence",
+   "no relation",
+   "No direct relation from Retinue to Field notes",
+   "mer3ly.matrix-derivation/v1",
+   "absence:retinue:field-notes",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "retinue",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "field-notes",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "retinue",
+   "radio-session",
+   "absence",
+   "no relation",
+   "No direct relation from Retinue to Radio session",
+   "mer3ly.matrix-derivation/v1",
+   "absence:retinue:radio-session",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "retinue",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "radio-session",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "retinue",
+   "relay",
+   "absence",
+   "no relation",
+   "No direct relation from Retinue to Neighborhood relay",
+   "mer3ly.matrix-derivation/v1",
+   "absence:retinue:relay",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "retinue",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "relay",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "retinue",
+   "message",
+   "absence",
+   "no relation",
+   "No direct relation from Retinue to Shared message",
+   "mer3ly.matrix-derivation/v1",
+   "absence:retinue:message",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "retinue",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "message",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "retinue",
+   "strophe",
+   "absence",
+   "no relation",
+   "No direct relation from Retinue to Strophe",
+   "mer3ly.matrix-derivation/v1",
+   "absence:retinue:strophe",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "retinue",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "strophe",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "retinue",
+   "old-mock",
+   "absence",
+   "no relation",
+   "No direct relation from Retinue to Old mock",
+   "mer3ly.matrix-derivation/v1",
+   "absence:retinue:old-mock",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "retinue",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "old-mock",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "netrender",
+   "merecat",
+   "absence",
+   "no relation",
+   "No direct relation from Netrender to merecat",
+   "mer3ly.matrix-derivation/v1",
+   "absence:netrender:merecat",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "netrender",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "merecat",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "netrender",
+   "mere",
+   "absence",
+   "no relation",
+   "No direct relation from Netrender to Mere",
+   "mer3ly.matrix-derivation/v1",
+   "absence:netrender:mere",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "netrender",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "mere",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "netrender",
+   "turnstone",
+   "absence",
+   "no relation",
+   "No direct relation from Netrender to Turnstone",
+   "mer3ly.matrix-derivation/v1",
+   "absence:netrender:turnstone",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "netrender",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "turnstone",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "netrender",
+   "ashland",
+   "absence",
+   "no relation",
+   "No direct relation from Netrender to Ashland",
+   "mer3ly.matrix-derivation/v1",
+   "absence:netrender:ashland",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "netrender",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "ashland",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "netrender",
+   "merely-made",
+   "absence",
+   "no relation",
+   "No direct relation from Netrender to merely-made",
+   "mer3ly.matrix-derivation/v1",
+   "absence:netrender:merely-made",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "netrender",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "merely-made",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "netrender",
+   "mark",
+   "absence",
+   "no relation",
+   "No direct relation from Netrender to Mark",
+   "mer3ly.matrix-derivation/v1",
+   "absence:netrender:mark",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "netrender",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "mark",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "netrender",
+   "field-notes",
+   "absence",
+   "no relation",
+   "No direct relation from Netrender to Field notes",
+   "mer3ly.matrix-derivation/v1",
+   "absence:netrender:field-notes",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "netrender",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "field-notes",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "netrender",
+   "radio-session",
+   "absence",
+   "no relation",
+   "No direct relation from Netrender to Radio session",
+   "mer3ly.matrix-derivation/v1",
+   "absence:netrender:radio-session",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "netrender",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "radio-session",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "netrender",
+   "relay",
+   "absence",
+   "no relation",
+   "No direct relation from Netrender to Neighborhood relay",
+   "mer3ly.matrix-derivation/v1",
+   "absence:netrender:relay",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "netrender",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "relay",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "netrender",
+   "message",
+   "absence",
+   "no relation",
+   "No direct relation from Netrender to Shared message",
+   "mer3ly.matrix-derivation/v1",
+   "absence:netrender:message",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "netrender",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "message",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "netrender",
+   "strophe",
+   "absence",
+   "no relation",
+   "No direct relation from Netrender to Strophe",
+   "mer3ly.matrix-derivation/v1",
+   "absence:netrender:strophe",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "netrender",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "strophe",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "netrender",
+   "old-mock",
+   "absence",
+   "no relation",
+   "No direct relation from Netrender to Old mock",
+   "mer3ly.matrix-derivation/v1",
+   "absence:netrender:old-mock",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "netrender",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "old-mock",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "turnstone",
+   "merecat",
+   "relation",
+   "relation",
+   "1 relation from Turnstone to merecat",
+   "mer3ly.repository-relation/v1",
+   "turnstone-hosts-merecat",
+   [
+    [
+     "specimen",
+     "mer3ly.repository-relation/v1",
+     "turnstone-hosts-merecat",
+     "curated"
+    ]
+   ]
+  ],
+  [
+   "turnstone",
+   "mere",
+   "relation",
+   "relation",
+   "2 relations from Turnstone to Mere",
+   "mer3ly.repository-relation/v1",
+   "turnstone-depends-on-mere+turnstone-hosts-mere",
+   [
+    [
+     "live",
+     "mer3ly.repository-relation/v1",
+     "turnstone-depends-on-mere",
+     "derived"
+    ],
+    [
+     "live",
+     "mer3ly.repository-relation/v1",
+     "turnstone-hosts-mere",
+     "curated"
+    ]
+   ]
+  ],
+  [
+   "turnstone",
+   "turnstone",
+   "identity_match",
+   "same source",
+   "Turnstone is present in both readings",
+   "mer3ly.matrix-derivation/v1",
+   "identity:turnstone",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "turnstone",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "turnstone",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "turnstone",
+   "ashland",
+   "absence",
+   "no relation",
+   "No direct relation from Turnstone to Ashland",
+   "mer3ly.matrix-derivation/v1",
+   "absence:turnstone:ashland",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "turnstone",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "ashland",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "turnstone",
+   "merely-made",
+   "absence",
+   "no relation",
+   "No direct relation from Turnstone to merely-made",
+   "mer3ly.matrix-derivation/v1",
+   "absence:turnstone:merely-made",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "turnstone",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "merely-made",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "turnstone",
+   "mark",
+   "absence",
+   "no relation",
+   "No direct relation from Turnstone to Mark",
+   "mer3ly.matrix-derivation/v1",
+   "absence:turnstone:mark",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "turnstone",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "mark",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "turnstone",
+   "field-notes",
+   "absence",
+   "no relation",
+   "No direct relation from Turnstone to Field notes",
+   "mer3ly.matrix-derivation/v1",
+   "absence:turnstone:field-notes",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "turnstone",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "field-notes",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "turnstone",
+   "radio-session",
+   "absence",
+   "no relation",
+   "No direct relation from Turnstone to Radio session",
+   "mer3ly.matrix-derivation/v1",
+   "absence:turnstone:radio-session",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "turnstone",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "radio-session",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "turnstone",
+   "relay",
+   "absence",
+   "no relation",
+   "No direct relation from Turnstone to Neighborhood relay",
+   "mer3ly.matrix-derivation/v1",
+   "absence:turnstone:relay",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "turnstone",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "relay",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "turnstone",
+   "message",
+   "absence",
+   "no relation",
+   "No direct relation from Turnstone to Shared message",
+   "mer3ly.matrix-derivation/v1",
+   "absence:turnstone:message",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "turnstone",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "message",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "turnstone",
+   "strophe",
+   "absence",
+   "no relation",
+   "No direct relation from Turnstone to Strophe",
+   "mer3ly.matrix-derivation/v1",
+   "absence:turnstone:strophe",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "turnstone",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "strophe",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "turnstone",
+   "old-mock",
+   "absence",
+   "no relation",
+   "No direct relation from Turnstone to Old mock",
+   "mer3ly.matrix-derivation/v1",
+   "absence:turnstone:old-mock",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "turnstone",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "old-mock",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "knot-editor",
+   "merecat",
+   "absence",
+   "no relation",
+   "No direct relation from Knot Editor to merecat",
+   "mer3ly.matrix-derivation/v1",
+   "absence:knot-editor:merecat",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "knot-editor",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "merecat",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "knot-editor",
+   "mere",
+   "relation",
+   "relation",
+   "1 relation from Knot Editor to Mere",
+   "mer3ly.repository-relation/v1",
+   "knot-editor-depends-on-mere",
+   [
+    [
+     "live",
+     "mer3ly.repository-relation/v1",
+     "knot-editor-depends-on-mere",
+     "derived"
+    ]
+   ]
+  ],
+  [
+   "knot-editor",
+   "turnstone",
+   "absence",
+   "no relation",
+   "No direct relation from Knot Editor to Turnstone",
+   "mer3ly.matrix-derivation/v1",
+   "absence:knot-editor:turnstone",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "knot-editor",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "turnstone",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "knot-editor",
+   "ashland",
+   "absence",
+   "no relation",
+   "No direct relation from Knot Editor to Ashland",
+   "mer3ly.matrix-derivation/v1",
+   "absence:knot-editor:ashland",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "knot-editor",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "ashland",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "knot-editor",
+   "merely-made",
+   "absence",
+   "no relation",
+   "No direct relation from Knot Editor to merely-made",
+   "mer3ly.matrix-derivation/v1",
+   "absence:knot-editor:merely-made",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "knot-editor",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "merely-made",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "knot-editor",
+   "mark",
+   "absence",
+   "no relation",
+   "No direct relation from Knot Editor to Mark",
+   "mer3ly.matrix-derivation/v1",
+   "absence:knot-editor:mark",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "knot-editor",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "mark",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "knot-editor",
+   "field-notes",
+   "absence",
+   "no relation",
+   "No direct relation from Knot Editor to Field notes",
+   "mer3ly.matrix-derivation/v1",
+   "absence:knot-editor:field-notes",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "knot-editor",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "field-notes",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "knot-editor",
+   "radio-session",
+   "absence",
+   "no relation",
+   "No direct relation from Knot Editor to Radio session",
+   "mer3ly.matrix-derivation/v1",
+   "absence:knot-editor:radio-session",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "knot-editor",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "radio-session",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "knot-editor",
+   "relay",
+   "absence",
+   "no relation",
+   "No direct relation from Knot Editor to Neighborhood relay",
+   "mer3ly.matrix-derivation/v1",
+   "absence:knot-editor:relay",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "knot-editor",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "relay",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "knot-editor",
+   "message",
+   "absence",
+   "no relation",
+   "No direct relation from Knot Editor to Shared message",
+   "mer3ly.matrix-derivation/v1",
+   "absence:knot-editor:message",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "knot-editor",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "message",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "knot-editor",
+   "strophe",
+   "absence",
+   "no relation",
+   "No direct relation from Knot Editor to Strophe",
+   "mer3ly.matrix-derivation/v1",
+   "absence:knot-editor:strophe",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "knot-editor",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "strophe",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "knot-editor",
+   "old-mock",
+   "absence",
+   "no relation",
+   "No direct relation from Knot Editor to Old mock",
+   "mer3ly.matrix-derivation/v1",
+   "absence:knot-editor:old-mock",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "knot-editor",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "old-mock",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "woodshed",
+   "merecat",
+   "absence",
+   "no relation",
+   "No direct relation from Woodshed to merecat",
+   "mer3ly.matrix-derivation/v1",
+   "absence:woodshed:merecat",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "woodshed",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "merecat",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "woodshed",
+   "mere",
+   "relation",
+   "relation",
+   "1 relation from Woodshed to Mere",
+   "mer3ly.repository-relation/v1",
+   "woodshed-depends-on-mere",
+   [
+    [
+     "live",
+     "mer3ly.repository-relation/v1",
+     "woodshed-depends-on-mere",
+     "derived"
+    ]
+   ]
+  ],
+  [
+   "woodshed",
+   "turnstone",
+   "absence",
+   "no relation",
+   "No direct relation from Woodshed to Turnstone",
+   "mer3ly.matrix-derivation/v1",
+   "absence:woodshed:turnstone",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "woodshed",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "turnstone",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "woodshed",
+   "ashland",
+   "absence",
+   "no relation",
+   "No direct relation from Woodshed to Ashland",
+   "mer3ly.matrix-derivation/v1",
+   "absence:woodshed:ashland",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "woodshed",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "ashland",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "woodshed",
+   "merely-made",
+   "absence",
+   "no relation",
+   "No direct relation from Woodshed to merely-made",
+   "mer3ly.matrix-derivation/v1",
+   "absence:woodshed:merely-made",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "woodshed",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "merely-made",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "woodshed",
+   "mark",
+   "absence",
+   "no relation",
+   "No direct relation from Woodshed to Mark",
+   "mer3ly.matrix-derivation/v1",
+   "absence:woodshed:mark",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "woodshed",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "mark",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "woodshed",
+   "field-notes",
+   "absence",
+   "no relation",
+   "No direct relation from Woodshed to Field notes",
+   "mer3ly.matrix-derivation/v1",
+   "absence:woodshed:field-notes",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "woodshed",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "field-notes",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "woodshed",
+   "radio-session",
+   "absence",
+   "no relation",
+   "No direct relation from Woodshed to Radio session",
+   "mer3ly.matrix-derivation/v1",
+   "absence:woodshed:radio-session",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "woodshed",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "radio-session",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "woodshed",
+   "relay",
+   "absence",
+   "no relation",
+   "No direct relation from Woodshed to Neighborhood relay",
+   "mer3ly.matrix-derivation/v1",
+   "absence:woodshed:relay",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "woodshed",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "relay",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "woodshed",
+   "message",
+   "absence",
+   "no relation",
+   "No direct relation from Woodshed to Shared message",
+   "mer3ly.matrix-derivation/v1",
+   "absence:woodshed:message",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "woodshed",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "message",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "woodshed",
+   "strophe",
+   "absence",
+   "no relation",
+   "No direct relation from Woodshed to Strophe",
+   "mer3ly.matrix-derivation/v1",
+   "absence:woodshed:strophe",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "woodshed",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "strophe",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "woodshed",
+   "old-mock",
+   "absence",
+   "no relation",
+   "No direct relation from Woodshed to Old mock",
+   "mer3ly.matrix-derivation/v1",
+   "absence:woodshed:old-mock",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "woodshed",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "old-mock",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "isocosm",
+   "merecat",
+   "absence",
+   "no relation",
+   "No direct relation from Isocosm to merecat",
+   "mer3ly.matrix-derivation/v1",
+   "absence:isocosm:merecat",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "isocosm",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "merecat",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "isocosm",
+   "mere",
+   "relation",
+   "relation",
+   "1 relation from Isocosm to Mere",
+   "mer3ly.repository-relation/v1",
+   "isocosm-depends-on-mere",
+   [
+    [
+     "live",
+     "mer3ly.repository-relation/v1",
+     "isocosm-depends-on-mere",
+     "derived"
+    ]
+   ]
+  ],
+  [
+   "isocosm",
+   "turnstone",
+   "absence",
+   "no relation",
+   "No direct relation from Isocosm to Turnstone",
+   "mer3ly.matrix-derivation/v1",
+   "absence:isocosm:turnstone",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "isocosm",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "turnstone",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "isocosm",
+   "ashland",
+   "absence",
+   "no relation",
+   "No direct relation from Isocosm to Ashland",
+   "mer3ly.matrix-derivation/v1",
+   "absence:isocosm:ashland",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "isocosm",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "ashland",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "isocosm",
+   "merely-made",
+   "absence",
+   "no relation",
+   "No direct relation from Isocosm to merely-made",
+   "mer3ly.matrix-derivation/v1",
+   "absence:isocosm:merely-made",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "isocosm",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "merely-made",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "isocosm",
+   "mark",
+   "absence",
+   "no relation",
+   "No direct relation from Isocosm to Mark",
+   "mer3ly.matrix-derivation/v1",
+   "absence:isocosm:mark",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "isocosm",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "mark",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "isocosm",
+   "field-notes",
+   "absence",
+   "no relation",
+   "No direct relation from Isocosm to Field notes",
+   "mer3ly.matrix-derivation/v1",
+   "absence:isocosm:field-notes",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "isocosm",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "field-notes",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "isocosm",
+   "radio-session",
+   "absence",
+   "no relation",
+   "No direct relation from Isocosm to Radio session",
+   "mer3ly.matrix-derivation/v1",
+   "absence:isocosm:radio-session",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "isocosm",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "radio-session",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "isocosm",
+   "relay",
+   "absence",
+   "no relation",
+   "No direct relation from Isocosm to Neighborhood relay",
+   "mer3ly.matrix-derivation/v1",
+   "absence:isocosm:relay",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "isocosm",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "relay",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "isocosm",
+   "message",
+   "absence",
+   "no relation",
+   "No direct relation from Isocosm to Shared message",
+   "mer3ly.matrix-derivation/v1",
+   "absence:isocosm:message",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "isocosm",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "message",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "isocosm",
+   "strophe",
+   "absence",
+   "no relation",
+   "No direct relation from Isocosm to Strophe",
+   "mer3ly.matrix-derivation/v1",
+   "absence:isocosm:strophe",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "isocosm",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "strophe",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "isocosm",
+   "old-mock",
+   "absence",
+   "no relation",
+   "No direct relation from Isocosm to Old mock",
+   "mer3ly.matrix-derivation/v1",
+   "absence:isocosm:old-mock",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "isocosm",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "old-mock",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "cleromancy",
+   "merecat",
+   "absence",
+   "no relation",
+   "No direct relation from Cleromancy to merecat",
+   "mer3ly.matrix-derivation/v1",
+   "absence:cleromancy:merecat",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "cleromancy",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "merecat",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "cleromancy",
+   "mere",
+   "relation",
+   "relation",
+   "1 relation from Cleromancy to Mere",
+   "mer3ly.repository-relation/v1",
+   "cleromancy-depends-on-mere",
+   [
+    [
+     "live",
+     "mer3ly.repository-relation/v1",
+     "cleromancy-depends-on-mere",
+     "derived"
+    ]
+   ]
+  ],
+  [
+   "cleromancy",
+   "turnstone",
+   "absence",
+   "no relation",
+   "No direct relation from Cleromancy to Turnstone",
+   "mer3ly.matrix-derivation/v1",
+   "absence:cleromancy:turnstone",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "cleromancy",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "turnstone",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "cleromancy",
+   "ashland",
+   "absence",
+   "no relation",
+   "No direct relation from Cleromancy to Ashland",
+   "mer3ly.matrix-derivation/v1",
+   "absence:cleromancy:ashland",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "cleromancy",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "ashland",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "cleromancy",
+   "merely-made",
+   "absence",
+   "no relation",
+   "No direct relation from Cleromancy to merely-made",
+   "mer3ly.matrix-derivation/v1",
+   "absence:cleromancy:merely-made",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "cleromancy",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "merely-made",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "cleromancy",
+   "mark",
+   "absence",
+   "no relation",
+   "No direct relation from Cleromancy to Mark",
+   "mer3ly.matrix-derivation/v1",
+   "absence:cleromancy:mark",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "cleromancy",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "mark",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "cleromancy",
+   "field-notes",
+   "absence",
+   "no relation",
+   "No direct relation from Cleromancy to Field notes",
+   "mer3ly.matrix-derivation/v1",
+   "absence:cleromancy:field-notes",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "cleromancy",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "field-notes",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "cleromancy",
+   "radio-session",
+   "absence",
+   "no relation",
+   "No direct relation from Cleromancy to Radio session",
+   "mer3ly.matrix-derivation/v1",
+   "absence:cleromancy:radio-session",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "cleromancy",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "radio-session",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "cleromancy",
+   "relay",
+   "absence",
+   "no relation",
+   "No direct relation from Cleromancy to Neighborhood relay",
+   "mer3ly.matrix-derivation/v1",
+   "absence:cleromancy:relay",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "cleromancy",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "relay",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "cleromancy",
+   "message",
+   "absence",
+   "no relation",
+   "No direct relation from Cleromancy to Shared message",
+   "mer3ly.matrix-derivation/v1",
+   "absence:cleromancy:message",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "cleromancy",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "message",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "cleromancy",
+   "strophe",
+   "absence",
+   "no relation",
+   "No direct relation from Cleromancy to Strophe",
+   "mer3ly.matrix-derivation/v1",
+   "absence:cleromancy:strophe",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "cleromancy",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "strophe",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "cleromancy",
+   "old-mock",
+   "absence",
+   "no relation",
+   "No direct relation from Cleromancy to Old mock",
+   "mer3ly.matrix-derivation/v1",
+   "absence:cleromancy:old-mock",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "cleromancy",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "old-mock",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "emblem",
+   "merecat",
+   "absence",
+   "no relation",
+   "No direct relation from Emblem to merecat",
+   "mer3ly.matrix-derivation/v1",
+   "absence:emblem:merecat",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "emblem",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "merecat",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "emblem",
+   "mere",
+   "absence",
+   "no relation",
+   "No direct relation from Emblem to Mere",
+   "mer3ly.matrix-derivation/v1",
+   "absence:emblem:mere",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "emblem",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "mere",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "emblem",
+   "turnstone",
+   "absence",
+   "no relation",
+   "No direct relation from Emblem to Turnstone",
+   "mer3ly.matrix-derivation/v1",
+   "absence:emblem:turnstone",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "emblem",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "turnstone",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "emblem",
+   "ashland",
+   "absence",
+   "no relation",
+   "No direct relation from Emblem to Ashland",
+   "mer3ly.matrix-derivation/v1",
+   "absence:emblem:ashland",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "emblem",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "ashland",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "emblem",
+   "merely-made",
+   "absence",
+   "no relation",
+   "No direct relation from Emblem to merely-made",
+   "mer3ly.matrix-derivation/v1",
+   "absence:emblem:merely-made",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "emblem",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "merely-made",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "emblem",
+   "mark",
+   "absence",
+   "no relation",
+   "No direct relation from Emblem to Mark",
+   "mer3ly.matrix-derivation/v1",
+   "absence:emblem:mark",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "emblem",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "mark",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "emblem",
+   "field-notes",
+   "absence",
+   "no relation",
+   "No direct relation from Emblem to Field notes",
+   "mer3ly.matrix-derivation/v1",
+   "absence:emblem:field-notes",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "emblem",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "field-notes",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "emblem",
+   "radio-session",
+   "absence",
+   "no relation",
+   "No direct relation from Emblem to Radio session",
+   "mer3ly.matrix-derivation/v1",
+   "absence:emblem:radio-session",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "emblem",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "radio-session",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "emblem",
+   "relay",
+   "absence",
+   "no relation",
+   "No direct relation from Emblem to Neighborhood relay",
+   "mer3ly.matrix-derivation/v1",
+   "absence:emblem:relay",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "emblem",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "relay",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "emblem",
+   "message",
+   "absence",
+   "no relation",
+   "No direct relation from Emblem to Shared message",
+   "mer3ly.matrix-derivation/v1",
+   "absence:emblem:message",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "emblem",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "message",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "emblem",
+   "strophe",
+   "absence",
+   "no relation",
+   "No direct relation from Emblem to Strophe",
+   "mer3ly.matrix-derivation/v1",
+   "absence:emblem:strophe",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "emblem",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "strophe",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "emblem",
+   "old-mock",
+   "absence",
+   "no relation",
+   "No direct relation from Emblem to Old mock",
+   "mer3ly.matrix-derivation/v1",
+   "absence:emblem:old-mock",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "emblem",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "old-mock",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "mora",
+   "merecat",
+   "absence",
+   "no relation",
+   "No direct relation from Mora to merecat",
+   "mer3ly.matrix-derivation/v1",
+   "absence:mora:merecat",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "mora",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "merecat",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "mora",
+   "mere",
+   "absence",
+   "no relation",
+   "No direct relation from Mora to Mere",
+   "mer3ly.matrix-derivation/v1",
+   "absence:mora:mere",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "mora",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "mere",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "mora",
+   "turnstone",
+   "absence",
+   "no relation",
+   "No direct relation from Mora to Turnstone",
+   "mer3ly.matrix-derivation/v1",
+   "absence:mora:turnstone",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "mora",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "turnstone",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "mora",
+   "ashland",
+   "absence",
+   "no relation",
+   "No direct relation from Mora to Ashland",
+   "mer3ly.matrix-derivation/v1",
+   "absence:mora:ashland",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "mora",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "ashland",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "mora",
+   "merely-made",
+   "absence",
+   "no relation",
+   "No direct relation from Mora to merely-made",
+   "mer3ly.matrix-derivation/v1",
+   "absence:mora:merely-made",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "mora",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "merely-made",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "mora",
+   "mark",
+   "absence",
+   "no relation",
+   "No direct relation from Mora to Mark",
+   "mer3ly.matrix-derivation/v1",
+   "absence:mora:mark",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "mora",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "mark",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "mora",
+   "field-notes",
+   "absence",
+   "no relation",
+   "No direct relation from Mora to Field notes",
+   "mer3ly.matrix-derivation/v1",
+   "absence:mora:field-notes",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "mora",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "field-notes",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "mora",
+   "radio-session",
+   "absence",
+   "no relation",
+   "No direct relation from Mora to Radio session",
+   "mer3ly.matrix-derivation/v1",
+   "absence:mora:radio-session",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "mora",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "radio-session",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "mora",
+   "relay",
+   "absence",
+   "no relation",
+   "No direct relation from Mora to Neighborhood relay",
+   "mer3ly.matrix-derivation/v1",
+   "absence:mora:relay",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "mora",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "relay",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "mora",
+   "message",
+   "absence",
+   "no relation",
+   "No direct relation from Mora to Shared message",
+   "mer3ly.matrix-derivation/v1",
+   "absence:mora:message",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "mora",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "message",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "mora",
+   "strophe",
+   "absence",
+   "no relation",
+   "No direct relation from Mora to Strophe",
+   "mer3ly.matrix-derivation/v1",
+   "absence:mora:strophe",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "mora",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "strophe",
+     "axis input"
+    ]
+   ]
+  ],
+  [
+   "mora",
+   "old-mock",
+   "absence",
+   "no relation",
+   "No direct relation from Mora to Old mock",
+   "mer3ly.matrix-derivation/v1",
+   "absence:mora:old-mock",
+   [
+    [
+     "live",
+     "mer3ly.repository-graph/v1",
+     "mora",
+     "axis input"
+    ],
+    [
+     "specimen",
+     "mer3ly.repository-graph/v1",
+     "old-mock",
+     "axis input"
+    ]
+   ]
+  ]
+ ]
+}

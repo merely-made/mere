@@ -46,7 +46,15 @@ fn persisted_semantic_sub_kind(sub_kind: SemanticSubKind) -> PersistedSemanticSu
 }
 
 impl Graph {
+    /// The graph's snapshot, dated now by the wall clock.
     pub fn to_snapshot(&self) -> GraphSnapshot {
+        self.to_snapshot_at(crate::time::unix_epoch_seconds())
+    }
+
+    /// The graph's snapshot dated `timestamp_secs`, reading no clock: two
+    /// snapshots of one graph at one date are equal whenever they are taken
+    /// (reservoir plan ruling 47).
+    pub fn to_snapshot_at(&self, timestamp_secs: u64) -> GraphSnapshot {
         let nodes = self
             .nodes()
             .map(|(_, node)| PersistedNode {
@@ -172,8 +180,6 @@ impl Graph {
                 strength: c.strength,
             })
             .collect();
-
-        let timestamp_secs = crate::time::unix_epoch_seconds();
 
         GraphSnapshot {
             nodes,

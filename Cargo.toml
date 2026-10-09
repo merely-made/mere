@@ -22,6 +22,7 @@ members = [
     "crates/system/notochord",
     "crates/system/registry",
     "crates/system/ux-events",
+    "crates/forme/curation",
     "crates/forme/forme",
     "crates/forme/uxtree",
     "crates/domain/apparatus",
@@ -432,6 +433,7 @@ paint_list_render = { version = "=0.1.2", git = "https://github.com/merely-made/
 # Published as `mere-forme`: the crates.io name `forme` is owned by someone else
 # (an HTML template engine). The `package =` alias keeps every `use forme::...`
 # in the tree working, so this rename is one line, not a sweep.
+curation = { package = "mere-curation", version = "0.1.0", path = "crates/forme/curation" }
 forme = { package = "mere-forme", version = "0.1.0", path = "crates/forme/forme" }
 uxtree = { version = "0.0.2", path = "crates/forme/uxtree" }
 
@@ -583,12 +585,12 @@ tincture = { package = "tinct", version = "=0.1.2", path = "crates/cambium/tinct
 # could not parse ratcheted announces from real RNS). Since the 2026-07-23 radio
 # merge the repo is one workspace (retinue, tulle, sennet, tucket, firmware), so
 # this is an immutable source-revision pin rather than a relative path.
-retinue = { version = "0.2.0", git = "https://github.com/merely-made/retinue.git", rev = "fa4f925059cc698058cb21fecc1c825d095741a9" }
+retinue = { version = "0.3.0", git = "https://github.com/merely-made/retinue.git", rev = "773515f21635093a319da1bd21f7354dfa430b5a" }
 # Signalman's station crates come from the same Retinue revision, so one
 # rev governs all four (device pairing plan, rulings 42 and 44).
-outrider = { version = "=0.2.0", git = "https://github.com/merely-made/retinue.git", rev = "fa4f925059cc698058cb21fecc1c825d095741a9" }
-postilion = { version = "=0.2.0", git = "https://github.com/merely-made/retinue.git", rev = "fa4f925059cc698058cb21fecc1c825d095741a9" }
-radio-hand = { version = "=0.0.1", git = "https://github.com/merely-made/retinue.git", rev = "fa4f925059cc698058cb21fecc1c825d095741a9" }
+outrider = { version = "=0.3.0", git = "https://github.com/merely-made/retinue.git", rev = "773515f21635093a319da1bd21f7354dfa430b5a" }
+postilion = { version = "=0.3.0", git = "https://github.com/merely-made/retinue.git", rev = "773515f21635093a319da1bd21f7354dfa430b5a" }
+radio-hand = { version = "=0.0.1", git = "https://github.com/merely-made/retinue.git", rev = "773515f21635093a319da1bd21f7354dfa430b5a" }
 
 # Reticulum identity derivation: HKDF-SHA256 stretches Mere's 32-byte master seed
 # into retinue's 64-byte dual-key private identity. retinue owns the X25519/RNG

@@ -1,8 +1,10 @@
 # Dramatis Repo Plan
 
 **Date**: 2026-10-06
-**Status (2026-10-07)**: assessed; rulings D1 to D23 (§3). Nothing built.
-The vault lock finishes first (D18), then phases DR-A to DR-E (§4).
+**Status (2026-10-09)**: assessed; rulings D1 to D27 (§3). Nothing built.
+D18's condition is met: the vault lock's L2 to L4 landed on 2026-10-08.
+DR-A's assessment is being refreshed against today's code before its
+forks are put to Mark (§6).
 **Scope**: the identity tier leaves mere for its own repository, `dramatis`,
 which becomes the product. personae, insigne, gaz, chatelaine (the
 keychain, still its own crate) and notochord move there, and gazette later.
@@ -356,6 +358,33 @@ vault lock first because L2 to L4 edit the castellan code DR-A moves.*
 Options: D18 stands; start DR-A beside the lock. Mark: **"D18 stands
 (Recommended)"**.
 
+Rulings D24 to D27 were asked on 2026-10-09 from DR-A's reassessment
+(§6), the first of three rounds.
+
+**Ruling D24** *(which crate D14's "dramatis" is).* *The facade
+`crates/dramatis/dramatis` exists and is empty. The views need personae's
+signing records, so the facade would depend on personae.* Options: the
+facade itself; a new plain-types crate below personae, re-exported by the
+facade; split by type. Mark: **"The facade itself (Recommended)"**.
+
+**Ruling D25** *(the signing records until DR-B).* *`personae/src/signing.rs:24-218`
+sits wholly behind `agent` (tokio, ssh-agent-lib), so castellan's views
+drag `agent` in; its approval broker is custody and moves in DR-B (D9).*
+Options: the plain records into an ungated personae module, the broker
+staying behind `agent`; into the home crate now, which forces a crate below
+personae; defer to DR-B. Mark: **"Personae, ungated (Recommended)"**.
+
+**Ruling D26** *(`VaultLockView` and `VaultProtectionView`).* *Since L2,
+`VaultLockView` is the type of castellan's lock watch channel
+(`authority.rs:244`, `:487`), consumed by djinn's triggers and status
+route.* Options: with the views; personae, beside `IdentityVault::is_locked`;
+chatelaine. Mark: **"With the views (Recommended)"**.
+
+**Ruling D27** *(callers through the move).* Options: `pub use` shims at
+the old paths, retired in DR-C (D15); shims for outside repos only, with
+mere's callers moved now; no shims. Mark: **"Re-export shims
+(Recommended)"**.
+
 Still open: whether gazette gets a matching facade name over gaz, the way
 chatelaine is the keychain.
 
@@ -453,3 +482,14 @@ rulings already made: D7 (leaf crates first, gazette held until its
 projection is split), D10 (notochord moves) and DR-D's done-condition
 (two apps on one identity revision, no duplicate types). They differ on
 castellan's home and on timing; D22 and D23 keep D6 and D18.
+
+**2026-10-09, D18 met; DR-A reassessed first.**
+- Mark: **"also, if it's time to promote dramatis, we can do that too"**.
+- **D18 is met.** The vault lock's L2 to L4 landed on 2026-10-08 (vault
+  lock plan §6). Ruling 44's transport-key switch is still unbuilt, but it
+  is not one of L2 to L4's done-conditions, and it touches only
+  Distillery, which stays in mere.
+- **Why reassess first:** L2 to L4 reworked castellan's `authority.rs`,
+  `view.rs` and `projection.rs` (lock state, the Locked card, the Secret
+  Service snapshot), which is the code DR-A moves. So the 2026-10-06 map is
+  being redrawn read-only before DR-A's forks are asked.

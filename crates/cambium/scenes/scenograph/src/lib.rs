@@ -20,6 +20,7 @@ use serde::{Deserialize, Serialize};
 pub mod dataset;
 pub mod options;
 pub mod relationship;
+pub mod swatch;
 
 /// The stable schema version for authored projection definitions.
 pub const PROJECTION_DEFINITION_VERSION: u16 = 1;

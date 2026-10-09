@@ -13,6 +13,7 @@ use crate::canvas::physics_catalog::{
     CANVAS_PHYSICS_MASS_SOURCES, CANVAS_PHYSICS_OVERLAYS, CANVAS_PHYSICS_PROFILES,
     PhysicsDepthSource, PhysicsKindSource, PhysicsLaw, PhysicsMassSource, PhysicsOverlay,
 };
+use crate::canvas::tests::ThroughView;
 
 /// A canvas with named nodes joined by directed semantic relations, for the
 /// petgraph-backed sources. A pair listed more than once gets a different
@@ -226,14 +227,14 @@ fn page_rank_weights_favour_the_linked_to() {
     // And it is the mass source Orbit and the hub overlays read.
     let mut canvas = canvas;
     canvas
-        .set_physics_overlays(vec![PhysicsOverlay::HubGravity])
+        .pick_overlays(vec![PhysicsOverlay::HubGravity])
         .unwrap();
-    canvas.set_physics_mass_source(PhysicsMassSource::PageRank);
+    canvas.pick_mass(PhysicsMassSource::PageRank);
     assert!(
         canvas.physics_forces_are_graph_bound(),
         "ranked hub weights follow the topology"
     );
-    canvas.set_physics_law(PhysicsLaw::Orbit).unwrap();
+    canvas.pick_law(PhysicsLaw::Orbit).unwrap();
     assert!(canvas.law_force_count() >= 3);
 }
 
@@ -284,9 +285,9 @@ fn layer_and_focus_depths_order_the_graph() {
     assert_eq!(inputs.focus_depths(None), inputs.root_depths());
     drop(inputs);
     canvas
-        .set_physics_overlays(vec![PhysicsOverlay::DepthGravity])
+        .pick_overlays(vec![PhysicsOverlay::DepthGravity])
         .unwrap();
-    canvas.set_physics_depth_source(PhysicsDepthSource::Layers);
+    canvas.pick_depth(PhysicsDepthSource::Layers);
     assert_eq!(canvas.law_force_count(), 4, "springs and the depth overlay");
 }
 
@@ -328,17 +329,17 @@ fn skeleton_and_weighted_stress_read_multiplicity() {
     );
     assert!((dist(keys[0], keys[1]) - 1.0).abs() < 1e-5);
     drop(inputs);
-    canvas.set_physics_law(PhysicsLaw::Still).unwrap();
+    canvas.pick_law(PhysicsLaw::Still).unwrap();
     canvas
-        .set_physics_overlays(vec![PhysicsOverlay::Skeleton])
+        .pick_overlays(vec![PhysicsOverlay::Skeleton])
         .unwrap();
     assert_eq!(canvas.law_force_count(), 2, "the hold and the tree");
     assert!(
         canvas.physics_forces_are_graph_bound(),
         "the tree follows the topology"
     );
-    assert!(canvas.apply_physics_profile("skeleton"));
-    assert_eq!(canvas.physics_profile_id(), Some("skeleton"));
+    assert!(canvas.pick_profile("skeleton"));
+    assert_eq!(canvas.view().profile_id(), Some("skeleton"));
 }
 
 #[test]
@@ -347,8 +348,8 @@ fn every_law_and_overlay_builds_on_the_sample_graph_without_moving_a_body() {
     canvas.set_physics_paused(true);
     let before = positions(&canvas);
     for law in PhysicsLaw::ALL {
-        canvas.set_physics_law(law).unwrap();
-        assert_eq!(canvas.physics_law(), law);
+        canvas.pick_law(law).unwrap();
+        assert_eq!(canvas.view().law, law);
         let expected_min = if law == PhysicsLaw::Still { 0 } else { 1 };
         assert!(
             canvas.law_force_count() >= expected_min,
@@ -363,10 +364,10 @@ fn every_law_and_overlay_builds_on_the_sample_graph_without_moving_a_body() {
         );
     }
     // The last law is Density, which refuses overlays; the toggles run on Springs.
-    canvas.set_physics_law(PhysicsLaw::Springs).unwrap();
+    canvas.pick_law(PhysicsLaw::Springs).unwrap();
     for overlay in PhysicsOverlay::ALL {
         assert!(
-            canvas.toggle_physics_overlay(overlay),
+            canvas.toggle_overlay(overlay),
             "{} toggles on",
             overlay.id()
         );
@@ -377,22 +378,22 @@ fn every_law_and_overlay_builds_on_the_sample_graph_without_moving_a_body() {
             overlay.id()
         );
     }
-    assert_eq!(canvas.physics_overlays().len(), PhysicsOverlay::ALL.len());
+    assert_eq!(canvas.view().overlays.len(), PhysicsOverlay::ALL.len());
     // Still + every overlay: the hold, then exactly one force per overlay.
-    canvas.set_physics_law(PhysicsLaw::Still).unwrap();
+    canvas.pick_law(PhysicsLaw::Still).unwrap();
     assert_eq!(canvas.law_force_count(), PhysicsOverlay::ALL.len() + 1);
     for overlay in PhysicsOverlay::ALL {
         assert!(
-            !canvas.toggle_physics_overlay(overlay),
+            !canvas.toggle_overlay(overlay),
             "{} toggles off",
             overlay.id()
         );
     }
     assert_eq!(canvas.law_force_count(), 1, "still is the hold alone");
     for source in PhysicsKindSource::ALL {
-        canvas.set_physics_law(PhysicsLaw::Kinds).unwrap();
-        canvas.set_physics_kind_source(source);
-        assert_eq!(canvas.physics_kind_source(), source);
+        canvas.pick_law(PhysicsLaw::Kinds).unwrap();
+        canvas.pick_kind(source);
+        assert_eq!(canvas.view().kind, source);
         assert!(
             canvas.law_force_count() >= 2,
             "kinds by {} builds",
@@ -405,20 +406,16 @@ fn every_law_and_overlay_builds_on_the_sample_graph_without_moving_a_body() {
 fn every_profile_applies_and_names_itself_back() {
     let mut canvas = Canvas::with_sample_graph();
     assert!(
-        !canvas.apply_physics_profile("plasma"),
+        !canvas.pick_profile("plasma"),
         "an unknown profile is refused"
     );
     for profile in CANVAS_PHYSICS_PROFILES {
         assert!(is_plain(profile.label), "{} is plain", profile.label);
-        assert!(
-            canvas.apply_physics_profile(profile.id),
-            "{} applies",
-            profile.id
-        );
-        assert_eq!(canvas.physics_law(), profile.law);
-        assert_eq!(canvas.physics_overlays(), profile.overlays);
+        assert!(canvas.pick_profile(profile.id), "{} applies", profile.id);
+        assert_eq!(canvas.view().law, profile.law);
+        assert_eq!(canvas.view().overlays, profile.overlays);
         assert_eq!(
-            canvas.physics_profile_id(),
+            canvas.view().profile_id(),
             Some(profile.id),
             "{} names itself back",
             profile.id
@@ -471,7 +468,7 @@ fn every_profile_applies_and_names_itself_back() {
 #[test]
 fn a_living_law_runs_until_paused_and_a_graph_bound_law_survives_a_reconcile() {
     let mut canvas = Canvas::with_sample_graph();
-    canvas.set_physics_law(PhysicsLaw::Orbit).unwrap();
+    canvas.pick_law(PhysicsLaw::Orbit).unwrap();
     assert!(canvas.physics_never_rests());
     assert!(canvas.is_settling(), "orbit keeps ticking");
     // Kinds is living too (F10's figures on the P2 fixture).
@@ -488,12 +485,12 @@ fn a_living_law_runs_until_paused_and_a_graph_bound_law_survives_a_reconcile() {
             PhysicsLaw::Sync
         ]
     );
-    canvas.set_physics_law(PhysicsLaw::Stress).unwrap();
+    canvas.pick_law(PhysicsLaw::Stress).unwrap();
     assert!(!canvas.physics_never_rests());
     let count = canvas.law_force_count();
     canvas.visit("https://a-new-node.example");
     assert_eq!(
-        canvas.physics_law(),
+        canvas.view().law,
         PhysicsLaw::Stress,
         "the law survives a topology change"
     );
@@ -504,7 +501,7 @@ fn a_living_law_runs_until_paused_and_a_graph_bound_law_survives_a_reconcile() {
     );
     // A graph swap keeps the choice too: the scene restore re-applies it afterwards anyway.
     canvas.set_graph(Graph::new());
-    assert_eq!(canvas.physics_law(), PhysicsLaw::Stress);
+    assert_eq!(canvas.view().law, PhysicsLaw::Stress);
 }
 
 /// What `never_rests` changes: switched to from rest, a living law (Kinds,
@@ -518,7 +515,7 @@ fn from_rest_a_living_law_ticks_on_and_a_resting_one_stops() {
         canvas.resize(800, 600);
         canvas.park_physics();
         assert!(!canvas.is_settling(), "at rest before the switch");
-        canvas.set_physics_law(law).unwrap();
+        canvas.pick_law(law).unwrap();
         for frame in 0..=u64::from(SETTLE_TICKS) + 60 {
             canvas.frame_at(
                 800,
@@ -552,13 +549,13 @@ fn a_whole_choice_applies_with_one_rebuild_and_reads_back() {
         depth: PhysicsDepthSource::Layers,
     };
     let before = canvas.law_rebuilds();
-    canvas.set_physics_choice(&choice).unwrap();
+    canvas.pick(&choice).unwrap();
     assert_eq!(
         canvas.law_rebuilds() - before,
         1,
         "one apply is one rebuild, whatever the sources"
     );
-    let live = canvas.physics_choice();
+    let live = canvas.view();
     assert_eq!(live.law, PhysicsLaw::Kinds);
     assert_eq!(live.kind, PhysicsKindSource::Cluster);
     assert_eq!(live.groups, PhysicsKindSource::Component);
@@ -573,35 +570,33 @@ fn a_whole_choice_applies_with_one_rebuild_and_reads_back() {
     // The same choice, built through the separate setters law-last, gives the
     // same force set: the one rebuild read the sources it was handed.
     let mut stepwise = Canvas::with_sample_graph();
-    stepwise.set_physics_kind_source(choice.kind);
-    stepwise.set_physics_group_source(choice.groups);
-    stepwise.set_physics_mass_source(choice.mass);
-    stepwise.set_physics_depth_source(choice.depth);
-    stepwise
-        .set_physics_overlays(choice.overlays.clone())
-        .unwrap();
+    stepwise.pick_kind(choice.kind);
+    stepwise.pick_groups(choice.groups);
+    stepwise.pick_mass(choice.mass);
+    stepwise.pick_depth(choice.depth);
+    stepwise.pick_overlays(choice.overlays.clone()).unwrap();
     let rebuilds = stepwise.law_rebuilds();
-    stepwise.set_physics_law(choice.law).unwrap();
+    stepwise.pick_law(choice.law).unwrap();
     assert!(stepwise.law_rebuilds() > rebuilds);
-    assert_eq!(stepwise.physics_choice(), live);
+    assert_eq!(stepwise.view(), live);
     assert_eq!(stepwise.law_force_count(), canvas.law_force_count());
     // A choice naming a profile's pair names that profile; any other is custom.
     canvas
-        .set_physics_choice(&PhysicsChoice {
+        .pick(&PhysicsChoice {
             law: PhysicsLaw::Springs,
             overlays: vec![PhysicsOverlay::GravityLocus],
             ..PhysicsChoice::default()
         })
         .unwrap();
-    assert_eq!(canvas.physics_profile_id(), Some("liquid"));
+    assert_eq!(canvas.view().profile_id(), Some("liquid"));
     canvas
-        .set_physics_choice(&PhysicsChoice {
+        .pick(&PhysicsChoice {
             law: PhysicsLaw::Still,
             overlays: vec![PhysicsOverlay::Skeleton],
             ..PhysicsChoice::default()
         })
         .unwrap();
-    assert_eq!(canvas.physics_profile_id(), None);
+    assert_eq!(canvas.view().profile_id(), None);
 }
 
 /// Density takes only the three overlays F73 named, converted (Hub room,
@@ -612,9 +607,9 @@ fn a_whole_choice_applies_with_one_rebuild_and_reads_back() {
 fn density_refuses_all_but_its_three_overlays_with_a_reason() {
     use crate::canvas::PhysicsChoice;
     let mut canvas = Canvas::with_sample_graph();
-    canvas.set_physics_law(PhysicsLaw::Density).unwrap();
+    canvas.pick_law(PhysicsLaw::Density).unwrap();
     let refused = canvas
-        .set_physics_overlays(vec![
+        .pick_overlays(vec![
             PhysicsOverlay::GravityLocus,
             PhysicsOverlay::Tide,
             PhysicsOverlay::GridSnap,
@@ -628,7 +623,7 @@ fn density_refuses_all_but_its_three_overlays_with_a_reason() {
             .starts_with("Density takes only Hub room, Centre and Tide")
     );
     assert_eq!(
-        canvas.physics_overlays(),
+        canvas.view().overlays,
         &[PhysicsOverlay::GravityLocus, PhysicsOverlay::Tide]
     );
     assert_eq!(
@@ -636,18 +631,15 @@ fn density_refuses_all_but_its_three_overlays_with_a_reason() {
         3,
         "Density, the centre and the tide"
     );
-    assert!(
-        !canvas.toggle_physics_overlay(PhysicsOverlay::Tide),
-        "toggled off"
-    );
-    assert_eq!(canvas.physics_overlays(), &[PhysicsOverlay::GravityLocus]);
-    assert!(!canvas.toggle_physics_overlay(PhysicsOverlay::Skeleton));
-    assert_eq!(canvas.physics_overlays(), &[PhysicsOverlay::GravityLocus]);
-    assert!(canvas.toggle_physics_overlay(PhysicsOverlay::DegreeRepulsion));
+    assert!(!canvas.toggle_overlay(PhysicsOverlay::Tide), "toggled off");
+    assert_eq!(canvas.view().overlays, &[PhysicsOverlay::GravityLocus]);
+    assert!(!canvas.toggle_overlay(PhysicsOverlay::Skeleton));
+    assert_eq!(canvas.view().overlays, &[PhysicsOverlay::GravityLocus]);
+    assert!(canvas.toggle_overlay(PhysicsOverlay::DegreeRepulsion));
     // The control: Springs takes them.
-    canvas.set_physics_law(PhysicsLaw::Springs).unwrap();
+    canvas.pick_law(PhysicsLaw::Springs).unwrap();
     canvas
-        .set_physics_overlays(vec![PhysicsOverlay::GravityLocus, PhysicsOverlay::GridSnap])
+        .pick_overlays(vec![PhysicsOverlay::GravityLocus, PhysicsOverlay::GridSnap])
         .unwrap();
     assert_eq!(
         canvas.law_force_count(),
@@ -656,10 +648,10 @@ fn density_refuses_all_but_its_three_overlays_with_a_reason() {
     );
     // Switching to Density with overlays live applies the law, drops the
     // ones it refuses, and says which.
-    let dropped = canvas.set_physics_law(PhysicsLaw::Density).unwrap_err();
+    let dropped = canvas.pick_law(PhysicsLaw::Density).unwrap_err();
     assert_eq!(dropped.refused, [PhysicsOverlay::GridSnap]);
-    assert_eq!(canvas.physics_law(), PhysicsLaw::Density);
-    assert_eq!(canvas.physics_overlays(), &[PhysicsOverlay::GravityLocus]);
+    assert_eq!(canvas.view().law, PhysicsLaw::Density);
+    assert_eq!(canvas.view().overlays, &[PhysicsOverlay::GravityLocus]);
     assert_eq!(canvas.law_force_count(), 2);
     // A whole choice: the law, the sources and the admitted overlay apply,
     // the rest are refused.
@@ -669,13 +661,10 @@ fn density_refuses_all_but_its_three_overlays_with_a_reason() {
         mass: PhysicsMassSource::PageRank,
         ..PhysicsChoice::default()
     };
-    let refused = canvas.set_physics_choice(&choice).unwrap_err();
+    let refused = canvas.pick(&choice).unwrap_err();
     assert_eq!(refused.refused, [PhysicsOverlay::HubGravity]);
-    assert_eq!(canvas.physics_mass_source(), PhysicsMassSource::PageRank);
-    assert_eq!(
-        canvas.physics_overlays(),
-        &[PhysicsOverlay::DegreeRepulsion]
-    );
+    assert_eq!(canvas.view().mass, PhysicsMassSource::PageRank);
+    assert_eq!(canvas.view().overlays, &[PhysicsOverlay::DegreeRepulsion]);
     // No profile pairs a law with an overlay it refuses.
     for profile in CANVAS_PHYSICS_PROFILES {
         assert!(

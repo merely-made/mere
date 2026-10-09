@@ -15,7 +15,7 @@ use std::sync::Arc;
 
 use kernel::graph::NodeKey;
 use pictograph::canvas::{
-    Canvas, Embedded, MeaningBackend, MeaningEngine, MeaningParams, MeaningSnapshot,
+    Canvas, Embedded, MeaningBackend, MeaningEngine, MeaningParams, MeaningSnapshot, PhysicsChoice,
     PhysicsKindSource, PhysicsLaw,
 };
 
@@ -32,10 +32,16 @@ pub fn snapshot_on(engine: Arc<dyn MeaningEngine>) -> (MeaningSnapshot, u64) {
     let (graph, _, _) = arxiv_graph();
     let mut canvas = Canvas::with_graph(graph);
     canvas.set_meaning_engine(engine);
-    canvas.set_physics_kind_source(PhysicsKindSource::Meaning);
-    canvas
-        .set_physics_law(PhysicsLaw::Kinds)
-        .expect("not refused");
+    // Kinds by meaning, set through the canvas's spec and its flat view
+    // (dynamics grammar plan, F162).
+    let mut spec = canvas.dynamics_spec().expect("the record reads");
+    PhysicsChoice {
+        law: PhysicsLaw::Kinds,
+        kind: PhysicsKindSource::Meaning,
+        ..PhysicsChoice::live(&canvas)
+    }
+    .write_into(&mut spec, &PhysicsChoice::live(&canvas));
+    canvas.set_dynamics_spec(&spec).expect("not refused");
     let snapshot = canvas.meaning().expect("a snapshot at build").clone();
     (snapshot, canvas.meaning_runs())
 }

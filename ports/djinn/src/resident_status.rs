@@ -389,10 +389,18 @@ impl IntentSink for ResidentStatusEndpoint {
     }
 }
 
+/// How long a stop waits for the asking session to end (ruling 88).
+const STOP_FALLBACK: std::time::Duration = std::time::Duration::from_secs(2);
+
 /// The control route's endpoint: stop, and unlock when given an unlocker.
+///
+/// One per session. A stop is raised when the session that asked for it
+/// ends, so the reply is written before the shutdown begins, or after
+/// [`STOP_FALLBACK`] if the session stays open (vault lock plan, ruling 88).
 pub struct ResidentControlEndpoint {
     stop: StopSignal,
     unlock: ControlUnlock,
+    stop_asked: bool,
 }
 
 impl ResidentControlEndpoint {
@@ -400,6 +408,7 @@ impl ResidentControlEndpoint {
         Self {
             stop,
             unlock: ControlUnlock::default(),
+            stop_asked: false,
         }
     }
 
@@ -420,9 +429,19 @@ impl ResidentControlEndpoint {
             Ok(Self {
                 stop: stop.clone(),
                 unlock: unlock.clone(),
+                stop_asked: false,
             })
         })?;
         Ok(route(RESIDENT_CONTROL_ROUTE))
+    }
+}
+
+impl Drop for ResidentControlEndpoint {
+    /// The asking session has ended, its reply written: the stop goes now.
+    fn drop(&mut self) {
+        if self.stop_asked {
+            self.stop.raise();
+        }
     }
 }
 
@@ -468,7 +487,14 @@ impl IntentSink for ResidentControlEndpoint {
         let payload = zeroize::Zeroizing::new(intent.payload);
         match intent.intent.as_str() {
             STOP_INTENT => {
-                self.stop.raise();
+                if !self.stop_asked {
+                    self.stop_asked = true;
+                    let stop = self.stop.clone();
+                    std::thread::spawn(move || {
+                        std::thread::sleep(STOP_FALLBACK);
+                        stop.raise();
+                    });
+                }
                 Ok(IntentResult::Accepted)
             },
             UNLOCK_INTENT => Ok(match &self.unlock.passphrase {
@@ -594,6 +620,33 @@ mod tests {
         }
     }
 
+    /// Ruling 88: the stop waits for the asking session to end, so its
+    /// reply is written first; a session left open still stops in time.
+    #[tokio::test]
+    async fn a_stop_is_raised_when_the_asking_session_ends() {
+        use std::time::Duration;
+        let stop = StopSignal::default();
+        let mut control = ResidentControlEndpoint::new(stop.clone());
+        assert_eq!(
+            control.invoke(invocation(STOP_INTENT, b"")).unwrap(),
+            IntentResult::Accepted
+        );
+        let early = tokio::time::timeout(Duration::from_millis(100), stop.raised()).await;
+        assert!(early.is_err(), "not raised while the session is open");
+        drop(control);
+        tokio::time::timeout(Duration::from_millis(100), stop.raised())
+            .await
+            .expect("raised when the session ends");
+
+        let held = StopSignal::default();
+        let mut open = ResidentControlEndpoint::new(held.clone());
+        open.invoke(invocation(STOP_INTENT, b"")).unwrap();
+        tokio::time::timeout(STOP_FALLBACK + Duration::from_secs(1), held.raised())
+            .await
+            .expect("raised by the fallback while the session stays open");
+        drop(open);
+    }
+
     /// Ruling 47: `unlock-native-v1` carries nothing. A payload, a
     /// passphrase sent where none belongs, is refused before the resident's
     /// prompt runs; the empty one runs it.
@@ -602,6 +655,7 @@ mod tests {
         let prompts = Arc::new(AtomicUsize::new(0));
         let counted = Arc::clone(&prompts);
         let mut control = ResidentControlEndpoint {
+            stop_asked: false,
             stop: StopSignal::default(),
             unlock: ControlUnlock {
                 passphrase: None,
