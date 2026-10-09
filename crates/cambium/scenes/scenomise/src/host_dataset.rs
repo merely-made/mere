@@ -115,6 +115,9 @@ pub enum HostDatasetError {
     /// The declared compared fields are empty, repeat a field, or name a
     /// field no revision declares.
     ComparedFields(String),
+    /// The declared compared relationship fields are empty, repeat a part,
+    /// or name a part outside [`crate::history::RELATIONSHIP_FIELDS`].
+    ComparedRelationshipFields(String),
 }
 
 impl fmt::Display for HostDatasetError {
@@ -181,6 +184,9 @@ impl fmt::Display for HostDatasetError {
                 write!(f, "revision {index} discloses another source")
             },
             Self::ComparedFields(problem) => write!(f, "the compared fields {problem}"),
+            Self::ComparedRelationshipFields(problem) => {
+                write!(f, "the compared relationship fields {problem}")
+            },
         }
     }
 }
@@ -341,6 +347,11 @@ pub struct HostDatasetV2 {
     /// change. Incident relationships count either way.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub compared_fields: Option<Vec<String>>,
+    /// The parts of a relationship whose change counts, from
+    /// [`crate::history::RELATIONSHIP_FIELDS`] (Ruling 146). Absent means
+    /// everything a relationship discloses except its source and revision.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub compared_relationship_fields: Option<Vec<String>>,
 }
 
 /// One revision in a host history, with what the source disclosed at it.
@@ -401,6 +412,7 @@ impl From<HostDatasetV1> for HostDatasetV2 {
                 relationships: envelope.relationships,
             }],
             compared_fields: None,
+            compared_relationship_fields: None,
         }
     }
 }
@@ -498,6 +510,26 @@ fn check_history(history: &HostDatasetV2) -> Result<(), HostDatasetError> {
             }
         }
     }
+    if let Some(parts) = &history.compared_relationship_fields {
+        if parts.is_empty() {
+            return Err(HostDatasetError::ComparedRelationshipFields(
+                "are empty".into(),
+            ));
+        }
+        let mut named = HashSet::new();
+        for part in parts {
+            if !named.insert(part.as_str()) {
+                return Err(HostDatasetError::ComparedRelationshipFields(format!(
+                    "name {part} twice"
+                )));
+            }
+            if !crate::history::RELATIONSHIP_FIELDS.contains(&part.as_str()) {
+                return Err(HostDatasetError::ComparedRelationshipFields(format!(
+                    "name {part}, which is not a relationship field"
+                )));
+            }
+        }
+    }
     Ok(())
 }
 
@@ -557,7 +589,12 @@ const PROVENANCE_KEYS: &[&str] = &[
     "evidence",
 ];
 const REVISION_KEYS: &[&str] = &["sequence", "revision"];
-const HISTORY_KEYS: &[&str] = &["schema", "revisions", "compared_fields"];
+const HISTORY_KEYS: &[&str] = &[
+    "schema",
+    "revisions",
+    "compared_fields",
+    "compared_relationship_fields",
+];
 const HISTORY_REVISION_KEYS: &[&str] = &["sequence", "revision", "dataset", "relationships"];
 
 /// Refuse a key the envelope does not define at any depth. A value of the

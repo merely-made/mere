@@ -1,5 +1,5 @@
 {
- "note": "Two real checkpoints of the site's repository authority, from the site build of merelyllc.com a812e7d (repos/index.html, history checkpoints 14 and 15 of the available ones), and the site's own `changes` reading of them (crates/repo-graph diff_graphs via project_reading_json), run unmodified at that revision.",
+ "note": "Two real checkpoints of the site's repository authority, from the site build of merelyllc.com a812e7d (repos/index.html, history checkpoints 14 and 15 of the available ones), and the site's own `changes` reading of them (crates/repo-graph diff_graphs via project_reading_json), run unmodified at that revision. Ruling 147b (2026-10-08): the expected edges keep a removed relationship only when both of its endpoints exist in the current checkpoint, which is what the site's diff_graphs comment intended; the site's code as written checked against current-plus-removed nodes and so kept every removed edge (8 here). Edges dropped by the correction: hocket-depends-on-genet, hocket-depends-on-mere, hocket-depends-on-netrender, hocket-depends-on-wavicle, hocket-depends-on-woodshed, isometry-depends-on-genet, isometry-depends-on-mere, isometry-depends-on-netrender.",
  "site_revision": "a812e7df929c5f5fea7031e6718eb41558eb5b44",
  "previous": {
   "cursor": {
@@ -923,39 +923,8 @@
    [
     "mere-renders-with-genet",
     null
-   ],
-   [
-    "hocket-depends-on-genet",
-    "removed"
-   ],
-   [
-    "hocket-depends-on-mere",
-    "removed"
-   ],
-   [
-    "hocket-depends-on-netrender",
-    "removed"
-   ],
-   [
-    "hocket-depends-on-wavicle",
-    "removed"
-   ],
-   [
-    "hocket-depends-on-woodshed",
-    "removed"
-   ],
-   [
-    "isometry-depends-on-genet",
-    "removed"
-   ],
-   [
-    "isometry-depends-on-mere",
-    "removed"
-   ],
-   [
-    "isometry-depends-on-netrender",
-    "removed"
    ]
   ]
- }
+ },
+ "site_removed_edges_as_written": 8
 }
