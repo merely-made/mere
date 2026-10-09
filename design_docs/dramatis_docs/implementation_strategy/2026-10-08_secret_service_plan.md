@@ -71,12 +71,17 @@ component, with the vault lock's semantics (rulings 10, 67 and 68).
         unlock;
   - [ ] a receipt on the real session bus under a name of its own, with
         `secret-tool` against it, and gnome-keyring left untouched.
-- **S2 — the name.** Done when:
-  - [ ] the check of which process holds `org.freedesktop.secrets`
-        reports it, and djinn says why it does not serve;
-  - [ ] gnome-keyring's secrets component is displaced as §3 rules, and
-        the displacement reverses cleanly;
-  - [ ] gnome-keyring's existing items are handled as §3 rules.
+- **S2 — its own name, and routing** (SS5 to SS7; amended 2026-10-09
+  from "the name"). Done when:
+  - [ ] djinn serves under a bus name of its own, and gnome-keyring keeps
+        `org.freedesktop.secrets` untouched;
+  - [ ] routing an app (a `SECRET_SERVICE_BUS_NAME` override in its
+        `.desktop` file) is a reversible step, and moves that app's items
+        across with a report (SS6);
+  - [ ] each item records its creating executable, shown in the snapshot
+        (SS7);
+  - [ ] the check of which process holds `org.freedesktop.secrets` reports
+        it.
 - **S3 — the launcher** (with pairing D2). Done when:
   - [ ] a djinn user unit starts the resident at logon, and the service
         before or after the first unlock behaves as §3 rules.
