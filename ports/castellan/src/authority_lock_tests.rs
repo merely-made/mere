@@ -461,3 +461,23 @@ async fn sign_over(
         })
         .await
 }
+
+/// The persisted lock (rulings 5, 80): with it kept, a lock writes the
+/// vault's marker and an unlock clears it; without it, nothing is written.
+#[test]
+fn a_kept_persisted_lock_follows_lock_and_unlock() {
+    let dir = tempdir().unwrap();
+    let vault_dir = dir.path().join("vault");
+    let Locked { host, resident, .. } = lockable(dir.path());
+    host.lock_vault().unwrap();
+    assert!(!personae::lock_persisted(&vault_dir), "only a host that keeps it writes it");
+    unlock(&host);
+
+    let host = host.with_persisted_lock(vault_dir.clone());
+    host.lock_vault().unwrap();
+    assert!(personae::lock_persisted(&vault_dir));
+    assert!(resident.is_locked());
+    unlock(&host);
+    assert!(!personae::lock_persisted(&vault_dir), "an unlock by a user act clears it");
+    assert!(host.unlock_vault(UnlockMethod::Passphrase(PASSPHRASE)).is_ok());
+}

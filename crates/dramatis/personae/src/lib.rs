@@ -103,11 +103,12 @@ pub use crate::provider::{
 pub use crate::retained::RetainedKeys;
 pub use crate::roster::{OpenedVault, Roster, RosterEntry, open_shared};
 pub use crate::seal::{seal_bytes, unseal_bytes};
-pub use crate::sealed_profile_storage::SealedProfileStorage;
+pub use crate::sealed_profile_storage::{AUTO_UNLOCK_ROOT_FILE, SealedProfileStorage};
 pub use crate::sealed_record_storage::{SealedRecordChange, SealedRecordStorage};
 pub use crate::startup_unlock::{
-    StartupUnlockMode, auto_unlock_backend_available, load_existing_auto_unlock_root,
-    load_or_create_auto_unlock_root,
+    PERSISTED_LOCK_FILE, StartupUnlockMode, auto_unlock_backend_available, clear_persisted_lock,
+    load_existing_auto_unlock_root, load_existing_auto_unlock_root_after_presence,
+    load_or_create_auto_unlock_root, lock_persisted, persist_lock,
 };
 pub use crate::unlock::{OsPresence, UnlockMethod, UnlockMethods};
 pub use crate::vault::{

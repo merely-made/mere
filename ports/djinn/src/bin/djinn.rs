@@ -915,7 +915,10 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         )
         // So a profile switch is remembered for the whole family, not just
         // applied to this resident.
-        .with_vault_dir(args.vault_dir.clone()),
+        .with_vault_dir(args.vault_dir.clone())
+        // Every lock persists beside the vault, so a restart waits for a
+        // user act (vault lock rulings 5, 76, 80).
+        .with_persisted_lock(args.vault_dir.clone()),
     );
     // The status follows the lock (ruling 31's watch channel; harness H4).
     // The doors' kept keys are captured now, while unlocked, so the doors
@@ -952,6 +955,23 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                 other => Err(format!("the native unlock ended: {other:?}")),
             }
         })
+    };
+    // What locks the vault besides an explicit act: the session locking,
+    // sleep and idle, each set in lock.toml (vault lock rulings 3, 73 to 77).
+    let _lock_triggers = {
+        let locker = Arc::clone(&personae);
+        let reported = events.clone();
+        let warned = events.clone();
+        djinn::lock_triggers::spawn(
+            djinn::lock_triggers::settings_path(&owner_settings::default_app_dir()),
+            move || locker.lock_vault().map_err(|error| error.to_string()),
+            personae.lock_state(),
+            move |reason| reported.emit("lock-trigger", json!({ "reason": reason.as_str() })),
+            move |warning| {
+                tracing::warn!(%warning, "lock settings");
+                warned.emit("lock-settings-warning", json!({ "warning": warning }));
+            },
+        )
     };
     let control_unlock = resident_status::ControlUnlock {
         passphrase: Some(unlocker.clone()),
