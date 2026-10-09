@@ -27,6 +27,12 @@ pub(super) struct Catalog {
     pub entries: Vec<IndexRow>,
     pub navigation: NavigationIndex,
     pub orphan_facets: NodeFacetStore,
+    pub pending: PendingIndex,
+}
+#[derive(Clone, Serialize, Deserialize)]
+pub(super) struct PendingIndex {
+    pub retention: kernel::graph::PendingLinkRetention,
+    pub owners: Vec<(Uuid, String)>,
 }
 #[derive(Clone, Serialize, Deserialize)]
 pub(super) struct NavigationIndex {

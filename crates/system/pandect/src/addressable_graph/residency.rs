@@ -43,12 +43,12 @@ impl<B: Backend> ResidentGraph<B> {
         let identical = generation == self.generation
             && records.keys().eq(self.records.keys())
             && policy == self.policy;
-        // All candidate construction and validation precedes persistent policy
-        // and in-memory publication; malformed reads leave the old view intact.
+        // All candidate construction and validation precedes policy persistence.
+        // A new source generation alone is not a change to available graph truth.
         let replacement = if identical {
             None
         } else {
-            let (snapshot, facets, coverage, footprint) = read::materialize(
+            let (snapshot, facets, coverage, mut footprint) = read::materialize(
                 &self.store,
                 &catalog,
                 &records,
@@ -56,15 +56,36 @@ impl<B: Backend> ResidentGraph<B> {
             )
             .await?;
             Graph::try_from_recorded_snapshot(&snapshot).map_err(|e| fail(e.to_string()))?;
-            Some((snapshot, facets, coverage, footprint))
+            let addresses = records.keys().copied().collect();
+            let (pending, bytes) = pending::load(
+                &self.store,
+                &catalog.pending,
+                &addresses,
+                policy == ResidencyPolicy::Full || records.len() == catalog.entries.len(),
+            )
+            .await?;
+            footprint.pending_bytes = bytes;
+            let mut comparable = snapshot.clone();
+            comparable.fields.sort_by(|a, b| a.id.cmp(&b.id));
+            comparable.couplings.sort_by(|a, b| a.id.cmp(&b.id));
+            let digest = hash(&encode(&(comparable, &facets))?);
+            Some((snapshot, facets, coverage, footprint, pending, digest))
         };
         if persist {
             self.store.set_policy(policy).await?;
         }
-        if let Some((snapshot, facets, coverage, footprint)) = replacement {
-            self.graph
-                .replace_loaded_recorded_snapshot(&snapshot, &facets, coverage)
-                .map_err(|e| fail(e.to_string()))?;
+        if let Some((snapshot, facets, coverage, footprint, pending, digest)) = replacement {
+            let composed = self.composed_coverage(&coverage);
+            if digest != self.available_digest {
+                self.graph
+                    .replace_loaded_recorded_snapshot(&snapshot, &facets, composed)
+                    .map_err(|e| fail(e.to_string()))?;
+            } else {
+                self.graph.set_known_coverage(composed);
+            }
+            self.graph.restore_pending_link_state(pending);
+            self.available_digest = digest;
+            self.residency_coverage = coverage;
             self.footprint = footprint;
         }
         self.catalog = Some(catalog);

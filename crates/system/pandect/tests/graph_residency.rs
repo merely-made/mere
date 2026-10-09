@@ -273,7 +273,9 @@ fn redb_real_store_controls() {
         neighborhood_controls(backend.clone()).await;
         session_controls(backend.clone()).await;
         identity_and_refusal_controls(backend.clone()).await;
-        read_footprint_controls(backend).await;
+        read_footprint_controls(backend.clone()).await;
+        p3_context_and_cache_controls(backend.clone()).await;
+        unloaded_only_cache_controls(backend).await;
         let reopened = muniment::RedbBackend::open(temp.path().join("graph.redb")).unwrap();
         let view = AddressableGraphStore::new(reopened, Uuid::from_u128(700))
             .open(Default::default())
@@ -294,7 +296,9 @@ async fn indexeddb_real_store_controls() {
     neighborhood_controls(backend.clone()).await;
     session_controls(backend.clone()).await;
     identity_and_refusal_controls(backend.clone()).await;
-    read_footprint_controls(backend).await;
+    read_footprint_controls(backend.clone()).await;
+    p3_context_and_cache_controls(backend.clone()).await;
+    unloaded_only_cache_controls(backend).await;
     let reopened = muniment::IndexedDbBackend::open(&name, "records")
         .await
         .unwrap();
@@ -753,4 +757,256 @@ fn live_allocation_scoped_partial_vs_full() {
             "partial={partial_live}, full={full_live}"
         );
     });
+}
+
+async fn p3_context_and_cache_controls<B: Backend + Clone>(backend: B) {
+    use kernel::graph::{
+        CoverageLimit, CoverageNote, PendingLink, PendingLinkRetention, ResourceNode,
+    };
+    use kernel::persistence::PersistedResourceRecord;
+    use pandect::graph_session::MereSessions;
+    let (mut graph, surfaces, resources) = source(32);
+    graph.set_pending_link_retention(PendingLinkRetention::UntilPurged);
+    for target in [
+        "https://not-possessed.test/".to_string(),
+        "https://residency.test/5".to_string(),
+    ] {
+        graph.queue_pending_link(PendingLink {
+            source_resource: resources[0],
+            source_surface: Some(surfaces[0]),
+            target_iri: target,
+            statement: SemanticStatementSpec {
+                predicate: "urn:test:pending".into(),
+                ..Default::default()
+            },
+        });
+    }
+    let sessions = MereSessions::new(backend.clone());
+    let mut session =
+        sessions.begin_recorded(kernel::graph::Author::person("pending-owner"), Some(graph));
+    let id = session.id();
+    let graph_id = *session.manifest().root_graph_id.as_uuid();
+    session.publish_resident_checkpoint().await.unwrap();
+    drop(session);
+    let ordinary = sessions.open(id).await.unwrap();
+    let mut view = sessions
+        .open_resident_graph(id, Default::default())
+        .await
+        .unwrap();
+    assert_eq!(
+        view.graph().pending_link_state(),
+        ordinary.graph().pending_link_state(),
+        "Full retains pending observations separately from truth"
+    );
+    assert_eq!(
+        view.graph().coverage_note(),
+        ordinary.graph().coverage_note()
+    );
+    drop(ordinary);
+    view.set_policy(ResidencyPolicy::Neighborhood { hops: 0 })
+        .await
+        .unwrap();
+    view.reconcile(roots(surfaces[0])).await.unwrap();
+    assert_eq!(view.graph().pending_links().len(), 2);
+    assert!(
+        view.graph()
+            .coverage_note()
+            .limits
+            .iter()
+            .any(|l| l.layer == CoverageLayer::Possession)
+    );
+    assert!(
+        view.graph()
+            .coverage_note()
+            .limits
+            .iter()
+            .any(|l| l.layer == CoverageLayer::Residency && l.resources.contains(&resources[5]))
+    );
+    let mut host = CoverageNote::default();
+    let mut note = CoverageLimit::new(CoverageLayer::Disclosure, "host withheld a source");
+    note.resources.push(resources[7]);
+    host.push(note);
+    let revision = view.graph().revision();
+    view.set_host_coverage(host.clone());
+    assert_eq!(view.graph().revision(), revision);
+    assert!(
+        view.graph()
+            .known_coverage()
+            .limits
+            .contains(&host.limits[0])
+    );
+    assert!(
+        view.graph()
+            .known_coverage()
+            .limits
+            .iter()
+            .any(|l| l.layer == CoverageLayer::Residency)
+    );
+    let before = serde_json::to_value(view.graph().to_snapshot_at(0)).unwrap();
+    let observation = view.graph().semantic_observation_revision();
+    let mut writer = sessions.open(id).await.unwrap();
+    writer
+        .apply_deltas(
+            kernel::graph::Author::person("editor"),
+            vec![GraphDelta::SetNodeBody {
+                key: writer.graph().get_node_key_by_id(surfaces[20]).unwrap(),
+                body: Some("unloaded-only edit".into()),
+            }],
+        )
+        .await
+        .unwrap();
+    writer.publish_resident_checkpoint().await.unwrap();
+    view.refresh().await.unwrap();
+    assert_eq!(
+        view.graph().revision(),
+        revision,
+        "unloaded body edits do not rerun available-data queries"
+    );
+    assert_eq!(view.graph().semantic_observation_revision(), observation);
+    assert_eq!(
+        serde_json::to_value(view.graph().to_snapshot_at(0)).unwrap(),
+        before
+    );
+    let resource = ResourceNode::for_term("urn:test:isolated");
+    let missing = resource.id();
+    writer
+        .apply_deltas(
+            kernel::graph::Author::person("editor"),
+            vec![GraphDelta::ReplaySetResourceRecordById {
+                resource_id: missing,
+                record: Some(PersistedResourceRecord {
+                    canonical_iri: resource.canonical_iri().into(),
+                    facets: vec![],
+                }),
+            }],
+        )
+        .await
+        .unwrap();
+    writer.publish_resident_checkpoint().await.unwrap();
+    view.refresh().await.unwrap();
+    assert_eq!(
+        view.graph().revision(),
+        revision,
+        "an unloaded addition changes coverage, not available truth"
+    );
+    assert!(view.graph().semantic_observation_revision() > observation);
+    assert_eq!(
+        view.status(GraphAddress::Resource(missing)),
+        ResidencyStatus::NotLoaded
+    );
+    assert!(
+        view.graph()
+            .known_coverage()
+            .limits
+            .contains(&host.limits[0]),
+        "host context survives source refresh"
+    );
+    let key = writer.graph().get_node_key_by_id(surfaces[0]).unwrap();
+    writer
+        .apply_deltas(
+            kernel::graph::Author::person("editor"),
+            vec![GraphDelta::SetNodeBody {
+                key,
+                body: Some("resident edit".into()),
+            }],
+        )
+        .await
+        .unwrap();
+    writer.publish_resident_checkpoint().await.unwrap();
+    view.refresh().await.unwrap();
+    assert!(view.graph().revision() > revision);
+    view.set_host_coverage(Default::default());
+    view.set_policy(ResidencyPolicy::Full).await.unwrap();
+    assert!(
+        !view
+            .graph()
+            .known_coverage()
+            .limits
+            .iter()
+            .any(|l| l.layer == CoverageLayer::Residency)
+    );
+    assert_eq!(
+        view.graph().pending_link_state(),
+        writer.graph().pending_link_state()
+    );
+    let old_revision = view.graph().revision();
+    let old_observation = view.graph().semantic_observation_revision();
+    writer
+        .edit_now(kernel::graph::Author::person("purger"), |g| {
+            g.purge_pending_links()
+        })
+        .unwrap();
+    writer.publish_resident_checkpoint().await.unwrap();
+    view.refresh().await.unwrap();
+    assert_eq!(view.graph().revision(), old_revision);
+    assert!(view.graph().semantic_observation_revision() > old_observation);
+    assert!(view.graph().pending_links().is_empty());
+    // Default session-only pending inputs remain deliberately ephemeral.
+    let mut ephemeral = Graph::new();
+    let key = apply::add_node(
+        &mut ephemeral,
+        Some(Uuid::from_u128(707)),
+        "https://ephemeral.test/".into(),
+        Default::default(),
+    );
+    let owner = ephemeral.shown_resource_id(key).unwrap();
+    ephemeral.queue_pending_link(PendingLink {
+        source_resource: owner,
+        source_surface: None,
+        target_iri: "https://absent.test/".into(),
+        statement: Default::default(),
+    });
+    let store = AddressableGraphStore::new(backend, Uuid::from_u128(705));
+    store.write_recorded_graph(&ephemeral).await.unwrap();
+    assert!(
+        store
+            .open(Default::default())
+            .await
+            .unwrap()
+            .graph()
+            .pending_links()
+            .is_empty()
+    );
+    let _ = graph_id;
+}
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn retained_pending_and_host_context() {
+    pollster::block_on(p3_context_and_cache_controls(MemoryBackend::new()));
+}
+
+async fn unloaded_only_cache_controls<B: Backend + Clone>(backend: B) {
+    let (mut graph, surfaces, _) = source(8);
+    let id = Uuid::from_u128(706);
+    let store = AddressableGraphStore::new(backend.clone(), id);
+    store.write_recorded_graph(&graph).await.unwrap();
+    store
+        .set_policy(ResidencyPolicy::Neighborhood { hops: 0 })
+        .await
+        .unwrap();
+    let mut view = store.open(roots(surfaces[0])).await.unwrap();
+    let revision = view.graph().revision();
+    let key = graph.get_node_key_by_id(surfaces[7]).unwrap();
+    apply_graph_delta(
+        &mut graph,
+        GraphDelta::SetNodeBody {
+            key,
+            body: Some("unloaded body".into()),
+        },
+    );
+    AddressableGraphStore::new(backend, id)
+        .write_recorded_graph(&graph)
+        .await
+        .unwrap();
+    view.refresh().await.unwrap();
+    assert_eq!(
+        view.graph().revision(),
+        revision,
+        "only source generation changed"
+    );
+}
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn unloaded_checkpoint_keeps_available_query_cache() {
+    pollster::block_on(unloaded_only_cache_controls(MemoryBackend::new()));
 }
