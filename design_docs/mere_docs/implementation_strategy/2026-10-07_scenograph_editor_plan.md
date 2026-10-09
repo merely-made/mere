@@ -1,7 +1,7 @@
 # Scenograph Editor Plan
 
 **Date:** 2026-10-07
-**Status (2026-10-08):** tracks E1 to E5 and C1 complete, each with headed checks in Chrome and Firefox (Safari not run); C2 landed (SE45 to SE51; F11 to F13), with headed checks in Chrome and Firefox; its label revision (SE52) landed with the web host's genet repin. Rulings SE1 to SE56 (§1). Waiting: genet branch `value-engine` (SE39 to SE42) for Mark or genet's lane to land, then mere's rhai `ValueEngine` and the rule runner after a coordinated repin. The Turnstone follow-up (SE32, SE35) is on Turnstone main at `d0775a1` (§3). Mapped, not opened: wallpapers and props, the style editors, authored motion (§3).
+**Status (2026-10-08):** tracks E1 to E5 and C1 complete, each with headed checks in Chrome and Firefox (Safari not run); C2 landed (SE45 to SE51; F11 to F13), with headed checks in Chrome and Firefox; its label revision (SE52) landed with the web host's genet repin. Rulings SE1 to SE60 (§1). Waiting: genet branch `value-engine` (SE39 to SE42) for Mark or genet's lane to land, then mere's rhai `ValueEngine` and the rule runner after a coordinated repin. The Turnstone follow-up (SE32, SE35) is on Turnstone main at `d0775a1` (§3). Mapped, not opened: wallpapers and props, the style editors, authored motion (§3).
 **Scope:** the editor foundation that Scenograph's editing surfaces stand on: one undo history in Cambium, and arrangement options declared as data. Carries out the balaur review's rulings A and B. The projection editor in Graphshell is the first consumer of both.
 
 Not in scope, mapped in §3 and opened by later rounds:
@@ -155,6 +155,16 @@ Mark, after the two-reading matrix landed: "i wonder if it's possible to do a ma
 **SE55, dynamics in cells.** Options: settled, one live on focus (recommended); settled only; all live. Mark: **"Settled, one live on focus (Recommended)"**.
 
 **SE56, scales.** Options: declared per axis, shared by default (recommended); always shared; always independent. Mark: **"Declared per axis (Recommended)"**.
+
+**SE57, what a swatch is made of.** Evidence put: cambium's `GraphCanvasSwatch` is a widget fed a host-built `GraphCanvasSubgraph`, outside the recipe and scene contract; the scope model record names a "swatch preset". Options: a portable swatch over a recipe, a scope, a mode and a recipe with its variant, composed by a facet, cambium's widget becoming one realization (recommended); the grid composes scenes and the swatch stays a widget. Mark: **"Portable swatch over a recipe (Recommended)"**.
+
+**SE58, reflection and projection.** Options: a reflection follows another view's recipe and camera live, a projection carries its own recipe and variant, one grid may mix them (recommended); a reflection is the mere's data as authored, a projection applies a recipe. Mark: **"Reflection follows, projection owns (Recommended)"**.
+
+**SE59, what may differ between cells.** Options: one scope, recipe axes (recommended); scope can be an axis too. Mark: **"Scope can be an axis too"**. *Follows:* a grid's axes may be scope as well as arrangement and then dynamics (SE54).
+
+**SE60, the first home.** Options: Graphshell's projection editor (recommended); a gloss pane; an embedded mere on the site. Mark: **"1 and 2 are clear consumers"**. *Follows:* the projection editor and the gloss pane are both named consumers. *Reading, not ruled:* in the catalog's terms they are the first forcing consumer and the second heterogeneous one, and their order is put back.
+
+Mark, with these: **"i am, of course, open to changing the concept to suit the stack as it is, not as it was months ago. but it seems a useful concept that needs restatement in the current terms."** *Follows:* TERMINOLOGY's **swatch** (wording ruled 2026-07-17) is restated in current terms and put back before it changes.
 
 ## 2. Tracks
 
