@@ -1,7 +1,7 @@
 # Scenograph Editor Plan
 
 **Date:** 2026-10-07
-**Status (2026-10-08):** tracks E1 to E5 and C1 complete, each with headed checks in Chrome and Firefox (Safari not run); C2 landed (SE45 to SE51; F11 to F13), with headed checks in Chrome and Firefox; its label revision (SE52) landed with the web host's genet repin. Rulings SE1 to SE82 (§1). Waiting: genet branch `value-engine` (SE39 to SE42) for Mark or genet's lane to land, then mere's rhai `ValueEngine` and the rule runner after a coordinated repin. The Turnstone follow-up (SE32, SE35) is on Turnstone main at `d0775a1` (§3). Mapped, not opened: wallpapers and props, the style editors, authored motion (§3).
+**Status (2026-10-08):** tracks E1 to E5 and C1 complete, each with headed checks in Chrome and Firefox (Safari not run); C2 landed (SE45 to SE51; F11 to F13), with headed checks in Chrome and Firefox; its label revision (SE52) landed with the web host's genet repin. Rulings SE1 to SE83 (§1). Waiting: genet branch `value-engine` (SE39 to SE42) for Mark or genet's lane to land, then mere's rhai `ValueEngine` and the rule runner after a coordinated repin. The Turnstone follow-up (SE32, SE35) is on Turnstone main at `d0775a1` (§3). Mapped, not opened: wallpapers and props, the style editors, authored motion (§3).
 **Scope:** the editor foundation that Scenograph's editing surfaces stand on: one undo history in Cambium, and arrangement options declared as data. Carries out the balaur review's rulings A and B. The projection editor in Graphshell is the first consumer of both.
 
 Not in scope, mapped in §3 and opened by later rounds:
@@ -213,6 +213,8 @@ Mark: "proceed!" Evidence put: the June gloss design (`mere_docs/design/2026-06-
 **SE81, picking a cell.** Options: apply it as one undo step through E2's history, the grid staying open (recommended); focus, then apply with a button. Mark: **"Apply it, one undo step (Recommended)"**.
 
 **SE82, a scope axis in the editor.** Options: arrangement only in the editor, scope arriving with the gloss (recommended); both now. Mark: **"Both now"**. *Found after the answer:* the editor compiles a host-supplied `ProjectionDataset` (source, revision, fields, occurrences; no relationships), three occurrences in the practice fixture; every `Scope` variant names graph structure the dataset lacks, and `SubgraphKind` has no plain selection kind. Put back as SE83.
+
+**SE83, the editor's scope rows.** Evidence put: SE82's finding. Options: two rows, every occurrence and the occurrences selected, `Scope` gaining a `Selection` of explicit ids that the gloss can reuse, the selection row hidden until something is selected (recommended); defer scope to the gloss; give the editor graph datasets first. Mark: **"Whole set and the selection (Recommended)"**. *Follows:* `Scope::Selection(Vec<String>)`; the editor's selection is one occurrence today, so its row shows that one until multiple selection exists.
 
 ## 2. Tracks
 

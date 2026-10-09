@@ -28,6 +28,8 @@ pub enum Scope {
     /// The graph nested within this node.
     NestedGraph(String),
     Mere(String),
+    /// An explicit set of ids, as a person picked them (SE83).
+    Selection(Vec<String>),
 }
 
 /// How a swatch gets its recipe (SE58).
