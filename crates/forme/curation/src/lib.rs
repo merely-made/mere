@@ -27,7 +27,9 @@ pub struct SubgraphSpec {
 /// The 9 canonical subgraph shapes from `subgraph_model.md`.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum SubgraphKind {
-    Ego { radius: u8 },
+    Ego {
+        radius: u8,
+    },
     Corridor,
     Component,
     Loop,
@@ -36,6 +38,11 @@ pub enum SubgraphKind {
     Session,
     Bridge,
     WorkbenchCorrespondence,
+    /// A saved SELECT query. The named column contains Resource IRIs.
+    Sparql {
+        query: String,
+        member_variable: String,
+    },
 }
 
 #[cfg(test)]
@@ -52,5 +59,16 @@ mod tests {
         let unit: SubgraphKind =
             serde_json::from_str(r#""WorkbenchCorrespondence""#).expect("reads");
         assert_eq!(unit, SubgraphKind::WorkbenchCorrespondence);
+    }
+}
+
+#[cfg(test)]
+mod saved_query_tests {
+    use super::*;
+    #[test]
+    fn sparql_spec_has_portable_query_and_explicit_member_column() {
+        let wire = r#"{"kind":{"Sparql":{"query":"SELECT ?item WHERE { ?item ?p ?o }","member_variable":"item"}},"anchors":[],"primary_anchor":null,"selectors":[]}"#;
+        let spec: SubgraphSpec = serde_json::from_str(wire).unwrap();
+        assert_eq!(serde_json::to_string(&spec).unwrap(), wire);
     }
 }

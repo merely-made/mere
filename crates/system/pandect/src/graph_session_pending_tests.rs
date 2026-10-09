@@ -271,3 +271,74 @@ fn cache_returning_to_saved_state_still_writes_after_an_older_batch() {
         );
     });
 }
+
+#[test]
+fn frozen_resource_selection_and_annotations_survive_recorded_save_reopen() {
+    pollster::block_on(async {
+        let sessions = MereSessions::new(MemoryBackend::new());
+        let base = baseline(PendingLinkRetention::SessionOnly);
+        let members: Vec<_> = base.resource_nodes().map(|node| node.id()).collect();
+        let mut session = sessions.begin_recorded(Author::user(), Some(base));
+        let id = session.manifest().session_id;
+        let (owner, _) = session
+            .edit_now(Author::user(), |graph| {
+                graph
+                    .freeze_resource_selection(
+                        serde_json::json!({"kind":"saved-selection"}),
+                        members,
+                    )
+                    .unwrap()
+            })
+            .unwrap();
+        let frozen = session
+            .graph()
+            .resource(owner)
+            .unwrap()
+            .nested_selection()
+            .unwrap()
+            .clone();
+        session
+            .edit_now(Author::user(), |graph| {
+                graph
+                    .append_resource_properties(
+                        owner,
+                        vec![kernel::types::NodeProperty {
+                            statement_id: "frozen-annotation".into(),
+                            predicate: "urn:test:annotation".into(),
+                            value: "keep this".into(),
+                            datatype: None,
+                            lang: None,
+                            graph_scope: Default::default(),
+                            provenance_iri: Some("urn:test:user".into()),
+                            asserted_at_ms: Some(53),
+                        }],
+                    )
+                    .unwrap();
+            })
+            .unwrap();
+        session.flush(SystemTime::now()).await.unwrap();
+        drop(session);
+        let reopened = sessions.open(id).await.unwrap();
+        assert_eq!(
+            reopened.graph().resource(owner).unwrap().nested_selection(),
+            Some(&frozen)
+        );
+        assert_eq!(
+            reopened.graph().resource_properties(owner)[0].statement_id,
+            "frozen-annotation"
+        );
+        assert_eq!(
+            reopened.graph().resource_properties(owner)[0].value,
+            "keep this"
+        );
+        assert!(
+            reopened
+                .graph()
+                .open_frozen_selection(owner)
+                .unwrap()
+                .coverage
+                .limits
+                .is_empty()
+        );
+    });
+}

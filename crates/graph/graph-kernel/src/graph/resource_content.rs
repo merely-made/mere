@@ -36,6 +36,10 @@ pub(crate) fn validate_content_record(
 ) -> Result<(), ContentError> {
     for facet in &record.facets {
         match facet.facet.as_str() {
+            super::frozen_selection::FROZEN_SELECTION => {
+                super::frozen_selection::selection_from_record(record)
+                    .map_err(ContentError::InvalidFacet)?;
+            },
             RESOURCE_PROPERTIES => {
                 let properties: Vec<crate::types::NodeProperty> =
                     serde_json::from_str(&facet.value_json)

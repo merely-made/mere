@@ -62,6 +62,10 @@ pub use cross_graph::ComponentCopy;
 mod assertion_write;
 pub mod pending_links;
 pub use pending_links::{PendingLink, PendingLinkRetention, PendingLinkRetry, PendingLinkState};
+pub mod frozen_selection;
+pub use frozen_selection::{FrozenSelection, OpenedFrozenSelection};
+#[cfg(test)]
+mod frozen_selection_tests;
 pub mod coverage;
 pub use coverage::{CoverageLayer, CoverageLimit, CoverageNote};
 pub mod edge_data;

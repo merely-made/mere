@@ -8,7 +8,21 @@
 //!
 //! This crate owns the pure half of the subgraph seam: the per-session subgraph
 //! index, linked-subgraph derivation/reconciliation, and the shape classifier in
-//! [`classifier`]. It depends only on forme + kernel + serde.
+//! [`classifier`]. SPARQL saved specs use the opt-in `query` capability.
+//!
+//! A `SubgraphKind::Sparql` carries SELECT text and the variable whose named
+//! IRI cells identify member Resources. [`try_derive_members`] returns coverage;
+//! [`SessionSubgraphs::try_record_linked`] and [`SessionSubgraphs::try_reconcile`]
+//! retain the local roster and report refusals. Sharing uses
+//! [`SessionSubgraphs::shared_spec`] only, so a receiver derives its own members.
+//! A new Resource from [`SessionSubgraphs::freeze_linked_with_nonce`] bears an
+//! immutable nested graph of member references and exact relation copies. Its
+//! record travels separately from the local subgraph index; ordinary Resource
+//! annotations and Surfaces refer to that owner. Opening it with
+//! [`Graph::open_frozen_selection`] reports missing references through coverage.
+//! The portable freeze takes a fresh host UUID; native hosts also have
+//! `freeze_linked`. Old shape wire formats and infallible calls remain supported;
+//! new saved-query consumers should use the checked paths.
 
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
@@ -17,10 +31,11 @@ use forme::{
     GraphMemberId, SubgraphBinding, SubgraphId, SubgraphKind, SubgraphMemberDelta, SubgraphRef,
     SubgraphSpec,
 };
-use kernel::graph::{EdgeFamily, Graph, RelationSelector};
+use kernel::graph::{CoverageNote, EdgeFamily, Graph, RelationSelector};
 use serde::{Deserialize, Serialize};
 
 pub mod classifier;
+mod saved;
 
 /// Crate version.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -48,11 +63,29 @@ pub struct SessionSubgraphs {
     /// changes what the derivation would produce (a spec edit, a roster edit, a rebind).
     #[serde(skip)]
     reconciled_revision: HashMap<SubgraphId, u64>,
+    #[serde(skip)]
+    observations: HashMap<SubgraphId, DerivationObservation>,
     /// Test-only observable: how many times [`derive_members`] has run through this
     /// index's reconcile paths, so tests can assert the revision gate skipped the walk.
     #[cfg(test)]
     #[serde(skip)]
     derive_calls: std::cell::Cell<usize>,
+}
+
+#[derive(Clone, Debug, Default)]
+struct DerivationObservation {
+    error: Option<String>,
+    missing_resources: Vec<GraphMemberId>,
+}
+
+/// One derivation, with coverage separate from the local member cache.
+#[derive(Clone, Debug)]
+pub struct DerivedMembers {
+    /// Surface UUIDs for shape walks; Resource UUIDs for SPARQL selections.
+    /// Resolve through the spec kind: UUID values can overlap across strata.
+    pub members: Vec<GraphMemberId>,
+    pub missing_resources: Vec<GraphMemberId>,
+    pub coverage: CoverageNote,
 }
 
 impl SessionSubgraphs {
@@ -90,6 +123,8 @@ impl SessionSubgraphs {
         id: SubgraphId,
     ) -> Option<SubgraphMemberDelta<GraphMemberId>> {
         self.reconcile_delta(graph, id)
+            .ok()
+            .flatten()
             .and_then(|(_, delta)| (!delta.is_empty()).then_some(delta))
     }
 
@@ -114,10 +149,14 @@ impl SessionSubgraphs {
         self.reconcile_all(graph)
     }
 
-    fn derive_members_counted(&self, graph: &Graph, spec: &SubgraphSpec) -> Vec<GraphMemberId> {
+    fn derive_members_counted(
+        &self,
+        graph: &Graph,
+        spec: &SubgraphSpec,
+    ) -> Result<DerivedMembers, String> {
         #[cfg(test)]
         self.derive_calls.set(self.derive_calls.get() + 1);
-        derive_members(graph, spec)
+        try_derive_members(graph, spec)
     }
 
     fn mint_id(&mut self) -> SubgraphId {
@@ -171,17 +210,8 @@ impl SessionSubgraphs {
     /// graph drifts. `anchors` holds the live derived set; `spec.primary_anchor` holds the
     /// seed (the anchors-vs-members split). Returns the new id. (Subgraph wiring Phase 3.)
     pub fn record_linked(&mut self, graph: &Graph, spec: SubgraphSpec) -> SubgraphId {
-        let id = self.mint_id();
-        let members = self.derive_members_counted(graph, &spec);
-        let seed = spec.primary_anchor.as_deref().and_then(|s| s.parse().ok());
-        let mut g = SubgraphRef::new_session(id);
-        g.kind = Some(spec.kind.clone());
-        g.anchors = members;
-        g.primary_anchor = seed;
-        g.binding = SubgraphBinding::Linked { spec };
-        self.subgraphs.push(g);
-        self.reconciled_revision.insert(id, graph.revision());
-        id
+        let derived = self.derive_members_counted(graph, &spec);
+        self.insert_linked(graph, spec, derived)
     }
 
     /// Freeze a multi-selection as a **Session** subgraph (the 2026-06-13 crystallize default): an
@@ -218,53 +248,72 @@ impl SessionSubgraphs {
         graph: &Graph,
         id: SubgraphId,
     ) -> Option<SubgraphMemberDelta<GraphMemberId>> {
-        let (truth, delta) = self.reconcile_delta(graph, id)?;
-        // The walk ran against this revision; record it whether or not anything drifted.
-        self.reconciled_revision.insert(id, graph.revision());
-        if delta.is_empty() {
-            return None;
-        }
-        if let Some(gm) = self.subgraphs.iter_mut().find(|g| g.id == id) {
-            gm.anchors = truth; // auto-apply: the live set tracks graph truth
-        }
-        Some(delta)
+        self.try_reconcile(graph, id).ok().flatten()
     }
 
-    /// Derive subgraph `id`'s truth set and diff it against the stored roster. `None`
-    /// when the subgraph is not `Linked` or the revision gate says the derivation would
-    /// be a repeat; otherwise `Some` even when the delta is empty (so [`reconcile`]
-    /// (Self::reconcile) can record the revision it walked against).
+    /// Checked reconciliation. Refusals preserve the prior roster and gate.
+    pub fn try_reconcile(
+        &mut self,
+        graph: &Graph,
+        id: SubgraphId,
+    ) -> Result<Option<SubgraphMemberDelta<GraphMemberId>>, String> {
+        let derived = match self.reconcile_delta(graph, id) {
+            Ok(derived) => derived,
+            Err(error) => {
+                self.observations.entry(id).or_default().error = Some(error.clone());
+                return Err(error);
+            },
+        };
+        let Some((truth, delta)) = derived else {
+            return Ok(None);
+        };
+        self.reconciled_revision.insert(id, graph.revision());
+        self.observations.insert(
+            id,
+            DerivationObservation {
+                error: None,
+                missing_resources: truth.missing_resources,
+            },
+        );
+        if let Some(g) = self.subgraphs.iter_mut().find(|g| g.id == id) {
+            g.anchors = truth.members;
+        }
+        Ok((!delta.is_empty()).then_some(delta))
+    }
+
     fn reconcile_delta(
         &self,
         graph: &Graph,
         id: SubgraphId,
-    ) -> Option<(Vec<GraphMemberId>, SubgraphMemberDelta<GraphMemberId>)> {
-        let g = self.subgraphs.iter().find(|g| g.id == id)?;
-        let spec = match &g.binding {
-            SubgraphBinding::Linked { spec } => spec,
-            _ => return None,
+    ) -> Result<Option<(DerivedMembers, SubgraphMemberDelta<GraphMemberId>)>, String> {
+        let Some(g) = self.get(id) else {
+            return Ok(None);
+        };
+        let SubgraphBinding::Linked { spec } = &g.binding else {
+            return Ok(None);
         };
         if self.reconciled_revision.get(&id) == Some(&graph.revision()) {
-            return None;
+            return Ok(None);
         }
-        let current = g.anchors.clone();
-        let truth = self.derive_members_counted(graph, spec);
-        let truth_set: HashSet<&GraphMemberId> = truth.iter().collect();
-        let cur_set: HashSet<&GraphMemberId> = current.iter().collect();
+        let truth = self.derive_members_counted(graph, spec)?;
+        let truth_set: HashSet<_> = truth.members.iter().collect();
+        let current_set: HashSet<_> = g.anchors.iter().collect();
         let delta = SubgraphMemberDelta {
             added: truth
+                .members
                 .iter()
-                .filter(|m| !cur_set.contains(m))
+                .filter(|m| !current_set.contains(m))
                 .copied()
                 .collect(),
-            removed: current
+            removed: g
+                .anchors
                 .iter()
                 .filter(|m| !truth_set.contains(m))
                 .copied()
                 .collect(),
-            rebased_seeds: Vec::new(),
+            rebased_seeds: vec![],
         };
-        Some((truth, delta))
+        Ok(Some((truth, delta)))
     }
 
     /// Convert a linked/branched subgraph to an unlinked session grouping without
@@ -385,15 +434,51 @@ impl SessionSubgraphs {
 /// Corridor / Loop / Frontier / Facet kinds are later sub-slices; they fall back to the
 /// seed alone for now.
 pub fn derive_members(graph: &Graph, spec: &SubgraphSpec) -> Vec<GraphMemberId> {
-    let Some(seed) = spec.primary_anchor.as_deref().and_then(|s| s.parse().ok()) else {
-        return Vec::new();
-    };
-    let selectors = selectors_from_spec(spec);
-    match spec.kind {
-        SubgraphKind::Component => graph.component_members(seed, &selectors),
-        SubgraphKind::Ego { radius } => graph.ego_members(seed, radius, &selectors),
-        _ => vec![seed],
+    // Compatibility for old shape callers. Saved-query consumers should use the
+    // checked API or SessionSubgraphs, which retains errors and coverage.
+    try_derive_members(graph, spec)
+        .map(|result| result.members)
+        .unwrap_or_default()
+}
+
+/// Checked shape/query derivation. A saved query is evaluated only with `query`.
+pub fn try_derive_members(graph: &Graph, spec: &SubgraphSpec) -> Result<DerivedMembers, String> {
+    if let SubgraphKind::Sparql {
+        query,
+        member_variable,
+    } = &spec.kind
+    {
+        #[cfg(feature = "query")]
+        {
+            let result =
+                linked_data::query::sparql_resource_members(graph, query, member_variable)?;
+            return Ok(DerivedMembers {
+                members: result.members,
+                missing_resources: result.missing_resources,
+                coverage: result.coverage,
+            });
+        }
+        #[cfg(not(feature = "query"))]
+        {
+            let _ = (query, member_variable);
+            return Err("saved SPARQL queries require Mere's query capability".into());
+        }
     }
+    let members = if let Some(seed) = spec.primary_anchor.as_deref().and_then(|s| s.parse().ok()) {
+        let selectors = selectors_from_spec(spec);
+        match spec.kind {
+            SubgraphKind::Component => graph.component_members(seed, &selectors),
+            SubgraphKind::Ego { radius } => graph.ego_members(seed, radius, &selectors),
+            _ => vec![seed],
+        }
+    } else {
+        vec![]
+    };
+    Ok(DerivedMembers {
+        members,
+        missing_resources: vec![],
+        coverage: graph.coverage_note(),
+    })
 }
 
 /// Map a spec's opaque `selectors` strings to kernel [`RelationSelector`]s (the edge
@@ -467,3 +552,6 @@ pub fn default_spec_for(anchor: GraphMemberId) -> SubgraphSpec {
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(all(test, feature = "query"))]
+mod query_tests;

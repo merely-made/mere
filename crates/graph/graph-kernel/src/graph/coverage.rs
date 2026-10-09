@@ -128,6 +128,32 @@ impl Graph {
         note
     }
 
+    /// Coverage for explicit portable references, without inventing absent records.
+    pub fn coverage_for_resource_refs(&self, references: &[Uuid]) -> CoverageNote {
+        let mut note = self.coverage_note();
+        let missing: std::collections::BTreeSet<_> = references
+            .iter()
+            .copied()
+            .filter(|id| self.resource(*id).is_none())
+            .filter(|id| {
+                !self.known_coverage.limits.iter().any(|limit| {
+                    limit.layer == CoverageLayer::Residency
+                        && (limit.resources.is_empty() || limit.resources.contains(id))
+                })
+            })
+            .collect();
+        if !missing.is_empty() {
+            let mut limit = CoverageLimit::new(
+                CoverageLayer::Possession,
+                "referenced resources are unavailable",
+            );
+            limit.count = Some(missing.len());
+            limit.resources = missing.into_iter().collect();
+            note.push(limit);
+        }
+        note
+    }
+
     pub fn copy_semantic_context_from(&mut self, graph: &Self) {
         self.restore_pending_link_state(graph.pending_link_state.clone());
         self.set_known_coverage(graph.known_coverage.clone());

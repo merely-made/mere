@@ -22,6 +22,7 @@ pub const TAGGED_WITH_IRI: &str = "https://mere.computer/ns/rel#taggedWith";
 #[derive(Debug, Clone, PartialEq)]
 pub struct ResourceNode {
     container: chartulary::Container<Uuid>,
+    pub(super) nested_selection: Option<super::FrozenSelection>,
 }
 
 impl ResourceNode {
@@ -39,11 +40,17 @@ impl ResourceNode {
 
     pub(crate) fn from_canonical_iri(canonical: &str) -> Self {
         Self {
+            nested_selection: None,
             container: chartulary::Container::with_identity(
                 chartulary::resource_id_from_canonical_iri(canonical),
             )
             .with_address_record(Address::new(canonical)),
         }
+    }
+
+    /// Immutable nested selection borne by this Resource, when frozen.
+    pub fn nested_selection(&self) -> Option<&super::FrozenSelection> {
+        self.nested_selection.as_ref()
     }
 
     /// The stable identity, shared by every surface showing this resource.
@@ -105,7 +112,7 @@ impl Graph {
             .collect()
     }
 
-    pub(crate) fn resource_record(&self, id: Uuid) -> Option<PersistedResourceRecord> {
+    pub fn resource_record(&self, id: Uuid) -> Option<PersistedResourceRecord> {
         let resource = self.resource(id)?;
         let facets = self
             .resource_facets
@@ -149,7 +156,37 @@ impl Graph {
             self.bump_revision();
             return true;
         };
-        let resource = ResourceNode::from_canonical_iri(&record.canonical_iri);
+        let mut resource = ResourceNode::from_canonical_iri(&record.canonical_iri);
+        let Ok(selection) = super::frozen_selection::selection_from_record(&record) else {
+            return false;
+        };
+        if let Some(existing) = self
+            .resource(id)
+            .and_then(|resource| resource.nested_selection())
+            && selection.as_ref() != Some(existing)
+        {
+            return false;
+        }
+        if self
+            .resource(id)
+            .is_some_and(|resource| resource.nested_selection().is_some())
+        {
+            let stored = self.resource_facets.get(
+                &id,
+                &chartulary::FacetId::new(super::frozen_selection::FROZEN_SELECTION),
+            );
+            let incoming = record
+                .facets
+                .iter()
+                .find(|facet| facet.facet == super::frozen_selection::FROZEN_SELECTION)
+                .and_then(|facet| {
+                    serde_json::from_str::<serde_json::Value>(&facet.value_json).ok()
+                });
+            if stored != incoming.as_ref() {
+                return false;
+            }
+        }
+        resource.nested_selection = selection;
         if resource.id() != id {
             return false;
         }

@@ -773,3 +773,69 @@ mod tests {
         );
     }
 }
+
+/// A SELECT roster of held Resource identities, with limits of this evaluation.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ResourceQueryMembers {
+    pub members: Vec<uuid::Uuid>,
+    /// Requested Resource IRIs not held here; retained for coverage refresh.
+    pub missing_resources: Vec<uuid::Uuid>,
+    pub coverage: kernel::graph::CoverageNote,
+}
+
+/// Evaluate the named member column as Resource references.
+pub fn sparql_resource_members(
+    graph: &Graph,
+    query: &str,
+    member_variable: &str,
+) -> Result<ResourceQueryMembers, String> {
+    let query = SparqlParser::new()
+        .parse_query(query)
+        .map_err(|e| e.to_string())?;
+    let evaluator = QueryEvaluator::new();
+    let results = evaluator
+        .prepare(&query)
+        .execute(GraphDataset::new(graph))
+        .map_err(|e| e.to_string())?;
+    let QueryResults::Solutions(solutions) = results else {
+        return Err("saved-query membership requires SELECT".into());
+    };
+    if !solutions
+        .variables()
+        .iter()
+        .any(|v| v.as_str() == member_variable)
+    {
+        return Err(format!("SELECT has no member variable ?{member_variable}"));
+    }
+    let identities: std::collections::HashMap<_, _> = graph
+        .resource_nodes()
+        .map(|r| (r.canonical_iri(), r.id()))
+        .collect();
+    let mut members = std::collections::BTreeSet::new();
+    let mut missing = std::collections::BTreeSet::new();
+    for solution in solutions {
+        let solution = solution.map_err(|e| e.to_string())?;
+        let Some(term) = solution.get(member_variable) else {
+            continue;
+        };
+        let Term::NamedNode(iri) = term else {
+            return Err(format!(
+                "?{member_variable} must contain Resource IRIs, not literals or blank nodes"
+            ));
+        };
+        if let Some(id) = identities.get(iri.as_str()) {
+            members.insert(*id);
+        } else {
+            missing.insert(kernel::graph::ResourceNode::for_term(iri.as_str()).id());
+        }
+    }
+    let missing_resources: Vec<_> = missing.into_iter().collect();
+    Ok(ResourceQueryMembers {
+        members: members.into_iter().collect(),
+        coverage: graph.coverage_for_resource_refs(&missing_resources),
+        missing_resources,
+    })
+}
+
+#[cfg(test)]
+mod resource_member_tests;
