@@ -1,7 +1,7 @@
 # Scenograph Editor Plan
 
 **Date:** 2026-10-07
-**Status (2026-10-08):** tracks E1 to E5 and C1 complete, each with headed checks in Chrome and Firefox (Safari not run); C2 landed (SE45 to SE51; F11 to F13), with headed checks in Chrome and Firefox; its label revision (SE52) landed with the web host's genet repin. Rulings SE1 to SE62 (§1). Waiting: genet branch `value-engine` (SE39 to SE42) for Mark or genet's lane to land, then mere's rhai `ValueEngine` and the rule runner after a coordinated repin. The Turnstone follow-up (SE32, SE35) is on Turnstone main at `d0775a1` (§3). Mapped, not opened: wallpapers and props, the style editors, authored motion (§3).
+**Status (2026-10-08):** tracks E1 to E5 and C1 complete, each with headed checks in Chrome and Firefox (Safari not run); C2 landed (SE45 to SE51; F11 to F13), with headed checks in Chrome and Firefox; its label revision (SE52) landed with the web host's genet repin. Rulings SE1 to SE66 (§1). Waiting: genet branch `value-engine` (SE39 to SE42) for Mark or genet's lane to land, then mere's rhai `ValueEngine` and the rule runner after a coordinated repin. The Turnstone follow-up (SE32, SE35) is on Turnstone main at `d0775a1` (§3). Mapped, not opened: wallpapers and props, the style editors, authored motion (§3).
 **Scope:** the editor foundation that Scenograph's editing surfaces stand on: one undo history in Cambium, and arrangement options declared as data. Carries out the balaur review's rulings A and B. The projection editor in Graphshell is the first consumer of both.
 
 Not in scope, mapped in §3 and opened by later rounds:
@@ -169,6 +169,18 @@ Mark, with these: **"i am, of course, open to changing the concept to suit the s
 **SE61, the swatch restated.** Evidence put: TERMINOLOGY's entry as worded 2026-07-17: "a compact graph-canvas projection embedded in a pane: a scoped rendering of a graph or nested graph, either mirroring the main view (a minimap) or projecting through its own lens (independent layout, scope, or overlays; the gloss is a pane containing a swatch). A representation, never an identity: gnodes render in an orrery or swatch, while the graph itself lives in the kernel. A swatch over a servitor's nested graph is that servitor's inspection UI. Wording ruled 2026-07-17" Options: the draft (a scope and a mode; a projection owns a recipe that compiles to a scene, a reflection follows another view live; a portable fact a gloss shows, a facet composes and an embed carries; a representation, never an identity) (recommended); a shorter form keeping the old core; rename it. Mark: **"The draft as written (Recommended)"**. *Follows:* TERMINOLOGY's **swatch** carries the draft, and the nested graph entry's "a canvas representation" becomes "a representation".
 
 **SE62, the consumers' order.** Options: the projection editor first, the gloss pane second (recommended); the gloss first. Mark: **"Editor first, gloss second (Recommended)"**. *Follows:* the projection editor's swatch grid opens the facet proof in the Graphshell web host; the gloss pane is the second heterogeneous consumer, bringing reflections and scope axes on a native host. Next: the portable swatch's shape and the facet contract, with the catalog's addition record, as their own round.
+
+### 1.6 The swatch's shape (2026-10-08)
+
+Mark: "proceed!" Evidence put: the June gloss design (`mere_docs/design/2026-06-07_gloss_navigator_design.md` §2a, §2b) already made the swatch "the portable, embeddable primitive configured by (scope, layout, lens, mode, filters)", with variants as points in that space, a view layer and an optional edit layer, embedded in facet panes, menus, djot notes and orrery cards, rendered as chrome-understood DOM; in current terms layout is the recipe's `Arrangement`, filters its `Reading`, the lens most of `Encoding` and `Appearance`, variants `ProjectionVariant`, the geometry a sceno `Scene`; scope has no portable type, forme has `SubgraphSpec` (nine kinds, anchors, selectors); sceno's `Scene` nests `Space`s; pandect names a view by `ViewKey`; June's "mode" is not SE58's.
+
+**SE63, scope.** Options: a tagged scope over existing ids, `Node`, `Subgraph(SubgraphSpec)`, `NestedGraph`, `Mere`, reusing forme's spec, Reading still deciding how it is read (recommended); scope folds into Reading; an opaque host scope. Mark: **"A tagged scope over existing ids (Recommended)"**.
+
+**SE64, the facet.** Options: one scene, a space per cell, axis labels as items, scales recorded per axis, through scenotime and the frozen and remote readers unchanged (recommended); separate scenes laid out by the host. Mark: **"One scene, a space per cell (Recommended)"**.
+
+**SE65, the edit layer.** Options: view now, editing inside a swatch later as interaction intents through host authority (recommended); carry a view/edit flag now. Mark: **"View now, edit as an intent later (Recommended)"**.
+
+**SE66, what a reflection follows.** Options: a pandect `ViewKey` or a sibling swatch in the same facet (recommended); only a view key. Mark: **"A view key, or a sibling cell (Recommended)"**.
 
 ## 2. Tracks
 
