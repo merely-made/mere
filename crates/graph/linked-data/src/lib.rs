@@ -70,14 +70,20 @@ pub mod statements;
 pub mod query;
 
 #[cfg(not(target_arch = "wasm32"))]
-pub use ingest::{ApplyOutcome, apply_contribution, apply_contribution_with_identity};
 pub use ingest::{
-    ContextCache, EdgeContribution, GraphContribution, IngestError, NodeContribution,
-    SubjectIdentity, from_jsonld, from_jsonld_with_contexts,
-    from_jsonld_with_contexts_and_base_iri, from_quads, is_bundled_context,
-    referenced_context_urls,
+    ApplyOutcome, apply_contribution, apply_contribution_with_identity, apply_import,
+    apply_import_with_identity,
 };
-pub use serialize::{from_nquads, from_trig, to_nquads, to_trig};
+pub use ingest::{
+    ContextCache, EdgeContribution, GraphContribution, ImportEnvelope, IngestError,
+    NodeContribution, SubjectIdentity, from_jsonld, from_jsonld_envelope,
+    from_jsonld_envelope_with_contexts, from_jsonld_envelope_with_contexts_and_base_iri,
+    from_jsonld_with_contexts, from_jsonld_with_contexts_and_base_iri, from_quads,
+    from_quads_envelope, is_bundled_context, referenced_context_urls,
+};
+pub use serialize::{
+    from_nquads, from_nquads_envelope, from_trig, from_trig_envelope, to_nquads, to_trig,
+};
 pub use statements::{StatementOutcome, apply_link_statements, resolve_rel};
 pub use vocab::{Alignment, alignment, vocabulary_alignment_quads};
 
@@ -528,7 +534,10 @@ pub fn node_quads(graph: &Graph, key: NodeKey, node: &Node) -> Vec<Quad> {
 /// The RDF dataset quads for the whole graph, including named-graph scoped
 /// semantic statements and node properties plus dataset-only reifier metadata.
 pub fn dataset_quads(graph: &Graph) -> Vec<Quad> {
-    dataset_quad_iter(graph).collect()
+    let mut seen = std::collections::HashSet::new();
+    dataset_quad_iter(graph)
+        .filter(|quad| seen.insert(quad.clone()))
+        .collect()
 }
 
 fn resource_edge_quads(
@@ -1110,10 +1119,10 @@ mod tests {
             "one shared triple term"
         );
 
-        let contribution =
-            crate::ingest::from_quads(crate::dataset_quads(&graph), "gate").expect("quad ingest");
+        let contribution = crate::ingest::from_quads_envelope(crate::dataset_quads(&graph), "gate")
+            .expect("quad ingest");
         let mut reimported = Graph::new();
-        let outcome = crate::ingest::apply_contribution(&mut reimported, &contribution);
+        let outcome = crate::ingest::apply_import(&mut reimported, &contribution);
         assert!(outcome.edges_skipped == 0, "self-contained contribution");
         assert_eq!(
             outcome.edges_asserted, 5,

@@ -27,7 +27,7 @@
 use kernel::graph::Graph;
 use oxttl::{NQuadsParser, NQuadsSerializer, TriGParser, TriGSerializer};
 
-use crate::ingest::{GraphContribution, IngestError, from_quads};
+use crate::ingest::{GraphContribution, ImportEnvelope, IngestError, from_quads_envelope};
 use crate::vocab::is_vocabulary_quad;
 use crate::{dataset_quads, vocabulary_alignment_quads};
 
@@ -66,6 +66,11 @@ pub fn to_trig(graph: &Graph) -> Result<String, String> {
 /// vocabulary-alignment graph. `namespace` scopes any skolemized blank nodes, as
 /// in [`from_quads`].
 pub fn from_nquads(text: &str, namespace: &str) -> Result<GraphContribution, IngestError> {
+    from_nquads_envelope(text, namespace).map(ImportEnvelope::into_contribution)
+}
+
+/// Parse N-Quads with the evidence required by the faithful profile importer.
+pub fn from_nquads_envelope(text: &str, namespace: &str) -> Result<ImportEnvelope, IngestError> {
     let mut quads = Vec::new();
     for quad in NQuadsParser::new().for_slice(text.as_bytes()) {
         let quad = quad.map_err(|e| IngestError::Parse(e.to_string()))?;
@@ -73,12 +78,17 @@ pub fn from_nquads(text: &str, namespace: &str) -> Result<GraphContribution, Ing
             quads.push(quad);
         }
     }
-    from_quads(quads, namespace)
+    from_quads_envelope(quads, namespace)
 }
 
 /// Parse **TriG** into a graph contribution, dropping the re-derivable
 /// vocabulary-alignment graph.
 pub fn from_trig(text: &str, namespace: &str) -> Result<GraphContribution, IngestError> {
+    from_trig_envelope(text, namespace).map(ImportEnvelope::into_contribution)
+}
+
+/// Parse TriG with the evidence required by the faithful profile importer.
+pub fn from_trig_envelope(text: &str, namespace: &str) -> Result<ImportEnvelope, IngestError> {
     let mut quads = Vec::new();
     for quad in TriGParser::new().for_slice(text.as_bytes()) {
         let quad = quad.map_err(|e| IngestError::Parse(e.to_string()))?;
@@ -86,13 +96,13 @@ pub fn from_trig(text: &str, namespace: &str) -> Result<GraphContribution, Inges
             quads.push(quad);
         }
     }
-    from_quads(quads, namespace)
+    from_quads_envelope(quads, namespace)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ingest::apply_contribution;
+    use crate::ingest::apply_import;
     use kernel::graph::apply::assert_semantic_relation_in_scope;
     use kernel::graph::fixtures::GraphFixtures;
     use kernel::graph::{SemanticStatementSpec, SemanticSubKind};
@@ -178,9 +188,9 @@ mod tests {
             "N-Quads file publishes the vocabulary alignment"
         );
 
-        let contribution = from_nquads(&text, "gate").expect("parse N-Quads");
+        let contribution = from_nquads_envelope(&text, "gate").expect("parse N-Quads");
         let mut reimported = Graph::new();
-        let outcome = apply_contribution(&mut reimported, &contribution);
+        let outcome = apply_import(&mut reimported, &contribution);
         assert_eq!(outcome.edges_skipped, 0, "self-contained contribution");
 
         assert_eq!(
@@ -195,9 +205,9 @@ mod tests {
         let graph = rich_graph();
         let text = to_trig(&graph).expect("serialize TriG");
 
-        let contribution = from_trig(&text, "gate").expect("parse TriG");
+        let contribution = from_trig_envelope(&text, "gate").expect("parse TriG");
         let mut reimported = Graph::new();
-        apply_contribution(&mut reimported, &contribution);
+        apply_import(&mut reimported, &contribution);
 
         assert_eq!(
             sorted_dataset(&graph),

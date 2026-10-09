@@ -13,8 +13,11 @@ kernel gate passes 430 tests plus its compile-fail type check; one doc example
 remains ignored. Pandect passes 345 tests, Canvas 303 and Graphshell 346 plus
 five integration tests after the final admission and fixture repairs. The
 locked workspace check exits 0. RDF tag
-metadata exposes one mandatory representation gap; the consolidated scope
-exception below is pending Mark's answer.
+metadata exposed one mandatory representation gap. Mark selected the additive
+import envelope and matching parse/apply APIs below; implementation and fresh
+RDF qualification remain incomplete. Mark requested a fresh-chat handoff;
+the frozen, unqualified envelope WIP and remaining work are recorded in the
+continuation handoff below. No Cargo gate has run on that WIP.
 Turnstone's owner has prepared reader adoption at its current pin; that is not
 qualification against this final supplier source. Consumer integration and Mere
 main integration remain held for Mark's review. Independent vocabulary/oracle
@@ -1836,6 +1839,18 @@ a contribution DTO extension with consumer adaptation, or explicit assertion
 semantics for tag definitions. None is implemented pending his answer. No new
 numbered checkpoint is added; accepted rulings remain unchanged.
 
+**Answer (2026-10-08).** Mark selected **"A. Add an import envelope and matching
+parse/apply APIs (Recommended). Carry parser evidence alongside the existing
+DTOs, preserve explicit assertion IDs, and adopt these APIs at Mere’s
+profile-import paths. Existing public DTO construction stays compatible."**
+The envelope carries parser evidence of explicit assertions separately from
+plain tag-definition metadata. Assertion intent is not inferred from handle
+syntax, source or timestamp. Existing contribution DTO fields remain unchanged;
+the profile-import paths adopt the matching APIs. This resolves the existing
+consolidated exception without adding a phase or numbered checkpoint. Exact
+quad round trips and explicit metadata-free assertion controls must pass before
+P2 completion.
+
 ### Remaining P2 seams and current consumer boundary (2026-10-08)
 
 The live writer paths now route the fixed families and custom declarations to
@@ -2081,6 +2096,92 @@ its time, and captures carry that stored ID (`graph/apply.rs`, 1405;
 asserter comparison makes both new invariant tests fail; restoring it passes
 the full 411-test kernel/store suite. This does not complete Resource literal
 routing. Fresh dependent checks and remaining P2 work are recorded in Progress.
+
+### Continuation handoff (2026-10-08)
+
+Mark requested a compact handoff because this chat is long. Implementation and
+all three agents are stopped; every in-flight edit is saved. P2 is incomplete.
+P1–P5 and the six P2 closure requirements remain the bound. P3–P5 have not begun.
+
+**Qualified base:** `72c68b6d`, already pushed on `graph-semantics`, after
+`6399fe6c` and `586167bd`. Worktree:
+`C:/Users/mark_/Code/worktrees/mere-graph-semantics`. Main is shared and untouched.
+Mark authorized branch commit/push and Turnstone coordination; main integration
+and consumer repinning remain review-gated. Retain this isolated worktree until
+the lane is integrated. Target `C:/t/cargo-targets/mere` is shared, reusable and
+contains the gate receipts; no compiler/test process belongs to this lane now.
+
+**Only remaining closure:** the RDF import representation exception above.
+Mark selected A, the additive import envelope, preserving public DTO construction.
+The current WIP is formatted and diff-clean but has not compiled or run tests:
+
+- `linked-data/src/ingest/envelope.rs` encloses the unchanged contribution and
+  parser evidence privately. `contribution()` borrows it; `into_contribution()`
+  explicitly discards evidence. Complete default-graph SKOS definitions are
+  recognized from original quads; reified label/owner entries remain assertions.
+- `ingest.rs`, `ingest/apply.rs`, `serialize.rs` and `lib.rs` add/export
+  `from_jsonld_envelope` and its context/base variants, `from_quads_envelope`,
+  `from_nquads_envelope`, `from_trig_envelope`, and `apply_import` with its identity
+  variant. Old DTO fields and old parser/apply signatures remain unchanged.
+  Scoped `rdf:type` no longer gets flattened into a default classification.
+- `ingest/exact.rs` attempts exact carried literal and semantic admission using
+  existing record/pair replay deltas and global-handle preflight. Resource
+  properties use exact handle union, preserving distinct IDs and absent source
+  or time. Ordinary live reassertion dedup remains unchanged.
+- The four previously failing profile/format tests in `lib.rs`, `serialize.rs`
+  and `resource_metadata.rs` now use envelope APIs. Their whole-quad comparisons
+  are unchanged. New paired-ID and foreign-definition controls are still missing.
+- `document-lanes/src/structured_data.rs` and `lib.rs` add parallel
+  `JsonLdImportBlockProjection`/`JsonLdImportOutcome` and
+  `project_json_ld_import_blocks[_with_base_iri]`/`json_ld_imports[_with_base_iri]`.
+  The old public helpers and outcome payload remain compatible. Saved controls
+  cover DOM text/order/errors, cached contexts/base IRIs, complete versus partial
+  concepts, explicit metadata-free IDs and repeated import. They are unrun.
+
+**Known defect to repair first:** `ingest/exact.rs::import_edge` passes a full
+Surface pair to `ReplaySetEdgesByIds`. `graph-kernel/src/graph/edge_ops.rs`
+`set_edges_between` rebuilds through `snapshot/from.rs::restore_persisted_edge`,
+which merges parallel Surface records and can overwrite an earlier Traversal
+array. Preflight preserves the rows; mutation does not. Reproduce with two valid
+recorded Surface rows on one pair, distinct Traversal arrays, and an incoming
+carried assertion for a declared Surface predicate. Assert complete original
+rows/payloads survive, alongside the new assertion. Resource pair replay is exact.
+Keep established C1 missing-source normalization on legacy Surface claims;
+qualify exact Surface metadata with source-present controls. No new semantic
+policy or numbered checkpoint is needed for this invariant repair.
+
+**Then add controls:** paired explicit prefLabel, owner and ordinary-literal
+assertions on the same triple, with distinct opaque/UUID/empty handles and absent
+source/time. Assert exact Resource records and complete quad sets. Include plain
+complete definitions, partial/multiple owner or label definitions, typed/language
+labels and scoped Concept type/metadata as same-run controls. Syntax/source/time
+heuristics must not replace parser evidence. Keep ordinary live dedup controls.
+
+**Qualification:** root alone runs Cargo, serially, offline/locked, one build job
+and `--test-threads=1`, reusing the stable target. Run full
+`cargo test -p mere-linked-data --features query --offline --locked -j 1`, full
+`cargo test -p mere-document-lanes --features eidetic-bridge,fleece-json-ld --offline --locked -j 1`,
+then `cargo check --workspace --offline --locked -j 1`. If kernel changes, rerun
+kernel/store and affected dependent tests plus the wasm32 kernel check. Record
+all failures with positive controls; do not weaken normalized whole-quad equality.
+Run `python scripts/mere_doc_audit.py` and diff checks after document edits.
+
+**Standing receipts at the qualified base:** kernel/store 430 plus one
+compile-fail doctest; Pandect 345; Eidetic/Fjall 118; Canvas 303; Cartography 45;
+document-lanes 17 units plus one peer-transfer integration; Graphshell 346 units
+plus five integration tests. Locked workspace and kernel/Pandect wasm checks
+exit 0. The previous RDF/query run is 62 passed, four failed at
+`graph-semantics-p2-rdf-exception-controls.log`. Individual receipt names are in
+the latest Progress entry. Ignored/headed/browser/device tests and final supplier
+sibling builds are unrun. Turnstone's existing-pin proof is separate: prepared
+reader adoption `78a59e1`, notes `eeb4a50`, old Mere pin `3ded2cd7`.
+
+Finish the bounded repair, qualify and update this plan/index, then commit/push
+on the lane branch and report P2 to Mark. Stop at the phase boundary. Do not
+integrate main, repin consumers or start P3 without Mark's review. No new
+dependencies, downloads, manifests/lock changes, sibling edits or generated
+output trees are authorized. Original naming remains ResourceNode/SurfaceNode,
+with Node/NodeKey as Surface compatibility names and SurfaceId kept distinct.
 
 ## 3. Rulings
 
@@ -2721,6 +2822,24 @@ binding; this list no longer grows as a running implementation checklist.
   transactional qualification and sealed wrapper support in this lane.
 
 ## 6. Progress
+
+- **2026-10-08. Fresh-chat handoff requested; envelope WIP frozen.** Mark asked
+  for a handoff. All agents stopped and saved their edits. The exact import helper
+  has a known Surface parallel-record preservation defect; paired-ID and scoped
+  definition controls remain to be added. No Cargo gate has run on the WIP.
+  The continuation handoff in Findings names the qualified base, pending files,
+  concrete repair, gate commands and review boundaries. Branch commit/push is
+  authorized; any saved WIP checkpoint must be labelled unqualified. P2 remains
+  incomplete, and P3–P5 remain unstarted.
+
+- **2026-10-08. RDF exception answered; bounded repair resumed.** Mark selected
+  the additive import envelope and matching parse/apply APIs, preserving public
+  DTO construction. The existing RDF lane implements the parser-evidence seam
+  and Mere profile-import adoption; root retains serial Cargo ownership and the
+  exact whole-quad controls. Prior independent gates and pushed source
+  `72c68b6d` remain qualified. P2 stays incomplete until the fresh RDF gate and
+  affected checks pass. P3–P5 have not begun; main and consumer integration
+  remain review-gated.
 
 - **2026-10-08. Remaining P2 source and fresh qualification in progress.**
   Production routing, shared content, replay/profile guards, existing immutable
