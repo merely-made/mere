@@ -5,12 +5,14 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use sceno::{
-    Backdrop, InstanceId, ProjectedItem, Rect, Region, RoutedRelation, SourceIx, SourceRef, Space,
-    SpaceId,
+    Backdrop, Fold, InstanceId, ProjectedItem, Rect, Region, RoutedRelation, SourceIx, SourceRef,
+    Space, SpaceId, StandIn,
 };
 use serde::{Deserialize, Serialize};
 
-use crate::{BackdropId, RegionId, RelationId, Revision, SceneEpoch, SceneSnapshot, SnapshotError};
+use crate::{
+    BackdropId, FoldId, RegionId, RelationId, Revision, SceneEpoch, SceneSnapshot, SnapshotError,
+};
 
 /// One idempotent transition within a scene epoch.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -99,6 +101,25 @@ pub enum SceneOp {
     },
     TombstoneRegion {
         index: RegionId,
+    },
+    /// Fold: the members are hidden behind the stand-in from this revision.
+    /// Refolding after an unfold appends a new slot.
+    AddFold {
+        index: FoldId,
+        value: Fold,
+    },
+    UpdateFold {
+        index: FoldId,
+        value: Fold,
+    },
+    /// Change only what is drawn in the fold's place.
+    SetFoldStandIn {
+        index: FoldId,
+        stand_in: StandIn,
+    },
+    /// Unfold: the fact goes, and the members show as they were.
+    TombstoneFold {
+        index: FoldId,
     },
     SetBounds {
         bounds: Rect,
@@ -233,6 +254,17 @@ impl SceneSnapshot {
                 update(&mut tables.regions, index.0, value.clone(), "region")
             },
             SceneOp::TombstoneRegion { index } => tombstone(&mut tables.regions, index.0, "region"),
+            SceneOp::AddFold { index, value } => {
+                append(&mut tables.folds, index.0, value.clone(), "fold")
+            },
+            SceneOp::UpdateFold { index, value } => {
+                update(&mut tables.folds, index.0, value.clone(), "fold")
+            },
+            SceneOp::SetFoldStandIn { index, stand_in } => {
+                active_mut(&mut tables.folds, index.0, "fold")?.stand_in = stand_in.clone();
+                Ok(())
+            },
+            SceneOp::TombstoneFold { index } => tombstone(&mut tables.folds, index.0, "fold"),
             SceneOp::SetBounds { bounds } => {
                 tables.bounds = *bounds;
                 Ok(())
