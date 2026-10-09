@@ -1,7 +1,7 @@
 # Dramatis Repo Plan
 
 **Date**: 2026-10-06
-**Status (2026-10-09)**: assessed; rulings D1 to D34 (§3). DR-A in progress: A0 and A1 landed, A2 and A3 gated (§6).
+**Status (2026-10-09)**: assessed; rulings D1 to D34 (§3). DR-A landed on 2026-10-09 (§6); DR-B is next.
 D18's condition is met: the vault lock's L2 to L4 landed on 2026-10-08.
 DR-A's assessment is being refreshed against today's code before its
 forks are put to Mark (§6).
@@ -438,9 +438,10 @@ finishes (D18).
 - **DR-A — the type split, inside mere.** The plain types leave `signing.rs`,
   `view.rs`, `projection.rs` and `otp/` for their ruled homes (D14, D21),
   with no change in behaviour. Done when:
-  - [ ] `IdentitySurfaceSnapshot`'s public JSON is byte-identical against
+  - [x] `IdentitySurfaceSnapshot`'s public JSON is byte-identical against
         a fixture;
-  - [ ] castellan's, graphshell's and djinn's test counts are unchanged.
+  - [x] castellan's, graphshell's and djinn's test counts are unchanged.
+        *(2026-10-09, conserved by name per D33; §6.)*
 
   *2026-10-09, DR-A's checkpoints* (from the reassessment in §6 and rulings
   D24 to D33), smallest blast radius first. Each lands only after its gate
@@ -636,3 +637,39 @@ directory (F183). The test inventories are in `Code/testing/mere/dra/`.
 - **Rebases:** main moved twice while A0 and A1 waited, once with 253 lock
   lines. Each time `cargo metadata --locked` confirmed the lock, and the
   gate reran on the rebased tip before the push.
+
+**2026-10-09, DR-A done** (A0 to A7 on main, ending `19853594`).
+- **A4, the views and snapshot** (`762c2fa8`): `dramatis::view`. The
+  goldens are byte-identical in both forms on Windows and Fedora, and the
+  facade's tree has no castellan, pandect, chirograph, tokio or
+  ssh-agent-lib.
+- **A5, the receipts** (`e68854f3`): `dramatis::receipts`, with
+  `IdentityIntentError` staying in castellan.
+- **A6, the Secret Service metadata** (`a1a7f1b7`):
+  `chatelaine::secret_metadata`.
+  - Lookups return a narrowed `MetadataLookupError`, and builder methods
+    let castellan's store fill the snapshot.
+  - The ids keep a public inner field and their serde form.
+  - The first Fedora gate failed to compile castellan with
+    `secret-service`: the Linux-only D-Bus layer converts errors into
+    `SecretDbusError`, which Windows never builds. The fix, a conversion
+    beside the existing one, was folded into the unpushed A6.
+  - Fedora then passed, and so did `secret_service_linux` (2 of 2) under
+    `dbus-run-session`.
+- **A7, close** (`19853594`): the gate passes on both targets.
+  - Windows: personae, castellan and djinn, with the `locked_restart`,
+    `harness` and `lock_agent` receipts and graphshell's 212. The installed
+    resident is unchanged.
+  - Fedora: the same crates, with castellan under every feature set.
+  - Every test name is conserved against A0. The only moves are the tile's
+    two tests (to chatelaine) and the broker's four (to
+    `signing::broker`), plus four graphshell tests upstream added during
+    the work.
+  - Knot: djinn builds knot-site through mere's patch table, and
+    knot-editor's `resident_app_route` test names only
+    `graphshell::identity` and `graphshell::native::personae_host`, which
+    the shims keep.
+  - The docs and the two record corrections landed with it.
+- **Next:** DR-B, custody into castellan (D8, D9), after the vault lock's
+  ruling 44 and ruling 91 by D34's order: DR-A, then 44, then 91. DR-B's
+  place in that order is not yet ruled.
