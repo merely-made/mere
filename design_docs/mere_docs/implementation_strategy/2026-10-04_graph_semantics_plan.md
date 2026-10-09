@@ -10,9 +10,12 @@ native suites, the locked workspace check, kernel/Pandect/query-feature wasm
 checks and the full standalone browser wasm check pass. Fresh source review
 cleared both reported defects after observed-negative regressions and repairs.
 P3 is merged and published on main and graph-semantics at `066668b7f`,
-including main `07c39def0` and its vault-lock design document. All 3067 qualified source/assets/manifests
-bytes match the frozen P3 receipt. Both remote hashes were verified exactly; P4 continues. Rulings 1–46 remain authoritative; C5/C6 are settled. P4–P5 code
-has not begun. Earlier Windows/Linux receipts below are historical.
+including main `07c39def0` and its vault-lock design document. All 3067
+qualified source/assets/manifests bytes match the frozen P3 receipt. Both remote
+hashes were verified exactly; P4 continues. Rulings 1–46 remain authoritative;
+C5/C6 are settled. P4 saved-query and frozen-selection implementation is undergoing
+qualification;
+P5 has not begun. Earlier Windows/Linux receipts below are historical.
 Consumer repinning and vocabulary/oracle cleanup remain separate under §4.
 
 Four questions were put to Mark from outside the project: what a link records,
@@ -3986,3 +3989,61 @@ remain. P4 is the next authorized phase, with a report at its boundary.
 origin/graph-semantics; both remote hashes were verified against HEAD.
 Documentation audit counts match the prior published P3 receipt exactly and
 the planted-defect self-test passes. P4 now continues under Mark’s authorization.
+
+### P4 implementation and qualification in progress (2026-10-09)
+
+P3 main publication and documentation receipt `d8c6c51aa` are verified on both
+remote branches. P4 now implements the bounded rulings 3, 8 and 46 inline.
+`SubgraphKind::Sparql` adds saved SELECT text and an explicit member variable
+beside the nine existing shapes, preserving their old wire format. The existing
+query capability resolves named IRI cells to held Resource identities, with
+coverage for requested unavailable identities; literals and blank nodes do not
+alias IRIs. Checked creation/reconciliation report errors, preserve the previous
+roster on refusal and never record a failed derivation as a successful revision.
+An unchanged graph revision skips evaluation while host coverage refreshes.
+Sharing returns the spec alone, without local roster or subgraph id.
+
+Freeze evaluates the definition at the current graph revision and mints a new
+Resource bearing a versioned immutable nested selection in its durable resource
+record. The value contains member Resource UUID references, exact Resource
+relation/statement copies, spec and source revision. It copies no member payloads
+and inserts no copied assertions into live truth. Surface display and Resource
+annotations use the existing paths. Captures and snapshots carry this owner
+record independently of workspace appearances and the session-local index.
+Opening a transferred owner retains references and reports unavailable members
+through P3 coverage, respecting known residency limits. Native hosts generate a
+fresh nonce; portable hosts supply one, matching existing Surface identity APIs.
+
+Routine implementation choices: an explicit SELECT column avoids guessing which
+cells are members; a versioned Resource facet bears the immutable nested graph
+without adding mutable log slots or a storage engine; freezing refuses explicitly
+unavailable requested members instead of silently freezing a partial roster.
+Their costs are the new spec variant, opening the owning Resource record to read
+the selection, and loading requested members before freezing. None changes the
+five-phase bound or adds a new checkpoint. CONSTRUCT/DESCRIBE and new remote
+formats remain excluded; the existing RDF profile is not an arbitrary-facet
+backup. P5 addressable residency and sibling adoption are unstarted.
+
+Observed-negative controls cover missing saved-query wire support, typed query
+membership, the formerly empty query roster, missing freeze behavior and silently
+ignored unknown nested payload fields. Focused index controls now pass, including
+receiver-local members, unchanged-revision skipping, invalid-spec refusal/retry,
+serde reload, immutable freeze versus live retraction and coverage-only changes.
+The fresh whole-P4 review reported missing shape-seed refusal, nested unknown
+fields escaping validation, and Resource roster labels falling back to UUIDs.
+Root treated all three as required repairs and observed each regression before
+fixing it. Focused kernel controls (six) and the complete graph/query facade
+suite (44) pass after that consolidated repair. A further numeric-underflow
+control showed typed equality could hide a logical wire-value change; retained
+nested JSON equality now protects the immutable carrier. Parallel rows, self
+relations and empty/opaque handles are copied exactly. Known null/default
+metadata remains accepted, while unknown keys are rejected throughout the v1
+nested carrier without tightening the shared legacy persistence DTOs.
+
+Full native/workspace/wasm gates remain in progress. Repeated unrelated-chat
+builds hold the shared target, so root copied its cache using Btrfs reflinks into
+`/home/markik/Code/target/graph-semantics-p4-qualification` and runs the remaining
+gates there. The original worktree, shared target and initial small-test target
+remain for receipts. No source or manifest versions changed through that move.
+This documentation checkpoint publishes progress only; P4 source remains local
+and no P4 main publication or P5 implementation is claimed.
