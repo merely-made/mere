@@ -139,3 +139,8 @@ determinism experiment.
   rather than maintaining two integrator wrappings. Version note for A1:
   align seiche's rapier pin toward 0.34/parry 0.29 so the two stacks don't
   hold divergent parry generations in one graph.
+
+- **2026-10-08 — the version note above is superseded.** Mark chose rapier
+  0.36 and parry 0.31.1 (dynamics grammar plan F163), the versions nexus
+  already pins, so mere and nexus share one parry generation; seiche and
+  conatus move on branch `rapier-036` with `enhanced-determinism` on (F165).

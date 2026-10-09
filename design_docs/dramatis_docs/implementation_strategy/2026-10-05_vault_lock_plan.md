@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-08)**: rulings 1 to 90 in §3. L1 to L4 landed (L3
+**Status (2026-10-08)**: rulings 1 to 91 in §3. L1 to L4 landed (L3
 as `79fbbeb7`, its attended receipts as `303b5097`; L4 on 2026-10-08, §6);
 deployment is Mark's step. Not yet carried out: ruling 44's transport-key hard switch,
 so Distillery keeps the master keypair while locked, and pandect's wallets
@@ -1070,6 +1070,18 @@ payload.* Options:
 
 Mark: **"Box the key + record (Recommended)"**.
 
+**Ruling 91** *(amends ruling 42; asked 2026-10-09 beside the Secret
+Service plan's SS8).* *Ruling 42 started Linux locked, partly because the
+desktop keyring was awkward while castellan meant to be the Secret
+Service, which SS5 then SS8 removed. gnome-keyring is unlocked by the login
+password through PAM and stays unlocked all session.* Options: keep ruling
+42 (Linux asks once per login); keep djinn's root in the OS keyring, so it
+auto-unlocks at login like Windows; ask again at D2. Mark: **"Root in the
+OS keyring"**. Follows: Linux gets an auto-unlock root held in the
+desktop's Secret Service. It is built after its own assessment, which
+covers the client library, the persisted lock and the threat statement's
+Linux at-rest line.
+
 Still open: a threat statement naming hibernation and the pagefile.
 *2026-10-08:* closed by ruling 82.
 
@@ -1985,3 +1997,12 @@ dynamics grammar plan's F183).
 - **Checkpoint E's Windows legs** ran a binary of unproven provenance.
   Their events matched L3's code, and rerunning them with an isolated
   build waits for Mark's hands.
+  - *Rerun 2026-10-09 (Mark: "let's do it now"),* with djinn built in
+    that worktree's own directory and the same two residents.
+  - `Win+L` locked A at 00:27:12.881, reason `session-lock`, with its
+    marker; B stayed open.
+  - Lid closed with no `Win+L` on a fresh pair: Modern Standby began at
+    00:28:01.716 (Kernel-Power 506). B locked, `suspend`, at 00:28:01.827,
+    and A locked, `session-lock`, at 00:28:02.139, both with markers.
+    Standby's next phase (566, 9 to 10) came at 00:28:02.357.
+  - E's Windows legs hold on an isolated build.

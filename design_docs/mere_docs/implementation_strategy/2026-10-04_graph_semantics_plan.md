@@ -8,8 +8,10 @@ Mark authorized source push, main integration and proceeding on October 9;
 HTTPS authentication is verified and the source branch is pushed. Integration
 against main `e5a24a4af` passes its full native supplier/consumer gates, locked
 workspace check, kernel/Pandect wasm checks and full standalone browser wasm
-check. Newer main `bdc89a053` includes scene/facet, projection-editor, Rapier
-and dependency updates; its integration and affected qualification follow.
+check. Integration against newer main `bdc89a053`, including scene/facet,
+projection-editor, Rapier and dependency updates, also passes its full affected
+native, workspace and wasm gates. The reviewed identity/Secret Service tail
+through `5df06f802` follows with targeted consumer qualification.
 No main merge is published yet. Earlier Windows/Linux receipts below remain
 historical. Consumer repinning and vocabulary/oracle cleanup remain separate
 under §4.
@@ -2907,6 +2909,26 @@ binding; this list no longer grows as a running implementation checklist.
 
 ## 6. Progress
 
+- **2026-10-09, Rapier and projection-editor integration qualified.** Main
+  `bdc89a053` merges cleanly onto the first qualified integration checkpoint
+  `768a2a94f`, which is pushed on `graph-semantics`. Kernel/store 426 plus its
+  compile-fail doctest, Pandect 342 plus two integrations, RDF/query 70,
+  document-lanes 18 plus one integration, Cartography 55, Canvas 372 and
+  Graphshell 411 plus seven integrations pass. The existing Canvas and
+  Graphshell ignored controls remain unchanged. Reticulum passes 62 tests
+  with its child helper ignored; its test targets compile. Scenograph passes
+  13 plus its compile-fail doctest, scenomise 157, Graphshell-client 69 plus
+  13 integrations, conatus 18 plus one integration and seiche 158 plus nine
+  integrations (10 unit tests ignored). Locked workspace, kernel/Pandect wasm
+  and full standalone browser wasm checks exit 0. Frozen code and asset
+  hashes match; the documentation audit adds no new findings. The transport
+  runner's inherited thread setting initially put the child's ticket on the
+  libtest title line; removing that variable while retaining the parent's
+  serial test flag restores the expected protocol line, without source edits.
+  The negative log is retained. Fresh review clears the next identity and
+  Secret Service tail through `5df06f802`; its targeted gates follow. Main
+  publication and P3 remain pending.
+
 - **2026-10-09, first P2 main integration candidate qualified.** The resolved
   merge against main `e5a24a4af` passes kernel/store 426 unit tests plus its
   compile-fail doctest, Pandect 342 plus two reservoir integrations, RDF/query
@@ -2919,8 +2941,9 @@ binding; this list no longer grows as a running implementation checklist.
   projected pairs and positions through the real Canvas underlay, alongside
   the retained fixture hash, labels, counts and refusals. Independent review
   clears this control and both private blob-owner cleanup paths. Source
-  hashes match the frozen receipt; the documentation audit is unchanged and
-  its planted-defect self-test passes. Main advanced to `bdc89a053` during
+  hashes match the frozen receipt; the documentation audit adds no findings
+  and its planted-defect self-test passes. Generating the ignored standalone
+  web lock clears one inherited missing-path finding (175 to 174). Main advanced to `bdc89a053` during
   qualification. The upstream-tail review finds no P2 source incompatibility;
   the newer tail still needs its affected tests after merging. These are
   native tests and wasm build receipts, without headed-browser, physical-GPU
