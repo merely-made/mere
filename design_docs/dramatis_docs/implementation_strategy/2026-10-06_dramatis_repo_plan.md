@@ -1,7 +1,7 @@
 # Dramatis Repo Plan
 
 **Date**: 2026-10-06
-**Status (2026-10-09)**: assessed; rulings D1 to D34 (§3). DR-A landed on 2026-10-09 (§6); DR-B is next.
+**Status (2026-10-09)**: assessed; rulings D1 to D35 (§3). DR-A landed on 2026-10-09 (§6). Next, by D35: the vault lock's ruling 44, then DR-B, then ruling 91.
 D18's condition is met: the vault lock's L2 to L4 landed on 2026-10-08.
 DR-A's assessment is being refreshed against today's code before its
 forks are put to Mark (§6).
@@ -427,6 +427,13 @@ vault lock's ruling 44 (Distillery's transport key), then its ruling 91
 (Linux's root in the OS keyring); 44 first; ruling 91's assessment
 alongside DR-A. Mark: **"DR-A, then 44, then 91 (Recommended)"**.
 
+**Ruling D35** *(DR-B's place in D34's order).* *Ruling 91 adds a Linux
+root loader to personae's `startup_unlock`, which is custody code DR-B
+moves into castellan; DR-B's D8 also closes the pandect wallet gap (vault
+lock ruling 81).* Options: 44, then DR-B, then 91, so 91's loader is built
+once, in castellan; 44, then 91, then DR-B; DR-B next. Mark: **"44, then
+DR-B, then 91 (Recommended)"**.
+
 Still open: whether gazette gets a matching facade name over gaz, the way
 chatelaine is the keychain.
 
@@ -670,6 +677,5 @@ directory (F183). The test inventories are in `Code/testing/mere/dra/`.
     `graphshell::identity` and `graphshell::native::personae_host`, which
     the shims keep.
   - The docs and the two record corrections landed with it.
-- **Next:** DR-B, custody into castellan (D8, D9), after the vault lock's
-  ruling 44 and ruling 91 by D34's order: DR-A, then 44, then 91. DR-B's
-  place in that order is not yet ruled.
+- **Next** (D35): the vault lock's ruling 44, then DR-B, custody into
+  castellan (D8, D9), then ruling 91.
