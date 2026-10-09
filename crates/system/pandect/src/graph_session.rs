@@ -316,6 +316,14 @@ fn provenance(manifest: &GraphSessionManifest) -> Option<Provenance> {
     })
 }
 
+/// What the replay check compares: the whole snapshot and facets, visit
+/// stamps included, under one fixed date so the check never reads the clock
+/// (reservoir plan ruling 47).
+fn replay_state(graph: &Graph) -> Result<serde_json::Value, SessionError> {
+    serde_json::to_value((graph.to_snapshot_at(0), graph.facets()))
+        .map_err(|e| SessionError::NotReplayable(e.to_string()))
+}
+
 /// Route what `graph` records into `buffer`, for the session to journal.
 fn record_into(graph: &mut Graph, buffer: &Arc<Mutex<Vec<CapturedDelta>>>) {
     let buffer = Arc::clone(buffer);
@@ -651,11 +659,7 @@ impl<B: Backend> GraphSession<B> {
         let recorded = std::mem::take(&mut *captured.lock().expect("candidate recorder buffer"));
         let mut replay = self.graph.clone();
         replay_captured_deltas_onto(&mut replay, recorded.iter().map(|entry| entry.clone()));
-        let state = |graph: &Graph| {
-            serde_json::to_value((graph.to_snapshot(), graph.facets()))
-                .map_err(|e| SessionError::NotReplayable(e.to_string()))
-        };
-        if state(&replay)? != state(&candidate)? {
+        if replay_state(&replay)? != replay_state(&candidate)? {
             return Err(SessionError::NotReplayable(
                 "candidate changed graph truth outside the journaled mutation path".into(),
             ));
@@ -1921,6 +1925,32 @@ mod tests {
             serde_json::to_value(&snapshot).unwrap(),
             serde_json::to_value(graph.facets()).unwrap(),
         )
+    }
+
+    /// The replay check's state reads no clock, so one graph compares equal
+    /// across a wall-clock second. The control is the check's old form, a
+    /// clock-dated snapshot per side, which differs across the same tick
+    /// (reservoir plan ruling 47).
+    #[test]
+    fn the_replay_check_compares_equal_across_a_second_tick() {
+        let mut graph = Graph::new();
+        replay_captured_deltas_onto(&mut graph, [add(1), add(2)]);
+        let old_state =
+            |graph: &Graph| serde_json::to_value((graph.to_snapshot(), graph.facets())).unwrap();
+
+        let before = replay_state(&graph).unwrap();
+        let old_before = old_state(&graph);
+        let second = graph.to_snapshot().timestamp_secs;
+        while graph.to_snapshot().timestamp_secs == second {
+            std::thread::sleep(std::time::Duration::from_millis(5));
+        }
+
+        assert_ne!(
+            old_state(&graph),
+            old_before,
+            "control: two clock reads differ"
+        );
+        assert_eq!(replay_state(&graph).unwrap(), before);
     }
 
     #[test]

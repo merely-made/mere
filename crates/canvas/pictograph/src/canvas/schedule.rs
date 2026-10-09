@@ -85,11 +85,15 @@ pub(crate) struct ScheduleRun {
 impl Canvas {
     /// Run `stages` in order from the current layout, playing. An empty
     /// schedule clears any schedule under way.
-    pub fn run_physics_schedule(&mut self, stages: Vec<PhysicsStage>) {
+    pub(crate) fn run_physics_schedule(&mut self, stages: Vec<PhysicsStage>) {
         if stages.is_empty() {
             self.schedule = None;
+            self.dynamics.schedule = None;
             return;
         }
+        // The record keeps the schedule as authored, after its run ends too
+        // (G4b1, F157: the spec is a recipe).
+        self.dynamics.schedule = Some(stages.clone());
         self.schedule = Some(ScheduleRun {
             stages,
             stage: 0,

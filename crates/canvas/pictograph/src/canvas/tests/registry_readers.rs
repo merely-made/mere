@@ -9,6 +9,7 @@
 //! the registry computes each once; a change of its key computes it once more,
 //! and nothing else.
 
+use crate::canvas::tests::ThroughView;
 use kernel::graph::apply::{GraphDelta, apply_graph_delta};
 use kernel::graph::fixtures::GraphFixtures;
 
@@ -66,7 +67,7 @@ fn every_fact_runs_once_with_its_readers_live_and_once_more_when_its_key_moves()
     );
     assert!(canvas.select_member(focus), "a focus for Radial's rings");
     canvas
-        .set_physics_choice(&PhysicsChoice {
+        .pick(&PhysicsChoice {
             law: PhysicsLaw::Kinds,
             overlays: vec![PhysicsOverlay::DomainCluster],
             kind: PhysicsKindSource::Site,

@@ -8,7 +8,8 @@
 //!
 //! The stem of the family. Sceno owns the vocabulary every other member
 //! speaks: stable source references, coordinate spaces, footprints, scene
-//! snapshots with per-instance identity, and persisted scores.
+//! snapshots with per-instance identity, folds over those instances, and
+//! persisted scores.
 //!
 //! The pipeline the family realizes:
 //!
@@ -53,11 +54,15 @@
 //! [`ProjectedItem::hit`] for the first half and `scenotime`'s pick for the
 //! resolution that turns a point into the [`InstanceId`] an intent names.
 
+pub mod fold;
 pub mod footprint;
 pub mod geometry;
 pub mod scene;
 pub mod score;
 
+pub use fold::{
+    BoundaryBundle, Fold, FoldBoundary, FoldDirection, FoldEffect, FoldError, FoldRule, StandIn,
+};
 pub use footprint::Footprint;
 pub use geometry::{Rect, Size2, Transform2, Vec2};
 pub use scene::{

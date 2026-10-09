@@ -9,6 +9,7 @@
 //! contacts, the flow's own shift beside what rapier moved, and shift by
 //! mass tercile and rim. Ignored; run optimized with `--ignored --nocapture`.
 
+use crate::canvas::tests::ThroughView;
 use std::collections::HashMap;
 use std::sync::Arc;
 
@@ -74,7 +75,7 @@ pub(super) fn law(canvas: &Canvas, form: Form, stop: DensityStop, passes: u32) -
 }
 
 pub(super) fn install(canvas: &mut Canvas, law: &Arc<Density>) {
-    canvas.set_physics_law(PhysicsLaw::Density).unwrap();
+    canvas.pick_law(PhysicsLaw::Density).unwrap();
     canvas
         .physics
         .set_forces(vec![Box::new(Shared(law.clone()))]);
@@ -263,6 +264,7 @@ fn density_wander_springs_control() {
                 mass: PhysicsMassSource::Degree,
                 depth: crate::canvas::PhysicsDepthSource::Roots,
                 focus: None,
+                seed: crate::canvas::physics_catalog::LAW_SEED,
             },
         );
         canvas.physics.set_forces(forces);
@@ -626,7 +628,7 @@ fn density_stop_variants() {
         let springs: Vec<f32> = (0..4u64)
             .map(|k| {
                 let mut canvas = seeded_dealt(graph.clone(), k as f32 * 2.399_963, k + 1);
-                canvas.set_physics_law(PhysicsLaw::Springs).unwrap();
+                canvas.pick_law(PhysicsLaw::Springs).unwrap();
                 run(&mut canvas, 900);
                 canvas.layout_stats().mass_area_rank
             })
