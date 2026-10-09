@@ -14706,6 +14706,7 @@ dependencies = [
 name = "scenograph"
 version = "0.0.4"
 dependencies = [
+ "mere-curation",
  "sceno",
  "serde",
  "serde_json",
