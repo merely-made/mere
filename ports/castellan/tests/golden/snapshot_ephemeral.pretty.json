@@ -1,0 +1,22 @@
+{
+  "vault": {
+    "protection": "Ephemeral",
+    "lock": "Unlocked",
+    "agent": {
+      "StandardEndpoint": {
+        "endpoint": "/run/user/1000/djinn/agent.sock"
+      }
+    }
+  },
+  "profiles": [],
+  "ssh_keys": [],
+  "carry": {
+    "recovery_policy": null,
+    "personas": [],
+    "devices": [],
+    "grants": [],
+    "unavailable": []
+  },
+  "pending_signing": [],
+  "signing_history": []
+}

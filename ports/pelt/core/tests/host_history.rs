@@ -61,7 +61,8 @@ impl DocumentSession<String> for Page {
         false
     }
 
-    /// Left of x=10 is a link; right of it submits a GET form.
+    /// Left of x=10 is a link; right of it submits a form: a GET form, or on
+    /// an `upload` page a mutation endpoint the host completes (a POST).
     fn click_at(&mut self, x: f32, _y: f32) -> SessionClick {
         if x < 10.0 {
             SessionClick::Navigate("next.html".to_owned())
@@ -71,6 +72,13 @@ impl DocumentSession<String> for Page {
     }
 
     fn form_submission(&mut self, action: &str) -> SessionFormSubmission {
+        if self.address.contains("upload") {
+            return SessionFormSubmission {
+                action: action.to_owned(),
+                method: SessionFormMethod::Post,
+                fields: Vec::new(),
+            };
+        }
         SessionFormSubmission {
             action: action.to_owned(),
             method: SessionFormMethod::Get,
@@ -235,4 +243,45 @@ fn linear_history_is_unchanged() {
             .navigated
     );
     assert_eq!(controller.address(), "docs/replaced.html");
+}
+
+/// A POST (a smolweb mutation endpoint) is handed to a host-history host to
+/// collect, confirm and send, resolved against the document; nothing loads.
+#[test]
+fn a_post_submission_is_handed_to_the_host() {
+    let spawns = Spawns::default();
+    let mut controller = controller(
+        &spawns,
+        PeltControllerConfig::new("fake", "titan://capsule.test/docs/upload.gmi", (640, 480))
+            .with_host_history(),
+    );
+    let spawned = spawns.lock().unwrap().len();
+    let effect = controller.input(press(20.0, SessionModifiers::default()));
+    assert!(effect.handled, "{effect:?}");
+    assert_eq!(effect.error, None);
+    assert_eq!(effect.navigation, None, "a POST is not a navigation");
+    let submission = effect.submission.expect("the submission is handed up");
+    assert_eq!(submission.method, SessionFormMethod::Post);
+    assert_eq!(submission.action, "titan://capsule.test/docs/search.html");
+    assert!(submission.fields.is_empty());
+    assert_eq!(spawns.lock().unwrap().len(), spawned, "nothing loads");
+}
+
+/// A linear-history controller still refuses a POST: it has no host to
+/// collect the body.
+#[test]
+fn a_linear_controller_still_refuses_a_post() {
+    let spawns = Spawns::default();
+    let mut controller = controller(
+        &spawns,
+        PeltControllerConfig::new("fake", "titan://capsule.test/docs/upload.gmi", (640, 480)),
+    );
+    let effect = controller.input(press(20.0, SessionModifiers::default()));
+    assert_eq!(effect.submission, None);
+    assert!(
+        effect
+            .error
+            .as_deref()
+            .is_some_and(|error| error.contains("POST form submission"))
+    );
 }

@@ -268,6 +268,11 @@ pub struct PeltHostEffect {
     pub reroute: Option<PeltReroute>,
     /// A host-history controller's navigation, for the host to place.
     pub navigation: Option<PeltNavigationRequest>,
+    /// A host-history controller's POST submission, its action resolved
+    /// against the document, for the host to collect, confirm and send. A
+    /// smolweb mutation endpoint (Titan, Spartan) arrives here with no
+    /// fields. A linear-history controller still refuses POST.
+    pub submission: Option<inker::SessionFormSubmission>,
 }
 
 /// Pelt's reusable one-session browser controller.
@@ -689,6 +694,13 @@ impl<F: 'static> PeltController<F> {
                 SessionFormMethod::Get => {
                     let target = get_submission_target(&submission.action, &submission.fields);
                     self.follow(target, PeltNavigationCause::FormGet, &mut host_effect);
+                },
+                SessionFormMethod::Post if self.history_mode == PeltHistoryMode::Host => {
+                    host_effect.handled = true;
+                    host_effect.submission = Some(inker::SessionFormSubmission {
+                        action: resolve_href(self.address(), &submission.action),
+                        ..submission
+                    });
                 },
                 SessionFormMethod::Post => {
                     let address = self.address().to_owned();
