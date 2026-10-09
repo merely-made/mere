@@ -59,6 +59,8 @@ ports/tabard/tests/fixtures/** text eol=lf
 ports/graphshell/web/fixtures/** text eol=lf
 # OpenSSH key fixtures whose slot bytes a test compares to a pre-P4a baseline.
 crates/dramatis/personae/tests/fixtures/** text eol=lf
+# Snapshot JSON that castellan compares byte for byte (dramatis repo plan D32).
+ports/castellan/tests/golden/** text eol=lf
 
 # The Cambium component-catalog receipt test compares the live render against these
 # captures byte for byte; autocrlf must not rewrite them on checkout (2026-09-03).

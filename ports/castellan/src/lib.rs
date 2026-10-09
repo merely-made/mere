@@ -50,6 +50,13 @@
 //!
 //! Graphshell composes all three (and re-exports them at their old paths);
 //! any other host embeds the subset it needs without inheriting graphshell.
+//!
+//! Since the dramatis repo plan's DR-A (2026-10-09), the plain types these
+//! modules name live in the identity tier and are re-exported here at their
+//! old paths: the views, intents and receipts in the `dramatis` facade, and
+//! the OTP display types and the Secret Service's metadata in chatelaine.
+//! castellan keeps what needs its authority or chirograph: the cards, the
+//! loaders, the error it raises, and the release gate.
 //! [`items::ItemStore`] keeps one persona's chatelaine items, each
 //! credential's secret in its own sealed payload record. OTP imports land
 //! there through [`otp::OtpItemStore`], and the Secret Service's items too. [`otp::OtpReleaseGate`] returns an
