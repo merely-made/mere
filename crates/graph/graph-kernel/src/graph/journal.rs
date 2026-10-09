@@ -37,7 +37,8 @@ use rkyv::{Archive, Deserialize, Serialize};
 
 use super::Graph;
 use super::capture::{
-    CapturedDelta, DeltaRecorder, replay_captured_deltas, replay_captured_deltas_onto,
+    CapturedDelta, DeltaRecorder, ReplayAttribution, replay_attributed_deltas_onto,
+    replay_graph_deltas_onto,
 };
 use super::source_time::{SourceExtent, SourceTime};
 
@@ -98,6 +99,24 @@ pub struct Author {
 }
 
 impl Author {
+    /// Stable assertion attribution; version and recording application stay metadata.
+    pub fn asserter_iri(&self) -> String {
+        if self.kind == AuthorKind::Person
+            && !self.id.chars().any(|c| c.is_whitespace() || c.is_control())
+            && url::Url::parse(&self.id).is_ok()
+        {
+            return self.id.clone();
+        }
+        let kind = match self.kind {
+            AuthorKind::Person => "person",
+            AuthorKind::Rule => "rule",
+            AuthorKind::Script => "script",
+            AuthorKind::Engine => "engine",
+        };
+        let encoded: String = url::form_urlencoded::byte_serialize(self.id.as_bytes()).collect();
+        format!("https://mere.computer/ns/agent#{kind}/{encoded}")
+    }
+
     /// A person, by persona or subject id.
     pub fn person(id: impl Into<String>) -> Self {
         Self::new(AuthorKind::Person, id, None)
@@ -293,14 +312,132 @@ impl GraphJournal {
     /// replays every current entry. A cursor beyond the known prefix is stale
     /// and is refused rather than silently clamped to live.
     pub fn snapshot_at(&self, cursor: Seq) -> Option<Graph> {
+        self.snapshot_at_from(&Graph::new(), cursor)
+    }
+
+    /// Replay a prefix over its retained baseline, preserving baseline attribution.
+    pub fn snapshot_at_from(&self, baseline: &Graph, cursor: Seq) -> Option<Graph> {
         let end = cursor.index();
         (end <= self.log.len()).then(|| {
-            replay_captured_deltas(
-                self.log.entries()[..end]
-                    .iter()
-                    .map(|entry| entry.delta.clone()),
-            )
+            let mut graph = baseline.clone();
+            replay_entries_onto(&mut graph, &self.log.entries()[..end]);
+            graph
         })
+    }
+
+    /// Migration of a caller-qualified legacy baseline and prefix.
+    /// Ordinary replay does not infer a legacy profile from absent resource columns.
+    pub fn migrated_prefix_at_from(
+        &self,
+        baseline: &Graph,
+        cursor: Seq,
+    ) -> Result<
+        Option<super::legacy_resource_migration::MigratedReplay>,
+        super::legacy_resource_migration::LegacyMigrationError,
+    > {
+        let end = cursor.index();
+        if end > self.log.len() {
+            return Ok(None);
+        }
+        super::legacy_resource_migration::migrate_legacy_prefix(
+            baseline,
+            &self.log.entries()[..end],
+        )
+        .map(Some)
+    }
+
+    /// Validate choices against this complete qualified legacy journal, then read a prefix.
+    /// Future carried-handle choices do not change or invalidate earlier prefixes.
+    /// A host with a modern suffix must supply only its qualified legacy prefix to the adapter.
+    pub fn migrated_prefix_at_from_with_resolutions(
+        &self,
+        baseline: &Graph,
+        cursor: Seq,
+        resolutions: &[super::legacy_resource_migration::LegacyResourceOriginResolution],
+    ) -> Result<
+        Option<super::legacy_resource_migration::MigratedReplay>,
+        super::legacy_resource_migration::LegacyMigrationError,
+    > {
+        use super::legacy_resource_migration::{
+            migrate_legacy_prefix_with_resolutions, probe_legacy_mint_links,
+            validate_legacy_origin_resolutions,
+        };
+        let end = cursor.index();
+        if end > self.log.len() {
+            return Ok(None);
+        }
+        validate_legacy_origin_resolutions(baseline, self.log.entries(), resolutions)?;
+        let prefix = &self.log.entries()[..end];
+        let ids: std::collections::BTreeSet<_> = probe_legacy_mint_links(baseline, prefix)?
+            .into_iter()
+            .map(|diagnostic| diagnostic.statement_id)
+            .collect();
+        let relevant: Vec<_> = resolutions
+            .iter()
+            .filter(|choice| ids.contains(&choice.statement_id))
+            .cloned()
+            .collect();
+        migrate_legacy_prefix_with_resolutions(baseline, prefix, &relevant).map(Some)
+    }
+
+    pub fn migrated_snapshot_at_from_with_resolutions(
+        &self,
+        baseline: &Graph,
+        cursor: Seq,
+        resolutions: &[super::legacy_resource_migration::LegacyResourceOriginResolution],
+    ) -> Result<Option<Graph>, super::legacy_resource_migration::LegacyMigrationError> {
+        self.migrated_prefix_at_from_with_resolutions(baseline, cursor, resolutions)
+            .map(|replay| replay.map(|replay| replay.graph))
+    }
+
+    /// The graph-only convenience form of [`migrated_prefix_at_from`](Self::migrated_prefix_at_from).
+    pub fn migrated_snapshot_at_from(
+        &self,
+        baseline: &Graph,
+        cursor: Seq,
+    ) -> Result<Option<Graph>, super::legacy_resource_migration::LegacyMigrationError> {
+        self.migrated_prefix_at_from(baseline, cursor)
+            .map(|replay| replay.map(|replay| replay.graph))
+    }
+
+    /// Reconstruct retained history before replacing a legacy checkpoint atomically.
+    /// The full prefix supplies historical URLs and withdrawn handles; `since` is
+    /// validated but cannot substitute the checkpoint's current URL for that evidence.
+    pub fn migrated_replay_from_with_baseline(
+        &self,
+        since: Seq,
+        graph: &mut Graph,
+        baseline: &Graph,
+    ) -> Result<(), super::legacy_resource_migration::LegacyMigrationError> {
+        self.migrated_replay_from_with_baseline_and_resolutions(since, graph, baseline, &[])
+    }
+
+    pub fn migrated_replay_from_with_baseline_and_resolutions(
+        &self,
+        since: Seq,
+        graph: &mut Graph,
+        baseline: &Graph,
+        resolutions: &[super::legacy_resource_migration::LegacyResourceOriginResolution],
+    ) -> Result<(), super::legacy_resource_migration::LegacyMigrationError> {
+        if since.index() > self.log.len() {
+            return Err(super::legacy_resource_migration::LegacyMigrationError(
+                "legacy checkpoint cursor is beyond retained history".into(),
+            ));
+        }
+        let mut replay = self
+            .migrated_prefix_at_from_with_resolutions(baseline, self.live_cursor(), resolutions)?
+            .expect("live cursor exists");
+        replay.graph.recorder.0 = graph.recorder.0.take();
+        replay.graph.write_author = graph.write_author.clone();
+        replay.graph.current_session = graph.current_session;
+        replay.graph.revision = replay.graph.revision.max(graph.revision).saturating_add(1);
+        replay.graph.url_grouping_revision = replay
+            .graph
+            .url_grouping_revision
+            .max(graph.url_grouping_revision)
+            .saturating_add(1);
+        *graph = replay.graph;
+        Ok(())
     }
 
     /// Stable, evenly distributed prefix cursors for a compact scrubber. This
@@ -332,18 +469,39 @@ impl GraphJournal {
         self.log.provenance()
     }
 
-    /// Rebuild the whole graph by replaying every edit from empty (attribution
-    /// rides the journal, not the graph — replay strips the envelope).
+    /// Rebuild the whole graph, using its author for legacy unattributed assertions.
     pub fn replay(&self) -> Graph {
-        replay_captured_deltas(self.log.entries().iter().map(|e| e.delta.clone()))
+        let mut graph = Graph::new();
+        replay_entries_onto(&mut graph, self.log.entries());
+        graph
     }
 
     /// Advance an already-materialized `graph` by the edits from `since` onward.
     /// The checkpoint-plus-tail path: restore a `GraphSnapshot`, then apply only
     /// the journal entries recorded after the snapshot's sequence. The incremental
     /// twin of [`replay`](Self::replay).
+    /// Without a retained baseline, exact records missing attribution stay unknown.
+    /// Use [`replay_from_with_baseline`](Self::replay_from_with_baseline) to recover
+    /// the original minting author across earlier removal and later restoration.
     pub fn replay_from(&self, since: Seq, graph: &mut Graph) {
-        replay_captured_deltas_onto(graph, self.log.from(since).iter().map(|e| e.delta.clone()));
+        replay_graph_deltas_onto(
+            graph,
+            self.log
+                .from(since)
+                .iter()
+                .filter_map(|entry| entry.delta.replay_delta_as(&entry.author)),
+        );
+    }
+
+    /// Replay a checkpoint tail with the baseline and original minting entries.
+    /// `baseline` is the graph before entry zero, not the checkpoint at `since`.
+    pub fn replay_from_with_baseline(&self, since: Seq, graph: &mut Graph, baseline: &Graph) {
+        let mut attribution = ReplayAttribution::from_baseline(baseline);
+        for entry in self.log.entries().iter().take(since.index()) {
+            let _ = attribution.replay_delta(&entry.delta, &entry.author);
+        }
+        attribution.repair_checkpoint(graph);
+        replay_attributed_deltas_onto(graph, &mut attribution, self.log.from(since));
     }
 
     /// Fork this journal under a new identity: copies the whole edit history and
@@ -374,6 +532,14 @@ impl GraphJournal {
     ) -> Result<Self, StoreError> {
         Ok(Self::from_log(Journal::load(slots, key).await?))
     }
+}
+
+fn replay_entries_onto<'a, I>(graph: &mut Graph, entries: I)
+where
+    I: IntoIterator<Item = &'a AttributedDelta>,
+{
+    let mut attribution = ReplayAttribution::from_baseline(graph);
+    replay_attributed_deltas_onto(graph, &mut attribution, entries);
 }
 
 impl SourceTime for GraphJournal {
@@ -425,10 +591,69 @@ pub fn journal_capture_hook() -> (Arc<Mutex<GraphJournal>>, DeltaRecorder) {
 mod tests {
     use super::*;
     use crate::graph::apply::{GraphDelta, GraphDeltaResult, apply_graph_delta};
+    use crate::graph::capture::{replay_captured_deltas, replay_captured_deltas_onto};
     use crate::graph::set_captured_delta_hook;
     use crate::graph::{EdgeAssertion, SemanticSubKind, SourceExtent, SourceTime};
     use euclid::default::Point2D;
     use uuid::Uuid;
+
+    #[test]
+    fn assertion_attribution_ignores_automated_versions_and_recording_application() {
+        for kind in [AuthorKind::Rule, AuthorKind::Script, AuthorKind::Engine] {
+            let v1 = Author::new(kind, "extractor", Some("1".into())).via("turnstone");
+            let v2 = Author::new(kind, "extractor", Some("2".into())).via("knot");
+            assert_ne!(v1, v2, "the journal keeps version and application metadata");
+            assert_eq!(v1.asserter_iri(), v2.asserter_iri());
+            assert_ne!(
+                v1.asserter_iri(),
+                Author::new(kind, "another-extractor", Some("1".into())).asserter_iri(),
+                "different names still identify different asserters"
+            );
+        }
+        let kinds = [
+            Author::person("extractor"),
+            Author::rule("extractor", "1"),
+            Author::script("extractor", "1"),
+            Author::engine("extractor", "1"),
+        ];
+        let identities: std::collections::BTreeSet<_> =
+            kinds.iter().map(Author::asserter_iri).collect();
+        assert_eq!(identities.len(), kinds.len());
+    }
+
+    #[test]
+    fn assertion_attribution_keeps_person_iris_and_encodes_opaque_ids() {
+        for iri in [
+            "https://people.test/alice",
+            "did:key:z6MkAlice",
+            "urn:uuid:058e1fe2-851b-4f1c-bbf0-0cbf74fe7727",
+        ] {
+            assert_eq!(Author::person(iri).asserter_iri(), iri);
+        }
+        let person = Author::person("alice /+?#%名字");
+        assert_eq!(
+            person.asserter_iri(),
+            "https://mere.computer/ns/agent#person/alice+%2F%2B%3F%23%25%E5%90%8D%E5%AD%97"
+        );
+        assert_eq!(
+            person.asserter_iri(),
+            person.clone().via("knot").asserter_iri()
+        );
+        assert!(url::Url::parse(&person.asserter_iri()).is_ok());
+        assert_ne!(
+            Author::person("alice /+?#%名字").asserter_iri(),
+            Author::person("alice +?#%名字").asserter_iri()
+        );
+        assert_ne!(
+            Author::person(".").asserter_iri(),
+            Author::person("..").asserter_iri(),
+            "opaque dot segments are preserved in the fragment"
+        );
+        assert_eq!(
+            Author::person(" https://people.test/alice ").asserter_iri(),
+            "https://mere.computer/ns/agent#person/+https%3A%2F%2Fpeople.test%2Falice+"
+        );
+    }
 
     fn add(id: u128, url: &str) -> CapturedDelta {
         CapturedDelta::ReplayAddNodeWithIdIfMissing {
@@ -436,6 +661,453 @@ mod tests {
             url: url.to_string(),
             position: [0.0, 0.0],
         }
+    }
+
+    fn assert_live_add_captures(deltas: &[CapturedDelta], id: u128, url: &str) {
+        let resource = super::super::ResourceNode::new(url);
+        assert_eq!(deltas.len(), 4);
+        assert_eq!(deltas[0], add(id, url));
+        assert!(
+            matches!(&deltas[1], CapturedDelta::ReplayTouchNodeLastVisitedById {
+            node_id, ..
+        } if node_id == &Uuid::from_u128(id).to_string())
+        );
+        assert_eq!(
+            deltas[2],
+            CapturedDelta::ReplaySetResourceRecordById {
+                resource_id: resource.id().to_string(),
+                record: Some(crate::persistence::PersistedResourceRecord {
+                    canonical_iri: resource.canonical_iri().into(),
+                    facets: vec![],
+                }),
+            }
+        );
+        assert_eq!(
+            deltas[3],
+            CapturedDelta::ReplaySetShownResourceById {
+                surface_id: Uuid::from_u128(id).to_string(),
+                resource_id: Some(resource.id().to_string()),
+            }
+        );
+    }
+
+    #[test]
+    fn legacy_journal_assertions_use_each_entry_author_on_full_and_prefix_replay() {
+        let mut journal = GraphJournal::new();
+        journal.record(add(1, "https://a.test/"));
+        journal.record(add(2, "https://b.test/"));
+        let recognized = CapturedDelta::ReplayAssertRelationByIds {
+            from_id: Uuid::from_u128(1).to_string(),
+            to_id: Uuid::from_u128(2).to_string(),
+            assertion: EdgeAssertion::Semantic {
+                sub_kind: SemanticSubKind::Cites,
+                label: None,
+                decay_progress: None,
+            },
+        };
+        let open = CapturedDelta::ReplayAssertSemanticPredicateByIds {
+            from_id: Uuid::from_u128(1).to_string(),
+            to_id: Uuid::from_u128(2).to_string(),
+            predicate: "https://vocab.test/mentions".into(),
+        };
+        let alice = Author::person("https://people.test/alice");
+        let bob = Author::person("https://people.test/bob");
+        for author in [&alice, &bob] {
+            journal.record_as(author.clone(), recognized.clone());
+            journal.record_as(author.clone(), open.clone());
+        }
+        let attributions = |graph: &Graph| {
+            let a = graph.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
+            let b = graph.get_node_key_by_id(Uuid::from_u128(2)).unwrap();
+            let edge = graph.find_edge_key(a, b).unwrap();
+            let mut values: Vec<_> = graph
+                .get_edge(edge)
+                .unwrap()
+                .semantic_statements()
+                .iter()
+                .map(|statement| {
+                    (
+                        statement.predicate.clone(),
+                        statement.provenance_iri.clone().unwrap(),
+                    )
+                })
+                .collect();
+            values.sort();
+            values
+        };
+        let full = journal.replay();
+        let full_attributions = attributions(&full);
+        assert_eq!(full_attributions.len(), 4);
+        for author in [&alice, &bob] {
+            assert_eq!(
+                full_attributions
+                    .iter()
+                    .filter(|(_, iri)| iri == &author.asserter_iri())
+                    .count(),
+                2
+            );
+        }
+        let mut prefix = journal.snapshot_at(Seq(4)).unwrap();
+        let prefix_attributions = attributions(&prefix);
+        assert_eq!(prefix_attributions.len(), 2);
+        assert!(
+            prefix_attributions
+                .iter()
+                .all(|(_, iri)| iri == &alice.asserter_iri())
+        );
+        journal.replay_from(Seq(4), &mut prefix);
+        assert_eq!(attributions(&prefix), full_attributions);
+        let unattributed =
+            replay_captured_deltas(journal.entries().iter().map(|entry| entry.delta.clone()));
+        let legacy_attributions = attributions(&unattributed);
+        assert_eq!(
+            legacy_attributions.len(),
+            2,
+            "without envelopes attribution remains unknown"
+        );
+        assert!(
+            legacy_attributions
+                .iter()
+                .all(|(_, iri)| iri == crate::graph::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI)
+        );
+    }
+
+    #[test]
+    fn exact_statement_capture_preserves_source_over_journal_recorder() {
+        let mut source =
+            replay_captured_deltas([add(1, "https://a.test/"), add(2, "https://b.test/")]);
+        let a = source.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
+        let b = source.get_node_key_by_id(Uuid::from_u128(2)).unwrap();
+        let source_iri = "https://source.test/page";
+        source
+            .assert_surface_semantic_statement(
+                a,
+                b,
+                super::super::SemanticStatementSpec {
+                    predicate: super::super::predicate_iri(SemanticSubKind::Cites).into(),
+                    recognized_sub_kind: Some(SemanticSubKind::Cites),
+                    provenance_iri: Some(source_iri.into()),
+                    asserted_at_ms: Some(100),
+                    ..Default::default()
+                },
+            )
+            .unwrap();
+        let expected = source.persisted_edges_between(a, b);
+        let exact = CapturedDelta::ReplaySetEdgesByIds {
+            from_id: Uuid::from_u128(1).to_string(),
+            to_id: Uuid::from_u128(2).to_string(),
+            edges: expected.clone(),
+        };
+        let recorder = Author::engine("extractor", "9");
+        assert_ne!(source_iri, recorder.asserter_iri());
+        let mut journal = GraphJournal::new();
+        journal.record(add(1, "https://a.test/"));
+        journal.record(add(2, "https://b.test/"));
+        journal.record_as(recorder.clone(), exact.clone());
+        let restored = journal.replay();
+        let restored_a = restored.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
+        let restored_b = restored.get_node_key_by_id(Uuid::from_u128(2)).unwrap();
+        assert_eq!(
+            restored.persisted_edges_between(restored_a, restored_b),
+            expected
+        );
+        let mut direct = Graph::new();
+        crate::graph::capture::replay_captured_deltas_as_onto(
+            &mut direct,
+            &recorder,
+            [add(1, "https://a.test/"), add(2, "https://b.test/"), exact],
+        );
+        let direct_a = direct.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
+        let direct_b = direct.get_node_key_by_id(Uuid::from_u128(2)).unwrap();
+        assert_eq!(direct.persisted_edges_between(direct_a, direct_b), expected);
+    }
+
+    #[test]
+    fn legacy_exact_capture_attribution_matches_checkpoint_replay() {
+        use crate::graph::SemanticStatementSpec;
+
+        let recorder = Author::engine("legacy-extractor", "1");
+        for source in [Some("https://source.test/page"), None] {
+            let mut template =
+                replay_captured_deltas([add(1, "https://a.test/"), add(2, "https://b.test/")]);
+            let from = template.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
+            let to = template.get_node_key_by_id(Uuid::from_u128(2)).unwrap();
+            template
+                .assert_surface_semantic_statement(
+                    from,
+                    to,
+                    SemanticStatementSpec {
+                        predicate: super::super::predicate_iri(SemanticSubKind::Cites).into(),
+                        recognized_sub_kind: Some(SemanticSubKind::Cites),
+                        provenance_iri: Some("https://template.test/".into()),
+                        asserted_at_ms: Some(100),
+                        ..Default::default()
+                    },
+                )
+                .unwrap();
+            let mut old_edges = template.persisted_edges_between(from, to);
+            let old_statement = &mut old_edges[0].semantic.as_mut().unwrap().statements[0];
+            old_statement.statement_id = "legacy-exact-handle".into();
+            old_statement.provenance_iri = source.map(str::to_owned);
+            if source.is_none() {
+                let exact = CapturedDelta::ReplaySetEdgesByIds {
+                    from_id: Uuid::from_u128(1).to_string(),
+                    to_id: Uuid::from_u128(2).to_string(),
+                    edges: old_edges.clone(),
+                };
+                let mut baseline = template.clone();
+                super::super::capture::replay_captured_deltas_onto(&mut baseline, [exact.clone()]);
+                let mut baseline_journal = GraphJournal::new();
+                baseline_journal.record_as(recorder.clone(), exact);
+                baseline_journal.replay_from(Seq(0), &mut baseline);
+                assert_eq!(
+                    baseline.persisted_edges_between(from, to)[0]
+                        .semantic
+                        .as_ref()
+                        .unwrap()
+                        .statements[0]
+                        .provenance_iri
+                        .as_deref(),
+                    Some(super::super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI),
+                    "an unattributed baseline handle stays unknown"
+                );
+            }
+            let mut journal = GraphJournal::new();
+            journal.record(add(1, "https://a.test/"));
+            journal.record(add(2, "https://b.test/"));
+            journal.record_as(
+                recorder.clone(),
+                CapturedDelta::ReplayAssertRelationByIds {
+                    from_id: Uuid::from_u128(1).to_string(),
+                    to_id: Uuid::from_u128(2).to_string(),
+                    assertion: EdgeAssertion::Semantic {
+                        sub_kind: SemanticSubKind::Cites,
+                        label: None,
+                        decay_progress: None,
+                    },
+                },
+            );
+            let prefix = journal.snapshot_at(Seq(3)).unwrap();
+            let prefix_edges = prefix.persisted_edges_between(from, to);
+            assert_eq!(
+                prefix_edges[0].semantic.as_ref().unwrap().statements[0].provenance_iri,
+                Some(recorder.asserter_iri()),
+                "the raw historical assertion first recovers its recorder"
+            );
+            journal.record_as(
+                recorder.clone(),
+                CapturedDelta::ReplaySetEdgesByIds {
+                    from_id: Uuid::from_u128(1).to_string(),
+                    to_id: Uuid::from_u128(2).to_string(),
+                    edges: old_edges,
+                },
+            );
+
+            let full = journal.replay();
+            let expected = full.persisted_edges_between(from, to);
+            let statements = &expected[0].semantic.as_ref().unwrap().statements;
+            assert_eq!(statements.len(), 1);
+            assert_eq!(statements[0].statement_id, "legacy-exact-handle");
+            assert_eq!(statements[0].asserted_at_ms, Some(100));
+            assert_eq!(
+                statements[0].provenance_iri.as_deref(),
+                Some(
+                    source
+                        .map(str::to_owned)
+                        .unwrap_or_else(|| recorder.asserter_iri())
+                        .as_str()
+                ),
+                "a minted handle recovers its Author; a known source remains unchanged"
+            );
+
+            let mut checkpoint = Graph::from_snapshot(&prefix.to_snapshot());
+            journal.replay_from_with_baseline(Seq(3), &mut checkpoint, &Graph::new());
+            assert_eq!(checkpoint.persisted_edges_between(from, to), expected);
+            let reopened = Graph::from_snapshot(&full.to_snapshot());
+            assert_eq!(reopened.persisted_edges_between(from, to), expected);
+        }
+    }
+
+    #[test]
+    fn legacy_checkpoint_empty_tail_recovers_proven_minting_attribution() {
+        use crate::graph::{SemanticStatementSpec, edge_data::UNKNOWN_LEGACY_ASSERTER_IRI};
+
+        let mut template =
+            replay_captured_deltas([add(1, "https://a.test/"), add(2, "https://b.test/")]);
+        let from = template.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
+        let to = template.get_node_key_by_id(Uuid::from_u128(2)).unwrap();
+        template.assert_surface_semantic_statement(
+            from,
+            to,
+            SemanticStatementSpec {
+                predicate: super::super::predicate_iri(SemanticSubKind::Cites).into(),
+                recognized_sub_kind: Some(SemanticSubKind::Cites),
+                provenance_iri: Some("https://template.test/".into()),
+                asserted_at_ms: Some(100),
+                ..Default::default()
+            },
+        );
+        let mut edges = template.persisted_edges_between(from, to);
+        let mut unknown = edges[0].semantic.as_ref().unwrap().statements[0].clone();
+        unknown.statement_id = "baseline-unknown".into();
+        unknown.provenance_iri = None;
+        let mut known = unknown.clone();
+        known.statement_id = "baseline-source".into();
+        known.provenance_iri = Some("https://source.test/page".into());
+        known.asserted_at_ms = Some(101);
+        edges[0].semantic.as_mut().unwrap().statements = vec![unknown.clone(), known];
+        let capture = |edges| CapturedDelta::ReplaySetEdgesByIds {
+            from_id: Uuid::from_u128(1).to_string(),
+            to_id: Uuid::from_u128(2).to_string(),
+            edges,
+        };
+        let mut baseline = template;
+        super::super::capture::replay_captured_deltas_onto(&mut baseline, [capture(edges.clone())]);
+        let mut minted = unknown;
+        minted.statement_id = "minted-handle".into();
+        minted.asserted_at_ms = Some(200);
+        edges[0].semantic.as_mut().unwrap().statements.push(minted);
+        let minter = Author::engine("first-extractor", "1");
+        let mut journal = GraphJournal::new();
+        journal.record_as(minter.clone(), capture(edges));
+        let mut checkpoint = baseline.clone();
+        super::super::capture::replay_captured_deltas_onto(
+            &mut checkpoint,
+            journal.entries().iter().map(|entry| entry.delta.clone()),
+        );
+        let old = checkpoint.persisted_edges_between(from, to);
+        let old_statements = &old[0].semantic.as_ref().unwrap().statements;
+        assert_eq!(old_statements.len(), 3);
+        assert_eq!(
+            old_statements[0].provenance_iri.as_deref(),
+            Some(UNKNOWN_LEGACY_ASSERTER_IRI)
+        );
+        assert_eq!(
+            old_statements[1].provenance_iri.as_deref(),
+            Some("https://source.test/page")
+        );
+        assert_eq!(
+            old_statements[2].provenance_iri.as_deref(),
+            Some(UNKNOWN_LEGACY_ASSERTER_IRI)
+        );
+        checkpoint = Graph::from_snapshot(&checkpoint.to_snapshot());
+        let before_revision = checkpoint.revision();
+        let captured = Arc::new(Mutex::new(Vec::new()));
+        let sink = captured.clone();
+        checkpoint.set_recorder(Some(Arc::new(move |delta| {
+            sink.lock().unwrap().push(delta.clone());
+        })));
+        journal.replay_from_with_baseline(Seq(1), &mut checkpoint, &baseline);
+        let repaired = checkpoint.persisted_edges_between(from, to);
+        let statements = &repaired[0].semantic.as_ref().unwrap().statements;
+        assert_eq!(statements[2].provenance_iri, Some(minter.asserter_iri()));
+        assert_eq!(statements[2].statement_id, "minted-handle");
+        assert_eq!(statements[2].asserted_at_ms, Some(200));
+        assert_eq!(statements[0], old_statements[0]);
+        assert_eq!(statements[1], old_statements[1]);
+        assert!(checkpoint.revision() > before_revision);
+        assert!(captured.lock().unwrap().is_empty());
+        let full = journal.snapshot_at_from(&baseline, Seq(1)).unwrap();
+        assert_eq!(repaired, full.persisted_edges_between(from, to));
+    }
+
+    #[test]
+    fn exact_capture_attribution_survives_later_authors_and_absent_checkpoint_handles() {
+        use crate::graph::{SemanticStatementSpec, edge_data::UNKNOWN_LEGACY_ASSERTER_IRI};
+
+        let mut template =
+            replay_captured_deltas([add(1, "https://a.test/"), add(2, "https://b.test/")]);
+        let from = template.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
+        let to = template.get_node_key_by_id(Uuid::from_u128(2)).unwrap();
+        template.assert_surface_semantic_statement(
+            from,
+            to,
+            SemanticStatementSpec {
+                predicate: super::super::predicate_iri(SemanticSubKind::Cites).into(),
+                recognized_sub_kind: Some(SemanticSubKind::Cites),
+                provenance_iri: Some("https://template.test/".into()),
+                asserted_at_ms: Some(100),
+                ..Default::default()
+            },
+        );
+        let mut edges = template.persisted_edges_between(from, to);
+        let mut unknown = edges[0].semantic.as_ref().unwrap().statements[0].clone();
+        unknown.statement_id = "baseline-unknown".into();
+        unknown.provenance_iri = None;
+        let mut known = unknown.clone();
+        known.statement_id = "baseline-source".into();
+        known.provenance_iri = Some("https://source.test/page".into());
+        edges[0].semantic.as_mut().unwrap().statements = vec![unknown.clone(), known.clone()];
+        let capture = |edges| CapturedDelta::ReplaySetEdgesByIds {
+            from_id: Uuid::from_u128(1).to_string(),
+            to_id: Uuid::from_u128(2).to_string(),
+            edges,
+        };
+        let mut baseline = template;
+        super::super::capture::replay_captured_deltas_onto(&mut baseline, [capture(edges.clone())]);
+
+        let minter = Author::engine("first-extractor", "1");
+        let updater = Author::script("later-update", "1");
+        let undoer = Author::rule("undo", "1");
+        let mut minted = unknown.clone();
+        minted.statement_id = "minted-handle".into();
+        minted.asserted_at_ms = Some(200);
+        edges[0].semantic.as_mut().unwrap().statements.push(minted);
+        let mut journal = GraphJournal::new();
+        journal.record_as(minter.clone(), capture(edges.clone()));
+        edges[0].semantic.as_mut().unwrap().statements[2].asserted_at_ms = Some(201);
+        journal.record_as(updater.clone(), capture(edges.clone()));
+        let mut withdrawn = edges.clone();
+        withdrawn[0].semantic.as_mut().unwrap().statements = vec![known];
+        journal.record_as(updater, capture(withdrawn));
+        edges[0].semantic.as_mut().unwrap().statements[2].asserted_at_ms = Some(202);
+        edges[0].semantic.as_mut().unwrap().statements[1].provenance_iri = None;
+        journal.record_as(undoer, capture(edges));
+
+        let full = journal.snapshot_at_from(&baseline, Seq(4)).unwrap();
+        let expected = full.persisted_edges_between(from, to);
+        let statements = &expected[0].semantic.as_ref().unwrap().statements;
+        assert_eq!(statements.len(), 3);
+        assert_eq!(statements[0].statement_id, "baseline-unknown");
+        assert_eq!(statements[0].asserted_at_ms, Some(100));
+        assert_eq!(
+            statements[0].provenance_iri.as_deref(),
+            Some(UNKNOWN_LEGACY_ASSERTER_IRI)
+        );
+        assert_eq!(statements[1].statement_id, "baseline-source");
+        assert_eq!(
+            statements[1].provenance_iri.as_deref(),
+            Some("https://source.test/page")
+        );
+        assert_eq!(statements[2].statement_id, "minted-handle");
+        assert_eq!(statements[2].asserted_at_ms, Some(202));
+        assert_eq!(statements[2].provenance_iri, Some(minter.asserter_iri()));
+        for cursor in 0..=4 {
+            let prefix = journal.snapshot_at_from(&baseline, Seq(cursor)).unwrap();
+            let mut checkpoint = Graph::from_snapshot(&prefix.to_snapshot());
+            journal.replay_from_with_baseline(Seq(cursor), &mut checkpoint, &baseline);
+            assert_eq!(checkpoint.persisted_edges_between(from, to), expected);
+        }
+
+        let withdrawn = journal.snapshot_at_from(&baseline, Seq(3)).unwrap();
+        assert_eq!(
+            withdrawn.persisted_edges_between(from, to)[0]
+                .semantic
+                .as_ref()
+                .unwrap()
+                .statements
+                .len(),
+            1
+        );
+        let mut without_baseline = Graph::from_snapshot(&withdrawn.to_snapshot());
+        journal.replay_from(Seq(3), &mut without_baseline);
+        let conservative = without_baseline.persisted_edges_between(from, to);
+        assert_eq!(
+            conservative[0].semantic.as_ref().unwrap().statements[2]
+                .provenance_iri
+                .as_deref(),
+            Some(UNKNOWN_LEGACY_ASSERTER_IRI)
+        );
     }
 
     /// A key-independent view: sorted node ids and sorted (from, to, kind) triples.
@@ -571,12 +1243,7 @@ mod tests {
         add_node(&mut copy, 2);
         add_node(&mut Graph::new(), 3);
         let seen = seen.lock().unwrap();
-        assert_eq!(seen.len(), 2, "node 1 and its visit stamp, nothing else");
-        assert_eq!(seen[0], add(1, "https://1.test/"));
-        assert!(matches!(
-            seen[1],
-            CapturedDelta::ReplayTouchNodeLastVisitedById { .. }
-        ));
+        assert_live_add_captures(&seen, 1, "https://1.test/");
     }
 
     /// Replay reproduces the live graph exactly, clock-read visit stamps and
@@ -605,6 +1272,7 @@ mod tests {
         apply_graph_delta(
             &mut live,
             GraphDelta::AssertRelation {
+                asserter_iri: crate::graph::journal::Author::user().asserter_iri(),
                 from: a,
                 to: b,
                 assertion: EdgeAssertion::Semantic {
@@ -617,6 +1285,7 @@ mod tests {
         apply_graph_delta(
             &mut live,
             GraphDelta::AssertSemanticPredicate {
+                asserter_iri: crate::graph::journal::Author::user().asserter_iri(),
                 from: b,
                 to: a,
                 predicate: "https://schema.org/about".into(),
@@ -646,13 +1315,28 @@ mod tests {
             graph.get_node_key_by_id(id).unwrap()
         };
         for (from, to) in [(a, b), (b, a)] {
+            let resource_pair = (
+                live.shown_resource_id(from).unwrap(),
+                live.shown_resource_id(to).unwrap(),
+            );
+            assert!(live.persisted_edges_between(from, to).is_empty());
             assert!(
-                !live.persisted_edges_between(from, to).is_empty(),
-                "the live graph holds a minted statement there"
+                !live
+                    .persisted_resource_edges_between(resource_pair.0, resource_pair.1)
+                    .is_empty(),
+                "the live Resource graph holds a minted statement there"
             );
             assert_eq!(
-                replayed.persisted_edges_between(key_of(&replayed, from), key_of(&replayed, to)),
-                live.persisted_edges_between(from, to),
+                replayed.shown_resource_id(key_of(&replayed, from)),
+                Some(resource_pair.0)
+            );
+            assert_eq!(
+                replayed.shown_resource_id(key_of(&replayed, to)),
+                Some(resource_pair.1)
+            );
+            assert_eq!(
+                replayed.persisted_resource_edges_between(resource_pair.0, resource_pair.1),
+                live.persisted_resource_edges_between(resource_pair.0, resource_pair.1),
                 "statement ids survive replay"
             );
         }
@@ -679,15 +1363,26 @@ mod tests {
                 position: Point2D::new(0.0, 0.0),
             },
         );
-        // A new node is two entries: the add and its visit stamp.
+        // A live add records the surface, visit, resource and shown binding.
+        assert_live_add_captures(
+            &hooked
+                .lock()
+                .unwrap()
+                .entries()
+                .iter()
+                .map(|entry| entry.delta.clone())
+                .collect::<Vec<_>>(),
+            1,
+            "https://a.test/",
+        );
         assert_eq!(
             hooked.lock().unwrap().len(),
-            2,
+            4,
             "the thread hook sees live edits"
         );
         assert_eq!(
             *seen.lock().unwrap(),
-            2,
+            4,
             "the graph's recorder sees live edits"
         );
 
@@ -698,12 +1393,12 @@ mod tests {
         assert_eq!(session.node_count(), 2);
         assert_eq!(
             hooked.lock().unwrap().len(),
-            2,
+            4,
             "replay reached the thread hook"
         );
         assert_eq!(
             *seen.lock().unwrap(),
-            2,
+            4,
             "replay reached the graph's recorder"
         );
 
@@ -717,8 +1412,16 @@ mod tests {
                 position: Point2D::new(0.0, 0.0),
             },
         );
-        assert_eq!(hooked.lock().unwrap().len(), 4);
-        assert_eq!(*seen.lock().unwrap(), 4);
+        let captures = hooked
+            .lock()
+            .unwrap()
+            .entries()
+            .iter()
+            .map(|entry| entry.delta.clone())
+            .collect::<Vec<_>>();
+        assert_eq!(captures.len(), 8);
+        assert_live_add_captures(&captures[4..], 3, "https://c.test/");
+        assert_eq!(*seen.lock().unwrap(), 8);
         set_captured_delta_hook(None);
     }
 
@@ -861,6 +1564,7 @@ mod tests {
         apply_graph_delta(
             &mut live,
             GraphDelta::AssertRelation {
+                asserter_iri: crate::graph::journal::Author::user().asserter_iri(),
                 from: a,
                 to: b,
                 assertion: EdgeAssertion::Semantic {

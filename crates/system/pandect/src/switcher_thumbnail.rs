@@ -177,8 +177,8 @@ pub fn build_switcher_thumbnail_with(
 
     // Edges: only include those whose endpoints survived the cap.
     thumbnail.edges = graph
-        .relations()
-        .filter_map(|view| {
+        .projected_relations()
+        .filter_map(|(_, view)| {
             if view.from == view.to {
                 return None;
             }
@@ -307,6 +307,8 @@ mod tests {
         let a = graph.add_node("a".into(), PortablePoint::new(0.0, 0.0));
         let b = graph.add_node("b".into(), PortablePoint::new(100.0, 0.0));
         graph.assert_relation(a, b, hyperlink()).unwrap();
+        assert!(graph.find_edge_key(a, b).is_none());
+        assert_eq!(graph.resource_relations().count(), 1);
         let t =
             build_switcher_thumbnail_with(&graph, |_| None, SwitcherThumbnailOptions::default());
         assert_eq!(t.edges.len(), 1);
@@ -342,6 +344,140 @@ mod tests {
         let tags: std::collections::HashSet<u8> = t.edges.iter().map(|e| e.family_tag).collect();
         assert!(tags.contains(&expected_family_tag(EdgeFamily::Semantic)));
         assert!(tags.contains(&expected_family_tag(EdgeFamily::Provenance)));
+        assert!(graph.find_edge_key(a, b).is_none());
+        kernel::graph::apply::apply_graph_delta(
+            &mut graph,
+            kernel::graph::apply::GraphDelta::AppendTraversal {
+                from: a,
+                to: b,
+                trigger: kernel::graph::NavigationTrigger::Programmatic,
+                timestamp_ms: Some(42),
+            },
+        );
+        let mixed =
+            build_switcher_thumbnail_with(&graph, |_| None, SwitcherThumbnailOptions::default());
+        assert_eq!(mixed.edges.len(), 3);
+        assert_eq!(
+            mixed
+                .edges
+                .iter()
+                .filter(|edge| edge.family_tag == expected_family_tag(EdgeFamily::Traversal))
+                .count(),
+            1
+        );
+        assert_eq!(
+            mixed
+                .edges
+                .iter()
+                .filter(|edge| edge.family_tag == expected_family_tag(EdgeFamily::Semantic))
+                .count(),
+            1
+        );
+        assert_eq!(
+            mixed
+                .edges
+                .iter()
+                .filter(|edge| edge.family_tag == expected_family_tag(EdgeFamily::Provenance))
+                .count(),
+            1
+        );
+        let surface_id = graph.get_node(b).unwrap().id;
+        assert!(graph.shown_resource_id(b).is_some());
+        kernel::graph::replay_captured_deltas_onto(
+            &mut graph,
+            [kernel::graph::CapturedDelta::ReplaySetShownResourceById {
+                surface_id: surface_id.to_string(),
+                resource_id: None,
+            }],
+        );
+        assert_eq!(graph.shown_resource_id(b), None);
+        let unshown =
+            build_switcher_thumbnail_with(&graph, |_| None, SwitcherThumbnailOptions::default());
+        assert_eq!(unshown.edges.len(), 1);
+        assert_eq!(
+            unshown.edges[0].family_tag,
+            expected_family_tag(EdgeFamily::Traversal)
+        );
+    }
+
+    #[test]
+    fn resource_content_lifts_to_each_alias_and_respects_the_node_cap() {
+        let mut graph = Graph::new();
+        let nodes: Vec<_> = ["a", "alias-a", "b", "alias-b"]
+            .into_iter()
+            .map(|iri| graph.add_node(iri.into(), PortablePoint::zero()))
+            .collect();
+        graph
+            .assert_relation(nodes[0], nodes[2], hyperlink())
+            .unwrap();
+        for (alias, original) in [(nodes[1], nodes[0]), (nodes[3], nodes[2])] {
+            let resource = graph
+                .shown_resource_id(original)
+                .expect("original shown resource");
+            assert_eq!(graph.shown_resource_id(alias), None);
+            let surface_id = graph.get_node(alias).unwrap().id.to_string();
+            kernel::graph::replay_captured_deltas_onto(
+                &mut graph,
+                [kernel::graph::CapturedDelta::ReplaySetShownResourceById {
+                    surface_id,
+                    resource_id: Some(resource.to_string()),
+                }],
+            );
+            assert_eq!(graph.shown_resource_id(alias), Some(resource));
+        }
+        assert_eq!(graph.resource_relations().count(), 1);
+        assert_eq!(
+            graph.relations().count(),
+            0,
+            "projection does not create Surface authority"
+        );
+        let positions = |key| {
+            nodes
+                .iter()
+                .position(|candidate| *candidate == key)
+                .map(|index| PortablePoint::new(index as f32, 0.0))
+        };
+        let thumbnail =
+            build_switcher_thumbnail_with(&graph, positions, SwitcherThumbnailOptions::default());
+        assert_eq!(thumbnail.edges.len(), 4);
+        assert!(thumbnail.edges.iter().all(|edge| edge.from.x < edge.to.x
+            && edge.family_tag == expected_family_tag(EdgeFamily::Semantic)));
+        let capped = build_switcher_thumbnail_with(
+            &graph,
+            positions,
+            SwitcherThumbnailOptions {
+                max_nodes: 2,
+                ..SwitcherThumbnailOptions::default()
+            },
+        );
+        assert_eq!(capped.nodes.len(), 2);
+        assert_eq!(
+            capped.edges.len(),
+            1,
+            "only the kept source/target pair is rendered"
+        );
+        for target in &nodes[2..] {
+            assert!(graph.shown_resource_id(*target).is_some());
+            let surface_id = graph.get_node(*target).unwrap().id.to_string();
+            kernel::graph::replay_captured_deltas_onto(
+                &mut graph,
+                [kernel::graph::CapturedDelta::ReplaySetShownResourceById {
+                    surface_id,
+                    resource_id: None,
+                }],
+            );
+            assert_eq!(graph.shown_resource_id(*target), None);
+        }
+        assert!(
+            build_switcher_thumbnail_with(&graph, positions, SwitcherThumbnailOptions::default())
+                .edges
+                .is_empty()
+        );
+        assert_eq!(
+            graph.resource_relations().count(),
+            1,
+            "unshown content is retained"
+        );
     }
 
     #[test]

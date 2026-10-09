@@ -404,6 +404,13 @@ pub enum ClassificationStatus {
     Imported,
 }
 
+impl ClassificationStatus {
+    /// Classifications used by ordinary selection, display and affirmative export.
+    pub fn is_affirmative(&self) -> bool {
+        matches!(self, Self::Accepted | Self::Verified | Self::Imported)
+    }
+}
+
 /// A single provenance-bearing classification record on a node.
 ///
 /// Multiple records can coexist; at most one should have `primary: true` per scheme.
@@ -427,17 +434,7 @@ pub struct NodeClassification {
 /// A literal property on a node: an open predicate IRI and its value. Holds the
 /// non-curated literals an ingest preserves — the kernel has no other general
 /// key→value bag (`title` / `tags` stay the curated fast-paths).
-#[derive(
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Archive,
-    Serialize,
-    Deserialize,
-    serde::Serialize,
-    serde::Deserialize,
-)]
+#[derive(Debug, Clone, PartialEq, Eq, Archive, Serialize, Deserialize, serde::Deserialize)]
 pub struct NodeProperty {
     /// Stable handle for this literal statement.
     #[serde(default = "mint_local_statement_id")]
@@ -461,6 +458,45 @@ pub struct NodeProperty {
     /// Optional assertion time in unix epoch milliseconds.
     #[serde(default)]
     pub asserted_at_ms: Option<u64>,
+}
+
+impl serde::Serialize for NodeProperty {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        use serde::ser::SerializeStruct;
+
+        let human = serializer.is_human_readable();
+        let scoped = self.graph_scope != GraphScope::Default;
+        let fields = if human {
+            3 + usize::from(self.datatype.is_some())
+                + usize::from(self.lang.is_some())
+                + usize::from(scoped)
+                + usize::from(self.provenance_iri.is_some())
+                + usize::from(self.asserted_at_ms.is_some())
+        } else {
+            8
+        };
+        // Positional codecs keep the complete legacy field order.
+        let mut state = serializer.serialize_struct("NodeProperty", fields)?;
+        state.serialize_field("statement_id", &self.statement_id)?;
+        state.serialize_field("predicate", &self.predicate)?;
+        state.serialize_field("value", &self.value)?;
+        if !human || self.datatype.is_some() {
+            state.serialize_field("datatype", &self.datatype)?;
+        }
+        if !human || self.lang.is_some() {
+            state.serialize_field("lang", &self.lang)?;
+        }
+        if !human || scoped {
+            state.serialize_field("graph_scope", &self.graph_scope)?;
+        }
+        if !human || self.provenance_iri.is_some() {
+            state.serialize_field("provenance_iri", &self.provenance_iri)?;
+        }
+        if !human || self.asserted_at_ms.is_some() {
+            state.serialize_field("asserted_at_ms", &self.asserted_at_ms)?;
+        }
+        state.end()
+    }
 }
 
 impl NodeProperty {
@@ -498,6 +534,7 @@ impl NodeProperty {
             && self.datatype == other.datatype
             && self.lang == other.lang
             && self.graph_scope == other.graph_scope
+            && self.provenance_iri == other.provenance_iri
     }
 }
 
@@ -661,4 +698,105 @@ pub enum BadgeIcon {
 pub struct NodeTagPresentationState {
     pub ordered_tags: Vec<String>,
     pub icon_overrides: HashMap<String, BadgeIcon>,
+}
+
+#[cfg(test)]
+mod property_serialization_tests {
+    use super::*;
+
+    fn cases() -> Vec<NodeProperty> {
+        let mut plain = NodeProperty::new("urn:predicate:value".into(), "held value".into());
+        plain.statement_id = "held\nproperty".into();
+        plain.provenance_iri = Some("https://author.test/".into());
+        let mut legacy = plain.clone();
+        legacy.provenance_iri = None;
+        let mut marker = plain.clone();
+        marker.provenance_iri = Some(crate::graph::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into());
+        let mut rich = plain.clone();
+        rich.statement_id = String::new();
+        rich.datatype = Some("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString".into());
+        rich.lang = Some("fr".into());
+        rich.graph_scope = GraphScope::Custom("urn:graph:held".into());
+        rich.provenance_iri = Some(String::new());
+        rich.asserted_at_ms = Some(0);
+        let mut explicit = plain.clone();
+        explicit.datatype = Some("http://www.w3.org/2001/XMLSchema#string".into());
+        explicit.lang = Some(String::new());
+        vec![plain, legacy, marker, rich, explicit]
+    }
+
+    #[test]
+    fn property_json_omits_absent_metadata_and_preserves_explicit_values() {
+        let cases = cases();
+        let plain = serde_json::to_value(&cases[0]).unwrap();
+        assert_eq!(plain.as_object().unwrap().len(), 4);
+        assert_eq!(plain["statement_id"], "held\nproperty");
+        assert_eq!(plain["provenance_iri"], "https://author.test/");
+        for absent in ["datatype", "lang", "graph_scope", "asserted_at_ms"] {
+            assert!(plain.get(absent).is_none());
+        }
+        let legacy = serde_json::to_value(&cases[1]).unwrap();
+        assert!(legacy.get("provenance_iri").is_none());
+        let decoded: NodeProperty = serde_json::from_value(legacy).unwrap();
+        assert_eq!(decoded, cases[1], "missing metadata keeps legacy defaults");
+        let marker = serde_json::to_value(&cases[2]).unwrap();
+        assert_eq!(
+            marker["provenance_iri"],
+            crate::graph::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI
+        );
+        let rich = serde_json::to_value(&cases[3]).unwrap();
+        assert_eq!(rich.as_object().unwrap().len(), 8);
+        assert_eq!(rich["statement_id"], "");
+        assert_eq!(rich["provenance_iri"], "");
+        assert_eq!(rich["asserted_at_ms"], 0);
+        assert_eq!(rich["lang"], "fr");
+        let explicit = serde_json::to_value(&cases[4]).unwrap();
+        assert_eq!(
+            explicit["datatype"],
+            "http://www.w3.org/2001/XMLSchema#string"
+        );
+        assert_eq!(explicit["lang"], "");
+        for value in cases {
+            let bytes = serde_json::to_vec(&value).unwrap();
+            assert_eq!(
+                serde_json::from_slice::<NodeProperty>(&bytes).unwrap(),
+                value
+            );
+        }
+    }
+
+    #[test]
+    fn property_binary_bytes_match_the_complete_legacy_shape() {
+        #[derive(serde::Serialize)]
+        struct Complete<'a> {
+            statement_id: &'a String,
+            predicate: &'a String,
+            value: &'a String,
+            datatype: &'a Option<String>,
+            lang: &'a Option<String>,
+            graph_scope: &'a GraphScope,
+            provenance_iri: &'a Option<String>,
+            asserted_at_ms: &'a Option<u64>,
+        }
+        for value in cases() {
+            let old = Complete {
+                statement_id: &value.statement_id,
+                predicate: &value.predicate,
+                value: &value.value,
+                datatype: &value.datatype,
+                lang: &value.lang,
+                graph_scope: &value.graph_scope,
+                provenance_iri: &value.provenance_iri,
+                asserted_at_ms: &value.asserted_at_ms,
+            };
+            let bytes = postcard::to_allocvec(&value).unwrap();
+            assert_eq!(bytes, postcard::to_allocvec(&old).unwrap());
+            assert_eq!(postcard::from_bytes::<NodeProperty>(&bytes).unwrap(), value);
+            let archive = rkyv::to_bytes::<rkyv::rancor::Error>(&value).unwrap();
+            assert_eq!(
+                rkyv::from_bytes::<NodeProperty, rkyv::rancor::Error>(&archive).unwrap(),
+                value
+            );
+        }
+    }
 }

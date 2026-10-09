@@ -34,13 +34,13 @@ pub(crate) fn visible_relation_edges(
     hidden_edges: &HashSet<crate::canvas::EdgeCell>,
 ) -> Vec<(NodeKey, NodeKey)> {
     graph
-        .relations()
-        .filter(|r| {
+        .projected_relations()
+        .filter(|(_, r)| {
             !hidden_edges.contains(&crate::canvas::edge_cells::edge_cell_for_relation(
                 r.from, r.to, r.kind,
             ))
         })
-        .map(|r| (r.from, r.to))
+        .map(|(_, r)| (r.from, r.to))
         .collect()
 }
 
