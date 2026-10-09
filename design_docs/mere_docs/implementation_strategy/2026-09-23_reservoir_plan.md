@@ -1008,6 +1008,18 @@ V2b's rulings, all 2026-09-25:
     2 ms wait in `capture_hook_receives_replayable_apply_events` stays: it
     makes that test's explicit touch change something, which is test setup,
     not a replay workaround.
+48. **Landing ruling 47** (2026-10-08). The coordinator checked the lane:
+    `edit_as` builds both states with one fixed date, 0 (`replay_state`), so
+    the check reads no clock, and visit stamps and every other field still
+    compare exactly. The forced-tick tests passed 20 of 20, with the old form
+    as their control differing 20 of 20. The suites are green (kernel 298,
+    pandect 310, graphshell `personal-sync` 372), and the merge onto
+    `origin/main` (`526cbb3b`, two docs-only commits newer) is clean, so
+    under F138 (dynamics grammar plan) nothing re-gates. Options: merge and
+    push now; hold to land beside G4b1; hold for review. Mark: **"Merge and
+    push now (Recommended)"**. *Follows:* `replay-touch` merges onto
+    `origin/main` and goes to mere main; its worktree, branch and target go
+    once it lands.
 
 ## 8. Progress
 
