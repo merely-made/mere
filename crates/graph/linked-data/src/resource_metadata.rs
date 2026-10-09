@@ -98,6 +98,7 @@ mod tests {
     use kernel::types::{
         ClassificationProvenance, ClassificationStatus, NodeClassification, NodeProperty,
     };
+    use oxrdf::GraphName;
 
     fn fixture() -> Graph {
         let mut graph = Graph::new();
@@ -330,6 +331,241 @@ mod tests {
             },
         );
         assert_eq!(graph.to_snapshot().resources, before.resources); // still shown, deletion refused
+    }
+
+    #[test]
+    fn envelope_keeps_paired_definition_and_literal_assertions_with_exact_handles() {
+        let subject = NamedNode::new_unchecked("urn:concept:paired");
+        let owner = NamedNode::new_unchecked("urn:owner:paired");
+        let mut quads = Vec::new();
+        for (predicate, object) in [
+            (RDF_TYPE, NamedNode::new_unchecked(SKOS_CONCEPT).into()),
+            (
+                SKOS_PREF_LABEL,
+                Literal::new_simple_literal("Paired").into(),
+            ),
+            (crate::PROV_WAS_ATTRIBUTED_TO, owner.clone().into()),
+            (
+                "urn:predicate:ordinary",
+                Literal::new_simple_literal("value").into(),
+            ),
+        ] {
+            push_quad(
+                &mut quads,
+                &subject,
+                predicate,
+                object,
+                &GraphScope::Default,
+            );
+        }
+        let pairs: [(&str, Term, [&str; 2]); 3] = [
+            (
+                SKOS_PREF_LABEL,
+                Literal::new_simple_literal("Paired").into(),
+                ["", "label\nopaque"],
+            ),
+            (
+                crate::PROV_WAS_ATTRIBUTED_TO,
+                owner.into(),
+                ["owner\0opaque", "00000000-0000-0000-0000-000000000001"],
+            ),
+            (
+                "urn:predicate:ordinary",
+                Literal::new_simple_literal("value").into(),
+                ["ordinary opaque", "00000000-0000-0000-0000-000000000002"],
+            ),
+        ];
+        for (predicate, object, handles) in &pairs {
+            for handle in handles {
+                push_statement_metadata_quads(
+                    &mut quads,
+                    &subject,
+                    handle,
+                    predicate,
+                    object.clone(),
+                    &GraphScope::Default,
+                    None,
+                    None,
+                    None,
+                );
+            }
+        }
+        let envelope = crate::from_quads_envelope(quads.clone(), "paired").unwrap();
+        let mut graph = Graph::new();
+        assert_eq!(apply_import(&mut graph, &envelope).edges_skipped, 0);
+        let id = ResourceNode::for_term(subject.as_str()).id();
+        let concept = graph.resource_tag_concept(id).unwrap();
+        assert_eq!(concept.label, "Paired");
+        assert_eq!(concept.owner_iri, "urn:owner:paired");
+        let properties = graph.resource_properties(id);
+        assert_eq!(properties.len(), 4);
+        for (predicate, object, handles) in &pairs {
+            for handle in handles {
+                if let Term::Literal(literal) = object {
+                    let property = properties
+                        .iter()
+                        .find(|p| p.statement_id == *handle)
+                        .unwrap();
+                    assert_eq!(property.predicate, *predicate);
+                    assert_eq!(property.value, literal.value());
+                    assert_eq!(property.graph_scope, GraphScope::Default);
+                    assert_eq!(property.provenance_iri, None);
+                    assert_eq!(property.asserted_at_ms, None);
+                } else {
+                    let held = graph.find_semantic_statement(handle).unwrap().1;
+                    assert_eq!(held.predicate, *predicate);
+                    assert_eq!(held.graph_scope, GraphScope::Default);
+                    assert_eq!(held.provenance_iri, None);
+                    assert_eq!(held.asserted_at_ms, None);
+                }
+            }
+        }
+        let normalized = |quads: Vec<Quad>| {
+            quads
+                .into_iter()
+                .map(|q| q.to_string())
+                .collect::<std::collections::BTreeSet<_>>()
+        };
+        assert_eq!(normalized(dataset_quads(&graph)), normalized(quads));
+        let resources = graph.to_snapshot().resources;
+        let edges = graph.to_snapshot().resource_edges;
+        for imported in [
+            from_jsonld_envelope(
+                serde_json::to_string(&to_jsonld(&graph))
+                    .unwrap()
+                    .as_bytes(),
+            )
+            .unwrap(),
+            from_jsonld_envelope(
+                serde_json::to_string(&to_jsonld_compact(&graph))
+                    .unwrap()
+                    .as_bytes(),
+            )
+            .unwrap(),
+            from_nquads_envelope(&to_nquads(&graph), "paired").unwrap(),
+            from_trig_envelope(&to_trig(&graph).unwrap(), "paired").unwrap(),
+        ] {
+            let mut restored = Graph::new();
+            apply_import(&mut restored, &imported);
+            assert_eq!(restored.resource_properties(id), properties);
+            assert_eq!(restored.to_snapshot().resources, resources);
+            assert_eq!(restored.to_snapshot().resource_edges, edges);
+            assert_eq!(
+                normalized(dataset_quads(&restored)),
+                normalized(dataset_quads(&graph))
+            );
+            let before = restored.to_snapshot();
+            apply_import(&mut restored, &imported);
+            let mut after = restored.to_snapshot();
+            after.timestamp_secs = before.timestamp_secs;
+            assert_eq!(
+                serde_json::to_value(after).unwrap(),
+                serde_json::to_value(before).unwrap()
+            );
+        }
+    }
+
+    #[test]
+    fn envelope_foreign_definition_controls_keep_partial_typed_and_scoped_claims() {
+        let cases = [
+            ("complete", r#""Label""#, vec!["urn:owner:one"], true, false),
+            ("partial", r#""Label""#, vec![], false, false),
+            (
+                "multiple-owner",
+                r#""Label""#,
+                vec!["urn:owner:one", "urn:owner:two"],
+                false,
+                false,
+            ),
+            (
+                "multiple-label",
+                r#""Label", "Other""#,
+                vec!["urn:owner:one"],
+                false,
+                false,
+            ),
+            (
+                "language",
+                r#""Label"@en"#,
+                vec!["urn:owner:one"],
+                false,
+                false,
+            ),
+            (
+                "typed",
+                r#""Label"^^<urn:datatype:label>"#,
+                vec!["urn:owner:one"],
+                false,
+                false,
+            ),
+            ("scoped", r#""Label""#, vec!["urn:owner:one"], false, true),
+        ];
+        for (name, labels, owners, complete, scoped) in cases {
+            let subject = format!("urn:concept:{name}");
+            let mut text = format!("<{subject}> a <{SKOS_CONCEPT}> ; <{SKOS_PREF_LABEL}> {labels}");
+            for (index, owner) in owners.iter().enumerate() {
+                text.push_str(&format!(
+                    " {} <{owner}>",
+                    if index == 0 {
+                        format!("; <{}>", crate::PROV_WAS_ATTRIBUTED_TO)
+                    } else {
+                        ",".into()
+                    }
+                ));
+            }
+            text.push_str(" .");
+            if scoped {
+                text = format!("GRAPH <urn:scope:foreign> {{ {text} }}");
+            }
+            let envelope = from_trig_envelope(&text, name).unwrap();
+            let mut graph = Graph::new();
+            apply_import(&mut graph, &envelope);
+            let id = ResourceNode::for_term(&subject).id();
+            assert_eq!(graph.resource_tag_concept(id).is_some(), complete, "{name}");
+            if complete {
+                assert!(graph.resource_properties(id).is_empty());
+                assert!(graph.resource_edges().next().is_none());
+            } else {
+                let properties = graph.resource_properties(id);
+                assert_eq!(
+                    properties.len(),
+                    if name == "multiple-label" { 2 } else { 1 },
+                    "{name}"
+                );
+                let quads = dataset_quads(&graph);
+                assert!(
+                    quads.iter().any(|q| q.predicate.as_str() == RDF_TYPE
+                        && q.object == Term::NamedNode(NamedNode::new_unchecked(SKOS_CONCEPT))
+                        && q.graph_name
+                            == if scoped {
+                                GraphName::NamedNode(NamedNode::new_unchecked("urn:scope:foreign"))
+                            } else {
+                                GraphName::DefaultGraph
+                            }),
+                    "{name}"
+                );
+                if name == "language" {
+                    assert_eq!(properties[0].lang.as_deref(), Some("en"));
+                }
+                if name == "typed" {
+                    assert_eq!(
+                        properties[0].datatype.as_deref(),
+                        Some("urn:datatype:label")
+                    );
+                }
+                let imported = from_nquads_envelope(&to_nquads(&graph), name).unwrap();
+                let mut restored = Graph::new();
+                apply_import(&mut restored, &imported);
+                let normalize = |g: &Graph| {
+                    dataset_quads(g)
+                        .into_iter()
+                        .map(|q| q.to_string())
+                        .collect::<std::collections::BTreeSet<_>>()
+                };
+                assert_eq!(normalize(&restored), normalize(&graph), "{name}");
+                assert!(restored.resource_tag_concept(id).is_none(), "{name}");
+            }
+        }
     }
 }
 

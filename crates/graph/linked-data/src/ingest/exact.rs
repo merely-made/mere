@@ -196,7 +196,7 @@ pub(super) fn import_edge(
         GraphStratum::Surface => &mut snapshot.edges,
         GraphStratum::Resource => &mut snapshot.resource_edges,
     };
-    records.push(PersistedEdge {
+    let incoming = PersistedEdge {
         from_node_id: pair.0.clone(),
         to_node_id: pair.1.clone(),
         families: vec![PersistedEdgeFamily::Semantic],
@@ -212,12 +212,26 @@ pub(super) fn import_edge(
         arrangement: None,
         imported: None,
         provenance: None,
-    });
-    let pairs: Vec<_> = records
-        .iter()
-        .filter(|record| record.from_node_id == pair.0 && record.to_node_id == pair.1)
-        .cloned()
-        .collect();
+    };
+    let pairs = match stratum {
+        GraphStratum::Surface => {
+            let mut pairs = graph.persisted_edges_between(from, to);
+            pairs.push(incoming.clone());
+            // Preflight the same complete rows that will be replayed, including
+            // live arrangements absent from the durable snapshot projection.
+            records.retain(|record| record.from_node_id != pair.0 || record.to_node_id != pair.1);
+            records.extend(pairs.iter().cloned());
+            pairs
+        },
+        GraphStratum::Resource => {
+            records.push(incoming);
+            records
+                .iter()
+                .filter(|record| record.from_node_id == pair.0 && record.to_node_id == pair.1)
+                .cloned()
+                .collect()
+        },
+    };
     if !preflight(&snapshot) {
         return false;
     }
@@ -235,4 +249,228 @@ pub(super) fn import_edge(
     };
     apply_graph_delta(graph, delta);
     graph.find_semantic_statement(id).is_some()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use kernel::persistence::{
+        PersistedNavigationTrigger, PersistedTraversalEdgeData, PersistedTraversalMetrics,
+        PersistedTraversalRecord,
+    };
+    use kernel::types::GraphScope;
+
+    #[test]
+    fn carried_import_refuses_conflicting_and_cross_store_handles_without_writes() {
+        let mut graph = Graph::new();
+        let from = kernel::graph::apply::add_node(
+            &mut graph,
+            None,
+            "https://from.test/".into(),
+            Default::default(),
+        );
+        let to = kernel::graph::apply::add_node(
+            &mut graph,
+            None,
+            "https://to.test/".into(),
+            Default::default(),
+        );
+        let mut held = NodeProperty::new("urn:predicate:literal".into(), "held".into());
+        held.statement_id = "held-handle".into();
+        assert!(import_properties(&mut graph, from, &[held.clone()]));
+        let truth = |graph: &Graph| {
+            let mut snapshot = graph.to_snapshot();
+            snapshot.timestamp_secs = 0;
+            serde_json::to_value(snapshot).unwrap()
+        };
+        let before = truth(&graph);
+        let mut conflicting = held.clone();
+        conflicting.value = "conflict".into();
+        assert!(!import_properties(&mut graph, from, &[conflicting]));
+        assert_eq!(truth(&graph), before);
+        assert!(!import_properties(&mut graph, to, &[held.clone()]));
+        assert_eq!(truth(&graph), before);
+        let mut edge = EdgeContribution {
+            subject: "https://from.test/".into(),
+            object: "https://to.test/".into(),
+            predicate: "urn:predicate:edge".into(),
+            graph_scope: GraphScope::Default,
+            statement_id: Some(held.statement_id.clone()),
+            label: None,
+            provenance_iri: None,
+            asserted_at_ms: None,
+        };
+        assert!(!import_edge(&mut graph, from, to, &edge));
+        assert_eq!(truth(&graph), before);
+        edge.statement_id = Some("edge-handle".into());
+        assert!(
+            import_edge(&mut graph, from, to, &edge),
+            "distinct handle control"
+        );
+        let before = truth(&graph);
+        let mut property = held.clone();
+        property.statement_id = "edge-handle".into();
+        assert!(!import_properties(&mut graph, from, &[property]));
+        assert_eq!(truth(&graph), before);
+        edge.label = Some("conflicting edge".into());
+        assert!(!import_edge(&mut graph, from, to, &edge));
+        assert_eq!(truth(&graph), before);
+        let resource = graph.shown_resource_id(from).unwrap();
+        assert_eq!(graph.resource_properties(resource), vec![held.clone()]);
+        held.statement_id = "fresh-handle".into();
+        assert!(
+            import_properties(&mut graph, to, &[held.clone()]),
+            "distinct property control"
+        );
+        assert_eq!(
+            graph.resource_properties(graph.shown_resource_id(to).unwrap()),
+            vec![held]
+        );
+    }
+
+    #[test]
+    fn carried_surface_import_preserves_parallel_rows_and_traversals() {
+        let mut graph = Graph::new();
+        let from = kernel::graph::apply::add_node(
+            &mut graph,
+            None,
+            "https://from.test/".into(),
+            Default::default(),
+        );
+        let to = kernel::graph::apply::add_node(
+            &mut graph,
+            None,
+            "https://to.test/".into(),
+            Default::default(),
+        );
+        graph
+            .declare_predicate("urn:predicate:surface", GraphStratum::Surface)
+            .unwrap();
+        let mut snapshot = graph.to_snapshot();
+        let mut first = PersistedEdge {
+            from_node_id: graph.get_node(from).unwrap().id.to_string(),
+            to_node_id: graph.get_node(to).unwrap().id.to_string(),
+            families: vec![PersistedEdgeFamily::Semantic],
+            semantic: Some(PersistedSemanticEdgeData {
+                sub_kinds: vec![],
+                label: Some("held".into()),
+                predicate: Some("urn:predicate:held".into()),
+                agent_decay_progress: None,
+                statements: vec![PersistedSemanticStatement {
+                    statement_id: "held-one".into(),
+                    predicate: "urn:predicate:held".into(),
+                    recognized_sub_kind: None,
+                    label: Some("held".into()),
+                    graph_scope: GraphScope::User,
+                    provenance_iri: Some("urn:author:held".into()),
+                    asserted_at_ms: Some(10),
+                }],
+            }),
+            traversal: None,
+            containment: None,
+            arrangement: None,
+            imported: None,
+            provenance: None,
+        };
+        first.families.push(PersistedEdgeFamily::Traversal);
+        first.traversal = Some(PersistedTraversalEdgeData {
+            traversals: vec![PersistedTraversalRecord {
+                timestamp_ms: 11,
+                trigger: PersistedNavigationTrigger::LinkClick,
+            }],
+            metrics: PersistedTraversalMetrics {
+                total_navigations: 1,
+                forward_navigations: 1,
+                backward_navigations: 0,
+                last_navigated_at: Some(11),
+            },
+        });
+        let mut second = first.clone();
+        second.semantic.as_mut().unwrap().statements[0].statement_id = "held-two".into();
+        let traversal = second.traversal.as_mut().unwrap();
+        traversal.traversals[0].timestamp_ms = 22;
+        traversal.traversals[0].trigger = PersistedNavigationTrigger::Back;
+        traversal.metrics.forward_navigations = 0;
+        traversal.metrics.backward_navigations = 1;
+        traversal.metrics.last_navigated_at = Some(22);
+        snapshot.edges = vec![first.clone(), second.clone()];
+        let mut graph = Graph::try_from_recorded_snapshot(&snapshot).unwrap();
+        let before = graph.to_snapshot().edges;
+        assert!(
+            before.contains(&first) && before.contains(&second),
+            "recorded load control"
+        );
+        for sub_kind in [
+            kernel::graph::ArrangementSubKind::TileGroup,
+            kernel::graph::ArrangementSubKind::SplitPair,
+        ] {
+            apply_graph_delta(
+                &mut graph,
+                GraphDelta::AssertRelation {
+                    from,
+                    to,
+                    assertion: kernel::graph::EdgeAssertion::Arrangement { sub_kind },
+                    asserter_iri: "urn:author:layout".into(),
+                },
+            );
+        }
+        let before = graph.to_snapshot().edges;
+        let before_payloads: Vec<_> = graph
+            .edges_between_undirected(from, to)
+            .map(|(_, payload)| payload.clone())
+            .collect();
+        assert_eq!(
+            before_payloads[0]
+                .arrangement_data()
+                .unwrap()
+                .sub_kinds
+                .len(),
+            2
+        );
+        let incoming = EdgeContribution {
+            subject: "https://from.test/".into(),
+            predicate: "urn:predicate:surface".into(),
+            object: "https://to.test/".into(),
+            graph_scope: GraphScope::User,
+            statement_id: Some("incoming".into()),
+            label: None,
+            provenance_iri: Some("urn:author:incoming".into()),
+            asserted_at_ms: None,
+        };
+        assert!(import_edge(&mut graph, from, to, &incoming));
+        let after_payloads: Vec<_> = graph
+            .edges_between_undirected(from, to)
+            .map(|(_, payload)| payload.clone())
+            .collect();
+        assert_eq!(
+            after_payloads[0], before_payloads[0],
+            "retain the existing first-arc priority and session arrangements"
+        );
+        for held in before_payloads {
+            assert!(
+                after_payloads.contains(&held),
+                "lost complete live Surface payload: {held:?}"
+            );
+        }
+        let after = graph.to_snapshot().edges;
+        assert_eq!(after.len(), before.len() + 1);
+        for held in before {
+            assert!(
+                after.contains(&held),
+                "lost complete Surface record: {held:?}"
+            );
+        }
+        let statement = graph.find_semantic_statement("incoming").unwrap().1;
+        assert_eq!(statement.provenance_iri, incoming.provenance_iri);
+        assert_eq!(statement.asserted_at_ms, None);
+        assert_eq!(statement.predicate, incoming.predicate);
+        let before_retry = graph.to_snapshot();
+        assert!(import_edge(&mut graph, from, to, &incoming));
+        let mut after_retry = graph.to_snapshot();
+        after_retry.timestamp_secs = before_retry.timestamp_secs;
+        assert_eq!(
+            serde_json::to_value(after_retry).unwrap(),
+            serde_json::to_value(before_retry).unwrap()
+        );
+    }
 }
