@@ -279,3 +279,26 @@ plan and producer receipt now distinguish that architectural acceptance from
 open stack performance and live physics. The Mesquite integration receipt
 adds 51 native tests and two headed browser passes; its four captures were
 inspected. The earlier audit counts remain historical.
+
+## 2026-10-09 incremental camera-recovery audit
+
+Checked the new hosted-camera target and Progress entry against merge
+`6a7c7d8fa` (published main `dafacc25c`) plus the source hashes in
+`ports/graphshell/docs/receipts/hosted_camera_recovery.json`. Pictograph frames
+current visible or selected placement without applying an arrangement or
+writing scene state; the hosted action stops following and pan inertia, while
+legacy non-hosted Fit retains its ruled follow behavior. Native framing tests
+cover selection, scope, fold summary, projection, empty/nonfinite input and
+narrow centering. The focus repair reports current runner focus to accessibility
+without overwriting the hover/restyle cache; its regression checks projected
+focus through changes and clear without hover.
+
+The original group and flat pixel gates and new recovery captures pass on
+headed Chrome `152.0.7977.83`, default AMD `gcn-5` WebGPU, with no shader hooks.
+The combined graph-input/keyboard sequence passes without its diagnostic focus
+workaround; disabled and enabled traversal and 420×800 activation were checked.
+Final wide/narrow captures were inspected. All 73 Rootstock tests and the
+recorded framing, host-input, Scenomise, exporter and wasm gates pass. This
+incremental check preserves the zoom-floor, node-centre, label/control-density,
+ambient-context, performance and deployment boundaries. The historical census
+totals above are unchanged.
