@@ -32,8 +32,9 @@
 //!
 //! ## ALPN mapping
 //!
-//! `mere/cable/v1` maps to `DestinationName::new("mere", ["cable.v1"])`: the first
-//! path segment is the Reticulum app name, the rest the dotted aspect.
+//! `mere/cable/v1` maps to `DestinationName::new("mere", ["cable", "v1"])`: the first
+//! path segment is the Reticulum app name, the rest are its aspects. The expanded name
+//! is `mere.cable.v1`, so the destination hash is the one RNS derives.
 //!
 //! [`retinue`]: https://github.com/merely-made/retinue
 
@@ -389,14 +390,15 @@ impl ReticulumTransport {
 }
 
 /// Map an ALPN string to a retinue destination name: the first `/`-segment is the
-/// app name, the remainder is the dotted aspect (`mere/cable/v1` ->
-/// `("mere", ["cable.v1"])`).
+/// app name, the rest are aspects (`mere/cable/v1` -> `("mere", ["cable", "v1"])`).
+/// Separate aspects expand to the same `mere.cable.v1` as one dotted aspect did, and RNS
+/// (and retinue from 0.3.1) refuse a dot inside an aspect.
 fn destination_name_for_alpn(alpn: &Alpn) -> DestinationName {
     let text = String::from_utf8_lossy(alpn.as_bytes());
     let mut parts = text.splitn(2, '/');
     let app = parts.next().filter(|s| !s.is_empty()).unwrap_or("mere");
-    let aspect = parts.next().unwrap_or("").replace('/', ".");
-    DestinationName::new(app, [aspect.as_str()])
+    let rest = parts.next().unwrap_or("");
+    DestinationName::new(app, rest.split('/'))
 }
 
 /// Accept-router task: forward each inbound link to the queue for the ALPN whose
