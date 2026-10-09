@@ -1,7 +1,10 @@
 # Secret Service Plan
 
 **Date**: 2026-10-08
-**Status (2026-10-08)**: plan. Scoped by the
+**Status (2026-10-09)**: parked (ruling SS8). Apps keep the platform's
+keyring; djinn serves no Secret Service for now, and SS5 to SS7 stay as
+the design for when an app needs djinn's lock. Before that, this was a
+plan. Scoped by the
 [vault lock plan](2026-10-05_vault_lock_plan.md)'s ruling 87, which amends
 ruling 69's "later items". Building waits on the
 [device pairing plan](../../mere_docs/implementation_strategy/2026-10-02_device_pairing_by_key_plan.md)'s
@@ -196,6 +199,18 @@ stay; leave them all; SS3 stands. Mark: **"Move per app when routed
 item records the executable that created it, shown in the snapshot;
 per-executable binding; same user only. Mark: **"Same user, record
 executable (Recommended)"**.
+
+**Ruling SS8** *(asked after Mark's "What’s wrong with ceding control to
+the native os?").* Answered first: nothing in itself. It is simpler,
+maintained, unlocked by PAM, and reached by every app, and djinn already
+cedes its root to DPAPI on Windows. What it costs is the lock's promise:
+the ThinkPad's `login` collection read `Locked = false` after that night's
+`loginctl lock-session` and suspend (checked 2026-10-09). Options: cede
+apps' secrets to the OS and shrink the plan to nothing; SS5 stands; cede
+now and keep SS5 on the shelf. Mark: **"Cede now, keep SS5 on the
+shelf"**. Follows: djinn serves no Secret Service, and its own items
+(chatelaine's keychain, SSH keys, OTP) stay in its vault under invariant
+13.
 
 ## 4. Findings
 

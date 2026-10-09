@@ -125,7 +125,8 @@ pub fn compose_facet(
         out.items.push(ProjectedItem {
             source,
             space: Scene::WORLD,
-            transform: Transform2::translation(at.x, at.y),
+            // `at` is the box's top-left; a rect footprint centres on the item.
+            transform: Transform2::translation(at.x + size.w / 2.0, at.y + size.h / 2.0),
             footprint: Footprint::Rect { size },
             representation: Representation::Open { kind: kind.into() },
             layer: 1,
@@ -171,7 +172,10 @@ pub fn compose_facet(
         out.items.push(ProjectedItem {
             source: frame_source,
             space: Scene::WORLD,
-            transform: Transform2::translation(at.x, at.y),
+            transform: Transform2::translation(
+                at.x + layout.cell.w / 2.0,
+                at.y + layout.cell.h / 2.0,
+            ),
             footprint: Footprint::Rect { size: layout.cell },
             representation: Representation::Open {
                 kind: "facet.cell".into(),
