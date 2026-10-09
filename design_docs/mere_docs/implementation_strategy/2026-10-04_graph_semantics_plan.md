@@ -9,8 +9,10 @@ P3 is implemented, qualified and pushed on graph-semantics at `5c6e5c526`. Full 
 native suites, the locked workspace check, kernel/Pandect/query-feature wasm
 checks and the full standalone browser wasm check pass. Fresh source review
 cleared both reported defects after observed-negative regressions and repairs.
-P3 branch publication is recorded below; its main publication is a separate
-checkpoint. Rulings 1–46 remain authoritative; C5/C6 are settled. P4–P5 code
+P3 is being integrated with main `07c39def0`, whose only intervening change
+is the vault-lock design document. All 3067 qualified source/assets/manifests
+bytes match the frozen P3 receipt. Main publication is authorized, then P4
+continues. Rulings 1–46 remain authoritative; C5/C6 are settled. P4–P5 code
 has not begun. Earlier Windows/Linux receipts below are historical.
 Consumer repinning and vocabulary/oracle cleanup remain separate under §4.
 
@@ -3970,3 +3972,12 @@ link, known-root path, historical annotation or source-header finding. Existing
 baseline findings remain recorded in the retained audit JSON. Qualification
 covers the 3067 frozen source/assets/manifests bytes, including the standalone
 browser lock; no package version upgrades or sibling edits were needed.
+
+**P3 main integration (2026-10-09):** Mark authorized “proceed to merge then
+continue”. Main `07c39def0` adds only the vault-lock plan amendment, which
+merges cleanly. The integrated tree matches all 3067 frozen P3
+source/assets/manifests bytes, including the standalone browser lock. Prior
+native/workspace/wasm qualification and fresh source review therefore apply
+unchanged. Documentation audit and publication are verified separately. The
+shared primary checkout is untouched; original worktree and Cargo receipts
+remain. P4 is the next authorized phase, with a report at its boundary.
