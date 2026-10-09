@@ -312,6 +312,186 @@ branch `conatus-world` assesses and builds these queries, its API shapes coming
 to Mark as forks before they are built, then carries T2 (§2) from its own
 assessment; SE69's design round is prepared meanwhile.
 
+##### Assessment (2026-10-09; forks to Mark, nothing built)
+
+The lane read the source at `6308cbeb` and ran two uncommitted scratch tests
+against rapier3d 0.36.0 and parry3d 0.31.1 (debug profile), deleting them
+after their runs. The logs and the scratch sources are kept in
+`Code/testing/mere/conatus-world/` (`m1` to `m3`).
+
+**The consumer.** `isometry/mesocosm/crates/probes/parry-ground/src/main.rs`
+has 481 lines. It pins parry3d `=0.29.0` and has no lockfile, and 0.29 is not
+in this machine's registry, so it does not build offline as it stands. It
+works against one `Voxels` at identity and makes six kinds of call:
+
+- per-cell `voxel_state`, for the occupancy receipt, the 69,632-cell exact
+  pass, the dirty-brick delta comparison, and the FNV signatures over each
+  brick's 512 cells;
+- `voxels()` iteration, whose count must equal the per-cell total, with every
+  cell solid in `Ground` and none below y = 0;
+- `set_voxel` for the delta, where `voxels_changed == removed`;
+- `cast_local_ray_and_get_normal` from 3 above the voxel centre (maximum 64,
+  solid), whose time of impact must equal `Ground`'s analytic answer in bits;
+- `contains_local_point` at the voxel centre;
+- `contact_manifolds` for a radius-0.2 ball centred at y + 0.9, at
+  prediction 0.0, recording the point count and the minimum `dist` in bits.
+
+Before the carve it asserts occupancy, containment and more than zero
+contacts. After it, it asserts no occupancy, no containment and zero contacts,
+a changed time of impact, and unchanged signatures for every brick the carve
+left alone. Replay must reproduce the whole receipt bit for bit. Its revision
+refusals are its own and stay product-side. It has no settle step today; a
+Conatus port would need one after spawning, and that step is what the refresh
+call replaces. Conatus already has `raycast` and `edit_voxels`. M6 shows its
+`raycast` returns the same time-of-impact bits as parry's local cast (2.5,
+`0x40200000`).
+
+**Measurements.**
+
+- M1: rapier's `PhysicsWorld::detect_collisions`, its collision-only
+  pipeline, passes `islands: None` into body-change handling and then clears
+  the modified lists (rapier3d 0.36.0, `pipeline/collision_pipeline.rs` and
+  `pipeline/user_changes.rs`). A dynamic ball spawned, refreshed this way,
+  then stepped ten times stays at y = 2.0 with no active bodies. Without the
+  refresh it falls to 1.8603. After at least one step, a teleport followed by
+  the same refresh does no harm.
+- M2: until a step, a spawned collider is invisible to rays and point
+  queries, and a teleported fixed body still answers at its old place. A
+  Conatus spawn followed by `raycast` returns `None` before `step(1e-6)` and
+  29.0 after it, the positive control for `tactile.rs`'s settle.
+- M3: `edit_voxels` within the collider's existing bounds is visible to
+  queries at once, both for a removal and for a cell added above. A cell added
+  outside the old bounds, at (40, 0, 40), stays invisible until a step.
+- R1: a targeted refresh calls `BroadPhaseBvh::set_aabb` for each touched
+  collider at its current pose. It made a fresh dynamic body visible to
+  queries, and the body still fell to 1.8603. It made the voxel growth
+  visible too. A teleport also needs the collider's cached world pose synced:
+  with the BVH update alone, neither place answered.
+- M4: parry's `voxels()` borrows the shape and copies nothing. On 41,173
+  synthetic cells it took 4.8 ms in debug; a per-cell pass over the
+  102,400-cell domain took 31 ms in debug. Outside the domain, `voxel_state`
+  is `None`. The iteration order follows the chunk BVH: the same set of cells,
+  built from reversed input or by edits, iterates in a different sequence.
+  Within one chunk the order is x, then y, then z. A copied `Vec<[i32; 3]>`
+  would take 494 KB at this scale.
+- M5: in parry 0.31 the single-contact `contact()` and `distance()` return
+  `Unsupported` for voxels, and rapier has no shape-contact query on
+  `PhysicsWorld` or `QueryPipeline`. `contact_manifolds` handles voxels
+  against a sphere, box, capsule and cylinder. With the voxels as the first
+  shape, the probe's case gives one point on the top face of the voxel, with
+  normal (0, 1, 0) pointing out of the voxels and `dist` −0.3. Reversing the
+  order flips the normal. A collider offset by 100 in x moves the point
+  correctly.
+- M5, prediction: for a voxel against a ball, parry finds candidate voxels
+  from the two bounding boxes, each loosened by half the prediction, over a
+  half-open cell range. The effective margin is therefore less than half the
+  prediction. Exact touching gives no point. At prediction 0.1, a gap of 0.04
+  is found but gaps of 0.05 and 0.09 are not; at prediction 0.2, a gap of 0.06
+  is found. A capsule at prediction 0.0 returned one point at `dist` +0.3, so
+  points are not filtered to the prediction either.
+- M6: without `solid`, a voxel point projection lands on the nearest face of
+  its own voxel, whatever the neighbours. The centre of the buried voxel
+  (1, 1, 1) "projects" to the internal face x = 1.0, at distance 0.5.
+
+**Proposed shapes.** The code below is illustrative and has not been compiled.
+Every call takes `&self` except the refresh, and speaks Conatus ids and
+arrays. Like `raycast` and `overlaps`, each refuses non-finite input with
+`InvalidQuery`, refuses an unknown body or collider with `UnknownBody` or
+`UnknownCollider`, and returns an empty result when the filter excludes both
+solids and sensors.
+
+```rust
+// 1. Colliders containing a point, sorted and deduplicated.
+pub fn colliders_at_point(&self, point: [f32; 3], filter: SpatialFilter)
+    -> Result<Vec<ColliderId>, BodyError>;
+// 2. Occupancy of the collider's own grid, in its cell coordinates.
+pub fn voxel_filled(&self, collider: ColliderId, cell: [i32; 3]) -> Result<bool, BodyError>;
+pub fn voxel_cells(&self, collider: ColliderId, within: Option<VoxelBox>)
+    -> Result<impl Iterator<Item = [i32; 3]> + '_, BodyError>;
+// 3. Contacts between a query shape and the world.
+pub struct ShapeContact {
+    pub collider: ColliderId,
+    pub point: [f32; 3],
+    pub normal: [f32; 3],
+    pub distance: f32,
+}
+pub fn contacts(&self, transform: Transform, shape: &ColliderShape, prediction: f32,
+                filter: SpatialFilter) -> Result<Vec<ShapeContact>, BodyError>;
+// 352. Make spawns, moves and voxel growth visible to queries without a step.
+pub fn refresh_queries(&mut self);
+```
+
+`voxel_filled` answers `false` outside the grid. Both occupancy calls refuse a
+collider that is not a voxel grid with `NotVoxelCollider`. `VoxelBox` would be
+a new half-open `[min, max)` box of collider cells, because nisus's
+`VoxelRegion` is chunk-local and `u32`. `refresh_queries` neither advances the
+tick nor emits events.
+
+**Forks for Mark.** The recommendation is listed first in each.
+
+- **P1, point query result.** (a) Containment only, as above. (b) Also the
+  nearest surface point and its distance. (c) Both, as two calls. The probe
+  asks only for containment, and M6 shows parry's voxel projection gives
+  wrong surface distances from inside terrain.
+- **O1, occupancy read-back.** (a) Per cell, plus iteration that can be
+  limited to a cell box. (b) Per cell, plus iteration over the whole grid.
+  (c) Per cell only. (d) Iteration only. The probe needs both kinds: per cell
+  for its 69,632-cell pass and its signatures, iteration to catch extra
+  voxels. T2's log works at 8³-brick grain (331).
+- **O2, iteration order.** (a) A documented canonical order without a copy:
+  Conatus walks parry's 8³ chunks in sorted chunk order, and the cells in
+  each chunk in x, y, z order. (b) No specified order, borrowed; consumers
+  sort. (c) A sorted copy, `Vec<[i32; 3]>`. M4 shows the order depends on how
+  the grid was built. Enhanced determinism (ruling 604, F165) argues for a
+  fixed order, and a copy is 494 KB at the probe's scale.
+- **O3, what is read.** (a) The collider's own grid. (b) Nisus's chunk.
+  (c) Both. The probe exists to check the collision projection against its
+  source, and reading nisus would compare the source with itself. Nisus
+  already offers `VoxelChunk::get`, `iter` and `occupied_cells`.
+- **C1, contact record.** (a) The point on the world collider's surface, in
+  the world frame; the normal pointing out of that collider toward the query
+  shape; the distance negative when penetrating. (b) The points on both
+  shapes. (c) The point on the query shape. Option (a) matches `RayHit`, and
+  it is what voxel manifolds produce natively.
+- **C2, grouping.** (a) A flat list, each record naming its collider. (b)
+  Manifolds per collider, with the points of a manifold sharing a normal. The
+  probe flattens, and parry's voxel-ball path emits one manifold per voxel, so
+  the manifold count means nothing there.
+- **C3, query shapes.** (a) Every `ColliderShape` except `VoxelGrid`, which is
+  refused. (b) The sphere only. (c) Every `ColliderShape`, voxel grids
+  included; parry dispatches voxels against voxels, which was not measured.
+- **C4, prediction.** (a) Accept `prediction >= 0`, return only points with
+  `distance <= prediction`, and document the voxel shortfall from M5. (b) No
+  prediction parameter: penetrating contacts only, with prediction fixed at
+  0.0. (c) Accept it, and compensate in Conatus by loosening the candidate
+  search before filtering. The probe uses 0.0.
+- **Q1, whether 352 joins this lane.** (a) Yes, built with the three
+  queries. (b) In a later lane. The evidence is M2 and `tactile.rs`'s settle.
+  M3 shows T2's additive writes outside a collider's bounds stay invisible to
+  queries without a refresh (334).
+- **Q2, refresh shape.** (a) An explicit `refresh_queries()`, 352's call,
+  that syncs the pose and BVH entry of each collider touched since the last
+  step or refresh (by spawn, transform, kind change or voxel edit). (b)
+  Implicit coherence: each mutation updates its own BVH entry and no call
+  exists; this amends 352. (c) A wrapper over rapier's `detect_collisions`
+  that refuses while bodies spawned since the last step are pending. M1 rules
+  out (c) without its guard, and R1 shows (a) works.
+
+**What T2 needs from these.** T2's Mere integration (334) has to show that
+the collider agrees with the nisus store at a source revision, after both
+carving and additive writes. Reading occupancy from the collider one brick at
+a time (O1 a) is its instrument at the log's 8³ grain (331). Additive writes
+outside a collider's current bounds reach queries only through the refresh
+(M3), so 352 should land before T2's integration. Source stamps (332) attach
+to colliders, and every result here names its `ColliderId`, so a stamp can be
+read per collider. It can also be added as a field of the result structs
+without changing any query signature, and a query result can be paired with
+`collider_revision` the way navigation records the revision it read (333).
+Nisus addresses world cells as `i64`, while the collider uses `i32`
+(`VoxelEdit::cell`). The read-back speaks collider cells, which leaves the
+conversion, and refusing what does not fit, to T2's lowering. The contact
+query is not on T2's path.
+
 The remaining runtime work is parallel system access declarations, enforcing
 the intent-lowering command boundary at the first product profile, and the
 lean spatial-frame resource (§4). A game can already register spatial
