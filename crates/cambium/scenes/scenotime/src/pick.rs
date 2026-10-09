@@ -45,18 +45,19 @@ impl SceneTables {
     /// The topmost live instance whose shape contains `world`, or `None`.
     ///
     /// Topmost means last painted: highest [`ProjectedItem::layer`] first,
-    /// then latest explicit order, then highest stable slot. Invisible items
-    /// and tombstoned slots never pick. An item's `hit` shape is used when
-    /// present, otherwise its footprint, so an item drawn large can be
-    /// clickable small and the reverse.
+    /// then latest explicit order, then highest stable slot. Invisible items,
+    /// members a fold hides, and tombstoned slots never pick. An item's `hit`
+    /// shape is used when present, otherwise its footprint, so an item drawn
+    /// large can be clickable small and the reverse.
     ///
     /// A miss returns `None` rather than a nearest match: this answers "what
     /// is under the pointer", not "what did they probably mean".
     pub fn pick(&self, world: Vec2) -> Option<InstanceId> {
         let mut candidates: Vec<(i16, i32, u32)> = Vec::new();
+        let folds = self.fold_effect();
         for (index, slot) in self.items.iter().enumerate() {
             let Some(item) = slot else { continue };
-            if !item.visible {
+            if !folds.is_shown(InstanceId(index as u32), item.visible) {
                 continue;
             }
             let Some(order) = self.item_order.get(index).copied().flatten() else {

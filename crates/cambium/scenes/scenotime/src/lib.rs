@@ -20,7 +20,7 @@ mod trace;
 mod transition;
 
 pub use diff::{ApplyOutcome, DiffError, SceneDiff, SceneOp};
-pub use ids::{BackdropId, RegionId, RelationId, Revision, SceneEpoch};
+pub use ids::{BackdropId, FoldId, RegionId, RelationId, Revision, SceneEpoch};
 pub use return_motion::{ReturnMotion, ReturnMotionMode, ReturnMotionSettings, ReturnMotionTick};
 pub use snapshot::{SceneSnapshot, SceneTables, SnapshotError};
 pub use trace::{SCENE_TRACE_VERSION, SceneTrace, TraceError, TraceStep};
