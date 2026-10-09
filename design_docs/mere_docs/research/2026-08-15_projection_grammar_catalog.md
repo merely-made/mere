@@ -436,6 +436,97 @@ The source authority must remain unchanged across these projections. Each proof 
 
 Do not add a primitive until one of these proofs fails without it. A catalog is a boundary map, not a cleanup queue or implementation schedule.
 
+### Addition records
+
+#### The swatch and the facet (promoted 2026-10-09)
+
+`scenograph::swatch` (`Scope`, `Swatch`, `Facet`) and `scenomise::facet`
+(`compose_facet`), closing the catalog's "Faceted small multiples" contract gap
+and open item 4; the Scenograph editor plan's track S1, rulings SE53 to SE83.
+
+- **Task:** compare one dataset under several recipes, or one recipe over
+  several scopes, side by side.
+- **Source facts:** each cell's scope (`Node`, `Subgraph` through
+  `curation::SubgraphSpec`, `NestedGraph`, `Mere`, `Selection`) and its recipe
+  (an authored definition and variant) or the view it reflects.
+- **Reading and derivation:** the host compiles each cell with the ordinary
+  compiler; `compose_facet` places the cell scenes, renumbering every source,
+  space and instance so relations, regions, folds and holds keep their cells.
+- **Marks and arrangement:** a space per cell; a frame item per cell
+  (`scenomise.facet-cell/v1`, carrying its scale) and a heading item per axis
+  position (`scenomise.facet-axis/v1`); cells share a scale across axes declared
+  shared and shrink to their box, never grow.
+- **Provenance:** cell items keep their own sources; frames and headings name
+  the facet's adapters, their text the host's from the facet's labels.
+- **Interaction and writeback:** picking a cell is a host intent (the editor
+  applies its arrangement as one undo step); a swatch is view only, editing in
+  it waits for an intent (SE65).
+- **Static and accessible realization:** the frozen form lists every heading,
+  frame and cell item (`graphshell-client/tests/facet_frozen.rs`); the editor
+  gives each cell a labelled button.
+- **First forcing consumer:** the projection editor's comparison grid
+  (`ports/graphshell/src/projection_compare.rs`, Preview | Compare).
+- **Second heterogeneous consumer:** the gloss pane, **pending** (SE62).
+- **Receipt:** `scenograph` swatch tests (round trip, validation refusals);
+  `scenomise` facet tests (shared scale and its independent control, mixed
+  axis rules, renumbering, items inside their frames, a round trip that opens
+  as a scenotime snapshot, generation, refusals); `projection_compare` tests
+  (families once, aliases, the selection row, compiled cards inside frames);
+  the headed `projection_compare.scn` in Chrome and Firefox. Settled frames
+  with dynamics (SE70) wait on the recipe's dynamics slot (SE69).
+- **Removed on promotion:** nothing; no earlier facet implementation existed.
+
+#### The fold fact (promoted 2026-10-08)
+
+`sceno::Fold` (`crates/cambium/scenes/sceno/src/fold.rs`), landed by the mer3ly
+site session as its S5 at `64974ccb`; the site's Rulings 149 to 153, and the
+promotion and duplicate rulings in the projection grammar adoption plan (the
+fold fact's promotion, 2026-10-08).
+
+- **Task:** reduce clutter by drawing a set of related instances as one
+  stand-in, while showing a reader that something is hidden, how much, and why.
+- **Source facts:** scene `InstanceId`s as members, a stand-in, an optional
+  rule, optional boundary accounting. No source fact changes.
+- **Reading and derivation:** the host chooses the members and the fact records
+  how (`FoldRule::Selection`, or `Descendants { root, family, direction }`);
+  readers never re-run the rule. The fact alone hides every member but a member
+  stand-in; "+N" is `hidden_count`. Folds never overlap, so none nest.
+- **Marks:** a member stand-in keeps its own mark with a +N badge; a summary
+  stand-in is a synthetic mark at the members' centroid. Boundary detail is
+  optional accounting: the internal relation count and bundles by outside
+  instance, family and direction.
+- **Provenance:** a fold names only scene instances; a summary has no source and
+  no instance of its own, and its label is the host's.
+- **Interaction and writeback:** fold, unfold and stand-in changes are
+  host-authorised intents arriving as scenotime's `AddFold`, `UpdateFold`,
+  `SetFoldStandIn` and `TombstoneFold`, validated as one transaction; a client
+  never changes the fact on its own.
+- **Static and accessible realization:** graphshell-client's `FrozenFold`, a
+  disclosure listing the members rather than dropping them; fold and
+  folded-instance table rows; a group per fold in the accessibility tree.
+- **First forcing consumer:** the site's projection proof
+  (`graphshell-client/tests/site_fold_parity.rs`).
+- **Second heterogeneous consumer:** Mere's native canvas, **pending** until the
+  native phase (Mark, "Promote, marked pending"); check this record again when
+  it lands.
+- **Receipt:** `unfolding_arrives_as_a_diff_and_round_trips`,
+  `a_fold_free_trace_writes_back_byte_identical`,
+  `optional_detail_stays_off_the_wire_when_absent`,
+  `a_trace_replays_fold_and_unfold`, `every_position_shows_what_the_site_shows`,
+  `the_committed_fact_trace_is_the_derived_one`,
+  `freezing_the_fold_lists_the_group_instead_of_dropping_it`; all seven rerun
+  and passing 2026-10-08 (*annotation 2026-10-09:* that run used the shared
+  build directory F183 withdrew; rerun in this lane's own directory at
+  `17519aa4`, all seven pass). Fold-free scenes are byte-identical to before; an
+  older reader ignores `folds` and shows every member, and cannot parse the new
+  ops.
+- **Removed on promotion:** the site's own fold (`visibility_diff` in
+  `crates/repo-graph`, the `["fold",1]` channel, the "+N" count in
+  `assets/projection-proof.js`), in the site's follow-up. `forme::FoldRecord` is
+  not a duplicate (Mark, "Not a duplicate"): it is the authored record a host
+  lowers into the fact. Open for the native phase: pictograph's
+  `FoldProjection` summary logic overlaps the summary stand-in.
+
 ## What the external systems teach us
 
 External prior art divides into two shelves, and the division is the point. Renderers and toolkits are prior art for drawing a scene. Specification languages and design solvers are prior art for the compiler: what a projection spec *means*, how it is checked, what is left underdetermined, and who is allowed to decide the rest. Mere's realization layer has no shortage of the first kind to learn from. The unresolved questions in the projection stack are almost all on the second shelf.

@@ -43,14 +43,16 @@ fn run(args: Vec<String>) -> Result<(), String> {
             if options.profile.is_some() {
                 return Err("--profile only belongs to configure".into());
             }
-            let authority = match options.vault_dir {
-                Some(vault_dir) => InstalledAuthority::open_with(
-                    &options.data_root,
-                    &vault_dir,
-                    personae::bootstrap::Unlock::from_env(),
-                ),
-                None => InstalledAuthority::open(&options.data_root),
-            }
+            // A CLI may read the passphrase from the environment; the
+            // library takes it explicitly (vault lock plan, rulings 7, 89).
+            let vault_dir = options
+                .vault_dir
+                .unwrap_or_else(personae::bootstrap::default_vault_dir);
+            let authority = InstalledAuthority::open_with(
+                &options.data_root,
+                &vault_dir,
+                personae::bootstrap::Unlock::from_env(),
+            )
             .map_err(|error| error.to_string())?;
             println!(
                 "Distillery profile: {}\nPersonae protection: {}\nProduct root: {}\n\

@@ -26,9 +26,11 @@ fn topic_canvas() -> (Canvas, Vec<NodeKey>, HashMap<NodeKey, usize>) {
     (Canvas::with_graph(graph), keys, topics)
 }
 
-/// Steps the with/without runs take: Springs on the topic fixture needs about
-/// 4 000 to come to rest from a scatter (energy 870 at 1 500, 3.2 at 6 000).
-const SETTLED_STEPS: usize = 6000;
+/// Steps the with/without runs take, so each is read at rest (F176). Under
+/// rapier 0.36, Springs on the topic fixture rests from a scatter by about
+/// 10 000 (energy 12.5 at 6 000, 0.009 at 10 000) and Group pull by cluster by
+/// about 18 000 (326 at 6 000, 1.3 at 12 000, 0.002 at 18 000).
+const SETTLED_STEPS: usize = 18_000;
 
 /// Seed every node at a fixed pseudo-random spot in a 640-wide square, the
 /// same for every run and blind to every partition.

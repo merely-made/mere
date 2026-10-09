@@ -39,6 +39,11 @@
 //!    them so a receipt can say how much of the scene was legible.
 //! 2. **Relations name instances, not sources.** They are resolved to names
 //!    here so the frozen form never asks a reader to follow an index.
+//!
+//! A fold freezes as a group, not as an absence. The members it hides leave
+//! the flat listing and appear under a [`FrozenFold`]: the stand-in, its "+N",
+//! the members behind a disclosure, and the membership rule as a sentence.
+//! An item hidden by its own `visible` flag is still omitted.
 
 use std::collections::HashMap;
 
@@ -46,7 +51,9 @@ use sceno::{
     HeldPlacement, InstanceId, ProjectedItem, Representation, RoutedRelation, Scene, SourceIx,
     SourceRef,
 };
-use scenotime::SceneSnapshot;
+use scenotime::{FoldId, SceneSnapshot};
+
+use crate::fold::FoldReading;
 use serde::{Deserialize, Serialize};
 
 /// What kind of thing a reader is being told about.
@@ -104,6 +111,44 @@ pub struct FrozenRelation {
     pub kind: Option<String>,
 }
 
+/// A fold, frozen as a group a reader can open.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct FrozenFold {
+    /// The fold's table index.
+    pub fold: u32,
+    /// The member drawn in the fold's place, listed among the scene's
+    /// instances; `None` for a summary stand-in.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stand_in: Option<InstanceId>,
+    /// The stand-in's name.
+    pub name: String,
+    /// The count the stand-in carries, `+N`.
+    pub badge: String,
+    /// The members the fold hides, in the fold's own disclosure.
+    pub members: Vec<FrozenInstance>,
+    /// The membership rule as a sentence, when the fold records one.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rule: Option<String>,
+    /// The host's own words for the fold, read in preference to the rule.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
+}
+
+impl FrozenFold {
+    /// What a reader is told the fold is: the label, else the rule.
+    pub fn description(&self) -> Option<&str> {
+        self.label.as_deref().or(self.rule.as_deref())
+    }
+
+    /// The disclosure's one-line summary: "Mere, +6 folded: <label or rule>".
+    pub fn heading(&self) -> String {
+        match self.description() {
+            Some(rule) => format!("{}, {} folded: {rule}", self.name, self.badge),
+            None => format!("{}, {} folded", self.name, self.badge),
+        }
+    }
+}
+
 /// A scene rendered as navigable semantics.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct FrozenScene {
@@ -113,7 +158,12 @@ pub struct FrozenScene {
     /// insufficient. Generated from the scene's own counts rather than
     /// invented, so it cannot drift from what is listed below it.
     pub summary: String,
+    /// The instances a reader meets directly. Members a fold hides are under
+    /// their fold in [`Self::folds`] instead.
     pub instances: Vec<FrozenInstance>,
+    /// The scene's folds, each a group listing what it hides.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub folds: Vec<FrozenFold>,
     pub relations: Vec<FrozenRelation>,
     /// Placements the solver could not honor, carried into the accessible form
     /// because "this was asked to sit here and does not" is exactly the kind of
@@ -128,7 +178,8 @@ impl FrozenScene {
     ///
     /// Invisible items are omitted: the frozen form describes what the scene
     /// presents, and an item the interactive realization does not draw is not
-    /// something a reader is missing.
+    /// something a reader is missing. A fold is different: what it hides is
+    /// one disclosure away, so its members are listed under the fold.
     pub fn freeze(scene: &Scene, name: &str, names: &HashMap<SourceRef, String>) -> Self {
         Self::freeze_parts(
             name,
@@ -139,6 +190,12 @@ impl FrozenScene {
                 .map(|(index, item)| (InstanceId(index as u32), item)),
             |source| scene.sources.get(source.0 as usize),
             scene.relations.iter(),
+            &scene
+                .folds
+                .iter()
+                .enumerate()
+                .map(|(index, fold)| FoldReading::new(FoldId(index as u32), fold))
+                .collect::<Vec<_>>(),
             &scene.unmet_holds,
             |_, source| names.get(source).cloned(),
             |_, _| None,
@@ -186,27 +243,40 @@ impl FrozenScene {
                     .and_then(Option::as_ref)
             },
             snapshot.tables.relations.iter().filter_map(Option::as_ref),
+            &crate::fold::read_folds(snapshot),
             &snapshot.tables.unmet_holds,
             |instance, _| names.get(&instance).cloned(),
             |instance, _| details.get(&instance).cloned(),
         )
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn freeze_parts<'a>(
         name: &str,
         items: impl IntoIterator<Item = (InstanceId, &'a ProjectedItem)>,
         source_at: impl Fn(SourceIx) -> Option<&'a SourceRef>,
         relations: impl IntoIterator<Item = &'a RoutedRelation>,
+        folds: &[FoldReading],
         unmet_holds: &[HeldPlacement],
         resolve_name: impl Fn(InstanceId, &SourceRef) -> Option<String>,
         resolve_detail: impl Fn(InstanceId, &SourceRef) -> Option<String>,
     ) -> Self {
         let mut instances = Vec::new();
         let mut name_by_instance = HashMap::new();
+        let mut every_name = HashMap::new();
         let mut unnamed = 0;
+        let hidden_by = folds
+            .iter()
+            .enumerate()
+            .flat_map(|(position, fold)| fold.hidden.iter().map(move |member| (*member, position)))
+            .collect::<HashMap<_, _>>();
+        let mut folded = vec![Vec::new(); folds.len()];
 
         for (instance, item) in items {
-            if !item.visible {
+            let hidden = hidden_by.get(&instance).copied();
+            // A fold's members are listed under it even when an item's own
+            // flag is off, so the listing always matches the fold's "+N".
+            if !item.visible && hidden.is_none() {
                 continue;
             }
             let Some(source) = source_at(item.source) else {
@@ -217,16 +287,43 @@ impl FrozenScene {
                 unnamed += 1;
             }
             let resolved = supplied.clone().unwrap_or_else(|| source.id.clone());
-            name_by_instance.insert(instance, resolved.clone());
-            instances.push(FrozenInstance {
+            every_name.insert(instance, resolved.clone());
+            let frozen = FrozenInstance {
                 instance,
                 source: source.clone(),
-                name: resolved,
+                name: resolved.clone(),
                 named_by_fallback: supplied.is_none(),
                 role: FrozenRole::of(&item.representation),
                 detail: resolve_detail(instance, source),
-            });
+            };
+            match hidden {
+                Some(position) => folded[position].push(frozen),
+                None => {
+                    name_by_instance.insert(instance, resolved);
+                    instances.push(frozen);
+                },
+            }
         }
+
+        let name_of = |instance: InstanceId| {
+            every_name
+                .get(&instance)
+                .cloned()
+                .unwrap_or_else(|| format!("item {}", instance.0))
+        };
+        let folds = folds
+            .iter()
+            .zip(folded)
+            .map(|(fold, members)| FrozenFold {
+                fold: fold.fold.0,
+                stand_in: fold.stand_in,
+                name: fold.stand_in_name(name_of),
+                badge: fold.badge(),
+                members,
+                rule: fold.rule_text(name_of),
+                label: fold.label.clone(),
+            })
+            .collect::<Vec<_>>();
 
         let relations = relations
             .into_iter()
@@ -239,12 +336,22 @@ impl FrozenScene {
             })
             .collect::<Vec<_>>();
 
-        let summary = summarize(instances.len(), relations.len(), unmet_holds.len());
+        let mut summary = summarize(instances.len(), relations.len(), unmet_holds.len());
+        if !folds.is_empty() {
+            let hidden: usize = folds.iter().map(|fold| fold.members.len()).sum();
+            summary.push_str(&format!(
+                " {} {} {} more.",
+                plural(folds.len(), "fold", "folds"),
+                if folds.len() == 1 { "holds" } else { "hold" },
+                plural(hidden, "item", "items")
+            ));
+        }
 
         Self {
             name: name.to_owned(),
             summary,
             instances,
+            folds,
             relations,
             unmet_holds: unmet_holds.to_vec(),
             unnamed,
@@ -271,6 +378,20 @@ impl FrozenScene {
                         FrozenRole::LiveContent => "live content".to_owned(),
                     }),
             ));
+        }
+        for fold in &self.folds {
+            rows.push((
+                "fold".to_owned(),
+                format!("{} {}", fold.name, fold.badge),
+                fold.description().unwrap_or("folded").to_owned(),
+            ));
+            for member in &fold.members {
+                rows.push((
+                    "folded instance".to_owned(),
+                    member.name.clone(),
+                    format!("folded into {}", fold.name),
+                ));
+            }
         }
         for relation in &self.relations {
             rows.push((
@@ -387,15 +508,19 @@ impl FrozenScene {
 
         html.push_str("<ul class=\"frozen-instances\">");
         for instance in &self.instances {
-            html.push_str(&format!(
-                "<li role=\"{}\" aria-label=\"{}\" data-projection-instance=\"{}\" data-source-adapter=\"{}\" data-source-id=\"{}\">{}</li>",
-                instance.role.aria_role(),
-                escape(&instance.name),
-                instance.instance.0,
-                escape(&instance.source.adapter),
-                escape(&instance.source.id),
-                escape(&instance.name)
-            ));
+            html.push_str(&instance_item(instance));
+            // A member stand-in's fold follows it, so the group is read next
+            // to the item that stands for it.
+            for fold in self
+                .folds
+                .iter()
+                .filter(|fold| fold.stand_in == Some(instance.instance))
+            {
+                html.push_str(&fold_item(fold));
+            }
+        }
+        for fold in self.folds.iter().filter(|fold| fold.stand_in.is_none()) {
+            html.push_str(&fold_item(fold));
         }
         html.push_str("</ul>");
 
@@ -437,6 +562,25 @@ impl FrozenScene {
                 escape(detail)
             ));
         }
+        for fold in &self.folds {
+            html.push_str(&format!(
+                "<tr data-projection-fold=\"{}\"><td>fold</td><th scope=\"row\">{} {}</th><td>{}</td></tr>",
+                fold.fold,
+                escape(&fold.name),
+                escape(&fold.badge),
+                escape(fold.description().unwrap_or("folded"))
+            ));
+            for member in &fold.members {
+                html.push_str(&format!(
+                    "<tr data-projection-instance=\"{}\" data-source-adapter=\"{}\" data-source-id=\"{}\"><td>folded instance</td><th scope=\"row\">{}</th><td>folded into {}</td></tr>",
+                    member.instance.0,
+                    escape(&member.source.adapter),
+                    escape(&member.source.id),
+                    escape(&member.name),
+                    escape(&fold.name)
+                ));
+            }
+        }
         for relation in &self.relations {
             html.push_str(&format!(
                 "<tr><td>relation</td><th scope=\"row\">{} to {}</th><td>{}</td></tr>",
@@ -458,6 +602,34 @@ impl FrozenScene {
         html.push_str("</tbody></table></figure>");
         html
     }
+}
+
+/// One instance as a list item a reader can land on.
+fn instance_item(instance: &FrozenInstance) -> String {
+    format!(
+        "<li role=\"{}\" aria-label=\"{}\" data-projection-instance=\"{}\" data-source-adapter=\"{}\" data-source-id=\"{}\">{}</li>",
+        instance.role.aria_role(),
+        escape(&instance.name),
+        instance.instance.0,
+        escape(&instance.source.adapter),
+        escape(&instance.source.id),
+        escape(&instance.name)
+    )
+}
+
+/// A fold as a disclosure: its heading names the stand-in, the "+N" and the
+/// rule, and opening it lists the members it hides as ordinary instances.
+fn fold_item(fold: &FrozenFold) -> String {
+    let mut html = format!(
+        "<li class=\"frozen-fold\" data-projection-fold=\"{}\"><details><summary>{}</summary><ul class=\"frozen-fold-members\">",
+        fold.fold,
+        escape(&fold.heading())
+    );
+    for member in &fold.members {
+        html.push_str(&instance_item(member));
+    }
+    html.push_str("</ul></details></li>");
+    html
 }
 
 /// One heading on either axis of a [`FrozenGrid`].
@@ -678,6 +850,30 @@ mod tree {
             instances_group.set_children(instance_ids);
             nodes.push((instances_id, instances_group));
 
+            let mut fold_ids = Vec::new();
+            for fold in &self.folds {
+                let mut member_ids = Vec::new();
+                for member in &fold.members {
+                    let id = node_id_for_path(&format!(
+                        "{path}/fold/{}/instance/{}/{}/{}",
+                        fold.fold, member.instance.0, member.source.adapter, member.source.id
+                    ));
+                    let mut node = Node::new(match member.role {
+                        FrozenRole::Symbol => Role::Image,
+                        FrozenRole::Object | FrozenRole::LiveContent => Role::ListItem,
+                    });
+                    node.set_label(member.name.clone());
+                    nodes.push((id, node));
+                    member_ids.push(id);
+                }
+                let id = node_id_for_path(&format!("{path}/fold/{}", fold.fold));
+                let mut group = Node::new(Role::Group);
+                group.set_label(fold.heading());
+                group.set_children(member_ids);
+                nodes.push((id, group));
+                fold_ids.push(id);
+            }
+
             let mut relation_ids = Vec::new();
             for (index, relation) in self.relations.iter().enumerate() {
                 let id = node_id_for_path(&format!("{path}/relation/{index}"));
@@ -710,7 +906,16 @@ mod tree {
                 nodes.push((id, node));
                 unmet_ids.push(id);
             }
-            let mut children = vec![instances_id, relations_id];
+            let mut children = vec![instances_id];
+            if !fold_ids.is_empty() {
+                let folds_id = node_id_for_path(&format!("{path}/folds"));
+                let mut folds_group = Node::new(Role::List);
+                folds_group.set_label(format!("{} folded groups", fold_ids.len()));
+                folds_group.set_children(fold_ids);
+                nodes.push((folds_id, folds_group));
+                children.push(folds_id);
+            }
+            children.push(relations_id);
             if !unmet_ids.is_empty() {
                 let unmet_id = node_id_for_path(&format!("{path}/unmet"));
                 let mut unmet_group = Node::new(Role::List);
@@ -990,6 +1195,216 @@ mod tests {
         assert_eq!(after.instances.len(), before - 1);
     }
 
+    /// Mere and three dependencies, folded behind Mere.
+    fn folded_dependencies() -> Scene {
+        let mut scene = Scene::new();
+        for (index, id) in ["mere", "genet", "netrender", "retinue"].iter().enumerate() {
+            let source = scene.intern_source(SourceRef::new("fixture.repo", *id));
+            scene.items.push(ProjectedItem {
+                source,
+                space: Scene::WORLD,
+                transform: Transform2::translation(index as f32 * 30.0, 0.0),
+                footprint: Footprint::Point,
+                representation: sceno::Representation::Glyph,
+                layer: 0,
+                visible: true,
+                hit: None,
+                channels: Vec::new(),
+            });
+            if index > 0 {
+                scene.relations.push(RoutedRelation {
+                    from: InstanceId(0),
+                    to: InstanceId(index as u32),
+                    space: Scene::WORLD,
+                    points: Vec::new(),
+                    kind: Some("depends_on".into()),
+                    weight: None,
+                });
+            }
+        }
+        scene.folds.push(sceno::Fold {
+            members: (0..4).map(InstanceId).collect(),
+            stand_in: sceno::StandIn::Member(InstanceId(0)),
+            rule: Some(sceno::FoldRule::Descendants {
+                root: InstanceId(0),
+                family: "depends_on".into(),
+                direction: sceno::FoldDirection::Outgoing,
+            }),
+            boundary: None,
+            label: None,
+        });
+        scene
+    }
+
+    #[test]
+    fn a_fold_freezes_as_a_group_not_an_absence() {
+        let scene = folded_dependencies();
+        let names = named(&[("fixture.repo", "mere", "Mere")]);
+        let frozen = FrozenScene::freeze(&scene, "Repositories", &names);
+
+        assert_eq!(
+            frozen
+                .instances
+                .iter()
+                .map(|i| i.name.as_str())
+                .collect::<Vec<_>>(),
+            ["Mere"],
+            "the stand-in is what a reader meets first"
+        );
+        assert_eq!(frozen.folds.len(), 1);
+        let fold = &frozen.folds[0];
+        assert_eq!(fold.stand_in, Some(InstanceId(0)));
+        assert_eq!(fold.badge, "+3");
+        assert_eq!(
+            fold.members
+                .iter()
+                .map(|m| m.name.as_str())
+                .collect::<Vec<_>>(),
+            ["genet", "netrender", "retinue"],
+            "no member is silently dropped"
+        );
+        assert_eq!(
+            fold.heading(),
+            "Mere, +3 folded: Mere and everything it reaches by depends on"
+        );
+        assert!(frozen.summary.ends_with("1 fold holds 3 items more."));
+        assert!(
+            frozen.relations.is_empty(),
+            "relations into the fold are not drawn, so not listed"
+        );
+        let rows = frozen.rows();
+        assert!(rows.contains(&(
+            "folded instance".to_owned(),
+            "genet".to_owned(),
+            "folded into Mere".to_owned()
+        )));
+
+        // The same answer from the sparse snapshot a viewer owns.
+        let snapshot = SceneSnapshot::from_dense(
+            scenotime::SceneEpoch(1),
+            scenotime::Revision(1),
+            scene.clone(),
+        )
+        .unwrap();
+        let mut by_instance = HashMap::new();
+        by_instance.insert(InstanceId(0), "Mere".to_owned());
+        let sparse = FrozenScene::freeze_snapshot(&snapshot, "Repositories", &by_instance);
+        assert_eq!(sparse, frozen);
+    }
+
+    #[test]
+    fn a_fold_is_a_disclosure_in_the_markup() {
+        use genet_scripted_dom::ScriptedDom;
+        use layout_dom_api::LayoutDom;
+
+        let frozen = FrozenScene::freeze(
+            &folded_dependencies(),
+            "Repositories",
+            &named(&[("fixture.repo", "mere", "Mere")]),
+        );
+        let html = frozen.to_html("repos");
+        let dom = ScriptedDom::from_serialized_document(&format!(
+            "<!doctype html><html><body>{html}</body></html>"
+        ));
+        let root = dom.document();
+        let details = descendants(&dom, root, "details");
+        assert_eq!(details.len(), 1);
+        let summary = descendants(&dom, details[0], "summary");
+        assert_eq!(
+            text(&dom, summary[0]),
+            "Mere, +3 folded: Mere and everything it reaches by depends on"
+        );
+        let members = descendants(&dom, details[0], "li")
+            .into_iter()
+            .filter_map(|li| attribute(&dom, li, "data-projection-instance"))
+            .collect::<Vec<_>>();
+        assert_eq!(members, ["1", "2", "3"]);
+        assert_eq!(
+            dom.inner_html(root).matches("<tr").count(),
+            frozen.rows().len() + 1,
+            "every row reached the table"
+        );
+    }
+
+    #[test]
+    fn a_labelled_fold_reads_its_label_in_place_of_the_rule() {
+        use genet_scripted_dom::ScriptedDom;
+        use layout_dom_api::LayoutDom;
+
+        let mut scene = folded_dependencies();
+        scene.folds[0].label = Some("Mere's dependencies".into());
+        let frozen = FrozenScene::freeze(
+            &scene,
+            "Repositories",
+            &named(&[("fixture.repo", "mere", "Mere")]),
+        );
+        let fold = &frozen.folds[0];
+        assert_eq!(fold.label.as_deref(), Some("Mere's dependencies"));
+        assert_eq!(
+            fold.rule.as_deref(),
+            Some("Mere and everything it reaches by depends on"),
+            "the rule is still recorded"
+        );
+        assert_eq!(fold.heading(), "Mere, +3 folded: Mere's dependencies");
+        assert!(frozen.rows().contains(&(
+            "fold".to_owned(),
+            "Mere +3".to_owned(),
+            "Mere's dependencies".to_owned()
+        )));
+
+        let html = frozen.to_html("repos");
+        let dom = ScriptedDom::from_serialized_document(&format!(
+            "<!doctype html><html><body>{html}</body></html>"
+        ));
+        let root = dom.document();
+        let details = descendants(&dom, root, "details");
+        let summary = descendants(&dom, details[0], "summary");
+        assert_eq!(
+            text(&dom, summary[0]),
+            "Mere, +3 folded: Mere's dependencies"
+        );
+        let members = descendants(&dom, details[0], "li")
+            .into_iter()
+            .filter_map(|li| attribute(&dom, li, "data-projection-instance"))
+            .collect::<Vec<_>>();
+        assert_eq!(members, ["1", "2", "3"], "the members are still listed");
+
+        let wire = serde_json::to_string(&frozen).unwrap();
+        assert!(wire.contains(r#""label":"Mere's dependencies""#));
+        let unlabelled = serde_json::to_string(&FrozenScene::freeze(
+            &folded_dependencies(),
+            "Repositories",
+            &HashMap::new(),
+        ))
+        .unwrap();
+        assert!(!unlabelled.contains("\"label\""), "{unlabelled}");
+    }
+
+    #[test]
+    fn a_summary_fold_without_a_rule_still_lists_its_members() {
+        let mut scene = folded_dependencies();
+        scene.folds[0] = sceno::Fold {
+            members: vec![InstanceId(1), InstanceId(2)],
+            stand_in: sceno::StandIn::Summary { label: None },
+            rule: None,
+            boundary: None,
+            label: None,
+        };
+        let frozen = FrozenScene::freeze(&scene, "Repositories", &HashMap::new());
+        assert_eq!(frozen.instances.len(), 2, "mere and retinue stay");
+        assert_eq!(frozen.folds[0].name, "2 folded items");
+        assert_eq!(frozen.folds[0].heading(), "2 folded items, +2 folded");
+        let html = frozen.to_html("repos");
+        assert!(html.contains("<details><summary>2 folded items, +2 folded</summary>"));
+    }
+
+    #[test]
+    fn a_fold_free_freeze_writes_no_fold_key() {
+        let frozen = FrozenScene::freeze(&coastal(), "Coastal map", &HashMap::new());
+        let wire = serde_json::to_string(&frozen).unwrap();
+        assert!(!wire.contains("folds"));
+    }
+
     #[test]
     fn relations_are_resolved_to_names_not_indices() {
         let mut scene = Scene::new();
@@ -1168,6 +1583,23 @@ mod tests {
             stack.extend(children);
         }
         labels
+    }
+
+    #[cfg(feature = "accesskit")]
+    #[test]
+    fn a_screen_reader_reaches_a_fold_and_its_members() {
+        let frozen = FrozenScene::freeze(
+            &folded_dependencies(),
+            "Repositories",
+            &named(&[("fixture.repo", "mere", "Mere")]),
+        );
+        let labels = traverse(&frozen.to_ux_tree("repos"));
+        let at = |label: &str| labels.iter().position(|l| l == label).unwrap();
+        let group = at("Mere, +3 folded: Mere and everything it reaches by depends on");
+        for member in ["genet", "netrender", "retinue"] {
+            assert!(at(member) > group, "{member} is read inside its fold");
+        }
+        assert!(at("Mere") < group, "the stand-in comes first");
     }
 
     #[cfg(feature = "accesskit")]
