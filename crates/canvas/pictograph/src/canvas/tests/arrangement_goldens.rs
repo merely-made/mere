@@ -66,15 +66,55 @@ fn visit(graph: &mut Graph, key: NodeKey, timestamp_ms: u64) {
     );
 }
 
+// The historical goldens used bare Surface nodes and Surface assertions.
+// Live Resource fixtures remain the default for current producer tests.
+fn fixture_node(
+    graph: &mut Graph,
+    legacy_surface: bool,
+    id: Uuid,
+    url: String,
+    position: PortablePoint,
+) -> NodeKey {
+    if legacy_surface {
+        graph.add_node_with_id(id, url, position)
+    } else {
+        add_node(graph, Some(id), url, position)
+    }
+}
+
+fn fixture_link(graph: &mut Graph, legacy_surface: bool, from: NodeKey, to: NodeKey) {
+    if legacy_surface {
+        let from_id = graph.get_node(from).unwrap().id;
+        let to_id = graph.get_node(to).unwrap().id;
+        let asserter_iri = graph.write_author().asserter_iri();
+        apply_graph_delta(
+            graph,
+            GraphDelta::ReplayAssertSemanticPredicateByIds {
+                from_id,
+                to_id,
+                predicate: "links".into(),
+                asserter_iri,
+            },
+        );
+    } else {
+        graph.assert_semantic_predicate(from, to, "links".into());
+    }
+}
+
 /// The topic fixture's 32 titles, sites and links, with fixed ids and visit
 /// times (pairs of nodes share a visit, so the recency order meets ties).
 pub(crate) fn topic_fixture() -> (Graph, Vec<NodeKey>) {
+    topic_fixture_in_store(false)
+}
+
+fn topic_fixture_in_store(legacy_surface: bool) -> (Graph, Vec<NodeKey>) {
     let mut graph = Graph::new();
     let keys: Vec<NodeKey> = (0..32)
         .map(|i| {
-            let key = add_node(
+            let key = fixture_node(
                 &mut graph,
-                Some(Uuid::from_u128(0x7000 + i as u128)),
+                legacy_surface,
+                Uuid::from_u128(0x7000 + i as u128),
                 format!("https://{}.example/{i}", SITES[i % 4]),
                 PortablePoint::new((i % 8) as f32 * 40.0, (i / 8) as f32 * 40.0),
             );
@@ -86,18 +126,19 @@ pub(crate) fn topic_fixture() -> (Graph, Vec<NodeKey>) {
         let members: Vec<usize> = (0..32).filter(|&i| community(i) == c).collect();
         for k in 0..members.len() {
             let (a, b) = (members[k], members[(k + 1) % members.len()]);
-            graph.assert_semantic_predicate(keys[a], keys[b], "links".to_string());
+            fixture_link(&mut graph, legacy_surface, keys[a], keys[b]);
         }
         for (a, b) in [(0, 4), (1, 5), (2, 6), (3, 7)] {
-            graph.assert_semantic_predicate(
+            fixture_link(
+                &mut graph,
+                legacy_surface,
                 keys[members[a]],
                 keys[members[b]],
-                "links".to_string(),
             );
         }
     }
     for (a, b) in [(0, 2), (3, 5), (6, 12), (15, 1)] {
-        graph.assert_semantic_predicate(keys[a], keys[b], "links".to_string());
+        fixture_link(&mut graph, legacy_surface, keys[a], keys[b]);
     }
     for (i, key) in keys.iter().enumerate() {
         visit(
@@ -113,6 +154,10 @@ pub(crate) fn topic_fixture() -> (Graph, Vec<NodeKey>) {
 /// with fixed ids and visit times drawn from a fixed sequence (ties
 /// included).
 pub(crate) fn generated_fixture(n: usize) -> (Graph, Vec<NodeKey>) {
+    generated_fixture_in_store(n, false)
+}
+
+fn generated_fixture_in_store(n: usize, legacy_surface: bool) -> (Graph, Vec<NodeKey>) {
     let mut state: u64 = 0x2545_f491_4f6c_dd1d;
     let mut next = move || {
         state = state
@@ -123,9 +168,10 @@ pub(crate) fn generated_fixture(n: usize) -> (Graph, Vec<NodeKey>) {
     let mut graph = Graph::new();
     let keys: Vec<NodeKey> = (0..n)
         .map(|i| {
-            let key = add_node(
+            let key = fixture_node(
                 &mut graph,
-                Some(Uuid::from_u128(0x5000_0000 + i as u128)),
+                legacy_surface,
+                Uuid::from_u128(0x5000_0000 + i as u128),
                 format!("https://site{}.example/{i}", i % 9),
                 PortablePoint::zero(),
             );
@@ -135,12 +181,12 @@ pub(crate) fn generated_fixture(n: usize) -> (Graph, Vec<NodeKey>) {
         .collect();
     for i in 1..n {
         let parent = (next() as usize) % i;
-        graph.assert_semantic_predicate(keys[i], keys[parent], "links".to_string());
+        fixture_link(&mut graph, legacy_surface, keys[i], keys[parent]);
     }
     for _ in 0..n / 2 {
         let (a, b) = ((next() as usize) % n, (next() as usize) % n);
         if a != b {
-            graph.assert_semantic_predicate(keys[a], keys[b], "links".to_string());
+            fixture_link(&mut graph, legacy_surface, keys[a], keys[b]);
         }
     }
     for key in &keys {
@@ -162,13 +208,25 @@ fn extents(keys: &[NodeKey]) -> HashMap<NodeKey, (f32, f32)> {
 
 /// Every arrangement's `(name, positions hash, score hash)` on `graph`.
 pub(crate) fn arrangement_hashes(graph: &Graph, keys: &[NodeKey]) -> Vec<(String, u64, u64)> {
+    arrangement_projections(graph, keys)
+        .into_iter()
+        .map(|(name, projection)| {
+            let score = projection.score.as_ref().map(score_hash).unwrap_or(0);
+            (name, positions_hash(&projection.positions), score)
+        })
+        .collect()
+}
+
+fn arrangement_projections(
+    graph: &Graph,
+    keys: &[NodeKey],
+) -> Vec<(String, crate::canvas::CanvasStrategyProjection)> {
     let extents = extents(keys);
     // One registry for the one graph, as a host holds it across calls (F87).
     let mut registry = crate::signals::ChannelRegistry::new();
     let mut out = Vec::new();
     let mut record = |name: String, projection: crate::canvas::CanvasStrategyProjection| {
-        let score = projection.score.as_ref().map(score_hash).unwrap_or(0);
-        out.push((name, positions_hash(&projection.positions), score));
+        out.push((name, projection));
     };
     for (id, _) in CANVAS_LAYOUT_STRATEGIES {
         let recent = [true, false];
@@ -244,8 +302,11 @@ pub(crate) fn arrangement_hashes(graph: &Graph, keys: &[NodeKey]) -> Vec<(String
             .collect();
         out.push((
             "radial weighted focus 0".to_string(),
-            positions_hash(&positions),
-            0,
+            crate::canvas::CanvasStrategyProjection {
+                coverage: Default::default(),
+                positions,
+                score: None,
+            },
         ));
     }
     out
@@ -253,7 +314,7 @@ pub(crate) fn arrangement_hashes(graph: &Graph, keys: &[NodeKey]) -> Vec<(String
 
 /// The goldens, taken on `7ea4b77f` before anything moved (G2b step 1).
 #[rustfmt::skip]
-const GOLDENS: &[(&str, &str, u64, u64)] = &[
+const HISTORICAL_GOLDENS: &[(&str, &str, u64, u64)] = &[
     ("topic", "phyllotaxis.default recent_first true", 0x11d4ed56b1ecd0da, 0x4b58e36d54859225),
     ("topic", "phyllotaxis.default recent_first false", 0xb8309ba62e9f1b4a, 0x5969b7597f373d27),
     ("topic", "grid.default recent_first true", 0x43ad04ce7ccbfeca, 0x0000000000000000),
@@ -278,12 +339,47 @@ const GOLDENS: &[(&str, &str, u64, u64)] = &[
     ("generated 500", "radial weighted focus 0", 0x401f146407bdb99a, 0x0000000000000000),
 ];
 
+// Captured independently from untouched main e5a24a4af on Linux. Keep the
+// historical captures too; their arithmetic differs from this platform's
+// bit hashes. The paired-store test below qualifies the new routing directly.
+#[rustfmt::skip]
+const LINUX_GOLDENS: &[(&str, &str, u64, u64)] = &[
+    ("topic", "phyllotaxis.default recent_first true", 0x11d4ed56b1ecd0da, 0x4b58e36d54859225),
+    ("topic", "phyllotaxis.default recent_first false", 0xb8309ba62e9f1b4a, 0x5969b7597f373d27),
+    ("topic", "grid.default recent_first true", 0x43ad04ce7ccbfeca, 0x0000000000000000),
+    ("topic", "spectral.default recent_first true", 0x4dd47e18a22025f5, 0x0000000000000000),
+    ("topic", "penrose.default recent_first true", 0x3cdc98d37bf9b14a, 0x0000000000000000),
+    ("topic", "lsystem.default recent_first true", 0x39409c082dbd6d6f, 0x0000000000000000),
+    ("topic", "kanban.default recent_first true", 0x4e390e0f086b4059, 0x0000000000000000),
+    ("topic", "kanban.community recent_first true", 0x7d9ec76289cca0bd, 0x0000000000000000),
+    ("topic", "timeline.default recent_first true", 0x2812629cb6301615, 0x0000000000000000),
+    ("topic", "radial.default focus 0", 0x7b86498e83ab96e0, 0x0000000000000000),
+    ("topic", "radial weighted focus 0", 0x143223deca19b751, 0x0000000000000000),
+    ("generated 500", "phyllotaxis.default recent_first true", 0xe35641c388bd0762, 0xbf7d39e9cb5455cd),
+    ("generated 500", "phyllotaxis.default recent_first false", 0x05cc902e1c85a84e, 0x18f34e3ca4421cfd),
+    ("generated 500", "grid.default recent_first true", 0x2c8eb12fa9da7098, 0x0000000000000000),
+    ("generated 500", "spectral.default recent_first true", 0xd0d787a1609d27d1, 0x0000000000000000),
+    ("generated 500", "penrose.default recent_first true", 0x6c7bd7d4d9651718, 0x0000000000000000),
+    ("generated 500", "lsystem.default recent_first true", 0xf5f0f54024d08202, 0x0000000000000000),
+    ("generated 500", "kanban.default recent_first true", 0x8e1d4d588a6c9fb9, 0x0000000000000000),
+    ("generated 500", "kanban.community recent_first true", 0x0ef74f7fc29541f7, 0x0000000000000000),
+    ("generated 500", "timeline.default recent_first true", 0x9b32cf772f256e3b, 0x0000000000000000),
+    ("generated 500", "radial.default focus 0", 0xa15022c25bb7cea3, 0x0000000000000000),
+    ("generated 500", "radial weighted focus 0", 0xb6d38886135c5dc3, 0x0000000000000000),
+];
+
+const GOLDENS: &[(&str, &str, u64, u64)] = if cfg!(target_os = "linux") {
+    LINUX_GOLDENS
+} else {
+    HISTORICAL_GOLDENS
+};
+
 #[test]
 fn every_arrangement_matches_its_golden_on_both_fixtures() {
     let mut taken = Vec::new();
     for (fixture, (graph, keys)) in [
-        ("topic", topic_fixture()),
-        ("generated 500", generated_fixture(500)),
+        ("topic", topic_fixture_in_store(true)),
+        ("generated 500", generated_fixture_in_store(500, true)),
     ] {
         for (name, positions, score) in arrangement_hashes(&graph, &keys) {
             println!("    (\"{fixture}\", \"{name}\", 0x{positions:016x}, 0x{score:016x}),");
@@ -291,7 +387,7 @@ fn every_arrangement_matches_its_golden_on_both_fixtures() {
         }
     }
     // The fixtures are fixed: the same hashes twice in one run.
-    let (graph, keys) = topic_fixture();
+    let (graph, keys) = topic_fixture_in_store(true);
     let again = arrangement_hashes(&graph, &keys);
     for (index, (name, positions, score)) in again.iter().enumerate() {
         assert_eq!(
@@ -316,5 +412,51 @@ fn every_arrangement_matches_its_golden_on_both_fixtures() {
             *golden,
             "{fixture} {name} moved from its golden"
         );
+    }
+}
+
+#[test]
+fn resource_and_surface_topologies_have_identical_arrangements() {
+    for (legacy, live) in [
+        (topic_fixture_in_store(true), topic_fixture_in_store(false)),
+        (
+            generated_fixture_in_store(500, true),
+            generated_fixture_in_store(500, false),
+        ),
+    ] {
+        let (legacy, legacy_keys) = legacy;
+        let (live, live_keys) = live;
+        assert!(legacy.resource_nodes().next().is_none());
+        assert!(live.resource_edges().next().is_some());
+        assert_eq!(
+            live.relations().count(),
+            0,
+            "former Surface-only producers see nothing"
+        );
+        for ((name, mut before), (other, mut after)) in
+            arrangement_projections(&legacy, &legacy_keys)
+                .into_iter()
+                .zip(arrangement_projections(&live, &live_keys))
+        {
+            assert_eq!(name, other);
+            assert_eq!(
+                positions_hash(&before.positions),
+                positions_hash(&after.positions),
+                "{name} geometry"
+            );
+            // Revisions count mutations to different stores. Every other score
+            // field must be byte-for-byte identical, not merely visually close.
+            if let Some(score) = &mut before.score {
+                score.generation = 0;
+            }
+            if let Some(score) = &mut after.score {
+                score.generation = 0;
+            }
+            assert_eq!(
+                serde_json::to_value(before.score).unwrap(),
+                serde_json::to_value(after.score).unwrap(),
+                "{name} score"
+            );
+        }
     }
 }

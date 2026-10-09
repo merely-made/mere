@@ -216,7 +216,7 @@ impl Graph {
         Some(self.node_facet_or_default(key, ARRANGEMENT_PIN))
     }
 
-    pub(crate) fn insert_node_tag(&mut self, key: NodeKey, tag: String) -> bool {
+    pub(crate) fn legacy_insert_node_tag(&mut self, key: NodeKey, tag: String) -> bool {
         let inserted = {
             let Some(node) = self.inner.node_mut(key) else {
                 return false;
@@ -234,7 +234,7 @@ impl Graph {
         inserted
     }
 
-    pub(crate) fn remove_node_tag(&mut self, key: NodeKey, tag: &str) -> bool {
+    pub(crate) fn legacy_remove_node_tag(&mut self, key: NodeKey, tag: &str) -> bool {
         let removed = {
             let Some(node) = self.inner.node_mut(key) else {
                 return false;
@@ -271,11 +271,15 @@ impl Graph {
     }
 
     /// Append an open literal property, deduplicating the full literal record
-    /// `(predicate, value, datatype, lang)`. Returns whether the property was
+    /// `(predicate, value, datatype, lang, scope, asserter)`. Returns whether the property was
     /// newly added. The sanctioned write path for `Node::properties` — the
     /// linked-data ingest previously pushed through `get_node_mut` (write-path
     /// migration, 2026-07-01).
-    pub(crate) fn append_node_property(&mut self, key: NodeKey, property: NodeProperty) -> bool {
+    pub(crate) fn legacy_append_node_property(
+        &mut self,
+        key: NodeKey,
+        property: NodeProperty,
+    ) -> bool {
         if self.inner.node(key).is_none() {
             return false;
         }
@@ -285,10 +289,7 @@ impl Graph {
             .iter_mut()
             .find(|existing| existing.content_eq(&property))
         {
-            if existing.provenance_iri != property.provenance_iri
-                || existing.asserted_at_ms != property.asserted_at_ms
-            {
-                existing.provenance_iri = property.provenance_iri;
+            if existing.asserted_at_ms != property.asserted_at_ms {
                 existing.asserted_at_ms = property.asserted_at_ms;
                 return self.set_node_facet(key, SEMANTIC_PROPERTIES, &properties);
             }
@@ -316,10 +317,31 @@ impl Graph {
 
     pub fn node_classifications(&self, key: NodeKey) -> Option<Vec<NodeClassification>> {
         self.get_node(key)?;
+        Some(match self.shown_resource_id(key) {
+            Some(id) => self
+                .resource_classification_variants(id)
+                .into_iter()
+                .map(|entry| entry.classification)
+                .collect(),
+            None => self.legacy_node_classifications(key).unwrap_or_default(),
+        })
+    }
+
+    /// Raw retained Surface content, used by legacy replay and RDF compatibility.
+    pub fn legacy_node_classifications(&self, key: NodeKey) -> Option<Vec<NodeClassification>> {
+        self.get_node(key)?;
         Some(self.node_facet_or_default(key, SEMANTIC_CLASSIFICATIONS))
     }
 
     pub fn node_properties(&self, key: NodeKey) -> Option<Vec<NodeProperty>> {
+        self.get_node(key)?;
+        Some(match self.shown_resource_id(key) {
+            Some(id) => self.resource_properties(id),
+            None => self.legacy_node_properties(key).unwrap_or_default(),
+        })
+    }
+
+    pub fn legacy_node_properties(&self, key: NodeKey) -> Option<Vec<NodeProperty>> {
         self.get_node(key)?;
         Some(self.node_facet_or_default(key, SEMANTIC_PROPERTIES))
     }
@@ -332,7 +354,7 @@ impl Graph {
     /// Add a classification record to a node.
     ///
     /// Deduplicates by `(scheme, value)`. Returns `true` if the record was inserted.
-    pub(crate) fn add_node_classification(
+    pub(crate) fn legacy_add_node_classification(
         &mut self,
         key: NodeKey,
         classification: NodeClassification,
@@ -380,7 +402,7 @@ impl Graph {
     /// Remove all classification records matching `(scheme, value)`.
     ///
     /// Returns `true` if at least one record was removed.
-    pub(crate) fn remove_node_classification(
+    pub(crate) fn legacy_remove_node_classification(
         &mut self,
         key: NodeKey,
         scheme: &ClassificationScheme,
@@ -402,7 +424,7 @@ impl Graph {
     /// Update the `status` of a classification record identified by `(scheme, value)`.
     ///
     /// Returns `true` if a matching record was found and updated.
-    pub(crate) fn set_node_classification_status(
+    pub(crate) fn legacy_set_node_classification_status(
         &mut self,
         key: NodeKey,
         scheme: &ClassificationScheme,
@@ -427,7 +449,7 @@ impl Graph {
     /// Promote a classification record to primary for its scheme; demotes all others.
     ///
     /// Returns `true` if a matching record was found.
-    pub(crate) fn set_node_primary_classification(
+    pub(crate) fn legacy_set_node_primary_classification(
         &mut self,
         key: NodeKey,
         scheme: &ClassificationScheme,
@@ -456,10 +478,10 @@ impl Graph {
         tag: &str,
         icon: Option<crate::types::BadgeIcon>,
     ) -> bool {
-        let Some(node) = self.inner.node(key) else {
+        let Some(tags) = self.node_content_tags(key) else {
             return false;
         };
-        if !node.tags.contains(tag) || tag.starts_with('#') || tag.starts_with("udc:") {
+        if !tags.contains(tag) || tag.starts_with('#') || tag.starts_with("udc:") {
             return false;
         }
         let mut presentation =

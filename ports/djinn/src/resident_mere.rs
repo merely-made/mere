@@ -852,8 +852,8 @@ impl MereEndpoint {
                         let id = payload.session.ok_or("save names no session")?;
                         let host = shared.host(id).await?;
                         let mut host = host.lock().await;
-                        let payload = host.graph_session().codicil_payload();
-                        let id = pandect::graph_codicil::save_session_codicil_checked(
+                        let payload = host.graph_session().profiled_codicil_payload();
+                        let id = pandect::graph_codicil::save_profiled_session_codicil_checked(
                             &mut store,
                             payload,
                             pandect::graph_codicil::archive_timestamp(),

@@ -25,7 +25,9 @@ component, with the vault lock's semantics (rulings 10, 67 and 68).
   17 and 20 (the store is a view of chatelaine items; a clean break for
   castellan's own old Secret Service records).
 - [dramatis repo plan](2026-10-06_dramatis_repo_plan.md): moves
-  `secret_service/` out of castellan later.
+  `secret_service/` out of castellan later. *Corrected 2026-10-09:* D2 keeps
+  the service in castellan; D21 and D30 moved only its metadata, to
+  chatelaine (DR-A's A6).
 - [standards survey brief](../../2026-08-24_standards_survey_brief.md),
   lines 280-286 (a check of which process holds the name) and 723, 909
   (the client-side portal, marked SKIP).

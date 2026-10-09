@@ -182,7 +182,8 @@ impl Canvas {
             self.channels.community_held(),
             self.channels.sites_fresh(&self.graph),
         )
-        .with_meaning(self.meaning.snapshot());
+        .with_meaning(self.meaning.snapshot())
+        .with_registry(&self.channels, self.physics_view_key());
         // A group is named by its smallest member's stable id (F134), which
         // survives the partition renumbering its groups.
         let groups = inputs.groups(source);

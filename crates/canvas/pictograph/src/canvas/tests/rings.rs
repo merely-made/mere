@@ -9,6 +9,320 @@
 
 use super::*;
 
+fn set_address(canvas: &mut Canvas, key: NodeKey, url: &str) {
+    canvas.ingest_graph(|graph| {
+        kernel::graph::apply::apply_graph_delta(
+            graph,
+            kernel::graph::apply::GraphDelta::SetNodeUrl {
+                key,
+                new_url: url.into(),
+            },
+        );
+        true
+    });
+}
+
+#[test]
+fn strategy_cache_tracks_visible_payload_and_resource_rebinding() {
+    use kernel::graph::SemanticStatementSpec;
+    let (graph, [a, alias_a, b, _, unbound]) = crate::canvas::build_tests::shown_content_graph();
+    let mut canvas = Canvas::with_graph(graph);
+    canvas.note_strategy_computed("kanban.default", 800, 600, None);
+    let revision = canvas.graph().revision();
+    let url_groups = canvas.graph().url_grouping_revision();
+    let footprint_revision = canvas.strategy_footprint_revision;
+    let extents = canvas.strategy_extents();
+    set_address(
+        &mut canvas,
+        unbound,
+        "https://unbound.surface.test/elsewhere",
+    );
+    assert_ne!(
+        canvas.graph().revision(),
+        revision,
+        "new empty page still advances graph truth"
+    );
+    assert_eq!(canvas.graph().url_grouping_revision(), url_groups);
+    assert_eq!(canvas.strategy_extents(), extents);
+    assert_eq!(canvas.strategy_footprint_revision, footprint_revision);
+    assert_eq!(canvas.graph().projected_relations().count(), 13);
+    assert!(!canvas.needs_strategy_recompute("kanban.default", 800, 600, None));
+    assert!(
+        !canvas.needs_strategy_recompute("kanban.default", 800, 600, None),
+        "steady frame reuses the stamp"
+    );
+
+    let claim = canvas
+        .graph()
+        .get_edge(canvas.graph().find_edge_key(a, b).unwrap())
+        .unwrap()
+        .semantic_statements()[0]
+        .clone();
+    canvas.ingest_graph(|graph| {
+        graph
+            .assert_semantic_statement(
+                a,
+                b,
+                SemanticStatementSpec {
+                    predicate: claim.predicate,
+                    recognized_sub_kind: claim.recognized_sub_kind,
+                    label: Some("edited metadata".into()),
+                    graph_scope: claim.graph_scope,
+                    provenance_iri: claim.provenance_iri,
+                    asserted_at_ms: claim.asserted_at_ms,
+                },
+            )
+            .unwrap()
+            .1
+            .changed
+    });
+    assert_eq!(
+        canvas.graph().projected_relations().count(),
+        13,
+        "classifier rows did not change"
+    );
+    assert!(
+        canvas.needs_strategy_recompute("kanban.default", 800, 600, None),
+        "same-kind payload edit invalidates"
+    );
+    canvas.note_strategy_computed("kanban.default", 800, 600, None);
+    assert!(!canvas.needs_strategy_recompute("kanban.default", 800, 600, None));
+
+    set_address(
+        &mut canvas,
+        alias_a,
+        "https://alias-a.surface.test/elsewhere",
+    );
+    assert_eq!(canvas.graph().url_grouping_revision(), url_groups);
+    assert_eq!(
+        canvas.graph().projected_relations().count(),
+        7,
+        "rebind removes six lifted rows"
+    );
+    assert_eq!(
+        canvas.graph().resource_relations().count(),
+        2,
+        "original resource truth survives"
+    );
+    assert!(
+        canvas.needs_strategy_recompute("kanban.default", 800, 600, None),
+        "visible content topology changed"
+    );
+}
+
+#[test]
+fn restored_score_tracks_visible_inputs_and_same_revision_graph_swap_clears_cache() {
+    let (graph, [a, alias_a, _, _, unbound]) = crate::canvas::build_tests::shown_content_graph();
+    let mut canvas = Canvas::with_graph(graph);
+    let mut extents = canvas.strategy_extents();
+    extents.insert(a, (64.0, 64.0));
+    let mut registry = crate::signals::ChannelRegistry::new();
+    let channels = registry.disclose(
+        canvas.graph(),
+        &[::cartography::ORDER_TIMELINE, ::cartography::WEIGHT_RECENCY],
+        None,
+    );
+    let score = ::cartography::project_spiral_score(
+        canvas.graph(),
+        &channels,
+        ::cartography::ORDER_TIMELINE,
+        Some(&extents),
+        None,
+    )
+    .score;
+    let footprint_revision = canvas.strategy_footprint_revision;
+    assert!(canvas.restore_projection_score(score.clone()));
+    assert_eq!(canvas.node_size(a), 64.0);
+    assert_ne!(canvas.strategy_footprint_revision, footprint_revision);
+    assert!(!canvas.needs_strategy_recompute("phyllotaxis.default", 800, 600, None));
+    let id = canvas.graph().get_node(a).unwrap().id;
+    canvas.set_node_size(id, 80.0);
+    assert!(
+        canvas.needs_strategy_recompute("phyllotaxis.default", 800, 600, None),
+        "a later real footprint change releases restored placement"
+    );
+    assert!(canvas.restore_projection_score(score));
+    assert!(!canvas.needs_strategy_recompute("phyllotaxis.default", 800, 600, None));
+    set_address(
+        &mut canvas,
+        unbound,
+        "https://unbound.surface.test/elsewhere",
+    );
+    assert!(
+        !canvas.needs_strategy_recompute("phyllotaxis.default", 800, 600, None),
+        "empty page binding keeps restored placement"
+    );
+    set_address(
+        &mut canvas,
+        alias_a,
+        "https://alias-a.surface.test/elsewhere",
+    );
+    assert!(
+        canvas.needs_strategy_recompute("phyllotaxis.default", 800, 600, None),
+        "visible content rebind releases restored placement"
+    );
+
+    let mut first = Graph::new();
+    first.add_node("https://first.test/".into(), Default::default());
+    let mut second = Graph::new();
+    second.add_node("https://second.test/".into(), Default::default());
+    assert_eq!(first.revision(), second.revision());
+    let mut canvas = Canvas::with_graph(first);
+    canvas.note_strategy_computed("grid.default", 800, 600, None);
+    assert!(!canvas.needs_strategy_recompute("grid.default", 800, 600, None));
+    canvas.set_graph(second);
+    assert!(
+        canvas.needs_strategy_recompute("grid.default", 800, 600, None),
+        "equal revision is not graph identity"
+    );
+}
+
+#[test]
+fn strategy_cache_tracks_replayed_raw_predicate_edits_with_identical_classifier_rows() {
+    use kernel::graph::apply::{GraphDelta, apply_graph_delta};
+    const SOURCE: &str = "https://source.test/";
+    const OLD: &str = "https://predicate.test/old";
+    const NEW: &str = "https://predicate.test/new";
+    let mut graph = Graph::new();
+    let a = graph.add_node("https://a.test/".into(), Default::default());
+    let b = graph.add_node("https://b.test/".into(), Default::default());
+    let from_id = graph.get_node(a).unwrap().id;
+    let to_id = graph.get_node(b).unwrap().id;
+    // This cache regression exercises the retained raw Surface replay grammar.
+    apply_graph_delta(
+        &mut graph,
+        GraphDelta::ReplayAssertSemanticPredicateByIds {
+            from_id,
+            to_id,
+            predicate: OLD.into(),
+            asserter_iri: SOURCE.into(),
+        },
+    );
+    assert!(graph.to_snapshot().resource_edges.is_empty());
+    let mut canvas = Canvas::with_graph(graph);
+    let rows: Vec<_> = canvas
+        .graph()
+        .projected_relations()
+        .map(|(_, row)| row)
+        .collect();
+    canvas.note_strategy_computed("grid.default", 800, 600, None);
+    assert!(!canvas.needs_strategy_recompute("grid.default", 800, 600, None));
+    let edit = || GraphDelta::ReplaySetEdgeSemanticPredicateByIds {
+        from_id,
+        to_id,
+        predicate: Some(NEW.into()),
+        asserter_iri: SOURCE.into(),
+    };
+    canvas.ingest_graph(|graph| {
+        apply_graph_delta(graph, edit());
+        true
+    });
+    assert_eq!(
+        canvas
+            .graph()
+            .projected_relations()
+            .map(|(_, row)| row)
+            .collect::<Vec<_>>(),
+        rows
+    );
+    let payload = canvas
+        .graph()
+        .get_edge(canvas.graph().find_edge_key(a, b).unwrap())
+        .unwrap();
+    assert_eq!(payload.semantic_statements()[0].predicate, NEW);
+    assert_eq!(
+        payload.semantic_statements()[0].provenance_iri.as_deref(),
+        Some(SOURCE)
+    );
+    assert!(
+        canvas.needs_strategy_recompute("grid.default", 800, 600, None),
+        "replay payload edit invalidates warm cache"
+    );
+    canvas.note_strategy_computed("grid.default", 800, 600, None);
+    let revision = canvas.graph().revision();
+    canvas.ingest_graph(|graph| {
+        apply_graph_delta(graph, edit());
+        true
+    });
+    assert_eq!(
+        canvas.graph().revision(),
+        revision,
+        "identical replay edit is a no-op"
+    );
+    assert!(!canvas.needs_strategy_recompute("grid.default", 800, 600, None));
+}
+
+#[test]
+fn strategy_cache_tracks_exact_assertion_insertions_and_retractions() {
+    use kernel::graph::SemanticStatement;
+    let (graph, [a, _, b, _, _]) = crate::canvas::build_tests::shown_content_graph();
+    let mut canvas = Canvas::with_graph(graph);
+    let exact = |id: &str| SemanticStatement {
+        statement_id: id.into(),
+        predicate: kernel::graph::predicate_iri(SemanticSubKind::UserGrouped).into(),
+        recognized_sub_kind: Some(SemanticSubKind::UserGrouped),
+        label: Some(id.into()),
+        graph_scope: Default::default(),
+        provenance_iri: Some(format!("https://source.test/{id}")),
+        asserted_at_ms: Some(17),
+    };
+    canvas.note_strategy_computed("grid.default", 800, 600, None);
+    for (id, count) in [("cache-alice", 14), ("cache-bob", 15)] {
+        assert!(!canvas.needs_strategy_recompute("grid.default", 800, 600, None));
+        canvas.ingest_graph(|graph| {
+            graph
+                .assert_persisted_semantic_statement(a, b, exact(id))
+                .is_some()
+        });
+        assert_eq!(canvas.graph().projected_relations().count(), count);
+        assert!(
+            canvas.needs_strategy_recompute("grid.default", 800, 600, None),
+            "a distinct carried assertion adds multiplicity"
+        );
+        canvas.note_strategy_computed("grid.default", 800, 600, None);
+        let revision = canvas.graph().revision();
+        canvas.ingest_graph(|graph| {
+            graph
+                .assert_persisted_semantic_statement(a, b, exact(id))
+                .is_some()
+        });
+        assert_eq!(canvas.graph().revision(), revision);
+        assert_eq!(canvas.graph().projected_relations().count(), count);
+        assert!(
+            !canvas.needs_strategy_recompute("grid.default", 800, 600, None),
+            "exact duplicate keeps the cached multiplicity"
+        );
+    }
+    canvas.ingest_graph(|graph| graph.retract_semantic_statement(a, b, "cache-alice"));
+    assert_eq!(canvas.graph().projected_relations().count(), 14);
+    assert!(canvas.needs_strategy_recompute("grid.default", 800, 600, None));
+    let payload = canvas
+        .graph()
+        .get_edge(canvas.graph().find_edge_key(a, b).unwrap())
+        .unwrap();
+    assert!(
+        payload
+            .semantic_statements()
+            .iter()
+            .any(|statement| statement.statement_id == "cache-bob")
+    );
+    assert!(
+        !payload
+            .semantic_statements()
+            .iter()
+            .any(|statement| statement.statement_id == "cache-alice")
+    );
+    canvas.note_strategy_computed("grid.default", 800, 600, None);
+    let revision = canvas.graph().revision();
+    assert!(!canvas.ingest_graph(|graph| graph.retract_semantic_statement(a, b, "missing-handle")));
+    assert_eq!(canvas.graph().revision(), revision);
+    assert!(!canvas.needs_strategy_recompute("grid.default", 800, 600, None));
+    canvas.ingest_graph(|graph| graph.retract_semantic_statement(a, b, "cache-bob"));
+    assert_eq!(canvas.graph().projected_relations().count(), 13);
+    assert!(canvas.needs_strategy_recompute("grid.default", 800, 600, None));
+    assert_eq!(canvas.graph().resource_relations().count(), 2);
+}
+
 #[test]
 fn arrangement_recompute_is_gated_on_its_inputs() {
     let mut graph = Graph::new();
@@ -20,7 +334,20 @@ fn arrangement_recompute_is_gated_on_its_inputs() {
         "https://b.example".to_string(),
         PortablePoint::new(1.0, 0.0),
     );
-    graph.assert_semantic_predicate(a, b, "links".to_string());
+    // This control holds topology on Surfaces while only URL grouping changes.
+    let from_id = graph.get_node(a).unwrap().id;
+    let to_id = graph.get_node(b).unwrap().id;
+    kernel::graph::apply::apply_graph_delta(
+        &mut graph,
+        kernel::graph::apply::GraphDelta::ReplayAssertSemanticPredicateByIds {
+            from_id,
+            to_id,
+            predicate: "links".into(),
+            asserter_iri: "urn:mere:test:surface-cache".into(),
+        },
+    );
+    assert_eq!(graph.relations().count(), 1);
+    assert_eq!(graph.resource_relations().count(), 0);
     let mut canvas = Canvas::with_graph(graph);
     let ak = canvas
         .graph()
@@ -241,5 +568,8 @@ fn bridge_metric_switch_recomputes_under_the_new_metric() {
         canvas.bridges().unwrap().bridges.is_empty(),
         "a 2-connected cycle has no articulation point"
     );
-    assert_eq!(canvas.bridge_metric(), crate::signals::BridgeMetric::Articulation);
+    assert_eq!(
+        canvas.bridge_metric(),
+        crate::signals::BridgeMetric::Articulation
+    );
 }

@@ -1,16 +1,43 @@
 # Archived-plan tails — deferred items spun out of the archive passes
 
-**Date**: 2026-07-03, extended 2026-08-06 and 2026-09-02.
-**Status**: backlog holder. Each item below was explicitly deferred by a plan that
+**Date**: 2026-07-03, extended 2026-08-06, 2026-09-02 and 2026-10-07.
+**Status (2026-10-07)**: backlog holder. Each item below was explicitly deferred by a plan that
 is otherwise complete and now lives under
 [`archive_docs/`](../../archive_docs/), in the checkpoint folder named by the
 section it sits under. None of these gate anything today; pick up when the
-relevant lane is quiet. Items already tracked by an active plan are *not*
-repeated here.
+relevant lane is quiet. Items already tracked for implementation by an active
+plan are *not* repeated here. The dated RDF section below is an explicit scope
+transfer from an active plan's received archive work; that plan retains a
+pointer only.
 
 This holds the tails from every pass rather than one per pass: a deferred item
 is easier to find in one backlog than across a folder of dated stubs, and the
 sections say which plan each came from.
+
+## RDF archive cleanup deferred by graph semantics (2026-10-07)
+
+Mark instructed **"Bound it."** after the graph-semantics lane accumulated
+31 checkpoints. Its
+[scope boundary](2026-10-04_graph_semantics_plan.md#scope-boundary-2026-10-07)
+retains the accepted dual-stratum/RDF-profile work and transfers these two
+independent tails here. They do not gate P2–P5 completion.
+
+- **ExampleOf/Summarizes alignment review.** The received RDF archive proposes
+  `schema:exampleOfWork` and `cito:describes` superproperties. These proposals
+  remain unaccepted. Keep current predicate identity and vocabulary mappings
+  during graph semantics. A future Mere vocabulary pass owns meaning review,
+  consumer compatibility and any explicit ruling before a mapping changes.
+- **Old Oxigraph oracle/dependency retirement.** The production borrowed
+  `QueryableDataset` and the existing materialized spareval oracle already
+  provide the required parity path. A future Mere dependency-cleanup pass may
+  remove the independent test-only old Store path and its query dependency,
+  with a narrow reviewed lock change if needed. It must preserve the active
+  materialized parity control; it does not replace the backend or query model.
+
+Term dictionaries/interned slotmaps remain separately gated in the existing
+petgraph-RDF record. New CONSTRUCT/DESCRIBE capability is also outside the
+bounded graph-semantics lane; its row-result saved-query requirement does not
+create a general SPARQL feature expansion.
 
 ## From native_surface_compositing (complete 2026-06-21)
 

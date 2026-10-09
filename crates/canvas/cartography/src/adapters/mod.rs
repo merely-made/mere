@@ -385,7 +385,11 @@ impl LayoutStrategy for RadialAdapter {
 
     fn project(&self, request: &ProjectionRequest<'_>) -> Projection {
         if request.intent.focus.is_none() {
-            return empty_projection(Self::PROJECTION_ID);
+            let mut projection =
+                Projection::unavailable(request.graph, "projection focus unavailable");
+            projection.metadata.strategy_id = Some(Self::PROJECTION_ID.into());
+            projection.metadata.settled = true;
+            return projection;
         }
 
         let mut faults = Vec::new();

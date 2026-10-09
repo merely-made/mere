@@ -10,3 +10,9 @@ keywords = ["identity", "persona", "contacts", "trust", "credentials"]
 categories = ["data-structures"]
 
 [dependencies]
+# The signing records the snapshot shows (ruling D25 builds them without
+# personae's `agent`).
+personae.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+uuid = { version = "1", default-features = false, features = ["serde"] }

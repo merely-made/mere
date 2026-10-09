@@ -2305,6 +2305,7 @@ dependencies = [
  "blake3",
  "chatelaine",
  "chirograph",
+ "dramatis",
  "futures-util",
  "gaz",
  "gazette",
@@ -2491,6 +2492,7 @@ dependencies = [
  "serde",
  "serde_json",
  "slotmap",
+ "uuid",
 ]
 
 [[package]]
@@ -2501,6 +2503,7 @@ dependencies = [
  "serde",
  "serde_json",
  "uuid",
+ "zeroize",
 ]
 
 [[package]]
@@ -4696,6 +4699,12 @@ checksum = "fd8e701084c37e7ef62d3f9e453b618130cbc0ef3573847785952a3ac3f746bf"
 [[package]]
 name = "dramatis"
 version = "0.0.2"
+dependencies = [
+ "personae",
+ "serde",
+ "serde_json",
+ "uuid",
+]
 
 [[package]]
 name = "dtoa"
@@ -9321,6 +9330,7 @@ dependencies = [
  "spareval",
  "spargebra",
  "time",
+ "uuid",
 ]
 
 [[package]]
@@ -15658,7 +15668,7 @@ dependencies = [
  "regex",
  "rustc-hash 2.1.3",
  "sha1 0.11.0",
- "sha2 0.10.9",
+ "sha2 0.11.0",
  "sparesults",
  "spargebra",
  "sparopt",

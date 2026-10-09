@@ -56,7 +56,14 @@ pub mod cross_graph;
 /// the graph (the substrate's append-only-log primitive over mere's own edit
 /// vocabulary). See `graph/journal.rs`.
 pub mod journal;
+pub mod legacy_content_migration;
+pub mod legacy_resource_migration;
 pub use cross_graph::ComponentCopy;
+mod assertion_write;
+pub mod pending_links;
+pub use pending_links::{PendingLink, PendingLinkRetention, PendingLinkRetry, PendingLinkState};
+pub mod coverage;
+pub use coverage::{CoverageLayer, CoverageLimit, CoverageNote};
 pub mod edge_data;
 pub mod edge_payload;
 pub mod edge_taxonomy;
@@ -73,6 +80,16 @@ pub mod merge;
 pub mod node;
 pub mod node_facets;
 pub mod node_props;
+pub mod predicate_declarations;
+pub mod predicate_registry;
+mod relation_read;
+pub mod resource;
+pub mod resource_classifications;
+pub mod resource_content;
+#[cfg(test)]
+mod resource_content_tests;
+pub mod resource_properties;
+pub mod resource_tags;
 /// Reverting one change: undo's edits and the parts it keeps (reservoir plan V2).
 pub mod revert;
 pub mod source_time;
@@ -97,13 +114,24 @@ mod field_ops;
 // the rkyv `with = ...` archive helpers are crate-internal and used
 // only by struct field annotations in this file.
 pub(crate) use identity::UuidAsBytes;
-pub use identity::{EdgeKey, GraphDirection, GraphIndex, GraphViewId, NodeKey};
+pub use identity::{
+    EdgeKey, GraphDirection, GraphIndex, GraphViewId, NodeKey, RelationKey, ResourceEdgeKey,
+    SurfaceNodeKey,
+};
 
 // Node + NodeLifecycle extracted to `node.rs` per the same
 // decomposition target. Re-exported so `kernel::graph::Node`
 // continues to resolve.
-pub use node::Node;
+pub use assertion_write::StatementWriteError;
+pub use node::{Node, SurfaceNode};
 pub use node_facets::{NodeFacetStore, VisitHistoryFacet};
+pub use predicate_declarations::{
+    PredicateDeclaration, PredicateDeclarationError, PredicateDeclarations,
+};
+pub use predicate_registry::{
+    GraphStratum, built_in_predicate_stratum, built_in_relation_stratum, default_predicate_stratum,
+};
+pub use resource::ResourceNode;
 
 // Node navigation history extracted to `history.rs` (2026-05-11
 // kernel-mod decomposition pass). Re-exported so external callers
@@ -122,7 +150,8 @@ pub use history::{
 // through [`EdgeAssertion`].
 pub use capture::{
     CapturedDelta, DeltaRecorder, GraphTableStats, replay_captured_deltas,
-    replay_captured_deltas_onto, set_captured_delta_hook, with_isolated_capture,
+    replay_captured_deltas_as_onto, replay_captured_deltas_onto, set_captured_delta_hook,
+    with_isolated_capture,
 };
 pub use journal::{
     AttributedDelta, Author, AuthorKind, GraphJournal, USER_AUTHOR, journal_capture_hook,
@@ -283,6 +312,13 @@ pub struct Graph {
     /// [`chartulary::Graph::inner`]. (Graph signals.)
     pub(crate) inner: chartulary::Graph<Node, EdgePayload>,
 
+    /// Resource truth beneath surfaces, indexed by the prepared identity IRI.
+    pub(crate) resources: chartulary::Graph<ResourceNode, EdgePayload>,
+    /// The one live authority for ordinary resource metadata.
+    pub(crate) resource_facets: chartulary::FacetStore<Uuid>,
+    /// Explicit surface UUID to resource UUID associations.
+    pub(crate) shown_resources: BTreeMap<Uuid, Uuid>,
+
     /// Atomic optional metadata keyed by stable node id. This is the single
     /// live authority persisted by the host as `facets.json`; snapshot columns
     /// are legacy import inputs only.
@@ -346,10 +382,18 @@ pub struct Graph {
     /// graph truth. (Alembic B5 — by-sessions eviction.)
     current_session: u64,
 
+    /// Attribution context supplied by the session performing a write.
+    write_author: Author,
+
     /// Where this graph sends its own captured deltas, once a host opts it in
     /// with [`set_recorder`](Self::set_recorder). Not graph truth, and not
     /// carried by a clone.
     pub(crate) recorder: capture::Recorder,
+    pub(crate) pending_link_state: PendingLinkState,
+    pub(crate) pending_derivation_suppressed: pending_links::Suppression,
+    pub(crate) semantic_observation_revision: u64,
+    pub(crate) appearance_admission_revision: u64,
+    pub(crate) known_coverage: CoverageNote,
 }
 
 impl Graph {
@@ -357,6 +401,9 @@ impl Graph {
     pub fn new() -> Self {
         Self {
             inner: chartulary::Graph::new(),
+            resources: chartulary::Graph::new(),
+            resource_facets: chartulary::FacetStore::new(),
+            shown_resources: BTreeMap::new(),
             facets: chartulary::FacetStore::new(),
             url_to_nodes: HashMap::new(),
             import_records: Vec::new(),
@@ -368,7 +415,13 @@ impl Graph {
             content_revision: 0,
             visit_revision: 0,
             current_session: 0,
+            write_author: Author::user(),
             recorder: capture::Recorder::default(),
+            pending_link_state: PendingLinkState::default(),
+            pending_derivation_suppressed: pending_links::Suppression::default(),
+            semantic_observation_revision: 0,
+            appearance_admission_revision: 0,
+            known_coverage: CoverageNote::default(),
         }
     }
 
@@ -383,6 +436,22 @@ impl Graph {
     /// Whether this graph records its deltas.
     pub fn is_recording(&self) -> bool {
         self.recorder.0.is_some()
+    }
+
+    /// The recorder identity used when a writer has no attributed source.
+    pub fn write_author(&self) -> &Author {
+        &self.write_author
+    }
+
+    /// Run a write under the same author its journal will record.
+    pub fn write_as<R>(&mut self, author: Author, write: impl FnOnce(&mut Self) -> R) -> R {
+        let previous = std::mem::replace(&mut self.write_author, author);
+        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| write(self)));
+        self.write_author = previous;
+        match result {
+            Ok(value) => value,
+            Err(panic) => std::panic::resume_unwind(panic),
+        }
     }
 
     /// Set the current app-launch session number (Alembic B5). The host calls this once,
@@ -536,6 +605,7 @@ impl Graph {
                 self.remove_url_mapping(address.as_url_str(), key);
             }
             let node_id = node.id;
+            self.shown_resources.remove(&node_id);
             self.remove_facets_for_node(node_id);
             let removed_id = node_id.to_string();
             for record in &mut self.import_records {
@@ -586,6 +656,42 @@ impl Graph {
             self.bump_content_revision();
         }
         Some(old_url)
+    }
+
+    /// Establish the current page binding for a live write, retaining an
+    /// already recorded binding. Legacy replay does not call this helper.
+    pub(crate) fn ensure_surface_resource(&mut self, key: NodeKey) -> Option<Uuid> {
+        self.shown_resource_id(key)
+            .or_else(|| self.refresh_surface_resource(key))
+    }
+
+    /// Refresh a live surface's page binding after its surface mutation has
+    /// been captured. The resource record precedes the shown association.
+    pub(crate) fn refresh_surface_resource(&mut self, key: NodeKey) -> Option<Uuid> {
+        let node = self.get_node(key)?;
+        let surface_id = node.id;
+        let resource = ResourceNode::new(node.primary_address().as_url_str());
+        let resource_id = resource.id();
+        if self.resource(resource_id).is_none() {
+            let record = crate::persistence::PersistedResourceRecord {
+                canonical_iri: resource.canonical_iri().to_string(),
+                facets: Vec::new(),
+            };
+            if !self.set_resource_record(resource_id, Some(record.clone())) {
+                return None;
+            }
+            self.record_delta(&CapturedDelta::ReplaySetResourceRecordById {
+                resource_id: resource_id.to_string(),
+                record: Some(record),
+            });
+        }
+        if self.set_shown_resource(surface_id, Some(resource_id)) {
+            self.record_delta(&CapturedDelta::ReplaySetShownResourceById {
+                surface_id: surface_id.to_string(),
+                resource_id: Some(resource_id.to_string()),
+            });
+        }
+        Some(resource_id)
     }
 
     /// Navigate `key` in place to `url`: record the visit in the node's own
@@ -723,3 +829,7 @@ pub mod snapshot;
 // 600-LOC ceiling (kernel decomposition pass 2026-05-11).
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+#[path = "tests/resource_lifecycle.rs"]
+mod resource_lifecycle_tests;

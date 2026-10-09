@@ -104,7 +104,7 @@ pub(crate) fn visible_edge_cell_segments(
     hidden_edges: &HashSet<EdgeCell>,
 ) -> Vec<EdgeCellSegment> {
     let mut groups: HashMap<(NodeKey, NodeKey), Vec<(EdgeCell, RelationKind)>> = HashMap::new();
-    for relation in graph.relations() {
+    for (_, relation) in graph.projected_relations() {
         let cell = edge_cell_for_relation(relation.from, relation.to, relation.kind);
         if hidden_edges.contains(&cell) {
             continue;

@@ -74,11 +74,8 @@ impl Graph {
     /// structural link predicates (`hyperlink` / `references`) that describe the
     /// link, not the node. `None` if no incoming edge carries a usable predicate.
     fn incoming_role(&self, key: NodeKey) -> Option<String> {
-        for src in self.in_neighbors(key) {
-            let Some(edge_key) = self.find_edge_key(src, key) else {
-                continue;
-            };
-            let Some(sem) = self.get_edge(edge_key).and_then(|p| p.semantic_data()) else {
+        for (_, _, payload) in self.projected_incoming_relations(key) {
+            let Some(sem) = payload.semantic_data() else {
                 continue;
             };
             // The open predicate IRI (raw web predicate from ingest), or the
@@ -113,7 +110,10 @@ fn first_type_term(graph: &Graph, key: NodeKey) -> Option<String> {
     graph
         .node_classifications(key)?
         .iter()
-        .find(|c| matches!(&c.scheme, ClassificationScheme::Custom(s) if s == "rdf:type"))
+        .find(|c| {
+            c.status.is_affirmative()
+                && matches!(&c.scheme, ClassificationScheme::Custom(s) if s == "rdf:type")
+        })
         .map(|c| humanize_term(iri_term(&c.value)))
         .filter(|t| !t.is_empty())
 }
@@ -252,6 +252,33 @@ mod tests {
         g.get_node_mut(publisher).unwrap().title = "Wikimedia Foundation".to_string();
         g.assert_semantic_predicate(page, publisher, "https://schema.org/publisher".to_string());
         assert_eq!(g.node_display_label(publisher), "Wikimedia Foundation");
+    }
+
+    #[test]
+    fn type_display_uses_affirmative_statuses_and_retains_review_records() {
+        for (status, displayed) in [
+            (ClassificationStatus::Accepted, true),
+            (ClassificationStatus::Verified, true),
+            (ClassificationStatus::Imported, true),
+            (ClassificationStatus::Suggested, false),
+            (ClassificationStatus::Rejected, false),
+        ] {
+            let mut graph = Graph::new();
+            let key = add(&mut graph, "urn:mere:bnode:deadbeefdeadbeef:_:b0");
+            let mut record = rdf_type("https://schema.org/ImageObject");
+            record.status = status;
+            assert!(graph.add_node_classification(key, record.clone()));
+            assert_eq!(
+                graph.node_display_label(key),
+                if displayed {
+                    "Image Object"
+                } else {
+                    "node _:b0"
+                },
+                "{record:?}"
+            );
+            assert_eq!(graph.node_classifications(key).unwrap(), vec![record]);
+        }
     }
 
     #[test]

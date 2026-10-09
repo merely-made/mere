@@ -17,6 +17,15 @@
 //!
 //! Each producer counts its runs ([`RegistryRuns`]), so a reader can assert
 //! one computation per key.
+//!
+//! The physics view's channels joined in G2c (F21, F149): `mass.*`, the
+//! colouring, island and degree-band groups, `depth.*`, `distances.hops`
+//! and `edges.spanning` ([`super::physics`]). They read the physics view,
+//! the graph's relations less the canvas's hidden ones, so they key by the
+//! [`PhysicsViewKey`] the caller passes in (F178) and the fact's own
+//! parameter, and count their runs in [`PhysicsRuns`]. They are read
+//! through `&self` while a law build holds the registry's other facts, so
+//! they sit in a cell; a read hands out a copy of the cached values.
 
 use std::collections::HashMap;
 
@@ -26,6 +35,8 @@ use cartography::{
 };
 use kernel::graph::{Graph, NodeKey};
 
+#[cfg(feature = "canvas")]
+use super::physics::{self, PhysicsRuns, PhysicsView, PhysicsViewKey};
 use super::producers::{self, Recency};
 use super::{
     AffinityScores, BridgeMetric, BridgeNodes, ClusterSet, ImportanceMetric, bridges,
@@ -99,6 +110,104 @@ pub struct ChannelRegistry {
     degree_weights: Slot<u64, HashMap<NodeKey, f32>>,
     sites: Slot<(u64, u64), HashMap<NodeKey, String>>,
     runs: RegistryRuns,
+    #[cfg(feature = "canvas")]
+    physics: std::cell::RefCell<PhysicsSlots>,
+}
+
+/// The physics view's facts and their run counts (G2c).
+#[cfg(feature = "canvas")]
+#[derive(Clone, Debug, Default)]
+struct PhysicsSlots {
+    mass_degree: Slot<PhysicsViewKey, Vec<(NodeKey, f32)>>,
+    pagerank: Slot<PhysicsViewKey, Vec<(NodeKey, f32)>>,
+    coloring: Slot<PhysicsViewKey, Vec<(NodeKey, u32)>>,
+    components: Slot<PhysicsViewKey, Vec<(NodeKey, u32)>>,
+    degree_bands: Slot<PhysicsViewKey, Vec<(NodeKey, u32)>>,
+    depth_roots: Slot<PhysicsViewKey, Vec<(NodeKey, u32)>>,
+    depth_layers: Slot<PhysicsViewKey, Vec<(NodeKey, u32)>>,
+    depth_focus: Slot<(PhysicsViewKey, NodeKey), Vec<(NodeKey, u32)>>,
+    distances: Slot<PhysicsViewKey, Vec<(NodeKey, NodeKey, f32)>>,
+    spanning: Slot<PhysicsViewKey, Vec<(NodeKey, NodeKey)>>,
+    runs: PhysicsRuns,
+}
+
+/// One physics fact over `view`, from its slot or computed and counted.
+#[cfg(feature = "canvas")]
+macro_rules! physics_fact {
+    ($(#[$meta:meta])* $name:ident, $slot:ident, $ty:ty, $producer:path) => {
+        $(#[$meta])*
+        pub fn $name(&self, view: PhysicsView<'_>) -> Vec<$ty> {
+            let mut slots = self.physics.borrow_mut();
+            let PhysicsSlots { $slot, runs, .. } = &mut *slots;
+            $slot
+                .get(view.key, &mut runs.$slot, || $producer(view.nodes, view.edges))
+                .clone()
+        }
+    };
+}
+
+#[cfg(feature = "canvas")]
+impl ChannelRegistry {
+    /// Every physics producer's run count.
+    pub fn physics_runs(&self) -> PhysicsRuns {
+        self.physics.borrow().runs
+    }
+
+    physics_fact!(
+        /// `mass.degree`, a body's mass before its reader's transform: each
+        /// node's degree over the physics view's edges (F147).
+        mass_degree, mass_degree, (NodeKey, f32), physics::mass_degree
+    );
+    physics_fact!(
+        /// `mass.pagerank`: PageRank over the physics view, mean one.
+        mass_pagerank, pagerank, (NodeKey, f32), physics::page_rank_weights
+    );
+    physics_fact!(
+        /// `groups.coloring`: a proper colouring of the physics view.
+        groups_coloring, coloring, (NodeKey, u32), physics::coloring_groups
+    );
+    physics_fact!(
+        /// `groups.component`: the physics view's islands.
+        groups_component, components, (NodeKey, u32), physics::component_groups
+    );
+    physics_fact!(
+        /// `groups.degree`: degree bands over the physics view.
+        groups_degree, degree_bands, (NodeKey, u32), physics::degree_bands
+    );
+    physics_fact!(
+        /// `depth.roots`: depth from the physics view's roots.
+        depth_roots, depth_roots, (NodeKey, u32), physics::root_depths
+    );
+    physics_fact!(
+        /// `depth.layers`: the physics view's Sugiyama layers.
+        depth_layers, depth_layers, (NodeKey, u32), physics::layer_depths
+    );
+    physics_fact!(
+        /// `distances.hops`: shortest paths over the physics view.
+        distances_hops, distances, (NodeKey, NodeKey, f32), physics::hop_distances
+    );
+    physics_fact!(
+        /// `edges.spanning`: the physics view's spanning tree, Stress's
+        /// skeleton (F174).
+        edges_spanning, spanning, (NodeKey, NodeKey), physics::spanning_edges
+    );
+
+    /// `depth.focus`: dominator depth from `focus`, keyed by the view and the
+    /// focus; a focus outside the view reads `depth.roots`.
+    pub fn depth_focus(&self, view: PhysicsView<'_>, focus: NodeKey) -> Vec<(NodeKey, u32)> {
+        if !view.nodes.contains(&focus) {
+            return self.depth_roots(view);
+        }
+        let mut slots = self.physics.borrow_mut();
+        let PhysicsSlots {
+            depth_focus, runs, ..
+        } = &mut *slots;
+        depth_focus
+            .get((view.key, focus), &mut runs.depth_focus, || {
+                physics::focus_depths(view.nodes, view.edges, focus)
+            })
+            .clone()
+    }
 }
 
 impl ChannelRegistry {

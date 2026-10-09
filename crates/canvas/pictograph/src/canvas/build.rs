@@ -29,8 +29,8 @@ use paint_list_api::{
 use seiche::LayoutView;
 
 use crate::canvas::scene_paint::ScenePaintStyle;
-use genet_scripted_dom::{NodeId as DomNodeId, ScriptedDom};
 use crate::signals::{BridgeNodes, ClusterSet};
+use genet_scripted_dom::{NodeId as DomNodeId, ScriptedDom};
 
 use crate::canvas::palette;
 
@@ -155,8 +155,8 @@ pub(crate) fn hyperlink() -> EdgeAssertion {
 pub(crate) fn dedup_edges(graph: &Graph) -> Vec<(NodeKey, NodeKey)> {
     let mut seen = HashSet::new();
     graph
-        .relations()
-        .filter_map(|r| {
+        .projected_relations()
+        .filter_map(|(_, r)| {
             let pair = if r.from <= r.to {
                 (r.from, r.to)
             } else {
@@ -180,7 +180,7 @@ pub(crate) fn dedup_edges(graph: &Graph) -> Vec<(NodeKey, NodeKey)> {
 pub(crate) fn dedup_edges_weighted(graph: &Graph) -> Vec<(NodeKey, NodeKey, u32)> {
     let mut index: HashMap<(NodeKey, NodeKey), usize> = HashMap::new();
     let mut edges: Vec<(NodeKey, NodeKey, u32)> = Vec::new();
-    for r in graph.relations() {
+    for (_, r) in graph.projected_relations() {
         let pair = if r.from <= r.to {
             (r.from, r.to)
         } else {

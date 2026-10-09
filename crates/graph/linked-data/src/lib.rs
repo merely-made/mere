@@ -35,13 +35,18 @@
 
 #![doc(html_root_url = "https://docs.rs/linked-data/0.0.1")]
 
-use kernel::graph::{Graph, Node, NodeKey, SemanticData, predicate_iri, sub_kind_from_iri};
+use kernel::graph::{Graph, Node, NodeKey, SemanticData, predicate_iri};
 use kernel::types::ClassificationScheme;
 use kernel::types::{GraphScope, NodeProperty};
 use oxrdf::{GraphName, Literal, NamedNode, Quad, Term, Triple};
-use serde_json::{Map, Value, json};
-use std::collections::BTreeMap;
+use serde_json::{Map, Value};
 use time::{OffsetDateTime, format_description::well_known::Rfc3339};
+
+mod jsonld;
+mod reifier;
+mod resource_metadata;
+
+use reifier::statement_reifier_id;
 
 /// JSON-LD ingest (Phase 2): `application/ld+json` → a graph contribution.
 pub mod ingest;
@@ -60,19 +65,25 @@ pub mod serialize;
 pub mod statements;
 
 /// SPARQL query over the graph via spareval evaluating directly over the
-/// projected dataset (the `query` feature). Consumes [`dataset_quads`] as its
-/// projection.
+/// borrowed RDF projection (the `query` feature).
 #[cfg(feature = "query")]
 pub mod query;
 
 #[cfg(not(target_arch = "wasm32"))]
-pub use ingest::{ApplyOutcome, apply_contribution};
 pub use ingest::{
-    ContextCache, EdgeContribution, GraphContribution, IngestError, NodeContribution, from_jsonld,
-    from_jsonld_with_contexts, from_jsonld_with_contexts_and_base_iri, from_quads,
-    is_bundled_context, referenced_context_urls,
+    ApplyOutcome, apply_contribution, apply_contribution_with_identity, apply_import,
+    apply_import_with_identity,
 };
-pub use serialize::{from_nquads, from_trig, to_nquads, to_trig};
+pub use ingest::{
+    ContextCache, EdgeContribution, GraphContribution, ImportEnvelope, IngestError,
+    NodeContribution, SubjectIdentity, from_jsonld, from_jsonld_envelope,
+    from_jsonld_envelope_with_contexts, from_jsonld_envelope_with_contexts_and_base_iri,
+    from_jsonld_with_contexts, from_jsonld_with_contexts_and_base_iri, from_quads,
+    from_quads_envelope, is_bundled_context, referenced_context_urls,
+};
+pub use serialize::{
+    from_nquads, from_nquads_envelope, from_trig, from_trig_envelope, to_nquads, to_trig,
+};
 pub use statements::{StatementOutcome, apply_link_statements, resolve_rel};
 pub use vocab::{Alignment, alignment, vocabulary_alignment_quads};
 
@@ -93,16 +104,10 @@ const GRAPH_SCOPE_USER: &str = "https://mere.computer/ns/graph#user";
 const GRAPH_SCOPE_AGENT: &str = "https://mere.computer/ns/graph#agent";
 const GRAPH_SCOPE_MOOT: &str = "https://mere.computer/ns/graph#moot";
 
-/// Export the whole graph as expanded JSON-LD: a [`Value::Array`] of node
-/// objects, one per graph node, in node-insertion order. Deterministic (tags and
-/// edge targets are sorted), so the output is safe to pin in a golden test.
+/// Export the complete RDF projection as expanded JSON-LD.
+/// Named graphs retain their scopes; assertions use classic RDF reification.
 pub fn to_jsonld(graph: &Graph) -> Value {
-    Value::Array(
-        graph
-            .nodes()
-            .map(|(key, node)| node_object(graph, key, node))
-            .collect(),
-    )
+    jsonld::export(graph, false)
 }
 
 /// Pretty-printed [`to_jsonld`], for goldens and human inspection.
@@ -183,10 +188,6 @@ fn property_literal(property: &NodeProperty) -> Literal {
         return Literal::new_typed_literal(property.value.clone(), datatype);
     }
     Literal::new_simple_literal(property.value.clone())
-}
-
-fn statement_reifier_id(statement_id: &str) -> String {
-    format!("urn:mere:statement:{statement_id}")
 }
 
 fn asserted_at_literal(asserted_at_ms: u64) -> Option<Literal> {
@@ -306,10 +307,13 @@ fn node_direct_quads(graph: &Graph, key: NodeKey, node: &Node) -> Vec<Quad> {
     };
 
     // `rdf:type` from the node's `rdf:type` classifications, sorted + deduped.
-    let classifications = graph.node_classifications(key).unwrap_or_default();
+    let classifications = graph.legacy_node_classifications(key).unwrap_or_default();
     let mut types: Vec<&str> = classifications
         .iter()
-        .filter(|c| matches!(&c.scheme, ClassificationScheme::Custom(s) if s == "rdf:type"))
+        .filter(|c| {
+            c.status.is_affirmative()
+                && matches!(&c.scheme, ClassificationScheme::Custom(s) if s == "rdf:type")
+        })
         .map(|c| c.value.as_str())
         .collect();
     types.sort_unstable();
@@ -393,7 +397,7 @@ fn node_direct_quads(graph: &Graph, key: NodeKey, node: &Node) -> Vec<Quad> {
     }
 
     // Open literal properties, sorted by full literal identity.
-    let mut props = graph.node_properties(key).unwrap_or_default();
+    let mut props = graph.legacy_node_properties(key).unwrap_or_default();
     props.sort_by(|a, b| {
         (
             a.predicate.as_str(),
@@ -476,7 +480,7 @@ fn node_metadata_quads(graph: &Graph, key: NodeKey, node: &Node) -> Vec<Quad> {
         );
     }
 
-    let mut properties = graph.node_properties(key).unwrap_or_default();
+    let mut properties = graph.legacy_node_properties(key).unwrap_or_default();
     properties.sort_by(|a, b| {
         (
             a.predicate.as_str(),
@@ -519,7 +523,7 @@ fn node_dataset_quads(graph: &Graph, key: NodeKey, node: &Node) -> Vec<Quad> {
 }
 
 /// The RDF quads for one node, restricted to the default graph. This remains
-/// the JSON-LD shaper's input until named-graph JSON-LD export lands.
+/// the compatibility view for callers that need direct default-graph node quads.
 pub fn node_quads(graph: &Graph, key: NodeKey, node: &Node) -> Vec<Quad> {
     node_direct_quads(graph, key, node)
         .into_iter()
@@ -530,165 +534,69 @@ pub fn node_quads(graph: &Graph, key: NodeKey, node: &Node) -> Vec<Quad> {
 /// The RDF dataset quads for the whole graph, including named-graph scoped
 /// semantic statements and node properties plus dataset-only reifier metadata.
 pub fn dataset_quads(graph: &Graph) -> Vec<Quad> {
-    graph
-        .nodes()
-        .flat_map(|(key, node)| node_dataset_quads(graph, key, node))
+    let mut seen = std::collections::HashSet::new();
+    dataset_quad_iter(graph)
+        .filter(|quad| seen.insert(quad.clone()))
         .collect()
 }
 
-fn node_object(graph: &Graph, key: NodeKey, node: &Node) -> Value {
-    let mut obj = Map::new();
-    obj.insert("@id".to_string(), Value::String(node_id(node)));
-
-    // Render the node's quads as expanded JSON-LD: `@type` collects the `rdf:type`
-    // objects; every other predicate is an array of `{@id}` / `{@value}` entries,
-    // grouped and key-sorted (`BTreeMap`) for a stable document. The quads already
-    // arrive in a deterministic order, so per-predicate entry order is stable.
-    let mut types: Vec<String> = Vec::new();
-    let mut by_predicate: BTreeMap<String, Vec<Value>> = BTreeMap::new();
-    for quad in node_quads(graph, key, node) {
-        let predicate = quad.predicate.as_str();
-        if predicate == RDF_TYPE {
-            if let Term::NamedNode(object) = &quad.object {
-                types.push(object.as_str().to_string());
-            }
-            continue;
-        }
-        let entry = match &quad.object {
-            Term::NamedNode(object) => json!({ "@id": object.as_str() }),
-            Term::Literal(object) => literal_json_value(object),
-            _ => continue,
-        };
-        by_predicate
-            .entry(predicate.to_string())
-            .or_default()
-            .push(entry);
-    }
-
-    if !types.is_empty() {
-        obj.insert(
-            "@type".to_string(),
-            Value::Array(types.into_iter().map(Value::String).collect()),
+fn resource_edge_quads(
+    from: &kernel::graph::resource::ResourceNode,
+    to: &kernel::graph::resource::ResourceNode,
+    payload: &kernel::graph::EdgePayload,
+) -> Vec<Quad> {
+    let mut quads = Vec::new();
+    let (Ok(subject), Ok(target)) = (
+        NamedNode::new(from.canonical_iri()),
+        NamedNode::new(to.canonical_iri()),
+    ) else {
+        return quads;
+    };
+    for statement in payload.semantic_statements() {
+        push_quad(
+            &mut quads,
+            &subject,
+            &statement.predicate,
+            target.clone().into(),
+            &statement.graph_scope,
+        );
+        push_statement_metadata_quads(
+            &mut quads,
+            &subject,
+            &statement.statement_id,
+            &statement.predicate,
+            target.clone().into(),
+            &statement.graph_scope,
+            statement.label.as_deref(),
+            statement.provenance_iri.as_deref(),
+            statement.asserted_at_ms,
         );
     }
-    for (predicate, values) in by_predicate {
-        obj.insert(predicate, Value::Array(values));
-    }
-
-    Value::Object(obj)
+    let mut seen = std::collections::HashSet::new();
+    quads.retain(|quad| seen.insert(quad.clone()));
+    quads
 }
 
-/// Export the whole graph as **compacted** JSON-LD: `{"@context": {…}, "@graph":
-/// […]}`. A recognized relation and the curated literals are emitted as short
-/// terms backed by an inline `@context` (term → IRI); an open / raw predicate
-/// keeps its full IRI as the key (the open tail stays explicit). This is the
-/// curated kernel-vocabulary context's first consumer, and it round-trips through
-/// [`from_jsonld`], which expands the inline context. Deterministic, like
-/// [`to_jsonld`].
-pub fn to_jsonld_compact(graph: &Graph) -> Value {
-    let mut context = Map::new();
-    let graph_nodes: Vec<Value> = graph
+pub(crate) fn dataset_quad_iter(graph: &Graph) -> impl Iterator<Item = Quad> + '_ {
+    graph
         .nodes()
-        .map(|(key, node)| compact_node_object(graph, key, node, &mut context))
-        .collect();
-    json!({ "@context": Value::Object(context), "@graph": Value::Array(graph_nodes) })
+        .flat_map(|(key, node)| node_dataset_quads(graph, key, node))
+        .chain(
+            graph
+                .resource_nodes()
+                .flat_map(|resource| resource_metadata::quads(graph, resource)),
+        )
+        .chain(
+            graph
+                .resource_edges()
+                .flat_map(|(from, to, payload)| resource_edge_quads(from, to, payload)),
+        )
 }
 
-/// The short term for a recognized predicate IRI: its fragment or last path
-/// segment (`…/rel#cites` → `cites`, `schema.org/name` → `name`).
-fn term_for(iri: &str) -> &str {
-    iri.rsplit(['#', '/']).next().unwrap_or(iri)
-}
-
-fn compact_node_object(
-    graph: &Graph,
-    key: NodeKey,
-    node: &Node,
-    context: &mut Map<String, Value>,
-) -> Value {
-    let mut obj = Map::new();
-    obj.insert("@id".to_string(), Value::String(node_id(node)));
-
-    // Render the node's quads as compacted JSON-LD. `@type` collects the
-    // `rdf:type` objects; the curated literals become the `name` (scalar) and
-    // `keywords` (array) short terms; a recognized relation becomes a short term
-    // registered in the inline context; a raw predicate keeps its full IRI as the
-    // key. Edge and open-property values collapse to a scalar when single.
-    let mut types: Vec<String> = Vec::new();
-    let mut name: Option<String> = None;
-    let mut keywords: Vec<String> = Vec::new();
-    let mut by_key: BTreeMap<String, Vec<Value>> = BTreeMap::new();
-
-    for quad in node_quads(graph, key, node) {
-        let predicate = quad.predicate.as_str();
-        if predicate == RDF_TYPE {
-            if let Term::NamedNode(object) = &quad.object {
-                types.push(object.as_str().to_string());
-            }
-            continue;
-        }
-        if predicate == SCHEMA_NAME {
-            if let Term::Literal(object) = &quad.object {
-                name = Some(object.value().to_string());
-            }
-            continue;
-        }
-        if predicate == SCHEMA_KEYWORDS {
-            if let Term::Literal(object) = &quad.object {
-                keywords.push(object.value().to_string());
-            }
-            continue;
-        }
-        let (emit_key, value) = match &quad.object {
-            Term::NamedNode(object) => {
-                let emit_key = if sub_kind_from_iri(predicate).is_some() {
-                    let term = term_for(predicate).to_string();
-                    context
-                        .entry(term.clone())
-                        .or_insert_with(|| json!(predicate));
-                    term
-                } else {
-                    predicate.to_string()
-                };
-                (emit_key, json!({ "@id": object.as_str() }))
-            },
-            Term::Literal(object) => (predicate.to_string(), compact_literal_json_value(object)),
-            _ => continue,
-        };
-        by_key.entry(emit_key).or_default().push(value);
-    }
-
-    if !types.is_empty() {
-        obj.insert(
-            "@type".to_string(),
-            Value::Array(types.into_iter().map(Value::String).collect()),
-        );
-    }
-    if let Some(name) = name {
-        context
-            .entry("name".to_string())
-            .or_insert_with(|| json!(SCHEMA_NAME));
-        obj.insert("name".to_string(), Value::String(name));
-    }
-    if !keywords.is_empty() {
-        context
-            .entry("keywords".to_string())
-            .or_insert_with(|| json!(SCHEMA_KEYWORDS));
-        obj.insert(
-            "keywords".to_string(),
-            Value::Array(keywords.into_iter().map(Value::String).collect()),
-        );
-    }
-    for (emit_key, mut values) in by_key {
-        let value = if values.len() == 1 {
-            values.pop().expect("length checked")
-        } else {
-            Value::Array(values)
-        };
-        obj.insert(emit_key, value);
-    }
-
-    Value::Object(obj)
+/// Export the complete RDF projection under an inline context.
+/// Curated and recognized predicates use short terms; open predicates retain IRIs.
+pub fn to_jsonld_compact(graph: &Graph) -> Value {
+    jsonld::export(graph, true)
 }
 
 #[cfg(test)]
@@ -704,13 +612,73 @@ mod tests {
     use kernel::types::{GraphScope, NodeProperty};
     use serde_json::json;
 
+    #[test]
+    fn type_export_uses_affirmative_statuses_and_retains_review_records() {
+        use kernel::types::{
+            ClassificationProvenance, ClassificationScheme, ClassificationStatus,
+            NodeClassification,
+        };
+
+        for (status, exported) in [
+            (ClassificationStatus::Accepted, true),
+            (ClassificationStatus::Verified, true),
+            (ClassificationStatus::Imported, true),
+            (ClassificationStatus::Suggested, false),
+            (ClassificationStatus::Rejected, false),
+        ] {
+            let mut graph = Graph::new();
+            let key = graph.add_node("https://classification.test".into(), Default::default());
+            graph.get_node_mut(key).unwrap().title = "Classification control".into();
+            let record = NodeClassification {
+                scheme: ClassificationScheme::Custom("rdf:type".into()),
+                value: "https://schema.org/Article".into(),
+                label: Some("Article".into()),
+                confidence: 0.8,
+                provenance: ClassificationProvenance::UserAuthored,
+                status,
+                primary: true,
+            };
+            assert!(graph.add_node_classifications(key, vec![record.clone()]));
+            let types: Vec<_> = super::dataset_quads(&graph)
+                .into_iter()
+                .filter(|quad| quad.predicate.as_str() == super::RDF_TYPE)
+                .collect();
+            assert_eq!(types.len(), usize::from(exported), "{record:?}");
+            if exported {
+                assert_eq!(types[0].object.to_string(), "<https://schema.org/Article>");
+            }
+            let exported_bytes = serde_json::to_vec(&to_jsonld(&graph)).unwrap();
+            let contribution = from_jsonld(&exported_bytes).expect("JSON-LD export reingests");
+            let node = contribution
+                .nodes
+                .iter()
+                .find(|node| node.id == "https://classification.test")
+                .expect("exported node remains");
+            assert_eq!(node.title.as_deref(), Some("Classification control"));
+            assert_eq!(node.types.contains(&record.value), exported, "{record:?}");
+            #[cfg(feature = "query")]
+            {
+                let rows = super::query::sparql(
+                    &graph,
+                    "SELECT ?type WHERE { <https://classification.test> a ?type }",
+                )
+                .expect("classification query");
+                assert_eq!(rows.rows.len(), usize::from(exported), "{record:?}");
+                if exported {
+                    assert_eq!(rows.rows[0], vec![Some(record.value.clone())]);
+                }
+            }
+            assert_eq!(graph.node_classifications(key).unwrap(), vec![record]);
+        }
+    }
+
     /// A graph with one recognized edge (A cites B, canonical IRI), one raw
     /// open-predicate edge (A → C, `schema:citation`), and curated literals on A.
     fn seed() -> Graph {
         let mut graph = Graph::new();
-        let a = graph.add_node("https://a.test/".to_string(), Default::default());
-        let b = graph.add_node("https://b.test/".to_string(), Default::default());
-        let c = graph.add_node("https://c.test/".to_string(), Default::default());
+        let a = graph.add_node("https://a.test".to_string(), Default::default());
+        let b = graph.add_node("https://b.test".to_string(), Default::default());
+        let c = graph.add_node("https://c.test".to_string(), Default::default());
 
         graph.assert_relation(
             a,
@@ -733,7 +701,7 @@ mod tests {
             )
             .expect("edge");
         graph
-            .get_edge_mut(e)
+            .get_relation_mut(e)
             .expect("payload")
             .set_semantic_predicate(Some("https://schema.org/citation".to_string()));
 
@@ -769,12 +737,12 @@ mod tests {
     #[test]
     fn properties_round_trip_via_the_property_bag() {
         // A non-curated literal survives ingest → graph property bag → export.
-        let doc = br#"{"@id":"https://a.test/","https://schema.org/datePublished":[{"@value":"2026-06-02"}]}"#;
+        let doc = br#"{"@id":"https://a.test","https://schema.org/datePublished":[{"@value":"2026-06-02"}]}"#;
         let contribution = from_jsonld(doc).expect("parse");
         let node = contribution
             .nodes
             .iter()
-            .find(|n| n.id == "https://a.test/")
+            .find(|n| n.id == "https://a.test")
             .expect("node a");
         assert_eq!(node.properties.len(), 1);
         assert_property_fields(
@@ -793,7 +761,7 @@ mod tests {
             .as_array()
             .unwrap()
             .iter()
-            .find(|n| n["@id"] == json!("https://a.test/"))
+            .find(|n| n["@id"] == json!("https://a.test"))
             .expect("exported node a");
         assert_eq!(
             a["https://schema.org/datePublished"],
@@ -804,7 +772,7 @@ mod tests {
     #[test]
     fn typed_and_language_tagged_properties_round_trip_via_the_property_bag() {
         let doc = br#"{
-            "@id":"https://a.test/",
+            "@id":"https://a.test",
             "https://schema.org/datePublished":[{"@value":"2026-06-02","@type":"http://www.w3.org/2001/XMLSchema#date"}],
             "https://schema.org/headline":[{"@value":"Bonjour","@language":"fr"}]
         }"#;
@@ -812,7 +780,7 @@ mod tests {
         let node = contribution
             .nodes
             .iter()
-            .find(|n| n.id == "https://a.test/")
+            .find(|n| n.id == "https://a.test")
             .expect("node a");
         assert_eq!(node.properties.len(), 2);
         assert_property_fields(
@@ -839,7 +807,7 @@ mod tests {
             .as_array()
             .unwrap()
             .iter()
-            .find(|n| n["@id"] == json!("https://a.test/"))
+            .find(|n| n["@id"] == json!("https://a.test"))
             .expect("exported node a");
         assert_eq!(
             a["https://schema.org/datePublished"],
@@ -861,12 +829,12 @@ mod tests {
     fn type_round_trips_via_rdf_type_classification() {
         // @type → node types on ingest, applied as an `rdf:type` classification,
         // re-exported as @type.
-        let doc = br#"{"@id":"https://a.test/","@type":["https://schema.org/Article"]}"#;
+        let doc = br#"{"@id":"https://a.test","@type":["https://schema.org/Article"]}"#;
         let contribution = from_jsonld(doc).expect("parse");
         let node = contribution
             .nodes
             .iter()
-            .find(|n| n.id == "https://a.test/")
+            .find(|n| n.id == "https://a.test")
             .expect("node a");
         assert_eq!(node.types, vec!["https://schema.org/Article".to_string()]);
 
@@ -877,25 +845,44 @@ mod tests {
             .as_array()
             .unwrap()
             .iter()
-            .find(|n| n["@id"] == json!("https://a.test/"))
+            .find(|n| n["@id"] == json!("https://a.test"))
             .expect("exported node a");
         assert_eq!(a["@type"], json!(["https://schema.org/Article"]));
+    }
+
+    fn instance_objects(document: &serde_json::Value, reifier_count: usize) -> serde_json::Value {
+        let nodes = document.as_array().expect("expanded node array");
+        let is_reifier = |node: &&serde_json::Value| {
+            node["@type"].as_array().is_some_and(|types| {
+                types.contains(&serde_json::Value::String(
+                    crate::jsonld::RDF_STATEMENT.into(),
+                ))
+            })
+        };
+        assert_eq!(nodes.iter().filter(is_reifier).count(), reifier_count);
+        serde_json::Value::Array(
+            nodes
+                .iter()
+                .filter(|node| !is_reifier(node))
+                .cloned()
+                .collect(),
+        )
     }
 
     #[test]
     fn exports_recognized_and_raw_predicates_with_literals() {
         assert_eq!(
-            to_jsonld(&seed()),
+            instance_objects(&to_jsonld(&seed()), 2),
             json!([
                 {
-                    "@id": "https://a.test/",
+                    "@id": "https://a.test",
                     "https://schema.org/name": [{ "@value": "Article A" }],
                     "https://schema.org/keywords": [{ "@value": "research" }],
-                    "https://mere.computer/ns/rel#cites": [{ "@id": "https://b.test/" }],
-                    "https://schema.org/citation": [{ "@id": "https://c.test/" }]
+                    "https://mere.computer/ns/rel#cites": [{ "@id": "https://b.test" }],
+                    "https://schema.org/citation": [{ "@id": "https://c.test" }]
                 },
-                { "@id": "https://b.test/" },
-                { "@id": "https://c.test/" }
+                { "@id": "https://b.test" },
+                { "@id": "https://c.test" }
             ])
         );
     }
@@ -903,8 +890,8 @@ mod tests {
     #[test]
     fn exports_multiple_statements_on_one_node_pair() {
         let mut graph = Graph::new();
-        let a = graph.add_node("https://a.test/".to_string(), Default::default());
-        let b = graph.add_node("https://b.test/".to_string(), Default::default());
+        let a = graph.add_node("https://a.test".to_string(), Default::default());
+        let b = graph.add_node("https://b.test".to_string(), Default::default());
 
         graph.assert_relation(
             a,
@@ -918,14 +905,14 @@ mod tests {
         graph.assert_semantic_predicate(a, b, "https://schema.org/citation".to_string());
 
         assert_eq!(
-            to_jsonld(&graph),
+            instance_objects(&to_jsonld(&graph), 2),
             json!([
                 {
-                    "@id": "https://a.test/",
-                    "https://mere.computer/ns/rel#cites": [{ "@id": "https://b.test/" }],
-                    "https://schema.org/citation": [{ "@id": "https://b.test/" }]
+                    "@id": "https://a.test",
+                    "https://mere.computer/ns/rel#cites": [{ "@id": "https://b.test" }],
+                    "https://schema.org/citation": [{ "@id": "https://b.test" }]
                 },
-                { "@id": "https://b.test/" }
+                { "@id": "https://b.test" }
             ])
         );
     }
@@ -947,28 +934,30 @@ mod tests {
             .as_array()
             .expect("@graph array")
             .iter()
-            .find(|n| n["@id"] == json!("https://a.test/"))
+            .find(|n| n["@id"] == json!("https://a.test"))
             .expect("node a");
         assert_eq!(a["name"], json!("Article A"));
-        assert_eq!(a["cites"], json!({ "@id": "https://b.test/" }));
+        assert_eq!(a["cites"], json!({ "@id": "https://b.test" }));
         // The raw predicate keeps its full IRI as the key, not a context term.
         assert_eq!(
             a["https://schema.org/citation"],
-            json!({ "@id": "https://c.test/" })
+            json!({ "@id": "https://c.test" })
         );
         assert!(compact["@context"].get("citation").is_none());
     }
 
     #[test]
     fn expanded_export_round_trips_through_ingest() {
-        let doc = serde_json::to_vec(&to_jsonld(&seed())).expect("serialize");
-        assert_round_trip(&from_jsonld(&doc).expect("round-trip parse"));
+        let graph = seed();
+        let doc = serde_json::to_vec(&to_jsonld(&graph)).expect("serialize");
+        assert_round_trip(&from_jsonld(&doc).expect("round-trip parse"), &graph);
     }
 
     #[test]
     fn compact_export_round_trips_through_ingest() {
-        let doc = serde_json::to_vec(&to_jsonld_compact(&seed())).expect("serialize");
-        assert_round_trip(&from_jsonld(&doc).expect("round-trip parse"));
+        let graph = seed();
+        let doc = serde_json::to_vec(&to_jsonld_compact(&graph)).expect("serialize");
+        assert_round_trip(&from_jsonld(&doc).expect("round-trip parse"), &graph);
     }
 
     /// Both export forms must ingest back to the same logical content: A's curated
@@ -977,7 +966,8 @@ mod tests {
     /// THE Phase 2 losslessness gate (petgraph-RDF plan): a graph exercising
     /// the full profile construct matrix — typed + language-tagged literals,
     /// named graph scopes, statement metadata (label / provenance / assertion
-    /// time via RDF 1.2 reifiers), two differently-scoped statements on one
+    /// time via RDF 1.2 reifiers), two asserters of one triple term and
+    /// two differently-scoped statements on one
     /// pair, a recognized (CiTO-mapped) and a raw predicate, `rdf:type`,
     /// curated title/tags — projects to quads, re-ingests through the quad
     /// path into a FRESH graph, and projects identically: a normalized
@@ -985,17 +975,18 @@ mod tests {
     /// handles. "Lossless under the profile" as a checked property.
     #[test]
     fn dataset_round_trip_is_lossless_under_the_profile() {
+        use super::{GRAPH_SCOPE_USER, RDF_REIFIES};
         use kernel::graph::SemanticStatementSpec;
+        use oxrdf::{GraphName, NamedNode, Term};
 
         let mut graph = Graph::new();
-        let a = graph.add_node("https://a.test/".to_string(), Default::default());
-        let b = graph.add_node("https://b.test/".to_string(), Default::default());
-        let c = graph.add_node("https://c.test/".to_string(), Default::default());
+        let a = graph.add_node("https://a.test".to_string(), Default::default());
+        let b = graph.add_node("https://b.test".to_string(), Default::default());
+        let c = graph.add_node("https://c.test".to_string(), Default::default());
 
         // Curated fast-path literals.
         graph.get_node_mut(a).expect("a").title = "Article A".to_string();
-        graph.get_node_mut(a).expect("a").tags =
-            std::collections::HashSet::from(["research".to_string()]);
+        assert!(graph.insert_node_tags(a, vec!["research".into()]));
 
         // A recognized predicate with full statement metadata, plus a second
         // statement on the SAME pair in a different named graph.
@@ -1037,6 +1028,23 @@ mod tests {
                 },
             )
             .expect("raw predicate statement");
+
+        // The same triple term and scope has two independently attributable
+        // assertion handles; neither reifier may overwrite the other.
+        graph
+            .assert_semantic_statement(
+                a,
+                b,
+                SemanticStatementSpec {
+                    predicate: "https://mere.computer/ns/rel#cites".to_string(),
+                    recognized_sub_kind: Some(SemanticSubKind::Cites),
+                    label: Some("also cited by Alice".to_string()),
+                    graph_scope: GraphScope::User,
+                    provenance_iri: Some("https://persona.test/alice".to_string()),
+                    asserted_at_ms: Some(1_720_000_050_000),
+                },
+            )
+            .expect("second asserter statement");
 
         // Typed + language-tagged + scoped literals with metadata.
         let mut published = NodeProperty::new(
@@ -1094,11 +1102,32 @@ mod tests {
         };
         let exported = normalized(&graph);
 
-        let contribution =
-            crate::ingest::from_quads(crate::dataset_quads(&graph), "gate").expect("quad ingest");
+        let reifiers: Vec<_> = crate::dataset_quads(&graph)
+            .into_iter()
+            .filter(|quad| {
+                quad.predicate.as_str() == RDF_REIFIES
+                    && quad.graph_name
+                        == GraphName::from(NamedNode::new(GRAPH_SCOPE_USER).expect("user scope"))
+                    && matches!(&quad.object, Term::Triple(triple)
+                        if triple.predicate.as_str() == "https://mere.computer/ns/rel#cites")
+            })
+            .collect();
+        assert_eq!(reifiers.len(), 2, "one reifier per asserter");
+        assert_ne!(reifiers[0].subject, reifiers[1].subject);
+        assert_eq!(
+            reifiers[0].object, reifiers[1].object,
+            "one shared triple term"
+        );
+
+        let contribution = crate::ingest::from_quads_envelope(crate::dataset_quads(&graph), "gate")
+            .expect("quad ingest");
         let mut reimported = Graph::new();
-        let outcome = crate::ingest::apply_contribution(&mut reimported, &contribution);
+        let outcome = crate::ingest::apply_import(&mut reimported, &contribution);
         assert!(outcome.edges_skipped == 0, "self-contained contribution");
+        assert_eq!(
+            outcome.edges_asserted, 5,
+            "all four relation handles and the tagging assertion survive"
+        );
 
         let reexported = normalized(&reimported);
         assert_eq!(
@@ -1107,34 +1136,20 @@ mod tests {
         );
     }
 
-    fn assert_round_trip(contribution: &GraphContribution) {
+    fn assert_round_trip(contribution: &GraphContribution, graph: &Graph) {
         let a = contribution
             .nodes
             .iter()
-            .find(|n| n.id == "https://a.test/")
+            .find(|n| n.id == "https://a.test")
             .expect("node a");
         assert_eq!(a.title.as_deref(), Some("Article A"));
         assert_eq!(a.tags, vec!["research".to_string()]);
-        assert!(contribution.edges.contains(&EdgeContribution {
-            subject: "https://a.test/".into(),
-            predicate: "https://mere.computer/ns/rel#cites".into(),
-            object: "https://b.test/".into(),
-            graph_scope: GraphScope::Default,
-            statement_id: None,
-            label: None,
-            provenance_iri: None,
-            asserted_at_ms: None,
-        }));
-        assert!(contribution.edges.contains(&EdgeContribution {
-            subject: "https://a.test/".into(),
-            predicate: "https://schema.org/citation".into(),
-            object: "https://c.test/".into(),
-            graph_scope: GraphScope::Default,
-            statement_id: None,
-            label: None,
-            provenance_iri: None,
-            asserted_at_ms: None,
-        }));
+        let expected = crate::from_quads(crate::dataset_quads(graph), "round-trip oracle")
+            .expect("native RDF contribution");
+        assert_eq!(
+            contribution, &expected,
+            "JSON-LD preserves the exact assertion metadata"
+        );
     }
 
     #[cfg(feature = "query")]
@@ -1145,7 +1160,7 @@ mod tests {
         // A curated literal: A's schema:name.
         let names = crate::query::sparql(
             &graph,
-            "SELECT ?name WHERE { <https://a.test/> <https://schema.org/name> ?name }",
+            "SELECT ?name WHERE { <https://a.test> <https://schema.org/name> ?name }",
         )
         .expect("name query");
         assert_eq!(names.variables, vec!["name".to_string()]);
@@ -1154,18 +1169,18 @@ mod tests {
         // A recognized semantic edge: A cites B (canonical Mere IRI).
         let cites = crate::query::sparql(
             &graph,
-            "SELECT ?t WHERE { <https://a.test/> <https://mere.computer/ns/rel#cites> ?t }",
+            "SELECT ?t WHERE { <https://a.test> <https://mere.computer/ns/rel#cites> ?t }",
         )
         .expect("edge query");
-        assert_eq!(cites.rows, vec![vec![Some("https://b.test/".to_string())]]);
+        assert_eq!(cites.rows, vec![vec![Some("https://b.test".to_string())]]);
     }
 
     #[cfg(feature = "query")]
     #[test]
     fn sparql_graph_clause_sees_scoped_statements_and_properties() {
         let mut graph = Graph::new();
-        let a = graph.add_node("https://a.test/".to_string(), Default::default());
-        let b = graph.add_node("https://b.test/".to_string(), Default::default());
+        let a = graph.add_node("https://a.test".to_string(), Default::default());
+        let b = graph.add_node("https://b.test".to_string(), Default::default());
 
         kernel::graph::apply::assert_semantic_relation_in_scope(
             &mut graph,
@@ -1175,27 +1190,30 @@ mod tests {
             None,
             GraphScope::Source,
         );
-        graph.get_node_mut(a).expect("node a").properties.push(
+        assert!(graph.append_node_properties(
+            a,
+            vec![
             NodeProperty::new(
                 "https://schema.org/datePublished".to_string(),
                 "2026-07-04".to_string(),
             )
             .with_graph_scope(GraphScope::User),
-        );
+        ]
+        ));
 
         let scoped_edge = crate::query::sparql(
             &graph,
-            "SELECT ?t WHERE { GRAPH <https://mere.computer/ns/graph#source> { <https://a.test/> <https://mere.computer/ns/rel#cites> ?t } }",
+            "SELECT ?t WHERE { GRAPH <https://mere.computer/ns/graph#source> { <https://a.test> <https://mere.computer/ns/rel#cites> ?t } }",
         )
         .expect("scoped edge query");
         assert_eq!(
             scoped_edge.rows,
-            vec![vec![Some("https://b.test/".to_string())]]
+            vec![vec![Some("https://b.test".to_string())]]
         );
 
         let scoped_property = crate::query::sparql(
             &graph,
-            "SELECT ?v WHERE { GRAPH <https://mere.computer/ns/graph#user> { <https://a.test/> <https://schema.org/datePublished> ?v } }",
+            "SELECT ?v WHERE { GRAPH <https://mere.computer/ns/graph#user> { <https://a.test> <https://schema.org/datePublished> ?v } }",
         )
         .expect("scoped property query");
         assert_eq!(
@@ -1208,8 +1226,8 @@ mod tests {
     #[test]
     fn sparql_exposes_reifier_metadata_but_node_quads_stay_clean() {
         let mut graph = Graph::new();
-        let a = graph.add_node("https://a.test/".to_string(), Default::default());
-        let b = graph.add_node("https://b.test/".to_string(), Default::default());
+        let a = graph.add_node("https://a.test".to_string(), Default::default());
+        let b = graph.add_node("https://b.test".to_string(), Default::default());
 
         kernel::graph::apply::assert_semantic_relation_in_scope(
             &mut graph,
@@ -1220,8 +1238,12 @@ mod tests {
             GraphScope::Source,
         );
 
-        let edge = graph.find_edge_key(a, b).expect("semantic edge");
-        let payload = graph.get_edge_mut(edge).expect("payload");
+        let edge = graph
+            .projected_relations_between(a, b)
+            .next()
+            .expect("semantic edge")
+            .0;
+        let payload = graph.get_relation_mut(edge).expect("payload");
         let statement = payload
             .semantic
             .as_mut()
@@ -1241,13 +1263,9 @@ mod tests {
             Some(1_720_000_100_456),
         );
         property.statement_id = "stmt-prop-1".to_string();
-        graph
-            .get_node_mut(a)
-            .expect("node a")
-            .properties
-            .push(property);
+        assert!(graph.append_node_properties(a, vec![property]));
 
-        let (_, node_a) = graph.get_node_by_url("https://a.test/").expect("node a");
+        let (_, node_a) = graph.get_node_by_url("https://a.test").expect("node a");
         assert!(
             node_quads(&graph, a, node_a)
                 .iter()
