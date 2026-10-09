@@ -438,6 +438,44 @@ Do not add a primitive until one of these proofs fails without it. A catalog is 
 
 ### Addition records
 
+#### The swatch and the facet (promoted 2026-10-09)
+
+`scenograph::swatch` (`Scope`, `Swatch`, `Facet`) and `scenomise::facet`
+(`compose_facet`), closing the catalog's "Faceted small multiples" contract gap
+and open item 4; the Scenograph editor plan's track S1, rulings SE53 to SE83.
+
+- **Task:** compare one dataset under several recipes, or one recipe over
+  several scopes, side by side.
+- **Source facts:** each cell's scope (`Node`, `Subgraph` through
+  `curation::SubgraphSpec`, `NestedGraph`, `Mere`, `Selection`) and its recipe
+  (an authored definition and variant) or the view it reflects.
+- **Reading and derivation:** the host compiles each cell with the ordinary
+  compiler; `compose_facet` places the cell scenes, renumbering every source,
+  space and instance so relations, regions, folds and holds keep their cells.
+- **Marks and arrangement:** a space per cell; a frame item per cell
+  (`scenomise.facet-cell/v1`, carrying its scale) and a heading item per axis
+  position (`scenomise.facet-axis/v1`); cells share a scale across axes declared
+  shared and shrink to their box, never grow.
+- **Provenance:** cell items keep their own sources; frames and headings name
+  the facet's adapters, their text the host's from the facet's labels.
+- **Interaction and writeback:** picking a cell is a host intent (the editor
+  applies its arrangement as one undo step); a swatch is view only, editing in
+  it waits for an intent (SE65).
+- **Static and accessible realization:** the frozen form lists every heading,
+  frame and cell item (`graphshell-client/tests/facet_frozen.rs`); the editor
+  gives each cell a labelled button.
+- **First forcing consumer:** the projection editor's comparison grid
+  (`ports/graphshell/src/projection_compare.rs`, Preview | Compare).
+- **Second heterogeneous consumer:** the gloss pane, **pending** (SE62).
+- **Receipt:** `scenograph` swatch tests (round trip, validation refusals);
+  `scenomise` facet tests (shared scale and its independent control, mixed
+  axis rules, renumbering, items inside their frames, a round trip that opens
+  as a scenotime snapshot, generation, refusals); `projection_compare` tests
+  (families once, aliases, the selection row, compiled cards inside frames);
+  the headed `projection_compare.scn` in Chrome and Firefox. Settled frames
+  with dynamics (SE70) wait on the recipe's dynamics slot (SE69).
+- **Removed on promotion:** nothing; no earlier facet implementation existed.
+
 #### The fold fact (promoted 2026-10-08)
 
 `sceno::Fold` (`crates/cambium/scenes/sceno/src/fold.rs`), landed by the mer3ly

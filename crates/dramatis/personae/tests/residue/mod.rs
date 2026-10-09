@@ -337,7 +337,8 @@ pub fn canary_bytes<const N: usize>(offset: usize) -> [u8; N] {
 }
 
 /// What each canary slot holds in the current scenario, for the report.
-pub static LABELS: std::sync::Mutex<[&str; MAX_CANARIES]> = std::sync::Mutex::new(["-"; MAX_CANARIES]);
+pub static LABELS: std::sync::Mutex<[&str; MAX_CANARIES]> =
+    std::sync::Mutex::new(["-"; MAX_CANARIES]);
 
 pub struct Report {
     pub failures: usize,
@@ -370,7 +371,6 @@ impl Report {
         }
     }
 }
-
 
 /// The instrument proves itself in the same process before any scenario:
 /// an uncleared Vec, raw and as decimal JSON, must be found, a `Zeroizing`

@@ -1,7 +1,7 @@
 # Dramatis Repo Plan
 
 **Date**: 2026-10-06
-**Status (2026-10-09)**: assessed; rulings D1 to D27 (§3). Nothing built.
+**Status (2026-10-09)**: assessed; rulings D1 to D34 (§3). Nothing built; DR-A is next (D34).
 D18's condition is met: the vault lock's L2 to L4 landed on 2026-10-08.
 DR-A's assessment is being refreshed against today's code before its
 forks are put to Mark (§6).
@@ -385,6 +385,46 @@ the old paths, retired in DR-C (D15); shims for outside repos only, with
 mere's callers moved now; no shims. Mark: **"Re-export shims
 (Recommended)"**.
 
+**Ruling D28** *(`SshKeyView` against D21's "SSH keys as items").*
+Options: it moves unchanged, and the item cards come as their own step
+after DR-A; item cards now, with an exception to the byte-identical check.
+Mark: **"Move unchanged, cards later (Recommended)"**.
+
+**Ruling D29** *(the OTP types' construction invariants).* *`OtpCredential::from_item`,
+`OtpCodeTile::new` and `OtpReleaseParticipantClaim::admitted` are callable
+only by castellan; in chatelaine they would have to be public; no caller
+outside castellan names these types.* Options: the display types
+(credential, tile, time ring) move with public constructors, while the
+participant claim and release request stay in castellan, so only it
+grants `AdmittedSession`; all move with hidden constructors; leave `otp/`
+for later. Mark: **"Display types move, trust stays (Recommended)"**.
+
+**Ruling D30** *(the Secret Service metadata, with the service parked by
+the Secret Service plan's SS8).* Options: it stays with the parked code;
+it moves to chatelaine per D21, with a narrowed error and a ThinkPad
+receipt under `dbus-run-session`. Mark: **"Move it per D21"**.
+
+**Ruling D31** *(the intent receipts).* Options: the plain receipts move to
+the facade and `IdentityIntentError` stays with the authority; both move;
+neither in DR-A. Mark: **"Receipts move, error stays (Recommended)"**.
+
+**Ruling D32** *(DR-A's baseline).* *No baseline exists. The snapshot is
+serialized pretty (`to_public_json`) and compact (graphshell's endpoint,
+whose revision counter depends on the bytes).* Options: hand-built,
+deterministic golden snapshots in both forms, committed before anything
+moves, with a control that must fail; captured from a live host; both.
+Mark: **"Hand-built golden snapshots (Recommended)"**.
+
+**Ruling D33** *(reading "test counts unchanged").* Options: conserved by
+name across castellan and the destinations, plus the new golden tests;
+tests stay in castellan and run through the re-exports; literal counts.
+Mark: **"Conserved by name (Recommended)"**.
+
+**Ruling D34** *(the order of the ready work).* Options: DR-A, then the
+vault lock's ruling 44 (Distillery's transport key), then its ruling 91
+(Linux's root in the OS keyring); 44 first; ruling 91's assessment
+alongside DR-A. Mark: **"DR-A, then 44, then 91 (Recommended)"**.
+
 Still open: whether gazette gets a matching facade name over gaz, the way
 chatelaine is the keychain.
 
@@ -399,6 +439,47 @@ finishes (D18).
   - [ ] `IdentitySurfaceSnapshot`'s public JSON is byte-identical against
         a fixture;
   - [ ] castellan's, graphshell's and djinn's test counts are unchanged.
+
+  *2026-10-09, DR-A's checkpoints* (from the reassessment in §6 and rulings
+  D24 to D33), smallest blast radius first. Each lands only after its gate
+  passes in a worktree with its own build directory (the dynamics grammar
+  plan's F183).
+  - **A0, the baseline. No move.** Done when:
+    - golden JSON for hand-built snapshots (fixed ids and times: unlocked
+      with pending signing and history, locked and kept, every enum
+      variant), in pretty and compact form, is committed and passes (D32);
+    - a control with one renamed field fails it;
+    - a by-name test inventory is recorded on Windows and Fedora: castellan
+      (default, `keeper`, `secret-service`, all features), personae with
+      and without `agent`, graphshell's library, djinn and chatelaine (D33).
+  - **A1, the intent names and payloads, to the facade** (D24, D27). Done
+    when the constant strings are equal, the shims compile every caller
+    unedited, and the goldens and inventory hold.
+  - **A2, the OTP display types, to chatelaine** (D29). The credential,
+    tile and time ring move with public constructors; the participant
+    claim and release request stay. Done when the OTP suites and the tile's
+    two tests pass by name.
+  - **A3, the signing records, ungated in personae** (D25). The broker
+    stays behind `agent`. Done when personae builds and tests unchanged
+    with and without `agent`.
+  - **A4, the views and the snapshot, to the facade** (D24, D26, D28).
+    `VaultLockView` goes with them, `SshKeyView` unchanged, and
+    `load_carry_view` stays in castellan. Done when:
+    - the goldens are byte-identical in both forms;
+    - the facade's tree has no castellan, pandect, chirograph or tokio;
+    - djinn and graphshell compile unedited.
+  - **A5, the receipts, to the facade** (D31). `IdentityIntentError` stays.
+  - **A6, the Secret Service metadata, to chatelaine** (D30), with a
+    narrowed error. Done when the Linux build and `secret_service_linux`
+    pass under `dbus-run-session`.
+  - **A7, close.** Done when:
+    - the gate passes on both targets, and Knot's lockstep compiles;
+    - castellan's `lib.rs` doc, the graphshell shim headers and invariant
+      1's wording ("castellan's `view`") are updated;
+    - §2's claim that chatelaine has no dependents is corrected (castellan
+      has depended on it since `71a91267`), and so is the Secret Service
+      plan's line about moving `secret_service/` (D2 keeps the service in
+      castellan; D21 and D30 move only its metadata).
 - **DR-B — custody into castellan, inside mere** (D8, D9). Done when:
   - [ ] personae's and pandect's dependency trees no longer reach the DPAPI
         root loaders or the passphrase storage (measured with `cargo tree`);
@@ -493,3 +574,25 @@ castellan's home and on timing; D22 and D23 keep D6 and D18.
   `view.rs` and `projection.rs` (lock state, the Locked card, the Secret
   Service snapshot), which is the code DR-A moves. So the 2026-10-06 map is
   being redrawn read-only before DR-A's forks are asked.
+
+**2026-10-09, DR-A reassessed (Opus, read-only, at `407bdbe9`), and its
+forks ruled (D24 to D33).**
+- **What moves:** the views and snapshot (`view.rs:26-133`, unchanged since
+  2026-09-26), the intent names and payloads (`projection.rs:28-149`, which
+  L2 extended with the lock intents), the receipts (`authority.rs:93-211`),
+  the OTP display types, the signing records (`personae/src/signing.rs`,
+  behind `agent`), and the Secret Service metadata (new on 2026-10-08).
+- **What stays:**
+  - the cards and renderer, Locked card included, which need chirograph;
+  - the kept snapshot;
+  - `VaultLockHolder`;
+  - `SecretServiceVault`.
+- **Callers:**
+  - graphshell's glob shims, through which djinn reaches the types;
+  - knot-editor's `resident_app_route` test.
+  - Turnstone, woodshed, hocket and retinue name none of these types.
+- **Evidence against the record,** corrected in A7:
+  - §2 says chatelaine has no dependents, but castellan has depended on it
+    since `71a91267`;
+  - DR-A's file list missed `authority.rs` and `secret_service/`;
+  - the Secret Service plan said the service itself moves.
