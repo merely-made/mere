@@ -1,7 +1,7 @@
 # Graphshell on one Cambium tree
 
 **Date:** 2026-09-25
-**Status (2026-10-08):** in progress, checked against the current Graphshell
+**Status (2026-10-09):** in progress, checked against the current Graphshell
 intake slice `da466027a`, based on published Mere `79fbbeb75` with Genet
 `15713014`. Phases 1–2 are landed; phase 3 has its recorded headed producer
 receipts and Mark's approval to proceed. Phase 4 remains unfinished: canvas
@@ -12,9 +12,10 @@ mere panel is its V2b step 5, after this cutover. §2's current handoff names
 the remaining gates; linked plans own later editor and dynamics status. The
 reservoir's V3–V5 resident implementation has advanced independently; its
 process fixtures do not close this browser cutover or mount the mere panel.
-**Nested host-dataset continuation (2026-10-08):** implemented on
-`codex/nested-graph-view`; the bounded headed proof now passes on the default
-Radeon WebGPU adapter after the coarse bitmap traversal repair. Mark approved
+**Nested host-dataset continuation (2026-10-09):** implemented on
+`codex/nested-graph-view`, with published main `dafacc25c` merged at
+`6a7c7d8fa`. The bounded headed proof passes on the default Radeon WebGPU
+adapter after the coarse bitmap traversal repair. Mark approved
 implementing expandable repository groups and entering their constituent graph.
 This is a view-local projection over explicit membership; portable scene folds,
 saved scene integration and the live site's viewer replacement remain separate work.
@@ -644,6 +645,30 @@ Excluded standalone workspaces can use a named `repo/workspace` scope. The
 source revision is a hash of the public disclosure, not a guessed Git revision.
 Open `tree.html?dataset=fixtures/grouped-manifest-components.json&grouping=contains`.
 
+### Hosted-view camera recovery (2026-10-09)
+
+An explicit camera action follows the bounded nested-group proof. Expanding and
+entering groups continue to retain the viewport; the visitor can choose **Fit
+visible graph** or **Fit selection** to recover current content. Pictograph owns
+the bounds and projection; Graphshell supplies the retained controls. Framing
+does not restore an arrangement, move nodes, change scope or selection, or write
+a portable scene fold. It stops camera following and pan inertia while retaining
+yaw and tilt. Empty/hidden selection disables its control; an empty view is a
+no-op. Legacy non-hosted Fit keeps its existing layout-follow behavior.
+The keyboard graph leaf also advertises its existing focusability to Genet.
+Rootstock reports current runner focus to accessibility independently of its
+hover/restyle cache, so the browser mirror follows graph input even without a
+hover event. The disabled control is excluded from retained keyboard traversal,
+and its callback also guards the current selection predicate.
+
+*Done when:* shared tests cover scoped outliers, multiple selections, the fold
+summary, projected yaw/tilt and empty/nonfinite input; a headed hosted receipt
+pans content offscreen and restores it through the retained action, then frames
+selection without moving nodes. The grouped and flat S1 pixel gates still pass,
+and keyboard activation and a 420px viewport reach the new controls.
+Tab skips the disabled action, reaches it after selection, and graph input
+transfers DOM focus into the graph before traversal returns to the controls.
+
 ## 5. Stop rules
 
 - Nothing a screen reader reaches today is lost: a control moves only once
@@ -654,6 +679,48 @@ Open `tree.html?dataset=fixtures/grouped-manifest-components.json&grouping=conta
 
 ## 6. Progress
 
+- **2026-10-09 — hosted camera recovery and live accessibility focus:** merged
+  published main `dafacc25c` at `6a7c7d8fa`, retaining both the grouping and
+  current history/facet modules. Hosted controls now offer one-shot **Fit
+  visible graph** and **Fit selection** through shared Pictograph framing.
+  They retain node placement, selection, scope, yaw and tilt; successful framing
+  clears pan inertia and camera following. The existing non-hosted **Fit graph**
+  continues to resume following. Selection fit excludes hidden/folded members,
+  and its retained control is unavailable without a finite visible selection.
+  - **Shared focus repair:** graph input already changed retained focus, but the
+    leaf did not advertise that capability to Genet. After adding `tabindex`, a
+    combined pointer/keyboard receipt still failed: Rootstock accessibility sync
+    forwarded `last_focus`, a hover/restyle cache. Sync now reports current runner
+    focus through the current `WindowDom` while leaving that cache intact. The
+    native regression changes and clears focus without hover and checks both the
+    reported ID and projected focused node.
+  - **Passed native/build gates:** six framing tests cover scoped outliers,
+    multiple selection, fold-summary bounds, yaw/tilt, nonfinite/empty input and
+    narrow singleton centering. All 73 Rootstock library tests, eight host-input
+    tests, the existing zoom-command test, 162 Scenomise tests and four exporter
+    tests pass. The locked standalone viewer builds, and `main-page` checks
+    without GPU physics. Rootstock and both wasm gates were rerun after the
+    shared focus fix.
+  - **Passed headed proof:** Chrome `152.0.7977.83` on the default AMD `gcn-5`
+    WebGPU adapter passes the three original group captures, two new recovery
+    captures and the original flat S1 capture, without shader hooks. The recovery
+    scenario pans the entered nine-node view offscreen, frames it, then centers
+    selection within one pixel. Positions, picked occurrence, node/edge counts,
+    camera and zoom satisfy the recorded assertions, including 60-frame holds.
+    Unknown grouping is refused without a page error. The original combined
+    keyboard sequence now transfers DOM focus into the graph, skips the disabled
+    action, reaches the enabled action and activates both fits at 420×800. No
+    focus-transition workaround is used. Final wide and narrow captures were
+    inspected.
+  - **Evidence and boundary:**
+    `ports/graphshell/docs/receipts/hosted_camera_recovery.json` records source,
+    debug-bundle and PNG hashes; local logs/captures are under
+    `Code/output/nested-graph-viewer/receipts-camera-recovery/`. The outside-view
+    assertion measures node centres, not all labels or relationship extents.
+    The normal 0.1 zoom floor still limits very large graphs. Dense group/toolbar
+    chrome, tiny glyphs and on-canvas labels need further usability work. This
+    closes the bounded recovery target, not saved scenes, ambient lens reason
+    accounting, full Cargo performance, release transfer budget or site cutover.
 - **2026-10-08 — Radeon coarse-command repair:** merged current main
   `fbc149bd9` at `26f4c19a0`, retaining the new intake controls and coherent
   Genet `15713014` pins. On the default Radeon Pro Vega 56 adapter, the old

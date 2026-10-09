@@ -759,6 +759,7 @@ mod actions;
 mod cartography;
 mod derived_face;
 mod gloss;
+mod framing;
 mod lifecycle;
 mod nodes;
 pub(crate) mod at_rest;
