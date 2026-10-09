@@ -1,32 +1,24 @@
 # Graph semantics plan: assertions, resources, saved queries, residency
 
 **Date:** 2026-10-04
-**Status (2026-10-09):** P1 and the six bounded P2 closure requirements
-are qualified and published to main: source `526f2ddb5`, documentation receipt
-`3b3afa289`. Integration includes main `15fe2a943` and its Rapier,
-projection-editor, identity/Secret Service and physics-registry updates.
-P3 is implemented, qualified and pushed on graph-semantics at `5c6e5c526`. Full affected
-native suites, the locked workspace check, kernel/Pandect/query-feature wasm
-checks and the full standalone browser wasm check pass. Fresh source review
-cleared both reported defects after observed-negative regressions and repairs.
-P3 is merged and published on main and graph-semantics at `066668b7f`,
-including main `07c39def0` and its vault-lock design document. All 3067
-qualified source/assets/manifests bytes match the frozen P3 receipt. Both remote
-hashes were verified exactly; P4 continues. Rulings 1–46 remain authoritative;
-C5/C6 are settled. P4 saved SELECT queries and frozen Resource selections are
-implemented and qualified locally: full native, locked workspace and all five
-wasm checks pass; fresh whole-phase review repairs and the final stratum-overlap
-regression are verified. P4 source `70cf382de` is merged and published on main and graph-semantics at
-`dff527e77`, including current main `50fd021ca`. The affected-tail gates and
-fresh compatibility review pass; both remote hashes are verified. Mark approved
-P4 publication and P5 continuation. P5 addressable records and configured
-residency are implemented and qualified locally: complete affected native suites,
-the locked workspace check, five wasm checks and actual Firefox IndexedDB pass.
-Both Important review findings have observed-negative regressions and verified
-repairs. The resident reader uses explicit checkpoint/refresh; editing retains
-the existing complete-session path. P5 source push/main integration awaits the
-phase-end approval. Earlier Windows/Linux receipts below are historical.
-Consumer repinning and vocabulary/oracle cleanup remain separate under §4.
+**Status (2026-10-09):** The bounded P1–P5 lane is complete and published on
+main and graph-semantics at source `7628ab689`. This includes the six bounded
+P2 closure requirements, P3 coverage and pending observations, P4 saved SELECT
+queries and frozen Resource selections, and P5 addressable records and
+configured neighborhood residency. Mark approved each phase's publication;
+both final remote source hashes were verified exactly.
+
+Complete affected native suites, the locked workspace check, five wasm checks
+and actual Firefox IndexedDB controls pass. Fresh whole-phase reviews and
+observed-negative regressions qualified the repairs. All 3088 final P5
+source/assets/manifests bytes match the frozen receipt. P5 publication is a
+fast-forward from main `8645b70a5`, with no intervening upstream changes.
+The resident reader uses explicit checkpoint/refresh; editing retains the
+existing complete-session path. The original worktree and Cargo receipts remain
+available for review. Earlier Windows/Linux receipts below are historical.
+
+Rulings 1–46 remain authoritative; C5/C6 are settled. Consumer repinning and
+vocabulary/oracle cleanup remain separate under §4.
 
 Four questions were put to Mark from outside the project: what a link records,
 what makes two things the same thing, what a saved query can become, and how
@@ -4251,5 +4243,17 @@ immutable-generation garbage collection, new transports/engines and sibling
 adoption remain outside the accepted phase. The original worktree, Cargo
 receipts and qualification cache are retained; the primary checkout is untouched.
 
-This receipt is published as documentation independently of the P5 source.
-P5 source push/main integration remains at Mark's phase-end approval boundary.
+The initial qualification receipt was published independently of the P5 source
+at `7e206b5b1`. Mark subsequently approved source push and main integration.
+
+### P5 main publication (2026-10-09)
+
+Qualified source `7628ab689139a63bc3376a94546aeb58ed74b6bf` is published on
+both main and graph-semantics. The normal atomic push fast-forwarded main from
+`8645b70a555e17eaa4f9bc6cfeb84622078216a2` and graph-semantics from the
+independently published qualification receipt `7e206b5b1`. Both remote source
+hashes were verified exactly. Main had no intervening changes, so integration
+preserves all qualified source bytes and does not introduce another merge
+variant. The final 3088-file frozen map still matches; the documentation audit
+adds no findings. The bounded P1–P5 lane is complete. Consumer repinning and the
+separately deferred vocabulary/oracle work remain outside this lane.
