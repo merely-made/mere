@@ -239,8 +239,9 @@ impl Graph {
         persisted_edge_with_ids(from_node_id, to_node_id, payload)
     }
 
-    /// Every edge from `from` to `to`, in persisted form.
-    pub(crate) fn persisted_edges_between(&self, from: NodeKey, to: NodeKey) -> Vec<PersistedEdge> {
+    /// Every live Surface edge from `from` to `to`, in exact capture order.
+    /// Retains session arrangements that durable snapshots intentionally omit.
+    pub fn persisted_edges_between(&self, from: NodeKey, to: NodeKey) -> Vec<PersistedEdge> {
         self.inner
             .inner()
             .edges_connecting(from, to)

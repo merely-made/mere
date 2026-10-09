@@ -20,6 +20,58 @@ fn resource_statements(graph: &Graph, from: NodeKey, to: NodeKey) -> &[SemanticS
 }
 
 #[test]
+fn exact_surface_pair_replay_keeps_parallel_traversals_and_complete_payloads() {
+    let mut graph = Graph::new();
+    let from = graph.add_node("https://from.test/".into(), Default::default());
+    let to = graph.add_node("https://to.test/".into(), Default::default());
+    for (id, time, trigger) in [
+        ("one", 10, NavigationTrigger::LinkClick),
+        ("two", 20, NavigationTrigger::Back),
+    ] {
+        let mut payload = EdgePayload::new();
+        payload.push_persisted_semantic_statement(SemanticStatement {
+            statement_id: id.into(),
+            predicate: predicate_iri(SemanticSubKind::UserGrouped).into(),
+            recognized_sub_kind: Some(SemanticSubKind::UserGrouped),
+            label: Some(id.into()),
+            graph_scope: crate::types::GraphScope::User,
+            provenance_iri: Some("urn:author:control".into()),
+            asserted_at_ms: Some(time),
+        });
+        payload.traversal = Some(TraversalData {
+            traversals: vec![Traversal {
+                timestamp_ms: time,
+                trigger,
+            }],
+            ..Default::default()
+        });
+        payload.assert_relation(EdgeAssertion::Containment {
+            sub_kind: ContainmentSubKind::UserFolder,
+        });
+        graph.inner.connect(from, to, payload);
+    }
+    let edges = graph.persisted_edges_between(from, to);
+    assert_eq!(edges.len(), 2);
+    let recorded = Graph::try_from_recorded_snapshot(&graph.to_snapshot()).unwrap();
+    assert_eq!(
+        recorded.persisted_edges_between(from, to),
+        edges,
+        "recorded loader control"
+    );
+    let from_id = graph.get_node(from).unwrap().id.to_string();
+    let to_id = graph.get_node(to).unwrap().id.to_string();
+    replay_captured_deltas_onto(
+        &mut graph,
+        [CapturedDelta::ReplaySetEdgesByIds {
+            from_id,
+            to_id,
+            edges: edges.clone(),
+        }],
+    );
+    assert_eq!(graph.persisted_edges_between(from, to), edges);
+}
+
+#[test]
 fn assertion_updates_and_precise_retractions_replay_exactly() {
     let mut graph = Graph::new();
     let from = graph.add_node("https://a.test/".into(), Default::default());

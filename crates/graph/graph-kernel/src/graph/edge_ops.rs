@@ -558,8 +558,8 @@ impl Graph {
     }
 
     /// Replace every relation from `from` to `to` with `edges`, given in
-    /// persisted form, or with none. Undo's exact edge write: the relations land
-    /// as a snapshot load would make them.
+    /// persisted form, or with none. Exact replay and undo retain each carried
+    /// row, rather than merging parallel payloads through the legacy loader.
     pub(crate) fn set_edges_between(
         &mut self,
         from: NodeKey,
@@ -575,22 +575,17 @@ impl Graph {
         for key in existing {
             let _ = self.inner.disconnect(key);
         }
-        for edge in edges {
-            self.restore_persisted_edge(from, to, edge);
-        }
-        let restored: Vec<_> = self
-            .inner
-            .inner()
-            .edges_connecting(from, to)
-            .map(|edge| edge.id())
-            .collect();
-        for key in restored {
-            if let Some(payload) = self.inner.edge_mut(key)
-                && let Some(semantic) = &mut payload.semantic
-            {
+        // Pair iteration visits the newest edge first, so insert in reverse
+        // order to preserve the exact capture's row order.
+        for edge in edges.iter().rev() {
+            let mut payload = super::snapshot::payload_from_persisted(edge);
+            if let Some(semantic) = &mut payload.semantic {
                 for statement in &mut semantic.statements {
                     statement.normalize_legacy_asserter();
                 }
+            }
+            if !payload.is_empty() || edge.semantic.is_some() || edge.traversal.is_some() {
+                self.inner.connect(from, to, payload);
             }
         }
         self.bump_revision();
