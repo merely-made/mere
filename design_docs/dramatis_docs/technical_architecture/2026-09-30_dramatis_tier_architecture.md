@@ -198,6 +198,24 @@ breaks one is an architecture change and comes to Mark first.
     quarantined item is sealed and is never filled, released or shown until
     the user accepts it into the vault, one item at a time (rulings 11, 13
     and 15, §7). Ruled 2026-10-01; unbuilt, so not yet enforced in code.
+13. **While locked, no secret is reachable, and unlocking takes a user act
+    on the resident's own surface.** Enforced in four places:
+    - the vault's lock state: personae's `IdentityVault::lock` drops the
+      profile and storage key, and its accessors return `Locked`
+      (`crates/dramatis/personae/src/vault.rs`);
+    - castellan's `ResidentLock`, whose synchronous holder hooks drop
+      every derived key before `lock()` returns
+      (`ports/castellan/src/authority.rs`);
+    - the persisted lock: personae's startup loaders refuse an unattended
+      open under the marker (`crates/dramatis/personae/src/startup_unlock.rs`);
+    - djinn's triggers: session lock, suspend and idle
+      (`ports/djinn/src/lock_triggers/`).
+
+    What stays while locked, and what the lock does not defend, are in the
+    [vault threat statement](2026-10-08_vault_threat_statement.md). Added
+    2026-10-08 by the
+    [vault lock plan](../implementation_strategy/2026-10-05_vault_lock_plan.md)'s
+    ruling 83.
 
 ## 5. What each side is for
 
@@ -346,6 +364,8 @@ This document carries no phase status, which goes stale; the plans carry it.
 | gaz's phases, anchors, intake | [gaz founding plan](../implementation_strategy/2026-08-08_gaz_founding_plan.md) |
 | castellan's keeper surface | [castellan keeper founding plan](../../archive_docs/2026-10-06_completed_plans/2026-08-14_castellan_keeper_founding_plan.md) |
 | castellan's credential runway | [castellan OTP plan](../../archive_docs/2026-10-06_completed_plans/2026-08-10_castellan_otp_plan.md) |
+| the vault's lock | [vault lock plan](../implementation_strategy/2026-10-05_vault_lock_plan.md) |
+| what the lock defends and leaves open | [vault threat statement](2026-10-08_vault_threat_statement.md) |
 | the resident | [djinn resident services plan](../../mere_docs/implementation_strategy/2026-08-22_djinn_family_resident_services_plan.md) |
 | chatelaine, insigne, dramatis as crates | [crate consolidation plan](../../mere_docs/implementation_strategy/2026-09-23_crate_consolidation_plan.md) |
 | standards grading (JSContact, DIDs, CXF) | [standards survey brief](../../2026-08-24_standards_survey_brief.md) |

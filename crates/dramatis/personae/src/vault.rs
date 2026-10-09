@@ -37,10 +37,12 @@
 //!
 //! ## Unlock tiers
 //!
-//! [`UnlockTier`] is declared per slot at registration time, and the
-//! unlock UX falls out of those declarations rather than being a global
-//! setting. v0 carries the type but does not enforce TTL; enforcement is
-//! a follow-up. See plan §3.6.
+//! [`UnlockTier`] is declared per slot at registration time. It is consent,
+//! not custody (vault lock plan, ruling 12): it decides when the approval
+//! broker asks before a slot is exercised, while every slot stays decrypted
+//! as long as the vault is unlocked. Custody is the vault-wide lock
+//! ([`IdentityVault::lock`]); the vault threat statement says what it
+//! defends.
 //!
 //! ## Isolation
 //!
@@ -137,18 +139,19 @@ impl CredentialLineage {
     }
 }
 
-/// Unlock tier declared at slot registration. See plan §3.6.
+/// When the approval broker asks before a slot is exercised, declared at
+/// registration. Consent, not custody (vault lock plan, ruling 12): every
+/// tier is decrypted while the vault is unlocked.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub enum UnlockTier {
-    /// Unlocked once at vault open; stays unlocked for the app session.
+    /// Exercised without asking while the vault is unlocked.
     Session,
-    /// Unlocked on first use; auto-relocks after the configured idle
-    /// window in seconds.
+    /// Asked once; the approval is reused until the idle window passes.
     ShortTtl {
-        /// Idle window in seconds before the slot relocks.
+        /// Seconds an approval lasts without use.
         idle_seconds: u32,
     },
-    /// Re-prompt on every credential read.
+    /// Asked visibly on every use; refused where no broker can ask.
     PerUse,
 }
 

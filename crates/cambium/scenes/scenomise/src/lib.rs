@@ -34,6 +34,7 @@
 //! the item, rather than shipping source truth for a solver to re-derive.
 
 pub mod catalog;
+pub mod facet;
 mod families;
 pub mod history;
 pub mod host_dataset;

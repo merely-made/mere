@@ -477,7 +477,9 @@ fold fact's promotion, 2026-10-08).
   `a_trace_replays_fold_and_unfold`, `every_position_shows_what_the_site_shows`,
   `the_committed_fact_trace_is_the_derived_one`,
   `freezing_the_fold_lists_the_group_instead_of_dropping_it`; all seven rerun
-  and passing 2026-10-08. Fold-free scenes are byte-identical to before; an
+  and passing 2026-10-08 (*annotation 2026-10-09:* that run used the shared
+  build directory F183 withdrew; rerun in this lane's own directory at
+  `17519aa4`, all seven pass). Fold-free scenes are byte-identical to before; an
   older reader ignores `folds` and shows every member, and cannot parse the new
   ops.
 - **Removed on promotion:** the site's own fold (`visibility_diff` in

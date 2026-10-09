@@ -115,12 +115,18 @@ fn cloned_store_updates_are_one_load_modify_replace_transaction() {
     assert_eq!(restored.value, 100);
 }
 
+/// The cross-process test spawns a child; on Unix a child forked while
+/// another test holds its `flock` keeps a copy of the lock until it execs,
+/// so the two authority tests take turns (vault lock plan, ruling 86).
+static AUTHORITY_TESTS: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
 fn authoritative_store(root: &Path, freshness: &Path) -> SealedRecordStorage {
     SealedRecordStorage::claim_with_file_freshness(root, [0x55; 32], freshness, [0x56; 32]).unwrap()
 }
 
 #[test]
 fn authoritative_opening_is_exclusive_until_every_clone_drops() {
+    let _turn = AUTHORITY_TESTS.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
     let dir = tempdir().unwrap();
     let records = dir.path().join("records");
     let freshness = dir.path().join("freshness");
@@ -169,6 +175,7 @@ fn authority_child_probe() {
 
 #[test]
 fn authoritative_opening_is_exclusive_across_processes() {
+    let _turn = AUTHORITY_TESTS.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
     let dir = tempdir().unwrap();
     let records = dir.path().join("records");
     let freshness = dir.path().join("freshness");

@@ -91,6 +91,7 @@ fn mere_dependencies(snapshot: &SceneSnapshot) -> Fold {
             direction: FoldDirection::Outgoing,
         }),
         boundary: None,
+        label: None,
     }
 }
 

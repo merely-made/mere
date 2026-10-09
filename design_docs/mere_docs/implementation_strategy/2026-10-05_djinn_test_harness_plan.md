@@ -415,3 +415,16 @@ merged):
   later files (docs and one wasm-only removal in
   `cambium-genet-web-host`).
 - **Next:** H4, the lock's seams, built with the vault lock (L1 to L4).
+
+**2026-10-08, the graceful stop's intermittent refusal** (the
+[vault lock plan](../../dramatis_docs/implementation_strategy/2026-10-05_vault_lock_plan.md)'s
+rulings 85 and 88).
+- **The failure:** once in a long run, `djinn --stop-resident` exited with
+  failure though the resident stopped (receipt `20261008T221052Z-2ff71592`).
+- **The cause** (read): the stop intent raised the stop before its reply
+  was written, so the shutdown could cancel the reply.
+- **The fix:**
+  - the control endpoint, one per session, now raises the stop when the
+    asking session ends, or after 2 s if the session stays open;
+  - `stop_with` records what the stop command said (its exit, stdout and
+    stderr) in the assertion's actual.

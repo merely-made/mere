@@ -1,0 +1,24 @@
+[package]
+name = "mere-curation"
+version = "0.1.0"
+description = "View-local graph curation for Mere: subgraph specifications now, folds and other per-view curation as they arrive."
+authors.workspace = true
+edition.workspace = true
+rust-version = "1.92"
+license = "MPL-2.0"
+repository.workspace = true
+keywords = ["graph", "subgraph", "curation", "mere"]
+categories = ["data-structures"]
+# Claimed on crates.io by Mark's ruling (Scenograph editor plan, SE78);
+# mere-forme, which is published, depends on it.
+publish = true
+
+[lib]
+name = "curation"
+path = "src/lib.rs"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+
+[dev-dependencies]
+serde_json = { workspace = true }

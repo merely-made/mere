@@ -34,6 +34,7 @@ fn dependencies_of_mere() -> Fold {
             direction: FoldDirection::Outgoing,
         }),
         boundary: None,
+        label: None,
     }
 }
 
@@ -158,6 +159,40 @@ fn a_mounted_fold_hides_its_members_behind_a_counted_stand_in() {
         fold.rule.as_deref(),
         Some("Mere and everything it reaches by depends on")
     );
+    assert_eq!(
+        fold.description, fold.rule,
+        "without a label, the rule is the description"
+    );
+}
+
+#[test]
+fn a_host_label_is_read_in_place_of_the_rule() {
+    let session = ProjectionSession("loopback:label".into());
+    let mut client = ClientState::default();
+    let labelled = Fold {
+        label: Some("Mere's dependencies".into()),
+        ..dependencies_of_mere()
+    };
+    client
+        .apply_snapshot(over_the_wire(&mounted(&session, Some(labelled))))
+        .unwrap();
+
+    let tree = client.accessibility_tree(&session, &profile()).unwrap();
+    let fold = &tree.folds[0];
+    assert_eq!(fold.description.as_deref(), Some("Mere's dependencies"));
+    assert_eq!(
+        fold.rule.as_deref(),
+        Some("Mere and everything it reaches by depends on"),
+        "the rule stays readable beside the label"
+    );
+
+    let snapshot = &client.mounted(&session).unwrap().scene;
+    let readings = read_folds(snapshot);
+    assert_eq!(readings[0].label.as_deref(), Some("Mere's dependencies"));
+    assert_eq!(
+        readings[0].description(|id| NAMES[id.0 as usize].to_owned()),
+        Some("Mere's dependencies".to_owned())
+    );
 }
 
 #[test]
@@ -247,6 +282,7 @@ fn a_summary_stand_in_sits_at_its_members_centroid() {
         },
         rule: Some(FoldRule::Selection),
         boundary: None,
+        label: None,
     };
     let mut client = ClientState::default();
     client
