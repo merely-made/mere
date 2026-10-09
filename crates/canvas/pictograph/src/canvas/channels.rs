@@ -319,6 +319,7 @@ impl Canvas {
             self.channels.sites_fresh(&self.graph),
         )
         .with_meaning(self.meaning.snapshot())
+        .with_registry(&self.channels, self.physics_view_key())
     }
 
     /// Resolve a channel against the current graph and the registry. It reads

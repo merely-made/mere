@@ -144,6 +144,7 @@ impl Canvas {
             selected: HashSet::new(),
             selected_edges: HashSet::new(),
             hidden_edges: HashSet::new(),
+            physics_view_revision: 0,
             active_field: None,
             hidden_fields: HashSet::new(),
             node_states: HashMap::new(),

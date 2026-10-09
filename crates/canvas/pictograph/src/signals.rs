@@ -25,11 +25,15 @@ mod affinity;
 mod bridges;
 mod community;
 mod importance;
+#[cfg(feature = "canvas")]
+pub mod physics;
 mod producers;
 mod registry;
 #[cfg(test)]
 mod registry_tests;
 
+#[cfg(feature = "canvas")]
+pub use physics::{PhysicsRuns, PhysicsView, PhysicsViewKey};
 pub use producers::{
     Recency, degree_weights, enumeration_order, radial_rings, recency, spectral_coords,
 };
