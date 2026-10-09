@@ -287,6 +287,31 @@ may then adopt the table; its terrain half belongs to T2. The VTT adopts
 only when accepted tokens actually require Conatus bodies, using the scene
 board's coordinate convention rather than reviving the retired runtime.
 
+#### BodyWorld queries for the parry-probe fold (requested 2026-10-08)
+
+The Isocosm lane asked, under isometry wing rulings 695 and 722 to 725, for
+three `BodyWorld` queries so isometry's parry-ground probe can drop its direct
+parry3d dependency and run its checks through Conatus after it repins onto
+rapier 0.36. `BodyWorld` queries today by raycast, overlaps, `edit_voxels` and
+`step` only. Wanted: (1) a point query, containment or intersection of a point
+against the world's colliders (rapier 0.36 has `intersect_point`); (2) voxel
+occupancy read-back for a voxel-grid collider, per cell or by iterating the
+occupied cells (the probe cross-checks 41,763 occupied voxels and FNV region
+signatures against its source); (3) a shape-against-world contact query
+returning contact points and distances (the probe's case: a ball of radius 0.2
+against a voxel grid at prediction 0.0, recording the point count and the
+minimum distance), which opens contact-geometry vocabulary in Conatus. The
+query-refresh call (352) would replace the probe's settle `step(1e-6)`, as
+`tactile.rs` does today.
+
+*Ruled 2026-10-09:* asked what takes the coordinator's free lane slot (options:
+one Conatus lane, these queries first and then T2; T2 first; the Scenograph
+recipe's dynamics slot, SE69, first; these queries alone), Mark answered
+**"One conatus lane: queries, then T2 (Recommended)"**. *Follows:* one lane on
+branch `conatus-world` assesses and builds these queries, its API shapes coming
+to Mark as forks before they are built, then carries T2 (§2) from its own
+assessment; SE69's design round is prepared meanwhile.
+
 The remaining runtime work is parallel system access declarations, enforcing
 the intent-lowering command boundary at the first product profile, and the
 lean spatial-frame resource (§4). A game can already register spatial
