@@ -18,7 +18,9 @@ use std::fmt;
 
 use zeroize::Zeroizing;
 
-use crate::{Credential, CredentialId, CredentialKind, Item, ItemId, OtpAlgorithm, OtpCodeStyle, OtpMode};
+use crate::{
+    Credential, CredentialId, CredentialKind, Item, ItemId, OtpAlgorithm, OtpCodeStyle, OtpMode,
+};
 
 /// An item and the `Otp` credential in it that a petition or tile is about.
 ///
