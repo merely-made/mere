@@ -38,6 +38,16 @@
 //! over every kernel edge, hidden ones included (the registry's
 //! `degree_weights`). They agree on a simple graph with nothing hidden and
 //! may differ elsewhere; neither value moved when the ids were ruled.
+//!
+//! **The physics channels are the registry's** (G2c; F21, F149): `mass.*`,
+//! the colouring, island and degree-band groups, `depth.*`,
+//! `distances.hops` and `edges.spanning` are computed once per physics view
+//! (the graph's structure and the canvas's view revision, F178) by
+//! [`ChannelRegistry`](crate::signals::ChannelRegistry), and a law build,
+//! a channel read, the role groups and the layout's stats all read them
+//! there (F179). The `edges` family opened with G2c (F174, "1
+//! prospectively"): a named subset of the physics view's edges, and who
+//! reads it; `edges.spanning` is the first.
 
 use kernel::graph::{Graph, Node, NodeKey};
 
@@ -81,10 +91,14 @@ pub enum ChannelFamily {
     Weight,
     /// Normalized importance per node: size by importance, the gloss.
     Importance,
+    /// A named subset of the physics view's edges, and who reads it:
+    /// `edges.spanning`, the spanning tree Stress's skeleton overlay pulls
+    /// along (F174).
+    Edges,
 }
 
 impl ChannelFamily {
-    pub const ALL: [ChannelFamily; 11] = [
+    pub const ALL: [ChannelFamily; 12] = [
         ChannelFamily::Kind,
         ChannelFamily::Groups,
         ChannelFamily::Mass,
@@ -96,6 +110,7 @@ impl ChannelFamily {
         ChannelFamily::Coords,
         ChannelFamily::Weight,
         ChannelFamily::Importance,
+        ChannelFamily::Edges,
     ];
 
     pub fn id(self) -> &'static str {
@@ -111,6 +126,7 @@ impl ChannelFamily {
             ChannelFamily::Coords => "coords",
             ChannelFamily::Weight => "weight",
             ChannelFamily::Importance => "importance",
+            ChannelFamily::Edges => "edges",
         }
     }
 }
@@ -121,6 +137,22 @@ impl ChannelFamily {
 pub enum OrderSource {
     Recency,
     Timeline,
+}
+
+/// Which subset of the physics view's edges.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum EdgeSubset {
+    /// The minimum spanning tree, a pair with more relations a shorter
+    /// edge: Stress's skeleton.
+    Spanning,
+}
+
+const EDGES: [EdgeSubset; 1] = [EdgeSubset::Spanning];
+
+fn edges_option(subset: EdgeSubset) -> &'static str {
+    match subset {
+        EdgeSubset::Spanning => "spanning",
+    }
 }
 
 /// Which weight: degree plus one, or recency in `0..=1`.
@@ -155,6 +187,8 @@ pub enum Channel {
     /// The bridge nodes, under the canvas's bridge metric (betweenness
     /// brokers or articulation points).
     Bridges,
+    /// A named subset of the physics view's edges.
+    Edges(EdgeSubset),
 }
 
 const ORDERS: [OrderSource; 2] = [OrderSource::Recency, OrderSource::Timeline];
@@ -204,6 +238,7 @@ impl Channel {
         all.extend(WEIGHTS.map(Channel::Weight));
         all.extend(IMPORTANCE.map(Channel::Importance));
         all.push(Channel::Bridges);
+        all.extend(EDGES.map(Channel::Edges));
         all
     }
 
@@ -221,6 +256,7 @@ impl Channel {
             Channel::Weight(_) => ChannelFamily::Weight,
             Channel::Importance(_) => ChannelFamily::Importance,
             Channel::Bridges => ChannelFamily::Groups,
+            Channel::Edges(_) => ChannelFamily::Edges,
         }
     }
 
@@ -238,6 +274,7 @@ impl Channel {
             Channel::Weight(weight) => weight_option(weight),
             Channel::Importance(metric) => metric.as_code(),
             Channel::Bridges => "bridges",
+            Channel::Edges(subset) => edges_option(subset),
         }
     }
 
@@ -274,6 +311,10 @@ impl Channel {
                 .into_iter()
                 .find(|metric| metric.as_code() == option)
                 .map(Channel::Importance),
+            "edges" => EDGES
+                .into_iter()
+                .find(|subset| edges_option(*subset) == option)
+                .map(Channel::Edges),
             _ => None,
         }
     }
@@ -299,6 +340,10 @@ pub enum ChannelValues {
     Coords(Vec<(NodeKey, (f32, f32))>),
     /// Nodes, in key order.
     Nodes(Vec<NodeKey>),
+    /// Edges of the physics view, unweighted, in the order their producer
+    /// yields them (the spanning tree as it grows), which is the order its
+    /// reader builds from (F180).
+    Edges(Vec<(NodeKey, NodeKey)>),
 }
 
 fn in_key_order<V: Copy>(map: &std::collections::HashMap<NodeKey, V>) -> Vec<(NodeKey, V)> {
@@ -405,6 +450,7 @@ impl Canvas {
                 ChannelValues::Pairs(blend_affinity_pairs(structural, content))
             },
             Channel::Distances => ChannelValues::Pairs(inputs.weighted_distances()),
+            Channel::Edges(EdgeSubset::Spanning) => ChannelValues::Edges(inputs.skeleton_edges()),
             Channel::Order(_)
             | Channel::Rings
             | Channel::Coords
