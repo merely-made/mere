@@ -985,6 +985,29 @@ V2b's rulings, all 2026-09-25:
     with a forced-timing test, as ruling 45 did; normalizing the stamp in the
     comparison stays declined (ruling 19). A fix that needs a different
     reading of ruling 19 goes to Mark first.
+47. **The replay check's clock-free state** (2026-10-08; amends 46). The lane
+    found ruling 46's premise wrong: ruling 19's touch is journaled after
+    every added node with no millisecond condition (`capture_visit_stamp`,
+    `graph/apply.rs`), and "a touch records only on a new millisecond" is a
+    true no-op, an explicit touch inside the birth millisecond writing the
+    same value. The flake is the snapshot envelope: `to_snapshot()` stamps
+    `timestamp_secs` from the wall clock (`graph/snapshot/to.rs`), and
+    pandect's `edit_as` builds the replay's and the candidate's state from two
+    separate calls, so a second ticking between them fails a good edit; with
+    that field zeroed, 0 of 20,000 runs differed idle and 0 of 5,000 under
+    load, while a forced tick differed 20 of 20. Pandect's own test helper
+    `whole()` already compares undated, and the archive gate excludes the same
+    field. Options: a clock-free state in the kernel (`to_snapshot_at`), both
+    states built with one timestamp; zero the field in pandect alone; stop
+    `to_snapshot` reading the clock. Mark: **"Clock-free state in kernel
+    (Recommended)"**. *Follows:* `Graph::to_snapshot_at(timestamp_secs)`, with
+    `to_snapshot()` calling it with the clock; `edit_as` builds both states
+    with one timestamp, so the check never reads the clock; a forced test
+    shows state taken across a second tick compares equal. Visit stamps and
+    every other field keep their exact comparison, as ruling 19 holds. The
+    2 ms wait in `capture_hook_receives_replayable_apply_events` stays: it
+    makes that test's explicit touch change something, which is test setup,
+    not a replay workaround.
 
 ## 8. Progress
 
