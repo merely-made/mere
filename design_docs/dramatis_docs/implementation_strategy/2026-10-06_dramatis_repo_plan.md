@@ -1,8 +1,10 @@
 # Dramatis Repo Plan
 
 **Date**: 2026-10-06
-**Status (2026-10-07)**: assessed; rulings D1 to D23 (§3). Nothing built.
-The vault lock finishes first (D18), then phases DR-A to DR-E (§4).
+**Status (2026-10-09)**: assessed; rulings D1 to D23 (§3). Nothing built.
+D18's condition is met: the vault lock's L2 to L4 landed on 2026-10-08.
+DR-A's assessment is being refreshed against today's code before its
+forks are put to Mark (§6).
 **Scope**: the identity tier leaves mere for its own repository, `dramatis`,
 which becomes the product. personae, insigne, gaz, chatelaine (the
 keychain, still its own crate) and notochord move there, and gazette later.
@@ -453,3 +455,14 @@ rulings already made: D7 (leaf crates first, gazette held until its
 projection is split), D10 (notochord moves) and DR-D's done-condition
 (two apps on one identity revision, no duplicate types). They differ on
 castellan's home and on timing; D22 and D23 keep D6 and D18.
+
+**2026-10-09, D18 met; DR-A reassessed first.**
+- Mark: **"also, if it's time to promote dramatis, we can do that too"**.
+- **D18 is met.** The vault lock's L2 to L4 landed on 2026-10-08 (vault
+  lock plan §6). Ruling 44's transport-key switch is still unbuilt, but it
+  is not one of L2 to L4's done-conditions, and it touches only
+  Distillery, which stays in mere.
+- **Why reassess first:** L2 to L4 reworked castellan's `authority.rs`,
+  `view.rs` and `projection.rs` (lock state, the Locked card, the Secret
+  Service snapshot), which is the code DR-A moves. So the 2026-10-06 map is
+  being redrawn read-only before DR-A's forks are asked.
