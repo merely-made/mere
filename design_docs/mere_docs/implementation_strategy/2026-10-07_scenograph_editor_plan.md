@@ -1,7 +1,7 @@
 # Scenograph Editor Plan
 
 **Date:** 2026-10-07
-**Status (2026-10-08):** tracks E1 to E5 and C1 complete, each with headed checks in Chrome and Firefox (Safari not run); C2 landed (SE45 to SE51; F11 to F13), with headed checks in Chrome and Firefox; its label revision (SE52) landed with the web host's genet repin. Rulings SE1 to SE78 (§1). Waiting: genet branch `value-engine` (SE39 to SE42) for Mark or genet's lane to land, then mere's rhai `ValueEngine` and the rule runner after a coordinated repin. The Turnstone follow-up (SE32, SE35) is on Turnstone main at `d0775a1` (§3). Mapped, not opened: wallpapers and props, the style editors, authored motion (§3).
+**Status (2026-10-08):** tracks E1 to E5 and C1 complete, each with headed checks in Chrome and Firefox (Safari not run); C2 landed (SE45 to SE51; F11 to F13), with headed checks in Chrome and Firefox; its label revision (SE52) landed with the web host's genet repin. Rulings SE1 to SE82 (§1). Waiting: genet branch `value-engine` (SE39 to SE42) for Mark or genet's lane to land, then mere's rhai `ValueEngine` and the rule runner after a coordinated repin. The Turnstone follow-up (SE32, SE35) is on Turnstone main at `d0775a1` (§3). Mapped, not opened: wallpapers and props, the style editors, authored motion (§3).
 **Scope:** the editor foundation that Scenograph's editing surfaces stand on: one undo history in Cambium, and arrangement options declared as data. Carries out the balaur review's rulings A and B. The projection editor in Graphshell is the first consumer of both.
 
 Not in scope, mapped in §3 and opened by later rounds:
@@ -205,6 +205,14 @@ Mark: "proceed!" Evidence put: the June gloss design (`mere_docs/design/2026-06-
 **SE77, its package name.** Options: `curation`, plain, as edit-history and command-menu (recommended); `mere-curation` with lib `curation`, as mere-forme and mere-kernel. Mark: **"mere-curation, lib curation"**.
 
 **SE78, publishing it.** Evidence put, against SE73's `publish = false`: `mere-forme` is `publish = true` and on crates.io at 0.1.0, in pandect's dependency closure, so its next publish needs curation published first; `mere-curation` was free. Options: publishable, released with forme's next publish (recommended); claim the name now, confirming the crate's contents first; keep `publish = false`. Mark: **"Claim the name now"**, then **"I authorize the publish"**. *Follows:* `mere-curation` 0.1.0 is published with `SubgraphSpec` and `SubgraphKind`, the spec gaining `PartialEq` and `Eq`, and SE73's `publish = false` is amended. *Reading, not ruled:* `SubgraphKind::Facet` keeps its name until the facet dissolution design (SE75) reaches it.
+
+**SE79, what fills the editor's grid (2026-10-09).** Evidence put: the projection editor edits one draft with no saved variants; scenomise has eleven built-in arrangement families. Options: the families, the working draft first as a reflection (recommended); authored variants; families now, variants next. Mark: **"Arrangement families, working draft first (Recommended)"**.
+
+**SE80, where it appears.** Options: in the preview, toggled Preview | Compare (recommended); under the arrangement rows; on the main canvas. Mark: **"In the preview, toggled (Recommended)"**.
+
+**SE81, picking a cell.** Options: apply it as one undo step through E2's history, the grid staying open (recommended); focus, then apply with a button. Mark: **"Apply it, one undo step (Recommended)"**.
+
+**SE82, a scope axis in the editor.** Options: arrangement only in the editor, scope arriving with the gloss (recommended); both now. Mark: **"Both now"**. *Found after the answer:* the editor compiles a host-supplied `ProjectionDataset` (source, revision, fields, occurrences; no relationships), three occurrences in the practice fixture; every `Scope` variant names graph structure the dataset lacks, and `SubgraphKind` has no plain selection kind. Put back as SE83.
 
 ## 2. Tracks
 
