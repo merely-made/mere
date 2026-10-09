@@ -13,9 +13,11 @@ P3 is merged and published on main and graph-semantics at `066668b7f`,
 including main `07c39def0` and its vault-lock design document. All 3067
 qualified source/assets/manifests bytes match the frozen P3 receipt. Both remote
 hashes were verified exactly; P4 continues. Rulings 1–46 remain authoritative;
-C5/C6 are settled. P4 saved-query and frozen-selection implementation is undergoing
-qualification;
-P5 has not begun. Earlier Windows/Linux receipts below are historical.
+C5/C6 are settled. P4 saved SELECT queries and frozen Resource selections are
+implemented and qualified locally: full native, locked workspace and all five
+wasm checks pass; fresh whole-phase review repairs and the final stratum-overlap
+regression are verified. P4 source is ready for its phase-end review before
+push/main integration. P5 has not begun. Earlier Windows/Linux receipts below are historical.
 Consumer repinning and vocabulary/oracle cleanup remain separate under §4.
 
 Four questions were put to Mark from outside the project: what a link records,
@@ -4047,3 +4049,82 @@ gates there. The original worktree, shared target and initial small-test target
 remain for receipts. No source or manifest versions changed through that move.
 This documentation checkpoint publishes progress only; P4 source remains local
 and no P4 main publication or P5 implementation is claimed.
+
+
+### P4 qualification receipt (2026-10-09)
+
+P4's bounded done-conditions are met locally. A saved SELECT spec reconciles on
+revision changes, skips an unchanged revision, and evaluates against a receiver's
+own graph. The same spec's live roster changes after a source retraction while its
+frozen owner remains unchanged. A transferred owner record retains member
+references and copied statements, reports missing members through P3 coverage,
+and preserves the carrier and ordinary annotations through real Pandect
+save/reopen. Invalid queries, unavailable shape seeds and malformed carriers
+refuse without publishing a successful derivation or partial freeze.
+
+The fresh whole-phase reviewer reported two Important defects and one initially
+Minor label defect. Root treated the labels as required consumer compatibility,
+observed all three failures and fixed them in one pass. Added controls cover
+numeric underflow hiding a retained wire-value edit, known null metadata,
+parallel rows and self relations. A final author control reproduced a stratum
+collision: a shape Surface UUID also identified a different Resource. Freeze now
+resolves by spec kind, with paired shape/query assertions proving each selects
+its own intended Resource. The isolated Session shape first failed against the
+qualified pre-repair facade, then passed in the final full query suite. The
+initial Ego radius-zero test was replaced because zero-hop shown bindings
+legitimately include co-shown Surfaces; traversal behavior was preserved.
+No second reviewer or broader feature work was needed.
+
+| Gate | Final result |
+| --- | --- |
+| Curation | 2 tests; old shape wire and saved-query wire |
+| Mere, graph only | 40 tests; unsupported-query refusals included |
+| Mere, default features plus query | 54 tests; six saved-query/freeze controls included |
+| Forme | 117 tests and two properties |
+| Scenograph | 13 tests and compile-fail doctest |
+| Kernel, store feature | 433 tests and compile-fail doctest; one existing ignored doctest |
+| Pandect | 349 tests and two reopen integrations; one isolated child helper ignored |
+| Linked-data, query feature | 86 tests |
+| Document lanes, all features | 55 tests and two integrations |
+| Cartography | 57 tests |
+| Canvas, canvas feature | 376 tests; existing 18 ignored tests and one ignored doctest |
+| Graphshell, personal-sync feature | 411 tests and seven integrations; existing five ignored tests |
+| Locked workspace | Full workspace check passes |
+| Kernel and Pandect wasm | Both wasm32-unknown-unknown checks pass |
+| Linked-data and Mere query wasm | Both explicit query-feature checks pass |
+| Full standalone browser wasm | Default browser feature check passes |
+
+The final graph-only and default/query suites were repeated after the stratum
+repair, preserving their earlier logs. Workspace and all wasm gates began after
+that repair and qualify the final source. Unchanged kernel, store, query-adapter
+and geometry sources retain their complete passing gates. Receipts are under
+`/home/markik/Code/target` with the graph-semantics-p4 prefix. This establishes
+native test and browser compilation behavior; it adds no headed-browser,
+physical-GPU or external-peer claim.
+
+Main's documentation-only Scenograph handoff at `db24dbe96` was incorporated
+locally at `9763abd1c`; all qualified source bytes were unchanged through that
+integration. The final source/assets/manifests map contains 3073 files, including
+the retained ignored standalone browser lock and the upstream support-audit
+note. Compared with the preceding map, only the three intentional facade files
+changed for the final stratum repair. Every final frozen byte matches.
+Manifest and lock bytes and package versions remain unchanged throughout P4.
+The documentation audit self-test passes and all audit counts match pristine
+current upstream `db24dbe96`; inherited findings remain recorded separately.
+
+Routine choices and costs remain: saved queries name their SELECT column
+explicitly (a new spec/display variant); the immutable selection lives in the
+owning Resource record (open that record to read it); portable hosts supply a
+fresh freeze nonce (the browser host must mint it); explicitly unavailable query
+members refuse freeze (load those requested members first). Shared payloads
+contain the spec alone. Whole-owner deletion remains normal undo, while a
+retained owner's nested carrier cannot be replaced or stripped. New
+CONSTRUCT/DESCRIBE capability, remote formats, arbitrary-facet RDF backup,
+sibling implementation and P5 remain outside this phase.
+
+This qualification receipt is published as documentation before the tested P4
+source commit, so the plan can be reviewed remotely without publishing that
+source ahead of its phase-end approval. P4 source push/main integration and P5
+continuation remain at Mark's next phase checkpoint. The original worktree,
+shared Cargo target, initial small-test target and qualification cache are
+retained for review and receipts; the primary Mere checkout is untouched.
