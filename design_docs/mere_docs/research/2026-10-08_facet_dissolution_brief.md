@@ -1,6 +1,7 @@
 # Facet dissolution brief
 
 **Date:** 2026-10-08
+**Status:** open: waiting for graph semantics' owner, to whom Mark hands it.
 **For:** graph semantics' owner (the Codex agent on the ThinkPad, per the Scenograph editor plan's SE74), handed over by Mark.
 **From:** the Scenograph editor lane. Rulings quoted are in [the Scenograph editor plan](../implementation_strategy/2026-10-07_scenograph_editor_plan.md), SE71, SE72 and SE75.
 
@@ -17,9 +18,11 @@ The store is `chartulary::FacetStore<Uuid>` behind graph-kernel's `node_facets.r
 | Claims about what a thing is | `semantic.classifications`, `semantic.properties`, `chartulary.class`, `provenance.import`, `provenance.derivations` | resource: assertions |
 | Labels | `presentation.tags` (tag order and icons) | tag |
 | How a node was met or is viewed | `arrangement.pin`, `arrangement.frame-layout`, `arrangement.split-offer-suppressed`, `visit.history`, `graphshell.access-history/v1`, `graphshell.browser-history/v1`, `graphshell.pinned-projection/v1` | attribute |
-| Whole app documents at a node | `graphshell.saved-scene/v4`, `graphshell.projection-definition/v1`, `graphshell.content/v1`, `graphshell.local-file/v1`, `graphshell.transfer-offer/v1`, `graphshell.transfer-content/v1`, `receipt.run`, `receipt.artifacts`, `gazette.contact-facet/v1`, scenograph's `explained_relationships`, `authored_order` and `occurrence_labels`, `denizen.binding`, `personae.vault-root/v1` | open, see question 1 |
+| Whole app documents at a node | `graphshell.saved-scene/v4`, `graphshell.projection-definition/v1`, `graphshell.content/v1`, `graphshell.local-file/v1`, `graphshell.transfer-offer/v1`, `graphshell.transfer-content/v1`, `receipt.run`, `receipt.artifacts`, scenograph's `explained_relationships`, `authored_order` and `occurrence_labels`, `denizen.binding`, `personae.vault-root/v1` | open, see question 1 |
 
 `facet_projection.rs` (the "PMEST facet projection", a derived queryable map) is the classification sense Mark retired.
+
+Other uses of the word that the rename meets: Gazette's contact facets (`ports/gazette/src/ledger.rs`, source adapter `gazette.contact-facet/v1`), a contact's own parts rather than node facets; servitor capabilities scoped to a facet key (`Cap::facet`, `crates/servitor/src/cap.rs`); forme's `SubgraphKind::Facet`.
 
 ## Questions for the design
 
