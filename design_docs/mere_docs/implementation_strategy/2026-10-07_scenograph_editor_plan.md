@@ -1,7 +1,7 @@
 # Scenograph Editor Plan
 
 **Date:** 2026-10-07
-**Status (2026-10-08):** tracks E1 to E5 and C1 complete, each with headed checks in Chrome and Firefox (Safari not run); C2 landed (SE45 to SE51; F11 to F13), with headed checks in Chrome and Firefox; its label revision (SE52) landed with the web host's genet repin. Rulings SE1 to SE66 (§1). Waiting: genet branch `value-engine` (SE39 to SE42) for Mark or genet's lane to land, then mere's rhai `ValueEngine` and the rule runner after a coordinated repin. The Turnstone follow-up (SE32, SE35) is on Turnstone main at `d0775a1` (§3). Mapped, not opened: wallpapers and props, the style editors, authored motion (§3).
+**Status (2026-10-08):** tracks E1 to E5 and C1 complete, each with headed checks in Chrome and Firefox (Safari not run); C2 landed (SE45 to SE51; F11 to F13), with headed checks in Chrome and Firefox; its label revision (SE52) landed with the web host's genet repin. Rulings SE1 to SE70 (§1). Waiting: genet branch `value-engine` (SE39 to SE42) for Mark or genet's lane to land, then mere's rhai `ValueEngine` and the rule runner after a coordinated repin. The Turnstone follow-up (SE32, SE35) is on Turnstone main at `d0775a1` (§3). Mapped, not opened: wallpapers and props, the style editors, authored motion (§3).
 **Scope:** the editor foundation that Scenograph's editing surfaces stand on: one undo history in Cambium, and arrangement options declared as data. Carries out the balaur review's rulings A and B. The projection editor in Graphshell is the first consumer of both.
 
 Not in scope, mapped in §3 and opened by later rounds:
@@ -182,6 +182,14 @@ Mark: "proceed!" Evidence put: the June gloss design (`mere_docs/design/2026-06-
 
 **SE66, what a reflection follows.** Options: a pandect `ViewKey` or a sibling swatch in the same facet (recommended); only a view key. Mark: **"A view key, or a sibling cell (Recommended)"**.
 
+**SE67, where `SubgraphSpec` lives.** Evidence put: forme pulls taffy, petgraph and uuid; scenograph depends on sceno and serde only; the site's Ruling 153 plans a view-curation leaf crate for `FoldRecord` in the native phase. Options: a serde-only leaf, the view-curation crate founded now by this lane in coordination with the site and graph-semantics' owner, forme re-exporting (recommended); into sceno; scenograph depends on forme. Mark: **"A serde-only leaf, forme re-exports (Recommended)"**.
+
+**SE68, the types' home.** Options: Swatch, Facet and Scope in scenograph beside the recipe, a facet compiled by scenomise (recommended); all in scenomise. Mark: **"Types in scenograph, compile in scenomise (Recommended)"**.
+
+**SE69, the recipe's dynamics slot.** Evidence put: the dynamics grammar plan's F21 ruled "Two slots, one binding" (a recipe names an arrangement and, optionally, a dynamics recipe); seiche's `DynamicsSpec` is the portable spec (F4); the authored recipe has no dynamics slot; seiche has no serde and F104 settles its carrier. Options: the dynamics lane builds the slot and the grid consumes it (recommended); this lane builds it to F21. Mark: **"Dynamics lane builds it, grid consumes (Recommended)"**. *Follows:* the physics coordinator is briefed; the grid's dynamics axis waits for the slot.
+
+**SE70, settled frames.** Options: seeded, run from the spec's seed to its law's stop rule or a fixed step bound on libm maths (SE40), the settled positions written into the cell's scene (recommended); the host settles, best effort. Mark: **"Seeded, run to the spec's stop (Recommended)"**.
+
 ## 2. Tracks
 
 E1 and E2 carry ruling A; E3 to E5 carry ruling B. E2 needs E1; E4 needs E3; E5 needs E2 and E4. *Added 2026-10-07:* E2b carries SE11 and SE12, after E2.
@@ -248,6 +256,23 @@ Done when:
 - a session stored before the change, with `CommandMenuView`, loads unchanged (a test over its JSON);
 - no command is defined in two places, by the map's own list;
 - the Graphshell web scenarios `canvas_commands.scn` and `canvas_commands_reopen.scn` pass headed in Chrome and Firefox.
+
+### S1 — the swatch grid (SE53 to SE70)
+
+The projection editor's grid of swatches, the catalog's facet proof (first forcing consumer; the gloss pane is the second, SE62).
+- **The leaf crate (SE67).** `SubgraphSpec` and `SubgraphKind` move out of forme into a serde-only view-curation crate; forme re-exports them, so no caller changes. Its name comes back as a question first.
+- **The types (SE63 to SE66, SE68).** In scenograph: `Scope` (`Node`, `Subgraph(SubgraphSpec)`, `NestedGraph`, `Mere`), `Swatch` (a scope, and either a projection's recipe and variant or a reflection naming a `ViewKey` or a sibling cell), `Facet` (axes of scope and arrangement, each declaring shared or independent scales, shared by default). View only; editing waits for an intent.
+- **The compile (SE64, SE68).** scenomise turns a facet into one `Scene`, a `Space` per cell, axis labels as items, scales recorded per axis; it passes scenotime and the frozen and remote readers unchanged.
+- **The editor's grid.** Graphshell's arrangement panel shows the recipe's variants as cells, settled (SE55, SE70) with the focused cell live; picking a cell applies it through E2's history.
+- **Dynamics axis.** Waits on the dynamics lane's recipe slot (SE69).
+
+Done when:
+- the leaf crate builds alone and forme's callers compile unchanged;
+- a facet over two arrangements and two scopes compiles to one scene that round-trips through serde and replays through scenotime, its frozen form listing every cell;
+- shared and independent scales differ in a test where they should, and a control fails when a cell escapes its declared scale;
+- a settled cell is identical across two runs and across native and wasm;
+- the catalog carries the facet's and the swatch's addition record;
+- a headed check in Chrome and Firefox shows the grid, focuses a cell live, and applies a variant with undo.
 
 ### E3 — the option declaration type (B, SE7)
 
