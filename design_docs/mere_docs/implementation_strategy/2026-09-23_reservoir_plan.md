@@ -1626,3 +1626,39 @@ V2b's rulings, all 2026-09-25:
   50-run loop. A control damaged a restored node's title, tag and custom
   facet, and added an edge: each showed in the fingerprint's half it belongs
   to. No clock seam was added.
+- 2026-10-08: ruling 47 landed on `replay-touch`. Kernel `c8204e6e` adds
+  `Graph::to_snapshot_at(timestamp_secs)`, which `to_snapshot()` now calls
+  with the clock; no other caller changed. Pandect `8e12677d` builds the
+  replay check's two states with `to_snapshot_at(0)`, so the check reads no
+  clock, and visit stamps and every other field still compare exactly.
+  - Before: the lane's probe of the old check differed 20 of 20 across a
+    forced second tick, while a stamp-zeroed probe differed 0 of 20,000 idle
+    and 0 of 5,000 under load. After: both new forced-tick tests,
+    `a_dated_snapshot_compares_equal_across_a_second_tick` (kernel) and
+    `the_replay_check_compares_equal_across_a_second_tick` (pandect), passed
+    20 of 20. Each also asserts, as its control, that the old clock-dated
+    form differs across the same tick.
+  - Graphshell (`personal-sync` lib tests), 20 runs per target with 8 busy
+    loops added to the other lanes' load (51–100% CPU):
+    | Target | Before | After |
+    | --- | --- | --- |
+    | `a_refused_spec_fails_the_open_by_name_and_place` | 20/20 | 20/20 |
+    | `product::tests::dynamics::` | 19/20 | 20/20 |
+    | `browser_host_seeds_once_then_reopens_the_stored_graph` | 20/20 | 20/20 |
+    | `h4_exportable_identity_cards…` | 20/20 | 20/20 |
+
+    The `dynamics` module stood in for G4b1's
+    `an_unknown_flat_id_fails_the_open_with_it`, which is not on this branch.
+    The one failure before the fix was
+    `a_spec_refused_while_read_names_its_path_at_the_open` failing with this
+    `NotReplayable`, at 87% load. Twenty runs cannot by themselves separate
+    so rare a flake; the forced tests carry the proof.
+  - Gates:
+    - mere-kernel: 298 of 298 (297 plus the new test), and its
+      `wasm32-unknown-unknown` check passes.
+    - pandect: 310 of 310 lib tests, plus 2 process tests (1 intentionally
+      ignored).
+    - graphshell `--features personal-sync --lib`: 372 passed, 4 ignored, in
+      one complete run with no hang.
+  - The 2 ms wait in `capture_hook_receives_replayable_apply_events` stays,
+    as ruled. Logs are in `Code/testing/mere/replay-touch/`.
