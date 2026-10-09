@@ -10,3 +10,5 @@ keywords = ["identity", "persona", "contacts", "trust", "credentials"]
 categories = ["data-structures"]
 
 [dependencies]
+serde.workspace = true
+uuid = { version = "1", default-features = false, features = ["serde"] }
