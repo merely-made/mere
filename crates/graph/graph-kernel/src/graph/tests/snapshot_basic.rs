@@ -823,3 +823,31 @@ fn derived_containment_is_rebuilt_child_to_parent_on_load() {
         "the URL-path parent relation is re-derived on load, got {sub_kinds:?}"
     );
 }
+
+/// A snapshot dated by its caller reads no clock, so one graph's snapshots
+/// compare equal across a wall-clock second; the clock-dated snapshot, taken
+/// the same way, is the control that differs (reservoir plan ruling 47).
+#[test]
+fn a_dated_snapshot_compares_equal_across_a_second_tick() {
+    let mut graph = Graph::new();
+    let a = graph.add_node("https://a.test/".to_string(), Point2D::new(0.0, 0.0));
+    let b = graph.add_node("https://b.test/".to_string(), Point2D::new(0.0, 0.0));
+    graph.assert_relation(a, b, hyperlink());
+    let state = |snapshot: crate::persistence::GraphSnapshot| {
+        serde_json::to_value((snapshot, graph.facets())).unwrap()
+    };
+
+    let dated_before = state(graph.to_snapshot_at(0));
+    let clock_before = state(graph.to_snapshot());
+    let second = clock_before[0]["timestamp_secs"].as_u64().unwrap();
+    while graph.to_snapshot().timestamp_secs == second {
+        std::thread::sleep(std::time::Duration::from_millis(5));
+    }
+
+    assert_ne!(
+        state(graph.to_snapshot()),
+        clock_before,
+        "control: the clock-dated snapshot moved with the tick"
+    );
+    assert_eq!(state(graph.to_snapshot_at(0)), dated_before);
+}

@@ -717,6 +717,9 @@ pub(crate) struct LawSources {
     pub depth: PhysicsDepthSource,
     /// The focused node, for the Focus depth source.
     pub focus: Option<NodeKey>,
+    /// The seed Kinds' matrix and Anneal's walk draw from: the spec's
+    /// (F156), [`LAW_SEED`] by default, so no default run moves.
+    pub seed: u64,
 }
 
 impl LawSources {
@@ -729,6 +732,7 @@ impl LawSources {
             mass: PhysicsMassSource::Degree,
             depth: PhysicsDepthSource::Roots,
             focus: None,
+            seed: LAW_SEED,
         }
     }
 }
@@ -1282,7 +1286,7 @@ impl<'a> LawInputs<'a> {
                 let (kinds, kind_count) = self.kinds(sources.kind);
                 vec![
                     Box::new(NodeExclusion::default()),
-                    Box::new(ParticleLife::seeded(kinds, kind_count, LAW_SEED)),
+                    Box::new(ParticleLife::seeded(kinds, kind_count, sources.seed)),
                 ]
             },
             PhysicsLaw::Flock => vec![
@@ -1302,7 +1306,7 @@ impl<'a> LawInputs<'a> {
                 Box::new(MagneticSpring::default()),
                 Box::new(Boundary::default()),
             ],
-            PhysicsLaw::Anneal => vec![Box::new(Anneal::seeded(LAW_SEED))],
+            PhysicsLaw::Anneal => vec![Box::new(Anneal::seeded(sources.seed))],
             // Held, not empty: with no force at all rapier's contact solver
             // blasts an overlapping seed apart (the Still receipt found it).
             PhysicsLaw::Still => vec![Box::new(Hold)],
@@ -1347,228 +1351,9 @@ impl<'a> LawInputs<'a> {
             ),
         }
     }
-
-    /// The whole force set: the law, then the overlays in order.
-    pub(crate) fn forces(
-        &self,
-        law: PhysicsLaw,
-        overlays: &[PhysicsOverlay],
-        sources: LawSources,
-    ) -> Vec<Box<dyn Force>> {
-        let mut forces = self.law_forces_taking(law, sources, overlays);
-        forces.extend(
-            overlays
-                .iter()
-                .map(|overlay| self.overlay_force(*overlay, sources)),
-        );
-        forces
-    }
 }
 
 impl Canvas {
-    /// The physics law the graph moves under.
-    pub fn physics_law(&self) -> PhysicsLaw {
-        self.physics_law
-    }
-
-    /// The overlays composed onto the law, in run order.
-    pub fn physics_overlays(&self) -> &[PhysicsOverlay] {
-        &self.physics_overlays
-    }
-
-    /// Where the Kinds law reads a node's kind from.
-    pub fn physics_kind_source(&self) -> PhysicsKindSource {
-        self.physics_kind_source
-    }
-
-    /// Where Orbit's masses and the hub overlays' weights come from.
-    pub fn physics_mass_source(&self) -> PhysicsMassSource {
-        self.physics_mass_source
-    }
-
-    /// Where the Depth overlay reads a node's depth from.
-    pub fn physics_depth_source(&self) -> PhysicsDepthSource {
-        self.physics_depth_source
-    }
-
-    /// Where Group pull reads its groups from.
-    pub fn physics_group_source(&self) -> PhysicsKindSource {
-        self.physics_group_source
-    }
-
-    /// Switch the law. The force set is replaced wholesale; no body moves until
-    /// the next tick, then a settle (or, for a law that never rests, a
-    /// continuous run) lets the new dynamics express themselves. Physics stays
-    /// paused if it was paused. A law that refuses overlays takes none: the
-    /// live ones are dropped and returned in the refusal. (Physics catalog — P1.)
-    pub fn set_physics_law(&mut self, law: PhysicsLaw) -> Result<(), OverlayRefusal> {
-        self.physics_composition = None;
-        self.schedule = None;
-        self.physics_law = law;
-        let refused = self.refuse_overlays();
-        self.rebuild_law_forces();
-        self.settle_for_law();
-        refused
-    }
-
-    /// Replace the overlay set (order is run order; duplicates collapse).
-    /// Overlays the law refuses are left out and returned in the refusal;
-    /// the rest are applied.
-    pub fn set_physics_overlays(
-        &mut self,
-        overlays: Vec<PhysicsOverlay>,
-    ) -> Result<(), OverlayRefusal> {
-        let mut seen = HashSet::new();
-        self.physics_overlays = overlays.into_iter().filter(|o| seen.insert(*o)).collect();
-        let refused = self.refuse_overlays();
-        self.rebuild_law_forces();
-        self.settle_for_law();
-        refused
-    }
-
-    /// Toggle one overlay on or off, returning whether it is now on (off,
-    /// and unchanged, for an overlay the law refuses).
-    pub fn toggle_physics_overlay(&mut self, overlay: PhysicsOverlay) -> bool {
-        let mut overlays = self.physics_overlays.clone();
-        let on = if let Some(i) = overlays.iter().position(|o| *o == overlay) {
-            overlays.remove(i);
-            false
-        } else {
-            overlays.push(overlay);
-            true
-        };
-        self.set_physics_overlays(overlays).is_ok() && on
-    }
-
-    /// Drop the live overlays the law refuses, saying which.
-    fn refuse_overlays(&mut self) -> Result<(), OverlayRefusal> {
-        let law = self.physics_law;
-        let (refused, kept): (Vec<_>, Vec<_>) = self
-            .physics_overlays
-            .iter()
-            .partition(|o| law.refuses(**o).is_some());
-        self.physics_overlays = kept;
-        match refused.first() {
-            Some(first) => Err(OverlayRefusal {
-                law,
-                reason: law.refuses(*first).unwrap_or_default(),
-                refused,
-            }),
-            None => Ok(()),
-        }
-    }
-
-    /// Choose where the Kinds law reads kinds from; rebuilds only if Kinds is live.
-    pub fn set_physics_kind_source(&mut self, source: PhysicsKindSource) {
-        self.physics_kind_source = source;
-        if self.physics_law == PhysicsLaw::Kinds {
-            self.rebuild_law_forces();
-            self.settle_for_law();
-        }
-    }
-
-    /// Choose where Group pull reads its groups from; rebuilds only if Group
-    /// pull is live. By cluster, it reads the partition Columns (by cluster)
-    /// lays out, so the overlay is that arrangement's law-form twin.
-    pub fn set_physics_group_source(&mut self, source: PhysicsKindSource) {
-        self.physics_group_source = source;
-        if self
-            .physics_overlays
-            .contains(&PhysicsOverlay::DomainCluster)
-        {
-            self.rebuild_law_forces();
-            self.settle_for_law();
-        }
-    }
-
-    /// Choose where masses and hub weights come from; rebuilds only if Orbit
-    /// or a weighted overlay is live.
-    pub fn set_physics_mass_source(&mut self, source: PhysicsMassSource) {
-        self.physics_mass_source = source;
-        if self.physics_law.weighted() || self.physics_overlays.iter().any(|o| o.weighted()) {
-            self.rebuild_law_forces();
-            self.settle_for_law();
-        }
-    }
-
-    /// Choose where the Depth overlay reads depth from; rebuilds only if it is live.
-    pub fn set_physics_depth_source(&mut self, source: PhysicsDepthSource) {
-        self.physics_depth_source = source;
-        if self
-            .physics_overlays
-            .contains(&PhysicsOverlay::DepthGravity)
-        {
-            self.rebuild_law_forces();
-            self.settle_for_law();
-        }
-    }
-
-    /// The live law, overlays and sources as one choice.
-    pub fn physics_choice(&self) -> crate::canvas::PhysicsChoice {
-        crate::canvas::PhysicsChoice {
-            law: self.physics_law,
-            overlays: self.physics_overlays.clone(),
-            kind: self.physics_kind_source,
-            groups: self.physics_group_source,
-            mass: self.physics_mass_source,
-            depth: self.physics_depth_source,
-        }
-    }
-
-    /// Replace the whole choice with one rebuild and one settle. Sources are
-    /// set first and the law last, so the law's build reads the new sources
-    /// and overlays. Overlay duplicates collapse, as in
-    /// [`set_physics_overlays`](Self::set_physics_overlays). A law that
-    /// refuses overlays is applied without them, and the refusal returned.
-    pub fn set_physics_choice(
-        &mut self,
-        choice: &crate::canvas::PhysicsChoice,
-    ) -> Result<(), OverlayRefusal> {
-        self.physics_composition = None;
-        self.schedule = None;
-        self.physics_kind_source = choice.kind;
-        self.physics_group_source = choice.groups;
-        self.physics_mass_source = choice.mass;
-        self.physics_depth_source = choice.depth;
-        let mut seen = HashSet::new();
-        self.physics_overlays = choice
-            .overlays
-            .iter()
-            .copied()
-            .filter(|o| seen.insert(*o))
-            .collect();
-        self.physics_law = choice.law;
-        let refused = self.refuse_overlays();
-        self.rebuild_law_forces();
-        self.settle_for_law();
-        refused
-    }
-
-    /// Apply a named profile: its law and its overlays. `false` for an unknown id.
-    pub fn apply_physics_profile(&mut self, id: &str) -> bool {
-        let Some(profile) = physics_profile(id) else {
-            return false;
-        };
-        self.physics_composition = None;
-        self.schedule = None;
-        self.physics_law = profile.law;
-        self.physics_overlays = profile.overlays.to_vec();
-        self.rebuild_law_forces();
-        self.settle_for_law();
-        true
-    }
-
-    /// The profile whose law and overlays match the live choice, if any.
-    pub fn physics_profile_id(&self) -> Option<&'static str> {
-        CANVAS_PHYSICS_PROFILES
-            .iter()
-            .find(|profile| {
-                profile.law == self.physics_law
-                    && profile.overlays == self.physics_overlays.as_slice()
-            })
-            .map(|profile| profile.id)
-    }
-
     /// Whether the live law or an overlay snapshots graph structure, so a
     /// topology change must rebuild it.
     pub(crate) fn physics_forces_are_graph_bound(&self) -> bool {
@@ -1597,6 +1382,7 @@ impl Canvas {
             mass: self.physics_mass_source,
             depth: self.physics_depth_source,
             focus: self.focused_key(),
+            seed: self.dynamics.seed,
         }
     }
 

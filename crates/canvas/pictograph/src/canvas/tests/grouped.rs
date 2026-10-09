@@ -21,6 +21,7 @@
 //! within-group stress is reported and not asserted: its bar waits on a
 //! fixture whose topics have more structure inside them (F72).
 
+use crate::canvas::tests::ThroughView;
 use std::sync::Arc;
 
 use super::meaning_topics::topic_graph;
@@ -113,7 +114,7 @@ fn rest_on(members: &[usize], slot: Slot, engine: Option<Arc<dyn MeaningEngine>>
     let seed: Vec<_> = members.iter().map(|&i| scatter[i]).collect();
     canvas.apply_strategy_positions(&keys.iter().copied().zip(seed).collect::<Vec<_>>());
     if let Slot::Composition(c) = slot {
-        canvas.set_physics_composition(Some(c)).unwrap();
+        canvas.pick_composition(Some(c)).unwrap();
     }
     canvas.set_physics_paused(false);
     let mut frames = 0;

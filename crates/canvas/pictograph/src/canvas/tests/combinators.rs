@@ -9,6 +9,7 @@
 //! catalog's terms, and the weighted mix of two force laws against each
 //! pure law.
 
+use crate::canvas::tests::ThroughView;
 use seiche::instruments::{Probe, Vector};
 use seiche::{Admission, Currency, Declared, Force, ForceContext, Term, compose, scale};
 
@@ -135,8 +136,9 @@ fn the_catalog_composes_converts_or_refuses_each_overlay_by_currency() {
             inputs.overlay_force(PhysicsOverlay::GravityLocus, sources),
         ]
     };
-    let catalog = run(inputs.forces(
+    let catalog = run(inputs.composed(
         PhysicsLaw::Density,
+        None,
         &[PhysicsOverlay::GravityLocus],
         sources,
     ));
@@ -158,18 +160,18 @@ fn the_catalog_composes_converts_or_refuses_each_overlay_by_currency() {
     assert!(apart(&catalog, &not_converting) > 1e-2);
     let mut canvas = Canvas::with_sample_graph();
     canvas
-        .set_physics_overlays(vec![PhysicsOverlay::GravityLocus, PhysicsOverlay::Skeleton])
+        .pick_overlays(vec![PhysicsOverlay::GravityLocus, PhysicsOverlay::Skeleton])
         .unwrap();
-    let refusal = canvas.set_physics_law(PhysicsLaw::Density).unwrap_err();
+    let refusal = canvas.pick_law(PhysicsLaw::Density).unwrap_err();
     assert_eq!(refusal.refused, vec![PhysicsOverlay::Skeleton]);
     assert_eq!(refusal.reason, DENSITY_REFUSAL);
-    assert_eq!(canvas.physics_overlays(), &[PhysicsOverlay::GravityLocus]);
-    canvas.set_physics_law(PhysicsLaw::Still).unwrap();
+    assert_eq!(canvas.view().overlays, &[PhysicsOverlay::GravityLocus]);
+    canvas.pick_law(PhysicsLaw::Still).unwrap();
     canvas
-        .set_physics_overlays(vec![PhysicsOverlay::GravityLocus, PhysicsOverlay::Skeleton])
+        .pick_overlays(vec![PhysicsOverlay::GravityLocus, PhysicsOverlay::Skeleton])
         .unwrap();
     assert_eq!(
-        canvas.physics_overlays(),
+        canvas.view().overlays,
         &[PhysicsOverlay::GravityLocus, PhysicsOverlay::Skeleton]
     );
 }
@@ -180,7 +182,7 @@ fn the_catalog_composes_converts_or_refuses_each_overlay_by_currency() {
 fn a_composition_takes_force_laws_only_and_a_pick_replaces_it() {
     let mut canvas = Canvas::with_sample_graph();
     let mix = PhysicsComposition::Mix(vec![(PhysicsLaw::Springs, 1.0), (PhysicsLaw::Still, 1.0)]);
-    let refusal = canvas.set_physics_composition(Some(mix)).unwrap_err();
+    let refusal = canvas.pick_composition(Some(mix)).unwrap_err();
     assert_eq!(refusal.law, PhysicsLaw::Still);
     assert_eq!(refusal.reason, compose::UNWEIGHTED);
     let grouped = PhysicsComposition::Grouped(PhysicsGrouping {
@@ -190,17 +192,14 @@ fn a_composition_takes_force_laws_only_and_a_pick_replaces_it() {
         outer_weight: 1.0,
     });
     assert_eq!(
-        canvas
-            .set_physics_composition(Some(grouped))
-            .unwrap_err()
-            .law,
+        canvas.pick_composition(Some(grouped)).unwrap_err().law,
         PhysicsLaw::Anneal
     );
     assert!(canvas.physics_composition().is_none());
     let mix = PhysicsComposition::Mix(vec![(PhysicsLaw::Springs, 0.5), (PhysicsLaw::Charge, 0.5)]);
-    canvas.set_physics_composition(Some(mix.clone())).unwrap();
+    canvas.pick_composition(Some(mix.clone())).unwrap();
     assert_eq!(canvas.physics_composition(), Some(&mix));
-    canvas.set_physics_law(PhysicsLaw::Stress).unwrap();
+    canvas.pick_law(PhysicsLaw::Stress).unwrap();
     assert!(canvas.physics_composition().is_none(), "a pick replaces it");
 }
 
@@ -348,8 +347,8 @@ fn a_weighted_mix_runs_as_each_pure_law_at_one_and_zero() {
             })
             .collect();
         canvas.apply_strategy_positions(&seed);
-        canvas.set_physics_law(law).unwrap();
-        canvas.set_physics_composition(slot).unwrap();
+        canvas.pick_law(law).unwrap();
+        canvas.pick_composition(slot).unwrap();
         canvas.set_physics_paused(false);
         for _ in 0..360 {
             canvas.step_layout();

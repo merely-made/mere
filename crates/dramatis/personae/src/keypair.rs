@@ -20,8 +20,15 @@ use crate::IdentityError;
 /// **Security note**: a master `Ed25519Keypair` in code is sensitive. Prefer
 /// holding it inside an [`crate::IdentityProvider`] implementation rather than
 /// passing it around directly.
-#[derive(Clone, ZeroizeOnDrop)]
-pub struct Ed25519Keypair(SigningKey);
+///
+/// The key lives on the heap, so moving a keypair, or a vault holding one,
+/// copies a pointer rather than leaving the seed in dead stack (vault lock
+/// plan, ruling 90).
+#[derive(Clone)]
+pub struct Ed25519Keypair(Box<SigningKey>);
+
+/// Dropping the box runs `SigningKey`'s own zeroizing drop before freeing.
+impl ZeroizeOnDrop for Ed25519Keypair {}
 
 impl Ed25519Keypair {
     /// Generate a new random keypair from OS randomness.
@@ -33,7 +40,7 @@ impl Ed25519Keypair {
     pub fn generate() -> Self {
         let mut seed = [0u8; 32];
         getrandom::fill(&mut seed).expect("OS randomness available");
-        let keypair = Self(SigningKey::from_bytes(&seed));
+        let keypair = Self(Box::new(SigningKey::from_bytes(&seed)));
         seed.zeroize();
         keypair
     }
@@ -43,7 +50,7 @@ impl Ed25519Keypair {
     /// The seed becomes the signing-key bytes directly (Ed25519 from-seed
     /// semantics — the seed expands to a 64-byte signing key internally).
     pub fn from_seed(seed: [u8; 32]) -> Self {
-        Self(SigningKey::from_bytes(&seed))
+        Self(Box::new(SigningKey::from_bytes(&seed)))
     }
 
     /// 32-byte signing-key seed.

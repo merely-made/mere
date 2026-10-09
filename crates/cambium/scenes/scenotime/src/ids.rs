@@ -26,3 +26,7 @@ pub struct RelationId(pub u32);
 /// Stable region-table index within one epoch.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct RegionId(pub u32);
+
+/// Stable fold-table index within one epoch.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+pub struct FoldId(pub u32);

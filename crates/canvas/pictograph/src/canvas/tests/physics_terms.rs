@@ -65,6 +65,7 @@ const SOURCES: LawSources = LawSources {
     mass: PhysicsMassSource::Degree,
     depth: PhysicsDepthSource::Roots,
     focus: None,
+    seed: LAW_SEED,
 };
 
 struct Fixture {

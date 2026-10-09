@@ -9,6 +9,7 @@
 pub mod action_draft;
 pub mod core;
 pub mod driver;
+pub mod fold;
 pub mod frozen;
 pub mod remote;
 pub mod session;
@@ -16,6 +17,7 @@ pub mod session;
 pub use action_draft::{ActionDraft, ActionDraftSemantics, ActionDraftTarget};
 pub use core::{Outcome, Progress, RESUME_ATTEMPTS, SessionCore};
 pub use driver::{Advance, SessionDriver};
+pub use fold::{FoldReading, read_folds};
 pub use remote::{ActionForm, RemoteOp, RemoteSession};
 pub use session::{
     RetainedEndpointSession, resume_after_notice, resume_request_for_notice, unexpected,
@@ -121,7 +123,32 @@ pub enum ResumeApplyError {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct AccessibilityTree {
     pub label: String,
+    /// Items a reader reaches, in order. Members a fold hides are not here;
+    /// they are listed under their fold in [`Self::folds`].
     pub children: Vec<AccessibleItem>,
+    /// The scene's folds, each a group a reader can open.
+    pub folds: Vec<AccessibleFold>,
+}
+
+/// One fold as a reader meets it: what stands in, the "+N", what it hides,
+/// and why, when the fold says.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct AccessibleFold {
+    pub fold: scenotime::FoldId,
+    /// The member drawn in the fold's place, also present in
+    /// [`AccessibilityTree::children`]; `None` for a summary stand-in.
+    pub stand_in: Option<InstanceId>,
+    /// The stand-in's name.
+    pub label: String,
+    /// The count the stand-in carries, `+N`.
+    pub badge: String,
+    /// The hidden members, with their names.
+    pub hidden: Vec<(InstanceId, String)>,
+    /// What the fold is, as a reader announces it: the host's label when the
+    /// fold carries one, else the membership rule as a sentence.
+    pub description: Option<String>,
+    /// The membership rule as a sentence, whatever the label says.
+    pub rule: Option<String>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -137,6 +164,9 @@ pub struct AccessibleItem {
     /// endpoint advertising the same intent keeps its own invocation
     /// (dynamics grammar plan, F64).
     pub local_actions: Vec<AdvertisedAction>,
+    /// The fold this item stands in for, when it is a fold's member
+    /// stand-in; its group is in [`AccessibilityTree::folds`].
+    pub stands_in_for: Option<scenotime::FoldId>,
 }
 
 /// A mounted item a host's local action is offered on or invoked for.
@@ -443,6 +473,9 @@ impl ClientState {
             .mounted
             .get(session)
             .ok_or(ResolutionError::UnknownSession)?;
+        let effect = mounted.scene.fold_effect();
+        let folds = fold::read_folds(&mounted.scene);
+        let mut labels = BTreeMap::new();
         let mut children = Vec::new();
         for (instance, item) in mounted.scene.active_items_in_order() {
             let Some(offers) = mounted.presentation.offers_for(instance) else {
@@ -455,6 +488,10 @@ impl ClientState {
                 .ok_or(ResolutionError::UnknownPresentation)?
                 .semantics
                 .clone();
+            labels.insert(instance.0, semantics.label.clone());
+            if effect.is_hidden(instance) {
+                continue;
+            }
             let target = LocalActionTarget {
                 session,
                 instance,
@@ -466,11 +503,42 @@ impl ClientState {
                 role: semantics.role,
                 actions: semantics.actions,
                 local_actions: local.actions(&target),
+                stands_in_for: folds
+                    .iter()
+                    .find(|fold| fold.stand_in == Some(instance))
+                    .map(|fold| fold.fold),
             });
         }
+        let name_of = |instance: InstanceId| {
+            labels.get(&instance.0).cloned().unwrap_or_else(|| {
+                mounted
+                    .scene
+                    .active_item(instance)
+                    .and_then(|item| source_of(&mounted.scene, item))
+                    .map(|source| source.id.clone())
+                    .unwrap_or_else(|| format!("item {}", instance.0))
+            })
+        };
+        let folds = folds
+            .iter()
+            .map(|fold| AccessibleFold {
+                fold: fold.fold,
+                stand_in: fold.stand_in,
+                label: fold.stand_in_name(name_of),
+                badge: fold.badge(),
+                hidden: fold
+                    .hidden
+                    .iter()
+                    .map(|member| (*member, name_of(*member)))
+                    .collect(),
+                description: fold.description(name_of),
+                rule: fold.rule_text(name_of),
+            })
+            .collect();
         Ok(AccessibilityTree {
             label: "Graphshell projection".into(),
             children,
+            folds,
         })
     }
 

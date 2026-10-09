@@ -258,7 +258,10 @@ impl ChannelRegistry {
             })
     }
 
-    /// Degree plus one (`weight.degree`), keyed by structure.
+    /// Degree plus one (`weight.degree`), keyed by structure: an
+    /// arrangement's weight, Radial's rings, over every kernel edge. A body's
+    /// mass is `mass.degree`, another computation over the physics view's
+    /// edges (F147; `canvas::channels`).
     pub fn degree_weights(&mut self, graph: &Graph) -> &HashMap<NodeKey, f32> {
         self.degree_weights
             .get(graph.revision(), &mut self.runs.degree_weights, || {

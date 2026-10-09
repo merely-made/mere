@@ -14,6 +14,7 @@
 use super::*;
 use crate::canvas::physics_catalog::PhysicsLaw;
 use crate::canvas::schedule::{PhysicsStage, StageStop};
+use crate::canvas::tests::ThroughView;
 use seiche::Role;
 
 const N: usize = 40;
@@ -73,7 +74,7 @@ struct Run {
 
 fn remembering(capture: Role) -> Run {
     let (mut canvas, _) = tree_canvas();
-    canvas.run_physics_schedule(vec![
+    canvas.pick_schedule(vec![
         PhysicsStage::law(PhysicsLaw::Stress, StageStop::Rest).capturing(capture),
         PhysicsStage::law(PhysicsLaw::Springs, StageStop::Rest),
     ]);
@@ -155,7 +156,7 @@ fn stress_then_springs_remembering_it_reproduces_the_capture() {
 #[test]
 fn stages_end_at_their_frames_and_at_their_laws_stop() {
     let (mut canvas, _) = tree_canvas();
-    canvas.run_physics_schedule(vec![
+    canvas.pick_schedule(vec![
         PhysicsStage::law(PhysicsLaw::Springs, StageStop::Frames(60)),
         PhysicsStage::law(PhysicsLaw::Stress, StageStop::LawDone),
     ]);
@@ -165,7 +166,7 @@ fn stages_end_at_their_frames_and_at_their_laws_stop() {
     assert_eq!(canvas.physics_schedule_stage(), Some(0));
     canvas.step_layout();
     assert_eq!(canvas.physics_schedule_stage(), Some(1));
-    assert_eq!(canvas.physics_law(), PhysicsLaw::Stress);
+    assert_eq!(canvas.view().law, PhysicsLaw::Stress);
     let settles = canvas.settle_count();
     let mut frames = 0;
     while canvas.physics_schedule_stage().is_some() && frames < 20_000 {
@@ -178,7 +179,7 @@ fn stages_end_at_their_frames_and_at_their_laws_stop() {
     );
     assert!(canvas.settle_count() > settles);
     // A pick replaces a schedule under way.
-    canvas.run_physics_schedule(vec![PhysicsStage::law(PhysicsLaw::Stress, StageStop::Rest)]);
-    canvas.set_physics_law(PhysicsLaw::Springs).unwrap();
+    canvas.pick_schedule(vec![PhysicsStage::law(PhysicsLaw::Stress, StageStop::Rest)]);
+    canvas.pick_law(PhysicsLaw::Springs).unwrap();
     assert!(canvas.physics_schedule_stage().is_none());
 }

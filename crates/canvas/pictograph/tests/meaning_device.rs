@@ -49,8 +49,8 @@ use pictograph::canvas::meaning_device::{
 };
 use pictograph::canvas::meaning_model::MeaningModel;
 use pictograph::canvas::{
-    Canvas, LexicalMeaning, MeaningBackend, MeaningEngine, MeaningParams, PhysicsKindSource,
-    PhysicsLaw, physics_device_for,
+    Canvas, LexicalMeaning, MeaningBackend, MeaningEngine, MeaningParams, PhysicsChoice,
+    PhysicsKindSource, PhysicsLaw, physics_device_for,
 };
 
 const MEBIBYTE: u64 = 1 << 20;
@@ -163,10 +163,16 @@ fn the_model_on_the_host_device_shares_it_and_records_purity() {
         warm.push(frame.elapsed());
     }
     println!("warm-up frames before the dispatch: {warm:?}");
-    canvas.set_physics_kind_source(PhysicsKindSource::Meaning);
-    canvas
-        .set_physics_law(PhysicsLaw::Kinds)
-        .expect("not refused");
+    // Kinds by meaning, set through the canvas's spec and its flat view
+    // (dynamics grammar plan, F162).
+    let mut spec = canvas.dynamics_spec().expect("the record reads");
+    PhysicsChoice {
+        law: PhysicsLaw::Kinds,
+        kind: PhysicsKindSource::Meaning,
+        ..PhysicsChoice::live(&canvas)
+    }
+    .write_into(&mut spec, &PhysicsChoice::live(&canvas));
+    canvas.set_dynamics_spec(&spec).expect("not refused");
     // The build dispatched the run; frames go on while it is in flight.
     let dispatched = Instant::now();
     let mut in_flight: Vec<Duration> = Vec::new();
