@@ -5,12 +5,12 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use sceno::{
-    Backdrop, HeldPlacement, Hold, HonoredHold, InstanceId, ProjectedItem, Rect, Region,
-    RoutedRelation, Scene, SourceRef, Space, SpaceId,
+    Backdrop, Fold, FoldEffect, HeldPlacement, Hold, HonoredHold, InstanceId, ProjectedItem, Rect,
+    Region, RoutedRelation, Scene, SourceRef, Space, SpaceId,
 };
 use serde::{Deserialize, Serialize};
 
-use crate::{BackdropId, RegionId, RelationId, Revision, SceneEpoch};
+use crate::{BackdropId, FoldId, RegionId, RelationId, Revision, SceneEpoch};
 
 /// Stable scene tables. `None` is a tombstone, never an invitation to reuse the
 /// index during this epoch.
@@ -25,6 +25,11 @@ pub struct SceneTables {
     pub item_order: Vec<Option<i32>>,
     pub relations: Vec<Option<RoutedRelation>>,
     pub regions: Vec<Option<Region>>,
+    /// Folds carried through from [`Scene::folds`]. A tombstone is an unfold.
+    /// Omitted from the wire when the table is empty, so a snapshot that never
+    /// folded serializes exactly as it did before folds existed.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub folds: Vec<Option<Fold>>,
     pub bounds: Rect,
     pub generation: u64,
     /// Pinned placements the solver could not honor, carried through from
@@ -76,6 +81,7 @@ impl SceneSnapshot {
                 item_order: (0..item_count).map(|index| Some(index as i32)).collect(),
                 relations: scene.relations.into_iter().map(Some).collect(),
                 regions: scene.regions.into_iter().map(Some).collect(),
+                folds: scene.folds.into_iter().map(Some).collect(),
                 bounds: scene.bounds,
                 generation: scene.generation,
                 unmet_holds: scene.unmet_holds,
@@ -110,6 +116,26 @@ impl SceneSnapshot {
 
     pub fn active_region(&self, id: RegionId) -> Option<&Region> {
         self.tables.regions.get(id.0 as usize)?.as_ref()
+    }
+
+    pub fn active_fold(&self, id: FoldId) -> Option<&Fold> {
+        self.tables.active_fold(id)
+    }
+
+    /// Active folds in table order.
+    pub fn active_folds(&self) -> Vec<(FoldId, &Fold)> {
+        self.tables.active_folds()
+    }
+
+    /// What the active folds hide, derived from the facts alone.
+    pub fn fold_effect(&self) -> FoldEffect {
+        self.tables.fold_effect()
+    }
+
+    /// Whether an active item is drawn: its own flag, and no fold hiding it.
+    pub fn is_shown(&self, id: InstanceId) -> bool {
+        self.active_item(id)
+            .is_some_and(|item| self.fold_effect().is_shown(id, item.visible))
     }
 
     pub fn active_item_count(&self) -> usize {
@@ -192,6 +218,21 @@ impl SceneSnapshot {
                 require_active(&tables.items, member.0, "region member")?;
             }
         }
+        sceno::fold::validate_folds(
+            tables
+                .folds
+                .iter()
+                .enumerate()
+                .filter_map(|(index, fold)| Some((index as u32, fold.as_ref()?))),
+            |member| {
+                tables
+                    .items
+                    .get(member.0 as usize)
+                    .and_then(Option::as_ref)
+                    .is_some()
+            },
+        )
+        .map_err(|error| SnapshotError::Invalid(error.to_string()))?;
         for unmet in &tables.unmet_holds {
             if !matches!(unmet.hold, Hold::Pinned) {
                 return invalid("an unmet hold must be pinned");
@@ -235,6 +276,31 @@ impl SceneSnapshot {
             }
         }
         Ok(())
+    }
+}
+
+impl SceneTables {
+    pub fn active_fold(&self, id: FoldId) -> Option<&Fold> {
+        self.folds.get(id.0 as usize)?.as_ref()
+    }
+
+    /// Active folds in table order.
+    pub fn active_folds(&self) -> Vec<(FoldId, &Fold)> {
+        self.folds
+            .iter()
+            .enumerate()
+            .filter_map(|(index, fold)| Some((FoldId(index as u32), fold.as_ref()?)))
+            .collect()
+    }
+
+    /// What the active folds hide, derived from the facts alone.
+    pub fn fold_effect(&self) -> FoldEffect {
+        FoldEffect::of(
+            self.folds
+                .iter()
+                .enumerate()
+                .filter_map(|(index, fold)| Some((index as u32, fold.as_ref()?))),
+        )
     }
 }
 

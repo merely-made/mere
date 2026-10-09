@@ -1,11 +1,12 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-08)**: rulings 1 to 81 in §3; the threat statement is
-still open. L1 landed (`2556a20c`). L2's checkpoints A (`7c588deb`) and B
-(`ec1768ab`) landed. Still to come in L2: the Secret Service on the
-ThinkPad, ruling 42 (Linux starts locked), ruling 44 (Distillery's
-transport key) and the seed residue fixes (rulings 49 to 51). The
+**Status (2026-10-08)**: rulings 1 to 91 in §3. L1 to L4 landed (L3
+as `79fbbeb7`, its attended receipts as `303b5097`; L4 on 2026-10-08, §6);
+deployment is Mark's step. Not yet carried out: ruling 44's transport-key hard switch,
+so Distillery keeps the master keypair while locked, and pandect's wallets
+until D8 (ruling 81). The [vault threat statement](../technical_architecture/2026-10-08_vault_threat_statement.md)
+says what the lock defends and leaves open. The
 [dramatis repo plan](2026-10-06_dramatis_repo_plan.md) moves this code
 later. Chatelaine P4 (CXF import) waits on this plan (chatelaine rulings
 64, 65).
@@ -27,6 +28,9 @@ locked.
 - [persona wallet carry layer plan](../../archive_docs/2026-10-06_completed_plans/2026-06-25_persona_wallet_carry_layer_plan.md):
   the "one unlock ladder" rule (:358-362), and Meerkat's 2026-07-04 "Lock
   now" (:788-792).
+- [vault threat statement](../technical_architecture/2026-10-08_vault_threat_statement.md):
+  what the lock defends, what stays while locked, and what it does not
+  defend (ruling 82).
 - [dramatis repo plan](2026-10-06_dramatis_repo_plan.md): moves the
   vault's custody from personae into castellan and the tier out of mere;
   sequenced after this plan's L2 at the earliest.
@@ -938,7 +942,148 @@ Options:
 
 Mark: **"Leave it to D8 (Recommended)"**.
 
+Rulings 82 and 83 were asked on 2026-10-08, at L4's start.
+
+**Ruling 82.** *Where should the vault's threat statement live? It would
+state what the lock defends, what it leaves open (the pagefile and
+hibernation copies made while unlocked, crash dumps, same-user processes,
+in-process mods), and what is fixed only by reading. The protocol plan's
+§3.7 promises "a future doc under technical_architecture".* Options:
+- its own doc in dramatis' `technical_architecture/`, linked from the tier
+  architecture and §3.7, moving with dramatis at the split;
+- a section in the tier architecture;
+- a section in this plan;
+- left open past L4.
+
+Mark: **"Own doc in dramatis (Recommended)"**. Follows:
+[the vault threat statement](../technical_architecture/2026-10-08_vault_threat_statement.md).
+
+**Ruling 83.** *Should the dramatis tier architecture gain an invariant for
+the lock? Its §4 lists 12, each with where it is enforced, and breaking
+one comes to Mark first.* Options:
+- add invariant 13: while locked no secret is reachable, and unlocking
+  takes a user act on the resident's own surface, with its four
+  enforcement points;
+- annotate invariant 1 only;
+- neither.
+
+Mark: **"Add invariant 13 (Recommended)"**.
+
+Rulings 84 to 87 were asked on 2026-10-08 from L4's follow-up of the
+failures and open items left beside this plan, scoped read-only first.
+Each fix lands in code another plan owns; this record holds the rulings,
+and the owners' plans get dated pointers.
+
+**Ruling 84** *(the reservoir plan's V5 code).* *`embedded_reservoir_two_process`
+and `embedded_reservoir_validation` fail on Windows with error 231 ("All
+pipe instances are busy"). The listener keeps one waiting pipe instance
+and makes the next only after a connect (`local_endpoint.rs:77-84`), and
+`connect_local` (`:36-41`) opens once with no retry. `EmbeddedOwner::start`
+probes with a connect and then connects for real at once, inside that
+window. It is a product race any two close clients can hit, and probably
+never green on Windows.* Options:
+- retry in `connect_local`, briefly and bounded, as tokio's docs advise;
+- the retry plus spare waiting instances;
+- spare instances only;
+- retry in the reservoir only.
+
+Mark: **"Retry in connect_local (Recommended)"**.
+
+**Ruling 85** *(the djinn test harness plan's code).* *Once in a long run,
+`djinn --stop-resident` exited with failure though the resident stopped.
+The stop intent raises the stop before its reply is written
+(`resident_status.rs:470-472`), so the shutdown can cancel the reply or
+exit before the CLI reads it. The testkit keeps no record of the stop
+command's output.* Options:
+- the resident raises the stop only once the reply is flushed, and the
+  testkit records the stop command's output;
+- the stop after the reply only;
+- the testkit judges "left" by the `stopping` event and the exit;
+- the CLI treats a dropped connection after the stop as accepted.
+
+Mark: **"Stop after reply + record (Recommended)"**.
+
+**Ruling 86** *(personae's tests; no live plan).* *`authoritative_opening_is_exclusive_until_every_clone_drops`
+flakes on Linux: the last claim finds "authority is already held". The lock
+is `flock`, which a forked child holds until it execs, and the sibling
+test `..._across_processes` spawns a child (inferred, not traced).* Options:
+- serialize the two tests;
+- retry the final claim;
+- record only.
+
+Mark: **"Serialize the two tests (Recommended)"**.
+
+**Ruling 87** *(amends ruling 69's "later items").* *Serving the Secret
+Service for real on Linux is eight work items, with open questions: how
+the name is taken from gnome-keyring, what serves before the first unlock,
+gnome-keyring's existing items, and the Flatpak portal backend. The Linux
+`personae-agent` keeps its passphrase in gnome-keyring today.* Options:
+- after pairing D2, with the questions asked then;
+- now, behind an owner setting that is off by default;
+- scoped as its own plan.
+
+Mark: **"Scope it as its own plan"**.
+
+**Ruling 88** *(how ruling 85's product half is built).* *The reply is
+written by graphshell's generic app-door loop (`app_broker.rs:351-366`),
+after the session's server task has run the intent, so nothing fires
+"after the reply". djinn makes a control endpoint per session
+(`resident_status.rs:419`), and the session ends once the reply is written
+and the asking CLI closes.* Options:
+- the stop intent marks the session, and the stop is raised when it ends
+  or after 2 s, whichever is first (djinn only);
+- at session end only;
+- a generic post-reply hook in graphshell's broker.
+
+Mark: **"At session end + 2 s fallback (Recommended)"**.
+
+**Ruling 89** *(carries ruling 7 into the libraries).* *`InstalledAuthority::open`
+(distillery) and `GraphshellIdentity::load` / `load_selected` (graphshell)
+read `PERSONAE_PASSPHRASE` themselves. Their only callers are the
+`distillery-installed` CLI and one graphshell test, and no sibling repo
+calls them. A smoke script also sets the variable for a binary that never
+opens the vault.* Options:
+- remove the env-reading entry points now; the CLI reads the environment
+  itself and passes an explicit `Unlock`, and the dead script line goes;
+- leave them until D5 and D2;
+- a debug assertion only.
+
+Mark: **"Remove them now (Recommended)"**.
+
+**Ruling 90** *(amends ruling 6's reach to the stack; asked from L4's gate).*
+*castellan's residue test failed on Fedora under djinn's unified features,
+3 of 3: a live 56-byte block held the persona's master seed after the
+lock. The block is castellan's `AgentListenerView` (`authority.rs:445`).
+Its `StandaloneRetained` variant leaves a 24-byte payload uninitialized,
+and that payload was copied from a stack slot holding a stale seed copy.
+`Profile` holds the key inline, so every by-value move of `IdentityVault`
+(`with_profile`, `Mutex::new`) leaves a bitwise copy in dead stack: 25 to
+29 at that point in every build, measured with gdb watchpoints. djinn's
+features only change codegen, which decided whether a copy landed under the
+payload.* Options:
+- box the key (`Ed25519Keypair` holds `Box<SigningKey>`; a private
+  field, so no API change), so moves copy a pointer; re-measure, keep the
+  test strict, and name stack residue and its path into the heap in the
+  threat statement;
+- box the profile in the vault instead, plus the same record;
+- record only.
+
+Mark: **"Box the key + record (Recommended)"**.
+
+**Ruling 91** *(amends ruling 42; asked 2026-10-09 beside the Secret
+Service plan's SS8).* *Ruling 42 started Linux locked, partly because the
+desktop keyring was awkward while castellan meant to be the Secret
+Service, which SS5 then SS8 removed. gnome-keyring is unlocked by the login
+password through PAM and stays unlocked all session.* Options: keep ruling
+42 (Linux asks once per login); keep djinn's root in the OS keyring, so it
+auto-unlocks at login like Windows; ask again at D2. Mark: **"Root in the
+OS keyring"**. Follows: Linux gets an auto-unlock root held in the
+desktop's Secret Service. It is built after its own assessment, which
+covers the client library, the persisted lock and the threat statement's
+Linux at-rest line.
+
 Still open: a threat statement naming hibernation and the pagefile.
+*2026-10-08:* closed by ruling 82.
 
 ## 4. Phases
 
@@ -976,11 +1121,12 @@ made, and carried out since under the later rulings.
   - [x] a locked resident restarted by the launcher comes back as ruled.
         *(2026-10-08, `79fbbeb7`; §6, L3 checkpoint E.)*
 - **L4 — docs and gates.** Done when:
-  - [ ] `UnlockTier`'s docs, the protocol plan's §3.6 and §3.7, and the
+  - [x] `UnlockTier`'s docs, the protocol plan's §3.6 and §3.7, and the
         tier invariants match the rulings;
-  - [ ] the gates pass, with Windows-only and Linux-only code each compiled
+  - [x] the gates pass, with Windows-only and Linux-only code each compiled
         on its own target;
-  - [ ] PID 53336 is untouched; deployment is Mark's step.
+  - [x] PID 53336 is untouched; deployment is Mark's step.
+        *(2026-10-08; §6, L4.)*
         *2026-10-05 correction:* the installed resident's PID changes
         on reboot (14756 that morning); the wall is its identity captured
         at each run's start (djinn test harness plan).
@@ -1785,3 +1931,78 @@ L3's `79fbbeb7`) on both machines.
     *Reading, not ruled:* harmless, left as is.
 - L3 is done; the scratch residents are stopped and their directories
   removed.
+
+**2026-10-08, L4 done: the docs, the gates and what the gates found.**
+- **Docs** (rulings 12, 82 and 83):
+  - `UnlockTier`'s docs in `personae/src/vault.rs` say consent: when the
+    approval broker asks, with every slot decrypted while unlocked;
+  - the protocol plan's §3.6 and §3.7 carry dated annotations on what
+    holds now;
+  - the tier architecture gains invariant 13 with its four enforcement
+    points;
+  - the [vault threat statement](../technical_architecture/2026-10-08_vault_threat_statement.md)
+    is new.
+- **The gates** ran on mere `526cbb3b` plus this work, in fresh worktrees.
+  - **Windows:** personae, castellan and djinn give 477 passed across 37
+    targets. The ignored `harness`, `lock_agent` and `locked_restart`
+    receipts pass. The installed resident (PID 14756, started 2026-10-05
+    05:06) is the same before and after every run.
+  - **Fedora:** the same crates give 464 passed across 35 targets,
+    compiling the logind and Mutter sources on their own target.
+    `secret_service_linux` passes 2 of 2 under `dbus-run-session`. On the
+    user's own bus it fails with `NameTaken`, since gnome-keyring owns
+    the name.
+- **What the gates found, and what was done** (rulings 84 to 90):
+  - **The first Linux gate failed castellan's residue test.** Only under
+    djinn's unified features, 3 of 3: a live block held the master seed
+    after the lock. The cause was stack residue: every by-value move of
+    `IdentityVault` left a seed copy in dead stack, and an enum's
+    uninitialized payload carried one into a heap block (ruling 90). The
+    key is now boxed, and the test is clean 3 of 3 on Fedora and clean on
+    Windows, with its positive control firing each time.
+  - **The reservoir fixtures** failed on Windows with error 231.
+    `connect_local` now retries a busy pipe (ruling 84), and both
+    fixtures pass. On the same commit without the fix, both fail.
+  - **The graceful stop** is raised when the asking session ends, or
+    after 2 s (rulings 85 and 88), and the testkit records the stop
+    command's output. The new unit test covers both paths, and `harness`
+    passes 5 of 5.
+  - **personae's two authority tests** take turns (ruling 86).
+  - **The env-reading library openers are gone** (ruling 89).
+    `distillery-installed` reads the environment itself, and the smoke
+    script's dead `PERSONAE_PASSPHRASE` line is removed.
+  - **The Secret Service's real serving** has its own
+    [plan](2026-10-08_secret_service_plan.md) (ruling 87).
+  - **Scoped, and left with their owners:** the mDNS restart failure is
+    the pairing plan's ruling 36, waiting on iroh-gossip (ruling 72).
+- **Still open, by ruling:**
+  - ruling 44's transport-key hard switch, so Distillery keeps the master
+    keypair while locked;
+  - pandect's wallets until D8 (ruling 81).
+
+**2026-10-09, L4's Windows gate rerun in its own build directory** (the
+dynamics grammar plan's F183).
+- **Why:** F183 withdrew F145's shared `C:/t/cargo-build/mere`. Its
+  freshness check runs by modification time, so one worktree can build
+  with another tree's artifacts. L4's two Windows gate runs, and the
+  djinn binary for L3 checkpoint E's Windows legs, were built through that
+  directory.
+- **The rerun:** on main `17519aa4`, which carries L4, in a fresh
+  worktree with its own `C:/t/cargo-build/mere-l4recheck`, built cold.
+  Personae, castellan and djinn give 477 passed across 37 targets, the same
+  as before. The ignored `locked_restart`, `harness` and `lock_agent`
+  receipts pass. The installed resident (PID 14756) is unchanged.
+- **The Fedora gates and receipts stand.** They built in each worktree's
+  own `target/`.
+- **Checkpoint E's Windows legs** ran a binary of unproven provenance.
+  Their events matched L3's code, and rerunning them with an isolated
+  build waits for Mark's hands.
+  - *Rerun 2026-10-09 (Mark: "let's do it now"),* with djinn built in
+    that worktree's own directory and the same two residents.
+  - `Win+L` locked A at 00:27:12.881, reason `session-lock`, with its
+    marker; B stayed open.
+  - Lid closed with no `Win+L` on a fresh pair: Modern Standby began at
+    00:28:01.716 (Kernel-Power 506). B locked, `suspend`, at 00:28:01.827,
+    and A locked, `session-lock`, at 00:28:02.139, both with markers.
+    Standby's next phase (566, 9 to 10) came at 00:28:02.357.
+  - E's Windows legs hold on an isolated build.

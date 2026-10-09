@@ -64,28 +64,9 @@ pub enum SubgraphBinding {
     },
 }
 
-/// Canonical subgraph specification (referenced by Linked bindings).
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct SubgraphSpec {
-    pub kind: SubgraphKind,
-    pub anchors: Vec<String>,
-    pub primary_anchor: Option<String>,
-    pub selectors: Vec<String>,
-}
-
-/// The 9 canonical subgraph shapes from `subgraph_model.md`.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub enum SubgraphKind {
-    Ego { radius: u8 },
-    Corridor,
-    Component,
-    Loop,
-    Frontier,
-    Facet,
-    Session,
-    Bridge,
-    WorkbenchCorrespondence,
-}
+// The specification and its kinds live in the curation crate (Scenograph
+// editor plan, SE67); re-exported so callers are unchanged.
+pub use curation::{SubgraphKind, SubgraphSpec};
 
 // ---------------------------------------------------------------------------
 // Edge projection spec (consumed from subgraph_projection_binding_spec.md §3)

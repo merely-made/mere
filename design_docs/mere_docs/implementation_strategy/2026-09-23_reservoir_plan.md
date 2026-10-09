@@ -1674,3 +1674,18 @@ V2b's rulings, all 2026-09-25:
       one complete run with no hang.
   - The 2 ms wait in `capture_hook_receives_replayable_apply_events` stays,
     as ruled. Logs are in `Code/testing/mere/replay-touch/`.
+
+**2026-10-08, V5's two process fixtures pass on Windows** (the
+[vault lock plan](../../dramatis_docs/implementation_strategy/2026-10-05_vault_lock_plan.md)'s
+ruling 84).
+- **The failure:** `embedded_reservoir_two_process` and
+  `embedded_reservoir_validation` failed on Windows with error 231 ("All
+  pipe instances are busy").
+- **The cause** (read): the listener keeps one waiting pipe instance and
+  makes the next only after a connect. `connect_local` opened once, and
+  `EmbeddedOwner::start`'s probe-then-connect landed between the two
+  instances.
+- **The fix:** `connect_local` now retries error 231 for up to 2 s, as
+  tokio's named-pipe documentation advises. Both fixtures pass on Windows
+  (3 and 1, each with its child entrypoint ignored); on the same commit
+  without the fix, both fail.

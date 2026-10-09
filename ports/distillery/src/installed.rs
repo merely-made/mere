@@ -213,15 +213,6 @@ impl InstalledAuthority {
         Ok(settings)
     }
 
-    /// Open the selected profile from the ordinary shared Personae vault.
-    pub fn open(data_root: &Path) -> Result<Self, InstalledError> {
-        Self::open_with(
-            data_root,
-            &bootstrap::default_vault_dir(),
-            Unlock::from_env(),
-        )
-    }
-
     /// Open against a named vault and unlock method.
     ///
     /// This refuses an absent profile rather than silently minting a new one:

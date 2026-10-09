@@ -11,6 +11,8 @@ keywords = ["projection", "authoring", "scene", "visualization"]
 categories = ["visualization", "data-structures"]
 
 [dependencies]
+# A swatch's subgraph scope (Scenograph editor plan, SE63, SE67).
+curation = { package = "mere-curation", version = "0.1.0", path = "../../../forme/curation" }
 # `SourceRef`, the score contract's source identity, which a resolved dataset's
 # occurrences carry.
 sceno = { version = "0.0.4", path = "../sceno" }
