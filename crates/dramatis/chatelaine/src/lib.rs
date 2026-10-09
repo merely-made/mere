@@ -108,6 +108,7 @@ mod id;
 mod item;
 mod kind;
 mod otp;
+mod otp_tile;
 #[cfg(test)]
 mod samples;
 mod value;
@@ -117,6 +118,7 @@ pub use id::{CollectionId, CredentialId, IdParseError, ItemId};
 pub use item::{AndroidApp, AppCertificate, Collection, Credential, Item, ItemState, Link, Scope};
 pub use kind::{CXF_V1_TYPES, CredentialKind, WifiSecurity};
 pub use otp::{OtpAlgorithm, OtpCodeStyle, OtpMode};
+pub use otp_tile::{OtpCodeTile, OtpCredential, OtpFields, OtpTimeRing};
 pub use value::{
     CountryCode, Date, LastFour, SourceId, SshFingerprint, SubdivisionCode, ValueError, YearMonth,
 };
