@@ -144,7 +144,10 @@ pub struct AccessibleFold {
     pub badge: String,
     /// The hidden members, with their names.
     pub hidden: Vec<(InstanceId, String)>,
-    /// The membership rule as a sentence.
+    /// What the fold is, as a reader announces it: the host's label when the
+    /// fold carries one, else the membership rule as a sentence.
+    pub description: Option<String>,
+    /// The membership rule as a sentence, whatever the label says.
     pub rule: Option<String>,
 }
 
@@ -528,6 +531,7 @@ impl ClientState {
                     .iter()
                     .map(|member| (*member, name_of(*member)))
                     .collect(),
+                description: fold.description(name_of),
                 rule: fold.rule_text(name_of),
             })
             .collect();

@@ -10,7 +10,9 @@
 //! members: no item's `visible` changes when a host folds. The remote reader
 //! and the frozen reader both read it here, so they agree on which members are
 //! hidden, what stands in for them, the "+N" the stand-in carries, and how the
-//! rule reads as text (site canvas plan, Rulings 149 to 151).
+//! rule reads as text (site canvas plan, Rulings 149 to 151). A host's own
+//! label, when the fold carries one, is read in preference to that generic
+//! wording (Ruling 155).
 //!
 //! Reversing a fold is not a client edit. Like every other change to a remote
 //! scene it arrives as a diff from the endpoint, here a
@@ -33,6 +35,8 @@ pub struct FoldReading {
     /// The members the fold hides: every member but a member stand-in.
     pub hidden: Vec<InstanceId>,
     pub rule: Option<FoldRule>,
+    /// The host's own words for the fold, preferred to the rule's wording.
+    pub label: Option<String>,
     pub boundary: Option<FoldBoundary>,
     /// Where a summary stand-in is drawn: the centroid of its members' world
     /// positions, which folding never moves. `None` for a member stand-in.
@@ -53,6 +57,7 @@ impl FoldReading {
             members: value.members.clone(),
             hidden: value.hidden().collect(),
             rule: value.rule.clone(),
+            label: value.label.clone(),
             boundary: value.boundary.clone(),
             summary_at: None,
         }
@@ -78,6 +83,15 @@ impl FoldReading {
             (Some(member), _) => name_of(member),
             (None, Some(label)) => label.clone(),
             (None, None) => format!("{} folded items", self.members.len()),
+        }
+    }
+
+    /// What a reader is told the fold is: the host's label when it gave one
+    /// (Ruling 155), else the rule as a sentence.
+    pub fn description(&self, name_of: impl Fn(InstanceId) -> String) -> Option<String> {
+        match &self.label {
+            Some(label) => Some(label.clone()),
+            None => self.rule_text(name_of),
         }
     }
 

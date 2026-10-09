@@ -1308,6 +1308,32 @@ nothing downloaded:
 - **PR #163** (a maintainer's draft asserting HyParView's paper claims) and
   **PR #121** change other pending-entry paths, not `on_join`'s.
 
+**2026-10-08: Retinue 0.3 at the root (rulings 42 and 44 followed).** The
+root's four Retinue rows move to retinue `main` `773515f2` together:
+retinue `0.3.0`, outrider `=0.3.0`, postilion `=0.3.0`, radio-hand
+`=0.0.1`. seneschal `0.2.0` enters the lock under postilion and radio-hand
+and needs no row of its own.
+- **No source change was forced.** mere-transport (`--features reticulum`)
+  and mere-signalman build, test and lint clean against the new API: neither
+  calls `set_freshness_policy`, reads `address_book::Peer`,
+  `SinglePacketReceipt` or the counters, and the public paths they use
+  survived the file split. (Signalman's clippy also needed one
+  `collapsible_if` in `head.rs`, which fails on the old pin too and is
+  committed separately.)
+- **Behaviour that reaches mere** (retinue `fd41131`, `e3468b9`, `f30f000`):
+  routes now live a week, not 30 minutes, unless an interface mode caps them;
+  links carry RNS keepalives and are torn down when stale, and a read on a
+  dropped `LinkStream` fails with `TimedOut` instead of hanging; inbound
+  links are bounded per endpoint and destination.
+- **One Retinue no longer holds.** Knot's `knot-site` (at mere's Knot
+  `eabd4434`, under djinn) names retinue `fa4f925` itself, so the lock now
+  carries retinue 0.2.0 for knot-site beside 0.3.0 for everything else. No
+  type crosses between them in mere (checked); the second copy goes when
+  Knot repins knot-site.
+- **Licence.** retinue and outrider are under the Reticulum License from
+  0.3.0 (retinue `313198c`); postilion, seneschal and radio-hand stay
+  MPL-2.0. mere vendors none of their source, so `LICENSES.md` is unchanged.
+
 ## 7. Progress
 
 **2026-10-02.** Assessed by a read-only lane (Sonnet) and ruled in three

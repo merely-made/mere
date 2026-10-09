@@ -99,6 +99,11 @@ pub struct Fold {
     pub rule: Option<FoldRule>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub boundary: Option<FoldBoundary>,
+    /// The host's own words for the fold ("Mere's dependencies"). Every
+    /// reader prefers it to the generic wording of [`Self::rule`], which
+    /// stays the fallback. Never blank when present.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
 }
 
 impl Fold {
@@ -151,6 +156,11 @@ impl Fold {
         {
             return Err(FoldError::RootNotMember(*root));
         }
+        if let Some(label) = &self.label
+            && label.trim().is_empty()
+        {
+            return Err(FoldError::BlankLabel);
+        }
         if let Some(boundary) = &self.boundary {
             for bundle in &boundary.bundles {
                 if seen.contains(&bundle.outside) {
@@ -183,6 +193,8 @@ pub enum FoldError {
     BoundaryInside(InstanceId),
     /// A boundary bundle's outside instance is absent or tombstoned.
     BoundaryAbsent(InstanceId),
+    /// The host's label is present but blank.
+    BlankLabel,
     /// Two active folds share an instance.
     Overlap {
         instance: InstanceId,
@@ -211,6 +223,7 @@ impl fmt::Display for FoldError {
             Self::BoundaryAbsent(id) => {
                 write!(f, "fold boundary instance {} is absent or tombstoned", id.0)
             },
+            Self::BlankLabel => write!(f, "a fold's label is blank"),
             Self::Overlap {
                 instance,
                 first,
@@ -313,6 +326,7 @@ mod tests {
                 direction: FoldDirection::Outgoing,
             }),
             boundary: None,
+            label: None,
         }
     }
 
@@ -348,6 +362,7 @@ mod tests {
             },
             rule: Some(FoldRule::Selection),
             boundary: None,
+            label: None,
         };
         assert_eq!(fold.hidden_count(), 2);
         assert!(fold.validate(live(6)).is_ok());
@@ -397,6 +412,18 @@ mod tests {
             inside.validate(live(4)),
             Err(FoldError::BoundaryInside(InstanceId(1)))
         );
+        for blank in ["", "  ", "\n\t"] {
+            let mut unlabelled = rooted(&[0, 1]);
+            unlabelled.label = Some(blank.into());
+            assert_eq!(
+                unlabelled.validate(live(4)),
+                Err(FoldError::BlankLabel),
+                "{blank:?}"
+            );
+        }
+        let mut labelled = rooted(&[0, 1]);
+        labelled.label = Some("Mere's dependencies".into());
+        assert!(labelled.validate(live(4)).is_ok());
     }
 
     #[test]
@@ -422,6 +449,7 @@ mod tests {
             stand_in: StandIn::Summary { label: None },
             rule: None,
             boundary: None,
+            label: None,
         };
         let wire = serde_json::to_string(&bare).unwrap();
         assert_eq!(
@@ -429,8 +457,16 @@ mod tests {
             "absent rule, boundary and label are not written"
         );
         assert_eq!(serde_json::from_str::<Fold>(&wire).unwrap(), bare);
-        let full = rooted(&[0, 1]);
+        let mut full = rooted(&[0, 1]);
         let wire = serde_json::to_string(&full).unwrap();
+        assert!(!wire.contains("label"), "no label, no key: {wire}");
+        assert_eq!(serde_json::from_str::<Fold>(&wire).unwrap(), full);
+        full.label = Some("Mere's dependencies".into());
+        let wire = serde_json::to_string(&full).unwrap();
+        assert!(
+            wire.ends_with(r#","label":"Mere's dependencies"}"#),
+            "{wire}"
+        );
         assert_eq!(serde_json::from_str::<Fold>(&wire).unwrap(), full);
     }
 }

@@ -129,12 +129,20 @@ pub struct FrozenFold {
     /// The membership rule as a sentence, when the fold records one.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub rule: Option<String>,
+    /// The host's own words for the fold, read in preference to the rule.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
 }
 
 impl FrozenFold {
-    /// The disclosure's one-line summary: "Mere, +6 folded: <rule>".
+    /// What a reader is told the fold is: the label, else the rule.
+    pub fn description(&self) -> Option<&str> {
+        self.label.as_deref().or(self.rule.as_deref())
+    }
+
+    /// The disclosure's one-line summary: "Mere, +6 folded: <label or rule>".
     pub fn heading(&self) -> String {
-        match &self.rule {
+        match self.description() {
             Some(rule) => format!("{}, {} folded: {rule}", self.name, self.badge),
             None => format!("{}, {} folded", self.name, self.badge),
         }
@@ -313,6 +321,7 @@ impl FrozenScene {
                 badge: fold.badge(),
                 members,
                 rule: fold.rule_text(name_of),
+                label: fold.label.clone(),
             })
             .collect::<Vec<_>>();
 
@@ -374,7 +383,7 @@ impl FrozenScene {
             rows.push((
                 "fold".to_owned(),
                 format!("{} {}", fold.name, fold.badge),
-                fold.rule.clone().unwrap_or_else(|| "folded".to_owned()),
+                fold.description().unwrap_or("folded").to_owned(),
             ));
             for member in &fold.members {
                 rows.push((
@@ -559,7 +568,7 @@ impl FrozenScene {
                 fold.fold,
                 escape(&fold.name),
                 escape(&fold.badge),
-                escape(fold.rule.as_deref().unwrap_or("folded"))
+                escape(fold.description().unwrap_or("folded"))
             ));
             for member in &fold.members {
                 html.push_str(&format!(
@@ -1222,6 +1231,7 @@ mod tests {
                 direction: sceno::FoldDirection::Outgoing,
             }),
             boundary: None,
+            label: None,
         });
         scene
     }
@@ -1317,6 +1327,60 @@ mod tests {
     }
 
     #[test]
+    fn a_labelled_fold_reads_its_label_in_place_of_the_rule() {
+        use genet_scripted_dom::ScriptedDom;
+        use layout_dom_api::LayoutDom;
+
+        let mut scene = folded_dependencies();
+        scene.folds[0].label = Some("Mere's dependencies".into());
+        let frozen = FrozenScene::freeze(
+            &scene,
+            "Repositories",
+            &named(&[("fixture.repo", "mere", "Mere")]),
+        );
+        let fold = &frozen.folds[0];
+        assert_eq!(fold.label.as_deref(), Some("Mere's dependencies"));
+        assert_eq!(
+            fold.rule.as_deref(),
+            Some("Mere and everything it reaches by depends on"),
+            "the rule is still recorded"
+        );
+        assert_eq!(fold.heading(), "Mere, +3 folded: Mere's dependencies");
+        assert!(frozen.rows().contains(&(
+            "fold".to_owned(),
+            "Mere +3".to_owned(),
+            "Mere's dependencies".to_owned()
+        )));
+
+        let html = frozen.to_html("repos");
+        let dom = ScriptedDom::from_serialized_document(&format!(
+            "<!doctype html><html><body>{html}</body></html>"
+        ));
+        let root = dom.document();
+        let details = descendants(&dom, root, "details");
+        let summary = descendants(&dom, details[0], "summary");
+        assert_eq!(
+            text(&dom, summary[0]),
+            "Mere, +3 folded: Mere's dependencies"
+        );
+        let members = descendants(&dom, details[0], "li")
+            .into_iter()
+            .filter_map(|li| attribute(&dom, li, "data-projection-instance"))
+            .collect::<Vec<_>>();
+        assert_eq!(members, ["1", "2", "3"], "the members are still listed");
+
+        let wire = serde_json::to_string(&frozen).unwrap();
+        assert!(wire.contains(r#""label":"Mere's dependencies""#));
+        let unlabelled = serde_json::to_string(&FrozenScene::freeze(
+            &folded_dependencies(),
+            "Repositories",
+            &HashMap::new(),
+        ))
+        .unwrap();
+        assert!(!unlabelled.contains("\"label\""), "{unlabelled}");
+    }
+
+    #[test]
     fn a_summary_fold_without_a_rule_still_lists_its_members() {
         let mut scene = folded_dependencies();
         scene.folds[0] = sceno::Fold {
@@ -1324,6 +1388,7 @@ mod tests {
             stand_in: sceno::StandIn::Summary { label: None },
             rule: None,
             boundary: None,
+            label: None,
         };
         let frozen = FrozenScene::freeze(&scene, "Repositories", &HashMap::new());
         assert_eq!(frozen.instances.len(), 2, "mere and retinue stay");

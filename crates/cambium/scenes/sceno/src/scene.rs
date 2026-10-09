@@ -427,6 +427,7 @@ mod tests {
             stand_in: crate::StandIn::Member(InstanceId(0)),
             rule: Some(crate::FoldRule::Selection),
             boundary: None,
+            label: None,
         });
         assert_eq!(scene.validate_folds(), Ok(()));
         assert!(scene.fold_effect().is_hidden(InstanceId(1)));
