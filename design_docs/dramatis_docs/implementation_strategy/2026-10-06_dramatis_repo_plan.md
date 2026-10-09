@@ -1,7 +1,7 @@
 # Dramatis Repo Plan
 
 **Date**: 2026-10-06
-**Status (2026-10-09)**: assessed; rulings D1 to D27 (§3). Nothing built.
+**Status (2026-10-09)**: assessed; rulings D1 to D31 (§3). Nothing built.
 D18's condition is met: the vault lock's L2 to L4 landed on 2026-10-08.
 DR-A's assessment is being refreshed against today's code before its
 forks are put to Mark (§6).
@@ -384,6 +384,29 @@ chatelaine. Mark: **"With the views (Recommended)"**.
 the old paths, retired in DR-C (D15); shims for outside repos only, with
 mere's callers moved now; no shims. Mark: **"Re-export shims
 (Recommended)"**.
+
+**Ruling D28** *(`SshKeyView` against D21's "SSH keys as items").*
+Options: it moves unchanged, and the item cards come as their own step
+after DR-A; item cards now, with an exception to the byte-identical check.
+Mark: **"Move unchanged, cards later (Recommended)"**.
+
+**Ruling D29** *(the OTP types' construction invariants).* *`OtpCredential::from_item`,
+`OtpCodeTile::new` and `OtpReleaseParticipantClaim::admitted` are callable
+only by castellan; in chatelaine they would have to be public; no caller
+outside castellan names these types.* Options: the display types
+(credential, tile, time ring) move with public constructors, while the
+participant claim and release request stay in castellan, so only it
+grants `AdmittedSession`; all move with hidden constructors; leave `otp/`
+for later. Mark: **"Display types move, trust stays (Recommended)"**.
+
+**Ruling D30** *(the Secret Service metadata, with the service parked by
+the Secret Service plan's SS8).* Options: it stays with the parked code;
+it moves to chatelaine per D21, with a narrowed error and a ThinkPad
+receipt under `dbus-run-session`. Mark: **"Move it per D21"**.
+
+**Ruling D31** *(the intent receipts).* Options: the plain receipts move to
+the facade and `IdentityIntentError` stays with the authority; both move;
+neither in DR-A. Mark: **"Receipts move, error stays (Recommended)"**.
 
 Still open: whether gazette gets a matching facade name over gaz, the way
 chatelaine is the keychain.
