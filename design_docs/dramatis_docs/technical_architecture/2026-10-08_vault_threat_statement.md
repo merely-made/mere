@@ -106,6 +106,14 @@ checkpoint E):
   locked. `transport_identity()` itself refuses while locked (*read*,
   `ports/distillery/src/installed.rs`). This is the largest gap the lock
   leaves today.
+  *Closed 2026-10-09 (rulings 44 and 92 to 97):* the transport identity is
+  now the mesh author key, derived under `MESH_AUTHOR_SALT`, so only that
+  derived key stays while locked. The master never reaches a transport:
+  production code can bind a transport only from personae's
+  `DerivedKeypair` (ruling 96). *Measured* by
+  `ports/distillery/tests/transport_residue.rs`. Before the fix it found the
+  master live after the bind (28 hits); now it is clean, with the author key
+  still live in the transport.
 - **Pandect's wallets.** Knot's seed, which comes from one, is dropped
   when the Knot lane closes (ruling 43). The wallets themselves know no
   vault, so after a restart they reopen unattended until the dramatis repo

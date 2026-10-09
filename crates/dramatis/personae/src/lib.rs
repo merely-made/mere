@@ -90,7 +90,7 @@ pub mod vault;
 mod zeroizing_json;
 
 pub use crate::error::IdentityError;
-pub use crate::keypair::{Ed25519Keypair, Ed25519PublicKey, Ed25519Signature};
+pub use crate::keypair::{DerivedKeypair, Ed25519Keypair, Ed25519PublicKey, Ed25519Signature};
 pub use crate::passphrase_root::{
     PassphraseWrappedRoot, change_passphrase, load_passphrase_root, passphrase_root_exists,
     save_passphrase_root, unwrap_vault_root, wrap_vault_root,

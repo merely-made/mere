@@ -30,6 +30,37 @@ pub struct Ed25519Keypair(Box<SigningKey>);
 /// Dropping the box runs `SigningKey`'s own zeroizing drop before freeing.
 impl ZeroizeOnDrop for Ed25519Keypair {}
 
+/// A keypair derived from a persona's master under a salt.
+///
+/// Only personae's derivation builds one
+/// ([`crate::IdentityProvider::derived_keypair`]), so a master can never pass
+/// for one. A transport that must not be handed the master requires this
+/// type (vault lock plan, ruling 96). It reads as the keypair it wraps.
+#[derive(Clone)]
+pub struct DerivedKeypair(Ed25519Keypair);
+
+impl DerivedKeypair {
+    pub(crate) fn new(keypair: Ed25519Keypair) -> Self {
+        Self(keypair)
+    }
+
+    /// The keypair itself, for an API that takes a plain one.
+    pub fn into_keypair(self) -> Ed25519Keypair {
+        self.0
+    }
+}
+
+impl std::ops::Deref for DerivedKeypair {
+    type Target = Ed25519Keypair;
+
+    fn deref(&self) -> &Ed25519Keypair {
+        &self.0
+    }
+}
+
+/// The wrapped keypair clears its key on drop.
+impl ZeroizeOnDrop for DerivedKeypair {}
+
 impl Ed25519Keypair {
     /// Generate a new random keypair from OS randomness.
     ///

@@ -62,7 +62,7 @@ async fn resident_lifecycle_ticks_maintains_persists_and_closes() {
     let blobs = storage.blobs();
     let space = storage.space();
     let transport = Arc::new(
-        P2pandaTransport::builder(provider.master_keypair())
+        P2pandaTransport::builder_for(&provider.derived_keypair(MESH_AUTHOR_SALT).unwrap())
             .gossip()
             .blobs(&blobs)
             .bind()

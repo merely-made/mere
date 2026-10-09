@@ -56,6 +56,8 @@ trainer-autodiff = ["trainer", "esp/decoder-autodiff"]
 flora = ["dep:eidetic", "dep:esp", "dep:safetensors"]
 
 [dev-dependencies]
+# Tests and examples bind throwaway identities (vault lock plan, ruling 96).
+transport = { workspace = true, features = ["test-identity"] }
 burn-flex = { version = "=0.22.0", features = ["default"] }
 gemot.workspace = true
 mien.workspace = true

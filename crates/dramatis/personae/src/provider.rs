@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use crate::sealed_record_storage::SealedRecordStorage;
-use crate::{Ed25519Keypair, Ed25519PublicKey, IdentityError};
+use crate::{DerivedKeypair, Ed25519Keypair, Ed25519PublicKey, IdentityError};
 
 const SEALED_IDENTITY_FORMAT_VERSION: u8 = 1;
 
@@ -80,6 +80,13 @@ pub trait IdentityProvider: Send + Sync {
     /// - MLS: the MLS group identifier
     /// - Co-op: the session identifier
     fn derive_keypair(&self, salt: &[u8]) -> Result<Ed25519Keypair, IdentityError>;
+
+    /// [`derive_keypair`](Self::derive_keypair), typed as derived, for an API
+    /// that must never receive the master, such as a transport (vault lock
+    /// plan, ruling 96).
+    fn derived_keypair(&self, salt: &[u8]) -> Result<DerivedKeypair, IdentityError> {
+        self.derive_keypair(salt).map(DerivedKeypair::new)
+    }
 
     /// Certify the key derived from `salt` under this identity's master key.
     fn attest_derived_key(&self, salt: &[u8]) -> Result<DerivedKeyAttestation, IdentityError>;
