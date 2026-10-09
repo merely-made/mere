@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-08)**: rulings 1 to 96 in §3. L1 to L4 landed (L3
+**Status (2026-10-08)**: rulings 1 to 97 in §3. L1 to L4 landed (L3
 as `79fbbeb7`, its attended receipts as `303b5097`; L4 on 2026-10-08, §6);
 deployment is Mark's step. Not yet carried out: ruling 44's transport-key hard switch,
 so Distillery keeps the master keypair while locked, and pandect's wallets
@@ -1123,6 +1123,17 @@ constructor named "derived" cannot tell the two apart, since both are an
 - a source check in the gate.
 
 Mark: **"A derived-key type (Recommended)"**.
+
+**Ruling 97** *(ruling 96's reach outside mere).* *Two sibling repos call
+the keypair builder, in tests only: knot-editor (`sync.rs`, 2 calls) and
+Turnstone (`place/lanes.rs`, 3 calls). Their test builds need the
+test-only feature in their dev-dependencies.* Options: edit both repos'
+dev-dependencies, Knot first; mere only, with the siblings ledgered; keep
+the builder ungated and deprecated. Mark: **"Edit both repos' dev-deps
+(Recommended)"**. *Reading, not ruled:* a sibling can name the feature only
+once its pinned mere revision has it, so mere lands first, and each
+sibling turns the feature on in the repin commit that would otherwise
+break its tests.
 
 Still open: a threat statement naming hibernation and the pagefile.
 *2026-10-08:* closed by ruling 82.
