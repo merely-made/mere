@@ -1967,3 +1967,21 @@ L3's `79fbbeb7`) on both machines.
   - ruling 44's transport-key hard switch, so Distillery keeps the master
     keypair while locked;
   - pandect's wallets until D8 (ruling 81).
+
+**2026-10-09, L4's Windows gate rerun in its own build directory** (the
+dynamics grammar plan's F183).
+- **Why:** F183 withdrew F145's shared `C:/t/cargo-build/mere`. Its
+  freshness check runs by modification time, so one worktree can build
+  with another tree's artifacts. L4's two Windows gate runs, and the
+  djinn binary for L3 checkpoint E's Windows legs, were built through that
+  directory.
+- **The rerun:** on main `17519aa4`, which carries L4, in a fresh
+  worktree with its own `C:/t/cargo-build/mere-l4recheck`, built cold.
+  Personae, castellan and djinn give 477 passed across 37 targets, the same
+  as before. The ignored `locked_restart`, `harness` and `lock_agent`
+  receipts pass. The installed resident (PID 14756) is unchanged.
+- **The Fedora gates and receipts stand.** They built in each worktree's
+  own `target/`.
+- **Checkpoint E's Windows legs** ran a binary of unproven provenance.
+  Their events matched L3's code, and rerunning them with an isolated
+  build waits for Mark's hands.
