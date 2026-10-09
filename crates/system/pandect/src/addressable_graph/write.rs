@@ -35,6 +35,10 @@ impl<B: Backend> AddressableGraphStore<B> {
                 digest: hash(&encode(snapshot.navigation.snapshot())?),
             },
             orphan_facets: graph.facets().clone(),
+            pending: PendingIndex {
+                retention: graph.pending_link_state().retention,
+                owners: vec![],
+            },
         };
         catalog.globals.nodes.clear();
         catalog.globals.edges.clear();
@@ -117,6 +121,12 @@ impl<B: Backend> AddressableGraphStore<B> {
                 },
             )?;
         }
+        pending::write(
+            self,
+            &graph.retained_pending_link_state(),
+            &mut catalog.pending,
+            &mut ops,
+        )?;
         navigation::write(
             self,
             snapshot.navigation.snapshot(),

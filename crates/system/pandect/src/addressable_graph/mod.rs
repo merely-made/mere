@@ -51,14 +51,16 @@ pub struct ResidentFootprint {
     pub catalog_bytes: usize,
     pub record_bytes: usize,
     pub navigation_bytes: usize,
+    pub pending_bytes: usize,
 }
 impl ResidentFootprint {
     pub fn retained_record_bytes(&self) -> usize {
-        self.catalog_bytes + self.record_bytes + self.navigation_bytes
+        self.catalog_bytes + self.record_bytes + self.navigation_bytes + self.pending_bytes
     }
 }
 
 mod navigation;
+mod pending;
 mod read;
 mod residency;
 mod schema;
@@ -98,6 +100,9 @@ impl<B: Backend> AddressableGraphStore<B> {
             demands: BTreeSet::new(),
             policy,
             footprint: Default::default(),
+            available_digest: String::new(),
+            residency_coverage: Default::default(),
+            host_coverage: Default::default(),
         };
         view.reconcile(roots).await?;
         Ok(view)
@@ -114,8 +119,27 @@ pub struct ResidentGraph<B> {
     demands: BTreeSet<GraphAddress>,
     policy: ResidencyPolicy,
     footprint: ResidentFootprint,
+    available_digest: String,
+    residency_coverage: kernel::graph::CoverageNote,
+    host_coverage: kernel::graph::CoverageNote,
 }
 impl<B: Backend> ResidentGraph<B> {
+    /// Host observations compose with calculated residency without editing truth.
+    pub fn set_host_coverage(&mut self, note: kernel::graph::CoverageNote) {
+        self.host_coverage = note;
+        self.graph
+            .set_known_coverage(self.composed_coverage(&self.residency_coverage));
+    }
+    fn composed_coverage(
+        &self,
+        residency: &kernel::graph::CoverageNote,
+    ) -> kernel::graph::CoverageNote {
+        let mut note = residency.clone();
+        for limit in &self.host_coverage.limits {
+            note.push(limit.clone());
+        }
+        note
+    }
     pub fn graph(&self) -> &Graph {
         &self.graph
     }
