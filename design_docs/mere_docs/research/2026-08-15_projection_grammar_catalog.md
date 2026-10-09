@@ -393,6 +393,14 @@ the suite test reuse and expose missing contract material; they do not authorize
 portable additions that the first consumer did not ask for. Every promoted
 addition still requires the second heterogeneous consumer named below.
 
+*Annotation 2026-10-08:* a named second consumer may be pending. Mark ruled,
+for the fold fact, "Promote, marked pending (Recommended)": the addition
+record names the consumer, marks it pending with the phase it is due in, and
+the record is checked again when that consumer lands (projection grammar
+adoption plan, the fold fact's promotion). An authored record that a host
+lowers into a portable fact is not the duplicate this rule removes (the same
+ruling, on `forme::FoldRecord`).
+
 For every proposed addition, record:
 
 - task or inference it serves;
