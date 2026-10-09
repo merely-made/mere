@@ -20,7 +20,7 @@ use crate::mesh_host::{HostConfig, MeshHost};
 use muniment::Backend;
 use personae::bootstrap::{self, Unlock};
 use personae::vault::{IdentityStorage, IdentityVault, ProfileId};
-use personae::{Ed25519Keypair, IdentityError, IdentityProvider};
+use personae::{DerivedKeypair, Ed25519Keypair, IdentityError, IdentityProvider};
 use insigne::DerivedKeyAttestation;
 use serde::{Deserialize, Serialize};
 use transport::{P2pandaTransport, TransportError};
@@ -35,7 +35,9 @@ use crate::{ResidentAuthority, ResidentError, ResidentSettings, ResidentStorage}
 /// 64-hex identifier would only invite them to mistype one and silently join
 /// nothing. Deriving it under a product-owned salt gives the same profile the
 /// same mesh on every device it unlocks, and gives a different profile a
-/// different one, with no stored value to drift.
+/// different one, with no stored value to drift. Every device holding one
+/// master shares a mesh; today each vault mints its own master, so in practice
+/// a mesh is one device's (vault lock plan §6, 2026-10-09).
 ///
 /// The salt is product-owned rather than borrowed from
 /// [`MESH_AUTHOR_SALT`]: reusing the author's salt would make the mesh id equal
@@ -254,12 +256,12 @@ impl InstalledAuthority {
         &self.protection
     }
 
-    /// The master transport identity belonging to the selected Personae profile.
-    ///
-    /// Errors while the vault is locked (rulings 2 and 24 replace it with a
-    /// derived transport key).
-    pub fn transport_identity(&self) -> Result<&Ed25519Keypair, InstalledError> {
-        Ok(&self.vault.current_profile()?.master)
+    /// The transport identity: the mesh author key, derived under the
+    /// selected profile (vault lock plan, rulings 2, 44 and 92). The master
+    /// never reaches the transport, so a locked vault leaves the running lane
+    /// nothing of it. Errors while the vault is locked.
+    pub fn transport_identity(&self) -> Result<DerivedKeypair, InstalledError> {
+        Ok(self.vault.derived_keypair(MESH_AUTHOR_SALT)?)
     }
 
     /// The mesh author derived under the selected profile.
@@ -282,8 +284,9 @@ impl InstalledAuthority {
             .to_bytes())
     }
 
-    /// The evidence peers need to connect the mesh author to this profile's
-    /// transport identity.
+    /// The evidence peers need to connect this device's mesh author, which is
+    /// also its transport identity (ruling 92), to the persona that authorized
+    /// it.
     pub fn mesh_author_attestation(&self) -> Result<DerivedKeyAttestation, InstalledError> {
         Ok(self.vault.attest_derived_key(MESH_AUTHOR_SALT)?)
     }
@@ -316,7 +319,7 @@ impl InstalledAuthority {
             ResidentStorage::open(paths.blob_store_root(), mesh_id, settings.blob_gc_every).await?;
         let blobs = storage.blobs();
         let transport = Arc::new(
-            P2pandaTransport::builder(self.transport_identity()?)
+            P2pandaTransport::builder_for(&self.transport_identity()?)
                 .gossip()
                 .blobs(&blobs)
                 .bind()
@@ -430,11 +433,13 @@ mod tests {
         let first = InstalledAuthority::open_with(directory.path(), &vault_dir, unlock()).unwrap();
         let first_author = first.mesh_author().unwrap().public_key().to_bytes();
         let first_transport = first.transport_identity().unwrap().public_key().to_bytes();
+        let master = first.vault.current_profile().unwrap().master.public_key().to_bytes();
         assert_eq!(first.profile(), profile);
         assert!(first.protection().contains("passphrase-encrypted"));
-        assert_ne!(
-            first_author, first_transport,
-            "mesh author is profile-derived"
+        assert_ne!(first_author, master, "mesh author is profile-derived");
+        assert_eq!(
+            first_transport, first_author,
+            "the mesh author is the transport identity (ruling 92)"
         );
         let paths = first.paths(MESH);
         assert_eq!(paths.mesh_store_path(), paths.root().join("mesh.redb"));

@@ -1,10 +1,10 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-08)**: rulings 1 to 97 in §3. L1 to L4 landed (L3
+**Status (2026-10-09)**: rulings 1 to 97 in §3. L1 to L4 landed (L3
 as `79fbbeb7`, its attended receipts as `303b5097`; L4 on 2026-10-08, §6);
-deployment is Mark's step. Not yet carried out: ruling 44's transport-key hard switch,
-so Distillery keeps the master keypair while locked, and pandect's wallets
+deployment is Mark's step. Ruling 44's hard switch landed on 2026-10-09 (§6), so Distillery no longer
+keeps the master while locked. Not yet carried out: pandect's wallets
 until D8 (ruling 81). The [vault threat statement](../technical_architecture/2026-10-08_vault_threat_statement.md)
 says what the lock defends and leaves open. The
 [dramatis repo plan](2026-10-06_dramatis_repo_plan.md) moves this code
@@ -2086,3 +2086,57 @@ headline checked in code).
   - C, a residue test that fails first on the current tree;
   - D, the gates with the lane on and locked by the real trigger;
   - E, the records.
+
+**2026-10-09, ruling 44 built** (rulings 92 to 97; worktree `mere-r44`, with
+its own build directory).
+- **C, red first** (`3f5d0022`): `ports/distillery/tests/transport_residue.rs`
+  plants the master and the mesh author's seed, then opens the vault and
+  binds the lane inside the armed region.
+  - On the old tree: 28 hits, with the master live in seven blocks after
+    the bind and freed uncleared in others (p2panda and iroh).
+  - The author key was already live (the mesh host signs with it), which
+    proves the instrument sees the transport's key.
+- **A, the derivation:**
+  - `transport_identity()` returns the mesh author key as a
+    `DerivedKeypair` (ruling 92), and the lane binds through
+    `P2pandaTransport::builder_for`.
+  - personae gains `DerivedKeypair`, which only its derivation builds, and
+    `IdentityProvider::derived_keypair`. The 153 existing `derive_keypair`
+    callers are unchanged.
+  - The transport's four master-taking constructors (`builder`, `bind`,
+    `bind_with_blobs`, `bind_with_authorized_blobs`) sit behind a new
+    `test-identity` feature, turned on only in dev-dependencies: mesh,
+    commons, gemot, mien, murm, eidetic, Distillery, graphshell, and the
+    remote-fixture probe.
+  - graphshell's carriage and personal-sync hosts bind from their derived
+    keys through `builder_for`.
+  - *Control:* putting the master back into Distillery's lane fails a
+    production build: "no associated function `builder`".
+- **B, the lookups** (ruling 93):
+  - The courier and the blob sources address mesh authors.
+  - The directory now records which persona an attested author belongs to,
+    with `is_attested`.
+  - The remote checks require the connected peer to be its own attested
+    author, the same strength as before.
+  - `a_device_answering_as_its_master_is_refused` is the control: a client
+    or server at its master is refused (`WrongClientPeer`,
+    `UnattestedServer`).
+  - Distillery's tests bind their transports with author keys. Two of them
+    (`mesh_host_blob_delivery` and `mesh_host_supervised_reclaim`) also
+    dialled peers by master, and now dial by author.
+- **C, green:** the residue test is clean, and the transport key is live.
+- **Windows tests:**
+  - personae, the transport, mesh and eidetic (with `iroh-fetcher`);
+  - Distillery's 11 targets with `--no-fail-fast`;
+  - gemot, mien, murm, commons and djinn;
+  - graphshell's library (212) and with `personal-sync` (412).
+  - A single graphshell run showed three failure lines that did not
+    reproduce on two reruns.
+- **E, the records:** the comments in `peer_id.rs`, `directory.rs`,
+  `courier.rs` and `installed.rs`, and the threat statement's §3 (the gap
+  is closed).
+- **Still to do:**
+  - D, the Fedora gate;
+  - the push;
+  - then knot-editor and Turnstone turn the feature on in their next
+    repins (ruling 97).
