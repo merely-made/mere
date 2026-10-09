@@ -46,6 +46,7 @@
 pub mod content_store;
 // Application-scoped preferences live under the host's data root rather than
 // in one session's settings sidecar.
+pub mod addressable_graph;
 pub mod application_settings_store;
 // Durable content-addressed store for node preview imagery (favicons, previews,
 // snapshots) — the sibling of content_store, keyed by BLAKE3 digest so identical

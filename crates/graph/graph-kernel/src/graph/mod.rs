@@ -64,9 +64,10 @@ pub mod pending_links;
 pub use pending_links::{PendingLink, PendingLinkRetention, PendingLinkRetry, PendingLinkState};
 pub mod frozen_selection;
 pub use frozen_selection::{FrozenSelection, OpenedFrozenSelection};
+pub mod coverage;
 #[cfg(test)]
 mod frozen_selection_tests;
-pub mod coverage;
+mod residency;
 pub use coverage::{CoverageLayer, CoverageLimit, CoverageNote};
 pub mod edge_data;
 pub mod edge_payload;

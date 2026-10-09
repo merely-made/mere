@@ -37,6 +37,9 @@ pub struct CoverageLimit {
     /// Empty scope means the entire supplied graph. Hosts own these observations.
     #[serde(default)]
     pub resources: Vec<Uuid>,
+    /// Surface scope; empty scopes together mean the supplied graph.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub surfaces: Vec<Uuid>,
     /// None means the number beyond this boundary is unknown.
     #[serde(default)]
     pub count: Option<usize>,
@@ -48,6 +51,7 @@ impl CoverageLimit {
             layer,
             reason: reason.into(),
             resources: vec![],
+            surfaces: vec![],
             count: None,
         }
     }
@@ -108,7 +112,8 @@ impl Graph {
             if missing.iter().any(|id| {
                 !self.known_coverage.limits.iter().any(|limit| {
                     limit.layer == CoverageLayer::Residency
-                        && (limit.resources.is_empty() || limit.resources.contains(id))
+                        && ((limit.resources.is_empty() && limit.surfaces.is_empty())
+                            || limit.resources.contains(id))
                 })
             }) {
                 unavailable += 1;
@@ -138,7 +143,8 @@ impl Graph {
             .filter(|id| {
                 !self.known_coverage.limits.iter().any(|limit| {
                     limit.layer == CoverageLayer::Residency
-                        && (limit.resources.is_empty() || limit.resources.contains(id))
+                        && ((limit.resources.is_empty() && limit.surfaces.is_empty())
+                            || limit.resources.contains(id))
                 })
             })
             .collect();
@@ -163,5 +169,56 @@ impl Graph {
     pub fn clear_semantic_context(&mut self) {
         self.restore_pending_link_state(Default::default());
         self.set_known_coverage(Default::default());
+    }
+}
+
+#[cfg(test)]
+mod residency_scope_tests {
+    use super::*;
+    #[test]
+    fn surface_scope_does_not_hide_absent_resources() {
+        let mut graph = Graph::new();
+        let mut limit = CoverageLimit::new(CoverageLayer::Residency, "surface unloaded");
+        limit.surfaces.push(Uuid::from_u128(1));
+        graph.set_known_coverage(CoverageNote {
+            limits: vec![limit.clone()],
+        });
+        let unknown = Uuid::from_u128(2);
+        assert!(
+            graph
+                .coverage_for_resource_refs(&[unknown])
+                .limits
+                .iter()
+                .any(|l| l.layer == CoverageLayer::Possession)
+        );
+        limit.resources.push(unknown);
+        graph.set_known_coverage(CoverageNote {
+            limits: vec![limit.clone()],
+        });
+        assert!(
+            !graph
+                .coverage_for_resource_refs(&[unknown])
+                .limits
+                .iter()
+                .any(|l| l.layer == CoverageLayer::Possession)
+        );
+        limit.surfaces.clear();
+        limit.resources.clear();
+        assert!(
+            serde_json::to_value(&limit)
+                .unwrap()
+                .get("surfaces")
+                .is_none()
+        );
+        graph.set_known_coverage(CoverageNote {
+            limits: vec![limit],
+        });
+        assert!(
+            !graph
+                .coverage_for_resource_refs(&[unknown])
+                .limits
+                .iter()
+                .any(|l| l.layer == CoverageLayer::Possession)
+        );
     }
 }
