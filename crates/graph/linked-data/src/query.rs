@@ -14,6 +14,102 @@
 
 const XSD_STRING: &str = "http://www.w3.org/2001/XMLSchema#string";
 
+#[cfg(test)]
+mod coverage_tests {
+    use super::*;
+    use kernel::graph::{
+        CoverageLayer, CoverageLimit, CoverageNote, PendingLink, ResourceNode,
+        SemanticStatementSpec,
+    };
+
+    #[test]
+    fn select_empty_select_and_ask_preserve_every_known_coverage_layer() {
+        let mut graph = Graph::new();
+        let limits = CoverageLayer::ALL
+            .into_iter()
+            .map(|layer| CoverageLimit::new(layer, "host boundary"))
+            .collect();
+        let note = CoverageNote { limits };
+        let mut truth = graph.to_snapshot();
+        truth.timestamp_secs = 0;
+        graph.set_known_coverage(note.clone());
+        for query in ["SELECT ?s WHERE { ?s ?p ?o }", "ASK { ?s ?p ?o }"] {
+            let rows = sparql(&graph, query).unwrap();
+            assert_eq!(rows.coverage, note);
+            assert_eq!(rows, sparql_materialized(&graph, query).unwrap());
+        }
+        let nonempty = sparql(
+            &graph,
+            "SELECT ?s WHERE { VALUES ?s { <urn:held-result> } }",
+        )
+        .unwrap();
+        assert_eq!(nonempty.rows.len(), 1);
+        assert_eq!(nonempty.coverage, note);
+        let mut after = graph.to_snapshot();
+        after.timestamp_secs = 0;
+        assert_eq!(
+            serde_json::to_value(after).unwrap(),
+            serde_json::to_value(truth).unwrap()
+        );
+        assert!(
+            sparql(&Graph::new(), "ASK { ?s ?p ?o }")
+                .unwrap()
+                .coverage
+                .limits
+                .is_empty()
+        );
+    }
+
+    #[test]
+    fn pending_unknown_targets_are_possession_limits_unless_known_to_be_unloaded() {
+        let mut graph = Graph::new();
+        let source = kernel::graph::apply::add_node(
+            &mut graph,
+            None,
+            "https://example.org/source".into(),
+            Default::default(),
+        );
+        let target = ResourceNode::new("https://example.org/absent");
+        graph.queue_pending_link(PendingLink {
+            source_resource: graph.shown_resource_id(source).unwrap(),
+            source_surface: None,
+            target_iri: target.canonical_iri().into(),
+            statement: SemanticStatementSpec {
+                predicate: "https://mere.computer/ns/rel#cites".into(),
+                ..Default::default()
+            },
+        });
+        let rows = sparql(&graph, "ASK { ?s ?p ?o }").unwrap();
+        assert!(
+            rows.coverage
+                .limits
+                .iter()
+                .any(|limit| limit.layer == CoverageLayer::Possession)
+        );
+        for scope in [vec![target.id()], vec![]] {
+            let mut limit = CoverageLimit::new(CoverageLayer::Residency, "known but not loaded");
+            limit.resources = scope;
+            graph.set_known_coverage(CoverageNote {
+                limits: vec![limit],
+            });
+            let rows = sparql(&graph, "ASK { ?s ?p ?o }").unwrap();
+            assert!(
+                rows.coverage
+                    .limits
+                    .iter()
+                    .any(|limit| limit.layer == CoverageLayer::Residency)
+            );
+            assert!(
+                !rows
+                    .coverage
+                    .limits
+                    .iter()
+                    .any(|limit| limit.layer == CoverageLayer::Possession)
+            );
+        }
+    }
+}
+
 use kernel::graph::Graph;
 use oxrdf::Term;
 use spareval::{QueryEvaluator, QueryResults};
@@ -31,6 +127,7 @@ pub struct QueryRows {
     /// One entry per solution; each is the bound term per variable (display
     /// form), or `None` when the variable is unbound in that solution.
     pub rows: Vec<Vec<Option<String>>>,
+    pub coverage: kernel::graph::CoverageNote,
 }
 
 /// Run `query` over `graph` and return the solution rows. The graph is
@@ -48,10 +145,13 @@ pub fn sparql(graph: &Graph, query: &str) -> Result<QueryRows, String> {
         .execute(dataset)
         .map_err(|e| e.to_string())?;
 
-    query_rows(results)
+    query_rows(results, graph.coverage_note())
 }
 
-fn query_rows(results: QueryResults<'_>) -> Result<QueryRows, String> {
+fn query_rows(
+    results: QueryResults<'_>,
+    coverage: kernel::graph::CoverageNote,
+) -> Result<QueryRows, String> {
     match results {
         QueryResults::Solutions(solutions) => {
             let variables: Vec<String> = solutions
@@ -68,11 +168,16 @@ fn query_rows(results: QueryResults<'_>) -> Result<QueryRows, String> {
                     .collect();
                 rows.push(row);
             }
-            Ok(QueryRows { variables, rows })
+            Ok(QueryRows {
+                variables,
+                rows,
+                coverage,
+            })
         },
         QueryResults::Boolean(value) => Ok(QueryRows {
             variables: vec!["result".to_string()],
             rows: vec![vec![Some(value.to_string())]],
+            coverage,
         }),
         QueryResults::Graph(_) => {
             Err("CONSTRUCT / DESCRIBE results are not supported in this cut".to_string())
@@ -92,7 +197,7 @@ fn sparql_materialized(graph: &Graph, query: &str) -> Result<QueryRows, String> 
         .prepare(&query)
         .execute(&dataset)
         .map_err(|error| error.to_string())?;
-    query_rows(results)
+    query_rows(results, graph.coverage_note())
 }
 
 /// A bound term's display form for a result cell: the bare IRI / lexical value
@@ -156,11 +261,16 @@ mod baseline {
                         .collect();
                     rows.push(row);
                 }
-                Ok(QueryRows { variables, rows })
+                Ok(QueryRows {
+                    variables,
+                    rows,
+                    coverage: graph.coverage_note(),
+                })
             },
             OxQueryResults::Boolean(value) => Ok(QueryRows {
                 variables: vec!["result".to_string()],
                 rows: vec![vec![Some(value.to_string())]],
+                coverage: graph.coverage_note(),
             }),
             OxQueryResults::Graph(_) => {
                 Err("CONSTRUCT / DESCRIBE results are not supported in this cut".to_string())

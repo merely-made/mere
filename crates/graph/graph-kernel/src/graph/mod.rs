@@ -60,6 +60,10 @@ pub mod legacy_content_migration;
 pub mod legacy_resource_migration;
 pub use cross_graph::ComponentCopy;
 mod assertion_write;
+pub mod pending_links;
+pub use pending_links::{PendingLink, PendingLinkRetention, PendingLinkRetry, PendingLinkState};
+pub mod coverage;
+pub use coverage::{CoverageLayer, CoverageLimit, CoverageNote};
 pub mod edge_data;
 pub mod edge_payload;
 pub mod edge_taxonomy;
@@ -385,6 +389,11 @@ pub struct Graph {
     /// with [`set_recorder`](Self::set_recorder). Not graph truth, and not
     /// carried by a clone.
     pub(crate) recorder: capture::Recorder,
+    pub(crate) pending_link_state: PendingLinkState,
+    pub(crate) pending_derivation_suppressed: pending_links::Suppression,
+    pub(crate) semantic_observation_revision: u64,
+    pub(crate) appearance_admission_revision: u64,
+    pub(crate) known_coverage: CoverageNote,
 }
 
 impl Graph {
@@ -408,6 +417,11 @@ impl Graph {
             current_session: 0,
             write_author: Author::user(),
             recorder: capture::Recorder::default(),
+            pending_link_state: PendingLinkState::default(),
+            pending_derivation_suppressed: pending_links::Suppression::default(),
+            semantic_observation_revision: 0,
+            appearance_admission_revision: 0,
+            known_coverage: CoverageNote::default(),
         }
     }
 

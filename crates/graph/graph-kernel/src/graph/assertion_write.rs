@@ -18,6 +18,7 @@ use super::{
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum StatementWriteError {
     MissingEndpoint,
+    SurfaceContextRequired,
     Declaration(PredicateDeclarationError),
     HandleCollision(String),
     AmbiguousAssertion {
@@ -72,6 +73,19 @@ mod tests {
             .try_assert_semantic_statement(a, b, spec(predicate, "urn:author:second"))
             .unwrap();
         assert!(matches!(surface_key, RelationKey::Surface(_)));
+        graph
+            .declare_predicate(predicate, GraphStratum::Resource)
+            .unwrap();
+        let (legacy_key, legacy) = graph
+            .try_assert_semantic_statement_by_resource_ids(
+                graph.shown_resource_id(a).unwrap(),
+                graph.shown_resource_id(b).unwrap(),
+                spec(predicate, "urn:author:second"),
+            )
+            .unwrap();
+        assert_eq!(legacy_key, surface_key);
+        assert_eq!(legacy.statement_id, second.statement_id);
+
         assert_eq!(
             graph
                 .find_semantic_statement(&first.statement_id)
@@ -131,6 +145,17 @@ mod tests {
         let before = serde_json::to_value(graph.to_snapshot()).unwrap();
         assert!(matches!(
             graph.try_assert_semantic_statement(a, b, spec(predicate, "urn:author:new")),
+            Err(StatementWriteError::Declaration(
+                PredicateDeclarationError::Conflict { .. }
+            ))
+        ));
+        assert_eq!(serde_json::to_value(graph.to_snapshot()).unwrap(), before);
+        assert!(matches!(
+            graph.try_assert_semantic_statement_by_resource_ids(
+                graph.shown_resource_id(a).unwrap(),
+                graph.shown_resource_id(b).unwrap(),
+                spec(predicate, "urn:author:new")
+            ),
             Err(StatementWriteError::Declaration(
                 PredicateDeclarationError::Conflict { .. }
             ))
@@ -256,6 +281,11 @@ mod migrated_handle_tests {
             matches!(graph.try_assert_semantic_statement(a, b, spec.clone()), Err(StatementWriteError::AmbiguousAssertion { statement_ids, .. }) if statement_ids.len() == 2)
         );
         assert_eq!(serde_json::to_value(graph.to_snapshot()).unwrap(), before);
+        assert!(
+            matches!(graph.try_assert_semantic_statement_by_resource_ids(pair.0, pair.1, spec.clone()),
+            Err(StatementWriteError::AmbiguousAssertion { statement_ids, .. }) if statement_ids.len() == 2)
+        );
+        assert_eq!(serde_json::to_value(graph.to_snapshot()).unwrap(), before);
         let mut precise = graph
             .find_semantic_statement(&other.statement_id)
             .unwrap()
@@ -320,6 +350,7 @@ impl std::fmt::Display for StatementWriteError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::MissingEndpoint => f.write_str("assertion endpoint is absent"),
+            Self::SurfaceContextRequired => f.write_str("the predicate requires Surface endpoints"),
             Self::Declaration(error) => error.fmt(f),
             Self::HandleCollision(id) => {
                 write!(f, "assertion handle {id:?} belongs to another claim")
@@ -345,6 +376,96 @@ fn matches_spec(statement: &SemanticStatement, spec: &SemanticStatementSpec) -> 
 }
 
 impl Graph {
+    pub(crate) fn held_statement_by_resource_ids(
+        &self,
+        from: Uuid,
+        to: Uuid,
+        spec: &SemanticStatementSpec,
+    ) -> Result<Option<(RelationKey, String)>, StatementWriteError> {
+        let mut matches = std::collections::BTreeMap::new();
+        for (key, payload) in self
+            .resource_relations()
+            .filter(|(_, source, target, _)| *source == from && *target == to)
+            .map(|(key, _, _, payload)| (RelationKey::Resource(key), payload))
+            .chain(
+                self.inner
+                    .inner()
+                    .edge_references()
+                    .filter(|edge| {
+                        self.shown_resource_id(edge.source()) == Some(from)
+                            && self.shown_resource_id(edge.target()) == Some(to)
+                    })
+                    .map(|edge| (RelationKey::Surface(edge.id()), edge.weight())),
+            )
+        {
+            for statement in payload
+                .semantic_statements()
+                .iter()
+                .filter(|statement| matches_spec(statement, spec))
+            {
+                matches.insert(statement.statement_id.clone(), key);
+            }
+        }
+        if matches.len() > 1 {
+            return Err(StatementWriteError::AmbiguousAssertion {
+                predicate: spec.predicate.clone(),
+                statement_ids: matches.into_keys().collect(),
+            });
+        }
+        Ok(matches.into_iter().next().map(|(id, key)| (key, id)))
+    }
+
+    /// Assert over held Resources without creating or selecting a Surface.
+    /// Held handles keep their recorded placement, even after a nature change.
+    pub fn try_assert_semantic_statement_by_resource_ids(
+        &mut self,
+        from: Uuid,
+        to: Uuid,
+        mut spec: SemanticStatementSpec,
+    ) -> Result<(RelationKey, StatementAssert), StatementWriteError> {
+        if self.resource(from).is_none() || self.resource(to).is_none() {
+            return Err(StatementWriteError::MissingEndpoint);
+        }
+        if spec.provenance_iri.is_none() {
+            spec.provenance_iri = Some(self.write_author().asserter_iri());
+        }
+        if let Some((key, id)) = self.held_statement_by_resource_ids(from, to, &spec)? {
+            let changed = self.update_assertion_metadata(&id, spec.label, spec.asserted_at_ms);
+            return Ok((
+                key,
+                StatementAssert {
+                    statement_id: id,
+                    changed,
+                },
+            ));
+        }
+        if self
+            .effective_predicate_stratum(&spec.predicate)
+            .map_err(StatementWriteError::Declaration)?
+            != GraphStratum::Resource
+        {
+            return Err(StatementWriteError::SurfaceContextRequired);
+        }
+        let key = match self.find_resource_edge_key(from, to) {
+            Some(key) => key,
+            None => ResourceEdgeKey::from_raw(self.resources.connect(
+                self.resources.key_of(&from).expect("held source"),
+                self.resources.key_of(&to).expect("held target"),
+                EdgePayload::new(),
+            )),
+        };
+        let key = RelationKey::Resource(key);
+        let asserted = self
+            .get_relation_mut(key)
+            .expect("resource bucket")
+            .assert_semantic_statement(spec);
+        if asserted.changed {
+            self.bump_revision();
+            self.capture_statement_bucket(key);
+        }
+        Ok((key, asserted))
+    }
+
     pub(crate) fn literal_statement_exists(&self, statement_id: &str) -> bool {
         self.resource_nodes().any(|resource| {
             self.resource_properties(resource.id())

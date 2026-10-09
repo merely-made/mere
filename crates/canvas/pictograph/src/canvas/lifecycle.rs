@@ -617,6 +617,11 @@ impl Canvas {
         true
     }
 
+    /// Refresh runtime cache and known coverage independently of geometry.
+    pub fn refresh_semantic_context(&mut self, source: &Graph) {
+        self.graph.copy_semantic_context_from(source);
+    }
+
     /// Refresh exact hosted content without restarting layout or physics.
     pub fn refresh_recorded_metadata(
         &mut self,

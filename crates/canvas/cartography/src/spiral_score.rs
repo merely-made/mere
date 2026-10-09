@@ -87,7 +87,7 @@ pub fn project_spiral_score_for_view(
             projection.metadata.faults = faults;
             return MereSpiralProjection {
                 score: Score::new(Arrangement::Spiral(Spiral::default())),
-                projection,
+                projection: projection.with_graph_coverage(graph),
             };
         },
     };
@@ -191,9 +191,13 @@ pub fn project_spiral_score_for_view(
             strategy_id: Some(SPIRAL_ID.to_string()),
             settled: true,
             faults: Vec::new(),
+            coverage: Default::default(),
         },
     };
-    MereSpiralProjection { score, projection }
+    MereSpiralProjection {
+        score,
+        projection: projection.with_graph_coverage(graph),
+    }
 }
 
 fn footprint_for((w, h): (f32, f32)) -> Footprint {

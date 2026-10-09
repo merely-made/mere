@@ -69,6 +69,7 @@ mod tests {
                     strategy_id: Some(self.projection_id().to_string()),
                     settled: true,
                     faults: Vec::new(),
+                    coverage: Default::default(),
                 },
                 ..Projection::empty()
             }

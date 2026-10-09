@@ -72,11 +72,34 @@ fn unknown_tags_require_original_mere_and_reopen_preserves_that_namespace() {
                 .owner_iri,
             context.original_mere_iri
         );
+        let observation = kernel::graph::CoverageNote {
+            limits: vec![kernel::graph::CoverageLimit::new(
+                kernel::graph::CoverageLayer::Disclosure,
+                "host boundary",
+            )],
+        };
+        qualified
+            .edit_now(Author::user(), |graph| {
+                graph.set_known_coverage(observation.clone());
+                graph.queue_pending_link(kernel::graph::PendingLink {
+                    source_resource: resource,
+                    source_surface: None,
+                    target_iri: "https://example.test/pending".into(),
+                    statement: kernel::graph::SemanticStatementSpec {
+                        predicate: "urn:test:pending".into(),
+                        ..Default::default()
+                    },
+                });
+            })
+            .unwrap();
+        let inputs = qualified.graph().pending_link_state().clone();
         let frozen = FrozenGraph::of(qualified.graph());
         qualified
             .qualify_legacy_with_content_context(Seq(0), vec![], &context)
             .await
             .unwrap();
+        assert_eq!(qualified.graph().pending_link_state(), &inputs);
+        assert_eq!(qualified.graph().known_coverage(), &observation);
         let wrong = LegacyContentContext {
             original_mere_iri: "urn:mere:destination:test".into(),
         };

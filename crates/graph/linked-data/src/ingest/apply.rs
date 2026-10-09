@@ -89,6 +89,27 @@ pub fn apply_import_with_identity(
 fn apply_inner(
     graph: &mut Graph,
     contribution: &GraphContribution,
+    identity: impl FnMut(&NodeContribution) -> SubjectIdentity,
+    evidence: Option<&super::envelope::ImportEvidence>,
+) -> ApplyOutcome {
+    let admission = (graph.resource_nodes().count(), graph.node_count());
+    let appearances = graph.appearance_admission_revision();
+    let outcome = graph.without_pending_derivation(|graph| {
+        apply_suppressed(graph, contribution, identity, evidence)
+    });
+    if graph.resource_nodes().count() > admission.0
+        || graph.node_count() > admission.1
+        || graph.appearance_admission_revision() != appearances
+    {
+        graph.retry_pending_links();
+    }
+    outcome
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+fn apply_suppressed(
+    graph: &mut Graph,
+    contribution: &GraphContribution,
     mut identity: impl FnMut(&NodeContribution) -> SubjectIdentity,
     evidence: Option<&super::envelope::ImportEvidence>,
 ) -> ApplyOutcome {

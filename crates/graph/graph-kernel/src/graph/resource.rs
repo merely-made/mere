@@ -199,6 +199,12 @@ impl Graph {
         true
     }
 
+    /// Runtime receipt for completed new shown-Resource associations.
+    /// This advances on admission, including navigation to an already held Resource.
+    pub fn appearance_admission_revision(&self) -> u64 {
+        self.appearance_admission_revision
+    }
+
     pub(crate) fn set_shown_resource(&mut self, surface: Uuid, resource: Option<Uuid>) -> bool {
         if self.inner.key_of(&surface).is_none()
             || resource.is_some_and(|id| self.resource(id).is_none())
@@ -210,6 +216,7 @@ impl Graph {
         }
         if let Some(resource) = resource {
             self.shown_resources.insert(surface, resource);
+            self.appearance_admission_revision = self.appearance_admission_revision.wrapping_add(1);
         } else {
             self.shown_resources.remove(&surface);
         }
