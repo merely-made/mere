@@ -39,6 +39,42 @@ pub enum StartupUnlockMode {
     Locked,
 }
 
+/// The persisted lock's marker in a vault directory (vault lock rulings 5,
+/// 32, 80). It holds no secret: it says only that this vault was locked.
+pub const PERSISTED_LOCK_FILE: &str = "locked";
+
+/// Whether `vault_dir` carries the persisted lock.
+pub fn lock_persisted(vault_dir: &Path) -> bool {
+    vault_dir.join(PERSISTED_LOCK_FILE).is_file()
+}
+
+/// Record that `vault_dir` is locked, so no `AutoOs` root beside it loads
+/// unattended after a restart (ruling 5).
+pub fn persist_lock(vault_dir: &Path) -> Result<(), IdentityError> {
+    std::fs::create_dir_all(vault_dir)
+        .and_then(|()| std::fs::write(vault_dir.join(PERSISTED_LOCK_FILE), b"locked\n"))
+        .map_err(|err| IdentityError::Backend(format!("persist the lock in {vault_dir:?}: {err}")))
+}
+
+/// Clear the persisted lock after an unlock by a user act.
+pub fn clear_persisted_lock(vault_dir: &Path) -> Result<(), IdentityError> {
+    match std::fs::remove_file(vault_dir.join(PERSISTED_LOCK_FILE)) {
+        Ok(()) => Ok(()),
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        Err(err) => Err(IdentityError::Backend(format!(
+            "clear the lock in {vault_dir:?}: {err}"
+        ))),
+    }
+}
+
+/// `Locked` while the root's own directory carries the persisted lock.
+fn refuse_if_persisted(path: &Path) -> Result<(), IdentityError> {
+    match path.parent() {
+        Some(dir) if lock_persisted(dir) => Err(IdentityError::Locked),
+        _ => Ok(()),
+    }
+}
+
 /// Whether the current build has a real `AutoOs` backend for explicit local unlocks.
 pub fn auto_unlock_backend_available() -> bool {
     cfg!(windows)
@@ -59,6 +95,7 @@ pub fn load_or_create_auto_unlock_root(
     path: impl Into<PathBuf>,
 ) -> Result<Option<[u8; 32]>, IdentityError> {
     let path = path.into();
+    refuse_if_persisted(&path)?;
     load_or_create_auto_unlock_root_impl(&path)
 }
 
@@ -69,6 +106,20 @@ pub fn load_or_create_auto_unlock_root(
 /// current platform has no AutoOs backend.
 pub fn load_existing_auto_unlock_root(
     path: impl Into<PathBuf>,
+) -> Result<Option<[u8; 32]>, IdentityError> {
+    let path = path.into();
+    refuse_if_persisted(&path)?;
+    if !path.exists() {
+        return Ok(None);
+    }
+    load_existing_auto_unlock_root_impl(&path)
+}
+
+/// Load an existing root after the OS verified the user (Windows Hello): the
+/// user act the persisted lock waits for, so its marker does not refuse it.
+pub fn load_existing_auto_unlock_root_after_presence(
+    path: impl Into<PathBuf>,
+    _verified: &crate::unlock::OsPresence,
 ) -> Result<Option<[u8; 32]>, IdentityError> {
     let path = path.into();
     if !path.exists() {
@@ -247,6 +298,42 @@ fn dpapi_unprotect(ciphertext: &[u8]) -> Result<zeroize::Zeroizing<Vec<u8>>, Ide
         bytes
     };
     Ok(plaintext)
+}
+
+#[cfg(test)]
+mod persisted_lock_tests {
+    use super::*;
+
+    #[test]
+    fn the_marker_refuses_the_loaders_until_it_is_cleared() {
+        let dir = tempfile::tempdir().unwrap();
+        let root = dir.path().join("auto-unlock-root.json");
+        assert!(!lock_persisted(dir.path()));
+        persist_lock(dir.path()).unwrap();
+        assert!(lock_persisted(dir.path()));
+        assert!(matches!(
+            load_existing_auto_unlock_root(&root),
+            Err(IdentityError::Locked)
+        ));
+        assert!(matches!(
+            load_or_create_auto_unlock_root(&root),
+            Err(IdentityError::Locked)
+        ));
+        assert!(!root.exists(), "a refused load mints nothing");
+        clear_persisted_lock(dir.path()).unwrap();
+        clear_persisted_lock(dir.path()).unwrap();
+        assert!(!lock_persisted(dir.path()));
+        assert!(load_existing_auto_unlock_root(&root).unwrap().is_none());
+    }
+
+    #[test]
+    fn a_marker_elsewhere_does_not_refuse() {
+        let vault = tempfile::tempdir().unwrap();
+        let other = tempfile::tempdir().unwrap();
+        persist_lock(vault.path()).unwrap();
+        let root = other.path().join("auto-unlock-root.json");
+        assert!(load_existing_auto_unlock_root(&root).unwrap().is_none());
+    }
 }
 
 #[cfg(test)]

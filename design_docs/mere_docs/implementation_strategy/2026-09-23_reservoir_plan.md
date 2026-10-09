@@ -109,6 +109,22 @@ source at Mere's integration of the three reservoir lanes, based on
 `cd3ebf26d` and Cleromancy `32a4b948`. Historical receipts stay dated; §8
 records the new isolated and integrated checks and their limitations.
 
+**Qualification refresh (2026-10-08):** resident integration is published as
+`9403b90a7`. Its focused native/process gates were repeated at `da466027a`,
+based on current Mere `79fbbeb75` and Genet `15713014`: Pandect 299, kernel
+undo 8, resident 40, archive 2 and the five Djinn process targets (8 parent
+tests) pass. The archive fingerprint regression excludes only the generated
+snapshot-envelope timestamp when comparing graph state; node visit stamps
+and graph/facet content remain exact. No archive format or undo ruling changed.
+The expanded personal-sync test's earlier hang remains outside this scoped
+qualification.
+
+V2b step 4 also advanced with durable address/file intake and current text-field
+and narrow-layout acceptance on the one tree. Its source, browser receipts
+and remaining controls/pages belong to the linked one-tree plan. This adds no
+mounted mere panel, reservoir-backed browser persistence or Cleromancy adoption;
+step 5 and the consumer/domain/native gates retain their order.
+
 | Target | Available source | Remaining acceptance |
 | --- | --- | --- |
 | V1: shared meres and one owner | `pandect::reservoir`, Djinn's reservoir lane/route and `ports/djinn/tests/reservoir_two_process.rs` | Landed. Preserve domain-id reuse, persona scope and refusal of a second owner when adapting consumers. |

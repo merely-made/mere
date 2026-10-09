@@ -7,6 +7,7 @@
 //! V3's durable receipt: an owner saves, exits, and a real child process opens
 //! the reservoir/session/archive stores, checks exact state and makes an edit fork.
 
+use kernel::graph::fixtures::GraphFixtures;
 use muniment::Backend;
 use pandect::graph_codicil::{
     archive_timestamp, load_graph_codicil, parse_codicil_id, save_session_codicil_checked,
@@ -32,8 +33,37 @@ fn author() -> Author {
     Author::person(persona().as_uuid().to_string()).via("cleromancy")
 }
 fn state(graph: &pandect::graph_codicil::GraphCandidate) -> Vec<u8> {
-    serde_json::to_vec(&serde_json::to_value((graph.to_snapshot(), graph.facets())).unwrap())
-        .unwrap()
+    state_parts(graph.to_snapshot(), graph.facets())
+}
+
+fn state_parts(
+    mut snapshot: kernel::persistence::GraphSnapshot,
+    facets: &pandect::NodeFacetStore,
+) -> Vec<u8> {
+    // to_snapshot stamps the serialization time, not graph state. Fresh
+    // processes may serialize in different seconds; retain every graph and
+    // facet field while excluding only that generated timestamp.
+    snapshot.timestamp_secs = 0;
+    serde_json::to_vec(&serde_json::to_value((snapshot, facets)).unwrap()).unwrap()
+}
+
+#[test]
+fn state_fingerprint_ignores_generation_time_but_retains_graph_changes() {
+    let mut graph = pandect::graph_codicil::GraphCandidate::new();
+    graph.add_node(
+        "mere://v3/fingerprint".to_string(),
+        euclid::Point2D::new(4.0, 9.0),
+    );
+    let mut earlier = graph.to_snapshot();
+    earlier.timestamp_secs = 10;
+    let expected = state_parts(earlier.clone(), graph.facets());
+
+    let mut later = earlier;
+    later.timestamp_secs = 11;
+    assert_eq!(state_parts(later.clone(), graph.facets()), expected);
+
+    later.nodes[0].title = "A changed title".into();
+    assert_ne!(state_parts(later, graph.facets()), expected);
 }
 
 #[test]

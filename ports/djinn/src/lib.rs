@@ -17,6 +17,7 @@
 pub mod conditions;
 pub mod embedded_reservoir;
 pub mod enrollment;
+pub mod lock_triggers;
 pub mod pairing;
 pub mod personal_sync;
 pub mod resident;

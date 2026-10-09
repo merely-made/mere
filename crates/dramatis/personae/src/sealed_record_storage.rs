@@ -111,6 +111,17 @@ impl SealedRecordStorage {
         }
     }
 
+    /// Open a sealed-record store rooted at `root` with no key yet: every
+    /// call is `Locked` until [`Self::unlock`] (vault lock ruling 76).
+    pub fn open_locked(root: impl Into<PathBuf>) -> Self {
+        Self {
+            root: root.into(),
+            key: Arc::new(RwLock::new(None)),
+            update_lock: Arc::new(Mutex::new(())),
+            authority: None,
+        }
+    }
+
     /// Forget the record key, and the freshness key of an authoritative
     /// store, for this store and every clone of it.
     pub fn lock(&self) {
