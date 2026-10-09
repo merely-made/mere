@@ -168,6 +168,7 @@ pub const CANVAS_LAYOUT_STRATEGIES: &[(&str, &str)] = &[
 pub struct CanvasStrategyProjection {
     pub positions: Vec<(NodeKey, PortablePoint)>,
     pub score: Option<sceno::Score>,
+    pub coverage: kernel::graph::CoverageNote,
 }
 
 /// Dispatch `id` to its cartography adapter and project against `graph` at viewport
@@ -249,7 +250,7 @@ fn project_canvas_dispatch(
         // canvas as-is.
         "radial.default" => {
             let Some(focus) = focus else {
-                return cartography::Projection::empty();
+                return cartography::Projection::unavailable(graph, "projection focus unavailable");
             };
             options.focus = Some(focus);
             None
@@ -270,8 +271,9 @@ fn project_canvas_dispatch(
         "radial.default" => RadialAdapter::default().project(&request),
         // Grid, Spectral, Penrose and L-system: cartography keeps their table, shared with the
         // mere view.
-        other => cartography::adapters::project_graph_only(other, &request)
-            .unwrap_or_else(cartography::Projection::empty),
+        other => cartography::adapters::project_graph_only(other, &request).unwrap_or_else(|| {
+            cartography::Projection::unavailable(graph, "projection strategy unavailable")
+        }),
     }
 }
 
@@ -383,10 +385,9 @@ pub fn project_canvas_subgraph(
             );
         }
     }
-    // Induced edges: one per scoped pair (no self-loops), as a plain hyperlink so `relations()` (the
-    // spring topology the layouts read) sees it.
+    // Scratch topology: one surface relation per scoped pair, with no self-loops.
     let mut seen: HashSet<(NodeKey, NodeKey)> = HashSet::new();
-    for r in graph.relations() {
+    for (_, r) in graph.projected_relations() {
         if r.from == r.to || !scope_set.contains(&r.from) || !scope_set.contains(&r.to) {
             continue;
         }
@@ -410,7 +411,7 @@ pub fn project_canvas_subgraph(
             sa,
             sb,
             EdgeAssertion::Semantic {
-                sub_kind: SemanticSubKind::Hyperlink,
+                sub_kind: SemanticSubKind::UserGrouped,
                 label: None,
                 decay_progress: None,
             },
@@ -617,25 +618,28 @@ fn project_strategy_in(
                 .map(|node| (node.node, node.position))
                 .collect(),
             score: Some(result.score),
+            coverage: result.projection.metadata.coverage,
         };
     }
+    let projection = project_canvas_dispatch(
+        registry,
+        id,
+        graph,
+        focus,
+        width,
+        height,
+        clusters,
+        extents,
+        recent_first,
+    );
     CanvasStrategyProjection {
-        positions: project_canvas_dispatch(
-            registry,
-            id,
-            graph,
-            focus,
-            width,
-            height,
-            clusters,
-            extents,
-            recent_first,
-        )
-        .nodes
-        .iter()
-        .map(|n| (n.node, n.position))
-        .collect(),
+        positions: projection
+            .nodes
+            .iter()
+            .map(|n| (n.node, n.position))
+            .collect(),
         score: None,
+        coverage: projection.metadata.coverage,
     }
 }
 
@@ -664,6 +668,84 @@ mod tests {
             PortablePoint::new(50.0, 86.6),
         );
         (graph, [a, b, c])
+    }
+
+    #[test]
+    fn coverage_refreshes_without_recomputing_channels_or_geometry() {
+        use kernel::graph::{CoverageLayer, CoverageLimit, CoverageNote};
+        let (mut graph, _) = triangle_graph();
+        let mut registry = ChannelRegistry::new();
+        for id in ["phyllotaxis.default", "grid.default", "kanban.default"] {
+            graph.set_known_coverage(Default::default());
+            let before = project_canvas_strategy_with_score(
+                &mut registry,
+                id,
+                &graph,
+                None,
+                800,
+                600,
+                None,
+                None,
+                false,
+            );
+            let runs = registry.runs();
+            let note = CoverageNote {
+                limits: CoverageLayer::ALL
+                    .into_iter()
+                    .map(|layer| CoverageLimit::new(layer, "host boundary"))
+                    .collect(),
+            };
+            graph.set_known_coverage(note.clone());
+            let after = project_canvas_strategy_with_score(
+                &mut registry,
+                id,
+                &graph,
+                None,
+                800,
+                600,
+                None,
+                None,
+                false,
+            );
+            let mut before_positions = before.positions;
+            let mut after_positions = after.positions;
+            before_positions.sort_by_key(|(key, _)| *key);
+            after_positions.sort_by_key(|(key, _)| *key);
+            assert_eq!(before_positions, after_positions);
+            assert_eq!(before.score, after.score);
+            assert_eq!(registry.runs(), runs);
+            assert!(
+                note.limits
+                    .iter()
+                    .all(|limit| after.coverage.limits.contains(limit)),
+                "{id}"
+            );
+        }
+        for (id, reason) in [
+            ("radial.default", "projection focus unavailable"),
+            ("unknown", "projection strategy unavailable"),
+        ] {
+            let result = project_canvas_strategy_with_score(
+                &mut registry,
+                id,
+                &graph,
+                None,
+                800,
+                600,
+                None,
+                None,
+                false,
+            );
+            assert!(result.positions.is_empty());
+            assert!(result.coverage.limits.iter().any(|limit| limit.layer == CoverageLayer::Projection && limit.reason == reason));
+            assert!(
+                graph
+                    .known_coverage()
+                    .limits
+                    .iter()
+                    .all(|limit| result.coverage.limits.contains(limit))
+            );
+        }
     }
 
     #[test]

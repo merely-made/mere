@@ -153,11 +153,11 @@ pub fn project_arrangement(
         faults.push(fault.clone());
     }
     if !faults.is_empty() {
-        return faulted_projection(strategy_id, faults);
+        return faulted_projection(strategy_id, faults).with_graph_coverage(request.graph);
     }
     let (score, keys) = scored.expect("no fault above");
     if keys.is_empty() {
-        return empty_projection(strategy_id);
+        return empty_projection(strategy_id).with_graph_coverage(request.graph);
     }
     project_score(strategy_id, request, &score, &keys)
 }
@@ -204,6 +204,7 @@ pub fn empty_projection(strategy_id: &str) -> Projection {
             strategy_id: Some(strategy_id.to_string()),
             settled: true,
             faults: Vec::new(),
+            coverage: Default::default(),
         },
         ..Projection::empty()
     }
@@ -235,8 +236,10 @@ pub fn projection_from_positions(
             strategy_id: Some(strategy_id.to_string()),
             settled: true,
             faults: Vec::new(),
+            coverage: Default::default(),
         },
     }
+    .with_graph_coverage(request.graph)
 }
 
 /// Graph edges as positioned edges. Self-loops are dropped; no analytic family
@@ -247,9 +250,9 @@ pub fn build_positioned_edges(
 ) -> Vec<PositionedEdge> {
     request
         .graph
-        .relations()
-        .filter(|view| view.from != view.to)
-        .map(|view| PositionedEdge {
+        .projected_relations()
+        .filter(|(_, view)| view.from != view.to)
+        .map(|(_, view)| PositionedEdge {
             edge: None,
             from: view.from,
             to: view.to,

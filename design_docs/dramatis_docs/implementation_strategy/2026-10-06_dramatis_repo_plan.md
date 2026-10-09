@@ -1,7 +1,7 @@
 # Dramatis Repo Plan
 
 **Date**: 2026-10-06
-**Status (2026-10-09)**: assessed; rulings D1 to D34 (§3). Nothing built; DR-A is next (D34).
+**Status (2026-10-09)**: assessed; rulings D1 to D35 (§3). DR-A landed on 2026-10-09 (§6). Next, by D35: the vault lock's ruling 44, then DR-B, then ruling 91.
 D18's condition is met: the vault lock's L2 to L4 landed on 2026-10-08.
 DR-A's assessment is being refreshed against today's code before its
 forks are put to Mark (§6).
@@ -74,7 +74,9 @@ Checked in code at `ea169154`; the assessment goes deeper.
   - network grants: `reticulum/grant.rs`.
 - **References.** castellan appears in 62 code files, 48 doc files and 605
   lines in mere, plus one file in retinue. chatelaine is 2,206 lines; only
-  the workspace manifest depends on it.
+  the workspace manifest depends on it. *Corrected 2026-10-09 (DR-A's
+  reassessment):* castellan has depended on chatelaine since `71a91267`
+  (2026-10-01).
 - **personae holds secrets today.** The vault, the sealed and passphrase
   storages, the startup unlock ladder and the SSH agent live there, and
   apps link it:
@@ -425,6 +427,13 @@ vault lock's ruling 44 (Distillery's transport key), then its ruling 91
 (Linux's root in the OS keyring); 44 first; ruling 91's assessment
 alongside DR-A. Mark: **"DR-A, then 44, then 91 (Recommended)"**.
 
+**Ruling D35** *(DR-B's place in D34's order).* *Ruling 91 adds a Linux
+root loader to personae's `startup_unlock`, which is custody code DR-B
+moves into castellan; DR-B's D8 also closes the pandect wallet gap (vault
+lock ruling 81).* Options: 44, then DR-B, then 91, so 91's loader is built
+once, in castellan; 44, then 91, then DR-B; DR-B next. Mark: **"44, then
+DR-B, then 91 (Recommended)"**.
+
 Still open: whether gazette gets a matching facade name over gaz, the way
 chatelaine is the keychain.
 
@@ -436,9 +445,10 @@ finishes (D18).
 - **DR-A — the type split, inside mere.** The plain types leave `signing.rs`,
   `view.rs`, `projection.rs` and `otp/` for their ruled homes (D14, D21),
   with no change in behaviour. Done when:
-  - [ ] `IdentitySurfaceSnapshot`'s public JSON is byte-identical against
+  - [x] `IdentitySurfaceSnapshot`'s public JSON is byte-identical against
         a fixture;
-  - [ ] castellan's, graphshell's and djinn's test counts are unchanged.
+  - [x] castellan's, graphshell's and djinn's test counts are unchanged.
+        *(2026-10-09, conserved by name per D33; §6.)*
 
   *2026-10-09, DR-A's checkpoints* (from the reassessment in §6 and rulings
   D24 to D33), smallest blast radius first. Each lands only after its gate
@@ -596,3 +606,76 @@ forks ruled (D24 to D33).**
     since `71a91267`;
   - DR-A's file list missed `authority.rs` and `secret_service/`;
   - the Secret Service plan said the service itself moves.
+
+**2026-10-09, DR-A's A0 to A3.** Worktree `mere-dra`, with its own build
+directory (F183). The test inventories are in `Code/testing/mere/dra/`.
+- **A0, the baseline** (`f469b836`, on main):
+  - `ports/castellan/tests/snapshot_golden.rs` pins three hand-built
+    snapshots (unlocked with every signing result, locked and kept,
+    ephemeral), each pretty and compact. They are built through
+    castellan's old paths.
+  - The goldens are LF-pinned in `.gitattributes`, and Windows and Fedora
+    produce the same bytes.
+  - A control that renames one field fails the two snapshots that carry
+    it.
+  - The by-name inventories, Windows / Fedora:
+    - castellan default 67/67, `keeper` 113/110, `secret-service` 85/88,
+      all features 133/133;
+    - personae 148/146, with `agent` 220/222;
+    - graphshell's library 208/207, djinn 155/150, chatelaine 53/53,
+      dramatis 0/0.
+- **A1, the intents** (`7af0aec1`, on main): `dramatis::intents` holds the
+  18 names and nine payloads verbatim, and `castellan::projection`
+  re-exports them. The inventories are identical by name on both machines,
+  the goldens pass, and djinn and graphshell compile unedited. The lock
+  gains five lines of dependency edges.
+- **A2, the OTP display types** (gated on Windows): `chatelaine::otp_tile`
+  takes `OtpCredential`, `OtpCodeTile`, `OtpTimeRing` and `OtpFields`, with
+  public constructors (D29). The tile's two tests moved with it, and every
+  other name is unchanged. The lock gains chatelaine's zeroize edge.
+- **A3, the signing records** (gated on Windows): `personae::signing` is
+  ungated, and its broker and tests moved to `signing/broker.rs`, behind
+  `agent`. Paths are unchanged.
+  - personae builds and passes without `agent` (148 tests) and with it
+    (220).
+  - The broker's four tests moved path with their names intact.
+  - graphshell's four new `projection_compare` tests came from upstream
+    through the rebase, not from DR-A.
+- **Rebases:** main moved twice while A0 and A1 waited, once with 253 lock
+  lines. Each time `cargo metadata --locked` confirmed the lock, and the
+  gate reran on the rebased tip before the push.
+
+**2026-10-09, DR-A done** (A0 to A7 on main, ending `19853594`).
+- **A4, the views and snapshot** (`762c2fa8`): `dramatis::view`. The
+  goldens are byte-identical in both forms on Windows and Fedora, and the
+  facade's tree has no castellan, pandect, chirograph, tokio or
+  ssh-agent-lib.
+- **A5, the receipts** (`e68854f3`): `dramatis::receipts`, with
+  `IdentityIntentError` staying in castellan.
+- **A6, the Secret Service metadata** (`a1a7f1b7`):
+  `chatelaine::secret_metadata`.
+  - Lookups return a narrowed `MetadataLookupError`, and builder methods
+    let castellan's store fill the snapshot.
+  - The ids keep a public inner field and their serde form.
+  - The first Fedora gate failed to compile castellan with
+    `secret-service`: the Linux-only D-Bus layer converts errors into
+    `SecretDbusError`, which Windows never builds. The fix, a conversion
+    beside the existing one, was folded into the unpushed A6.
+  - Fedora then passed, and so did `secret_service_linux` (2 of 2) under
+    `dbus-run-session`.
+- **A7, close** (`19853594`): the gate passes on both targets.
+  - Windows: personae, castellan and djinn, with the `locked_restart`,
+    `harness` and `lock_agent` receipts and graphshell's 212. The installed
+    resident is unchanged.
+  - Fedora: the same crates, with castellan under every feature set.
+  - Every test name is conserved against A0. The only moves are the tile's
+    two tests (to chatelaine) and the broker's four (to
+    `signing::broker`), plus four graphshell tests upstream added during
+    the work.
+  - Knot: djinn builds knot-site through mere's patch table, and
+    knot-editor's `resident_app_route` test names only
+    `graphshell::identity` and `graphshell::native::personae_host`, which
+    the shims keep.
+  - The docs and the two record corrections landed with it.
+- **Next** (D35): the vault lock's ruling 44, then DR-B, custody into
+  castellan (D8, D9), then ruling 91.

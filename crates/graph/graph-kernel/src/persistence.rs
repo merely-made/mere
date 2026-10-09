@@ -226,6 +226,57 @@ pub struct PersistedNode {
     pub content_hash: Option<String>,
 }
 
+/// Ordinary metadata on a resource, encoded without a JSON codec assumption.
+#[derive(
+    Archive,
+    Serialize,
+    Deserialize,
+    Clone,
+    Debug,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+)]
+pub struct PersistedResourceFacet {
+    pub facet: String,
+    pub value_json: String,
+}
+
+/// One resource's identity and metadata; its edges are stored separately.
+#[derive(
+    Archive,
+    Serialize,
+    Deserialize,
+    Clone,
+    Debug,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+)]
+pub struct PersistedResourceRecord {
+    pub canonical_iri: String,
+    pub facets: Vec<PersistedResourceFacet>,
+}
+
+/// A surface's current resource association, with explicit strata.
+#[derive(
+    Archive,
+    Serialize,
+    Deserialize,
+    Clone,
+    Debug,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+)]
+pub struct PersistedShownResource {
+    pub surface_id: String,
+    pub resource_id: String,
+}
+
 /// Full graph snapshot for periodic saves.
 ///
 /// Carries both `rkyv` derives (for compact binary persistence —
@@ -251,6 +302,12 @@ pub struct GraphSnapshot {
     /// with an empty history rather than failing.
     #[serde(default)]
     pub navigation: SharedNavigationMemory,
+    #[serde(default)]
+    pub resources: Vec<PersistedResourceRecord>,
+    #[serde(default)]
+    pub resource_edges: Vec<PersistedEdge>,
+    #[serde(default)]
+    pub shown_resources: Vec<PersistedShownResource>,
 }
 
 impl GraphSnapshot {

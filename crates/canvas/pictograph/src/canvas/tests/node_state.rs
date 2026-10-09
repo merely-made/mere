@@ -73,7 +73,7 @@ fn hide_selected_edges_then_show_all_round_trips() {
     assert_eq!(canvas.hidden_edges.len(), 1);
     // The relation itself survives (hiding is display-only).
     assert!(
-        canvas.graph().relations().count() >= 1,
+        canvas.graph().projected_relations().count() >= 1,
         "the relation is not deleted"
     );
 
@@ -159,6 +159,36 @@ fn connected_members_reaches_the_whole_trail() {
             .is_empty(),
         "an unknown member yields nothing",
     );
+}
+
+#[test]
+fn connected_members_joins_surfaces_showing_the_same_resource() {
+    let mut graph = Graph::new();
+    let a = kernel::graph::apply::add_node(
+        &mut graph,
+        Some(uuid::Uuid::from_u128(101)),
+        "https://EXAMPLE.test:443/page#first".into(),
+        Default::default(),
+    );
+    let alias = kernel::graph::apply::add_node(
+        &mut graph,
+        Some(uuid::Uuid::from_u128(102)),
+        "https://example.test/page#second".into(),
+        Default::default(),
+    );
+    let other = kernel::graph::apply::add_node(
+        &mut graph,
+        Some(uuid::Uuid::from_u128(103)),
+        "https://example.test/other".into(),
+        Default::default(),
+    );
+    let [a_id, alias_id, other_id] = [a, alias, other].map(|key| graph.get_node(key).unwrap().id);
+    assert_eq!(graph.shown_resource_id(a), graph.shown_resource_id(alias));
+    assert_ne!(graph.shown_resource_id(a), graph.shown_resource_id(other));
+    let canvas = Canvas::with_graph(graph);
+    assert_eq!(canvas.connected_members(a_id), vec![a_id, alias_id]);
+    assert_eq!(canvas.connected_members(alias_id), vec![alias_id, a_id]);
+    assert_eq!(canvas.connected_members(other_id), vec![other_id]);
 }
 
 #[test]

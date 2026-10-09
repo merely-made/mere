@@ -25,11 +25,15 @@ mod affinity;
 mod bridges;
 mod community;
 mod importance;
+#[cfg(feature = "canvas")]
+pub mod physics;
 mod producers;
 mod registry;
 #[cfg(test)]
 mod registry_tests;
 
+#[cfg(feature = "canvas")]
+pub use physics::{PhysicsRuns, PhysicsView, PhysicsViewKey};
 pub use producers::{
     Recency, degree_weights, enumeration_order, radial_rings, recency, spectral_coords,
 };
@@ -63,8 +67,13 @@ impl TopologyView for Graph {
     }
 
     fn neighbors_undirected(&self, key: NodeKey) -> impl Iterator<Item = NodeKey> + '_ {
-        // The inherent method (inherent wins over the trait method of the same name).
-        Graph::neighbors_undirected(self, key)
+        // A self-loop bucket appears in both directions; count it once.
+        self.projected_outgoing_relations(key)
+            .chain(
+                self.projected_incoming_relations(key)
+                    .filter(move |(neighbor, _, _)| *neighbor != key),
+            )
+            .map(|(neighbor, _, _)| neighbor)
     }
 }
 

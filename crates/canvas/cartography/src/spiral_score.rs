@@ -87,7 +87,7 @@ pub fn project_spiral_score_for_view(
             projection.metadata.faults = faults;
             return MereSpiralProjection {
                 score: Score::new(Arrangement::Spiral(Spiral::default())),
-                projection,
+                projection: projection.with_graph_coverage(graph),
             };
         },
     };
@@ -113,7 +113,8 @@ pub fn project_spiral_score_for_view(
             .and_then(|items| items.get(key).copied())
             .unwrap_or((0.0, 0.0));
         let source = SourceRef::new(MERE_GRAPH_ADAPTER, node.id.to_string());
-        let profile = registry.resolve_classes(node.tags.iter().map(String::as_str));
+        let tags = graph.node_content_tags(*key).unwrap_or_default();
+        let profile = registry.resolve_classes(tags.iter().map(String::as_str));
         let state = RepresentationState {
             screen_width: extent.0 * zoom_level,
             screen_height: extent.1 * zoom_level,
@@ -163,7 +164,8 @@ pub fn project_spiral_score_for_view(
         })
         .collect();
     let edges = graph
-        .relations()
+        .projected_relations()
+        .map(|(_, view)| view)
         .filter(|relation| relation.from != relation.to)
         .map(|relation| PositionedEdge {
             edge: None,
@@ -189,9 +191,13 @@ pub fn project_spiral_score_for_view(
             strategy_id: Some(SPIRAL_ID.to_string()),
             settled: true,
             faults: Vec::new(),
+            coverage: Default::default(),
         },
     };
-    MereSpiralProjection { score, projection }
+    MereSpiralProjection {
+        score,
+        projection: projection.with_graph_coverage(graph),
+    }
 }
 
 fn footprint_for((w, h): (f32, f32)) -> Footprint {

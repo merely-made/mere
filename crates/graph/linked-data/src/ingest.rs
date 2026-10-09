@@ -16,17 +16,22 @@
 //! skolemized to a `urn:mere:bnode:` IRI.
 //!
 //! [`apply_contribution`] materializes a contribution into a [`Graph`]: it
-//! creates a node per subject/object (or reuses one matched by URL) and asserts
+//! creates a surface per subject/object (or reuses one matched by URL), binds
+//! new subjects to exact-IRI resources and asserts
 //! each edge — a recognized predicate as a typed `Semantic` edge (sub-kind +
 //! canonical IRI), an unrecognized one as an **open-predicate** edge via
 //! `Graph::assert_semantic_predicate`. It is `not(wasm32)` because `add_node`
 //! mints a UUID; a wasm host materializes from the same contribution with
 //! `add_node_with_id`.
+//! Page extractors supply explicit per-subject [`SubjectIdentity::Page`] intent
+//! through [`apply_contribution_with_identity`]. Contribution transport does
+//! not infer identity from a document base or an RDF type.
 //!
 //! The parser expands `@type` values and can resolve explicitly cached remote
 //! contexts without network access. Class-IRI projection policy and complete
-//! named-graph / statement metadata fidelity remain outside this layer.
+//! named-graph and assertion metadata are shared across all supported formats.
 
+use crate::reifier::statement_id_from_reifier;
 use crate::{SCHEMA_KEYWORDS, SCHEMA_NAME};
 use kernel::types::{GraphScope, NodeProperty};
 use oxjsonld::{JsonLdParser, JsonLdRemoteDocument};
@@ -36,6 +41,17 @@ use std::collections::BTreeMap;
 /// `rdf:type` — the predicate JSON-LD `@type` expands to.
 const RDF_TYPE: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 const XSD_STRING: &str = "http://www.w3.org/2001/XMLSchema#string";
+
+/// How a newly bound subject identifies its resource at the apply boundary.
+/// Existing shown-resource associations retain their prepared identity.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum SubjectIdentity {
+    /// Preserve the prepared subject IRI, including fragment and case.
+    #[default]
+    ExactIri,
+    /// A caller-identified page uses the common URL canonicalizer.
+    Page,
+}
 
 /// A node described by an ingested JSON-LD document.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -75,8 +91,8 @@ pub struct EdgeContribution {
     pub predicate: String,
     pub object: String,
     pub graph_scope: GraphScope,
-    /// The fact handle a `urn:mere:statement:<id>` reifier carried; preserving
-    /// it through apply is what makes the dataset round trip id-stable.
+    /// The exact fact handle a legacy or encoded Mere reifier carried.
+    /// Preserving it through apply makes the dataset round trip id-stable.
     pub statement_id: Option<String>,
     pub label: Option<String>,
     pub provenance_iri: Option<String>,
@@ -92,11 +108,13 @@ pub struct GraphContribution {
     pub edges: Vec<EdgeContribution>,
 }
 
+mod envelope;
+pub use envelope::ImportEnvelope;
+
 /// RDF ingest failure (JSON-LD, N-Quads, or TriG).
 #[derive(Debug)]
 pub enum IngestError {
-    /// The bytes were not valid for their RDF syntax (oxjsonld / oxttl
-    /// parse/expansion error).
+    /// RDF syntax, expansion, or reserved Mere reifier data was invalid.
     Parse(String),
 }
 
@@ -183,7 +201,7 @@ fn route_resource(
     object: String,
     graph_scope: GraphScope,
 ) {
-    if predicate == RDF_TYPE {
+    if predicate == RDF_TYPE && graph_scope == GraphScope::Default {
         nodes
             .get_mut(subject)
             .expect("subject inserted before routing")
@@ -223,17 +241,30 @@ fn scope_from_graph_name(graph_name: &oxrdf::GraphName, namespace: &str) -> Grap
 /// graph, no kernel mutation. Expects inline-`@context` or expanded JSON-LD; a
 /// remote `@context` is not fetched (a bundled-context loader is a later step).
 pub fn from_jsonld(bytes: &[u8]) -> Result<GraphContribution, IngestError> {
+    from_jsonld_envelope(bytes).map(ImportEnvelope::into_contribution)
+}
+
+/// Parse JSON-LD with definition evidence for [`apply_import`].
+pub fn from_jsonld_envelope(bytes: &[u8]) -> Result<ImportEnvelope, IngestError> {
     collect_contribution(JsonLdParser::new().for_slice(bytes), &doc_namespace(bytes))
 }
 
 /// Ingest a set of RDF quads directly — the dataset path (`dataset_quads` /
 /// Turtle / N-Quads), and the half of the Phase 2 round-trip gate that JSON-LD
-/// cannot carry: RDF 1.2 reifier metadata (triple terms) is recognized here
+/// represents with classic records: RDF 1.2 reifier metadata (triple terms) is recognized here
 /// and attached to the matching edge / property contributions.
 pub fn from_quads(
     quads: impl IntoIterator<Item = Quad>,
     namespace: &str,
 ) -> Result<GraphContribution, IngestError> {
+    from_quads_envelope(quads, namespace).map(ImportEnvelope::into_contribution)
+}
+
+/// Parse RDF quads while retaining profile definition and assertion evidence.
+pub fn from_quads_envelope(
+    quads: impl IntoIterator<Item = Quad>,
+    namespace: &str,
+) -> Result<ImportEnvelope, IngestError> {
     collect_contribution(
         quads.into_iter().map(Ok::<Quad, std::convert::Infallible>),
         namespace,
@@ -263,6 +294,24 @@ pub fn from_jsonld_with_contexts_and_base_iri(
     contexts: ContextCache,
     base_iri: Option<&str>,
 ) -> Result<GraphContribution, IngestError> {
+    from_jsonld_envelope_with_contexts_and_base_iri(bytes, contexts, base_iri)
+        .map(ImportEnvelope::into_contribution)
+}
+
+/// Parse JSON-LD using the offline cache and retain its import evidence.
+pub fn from_jsonld_envelope_with_contexts(
+    bytes: &[u8],
+    contexts: ContextCache,
+) -> Result<ImportEnvelope, IngestError> {
+    from_jsonld_envelope_with_contexts_and_base_iri(bytes, contexts, None)
+}
+
+/// Like [`from_jsonld_envelope_with_contexts`], using a caller-owned document base.
+pub fn from_jsonld_envelope_with_contexts_and_base_iri(
+    bytes: &[u8],
+    contexts: ContextCache,
+    base_iri: Option<&str>,
+) -> Result<ImportEnvelope, IngestError> {
     let namespace = doc_namespace(bytes);
     let parser = match base_iri {
         Some(base_iri) => JsonLdParser::new()
@@ -333,8 +382,6 @@ fn collect_context_strings(ctx: &serde_json::Value, out: &mut Vec<String>) {
         _ => {},
     }
 }
-/// The reifier-IRI prefix `dataset_quads` mints fact handles under.
-const STATEMENT_REIFIER_PREFIX: &str = "urn:mere:statement:";
 const RDF_REIFIES: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#reifies";
 const RDFS_LABEL: &str = "http://www.w3.org/2000/01/rdf-schema#label";
 const PROV_WAS_ATTRIBUTED_TO: &str = "http://www.w3.org/ns/prov#wasAttributedTo";
@@ -343,6 +390,7 @@ const PROV_GENERATED_AT_TIME: &str = "http://www.w3.org/ns/prov#generatedAtTime"
 /// One lifted RDF 1.2 reifier: the fact it names + the metadata its other
 /// quads carried.
 struct ReifiedStatement {
+    statement_id: Option<String>,
     subject: String,
     predicate: String,
     object: ReifiedObject,
@@ -363,7 +411,7 @@ enum ReifiedObject {
 
 /// Parse an `xsd:dateTime` lexical back to unix ms — the inverse of the
 /// export's `prov:generatedAtTime` formatting.
-fn parse_xsd_datetime_ms(lexical: &str) -> Option<u64> {
+pub(crate) fn parse_xsd_datetime_ms(lexical: &str) -> Option<u64> {
     let parsed =
         time::OffsetDateTime::parse(lexical, &time::format_description::well_known::Rfc3339)
             .ok()?;
@@ -376,25 +424,56 @@ fn parse_xsd_datetime_ms(lexical: &str) -> Option<u64> {
 fn collect_contribution<E: std::fmt::Display>(
     quads: impl Iterator<Item = Result<Quad, E>>,
     namespace: &str,
-) -> Result<GraphContribution, IngestError> {
+) -> Result<ImportEnvelope, IngestError> {
     let mut nodes: BTreeMap<String, NodeContribution> = BTreeMap::new();
     let mut edges: Vec<EdgeContribution> = Vec::new();
 
     // Pass A: materialize the stream and lift out RDF 1.2 reifiers. A subject
     // that `rdf:reifies` a triple term is statement METADATA, not a node: its
     // reified (s, p, o, g) names the fact, its other quads carry the fact's
-    // label / provenance / assertion time, and a `urn:mere:statement:<id>`
+    // label / provenance / assertion time, and a legacy or encoded Mere
     // IRI carries the fact handle itself. Everything else flows to pass B.
     let mut plain: Vec<Quad> = Vec::new();
-    let mut reified: std::collections::HashMap<String, ReifiedStatement> =
-        std::collections::HashMap::new();
+    let mut reified: BTreeMap<String, ReifiedStatement> = BTreeMap::new();
     let mut reifier_meta: Vec<Quad> = Vec::new();
-    for quad in quads {
-        let quad = quad.map_err(|err| IngestError::Parse(err.to_string()))?;
-        if quad.predicate.as_str() == RDF_REIFIES
-            && let Term::Triple(triple) = &quad.object
+    let quads = quads
+        .map(|quad| quad.map_err(|error| IngestError::Parse(error.to_string())))
+        .collect::<Result<Vec<_>, _>>()?;
+    // Reserved assertion identifiers have the same validation in both formats,
+    // including descriptions that otherwise stay ordinary RDF.
+    let mut classic_reifiers = std::collections::HashSet::new();
+    for quad in &quads {
+        if quad.predicate.as_str() == RDF_TYPE
+            && matches!(&quad.object, Term::NamedNode(node)
+                if node.as_str() == crate::jsonld::RDF_STATEMENT)
         {
             let reifier = subject_iri(&quad.subject, namespace);
+            statement_id_from_reifier(&reifier).map_err(|error| {
+                IngestError::Parse(format!("invalid assertion ID reifier {reifier}: {error}"))
+            })?;
+            classic_reifiers.insert(reifier);
+        }
+    }
+    let quads = crate::jsonld::bridge_classic_reification(quads);
+    let descriptions: std::collections::HashSet<_> = quads
+        .iter()
+        .filter(|quad| {
+            quad.predicate.as_str() == RDF_TYPE
+                && matches!(&quad.object, Term::NamedNode(node)
+                    if node.as_str() == crate::jsonld::RDF_STATEMENT)
+        })
+        .map(|quad| subject_iri(&quad.subject, namespace))
+        .collect();
+    classic_reifiers.retain(|reifier| !descriptions.contains(reifier));
+    for quad in quads {
+        if quad.predicate.as_str() == RDF_REIFIES
+            && let Term::Triple(triple) = &quad.object
+            && !descriptions.contains(&subject_iri(&quad.subject, namespace))
+        {
+            let reifier = subject_iri(&quad.subject, namespace);
+            let statement_id = statement_id_from_reifier(&reifier).map_err(|error| {
+                IngestError::Parse(format!("invalid assertion ID reifier {reifier}: {error}"))
+            })?;
             let object = match &triple.object {
                 Term::NamedNode(node) => ReifiedObject::Resource(node.as_str().to_string()),
                 Term::BlankNode(node) => {
@@ -410,6 +489,7 @@ fn collect_contribution<E: std::fmt::Display>(
             reified.insert(
                 reifier,
                 ReifiedStatement {
+                    statement_id,
                     subject: subject_iri(&triple.subject.clone(), namespace),
                     predicate: normalize_schema_org(triple.predicate.as_str()),
                     object,
@@ -427,7 +507,22 @@ fn collect_contribution<E: std::fmt::Display>(
         // Split off the reifier-subject metadata quads; the rest stay plain.
         let mut rest = Vec::with_capacity(plain.len());
         for quad in plain {
-            if reified.contains_key(&subject_iri(&quad.subject, namespace)) {
+            let reifier = subject_iri(&quad.subject, namespace);
+            if reified.get(&reifier).is_some_and(|statement| {
+                if classic_reifiers.contains(&reifier) {
+                    statement.graph_scope == scope_from_graph_name(&quad.graph_name, namespace)
+                        && crate::jsonld::representable_metadata(
+                            quad.predicate.as_str(),
+                            &quad.object,
+                        )
+                } else {
+                    matches!(
+                        (quad.predicate.as_str(), &quad.object),
+                        (RDFS_LABEL | PROV_GENERATED_AT_TIME, Term::Literal(_))
+                            | (PROV_WAS_ATTRIBUTED_TO, Term::NamedNode(_))
+                    )
+                }
+            }) {
                 reifier_meta.push(quad);
             } else {
                 rest.push(quad);
@@ -454,6 +549,7 @@ fn collect_contribution<E: std::fmt::Display>(
         }
     }
 
+    let mut evidence = envelope::ImportEvidence::from_quads(&plain, namespace);
     for quad in plain {
         let subject = subject_iri(&quad.subject, namespace);
         let predicate_norm = normalize_schema_org(quad.predicate.as_str());
@@ -484,6 +580,7 @@ fn collect_contribution<E: std::fmt::Display>(
                         .with_graph_scope(graph_scope.clone());
                     property.datatype = datatype;
                     property.lang = lang;
+                    evidence.plain_property(&subject, &property);
                     node.properties.push(property);
                 }
             },
@@ -506,12 +603,15 @@ fn collect_contribution<E: std::fmt::Display>(
             Term::Triple(_) => {},
         }
     }
+    for (index, edge) in edges.iter().enumerate() {
+        evidence.plain_edge(index, edge);
+    }
 
     // Attach the lifted reifier metadata to the matching contributions:
     // resource-object statements to edges (by subject + predicate + object +
     // scope), literal-object statements to node properties (by predicate +
-    // value + typing + scope). A `urn:mere:statement:<id>` reifier also hands
-    // over the fact id, keeping the round trip id-stable; a foreign reifier
+    // value + typing + scope). A Mere reifier also hands over the exact fact
+    // id, keeping the round trip id-stable; a foreign reifier
     // leaves the id to the kernel's minter.
     //
     // Both matches are indexed up front rather than linear-scanned per reifier,
@@ -557,10 +657,9 @@ fn collect_contribution<E: std::fmt::Display>(
             }
         }
     }
-    for (reifier, statement) in reified {
-        let statement_id = reifier
-            .strip_prefix(STATEMENT_REIFIER_PREFIX)
-            .map(str::to_string);
+    let asserted_literals: std::collections::HashSet<_> = property_index.keys().cloned().collect();
+    for statement in reified.into_values() {
+        let statement_id = statement.statement_id;
         match &statement.object {
             ReifiedObject::Resource(object) => {
                 let match_key = (
@@ -569,7 +668,11 @@ fn collect_contribution<E: std::fmt::Display>(
                     object.clone(),
                     statement.graph_scope.clone(),
                 );
-                if let Some(&position) = edge_index.get(&match_key) {
+                // A base triple describes the shared claim, not another
+                // assertion. Consume its slot once; each further reifier
+                // creates its own contribution instead of overwriting it.
+                if let Some(position) = edge_index.remove(&match_key) {
+                    evidence.reified_edge(position);
                     let edge = &mut edges[position];
                     edge.statement_id = statement_id;
                     edge.label = statement.label;
@@ -583,10 +686,6 @@ fn collect_contribution<E: std::fmt::Display>(
                     nodes
                         .entry(statement.subject.clone())
                         .or_insert_with(|| NodeContribution::new(&statement.subject));
-                    // The materialized edge joins the index, so a later reifier
-                    // naming the same fact attaches to it instead of pushing a
-                    // duplicate — what the old linear scan over `edges` did.
-                    edge_index.insert(match_key, edges.len());
                     edges.push(EdgeContribution {
                         subject: statement.subject,
                         predicate: statement.predicate,
@@ -617,18 +716,36 @@ fn collect_contribution<E: std::fmt::Display>(
                     lang.clone(),
                     statement.graph_scope.clone(),
                 );
-                let Some(&position) = property_index.get(&match_key) else {
+                if !asserted_literals.contains(&match_key) {
                     continue;
-                };
+                }
                 let Some(node) = nodes.get_mut(&statement.subject) else {
                     continue;
                 };
+                let position = match property_index.remove(&match_key) {
+                    Some(position) => position,
+                    None => {
+                        // The shared base literal is consumed once, but each
+                        // attributable reifier keeps its own assertion record.
+                        let mut property =
+                            NodeProperty::new(statement.predicate.clone(), value.clone())
+                                .with_graph_scope(statement.graph_scope.clone());
+                        property.datatype = match_key.3.clone();
+                        property.lang = lang.clone();
+                        node.properties.push(property);
+                        node.properties.len() - 1
+                    },
+                };
                 let property = &mut node.properties[position];
-                if let Some(id) = statement_id {
-                    property.statement_id = id;
+                evidence.reified_property(&statement.subject, &property.statement_id);
+                if let Some(id) = &statement_id {
+                    property.statement_id = id.clone();
                 }
                 property.provenance_iri = statement.provenance_iri;
                 property.asserted_at_ms = statement.asserted_at_ms;
+                if statement_id.is_some() {
+                    evidence.carried_property(&statement.subject, property);
+                }
             },
         }
     }
@@ -654,6 +771,8 @@ fn collect_contribution<E: std::fmt::Display>(
                     a.datatype.as_deref(),
                     a.lang.as_deref(),
                     &a.graph_scope,
+                    &a.provenance_iri,
+                    &a.statement_id,
                 )
                     .cmp(&(
                         b.predicate.as_str(),
@@ -661,14 +780,24 @@ fn collect_contribution<E: std::fmt::Display>(
                         b.datatype.as_deref(),
                         b.lang.as_deref(),
                         &b.graph_scope,
+                        &b.provenance_iri,
+                        &b.statement_id,
                     ))
             });
-            node.properties.dedup_by(|a, b| a.content_eq(b));
+            node.properties.dedup_by(|a, b| {
+                a.content_eq(b)
+                    && (a.statement_id == b.statement_id
+                        || (!evidence.is_carried_property(&node.id, a)
+                            && !evidence.is_carried_property(&node.id, b)))
+            });
             node
         })
         .collect();
 
-    Ok(GraphContribution { nodes, edges })
+    Ok(ImportEnvelope {
+        contribution: GraphContribution { nodes, edges },
+        evidence,
+    })
 }
 
 /// A bundled JSON-LD `@context` cache for offline ingest: a map of context URL to
@@ -794,6 +923,8 @@ mod apply;
 #[cfg(not(target_arch = "wasm32"))]
 pub use apply::ApplyOutcome;
 #[cfg(not(target_arch = "wasm32"))]
-pub use apply::apply_contribution;
+pub use apply::{
+    apply_contribution, apply_contribution_with_identity, apply_import, apply_import_with_identity,
+};
 #[cfg(test)]
 mod tests;

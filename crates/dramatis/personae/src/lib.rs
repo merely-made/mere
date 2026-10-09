@@ -73,7 +73,6 @@ pub mod roster;
 pub mod seal;
 pub mod sealed_profile_storage;
 pub mod sealed_record_storage;
-#[cfg(feature = "agent")]
 pub mod signing;
 #[cfg(feature = "ssh")]
 pub mod ssh_ca;

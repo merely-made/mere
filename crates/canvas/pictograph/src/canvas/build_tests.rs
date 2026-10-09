@@ -38,7 +38,38 @@ fn computed_value(
 fn sample_graph_has_nodes_and_edges() {
     let g = sample_graph();
     assert_eq!(g.nodes().count(), 12, "the ring has twelve nodes");
-    assert!(g.relations().count() >= 12, "at least the ring edges");
+    assert_eq!(
+        g.relations().count(),
+        0,
+        "content links live in the Resource graph"
+    );
+    assert_eq!(
+        g.resource_relations().count(),
+        16,
+        "twelve ring links and four spokes"
+    );
+    assert_eq!(
+        g.projected_relations().count(),
+        16,
+        "each Resource link lifts once to this ring"
+    );
+    for i in 0..12 {
+        let from = g.get_node_by_url(&format!("mere://node/{i}")).unwrap().0;
+        let to = g
+            .get_node_by_url(&format!("mere://node/{}", (i + 1) % 12))
+            .unwrap()
+            .0;
+        let from_resource = g.shown_resource_id(from).unwrap();
+        let to_resource = g.shown_resource_id(to).unwrap();
+        assert_ne!(from_resource, to_resource);
+        let (handle, payload) = g.projected_relations_between(from, to).next().unwrap();
+        assert!(matches!(handle, kernel::graph::RelationKey::Resource(_)));
+        assert!(payload.has_relation(RelationSelector::Semantic(SemanticSubKind::Hyperlink)));
+        assert!(
+            g.find_resource_edge_key(from_resource, to_resource)
+                .is_some()
+        );
+    }
 }
 
 #[test]
@@ -222,4 +253,309 @@ fn ticking_moves_nodes_from_the_seed() {
             .is_some_and(|p1| (p1.x - p0.x).hypot(p1.y - p0.y) > 1.0)
     });
     assert!(moved, "the force-directed settle moves nodes off the seed");
+}
+
+#[test]
+fn independent_assertions_group_into_one_drawn_link() {
+    use kernel::graph::SemanticStatementSpec;
+    let mut graph = Graph::new();
+    let a = graph.add_node("https://a.test/".into(), Default::default());
+    let b = graph.add_node("https://b.test/".into(), Default::default());
+    let assertion = |asserter: &str| SemanticStatementSpec {
+        predicate: kernel::graph::predicate_iri(SemanticSubKind::Cites).into(),
+        recognized_sub_kind: Some(SemanticSubKind::Cites),
+        provenance_iri: Some(asserter.into()),
+        ..Default::default()
+    };
+    let (key, alice) = graph
+        .assert_semantic_statement(a, b, assertion("https://alice.test/"))
+        .unwrap();
+    let (_, bob) = graph
+        .assert_semantic_statement(a, b, assertion("https://bob.test/"))
+        .unwrap();
+    assert_ne!(alice.statement_id, bob.statement_id);
+    assert_eq!(
+        graph.get_relation(key).unwrap().semantic_statements().len(),
+        2
+    );
+    assert_eq!(dedup_edges(&graph), vec![(a, b)]);
+    assert!(graph.retract_semantic_statement(a, b, &alice.statement_id));
+    assert_eq!(
+        dedup_edges(&graph),
+        vec![(a, b)],
+        "Bob still draws the link"
+    );
+    assert!(graph.retract_semantic_statement(a, b, &bob.statement_id));
+    assert!(dedup_edges(&graph).is_empty());
+}
+
+pub(super) fn shown_content_graph() -> (Graph, [NodeKey; 5]) {
+    use kernel::graph::ResourceNode;
+    use kernel::persistence::{
+        PersistedEdge, PersistedEdgeFamily, PersistedResourceRecord, PersistedSemanticEdgeData,
+        PersistedSemanticStatement, PersistedSemanticSubKind, PersistedShownResource,
+    };
+    let mut graph = Graph::new();
+    let keys = ["a", "alias-a", "b", "alias-b", "unbound"].map(|suffix| {
+        graph.add_node(
+            format!("https://{suffix}.surface.test/"),
+            Default::default(),
+        )
+    });
+    let [a, _, b, _, _] = keys;
+    graph.assert_relation(
+        a,
+        b,
+        EdgeAssertion::Semantic {
+            sub_kind: SemanticSubKind::UserGrouped,
+            label: None,
+            decay_progress: None,
+        },
+    );
+    let ids = keys.map(|key| graph.get_node(key).unwrap().id);
+    let mut snapshot = graph.to_snapshot();
+    let resources = [
+        "https://content.test/a",
+        "https://content.test/b",
+        "https://content.test/unshown",
+    ];
+    let [ra, rb, unshown] = resources.map(|iri| ResourceNode::for_term(iri).id());
+    snapshot.resources = resources
+        .map(|iri| PersistedResourceRecord {
+            canonical_iri: iri.into(),
+            facets: vec![],
+        })
+        .into_iter()
+        .collect();
+    let claim = |id: &str, kind| PersistedSemanticStatement {
+        statement_id: id.into(),
+        predicate: kernel::graph::predicate_iri(kind).into(),
+        recognized_sub_kind: Some(match kind {
+            SemanticSubKind::Cites => PersistedSemanticSubKind::Cites,
+            SemanticSubKind::Quotes => PersistedSemanticSubKind::Quotes,
+            _ => unreachable!(),
+        }),
+        label: Some(id.into()),
+        graph_scope: Default::default(),
+        provenance_iri: Some(format!("https://author.test/{id}")),
+        asserted_at_ms: Some(17),
+    };
+    let pair = |from: uuid::Uuid, to: uuid::Uuid, statements| PersistedEdge {
+        from_node_id: from.to_string(),
+        to_node_id: to.to_string(),
+        families: vec![PersistedEdgeFamily::Semantic],
+        semantic: Some(PersistedSemanticEdgeData {
+            statements,
+            ..Default::default()
+        }),
+        traversal: None,
+        containment: None,
+        arrangement: None,
+        imported: None,
+        provenance: None,
+    };
+    snapshot.resource_edges = vec![
+        pair(
+            ra,
+            rb,
+            vec![
+                claim("alice", SemanticSubKind::Cites),
+                claim("bob", SemanticSubKind::Cites),
+                claim("quote", SemanticSubKind::Quotes),
+            ],
+        ),
+        pair(
+            ra,
+            unshown,
+            vec![claim("not-shown", SemanticSubKind::Cites)],
+        ),
+    ];
+    snapshot.shown_resources = [(ids[0], ra), (ids[1], ra), (ids[2], rb), (ids[3], rb)]
+        .map(|(surface, resource)| PersistedShownResource {
+            surface_id: surface.to_string(),
+            resource_id: resource.to_string(),
+        })
+        .into_iter()
+        .collect();
+    let graph = Graph::try_from_snapshot(&snapshot).unwrap();
+    let keys = ids.map(|id| graph.get_node_key_by_id(id).unwrap());
+    (graph, keys)
+}
+
+#[test]
+fn content_projection_drives_all_shown_pairs_through_topology_draw_and_hit() {
+    use crate::canvas::edge_cells::{edge_cell_hit_test, visible_edge_cell_segments};
+    use kernel::graph::{RelationKey, RelationKind};
+    let (graph, [a, alias_a, b, alias_b, unbound]) = shown_content_graph();
+    assert_eq!(
+        graph.relations().count(),
+        1,
+        "surface assertion remains in its own store"
+    );
+    assert_eq!(
+        graph.resource_relations().count(),
+        2,
+        "unshown truth remains stored"
+    );
+    let rows: Vec<_> = graph.projected_relations().collect();
+    assert_eq!(rows.len(), 13); // 3 claims * 4 shown pairs + one surface claim
+    assert_eq!(
+        rows.iter()
+            .filter(|(key, _)| matches!(key, RelationKey::Resource(_)))
+            .count(),
+        12
+    );
+    assert!(
+        rows.iter()
+            .all(|(key, _)| graph.get_relation(*key).is_some())
+    );
+    assert!(
+        rows.iter()
+            .all(|(_, row)| row.from != unbound && row.to != unbound)
+    );
+    let pairs = dedup_edges(&graph);
+    assert_eq!(pairs.len(), 4);
+    for source in [a, alias_a] {
+        for target in [b, alias_b] {
+            assert!(pairs.contains(&(source, target)));
+        }
+    }
+    assert_eq!(visible_relation_edges(&graph, &HashSet::new()).len(), 13);
+    let weighted = dedup_edges_weighted(&graph);
+    assert_eq!(weighted.len(), 4);
+    assert_eq!(
+        weighted.iter().map(|(_, _, weight)| weight).sum::<u32>(),
+        13
+    );
+    let projection = crate::canvas::underlay::projection_from_graph(&graph);
+    assert_eq!(projection.edges.len(), 4);
+    assert_eq!(
+        projection.edges.iter().map(|edge| edge.weight).sum::<f32>(),
+        13.0
+    );
+    assert!(
+        projection.edges.iter().all(|edge| edge.edge.is_none()),
+        "mixed rows never become surface handles"
+    );
+    let view = seiche::LayoutView::from_parts(
+        [
+            (a, Point2D::new(0.0, 0.0)),
+            (alias_a, Point2D::new(0.0, 300.0)),
+            (b, Point2D::new(1000.0, 0.0)),
+            (alias_b, Point2D::new(1000.0, 300.0)),
+            (unbound, Point2D::new(500.0, 900.0)),
+        ],
+        pairs,
+        1.0,
+    );
+    let segments = visible_edge_cell_segments(&graph, &view, &HashSet::new());
+    assert_eq!(
+        segments.len(),
+        13,
+        "every assertion contributes its fanned lane"
+    );
+    for segment in segments
+        .iter()
+        .filter(|segment| segment.kind == RelationKind::Semantic(SemanticSubKind::Quotes))
+    {
+        let point = Point2D::new(
+            segment.from.x * 0.75 + segment.to.x * 0.25,
+            segment.from.y * 0.75 + segment.to.y * 0.25,
+        );
+        assert_eq!(
+            edge_cell_hit_test(&graph, &view, &HashSet::new(), point, 1.0),
+            Some(segment.cell)
+        );
+    }
+    let hidden = HashSet::from([crate::canvas::EdgeCell {
+        from: a,
+        to: b,
+        selector: RelationSelector::Semantic(SemanticSubKind::Cites),
+    }]);
+    assert_eq!(visible_relation_edges(&graph, &hidden).len(), 11);
+    let visible = visible_edge_cell_segments(&graph, &view, &hidden);
+    assert_eq!(visible.len(), 11);
+    assert!(
+        visible
+            .iter()
+            .all(|segment| !hidden.contains(&segment.cell))
+    );
+    assert!(
+        visible.iter().any(|segment| segment.cell.from == a
+            && segment.cell.to == b
+            && segment.kind == RelationKind::Semantic(SemanticSubKind::Quotes)),
+        "same-pair quote is the hiding control"
+    );
+    assert_eq!(graph.resource_relations().count(), 2);
+}
+
+#[test]
+fn content_projection_reaches_score_edges_and_fold_boundary_accounting() {
+    let (graph, [a, alias_a, b, alias_b, unbound]) = shown_content_graph();
+    let signals = cartography::IntelligenceSignals::default();
+    let request = cartography::ProjectionRequest {
+        graph: &graph,
+        signals: &signals,
+        intent: Default::default(),
+    };
+    let edges = cartography::adapters::score::build_positioned_edges(&request, &HashMap::new());
+    assert_eq!(edges.len(), 13);
+    assert!(
+        edges
+            .iter()
+            .all(|edge| edge.from != unbound && edge.to != unbound && edge.edge.is_none())
+    );
+    let mut registry = crate::signals::ChannelRegistry::new();
+    let channels = registry.disclose(
+        &graph,
+        &[cartography::ORDER_TIMELINE, cartography::WEIGHT_RECENCY],
+        None,
+    );
+    let spiral = cartography::project_spiral_score(
+        &graph,
+        &channels,
+        cartography::ORDER_TIMELINE,
+        None,
+        None,
+    );
+    assert_eq!(spiral.projection.edges.len(), 13);
+    assert_eq!(
+        spiral.projection.nodes.len(),
+        5,
+        "unbound surface still has a body"
+    );
+    let fold = forme::FoldRecord::from_selection(
+        "content",
+        [
+            graph.get_node(a).unwrap().id,
+            graph.get_node(alias_a).unwrap().id,
+        ],
+    )
+    .unwrap();
+    let projection = crate::canvas::fold_projection::project_fold(&graph, &fold).unwrap();
+    assert_eq!(projection.internal_relation_count, 0);
+    assert_eq!(projection.boundary_bundles.len(), 2);
+    for (target, count) in [(b, 7), (alias_b, 6)] {
+        let bundle = projection
+            .boundary_bundles
+            .iter()
+            .find(|bundle| bundle.outside == target)
+            .unwrap();
+        assert_eq!(bundle.count, count);
+        assert_eq!(
+            bundle.direction,
+            crate::canvas::fold_projection::FoldBoundaryDirection::Outgoing
+        );
+    }
+    assert!(
+        !projection
+            .boundary_bundles
+            .iter()
+            .any(|bundle| bundle.outside == unbound)
+    );
+    assert_eq!(
+        graph.resource_relations().count(),
+        2,
+        "layout and folding preserve stored truth"
+    );
 }

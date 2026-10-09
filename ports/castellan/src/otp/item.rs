@@ -24,7 +24,7 @@ use chatelaine::{
 };
 use personae::{IdentityError, PersonaId, SealedRecordStorage};
 
-use super::credential::OtpFields;
+use chatelaine::OtpFields;
 use super::steam_guard::decode_shared_secret;
 use super::{
     Otp, OtpCodeTile, OtpCredential, OtpError, OtpKind, OtpUriError, SteamGuard, SteamGuardError,

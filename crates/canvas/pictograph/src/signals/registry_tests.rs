@@ -25,6 +25,10 @@ const EPSILON: f32 = 0.01;
 
 /// cartography's parity fixture: a hub with three spokes, a pair, and a loner.
 fn parity_fixture() -> (Graph, Vec<NodeKey>) {
+    parity_fixture_in_store(false)
+}
+
+fn parity_fixture_in_store(legacy_surface: bool) -> (Graph, Vec<NodeKey>) {
     let mut graph = Graph::new();
     let keys: Vec<NodeKey> = (0..7u8)
         .map(|i| {
@@ -41,10 +45,26 @@ fn parity_fixture() -> (Graph, Vec<NodeKey>) {
         label: None,
         decay_progress: None,
     };
+    let mut assert = |from: NodeKey, to: NodeKey| {
+        if legacy_surface {
+            let from_id = graph.get_node(from).unwrap().id.to_string();
+            let to_id = graph.get_node(to).unwrap().id.to_string();
+            kernel::graph::replay_captured_deltas_onto(
+                &mut graph,
+                [kernel::graph::CapturedDelta::ReplayAssertRelationByIds {
+                    from_id,
+                    to_id,
+                    assertion: hyperlink(),
+                }],
+            );
+        } else {
+            graph.assert_relation(from, to, hyperlink());
+        }
+    };
     for spoke in 1..=3 {
-        graph.assert_relation(keys[0], keys[spoke], hyperlink());
+        assert(keys[0], keys[spoke]);
     }
-    graph.assert_relation(keys[4], keys[5], hyperlink());
+    assert(keys[4], keys[5]);
     (graph, keys)
 }
 
@@ -79,76 +99,81 @@ fn assert_golden(
 /// cartography's spectral golden, from the registry's coordinates.
 #[test]
 fn spectral_from_the_registry_matches_the_pre_migration_placement() {
-    let (graph, keys) = parity_fixture();
-    let mut registry = ChannelRegistry::new();
-    let adapter = cartography::adapters::SpectralAdapter::default();
-    let signals = registry.disclose(
-        &graph,
-        channels_read(cartography::adapters::SpectralAdapter::PROJECTION_ID),
-        None,
-    );
-    let projection = adapter.project(&ProjectionRequest {
-        graph: &graph,
-        signals: &signals,
-        intent: ViewIntent {
-            target_size: TargetSize::default(),
-            ..ViewIntent::default()
-        },
-    });
-    assert_golden(
-        "spectral",
-        &keys,
-        &projection,
-        &[
-            (146.7027, 34.4556),
-            (146.7027, 34.4556),
-            (146.7027, 34.4556),
-            (146.7027, 34.4556),
-            (-152.6299, -228.9111),
-            (-152.6299, -228.9111),
-            (-281.5509, 320.0),
-        ],
-    );
+    for legacy_surface in [false, true] {
+        let (graph, keys) = parity_fixture_in_store(legacy_surface);
+        let mut registry = ChannelRegistry::new();
+        let adapter = cartography::adapters::SpectralAdapter::default();
+        let signals = registry.disclose(
+            &graph,
+            channels_read(cartography::adapters::SpectralAdapter::PROJECTION_ID),
+            None,
+        );
+        let projection = adapter.project(&ProjectionRequest {
+            graph: &graph,
+            signals: &signals,
+            intent: ViewIntent {
+                target_size: TargetSize::default(),
+                ..ViewIntent::default()
+            },
+        });
+        assert_golden(
+            "spectral",
+            &keys,
+            &projection,
+            &[
+                (146.7027, 34.4556),
+                (146.7027, 34.4556),
+                (146.7027, 34.4556),
+                (146.7027, 34.4556),
+                (-152.6299, -228.9111),
+                (-152.6299, -228.9111),
+                (-281.5509, 320.0),
+            ],
+        );
+    }
 }
 
 /// cartography's radial golden, from the registry's rings.
 #[test]
 fn radial_from_the_registry_matches_the_pre_migration_placement() {
-    let (graph, keys) = parity_fixture();
-    let mut registry = ChannelRegistry::new();
-    assert_eq!(
-        registry.rings(&graph, keys[0]).len(),
-        4,
-        "the hub and its spokes; the rest unreachable"
-    );
-    let signals = registry.disclose(
-        &graph,
-        channels_read(cartography::adapters::RadialAdapter::PROJECTION_ID),
-        Some(keys[0]),
-    );
-    let projection = cartography::adapters::RadialAdapter::default().project(&ProjectionRequest {
-        graph: &graph,
-        signals: &signals,
-        intent: ViewIntent {
-            target_size: TargetSize::default(),
-            focus: Some(keys[0]),
-            ..ViewIntent::default()
-        },
-    });
-    assert_golden(
-        "radial",
-        &keys,
-        &projection,
-        &[
-            (0.0, 0.0),
-            (120.0, 0.0),
-            (-60.0, 103.923),
-            (-60.0, -103.923),
-            (240.0, 0.0),
-            (-120.0, 207.8461),
-            (-120.0, -207.8461),
-        ],
-    );
+    for legacy_surface in [false, true] {
+        let (graph, keys) = parity_fixture_in_store(legacy_surface);
+        let mut registry = ChannelRegistry::new();
+        assert_eq!(
+            registry.rings(&graph, keys[0]).len(),
+            4,
+            "the hub and its spokes; the rest unreachable"
+        );
+        let signals = registry.disclose(
+            &graph,
+            channels_read(cartography::adapters::RadialAdapter::PROJECTION_ID),
+            Some(keys[0]),
+        );
+        let projection =
+            cartography::adapters::RadialAdapter::default().project(&ProjectionRequest {
+                graph: &graph,
+                signals: &signals,
+                intent: ViewIntent {
+                    target_size: TargetSize::default(),
+                    focus: Some(keys[0]),
+                    ..ViewIntent::default()
+                },
+            });
+        assert_golden(
+            "radial",
+            &keys,
+            &projection,
+            &[
+                (0.0, 0.0),
+                (120.0, 0.0),
+                (-60.0, 103.923),
+                (-60.0, -103.923),
+                (240.0, 0.0),
+                (-120.0, 207.8461),
+                (-120.0, -207.8461),
+            ],
+        );
+    }
 }
 
 /// Moved from cartography's spiral tests: visits in one tick tie, and the
@@ -297,11 +322,11 @@ fn each_producer_runs_once_per_key() {
         "a visit reruns recency only"
     );
 
-    // A URL move moves the sites' key alone.
+    // A recorded URL move retains the shown Resource binding, moving only sites.
     apply_graph_delta(
         &mut graph,
-        GraphDelta::SetNodeUrl {
-            key: keys[6],
+        GraphDelta::ReplaySetNodeUrlById {
+            node_id,
             new_url: "https://elsewhere.example/6".to_string(),
         },
     );
@@ -313,7 +338,7 @@ fn each_producer_runs_once_per_key() {
             sites: 2,
             ..once
         },
-        "a URL move reruns the sites only"
+        "a recorded URL move reruns the sites only"
     );
 
     // An edge moves structure, so every topology fact runs once more.
@@ -352,6 +377,32 @@ fn each_producer_runs_once_per_key() {
     assert_eq!(fresh.runs(), RegistryRuns::default());
     fresh.spectral(&graph, 200);
     assert_eq!(fresh.runs().spectral, 1, "the counter counts");
+}
+
+/// Live navigation changes the Resource projected through a Surface, so cached
+/// topology must lose the old page's links and regain them when it returns.
+#[test]
+fn live_resource_rebinding_invalidates_cached_topology() {
+    let (mut graph, keys) = parity_fixture();
+    let mut registry = ChannelRegistry::new();
+    let before = registry.degree_weights(&graph).clone();
+    assert_eq!(before[&keys[5]], 2.0);
+    let resource = graph.shown_resource_id(keys[5]).unwrap();
+    for (url, expected, runs) in [
+        ("https://elsewhere.example/5", 1.0, 2),
+        ("https://parity.example/5", before[&keys[5]], 3),
+    ] {
+        apply_graph_delta(
+            &mut graph,
+            GraphDelta::SetNodeUrl { key: keys[5], new_url: url.into() },
+        );
+        assert_eq!(registry.degree_weights(&graph)[&keys[5]], expected);
+        let mut fresh = ChannelRegistry::new();
+        assert_eq!(registry.degree_weights(&graph), fresh.degree_weights(&graph));
+        assert_eq!(registry.runs().degree_weights, runs);
+    }
+    assert_eq!(graph.shown_resource_id(keys[5]), Some(resource));
+    assert_eq!(registry.degree_weights(&graph), &before);
 }
 
 /// An off-thread partition is taken once for its revision, and a stale one
@@ -416,4 +467,65 @@ fn the_enumeration_channel_is_the_order_every_score_ordinal_follows() {
     for (index, item) in score.items.iter().enumerate() {
         assert_eq!(item.ordinal as usize, index);
     }
+}
+
+#[test]
+fn topology_producers_combine_resource_and_surface_buckets() {
+    use super::producers::{degree_weights, radial_rings, spectral_coords};
+    let (mut graph, keys) = parity_fixture();
+    let resource = graph.shown_resource_id(keys[1]).unwrap();
+    let alias = graph.add_node_with_id(
+        Uuid::from_u128(99),
+        "https://parity.example/1#alias".into(),
+        PortablePoint::new(0.0, 0.0),
+    );
+    // Live lifecycle is deliberately explicit in this raw fixture.
+    let alias_id = graph.get_node(alias).unwrap().id.to_string();
+    kernel::graph::replay_captured_deltas_onto(
+        &mut graph,
+        [kernel::graph::CapturedDelta::ReplaySetShownResourceById {
+            surface_id: alias_id,
+            resource_id: Some(resource.to_string()),
+        }],
+    );
+    graph.assert_relation(
+        keys[0],
+        keys[1],
+        EdgeAssertion::Semantic {
+            sub_kind: SemanticSubKind::UserGrouped,
+            label: None,
+            decay_progress: None,
+        },
+    );
+    graph.assert_relation(
+        keys[3],
+        keys[6],
+        EdgeAssertion::Semantic {
+            sub_kind: SemanticSubKind::UserGrouped,
+            label: None,
+            decay_progress: None,
+        },
+    );
+    let rings = radial_rings(&graph, keys[0]);
+    assert_eq!(rings[&keys[0]], 0);
+    for key in [keys[1], keys[2], keys[3], alias] {
+        assert_eq!(rings[&key], 1);
+    }
+    assert_eq!(rings[&keys[6]], 2);
+    assert!(!rings.contains_key(&keys[4]));
+    let weights = degree_weights(&graph);
+    assert_eq!(
+        weights[&keys[0]], 6.0,
+        "three resource buckets plus alias lift and one Surface bucket"
+    );
+    assert_eq!(
+        weights[&keys[1]], 3.0,
+        "Resource and Surface multiplicity both count"
+    );
+    assert_eq!(weights[&alias], 2.0, "content lifts to the alias once");
+    assert_eq!(
+        weights[&keys[6]], 2.0,
+        "Surface-only neighbor remains visible"
+    );
+    assert_eq!(spectral_coords(&graph, 200).len(), graph.node_count());
 }

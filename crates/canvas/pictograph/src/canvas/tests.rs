@@ -44,6 +44,7 @@ mod node_minting;
 mod node_state;
 mod permitted_actions;
 mod physics_catalog;
+mod physics_registry;
 mod physics_terms;
 mod pointer_gestures;
 mod reader;
@@ -67,8 +68,8 @@ fn first_edge_cell_between(
 ) -> EdgeCell {
     canvas
         .graph()
-        .relations()
-        .find_map(|relation| {
+        .projected_relations()
+        .find_map(|(_, relation)| {
             let same_pair = (relation.from == a && relation.to == b)
                 || (relation.from == b && relation.to == a);
             same_pair.then_some(EdgeCell {

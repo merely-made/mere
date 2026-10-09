@@ -35,6 +35,7 @@ query = ["dep:spareval", "dep:spargebra", "dep:oxigraph"]
 inker.workspace = true
 kernel.workspace = true
 serde_json.workspace = true
+uuid.workspace = true
 oxjsonld = "0.2"
 oxttl = { version = "0.2", features = ["rdf-12"] }
 oxrdf = { version = "0.3", features = ["rdf-12"] }

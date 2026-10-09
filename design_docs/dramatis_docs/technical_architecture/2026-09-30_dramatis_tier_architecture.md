@@ -148,7 +148,9 @@ breaks one is an architecture change and comes to Mark first.
 1. **Hosts never hold secrets.** castellan's `view` is the secret-free read
    model; the secrets stay in the authority (`PersonaeHost`,
    `ports/castellan/src/authority.rs`). Approval renders on the resident's
-   surface.
+   surface. *2026-10-09:* the read model's types moved to the `dramatis`
+   facade's `view` (dramatis repo plan, DR-A); castellan re-exports them,
+   and the authority is unchanged.
 2. **The contact store carries no cryptography.** gaz never verifies a
    signature. Its only runtime dependency in the tier is insigne's plain core;
    personae and insigne's `verify` are dev-dependencies

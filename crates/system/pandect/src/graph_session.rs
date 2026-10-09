@@ -38,7 +38,7 @@ use kernel::graph::apply::{GraphDelta, apply_graph_delta};
 use kernel::graph::node_facets::{PROVENANCE_DERIVATIONS, PROVENANCE_IMPORT};
 use kernel::graph::{
     AttributedDelta, Author, CapturedDelta, Graph, GraphJournal, LogId, Part, Seq, Touched,
-    replay_captured_deltas_onto, revert_change,
+    revert_change,
 };
 use kernel::persistence::GraphSnapshot;
 use kernel::time::wall_clock_now;
@@ -49,6 +49,9 @@ use uuid::Uuid;
 #[cfg(not(target_arch = "wasm32"))]
 use crate::facet_store::{AcceptAll, FacetId, copy_node_facets};
 use crate::facet_store::{NODE_FACETS_FILE, NodeFacetStore};
+use crate::graph_placement::{
+    FrozenGraph, LegacyTranslationReceipt, PlacementProfile, SessionPlacement, source_digest,
+};
 use crate::manifest::{GraphSessionManifest, TrashMark};
 #[cfg(not(target_arch = "wasm32"))]
 use crate::scene_facets::copy_scene_facets;
@@ -63,8 +66,30 @@ pub const SESSIONS_PREFIX: &str = "sessions";
 /// checkpoint (reservoir plan §7 item 16).
 pub const DEFAULT_CHECKPOINT_INTERVAL: u64 = 1_000;
 
+/// Backend bound needed only when qualifying a legacy session transactionally.
+/// Native transaction futures require `Sync`; browser backends keep their local bound.
+#[cfg(not(target_arch = "wasm32"))]
+pub trait LegacyTransactionBackend: Backend + Sync {}
+#[cfg(not(target_arch = "wasm32"))]
+impl<T: Backend + Sync + ?Sized> LegacyTransactionBackend for T {}
+/// Browser counterpart of the native qualification backend bound.
+#[cfg(target_arch = "wasm32")]
+pub trait LegacyTransactionBackend: Backend {}
+#[cfg(target_arch = "wasm32")]
+impl<T: Backend + ?Sized> LegacyTransactionBackend for T {}
+
 const MANIFEST: &str = "manifest.json";
 const BASELINE: &str = "baseline.json";
+const PLACEMENT: &str = "placement.json";
+const TRANSLATION: &str = "legacy-translation.json";
+const PENDING_LINKS: &str = "pending-links.json";
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct PendingLinksSlot {
+    version: u32,
+    state: kernel::graph::PendingLinkState,
+}
 const GRAPH: &str = "graph.json";
 const CHECKPOINT: &str = "checkpoint.json";
 const JOURNAL: &str = "journal.jsonl";
@@ -244,6 +269,8 @@ struct Baseline {
 #[derive(Serialize, Deserialize)]
 struct Checkpoint {
     cursor: Seq,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    translated_receipt_digest: Option<String>,
 }
 
 #[derive(Default)]
@@ -294,10 +321,13 @@ async fn read<B: Backend, T: DeserializeOwned>(
 /// rather than overlay what the snapshot's columns import: a session stores
 /// its whole facet store, and an overlay would add default-valued facets the
 /// graph never held.
-fn graph_of(snapshot: &GraphSnapshot, facets: NodeFacetStore) -> Graph {
-    let mut graph = Graph::from_snapshot(snapshot);
+fn graph_of(
+    snapshot: &GraphSnapshot,
+    facets: NodeFacetStore,
+) -> Result<Graph, kernel::graph::snapshot::ResourceSnapshotError> {
+    let mut graph = Graph::try_from_snapshot(snapshot)?;
     *graph.facets_mut() = facets;
-    graph
+    Ok(graph)
 }
 
 fn baseline_of(graph: &Graph) -> Baseline {
@@ -305,6 +335,162 @@ fn baseline_of(graph: &Graph) -> Baseline {
         graph: graph.to_snapshot(),
         facets: graph.facets().clone(),
     }
+}
+
+async fn retained_source_digest<B: Backend>(
+    slots: &JsonSlots<B>,
+    keys: &Keys,
+    placement: &SessionPlacement,
+) -> Result<String, SessionError> {
+    let baseline = slots.backend().get(&keys.at(BASELINE)).await?;
+    let mut entries = Vec::new();
+    for index in 0..placement.cutoff().0 {
+        let key = muniment::journal::entry_key(&keys.at(JOURNAL), Seq(index));
+        entries.push(slots.backend().get(&key).await?.ok_or_else(|| {
+            SessionError::Corrupt(format!("{key}: missing retained legacy entry"))
+        })?);
+    }
+    source_digest(placement, baseline.as_deref(), &entries).map_err(SessionError::Corrupt)
+}
+
+#[derive(Clone)]
+struct RetainedSource {
+    baseline: Option<Vec<u8>>,
+    entries: Vec<Vec<u8>>,
+}
+
+fn translation_transaction(
+    keys: &Keys,
+    source: &RetainedSource,
+    ops: Vec<WriteOp>,
+) -> (muniment::TransactFn, Arc<Mutex<Option<String>>>) {
+    let baseline_key = keys.at(BASELINE);
+    let journal_prefix = keys.at(JOURNAL);
+    let profile_key = keys.at(PLACEMENT);
+    let receipt_key = keys.at(TRANSLATION);
+    let source = source.clone();
+    let error = Arc::new(Mutex::new(None));
+    let rejected = Arc::clone(&error);
+    let transaction = Box::new(move |reader: &dyn muniment::TransactionReader| {
+        let check = || -> Result<(), String> {
+            if reader
+                .get(&baseline_key)
+                .map_err(|error| error.to_string())?
+                != source.baseline
+            {
+                return Err("legacy baseline changed before qualification commit".into());
+            }
+            let keys = reader
+                .list(&format!("{journal_prefix}/"))
+                .map_err(|error| error.to_string())?;
+            if keys.len() != source.entries.len() {
+                return Err("legacy journal changed before qualification commit".into());
+            }
+            for (index, expected) in source.entries.iter().enumerate() {
+                let key = muniment::journal::entry_key(&journal_prefix, Seq(index as u64));
+                if reader
+                    .get(&key)
+                    .map_err(|error| error.to_string())?
+                    .as_ref()
+                    != Some(expected)
+                {
+                    return Err("retained journal entry changed before qualification commit".into());
+                }
+            }
+            if reader
+                .get(&profile_key)
+                .map_err(|error| error.to_string())?
+                .is_some()
+                || reader
+                    .get(&receipt_key)
+                    .map_err(|error| error.to_string())?
+                    .is_some()
+            {
+                return Err("session placement changed before qualification commit".into());
+            }
+            Ok(())
+        };
+        if let Err(reason) = check() {
+            *rejected.lock().expect("translation rejection") = Some(reason);
+            Vec::new()
+        } else {
+            ops
+        }
+    });
+    (transaction, error)
+}
+
+impl RetainedSource {
+    fn digest(&self, placement: &SessionPlacement) -> Result<String, SessionError> {
+        let entries = self
+            .entries
+            .get(..placement.cutoff().index())
+            .ok_or_else(|| {
+                SessionError::Corrupt(
+                    "legacy qualification requires reopening the durable prefix".into(),
+                )
+            })?;
+        source_digest(placement, self.baseline.as_deref(), entries).map_err(SessionError::Corrupt)
+    }
+}
+
+async fn load_retained_source<B: Backend>(
+    slots: &JsonSlots<B>,
+    keys: &Keys,
+    manifest: &GraphSessionManifest,
+    recorded: bool,
+) -> Result<(Graph, GraphJournal, RetainedSource), SessionError> {
+    let baseline = slots.backend().get(&keys.at(BASELINE)).await?;
+    let journal_prefix = keys.at(JOURNAL);
+    let entry_keys = slots
+        .backend()
+        .scan(&format!("{journal_prefix}/"), &format!("{journal_prefix}0"))
+        .await?;
+    let mut entries = Vec::new();
+    let mut writes = Vec::new();
+    for key in entry_keys {
+        let value = slots
+            .backend()
+            .get(&key)
+            .await?
+            .ok_or_else(|| SessionError::Corrupt(format!("{key}: vanished retained entry")))?;
+        entries.push(value.clone());
+        writes.push(WriteOp::Put { key, value });
+    }
+    let source = muniment::MemoryBackend::new();
+    source.apply(&writes).await?;
+    let journal = GraphJournal::from_log(
+        Journal::<AttributedDelta>::load_entries(
+            &JsonSlots::new(source),
+            &journal_prefix,
+            Some(LogId::new(manifest.session_id.as_uuid().to_string())),
+            provenance(manifest),
+        )
+        .await?,
+    );
+    let graph = baseline
+        .as_deref()
+        .map(|bytes| {
+            let baseline: Baseline = serde_json::from_slice(bytes).map_err(|error| {
+                SessionError::Corrupt(format!("{}: {error}", keys.at(BASELINE)))
+            })?;
+            let mut graph = if recorded {
+                Graph::try_from_recorded_snapshot(&baseline.graph)
+            } else {
+                Graph::try_from_snapshot(&baseline.graph)
+            }
+            .map_err(|error| SessionError::Corrupt(format!("{}: {error}", keys.at(BASELINE))))?;
+            *graph.facets_mut() = baseline.facets;
+            graph
+                .validate_active_resource_assertion_handles()
+                .map_err(|error| {
+                    SessionError::Corrupt(format!("{}: {error}", keys.at(BASELINE)))
+                })?;
+            Ok::<_, SessionError>(graph)
+        })
+        .transpose()?
+        .unwrap_or_default();
+    Ok((graph, journal, RetainedSource { baseline, entries }))
 }
 
 /// The provenance a session's journal was recorded with: a fork's starts at
@@ -345,9 +531,11 @@ pub struct Pending {
     updated_at: Option<SystemTime>,
     /// Views written, with the log position each was written through.
     views: Vec<(ViewKey, Seq)>,
+    pending_links: Option<(u64, kernel::graph::PendingLinkState)>,
 }
 
 impl Pending {
+    /// Commit batches in creation order. Storage receipts may arrive later.
     pub fn ops(&self) -> &[WriteOp] {
         &self.ops
     }
@@ -366,6 +554,9 @@ pub struct GraphSession<B> {
     keys: Keys,
     manifest: GraphSessionManifest,
     baseline: Graph,
+    placement: Option<SessionPlacement>,
+    translation: Option<LegacyTranslationReceipt>,
+    retained_source: Option<RetainedSource>,
     graph: Graph,
     journal: GraphJournal,
     pending: Arc<Mutex<Vec<CapturedDelta>>>,
@@ -381,6 +572,9 @@ pub struct GraphSession<B> {
     /// Whether the baseline is written with the head: a session begun from
     /// no graph stores none, and opens empty.
     write_baseline: bool,
+    saved_pending_links: kernel::graph::PendingLinkState,
+    saved_pending_links_revision: u64,
+    retained_pending_links_revision: u64,
 }
 
 impl<B: Backend> GraphSession<B> {
@@ -407,8 +601,10 @@ impl<B: Backend> GraphSession<B> {
             end: Seq(0),
         });
         let write_baseline = baseline.is_some();
-        let baseline = baseline.unwrap_or_default();
+        let placement = (!write_baseline).then(SessionPlacement::recorded);
+        let mut baseline = baseline.unwrap_or_default();
         let mut graph = baseline.clone();
+        baseline.clear_semantic_context();
         let pending = Arc::default();
         record_into(&mut graph, &pending);
         Self {
@@ -417,6 +613,9 @@ impl<B: Backend> GraphSession<B> {
             keys: Keys::new(manifest.session_id),
             manifest,
             baseline,
+            placement,
+            translation: None,
+            retained_source: None,
             graph,
             journal,
             pending,
@@ -429,7 +628,24 @@ impl<B: Backend> GraphSession<B> {
             revision: 1,
             head_stored: false,
             write_baseline,
+            saved_pending_links: Default::default(),
+            saved_pending_links_revision: 0,
+            retained_pending_links_revision: 1,
         }
+    }
+
+    /// Begin from explicitly recorded store placement. An arbitrary graph supplied
+    /// to `new` remains unqualified; qualification must come from its caller.
+    pub fn new_recorded(
+        backend: B,
+        manifest: GraphSessionManifest,
+        baseline: Option<Graph>,
+        author: Author,
+        kind: ChangeKind,
+    ) -> Self {
+        let mut session = Self::new(backend, manifest, baseline, author, kind);
+        session.placement = Some(SessionPlacement::recorded());
+        session
     }
 
     /// Open session `id` from a mere's store: the latest checkpoint and the
@@ -440,43 +656,152 @@ impl<B: Backend> GraphSession<B> {
         let manifest: GraphSessionManifest = read(&slots, &keys.at(MANIFEST))
             .await?
             .ok_or(SessionError::Missing(id))?;
-        let baseline = read::<B, Baseline>(&slots, &keys.at(BASELINE))
-            .await?
-            .map(|baseline| graph_of(&baseline.graph, baseline.facets))
-            .unwrap_or_default();
-        let journal = GraphJournal::from_log(
-            Journal::<AttributedDelta>::load_entries(
-                &slots,
-                &keys.at(JOURNAL),
-                Some(LogId::new(id.as_uuid().to_string())),
-                provenance(&manifest),
-            )
-            .await?,
-        );
+        let placement: Option<SessionPlacement> = read(&slots, &keys.at(PLACEMENT)).await?;
+        let recorded = placement
+            .as_ref()
+            .is_some_and(|profile| profile.baseline == PlacementProfile::RecordedStrataV1);
+        let (baseline, journal, retained_source) =
+            load_retained_source(&slots, &keys, &manifest, recorded).await?;
         let changes = Journal::load_entries(&slots, &keys.at(CHANGES), None, None).await?;
         let live = journal.live_cursor();
+        if let Some(profile) = &placement {
+            if profile.cutoff() > live {
+                return Err(SessionError::Corrupt(format!(
+                    "{}: legacy cursor lies past the journal",
+                    keys.at(PLACEMENT)
+                )));
+            }
+            if profile.baseline == PlacementProfile::RecordedStrataV1
+                && (profile.cutoff() != Seq(0) || !profile.origins.is_empty())
+            {
+                return Err(SessionError::Corrupt(format!(
+                    "{}: recorded placement has legacy history metadata",
+                    keys.at(PLACEMENT)
+                )));
+            }
+        }
+
+        let translation: Option<LegacyTranslationReceipt> =
+            read(&slots, &keys.at(TRANSLATION)).await?;
+        match (&placement, &translation) {
+            (Some(profile), Some(receipt))
+                if profile.baseline == PlacementProfile::LegacySurfaceV1 =>
+            {
+                let digest = retained_source_digest(&slots, &keys, profile).await?;
+                receipt
+                    .validate(profile, &digest, journal.entries())
+                    .map_err(|error| {
+                        SessionError::Corrupt(format!("{}: {error}", keys.at(TRANSLATION)))
+                    })?;
+            },
+            (Some(profile), None) if profile.baseline == PlacementProfile::LegacySurfaceV1 => {
+                return Err(SessionError::Corrupt(format!(
+                    "{}: missing legacy translation receipt",
+                    keys.at(TRANSLATION)
+                )));
+            },
+            (_, Some(_)) => {
+                return Err(SessionError::Corrupt(format!(
+                    "{}: receipt has no legacy placement",
+                    keys.at(TRANSLATION)
+                )));
+            },
+            _ => {},
+        }
 
         let checkpoint: Option<Checkpoint> = read(&slots, &keys.at(CHECKPOINT)).await?;
         let (mut graph, checkpointed) = match checkpoint {
-            Some(checkpoint) if checkpoint.cursor <= live => {
+            Some(checkpoint)
+                if checkpoint.cursor <= live
+                    && translation.as_ref().is_none_or(|receipt| {
+                        checkpoint.cursor >= receipt.placement.cutoff()
+                            && checkpoint.translated_receipt_digest.as_deref()
+                                == Some(receipt.translation_digest.as_str())
+                    }) =>
+            {
                 let snapshot: GraphSnapshot = read(&slots, &keys.at(GRAPH))
                     .await?
                     .ok_or_else(|| SessionError::Corrupt(keys.at(GRAPH)))?;
                 let facets: NodeFacetStore = read(&slots, &keys.at(NODE_FACETS_FILE))
                     .await?
                     .unwrap_or_default();
-                (graph_of(&snapshot, facets), checkpoint.cursor)
+                let graph = if translation.is_some() || recorded {
+                    FrozenGraph {
+                        graph: snapshot,
+                        facets,
+                    }
+                    .materialize()
+                    .map_err(|error| {
+                        SessionError::Corrupt(format!("{}: {error}", keys.at(GRAPH)))
+                    })?
+                } else {
+                    graph_of(&snapshot, facets).map_err(|error| {
+                        SessionError::Corrupt(format!("{}: {error}", keys.at(GRAPH)))
+                    })?
+                };
+                if let Some(receipt) = &translation {
+                    let expected = receipt
+                        .graph_at(journal.entries(), checkpoint.cursor)
+                        .map_err(SessionError::Corrupt)?
+                        .ok_or_else(|| SessionError::Corrupt(keys.at(CHECKPOINT)))?;
+                    if FrozenGraph::of(&graph) != FrozenGraph::of(&expected) {
+                        return Err(SessionError::Corrupt(format!(
+                            "{}: checkpoint differs from retained translation",
+                            keys.at(CHECKPOINT)
+                        )));
+                    }
+                }
+                (graph, checkpoint.cursor)
             },
-            _ => (baseline.clone(), Seq(0)),
+            _ => (
+                match &translation {
+                    Some(receipt) => receipt
+                        .baseline
+                        .materialize()
+                        .map_err(SessionError::Corrupt)?,
+                    None => baseline.clone(),
+                },
+                Seq(0),
+            ),
         };
-        replay_captured_deltas_onto(
-            &mut graph,
-            journal
-                .log()
-                .from(checkpointed)
-                .iter()
-                .map(|entry| entry.delta.clone()),
-        );
+        if let Some(receipt) = &translation {
+            let translated = receipt
+                .journal(journal.entries(), live)
+                .expect("receipt validated against journal");
+            let baseline = receipt
+                .baseline
+                .materialize()
+                .map_err(SessionError::Corrupt)?;
+            translated.replay_from_with_baseline(
+                receipt.effect_cursor(checkpointed),
+                &mut graph,
+                &baseline,
+            );
+        } else {
+            journal.replay_from_with_baseline(checkpointed, &mut graph, &baseline);
+        }
+        graph
+            .validate_active_resource_assertion_handles()
+            .map_err(|error| {
+                SessionError::Corrupt(format!("{}: replayed graph: {error}", keys.at(JOURNAL)))
+            })?;
+
+        let mut saved_pending_links =
+            match read::<B, PendingLinksSlot>(&slots, &keys.at(PENDING_LINKS)).await? {
+                Some(slot) if slot.version == 1 => slot.state,
+                Some(slot) => {
+                    return Err(SessionError::Corrupt(format!(
+                        "{}: unsupported pending-links version {}",
+                        keys.at(PENDING_LINKS),
+                        slot.version,
+                    )));
+                },
+                None => Default::default(),
+            };
+        if saved_pending_links.retention == kernel::graph::PendingLinkRetention::SessionOnly {
+            saved_pending_links.entries.clear();
+        }
+        graph.restore_pending_link_state(saved_pending_links.clone());
 
         let mut session = Self {
             slots,
@@ -484,6 +809,9 @@ impl<B: Backend> GraphSession<B> {
             keys,
             manifest,
             baseline,
+            placement,
+            translation,
+            retained_source: Some(retained_source),
             graph,
             journal,
             pending: Arc::default(),
@@ -496,10 +824,194 @@ impl<B: Backend> GraphSession<B> {
             revision: 1,
             head_stored: true,
             write_baseline: false,
+            saved_pending_links,
+            saved_pending_links_revision: 1,
+            retained_pending_links_revision: 1,
         };
         session.load_views().await?;
         record_into(&mut session.graph, &session.pending);
         Ok(session)
+    }
+
+    /// Qualify an already-durable legacy input and retain its original authority.
+    pub async fn open_legacy(
+        backend: B,
+        id: SessionId,
+        cutoff: Seq,
+        origins: Vec<kernel::graph::legacy_resource_migration::LegacyResourceOriginResolution>,
+    ) -> Result<Self, SessionError>
+    where
+        B: LegacyTransactionBackend,
+    {
+        let mut session = Self::open(backend, id).await?;
+        session.qualify_legacy(cutoff, origins).await?;
+        Ok(session)
+    }
+
+    /// Freeze a translation once. Its cutoff never grows with the modern journal.
+    pub async fn qualify_legacy(
+        &mut self,
+        cutoff: Seq,
+        origins: Vec<kernel::graph::legacy_resource_migration::LegacyResourceOriginResolution>,
+    ) -> Result<(), SessionError>
+    where
+        B: LegacyTransactionBackend,
+    {
+        self.qualify_legacy_content(cutoff, origins, None).await
+    }
+
+    /// Qualify tags with their original mere's explicit vocabulary namespace.
+    pub async fn qualify_legacy_with_content_context(
+        &mut self,
+        cutoff: Seq,
+        origins: Vec<kernel::graph::legacy_resource_migration::LegacyResourceOriginResolution>,
+        context: &kernel::graph::legacy_resource_migration::LegacyContentContext,
+    ) -> Result<(), SessionError>
+    where
+        B: LegacyTransactionBackend,
+    {
+        self.qualify_legacy_content(cutoff, origins, Some(context))
+            .await
+    }
+
+    pub async fn open_legacy_with_content_context(
+        backend: B,
+        id: SessionId,
+        cutoff: Seq,
+        origins: Vec<kernel::graph::legacy_resource_migration::LegacyResourceOriginResolution>,
+        context: &kernel::graph::legacy_resource_migration::LegacyContentContext,
+    ) -> Result<Self, SessionError>
+    where
+        B: LegacyTransactionBackend,
+    {
+        let mut session = Self::open(backend, id).await?;
+        session
+            .qualify_legacy_with_content_context(cutoff, origins, context)
+            .await?;
+        Ok(session)
+    }
+
+    async fn qualify_legacy_content(
+        &mut self,
+        cutoff: Seq,
+        origins: Vec<kernel::graph::legacy_resource_migration::LegacyResourceOriginResolution>,
+        content_context: Option<&kernel::graph::legacy_resource_migration::LegacyContentContext>,
+    ) -> Result<(), SessionError>
+    where
+        B: LegacyTransactionBackend,
+    {
+        let placement = SessionPlacement::legacy(cutoff, origins);
+        if let Some(existing) = &self.placement {
+            if existing == &placement
+                && self.translation.as_ref().is_some_and(|receipt| {
+                    content_context.is_none() || receipt.content_context.as_ref() == content_context
+                })
+            {
+                return Ok(());
+            }
+            return Err(SessionError::Corrupt(
+                "session already has a different placement contract".into(),
+            ));
+        }
+        let live = self.journal.live_cursor();
+        if cutoff > live {
+            return Err(SessionError::CursorOutOfRange {
+                cursor: cutoff,
+                live,
+            });
+        }
+        if !self.head_stored
+            || self.saved != live
+            || self.changes_saved != self.changes.next_seq()
+            || !self.pending.lock().expect("recorder buffer").is_empty()
+        {
+            return Err(SessionError::Corrupt(
+                "legacy qualification requires an already durable session".into(),
+            ));
+        }
+        let digest = retained_source_digest(&self.slots, &self.keys, &placement).await?;
+        let retained = self.retained_source.as_ref().ok_or_else(|| {
+            SessionError::Corrupt(
+                "legacy qualification requires reopening the durable session".into(),
+            )
+        })?;
+        if retained.entries.len() != live.index() || retained.digest(&placement)? != digest {
+            return Err(SessionError::Corrupt(
+                "legacy source changed since this session was opened; reopen before qualification"
+                    .into(),
+            ));
+        }
+        let migrated = if let Some(context) = content_context {
+            kernel::graph::legacy_resource_migration::migrate_legacy_prefix_with_content_context(
+                &self.baseline,
+                &self.journal.entries()[..cutoff.index()],
+                &placement.origins,
+                Some(context),
+            )
+        } else {
+            kernel::graph::legacy_resource_migration::migrate_legacy_prefix_with_resolutions(
+                &self.baseline,
+                &self.journal.entries()[..cutoff.index()],
+                &placement.origins,
+            )
+        }
+        .map_err(|error| SessionError::Corrupt(error.to_string()))?;
+        let mut baseline = self.baseline.clone();
+        kernel::graph::replay_captured_deltas_onto(&mut baseline, migrated.baseline_effects);
+        let mut receipt = LegacyTranslationReceipt::new(
+            digest.clone(),
+            placement.clone(),
+            FrozenGraph::of(&baseline),
+            migrated.entry_effects,
+            FrozenGraph::of(&migrated.graph),
+        )
+        .map_err(SessionError::Corrupt)?;
+        receipt
+            .bind_content_context(content_context)
+            .map_err(SessionError::Corrupt)?;
+        receipt
+            .validate(&placement, &digest, self.journal.entries())
+            .map_err(SessionError::Corrupt)?;
+        let mut graph = receipt
+            .graph_at(self.journal.entries(), live)
+            .map_err(SessionError::Corrupt)?
+            .expect("cutoff validated against live journal");
+        let ops = [
+            pretty(self.keys.at(PLACEMENT), &placement)?,
+            pretty(self.keys.at(TRANSLATION), &receipt)?,
+            pretty(self.keys.at(GRAPH), &graph.to_snapshot())?,
+            pretty(self.keys.at(NODE_FACETS_FILE), graph.facets())?,
+            pretty(
+                self.keys.at(CHECKPOINT),
+                &Checkpoint {
+                    cursor: live,
+                    translated_receipt_digest: Some(receipt.translation_digest.clone()),
+                },
+            )?,
+        ];
+        self.commit_translation(retained, ops.to_vec()).await?;
+        graph.copy_semantic_context_from(&self.graph);
+        record_into(&mut graph, &self.pending);
+        self.graph = graph;
+        self.placement = Some(placement);
+        self.translation = Some(receipt);
+        self.checkpointed = live;
+        self.revision += 1;
+        Ok(())
+    }
+
+    async fn commit_translation(
+        &self,
+        retained: &RetainedSource,
+        ops: Vec<WriteOp>,
+    ) -> Result<(), SessionError>
+    where
+        B: LegacyTransactionBackend,
+    {
+        let (transaction, rejected) = translation_transaction(&self.keys, retained, ops);
+        self.slots.backend().transact(transaction).await?;
+        let error = rejected.lock().expect("translation rejection").take();
+        error.map_or(Ok(()), |reason| Err(SessionError::Corrupt(reason)))
     }
 
     async fn load_views(&mut self) -> Result<(), SessionError> {
@@ -538,6 +1050,11 @@ impl<B: Backend> GraphSession<B> {
 
     pub fn manifest(&self) -> &GraphSessionManifest {
         &self.manifest
+    }
+
+    /// Explicit baseline placement. Absence remains unqualified.
+    pub fn placement(&self) -> Option<&SessionPlacement> {
+        self.placement.as_ref()
     }
 
     /// The live graph. Edits go through [`apply`](Self::apply), so every one is
@@ -618,7 +1135,7 @@ impl<B: Backend> GraphSession<B> {
         let deltas = edits
             .iter()
             .map(|edit| {
-                edit.replay_delta()
+                edit.replay_delta_as(&author)
                     .ok_or_else(|| SessionError::NotReplayable(format!("{edit:?}")))
             })
             .collect::<Result<Vec<_>, _>>()?;
@@ -651,18 +1168,27 @@ impl<B: Backend> GraphSession<B> {
         edit: impl FnOnce(&mut Graph) -> R,
     ) -> Result<(R, Applied), SessionError> {
         self.ensure_writable()?;
+        let observation = self.graph.semantic_observation_revision();
         let mut candidate = self.graph.clone();
         let captured = Arc::default();
         record_into(&mut candidate, &captured);
-        let result = kernel::graph::with_isolated_capture(|| edit(&mut candidate));
+        let result =
+            kernel::graph::with_isolated_capture(|| candidate.write_as(author.clone(), edit));
         self.validate(&candidate)?;
         let recorded = std::mem::take(&mut *captured.lock().expect("candidate recorder buffer"));
         let mut replay = self.graph.clone();
-        replay_captured_deltas_onto(&mut replay, recorded.iter().map(|entry| entry.clone()));
+        kernel::graph::replay_captured_deltas_as_onto(
+            &mut replay,
+            &author,
+            recorded.iter().cloned(),
+        );
         if replay_state(&replay)? != replay_state(&candidate)? {
             return Err(SessionError::NotReplayable(
                 "candidate changed graph truth outside the journaled mutation path".into(),
             ));
+        }
+        if candidate.retained_pending_link_state() != self.graph.retained_pending_link_state() {
+            self.retained_pending_links_revision += 1;
         }
         self.graph = candidate;
         record_into(&mut self.graph, &self.pending);
@@ -678,6 +1204,8 @@ impl<B: Backend> GraphSession<B> {
                 first,
                 end,
             });
+            self.revision += 1;
+        } else if self.graph.semantic_observation_revision() != observation {
             self.revision += 1;
         }
         let applied = Applied {
@@ -730,6 +1258,8 @@ impl<B: Backend> GraphSession<B> {
     /// Whether anything waits for the next store, without building the batch.
     pub fn has_unstored(&self) -> bool {
         !self.head_stored
+            || self.retained_pending_links_revision > self.saved_pending_links_revision
+            || self.graph.retained_pending_link_state() != self.saved_pending_links
             || self.journal.live_cursor() > self.saved
             || self.changes.next_seq() > self.changes_saved
             || self
@@ -748,6 +1278,26 @@ impl<B: Backend> GraphSession<B> {
         let changes = self.changes.next_seq();
         let updated_at = (changes > self.changes_saved).then_some(at);
         let mut ops = Vec::new();
+        let retained_pending_links = self.graph.retained_pending_link_state();
+        // Returning to the saved value still needs a write when an earlier
+        // batch may commit an intervening value. Session-only observations
+        // and host coverage do not advance this durable-cache revision.
+        let pending_links = Some((
+            self.retained_pending_links_revision,
+            retained_pending_links.clone(),
+        ));
+        if !self.head_stored
+            || self.retained_pending_links_revision > self.saved_pending_links_revision
+            || retained_pending_links != self.saved_pending_links
+        {
+            ops.push(pretty(
+                self.keys.at(PENDING_LINKS),
+                &PendingLinksSlot {
+                    version: 1,
+                    state: retained_pending_links,
+                },
+            )?);
+        }
         if !self.head_stored || updated_at.is_some() {
             let mut manifest = self.manifest.clone();
             manifest.updated_at = updated_at.unwrap_or(manifest.updated_at);
@@ -758,6 +1308,11 @@ impl<B: Backend> GraphSession<B> {
                 self.keys.at(BASELINE),
                 &baseline_of(&self.baseline),
             )?);
+        }
+        if !self.head_stored {
+            if let Some(placement) = &self.placement {
+                ops.push(pretty(self.keys.at(PLACEMENT), placement)?);
+            }
         }
         ops.extend(
             self.journal
@@ -775,7 +1330,16 @@ impl<B: Backend> GraphSession<B> {
             ops.extend([
                 pretty(self.keys.at(GRAPH), &self.graph.to_snapshot())?,
                 pretty(self.keys.at(NODE_FACETS_FILE), self.graph.facets())?,
-                pretty(self.keys.at(CHECKPOINT), &Checkpoint { cursor: journal })?,
+                pretty(
+                    self.keys.at(CHECKPOINT),
+                    &Checkpoint {
+                        cursor: journal,
+                        translated_receipt_digest: self
+                            .translation
+                            .as_ref()
+                            .map(|receipt| receipt.translation_digest.clone()),
+                    },
+                )?,
             ]);
         }
         let mut views = Vec::new();
@@ -797,11 +1361,18 @@ impl<B: Backend> GraphSession<B> {
             checkpoint,
             updated_at,
             views,
+            pending_links,
         })
     }
 
     /// Mark a [`Pending`] batch as stored, once it has committed.
     pub fn stored(&mut self, pending: Pending) {
+        if let Some((revision, state)) = pending.pending_links {
+            if revision >= self.saved_pending_links_revision {
+                self.saved_pending_links = state;
+                self.saved_pending_links_revision = revision;
+            }
+        }
         for (key, through) in pending.views {
             if let Some(view) = self.views.get_mut(&key) {
                 view.saved = view.saved.max(through);
@@ -909,7 +1480,14 @@ impl<B: Backend> GraphSession<B> {
     fn edits_of(&self, change: &Change) -> Vec<CapturedDelta> {
         self.journal.entries()[change.first.index()..change.end.index()]
             .iter()
-            .map(|entry| entry.delta.clone())
+            .enumerate()
+            .flat_map(|(offset, entry)| {
+                self.translation
+                    .as_ref()
+                    .and_then(|receipt| receipt.entry_effects.get(change.first.index() + offset))
+                    .cloned()
+                    .unwrap_or_else(|| vec![entry.delta.clone()])
+            })
             .collect()
     }
 
@@ -945,7 +1523,7 @@ impl<B: Backend> GraphSession<B> {
             .edits
             .iter()
             .map(|edit| {
-                edit.replay_delta()
+                edit.replay_delta_as(&author)
                     .ok_or_else(|| SessionError::NotReplayable(format!("{edit:?}")))
             })
             .collect::<Result<Vec<_>, _>>()?;
@@ -985,11 +1563,18 @@ impl<B: Backend> GraphSession<B> {
     }
 
     /// The graph as it stood at journal cursor `cursor`: the baseline with the
-    /// first `cursor` entries replayed. `None` past the live cursor.
+    /// first `cursor` entries replayed. `None` past the live cursor or when
+    /// replay produces conflicting active Resource handles.
     pub fn graph_at(&self, cursor: Seq) -> Option<Graph> {
-        let entries = self.journal.entries().get(..cursor.index())?;
-        let mut graph = self.baseline.clone();
-        replay_captured_deltas_onto(&mut graph, entries.iter().map(|entry| entry.delta.clone()));
+        let mut graph = match &self.translation {
+            Some(receipt) => receipt
+                .graph_at(self.journal.entries(), cursor)
+                .ok()
+                .flatten(),
+            None => self.journal.snapshot_at_from(&self.baseline, cursor),
+        }?;
+        graph.validate_active_resource_assertion_handles().ok()?;
+        graph.set_known_coverage(self.graph.known_coverage().clone());
         Some(graph)
     }
 
@@ -1047,6 +1632,18 @@ impl<B: Backend> GraphSession<B> {
         });
         view.current = state;
         Ok(())
+    }
+
+    /// Complete source archive with explicit current placement when the session is qualified.
+    pub fn profiled_codicil_payload(&self) -> crate::graph_codicil::ProfiledGraphCodicil {
+        crate::graph_codicil::ProfiledGraphCodicil {
+            codicil: self.codicil_payload(),
+            // A legacy profile is admitted only with its validated translation receipt.
+            placement: self
+                .placement
+                .as_ref()
+                .map(|_| PlacementProfile::RecordedStrataV1),
+        }
     }
 
     /// Freeze graph, facets and the source's complete parallel histories.
@@ -1207,11 +1804,35 @@ impl<B: Backend + Clone> MereSessions<B> {
         GraphSession::open(self.backend.clone(), id).await
     }
 
+    pub async fn open_legacy(
+        &self,
+        id: SessionId,
+        cutoff: Seq,
+        origins: Vec<kernel::graph::legacy_resource_migration::LegacyResourceOriginResolution>,
+    ) -> Result<GraphSession<B>, SessionError>
+    where
+        B: LegacyTransactionBackend,
+    {
+        GraphSession::open_legacy(self.backend.clone(), id, cutoff, origins).await
+    }
+
     /// Begin a new session in memory, from `baseline` or empty. Its first
     /// flush stores it.
     pub fn begin(&self, author: Author, baseline: Option<Graph>) -> GraphSession<B> {
         let manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
         GraphSession::new(
+            self.backend.clone(),
+            manifest,
+            baseline,
+            author,
+            ChangeKind::Minted,
+        )
+    }
+
+    /// Begin from a caller-qualified recorded graph without changing its stores.
+    pub fn begin_recorded(&self, author: Author, baseline: Option<Graph>) -> GraphSession<B> {
+        let manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
+        GraphSession::new_recorded(
             self.backend.clone(),
             manifest,
             baseline,
@@ -1257,11 +1878,16 @@ impl<B: Backend + Clone> MereSessions<B> {
         author: Author,
         validate: impl FnOnce(&Graph) -> Result<(), String>,
     ) -> Result<GraphSessionManifest, SessionError> {
-        let payload = crate::graph_codicil::load_graph_codicil(store, id)
+        let input = crate::graph_codicil::load_profiled_graph_codicil_sealed(store, None, id)
             .await
             .map_err(|e| SessionError::Corrupt(e.to_string()))?
             .ok_or_else(|| SessionError::Corrupt(format!("no codicil {id} in this mere")))?;
-        let graph = payload.clone().into_graph();
+        let graph = input
+            .clone()
+            .into_graph()
+            .map_err(|error| SessionError::Corrupt(error.to_string()))?;
+        let recorded = input.placement == Some(PlacementProfile::RecordedStrataV1);
+        let payload = input.codicil;
         validate(&graph).map_err(SessionError::Validation)?;
         let mut manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
         manifest.display_name = payload
@@ -1278,6 +1904,9 @@ impl<B: Backend + Clone> MereSessions<B> {
                 codicil: id.to_string(),
             },
         );
+        if recorded {
+            session.placement = Some(SessionPlacement::recorded());
+        }
         // Compose keeps the first source's view for each app/name, matching its graph base.
         for source in &payload.sessions {
             for view in &source.views {
@@ -1394,11 +2023,999 @@ impl<B: Backend + Clone> MereSessions<B> {
 }
 
 #[cfg(test)]
+#[path = "graph_session_content_tests.rs"]
+mod content_tests;
+
+#[cfg(test)]
+#[path = "graph_session_pending_tests.rs"]
+mod pending_tests;
+
+#[cfg(test)]
 mod tests {
     use super::*;
+    use kernel::graph::replay_captured_deltas_onto;
 
     use euclid::default::Point2D;
     use muniment::{DirectoryBackend, MemoryBackend};
+
+    async fn legacy_receipt_fixture() -> (MemoryBackend, SessionId, Seq) {
+        legacy_receipt_fixture_with_addresses(false).await
+    }
+
+    async fn legacy_receipt_fixture_with_addresses(
+        same_host: bool,
+    ) -> (MemoryBackend, SessionId, Seq) {
+        let store = MemoryBackend::new();
+        let mut baseline = kernel::graph::replay_captured_deltas([add(1), add(2)]);
+        if same_host {
+            replay_captured_deltas_onto(
+                &mut baseline,
+                [
+                    CapturedDelta::ReplaySetNodeUrlById {
+                        node_id: Uuid::from_u128(1).to_string(),
+                        new_url: "https://same-host.test/".into(),
+                    },
+                    CapturedDelta::ReplaySetNodeUrlById {
+                        node_id: Uuid::from_u128(2).to_string(),
+                        new_url: "https://same-host.test/child".into(),
+                    },
+                ],
+            );
+            baseline = Graph::try_from_snapshot(&baseline.to_snapshot()).unwrap();
+        }
+        let grouped = |from: u128, to: u128| CapturedDelta::ReplayAssertRelationByIds {
+            from_id: Uuid::from_u128(from).to_string(),
+            to_id: Uuid::from_u128(to).to_string(),
+            assertion: kernel::graph::EdgeAssertion::Semantic {
+                sub_kind: kernel::graph::SemanticSubKind::UserGrouped,
+                label: Some("held surface".into()),
+                decay_progress: None,
+            },
+        };
+        replay_captured_deltas_onto(&mut baseline, [grouped(1, 2)]);
+        let mut raw = baseline.to_snapshot();
+        for edge in &mut raw.edges {
+            if let Some(semantic) = &mut edge.semantic {
+                semantic.statements.clear();
+            }
+        }
+        let mere = MereSessions::new(store.clone());
+        let mut session = mere.begin(person(), Some(baseline));
+        for (author, delta) in [
+            (Author::person("node-author").via("legacy-host"), add(3)),
+            (person(), relate(1, 2)),
+            (
+                Author::person("group-author").via("legacy-editor"),
+                grouped(2, 3),
+            ),
+        ] {
+            let first = session.journal.live_cursor();
+            session.journal.record_as(author.clone(), delta);
+            session.changes.append(Change {
+                author,
+                kind: ChangeKind::Edit,
+                first,
+                end: session.journal.live_cursor(),
+            });
+        }
+        session.graph = session
+            .journal
+            .snapshot_at_from(&session.baseline, session.journal.live_cursor())
+            .unwrap();
+        session
+            .store(wall_clock_now(), Vec::new(), true)
+            .await
+            .unwrap();
+        let id = session.id();
+        store
+            .apply(&[pretty(
+                Keys::new(id).at(BASELINE),
+                &Baseline {
+                    graph: raw,
+                    facets: session.baseline.facets().clone(),
+                },
+            )
+            .unwrap()])
+            .await
+            .unwrap();
+        (store, id, Seq(3))
+    }
+
+    #[test]
+    fn prepared_translation_transaction_rechecks_every_retained_input() {
+        pollster::block_on(async {
+            let (store, id, _) = legacy_receipt_fixture().await;
+            let session = GraphSession::open(store.clone(), id).await.unwrap();
+            let source = session.retained_source.as_ref().unwrap();
+            let keys = Keys::new(id);
+            let baseline = store.get(&keys.at(BASELINE)).await.unwrap().unwrap();
+            let entry_key = muniment::journal::entry_key(&keys.at(JOURNAL), Seq(0));
+            let entry = store.get(&entry_key).await.unwrap().unwrap();
+            let appended =
+                muniment::journal::entry_key(&keys.at(JOURNAL), Seq(source.entries.len() as u64));
+            let mut changed_baseline = baseline.clone();
+            changed_baseline.push(b'\n');
+            let mut changed_entry = entry.clone();
+            changed_entry.push(b'\n');
+            for (key, invalid, restore) in [
+                (keys.at(BASELINE), changed_baseline, Some(baseline)),
+                (entry_key, changed_entry, Some(entry)),
+                (appended, b"new concurrent entry".to_vec(), None),
+                (keys.at(PLACEMENT), b"new concurrent profile".to_vec(), None),
+            ] {
+                store.put(&key, &invalid).await.unwrap();
+                let candidate = || {
+                    vec![WriteOp::Put {
+                        key: keys.at(TRANSLATION),
+                        value: b"candidate".to_vec(),
+                    }]
+                };
+                let (transaction, rejected) = translation_transaction(&keys, source, candidate());
+                store.transact(transaction).await.unwrap();
+                assert!(rejected.lock().unwrap().is_some());
+                assert!(store.get(&keys.at(TRANSLATION)).await.unwrap().is_none());
+                assert_eq!(store.get(&key).await.unwrap().unwrap(), invalid);
+                match restore {
+                    Some(bytes) => store.put(&key, &bytes).await.unwrap(),
+                    None => store.delete(&key).await.unwrap(),
+                }
+                let (transaction, rejected) = translation_transaction(&keys, source, candidate());
+                store.transact(transaction).await.unwrap();
+                assert!(rejected.lock().unwrap().is_none());
+                assert_eq!(
+                    store.get(&keys.at(TRANSLATION)).await.unwrap().unwrap(),
+                    b"candidate"
+                );
+                store.delete(&keys.at(TRANSLATION)).await.unwrap();
+            }
+        });
+    }
+
+    #[test]
+    fn legacy_translation_receipt_preserves_first_handles_history_undo_and_modern_suffix() {
+        pollster::block_on(async {
+            let (store, id, cutoff) = legacy_receipt_fixture_with_addresses(true).await;
+            let keys = Keys::new(id);
+            let retained_baseline = store.get(&keys.at(BASELINE)).await.unwrap().unwrap();
+            let retained_entries = {
+                let mut values = Vec::new();
+                for index in 0..cutoff.0 {
+                    values.push(
+                        store
+                            .get(&muniment::journal::entry_key(&keys.at(JOURNAL), Seq(index)))
+                            .await
+                            .unwrap()
+                            .unwrap(),
+                    );
+                }
+                values
+            };
+            let mut session = GraphSession::open_legacy(store.clone(), id, cutoff, vec![])
+                .await
+                .unwrap();
+            let original_entries = session.journal().entries()[..cutoff.index()].to_vec();
+            let first = FrozenGraph::of(session.graph());
+            assert!(first.graph.resource_edges.iter().any(|edge| {
+                edge.containment.as_ref().is_some_and(|bucket| {
+                    bucket
+                        .sub_kinds
+                        .contains(&kernel::persistence::PersistedContainmentSubKind::Domain)
+                })
+            }));
+            assert!(first.graph.resource_edges.iter().any(|edge| {
+                edge.containment.as_ref().is_some_and(|bucket| {
+                    bucket
+                        .sub_kinds
+                        .contains(&kernel::persistence::PersistedContainmentSubKind::UrlPath)
+                })
+            }));
+            assert!(
+                first
+                    .graph
+                    .edges
+                    .iter()
+                    .all(|edge| edge.containment.as_ref().is_none_or(|bucket| !bucket
+                        .sub_kinds
+                        .contains(&kernel::persistence::PersistedContainmentSubKind::Domain)
+                        && !bucket
+                            .sub_kinds
+                            .contains(&kernel::persistence::PersistedContainmentSubKind::UrlPath)))
+            );
+            let histories: Vec<_> = (0..=cutoff.0)
+                .map(|cursor| FrozenGraph::of(&session.graph_at(Seq(cursor)).unwrap()))
+                .collect();
+            assert_eq!(histories[cutoff.index()], first);
+            assert_eq!(
+                histories[0]
+                    .graph
+                    .edges
+                    .iter()
+                    .filter_map(|edge| edge.semantic.as_ref())
+                    .map(|bucket| bucket.statements.len())
+                    .sum::<usize>(),
+                1,
+                "aggregate-only held baseline gains one frozen handle"
+            );
+            let resource_claims: Vec<_> = first
+                .graph
+                .resource_edges
+                .iter()
+                .filter_map(|edge| edge.semantic.as_ref())
+                .flat_map(|bucket| bucket.statements.iter())
+                .collect();
+            assert_eq!(resource_claims.len(), 1);
+            assert_eq!(
+                resource_claims[0].provenance_iri.as_deref(),
+                Some(person().asserter_iri().as_str())
+            );
+            let resource_handle = resource_claims[0].statement_id.clone();
+            let group_author = Author::person("group-author").via("legacy-editor");
+            assert!(
+                first
+                    .graph
+                    .edges
+                    .iter()
+                    .filter_map(|edge| edge.semantic.as_ref())
+                    .flat_map(|bucket| bucket.statements.iter())
+                    .any(|claim| claim.provenance_iri.as_deref()
+                        == Some(group_author.asserter_iri().as_str()))
+            );
+            for _ in 0..2 {
+                let reopened = GraphSession::open(store.clone(), id).await.unwrap();
+                assert_eq!(FrozenGraph::of(reopened.graph()), first);
+                for (cursor, expected) in histories.iter().enumerate() {
+                    assert_eq!(
+                        FrozenGraph::of(&reopened.graph_at(Seq(cursor as u64)).unwrap()),
+                        *expected
+                    );
+                }
+                assert_eq!(
+                    reopened.journal().entries()[..cutoff.index()],
+                    original_entries
+                );
+            }
+            session.undo(group_author.clone()).await.unwrap().unwrap();
+            assert_eq!(
+                session.graph().to_snapshot().resource_edges,
+                first.graph.resource_edges,
+                "undo held Surface control keeps migrated Resource claim"
+            );
+            session.redo(group_author).await.unwrap().unwrap();
+            assert_eq!(
+                FrozenGraph::of(session.graph()),
+                first,
+                "redo restores first Surface handles and facets"
+            );
+            session.undo(person()).await.unwrap().unwrap();
+            assert!(
+                session
+                    .graph()
+                    .to_snapshot()
+                    .resource_edges
+                    .iter()
+                    .all(|edge| edge.semantic.as_ref().is_none_or(|bucket| bucket
+                        .statements
+                        .iter()
+                        .all(|claim| claim.statement_id != resource_handle)))
+            );
+            assert_eq!(
+                session.graph().to_snapshot().edges,
+                first.graph.edges,
+                "resource undo keeps held Surface controls"
+            );
+            session.redo(person()).await.unwrap().unwrap();
+            assert_eq!(
+                FrozenGraph::of(session.graph()),
+                first,
+                "resource redo restores exact original handles/source/time"
+            );
+
+            let modern = Author::person("modern-author").via("modern-host");
+            let predicate = "urn:mere:receipt:modern-held";
+            session.edit_now(modern.clone(), |graph| {
+                graph
+                    .declare_predicate(predicate, kernel::graph::GraphStratum::Surface)
+                    .unwrap()
+            });
+            session.flush(wall_clock_now()).await.unwrap();
+            session
+                .apply(
+                    modern.clone(),
+                    vec![CapturedDelta::ReplayAssertSemanticPredicateByIds {
+                        from_id: Uuid::from_u128(1).to_string(),
+                        to_id: Uuid::from_u128(2).to_string(),
+                        predicate: predicate.into(),
+                    }],
+                )
+                .await
+                .unwrap();
+            session.edit_now(modern.clone(), |graph| {
+                graph
+                    .declare_predicate(predicate, kernel::graph::GraphStratum::Resource)
+                    .unwrap()
+            });
+            session.checkpoint().await.unwrap();
+            let final_graph = FrozenGraph::of(session.graph());
+            assert!(
+                final_graph
+                    .graph
+                    .edges
+                    .iter()
+                    .filter_map(|edge| edge.semantic.as_ref())
+                    .flat_map(|bucket| bucket.statements.iter())
+                    .any(|claim| claim.predicate == predicate
+                        && claim.provenance_iri.as_deref() == Some(modern.asserter_iri().as_str()))
+            );
+            assert!(
+                final_graph
+                    .graph
+                    .resource_edges
+                    .iter()
+                    .filter_map(|edge| edge.semantic.as_ref())
+                    .flat_map(|bucket| bucket.statements.iter())
+                    .all(|claim| claim.predicate != predicate),
+                "later Resource declaration does not migrate modern held claims"
+            );
+            assert_eq!(session.placement().unwrap().cutoff(), cutoff);
+            for _ in 0..2 {
+                let reopened = GraphSession::open_legacy(store.clone(), id, cutoff, vec![])
+                    .await
+                    .unwrap();
+                assert_eq!(FrozenGraph::of(reopened.graph()), final_graph);
+                assert_eq!(
+                    FrozenGraph::of(&reopened.graph_at(reopened.journal().live_cursor()).unwrap()),
+                    final_graph
+                );
+                assert_eq!(
+                    reopened.journal().entries()[..cutoff.index()],
+                    original_entries
+                );
+            }
+            store
+                .apply(&[pretty(
+                    keys.at(CHECKPOINT),
+                    &Checkpoint {
+                        cursor: session.journal().live_cursor(),
+                        translated_receipt_digest: None,
+                    },
+                )
+                .unwrap()])
+                .await
+                .unwrap();
+            assert_eq!(
+                FrozenGraph::of(GraphSession::open(store.clone(), id).await.unwrap().graph()),
+                final_graph,
+                "unqualified checkpoint falls back to the receipt, keeping first IDs"
+            );
+            assert_eq!(
+                store.get(&keys.at(BASELINE)).await.unwrap().unwrap(),
+                retained_baseline
+            );
+            for (index, expected) in retained_entries.iter().enumerate() {
+                assert_eq!(
+                    store
+                        .get(&muniment::journal::entry_key(
+                            &keys.at(JOURNAL),
+                            Seq(index as u64)
+                        ))
+                        .await
+                        .unwrap()
+                        .unwrap(),
+                    *expected
+                );
+            }
+        });
+    }
+
+    #[test]
+    fn legacy_translation_receipt_rejects_source_profile_and_receipt_damage_atomically() {
+        pollster::block_on(async {
+            let (store, id, cutoff) = legacy_receipt_fixture().await;
+            let mut session = GraphSession::open_legacy(store.clone(), id, cutoff, vec![])
+                .await
+                .unwrap();
+            let expected = FrozenGraph::of(session.graph());
+            let keys = Keys::new(id);
+            let checkpoint = store.get(&keys.at(GRAPH)).await.unwrap().unwrap();
+            let receipt = store.get(&keys.at(TRANSLATION)).await.unwrap().unwrap();
+            let baseline = store.get(&keys.at(BASELINE)).await.unwrap().unwrap();
+            let profile = store.get(&keys.at(PLACEMENT)).await.unwrap().unwrap();
+            let first_key = muniment::journal::entry_key(&keys.at(JOURNAL), Seq(0));
+            let first_entry = store.get(&first_key).await.unwrap().unwrap();
+            let mut changed_source = baseline.clone();
+            changed_source.push(b'\n');
+            let mut changed_entry: serde_json::Value =
+                serde_json::from_slice(&first_entry).unwrap();
+            changed_entry["entry"]["author"]["id"] = serde_json::json!("changed-author");
+            let mut changed_receipt: serde_json::Value = serde_json::from_slice(&receipt).unwrap();
+            changed_receipt["translation_digest"] = serde_json::json!("invalid");
+            let changed_profile = SessionPlacement::legacy(Seq(0), vec![]);
+            for (key, invalid, original) in [
+                (keys.at(BASELINE), changed_source, baseline),
+                (
+                    first_key,
+                    serde_json::to_vec(&changed_entry).unwrap(),
+                    first_entry,
+                ),
+                (
+                    keys.at(TRANSLATION),
+                    serde_json::to_vec(&changed_receipt).unwrap(),
+                    receipt.clone(),
+                ),
+                (
+                    keys.at(PLACEMENT),
+                    serde_json::to_vec(&changed_profile).unwrap(),
+                    profile,
+                ),
+            ] {
+                store
+                    .apply(&[WriteOp::Put {
+                        key: key.clone(),
+                        value: invalid.clone(),
+                    }])
+                    .await
+                    .unwrap();
+                assert!(matches!(
+                    GraphSession::open(store.clone(), id).await,
+                    Err(SessionError::Corrupt(_))
+                ));
+                assert_eq!(store.get(&key).await.unwrap().unwrap(), invalid);
+                assert_eq!(
+                    store.get(&keys.at(GRAPH)).await.unwrap().unwrap(),
+                    checkpoint,
+                    "failed load writes no checkpoint"
+                );
+                assert_eq!(
+                    FrozenGraph::of(session.graph()),
+                    expected,
+                    "existing live session stays intact"
+                );
+                store
+                    .apply(&[WriteOp::Put {
+                        key,
+                        value: original,
+                    }])
+                    .await
+                    .unwrap();
+                assert_eq!(
+                    FrozenGraph::of(GraphSession::open(store.clone(), id).await.unwrap().graph()),
+                    expected,
+                    "unchanged source positive control"
+                );
+            }
+            store.delete(&keys.at(TRANSLATION)).await.unwrap();
+            assert!(matches!(
+                GraphSession::open(store.clone(), id).await,
+                Err(SessionError::Corrupt(_))
+            ));
+            assert_eq!(
+                store.get(&keys.at(GRAPH)).await.unwrap().unwrap(),
+                checkpoint
+            );
+            store.put(&keys.at(TRANSLATION), &receipt).await.unwrap();
+            assert_eq!(
+                FrozenGraph::of(GraphSession::open(store.clone(), id).await.unwrap().graph()),
+                expected
+            );
+            assert!(
+                session
+                    .qualify_legacy(Seq(cutoff.0 + 1), vec![])
+                    .await
+                    .is_err()
+            );
+            assert_eq!(FrozenGraph::of(session.graph()), expected);
+            let mere = MereSessions::new(store.clone());
+            let mut undurable = mere.begin(person(), Some(Graph::new()));
+            assert!(undurable.qualify_legacy(Seq(0), vec![]).await.is_err());
+            assert!(
+                store
+                    .get(&undurable.keys.at(TRANSLATION))
+                    .await
+                    .unwrap()
+                    .is_none()
+            );
+        });
+    }
+
+    #[test]
+    fn translated_checkpoint_rejects_valid_truth_changes_before_admission() {
+        pollster::block_on(async {
+            async fn stored_values(store: &MemoryBackend) -> Vec<(String, Vec<u8>)> {
+                let mut keys = store.list("").await.unwrap();
+                keys.sort();
+                let mut values = Vec::new();
+                for key in keys {
+                    values.push((key.clone(), store.get(&key).await.unwrap().unwrap()));
+                }
+                values
+            }
+
+            let (store, id, cutoff) = legacy_receipt_fixture_with_addresses(true).await;
+            let session = GraphSession::open_legacy(store.clone(), id, cutoff, vec![])
+                .await
+                .unwrap();
+            let expected = FrozenGraph::of(session.graph());
+            let keys = Keys::new(id);
+            let checkpoint_bytes = store.get(&keys.at(GRAPH)).await.unwrap().unwrap();
+            let facet_bytes = store
+                .get(&keys.at(NODE_FACETS_FILE))
+                .await
+                .unwrap()
+                .unwrap();
+            let checkpoint: GraphSnapshot = serde_json::from_slice(&checkpoint_bytes).unwrap();
+            let facets: NodeFacetStore = serde_json::from_slice(&facet_bytes).unwrap();
+            let before = stored_values(&store).await;
+            let opened = GraphSession::open(store.clone(), id).await.unwrap();
+            assert_eq!(FrozenGraph::of(opened.graph()), expected);
+            assert_eq!(
+                FrozenGraph::of(&opened.graph_at(cutoff).unwrap()),
+                expected,
+                "unchanged qualified checkpoint agrees with receipt replay"
+            );
+            assert_eq!(stored_values(&store).await, before);
+
+            let mut changed_checkpoint = checkpoint.clone();
+            let claim = changed_checkpoint
+                .resource_edges
+                .iter_mut()
+                .filter_map(|edge| edge.semantic.as_mut())
+                .flat_map(|semantic| &mut semantic.statements)
+                .next()
+                .expect("fixture has a migrated resource claim");
+            let original_claim = claim.clone();
+            claim.label = Some("changed valid checkpoint label".into());
+            let changed_claim = claim.clone();
+            claim.label = original_claim.label.clone();
+            assert_eq!(
+                *claim, original_claim,
+                "IDs, source, time and predicate stay exact"
+            );
+            assert_eq!(
+                serde_json::to_value(&changed_checkpoint).unwrap(),
+                serde_json::to_value(&checkpoint).unwrap(),
+                "no endpoints or other checkpoint truth were changed"
+            );
+            changed_checkpoint
+                .resource_edges
+                .iter_mut()
+                .filter_map(|edge| edge.semantic.as_mut())
+                .flat_map(|semantic| &mut semantic.statements)
+                .next()
+                .unwrap()
+                .label = changed_claim.label;
+
+            let mut changed_facets = facets.clone();
+            changed_facets
+                .set(
+                    Uuid::from_u128(1),
+                    chartulary::FacetId::new("extension.checkpoint-note"),
+                    serde_json::json!({"foreign": "valid but not in retained history"}),
+                    &chartulary::AcceptAll,
+                )
+                .unwrap();
+            let changes = [
+                (
+                    keys.at(GRAPH),
+                    serde_json::to_vec(&changed_checkpoint).unwrap(),
+                    checkpoint_bytes,
+                    FrozenGraph {
+                        graph: changed_checkpoint,
+                        facets: facets.clone(),
+                    },
+                ),
+                (
+                    keys.at(NODE_FACETS_FILE),
+                    serde_json::to_vec(&changed_facets).unwrap(),
+                    facet_bytes,
+                    FrozenGraph {
+                        graph: checkpoint,
+                        facets: changed_facets,
+                    },
+                ),
+            ];
+            let mut refused = Vec::new();
+            for (key, changed, original, changed_truth) in changes {
+                let valid_changed = changed_truth.materialize().unwrap();
+                assert_ne!(FrozenGraph::of(&valid_changed), expected);
+                store.put(&key, &changed).await.unwrap();
+                let before_open = stored_values(&store).await;
+                refused.push(matches!(
+                    GraphSession::open(store.clone(), id).await,
+                    Err(SessionError::Corrupt(_))
+                ));
+                assert_eq!(
+                    stored_values(&store).await,
+                    before_open,
+                    "load writes nothing"
+                );
+                assert_eq!(FrozenGraph::of(session.graph()), expected);
+                store.put(&key, &original).await.unwrap();
+                let restored = GraphSession::open(store.clone(), id).await.unwrap();
+                assert_eq!(FrozenGraph::of(restored.graph()), expected);
+                assert_eq!(
+                    FrozenGraph::of(&restored.graph_at(cutoff).unwrap()),
+                    expected
+                );
+            }
+            assert_eq!(
+                refused,
+                vec![true, true],
+                "changed label and foreign facet refuse"
+            );
+        });
+    }
+
+    #[test]
+    fn legacy_translation_qualification_rejects_a_changed_open_source_before_writing() {
+        pollster::block_on(async {
+            let (store, id, cutoff) = legacy_receipt_fixture().await;
+            let mut session = GraphSession::open(store.clone(), id).await.unwrap();
+            let expected = FrozenGraph::of(session.graph());
+            let keys = Keys::new(id);
+            let original = store.get(&keys.at(BASELINE)).await.unwrap().unwrap();
+            let mut changed = original.clone();
+            changed.push(b'\n');
+            store.put(&keys.at(BASELINE), &changed).await.unwrap();
+            assert!(matches!(
+                session.qualify_legacy(cutoff, vec![]).await,
+                Err(SessionError::Corrupt(_))
+            ));
+            assert_eq!(FrozenGraph::of(session.graph()), expected);
+            assert!(store.get(&keys.at(TRANSLATION)).await.unwrap().is_none());
+            assert!(store.get(&keys.at(PLACEMENT)).await.unwrap().is_none());
+            assert_eq!(
+                store.get(&keys.at(BASELINE)).await.unwrap().unwrap(),
+                changed
+            );
+            store.put(&keys.at(BASELINE), &original).await.unwrap();
+            session.qualify_legacy(cutoff, vec![]).await.unwrap();
+            let qualified = FrozenGraph::of(session.graph());
+            assert_eq!(
+                FrozenGraph::of(GraphSession::open(store.clone(), id).await.unwrap().graph()),
+                qualified
+            );
+            assert_eq!(
+                store.get(&keys.at(BASELINE)).await.unwrap().unwrap(),
+                original
+            );
+        });
+    }
+
+    #[derive(Clone)]
+    struct QualificationBackend {
+        store: MemoryBackend,
+        before_commit: Option<WriteOp>,
+        transactional: bool,
+    }
+
+    #[cfg_attr(not(target_arch = "wasm32"), async_trait::async_trait)]
+    #[cfg_attr(target_arch = "wasm32", async_trait::async_trait(?Send))]
+    impl Backend for QualificationBackend {
+        async fn get(&self, key: &str) -> Result<Option<Vec<u8>>, StoreError> {
+            self.store.get(key).await
+        }
+        async fn put(&self, key: &str, bytes: &[u8]) -> Result<(), StoreError> {
+            self.store.put(key, bytes).await
+        }
+        async fn delete(&self, key: &str) -> Result<(), StoreError> {
+            self.store.delete(key).await
+        }
+        async fn list(&self, prefix: &str) -> Result<Vec<String>, StoreError> {
+            self.store.list(prefix).await
+        }
+        async fn scan(&self, start: &str, end: &str) -> Result<Vec<String>, StoreError> {
+            self.store.scan(start, end).await
+        }
+        async fn apply(&self, ops: &[WriteOp]) -> Result<(), StoreError> {
+            self.store.apply(ops).await
+        }
+        async fn transact(&self, transaction: muniment::TransactFn) -> Result<(), StoreError> {
+            if !self.transactional {
+                return Err(StoreError::NotTransactional);
+            }
+            if let Some(op) = &self.before_commit {
+                self.store.apply(std::slice::from_ref(op)).await?;
+            }
+            self.store.transact(transaction).await
+        }
+    }
+
+    #[test]
+    fn qualification_commit_refuses_raced_source_and_unsupported_backend_atomically() {
+        pollster::block_on(async {
+            let (store, id, cutoff) = legacy_receipt_fixture().await;
+            let keys = Keys::new(id);
+            let baseline = store.get(&keys.at(BASELINE)).await.unwrap().unwrap();
+            let checkpoint = store.get(&keys.at(GRAPH)).await.unwrap().unwrap();
+            let mut changed = baseline.clone();
+            changed.push(b'\n');
+            for transactional in [true, false] {
+                let backend = QualificationBackend {
+                    store: store.clone(),
+                    before_commit: Some(WriteOp::Put {
+                        key: keys.at(BASELINE),
+                        value: changed.clone(),
+                    }),
+                    transactional,
+                };
+                let mut session = GraphSession::open(backend, id).await.unwrap();
+                let live = FrozenGraph::of(session.graph());
+                let result = session.qualify_legacy(cutoff, vec![]).await;
+                if transactional {
+                    assert!(matches!(result, Err(SessionError::Corrupt(_))));
+                    assert_eq!(
+                        store.get(&keys.at(BASELINE)).await.unwrap().unwrap(),
+                        changed
+                    );
+                } else {
+                    assert!(matches!(
+                        result,
+                        Err(SessionError::Store(StoreError::NotTransactional))
+                    ));
+                    assert_eq!(
+                        store.get(&keys.at(BASELINE)).await.unwrap().unwrap(),
+                        baseline
+                    );
+                }
+                assert_eq!(FrozenGraph::of(session.graph()), live);
+                assert!(session.placement().is_none());
+                assert!(store.get(&keys.at(TRANSLATION)).await.unwrap().is_none());
+                assert!(store.get(&keys.at(PLACEMENT)).await.unwrap().is_none());
+                assert_eq!(
+                    store.get(&keys.at(GRAPH)).await.unwrap().unwrap(),
+                    checkpoint
+                );
+                store.put(&keys.at(BASELINE), &baseline).await.unwrap();
+            }
+            let qualified = GraphSession::open_legacy(store.clone(), id, cutoff, vec![])
+                .await
+                .unwrap();
+            assert!(qualified.placement().is_some());
+            assert_eq!(
+                FrozenGraph::of(qualified.graph()),
+                FrozenGraph::of(GraphSession::open(store, id).await.unwrap().graph())
+            );
+        });
+    }
+
+    #[test]
+    fn sealed_legacy_receipt_activation_history_undo_and_corruption_are_exact() {
+        pollster::block_on(async {
+            let (source, id, cutoff) = legacy_receipt_fixture_with_addresses(true).await;
+            let raw = MemoryBackend::new();
+            let epoch = crate::wallet_store::KeyEpochId(Uuid::from_bytes([7; 16]));
+            let sealed = crate::WalletSealedBackend::new(
+                raw.clone(),
+                crate::WalletEpochSealer::from_epoch(
+                    crate::PersonaId::new(),
+                    epoch,
+                    b"session secret",
+                ),
+            );
+            let mut ops = Vec::new();
+            for key in source.list("").await.unwrap() {
+                ops.push(WriteOp::Put {
+                    value: source.get(&key).await.unwrap().unwrap(),
+                    key,
+                });
+            }
+            sealed.apply(&ops).await.unwrap();
+            let keys = Keys::new(id);
+            let original_baseline = sealed.get(&keys.at(BASELINE)).await.unwrap().unwrap();
+            let original_entries = {
+                let mut entries = Vec::new();
+                for index in 0..cutoff.0 {
+                    let key = muniment::journal::entry_key(&keys.at(JOURNAL), Seq(index));
+                    entries.push((key.clone(), sealed.get(&key).await.unwrap().unwrap()));
+                }
+                entries
+            };
+            let mut session = GraphSession::open_legacy(sealed.clone(), id, cutoff, vec![])
+                .await
+                .unwrap();
+            let qualified = FrozenGraph::of(session.graph());
+            let histories: Vec<_> = (0..=cutoff.0)
+                .map(|cursor| FrozenGraph::of(&session.graph_at(Seq(cursor)).unwrap()))
+                .collect();
+            for _ in 0..2 {
+                let reopened = GraphSession::open(sealed.clone(), id).await.unwrap();
+                assert_eq!(FrozenGraph::of(reopened.graph()), qualified);
+                for (index, expected) in histories.iter().enumerate() {
+                    assert_eq!(
+                        FrozenGraph::of(&reopened.graph_at(Seq(index as u64)).unwrap()),
+                        *expected
+                    );
+                }
+                assert_eq!(reopened.journal().entries(), session.journal().entries());
+            }
+            assert!(session.undo(person()).await.unwrap().is_some());
+            assert_ne!(FrozenGraph::of(session.graph()), qualified);
+            assert!(session.redo(person()).await.unwrap().is_some());
+            assert_eq!(FrozenGraph::of(session.graph()), qualified);
+            session.flush(wall_clock_now()).await.unwrap();
+            session.checkpoint().await.unwrap();
+            assert_eq!(
+                FrozenGraph::of(
+                    GraphSession::open(sealed.clone(), id)
+                        .await
+                        .unwrap()
+                        .graph()
+                ),
+                qualified
+            );
+            // Without the checkpoint, the frozen receipt and retained Authors give the same graph.
+            sealed.delete(&keys.at(CHECKPOINT)).await.unwrap();
+            assert_eq!(
+                FrozenGraph::of(
+                    GraphSession::open(sealed.clone(), id)
+                        .await
+                        .unwrap()
+                        .graph()
+                ),
+                qualified
+            );
+            assert_eq!(
+                sealed.get(&keys.at(BASELINE)).await.unwrap().unwrap(),
+                original_baseline
+            );
+            for (key, value) in original_entries {
+                assert_eq!(sealed.get(&key).await.unwrap().unwrap(), value);
+            }
+            let receipt_key = keys.at(TRANSLATION);
+            let original_receipt = sealed.get(&receipt_key).await.unwrap().unwrap();
+            let mut corrupted: serde_json::Value =
+                serde_json::from_slice(&original_receipt).unwrap();
+            corrupted["translation_digest"] = serde_json::json!("damaged");
+            sealed
+                .put(&receipt_key, &serde_json::to_vec(&corrupted).unwrap())
+                .await
+                .unwrap();
+            let corrupted_ciphertext = raw.get(&receipt_key).await.unwrap().unwrap();
+            assert!(matches!(
+                GraphSession::open(sealed.clone(), id).await,
+                Err(SessionError::Corrupt(_))
+            ));
+            assert_eq!(
+                raw.get(&receipt_key).await.unwrap().unwrap(),
+                corrupted_ciphertext
+            );
+            assert_eq!(FrozenGraph::of(session.graph()), qualified);
+            sealed.put(&receipt_key, &original_receipt).await.unwrap();
+            assert_eq!(
+                FrozenGraph::of(
+                    GraphSession::open(sealed.clone(), id)
+                        .await
+                        .unwrap()
+                        .graph()
+                ),
+                qualified
+            );
+            let good_ciphertext = raw.get(&receipt_key).await.unwrap().unwrap();
+            raw.put(&receipt_key, b"unsealed receipt").await.unwrap();
+            assert!(GraphSession::open(sealed.clone(), id).await.is_err());
+            assert_eq!(
+                raw.get(&receipt_key).await.unwrap().unwrap(),
+                b"unsealed receipt"
+            );
+            raw.put(&receipt_key, &good_ciphertext).await.unwrap();
+            assert_eq!(
+                FrozenGraph::of(
+                    GraphSession::open(sealed.clone(), id)
+                        .await
+                        .unwrap()
+                        .graph()
+                ),
+                qualified
+            );
+            for key in raw.list("").await.unwrap() {
+                let ciphertext: serde_json::Value =
+                    serde_json::from_slice(&raw.get(&key).await.unwrap().unwrap()).unwrap();
+                assert_eq!(ciphertext["format"], "pandect-wallet-slot-v1");
+            }
+        });
+    }
+
+    #[test]
+    fn placement_is_explicit_and_recorded_sessions_keep_held_surface_claims() {
+        pollster::block_on(async {
+            let store = MemoryBackend::new();
+            let mere = MereSessions::new(store.clone());
+            let mut baseline =
+                kernel::graph::replay_captured_deltas([add(1), add(2), relate(1, 2)]);
+            let predicate = "urn:mere:profile-test:custom";
+            replay_captured_deltas_onto(
+                &mut baseline,
+                [CapturedDelta::ReplaySetEdgeSemanticPredicateByIds {
+                    from_id: Uuid::from_u128(1).to_string(),
+                    to_id: Uuid::from_u128(2).to_string(),
+                    predicate: Some(predicate.into()),
+                }],
+            );
+            baseline
+                .write_as(person(), |graph| {
+                    graph.declare_predicate(predicate, kernel::graph::GraphStratum::Resource)
+                })
+                .unwrap();
+            assert!(baseline.to_snapshot().resource_edges.is_empty());
+            let edges = baseline.to_snapshot().edges;
+            let mut unqualified = mere.begin(person(), Some(baseline.clone()));
+            assert_eq!(unqualified.placement(), None);
+            unqualified.flush(wall_clock_now()).await.unwrap();
+            let id = unqualified.id();
+            let opened = mere.open(id).await.unwrap();
+            assert_eq!(
+                opened.placement(),
+                None,
+                "columns never qualify an arbitrary baseline"
+            );
+            assert_eq!(opened.graph().to_snapshot().edges, edges);
+
+            let mut recorded = mere.begin_recorded(person(), Some(baseline));
+            assert_eq!(recorded.placement(), Some(&SessionPlacement::recorded()));
+            let pending = recorded.pending(wall_clock_now()).unwrap();
+            assert!(pending.ops().iter().any(
+                |op| matches!(op, WriteOp::Put { key, .. } if key.ends_with("/placement.json"))
+            ));
+            recorded.flush(wall_clock_now()).await.unwrap();
+            let recorded_id = recorded.id();
+            let opened = mere.open(recorded_id).await.unwrap();
+            assert_eq!(opened.placement(), Some(&SessionPlacement::recorded()));
+            assert_eq!(
+                opened.graph().to_snapshot().edges,
+                edges,
+                "recorded placement does not relocate held claims"
+            );
+            assert!(opened.graph().to_snapshot().resource_edges.is_empty());
+            assert_eq!(
+                opened.graph().predicate_declarations(predicate).unwrap(),
+                recorded.graph().predicate_declarations(predicate).unwrap()
+            );
+
+            let fresh = mere.begin(person(), None);
+            assert_eq!(fresh.placement(), Some(&SessionPlacement::recorded()));
+            let key = Keys::new(recorded_id).at(PLACEMENT);
+            for invalid in [
+                serde_json::json!({"baseline":"future-placement-v9", "legacy_journal_until":null}),
+                serde_json::json!({"baseline":"legacy-surface-v1", "legacy_journal_until":null}),
+                serde_json::json!({"baseline":"recorded-strata-v1", "legacy_journal_until":9}),
+                serde_json::json!({"baseline":"recorded-strata-v1", "origins":[{"statement_id":"unexpected", "from_resource_id":Uuid::nil(), "to_resource_id":Uuid::nil()}]}),
+            ] {
+                let bytes = serde_json::to_vec(&invalid).unwrap();
+                store
+                    .apply(&[WriteOp::Put {
+                        key: key.clone(),
+                        value: bytes.clone(),
+                    }])
+                    .await
+                    .unwrap();
+                assert!(matches!(
+                    mere.open(recorded_id).await,
+                    Err(SessionError::Corrupt(_))
+                ));
+                let slots = JsonSlots::new(store.clone());
+                assert_eq!(
+                    read::<_, serde_json::Value>(&slots, &key)
+                        .await
+                        .unwrap()
+                        .unwrap(),
+                    invalid
+                );
+                store
+                    .apply(&[pretty(key.clone(), &SessionPlacement::recorded()).unwrap()])
+                    .await
+                    .unwrap();
+                assert_eq!(
+                    mere.open(recorded_id)
+                        .await
+                        .unwrap()
+                        .graph()
+                        .to_snapshot()
+                        .edges,
+                    edges
+                );
+            }
+        });
+    }
 
     fn person() -> Author {
         Author::person("persona-a").via("turnstone")
@@ -1472,6 +3089,121 @@ mod tests {
             bytes.push((key.clone(), store.get(&key).await.unwrap().unwrap()));
         }
         bytes
+    }
+
+    #[test]
+    fn profiled_archive_retains_placement_and_redaction_omits_private_history() {
+        pollster::block_on(async {
+            use crate::graph_codicil::{
+                RedactionPolicy, load_profiled_graph_codicil_sealed,
+                save_profiled_graph_codicil_sealed,
+            };
+            let mut store = muniment::MemoryBackend::default();
+            let sessions = MereSessions::new(store.clone());
+            let graph = crate::graph_placement::placement_test_graph();
+            let mut snapshot = graph.to_snapshot();
+            let mut second = snapshot.edges[0].clone();
+            second.semantic.as_mut().unwrap().statements[0].statement_id =
+                "held-profile-second".into();
+            snapshot.edges.push(second);
+            let mut graph = Graph::try_from_recorded_snapshot(&snapshot).unwrap();
+            graph.overlay_facets(
+                crate::graph_placement::placement_test_graph()
+                    .facets()
+                    .clone(),
+            );
+            let mut live = sessions.begin_recorded(person(), Some(graph));
+            live.set_view_now(
+                person(),
+                ViewKey::new("graphshell", "private").unwrap(),
+                ViewIntent {
+                    focus: Some("private source history".into()),
+                    ..Default::default()
+                },
+            )
+            .unwrap();
+            let original = serde_json::to_value(live.graph().to_snapshot_at(0)).unwrap();
+            let input = live.profiled_codicil_payload();
+            assert_eq!(input.placement, Some(PlacementProfile::RecordedStrataV1));
+            assert!(!input.codicil.sessions.is_empty());
+            let id = crate::graph_codicil::save_profiled_session_codicil_checked(
+                &mut store,
+                input.clone(),
+                eidetic::Timestamp(42),
+                |candidate| {
+                    assert_eq!(
+                        serde_json::to_value(candidate.to_snapshot_at(0)).unwrap(),
+                        original
+                    );
+                    Ok(())
+                },
+            )
+            .await
+            .unwrap();
+            let retained = load_profiled_graph_codicil_sealed(&mut store, None, id)
+                .await
+                .unwrap()
+                .unwrap();
+            assert_eq!(
+                serde_json::to_value(&retained).unwrap(),
+                serde_json::to_value(&input).unwrap()
+            );
+            let opened = sessions
+                .open_codicil_from_checked(&mut store, id, person(), |candidate| {
+                    assert_eq!(
+                        serde_json::to_value(candidate.to_snapshot_at(0)).unwrap(),
+                        original
+                    );
+                    Ok(())
+                })
+                .await
+                .unwrap();
+            let reopened = sessions.open(opened.session_id).await.unwrap();
+            assert_eq!(
+                reopened.placement().unwrap().baseline,
+                PlacementProfile::RecordedStrataV1
+            );
+            assert_eq!(
+                serde_json::to_value(reopened.graph().to_snapshot_at(0)).unwrap(),
+                original
+            );
+            assert!(reopened.manifest().codicil_read_only);
+            let composed = crate::graph_codicil::compose_graph_codicils_checked(
+                &mut store,
+                &[id, id],
+                eidetic::Timestamp(43),
+                |_| Ok(()),
+            )
+            .await
+            .unwrap()
+            .unwrap();
+            let composed = load_profiled_graph_codicil_sealed(&mut store, None, composed)
+                .await
+                .unwrap()
+                .unwrap();
+            assert_eq!(composed.placement, Some(PlacementProfile::RecordedStrataV1));
+            assert_eq!(
+                serde_json::to_value(composed.into_graph().unwrap().to_snapshot_at(0)).unwrap(),
+                original
+            );
+            let redacted = save_profiled_graph_codicil_sealed(
+                &mut store,
+                None,
+                input,
+                RedactionPolicy::default(),
+                eidetic::Timestamp(43),
+            )
+            .await
+            .unwrap();
+            let redacted = load_profiled_graph_codicil_sealed(&mut store, None, redacted)
+                .await
+                .unwrap()
+                .unwrap();
+            assert!(
+                redacted.codicil.sessions.is_empty(),
+                "private histories do not bypass redaction"
+            );
+        });
     }
 
     #[test]
@@ -1853,7 +3585,6 @@ mod tests {
                     "person persona-a via turnstone",
                     "person persona-a via knot-editor",
                     "person persona-a via knot-editor",
-                    "person persona-a via knot-editor",
                 ]
             );
             let kinds: Vec<&ChangeKind> = session.changes().iter().map(|c| &c.kind).collect();
@@ -1869,17 +3600,119 @@ mod tests {
             let session_dir = dir.path().join("sessions").join(id.as_uuid().to_string());
             assert!(session_dir.join("manifest.json").is_file());
             let journal = std::fs::read_to_string(session_dir.join("journal.jsonl")).unwrap();
-            assert_eq!(journal.lines().count(), 7);
+            assert_eq!(journal.lines().count(), 6);
 
             let store = DirectoryBackend::open(dir.path()).unwrap();
             let reopened = GraphSession::open(store, id).await.unwrap();
             assert_eq!(fingerprint(reopened.graph()), live);
-            assert_eq!(reopened.journal().len(), 7);
+            assert_eq!(reopened.journal().len(), 6);
             assert_eq!(reopened.changes().len(), 3);
             assert_eq!(
                 reopened.manifest().display_name.as_deref(),
                 Some("readings")
             );
+        });
+    }
+
+    #[test]
+    fn checked_snapshot_session_load_reports_baseline_and_checkpoint_corruption() {
+        use kernel::persistence::{PersistedResourceFacet, PersistedResourceRecord};
+
+        pollster::block_on(async {
+            let store = MemoryBackend::new();
+            let mere = MereSessions::new(store.clone());
+            let id = mere.mint(person(), None).await.unwrap().session_id;
+            let keys = Keys::new(id);
+            let graph = kernel::graph::replay_captured_deltas([add(1)]);
+            let mut valid = graph.to_snapshot();
+            valid.resources.push(PersistedResourceRecord {
+                canonical_iri: "urn:mere:test:checked-session".into(),
+                facets: vec![PersistedResourceFacet {
+                    facet: "foreign.metadata".into(),
+                    value_json: "true".into(),
+                }],
+            });
+            let baseline = |snapshot: GraphSnapshot| Baseline {
+                graph: snapshot,
+                facets: NodeFacetStore::default(),
+            };
+            for column in [BASELINE, GRAPH] {
+                for conflict in [false, true] {
+                    store
+                        .apply(&[
+                            pretty(keys.at(BASELINE), &baseline(valid.clone())).unwrap(),
+                            pretty(keys.at(GRAPH), &valid).unwrap(),
+                            pretty(
+                                keys.at(CHECKPOINT),
+                                &Checkpoint {
+                                    cursor: Seq(0),
+                                    translated_receipt_digest: None,
+                                },
+                            )
+                            .unwrap(),
+                        ])
+                        .await
+                        .unwrap();
+                    let opened = GraphSession::open(store.clone(), id).await.unwrap();
+                    assert_eq!(opened.graph().to_snapshot().resources, valid.resources);
+                    assert_eq!(opened.graph().node_count(), 1);
+                    let mut invalid = valid.clone();
+                    if conflict {
+                        let mut record = invalid.resources[0].clone();
+                        record.facets[0].value_json = "false".into();
+                        invalid.resources.push(record);
+                    } else {
+                        invalid.resources[0].facets[0].value_json = "{".into();
+                    }
+                    let op = if column == BASELINE {
+                        pretty(keys.at(column), &baseline(invalid.clone())).unwrap()
+                    } else {
+                        pretty(keys.at(column), &invalid).unwrap()
+                    };
+                    store.apply(&[op.clone()]).await.unwrap();
+                    match GraphSession::open(store.clone(), id).await {
+                        Err(SessionError::Corrupt(error)) => {
+                            assert!(error.contains(&keys.at(column)));
+                            assert!(error.contains(if conflict {
+                                "conflicts"
+                            } else {
+                                "invalid JSON"
+                            }));
+                        },
+                        Err(error) => panic!("unexpected load error: {error}"),
+                        Ok(_) => panic!("invalid resource snapshot was loaded"),
+                    }
+                    let slots = JsonSlots::new(store.clone());
+                    let held = if column == BASELINE {
+                        read::<_, Baseline>(&slots, &keys.at(column))
+                            .await
+                            .unwrap()
+                            .unwrap()
+                            .graph
+                    } else {
+                        read::<_, GraphSnapshot>(&slots, &keys.at(column))
+                            .await
+                            .unwrap()
+                            .unwrap()
+                    };
+                    assert_eq!(held.resources, invalid.resources);
+                }
+            }
+            let mut legacy = serde_json::to_value(&valid).unwrap();
+            for column in ["resources", "resource_edges", "shown_resources"] {
+                legacy.as_object_mut().unwrap().remove(column);
+            }
+            let legacy: GraphSnapshot = serde_json::from_value(legacy).unwrap();
+            store
+                .apply(&[
+                    pretty(keys.at(BASELINE), &baseline(legacy.clone())).unwrap(),
+                    pretty(keys.at(GRAPH), &legacy).unwrap(),
+                ])
+                .await
+                .unwrap();
+            let opened = GraphSession::open(store, id).await.unwrap();
+            assert_eq!(opened.graph().node_count(), 1);
+            assert!(opened.graph().to_snapshot().resources.is_empty());
         });
     }
 
@@ -1914,6 +3747,150 @@ mod tests {
             assert_eq!(whole(reopened.graph()), live, "checkpoint plus tail");
             let replayed = reopened.graph_at(reopened.journal().live_cursor()).unwrap();
             assert_eq!(whole(&replayed), live, "baseline plus whole journal");
+        });
+    }
+
+    #[test]
+    fn legacy_exact_assertions_keep_minting_authors_across_checkpointed_withdrawals() {
+        pollster::block_on(async {
+            let store = MemoryBackend::new();
+            let mere = MereSessions::new(store.clone());
+            let id = mere.mint(person(), None).await.unwrap().session_id;
+            let mut session = mere.open(id).await.unwrap();
+            // This fixture models the old Surface capture grammar explicitly.
+            let mut template =
+                kernel::graph::replay_captured_deltas([add(1), add(2), relate(1, 2)]);
+            assert!(template.to_snapshot().resource_edges.is_empty());
+            let mut baseline_edges = template.to_snapshot().edges;
+            assert_eq!(baseline_edges.len(), 1);
+            let statements = &mut baseline_edges[0].semantic.as_mut().unwrap().statements;
+            statements[0].statement_id = "baseline-source".into();
+            statements[0].provenance_iri = Some("https://source.test/page".into());
+            statements[0].asserted_at_ms = Some(100);
+            let mut unknown = statements[0].clone();
+            unknown.statement_id = "baseline-unknown".into();
+            unknown.provenance_iri = None;
+            statements.push(unknown.clone());
+            let exact = |edges| CapturedDelta::ReplaySetEdgesByIds {
+                from_id: Uuid::from_u128(1).to_string(),
+                to_id: Uuid::from_u128(2).to_string(),
+                edges,
+            };
+            replay_captured_deltas_onto(&mut template, [exact(baseline_edges.clone())]);
+            session.baseline = template;
+            session.write_baseline = true;
+            session.head_stored = false;
+            let restorer = Author::person("persona-b").via("knot-editor");
+            let mut minted_edges = baseline_edges.clone();
+            unknown.statement_id = "journal-minted".into();
+            minted_edges[0]
+                .semantic
+                .as_mut()
+                .unwrap()
+                .statements
+                .push(unknown);
+            session
+                .journal
+                .record_as(person(), exact(minted_edges.clone()));
+            session.graph = session.baseline.clone();
+            replay_captured_deltas_onto(&mut session.graph, [exact(minted_edges.clone())]);
+            session
+                .store(SystemTime::now(), Vec::new(), true)
+                .await
+                .unwrap();
+            let old_checkpoint = GraphSession::open(store.clone(), id).await.unwrap();
+            let old_checkpoint_snapshot = old_checkpoint.graph().to_snapshot();
+            let old_statements = &old_checkpoint_snapshot.edges[0]
+                .semantic
+                .as_ref()
+                .unwrap()
+                .statements;
+            let old_source_of = |id: &str| {
+                old_statements
+                    .iter()
+                    .find(|s| s.statement_id == id)
+                    .unwrap()
+                    .provenance_iri
+                    .as_deref()
+                    .unwrap()
+            };
+            assert_eq!(
+                old_source_of("baseline-source"),
+                "https://source.test/page",
+                "legacy checkpoint explicit-source control"
+            );
+            assert_eq!(
+                old_source_of("baseline-unknown"),
+                kernel::graph::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI,
+                "legacy checkpoint baseline control"
+            );
+            assert_eq!(
+                old_source_of("journal-minted"),
+                person().asserter_iri(),
+                "an empty tail still repairs legacy checkpoint attribution"
+            );
+            assert_eq!(
+                whole(old_checkpoint.graph()),
+                whole(&old_checkpoint.graph_at(Seq(1)).unwrap())
+            );
+            drop(old_checkpoint);
+            session
+                .journal
+                .record_as(restorer.clone(), exact(baseline_edges));
+            session.graph = session
+                .journal
+                .snapshot_at_from(&session.baseline, Seq(2))
+                .unwrap();
+            session
+                .store(SystemTime::now(), Vec::new(), true)
+                .await
+                .unwrap();
+            session
+                .journal
+                .record_as(restorer.clone(), exact(minted_edges));
+            session.graph = session
+                .journal
+                .snapshot_at_from(&session.baseline, Seq(3))
+                .unwrap();
+            session.flush(SystemTime::now()).await.unwrap();
+            drop(session);
+
+            let reopened = GraphSession::open(store, id).await.unwrap();
+            let full = reopened.graph_at(Seq(3)).unwrap();
+            assert_eq!(
+                whole(reopened.graph()),
+                whole(&full),
+                "checkpoint plus tail equals full replay"
+            );
+            let edges = full.to_snapshot().edges;
+            let statements = &edges[0].semantic.as_ref().unwrap().statements;
+            let source_of = |id: &str| {
+                statements
+                    .iter()
+                    .find(|s| s.statement_id == id)
+                    .unwrap()
+                    .provenance_iri
+                    .as_deref()
+                    .unwrap()
+            };
+            assert_eq!(
+                source_of("baseline-source"),
+                "https://source.test/page",
+                "explicit-source control"
+            );
+            assert_eq!(
+                source_of("baseline-unknown"),
+                kernel::graph::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI,
+                "baseline control"
+            );
+            assert_eq!(
+                source_of("journal-minted"),
+                person().asserter_iri(),
+                "restoration keeps the minting Author"
+            );
+            assert_ne!(source_of("journal-minted"), restorer.asserter_iri());
+            assert_eq!(statements.len(), 3);
+            assert!(statements.iter().all(|s| s.asserted_at_ms == Some(100)));
         });
     }
 
@@ -2436,8 +4413,260 @@ mod tests {
                 )
                 .await
                 .unwrap();
-            assert_eq!(result.end, Seq(3));
+            assert_eq!(result.first, Seq(4));
+            assert_eq!(result.end, Seq(5));
             assert_eq!(session.graph().get_node(key).unwrap().title, "Seven");
+            let resource_id = kernel::graph::ResourceNode::new("https://seven.test/").id();
+            assert_eq!(session.graph().shown_resource_id(key), Some(resource_id));
+            let [added, visit, resource, shown, title] = session.journal().entries() else {
+                panic!("expected surface, visit, resource, shown binding and title");
+            };
+            let surface_id = Uuid::from_u128(7).to_string();
+            let resource_id_text = resource_id.to_string();
+            assert!(
+                matches!(&added.delta, CapturedDelta::ReplayAddNodeWithIdIfMissing {
+                id, url, ..
+            } if id == &surface_id && url == "https://seven.test/")
+            );
+            assert!(
+                matches!(&visit.delta, CapturedDelta::ReplayTouchNodeLastVisitedById {
+                node_id, ..
+            } if node_id == &surface_id)
+            );
+            assert!(
+                matches!(&resource.delta, CapturedDelta::ReplaySetResourceRecordById {
+                resource_id, record: Some(record)
+            } if resource_id == &resource_id_text
+                && record.canonical_iri == "https://seven.test")
+            );
+            assert!(
+                matches!(&shown.delta, CapturedDelta::ReplaySetShownResourceById {
+                surface_id: captured_surface, resource_id: Some(captured_resource)
+            } if captured_surface == &surface_id && captured_resource == &resource_id_text)
+            );
+            assert!(
+                matches!(&title.delta, CapturedDelta::ReplaySetNodeTitleById {
+                node_id, title
+            } if node_id == &surface_id && title == "Seven")
+            );
+            assert!(
+                session
+                    .journal()
+                    .entries()
+                    .iter()
+                    .all(|entry| entry.author == person())
+            );
+            drop(session);
+            let reopened = mere.open(id).await.unwrap();
+            let (key, node) = reopened.graph().get_node_by_id(Uuid::from_u128(7)).unwrap();
+            assert_eq!(node.title, "Seven");
+            assert_eq!(reopened.graph().shown_resource_id(key), Some(resource_id));
+        });
+    }
+    #[test]
+    fn assertion_author_version_and_source_survive_session_replay() {
+        use kernel::graph::{SemanticStatementSpec, SemanticSubKind, predicate_iri};
+        pollster::block_on(async {
+            let mere = MereSessions::new(MemoryBackend::default());
+            let manifest = mere.mint(person(), None).await.unwrap();
+            let mut session = mere.open(manifest.session_id).await.unwrap();
+            session.apply(person(), vec![add(1), add(2)]).await.unwrap();
+            let claim = |graph: &mut Graph, time, source: Option<&str>| {
+                let from = graph.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
+                let to = graph.get_node_key_by_id(Uuid::from_u128(2)).unwrap();
+                graph
+                    .assert_semantic_statement(
+                        from,
+                        to,
+                        SemanticStatementSpec {
+                            predicate: predicate_iri(SemanticSubKind::Cites).into(),
+                            recognized_sub_kind: Some(SemanticSubKind::Cites),
+                            provenance_iri: source.map(str::to_owned),
+                            asserted_at_ms: Some(time),
+                            ..Default::default()
+                        },
+                    )
+                    .unwrap()
+                    .1
+                    .statement_id
+            };
+            let (first, _) = session
+                .edit_now(Author::engine("extractor", "1"), |graph| {
+                    claim(graph, 10, None)
+                })
+                .unwrap();
+            let (second, _) = session
+                .edit_now(Author::engine("extractor", "2"), |graph| {
+                    claim(graph, 20, None)
+                })
+                .unwrap();
+            assert_eq!(
+                first, second,
+                "new engine version updates its own assertion"
+            );
+            session
+                .edit_now(Author::engine("extractor", "2"), |graph| {
+                    claim(graph, 30, Some("https://page.test/"))
+                })
+                .unwrap();
+            let graph = session.graph();
+            let from = graph.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
+            let to = graph.get_node_key_by_id(Uuid::from_u128(2)).unwrap();
+            assert!(
+                graph.find_edge_key(from, to).is_none(),
+                "live content has no duplicate Surface authority"
+            );
+            let resource_key = graph
+                .find_resource_edge_key(
+                    graph.shown_resource_id(from).unwrap(),
+                    graph.shown_resource_id(to).unwrap(),
+                )
+                .unwrap();
+            let statements = graph
+                .get_resource_edge(resource_key)
+                .unwrap()
+                .semantic_statements();
+            assert_eq!(statements.len(), 2);
+            assert_eq!(
+                statements[0].provenance_iri,
+                Some(Author::engine("extractor", "1").asserter_iri())
+            );
+            assert_eq!(statements[0].asserted_at_ms, Some(20));
+            assert_eq!(
+                statements[1].provenance_iri.as_deref(),
+                Some("https://page.test/")
+            );
+            let live = whole(graph);
+            let replayed = session.graph_at(session.journal().live_cursor()).unwrap();
+            assert_eq!(whole(&replayed), live);
+        });
+    }
+    #[test]
+    fn replayed_session_handles_are_checked_before_open_and_historical_publication() {
+        pollster::block_on(async {
+            let store = MemoryBackend::new();
+            let mere = MereSessions::new(store.clone());
+            let mut baseline = kernel::graph::replay_captured_deltas([add(1), add(2)]);
+            let surface = baseline.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
+            let mut property =
+                kernel::types::NodeProperty::new("urn:replay:literal".into(), "held".into());
+            property.statement_id = "shared replay handle".into();
+            assert!(baseline.append_node_properties(surface, vec![property]));
+            let held = baseline.node_properties(surface).unwrap()[0].clone();
+            assert!(
+                baseline
+                    .validate_active_resource_assertion_handles()
+                    .is_ok()
+            );
+            let baseline_truth = whole(&baseline);
+            let mut session = mere.begin_recorded(person(), Some(baseline.clone()));
+            let id = session.manifest().session_id;
+            session.flush(wall_clock_now()).await.unwrap();
+            let opened = mere.open(id).await.unwrap();
+            assert_eq!(whole(opened.graph()), baseline_truth);
+            let facet = |property| CapturedDelta::ReplaySetNodeFacetById {
+                node_id: Uuid::from_u128(2).to_string(),
+                facet: kernel::graph::node_facets::SEMANTIC_PROPERTIES.into(),
+                value_json: serde_json::to_string(&vec![property]).unwrap(),
+            };
+            let mut distinct = held.clone();
+            distinct.statement_id = "distinct replay handle".into();
+            session.journal.record_as(person(), facet(distinct.clone()));
+            session.flush(wall_clock_now()).await.unwrap();
+            let mut valid = mere.open(id).await.unwrap();
+            assert_eq!(
+                valid
+                    .graph()
+                    .legacy_node_properties(
+                        valid
+                            .graph()
+                            .get_node_key_by_id(Uuid::from_u128(2))
+                            .unwrap()
+                    )
+                    .unwrap(),
+                vec![distinct]
+            );
+            valid.checkpoint().await.unwrap();
+            assert!(session.graph_at(Seq(1)).is_some());
+            session.journal.record_as(person(), facet(held));
+            session.flush(wall_clock_now()).await.unwrap();
+            assert!(session.graph_at(Seq(0)).is_some());
+            assert!(session.graph_at(Seq(1)).is_some());
+            assert!(
+                session.graph_at(Seq(2)).is_none(),
+                "historical read refuses the colliding replay result"
+            );
+            assert_eq!(
+                whole(session.graph()),
+                baseline_truth,
+                "failed publication does not mutate the live graph"
+            );
+            let retained =
+                load_retained_source(&session.slots, &session.keys, &session.manifest, true)
+                    .await
+                    .unwrap()
+                    .2;
+            match mere.open(id).await {
+                Err(SessionError::Corrupt(error)) => {
+                    assert!(error.contains(&session.keys.at(JOURNAL)));
+                    assert!(error.contains("shared replay handle"));
+                },
+                Err(error) => panic!("unexpected error: {error}"),
+                Ok(_) => panic!("colliding journal replay was published"),
+            }
+            let after =
+                load_retained_source(&session.slots, &session.keys, &session.manifest, true)
+                    .await
+                    .unwrap()
+                    .2;
+            assert_eq!(after.baseline, retained.baseline);
+            assert_eq!(after.entries, retained.entries);
+            let receipt = LegacyTranslationReceipt::new(
+                "historical control".into(),
+                SessionPlacement::legacy(Seq(0), vec![]),
+                FrozenGraph::of(&baseline),
+                vec![],
+                FrozenGraph::of(&baseline),
+            )
+            .unwrap();
+            assert!(
+                receipt
+                    .graph_at(session.journal.entries(), Seq(1))
+                    .unwrap()
+                    .is_some()
+            );
+            assert!(receipt.graph_at(session.journal.entries(), Seq(2)).is_err());
+            session.translation = Some(receipt);
+            assert!(session.graph_at(Seq(1)).is_some());
+            assert!(
+                session.graph_at(Seq(2)).is_none(),
+                "translated session historical read also refuses collision"
+            );
+
+            let mut legacy = mere.begin(
+                person(),
+                Some(kernel::graph::replay_captured_deltas([add(1), add(2)])),
+            );
+            let mut legacy_property =
+                kernel::types::NodeProperty::new("urn:legacy:literal".into(), "held".into());
+            legacy_property.statement_id = "shared replay handle".into();
+            for node_id in [1, 2] {
+                legacy.journal.record_as(
+                    person(),
+                    CapturedDelta::ReplaySetNodeFacetById {
+                        node_id: Uuid::from_u128(node_id).to_string(),
+                        facet: kernel::graph::node_facets::SEMANTIC_PROPERTIES.into(),
+                        value_json: serde_json::to_string(&vec![legacy_property.clone()]).unwrap(),
+                    },
+                );
+            }
+            legacy.flush(wall_clock_now()).await.unwrap();
+            let legacy = mere.open(legacy.manifest().session_id).await.unwrap();
+            assert!(legacy.graph().to_snapshot().resources.is_empty());
+            assert!(
+                legacy.graph_at(Seq(2)).is_some(),
+                "Surface-only legacy handles retain their permissive grammar"
+            );
         });
     }
 }
