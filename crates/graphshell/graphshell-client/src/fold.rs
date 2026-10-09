@@ -40,11 +40,9 @@ pub struct FoldReading {
 }
 
 impl FoldReading {
-    fn of(tables: &SceneTables, fold: FoldId, value: &Fold) -> Self {
-        let summary_at = match value.stand_in {
-            StandIn::Member(_) => None,
-            StandIn::Summary { .. } => centroid(tables, &value.members),
-        };
+    /// Read one fold fact. `summary_at` stays `None`: placing a summary needs
+    /// the scene's geometry, which [`read_folds`] supplies.
+    pub fn new(fold: FoldId, value: &Fold) -> Self {
         Self {
             fold,
             stand_in: value.stand_in_member(),
@@ -56,8 +54,16 @@ impl FoldReading {
             hidden: value.hidden().collect(),
             rule: value.rule.clone(),
             boundary: value.boundary.clone(),
-            summary_at,
+            summary_at: None,
         }
+    }
+
+    fn of(tables: &SceneTables, fold: FoldId, value: &Fold) -> Self {
+        let mut reading = Self::new(fold, value);
+        if reading.stand_in.is_none() {
+            reading.summary_at = centroid(tables, &value.members);
+        }
+        reading
     }
 
     /// The count the stand-in carries, as drawn: `+N`.
