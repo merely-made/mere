@@ -699,6 +699,7 @@ pub fn subgraph_kind_label(kind: Option<&SubgraphKind>) -> String {
         Some(SubgraphKind::Session) => "Session".to_string(),
         Some(SubgraphKind::Bridge) => "Bridge".to_string(),
         Some(SubgraphKind::WorkbenchCorrespondence) => "Workbench".to_string(),
+        Some(SubgraphKind::Sparql { .. }) => "Saved query".to_string(),
         None => "Subgraph".to_string(),
     }
 }
@@ -759,6 +760,19 @@ pub fn member_labels(graph: &Graph, members: &[GraphMemberId]) -> Vec<String> {
             graph
                 .get_node_by_id(*member)
                 .map(|(key, _)| graph.node_display_label(key))
+                .or_else(|| {
+                    graph.resource(*member).map(|resource| {
+                        graph
+                            .surface_ids_showing_resource(*member)
+                            .into_iter()
+                            .find_map(|id| {
+                                graph
+                                    .get_node_by_id(id)
+                                    .map(|(key, _)| graph.node_display_label(key))
+                            })
+                            .unwrap_or_else(|| resource.canonical_iri().to_string())
+                    })
+                })
                 .unwrap_or_else(|| short_id(*member))
         })
         .collect()
@@ -1291,5 +1305,42 @@ mod tests {
         assert_eq!(card.selectors_label, "semantic");
         assert!(card.drift_tracking);
         assert_eq!(card.drift_summary, "drift proposal: +1 -1");
+    }
+}
+
+#[cfg(test)]
+mod resource_member_label_tests {
+    use super::*;
+    use kernel::graph::apply::{GraphDelta, add_node, apply_graph_delta};
+    #[test]
+    fn resource_roster_members_keep_surface_labels_and_unshown_canonical_addresses() {
+        let mut graph = Graph::new();
+        let surface = add_node(
+            &mut graph,
+            None,
+            "https://example.test/member".into(),
+            Default::default(),
+        );
+        apply_graph_delta(
+            &mut graph,
+            GraphDelta::SetNodeTitle {
+                key: surface,
+                title: "Readable member".into(),
+            },
+        );
+        let resource = graph.shown_resource_id(surface).unwrap();
+        assert_eq!(member_labels(&graph, &[resource]), vec!["Readable member"]);
+        assert_eq!(
+            member_labels(&graph, &[graph.get_node(surface).unwrap().id]),
+            vec!["Readable member"]
+        );
+        let owner = graph
+            .freeze_resource_selection(serde_json::json!({}), vec![resource])
+            .unwrap();
+        assert!(graph.surface_ids_showing_resource(owner).is_empty());
+        assert_eq!(
+            member_labels(&graph, &[owner]),
+            vec![graph.resource(owner).unwrap().canonical_iri()]
+        );
     }
 }

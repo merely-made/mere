@@ -132,7 +132,9 @@ fn rank(kind: SubgraphKind, fit: f32, label: String) -> ShapeRank {
 
 /// A stable string tag for a shape kind, carried on the swatch chip strip's DOM
 /// (`data-shape-kind`) so a chip click can name the shape to crystallize as. The inverse is
-/// [`shape_kind_from_tag`]. (Swatch primitive — P3, chip-click crystallize.)
+/// [`shape_kind_from_tag`] for the nine shapes. Saved queries have a display
+/// tag only; their query text and member column remain in the full spec.
+/// (Swatch primitive — P3, chip-click crystallize.)
 pub fn shape_kind_tag(kind: &SubgraphKind) -> String {
     match kind {
         SubgraphKind::Ego { radius } => format!("ego:{radius}"),
@@ -144,6 +146,7 @@ pub fn shape_kind_tag(kind: &SubgraphKind) -> String {
         SubgraphKind::Session => "session".into(),
         SubgraphKind::Bridge => "bridge".into(),
         SubgraphKind::WorkbenchCorrespondence => "workbench-correspondence".into(),
+        SubgraphKind::Sparql { .. } => "sparql".into(),
     }
 }
 
