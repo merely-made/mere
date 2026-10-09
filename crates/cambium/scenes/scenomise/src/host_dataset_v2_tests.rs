@@ -354,10 +354,20 @@ fn refuses_empty_repeated_or_undeclared_compared_fields() {
 
 #[test]
 fn refuses_oversized_and_malformed_histories() {
-    let large = " ".repeat(MAX_HOST_DATASET_BYTES + 1);
+    let large = " ".repeat(MAX_HOST_HISTORY_BYTES + 1);
     assert!(matches!(
         parse_host_history(&large),
-        Err(HostDatasetError::TooLarge { .. })
+        Err(HostDatasetError::TooLarge { limit, .. }) if limit == MAX_HOST_HISTORY_BYTES
+    ));
+    // Past one dataset's limit but within a history's, the input reaches
+    // the parser; a v1 envelope that large is still refused by v1's limit.
+    let padded_v1 = format!(
+        "{{\"schema\":\"{HOST_DATASET_SCHEMA_V1}\"{}}}",
+        " ".repeat(MAX_HOST_DATASET_BYTES)
+    );
+    assert!(matches!(
+        parse_host_history(&padded_v1),
+        Err(HostDatasetError::TooLarge { limit, .. }) if limit == MAX_HOST_DATASET_BYTES
     ));
     assert!(matches!(
         parse_host_history("{"),
