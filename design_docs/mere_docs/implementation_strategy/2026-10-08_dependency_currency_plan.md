@@ -62,6 +62,8 @@ A family moves together because its crates pin each other.
 
 **D12, landing netrender's lane (2026-10-08).** Question: sha2 0.11 (receipt hashes byte-identical) and the compatible updates reach neither consumer (sha2 is a dev-dependency; genet and mere already resolve every target version), so no repin follows. Options: push to netrender main once aligned; hold for genet's stage. Mark: **"Push after aligning (Recommended)"**.
 
+**D13, when genet's stage opens (2026-10-08).** Question: with netrender landed (D12) and a lane slot free beside the mere lanes, genet's stage (accessibility, the small ones and compatible updates, the Servo parsers by D10) runs in genet's own repo and does not touch mere's lock. Options: open it now; wait for G4b1 to land, keeping the machine calm for its headed re-gate and rapier's receipts; spend the slot scoping G2c instead. Mark: **"Open genet's stage now (Recommended)"**. *Follows:* an Opus lane on its own genet worktree from `origin/main` (`cca45fc7a5c`), never genet's main checkout, which holds another session's uncommitted work. It carries D4, D8 and D10 and F138's gate rule, and stops at any fork or any WPT or DOM number that moves. Adopting the resulting genet into mere goes to Mark as its own question.
+
 ## 4. Order
 
 Upstream first (D6): netrender (sha2 and its compatible updates; its text family is the Vello lane's, D8), then genet (accessibility, the small ones, the Servo parsers (D10); its text family is the Vello lane's), then mere's own groups (security-sensitive, accessibility, data and Meaning, other), one mere lane at a time, each taking the genet and netrender repins as they land. Constraints:
@@ -78,3 +80,4 @@ Upstream first (D6): netrender (sha2 and its compatible updates; its text family
 ## Progress
 
 - 2026-10-08: surveyed (§1). rapier and parry moving on `rapier-036` with the compatible updates folded in (D2).
+- 2026-10-08: netrender landed at `99d8d71ec` (D11, D12). genet's stage opened (D13).
