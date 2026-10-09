@@ -1985,3 +1985,12 @@ dynamics grammar plan's F183).
 - **Checkpoint E's Windows legs** ran a binary of unproven provenance.
   Their events matched L3's code, and rerunning them with an isolated
   build waits for Mark's hands.
+  - *Rerun 2026-10-09 (Mark: "let's do it now"),* with djinn built in
+    that worktree's own directory and the same two residents.
+  - `Win+L` locked A at 00:27:12.881, reason `session-lock`, with its
+    marker; B stayed open.
+  - Lid closed with no `Win+L` on a fresh pair: Modern Standby began at
+    00:28:01.716 (Kernel-Power 506). B locked, `suspend`, at 00:28:01.827,
+    and A locked, `session-lock`, at 00:28:02.139, both with markers.
+    Standby's next phase (566, 9 to 10) came at 00:28:02.357.
+  - E's Windows legs hold on an isolated build.
