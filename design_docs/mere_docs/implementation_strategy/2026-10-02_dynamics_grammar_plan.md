@@ -1215,3 +1215,18 @@ This pass decides none of them.
     - the group-pull test: budget 6 000 to 18 000 with every bar unchanged (the smallest budget measured at which all three runs rest under 0.01), the doc comment's settle figures updated; re-recording at 6 000 instead would need an at-rest bar near 330 and a with-pull margin near 0.03;
     - Density's per-start floor on gen-200: 0.7 to 0.68 (the new lowest, 0.683, rounded down; also the old floor less the largest fall, 0.020), the sample and gen-50 unchanged; or the ruled 0.7 kept;
     - the tree page's Density control and F73: no change (both within their bars).
+- 2026-10-08 (rapier-036, F175 to F177 carried out). Logs in `Code/testing/mere/rapier-036/` (`f175-f176.log`, `f176-time.log`, `gates-f175.log`, `gates-f176.log`, `probe-f177-release.log`).
+  - **F175** (`f574914a`). `sift::remask_node` wakes the node's body after re-masking it. `node_tangibility_toggles_scene_collision` keeps its bar (x < −1.0) and passes; run against the unwoken code at `e3d90b8f` it fails with the node at (0.0, 0.0), so the test is its own control (`f17x-before-tangibility.log`); the probe measured x −1.413 with the wake. `remask_node` is reached from `set_nodes_tangible`, `set_node_tangibility`, `set_node_kinds` and `load_scene`; nothing outside tests in mere calls any of them, so the headed receipts are not reached.
+  - **F176** (`62da3c42`). The group-pull test reads at 18,000 steps; every bar passes as written: energies 0.0001, 0.002, 0.0001; with-pull cluster agreement 0.792 against 0.727 needed, against by-site 0.490 + 0.1; by-site compactness 0.669 against 0.794. The doc comment carries the measured settle figures. Wall time, three runs each from one build: 0.56 to 0.60 s at 6,000, 1.55 to 1.85 s at 18,000.
+  - **Gates** (F138): seiche 158, 152, 158 and 165 in its four feature sets with its integration suites (5, 4) and `gpu`'s device receipts (3, 1 ignored); conatus 18; clippy unchanged (17 seiche lib warnings); pictograph `canvas` 349, 18 ignored, no failure.
+  - **F177, settling checked** (a release probe, applied and reverted, never committed). Each start run as the receipt runs it, to the Density flow's stop, then ticked on to six times the stop's ticks:
+
+  | Start | Stop (ticks) | Rank at the stop | 2x | 3x | 4x to 6x |
+  |---|---|---|---|---|---|
+  | gen-200 start 2 | 5,341 | 0.6827 | 0.6827 | 0.6827 | 0.6827 |
+  | gen-200 start 0 | 3,601 | 0.7264 | 0.7264 | 0.7264 | 0.7264 |
+  | gen-200 start 11 | 3,601 | 0.7224 | 0.7224 | 0.7224 | 0.7224 |
+  | gen-50 start 4 | 3,601 | 0.7127 | 0.7127 | 0.7127 | 0.7127 |
+  | gen-50 start 6 | 3,601 | 0.7177 | 0.7177 | 0.7177 | 0.7177 |
+
+  Energy reads 0.0000 and the law asks for no ticks at every read; seiche applies forces waking the body (`add_force(…, true)`), so the layout is at rest because the flow ended, not frozen by sleep. The stop is the law's own (5,341 ticks, inside the 7,320 limit), so no settle budget moves the rank. No sample start sits within 0.03 of its bar (closest margin 0.084, start 3). The first read reproduces the receipt (0.683). **Returned to Mark:** gen-200 start 2 settles at 0.6827 under the floor 0.7; the floor is his.
