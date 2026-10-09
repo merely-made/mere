@@ -5,7 +5,7 @@
 are qualified and published to main: source `526f2ddb5`, documentation receipt
 `3b3afa289`. Integration includes main `15fe2a943` and its Rapier,
 projection-editor, identity/Secret Service and physics-registry updates.
-P3 is implemented and qualified on the graph-semantics lane. Full affected
+P3 is implemented, qualified and pushed on graph-semantics at `5c6e5c526`. Full affected
 native suites, the locked workspace check, kernel/Pandect/query-feature wasm
 checks and the full standalone browser wasm check pass. Fresh source review
 cleared both reported defects after observed-negative regressions and repairs.
@@ -3953,5 +3953,20 @@ The fresh reviewer cleared the complete source after both repairs. The only
 manifest/lock addition is linked-data's direct dependency edge to the already
 locked uuid package for explicit prepared-source rebuilding; package versions
 and the standalone browser lock are unchanged. Source, index and plan are
-ready for normal branch publication. Report at the P3 phase boundary before
-main integration or P4/P5 work.
+published on the normal branch push recorded below. Report at the P3 phase
+boundary before main integration or P4/P5 work.
+
+**P3 branch publication receipt:** source and initial plan/index commit
+`5c6e5c526bcd662912ea088910c52480998ecb98` was normally pushed to
+origin/graph-semantics. The remote hash was verified exactly against HEAD.
+User-provided HTTPS authentication worked. No force push or P3 main merge
+was performed. This documentation receipt updates the plan/index after that
+verified publication; P4/P5 remain unstarted at the required phase boundary.
+The original worktree and shared Cargo target remain for review and receipts.
+
+The final documentation audit self-test passes. All audit counts match the
+published P2 audit exactly: no new index orphan/ghost, statusless plan, relative
+link, known-root path, historical annotation or source-header finding. Existing
+baseline findings remain recorded in the retained audit JSON. Qualification
+covers the 3067 frozen source/assets/manifests bytes, including the standalone
+browser lock; no package version upgrades or sibling edits were needed.
