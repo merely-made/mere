@@ -109,7 +109,7 @@ impl ThroughView for Canvas {
     fn pick(&mut self, choice: &PhysicsChoice) -> Result<(), OverlayRefusal> {
         let (choice, refusal) = choice.clone().admitted();
         let mut spec = self.record();
-        choice.write_into(&mut spec);
+        choice.write_into(&mut spec, &self.view());
         self.set_dynamics_spec(&spec)
             .expect("an admitted choice binds");
         refusal.map_or(Ok(()), Err)
