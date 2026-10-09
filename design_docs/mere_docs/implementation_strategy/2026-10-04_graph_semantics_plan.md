@@ -2,19 +2,15 @@
 
 **Date:** 2026-10-04
 **Status (2026-10-09):** P1 and the six bounded P2 closure requirements
-are implemented and qualified on `graph-semantics` at `640dbd587`.
-Rulings 1–46 remain authoritative; C5/C6 are settled. P3–P5 have not begun.
-Mark authorized source push, main integration and proceeding on October 9;
-HTTPS authentication is verified and the source branch is pushed. Integration
-against main `e5a24a4af` passes its full native supplier/consumer gates, locked
-workspace check, kernel/Pandect wasm checks and full standalone browser wasm
-check. Integration against newer main `bdc89a053`, including scene/facet,
-projection-editor, Rapier and dependency updates, also passes its full affected
-native, workspace and wasm gates. The reviewed identity/Secret Service tail
-through `5df06f802` follows with targeted consumer qualification.
-No main merge is published yet. Earlier Windows/Linux receipts below remain
-historical. Consumer repinning and vocabulary/oracle cleanup remain separate
-under §4.
+are implemented, qualified and merged to main at `526f2ddb5`. The normal
+atomic push updated both `main` and `graph-semantics`; both remote hashes were
+verified exactly. Integration includes main `15fe2a943` and its Rapier,
+projection-editor, identity/Secret Service and physics-registry updates.
+Native supplier and consumer gates, the locked workspace check, kernel/Pandect
+wasm checks and the full standalone browser wasm check pass. Rulings 1–46
+remain authoritative; C5/C6 are settled. P3 is the next authorized phase;
+P3–P5 code has not begun. Earlier Windows/Linux receipts below are historical.
+Consumer repinning and vocabulary/oracle cleanup remain separate under §4.
 
 Four questions were put to Mark from outside the project: what a link records,
 what makes two things the same thing, what a saved query can become, and how
@@ -2908,6 +2904,30 @@ binding; this list no longer grows as a running implementation checklist.
   transactional qualification and sealed wrapper support in this lane.
 
 ## 6. Progress
+
+- **2026-10-09, P2 main publication verified.** Qualified integration
+  `526f2ddb5` is pushed atomically to `main` and `graph-semantics`, with both
+  remote hashes verified. It contains main through `15fe2a943`. Fresh review
+  clears the identity and Secret Service metadata moves and the physics
+  channel registry's production topology/cache boundaries. The new physics
+  test helpers initially read only Surface relations from the Resource
+  fixture: the full negative run passed 373 and failed two. Both reads now
+  use projected relations, retaining all fixture, cache-count and hide/show
+  assertions. The focused three tests and complete Canvas 375-test rerun
+  pass (18 unit tests and one doctest ignored). Full Graphshell 411 plus
+  seven integrations pass (five unit tests ignored). Chatelaine 55, Personae
+  145 plus its residue checks and doctest, agent-enabled Personae 210,
+  Castellan 118 plus ten integrations/residue checks/doctest, default document
+  lanes eight, Pelt four plus 32 integrations, and all-feature document lanes
+  55 plus two integrations pass. Two Castellan live Linux D-Bus tests remain
+  ignored. Locked workspace, kernel/Pandect wasm and full standalone browser
+  wasm checks exit 0; earlier unchanged core/RDF/archive receipts above remain
+  qualified. Frozen code/asset hashes match. The audit adds no new defects
+  against pristine main; two ambiguity entries in this plan are historical,
+  and the ignored web lock clears one inherited missing-path finding. These
+  are native test and wasm build receipts, without headed-browser,
+  physical-GPU or sibling-adoption claims. P3 proceeds under the original
+  coverage/pending-index contract, with a report at that phase boundary.
 
 - **2026-10-09, Rapier and projection-editor integration qualified.** Main
   `bdc89a053` merges cleanly onto the first qualified integration checkpoint
