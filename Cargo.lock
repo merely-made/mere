@@ -2646,7 +2646,7 @@ version = "3.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "faf9468729b8cbcea668e36183cb69d317348c2e08e994829fb56ebfdfbaac34"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.48.0",
 ]
 
 [[package]]
@@ -4164,7 +4164,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c54e03a951783e8b327515db3f2a2fd0e3bed362a96b066f341ce66ed49b4ead"
 dependencies = [
  "data-encoding",
- "syn 3.0.6",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -4429,7 +4429,7 @@ dependencies = [
  "libc",
  "option-ext",
  "redox_users 0.5.3",
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -4951,7 +4951,7 @@ dependencies = [
 [[package]]
 name = "embedded-graphics"
 version = "0.8.2"
-source = "git+https://github.com/merely-made/retinue.git?rev=fa4f925059cc698058cb21fecc1c825d095741a9#fa4f925059cc698058cb21fecc1c825d095741a9"
+source = "git+https://github.com/merely-made/retinue.git?rev=773515f21635093a319da1bd21f7354dfa430b5a#773515f21635093a319da1bd21f7354dfa430b5a"
 dependencies = [
  "az",
  "byteorder",
@@ -4963,7 +4963,7 @@ dependencies = [
 [[package]]
 name = "embedded-graphics-core"
 version = "0.4.1"
-source = "git+https://github.com/merely-made/retinue.git?rev=fa4f925059cc698058cb21fecc1c825d095741a9#fa4f925059cc698058cb21fecc1c825d095741a9"
+source = "git+https://github.com/merely-made/retinue.git?rev=773515f21635093a319da1bd21f7354dfa430b5a#773515f21635093a319da1bd21f7354dfa430b5a"
 dependencies = [
  "az",
  "byteorder",
@@ -5194,7 +5194,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -8392,7 +8392,7 @@ dependencies = [
  "getrandom 0.2.17",
  "language-tags",
  "rcgen 0.13.2",
- "retinue",
+ "retinue 0.2.0",
  "rustls",
  "scroll-protocol",
  "serde",
@@ -9435,7 +9435,7 @@ dependencies = [
  "personae",
  "postilion",
  "radio-hand",
- "retinue",
+ "retinue 0.3.0",
  "serde",
  "serde_json",
  "tempfile",
@@ -9468,7 +9468,7 @@ dependencies = [
  "notochord",
  "p2panda-core",
  "personae",
- "retinue",
+ "retinue 0.3.0",
  "serde_json",
  "sha2 0.11.0",
  "snow",
@@ -10654,7 +10654,7 @@ version = "0.50.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -11565,11 +11565,11 @@ dependencies = [
 
 [[package]]
 name = "outrider"
-version = "0.2.0"
-source = "git+https://github.com/merely-made/retinue.git?rev=fa4f925059cc698058cb21fecc1c825d095741a9#fa4f925059cc698058cb21fecc1c825d095741a9"
+version = "0.3.0"
+source = "git+https://github.com/merely-made/retinue.git?rev=773515f21635093a319da1bd21f7354dfa430b5a#773515f21635093a319da1bd21f7354dfa430b5a"
 dependencies = [
  "hkdf 0.13.0",
- "retinue",
+ "retinue 0.3.0",
  "rmpv",
  "sha2 0.11.0",
  "thiserror 2.0.20",
@@ -11842,7 +11842,7 @@ dependencies = [
  "sparesults",
  "spareval",
  "spargebra",
- "thiserror 2.0.20",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -11870,7 +11870,7 @@ dependencies = [
  "oxiri",
  "oxrdf",
  "ryu-js",
- "thiserror 2.0.20",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -11884,8 +11884,8 @@ dependencies = [
  "oxiri",
  "oxsdatatypes",
  "rand 0.9.5",
- "sha2 0.11.0",
- "thiserror 2.0.20",
+ "sha2 0.10.9",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -11898,7 +11898,7 @@ dependencies = [
  "oxrdf",
  "oxrdfxml",
  "oxttl",
- "thiserror 2.0.20",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -11911,7 +11911,7 @@ dependencies = [
  "oxiri",
  "oxrdf",
  "quick-xml 0.37.5",
- "thiserror 2.0.20",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -11920,7 +11920,7 @@ version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c17c2ae62ac34fda465f6331105906c0e17b4e088dac3249e1f229b962062503"
 dependencies = [
- "thiserror 2.0.20",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -11933,7 +11933,7 @@ dependencies = [
  "oxilangtag",
  "oxiri",
  "oxrdf",
- "thiserror 2.0.20",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -13076,15 +13076,15 @@ dependencies = [
 
 [[package]]
 name = "postilion"
-version = "0.2.0"
-source = "git+https://github.com/merely-made/retinue.git?rev=fa4f925059cc698058cb21fecc1c825d095741a9#fa4f925059cc698058cb21fecc1c825d095741a9"
+version = "0.3.0"
+source = "git+https://github.com/merely-made/retinue.git?rev=773515f21635093a319da1bd21f7354dfa430b5a#773515f21635093a319da1bd21f7354dfa430b5a"
 dependencies = [
  "getrandom 0.3.4",
  "heapless 0.9.3",
  "outrider",
- "radio-hand",
- "retinue",
+ "retinue 0.3.0",
  "selvage",
+ "seneschal",
  "serial2-tokio",
  "thiserror 2.0.20",
  "tokio",
@@ -13505,7 +13505,7 @@ dependencies = [
  "once_cell",
  "socket2",
  "tracing",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -13552,7 +13552,7 @@ dependencies = [
 [[package]]
 name = "radio-face"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/retinue.git?rev=fa4f925059cc698058cb21fecc1c825d095741a9#fa4f925059cc698058cb21fecc1c825d095741a9"
+source = "git+https://github.com/merely-made/retinue.git?rev=773515f21635093a319da1bd21f7354dfa430b5a#773515f21635093a319da1bd21f7354dfa430b5a"
 dependencies = [
  "embedded-graphics",
 ]
@@ -13560,15 +13560,14 @@ dependencies = [
 [[package]]
 name = "radio-hand"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/retinue.git?rev=fa4f925059cc698058cb21fecc1c825d095741a9#fa4f925059cc698058cb21fecc1c825d095741a9"
+source = "git+https://github.com/merely-made/retinue.git?rev=773515f21635093a319da1bd21f7354dfa430b5a#773515f21635093a319da1bd21f7354dfa430b5a"
 dependencies = [
- "ed25519-dalek 3.0.0",
  "heapless 0.9.3",
  "hmac 0.13.0",
  "lora-modulation",
  "radio-face",
- "retinue",
  "selvage",
+ "seneschal",
  "sha2 0.11.0",
 ]
 
@@ -14213,6 +14212,24 @@ dependencies = [
  "hmac 0.13.0",
  "sha2 0.11.0",
  "tokio",
+ "x25519-dalek 3.0.0",
+]
+
+[[package]]
+name = "retinue"
+version = "0.3.0"
+source = "git+https://github.com/merely-made/retinue.git?rev=773515f21635093a319da1bd21f7354dfa430b5a#773515f21635093a319da1bd21f7354dfa430b5a"
+dependencies = [
+ "aes 0.9.3",
+ "bzip2 0.6.1",
+ "cbc 0.2.1",
+ "ed25519-dalek 3.0.0",
+ "getrandom 0.2.17",
+ "heapless 0.9.3",
+ "hkdf 0.13.0",
+ "hmac 0.13.0",
+ "sha2 0.11.0",
+ "tokio",
  "tulle",
  "x25519-dalek 3.0.0",
 ]
@@ -14481,7 +14498,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys 0.12.1",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -14549,7 +14566,7 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -14974,7 +14991,7 @@ checksum = "2ab42ca02749e120097e328d91d415325bdf43b1c72c4c8badf37375fe40a813"
 [[package]]
 name = "selvage"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/retinue.git?rev=fa4f925059cc698058cb21fecc1c825d095741a9#fa4f925059cc698058cb21fecc1c825d095741a9"
+source = "git+https://github.com/merely-made/retinue.git?rev=773515f21635093a319da1bd21f7354dfa430b5a#773515f21635093a319da1bd21f7354dfa430b5a"
 
 [[package]]
 name = "semver"
@@ -14991,6 +15008,19 @@ name = "send_wrapper"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cd0b0ec5f1c1ca621c432a25813d8d60c88abe6d3e08a3eb9cf37d97a0fe3d73"
+
+[[package]]
+name = "seneschal"
+version = "0.2.0"
+source = "git+https://github.com/merely-made/retinue.git?rev=773515f21635093a319da1bd21f7354dfa430b5a#773515f21635093a319da1bd21f7354dfa430b5a"
+dependencies = [
+ "ed25519-dalek 3.0.0",
+ "heapless 0.9.3",
+ "hmac 0.13.0",
+ "retinue 0.3.0",
+ "selvage",
+ "sha2 0.11.0",
+]
 
 [[package]]
 name = "seq-macro"
@@ -15532,7 +15562,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3d1e2c7f27f8d4cb10542a02c49005dbd6e93095799d6f3be745fae9f8fedd4"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -15602,7 +15632,7 @@ dependencies = [
  "memchr",
  "oxrdf",
  "quick-xml 0.37.5",
- "thiserror 2.0.20",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -15621,11 +15651,11 @@ dependencies = [
  "regex",
  "rustc-hash 2.1.3",
  "sha1 0.11.0",
- "sha2 0.11.0",
+ "sha2 0.10.9",
  "sparesults",
  "spargebra",
  "sparopt",
- "thiserror 2.0.20",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -15639,7 +15669,7 @@ dependencies = [
  "oxrdf",
  "peg",
  "rand 0.9.5",
- "thiserror 2.0.20",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -15846,7 +15876,7 @@ dependencies = [
  "cfg-if",
  "libc",
  "psm",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -16249,7 +16279,7 @@ dependencies = [
  "getrandom 0.4.3",
  "once_cell",
  "rustix 1.1.5",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -16946,7 +16976,7 @@ checksum = "d2df906b07856748fa3f6e0ad0cbaa047052d4a7dd609e231c4f72cee8c36f31"
 [[package]]
 name = "tulle"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/retinue.git?rev=fa4f925059cc698058cb21fecc1c825d095741a9#fa4f925059cc698058cb21fecc1c825d095741a9"
+source = "git+https://github.com/merely-made/retinue.git?rev=773515f21635093a319da1bd21f7354dfa430b5a#773515f21635093a319da1bd21f7354dfa430b5a"
 dependencies = [
  "selvage",
  "serial2-tokio",
@@ -17009,7 +17039,7 @@ checksum = "f2f6fb2847f6742cd76af783a2a2c49e9375d0a111c7bef6f71cd9e738c72d6e"
 dependencies = [
  "memoffset",
  "tempfile",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -18490,7 +18520,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.48.0",
 ]
 
 [[package]]
