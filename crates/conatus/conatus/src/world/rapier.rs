@@ -6,6 +6,10 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
+mod queries;
+
+pub(super) use queries::VoxelCellWalk;
+
 use rapier3d::control::{
     CharacterAutostep as RapierCharacterAutostep, CharacterLength, KinematicCharacterController,
 };

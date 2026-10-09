@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-08)**: rulings 1 to 95 in §3. L1 to L4 landed (L3
+**Status (2026-10-08)**: rulings 1 to 97 in §3. L1 to L4 landed (L3
 as `79fbbeb7`, its attended receipts as `303b5097`; L4 on 2026-10-08, §6);
 deployment is Mark's step. Not yet carried out: ruling 44's transport-key hard switch,
 so Distillery keeps the master keypair while locked, and pandect's wallets
@@ -1107,6 +1107,33 @@ locked (Recommended)"**.
 retire it from production, which binds only from a derived key, keeping it
 for tests and probes with a check against production use; keep it. Mark:
 **"Retire it from production (Recommended)"**.
+
+**Ruling 96** *(amends ruling 95, whose premise was wrong).* *Ruling 95
+was put as "only tests and probes call the keypair builder". In fact
+graphshell's carriage host (`carriage_host.rs:168`) and personal-sync host
+(`personal_sync_host.rs:270`) call it in production with per-graph derived
+keys, which is correct; only Distillery's lane passes the master. A
+constructor named "derived" cannot tell the two apart, since both are an
+`Ed25519Keypair`.* Options:
+- a distinct `DerivedKeypair` type from personae's derivation, which the
+  transport's production constructor alone accepts, so a master is a
+  compile error, with the keypair builder kept for tests behind a
+  test-only feature;
+- no guard beyond ruling 92;
+- a source check in the gate.
+
+Mark: **"A derived-key type (Recommended)"**.
+
+**Ruling 97** *(ruling 96's reach outside mere).* *Two sibling repos call
+the keypair builder, in tests only: knot-editor (`sync.rs`, 2 calls) and
+Turnstone (`place/lanes.rs`, 3 calls). Their test builds need the
+test-only feature in their dev-dependencies.* Options: edit both repos'
+dev-dependencies, Knot first; mere only, with the siblings ledgered; keep
+the builder ungated and deprecated. Mark: **"Edit both repos' dev-deps
+(Recommended)"**. *Reading, not ruled:* a sibling can name the feature only
+once its pinned mere revision has it, so mere lands first, and each
+sibling turns the feature on in the repin commit that would otherwise
+break its tests.
 
 Still open: a threat statement naming hibernation and the pagefile.
 *2026-10-08:* closed by ruling 82.
