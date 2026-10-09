@@ -7,7 +7,7 @@
 //! The projection scene — the output side of the contract.
 //!
 //! Identity is an index (the data-oriented doctrine): sources, spaces,
-//! backdrops, items, relations, and regions are dense vectors; ids are indexes into
+//! backdrops, items, relations, regions, and folds are dense vectors; ids are indexes into
 //! them. The source/instance separation is structural: one [`SourceRef`]
 //! entry may be pointed at by many [`ProjectedItem`]s, which is how one
 //! phrase appears in the loop table, the history branch, and the similarity
@@ -192,6 +192,12 @@ pub struct Scene {
     pub items: Vec<ProjectedItem>,
     pub relations: Vec<RoutedRelation>,
     pub regions: Vec<Region>,
+    /// Folds over member instances: each draws its members as one stand-in
+    /// and, by being here, hides the rest (see [`crate::fold`]). Omitted from
+    /// the wire when empty, so a scene without folds serializes exactly as it
+    /// did before folds existed.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub folds: Vec<crate::Fold>,
     /// Content bounds in world space (what a camera frames).
     pub bounds: Rect,
     /// The generation of inputs this scene was computed from (score +
@@ -260,6 +266,27 @@ impl Scene {
             name,
         });
         SpaceId((self.spaces.len() - 1) as u32)
+    }
+
+    /// What this scene's folds hide.
+    pub fn fold_effect(&self) -> crate::FoldEffect {
+        crate::FoldEffect::of(
+            self.folds
+                .iter()
+                .enumerate()
+                .map(|(index, fold)| (index as u32, fold)),
+        )
+    }
+
+    /// Check every fold against the items and against each other.
+    pub fn validate_folds(&self) -> Result<(), crate::FoldError> {
+        crate::fold::validate_folds(
+            self.folds
+                .iter()
+                .enumerate()
+                .map(|(index, fold)| (index as u32, fold)),
+            |id| (id.0 as usize) < self.items.len(),
+        )
     }
 
     /// Resolve a space's transform to world by composing its parent chain.
@@ -373,5 +400,43 @@ mod tests {
         let json = serde_json::to_string(&scene).unwrap();
         let back: Scene = serde_json::from_str(&json).unwrap();
         assert_eq!(scene, back);
+    }
+
+    #[test]
+    fn a_scene_without_folds_writes_no_fold_key() {
+        let mut scene = Scene::new();
+        let src = scene.intern_source(SourceRef::new("mere.graph", "uuid:abc"));
+        for x in [0.0, 10.0] {
+            scene.items.push(ProjectedItem {
+                source: src,
+                space: Scene::WORLD,
+                transform: Transform2::translation(x, 0.0),
+                footprint: Footprint::Point,
+                representation: Representation::Glyph,
+                layer: 0,
+                visible: true,
+                hit: None,
+                channels: Vec::new(),
+            });
+        }
+        let bare = serde_json::to_string(&scene).unwrap();
+        assert!(!bare.contains("folds"), "fold-free wire is unchanged");
+
+        scene.folds.push(crate::Fold {
+            members: vec![InstanceId(0), InstanceId(1)],
+            stand_in: crate::StandIn::Member(InstanceId(0)),
+            rule: Some(crate::FoldRule::Selection),
+            boundary: None,
+        });
+        assert_eq!(scene.validate_folds(), Ok(()));
+        assert!(scene.fold_effect().is_hidden(InstanceId(1)));
+        let folded = serde_json::to_string(&scene).unwrap();
+        assert_eq!(serde_json::from_str::<Scene>(&folded).unwrap(), scene);
+
+        scene.folds[0].members.push(InstanceId(5));
+        assert_eq!(
+            scene.validate_folds(),
+            Err(crate::FoldError::AbsentMember(InstanceId(5)))
+        );
     }
 }

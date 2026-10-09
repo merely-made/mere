@@ -759,6 +759,7 @@ impl Canvas {
     /// just applies it. (Physics settings.)
     pub fn set_physics_damping(&mut self, damping: f32) {
         self.physics.set_linear_damping(damping);
+        self.note_physics_damping(damping);
         self.settle_physics(SETTLE_TICKS / 3);
     }
 

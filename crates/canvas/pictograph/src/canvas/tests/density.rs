@@ -17,6 +17,7 @@
 
 use super::*;
 use crate::canvas::physics_catalog::PhysicsLaw;
+use crate::canvas::tests::ThroughView;
 use kernel::graph::apply::{add_node, assert_relation};
 
 /// The web pages' generated graph (`web_graphs::generated`): each node links
@@ -162,7 +163,7 @@ struct Settled {
 
 fn settle_from(mut canvas: Canvas) -> Settled {
     let seed = canvas.layout_stats();
-    canvas.set_physics_law(PhysicsLaw::Density).unwrap();
+    canvas.pick_law(PhysicsLaw::Density).unwrap();
     let ticks = until_settled(&mut canvas, 60 * 122);
     assert!(
         !canvas.physics_tick_demand().0,
@@ -177,7 +178,7 @@ fn settle_from(mut canvas: Canvas) -> Settled {
 
 /// Springs from the same start: the negative control's rank.
 fn springs_from(mut canvas: Canvas) -> f32 {
-    canvas.set_physics_law(PhysicsLaw::Springs).unwrap();
+    canvas.pick_law(PhysicsLaw::Springs).unwrap();
     run(&mut canvas, 900);
     canvas.layout_stats().mass_area_rank
 }
@@ -273,7 +274,7 @@ fn density_on_the_sample_rises_and_evens_past_the_settle_budget() {
     let graph = crate::canvas::build::sample_graph();
     let mut canvas = dealt(&graph, 0);
     let seed = canvas.layout_stats();
-    canvas.set_physics_law(PhysicsLaw::Density).unwrap();
+    canvas.pick_law(PhysicsLaw::Density).unwrap();
     // Frames only: no settle is asked for beyond the law switch's own.
     for _ in 0..crate::canvas::SETTLE_TICKS + 30 {
         canvas.physics.advance_frame(&mut canvas.view);
@@ -301,7 +302,7 @@ fn density_on_the_sample_rises_and_evens_past_the_settle_budget() {
         seed.density_cv
     );
     let mut springs = dealt(&graph, 0);
-    springs.set_physics_law(PhysicsLaw::Springs).unwrap();
+    springs.pick_law(PhysicsLaw::Springs).unwrap();
     for _ in 0..crate::canvas::SETTLE_TICKS + 30 {
         springs.physics.advance_frame(&mut springs.view);
     }
@@ -320,7 +321,7 @@ fn density_on_the_sample_rises_and_evens_from_all_sixteen_starts() {
 #[ignore = "release receipt: the module doc's one line runs it"]
 fn uniform_mass_spreads_evenly() {
     let mut canvas = seeded(uniform(60), 14.0);
-    canvas.set_physics_law(PhysicsLaw::Density).unwrap();
+    canvas.pick_law(PhysicsLaw::Density).unwrap();
     run(&mut canvas, 2);
     let before = canvas.layout_stats().density_cv;
     let ticks = until_settled(&mut canvas, 60 * 122);

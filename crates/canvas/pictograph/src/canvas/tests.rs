@@ -17,10 +17,12 @@ use kernel::graph::fixtures::GraphFixtures;
 use kernel::graph::{Graph, RelationKind, RelationSelector, SemanticSubKind};
 use layout_dom_api::{LayoutDom, LocalName, Namespace};
 use std::collections::HashMap;
+pub(crate) use through_view::ThroughView;
 
 mod affinity;
 pub(crate) mod arrangement_goldens;
 mod arrangement_roles;
+mod binding;
 mod camera;
 mod combinators;
 mod dynamics_spec;
@@ -56,6 +58,7 @@ mod score_and_physics;
 mod selection;
 mod sizing;
 mod speed;
+pub(crate) mod through_view;
 
 fn first_edge_cell_between(
     canvas: &Canvas,

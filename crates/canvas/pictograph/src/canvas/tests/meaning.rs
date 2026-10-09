@@ -19,6 +19,7 @@ use crate::canvas::meaning::{
     compute_meaning,
 };
 use crate::canvas::physics_catalog::{PhysicsKindSource, PhysicsLaw, PhysicsOverlay};
+use crate::canvas::tests::ThroughView;
 
 fn topic_canvas() -> (Canvas, Vec<NodeKey>, HashMap<NodeKey, usize>) {
     let (graph, keys, topics) = topic_graph();
@@ -222,11 +223,9 @@ fn group_pull_by_cluster_is_the_columns_by_cluster_twin() {
     let site = canvas.channel_groups(PhysicsKindSource::Site);
     let run = |overlays: Vec<PhysicsOverlay>, groups: PhysicsKindSource| {
         let (mut canvas, _, _) = topic_canvas();
-        canvas.set_physics_group_source(groups);
-        canvas.set_physics_overlays(overlays).expect("not refused");
-        canvas
-            .set_physics_law(PhysicsLaw::Springs)
-            .expect("not refused");
+        canvas.pick_groups(groups);
+        canvas.pick_overlays(overlays).expect("not refused");
+        canvas.pick_law(PhysicsLaw::Springs).expect("not refused");
         scatter(&mut canvas);
         canvas.physics.settle(SETTLED_STEPS as u32);
         steps(&mut canvas, SETTLED_STEPS);
@@ -336,7 +335,7 @@ fn columns_by_cluster_and_kinds_by_cluster_read_one_computation() {
     let (mut canvas, keys, _) = topic_canvas();
     let start = louvain_runs_on_this_thread();
     canvas
-        .set_physics_choice(&crate::canvas::PhysicsChoice {
+        .pick(&crate::canvas::PhysicsChoice {
             law: PhysicsLaw::Kinds,
             overlays: vec![PhysicsOverlay::DomainCluster],
             kind: PhysicsKindSource::Cluster,
@@ -442,7 +441,7 @@ fn one_meaning_snapshot_feeds_kinds_group_pull_affinity_and_groups() {
     canvas.set_cluster_by_affinity(true);
     canvas.set_meaning_affinity(true);
     canvas
-        .set_physics_choice(&crate::canvas::PhysicsChoice {
+        .pick(&crate::canvas::PhysicsChoice {
             law: PhysicsLaw::Kinds,
             overlays: vec![PhysicsOverlay::DomainCluster],
             kind: PhysicsKindSource::Meaning,
@@ -573,10 +572,8 @@ fn the_lexical_fallback_records_its_purity_on_the_arxiv_fixture() {
     use super::meaning_topics::{arxiv_graph, shuffled};
     let (graph, keys, topics) = arxiv_graph();
     let mut canvas = Canvas::with_graph(graph);
-    canvas.set_physics_kind_source(PhysicsKindSource::Meaning);
-    canvas
-        .set_physics_law(PhysicsLaw::Kinds)
-        .expect("not refused");
+    canvas.pick_kind(PhysicsKindSource::Meaning);
+    canvas.pick_law(PhysicsLaw::Kinds).expect("not refused");
     let snapshot = canvas
         .meaning()
         .expect("Kinds by meaning embeds at build")
@@ -703,20 +700,16 @@ fn the_sparse_lexical_search_matches_the_dense_one() {
 #[test]
 fn a_sliced_run_lands_over_frames_with_the_whole_runs_snapshot() {
     let (mut whole, _, _) = topic_canvas();
-    whole.set_physics_kind_source(PhysicsKindSource::Meaning);
-    whole
-        .set_physics_law(PhysicsLaw::Kinds)
-        .expect("not refused");
+    whole.pick_kind(PhysicsKindSource::Meaning);
+    whole.pick_law(PhysicsLaw::Kinds).expect("not refused");
     let expected = whole.meaning().expect("inline: whole at build").clone();
     assert_eq!(expected.steps, 1);
 
     let (mut canvas, _, _) = topic_canvas();
     // 32 nodes: 64 scores is two rows a frame, so the scan alone is 16 slices.
     canvas.set_meaning_slice(Some(64));
-    canvas.set_physics_kind_source(PhysicsKindSource::Meaning);
-    canvas
-        .set_physics_law(PhysicsLaw::Kinds)
-        .expect("not refused");
+    canvas.pick_kind(PhysicsKindSource::Meaning);
+    canvas.pick_law(PhysicsLaw::Kinds).expect("not refused");
     assert!(
         canvas.meaning().is_none(),
         "the build did one slice, not the run"
@@ -752,10 +745,8 @@ fn a_sliced_run_lands_over_frames_with_the_whole_runs_snapshot() {
 #[test]
 fn a_replaced_graph_earns_its_own_run_whatever_its_revision_reads() {
     let (mut canvas, _, _) = topic_canvas();
-    canvas.set_physics_kind_source(PhysicsKindSource::Meaning);
-    canvas
-        .set_physics_law(PhysicsLaw::Kinds)
-        .expect("not refused");
+    canvas.pick_kind(PhysicsKindSource::Meaning);
+    canvas.pick_law(PhysicsLaw::Kinds).expect("not refused");
     assert_eq!(canvas.meaning_runs(), 1);
     let before = canvas.meaning().unwrap().generation;
     let (other, _, _) = topic_graph();

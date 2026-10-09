@@ -10,6 +10,7 @@
 //! encoded axes.
 
 use super::*;
+use crate::canvas::tests::ThroughView;
 use seiche::{Axes, Role, RoleTable};
 
 const N: usize = 60;
@@ -517,7 +518,7 @@ fn settled_holds_the_last_settle_and_a_living_law_leaves_it() {
 
     // A law that never rests leaves it as it was.
     canvas
-        .set_physics_law(PhysicsLaw::Orbit)
+        .pick_law(PhysicsLaw::Orbit)
         .expect("Orbit takes overlays");
     for _ in 0..1200 {
         canvas.frame(1400, 900);
@@ -605,10 +606,15 @@ fn an_encoded_axis_stays_fixed_while_the_free_axis_separates() {
         let mut board = PhysicsBoard::new();
         board.set_encoded_axes(axes);
         board.sync(cards());
-        board.set_choice(PhysicsChoice {
-            law: PhysicsLaw::Charge,
-            ..PhysicsChoice::default()
-        });
+        board
+            .set_stage(
+                &PhysicsChoice {
+                    law: PhysicsLaw::Charge,
+                    ..PhysicsChoice::default()
+                }
+                .into_spec(),
+            )
+            .unwrap();
         settle_board(&mut board);
         board
     };

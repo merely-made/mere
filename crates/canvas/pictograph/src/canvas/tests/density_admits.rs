@@ -19,6 +19,7 @@
 
 use super::density::{dealt, generated, until_settled};
 use crate::canvas::physics_catalog::{LawSources, PhysicsLaw, PhysicsOverlay};
+use crate::canvas::tests::ThroughView;
 use kernel::graph::Graph;
 
 /// What joins Density: nothing (as the catalog runs it, or converting), an
@@ -46,7 +47,7 @@ impl Joining {
 /// until Density's own stop: rank, density CV, overlaps, ticks.
 fn one_start(graph: &Graph, k: u64, joining: Joining) -> (f32, f32, usize, u32) {
     let mut canvas = dealt(graph, k);
-    canvas.set_physics_law(PhysicsLaw::Density).unwrap();
+    canvas.pick_law(PhysicsLaw::Density).unwrap();
     let forces = {
         let inputs = canvas.law_inputs();
         let mut law = crate::canvas::physics_catalog::density_law(
@@ -164,8 +165,8 @@ fn every_overlay_density_admits_holds_its_bar_at_all_sixteen_starts() {
             let rows: Vec<_> = (0..16)
                 .map(|k| {
                     let mut canvas = dealt(&graph, k);
-                    canvas.set_physics_law(PhysicsLaw::Density).unwrap();
-                    canvas.set_physics_overlays(vec![overlay]).unwrap();
+                    canvas.pick_law(PhysicsLaw::Density).unwrap();
+                    canvas.pick_overlays(vec![overlay]).unwrap();
                     let ticks = until_settled(&mut canvas, 60 * 122);
                     let stats = canvas.layout_stats();
                     (
