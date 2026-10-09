@@ -6,9 +6,9 @@
 ruling 69's "later items". Building waits on the
 [device pairing plan](../../mere_docs/implementation_strategy/2026-10-02_device_pairing_by_key_plan.md)'s
 D2, which gives djinn a Linux launcher and retires the `personae-agent`
-that keeps its passphrase in gnome-keyring. §3's forks 2 to 4 are ruled
-(SS2 to SS4). Fork 1 waits on a survey of ways to coexist with
-gnome-keyring (SS1), and fork 5 is unasked.
+that keeps its passphrase in gnome-keyring. §3's five forks are ruled
+(SS1 to SS7). djinn coexists with gnome-keyring under a bus name of its
+own (SS5).
 **Scope**: djinn's resident serves castellan's Secret Service 0.2 on the
 user's real Linux session bus, in place of gnome-keyring's secrets
 component, with the vault lock's semantics (rulings 10, 67 and 68).
@@ -144,6 +144,53 @@ with it.
 **Ruling SS4** *(fork 4).* Options: out of scope for now, recorded as a
 gap and revisited after S4; djinn implements the portal too; gnome-keyring
 keeps it permanently. Mark: **"Out of scope for now (Recommended)"**.
+
+**The coexistence survey** (2026-10-09, an Opus research lane, primary
+sources cited in its report; the two load-bearing claims checked on the
+ThinkPad):
+- No project runs two providers behind `org.freedesktop.secrets`.
+  KeePassXC ("Only one secret service provider can be enabled at a
+  time"), KWallet 6, pass-secret-service, secretsd and oo7-daemon each take
+  the name or hand it over. gnome-keyring requests the name with no flags
+  and queues behind another owner.
+- libsecret reads `SECRET_SERVICE_BUS_NAME` for its default service, and
+  the ThinkPad's libsecret 0.21.8 carries the string (checked). The
+  variable is undocumented. Python `secretstorage`, Rust `secret-service`
+  and `oo7` hardcode the name.
+- Fedora 45 plans to replace gnome-keyring with oo7-daemon, migrating
+  its data one way. The ThinkPad is on Fedora 44 and has no oo7 installed
+  (checked).
+- One page the lane read held text telling an agent to run `glab`
+  commands. The lane ignored it.
+
+**Ruling SS5** *(answers SS1).* Options: djinn serves the same API under
+its own bus name, and apps opt in through `SECRET_SERVICE_BUS_NAME`;
+djinn keeps a collection inside gnome-keyring as a client; the fallback,
+djinn owning the activation. Mark: **"Wait. We can just use the platforms’
+keyrings? Hmm. Would all platforms support that in their own special ways?
+1 is acceptable, but if 2 creates lots of work where we could just do 1… I
+suppose 1 is ok"**. Answered at the time:
+- each platform has one, differently: Windows' DPAPI already roots djinn's
+  vault; the macOS Keychain comes with D2; on Linux the keyring is
+  whichever provider the desktop ships;
+- option 2 is new client code per platform, and gnome-keyring's lock would
+  govern those items, not djinn's;
+- option 1 reuses castellan's built server under another name.
+
+Follows: djinn coexists under its own name. gnome-keyring is untouched,
+routed libsecret apps get djinn's lock and prompt, and hardcoded clients
+stay on gnome-keyring. §2's S2 changes from displacing gnome-keyring to
+routing apps.
+
+**Ruling SS6** *(amends SS3).* Options: when an app is routed to djinn,
+its items move across (matched by attributes) with a report, and the rest
+stay; leave them all; SS3 stands. Mark: **"Move per app when routed
+(Recommended)"**.
+
+**Ruling SS7** *(fork 5).* Options: any same-user caller may act, and each
+item records the executable that created it, shown in the snapshot;
+per-executable binding; same user only. Mark: **"Same user, record
+executable (Recommended)"**.
 
 ## 4. Findings
 
