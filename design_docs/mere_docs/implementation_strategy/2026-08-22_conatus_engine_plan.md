@@ -1314,3 +1314,45 @@ were not rerun.
   or product code changed. The `Engine` source comment and the separate
   runtime-composition acceptance ledger still need their corresponding
   reconciliation; they were outside this preparation lane's file ownership.
+
+## Progress (2026-10-09 BodyWorld queries)
+
+On branch `conatus-world`, under the 2026-10-09 rulings in §1 (Q1, Q2, O1 to
+O3, P1, C1 to C4). Not on main. Logs in `Code/testing/mere/conatus-world/`.
+
+- `24069261`: `refresh_queries(&mut self)` (352). `BodyWorld` records the
+  bodies touched since the last step (spawn, teleport, kind change, voxel
+  edit), and the refresh syncs each touched collider's cached pose and
+  broad-phase entry through `BroadPhaseBvh::set_aabb`, with no tick, events
+  or island effects. A dynamic body refreshed straight after insert falls to
+  1.8603, bit-identical to its unrefreshed control. A teleport and a voxel
+  added outside the grid's bounds answer at their new places only after
+  refresh, and their controls still answer at the old.
+- `1919abdf`: `colliders_at_point`, `voxel_filled` and
+  `voxel_cells(collider, Option<VoxelBox>)`. The walk halves the box along
+  x, then y, then z, lower half first, and skips empty halves, so 8-cell
+  blocks come in sorted order with no copy. Forward, reversed, edit-built and
+  carved-back grids iterate identically. With one block spanning the grid,
+  parry's raw order fails four of the tests (`b04`).
+- `9154f7d0`: `contacts(transform, shape, prediction, filter) ->
+  Vec<ShapeContact>`. All 25 shape pairs, voxel against voxel included, are
+  answered by parry 0.31.1 (`b01`). Parry is asked for twice the prediction
+  plus 1/64, and points beyond the prediction are dropped. Before
+  compensation, 28 of 350 edge cases were missed at margin = prediction and
+  12 at twice it; none were missed at twice plus 1/1024. Voxel manifolds are
+  read through their sub-shape pose, without which their points sat at the
+  cell centre. The pair matrix holds at prediction 0, 1/8 and 0.1, including
+  the 0.04, 0.05 and 0.09 gaps. The probe case gives one point at
+  (1.5, 2.0, 1.5) with distance −0.3. The capsule's +0.3 point is dropped at
+  prediction 0, and its prediction-1 control keeps it. Three negative
+  controls fail the tests as they should (`b06` to `b08`): margin =
+  prediction, the sub-shape pose ignored, and no sort. The quirk is item 12
+  of the upstream candidates ledger, not raised; a unit test pins it.
+- Gates under F138: conatus 44 tests pass (18 before);
+  `check -p seiche -p conatus --all-targets --all-features` passes; clippy
+  adds no warning in conatus, and seiche's and numen's counts match the
+  rapier lane's; seiche `--features gpu` gives 158 + 5 + 3 + 4, as the rapier
+  lane's landing gate did. Seiche's other configurations and everything
+  above it reach conatus only through `resident`, which this work leaves
+  untouched, so their earlier passes stand. No crate in mere uses
+  `BodyWorld`.
