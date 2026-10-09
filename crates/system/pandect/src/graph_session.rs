@@ -78,6 +78,8 @@ pub trait LegacyTransactionBackend: Backend {}
 #[cfg(target_arch = "wasm32")]
 impl<T: Backend + ?Sized> LegacyTransactionBackend for T {}
 
+mod residency;
+
 const MANIFEST: &str = "manifest.json";
 const BASELINE: &str = "baseline.json";
 const PLACEMENT: &str = "placement.json";

@@ -12166,6 +12166,7 @@ dependencies = [
  "tabard",
  "tempfile",
  "uuid",
+ "wasm-bindgen-test",
 ]
 
 [[package]]
