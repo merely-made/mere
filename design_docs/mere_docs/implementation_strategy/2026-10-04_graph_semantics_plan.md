@@ -14,10 +14,12 @@ remains ignored. Pandect passes 345 tests, Canvas 303 and Graphshell 346 plus
 five integration tests after the final admission and fixture repairs. The
 locked workspace check exits 0. RDF tag
 metadata exposed one mandatory representation gap. Mark selected the additive
-import envelope and matching parse/apply APIs below; implementation and fresh
-RDF qualification remain incomplete. Mark requested a fresh-chat handoff;
-the frozen, unqualified envelope WIP and remaining work are recorded in the
-continuation handoff below. No Cargo gate has run on that WIP.
+import envelope and matching parse/apply APIs below. Fresh-chat continuation
+from `c49e3e0b` repairs exact Surface replay and qualifies the envelope with
+70 passing RDF/query tests. The direct replay gate passes 431 kernel/store
+tests plus its compile-fail check. Final dependent, workspace and wasm gates
+remain in progress; P2 is not yet declared complete. The original frozen-WIP
+handoff below remains historical.
 Turnstone's owner has prepared reader adoption at its current pin; that is not
 qualification against this final supplier source. Consumer integration and Mere
 main integration remain held for Mark's review. Independent vocabulary/oracle
@@ -2182,6 +2184,66 @@ integrate main, repin consumers or start P3 without Mark's review. No new
 dependencies, downloads, manifests/lock changes, sibling edits or generated
 output trees are authorized. Original naming remains ResourceNode/SurfaceNode,
 with Node/NodeKey as Surface compatibility names and SurfaceId kept distinct.
+
+### Linux continuation qualification (2026-10-08)
+
+Resumed `origin/graph-semantics` at exact `c49e3e0b1` in
+`/home/markik/Code/worktrees/mere-graph-semantics`. The retained Windows
+worktree and its receipts are on the other machine. This chat's native
+worktree tool rejected the non-repository chat directory; the Git fallback
+created a local isolated lane. The existing `/home/markik/Code/target` is
+shared and reusable. Mark authorized missing locked dependency downloads and
+autonomous dependency setup; manifests and the lockfile remain unchanged.
+His latest instruction requires review before a source push or merge, replacing
+the earlier branch-push authorization. He separately authorized updating and
+pushing this plan during qualification. This documentation checkpoint carries
+no repair source: the repair and new controls remain local and uncommitted.
+No main or sibling edits are made.
+
+The first offline RDF gate stopped before compilation on uncached `md-5
+0.11.0`. After the authorized cache fill, a fixture-only private helper error
+was corrected to the public node-creation API. The executing full RDF gate
+then passed 68 tests and failed the new Surface preservation control: two
+held rows and one incoming assertion collapsed to one row. A direct kernel
+control also failed, with one traversal array overwritten, while recorded
+snapshot loading retained both rows in the same run. Exact Surface pair
+replay now decodes each row independently and inserts in reverse capture
+order, retaining the existing legacy missing-source normalization. The first
+repaired full kernel/store run passes 431 tests plus the compile-fail doctest;
+one doc example remains ignored.
+
+Independent read-only review found that the importer still used durable
+snapshot rows: Session `TileGroup`/`SplitPair` arrangements were omitted,
+and snapshot iteration order differed from exact pair-capture order. The
+strengthened control reproduces both before repair, comparing the complete
+first live payload and every held payload. The importer now reads the
+existing `persisted_edges_between` helper, exposed as an additive public
+read method, and preflights the same complete capture-order rows it replays.
+The legacy durable snapshot filter is unchanged. Follow-up review confirms
+both findings are resolved, with no new findings in these changes.
+
+Paired explicit prefLabel, owner and ordinary literals retain separate
+opaque/UUID/empty handles with absent source/time, including exact Resource
+records and complete normalized quad sets across expanded/compact JSON-LD,
+N-Quads and TriG. Complete plain definitions, partial or multiple owner/label
+definitions, typed/language labels and scoped Concept metadata are same-run
+controls. Repeated application is unchanged. Conflicting literal payloads,
+cross-resource handle reuse, literal/edge collisions and conflicting edge
+metadata refuse without changing held truth; distinct-ID positive controls
+succeed. Ordinary live reassertion dedup controls remain intact. The final
+RDF/query gate passes all 70 tests.
+
+The final document-lanes gate passes 18 units and one peer-transfer integration.
+Pandect passes all 335 Linux tests. Its earlier Windows total was 345: 11
+Windows-only wallet tests versus one non-Windows control account for the
+difference; no test was removed or weakened. Graphshell, Canvas, Cartography,
+workspace and wasm qualification is still running serially, root-only, one
+build job and one test thread. Mark has removed the offline restriction;
+missing locked dependencies may be downloaded without another permission stop. Gate
+logs are named `graph-semantics-linux-*.log` in the stable shared target;
+failed controls are retained alongside successful receipts. Final P2 status,
+remaining limitations and the branch commit will be recorded after these
+gates. P3–P5, consumer repinning, push and main integration have not begun.
 
 ## 3. Rulings
 
