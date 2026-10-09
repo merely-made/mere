@@ -27,6 +27,13 @@ url = "2.5"
 fleece.workspace = true
 genet-static-dom.workspace = true
 
+[dev-dependencies]
+# Test-only: the Ledger parity test reproduces the Ledger's receipts through
+# the shared matrix derivation and the frozen grid (site canvas plan, Ruling
+# 143). `ledger.rs` retires onto them at the dramatis split.
+scenomise.workspace = true
+graphshell-client.workspace = true
+
 [lib]
 name = "gazette"
 path = "src/lib.rs"
