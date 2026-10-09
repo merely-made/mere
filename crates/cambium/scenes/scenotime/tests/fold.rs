@@ -49,6 +49,7 @@ fn dependents() -> Fold {
             direction: FoldDirection::Outgoing,
         }),
         boundary: None,
+        label: None,
     }
 }
 
@@ -184,6 +185,10 @@ fn invalid_folds_are_refused_whole() {
             stand_in: StandIn::Member(InstanceId(7)),
             ..dependents()
         },
+        Fold {
+            label: Some(" ".into()),
+            ..dependents()
+        },
     ];
     for fold in refusals {
         let mut attempt = state.clone();
@@ -223,6 +228,7 @@ fn invalid_folds_are_refused_whole() {
                     stand_in: StandIn::Member(InstanceId(2)),
                     rule: Some(FoldRule::Selection),
                     boundary: None,
+                    label: None,
                 },
             },
         ],
