@@ -9190,6 +9190,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "mere-curation"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "mere-document-lanes"
 version = "0.1.0"
 dependencies = [
@@ -9247,6 +9255,7 @@ dependencies = [
 name = "mere-forme"
 version = "0.1.0"
 dependencies = [
+ "mere-curation",
  "mere-kernel",
  "petgraph 0.8.3",
  "proptest",
