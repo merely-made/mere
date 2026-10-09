@@ -53,6 +53,13 @@ pub const HOST_DATASET_SCHEMA_V2: &str = "scenomise.host-dataset/v2";
 /// Input larger than this is refused before it is parsed.
 pub const MAX_HOST_DATASET_BYTES: usize = 1024 * 1024;
 
+/// A v2 history larger than this is refused before it is parsed. A history
+/// carries a dataset per revision, so it gets more room than one dataset: at
+/// mer3ly's size (about 65 KB a revision pretty-printed) that is about 60
+/// revisions (mer3ly site Ruling 148). A v1 envelope read as a history keeps
+/// [`MAX_HOST_DATASET_BYTES`].
+pub const MAX_HOST_HISTORY_BYTES: usize = 4 * 1024 * 1024;
+
 /// A host-supplied dataset: the dataset, the relationships its source
 /// discloses, and the public revisions it has published, oldest first.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -421,10 +428,10 @@ impl From<HostDatasetV1> for HostDatasetV2 {
 /// envelope is checked revision by revision as strictly as v1 checks its
 /// one dataset; a v1 envelope is parsed as v1 and lifted to one revision.
 pub fn parse_host_history(json: &str) -> Result<HostDatasetV2, HostDatasetError> {
-    if json.len() > MAX_HOST_DATASET_BYTES {
+    if json.len() > MAX_HOST_HISTORY_BYTES {
         return Err(HostDatasetError::TooLarge {
             bytes: json.len(),
-            limit: MAX_HOST_DATASET_BYTES,
+            limit: MAX_HOST_HISTORY_BYTES,
         });
     }
     let value: Value = serde_json::from_str(json)
