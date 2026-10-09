@@ -6,7 +6,9 @@
 ruling 69's "later items". Building waits on the
 [device pairing plan](../../mere_docs/implementation_strategy/2026-10-02_device_pairing_by_key_plan.md)'s
 D2, which gives djinn a Linux launcher and retires the `personae-agent`
-that keeps its passphrase in gnome-keyring. The forks in §3 are unasked.
+that keeps its passphrase in gnome-keyring. §3's forks 2 to 4 are ruled
+(SS2 to SS4). Fork 1 waits on a survey of ways to coexist with
+gnome-keyring (SS1), and fork 5 is unasked.
 **Scope**: djinn's resident serves castellan's Secret Service 0.2 on the
 user's real Linux session bus, in place of gnome-keyring's secrets
 component, with the vault lock's semantics (rulings 10, 67 and 68).
@@ -106,6 +108,42 @@ component, with the vault lock's semantics (rulings 10, 67 and 68).
 5. **Caller binding** in the access policy: by bus credentials and the
    `/proc` executable path, as the standards survey names; or allow every
    same-user caller, as gnome-keyring does.
+
+### Rulings
+
+Asked 2026-10-08, with the ThinkPad's state read first:
+- gnome-keyring holds the name through D-Bus activation
+  (`/usr/share/dbus-1/services/org.freedesktop.secrets.service` runs
+  `gnome-keyring-daemon --components=secrets`), plus the
+  `gnome-keyring-secrets.desktop` autostart entry;
+- PAM unlocks it at login (`gdm-password`);
+- `portals.conf` names it for `org.freedesktop.impl.portal.Secret`;
+- its `login` collection holds 21 items (counted, not read), and 10
+  Flatpak apps are installed.
+
+**Ruling SS1** *(fork 1).* Options: djinn owns the activation (a
+user-level service file that outranks the system one, with gnome-keyring's
+secrets autostart disabled, reversibly); the owner disables gnome-keyring
+by hand; request the name with replacement. Mark: **"wait, wait. this
+sounds antisocial. let's look and see the options for coexisting. 1
+otherwise, if there are none."** Follows: survey the ways djinn can
+coexist with gnome-keyring, and put them back as the next round; owning
+the activation is the fallback if none works.
+
+**Ruling SS2** *(fork 2).* Options: serve a locked, empty service from the
+start, so a client's `Unlock` gets ruling 67's Prompt; no service until
+the first unlock. Mark: **"Serve locked, empty (Recommended)"**.
+
+**Ruling SS3** *(fork 3).* Options: migrate the 21 items through the
+client API while gnome-keyring is unlocked, then retire it; a clean break;
+leave them read-only in gnome-keyring. Mark: **"Migrate, then retire
+(Recommended)"**. *Reading, not ruled:* "retire" assumed djinn replaces
+gnome-keyring. If SS1's survey finds a way to coexist, this comes back
+with it.
+
+**Ruling SS4** *(fork 4).* Options: out of scope for now, recorded as a
+gap and revisited after S4; djinn implements the portal too; gnome-keyring
+keeps it permanently. Mark: **"Out of scope for now (Recommended)"**.
 
 ## 4. Findings
 
