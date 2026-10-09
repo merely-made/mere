@@ -277,6 +277,13 @@ impl FoldEffect {
         self.hidden.get(&instance).copied()
     }
 
+    /// Every hidden instance, in instance order.
+    pub fn hidden_instances(&self) -> Vec<InstanceId> {
+        let mut hidden = self.hidden.keys().copied().collect::<Vec<_>>();
+        hidden.sort_by_key(|instance| instance.0);
+        hidden
+    }
+
     /// How many instances the folds hide in all.
     pub fn hidden_count(&self) -> usize {
         self.hidden.len()
@@ -325,6 +332,7 @@ mod tests {
         );
         assert!(!effect.is_shown(InstanceId(2), true));
         assert_eq!(effect.folded_by(InstanceId(2)), Some(0));
+        assert_eq!(effect.hidden_instances(), ids(&[1, 2, 3]));
         assert!(
             !effect.is_shown(InstanceId(9), false),
             "own flag still counts"
