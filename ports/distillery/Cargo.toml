@@ -62,9 +62,18 @@ mien.workspace = true
 mooting.workspace = true
 tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread", "sync", "time"] }
 tempfile = "3"
+# Personae's residue tracker, included by path, clears its own buffers.
+zeroize = "1"
 proofs.workspace = true
 genet-scripted-dom = { workspace = true }
 layout-dom-api = { workspace = true }
 # The walk fixtures author a p2panda log directly, so the test names
 # `Operation<MeshExt>`. `mesh` re-exports `MeshExt` and `to_operation` but not
 # p2panda's own `Operation`, and a helper that returns one has to say so.
+
+# Personae's tracking allocator owns this binary's heap, so it runs without
+# libtest (vault lock rulings 44 and 92).
+[[test]]
+name = "transport_residue"
+path = "tests/transport_residue.rs"
+harness = false
