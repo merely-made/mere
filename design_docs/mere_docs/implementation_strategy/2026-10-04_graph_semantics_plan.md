@@ -16,8 +16,10 @@ hashes were verified exactly; P4 continues. Rulings 1–46 remain authoritative;
 C5/C6 are settled. P4 saved SELECT queries and frozen Resource selections are
 implemented and qualified locally: full native, locked workspace and all five
 wasm checks pass; fresh whole-phase review repairs and the final stratum-overlap
-regression are verified. P4 source is ready for its phase-end review before
-push/main integration. P5 has not begun. Earlier Windows/Linux receipts below are historical.
+regression are verified. P4 source `70cf382de` is merged and published on main and graph-semantics at
+`dff527e77`, including current main `50fd021ca`. The affected-tail gates and
+fresh compatibility review pass; both remote hashes are verified. Mark approved
+P4 publication and P5 continuation. P5 implementation starts next. Earlier Windows/Linux receipts below are historical.
 Consumer repinning and vocabulary/oracle cleanup remain separate under §4.
 
 Four questions were put to Mark from outside the project: what a link records,
@@ -4128,3 +4130,44 @@ source ahead of its phase-end approval. P4 source push/main integration and P5
 continuation remain at Mark's next phase checkpoint. The original worktree,
 shared Cargo target, initial small-test target and qualification cache are
 retained for review and receipts; the primary Mere checkout is untouched.
+
+
+### P4 main publication and P5 continuation (2026-10-09)
+
+Mark's “Absolutely!” approved P4 push/main integration and P5 continuation.
+Qualified P4 source `70cf382dee9dad39ad3d7a67335398915cda482e` was normally
+pushed to graph-semantics and verified. Current main
+`50fd021cac6345a320db539b56637228318669ff` adds Conatus's BodyWorld
+query/read/refresh API and design amendments. It merged cleanly; all P4 source,
+manifest and lock bytes remain unchanged. A fresh read-only tail review found
+no Critical/Important compatibility defect: existing mutator validation,
+revision and publication behavior remain, public additions preserve existing
+signatures, and scene/Canvas physics continues through separate Rapier2D code.
+Contact-event parity after the newly added explicit refresh is a review boundary,
+not a demonstrated regression or a new graph-semantics completion requirement.
+
+Affected integration gates pass: Conatus's 19 unit tests and 25 integrations;
+Seiche's 158 unit tests and nine integrations, with ten existing ignored tests;
+both Canvas placement goldens and 40 physics controls; nine Graphshell physics
+controls, with four existing ignored diagnostics/long receipts; the locked
+workspace check; Conatus wasm and the full standalone browser wasm check.
+The preceding complete P4 native suites and kernel/Pandect/query wasm receipts
+remain applicable to their unchanged source. The integrated map contains 3078
+source/assets/manifests files, including five new upstream Conatus source/test
+files and the retained browser lock. Every qualified byte matches. Documentation
+audit counts match pristine current upstream and the planted-defect self-test
+passes; the disposable baseline checkout was removed with its receipts retained.
+
+Normal atomic push published merge
+`dff527e77d3c9af2bbde47684071ce896024bb85` to both origin/main and
+origin/graph-semantics. Both remote hashes were verified exactly. The primary
+checkout, original graph-semantics worktree and Cargo receipts remain intact.
+
+P5 continues inline under the existing §4 bound: addressable storage of both
+strata through Muniment's existing backends, a configured neighborhood around
+open projection Surfaces plus pinned/focused items, on-demand loading with P3
+Residency coverage, and a full-residency control. Its same residency controls
+must run on real redb and IndexedDB. Browser test tooling is prepared separately,
+using the locked wasm-bindgen version and the installed Firefox; preparation
+changes no product dependencies or source. No storage engine, scheduler,
+transport protocol or sibling implementation is added by this continuation.
