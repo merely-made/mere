@@ -22,6 +22,7 @@ members = [
     "crates/system/notochord",
     "crates/system/registry",
     "crates/system/ux-events",
+    "crates/forme/curation",
     "crates/forme/forme",
     "crates/forme/uxtree",
     "crates/domain/apparatus",
@@ -432,6 +433,7 @@ paint_list_render = { version = "=0.1.2", git = "https://github.com/merely-made/
 # Published as `mere-forme`: the crates.io name `forme` is owned by someone else
 # (an HTML template engine). The `package =` alias keeps every `use forme::...`
 # in the tree working, so this rename is one line, not a sweep.
+curation = { package = "mere-curation", version = "0.1.0", path = "crates/forme/curation" }
 forme = { package = "mere-forme", version = "0.1.0", path = "crates/forme/forme" }
 uxtree = { version = "0.0.2", path = "crates/forme/uxtree" }
 
