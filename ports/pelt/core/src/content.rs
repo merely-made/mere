@@ -103,6 +103,38 @@ impl<F: 'static> PeltContent<F> {
         }
     }
 
+    /// Wrap a surface producer the caller spawned and routed itself, as
+    /// [`Self::from_controller`] wraps a document. A host that keeps its own
+    /// routing and per-key engine profiles (Turnstone) holds its web surfaces
+    /// in the same content as its documents. It stays a surface for every
+    /// load, and navigation commands reach the producer's web plane.
+    /// `viewport` is the physical extent the producer was spawned at.
+    pub fn from_surface(
+        producer: Box<dyn SurfaceProducer>,
+        viewport: (u32, u32),
+        route: PeltRoute,
+    ) -> Self {
+        Self {
+            lane: Lane::Surface(PeltSurface {
+                producer,
+                viewport,
+                offset: None,
+            }),
+            route,
+            routed: None,
+        }
+    }
+
+    /// The live surface producer, for host work the content does not wrap
+    /// (pointer streams, drag, accessibility, capture). `None` on a document
+    /// lane.
+    pub fn surface_producer_mut(&mut self) -> Option<&mut dyn SurfaceProducer> {
+        match &mut self.lane {
+            Lane::Surface(surface) => Some(surface.producer.as_mut()),
+            Lane::Document(_) => None,
+        }
+    }
+
     pub fn lane(&self) -> PeltLane {
         match self.lane {
             Lane::Document(_) => PeltLane::Document,
