@@ -230,11 +230,11 @@ impl SitedStationHead {
             .expect("sited station head mutex poisoned");
         let previous = receiver.clone();
         let result = transition(&mut receiver);
-        if *receiver != previous {
-            if let Err(error) = self.core.persistence.save(&receiver) {
-                *receiver = previous;
-                return Err(error);
-            }
+        if *receiver != previous
+            && let Err(error) = self.core.persistence.save(&receiver)
+        {
+            *receiver = previous;
+            return Err(error);
         }
         result.map_err(Into::into)
     }
