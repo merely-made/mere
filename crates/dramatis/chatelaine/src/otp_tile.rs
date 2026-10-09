@@ -4,21 +4,136 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Embeddable, seed-free OTP code tiles.
+//! The keychain's secret-free OTP display: which credential a code is for,
+//! the tile that shows one code, and its remaining-time ring.
 //!
-//! A tile is a short-lived presentation result from the resident authority.
-//! It holds the code a host is allowed to show, ordinary item metadata, and
-//! an absolute expiry for any renderer to draw the remaining-time ring and
-//! stop presenting a stale TOTP. It deliberately has no serialization or
-//! public constructor: carriers do not get a new code wire before an actual
-//! carrier needs one.
+//! Moved from castellan's OTP gate (dramatis repo plan, ruling D29), which
+//! re-exports these. The trust-bearing types, the release participant
+//! claim and the release request, stay in castellan. A tile holds the code a
+//! host may show and an absolute expiry for any renderer to draw the ring
+//! and stop presenting a stale TOTP. It deliberately has no serialization:
+//! carriers get no new code wire before a real carrier needs one.
 
 use std::fmt;
 
-use chatelaine::OtpMode;
 use zeroize::Zeroizing;
 
-use super::OtpCredential;
+use crate::{
+    Credential, CredentialId, CredentialKind, Item, ItemId, OtpAlgorithm, OtpCodeStyle, OtpMode,
+};
+
+/// An item and the `Otp` credential in it that a petition or tile is about.
+///
+/// Built by [`OtpCredential::from_item`], which checks that the credential
+/// is in the item and is an `Otp` credential. Every field may be shown.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct OtpCredential {
+    item: Item,
+    credential: CredentialId,
+}
+
+/// The display fields of an `Otp` credential, borrowed from it.
+#[derive(Clone, Copy)]
+pub struct OtpFields<'a> {
+    /// The account the codes are for.
+    pub account: &'a str,
+    /// The issuing service, when the import named one.
+    pub issuer: Option<&'a str>,
+    /// The HMAC hash behind each code.
+    pub algorithm: OtpAlgorithm,
+    /// How each code is written.
+    pub code_style: OtpCodeStyle,
+    /// Time-based with its period, or counter-based.
+    pub mode: OtpMode,
+}
+
+impl<'a> OtpFields<'a> {
+    /// The fields, when `credential` is an `Otp` credential.
+    pub fn of(credential: &'a Credential) -> Option<Self> {
+        match &credential.kind {
+            CredentialKind::Otp {
+                account,
+                issuer,
+                algorithm,
+                code_style,
+                mode,
+            } => Some(Self {
+                account,
+                issuer: issuer.as_deref(),
+                algorithm: *algorithm,
+                code_style: *code_style,
+                mode: *mode,
+            }),
+            _ => None,
+        }
+    }
+}
+
+impl OtpCredential {
+    /// Pair an item with one of its credentials, if that credential is OTP.
+    ///
+    /// Public since the dramatis repo plan's ruling D29 moved it here from
+    /// castellan; it still refuses a credential that is not the item's or not
+    /// OTP.
+    pub fn from_item(item: Item, credential: CredentialId) -> Option<Self> {
+        let held = item
+            .credentials
+            .iter()
+            .find(|candidate| candidate.id == credential)?;
+        OtpFields::of(held)?;
+        Some(Self { item, credential })
+    }
+
+    /// The whole item, every credential's metadata included.
+    pub fn item(&self) -> &Item {
+        &self.item
+    }
+
+    /// The item's id.
+    pub fn item_id(&self) -> ItemId {
+        self.item.id
+    }
+
+    /// The exercised credential's id.
+    pub fn credential_id(&self) -> CredentialId {
+        self.credential
+    }
+
+    /// The account the codes are for.
+    pub fn account(&self) -> &str {
+        self.fields().account
+    }
+
+    /// The issuing service, when the import named one.
+    pub fn issuer(&self) -> Option<&str> {
+        self.fields().issuer
+    }
+
+    /// The HMAC hash behind each code.
+    pub fn algorithm(&self) -> OtpAlgorithm {
+        self.fields().algorithm
+    }
+
+    /// How each code is written.
+    pub fn code_style(&self) -> OtpCodeStyle {
+        self.fields().code_style
+    }
+
+    /// Time-based with its period, or counter-based. The counter itself is
+    /// sealed, never shown.
+    pub fn mode(&self) -> OtpMode {
+        self.fields().mode
+    }
+
+    fn fields(&self) -> OtpFields<'_> {
+        self.item
+            .credentials
+            .iter()
+            .find(|candidate| candidate.id == self.credential)
+            .and_then(OtpFields::of)
+            .expect("an OtpCredential is built only around an Otp credential it holds")
+    }
+}
 
 /// One code prepared for an admitted host to show.
 ///
@@ -42,7 +157,12 @@ impl fmt::Debug for OtpCodeTile {
 }
 
 impl OtpCodeTile {
-    pub(crate) fn new(credential: OtpCredential, code: String, unix_secs: u64) -> Self {
+    /// A tile for `code`, generated at `unix_secs`.
+    ///
+    /// castellan's OTP gate is what generates codes and builds tiles. Public
+    /// since ruling D29 moved the tile here: a tile built anywhere else only
+    /// fools its own builder's display, and grants nothing.
+    pub fn new(credential: OtpCredential, code: String, unix_secs: u64) -> Self {
         let time_ring = match credential.mode() {
             OtpMode::Totp { period, t0 } => {
                 let elapsed = unix_secs.saturating_sub(t0);
@@ -135,8 +255,7 @@ impl OtpTimeRing {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::otp::{OtpAlgorithm, OtpCodeStyle};
-    use chatelaine::{Credential, CredentialId, CredentialKind, Item, ItemId, ItemState};
+    use crate::{Credential, CredentialId, CredentialKind, Item, ItemId, ItemState};
 
     fn item(mode: OtpMode) -> OtpCredential {
         let credential = CredentialId::from_bytes([0x45; 16]);

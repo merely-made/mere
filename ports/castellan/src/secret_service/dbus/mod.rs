@@ -362,6 +362,13 @@ impl DBusError for SecretDbusError {
     }
 }
 
+/// The snapshot's lookups (chatelaine, ruling D30), as the store's own.
+impl From<chatelaine::MetadataLookupError> for SecretDbusError {
+    fn from(error: chatelaine::MetadataLookupError) -> Self {
+        SecretServiceError::from(error).into()
+    }
+}
+
 impl From<SecretServiceError> for SecretDbusError {
     fn from(error: SecretServiceError) -> Self {
         match error {

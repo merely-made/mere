@@ -16,13 +16,11 @@
 //! (ruling 48), so a replace never tears.
 
 use std::collections::BTreeMap;
-use std::fmt;
 
 use chatelaine::{
-    CollectionId, Credential, CredentialId, CredentialKind, Item, ItemId, ItemState, Link,
+    Credential, CredentialId, CredentialKind, Item, ItemId, ItemState, Link,
 };
 use personae::{IdentityError, PersonaId};
-use serde::{Deserialize, Serialize};
 use zeroize::Zeroize;
 #[cfg(any(test, target_os = "linux"))]
 use zeroize::Zeroizing;
@@ -33,7 +31,7 @@ mod collections;
 mod snapshot;
 mod validate;
 
-pub use snapshot::MetadataSnapshot;
+pub use chatelaine::MetadataSnapshot;
 
 /// Resource limits applied before any Secret Service value reaches storage.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -68,97 +66,9 @@ impl Default for SecretServiceLimits {
     }
 }
 
-/// Stable identifier for one Secret Service collection: its chatelaine
-/// collection's id.
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
-pub struct SecretCollectionId(CollectionId);
-
-impl SecretCollectionId {
-    fn mint() -> Self {
-        Self(CollectionId::from_random(random_id_bytes()))
-    }
-
-    /// Recover an identifier from a D-Bus object-path UUID.
-    pub fn from_uuid(id: uuid::Uuid) -> Self {
-        Self(CollectionId::from_bytes(id.into_bytes()))
-    }
-
-    /// Return the UUID used in the D-Bus object path.
-    pub fn as_uuid(self) -> uuid::Uuid {
-        uuid::Uuid::from_bytes(*self.0.as_bytes())
-    }
-}
-
-/// Stable identifier for one Secret Service item: its chatelaine item's id.
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
-pub struct SecretItemId(ItemId);
-
-impl SecretItemId {
-    /// Recover an identifier from a D-Bus object-path UUID.
-    pub fn from_uuid(id: uuid::Uuid) -> Self {
-        Self(ItemId::from_bytes(id.into_bytes()))
-    }
-
-    /// Return the UUID used in the D-Bus object path.
-    pub fn as_uuid(self) -> uuid::Uuid {
-        uuid::Uuid::from_bytes(*self.0.as_bytes())
-    }
-}
-
-/// Both ids print as their bare UUID, as they did before P3, so policy and
-/// error text keep their form.
-macro_rules! uuid_text {
-    ($name:ident) => {
-        impl fmt::Display for $name {
-            fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-                self.as_uuid().fmt(formatter)
-            }
-        }
-
-        impl fmt::Debug for $name {
-            fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-                write!(
-                    formatter,
-                    concat!(stringify!($name), "({:?})"),
-                    self.as_uuid()
-                )
-            }
-        }
-    };
-}
-
-uuid_text!(SecretCollectionId);
-uuid_text!(SecretItemId);
-
-/// Secret-free collection metadata exposed through D-Bus properties.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct SecretCollection {
-    /// Stable collection identifier.
-    pub id: SecretCollectionId,
-    /// User-visible collection label.
-    pub label: String,
-    /// Unix creation time in seconds.
-    pub created: u64,
-    /// Unix modification time in seconds.
-    pub modified: u64,
-}
-
-/// Secret-free item metadata exposed through D-Bus properties and search.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct SecretItem {
-    /// Stable item identifier.
-    pub id: SecretItemId,
-    /// Owning collection.
-    pub collection: SecretCollectionId,
-    /// User-visible item label.
-    pub label: String,
-    /// Exact-match lookup attributes.
-    pub attributes: BTreeMap<String, String>,
-    /// Unix creation time in seconds.
-    pub created: u64,
-    /// Unix modification time in seconds.
-    pub modified: u64,
-}
+// The secret-free metadata types live in chatelaine (dramatis repo plan,
+// ruling D30), re-exported at their old paths.
+pub use chatelaine::{SecretCollection, SecretCollectionId, SecretItem, SecretItemId};
 
 /// Values required to create or exact-attribute-replace one secret item.
 pub struct NewSecretItem {
@@ -237,11 +147,18 @@ impl From<ItemStoreError> for SecretServiceError {
     }
 }
 
+impl From<chatelaine::MetadataLookupError> for SecretServiceError {
+    fn from(error: chatelaine::MetadataLookupError) -> Self {
+        match error {
+            chatelaine::MetadataLookupError::CollectionNotFound(id) => Self::CollectionNotFound(id),
+            chatelaine::MetadataLookupError::ItemNotFound(id) => Self::ItemNotFound(id),
+        }
+    }
+}
+
 /// Whether `item` carries every supplied attribute exactly.
 fn matches(item: &SecretItem, attributes: &BTreeMap<String, String>) -> bool {
-    attributes
-        .iter()
-        .all(|(key, value)| item.attributes.get(key) == Some(value))
+    item.matches_attributes(attributes)
 }
 
 /// Persona-scoped Secret Service collections held by one resident authority.

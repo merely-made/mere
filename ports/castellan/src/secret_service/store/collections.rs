@@ -159,7 +159,7 @@ impl SecretServiceStore {
             return Err(SecretServiceError::Limit("collections per persona"));
         }
         let collection = Collection {
-            id: SecretCollectionId::mint().0,
+            id: chatelaine::CollectionId::from_random(crate::items::random_id_bytes()),
             source_id: None,
             title: label.to_string(),
             subtitle: None,
