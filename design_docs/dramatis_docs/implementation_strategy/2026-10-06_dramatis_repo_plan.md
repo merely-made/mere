@@ -74,7 +74,9 @@ Checked in code at `ea169154`; the assessment goes deeper.
   - network grants: `reticulum/grant.rs`.
 - **References.** castellan appears in 62 code files, 48 doc files and 605
   lines in mere, plus one file in retinue. chatelaine is 2,206 lines; only
-  the workspace manifest depends on it.
+  the workspace manifest depends on it. *Corrected 2026-10-09 (DR-A's
+  reassessment):* castellan has depended on chatelaine since `71a91267`
+  (2026-10-01).
 - **personae holds secrets today.** The vault, the sealed and passphrase
   storages, the startup unlock ladder and the SSH agent live there, and
   apps link it:
