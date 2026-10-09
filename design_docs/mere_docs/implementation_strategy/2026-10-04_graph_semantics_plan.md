@@ -19,7 +19,13 @@ wasm checks pass; fresh whole-phase review repairs and the final stratum-overlap
 regression are verified. P4 source `70cf382de` is merged and published on main and graph-semantics at
 `dff527e77`, including current main `50fd021ca`. The affected-tail gates and
 fresh compatibility review pass; both remote hashes are verified. Mark approved
-P4 publication and P5 continuation. P5 implementation starts next. Earlier Windows/Linux receipts below are historical.
+P4 publication and P5 continuation. P5 addressable records and configured
+residency are implemented and qualified locally: complete affected native suites,
+the locked workspace check, five wasm checks and actual Firefox IndexedDB pass.
+Both Important review findings have observed-negative regressions and verified
+repairs. The resident reader uses explicit checkpoint/refresh; editing retains
+the existing complete-session path. P5 source push/main integration awaits the
+phase-end approval. Earlier Windows/Linux receipts below are historical.
 Consumer repinning and vocabulary/oracle cleanup remain separate under §4.
 
 Four questions were put to Mark from outside the project: what a link records,
@@ -4171,3 +4177,79 @@ must run on real redb and IndexedDB. Browser test tooling is prepared separately
 using the locked wasm-bindgen version and the installed Firefox; preparation
 changes no product dependencies or source. No storage engine, scheduler,
 transport protocol or sibling implementation is added by this continuation.
+
+### P5 local qualification and publication boundary (2026-10-09)
+
+P5 is implemented and qualified locally against the final 3088-file frozen map.
+This phase implements
+§4 and rulings 4 and 7 through Pandect's graph/session domain layer over
+Muniment's existing Backend. Surface and Resource addresses remain distinct
+even when their UUID values coincide. Records carry exact incident statements;
+immutable content hashes and a catalog head give readers a coherent published
+checkpoint. A resident open reads the session manifest and addressed records
+without replaying the complete session baseline.
+
+Full remains the compatibility default. The saved policy also accepts
+Neighborhood with a configured hop count. Hosts supply every open projection's
+Surface roots, explicit pins and focus; stored Surface pins are included.
+Shown-resource bindings and their projection aliases cost zero hops, and
+relations in either stratum cost one. Demand adds an item until reconciliation;
+reconciliation evicts decoded payloads without deleting stored truth. Known
+unloaded addresses report NotLoaded, unknown addresses report Absent, and missing
+or damaged required records refuse the load without replacing the current view.
+Partial views cannot be published as complete source graphs.
+
+Unknown facets, declaration ownership, frozen selections, statement scopes,
+provenance, timestamps and handles survive demand and Full loading. Shared
+navigation is stored as existing indexed rows and loaded for resident owners
+plus required references; Full reconstructs the original history. Global
+metadata and thin catalogs remain resident, so savings depend on payload and
+relation degree rather than implying constant memory for every graph.
+
+The same async controls pass on redb, including reopen, and actual IndexedDB in
+headless Firefox. They cover both strata, aliases and UUID overlap, pins/focus,
+multiple projection roots, exact parallel/self statements, declaration and
+frozen ownership, Full equality, failed-load atomicity, settings, session
+qualification and checkpoint refresh. A 64-Surface fixture reads four of 128
+Surface/Resource records. Its retained-record probe measures 84,217 bytes in
+Neighborhood versus 1,266,805 in Full. Scoped allocation on a 128-Surface fixture
+measures 189,442 versus 5,888,425 additional live bytes after the source graph is
+dropped, about 31 times smaller.
+
+One fresh whole-phase review found two Important issues and no Critical issue:
+the reader omitted retained P3 pending observations/host context, and an
+unloaded-only source change invalidated available-data query caches. Both have
+observed-negative regressions and one consolidated repair pass. Retained pending
+inputs are addressed by Resource owner separately from graph truth and retain
+original order and attribution; the existing SessionOnly default stays
+ephemeral. Full reader coverage matches the ordinary recorded-session reader.
+Host observations compose with computed Residency through a runtime setter.
+Checkpoint refresh updates source generation, status and coverage while keeping
+truth revisions unchanged when snapshot, facets and navigation are unchanged;
+resident changes still advance the relevant revisions. Pending purge is also a
+context-only update. The reader performs no pending assertion derivation.
+
+Complete affected qualification gates pass: kernel 435 tests plus its compile-
+fail API control; Pandect 349 unit tests, seven residency controls and two process
+receipts; Muniment 73; Mere graph 40 and query 54; RDF query 86; Scenograph 13
+plus its compile-fail control; Canvas 376 (18 existing ignored tests);
+Graphshell 411 and seven integration controls (five existing ignored tests);
+the locked workspace check; kernel, Pandect, RDF-query, Mere-query and full
+standalone browser wasm checks; and the real Firefox IndexedDB runtime control.
+Existing ignored diagnostics/doctests retain their stated boundaries.
+All 3088 qualified source/assets/manifests bytes match the final frozen map.
+The documentation audit matches pristine current upstream and its planted-
+defect self-test passes. No dependency version is upgraded: the root lock adds
+only Pandect's already-locked wasm-bindgen-test test dependency; native-only
+fjall test support and IndexedDB browser test support are target-scoped.
+
+The recorded GraphSession remains the writer/history authority. Hosts explicitly
+publish a checkpoint and refresh resident readers; editing uses complete data
+through that existing session path. This costs a checkpoint/refresh boundary
+and Full data for editing. Automatic scheduling, a partial-write journal,
+immutable-generation garbage collection, new transports/engines and sibling
+adoption remain outside the accepted phase. The original worktree, Cargo
+receipts and qualification cache are retained; the primary checkout is untouched.
+
+This receipt is published as documentation independently of the P5 source.
+P5 source push/main integration remains at Mark's phase-end approval boundary.
