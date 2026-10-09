@@ -1,14 +1,16 @@
 # Upstream Candidates Ledger
 
 **Date**: 2026-10-03
-**Status (2026-10-08)**: open; eleven items, none raised. Kept by ruling 46 of
+**Status (2026-10-09)**: open; twelve items, none raised. Kept by ruling 46 of
 the device pairing plan: noted for a later review, raised only after a
 release passes them by. Item 9 (argon2) comes from the vault lock plan's
-ruling 33.
+ruling 33; item 12 (parry) from the Conatus engine plan's ruling C4.
 **Scope**: defects and rough edges found in the stack's fastest-moving
 dependencies (iroh and iroh-gossip, p2panda, and Burn's CubeCL) that the
 upstream projects may want to hear about, with what we carry meanwhile.
 Item 9 extends it to a security dependency, argon2 (vault lock ruling 33).
+Item 12 extends it to parry, rapier's geometry library, by the Conatus
+engine plan's ruling C4 (2026-10-09).
 
 **Related**:
 
@@ -18,6 +20,8 @@ Item 9 extends it to a security dependency, argon2 (vault lock ruling 33).
   item 7 (its §13.3).
 - [vault lock plan](../../dramatis_docs/implementation_strategy/2026-10-05_vault_lock_plan.md):
   item 9 (its ruling 33).
+- [Conatus engine plan](../implementation_strategy/2026-08-22_conatus_engine_plan.md):
+  item 12 (§1, the BodyWorld queries' assessment and ruling C4).
 
 ---
 
@@ -245,6 +249,27 @@ So, for each item:
 - **Last checked:** mere-p2panda-net 0.7.5 and p2panda-core 0.7.1 (fork
   tag `mere-p2panda-net-0.7.5`, `1bec457`), ractor 0.16.5.
 
+### 12. parry: voxel contacts honour less than half the prediction
+
+- **What happens:** `contact_manifolds` finds candidate voxels from the two
+  shapes' bounding boxes, each loosened by half the prediction, over a
+  half-open cell range. A shape above a voxel grid is found only when its
+  gap is below half the prediction, and at prediction 0 exact touching is
+  missed, convex pairs included. Measured over all 25 pairs of sphere, box,
+  capsule, cylinder and voxel grid: 28 of 350 edge cases missed at the
+  requested prediction, 12 at twice it, none at twice plus 1/1024. Points
+  beyond the prediction are also returned (a capsule at prediction 0 gave
+  one at +0.3). The single-contact `contact()` and `distance()` return
+  `Unsupported` for voxels.
+- **Why it matters:** a query asked for contacts within a margin silently
+  drops some of them, and whether a boundary case is found turns on f32
+  rounding.
+- **What we carry:** Conatus's `BodyWorld::contacts` asks parry for twice
+  the prediction plus 1/64 and drops points beyond the prediction (ruling
+  C4). A unit test (`parry_still_needs_the_compensated_margin`) fails when
+  parry changes, prompting a re-measure.
+- **Last checked:** parry3d 0.31.1 (through rapier3d 0.36.0).
+
 ## 3. Progress
 
 **2026-10-03.** Opened with items 1 to 8 from the pairing plan and the Burn
@@ -258,3 +283,6 @@ plan's rulings 49 to 52. Not raised.
 
 **2026-10-08.** Item 11 extended with p2panda-net's mDNS blocks (vault lock
 ruling 60), measured apart from iroh's mDNS lookup. Not raised.
+
+**2026-10-09.** Item 12 (parry) added from the Conatus engine plan's ruling
+C4. Not raised.
