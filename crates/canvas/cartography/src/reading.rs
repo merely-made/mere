@@ -132,6 +132,7 @@ pub fn default_graph_reading_registry() -> GraphReadingRegistry {
                 ReadingEmphasis::Relation,
                 ReadingArrangement::None,
             ),
+            crate::adapters::matrix::two_reading_matrix_profile(),
         ],
     }
 }

@@ -24,6 +24,10 @@
 //! node tree, or an HTML table, and the same receipt can be asserted in a test
 //! without a browser. That also keeps a DOM engine out of the client.
 //!
+//! A two-axis projection, such as a two-reading matrix, freezes into a
+//! [`FrozenGrid`] instead: a table with row and column headers, which is the
+//! shape a reader needs to land on a cell and hear where it is.
+//!
 //! Two facts about the contract shape this had to work around, both worth
 //! stating where a reader meets them:
 //!
@@ -452,6 +456,178 @@ impl FrozenScene {
             ));
         }
         html.push_str("</tbody></table></figure>");
+        html
+    }
+}
+
+/// One heading on either axis of a [`FrozenGrid`].
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct FrozenGridHeading {
+    /// The scene instance that draws this heading, when there is one.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub instance: Option<InstanceId>,
+    pub source: SourceRef,
+    pub name: String,
+}
+
+/// One cell of a [`FrozenGrid`].
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct FrozenGridCell {
+    /// The scene instance that draws this cell, when there is one.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub instance: Option<InstanceId>,
+    pub source: SourceRef,
+    /// The short text the grid shows. Never blank: an empty cell states its
+    /// emptiness ("no relation", "no value") rather than leaving a reader to
+    /// guess whether something failed to load.
+    pub text: String,
+    /// The full sentence a reader hears for the cell.
+    pub description: String,
+}
+
+/// One row of a [`FrozenGrid`]: its heading, then one cell per column.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct FrozenGridRow {
+    pub heading: FrozenGridHeading,
+    pub cells: Vec<FrozenGridCell>,
+}
+
+/// A two-axis projection, such as a two-reading matrix, frozen as a grid.
+///
+/// The flat [`FrozenScene`] lists instances, which is the wrong shape for a
+/// matrix: a reader needs to land on a cell and hear which row and which
+/// column it belongs to. This is the table form WAI's tables tutorial
+/// describes for two-header grids: a caption, one column header per column,
+/// one row header per row, and a cell at every crossing (mer3ly site canvas
+/// plan, Ruling 3).
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct FrozenGrid {
+    /// What the grid is, read before anything in it.
+    pub caption: String,
+    /// The header over the row headings, naming the two axes.
+    pub corner: String,
+    pub columns: Vec<FrozenGridHeading>,
+    pub rows: Vec<FrozenGridRow>,
+}
+
+/// Why a grid could not be frozen.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum FrozenGridError {
+    /// The caption or corner header is blank.
+    Unlabelled,
+    /// A heading has a blank name.
+    BlankHeading { source: SourceRef },
+    /// A row does not have one cell per column.
+    Ragged {
+        row: usize,
+        cells: usize,
+        columns: usize,
+    },
+    /// A cell has blank text or no description.
+    BlankCell { row: usize, column: usize },
+}
+
+impl FrozenGrid {
+    /// Check and assemble a grid. Every heading is named, every row has one
+    /// cell per column, and no cell is blank.
+    pub fn new(
+        caption: impl Into<String>,
+        corner: impl Into<String>,
+        columns: Vec<FrozenGridHeading>,
+        rows: Vec<FrozenGridRow>,
+    ) -> Result<Self, FrozenGridError> {
+        let grid = Self {
+            caption: caption.into(),
+            corner: corner.into(),
+            columns,
+            rows,
+        };
+        if grid.caption.trim().is_empty() || grid.corner.trim().is_empty() {
+            return Err(FrozenGridError::Unlabelled);
+        }
+        let headings = grid
+            .columns
+            .iter()
+            .chain(grid.rows.iter().map(|row| &row.heading));
+        for heading in headings {
+            if heading.name.trim().is_empty() {
+                return Err(FrozenGridError::BlankHeading {
+                    source: heading.source.clone(),
+                });
+            }
+        }
+        for (row_index, row) in grid.rows.iter().enumerate() {
+            if row.cells.len() != grid.columns.len() {
+                return Err(FrozenGridError::Ragged {
+                    row: row_index,
+                    cells: row.cells.len(),
+                    columns: grid.columns.len(),
+                });
+            }
+            for (column, cell) in row.cells.iter().enumerate() {
+                if cell.text.trim().is_empty() || cell.description.trim().is_empty() {
+                    return Err(FrozenGridError::BlankCell {
+                        row: row_index,
+                        column,
+                    });
+                }
+            }
+        }
+        Ok(grid)
+    }
+
+    /// Render the grid as a table whose structure a screen reader announces:
+    /// the caption, a `scope="col"` header per column, a `scope="row"` header
+    /// per row, and each cell's sentence as its accessible name over its short
+    /// text. Headings and cells carry their source identity, and their scene
+    /// instance when they have one, as data attributes.
+    pub fn to_html(&self, id_prefix: &str) -> String {
+        let identity = |instance: Option<InstanceId>, source: &SourceRef| {
+            let mut attributes = String::new();
+            if let Some(instance) = instance {
+                attributes.push_str(&format!(" data-projection-instance=\"{}\"", instance.0));
+            }
+            attributes.push_str(&format!(
+                " data-source-adapter=\"{}\" data-source-id=\"{}\"",
+                escape(&source.adapter),
+                escape(&source.id)
+            ));
+            attributes
+        };
+        let mut html = format!(
+            "<table class=\"frozen-grid\"><caption id=\"{0}-caption\">{1}</caption>",
+            escape(id_prefix),
+            escape(&self.caption)
+        );
+        html.push_str(&format!(
+            "<thead><tr><th scope=\"col\">{}</th>",
+            escape(&self.corner)
+        ));
+        for column in &self.columns {
+            html.push_str(&format!(
+                "<th scope=\"col\"{}>{}</th>",
+                identity(column.instance, &column.source),
+                escape(&column.name)
+            ));
+        }
+        html.push_str("</tr></thead><tbody>");
+        for row in &self.rows {
+            html.push_str(&format!(
+                "<tr><th scope=\"row\"{}>{}</th>",
+                identity(row.heading.instance, &row.heading.source),
+                escape(&row.heading.name)
+            ));
+            for cell in &row.cells {
+                html.push_str(&format!(
+                    "<td{} aria-label=\"{}\">{}</td>",
+                    identity(cell.instance, &cell.source),
+                    escape(&cell.description),
+                    escape(&cell.text)
+                ));
+            }
+            html.push_str("</tr>");
+        }
+        html.push_str("</tbody></table>");
         html
     }
 }
@@ -1331,5 +1507,261 @@ mod tests {
         let twice = FrozenScene::freeze(&scene, "Coastal map", &names);
         assert_eq!(once, twice, "a receipt that varies is not a receipt");
         assert_eq!(once.rows(), twice.rows());
+    }
+
+    /// A two-reading matrix from the shared derivation, frozen as a grid the
+    /// way a viewer does: headings and cells keep their scene instances.
+    fn matrix_grid() -> (scenomise::matrix::Matrix, FrozenGrid) {
+        use scenomise::matrix::{CellReading, MatrixAxis, MatrixAxisSource, derive_matrix};
+
+        let axis = |authority: &str, reading: &str, ids: &[(&str, &str)]| MatrixAxis {
+            authority: authority.into(),
+            record: "rev:1".into(),
+            reading: reading.into(),
+            focus: None,
+            generation: "1".into(),
+            sources: ids
+                .iter()
+                .map(|(id, label)| MatrixAxisSource {
+                    source: SourceRef::new("fixture.repo", *id),
+                    label: (*label).into(),
+                })
+                .collect(),
+        };
+        let matrix = derive_matrix(
+            axis("live", "neighbors", &[("mere", "Mere"), ("genet", "Genet")]),
+            axis(
+                "specimen",
+                "changes",
+                &[("genet", "Genet"), ("relay", "Relay <b>")],
+            ),
+            |row, column| {
+                Ok(if row.source.id == "mere" && column.source.id == "genet" {
+                    CellReading::Relations(vec![scenomise::matrix::MatrixContributor {
+                        authority: "live".into(),
+                        source: SourceRef::new("fixture.relation", "mere-depends-on-genet"),
+                        provenance: "derived".into(),
+                    }])
+                } else {
+                    CellReading::NoRelation
+                })
+            },
+        )
+        .expect("matrix");
+        let heading = |instance: InstanceId, entry: &MatrixAxisSource| FrozenGridHeading {
+            instance: Some(instance),
+            source: entry.source.clone(),
+            name: entry.label.clone(),
+        };
+        let width = matrix.columns.sources.len();
+        let grid = FrozenGrid::new(
+            format!(
+                "Two-reading matrix: {} by {}",
+                matrix.rows.reading, matrix.columns.reading
+            ),
+            "Rows / columns",
+            matrix
+                .columns
+                .sources
+                .iter()
+                .enumerate()
+                .map(|(index, entry)| heading(matrix.column_instance(index), entry))
+                .collect(),
+            matrix
+                .rows
+                .sources
+                .iter()
+                .enumerate()
+                .map(|(row, entry)| FrozenGridRow {
+                    heading: heading(matrix.row_instance(row), entry),
+                    cells: (0..width)
+                        .map(|column| {
+                            let index = row * width + column;
+                            let cell = &matrix.cells[index];
+                            FrozenGridCell {
+                                instance: Some(matrix.cell_instance(index)),
+                                source: cell.source.clone(),
+                                text: cell.value.clone(),
+                                description: cell.description.clone(),
+                            }
+                        })
+                        .collect(),
+                })
+                .collect(),
+        )
+        .expect("grid");
+        (matrix, grid)
+    }
+
+    type Dom = genet_scripted_dom::ScriptedDom;
+    type Node = <Dom as layout_dom_api::LayoutDom>::NodeId;
+
+    fn tag(dom: &Dom, node: Node) -> Option<String> {
+        use layout_dom_api::LayoutDom;
+        dom.element_name(node).map(|name| name.local.to_string())
+    }
+
+    fn attribute(dom: &Dom, node: Node, key: &str) -> Option<String> {
+        use layout_dom_api::LayoutDom;
+        dom.attributes(node)
+            .find(|attribute| &*attribute.name.local == key)
+            .map(|attribute| attribute.value.to_owned())
+    }
+
+    /// Every element named `name` under `root`, in document order.
+    fn descendants(dom: &Dom, root: Node, name: &str) -> Vec<Node> {
+        use layout_dom_api::LayoutDom;
+        let mut found = Vec::new();
+        for child in dom.dom_children(root).collect::<Vec<_>>() {
+            if tag(dom, child).as_deref() == Some(name) {
+                found.push(child);
+            }
+            found.extend(descendants(dom, child, name));
+        }
+        found
+    }
+
+    fn text(dom: &Dom, node: Node) -> String {
+        use layout_dom_api::LayoutDom;
+        let mut out = dom.text(node).unwrap_or_default().to_owned();
+        for child in dom.dom_children(node).collect::<Vec<_>>() {
+            out.push_str(&text(dom, child));
+        }
+        out
+    }
+
+    /// What a screen reader announces on landing in each data cell of the
+    /// first table: the cell's row header, its column header (resolved
+    /// through `scope`, by position, as the HTML table model does), and the
+    /// cell's accessible name, which is its `aria-label` over its text.
+    fn announcements(dom: &Dom) -> (String, Vec<(String, String, String, String)>) {
+        use layout_dom_api::LayoutDom;
+        let table = descendants(dom, dom.document(), "table")[0];
+        let caption = text(dom, descendants(dom, table, "caption")[0]);
+        let rows = descendants(dom, table, "tr");
+        let column_headers = descendants(dom, rows[0], "th")
+            .into_iter()
+            .map(|header| {
+                assert_eq!(attribute(dom, header, "scope").as_deref(), Some("col"));
+                text(dom, header)
+            })
+            .collect::<Vec<_>>();
+        let mut announced = Vec::new();
+        for row in &rows[1..] {
+            let cells = dom
+                .dom_children(*row)
+                .filter(|child| tag(dom, *child).is_some())
+                .collect::<Vec<_>>();
+            assert_eq!(tag(dom, cells[0]).as_deref(), Some("th"));
+            assert_eq!(attribute(dom, cells[0], "scope").as_deref(), Some("row"));
+            let row_header = text(dom, cells[0]);
+            for (position, cell) in cells.iter().enumerate().skip(1) {
+                assert_eq!(tag(dom, *cell).as_deref(), Some("td"));
+                announced.push((
+                    row_header.clone(),
+                    column_headers[position].clone(),
+                    attribute(dom, *cell, "aria-label").unwrap_or_else(|| text(dom, *cell)),
+                    text(dom, *cell),
+                ));
+            }
+        }
+        (caption, announced)
+    }
+
+    #[test]
+    fn a_matrix_grid_reads_as_a_grid_to_a_screen_reader() {
+        let (matrix, grid) = matrix_grid();
+        let dom = Dom::from_serialized_document(&format!(
+            "<!doctype html><html><body>{}</body></html>",
+            grid.to_html("matrix")
+        ));
+        let (caption, announced) = announcements(&dom);
+        assert_eq!(caption, "Two-reading matrix: neighbors by changes");
+        // Every crossing is reachable, once, with both of its headers.
+        assert_eq!(announced.len(), matrix.cells.len());
+        let expected = matrix
+            .cells
+            .iter()
+            .enumerate()
+            .map(|(index, cell)| {
+                (
+                    matrix.rows.sources[index / 2].label.clone(),
+                    matrix.columns.sources[index % 2].label.clone(),
+                    cell.description.clone(),
+                    cell.value.clone(),
+                )
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(announced, expected);
+        // An absence is stated, never blank.
+        assert!(
+            announced
+                .iter()
+                .all(|(_, _, _, shown)| !shown.trim().is_empty())
+        );
+        assert_eq!(
+            announced[1],
+            (
+                "Mere".into(),
+                "Relay <b>".into(),
+                "No direct relation from Mere to Relay <b>".into(),
+                "no relation".into()
+            )
+        );
+        assert_eq!(announced[0].3, "relation");
+        assert_eq!(announced[2].3, "same source");
+    }
+
+    #[test]
+    fn a_matrix_grid_carries_instance_and_source_identity() {
+        let (matrix, grid) = matrix_grid();
+        let html = grid.to_html("matrix");
+        let dom = Dom::from_serialized_document(&format!(
+            "<!doctype html><html><body>{html}</body></html>"
+        ));
+        let cells = descendants(&dom, layout_dom_api::LayoutDom::document(&dom), "td");
+        for (index, cell) in cells.iter().enumerate() {
+            assert_eq!(
+                attribute(&dom, *cell, "data-projection-instance"),
+                Some(matrix.cell_instance(index).0.to_string())
+            );
+            assert_eq!(
+                attribute(&dom, *cell, "data-source-id"),
+                Some(matrix.cells[index].source.id.clone())
+            );
+        }
+        assert!(html.contains("id=\"matrix-caption\""));
+        assert!(!html.contains("<b>"), "a hostile label stays text");
+    }
+
+    #[test]
+    fn a_grid_refuses_ragged_rows_and_blank_cells() {
+        let (_, grid) = matrix_grid();
+        let mut ragged = grid.rows.clone();
+        ragged[1].cells.pop();
+        assert_eq!(
+            FrozenGrid::new("Caption", "Corner", grid.columns.clone(), ragged),
+            Err(FrozenGridError::Ragged {
+                row: 1,
+                cells: 1,
+                columns: 2
+            })
+        );
+        let mut blank = grid.rows.clone();
+        blank[0].cells[1].text = " ".into();
+        assert_eq!(
+            FrozenGrid::new("Caption", "Corner", grid.columns.clone(), blank),
+            Err(FrozenGridError::BlankCell { row: 0, column: 1 })
+        );
+        assert_eq!(
+            FrozenGrid::new("", "Corner", grid.columns.clone(), grid.rows.clone()),
+            Err(FrozenGridError::Unlabelled)
+        );
+        let mut unnamed = grid.columns.clone();
+        unnamed[0].name.clear();
+        assert!(matches!(
+            FrozenGrid::new("Caption", "Corner", unnamed, grid.rows),
+            Err(FrozenGridError::BlankHeading { .. })
+        ));
     }
 }

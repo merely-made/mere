@@ -1,0 +1,930 @@
+{
+ "note": "Two real checkpoints of the site's repository authority, from the site build of merelyllc.com a812e7d (repos/index.html, history checkpoints 14 and 15 of the available ones), and the site's own `changes` reading of them (crates/repo-graph diff_graphs via project_reading_json), run unmodified at that revision. Ruling 147b (2026-10-08): the expected edges keep a removed relationship only when both of its endpoints exist in the current checkpoint, which is what the site's diff_graphs comment intended; the site's code as written checked against current-plus-removed nodes and so kept every removed edge (8 here). Edges dropped by the correction: hocket-depends-on-genet, hocket-depends-on-mere, hocket-depends-on-netrender, hocket-depends-on-wavicle, hocket-depends-on-woodshed, isometry-depends-on-genet, isometry-depends-on-mere, isometry-depends-on-netrender.",
+ "site_revision": "a812e7df929c5f5fea7031e6718eb41558eb5b44",
+ "previous": {
+  "cursor": {
+   "source": "merely-made/merelyllc.com",
+   "commit": "27c9e87decb5d0f2ab63ba599f28e7980c8696bd",
+   "committed_at": "2026-09-05T01:33:47-04:00"
+  },
+  "graph": {
+   "nodes": [
+    {
+     "id": "org-profile",
+     "name": "Merely organization profile",
+     "class": "tool",
+     "status": "reference",
+     "pushed_at": "2026-09-04T19:52:47Z"
+    },
+    {
+     "id": "mer3ly",
+     "name": "Mer3ly",
+     "class": "product",
+     "status": "active",
+     "pushed_at": "2026-09-04T19:47:04Z"
+    },
+    {
+     "id": "genet",
+     "name": "Genet",
+     "class": "platform",
+     "status": "active",
+     "pushed_at": "2026-09-05T03:19:57Z"
+    },
+    {
+     "id": "mere",
+     "name": "Mere",
+     "class": "platform",
+     "status": "active",
+     "pushed_at": "2026-09-05T03:19:36Z"
+    },
+    {
+     "id": "retinue",
+     "name": "Retinue",
+     "class": "platform",
+     "status": "active",
+     "pushed_at": "2026-09-04T10:40:49Z"
+    },
+    {
+     "id": "netrender",
+     "name": "Netrender",
+     "class": "foundation",
+     "status": "active",
+     "pushed_at": "2026-09-04T19:49:03Z"
+    },
+    {
+     "id": "smolweb",
+     "name": "Smolweb",
+     "class": "foundation",
+     "status": "active",
+     "pushed_at": "2026-08-26T01:39:00Z"
+    },
+    {
+     "id": "wavicle",
+     "name": "Wavicle",
+     "class": "foundation",
+     "status": "active",
+     "pushed_at": "2026-09-03T05:29:02Z"
+    },
+    {
+     "id": "wgpu-graft",
+     "name": "wgpu-graft",
+     "class": "foundation",
+     "status": "research",
+     "pushed_at": "2026-09-05T03:53:35Z"
+    },
+    {
+     "id": "wgpu-scry",
+     "name": "wgpu-scry",
+     "class": "foundation",
+     "status": "research",
+     "pushed_at": "2026-09-04T20:17:02Z"
+    },
+    {
+     "id": "wgpu-weld",
+     "name": "wgpu-weld",
+     "class": "foundation",
+     "status": "research",
+     "pushed_at": "2026-09-05T03:23:05Z"
+    },
+    {
+     "id": "turnstone",
+     "name": "Turnstone",
+     "class": "product",
+     "status": "prototype",
+     "pushed_at": "2026-09-05T03:19:45Z"
+    },
+    {
+     "id": "knot-editor",
+     "name": "Knot Editor",
+     "class": "product",
+     "status": "active",
+     "pushed_at": "2026-09-05T03:22:04Z"
+    },
+    {
+     "id": "woodshed",
+     "name": "Woodshed",
+     "class": "product",
+     "status": "active",
+     "pushed_at": "2026-09-03T00:56:39Z"
+    },
+    {
+     "id": "hocket",
+     "name": "Hocket",
+     "class": "product",
+     "status": "prototype",
+     "pushed_at": "2026-09-05T03:21:57Z"
+    },
+    {
+     "id": "isometry",
+     "name": "Isometry",
+     "class": "product",
+     "status": "prototype",
+     "pushed_at": "2026-09-04T01:19:03Z"
+    },
+    {
+     "id": "mesocosm",
+     "name": "Mesocosm",
+     "class": "product",
+     "status": "prototype",
+     "pushed_at": "2026-09-05T03:22:14Z"
+    },
+    {
+     "id": "paredros",
+     "name": "Paredros",
+     "class": "product",
+     "status": "prototype",
+     "pushed_at": "2026-09-05T03:22:30Z"
+    },
+    {
+     "id": "vano",
+     "name": "Vano",
+     "class": "foundation",
+     "status": "active",
+     "pushed_at": "2026-07-30T02:08:19Z"
+    },
+    {
+     "id": "cleromancy",
+     "name": "cleromancy",
+     "class": "tool",
+     "status": "active",
+     "pushed_at": "2026-09-04T04:24:15Z"
+    },
+    {
+     "id": "emblem",
+     "name": "emblem",
+     "class": "tool",
+     "status": "active",
+     "pushed_at": "2026-09-05T05:13:45Z"
+    },
+    {
+     "id": "mora",
+     "name": "mora",
+     "class": "tool",
+     "status": "active",
+     "pushed_at": "2026-09-05T03:22:22Z"
+    },
+    {
+     "id": "pipit",
+     "name": "pipit",
+     "class": "tool",
+     "status": "active",
+     "pushed_at": "2026-09-05T03:22:38Z"
+    },
+    {
+     "id": "ringdown",
+     "name": "ringdown",
+     "class": "tool",
+     "status": "active",
+     "pushed_at": "2026-09-02T02:49:31Z"
+    },
+    {
+     "id": "turquet",
+     "name": "turquet",
+     "class": "maintained-fork",
+     "status": "active",
+     "pushed_at": "2026-09-05T03:22:48Z"
+    }
+   ],
+   "edges": [
+    {
+     "id": "genet-depends-on-netrender",
+     "source": "genet",
+     "target": "netrender",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "genet-depends-on-vano",
+     "source": "genet",
+     "target": "vano",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "genet-depends-on-wgpu-scry",
+     "source": "genet",
+     "target": "wgpu-scry",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "hocket-depends-on-genet",
+     "source": "hocket",
+     "target": "genet",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "hocket-depends-on-mere",
+     "source": "hocket",
+     "target": "mere",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "hocket-depends-on-netrender",
+     "source": "hocket",
+     "target": "netrender",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "hocket-depends-on-wavicle",
+     "source": "hocket",
+     "target": "wavicle",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "hocket-depends-on-woodshed",
+     "source": "hocket",
+     "target": "woodshed",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "isometry-depends-on-genet",
+     "source": "isometry",
+     "target": "genet",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "isometry-depends-on-mere",
+     "source": "isometry",
+     "target": "mere",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "isometry-depends-on-netrender",
+     "source": "isometry",
+     "target": "netrender",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "knot-editor-depends-on-genet",
+     "source": "knot-editor",
+     "target": "genet",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "knot-editor-depends-on-mere",
+     "source": "knot-editor",
+     "target": "mere",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "mere-depends-on-knot-editor",
+     "source": "mere",
+     "target": "knot-editor",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "mere-depends-on-genet",
+     "source": "mere",
+     "target": "genet",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "mere-depends-on-netrender",
+     "source": "mere",
+     "target": "netrender",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "mere-depends-on-retinue",
+     "source": "mere",
+     "target": "retinue",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "turnstone-depends-on-genet",
+     "source": "turnstone",
+     "target": "genet",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "turnstone-depends-on-mere",
+     "source": "turnstone",
+     "target": "mere",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "turnstone-depends-on-netrender",
+     "source": "turnstone",
+     "target": "netrender",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "turnstone-depends-on-knot-editor",
+     "source": "turnstone",
+     "target": "knot-editor",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "turnstone-hosts-mere",
+     "source": "turnstone",
+     "target": "mere",
+     "kind": "host_for",
+     "provenance": "curated"
+    },
+    {
+     "id": "woodshed-depends-on-genet",
+     "source": "woodshed",
+     "target": "genet",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "woodshed-depends-on-mere",
+     "source": "woodshed",
+     "target": "mere",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "woodshed-depends-on-netrender",
+     "source": "woodshed",
+     "target": "netrender",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "wgpu-scry-depends-on-wgpu-graft",
+     "source": "wgpu-scry",
+     "target": "wgpu-graft",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "wgpu-weld-depends-on-wgpu-graft",
+     "source": "wgpu-weld",
+     "target": "wgpu-graft",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "genet-renders-with-netrender",
+     "source": "genet",
+     "target": "netrender",
+     "kind": "renders_with",
+     "provenance": "curated"
+    },
+    {
+     "id": "mere-renders-with-genet",
+     "source": "mere",
+     "target": "genet",
+     "kind": "renders_with",
+     "provenance": "curated"
+    }
+   ]
+  }
+ },
+ "current": {
+  "cursor": {
+   "source": "merely-made/merelyllc.com",
+   "commit": "69b31d943f5fa025e8497ccc9ce004ad143b73b2",
+   "committed_at": "2026-09-30T22:02:56-04:00"
+  },
+  "graph": {
+   "nodes": [
+    {
+     "id": "org-profile",
+     "name": "Merely organization profile",
+     "class": "tool",
+     "status": "reference",
+     "pushed_at": "2026-09-24T11:45:13Z"
+    },
+    {
+     "id": "mer3ly",
+     "name": "Mer3ly",
+     "class": "product",
+     "status": "active",
+     "pushed_at": "2026-09-11T18:16:25Z"
+    },
+    {
+     "id": "genet",
+     "name": "Genet",
+     "class": "platform",
+     "status": "active",
+     "pushed_at": "2026-09-23T12:05:08Z"
+    },
+    {
+     "id": "mere",
+     "name": "Mere",
+     "class": "platform",
+     "status": "active",
+     "pushed_at": "2026-09-24T11:36:39Z"
+    },
+    {
+     "id": "retinue",
+     "name": "Retinue",
+     "class": "platform",
+     "status": "active",
+     "pushed_at": "2026-09-21T18:00:08Z"
+    },
+    {
+     "id": "netrender",
+     "name": "Netrender",
+     "class": "foundation",
+     "status": "active",
+     "pushed_at": "2026-09-17T03:09:30Z"
+    },
+    {
+     "id": "smolweb",
+     "name": "Smolweb",
+     "class": "foundation",
+     "status": "active",
+     "pushed_at": "2026-09-11T08:15:34Z"
+    },
+    {
+     "id": "wavicle",
+     "name": "Wavicle",
+     "class": "foundation",
+     "status": "active",
+     "pushed_at": "2026-09-03T05:29:02Z"
+    },
+    {
+     "id": "wgpu-graft",
+     "name": "wgpu-graft",
+     "class": "foundation",
+     "status": "research",
+     "pushed_at": "2026-09-05T03:53:35Z"
+    },
+    {
+     "id": "wgpu-scry",
+     "name": "wgpu-scry",
+     "class": "foundation",
+     "status": "research",
+     "pushed_at": "2026-09-11T19:30:04Z"
+    },
+    {
+     "id": "wgpu-weld",
+     "name": "wgpu-weld",
+     "class": "foundation",
+     "status": "research",
+     "pushed_at": "2026-09-05T03:23:05Z"
+    },
+    {
+     "id": "turnstone",
+     "name": "Turnstone",
+     "class": "product",
+     "status": "prototype",
+     "pushed_at": "2026-09-23T11:15:10Z"
+    },
+    {
+     "id": "knot-editor",
+     "name": "Knot Editor",
+     "class": "product",
+     "status": "active",
+     "pushed_at": "2026-09-24T10:21:29Z"
+    },
+    {
+     "id": "woodshed",
+     "name": "Woodshed",
+     "class": "product",
+     "status": "active",
+     "pushed_at": "2026-09-23T11:01:04Z"
+    },
+    {
+     "id": "isocosm",
+     "name": "Isocosm",
+     "class": "product",
+     "status": "prototype",
+     "pushed_at": "2026-09-24T11:45:08Z"
+    },
+    {
+     "id": "vano",
+     "name": "Vano",
+     "class": "foundation",
+     "status": "active",
+     "pushed_at": "2026-09-12T23:52:06Z"
+    },
+    {
+     "id": "cleromancy",
+     "name": "cleromancy",
+     "class": "tool",
+     "status": "active",
+     "pushed_at": "2026-09-15T07:39:05Z"
+    },
+    {
+     "id": "emblem",
+     "name": "emblem",
+     "class": "tool",
+     "status": "active",
+     "pushed_at": "2026-09-05T05:13:45Z"
+    },
+    {
+     "id": "mora",
+     "name": "mora",
+     "class": "tool",
+     "status": "active",
+     "pushed_at": "2026-09-05T03:22:22Z"
+    },
+    {
+     "id": "pipit",
+     "name": "pipit",
+     "class": "tool",
+     "status": "active",
+     "pushed_at": "2026-09-05T03:22:38Z"
+    },
+    {
+     "id": "turquet",
+     "name": "turquet",
+     "class": "maintained-fork",
+     "status": "active",
+     "pushed_at": "2026-09-11T19:10:30Z"
+    }
+   ],
+   "edges": [
+    {
+     "id": "genet-depends-on-netrender",
+     "source": "genet",
+     "target": "netrender",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "genet-depends-on-vano",
+     "source": "genet",
+     "target": "vano",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "genet-depends-on-wgpu-scry",
+     "source": "genet",
+     "target": "wgpu-scry",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "isocosm-depends-on-genet",
+     "source": "isocosm",
+     "target": "genet",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "isocosm-depends-on-mere",
+     "source": "isocosm",
+     "target": "mere",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "isocosm-depends-on-netrender",
+     "source": "isocosm",
+     "target": "netrender",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "knot-editor-depends-on-genet",
+     "source": "knot-editor",
+     "target": "genet",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "knot-editor-depends-on-mere",
+     "source": "knot-editor",
+     "target": "mere",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "mere-depends-on-knot-editor",
+     "source": "mere",
+     "target": "knot-editor",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "mere-depends-on-genet",
+     "source": "mere",
+     "target": "genet",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "mere-depends-on-netrender",
+     "source": "mere",
+     "target": "netrender",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "mere-depends-on-retinue",
+     "source": "mere",
+     "target": "retinue",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "turnstone-depends-on-genet",
+     "source": "turnstone",
+     "target": "genet",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "turnstone-depends-on-mere",
+     "source": "turnstone",
+     "target": "mere",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "turnstone-depends-on-netrender",
+     "source": "turnstone",
+     "target": "netrender",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "turnstone-depends-on-knot-editor",
+     "source": "turnstone",
+     "target": "knot-editor",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "turnstone-hosts-mere",
+     "source": "turnstone",
+     "target": "mere",
+     "kind": "host_for",
+     "provenance": "curated"
+    },
+    {
+     "id": "woodshed-depends-on-genet",
+     "source": "woodshed",
+     "target": "genet",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "woodshed-depends-on-mere",
+     "source": "woodshed",
+     "target": "mere",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "woodshed-depends-on-netrender",
+     "source": "woodshed",
+     "target": "netrender",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "wgpu-scry-depends-on-wgpu-graft",
+     "source": "wgpu-scry",
+     "target": "wgpu-graft",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "wgpu-weld-depends-on-wgpu-graft",
+     "source": "wgpu-weld",
+     "target": "wgpu-graft",
+     "kind": "depends_on",
+     "provenance": "derived"
+    },
+    {
+     "id": "genet-renders-with-netrender",
+     "source": "genet",
+     "target": "netrender",
+     "kind": "renders_with",
+     "provenance": "curated"
+    },
+    {
+     "id": "mere-renders-with-genet",
+     "source": "mere",
+     "target": "genet",
+     "kind": "renders_with",
+     "provenance": "curated"
+    }
+   ]
+  }
+ },
+ "expected": {
+  "nodes": [
+   [
+    "org-profile",
+    "updated"
+   ],
+   [
+    "mer3ly",
+    "updated"
+   ],
+   [
+    "genet",
+    "updated"
+   ],
+   [
+    "mere",
+    "updated"
+   ],
+   [
+    "retinue",
+    "updated"
+   ],
+   [
+    "netrender",
+    "updated"
+   ],
+   [
+    "smolweb",
+    "updated"
+   ],
+   [
+    "wavicle",
+    "updated"
+   ],
+   [
+    "wgpu-graft",
+    "stable"
+   ],
+   [
+    "wgpu-scry",
+    "updated"
+   ],
+   [
+    "wgpu-weld",
+    "stable"
+   ],
+   [
+    "turnstone",
+    "updated"
+   ],
+   [
+    "knot-editor",
+    "updated"
+   ],
+   [
+    "woodshed",
+    "updated"
+   ],
+   [
+    "isocosm",
+    "added"
+   ],
+   [
+    "vano",
+    "updated"
+   ],
+   [
+    "cleromancy",
+    "updated"
+   ],
+   [
+    "emblem",
+    "stable"
+   ],
+   [
+    "mora",
+    "stable"
+   ],
+   [
+    "pipit",
+    "stable"
+   ],
+   [
+    "turquet",
+    "updated"
+   ],
+   [
+    "hocket",
+    "removed"
+   ],
+   [
+    "isometry",
+    "removed"
+   ],
+   [
+    "mesocosm",
+    "removed"
+   ],
+   [
+    "paredros",
+    "removed"
+   ],
+   [
+    "ringdown",
+    "removed"
+   ]
+  ],
+  "edges": [
+   [
+    "genet-depends-on-netrender",
+    null
+   ],
+   [
+    "genet-depends-on-vano",
+    null
+   ],
+   [
+    "genet-depends-on-wgpu-scry",
+    null
+   ],
+   [
+    "isocosm-depends-on-genet",
+    null
+   ],
+   [
+    "isocosm-depends-on-mere",
+    null
+   ],
+   [
+    "isocosm-depends-on-netrender",
+    null
+   ],
+   [
+    "knot-editor-depends-on-genet",
+    null
+   ],
+   [
+    "knot-editor-depends-on-mere",
+    null
+   ],
+   [
+    "mere-depends-on-knot-editor",
+    null
+   ],
+   [
+    "mere-depends-on-genet",
+    null
+   ],
+   [
+    "mere-depends-on-netrender",
+    null
+   ],
+   [
+    "mere-depends-on-retinue",
+    null
+   ],
+   [
+    "turnstone-depends-on-genet",
+    null
+   ],
+   [
+    "turnstone-depends-on-mere",
+    null
+   ],
+   [
+    "turnstone-depends-on-netrender",
+    null
+   ],
+   [
+    "turnstone-depends-on-knot-editor",
+    null
+   ],
+   [
+    "turnstone-hosts-mere",
+    null
+   ],
+   [
+    "woodshed-depends-on-genet",
+    null
+   ],
+   [
+    "woodshed-depends-on-mere",
+    null
+   ],
+   [
+    "woodshed-depends-on-netrender",
+    null
+   ],
+   [
+    "wgpu-scry-depends-on-wgpu-graft",
+    null
+   ],
+   [
+    "wgpu-weld-depends-on-wgpu-graft",
+    null
+   ],
+   [
+    "genet-renders-with-netrender",
+    null
+   ],
+   [
+    "mere-renders-with-genet",
+    null
+   ]
+  ]
+ },
+ "site_removed_edges_as_written": 8
+}
