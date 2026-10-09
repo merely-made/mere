@@ -303,6 +303,7 @@ fn arrangement_projections(
         out.push((
             "radial weighted focus 0".to_string(),
             crate::canvas::CanvasStrategyProjection {
+                coverage: Default::default(),
                 positions,
                 score: None,
             },

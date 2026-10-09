@@ -9330,6 +9330,7 @@ dependencies = [
  "spareval",
  "spargebra",
  "time",
+ "uuid",
 ]
 
 [[package]]

@@ -140,7 +140,7 @@ pub struct SemanticData {
 /// statement-aware write API's input — the petgraph-RDF plan's Phase 1
 /// requirement that interactive writes can carry per-statement metadata, not
 /// just the legacy edge-wide predicate stamp.
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Default, serde::Serialize, serde::Deserialize)]
 pub struct SemanticStatementSpec {
     pub predicate: String,
     pub recognized_sub_kind: Option<SemanticSubKind>,

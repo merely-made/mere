@@ -933,35 +933,46 @@ pub(crate) fn replay_attributed_deltas_onto<'a, I>(
 ) where
     I: IntoIterator<Item = &'a super::journal::AttributedDelta>,
 {
-    let _quiet = QuietThread::begin();
-    let recorder = graph.recorder.0.take();
-    for entry in entries {
-        if let Some(delta) = attribution.replay_delta(&entry.delta, &entry.author) {
-            let legacy_assertion = matches!(
-                delta,
-                GraphDelta::ReplayAssertRelationByIds { .. }
-                    | GraphDelta::ReplayAssertSemanticPredicateByIds { .. }
-                    | GraphDelta::ReplaySetEdgeSemanticPredicateByIds { .. }
-            );
-            let _ = apply_graph_delta(graph, delta);
-            if legacy_assertion {
-                attribution.observe_graph(graph);
+    replay_quietly(graph, |graph| {
+        for entry in entries {
+            if let Some(delta) = attribution.replay_delta(&entry.delta, &entry.author) {
+                let legacy_assertion = matches!(
+                    delta,
+                    GraphDelta::ReplayAssertRelationByIds { .. }
+                        | GraphDelta::ReplayAssertSemanticPredicateByIds { .. }
+                        | GraphDelta::ReplaySetEdgeSemanticPredicateByIds { .. }
+                );
+                let _ = apply_graph_delta(graph, delta);
+                if legacy_assertion {
+                    attribution.observe_graph(graph);
+                }
             }
         }
-    }
-    graph.recorder.0 = recorder;
+    });
 }
 
 pub(crate) fn replay_graph_deltas_onto<I>(graph: &mut Graph, deltas: I)
 where
     I: IntoIterator<Item = GraphDelta>,
 {
+    replay_quietly(graph, |graph| {
+        for delta in deltas {
+            let _ = apply_graph_delta(graph, delta);
+        }
+    });
+}
+
+fn replay_quietly<R>(graph: &mut Graph, edit: impl FnOnce(&mut Graph) -> R) -> R {
     let _quiet = QuietThread::begin();
     let recorder = graph.recorder.0.take();
-    for delta in deltas {
-        let _ = apply_graph_delta(graph, delta);
-    }
+    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        graph.without_pending_derivation(edit)
+    }));
     graph.recorder.0 = recorder;
+    match result {
+        Ok(result) => result,
+        Err(panic) => std::panic::resume_unwind(panic),
+    }
 }
 
 type CaptureHook = dyn Fn(&CapturedDelta) + Send + Sync + 'static;

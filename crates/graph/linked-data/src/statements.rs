@@ -51,12 +51,69 @@ pub fn resolve_rel(rel: &str) -> Option<(SemanticSubKind, &'static str)> {
 pub struct StatementOutcome {
     /// Number of `Semantic` edges asserted (each with its predicate stamped).
     pub edges_asserted: usize,
-    /// Target URLs not yet present in the graph — the host follows the link
-    /// first (creating the node), then re-applies.
+    /// Target URLs still pending after this apply. Recognized links remain in
+    /// the derived cache and retry after a completed live endpoint admission.
     pub pending_targets: Vec<String>,
     /// Statements whose `rel` is outside Mere's vocabulary — a raw predicate
     /// awaiting the raw-IRI `Semantic` edge path (linked-data plan Phase 2).
     pub unrecognized: Vec<LinkStatement>,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct PendingLinkRebuild {
+    pub queued: usize,
+    pub missing_sources: Vec<String>,
+    pub unrecognized: Vec<LinkStatement>,
+    pub retry: kernel::graph::PendingLinkRetry,
+}
+
+/// Rebuild page extraction inputs using Inker's real document walk. Documents
+/// stay caller-owned. Missing sources are reported rather than materialized.
+pub fn rebuild_pending_links(
+    graph: &mut Graph,
+    documents: &[inker::EngineDocument],
+) -> PendingLinkRebuild {
+    rebuild_pending_links_from_sources(
+        graph,
+        documents
+            .iter()
+            .map(|doc| (kernel::graph::ResourceNode::new(&doc.address).id(), doc)),
+    )
+}
+
+/// The host can supply an already prepared Resource identity for foreign-exact
+/// or redirected sources, without guessing identity from a document's address.
+pub fn rebuild_pending_links_from_sources<'a>(
+    graph: &mut Graph,
+    sources: impl IntoIterator<Item = (uuid::Uuid, &'a inker::EngineDocument)>,
+) -> PendingLinkRebuild {
+    let mut result = PendingLinkRebuild::default();
+    for (source_resource, doc) in sources {
+        if graph.resource(source_resource).is_none() {
+            result.missing_sources.push(doc.address.clone());
+            continue;
+        }
+        for link in inker::link_statements(doc) {
+            let Some((kind, predicate)) = resolve_rel(&link.rel) else {
+                result.unrecognized.push(link);
+                continue;
+            };
+            result.queued += usize::from(graph.queue_pending_link(kernel::graph::PendingLink {
+                source_resource,
+                source_surface: None,
+                target_iri: link.target_url,
+                statement: SemanticStatementSpec {
+                    predicate: predicate.into(),
+                    recognized_sub_kind: Some(kind),
+                    graph_scope: kernel::types::GraphScope::Source,
+                    provenance_iri: Some(doc.address.clone()),
+                    ..Default::default()
+                },
+            }));
+        }
+    }
+    result.retry = graph.retry_pending_links();
+    result
 }
 
 /// Apply predicate-bearing link statements to `graph` as `Semantic` edges from
@@ -75,6 +132,9 @@ pub fn apply_link_statements(
     let Some(asserter) = graph.get_node(source).map(|node| node.url().to_owned()) else {
         return outcome;
     };
+    let source_resource = graph
+        .shown_resource_id(source)
+        .unwrap_or_else(|| kernel::graph::ResourceNode::new(&asserter).id());
     for stmt in statements {
         let Some((sub_kind, predicate)) = resolve_rel(&stmt.rel) else {
             outcome.unrecognized.push(stmt.clone());
@@ -83,6 +143,21 @@ pub fn apply_link_statements(
         // Edge only to a target already in the graph; the immutable lookup ends
         // before the mutation below (`NodeKey` is `Copy`).
         let Some(target) = graph.get_node_by_url(&stmt.target_url).map(|(key, _)| key) else {
+            graph.queue_pending_link(kernel::graph::PendingLink {
+                source_resource,
+                source_surface: (graph.effective_predicate_stratum(predicate)
+                    == Ok(kernel::graph::GraphStratum::Surface))
+                .then(|| graph.get_node(source).map(|node| node.id))
+                .flatten(),
+                target_iri: stmt.target_url.clone(),
+                statement: SemanticStatementSpec {
+                    predicate: predicate.into(),
+                    recognized_sub_kind: Some(sub_kind),
+                    graph_scope: kernel::types::GraphScope::Source,
+                    provenance_iri: Some(asserter.clone()),
+                    ..Default::default()
+                },
+            });
             outcome.pending_targets.push(stmt.target_url.clone());
             continue;
         };
@@ -102,6 +177,13 @@ pub fn apply_link_statements(
             outcome.edges_asserted += 1;
         }
     }
+    outcome.edges_asserted += graph.retry_pending_links().asserted;
+    outcome.pending_targets.retain(|url| {
+        let target = kernel::graph::ResourceNode::new(url);
+        graph.pending_links().iter().any(|link| {
+            link.source_resource == source_resource && link.target_iri == target.canonical_iri()
+        })
+    });
     outcome
 }
 
@@ -220,3 +302,7 @@ mod tests {
         );
     }
 }
+
+#[cfg(test)]
+#[path = "statements_pending_tests.rs"]
+mod pending_tests;

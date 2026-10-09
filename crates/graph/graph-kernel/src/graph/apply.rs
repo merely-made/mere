@@ -554,7 +554,9 @@ fn remove_node_facet(graph: &mut Graph, key: NodeKey, facet: &str) -> bool {
 }
 
 pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResult {
-    match delta {
+    let admission = (graph.resources.inner().node_count(), graph.node_count());
+    let appearances = graph.appearance_admission_revision();
+    let result = match delta {
         GraphDelta::AddNode { id, url, position } => {
             let capture_url = url.clone();
             let capture_position = [position.x, position.y];
@@ -1377,9 +1379,9 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             node_id,
             classification,
         } => {
-            let updated = graph
-                .get_node_key_by_id(node_id)
-                .is_some_and(|key| graph.legacy_add_node_classification(key, classification.clone()));
+            let updated = graph.get_node_key_by_id(node_id).is_some_and(|key| {
+                graph.legacy_add_node_classification(key, classification.clone())
+            });
             if updated {
                 graph.record_delta(&CapturedDelta::ReplayAddNodeClassificationById {
                     node_id: node_id.to_string(),
@@ -1464,9 +1466,9 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             scheme,
             value,
         } => {
-            let updated = graph
-                .get_node_key_by_id(node_id)
-                .is_some_and(|key| graph.legacy_set_node_primary_classification(key, &scheme, &value));
+            let updated = graph.get_node_key_by_id(node_id).is_some_and(|key| {
+                graph.legacy_set_node_primary_classification(key, &scheme, &value)
+            });
             if updated {
                 graph.record_delta(&CapturedDelta::ReplaySetNodePrimaryClassificationById {
                     node_id: node_id.to_string(),
@@ -1793,7 +1795,14 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
         },
+    };
+    if graph.appearance_admission_revision() != appearances
+        || graph.resources.inner().node_count() > admission.0
+        || graph.node_count() > admission.1
+    {
+        graph.retry_pending_links();
     }
+    result
 }
 
 // --- Ergonomic wrappers (write-path migration, 2026-07-01) ---

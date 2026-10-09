@@ -184,9 +184,11 @@ where
             strategy_id: Some(strategy_id.to_string()),
             settled,
             faults: Vec::new(),
+            coverage: Default::default(),
         },
         ..Projection::empty()
     }
+    .with_graph_coverage(graph)
 }
 
 /// The graph's relations collapsed to undirected, de-duplicated `(from, to)`

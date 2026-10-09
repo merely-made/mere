@@ -82,6 +82,14 @@ const MANIFEST: &str = "manifest.json";
 const BASELINE: &str = "baseline.json";
 const PLACEMENT: &str = "placement.json";
 const TRANSLATION: &str = "legacy-translation.json";
+const PENDING_LINKS: &str = "pending-links.json";
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct PendingLinksSlot {
+    version: u32,
+    state: kernel::graph::PendingLinkState,
+}
 const GRAPH: &str = "graph.json";
 const CHECKPOINT: &str = "checkpoint.json";
 const JOURNAL: &str = "journal.jsonl";
@@ -523,9 +531,11 @@ pub struct Pending {
     updated_at: Option<SystemTime>,
     /// Views written, with the log position each was written through.
     views: Vec<(ViewKey, Seq)>,
+    pending_links: Option<(u64, kernel::graph::PendingLinkState)>,
 }
 
 impl Pending {
+    /// Commit batches in creation order. Storage receipts may arrive later.
     pub fn ops(&self) -> &[WriteOp] {
         &self.ops
     }
@@ -562,6 +572,9 @@ pub struct GraphSession<B> {
     /// Whether the baseline is written with the head: a session begun from
     /// no graph stores none, and opens empty.
     write_baseline: bool,
+    saved_pending_links: kernel::graph::PendingLinkState,
+    saved_pending_links_revision: u64,
+    retained_pending_links_revision: u64,
 }
 
 impl<B: Backend> GraphSession<B> {
@@ -589,8 +602,9 @@ impl<B: Backend> GraphSession<B> {
         });
         let write_baseline = baseline.is_some();
         let placement = (!write_baseline).then(SessionPlacement::recorded);
-        let baseline = baseline.unwrap_or_default();
+        let mut baseline = baseline.unwrap_or_default();
         let mut graph = baseline.clone();
+        baseline.clear_semantic_context();
         let pending = Arc::default();
         record_into(&mut graph, &pending);
         Self {
@@ -614,6 +628,9 @@ impl<B: Backend> GraphSession<B> {
             revision: 1,
             head_stored: false,
             write_baseline,
+            saved_pending_links: Default::default(),
+            saved_pending_links_revision: 0,
+            retained_pending_links_revision: 1,
         }
     }
 
@@ -769,6 +786,23 @@ impl<B: Backend> GraphSession<B> {
                 SessionError::Corrupt(format!("{}: replayed graph: {error}", keys.at(JOURNAL)))
             })?;
 
+        let mut saved_pending_links =
+            match read::<B, PendingLinksSlot>(&slots, &keys.at(PENDING_LINKS)).await? {
+                Some(slot) if slot.version == 1 => slot.state,
+                Some(slot) => {
+                    return Err(SessionError::Corrupt(format!(
+                        "{}: unsupported pending-links version {}",
+                        keys.at(PENDING_LINKS),
+                        slot.version,
+                    )));
+                },
+                None => Default::default(),
+            };
+        if saved_pending_links.retention == kernel::graph::PendingLinkRetention::SessionOnly {
+            saved_pending_links.entries.clear();
+        }
+        graph.restore_pending_link_state(saved_pending_links.clone());
+
         let mut session = Self {
             slots,
             validator: None,
@@ -790,6 +824,9 @@ impl<B: Backend> GraphSession<B> {
             revision: 1,
             head_stored: true,
             write_baseline: false,
+            saved_pending_links,
+            saved_pending_links_revision: 1,
+            retained_pending_links_revision: 1,
         };
         session.load_views().await?;
         record_into(&mut session.graph, &session.pending);
@@ -953,6 +990,7 @@ impl<B: Backend> GraphSession<B> {
             )?,
         ];
         self.commit_translation(retained, ops.to_vec()).await?;
+        graph.copy_semantic_context_from(&self.graph);
         record_into(&mut graph, &self.pending);
         self.graph = graph;
         self.placement = Some(placement);
@@ -1130,6 +1168,7 @@ impl<B: Backend> GraphSession<B> {
         edit: impl FnOnce(&mut Graph) -> R,
     ) -> Result<(R, Applied), SessionError> {
         self.ensure_writable()?;
+        let observation = self.graph.semantic_observation_revision();
         let mut candidate = self.graph.clone();
         let captured = Arc::default();
         record_into(&mut candidate, &captured);
@@ -1148,6 +1187,9 @@ impl<B: Backend> GraphSession<B> {
                 "candidate changed graph truth outside the journaled mutation path".into(),
             ));
         }
+        if candidate.retained_pending_link_state() != self.graph.retained_pending_link_state() {
+            self.retained_pending_links_revision += 1;
+        }
         self.graph = candidate;
         record_into(&mut self.graph, &self.pending);
         let first = self.journal.live_cursor();
@@ -1162,6 +1204,8 @@ impl<B: Backend> GraphSession<B> {
                 first,
                 end,
             });
+            self.revision += 1;
+        } else if self.graph.semantic_observation_revision() != observation {
             self.revision += 1;
         }
         let applied = Applied {
@@ -1214,6 +1258,8 @@ impl<B: Backend> GraphSession<B> {
     /// Whether anything waits for the next store, without building the batch.
     pub fn has_unstored(&self) -> bool {
         !self.head_stored
+            || self.retained_pending_links_revision > self.saved_pending_links_revision
+            || self.graph.retained_pending_link_state() != self.saved_pending_links
             || self.journal.live_cursor() > self.saved
             || self.changes.next_seq() > self.changes_saved
             || self
@@ -1232,6 +1278,26 @@ impl<B: Backend> GraphSession<B> {
         let changes = self.changes.next_seq();
         let updated_at = (changes > self.changes_saved).then_some(at);
         let mut ops = Vec::new();
+        let retained_pending_links = self.graph.retained_pending_link_state();
+        // Returning to the saved value still needs a write when an earlier
+        // batch may commit an intervening value. Session-only observations
+        // and host coverage do not advance this durable-cache revision.
+        let pending_links = Some((
+            self.retained_pending_links_revision,
+            retained_pending_links.clone(),
+        ));
+        if !self.head_stored
+            || self.retained_pending_links_revision > self.saved_pending_links_revision
+            || retained_pending_links != self.saved_pending_links
+        {
+            ops.push(pretty(
+                self.keys.at(PENDING_LINKS),
+                &PendingLinksSlot {
+                    version: 1,
+                    state: retained_pending_links,
+                },
+            )?);
+        }
         if !self.head_stored || updated_at.is_some() {
             let mut manifest = self.manifest.clone();
             manifest.updated_at = updated_at.unwrap_or(manifest.updated_at);
@@ -1295,11 +1361,18 @@ impl<B: Backend> GraphSession<B> {
             checkpoint,
             updated_at,
             views,
+            pending_links,
         })
     }
 
     /// Mark a [`Pending`] batch as stored, once it has committed.
     pub fn stored(&mut self, pending: Pending) {
+        if let Some((revision, state)) = pending.pending_links {
+            if revision >= self.saved_pending_links_revision {
+                self.saved_pending_links = state;
+                self.saved_pending_links_revision = revision;
+            }
+        }
         for (key, through) in pending.views {
             if let Some(view) = self.views.get_mut(&key) {
                 view.saved = view.saved.max(through);
@@ -1493,7 +1566,7 @@ impl<B: Backend> GraphSession<B> {
     /// first `cursor` entries replayed. `None` past the live cursor or when
     /// replay produces conflicting active Resource handles.
     pub fn graph_at(&self, cursor: Seq) -> Option<Graph> {
-        let graph = match &self.translation {
+        let mut graph = match &self.translation {
             Some(receipt) => receipt
                 .graph_at(self.journal.entries(), cursor)
                 .ok()
@@ -1501,6 +1574,7 @@ impl<B: Backend> GraphSession<B> {
             None => self.journal.snapshot_at_from(&self.baseline, cursor),
         }?;
         graph.validate_active_resource_assertion_handles().ok()?;
+        graph.set_known_coverage(self.graph.known_coverage().clone());
         Some(graph)
     }
 
@@ -1951,6 +2025,10 @@ impl<B: Backend + Clone> MereSessions<B> {
 #[cfg(test)]
 #[path = "graph_session_content_tests.rs"]
 mod content_tests;
+
+#[cfg(test)]
+#[path = "graph_session_pending_tests.rs"]
+mod pending_tests;
 
 #[cfg(test)]
 mod tests {

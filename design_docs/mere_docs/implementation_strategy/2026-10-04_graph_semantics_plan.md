@@ -2,14 +2,16 @@
 
 **Date:** 2026-10-04
 **Status (2026-10-09):** P1 and the six bounded P2 closure requirements
-are implemented, qualified and merged to main at `526f2ddb5`. The normal
-atomic push updated both `main` and `graph-semantics`; both remote hashes were
-verified exactly. Integration includes main `15fe2a943` and its Rapier,
+are qualified and published to main: source `526f2ddb5`, documentation receipt
+`3b3afa289`. Integration includes main `15fe2a943` and its Rapier,
 projection-editor, identity/Secret Service and physics-registry updates.
-Native supplier and consumer gates, the locked workspace check, kernel/Pandect
-wasm checks and the full standalone browser wasm check pass. Rulings 1–46
-remain authoritative; C5/C6 are settled. P3 is the next authorized phase;
-P3–P5 code has not begun. Earlier Windows/Linux receipts below are historical.
+P3 is implemented and qualified on the graph-semantics lane. Full affected
+native suites, the locked workspace check, kernel/Pandect/query-feature wasm
+checks and the full standalone browser wasm check pass. Fresh source review
+cleared both reported defects after observed-negative regressions and repairs.
+P3 branch publication is recorded below; its main publication is a separate
+checkpoint. Rulings 1–46 remain authoritative; C5/C6 are settled. P4–P5 code
+has not begun. Earlier Windows/Linux receipts below are historical.
 Consumer repinning and vocabulary/oracle cleanup remain separate under §4.
 
 Four questions were put to Mark from outside the project: what a link records,
@@ -3870,3 +3872,86 @@ binding; this list no longer grows as a running implementation checklist.
   worktree for P2 continuation and Mark's review; no new target/home/worktree.
   Nothing is pushed or integrated into main. C18/C19 options remain open;
   this checkpoint does not select an answer or complete P2.
+
+### P3 implementation and qualification (2026-10-09)
+
+Implemented and qualified in the graph-semantics lane:
+
+- Kernel pending inputs retain the source Resource UUID, canonical target IRI,
+  complete source-attributed statement spec and, for Surface-owned predicates,
+  the original stable Surface UUID. Completed Resource, Surface and shown-binding
+  admissions retry the cache. Navigation does not redirect source ownership.
+  Resource-only assertions preserve held handles and placement, refuse ambiguous
+  content matches or declaration conflicts before allocating new relation buckets,
+  and require legitimate appearance context for new Surface-owned claims.
+- Replay suppresses ambient extraction for the complete replay and restores both
+  suppression and recorder on unwind. Clones start live. Native RDF apply suppresses
+  retry through the complete carried batch, then retries successful admissions so
+  carried handles and metadata win. Import remains the existing per-row API;
+  snapshot-equal refusal is qualified for an incoming row with no admission, not
+  a new whole-envelope transaction guarantee.
+- Inker's real EngineDocument walk rebuilds inputs from caller-owned documents.
+  Missing sources are reported, not created. Prepared source identities can be
+  supplied explicitly. Purge changes no source document, assertion, snapshot or
+  journal entry.
+- GraphSession keeps live pending inputs outside historical baseline/replay.
+  SessionOnly is the default; UntilPurged is a setting persisted in a separate
+  version-1 pending-links.json slot. Unsupported versions are refused. Cache and
+  coverage observations advance the session revision without fake journal changes.
+  Only retained-state changes advance the durable cache revision, including a
+  return to the previously saved value while an older batch is outstanding.
+  Backend batches commit in creation order; delayed receipts cannot replace a
+  newer saved-cache receipt. Session-only inputs and host coverage do not dirty
+  or write the durable slot. Legacy qualification preserves live runtime context.
+- CoverageNote carries possession, residency, disclosure, synchronization and
+  projection limits. Host observations stay runtime context, outside graph truth
+  and geometry/channel cache keys. An empty note means no known limit in this
+  supplied graph, never world completeness. Pending missing endpoints add aggregate
+  possession notes, except where a known residency boundary explains the absence.
+  Automatic notes expose counts and reasons without pending target IRIs or IDs.
+- SELECT, empty SELECT and ASK retain notes. Projection metadata carries host
+  limits and actual omitted Surfaces, Resources without projected appearances,
+  relation pairs, missing channels, missing focus and unavailable strategies.
+  Parallel/directional strokes count as represented endpoint pairs under the
+  existing underlay contract; geometry is unchanged. CoveredScene retains the
+  portable sceno Scene alongside coverage. CanvasStrategyProjection retains notes
+  when reducing geometry, with fresh notes even when channels remain cached.
+
+Focused controls establish live arrival versus purge, Resource-only arrival,
+source navigation/deletion, duplicate reapply, carried import handles/metadata,
+Surface context/ambiguity, suppression unwind/clone, actual document rebuilding,
+prepared identity, unsupported cache version, both retention policies, actual
+backend batch/reopen ordering, all five host coverage layers, projection omissions
+and missing-channel faults. The reviewer found the returned-to-saved-state cache
+write omission and navigation to an already held target; both have observed
+negative regressions and repairs. Full serial gates and fresh source review
+pass; receipts follow. P5 supplies actual partial residency. External live
+peers, headed browser, physical GPU and sibling adoption remain outside these
+native tests and wasm compile receipts.
+
+P3 serial qualification receipts, all with --locked, -j1 and native
+tests using --test-threads=1 (inherited RUST_TEST_THREADS removed):
+
+| Gate | Receipt |
+| --- | --- |
+| Kernel, store feature | 426 tests; compile-fail handle doctest passes; one capture-hook doctest ignored |
+| Pandect | 348 tests and two reopen integrations; one isolated child helper ignored |
+| Linked-data, query feature | 84 tests |
+| Document lanes, all features | 55 tests and two integrations, including peer transfer and streaming render |
+| Cartography | 57 tests |
+| Canvas, canvas feature | 376 tests; existing 18 ignored tests and one ignored doctest |
+| Graphshell, personal-sync feature | 411 tests and seven integrations; existing five ignored tests |
+| Locked workspace | cargo check --workspace passes |
+| Kernel and Pandect wasm | Both wasm32-unknown-unknown checks pass |
+| Linked-data query wasm | Explicit query-feature wasm32-unknown-unknown check passes, from browser cwd with root manifest |
+| Full standalone browser wasm | Default browser feature build passes, with its retained ignored lock |
+
+The frozen source/assets/manifests map contains 3067 files, including the
+ignored standalone browser lock, and remains unchanged through every gate.
+Logs are retained under the shared Cargo target as graph-semantics-p3-*.log.
+The fresh reviewer cleared the complete source after both repairs. The only
+manifest/lock addition is linked-data's direct dependency edge to the already
+locked uuid package for explicit prepared-source rebuilding; package versions
+and the standalone browser lock are unchanged. Source, index and plan are
+ready for normal branch publication. Report at the P3 phase boundary before
+main integration or P4/P5 work.
