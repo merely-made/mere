@@ -41,12 +41,10 @@
 
 mod admitted;
 pub mod base32;
-mod credential;
 mod item;
 mod participant;
 mod release;
 mod steam_guard;
-mod tile;
 mod uri;
 
 use std::fmt;
@@ -69,7 +67,6 @@ pub use base32::Base32Error;
 // The display enums are chatelaine's, one definition for the taxonomy and
 // castellan. `OtpKind` stays here: it carries the live HOTP counter.
 pub use chatelaine::{OtpAlgorithm, OtpCodeStyle, OtpMode};
-pub use credential::OtpCredential;
 pub use item::{OtpItemError, OtpItemStore};
 pub use participant::{OtpReleaseParticipantClaim, OtpReleaseParticipantProof};
 pub use release::{
@@ -77,7 +74,8 @@ pub use release::{
     OtpReleaseRequest, OtpReleasedCode,
 };
 pub use steam_guard::{SteamGuard, SteamGuardError};
-pub use tile::{OtpCodeTile, OtpTimeRing};
+// The display types live in chatelaine (dramatis repo plan, ruling D29).
+pub use chatelaine::{OtpCodeTile, OtpCredential, OtpTimeRing};
 pub use uri::{OtpUri, OtpUriError, parse_otpauth_uri};
 
 /// The default time step, in seconds. RFC 6238 §5.2 recommends 30.
