@@ -58,6 +58,10 @@ A family moves together because its crates pin each other.
 
 **D10, the Servo parsers (2026-10-08; from D5).** Options: include them in genet's stage, the WPT and DOM suites as their gate; leave them. Mark: **"Include them (Recommended)"**.
 
+**D11, netrender's wgpu family (2026-10-08).** Question: `cargo update -p wgpu` left netrender on wgpu 30.0.1 over wgpu-core, wgpu-hal, wgpu-types and naga 30.0.0, a mix neither genet nor mere resolves; aligning moves five versions, downloads nothing, and passed netrender's suite (343 passed, 2 ignored, 66 executables) with the Classic Isocosm replay identical in all 18 fields. Options: align the family; keep wgpu alone at 30.0.1. Mark: **"Align the family (Recommended)"**.
+
+**D12, landing netrender's lane (2026-10-08).** Question: sha2 0.11 (receipt hashes byte-identical) and the compatible updates reach neither consumer (sha2 is a dev-dependency; genet and mere already resolve every target version), so no repin follows. Options: push to netrender main once aligned; hold for genet's stage. Mark: **"Push after aligning (Recommended)"**.
+
 ## 4. Order
 
 Upstream first (D6): netrender (sha2 and its compatible updates; its text family is the Vello lane's, D8), then genet (accessibility, the small ones, the Servo parsers (D10); its text family is the Vello lane's), then mere's own groups (security-sensitive, accessibility, data and Meaning, other), one mere lane at a time, each taking the genet and netrender repins as they land. Constraints:
