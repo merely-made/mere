@@ -89,8 +89,9 @@ pub(crate) fn quads(graph: &Graph, resource: &kernel::graph::ResourceNode) -> Ve
 mod tests {
     use super::*;
     use crate::{
-        RDF_REIFIES, apply_contribution, dataset_quads, from_jsonld, from_nquads, from_trig,
-        to_jsonld, to_jsonld_compact, to_nquads, to_trig,
+        RDF_REIFIES, apply_contribution, apply_import, dataset_quads, from_jsonld,
+        from_jsonld_envelope, from_nquads_envelope, from_trig_envelope, to_jsonld,
+        to_jsonld_compact, to_nquads, to_trig,
     };
     use kernel::graph::apply::{GraphDelta, add_node, apply_graph_delta};
     use kernel::graph::{Author, ResourceNode};
@@ -247,27 +248,27 @@ mod tests {
         };
         let expected_dataset = normalized(&graph);
         let contributions = [
-            from_jsonld(
+            from_jsonld_envelope(
                 serde_json::to_string(&to_jsonld(&graph))
                     .unwrap()
                     .as_bytes(),
             )
             .unwrap(),
-            from_jsonld(
+            from_jsonld_envelope(
                 serde_json::to_string(&to_jsonld_compact(&graph))
                     .unwrap()
                     .as_bytes(),
             )
             .unwrap(),
-            from_nquads(&to_nquads(&graph), "resource-profile").unwrap(),
-            from_trig(&to_trig(&graph).unwrap(), "resource-profile").unwrap(),
+            from_nquads_envelope(&to_nquads(&graph), "resource-profile").unwrap(),
+            from_trig_envelope(&to_trig(&graph).unwrap(), "resource-profile").unwrap(),
         ];
         for (format, contribution) in ["expanded JSON-LD", "compact JSON-LD", "N-Quads", "TriG"]
             .into_iter()
             .zip(contributions)
         {
             let mut reingested = Graph::new();
-            let outcome = apply_contribution(&mut reingested, &contribution);
+            let outcome = apply_import(&mut reingested, &contribution);
             assert_eq!(outcome.edges_skipped, 0);
             let actual = reingested.resource_properties(id);
             for property in &expected {
@@ -297,7 +298,7 @@ mod tests {
                 "{format} must preserve the complete Resource RDF dataset, including exact reifiers"
             );
             let before = reingested.resource_properties(id);
-            apply_contribution(&mut reingested, &contribution);
+            apply_import(&mut reingested, &contribution);
             assert_eq!(reingested.resource_properties(id), before);
         }
     }

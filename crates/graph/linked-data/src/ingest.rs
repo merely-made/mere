@@ -108,6 +108,9 @@ pub struct GraphContribution {
     pub edges: Vec<EdgeContribution>,
 }
 
+mod envelope;
+pub use envelope::ImportEnvelope;
+
 /// RDF ingest failure (JSON-LD, N-Quads, or TriG).
 #[derive(Debug)]
 pub enum IngestError {
@@ -198,7 +201,7 @@ fn route_resource(
     object: String,
     graph_scope: GraphScope,
 ) {
-    if predicate == RDF_TYPE {
+    if predicate == RDF_TYPE && graph_scope == GraphScope::Default {
         nodes
             .get_mut(subject)
             .expect("subject inserted before routing")
@@ -238,6 +241,11 @@ fn scope_from_graph_name(graph_name: &oxrdf::GraphName, namespace: &str) -> Grap
 /// graph, no kernel mutation. Expects inline-`@context` or expanded JSON-LD; a
 /// remote `@context` is not fetched (a bundled-context loader is a later step).
 pub fn from_jsonld(bytes: &[u8]) -> Result<GraphContribution, IngestError> {
+    from_jsonld_envelope(bytes).map(ImportEnvelope::into_contribution)
+}
+
+/// Parse JSON-LD with definition evidence for [`apply_import`].
+pub fn from_jsonld_envelope(bytes: &[u8]) -> Result<ImportEnvelope, IngestError> {
     collect_contribution(JsonLdParser::new().for_slice(bytes), &doc_namespace(bytes))
 }
 
@@ -249,6 +257,14 @@ pub fn from_quads(
     quads: impl IntoIterator<Item = Quad>,
     namespace: &str,
 ) -> Result<GraphContribution, IngestError> {
+    from_quads_envelope(quads, namespace).map(ImportEnvelope::into_contribution)
+}
+
+/// Parse RDF quads while retaining profile definition and assertion evidence.
+pub fn from_quads_envelope(
+    quads: impl IntoIterator<Item = Quad>,
+    namespace: &str,
+) -> Result<ImportEnvelope, IngestError> {
     collect_contribution(
         quads.into_iter().map(Ok::<Quad, std::convert::Infallible>),
         namespace,
@@ -278,6 +294,24 @@ pub fn from_jsonld_with_contexts_and_base_iri(
     contexts: ContextCache,
     base_iri: Option<&str>,
 ) -> Result<GraphContribution, IngestError> {
+    from_jsonld_envelope_with_contexts_and_base_iri(bytes, contexts, base_iri)
+        .map(ImportEnvelope::into_contribution)
+}
+
+/// Parse JSON-LD using the offline cache and retain its import evidence.
+pub fn from_jsonld_envelope_with_contexts(
+    bytes: &[u8],
+    contexts: ContextCache,
+) -> Result<ImportEnvelope, IngestError> {
+    from_jsonld_envelope_with_contexts_and_base_iri(bytes, contexts, None)
+}
+
+/// Like [`from_jsonld_envelope_with_contexts`], using a caller-owned document base.
+pub fn from_jsonld_envelope_with_contexts_and_base_iri(
+    bytes: &[u8],
+    contexts: ContextCache,
+    base_iri: Option<&str>,
+) -> Result<ImportEnvelope, IngestError> {
     let namespace = doc_namespace(bytes);
     let parser = match base_iri {
         Some(base_iri) => JsonLdParser::new()
@@ -390,7 +424,7 @@ pub(crate) fn parse_xsd_datetime_ms(lexical: &str) -> Option<u64> {
 fn collect_contribution<E: std::fmt::Display>(
     quads: impl Iterator<Item = Result<Quad, E>>,
     namespace: &str,
-) -> Result<GraphContribution, IngestError> {
+) -> Result<ImportEnvelope, IngestError> {
     let mut nodes: BTreeMap<String, NodeContribution> = BTreeMap::new();
     let mut edges: Vec<EdgeContribution> = Vec::new();
 
@@ -515,6 +549,7 @@ fn collect_contribution<E: std::fmt::Display>(
         }
     }
 
+    let mut evidence = envelope::ImportEvidence::from_quads(&plain, namespace);
     for quad in plain {
         let subject = subject_iri(&quad.subject, namespace);
         let predicate_norm = normalize_schema_org(quad.predicate.as_str());
@@ -545,6 +580,7 @@ fn collect_contribution<E: std::fmt::Display>(
                         .with_graph_scope(graph_scope.clone());
                     property.datatype = datatype;
                     property.lang = lang;
+                    evidence.plain_property(&subject, &property);
                     node.properties.push(property);
                 }
             },
@@ -566,6 +602,9 @@ fn collect_contribution<E: std::fmt::Display>(
             ),
             Term::Triple(_) => {},
         }
+    }
+    for (index, edge) in edges.iter().enumerate() {
+        evidence.plain_edge(index, edge);
     }
 
     // Attach the lifted reifier metadata to the matching contributions:
@@ -633,6 +672,7 @@ fn collect_contribution<E: std::fmt::Display>(
                 // assertion. Consume its slot once; each further reifier
                 // creates its own contribution instead of overwriting it.
                 if let Some(position) = edge_index.remove(&match_key) {
+                    evidence.reified_edge(position);
                     let edge = &mut edges[position];
                     edge.statement_id = statement_id;
                     edge.label = statement.label;
@@ -697,11 +737,15 @@ fn collect_contribution<E: std::fmt::Display>(
                     },
                 };
                 let property = &mut node.properties[position];
-                if let Some(id) = statement_id {
-                    property.statement_id = id;
+                evidence.reified_property(&statement.subject, &property.statement_id);
+                if let Some(id) = &statement_id {
+                    property.statement_id = id.clone();
                 }
                 property.provenance_iri = statement.provenance_iri;
                 property.asserted_at_ms = statement.asserted_at_ms;
+                if statement_id.is_some() {
+                    evidence.carried_property(&statement.subject, property);
+                }
             },
         }
     }
@@ -740,12 +784,20 @@ fn collect_contribution<E: std::fmt::Display>(
                         &b.statement_id,
                     ))
             });
-            node.properties.dedup_by(|a, b| a.content_eq(b));
+            node.properties.dedup_by(|a, b| {
+                a.content_eq(b)
+                    && (a.statement_id == b.statement_id
+                        || (!evidence.is_carried_property(&node.id, a)
+                            && !evidence.is_carried_property(&node.id, b)))
+            });
             node
         })
         .collect();
 
-    Ok(GraphContribution { nodes, edges })
+    Ok(ImportEnvelope {
+        contribution: GraphContribution { nodes, edges },
+        evidence,
+    })
 }
 
 /// A bundled JSON-LD `@context` cache for offline ingest: a map of context URL to
@@ -871,6 +923,8 @@ mod apply;
 #[cfg(not(target_arch = "wasm32"))]
 pub use apply::ApplyOutcome;
 #[cfg(not(target_arch = "wasm32"))]
-pub use apply::{apply_contribution, apply_contribution_with_identity};
+pub use apply::{
+    apply_contribution, apply_contribution_with_identity, apply_import, apply_import_with_identity,
+};
 #[cfg(test)]
 mod tests;

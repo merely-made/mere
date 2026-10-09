@@ -18,9 +18,13 @@ use kernel::types::{
 };
 
 #[cfg(not(target_arch = "wasm32"))]
-use super::{GraphContribution, NodeContribution, SubjectIdentity};
+use super::{GraphContribution, ImportEnvelope, NodeContribution, SubjectIdentity};
 #[cfg(not(target_arch = "wasm32"))]
 use kernel::persistence::PersistedResourceRecord;
+
+#[cfg(not(target_arch = "wasm32"))]
+#[path = "exact.rs"]
+mod exact;
 
 /// What [`apply_contribution`] did.
 #[cfg(not(target_arch = "wasm32"))]
@@ -55,7 +59,38 @@ pub fn apply_contribution(graph: &mut Graph, contribution: &GraphContribution) -
 pub fn apply_contribution_with_identity(
     graph: &mut Graph,
     contribution: &GraphContribution,
+    identity: impl FnMut(&NodeContribution) -> SubjectIdentity,
+) -> ApplyOutcome {
+    apply_inner(graph, contribution, identity, None)
+}
+
+/// Import a parsed RDF profile without inventing assertions for its definitions.
+#[cfg(not(target_arch = "wasm32"))]
+pub fn apply_import(graph: &mut Graph, envelope: &ImportEnvelope) -> ApplyOutcome {
+    apply_import_with_identity(graph, envelope, |_| SubjectIdentity::ExactIri)
+}
+
+/// Import with explicit page identity intent and the original parser evidence.
+#[cfg(not(target_arch = "wasm32"))]
+pub fn apply_import_with_identity(
+    graph: &mut Graph,
+    envelope: &ImportEnvelope,
+    identity: impl FnMut(&NodeContribution) -> SubjectIdentity,
+) -> ApplyOutcome {
+    apply_inner(
+        graph,
+        &envelope.contribution,
+        identity,
+        Some(&envelope.evidence),
+    )
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+fn apply_inner(
+    graph: &mut Graph,
+    contribution: &GraphContribution,
     mut identity: impl FnMut(&NodeContribution) -> SubjectIdentity,
+    evidence: Option<&super::envelope::ImportEvidence>,
 ) -> ApplyOutcome {
     use std::collections::HashMap;
 
@@ -75,6 +110,7 @@ pub fn apply_contribution_with_identity(
 
     let mut outcome = ApplyOutcome::default();
     let mut key_for: HashMap<&str, NodeKey> = HashMap::new();
+    let mut defined = std::collections::HashSet::new();
 
     for node in &contribution.nodes {
         let subject_identity = identity(node);
@@ -180,21 +216,50 @@ pub fn apply_contribution_with_identity(
                 );
             }
         }
-        let _ = graph.append_node_properties(key, node.properties.clone());
+        if let Some(definition) = evidence.and_then(|evidence| evidence.definitions.get(&node.id))
+            && let Some(id) = graph.shown_resource_id(key)
+            && graph
+                .define_tag_concept(
+                    id,
+                    kernel::graph::resource_tags::TagConcept {
+                        owner_iri: definition.owner.clone(),
+                        label: definition.label.clone(),
+                    },
+                )
+                .is_ok()
+        {
+            defined.insert(node.id.as_str());
+        }
+        let is_definition = defined.contains(node.id.as_str());
+        let properties: Vec<_> = node
+            .properties
+            .iter()
+            .filter(|property| {
+                !is_definition || !evidence.unwrap().is_plain_property(&node.id, property)
+            })
+            .cloned()
+            .collect();
+        let (carried, plain): (Vec<_>, Vec<_>) = properties.into_iter().partition(|property| {
+            evidence.is_some_and(|evidence| evidence.is_carried_property(&node.id, property))
+        });
+        let _ = graph.append_node_properties(key, plain);
+        let _ = exact::import_properties(graph, key, &carried);
         // `@type` IRIs become `rdf:type` classifications (kernel dedups them).
         let _ = graph.add_node_classifications(
             key,
             node.types
                 .iter()
+                .filter(|iri| !is_definition || iri.as_str() != super::envelope::SKOS_CONCEPT)
                 .map(|type_iri| rdf_type_classification(type_iri))
                 .collect(),
         );
         // Interpret only the complete, unambiguous SKOS tag profile. Foreign partial
         // descriptions remain ordinary RDF properties and edges.
-        if node
-            .types
-            .iter()
-            .any(|iri| iri == "http://www.w3.org/2004/02/skos/core#Concept")
+        if evidence.is_none()
+            && node
+                .types
+                .iter()
+                .any(|iri| iri == "http://www.w3.org/2004/02/skos/core#Concept")
         {
             let descriptions: Vec<_> = node
                 .properties
@@ -241,7 +306,12 @@ pub fn apply_contribution_with_identity(
         key_for.insert(node.id.as_str(), key);
     }
 
-    for edge in &contribution.edges {
+    for (index, edge) in contribution.edges.iter().enumerate() {
+        if defined.contains(edge.subject.as_str())
+            && evidence.is_some_and(|evidence| evidence.is_plain_edge(index))
+        {
+            continue;
+        }
         let (Some(&from), Some(&to)) = (
             key_for.get(edge.subject.as_str()),
             key_for.get(edge.object.as_str()),
@@ -250,6 +320,12 @@ pub fn apply_contribution_with_identity(
             continue;
         };
         let sub_kind = sub_kind_from_iri(&edge.predicate);
+        if evidence.is_some() && edge.statement_id.is_some() {
+            if exact::import_edge(graph, from, to, edge) {
+                outcome.edges_asserted += 1;
+            }
+            continue;
+        }
         let asserter = edge
             .provenance_iri
             .clone()
