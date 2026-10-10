@@ -82,6 +82,89 @@ lift that hold or assign Moot's work to this lane.
 
 ## Where things are
 
+**Codex checkpoint (2026-10-09, implementation draft):** SE88 names the UI
+concept "appearance part"; SE89 gives every occurrence a separate transient
+physics body and refuses undisclosed channels. The carrier, preset/full-spec
+variant binding, fixed-step settle loop, and Arrangement/Dynamics matrix are
+being implemented. Native checks cover repeatability, a changed-bound control,
+independent bodies for a repeated source, display refresh without restarting
+motion, and one undo for a comparison pick. Native suites pass: Scenograph 16,
+Scenomise 157, Seiche 159 (10 ignored), Pictograph with canvas 381 (18 ignored),
+and Graphshell's no-default-features web library 187 (5 ignored). The full
+browser host builds for wasm. The encoded-position interpretation, variant
+precedence and measured default bound remain open, as do the browser and
+readability qualification gates described below.
+The broader F199 pause remains in effect.
+
+**Final draft receipts:** `Code/testing/mere/scenograph-editor/receipts/dynamics-identity-final.json`
+records two fresh runs per target for all twelve presets, with exact float-word
+identity between native and Node wasm at bounds 0, 59, 60 and 4,000. The 59/60
+control changes positions for six laws. It records source/binary/lock hashes;
+source was unchanged during the probe. `dynamics_identity.py` beside the sink
+server reproduces the probe after building the native example and generating
+the Node wasm bindings. These are three-occurrence fixture receipts, not a
+large-scene performance claim. The earlier `dynamics-identity.json` is superseded
+because its attempted Anneal tick-demand change was removed.
+The standalone web lock is ignored by Git and was regenerated against its
+existing manifests after the stale lock could not satisfy Rapier's glamx
+requirement. Its transitive resolution changed; no Genet manifest pin was
+changed by this lane. The two lock hashes in the final receipt identify the
+actual graphs used, rather than claiming a one-entry dependency update.
+
+The corrected `projection_dynamics.scn` passes 27 steps over 46 frames in the
+Codex in-app Chromium browser at 520×604 and 1440×900, with two captures per run
+and no reported errors or gate failures. The sink labels this browser "chrome";
+it is not a standalone Chrome receipt. Desktop headings are readable, but the
+narrow matrix overlaps labels and the desktop footer covers part of the last
+row. Capped-state wording is present in semantic buttons but needs visible
+treatment. Standalone Chrome and Firefox remain unqualified. The receipt names
+are `chrome_dynamics-final-scenario-receipt.json` and
+`chrome_dynamics-desktop-scenario-receipt.json` in that receipts directory.
+
+The final twelve-preset probe measured about 0.96 s per wasm run at 60 ticks and
+14.79 s at 4,000; these include process/module startup and concurrent workspace
+load. The earlier 0.30/13.84 s measurement is superseded. A configurable default
+of 60 ticks remains a recommendation to Mark, not an installed default; a capped
+cell is "Step limit reached", not "At rest".
+
+**Stop-condition correction:** an attempted Anneal tick-demand change failed
+the existing Seiche speed/settle contract and was removed. The occurrence
+preview now reads the catalog's derived currencies. A kinematic or resident
+law does not acquire an RMS-velocity rest claim; explicit schedule stops and
+existing completion signals remain usable, otherwise the caller's step limit
+ends the snapshot. Anneal's own completion is not qualified by this lane.
+This does not change the shared Canvas runtime's ordinary settle budgets.
+
+**Design-language reconciliation:** upstream §9.8/§9.9 keeps resource identity
+separate from multiple appearances and makes deselection preserve edits.
+The draft uses one body per occurrence and refreshes presentation without
+restarting a reused placement. A footprint change rebuilds the preview,
+because measurement is a physics input. Foreground attention, positional
+pins and layout locks remain distinct. Fields and relationship explanations
+do not install forces implicitly; their broader proofs remain with their
+owners. The encoding interpretation, F194's dual-name refusal and F195's
+default bound are pending questions to Mark. The draft is not promoted while
+those decisions and browser/readability gates remain open.
+
+**Viewer ownership refresh:** the site source was refreshed against upstream
+`87d7a3d`. Ruling 161 replaces the deferred grouping choice with folds; Ruling
+162 assigns `web_tree*`, `host_dataset_view.rs` and `web_dataset.rs` to the site
+lane for its cutover. B1/S2 edits to those files must go through that owner.
+The one `host_dataset_view.rs` change in the dynamics draft is the required
+`dynamics: None` initialization for the expanded recipe type. No new viewer
+behavior has been installed. The site's upstream sandbox still carries
+`mer3ly.facets`; SE88's key migration has not been applied.
+
+**Workspace rules for this continuation:** Mark's current workspace
+instructions supersede the historical worktree/build-directory paragraph below.
+Use main unless an actual concurrent collision requires isolation, and reuse
+`C:/t/cargo-targets/mere`. No dynamics worktree or isolated Cargo home has been
+created.
+The temporary browser tab and receipt server were closed, and the generated
+Node bindings were removed after the identity gate. Receipts and the reusable
+probe remain under the existing testing directory. The shared Mere target and
+the browser package remain available for the open qualification gates.
+
 - Swatch types: `crates/cambium/scenes/scenograph/src/swatch.rs`. Composition: `crates/cambium/scenes/scenomise/src/facet.rs` (`compose_facet`), tests in `facet_tests.rs`. Subgraph specs: `crates/forme/curation` (published as `mere-curation`).
 - The editor's grid: `ports/graphshell/src/projection_compare.rs` and `web_projection.rs` (`compare_targets`, `toggle_projection_compare`, `pick_projection_compare`); headed scenario `ports/graphshell/web/scenarios/projection_compare.scn`.
 - The catalog's addition records: `mere_docs/research/2026-08-15_projection_grammar_catalog.md`, "Addition records". Each promoted primitive needs one.

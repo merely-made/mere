@@ -319,6 +319,10 @@ Done when:
 
 ### S2 — linked swatches (SE84, SE85)
 
+*Ownership checkpoint, 2026-10-09:* the site's R162 now assigns the viewer
+files to the site lane for its cutover. S2 and B1 coordinate through that
+owner; the dynamics editor draft is not a qualification of either track.
+
 A facet's cells act together, so the mer3ly sandbox's scatter, deck and linked views move onto the stack.
 - **Shared selection.** A facet carries a selection of clauses per cell (crossfilter or highlight, as the site's `selection.clauses`), which every cell reads; picking routes as a host intent.
 - **Appearance-part selection.** Selecting a part of one appearance (the site's cell, heading, summary, status) is a clause of its own, under a new name put to Mark; the site's `mer3ly.facets` shelfmark key migrates to it.
