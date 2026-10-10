@@ -8,8 +8,9 @@
 #
 # Interim scaffolding per the 2026-07-22 identity-vault-ssh-agent plan: the
 # agent's durable home is the mere/Graphshell resident host, which will serve
-# `personae::agent` in-process. Until then this installs the standalone bins
-# and a logon scheduled task. Source is the folded crate here in mere (the
+# the agent (`castellan::custody::agent` since DR-B) in-process. Until then
+# this installs the standalone bins and a logon scheduled task. Source is
+# castellan here in mere (the bins moved from personae in DR-B; the
 # standalone repos/personae was absorbed 2026-07-23), so rebuilds come from
 # the mere workspace.
 #
@@ -18,12 +19,12 @@
 
 $ErrorActionPreference = "Stop"
 $bin = "$env:LOCALAPPDATA\personae\bin"
-$mere = (Resolve-Path "$PSScriptRoot\..\..\..").Path
+$mere = (Resolve-Path "$PSScriptRoot\..\..").Path
 
-Write-Host "building personae bins (release, agent feature) from $mere"
+Write-Host "building the personae bins (castellan, release, agent feature) from $mere"
 Push-Location $mere
 try {
-    cargo build -p personae --features agent --release
+    cargo build -p castellan --features agent --release
 } finally {
     Pop-Location
 }
