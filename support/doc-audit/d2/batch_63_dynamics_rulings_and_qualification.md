@@ -161,3 +161,12 @@ foreground pins bring nodes forward; deselected interacted nodes remain in
 the background until dismissed. The plan and handoff preserve independent
 physics/behavior and keeping state. Reset and qualifying-interaction details
 remain open. No viewer implementation or new runtime receipt is claimed.
+
+## Design ownership continuation, 2026-10-10
+
+Read published Mere `79115edd` §9.14 directly after a fresh fetch, against
+local base `ad376e26`. The handoff matches its projection/dynamics boundary,
+Tabard ownership, unassigned scene-authoring research and retained runtime
+gates. The forme draft summary matches the accepted scope conveyed by the
+allocation. This is a documentation-only acknowledgment, not an implementation
+receipt or reopening of F199. Concurrent CLI work is outside this change.
