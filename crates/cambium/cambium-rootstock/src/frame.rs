@@ -827,31 +827,32 @@ where
     }
 
     /// Route Cambium `on_hover` Enter/Leave as the hit node changes. The host
-    /// owns transition detection; Move is not routed, so idle motion within a
-    /// target stays free. Coordinates are zeroed — a peek only needs which
-    /// target.
+    /// owns transition detection. Registered hover handlers also receive local
+    /// coordinates on Move; motion over unregistered content does no dispatch.
     pub fn hover_dispatch(&mut self) {
         use cambium::{HoverEvent, HoverPhase};
-        let hit = self.hit_at_cursor();
-        if hit == self.s.last_hover_hit {
+        let target = self
+            .hit_at_cursor()
+            .and_then(|hit| self.s.runner.as_ref()?.hover_target(hit));
+        if target == self.s.last_hover_hit {
+            if let Some(target) = target {
+                let (local, size) = self.local_in(target);
+                if let Some(runner) = self.s.runner.as_mut() {
+                    runner.dispatch_hover(target, HoverEvent::new(HoverPhase::Move, local, size));
+                }
+                self.after_dispatch();
+            }
             return;
         }
         let old = self.s.last_hover_hit.take();
-        self.s.last_hover_hit = hit;
-        let Some(runner) = self.s.runner.as_mut() else {
-            return;
-        };
-        if let Some(old) = old {
-            runner.dispatch_hover(
-                old,
-                HoverEvent::new(HoverPhase::Leave, (0.0, 0.0), (0.0, 0.0)),
-            );
-        }
-        if let Some(new) = hit {
-            runner.dispatch_hover(
-                new,
-                HoverEvent::new(HoverPhase::Enter, (0.0, 0.0), (0.0, 0.0)),
-            );
+        self.s.last_hover_hit = target;
+        for (node, phase) in [(old, HoverPhase::Leave), (target, HoverPhase::Enter)] {
+            if let Some(node) = node {
+                let (local, size) = self.local_in(node);
+                if let Some(runner) = self.s.runner.as_mut() {
+                    runner.dispatch_hover(node, HoverEvent::new(phase, local, size));
+                }
+            }
         }
         self.after_dispatch();
     }

@@ -6719,6 +6719,7 @@ dependencies = [
  "p2panda-store",
  "pandect",
  "personae",
+ "platen",
  "pollster 0.4.0",
  "rand_core 0.6.4",
  "sceno",

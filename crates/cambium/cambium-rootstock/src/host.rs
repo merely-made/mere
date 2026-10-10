@@ -1037,7 +1037,7 @@ where
     /// Opaque ids for `:hover` / `:focus` restyles on target change.
     pub last_hover: Option<u64>,
     pub last_focus: Option<u64>,
-    /// The hovered hit node, for `on_hover` Enter/Leave routing.
+    /// The resolved hover handler, for `on_hover` Enter/Leave/Move routing.
     pub last_hover_hit: Option<NodeId>,
     /// Monotonic base for the CSS-transition animation clock.
     pub anim_base: crate::Instant,

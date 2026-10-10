@@ -478,6 +478,11 @@ where
         self.projection(id).and_then(|p| p.tree.pointer_target(hit))
     }
 
+    /// The nearest hover handler for `hit` in projection `id`.
+    pub fn hover_target(&self, id: ProjectionId, hit: NodeId) -> Option<NodeId> {
+        self.projection(id).and_then(|p| p.tree.hover_target(hit))
+    }
+
     /// The element a wheel on `hit` would scroll in projection `id`.
     pub fn wheel_target(&self, id: ProjectionId, hit: NodeId) -> Option<NodeId> {
         self.projection(id).and_then(|p| p.tree.wheel_target(hit))
