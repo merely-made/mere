@@ -472,7 +472,7 @@ and open item 4; the Scenograph editor plan's track S1, rulings SE53 to SE83.
   axis rules, renumbering, items inside their frames, a round trip that opens
   as a scenotime snapshot, generation, refusals); `projection_compare` tests
   (families once, aliases, the selection row, compiled cards inside frames);
-  the headed `projection_compare.scn` in Chrome and Firefox. Settled dynamics frames are implemented in `e2543cee` (SE69/SE70; F192 to F202); their integrated Genet and Firefox qualification remains open.
+  the headed `projection_compare.scn` in Chrome and Firefox. Settled dynamics frames are implemented in `e2543cee` (SE69/SE70; F192 to F202), with native/wasm fixture identity qualified on Genet `7422e906` and Vello `491c376c`. Their current browser receipts and separate Firefox gate are recorded in the handoff.
 - **Removed on promotion:** nothing; no earlier facet implementation existed.
 
 #### Dynamics in a swatch (implemented 2026-10-10; consumer qualification open)
@@ -493,7 +493,9 @@ and open item 4; the Scenograph editor plan's track S1, rulings SE53 to SE83.
   host limit defaults to 60 under F202; a cap is labeled "Step limit reached".
 - **Evidence and limits:** the handoff records source-qualified fixture receipts,
   including native/wasm identity, its changed-bound control and browser scenarios.
-  Final qualification against the integrated Genet pin and Firefox remains open.
+  Native/wasm fixture identity passes against integrated Genet `7422e906` and
+  Vello `491c376c`; the handoff records the current browser qualification and
+  its open Firefox gate.
   The second heterogeneous consumer remains pending under SE62. This implementation
   does not qualify linked swatches, viewer backdrops or larger datasets.
 - **Removed:** the preview's earlier manual-bound prerequisite; shared Canvas
