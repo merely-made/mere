@@ -1,7 +1,7 @@
 # Scenograph Editor Plan
 
 **Date:** 2026-10-07
-**Status (2026-10-10):** tracks E1 to E5 and C1 complete, each with headed checks in Chrome and Firefox (Safari not run); C2 landed (SE45 to SE51; F11 to F13), with headed checks in Chrome and Firefox; its label revision (SE52) landed with the web host's genet repin. S1, the swatch grid, landed 2026-10-09 (SE53 to SE83), its dynamics axis implemented in `e2543cee` (SE69, SE89; F200 to F202), with native/wasm fixture identity qualified against Genet `7422e906` and Vello `491c376c`; the handoff records browser qualification and its open Firefox gate. Rulings SE1 to SE89 (§1). Waiting: genet branch `value-engine` (SE39 to SE42) for Mark or genet's lane to land, then mere's rhai `ValueEngine` and the rule runner after a coordinated repin. The Turnstone follow-up (SE32, SE35) is on Turnstone main at `d0775a1` (§3). Mapped, not opened: wallpapers and props, the style editors, authored motion (§3).
+**Status (2026-10-10):** tracks E1 to E5 and C1 complete, each with headed checks in Chrome and Firefox (Safari not run); C2 landed (SE45 to SE51; F11 to F13), with headed checks in Chrome and Firefox; its label revision (SE52) landed with the web host's genet repin. S1, the swatch grid, landed 2026-10-09 (SE53 to SE83), its dynamics axis implemented in `e2543cee` (SE69, SE89; F200 to F202), with native/wasm fixture identity qualified against Genet `7422e906` and Vello `491c376c`; the handoff records browser qualification and its open Firefox gate. Rulings SE1 to SE90 (§1). Waiting: genet branch `value-engine` (SE39 to SE42) for Mark or genet's lane to land, then mere's rhai `ValueEngine` and the rule runner after a coordinated repin. The Turnstone follow-up (SE32, SE35) is on Turnstone main at `d0775a1` (§3). Mapped, not opened: wallpapers and props, the style editors, authored motion (§3).
 **Scope:** the editor foundation that Scenograph's editing surfaces stand on: one undo history in Cambium, and arrangement options declared as data. Carries out the balaur review's rulings A and B. The projection editor in Graphshell is the first consumer of both.
 
 **2026-10-09 addition:** R1's first declarative slice is implemented and qualified: the cross-app design conversation
@@ -239,6 +239,31 @@ The mer3ly site session relayed its Ruling 158 (Mark: "Promote where a home exis
 
 **SE89, physics bodies follow occurrences (2026-10-09).** Asked: "The practice grid has source occurrences, while Canvas physics uses graph nodes. Should each occurrence get its own preview body, with unavailable physics channels refused until an adapter supplies them? This preserves separate appearances of the same source." Options: Separate body per occurrence (recommended), Limit dynamics to graph-backed datasets. Mark: **"Separate body per occurrence (Recommended)"**. *Follows:* each preview occurrence has a separate transient body; an undisclosed physics channel is refused. The source identity remains the dataset's exact source reference. *Reading, not ruled:* a private per-cell controller may give each body a deterministic runtime UUID without writing those identities into the source dataset.
 
+**SE90, reset, context and scenery (2026-10-10).** Mark corrected the proposed
+Clear / Ambient / Props control, which had made visibility and collision
+consequences of the selected mode. His answer, verbatim:
+
+> i feel like clear is better as reset, like resetting the scene to its initial arrangement w/rt your backdrop (which should be able to be interactive, or at least animated, right? that in my mind makes it more of the backdrop of a scene's set, or almost diorama-esque, compared to a static wallpaper), but ambient content and props are both more like classes of entity in the scene; ambient nodes are like propositions for what's relevant to the entities in the foreground, which are either pinned, currently selected, or recently interacted with. you can turn that off, of course, but that's not the same thing as saying they do or don't interact with the scene. and props, likewise, can be turned off; you could have a static wallpaper, an animated wallpaper, an interactive wallpaper, or an interactive wallpaper that contains entities with scripted behavior, authored attributes, or presentation relevant to the backdrop, aside from but relevant to contextualizing the nodes in the foreground and the ambient nodes in the background in the backdrop and scene. but that's not the same as saying props are tangible or not. you have the wrong cut for what matters on that front.
+
+*Follows:* SE86's three-mode wording is amended. Reset is an action restoring
+the initial arrangement in relation to the backdrop. Ambient context and props
+can coexist and have separate visibility choices. Neither role nor visibility
+determines collision, animation, picking or authored behavior. The backdrop
+may be a scene's animated or interactive set; static geometry is one supported
+part, not the complete backdrop model. F199's pause and R162 ownership remain.
+
+*Reading, not ruled:* keep contextual graph occurrences separate from scenic
+entities even when both have a visible presentation. Reuse existing scene,
+simulation and interaction owners before adding a portable behavior carrier.
+The reset boundary still needs a concrete definition: arrangement baseline,
+body velocities, animation time and script state are distinct state owners.
+The current `restore_arrangement` restores stored positions and pauses physics;
+it does not reset a whole animated set. Also reconcile §9.2's retained
+background membership after deselection with the foreground role for recently
+interacted nodes in this answer. No recency cutoff or automatic promotion is
+chosen here. Field remains deferred; interactive/scripted scenery has not been
+implemented by this ruling.
+
 ## 2. Tracks
 
 E1 and E2 carry ruling A; E3 to E5 carry ruling B. E2 needs E1; E4 needs E3; E5 needs E2 and E4. *Added 2026-10-07:* E2b carries SE11 and SE12, after E2.
@@ -368,11 +393,23 @@ A facet's cells act together, so the mer3ly sandbox's scatter, deck and linked v
 
 Done when: the selection and visibility round-trip in a facet and replay through scenotime; a cell's hidden appearance leaves the source and the other cells untouched; the site's sandbox state maps onto it without loss; a headed check links two cells' selection in Chrome and Firefox.
 
-### B1 — backdrops in the Graphshell viewer (SE86)
+### B1 — backdrops in the Graphshell viewer (SE86, amended by SE90)
 
-The viewer draws a scene's backdrops and offers the backdrop mode: clear, ambient and props now, field once defined; a tangible (collidable) backdrop is an obstacle to its physics.
+The viewer draws a scene's set, with independently visible ambient context
+and props. Reset restores the initial arrangement in relation to that set.
+Visibility, collision, animation, picking and authored behavior are separate
+choices; ambient and props are not mutually exclusive modes. Field waits until
+defined. A collidable backdrop footprint is an obstacle to physics, regardless
+of its visibility or scene role.
 
-Done when: the viewer draws each kind and its tangible edge; a tangible backdrop holds nodes out in a physics test, with a control where an intangible one does not; the mode travels in the scene state; a headed check in Chrome and Firefox.
+The former three-mode done-condition is superseded. The bounded static backend
+still needs viewer drawing, a disclosed collision edge and the tangible versus
+intangible exclusion control. Before viewer controls land, resolve the reset
+baseline and contextual membership seams, then define the saved scene state
+and animated/interactive set slice against their existing owners. Acceptance
+must cover independent visibility and collision, saved-state round trips and
+headed Chrome and Firefox checks. Static obstacle acceptance alone does not
+establish animated or interactive scenery.
 
 **B1 backend draft (2026-10-10):** `Canvas::set_projection_backdrops` resolves
 a scene's spaces and transforms for graph-canvas paint and static contact.
@@ -381,9 +418,10 @@ collidable geometry remains an obstacle. Concave contact polygons and
 contact paths/points refuse by path pending a footprint adapter; a refusal
 retains the previous bound layer. The separate Seiche obstacle set leaves
 living scenery, gravity and node tangibility intact. This is implementation
-work, not B1 acceptance. Viewer controls, mode persistence and headed checks
-remain open under R162's site ownership. The sandbox's current mode and
-tangibility separation is evidence for the control draft, not a new ruling.
+work, not B1 acceptance. Viewer controls, scene-state persistence and headed checks
+remain open under R162's site ownership. SE90 supersedes the pending mode
+fork and the sandbox's three-mode cut; the backend does not implement that
+expanded set or determine contextual membership.
 The retained short 120-step probe leaves residual overlap. Rapier caps
 correction at 3 world units per second; the active-law/control check uses
 the canvas's existing 360-step settle budget. All four focused native
