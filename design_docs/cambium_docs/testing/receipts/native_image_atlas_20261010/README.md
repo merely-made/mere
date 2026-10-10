@@ -23,3 +23,6 @@ identify Radeon Pro Vega 56 / Metal with GPU computation enabled.
 These receipts qualify this reproducible atlas defect. They do not identify
 the exact kernel responsible for the earlier Pelt GPU reset, and do not replace
 an application's native window, workflow or separate-process reopen acceptance.
+
+The [earlier native reset analysis](original_reset_analysis.md) records the
+archived fault pattern and the limits of kernel attribution separately.
