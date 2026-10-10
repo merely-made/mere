@@ -86,7 +86,8 @@ applicable rendered acceptance pass against its published dependency set.
   documents before both creation and replacement, including aliases. This
   avoids each app duplicating export path normalization. All 17 interchange
   tests pass, including the two new host-file boundary regressions; this
-  additive API is ready for publication.
+  additive API was pushed and remote-verified as
+  `d5679eba4aa1bc5e1a241c5df63d13490a5f46a7`.
 - Editing and saving the currently selected theme under the same identity must
   not bypass explicit application Apply. Each native adapter holds the applied
   presentation while authoring updates the library, refreshing it only after
@@ -103,7 +104,8 @@ applicable rendered acceptance pass against its published dependency set.
 - Origin advanced again to `4d8bd7037` with the Conatus tenant and its plan.
   The worktree fast-forwarded without changing application sources; the exact
   seven local application dependency rows were preserved over the upstream
-  lockfile. Locked full metadata qualification is running on that new baseline.
+  lockfile. Locked full metadata and the port/web boundary checker pass on
+  that baseline.
 - Shared foundation and current-source lock repair were pushed directly to
   origin main as `3567c8e937b0e2ec8e2c670cfaf4289d4403d216`. A clean committed
   snapshot independently passes locked full metadata and the port/web boundary
@@ -129,6 +131,13 @@ applicable rendered acceptance pass against its published dependency set.
 - The corrected Pelt source passes all 69 desktop tests, including application
   export-path protection and saving an edited active theme without implicitly
   applying it. Native presentation qualification remains open.
+- The second Pelt LaunchServices run reaches the embedded workshop and captures
+  Light and Dark but exceeds its scenario deadline: the driver did not owe the
+  redraw that follows its first successful browser presentation. Failed receipts
+  remain retained while that continuation is corrected. The shared launcher
+  now recognizes the canonical macOS `/private` spelling of its unique copied
+  executable during timeout cleanup; focused alias/argument/non-owned-process
+  checks pass. This cleanup change cannot make a failed receipt pass.
 - Graphshell's application routes are the web full app and tree `app=local`;
   its native-messaging executable is a relay, not a settings window. The web
   adapter is being built around shared Tabard intake and separate application
