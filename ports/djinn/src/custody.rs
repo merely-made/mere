@@ -245,10 +245,14 @@ impl ReleasePolicy {
         }
         // Gemot authors a Moot's delegation facts under the scope key that
         // signed them, so a place's delegation key is held while it is open.
-        policy = persona(
-            policy,
-            &insigne::delegation::delegation_signing_prefix("moot"),
-        );
+        // Knot's share grants and revocations are issued through a provider
+        // by the host publishing them (Turnstone), so their scope key too.
+        for domain in ["moot", "mere.knot"] {
+            policy = persona(
+                policy,
+                &insigne::delegation::delegation_signing_prefix(domain),
+            );
+        }
         // The reader key Turnstone opens Knot's published shares with
         // (`knot_editor::KNOT_PUBLISH_READER_KEY_CONTEXT`).
         policy = policy.with(
