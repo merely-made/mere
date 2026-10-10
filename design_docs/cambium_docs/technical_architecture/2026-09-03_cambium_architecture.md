@@ -4,6 +4,11 @@ Cambium is an application toolkit over Genet. Meristem produces and reconciles
 view structure. Cambium translates that structure into Genet's neutral DOM,
 custom-leaf, presentation, and document-engine seams.
 
+**2026-10-09 product direction:** the [cross-app design language record](../../2026-08-23_projection_scenes_and_graph_native_platform.md#9-configurable-visual-and-interaction-language-2026-10-09)
+describes the forme as a field representing recursive workbench regions,
+explicit layout editing with drop previews, and configurable HUD placement.
+It records consumer intent; the ownership boundaries below stand.
+
 The dependency direction is one-way:
 
 ```text

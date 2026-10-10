@@ -9,6 +9,7 @@ Not in scope, mapped in §3 and opened by later rounds:
 - wallpapers and props, the node, edge and field style editors, and authored motion.
 
 **Related:**
+- [cross-app design language record, 2026-10-09](../../2026-08-23_projection_scenes_and_graph_native_platform.md#9-configurable-visual-and-interaction-language-2026-10-09): selection-shaped context and swatches, themeable forme regions, configurable appearance; product direction with open choices identified, not an additional editor track.
 - [balaur review brief](../research/2026-10-06_balaur_review_brief.md): rulings A to E and the findings (§3.2, §3.3) this plan builds on.
 - [Scenograph expansion brief](../research/2026-08-10_scenograph_expansion_brief.md): lanes L1 to L5; L2 (backdrops) is landed, L4 and L5 wait on consumers.
 - [projection grammar adoption plan](2026-08-15_projection_grammar_adoption_plan.md) and [catalog](../research/2026-08-15_projection_grammar_catalog.md): the grammar the editor authors. The same lane owns both documents and this plan.
