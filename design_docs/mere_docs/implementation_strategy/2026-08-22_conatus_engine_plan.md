@@ -934,6 +934,10 @@ contract declared in advance.
       window, the tracer's depth as a pre-pass, its shadow atlas and light
       buffer exported. The alternatives were growing isometer-render with
       both as donors, re-adopting renderling, or measuring both first.
+      *Landed (2026-10-09), under wing rulings 606, 734 and 735:* the reshape
+      is the mark-ik fork's `mark-ik/tenant` branch over upstream v0.47.0,
+      and the crate over it is `crates/conatus/tenant`; see "Progress
+      (2026-10-09 kiss3d tenant)" below.
     - **Lighting:** "Stack-owned light/environment block": sun and
       day/night from sim fields, the point-light list and the water field
       live in the scene contract, read by the tracer and the rasteriser; the
@@ -1358,3 +1362,96 @@ O3, P1, C1 to C4). Not on main. Logs in `Code/testing/mere/conatus-world/`.
   above it reach conatus only through `resident`, which this work leaves
   untouched, so their earlier passes stand. No crate in mere uses
   `BodyWorld`.
+
+## Progress (2026-10-09 kiss3d tenant)
+
+Wing rulings 471, 472, 606, 732, 734 and 735, in the Isocosm migration push.
+Branch `isocosm/kiss3d-tenant`, not on main.
+
+**The fork.** `crates/kiss3d`, branch `mark-ik/tenant` over upstream
+`03727cd2` (v0.47.0), pushed to `mark-ik/kiss3d` at `c362cd58`. No balaur
+commit was needed. Seven commits, each compiling under
+`cargo check --all-targets`:
+
+- `66c34a3f` context: `Context::from_host` builds a handle over a device
+  the caller owns, with no window; `Context::enter` makes it current on the
+  thread until the returned scope drops. A host-owned device is never
+  destroyed by kiss3d. Entering another device while surfaces built on the
+  current one live panics, since the managers are per thread.
+- `043069bc` window: `Window::new_on_context` (no device request, no OS
+  window) and a caller-target frame that skips the readback copy and the
+  platform frame wait.
+- `63cbb2e4` window: `Window::set_depth_prepass`, a `Depth32Float` texture
+  in the raster's clip space written into the frame's depth after the clear
+  by a fullscreen `frag_depth` pass, at the canvas's sample count.
+- `b52b3f3d` teardown: the deform globals and the 2D default material now
+  drop with the other managers (finding below).
+- `d2171f36` window: `Window::render_into(encoder, target, ..)` records the
+  frame into the caller's encoder and never submits; `CallerFrame` reports
+  kiss3d's own submissions, counted by `Context::submission_count`.
+- `bb3ec56d` window: `Window::light_exports` (shadow atlas, comparison
+  sampler, `ShadowUniforms` buffer, clustered light buffer and count) and
+  `LIGHT_EXPORTS_WGSL`, with a test that fails if it drifts from
+  `default.wgsl`.
+- `c362cd58` window: an sRGB target is drawn through its linear view.
+
+The fork's diff over v0.47.0 is additive apart from the frame's encoder,
+target and pacing branches in `rendering.rs`; the new code sits in
+`window/caller_target.rs`, `window/light_exports.rs` and
+`renderer/depth_prepass.rs`. The thread-local is now a current-context slot
+entered by an explicit handle; threading a handle through kiss3d's 216
+`Context::get()` calls in 53 files was not done (open below).
+
+**The crate.** `crates/conatus/tenant` (working name; it awaits a naming
+round), 1,275 lines in seven files, the largest 336. It depends on the fork
+by git rev and shows no kiss3d or glam type: plain arrays and wgpu.
+
+- `DeviceNeeds::tenant()`: nothing beyond wgpu's defaults; clustered
+  lights and skinning degrade at run time. `HostDevice`: the host's
+  instance, adapter, device and queue.
+- `LightBlock { sun: Option<Sun>, ambient, points: Vec<PointLight> }`, the
+  472 block as plain data with `is_valid`.
+- `Palette` (sRGB bytes, a texture addressed by UV) and `PaletteMesh`
+  (non-indexed triangles, a palette index a vertex, face normals), with
+  `PaletteMesh::from_colored` folding per-vertex colours into a palette.
+- `Camera { view, projection, near, far }` with `clip_from_world()`, the
+  matrix the tracer's depth must use.
+- `Tenant::new(host, target_format, size)`; `add_mesh`, `set_mesh`,
+  `add_gltf`, `play`, `advance`, `set_pose`, `remove`; `set_lights`,
+  `set_background`, `set_tonemap`, `set_shadows`, `set_camera`,
+  `set_depth_prepass`; `encode(encoder, target) -> FrameReport` with
+  `internal_submissions`; `exports() -> Exports` (shadow atlas, sampler,
+  uniforms, light buffer and count, depth view, the WGSL layouts).
+
+Gates: `cargo check -p tenant --all-targets` passes, and seven tests pass,
+one on the GPU: a palette cube under a sun and a point light drawn into an
+`Rgba8UnormSrgb` target through the caller's encoder with zero internal
+submissions, hidden on the half of a split pre-pass at the near plane and
+drawn on the other, exports present, the host's device alive after the
+tenant drops. The fork's own two tests pass. The lock gains 34 packages
+(kiss3d and its graph) and moves none.
+
+**Findings.**
+
+- kiss3d's tonemap gamma-encodes in the shader and wants a linear output
+  format (`tonemap_ops.wgsl`, `apply_tonemap`), so an `Rgba8UnormSrgb`
+  target, eponym's, was encoded twice until `c362cd58`. The target must
+  list `Rgba8Unorm` in its `view_formats`.
+- Upstream v0.47.0 hangs a thread at exit on this machine after any
+  offscreen frame: the 2D default material and the deform globals kept the
+  device in thread-locals past `Context::reset`, and dropping it in a TLS
+  destructor never returned. An upstream `OffscreenSurface` test showed it
+  before any fork change; `b52b3f3d` fixes it, and it also stops a later
+  device from binding the first device's deform layout.
+- Uniforms reach the GPU through `Queue::write_buffer`, which lands at the
+  caller's next submit, so a caller submits each tenant frame before
+  recording another.
+- Probe capture, planar reflectors and egui still submit inside kiss3d;
+  `FrameReport::internal_submissions` counts them. The bodies-and-lights
+  path makes none.
+
+**Open (forks, back to Mark).** A full handle threaded through kiss3d in
+place of the scoped slot; whether `FrameReport` also counts render passes
+and copies, which needs instrumenting about thirty pass sites in the fork;
+and the water field's format in the light block, which ruling 472 places
+in the scene contract but which no consumer here reads yet.
