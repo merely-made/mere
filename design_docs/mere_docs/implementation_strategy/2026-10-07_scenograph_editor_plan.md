@@ -4,12 +4,18 @@
 **Status (2026-10-08):** tracks E1 to E5 and C1 complete, each with headed checks in Chrome and Firefox (Safari not run); C2 landed (SE45 to SE51; F11 to F13), with headed checks in Chrome and Firefox; its label revision (SE52) landed with the web host's genet repin. S1, the swatch grid, landed 2026-10-09 (SE53 to SE83), its dynamics axis waiting on the dynamics lane (SE69). Rulings SE1 to SE87 (§1). Waiting: genet branch `value-engine` (SE39 to SE42) for Mark or genet's lane to land, then mere's rhai `ValueEngine` and the rule runner after a coordinated repin. The Turnstone follow-up (SE32, SE35) is on Turnstone main at `d0775a1` (§3). Mapped, not opened: wallpapers and props, the style editors, authored motion (§3).
 **Scope:** the editor foundation that Scenograph's editing surfaces stand on: one undo history in Cambium, and arrangement options declared as data. Carries out the balaur review's rulings A and B. The projection editor in Graphshell is the first consumer of both.
 
+**2026-10-09 addition:** R1's first declarative slice is implemented and qualified: the cross-app design conversation
+agreed target → condition → effect authoring, the six presentation examples,
+explicit precedence and match explanations, and an interactive aesthetic study.
+The Rhai runner still waits on SE39–SE42's coordinated Genet repin. The
+declarative model and study do not reopen S2/B1 or claim their completion.
+
 Not in scope, mapped in §3 and opened by later rounds:
 - the scripting comparison (SE3), which is the next assessment;
 - wallpapers and props, the node, edge and field style editors, and authored motion.
 
 **Related:**
-- [cross-app design language record, 2026-10-09](../../2026-08-23_projection_scenes_and_graph_native_platform.md#9-configurable-visual-and-interaction-language-2026-10-09): selection-shaped context and swatches, themeable forme regions, configurable appearance; product direction with open choices identified, not an additional editor track.
+- [cross-app design language record, 2026-10-09](../../2026-08-23_projection_scenes_and_graph_native_platform.md#9-configurable-visual-and-interaction-language-2026-10-09): selection-shaped context and swatches, themeable forme regions, configurable appearance; §9.8 records the agreed presentation rules carried by R1.
 - [balaur review brief](../research/2026-10-06_balaur_review_brief.md): rulings A to E and the findings (§3.2, §3.3) this plan builds on.
 - [Scenograph expansion brief](../research/2026-08-10_scenograph_expansion_brief.md): lanes L1 to L5; L2 (backdrops) is landed, L4 and L5 wait on consumers.
 - [projection grammar adoption plan](2026-08-15_projection_grammar_adoption_plan.md) and [catalog](../research/2026-08-15_projection_grammar_catalog.md): the grammar the editor authors. The same lane owns both documents and this plan.
@@ -233,6 +239,37 @@ The mer3ly site session relayed its Ruling 158 (Mark: "Promote where a home exis
 
 E1 and E2 carry ruling A; E3 to E5 carry ruling B. E2 needs E1; E4 needs E3; E5 needs E2 and E4. *Added 2026-10-07:* E2b carries SE11 and SE12, after E2.
 
+### R1 — presentation rules and the first aesthetic study (2026-10-09)
+
+Mark: "Target->condition->effect, rhai, etc. all agreed. Proceed". The
+[design language record §9.8](../../2026-08-23_projection_scenes_and_graph_native_platform.md#98-presentation-rules-agreed-2026-10-09)
+owns the product direction and the six accepted examples.
+
+Scope for this first slice:
+- A host-neutral, serializable rule set in Scenograph, using the existing
+  `sceno::Representation` slots. Conditions read disclosed scalar facts and
+  occurrence-local view state; effects resolve presentation without source edits.
+- Explicit higher-priority-first property resolution, with later authored
+  rules winning equal priorities. Explain matches, missing inputs and overridden
+  effects. Validate the whole set before applying it.
+- Compact/detail screen-size hysteresis with prior match state held by the host
+  per rule and occurrence. Resolve representations before measurement; no rule
+  here moves an item, changes a pin, or conflates foreground and position pins.
+- A mixed-content interactive study, with independent editable theme and
+  arrangement choices, node selection, retained background membership, pinning,
+  forme guides, link inspection, rule editing and match explanations.
+
+Done when meaningful tests cover precedence, missing facts, malformed sets,
+occurrence identity, hysteresis and round-trip storage; the browser study
+agrees with the Rust resolver on shared fixtures; and headed checks verify rule
+changes, themes, selection/deselection, pins and narrow-screen layout.
+
+Rhai remains the rule language for the production scene/region runner under
+SE36–SE42. This first declarative slice adds no replacement scripting seam.
+The study exercises the model locally; its browser resolver is a study host,
+not production Graphshell adoption. Broader style editors and live resource
+rendering remain with their existing owners.
+
 ### E1 — one history in Cambium (A, SE5)
 
 Generalize `EditHistory` (`crates/cambium/cambium/src/editor.rs`) into a history over any `Clone` snapshot.
@@ -405,6 +442,55 @@ Verified 2026-10-07 against mere's origin unless named.
 
 
 ## Progress
+
+- **R1, presentation rules and aesthetic study (2026-10-09).**
+  [`scenograph::presentation`](../../../crates/cambium/scenes/scenograph/src/presentation.rs)
+  implements the versioned target → condition → effect model with atomic
+  validation, per-property priority and authored-order tie breaking, match
+  explanations, and occurrence-local screen-size hysteresis. The existing
+  `sceno::Representation` vocabulary is reused. Hosts retain source authority,
+  selection, pins, measurement and placement; the resolver returns decisions.
+  [`scene-rules.html`](../../../support/design-studies/scene-rules.html) is the
+  first mixed-content study, with Paper and ink, Workshop and Night as editable
+  starting treatments, independent arrangement choices, retained ambient
+  context, distinct foreground and position pins, forme guides, link provenance,
+  and rule editing. Two surfaces access one resource independently. The local
+  five-second media sample uses native video controls. Its identity marks are
+  monochrome previews of actual Pictograph `params_of` masks (derivation v3),
+  not a browser Emblem decoder or the full Pictograph LOD renderer. Forme
+  quadrants and alternative link marks are study representations, not a new
+  production tiling or dynamics implementation.
+
+  **Qualification:** an isolated workspace containing the unchanged manifests
+  and complete source of `sceno`, `scenograph` and `curation` passed 57 unit tests
+  and one documentation test. Seven new resolver tests cover priority and ties,
+  independent accesses, missing/wrong-type facts, hysteresis, malformed sets,
+  persisted rules, and complexity limits. This is scoped source qualification;
+  the sparse checkout's full workspace and its lockfile were not qualified.
+  Build the `presentation_rules` example, then run
+  `node scripts/mere_scene_study_check.mjs <path-to-presentation_rules>`.
+  The [source qualification receipt](../../../support/design-studies/source-qualification.json)
+  identifies the exact copied files and isolated lockfile. The
+  [parity receipt](../../../support/design-studies/scene-rules-receipt.json)
+  records 116 identical resolutions and four invalid sets refused by both
+  hosts. `python3 scripts/mere_scene_study_pack.py` reproducibly embeds the
+  canonical fixture, face masks and media in the fragment.
+
+  Headed checks in the Codex Chromium browser verified rule changes, invalid
+  edits retaining the prior valid presentation, threshold hold/exit, pinned
+  media, three-node selection, foreground persistence after deselection, theme
+  changes preserving coordinates, retained context across lenses, unlocked
+  guides and a disabled drag handle on position-pinned media. Playing media
+  continued across a theme change and selection. Responsive checks
+  at 1024 and 320 pixels verified the narrow flow layout without horizontal
+  overflow. Native drag automation could not run because the browser adapter
+  rejected fractional iframe coordinates; drop exchange and pinned-occupant
+  refusal are implemented but have not had a headed gesture check. Firefox and
+  Safari were not run for this study. The browser resolver is a study host;
+  production Rhai execution remains gated on SE39–SE42 and no Graphshell
+  adoption is claimed. The [mechanical documentation delta](../../../support/design-studies/doc-audit-delta.json)
+  added no findings and repaired two moved Tabard references; existing audit
+  findings remain, including the D2 snapshot digest and coverage failures.
 
 - **F12, the `ActionId` audit (C2, SE48, 2026-10-08).** Each of the 68 variants against Graphshell web's commands, Turnstone's catalogue (`d0775a1`) and the readers; gathered by a read-only agent, its load-bearing claims rechecked here. *Live* (a host offers the verb today), 12: `node:new`, `node:delete`, `node:edit_tags`, `node:mark_tombstone` (the same recoverable delete as `node:delete`; Turnstone's recycle bin, and the owner's "no tombstones"), `graph:fit`, `graph:toggle_physics`, `persistence:undo`, `persistence:redo`, `persistence:save_graph` (Turnstone's Save session; Graphshell's Save scene saves view state), `workbench:settings_pane`, and loosely `workbench:toggle_workbench_overlay` (now summon a pane) and `workbench:open_history_manager` (now the Trail). *Backed* (working code, no command), 16: `node:pin_toggle`, `node:pin_selected`, `node:unpin_selected`, `node:open_split`, `node:detach_to_split`, `node:move_to_active_pane`, `node:render_auto`, `node:import_webfinger`, `node:resolve_activitypub`, `node:add_to_frame` (a `frame-member` relation), `edge:connect_pair`, `edge:connect_both`, `edge:remove_user`, `graph:physics_config`, `workbench:command_palette_open`, `import:bookmarks_from_file`. *Planned*, 1: `node:resolve_nip05`. *Uncertain*, 9: `node:remove_from_subgraph`, `node:refresh_person_identity`, `node:copy_url`, `node:copy_title`, `graph:fit_subgraph`, `graph:cycle_focus_region`, `persistence:save_snapshot`, `persistence:restore_session`, `persistence:restore_latest_graph`. *Stale*, 30: the eight `frame:*`, the four layout-lock and tile-group `workbench:*`, the three workflows, `node:new_as_tab`, `node:choose_frame`, `node:add_connected_to_frame`, `node:open_frame`, `node:open_neighbors`, `node:open_connected`, `node:warm_select`, `node:resolve_matrix` (Matrix is SKIP in the standards survey), `node:render_webview`, `node:render_wry`, `graph:toggle_overview_plane`, `graph:toggle_ghost_nodes`, `workbench:radial_menu_open`, `persistence:open_hub`, `workbench:settings_overlay`. *Readers:* ux-events and `HostIntent` carry any `ActionId`; nothing outside `#[cfg(test)]` builds `UxEvent::ActionDispatched` or `HostIntent::Action` (checked); the one variant named in non-test code is `NodeMarkTombstone`, in `DestructiveActionGateProbe::iced_default`, which only tests call, for an iced host not in the tree. *Missing* (verbs hosts offer with no `ActionId`): navigation (Back, Forward, Reload, Stop), canvas zoom and pan, camera and view toggles, the physics catalogue rows, panes and windows, sessions, feeds, places, document find and capture, participants, the projection editor's ten, Graphshell's unregistered product edits. *A third vocabulary:* `registry`'s `input::action_id` (`crates/system/registry/src/input.rs`), 46 string constants for keybinding defaults, partly the same verbs under other keys (`graph:node_new` beside `node:new`, `workbench:undo` beside `persistence:undo`), plus zoom, select-all, reheat and help; nothing outside the registry crate, nor Turnstone, reads it (checked). *Corrections:* SE29's "43 string commands": Graphshell's page dispatches 49 named ids, 32 of them registered; SE46's and SE47's "about 130 actions": 68 (a line count was misread as a variant count).
 - **F13, the draft catalogue (C2, SE49, put to Mark 2026-10-08; accepted as SE50).** 33 ids in eleven namespaces named for what each acts on, in the stack's words (TERMINOLOGY: *relation* in user copy where the kernel says edge; panes, the workbench and the Trail as surfaces; *frame* is a frame-tree leaf, so the old `frame:*` set stays stale). 27 come from `ActionId`'s 28 with `node:add_to_frame` folded into `relation:add`; six are new shared verbs (zoom in and out, navigation).

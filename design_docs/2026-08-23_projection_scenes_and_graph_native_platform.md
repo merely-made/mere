@@ -655,9 +655,9 @@ useful defaults. No single palette or quiet visual treatment is mandated
 across the apps. Defaults can provide coherent starting arrangements; users
 must be able to customize them.
 
-*Checked precedent:* [Tabard's theme model](../ports/tabard/src/lib.rs) carries
+*Checked precedent:* [Tabard's theme model](../crates/system/tabard/src/lib.rs) carries
 seed-based definitions, modes and custom mode sheets; its
-[registry](../ports/tabard/src/theme/registry.rs) distinguishes built-ins from
+[registry](../crates/system/tabard/src/theme/registry.rs) distinguishes built-ins from
 user themes and supports forking a user copy. Woodshed's
 `woodshed/crates/woodshed-views/src/theme.rs` at
 `e08bf4b9875a7efb02b1c17bf9fac56708712cee` has Slate, Ember, Light, Dusk,
@@ -714,6 +714,39 @@ The [Scenograph editor plan](mere_docs/implementation_strategy/2026-10-07_scenog
 and the other owning plans linked above remain the implementation homes.
 Apps can cite this section as the shared design direction rather than copying
 it into separate competing records.
+
+### 9.8 Presentation rules agreed (2026-10-09)
+
+Mark, on §9's follow-up discussion and the six examples below:
+
+> I think those are all wonderful graph interactions, your targets and
+> conditions and presentation decisions, they all make immediate sense to me.
+> Target->condition->effect, rhai, etc. all agreed. Proceed
+
+Agreed direction: author presentation as **target → condition → effect**, with
+explicit precedence, fallbacks and explanations of which rules matched.
+Representation decisions precede measurement and arrangement; user placement
+and pins survive presentation changes. The examples Mark accepted are:
+
+| Target and condition | Presentation decision |
+|---|---|
+| Image-bearing node in an overview | Thumbnail with its identity marker. |
+| Selected node | Configured attributes and controls. |
+| Node below a screen-size threshold | Compact face, with a separate threshold for restoring detail. |
+| Membership link in a hierarchy scene | Containment. |
+| Derived link being inspected | Its rule, inputs and explanation. |
+| Unlocked forme field | Subregions and applicable drop previews. |
+
+The interactive authoring surface is target → condition → effect with a live
+swatch; Rhai serves more involved rules, under the Scenograph editor plan's
+SE36–SE42 binding and dependency rulings. A first aesthetic study uses the
+same mixed-content scene across three editable starting treatments (paper
+and ink, workshop, night), independently of arrangement and representation.
+These are study presets, not prescribed palettes for every application.
+
+The [Scenograph editor plan](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md)
+owns track R1 for the shared declarative model and first interactive study.
+Production host adoption and the Rhai runner are separately qualified there.
 
 **Consumer reconciliation (2026-10-09):** the [ambient relation-lens proposal](mere_docs/design/2026-09-23_ambiance_design.md#10-proposal-focus-driven-relation-lenses-2026-10-07)
 applies §9.2 to temporary lens reasons and previously selected background
