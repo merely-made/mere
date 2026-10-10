@@ -12,9 +12,9 @@ qualified file maps; all five locked Cargo metadata checks pass with a fresh Git
 source/locks. Consumer adoption (A1) is complete.
 All 108 owned Mere dependency rows select the qualified source. This establishes
 source compatibility; actual Turnstone residency authority remains A2.
-The approved initial Graphshell/Djinn resident-host plan has Tasks 1–3 reviewed
-and locally committed at `a61dfb5c9`, `652acbb72` and `6b2f2860b`. Task 4 graph
-settings, pane roots and exact scopes is in progress. The initial host still retains its complete writer and
+The approved initial Graphshell/Djinn resident-host plan has Tasks 1–4 reviewed
+and locally committed at `a61dfb5c9`, `652acbb72`, `6b2f2860b` and `29ab75c56`.
+Task 4 settings, pane roots and exact scope gates pass; Task 5 lifecycle-safe refresh is in progress. The initial host still retains its complete writer and
 history; native/product/browser host qualification and publication remain pending.
 Mere's last published checkpoint remains `a8889f60e`.
 
