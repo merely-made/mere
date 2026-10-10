@@ -1359,6 +1359,16 @@ impl windowed::ViewerContent for ControllerViewerContent {
                 Ok("jump-link press/release moved the retained viewport".to_owned())
             },
             StaticProductReceipt::Controls => {
+                let glyph_count = |scene: &netrender::Scene| {
+                    scene
+                        .ops
+                        .iter()
+                        .filter_map(|operation| match operation {
+                            netrender::SceneOp::GlyphRun(run) => Some(run.glyphs.len()),
+                            _ => None,
+                        })
+                        .sum::<usize>()
+                };
                 let scroll_target = self
                     .controller
                     .text_target("Control log start")
@@ -1382,6 +1392,7 @@ impl windowed::ViewerContent for ControllerViewerContent {
                     );
                 }
 
+                let initial_glyphs = glyph_count(&self.controller.frame(960, 640));
                 let tab = || inker::SessionInput::Key {
                     key: inker::SessionKey::Tab,
                     state: inker::SessionButtonState::Pressed,
@@ -1392,6 +1403,9 @@ impl windowed::ViewerContent for ControllerViewerContent {
                 if !note.handled || !note.editable {
                     return Err("controls receipt did not focus the retained textarea".to_owned());
                 }
+                // Focus changes CSS state and invalidates retained layout.
+                // Prepare the receipt viewport before capturing its AX identity.
+                let _focused = self.controller.frame(960, 640);
                 let note_id = self
                     .controller
                     .accessibility_projection()
@@ -1408,12 +1422,27 @@ impl windowed::ViewerContent for ControllerViewerContent {
                     .ok_or_else(|| {
                         "controls receipt focused textarea was not projected".to_owned()
                     })?;
+                let end = self.controller.input(inker::SessionInput::Key {
+                    key: inker::SessionKey::End,
+                    state: inker::SessionButtonState::Pressed,
+                    modifiers: inker::SessionModifiers::default(),
+                    repeat: false,
+                });
+                if !end.handled {
+                    return Err(
+                        "controls receipt could not move the retained caret to the end".to_owned(),
+                    );
+                }
                 let edited = self
                     .controller
                     .input(inker::SessionInput::Text(" and ash".to_owned()));
                 if !edited.handled {
                     return Err("controls receipt textarea rejected text input".to_owned());
                 }
+                // Reconcile the retained edit with layout/paint before reading
+                // its semantic projection. The native render then frames at
+                // the actual host size for the final artifact.
+                let edited_glyphs = glyph_count(&self.controller.frame(960, 640));
                 // Editing changes the live control value while preserving the
                 // authored textarea text reported by structural inspection.
                 let retained =
@@ -1430,13 +1459,8 @@ impl windowed::ViewerContent for ControllerViewerContent {
                         .iter()
                         .any(|entry| entry.role == "textbox" && entry.name == "cedar")
                 });
-                if !authored {
-                    return Err("controls receipt edit changed authored textarea text".to_owned());
-                }
-                if !retained {
-                    return Err(
-                        "controls receipt edit did not reach retained control value".to_owned()
-                    );
+                if !retained || !authored || edited_glyphs <= initial_glyphs {
+                    return Err("controls receipt keyboard edit did not reach paint and retained value while preserving its HTML default".to_owned());
                 }
                 Ok(
                     "nested wheel stayed local and keyboard edit reached retained control value"

@@ -166,3 +166,151 @@ fn profile_graph() -> Graph {
 
 mod descriptions;
 mod profile;
+
+#[cfg(feature = "query")]
+mod directional_descriptions {
+    use super::*;
+    use crate::ingest::GraphContribution;
+    use oxjsonld::JsonLdParser;
+    use oxrdf::BaseDirection;
+
+    fn input(description_objects: Value) -> Vec<u8> {
+        serde_json::to_vec(&json!([
+            {
+                "@id": "urn:subject",
+                "urn:predicate": {
+                    "@value": "same", "@language": "en", "@direction": "ltr"
+                }
+            },
+            {
+                "@id": "urn:foreign:claim",
+                "@type": RDF_STATEMENT,
+                (RDF_SUBJECT): {"@id": "urn:subject"},
+                (RDF_PREDICATE): {"@id": "urn:predicate"},
+                (RDF_OBJECT): description_objects,
+                (crate::PROV_WAS_ATTRIBUTED_TO): {"@id": "urn:author"}
+            }
+        ]))
+        .unwrap()
+    }
+
+    fn asserted_property(contribution: &GraphContribution) -> &NodeProperty {
+        let subject = contribution
+            .nodes
+            .iter()
+            .find(|node| node.id == "urn:subject")
+            .expect("asserted subject remains present");
+        assert_eq!(subject.properties.len(), 1);
+        let property = &subject.properties[0];
+        assert_eq!(property.predicate, "urn:predicate");
+        assert_eq!(property.value, "same");
+        assert_eq!(property.lang.as_deref(), Some("en"));
+        property
+    }
+
+    fn assert_ordinary_description(contribution: &GraphContribution, bytes: &[u8]) {
+        let wrapper = contribution
+            .nodes
+            .iter()
+            .find(|node| node.id == "urn:foreign:claim")
+            .expect("unpromoted description remains an ordinary RDF subject");
+        assert_eq!(wrapper.types, vec![RDF_STATEMENT.to_string()]);
+        assert!(wrapper.properties.iter().any(|property| {
+            property.predicate == RDF_OBJECT
+                && property.value == "same"
+                && property.lang.as_deref() == Some("en")
+                && property.provenance_iri.is_none()
+        }));
+        for (predicate, object) in [
+            (RDF_SUBJECT, "urn:subject"),
+            (RDF_PREDICATE, "urn:predicate"),
+            (crate::PROV_WAS_ATTRIBUTED_TO, "urn:author"),
+        ] {
+            assert!(contribution.edges.iter().any(|edge| {
+                edge.subject == "urn:foreign:claim"
+                    && edge.predicate == predicate
+                    && edge.object == object
+                    && edge.statement_id.is_none()
+                    && edge.provenance_iri.is_none()
+            }));
+        }
+        // NodeProperty does not store direction; the RDF bridge must still
+        // retain the exact original terms rather than promoting this record.
+        let quads = JsonLdParser::new()
+            .for_slice(bytes)
+            .collect::<Result<Vec<_>, _>>()
+            .expect("expanded directional JSON-LD parses");
+        assert_eq!(bridge_classic_reification(quads.clone()), quads);
+    }
+
+    #[test]
+    fn feature_compat_jsonld_mismatched_direction_keeps_description_rdf() {
+        let bytes = input(json!({
+            "@value": "same", "@language": "en", "@direction": "rtl"
+        }));
+        let contribution = crate::from_jsonld(&bytes).unwrap();
+        assert_eq!(asserted_property(&contribution).provenance_iri, None);
+        assert_ordinary_description(&contribution, &bytes);
+    }
+
+    #[test]
+    fn feature_compat_jsonld_matching_direction_promotes_metadata() {
+        let bytes = input(json!({
+            "@value": "same", "@language": "en", "@direction": "ltr"
+        }));
+        let contribution = crate::from_jsonld(&bytes).unwrap();
+        assert_eq!(
+            asserted_property(&contribution).provenance_iri.as_deref(),
+            Some("urn:author")
+        );
+        assert!(
+            !contribution
+                .nodes
+                .iter()
+                .any(|node| node.id == "urn:foreign:claim")
+        );
+        assert!(
+            !contribution
+                .edges
+                .iter()
+                .any(|edge| edge.subject == "urn:foreign:claim")
+        );
+        let quads = JsonLdParser::new()
+            .for_slice(&bytes)
+            .collect::<Result<Vec<_>, _>>()
+            .unwrap();
+        let objects = quads
+            .iter()
+            .filter(|quad| {
+                quad.predicate.as_str() == "urn:predicate" || quad.predicate.as_str() == RDF_OBJECT
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(objects.len(), 2);
+        for quad in objects {
+            let Term::Literal(literal) = &quad.object else {
+                panic!("matching-direction controls are literal terms");
+            };
+            assert_eq!(literal.direction(), Some(BaseDirection::Ltr));
+        }
+    }
+
+    #[test]
+    fn feature_compat_jsonld_opposite_direction_objects_refuse_promotion() {
+        let bytes = input(json!([
+            {"@value": "same", "@language": "en", "@direction": "ltr"},
+            {"@value": "same", "@language": "en", "@direction": "rtl"}
+        ]));
+        let contribution = crate::from_jsonld(&bytes).unwrap();
+        assert_eq!(asserted_property(&contribution).provenance_iri, None);
+        assert_ordinary_description(&contribution, &bytes);
+        let objects = JsonLdParser::new()
+            .for_slice(&bytes)
+            .collect::<Result<Vec<_>, _>>()
+            .unwrap()
+            .into_iter()
+            .filter(|quad| quad.predicate.as_str() == RDF_OBJECT)
+            .map(|quad| quad.object)
+            .collect::<HashSet<_>>();
+        assert_eq!(objects.len(), 2, "directions distinguish RDF object values");
+    }
+}

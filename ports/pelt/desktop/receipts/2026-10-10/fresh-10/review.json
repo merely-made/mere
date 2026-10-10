@@ -1,0 +1,28 @@
+{
+  "status": "accepted",
+  "all_images_visually_reviewed": [
+    "browser.png",
+    "editor_dark.png",
+    "editor_hc_dark.png",
+    "editor_hc_light.png",
+    "editor_light.png",
+    "initial_editor.png",
+    "narrow_editor.png",
+    "narrow_specimens.png",
+    "saved_editor.png"
+  ],
+  "presented_editor_frames": 74,
+  "total_pngs": 9,
+  "blank_editor_captures": 0,
+  "renderer_revision": "491c376cf2b01fc11132cf8f86419dec114ae032",
+  "shared_mere_revision": "11236fd4f8da9b7e2ce3712b4f036fbf676b1c8d",
+  "genet_revision": "7422e90613f9017e5bb790e3acb48f61776b2eda",
+  "gpu_adapter": "AMD Radeon Pro Vega 56 / Metal",
+  "new_gpu_reset_report": false,
+  "image_directory": "/Users/markik/Code/tabard-app-receipts/2026-10-10/pelt/fresh-10",
+  "notes": [
+    "Canonical modes, text, graph, authored CSS preview and narrow controls inspected.",
+    "Authored CSS uses exactly supplied roles; unspecified roles retain their ordinary fallbacks.",
+    "Application Apply and restored exact choice confirmed by the actual workspace assertion."
+  ]
+}

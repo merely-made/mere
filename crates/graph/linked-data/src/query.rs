@@ -10,9 +10,7 @@
 //! Each triple pattern streams the projection and deduplicates its matching
 //! quads. The adapter keeps kernel authority without rebuilding a whole
 //! materialized dataset before each query. Broad patterns still scan all rows.
-//! Materialized spareval and Oxigraph paths remain test oracles.
-
-const XSD_STRING: &str = "http://www.w3.org/2001/XMLSchema#string";
+//! A materialized spareval dataset remains the test parity oracle.
 
 #[cfg(test)]
 mod coverage_tests {
@@ -211,137 +209,6 @@ fn term_to_string(term: &Term) -> String {
     }
 }
 
-/// The retired copy-into-Oxigraph-`Store` query path, kept as the parity
-/// oracle: an independently implemented SPARQL engine over the same
-/// projection, diff-tested against the spareval mainline above. Oxigraph
-/// carries its own RDF model (a newer `oxrdf`), so [`baseline::to_ox_quad`]
-/// rebuilds each term across the two crate versions.
-#[cfg(test)]
-mod baseline {
-    use super::{QueryRows, XSD_STRING, term_to_string};
-    use kernel::graph::Graph;
-    use oxigraph::model::{
-        BlankNode as OxBlankNode, GraphName as OxGraphName, Literal as OxLiteral,
-        NamedNode as OxNamedNode, NamedOrBlankNode as OxNamedOrBlankNode, Quad as OxQuad,
-        Term as OxTerm, Triple as OxTriple,
-    };
-    use oxigraph::sparql::{QueryResults as OxQueryResults, SparqlEvaluator};
-    use oxigraph::store::Store;
-
-    use crate::dataset_quads;
-
-    pub(super) fn sparql_store(graph: &Graph, query: &str) -> Result<QueryRows, String> {
-        let store = Store::new().map_err(|e| e.to_string())?;
-        for quad in dataset_quads(graph) {
-            if let Some(oxquad) = to_ox_quad(&quad) {
-                store.insert(&oxquad).map_err(|e| e.to_string())?;
-            }
-        }
-
-        let results = SparqlEvaluator::new()
-            .parse_query(query)
-            .map_err(|e| e.to_string())?
-            .on_store(&store)
-            .execute()
-            .map_err(|e| e.to_string())?;
-
-        match results {
-            OxQueryResults::Solutions(solutions) => {
-                let variables: Vec<String> = solutions
-                    .variables()
-                    .iter()
-                    .map(|v| v.as_str().to_string())
-                    .collect();
-                let mut rows = Vec::new();
-                for solution in solutions {
-                    let solution = solution.map_err(|e| e.to_string())?;
-                    let row = variables
-                        .iter()
-                        .map(|var| solution.get(var.as_str()).map(ox_term_to_string))
-                        .collect();
-                    rows.push(row);
-                }
-                Ok(QueryRows {
-                    variables,
-                    rows,
-                    coverage: graph.coverage_note(),
-                })
-            },
-            OxQueryResults::Boolean(value) => Ok(QueryRows {
-                variables: vec!["result".to_string()],
-                rows: vec![vec![Some(value.to_string())]],
-                coverage: graph.coverage_note(),
-            }),
-            OxQueryResults::Graph(_) => {
-                Err("CONSTRUCT / DESCRIBE results are not supported in this cut".to_string())
-            },
-        }
-    }
-
-    fn to_ox_subject(subject: &oxrdf::NamedOrBlankNode) -> Option<OxNamedOrBlankNode> {
-        Some(match subject {
-            oxrdf::NamedOrBlankNode::NamedNode(n) => OxNamedNode::new(n.as_str()).ok()?.into(),
-            oxrdf::NamedOrBlankNode::BlankNode(b) => OxBlankNode::new(b.as_str()).ok()?.into(),
-        })
-    }
-
-    fn to_ox_term(term: &oxrdf::Term) -> Option<OxTerm> {
-        Some(match term {
-            oxrdf::Term::NamedNode(n) => OxNamedNode::new(n.as_str()).ok()?.into(),
-            oxrdf::Term::BlankNode(b) => OxBlankNode::new(b.as_str()).ok()?.into(),
-            oxrdf::Term::Literal(l) => {
-                if let Some(language) = l.language() {
-                    OxLiteral::new_language_tagged_literal(l.value(), language)
-                        .ok()?
-                        .into()
-                } else if l.datatype().as_str() == XSD_STRING {
-                    OxLiteral::new_simple_literal(l.value()).into()
-                } else {
-                    OxLiteral::new_typed_literal(
-                        l.value(),
-                        OxNamedNode::new(l.datatype().as_str()).ok()?,
-                    )
-                    .into()
-                }
-            },
-            oxrdf::Term::Triple(triple) => OxTriple::new(
-                to_ox_subject(&triple.subject)?,
-                OxNamedNode::new(triple.predicate.as_str()).ok()?,
-                to_ox_term(&triple.object)?,
-            )
-            .into(),
-        })
-    }
-
-    fn to_ox_quad(quad: &oxrdf::Quad) -> Option<OxQuad> {
-        let subject = to_ox_subject(&quad.subject)?;
-        let predicate = OxNamedNode::new(quad.predicate.as_str()).ok()?;
-        let object = to_ox_term(&quad.object)?;
-        Some(OxQuad::new(
-            subject,
-            predicate,
-            object,
-            match &quad.graph_name {
-                oxrdf::GraphName::DefaultGraph => OxGraphName::DefaultGraph,
-                oxrdf::GraphName::NamedNode(node) => OxNamedNode::new(node.as_str()).ok()?.into(),
-                oxrdf::GraphName::BlankNode(node) => OxBlankNode::new(node.as_str()).ok()?.into(),
-            },
-        ))
-    }
-
-    fn ox_term_to_string(term: &OxTerm) -> String {
-        match term {
-            OxTerm::NamedNode(n) => n.as_str().to_string(),
-            OxTerm::Literal(l) => l.value().to_string(),
-            OxTerm::BlankNode(b) => format!("_:{}", b.as_str()),
-            OxTerm::Triple(triple) => triple.to_string(),
-        }
-    }
-
-    // Both engines share this crate's display mapping; anchor the assumption.
-    const _: fn(&super::Term) -> String = term_to_string;
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -434,15 +301,13 @@ mod tests {
         "ASK { <https://b.test> <https://example.test/vocab#refutes> <https://a.test> }",
     ];
 
-    /// Phase 3 gate (a): the spareval mainline returns the same solutions as
-    /// the retired Oxigraph-Store baseline on every representative query.
+    /// The borrowed adapter returns the same solutions as the materialized
+    /// spareval dataset on every representative query.
     #[test]
-    fn spareval_rows_match_store_baseline() {
+    fn adapter_rows_match_materialized_dataset() {
         let graph = rich_graph();
         for query in PARITY_QUERIES {
             let mainline = sorted(sparql(&graph, query).expect(query));
-            let oracle = sorted(baseline::sparql_store(&graph, query).expect(query));
-            assert_eq!(mainline, oracle, "row parity for: {query}");
             assert_eq!(
                 mainline,
                 sorted(sparql_materialized(&graph, query).expect(query)),
@@ -459,6 +324,69 @@ mod tests {
                 vec![vec![Some(expected.to_string())]],
                 "canonical resource ASK control: {query}"
             );
+        }
+    }
+
+    #[test]
+    fn feature_compat_adjust_preserves_timezone_conversion() {
+        let graph = Graph::new();
+        let query = r#"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+            SELECT (ADJUST("2026-10-09T12:00:00Z"^^xsd:dateTime,
+                           "PT2H"^^xsd:dayTimeDuration) AS ?adjusted)
+            WHERE {}"#;
+        let expected = QueryRows {
+            variables: vec!["adjusted".to_string()],
+            rows: vec![vec![Some("2026-10-09T14:00:00+02:00".to_string())]],
+            coverage: graph.coverage_note(),
+        };
+        for (path, actual) in [
+            ("adapter", sparql(&graph, query)),
+            ("materialized", sparql_materialized(&graph, query)),
+        ] {
+            assert_eq!(actual, Ok(expected.clone()), "{path} ADJUST result");
+        }
+    }
+
+    #[test]
+    fn feature_compat_lateral_preserves_per_row_correlation() {
+        let graph = Graph::new();
+        let query = "SELECT ?value ?next WHERE {
+            VALUES ?value { 1 2 }
+            LATERAL { SELECT ?value (?value + 1 AS ?next) WHERE {} LIMIT 1 }
+        } ORDER BY ?value";
+        let expected = QueryRows {
+            variables: vec!["value".to_string(), "next".to_string()],
+            rows: vec![
+                vec![Some("1".to_string()), Some("2".to_string())],
+                vec![Some("2".to_string()), Some("3".to_string())],
+            ],
+            coverage: graph.coverage_note(),
+        };
+        for (path, actual) in [
+            ("adapter", sparql(&graph, query)),
+            ("materialized", sparql_materialized(&graph, query)),
+        ] {
+            assert_eq!(actual, Ok(expected.clone()), "{path} LATERAL result");
+        }
+    }
+
+    #[test]
+    fn feature_compat_calendar_preserves_year_month_extraction() {
+        let graph = Graph::new();
+        let query = r#"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+            SELECT (YEAR("2026-10"^^xsd:gYearMonth) AS ?year)
+                   (MONTH("2026-10"^^xsd:gYearMonth) AS ?month)
+            WHERE {}"#;
+        let expected = QueryRows {
+            variables: vec!["year".to_string(), "month".to_string()],
+            rows: vec![vec![Some("2026".to_string()), Some("10".to_string())]],
+            coverage: graph.coverage_note(),
+        };
+        for (path, actual) in [
+            ("adapter", sparql(&graph, query)),
+            ("materialized", sparql_materialized(&graph, query)),
+        ] {
+            assert_eq!(actual, Ok(expected.clone()), "{path} calendar result");
         }
     }
 
@@ -613,10 +541,6 @@ mod tests {
             let actual = sorted(sparql(&graph, query).unwrap());
             assert_eq!(actual.rows.len(), count, "{query}");
             assert_eq!(actual, sorted(sparql_materialized(&graph, query).unwrap()));
-            assert_eq!(
-                actual,
-                sorted(baseline::sparql_store(&graph, query).unwrap())
-            );
         }
         for (query, expected) in [
             (
@@ -638,7 +562,6 @@ mod tests {
                 "canonical resource and raw Surface control: {query}"
             );
             assert_eq!(sparql(&graph, query), sparql_materialized(&graph, query));
-            assert_eq!(sparql(&graph, query), baseline::sparql_store(&graph, query));
         }
     }
 
@@ -718,10 +641,6 @@ mod tests {
             let actual = sorted(sparql(&graph, query).unwrap());
             assert_eq!(actual.rows.len(), count, "{query}");
             assert_eq!(actual, sorted(sparql_materialized(&graph, query).unwrap()));
-            assert_eq!(
-                actual,
-                sorted(baseline::sparql_store(&graph, query).unwrap())
-            );
         }
         let default_targets = sparql(&graph, controls[1].0).unwrap();
         assert_eq!(
@@ -746,31 +665,6 @@ mod tests {
             .map(|quad| quad.subject.clone())
             .collect();
         assert_eq!(reifiers.len(), 3);
-    }
-
-    /// Phase 3 gate (b): the direct evaluation path must not regress against
-    /// the store-copy path it replaces. Debug-build wall clock over the
-    /// parity battery; generous 3x headroom keeps this a regression tripwire,
-    /// not a benchmark.
-    #[test]
-    fn spareval_is_not_slower_than_store_copy() {
-        let graph = rich_graph();
-        let battery = |run: &dyn Fn(&str) -> QueryRows| {
-            let start = std::time::Instant::now();
-            for _ in 0..20 {
-                for query in PARITY_QUERIES {
-                    run(query);
-                }
-            }
-            start.elapsed()
-        };
-        let mainline = battery(&|q| sparql(&graph, q).expect(q));
-        let oracle = battery(&|q| baseline::sparql_store(&graph, q).expect(q));
-        println!("spareval {mainline:?} vs store-copy {oracle:?} over the parity battery x20");
-        assert!(
-            mainline < oracle * 3,
-            "spareval path ({mainline:?}) should not be slower than 3x the store-copy path ({oracle:?})"
-        );
     }
 }
 
