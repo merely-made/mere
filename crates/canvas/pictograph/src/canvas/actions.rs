@@ -182,7 +182,13 @@ impl Canvas {
     pub(crate) fn actions_of(&self, key: NodeKey) -> Vec<AdvertisedAction> {
         let permitted = &self.roles.actions;
         let mut actions = Vec::new();
-        if permitted.allows(ArrangementAction::Drag) {
+        if permitted.allows(ArrangementAction::Drag)
+            && (self.arrangement_role_of(key) == Role::Pinned
+                || !self
+                    .graph
+                    .get_node(key)
+                    .is_some_and(|n| self.forme_member(n.id)))
+        {
             let returns_home = self.arrangement_slot(key).is_some();
             actions.push(
                 ArrangementAction::Drag

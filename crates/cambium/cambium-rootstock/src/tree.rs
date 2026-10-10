@@ -51,6 +51,7 @@ pub trait HostTree<State>: sealed::Sealed {
     fn pointer_capture(&self) -> Option<NodeId>;
     fn pointer_target(&self, hit: NodeId) -> Option<NodeId>;
     fn wheel_target(&self, hit: NodeId) -> Option<NodeId>;
+    fn hover_target(&self, hit: NodeId) -> Option<NodeId>;
     fn take_file_request(&mut self) -> Option<FileRequest>;
     fn dispatch_click(&mut self, target: NodeId, event: PointerClick);
     fn dispatch_value(&mut self, target: NodeId, event: ValueEvent);
@@ -159,6 +160,10 @@ where
 
     fn dispatch_pointer_up(&mut self, event: PointerEvent) {
         GenetAppRunner::dispatch_pointer_up(self, event);
+    }
+
+    fn hover_target(&self, hit: NodeId) -> Option<NodeId> {
+        GenetAppRunner::hover_target(self, hit)
     }
 
     fn dispatch_hover(&mut self, target: NodeId, event: HoverEvent) {

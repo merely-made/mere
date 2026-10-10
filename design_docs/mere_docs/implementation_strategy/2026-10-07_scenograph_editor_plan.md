@@ -694,3 +694,63 @@ Verified 2026-10-07 against mere's origin unless named.
 - **2026-10-08, the web host's genet pin, and SE52 landed.** Mark: "fix the web genet pin yourself". `ports/graphshell/web/Cargo.toml`'s seven genet pins move from `965b64e2` to `e84f9c7f`, the root's since `632c1d29`; the lock resolves one genet, netrender and taproot, and the host builds for wasm. SE52's labels landed on top. Headed on that build: Chrome, h3_boot and canvas_commands with its reopen; Firefox, canvas_commands with its reopen (the sink's log shows the fresh wasm fetched). Finding: on `e84f9c7f` some node bodies draw as circles where `965b64e2` drew squares, on the same stored data (a control build of `9e482f3a` showed squares). pictograph asks for them: `.gnode-representation-glyph` and `.gnode-circle` set `border-radius: 50%` (`crates/canvas/pictograph/src/canvas/build.rs`). *Reading, not ruled:* the newer genet honours a radius the older one dropped. Next door, not fixed: `ports/distillery/probe/Cargo.toml` still pins genet `965b64e2`.
   *Annotation 2026-10-08:* on the circles, Mark: **"that's also cool, if that's a fix, i can accept that"**. On the distillery pin, Mark: **"fix the distillery pin too"**: its three `[patch]` rows move to `e84f9c7f`; the probe checks for wasm32 and its committed lock resolves one genet and one taproot, also picking up `command-menu` and `edit-history` through cambium and genet's `wuff` in place of `fontsan-woff2`. Its real-model receipts were not rerun: they measure inference, which the repin does not reach, and need the fetched model matrix.
 - **2026-10-09, S1 landed: the swatch grid in the projection editor.** `mere-curation` 0.1.0 published (SE78) with `SubgraphSpec` and `SubgraphKind`, forme re-exporting; scenograph's `Scope` (with `Selection`, SE83), `Swatch`, `Facet`; scenomise's `compose_facet`; graphshell's `projection_compare` and the editor's Preview | Compare, the working draft first and every other family that compiles, over the whole set and the selection, a pick applying the family as one undo step. Tests: mere-curation 1, scenograph 13, scenomise 157 (8 facet), graphshell lib 212 (4 compare), graphshell-client facet_frozen 1. Headed: `projection_compare.scn` in Chrome and Firefox; the first runs failed at the pick (buttons kept stale ids when a pick renamed cells at an equal count, so the page stopped updating), fixed by keying the rebuild on the target ids; a screenshot found frames offset half a cell from their cards (a rect footprint centres on its item), fixed in `compose_facet` with a test that every cell's items lie inside its frame; headings now keep a readable size. Open: settled frames with dynamics (SE70) wait on the dynamics lane's slot (SE69); the gloss pane is the second consumer (SE62).
+
+
+### Workbench Forme bridge (2026-10-10)
+
+**Status:** implemented; native/build qualification passes; headed qualification
+is pending. Mark: "alright, let's do it", asking to apply the
+saved-workbench field to Graphshell. This opens the bounded bridge previously
+proposed in the design-language discussion; general overlapping field behavior,
+Rhai execution and other panes retain their own targets.
+
+- Canonical membership is Forme's Arrangement; nesting, split shares and active
+  tabs are Platen's TreeGeometry. Graphshell saves their pair and the field's
+  extent under a graph-session key through Muniment. Surface UUIDs identify
+  accesses, even where Resources are shared.
+- The retained `tree.html?app=local` page presents reading tiles through Cambium
+  Frisket and projects the same active cells into a quiet rectangular forme
+  region in its Canvas. Hover, selection and unlocked editing reveal cells.
+- Forme-local holds preserve the tile arrangement without pausing unrelated
+  physics. Explicit item pins take precedence. The boundary's visibility and
+  the layout-edit lock are independent of these holds.
+- Existing graph-held Numen fields get an inspect/locate/hide section. A forme
+  projection does not fabricate a scalar field, coupling or semantic link.
+
+Done when nested/ratio/tab geometry and identities survive save/reopen,
+removed accesses reconcile, malformed records refuse atomically, tile regions
+hold while other bodies remain free, explicit pins win, and the retained
+Graphshell page passes a headed open-two/return/hover/rearrange/reopen check.
+Graphshell's reading tiles are its address/metadata view; live browser-engine
+content continues to belong to Pelt in Turnstone.
+
+**Implementation and qualification (2026-10-10):** the bridge, reading panes, existing-field
+inspector, explicit placement previews, per-split size controls and atomic
+workspace save/load are implemented. Previews update both projections; cancel
+restores the saved arrangement and reports cancellation. The shared host resolves
+hover handlers and delivers their local coordinates on ordinary motion; captured
+drags keep owning their gesture. A graph swap releases Forme holds before reusing
+node keys.
+
+Seven workspace tests, five public Canvas integration tests and one real-layout
+host hover test pass in an isolated native qualification crate importing the
+tracked sources, including the stronger graph-switch regression. The product
+wasm build, compact release wasm build, viewer-only wasm check and full
+default-feature wasm check pass. The uncapped debug `wasm-bindgen` packaging step
+exhausted the machine's remaining memory. The whole release dependency tree was
+then rebuilt with size optimization, no debug symbols, no LTO and one Cargo job,
+inside a 1 GiB resident-memory scope with no swap. This reduced the input wasm
+from 88,386,325 to 21,623,120 bytes. Matching `wasm-bindgen` 0.2.129 successfully
+packaged it under a 1280 MiB scope: maximum RSS 1,069,440 KiB, no swap, exit 0.
+Qualification logs are in `Code/testing/mere/forme-{tests,build-final,viewer-check,
+default-check,release-build,release-bindgen-1280}.log` on S-PC.
+
+The headed open/return/hover/edit/reopen receipt remains pending. The Codex
+in-app browser on this machine fails before scenario startup with
+`netrender wgpu boot failed: could not request a wgpu adapter` and
+`webgpu found no adapters`. A visible-browser reload reproduces that failure.
+This is a graphics-startup blocker after packaging succeeded; no interactive
+Graphshell receipt or screenshot has been claimed. Run the paired scenarios in
+a WebGPU-capable browser to complete qualification. The portable source scenarios
+are `p4_tree_forme.scn` and
+`p4_tree_forme_reopen.scn` in `ports/graphshell/web/scenarios/`.

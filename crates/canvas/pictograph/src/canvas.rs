@@ -160,6 +160,8 @@ pub mod canvas_search;
 mod edge_cells;
 pub mod field_bridge;
 mod fields;
+mod forme_region;
+pub use forme_region::{FormeCell, FormeRegion};
 pub use canvas_search::CanvasSearchSurface;
 pub use field_bridge::{build_query_similarity_field, register_query_similarity_field};
 mod elapsed;
@@ -409,6 +411,8 @@ pub struct Canvas {
     pinned_nodes: HashSet<NodeKey>,
     /// An in-progress field move / resize drag, if any. (Field regions.)
     field_drag: Option<fields::FieldDrag>,
+    forme_region: Option<FormeRegion>,
+    forme_held: HashSet<NodeKey>,
     /// Currently-selected nodes (click selects one; marquee selects many).
     selected: HashSet<NodeKey>,
     /// Currently-selected relation cells (edge-pick, or covered by a marquee).
