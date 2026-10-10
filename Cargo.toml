@@ -66,6 +66,8 @@ members = [
     "crates/conatus/nisus",
     "crates/conatus/modulus",
     "crates/conatus/conatus",
+    # The lit body tenant over the reshaped kiss3d fork (wing rulings 471, 735).
+    "crates/conatus/tenant",
     # The scene family sits under the Cambium umbrella (platform boundary plan
     # §1, P2): one family per crates/<family>/ directory, with the widget lane
     # and the scene lane sharing a home and keeping their state models apart.
