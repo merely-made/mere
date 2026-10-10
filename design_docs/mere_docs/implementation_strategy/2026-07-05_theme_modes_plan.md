@@ -42,8 +42,9 @@ This note does not change adoption order or claim controls in every consumer.
 
 **Status:** in progress. Mark selected this order: Pelt, Graphshell, Knot,
 Turnstone, Woodshed, Redshank, Signalman. Isocosm is excluded while its own
-migration proceeds. Publication follows this order; implementation and
-discovery can overlap, with each slice qualified before publication. Existing Woodshed adoption receives a
+migration proceeds. This is the implementation priority; the owner subsequently
+asked to push integrations as they qualify. Implementation and discovery can
+overlap, with each slice qualified before publication. Existing Woodshed adoption receives a
 reconciliation pass rather than a second editor implementation.
 
 ### Shared foundation and current origin
@@ -162,11 +163,69 @@ applicable rendered acceptance pass against its published dependency set.
   now recognizes the canonical macOS `/private` spelling of its unique copied
   executable during timeout cleanup; focused alias/argument/non-owned-process
   checks pass. This cleanup change cannot make a failed receipt pass.
+- The final Pelt desktop suite passes all 70 tests, including real nested wheel
+  delivery, scroll-aware accessibility bounds and Scroll Into View routing. The
+  library drawer and builtin radio state are qualified in the production adapter.
+- Fresh Pelt run 05 reaches the actual editor and captures all four modes, then
+  stalls in the shared texture readback. Its retained process sample identifies
+  `RenderCore::read_rgba8_texture` waiting indefinitely in Metal `Device.poll`.
+  This is a shared capture issue; partial images do not qualify the workflow.
+  Genet's owned pending readback is published and remote-verified as
+  `7422e90613f9017e5bb790e3acb48f61776b2eda`. All four renderer/readback
+  regressions pass on the AMD Radeon Pro Vega 56 / Metal discrete adapter,
+  including padded rows, independent queued captures and cancellation.
+  Rootstock starts the copy of the original presented frame; Mesquite polls
+  completion on later host turns with a five-second deadline, retaining the
+  original request and presentation identity. Synchronous callers wait only
+  for their own copy submission with a bounded timeout. Current Genet's added
+  form metadata notifications route through the owning Rootstock window.
+  Mere adopts the whole active Genet host/render/DOM family and its required
+  Boa/ICU lock update; its unchanged portable Knot dependency still carries
+  older Fleece/layout API packages, without a second host or renderer.
+  All 266 shared native tests pass (166 native host, 73 Rootstock, 27
+  Mesquite), with four documentation examples intentionally ignored. All 19
+  workshop interchange tests pass, including protection of entire owned
+  directories, future generated files, symlink aliases and late replacement
+  decisions. Directory protection uses the existing shared path identity
+  handling and component boundaries; it does not enter authored definitions.
+  A clean staged snapshot independently passes locked offline full metadata;
+  the port and Graphshell web boundary checker passes. Fresh native app
+  acceptance remains open.
+- Another origin fetch found `421818710`, including the Moot capsule host for
+  Graphshell. The worktree fast-forwarded and restored the application changes
+  from a preserved stash. Both capsule and appearance module/state/frame seams
+  remain; the tree stylesheet retains the capsule sheet on later appearance
+  refreshes. Reconciled browser and metadata gates are in progress.
+- Knot's initial adapter replaced the supplied sheet on unrelated dispatch,
+  breaking existing scroll and focus invariants. Explicit appearance/editor
+  refresh transitions repair that regression. Its full library now passes
+  298 tests, with one existing diagnostic ignored; all 17 appearance tests,
+  four preference tests, eight title-bar tests and eight existing scenario
+  tests pass, as do all three bundled-font tests (338 tests total). Native
+  qualification against the newly published capture stack remains open.
 - Graphshell's application routes are the web full app and tree `app=local`;
   its native-messaging executable is a relay, not a settings window. The web
-  adapter is being built around shared Tabard intake and separate application
-  appearance persistence. Embedded roots must inherit their composing host's
-  roles without acquiring application settings authority.
+  adapter now consumes shared Tabard intake with separate application appearance
+  persistence. Its six portable appearance regressions, locked default WASM
+  build, viewer-only check and optional applet check pass on the current shared
+  stack. Actual Chrome 152 / AMD Radeon Pro Vega 56 browser acceptance passes
+  four canonical modes, exact authored CSS, custom mode intake, corrupt-input
+  retention, fresh reload, embedded host/title/storage ownership, saved-tree
+  mode controls and narrow layout. All 23 retained captures were inspected;
+  browser/page/GPU error gates are clear and product storage remains unchanged
+  by appearance selection. Evidence is retained under
+  `tabard-app-receipts/2026-10-09/graphshell/visual-run-02.json` and
+  `graphshell/main-controls-02/browser-report.json` in the family workspace.
+  Embedded roots inherit composing-host roles without reading or writing the
+  application preference. Optional Moot capsule lifecycle and styling survive
+  later appearance refreshes.
+- Native acceptance is paused after Pelt fresh runs 07 and 08 triggered GPU
+  resets and WindowServer watchdog failures. The 01:46:41 October 10 kernel
+  report identifies the fresh-08 Pelt process and its stalled Metal compute
+  queue. Boot time remained October 2: this was a graphics-session reset, not
+  a full reboot. Fresh-08 reproduces with sleep prevention active and records
+  zero captures; no native application is visually qualified by this run.
+  Renderer compute isolation and repair must precede another native attempt.
 - Knot's fetched origin `802238cb` already has coherent Mere/Genet pins and
   semantic-field adaptation. An isolated application worktree preserves its
   primary checkout. Its shared-editor adapter extends local desktop preferences,
