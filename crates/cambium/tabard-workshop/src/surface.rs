@@ -327,6 +327,7 @@ fn editor(state: &WorkshopState) -> WorkshopView {
         lens(
             |name: &mut cambium::TextInput| {
                 text_field_typed(name)
+                    .attr("class", "tabard-text-input")
                     .attr("role", "textbox")
                     .attr("aria-label", "Theme name")
                     .attr("data-field", "name")

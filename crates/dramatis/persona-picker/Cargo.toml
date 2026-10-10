@@ -20,4 +20,6 @@ path = "src/lib.rs"
 # one picker.
 [dependencies]
 cambium.workspace = true
+# The roster's plain types, which an application reads from djinn (DR-C).
+dramatis.workspace = true
 identity.workspace = true

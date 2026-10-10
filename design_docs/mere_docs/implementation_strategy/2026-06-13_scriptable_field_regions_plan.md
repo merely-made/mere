@@ -99,6 +99,29 @@ field may change membership without a node crossing a stationary boundary.
 The entry-action decision must cover those causes and initial scene loading,
 alongside jitter and re-entry; the current force evaluator is not an event log.
 
+**Host inventory (2026-10-10, Mere `6183006b`):** the editor plan's
+[Graphshell control inventory](2026-10-07_scenograph_editor_plan.md#graphshell-control-inventory-2026-10-10-planning-step-1)
+confirms that shared field cards and Canvas field methods have no Graphshell
+authoring caller. Visibility is presentation-only; hiding a field does not
+disable its coupling. Strength/placement mutate Canvas's graph, so wiring a
+button straight to those methods would not establish MereHost's session edit,
+undo and persistence path. A host adapter must distinguish that recorded write
+from the refreshed simulation and the visibility intent. No new placement or
+script UI is installed by this inventory.
+
+**Embedded forme study (2026-10-10; proposal):**
+[design language §9.10](../../2026-08-23_projection_scenes_and_graph_native_platform.md#910-mixed-content-scene-and-embedded-forme-study-2026-10-10)
+makes the two-coordinate problem concrete: a field can move in the scene
+while two webpage members retain their local split. Forme's semantic
+arrangement excludes geometry; proportions and positions belong to projection
+state. The bridge must reuse the owning layout and document accesses rather
+than make the field another tile authority. Hovered subdivisions and explicit
+unlocking are proposed presentations of that same structure. Define how local
+placement constraints compose with outside dynamics and overlapping fields;
+neither additive forces nor an outer rectangle resolves that policy. The
+[editor study](2026-10-07_scenograph_editor_plan.md#mixed-content-study-2026-10-10-proposal-not-opened)
+carries candidate done-conditions, not an opened field implementation track.
+
 ## Findings (code-verified substrate)
 
 The pieces exist; what is missing is **placement, rendering, and the unifying

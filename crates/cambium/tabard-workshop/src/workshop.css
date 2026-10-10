@@ -36,7 +36,7 @@ button[aria-pressed="true"] { background: #e8eef5; color: #254e72; border-color:
 .seed-value { display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid #e1e6ec; border-radius: 6px; }
 .large-swatch { display: block; width: 32px; height: 28px; border: 1px solid #cbd3df; border-radius: 4px; }
 .hex-value { font-family: monospace; font-size: 13px; }
-.seed-value input { flex: 1; min-width: 0; font-family: monospace; font-size: 13px; }
+.seed-value .tabard-text-input { flex: 1; min-width: 0; font-family: monospace; font-size: 13px; }
 .seed-value .large-swatch { flex-shrink: 0; }
 .field-error { color: #8d302e; font-size: 11px; line-height: 1.5; margin: 8px 0; }
 .export-formats { display: flex; flex-wrap: wrap; gap: 5px; }
@@ -101,4 +101,9 @@ button[aria-pressed="true"] { background: #e8eef5; color: #254e72; border-color:
   .specimen-card { width: 100%; }
   .save-state { display: none; }
   .footer-note { display: none; }
+}
+@media (max-width: 480px) {
+  .tabard-workshop > .cambium-title-bar > .title-bar-title { min-width: 140px; }
+  .tabard-workshop > .cambium-title-bar > .title-bar-actions { flex-basis: 100%; flex-wrap: wrap; }
+  .tabard-workshop .header-actions { flex-wrap: wrap; }
 }

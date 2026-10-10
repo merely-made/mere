@@ -18,6 +18,8 @@ use std::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
 
 pub mod dataset;
+pub mod dynamics;
+pub use dynamics::{DynamicsSlot, DynamicsVariant, DYNAMICS_SLOT_VERSION};
 pub mod options;
 pub mod presentation;
 pub mod relationship;
@@ -238,6 +240,9 @@ pub struct ProjectionDraft {
     pub reading: Reading,
     pub encoding: Encoding,
     pub arrangement: Arrangement,
+    /// Optional motion; the binding host validates its opaque specification.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub dynamics: Option<DynamicsSlot>,
     pub interaction: Interaction,
     pub appearance: Appearance,
     pub provenance: Provenance,
@@ -253,6 +258,9 @@ pub struct ProjectionDefinition {
     pub reading: Reading,
     pub encoding: Encoding,
     pub arrangement: Arrangement,
+    /// Optional motion; the binding host validates its opaque specification.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub dynamics: Option<DynamicsSlot>,
     pub interaction: Interaction,
     pub appearance: Appearance,
     pub provenance: Provenance,
@@ -349,6 +357,9 @@ pub struct AuthoredProjectionDefinition {
     pub reading: Reading,
     pub encoding: Encoding,
     pub arrangement: Arrangement,
+    /// Optional motion; the binding host validates its opaque specification.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub dynamics: Option<DynamicsSlot>,
     pub interaction: Interaction,
     pub appearance: Appearance,
     /// This revision belongs to the authored recipe. Bound definitions receive
@@ -358,14 +369,16 @@ pub struct AuthoredProjectionDefinition {
 
 /// An authored delta over one definition, rather than another definition.
 ///
-/// v1 owns arrangement options only. Other section deltas need their own
-/// forcing consumer before entering the portable contract.
+/// Carries arrangement options and the dynamics replacement required by the
+/// swatch grid (F194). Other section deltas need their own forcing consumer.
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct ProjectionVariant {
     pub definition_id: String,
     pub id: String,
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub arrangement_options: BTreeMap<String, String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub dynamics: Option<DynamicsVariant>,
 }
 
 /// Why a reusable authored definition could not be bound to a host payload.
@@ -376,6 +389,7 @@ pub enum AuthoredDefinitionError {
     EmptyExpectedGeneration(String),
     VariantForAnotherDefinition(String),
     EmptyVariantId,
+    Dynamics(String),
     EmptyArrangementOption(String),
     RuntimeSourceMismatch(String),
     RuntimeBindingRequiresWitness(String),
@@ -394,6 +408,7 @@ impl ProjectionDraft {
             reading: Reading::default(),
             encoding: Encoding::default(),
             arrangement: Arrangement::default(),
+            dynamics: None,
             interaction: Interaction::default(),
             appearance: Appearance::default(),
             provenance: Provenance::default(),
@@ -404,6 +419,7 @@ impl ProjectionDraft {
     pub fn to_definition(&self) -> Result<ProjectionDefinition, Vec<ValidationIssue>> {
         self.validate()?;
         Ok(ProjectionDefinition {
+            dynamics: self.dynamics.clone(),
             version: self.version,
             id: self.id.clone(),
             label: self.label.clone(),
@@ -420,6 +436,11 @@ impl ProjectionDraft {
     /// Check all required fields without contacting a host or authority.
     pub fn validate(&self) -> Result<(), Vec<ValidationIssue>> {
         let mut issues = Vec::new();
+        if let Some(slot) = &self.dynamics {
+            if let Err(message) = slot.validate() {
+                issues.push(ValidationIssue::error("dynamics", &message));
+            }
+        }
         if self.version != PROJECTION_DEFINITION_VERSION {
             issues.push(ValidationIssue::error(
                 "version",
@@ -546,6 +567,9 @@ impl AuthoredProjectionDefinition {
     /// authority. A bad dormant source is still a bad durable definition.
     pub fn validate(&self) -> Result<(), AuthoredDefinitionError> {
         let mut issues = Vec::new();
+        if let Some(slot) = &self.dynamics {
+            slot.validate().map_err(AuthoredDefinitionError::Dynamics)?;
+        }
         required(
             &mut issues,
             "provenance.author",
@@ -614,6 +638,19 @@ impl AuthoredProjectionDefinition {
         source_name: &str,
         variant: Option<&ProjectionVariant>,
     ) -> Result<ProjectionDefinition, AuthoredDefinitionError> {
+        self.bind_with_dynamics(source_name, variant, |id| {
+            Err(format!("variant.dynamics.id: preset {id:?} requires a host catalog"))
+        })
+    }
+
+    /// Bind with the host's preset catalog. The portable recipe never
+    /// interprets or silently substitutes a physics preset.
+    pub fn bind_with_dynamics(
+        &self,
+        source_name: &str,
+        variant: Option<&ProjectionVariant>,
+        resolve: impl FnOnce(&str) -> Result<DynamicsSlot, String>,
+    ) -> Result<ProjectionDefinition, AuthoredDefinitionError> {
         self.validate()?;
         let binding = self
             .sources
@@ -625,7 +662,9 @@ impl AuthoredProjectionDefinition {
             ));
         }
         let arrangement = self.arrangement_with_variant(variant)?;
-        self.draft_for(binding, arrangement)
+        let mut draft = self.draft_for(binding, arrangement);
+        draft.dynamics = self.dynamics_with_variant(variant, resolve)?;
+        draft
             .to_definition()
             .map_err(AuthoredDefinitionError::Invalid)
     }
@@ -638,6 +677,18 @@ impl AuthoredProjectionDefinition {
         source_name: &str,
         runtime_source: RuntimeSourceBinding<W>,
         variant: Option<&ProjectionVariant>,
+    ) -> Result<RuntimeProjectionBinding<W>, AuthoredDefinitionError> {
+        self.bind_runtime_with_dynamics(source_name, runtime_source, variant, |id| {
+            Err(format!("variant.dynamics.id: preset {id:?} requires a host catalog"))
+        })
+    }
+
+    pub fn bind_runtime_with_dynamics<W>(
+        &self,
+        source_name: &str,
+        runtime_source: RuntimeSourceBinding<W>,
+        variant: Option<&ProjectionVariant>,
+        resolve: impl FnOnce(&str) -> Result<DynamicsSlot, String>,
     ) -> Result<RuntimeProjectionBinding<W>, AuthoredDefinitionError> {
         self.validate()?;
         let declared = self
@@ -655,8 +706,9 @@ impl AuthoredProjectionDefinition {
             ));
         }
         let arrangement = self.arrangement_with_variant(variant)?;
-        let definition = self
-            .draft_for(declared, arrangement)
+        let mut draft = self.draft_for(declared, arrangement);
+        draft.dynamics = self.dynamics_with_variant(variant, resolve)?;
+        let definition = draft
             .to_definition()
             .map_err(AuthoredDefinitionError::Invalid)?;
         Ok(RuntimeProjectionBinding {
@@ -698,12 +750,27 @@ impl AuthoredProjectionDefinition {
         Ok(arrangement)
     }
 
+    fn dynamics_with_variant(
+        &self,
+        variant: Option<&ProjectionVariant>,
+        resolve: impl FnOnce(&str) -> Result<DynamicsSlot, String>,
+    ) -> Result<Option<DynamicsSlot>, AuthoredDefinitionError> {
+        match variant.and_then(|variant| variant.dynamics.as_ref()) {
+            None => Ok(self.dynamics.clone()),
+            Some(DynamicsVariant::Spec { slot }) => Ok(Some(slot.clone())),
+            Some(DynamicsVariant::Preset { id }) => resolve(id)
+                .map(Some)
+                .map_err(AuthoredDefinitionError::Dynamics),
+        }
+    }
+
     fn draft_for(
         &self,
         binding: &ProjectionInputBinding,
         arrangement: Arrangement,
     ) -> ProjectionDraft {
         ProjectionDraft {
+            dynamics: self.dynamics.clone(),
             version: self.version,
             id: self.id.clone(),
             label: self.label.clone(),
@@ -740,6 +807,7 @@ impl std::fmt::Display for AuthoredDefinitionError {
                     "variant belongs to another definition {definition:?}"
                 )
             },
+            Self::Dynamics(error) => write!(formatter, "{error}"),
             Self::EmptyVariantId => write!(formatter, "variant id is required"),
             Self::EmptyArrangementOption(option) => {
                 write!(formatter, "arrangement option {option:?} is invalid")
@@ -818,6 +886,7 @@ mod tests {
 
     fn valid_draft() -> ProjectionDraft {
         ProjectionDraft {
+            dynamics: None,
             version: PROJECTION_DEFINITION_VERSION,
             id: "notes-by-topic".into(),
             label: "Notes by topic".into(),
@@ -881,6 +950,7 @@ mod tests {
     fn authored() -> AuthoredProjectionDefinition {
         let draft = valid_draft();
         AuthoredProjectionDefinition {
+            dynamics: None,
             version: draft.version,
             id: draft.id,
             label: draft.label,
@@ -917,6 +987,30 @@ mod tests {
                 .iter()
                 .any(|issue| issue.field == "provenance.source_revision")
         );
+    }
+
+    #[test]
+    fn dynamics_survives_authored_binding_and_variant_replacement() {
+        let mut recipe = authored();
+        let original = DynamicsSlot::from_json(1, r#"{"version":2,"root":{"future":"preserved"}}"#).unwrap();
+        recipe.dynamics = Some(original.clone());
+        let inherited = recipe.bind("personal", None).unwrap();
+        assert_eq!(inherited.dynamics, Some(original.clone()));
+        assert_eq!(serde_json::from_slice::<ProjectionDefinition>(&inherited.to_json_bytes().unwrap()).unwrap(), inherited);
+        let mut variant = ProjectionVariant {
+            definition_id: recipe.id.clone(), id: "another-law".into(),
+            arrangement_options: BTreeMap::new(),
+            dynamics: Some(DynamicsVariant::Preset { id: "law".into() }),
+        };
+        assert!(matches!(recipe.bind("personal", Some(&variant)), Err(AuthoredDefinitionError::Dynamics(_))));
+        let replacement = DynamicsSlot::from_json(1, r#"{"root":"replacement"}"#).unwrap();
+        let bound = recipe.bind_with_dynamics("personal", Some(&variant), |id| {
+            assert_eq!(id, "law"); Ok(replacement.clone())
+        }).unwrap();
+        assert_eq!(bound.dynamics, Some(replacement.clone()));
+        variant.dynamics = Some(DynamicsVariant::Spec { slot: replacement.clone() });
+        assert_eq!(recipe.bind("shared", Some(&variant)).unwrap().dynamics, Some(replacement));
+        assert_eq!(recipe.dynamics, Some(original));
     }
 
     #[test]
@@ -1057,7 +1151,8 @@ mod tests {
     fn variant_changes_arrangement_options_without_creating_another_recipe() {
         let authored = authored();
         let variant = ProjectionVariant {
-            definition_id: authored.id.clone(),
+            dynamics: None,
+        definition_id: authored.id.clone(),
             id: "compact".to_owned(),
             arrangement_options: BTreeMap::from([("guides".to_owned(), "false".to_owned())]),
         };
@@ -1083,7 +1178,8 @@ mod tests {
     fn variant_for_another_definition_is_refused() {
         let authored = authored();
         let variant = ProjectionVariant {
-            definition_id: "other.recipe".to_owned(),
+            dynamics: None,
+        definition_id: "other.recipe".to_owned(),
             id: "compact".to_owned(),
             arrangement_options: BTreeMap::new(),
         };

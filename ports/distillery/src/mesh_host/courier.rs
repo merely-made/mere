@@ -46,9 +46,8 @@ pub enum CourierError {
 
 /// Brings a named blob onto this device from somebody who has it.
 pub trait BlobCourier: Send + Sync {
-    /// Try each candidate in turn. `from` holds persona **master** keys, which
-    /// is what a transport can address; resolving a mesh author to one is
-    /// [`mesh::DeviceDirectory`]'s job.
+    /// Try each candidate in turn. `from` holds mesh **author** keys, which
+    /// are transport addresses since the vault lock plan's ruling 92.
     ///
     /// `Ok(false)` means nobody served it — a fact about the ring, not a fault.
     fn fetch<'a>(
@@ -247,8 +246,8 @@ impl BlobCourier for TransportCourier {
     ) -> BoxFuture<'a, Result<bool, CourierError>> {
         Box::pin(async move {
             let hash = blob_hash(blob)?;
-            for master in from {
-                let Ok(peer) = PeerID::from_bytes(master) else {
+            for author in from {
+                let Ok(peer) = PeerID::from_bytes(author) else {
                     continue;
                 };
                 // iroh-blobs verifies the BLAKE3 tree as it transfers, so a peer

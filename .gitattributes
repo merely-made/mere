@@ -58,7 +58,7 @@ ports/tabard/tests/fixtures/** text eol=lf
 # Fixtures whose digests graphshell's web tests pin (site export, practice dataset).
 ports/graphshell/web/fixtures/** text eol=lf
 # OpenSSH key fixtures whose slot bytes a test compares to a pre-P4a baseline.
-crates/dramatis/personae/tests/fixtures/** text eol=lf
+ports/castellan/tests/fixtures/** text eol=lf
 # Snapshot JSON that castellan compares byte for byte (dramatis repo plan D32).
 ports/castellan/tests/golden/** text eol=lf
 

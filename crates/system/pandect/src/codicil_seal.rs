@@ -14,15 +14,13 @@
 //! this sealer is what binds them.
 
 use std::collections::HashMap;
-use std::io;
-use std::path::Path;
 
 use chacha20poly1305::aead::{Aead, KeyInit, Payload};
 use chacha20poly1305::{Key, XChaCha20Poly1305, XNonce};
 use eidetic::{Hash, PayloadSealer, SealEpochId, SealedBlobRef};
 
 use crate::manifest::PersonaId;
-use crate::wallet_store::{KeyEpochId, load_current_private_epoch};
+use crate::wallet_store::KeyEpochId;
 
 /// At-rest seal format for codicil payloads. Same AEAD family as the wallet's
 /// wrapped-epoch format so one primitive covers key wrapping and payload sealing.
@@ -67,20 +65,6 @@ impl WalletEpochSealer {
             current,
             keys,
         }
-    }
-
-    /// Build a sealer from a persona's current private epoch, or `None` when the
-    /// persona has no staged epoch yet (nothing to seal under, so writes stay
-    /// cleartext — the host's degraded-but-honest posture).
-    pub fn for_persona(data_root: &Path, persona: PersonaId) -> io::Result<Option<Self>> {
-        let Some(epoch) = load_current_private_epoch(data_root, persona)? else {
-            return Ok(None);
-        };
-        Ok(Some(Self::from_epoch(
-            persona,
-            epoch.epoch_id,
-            &epoch.epoch_secret,
-        )))
     }
 
     /// Add another epoch's key (e.g. a pre-rotation epoch, for historical reads).
@@ -238,47 +222,5 @@ mod tests {
         let last = sealed.len() - 1;
         sealed[last] ^= 0xff;
         assert!(sealer.unseal(&hash, &marker, &sealed).is_err());
-    }
-
-    #[test]
-    fn for_persona_is_none_without_a_staged_epoch() {
-        // No wallet state on this path, so there is no epoch to seal under and
-        // the host stays in the cleartext lane rather than erroring.
-        let dir = std::env::temp_dir().join("mere-codicil-seal-none-probe");
-        let _ = std::fs::remove_dir_all(&dir);
-        let sealer = WalletEpochSealer::for_persona(&dir, PersonaId::new()).unwrap();
-        assert!(sealer.is_none());
-    }
-
-    #[test]
-    fn for_persona_builds_a_working_sealer_from_a_staged_epoch() {
-        // The path the meerkat wiring relies on: real wallet state -> for_persona
-        // -> a sealer that actually seals and unseals.
-        use crate::wallet_store::{
-            ensure_wallet_state, load_persona_wallet, stage_persona_private_epoch,
-        };
-
-        let dir = std::env::temp_dir().join(format!(
-            "mere-codicil-seal-forpersona-{}",
-            std::process::id()
-        ));
-        let _ = std::fs::remove_dir_all(&dir);
-        let persona = PersonaId::new();
-        ensure_wallet_state(&dir, persona, "Test PC").unwrap();
-        let head = load_persona_wallet(&dir, persona)
-            .unwrap()
-            .unwrap()
-            .private_epoch_head;
-        stage_persona_private_epoch(&dir, persona, head, b"staged-epoch-secret").unwrap();
-
-        let sealer = WalletEpochSealer::for_persona(&dir, persona)
-            .unwrap()
-            .expect("a staged epoch yields a sealer");
-        let cleartext = b"round-trip via for_persona";
-        let hash = Hash::of(cleartext);
-        let (sealed, marker) = sealer.seal(&hash, cleartext).unwrap();
-        assert_ne!(sealed.as_slice(), cleartext);
-        assert_eq!(sealer.unseal(&hash, &marker, &sealed).unwrap(), cleartext);
-        let _ = std::fs::remove_dir_all(&dir);
     }
 }

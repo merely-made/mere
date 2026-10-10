@@ -6,23 +6,20 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-
 use std::collections::BTreeMap;
 use std::error::Error;
-use std::io;
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use mere_signalman::{
-    SITED_STATION_CONTROL_TITLE, SitedStationControlResult, SitedStationCredential,
-    SitedStationHead, SitedStationHeadError,
+    DjinnStationAuthority, SITED_STATION_CONTROL_TITLE, SitedStationControlResult,
+    SitedStationCredential, SitedStationHead, SitedStationHeadError,
 };
-use pandect::wallet_store::identity_auto_unlock_root_path;
-use pandect::{DeviceId, ensure_wallet_state};
-use personae::{InMemoryProvider, PersonaId, SealedRecordStorage, load_or_create_auto_unlock_root};
+use pandect::DeviceId;
+use personae::{IdentityProvider, SealedRecordStorage};
 
 struct ProvisionArgs {
-    authority_root: PathBuf,
+    app_endpoint: Option<String>,
     station_root: PathBuf,
     record: PathBuf,
     label: String,
@@ -40,27 +37,31 @@ fn main() -> Result<(), Box<dyn Error>> {
         )
         .ok_or("grant expiry is too large")?;
 
-    let root_key =
-        load_or_create_auto_unlock_root(identity_auto_unlock_root_path(&args.station_root))?
-            .ok_or_else(|| {
-                io::Error::new(
-                    io::ErrorKind::Unsupported,
-                    "this host has no automatic sealed-station unlock backend",
-                )
-            })?;
-    let storage = SealedRecordStorage::open_with_key(&args.station_root, root_key);
+    // djinn holds the wallet (dramatis repo plan, D5, D17). Absent or Locked,
+    // the station cannot be commissioned and nothing is written (D12).
+    let djinn = match &args.app_endpoint {
+        Some(endpoint) => DjinnStationAuthority::at(endpoint.clone()),
+        None => DjinnStationAuthority::default(),
+    };
+    djinn.status().map_err(pending)?;
+    let device_id = DeviceId::new();
+    let released = djinn.release_station(device_id).map_err(pending)?;
+
+    // The bench head's record is sealed under a station-scoped key djinn
+    // releases for its record path, so a later restore asks for the same.
+    let storage_salt =
+        personae::reticulum::station_storage_salt(args.record.to_string_lossy().as_bytes());
+    let storage_key = djinn
+        .release_storage(storage_salt.clone())
+        .map_err(pending)?
+        .derive_keypair(&storage_salt)?
+        .to_seed();
+    let storage = SealedRecordStorage::open_with_key(&args.station_root, storage_key);
     refuse_existing_head(storage.clone(), &args.record)?;
 
-    let seed = ensure_wallet_state(
-        &args.authority_root,
-        PersonaId::default_persona(),
-        "Signalman bench authority",
-    )?;
-    let provider = InMemoryProvider::from_seed(seed);
-    let device_id = DeviceId::new();
-    let credential = SitedStationCredential::derive_for_device(&provider, device_id)?;
+    let credential = SitedStationCredential::derive_for_device(&released, device_id)?;
     let grant = credential.issue_remote_auth_grant(
-        &args.authority_root,
+        &djinn,
         device_id,
         &args.label,
         issued_at_ms,
@@ -97,6 +98,13 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
+fn pending(error: graphshell::native::custody_client::CustodyClientError) -> Box<dyn Error> {
+    match error.is_pending() {
+        true => format!("the Signalman authority is pending: {error}").into(),
+        false => error.into(),
+    }
+}
+
 fn refuse_existing_head(storage: SealedRecordStorage, record: &Path) -> Result<(), Box<dyn Error>> {
     match SitedStationHead::restore(storage, record) {
         Ok(head) => Err(format!(
@@ -129,7 +137,7 @@ fn parse_args() -> Result<ProvisionArgs, Box<dyn Error>> {
         }
     }
 
-    let authority_root = required_path(&mut values, "--authority-root")?;
+    let app_endpoint = values.remove("--app-endpoint");
     let station_root = required_path(&mut values, "--station-root")?;
     let record = required_path(&mut values, "--record")?;
     if record.is_absolute() {
@@ -148,7 +156,7 @@ fn parse_args() -> Result<ProvisionArgs, Box<dyn Error>> {
     }
 
     Ok(ProvisionArgs {
-        authority_root,
+        app_endpoint,
         station_root,
         record,
         label,
@@ -176,6 +184,6 @@ fn unix_time_ms() -> Result<u64, std::time::SystemTimeError> {
 
 fn print_usage() {
     println!(
-        "usage: mere-signalman-provision \\\n  --authority-root PATH \\\n  --station-root PATH \\\n  --record RELATIVE_PATH \\\n  --label NAME \\\n  --expires-hours HOURS"
+        "usage: mere-signalman-provision \\\n  [--app-endpoint ENDPOINT] \\\n  --station-root PATH \\\n  --record RELATIVE_PATH \\\n  --label NAME \\\n  --expires-hours HOURS"
     );
 }

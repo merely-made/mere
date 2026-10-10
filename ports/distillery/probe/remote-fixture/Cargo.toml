@@ -14,13 +14,15 @@ burn-wgpu = { version = "=0.22.0", default-features = false, features = ["std"] 
 cubecl = { version = "=0.11.0", default-features = false }
 distillery = { path = "../..", features = ["remote"] }
 esp = { path = "../../../../crates/intel/esp", features = ["bert"] }
-identity = { package = "personae", path = "../../../../crates/dramatis/personae" }
+identity = { package = "personae", git = "https://github.com/merely-made/dramatis.git", rev = "c1d620764315b4c750fcffea30b8c898b8bb73bc" }
 mesh = { package = "mere-mesh", path = "../../../../crates/mesh/mesh" }
 muniment = { path = "../../../../crates/eidetic/muniment" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "time"] }
-transport = { package = "mere-transport", path = "../../../../crates/murm/transport" }
+# A probe binary with throwaway identities, so it uses the test-only
+# keypair builder (vault lock plan, ruling 96).
+transport = { package = "mere-transport", path = "../../../../crates/murm/transport", features = ["test-identity"] }
 
 [features]
 default = []

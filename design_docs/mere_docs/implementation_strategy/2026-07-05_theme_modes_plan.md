@@ -40,7 +40,8 @@ This note does not change adoption order or claim controls in every consumer.
 
 ## Application adoption (2026-10-09)
 
-**Status:** in progress. Mark selected this order: Pelt, Graphshell, Knot,
+**Status:** all seven selected application integrations published with platform
+receipts; broader authoring follow-ups remain open below. Mark selected this order: Pelt, Graphshell, Knot,
 Turnstone, Woodshed, Redshank, Signalman. Isocosm is excluded while its own
 migration proceeds. This is the implementation priority; the owner subsequently
 asked to push integrations as they qualify. Implementation and discovery can
@@ -205,14 +206,237 @@ applicable rendered acceptance pass against its published dependency set.
   qualification against the newly published capture stack remains open.
 - Graphshell's application routes are the web full app and tree `app=local`;
   its native-messaging executable is a relay, not a settings window. The web
-  adapter is being built around shared Tabard intake and separate application
-  appearance persistence. Embedded roots must inherit their composing host's
-  roles without acquiring application settings authority.
-- Knot's fetched origin `802238cb` already has coherent Mere/Genet pins and
-  semantic-field adaptation. An isolated application worktree preserves its
+  adapter now consumes shared Tabard intake with separate application appearance
+  persistence. Its six portable appearance regressions, locked default WASM
+  build, viewer-only check and optional applet check pass on the current shared
+  stack. Actual Chrome 152 / AMD Radeon Pro Vega 56 browser acceptance passes
+  four canonical modes, exact authored CSS, custom mode intake, corrupt-input
+  retention, fresh reload, embedded host/title/storage ownership, saved-tree
+  mode controls and narrow layout. All 23 retained captures were inspected;
+  browser/page/GPU error gates are clear and product storage remains unchanged
+  by appearance selection. Evidence is retained under
+  `tabard-app-receipts/2026-10-09/graphshell/visual-run-02.json` and
+  `graphshell/main-controls-02/browser-report.json` in the family workspace.
+  Embedded roots inherit composing-host roles without reading or writing the
+  application preference. Optional Moot capsule lifecycle and styling survive
+  later appearance refreshes.
+- October 10 separately qualifies Graphshell's guarded Vello `491c376c`
+  default Wasm bundle on Chrome 152 / AMD gcn-5 without a fallback adapter.
+  The existing mode, reopen and embedding scenarios pass 97 frames and eight
+  internal captures; all 23 original scenario/browser/tree/main-control PNGs
+  were reviewed. Four modes, exact authored CSS/custom modes, corrupt-input
+  preservation, fresh reload, narrow layouts and embedded host ownership pass,
+  with no browser errors, product-storage changes or new GPU reset. Exact
+  bundle hash, adapter, pixel ledger and PNGs are retained under
+  `ports/graphshell/docs/receipts/tabard_renderer_20261010`. This qualification
+  covers the new renderer separately from the October 9 pre-guard receipts.
+- Native acceptance was paused after Pelt fresh runs 07 and 08 triggered GPU
+  resets and WindowServer watchdog failures. The 01:46:41 October 10 kernel
+  report identifies the fresh-08 Pelt process and its stalled Metal compute
+  queue. Boot time remained October 2: this was a graphics-session reset, not
+  a full reboot. Fresh-08 reproduces with sleep prevention active and records
+  zero captures; no native application is visually qualified by this run.
+  Renderer compute isolation and repair must precede another native attempt.
+- October 10 renderer isolation: both the BBS Moot and canonical-domain lanes
+  report their last headed browser checks ended near 00:12 Eastern, with no
+  newly launched headed GPU runs at the later reset timestamps. Earlier demo
+  pages may have remained open; those reports do not establish a shader cause.
+  The canonical-domain lane also records later headless device-loss failures.
+  Shared Vello `491c376c` retains the existing Radeon coarse fix, enables normal
+  shader runtime checks and workgroup initialization, and validates fine
+  command framing, forward jumps, clip depth and fill segment spans. All 31
+  deliberate command dispatches, two coarse regressions, ten general renderer
+  regressions, allocation recovery and repeated clip composition pass on the
+  actual Radeon Pro Vega 56 / Metal adapter. The test image comparison now
+  uses independent GPU bytes instead of comparing the CPU image with itself.
+  The actual workshop Reader/CSS previews also pass 60 owned readbacks over
+  four modes, authored CSS, wide/narrow dimensions and interleaved shared-core
+  draws. Copy completion is at most 498 ms; exact background/text checks pass.
+  Settled and isolated Reader comparisons permit at most 64 pixels differing
+  by one byte per channel, with a CPU regression enforcing that bound.
+  Twenty representative images were visually inspected. Evidence is retained
+  under `tabard-app-receipts/2026-10-09/shared-renderer/offscreen-previews-03`.
+  No new GPU reset report appeared during these diagnostics. The exact hung
+  kernel remains unidentified. Native window acceptance was still pending at
+  this isolation stage; the later application receipts below qualify actual
+  presentation and reopen separately from these offscreen results.
+  Each standalone application root must patch the maintained renderer triple
+  explicitly: Cargo does not inherit Mere's root patches into consuming roots.
+  Inspect the application's native host dependency closure before its receipt;
+  an older unrelated Sprigging bridge may retain its existing Vello types.
+- October 10 interleaved image repair: maintained Vello `10f01d6d` retains
+  the image atlas extent across solid-only and empty scenes. The original
+  `491c376c` renderer reproduces loss of every image pixel after a patchless
+  frame on Radeon Pro Vega 56 / Metal; fresh raster identities do not repair
+  it. The fixed renderer passes 33 encoding tests, a 13-frame exact-pixel GPU
+  image/solid/empty sequence, and the existing repeated clipped-preview gate.
+  [The shared receipt](../../cambium_docs/testing/receipts/native_image_atlas_20261010/README.md)
+  preserves original failure and fixed test evidence. Mere's root patches the
+  maintained triple together; consuming roots must repeat that policy. This
+  closes the reproduced atlas defect without identifying the earlier hung
+  kernel. Turnstone's subsequent production qualification below independently
+  closes its populated child-preview and application persistence gates.
+- October 10 Pelt native qualification follows the renderer publication.
+  The fixed binary passes fresh-10 and separate-process reopen-10 on Radeon
+  Pro Vega 56 / Metal: 85 presented editor frames, nine nonblank editor captures
+  and two application captures. All eleven PNGs were visually inspected.
+  The real workflow authors all four modes and exact CSS, saves, resizes the
+  same editor to 640×780, explicitly applies the choice in Pelt and restores
+  that exact choice in a new process. Workspace assertions preserve controller
+  identity, history, focus and aperture. No new GPU reset report appeared.
+  Original evidence is retained under
+  `tabard-app-receipts/2026-10-10/pelt/{fresh-10,reopen-10}`; the port's receipts
+  preserve logs, presentation counts, hashes and review records. Fresh-09 was
+  stopped prematurely as a precaution and is explicitly marked partial.
+  Native acceptance now proceeds one application at a time; simultaneous
+  browser/native GPU runs remain held while the other integrations qualify.
+- Knot's initial fetched origin `802238cb` already had coherent Mere/Genet pins
+  and semantic-field adaptation. An isolated application worktree preserved its
   primary checkout. Its shared-editor adapter extends local desktop preferences,
   leaving persona sync, document contents and writing controls under their
-  current owners. Dependency publication and native qualification remain open.
+  current owners. Publication and native qualification were pending at that
+  discovery point; the October 10 accepted consumer receipt below closes them.
+- October 10 narrow native inspection found the workshop brand overlapping
+  Undo/Redo/Save at 420 pixels. The shared workshop stylesheet now reserves
+  the brand width and moves its action slot to a wrapping row below 480 pixels.
+  Production `native_init` font/layout tests cover 360, 420 and 640 pixels with
+  platform and explicit caption policies, checking nonoverlap, viewport bounds,
+  pointer hit centres and Tab reachability. All 15 native-host library tests
+  pass; the same focused test rejects the original stylesheet at 420 pixels.
+  The windowless harness does not measure macOS traffic-light insets, so actual
+  narrow window acceptance remains required. Initial full-image review also
+  suggested missing title/control paint in Knot and Redshank. Independent PNG
+  byte checks and cropped views disprove the reported omissions: title and
+  control regions are identical across the affected frames, and the original
+  parent controls are present. The image tool supplied an incorrect generic
+  binary MIME envelope for valid PNGs. Normalize the envelope and inspect exact
+  pixels before attributing a rendering defect; the paint-loss reports are
+  retracted. The confirmed narrow header overlap was repaired and recaptured.
+
+- October 10 qualified consumer publication: Woodshed `32d335986` passes 444
+  CPU tests and four native lanes (242 presentations, 20 reviewed nonblank
+  captures); Knot `95849aea` passes 338 CPU tests with one existing ignored
+  diagnostic and six accepted native lanes (173 presentations, 21 reviewed
+  captures); Redshank atop Woodshed `4aa68bfb` passes 253 CPU tests with seven
+  existing hardware/fixture ignores and six accepted native lanes (191
+  presentations, 22 reviewed captures). Their acceptance ledgers distinguish
+  the earlier guarded-renderer wide runs from the final Mere `7019f07d` narrow
+  header and authored-definition runs. Fresh processes restore the exact saved
+  identity and mode; authored colors and custom modes remain separate from
+  seed derivation. Knot's document fixture stays byte-exact; Redshank's isolated
+  listener directories stay empty. Product ownership and preserved failed
+  receipts are recorded in each app's existing owning plan and checked-in
+  acceptance ledger. No new GPU reset appeared during these serialized lanes.
+
+- Signalman `937eba84` publishes the shared workshop in Retinue's existing
+  standalone desktop app. All 69 CPU tests and the production build pass;
+  four device-free native lanes record 247 presentations, 22 reviewed nonblank
+  captures and fresh-process restoration in wide/narrow profiles. Exact authored
+  roles remain CSS and preserve network-state semantics; appearance does not
+  exercise firmware installation, microphone inventory or device collection.
+  The checked-in app scenario ledger records the coherent Mere `7019f07d`,
+  Genet `7422e906` and guarded renderer `491c376c` family. A generated test
+  executable initially stalled before libtest with only a dyld startup frame;
+  preserved artifact hashes and ad hoc signing of the generated test binaries
+  qualify the successful CPU retry without attributing it to rendering.
+  Native runs use the ordinary production binary and LaunchServices. No new GPU
+  reset appeared; all owned processes exited before the next app handoff.
+
+- Turnstone `7fca85ac` publishes its application adapter and the shared native
+  workshop. Four production LaunchServices processes on Radeon Pro Vega 56 /
+  Metal record 521 presentations, 19 visually reviewed nonblank captures and
+  no new GPU reset. Application previews contain text and controls at both
+  sizes. Exact 255-byte CSS fixtures prove Save preserves the applied
+  same-ID definition, ordinary Apply adopts the edit, and both initial and
+  edited identity/mode/CSS restore in separate processes. The
+  [application ledger](https://github.com/merely-made/turnstone/blob/7fca85ac4cb04d872a4bf6a60bc87a7abd7d894f/docs/receipts/tabard_adoption_20261010/README.md)
+  binds the production binary and all 320 unchanged build inputs. Current
+  source passes 32 focused CPU tests; the older full serial 777-pass suite
+  predates later selector/wait changes and is recorded separately. Generated
+  test startup initially stalled before libtest; a scoped generated-artifact
+  repair restored execution without changing source or the production binary.
+  The compiled candidate retains Mere `7019f07d` and Genet `7422e906` with
+  explicit maintained renderer triple `10f01d6d`; later Mere `3808c5a22` and
+  Genet `7971ac91a1d` root-policy publications have identical shared crate /
+  component content. The ledger records the actual pins rather than claiming
+  an unbuilt repin. Dirty parent-quit Save/Discard/Cancel and each OS focus
+  transition were not separately exercised natively; other platforms and
+  independent Reader/browser rollout gates remain outside this receipt.
+- Turnstone's earlier failed attempts remain diagnosis evidence. A process
+  sample identifies child redraw starvation in its legacy synchronous
+  `wait-file`; the fixtures now use shared Taproot's cooperative `wait` and
+  the existing busy report covers requested and open workshops. Subsequent
+  populated producer textures but transparent registered-image samples isolate
+  the atlas loss closed by `10f01d6d`. Moving parent chrome out of the child's
+  low raster identity range avoids an overlap but did not repair that preview;
+  its diagnostic receipt remains failed evidence. No temporary source observer
+  survives in the accepted production binary, and no serialized attempt added
+  a GPU restart report. Concurrent Moot/canonical-domain activity has no
+  established causal link to the original reset; qualification now has one
+  explicit GPU owner at a time.
+
+### Findings and progress — 2026-10-10 (workshop field geometry)
+
+- Woodshed's dr-c worktree failed
+  `native_workshop_routes_name_and_stylesheet_text_through_owned_model`
+  (`crates/woodshed-genet/src/main.rs:368`) with the stylesheet field at
+  833×0. Its local patch builds against `dr-c-verify-tabard` (`00b43558`):
+  unmerged r44 plus `codex/tabard-boundary` `7d2a5f3`. That Tabard predates
+  `d1ee0675`, so its `workshop.css` still styles `input` and `textarea`, which
+  no longer match since Cambium `019e07a0` made fields `div[role=textbox]`.
+  `codex/tabard-boundary` itself does not contain `019e07a0`; its seven
+  commits were replayed onto main (`7d2a5f3` → `6c8aa143`, `4797fd8d` →
+  `9e1bec3d`), so the branch is superseded.
+- Main's class fix (`d1ee0675`) reached only `text_control`. The Theme name
+  field is built separately in `editor()` and had no class, so it rendered
+  unstyled at 254×16. `.seed-value input` matched nothing, which left the seed
+  hex field without its monospace face and flex sizing.
+- **Ruling (2026-10-10), the approach.** Asked: main fixed this with classes
+  and the branch was replayed onto main; adopt main's classes in a dr-c
+  worktree (recommended), put role selectors
+  (`[role=textbox]`, `[role=textbox][aria-multiline=true]`) on
+  `codex/tabard-boundary`, or put role selectors on the dr-c mix? Mark:
+  "Adopt main's classes (Recommended)". Classes stay the workshop's field
+  selectors; `codex/tabard-boundary` gets no commit.
+- **Ruling (2026-10-10), main's gap.** Asked: fix the name-field class and
+  `.seed-value input` on main (recommended), record it only, or leave main
+  alone? Mark: "Fix on main too (Recommended)".
+- Main now gives the name field `tabard-text-input` and retargets the seed rule
+  to `.seed-value .tabard-text-input`. The usability test
+  `every_text_field_lays_out_at_its_authored_height` requires name and seed hex
+  to reach 34 px and the empty mode stylesheet to reach 200 px. As controls,
+  it failed on unfixed main (name only, 254×16) and on the unfixed dr-c tree
+  (name 254×16, seed hex 57×16, mode sheet 933×0). With the fix, `cargo test
+  --no-fail-fast -p tabard -p tabard-workshop -p tabard-desktop` passes 136 on
+  main (one ignored) and 121 on a dr-c scratch branch (`tabard-css-dr-c`,
+  `d1ee0675`'s hunks plus this fix on `00b43558`). Each run has one failure,
+  `lagrange_palette_matches_golden_documented_shape`, which also fails on
+  unchanged main: with `core.autocrlf=true` the LF fixture blob checks out as
+  CRLF, so the comparison fails even though every palette value matches. It
+  needs a `.gitattributes` `-text`/`eol=lf` row or a newline-normalized
+  comparison; this pass leaves it open.
+- Woodshed's own test was not rerun. By the time the scratch branch was ready,
+  the dr-c worktree was in the middle of merging woodshed `origin/main`
+  (`4aa68bf`, which pins main `11236fd4` and so already carries the class fix),
+  so it was left untouched.
+- **Ruling (2026-10-10), woodshed verification.** Asked: wait for that merge
+  and rerun the test there (recommended), build a separate woodshed worktree at
+  `d9d3f19` patched to the scratch branch, or skip woodshed? Mark: "Wait for
+  that merge (Recommended)".
+- **Ruling (2026-10-10), landing.** Asked: fast-forward main without pushing
+  (recommended), fast-forward and push, or leave it on the branch? Mark:
+  "Fast-forward main, no push (Recommended)". The push waits for Mark.
+- Later the same day the dr-c merge landed as woodshed `7d33337`, which repins
+  every mere row to `5dca58a9`. That revision carries r44, `019e07a0` and
+  `d1ee0675`, so the dr-c bridge is no longer needed, and the scratch branch
+  `tabard-css-dr-c` was deleted. The dr-c worktree was gone, so
+  `native_workshop_routes_name_and_stylesheet_text_through_owned_model` was
+  rerun with `--locked` in a fresh detached woodshed worktree at `7d33337`, and
+  it passes. `5dca58a9` still lacks this entry's name-field fix, which reaches
+  woodshed at its next mere repin.
+- `shared_components.rs:126` still asserts that the code sample contains no
+  native `input`/`textarea`. It stays, because it guards against native form
+  elements; the `role=textbox` check beside it covers Cambium fields.
 
 ## Shared authoring and title-bar composition (2026-10-08)
 

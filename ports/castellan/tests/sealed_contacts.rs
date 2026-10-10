@@ -9,19 +9,15 @@
 
 use std::path::Path;
 
+use castellan::custody::wallet::{ensure_wallet_state, stage_persona_private_epoch};
+use castellan::custody::{IdentityVault, InMemoryStorage, Profile};
 use castellan::{authority::PersonaeHost, view::VaultProtectionView};
 use gaz::{Contact, ContactBook, KeyProof, PersistenceError, PersonaScope, load_book, save_book};
 use muniment::{
     Backend, Codec, JsonCodec, MemoryBackend, PostcardCodec, RedbBackend, SlotStore, StoreError,
 };
-use pandect::{
-    PersonaId,
-    wallet_store::{ensure_wallet_state, load_persona_wallet, stage_persona_private_epoch},
-};
-use personae::{
-    Ed25519Keypair, IdentityProvider, IdentityVault, InMemoryProvider, InMemoryStorage, Profile,
-    ProfileId,
-};
+use pandect::{PersonaId, wallet_store::load_persona_wallet};
+use personae::{Ed25519Keypair, IdentityProvider, InMemoryProvider, ProfileId};
 
 type Host = PersonaeHost<InMemoryStorage>;
 

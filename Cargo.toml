@@ -19,7 +19,6 @@ members = [
     "crates/system/content-contract",
     "crates/system/proofs",
     "crates/system/shell-state",
-    "crates/system/notochord",
     "crates/system/registry",
     "crates/system/tabard",
     "crates/distillery/alembic",
@@ -39,10 +38,9 @@ members = [
     "crates/stickleback",
     "crates/murm/murm",
     "crates/murm/transport",
-    "crates/dramatis/chatelaine",
-    "crates/dramatis/dramatis",
-    "crates/dramatis/insigne",
-    "crates/dramatis/gaz",
+    # personae, insigne, gaz, chatelaine, notochord and the dramatis facade
+    # left for their own repository on 2026-10-09 (dramatis repo plan, DR-D);
+    # the persona picker stays until D7's condition is met.
     "crates/dramatis/persona-picker",
     "crates/moot/commons",
     "crates/moot/gemot",
@@ -57,7 +55,6 @@ members = [
     # Mere is the platform; these families are its components, packaged here
     # rather than as siblings. Crate names, versions, and licenses are unchanged;
     # only their repository home moved. Products consume them from mere.git.
-    "crates/dramatis/personae",
     "crates/armillary",
     "crates/eidetic/muniment",
     "crates/eidetic/chartulary",
@@ -230,8 +227,14 @@ scenotime = { version = "0.0.4", path = "crates/cambium/scenes/scenotime" }
 scenograph = { version = "0.0.4", path = "crates/cambium/scenes/scenograph" }
 # The remaining families absorbed 2026-07-23. Consumers keep using
 # `<dep>.workspace = true`, so only this block knows where each one lives.
-personae = { version = "0.2.1", path = "crates/dramatis/personae" }
-notochord = { version = "0.1.0", path = "crates/system/notochord" }
+# The identity tier lives in merely-made/dramatis since DR-D (dramatis repo
+# plan). Every entry names the SAME revision: two revisions are two sources,
+# and two personae in one graph split its types. A sibling that embeds in
+# this graph (Knot, through djinn) must pin the same revision too. Until
+# dramatis is pushed, the gitignored `.cargo/config.toml` patches these to a
+# local checkout.
+personae = { version = "0.2.1", git = "https://github.com/merely-made/dramatis.git", rev = "c1d620764315b4c750fcffea30b8c898b8bb73bc" }
+notochord = { version = "0.1.0", git = "https://github.com/merely-made/dramatis.git", rev = "c1d620764315b4c750fcffea30b8c898b8bb73bc" }
 chartulary = { version = "0.2.1", path = "crates/eidetic/chartulary" }
 # The legend/memorial view over journals and codicils; reservation only.
 hagiograph = { version = "0.0.1", path = "crates/eidetic/hagiograph" }
@@ -255,8 +258,8 @@ graphshell-endpoint = { version = "0.0.2", path = "crates/graphshell/graphshell-
 # with the lent signing seed (vault lock rulings 49, 57-59), on Knot's
 # current-family repin: every Mere row at `f1d169c7`, genet `965b64e`. Knot
 # moved first, and djinn's `knot-site` row follows this one.
-knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "eabd44345c3d02110891dbda0a63930ba4841d18" }
-knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "eabd44345c3d02110891dbda0a63930ba4841d18" }
+knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "fef132ef9922ede907d80950762a7f313508547e" }
+knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "fef132ef9922ede907d80950762a7f313508547e" }
 # The credential-keeper port (dramatis plan D4). No longer a reservation:
 # C1/C2 landed the OTP core, sealed OTP items, the release gate, and the
 # `keeper` identity surface graphshell re-exports.
@@ -499,7 +502,7 @@ mesh = { package = "mere-mesh", path = "crates/mesh/mesh" }
 # The same crate as `personae` above, under mere's historical alias. Both
 # entries must carry the SAME version: they resolve to one package, and a
 # stale pin here is invisible from the personae line.
-identity = { package = "personae", version = "0.2.1", path = "crates/dramatis/personae" }
+identity = { package = "personae", version = "0.2.1", git = "https://github.com/merely-made/dramatis.git", rev = "c1d620764315b4c750fcffea30b8c898b8bb73bc" }
 # The participant authority gate (participant gate B1/B3): document-host derives
 # its import-level Grant from a servitor authority — one grant, two faces.
 servitor = { version = "0.0.2", path = "crates/servitor" }
@@ -516,12 +519,12 @@ muniment = { version = "0.1.2", path = "crates/eidetic/muniment" }
 gazette = { version = "0.0.1", path = "ports/gazette" }
 # Stored key-rooted contacts (the "them" side personae keeps): petnames, handles,
 # per-endpoint trust, kith/kin tiers, recency. Relocated from repos/gaz 2026-08-10.
-gaz = { version = "0.0.1", path = "crates/dramatis/gaz" }
+gaz = { version = "0.0.1", git = "https://github.com/merely-made/dramatis.git", rev = "c1d620764315b4c750fcffea30b8c898b8bb73bc" }
 # The cast-list tier's facade reservation; empty until something imports it.
-dramatis = { version = "0.0.2", path = "crates/dramatis/dramatis" }
+dramatis = { version = "0.0.2", git = "https://github.com/merely-made/dramatis.git", rev = "c1d620764315b4c750fcffea30b8c898b8bb73bc" }
 # The graded identity proofs and the never-shown secrets; reservations, no code.
-insigne = { version = "0.0.1", path = "crates/dramatis/insigne" }
-chatelaine = { version = "0.0.2", path = "crates/dramatis/chatelaine" }
+insigne = { version = "0.0.1", git = "https://github.com/merely-made/dramatis.git", rev = "c1d620764315b4c750fcffea30b8c898b8bb73bc" }
+chatelaine = { version = "0.0.2", git = "https://github.com/merely-made/dramatis.git", rev = "c1d620764315b4c750fcffea30b8c898b8bb73bc" }
 # The shared "which persona am I?" list. A Cambium view over the personae
 # roster, so the four applications with a GUI draw one picker rather than four.
 persona-picker = { package = "mere-persona-picker", path = "crates/dramatis/persona-picker" }
@@ -618,6 +621,12 @@ all = "warn"
 # so the shared contracts keep one Cargo source identity. Add an entry whenever
 # Knot names a new Mere package; a name missing here resolves from git and is a
 # duplicate.
+#
+# insigne, notochord and personae left for merely-made/dramatis (DR-D). A Knot
+# revision that still names them through mere.git is redirected to the one
+# dramatis revision this workspace pins, not to a path; a Knot revision that
+# names them through dramatis.git needs no entry, only the same revision
+# (Cargo refuses a patch from dramatis.git to dramatis.git).
 [patch."https://github.com/merely-made/mere.git"]
 cambium = { path = "crates/cambium/cambium" }
 cambium-genet-winit-host = { path = "crates/cambium/cambium-genet-winit-host" }
@@ -631,7 +640,7 @@ graphshell = { path = "ports/graphshell" }
 graphshell-endpoint = { path = "crates/graphshell/graphshell-endpoint" }
 illume = { path = "crates/nematic/illume" }
 inker = { path = "crates/inker/inker" }
-insigne = { path = "crates/dramatis/insigne" }
+insigne = { git = "https://github.com/merely-made/dramatis.git", rev = "c1d620764315b4c750fcffea30b8c898b8bb73bc" }
 knot-editor-host = { path = "crates/inker/knot-editor-host" }
 mere-proofs = { path = "crates/system/proofs" }
 mere-surface-api = { path = "crates/system/surface-api" }
@@ -640,9 +649,9 @@ mora-cmudict = { path = "crates/intel/mora-cmudict" }
 reference-data = { path = "crates/intel/reference-data" }
 muniment = { path = "crates/eidetic/muniment" }
 nematic = { path = "crates/nematic/nematic" }
-notochord = { path = "crates/system/notochord" }
+notochord = { git = "https://github.com/merely-made/dramatis.git", rev = "c1d620764315b4c750fcffea30b8c898b8bb73bc" }
 pandect = { path = "crates/system/pandect" }
-personae = { path = "crates/dramatis/personae" }
+personae = { git = "https://github.com/merely-made/dramatis.git", rev = "c1d620764315b4c750fcffea30b8c898b8bb73bc" }
 sceno = { path = "crates/cambium/scenes/sceno" }
 # Knot has named these two since its `5516606`; they arrived with the
 # `c966e31` pin (wing ruling 586, "With djinn's Knot repin (Recommended)").
@@ -657,6 +666,10 @@ stickleback = { path = "crates/stickleback" }
 # Livery/Buckram consume Genet's Taffy fork directly. The retired Stylo layout
 # cone has no root patch in this workspace.
 [patch.crates-io]
+# gaz (dramatis) takes muniment from crates.io so dramatis never pins mere;
+# this swaps in mere's own, so the graph holds one muniment and castellan's
+# stores and gaz's agree on its types.
+muniment = { path = "crates/eidetic/muniment" }
 # Vello on wgpu 30, from the owned fork. Upstream vello 0.10 still requires
 # wgpu 29 and their own migration PR is stalled, so netrender (and through it
 # this workspace's render path) takes vello from the v0.10.0 tag plus the API
@@ -664,10 +677,11 @@ stickleback = { path = "crates/stickleback" }
 # netrender, so this workspace restates it. Retires by deletion when upstream
 # ships a wgpu-30 vello.
 vello = { git = "https://github.com/mark-ik/vello.git", tag = "vello-0.10.0" }
-# Existing qualified Radeon repair (Mere 27a39780b), needed by this host.
-netrender-vello = { git = "https://github.com/mark-ik/vello.git", rev = "865cbf419668a6fb5b5e96ea54eaaf9be160fd92" }
-vello_encoding = { git = "https://github.com/mark-ik/vello.git", rev = "865cbf419668a6fb5b5e96ea54eaaf9be160fd92" }
-vello_shaders = { git = "https://github.com/mark-ik/vello.git", rev = "865cbf419668a6fb5b5e96ea54eaaf9be160fd92" }
+# Radeon coarse repair plus validated native shader command progress guards.
+# Keep Classic and its encoding/shader types on the same 0.10 maintenance source.
+netrender-vello = { git = "https://github.com/mark-ik/vello.git", rev = "10f01d6d88e94eac087daf033b24895cf97b8e82" }
+vello_encoding = { git = "https://github.com/mark-ik/vello.git", rev = "10f01d6d88e94eac087daf033b24895cf97b8e82" }
+vello_shaders = { git = "https://github.com/mark-ik/vello.git", rev = "10f01d6d88e94eac087daf033b24895cf97b8e82" }
 # cubecl-wgpu 0.10.0, vendored from the registry and moved to wgpu 30. This is
 # the "narrow CubeCL backport" of the 2026-08-15 wgpu 30 unification: it is the
 # ONLY crate in the burn 0.21 / cubecl 0.10 stack that names wgpu at all, so
