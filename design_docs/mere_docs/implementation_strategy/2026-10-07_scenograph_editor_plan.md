@@ -486,6 +486,48 @@ can be researched before those storage and composition choices are ruled.
 The dynamics slot and settle work, then the grid dynamics axis, B1 and S2 retain
 their existing order and active-owner boundaries.
 
+#### Graphshell control inventory (2026-10-10; planning step 1)
+
+Checked against published Mere `6183006b`, independently of the dynamics draft
+being qualified in the primary checkout. This is source inspection of the
+browser reference host, not a new browser receipt or native-host qualification.
+
+| Control | Present browser route | Authority and missing work |
+|---|---|---|
+| Create a content node | `node:new` calls `create_address`, then refreshes the Canvas. | MereHost's recorded graph edit. A graph member is not a preview occurrence. |
+| Edit title and tags | `node:edit` opens detail; `save-metadata` calls `edit_node`. | The title delta addresses the Surface. Tag deltas route to the shown Resource and retain assertion authorship. Shared Resource changes can affect several surfaces. |
+| Edit a named JSON value | The same form optionally calls `set_product_facet`. | A separate journaled Surface-facet edit. This is not a general Resource, link or field attribute editor, nor the pending facet-dissolution design. |
+| Add a link | `add-relation` resolves a target by URL and calls `assert_product_relation` for one of five editable kinds. | A recorded assertion through MereHost. The form does not address an individual statement handle, its provenance or a link-owned dynamics rule. Selecting the pair selects its nodes. |
+| Inspect link bundles and cells | Shared roster has `LinkCard` and distinct bundle/cell subjects. | No Graphshell source calls these builders or consumes their subjects. Wiring an exact source assertion remains work. |
+| Inspect and configure fields | Shared roster has field detail and visibility/strength intents. Canvas has placement, strength and visibility methods. | No Graphshell source consumes these roster intents or calls `add_field_at`/`set_field_strength`. Canvas's field writes mutate its graph; a host control must route durable changes through the authoritative session before refreshing the view. |
+| Configure placement and motion | Browser arrangement, physics and role controls affect the Canvas; saved scenes retain the settings. | Distinct from a graph primitive's attributes. The pending occurrence-preview adapter is not assumed to supply field or link authoring. |
+
+Sources: [browser product dispatch and form](../../../ports/graphshell/src/web_product.rs),
+[recorded product edits](../../../ports/graphshell/src/product.rs),
+[MereHost edit and undo routes](../../../ports/graphshell/src/mere_host.rs),
+[tag routing](../../../crates/graph/graph-kernel/src/graph/resource_content.rs),
+[shared roster](../../../crates/mere/src/roster.rs),
+[Canvas field writes](../../../crates/canvas/pictograph/src/canvas/input.rs) and
+[field visibility](../../../crates/canvas/pictograph/src/canvas/fields.rs).
+Hiding a field is presentation-only; its coupling continues to exist. Field
+rule/extent cards currently describe values and select the field; they do not
+edit the rule, script or extent. Their script/template rows say not configured.
+
+**Edit boundary to resolve in the authoring proof:** `save_metadata` commits
+title/tags before parsing and writing the optional JSON facet. An invalid JSON
+value can therefore report failure after title/tags have changed. Two successful
+calls also make separate recorded edits. The proposed authoring loop must state
+whether a form submission is one change or several, validate the full draft
+before committing, and show which owner each value changes. This is a source
+finding; no repair or new undo semantics is claimed in this documentation pass.
+
+Step 1's inventory is complete at this source. Before opening step 2, prepare
+the explicit member-to-Resource inspection and exact-statement selection paths,
+then the field read/write adapter. Reuse the established session for writes and
+separate presentation intents. Arbitrary attribute storage, primitive node
+encoding and overlap policy remain the existing forks. The active dynamics
+qualification and B1/S2 owner boundaries retain their priority.
+
 ## 4. Findings
 
 Verified 2026-10-07 against mere's origin unless named.

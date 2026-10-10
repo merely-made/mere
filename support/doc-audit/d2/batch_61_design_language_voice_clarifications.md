@@ -17,6 +17,18 @@ identical counts and hashes. The global D2 checker retains its existing
 259/265 coverage and unrelated failures; no new missing or unknown record was
 introduced. No runtime source changed and no build or browser gate ran.
 
+**Control inventory continuation (2026-10-10):** checked published Mere
+`6183006b`, using browser dispatch/forms, product edits, session edit/undo,
+Resource tag routing, shared roster cards and Canvas field methods. The
+browser routes and missing roster consumers are source findings, not headed
+acceptance. The compound metadata form's sequential commits and validation
+order are recorded as an authoring boundary; no repair is claimed. Native
+controls and the concurrent dynamics draft are outside this pass.
+Validation: all nine new local links and anchors resolve; whitespace checks
+pass. The complete doc-audit JSON has the same SHA256 before and after the
+inventory. D2 retains its six existing missing records, 259/265 coverage and
+no unknown supplemental records. No build or browser gate ran.
+
 ## 2026-08-23_projection_scenes_and_graph_native_platform.md
 
 - disposition: current
@@ -70,6 +82,8 @@ research, and the primitive-inspection candidate in Graphshell.
 Continuation checks cover the four source-backed map rows. Host control
 availability is explicitly unqualified; dynamics attribution and the fixture
 are proposed. No new SE track or storage schema is claimed.
+The 2026-10-10 source inventory now qualifies the browser control routes and
+their missing consumers at `6183006b`; runtime behavior remains untested here.
 
 ## mere_docs/implementation_strategy/2026-06-13_scriptable_field_regions_plan.md
 
@@ -99,6 +113,8 @@ Checked the broadened field direction, the unchanged implementation boundary,
 and the proposed composition/action proof with lifecycle distinctions.
 The continuation verified selector variants, extent utilities and the bridge's
 actual inputs; spatial inclusion and declared membership remain distinct.
+The 2026-10-10 inventory verifies absent Graphshell field-authoring callers
+and distinguishes Canvas graph writes from view-only field visibility.
 
 ## mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md
 
