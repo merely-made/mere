@@ -357,6 +357,10 @@ tests and four native reader tests pass against that tree; the ordinary viewer
 check and locked applet build pass. Its actual browser run repeats all thirteen
 checks and the three inspected Radeon captures. The distinct accepted artifact
 is `targets/moot-main-published-20261009`; earlier receipts remain preserved.
+The first push raced additive Tabard strict-choice loading at `0669a9192`.
+That change is included; all 36 Tabard library tests and the six capsule-gate
+tests pass. The captured capsule execution paths and owned host sources are
+unchanged by this appearance-store API addition.
 
 ### Independent capsule readings continuation (2026-10-09)
 

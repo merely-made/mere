@@ -136,6 +136,22 @@ pub struct FileThemeChoiceStore {
 }
 
 impl FileThemeChoiceStore {
+    /// Load without silently replacing malformed preferences with defaults.
+    /// A missing file starts at the default; invalid UTF-8, malformed choices
+    /// and other read failures stay visible to the host. Reading creates no
+    /// files. Legacy Pelt light/dark lines retain their existing interpretation.
+    pub fn load_strict(path: impl Into<PathBuf>) -> io::Result<Self> {
+        let path = path.into();
+        let choice = match fs::read_to_string(&path) {
+            Ok(contents) => ThemeChoice::parse(&contents).ok_or_else(|| {
+                io::Error::new(io::ErrorKind::InvalidData, "invalid stored theme choice")
+            })?,
+            Err(error) if error.kind() == io::ErrorKind::NotFound => ThemeChoice::default(),
+            Err(error) => return Err(error),
+        };
+        Ok(Self { path, choice })
+    }
+
     /// Loads the choice at `path`. A missing or unreadable choice starts at
     /// the default; other I/O failures stay visible to the caller.
     pub fn load(path: impl Into<PathBuf>) -> io::Result<Self> {
@@ -300,5 +316,40 @@ mod tests {
         fs::create_dir(&path).unwrap();
         assert!(FileThemeChoiceStore::load(&path).is_err());
         fs::remove_dir(path).unwrap();
+    }
+
+    #[test]
+    fn strict_load_preserves_malformed_and_non_utf8_preferences() {
+        let path = scratch("strict-invalid-choice");
+        for bytes in [b"{broken".as_slice(), &[0xff, 0xfe]] {
+            fs::write(&path, bytes).unwrap();
+            assert_eq!(
+                FileThemeChoiceStore::load_strict(&path).unwrap_err().kind(),
+                io::ErrorKind::InvalidData
+            );
+            assert_eq!(fs::read(&path).unwrap(), bytes);
+        }
+        fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn strict_load_keeps_missing_and_legacy_choice_semantics() {
+        let path = scratch("strict-choice");
+        let store = FileThemeChoiceStore::load_strict(&path).unwrap();
+        assert_eq!(store.choice(), &ThemeChoice::default());
+        assert!(!path.exists());
+        fs::write(&path, "light\n").unwrap();
+        let mut store = FileThemeChoiceStore::load_strict(&path).unwrap();
+        assert_eq!(
+            store.choice(),
+            &ThemeChoice::new(THEME_ID_LIGHT, Some(Mode::Light))
+        );
+        let choice = ThemeChoice::new("theme:authored", Some(Mode::Custom("garden".into())));
+        store.set_choice(choice.clone()).unwrap();
+        assert_eq!(
+            FileThemeChoiceStore::load_strict(&path).unwrap().choice(),
+            &choice
+        );
+        fs::remove_file(path).unwrap();
     }
 }

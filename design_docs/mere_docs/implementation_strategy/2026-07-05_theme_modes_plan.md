@@ -88,6 +88,12 @@ applicable rendered acceptance pass against its published dependency set.
   tests pass, including the two new host-file boundary regressions; this
   additive API was pushed and remote-verified as
   `d5679eba4aa1bc5e1a241c5df63d13490a5f46a7`.
+- The existing choice file store gains an additive strict loader. Missing files
+  keep the existing default, while malformed/non-UTF-8 preferences surface an
+  error without changing bytes; legacy lines and authored custom-mode JSON keep
+  their existing interpretation. All seven focused choice-store tests pass.
+  The compatibility loader remains unchanged for existing consumers. Pelt and
+  Signalman use this shared operation rather than duplicating file validation.
 - Editing and saving the currently selected theme under the same identity must
   not bypass explicit application Apply. Each native adapter holds the applied
   presentation while authoring updates the library, refreshing it only after
