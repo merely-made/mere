@@ -88,7 +88,7 @@ impl Canvas {
         self.field_drag = None;
         self.marquee = None;
         self.middle_drag = None;
-        self.fold = None;
+        self.folds.clear();
         self.fold_press = None;
         self.fold_undo.clear();
         self.fold_redo.clear();
@@ -224,8 +224,9 @@ impl Canvas {
             law_rebuilds: 0,
             restored_score_hold: None,
             scope: None,
-            fold: None,
+            folds: Vec::new(),
             fold_press: None,
+            fold_badge_nodes: Vec::new(),
             fold_undo: Vec::new(),
             fold_redo: Vec::new(),
             render_gnodes_as_dom: false,
@@ -406,6 +407,7 @@ impl Canvas {
         );
         self.gnode_of = gnode_of;
         self.stage_node = stage_node;
+        self.fold_badge_nodes.clear();
         self.resync_view_to_graph();
         // Degree-based sizes shift when the topology changes, so re-push radii (also
         // seeds them for newly-spawned bodies). No re-settle here: the structural

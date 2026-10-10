@@ -209,7 +209,7 @@ impl Canvas {
                     // so no node pick / field grab / marquee starts. (Isometric camera — orbit.)
                     self.follow = false;
                     self.orbit_drag = Some(self.cursor);
-                } else if let Some(fold) = self.fold_summary_at_screen(self.cursor) {
+                } else if let Some(fold) = self.fold_stand_in_at_screen(self.cursor) {
                     self.fold_press = Some((fold, self.cursor));
                 } else if let Some(node) = self.pick_at(self.cursor) {
                     self.drag = Some(Drag {
@@ -264,7 +264,7 @@ impl Canvas {
                 }
                 if let Some((fold, press)) = self.fold_press.take() {
                     if (self.cursor.0 - press.0).hypot(self.cursor.1 - press.1) <= CLICK_SLOP {
-                        return self.expand_fold(fold);
+                        return self.expand_fold(&fold);
                     }
                     return true;
                 }

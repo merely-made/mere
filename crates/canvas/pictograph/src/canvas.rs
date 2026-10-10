@@ -164,6 +164,8 @@ pub use canvas_search::CanvasSearchSurface;
 pub use field_bridge::{build_query_similarity_field, register_query_similarity_field};
 mod elapsed;
 pub mod fold_projection;
+mod folds;
+pub use folds::FoldBadge;
 mod frame;
 mod frame_profile;
 pub use frame_profile::CanvasFrameProfile;
@@ -344,7 +346,7 @@ pub struct ContextRequest {
 /// cells, and physics positions deliberately do not participate.
 #[derive(Clone)]
 struct FoldViewState {
-    fold: Option<forme::FoldRecord>,
+    folds: Vec<curation::FoldRecord>,
     selected: HashSet<NodeKey>,
     selected_edges: HashSet<EdgeCell>,
 }
@@ -733,14 +735,19 @@ pub struct Canvas {
     /// curated subset), projecting through a curated forme arrangement instead of the
     /// full Identity one. `None` shows the whole graph. (Curated canvas.)
     scope: Option<Vec<NodeKey>>,
-    /// One view-local fold currently rendered as a synthetic summary object. Its
-    /// members stay in the source graph and the physics layout; only this Canvas
-    /// projection replaces them visually. (Graph view curation C3.)
-    fold: Option<forme::FoldRecord>,
-    /// A pending summary-object click. Keeping this separate from node dragging
-    /// lets a click expand the fold without ever making the synthetic summary a
-    /// source-graph node.
-    fold_press: Option<(forme::FoldId, (f32, f32))>,
+    /// The view-local folds, never sharing a member, each drawn as its
+    /// stand-in: a summary body or a member with "+N". Their members stay in
+    /// the source graph and the physics layout; only this Canvas projection
+    /// replaces them visually. (Graph view curation C3; mer3ly site plan,
+    /// Rulings 165 and 166.)
+    folds: Vec<curation::FoldRecord>,
+    /// A pending stand-in click (a summary body or a badge). Keeping this
+    /// separate from node dragging lets a click expand the fold without ever
+    /// making the synthetic summary a source-graph node.
+    fold_press: Option<(curation::FoldId, (f32, f32))>,
+    /// The "+N" badge elements in the node document, made as folds need
+    /// them and reused; each with its text node and the text it shows.
+    fold_badge_nodes: Vec<(DomNodeId, DomNodeId, String)>,
     /// Fold/expand curation history. This stays local to one Canvas and is
     /// discarded on a graph switch, just like selection and other view state.
     fold_undo: Vec<FoldViewState>,

@@ -13,6 +13,7 @@ use crate::canvas::underlay::{canvas_paint_list_demoted_from_arrangement, identi
 use genet_scripted_dom::NodeId as DomNodeId;
 use kernel::geometry::PortablePoint;
 use kernel::graph::NodeKey;
+use layout_dom_api::LayoutDomMut;
 use netrender::Scene;
 use paint_list_api::{
     AlphaType, ColorF, CommonPlacement, DeviceIntSize, ExtendMode, GradientStop, IdNamespace,
@@ -26,7 +27,7 @@ use seiche::NodeCollider;
 
 use super::build::{
     background_cmds, bridge_ring_overlay, community_ring_overlay, field_overlay, marquee_rect_cmds,
-    set_class, set_style,
+    qual, set_class, set_style,
 };
 use super::edge_cells::{
     edge_cell_for_relation, relation_cell_overlay, relation_family_color, selected_edge_overlay,
@@ -89,6 +90,46 @@ fn fold_summary_overlay(
     }));
     commands
 }
+
+/// Show one badge element per `(centre, text)`, made as needed and reused,
+/// and hide the rest. Badges sit on the stage above every gnode.
+fn place_fold_badges(
+    dom: &mut genet_scripted_dom::ScriptedDom,
+    stage: DomNodeId,
+    pool: &mut Vec<(DomNodeId, DomNodeId, String)>,
+    badges: &[((f32, f32), String)],
+) {
+    while pool.len() < badges.len() {
+        let badge = dom.create_element(qual("div"));
+        dom.set_attribute(badge, qual("class"), "gbadge");
+        let text = dom.create_text("");
+        dom.append_child(badge, text);
+        dom.append_child(stage, badge);
+        pool.push((badge, text, String::new()));
+    }
+    for (index, (badge, text, shown)) in pool.iter_mut().enumerate() {
+        let Some(((x, y), wanted)) = badges.get(index) else {
+            set_style(dom, *badge, "display: none;");
+            continue;
+        };
+        if shown != wanted {
+            dom.set_text_content(*text, wanted);
+            *shown = wanted.clone();
+        }
+        set_style(
+            dom,
+            *badge,
+            &format!(
+                "transform: translate({}px, {}px); z-index: 2147483000;",
+                x - FOLD_BADGE_HALF.0,
+                y - FOLD_BADGE_HALF.1
+            ),
+        );
+    }
+}
+
+/// Half a badge's drawn size, px, so its centre lands on its anchor.
+const FOLD_BADGE_HALF: (f32, f32) = (12.0, 9.0);
 
 impl Canvas {
     /// Advance one frame at viewport `(w, h)` and return the composited content
@@ -226,12 +267,9 @@ impl Canvas {
         // gnode loop). `None` shows the whole graph. (Curated canvas.)
         let scoped: Option<HashSet<NodeKey>> =
             self.scope.as_ref().map(|s| s.iter().copied().collect());
-        let fold = self.active_fold_projection();
-        let folded_members = fold
-            .as_ref()
-            .map(|projection| &projection.members)
-            .cloned()
-            .unwrap_or_default();
+        let folds = self.fold_projections();
+        let folded_members: HashSet<NodeKey> =
+            folds.iter().flat_map(FoldProjection::hidden).collect();
         let node_visible = |key: NodeKey| {
             scoped.as_ref().is_none_or(|scope| scope.contains(&key))
                 && !folded_members.contains(&key)
@@ -249,8 +287,8 @@ impl Canvas {
         // scope. Either way the canvas renders as a Cartography projection of an
         // arrangement (the spine's "two projections of one arrangement"); a scoped
         // arrangement is exactly the shape a stored/compare arrangement would take.
-        let arrangement = match (&self.scope, &fold) {
-            (None, None) => identity_arrangement(&self.graph),
+        let arrangement = match (&self.scope, folds.is_empty()) {
+            (None, true) => identity_arrangement(&self.graph),
             _ => crate::canvas::underlay::arrangement_of_keys(&self.graph, &visible_keys),
         };
         observer.mark(1);
@@ -290,7 +328,9 @@ impl Canvas {
             &self.hidden_edges,
             &node_visible,
         ));
-        if let Some(fold) = &fold {
+        // A summary stand-in is a body of its own, with its boundary bundles;
+        // a member stand-in is the member's own gnode, with its badge below.
+        for fold in folds.iter().filter(|fold| fold.stand_in.is_none()) {
             underlay.splice_world_overlays(fold_summary_overlay(
                 fold,
                 &positions,
@@ -419,7 +459,21 @@ impl Canvas {
             let class = format!("{state_class}{shape_class}{representation_class}");
             gnode_updates.push((gnode, style, Some(class)));
         }
+        // Each fold's "+N", over the node layer it belongs to: none when the
+        // host draws the gnodes itself (it reads `fold_badges` instead).
+        let badges: Vec<((f32, f32), String)> = if self.render_gnodes_as_dom {
+            Vec::new()
+        } else {
+            folds
+                .iter()
+                .filter_map(|fold| {
+                    let at = self.fold_badge_anchor(fold, |key| positions.get(&key).copied())?;
+                    Some((at, fold.badge()))
+                })
+                .collect()
+        };
         let stage_node = self.stage_node;
+        let mut badge_nodes = std::mem::take(&mut self.fold_badge_nodes);
         observer.mark(3);
         let (_, restyle) = self.node_document.mutate_dom(|dom| {
             set_style(dom, stage_node, "transform: translate(0px, 0px) scale(1);");
@@ -429,7 +483,9 @@ impl Canvas {
                     set_class(dom, *gnode, class);
                 }
             }
+            place_fold_badges(dom, stage_node, &mut badge_nodes, &badges);
         });
+        self.fold_badge_nodes = badge_nodes;
         tracing::debug!(?restyle, "canvas pool: Livery mutation batch");
         observer.mark(4);
         let nodes_plist = self

@@ -524,11 +524,12 @@ fn content_projection_reaches_score_edges_and_fold_boundary_accounting() {
         5,
         "unbound surface still has a body"
     );
-    let fold = forme::FoldRecord::from_selection(
+    let fold = curation::FoldRecord::selection(
+        curation::FoldId::new("fold:content"),
         "content",
         [
-            graph.get_node(a).unwrap().id,
-            graph.get_node(alias_a).unwrap().id,
+            graph.get_node(a).unwrap().id.to_string(),
+            graph.get_node(alias_a).unwrap().id.to_string(),
         ],
     )
     .unwrap();
