@@ -77,6 +77,16 @@ SPDX-License-Identifier: MPL-2.0 -->
     #mere-scene-study [hidden] { display:none!important; }
     #mere-scene-study[data-theme=workshop] .space { background-size:28px 28px; }
     #mere-scene-study[data-theme=night] .space { background-image:radial-gradient(var(--m-line) .75px,transparent .75px),radial-gradient(ellipse at 55% 45%,var(--m-soft),transparent 70%); background-size:34px 34px,100% 100%; }
+    #mere-scene-study[data-scene=force] .field-boundary { border-style:dashed; opacity:.4; }
+    #mere-scene-study[data-scene=force] .node { border-radius:18px; }
+    #mere-scene-study[data-scene=force] .node .document p { display:none; }
+    #mere-scene-study[data-scene=force] .node[data-selected=true] .document p { display:block; }
+    #mere-scene-study[data-scene=force] .node[data-peripheral=true] { opacity:.7; box-shadow:none; }
+    #mere-scene-study[data-scene=force] .node[data-peripheral=true][data-selected=true],#mere-scene-study[data-scene=force] .node[data-peripheral=true][data-foreground=true] { opacity:1; }
+    #mere-scene-study .force-controls { display:flex; align-items:center; flex-wrap:wrap; gap:7px; margin-top:10px; }
+    #mere-scene-study .force-controls label { flex-direction:row; align-items:center; gap:4px; }
+    #mere-scene-study .force-controls input { accent-color:var(--m-accent); }
+    #mere-scene-study .force-detail { font-size:12px; color:var(--m-muted); margin:8px 0 0; }
     @media(max-width:850px) { #mere-scene-study .layout { grid-template-columns:1fr; } #mere-scene-study aside { border-left:0; border-top:1px solid var(--m-line); } #mere-scene-study .editor { grid-template-columns:1fr 1fr; } #mere-scene-study .editor .full { grid-column:1/-1; } }
     @media(max-width:540px) { #mere-scene-study header { padding:12px; gap:10px; } #mere-scene-study header label { flex:1; flex-direction:column; align-items:stretch; } #mere-scene-study .wordmark { flex-basis:100%; } #mere-scene-study .space { height:auto; display:flex; flex-direction:column; gap:14px; padding-top:5px; background:none; } #mere-scene-study .node { position:relative; left:auto!important; top:auto!important; transform:none; width:100%!important; } #mere-scene-study .links,#mere-scene-study .field-boundary,#mere-scene-study .guides { display:none!important; } #mere-scene-study .field-title { position:static; align-self:flex-start; } #mere-scene-study .editor { grid-template-columns:1fr; } #mere-scene-study .editor .full { grid-column:auto; } #mere-scene-study .handle { display:none; } }
     @media(prefers-reduced-motion:no-preference) { #mere-scene-study .node { transition:left .2s,top .2s; } #mere-scene-study .node[data-dragging=true] { transition:none; } }
@@ -85,7 +95,7 @@ SPDX-License-Identifier: MPL-2.0 -->
   <header>
     <div class="wordmark">mere <small>scene study</small></div>
     <label>Theme <select id="mere-theme"><option value="paper">Paper and ink</option><option value="workshop">Workshop</option><option value="night">Night</option></select></label>
-    <label>Scene <select id="mere-arrangement"><option value="workbench">Workbench</option><option value="neighborhood">Neighborhood</option><option value="hierarchy">Hierarchy</option></select></label>
+    <label>Scene <select id="mere-arrangement"><option value="force">Force-directed dataspace</option><option value="workbench">Workbench / forme</option><option value="neighborhood">Neighborhood</option><option value="hierarchy">Hierarchy</option></select></label>
   </header>
   <div class="layout">
     <section class="stage" aria-label="Mixed-content scene">
@@ -94,6 +104,13 @@ SPDX-License-Identifier: MPL-2.0 -->
         <label>Lens <select id="mere-lens"><option value="related">Related</option><option value="history">History</option></select></label>
         <button id="mere-lock" type="button" aria-pressed="false">Unlock forme</button>
       </div>
+      <div class="force-controls" id="mere-force-controls">
+        <label><input type="checkbox" id="mere-family-membership" checked>Membership</label>
+        <label><input type="checkbox" id="mere-family-similarity" checked>Shared resource</label>
+        <label><input type="checkbox" id="mere-family-context" checked>Context</label>
+        <button type="button" id="mere-settle">Settle graph</button>
+      </div>
+      <div class="force-detail" id="mere-force-detail" aria-live="polite">Link families attract; nodes repel. Position pins hold geometry.</div>
       <div class="space" id="mere-space">
         <div class="field-boundary" aria-hidden="true"></div>
         <svg class="links" id="mere-links" role="img" aria-label="Membership and derived similarity links"></svg>
@@ -226,6 +243,46 @@ SPDX-License-Identifier: MPL-2.0 -->
     globalThis.MerePresentationRules={validate,resolve};
   })();
   </script>
+  <script data-mere-force-model>
+  (()=>{
+    // A bounded, deterministic study solver, not a production dynamics engine.
+    const families={membership:{distance:155,strength:.024},similarity:{distance:125,strength:.03},context:{distance:190,strength:.012}};
+    function solve(items,links,width,height) {
+      if(!width||!height)return items.map(item=>({...item}));
+      const bodies=items.map(item=>({...item,vx:0,vy:0})).sort((a,b)=>a.id.localeCompare(b.id));
+      const byId=new Map(bodies.map(item=>[item.id,item]));
+      for(let step=0;step<360;step++) {
+        const cooling=1-step/400;
+        for(const item of bodies){item.ax=(width/2-item.x)*.0012;item.ay=(height/2-item.y)*.0012;}
+        for(let i=0;i<bodies.length;i++)for(let j=i+1;j<bodies.length;j++) {
+          const a=bodies[i],b=bodies[j];let dx=b.x-a.x,dy=b.y-a.y;
+          if(Math.abs(dx)+Math.abs(dy)<.01){dx=(j-i)*.1;dy=.1;}
+          const distance=Math.max(1,Math.hypot(dx,dy)),push=1800/(distance*distance),nx=dx/distance,ny=dy/distance;
+          a.ax-=nx*push;a.ay-=ny*push;b.ax+=nx*push;b.ay+=ny*push;
+          const overlapX=(a.width+b.width)/2+16-Math.abs(dx),overlapY=(a.height+b.height)/2+16-Math.abs(dy);
+          if(overlapX>0&&overlapY>0) {
+            if(overlapX<overlapY){const force=Math.sign(dx||1)*overlapX*.12;a.ax-=force;b.ax+=force;}
+            else {const force=Math.sign(dy||1)*overlapY*.12;a.ay-=force;b.ay+=force;}
+          }
+        }
+        for(const link of links) {
+          const a=byId.get(link.from),b=byId.get(link.to),family=families[link.family]||families.context;if(!a||!b)continue;
+          const dx=b.x-a.x,dy=b.y-a.y,distance=Math.max(1,Math.hypot(dx,dy));
+          const rest=Math.max(family.distance,(a.width+b.width)/2+24),pull=(distance-rest)*family.strength;
+          a.ax+=dx/distance*pull;a.ay+=dy/distance*pull;b.ax-=dx/distance*pull;b.ay-=dy/distance*pull;
+        }
+        for(const item of bodies) {
+          if(item.pinned)continue;
+          item.vx=(item.vx+item.ax*cooling)*.65;item.vy=(item.vy+item.ay*cooling)*.65;
+          const padX=Math.min(width/2,item.width/2+12),padY=Math.min(height/2,item.height/2+28);
+          item.x=Math.max(padX,Math.min(width-padX,item.x+item.vx));item.y=Math.max(padY,Math.min(height-padY,item.y+item.vy));
+        }
+      }
+      return bodies.map(({id,x,y})=>({id,x,y}));
+    }
+    globalThis.MereForceStudy={solve,families};
+  })();
+  </script>
   <script data-mere-study-app>
   (() => {
     const root=document.getElementById('mere-scene-study'),$=id=>root.querySelector('#mere-'+id);
@@ -241,9 +298,14 @@ SPDX-License-Identifier: MPL-2.0 -->
       {id:'materials',label:'Other horizons',resource:'mere://study/materials',media:'image',lens:'related',context:'image'},
       {id:'earlier',label:'Earlier impression',resource:'mere://study/earlier',media:'document',lens:'history',context:'all'}
     ];
+    const graphNodes=[...nodes,...peripheral.map(node=>({...node,base:'Glyph',width:142,detail:65,peripheral:true}))];
     const relations=[
       {id:'belongs',label:'Membership',from:'notes',to:'horizon-a',family:'membership',derived:false},
-      {id:'similar',label:'Shared resource',from:'horizon-a',to:'horizon-b',family:'similarity',derived:true}
+      {id:'similar',label:'Shared resource',from:'horizon-a',to:'horizon-b',family:'similarity',derived:true},
+      {id:'motion-ref',label:'Referenced media',from:'notes',to:'motion',family:'context',derived:false},
+      {id:'materials-ref',label:'Other horizons context',from:'horizon-a',to:'materials',family:'context',derived:false},
+      {id:'related-ref',label:'Material references context',from:'notes',to:'related',family:'context',derived:false},
+      {id:'history-ref',label:'Earlier impression context',from:'notes',to:'earlier',family:'context',derived:false}
     ];
     const themes={
       paper:{bg:'#eee9dc',panel:'#faf7ef',fg:'#332e28',muted:'#696157',line:'#c3bba9',accent:'#47645e',soft:'#dce4dd',radius:4,font:'"Source Serif 4", Georgia, serif'},
@@ -251,30 +313,32 @@ SPDX-License-Identifier: MPL-2.0 -->
       night:{bg:'#141d2a',panel:'#202d3e',fg:'#e2e8ee',muted:'#b0bdc9',line:'#45586b',accent:'#82c2bb',soft:'#213c44',radius:16,font:'"IBM Plex Sans", system-ui, sans-serif'}
     };
     const layouts={
+      force:{notes:[.36,.3],'horizon-a':[.68,.25],'horizon-b':[.74,.66],motion:[.26,.75],related:[.18,.26],materials:[.84,.45],earlier:[.5,.8]},
       workbench:{notes:[.25,.26],'horizon-a':[.74,.24],motion:[.25,.73],'horizon-b':[.74,.72]},
       neighborhood:{notes:[.28,.23],'horizon-a':[.73,.35],motion:[.68,.77],'horizon-b':[.25,.76]},
       hierarchy:{notes:[.45,.2],'horizon-a':[.24,.65],motion:[.77,.31],'horizon-b':[.73,.78]}
     };
-    const defaults=()=>({version:1,theme:'paper',scene:'workbench',lens:'related',zoom:100,unlocked:false,selected:[],foreground:[],positionPins:['motion'],kept:[],dismissed:[],positions:structuredClone(layouts),themes:structuredClone(themes),rules:structuredClone(fixture.rule_set)});
+    const defaults=()=>({version:2,theme:'paper',scene:'force',lens:'related',zoom:100,unlocked:false,families:['membership','similarity','context'],selected:[],foreground:[],positionPins:['motion'],kept:[],dismissed:[],positions:structuredClone(layouts),themes:structuredClone(themes),rules:structuredClone(fixture.rule_set)});
     let state=defaults();
-    let previous={},resolutions={},lastRule='image-overview',drag=null;
+    let previous={},resolutions={},lastRule='image-overview',drag=null,forceSignature='';
     const nodeElements=new Map();
     function restore(saved) {
-      if(saved?.version!==1) return;
+      if(![1,2].includes(saved?.version)) return;
       const candidate=defaults();
       for(const key of ['theme','scene','lens']) {
         const allowed=key==='theme'?Object.keys(themes):key==='scene'?Object.keys(layouts):['related','history'];
-        if(allowed.includes(saved[key]))candidate[key]=saved[key];
+        if(allowed.includes(saved[key])&&(key!=='scene'||saved.version===2))candidate[key]=saved[key];
       }
       if(Number.isFinite(saved.zoom))candidate.zoom=Math.max(25,Math.min(125,saved.zoom));
       candidate.unlocked=saved.unlocked===true;
+      if(Array.isArray(saved.families))candidate.families=[...new Set(saved.families.filter(family=>['membership','similarity','context'].includes(family)))];
       for(const key of ['selected','foreground','positionPins','kept','dismissed']) {
-        const allowed=key==='selected'?[...nodes,...peripheral,...relations,{id:'workbench'}]:key==='positionPins'?nodes:[...nodes,...peripheral];
+        const allowed=key==='selected'?[...graphNodes,...relations,{id:'workbench'}]:graphNodes;
         if(Array.isArray(saved[key]))candidate[key]=[...new Set(saved[key].filter(id=>allowed.some(item=>item.id===id)))];
       }
-      for(const scene of Object.keys(layouts))for(const node of nodes) {
+      for(const scene of Object.keys(layouts))for(const node of graphNodes) {
         const point=saved.positions?.[scene]?.[node.id];
-        if(Array.isArray(point)&&point.length===2&&point.every(Number.isFinite))candidate.positions[scene][node.id]=[Math.max(.16,Math.min(.84,point[0])),Math.max(.17,Math.min(.82,point[1]))];
+        if(layouts[scene][node.id]&&Array.isArray(point)&&point.length===2&&point.every(Number.isFinite))candidate.positions[scene][node.id]=[Math.max(.05,Math.min(.95,point[0])),Math.max(.05,Math.min(.95,point[1]))];
       }
       for(const name of Object.keys(themes)) {
         const source=saved.themes?.[name];if(!source)continue;
@@ -288,6 +352,8 @@ SPDX-License-Identifier: MPL-2.0 -->
         if(saved.rules.rules.length===ids.length&&saved.rules.rules.every(rule=>ids.includes(rule.id)))candidate.rules=structuredClone(saved.rules);
       } catch { /* Incompatible rules use the study's defaults. */ }
       state=candidate;previous={};
+      const storedForce=saved.version===2&&graphNodes.every(node=>{const point=saved.positions?.force?.[node.id];return Array.isArray(point)&&point.length===2&&point.every(Number.isFinite);});
+      forceSignature=storedForce?forceKey():'';
     }
     restore(globalThis.openai?.widgetState?.privateContent);
     function save() {
@@ -295,8 +361,28 @@ SPDX-License-Identifier: MPL-2.0 -->
       const content={modelContent:{theme:state.theme,scene:state.scene,selection:state.selected,foreground:state.foreground,rules:state.rules},privateContent:state};
       if(JSON.stringify(content).length<16384) globalThis.openai.setWidgetState(content).catch(()=>{});
     }
-    window.addEventListener('openai:set_globals',event=>{restore(event.detail?.globals?.widgetState?.privateContent);render();loadRule(lastRule);});
-    function known(id) {return [...nodes,...peripheral,...relations,{id:'workbench',label:'Forme field'}].find(item=>item.id===id);}
+    window.addEventListener('openai:set_globals',event=>{
+      const saved=event.detail?.globals?.widgetState?.privateContent;
+      if(!saved||JSON.stringify(saved)===JSON.stringify(state))return;
+      restore(saved);render();loadRule(lastRule);
+    });
+    function known(id) {return [...graphNodes,...relations,{id:'workbench',label:'Forme field'}].find(item=>item.id===id);}
+    function visiblePeripheral() {
+      const active=[...new Set([...state.selected,...state.foreground])].map(known).filter(item=>item?.media);
+      return peripheral.filter(item=>!state.dismissed.includes(item.id)&&(state.kept.includes(item.id)||state.foreground.includes(item.id)||item.lens===state.lens&&(!active.length||item.context==='all'||active.some(node=>node.media===item.context))));
+    }
+    function visibleGraphNodes() {
+      const ambient=new Set(visiblePeripheral().map(item=>item.id));
+      return graphNodes.filter(node=>!state.dismissed.includes(node.id)&&(!node.peripheral||state.scene==='force'&&ambient.has(node.id)));
+    }
+    function visibleLinks() {
+      const ids=new Set(visibleGraphNodes().map(node=>node.id));
+      return relations.filter(link=>ids.has(link.from)&&ids.has(link.to)&&(state.scene!=='force'||state.families.includes(link.family)));
+    }
+    function forceKey() {
+      const ids=[...nodes,...visiblePeripheral()].filter(node=>!state.dismissed.includes(node.id)).map(node=>node.id);
+      return JSON.stringify([ids,state.families,state.positionPins]);
+    }
     function select(id,event) {
       const multi=event?.shiftKey;
       state.selected=multi?(state.selected.includes(id)?state.selected.filter(value=>value!==id):[...state.selected,id]):state.selected.length===1&&state.selected[0]===id?[]:[id];
@@ -342,22 +428,36 @@ SPDX-License-Identifier: MPL-2.0 -->
       if(node.media==='image') return `<div class="document">${face(node.resource,true)}<span>Image · two independent accesses</span></div>`;
       return `<div class="document">${face(node.resource,true)}<span>Video · paused or playing</span></div>`;
     }
-    nodes.forEach(node=>{
-      const element=document.createElement('div');element.className='node';element.dataset.node=node.id;
+    graphNodes.forEach(node=>{
+      const element=document.createElement('div');element.className='node';element.dataset.node=node.id;element.dataset.peripheral=String(!!node.peripheral);
       element.innerHTML=`<div class="node-head"><button type="button" class="choose" aria-label="Select ${node.label}; Shift adds to selection">${face(node.resource)}<span></span></button><button class="handle" type="button" aria-label="Arrange ${node.label}">↔</button></div><div class="node-body"></div><div class="facts" hidden></div><div class="status"></div>`;
       element.querySelector('.choose span').textContent=node.label;
       element.querySelector('.choose').addEventListener('click',event=>{event.stopPropagation();select(node.id,event);});
+      element.querySelector('.handle').setAttribute('data-tooltip','Drag or use arrow keys to arrange');
+      element.querySelector('.handle').addEventListener('keydown',event=>{
+        const delta={ArrowLeft:[-.03,0],ArrowRight:[.03,0],ArrowUp:[0,-.03],ArrowDown:[0,.03]}[event.key];
+        if(!delta||state.scene!=='force'&&!state.unlocked||state.positionPins.includes(node.id))return;
+        event.preventDefault();const start=state.positions[state.scene][node.id];
+        if(state.scene==='workbench') {
+          const column=Math.max(0,Math.min(1,(start[0]<.5?0:1)+Math.sign(delta[0]))),row=Math.max(0,Math.min(1,(start[1]<.5?0:1)+Math.sign(delta[1])));
+          const occupant=nodes.find(item=>item.id!==node.id&&!state.dismissed.includes(item.id)&&state.positions.workbench[item.id].every((value,index)=>(value<.5?0:1)===(index?row:column)));
+          if(occupant&&state.positionPins.includes(occupant.id))return;
+          if(occupant)state.positions.workbench[occupant.id]=start;
+          state.positions.workbench[node.id]=[column ? .74 : .25,row ? .73 : .26];
+        } else state.positions[state.scene][node.id]=[Math.max(.16,Math.min(.84,start[0]+delta[0])),Math.max(.17,Math.min(.82,start[1]+delta[1]))];
+        renderPositions();drawLinks();save();
+      });
       element.querySelector('.handle').addEventListener('pointerdown',event=>{
-        if(!state.unlocked||state.positionPins.includes(node.id)) return;
+        if(state.scene!=='force'&&!state.unlocked||state.positionPins.includes(node.id)) return;
         event.preventDefault();event.stopPropagation();event.currentTarget.setPointerCapture(event.pointerId);
         drag={id:node.id,startX:event.clientX,startY:event.clientY,start:[...state.positions[state.scene][node.id]],element};element.dataset.dragging='true';
-        previewDrop();
+        if(state.scene!=='force')previewDrop();
       });
       element.querySelector('.handle').addEventListener('pointermove',event=>{
         if(drag?.id!==node.id) return;
         const bounds=$('space').getBoundingClientRect();
         state.positions[state.scene][node.id]=[Math.max(.16,Math.min(.84,drag.start[0]+(event.clientX-drag.startX)/bounds.width)),Math.max(.17,Math.min(.82,drag.start[1]+(event.clientY-drag.startY)/bounds.height))];
-        renderPositions();drawLinks();previewDrop();
+        renderPositions();drawLinks();if(state.scene!=='force')previewDrop();
       });
       element.querySelector('.handle').addEventListener('pointerup',()=>{
         if(drag?.id!==node.id) return;
@@ -366,13 +466,32 @@ SPDX-License-Identifier: MPL-2.0 -->
           if(target.blocked)state.positions.workbench[node.id]=drag.start;
           else {if(target.occupant)state.positions.workbench[target.occupant.id]=drag.start;state.positions.workbench[node.id]=[target.column ? .74 : .25,target.row ? .73 : .26];}
         }
-        element.dataset.dragging='false';drag=null;$('drop').hidden=true;renderPositions();drawLinks();save();
+        element.dataset.dragging='false';drag=null;$('drop').hidden=true;renderPositions();drawLinks();if(state.scene==='force')relaxGraph();save();
       });
       element.querySelector('.handle').addEventListener('pointercancel',()=>{if(drag?.id!==node.id)return;state.positions[state.scene][node.id]=drag.start;element.dataset.dragging='false';drag=null;$('drop').hidden=true;renderPositions();drawLinks();});
       $('space').append(element);nodeElements.set(node.id,element);
     });
     function renderPositions() {
-      nodes.forEach(node=>{const element=nodeElements.get(node.id),point=state.positions[state.scene][node.id];element.style.left=`${point[0]*100}%`;element.style.top=`${point[1]*100}%`;});
+      graphNodes.forEach(node=>{const element=nodeElements.get(node.id),point=state.positions[state.scene][node.id];if(!point)return;element.style.left=`${point[0]*100}%`;element.style.top=`${point[1]*100}%`;});
+    }
+    function relaxGraph() {
+      if(state.scene!=='force'||$('space').clientWidth<400)return;
+      const width=$('space').clientWidth,height=500;
+      const items=visibleGraphNodes().map(node=>{
+        const [x,y]=state.positions.force[node.id],element=nodeElements.get(node.id);
+        return {id:node.id,x:x*width,y:y*height,width:element.offsetWidth,height:element.offsetHeight,pinned:state.positionPins.includes(node.id)||state.selected.includes(node.id)};
+      });
+      const result=globalThis.MereForceStudy.solve(items,visibleLinks(),width,height);
+      result.forEach(item=>{state.positions.force[item.id]=[item.x/width,item.y/height];});
+      renderPositions();drawLinks();
+    }
+    function updateForces() {
+      if(state.scene!=='force')return;
+      const signature=forceKey();
+      if(signature!==forceSignature){forceSignature=signature;relaxGraph();}
+      const focus=state.selected.at(-1),item=known(focus);
+      const incident=visibleLinks().filter(link=>link.from===focus||link.to===focus);
+      $('force-detail').textContent=item?.media?(state.positionPins.includes(focus)?item.label+' · position pinned; other nodes can settle around it.':item.label+' · '+incident.map(link=>link.family==='similarity'?'shared-resource attraction':link.family+' attraction').join(', ')+(incident.length?'; ':'')+'repulsion and overlap avoidance.'):visibleLinks().length+' links · family-specific attraction, repulsion and overlap avoidance. Position pins hold geometry.';
     }
     function applyTheme() {
       const theme=state.themes[state.theme];root.dataset.theme=state.theme;
@@ -384,7 +503,13 @@ SPDX-License-Identifier: MPL-2.0 -->
       const bounds=$('space').getBoundingClientRect();if(!bounds.width) return;
       $('links').setAttribute('viewBox',`0 0 ${bounds.width} ${bounds.height}`);
       const point=id=>{const [x,y]=state.positions[state.scene][id];return [x*bounds.width,y*bounds.height];};
-      $('links').innerHTML=relations.filter(link=>!state.dismissed.includes(link.from)&&!state.dismissed.includes(link.to)).map(link=>{
+      const boundary=root.querySelector('.field-boundary');
+      if(state.scene==='force') {
+        const active=nodes.filter(node=>!state.dismissed.includes(node.id)).map(node=>{const [x,y]=point(node.id),element=nodeElements.get(node.id);return {left:x-element.offsetWidth/2-10,right:x+element.offsetWidth/2+10,top:y-element.offsetHeight/2-10,bottom:y+element.offsetHeight/2+10};});
+        boundary.hidden=!active.length;
+        if(active.length){const left=Math.max(0,Math.min(...active.map(item=>item.left))),top=Math.max(18,Math.min(...active.map(item=>item.top)));boundary.style.inset='auto';boundary.style.left=left+'px';boundary.style.top=top+'px';boundary.style.width=Math.min(bounds.width-left,Math.max(...active.map(item=>item.right))-left)+'px';boundary.style.height=Math.min(bounds.height-top,Math.max(...active.map(item=>item.bottom))-top)+'px';}
+      } else {boundary.hidden=false;boundary.style.cssText='';}
+      $('links').innerHTML=visibleLinks().map(link=>{
         const [x1,y1]=point(link.from),[x2,y2]=point(link.to),form=resolutions[link.id]?.winners.relation_form?.effect.value||'stroke';
         if(form==='containment') return `<rect x="${x2-99}" y="${y2-83}" width="198" height="166" rx="8"/><text x="${x2-94}" y="${y2-89}">Field notes · contains</text>`;
         if(form==='matrix_cell') return `<rect x="${(x1+x2)/2-13}" y="${(y1+y2)/2-13}" width="26" height="26"/><text x="${(x1+x2)/2-4}" y="${(y1+y2)/2+4}">1</text>`;
@@ -393,8 +518,7 @@ SPDX-License-Identifier: MPL-2.0 -->
       }).join('');
     }
     function renderAmbient() {
-      const active=[...new Set([...state.selected,...state.foreground])].map(known).filter(item=>item?.media);
-      const visible=peripheral.filter(item=>!state.dismissed.includes(item.id)&&(state.kept.includes(item.id)||state.foreground.includes(item.id)||item.lens===state.lens&&(!active.length||item.context==='all'||active.some(node=>node.media===item.context))));
+      const visible=visiblePeripheral();
       $('ambient').replaceChildren();const label=document.createElement('span');label.className='ambient-label';label.textContent=state.lens==='related'?'Related context':'History context';$('ambient').append(label);
       visible.forEach(item=>{const button=document.createElement('button');button.type='button';button.textContent=item.label;button.className=state.kept.includes(item.id)?'kept':'';button.setAttribute('aria-pressed',String(state.selected.includes(item.id)||state.foreground.includes(item.id)));button.addEventListener('click',event=>select(item.id,event));$('ambient').append(button);});
       $('roster').replaceChildren();state.dismissed.filter(id=>[...nodes,...peripheral].some(item=>item.id===id)).forEach(id=>{const button=document.createElement('button');button.type='button';button.textContent='Show '+known(id).label;button.addEventListener('click',()=>{state.dismissed=state.dismissed.filter(value=>value!==id);state.kept.push(id);render();save();});$('roster').append(button);});
@@ -403,7 +527,7 @@ SPDX-License-Identifier: MPL-2.0 -->
       const last=state.selected.at(-1)||state.foreground.at(-1)||'notes',item=known(last),result=resolutions[last]||resolved(last);
       $('selection').textContent=state.selected.length?state.selected.map(id=>known(id).label).join(' · '):state.foreground.length?'Foreground: '+state.foreground.map(id=>known(id).label).join(' · '):'Choose an object';
       const selectedNodes=state.selected.filter(id=>[...nodes,...peripheral].some(node=>node.id===id));
-      $('fg-pin').disabled=!selectedNodes.length;$('position-pin').disabled=!selectedNodes.some(id=>nodes.some(node=>node.id===id));$('dismiss').disabled=!selectedNodes.length;
+      $('fg-pin').disabled=!selectedNodes.length;$('position-pin').disabled=!selectedNodes.some(id=>visibleGraphNodes().some(node=>node.id===id));$('dismiss').disabled=!selectedNodes.length;
       $('fg-pin').textContent=selectedNodes.length&&selectedNodes.every(id=>state.foreground.includes(id))?'Unpin foreground':'Foreground pin';
       $('position-pin').textContent=selectedNodes.length&&selectedNodes.every(id=>state.positionPins.includes(id))?'Unpin position':'Position pin';
       $('traces').replaceChildren();
@@ -411,18 +535,22 @@ SPDX-License-Identifier: MPL-2.0 -->
         const row=document.createElement('div');row.className='trace';const title=document.createElement('strong'),reason=document.createElement('small');
         const rule=state.rules.rules.find(rule=>rule.id===trace.rule_id);title.textContent=rule.label+' · '+(trace.winning_properties.length?'applied':trace.matched?'overridden':'unmatched');reason.textContent=trace.reason;row.append(title,reason);$('traces').append(row);
       });
-      $('link-list').replaceChildren();relations.forEach(link=>{const button=document.createElement('button');button.type='button';button.textContent=link.label;button.setAttribute('aria-pressed',String(state.selected.includes(link.id)));button.addEventListener('click',event=>select(link.id,event));$('link-list').append(button);});
+      $('link-list').replaceChildren();visibleLinks().forEach(link=>{const button=document.createElement('button');button.type='button';button.textContent=link.label;button.setAttribute('aria-pressed',String(state.selected.includes(link.id)));button.addEventListener('click',event=>select(link.id,event));$('link-list').append(button);});
       const provenance=item?.derived&&result.winners.provenance?.effect.visible;
       $('provenance').hidden=!provenance;
       if(provenance) $('provenance').textContent='shared-resource/v1 · access A and access B both show '+nodes[1].resource+'. Inputs: the two shown-resource bindings. This does not merge their surface identities.';
     }
     function render() {
+      root.dataset.scene=state.scene;
       applyTheme();$('theme').value=state.theme;$('arrangement').value=state.scene;$('lens').value=state.lens;$('zoom').value=state.zoom;$('zoom-value').textContent=state.zoom+'%';
+      $('force-controls').hidden=state.scene!=='force';$('force-detail').hidden=state.scene!=='force';$('lock').hidden=state.scene==='force';
+      for(const family of ['membership','similarity','context'])$('family-'+family).checked=state.families.includes(family);
+      const visible=new Set(visibleGraphNodes().map(node=>node.id));
       $('lock').textContent=state.unlocked?'Lock forme':'Unlock forme';$('lock').setAttribute('aria-pressed',String(state.unlocked));
-      nodes.forEach(node=>{
+      graphNodes.forEach(node=>{
         const result=resolved(node.id),element=nodeElements.get(node.id),representation=result.winners.representation?.effect.value||node.base;
-        element.hidden=state.dismissed.includes(node.id);element.dataset.selected=state.selected.includes(node.id);element.dataset.foreground=state.foreground.includes(node.id);element.dataset.representation=typeof representation==='string'?representation:'Open';
-        element.style.width=(representation==='Glyph'?132:node.width)+'px';
+        element.hidden=!visible.has(node.id);element.dataset.selected=state.selected.includes(node.id);element.dataset.foreground=state.foreground.includes(node.id);element.dataset.representation=typeof representation==='string'?representation:'Open';
+        element.style.width=(representation==='Glyph'?132:state.scene==='force'&&node.media!=='video'?Math.min(node.width,160):node.width)+'px';
         const key=JSON.stringify(representation),bodyElement=element.querySelector('.node-body');
         if(bodyElement.dataset.key!==key) {
           bodyElement.dataset.key=key;bodyElement.innerHTML=body(node,representation);
@@ -430,10 +558,11 @@ SPDX-License-Identifier: MPL-2.0 -->
         }
         const facts=element.querySelector('.facts');facts.hidden=!result.winners.details?.effect.visible;facts.textContent=node.media+' · '+node.resource;
         const video=bodyElement.querySelector('video');element.querySelector('.status').textContent=(video&&!video.paused?'Active':'Available')+(state.foreground.includes(node.id)?' · foreground':'')+(state.positionPins.includes(node.id)?' · position pinned':'');
-        element.querySelector('.handle').disabled=!state.unlocked||state.positionPins.includes(node.id);
+        element.querySelector('.handle').disabled=state.scene!=='force'&&!state.unlocked||state.positionPins.includes(node.id);
       });
-      relations.forEach(link=>resolved(link.id));const field=resolved('workbench');$('guides').hidden=!field.winners.region_guides?.effect.visible;$('field').setAttribute('aria-pressed',String(state.selected.includes('workbench')));
-      renderPositions();drawLinks();renderAmbient();renderInspector();
+      relations.forEach(link=>resolved(link.id));const field=resolved('workbench');$('guides').hidden=state.scene==='force'||!field.winners.region_guides?.effect.visible;$('field').setAttribute('aria-pressed',String(state.selected.includes('workbench')));
+      $('field').textContent=state.scene==='force'?'forme · four active surfaces':'forme · four surfaces';
+      renderPositions();drawLinks();renderAmbient();renderInspector();updateForces();
     }
     const presets={selected:{kind:'state',state:'selected'},image:fixture.rule_set.rules[0].condition,compact:fixture.rule_set.rules[2].condition,membership:fixture.rule_set.rules[3].condition,derived:fixture.rule_set.rules[4].condition,unlocked:fixture.rule_set.rules[5].condition,always:{kind:'always'}};
     const choices={node:[['Glyph','Compact face'],['Card','Summary/document'],['Snapshot','Thumbnail'],['LivePane','Live surface'],['details:true','Show attributes'],['details:false','Hide attributes']],relation:[['stroke','Stroke'],['containment','Containment'],['adjacency','Adjacency mark'],['matrix_cell','Matrix cell'],['provenance:true','Show derivation'],['provenance:false','Hide derivation']],field:[['guides:true','Regions and drop previews'],['guides:false','Hide regions and drop previews'],['region_guides:true','Show regions'],['drop_previews:true','Show drop previews']]};
@@ -456,11 +585,13 @@ SPDX-License-Identifier: MPL-2.0 -->
     $('lock').addEventListener('click',()=>{state.unlocked=!state.unlocked;render();save();});$('field').addEventListener('click',event=>select('workbench',event));
     $('clear').addEventListener('click',()=>{state.selected=[];render();save();});
     $('fg-pin').addEventListener('click',()=>{const ids=state.selected.filter(id=>[...nodes,...peripheral].some(node=>node.id===id)),remove=ids.every(id=>state.foreground.includes(id));state.foreground=remove?state.foreground.filter(id=>!ids.includes(id)):[...new Set([...state.foreground,...ids])];render();save();});
-    $('position-pin').addEventListener('click',()=>{const ids=state.selected.filter(id=>nodes.some(node=>node.id===id)),remove=ids.every(id=>state.positionPins.includes(id));state.positionPins=remove?state.positionPins.filter(id=>!ids.includes(id)):[...new Set([...state.positionPins,...ids])];render();save();});
+    $('position-pin').addEventListener('click',()=>{const ids=state.selected.filter(id=>visibleGraphNodes().some(node=>node.id===id)),remove=ids.every(id=>state.positionPins.includes(id));state.positionPins=remove?state.positionPins.filter(id=>!ids.includes(id)):[...new Set([...state.positionPins,...ids])];render();save();});
     $('dismiss').addEventListener('click',()=>{const ids=state.selected.filter(id=>[...nodes,...peripheral].some(node=>node.id===id));state.dismissed=[...new Set([...state.dismissed,...ids])];state.foreground=state.foreground.filter(id=>!ids.includes(id));state.selected=[];render();save();});
     $('space').addEventListener('click',event=>{if(event.target.closest('.node')||event.target.closest('button'))return;state.selected=[];render();save();});
     [['surface','panel'],['accent','accent'],['font','font'],['radius','radius']].forEach(([id,key])=>$(id).addEventListener('input',()=>{state.themes[state.theme][key]=key==='radius'?Number($(id).value):$(id).value;applyTheme();drawLinks();save();}));
-    new ResizeObserver(()=>drawLinks()).observe($('space'));
+    for(const family of ['membership','similarity','context'])$('family-'+family).addEventListener('change',()=>{state.families=$('family-'+family).checked?[...new Set([...state.families,family])]:state.families.filter(value=>value!==family);render();save();});
+    $('settle').addEventListener('click',()=>{relaxGraph();save();});
+    new ResizeObserver(()=>{drawLinks();updateForces();}).observe($('space'));
     render();loadRule(lastRule);
   })();
   </script>

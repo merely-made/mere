@@ -520,6 +520,14 @@ content, media, documents, attributes and resources. The dataspace explores
 and contextualizes that content and its relationships. They are complementary
 ways to work with the same domain, with connections between their arrangements.
 
+*Clarified by Mark after the first study, 2026-10-09:* "I guess i was thinking
+in terms of a force directed node graph, but that works too", followed by
+"This is not a bad thing to have either, though. I can appreciate that both
+are possible." The dataspace study should therefore lead with a force-directed
+graph, while keeping the deliberate workbench/forme view as another useful
+presentation of the same content. This is a clarification of the study's
+emphasis, not a requirement that every application or lens use forces.
+
 Dataspace presentation can vary with the data and the chosen view: canvas,
 strata, planes, dimensionality, wallpaper, scenes and props; nodes, links and
 fields; different arrangements and dynamics. Background, foreground and

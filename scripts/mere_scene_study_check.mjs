@@ -55,4 +55,18 @@ for(const set of malformed) {
   const result=spawnSync(binary,[],{input:JSON.stringify({rule_set:set,contexts:[fixture.contexts[0]]}),encoding:'utf8'});
   assert.notEqual(result.status,0,'Rust must refuse the same malformed set');
 }
-console.log(JSON.stringify({valid_contexts_compared:compared,invalid_sets_refused:malformed.length,fixture_sha256:createHash('sha256').update(JSON.stringify(fixture)).digest('hex'),browser_model_sha256:createHash('sha256').update(code).digest('hex')},null,2));
+const forceCode=html.match(/<script data-mere-force-model>([\s\S]*?)<\/script>/)[1];
+const forceSandbox={};runInNewContext(forceCode,forceSandbox);const force=forceSandbox.MereForceStudy;
+const pair=[{id:'a',x:100,y:180,width:100,height:70,pinned:true},{id:'b',x:500,y:180,width:100,height:70,pinned:false}];
+const link=family=>[{from:'a',to:'b',family}];
+const connected=plain(force.solve(pair,link('similarity'),640,440));
+assert.deepEqual(connected,plain(force.solve([...pair].reverse(),link('similarity'),640,440)),'authored iteration order must not change settled geometry');
+assert.deepEqual(connected.find(item=>item.id==='a'),{id:'a',x:100,y:180},'position pins must remain exact');
+assert.ok(connected.every(item=>Number.isFinite(item.x)&&Number.isFinite(item.y)&&item.x>=62&&item.x<=578&&item.y>=63&&item.y<=377),'free bodies stay finite and inside measured bounds');
+const membership=plain(force.solve(pair,link('membership'),640,440));
+assert.ok(connected[1].x<membership[1].x,'shared-resource attraction settles closer than membership');
+const disconnected=plain(force.solve(pair,[],640,440));
+assert.notDeepEqual(connected,disconnected,'removing a link must change its force contribution');
+const overlap=plain(force.solve(pair.map(item=>({...item,x:320,y:220,pinned:false})),[],640,440));
+assert.ok(Math.abs(overlap[0].x-overlap[1].x)>=100||Math.abs(overlap[0].y-overlap[1].y)>=70,'overlapping free bodies must separate');
+console.log(JSON.stringify({valid_contexts_compared:compared,invalid_sets_refused:malformed.length,force_checks_passed:6,fixture_sha256:createHash('sha256').update(JSON.stringify(fixture)).digest('hex'),browser_model_sha256:createHash('sha256').update(code).digest('hex'),force_model_sha256:createHash('sha256').update(forceCode).digest('hex')},null,2));

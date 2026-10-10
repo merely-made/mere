@@ -443,6 +443,38 @@ Verified 2026-10-07 against mere's origin unless named.
 
 ## Progress
 
+- **R1, force-directed dataspace clarification (2026-10-09).** Mark clarified
+  that the first aesthetic study emphasized the forme more than he had intended:
+  he had pictured a force-directed node graph, and then explicitly appreciated
+  having both views. The study now starts with the force-directed dataspace and
+  retains Workbench / forme, Neighborhood and Hierarchy. The same occurrence
+  identities, rules, selection, foreground pins and position pins survive view
+  changes; each arrangement keeps its own coordinates. Ambient nodes are
+  represented within the dataspace under the same lens and retention policy.
+  The forme field marks its four active surfaces within the graph.
+
+  The bounded study solver uses family-specific springs, repulsion, overlap
+  avoidance and damping. Link-family controls change which disclosed
+  relationships affect the arrangement. It settles for a finite number of
+  deterministic steps; selection and theme changes do not start perpetual
+  motion. Position pins are exact constraints, while the current selection is
+  temporarily held during context-driven settling. Foreground pins affect
+  attention and context without imposing a position constraint. This is a local
+  preview, not adoption or replacement of the production dynamics grammar.
+
+  The resolver parity checks still pass all 116 cases. Six force checks cover
+  repeatability under reordered input, exact pins, finite measured bounds,
+  different family attraction, removal of a relationship and separation of
+  overlapping free bodies. Headed Chromium checks verified that removing shared
+  resource attraction moves free nodes while preserving pinned media, and that
+  selection and foreground pins survive switches to the workbench and back.
+  Foreground-pinned nodes remained free to move under changed link forces;
+  theme changes preserved geometry, and the 320-pixel layout had no horizontal
+  overflow. Native key automation, like drag automation, could not complete
+  through the browser adapter; arrow-key arrangement is implemented but was
+  not verified with a headed input action. Stored geometry is restored without
+  an automatic re-solve when the host echoes saved state.
+
 - **R1, presentation rules and aesthetic study (2026-10-09).**
   [`scenograph::presentation`](../../../crates/cambium/scenes/scenograph/src/presentation.rs)
   implements the versioned target → condition → effect model with atomic
