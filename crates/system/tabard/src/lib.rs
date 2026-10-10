@@ -18,6 +18,7 @@
 #![doc(html_no_source)]
 #![forbid(unsafe_code)]
 
+pub mod appearance;
 pub mod artifact;
 pub mod library;
 pub mod portable;
@@ -25,6 +26,9 @@ pub mod smolweb;
 pub mod theme;
 pub mod workshop;
 
+pub use appearance::{
+    ResolvedThemeChoice, ThemeChoiceDiagnostic, ThemePresentation, resolve_theme_choice,
+};
 pub use artifact::{DtcgModeDocument, DtcgModeProvenance, ModeExportError, ModePalette};
 
 use std::collections::BTreeMap;

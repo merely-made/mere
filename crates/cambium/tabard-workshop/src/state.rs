@@ -11,7 +11,7 @@ use std::{cell::RefCell, rc::Rc};
 use cambium::{Slider, TextInput};
 use tabard::Theme;
 use tabard::library::ThemeLibraryStore;
-use tabard::theme::choice::FileThemeChoiceStore;
+use tabard::theme::choice::{FileThemeChoiceStore, ThemeChoice};
 use tabard::theme::registry::{
     Harmony, Mode, THEME_ID_DEFAULT, ThemeRegistry, ThemeSource, set_user_theme_harmony,
 };
@@ -198,6 +198,65 @@ impl WorkshopState {
     }
     pub fn library_path(&self) -> Option<&Path> {
         self.library.as_ref().map(ThemeLibraryStore::path)
+    }
+
+    /// The exact registered save point and preview mode a host may explicitly
+    /// apply. Staged fields and unsaved intakes never produce an app choice.
+    /// Library persistence (when configured) completed before registration.
+    pub fn saved_choice(&self) -> Result<ThemeChoice, String> {
+        if self.has_changes() || self.name.text() != self.draft_theme().name {
+            return Err("Save the theme before applying it to the application.".into());
+        }
+        let theme = self.draft_theme();
+        if theme.source != ThemeSource::User || self.registry.theme_def(&theme.id) != Some(theme) {
+            return Err("Save an authored copy before applying it to the application.".into());
+        }
+        theme
+            .presentation_for_mode(self.mode())
+            .map_err(|error| error.to_string())?;
+        Ok(ThemeChoice::new(theme.id.clone(), Some(self.mode.clone())))
+    }
+
+    /// Open a saved user definition or fork an external/built-in definition
+    /// into a fresh user draft. All validation happens before replacing the
+    /// editor state; failure preserves staged fields and the current draft.
+    /// This never activates a registry theme or writes the authored library.
+    pub fn edit_definition(&mut self, theme: &Theme, mode: Option<Mode>) -> Result<(), String> {
+        if self.has_changes() || self.name.text() != self.draft_theme().name {
+            return Err("Save or discard the current changes before editing another theme.".into());
+        }
+        let mode = mode.unwrap_or_else(|| default_mode_for_def(theme));
+        theme
+            .presentation_for_mode(&mode)
+            .map_err(|error| error.to_string())?;
+        let registered =
+            theme.source == ThemeSource::User && self.registry.theme_def(&theme.id) == Some(theme);
+        let draft = if registered {
+            ThemeDraft::open(&self.registry, &theme.id)
+        } else {
+            let id = (1u64..)
+                .map(|number| format!("theme:copy-{number}"))
+                .find(|id| self.registry.theme_def(id).is_none() && self.draft_theme().id != *id)
+                .ok_or_else(|| "No fresh theme identity is available.".to_string())?;
+            ThemeDraft::fork_theme(&self.registry, theme, &id, &format!("{} copy", theme.name))
+        }
+        .map_err(|error| error.to_string())?;
+        self.mode = mode;
+        self.opening = draft.theme().clone();
+        self.draft = draft;
+        self.unsaved_intake = !registered;
+        self.delete_requested = false;
+        self.close_requested = false;
+        self.exit_requested = false;
+        self.refresh_controls();
+        self.status = if registered {
+            "Theme ready to edit"
+        } else {
+            "User copy ready to edit. Save to add it to your library."
+        }
+        .into();
+        self.remember_editor_choice();
+        Ok(())
     }
     pub fn hue_follows_primary(&self) -> bool {
         matches!(self.seed, SeedRole::Secondary | SeedRole::Tertiary)

@@ -20,6 +20,74 @@ does not establish implementation or consumer adoption of those preferences.
 derivation), `crates/meerkat/src/theme_sheets.rs` *(historical citation)* <!-- doc-audit: historical-path --> + `theme_edit.rs` (current sheet baking +
 switch path).
 
+## Application adoption (2026-10-09)
+
+**Status:** in progress. Mark selected this order: Pelt, Graphshell, Knot,
+Turnstone, Woodshed, Redshank, Signalman. Isocosm is excluded while its own
+migration proceeds. Each application slice is qualified before moving to the
+next; discovery may run independently. Existing Woodshed adoption receives a
+reconciliation pass rather than a second editor implementation.
+
+### Shared foundation and current origin
+
+Reconcile the published Tabard library/workshop, Cambium title bar and native
+scene adapter with current Mere origin before consumer edits. Preserve newer
+fetch, retained session, graph and domain changes. Keep primary checkouts'
+unpublished commits intact, and fetch again before integration/push. Done when
+the current resolved graph keeps one shared source identity, scoped foundation
+checks pass and the port boundary remains one way. Historical native receipts
+describe their original binaries; they do not qualify the new integration.
+
+### Pelt durable application appearance
+
+Add a reachable application appearance workflow using the shared workshop,
+library and title-bar slots. Store application selection separately from
+authored definitions, use normal host text/file/close seams, and preserve
+controller/session and loaded-document authority. Custom authored stylesheets
+remain authored stylesheets rather than being silently reduced to tokens.
+Done when saved selection and mode survive a fresh process, editor preview
+does not apply implicitly, invalid/corrupt saves remain recoverable, and native
+wide/narrow rendering and same-window resize have actual nonblank captures.
+
+### Remaining consumers in order
+
+Graphshell qualifies its actual application presentation rather than mistaking
+the native-messaging relay for a window. Its embedded projections inherit the
+composing host's roles. Knot keeps writing/measure/font preferences and document
+authority; Turnstone keeps settings, surface routing and reader precedence.
+Woodshed preserves its accepted legacy themes and persona-owned selection.
+Redshank and Signalman retain their product/domain contracts. Every host uses
+shared authoring and theme resolution; no consumer grows another palette
+engine, draft model, file format, renderer or caption-command queue. Done for
+each when its reachable controls, durable selection, failure handling and
+applicable rendered acceptance pass against its published dependency set.
+
+### Findings and progress — 2026-10-09
+
+- Mere's primary main has unpublished local commits and is behind the fetched
+  origin. It was preserved. A separate worktree starts at origin
+  `6708bfcd0`; the seven published Tabard commits were replayed cleanly there,
+  retaining the intervening upstream changes and excluding unrelated local
+  ambient-design history.
+- The moved Tabard/workshop manifests require two lockfile references to adopt
+  current Genet `15713014` rather than the older `965b64e2` used in historical
+  acceptance. Full metadata resolves successfully with the current Genet source;
+  the port and Graphshell web boundary checker passes.
+- The shared theme resolver keeps the requested choice intact, reports missing
+  theme/mode fallback, and distinguishes exact authored CSS from a derived
+  palette. The workshop exposes validated definition intake and a saved-choice
+  accessor that rejects unsaved or staged edits. Nine focused contract tests
+  cover these embedding seams.
+- The native host exposes an additive tool-window entry over a caller-owned
+  event loop and existing render core. Its normal input, accessibility and
+  close-policy pipeline remains the owner of the tool window's behavior.
+- Current Cambium fields render semantic containers, so the workshop's old
+  tag-based input/textarea CSS collapsed an empty stylesheet editor to zero
+  height. Shared field classes restore its geometry. All 299 scoped Tabard,
+  workshop, desktop and native-host tests pass against the fetched origin,
+  including all six desktop usability tests. Two host documentation examples
+  remain intentionally ignored. Pelt application/native qualification follows.
+
 ## Shared authoring and title-bar composition (2026-10-08)
 
 **Decision:** expose the existing workshop as `crates/cambium/tabard-workshop`
