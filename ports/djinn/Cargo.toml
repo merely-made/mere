@@ -17,6 +17,7 @@ personal-sync = []
 # it on through the dev-dependency on this package below; release builds keep
 # the prompt only.
 passphrase-fd = []
+custody-receipt-host = []
 # The Distillery trainer resource, composed into the works lane
 # (`src/resident_distillery.rs`). Gated because it pulls the burn stack into
 # the desktop resident: a default build must stay light, and a lane whose
@@ -249,3 +250,8 @@ tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread", "sync", 
 name = "knot_residue"
 path = "tests/knot_residue.rs"
 harness = false
+
+[[bin]]
+name = "dr-c-receipt-host"
+path = "src/bin/dr_c_receipt_host.rs"
+required-features = ["custody-receipt-host"]

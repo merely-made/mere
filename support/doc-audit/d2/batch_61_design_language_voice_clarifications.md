@@ -1,5 +1,21 @@
 # Batch 61: design-language voice clarifications
 
+**Design ownership continuation (2026-10-10):** Mark allocated the seven design
+concerns across the research, Tabard, projection grammar and dynamics lanes.
+Canonical §9.14 records the allocation; the editor and field plans carry their
+local consequences, and the canonical index links the record. Selection's
+fundamentals remain established. R1's existing accepted rules and receipts are
+preserved alongside the broader authoring research scope. No individual is
+invented for the unnamed research lane, and this pass does not dispatch agents
+or claim implementation. Five new local links and heading anchors resolve;
+`git diff --check` passes. Both audit JSON results match the same checkout's
+pre-edit baseline: doc-audit SHA256
+`c2c7060fcb8e93a6e743a6be9835554074af527a7193f308745e0b2793cac3d8`
+and D2 SHA256
+`64c550fb99df7fdf917b8f9af87b156e3eb7010a64e191b08ba831b2be2233cf`.
+D2 retains seven existing missing records at 252/259 coverage. Validation is
+documentation-only; no source, build or browser receipt is added.
+
 **Date:** 2026-10-09. Base: Mere `4d8bd703`; documentation-only pass requested
 by Mark. The voice discussion and subsequent primitive-planning request are
 the evidence for intent. Existing source/plan boundaries were inspected;
