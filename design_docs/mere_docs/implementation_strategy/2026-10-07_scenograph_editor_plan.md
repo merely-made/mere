@@ -438,6 +438,18 @@ Each comes back as its own round of questions.
 
 ### Design-language follow-through (2026-10-09; research, not opened)
 
+**Ownership allocation, 2026-10-10:** the
+[design language §9.14](../../2026-08-23_projection_scenes_and_graph_native_platform.md#914-design-work-ownership-2026-10-10)
+assigns field behavior and node/link/field editors to the projection grammar
+agent in Mark's current conversation. Selection, inspection and ambient
+context remain there, with their fundamentals established and residual work
+focused on integration. Scene authoring and presentation rules are a research
+lane; this does not revoke R1's accepted direction or recorded implementation.
+Theme and typography belong to the Tabard agent on q-pc. Visible dynamics
+explanations and script/motion authoring belong to the dynamics agent.
+The mapped items below retain their individual implementation gates; this
+allocation names design responsibility rather than opening every track.
+
 Mark's [voice clarifications, design language §9.8](../../2026-08-23_projection_scenes_and_graph_native_platform.md#98-voice-clarifications-and-research-boundaries-2026-10-09)
 extend the mapped editor concerns. Deselection preserves edits and returns to
 an unselected view; it is not undo or snapshot restoration. Selection,
