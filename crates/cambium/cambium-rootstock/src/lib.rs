@@ -331,8 +331,20 @@ pub fn document_projection(
     // children. Preserve Genet's generic projection, then make explicitly
     // marked app textboxes accessible leaves with their app-owned value.
     let mut markers = std::collections::HashMap::new();
+    let mut painted = std::collections::HashMap::new();
     let mut pending = vec![dom.document()];
     while let Some(node) = pending.pop() {
+        if let Some((x, y, width, height)) = layout.painted_rect(dom, node) {
+            painted.insert(
+                dom.opaque_id(node),
+                document_session_api::DocumentA11yBounds {
+                    x,
+                    y,
+                    width,
+                    height,
+                },
+            );
+        }
         if dom.kind(node) == NodeKind::Element
             && dom
                 .attribute(node, &Namespace::default(), &LocalName::from("role"))
@@ -352,6 +364,25 @@ pub fn document_projection(
         }
         pending.extend(dom.dom_children(node));
     }
+    // Genet supplies semantic names and actions; this host owns the retained
+    // scroll planes. Match the rectangles used by paint and pointer hit testing,
+    // including both document and nested scrolling, before a platform lowers
+    // the projection. Semantic requests dispatch by node identity, so their
+    // actions remain independent of the current cursor or scroll offset.
+    let mut nodes = projection.nodes().to_vec();
+    for node in &mut nodes {
+        if node.bounds.is_some()
+            && let Some(bounds) = painted.get(&node.id.get())
+        {
+            node.bounds = Some(*bounds);
+        }
+    }
+    let projection = DocumentA11yProjection::new(
+        projection.revision(),
+        projection.support().clone(),
+        projection.root(),
+        nodes,
+    );
     if markers.is_empty() {
         return projection;
     }
