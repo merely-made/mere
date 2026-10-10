@@ -426,7 +426,63 @@ pending while headed/GPU runs are held. The activity audit is preserved at
 `targets/moot-gpu-activity-audit-20261010.json`; failed captures remain beside
 their original receipts.
 
-**Peer and standalone-browser reproduction (executable commands; start at the repository root):**
+### Moot conversation and coop continuation (2026-10-10)
+
+**Status:** implementation and CPU receipt complete; awaiting publication alongside
+the held readings qualification. Browser and
+native GPU presentation remain held during the concurrent system incident.
+This slice composes `ports/moot`'s existing coop contract with Comms' portable
+pane and Commons' actual encrypted chat owner. The retired Meerkat host does
+not make a second message store necessary. This consumer earns retaining the
+small Comms model; it does not revive that host or move exchange into Cambium.
+
+1. Project the existing authorized Commons chat read into independently
+   mountable conversation state. Preserve the space/channel address, stable
+   Personae author, original operation, reply/edit facts and causal order.
+   Withheld content must remain absent and retained operation counts unchanged.
+2. Apply design language §9.8–9.9 to local attention and editing. Deselecting,
+   switching channels and refreshing owner state preserve drafts. Delayed
+   thread loads cannot attach after switching or reloading. Successful send
+   acknowledgment clears only the submitted content; owner refusal keeps it.
+3. Join a consumer's existing coop report to presentation without converting
+   membership into presence or report data into write authority. Confirm two
+   encrypted stores under actual signed Gemot delegation/revocation facts,
+   expiry, retained-data survival and independent pane state. The default port
+   must still build on Wasm without the optional Commons/native dependency cone.
+
+**Findings (2026-10-10):** `ports/moot/src/conversation.rs` is a derived view.
+Its optional `commons-chat` read bridge always calls
+`ChatReplica::projection_with_authority`, never the unguarded compatibility
+read. The exact channel address supplies a fallback title when the title's
+author is withheld, so permitted messages remain visible without leaking a
+withdrawn title. Comms names this record grammar `CommonsChat`, independently
+of carriage; bilateral Murm remains distinct. Authors do not populate the
+membership roster, presence or unread state.
+
+`crates/shell/comms/src/pane.rs` now parks drafts per conversation and binds
+thread completions to the latest local request. Explicit identity unbinding
+forgets that identity's transient work; a transport outage alone need not.
+`prepare_send` creates addressed content only. The actual application must
+recheck membership, current Gemot authority and keys at dispatch. Host controls,
+real transport sessions, live presence and call/media composition remain the
+next receipts; the coop lifecycle contract and durable authorities are unchanged.
+
+**Progress (2026-10-10):** the locked CPU receipt passes nineteen Comms tests,
+ten existing coop contract tests and three conversation tests over two encrypted
+stores with independently attested Personae writers and signed Gemot authority.
+It confirms causal order despite opposing wall clocks, edit/reply/retraction
+identity, title fallback after revocation, expiry withholding, unchanged store
+counts and independent drafts. The default Moot port builds for Wasm; its normal
+dependency cone contains Comms and serde without Commons, Iroh, redb or tokio.
+The port/default-Graphshell boundaries pass. Evidence is preserved in
+`targets/moot-conversation-tests.log`, `targets/moot-conversation-wasm-check.log`
+and `targets/moot-conversation-wasm-cone.txt`. No GPU or browser run belongs to
+this receipt.
+
+### Capsule peer and standalone-browser reproduction
+
+The following commands execute the earlier capsule-library proof. Start at the
+repository root; browser commands remain subject to the current GPU hold.
 
 ```sh
 cargo build --manifest-path crates/moot/gemot/examples/capsule-library/guest/Cargo.toml --locked --target wasm32-wasip2 --release
