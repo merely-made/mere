@@ -34,6 +34,12 @@ the [ambiance design](../design/2026-09-23_ambiance_design.md) and the
 [family composition thesis](../../2026-08-12_family_composition_thesis_brief.md)
 (the narrowing gradient).
 
+**2026-10-09 design continuation:** the [cross-app design language record](../../2026-08-23_projection_scenes_and_graph_native_platform.md#9-configurable-visual-and-interaction-language-2026-10-09)
+inherits this plan's resource/surface identity boundary for independent content
+accesses, and records selection, activity and presentation as distinct UI
+concerns. Link/edge wording remains an open design choice there; this plan's
+relationship semantics and implementation status are unchanged.
+
 ## 1. The questions
 
 1. **What does a link record?** "A cites B" could mean the page says so, the

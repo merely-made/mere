@@ -1,13 +1,18 @@
 # App composition brief: one Cambium application inside another
 
 **Date:** 2026-10-06
-**Status (2026-10-07):** research, ruled. AC1 to AC6 are ruled (§9,
+**Status (2026-10-09):** research, ruled. AC1 to AC6 are ruled (§9,
 "Rulings (2026-10-07)"): retained in-process sessions joined as AccessKit
 subtrees through one Mere helper, E1a and E1b authorised, panics caught,
 room reserved for forest mounts, and paint lists as the cross-process research
 target. Turnstone's unusual-protocols lane owns the session-seam work and E1
 (Turnstone U15). A read-only lane wrote the brief under fork U8 of that plan;
 no code changed and nothing was built or run.
+
+The initial assessment and the E1 progress below retain their source dates.
+The [current reconciliation](#11-current-consumers-and-design-direction-2026-10-09)
+links the design language, actual consumer progress, ambient-context proposal
+and the separate Moot applet experiment. It changes no ownership or release bar.
 
 Read against Mere `362c5d5a` (main moved during the read; no commit in that
 window touched `crates/cambium`), Turnstone `032463ae` (the committed tree:
@@ -523,7 +528,7 @@ application's best first home is its own document beside the host's, joined
 in one accessibility tree. Mounting it inside the host's document is the
 second step, worth reserving room for now.
 
-## 8. The first experiment: E1, not authorised to build
+## 8. The first experiment: E1, authorised under AC3
 
 E1 tests the recommendation's riskiest claim: that two independent Cambium
 sessions joined by AccessKit subtrees reach every screen reader as one tree,
@@ -796,3 +801,57 @@ controller in `pelt-core`) and S8 (page accessibility).
 - Turnstone: `turnstone/design_docs/2026-10-06_unusual_protocols_browser_plan.md`
   (§4, S11, U2, U8); `turnstone/design_docs/2026-08-20_screen_reader_pass_receipt.md`;
   `turnstone/docs/receipts/browser_scry_windows_20261005/README.md`.
+
+## 11. Current consumers and design direction (2026-10-09)
+
+**Status:** read-only reconciliation against Mere `6708bfcd0`, Turnstone
+`25f85bd`, site `9ba3f03` and the available Tabard and Moot chats. Recorded
+qualifications were read; no runtime or physical assistive-technology gate was
+rerun. Historical findings above describe the earlier assessed sources.
+
+The [design language](../../2026-08-23_projection_scenes_and_graph_native_platform.md#9-configurable-visual-and-interaction-language-2026-10-09)
+joins the workbench and dataspace as presentations of the same domain. Opening
+may focus a retained tile, unfold an applet or use an overlay. Selection,
+activity and presentation remain independent. Its forme field represents the
+recursive workbench arrangement; that direction does not require every embedded
+surface to become a graph node or every guest to share the host's document.
+AC1's retained sessions and AC5's reserved forest mount remain as ruled.
+
+Three existing paths can participate, with different ownership boundaries:
+
+| Path | Existing authority and qualification boundary |
+| --- | --- |
+| Retained Cambium session | The guest keeps its state/document; the host admits it and composes input, focus, leaves and accessibility through the shared seam. AC1–AC5 and E1 remain the governing choices. Tabard's Woodshed adoption is a concrete native embedding precedent; its visual receipt does not complete E1b's screen-reader walks. |
+| Owner-served Graphshell projection | Domain/session authority remains with its owner; the host presents disclosed state and returns authorized intents. The browser carrier and reservoir plans own delivery and access. A projection does not transfer custody merely because it opens beside a local session. |
+| Verified Wasm applet | The [Moot capsule-library proof](../../moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#capsule-library-composition-proof-2026-10-09) exercises a signed WIT component over host-disclosed data and local execution grants in native and browser example hosts. Its active Graphshell mount continuation remains uncommitted work at this read. This bounded catalogue/reader host dialect is not a universal Cambium surface ABI or a release-qualified embedded product. |
+
+The Moot example separates Gemot collection/contribution/hosting authority,
+signed content, participant retention and local applet execution. Its browser
+host reads a disclosed snapshot; it does not replay all Gemot operations.
+The host rechecks proposals against disclosure and current grants, and owns
+presentation and mount lifetime. Those boundaries complement AC1's trusted
+in-process presentation crates; they do not establish equivalent isolation or
+input/accessibility behavior. Canonical proof details and checks remain in the
+Moot plan rather than being copied here.
+
+Turnstone `25f85bd` records the current SC/S8 continuation. Its own AccessKit
+adapter preserves tree-aware requests and ordered guest batches; the earlier
+unconditional Genet-bridge prerequisite therefore does not block Turnstone
+source integration. The pinned Genet bridge still needs the repair for hosts
+using it, including standalone Pelt. Live document projections/actions,
+contributed-tree migration, shared scenario observation and physical S8/E1b
+acceptance remain open. The qualified controller-pumping cut advances retained
+clocks while suppressing hidden redraw; SC6's engine-aware pool and repeated-
+placement contract remain separate. Read the consumer's plan and handoff before
+resuming its work, rather than reconstructing ownership from this brief's
+historical findings.
+
+For the site, [ambient relation lenses](../../mere_docs/design/2026-09-23_ambiance_design.md#10-proposal-focus-driven-relation-lenses-2026-10-07)
+need disclosed identities, reasons and coverage across all these presentations;
+they do not need arbitrary app execution to show dependencies. Portable article
+content opened in Knot or Turnstone can be a bounded composition proof before
+a full browser application is delivered. A static site, a browser-local session,
+an extension sidecar and a native-owned attached session have separate storage,
+capability and lifecycle boundaries. Existing owner plans retain those choices:
+`merelyllc.com/docs/2026-09-30_graphshell_site_canvas_plan.md` and
+`turnstone/design_docs/2026-10-06_unusual_protocols_browser_plan.md`.

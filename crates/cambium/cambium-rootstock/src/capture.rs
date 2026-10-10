@@ -13,6 +13,9 @@
 //! presented — no compositor, no foreground window, and no chance of
 //! photographing the wrong window.
 //!
+//! Event-loop hosts start an owned readback and poll it on later turns, so
+//! waiting for GPU completion cannot stall other windows sharing the device.
+//!
 //! What the bytes become is the application's business: woodshed writes a PNG,
 //! the host's own smoke example digests them.
 
@@ -22,14 +25,46 @@ use netrender::ExternalTexturePlacement;
 /// A presented frame, read back through the shared render-host machinery.
 pub type Frame = genet_render_host::RgbaFrame;
 
+/// An owned readback that can be polled without waiting on the shared GPU.
+pub type PendingFrame = genet_render_host::PendingRgbaReadback;
+
+/// Compose the presented view and start copying it into host memory.
+/// Poll the returned frame on later event-loop turns; it retains the original
+/// pixels even when another window draws through the same render core.
+pub fn start_frame_readback(
+    surface: &dyn Surface,
+    view: &wgpu::TextureView,
+    width: u32,
+    height: u32,
+) -> Result<PendingFrame, String> {
+    let target = capture_target(surface, view, width, height);
+    surface.core().start_rgba8_readback(&target, width, height)
+}
+
 /// Compose `view` — the rasterized frame the host just presented — into an
 /// owned target and read it back. `None` if the readback failed.
+/// This synchronous path waits for at most five seconds; event-loop capture
+/// backends should use [`start_frame_readback`] instead.
 pub fn read_frame(
     surface: &dyn Surface,
     view: &wgpu::TextureView,
     width: u32,
     height: u32,
 ) -> Option<Frame> {
+    let target = capture_target(surface, view, width, height);
+    surface
+        .core()
+        .read_rgba8_texture(&target, width, height)
+        .map_err(|error| eprintln!("[cambium-host] {error}"))
+        .ok()
+}
+
+fn capture_target(
+    surface: &dyn Surface,
+    view: &wgpu::TextureView,
+    width: u32,
+    height: u32,
+) -> wgpu::Texture {
     let target = surface.device().create_texture(&wgpu::TextureDescriptor {
         label: Some("cambium host frame capture"),
         size: wgpu::Extent3d {
@@ -53,9 +88,5 @@ pub fn read_frame(
         height,
         ExternalTexturePlacement::new([0.0, 0.0, width as f32, height as f32]),
     );
-    surface
-        .core()
-        .read_rgba8_texture(&target, width, height)
-        .map_err(|error| eprintln!("[cambium-host] {error}"))
-        .ok()
+    target
 }

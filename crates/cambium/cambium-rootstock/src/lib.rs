@@ -1074,7 +1074,7 @@ pub mod meristem_bounds {
     }
 }
 
-pub use capture::{Frame, read_frame};
+pub use capture::{Frame, PendingFrame, read_frame, start_frame_readback};
 pub use host::{
     AppCtx, AppFrameInsets, AppHook, AppShared, CaptureFn, CloseDisposition, CloseRequest,
     CloseRequestHook, FocusedTextHook, FocusedTextSlot, FrameHook, FrameProfile, Hook, Host,

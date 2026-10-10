@@ -15,6 +15,9 @@ path = "src/lib.rs"
 
 [features]
 default = []
+# A native read bridge over Commons' existing encrypted chat replica. The
+# conversation view itself stays available without transport or store crates.
+commons-chat = ["dep:commons-spine", "dep:muniment"]
 # An opt-in derived view over authorized Fleece page captures. The ordinary
 # Moot port stays mountable by murmur without pulling the capture/search lanes.
 captured-web = [
@@ -25,6 +28,9 @@ captured-web = [
 ]
 
 [dependencies]
+comms.workspace = true
+commons-spine = { workspace = true, optional = true }
+muniment = { workspace = true, optional = true }
 gemot = { workspace = true, optional = true }
 servitor = { workspace = true, optional = true }
 mere-document-lanes = { workspace = true, optional = true, features = ["eidetic-bridge"] }
@@ -37,3 +43,17 @@ serde_json = { workspace = true }
 eidetic = { workspace = true }
 fleece = { workspace = true }
 genet-static-dom = { workspace = true }
+
+# The Commons + Moot coop proof is a port consumer; shared Commons must not
+# depend back on a port, even to build this example.
+commons-spine.workspace = true
+chartulary.workspace = true
+gemot.workspace = true
+insigne = { workspace = true, features = ["verify"] }
+muniment = { workspace = true, features = ["redb"] }
+personae.workspace = true
+servitor.workspace = true
+stickleback.workspace = true
+p2panda-core = "0.7.0"
+hex = "0.4"
+tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread"] }
