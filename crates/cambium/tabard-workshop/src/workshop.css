@@ -102,3 +102,8 @@ button[aria-pressed="true"] { background: #e8eef5; color: #254e72; border-color:
   .save-state { display: none; }
   .footer-note { display: none; }
 }
+@media (max-width: 480px) {
+  .tabard-workshop > .cambium-title-bar > .title-bar-title { min-width: 140px; }
+  .tabard-workshop > .cambium-title-bar > .title-bar-actions { flex-basis: 100%; flex-wrap: wrap; }
+  .tabard-workshop .header-actions { flex-wrap: wrap; }
+}
