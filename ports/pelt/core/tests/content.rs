@@ -48,6 +48,7 @@ impl SessionEngine<String> for Engine {
         Ok(Box::new(Document {
             id: self.id,
             address: request.address.clone(),
+            link_focused: false,
         }))
     }
 }
@@ -55,6 +56,7 @@ impl SessionEngine<String> for Engine {
 struct Document {
     id: &'static str,
     address: String,
+    link_focused: bool,
 }
 
 impl DocumentSession<String> for Document {
@@ -75,7 +77,32 @@ impl DocumentSession<String> for Document {
     }
 
     fn links(&self) -> Vec<inker::SessionLink> {
-        Vec::new()
+        vec![inker::SessionLink {
+            url: "web://site.test/".into(),
+            rect: [0.0, 0.0, 80.0, 20.0],
+        }]
+    }
+
+    fn key_input(
+        &mut self,
+        key: inker::SessionKey,
+        state: inker::SessionButtonState,
+        _modifiers: inker::SessionModifiers,
+        _repeat: bool,
+    ) -> inker::SessionEffect {
+        if state != inker::SessionButtonState::Pressed {
+            return inker::SessionEffect::Ignored;
+        }
+        match key {
+            inker::SessionKey::Tab => {
+                self.link_focused = true;
+                inker::SessionEffect::Handled
+            }
+            inker::SessionKey::Enter if self.link_focused => {
+                inker::SessionEffect::Navigate(self.links()[0].url.clone())
+            }
+            _ => inker::SessionEffect::Ignored,
+        }
     }
 
     fn as_any_ref(&self) -> &dyn Any {
@@ -443,6 +470,7 @@ fn adopting_an_owned_appearance_does_not_respawn_or_fetch() {
         Box::new(Document {
             id: "owned",
             address: "retained://reader".to_owned(),
+            link_focused: false,
         }),
     );
     assert_eq!(controller.frame(300, 200), "owned:retained://reader");
@@ -451,4 +479,70 @@ fn adopting_an_owned_appearance_does_not_respawn_or_fetch() {
         "adopting an existing appearance must not fetch its source again"
     );
     assert!(controller.session_as_any_ref().is::<Document>());
+}
+
+#[test]
+fn keyboard_envelope_completes_the_same_surface_link_route_as_session_enter() {
+    use inker::{SessionButtonState, SessionInput, SessionKey};
+    use pelt_core::PeltInput;
+    let mut completed_routes = Vec::new();
+    // Session input is the positive control. Both traverse the real retained
+    // PeltContent/controller/router and registered surface factory; only the
+    // source document's focused-link behavior is supplied by this fixture.
+    for envelope in [false, true] {
+        let fixture = fixture(false);
+        let mut content = open(
+            fixture.registries,
+            PeltTileRequest::new(CAPSULE, (640, 480)).with_surface_profile(EngineProfileBinding {
+                user_data_dir: "keyboard-link-profile".into(),
+            }),
+        );
+        let key = |key| SessionInput::Key {
+            key,
+            state: SessionButtonState::Pressed,
+            modifiers: Default::default(),
+            repeat: false,
+        };
+        assert!(
+            content
+                .input_event(PeltInput::Session(key(SessionKey::Tab)), 1.0)
+                .handled
+        );
+        let enter = if envelope {
+            PeltInput::Keyboard(KeyboardEvent {
+                key_code: 13,
+                scan_code: 28,
+                pressed: true,
+                modifiers: Default::default(),
+                text: None,
+            })
+        } else {
+            PeltInput::Session(key(SessionKey::Enter))
+        };
+        let effect = content.input_event(enter, 1.0);
+        assert_eq!(
+            content.lane(),
+            PeltLane::Surface,
+            "Keyboard={envelope}: focused Enter must complete the routed lane swap"
+        );
+        assert!(effect.handled && effect.navigated, "{effect:?}");
+        assert!(effect.error.is_none(), "{effect:?}");
+        assert_eq!(
+            effect.reroute, None,
+            "content consumes the reroute exactly once"
+        );
+        assert_eq!(content.route().state, PeltRouteState::Surface);
+        assert_eq!(content.route().active_engine(), "fake.surface");
+        assert_eq!(content.address(), Some("web://site.test/"));
+        assert!(content.document().is_none());
+        assert_eq!(
+            fixture.surfaces.lock().unwrap().as_slice(),
+            [(
+                "web://site.test/".to_owned(),
+                "keyboard-link-profile".to_owned()
+            )]
+        );
+        completed_routes.push(content.route().clone());
+    }
+    assert_eq!(completed_routes[0], completed_routes[1]);
 }
