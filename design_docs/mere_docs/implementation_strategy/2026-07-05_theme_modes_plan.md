@@ -84,8 +84,9 @@ applicable rendered acceptance pass against its published dependency set.
 - Hosts also supply transient protected export paths to the existing workshop
   writer. The shared identity comparison protects application settings and open
   documents before both creation and replacement, including aliases. This
-  avoids each app duplicating export path normalization. Two focused boundary
-  regressions are awaiting qualification before publication.
+  avoids each app duplicating export path normalization. All 17 interchange
+  tests pass, including the two new host-file boundary regressions; this
+  additive API is ready for publication.
 - Editing and saving the currently selected theme under the same identity must
   not bypass explicit application Apply. Each native adapter holds the applied
   presentation while authoring updates the library, refreshing it only after
@@ -113,7 +114,8 @@ applicable rendered acceptance pass against its published dependency set.
   without changing deterministic face bytes or semantic node-state accents.
   All seven focused palette tests pass, including selected-mode and alpha
   preservation plus unchanged legacy seed mapping. This addition is ready for
-  publication independently of the application adapters.
+  publication independently of the application adapters and was pushed as
+  `7a2a851fb0134a3cab7e1c4161c1c46f371d829a`.
 - Pelt's source adapter reaches the shared workshop through its real Theme
   drawer and mounts a tool window over the existing render core. Application
   choice and shared definitions have independent durable paths. Focused tests
@@ -124,6 +126,9 @@ applicable rendered acceptance pass against its published dependency set.
   motivates bounded first-presentation retries, initial activation after the
   accessibility reveal, and composition of the editor's existing idle policy
   into the parent event loop. That lifecycle correction is being requalified.
+- The corrected Pelt source passes all 69 desktop tests, including application
+  export-path protection and saving an edited active theme without implicitly
+  applying it. Native presentation qualification remains open.
 - Graphshell's application routes are the web full app and tree `app=local`;
   its native-messaging executable is a relay, not a settings window. The web
   adapter is being built around shared Tabard intake and separate application
