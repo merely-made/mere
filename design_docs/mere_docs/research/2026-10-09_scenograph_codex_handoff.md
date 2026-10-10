@@ -91,6 +91,17 @@ lane coordinate overlapping edits through that site lane. Native fold Rulings
 163–166 belong to its separate S5 continuation. This handoff assigns none of
 those implementations to the editor lane.
 
+The nested branch's 2026-10-10 checkpoint combines the committed site cutover,
+Moot, shared capture polling/Genet `7422e906`, and published Tabard appearance
+through `6b0798a95` (source notice completion `2ef6e3207`). Its 395 CPU Rust
+tests, four exporter tests, locked viewer build and main-page/applet Wasm check
+pass. Main landing remains pending: the iMac's confirmed Radeon reset and
+WindowServer incident has put GPU/capture runs on hold, and seven Rootstock
+GPU fixtures failed to obtain a device. The
+[Fold receipt](../../../ports/graphshell/docs/receipts/host_dataset_folds.json)
+records current hashes, historical partial receipts and the exact remaining
+headed checks. The site lane's uncommitted docs/scenarios remain its own work.
+
 ## Where things are
 
 - Swatch types: `crates/cambium/scenes/scenograph/src/swatch.rs`. Composition: `crates/cambium/scenes/scenomise/src/facet.rs` (`compose_facet`), tests in `facet_tests.rs`. Subgraph specs: `crates/forme/curation` (published as `mere-curation`).
