@@ -9,8 +9,15 @@ memory design. No code.
 > *tier* names only the t1–t4 socialization aspect. The meaning is unchanged; the
 > text below keeps "ambient tier" as written.
 
-**Status (2026-09-23):** recorded; every question raised while writing it was
-ruled the same day (§9).
+**Status (2026-10-09):** the original ambiance questions were ruled on
+2026-09-23 (§9). Section 10 is the proposed site relation-lens continuation,
+reconciled with the new design language and current supplier/consumer state;
+its open product choices and unexecuted proofs remain explicit. No code.
+
+**2026-10-09 continuation:** the [cross-app design language record](../../2026-08-23_projection_scenes_and_graph_native_platform.md#9-configurable-visual-and-interaction-language-2026-10-09)
+clarifies selection-driven foreground/context, foreground pins, and previously
+selected nodes remaining in the background until dismissed. It concerns view
+curation; the attention/keeping distinction and keeping levels below stand.
 
 The rulings in §2 are Mark's. Quoted text is verbatim. Several rulings were
 choices Mark made among options offered to him, and the text says so where it
@@ -602,9 +609,465 @@ quotes Mark's own answer.
 | Terms | *Ambiance* and *reservoir* (an identity's whole set of meres, at IBM's scale) are added to TERMINOLOGY. A working state is a session. "Noted", "asserted" and "checkout" are retired. |
 | Reconciliation | Annotate the family composition thesis, and rewrite TERMINOLOGY's *mere* entry per data domain. |
 
-No design question is left open here. The shape of the engine registry is work
+No original §9 design question is left open. Section 10 opens the later
+consumer interaction questions without reopening these rulings. The shape of
+the engine registry is work
 for the plan that builds it. The
 [reservoir plan](../implementation_strategy/2026-09-23_reservoir_plan.md)
 implements the per-domain meres, their sessions and archive, and the access and
 ambient grants. Alembic's own open decisions stand, including the
 event log's shape (its §10, item 5).
+
+## 10. Proposal: focus-driven relation lenses (2026-10-07)
+
+**Status:** proposed design, not a new set of rulings. In the site conversation,
+Mark described selecting a project and choosing Foundations, Dependencies or
+Rust crates to disclose background material, then withdrawing material which
+is no longer relevant when the subject is deselected. He raised comparison,
+scenes and arrangements as questions. The following makes that interaction
+concrete without treating the answers as already ruled. Implementation belongs
+to a consumer's existing plan; this is the single shared design home.
+
+**Reconciled 2026-10-09:** the [cross-app design language](../../2026-08-23_projection_scenes_and_graph_native_platform.md#9-configurable-visual-and-interaction-language-2026-10-09)
+now supplies the attention and background-membership direction for this
+proposal. Its §9.2 distinguishes previously selected material, which remains
+in the background until dismissed, from untouched peripheral context, which
+can change with the lenses. The original site request supplies the latter's
+withdrawal rule. Neither implies a keeping-level promotion. The exact lifetime
+across scenes and reopened sessions remains open; §10.8 records current supplier
+and consumer boundaries.
+
+### 10.1 Established boundaries
+
+The laws in §§2–6 continue to apply. Reveal reads; it does not author domain
+membership or claims. Examination can enter short-term memory, keeping is a
+separate promotion, and withdrawing a projection is neither forgetting nor
+deletion. Cross-mere automatic context requires the per-mere/per-app opt-in.
+
+The [projection-scenes direction](../../2026-08-23_projection_scenes_and_graph_native_platform.md)
+§§4–5 separates scope-producing queries from scenes, and source identity from
+projected instance identity. A lens selects or derives a disclosed scope and
+reading; a scene determines what its entities and relations become. The
+[relationship adoption plan](../implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md)
+already requires source revisions, explained relationships and occurrence-safe
+selection. Those contracts are reused, not replaced by a second context graph.
+
+The [Scenograph editor plan](../implementation_strategy/2026-10-07_scenograph_editor_plan.md)
+SE11–SE22 distinguishes working draft history from attributed session saves;
+SE31 puts command preferences in the view plane. Transient lens activation
+should not dirty an authored recipe. Editing and explicitly saving a recipe
+remain separate operations through the owner's existing path. This is an
+application of those boundaries, not a claim that an ambient controller exists.
+
+### 10.2 Selected subjects, inspection and reasons
+
+**Proposed behavior.** Keep the selected comparison subjects separate from the
+one item currently inspected and from pointer/keyboard focus. Inspecting a
+dependency explains it; it does not silently replace the selected projects or
+make that dependency a new traversal root. Explore from here is an explicit
+command when the person wants to change the root.
+
+For each selected subject, evaluate the enabled lenses against the same
+disclosed binding and revision. A contextual item has all of its applicable
+reasons: which subject and lens introduced it, the source statement or derived
+path, and the conditions under which that reason holds. A result arriving after
+its subject, lens or binding revision changed cannot reinstate the old view.
+Loading, refusal and stale input are visible states, not empty successful sets.
+
+Within one scene, two reasons for the same owner-disclosed semantic identity
+produce one contextual item with two reasons. Do not merge equal labels:
+package versions/configurations can differ, and authored occurrences remain
+distinct even when they refer to one source. If an item is already a primary
+subject, emphasize that instance and its reasons instead of adding a duplicate.
+Several scenes may have separate projected instances with one source mapping.
+
+| Action | Proposed display result | Keeping/source effect |
+| --- | --- | --- |
+| Select A, enable a lens | Disclose A's bounded context and reasons. | No implicit saved membership or source claim. |
+| Add B to the selected subjects | Disclose the union; one shared item retains both reasons. | Same read-side boundary. |
+| Deselect A | Remove A's lens reasons; A returns to the background until dismissed. Retain context justified by B, prior selection or explicit view retention. | Do not erase examined or saved memory. |
+| Clear selected subjects | Withdraw untouched context with no surviving reason; retain previously selected material until dismissed. Restore the preceding context, with intervening view edits still an open specification question. | Do not forget Recent, retract claims or delete Saved. |
+| Select a contextual item, then deselect it | It returns to the background and remains available until dismissed, following the design language §9.2. Whether it also becomes a traversal subject is a separate command/policy. | View curation does not establish durable keeping or a new source assertion. |
+| Pin to foreground | Keep the item contributing to context while other selections change, following the design language §9.2. | Distinct from a position pin and from owner Save. |
+| Keep in view | Add an explicit view-local reason independent of current subject selection. | Not long-term keeping; session/view persistence follows an explicit save choice. |
+| Save or add to a domain collection | Submit the named owner action and expose its result/refusal. | Uses the domain's authority and attributed retention path. |
+| Hold position | Apply a permitted placement constraint. | Does not itself keep the item visible, save it or author a relation. |
+
+The exact action names remain open. The design language distinguishes a
+foreground pin from a position pin and a forme layout lock. Preserve those
+meanings; owner Save remains separate. Inspecting or keyboard-focusing an item
+does not automatically become selecting it. Whether either action establishes
+a background-membership reason also remains open; examination's short-term
+memory follows §9 independently.
+
+### 10.3 Lens meaning, provenance and coverage
+
+The site adapter supplies domain facts and scope; the shared interaction only
+controls their disclosure. Working examples for the site's three graph views;
+names and exact boundaries remain under discussion:
+
+| Lens | Meaning and explanation |
+| --- | --- |
+| Foundations (working label) | A coarse architecture overview of the shared stack's repositories/families, with supporting paths to the selected project. Repository groups remain expandable into their constituent crates. The boundary of this overview is still a design question. |
+| Dependencies (working label) | The organization-owned graph: Merely-made repositories and their member/constituent crates, including internal and cross-repository dependency relationships. Name the source and whether these are declarations or a selected resolved configuration. |
+| Cargo (working label) | The expanded Cargo dependency graph, including external transitives, for a named product/build selection. A manifest graph, resolver graph and compile-unit graph are different evidence; disclose package, target, feature and dependency-kind coverage. |
+
+**Mark's further clarification, 2026-10-08:** the tree language illustrated
+relationships; it did not introduce trunk/branch/leaf terms or a tier ontology.
+This supersedes the preceding literal tier-filter interpretation as well as
+the earlier requirement for per-project editorial importance. The distinction
+is between shared-stack overview, the organization and its constituent crates,
+and the expanded Cargo graph. These also supply increasingly substantial
+workloads for the stack's web embed. A fourth view is a possibility, not a
+decision. Engine crates being the "true foundations" remains a question about
+which architectural reading is useful, not a global ranking to enforce.
+
+Repository ownership, crate membership, dependency reachability and build
+selection are separate facts. Treat a repository as an expandable grouping,
+not an indivisible component: one project can consume only some of Mere or
+Genet's crates. A collapsed repository dependency summarizes real crate-level
+edges and must retain those witnesses. Membership edges are not dependency
+edges. Changing display resolution preserves source identities and evidence.
+Cross-project reuse can be an inspectable semantic facet without classifying
+every member crate of one repository identically.
+
+**Proposed controls, not ruled:** keep coverage and grouping independent. Three
+starting views could be a repository overview, organization-owned crates and
+an expanded build graph. Each can permit repository expansion and focused or
+whole-scope exploration. If a fourth view answers a distinct question, direct
+external dependencies could separate dependencies the organization chooses
+from the transitives they bring. It need not become another architectural tier.
+
+“All dependencies” means all within the stated coverage, never an unsupported
+claim about an entire ecosystem. Each result carries the limiting layer and
+any breadth/traversal budget, following [graph-semantics ruling 4](../implementation_strategy/2026-10-04_graph_semantics_plan.md).
+Not loaded, undisclosed, unavailable, unsupported, stale and truncated are
+different from a known empty result. Identity, evidence and freshness remain
+inspectable in spatial and list presentations. Multiple attributed assertions
+may support one drawn relationship; hiding one reason does not retract others.
+
+**Proposed comparison modes:** All shows the union; Shared shows members
+returned for every selected subject; Differences shows those absent from at
+least one subject's returned set, labelled by subject. An unknown absence must
+remain unknown. With incomplete coverage, say shared/different *among disclosed
+results* and identify the incomplete subjects rather than certifying exclusivity.
+With one subject, Shared and Differences explain why comparison is unavailable.
+The mode filters disclosure, not source membership or the underlying reasons.
+
+Show incident relationships for inspected or selected material prominently.
+Other disclosed context-to-context routes remain available through inspection
+or expansion, following Woodshed's connected exploration precedent. Edge
+density can be reduced, with a visible count/filter and an equivalent list;
+visual reduction does not mean the relationships are absent. Domain measures
+and unavailable values stay separate rather than becoming one unexplained
+relevance score.
+
+### 10.4 Scenes and placement
+
+**Proposed first realization:** retain the primary graph's existing positions
+as context expands. Preserve surviving contextual positions and remembered
+coordinates when the same material returns. Add context without repeatedly
+fitting the camera or solving a new placement for everything. Reframe or change
+the scene explicitly. A bounded disclosure budget states its limits and offers
+Show more or Explore from here; automatic budget reduction protects selected,
+inspected, previously selected and explicitly retained material, and asks
+before replacing it. Previously selected material does not silently become
+eligible for withdrawal merely because its last lens reason disappeared.
+
+Placement must respect the selected reading. A topology view can permit free
+placement; a Matrix compares projects against dependencies; a Provenance view
+can explain declarations, resolutions and derived paths. These are applications
+of the scene catalog, not new scene names or completed portable surfaces.
+Foundations is not an arrangement, and one generic halo cannot substitute for
+the meaningful coordinates of a musical or quantitative reading.
+
+The seeded/anchored/pinned roles and encoded-axis constraints remain as ruled
+in the [projection grammar catalog](../research/2026-08-15_projection_grammar_catalog.md).
+An encoded axis does not allow dragging a value into a false position. Report
+unsupported placement or an unmet constraint; offer inspection or another
+presentation. A held coordinate in a free topology view does not force an item
+onto that coordinate in a different scene. Changing scenes preserves selected
+source identities and explanations where applicable, not incompatible geometry.
+
+### 10.5 Equivalent controls and ownership
+
+Lens activation, adding/removing subjects, comparison, inspection, expansion,
+view retention and any granted owner action need keyboard-operable controls
+through the host's command/focus system. Do not make modifier-drag the only way
+to compare. A list or table exposes the same subject identities, reasons,
+coverage and actions. Removing the inspected item deliberately returns focus
+and announces the changed context; an asynchronous refresh cannot steal focus.
+
+At narrow widths, keep the foreground readable and put context controls and
+explanations in a reachable adjacent/stacked surface. Context can be collapsed
+without clearing subjects or saving anything. Static and reduced-motion
+presentations retain membership, selection, reasons and owner actions; motion
+and hover are not the only way to discover a relation. Frozen publication
+preserves source mapping, evidence and coverage for its recorded selection;
+it makes no claim to execute dynamic selection or newly authorized writes.
+
+| Responsibility | Existing boundary applied to this proposal |
+| --- | --- |
+| Domain adapter/owner | Identity and occurrence semantics, statements, revisions, domain calculations, disclosed actions and retention authority. |
+| Mere scope/context layer | Selected scope, derived membership and reasons, coverage, cross-mere grant enforcement; no second truth store. |
+| Scenograph/Scenomise | Portable source mapping, recipe validation and projection; no project-specific Cargo parser, music calculation or owner store. |
+| Cambium/host | Commands, keyboard and pointer focus, cancellation, announcements and responsive realization. |
+| View state | Active lenses, subjects, comparison mode, inspection, visibility/breadth, camera and permitted placement overrides. |
+| Owner-authored session state | Explicit saved material, recipe or query definitions and attributed source/domain actions. |
+
+Saving a query shares its spec; freezing records members and revision under
+graph-semantics ruling 3. Neither a saved view nor a recipe grants access to a
+mere, enables a provider/model, or authorizes script execution. Local-only
+published site exploration must not pretend that a disabled Save action has
+durable session authority.
+
+### 10.6 Bounded proof and open product choices
+
+**Recommended first proof, not run:** two disclosed site projects, one shared
+supporting item and one unique item each; one explicit repository-scale context
+lens, one topology view and its equivalent list. Use declared source revisions,
+disclosed scope and dependency-path witnesses. Select A, add B, deselect A and
+clear all. Verify one shared contextual identity and both reasons, preservation
+of B's context, withdrawal of untouched context after clear, stable primary
+placement and unchanged
+source/collection state. Inspect a candidate separately; repeat with Keep in
+view and with Hold position to prove that neither conflates the other or Save.
+Select one contextual candidate, deselect it and then dismiss it: selection
+must establish the background lifetime required by the design language, while
+dismissal ends that lifetime without deleting the source. Repeat with a
+foreground pin to prove that deselection keeps its contextual contribution.
+
+Add controls for incomplete coverage, same label/different identity, repeated
+authored occurrences, stale asynchronous completion, budget reduction and a
+refused owner action. Exercise keyboard and narrow/static presentations. No
+receipt here advances S1, a browser storage gate or native accessibility
+acceptance. A second heterogeneous consumer over Woodshed or Knot data must
+prove the lifecycle without project-specific shared code before claiming a
+general ambient interaction contract. Their existing proofs are precedents,
+not acceptance of this proposal:
+`repos/woodshed/design_docs/2026-09-04_musical_projections_plan.md`,
+`repos/woodshed/design_docs/2026-07-11_stage_set_tools_plan.md`, and
+`repos/knot-editor/design_docs/2026-09-30_composition_mere_retention.md`.
+
+Open product choices for the first consumer:
+
+- Whether Foundations starts enabled when a subject is selected, or requires
+  deliberate activation; the proof should activate it explicitly until ruled.
+- Whether enabled lenses apply to all selected subjects together or can differ
+  per subject; a single shared lens set is the proposed first cut.
+- The default breadth and comparison mode; All is the proposed first mode,
+  with no universal numeric budget chosen here.
+- The user-facing names and persistence of view retention versus owner Save
+  versus held placement; terminology must not collapse these actions.
+- Exact dependency coverage: direct declarations versus resolved transitives,
+  feature/target selection and dependency kinds. Foundations can first use the
+  published repository-family relationships, with that coverage stated.
+- The boundary of the coarse shared-stack overview, independent of repository
+  expansion; whether three starting views suffice or direct external
+  dependencies merits a fourth view. No tree-tier classification is proposed.
+
+This continuation opens these interaction choices without reopening §9's ruled
+state model or claiming its engine-registry and reservoir follow-ons complete.
+
+### 10.7 Research follow-up: existing mechanisms and useful proofs (2026-10-08)
+
+**Status:** researched recommendations, not rulings or implementation receipts.
+Remote main was checked against the available Git objects: Knot `ed419a8e`,
+Woodshed `5c683d82` and Turnstone `56aff960`. During the pass, S1 merged to
+Mere main at `f67f50807`; the site records that integration at `55c660e`.
+The final Mere/site refs were checked live. Code and recorded qualifications
+were read, not rebuilt or rerun; the headed viewer/practice gate remains open.
+The local §10 proposal was not present in the Mere remote main reviewed on
+2026-10-08. This historical assessment predates the design-language continuation
+and P4/P5 publication; §10.8 records their effect without relabelling the old
+research as a fresh consumer or performance receipt.
+
+**The reusable gap is the context lifecycle, not a second domain graph.**
+Mere already has source/occurrence mappings, explained relationship disclosures
+and lower-level multiple selection. Its relationship snapshot still stores one
+selected occurrence, and `pandect::ViewIntent` does not yet carry subjects,
+enabled relation lenses or reasons. A shared view-state reducer must join those
+pieces, reject stale completions and withdraw only reasons that ceased to hold.
+Domain adapters retain identity, calculations and evidence; this reducer must
+not acquire source authority or calculate music or dependency truth.
+
+Two newer consumers provide useful, bounded precedents:
+
+| Reviewed mechanism | What it establishes | Remaining difference |
+| --- | --- | --- |
+| Knot, `knot-editor/apps/desktop/src/composition/recipe/scene.rs`, and `knot-editor/crates/knot-composition/src/retention.rs` | Independent relationship-category visibility, explicit foreground occurrences, copied disclosure and retained presentation. Its plan records native encrypted reopening. | It filters an existing disclosure; it does not generate neighborhoods around several selected subjects or track their independent reasons. |
+| Woodshed, `woodshed/crates/woodshed-core/src/stage_context.rs` and `woodshed/crates/woodshed-core/src/musical_context.rs` | Keyed musical context, bounded/truncated results, protected inspection and explicit Keep Nearby distinct from adding a Set Card. | Inspection can change the exploration root; clearing inspection retains discovered context. That differs from the proposed withdrawal of untouched context after the last subject/lens reason disappears. |
+
+Woodshed's Orbits/Cells atmosphere is decorative `AmbientSim` paint, not
+relationship discovery. Seeded/anchored/pinned are placement roles, not
+foreground/background attention strata. Knot establishes a host presentation
+mechanism; it does not establish a new portable authored-strata contract.
+
+**External findings inform choices, rather than prescribe one appearance.**
+[Furnas, Generalized Fisheye Views (1986)](https://courses.ischool.berkeley.edu/i247/f05/readings/Furnas_GeneralizedFisheyeViews_CHI86.pdf)
+separates prior importance from distance to the current focus. The useful
+transfer is explaining why context is relevant. It does not justify a universal
+importance score or geometrically distorting semantic scenes. The current
+site discussion in §10.3 distinguishes graph coverage and display resolution;
+it does not require a per-project importance list or a tree-tier classification.
+
+[GraphTrail (Dunne et al., 2012)](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/12/graphtrail_chi2012.pdf)
+combines typed relationship pivots, aggregation and visible exploration history.
+Its branches can merge, and a derived chart retains how it was produced. The
+transfer is inspectable reasons and explicit exploration from a new root. A
+temporary background need not become a permanently accumulating history canvas.
+
+[UpSet (Lex et al., 2014)](https://vdl.sci.utah.edu/publications/2014_infovis_upset/)
+separates set intersections and aggregates from their individual elements. This
+supports offering a comparison matrix or table alongside topology, using the
+same selected identities and disclosures. Which representation helps must be
+tested against the task. Stable placement likewise remains a hypothesis:
+[Archambault and Purchase's experiments](https://www.sciencedirect.com/science/article/pii/S107158191300102X)
+caution against treating mental-map preservation as a general comprehension
+guarantee. Test finding a returning item or route separately from reading an
+intersection or a dependency path.
+
+**Data acquisition should be incremental and accurately scoped.** The site's
+current 21-project/30-relationship export is sufficient for an initial controller
+probe. It explicitly excludes resolved Cargo closure. The wider organization
+view needs member-crate identities and actual dependency witnesses, while the
+Cargo view needs a named product/build scope. Workspace dependency templates
+are not edges, and a lockfile's package list alone does not establish which
+packages a selected product uses.
+[Cargo metadata](https://doc.rust-lang.org/cargo/commands/cargo-metadata.html)
+separates manifest declarations from the resolver graph and records dependency
+kinds, targets, renames and features. A later Rust-crate disclosure should name
+the workspace/member, revision, feature and target selection, and direct versus
+transitive coverage. Treat opaque Cargo IDs as snapshot identifiers; publish
+normalized source identities rather than machine paths. Non-Rust/runtime
+prerequisites require their own evidence. A static, revisioned disclosure can
+be published through [GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages);
+browser selection and presentation need no server-side session. S1 currently
+fetches one input before mounting; dynamic shard acquisition/merge is additional
+work, not an existing capability to promise.
+
+S1's validator requires each relationship's authority/revision to match its
+enclosing dataset. Combining project disclosures therefore needs a named
+aggregate authority and revision, with original manifest revisions retained as
+evidence; concatenating envelopes does not establish this contract. Relationship
+records have no arbitrary metadata map. A small Cargo fixture must test how
+machine-filterable declaration details use existing typed occurrence values
+(potentially declaration occurrences), while explanations remain readable.
+The viewer's current `ViewedRelation` retains labels/kinds/endpoints, so full
+evidence and explanation inspection is still an implementation requirement.
+
+The hard S1 input limit is 1 MiB raw per envelope. The pinned site fixture is
+65,038 bytes; refreshed metadata can change that size and identity. Measure raw
+bytes, entity/relationship counts and the active context separately. A later
+shard/index design and active-display budget need visible truncation and new
+qualification; the earlier viewer bundle measurement is not a post-S1 size
+measurement or an approved ambient budget. Woodshed's two wasm declarations,
+`getrandom` 0.3 and alias `getrandom_04` for package `getrandom` 0.4, are a useful
+control against merging names, aliases, versions or target conditions. Compare
+package families separately from exact source/version identities.
+
+**Recommended technical proof, followed by increasing graph scope/resolution:**
+declare a stable base view of Mere and Genet over the unchanged complete site
+disclosure. Selection and foreground pins determine foreground attention under
+the design language; the base view is not a new attention role. Enable published
+`depends_on`, then `renders_with`. NetRender is
+shared; Retinue/Emblem/Mora/Knot and Vano/wgpu-scry give distinct neighborhoods.
+Genet also being a dependency of Mere tests a primary/context overlap. Preserve
+every source identity, occurrence and source revision; only projected visibility
+and hit routes change. Current S1 draws all occurrences with single selection,
+so the shared reason reducer and Graphshell presentation adapter are still work.
+Follow with organization-owned crate expansion, preserving the member edges
+behind repository summaries, then a scoped expanded Cargo graph. Test both
+focused context and whole-scope realization; drawing a small subset does not
+by itself qualify rendering the complete graph.
+
+A 2026-10-08 count of the stored
+`design_docs/inker_docs/testing/receipts/2026-10-07_current_browser_family/family-resolver.json`
+fixture found 1,564 packages, 1,564 resolver nodes and 6,538 `deps` entries.
+This is an available resolver workload, not a fresh selected-build graph or a
+count of compile units. Its verbose Cargo JSON is 8,185,829 bytes; that is not
+the size of a normalized host envelope. No performance receipt was run here.
+Measure transfer/decode/validation, projection/layout, memory and interaction
+separately, recording loaded, compiled, visible and rendered counts.
+[Cargo's unit graph](https://doc.rust-lang.org/cargo/reference/unstable.html#unit-graph)
+describes compilation units for a selected command and remains an unstable
+interface. Use it or build evidence if the view claims what is compiled;
+resolver membership alone does not make that claim.
+
+Select both subjects, inspect separately, disable one lens, deselect one subject
+and clear comparison selection. The base graph remains available; previously
+selected material returns to the background until dismissed. Untouched context
+remains while another lens reason or explicit view retention justifies it. Exercise stale
+completion, same label/different identity, incomplete coverage, narrow/list
+controls and placement separately. In the normal all-project graph, test reuse
+and emphasis of existing primary instances; do not count that as withdrawal.
+
+Use Woodshed's keyed C-major/A-minor material and owner-derived shared-tone/fifth
+relationships for the second consumer. Preserve authored occurrences separately
+from catalog identities and keep Hear/Add/Keep as explicit owner actions. This
+probes portability beyond software dependencies without making the reducer own
+musical theory.
+
+An independent content proof can be smaller than a browser product: one article
+with exact native document bytes, canonical address and revision, opened through
+Knot's read-only document session in standalone Knot and Turnstone, with related
+material supplied as a separate projection. Today's site articles are Rust views;
+an extracted document is a derived representation unless native text becomes
+the authored source by an explicit migration. Browser-local persistence,
+extension permissions and attached native sessions remain later, separate gates.
+The canonical consumer scope stays in
+`turnstone/design_docs/2026-10-06_unusual_protocols_browser_plan.md`;
+these recommendations do not reorder its native lane or the site's Ruling 22.
+
+### 10.8 Current composition and delivery boundaries (2026-10-09)
+
+**Status:** documentation reconciliation, not an implementation receipt or a
+new ruling. This pass read Mere `6708bfcd0`, Turnstone `25f85bd` and site
+`9ba3f03`, the available site, Tabard and Moot chats, and the incoming design
+language in the projection-scenes brief §9. Earlier research in §10.7 retains
+its dated source identities and unexecuted boundaries.
+
+The same disclosed subject can support several presentations and lifetimes:
+
+| Concern | Existing home and boundary |
+| --- | --- |
+| Source facts, saved queries, frozen selections and residency coverage | The [graph semantics plan](../implementation_strategy/2026-10-04_graph_semantics_plan.md) completes P1–P5 on main at source `7628ab689`. Its resident reader uses explicit checkpoint/refresh; edits still use the complete recorded session. This supplies graph mechanisms, not an ambient reason controller. |
+| Several appearances and linked comparison | The [Scenograph editor plan](../implementation_strategy/2026-10-07_scenograph_editor_plan.md) S2 owns linked swatches, coordinated selection and visibility. Source selection, appearance-part selection and instance dismissal must remain distinguishable; the part name awaits Mark under SE84. |
+| Ambient relevance and attention | This proposal applies the design language §9.2: selected or foreground-pinned subjects shape context; previously selected material survives in the background until dismissed; untouched context can withdraw when its reasons cease. The lens set and reason reducer are still proposed work. |
+| Scene placement, forme and dynamics | The design language §9.4 describes a field representing the recursive workbench arrangement. It does not define the sandbox's field physics, finish Scenograph B1 or change arrangement roles. The [Scenograph handoff](../research/2026-10-09_scenograph_codex_handoff.md) retains the ruled carrier, dynamics-axis, B1 and S2 work. |
+| One application inside another | The [app composition brief](../../cambium_docs/research/2026-10-06_app_composition_brief.md) owns retained sessions and host accessibility composition. Owner-served projections and locally granted applet execution have distinct lifecycle and authority boundaries; neither gives a lens access to undisclosed material. |
+| Public site delivery | `merelyllc.com/docs/2026-09-30_graphshell_site_canvas_plan.md` R157–R160 owns the frozen-first delivery caps, viewer cutover and deferred grouping choice. Main contains the frozen-first lazy sandbox and shared providers; the Graphshell viewer has not replaced that sandbox. |
+
+An ambient controller should consume coverage rather than manufacture complete
+answers from a resident subset. P5 can report known NotLoaded addresses, and
+demand/refresh preserves recorded truth. It does not make Cargo acquisition,
+shard publication, pending assertion derivation or context scheduling automatic.
+The [graph semantics follow-ons](../implementation_strategy/2026-10-09_graph_semantics_followons_plan.md)
+own consumer adoption, automatic refresh, partial editing and cleanup. The site
+and native browser can remain pinned to earlier qualified suppliers while those
+successors are qualified; a moving Mere main is not consumer adoption.
+
+Repository/member expansion, source graph residency, recursive forme regions,
+sceno Fold and an embedded application answer different questions. Preserve the
+underlying memberships and dependency witnesses across presentations; do not
+equate these mechanisms merely because each can look nested. R160 still leaves
+the old nested-graph branch's relationship to Fold undecided. The new forme
+direction is useful context for that later choice, not a decision to merge it.
+
+The site's frozen publication can demonstrate related information and export
+portable documents or sessions without owning a resident service. GitHub Pages
+delivery therefore does not settle extension permissions, attached Turnstone
+authority or Cloudflare rendezvous. Those remain in the Turnstone browser-
+sidecar proposal and the [browser carrier plan](../implementation_strategy/2026-08-25_browser_webrtc_carrier_plan.md).
+The next bounded ambient proof should qualify the lifecycle above with the
+existing disclosed site graph before expanding to member crates and a named
+Cargo configuration. No larger graph or live app mount is qualified by this
+documentation pass.
+
+**Voice clarification (2026-10-09):** [design language §9.8](../../2026-08-23_projection_scenes_and_graph_native_platform.md#98-voice-clarifications-and-research-boundaries-2026-10-09)
+amends the earlier "Clear selected subjects" row: deselection preserves edits
+made while selected and returns to an unselected view; it does not restore a
+prior snapshot. Exact context recomputation remains to be specified against
+current state. Previously selected background membership and the keeping axis
+stand. Selection's overload and hover previews need interaction research;
+this does not make hover establish retained membership or keeping.

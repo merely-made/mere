@@ -41,7 +41,7 @@
 use serde::{Deserialize, Serialize};
 
 pub mod syntax;
-pub use syntax::{SyntaxPalette, SyntaxRole, derive_syntax_palette};
+pub use syntax::{SyntaxPalette, SyntaxRole, derive_syntax_palette, derive_syntax_palette_with};
 
 // =============================================================================
 // Colour type

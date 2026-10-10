@@ -167,6 +167,20 @@ where
         Self::with_hooks_and_options(init, hooks, HostOptions::default())
     }
 
+    /// Initialize view closures and state with the host's window command queue.
+    /// This mirrors native initialization when commands belong to a caption
+    /// adapter rather than to the application's portable state.
+    pub fn with_command_init(
+        init: impl FnOnce(&WindowCommands) -> Init<State, Logic>,
+        hooks: HostHooks<State, Logic, V>,
+        options: HostOptions,
+    ) -> Self {
+        let commands = WindowCommands::new();
+        let mut harness = Self::with_hooks_and_options(init(&commands), hooks, options);
+        harness.host.core.s.commands = commands;
+        harness
+    }
+
     /// [`with_hooks`](Self::with_hooks) with the host options spelled out — for
     /// behaviour a test needs to configure, such as `spatial_focus`.
     pub fn with_hooks_and_options(
