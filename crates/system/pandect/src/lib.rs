@@ -101,6 +101,8 @@ pub mod graph_placement;
 // A mere's sessions over one muniment store: the session schema, the live
 // session core and the lifecycle (reservoir plan V2).
 pub mod graph_session;
+// Observed stable-ID live commands over the complete session writer.
+pub mod live_graph;
 // Producer-owned, content-addressed recipes for reopening a source at a
 // cursor with existing durable curation. Source resolution stays at the host.
 pub mod live_view;
