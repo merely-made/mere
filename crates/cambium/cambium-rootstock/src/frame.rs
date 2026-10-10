@@ -98,6 +98,7 @@ where
                 render_core: self.s.shared.render_core.as_ref(),
                 geometry,
                 frame_profile,
+                presentation: self.s.last_redraw_presentation,
             };
             (self.hooks.frame)(&mut ctx)
         };
@@ -480,6 +481,7 @@ where
     }
 
     pub fn redraw(&mut self) {
+        self.s.last_redraw_presentation = None;
         self.deliver_files();
         let frame_started = crate::Instant::now();
         let mut profile = FrameProfile::default();
@@ -662,6 +664,7 @@ where
             height: ph,
             layout_scale: scale,
         };
+        self.s.last_redraw_presentation = Some(presented);
         // Freeze product state before any capture callback, queued pointer
         // dispatch or platform accessibility action can change the product.
         self.observe_presentation(presented);

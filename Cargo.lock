@@ -2754,7 +2754,6 @@ dependencies = [
  "gemot",
  "hex",
  "insigne",
- "mere-moot",
  "mere-p2panda-net",
  "mere-proofs",
  "mere-transport",
@@ -9532,7 +9531,6 @@ dependencies = [
  "getrandom 0.3.4",
  "inker",
  "mere-kernel",
- "oxigraph",
  "oxjsonld",
  "oxrdf",
  "oxttl",
@@ -9568,15 +9566,24 @@ dependencies = [
 name = "mere-moot"
 version = "0.0.1"
 dependencies = [
+ "chartulary",
+ "commons-spine",
  "eidetic",
  "eidetic-search",
  "fleece 0.5.0 (git+https://github.com/merely-made/genet.git?rev=15713014e2e23b887360471552f75f60684f5384)",
  "gemot",
  "genet-static-dom",
+ "hex",
+ "insigne",
  "mere-document-lanes",
+ "muniment",
+ "p2panda-core",
+ "personae",
  "serde",
  "serde_json",
  "servitor",
+ "stickleback",
+ "tokio",
 ]
 
 [[package]]
@@ -12099,28 +12106,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "oxigraph"
-version = "0.5.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7f6632dd080bd07676f06e70254ff5862c9943e9483d700fa7258df73a3f9a6a"
-dependencies = [
- "dashmap",
- "getrandom 0.3.4",
- "libc",
- "oxiri",
- "oxrdf",
- "oxrdfio",
- "oxsdatatypes",
- "rand 0.9.5",
- "rustc-hash 2.1.3",
- "siphasher",
- "sparesults",
- "spareval",
- "spargebra",
- "thiserror 1.0.69",
-]
-
-[[package]]
 name = "oxilangtag"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -12154,38 +12139,10 @@ version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4be15186205eb60ddbdc2fb47cb25df472c7f399bbe119b68c0972b6b6dd46ea"
 dependencies = [
- "hex",
  "oxilangtag",
  "oxiri",
  "oxsdatatypes",
  "rand 0.9.5",
- "sha2 0.10.9",
- "thiserror 1.0.69",
-]
-
-[[package]]
-name = "oxrdfio"
-version = "0.2.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "17b3fe3bb34179c376ab04f2a1b32616b0babab574b3b7eef64d587e60d5e1db"
-dependencies = [
- "oxjsonld",
- "oxrdf",
- "oxrdfxml",
- "oxttl",
- "thiserror 1.0.69",
-]
-
-[[package]]
-name = "oxrdfxml"
-version = "0.2.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "71853d12051879f3e424c6864e978f5f5cbecd8e86a9817adbccaefccac9d61d"
-dependencies = [
- "oxilangtag",
- "oxiri",
- "oxrdf",
- "quick-xml 0.37.5",
  "thiserror 1.0.69",
 ]
 
@@ -16517,6 +16474,44 @@ dependencies = [
  "serde",
  "serde_json",
  "tinct",
+]
+
+[[package]]
+name = "tabard-desktop"
+version = "0.1.0"
+dependencies = [
+ "cambium",
+ "cambium-genet-winit-host",
+ "cambium-rootstock",
+ "dirs 5.0.1",
+ "layout-dom-api 0.1.1 (git+https://github.com/merely-made/genet.git?rev=15713014e2e23b887360471552f75f60684f5384)",
+ "mesquite",
+ "tabard-workshop",
+ "taproot",
+ "tempfile",
+]
+
+[[package]]
+name = "tabard-workshop"
+version = "0.0.1"
+dependencies = [
+ "accesskit",
+ "cambium",
+ "cambium-genet-winit-host",
+ "genet-livery",
+ "genet-scripted-dom",
+ "inker",
+ "layout-dom-api 0.1.1 (git+https://github.com/merely-made/genet.git?rev=15713014e2e23b887360471552f75f60684f5384)",
+ "livery",
+ "mere-document-lanes",
+ "netrender",
+ "paint_list_render",
+ "sprigging",
+ "tabard",
+ "taproot",
+ "tempfile",
+ "tinct",
+ "winit",
 ]
 
 [[package]]

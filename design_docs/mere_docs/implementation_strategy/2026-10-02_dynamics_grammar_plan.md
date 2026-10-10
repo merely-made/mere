@@ -11,6 +11,7 @@ Not in scope:
 - Any change to `sceno::Score`.
 
 **Related:**
+- [cross-app design language record, 2026-10-09](../../2026-08-23_projection_scenes_and_graph_native_platform.md#9-configurable-visual-and-interaction-language-2026-10-09): predictable behavior informed by entity data, inspectable derived links, and the interaction distinction between foreground pins, position pins, anchors and forme layout locks. No new grammar role or realization is declared there.
 - [dynamics grammar brief](../research/2026-10-02_dynamics_grammar_brief.md): the evidence, the decomposition tables (§5) and the hypothesis test (§6) this plan builds on.
 - [physics catalog plan](2026-09-02_physics_catalog_plan.md): the catalog, P5 and P6, and the record of every ruling below.
 - [projection grammar adoption plan](2026-08-15_projection_grammar_adoption_plan.md): the sibling this plan stands beside, and its discipline, "Solver proposes, the score records".
