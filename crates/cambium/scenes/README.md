@@ -51,6 +51,17 @@ A `ProjectedItem` carries `source`, `space`, `transform`, `footprint`,
 `representation`, `layer`, `visible`, an optional `hit` shape, and an open
 `channels` map of `(name, value)` emphasis pairs.
 
+`scenograph::presentation` authors target → condition → effect rules over
+projected occurrences. Its versioned `RuleSet` validates atomically and resolves
+each presentation property by priority, retaining match explanations and
+overridden matches. Conditions read scalar facts and occurrence-local view
+state; screen-size thresholds use host-held hysteresis. Hosts resolve these
+decisions before representation measurement and placement. Effects do not
+write source facts, coordinates, selection or pins. The interactive study and
+shared resolver fixtures live in `support/design-studies/`; this is a
+declarative authoring model, with the production Rhai runner still pending the
+coordinated Genet repin in the Scenograph editor plan.
+
 A `Backdrop` carries source provenance, space, transform, footprint, an open
 appearance kind, visibility, and collision participation. Backdrops paint in
 table order behind graph content and remain pointer-transparent. Interactive

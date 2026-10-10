@@ -173,6 +173,29 @@ impl Pane {
         }
     }
 
+    /// Insert at a post-removal index in the stack holding `target`, made active.
+    /// The caller has detached `member`; the stack index is clamped to its end.
+    pub(super) fn stack_into_at(
+        &mut self,
+        member: GraphMemberId,
+        target: GraphMemberId,
+        index: usize,
+    ) -> bool {
+        match self {
+            Pane::Stack(s) if s.members.contains(&target) => {
+                s.members.retain(|m| *m != member);
+                let index = index.min(s.members.len());
+                s.members.insert(index, member);
+                s.active = index;
+                true
+            },
+            Pane::Split { children, .. } => children
+                .iter_mut()
+                .any(|b| b.pane.stack_into_at(member, target, index)),
+            _ => false,
+        }
+    }
+
     /// Stack `member` into the stack holding `target`, made the active tab. Within the
     /// same stack it reorders `member` to just after `target`. Returns whether `target`
     /// was found. `member` must already be detached from elsewhere by the caller.
