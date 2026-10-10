@@ -479,6 +479,20 @@ The port/default-Graphshell boundaries pass. Evidence is preserved in
 and `targets/moot-conversation-wasm-cone.txt`. No GPU or browser run belongs to
 this receipt.
 
+The integration includes published `7bfb293df`, Graphshell's Tabard appearance
+and the shared asynchronous capture helper/Genet pin from `b513994ba`. Its new
+Graphshell control inventory confirms that source attributes and recorded edits
+still belong to the authoritative session; local attention is a separate concern.
+The earlier nineteen browser checks predate this appearance integration as well
+as the wheel correction. Fresh CPU checks are recorded separately from them;
+final browser qualification and publication remain held.
+
+The integrated CPU rerun passes all ten capsule tests, eleven browser-host
+tests and the thirty-two Comms/coop/conversation tests; strict consumer Clippy
+and the ordinary viewer check pass. The prepared capsule bundle is
+`targets/moot-capsule-readings-20261010-f`, with byte/source verification and
+an explicit held status. It has no browser check or capture receipt.
+
 ### Capsule peer and standalone-browser reproduction
 
 The following commands execute the earlier capsule-library proof. Start at the
