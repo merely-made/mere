@@ -34,6 +34,30 @@ done-conditions without taking over the active dynamics implementation or
 opening a new track. The field plan corrects the earlier assumption that a
 coupling selector already means membership in the field's extent.
 
+**Design ownership continuation (2026-10-10):** verified the projection
+grammar agent's notice against freshly fetched Mere `79115edd`. Mark's
+allocation is recorded in
+[published design language §9.14](https://github.com/merely-made/mere/blob/79115edd7b5b2c6ef7c14b8700dd2b66ecb49873/design_docs/2026-08-23_projection_scenes_and_graph_native_platform.md#914-design-work-ownership-2026-10-10).
+The dynamics lane owns visible explanations of contributions/constraints,
+script and motion authoring, force execution and runtime field actions.
+The projection grammar lane owns selection, inspection, ambient context,
+node/link/field editors and the user's field membership, extent, placement,
+influence and projection controls, including workbench/forme correspondence
+and overlapping-field inspection. Tabard's q-pc lane owns theme and typography.
+Scene authoring and presentation rules remain a research lane without an
+individual owner assigned by this allocation; preserve accepted R1 evidence.
+
+At the projection/dynamics seam, agree exact target identities, triggering
+events and emitted effects, and disclose applicable forces and constraints
+without silently retargeting. Ordinary additive forces compose; incompatible
+placement or state writers require explicit treatment. The accepted per-forme
+draft has unlock, scoped gesture undo/redo, discard to committed arrangement,
+and lock-and-apply as one undoable arrangement change. It does not snapshot
+document contents, playback or unrelated graph edits. Existing source,
+workbench and site viewer ownership, the B1/S2 sequence, F199's pause and
+qualification gates remain intact. This allocation is design ownership;
+it is not runtime completion or permission to reopen the coordinator's queue.
+
 ## Ruled continuation, 2026-10-10
 
 F200 to F202 are recorded verbatim in the dynamics grammar plan, committed
