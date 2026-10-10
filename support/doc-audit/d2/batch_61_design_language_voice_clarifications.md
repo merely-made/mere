@@ -65,6 +65,24 @@ duplicate README basenames; this pass adds no active doc or unknown record.
 No runtime code changed, and no build or browser gate ran.
 
 
+**Backdrop-cut correction (2026-10-10):** Mark rejects the Clear / Ambient /
+Props / Field cut: reset is an action; contextual ambient nodes and props are
+entity roles/classes; backdrop presentation and physical participation are
+independent. Canonical §9.13 and the editor/dynamics/ambiance follow-through
+record this correction. SE86's original words and minimum paint/contact
+receipts are preserved; its mode requirement is explicitly superseded.
+Source checks distinguish published `773a0dc2`'s visible/collidable and
+non-item-picking contract from the binder inspected at local `d572b322`.
+Decorative AmbientSim does not supply contextual discovery or interactive
+entity authority. Reset baseline, animation/script reset, recent-attention
+lifetime and legacy control migration remain open rather than inferred.
+Nine new local links/anchors resolve; whitespace checks pass. Complete
+doc-audit JSON matches the pre-edit baseline
+(`b93a685a2a57f5c1d029555fc44bec09116a6840fe8284f56c0c6d0075cf1daf`).
+D2 retains 252/259 coverage, seven existing missing records and duplicate
+README basenames, with no unknown supplemental record. No runtime source,
+viewer-owner files, build or browser qualification was changed by this pass.
+
 ## 2026-08-23_projection_scenes_and_graph_native_platform.md
 
 - disposition: current

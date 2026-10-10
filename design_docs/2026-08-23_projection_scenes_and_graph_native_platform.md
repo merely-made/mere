@@ -995,3 +995,64 @@ on one axis with representation or arrangement on another; the shipped grid's
 axis contract is not expanded by this proposal. Keep source material and access
 identities stable across comparisons, disclose live versus captured faces,
 and evaluate appearance and behavior together.
+
+### 9.13 Backdrop, context, props and reset (2026-10-10)
+
+**Mark's correction to the backdrop cut.** The earlier Clear / Ambient /
+Props / Field mode list mixes different concerns. Mark prefers Clear as a
+reset action: return the scene to its initial arrangement relative to its
+backdrop. Contextual ambient nodes and props are classes or roles of entities
+within a scene, with independently configurable presentation and behavior.
+This revises the consumer direction behind SE86, not the earlier mechanical
+backdrop receipts.
+
+| Concern | Direction |
+|---|---|
+| Reset | An action that restores an arrangement relative to the scene's backdrop. It is not another scenery mode. |
+| Ambient content | Contextual propositions about what is relevant to foreground entities; its display can be turned off. |
+| Props | Scene entities with authored attributes, presentation or scripted behavior, including objects relevant to contextualizing the content. Their display can be turned off. |
+| Backdrop | The scene's set, potentially with depth, animation and interaction, rather than only static wallpaper. |
+| Physical participation | Collision, forces and other behavior remain separately configured; being a prop or ambient entity does not decide tangibility. |
+
+Static wallpaper, animated scenery, interactive scenery and scenery with
+scripted entities are possible treatments. This is capability direction, not
+a mandatory ladder, four mutually exclusive modes or a claim of a shipped
+interactive-backdrop runtime. Turning off contextual content or props does
+not by itself specify collision or simulation participation. Define those
+controls by the effect they change rather than infer behavior from a class
+name. Context discovery, paint visibility, input interaction and physical
+participation are distinct questions.
+
+Mark describes the foreground as pinned, currently selected or recently
+interacted-with entities. This adds recent interaction to the foreground
+criteria in §9.2. Its duration and transition back to retained background
+membership remain to be designed; it does not repeal the previously selected
+material's availability until dismissed. Contextual relevance does not imply
+that an entity must be noninteractive, intangible or stored permanently.
+
+**Checked portable substrate at published Mere `773a0dc2`:**
+[Backdrop](../crates/cambium/scenes/sceno/src/scene.rs) already carries
+independent `visible` and `collidable` flags. It deliberately stays outside
+ordinary item picking. The canvas binder inspected separately at local main
+`d572b322` preserves that distinction, including invisible obstacles; its B1
+draft record is not a claim that this binder exists in the published baseline.
+Interactive props need a connection to scene entities and their existing
+input/action authority; painting a backdrop does not establish that connection.
+[AmbientSim](../crates/canvas/pictograph/src/canvas/ambient/mod.rs) is decorative
+animation, distinct from the contextual ambient nodes described here. Its
+advance/paint seam is not the interactive scenery or relation-lens contract.
+
+**Remaining design:** identify the reset baseline and what it restores.
+Resetting arrangement coordinates, rewinding animation and resetting a
+scripted world's state are separate effects. Their combination, camera and
+pin handling, undo and interaction with an open forme draft are not decided
+by renaming Clear to Reset. Depth and richer scenery also require a forcing
+consumer; today's portable 2D transform/footprint contract does not establish
+a complete spatial scene implementation.
+
+The [editor's B1 follow-through](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#b1--backdrops-in-the-graphshell-viewer-se86),
+[dynamics plan](mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md#backdrop-control-correction-2026-10-10)
+and [ambiance continuation](mere_docs/design/2026-09-23_ambiance_design.md#backdrop-and-context-distinction-2026-10-10)
+carry this correction. The shared design is recorded here; controls, legacy
+mode migration and richer input/runtime behavior remain implementation and
+design work with their existing owners.
