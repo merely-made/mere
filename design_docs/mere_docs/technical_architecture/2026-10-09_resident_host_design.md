@@ -1,7 +1,8 @@
 # Initial resident host design
 
 **Date:** 2026-10-09
-**Status:** Proposed for user review. This is not an approved implementation plan.
+**Status (2026-10-09):** Written spec approved by Mark. The concrete
+implementation plan is [written for review](../implementation_strategy/2026-10-09_resident_host_implementation_plan.md); implementation has not begun.
 
 This proposal belongs to the [graph semantics follow-ons](../implementation_strategy/2026-10-09_graph_semantics_followons_plan.md).
 It preserves the [bounded P1–P5 lane](../implementation_strategy/2026-10-04_graph_semantics_plan.md)
@@ -11,8 +12,8 @@ and its accepted semantic rulings, qualification and publication receipts.
 
 Graphshell/Djinn keep their existing owned complete GraphSession and add a
 ResidentGraph for presentation. Commands from that partial display go to the
-same writer; ResidentGraph remains immutable. This is the provisional first
-milestone, subject to user steering. The resident reader can retain fewer payloads,
+same writer; ResidentGraph remains immutable. Mark approved this first
+milestone on 2026-10-09. The resident reader can retain fewer payloads,
 but the host process still holds the complete writer, baseline and history.
 Candidate/replay cloning can increase the peak. Report process memory separately
 from reader-record savings; this milestone makes no bounded-process-memory claim.

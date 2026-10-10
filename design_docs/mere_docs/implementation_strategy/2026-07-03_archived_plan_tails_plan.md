@@ -50,7 +50,7 @@ linked suite passes 91 tests and Mere passes 54, with feature-free/workspace and
 both query wasm checks green. Fresh review's one Important direction-matching
 regression is repaired and requalified. Only three unreachable packages and
 unused canonicalization feature edges leave the lock; surviving package versions
-and checksums are unchanged. Publication is pending user approval. Historical
+and checksums are unchanged. Published after user approval at `a8889f60e`. Historical
 receipts above remain historical; these counts describe the new source gates.
 
 Term dictionaries/interned slotmaps remain separately gated in the existing
