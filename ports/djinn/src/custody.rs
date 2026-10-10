@@ -396,7 +396,7 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
                 &keys,
             )?;
             tracing::info!(app = %app, keys = released.len(), "released epoch keys");
-            Ok(CustodyAnswer::EpochKeys(released))
+            Ok(CustodyAnswer::EpochKeys { keys: released })
         },
         CustodyCall::WatchLock { seen } => {
             let mut lock = keeper.lock_state();
