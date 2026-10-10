@@ -2640,6 +2640,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "document-canvas"
+version = "0.1.0"
+dependencies = [
+ "genet-parley",
+ "inker",
+ "paint_list_api",
+ "serde",
+]
+
+[[package]]
 name = "document-features"
 version = "0.2.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3695,6 +3705,7 @@ dependencies = [
  "notochord",
  "pandect",
  "personae",
+ "platen",
  "sceno",
  "scenograph",
  "scenomise",
@@ -3761,6 +3772,7 @@ dependencies = [
  "wasm-bindgen-futures",
  "web-sys",
  "wgpu",
+ "workbench",
 ]
 
 [[package]]
@@ -6072,6 +6084,22 @@ name = "plain"
 version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b4596b6d070b27117e987119b4dac604f3c58cfb0b191112e24771b2faeac1a6"
+
+[[package]]
+name = "platen"
+version = "0.0.1"
+dependencies = [
+ "accesskit",
+ "document-canvas",
+ "inker",
+ "mere-forme",
+ "serde",
+ "serde_json",
+ "tracing",
+ "uuid",
+ "uxtree",
+ "workbench",
+]
 
 [[package]]
 name = "pliron"

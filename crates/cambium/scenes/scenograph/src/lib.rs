@@ -21,6 +21,7 @@ pub mod dataset;
 pub mod dynamics;
 pub use dynamics::{DynamicsSlot, DynamicsVariant, DYNAMICS_SLOT_VERSION};
 pub mod options;
+pub mod presentation;
 pub mod relationship;
 pub mod swatch;
 

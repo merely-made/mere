@@ -133,7 +133,7 @@ fn tree_stylesheet(appearance: &str) -> String {
     let applet_sheet = applet::SHEET;
     #[cfg(not(feature = "applets"))]
     let applet_sheet = "";
-    format!("{SHEET}\n{applet_sheet}\n{appearance}")
+    format!("{SHEET}\n{}\n{applet_sheet}\n{appearance}", forme_sheet())
 }
 
 /// What the page, its producer and its hooks share.
@@ -483,6 +483,10 @@ impl TextureProducer for CanvasProducer {
 
 /// The application state the tree renders.
 pub(crate) struct TreePage {
+    #[cfg(feature = "product")]
+    forme: Option<forme::Pane>,
+    #[cfg(feature = "product")]
+    forme_error: Option<String>,
     #[cfg(feature = "applets")]
     applet_seen: u64,
     #[cfg(feature = "applets")]
@@ -618,16 +622,26 @@ fn view(page: &TreePage) -> Child {
     } else {
         width.max(1)
     };
-    // The wheel and touch over the graph are the page's gestures
-    // (`gestures`), taken before the host hears of them.
+    // Wheel and touch remain the page's gestures; hover uses target-local coordinates.
     let graph = on_key(
         on_pointer(
-            custom_leaf::<TreePage, ()>(CANVAS_KEY, canvas_width, 1)
-                .attr("class", "tree-canvas")
-                .attr("role", "img")
-                // Mirror retained graph focus in the browser semantic tree.
-                .attr("tabindex", "0")
-                .attr("aria-label", "Graph"),
+            cambium::on_hover(
+                custom_leaf::<TreePage, ()>(CANVAS_KEY, canvas_width, 1)
+                    .attr("class", "tree-canvas")
+                    .attr("role", "img")
+                    .attr("tabindex", "0")
+                    .attr("aria-label", "Graph"),
+                |page: &mut TreePage, event: cambium::HoverEvent| {
+                    let (x, y) = if event.phase == cambium::HoverPhase::Leave {
+                        (-10000., -10000.)
+                    } else {
+                        event.local
+                    };
+                    page.shared.canvas.borrow_mut().cursor_moved(x, y);
+                    page.shared.dirty.set(true);
+                    event.defer_rebuild();
+                },
+            ),
             |page: &mut TreePage, event: cambium::PointerEvent| page.pointer(event),
         ),
         |page: &mut TreePage, event: cambium::KeyEvent| {
@@ -648,11 +662,16 @@ fn view(page: &TreePage) -> Child {
                 hosted_dataset(page),
                 grouping::controls(page),
                 controls::toolbar(page),
+                forme_toolbar(page),
                 el(
                     "div",
                     (
                         product::controls(page),
-                        el("div", graph).attr("class", "tree-graph"),
+                        el(
+                            "div",
+                            forme_workbench(page).unwrap_or_else(|| Box::new(graph)),
+                        )
+                        .attr("class", "tree-graph"),
                         if docked {
                             Some(tools_region(page))
                         } else {
@@ -695,6 +714,8 @@ fn tools_region(page: &TreePage) -> Child {
         ));
     }
     children.push(physics::section(page));
+    #[cfg(feature = "product")]
+    children.push(forme::section(page));
     children.push(remote::section(page));
     Box::new(
         el("aside", children)
@@ -855,6 +876,19 @@ async fn boot(root: Element) -> Result<(), String> {
     } else {
         product::open().await?
     };
+    #[cfg(feature = "product")]
+    let (mut forme, mut forme_error) = match &product {
+        Some(p) => match forme::Pane::open(p).await {
+            Ok(pane) => (Some(pane), None),
+            Err(error) => (
+                None,
+                Some(format!(
+                    "Workbench could not be restored · {error}. The saved record has been retained."
+                )),
+            ),
+        },
+        None => (None, None),
+    };
     let mut dataset = HostedDataset::None;
     let mut grouping = None;
     let mut hosted_history = None;
@@ -943,10 +977,15 @@ async fn boot(root: Element) -> Result<(), String> {
         .appearance
         .borrow()
         .apply_canvas(&mut shared.canvas.borrow_mut());
-    // Reduced motion: the graph stays where it was placed until the reader
-    // plays physics.
     if shared.reduced_motion() {
         shared.canvas.borrow_mut().set_physics_paused(true);
+    }
+    #[cfg(feature = "product")]
+    if let Some(pane) = &forme {
+        if let Err(error) = pane.install(&mut shared.canvas.borrow_mut()) {
+            forme_error = Some(format!("Workbench could not be projected · {error}"));
+            forme = None;
+        }
     }
     if let Some(slice) = controls::meaning_slice()? {
         shared.canvas.borrow_mut().set_meaning_slice(slice);
@@ -974,6 +1013,10 @@ async fn boot(root: Element) -> Result<(), String> {
         options,
         move |_window, _commands, _wake| Init {
             state: TreePage {
+                #[cfg(feature = "product")]
+                forme,
+                #[cfg(feature = "product")]
+                forme_error,
                 #[cfg(feature = "applets")]
                 applet_seen: 0,
                 #[cfg(feature = "applets")]
@@ -1001,7 +1044,6 @@ async fn boot(root: Element) -> Result<(), String> {
             },
             logic: view as Logic,
             sheet: initial_sheet,
-
             // A browser lends genet no system faces, so the page brings one.
             fonts: vec![HostFont {
                 family: None,
@@ -1109,6 +1151,14 @@ fn hooks(shared: Rc<Shared>) -> HostHooks<TreePage, Logic, Child> {
                     .as_ref()
                     .is_some_and(|product| product.selection_locked()),
             );
+            #[cfg(feature = "product")]
+            if ctx.runner.state().forme.as_ref().is_some_and(|f| f.ready()) {
+                ctx.runner.update(|page| {
+                    if let Some(f) = &mut page.forme {
+                        f.poll();
+                    }
+                });
+            }
             // The remote session moves outside the runner (its channel's
             // pumps); rebuild the view when it has.
             let (generation, linked) = {
@@ -1316,6 +1366,8 @@ impl NoRepulsionLane for mere::canvas::Canvas {
 #[cfg(feature = "applets")]
 mod applet;
 mod controls;
+#[cfg(feature = "product")]
+mod forme;
 mod gesture_steps;
 mod gestures;
 mod grouping;
@@ -1340,3 +1392,28 @@ pub(crate) fn connect_remote(signal_url: String, invite: Option<String>) -> Resu
     remote::connect(signal_url, invite)
 }
 use lane::TreeLane;
+
+fn forme_toolbar(page: &TreePage) -> Child {
+    #[cfg(feature = "product")]
+    return forme::toolbar(page);
+    #[cfg(not(feature = "product"))]
+    {
+        let _ = page;
+        Box::new(el("span", ()))
+    }
+}
+fn forme_workbench(page: &TreePage) -> Option<Child> {
+    #[cfg(feature = "product")]
+    return forme::workbench(page);
+    #[cfg(not(feature = "product"))]
+    {
+        let _ = page;
+        None
+    }
+}
+fn forme_sheet() -> String {
+    #[cfg(feature = "product")]
+    return format!("{}{}", cambium::FRISKET_CSS, forme::SHEET);
+    #[cfg(not(feature = "product"))]
+    String::new()
+}

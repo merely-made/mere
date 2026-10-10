@@ -35,13 +35,18 @@ Mere `7bfb293d`: the projection grammar's encoding/representation boundary,
 Forme's geometry-free semantic arrangement, Platen's layout-to-`TileTree`
 projection, Scenomise's card realization and the suite's host/session ownership.
 Mosaic and Vega-Lite's official references support coordination and conditional
-encodings, not a Mere rule schema or execution grant. The canonical §9.10 and
+encodings, not a Mere rule schema or execution grant. The canonical §9.12 and
 editor/field follow-through retain proposal status, the existing work order
 and overlap/lock forks. No new palette decision, SE ruling or runtime receipt
 is inferred. Ten new local links and heading anchors resolve; whitespace
 checks pass. Complete doc-audit JSON is unchanged from the same checkout's
 baseline (`e563d41bb9a4c6b077b76232c65a0fe9bd01d90827f4c23885059afde5c13982`).
 No build or browser gate ran.
+
+**Concurrent-record reconciliation (2026-10-10):** the accepted presentation-rule
+record is §9.10; the richer mixed-content proposal above is now §9.12. The bounded
+Workbench Forme implementation and its separate qualification are tracked in the
+Scenograph editor plan. That bridge does not qualify the richer study.
 
 **Forme-draft agreement (2026-10-10):** Mark accepted scoped draft undo/redo,
 Discard changes and Lock and apply after explaining the node-as-tile-handle
@@ -58,6 +63,7 @@ matches the pre-edit baseline
 D2 remains at 252/259 coverage with seven pre-existing missing records and
 duplicate README basenames; this pass adds no active doc or unknown record.
 No runtime code changed, and no build or browser gate ran.
+
 
 ## 2026-08-23_projection_scenes_and_graph_native_platform.md
 

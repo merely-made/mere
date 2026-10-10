@@ -128,6 +128,7 @@ impl Canvas {
         // Host time for this frame, or one tick when the host gives none.
         let dt = elapsed.map_or(seiche::TICK_DT, |(elapsed, _)| elapsed.as_secs_f32());
 
+        self.apply_forme_region();
         // Advance physics (the in-thread tick, or the freshest actor snapshot)
         // into the read model, and learn whether the layout is still settling.
         // Everything below reprojects from the view — never the rapier world.
@@ -153,6 +154,7 @@ impl Canvas {
         // A playing graph come to rest replaces Settled and sends anchored
         // items home (G7, F30, F45).
         self.advance_roles();
+        self.apply_forme_region();
         // Pick up any finished off-thread community partition (a no-op when computing inline), so a
         // result dispatched on an earlier frame lands before the rings paint. (Graph signals — P3.)
         self.drain_community();
@@ -284,6 +286,7 @@ impl Canvas {
             self.active_field(),
             self.hidden_field_ids(),
         ));
+        underlay.splice_world_underlay(self.forme_overlay());
         underlay.splice_world_overlays(relation_cell_overlay(
             &self.graph,
             &self.view,
