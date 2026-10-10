@@ -855,3 +855,33 @@ an extension sidecar and a native-owned attached session have separate storage,
 capability and lifecycle boundaries. Existing owner plans retain those choices:
 `merelyllc.com/docs/2026-09-30_graphshell_site_canvas_plan.md` and
 `turnstone/design_docs/2026-10-06_unusual_protocols_browser_plan.md`.
+
+### 11.1 Renderer choice for composed applications (2026-10-10)
+
+**Status:** source assessment and upstream review; no CPU/Hybrid application
+parity or automatic fallback is qualified. The pinned Netrender `9607d16f`
+exposes optional `vello-cpu` and `vello-hybrid` adapters. Its shared sparse
+lowering admits geometry, gradients, transforms, clips and layers, but refuses
+image/pattern hydration, glyph resources and retained fragments. Graphshell's
+current host uses Classic; merely enabling the optional features cannot render
+its full application scenes. These are integration limits, not limits of the
+upstream renderers. The three coherent Classic patch crates (`netrender-vello`,
+`vello_encoding`, `vello_shaders`) are distinct from the three renderer choices.
+
+[Upstream's current renderer guidance](https://github.com/linebender/vello#choose-a-renderer)
+identifies CPU as its most mature software renderer and Vello GPU as a CPU path
+preprocessor with GPU raster/compositing that does not require compute shaders.
+The original compute renderer remains experimental under `research/`. Our
+pinned sparse GPU adapter still uses the Hybrid name. This source assessment
+does not update pins or establish compatibility with current upstream APIs.
+
+The bounded follow-up is to hydrate the same Scene's text, image and retained
+resources for the optional adapters, then compare a real Cambium application
+through CPU output and the independent sparse GPU path. Explicit backend
+admission must refuse unsupported scene operations rather than omit content.
+Qualify fonts, images, clips, composition, resize and input/accessibility against
+that shared scene before routing ordinary applications to another backend.
+CPU raster output can provide an independent visual control and export path;
+host upload/presentation and recovery after a driver reset need separate
+qualification. Backend selection must preserve guest/session authority, drafts
+and selection; it must not turn a rendering failure into a new applet grant.

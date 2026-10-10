@@ -366,9 +366,10 @@ the successful fast-forward push.
 
 ### Independent capsule readings continuation (2026-10-09)
 
-**Status (2026-10-10):** final narrow scroll and reading qualification waits
-for the coordinated browser GPU slot. Source/CPU results below are recorded
-separately from browser acceptance.
+**Status (2026-10-10):** all twenty browser checks pass on the repaired Classic
+renderer, with five inspected captures. Source and bundle hashes match the
+qualified `6a10ad673` source. Main publication follows this completed receipt;
+the historical held and failed candidates below remain separate evidence.
 The continuation starts from published `3055ae5af`. The
 [design language §9.2–9.3](../../2026-08-23_projection_scenes_and_graph_native_platform.md#92-selection-foreground-and-ambient-context)
 separates attention, activity, presentation and keeping, and distinguishes two
@@ -451,6 +452,36 @@ publication. The earlier `20261010-g` artifact remains unchanged. The updated
 document audits add no subjects relative to the fetched `3808c5a22` baseline;
 existing coverage/index/header/ledger findings are retained.
 
+The final reconciliation includes Mere main `ef88b7739`, the Dramatis extraction,
+Knot `fef132ef`, and the existing Vello `10f01d6d` repair. Candidate
+`targets/moot-capsule-readings-20261010-i` passed ten browser checks before its
+narrow reachability assertion failed. Its nonblank capture showed the control
+inside the viewport: Rootstock's semantic projection still used unscrolled
+layout bounds while paint and pointer input used retained scroll planes. A new
+regression reproduces that disagreement for nested and document scrolling.
+Rootstock now derives projection bounds from the same `painted_rect` geometry;
+names, focus and identity-dispatched semantic actions remain intact. No shader
+or renderer implementation changed in this correction.
+
+The corrected candidate `targets/moot-capsule-readings-20261010-j` passed all
+twenty checks in one bounded headed Chrome `152.0.7977.83` run on AMD `gcn-5`,
+with `isFallbackAdapter=false`, no page/console errors and no new or modified
+GPU reset report. All five captures were inspected. At 520 by 1120 the scrolled
+Close control's semantic rectangle is `(33, 1057, 103, 30)` and pointer selection
+updates the intended reading. Browser and local server exited; the watchdog
+receipt records no remaining owned processes. `verification.json` binds the
+receipt to source, browser bundle, signed component and preserved fixture hashes.
+This run reuses the earlier peer/native fixture; it does not repeat transport
+acceptance. The failed `20261010-i` receipt is preserved unchanged apart from
+its explicit failure status.
+
+Renewed focused qualification passes ten capsule tests, eleven browser-host
+CPU tests, the applet Wasm build, ordinary viewer Wasm check, and port/default-web
+boundaries. The scroll regression fails before the correction and passes after
+it; the full Rootstock suite passes 75 tests, including its GPU producer tests.
+The existing Comms/coop/encrypted-conversation checks pass 32 tests and default
+Moot Wasm compilation passes. GPU producer tests are not a CPU-only receipt.
+
 ### Moot conversation and coop continuation (2026-10-10)
 
 **Status:** implementation and CPU receipt complete. Product browser and
@@ -509,7 +540,15 @@ their own receipts complete; no browser or GPU run belongs to this change.
 
 Publication of this CPU-qualified conversation slice completed on main at
 `4e1811578`; its remote hash was verified. The held readings continuation is
-separate and remains unpublished.
+separate; its completed browser receipt is recorded above.
+
+The next presentation slice should mount the derived conversation and coop
+states in Graphshell through normal Cambium controls: independent conversation
+selection and drafts, explicit send intent, and owner-confirmed success/refusal.
+The actual Commons owner must recheck current authority and keys at dispatch;
+observation does not grant permission. Use design language §9.8–9.9 to keep
+attention and per-view editing separate from shared records. Presence, media
+and a general applet ABI still require their own concrete owners and receipts.
 
 ### Capsule peer and standalone-browser reproduction
 
