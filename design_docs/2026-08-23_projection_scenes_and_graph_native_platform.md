@@ -1056,3 +1056,39 @@ and [ambiance continuation](mere_docs/design/2026-09-23_ambiance_design.md#backd
 carry this correction. The shared design is recorded here; controls, legacy
 mode migration and richer input/runtime behavior remain implementation and
 design work with their existing owners.
+
+### 9.14 Design work ownership (2026-10-10)
+
+**Mark's allocation of the remaining design work:**
+
+| Work | Owner and scope |
+|---|---|
+| Scene authoring and presentation rules | A research lane; no individual owner named in this allocation. Carry forward the accepted rule direction and R1 evidence while researching broader authoring. |
+| Theme and typography roles | Tabard agent on q-pc. Editable theme definitions, semantic roles and typography customization. |
+| Selection, inspection and ambient context | Projection grammar agent, this conversation. Fundamentals are established; concentrate on remaining integration and concrete controls rather than another foundational design round. |
+| Field authoring and behavior | Projection grammar agent, this conversation. Membership, extent, placement, influence and projection, including the workbench/forme correspondence. |
+| Node, link and field editors | Projection grammar agent, this conversation. Inspect and edit the intended entity or occurrence through its existing authority. |
+| Visible dynamics explanations | Dynamics agent. Disclose applicable contributions, constraints and their effects through inspectable visual explanations. |
+| Script and motion authoring | Dynamics agent. Scripted behavior and authored motion, including the runtime side of field actions. |
+
+This allocation does not reopen the established distinction between selection,
+inspection and explicit open/focus. Deselection preserves edits; attention is
+separate from keeping, and foreground pins are separate from position pins.
+The [ambiance design](mere_docs/design/2026-09-23_ambiance_design.md) and
+Scenograph's selection rulings remain the starting contracts. Residual gesture,
+retention and linked-appearance integration should resolve specific gaps.
+
+For fields and primitive editors, the next design pass should make the
+inspect/configure loop concrete: which identity is edited, which members are
+affected, which placement constraints apply, and how overlapping fields are
+explained. Ordinary additive forces already compose; incompatible placement
+or state writers need explicit treatment. The agreed forme draft in §9.11
+supplies unlock, scoped undo/redo, discard and lock-and-apply behavior.
+
+Field authoring owns how a user selects members and configures a field's
+effects. The dynamics lane owns force execution, visual explanations and the
+script/motion authoring seam; their interface must describe targets, events
+and effects consistently. Theme values and font roles come from Tabard.
+Graphshell remains the reference host. Existing source authority, workbench
+arrangement ownership and site viewer ownership are preserved. This is a
+design allocation, not a new runtime receipt or a dispatch to another agent.

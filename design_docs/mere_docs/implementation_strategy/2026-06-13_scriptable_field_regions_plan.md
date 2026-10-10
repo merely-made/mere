@@ -40,6 +40,20 @@ governing a region of space.
 
 ## Expanded field direction (2026-10-09; research, not implemented)
 
+**Design owner assigned 2026-10-10:** Mark assigns field authoring and behavior,
+and node/link/field editors, to the projection grammar agent in the current
+conversation. The [shared allocation](../../2026-08-23_projection_scenes_and_graph_native_platform.md#914-design-work-ownership-2026-10-10)
+places visible dynamics explanations and script/motion authoring with the
+dynamics agent, and theme/typography roles with Tabard on q-pc.
+
+The field design pass should specify the user's membership/extent controls,
+placement/influence/projection controls and overlapping-field inspection.
+The forme case carries the agreed scoped draft and discard model. A concrete
+editor design is ready when its walkthrough identifies the edited entity,
+affected members, owning writes, draft/apply/discard behavior and explanations
+for conflicting constraints. Force and script execution stay with their
+existing owners; this allocation does not qualify a runtime implementation.
+
 The [design language §9.8](../../2026-08-23_projection_scenes_and_graph_native_platform.md#98-voice-clarifications-and-research-boundaries-2026-10-09)
 records Mark's clarification: fields participate in a scene and can apply an
 arrangement, dynamics or a projection to affected material. Scripting includes

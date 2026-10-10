@@ -707,7 +707,7 @@ is historical evidence, not the current path or ownership inventory. For the wor
 
 ## Working principles
 
-- **Configurable presentation, stable meaning (2026-10-09):** learnable behavior and user control carry the shared design language across apps. Themes and installed fonts are configurable; defaults are starting points. Keep foreground pins, position pins, anchors and forme layout locks distinct, and preserve the resource/surface identity boundary. See the [design language record](2026-08-23_projection_scenes_and_graph_native_platform.md#9-configurable-visual-and-interaction-language-2026-10-09).
+- **Configurable presentation, stable meaning (2026-10-09):** learnable behavior and user control carry the shared design language across apps. Themes and installed fonts are configurable; defaults are starting points. Keep foreground pins, position pins, anchors and forme layout locks distinct, and preserve the resource/surface identity boundary. See the [design language record](2026-08-23_projection_scenes_and_graph_native_platform.md#9-configurable-visual-and-interaction-language-2026-10-09). The [2026-10-10 design allocation](2026-08-23_projection_scenes_and_graph_native_platform.md#914-design-work-ownership-2026-10-10) assigns theme/typography to Tabard on q-pc, field and primitive editors to the projection grammar agent, and visible dynamics plus script/motion authoring to the dynamics agent; selection fundamentals are established, and broader scene authoring remains a research lane.
 
 - **Projected topology**: a live Surface changing its shown Resource changes the links a view reads, even when the Surface edge table is unchanged. Recorded URL replay retains its recorded binding. Cache keys and tests must distinguish these operations.
 
