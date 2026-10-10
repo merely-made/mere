@@ -191,14 +191,12 @@ impl Canvas {
     }
 
     /// Whether `key` is individually visible in the current Canvas view. The
-    /// scope lens is applied first; an active fold then substitutes its source
-    /// members with a synthetic summary body. The host's gnode builder uses this
-    /// too, so its DOM path matches the scene paint path. (Graph curation C3.)
+    /// scope lens is applied first; a current fold then hides its members but
+    /// a member stand-in, which stays drawn with its "+N". The host's gnode
+    /// builder uses this too, so its DOM path matches the scene paint path.
+    /// (Graph curation C3; mer3ly site plan, Ruling 166.)
     pub fn node_in_scope(&self, key: NodeKey) -> bool {
-        self.scope.as_ref().is_none_or(|s| s.contains(&key))
-            && self
-                .active_fold_projection()
-                .is_none_or(|projection| !projection.members.contains(&key))
+        self.scope.as_ref().is_none_or(|s| s.contains(&key)) && !self.fold_hides(key)
     }
 
     /// Zoom by `factor`, keeping the world point under `anchor` (screen px) fixed.
