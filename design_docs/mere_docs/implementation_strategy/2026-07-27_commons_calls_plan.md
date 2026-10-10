@@ -12,7 +12,7 @@ also waits on the open question at the end of this plan: which noun owns a
 call.
 **Depends on:** the
 [Commons profile](../design/2026-07-27_commons_profile_v1.md), the
-[Notochord session spine](../../archive_docs/2026-08-06_completed_plans/2026-07-26_notochord_session_policy_spine_plan.md),
+Notochord session spine (`repos/dramatis/design_docs/archive_docs/2026-08-06_completed_plans/2026-07-26_notochord_session_policy_spine_plan.md`),
 the real `mere-transport` carriers, and Turnstone's
 [peer-web reframe](../../../../turnstone/design_docs/2026-07-28_turnstone_peer_web_reframe.md).
 
@@ -210,7 +210,7 @@ selects no audio device or codec dependency; that remains A2's measured probe.
 **Seams:**
 
 - `crates/murm/transport/src/accepted.rs`
-- `crates/system/notochord/src/io.rs`
+- `repos/dramatis/crates/notochord/src/io.rs`
 - `turnstone/src/call.rs`, beside Turnstone's place port
 
 A1 starts only after the place-port plan's **T5** headed receipt, not merely

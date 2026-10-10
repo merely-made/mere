@@ -225,6 +225,14 @@ impl Canvas {
         )
     }
 
+    /// A displayed node's current world coordinate, independent of the camera.
+    /// Hosts use this to retain placement when expanding view-local groups.
+    pub fn world_position_of(&self, node: NodeKey) -> Option<PortablePoint> {
+        self.view
+            .position_of(node)
+            .map(|p| PortablePoint::new(p.x, p.y))
+    }
+
     /// Where the single focused node sits in screen px, if exactly one is
     /// focused. What a host reports so a receipt can aim at it.
     pub fn focused_screen_position(&self) -> Option<(f32, f32)> {

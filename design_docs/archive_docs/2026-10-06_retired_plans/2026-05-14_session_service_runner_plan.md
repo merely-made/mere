@@ -119,7 +119,7 @@ The `InMemoryRunner` (in `#[cfg(test)]` plus exported for downstream test crates
 
 The trait is intentionally synchronous and accepts owned ids — both choices keep it remotable. A future `RemoteRunner` impl over IPC matches this shape directly. Errors are values not panics for the same reason: remote-edge failures must be expressible without unwinding across the IPC boundary.
 
-**Open, raised by the S14 pass (2026-10-06):** the [dramatis tier architecture](../../dramatis_docs/technical_architecture/2026-09-30_dramatis_tier_architecture.md)'s ruling 6 makes feed polling a job on djinn's resident scheduler. How does `SessionServiceRunner` relate to that scheduler? Options: the runner stays the session-worker contract; djinn's scheduler supersedes it; both, scoped apart.
+**Open, raised by the S14 pass (2026-10-06):** the dramatis tier architecture (`repos/dramatis/design_docs/2026-09-30_dramatis_tier_architecture.md`)'s ruling 6 makes feed polling a job on djinn's resident scheduler. How does `SessionServiceRunner` relate to that scheduler? Options: the runner stays the session-worker contract; djinn's scheduler supersedes it; both, scoped apart.
 
 ## 8. Open questions
 

@@ -11,7 +11,7 @@ Gemini publication service was implemented and receipted outside that gate on
 **Date:** 2026-08-22
 **Amended:** 2026-09-04, notification ownership name corrected; 2026-10-01,
 Gazette row added (Mark's ruling 6 in the
-[dramatis tier architecture](../../dramatis_docs/technical_architecture/2026-09-30_dramatis_tier_architecture.md))
+dramatis tier architecture (`repos/dramatis/design_docs/2026-09-30_dramatis_tier_architecture.md`))
 
 **Related:**
 
