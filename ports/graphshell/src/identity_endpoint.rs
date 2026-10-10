@@ -522,6 +522,7 @@ impl<S: IdentityStorage + 'static> IdentityEndpoint<S> {
             session: self.session(),
             scene,
             presentation,
+            coverage: None,
             cache_policy: CachePolicy {
                 retention: CacheRetention::Exportable,
                 expires_at_ms: None,

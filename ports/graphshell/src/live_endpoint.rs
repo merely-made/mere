@@ -280,6 +280,7 @@ impl ProjectionSource for LiveEndpoint {
             scene: SceneSnapshot::from_dense(EPOCH, self.revision, self.scene.clone())
                 .expect("the live fixture scene is always valid"),
             presentation: self.manifest(),
+            coverage: None,
             cache_policy: CachePolicy::default(),
         })
     }

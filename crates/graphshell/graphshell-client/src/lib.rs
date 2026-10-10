@@ -43,6 +43,8 @@ pub struct MountedScene {
     pub scene: SceneSnapshot,
     pub presentation: PresentationManifest,
     pub cache_policy: CachePolicy,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub coverage: Option<chirograph::PortableCoverageV1>,
 }
 
 /// A decoded representation plus the semantics that survive fallback.
@@ -277,6 +279,7 @@ impl ClientState {
             scene: snapshot.scene,
             presentation: snapshot.presentation,
             cache_policy: snapshot.cache_policy,
+            coverage: snapshot.coverage,
         };
         validate_presentation(&mounted).map_err(SnapshotApplyError::InvalidPresentation)?;
         let advertised = mounted
@@ -678,6 +681,7 @@ impl ClientState {
     pub fn mark_expired(&mut self, session: &ProjectionSession) {
         if let Some(mounted) = self.mounted.get_mut(session) {
             mounted.status = SessionStatus::Expired;
+            mounted.coverage = None;
         }
     }
 
@@ -685,6 +689,7 @@ impl ClientState {
     pub fn mark_revoked(&mut self, session: &ProjectionSession) {
         if let Some(mounted) = self.mounted.get_mut(session) {
             mounted.status = SessionStatus::Revoked;
+            mounted.coverage = None;
             if mounted.cache_policy.purge_on_revocation {
                 self.resources.retain(|(owner, _), _| owner != session);
             }
@@ -923,12 +928,63 @@ mod tests {
             scene: SceneSnapshot::from_dense(SceneEpoch(1), Revision(4), scene_with_one_item())
                 .unwrap(),
             presentation,
+            coverage: None,
             cache_policy: CachePolicy {
                 retention,
                 expires_at_ms: None,
                 purge_on_revocation: true,
             },
         }
+    }
+
+    #[test]
+    fn context_only_coverage_updates_preserve_cached_resources() {
+        use chirograph::{PortableCoverageLayerV1, PortableCoverageLimitV1, PortableCoverageV1};
+        let session = ProjectionSession("resident:coverage".into());
+        let bytes = serde_json::to_vec(&NativeGlyphV1 {
+            label: "One".into(),
+            icon: None,
+            color: None,
+        })
+        .unwrap();
+        let mut snapshot = snapshot_with_offer(
+            &session,
+            PresentationCodec::NativeGlyphV1,
+            PresentationCapability::NativeGlyph,
+            semantics("One", SemanticRole::Graphic),
+            &bytes,
+            CacheRetention::MemoryOnly,
+        );
+        snapshot.coverage = Some(PortableCoverageV1::default());
+        let hash = ContentHash::of(&bytes);
+        let mut client = ClientState::default();
+        client.apply_snapshot(snapshot.clone()).unwrap();
+        client
+            .apply_resource(ResourceResponse::new(session.clone(), bytes.clone()))
+            .unwrap();
+        snapshot.scene.revision = Revision(snapshot.scene.revision.0 + 1);
+        snapshot.coverage = Some(PortableCoverageV1 {
+            limits: vec![PortableCoverageLimitV1 {
+                layer: PortableCoverageLayerV1::Residency,
+                reason: "not loaded".into(),
+                surfaces: vec!["00000000-0000-0000-0000-000000006001".into()],
+                resources: vec![],
+                count: Some(1),
+            }],
+        });
+        client.apply_snapshot(snapshot.clone()).unwrap();
+        assert_eq!(
+            client.mounted(&session).unwrap().coverage,
+            snapshot.coverage
+        );
+        assert_eq!(
+            client.mounted(&session).unwrap().scene.tables,
+            snapshot.scene.tables
+        );
+        assert_eq!(client.resources.get(&(session.clone(), hash)), Some(&bytes));
+        snapshot.coverage = None;
+        client.apply_snapshot(snapshot).unwrap();
+        assert_eq!(client.mounted(&session).unwrap().coverage, None);
     }
 
     #[test]
@@ -1512,6 +1568,69 @@ mod tests {
                 content: ResolvedContent::NativeGlyph(glyph_value)
             })
         );
+    }
+
+    #[test]
+    fn persisted_coverage_defaults_old_records_and_session_end_clears_it() {
+        let session = ProjectionSession("coverage:persist".into());
+        let bytes = serde_json::to_vec(&NativeGlyphV1 {
+            label: "Kept".into(),
+            icon: None,
+            color: None,
+        })
+        .unwrap();
+        let mut snapshot = snapshot_with_offer(
+            &session,
+            PresentationCodec::NativeGlyphV1,
+            PresentationCapability::NativeGlyph,
+            semantics("Kept", SemanticRole::Graphic),
+            &bytes,
+            CacheRetention::EncryptedPersistent,
+        );
+        snapshot.coverage = Some(chirograph::PortableCoverageV1::default());
+        let mut client = ClientState::default();
+        client.apply_snapshot(snapshot.clone()).unwrap();
+        client
+            .apply_resource(ResourceResponse::new(session.clone(), bytes.clone()))
+            .unwrap();
+        let mut store = MemoryStore {
+            encrypted: true,
+            ..MemoryStore::default()
+        };
+        client.persist_session(&session, 10, &mut store).unwrap();
+        let mut restored = ClientState::default();
+        restored.restore_session(&session, 11, &store).unwrap();
+        assert_eq!(
+            restored.mounted(&session).unwrap().coverage,
+            snapshot.coverage
+        );
+        let mut old_record: serde_json::Value =
+            serde_json::from_slice(&store.records[&session]).unwrap();
+        old_record["mounted"]
+            .as_object_mut()
+            .unwrap()
+            .remove("coverage");
+        store
+            .records
+            .insert(session.clone(), serde_json::to_vec(&old_record).unwrap());
+        restored.restore_session(&session, 11, &store).unwrap();
+        assert_eq!(restored.mounted(&session).unwrap().coverage, None);
+        assert_eq!(
+            restored
+                .resources
+                .get(&(session.clone(), ContentHash::of(&bytes))),
+            Some(&bytes)
+        );
+        restored.apply_snapshot(snapshot.clone()).unwrap();
+        restored.mark_expired(&session);
+        assert_eq!(restored.mounted(&session).unwrap().coverage, None);
+        restored.apply_snapshot(snapshot.clone()).unwrap();
+        restored.mark_revoked(&session);
+        assert_eq!(restored.mounted(&session).unwrap().coverage, None);
+        assert!(restored.resources.is_empty());
+        restored.apply_snapshot(snapshot).unwrap();
+        restored.forget_session(&session);
+        assert!(restored.mounted(&session).is_none());
     }
 
     #[test]

@@ -431,7 +431,35 @@ impl Default for CachePolicy {
     }
 }
 
-/// A complete epoch-preserving scene snapshot plus its presentation sidecar.
+/// Reported limits of the supplied graph, never a claim of world completeness.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum PortableCoverageLayerV1 {
+    Possession,
+    Residency,
+    Disclosure,
+    Synchronization,
+    Projection,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PortableCoverageLimitV1 {
+    pub layer: PortableCoverageLayerV1,
+    pub reason: String,
+    #[serde(default)]
+    pub surfaces: Vec<String>,
+    #[serde(default)]
+    pub resources: Vec<String>,
+    #[serde(default)]
+    pub count: Option<u64>,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PortableCoverageV1 {
+    pub limits: Vec<PortableCoverageLimitV1>,
+}
+
+/// A complete epoch-preserving scene snapshot plus presentation and coverage.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct ProjectionSnapshot {
     pub version: ProtocolVersion,
@@ -441,6 +469,9 @@ pub struct ProjectionSnapshot {
     pub presentation: PresentationManifest,
     #[serde(default)]
     pub cache_policy: CachePolicy,
+    /// None means unreported; supplied empty metadata means no known limit here.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub coverage: Option<PortableCoverageV1>,
 }
 
 /// Schema for an opaque reference to a producer-owned live-view record. The
@@ -1311,6 +1342,29 @@ mod tests {
     }
 
     #[test]
+    fn coverage_preserves_stratum_and_unreported_is_not_empty_note() {
+        let id = "00000000-0000-0000-0000-000000006000".to_string();
+        let note = PortableCoverageV1 {
+            limits: vec![PortableCoverageLimitV1 {
+                layer: PortableCoverageLayerV1::Residency,
+                reason: "stored graph items are not resident".into(),
+                surfaces: vec![id.clone()],
+                resources: vec![id],
+                count: Some(2),
+            }],
+        };
+        let bytes = serde_json::to_vec(&note).unwrap();
+        assert_eq!(
+            serde_json::from_slice::<PortableCoverageV1>(&bytes).unwrap(),
+            note
+        );
+        assert_ne!(
+            None::<PortableCoverageV1>,
+            Some(PortableCoverageV1::default())
+        );
+    }
+
+    #[test]
     fn projection_capture_replays_same_tables_bounds_and_presentation_addresses() {
         let capture = projection_capture_fixture();
         let bytes = capture.encode().expect("capture serializes");
@@ -1697,6 +1751,7 @@ mod tests {
             session: ProjectionSession("local:fixture".into()),
             scene: SceneSnapshot::from_dense(SceneEpoch(1), Revision(1), Scene::new()).unwrap(),
             presentation: PresentationManifest::default(),
+            coverage: None,
             cache_policy: CachePolicy::default(),
         };
         let json = serde_json::to_string(&snapshot).unwrap();
@@ -1704,6 +1759,62 @@ mod tests {
         assert_eq!(
             serde_json::from_str::<ProjectionSnapshot>(&json).unwrap(),
             snapshot
+        );
+    }
+
+    #[test]
+    fn snapshot_coverage_defaults_old_wire_and_round_trips_all_layers() {
+        let mut snapshot = ProjectionSnapshot {
+            version: ProtocolVersion::V1,
+            session: ProjectionSession("coverage:fixture".into()),
+            scene: SceneSnapshot::from_dense(SceneEpoch(1), Revision(1), Scene::new()).unwrap(),
+            presentation: PresentationManifest::default(),
+            cache_policy: CachePolicy::default(),
+            coverage: Some(PortableCoverageV1::default()),
+        };
+        let mut old_wire = serde_json::to_value(&snapshot).unwrap();
+        old_wire.as_object_mut().unwrap().remove("coverage");
+        assert_eq!(
+            serde_json::from_value::<ProjectionSnapshot>(old_wire)
+                .unwrap()
+                .coverage,
+            None
+        );
+        assert_eq!(
+            serde_json::from_slice::<ProjectionSnapshot>(&serde_json::to_vec(&snapshot).unwrap())
+                .unwrap(),
+            snapshot
+        );
+        let id = "00000000-0000-0000-0000-000000006000".to_string();
+        snapshot.coverage = Some(PortableCoverageV1 {
+            limits: [
+                PortableCoverageLayerV1::Possession,
+                PortableCoverageLayerV1::Residency,
+                PortableCoverageLayerV1::Disclosure,
+                PortableCoverageLayerV1::Synchronization,
+                PortableCoverageLayerV1::Projection,
+            ]
+            .into_iter()
+            .map(|layer| PortableCoverageLimitV1 {
+                layer,
+                reason: "fixture supplied limit".into(),
+                surfaces: vec![id.clone()],
+                resources: vec![id.clone()],
+                count: Some(2),
+            })
+            .collect(),
+        });
+        assert_eq!(
+            serde_json::from_slice::<ProjectionSnapshot>(&serde_json::to_vec(&snapshot).unwrap())
+                .unwrap(),
+            snapshot
+        );
+        snapshot.coverage = None;
+        assert!(
+            serde_json::to_value(&snapshot)
+                .unwrap()
+                .get("coverage")
+                .is_none()
         );
     }
 

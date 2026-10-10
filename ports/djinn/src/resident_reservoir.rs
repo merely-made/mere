@@ -437,6 +437,7 @@ impl ProjectionSource for ReservoirEndpoint {
             scene: SceneSnapshot::from_dense(EPOCH, revision, scene)
                 .map_err(|error| format!("{error:?}"))?,
             presentation,
+            coverage: None,
             cache_policy: CachePolicy::default(),
         })
     }

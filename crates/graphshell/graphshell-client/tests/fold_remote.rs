@@ -81,6 +81,7 @@ fn mounted(session: &ProjectionSession, fold: Option<Fold>) -> ProjectionSnapsho
         session: session.clone(),
         scene: SceneSnapshot::from_dense(SceneEpoch(1), Revision(1), scene).unwrap(),
         presentation,
+        coverage: None,
         cache_policy: CachePolicy {
             retention: CacheRetention::MemoryOnly,
             expires_at_ms: None,

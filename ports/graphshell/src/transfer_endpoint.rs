@@ -201,6 +201,7 @@ impl TransferSourceEndpoint {
             session: session.clone(),
             scene,
             presentation,
+            coverage: None,
             cache_policy: CachePolicy {
                 retention: CacheRetention::Exportable,
                 expires_at_ms: None,

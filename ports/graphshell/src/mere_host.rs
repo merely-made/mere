@@ -98,6 +98,7 @@ pub enum MereHostError {
     WrongSession,
     MissingResource,
     ResidentBusy,
+    Resident(Box<crate::resident_host::ResidentHostError>),
 }
 
 impl std::fmt::Display for MereHostError {
@@ -109,6 +110,7 @@ impl std::fmt::Display for MereHostError {
             Self::Facet(error) => write!(formatter, "{error}"),
             Self::InvalidSnapshot(error) => write!(formatter, "Mere projection: {error}"),
             Self::WrongSession => write!(formatter, "request names another projection session"),
+            Self::Resident(error) => write!(formatter, "{error}"),
             Self::ResidentBusy => write!(formatter, "resident write is pending"),
             Self::MissingResource => {
                 write!(formatter, "resource was not disclosed by this session")
@@ -118,6 +120,12 @@ impl std::fmt::Display for MereHostError {
 }
 
 impl std::error::Error for MereHostError {}
+
+impl From<crate::resident_host::ResidentHostError> for MereHostError {
+    fn from(error: crate::resident_host::ResidentHostError) -> Self {
+        Self::Resident(Box::new(error))
+    }
+}
 
 impl From<StoreError> for MereHostError {
     fn from(value: StoreError) -> Self {
@@ -161,6 +169,7 @@ pub struct MereHost<B> {
     #[cfg(test)]
     pub(crate) resident_prepare_error: Option<StoreError>,
     pub(crate) resident_admitted: bool,
+    pub(crate) owned_persistence_status: Option<crate::resident_host::OwnedPersistenceStatus>,
     pub(crate) resident_reader: Option<pandect::addressable_graph::ResidentGraph<B>>,
     pub(crate) resident_settings: crate::resident_host::ResidentSettings,
     pub(crate) resident_settings_dirty: bool,
@@ -181,7 +190,11 @@ pub struct MereHost<B> {
     epoch_stored: u64,
     pub(crate) projection_revision: u64,
     resources: BTreeMap<ContentHash, Vec<u8>>,
-    instance_targets: Vec<NodeKey>,
+    instance_targets: Vec<uuid::Uuid>,
+    projection_context: Option<(
+        mere::kernel::graph::CoverageNote,
+        mere::kernel::graph::PendingLinkState,
+    )>,
     reopened: bool,
     projection_session: ProjectionSession,
     /// Whether the graph projection shows the session item (§7 item 31).
@@ -245,6 +258,7 @@ impl<B: Backend + Clone> MereHost<B> {
             #[cfg(test)]
             resident_prepare_error: None,
             resident_admitted: false,
+            owned_persistence_status: None,
             resident_reader: None,
             resident_settings: Default::default(),
             resident_settings_dirty: false,
@@ -265,6 +279,7 @@ impl<B: Backend + Clone> MereHost<B> {
             projection_revision: 1,
             resources: BTreeMap::new(),
             instance_targets: Vec::new(),
+            projection_context: None,
             reopened,
             projection_session: ProjectionSession(LOCAL_SESSION.to_string()),
             session_item: false,
@@ -449,6 +464,7 @@ impl<B: Backend + Clone> MereHost<B> {
         self.resident_roots = Default::default();
         self.resources.clear();
         self.instance_targets.clear();
+        self.projection_context = None;
         Ok(())
     }
 }
@@ -601,6 +617,10 @@ impl<B: Backend> MereHost<B> {
     ///
     /// The clock is injected so tests and importing hosts stamp stable times.
     pub async fn persist(&mut self, saved_at_secs: u64) -> Result<(), MereHostError> {
+        // Admitted cached owners use persist_owned; this cannot bypass their retained batch.
+        if self.resident_admitted {
+            return Err(MereHostError::ResidentBusy);
+        }
         self.ensure_resident_idle()?;
         let at = saved_at(saved_at_secs);
         for session in &mut self.retired {
@@ -608,6 +628,14 @@ impl<B: Backend> MereHost<B> {
         }
         self.retired.clear();
         self.graph_session.flush(at).await?;
+        if self.epoch_stored != self.projection_epoch {
+            self.slots.save(EPOCH_SLOT, &self.projection_epoch).await?;
+            self.epoch_stored = self.projection_epoch;
+        }
+        Ok(())
+    }
+
+    pub(crate) async fn persist_projection_epoch(&mut self) -> Result<(), MereHostError> {
         if self.epoch_stored != self.projection_epoch {
             self.slots.save(EPOCH_SLOT, &self.projection_epoch).await?;
             self.epoch_stored = self.projection_epoch;
@@ -634,6 +662,9 @@ impl<B: Backend> MereHost<B> {
     /// then hands it to [`staged`](Self::staged). Changes made in between stay
     /// pending for the next batch.
     pub fn prepare_store(&self, saved_at_secs: u64) -> Result<Staged, MereHostError> {
+        if self.resident_admitted {
+            return Err(MereHostError::ResidentBusy);
+        }
         self.ensure_resident_idle()?;
         let at = saved_at(saved_at_secs);
         let retired = self
@@ -744,6 +775,18 @@ impl<B: Backend> MereHost<B> {
         u32::from(self.session_item)
     }
 
+    /// Observe presentation context without editing graph truth or replay.
+    pub fn sync_projection_context(&mut self) {
+        let graph = self.presentation_graph();
+        let context = (graph.coverage_note(), graph.pending_link_state().clone());
+        if self.projection_context.as_ref() != Some(&context) {
+            if self.projection_context.is_some() {
+                self.projection_revision = self.projection_revision.wrapping_add(1);
+            }
+            self.projection_context = Some(context);
+        }
+    }
+
     pub fn projection_revision(&self) -> Revision {
         Revision(self.projection_revision)
     }
@@ -772,9 +815,10 @@ impl<B: Backend> MereHost<B> {
     pub fn instance_for_address(&self, address: &str) -> Option<InstanceId> {
         self.instance_targets
             .iter()
-            .position(|key| {
+            .position(|id| {
                 self.graph()
-                    .get_node(*key)
+                    .get_node_key_by_id(*id)
+                    .and_then(|key| self.graph().get_node(key))
                     .is_some_and(|node| node.url() == address)
             })
             .map(|index| InstanceId(index as u32 + self.node_offset()))
@@ -803,7 +847,7 @@ impl<B: Backend> MereHost<B> {
     /// keeps them from disagreeing about a rung.
     fn served_layout(&self) -> mere::canvas::CanvasStrategyProjection {
         let extents: HashMap<NodeKey, (f32, f32)> = self
-            .graph()
+            .presentation_graph()
             .nodes()
             .map(|(key, _)| (key, SERVED_FOOTPRINT))
             .collect();
@@ -814,7 +858,7 @@ impl<B: Backend> MereHost<B> {
         mere::canvas::project_canvas_strategy_with_score_for_view(
             &mut registry,
             "phyllotaxis.default",
-            self.graph(),
+            self.presentation_graph(),
             None,
             SERVED_VIEWPORT.0,
             SERVED_VIEWPORT.1,
@@ -895,6 +939,9 @@ impl<B: Backend> MereHost<B> {
     /// Undo `via`'s own latest change still in effect, and store the undo
     /// (reservoir plan §7 items 17 and 18).
     pub async fn undo(&mut self, via: &str) -> Result<Option<Reverted>, MereHostError> {
+        if self.resident_admitted {
+            return Err(MereHostError::ResidentBusy);
+        }
         self.ensure_resident_idle()?;
         let author = author_of(&self.selected_persona, via);
         let reverted = self.graph_session.undo(author).await?;
@@ -904,6 +951,9 @@ impl<B: Backend> MereHost<B> {
 
     /// Redo `via`'s most recent undo, and store it.
     pub async fn redo(&mut self, via: &str) -> Result<Option<Reverted>, MereHostError> {
+        if self.resident_admitted {
+            return Err(MereHostError::ResidentBusy);
+        }
         self.ensure_resident_idle()?;
         let author = author_of(&self.selected_persona, via);
         let reverted = self.graph_session.redo(author).await?;
@@ -936,6 +986,9 @@ impl<B: Backend> MereHost<B> {
         view: &str,
         state: ViewIntent,
     ) -> Result<(), MereHostError> {
+        if self.resident_admitted {
+            return Err(MereHostError::ResidentBusy);
+        }
         self.ensure_resident_idle()?;
         let key = ViewKey::new(via, view)?;
         let author = author_of(&self.selected_persona, via);
@@ -963,9 +1016,17 @@ impl<B: Backend> MereHost<B> {
         Ok(())
     }
 
+    fn ensure_metadata_store_idle(&self) -> Result<(), MereHostError> {
+        self.ensure_resident_idle()?;
+        if self.resident_admitted && self.has_unstored() {
+            return Err(MereHostError::ResidentBusy);
+        }
+        Ok(())
+    }
+
     /// Record the codicil returned by the reservoir's owner under the admitted app.
     pub async fn archive_receipt(&mut self, via: &str, id: String) -> Result<(), MereHostError> {
-        self.ensure_resident_idle()?;
+        self.ensure_metadata_store_idle()?;
         let id = pandect::graph_codicil::parse_codicil_id(&id)
             .map_err(pandect::SessionError::Corrupt)?;
         self.graph_session
@@ -976,7 +1037,7 @@ impl<B: Backend> MereHost<B> {
 
     /// Put this session in the trash for `via`, and store it.
     pub async fn trash(&mut self, via: &str) -> Result<(), MereHostError> {
-        self.ensure_resident_idle()?;
+        self.ensure_metadata_store_idle()?;
         let author = author_of(&self.selected_persona, via);
         self.graph_session.trash(author, wall_clock_now()).await?;
         Ok(())
@@ -984,7 +1045,7 @@ impl<B: Backend> MereHost<B> {
 
     /// Take this session back out of the trash for `via`, and store it.
     pub async fn restore(&mut self, via: &str) -> Result<(), MereHostError> {
-        self.ensure_resident_idle()?;
+        self.ensure_metadata_store_idle()?;
         let author = author_of(&self.selected_persona, via);
         self.graph_session.restore(author, wall_clock_now()).await?;
         Ok(())
@@ -997,6 +1058,8 @@ impl<B: Backend> MereHost<B> {
     }
 
     fn build_snapshot(&mut self) -> Result<ProjectionSnapshot, MereHostError> {
+        self.sync_projection_context();
+        let coverage = portable_coverage(&self.presentation_graph().coverage_note())?;
         let layout = self.served_layout();
         // The ladder's fallback is Glyph; an item the score does not name gets
         // the same answer the ladder would have given it.
@@ -1054,7 +1117,34 @@ impl<B: Backend> MereHost<B> {
                 hit: None,
                 channels: Vec::new(),
             });
-            let card = session_item::card(&self.graph_session);
+            let mut card = session_item::card(&self.graph_session);
+            if let Some(status) = &self.owned_persistence_status {
+                card.values.extend([
+                    CardValueV1 {
+                        label: "Store".into(),
+                        value: status.store.token(self.has_unstored()).into(),
+                    },
+                    CardValueV1 {
+                        label: "Unstored".into(),
+                        value: self.has_unstored().to_string(),
+                    },
+                    CardValueV1 {
+                        label: "Publication".into(),
+                        value: if status.publication_pending {
+                            "pending"
+                        } else {
+                            "published"
+                        }
+                        .into(),
+                    },
+                ]);
+                if let Some(error) = &status.error {
+                    card.values.push(CardValueV1 {
+                        label: "Store error".into(),
+                        value: error.clone(),
+                    });
+                }
+            }
             let bytes = serde_json::to_vec(&card).expect("PortableCardV1 always serializes");
             let resource = ContentHash::of(&bytes);
             let key = PresentationKey(format!("{}:{id}", session_item::SESSION_ITEM_SOURCE));
@@ -1073,7 +1163,13 @@ impl<B: Backend> MereHost<B> {
                         label: card.title.clone(),
                         role: SemanticRole::Article,
                         bounds: BoundsRelationship::FillFootprint,
-                        actions: session_item::actions(),
+                        actions: {
+                            let mut actions = session_item::actions();
+                            if self.resident_reader.is_some() {
+                                actions.extend(crate::resident_host::observation_actions());
+                            }
+                            actions
+                        },
                     },
                 }],
             );
@@ -1082,11 +1178,11 @@ impl<B: Backend> MereHost<B> {
 
         for (index, (key, position)) in layout.positions.iter().copied().enumerate() {
             let node = self
-                .graph()
+                .presentation_graph()
                 .get_node(key)
                 .expect("Mere canvas returned a key from this graph");
             let instance = InstanceId(index as u32 + offset);
-            instance_targets.push(key);
+            instance_targets.push(node.id);
             instance_of.insert(key, instance);
             min_x = min_x.min(position.x);
             min_y = min_y.min(position.y);
@@ -1113,7 +1209,7 @@ impl<B: Backend> MereHost<B> {
 
             let kind = node.primary_address().address_kind();
             let mut tags: Vec<String> = self
-                .graph()
+                .presentation_graph()
                 .node_content_tags(key)
                 .unwrap_or_default()
                 .into_iter()
@@ -1132,7 +1228,10 @@ impl<B: Backend> MereHost<B> {
                     },
                     CardValueV1 {
                         label: "Accesses".to_string(),
-                        value: access_history(self.graph(), key)?.records.len().to_string(),
+                        value: access_history(self.presentation_graph(), key)?
+                            .records
+                            .len()
+                            .to_string(),
                     },
                 ],
                 badges: tags,
@@ -1166,7 +1265,7 @@ impl<B: Backend> MereHost<B> {
             resources.insert(resource, bytes);
         }
 
-        for (_, relation) in self.graph().projected_relations() {
+        for (_, relation) in self.presentation_graph().projected_relations() {
             let (Some(&from), Some(&to)) = (
                 instance_of.get(&relation.from),
                 instance_of.get(&relation.to),
@@ -1204,7 +1303,7 @@ impl<B: Backend> MereHost<B> {
                 ),
             )
         };
-        scene.generation = self.projection_revision;
+        scene.generation = self.presentation_graph().revision();
         let scene = SceneSnapshot::from_dense(
             SceneEpoch(self.projection_epoch),
             Revision(self.projection_revision),
@@ -1219,6 +1318,7 @@ impl<B: Backend> MereHost<B> {
             session: self.session(),
             scene,
             presentation,
+            coverage: Some(coverage),
             cache_policy: CachePolicy::default(),
         })
     }
@@ -1308,6 +1408,38 @@ pub(crate) fn placement_test_graph() -> Graph {
     result
 }
 
+pub fn portable_coverage(
+    note: &mere::kernel::graph::CoverageNote,
+) -> Result<chirograph::PortableCoverageV1, MereHostError> {
+    use chirograph::{
+        PortableCoverageLayerV1 as Portable, PortableCoverageLimitV1, PortableCoverageV1,
+    };
+    use mere::kernel::graph::CoverageLayer;
+    let limits = note
+        .limits
+        .iter()
+        .map(|limit| {
+            let layer = match limit.layer {
+                CoverageLayer::Possession => Portable::Possession,
+                CoverageLayer::Residency => Portable::Residency,
+                CoverageLayer::Disclosure => Portable::Disclosure,
+                CoverageLayer::Synchronization => Portable::Synchronization,
+                CoverageLayer::Projection => Portable::Projection,
+            };
+            Ok(PortableCoverageLimitV1 {
+                layer,
+                reason: limit.reason.clone(),
+                surfaces: limit.surfaces.iter().map(uuid::Uuid::to_string).collect(),
+                resources: limit.resources.iter().map(uuid::Uuid::to_string).collect(),
+                count: limit.count.map(u64::try_from).transpose().map_err(|_| {
+                    MereHostError::InvalidSnapshot("coverage count exceeds portable u64".into())
+                })?,
+            })
+        })
+        .collect::<Result<_, MereHostError>>()?;
+    Ok(PortableCoverageV1 { limits })
+}
+
 impl<B: Backend> ProjectionCatalog for MereHost<B> {
     fn describe(&self) -> EndpointDescriptor {
         EndpointDescriptor {
@@ -1371,7 +1503,7 @@ impl<B: Backend> IntentSink for MereHost<B> {
                 current_revision: Revision(self.projection_revision),
             });
         }
-        let Some(&target) = intent
+        let Some(&surface) = intent
             .target
             .0
             .checked_sub(self.node_offset())
@@ -1379,6 +1511,11 @@ impl<B: Backend> IntentSink for MereHost<B> {
         else {
             return Ok(IntentResult::Rejected {
                 reason: "intent target is not in the disclosed scene".to_string(),
+            });
+        };
+        let Some(target) = self.graph().get_node_key_by_id(surface) else {
+            return Ok(IntentResult::Rejected {
+                reason: "disclosed surface is no longer in the writer".into(),
             });
         };
         let Some(handler_id) = handler_from_intent(&intent.intent) else {
@@ -1484,6 +1621,45 @@ mod tests {
         SelectedPersonaRef {
             persona: FIXTURE_PERSONA_ADDRESS.to_string(),
             profile: "profile:graphshell-a3".to_string(),
+        }
+    }
+
+    #[test]
+    fn portable_coverage_conversion_preserves_all_layers_and_both_strata() {
+        use mere::kernel::graph::{CoverageLayer, CoverageLimit, CoverageNote};
+        let id = uuid::Uuid::from_u128(6000);
+        let note = CoverageNote {
+            limits: CoverageLayer::ALL
+                .into_iter()
+                .map(|layer| {
+                    let mut limit = CoverageLimit::new(layer, "fixture limit");
+                    limit.surfaces.push(id);
+                    limit.resources.push(id);
+                    limit.count = Some(2);
+                    limit
+                })
+                .collect(),
+        };
+        let portable = portable_coverage(&note).unwrap();
+        assert_eq!(portable.limits.len(), 5);
+        assert_eq!(
+            portable
+                .limits
+                .iter()
+                .map(|limit| limit.layer.clone())
+                .collect::<Vec<_>>(),
+            vec![
+                chirograph::PortableCoverageLayerV1::Possession,
+                chirograph::PortableCoverageLayerV1::Residency,
+                chirograph::PortableCoverageLayerV1::Disclosure,
+                chirograph::PortableCoverageLayerV1::Synchronization,
+                chirograph::PortableCoverageLayerV1::Projection,
+            ]
+        );
+        for limit in portable.limits {
+            assert_eq!(limit.surfaces, vec![id.to_string()]);
+            assert_eq!(limit.resources, vec![id.to_string()]);
+            assert_eq!(limit.count, Some(2));
         }
     }
 

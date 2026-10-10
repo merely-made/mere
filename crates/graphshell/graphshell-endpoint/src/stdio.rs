@@ -478,6 +478,7 @@ mod native {
                     scene: SceneSnapshot::from_dense(SceneEpoch(1), Revision(1), Scene::new())
                         .unwrap(),
                     presentation: Default::default(),
+                    coverage: None,
                     cache_policy: CachePolicy::default(),
                 })
             }

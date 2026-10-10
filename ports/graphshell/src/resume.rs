@@ -66,6 +66,7 @@ impl ResumeFixtureEndpoint {
             session: session.clone(),
             scene,
             presentation: initial_presentation,
+            coverage: None,
             cache_policy: CachePolicy::default(),
         };
 
@@ -164,6 +165,7 @@ impl ResumeFixtureEndpoint {
             session: session.clone(),
             scene: current_scene,
             presentation: current_presentation,
+            coverage: None,
             cache_policy: CachePolicy::default(),
         };
         Self {

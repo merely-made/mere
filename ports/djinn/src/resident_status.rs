@@ -283,6 +283,7 @@ fn card_snapshot(session: &str, label: &str, card_bytes: &[u8]) -> ProjectionSna
         scene: SceneSnapshot::from_dense(SceneEpoch(1), Revision(1), scene)
             .expect("a one-item scene is dense"),
         presentation,
+        coverage: None,
         cache_policy: CachePolicy::default(),
     }
 }
