@@ -375,6 +375,54 @@ applicable rendered acceptance pass against its published dependency set.
   established causal link to the original reset; qualification now has one
   explicit GPU owner at a time.
 
+### Findings and progress — 2026-10-10 (workshop field geometry)
+
+- Woodshed's dr-c worktree failed
+  `native_workshop_routes_name_and_stylesheet_text_through_owned_model`
+  (`crates/woodshed-genet/src/main.rs:368`) with the stylesheet field at
+  833×0. Its local patch builds against `dr-c-verify-tabard` (`00b43558`):
+  unmerged r44 plus `codex/tabard-boundary` `7d2a5f3`. That Tabard predates
+  `d1ee0675`, so its `workshop.css` still styles `input` and `textarea`, which
+  no longer match since Cambium `019e07a0` made fields `div[role=textbox]`.
+  `codex/tabard-boundary` itself does not contain `019e07a0`; its seven
+  commits were replayed onto main (`7d2a5f3` → `6c8aa143`, `4797fd8d` →
+  `9e1bec3d`), so the branch is superseded.
+- Main's class fix (`d1ee0675`) reached only `text_control`. The Theme name
+  field is built separately in `editor()` and had no class, so it rendered
+  unstyled at 254×16. `.seed-value input` matched nothing, which left the seed
+  hex field without its monospace face and flex sizing.
+- **Ruling (2026-10-10), the approach.** Asked: main fixed this with classes
+  and the branch was replayed onto main; adopt main's classes in a dr-c
+  worktree (recommended), put role selectors
+  (`[role=textbox]`, `[role=textbox][aria-multiline=true]`) on
+  `codex/tabard-boundary`, or put role selectors on the dr-c mix? Mark:
+  "Adopt main's classes (Recommended)". Classes stay the workshop's field
+  selectors; `codex/tabard-boundary` gets no commit.
+- **Ruling (2026-10-10), main's gap.** Asked: fix the name-field class and
+  `.seed-value input` on main (recommended), record it only, or leave main
+  alone? Mark: "Fix on main too (Recommended)".
+- Main now gives the name field `tabard-text-input` and retargets the seed rule
+  to `.seed-value .tabard-text-input`. The usability test
+  `every_text_field_lays_out_at_its_authored_height` requires name and seed hex
+  to reach 34 px and the empty mode stylesheet to reach 200 px. As controls,
+  it failed on unfixed main (name only, 254×16) and on the unfixed dr-c tree
+  (name 254×16, seed hex 57×16, mode sheet 933×0). With the fix, `cargo test
+  --no-fail-fast -p tabard -p tabard-workshop -p tabard-desktop` passes 136 on
+  main (one ignored) and 121 on a dr-c scratch branch (`tabard-css-dr-c`,
+  `d1ee0675`'s hunks plus this fix on `00b43558`). Each run has one failure,
+  `lagrange_palette_matches_golden_documented_shape`, which also fails on
+  unchanged main: with `core.autocrlf=true` the LF fixture blob checks out as
+  CRLF, so the comparison fails even though every palette value matches. It
+  needs a `.gitattributes` `-text`/`eol=lf` row or a newline-normalized
+  comparison; this pass leaves it open.
+- Woodshed's own test was not rerun. By the time the scratch branch was ready,
+  the dr-c worktree was in the middle of merging woodshed `origin/main`
+  (`4aa68bf`, which pins main `11236fd4` and so already carries the class fix),
+  so it was left untouched.
+- `shared_components.rs:126` still asserts that the code sample contains no
+  native `input`/`textarea`. It stays, because it guards against native form
+  elements; the `role=textbox` check beside it covers Cambium fields.
+
 ## Shared authoring and title-bar composition (2026-10-08)
 
 **Decision:** expose the existing workshop as `crates/cambium/tabard-workshop`

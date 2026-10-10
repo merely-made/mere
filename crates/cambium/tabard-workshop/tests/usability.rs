@@ -75,6 +75,30 @@ fn editor_colors(host: &Host) -> Vec<(Option<String>, Option<String>)> {
     })
 }
 
+/// Cambium fields are `div[role=textbox]`, not native `<input>`/`<textarea>`,
+/// so the sheet must reach every field by class. An empty stylesheet field
+/// with no matching rule lays out at zero height.
+#[test]
+fn every_text_field_lays_out_at_its_authored_height() {
+    let directory = tempfile::tempdir().unwrap();
+    let mut host = mount(WorkshopState::load(&directory.path().join("themes.json")).unwrap());
+    click(&mut host, &action("toggle-stylesheet"));
+    let mut collapsed = Vec::new();
+    for (field, min_height) in [("name", 34.0), ("seed-hex", 34.0), ("mode-sheet", 200.0)] {
+        let selector = Selector::role("textbox").with_attr("data-field", field);
+        let node = host.with_dom(|dom| {
+            let nodes = taproot::matching(dom, &selector);
+            assert_eq!(nodes.len(), 1, "{field} must be one textbox");
+            nodes[0]
+        });
+        let (_, _, width, height) = host.painted_rect(node).expect("field paints");
+        if !(width > 0.0 && height >= min_height - 0.5) {
+            collapsed.push(format!("{field} at {width}x{height}, wants height {min_height}"));
+        }
+    }
+    assert!(collapsed.is_empty(), "fields lose their geometry: {collapsed:?}");
+}
+
 #[test]
 fn incomplete_hex_blocks_save_and_navigation_and_undo_keeps_authored_alpha() {
     let directory = tempfile::tempdir().unwrap();
