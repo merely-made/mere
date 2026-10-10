@@ -434,6 +434,16 @@ applicable rendered acceptance pass against its published dependency set.
   rerun with `--locked` in a fresh detached woodshed worktree at `7d33337`, and
   it passes. `5dca58a9` still lacks this entry's name-field fix, which reaches
   woodshed at its next mere repin.
+- The Lagrange golden failure was a lost fix. `b7ed0bdc` (2026-09-24) had
+  pinned `ports/tabard/tests/fixtures/** text eol=lf`; when Tabard moved to
+  `crates/system/tabard`, that row was left matching nothing, the only dead
+  row among the 15 line-ending rows. **Ruling (2026-10-10).** Asked: retarget
+  the row (recommended), normalize newlines in the test, or both? Mark:
+  "Retarget the row (Recommended)". The row now names
+  `crates/system/tabard/tests/fixtures/**`. With the fixture checked out again
+  as LF, `cargo test --locked -p tabard --test theme` passes 10 of 10 at
+  `ef88b773`, where it had failed. The workshop's own fixtures are parsed as
+  inputs, never compared byte for byte, so they need no row.
 - `shared_components.rs:126` still asserts that the code sample contains no
   native `input`/`textarea`. It stays, because it guards against native form
   elements; the `role=textbox` check beside it covers Cambium fields.
