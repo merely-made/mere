@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! What a bound Distillery lane keeps of the persona's master (vault lock
-//! rulings 2, 24, 44 and 92): personae's tracker, included by path, in one
+//! rulings 2, 24, 44 and 92): castellan's residue tracker, included by path, in one
 //! process.
 //!
 //! The installed authority opens a vault and binds the resident; binding
@@ -17,7 +17,7 @@
 //!
 //! No libtest harness: the allocator is process-wide.
 
-#[path = "../../../crates/dramatis/personae/tests/residue/mod.rs"]
+#[path = "../../castellan/tests/residue/mod.rs"]
 mod residue;
 
 use std::path::Path;

@@ -8,10 +8,14 @@
 //!
 //! The identity and carry layer for the Merely ecosystem. personae owns a
 //! person's **faces**: the master Ed25519 keypair, deterministic per-protocol
-//! key derivation (BLAKE3 keyed-hash), the passphrase- and OS-store-unlocked
-//! vault, and sealed-record storage for secrets at rest. A human has *personae*,
-//! plural — a work face, a research face, a burner — so the crate is the
-//! register of them and the root of trust they derive from.
+//! key derivation (BLAKE3 keyed-hash), delegation issuing, and sealed-record
+//! storage under keys the caller derives. A human has *personae*, plural — a
+//! work face, a research face, a burner — so the crate is the register of them
+//! and the root of trust they derive from.
+//!
+//! It holds no secret custody (dramatis repo plan, rulings D3, D9 and D22):
+//! the vault, its passphrase and OS-sealed storages, the unlock ladder and the
+//! SSH agent live in castellan, which only the resident links.
 //!
 //! Promoted from mere's `persona/identity`. The carry layer (device roster,
 //! capability grants, private-epoch history — the portable-persona spine) folds
@@ -44,9 +48,9 @@
 //! - **Derivation is `BLAKE3-keyed(master_seed, salt)` → Ed25519 seed** (the
 //!   per-protocol-derivation pattern).
 //! - **Pure-Rust crypto** — `ed25519-dalek` + `blake3`, no libsodium.
-//! - **At-rest security** — `PassphraseEncryptedStorage` (Argon2id +
-//!   ChaCha20-Poly1305) and a sealed-record store, unlocked by passphrase or an
-//!   OS store (Windows DPAPI today; other platforms follow).
+//! - **At-rest sealing** — `seal_bytes` and the sealed-record store, under a
+//!   32-byte key the caller holds. Unlocking (passphrase, OS store) is
+//!   castellan's.
 //!
 //! ## Status
 //!
@@ -55,23 +59,15 @@
 #![doc(html_root_url = "https://docs.rs/personae/0.1.0")]
 #![warn(missing_docs)]
 
-#[cfg(feature = "agent")]
-pub mod agent;
-pub mod bootstrap;
 pub mod carry;
 pub mod delegation;
 #[cfg(feature = "ssh")]
 pub mod enroll;
 mod error;
 mod keypair;
-pub mod passphrase_root;
-pub mod passphrase_storage;
-mod profile_wire;
 mod provider;
 mod retained;
-pub mod roster;
 pub mod seal;
-pub mod sealed_profile_storage;
 pub mod sealed_record_storage;
 pub mod signing;
 #[cfg(feature = "ssh")]
@@ -80,39 +76,21 @@ pub mod ssh_ca;
 pub mod ssh_face;
 #[cfg(feature = "ssh")]
 pub mod ssh_krl;
-#[cfg(feature = "agent")]
-pub mod ssh_sign;
-#[cfg(feature = "ssh")]
-pub mod ssh_slot;
 pub mod startup_unlock;
-pub mod unlock;
 pub mod vault;
-mod zeroizing_json;
+pub mod zeroizing_json;
 
 pub use crate::error::IdentityError;
 pub use crate::keypair::{DerivedKeypair, Ed25519Keypair, Ed25519PublicKey, Ed25519Signature};
-pub use crate::passphrase_root::{
-    PassphraseWrappedRoot, change_passphrase, load_passphrase_root, passphrase_root_exists,
-    save_passphrase_root, unwrap_vault_root, wrap_vault_root,
-};
-pub use crate::passphrase_storage::PassphraseEncryptedStorage;
 pub use crate::provider::{
-    AttestationKeys, IdentityProvider, InMemoryProvider, SealedIdentityProvider,
+    AttestationKeys, IdentityProvider, InMemoryProvider, attest_derived_key,
 };
 pub use crate::retained::RetainedKeys;
-pub use crate::roster::{OpenedVault, Roster, RosterEntry, open_shared};
 pub use crate::seal::{seal_bytes, unseal_bytes};
-pub use crate::sealed_profile_storage::{AUTO_UNLOCK_ROOT_FILE, SealedProfileStorage};
 pub use crate::sealed_record_storage::{SealedRecordChange, SealedRecordStorage};
-pub use crate::startup_unlock::{
-    PERSISTED_LOCK_FILE, StartupUnlockMode, auto_unlock_backend_available, clear_persisted_lock,
-    load_existing_auto_unlock_root, load_existing_auto_unlock_root_after_presence,
-    load_or_create_auto_unlock_root, lock_persisted, persist_lock,
-};
-pub use crate::unlock::{OsPresence, UnlockMethod, UnlockMethods};
+pub use crate::startup_unlock::StartupUnlockMode;
 pub use crate::vault::{
-    CredentialLineage, IdentitySlot, IdentityStorage, IdentityVault, InMemoryStorage, Profile,
-    ProfileId, ProfileSummary, ProtocolKey, PublicProfile, SecretBytes, SlotMap, SlotSummary,
+    CredentialLineage, ProfileId, ProfileSummary, ProtocolKey, PublicProfile, SlotSummary,
     UnlockTier,
 };
 

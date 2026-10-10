@@ -10,7 +10,8 @@
 //! reallocating, and every reallocation frees the outgrown buffer uncleared.
 //! [`to_vec`] sizes its buffer before writing; [`bytes`] zeroizes each buffer
 //! it outgrows. The wire format is unchanged. Vault lock ruling 6; the
-//! no-residue test (`tests/no_residue.rs`) is what holds this to account.
+//! no-residue test (castellan's `tests/vault_residue.rs`) is what holds
+//! this to account. Public because castellan's storages serialize through it.
 
 use std::fmt;
 use std::io;
@@ -20,7 +21,7 @@ use serde::de::{Deserializer, SeqAccess, Visitor};
 use zeroize::Zeroizing;
 
 /// `serde_json::to_vec` into one exactly-sized buffer that zeroizes on drop.
-pub(crate) fn to_vec<T: Serialize + ?Sized>(value: &T) -> serde_json::Result<Zeroizing<Vec<u8>>> {
+pub fn to_vec<T: Serialize + ?Sized>(value: &T) -> serde_json::Result<Zeroizing<Vec<u8>>> {
     let mut counted = Counter(0);
     serde_json::to_writer(&mut counted, value)?;
     let mut out = Zeroizing::new(Vec::with_capacity(counted.0));
@@ -42,7 +43,7 @@ impl io::Write for Counter {
 }
 
 /// `#[serde(deserialize_with)]` for secret bytes held as `Vec<u8>`.
-pub(crate) fn bytes<'de, D: Deserializer<'de>>(deserializer: D) -> Result<Vec<u8>, D::Error> {
+pub fn bytes<'de, D: Deserializer<'de>>(deserializer: D) -> Result<Vec<u8>, D::Error> {
     deserializer.deserialize_seq(BytesVisitor)
 }
 

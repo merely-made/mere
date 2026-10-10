@@ -190,7 +190,7 @@ pub use graph_session::{
     Applied, Change, ChangeKind, DEFAULT_CHECKPOINT_INTERVAL, GraphSession, GraphValidator, Kept,
     MereSessions, Pending, Reverted, SESSIONS_PREFIX, SessionError, ViewEntry, ViewKey,
 };
-pub use identity::{StartupUnlockMode, auto_unlock_backend_available};
+pub use identity::StartupUnlockMode;
 pub use wallet_sealed_backend::WalletSealedBackend;
 // The ids and author the session schema names, so a host can name them
 // through pandect.
@@ -260,13 +260,11 @@ pub use wallet_grant::{
     derive_remote_auth_pairing_material, device_grant_set_ref, device_is_fully_revoked,
     encode_device_grant_set, encode_epoch_record, encode_remote_auth_enrollment_bundle,
     encode_remote_auth_pairing_ticket, fold_revocations, format_remote_auth_pairing_code,
-    install_remote_auth_enrollment_bundle, install_remote_auth_enrollment_bundle_with_wrapping_key,
-    issue_remote_auth_device_grant, issue_remote_auth_device_grant_from_pairing,
-    issue_remote_auth_device_grant_from_ticket, load_device_grant_set, load_revocation_ledger,
-    load_wrapped_epoch_record, mint_remote_auth_pairing_ticket, parse_remote_auth_pairing_code,
-    requires_epoch_material, revoke_device_certificates, revoke_remote_auth_device,
-    revoked_certificate_count, save_device_grant_set, save_wrapped_epoch_record,
-    unwrap_private_epoch_material, wallet_trusted_roots, wrap_private_epoch_material,
+    load_device_grant_set, load_revocation_ledger, load_wrapped_epoch_record,
+    mint_remote_auth_pairing_ticket, parse_remote_auth_pairing_code, requires_epoch_material,
+    revoke_device_certificates, revoked_certificate_count, save_device_grant_set,
+    save_wrapped_epoch_record, unwrap_private_epoch_material, wallet_trusted_roots,
+    wrap_private_epoch_material,
 };
 pub use wallet_store::{
     CapabilitySlotRef, CarriagePolicy, DEVICE_ROSTER_FILENAME, DeviceExposure, DeviceGrantRef,
@@ -276,19 +274,13 @@ pub use wallet_store::{
     PERSONA_WALLET_FILENAME, PersonaChainRoot, PersonaEpochBridge, PersonaWalletManifest,
     PersonaWalletRef, PrivateEpochRecord, PrivateRoots, PublicRoots,
     REMOTE_AUTH_WRAPPING_KEYS_FILENAME, RecoveryPolicy, RemoteAuthWrappingKeyBridge,
-    RemoteAuthWrappingKeyRecord, WALLET_SCHEMA_VERSION, WalletBootstrapMode,
-    bootstrap_wallet_state, derive_persona_chain_root, device_grant_path, device_roster_path,
-    device_roster_ref, ensure_local_device_identity, ensure_persona_epoch_bridge,
-    ensure_wallet_state, identity_dir, identity_grants_dir, identity_seed_locked_at_startup,
-    identity_seed_path, identity_wallet_path, load_current_private_epoch, load_device_grant,
-    load_device_roster, load_identity_seed, load_identity_seed_read_only, load_identity_wallet,
-    load_local_device_identity, load_persona_epoch_bridge, load_persona_wallet,
-    load_remote_auth_wrapping_key_bridge, local_device_identity_path, persona_epoch_bridge_path,
-    persona_wallet_path, persona_wallet_salt, relock_wallet_after_manual_unlock,
-    remote_auth_wrapping_keys_path, save_device_grant, save_device_roster, save_identity_seed,
-    save_identity_wallet, save_local_device_identity, save_persona_epoch_bridge,
-    save_persona_wallet, save_remote_auth_wrapping_key_bridge, stage_persona_private_epoch,
-    unlock_wallet_with_auto_os, wallet_local_secrets_locked,
+    RemoteAuthWrappingKeyRecord, WALLET_SCHEMA_VERSION, derive_persona_chain_root,
+    device_grant_path, device_roster_path, device_roster_ref, identity_dir, identity_grants_dir,
+    identity_seed_path, identity_wallet_path, load_device_grant, load_device_roster,
+    load_identity_wallet, load_persona_wallet, local_device_identity_path,
+    persona_epoch_bridge_path, persona_wallet_path, persona_wallet_salt,
+    remote_auth_wrapping_keys_path, save_device_grant, save_device_roster, save_identity_wallet,
+    save_persona_wallet,
 };
 pub use web_facets::{
     WEB_COMPAT, WEB_CONTENT, WEB_FORM_DRAFT, WEB_PAGE_SCALE, WEB_SCROLL, WEB_VIEWER,

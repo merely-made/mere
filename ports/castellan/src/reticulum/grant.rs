@@ -22,9 +22,11 @@ use std::path::Path;
 use insigne::CheckFault;
 use pandect::{
     DeviceExposure, DeviceGrantError, DeviceId, DeviceMode, DevicePublicKey, RemoteAuthGrantSpec,
-    certificate_device_id, device_grant_set_ref, device_is_fully_revoked,
-    issue_remote_auth_device_grant, load_device_grant_set, load_device_roster, load_identity_seed,
+    certificate_device_id, device_grant_set_ref, device_is_fully_revoked, load_device_grant_set,
+    load_device_roster,
 };
+
+use crate::custody::wallet::{issue_remote_auth_device_grant, load_identity_seed};
 use personae::carry::DeviceGrantSet;
 use personae::{IdentityProvider, InMemoryProvider};
 
@@ -539,7 +541,9 @@ mod tests {
     fn a_station_grant_can_only_be_renewed_with_a_later_expiry() {
         let root = tempfile::tempdir().unwrap();
         let persona = personae::PersonaId::new();
-        let seed = pandect::ensure_wallet_state(root.path(), persona, "Station host").unwrap();
+        let seed =
+            crate::custody::wallet::ensure_wallet_state(root.path(), persona, "Station host")
+                .unwrap();
         let issuer = InMemoryProvider::from_seed(seed);
         let device_id = DeviceId::new();
         let key = issuer

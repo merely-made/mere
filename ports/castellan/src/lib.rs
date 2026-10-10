@@ -28,8 +28,8 @@
 //!
 //! The boundaries are the point:
 //!
-//! - **Not personae.** The faces, their derivation roots, and the vault
-//!   substrate live in `personae`; castellan is the keeper who serves them.
+//! - **Not personae.** The faces, their derivation roots and issuing live in
+//!   `personae`; castellan is the keeper who holds and serves them.
 //! - **Not gaz or gazette.** Those keep and find the other players; castellan
 //!   guards and presents you.
 //!
@@ -70,11 +70,17 @@
 //! CXF import remains follow-on work; see the castellan OTP plan and the keeper
 //! founding plan in mere's design docs.
 
+//! [`custody`] is every secret at rest and in hand, moved here in the dramatis
+//! repo plan's DR-B (2026-10-09): personae's vault, storages, unlock ladder
+//! and SSH agent, and pandect's wallet seeds and private epochs. Only the
+//! resident (djinn) may link this crate; `deny.toml` holds the line (D4, D16).
+
 #![doc(html_no_source)]
 #![warn(missing_docs)]
 
 #[cfg(feature = "keeper")]
 pub mod authority;
+pub mod custody;
 #[cfg(feature = "keeper")]
 mod sealed_storage;
 pub mod items;

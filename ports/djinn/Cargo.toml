@@ -50,7 +50,10 @@ distillery-chronicle-receipt-host = [
 
 [dependencies]
 blake3.workspace = true
-castellan = { workspace = true, features = ["keeper"] }
+# The one crate allowed to link castellan (dramatis repo plan, D4, D16).
+# `os-presence`: the resident's own unlock prompt asks Windows Hello first
+# (vault lock ruling 47); it moved from personae with custody (DR-B).
+castellan = { workspace = true, features = ["keeper", "os-presence"] }
 chirograph.workspace = true
 incipit.workspace = true
 # The operational works composed as this resident's fourth lane
@@ -71,9 +74,7 @@ mesh.workspace = true
 muniment.workspace = true
 notochord.workspace = true
 pandect.workspace = true
-# `os-presence`: the resident's own unlock prompt asks Windows Hello first
-# (vault lock ruling 47).
-personae = { workspace = true, features = ["agent", "os-presence"] }
+personae = { workspace = true, features = ["ssh"] }
 rand_core = { version = "0.6", features = ["getrandom"], optional = true }
 sceno.workspace = true
 scenotime.workspace = true
@@ -200,7 +201,7 @@ tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread", "sync", 
 
 # Vault lock rulings 48 and 49: what Knot leaves of its seed, strict on the
 # paths that open no network and judged against iroh's and p2panda-net's own
-# blocks for the sync host; personae's tracker (its own global allocator, no
+# blocks for the sync host; castellan's residue tracker (its own global allocator, no
 # libtest).
 [[test]]
 name = "knot_residue"

@@ -32,14 +32,17 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use insigne::DerivedKeyAttestation;
-use pandect::{DeviceId, PersonaId, WalletEpochSealer, revoke_remote_auth_device};
-use personae::agent::{VaultAgent, VaultLockRequest};
-use personae::signing::{ApprovalBroker, DecisionError, RememberApproval, SigningDecision};
-use personae::ssh_slot;
+use pandect::{DeviceId, PersonaId, WalletEpochSealer};
+use personae::signing::{DecisionError, RememberApproval, SigningDecision};
 use personae::{
     CredentialLineage, Ed25519Keypair, Ed25519PublicKey, IdentityError, IdentityProvider,
-    IdentityStorage, IdentityVault, ProfileId, ProtocolKey, RetainedKeys, UnlockMethod,
-    UnlockTier, roster,
+    ProfileId, ProtocolKey, RetainedKeys, UnlockTier,
+};
+
+use crate::custody::agent::{VaultAgent, VaultLockRequest};
+use crate::custody::wallet::{epoch_sealer_for_persona, revoke_remote_auth_device};
+use crate::custody::{
+    ApprovalBroker, IdentityStorage, IdentityVault, UnlockMethod, roster, ssh_slot,
 };
 use ssh_key::{Algorithm, PrivateKey, PublicKey};
 use tokio::sync::watch;
@@ -204,7 +207,7 @@ impl<S: IdentityStorage + 'static> ResidentLock<S> {
         drop(vault);
         // Every lock, the agent's `ssh-add -x` included, persists (ruling 5).
         if let Some(dir) = self.persisted.lock().unwrap().as_deref() {
-            if let Err(error) = personae::persist_lock(dir) {
+            if let Err(error) = crate::custody::persist_lock(dir) {
                 tracing::error!(%error, "the lock holds, but a restart could reopen the vault");
             }
         }
@@ -237,7 +240,7 @@ impl<S: IdentityStorage + 'static> ResidentLock<S> {
         *self.kept.lock().unwrap() = None;
         drop(vault);
         if let Some(dir) = self.persisted.lock().unwrap().as_deref() {
-            if let Err(error) = personae::clear_persisted_lock(dir) {
+            if let Err(error) = crate::custody::clear_persisted_lock(dir) {
                 tracing::error!(%error, "unlocked, but the next start will still ask");
             }
         }
@@ -609,7 +612,7 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
             });
         }
         // Ruling 56: only keys the agent can sign are taken in.
-        personae::ssh_sign::check_signable(private.key_data())
+        crate::custody::ssh_sign::check_signable(private.key_data())
             .map_err(|refused| IdentityIntentError::UnsignableKey(refused.to_string()))?;
         let slot = ssh_slot::slot_for(&private, tier)?;
         let comment = private.comment().to_string();
@@ -680,7 +683,7 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         let Some(data_root) = self.data_root.as_deref() else {
             return Ok(None);
         };
-        WalletEpochSealer::for_persona(data_root, persona)
+        epoch_sealer_for_persona(data_root, persona)
     }
 
     /// Revoke one delegated device through pandect's live authority.
@@ -989,8 +992,9 @@ fn unlock_label(tier: UnlockTier) -> String {
 
 #[cfg(test)]
 mod tests {
-    use personae::ssh_slot::{protocol_key_for, slot_for};
-    use personae::{Ed25519Keypair, InMemoryStorage, Profile, ProfileId};
+    use crate::custody::ssh_slot::{protocol_key_for, slot_for};
+    use crate::custody::{InMemoryStorage, Profile};
+    use personae::{Ed25519Keypair, ProfileId};
     use signature::Verifier;
     use ssh_agent_lib::agent::Session;
     use ssh_agent_lib::proto::SignRequest;
@@ -1451,36 +1455,36 @@ mod tests {
     fn fixture(name: &str) -> PrivateKey {
         let text = match name {
             "ed25519" => {
-                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/ed25519")
+                include_str!("../tests/fixtures/ssh/ed25519")
             },
             "rsa2048" => {
-                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/rsa2048")
+                include_str!("../tests/fixtures/ssh/rsa2048")
             },
             "rsa4096" => {
-                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/rsa4096")
+                include_str!("../tests/fixtures/ssh/rsa4096")
             },
             "ecdsa256" => {
-                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/ecdsa256")
+                include_str!("../tests/fixtures/ssh/ecdsa256")
             },
             "ecdsa384" => {
-                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/ecdsa384")
+                include_str!("../tests/fixtures/ssh/ecdsa384")
             },
             "ecdsa521" => {
-                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/ecdsa521")
+                include_str!("../tests/fixtures/ssh/ecdsa521")
             },
             "rsa1024" => {
-                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/rsa1024")
+                include_str!("../tests/fixtures/ssh/rsa1024")
             },
             "rsa2560" => {
-                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/rsa2560")
+                include_str!("../tests/fixtures/ssh/rsa2560")
             },
             "rsa8192" => {
-                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/rsa8192")
+                include_str!("../tests/fixtures/ssh/rsa8192")
             },
             "rsa2048e3" => {
-                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/rsa2048e3")
+                include_str!("../tests/fixtures/ssh/rsa2048e3")
             },
-            "dsa" => include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/dsa"),
+            "dsa" => include_str!("../tests/fixtures/ssh/dsa"),
             other => panic!("no fixture {other}"),
         };
         PrivateKey::from_openssh(text).unwrap()
@@ -1572,7 +1576,7 @@ mod tests {
     ) -> (String, Vec<u8>, CredentialLineage, UnlockTier) {
         let vault = host.vault.lock().unwrap();
         match vault.current_profile().unwrap().slots.get(key).expect("slot held") {
-            personae::IdentitySlot::Direct {
+            crate::custody::IdentitySlot::Direct {
                 kind,
                 payload,
                 lineage,

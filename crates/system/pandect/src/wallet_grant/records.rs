@@ -16,7 +16,7 @@ use crate::wallet_store::*;
 
 use super::*;
 
-pub(crate) fn upsert_remote_auth_device_record(
+pub fn upsert_remote_auth_device_record(
     roster: &mut DeviceRoster,
     spec: &RemoteAuthGrantSpec,
     grant_ref: CarryRef,
@@ -44,7 +44,7 @@ pub(crate) fn upsert_remote_auth_device_record(
     });
 }
 
-pub(crate) fn upsert_grant_index(
+pub fn upsert_grant_index(
     wallet: &mut IdentityWalletManifest,
     device_id: DeviceId,
     grant_ref: CarryRef,
@@ -63,7 +63,7 @@ pub(crate) fn upsert_grant_index(
     });
 }
 
-pub(crate) fn upsert_local_remote_auth_record(
+pub fn upsert_local_remote_auth_record(
     roster: &mut DeviceRoster,
     local: &LocalDeviceIdentity,
     grant_ref: CarryRef,
