@@ -13,6 +13,14 @@ impl<B: Backend> ResidentGraph<B> {
         self.update(roots, BTreeSet::new(), self.policy, false)
             .await
     }
+    /// Apply host settings without independently persisting P5's policy slot.
+    pub async fn reconcile_with_policy(
+        &mut self,
+        roots: ResidencyRoots,
+        policy: ResidencyPolicy,
+    ) -> Result<(), StoreError> {
+        self.update(roots, BTreeSet::new(), policy, false).await
+    }
     pub async fn refresh(&mut self) -> Result<(), StoreError> {
         self.update(self.roots.clone(), self.demands.clone(), self.policy, false)
             .await
@@ -74,6 +82,23 @@ impl<B: Backend> ResidentGraph<B> {
         if persist {
             self.store.set_policy(policy).await?;
         }
+        let mut projection_coverage = kernel::graph::CoverageNote::default();
+        let absent: Vec<_> = roots
+            .projection_surfaces
+            .iter()
+            .copied()
+            .filter(|id| catalog.row(GraphAddress::Surface(*id)).is_none())
+            .collect();
+        if !absent.is_empty() {
+            let mut limit = kernel::graph::CoverageLimit::new(
+                kernel::graph::CoverageLayer::Projection,
+                "authored projection members are absent from the catalog",
+            );
+            limit.count = Some(absent.len());
+            limit.surfaces = absent;
+            projection_coverage.push(limit);
+        }
+        self.projection_coverage = projection_coverage;
         if let Some((snapshot, facets, coverage, footprint, pending, digest)) = replacement {
             let composed = self.composed_coverage(&coverage);
             if digest != self.available_digest {
@@ -88,6 +113,8 @@ impl<B: Backend> ResidentGraph<B> {
             self.residency_coverage = coverage;
             self.footprint = footprint;
         }
+        self.graph
+            .set_known_coverage(self.composed_coverage(&self.residency_coverage));
         self.catalog = Some(catalog);
         self.generation = generation;
         self.records = records;
@@ -115,6 +142,7 @@ impl<B: Backend> ResidentGraph<B> {
                     roots
                         .projection_surfaces
                         .iter()
+                        .filter(|id| catalog.row(GraphAddress::Surface(**id)).is_some())
                         .map(|id| (GraphAddress::Surface(*id), 0, true)),
                 );
                 queue.extend(
@@ -123,6 +151,7 @@ impl<B: Backend> ResidentGraph<B> {
                         .iter()
                         .copied()
                         .chain(roots.focused)
+                        .chain(roots.transient.iter().copied())
                         .chain(demands.iter().copied())
                         .map(|a| (a, 0, false)),
                 );

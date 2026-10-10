@@ -540,6 +540,8 @@ struct MereEndpoint {
     app: String,
     attached: SessionId,
     host: SharedHost,
+    /// Minted by the admitted endpoint, independent of any payload view name.
+    pane: pandect::ViewKey,
     /// The graph epoch and revision this connection last saw or was told of.
     seen_graph: (SceneEpoch, Revision),
     /// The sessions revision this connection last saw or was told of.
@@ -570,8 +572,11 @@ impl MereEndpoint {
                 shared.latest(&app).await?
             };
             let host = shared.host(attached).await?;
+            let pane = pandect::ViewKey::new(&app, uuid::Uuid::new_v4().to_string())
+                .map_err(|e| e.to_string())?;
             let seen_graph = {
-                let host = host.lock().await;
+                let mut host = host.lock().await;
+                host.set_resident_pane(pane.clone(), Default::default());
                 (host.projection_epoch(), host.projection_revision())
             };
             Ok(Self {
@@ -581,9 +586,26 @@ impl MereEndpoint {
                 app,
                 attached,
                 host,
+                pane,
                 seen_graph,
             })
         })
+    }
+
+    fn attach_host(&mut self, id: SessionId, host: SharedHost) {
+        if !Arc::ptr_eq(&self.host, &host) {
+            run(async {
+                let mut previous = self.host.lock().await;
+                previous.close_resident_pane(&self.pane);
+                let _ = previous.refresh_resident_reader().await;
+                drop(previous);
+                host.lock()
+                    .await
+                    .set_resident_pane(self.pane.clone(), Default::default());
+            });
+        }
+        self.attached = id;
+        self.host = host;
     }
 
     fn sessions_session() -> ProjectionSession {
@@ -904,8 +926,7 @@ impl MereEndpoint {
         })();
         match outcome {
             Ok(Some((id, host))) => {
-                self.attached = id;
-                self.host = host;
+                self.attach_host(id, host);
                 self.seen_graph = (SceneEpoch(0), Revision(0));
                 Ok(IntentResult::Accepted)
             },
@@ -1028,8 +1049,7 @@ impl MereEndpoint {
         });
         match outcome {
             Ok(Some((id, host))) => {
-                self.attached = id;
-                self.host = host;
+                self.attach_host(id, host);
                 // The attached session's graph is new to this connection; the
                 // others' views of the sessions did not move.
                 self.seen_graph = (SceneEpoch(0), Revision(0));
@@ -1111,8 +1131,8 @@ impl MereEndpoint {
             });
             match candidate {
                 Ok(Ok(id)) => {
-                    self.attached = id;
-                    self.host = run(self.shared.host(id))?;
+                    let host = run(self.shared.host(id))?;
+                    self.attach_host(id, host);
                     self.shared.moved();
                     self.seen_graph = (SceneEpoch(0), Revision(0));
                     return Ok(IntentResult::Accepted);
@@ -1355,6 +1375,18 @@ impl ProjectionNoticeSource for MereEndpoint {
     }
 }
 
+impl Drop for MereEndpoint {
+    fn drop(&mut self) {
+        run(async {
+            let mut host = self.host.lock().await;
+            host.close_resident_pane(&self.pane);
+            // Retain the last coherent reader on I/O failure; desired roots are
+            // already released and the next successful refresh reconciles them.
+            let _ = host.refresh_resident_reader().await;
+        });
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1369,6 +1401,82 @@ mod tests {
     use crate::resident_reservoir::{
         EnsureMereV1, RESERVOIR_ENSURE_MERE_INTENT, RESIDENT_RESERVOIR_ROUTE, ResidentReservoir,
     };
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn admitted_endpoints_have_distinct_pane_roots_and_drop_only_their_own() {
+        use graphshell::resident_host::PaneRoots;
+        use pandect::addressable_graph::GraphAddress;
+        use std::collections::BTreeSet;
+        let fixture = fixture(49, "pane-roots").await;
+        let shared = fixture
+            .routes
+            .inner
+            .served
+            .lock()
+            .await
+            .values()
+            .next()
+            .unwrap()
+            .clone();
+        let first = MereEndpoint::open_mode(shared.clone(), &context("turnstone"), false).unwrap();
+        let second = MereEndpoint::open_mode(shared.clone(), &context("turnstone"), false).unwrap();
+        assert!(Arc::ptr_eq(&first.host, &second.host));
+        assert_ne!(first.pane, second.pane);
+        assert_eq!(first.pane.app(), "turnstone");
+        assert_eq!(second.pane.app(), "turnstone");
+        let a = Uuid::from_u128(4950);
+        let b = Uuid::from_u128(4951);
+        let first_focus = GraphAddress::Resource(Uuid::from_u128(4952));
+        let second_focus = GraphAddress::Resource(Uuid::from_u128(4953));
+        let pin = GraphAddress::Surface(Uuid::from_u128(4954));
+        let host = first.host.clone();
+        {
+            let mut host = host.lock().await;
+            // Both admitted endpoints resolve the same authored projection.
+            let roster = BTreeSet::from([a, b]);
+            host.set_resident_pane(
+                first.pane.clone(),
+                PaneRoots {
+                    roster: roster.clone(),
+                    focus: Some(first_focus),
+                },
+            );
+            host.set_resident_pane(
+                second.pane.clone(),
+                PaneRoots {
+                    roster,
+                    focus: Some(second_focus),
+                },
+            );
+            host.set_resident_pins(BTreeSet::from([pin]));
+        }
+        let first_id = first.pane.clone();
+        drop(first);
+        {
+            let mut host = host.lock().await;
+            let roots = host.resident_roots().union();
+            assert_eq!(roots.projection_surfaces, BTreeSet::from([a, b]));
+            assert_eq!(roots.transient, BTreeSet::from([second_focus]));
+            assert_eq!(roots.pinned, BTreeSet::from([pin]));
+            let revision = host.resident_roots().revision();
+            host.close_resident_pane(&first_id);
+            assert_eq!(
+                host.resident_roots().revision(),
+                revision,
+                "drop already released the pane"
+            );
+        }
+        drop(second);
+        let host = host.lock().await;
+        assert!(host.resident_roots().union().projection_surfaces.is_empty());
+        assert!(host.resident_roots().union().transient.is_empty());
+        assert_eq!(host.resident_roots().union().pinned, BTreeSet::from([pin]));
+        assert_eq!(
+            shared.hosts.lock().await.len(),
+            1,
+            "one cached writer serves both endpoints"
+        );
+    }
 
     fn persona(n: u128) -> PersonaId {
         PersonaId::from_uuid(Uuid::from_u128(n))

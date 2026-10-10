@@ -160,7 +160,11 @@ struct PersistedMereHost {
 pub struct MereHost<B> {
     #[cfg(test)]
     pub(crate) resident_prepare_error: Option<StoreError>,
-    resident_admitted: bool,
+    pub(crate) resident_admitted: bool,
+    pub(crate) resident_reader: Option<pandect::addressable_graph::ResidentGraph<B>>,
+    pub(crate) resident_settings: crate::resident_host::ResidentSettings,
+    pub(crate) resident_settings_dirty: bool,
+    pub(crate) resident_roots: crate::resident_host::HostRoots,
     resident_busy: bool,
     resident_staged: Option<crate::resident_host::ResidentStaged>,
     sessions: MereSessions<B>,
@@ -240,6 +244,10 @@ impl<B: Backend + Clone> MereHost<B> {
             #[cfg(test)]
             resident_prepare_error: None,
             resident_admitted: false,
+            resident_reader: None,
+            resident_settings: Default::default(),
+            resident_settings_dirty: false,
+            resident_roots: Default::default(),
             resident_busy: false,
             resident_staged: None,
             sessions: MereSessions::new(backend.clone()),
@@ -334,7 +342,7 @@ impl<B: Backend + Clone> MereHost<B> {
             },
         };
         let epoch = Self::advance_epoch(&slots, fallback).await?;
-        Ok(Self::assemble(
+        Self::assemble(
             backend,
             graph_session,
             selected_persona,
@@ -342,7 +350,9 @@ impl<B: Backend + Clone> MereHost<B> {
             access_context,
             (epoch, epoch),
             reopened,
-        ))
+        )
+        .load_resident_settings()
+        .await
     }
 
     /// Open session `id` of this store, as a resident does to serve one
@@ -379,7 +389,7 @@ impl<B: Backend + Clone> MereHost<B> {
             graph_session = graph_session.with_validator(validator)?;
         }
         let epoch = Self::advance_epoch(&JsonSlots::new(backend.clone()), 0).await?;
-        Ok(Self::assemble(
+        Self::assemble(
             backend,
             graph_session,
             selected_persona,
@@ -387,7 +397,9 @@ impl<B: Backend + Clone> MereHost<B> {
             access_context,
             (epoch, epoch),
             true,
-        ))
+        )
+        .load_resident_settings()
+        .await
     }
 
     /// Switch to a new session begun from `graph`, keeping the one it replaces
@@ -428,6 +440,10 @@ impl<B: Backend + Clone> MereHost<B> {
             mere::canvas::ChannelRegistry::new();
         self.projection_epoch = self.projection_epoch.wrapping_add(1);
         self.projection_revision = 1;
+        self.resident_reader = None;
+        self.resident_settings = Default::default();
+        self.resident_settings_dirty = false;
+        self.resident_roots = Default::default();
         self.resources.clear();
         self.instance_targets.clear();
         Ok(())
@@ -506,7 +522,7 @@ impl<B: Backend + Clone> MereHost<B> {
             .map(|s| s.pending(at))
             .collect::<Result<Vec<_>, _>>()
             .map_err(MereHostError::from)?;
-        let staged = ResidentStaged::new(current, retired);
+        let staged = ResidentStaged::new(current, retired, self.resident_settings_ops()?);
         let work = staged.work();
         self.resident_busy = true;
         self.resident_staged = Some(staged);
@@ -560,6 +576,7 @@ impl<B: Backend + Clone> MereHost<B> {
         self.retired.clear();
         self.resident_staged = None;
         self.resident_busy = false;
+        self.resident_settings_dirty = false;
         Ok(Some(generation))
     }
 }
@@ -633,7 +650,9 @@ impl<B: Backend> MereHost<B> {
 
     /// Whether any change waits for the next store.
     pub fn has_unstored(&self) -> bool {
-        !self.retired.is_empty() || self.graph_session.has_unstored()
+        self.resident_settings_dirty
+            || !self.retired.is_empty()
+            || self.graph_session.has_unstored()
     }
 
     /// The host's store, to write a [`Staged`] batch through.
@@ -652,6 +671,13 @@ impl<B: Backend> MereHost<B> {
         }
         self.retired.drain(..count);
         self.graph_session.stored(staged.current);
+    }
+
+    /// Installed immutable presentation, while graph() remains the complete writer.
+    pub fn presentation_graph(&self) -> &Graph {
+        self.resident_reader
+            .as_ref()
+            .map_or_else(|| self.graph(), |reader| reader.graph())
     }
 
     pub fn graph(&self) -> &Graph {
@@ -1213,7 +1239,7 @@ impl<B: pandect::graph_session::LegacyTransactionBackend + Clone> MereHost<B> {
         )
         .await?;
         let epoch = Self::advance_epoch(&JsonSlots::new(backend.clone()), 0).await?;
-        Ok(Self::assemble(
+        Self::assemble(
             backend,
             graph_session,
             selected_persona,
@@ -1221,7 +1247,9 @@ impl<B: pandect::graph_session::LegacyTransactionBackend + Clone> MereHost<B> {
             access_context,
             (epoch, epoch),
             true,
-        ))
+        )
+        .load_resident_settings()
+        .await
     }
 }
 
