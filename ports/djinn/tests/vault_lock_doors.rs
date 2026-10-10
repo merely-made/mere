@@ -33,10 +33,10 @@ use graphshell::native::identity_ui::{NativeIdentityUi, apply_native_identity_ac
 use graphshell::native::local_session::{DoorIdentity, door_salts};
 use graphshell::native::personae_host::PersonaeHost;
 use notochord::{NetworkId, ProfileRef, ProofBinding, SessionHello, TrafficClass};
-use personae::{
-    Ed25519Keypair, IdentityError, IdentityProvider, IdentityStorage, IdentityVault, OsPresence,
-    Profile, ProfileId, SealedProfileStorage, UnlockMethod,
+use castellan::custody::{
+    IdentityStorage, IdentityVault, OsPresence, Profile, SealedProfileStorage, UnlockMethod,
 };
+use personae::{Ed25519Keypair, IdentityError, IdentityProvider, ProfileId};
 use uuid::Uuid;
 use zeroize::Zeroizing;
 

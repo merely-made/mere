@@ -55,6 +55,7 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::time::Duration;
 
+use castellan::custody::bootstrap::Unlock;
 use distillery::{
     ChronicleObserver, ChronicleRevision, Distillery, InstalledAuthority, InstalledSettings,
     ResidentAuthority, ResidentReceipt, ResidentSettings, RetentionSettings,
@@ -66,7 +67,6 @@ use mesh::spec::JobSpec;
 use mesh::{AvailabilityPolicy, DevicePolicy, ErasurePolicy, JobBoard, MeshRetentionPolicy};
 use muniment::RedbBackend;
 use notochord::LocalNetworkPolicy;
-use personae::bootstrap::Unlock;
 use personae::{Ed25519Keypair, ProfileId};
 use tokio::sync::Mutex;
 

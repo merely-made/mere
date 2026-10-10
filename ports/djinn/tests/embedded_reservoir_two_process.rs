@@ -17,6 +17,9 @@ use std::sync::Arc;
 use std::sync::mpsc::{Receiver, channel};
 use std::time::Duration;
 
+use castellan::custody::{
+    IdentityStorage, IdentityVault, InMemoryStorage, Profile, SealedProfileStorage,
+};
 use chirograph::{CarrierRequestBody, CarrierResponseBody, IntentInvocation, IntentResult};
 use djinn::embedded_reservoir::{
     ReservoirAttachment, ReservoirAttachmentError, ReservoirAttachmentOptions,
@@ -32,10 +35,7 @@ use graphshell::native::personae_host::PersonaeHost;
 use graphshell::native::tasks::ResidentTasks;
 use graphshell::session_item::{APPLY_EDITS_INTENT, ApplyEditsV1};
 use pandect::{CapturedDelta, DomainId};
-use personae::{
-    Ed25519Keypair, IdentityStorage, IdentityVault, InMemoryStorage, PersonaId, Profile, ProfileId,
-    SealedProfileStorage,
-};
+use personae::{Ed25519Keypair, PersonaId, ProfileId};
 use sceno::InstanceId;
 use uuid::Uuid;
 
@@ -355,8 +355,10 @@ async fn locked_identity_never_opens_a_reservoir_and_lock_stops_an_embedded_owne
         matches!(locked, Err(ReservoirAttachmentError::Embedded(reason)) if reason.contains("locked"))
     );
     assert!(!config.shared_root.exists());
-    host.unlock_vault(personae::UnlockMethod::Passphrase(b"isolated v5 fixture"))
-        .unwrap();
+    host.unlock_vault(castellan::custody::UnlockMethod::Passphrase(
+        b"isolated v5 fixture",
+    ))
+    .unwrap();
     let attached = ReservoirAttachment::open(config.clone(), || async { Ok(host.clone()) })
         .await
         .unwrap();

@@ -15,6 +15,8 @@ use std::sync::Arc;
 #[cfg(feature = "personal-sync")]
 use std::time::Duration;
 
+use castellan::custody::IdentityVault;
+use castellan::custody::bootstrap;
 #[cfg(feature = "personal-sync")]
 use distillery::ResidentReceipt;
 #[cfg(feature = "personal-sync")]
@@ -59,8 +61,7 @@ use graphshell::native::personae_host::PersonaeHost;
 use graphshell::native::personae_host::STANDARD_WINDOWS_AGENT_ENDPOINT;
 use graphshell::native::tasks::ResidentTasks;
 use graphshell::profile::{default_vault_dir, resolve_selected_profile};
-use personae::bootstrap;
-use personae::{IdentityVault, ProfileId};
+use personae::ProfileId;
 use serde_json::json;
 use ssh_agent_lib::agent::listen;
 
@@ -934,7 +935,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         let personae = Arc::clone(&personae);
         Arc::new(move |passphrase: &[u8]| {
             personae
-                .unlock_vault(personae::UnlockMethod::Passphrase(passphrase))
+                .unlock_vault(castellan::custody::UnlockMethod::Passphrase(passphrase))
                 .map_err(|error| error.to_string())
         })
     };

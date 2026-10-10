@@ -20,8 +20,10 @@
 use std::path::Path;
 use std::time::Duration;
 
-use personae::bootstrap::{self, OpenedStorage, PASSPHRASE_VAULT_FILE, Unlock};
-use personae::{AUTO_UNLOCK_ROOT_FILE, IdentityStorage, OsPresence, SealedProfileStorage, UnlockMethod};
+use castellan::custody::bootstrap::{self, OpenedStorage, PASSPHRASE_VAULT_FILE, Unlock};
+use castellan::custody::{
+    AUTO_UNLOCK_ROOT_FILE, IdentityStorage, OsPresence, SealedProfileStorage, UnlockMethod,
+};
 use zeroize::Zeroizing;
 
 /// Which vault a start opens.
@@ -174,7 +176,7 @@ pub fn open(
     waiting: &mut dyn Waiting,
     sleep: &mut dyn FnMut(Duration),
 ) -> Result<Started, String> {
-    if choice == VaultChoice::AutoOs && personae::lock_persisted(vault_dir) {
+    if choice == VaultChoice::AutoOs && castellan::custody::lock_persisted(vault_dir) {
         return open_under_persisted_lock(vault_dir, prompt, waiting, sleep);
     }
     if choice == VaultChoice::AutoOs {
@@ -302,7 +304,7 @@ fn open_under_persisted_lock(
             },
         }
     }
-    personae::clear_persisted_lock(vault_dir).map_err(|error| error.to_string())?;
+    castellan::custody::clear_persisted_lock(vault_dir).map_err(|error| error.to_string())?;
     waiting.emit("unlocked-at-start", serde_json::json!({ "persisted_lock": true }));
     Ok(Started {
         opened: OpenedStorage {
@@ -535,7 +537,7 @@ mod tests {
         assert!(unattended.is_ok());
         assert!(events.is_empty(), "no lock persisted: no prompt");
 
-        personae::persist_lock(dir.path()).unwrap();
+        castellan::custody::persist_lock(dir.path()).unwrap();
         let mut prompt = script(&[Some("wrong"), None, Some("right")]);
         let (started, events, slept) = start_as(dir.path(), VaultChoice::AutoOs, &mut prompt);
         let (opened, choice, second) = started.unwrap().into_parts();
@@ -547,7 +549,7 @@ mod tests {
             ["waiting-for-unlock", "unlock-refused", "unlock-cancelled", "unlocked-at-start"]
         );
         assert_eq!(slept, [backoff(0)]);
-        assert!(!personae::lock_persisted(dir.path()), "the unlock cleared the marker");
+        assert!(!castellan::custody::lock_persisted(dir.path()), "the unlock cleared the marker");
         drop(opened);
 
         let (again, events, _) = start_as(dir.path(), VaultChoice::AutoOs, &mut script(&[]));
