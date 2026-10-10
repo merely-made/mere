@@ -223,6 +223,10 @@ impl ProjectionDynamics {
         self.finished.is_none()
     }
 
+    pub fn end(&self) -> Option<SettleEnd> {
+        self.finished
+    }
+
     pub fn ticks(&self) -> u64 {
         self.ticks
     }
