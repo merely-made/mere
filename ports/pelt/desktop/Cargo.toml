@@ -32,6 +32,7 @@ livery = [
     "dep:cambium", "dep:cambium-genet-winit-host", "dep:genet-livery", "dep:genet-scripted-dom",
     "dep:genet-render", "dep:accesskit", "dep:layout-dom-api", "dep:paint_list_render", "dep:url",
     "dep:windows", "dep:dpi", "dep:scrying-engine",
+    "dep:tabard-workshop", "dep:cambium-rootstock", "dep:mesquite", "dep:taproot", "dep:dirs",
 ]
 # Named developer receipt for applying a Tabard artifact to Pelt Chrome. This
 # stays optional so the generic shell has no Tabard runtime dependency.
@@ -125,6 +126,11 @@ linux-present = [
 # genet.git at the one revision the root manifest states.
 cambium = { workspace = true, optional = true }
 cambium-genet-winit-host = { workspace = true, optional = true }
+cambium-rootstock = { workspace = true, optional = true }
+tabard-workshop = { workspace = true, optional = true, features = ["native-host"] }
+mesquite = { workspace = true, optional = true }
+taproot = { workspace = true, optional = true }
+dirs = { version = "6", optional = true }
 netrender = { workspace = true, optional = true }
 # Only `save_buffer_with_format(.., ImageFormat::Png)` is used, so this takes
 # the png-only feature set mere's other image consumer already uses.
@@ -218,6 +224,7 @@ ash = "0.38"
 
 
 [dev-dependencies]
+tempfile = "3"
 # The fixture-5 receipt inspects the concrete retained resource-ledger types
 # returned by `LiveryDocumentSession::resource_set()`.
 genet-document-resources = { workspace = true }

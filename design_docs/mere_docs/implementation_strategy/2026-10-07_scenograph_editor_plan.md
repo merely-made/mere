@@ -532,6 +532,42 @@ separate presentation intents. Arbitrary attribute storage, primitive node
 encoding and overlap policy remain the existing forks. The active dynamics
 qualification and B1/S2 owner boundaries retain their priority.
 
+#### Mixed-content study (2026-10-10; proposal, not opened)
+
+Mark forwarded the design-language agent's proposed
+[mixed-content scene and embedded forme study, §9.10](../../2026-08-23_projection_scenes_and_graph_native_platform.md#910-mixed-content-scene-and-embedded-forme-study-2026-10-10).
+It joins the existing style-editor and composition research; it creates no
+SE ruling or additional active track. The candidate theme axis is not an
+implemented facet axis. The existing dynamics qualification → B1 → S2 order
+and viewer-file ownership holds stand.
+
+*Reading, not ruled:* prepare the study in three reviewable parts:
+
+1. Establish one scene with document, image and video material, related nodes
+   and a forme corresponding to two existing side-by-side webpage accesses.
+   Record source, occurrence, arrangement-member, tile and session identities.
+   A captured face must be distinguishable from a working live surface.
+2. Compare editable appearance treatments and representation/arrangement
+   choices. Retain semantic font roles and selection cues. Separate paint-only
+   updates from footprint changes requiring measurement and placement.
+   A target → condition → effect sketch should expose matching inputs,
+   precedence, fallback and eligibility before becoming a rule schema.
+3. Exercise the tile-to-field bridge: hover subdivisions, selection, explicit
+   focus, moving the outer field and deliberately unlocking its internal
+   layout. Apply accepted tile edits to their owning state and refresh both
+   projections. Keep the semantic arrangement, projection geometry and
+   document-session ownership distinct.
+
+Candidate done-conditions: changing treatments preserves source/access
+identity and manual placement; font or face changes update measured extents;
+returning to the tile reuses its session; moving the field preserves a locked
+local split; selection and deselection preserve edits; unlocking a layout
+change round-trips through undo and save/reopen. Explain each displayed rule
+and overlapping-field contribution. Compact/detail thresholds must not
+oscillate merely because their own representation changes the measured size.
+These are acceptance proposals, not recorded receipts. SE36's Rhai choice
+does not establish that the pending rule runner or style editors exist.
+
 ## 4. Findings
 
 Verified 2026-10-07 against mere's origin unless named.
