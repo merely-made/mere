@@ -40,7 +40,8 @@ This note does not change adoption order or claim controls in every consumer.
 
 ## Application adoption (2026-10-09)
 
-**Status:** in progress. Mark selected this order: Pelt, Graphshell, Knot,
+**Status:** all seven selected application integrations published with platform
+receipts; broader authoring follow-ups remain open below. Mark selected this order: Pelt, Graphshell, Knot,
 Turnstone, Woodshed, Redshank, Signalman. Isocosm is excluded while its own
 migration proceeds. This is the implementation priority; the owner subsequently
 asked to push integrations as they qualify. Implementation and discovery can
@@ -272,8 +273,9 @@ applicable rendered acceptance pass against its published dependency set.
   [The shared receipt](../../cambium_docs/testing/receipts/native_image_atlas_20261010/README.md)
   preserves original failure and fixed test evidence. Mere's root patches the
   maintained triple together; consuming roots must repeat that policy. This
-  closes the reproduced atlas defect, without identifying the earlier hung
-  kernel or qualifying Turnstone's still-pending production child preview.
+  closes the reproduced atlas defect without identifying the earlier hung
+  kernel. Turnstone's subsequent production qualification below independently
+  closes its populated child-preview and application persistence gates.
 - October 10 Pelt native qualification follows the renderer publication.
   The fixed binary passes fresh-10 and separate-process reopen-10 on Radeon
   Pro Vega 56 / Metal: 85 presented editor frames, nine nonblank editor captures
@@ -340,25 +342,38 @@ applicable rendered acceptance pass against its published dependency set.
   Native runs use the ordinary production binary and LaunchServices. No new GPU
   reset appeared; all owned processes exited before the next app handoff.
 
-- Turnstone's application adapter remains a candidate while its native preview
-  gate is open. The full serial candidate suite passes 777 tests with nine
-  existing ignores; the subsequent retained Settings and cooperative-wait
-  changes pass 28 focused checks. A process sample identifies the original
-  child presentation starvation in the legacy synchronous `wait-file` fixture.
-  The fixtures now use shared Taproot `wait`, and the existing busy report
-  covers both a requested and open workshop. Native seed 04 records 198 main
-  and 51 child presentations with nine nonblank captures, and the four modes,
-  saved definition, explicit Apply and narrow application pixels pass. The
-  workshop's application preview nevertheless has a flat-color interior at
-  both sizes. Native diagnostics 05–06 prove producer staging and retain
-  presented-frame PaintLists; those packets contain correctly placed external
-  images with valid clips and full opacity. Moving Turnstone chrome out of the
-  shared child host's low raster identity range repairs a concrete cache-key
-  collision, but native diagnostic 07 still has the empty preview and no
-  document-rendering diagnostic. Its intentional diagnostic assertion is a
-  failed receipt, not acceptance. Fresh-process and same-ID lanes remain held;
-  Turnstone publication awaits the preview repair. None of these serialized
-  attempts added a GPU restart report.
+- Turnstone `7fca85ac` publishes its application adapter and the shared native
+  workshop. Four production LaunchServices processes on Radeon Pro Vega 56 /
+  Metal record 521 presentations, 19 visually reviewed nonblank captures and
+  no new GPU reset. Application previews contain text and controls at both
+  sizes. Exact 255-byte CSS fixtures prove Save preserves the applied
+  same-ID definition, ordinary Apply adopts the edit, and both initial and
+  edited identity/mode/CSS restore in separate processes. The
+  [application ledger](https://github.com/merely-made/turnstone/blob/7fca85ac4cb04d872a4bf6a60bc87a7abd7d894f/docs/receipts/tabard_adoption_20261010/README.md)
+  binds the production binary and all 320 unchanged build inputs. Current
+  source passes 32 focused CPU tests; the older full serial 777-pass suite
+  predates later selector/wait changes and is recorded separately. Generated
+  test startup initially stalled before libtest; a scoped generated-artifact
+  repair restored execution without changing source or the production binary.
+  The compiled candidate retains Mere `7019f07d` and Genet `7422e906` with
+  explicit maintained renderer triple `10f01d6d`; later Mere `3808c5a22` and
+  Genet `7971ac91a1d` root-policy publications have identical shared crate /
+  component content. The ledger records the actual pins rather than claiming
+  an unbuilt repin. Dirty parent-quit Save/Discard/Cancel and each OS focus
+  transition were not separately exercised natively; other platforms and
+  independent Reader/browser rollout gates remain outside this receipt.
+- Turnstone's earlier failed attempts remain diagnosis evidence. A process
+  sample identifies child redraw starvation in its legacy synchronous
+  `wait-file`; the fixtures now use shared Taproot's cooperative `wait` and
+  the existing busy report covers requested and open workshops. Subsequent
+  populated producer textures but transparent registered-image samples isolate
+  the atlas loss closed by `10f01d6d`. Moving parent chrome out of the child's
+  low raster identity range avoids an overlap but did not repair that preview;
+  its diagnostic receipt remains failed evidence. No temporary source observer
+  survives in the accepted production binary, and no serialized attempt added
+  a GPU restart report. Concurrent Moot/canonical-domain activity has no
+  established causal link to the original reset; qualification now has one
+  explicit GPU owner at a time.
 
 ## Shared authoring and title-bar composition (2026-10-08)
 
