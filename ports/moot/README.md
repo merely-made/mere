@@ -19,8 +19,8 @@ owns replication machinery. Coop exposes activity lifecycle without moving
 application state into a second store. Turnstone composes these surfaces.
 
 The technical package remains `mere-moot`, library `moot`, at `ports/moot`.
-The existing optional `captured-web` module is a bounded implementation;
-the composed conversation and coop experiences remain planned. The active
+The optional `captured-web` module and portable conversation view are bounded
+implementations. Product conversation rendering and live coop remain open. The active
 [Gemot implementation lanes](../../design_docs/2026-08-22_turnstone_suite_composition_and_capability_census.md#gemot-murmurs-moots-and-coop-2026-09-13)
 define the next receipts.
 
@@ -40,6 +40,30 @@ invite/join/leave/reconnect/expire/revoke sequence against a consumer's own
 rather than failures. Domain state, history, merge and authorization stay with
 Gemot, Commons, the place worker and the fixture's store. See the
 [coop lifecycle parity plan](../../design_docs/archive_docs/2026-10-06_completed_plans/2026-09-16_coop_lifecycle_parity_plan.md).
+
+## The Commons conversation view
+
+`moot::conversation` composes the existing Comms pane model and a consumer's
+coop lifecycle report. Each pane keeps its own attention and drafts. Switching
+or clearing selection preserves edits; an explicit confirmed send clears only
+the submitted draft if its content still matches. Thread-load requests carry
+local identities so stale completions cannot attach after a switch or reload.
+
+The optional `commons-chat` feature supplies `conversation::snapshot` over a
+real encrypted `ChatReplica` and the owner's current `CommonsAuthority`.
+It preserves stable Personae authors, original operation identities, reply and
+edit facts, and causal message order. Withheld authority, revocation, causal
+and retraction facts contribute counts. Message authors do not establish a
+membership roster or presence. The default view builds on Wasm without Commons,
+Iroh, a store or a transport runtime.
+
+`Pane::prepare_send` returns addressed content for the existing application
+owner. The owner rechecks current membership, Gemot authority and keys before
+authoring; a snapshot or coop report cannot authorize a later write. Failure
+keeps the draft. No new wire protocol, message store or key distribution lives
+in this view. The CPU receipt uses two encrypted replicas and signed Gemot
+delegation/revocation facts; it qualifies no network, browser UI, presence or
+media path. See the [Moot implementation plan](../../design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#moot-conversation-and-coop-continuation-2026-10-10).
 
 ## License
 

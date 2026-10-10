@@ -101,6 +101,9 @@ impl WorkspaceApp {
             return false;
         };
         match (request.action, target) {
+            (Action::ScrollIntoView, WorkspaceA11yActionTarget::Frisket(node)) => {
+                self.frisket.scroll_accessible_node_into_view(node)
+            },
             (Action::Focus, WorkspaceA11yActionTarget::Frisket(node)) => self
                 .frisket
                 .accessibility_target(node)
