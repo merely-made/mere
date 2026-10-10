@@ -16,6 +16,7 @@
 
 pub mod conditions;
 pub mod custody;
+pub mod hocket_adoption;
 pub mod embedded_reservoir;
 pub mod enrollment;
 pub mod identity_ui;

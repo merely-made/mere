@@ -75,6 +75,7 @@ pub fn grant(
 pub struct ReleasePolicy {
     rules: Vec<(KeySource, SaltRule)>,
     epoch: Vec<EpochRule>,
+    acts: Vec<(KeySource, SaltRule)>,
 }
 
 /// One epoch derivation a release may hand over: its context, whether it
@@ -122,7 +123,26 @@ impl ReleasePolicy {
         Self {
             rules: Vec::new(),
             epoch: Vec::new(),
+            acts: Vec::new(),
         }
+    }
+
+    /// Sign and attest, but never release, salts matching `rule` from
+    /// `source`: root-level acts done here on an app's behalf (D11).
+    pub fn with_act(mut self, source: KeySource, rule: SaltRule) -> Self {
+        self.acts.push((source, rule));
+        self
+    }
+
+    /// Whether djinn may sign or attest with `salt`'s key for an app: any
+    /// releasable salt, and the acts' salts. Never the master's place.
+    pub fn allows_act(&self, source: KeySource, salt: &[u8]) -> bool {
+        self.allows(source, salt)
+            || (!salt.is_empty()
+                && self
+                    .acts
+                    .iter()
+                    .any(|(from, rule)| *from == source && rule.allows(salt)))
     }
 
     /// Release the epoch derivation `rule` names as well.
@@ -187,6 +207,61 @@ impl Default for ReleasePolicy {
                 KeySource::Wallet,
                 SaltRule::Matches(personae::reticulum::is_reticulum_salt),
             )
+            .with_apps()
+    }
+}
+
+/// The application namespaces DR-C moved behind the custody route: the
+/// derived keys Turnstone, Woodshed and Hocket need continuously (transport
+/// and sealing, D11), and the delegations Turnstone issues through djinn.
+impl ReleasePolicy {
+    fn with_apps(self) -> Self {
+        let persona = |policy: Self, prefix: &[u8]| {
+            policy.with(KeySource::Persona, SaltRule::Prefix(prefix.to_vec()))
+        };
+        let mut policy = self.with(
+            KeySource::Persona,
+            SaltRule::Exact(b"woodshed.practice-session.seal.v1".to_vec()),
+        );
+        for prefix in [
+            // Hocket's per-session hand-off signer.
+            &b"hocket/handoff/v2/"[..],
+            // Turnstone: a place's transport, sealed secrets and founding key;
+            // the projection endpoint; capsule-scoped Gemini identities.
+            b"turnstone.place.",
+            b"turnstone/projection-endpoint/",
+            b"personae/gemini-client-identity/v1/",
+            // The shared-place writers Turnstone authors under: Commons
+            // containers and chat, Gemot membership and objects, Stickleback
+            // group keys and prekeys.
+            b"mere.commons.writer.v1/",
+            b"mere.commons.chat.writer.v1/",
+            b"mere.gemot.membership.v1/",
+            b"mere.gemot.objects.v1/",
+            b"stickleback/group-key-writer/v1/",
+            b"stickleback/group-prekey-identity/v1",
+        ] {
+            policy = persona(policy, prefix);
+        }
+        // Gemot authors a Moot's delegation facts under the scope key that
+        // signed them, so a place's delegation key is held while it is open.
+        policy = persona(
+            policy,
+            &insigne::delegation::delegation_signing_prefix("moot"),
+        );
+        // The reader key Turnstone opens Knot's published shares with
+        // (`knot_editor::KNOT_PUBLISH_READER_KEY_CONTEXT`).
+        policy = policy.with(
+            KeySource::Persona,
+            SaltRule::Exact(b"mere/knot-publish/reader/v1".to_vec()),
+        );
+        // A participant install is the root's act: signed here, never released.
+        policy.with_act(
+            KeySource::Persona,
+            SaltRule::Prefix(insigne::delegation::delegation_signing_prefix(
+                "mere.denizen",
+            )),
+        )
     }
 }
 
@@ -197,6 +272,15 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
     call: CustodyCall,
 ) -> Result<CustodyAnswer, CustodyRefusal> {
     tracing::debug!(app = %app, call = call_name(&call), "custody call");
+    if app.as_str() == "hocket"
+        && matches!(&call, CustodyCall::Status | CustodyCall::AsProfile { .. })
+        && !keeper.is_locked()
+    {
+        // D13: Hocket's own record joins custody before Hocket asks who it is.
+        if let Err(error) = crate::hocket_adoption::adopt(keeper.host()) {
+            tracing::warn!(%error, "Hocket's identity was not adopted");
+        }
+    }
     match call {
         CustodyCall::Status => status(&keeper).map(CustodyAnswer::Status),
         CustodyCall::Roster => roster(&keeper).map(CustodyAnswer::Roster),
@@ -225,39 +309,12 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
         },
         CustodyCall::Release { source, salts } => {
             unlocked(&keeper)?;
-            if salts.is_empty()
-                || salts
-                    .iter()
-                    .any(|salt| !keeper.policy().allows(source, salt))
-            {
-                return Err(CustodyRefusal::NotReleasable);
-            }
             let root = root(&keeper, source)?;
-            let root = root.provider();
-            let master = root.master_public_key().to_bytes();
-            let keys = salts
-                .into_iter()
-                .map(|salt| {
-                    Ok(ReleasedKey {
-                        seed: root.derive_keypair(&salt).map_err(identity)?.to_seed(),
-                        attestation: root.attest_derived_key(&salt).map_err(identity)?,
-                        salt,
-                    })
-                })
-                .collect::<Result<Vec<_>, CustodyRefusal>>()?;
-            tracing::info!(app = %app, keys = keys.len(), ?source, "released derived keys");
-            Ok(CustodyAnswer::Released { master, keys })
+            release(keeper.policy(), &app, source, root.provider(), salts)
         },
         CustodyCall::Attest { source, salt } => {
             unlocked(&keeper)?;
-            if !keeper.policy().allows(source, &salt) {
-                return Err(CustodyRefusal::NotReleasable);
-            }
-            let attestation = root(&keeper, source)?
-                .provider()
-                .attest_derived_key(&salt)
-                .map_err(identity)?;
-            Ok(CustodyAnswer::Attestation(attestation))
+            attest(keeper.policy(), source, root(&keeper, source)?.provider(), &salt)
         },
         CustodyCall::Sign {
             source,
@@ -265,18 +322,42 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
             message,
         } => {
             unlocked(&keeper)?;
-            if !keeper.policy().allows(source, &salt) {
-                return Err(CustodyRefusal::NotReleasable);
+            sign(
+                keeper.policy(),
+                source,
+                root(&keeper, source)?.provider(),
+                &salt,
+                &message,
+            )
+        },
+        CustodyCall::AsProfile { profile, inner } => {
+            unlocked(&keeper)?;
+            let persona = keeper.profile_provider(&profile).map_err(identity)?;
+            let source = KeySource::Persona;
+            match *inner {
+                CustodyCall::Status => {
+                    let mut status = status(&keeper)?;
+                    status.persona_public_key = Some(persona.master_public_key().to_bytes());
+                    status.profile = Some(profile);
+                    Ok(CustodyAnswer::Status(status))
+                },
+                CustodyCall::Release {
+                    source: KeySource::Persona,
+                    salts,
+                } => release(keeper.policy(), &app, source, &persona, salts),
+                CustodyCall::Attest {
+                    source: KeySource::Persona,
+                    salt,
+                } => attest(keeper.policy(), source, &persona, &salt),
+                CustodyCall::Sign {
+                    source: KeySource::Persona,
+                    salt,
+                    message,
+                } => sign(keeper.policy(), source, &persona, &salt, &message),
+                _ => Err(CustodyRefusal::Refused {
+                    reason: "only a status, or a persona release, attestation or signature, answers as a named persona".into(),
+                }),
             }
-            let key = root(&keeper, source)?
-                .provider()
-                .derive_keypair(&salt)
-                .map_err(identity)?;
-            let signature = key.sign(&message);
-            Ok(CustodyAnswer::Signature {
-                public_key: key.public_key().to_bytes(),
-                signature: signature.to_bytes().to_vec(),
-            })
         },
         CustodyCall::IssueStationGrant {
             request,
@@ -343,6 +424,7 @@ fn call_name(call: &CustodyCall) -> &'static str {
         CustodyCall::RevokeDevice { .. } => "revoke_device",
         CustodyCall::WatchLock { .. } => "watch_lock",
         CustodyCall::ReleaseEpochKeys { .. } => "release_epoch_keys",
+        CustodyCall::AsProfile { .. } => "as_profile",
     }
 }
 
@@ -418,6 +500,66 @@ fn device_root(data_root: &Path, label: Option<&str>) -> Result<[u8; 32], Custod
             reason: "this device has no identity yet".into(),
         }),
     }
+}
+
+/// Release `salts`' keys from `root`, each with its attestation (D11).
+fn release(
+    policy: &ReleasePolicy,
+    app: &AppId,
+    source: KeySource,
+    root: &dyn IdentityProvider,
+    salts: Vec<Vec<u8>>,
+) -> Result<CustodyAnswer, CustodyRefusal> {
+    if salts.is_empty() || salts.iter().any(|salt| !policy.allows(source, salt)) {
+        return Err(CustodyRefusal::NotReleasable);
+    }
+    let master = root.master_public_key().to_bytes();
+    let keys = salts
+        .into_iter()
+        .map(|salt| {
+            Ok(ReleasedKey {
+                seed: root.derive_keypair(&salt).map_err(identity)?.to_seed(),
+                attestation: root.attest_derived_key(&salt).map_err(identity)?,
+                salt,
+            })
+        })
+        .collect::<Result<Vec<_>, CustodyRefusal>>()?;
+    tracing::info!(app = %app, keys = keys.len(), ?source, "released derived keys");
+    Ok(CustodyAnswer::Released { master, keys })
+}
+
+/// The master's attestation of `salt`'s key; no key crosses.
+fn attest(
+    policy: &ReleasePolicy,
+    source: KeySource,
+    root: &dyn IdentityProvider,
+    salt: &[u8],
+) -> Result<CustodyAnswer, CustodyRefusal> {
+    if !policy.allows_act(source, salt) {
+        return Err(CustodyRefusal::NotReleasable);
+    }
+    root.attest_derived_key(salt)
+        .map(CustodyAnswer::Attestation)
+        .map_err(identity)
+}
+
+/// Sign `message` with `salt`'s key, here; only the signature crosses.
+fn sign(
+    policy: &ReleasePolicy,
+    source: KeySource,
+    root: &dyn IdentityProvider,
+    salt: &[u8],
+    message: &[u8],
+) -> Result<CustodyAnswer, CustodyRefusal> {
+    if !policy.allows_act(source, salt) {
+        return Err(CustodyRefusal::NotReleasable);
+    }
+    let key = root.derive_keypair(salt).map_err(identity)?;
+    let signature = key.sign(message);
+    Ok(CustodyAnswer::Signature {
+        public_key: key.public_key().to_bytes(),
+        signature: signature.to_bytes().to_vec(),
+    })
 }
 
 /// Refuse while the vault is Locked: every act and release waits for an
@@ -600,6 +742,14 @@ mod tests {
             )),
             "the legacy writer's secret stays in djinn"
         );
+        let install = insigne::delegation::delegation_signing_salt(&insigne::delegation::CapabilityScope {
+            domain: "mere.denizen".into(),
+            resource: b"resident".to_vec(),
+            path_prefix: "scope/".into(),
+            actions: ["write".to_string()].into_iter().collect(),
+        });
+        assert!(policy.allows_act(KeySource::Persona, &install), "djinn signs an install");
+        assert!(!policy.allows(KeySource::Persona, &install), "and never releases its key");
         for door in graphshell::native::local_session::door_salts([7; 32]) {
             assert!(
                 !policy.allows(KeySource::Persona, &door),

@@ -875,6 +875,66 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         })
     }
 
+    /// The persona currently spoken as.
+    pub fn current_profile_id(&self) -> ProfileId {
+        self.vault.lock().unwrap().profile_id().clone()
+    }
+
+    /// Whether the vault holds a persona `id`.
+    pub fn has_profile(&self, id: &ProfileId) -> Result<bool, IdentityError> {
+        let vault = self.vault.lock().unwrap();
+        Ok(vault
+            .storage()
+            .list_profiles()?
+            .iter()
+            .any(|summary| &summary.id == id))
+    }
+
+    /// The persona whose master is `master`, if any. Refused while Locked.
+    pub fn profile_holding(
+        &self,
+        master: &Ed25519PublicKey,
+    ) -> Result<Option<ProfileId>, IdentityError> {
+        if self.is_locked() {
+            return Err(IdentityError::Locked);
+        }
+        let vault = self.vault.lock().unwrap();
+        for summary in vault.storage().list_profiles()? {
+            if vault.storage().load_profile(&summary.id)?.master.public_key() == *master {
+                return Ok(Some(summary.id));
+            }
+        }
+        Ok(None)
+    }
+
+    /// Place an existing master in the vault as persona `id`, key unchanged,
+    /// without switching to it: an application's own identity adopted into
+    /// custody (dramatis D13). Refuses a taken id, as `create_profile` does.
+    pub fn import_profile(
+        &self,
+        id: &ProfileId,
+        display_name: &str,
+        master: Ed25519Keypair,
+    ) -> Result<(), IdentityError> {
+        if self.is_locked() {
+            return Err(IdentityError::Locked);
+        }
+        let vault = self.vault.lock().unwrap();
+        roster::import_profile(vault.storage(), id, display_name, master).map(|_| ())
+    }
+
+    /// A provider for persona `id` without switching to it, for an
+    /// application that speaks as a persona of its own (D13). Refused while
+    /// Locked; it lives only as long as the caller's act.
+    pub fn profile_provider(&self, id: &ProfileId) -> Result<personae::InMemoryProvider, IdentityError> {
+        if self.is_locked() {
+            return Err(IdentityError::Locked);
+        }
+        let vault = self.vault.lock().unwrap();
+        let profile = vault.storage().load_profile(id)?;
+        Ok(personae::InMemoryProvider::from_seed(profile.master.to_seed()))
+    }
+
     /// Apply one typed action a card offered (graphshell's
     /// `identity_projection`, names in [`dramatis::intents`]).
     pub fn apply_intent(
