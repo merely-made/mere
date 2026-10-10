@@ -1,0 +1,163 @@
+[
+  {
+    "path": "embed-fixed/appearance_embedded_host.png",
+    "width": 960,
+    "height": 600,
+    "unique_colors": 1714,
+    "sha256": "0a79492e3c4f707b8b4acebd442c870852c657b99ec92521ff694580805b5d01"
+  },
+  {
+    "path": "embed-fixed/browser.png",
+    "width": 1280,
+    "height": 960,
+    "unique_colors": 2587,
+    "sha256": "ea6cccac955a970700baa994fe0df1faf07fc926746bf17ff91c1d9eb29ac948"
+  },
+  {
+    "path": "host-tree-fixed/host-roles.png",
+    "width": 1280,
+    "height": 960,
+    "unique_colors": 2169,
+    "sha256": "2ee42f1739288458827c9239ad6e47529c4562f0af58889d7a299eefeefacdb5"
+  },
+  {
+    "path": "main-controls-fixed/dark.png",
+    "width": 1280,
+    "height": 960,
+    "unique_colors": 2454,
+    "sha256": "d66ac28c944d8bc89883c4a90d6e4d1ee3e0749f2927d5ed2ac1b2d580daf788"
+  },
+  {
+    "path": "main-controls-fixed/hc_dark.png",
+    "width": 1280,
+    "height": 960,
+    "unique_colors": 2724,
+    "sha256": "5de5dc165337ce89af5aeb9f0d1f3495cc09ce2322648f6166ec34252e9dd583"
+  },
+  {
+    "path": "main-controls-fixed/hc_light.png",
+    "width": 1280,
+    "height": 960,
+    "unique_colors": 2637,
+    "sha256": "ec933b57c48f032c3252ff0ef85c6f49904512828c7cd8ab82cc1feb675bb2b4"
+  },
+  {
+    "path": "main-controls-fixed/light.png",
+    "width": 1280,
+    "height": 960,
+    "unique_colors": 2858,
+    "sha256": "c0356e7afd482e25a09c51ec1e1de4dab2c66317d44d0d4f21cb82eea20a64a3"
+  },
+  {
+    "path": "main-controls-fixed/narrow.png",
+    "width": 640,
+    "height": 780,
+    "unique_colors": 2017,
+    "sha256": "93b2c3d3958133d21184f68a6852e3ef5bfb1436dd1d06e903df3ede32df7fb6"
+  },
+  {
+    "path": "modes-fixed/appearance_authored_dark.png",
+    "width": 1280,
+    "height": 960,
+    "unique_colors": 1682,
+    "sha256": "ea1ae9eceb9a7c13b165242fd5226d74b043310d0f2b557ac7ac09e75ebdd740"
+  },
+  {
+    "path": "modes-fixed/appearance_corrupt_preserved.png",
+    "width": 1280,
+    "height": 960,
+    "unique_colors": 2073,
+    "sha256": "d4b5ce16479e375140223a54b1105291f835408ae97400b176b99e04f1a47f68"
+  },
+  {
+    "path": "modes-fixed/appearance_dark.png",
+    "width": 1280,
+    "height": 960,
+    "unique_colors": 1687,
+    "sha256": "c8ad1d4cedb66dc4090c4af76c97897ad7a016a3ac0779205f6fa50969694d0d"
+  },
+  {
+    "path": "modes-fixed/appearance_hc_dark.png",
+    "width": 1280,
+    "height": 960,
+    "unique_colors": 1984,
+    "sha256": "7980d2e65419ca3f8ac919ea3d689a8b32b330df16cd3f0cca84483b84b81186"
+  },
+  {
+    "path": "modes-fixed/appearance_hc_light.png",
+    "width": 1280,
+    "height": 960,
+    "unique_colors": 1790,
+    "sha256": "1d10aad33f243dfd32c419adb5a037f5b99f9cba8ad755108943649fccbfde46"
+  },
+  {
+    "path": "modes-fixed/appearance_light.png",
+    "width": 1280,
+    "height": 960,
+    "unique_colors": 1891,
+    "sha256": "83a2b032e406125ddedceefee0fefe9de02733c31a1d9cc8f8970c320de75bd5"
+  },
+  {
+    "path": "modes-fixed/browser.png",
+    "width": 1280,
+    "height": 960,
+    "unique_colors": 3010,
+    "sha256": "a36d065ffc5cc36609dc849962a62d62e774740fda46082f0f595f599cb87004"
+  },
+  {
+    "path": "reopen-fixed/appearance_reopened.png",
+    "width": 1280,
+    "height": 960,
+    "unique_colors": 2102,
+    "sha256": "055741417e97a4c6794b5572868eaab290b5f45b259840888c8d6233d2f0030c"
+  },
+  {
+    "path": "reopen-fixed/browser.png",
+    "width": 1280,
+    "height": 960,
+    "unique_colors": 2740,
+    "sha256": "2be52c7767cd3d897a8ee195272be4efcb1c1ba159b439aef54273f49cbf0865"
+  },
+  {
+    "path": "tree-fixed/dark.png",
+    "width": 1280,
+    "height": 960,
+    "unique_colors": 2091,
+    "sha256": "a49f7ca252debeaf7ee440fcd75dc074488262ee0aa5d94b95cf43fbbf885427"
+  },
+  {
+    "path": "tree-fixed/hc_dark.png",
+    "width": 1280,
+    "height": 960,
+    "unique_colors": 2491,
+    "sha256": "93b7c0745db39083688a7c3cf7bb52f0c82c3ea24e5983180ed1d6195e2a62ed"
+  },
+  {
+    "path": "tree-fixed/hc_light.png",
+    "width": 1280,
+    "height": 960,
+    "unique_colors": 2393,
+    "sha256": "c400ddc7c1c16930dd84a3bf08d703aa7d32d963c39e53f6e24241aba9924575"
+  },
+  {
+    "path": "tree-fixed/light.png",
+    "width": 1280,
+    "height": 960,
+    "unique_colors": 2338,
+    "sha256": "b09940d1583c668ba9b44abd7e8f2e093c9037181584122d9e01d118e586458d"
+  },
+  {
+    "path": "tree-fixed/narrow.png",
+    "width": 640,
+    "height": 780,
+    "unique_colors": 1694,
+    "sha256": "20a03a6c7f096b4b49533a01522eeffaaf49076304c077e0a426c58f9e76bea2"
+  },
+  {
+    "path": "tree-fixed/reopened.png",
+    "width": 1280,
+    "height": 960,
+    "unique_colors": 2218,
+    "sha256": "1c31ebaca02f7bc41d58af51dfde096907d8d5b9e0173f93a7fe5d88a161c26b"
+  }
+]

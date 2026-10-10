@@ -219,6 +219,16 @@ applicable rendered acceptance pass against its published dependency set.
   Embedded roots inherit composing-host roles without reading or writing the
   application preference. Optional Moot capsule lifecycle and styling survive
   later appearance refreshes.
+- October 10 separately qualifies Graphshell's guarded Vello `491c376c`
+  default Wasm bundle on Chrome 152 / AMD gcn-5 without a fallback adapter.
+  The existing mode, reopen and embedding scenarios pass 97 frames and eight
+  internal captures; all 23 original scenario/browser/tree/main-control PNGs
+  were reviewed. Four modes, exact authored CSS/custom modes, corrupt-input
+  preservation, fresh reload, narrow layouts and embedded host ownership pass,
+  with no browser errors, product-storage changes or new GPU reset. Exact
+  bundle hash, adapter, pixel ledger and PNGs are retained under
+  `ports/graphshell/docs/receipts/tabard_renderer_20261010`. This qualification
+  covers the new renderer separately from the October 9 pre-guard receipts.
 - Native acceptance is paused after Pelt fresh runs 07 and 08 triggered GPU
   resets and WindowServer watchdog failures. The 01:46:41 October 10 kernel
   report identifies the fresh-08 Pelt process and its stalled Metal compute
@@ -271,6 +281,21 @@ applicable rendered acceptance pass against its published dependency set.
   primary checkout. Its shared-editor adapter extends local desktop preferences,
   leaving persona sync, document contents and writing controls under their
   current owners. Dependency publication and native qualification remain open.
+- October 10 narrow native inspection found the workshop brand overlapping
+  Undo/Redo/Save at 420 pixels. The shared workshop stylesheet now reserves
+  the brand width and moves its action slot to a wrapping row below 480 pixels.
+  Production `native_init` font/layout tests cover 360, 420 and 640 pixels with
+  platform and explicit caption policies, checking nonoverlap, viewport bounds,
+  pointer hit centres and Tab reachability. All 15 native-host library tests
+  pass; the same focused test rejects the original stylesheet at 420 pixels.
+  The windowless harness does not measure macOS traffic-light insets, so actual
+  narrow window acceptance remains required. Initial full-image review also
+  suggested missing title/control paint in Knot and Redshank. Independent PNG
+  byte checks and cropped views disprove the Redshank omissions: title regions
+  are identical across the affected frames, and parent controls are present.
+  The image tool supplied an incorrect generic binary MIME envelope for valid
+  PNGs. Normalize the envelope and inspect exact pixels before attributing a
+  rendering defect; remaining native receipts are undergoing that review.
 
 ## Shared authoring and title-bar composition (2026-10-08)
 
