@@ -93,11 +93,14 @@ those implementations to the editor lane.
 
 The nested branch's 2026-10-10 checkpoint combines the committed site cutover,
 Moot, shared capture polling/Genet `7422e906`, published Tabard appearance and
-the guarded renderer publication through `5cea11408` (published main
-`11236fd4f`, Vello `491c376c`). The guard preserves the earlier Radeon coarse
+the guarded renderer publication through `5cea11408`, followed by published
+Moot/Pelt continuation `4e1811578` at `5884b94a0` (Vello `491c376c`).
+The guard preserves the earlier Radeon coarse
 repair. Its 141 affected CPU tests, locked viewer build and main-page/applet
 Wasm check pass after the renderer update; the unchanged shared scene and
-exporter inputs retain their 254 and four passing tests. Main landing remains
+exporter inputs retain their 254 and four passing tests. Both Wasm gates and
+the 22 host/history and six capsule tests were renewed after the Moot/Pelt
+merge. Main landing remains
 pending: the iMac's confirmed Radeon reset and
 WindowServer incident has put GPU/capture runs on hold, and seven Rootstock
 GPU fixtures failed to obtain a device. The

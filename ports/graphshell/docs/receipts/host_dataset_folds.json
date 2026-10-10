@@ -1,9 +1,9 @@
 {
   "schema": "graphshell.host-dataset-fold-receipt/v1",
-  "recorded_at": "2026-10-10T06:52:34.153790+00:00",
+  "recorded_at": "2026-10-10T07:01:47.035257+00:00",
   "qualification_status": "pending_gpu_acceptance",
-  "qualification_base": "5cea11408d15be7f3f37b630ede91756baa07c82",
-  "check_source_base": "5cea11408d15be7f3f37b630ede91756baa07c82",
+  "qualification_base": "5884b94a00ce907ca6ce4aa0f9a2eaca8b92f1f4",
+  "check_source_base": "5884b94a00ce907ca6ce4aa0f9a2eaca8b92f1f4",
   "contract": "R161: membership becomes sceno::Fold facts, without scenomise::grouping. R162: committed site cutover and current appearance work combined, with owner WIP untouched.",
   "fold_semantics": {
     "membership": "Explicit parent-to-member forest; never inferred from dependencies.",
@@ -31,12 +31,13 @@
           "-j2"
         ],
         "exit_code": 0,
-        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/guarded-renderer-491c376c/final-host.log",
+        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/moot-pelt-integration/final-host.log",
         "passed": 22,
         "log_digest": {
-          "bytes": 39268,
-          "sha256": "93d57e9271a9daaec72cdba9c3d5b137254144f571a2c0dc47568502452e1ed5"
-        }
+          "bytes": 37413,
+          "sha256": "fcaadbb2b85c70977ab61ffaabb9432f3b282e3dafede6b819f9653221164a79"
+        },
+        "source_base": "5884b94a00ce907ca6ce4aa0f9a2eaca8b92f1f4"
       },
       {
         "name": "gestures",
@@ -60,7 +61,8 @@
         "log_digest": {
           "bytes": 35653,
           "sha256": "5b4fcc215a255a4e7ae16d1e38797a16f3c3f441cfd166ec6296643cc9a15c59"
-        }
+        },
+        "source_base": "5cea11408d15be7f3f37b630ede91756baa07c82"
       },
       {
         "name": "framing",
@@ -84,7 +86,8 @@
         "log_digest": {
           "bytes": 9016,
           "sha256": "b78961799e71b2c63d38408b09aebbf9180b30f6d0fac95a633d2692e7ffca38"
-        }
+        },
+        "source_base": "5cea11408d15be7f3f37b630ede91756baa07c82"
       },
       {
         "name": "rootstock-cpu",
@@ -107,7 +110,8 @@
         "log_digest": {
           "bytes": 7473,
           "sha256": "83f1480a299fd3e4a22e9040572402f80d71a9dd47525b869f7d421807f31526"
-        }
+        },
+        "source_base": "5cea11408d15be7f3f37b630ede91756baa07c82"
       },
       {
         "name": "mesquite",
@@ -127,7 +131,8 @@
         "log_digest": {
           "bytes": 3421,
           "sha256": "651f69dcf9781305de289fcc4eb6105c6aa9e2c11563c7297f6bf4d0c35386e3"
-        }
+        },
+        "source_base": "5cea11408d15be7f3f37b630ede91756baa07c82"
       },
       {
         "name": "legacy-controls",
@@ -151,7 +156,8 @@
         "log_digest": {
           "bytes": 35262,
           "sha256": "71a796b805c4ebbfa48132a853a3bc0a024ff92d1486682d4cce089883e79417"
-        }
+        },
+        "source_base": "5cea11408d15be7f3f37b630ede91756baa07c82"
       },
       {
         "name": "capsule",
@@ -170,12 +176,13 @@
           "-j2"
         ],
         "exit_code": 0,
-        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/guarded-renderer-491c376c/final-capsule.log",
+        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/moot-pelt-integration/final-capsule.log",
         "passed": 6,
         "log_digest": {
-          "bytes": 35812,
-          "sha256": "72c2aacd78f99c6a4d7afd7c3c57399193a856acd2fe8da4c456d7b364f89d47"
-        }
+          "bytes": 35709,
+          "sha256": "a94f666a12d53ba79cb55fcb58c81bf07b3f537569febbe357d72dbfc474fa0f"
+        },
+        "source_base": "5884b94a00ce907ca6ce4aa0f9a2eaca8b92f1f4"
       },
       {
         "name": "appearance",
@@ -199,7 +206,8 @@
         "log_digest": {
           "bytes": 35767,
           "sha256": "856d6e46e8362b63b9b0d51ffe36ff2f37b2fc899a8b99c37aa899c5aea119f1"
-        }
+        },
+        "source_base": "5cea11408d15be7f3f37b630ede91756baa07c82"
       }
     ],
     "shared_scene": {
@@ -234,11 +242,12 @@
           "-j2"
         ],
         "exit_code": 0,
-        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/guarded-renderer-491c376c/final-viewer.log",
+        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/moot-pelt-integration/final-viewer.log",
         "log_digest": {
-          "bytes": 28663,
-          "sha256": "67a29cd099ecc2b3304b830f54274e95a3222a7173e925a611d44cab22eaa778"
-        }
+          "bytes": 26960,
+          "sha256": "7c322fcdbc612887e4cf99c971a849949fcf19ab8642d369596d9bb4b6eb3435"
+        },
+        "source_base": "5884b94a00ce907ca6ce4aa0f9a2eaca8b92f1f4"
       },
       {
         "name": "main-applets",
@@ -255,26 +264,27 @@
           "-j2"
         ],
         "exit_code": 0,
-        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/guarded-renderer-491c376c/final-main-applets.log",
+        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/moot-pelt-integration/final-main-applets.log",
         "log_digest": {
-          "bytes": 23287,
-          "sha256": "e667fafe8326dcaa89e9aac4f9a17501dcee63855ce859e327c50f720ddc2bd4"
-        }
+          "bytes": 21584,
+          "sha256": "f142c88cca19ae073bf8c1eb777bc1ccbe96eae8d6077dbfc93cf7a1669ff4b9"
+        },
+        "source_base": "5884b94a00ce907ca6ce4aa0f9a2eaca8b92f1f4"
       }
     ],
     "portable_lock": {
       "status": "passed_metadata_only",
-      "log": "/Users/markik/Code/output/nested-graph-folds-20261009/guarded-renderer-491c376c/portable-metadata.log",
+      "log": "/Users/markik/Code/output/nested-graph-folds-20261009/moot-pelt-integration/portable-metadata.log",
       "digest": {
-        "bytes": 803,
-        "sha256": "bf061b74074e730a8fbf08f7dc83a3f4a427b4247dc9c60acf3263d801a455dc"
+        "bytes": 647,
+        "sha256": "b9d55103bc52e422fda08da7015540b4b99e5ad385382da8d9537079d5c1b6ae"
       }
     },
     "owned_source_headers": {
       "status": "passed",
       "controls": "planted defects failed as intended",
       "logs": [
-        "/Users/markik/Code/output/nested-graph-folds-20261009/guarded-renderer-491c376c/license.log",
+        "/Users/markik/Code/output/nested-graph-folds-20261009/moot-pelt-integration/license.log",
         "/Users/markik/Code/output/nested-graph-folds-20261009/final-license-controls.log"
       ]
     },
@@ -433,8 +443,8 @@
       "sha256": "311706a88e66728d397a4b2687378fb1d3e4122ae318f4c19c19d5ce695acf50"
     },
     "Cargo.lock": {
-      "bytes": 467455,
-      "sha256": "2fe3724f4e1de8cc1c02406c6991df84f6e4878b2a65b795e41e51e7272ece9d"
+      "bytes": 467565,
+      "sha256": "b77c02e17c1b74f7a05dba3f8e7ba7742e92d7193e806ae4cd6ffd64faa91964"
     },
     "Cargo.toml": {
       "bytes": 48944,
@@ -495,6 +505,18 @@
     "crates/canvas/pictograph/src/canvas/view.rs": {
       "bytes": 27344,
       "sha256": "9434699d648025782929e3a5bbcb49e00b7fc4b89bf65c1088ab6db1e5d2dd4f"
+    },
+    "crates/moot/commons/src/chat.rs": {
+      "bytes": 148917,
+      "sha256": "ccf2c6203f91be099a7c0aca3aac4db72ee4f012c7af9f81df2563aab1421ddd"
+    },
+    "crates/shell/comms/src/model.rs": {
+      "bytes": 9006,
+      "sha256": "c42def39f16edc30c175f65f08327f03ca29e3ca273f86b801a5173a79cf700e"
+    },
+    "crates/shell/comms/src/pane.rs": {
+      "bytes": 18570,
+      "sha256": "85fbf49c929ce9a29020c03b5ff00cfc94b0acecb29ce826baebe140b935cbce"
     },
     "ports/graphshell/src/appearance.rs": {
       "bytes": 18364,
@@ -636,6 +658,10 @@
       "bytes": 998,
       "sha256": "d36f0c879683b0f18e27d31b67162055fab268377ad04c2d0039f1aaf116419f"
     },
+    "ports/moot/src/conversation.rs": {
+      "bytes": 10271,
+      "sha256": "f040b126bacc8260201f5f3cc9e40b6bb41ca2dd83b51898194fcef31f223915"
+    },
     "scripts/export_grouped_cargo.py": {
       "bytes": 8636,
       "sha256": "f06f7c3e78648d61502b03ca3fa84e2fdd318dbb7da5126a7526a152044de243"
@@ -665,5 +691,12 @@
     "upstream_diagnostics": "Published theme-modes plan reports real Radeon/Metal malformed-command, renderer and 60 Reader/CSS preview readbacks. These are the renderer lane's diagnostics, not current-source Graphshell viewer acceptance.",
     "hold": "Coordinator retains the headed/browser/native GPU hold during serialized application acceptance. No new GPU test or native capture was launched in this lane for this integration."
   },
-  "current_build_evidence_root": "/Users/markik/Code/output/nested-graph-folds-20261009/guarded-renderer-491c376c"
+  "current_build_evidence_root": "/Users/markik/Code/output/nested-graph-folds-20261009/moot-pelt-integration",
+  "post_renderer_sync": {
+    "published_main": "4e1811578f57a164b0ea5f82a5bd0e5d32aacc6c",
+    "branch_integration": "5884b94a00ce907ca6ce4aa0f9a2eaca8b92f1f4",
+    "changes": "Published Moot conversation adapter and Pelt durable appearance/acceptance. No viewer source or renderer-pin edits in this merge.",
+    "renewed": "22 host/history tests, six capsule tests, both locked Wasm gates and lock/header checks passed; other retained gate inputs are unchanged.",
+    "gpu_acceptance": "Held during serialized native application runs; no GPU test or capture launched here."
+  }
 }

@@ -1,8 +1,8 @@
 # Graphshell on one Cambium tree
 
 **Date:** 2026-09-25
-**Status (2026-10-10):** in progress. The combined viewer at `5cea11408`
-integrates published Mere `11236fd4f`, Genet `7422e906`, guarded Vello
+**Status (2026-10-10):** in progress. The combined viewer at `5884b94a0`
+integrates published Mere `4e1811578`, Genet `7422e906`, guarded Vello
 `491c376c`, and the committed site
 cutover `bf626abd2`. Phases 1–2 are landed; phase 3 has its recorded headed producer
 receipts and Mark's approval to proceed. Phase 4 remains unfinished: canvas
@@ -16,7 +16,8 @@ process fixtures do not close this browser cutover or mount the mere panel.
 **Nested host-dataset continuation (2026-10-10):** implemented on
 `codex/nested-graph-view`, with the site cutover combined at `25e356782`,
 current shared captures and Genet at `178779e2c`, published Tabard appearance
-at `6b0798a95`, and guarded renderer publication at `5cea11408`. The earlier bounded headed proof passes on the default Radeon WebGPU
+at `6b0798a95`, guarded renderer publication at `5cea11408`, and the published
+Moot/Pelt continuation at `5884b94a0`. The earlier bounded headed proof passes on the default Radeon WebGPU
 adapter after the coarse bitmap traversal repair. Mark approved
 implementing expandable repository groups and entering their constituent graph.
 Rulings 161–162 now require portable `sceno::Fold` facts and give the site
@@ -694,6 +695,16 @@ transfers DOM focus into the graph before traversal returns to the controls.
 - No Graphshell-only UI pieces. What Cambium lacks is added to Cambium.
 
 ## 6. Progress
+
+- **2026-10-10 — published Moot/Pelt continuation combined:** merged main
+  `4e1811578` at `5884b94a0`, including Moot's Commons conversation adapter
+  and Pelt's durable appearance/native acceptance record. This merge changes
+  no viewer source or renderer pin. Both locked Wasm gates, 22 host/history
+  tests and six capsule tests pass on the combined source, along with
+  portable-lock metadata and header verification. Other retained gate inputs
+  are unchanged. The receipt names the source base for each renewed or
+  retained CPU gate. Pelt's separate application acceptance does not close
+  this lane's headed viewer acceptance; the coordinated GPU hold continues.
 
 - **2026-10-10 — published guarded renderer integrated; GPU hold continues:**
   merged published Mere `11236fd4f` at `5cea11408`. Both Cargo roots and their
