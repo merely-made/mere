@@ -279,10 +279,13 @@ applicable rendered acceptance pass against its published dependency set.
   pointer hit centres and Tab reachability. All 15 native-host library tests
   pass; the same focused test rejects the original stylesheet at 420 pixels.
   The windowless harness does not measure macOS traffic-light insets, so actual
-  narrow window acceptance remains required. Knot and Redshank also expose
-  intermittent missing title/control paint despite successful presentation and
-  nonblank frames. Those receipts are rejected pending shared renderer/retained
-  scene isolation; this geometry repair does not close that separate defect.
+  narrow window acceptance remains required. Initial full-image review also
+  suggested missing title/control paint in Knot and Redshank. Independent PNG
+  byte checks and cropped views disprove the Redshank omissions: title regions
+  are identical across the affected frames, and parent controls are present.
+  The image tool supplied an incorrect generic binary MIME envelope for valid
+  PNGs. Normalize the envelope and inspect exact pixels before attributing a
+  rendering defect; remaining native receipts are undergoing that review.
 
 ## Shared authoring and title-bar composition (2026-10-08)
 
