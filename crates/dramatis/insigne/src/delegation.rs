@@ -468,6 +468,15 @@ pub fn delegation_signing_salt(scope: &CapabilityScope) -> Vec<u8> {
     bytes
 }
 
+/// What every [`delegation_signing_salt`] in `domain` begins with: a custodian
+/// names a domain's signing keys by this prefix without knowing the resources.
+pub fn delegation_signing_prefix(domain: &str) -> Vec<u8> {
+    let mut bytes = Vec::new();
+    push_bytes(&mut bytes, SIGNING_KEY_DOMAIN);
+    push_str(&mut bytes, domain);
+    bytes
+}
+
 /// Whether `prefix` selects `path` at a structural slash boundary.
 ///
 /// A scope for `/publications/a` reaches `/publications/a/version`, but not
