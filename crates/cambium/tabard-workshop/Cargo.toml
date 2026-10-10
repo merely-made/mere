@@ -31,6 +31,7 @@ cambium-genet-winit-host = { workspace = true, optional = true }
 cambium-rootstock = { workspace = true, optional = true }
 
 [dev-dependencies]
+genet-render-host.workspace = true
 cambium-genet-winit-host.workspace = true
 taproot.workspace = true
 genet-scripted-dom.workspace = true

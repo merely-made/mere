@@ -226,6 +226,46 @@ applicable rendered acceptance pass against its published dependency set.
   a full reboot. Fresh-08 reproduces with sleep prevention active and records
   zero captures; no native application is visually qualified by this run.
   Renderer compute isolation and repair must precede another native attempt.
+- October 10 renderer isolation: both the BBS Moot and canonical-domain lanes
+  report their last headed browser checks ended near 00:12 Eastern, with no
+  newly launched headed GPU runs at the later reset timestamps. Earlier demo
+  pages may have remained open; those reports do not establish a shader cause.
+  The canonical-domain lane also records later headless device-loss failures.
+  Shared Vello `491c376c` retains the existing Radeon coarse fix, enables normal
+  shader runtime checks and workgroup initialization, and validates fine
+  command framing, forward jumps, clip depth and fill segment spans. All 31
+  deliberate command dispatches, two coarse regressions, ten general renderer
+  regressions, allocation recovery and repeated clip composition pass on the
+  actual Radeon Pro Vega 56 / Metal adapter. The test image comparison now
+  uses independent GPU bytes instead of comparing the CPU image with itself.
+  The actual workshop Reader/CSS previews also pass 60 owned readbacks over
+  four modes, authored CSS, wide/narrow dimensions and interleaved shared-core
+  draws. Copy completion is at most 498 ms; exact background/text checks pass.
+  Settled and isolated Reader comparisons permit at most 64 pixels differing
+  by one byte per channel, with a CPU regression enforcing that bound.
+  Twenty representative images were visually inspected. Evidence is retained
+  under `tabard-app-receipts/2026-10-09/shared-renderer/offscreen-previews-03`.
+  No new GPU reset report appeared during these diagnostics. The exact hung
+  kernel remains unidentified, and native window acceptance remains pending;
+  these offscreen results do not qualify application presentation or reopen.
+  Each standalone application root must patch the maintained renderer triple
+  explicitly: Cargo does not inherit Mere's root patches into consuming roots.
+  Inspect the application's native host dependency closure before its receipt;
+  an older unrelated Sprigging bridge may retain its existing Vello types.
+- October 10 Pelt native qualification follows the renderer publication.
+  The fixed binary passes fresh-10 and separate-process reopen-10 on Radeon
+  Pro Vega 56 / Metal: 85 presented editor frames, nine nonblank editor captures
+  and two application captures. All eleven PNGs were visually inspected.
+  The real workflow authors all four modes and exact CSS, saves, resizes the
+  same editor to 640×780, explicitly applies the choice in Pelt and restores
+  that exact choice in a new process. Workspace assertions preserve controller
+  identity, history, focus and aperture. No new GPU reset report appeared.
+  Original evidence is retained under
+  `tabard-app-receipts/2026-10-10/pelt/{fresh-10,reopen-10}`; the port's receipts
+  preserve logs, presentation counts, hashes and review records. Fresh-09 was
+  stopped prematurely as a precaution and is explicitly marked partial.
+  Native acceptance now proceeds one application at a time; simultaneous
+  browser/native GPU runs remain held while the other integrations qualify.
 - Knot's fetched origin `802238cb` already has coherent Mere/Genet pins and
   semantic-field adaptation. An isolated application worktree preserves its
   primary checkout. Its shared-editor adapter extends local desktop preferences,
