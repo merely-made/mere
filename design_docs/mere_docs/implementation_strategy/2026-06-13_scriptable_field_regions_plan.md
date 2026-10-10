@@ -109,6 +109,19 @@ undo and persistence path. A host adapter must distinguish that recorded write
 from the refreshed simulation and the visibility intent. No new placement or
 script UI is installed by this inventory.
 
+**Embedded forme study (2026-10-10; proposal):**
+[design language §9.10](../../2026-08-23_projection_scenes_and_graph_native_platform.md#910-mixed-content-scene-and-embedded-forme-study-2026-10-10)
+makes the two-coordinate problem concrete: a field can move in the scene
+while two webpage members retain their local split. Forme's semantic
+arrangement excludes geometry; proportions and positions belong to projection
+state. The bridge must reuse the owning layout and document accesses rather
+than make the field another tile authority. Hovered subdivisions and explicit
+unlocking are proposed presentations of that same structure. Define how local
+placement constraints compose with outside dynamics and overlapping fields;
+neither additive forces nor an outer rectangle resolves that policy. The
+[editor study](2026-10-07_scenograph_editor_plan.md#mixed-content-study-2026-10-10-proposal-not-opened)
+carries candidate done-conditions, not an opened field implementation track.
+
 ## Findings (code-verified substrate)
 
 The pieces exist; what is missing is **placement, rendering, and the unifying

@@ -428,8 +428,7 @@ their original receipts.
 
 ### Moot conversation and coop continuation (2026-10-10)
 
-**Status:** implementation and CPU receipt complete; awaiting publication alongside
-the held readings qualification. Browser and
+**Status:** implementation and CPU receipt complete. Product browser and
 native GPU presentation remain held during the concurrent system incident.
 This slice composes `ports/moot`'s existing coop contract with Comms' portable
 pane and Commons' actual encrypted chat owner. The retired Meerkat host does
@@ -479,19 +478,13 @@ The port/default-Graphshell boundaries pass. Evidence is preserved in
 and `targets/moot-conversation-wasm-cone.txt`. No GPU or browser run belongs to
 this receipt.
 
-The integration includes published `7bfb293df`, Graphshell's Tabard appearance
-and the shared asynchronous capture helper/Genet pin from `b513994ba`. Its new
-Graphshell control inventory confirms that source attributes and recorded edits
-still belong to the authoritative session; local attention is a separate concern.
-The earlier nineteen browser checks predate this appearance integration as well
-as the wheel correction. Fresh CPU checks are recorded separately from them;
-final browser qualification and publication remain held.
+Conversation qualification is independent of the held multiple-reading browser
+continuation. The coordinating instruction is to publish other integrations as
+their own receipts complete; no browser or GPU run belongs to this change.
 
-The integrated CPU rerun passes all ten capsule tests, eleven browser-host
-tests and the thirty-two Comms/coop/conversation tests; strict consumer Clippy
-and the ordinary viewer check pass. The prepared capsule bundle is
-`targets/moot-capsule-readings-20261010-f`, with byte/source verification and
-an explicit held status. It has no browser check or capture receipt.
+Publication of this CPU-qualified conversation slice completed on main at
+`4e1811578`; its remote hash was verified. The held readings continuation is
+separate and remains unpublished.
 
 ### Capsule peer and standalone-browser reproduction
 

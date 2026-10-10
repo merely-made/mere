@@ -271,3 +271,283 @@ mod tests {
         }
     }
 }
+
+/// Pelt keeps its application choice separately from the shared definitions.
+#[cfg(feature = "livery")]
+pub fn default_appearance_store_path() -> std::io::Result<std::path::PathBuf> {
+    dirs::config_dir()
+        .map(|directory| directory.join("mere").join("pelt").join("appearance.json"))
+        .ok_or_else(|| {
+            std::io::Error::other("No configuration directory; pass --appearance-store PATH")
+        })
+}
+
+/// The standalone workshop and applications share this authored library.
+#[cfg(feature = "livery")]
+pub fn default_theme_library_path() -> std::io::Result<std::path::PathBuf> {
+    dirs::data_local_dir()
+        .map(|directory| directory.join("mere").join("tabard").join("themes.json"))
+        .ok_or_else(|| {
+            std::io::Error::other("No application data directory; pass --theme-library PATH")
+        })
+}
+
+#[cfg(feature = "livery")]
+pub(crate) struct ThemeCatalog {
+    pub path: Option<std::path::PathBuf>,
+    pub registry: tabard::theme::registry::ThemeRegistry,
+    pub error: Option<String>,
+}
+
+#[cfg(feature = "livery")]
+impl ThemeCatalog {
+    pub fn new(path: Option<std::path::PathBuf>) -> Self {
+        let mut catalog = Self {
+            path,
+            registry: tabard::theme::registry::ThemeRegistry::default(),
+            error: None,
+        };
+        catalog.reload();
+        catalog
+    }
+
+    pub fn reload(&mut self) -> bool {
+        let Some(path) = self.path.as_ref() else {
+            return true;
+        };
+        let result = tabard::library::ThemeLibraryStore::load(path.clone()).and_then(|library| {
+            let mut registry = tabard::theme::registry::ThemeRegistry::default();
+            for definition in library.themes() {
+                registry
+                    .add_user_theme(definition.clone())
+                    .map_err(std::io::Error::other)?;
+            }
+            Ok(registry)
+        });
+        match result {
+            Ok(registry) => {
+                self.registry = registry;
+                self.error = None;
+                true
+            },
+            Err(error) => {
+                self.error = Some(format!(
+                    "Could not load theme library {}: {error}",
+                    path.display()
+                ));
+                false
+            },
+        }
+    }
+
+    pub fn user_themes(&self) -> Vec<&tabard::Theme> {
+        self.registry
+            .list()
+            .into_iter()
+            .filter(|theme| theme.source == tabard::theme::registry::ThemeSource::User)
+            .collect()
+    }
+
+    pub fn modes(&self, choice: &ThemeChoice) -> Vec<Mode> {
+        let mut modes = vec![Mode::Light, Mode::Dark, Mode::HcLight, Mode::HcDark];
+        if let Some(theme) = self.registry.theme_def(&choice.theme_id) {
+            modes.extend(
+                theme
+                    .mode_sheets
+                    .iter()
+                    .filter(|(_, rules)| !rules.is_empty())
+                    .filter_map(|(key, _)| Mode::from_key(key))
+                    .filter(|mode| matches!(mode, Mode::Custom(_))),
+            );
+        }
+        modes
+    }
+
+    /// Validation precedes writing the application choice. Preview drafts never
+    /// enter this path: the ID must name a registered definition read from disk.
+    pub fn apply_choice(
+        &mut self,
+        store: &mut dyn ThemeChoiceStore,
+        choice: ThemeChoice,
+    ) -> Result<(), String> {
+        if !self.reload() {
+            return Err(self.error.clone().unwrap());
+        }
+        let theme = self
+            .registry
+            .theme_def(&choice.theme_id)
+            .ok_or_else(|| format!("Theme {} is not saved in the library", choice.theme_id))?;
+        let mode = choice
+            .theme_mode
+            .clone()
+            .unwrap_or_else(|| tabard::theme::seed::default_mode_for_def(theme));
+        theme
+            .presentation_for_mode(&mode)
+            .map_err(|error| error.to_string())?;
+        store
+            .set_choice(choice)
+            .map_err(|error| format!("Could not save Pelt appearance: {error}"))
+    }
+}
+
+#[cfg(feature = "livery")]
+pub fn load_appearance_store(
+    path: impl Into<std::path::PathBuf>,
+) -> std::io::Result<tabard::theme::choice::FileThemeChoiceStore> {
+    let path = path.into();
+    let store = tabard::theme::choice::FileThemeChoiceStore::load_strict(path.clone())?;
+    if let Some(parent) = path
+        .parent()
+        .filter(|parent| !parent.as_os_str().is_empty())
+    {
+        std::fs::create_dir_all(parent)?;
+    }
+    Ok(store)
+}
+
+#[cfg(all(test, feature = "livery"))]
+mod catalog_tests {
+    use super::*;
+    use tabard::library::ThemeLibraryStore;
+    use tabard::theme::choice::InMemoryThemeChoiceStore;
+    use tabard::theme::registry::{THEME_ID_DEFAULT, ThemeRegistry};
+    use tabard::{Theme, ThemePresentation, resolve_theme_choice};
+
+    fn authored() -> Theme {
+        let registry = ThemeRegistry::default();
+        let mut theme = Theme::new(
+            "theme:pelt-test",
+            "Pelt test",
+            registry.theme_def(THEME_ID_DEFAULT).unwrap().seeds,
+        );
+        theme.mode_sheets.insert(
+            "custom:concert".into(),
+            vec![".pelt-toolbar { background: #713f92; }".into()],
+        );
+        theme
+    }
+
+    #[test]
+    fn saved_definition_and_exact_mode_survive_independent_store_recreation() {
+        let temporary = tempfile::tempdir().unwrap();
+        let library_path = temporary.path().join("shared/themes.json");
+        let selection_path = temporary.path().join("pelt/appearance.json");
+        let theme = authored();
+        ThemeLibraryStore::load(&library_path)
+            .unwrap()
+            .save(&[theme.clone()])
+            .unwrap();
+        let library_bytes = std::fs::read(&library_path).unwrap();
+        let mut catalog = ThemeCatalog::new(Some(library_path.clone()));
+        let mut store = load_appearance_store(&selection_path).unwrap();
+        let choice = ThemeChoice::new(&theme.id, Some(Mode::Custom("concert".into())));
+        catalog.apply_choice(&mut store, choice.clone()).unwrap();
+        drop(store);
+        let restored = load_appearance_store(&selection_path).unwrap();
+        let restored_catalog = ThemeCatalog::new(Some(library_path.clone()));
+        assert_eq!(restored.choice(), &choice);
+        assert_eq!(
+            resolve_theme_choice(&restored_catalog.registry, restored.choice())
+                .unwrap()
+                .presentation,
+            ThemePresentation::AuthoredStylesheet(theme.mode_sheets["custom:concert"].clone())
+        );
+        assert_eq!(std::fs::read(&library_path).unwrap(), library_bytes);
+        assert_ne!(selection_path, library_path);
+    }
+
+    #[test]
+    fn corrupt_library_and_invalid_modes_preserve_choice_and_original_bytes() {
+        let temporary = tempfile::tempdir().unwrap();
+        let path = temporary.path().join("themes.json");
+        let theme = authored();
+        ThemeLibraryStore::load(&path)
+            .unwrap()
+            .save(&[theme.clone()])
+            .unwrap();
+        let mut catalog = ThemeCatalog::new(Some(path.clone()));
+        let mut store = InMemoryThemeChoiceStore::default();
+        let before = store.choice().clone();
+        assert!(
+            catalog
+                .apply_choice(
+                    &mut store,
+                    ThemeChoice::new(&theme.id, Some(Mode::Custom("missing".into())))
+                )
+                .is_err()
+        );
+        assert!(
+            catalog
+                .apply_choice(
+                    &mut store,
+                    ThemeChoice::new("theme:unsaved-preview", Some(Mode::Dark))
+                )
+                .is_err()
+        );
+        assert_eq!(store.choice(), &before);
+        std::fs::write(&path, b"original malformed library").unwrap();
+        assert!(
+            catalog
+                .apply_choice(&mut store, ThemeChoice::new(&theme.id, Some(Mode::Light)))
+                .is_err()
+        );
+        assert!(
+            catalog
+                .error
+                .as_deref()
+                .unwrap()
+                .contains("Could not load theme library")
+        );
+        assert_eq!(store.choice(), &before);
+        assert_eq!(std::fs::read(&path).unwrap(), b"original malformed library");
+    }
+
+    #[test]
+    fn failed_application_selection_write_keeps_current_choice_and_shared_definition() {
+        let temporary = tempfile::tempdir().unwrap();
+        let library = temporary.path().join("themes.json");
+        let selection = temporary.path().join("appearance.json");
+        let theme = authored();
+        ThemeLibraryStore::load(&library)
+            .unwrap()
+            .save(&[theme.clone()])
+            .unwrap();
+        let library_bytes = std::fs::read(&library).unwrap();
+        let mut catalog = ThemeCatalog::new(Some(library.clone()));
+        let mut store = load_appearance_store(&selection).unwrap();
+        let original = store.choice().clone();
+        std::fs::create_dir(&selection).unwrap();
+        std::fs::write(selection.join("preserved"), b"existing destination").unwrap();
+        assert!(
+            catalog
+                .apply_choice(&mut store, ThemeChoice::new(&theme.id, Some(Mode::Dark)))
+                .unwrap_err()
+                .contains("Could not save Pelt appearance")
+        );
+        assert_eq!(store.choice(), &original);
+        assert_eq!(
+            std::fs::read(selection.join("preserved")).unwrap(),
+            b"existing destination"
+        );
+        assert_eq!(std::fs::read(&library).unwrap(), library_bytes);
+    }
+
+    #[test]
+    fn missing_definition_fallback_preserves_requested_durable_choice_and_corrupt_settings_are_rejected()
+     {
+        let temporary = tempfile::tempdir().unwrap();
+        let path = temporary.path().join("appearance.json");
+        let requested = ThemeChoice::new("theme:external-later", Some(Mode::HcLight));
+        let mut store = load_appearance_store(&path).unwrap();
+        store.set_choice(requested.clone()).unwrap();
+        let before = std::fs::read(&path).unwrap();
+        let catalog = ThemeCatalog::new(Some(temporary.path().join("absent.json")));
+        let resolution = resolve_theme_choice(&catalog.registry, store.choice()).unwrap();
+        assert!(!resolution.diagnostics.is_empty());
+        assert_eq!(store.choice(), &requested);
+        assert_eq!(std::fs::read(&path).unwrap(), before);
+        std::fs::write(&path, b"invalid settings").unwrap();
+        assert!(load_appearance_store(&path).is_err());
+        assert_eq!(std::fs::read(&path).unwrap(), b"invalid settings");
+    }
+}
