@@ -6,10 +6,13 @@
 feature-free/workspace checks and both query wasm checks pass. Fresh review
 found one Important parser-feature regression; the scoped repair has observed
 RED/GREEN controls and the full green gates. All 108 owned consumer Mere rows
-select this source in isolated successors. Provider qualification is running
-before Turnstone provider references are changed.
-Residency interfaces are proposed for user review, with no implementation yet.
-None of these candidates has been pushed or merged.
+select this source in isolated successors. Knot and Redshank passed their provider
+gates and have local commits; Turnstone now selects those commits and is under
+qualification. Consumer publication and the final family review remain pending.
+The initial Graphshell/Djinn resident-host spec is approved, and its concrete
+implementation plan is written for review. Host implementation has not begun. The
+RDF checkpoint and coordination documents are published at `a8889f60e`; consumer
+candidates remain local until their gates, review and publication approval.
 
 ## Authority and intent
 
@@ -145,10 +148,11 @@ historical test receipts as current evidence.
 ### C1. Editing from a partial display
 
 The [initial resident host design](../technical_architecture/2026-10-09_resident_host_design.md)
-is a written proposal for review. Its first host is the existing owned
+is approved by Mark. The [concrete implementation plan](2026-10-09_resident_host_implementation_plan.md)
+is written for review. Its first host is the existing owned
 Graphshell/Djinn writer; Turnstone authority migration follows separately.
 
-Provisional first milestone: stable typed IDs and explicit observation
+Approved first milestone: stable typed IDs and explicit observation
 preconditions go from the resident display to the existing complete-session
 writer. Preserve Author, qualification, validation, capture/replay, journal and
 undo. Demand aids inspection; it does not prove the edit's dependency completeness.
@@ -161,8 +165,7 @@ remain separate, the outcome distinguishes a committed edit from pending/failed
 publication; retry republishes without applying the edit twice. Prefer existing
 request/change identity and host ownership over introducing another journal.
 
-Memory choice was requested from Mark. Temporary Full memory is the recommended
-first milestone, subject to steering. A writer that never materializes the whole
+Mark approved retaining Full writer memory for the first milestone. A writer that never materializes the whole
 graph is a distinct larger contract: complete operation dependency declarations,
 incremental journal/materialization updates, bounded history reconstruction and
 explicit refusal for unsupported/global operations. Neither a partial UI nor a
@@ -281,3 +284,12 @@ claims, each supported by its own evidence.
   starts with no broad lock-change allowances, in the dedicated cache and using
   a process-only local Git route for the unpublished supplier. That route is
   local object availability, not remote publication evidence.
+
+- **2026-10-09:** Mark approves the written resident-host spec and RDF checkpoint
+  publication. Atomic push merges the qualified cleanup and documents into main
+  at `a8889f60e`, preserving concurrent documentation rulings and all qualified
+  source bytes. Both remote heads are verified. Knot fully qualifies and is
+  locally committed at `ab191d4`; Redshank qualification continues. Concrete
+  resident-host planning now follows the approved complete-writer milestone.
+
+- **2026-10-09:** Knot `ab191d4d` and Redshank `fea7f0f7` pass provider gates and remain local. Turnstone now selects both provider commits and supplier `297682178`; its default/Piccolo qualification is running. The initial host implementation plan is written, source-checked and indexed for Mark’s review. Host code has not started.
