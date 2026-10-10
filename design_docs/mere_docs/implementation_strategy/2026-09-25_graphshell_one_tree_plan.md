@@ -1,17 +1,14 @@
 # Graphshell on one Cambium tree
 
 **Date:** 2026-09-25
-**Status (2026-10-08):** in progress, checked against the current Graphshell
-intake slice `da466027a`, based on published Mere `79fbbeb75` with Genet
-`15713014`. Phases 1–2 are landed; phase 3 has its recorded headed producer
-receipts and Mark's approval to proceed. Phase 4 remains unfinished: canvas
-controls, elapsed-time physics, saved-graph editing and remote-session slices
-have landed, but the complete page/control migration and acceptance wall have
-not closed. The legacy `web_gpu.rs` and `component.html` remain. The reservoir's
-mere panel is its V2b step 5, after this cutover. §2's current handoff names
-the remaining gates; linked plans own later editor and dynamics status. The
-reservoir's V3–V5 resident implementation has advanced independently; its
-process fixtures do not close this browser cutover or mount the mere panel.
+**Status (2026-10-09):** in progress. The user authorized completing the full
+five-page cutover alongside Turnstone live accessibility and the shared Pelt
+pool/input lane. The isolated supplier baseline is published Mere `b6b551d44`;
+the current source is under qualification. Phases 1–2 and the recorded phase-3
+producer receipts stand. Phase 4 remains open until every current public mount
+and live scenario passes with full-frame and accessibility checks, followed by
+legacy retirement. The reservoir's mounted Mere panel remains its separate
+V2b step 5; resident process fixtures do not close this browser cutover.
 **Scope:** Graphshell's browser page becomes one retained Cambium tree. Its
 HTML controls become Cambium components, its display-only Cambium chrome
 joins them, pictograph's canvas renders into the tree as a texture producer,
@@ -1048,3 +1045,19 @@ this tree.
   Graphshell web build is claimed. Genet's wider gate retains three failures
   reproduced on its untouched base (two float cases and one table-glyph case);
   consumer checks do not establish a wholly green upstream suite.
+
+- 2026-10-09: full cutover resumed with explicit parallel source ownership and
+  one low-priority build queue in the existing cache. The current scenario
+  inventory reconciles 119 original scripts and 16 archived names to four
+  byte-identical imported scripts, with two historical presenter-only scripts
+  separated from live acceptance. New tests cover the remaining retained
+  detail, find, projection, scene and practice controls. Reopen scenarios keep
+  their same-origin persistence prerequisites rather than using empty profiles.
+  Initial detail-action RED exposes only its missing typed owner API; the
+  implemented owner passes eight native tests, including saved facet/relation
+  reopening and refused-write retry. Corrected canvas-cancel RED reaches six
+  missing-method references, and saved-scene RED reaches its missing owner
+  module. Their implementations still await GREEN. These bounded tests do not
+  close the Wasm, five-page, live-inventory or performance gates.
+
+- 2026-10-09 continued: canvas cancellation passes its two native regressions. Projection-owner RED reaches only the missing module; scene GREEN awaits a corrected typed diagnostic formatter and repeat. The standalone full web development graph resolves 683 packages with no selected Mere/Genet git duplicates. The live inventory is 126 scripts plus two historical comparisons; intentional negative diagnostics retain explicit source-bound expected predicates rather than being silently removed or counted as acceptance passes. Fresh Wasm, all five public pages and the complete live receipt wall remain open.

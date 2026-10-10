@@ -990,6 +990,22 @@ where
                 button: MouseButton::Left,
                 ..
             } => self.release(),
+            WindowEvent::MouseInput {
+                state: ElementState::Pressed,
+                button: MouseButton::Middle,
+                ..
+            } => self.pointer_press(cambium::PointerButton::Auxiliary),
+            WindowEvent::MouseInput {
+                state: ElementState::Released,
+                button: MouseButton::Middle,
+                ..
+            } => self.release_button(cambium::PointerButton::Auxiliary),
+            WindowEvent::MouseInput {
+                state: ElementState::Released,
+                button: MouseButton::Right,
+                ..
+            } => self.release_button(cambium::PointerButton::Secondary),
+            WindowEvent::Focused(false) => self.cancel_pointer(),
             WindowEvent::MouseWheel { delta, .. } => {
                 // `Host::wheel` takes layout pixels, the same frame
                 // `CursorMoved` above is divided into. Winit reports a

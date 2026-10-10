@@ -119,6 +119,8 @@ impl<F: 'static> PeltContent<F> {
                 producer,
                 viewport,
                 offset: None,
+                last_pointer: None,
+                buttons: 0,
             }),
             route,
             routed: None,
@@ -251,6 +253,23 @@ impl<F: 'static> PeltContent<F> {
         }
     }
 
+    /// Prepare only this appearance's layout for input. Surface preparation
+    /// updates geometry without acquiring a frame or changing polling policy.
+    pub(crate) fn prepare_input(
+        &mut self,
+        rect: WorkspaceRect,
+        scale_factor: f32,
+    ) -> Result<(), String> {
+        match &mut self.lane {
+            Lane::Document(controller) => {
+                let (width, height) = rect.viewport();
+                controller.prepare_input(width, height);
+                Ok(())
+            },
+            Lane::Surface(surface) => surface.prepare_geometry(rect, scale_factor),
+        }
+    }
+
     /// Advance session-owned time work. A surface has no settled bit, so it
     /// always asks for another poll.
     pub fn pump(&mut self) -> bool {
@@ -277,8 +296,9 @@ impl<F: 'static> PeltContent<F> {
             Lane::Document(controller) => {
                 let _ = controller.input(SessionInput::Focus(focused));
             },
-            Lane::Surface(surface) if focused => surface.focus(),
-            Lane::Surface(_) => {},
+            Lane::Surface(surface) => {
+                let _ = surface.producer.set_focus(focused);
+            },
         }
     }
 
@@ -290,6 +310,107 @@ impl<F: 'static> PeltContent<F> {
                 self.after_document(effect)
             },
             Lane::Surface(surface) => surface_input(surface, input, scale_factor),
+        }
+    }
+
+    /// Shared input path for document sessions and native producers.
+    pub fn input_event(&mut self, input: crate::PeltInput, scale_factor: f32) -> PeltHostEffect {
+        use crate::PeltInput;
+        match input {
+            PeltInput::Session(input) => self.input(input, scale_factor),
+            PeltInput::ScrollKey(key) => {
+                let handled = self.scroll_for_key(key);
+                PeltHostEffect {
+                    handled,
+                    redraw: handled,
+                    ..Default::default()
+                }
+            },
+            PeltInput::Keyboard(event) => match &mut self.lane {
+                Lane::Surface(surface) => surface.keyboard(event),
+                Lane::Document(controller) => match crate::input::document_keyboard(event) {
+                    Ok(input) => controller.input(input),
+                    Err(error) => PeltHostEffect {
+                        error: Some(error),
+                        ..Default::default()
+                    },
+                },
+            },
+            PeltInput::Pointer(event) => match &mut self.lane {
+                Lane::Surface(surface) => surface.pointer(event, scale_factor),
+                Lane::Document(_) => {
+                    let modifiers = inker::SessionModifiers {
+                        shift: event.modifiers.shift,
+                        control: event.modifiers.ctrl,
+                        alt: event.modifiers.alt,
+                        meta: event.modifiers.meta,
+                    };
+                    let input = match event.phase {
+                        inker::PointerPhase::Move => SessionInput::PointerMoved {
+                            x: event.position.x,
+                            y: event.position.y,
+                            modifiers,
+                        },
+                        inker::PointerPhase::Cancel => SessionInput::Cancel,
+                        phase => {
+                            let button = match event.button {
+                                Some(MouseButton::Left) => SessionPointerButton::Primary,
+                                Some(MouseButton::Right) => SessionPointerButton::Secondary,
+                                Some(MouseButton::Middle) => SessionPointerButton::Auxiliary,
+                                _ => return PeltHostEffect::default(),
+                            };
+                            SessionInput::PointerButton {
+                                x: event.position.x,
+                                y: event.position.y,
+                                button,
+                                state: if phase == inker::PointerPhase::Down {
+                                    SessionButtonState::Pressed
+                                } else {
+                                    SessionButtonState::Released
+                                },
+                                modifiers,
+                            }
+                        },
+                    };
+                    self.input(input, scale_factor)
+                },
+            },
+            PeltInput::Drag(mut event) => match &mut self.lane {
+                Lane::Surface(surface) => {
+                    event.position.x *= scale_factor;
+                    event.position.y *= scale_factor;
+                    surface_effect(surface.producer.send_drag_input(event))
+                },
+                Lane::Document(_) => PeltHostEffect::default(),
+            },
+            PeltInput::Wheel {
+                position,
+                delta,
+                modifiers,
+            } => match &mut self.lane {
+                Lane::Surface(surface) => {
+                    surface_effect(surface.producer.send_wheel_input(inker::SurfaceWheelEvent {
+                        position: PhysicalPosition {
+                            x: position.x * scale_factor,
+                            y: position.y * scale_factor,
+                        },
+                        delta: (delta.0 * scale_factor, delta.1 * scale_factor),
+                        modifiers: crate::input::modifiers(modifiers),
+                    }))
+                },
+                Lane::Document(controller) => {
+                    // A modified wheel must not silently become ordinary scroll.
+                    if modifiers.control || modifiers.meta {
+                        return PeltHostEffect::default();
+                    }
+                    let changed = controller.scroll_at(position.x, position.y, delta.0, delta.1);
+                    PeltHostEffect {
+                        handled: changed,
+                        redraw: changed,
+                        ..Default::default()
+                    }
+                },
+            },
         }
     }
 
@@ -623,6 +744,8 @@ fn open_lane<F: 'static>(
                     producer,
                     viewport,
                     offset: None,
+                    last_pointer: None,
+                    buttons: 0,
                 }),
                 route,
             ))
@@ -645,6 +768,8 @@ pub(crate) struct PeltSurface {
     pub(crate) producer: Box<dyn SurfaceProducer>,
     viewport: (u32, u32),
     offset: Option<(i32, i32)>,
+    last_pointer: Option<inker::PointerEvent>,
+    buttons: u16,
 }
 
 impl PeltSurface {
@@ -653,6 +778,13 @@ impl PeltSurface {
         rect: WorkspaceRect,
         scale_factor: f32,
     ) -> Result<Option<SurfaceFrame>, String> {
+        self.prepare_geometry(rect, scale_factor)?;
+        self.producer
+            .acquire_frame()
+            .map_err(|error| format!("surface frame failed: {error}"))
+    }
+
+    fn prepare_geometry(&mut self, rect: WorkspaceRect, scale_factor: f32) -> Result<(), String> {
         let viewport = (
             physical_extent(rect.width, scale_factor),
             physical_extent(rect.height, scale_factor),
@@ -673,9 +805,34 @@ impl PeltSurface {
                 .map_err(|error| format!("surface placement failed: {error}"))?;
             self.offset = Some(offset);
         }
-        self.producer
-            .acquire_frame()
-            .map_err(|error| format!("surface frame failed: {error}"))
+        Ok(())
+    }
+
+    fn pointer(&mut self, mut event: inker::PointerEvent, scale_factor: f32) -> PeltHostEffect {
+        self.buttons = event.buttons.0;
+        self.last_pointer = if event.phase == inker::PointerPhase::Cancel
+            || (event.phase == inker::PointerPhase::Up
+                && event.buttons == inker::PointerButtons::NONE)
+        {
+            None
+        } else {
+            Some(event.clone())
+        };
+        event.position.x *= scale_factor;
+        event.position.y *= scale_factor;
+        event.width *= scale_factor;
+        event.height *= scale_factor;
+        let capture = match event.phase {
+            inker::PointerPhase::Down => Some(true),
+            inker::PointerPhase::Up => Some(event.buttons.0 != 0),
+            inker::PointerPhase::Cancel => Some(false),
+            inker::PointerPhase::Move => None,
+        };
+        let mut effect = surface_effect(self.producer.send_pointer_input(event));
+        if effect.handled {
+            effect.pointer_capture = capture;
+        }
+        effect
     }
 
     fn mouse(&mut self, event: MouseEvent) -> PeltHostEffect {
@@ -717,35 +874,59 @@ fn surface_input(
     scale_factor: f32,
 ) -> PeltHostEffect {
     match input {
-        SessionInput::PointerMoved { x, y, .. } => surface.mouse(MouseEvent {
-            position: PhysicalPosition {
-                x: x * scale_factor,
-                y: y * scale_factor,
-            },
-            button: None,
-            kind: MouseEventKind::Moved,
-        }),
+        SessionInput::PointerMoved { x, y, modifiers } => {
+            let event = crate::mouse_pointer(
+                0,
+                inker::PointerPhase::Move,
+                PhysicalPosition { x, y },
+                None,
+                inker::PointerButtons(surface.buttons),
+                modifiers,
+            );
+            surface.pointer(event, scale_factor)
+        },
         SessionInput::PointerButton {
             x,
             y,
             button,
             state,
-            ..
-        } => surface.mouse(MouseEvent {
-            position: PhysicalPosition {
-                x: x * scale_factor,
-                y: y * scale_factor,
-            },
-            button: Some(match button {
+            modifiers,
+        } => {
+            let button = Some(match button {
                 SessionPointerButton::Primary => MouseButton::Left,
                 SessionPointerButton::Secondary => MouseButton::Right,
                 SessionPointerButton::Auxiliary => MouseButton::Middle,
-            }),
-            kind: match state {
-                SessionButtonState::Pressed => MouseEventKind::Pressed,
-                SessionButtonState::Released => MouseEventKind::Released,
-            },
-        }),
+            });
+            let bit = crate::input::button_bit(button);
+            if state == SessionButtonState::Pressed {
+                surface.buttons |= bit;
+            } else {
+                surface.buttons &= !bit;
+            }
+            let phase = if state == SessionButtonState::Pressed {
+                inker::PointerPhase::Down
+            } else {
+                inker::PointerPhase::Up
+            };
+            let event = crate::mouse_pointer(
+                0,
+                phase,
+                PhysicalPosition { x, y },
+                button,
+                inker::PointerButtons(surface.buttons),
+                modifiers,
+            );
+            surface.pointer(event, scale_factor)
+        },
+        SessionInput::Cancel => {
+            let Some(mut event) = surface.last_pointer.clone() else {
+                return PeltHostEffect::default();
+            };
+            event.phase = inker::PointerPhase::Cancel;
+            event.button = None;
+            event.buttons = inker::PointerButtons::NONE;
+            surface.pointer(event, scale_factor)
+        },
         SessionInput::Key {
             key,
             state,
@@ -781,10 +962,16 @@ fn surface_input(
                 ..Default::default()
             }
         },
-        SessionInput::Focus(false)
-        | SessionInput::FocusMove(_)
-        | SessionInput::Ime(_)
-        | SessionInput::Cancel => PeltHostEffect::default(),
+        SessionInput::Focus(false) => {
+            let _ = surface_input(surface, SessionInput::Cancel, scale_factor);
+            surface_effect(surface.producer.set_focus(false))
+        },
+        SessionInput::Ime(inker::SessionIme::Commit(text)) => surface_input(surface, SessionInput::Text(text), scale_factor),
+        SessionInput::Ime(_) => PeltHostEffect {
+            error: Some("this surface producer does not support IME composition state; committed text is supported".into()),
+            ..Default::default()
+        },
+        SessionInput::FocusMove(_) => PeltHostEffect::default(),
     }
 }
 
@@ -809,9 +996,31 @@ fn surface_key_code(key: &SessionKey) -> u32 {
 }
 
 fn physical_extent(logical: f32, scale_factor: f32) -> u32 {
-    ((logical.max(1.0) * scale_factor.max(1.0)).round() as u32).max(1)
+    ((logical.max(1.0) * valid_scale(scale_factor)).round() as u32).max(1)
 }
 
 fn physical_offset(logical: f32, scale_factor: f32) -> i32 {
-    (logical * scale_factor.max(1.0)).round() as i32
+    (logical * valid_scale(scale_factor)).round() as i32
+}
+
+fn surface_effect(result: Result<(), inker::SurfaceError>) -> PeltHostEffect {
+    match result {
+        Ok(()) => PeltHostEffect {
+            handled: true,
+            redraw: true,
+            ..Default::default()
+        },
+        Err(error) => PeltHostEffect {
+            error: Some(format!("surface input failed: {error}")),
+            ..Default::default()
+        },
+    }
+}
+
+fn valid_scale(scale: f32) -> f32 {
+    if scale.is_finite() && scale > 0.0 {
+        scale
+    } else {
+        1.0
+    }
 }

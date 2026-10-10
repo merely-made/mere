@@ -484,6 +484,11 @@ where
     }
 
     /// The element capturing projection `id`'s current drag, if any.
+    pub fn pointer_capture_owner(&self, id: ProjectionId) -> Option<(i32, crate::PointerButton)> {
+        self.projection(id)
+            .and_then(|p| p.tree.pointer_capture_owner())
+    }
+
     pub fn pointer_capture(&self, id: ProjectionId) -> Option<NodeId> {
         self.projection(id).and_then(|p| p.tree.pointer_capture())
     }

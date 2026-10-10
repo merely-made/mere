@@ -5,6 +5,12 @@
 //! Window-neutral Pelt host controller.
 
 mod content;
+mod input;
+mod pool;
+mod pool_a11y;
+pub use input::{PeltInput, mouse_pointer};
+pub use pool::{PeltControllerPool, PeltPlacement};
+pub use pool_a11y::PeltPlacementA11y;
 mod surface_policy;
 mod workspace;
 
@@ -290,6 +296,7 @@ pub struct PeltController<F> {
     history: Vec<HistoryEntry>,
     history_index: usize,
     viewport: (u32, u32),
+    framed: Option<(PeltSessionIdentity, (u32, u32))>,
     clock: Box<dyn PeltClock>,
     document_state: PeltDocumentState,
     instance_id: u64,
@@ -337,7 +344,6 @@ impl<F: 'static> PeltController<F> {
         clock: Box<dyn PeltClock>,
     ) -> Result<Self, String> {
         let engine_id = config.engine_id;
-        let viewport = config.request.viewport;
         // A host-loading controller without a held body opens on an empty
         // document of the same engine; the engine never fetches.
         let fetch_first = config.load_mode == PeltLoadMode::Host && config.request.body.is_none();
@@ -349,7 +355,52 @@ impl<F: 'static> PeltController<F> {
         let session = session_engines
             .spawn(&engine_id, &opening)
             .map_err(|error| format!("could not spawn engine {engine_id}: {error}"))?;
-        let mut controller = Self {
+        let mut controller = Self::from_session_shared_boxed(
+            session_engines,
+            surface_engines,
+            PeltControllerConfig {
+                engine_id,
+                ..config
+            },
+            clock,
+            session,
+        );
+        if fetch_first {
+            let entry = controller.history[0].clone();
+            controller.begin_load(entry.request, Some(entry.engine_id), HistoryCommit::Replace);
+        }
+        Ok(controller)
+    }
+
+    /// Adopt an already-owned appearance without spawning or fetching. Reader
+    /// appearances can share source data while retaining independent session
+    /// viewport, scroll and focus. The injected host clock remains authoritative.
+    pub fn from_session_shared(
+        session_engines: Arc<SessionRegistry<F>>,
+        surface_engines: Arc<SurfaceEngineRegistry>,
+        config: PeltControllerConfig,
+        clock: impl PeltClock,
+        session: Box<dyn DocumentSession<F>>,
+    ) -> Self {
+        Self::from_session_shared_boxed(
+            session_engines,
+            surface_engines,
+            config,
+            Box::new(clock),
+            session,
+        )
+    }
+
+    fn from_session_shared_boxed(
+        session_engines: Arc<SessionRegistry<F>>,
+        surface_engines: Arc<SurfaceEngineRegistry>,
+        config: PeltControllerConfig,
+        clock: Box<dyn PeltClock>,
+        session: Box<dyn DocumentSession<F>>,
+    ) -> Self {
+        let engine_id = config.engine_id;
+        let viewport = config.request.viewport;
+        Self {
             session_engines,
             surface_engines,
             history: vec![HistoryEntry {
@@ -360,6 +411,7 @@ impl<F: 'static> PeltController<F> {
             session,
             history_index: 0,
             viewport,
+            framed: None,
             clock,
             document_state: PeltDocumentState::Ready,
             instance_id: next_controller_instance_id(),
@@ -374,12 +426,7 @@ impl<F: 'static> PeltController<F> {
             body_replacer: None,
             router: None,
             route: None,
-        };
-        if fetch_first {
-            let entry = controller.history[0].clone();
-            controller.begin_load(entry.request, Some(entry.engine_id), HistoryCommit::Replace);
         }
-        Ok(controller)
     }
 
     pub fn load_mode(&self) -> PeltLoadMode {
@@ -505,6 +552,7 @@ impl<F: 'static> PeltController<F> {
     /// Mutable access to the active session's neutral seam. See
     /// [`Self::session`].
     pub fn session_mut(&mut self) -> &mut dyn DocumentSession<F> {
+        self.framed = None;
         self.session.as_mut()
     }
 
@@ -525,6 +573,7 @@ impl<F: 'static> PeltController<F> {
     /// [`Self::session_identity`] so a stale retained node cannot mutate a
     /// replacement or reconstructed session.
     pub fn session_as_any_mut(&mut self) -> &mut dyn std::any::Any {
+        self.framed = None;
         self.session.as_any()
     }
 
@@ -533,6 +582,7 @@ impl<F: 'static> PeltController<F> {
     /// The active engine reports its supported bounds and applied factor. Pelt
     /// neither chooses a zoom policy nor reaches into an engine concrete type.
     pub fn set_page_zoom(&mut self, factor: f32) -> Result<DocumentZoomState, SessionError> {
+        self.framed = None;
         self.session.set_page_zoom(factor)
     }
 
@@ -579,7 +629,11 @@ impl<F: 'static> PeltController<F> {
     /// Dispatch one non-pointer accessibility action through the active
     /// document session after the host has checked its tile/session identity.
     pub fn dispatch_accessibility_action(&mut self, request: &DocumentA11yActionRequest) -> bool {
-        self.session.dispatch_accessibility_action(request)
+        let handled = self.session.dispatch_accessibility_action(request);
+        if handled {
+            self.framed = None;
+        }
+        handled
     }
 
     /// Semantic clip from the current retained selection or document.
@@ -640,24 +694,37 @@ impl<F: 'static> PeltController<F> {
     /// Advance session-owned time work using the injected clock. `true`
     /// requests another frame because the session has not settled.
     pub fn pump(&mut self) -> bool {
+        self.framed = None;
         self.session.pump(self.clock.now_ms());
         !self.session.settled()
     }
 
     pub fn frame(&mut self, width: u32, height: u32) -> F {
         self.viewport = (width.max(1), height.max(1));
-        self.session.frame(self.viewport.0, self.viewport.1)
+        let frame = self.session.frame(self.viewport.0, self.viewport.1);
+        self.framed = Some((self.session_identity(), self.viewport));
+        frame
+    }
+
+    pub(crate) fn prepare_input(&mut self, width: u32, height: u32) {
+        let viewport = (width.max(1), height.max(1));
+        if self.framed != Some((self.session_identity(), viewport)) {
+            drop(self.frame(viewport.0, viewport.1));
+        }
     }
 
     pub fn scroll_by(&mut self, dx: f32, dy: f32) -> bool {
+        self.framed = None;
         self.session.scroll_by(dx, dy)
     }
 
     pub fn scroll_at(&mut self, x: f32, y: f32, dx: f32, dy: f32) -> bool {
+        self.framed = None;
         self.session.scroll_at(x, y, dx, dy)
     }
 
     pub fn scroll_for_key(&mut self, key: SessionScrollKey) -> bool {
+        self.framed = None;
         self.session.scroll_for_key(key)
     }
 
@@ -665,10 +732,12 @@ impl<F: 'static> PeltController<F> {
     /// Hidden sessions keep their navigation and scroll state while avoiding
     /// work that only contributes to a visible frame.
     pub fn set_hidden(&mut self, hidden: bool) {
+        self.framed = None;
         self.session.set_hidden(hidden);
     }
 
     pub fn input(&mut self, input: SessionInput) -> PeltHostEffect {
+        self.framed = None;
         let modifiers = input_modifiers(&input);
         let SessionInputResult {
             effect,
@@ -1219,6 +1288,7 @@ impl<F: 'static> PeltController<F> {
     /// Install a session only after its factory has completed successfully.
     /// Failed replacement attempts retain both this session and its generation.
     fn install_session(&mut self, session: Box<dyn DocumentSession<F>>) {
+        self.framed = None;
         self.session = session;
         self.session_generation = self
             .session_generation

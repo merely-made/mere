@@ -41,23 +41,25 @@ pub enum PointerPhase {
     Move,
     /// Button released; ends capture.
     Up,
+    /// The gesture lost capture or its host lost focus; it must not activate.
+    Cancel,
 }
 
 /// Which button a [`PointerEvent`] came from.
 ///
-/// **Capture belongs to the primary button.** A `Secondary` `Down` routes to
-/// the same handler a primary press would capture, but starts no drag: there
-/// is no `Move` or `Up` to follow it, and an unrelated primary release must
-/// never deliver an `Up` for a capture that never began. A context menu is a
-/// press, not a gesture, so the one-shot is the whole of it. See
+/// Primary and Auxiliary start qualified capture automatically. Secondary
+/// is a one-shot press unless the handler calls [`PointerEvent::capture_pointer`].
+/// This preserves menu activation while allowing secondary canvas gestures. See
 /// [`GenetAppRunner::dispatch_pointer_down`](crate::GenetAppRunner::dispatch_pointer_down).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum PointerButton {
     /// The left button, or the platform's equivalent. Begins capture.
     #[default]
     Primary,
-    /// The right button — the context-menu press. One-shot; no capture.
+    /// Right button. One-shot unless the handler explicitly requests capture.
     Secondary,
+    /// Middle-button gesture, with qualified capture and release.
+    Auxiliary,
 }
 
 /// A native pointer-drag event payload.
@@ -73,6 +75,8 @@ pub struct PointerEvent {
     /// Which button produced this event. [`PointerButton::Primary`] unless the
     /// host marked it otherwise with [`with_button`](PointerEvent::with_button).
     pub button: PointerButton,
+    pub pointer_id: i32,
+    pub modifiers: crate::Modifiers,
     pub local: (f32, f32),
     pub size: (f32, f32),
     /// Clone-through cancellation state — the native twin of a JS event's
@@ -85,6 +89,7 @@ pub struct PointerEvent {
     /// [`default_prevented`]: crate::GenetAppRunner::default_prevented
     pub prop: Propagation,
     rebuild_deferred: Rc<Cell<bool>>,
+    capture_requested: Rc<Cell<bool>>,
 }
 
 impl PointerEvent {
@@ -96,10 +101,13 @@ impl PointerEvent {
         Self {
             phase,
             button: PointerButton::Primary,
+            pointer_id: 0,
+            modifiers: crate::Modifiers::default(),
             local,
             size,
             prop: Propagation::new(),
             rebuild_deferred: Rc::new(Cell::new(false)),
+            capture_requested: Rc::new(Cell::new(false)),
         }
     }
 
@@ -108,6 +116,28 @@ impl PointerEvent {
     /// .with_button(PointerButton::Secondary)`.
     pub fn with_button(mut self, button: PointerButton) -> Self {
         self.button = button;
+        self
+    }
+
+    /// Request a qualified gesture for a secondary-button Down. Primary and
+    /// auxiliary presses capture automatically; one-shot menu handlers need
+    /// not opt in. Every event clone shares this request with the runner.
+    pub fn capture_pointer(&self) {
+        if self.phase == PointerPhase::Down {
+            self.capture_requested.set(true);
+        }
+    }
+
+    pub(crate) fn capture_requested(&self) -> bool {
+        self.capture_requested.get()
+    }
+
+    pub fn with_modifiers(mut self, modifiers: crate::Modifiers) -> Self {
+        self.modifiers = modifiers;
+        self
+    }
+    pub fn with_pointer_id(mut self, pointer_id: i32) -> Self {
+        self.pointer_id = pointer_id;
         self
     }
 
@@ -305,7 +335,7 @@ mod tests {
             |s: &mut KnobState, e: PointerEvent| {
                 // Normalize without knowing layout: `local` is element-local and
                 // `size` is the element's box, both supplied by the runner.
-                if !matches!(e.phase, PointerPhase::Up) {
+                if matches!(e.phase, PointerPhase::Down | PointerPhase::Move) {
                     s.knob.set_value((e.local.0 / e.size.0).clamp(0.0, 1.0));
                 }
             },
@@ -485,6 +515,7 @@ mod tests {
                     PointerPhase::Down => 1,
                     PointerPhase::Move => 2,
                     PointerPhase::Up => 3,
+                    PointerPhase::Cancel => 0,
                 };
                 if matches!(event.phase, PointerPhase::Move) {
                     event.defer_rebuild();

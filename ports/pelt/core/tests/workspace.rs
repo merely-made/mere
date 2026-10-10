@@ -22,6 +22,7 @@ use workbench::{
 #[derive(Default)]
 struct Probe {
     spawns: Vec<String>,
+    pumps: HashMap<String, usize>,
     hidden: HashMap<String, Vec<bool>>,
 }
 
@@ -52,6 +53,16 @@ struct FakeSession {
 }
 
 impl DocumentSession<String> for FakeSession {
+    fn pump(&mut self, _now_ms: f64) {
+        *self
+            .probe
+            .lock()
+            .unwrap()
+            .pumps
+            .entry(self.address.clone())
+            .or_default() += 1;
+    }
+
     fn frame(&mut self, width: u32, height: u32) -> String {
         format!("{}@{width}x{height}+{}", self.address, self.scroll)
     }
@@ -340,4 +351,19 @@ fn outside_tearout_waits_for_host_acceptance_and_retains_pelt_custody() {
     assert!(!unknown.changed());
     assert!(workspace.tree().find(TileId(1)).is_none());
     assert!(workspace.controller(TileId(1)).is_none());
+}
+
+#[test]
+fn hidden_sessions_are_pumped_to_complete_async_work() {
+    let probe = Arc::new(Mutex::new(Probe::default()));
+    let tree = TileTree::stack(vec![tile(1, "a/index.html"), tile(2, "b/index.html")], 0);
+    let mut workspace = PeltWorkspace::try_new(tree, |t| controller(t, probe.clone())).unwrap();
+    workspace.pump();
+    let probe = probe.lock().unwrap();
+    assert_eq!(probe.pumps.get("a/index.html"), Some(&1));
+    assert_eq!(
+        probe.pumps.get("b/index.html"),
+        Some(&1),
+        "hidden work must reach the engine's settled decision"
+    );
 }

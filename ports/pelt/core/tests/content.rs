@@ -429,3 +429,26 @@ fn host_history_content_hands_links_up_and_opens_entries_in_either_lane() {
         "the swap opens one entry, not a history"
     );
 }
+
+#[test]
+fn adopting_an_owned_appearance_does_not_respawn_or_fetch() {
+    let mut config = pelt_core::PeltControllerConfig::new("owned", "retained://reader", (200, 100));
+    config.load_mode = pelt_core::PeltLoadMode::Host;
+    config.history_mode = pelt_core::PeltHistoryMode::Host;
+    let mut controller = pelt_core::PeltController::from_session_shared(
+        Arc::new(SessionRegistry::new()),
+        Arc::new(SurfaceEngineRegistry::new()),
+        config,
+        TestClock,
+        Box::new(Document {
+            id: "owned",
+            address: "retained://reader".to_owned(),
+        }),
+    );
+    assert_eq!(controller.frame(300, 200), "owned:retained://reader");
+    assert!(
+        controller.take_load_commands().is_empty(),
+        "adopting an existing appearance must not fetch its source again"
+    );
+    assert!(controller.session_as_any_ref().is::<Document>());
+}
