@@ -34,12 +34,50 @@ done-conditions without taking over the active dynamics implementation or
 opening a new track. The field plan corrects the earlier assumption that a
 coupling selector already means membership in the field's extent.
 
+## Ruled continuation, 2026-10-10
+
+F200 to F202 are recorded verbatim in the dynamics grammar plan, committed
+as `38cdebca`. The carrier, fixed-step runner, occurrence adapter and dynamics
+matrix are committed as `e2543cee`; `40aac7fc` integrates upstream Mere
+`6183006b`, preserving Tabard's host stylesheet alongside live dynamics.
+That integration also adopts upstream's Genet `7422e906` pin. Its qualification
+is being recomputed rather than inherited from the older draft receipts.
+
+- Direct coordinate and embedding families hold their encoded data axes;
+  Timeline holds its continuous x position. Grid ranks, ordering, layers,
+  buckets and ring slots remain free. With both axes encoded, F47 permits
+  contact-only separation. A one-axis position-writing law refuses by path
+  until an adapter can preserve that coordinate; unknown solvers likewise
+  need a disclosed constraint adapter. Regions, relations and folds still
+  require a broader scene-input adapter.
+- A variant carries a preset or a complete spec. Naming both is refused (F201).
+- The host's editable preview limit starts at 60 (F202). Capped cells visibly
+  say "Step limit reached". The matrix pages across the complete axes;
+  only its working cell advances. Paging does not rerun settled cells.
+- The six focused native matrix tests pass, including the held-coordinate
+  test and its moving-grid control. The pre-integration paged scenario passes
+  34 steps / 55 frames in the in-app browser at 520×604 and 1280×720, and in
+  standalone Chrome at 1037×583. These receipts precede the final stylesheet,
+  refusal-card and newer-Genet qualification. Firefox remains open.
+
+The full native Graphshell web library now passes on Genet `7422e906`:
+194 passed, 5 ignored. Upstream `4e181157` also carries Vello `491c376c`;
+the final browser package and fixture identity gate will qualify that graph.
+
+B1/S2 continue through the viewer owner assigned by site R162. The concrete
+next slices are: B1's three-mode control, backdrop drawing, tangible obstacle
+binding and its intangible control; then S2's clause selection, per-appearance
+visibility, shelfmark mapping and scenotime replay. SE88's UI name is
+"Appearance part"; a spelling for the replacement shelfmark key remains a
+reading, not a separate ruling. The site's current selection semantics must
+be preserved during that owner's cutover. F199's broader queue stays paused.
+
 ## The work, in order
 
 1. **The dynamics slot** (dynamics grammar plan, `mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md`, F192 to F195; asked for by the Scenograph plan's SE69).
    - F192: `scenograph::AuthoredProjectionDefinition` gains `dynamics: Option<DynamicsSlot { version, spec }>`, the spec as canonical JSON. scenograph stays on sceno and serde and keeps `Eq`; no seiche dependency. The binding host reads the spec through seiche and refuses by path.
    - F193: the recipe's `arrangement.kind` and the spec's `target.arrangement` must agree; binding refuses a mismatch, naming both paths.
-   - F194: `ProjectionVariant` varies dynamics by a catalog preset id or a whole `DynamicsSlot`, one or the other (naming both is refused, a reading not yet ruled: confirm with Mark).
+   - F194: `ProjectionVariant` varies dynamics by a catalog preset id or a whole `DynamicsSlot`, one or the other (naming both is refused under F201).
    - F195: SE70's settle is a seiche function, `settle(spec, inputs, bound) -> positions`, every host calls, with a native-against-wasm identity receipt. The default step bound for a spec with no stop rule goes back to Mark as a measured number.
 2. **The grid's dynamics axis** (Scenograph plan SE54, SE55, SE70, track S1's last open item). After the slot: `scenograph::swatch::AxisKind` gains `Dynamics`; the projection editor's comparison (`ports/graphshell/src/projection_compare.rs`) can vary it; settled cells call F195's settle; the focused cell runs live (SE55).
 3. **B1, backdrops in the Graphshell viewer** (Scenograph plan §2 B1, SE86). Independent of the others.
@@ -132,7 +170,7 @@ are `chrome_dynamics-final-scenario-receipt.json` and
 The final twelve-preset probe measured about 0.96 s per wasm run at 60 ticks and
 14.79 s at 4,000; these include process/module startup and concurrent workspace
 load. The earlier 0.30/13.84 s measurement is superseded. A configurable default
-of 60 ticks remains a recommendation to Mark, not an installed default; a capped
+of 60 ticks was recommended from this receipt and installed under F202; a capped
 cell is "Step limit reached", not "At rest".
 
 **Stop-condition correction:** an attempted Anneal tick-demand change failed
@@ -150,9 +188,7 @@ restarting a reused placement. A footprint change rebuilds the preview,
 because measurement is a physics input. Foreground attention, positional
 pins and layout locks remain distinct. Fields and relationship explanations
 do not install forces implicitly; their broader proofs remain with their
-owners. The encoding interpretation, F194's dual-name refusal and F195's
-default bound are pending questions to Mark. The draft is not promoted while
-those decisions and browser/readability gates remain open.
+owners. Those three questions were resolved as F200 to F202 on 2026-10-10; the checkpoint above supersedes their pending state. Consumer qualification remains separate from implementation.
 
 **Viewer ownership refresh:** the site source was refreshed against upstream
 `87d7a3d`. Ruling 161 replaces the deferred grouping choice with folds; Ruling
