@@ -8,12 +8,20 @@
 //! from the graph itself (Scenograph editor plan, SE67 and SE73; mer3ly site
 //! plan, Ruling 153).
 //!
-//! It holds subgraph specifications now, moved out of forme so that crates
+//! It holds subgraph specifications, moved out of forme so that crates
 //! without forme's layout stack (scenograph's swatch scope among them) can
-//! name a subgraph; forme re-exports them, so its callers are unchanged.
-//! Folds join in the native phase.
+//! name a subgraph (forme re-exports them, so its callers are unchanged), and
+//! the native fold record ([`fold`]), which left forme in S5's native phase
+//! (Rulings 163 and 164).
 
 use serde::{Deserialize, Serialize};
+
+pub mod fold;
+
+pub use fold::{
+    FOLD_RECORD_VERSION, FoldBoundaryPolicy, FoldDirection, FoldId, FoldRecord, FoldRecordError,
+    FoldRecordV1, FoldRule, FoldStandIn,
+};
 
 /// Canonical subgraph specification (referenced by Linked bindings).
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
