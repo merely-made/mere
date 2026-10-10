@@ -1,0 +1,42 @@
+[
+  {
+    "name": "source",
+    "rgba_sha256": "94d7aa49e3ef5a14f6fa00b1801b3727c5b303f7b5fcf2e5647ab6e869b5384a",
+    "png_sha256": "1df89bce789678ed76976164ecc7a5914a93ea925137d7325c79474d3719d1b1",
+    "png_matches_raw": true,
+    "opaque_pixels": 65536,
+    "transparent_pixels": 0
+  },
+  {
+    "name": "image-before",
+    "rgba_sha256": "94d7aa49e3ef5a14f6fa00b1801b3727c5b303f7b5fcf2e5647ab6e869b5384a",
+    "png_sha256": "1df89bce789678ed76976164ecc7a5914a93ea925137d7325c79474d3719d1b1",
+    "png_matches_raw": true,
+    "opaque_pixels": 65536,
+    "transparent_pixels": 0
+  },
+  {
+    "name": "patchless-solid",
+    "rgba_sha256": "20c155cdf5619871b2081dd9056cb64c91eb4ea17262ad9232fb4456ac6bf52f",
+    "png_sha256": "510433db02b69db82767d9fc5fb901e7e37cd5dc1d01931863a369f5abdeecf2",
+    "png_matches_raw": true,
+    "opaque_pixels": 65536,
+    "transparent_pixels": 0
+  },
+  {
+    "name": "image-after",
+    "rgba_sha256": "8a39d2abd3999ab73c34db2476849cddf303ce389b35826850f9a700589b4a90",
+    "png_sha256": "2aa689769be690a6f6702dd3c140591c0c6655eb43e6c1ba96b327b8b5eed4b2",
+    "png_matches_raw": true,
+    "opaque_pixels": 0,
+    "transparent_pixels": 65536
+  },
+  {
+    "name": "image-repeat",
+    "rgba_sha256": "8a39d2abd3999ab73c34db2476849cddf303ce389b35826850f9a700589b4a90",
+    "png_sha256": "2aa689769be690a6f6702dd3c140591c0c6655eb43e6c1ba96b327b8b5eed4b2",
+    "png_matches_raw": true,
+    "opaque_pixels": 0,
+    "transparent_pixels": 65536
+  }
+]
