@@ -99,6 +99,16 @@ field may change membership without a node crossing a stationary boundary.
 The entry-action decision must cover those causes and initial scene loading,
 alongside jitter and re-entry; the current force evaluator is not an event log.
 
+**Host inventory (2026-10-10, Mere `6183006b`):** the editor plan's
+[Graphshell control inventory](2026-10-07_scenograph_editor_plan.md#graphshell-control-inventory-2026-10-10-planning-step-1)
+confirms that shared field cards and Canvas field methods have no Graphshell
+authoring caller. Visibility is presentation-only; hiding a field does not
+disable its coupling. Strength/placement mutate Canvas's graph, so wiring a
+button straight to those methods would not establish MereHost's session edit,
+undo and persistence path. A host adapter must distinguish that recorded write
+from the refreshed simulation and the visibility intent. No new placement or
+script UI is installed by this inventory.
+
 ## Findings (code-verified substrate)
 
 The pieces exist; what is missing is **placement, rendering, and the unifying
