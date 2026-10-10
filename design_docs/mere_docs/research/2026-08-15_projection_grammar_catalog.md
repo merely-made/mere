@@ -472,9 +472,34 @@ and open item 4; the Scenograph editor plan's track S1, rulings SE53 to SE83.
   axis rules, renumbering, items inside their frames, a round trip that opens
   as a scenotime snapshot, generation, refusals); `projection_compare` tests
   (families once, aliases, the selection row, compiled cards inside frames);
-  the headed `projection_compare.scn` in Chrome and Firefox. Settled frames
-  with dynamics (SE70) wait on the recipe's dynamics slot (SE69).
+  the headed `projection_compare.scn` in Chrome and Firefox. Settled dynamics frames are implemented in `e2543cee` (SE69/SE70; F192 to F202), with native/wasm fixture identity qualified on Genet `7422e906` and Vello `491c376c`. Their current browser receipts and separate Firefox gate are recorded in the handoff.
 - **Removed on promotion:** nothing; no earlier facet implementation existed.
+
+#### Dynamics in a swatch (implemented 2026-10-10; consumer qualification open)
+
+- **Task and forcing consumer:** Graphshell's projection editor compares
+  arrangements against twelve dynamics presets over the disclosed practice set.
+- **Carrier and binding:** Scenograph carries canonical, opaque versioned JSON
+  and a tagged preset/spec variant (F192/F194/F201); the Canvas host parses and
+  binds it, refusing a target/arrangement mismatch by both paths (F193).
+- **Inputs and identity:** one disposable body per occurrence (SE89), measured
+  footprint and static placement; source identity survives unchanged. The first
+  adapter refuses undisclosed channels and non-flat scenes. F200 distinguishes
+  direct data coordinates from ranks and layout slots.
+- **Execution and realization:** every bounded cell calls Seiche's fixed-step
+  settle function. Native and wasm use the same controller. The host retains
+  only the working cell's live runner and pages readable cards through the full
+  matrix. A pick applies arrangement plus dynamics as one undo step. The editable
+  host limit defaults to 60 under F202; a cap is labeled "Step limit reached".
+- **Evidence and limits:** the handoff records source-qualified fixture receipts,
+  including native/wasm identity, its changed-bound control and browser scenarios.
+  Native/wasm fixture identity passes against integrated Genet `7422e906` and
+  Vello `491c376c`; the handoff records the current browser qualification and
+  its open Firefox gate.
+  The second heterogeneous consumer remains pending under SE62. This implementation
+  does not qualify linked swatches, viewer backdrops or larger datasets.
+- **Removed:** the preview's earlier manual-bound prerequisite; shared Canvas
+  runtime budgets and law completion contracts retain their existing authority.
 
 #### The fold fact (promoted 2026-10-08)
 

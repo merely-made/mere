@@ -71,6 +71,7 @@ pub struct Swatch {
 pub enum AxisKind {
     Scope,
     Arrangement,
+    Dynamics,
 }
 
 /// Whether an axis's cells are drawn at one scale (SE56).
