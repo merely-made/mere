@@ -86,6 +86,12 @@ impl Catalog {
     pub fn row(&self, address: GraphAddress) -> Option<&IndexRow> {
         self.entries.iter().find(|e| e.address == address)
     }
+    pub fn record_digest(&self, address: GraphAddress) -> Option<&str> {
+        self.row(address).map(|row| row.hash.as_str())
+    }
+    pub fn shown_resource(&self, surface: Uuid) -> Option<Uuid> {
+        self.row(GraphAddress::Surface(surface))?.shown
+    }
 }
 impl<B: Backend> AddressableGraphStore<B> {
     pub(super) fn record_key(&self, address: GraphAddress, digest: &str) -> String {

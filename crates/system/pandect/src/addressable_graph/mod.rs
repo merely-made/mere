@@ -69,6 +69,31 @@ use kernel::graph::NodeFacetStore;
 use schema::*;
 use std::collections::BTreeMap;
 
+/// Immutable publication bytes and complete-record observations, prepared
+/// without backend access. The caller owns storage and publication ordering.
+pub struct PreparedGraphPublication {
+    ops: Vec<muniment::WriteOp>,
+    generation: String,
+    catalog: schema::Catalog,
+}
+impl PreparedGraphPublication {
+    /// The existing publication batch, with its head pointer last.
+    pub fn ops(&self) -> &[muniment::WriteOp] {
+        &self.ops
+    }
+    pub fn generation(&self) -> &str {
+        &self.generation
+    }
+    /// Digest of the complete stored record, including all incident copies.
+    pub fn record_digest(&self, address: GraphAddress) -> Option<&str> {
+        self.catalog.record_digest(address)
+    }
+    /// The catalog binding, which is separate from the Surface record digest.
+    pub fn shown_resource(&self, surface: Uuid) -> Option<Uuid> {
+        self.catalog.shown_resource(surface)
+    }
+}
+
 pub struct AddressableGraphStore<B> {
     backend: B,
     graph_id: Uuid,
@@ -145,6 +170,15 @@ impl<B: Backend> ResidentGraph<B> {
     }
     pub fn generation(&self) -> &str {
         &self.generation
+    }
+    /// Digest of the complete published record, even when the item or an
+    /// incident endpoint is not loaded in this view. This does not load bytes.
+    pub fn record_digest(&self, address: GraphAddress) -> Option<&str> {
+        self.catalog.as_ref()?.record_digest(address)
+    }
+    /// The published catalog binding, including unloaded Surfaces.
+    pub fn shown_resource(&self, surface: Uuid) -> Option<Uuid> {
+        self.catalog.as_ref()?.shown_resource(surface)
     }
     pub fn policy(&self) -> ResidencyPolicy {
         self.policy

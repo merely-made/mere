@@ -107,6 +107,213 @@ fn roots(id: Uuid) -> ResidencyRoots {
     }
 }
 
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn preparation_has_no_writes_and_observations_use_complete_records() {
+    pollster::block_on(async {
+        let backend = MemoryBackend::new();
+        let (graph, surfaces, _) = source(8);
+        let graph_id = Uuid::from_u128(1400);
+        let store = AddressableGraphStore::new(backend.clone(), graph_id);
+        let prepared = store.prepare_recorded_graph(&graph).unwrap();
+        assert!(
+            backend
+                .list(&format!("graphs/{graph_id}/resident/v1/"))
+                .await
+                .unwrap()
+                .is_empty()
+        );
+        let address = GraphAddress::Surface(surfaces[0]);
+        let expected = prepared.record_digest(address).unwrap().to_string();
+        backend.apply(prepared.ops()).await.unwrap();
+        store
+            .set_policy(ResidencyPolicy::Neighborhood { hops: 0 })
+            .await
+            .unwrap();
+        let view = store.open(roots(surfaces[0])).await.unwrap();
+        assert_eq!(view.record_digest(address), Some(expected.as_str()));
+        assert_eq!(view.generation(), prepared.generation());
+        assert!(view.graph().node_count() < graph.node_count());
+    });
+}
+
+async fn preparation_publication_controls<B: ProbeBackend + Clone>(backend: B) {
+    use kernel::graph::{PendingLink, PendingLinkRetention};
+    let probe = ReadProbe::new(backend.clone());
+    *probe.applied_ops.lock().unwrap() = Some(vec![]);
+    let (mut graph, surfaces, resources) = source(4);
+    graph.set_pending_link_retention(PendingLinkRetention::UntilPurged);
+    graph.queue_pending_link(PendingLink {
+        source_resource: resources[0],
+        source_surface: Some(surfaces[0]),
+        target_iri: "https://preparation-unpossessed.test/".into(),
+        statement: Default::default(),
+    });
+    let graph_id = Uuid::from_u128(1401);
+    let store = AddressableGraphStore::new(probe.clone(), graph_id);
+    let prepared = store.prepare_recorded_graph(&graph).unwrap();
+    assert_eq!(probe.applies.load(std::sync::atomic::Ordering::SeqCst), 0);
+    assert!(
+        backend
+            .list(&format!("graphs/{graph_id}/resident/v1/"))
+            .await
+            .unwrap()
+            .is_empty()
+    );
+    assert_eq!(
+        store.write_recorded_graph(&graph).await.unwrap(),
+        prepared.generation()
+    );
+    assert_eq!(probe.applies.load(std::sync::atomic::Ordering::SeqCst), 1);
+    assert_eq!(
+        probe
+            .applied_ops
+            .lock()
+            .unwrap()
+            .as_ref()
+            .unwrap()
+            .as_slice(),
+        prepared.ops()
+    );
+    let head = format!("graphs/{graph_id}/resident/v1/head");
+    assert_eq!(
+        prepared.ops().last(),
+        Some(&muniment::WriteOp::Put {
+            key: head,
+            value: serde_json::to_vec(prepared.generation()).unwrap(),
+        })
+    );
+    let mut expected_keys = std::collections::BTreeSet::new();
+    for op in prepared.ops() {
+        let muniment::WriteOp::Put { key, value } = op else {
+            panic!("publication must retain prior generations");
+        };
+        expected_keys.insert(key.clone());
+        assert_eq!(backend.get(key).await.unwrap().as_ref(), Some(value));
+    }
+    assert_eq!(
+        backend
+            .list(&format!("graphs/{graph_id}/resident/v1/"))
+            .await
+            .unwrap()
+            .into_iter()
+            .collect::<std::collections::BTreeSet<_>>(),
+        expected_keys
+    );
+    let view = store.open(Default::default()).await.unwrap();
+    assert_eq!(
+        serde_json::to_value(view.graph().to_snapshot_at(0)).unwrap(),
+        serde_json::to_value(graph.to_snapshot_at(0)).unwrap(),
+        "prepared publication preserves exact recorded truth and navigation"
+    );
+    assert_eq!(view.graph().facets(), graph.facets());
+    assert_eq!(
+        view.graph().pending_link_state(),
+        graph.pending_link_state()
+    );
+    for (surface, resource) in surfaces.into_iter().zip(resources) {
+        assert_eq!(prepared.shown_resource(surface), Some(resource));
+        assert_eq!(view.shown_resource(surface), Some(resource));
+        for address in [
+            GraphAddress::Surface(surface),
+            GraphAddress::Resource(resource),
+        ] {
+            assert_eq!(view.record_digest(address), prepared.record_digest(address));
+        }
+    }
+    for address in [
+        GraphAddress::Surface(Uuid::nil()),
+        GraphAddress::Resource(Uuid::nil()),
+    ] {
+        assert_eq!(prepared.record_digest(address), None);
+        assert_eq!(view.record_digest(address), None);
+    }
+    assert_eq!(prepared.shown_resource(Uuid::nil()), None);
+    assert_eq!(view.shown_resource(Uuid::nil()), None);
+}
+
+async fn preparation_refusal_controls<B: ProbeBackend + Clone>(backend: B) {
+    let probe = ReadProbe::new(backend.clone());
+    let (graph, surfaces, _) = source(2);
+    let graph_id = Uuid::from_u128(1402);
+    let store = AddressableGraphStore::new(probe.clone(), graph_id);
+    let generation = store.write_recorded_graph(&graph).await.unwrap();
+    store
+        .set_policy(ResidencyPolicy::Neighborhood { hops: 0 })
+        .await
+        .unwrap();
+    let view = AddressableGraphStore::new(probe.clone(), graph_id)
+        .open(roots(surfaces[0]))
+        .await
+        .unwrap();
+    let mut before = std::collections::BTreeMap::new();
+    for key in backend
+        .list(&format!("graphs/{graph_id}/resident/v1/"))
+        .await
+        .unwrap()
+    {
+        before.insert(key.clone(), backend.get(&key).await.unwrap().unwrap());
+    }
+    let limited = store.prepare_recorded_graph(view.graph()).err().unwrap();
+    assert!(
+        matches!(limited, muniment::StoreError::Codec(message) if message.contains("residency-limited"))
+    );
+    assert!(store.write_recorded_graph(view.graph()).await.is_err());
+
+    // The supported restoration boundary preserves navigation for removed
+    // owners. A bad visit reference remains reachable without private mutation.
+    let mut snapshot = Graph::new().to_snapshot_at(0);
+    let mut navigation = graph.to_snapshot_at(0).navigation.snapshot().clone();
+    navigation.visits[0].entry = usize::MAX;
+    snapshot.navigation = kernel::graph::history::SharedNavigationMemory::from_snapshot(navigation);
+    let invalid = Graph::try_from_recorded_snapshot(&snapshot).unwrap();
+    let refused = store.prepare_recorded_graph(&invalid).err().unwrap();
+    assert!(
+        matches!(refused, muniment::StoreError::Codec(message) if message.contains("invalid navigation visit reference"))
+    );
+    assert!(store.write_recorded_graph(&invalid).await.is_err());
+
+    assert_eq!(probe.applies.load(std::sync::atomic::Ordering::SeqCst), 1);
+    assert_eq!(view.generation(), generation);
+    let mut after = std::collections::BTreeMap::new();
+    for key in backend
+        .list(&format!("graphs/{graph_id}/resident/v1/"))
+        .await
+        .unwrap()
+    {
+        after.insert(key.clone(), backend.get(&key).await.unwrap().unwrap());
+    }
+    assert_eq!(
+        after, before,
+        "refused preparation and writes preserve all prior bytes"
+    );
+    // Graph has no provenance flag. Valid empty and unbound Surface truth stays
+    // accepted under the existing structural recorded-snapshot contract.
+    let mut unbound = Graph::new().to_snapshot_at(0);
+    unbound.nodes = graph.to_snapshot_at(0).nodes;
+    let unbound = Graph::try_from_recorded_snapshot(&unbound).unwrap();
+    let prepared = store.prepare_recorded_graph(&unbound).unwrap();
+    assert_eq!(prepared.shown_resource(surfaces[0]), None);
+    assert!(
+        prepared
+            .record_digest(GraphAddress::Surface(surfaces[0]))
+            .is_some()
+    );
+    assert!(store.prepare_recorded_graph(&Graph::new()).is_ok());
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn prepared_publication_preserves_bytes_single_apply_and_complete_round_trip() {
+    pollster::block_on(preparation_publication_controls(MemoryBackend::new()));
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn preparation_refuses_partial_and_invalid_navigation_without_writes() {
+    pollster::block_on(preparation_refusal_controls(MemoryBackend::new()));
+}
+
 async fn neighborhood_controls<B: Backend + Clone>(backend: B) {
     let (source, surfaces, resources) = source(64);
     let expected = source.to_snapshot_at(0);
@@ -273,6 +480,8 @@ fn redb_real_store_controls() {
         neighborhood_controls(backend.clone()).await;
         session_controls(backend.clone()).await;
         identity_and_refusal_controls(backend.clone()).await;
+        preparation_publication_controls(backend.clone()).await;
+        preparation_refusal_controls(backend.clone()).await;
         read_footprint_controls(backend.clone()).await;
         p3_context_and_cache_controls(backend.clone()).await;
         unloaded_only_cache_controls(backend).await;
@@ -296,6 +505,8 @@ async fn indexeddb_real_store_controls() {
     neighborhood_controls(backend.clone()).await;
     session_controls(backend.clone()).await;
     identity_and_refusal_controls(backend.clone()).await;
+    preparation_publication_controls(backend.clone()).await;
+    preparation_refusal_controls(backend.clone()).await;
     read_footprint_controls(backend.clone()).await;
     p3_context_and_cache_controls(backend.clone()).await;
     unloaded_only_cache_controls(backend).await;
@@ -373,6 +584,16 @@ async fn identity_and_refusal_controls<B: Backend + Clone>(backend: B) {
             )
             .unwrap();
     }
+    graph
+        .try_assert_semantic_statement_by_resource_ids(
+            resources[5],
+            resources[23],
+            SemanticStatementSpec {
+                predicate: "urn:test:hidden-incident".into(),
+                ..Default::default()
+            },
+        )
+        .unwrap();
     let frozen = graph
         .freeze_resource_selection_with_nonce(
             json!({"kind":"portable"}),
@@ -385,6 +606,7 @@ async fn identity_and_refusal_controls<B: Backend + Clone>(backend: B) {
     let expected_facets = graph.facets().clone();
     let id = Uuid::from_u128(701);
     let store = AddressableGraphStore::new(backend.clone(), id);
+    let prepared = store.prepare_recorded_graph(&graph).unwrap();
     store.write_recorded_graph(&graph).await.unwrap();
     store
         .set_policy(ResidencyPolicy::Neighborhood { hops: 0 })
@@ -394,6 +616,31 @@ async fn identity_and_refusal_controls<B: Backend + Clone>(backend: B) {
     root.focused = Some(GraphAddress::Resource(resources[15]));
     root.pinned.insert(GraphAddress::Surface(surfaces[20]));
     let mut view = store.open(root).await.unwrap();
+    let surface_digest = prepared
+        .record_digest(GraphAddress::Surface(overlap))
+        .unwrap();
+    let resource_digest = prepared
+        .record_digest(GraphAddress::Resource(overlap))
+        .unwrap();
+    assert_ne!(
+        surface_digest, resource_digest,
+        "equal UUIDs retain separate strata"
+    );
+    assert_eq!(
+        view.record_digest(GraphAddress::Surface(overlap)),
+        Some(surface_digest)
+    );
+    assert_eq!(
+        view.record_digest(GraphAddress::Resource(overlap)),
+        Some(resource_digest)
+    );
+    assert_eq!(prepared.shown_resource(overlap), Some(resources[0]));
+    assert_eq!(view.shown_resource(overlap), Some(resources[0]));
+    assert_eq!(
+        view.shown_resource(surfaces[5]),
+        Some(resources[5]),
+        "shown mapping is observable before its Surface is loaded"
+    );
     assert_eq!(
         view.status(GraphAddress::Surface(overlap)),
         ResidencyStatus::Loaded
@@ -454,6 +701,38 @@ async fn identity_and_refusal_controls<B: Backend + Clone>(backend: B) {
     view.demand(GraphAddress::Resource(resources[6]))
         .await
         .unwrap();
+    assert_eq!(
+        view.status(GraphAddress::Resource(resources[23])),
+        ResidencyStatus::NotLoaded
+    );
+    assert!(
+        view.graph()
+            .to_snapshot_at(0)
+            .resource_edges
+            .iter()
+            .all(|e| e.to_node_id != resources[23].to_string())
+    );
+    let stored = backend
+        .get(&format!(
+            "graphs/{id}/resident/v1/nodes/resource/{overlap}/{resource_digest}"
+        ))
+        .await
+        .unwrap()
+        .unwrap();
+    let wire: serde_json::Value = serde_json::from_slice(&stored).unwrap();
+    assert!(
+        wire["Resource"]["edges"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|edge| edge[1]["to_node_id"] == resources[23].to_string())
+    );
+    let stored_digest = blake3::hash(&stored).to_hex().to_string();
+    assert_eq!(
+        view.record_digest(GraphAddress::Resource(overlap)),
+        Some(stored_digest.as_str()),
+        "observation includes the unloaded incident endpoint"
+    );
     let held: std::collections::BTreeSet<_> = view
         .graph()
         .resource_nodes()
@@ -469,6 +748,16 @@ async fn identity_and_refusal_controls<B: Backend + Clone>(backend: B) {
     view.demand(GraphAddress::Surface(surfaces[2]))
         .await
         .unwrap();
+    assert_eq!(
+        view.status(GraphAddress::Surface(surfaces[3])),
+        ResidencyStatus::NotLoaded
+    );
+    assert!(view.graph().to_snapshot_at(0).edges.is_empty());
+    assert_eq!(
+        view.record_digest(GraphAddress::Surface(surfaces[2])),
+        prepared.record_digest(GraphAddress::Surface(surfaces[2])),
+        "Surface observation also retains filtered incident records"
+    );
     view.demand(GraphAddress::Surface(surfaces[3]))
         .await
         .unwrap();
@@ -606,6 +895,8 @@ struct ReadProbe<B> {
     backend: B,
     reads: std::sync::Arc<std::sync::atomic::AtomicUsize>,
     bytes: std::sync::Arc<std::sync::atomic::AtomicUsize>,
+    applies: std::sync::Arc<std::sync::atomic::AtomicUsize>,
+    applied_ops: std::sync::Arc<std::sync::Mutex<Option<Vec<muniment::WriteOp>>>>,
 }
 impl<B> ReadProbe<B> {
     fn new(backend: B) -> Self {
@@ -613,6 +904,8 @@ impl<B> ReadProbe<B> {
             backend,
             reads: Default::default(),
             bytes: Default::default(),
+            applies: Default::default(),
+            applied_ops: Default::default(),
         }
     }
     fn reset(&self) {
@@ -653,6 +946,12 @@ impl<B: ProbeBackend> Backend for ReadProbe<B> {
         self.backend.scan(start, end).await
     }
     async fn apply(&self, ops: &[muniment::WriteOp]) -> Result<(), muniment::StoreError> {
+        self.applies
+            .fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+        if let Some(capture) = self.applied_ops.lock().unwrap().as_mut() {
+            capture.clear();
+            capture.extend_from_slice(ops);
+        }
         self.backend.apply(ops).await
     }
 }

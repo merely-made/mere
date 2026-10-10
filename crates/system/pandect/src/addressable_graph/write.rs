@@ -11,6 +11,17 @@ impl<B: Backend> AddressableGraphStore<B> {
     /// Publish immutable records and catalog, then their head pointer. Existing
     /// resident readers retain their prior generation until an explicit refresh.
     pub async fn write_recorded_graph(&self, graph: &Graph) -> Result<String, StoreError> {
+        let prepared = self.prepare_recorded_graph(graph)?;
+        self.backend.apply(prepared.ops()).await?;
+        Ok(prepared.generation)
+    }
+    /// Prepare the existing recorded publication without backend reads or
+    /// writes. Residency-limited input and invalid recorded structure refuse
+    /// before returning a batch; session ownership remains the caller's duty.
+    pub fn prepare_recorded_graph(
+        &self,
+        graph: &Graph,
+    ) -> Result<PreparedGraphPublication, StoreError> {
         if graph
             .known_coverage()
             .limits
@@ -143,8 +154,11 @@ impl<B: Backend> AddressableGraphStore<B> {
             key: self.key("head"),
             value: encode(&generation)?,
         });
-        self.backend.apply(&ops).await?;
-        Ok(generation)
+        Ok(PreparedGraphPublication {
+            ops,
+            generation,
+            catalog,
+        })
     }
     fn append_node(
         &self,
