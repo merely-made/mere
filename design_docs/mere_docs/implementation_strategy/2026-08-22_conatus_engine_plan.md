@@ -1366,7 +1366,8 @@ O3, P1, C1 to C4). Not on main. Logs in `Code/testing/mere/conatus-world/`.
 ## Progress (2026-10-09 kiss3d tenant)
 
 Wing rulings 471, 472, 606, 732, 734 and 735, in the Isocosm migration push.
-Branch `isocosm/kiss3d-tenant`, not on main.
+Branch `isocosm/kiss3d-tenant`, not on main. *Annotation, 2026-10-09:* on main at `e1bf0601`,
+Mark approving the push ("Yes, push to main").
 
 **The fork.** `crates/kiss3d`, branch `mark-ik/tenant` over upstream
 `03727cd2` (v0.47.0), pushed to `mark-ik/kiss3d` at `c362cd58`. No balaur
@@ -1455,3 +1456,23 @@ place of the scoped slot; whether `FrameReport` also counts render passes
 and copies, which needs instrumenting about thirty pass sites in the fork;
 and the water field's format in the light block, which ruling 472 places
 in the scene contract but which no consumer here reads yet.
+
+**Rulings, 2026-10-09 (isometry wing record 745 to 748, put by the Isocosm
+lane):**
+
+- *The context handle.* Question: the fork has `Context::from_host` and a
+  scoped `enter()` slot; threading a handle through 216 `Context::get()`
+  calls in 53 files would make every upstream rebase expensive. Options:
+  keep the scoped slot (recommended); thread it everywhere. Mark: "Keep the
+  scoped slot (Recommended)". So 471's explicit handle is the entered slot.
+- *The frame report.* Question: netrender asserts only zero internal
+  submissions; counting passes and copies instruments 57 pass sites in 31
+  files and 4 copy sites, and probe capture, planar reflectors and egui
+  still submit inside kiss3d. Options: submissions only, those three
+  counted not rerouted (recommended); instrument passes and route the
+  three. Mark: "Submissions only (Recommended)".
+- *The water field.* Question: 472 puts it in the scene contract but no
+  format or reader exists. Options: define it with its reader
+  (recommended); propose one now. Mark: "Define it with its reader
+  (Recommended)".
+- *Landing.* Mark approved the fast-forward of main to the branch.
