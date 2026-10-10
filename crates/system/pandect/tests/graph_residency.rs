@@ -828,7 +828,11 @@ async fn identity_and_refusal_controls<B: Backend + Clone>(backend: B) {
         .unwrap();
     let before = serde_json::to_value(view.graph().to_snapshot_at(0)).unwrap();
     let revision = view.graph().revision();
-    assert!(view.reconcile(roots(Uuid::nil())).await.is_err());
+    // Missing authored members are Projection context; an absent individual
+    // focus still refuses and must preserve the installed reader unchanged.
+    let mut invalid_focus = roots(surfaces[2]);
+    invalid_focus.focused = Some(GraphAddress::Surface(Uuid::nil()));
+    assert!(view.reconcile(invalid_focus).await.is_err());
     assert_eq!(
         serde_json::to_value(view.graph().to_snapshot_at(0)).unwrap(),
         before
@@ -1373,4 +1377,107 @@ fn prepared_checkpoint_refuses_changed_writer_before_acknowledgement() {
         .unwrap();
     assert!(session.acknowledge_resident_checkpoint(prepared).is_err());
     assert!(session.has_unstored());
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn pane_focus_is_individual_and_absent_authored_members_are_projection_context() {
+    pollster::block_on(async {
+        use kernel::graph::{CoverageLimit, CoverageNote};
+        use std::collections::BTreeSet;
+        let backend = MemoryBackend::new();
+        let (source, surfaces, resources) = source(12);
+        let store = AddressableGraphStore::new(backend, Uuid::from_u128(4901));
+        store.write_recorded_graph(&source).await.unwrap();
+        let missing = Uuid::from_u128(4902);
+        let roots = ResidencyRoots {
+            projection_surfaces: BTreeSet::from([surfaces[0], missing]),
+            transient: BTreeSet::from([GraphAddress::Surface(surfaces[8])]),
+            ..Default::default()
+        };
+        let mut reader = store
+            .open_with_policy(roots.clone(), ResidencyPolicy::Neighborhood { hops: 1 })
+            .await
+            .unwrap();
+        assert_eq!(
+            reader.status(GraphAddress::Surface(missing)),
+            ResidencyStatus::Absent
+        );
+        assert_eq!(
+            reader.demand(GraphAddress::Surface(missing)).await.unwrap(),
+            ResidencyStatus::Absent
+        );
+        assert_eq!(
+            reader.status(GraphAddress::Surface(surfaces[8])),
+            ResidencyStatus::Loaded
+        );
+        assert_eq!(
+            reader.status(GraphAddress::Resource(resources[8])),
+            ResidencyStatus::Loaded
+        );
+        assert_eq!(
+            reader.status(GraphAddress::Surface(surfaces[7])),
+            ResidencyStatus::NotLoaded
+        );
+        assert_eq!(
+            reader.status(GraphAddress::Surface(surfaces[9])),
+            ResidencyStatus::NotLoaded
+        );
+        assert!(
+            reader
+                .graph()
+                .known_coverage()
+                .limits
+                .iter()
+                .any(|l| l.layer == CoverageLayer::Projection && l.surfaces == vec![missing])
+        );
+        let mut host = CoverageNote::default();
+        host.push(CoverageLimit::new(
+            CoverageLayer::Disclosure,
+            "private source",
+        ));
+        reader.set_host_coverage(host);
+        reader
+            .reconcile_with_policy(roots, ResidencyPolicy::Full)
+            .await
+            .unwrap();
+        let coverage = reader.graph().known_coverage();
+        assert!(
+            !coverage
+                .limits
+                .iter()
+                .any(|l| l.layer == CoverageLayer::Residency)
+        );
+        assert!(
+            coverage
+                .limits
+                .iter()
+                .any(|l| l.layer == CoverageLayer::Disclosure)
+        );
+        assert!(
+            coverage
+                .limits
+                .iter()
+                .any(|l| l.layer == CoverageLayer::Projection)
+        );
+        // Removing only the missing authored ID updates context even when the
+        // available Full records are identical.
+        reader.reconcile(ResidencyRoots::default()).await.unwrap();
+        assert!(
+            !reader
+                .graph()
+                .known_coverage()
+                .limits
+                .iter()
+                .any(|l| l.layer == CoverageLayer::Projection)
+        );
+        assert!(
+            reader
+                .graph()
+                .known_coverage()
+                .limits
+                .iter()
+                .any(|l| l.layer == CoverageLayer::Disclosure)
+        );
+    });
 }

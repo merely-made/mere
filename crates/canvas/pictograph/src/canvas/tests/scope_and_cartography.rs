@@ -197,3 +197,75 @@ fn park_physics_halts_an_in_progress_settle() {
         "park halts the settle so a backgrounded graph stops ticking and waking the loop",
     );
 }
+
+#[test]
+fn exact_scope_empty_stays_empty_until_explicit_clear() {
+    let mut graph = Graph::new();
+    let key = graph.add_node("https://visible.test".into(), PortablePoint::new(0.0, 0.0));
+    let mut canvas = Canvas::with_graph(graph);
+    canvas.scope_to_exact_members([]);
+    assert!(canvas.is_scoped());
+    assert_eq!(canvas.scope_members(), Some(vec![]));
+    assert!(!canvas.node_in_scope(key));
+    canvas.set_graph(canvas.graph().clone());
+    assert!(!canvas.node_in_scope(key));
+    canvas.clear_scope();
+    assert!(canvas.node_in_scope(key));
+    assert_eq!(canvas.scope_members(), None);
+}
+
+#[test]
+fn exact_scope_unloaded_members_survive_graph_swaps_and_appear_after_demand() {
+    let mut full = Graph::new();
+    let wanted = full.add_node("https://wanted.test".into(), PortablePoint::new(0.0, 0.0));
+    let wanted_id = full.get_node(wanted).unwrap().id;
+    let other = full.add_node("https://other.test".into(), PortablePoint::new(0.0, 0.0));
+    let absent_id = uuid::Uuid::from_u128(4900);
+    let mut available = Graph::new();
+    let unrelated = available.add_node(
+        "https://unrelated.test".into(),
+        PortablePoint::new(0.0, 0.0),
+    );
+    let mut canvas = Canvas::with_graph(available);
+    let roster = std::collections::BTreeSet::from([wanted_id, absent_id]);
+    canvas.scope_to_exact_members(roster.clone());
+    assert!(!canvas.node_in_scope(unrelated));
+    assert_eq!(
+        canvas.scope_members(),
+        Some(roster.iter().copied().collect())
+    );
+    canvas.set_graph(Graph::new());
+    assert!(canvas.is_scoped());
+    assert_eq!(
+        canvas.scope_members(),
+        Some(roster.iter().copied().collect())
+    );
+    canvas.set_graph(full);
+    assert!(canvas.node_in_scope(wanted));
+    assert!(!canvas.node_in_scope(other));
+    assert_eq!(
+        canvas.scope_members(),
+        Some(roster.iter().copied().collect())
+    );
+    canvas.clear_scope();
+    assert!(canvas.node_in_scope(other));
+    canvas.set_graph(Graph::new());
+    assert!(!canvas.is_scoped());
+}
+
+#[test]
+fn ordinary_scope_overrides_exact_scope() {
+    let mut graph = Graph::new();
+    let key = graph.add_node("https://selected.test".into(), PortablePoint::new(0.0, 0.0));
+    let id = graph.get_node(key).unwrap().id;
+    let mut canvas = Canvas::with_graph(graph);
+    canvas.scope_to_exact_members([]);
+    canvas.scope_to_members([id]);
+    assert!(canvas.exact_scope.is_none());
+    assert!(canvas.node_in_scope(key));
+    canvas.scope_to_exact_members([]);
+    canvas.selected.insert(key);
+    canvas.isolate_selection();
+    assert!(canvas.exact_scope.is_none());
+    assert!(canvas.node_in_scope(key));
+}

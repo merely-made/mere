@@ -150,6 +150,7 @@ impl Canvas {
     /// neighborhood projected through a curated arrangement. A no-op with no
     /// selection. (Curated canvas.)
     pub fn isolate_selection(&mut self) {
+        self.exact_scope = None;
         if self.selected.is_empty() {
             return;
         }
@@ -166,6 +167,7 @@ impl Canvas {
     /// from the graph are skipped; an empty set clears the lens (shows the whole
     /// graph). (Curated canvas — workbench mirror.)
     pub fn scope_to_members(&mut self, members: impl IntoIterator<Item = uuid::Uuid>) {
+        self.exact_scope = None;
         let keys: Vec<NodeKey> = members
             .into_iter()
             .filter_map(|id| self.graph.get_node_by_id(id).map(|(key, _)| key))
@@ -173,9 +175,22 @@ impl Canvas {
         self.scope = (!keys.is_empty()).then_some(keys);
     }
 
+    /// Show exactly these authored IDs, even when empty or currently unloaded.
+    pub fn scope_to_exact_members(&mut self, members: impl IntoIterator<Item = uuid::Uuid>) {
+        let members: std::collections::BTreeSet<_> = members.into_iter().collect();
+        self.scope = Some(
+            members
+                .iter()
+                .filter_map(|id| self.graph.get_node_by_id(*id).map(|(key, _)| key))
+                .collect(),
+        );
+        self.exact_scope = Some(members);
+    }
+
     /// Drop the scope lens — show the whole graph again. (Curated canvas.)
     pub fn clear_scope(&mut self) {
         self.scope = None;
+        self.exact_scope = None;
     }
 
     /// The current scope lens as member uuids, or `None` when unscoped. The inverse of
@@ -183,6 +198,9 @@ impl Canvas {
     /// per-window scope override (a branch window scoping to its subgraph) and restores it
     /// after. (Per-window branch scope.)
     pub fn scope_members(&self) -> Option<Vec<uuid::Uuid>> {
+        if let Some(members) = &self.exact_scope {
+            return Some(members.iter().copied().collect());
+        }
         self.scope.as_ref().map(|keys| {
             keys.iter()
                 .filter_map(|&k| self.graph.get_node(k).map(|n| n.id))
@@ -416,7 +434,12 @@ impl Canvas {
         let view = self.world_viewport();
         let mut framing = LayoutFraming {
             view: [view.min.x, view.min.y, view.max.x, view.max.y],
-            extent: [f32::INFINITY, f32::INFINITY, f32::NEG_INFINITY, f32::NEG_INFINITY],
+            extent: [
+                f32::INFINITY,
+                f32::INFINITY,
+                f32::NEG_INFINITY,
+                f32::NEG_INFINITY,
+            ],
             ..LayoutFraming::default()
         };
         for (_, p) in self.view.positions() {
@@ -585,7 +608,10 @@ mod tests {
         });
         let world = canvas.world_point_at((410.0, 275.0));
         let back = canvas.screen_point_of(world);
-        assert!((back.0 - 410.0).abs() < 1e-3 && (back.1 - 275.0).abs() < 1e-3, "{back:?}");
+        assert!(
+            (back.0 - 410.0).abs() < 1e-3 && (back.1 - 275.0).abs() < 1e-3,
+            "{back:?}"
+        );
         let (key, _) = canvas.graph.nodes().next().unwrap();
         canvas.selected = [key].into_iter().collect();
         let at = canvas.focused_world_position().unwrap();

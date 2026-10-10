@@ -37,6 +37,8 @@ pub struct ResidencyRoots {
     pub projection_surfaces: BTreeSet<Uuid>,
     pub pinned: BTreeSet<GraphAddress>,
     pub focused: Option<GraphAddress>,
+    /// Individual pane focus roots, without neighborhood walking.
+    pub transient: BTreeSet<GraphAddress>,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ResidencyStatus {
@@ -115,6 +117,14 @@ impl<B: Backend> AddressableGraphStore<B> {
             Some(bytes) => decode(&bytes)?,
             None => ResidencyPolicy::Full,
         };
+        self.open_with_policy(roots, policy).await
+    }
+    /// Host-owned settings use a single authority and stage their policy mirror.
+    pub async fn open_with_policy(
+        self,
+        roots: ResidencyRoots,
+        policy: ResidencyPolicy,
+    ) -> Result<ResidentGraph<B>, StoreError> {
         let mut view = ResidentGraph {
             store: self,
             graph: Graph::new(),
@@ -128,6 +138,7 @@ impl<B: Backend> AddressableGraphStore<B> {
             available_digest: String::new(),
             residency_coverage: Default::default(),
             host_coverage: Default::default(),
+            projection_coverage: Default::default(),
         };
         view.reconcile(roots).await?;
         Ok(view)
@@ -147,6 +158,7 @@ pub struct ResidentGraph<B> {
     available_digest: String,
     residency_coverage: kernel::graph::CoverageNote,
     host_coverage: kernel::graph::CoverageNote,
+    projection_coverage: kernel::graph::CoverageNote,
 }
 impl<B: Backend> ResidentGraph<B> {
     /// Host observations compose with calculated residency without editing truth.
@@ -160,7 +172,12 @@ impl<B: Backend> ResidentGraph<B> {
         residency: &kernel::graph::CoverageNote,
     ) -> kernel::graph::CoverageNote {
         let mut note = residency.clone();
-        for limit in &self.host_coverage.limits {
+        for limit in self
+            .host_coverage
+            .limits
+            .iter()
+            .chain(&self.projection_coverage.limits)
+        {
             note.push(limit.clone());
         }
         note

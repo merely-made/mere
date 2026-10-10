@@ -733,6 +733,8 @@ pub struct Canvas {
     /// curated subset), projecting through a curated forme arrangement instead of the
     /// full Identity one. `None` shows the whole graph. (Curated canvas.)
     scope: Option<Vec<NodeKey>>,
+    /// Authored stable IDs survive unloaded members and graph replacements.
+    exact_scope: Option<std::collections::BTreeSet<uuid::Uuid>>,
     /// One view-local fold currently rendered as a synthetic summary object. Its
     /// members stay in the source graph and the physics layout; only this Canvas
     /// projection replaces them visually. (Graph view curation C3.)

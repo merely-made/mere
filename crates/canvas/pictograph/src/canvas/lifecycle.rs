@@ -56,6 +56,9 @@ impl Canvas {
     /// This is the Model-A graph swap the multi-graph switch drives. (Multi-graph MG2.)
     pub fn set_graph(&mut self, graph: Graph) {
         self.graph = graph;
+        if let Some(members) = self.exact_scope.clone() {
+            self.scope_to_exact_members(members);
+        }
         self.meaning.forget_graph();
         self.last_strategy_inputs = None;
         *self
@@ -224,6 +227,7 @@ impl Canvas {
             law_rebuilds: 0,
             restored_score_hold: None,
             scope: None,
+            exact_scope: None,
             fold: None,
             fold_press: None,
             fold_undo: Vec::new(),

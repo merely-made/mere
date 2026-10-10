@@ -10,12 +10,197 @@ use crate::access::AccessContext;
 use crate::handlers::HandlerRegistry;
 use crate::mere_host::{MereHost, MereHostError, SelectedPersonaRef};
 use muniment::{Backend, StoreError, WriteOp};
-use pandect::addressable_graph::{ResidencyRoots, ResidentGraph};
+use pandect::addressable_graph::{GraphAddress, ResidencyPolicy, ResidencyRoots, ResidentGraph};
 use pandect::live_graph::{LiveEditError, ObservedCommand};
 use pandect::{Applied, Pending, PreparedResidentCheckpoint};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::sync::{Arc, Mutex};
 use std::time::SystemTime;
+
+#[derive(Clone, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum ResidentRefreshMode {
+    #[default]
+    Manual,
+    HostDriven {
+        minimum_check_ms: u64,
+    },
+}
+#[derive(Clone, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct ResidentSettings {
+    pub policy: ResidencyPolicy,
+    pub projection: Option<String>,
+    pub refresh: ResidentRefreshMode,
+    pub publication_batch_ms: u64,
+}
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct PaneRoots {
+    pub roster: BTreeSet<uuid::Uuid>,
+    pub focus: Option<GraphAddress>,
+}
+#[derive(Default)]
+pub struct HostRoots {
+    panes: BTreeMap<pandect::ViewKey, PaneRoots>,
+    pins: BTreeSet<GraphAddress>,
+    revision: u64,
+}
+impl HostRoots {
+    pub fn set_pane(&mut self, pane: pandect::ViewKey, roots: PaneRoots) {
+        if self.panes.get(&pane) != Some(&roots) {
+            self.panes.insert(pane, roots);
+            self.revision = self.revision.wrapping_add(1);
+        }
+    }
+    pub fn close_pane(&mut self, pane: &pandect::ViewKey) {
+        if self.panes.remove(pane).is_some() {
+            self.revision = self.revision.wrapping_add(1);
+        }
+    }
+    pub fn set_pins(&mut self, pins: BTreeSet<GraphAddress>) {
+        if self.pins != pins {
+            self.pins = pins;
+            self.revision = self.revision.wrapping_add(1);
+        }
+    }
+    pub fn union(&self) -> ResidencyRoots {
+        ResidencyRoots {
+            projection_surfaces: self
+                .panes
+                .values()
+                .flat_map(|p| p.roster.iter().copied())
+                .collect(),
+            transient: self.panes.values().filter_map(|p| p.focus).collect(),
+            pinned: self.pins.clone(),
+            focused: None,
+        }
+    }
+    pub fn revision(&self) -> u64 {
+        self.revision
+    }
+}
+
+impl<B: Backend + Clone> MereHost<B> {
+    fn resident_key(&self, suffix: &str) -> String {
+        format!(
+            "graphs/{}/resident/v1/{suffix}",
+            self.graph_session().manifest().root_graph_id.as_uuid()
+        )
+    }
+    pub(crate) async fn load_resident_settings(mut self) -> Result<Self, MereHostError> {
+        let slots = muniment::JsonSlots::new(self.store());
+        let settings = slots
+            .load::<ResidentSettings>(&self.resident_key("host-settings"))
+            .await?
+            .unwrap_or_default();
+        self.validate_resident_settings(&settings)?;
+        self.resident_settings = settings;
+        Ok(self)
+    }
+    pub(crate) fn validate_resident_settings(
+        &self,
+        settings: &ResidentSettings,
+    ) -> Result<(), MereHostError> {
+        let invalid = |reason: &str| MereHostError::InvalidSnapshot(reason.to_owned());
+        if matches!(
+            settings.refresh,
+            ResidentRefreshMode::HostDriven {
+                minimum_check_ms: 0
+            }
+        ) {
+            return Err(invalid(
+                "host-driven resident refresh requires a positive minimum interval",
+            ));
+        }
+        if matches!(settings.policy, ResidencyPolicy::Neighborhood { .. }) {
+            let id = settings
+                .projection
+                .as_deref()
+                .filter(|id| !id.is_empty())
+                .ok_or_else(|| invalid("Neighborhood requires a selected authored projection"))?;
+            let snapshot = self
+                .saved_projection(id)
+                .map_err(|e| invalid(&e.to_string()))?
+                .ok_or_else(|| invalid("selected authored projection is missing"))?;
+            if snapshot.definition.id != id {
+                return Err(invalid("selected authored projection identity mismatch"));
+            }
+            let draft: crate::projection_editor::ProjectionDraft = serde_json::from_value(
+                serde_json::to_value(&snapshot.definition).map_err(|e| invalid(&e.to_string()))?,
+            )
+            .map_err(|e| invalid(&e.to_string()))?;
+            draft
+                .validate()
+                .map_err(|issues| invalid(&format!("invalid authored projection: {issues:?}")))?;
+        }
+        Ok(())
+    }
+    pub fn resident_settings(&self) -> &ResidentSettings {
+        &self.resident_settings
+    }
+    /// Stage graph settings under the admitted writer's retained checkpoint batch.
+    pub fn set_resident_settings(
+        &mut self,
+        settings: ResidentSettings,
+    ) -> Result<(), ResidentHostError> {
+        if !self.resident_admitted {
+            return Err(ResidentHostError::OwnershipUnproven);
+        }
+        self.ensure_resident_idle()?;
+        self.validate_resident_settings(&settings)?;
+        self.resident_settings_dirty |= self.resident_settings != settings;
+        self.resident_settings = settings;
+        Ok(())
+    }
+    pub(crate) fn resident_settings_ops(&self) -> Result<Vec<WriteOp>, StoreError> {
+        use muniment::Codec;
+        Ok(vec![
+            WriteOp::Put {
+                key: self.resident_key("host-settings"),
+                value: muniment::JsonCodec::encode(&self.resident_settings)?,
+            },
+            WriteOp::Put {
+                key: self.resident_key("policy"),
+                value: muniment::JsonCodec::encode(&self.resident_settings.policy)?,
+            },
+        ])
+    }
+    pub fn resident_roots(&self) -> &HostRoots {
+        &self.resident_roots
+    }
+    pub fn set_resident_pane(&mut self, pane: pandect::ViewKey, roots: PaneRoots) {
+        self.resident_roots.set_pane(pane, roots);
+    }
+    pub fn close_resident_pane(&mut self, pane: &pandect::ViewKey) {
+        self.resident_roots.close_pane(pane);
+    }
+    /// These roots reflect explicit graph pinning, independently of per-view Keep.
+    pub fn set_resident_pins(&mut self, pins: BTreeSet<GraphAddress>) {
+        self.resident_roots.set_pins(pins);
+    }
+    pub fn resident_reader(&self) -> Option<&ResidentGraph<B>> {
+        self.resident_reader.as_ref()
+    }
+    /// Reconcile the installed reader in the same owner that holds the writer.
+    pub async fn refresh_resident_reader(&mut self) -> Result<(), ResidentHostError> {
+        if !self.resident_admitted {
+            return Err(ResidentHostError::OwnershipUnproven);
+        }
+        let roots = self.resident_roots.union();
+        if let Some(reader) = &mut self.resident_reader {
+            reader
+                .reconcile_with_policy(roots, self.resident_settings.policy)
+                .await?;
+        } else {
+            let reader = pandect::addressable_graph::AddressableGraphStore::new(
+                self.store(),
+                *self.graph_session().manifest().root_graph_id.as_uuid(),
+            )
+            .open_with_policy(roots, self.resident_settings.policy)
+            .await?;
+            self.resident_reader = Some(reader);
+        }
+        Ok(())
+    }
+}
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ResidentPersistence {
@@ -193,11 +378,17 @@ pub(crate) struct ResidentStaged {
     work: ResidentWrite,
 }
 impl ResidentStaged {
-    pub(crate) fn new(current: PreparedResidentCheckpoint, retired: Vec<Pending>) -> Self {
+    pub(crate) fn new(
+        current: PreparedResidentCheckpoint,
+        retired: Vec<Pending>,
+        settings: Vec<WriteOp>,
+    ) -> Self {
+        let mut current_ops = settings;
+        current_ops.extend_from_slice(current.ops());
         let parts = retired
             .iter()
             .map(|p| Part::new(p.ops().to_vec()))
-            .chain([Part::new(current.ops().to_vec())])
+            .chain([Part::new(current_ops)])
             .collect();
         Self {
             current: Some(current),
@@ -232,8 +423,6 @@ impl ResidentStaged {
 /// reader. Only concrete factories below can grant write admission.
 pub struct ResidentHost<B> {
     host: Option<MereHost<B>>,
-    reader: Option<ResidentGraph<B>>,
-    roots: ResidencyRoots,
     applied: Option<Applied>,
     publication: Option<String>,
     #[cfg(all(feature = "resident-storage", not(target_arch = "wasm32")))]
@@ -244,8 +433,6 @@ impl<B: Backend + Clone> ResidentHost<B> {
         host.admit_resident();
         Self {
             host: Some(host),
-            reader: None,
-            roots: Default::default(),
             applied: None,
             publication: None,
             #[cfg(all(feature = "resident-storage", not(target_arch = "wasm32")))]
@@ -257,7 +444,44 @@ impl<B: Backend + Clone> ResidentHost<B> {
         Err(ResidentHostError::OwnershipUnproven)
     }
     pub fn reader(&self) -> Option<&ResidentGraph<B>> {
-        self.reader.as_ref()
+        self.host.as_ref().and_then(|host| host.resident_reader())
+    }
+    pub fn presentation_graph(&self) -> &mere::kernel::graph::Graph {
+        self.host
+            .as_ref()
+            .expect("open resident")
+            .presentation_graph()
+    }
+    pub fn settings(&self) -> &ResidentSettings {
+        self.host
+            .as_ref()
+            .expect("open resident")
+            .resident_settings()
+    }
+    pub fn set_settings(&mut self, settings: ResidentSettings) -> Result<(), ResidentHostError> {
+        if self.is_busy() {
+            return Err(ResidentHostError::Busy);
+        }
+        self.host
+            .as_mut()
+            .expect("open resident")
+            .set_resident_settings(settings)
+    }
+    pub async fn set_pane(
+        &mut self,
+        pane: pandect::ViewKey,
+        roots: PaneRoots,
+    ) -> Result<(), ResidentHostError> {
+        let host = self.host.as_mut().ok_or(ResidentHostError::Busy)?;
+        host.set_resident_pane(pane, roots);
+        host.refresh_resident_reader().await?;
+        Ok(())
+    }
+    pub async fn close_pane(&mut self, pane: &pandect::ViewKey) -> Result<(), ResidentHostError> {
+        let host = self.host.as_mut().ok_or(ResidentHostError::Busy)?;
+        host.close_resident_pane(pane);
+        host.refresh_resident_reader().await?;
+        Ok(())
     }
     pub fn session(&self) -> &pandect::GraphSession<B> {
         self.host.as_ref().expect("open resident").graph_session()
@@ -351,21 +575,8 @@ impl<B: Backend + Clone> ResidentHost<B> {
     }
     pub async fn refresh(&mut self) -> Result<ResidentPersistence, ResidentHostError> {
         let generation = self.publication.clone().ok_or(ResidentHostError::Busy)?;
-        let host = self.host.as_ref().ok_or(ResidentHostError::Busy)?;
-        let result = if let Some(reader) = &mut self.reader {
-            reader.refresh().await.map_err(MereHostError::from)
-        } else {
-            match pandect::MereSessions::new(host.store())
-                .open_resident_graph(host.graph_session().id(), self.roots.clone())
-                .await
-            {
-                Ok(reader) => {
-                    self.reader = Some(reader);
-                    Ok(())
-                },
-                Err(e) => Err(e.into()),
-            }
-        };
+        let host = self.host.as_mut().ok_or(ResidentHostError::Busy)?;
+        let result = host.refresh_resident_reader().await;
         match result {
             Ok(()) => {
                 self.publication = None;
@@ -409,7 +620,6 @@ impl ResidentHost<muniment::DirectoryBackend> {
             .take()
             .ok_or(ResidentHostError::OwnershipUnproven)?;
         let work = self.host.as_ref().and_then(|h| h.retained_resident_work());
-        drop(self.reader.take());
         drop(self.host.take());
         // Opening finishes a durable redo batch before any comparison. The
         // retained worker owns bytes/preimages only, so it cannot hold the lock.
@@ -441,10 +651,45 @@ impl ResidentHost<muniment::RedbBackend> {
 mod tests {
     use super::*;
     use muniment::MemoryBackend;
+    use pandect::ViewKey;
     use pandect::addressable_graph::GraphAddress;
     use pandect::live_graph::{LiveCheck, LiveCommand};
+    use std::collections::BTreeSet;
     use std::sync::atomic::{AtomicUsize, Ordering};
     use uuid::Uuid;
+
+    #[test]
+    fn closing_one_pane_releases_only_its_transient_roots() {
+        let first = ViewKey::new("graphshell", "first").unwrap();
+        let second = ViewKey::new("graphshell", "second").unwrap();
+        let a = Uuid::from_u128(4000);
+        let b = Uuid::from_u128(4001);
+        let focus = GraphAddress::Resource(Uuid::from_u128(4002));
+        let pin = GraphAddress::Surface(Uuid::from_u128(4003));
+        let mut roots = HostRoots::default();
+        roots.set_pins(BTreeSet::from([pin]));
+        roots.set_pane(
+            first.clone(),
+            PaneRoots {
+                roster: BTreeSet::from([a]),
+                focus: Some(focus),
+            },
+        );
+        roots.set_pane(
+            second,
+            PaneRoots {
+                roster: BTreeSet::from([a, b]),
+                focus: Some(focus),
+            },
+        );
+        assert_eq!(roots.union().projection_surfaces, BTreeSet::from([a, b]));
+        assert_eq!(roots.union().transient, BTreeSet::from([focus]));
+        assert_eq!(roots.union().pinned, BTreeSet::from([pin]));
+        roots.close_pane(&first);
+        assert_eq!(roots.union().projection_surfaces, BTreeSet::from([a, b]));
+        assert_eq!(roots.union().transient, BTreeSet::from([focus]));
+        assert_eq!(roots.union().pinned, BTreeSet::from([pin]));
+    }
 
     #[derive(Clone, Default)]
     struct Fault {
@@ -549,6 +794,241 @@ mod tests {
         backend.calls.lock().unwrap().clear();
         (owner, backend)
     }
+    fn authored_projection() -> crate::projection_compile::ProjectionSnapshot {
+        use crate::projection_editor::*;
+        let mut draft = ProjectionDraft::new();
+        draft.id = "resident-test".into();
+        draft.label = "Resident test".into();
+        draft.source = SourceBinding {
+            authority: "local".into(),
+            domain: "notes".into(),
+            resource: "graph:notes".into(),
+        };
+        draft.reading = Reading {
+            kind: "nodes".into(),
+            key: "id".into(),
+            value: None,
+        };
+        draft.encoding.x = Channel::Field("x".into());
+        draft.encoding.y = Channel::Field("y".into());
+        draft.appearance.title = "Resident test".into();
+        draft.appearance.realization = "canvas".into();
+        draft.provenance.author = "test-author".into();
+        draft.provenance.source_revision = Some("1".into());
+        crate::projection_compile::ProjectionSnapshot {
+            definition: draft.to_definition().unwrap(),
+            selected_occurrence: None,
+        }
+    }
+
+    #[test]
+    fn settings_are_validated_and_both_slots_share_the_retained_checkpoint() {
+        pollster::block_on(async {
+            let (mut owner, backend) = owner().await;
+            assert_eq!(owner.settings(), &ResidentSettings::default());
+            assert_eq!(owner.settings().policy, ResidencyPolicy::Full);
+            assert_eq!(owner.settings().refresh, ResidentRefreshMode::Manual);
+            assert_eq!(owner.settings().publication_batch_ms, 0);
+            let invalid_interval = ResidentSettings {
+                refresh: ResidentRefreshMode::HostDriven {
+                    minimum_check_ms: 0,
+                },
+                ..Default::default()
+            };
+            assert!(owner.set_settings(invalid_interval).is_err());
+            let mut settings = ResidentSettings {
+                policy: ResidencyPolicy::Neighborhood { hops: 1 },
+                projection: Some("resident-test".into()),
+                refresh: ResidentRefreshMode::HostDriven {
+                    minimum_check_ms: 75,
+                },
+                publication_batch_ms: 20,
+            };
+            assert!(owner.set_settings(settings.clone()).is_err());
+            assert_eq!(owner.settings(), &ResidentSettings::default());
+            assert!(backend.calls.lock().unwrap().is_empty());
+            owner
+                .host
+                .as_mut()
+                .unwrap()
+                .save_projection(&authored_projection())
+                .unwrap();
+            owner.persist(SystemTime::UNIX_EPOCH).await.unwrap();
+            let cursor = owner.session().journal().live_cursor();
+            owner.set_settings(settings.clone()).unwrap();
+            assert!(owner.host.as_ref().unwrap().has_unstored());
+            backend.mode.store(1, Ordering::SeqCst);
+            owner.persist(SystemTime::UNIX_EPOCH).await.unwrap();
+            assert!(owner.is_busy());
+            assert!(matches!(
+                owner.set_settings(ResidentSettings::default()),
+                Err(ResidentHostError::Busy)
+            ));
+            let graph = owner.session().manifest().root_graph_id;
+            let prefix = format!("graphs/{}/resident/v1", graph.as_uuid());
+            let slots = muniment::JsonSlots::new(backend.clone());
+            assert_eq!(
+                slots
+                    .load::<ResidentSettings>(&format!("{prefix}/host-settings"))
+                    .await
+                    .unwrap(),
+                Some(ResidentSettings::default())
+            );
+            let batch = backend.calls.lock().unwrap().last().unwrap().clone();
+            assert!(batch.iter().any(|op| matches!(op, WriteOp::Put { key, .. } if key == &format!("{prefix}/host-settings"))));
+            assert!(batch.iter().any(
+                |op| matches!(op, WriteOp::Put { key, .. } if key == &format!("{prefix}/policy"))
+            ));
+            assert!(batch.iter().any(
+                |op| matches!(op, WriteOp::Put { key, .. } if key == &format!("{prefix}/head"))
+            ));
+            backend.mode.store(0, Ordering::SeqCst);
+            assert!(matches!(
+                owner.persist(SystemTime::UNIX_EPOCH).await.unwrap(),
+                ResidentPersistence::Durable { .. }
+            ));
+            assert_eq!(backend.calls.lock().unwrap().last(), Some(&batch));
+            assert_eq!(
+                slots
+                    .load::<ResidentSettings>(&format!("{prefix}/host-settings"))
+                    .await
+                    .unwrap(),
+                Some(settings.clone())
+            );
+            assert_eq!(
+                slots
+                    .load::<ResidencyPolicy>(&format!("{prefix}/policy"))
+                    .await
+                    .unwrap(),
+                Some(settings.policy)
+            );
+            assert_eq!(owner.session().journal().live_cursor(), cursor);
+            assert!(!owner.host.as_ref().unwrap().has_unstored());
+            let reopened = MereHost::open_session(
+                backend.clone(),
+                owner.session().id(),
+                persona(),
+                HandlerRegistry::default(),
+                access(),
+            )
+            .await
+            .unwrap();
+            assert_eq!(reopened.resident_settings(), &settings);
+            settings.policy = ResidencyPolicy::Full;
+            owner.set_settings(settings).unwrap();
+            owner.persist(SystemTime::UNIX_EPOCH).await.unwrap();
+            assert!(
+                !owner
+                    .presentation_graph()
+                    .known_coverage()
+                    .limits
+                    .iter()
+                    .any(|l| l.layer == mere::kernel::graph::CoverageLayer::Residency)
+            );
+        });
+    }
+
+    #[test]
+    fn pane_close_reconciles_the_actual_presentation_and_preserves_writer_and_views() {
+        pollster::block_on(async {
+            use pandect::addressable_graph::ResidencyStatus;
+            let (mut owner, _) = owner().await;
+            for id in 4100..4104 {
+                owner
+                    .edit("test", command(id), SystemTime::UNIX_EPOCH)
+                    .unwrap();
+                owner.persist(SystemTime::UNIX_EPOCH).await.unwrap();
+            }
+            let host = owner.host.as_mut().unwrap();
+            host.save_projection(&authored_projection()).unwrap();
+            let view = pandect::view_intent_store::ViewIntent {
+                focus: Some("https://resident.test/4103".into()),
+                ..Default::default()
+            };
+            host.set_view_now("graphshell", "kept-view", view.clone())
+                .unwrap();
+            host.set_resident_pins(BTreeSet::from([GraphAddress::Surface(Uuid::from_u128(
+                4103,
+            ))]));
+            owner
+                .set_settings(ResidentSettings {
+                    policy: ResidencyPolicy::Neighborhood { hops: 0 },
+                    projection: Some("resident-test".into()),
+                    ..Default::default()
+                })
+                .unwrap();
+            let first = ViewKey::new("graphshell", "first").unwrap();
+            let second = ViewKey::new("graphshell", "second").unwrap();
+            let shared = Uuid::from_u128(4100);
+            let missing = Uuid::from_u128(4199);
+            owner.host.as_mut().unwrap().set_resident_pane(
+                first.clone(),
+                PaneRoots {
+                    roster: BTreeSet::from([shared, missing]),
+                    focus: Some(GraphAddress::Surface(Uuid::from_u128(4101))),
+                },
+            );
+            owner.host.as_mut().unwrap().set_resident_pane(
+                second.clone(),
+                PaneRoots {
+                    roster: BTreeSet::from([shared, missing]),
+                    focus: Some(GraphAddress::Surface(Uuid::from_u128(4102))),
+                },
+            );
+            owner.persist(SystemTime::UNIX_EPOCH).await.unwrap();
+            let before = owner.reader().unwrap().footprint().retained_record_bytes();
+            let writer = owner.session().graph().to_snapshot_at(0);
+            let cursor = owner.session().journal().live_cursor();
+            owner.close_pane(&first).await.unwrap();
+            let reader = owner.reader().unwrap();
+            assert_eq!(
+                reader.status(GraphAddress::Surface(Uuid::from_u128(4101))),
+                ResidencyStatus::NotLoaded
+            );
+            assert_eq!(
+                reader.status(GraphAddress::Surface(Uuid::from_u128(4102))),
+                ResidencyStatus::Loaded
+            );
+            assert_eq!(
+                reader.status(GraphAddress::Surface(Uuid::from_u128(4103))),
+                ResidencyStatus::Loaded
+            );
+            assert!(reader.footprint().retained_record_bytes() < before);
+            let host = owner.host.as_ref().unwrap();
+            assert!(std::ptr::eq(host.presentation_graph(), reader.graph()));
+            assert!(host.presentation_graph().node_count() < host.graph().node_count());
+            assert_eq!(
+                host.resident_roots().union().projection_surfaces,
+                BTreeSet::from([shared, missing])
+            );
+            assert_eq!(
+                host.resident_roots().union().pinned,
+                BTreeSet::from([GraphAddress::Surface(Uuid::from_u128(4103))])
+            );
+            assert_eq!(host.view("graphshell", "kept-view"), Some(&view));
+            assert_eq!(
+                serde_json::to_value(host.graph().to_snapshot_at(0)).unwrap(),
+                serde_json::to_value(writer).unwrap()
+            );
+            assert_eq!(owner.session().journal().live_cursor(), cursor);
+            owner.close_pane(&second).await.unwrap();
+            assert_eq!(
+                owner
+                    .reader()
+                    .unwrap()
+                    .status(GraphAddress::Surface(shared)),
+                ResidencyStatus::NotLoaded
+            );
+            assert_eq!(
+                owner
+                    .reader()
+                    .unwrap()
+                    .status(GraphAddress::Surface(Uuid::from_u128(4103))),
+                ResidencyStatus::Loaded
+            );
+        });
+    }
+
     #[test]
     fn retry_twice_keeps_exact_batch_author_and_change_identity() {
         pollster::block_on(async {
