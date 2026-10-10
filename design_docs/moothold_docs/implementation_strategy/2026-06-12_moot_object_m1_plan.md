@@ -142,6 +142,264 @@ adoption (post-reshape).
 co-op, community lineage and voluntary distribution discussion. It replaces the
 old M2 implementation assumptions above; it does not reopen completed M1 work.
 
+### Capsule-library composition proof (2026-10-09)
+
+**Status (2026-10-09):** bounded example and opt-in Graphshell browser mount
+implemented and exercised; broader product adoption remains open. Mark authorized the
+capsule-library proof following the Moot prior-art discussion. This does not
+adopt a new publication wire grammar or make the experimental host a Graphshell
+product surface.
+
+**Phases and done-conditions:**
+
+1. Independently signed capsule packs and a signed applet pack enter an existing
+   Gemot collection through authorized contributions. The selected collection
+   exposes author identities and immutable content references; old revisions
+   remain retained. Tampered packs, payload substitution, an unauthorized
+   contribution and a foreign author's replacement are refused.
+2. A member receives a NativeDrop over scoped iroh, retains it in Muniment,
+   and reopens it after the publisher process exits. A separate member accepts
+   only graph records, without retaining capsule or applet payloads. The proof
+   records separate process identities and storage facts.
+3. The same `app-core` component drives browsing/search in the native host and
+   a browser host using jco's generated Component Model bindings. Each host
+   checks a separate local execution grant, refuses self-escalation and
+   out-of-scope navigation, and reports missing capabilities. Browser rendering
+   and retention remain host responsibilities. This does not prove Graphshell
+   mounting, arbitrary applet support, cross-machine delivery or live coediting.
+
+**Findings (2026-10-09):** `crates/moot/gemot/examples/author-offline-publication.rs`
+already proves same-machine scoped transfer, author exit and durable reopening.
+`crates/eidetic/eidetic-core/src/pack.rs` already signs `WasmComponent` and
+`Asset` inventories; signature verification alone grants no execution power.
+`crates/script/app-host/src/lib.rs` hosts the existing envelope WIT contract and
+accepts exact verified component bytes. The existing production collection
+commands preserve original signed contribution identities. This proof composes
+those owners and keeps its catalogue/event vocabulary inside the example.
+
+**Progress:** 2026-10-09 — isolated checkout started at current remote Mere
+`db24dbe96612a6bd47fcd79625668dbc713fa575`; no production runtime wiring changed.
+
+2026-10-09 — `crates/moot/gemot/examples/capsule-library.rs` composes two
+independently signed gemtext capsule packs, a later Alice revision and a signed
+WIT applet pack. Existing Gemot grants authorize contribution, collection
+curation and a distinct Standing hosting commitment. The collection selects
+Alice's new reference and Bob's reference while the old Alice pack, payload
+and signed contribution remain retained. A publisher, a retaining member, an
+index-only member and the reopened native host use separate processes; the two
+authors use independent roots inside the publisher fixture.
+
+The final index-only member received 27,180 bytes of signed community/lane evidence,
+retained no capsule or applet payloads, and was refused the 285,851-byte full
+bundle. These are fixture sizes, not performance measurements. After publisher
+exit, the native host reopened the member's durable Moot and ingress stores,
+rechecked current hosting authority and Standing, and recovered its retention
+lease. Its applet used signed Servitor grants for a separate local participant
+key, independently of pack signatures and community membership.
+
+The same component, BLAKE3
+`56aaec6106a0d4a4d82a2ac20b6ae666919b1081d164b256c13d807beac5fe5f`,
+produced equal browsing and title/author search results in Wasmtime and Chromium
+151.0.7922.34 via jco 1.37.0. Real browser checks covered explicit execution
+review, reading without saving capsule files, address-only retention, explicit
+revision retention, page reopen and offline IndexedDB reading, missing
+capabilities, grant narrowing, self-escalation/outside-address refusals,
+malformed/unknown actions, changed component bytes and host recovery after
+terminating a runaway worker. Native grant revocation and epoch interruption
+also passed. The native receipt matches all four compiled fixture source hashes;
+the browser build records its host-source and generated JS/core-Wasm hashes.
+
+**Additional findings (2026-10-09):** a JSON value projection reorders the
+signed pack wrapper's fields. Re-serializing that projection cannot recover its
+original content address. The browser therefore fetches, hashes and retains
+exact original pack bytes before parsing and checking their signatures. The
+guest receives copied disclosed metadata and emits proposals through the
+existing envelope. Its example projection action does not extend Turnstone's
+production classifier.
+
+**Qualification boundary:** the native host is headless; the standalone browser
+host consumes the member's disclosed snapshot without replaying Gemot operations.
+Browser retention uses real IndexedDB directly, not Muniment's browser adapter.
+jco bindings are generated locally from the checked component. The small WASI
+adapter supplies only this guest's CLI/logging imports, without ambient files,
+network or environment; it is not a general browser WASI host. Native memory
+limits and browser worker interruption are distinct containment mechanisms.
+The native fixture uses short-lived instances: `AppScript` currently sets its
+epoch deadline at attach rather than renewing it for each lifecycle call.
+Sustained native sessions need an explicit budget/renewal policy at host adoption.
+Public fixtures use encrypted authenticated iroh carriage and unsealed local
+stores. Private publication/key epochs, full hosting bounds, historical authority
+proofs, two-machine delivery, Turnstone/native product mounting and live coediting
+remain open. Pack versions do not establish production publication lineage.
+
+**Graphshell adoption continuation (2026-10-09):** implemented and qualified on
+one machine, authorized by
+Mark's next "Go ahead". The isolated checkout has been advanced to fetched
+`b6b551d44`; the prior proof's changes were preserved. This pass mounts the
+verified capsule component in Graphshell's existing retained tree. Its bounded
+host dialect is the capsule catalogue and addressed reader, through the existing
+`app-core` envelope; it does not freeze a universal applet surface ABI.
+
+1. An opt-in portable host model verifies exact signed pack/component bytes and
+   each selected capsule's signed metadata. A host-disclosed collection binds
+   the scope; local review grants execution independently. Changed signatures,
+   content, authors and out-of-scope or stale proposals must be refused.
+2. Graphshell's retained Cambium tree presents the review, catalogue and reader.
+   A worker runs the original component; Graphshell lowers its proposals after
+   the turn, rechecking the current grant. Replacing or closing a mount invalidates
+   its outstanding work. Runaway execution must leave the host responsive.
+3. The fixture exercises the actual Graphshell browser bundle and records
+   browse/search parity, reading, revocation, replacement, containment and visible
+   captures. A baseline tree without the feature remains buildable. Any retention
+   adopted here uses Muniment's browser backend. Graphshell mounting is qualified
+   only after these checks pass; native product mounting and remote projection
+   fallback remain separate.
+
+**Adoption finding (2026-10-09):** fetched `b6b551d44` lacks the locally
+qualified renderer pins from Mere `27a39780b`. Both initial captures were black;
+headless Chromium additionally lost its GPU device during buffer creation.
+This continuation restates the existing immutable Classic/encoding/shader
+repair `865cbf419668a6fb5b5e96ea54eaaf9be160fd92` in the root and standalone
+browser manifests. It does not change shader source or claim software rendering
+as hardware acceptance. Pointer checks use the accessibility mirror's retained
+rectangles to click the actual canvas; the mirror deliberately is not the
+pointer target. The accepted receipt must record the actual adapter and visible
+capture after this adoption.
+
+**Graphshell progress and acceptance (2026-10-09):**
+
+- `ports/graphshell/src/capsule_applet.rs` is the opt-in portable host gate. It
+  verifies exact signed applet/asset pack bytes, signed contributor metadata and
+  the component inventory; review itself grants nothing. Proposals bind the
+  pack, Moot, collection, disclosure revision, local instance and execution
+  generation. Lowering and body arrival recheck the current grant. This is a
+  bounded reader dialect over the fixture's pack wrapper, not a publication or
+  universal surface schema. Limits are 1 MiB of disclosure, 1,024 selected
+  capsules, and 16 MiB per component or UTF-8 capsule body.
+- `ports/graphshell/src/web_tree/applet.rs` mounts review, search, catalogue and
+  reader in Graphshell's existing retained Cambium tree. Exact capsule bytes
+  enter Muniment's IndexedDB backend only on the person's explicit retention
+  command. Reopening rechecks the exact retained pack and body. Closing or
+  replacing a mount invalidates pending turns/responses; a failed replacement
+  preserves the current verified mount. This pass supports one active capsule
+  mount in the one-tree host.
+- The proof's browser worker, verifier and narrow WASI adapter now live once at
+  `ports/graphshell/web/applets/`, shared by the earlier standalone browser and
+  Graphshell. jco derivation is still performed by trusted local build tooling.
+  The supplying host pins the derivation manifest's address before the worker
+  imports any generated JavaScript or compiles a core module. The signature on
+  the original component alone does not authenticate JavaScript claimed to be
+  its translation. A remote peer's self-asserted derivation hash is insufficient;
+  deployment must establish that pin from a trusted build. The worker has a
+  2.5-second turn deadline; browser memory is not qualified as a per-instance
+  hard limit. Native AppScript's earlier deadline-renewal finding remains open.
+- The final fixture completed scoped peer delivery, index-only refusal,
+  publisher exit and durable native reopening again, then used the same
+  `56aaec6106a0d4a4d82a2ac20b6ae666919b1081d164b256c13d807beac5fe5f`
+  component in the Graphshell browser mount. Actual pointer/keyboard interaction
+  passed native browse/search parity, verified reading without saving, explicit
+  Muniment retention, fresh-page reopen and offline capsule reading, typed
+  refusals, queued-action and late-body revocation, rejected/stale replacement,
+  worker interruption and a freshly reviewed instance after interruption. An
+  unpinned browser derivation was refused before executing generated code.
+- Headed Google Chrome 152.0.7977.83 requested the default high-performance
+  WebGPU adapter: AMD `gcn-5`, no fallback. The machine reports Radeon Pro Vega
+  56. Review, reader and reopened captures passed visible-pixel gates and were
+  inspected. There were no page or console errors in the accepted run. Earlier
+  failed captures remain separate. The bindings receipt names exact host source
+  and bundle hashes; this is a debug build, not a payload/performance result.
+- Six portable gate tests, the original standalone Chromium proof, the opt-in
+  browser build and the baseline viewer check passed. The applet browser cone
+  includes dev/test edges and excludes the forbidden native packages; native
+  AccessKit fixture dependencies/tests were target-scoped in Graphshell. The
+  general port wall still fails on the existing `crates/mere` to `ports/tabard`
+  edge. Documentation audits retain the starting commit's six D2 errors and
+  add no broken-link or missing-path subjects. Graphshell Clippy completed with
+  existing host warnings; no new gate warning was reported.
+
+**Graphshell reproduction (after the earlier peer proof and browser build):**
+
+```sh
+# From ports/graphshell/web; its standalone lock is generated on first build.
+cargo build --target wasm32-unknown-unknown --no-default-features --features applets
+# Return to crates/moot/gemot/examples/capsule-library:
+node graphshell-build.mjs /absolute/path/to/proof-root/site /absolute/path/to/graphshell_web.wasm
+python3 -m http.server 8774 --bind 127.0.0.1 --directory /absolute/path/to/proof-root/site
+# In a second terminal; headed installed Chrome and Python with Pillow are required:
+node graphshell-check.mjs http://127.0.0.1:8774/graphshell.html /absolute/path/to/proof-root
+```
+
+The accepted local run is `targets/moot-graphshell-run-20261009-c` in the
+workspace umbrella, outside this repository. `graphshell.json`, the three
+`graphshell-*.png` captures, `site/graphshell-bindings.json` and the preserved
+`graphshell-web.Cargo.lock` supplement the peer/native/browser receipts.
+`CAPSULE_PYTHON` selects the Pillow interpreter when the default Python lacks it.
+Browser Gemot replay, host-page offline boot, live collection subscription,
+generic/concurrent applets, native/Turnstone mounting, remote projection
+fallback, private publication epochs and live coediting remain separate work.
+
+**Main integration (2026-10-09):** the qualified capsule source is committed at
+`56879c7cd`. Mark authorized merging and pushing it, then continuing against the
+recent plans. The integration starts from fetched `4d8bd7037`, preserving the
+primary checkout's unpublished design commits. Consolidating the overlapping
+native test tables and resolving the combined lock are integration changes.
+Current Tabard placement repairs the earlier global port-wall failure. The
+rebuilt browser passed all thirteen checks on AMD `gcn-5` with no fallback;
+captures and matching source/bundle hashes are in the local workspace artifact
+`targets/moot-main-integration-20261009`. Its peer/native fixture is reused from
+the unchanged capsule proof; the integrated native suite passed 187 tests with
+five existing ignored tests. Current
+documentation comparison adds no audit subjects; existing D2 gaps remain.
+
+### Independent capsule readings continuation (2026-10-09)
+
+**Status:** planned, following the authorized continuation. The
+[design language §9.2–9.3](../../2026-08-23_projection_scenes_and_graph_native_platform.md#92-selection-foreground-and-ambient-context)
+separates attention, activity, presentation and keeping, and distinguishes two
+accesses to the same resource. This capsule slice exercises that boundary with
+instance-local readings; it neither authors graph Surfaces nor introduces a
+general applet/tile ABI. The existing
+[app composition owners](../../cambium_docs/research/2026-10-06_app_composition_brief.md#11-current-consumers-and-design-direction-2026-10-09),
+[Tabard adoption](../../mere_docs/implementation_strategy/2026-07-05_theme_modes_plan.md#application-adoption-2026-10-09)
+and resident graph work keep their current lanes.
+
+1. Give each open reading a distinct local identity while sharing one verified
+   body per addressed revision. Selection and catalogue filters must not close
+   readings or keep files. Closing one must preserve the others and stored data.
+2. Render readings through Cambium's keyed sequence, with local selection,
+   explicit close and per-reading Keep controls. Limit this mount to eight
+   readings; exceeding the bound must preserve the running host and prior views.
+3. Confirm retention feedback only for the requesting generation, reading and
+   revision. Exercise closed/stale acknowledgment controls, repeated access,
+   deselection, catalogue filtering, distinct revision retention and wide/narrow
+   actual Graphshell presentation. The existing grants, signature, replacement,
+   interruption and offline-read checks must still pass.
+
+**Peer and standalone-browser reproduction (executable commands; start at the repository root):**
+
+```sh
+cargo build --manifest-path crates/moot/gemot/examples/capsule-library/guest/Cargo.toml --locked --target wasm32-wasip2 --release
+cargo run -p gemot --example capsule-library --locked -- run crates/moot/gemot/examples/capsule-library/guest/target/wasm32-wasip2/release/capsule_library_guest.wasm /absolute/path/to/new-proof-root
+cd crates/moot/gemot/examples/capsule-library
+pnpm install --frozen-lockfile
+node build.mjs /absolute/path/to/new-proof-root/site
+python3 -m http.server 8770 --bind 127.0.0.1 --directory /absolute/path/to/new-proof-root/site
+# In a second terminal in the same example directory:
+node browser-check.mjs http://127.0.0.1:8770/ /absolute/path/to/new-proof-root
+```
+
+Use `pnpm exec playwright install chromium` if the pinned browser is absent.
+Every peer-proof run requires a new directory and refuses to overwrite earlier
+work. Local artifacts are `proof.json`, `native.json`, `browser.json`,
+`browser.png` and `site/` under that directory, outside tracked source.
+
+**Checks (2026-10-09):** the peer/native run, actual Chromium browser check,
+strict example Clippy, Rust/JS formatting or syntax checks, source-hash comparison
+and diff check passed. The D2 judgment audit has the same six errors on the clean
+starting commit and this tree. The general documentation audit also fails on the
+starting commit; comparison adds no broken-link or missing-path subjects. Existing
+ledger/index and external-path findings are not repaired by this proof.
+
 ### First product proof
 
 An author publishes a small gemtext page into a moot. A different member accepts
