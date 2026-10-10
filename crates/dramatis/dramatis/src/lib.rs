@@ -29,10 +29,11 @@
 //! re-exporting personae, insigne and gaz behind features, so one dependency
 //! at one revision carries the tier. The dramatis repo plan's DR-A moves the
 //! identity surface's plain types here first (ruling D24): [`intents`],
-//! [`view`] and [`receipts`] so far.
+//! [`view`], [`receipts`] and, with DR-C, the [`roster`].
 
 #![doc(html_no_source)]
 
 pub mod intents;
 pub mod receipts;
+pub mod roster;
 pub mod view;

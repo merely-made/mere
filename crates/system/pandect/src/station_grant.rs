@@ -6,6 +6,12 @@
 
 //! Narrow, expiring RemoteAuth grants for sited Reticulum stations.
 //!
+//! Moved here from castellan in DR-C (dramatis repo plan, D17): the station
+//! policy is public grant vocabulary, so it lives beside the wallet's public
+//! records. Signing the grant needs the wallet seed, which only djinn holds,
+//! so [`SitedStationGrant::issue_with`] takes the custodian's signing step as
+//! a function and keeps every policy check here.
+//!
 //! A station grant is a `DeviceGrantSet` holding exactly one device-scoped
 //! `SignedDelegationCertificate`. This adapter fixes the station policy over
 //! it: one derived station signing key, `transport.egress` only, no persona
@@ -19,16 +25,14 @@
 use std::fmt;
 use std::path::Path;
 
+use identity::carry::DeviceGrantSet;
 use insigne::CheckFault;
-use pandect::{
+
+use crate::{
     DeviceExposure, DeviceGrantError, DeviceId, DeviceMode, DevicePublicKey, RemoteAuthGrantSpec,
     certificate_device_id, device_grant_set_ref, device_is_fully_revoked, load_device_grant_set,
     load_device_roster,
 };
-
-use crate::custody::wallet::{issue_remote_auth_device_grant, load_identity_seed};
-use personae::carry::DeviceGrantSet;
-use personae::{IdentityProvider, InMemoryProvider};
 
 /// The sole capability a sited station can receive.
 pub const TRANSPORT_EGRESS_SCOPE: &str = "transport.egress";
@@ -73,7 +77,34 @@ impl SitedStationGrantRequest {
         })
     }
 
-    fn remote_auth_spec(&self) -> RemoteAuthGrantSpec {
+    /// The station this request commissions.
+    pub fn device_id(&self) -> DeviceId {
+        self.device_id
+    }
+
+    /// The station's Ed25519 key the grant will authorize.
+    pub fn station_ed25519_public_key(&self) -> [u8; 32] {
+        self.station_ed25519_public_key
+    }
+
+    /// The label the roster shows.
+    pub fn label(&self) -> &str {
+        &self.label
+    }
+
+    /// When the grant is issued.
+    pub fn issued_at_ms(&self) -> u64 {
+        self.issued_at_ms
+    }
+
+    /// The grant's mandatory expiry.
+    pub fn expires_at_ms(&self) -> u64 {
+        self.expires_at_ms
+    }
+
+    /// The RemoteAuth spec the custodian signs: one device certificate,
+    /// `transport.egress` only, no persona, no subdelegation.
+    pub fn remote_auth_spec(&self) -> RemoteAuthGrantSpec {
         RemoteAuthGrantSpec {
             device_id: self.device_id,
             delegatee_pubkey: DevicePublicKey(self.station_ed25519_public_key),
@@ -96,20 +127,22 @@ pub struct SitedStationGrant {
 }
 
 impl SitedStationGrant {
-    /// Issue and persist a narrow grant through the host wallet store.
+    /// Issue and persist a narrow grant through the custodian's wallet.
     ///
     /// `issuer_public_key` must be the Persona public key that derived the
-    /// station credential. It is checked against the unlocked wallet root so
-    /// a different Persona cannot accidentally commission the station.
-    pub fn issue(
+    /// station credential; `wallet_public_key` is the custodian's unlocked
+    /// wallet root, so a different Persona cannot commission the station.
+    /// `sign` is the custodian's issue step (castellan's
+    /// `issue_remote_auth_device_grant`, inside djinn), which persists the
+    /// grant and its roster record.
+    pub fn issue_with(
         data_root: &Path,
         issuer_public_key: [u8; 32],
+        wallet_public_key: [u8; 32],
         request: SitedStationGrantRequest,
+        sign: impl FnOnce(&RemoteAuthGrantSpec) -> std::io::Result<DeviceGrantSet>,
     ) -> Result<Self, SitedStationGrantError> {
-        let wallet_seed =
-            load_identity_seed(data_root)?.ok_or(SitedStationGrantError::WalletLocked)?;
-        let wallet_provider = InMemoryProvider::from_seed(wallet_seed);
-        if wallet_provider.master_public_key().to_bytes() != issuer_public_key {
+        if wallet_public_key != issuer_public_key {
             return Err(SitedStationGrantError::IssuerMismatch);
         }
 
@@ -126,7 +159,7 @@ impl SitedStationGrant {
             }
         }
 
-        let grant = issue_remote_auth_device_grant(data_root, &request.remote_auth_spec())?;
+        let grant = sign(&request.remote_auth_spec())?;
         Self::from_signed(grant)
     }
 
@@ -509,7 +542,7 @@ impl std::error::Error for SitedStationGrantError {}
 
 #[cfg(test)]
 mod tests {
-    use personae::{IdentityProvider, InMemoryProvider};
+    use identity::{IdentityProvider, InMemoryProvider};
 
     use super::*;
 
@@ -522,12 +555,12 @@ mod tests {
         // A grant carrying identity.act as well: the extra action lands on a
         // persona certificate, so the set has persona authority in it and the
         // station policy must refuse it.
-        let signed = personae::carry::issue_device_grant_set(
+        let signed = identity::carry::issue_device_grant_set(
             seed,
             device_id,
             DevicePublicKey::from(station.public_key()),
             &[TRANSPORT_EGRESS_SCOPE, "identity.act"],
-            &[personae::PersonaId::new()],
+            &[identity::PersonaId::new()],
             100,
             100,
         )
@@ -537,14 +570,34 @@ mod tests {
         assert!(matches!(error, SitedStationGrantError::PersonaAuthority));
     }
 
+    /// The custodian's signing step, as djinn performs it, over a fixed seed.
+    fn sign_with(
+        root: &Path,
+        seed: [u8; 32],
+    ) -> impl FnOnce(&RemoteAuthGrantSpec) -> std::io::Result<DeviceGrantSet> + '_ {
+        move |spec| {
+            let actions: Vec<&str> = spec.scopes.iter().map(String::as_str).collect();
+            let set = identity::carry::issue_device_grant_set(
+                seed,
+                spec.device_id,
+                spec.delegatee_pubkey,
+                &actions,
+                &spec.personas,
+                spec.expires_at_ms.unwrap() - spec.issued_at_ms,
+                spec.issued_at_ms,
+            )
+            .map_err(|error| std::io::Error::new(std::io::ErrorKind::InvalidData, error))?;
+            crate::save_device_grant_set(root, spec.device_id, &set)?;
+            Ok(set)
+        }
+    }
+
     #[test]
     fn a_station_grant_can_only_be_renewed_with_a_later_expiry() {
         let root = tempfile::tempdir().unwrap();
-        let persona = personae::PersonaId::new();
-        let seed =
-            crate::custody::wallet::ensure_wallet_state(root.path(), persona, "Station host")
-                .unwrap();
+        let seed = [0x52; 32];
         let issuer = InMemoryProvider::from_seed(seed);
+        let master = issuer.master_public_key().to_bytes();
         let device_id = DeviceId::new();
         let key = issuer
             .derive_keypair(b"sited-station-renewal-test")
@@ -557,8 +610,14 @@ mod tests {
             200,
         )
         .unwrap();
-        SitedStationGrant::issue(root.path(), issuer.master_public_key().to_bytes(), first)
-            .unwrap();
+        SitedStationGrant::issue_with(
+            root.path(),
+            master,
+            master,
+            first,
+            sign_with(root.path(), seed),
+        )
+        .unwrap();
 
         let replacement = SitedStationGrantRequest::new(
             device_id,
@@ -568,10 +627,12 @@ mod tests {
             200,
         )
         .unwrap();
-        let error = SitedStationGrant::issue(
+        let error = SitedStationGrant::issue_with(
             root.path(),
-            issuer.master_public_key().to_bytes(),
+            master,
+            master,
             replacement,
+            sign_with(root.path(), seed),
         )
         .unwrap_err();
 
@@ -583,5 +644,22 @@ mod tests {
                 ..
             }
         ));
+    }
+
+    #[test]
+    fn another_personas_wallet_cannot_commission_the_station() {
+        let root = tempfile::tempdir().unwrap();
+        let request =
+            SitedStationGrantRequest::new(DeviceId::new(), [7; 32], "Ridge north", 100, 200)
+                .unwrap();
+        let error = SitedStationGrant::issue_with(
+            root.path(),
+            [1; 32],
+            [2; 32],
+            request,
+            sign_with(root.path(), [0x53; 32]),
+        )
+        .unwrap_err();
+        assert!(matches!(error, SitedStationGrantError::IssuerMismatch));
     }
 }

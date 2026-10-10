@@ -67,6 +67,7 @@ mod error;
 mod keypair;
 mod provider;
 mod retained;
+pub mod reticulum;
 pub mod seal;
 pub mod sealed_record_storage;
 pub mod signing;
@@ -91,7 +92,7 @@ pub use crate::sealed_record_storage::{SealedRecordChange, SealedRecordStorage};
 pub use crate::startup_unlock::StartupUnlockMode;
 pub use crate::vault::{
     CredentialLineage, ProfileId, ProfileSummary, ProtocolKey, PublicProfile, SlotSummary,
-    UnlockTier,
+    UnlockTier, default_vault_dir,
 };
 
 /// Identity of a persona — the user's mode-scoped identity boundary.

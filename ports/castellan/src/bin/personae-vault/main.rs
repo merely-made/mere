@@ -92,7 +92,7 @@ struct Cli {
 }
 
 fn parse_cli() -> Result<Cli, String> {
-    let mut dir = bootstrap::default_vault_dir();
+    let mut dir = personae::default_vault_dir();
     let mut profile = "default".to_string();
     let mut command = None;
     let mut rest = Vec::new();

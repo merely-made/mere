@@ -35,28 +35,27 @@
 //!
 //! [`otp`] is the algorithm half of the chatelaine's 2FA codes: given a secret
 //! and a clock, the digits; given an `otpauth://` URI, the configured
-//! generator. [`reticulum`] is Castellan's first device-identity issue seam:
-//! it derives a radio credential from a supplied Persona provider without
-//! creating a device-local account file.
+//! generator. The Reticulum station derivation that began here moved to
+//! `personae::reticulum` and the station grant policy to
+//! `pandect::station_grant` in DR-C (D17); djinn signs the grant.
 //!
 //! The **keeper surface** (feature `keeper`, founded 2026-08-14) is the two
 //! halves made real, moved home from graphshell where they first grew:
 //!
 //! - [`view`] — the secret-free read model. What a host may know.
-//! - [`projection`] — the cards and typed intents. What a host may show and
-//!   offer.
 //! - [`authority`] — [`authority::PersonaeHost`], the resident keeper. What
 //!   only the castellan does.
 //!
-//! Graphshell composes all three (and re-exports them at their old paths);
-//! any other host embeds the subset it needs without inheriting graphshell.
+//! The cards (once `projection`) moved to graphshell's `identity_projection`
+//! in DR-C (D15): they are a pure function of the snapshot, and djinn serves
+//! them through graphshell's endpoint, which no longer names castellan.
 //!
 //! Since the dramatis repo plan's DR-A (2026-10-09), the plain types these
 //! modules name live in the identity tier and are re-exported here at their
 //! old paths: the views, intents and receipts in the `dramatis` facade, and
 //! the OTP display types and the Secret Service's metadata in chatelaine.
-//! castellan keeps what needs its authority or chirograph: the cards, the
-//! loaders, the error it raises, and the release gate.
+//! castellan keeps what needs its authority: the loaders, the error it
+//! raises, and the release gate.
 //! [`items::ItemStore`] keeps one persona's chatelaine items, each
 //! credential's secret in its own sealed payload record. OTP imports land
 //! there through [`otp::OtpItemStore`], and the Secret Service's items too. [`otp::OtpReleaseGate`] returns an
@@ -81,15 +80,12 @@
 #[cfg(feature = "keeper")]
 pub mod authority;
 pub mod custody;
-#[cfg(feature = "keeper")]
-mod sealed_storage;
 pub mod items;
 pub mod lock;
 pub mod otp;
-#[cfg(feature = "keeper")]
-pub mod projection;
 pub mod resident;
-pub mod reticulum;
+#[cfg(feature = "keeper")]
+mod sealed_storage;
 #[cfg(feature = "secret-service")]
 pub mod secret_service;
 #[cfg(feature = "keeper")]

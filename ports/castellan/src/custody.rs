@@ -52,7 +52,7 @@ pub use passphrase_root::{
     save_passphrase_root, unwrap_vault_root, wrap_vault_root,
 };
 pub use passphrase_storage::PassphraseEncryptedStorage;
-pub use roster::{OpenedVault, Roster, RosterEntry, open_shared};
+pub use roster::{OpenedVault, open_shared};
 pub use sealed_profile_storage::{AUTO_UNLOCK_ROOT_FILE, SealedProfileStorage};
 pub use sealed_provider::SealedIdentityProvider;
 pub use startup_unlock::{

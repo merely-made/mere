@@ -76,7 +76,7 @@ fn default_socket(dir: &std::path::Path) -> String {
 }
 
 fn parse_args() -> Result<Args, String> {
-    let mut dir = bootstrap::default_vault_dir();
+    let mut dir = personae::default_vault_dir();
     let mut profile = "default".to_string();
     let mut socket = None;
     let mut log_file = None;
