@@ -8,12 +8,13 @@
 //! rulings 2, 24, 44 and 92): castellan's residue tracker, included by path, in one
 //! process.
 //!
-//! The installed authority opens a vault and binds the resident; binding
-//! consumes the opened vault, which is what a lock leaves behind in djinn
-//! (ruling 24 keeps the lane running). After that, nothing may hold the
-//! master, live or freed uncleared. The transport identity, the mesh author
-//! key since ruling 92, must still be live: that shows the instrument sees
-//! the transport's key, and that the transport outlived the vault.
+//! Since DR-C (dramatis repo plan, D5, D11) Distillery opens no vault: djinn
+//! releases the lane's derived keys, and the installed authority binds the
+//! resident over them. The armed window covers rebuilding that release and
+//! binding; after it, nothing may hold the master, live or freed uncleared.
+//! The transport identity, the mesh author key since ruling 92, must still
+//! be live: that shows the instrument sees the transport's key, and that the
+//! transport is the released key and not the master.
 //!
 //! No libtest harness: the allocator is process-wide.
 
@@ -21,44 +22,61 @@
 mod residue;
 
 use std::path::Path;
+use std::sync::Arc;
 use std::time::Duration;
 
 use distillery::mesh_host::HostConfig;
 use distillery::{InstalledAuthority, ResidentSettings, RetentionSettings};
+use insigne::DerivedKeyAttestation;
 use mesh::{
-    AvailabilityPolicy, ErasurePolicy, KeepBound, LeasePolicy, MESH_AUTHOR_SALT, MeshRetentionPolicy,
-    MeshStore, PolicyRevision,
+    AvailabilityPolicy, ErasurePolicy, KeepBound, LeasePolicy, MESH_AUTHOR_SALT,
+    MeshRetentionPolicy, MeshStore, PolicyRevision,
 };
-use personae::Ed25519Keypair;
-use personae::bootstrap::{self, Unlock};
-use personae::vault::{Profile, ProfileId};
+use personae::vault::ProfileId;
+use personae::{
+    Ed25519Keypair, Ed25519PublicKey, IdentityProvider, InMemoryProvider, RetainedKeys,
+};
 use residue::*;
 
 const MESH: [u8; 32] = [0xD1; 32];
-const PASSPHRASE: &[u8] = b"distillery-transport-residue";
 
-fn unlock() -> Unlock {
-    Unlock::passphrase(PASSPHRASE)
+/// What djinn sends for the lane's salts: the master's public key, and each
+/// salt's derived seed with its attestation. Computed before arming, as djinn
+/// computes it in its own process.
+struct Release {
+    master: Ed25519PublicKey,
+    keys: Vec<(Vec<u8>, [u8; 32], DerivedKeyAttestation)>,
 }
 
-/// A vault whose one profile carries `seed` as its master. Argon2 runs here,
-/// before arming; personae's own instrument covers its residue.
-fn provision(root: &Path, seed: [u8; 32]) {
-    let opened = bootstrap::open_storage(&root.join("vault"), unlock()).unwrap();
-    let profile = ProfileId("research".into());
-    opened
-        .storage
-        .save_profile(&Profile::new(
-            profile.clone(),
-            "Research",
-            Ed25519Keypair::from_seed(seed),
-        ))
-        .unwrap();
-    InstalledAuthority::configure(root, profile).unwrap();
+fn provision(root: &Path, seed: [u8; 32]) -> Release {
+    InstalledAuthority::configure(root, ProfileId("research".into())).unwrap();
+    let persona = InMemoryProvider::from_seed(seed);
+    Release {
+        master: persona.master_public_key(),
+        keys: InstalledAuthority::release_salts()
+            .into_iter()
+            .map(|salt| {
+                let seed = persona.derive_keypair(&salt).unwrap().to_seed();
+                let attestation = persona.attest_derived_key(&salt).unwrap();
+                (salt, seed, attestation)
+            })
+            .collect(),
+    }
 }
 
-async fn bind(root: &Path) -> distillery::ResidentAuthority<muniment::RedbBackend> {
-    let authority = InstalledAuthority::open_with(root, &root.join("vault"), unlock()).unwrap();
+async fn bind(
+    root: &Path,
+    release: Release,
+) -> distillery::ResidentAuthority<muniment::RedbBackend> {
+    let keys = RetainedKeys::from_released(
+        release.master,
+        release
+            .keys
+            .into_iter()
+            .map(|(salt, seed, attestation)| (salt, Ed25519Keypair::from_seed(seed), attestation)),
+    )
+    .unwrap();
+    let authority = InstalledAuthority::open(root, Arc::new(keys), "released by djinn").unwrap();
     let author = authority.mesh_author().unwrap();
     let policy = MeshRetentionPolicy {
         revision: PolicyRevision([0x41; 32]),
@@ -98,7 +116,7 @@ fn main() {
         .build()
         .unwrap();
     let dir = tempfile::tempdir().unwrap();
-    provision(dir.path(), master);
+    let release = provision(dir.path(), master);
     let transport = Ed25519Keypair::from_seed(master)
         .derive_child(MESH_AUTHOR_SALT)
         .to_seed();
@@ -109,7 +127,7 @@ fn main() {
     phase(1);
     let root = dir.path().to_path_buf();
     // Spawned, so the task's frames are heap allocations the tracker sees.
-    let task = runtime.spawn(async move { bind(&root).await });
+    let task = runtime.spawn(async move { bind(&root, release).await });
     let resident = runtime.block_on(task).unwrap();
     phase(2);
     let (hits, overflow) = disarm();
@@ -120,7 +138,7 @@ fn main() {
     let mut report = Report { failures: 0 };
     report.check(
         "bound lane holds no master",
-        &["setup", "open and bind", "bound"],
+        &["setup", "release and bind", "bound"],
         &master_hits,
         overflow,
     );
