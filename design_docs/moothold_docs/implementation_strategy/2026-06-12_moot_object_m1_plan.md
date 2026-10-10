@@ -550,6 +550,21 @@ observation does not grant permission. Use design language §9.8–9.9 to keep
 attention and per-view editing separate from shared records. Presence, media
 and a general applet ABI still require their own concrete owners and receipts.
 
+The Murm consumer continuation now uses a causally ordered owner read and exact
+cabal/channel identifiers. It composes the same portable draft/attention model
+without treating bilateral secret possession as Gemot authority. Its native
+owner/adapter receipt and view-address compatibility boundary are recorded once
+in the
+[Murm runtime plan](../../mere_docs/implementation_strategy/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md#2026-10-10-murms-application-read-and-exact-channel-addresses).
+Graphshell presentation remains the next consumer step; these library checks
+do not establish a rendered community client.
+The fetched [forme draft agreement §9.11](../../2026-08-23_projection_scenes_and_graph_native_platform.md#911-forme-draft-session-2026-10-10)
+keeps arrangement undo/discard scoped to the active editor. Conversation drafts
+and shared records are not part of an arrangement snapshot; hiding or discarding
+a forme draft must not author a message or discard an independent conversation
+edit. This continuation qualifies channel-local editing, not the pending forme
+gesture/undo implementation.
+
 ### Capsule peer and standalone-browser reproduction
 
 The following commands execute the earlier capsule-library proof. Start at the
