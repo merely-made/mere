@@ -52,11 +52,14 @@ pub enum ActionId {
     NavForward,
     NavReload,
     NavStop,
+    FoldSelection,
+    FoldCollapseDescendants,
+    FoldExpand,
 }
 
 impl ActionId {
     /// Every variant, in the catalogue's order.
-    pub const ALL: [Self; 33] = [
+    pub const ALL: [Self; 36] = [
         Self::NodeNew,
         Self::NodeDelete,
         Self::NodeEdit,
@@ -90,6 +93,9 @@ impl ActionId {
         Self::NavForward,
         Self::NavReload,
         Self::NavStop,
+        Self::FoldSelection,
+        Self::FoldCollapseDescendants,
+        Self::FoldExpand,
     ];
 
     /// The shared id, `namespace:name`.
@@ -128,6 +134,9 @@ impl ActionId {
             Self::NavForward => ids::NAV_FORWARD,
             Self::NavReload => ids::NAV_RELOAD,
             Self::NavStop => ids::NAV_STOP,
+            Self::FoldSelection => ids::FOLD_SELECTION,
+            Self::FoldCollapseDescendants => ids::FOLD_COLLAPSE_DESCENDANTS,
+            Self::FoldExpand => ids::FOLD_EXPAND,
         }
     }
 
