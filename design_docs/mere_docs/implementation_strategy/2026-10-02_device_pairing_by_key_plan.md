@@ -26,7 +26,7 @@ ceremony. A self-hosted relay covers the second network.
   the shape (Syncthing's: identity is the key, addresses are disposable
   hints), R0 local mDNS and R1 cached dial hints, both landed. This plan is
   its SSH and pairing rung.
-- [SSH CA projection plan](../../dramatis_docs/implementation_strategy/2026-08-12_ssh_ca_projection_plan.md):
+- SSH CA projection plan (`repos/dramatis/design_docs/2026-08-12_ssh_ca_projection_plan.md`):
   personae's SSH certificate authority; its host-certificate half was never
   built (§4).
 - [djinn family resident services plan](2026-08-22_djinn_family_resident_services_plan.md):
@@ -55,12 +55,12 @@ From a read-only research lane, with the load-bearing claims re-checked in
 code:
 
 - **Four unrelated device identities.** personae's wallet `DeviceRoster`
-  (`crates/dramatis/personae/src/carry/mod.rs:350`, device id, Ed25519
+  (`repos/dramatis/crates/personae/src/carry/mod.rs:350`, device id, Ed25519
   public key, label, mode, exposure, no address field); the personal-graph
   node id that djinn's `PairedDevice` keys on
   (`ports/djinn/src/settings.rs:468`), derived per graph; Knot's own
   `PairedWriter` key; and SSH's device id, a hash of the hostname
-  (`crates/dramatis/personae/src/enroll.rs`).
+  (`repos/dramatis/crates/personae/src/enroll.rs`).
 - **R0 and R1 work for the stack's own peers only.** djinn refreshes each
   paired device's `last_endpoint` hint every 5 s while connected
   (`settings.rs:511`, `:673-688`). The live copy is in-process and the

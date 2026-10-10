@@ -8,7 +8,8 @@
 //!
 //! Turnstone, Woodshed, Knot, Hocket and the rest all ask the same question at
 //! startup — which persona am I? — and they all answer it against the same
-//! shared vault ([`identity::roster`]). What varies is only where the list is
+//! shared vault, whose roster djinn reads for them ([`dramatis::roster`];
+//! dramatis repo plan, D5). What varies is only where the list is
 //! shown. So the list itself lives here: how a persona reads in a row, which
 //! one is marked as in use, what a vault with nothing in it says.
 //!
@@ -19,10 +20,10 @@
 //! The shape an application takes, illustrative rather than compile-ready:
 //!
 //! ```text
-//! let opened = bootstrap::open_storage(&dir, Unlock::from_env())?;
-//! let list = roster::read_roster(&*opened.storage, &dir, &opened.description)?;
+//! let mut djinn = CustodyClient::open(app).await?;   // graphshell's client
+//! let list = djinn.roster().await?;
 //! let view = persona_picker_focused(&state, &list);  // or persona_picker
-//! // on PickerEvent::Chose(id): roster::remember_profile(&dir, &id)?, then reopen.
+//! // on PickerEvent::Chose(id): djinn.choose_profile(id).await?, then reread.
 //! ```
 
 #![warn(missing_docs)]
@@ -31,7 +32,7 @@ use cambium::{
     Action, CommandEvent, CommandItem, CommandState, GenetCtx, GenetElement, View, command_picker,
     map_action, request_focus,
 };
-use identity::roster::{Roster, RosterEntry};
+use dramatis::roster::{Roster, RosterEntry};
 use identity::vault::ProfileId;
 
 /// The id of the row that asks for a new persona, rather than choosing one.
@@ -45,13 +46,12 @@ const CREATE_ROW_ID: &str = "\u{0}persona-picker:create";
 /// What the picker reports.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum PickerEvent {
-    /// A persona was chosen. The caller decides whether to remember it
-    /// ([`identity::roster::remember_profile`]) — the picker does not write to
-    /// the vault.
+    /// A persona was chosen. The caller decides whether to ask djinn to
+    /// switch to it — the picker does not write to the vault.
     Chose(ProfileId),
     /// The user asked for a persona that does not exist yet. Naming it is the
-    /// application's flow, not a row in a list; [`identity::roster::create_profile`]
-    /// is what it calls with the name.
+    /// application's flow, not a row in a list; it then asks djinn to create
+    /// the persona under that name.
     CreateRequested,
     /// Dismissed without choosing.
     Dismissed,

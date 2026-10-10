@@ -60,6 +60,8 @@ esp = { workspace = true }
 # the two-peer convergence test and the `mesh-peer` example bin. `macros` +
 # `rt-multi-thread` run the async tests; `io-std`/`io-util` read pasted peer
 # tickets in the example; tempfile backs the file-store reopen test.
-transport = { workspace = true }
+# `test-identity`: tests and examples bind throwaway identities (vault lock
+# plan, ruling 96).
+transport = { workspace = true, features = ["test-identity"] }
 tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread", "time", "io-std", "io-util"] }
 tempfile = "3"

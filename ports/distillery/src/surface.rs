@@ -235,24 +235,20 @@ mod tests {
 
     use genet_scripted_dom::ScriptedDom;
     use layout_dom_api::LayoutDom;
-    use personae::ProfileId;
-    use personae::bootstrap::{self, Unlock, load_or_create_profile};
+    use personae::{InMemoryProvider, ProfileId, RetainedKeys};
 
     use super::*;
 
     const MESH: [u8; 32] = [0xD5; 32];
 
-    fn unlock() -> Unlock {
-        Unlock::passphrase(b"distillery-surface-test-passphrase")
-    }
-
+    /// An installed authority over keys released for the lane's salts, as
+    /// djinn releases them; the master never reaches Distillery.
     fn authority(root: &std::path::Path) -> InstalledAuthority {
-        let vault_dir = root.join("vault");
         let profile = ProfileId("research".into());
-        let opened = bootstrap::open_storage(&vault_dir, unlock()).unwrap();
-        load_or_create_profile(&*opened.storage, &profile).unwrap();
         InstalledAuthority::configure(root, profile).unwrap();
-        InstalledAuthority::open_with(root, &vault_dir, unlock()).unwrap()
+        let persona = InMemoryProvider::from_seed([0xD6; 32]);
+        let keys = RetainedKeys::capture(&persona, &InstalledAuthority::release_salts()).unwrap();
+        InstalledAuthority::open(root, std::sync::Arc::new(keys), "passphrase-encrypted").unwrap()
     }
 
     fn text_present(dom: &ScriptedDom, needle: &str) -> bool {

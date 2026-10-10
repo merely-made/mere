@@ -11,11 +11,12 @@
 //! pulls the blob over the transport, and finishes. Nothing is staged on Bob in
 //! advance — the assertion that he did not hold it is made before he starts.
 //!
-//! The part that was actually missing was never the transfer. A mesh operation
-//! is signed by a key derived under `mesh-author`, while a transport addresses
-//! the persona master key, and neither derives the other. `DeviceAttested`
-//! closes that: each device publishes the master-signed statement binding its
-//! own authoring key, and the board becomes a directory.
+//! A mesh operation is signed by a key derived under `mesh-author`, and since
+//! the vault lock plan's ruling 92 that author key is also the device's
+//! transport address, so Bob dials the poster by the key that signed the job.
+//! `DeviceAttested` still publishes the master-signed statement binding each
+//! authoring key to its persona, and the board lists the attested devices a
+//! blob may come from.
 
 use std::sync::Arc;
 use std::time::Duration;
@@ -55,7 +56,7 @@ impl Device {
         let provider = InMemoryProvider::from_seed([seed; 32]);
         let keypair = provider.derive_keypair(MESH_AUTHOR_SALT).unwrap();
         let blobs = Arc::new(BlobStore::new());
-        let transport = P2pandaTransport::builder(provider.master_keypair())
+        let transport = P2pandaTransport::builder_for(&provider.derived_keypair(MESH_AUTHOR_SALT).unwrap())
             .gossip()
             .blobs(&blobs)
             .bind()
@@ -69,8 +70,9 @@ impl Device {
         }
     }
 
+    /// The transport address: the mesh author key (ruling 92).
     fn peer_id(&self) -> transport::PeerID {
-        transport::PeerID::from_public_key(self.provider.master_public_key())
+        transport::PeerID::from_public_key(self.keypair.public_key())
     }
 
     async fn into_host(
@@ -180,6 +182,7 @@ async fn a_worker_runs_a_job_whose_inputs_it_never_held() {
         .await
         .unwrap();
 
+    let alice_master = alice_device.provider.master_public_key().to_bytes();
     let alice_kp = alice_device.keypair.clone();
     let alice_me = alice_kp.public_key().to_bytes();
     let bob_me = bob_device.keypair.public_key().to_bytes();
@@ -234,9 +237,13 @@ async fn a_worker_runs_a_job_whose_inputs_it_never_held() {
     }
     assert_eq!(
         resolved,
-        Some(alice_peer.to_bytes()),
-        "bob resolves alice's mesh author key to the master key his transport addresses \
-         — the two are different keys, which is the gap this closes"
+        Some(alice_master),
+        "bob learns which persona alice's mesh author acts for"
+    );
+    assert_eq!(
+        alice_peer.to_bytes(),
+        alice_me,
+        "and dials her by that author key itself (ruling 92)"
     );
 
     let (_, b) = pump(&mut alice, &mut bob, "bob completes the job", |_, b| {

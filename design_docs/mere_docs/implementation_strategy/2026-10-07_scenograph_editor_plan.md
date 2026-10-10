@@ -1,7 +1,7 @@
 # Scenograph Editor Plan
 
 **Date:** 2026-10-07
-**Status (2026-10-08):** tracks E1 to E5 and C1 complete, each with headed checks in Chrome and Firefox (Safari not run); C2 landed (SE45 to SE51; F11 to F13), with headed checks in Chrome and Firefox; its label revision (SE52) landed with the web host's genet repin. S1, the swatch grid, landed 2026-10-09 (SE53 to SE83), its dynamics axis waiting on the dynamics lane (SE69). Rulings SE1 to SE87 (§1). Waiting: genet branch `value-engine` (SE39 to SE42) for Mark or genet's lane to land, then mere's rhai `ValueEngine` and the rule runner after a coordinated repin. The Turnstone follow-up (SE32, SE35) is on Turnstone main at `d0775a1` (§3). Mapped, not opened: wallpapers and props, the style editors, authored motion (§3).
+**Status (2026-10-10):** tracks E1 to E5 and C1 complete, each with headed checks in Chrome and Firefox (Safari not run); C2 landed (SE45 to SE51; F11 to F13), with headed checks in Chrome and Firefox; its label revision (SE52) landed with the web host's genet repin. S1, the swatch grid, landed 2026-10-09 (SE53 to SE83), its dynamics axis implemented in `e2543cee` (SE69, SE89; F200 to F202), with native/wasm fixture identity qualified against Genet `7422e906` and Vello `491c376c`; the handoff records browser qualification and its open Firefox gate. Rulings SE1 to SE89 (§1). Waiting: genet branch `value-engine` (SE39 to SE42) for Mark or genet's lane to land, then mere's rhai `ValueEngine` and the rule runner after a coordinated repin. The Turnstone follow-up (SE32, SE35) is on Turnstone main at `d0775a1` (§3). Mapped, not opened: wallpapers and props, the style editors, authored motion (§3).
 **Scope:** the editor foundation that Scenograph's editing surfaces stand on: one undo history in Cambium, and arrangement options declared as data. Carries out the balaur review's rulings A and B. The projection editor in Graphshell is the first consumer of both.
 
 **2026-10-09 addition:** R1's first declarative slice is implemented and qualified: the cross-app design conversation
@@ -356,6 +356,10 @@ Done when:
 
 ### S2 — linked swatches (SE84, SE85)
 
+*Ownership checkpoint, 2026-10-09:* the site's R162 now assigns the viewer
+files to the site lane for its cutover. S2 and B1 coordinate through that
+owner; the dynamics editor draft is not a qualification of either track.
+
 A facet's cells act together, so the mer3ly sandbox's scatter, deck and linked views move onto the stack.
 - **Shared selection.** A facet carries a selection of clauses per cell (crossfilter or highlight, as the site's `selection.clauses`), which every cell reads; picking routes as a host intent.
 - **Appearance-part selection.** Selecting a part of one appearance (the site's cell, heading, summary, status) is a clause of its own, under a new name put to Mark; the site's `mer3ly.facets` shelfmark key migrates to it.
@@ -522,6 +526,84 @@ projection and behavior rules compose. A shared inspect/configure interaction
 can be researched before those storage and composition choices are ruled.
 The dynamics slot and settle work, then the grid dynamics axis, B1 and S2 retain
 their existing order and active-owner boundaries.
+
+#### Graphshell control inventory (2026-10-10; planning step 1)
+
+Checked against published Mere `6183006b`, independently of the dynamics draft
+being qualified in the primary checkout. This is source inspection of the
+browser reference host, not a new browser receipt or native-host qualification.
+
+| Control | Present browser route | Authority and missing work |
+|---|---|---|
+| Create a content node | `node:new` calls `create_address`, then refreshes the Canvas. | MereHost's recorded graph edit. A graph member is not a preview occurrence. |
+| Edit title and tags | `node:edit` opens detail; `save-metadata` calls `edit_node`. | The title delta addresses the Surface. Tag deltas route to the shown Resource and retain assertion authorship. Shared Resource changes can affect several surfaces. |
+| Edit a named JSON value | The same form optionally calls `set_product_facet`. | A separate journaled Surface-facet edit. This is not a general Resource, link or field attribute editor, nor the pending facet-dissolution design. |
+| Add a link | `add-relation` resolves a target by URL and calls `assert_product_relation` for one of five editable kinds. | A recorded assertion through MereHost. The form does not address an individual statement handle, its provenance or a link-owned dynamics rule. Selecting the pair selects its nodes. |
+| Inspect link bundles and cells | Shared roster has `LinkCard` and distinct bundle/cell subjects. | No Graphshell source calls these builders or consumes their subjects. Wiring an exact source assertion remains work. |
+| Inspect and configure fields | Shared roster has field detail and visibility/strength intents. Canvas has placement, strength and visibility methods. | No Graphshell source consumes these roster intents or calls `add_field_at`/`set_field_strength`. Canvas's field writes mutate its graph; a host control must route durable changes through the authoritative session before refreshing the view. |
+| Configure placement and motion | Browser arrangement, physics and role controls affect the Canvas; saved scenes retain the settings. | Distinct from a graph primitive's attributes. The pending occurrence-preview adapter is not assumed to supply field or link authoring. |
+
+Sources: [browser product dispatch and form](../../../ports/graphshell/src/web_product.rs),
+[recorded product edits](../../../ports/graphshell/src/product.rs),
+[MereHost edit and undo routes](../../../ports/graphshell/src/mere_host.rs),
+[tag routing](../../../crates/graph/graph-kernel/src/graph/resource_content.rs),
+[shared roster](../../../crates/mere/src/roster.rs),
+[Canvas field writes](../../../crates/canvas/pictograph/src/canvas/input.rs) and
+[field visibility](../../../crates/canvas/pictograph/src/canvas/fields.rs).
+Hiding a field is presentation-only; its coupling continues to exist. Field
+rule/extent cards currently describe values and select the field; they do not
+edit the rule, script or extent. Their script/template rows say not configured.
+
+**Edit boundary to resolve in the authoring proof:** `save_metadata` commits
+title/tags before parsing and writing the optional JSON facet. An invalid JSON
+value can therefore report failure after title/tags have changed. Two successful
+calls also make separate recorded edits. The proposed authoring loop must state
+whether a form submission is one change or several, validate the full draft
+before committing, and show which owner each value changes. This is a source
+finding; no repair or new undo semantics is claimed in this documentation pass.
+
+Step 1's inventory is complete at this source. Before opening step 2, prepare
+the explicit member-to-Resource inspection and exact-statement selection paths,
+then the field read/write adapter. Reuse the established session for writes and
+separate presentation intents. Arbitrary attribute storage, primitive node
+encoding and overlap policy remain the existing forks. The active dynamics
+qualification and B1/S2 owner boundaries retain their priority.
+
+#### Mixed-content study (2026-10-10; proposal, not opened)
+
+Mark forwarded the design-language agent's proposed
+[mixed-content scene and embedded forme study, §9.11](../../2026-08-23_projection_scenes_and_graph_native_platform.md#911-mixed-content-scene-and-embedded-forme-study-2026-10-10).
+It joins the existing style-editor and composition research; it creates no
+SE ruling or additional active track. The candidate theme axis is not an
+implemented facet axis. The existing dynamics qualification → B1 → S2 order
+and viewer-file ownership holds stand.
+
+*Reading, not ruled:* prepare the study in three reviewable parts:
+
+1. Establish one scene with document, image and video material, related nodes
+   and a forme corresponding to two existing side-by-side webpage accesses.
+   Record source, occurrence, arrangement-member, tile and session identities.
+   A captured face must be distinguishable from a working live surface.
+2. Compare editable appearance treatments and representation/arrangement
+   choices. Retain semantic font roles and selection cues. Separate paint-only
+   updates from footprint changes requiring measurement and placement.
+   A target → condition → effect sketch should expose matching inputs,
+   precedence, fallback and eligibility before becoming a rule schema.
+3. Exercise the tile-to-field bridge: hover subdivisions, selection, explicit
+   focus, moving the outer field and deliberately unlocking its internal
+   layout. Apply accepted tile edits to their owning state and refresh both
+   projections. Keep the semantic arrangement, projection geometry and
+   document-session ownership distinct.
+
+Candidate done-conditions: changing treatments preserves source/access
+identity and manual placement; font or face changes update measured extents;
+returning to the tile reuses its session; moving the field preserves a locked
+local split; selection and deselection preserve edits; unlocking a layout
+change round-trips through undo and save/reopen. Explain each displayed rule
+and overlapping-field contribution. Compact/detail thresholds must not
+oscillate merely because their own representation changes the measured size.
+These are acceptance proposals, not recorded receipts. SE36's Rhai choice
+does not establish that the pending rule runner or style editors exist.
 
 ## 4. Findings
 
@@ -732,23 +814,36 @@ hover handlers and delivers their local coordinates on ordinary motion; captured
 drags keep owning their gesture. A graph swap releases Forme holds before reusing
 node keys.
 
-Seven workspace tests, five public Canvas integration tests and one real-layout
-host hover test pass in an isolated native qualification crate importing the
-tracked sources, including the stronger graph-switch regression. The product
-wasm build, compact release wasm build, viewer-only wasm check and full
-default-feature wasm check pass. The uncapped debug `wasm-bindgen` packaging step
-exhausted the machine's remaining memory. The whole release dependency tree was
-then rebuilt with size optimization, no debug symbols, no LTO and one Cargo job,
-inside a 1 GiB resident-memory scope with no swap. This reduced the input wasm
-from 88,386,325 to 21,623,120 bytes. Matching `wasm-bindgen` 0.2.129 successfully
-packaged it under a 1280 MiB scope: maximum RSS 1,069,440 KiB, no swap, exit 0.
-Qualification logs are in `Code/testing/mere/forme-{tests,build-final,viewer-check,
-default-check,release-build,release-bindgen-1280}.log` on S-PC.
+After integrating published main `e95326dc`, twenty native checks pass in an
+isolated qualification crate importing the tracked sources: seven presentation
+rule tests, seven workspace tests, five public Canvas integration tests and one
+real-layout host hover test, including the stronger graph-switch regression.
+The native rule example also agrees with the study model across 116 contexts;
+four invalid rule sets refuse and six force checks pass. This is source/model
+qualification, not a headed Graphshell receipt.
+
+The integrated compact release product wasm build, viewer-only wasm check and
+full default-feature wasm check pass. The uncapped debug `wasm-bindgen` packaging
+step had exhausted the machine's remaining memory. The release dependency tree
+was rebuilt with size optimization, no debug symbols, no LTO and one Cargo job,
+inside a 1 GiB resident-memory scope with no swap. The current input wasm is
+21,593,299 bytes, versus the earlier 88,386,325-byte debug input. Matching
+`wasm-bindgen` 0.2.129 packages it under a 1280 MiB scope: maximum RSS 1,062,400
+KiB, no swap, exit 0. The full-feature check required a 1536 MiB scope, reduced
+debug information for `cubecl-ir`, and a guard stopping only the check's child
+processes if available memory fell below 256 MiB; it completed without a guard
+stop. These are per-command limits, not machine-wide settings.
+Qualification logs are in `Code/testing/mere/forme-{tests-integrated,
+rule-parity-integrated,build-integrated,viewer-integrated,
+default-integrated-guard,bindgen-integrated}.log` on S-PC. Integration preserves
+main's page/canvas gesture ownership and binds the reading tiles to its
+configurable appearance roles.
 
 The headed open/return/hover/edit/reopen receipt remains pending. The Codex
 in-app browser on this machine fails before scenario startup with
 `netrender wgpu boot failed: could not request a wgpu adapter` and
-`webgpu found no adapters`. A visible-browser reload reproduces that failure.
+`webgpu found no adapters`. A visible-browser reload reproduced that failure;
+the final integrated bundle reproduces it in a fresh tab as well.
 This is a graphics-startup blocker after packaging succeeded; no interactive
 Graphshell receipt or screenshot has been claimed. Run the paired scenarios in
 a WebGPU-capable browser to complete qualification. The portable source scenarios

@@ -8,7 +8,7 @@ freshness custody; code presentation, admitted approval, Secret Service
 policy, credential replication between persona devices, and CXF import remain
 follow-on slices.
 **Anchors:** [credential port + gazette brief](../../mere_docs/research/2026-08-10_credential_port_gazette_brief.md)
-(Part I), [dramatis tier plan](2026-08-10_dramatis_tier_plan.md) D4,
+(Part I), dramatis tier plan (`repos/dramatis/design_docs/archive_docs/2026-10-06_completed_plans/2026-08-10_dramatis_tier_plan.md`) D4,
 [wallet carry fold-in plan](2026-08-10_wallet_carry_foldin_plan.md) (the
 prerequisite, complete).
 
@@ -44,7 +44,7 @@ needs a wall, a subset, a consumer, or an audience. This has one consumer
 **Corrected 2026-10-06 (S14 pass):** chatelaine is no longer an empty
 reservation. `crates/dramatis/chatelaine` is a real taxonomy crate (item.rs,
 otp.rs, disposition.rs), landed by P1 to P3 of the
-[chatelaine and CXF import plan](../../dramatis_docs/implementation_strategy/2026-10-01_chatelaine_cxf_plan.md)
+chatelaine and CXF import plan (`repos/dramatis/design_docs/2026-10-01_chatelaine_cxf_plan.md`)
 (`da3c50bc`, `3e4992ec`, `ff68e86c`), and castellan imports `OtpCodeStyle` and
 `OtpAlgorithm` from it. That plan now owns OTP storage and CXF import.
 

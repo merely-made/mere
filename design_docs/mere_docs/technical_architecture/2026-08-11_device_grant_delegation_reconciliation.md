@@ -8,7 +8,7 @@ the [castellan OTP plan](../../archive_docs/2026-10-06_completed_plans/2026-08-1
 `personae::delegation`, `session_runtime::wallet_grant`.
 
 **Ownership update (2026-09-29).** The reconciliation below remains the
-grammar ruling. Under the [Insigne proofs plan](../../archive_docs/2026-10-06_completed_plans/2026-09-23_insigne_proofs_plan.md),
+grammar ruling. Under the Insigne proofs plan (`repos/dramatis/design_docs/archive_docs/2026-10-06_completed_plans/2026-09-23_insigne_proofs_plan.md`),
 statements, attenuation and checks now live in `insigne`; `personae::delegation`
 keeps `Issue` and `DelegationError`. Consumers import the proof data from
 Insigne directly. The following account describes the original 2026-08-11

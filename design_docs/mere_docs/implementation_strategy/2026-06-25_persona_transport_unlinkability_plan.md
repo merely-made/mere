@@ -15,7 +15,7 @@ This doc owns the persona-transport privacy model: how a persona's network prese
 persona's transport choice couples to its tessera standing. It sits between the identity
 crate (`crates/persona/identity` *(historical citation)* <!-- doc-audit: historical-path -->), the transport (`crates/murm/transport`), and the
 standing layer (`crates/moot/gemot/src/tessera` *(historical citation)* <!-- doc-audit: historical-path -->).
-**Corrected 2026-10-06 (S14 pass):** the identity crate is `crates/dramatis/personae`, and
+**Corrected 2026-10-06 (S14 pass):** the identity crate is `repos/dramatis/crates/personae`, and
 the standing files live in mien: `crates/moot/mien/src/persona_chain.rs` and
 `crates/moot/mien/src/gate.rs` (`posting_threshold` at `:31`). The links below keep the
 old paths as historical citations.

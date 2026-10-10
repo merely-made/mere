@@ -10,16 +10,12 @@
 use std::io;
 use std::path::Path;
 
-use identity::{Ed25519Keypair, IdentityProvider, InMemoryProvider, PersonaId};
-
 use crate::wallet_store::*;
 
 use super::*;
 
-pub(crate) fn validate_remote_auth_spec(
-    data_root: &Path,
-    spec: &RemoteAuthGrantSpec,
-) -> io::Result<()> {
+/// Check a remote-auth grant spec against the wallet before issuing.
+pub fn validate_remote_auth_spec(data_root: &Path, spec: &RemoteAuthGrantSpec) -> io::Result<()> {
     for &persona in &spec.personas {
         if load_persona_wallet(data_root, persona)?.is_none() {
             return Err(io::Error::new(
@@ -50,7 +46,8 @@ pub(crate) fn validate_remote_auth_spec(
     Ok(())
 }
 
-pub(crate) fn validate_paired_remote_auth_spec(
+/// Check a paired remote-auth grant spec against the wallet before issuing.
+pub fn validate_paired_remote_auth_spec(
     data_root: &Path,
     spec: &PairedRemoteAuthGrantSpec,
 ) -> io::Result<()> {
@@ -82,9 +79,13 @@ pub(crate) fn validate_paired_remote_auth_spec(
     Ok(())
 }
 
-pub(crate) fn validate_remote_auth_enrollment_bundle(
-    data_root: &Path,
+/// Check an enrollment bundle against this device's delegated identity
+/// `local`, which the caller loads (castellan holds it since DR-B): every
+/// certificate checks, addresses this device and names its key. `None` is
+/// refused as a missing identity, after the bundle's own checks.
+pub fn validate_remote_auth_enrollment_bundle(
     bundle: &RemoteAuthEnrollmentBundle,
+    local: Option<&LocalDeviceIdentity>,
 ) -> io::Result<()> {
     if bundle.grant.is_empty() {
         return Err(io::Error::new(
@@ -94,7 +95,7 @@ pub(crate) fn validate_remote_auth_enrollment_bundle(
     }
     check_grant_set(&bundle.grant, "remote-auth enrollment bundle grant")?;
 
-    let local = load_local_device_identity(data_root)?.ok_or_else(|| {
+    let local = local.ok_or_else(|| {
         io::Error::new(
             io::ErrorKind::NotFound,
             "local delegated-device identity missing; generate a pairing response first",
@@ -164,71 +165,4 @@ pub(crate) fn validate_remote_auth_enrollment_bundle(
         ));
     }
     Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::super::test_support::*;
-    use super::super::*;
-    use super::*;
-
-    #[test]
-    fn issue_remote_auth_device_grant_rejects_unknown_persona_wallet() {
-        let root = temp_data_root("remote-auth-missing-persona");
-        crate::wallet_store::ensure_wallet_state(&root, fixture_persona(), "Studio PC").unwrap();
-
-        let mut spec = sample_remote_auth_spec();
-        spec.personas.push(second_persona());
-        let err = issue_remote_auth_device_grant(&root, &spec).unwrap_err();
-        assert_eq!(err.kind(), io::ErrorKind::NotFound);
-
-        let _ = std::fs::remove_dir_all(&root);
-    }
-
-    #[test]
-    fn issue_remote_auth_device_grant_rejects_wrapped_epoch_outside_persona_set() {
-        let root = temp_data_root("remote-auth-mismatch");
-        crate::wallet_store::ensure_wallet_state(&root, fixture_persona(), "Studio PC").unwrap();
-
-        let mut spec = sample_remote_auth_spec();
-        spec.wrapped_private_epochs.push(EpochCarriage {
-            persona_id: second_persona(),
-            material: WrappedEpochMaterial {
-                index: blinded_epoch_index(second_persona(), fixture_epoch(), FIXTURE_WRAPPING_KEY),
-                wrap_format: "xchacha20poly1305-v1".into(),
-                wrapped_key: vec![0xca, 0xfe],
-            },
-        });
-        let err = issue_remote_auth_device_grant(&root, &spec).unwrap_err();
-        assert_eq!(err.kind(), io::ErrorKind::InvalidInput);
-
-        let _ = std::fs::remove_dir_all(&root);
-    }
-
-    #[test]
-    fn issue_remote_auth_device_grant_rejects_private_read_without_wrapped_epoch() {
-        let root = temp_data_root("remote-auth-missing-wrap");
-        crate::wallet_store::ensure_wallet_state(&root, fixture_persona(), "Studio PC").unwrap();
-
-        let mut spec = sample_remote_auth_spec();
-        spec.wrapped_private_epochs.clear();
-        let err = issue_remote_auth_device_grant(&root, &spec).unwrap_err();
-        assert_eq!(err.kind(), io::ErrorKind::InvalidInput);
-
-        let _ = std::fs::remove_dir_all(&root);
-    }
-
-    #[test]
-    fn private_read_free_grant_can_skip_wrapped_epoch_material() {
-        let root = temp_data_root("remote-auth-no-private");
-        crate::wallet_store::ensure_wallet_state(&root, fixture_persona(), "Studio PC").unwrap();
-
-        let mut spec = sample_remote_auth_spec();
-        spec.scopes = vec!["identity.act".into(), "transport.egress".into()];
-        spec.wrapped_private_epochs.clear();
-        let grant = issue_remote_auth_device_grant(&root, &spec).unwrap();
-        assert!(stored_epochs_for(&root, &grant, fixture_persona()).is_empty());
-
-        let _ = std::fs::remove_dir_all(&root);
-    }
 }

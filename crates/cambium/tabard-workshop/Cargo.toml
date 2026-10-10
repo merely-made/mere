@@ -8,6 +8,10 @@ publish = false
 description = "Tabard's reusable appearance workshop surface and authored-theme workflow"
 readme = "README.md"
 
+[features]
+default = []
+native-host = ["dep:cambium-genet-winit-host", "dep:cambium-rootstock"]
+
 [dependencies]
 tabard.workspace = true
 tinct.workspace = true
@@ -22,7 +26,12 @@ layout-dom-api.workspace = true
 paint_list_render.workspace = true
 livery.workspace = true
 
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+cambium-genet-winit-host = { workspace = true, optional = true }
+cambium-rootstock = { workspace = true, optional = true }
+
 [dev-dependencies]
+genet-render-host.workspace = true
 cambium-genet-winit-host.workspace = true
 taproot.workspace = true
 genet-scripted-dom.workspace = true

@@ -1,0 +1,11 @@
+ADAPTER AdapterInfo { name: "AMD Radeon Pro Vega 56", vendor: 0, device: 0, device_type: DiscreteGpu, device_pci_bus_id: "", driver: "", driver_info: "", backend: Metal, subgroup_min_size: 4, subgroup_max_size: 64, transient_saves_memory: Some(false), limit_bucket: None }
+STEP image before patchless
+STEP patchless solid interleave
+STEP same image after patchless fresh raster key
+STEP same image repeat fresh raster key
+MAP image-repeat 12ms
+MAP image-after 13ms
+MAP patchless-solid 13ms
+MAP image-before 14ms
+MAP source 14ms
+RESULT {"adapter":"AdapterInfo { name: \"AMD Radeon Pro Vega 56\", vendor: 0, device: 0, device_type: DiscreteGpu, device_pci_bus_id: \"\", driver: \"\", driver_info: \"\", backend: Metal, subgroup_min_size: 4, subgroup_max_size: 64, transient_saves_memory: Some(false), limit_bucket: None }","copies":[{"changed_pixels_from_image_before":65536,"colors":[[0,0,0,0]],"corners":[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]],"height":256,"map_ms":12,"name":"image-repeat","width":256},{"changed_pixels_from_image_before":65536,"colors":[[0,0,0,0]],"corners":[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]],"height":256,"map_ms":13,"name":"image-after","width":256},{"changed_pixels_from_image_before":65536,"colors":[[64,128,191,255]],"corners":[[64,128,191,255],[64,128,191,255],[64,128,191,255],[64,128,191,255]],"height":256,"map_ms":13,"name":"patchless-solid","width":256},{"changed_pixels_from_image_before":0,"colors":[[0,0,255,255],[0,255,0,255],[255,0,0,255],[255,255,0,255]],"corners":[[255,0,0,255],[0,255,0,255],[0,0,255,255],[255,255,0,255]],"height":256,"map_ms":14,"name":"image-before","width":256},{"changed_pixels_from_image_before":0,"colors":[[0,0,255,255],[0,255,0,255],[255,0,0,255],[255,255,0,255]],"corners":[[255,0,0,255],[0,255,0,255],[0,0,255,255],[255,255,0,255]],"height":256,"map_ms":14,"name":"source","width":256}],"image_key":"0xc000000074617011","renderer":"Vello491 warm immutable rlibs","sequence":"solid quadrant source -> register -> image -> patchless solid -> same image fresh key -> same image another fresh key -> arm all copies -> collect all -> write","tile_size":64}
