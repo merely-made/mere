@@ -19,7 +19,7 @@ use crate::A11yAction;
 use cambium::PointerClick;
 use genet_render::VisualCaret;
 use genet_scripted_dom::NodeId;
-use layout_dom_api::DomMutation;
+use layout_dom_api::{DomMutation, LayoutDom as _};
 use netrender::{ColorLoad, ExternalTexturePlacement};
 use paint_list_api::{DeviceIntSize, PaintEnvelope, PaintList as _};
 
@@ -716,21 +716,25 @@ where
         // device scale alone would point at a control's unzoomed position.
         let layout_scale = self.layout_scale();
         let requests = {
-            let (dom, mount) = match self.s.runner.as_ref() {
-                Some(runner) => (runner.dom(), runner.mount()),
+            let (dom, mount, focus) = match self.s.runner.as_ref() {
+                Some(runner) => (runner.dom(), runner.mount(), runner.focus()),
                 None => return,
             };
             let dom_ref = dom.borrow();
+            let view = crate::WindowDom::new(&dom_ref, mount);
+            // Focus can change without hover; last_focus belongs to restyling,
+            // not to the accessibility adapter's current focus report.
+            let focus = focus.map(|node| view.opaque_id(node));
             let (Some(a11y), Some(layout)) = (self.s.a11y.as_mut(), self.s.layout.as_ref()) else {
                 return;
             };
             // The window is the adapter's own now, so the seam does not carry it.
             a11y.sync(
-                &crate::WindowDom::new(&dom_ref, mount),
+                &view,
                 layout,
                 &mut self.s.shared.leaves,
                 &mut self.s.shared.producers,
-                self.s.last_focus,
+                focus,
                 layout_scale,
             )
         };

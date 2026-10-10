@@ -21,15 +21,16 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::Duration;
 
+use castellan::authority::PersonaeHost;
+use castellan::custody::IdentityStorage;
 use chirograph::{CarrierRequestBody, CarrierResponseBody, IntentInvocation, IntentResult};
 use graphshell::native::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId};
 use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
 use graphshell::native::app_client::{AppBrokerClient, AppClientError};
 use graphshell::native::endpoint_catalog::ResidentEndpointCatalog;
-use graphshell::native::personae_host::PersonaeHost;
 use graphshell::native::tasks::ResidentTasks;
 use pandect::DomainId;
-use personae::{IdentityStorage, PersonaId};
+use personae::PersonaId;
 use sceno::InstanceId;
 use tokio::sync::oneshot;
 
@@ -338,7 +339,7 @@ impl EmbeddedOwner {
                     return Err("selected identity locked during embedded startup".into());
                 }
                 tokio::select! {
-                    result = serve_app_broker(&endpoint, host, grants, session_duration_ms, None, catalog.clone()) => {
+                    result = serve_app_broker(&endpoint, Arc::new(crate::keeper::Keeper::new(host)), grants, session_duration_ms, None, catalog.clone()) => {
                         result.map_err(|error| error.to_string())
                     },
                     _ = &mut stopped => Ok(()),

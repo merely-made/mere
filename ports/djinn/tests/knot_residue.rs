@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! What Knot leaves of its signing seed (vault lock rulings 48 and 49):
-//! personae's tracker, included by path, in one process.
+//! castellan's residue tracker, included by path, in one process.
 //!
 //! Each run is armed around one spawned task (so its frames are heap
 //! allocations the tracker sees, as in the resident) that builds what it
@@ -26,7 +26,7 @@
 //!
 //! No libtest harness: the allocator is process-wide.
 
-#[path = "../../../crates/dramatis/personae/tests/residue/mod.rs"]
+#[path = "../../castellan/tests/residue/mod.rs"]
 mod residue;
 
 use std::collections::BTreeSet;

@@ -424,7 +424,7 @@ impl RunningSitedStationHead {
             Err(error) => {
                 self.station.lock().await.take();
                 Err(error)
-            }
+            },
         }
     }
 }
@@ -446,14 +446,14 @@ async fn watch_head(
             Err(_) => {
                 station.lock().await.take();
                 return;
-            }
+            },
         };
         let expires_at_ms = match head.authorize_at(now_ms) {
             Ok(expires_at_ms) => expires_at_ms,
             Err(_) => {
                 station.lock().await.take();
                 return;
-            }
+            },
         };
         tokio::select! {
             _ = tokio::time::sleep(remaining_window(now_ms, expires_at_ms)) => {}
@@ -535,7 +535,7 @@ impl fmt::Display for SitedStationHeadError {
             ),
             Self::UnsupportedStateSchema { actual } => {
                 write!(f, "unsupported sited station state schema {actual}")
-            }
+            },
             Self::InvalidStationSecretLength { actual } => write!(
                 f,
                 "sealed sited station secret has {actual} bytes, not Reticulum's 64"
@@ -545,7 +545,7 @@ impl fmt::Display for SitedStationHeadError {
             Self::Stopped => f.write_str("sited station is stopped"),
             Self::OperationInterrupted => {
                 f.write_str("sited station operation was interrupted by a grant renewal; retry it")
-            }
+            },
         }
     }
 }
@@ -563,8 +563,7 @@ fn remaining_window(now_ms: u64, expires_at_ms: u64) -> Duration {
 
 #[cfg(test)]
 mod tests {
-    use pandect::ensure_wallet_state;
-    use personae::{InMemoryProvider, PersonaId};
+    use crate::authority::test_support::TestWallet;
     use tempfile::tempdir;
 
     use super::*;
@@ -574,12 +573,12 @@ mod tests {
     fn accepted_control_is_sealed_before_its_ack_and_survives_restart() {
         let wallet = tempdir().unwrap();
         let storage_root = tempdir().unwrap();
-        let seed = ensure_wallet_state(wallet.path(), PersonaId::new(), "Station host").unwrap();
-        let provider = InMemoryProvider::from_seed(seed);
+        let custodian = TestWallet::new(wallet.path(), 0x5a);
+        let provider = custodian.provider();
         let device_id = DeviceId::new();
         let credential = SitedStationCredential::derive_for_device(&provider, device_id).unwrap();
         let grant = credential
-            .issue_remote_auth_grant(wallet.path(), device_id, "Ridge north", 100, 200)
+            .issue_remote_auth_grant(custodian.as_ref(), device_id, "Ridge north", 100, 200)
             .unwrap();
         let storage = SealedRecordStorage::open_with_key(storage_root.path(), [0x55; 32]);
         let head = SitedStationHead::provision(
@@ -615,12 +614,12 @@ mod tests {
     fn expiry_is_persisted_so_restart_cannot_restore_authority() {
         let wallet = tempdir().unwrap();
         let storage_root = tempdir().unwrap();
-        let seed = ensure_wallet_state(wallet.path(), PersonaId::new(), "Station host").unwrap();
-        let provider = InMemoryProvider::from_seed(seed);
+        let custodian = TestWallet::new(wallet.path(), 0x5a);
+        let provider = custodian.provider();
         let device_id = DeviceId::new();
         let credential = SitedStationCredential::derive_for_device(&provider, device_id).unwrap();
         let grant = credential
-            .issue_remote_auth_grant(wallet.path(), device_id, "Ridge north", 100, 200)
+            .issue_remote_auth_grant(custodian.as_ref(), device_id, "Ridge north", 100, 200)
             .unwrap();
         let storage = SealedRecordStorage::open_with_key(storage_root.path(), [0x56; 32]);
         let head = SitedStationHead::provision(
@@ -648,12 +647,12 @@ mod tests {
     fn revoke_is_persisted_before_its_ack_so_restart_cannot_restore_authority() {
         let wallet = tempdir().unwrap();
         let storage_root = tempdir().unwrap();
-        let seed = ensure_wallet_state(wallet.path(), PersonaId::new(), "Station host").unwrap();
-        let provider = InMemoryProvider::from_seed(seed);
+        let custodian = TestWallet::new(wallet.path(), 0x5a);
+        let provider = custodian.provider();
         let device_id = DeviceId::new();
         let credential = SitedStationCredential::derive_for_device(&provider, device_id).unwrap();
         let grant = credential
-            .issue_remote_auth_grant(wallet.path(), device_id, "Ridge north", 100, 200)
+            .issue_remote_auth_grant(custodian.as_ref(), device_id, "Ridge north", 100, 200)
             .unwrap();
         let storage = SealedRecordStorage::open_with_key(storage_root.path(), [0x58; 32]);
         let head = SitedStationHead::provision(
