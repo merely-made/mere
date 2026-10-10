@@ -1,5 +1,23 @@
 # Batch 61: design-language voice clarifications
 
+**Field/editor design continuation (2026-10-10):** following Mark's instruction
+to proceed, source was refreshed at published Mere `86f2a3b8`: Numen field and
+coupling data, graph mutations and strength accessors, Canvas picking and force
+conversion, roster subjects/relation selectors, product edits, and the retained
+Graphshell forme/workspace bridge. The field plan owns the detailed field draft;
+the editor plan owns primitive inspection/editing, with canonical §9.15 and the
+index linking them. The newer existing-field inspector narrows the historical
+no-caller finding. Hash-map overlap picking and first-read/all-write strength
+are source findings, not repairs. Membership, conflicting placement, events and
+storage association retain named checkpoints; recommendations are not promoted
+to rulings. The obsolete embedded-study anchor was repaired to §9.12.
+Twenty-two new or repaired local links and anchors resolve; whitespace checks
+pass. Doc-audit JSON matches the pre-edit baseline SHA256
+`e5720534be41eb9fad1d109d5fb44cc8a92a8cdea894bac024713e8d21f411fc`;
+D2 matches `64c550fb99df7fdf917b8f9af87b156e3eb7010a64e191b08ba831b2be2233cf`
+and retains its seven pre-existing missing records at 252/259 coverage.
+No runtime source changed and no build or browser gate ran.
+
 **Design ownership continuation (2026-10-10):** Mark allocated the seven design
 concerns across the research, Tabard, projection grammar and dynamics lanes.
 Canonical §9.14 records the allocation; the editor and field plans carry their

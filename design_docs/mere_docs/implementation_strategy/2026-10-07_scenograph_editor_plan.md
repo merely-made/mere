@@ -599,6 +599,77 @@ separate presentation intents. Arbitrary attribute storage, primitive node
 encoding and overlap policy remain the existing forks. The active dynamics
 qualification and B1/S2 owner boundaries retain their priority.
 
+#### Primitive editor draft (2026-10-10)
+
+**Design proposal; no new runtime track or receipt.** Mark assigned node, link
+and field editors to the projection grammar agent and asked it to proceed.
+The shared [allocation](../../2026-08-23_projection_scenes_and_graph_native_platform.md#914-design-work-ownership-2026-10-10)
+preserves Tabard's appearance roles, the dynamics lane's explanations and
+script/motion authoring, and established selection fundamentals.
+
+Propose one inspect/edit pattern reached from a scene appearance or roster
+entry. The inspector identifies the target in ordinary language before offering
+writes. Inspecting something need not replace the working selection or open its
+content. An explicit Edit action starts a draft for the chosen owner. Source
+facts, this access and this appearance are distinguishable scopes, with their
+shared effects explained rather than exposed as raw implementation labels.
+
+| Target | Inspect | Proposed editing boundary |
+|---|---|---|
+| Content access / Surface | Title, content access, associated Resource and other appearances. | Surface-owned values address this access; Resource facts have their own edit action and disclose shared use. Content editing opens its existing document editor. |
+| Scene occurrence | Its face, applicable rules, local placement and dynamics role. | Edit this appearance or its named recipe through the scene owner. A foreground pin remains separate from position pin, anchor and forme lock. |
+| Link mark or bundle | Endpoints, contributing relations and provenance; explain whether one mark represents several facts. | Select the intended source record before a source edit. A relation family/subkind filter is not exact statement identity. Derived links expose their inputs/rule and route editing to their owner. |
+| Field | Identity, members, extent, placement, couplings and scoped presentation. | Separate field values, individual coupling values, scene visibility and workbench arrangement writes. Use the field plan's draft. |
+
+**Source findings at published Mere `86f2a3b8`:**
+[RosterSubject](../../../crates/mere/src/roster.rs) already distinguishes Node,
+LinkBundle, RelationCell and Field. Its
+[RelationSelector](../../../crates/graph/graph-kernel/src/graph/edge_taxonomy.rs)
+selects families/subkinds; a RelationCell is not necessarily one assertion.
+[RelationKey](../../../crates/graph/graph-kernel/src/graph/identity.rs) identifies
+the Surface/Resource relation stratum. The exact-record adapter must retain
+the source's statement/provenance identity rather than infer it from endpoints.
+The existing [product edits](../../../ports/graphshell/src/product.rs) address
+Surface titles, shown-Resource tags and relation assertions; arbitrary
+link/field attributes remain a storage-design question. The proposed narrow
+link/edge vocabulary is not adopted as a schema rename by this editor draft.
+
+The [current forme host](../../../ports/graphshell/src/web_tree/forme.rs) and
+[saved workspace](../../../ports/graphshell/src/forme_workspace.rs) already
+provide field inspection and bounded workbench projection. This supersedes
+the earlier inventory's no-field-inspection-caller finding for that retained
+host, without claiming shared roster-card adoption or a general field editor.
+Existing workspace records hold arrangement, geometry, bounds, lock and
+visibility; the whole-forme draft/history remains pending as recorded below.
+
+**Proposed edit flow:** Inspect → Edit → Preview → Apply / Discard changes.
+Use the agreed Unlock → Lock and apply wording for a forme. Show pending state
+and the exact affected owner. Validate all authored values before applying a
+single-owner form; its successful apply should be one logical saved change.
+The current metadata form commits title/tags before parsing an optional JSON
+facet, so it does not meet that proposed behavior. Multi-owner edits need an
+explicit compound adapter or separate named applies; do not promise atomic
+saved undo merely because the controls share an inspector. Failed apply retains
+the draft and states which changes, if any, committed. Discard changes leaves
+content and other owners' committed edits intact.
+
+**First walkthrough:** inspect two accesses to one Resource; change one access's
+title, then explicitly inspect the shared Resource. Inspect a bundled link and
+choose its actual source record. Inspect two overlapping fields and tune one
+named coupling. Finally edit a forme through its scoped draft and discard or
+apply it. This keeps arbitrary attribute storage and scripting out of the first
+editor proof until their owners supply the necessary contracts.
+
+Done when the walkthrough exposes the intended identity and shared effects;
+two accesses remain distinct; a bundled mark cannot silently edit the wrong
+assertion; one coupling edit leaves the others unchanged; malformed input
+commits nothing for the promised single-owner edit; and apply/discard/undo plus
+save/reopen preserve unrelated state. Test derived and undisclosed relations,
+hidden fields, changed/deleted targets and failed persistence. Keyboard access
+must reach the same inspection and apply/discard actions. The
+[field authoring draft](2026-06-13_scriptable_field_regions_plan.md#field-authoring-draft-2026-10-10)
+owns membership, overlap checkpoints and the field-specific walkthrough.
+
 #### Mixed-content study (2026-10-10; proposal, not opened)
 
 Mark forwarded the design-language agent's proposed

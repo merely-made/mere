@@ -1092,3 +1092,30 @@ and effects consistently. Theme values and font roles come from Tabard.
 Graphshell remains the reference host. Existing source authority, workbench
 arrangement ownership and site viewer ownership are preserved. This is a
 design allocation, not a new runtime receipt or a dispatch to another agent.
+
+### 9.15 Field and primitive editor draft (2026-10-10)
+
+Mark asked the projection grammar lane to proceed with its assigned design
+work. The [field authoring draft](mere_docs/implementation_strategy/2026-06-13_scriptable_field_regions_plan.md#field-authoring-draft-2026-10-10)
+specifies member/extent, placement, influence, projection, action and appearance
+controls. The [primitive editor draft](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#primitive-editor-draft-2026-10-10)
+specifies inspect/edit flows for content accesses, Resources, scene appearances,
+link bundles/source records and fields. These are reviewable proposals, not
+additional rulings. The established selection fundamentals and agreed forme
+draft behavior remain their starting contracts.
+
+Source at published Mere `86f2a3b8` supports a bounded workbench/forme bridge
+and existing-field inspection, with headed acceptance pending. It also exposes
+two editor gaps: overlapping field picking follows hash-map paint order, and
+the field-level strength shortcut reads one coupling but writes all of them.
+The drafts propose explicit edit targets and per-effect controls. They preserve
+the difference between declared arrangement membership, occurrence-local
+spatial eligibility and influence weight, and between an inspected link family
+and an exact source assertion.
+
+Open checkpoints are the spatial-membership test, incompatible exact-placement
+policy, membership-event causes and field/forme storage association. Refusing a
+conflicting placement edit and reporting initial matches without firing entry
+actions are recommendations pending rulings. Theme roles, presentation-rule
+precedence, visual force explanations and script execution remain with their
+assigned lanes. No runtime source or qualification was changed by this pass.

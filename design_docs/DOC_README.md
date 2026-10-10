@@ -16,6 +16,14 @@ Knot's subsequent `9d0b955f` adoption includes eight reviewed 420px/400% recipe
 captures and the coherent horizontal-reveal pin; native personal-wallet retention
 remains unqualified.
 
+Field/editor design continuation (2026-10-10): the
+[field authoring draft](mere_docs/implementation_strategy/2026-06-13_scriptable_field_regions_plan.md#field-authoring-draft-2026-10-10)
+and [primitive editor draft](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#primitive-editor-draft-2026-10-10)
+make the assigned inspect/edit flows concrete. They refresh the implemented
+forme bridge, identify overlap-picking and multi-coupling edit gaps, and retain
+explicit membership, placement, event and storage checkpoints. These are design
+proposals, distinct from the agreed forme draft and existing runtime receipts.
+
 ## Required reading order
 
 Terminology amendment (2026-09-20): [TERMINOLOGY.md](TERMINOLOGY.md) restores
