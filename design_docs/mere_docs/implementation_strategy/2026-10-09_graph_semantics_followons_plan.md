@@ -10,7 +10,7 @@ select this source in isolated successors. Knot and Redshank passed their provid
 gates and have local commits; Turnstone now selects those commits and is under
 qualification. Consumer publication and the final family review remain pending.
 The initial Graphshell/Djinn resident-host spec is approved, and its concrete
-implementation plan is written for review. Host implementation has not begun. The
+implementation plan is approved and entering Task 1. The
 RDF checkpoint and coordination documents are published at `a8889f60e`; consumer
 candidates remain local until their gates, review and publication approval.
 
@@ -149,7 +149,7 @@ historical test receipts as current evidence.
 
 The [initial resident host design](../technical_architecture/2026-10-09_resident_host_design.md)
 is approved by Mark. The [concrete implementation plan](2026-10-09_resident_host_implementation_plan.md)
-is written for review. Its first host is the existing owned
+is approved and entering implementation. Its first host is the existing owned
 Graphshell/Djinn writer; Turnstone authority migration follows separately.
 
 Approved first milestone: stable typed IDs and explicit observation
@@ -293,3 +293,4 @@ claims, each supported by its own evidence.
   resident-host planning now follows the approved complete-writer milestone.
 
 - **2026-10-09:** Knot `ab191d4d` and Redshank `fea7f0f7` pass provider gates and remain local. Turnstone now selects both provider commits and supplier `297682178`; its default/Piccolo qualification is running. The initial host implementation plan is written, source-checked and indexed for Mark’s review. Host code has not started.
+- **2026-10-09:** Mark approves the concrete host plan. Task 1 starts with pure publication preparation and complete catalog observations. Turnstone’s one-file CoveredScene compatibility repair passes seven focused endpoint controls; full default/Piccolo qualification continues independently. Portable wire coverage and actual residency activation remain subsequent host tasks.

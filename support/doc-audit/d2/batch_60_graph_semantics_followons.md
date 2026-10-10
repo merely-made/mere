@@ -5,7 +5,7 @@ Audit base: Mere a8889f60e, 2026-10-09, with local documentation updates. Origin
 ## mere_docs/implementation_strategy/2026-10-09_graph_semantics_followons_plan.md
 
 - disposition: current
-- status line: "In progress; RDF qualified and published, providers qualified locally, Turnstone under qualification, host plan written for review" - accurate: yes
+- status line: "In progress; RDF qualified and published, providers qualified locally, Turnstone under qualification, host plan approved and entering Task 1" - accurate: yes
 - claims checked: 5 - holds: 5, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -27,7 +27,7 @@ Checked supplier source and six-gate repair receipt; verified published main/fol
 ## mere_docs/technical_architecture/2026-10-09_resident_host_design.md
 
 - disposition: current
-- status line: "Written spec approved by Mark; implementation plan written for review; implementation has not begun" - accurate: yes
+- status line: "Written spec and implementation plan approved by Mark; entering implementation" - accurate: yes
 - claims checked: 5 - holds: 5, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -49,7 +49,7 @@ User approval settles the complete-writer milestone. Existing GraphSession owns 
 ## mere_docs/implementation_strategy/2026-10-09_resident_host_implementation_plan.md
 
 - disposition: current
-- status line: "Plan written for approved spec; awaiting user review; implementation has not started" - accurate: yes
+- status line: "Written spec and concrete plan approved by Mark; team implementation starts with Task 1" - accurate: yes
 - claims checked: 15 - holds: 15, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -67,4 +67,3 @@ User approval settles the complete-writer milestone. Existing GraphSession owns 
 ### Notes
 
 Checked all 15 existing-path responsibility rows against source at a8889f60e, including NodeFacetStore export, SessionId re-export, ViewKey::new, node_is_pinned, Applied fields and private pending_with(&self). New signatures and tests are expressly proposed; six new paths carry planned-path annotations. Eight tasks cover the approved spec and five review-focus failures. No new capability or successful host gate is claimed.
-

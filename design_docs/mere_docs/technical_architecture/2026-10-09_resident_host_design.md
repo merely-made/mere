@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-09
 **Status (2026-10-09):** Written spec approved by Mark. The concrete
-implementation plan is [written for review](../implementation_strategy/2026-10-09_resident_host_implementation_plan.md); implementation has not begun.
+implementation plan is [approved and entering implementation](../implementation_strategy/2026-10-09_resident_host_implementation_plan.md).
 
 This proposal belongs to the [graph semantics follow-ons](../implementation_strategy/2026-10-09_graph_semantics_followons_plan.md).
 It preserves the [bounded P1–P5 lane](../implementation_strategy/2026-10-04_graph_semantics_plan.md)

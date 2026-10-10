@@ -11,7 +11,7 @@
 **Spec:** [Approved initial resident host design](../technical_architecture/2026-10-09_resident_host_design.md). Read it alongside the [parent follow-ons plan](2026-10-09_graph_semantics_followons_plan.md).
 
 **Date:** 2026-10-09
-**Status (2026-10-09):** Plan written for the approved spec; awaiting user plan review. Implementation has not started. Approval of the spec does not replace the required review of this plan.
+**Status (2026-10-09):** Written spec and concrete plan approved by Mark. Team implementation starts with Task 1; Tasks 2–8 remain pending. Root runs Cargo serially and preserves separate consumer qualification.
 
 ## Global Constraints
 
@@ -730,3 +730,4 @@ Dependencies and signatures were checked: tasks consume only verified existing i
 ## Progress
 
 - **2026-10-09:** Read approved spec, parent lane, canonical policy/index and relevant source interfaces. Concrete plan written and self-reviewed. No implementation, backend/consumer edit, Cargo run, commit or push performed. Awaiting the user's plan review before the preserved orchestration method proceeds.
+- **2026-10-09:** Mark approves the concrete plan. Root records the interface/file preflight and starts Task 1 under the preserved team method. Each task receives observed tests and an independent task review; final host qualification and publication remain pending.
