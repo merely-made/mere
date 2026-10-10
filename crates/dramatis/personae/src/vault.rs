@@ -16,13 +16,34 @@ use serde::{Deserialize, Serialize};
 
 use crate::Ed25519PublicKey;
 
+/// Per-user vault directory (`%LOCALAPPDATA%\personae\vault`, or
+/// `$XDG_DATA_HOME/personae/vault`).
+///
+/// A location, not custody: it moved here from castellan's bootstrap in DR-C
+/// so a host that only needs the path (an owner-only socket's fallback
+/// directory) does not name castellan.
+pub fn default_vault_dir() -> std::path::PathBuf {
+    use std::path::PathBuf;
+    #[cfg(windows)]
+    let base = std::env::var_os("LOCALAPPDATA")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| PathBuf::from("."));
+    #[cfg(not(windows))]
+    let base = std::env::var_os("XDG_DATA_HOME")
+        .map(PathBuf::from)
+        .or_else(|| std::env::var_os("HOME").map(|home| PathBuf::from(home).join(".local/share")))
+        .unwrap_or_else(|| PathBuf::from("."));
+    base.join("personae").join("vault")
+}
+
 /// Stable identifier for a profile within a vault.
 ///
 /// Profiles are independent: per-profile master keys do not derive from
 /// each other. A user with multiple profiles (work / personal / alt)
 /// switches between them at the vault level; mods hold per-profile
 /// sub-instances (Element-style).
-#[derive(Clone, Debug, Eq, PartialEq, Hash, Ord, PartialOrd)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash, Ord, PartialOrd, Serialize, Deserialize)]
+#[serde(transparent)]
 pub struct ProfileId(pub String);
 
 /// Compound key for a slot within a profile.

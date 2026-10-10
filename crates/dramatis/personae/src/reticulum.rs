@@ -13,23 +13,29 @@
 //!
 //! This module has no dependency on Retinue. Its caller converts the returned
 //! material into Retinue's `PrivateIdentity`, then scrubs the transient byte
-//! array. A resident Castellan authority can later expose the same operation
-//! over its gate instead of handing material to an in-process port.
+//! array.
+//!
+//! Moved here from castellan in DR-C (dramatis repo plan, D17): the derivation
+//! is issuing code over any provider, so a station port derives from the
+//! station-scoped keys djinn releases ([`station_salts`], D11) rather than
+//! from a wallet it opens. The domain strings keep their castellan-era bytes,
+//! because changing them would change every commissioned station's identity.
 
 use std::fmt;
 
-use personae::{IdentityError, IdentityProvider};
+use crate::{IdentityError, IdentityProvider};
 use zeroize::{Zeroize, ZeroizeOnDrop};
-
-/// Narrow RemoteAuth issuance and validation for an unattended station.
-///
-/// This is optional because it is the host-side wallet adapter, while derived
-/// station material itself remains a Personae-only operation.
-#[cfg(feature = "station-grants")]
-pub mod grant;
 
 const RETICULUM_STATION_DOMAIN: &[u8] = b"mere.castellan.reticulum.station/v1";
 const RETICULUM_CONTROLLER_DOMAIN: &[u8] = b"mere.castellan.reticulum.controller/v1";
+/// The domain of a sited station's control signer, the device-specific child
+/// that signs grant and revoke frames (moved from signalman with D17, bytes
+/// unchanged).
+const STATION_CONTROL_DOMAIN: &[u8] = b"mere/signalman/sited-station-control/v1/";
+/// The domain of a bench station head's record-sealing key, scoped by the
+/// record's path (DR-C, D11): the head's storage key without an OS root of
+/// its own.
+const STATION_STORAGE_DOMAIN: &[u8] = b"mere/signalman/sited-station-storage/v1/";
 const EXCHANGE_PURPOSE: &[u8] = b"x25519";
 const SIGNING_PURPOSE: &[u8] = b"ed25519";
 
@@ -120,13 +126,61 @@ impl ReticulumControllerMaterial {
     }
 }
 
+/// The two salts a station's material derives from, for a release request:
+/// the X25519 half first, then the Ed25519 half.
+pub fn station_salts(station_scope: &[u8]) -> [Vec<u8>; 2] {
+    scope_salts(RETICULUM_STATION_DOMAIN, station_scope)
+}
+
+/// The two salts a controller's material derives from, in the same order.
+pub fn controller_salts(controller_scope: &[u8]) -> [Vec<u8>; 2] {
+    scope_salts(RETICULUM_CONTROLLER_DOMAIN, controller_scope)
+}
+
+/// The salt of a sited station's control signer for `station_scope` (the
+/// device id's bytes).
+pub fn station_control_salt(station_scope: &[u8]) -> Vec<u8> {
+    let mut salt = Vec::with_capacity(STATION_CONTROL_DOMAIN.len() + station_scope.len());
+    salt.extend_from_slice(STATION_CONTROL_DOMAIN);
+    salt.extend_from_slice(station_scope);
+    salt
+}
+
+/// The salt of a bench station head's record-sealing key for `record_scope`.
+pub fn station_storage_salt(record_scope: &[u8]) -> Vec<u8> {
+    let mut salt = Vec::with_capacity(STATION_STORAGE_DOMAIN.len() + record_scope.len());
+    salt.extend_from_slice(STATION_STORAGE_DOMAIN);
+    salt.extend_from_slice(record_scope);
+    salt
+}
+
+/// Whether `salt` belongs to a Reticulum station, controller, station
+/// control or station storage derivation, for a releasing authority's
+/// namespace check.
+pub fn is_reticulum_salt(salt: &[u8]) -> bool {
+    [
+        RETICULUM_STATION_DOMAIN,
+        RETICULUM_CONTROLLER_DOMAIN,
+        STATION_CONTROL_DOMAIN,
+        STATION_STORAGE_DOMAIN,
+    ]
+    .iter()
+    .any(|domain| salt.len() > domain.len() && salt.starts_with(domain))
+}
+
+fn scope_salts(domain: &[u8], scope: &[u8]) -> [Vec<u8>; 2] {
+    [
+        derivation_salt(domain, EXCHANGE_PURPOSE, scope),
+        derivation_salt(domain, SIGNING_PURPOSE, scope),
+    ]
+}
+
 fn derive_reticulum_secret(
     provider: &dyn IdentityProvider,
     domain: &[u8],
     scope: &[u8],
 ) -> Result<[u8; 64], IdentityError> {
-    let exchange_salt = derivation_salt(domain, EXCHANGE_PURPOSE, scope);
-    let signing_salt = derivation_salt(domain, SIGNING_PURPOSE, scope);
+    let [exchange_salt, signing_salt] = scope_salts(domain, scope);
     let exchange_key = provider.derive_keypair(&exchange_salt)?;
     let signing_key = provider.derive_keypair(&signing_salt)?;
     let mut exchange_seed = exchange_key.to_seed();
@@ -151,7 +205,7 @@ fn derivation_salt(domain: &[u8], purpose: &[u8], scope: &[u8]) -> Vec<u8> {
 
 #[cfg(test)]
 mod tests {
-    use personae::InMemoryProvider;
+    use crate::InMemoryProvider;
 
     use super::*;
 

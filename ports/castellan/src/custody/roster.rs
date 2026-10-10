@@ -39,46 +39,7 @@ pub const DEFAULT_PROFILE: &str = "default";
 /// The file beside the vault holding the chosen profile id.
 const CHOICE_FILENAME: &str = "chosen-profile";
 
-/// One persona in the vault, as a picker needs to show it.
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct RosterEntry {
-    /// Stable id, and what [`remember_profile`] writes.
-    pub id: ProfileId,
-    /// The name to show.
-    pub display_name: String,
-    /// How many protocol slots this persona carries. Shown because it is the
-    /// one honest signal of which persona is the used one when the display
-    /// names are not telling.
-    pub slot_count: usize,
-    /// Whether this is the persona currently in use.
-    pub chosen: bool,
-}
-
-/// Everything a persona picker needs from the vault.
-#[derive(Clone, Debug)]
-pub struct Roster {
-    /// The vault's personas, sorted by id so the list does not reorder itself
-    /// between runs.
-    pub entries: Vec<RosterEntry>,
-    /// The persona in use, whether or not it exists yet: a fresh vault resolves
-    /// to a name that will be minted on first open.
-    pub chosen: ProfileId,
-    /// What protects the vault, from [`crate::custody::bootstrap::OpenedStorage`].
-    /// Shown, never guessed.
-    pub description: String,
-}
-
-impl Roster {
-    /// The entry for the persona in use, absent on a vault that has none yet.
-    pub fn chosen_entry(&self) -> Option<&RosterEntry> {
-        self.entries.iter().find(|entry| entry.chosen)
-    }
-
-    /// Whether the vault holds no personas at all, which is a first run.
-    pub fn is_empty(&self) -> bool {
-        self.entries.is_empty()
-    }
-}
+use dramatis::roster::{Roster, RosterEntry};
 
 /// A vault opened on a particular persona.
 pub struct OpenedVault {
@@ -263,7 +224,7 @@ fn vault_on(
 /// Open the family-shared vault on the chosen persona: the one call an
 /// application makes to get the user's identity rather than its own.
 pub fn open_shared(unlock: Unlock) -> Result<OpenedVault, IdentityError> {
-    open_chosen(&bootstrap::default_vault_dir(), unlock)
+    open_chosen(&personae::default_vault_dir(), unlock)
 }
 
 #[cfg(test)]

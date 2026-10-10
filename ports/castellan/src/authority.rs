@@ -50,17 +50,17 @@ use uuid::Uuid;
 
 use crate::lock::VaultLockHolder;
 
-use crate::projection::{
-    CreateProfileIntentV1, DEVICE_REVOKE_INTENT, GenerateSshKeyIntentV1,
-    ImportSshKeyNativeIntentV1, PROFILE_CREATE_INTENT, PROFILE_SWITCH_INTENT, RemoveSshKeyIntentV1,
-    RevokeDeviceIntentV1, LockVaultIntentV1, VAULT_LOCK_INTENT, VAULT_UNLOCK_INTENT,
-    SIGNING_APPROVE_IDLE_INTENT, SIGNING_APPROVE_ONCE_INTENT,
-    SIGNING_DENY_INTENT, SSH_GENERATE_INTENT, SSH_IMPORT_NATIVE_INTENT, SSH_REMOVE_INTENT,
-    SigningDecisionIntentV1, SshUnlockPolicyIntentV1, SwitchProfileIntentV1,
-};
 use crate::view::{
     AgentListenerView, CarryView, IdentitySurfaceSnapshot, ProfileView, SshKeyView, VaultLockView,
     VaultProtectionView, VaultView, load_carry_view,
+};
+use dramatis::intents::{
+    CreateProfileIntentV1, DEVICE_REVOKE_INTENT, GenerateSshKeyIntentV1,
+    ImportSshKeyNativeIntentV1, LockVaultIntentV1, PROFILE_CREATE_INTENT, PROFILE_SWITCH_INTENT,
+    RemoveSshKeyIntentV1, RevokeDeviceIntentV1, SIGNING_APPROVE_IDLE_INTENT,
+    SIGNING_APPROVE_ONCE_INTENT, SIGNING_DENY_INTENT, SSH_GENERATE_INTENT,
+    SSH_IMPORT_NATIVE_INTENT, SSH_REMOVE_INTENT, SigningDecisionIntentV1, SshUnlockPolicyIntentV1,
+    SwitchProfileIntentV1, VAULT_LOCK_INTENT, VAULT_UNLOCK_INTENT,
 };
 
 const MAX_SHORT_TTL_SECONDS: u32 = 24 * 60 * 60;
@@ -875,7 +875,8 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         })
     }
 
-    /// Apply one typed action emitted by [`crate::projection`].
+    /// Apply one typed action a card offered (graphshell's
+    /// `identity_projection`, names in [`dramatis::intents`]).
     pub fn apply_intent(
         &self,
         intent: &str,
@@ -1575,7 +1576,13 @@ mod tests {
         key: &ProtocolKey,
     ) -> (String, Vec<u8>, CredentialLineage, UnlockTier) {
         let vault = host.vault.lock().unwrap();
-        match vault.current_profile().unwrap().slots.get(key).expect("slot held") {
+        match vault
+            .current_profile()
+            .unwrap()
+            .slots
+            .get(key)
+            .expect("slot held")
+        {
             crate::custody::IdentitySlot::Direct {
                 kind,
                 payload,

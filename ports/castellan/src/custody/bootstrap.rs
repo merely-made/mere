@@ -21,7 +21,7 @@
 //! message pointing at the passphrase option. It never falls back to
 //! storing secrets in the clear.
 
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use zeroize::Zeroizing;
 
@@ -75,21 +75,6 @@ pub struct OpenedStorage {
     pub storage: Box<dyn IdentityStorage>,
     /// Human-readable description of the backend and its protection.
     pub description: String,
-}
-
-/// Per-user vault directory (`%LOCALAPPDATA%\personae\vault`, or
-/// `$XDG_DATA_HOME/personae/vault`).
-pub fn default_vault_dir() -> PathBuf {
-    #[cfg(windows)]
-    let base = std::env::var_os("LOCALAPPDATA")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| PathBuf::from("."));
-    #[cfg(not(windows))]
-    let base = std::env::var_os("XDG_DATA_HOME")
-        .map(PathBuf::from)
-        .or_else(|| std::env::var_os("HOME").map(|home| PathBuf::from(home).join(".local/share")))
-        .unwrap_or_else(|| PathBuf::from("."));
-    base.join("personae").join("vault")
 }
 
 /// Open (creating the directory if needed) the vault storage at `dir`.
@@ -183,7 +168,7 @@ mod tests {
 
     #[test]
     fn default_vault_dir_is_under_a_personae_directory() {
-        let dir = default_vault_dir();
+        let dir = personae::default_vault_dir();
         assert!(dir.ends_with("personae/vault") || dir.ends_with(r"personae\vault"));
     }
 }

@@ -50,6 +50,36 @@ impl RetainedKeys {
         })
     }
 
+    /// Rebuild a release received from a custodian (dramatis repo plan,
+    /// D11): each salt with the derived keypair and the custodian's
+    /// attestation for it. Every attestation must check under its salt,
+    /// name `master`, and name the keypair it came with, so a release that
+    /// mixes keys or masters is refused rather than trusted.
+    pub fn from_released(
+        master: Ed25519PublicKey,
+        released: impl IntoIterator<Item = (Vec<u8>, Ed25519Keypair, DerivedKeyAttestation)>,
+    ) -> Result<Self, IdentityError> {
+        let mut keys = Vec::new();
+        for (salt, keypair, attestation) in released {
+            let checked = attestation.check(&salt).map_err(|error| {
+                IdentityError::DerivationFailed(format!("released key attestation: {error:?}"))
+            })?;
+            if checked.master() != &master.to_bytes()
+                || checked.derived() != &keypair.public_key().to_bytes()
+            {
+                return Err(IdentityError::DerivationFailed(
+                    "a released key does not belong to the released master".into(),
+                ));
+            }
+            keys.push(RetainedKey {
+                salt,
+                keypair,
+                attestation,
+            });
+        }
+        Ok(Self { master, keys })
+    }
+
     /// Whether this holds exactly `salts`, in order.
     pub fn holds(&self, salts: &[Vec<u8>]) -> bool {
         self.keys.len() == salts.len() && self.keys.iter().zip(salts).all(|(k, s)| k.salt == *s)

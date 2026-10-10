@@ -53,12 +53,10 @@ Implemented:
   callers, and delegates every operation to a host policy over bus credentials
   and `/proc` executable identity. A `secret-tool` store/lookup/clear receipt
   runs under a disposable session bus.
-- `reticulum` — the first device-identity issue seam: a radio credential
-  derived from a Persona provider, no device-local account file.
+- The Reticulum station derivation that began here is `personae::reticulum`
+  now, and the station grant policy `pandect::station_grant` (DR-C, D17).
 - feature `keeper` — the two halves made real, moved home from graphshell
-  where they first grew: `view` (the secret-free read model), `projection`
-  (the cards and typed intents: signing decisions, SSH generate/import/
-  remove, device revoke, persona switch, persona create), and `authority`
+  where they first grew: `view` (the secret-free read model) and `authority`
   (`PersonaeHost`, the resident keeper that holds the vault, serves the SSH
   agent, and brokers approvals).
 

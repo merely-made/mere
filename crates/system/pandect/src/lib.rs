@@ -112,6 +112,8 @@ pub mod notochord_policy_store;
 #[cfg(test)]
 mod resource_content_merge_tests;
 pub mod snapshot_merge;
+#[cfg(not(target_arch = "wasm32"))]
+pub mod station_grant;
 // The frame.json pane-layout store moved OUT with the pane model at
 // meerkat's deletion (2026-07-18): it lives in turnstone's `frisket::store`
 // now — the pane-coupled half of this crate, split exactly as the
