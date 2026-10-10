@@ -10540,7 +10540,7 @@ dependencies = [
 [[package]]
 name = "netrender-vello"
 version = "0.10.1"
-source = "git+https://github.com/mark-ik/vello.git?rev=865cbf419668a6fb5b5e96ea54eaaf9be160fd92#865cbf419668a6fb5b5e96ea54eaaf9be160fd92"
+source = "git+https://github.com/mark-ik/vello.git?rev=491c376cf2b01fc11132cf8f86419dec114ae032#491c376cf2b01fc11132cf8f86419dec114ae032"
 dependencies = [
  "bytemuck",
  "futures-intrusive",
@@ -10550,7 +10550,7 @@ dependencies = [
  "skrifa 0.44.0",
  "static_assertions",
  "thiserror 2.0.21",
- "vello_encoding 0.10.0 (git+https://github.com/mark-ik/vello.git?rev=865cbf419668a6fb5b5e96ea54eaaf9be160fd92)",
+ "vello_encoding 0.10.0 (git+https://github.com/mark-ik/vello.git?rev=491c376cf2b01fc11132cf8f86419dec114ae032)",
  "vello_shaders",
  "wgpu",
 ]
@@ -16495,6 +16495,7 @@ dependencies = [
  "cambium-genet-winit-host",
  "cambium-rootstock",
  "genet-livery",
+ "genet-render-host",
  "genet-scripted-dom",
  "inker",
  "layout-dom-api 0.1.1 (git+https://github.com/merely-made/genet.git?rev=7422e90613f9017e5bb790e3acb48f61776b2eda)",
@@ -17787,7 +17788,7 @@ dependencies = [
 [[package]]
 name = "vello_encoding"
 version = "0.10.0"
-source = "git+https://github.com/mark-ik/vello.git?rev=865cbf419668a6fb5b5e96ea54eaaf9be160fd92#865cbf419668a6fb5b5e96ea54eaaf9be160fd92"
+source = "git+https://github.com/mark-ik/vello.git?rev=491c376cf2b01fc11132cf8f86419dec114ae032#491c376cf2b01fc11132cf8f86419dec114ae032"
 dependencies = [
  "bytemuck",
  "guillotiere",
@@ -17799,13 +17800,13 @@ dependencies = [
 [[package]]
 name = "vello_shaders"
 version = "0.10.0"
-source = "git+https://github.com/mark-ik/vello.git?rev=865cbf419668a6fb5b5e96ea54eaaf9be160fd92#865cbf419668a6fb5b5e96ea54eaaf9be160fd92"
+source = "git+https://github.com/mark-ik/vello.git?rev=491c376cf2b01fc11132cf8f86419dec114ae032#491c376cf2b01fc11132cf8f86419dec114ae032"
 dependencies = [
  "bytemuck",
  "log",
  "naga",
  "thiserror 2.0.21",
- "vello_encoding 0.10.0 (git+https://github.com/mark-ik/vello.git?rev=865cbf419668a6fb5b5e96ea54eaaf9be160fd92)",
+ "vello_encoding 0.10.0 (git+https://github.com/mark-ik/vello.git?rev=491c376cf2b01fc11132cf8f86419dec114ae032)",
 ]
 
 [[package]]
