@@ -30,6 +30,14 @@ retains commands, source/bundle hashes, captures and superseded failures.
 The coordinated GPU slot is released. Control density and small glyphs remain
 usability work; native S5, saved-scene integration and the live site's viewer
 replacement remain separate work.
+**Post-qualification main sync (2026-10-10):** published main `35ad305af`
+advanced during the first push. Its Dramatis/custody migration and kernel
+component-copy repair are combined, with the standalone web root aligned at
+`7d78b9960`. The 254 scene and 141 affected CPU tests and both Wasm gates are
+renewed. Renderer and directly recorded hosted-viewer inputs are unchanged;
+the headed receipts retain their exact `8b8bd92b1` source and tested bundle.
+The post-Dramatis bundle is compile-checked, with no new GPU run after slot
+release.
 **Scope:** Graphshell's browser page becomes one retained Cambium tree. Its
 HTML controls become Cambium components, its display-only Cambium chrome
 joins them, pictograph's canvas renders into the tree as a texture producer,
@@ -695,6 +703,20 @@ transfers DOM focus into the graph before traversal returns to the controls.
 - No Graphshell-only UI pieces. What Cambium lacks is added to Cambium.
 
 ## 6. Progress
+
+- **2026-10-10 — concurrent Dramatis publication combined before main push:**
+  the qualified branch push succeeded, while main correctly rejected a stale
+  fast-forward after `35ad305af` published. Integrated that migration without
+  conflicts. DR-D moves identity packages to published Dramatis `c1d62076`;
+  the separate web root needs the root's Muniment patch and a renewed lock,
+  removing unused password-custody packages (`7d78b9960`). A cold offline
+  cache initially lacked the new Knot pin; locked metadata fetched it before
+  successful offline checks. All 254 shared scene and 141 affected CPU tests,
+  both locked Wasm gates, portable metadata and headers pass again. The renderer,
+  Rootstock and directly recorded viewer/fold/history/gesture/framing sources,
+  fixtures and assets are unchanged. Headed/GPU results remain explicitly
+  qualified at `8b8bd92b1`; the new bundle is compile-checked. No GPU work was
+  launched after releasing the slot. The receipt distinguishes these bases.
 
 - **2026-10-10 — combined Fold/viewer acceptance closed for main landing:**
   integrated the published image-atlas repair (Mere `3808c5a22`, Vello
