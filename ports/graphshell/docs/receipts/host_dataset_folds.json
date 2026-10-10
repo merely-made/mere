@@ -1,9 +1,9 @@
 {
   "schema": "graphshell.host-dataset-fold-receipt/v1",
-  "recorded_at": "2026-10-10T11:04:32.194265+00:00",
+  "recorded_at": "2026-10-10T11:16:58.724924+00:00",
   "qualification_status": "passed_combined_viewer_acceptance",
   "qualification_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e",
-  "check_source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e",
+  "check_source_base": "7d78b9960e24ef8a4295cec29d427c059c9dcaa6",
   "contract": "R161: membership becomes sceno::Fold facts, without scenomise::grouping. R162: committed site cutover and current appearance work combined, with owner WIP untouched.",
   "fold_semantics": {
     "membership": "Explicit parent-to-member forest; never inferred from dependencies.",
@@ -31,11 +31,11 @@
           "-j2"
         ],
         "exit_code": 0,
-        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/published-dynamics-0a3203f05/final-host.log",
-        "source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e",
+        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/dramatis-sync-35ad305af/final-host.log",
+        "source_base": "7d78b9960e24ef8a4295cec29d427c059c9dcaa6",
         "log_digest": {
-          "bytes": 38325,
-          "sha256": "2d378bd11abbfc89555b692dad512c7ddfcfd2f0e34da5d2c1f3e63a87d8c8bc"
+          "bytes": 32032,
+          "sha256": "f7fde238329c500205a7abeb89e8b5c41ab03b36c8ef8ef4577da1e77ee55ad3"
         },
         "passed": 22
       },
@@ -56,11 +56,11 @@
           "-j2"
         ],
         "exit_code": 0,
-        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/published-dynamics-0a3203f05/final-gestures.log",
-        "source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e",
+        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/dramatis-sync-35ad305af/final-gestures.log",
+        "source_base": "7d78b9960e24ef8a4295cec29d427c059c9dcaa6",
         "log_digest": {
-          "bytes": 35653,
-          "sha256": "8d0d05c9a7fc6e2b0c54295c5baf62a7ae3019e9f9fa2d9e4f0d87b768d553bc"
+          "bytes": 28612,
+          "sha256": "e3617140f7bedb0b255cf80894d8be1f4429a320ac2cf2278e277f9c7f0a36e2"
         },
         "passed": 6
       },
@@ -81,11 +81,11 @@
           "-j2"
         ],
         "exit_code": 0,
-        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/published-dynamics-0a3203f05/final-framing.log",
-        "source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e",
+        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/dramatis-sync-35ad305af/final-framing.log",
+        "source_base": "7d78b9960e24ef8a4295cec29d427c059c9dcaa6",
         "log_digest": {
-          "bytes": 8813,
-          "sha256": "31eaa2e53024e4ad3e3cf1397f3a5338ff43a2c5b6dabdaecc7f98a2aa391d9e"
+          "bytes": 8588,
+          "sha256": "641cb39fd3b9dc43cd0d470eeb9eaf94c197df61c1aca6689f066978cdeba418"
         },
         "passed": 6
       },
@@ -105,11 +105,11 @@
           "producer::tests::gpu_"
         ],
         "exit_code": 0,
-        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/published-dynamics-0a3203f05/final-rootstock-cpu.log",
-        "source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e",
+        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/dramatis-sync-35ad305af/final-rootstock-cpu.log",
+        "source_base": "7d78b9960e24ef8a4295cec29d427c059c9dcaa6",
         "log_digest": {
           "bytes": 6425,
-          "sha256": "66b4e8ea5185dc2a01736b292e3cc55181dc7e457055d79b8a15d750bb827b5a"
+          "sha256": "e1ffce1cd5af6892ab89ff93678b8a91281540a4a441670560873a9704013c81"
         },
         "passed": 67
       },
@@ -126,11 +126,11 @@
           "-j2"
         ],
         "exit_code": 0,
-        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/published-dynamics-0a3203f05/final-mesquite.log",
-        "source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e",
+        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/dramatis-sync-35ad305af/final-mesquite.log",
+        "source_base": "7d78b9960e24ef8a4295cec29d427c059c9dcaa6",
         "log_digest": {
           "bytes": 3188,
-          "sha256": "0230402e765aea48026778c4a404213992476086ebcedb6fb5ce26d1a0417675"
+          "sha256": "84fba1bf3b0be47eae263866e7c4ddeb9bbd9170b36a92c32ebb79c6d51d76c3"
         },
         "passed": 27
       },
@@ -151,11 +151,11 @@
           "-j2"
         ],
         "exit_code": 0,
-        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/published-dynamics-0a3203f05/final-legacy-controls.log",
-        "source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e",
+        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/dramatis-sync-35ad305af/final-legacy-controls.log",
+        "source_base": "7d78b9960e24ef8a4295cec29d427c059c9dcaa6",
         "log_digest": {
-          "bytes": 35262,
-          "sha256": "0157abf7c638736f3f9cbdc5a508adac8af334185cc38b5f3f6e74e40902be16"
+          "bytes": 28221,
+          "sha256": "6d59a33d31c4958139d478d185171206b26245d0378bfb52ec80d789d91008df"
         },
         "passed": 1
       },
@@ -176,11 +176,11 @@
           "-j2"
         ],
         "exit_code": 0,
-        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/published-dynamics-0a3203f05/final-capsule.log",
-        "source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e",
+        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/dramatis-sync-35ad305af/final-capsule.log",
+        "source_base": "7d78b9960e24ef8a4295cec29d427c059c9dcaa6",
         "log_digest": {
-          "bytes": 35914,
-          "sha256": "3a120a0f32ed9181738b83e7fc081bcafcbf1a32123b7f8c063aaf0b7eb28cf3"
+          "bytes": 29087,
+          "sha256": "0ca35a14c29bf75c624fc6682be1f896ed16d6f81a7734478b8ebc4badc9fdc8"
         },
         "passed": 6
       },
@@ -201,11 +201,11 @@
           "-j2"
         ],
         "exit_code": 0,
-        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/published-dynamics-0a3203f05/final-appearance.log",
-        "source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e",
+        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/dramatis-sync-35ad305af/final-appearance.log",
+        "source_base": "7d78b9960e24ef8a4295cec29d427c059c9dcaa6",
         "log_digest": {
-          "bytes": 35923,
-          "sha256": "9ae535ab7141310b5b8512131545b8b47d1a085af2628dee93f31abf2733c9f5"
+          "bytes": 28726,
+          "sha256": "6c2e1cd0fdb4577e962d34219358a3bb72b2a84f831e00e1de8bb5ef99904b6e"
         },
         "passed": 6
       }
@@ -213,13 +213,13 @@
     "shared_scene": {
       "passed": 254,
       "fold_cases": 10,
-      "log": "/Users/markik/Code/output/nested-graph-folds-20261009/published-dynamics-0a3203f05/final-scene.log",
+      "log": "/Users/markik/Code/output/nested-graph-folds-20261009/dramatis-sync-35ad305af/final-scene.log",
       "digest": {
-        "bytes": 21597,
-        "sha256": "0389930a8044c0ead2c48faab7997d4f6a177aa7d91b10155129342b521562f0"
+        "bytes": 21362,
+        "sha256": "b38b6ef4efa9c4a5ba14bd86c5217d23a5e0aeb5c22fe5ea6fbd9990e3d6dd31"
       },
-      "source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e",
-      "inputs": "Renewed after the published dynamics merge; all shared scene tests pass on the combined source."
+      "source_base": "7d78b9960e24ef8a4295cec29d427c059c9dcaa6",
+      "inputs": "Renewed after the published Dramatis/custody and graph-kernel component-copy merge."
     },
     "exporter": {
       "passed": 4,
@@ -243,11 +243,11 @@
           "-j2"
         ],
         "exit_code": 0,
-        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/published-dynamics-0a3203f05/final-viewer.log",
-        "source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e",
+        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/dramatis-sync-35ad305af/final-viewer.log",
+        "source_base": "7d78b9960e24ef8a4295cec29d427c059c9dcaa6",
         "log_digest": {
-          "bytes": 27880,
-          "sha256": "7d812fbdf3ebdf5d64032337156c6f8459cda19a1203cfead181e47583489edb"
+          "bytes": 19441,
+          "sha256": "1be98ceec2334eb07fc67da562c6268084f7dc190c7295c97897e65e655c1065"
         }
       },
       {
@@ -265,25 +265,25 @@
           "-j2"
         ],
         "exit_code": 0,
-        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/published-dynamics-0a3203f05/final-main-applets.log",
-        "source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e",
+        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/dramatis-sync-35ad305af/final-main-applets.log",
+        "source_base": "7d78b9960e24ef8a4295cec29d427c059c9dcaa6",
         "log_digest": {
-          "bytes": 22452,
-          "sha256": "a5c29b336ca405481c250b28b4fb07d7f27fd4d6eade0384a86c8ddd148cd18d"
+          "bytes": 14279,
+          "sha256": "7f476812596a449b75e4f750eb4899f519e1cc665e76d370823f758eadf38bc1"
         }
       }
     ],
     "portable_lock": {
       "status": "passed_metadata_only",
-      "log": "/Users/markik/Code/output/nested-graph-folds-20261009/published-dynamics-0a3203f05/portable-lock.log",
+      "log": "/Users/markik/Code/output/nested-graph-folds-20261009/dramatis-sync-35ad305af/portable-lock.log",
       "digest": {
         "bytes": 191,
-        "sha256": "9d45b3684dc7489da17d33006153214eb5eb895907e5de9232d26716e646cda6"
+        "sha256": "1ebc72629681e681d9f21f693eb66d07f4ee30be00d8132cc84fa6c18d69a7c1"
       }
     },
     "owned_source_headers": {
       "status": "passed",
-      "log": "/Users/markik/Code/output/nested-graph-folds-20261009/published-dynamics-0a3203f05/headers.log",
+      "log": "/Users/markik/Code/output/nested-graph-folds-20261009/dramatis-sync-35ad305af/headers.log",
       "digest": {
         "bytes": 74,
         "sha256": "9d516eef67f2fe046f019a8daac16125696edb0699b57f63f648c7d1586e2054"
@@ -511,7 +511,262 @@
         "sha256": "88dbcddef9e31b3351d1e243db4f404f6374a114e72911d88e893020b326b4e6"
       },
       "boundary": "Whole-corpus audits retain baseline findings: four index orphans, 27 broken relative links, seven missing D2 records and nine D2 errors. These are not a clean full-doc-tree claim."
-    }
+    },
+    "previous_cpu_and_wasm": {
+      "cpu": [
+        {
+          "name": "host",
+          "command": [
+            "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+            "test",
+            "--locked",
+            "--offline",
+            "-p",
+            "graphshell",
+            "--no-default-features",
+            "--features",
+            "web",
+            "host_",
+            "--lib",
+            "-j2"
+          ],
+          "exit_code": 0,
+          "log": "/Users/markik/Code/output/nested-graph-folds-20261009/published-dynamics-0a3203f05/final-host.log",
+          "source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e",
+          "log_digest": {
+            "bytes": 38325,
+            "sha256": "2d378bd11abbfc89555b692dad512c7ddfcfd2f0e34da5d2c1f3e63a87d8c8bc"
+          },
+          "passed": 22
+        },
+        {
+          "name": "gestures",
+          "command": [
+            "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+            "test",
+            "--locked",
+            "--offline",
+            "-p",
+            "graphshell",
+            "--no-default-features",
+            "--features",
+            "web",
+            "canvas_gestures",
+            "--lib",
+            "-j2"
+          ],
+          "exit_code": 0,
+          "log": "/Users/markik/Code/output/nested-graph-folds-20261009/published-dynamics-0a3203f05/final-gestures.log",
+          "source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e",
+          "log_digest": {
+            "bytes": 35653,
+            "sha256": "8d0d05c9a7fc6e2b0c54295c5baf62a7ae3019e9f9fa2d9e4f0d87b768d553bc"
+          },
+          "passed": 6
+        },
+        {
+          "name": "framing",
+          "command": [
+            "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+            "test",
+            "--locked",
+            "--offline",
+            "-p",
+            "pictograph",
+            "--no-default-features",
+            "--features",
+            "canvas",
+            "canvas::tests::framing",
+            "--lib",
+            "-j2"
+          ],
+          "exit_code": 0,
+          "log": "/Users/markik/Code/output/nested-graph-folds-20261009/published-dynamics-0a3203f05/final-framing.log",
+          "source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e",
+          "log_digest": {
+            "bytes": 8813,
+            "sha256": "31eaa2e53024e4ad3e3cf1397f3a5338ff43a2c5b6dabdaecc7f98a2aa391d9e"
+          },
+          "passed": 6
+        },
+        {
+          "name": "rootstock-cpu",
+          "command": [
+            "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+            "test",
+            "--locked",
+            "--offline",
+            "-p",
+            "cambium-rootstock",
+            "--lib",
+            "-j2",
+            "--",
+            "--skip",
+            "producer::tests::gpu_"
+          ],
+          "exit_code": 0,
+          "log": "/Users/markik/Code/output/nested-graph-folds-20261009/published-dynamics-0a3203f05/final-rootstock-cpu.log",
+          "source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e",
+          "log_digest": {
+            "bytes": 6425,
+            "sha256": "66b4e8ea5185dc2a01736b292e3cc55181dc7e457055d79b8a15d750bb827b5a"
+          },
+          "passed": 67
+        },
+        {
+          "name": "mesquite",
+          "command": [
+            "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+            "test",
+            "--locked",
+            "--offline",
+            "-p",
+            "mesquite",
+            "--lib",
+            "-j2"
+          ],
+          "exit_code": 0,
+          "log": "/Users/markik/Code/output/nested-graph-folds-20261009/published-dynamics-0a3203f05/final-mesquite.log",
+          "source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e",
+          "log_digest": {
+            "bytes": 3188,
+            "sha256": "0230402e765aea48026778c4a404213992476086ebcedb6fb5ce26d1a0417675"
+          },
+          "passed": 27
+        },
+        {
+          "name": "legacy-controls",
+          "command": [
+            "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+            "test",
+            "--locked",
+            "--offline",
+            "-p",
+            "graphshell",
+            "--no-default-features",
+            "--features",
+            "web",
+            "canvas_controls",
+            "--lib",
+            "-j2"
+          ],
+          "exit_code": 0,
+          "log": "/Users/markik/Code/output/nested-graph-folds-20261009/published-dynamics-0a3203f05/final-legacy-controls.log",
+          "source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e",
+          "log_digest": {
+            "bytes": 35262,
+            "sha256": "0157abf7c638736f3f9cbdc5a508adac8af334185cc38b5f3f6e74e40902be16"
+          },
+          "passed": 1
+        },
+        {
+          "name": "capsule",
+          "command": [
+            "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+            "test",
+            "--locked",
+            "--offline",
+            "-p",
+            "graphshell",
+            "--no-default-features",
+            "--features",
+            "applets",
+            "capsule_applet",
+            "--lib",
+            "-j2"
+          ],
+          "exit_code": 0,
+          "log": "/Users/markik/Code/output/nested-graph-folds-20261009/published-dynamics-0a3203f05/final-capsule.log",
+          "source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e",
+          "log_digest": {
+            "bytes": 35914,
+            "sha256": "3a120a0f32ed9181738b83e7fc081bcafcbf1a32123b7f8c063aaf0b7eb28cf3"
+          },
+          "passed": 6
+        },
+        {
+          "name": "appearance",
+          "command": [
+            "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+            "test",
+            "--locked",
+            "--offline",
+            "-p",
+            "graphshell",
+            "--no-default-features",
+            "--features",
+            "web",
+            "appearance::tests",
+            "--lib",
+            "-j2"
+          ],
+          "exit_code": 0,
+          "log": "/Users/markik/Code/output/nested-graph-folds-20261009/published-dynamics-0a3203f05/final-appearance.log",
+          "source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e",
+          "log_digest": {
+            "bytes": 35923,
+            "sha256": "9ae535ab7141310b5b8512131545b8b47d1a085af2628dee93f31abf2733c9f5"
+          },
+          "passed": 6
+        }
+      ],
+      "shared_scene": {
+        "passed": 254,
+        "fold_cases": 10,
+        "log": "/Users/markik/Code/output/nested-graph-folds-20261009/published-dynamics-0a3203f05/final-scene.log",
+        "digest": {
+          "bytes": 21597,
+          "sha256": "0389930a8044c0ead2c48faab7997d4f6a177aa7d91b10155129342b521562f0"
+        },
+        "source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e",
+        "inputs": "Renewed after the published dynamics merge; all shared scene tests pass on the combined source."
+      },
+      "wasm": [
+        {
+          "name": "viewer",
+          "command": [
+            "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+            "build",
+            "--locked",
+            "--offline",
+            "--target",
+            "wasm32-unknown-unknown",
+            "--no-default-features",
+            "-j2"
+          ],
+          "exit_code": 0,
+          "log": "/Users/markik/Code/output/nested-graph-folds-20261009/published-dynamics-0a3203f05/final-viewer.log",
+          "source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e",
+          "log_digest": {
+            "bytes": 27880,
+            "sha256": "7d812fbdf3ebdf5d64032337156c6f8459cda19a1203cfead181e47583489edb"
+          }
+        },
+        {
+          "name": "main-applets",
+          "command": [
+            "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+            "check",
+            "--locked",
+            "--offline",
+            "--target",
+            "wasm32-unknown-unknown",
+            "--no-default-features",
+            "--features",
+            "main-page,applets",
+            "-j2"
+          ],
+          "exit_code": 0,
+          "log": "/Users/markik/Code/output/nested-graph-folds-20261009/published-dynamics-0a3203f05/final-main-applets.log",
+          "source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e",
+          "log_digest": {
+            "bytes": 22452,
+            "sha256": "a5c29b336ca405481c250b28b4fb07d7f27fd4d6eade0384a86c8ddd148cd18d"
+          }
+        }
+      ]
+    },
+    "gpu_producer_qualification_source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e"
   },
   "browser": {
     "current_source_status": "passed",
@@ -943,7 +1198,8 @@
       "narrow-visible-fit.png",
       "narrow-selection-fit.png",
       "plain-viewer.png"
-    ]
+    ],
+    "qualification_source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e"
   },
   "incident_audit": {
     "status": "Historical reset/device-loss evidence retained; the coordinator explicitly handed this lane the GPU slot after repaired renderer and native application qualification. Seven producer tests and combined headed Chrome receipts pass on the repaired source.",
@@ -1261,7 +1517,7 @@
     }
   },
   "local_evidence_root": "/Users/markik/Code/output/nested-graph-folds-20261009",
-  "boundary": "Combined portable Fold, site history and hosted viewer slice qualified for main landing on the default headed Radeon WebGPU adapter. Bounded 18-occurrence manifest fixture and two-checkpoint membership fixture plus fifteen site checkpoints. No full compiled Cargo closure, performance/release-size measurement, nested frame geometry, saved ambient persistence, native S5 acceptance or live-site cutover claim.",
+  "boundary": "Combined portable Fold, site history and hosted viewer slice qualified for main landing on the default headed Radeon WebGPU adapter. Bounded 18-occurrence manifest fixture and two-checkpoint membership fixture plus fifteen site checkpoints. No full compiled Cargo closure, performance/release-size measurement, nested frame geometry, saved ambient persistence, native S5 acceptance or live-site cutover claim. After published Dramatis/custody synchronization, the affected CPU/build gates are renewed at the post-qualification source base; the original headed source and bundle remain explicitly named. No fresh GPU execution is claimed after slot release.",
   "previous_checkpoint": {
     "qualification_base": "4c18d597d7849482362c5f79f96bf20ef8ac7c5c",
     "check_source_base": "5884b94a00ce907ca6ce4aa0f9a2eaca8b92f1f4"
@@ -1334,5 +1590,115 @@
     "own_server_stopped": 78996,
     "gpu_slot": "released",
     "recorded_utc": "2026-10-10T11:03:33.772343+00:00"
+  },
+  "post_qualification_sync": {
+    "published_main": "35ad305af",
+    "source_base": "7d78b9960e24ef8a4295cec29d427c059c9dcaa6",
+    "viewer_alignment": "7d78b9960",
+    "changes": "Dramatis identity crates move to published c1d62076; custody stays in its owning application ports. The graph-kernel component copy retains the resource stratum. The standalone web root adopts the root Muniment patch and resolves three identity packages from the published Dramatis revision, removing unused password-custody packages.",
+    "checks": "254 scene and 141 affected CPU tests renewed; viewer build and full main-page/applet Wasm check pass locked/offline. Metadata and header gates renewed.",
+    "retained_gpu_qualification": {
+      "source_base": "8b8bd92b1f3dbadef48011e963e114f1b2d75f8e",
+      "renderer": "10f01d6d",
+      "browser": {
+        "runs": [
+          "nested-groups",
+          "camera-recovery",
+          "flat-site",
+          "fold-history",
+          "fold-gestures",
+          "site-history",
+          "unknown-grouping"
+        ],
+        "keyboard": true,
+        "headed": true,
+        "width": 1440,
+        "height": 1000,
+        "browser": "152.0.7977.83",
+        "adapter": {
+          "vendor": "amd",
+          "architecture": "gcn-5",
+          "device": "",
+          "description": ""
+        }
+      },
+      "input_comparison": "/Users/markik/Code/output/nested-graph-folds-20261009/dramatis-sync-35ad305af/retained-gpu-inputs.json",
+      "digest": {
+        "bytes": 1027,
+        "sha256": "805cdd3fbe968ca1d17c83e88671d5fd63399895a8ab24364fe4ae415c4cf4bf"
+      },
+      "boundary": "The renderer and directly recorded viewer/fold/history/gesture/framing/Rootstock/Mesquite sources and fixtures are unchanged. Headed receipts and their generated bundle remain explicitly qualified at 8b8bd92b1. The post-Dramatis bundle was compiled, not rerun on GPU after the slot release."
+    },
+    "sources": {
+      "Cargo.toml": {
+        "bytes": 50659,
+        "sha256": "6bd11bf4f2207d3a58dabd574625acb39a97a33d893394381ea822099e3b7daa"
+      },
+      "Cargo.lock": {
+        "bytes": 464384,
+        "sha256": "4ebf73615c53acc55cde73813dd8269a9e66643bd3031aa86101b36850eee03f"
+      },
+      "ports/graphshell/Cargo.toml": {
+        "bytes": 13111,
+        "sha256": "60bb5cb57673940c2a7ff7d2465533729b0f87139860b17587c37377d4857346"
+      },
+      "ports/graphshell/web/Cargo.toml": {
+        "bytes": 11091,
+        "sha256": "6014dcecc7a39e03577e458db6dac31599c58053ab6cfd6c73665d289905c6e7"
+      },
+      "ports/graphshell/web/Cargo.lock": {
+        "bytes": 226205,
+        "sha256": "63088c6f4543cf5e06d10888f14a748d7856421e0077aebafebb2ff9b9c0788c"
+      },
+      "crates/graph/graph-kernel/src/graph/cross_graph.rs": {
+        "bytes": 24452,
+        "sha256": "a8c5f1d461ac3d979d7c84684c267d7a0a2edbe518b0f1d19c28852ceb22e520"
+      },
+      "crates/graph/graph-kernel/src/graph/query.rs": {
+        "bytes": 52269,
+        "sha256": "096b1cd2323541f862aba8e8025484d1b5264c70021c229d777d5397f8fa29e6"
+      }
+    },
+    "cold_cache_attempts": {
+      "cpu": "/Users/markik/Code/output/nested-graph-folds-20261009/dramatis-sync-35ad305af/cold-cache-cpu-checks.json",
+      "scene": "/Users/markik/Code/output/nested-graph-folds-20261009/dramatis-sync-35ad305af/cold-cache-scene-checks.json",
+      "reason": "The new published Knot revision was not cached offline. Locked metadata fetched it, then the offline checks passed; no tests ran in those initial attempts."
+    },
+    "documentation_delta": {
+      "status": "passed_no_added_findings",
+      "path": "/Users/markik/Code/output/nested-graph-folds-20261009/dramatis-sync-35ad305af/doc-audit-delta.json",
+      "digest": {
+        "bytes": 876,
+        "sha256": "c3e3296d5cea2c2e4bc348bf3fc65652f002e5149e8a718db13865b75b1588b0"
+      },
+      "existing_corpus_counts": {
+        "added_doc_findings": {},
+        "judgment_errors_unchanged": true,
+        "judgment_coverage_unchanged": true,
+        "existing_doc_counts": {
+          "active_docs": 258,
+          "indexed_active_docs": 255,
+          "index_orphans": 2,
+          "index_ghosts": 0,
+          "memory_directory_links": 0,
+          "statusless_plans": 0,
+          "broken_relative_links": 27,
+          "historical_broken_relative_links": 246,
+          "planned_broken_relative_links": 0,
+          "ambiguous_known_root_paths": 101,
+          "ignored_known_root_patterns": 19,
+          "reserved_identifier_paths": 24,
+          "missing_known_root_paths": 247,
+          "historical_missing_known_root_paths": 223,
+          "planned_missing_known_root_paths": 8,
+          "invalid_historical_annotations": 0,
+          "stale_historical_annotations": 0,
+          "unheaded_owned_sources": 0,
+          "exhibit_b_sources": 0
+        },
+        "existing_judgment_errors": 8,
+        "existing_missing_active_records": 6
+      }
+    }
   }
 }

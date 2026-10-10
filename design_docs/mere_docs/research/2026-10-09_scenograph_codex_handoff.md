@@ -195,6 +195,15 @@ records fresh source and bundle hashes, commands and capture paths, preserving
 superseded device-loss and harness failures as history. Browser and receipt
 server are stopped; the coordinated GPU slot is released.
 
+Main subsequently advanced to `35ad305af` during the push. Its published
+Dramatis/custody move and kernel component-copy repair are integrated, with
+the separate viewer root aligned at `7d78b9960`. The scene and affected CPU
+suites, both locked Wasm gates, metadata and header checks pass again. Renderer
+and directly recorded viewer/fold/history/gesture/framing inputs are unchanged.
+The receipt retains the headed source/bundle at `8b8bd92b1` and names the
+post-publication CPU/build source separately; no further GPU run is claimed
+after slot release.
+
 This acceptance does not close native S5, saved ambient scenes, full compiled
 Cargo closure or live-site adoption. R162's site owner continues those assigned
 viewer edits; its uncommitted docs/scenarios and the primary checkout's five
