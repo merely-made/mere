@@ -1,7 +1,7 @@
 # Dramatis Repo Plan
 
 **Date**: 2026-10-06
-**Status (2026-10-09)**: assessed; rulings D1 to D35 (§3). DR-A landed on 2026-10-09 (§6). Next, by D35: the vault lock's ruling 44, then DR-B, then ruling 91.
+**Status (2026-10-09)**: assessed; rulings D1 to D35 (§3). DR-A landed on 2026-10-09 (§6). Next, by D36: DR-B, DR-D, then DR-C on one branch with ruling 44 (built), and one test run at the end.
 D18's condition is met: the vault lock's L2 to L4 landed on 2026-10-08.
 DR-A's assessment is being refreshed against today's code before its
 forks are put to Mark (§6).
@@ -433,6 +433,18 @@ moves into castellan; DR-B's D8 also closes the pandect wallet gap (vault
 lock ruling 81).* Options: 44, then DR-B, then 91, so 91's loader is built
 once, in castellan; 44, then 91, then DR-B; DR-B next. Mark: **"44, then
 DR-B, then 91 (Recommended)"**.
+
+**Ruling D36** *(amends D35 and §4's order; asked 2026-10-09).* Mark first
+set the cadence: **"Test after completing the critical realignments."**
+Asked which realignments count (DR-B, DR-C, DR-D, ruling 91), he picked
+DR-D alone. That conflicts with D22, since personae still holds custody
+until DR-B, so its order was put back. Options: DR-B then DR-D; DR-D now
+with custody included; DR-D now with the leaf crates only. Mark: **"Dr-b,
+dr-d, dr-c, test"**. Follows:
+- DR-B, then DR-D, then DR-C, built on a local branch;
+- one combined test run at the end, before anything reaches main;
+- ruling 44, already built, rides the same branch;
+- ruling 91 is not in this batch.
 
 Still open: whether gazette gets a matching facade name over gaz, the way
 chatelaine is the keychain.
