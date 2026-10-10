@@ -32,6 +32,8 @@
 //! reads a v1 envelope as the one-revision case. [`parse_host_dataset`] and
 //! [`HostDatasetV1`] are unchanged.
 
+pub mod folds;
+
 use std::collections::HashSet;
 use std::fmt;
 

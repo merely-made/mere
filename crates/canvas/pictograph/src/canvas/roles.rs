@@ -49,6 +49,8 @@ pub(crate) struct ArrangementRoles {
     group_source: PhysicsKindSource,
     /// The anchored role's return stiffness ([`seiche::AnchorSpring`]).
     pub(crate) stiffness: f32,
+    /// Translation axes that the occurrence adapter binds directly to data.
+    pub(crate) encoded: seiche::Axes,
     /// Bodies the table holds kinematic, so a role change can free them.
     pinned: HashSet<NodeKey>,
     /// A pick made while playing resumes once its final placement lands.
@@ -72,6 +74,7 @@ impl Default for ArrangementRoles {
             table: RoleTable::default(),
             group_source: PhysicsKindSource::Site,
             stiffness: seiche::DEFAULT_ANCHOR_STIFFNESS,
+            encoded: seiche::Axes::NONE,
             pinned: HashSet::new(),
             resume_after_pick: false,
             settled: None,
@@ -317,6 +320,10 @@ impl Canvas {
             }
         }
         self.roles.pinned = pinned;
+        let held = if self.roles.encoded == seiche::Axes::BOTH {
+            seiche::Axes::NONE
+        } else { self.roles.encoded };
+        self.physics.set_axis_locks(self.view.positions().map(|(key, _)| (key, held)).collect());
         let force = (playing && !anchors.is_empty())
             .then(|| seiche::AnchorSpring::new(anchors).with_stiffness(self.roles.stiffness));
         self.physics.set_anchor_force(force);
@@ -496,14 +503,36 @@ impl Canvas {
         self.roles.rest.parked_count()
     }
 
+    pub(crate) fn returning_home(&self) -> bool {
+        self.roles.rest.gliding()
+    }
+
+    /// A fresh bounded recipe may begin already at rest (Still, empty or
+    /// fully pinned). Its first fixed tick must be eligible to record that.
+    pub(crate) fn arm_settle_detection(&mut self) {
+        self.roles.rest.arm();
+    }
+
     /// The frame's layout stage alone, without composing a scene: the
     /// physics snapshot, the paused placement, and the roles. For receipts
     /// that run thousands of frames.
-    #[cfg(test)]
     pub(crate) fn step_layout(&mut self) {
         self.physics.advance_frame(&mut self.view);
         self.apply_strategy_to_view();
         self.advance_roles();
+    }
+
+    /// A bounded preview cannot infer a position-writing kernel's rest from
+    /// body velocity. Explicit schedules still advance on every fixed tick.
+    pub(crate) fn step_dynamics_layout(&mut self, velocity_rest: bool) {
+        if velocity_rest {
+            self.step_layout();
+        } else {
+            self.physics.advance_frame(&mut self.view);
+            self.apply_strategy_to_view();
+            self.advance_home();
+            self.advance_schedule();
+        }
     }
 
     /// A placement applied while Settled is active is Settled's own (a

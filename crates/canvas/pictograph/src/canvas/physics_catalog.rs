@@ -1181,6 +1181,7 @@ impl Canvas {
 
     /// Whether the live law or an overlay keeps the graph moving on its own.
     pub fn physics_never_rests(&self) -> bool {
+        if self.roles.encoded == seiche::Axes::BOTH { return false; }
         let laws = self.physics_composition.as_ref().map_or_else(
             || vec![self.physics_law],
             crate::canvas::composition::PhysicsComposition::laws,
@@ -1207,6 +1208,14 @@ impl Canvas {
         #[cfg(test)]
         {
             self.law_rebuilds += 1;
+        }
+        if self.roles.encoded == seiche::Axes::BOTH {
+            // F28: two directly encoded axes admit contact separation only.
+            self.physics.set_forces(vec![Box::new(seiche::NodeExclusion {
+                cutoff: 2.0 * seiche::NODE_BODY_RADIUS,
+                ..Default::default()
+            })]);
+            return;
         }
         let wants_clusters = self.physics_reads(PhysicsKindSource::Cluster);
         if wants_clusters {

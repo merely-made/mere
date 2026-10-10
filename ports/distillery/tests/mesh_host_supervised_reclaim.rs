@@ -24,6 +24,7 @@ use std::time::Duration;
 use personae::{Ed25519Keypair, IdentityProvider, InMemoryProvider};
 use mesh::resources::DelayedResource;
 use mesh::spec::{DeterminismClass, JobSpec};
+use mesh::MESH_AUTHOR_SALT;
 use mesh::{
     DevicePolicy, HostFacts, JobId, JobState, LeasePhase, LeasePolicy, LeaseTerms, MemoryBlobSpace,
     MeshEvent, MeshStore, ReclaimReason, ResourceId, ResourceRegistry, SyncedMesh,
@@ -85,15 +86,19 @@ fn abstaining() -> DevicePolicy {
 async fn two_peers() -> (P2pandaTransport, P2pandaTransport) {
     let alice_provider = Arc::new(InMemoryProvider::from_seed([70; 32]));
     let bob_provider = Arc::new(InMemoryProvider::from_seed([71; 32]));
-    let alice_id = transport::PeerID::from_public_key(alice_provider.master_public_key());
-    let bob_id = transport::PeerID::from_public_key(bob_provider.master_public_key());
+    let alice_id = transport::PeerID::from_public_key(
+        alice_provider.derived_keypair(MESH_AUTHOR_SALT).unwrap().public_key(),
+    );
+    let bob_id = transport::PeerID::from_public_key(
+        bob_provider.derived_keypair(MESH_AUTHOR_SALT).unwrap().public_key(),
+    );
 
-    let alice = P2pandaTransport::builder(alice_provider.master_keypair())
+    let alice = P2pandaTransport::builder_for(&alice_provider.derived_keypair(MESH_AUTHOR_SALT).unwrap())
         .gossip()
         .bind()
         .await
         .expect("bind alice");
-    let bob = P2pandaTransport::builder(bob_provider.master_keypair())
+    let bob = P2pandaTransport::builder_for(&bob_provider.derived_keypair(MESH_AUTHOR_SALT).unwrap())
         .gossip()
         .bind()
         .await
