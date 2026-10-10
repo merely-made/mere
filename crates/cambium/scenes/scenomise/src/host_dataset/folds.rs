@@ -174,6 +174,10 @@ impl HostDatasetFolds {
         &self.instances
     }
 
+    pub fn membership_kind(&self) -> &str {
+        &self.kind
+    }
+
     pub fn groups(&self) -> impl Iterator<Item = &str> {
         self.children.keys().map(String::as_str)
     }
