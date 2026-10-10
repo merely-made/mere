@@ -10,7 +10,7 @@
 
 **Totals: 4 docs, 20 claims checked (20 holds, 0 stale, 0 unverifiable), 0 contradictions; 0 status lines wrong.**
 
-Audit base: Mere `df8b2ff5`, 2026-10-10. The implementing agent judged this
+Audit base: Mere `3d40d546`, 2026-10-10. The implementing agent judged this
 record; independent re-judgment can supersede it. Qualification receipts are
 distinguished from implementation, and pending gates remain explicit.
 
@@ -105,8 +105,10 @@ Complete the stated consumer qualification and preserve the ownership boundaries
 
 ### Notes
 
-Checked ruling commits, implementation commits, the upstream merge retaining
-Tabard's stylesheet, the newer Genet pin, six focused native tests, pre-integration
-browser receipts, paging without re-running settled cells, and R162's viewer
-ownership. Earlier pending questions and measurements have explicit superseding
-checkpoints. Final qualification is recorded separately when its gates finish.
+Checked ruling and implementation commits, the upstream merges retaining
+Tabard's stylesheet, Genet `7422e906` and Vello `491c376c`, six focused native
+tests, exact native/wasm fixture identity and both controls, the retained
+Pictograph timing failure and passing targeted rerun, and the browser receipts.
+Paging does not rerun settled cells; R162 still owns overlapping viewer files.
+Earlier questions and measurements have explicit superseding checkpoints.
+Firefox, B1/S2, the second consumer and the coordinator's review remain open.

@@ -40,8 +40,9 @@ F200 to F202 are recorded verbatim in the dynamics grammar plan, committed
 as `38cdebca`. The carrier, fixed-step runner, occurrence adapter and dynamics
 matrix are committed as `e2543cee`; `40aac7fc` integrates upstream Mere
 `6183006b`, preserving Tabard's host stylesheet alongside live dynamics.
-That integration also adopts upstream's Genet `7422e906` pin. Its qualification
-is being recomputed rather than inherited from the older draft receipts.
+That integration also adopts upstream's Genet `7422e906` pin. The subsequent
+`601b6dd1` merge adopts Vello `491c376c`; `3d40d546` adds the upstream workshop
+header and appearance receipts without moving the qualified physics sources.
 
 - Direct coordinate and embedding families hold their encoded data axes;
   Timeline holds its continuous x position. Grid ranks, ordering, layers,
@@ -60,9 +61,51 @@ is being recomputed rather than inherited from the older draft receipts.
   standalone Chrome at 1037×583. These receipts precede the final stylesheet,
   refusal-card and newer-Genet qualification. Firefox remains open.
 
-The full native Graphshell web library now passes on Genet `7422e906`:
-194 passed, 5 ignored. Upstream `4e181157` also carries Vello `491c376c`;
-the final browser package and fixture identity gate will qualify that graph.
+**Native and identity qualification:** the full native Graphshell web library
+passes on Genet `7422e906` (194 passed, 5 ignored, before the final caption
+changes). The six comparison tests pass after `72ce892d`, including the live
+working-state label and unchanged snapshot states. Scenograph passes 16,
+Scenomise 157, and Seiche 159 (10 ignored). Pictograph's full single-thread run
+passes 381 with 18 ignored and one frame-timing failure under concurrent build
+load. That speed test passes its targeted rerun with the original tolerance;
+the loaded run is retained as `dynamics-pictograph-loaded-run.txt`.
+
+`Code/testing/mere/scenograph-editor/receipts/dynamics-identity-ruled.json`
+records all twelve presets twice per target at 0, 59, 60 and 4,000 steps:
+native and Node wasm agree exactly, including float words and stop results.
+Six laws change positions between 59 and 60 (the control). The direct-coordinate
+probe agrees across targets and keeps its coordinates at 0 and 60. The receipt
+names source `72ce892d`, both lock hashes, source and binary hashes, and Node
+24.11.0; covered source stayed unchanged during the run. Its covered hashes
+also match after the presentation-only `34539624` contrast correction, which
+uses the existing on-tertiary theme role for selected captions. The final wasm
+host builds on Genet `7422e906` and Vello `491c376c`. This supersedes the older
+identity measurements below. Measured wasm runs average 3.85 s at 60 and
+42.27 s at 4,000, including startup and concurrent system load; these are
+three-occurrence fixture receipts, not a large-scene performance claim.
+
+**Browser qualification:** the final 48-step scenario passes over 77 frames
+with four captures in standalone Chrome at 1037×639 and the in-app Chromium
+browser at 520×604 and 1440×900, with no errors or gate failures. The whole
+captures were inspected: paging leaves captions readable, capped snapshots
+say "Step limit reached", refusal cards name the missing input adapter, and
+the applied working frame is brought into view with its current live state.
+The selected captions now use the existing on-tertiary role; all six native
+appearance tests pass after that correction. Final browser receipt names are
+`chrome_dynamics-contrast-chrome-scenario-receipt.json`,
+`chrome_dynamics-contrast-narrow-scenario-receipt.json`, and
+`chrome_dynamics-contrast-desktop-scenario-receipt.json` in the receipts folder.
+`dynamics-qualification.json` records their hashes, the browser package and
+scenario hashes, source bases, the native results and the unchanged physics
+source control. Firefox is unavailable in this session's browser control
+inventory and retains its separate qualification gate. S1's final acceptance
+and the physics coordinator's review remain open.
+
+**Cleanup:** the receipt server is stopped, the temporary Node bindings are
+removed, and the viewport override is reset. Receipts and the reproducible
+probe remain in the existing testing directory. No isolated target, Cargo home
+or worktree was created. The shared `C:/t/cargo-targets/mere` target and browser
+package are retained for Mere's ongoing work and the open Firefox gate.
 
 B1/S2 continue through the viewer owner assigned by site R162. The concrete
 next slices are: B1's three-mode control, backdrop drawing, tangible obstacle
@@ -126,7 +169,7 @@ holds work in its touched viewer files. Reconcile these active owners and source
 baselines before resuming overlapping viewer edits; this doc refresh does not
 lift that hold or assign Moot's work to this lane.
 
-## Where things are
+## Historical draft checkpoint, 2026-10-09
 
 **Codex checkpoint (2026-10-09, implementation draft):** SE88 names the UI
 concept "appearance part"; SE89 gives every occurrence a separate transient
