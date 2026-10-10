@@ -297,6 +297,9 @@ impl MutationRouter {
                 DomMutation::AttributeChanged { node, .. }
                 | DomMutation::CharacterDataChanged { node }
                 | DomMutation::FormControlStateChanged { node }
+                | DomMutation::FormControlInteractionStateChanged { node }
+                | DomMutation::OptionStateChanged { node }
+                | DomMutation::FormControlCustomValidityChanged { node }
                 | DomMutation::SubtreeReplaced { node } => vec![*node],
                 DomMutation::Moved {
                     from_parent,
