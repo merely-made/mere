@@ -31,6 +31,10 @@ pub enum MurmError {
     #[error(transparent)]
     ConversationStore(#[from] crate::ConversationStoreError),
 
+    /// Retained causal metadata cannot form a legal projection.
+    #[error(transparent)]
+    Causality(#[from] stickleback::CausalError),
+
     /// A key epoch was missing or installed out of order.
     #[error(transparent)]
     Keyring(#[from] crate::CabalKeyringError),

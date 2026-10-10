@@ -273,9 +273,18 @@ impl CabalHandle {
         self.engine.get_post(self.cabal_id.as_bytes(), post_id)
     }
 
-    /// All posts in a channel, in insertion order.
+    /// Legacy materialized channel history, ordered by asserted time and post id.
+    /// Use [`Self::causal_history`] for a causally ordered application read.
     pub fn history(&self, channel: &str) -> Vec<Post> {
         self.engine.history(self.cabal_id.as_bytes(), channel)
+    }
+
+    /// A causally complete read over retained headers and available bodies.
+    /// Reports missing history separately; never grants access or removes data.
+    pub async fn causal_history(&self, channel: &str) -> Result<crate::CabalHistory, MurmError> {
+        self.engine
+            .causal_history(self.cabal_id.as_bytes(), channel)
+            .await
     }
 
     /// Fold signed Join/Leave posts into the channel's current audience.

@@ -34,6 +34,18 @@ pub struct ConversationRefresh {
     pub removed: u64,
 }
 
+/// One channel's retained, causally complete read. This is a projection, not
+/// admission or deletion policy; the legacy timestamp-based history is separate.
+#[derive(Clone, Debug, Default)]
+pub struct CabalHistory {
+    /// Materializable channel posts in deterministic causal order.
+    pub posts: Vec<Post>,
+    /// Blocked operations across the cabal, including cross-channel ancestors.
+    pub pending: Vec<stickleback::PendingCausalOperation>,
+    /// Complete channel headers whose content body is no longer retained.
+    pub unavailable_payloads: usize,
+}
+
 /// Murm's native conversation runtime.
 ///
 /// Signed-post grammar, storage, admission, materialized history, and
@@ -485,6 +497,47 @@ impl ConversationEngine {
                 .then_with(|| left_id.cmp(right_id))
         });
         posts.into_iter().map(|(_, post)| post).collect()
+    }
+
+    /// Read causal order from every retained header before selecting a channel.
+    /// Missing payloads do not erase causal witnesses; missing headers withhold
+    /// their dependent tail. This read does not mutate the retained store.
+    pub async fn causal_history(
+        &self,
+        conversation_id: &[u8; 32],
+        channel: &str,
+    ) -> Result<CabalHistory, MurmError> {
+        ChannelName::try_new(channel)?;
+        let session = self.session(conversation_id)?;
+        let _ingest = session.ingest.lock().await;
+        let operations = session.store.operations().await?;
+        let entries: Vec<_> = operations
+            .iter()
+            .map(|operation| {
+                stickleback::CausalEntry::from_operation(
+                    operation,
+                    0u64,
+                    operation.header.extensions.parents.clone(),
+                )
+            })
+            .collect();
+        let causal = stickleback::causal_projection(&entries)?;
+        let mut history = CabalHistory {
+            pending: causal.pending,
+            ..Default::default()
+        };
+        for index in causal.order {
+            let operation = &operations[index];
+            if operation.header.extensions.channel != channel {
+                continue;
+            }
+            if Self::materializable(operation) {
+                history.posts.push(operation_to_post(operation)?);
+            } else {
+                history.unavailable_payloads += 1;
+            }
+        }
+        Ok(history)
     }
 
     /// Subscribe to newly materialized posts.
