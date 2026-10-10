@@ -13,6 +13,27 @@ The work order below stands. The [ambiance proposal](../design/2026-09-23_ambian
 and [app composition reconciliation](../../cambium_docs/research/2026-10-06_app_composition_brief.md#11-current-consumers-and-design-direction-2026-10-09)
 carry the wider site and cross-app context; neither is a receipt for these tracks.
 
+**Voice continuation (2026-10-09):** [design language §9.8](../../2026-08-23_projection_scenes_and_graph_native_platform.md#98-voice-clarifications-and-research-boundaries-2026-10-09)
+clarifies that deselection preserves edits, welcomes hover previews, expands
+fields toward scoped projections and entry-triggered behavior, calls for
+granular configurable font roles and meaningful visible dynamics, and records
+the need to compose theme values with semantic channels. Owner plans carry
+research inputs and candidate proofs. Existing work order, R160 and viewer
+ownership holds stand; this is not qualification of the shared checkout's
+concurrent dynamics implementation. The subsequent [primitive planning
+direction, §9.9](../../2026-08-23_projection_scenes_and_graph_native_platform.md#99-plan-through-graph-primitives-2026-10-09)
+asks for nodes, links and fields to be inspectable/configurable and connected
+to dynamics. Graphshell is the reference host; the proposed terminology needs
+reconciliation before a new proof is opened.
+
+**Planning continuation (2026-10-09):** the editor plan's
+[primitive and dynamics map](../implementation_strategy/2026-10-07_scenograph_editor_plan.md#primitive-and-dynamics-map-2026-10-09-source-backed-planning)
+maps existing surface/Resource, relation and field/coupling identities to
+authoring controls and dynamics. It records source gaps and proposed
+done-conditions without taking over the active dynamics implementation or
+opening a new track. The field plan corrects the earlier assumption that a
+coupling selector already means membership in the field's extent.
+
 ## The work, in order
 
 1. **The dynamics slot** (dynamics grammar plan, `mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md`, F192 to F195; asked for by the Scenograph plan's SE69).
