@@ -17,7 +17,9 @@ use cambium::{
     tab_drop_index, tab_target,
 };
 use genet_livery::{Device, LiveryDocument, StyleSet};
-use genet_render::{A11yStyleQueries, accesskit_tree_with_style};
+use genet_render::{
+    A11yStyleQueries, accesskit_tree_from_projection, document_a11y_projection_with_style,
+};
 use genet_scripted_dom::{NodeId, ScriptedDom};
 use layout_dom_api::{LayoutDom, LocalName, Namespace};
 use pelt_core::WorkspaceRect;
@@ -314,6 +316,9 @@ pub(crate) enum ChromeAction {
     ToggleInspector,
     ToggleAppearance,
     ChooseTheme(AppearanceTheme),
+    ChooseSavedTheme(usize),
+    ChooseThemeMode(usize),
+    EditThemes,
     /// CSD caption verbs. Present only when the host asked the chrome to
     /// draw window controls (an undecorated Windows workspace window).
     Minimize,
@@ -390,10 +395,29 @@ fn engine_choice_view(choice: ChromeEngineChoice, selected: bool) -> FrameView {
 
 /// Pelt-owned appearance controls. The selection is intentionally kept
 /// separate from document engine themes and Tabard's preview-only palette.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub(crate) struct ChromeAppearance {
     pub theme: AppearanceTheme,
+    pub builtin_selected: bool,
     pub persistent: bool,
+    pub saved_themes: Vec<(String, bool)>,
+    pub modes: Vec<(String, bool)>,
+    pub editor_available: bool,
+    pub notice: Option<String>,
+}
+
+impl ChromeAppearance {
+    pub fn basic(theme: AppearanceTheme, persistent: bool) -> Self {
+        Self {
+            theme,
+            builtin_selected: true,
+            persistent,
+            saved_themes: Vec::new(),
+            modes: Vec::new(),
+            editor_available: false,
+            notice: None,
+        }
+    }
 }
 
 fn appearance_choice_view(theme: AppearanceTheme, selected: bool) -> FrameView {
@@ -416,9 +440,14 @@ fn appearance_choice_view(theme: AppearanceTheme, selected: bool) -> FrameView {
 fn appearance_view(appearance: &ChromeAppearance) -> FrameView {
     let options = [AppearanceTheme::Dark, AppearanceTheme::Light]
         .into_iter()
-        .map(|theme| appearance_choice_view(theme, appearance.theme == theme))
+        .map(|theme| {
+            appearance_choice_view(
+                theme,
+                appearance.builtin_selected && appearance.theme == theme,
+            )
+        })
         .collect::<Vec<_>>();
-    let rows: Vec<FrameView> = vec![
+    let mut rows: Vec<FrameView> = vec![
         Box::new(
             el::<_, FrameState, ()>("div", "Appearance").attr("class", "pelt-appearance-heading"),
         ),
@@ -447,6 +476,69 @@ fn appearance_view(appearance: &ChromeAppearance) -> FrameView {
                 .attr("class", "pelt-appearance-note"),
         ),
     ];
+    for (index, (name, selected)) in appearance.saved_themes.iter().enumerate() {
+        rows.push(Box::new(
+            el::<_, FrameState, ()>("div", name.clone())
+                .attr(
+                    "class",
+                    if *selected {
+                        "pelt-appearance-option pelt-appearance-option-selected pelt-saved-theme"
+                    } else {
+                        "pelt-appearance-option pelt-saved-theme"
+                    },
+                )
+                .attr("role", "radio")
+                .attr("aria-label", format!("Use theme {name}"))
+                .attr("aria-checked", if *selected { "true" } else { "false" })
+                .attr(ATTR_CHROME_ACTION, format!("appearance-saved-{index}")),
+        ));
+    }
+    if !appearance.modes.is_empty() {
+        rows.push(Box::new(
+            el::<_, FrameState, ()>("div", "Mode").attr("class", "pelt-appearance-label"),
+        ));
+        let modes = appearance
+            .modes
+            .iter()
+            .enumerate()
+            .map(|(index, (name, selected))| {
+                Box::new(
+                    el::<_, FrameState, ()>("div", name.clone())
+                        .attr(
+                            "class",
+                            if *selected {
+                                "pelt-appearance-option pelt-appearance-option-selected"
+                            } else {
+                                "pelt-appearance-option"
+                            },
+                        )
+                        .attr("role", "radio")
+                        .attr("aria-label", format!("Theme mode {name}"))
+                        .attr("aria-checked", if *selected { "true" } else { "false" })
+                        .attr(ATTR_CHROME_ACTION, format!("appearance-mode-{index}")),
+                ) as FrameView
+            })
+            .collect::<Vec<_>>();
+        rows.push(Box::new(
+            el::<_, FrameState, ()>("div", modes).attr("class", "pelt-appearance-modes"),
+        ));
+    }
+    if appearance.editor_available {
+        rows.push(Box::new(
+            el::<_, FrameState, ()>("div", "Edit themes…")
+                .attr("class", "pelt-appearance-option pelt-theme-editor")
+                .attr("role", "button")
+                .attr("aria-label", "Edit themes")
+                .attr(ATTR_CHROME_ACTION, "edit-themes"),
+        ));
+    }
+    if let Some(notice) = &appearance.notice {
+        rows.push(Box::new(
+            el::<_, FrameState, ()>("div", notice.clone())
+                .attr("class", "pelt-appearance-note")
+                .attr("role", "status"),
+        ));
+    }
     Box::new(
         el::<_, FrameState, ()>("div", rows)
             .attr("class", "pelt-appearance")
@@ -675,7 +767,6 @@ impl FrisketSurface {
         self.rebuild_document();
     }
 
-    #[cfg(any(feature = "tabard-preview", test))]
     /// Append or remove a host-owned author layer for the workspace shell.
     ///
     /// This deliberately has no document-tile input: Pelt keeps session,
@@ -783,27 +874,27 @@ impl FrisketSurface {
         focus: Option<&FrisketA11yTarget>,
     ) -> Option<FrisketA11yProjection> {
         let dom = self.document.dom();
-        // P6 projects only Frisket's fixed shell. Pelt routes wheel and scroll
-        // keys to the active tile engine, never this Livery document. A future
-        // scrollable shell needs visual, scroll-adjusted bounds before it can
-        // reuse this projection.
+        // The shell's root stays fixed while the appearance drawer may scroll.
+        // Use the shared style-aware projector with its retained nested offsets
+        // so accessibility follows the same bounds as pointer input.
         debug_assert_eq!(self.document.scroll(), (0.0, 0.0));
-        debug_assert!(self.document.element_scroll().is_empty());
         let fragments = self.document.retained_layout()?;
         let root = AccessNodeId(dom.opaque_id(dom.document()));
         let nodes = nodes_in_document(dom)
             .into_iter()
             .map(|node| (AccessNodeId(dom.opaque_id(node)), node))
             .collect::<HashMap<_, _>>();
-        let mut tree = accesskit_tree_with_style(
+        let mut tree = accesskit_tree_from_projection(document_a11y_projection_with_style(
             dom,
             fragments,
             None,
+            0,
+            Some(self.document.element_scroll()),
             &A11yStyleQueries {
                 generated: &|node| self.document.generated_text(node),
                 rendered: &|node| self.document.rendered_visible(node),
             },
-        );
+        ));
 
         // A Frisket document is rebuilt whenever Chrome state changes, so a
         // raw ScriptedDom NodeId would become foreign on the next frame. Keep
@@ -825,6 +916,16 @@ impl FrisketSurface {
             let Some(node) = nodes.get(id).copied() else {
                 continue;
             };
+            // The canonical projector conservatively withholds Click beneath
+            // an active scrollport. Livery's current clip-aware hit test can
+            // admit visible controls without manufacturing stale geometry.
+            if access.supports_action(Action::ScrollIntoView)
+                && !access.is_disabled()
+                && !access.is_hidden()
+                && self.document.accessible_pointer_target(node).is_some()
+            {
+                access.add_action(Action::Click);
+            }
             if chrome_action(dom, node) == Some(ChromeAction::Address) {
                 if let Some(chrome) = &self.chrome {
                     access.set_value(chrome.address.clone());
@@ -872,6 +973,16 @@ impl FrisketSurface {
             return Some(FrisketA11yTarget::Close(tile));
         }
         tab_target(dom, node).map(FrisketA11yTarget::Tab)
+    }
+
+    /// Wheel events inside the appearance overlay belong to its retained
+    /// scrollport, rather than to the covered browser document.
+    pub fn scroll_appearance_at(&mut self, x: f32, y: f32, dx: f32, dy: f32) -> bool {
+        self.document.scroll_at(x, y, dx, dy)
+    }
+
+    pub fn scroll_accessible_node_into_view(&mut self, node: NodeId) -> bool {
+        self.document.scroll_accessible_node_into_view(node)
     }
 
     pub fn tabbar_drop(&self, x: f32, y: f32) -> Option<(TilePath, usize)> {
@@ -1046,6 +1157,16 @@ fn chrome_action(dom: &ScriptedDom, hit: NodeId) -> Option<ChromeAction> {
                 "appearance" => Some(ChromeAction::ToggleAppearance),
                 "appearance-dark" => Some(ChromeAction::ChooseTheme(AppearanceTheme::Dark)),
                 "appearance-light" => Some(ChromeAction::ChooseTheme(AppearanceTheme::Light)),
+                "edit-themes" => Some(ChromeAction::EditThemes),
+                value if value.starts_with("appearance-saved-") => value
+                    ["appearance-saved-".len()..]
+                    .parse()
+                    .ok()
+                    .map(ChromeAction::ChooseSavedTheme),
+                value if value.starts_with("appearance-mode-") => value["appearance-mode-".len()..]
+                    .parse()
+                    .ok()
+                    .map(ChromeAction::ChooseThemeMode),
                 "minimize" => Some(ChromeAction::Minimize),
                 "maximize" => Some(ChromeAction::ToggleMaximize),
                 "close-window" => Some(ChromeAction::CloseWindow),
@@ -1129,7 +1250,10 @@ const PELT_CHROME_CSS: &str = "\
     .pelt-inspector-section { flex-grow: 0; flex-shrink: 0; margin-top: 8px; color: var(--pelt-chrome-section); font-size: 12px; } \
     .pelt-inspector-entry { flex-grow: 0; flex-shrink: 0; padding-left: 6px; overflow: hidden; white-space: nowrap; color: var(--pelt-chrome-entry); font-size: 12px; } \
     .pelt-inspector-more { flex-grow: 0; flex-shrink: 0; padding-left: 6px; color: var(--pelt-chrome-muted); font-size: 12px; } \
-    .pelt-appearance { position: absolute; top: 0px; right: 0px; bottom: 0px; z-index: 3; display: flex; flex-direction: column; width: 260px; min-width: 260px; min-height: 0; padding: 16px; overflow: hidden; color: var(--pelt-chrome-panel-text); background: var(--pelt-chrome-panel-surface); border-left: 1px solid var(--pelt-chrome-panel-border); } \
+    .pelt-appearance { position: absolute; top: 0px; right: 0px; bottom: 0px; z-index: 3; display: flex; flex-direction: column; width: 260px; min-width: 260px; min-height: 0; padding: 16px; overflow-y: auto; overflow-x: hidden; color: var(--pelt-chrome-panel-text); background: var(--pelt-chrome-panel-surface); border-left: 1px solid var(--pelt-chrome-panel-border); } \
+    .pelt-saved-theme, .pelt-theme-editor { flex: none; min-height: 32px; margin-top: 8px; } \
+    .pelt-appearance-modes { display: flex; flex-wrap: wrap; flex: none; gap: 4px; margin-top: 6px; } \
+    .pelt-appearance-modes .pelt-appearance-option { flex: 1 0 calc(50% - 4px); font-size: 11px; } \
     .pelt-appearance-heading { flex-grow: 0; flex-shrink: 0; color: var(--pelt-chrome-heading); font-size: 16px; font-weight: bold; } \
     .pelt-appearance-label { flex-grow: 0; flex-shrink: 0; margin-top: 16px; color: var(--pelt-chrome-route); font-size: 13px; } \
     .pelt-appearance-options { display: flex; flex-direction: row; flex-grow: 0; flex-shrink: 0; flex-basis: 32px; min-width: 0; margin-top: 6px; } \
@@ -1801,10 +1925,7 @@ mod tests {
 
         surface.set_chrome(Some(WorkspaceChrome {
             theme: AppearanceTheme::Light,
-            appearance: Some(ChromeAppearance {
-                theme: AppearanceTheme::Light,
-                persistent: false,
-            }),
+            appearance: Some(ChromeAppearance::basic(AppearanceTheme::Light, false)),
             ..chrome
         }));
         let light = surface.frame(800, 600).expect("light appearance frame");
@@ -1892,10 +2013,7 @@ mod tests {
             engine_selected: Some(ChromeEngineChoice::Automatic),
             engine_choices: vec![ChromeEngineChoice::Automatic, ChromeEngineChoice::Livery],
             inspector: None,
-            appearance: Some(ChromeAppearance {
-                theme: AppearanceTheme::Light,
-                persistent: false,
-            }),
+            appearance: Some(ChromeAppearance::basic(AppearanceTheme::Light, false)),
             diagnostic: None,
             window_controls: false,
             maximized: false,
@@ -2093,5 +2211,61 @@ mod tests {
         assert!(text.contains("Contents not inspectable on this surface."));
         assert!(!text.contains("Headings ("));
         assert!(!text.contains("Links ("));
+    }
+}
+
+#[cfg(test)]
+mod appearance_scroll_tests {
+    use super::*;
+    use workbench::{ContentSource, DocumentRef, Tile};
+
+    #[test]
+    fn long_saved_library_scrolls_editor_into_reachable_drawer_space() {
+        let tree = TileTree::single(Tile {
+            id: TileId(1),
+            title: "Browser".into(),
+            content: ContentSource::Document(DocumentRef("fixture".into())),
+            accent: None,
+        });
+        let mut appearance = ChromeAppearance::basic(AppearanceTheme::Dark, true);
+        appearance.saved_themes = (0..18)
+            .map(|index| (format!("Saved theme {index}"), false))
+            .collect();
+        appearance.editor_available = true;
+        let chrome = WorkspaceChrome {
+            title: "Browser".into(),
+            address: "fixture".into(),
+            route: "Livery".into(),
+            status: "Ready".into(),
+            theme: AppearanceTheme::Dark,
+            address_focused: false,
+            can_go_back: false,
+            can_go_forward: false,
+            engine_label: "Auto".into(),
+            engine_menu_open: false,
+            engine_selected: Some(ChromeEngineChoice::Automatic),
+            engine_choices: vec![ChromeEngineChoice::Automatic],
+            inspector: None,
+            appearance: Some(appearance),
+            diagnostic: None,
+            window_controls: false,
+            maximized: false,
+        };
+        let mut surface = FrisketSurface::new(&tree);
+        surface.set_chrome(Some(chrome));
+        let frame = surface.frame(640, 480).unwrap();
+        let aperture = frame.content_rects;
+        let drawer = frame.appearance_rect.unwrap();
+        let before = surface.chrome_rect("edit-themes").unwrap();
+        assert!(before.y > 480.0);
+        assert!(surface.scroll_appearance_at(drawer.x + 50.0, drawer.y + 50.0, 0.0, 2000.0));
+        let frame = surface.frame(640, 480).unwrap();
+        let after = surface.chrome_rect("edit-themes").unwrap();
+        assert!(after.y < 480.0 && after.y >= drawer.y);
+        assert_eq!(
+            surface.hit(after.x + after.width / 2.0, after.y + after.height / 2.0),
+            Some(FrisketHit::ChromeAction(ChromeAction::EditThemes))
+        );
+        assert_eq!(frame.content_rects, aperture);
     }
 }

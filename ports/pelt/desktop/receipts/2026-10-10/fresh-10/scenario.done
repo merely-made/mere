@@ -1,0 +1,20 @@
+RESULT ok
+Pelt shared workshop production authoring
+captured initial_editor
+captured editor_light
+captured editor_dark
+captured editor_hc_light
+captured editor_hc_dark
+captured saved_editor
+captured narrow_editor
+captured narrow_specimens
+capture initial_editor 2360x1600 digest=897f776ba7dfa95c file=/Users/markik/Code/tabard-app-receipts/2026-10-10/pelt/fresh-10/initial_editor.png
+capture editor_light 2360x1600 digest=510128f1de04462f file=/Users/markik/Code/tabard-app-receipts/2026-10-10/pelt/fresh-10/editor_light.png
+capture editor_dark 2360x1600 digest=04de982f6d26b311 file=/Users/markik/Code/tabard-app-receipts/2026-10-10/pelt/fresh-10/editor_dark.png
+capture editor_hc_light 2360x1600 digest=9f442ab285394a90 file=/Users/markik/Code/tabard-app-receipts/2026-10-10/pelt/fresh-10/editor_hc_light.png
+capture editor_hc_dark 2360x1600 digest=73c687d7e105e9a7 file=/Users/markik/Code/tabard-app-receipts/2026-10-10/pelt/fresh-10/editor_hc_dark.png
+capture saved_editor 2360x1600 digest=548b13a1ad958918 file=/Users/markik/Code/tabard-app-receipts/2026-10-10/pelt/fresh-10/saved_editor.png
+capture narrow_editor 1280x1560 digest=38e02615a8358cca file=/Users/markik/Code/tabard-app-receipts/2026-10-10/pelt/fresh-10/narrow_editor.png
+capture narrow_specimens 1280x1560 digest=2b6135e98bb359be file=/Users/markik/Code/tabard-app-receipts/2026-10-10/pelt/fresh-10/narrow_specimens.png
+frames: 8 captured, 0 blank, 8 distinct digests
+presentation: 74 frames, 77 redraws, 3 unpresented redraws
