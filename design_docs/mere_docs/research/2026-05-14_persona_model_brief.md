@@ -8,7 +8,7 @@
 
 - [`2026-05-11_browser_multiplexer_framing.md`](2026-05-11_browser_multiplexer_framing.md) §11.2 — the gap this brief fills.
 - [`../../archive_docs/2026-10-06_retired_plans/2026-05-14_engine_profile_boundary_plan.md`](../../archive_docs/2026-10-06_retired_plans/2026-05-14_engine_profile_boundary_plan.md) — relies on `PersonaId` to root UDF paths under `<data_root>/personas/<persona_id>/`.
-- [`crates/dramatis/personae/src/lib.rs`](../../../crates/dramatis/personae/src/lib.rs) — `PersonaId(pub Uuid)` now lives at the persona boundary.
+- `repos/dramatis/crates/personae/src/lib.rs` — `PersonaId(pub Uuid)` now lives at the persona boundary.
 - [`crates/system/pandect/src/manifest.rs`](../../../crates/system/pandect/src/manifest.rs) — `GraphSessionManifest.persona_id` references that `PersonaId`. v0 always uses `PersonaId::default_persona()`; this brief governs what the not-default world looks like.
 
 ---

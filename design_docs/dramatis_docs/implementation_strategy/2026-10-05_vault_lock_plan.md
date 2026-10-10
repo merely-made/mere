@@ -5,9 +5,9 @@
 as `79fbbeb7`, its attended receipts as `303b5097`; L4 on 2026-10-08, §6);
 deployment is Mark's step. Ruling 44's hard switch landed on 2026-10-09 (§6), so Distillery no longer
 keeps the master while locked. Not yet carried out: pandect's wallets
-until D8 (ruling 81). The [vault threat statement](../technical_architecture/2026-10-08_vault_threat_statement.md)
+until D8 (ruling 81). The vault threat statement (`repos/dramatis/design_docs/2026-10-08_vault_threat_statement.md`)
 says what the lock defends and leaves open. The
-[dramatis repo plan](2026-10-06_dramatis_repo_plan.md) moves this code
+dramatis repo plan (`repos/dramatis/design_docs/2026-10-06_dramatis_repo_plan.md`) moves this code
 later. Chatelaine P4 (CXF import) waits on this plan (chatelaine rulings
 64, 65).
 **Scope**: the resident's secrets can be locked. While locked, no secret
@@ -18,9 +18,9 @@ locked.
 
 **Related**:
 
-- [chatelaine and CXF import plan](2026-10-01_chatelaine_cxf_plan.md):
+- chatelaine and CXF import plan (`repos/dramatis/design_docs/2026-10-01_chatelaine_cxf_plan.md`):
   rulings 63 to 65 and the finding "the vault never locks".
-- [dramatis tier architecture](../technical_architecture/2026-09-30_dramatis_tier_architecture.md):
+- dramatis tier architecture (`repos/dramatis/design_docs/2026-09-30_dramatis_tier_architecture.md`):
   the tier's invariants (1, custody; 12, quarantine).
 - [protocol architecture plan](../../mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md):
   §3.6 and §3.7 describe `UnlockTier` as custody tiers, and its line 349
@@ -28,10 +28,10 @@ locked.
 - [persona wallet carry layer plan](../../archive_docs/2026-10-06_completed_plans/2026-06-25_persona_wallet_carry_layer_plan.md):
   the "one unlock ladder" rule (:358-362), and Meerkat's 2026-07-04 "Lock
   now" (:788-792).
-- [vault threat statement](../technical_architecture/2026-10-08_vault_threat_statement.md):
+- vault threat statement (`repos/dramatis/design_docs/2026-10-08_vault_threat_statement.md`):
   what the lock defends, what stays while locked, and what it does not
   defend (ruling 82).
-- [dramatis repo plan](2026-10-06_dramatis_repo_plan.md): moves the
+- dramatis repo plan (`repos/dramatis/design_docs/2026-10-06_dramatis_repo_plan.md`): moves the
   vault's custody from personae into castellan and the tier out of mere;
   sequenced after this plan's L2 at the earliest.
 
@@ -956,7 +956,7 @@ in-process mods), and what is fixed only by reading. The protocol plan's
 - left open past L4.
 
 Mark: **"Own doc in dramatis (Recommended)"**. Follows:
-[the vault threat statement](../technical_architecture/2026-10-08_vault_threat_statement.md).
+the vault threat statement (`repos/dramatis/design_docs/2026-10-08_vault_threat_statement.md`).
 
 **Ruling 83.** *Should the dramatis tier architecture gain an invariant for
 the lock? Its §4 lists 12, each with where it is enforced, and breaking
@@ -1233,7 +1233,7 @@ breaking change is built, Knot first.
 **2026-10-05, L1 checkpoint A reached** (Opus lane, branch
 `worktree-agent-a014d67042870a2b4`, base `24bfe7be`, not merged):
 - `fea481a3` adds the no-residue instrument
-  (`crates/dramatis/personae/tests/no_residue.rs`). It is a test-only
+  (`repos/dramatis/crates/personae/tests/no_residue.rs`). It is a test-only
   tracking allocator with three canaries: the master seed, a slot payload,
   and a DPAPI root in a temp dir. It is red on purpose at that commit.
 - `ffd3279b` adds the residue fixes:
@@ -1993,7 +1993,7 @@ L3's `79fbbeb7`) on both machines.
     holds now;
   - the tier architecture gains invariant 13 with its four enforcement
     points;
-  - the [vault threat statement](../technical_architecture/2026-10-08_vault_threat_statement.md)
+  - the vault threat statement (`repos/dramatis/design_docs/2026-10-08_vault_threat_statement.md`)
     is new.
 - **The gates** ran on mere `526cbb3b` plus this work, in fresh worktrees.
   - **Windows:** personae, castellan and djinn give 477 passed across 37
