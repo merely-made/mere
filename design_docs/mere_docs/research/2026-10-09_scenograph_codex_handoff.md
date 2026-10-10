@@ -62,10 +62,12 @@ deferred field physics or the layout-lock gesture.
 At this read, Moot's capsule-library lane is adding an opt-in applet mount in
 `web_tree.rs` and `web_tree/applet.rs` in its own dirty worktree. Its canonical
 continuation is the [Moot plan](../../moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#capsule-library-composition-proof-2026-10-09).
-R160 separately defers the old nested-graph branch's grouping/Fold decision and
-holds work in its touched viewer files. Reconcile these active owners and source
-baselines before resuming overlapping viewer edits; this doc refresh does not
-lift that hold or assign Moot's work to this lane.
+Site Rulings 161–162 supersede R160: the nested branch adapts its groups to
+`sceno::Fold`, and the site lane owns `web_tree*`, `host_dataset_view.rs` and
+`web_dataset.rs` during cutover. The branch owner, Moot and the editor S2/B1
+lane coordinate overlapping edits through that site lane. Native fold Rulings
+163–166 belong to its separate S5 continuation. This handoff assigns none of
+those implementations to the editor lane.
 
 ## Where things are
 

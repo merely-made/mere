@@ -36,7 +36,6 @@
 pub mod catalog;
 pub mod facet;
 mod families;
-pub mod grouping;
 pub mod history;
 pub mod host_dataset;
 pub mod matrix;
