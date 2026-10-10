@@ -1053,6 +1053,8 @@ mod input;
 mod multi_host;
 #[cfg(test)]
 mod multi_host_tests;
+#[cfg(test)]
+mod accessibility_tests;
 mod spatial;
 mod tree;
 mod wake;

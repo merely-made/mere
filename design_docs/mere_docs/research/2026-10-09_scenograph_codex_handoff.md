@@ -18,8 +18,8 @@ clarifies that deselection preserves edits, welcomes hover previews, expands
 fields toward scoped projections and entry-triggered behavior, calls for
 granular configurable font roles and meaningful visible dynamics, and records
 the need to compose theme values with semantic channels. Owner plans carry
-research inputs and candidate proofs. Existing work order, R160 and viewer
-ownership holds stand; this is not qualification of the shared checkout's
+research inputs and candidate proofs. Existing work order and viewer ownership
+stand; site Rulings 161–162 below replace R160. This is not qualification of the shared checkout's
 concurrent dynamics implementation. The subsequent [primitive planning
 direction, §9.9](../../2026-08-23_projection_scenes_and_graph_native_platform.md#99-plan-through-graph-primitives-2026-10-09)
 asks for nodes, links and fields to be inspectable/configurable and connected
@@ -161,13 +161,54 @@ it can use, not a completed ambient reason controller. The new forme field
 represents the recursive tile arrangement (§9.4); it does not settle B1's
 deferred field physics or the layout-lock gesture.
 
-At this read, Moot's capsule-library lane is adding an opt-in applet mount in
-`web_tree.rs` and `web_tree/applet.rs` in its own dirty worktree. Its canonical
+Moot's capsule-library proof is now on published main (`f22205e4e`, followed by
+`0792da6a9` and `3055ae5af` integration fixes), with an opt-in applet mount in
+`web_tree.rs` and `web_tree/applet.rs`. Its canonical
 continuation is the [Moot plan](../../moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#capsule-library-composition-proof-2026-10-09).
-R160 separately defers the old nested-graph branch's grouping/Fold decision and
-holds work in its touched viewer files. Reconcile these active owners and source
-baselines before resuming overlapping viewer edits; this doc refresh does not
-lift that hold or assign Moot's work to this lane.
+Site Rulings 161–162 supersede R160: the nested branch adapts its groups to
+`sceno::Fold`, and the site lane owns `web_tree*`, `host_dataset_view.rs` and
+`web_dataset.rs` during cutover. The branch owner, Moot and the editor S2/B1
+lane coordinate overlapping edits through that site lane. Native fold Rulings
+163–166 belong to its separate S5 continuation. This handoff assigns none of
+those implementations to the editor lane.
+
+The nested branch's 2026-10-10 acceptance closes the portable Fold and combined
+viewer slice for main integration. Source `8b8bd92b1` combines the committed
+site cutover, Moot, shared capture polling/Genet `7422e906`, Tabard appearance,
+maintained Vello `10f01d6d` and published Mere `0a3203f05` (including the
+occurrence-dynamics work above). Both Cargo roots resolve the maintained
+renderer/encoding/shader triple to the atlas repair, retaining the earlier
+Radeon coarse and native-compute guards. The legacy compatibility encoding
+remains separate.
+
+All 254 shared scene tests, 141 affected CPU tests and seven serialized GPU
+producer tests pass on this integration. Four unchanged exporter tests retain
+their result. The locked viewer build, main-page/applet compile check, portable
+metadata and header gate pass. Headed Chrome `152.0.7977.83` on the default
+`amd` / `gcn-5` adapter passes nested/camera/flat/fold-history/gesture receipts,
+all 15 site checkpoints and their keys, clean unknown-membership refusal,
+a planted propagation control, narrow keyboard recovery and the plain viewer's
+mount and actual page-wheel check. Actual captures were inspected; control
+density and small glyphs remain usability concerns. The
+[Fold receipt](../../../ports/graphshell/docs/receipts/host_dataset_folds.json)
+records fresh source and bundle hashes, commands and capture paths, preserving
+superseded device-loss and harness failures as history. Browser and receipt
+server are stopped; the coordinated GPU slot is released.
+
+Main subsequently advanced to `35ad305af` during the push. Its published
+Dramatis/custody move and kernel component-copy repair are integrated, with
+the separate viewer root aligned at `7d78b9960`. The scene and affected CPU
+suites, both locked Wasm gates, metadata and header checks pass again. Renderer
+and directly recorded viewer/fold/history/gesture/framing inputs are unchanged.
+The receipt retains the headed source/bundle at `8b8bd92b1` and names the
+post-publication CPU/build source separately; no further GPU run is claimed
+after slot release.
+
+This acceptance does not close native S5, saved ambient scenes, full compiled
+Cargo closure or live-site adoption. R162's site owner continues those assigned
+viewer edits; its uncommitted docs/scenarios and the primary checkout's five
+unpublished commits were untouched. B1/S2 and the dynamics lane retain their
+own done-conditions and acceptance boundaries above.
 
 ## Historical draft checkpoint, 2026-10-09
 

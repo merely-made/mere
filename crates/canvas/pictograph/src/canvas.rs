@@ -766,6 +766,7 @@ pub(crate) mod at_rest;
 mod cartography;
 mod derived_face;
 mod gloss;
+mod framing;
 mod lifecycle;
 mod nodes;
 mod reader;

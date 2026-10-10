@@ -10,32 +10,48 @@ keywords = ["credentials", "identity", "vault", "agent", "persona"]
 categories = ["authentication"]
 
 [features]
-# The SitedStationGrant adapter uses Mere's host-side wallet store to issue and
-# check the existing signed RemoteAuth envelope. Keep the credential and OTP
-# library halves usable without that application-storage dependency.
-station-grants = ["dep:pandect"]
-# The keeper surface (founded 2026-08-14): the secret-free read model, the
-# card/intent projection, and the resident PersonaeHost authority, moved home
-# from graphshell per the port law. One feature rather than an embeddable/
-# authority pair because the projection already renders pending signing
-# requests, which rides personae's agent stack; split when a consumer wants
-# views without it.
-keeper = [
-  "dep:blake3",
-  "dep:chirograph",
+# Secret custody moved here from personae and pandect in DR-B (dramatis repo
+# plan, rulings D3, D8, D9 and D22): the vault, its passphrase and OS-sealed
+# storages, the unlock ladder, the SSH agent, and the wallet's seeds and
+# private epochs. Only djinn may link this crate (D4, D16: `deny.toml`).
+#
+# The SSH agent and its CLI (`personae-agent`, `personae-vault`), the
+# approval broker, and SSH keys as vault slots. RSA signs through ring; the
+# rsa crate only builds the key at load (rulings 52, 59: RUSTSEC-2023-0071
+# rules out its signing and decryption). ECDSA through RustCrypto's curves,
+# named here rather than left to ssh-agent-lib's feature unification.
+agent = [
+  "personae/ssh",
+  "dep:ring",
+  "dep:rsa",
   "dep:rand_core",
-  "dep:serde_json",
-  "dep:pandect",
+  "dep:signature",
   "dep:ssh-agent-lib",
   "dep:ssh-key",
   "dep:thiserror",
-  "dep:tracing",
   "dep:tokio",
-  "personae/agent",
+  "dep:tracing-subscriber",
+  "ssh-key/p256",
+  "ssh-key/p384",
+  "ssh-key/p521",
+]
+# Windows Hello as the unlock gate (vault lock rulings 21, 28). Elsewhere
+# presence reports unavailable.
+os-presence = ["dep:windows"]
+# The wallet's secret half, moved from pandect (D8): the identity seed, the
+# delegated-device identity, the remote-auth wrapping keys, the private-epoch
+# bridge, and the grant flows that sign or wrap with them. pandect keeps the
+# public manifests, roster and grant vocabulary.
+wallet = ["dep:pandect"]
+# The keeper surface (founded 2026-08-14): the secret-free read model and the
+# resident PersonaeHost authority. The cards went back to graphshell in DR-C.
+keeper = [
+  "agent",
+  "wallet",
 ]
 # Freedesktop Secret Service 0.2 adapter. The portable sealed collection model
 # compiles everywhere; the D-Bus server is Linux-only.
-secret-service = ["dep:thiserror", "dep:tokio", "dep:tracing", "dep:zbus"]
+secret-service = ["dep:thiserror", "dep:tokio", "dep:zbus"]
 
 [dependencies]
 # The check conclusions and faults, named directly (insigne proofs plan, B).
@@ -56,22 +72,56 @@ sha2.workspace = true
 uuid.workspace = true
 pandect = { workspace = true, optional = true }
 zeroize = "1"
-# ── keeper surface ────────────────────────────────────────────────────────
-blake3 = { workspace = true, optional = true }
-chirograph = { workspace = true, optional = true }
-serde_json = { workspace = true, optional = true }
+# ── custody (DR-B) ────────────────────────────────────────────────────────
+# Passphrase-encrypted storage and the wrapped vault root. `zeroize` clears
+# the working memory we hand it (vault lock ruling 33).
+argon2 = { version = "0.5", features = ["zeroize"] }
+blake3.workspace = true
+# `zeroize` clears the cipher's copy of the key on drop (ruling 37).
+chacha20poly1305 = { version = "0.11", features = ["zeroize"] }
+getrandom = "0.3"
+serde_json.workspace = true
+tracing.workspace = true
+# ── agent ─────────────────────────────────────────────────────────────────
 # SSH key generation inside the authority mints with the OS RNG.
 rand_core = { version = "0.6", features = ["getrandom"], optional = true }
+# RSA private-key operations, constant-time. Already in the lock (rustls).
+ring = { version = "0.17.14", optional = true }
+# Builds the full RSA key (CRT values included) from OpenSSH's components and
+# exports it as PKCS#8 for ring, once per load (ruling 59).
+rsa = { version = "0.9", default-features = false, optional = true }
+signature = { version = "2", optional = true }
 ssh-agent-lib = { version = "0.6", optional = true }
 ssh-key = { version = "0.6", features = ["ed25519", "encryption"], optional = true }
 thiserror = { version = "1", optional = true }
-tracing = { workspace = true, optional = true }
-tokio = { version = "1", features = ["macros", "net", "rt", "sync", "time"], optional = true }
+tokio = { version = "1", features = ["macros", "net", "rt", "rt-multi-thread", "sync", "time"], optional = true }
+tracing-subscriber = { version = "0.3", optional = true }
+
+[target.'cfg(windows)'.dependencies]
+# DPAPI, the `AutoOs` root's wrap on Windows.
+windows-sys = { version = "0.59", features = [
+  "Win32_Foundation",
+  "Win32_Security_Cryptography",
+] }
+# `os-presence`: UserConsentVerifier, and its window-parented interop.
+windows = { version = "0.62", optional = true, features = [
+  "Security_Credentials_UI",
+  "Win32_Foundation",
+  "Win32_System_WinRT",
+] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 zbus = { version = "5.19", default-features = false, features = ["tokio"], optional = true }
 
 [dev-dependencies]
+# The wallet sealer's moved tests seal through eidetic's trait (DR-B).
+eidetic.workspace = true
+# The moved agent and signing tests (DR-B).
+hex = "0.4"
+rand_core = { version = "0.6", features = ["getrandom"] }
+# Tests verify RSA signatures with ssh-key's public-key verification, which
+# is the rsa crate's public operation, independent of the ring signer.
+ssh-key = { version = "0.6", features = ["ed25519", "rsa"] }
 # The Linux Secret Service receipt reads its lock signal as a stream.
 futures-util = "0.3"
 gaz = { workspace = true, features = ["muniment"] }
@@ -88,7 +138,7 @@ tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "net",
 signature = "2"
 
 # Vault lock ruling 6's no-residue instrument over the resident's lock path
-# (L2). Personae's tracker installs its own global allocator, so this runs
+# (L2). The residue tracker installs its own global allocator, so this runs
 # outside libtest's harness, on one thread.
 [[test]]
 name = "snapshot_golden"
@@ -100,3 +150,26 @@ name = "no_residue"
 path = "tests/no_residue.rs"
 harness = false
 required-features = ["keeper"]
+
+# Vault lock ruling 6's no-residue instrument over the vault and its storages,
+# moved from personae with the code it measures (DR-B). It installs its own
+# global allocator, so it runs outside libtest's harness, on one thread.
+[[test]]
+name = "vault_residue"
+path = "tests/vault_residue.rs"
+harness = false
+
+# Serves vault `ssh` slots over the OpenSSH agent protocol (Windows named
+# pipe / Unix socket). Moved from personae (DR-B); the name is unchanged.
+[[bin]]
+name = "personae-agent"
+path = "src/bin/personae-agent.rs"
+required-features = ["agent"]
+
+# Inspect and manage the vault from a terminal. `agent` because its `add-ssh`
+# door refuses keys the agent cannot sign, as `ssh-add` and the authority's
+# import do (chatelaine ruling 60). Moved from personae (DR-B).
+[[bin]]
+name = "personae-vault"
+path = "src/bin/personae-vault/main.rs"
+required-features = ["agent"]

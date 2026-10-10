@@ -24,6 +24,42 @@ workstream's two to be covered.
 
 ## 2026-09-27 phase-3 follow-up
 
+### 2026-10-08 incremental continuation audit
+
+The one-tree plan's expandable-host-groups target was checked against
+`scenomise::grouping`, Graphshell's `GroupedHostDataset`, the retained tree
+controls and `scripts/export_grouped_cargo.py`. Its boundary is explicit
+membership, view-local disclosure and a bounded manifest fixture; it makes no
+claim about portable folds, saved scene adoption or live deployment. This is
+an incremental check of that added target; the original census totals below
+are not a fresh whole-document audit. Validation outcomes are recorded in
+the plan's Progress section after execution.
+
+The current-main continuation was checked against merge `7ec9c4503`, the
+root and standalone Genet manifests, repeated test/build logs and the headed
+receipt. It preserves the failed pixel gate and labels intermediate texture
+sampling as diagnostic evidence, without claiming visual or live-site readiness.
+
+The unmodified `0051258e4` viewer then passed the original grouped and flat
+scenario pixel gates on Chrome's SwiftShader WebGPU adapter. All three group
+captures, the flat capture, keyboard/breadcrumb capture and 420×800 narrow
+capture were inspected; their PNG hashes are in the receipt. Three pinned
+native Netrender rectangle controls also pass. The plan keeps this software
+acceptance separate from the still-failed default Radeon adapter, and records
+the offscreen graph content and substantial narrow-screen control area as
+remaining usability work. It does not claim the exact renderer fault, site
+deployment or a performance measurement.
+
+The subsequent Radeon repair was checked against maintained Vello `865cbf41`
+and Mere's integration of main `fbc149bd9`. The shader separates slice and
+set-bit traversal while retaining draw order and clip state. Twelve provider
+tests pass, including visible-pixel assertions and overflow recovery. The
+original headed grouped and flat scenarios pass on the default hardware
+adapter without shader hooks; substituting only the old coarse shader restores
+the failed capture gate. This supersedes the earlier default-adapter failure
+for this qualified source and adapter. It does not close the site cutover,
+performance or layout-usability work.
+
 The totals above remain the original 2026-09-26 audit, not a new full census.
 The plan's status now records phase 3 under headed verification and preserves
 Mark's timing ruling as the gate before phase 4. The clean dependency repin
@@ -243,3 +279,26 @@ plan and producer receipt now distinguish that architectural acceptance from
 open stack performance and live physics. The Mesquite integration receipt
 adds 51 native tests and two headed browser passes; its four captures were
 inspected. The earlier audit counts remain historical.
+
+## 2026-10-09 incremental camera-recovery audit
+
+Checked the new hosted-camera target and Progress entry against merge
+`6a7c7d8fa` (published main `dafacc25c`) plus the source hashes in
+`ports/graphshell/docs/receipts/hosted_camera_recovery.json`. Pictograph frames
+current visible or selected placement without applying an arrangement or
+writing scene state; the hosted action stops following and pan inertia, while
+legacy non-hosted Fit retains its ruled follow behavior. Native framing tests
+cover selection, scope, fold summary, projection, empty/nonfinite input and
+narrow centering. The focus repair reports current runner focus to accessibility
+without overwriting the hover/restyle cache; its regression checks projected
+focus through changes and clear without hover.
+
+The original group and flat pixel gates and new recovery captures pass on
+headed Chrome `152.0.7977.83`, default AMD `gcn-5` WebGPU, with no shader hooks.
+The combined graph-input/keyboard sequence passes without its diagnostic focus
+workaround; disabled and enabled traversal and 420×800 activation were checked.
+Final wide/narrow captures were inspected. All 73 Rootstock tests and the
+recorded framing, host-input, Scenomise, exporter and wasm gates pass. This
+incremental check preserves the zoom-floor, node-centre, label/control-density,
+ambient-context, performance and deployment boundaries. The historical census
+totals above are unchanged.

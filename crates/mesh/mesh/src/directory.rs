@@ -4,13 +4,17 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Which device is behind a mesh author key.
+//! Which persona is behind a mesh author key.
 //!
 //! A mesh operation is signed by a key *derived* from a persona master key
-//! (salt [`MESH_AUTHOR_SALT`]), while every transport addresses the master key
-//! itself. So "fetch this blob from whoever posted the job" is unanswerable
-//! from the board alone: the two keys are different and neither derives the
-//! other.
+//! (salt [`MESH_AUTHOR_SALT`]). Since the vault lock plan's ruling 92 that same
+//! author key is the device's transport identity, so a peer is addressed by
+//! its author directly and the master never reaches a transport. What the
+//! board alone cannot say is which persona an author acts for, and which
+//! authors are attested devices at all: that is this directory.
+//!
+//! *Before ruling 92* transports addressed the master, and this directory was
+//! how an author was resolved to an address.
 //!
 //! The binding already existed. [`personae`](identity) mints a
 //! [`DerivedKeyAttestation`]: a statement, signed *by the master*, that this
@@ -37,9 +41,9 @@ use serde::{Deserialize, Serialize};
 /// its peers.
 pub const MESH_AUTHOR_SALT: &[u8] = b"mesh-author";
 
-/// Mesh author key → the persona master key that authorized it. The master key
-/// is what a transport turns into a peer address; the mesh deliberately stops
-/// short of naming one, so it stays transport-free.
+/// Mesh author key → the persona master key that authorized it. The author
+/// key is also the device's transport address (ruling 92); the master is
+/// recorded only as which persona the device belongs to.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct DeviceDirectory {
     devices: BTreeMap<[u8; 32], [u8; 32]>,
@@ -57,6 +61,11 @@ impl DeviceDirectory {
     /// The master key behind a mesh author, if that device has attested itself.
     pub fn master_of(&self, author: &[u8; 32]) -> Option<[u8; 32]> {
         self.devices.get(author).copied()
+    }
+
+    /// Whether `author` is an attested device.
+    pub fn is_attested(&self, author: &[u8; 32]) -> bool {
+        self.devices.contains_key(author)
     }
 
     /// Every attested device, in author order.
