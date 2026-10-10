@@ -688,6 +688,17 @@ transfers DOM focus into the graph before traversal returns to the controls.
 
 ## 6. Progress
 
+- **2026-10-10 — combined viewer qualification, in progress:** native checks
+  pass on the integrated site/Moot sources. The first headed Fold/history
+  receipt passes. The gesture receipt exposed an inherited probe bug:
+  `gesture_steps::pointer` read `cancelBubble` after dispatch, when the browser
+  has reset its propagation flags. The probe now observes delivery at the
+  host's canvas; an injected routing fault will test that it can fail. The
+  viewer and main-page/app-host checks are being renewed for this probe change.
+  Portable metadata/lock provenance passes. The CI header gate also caught
+  the published macOS scenario runner's missing Exhibit A notice; adding the
+  standard owned-source header makes the gate and its planted controls pass.
+
 - **2026-10-09 — Rulings 161–162 adaptation, in progress:** incorporated
   published Mere `3567c8e93` and site cutover baseline `7c0c12008` without
   rewriting the pushed branch. The only merge conflict was the root lockfile;
