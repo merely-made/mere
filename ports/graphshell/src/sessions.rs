@@ -273,6 +273,7 @@ mod tests {
                 session: session.clone(),
                 scene: SceneSnapshot::from_dense(SceneEpoch(1), Revision(3), Scene::new()).unwrap(),
                 presentation: PresentationManifest::default(),
+                coverage: None,
                 cache_policy: CachePolicy::default(),
             })
             .unwrap();

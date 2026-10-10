@@ -17,6 +17,64 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::sync::{Arc, Mutex};
 use std::time::SystemTime;
 
+/// Explicitly opted-in native fault fixtures, never production ownership proof.
+#[cfg(all(feature = "resident-test-support", not(target_arch = "wasm32")))]
+#[path = "resident_host_test_support.rs"]
+pub mod test_support;
+
+#[cfg(all(feature = "resident-storage", not(target_arch = "wasm32")))]
+#[path = "resident_directory_owner.rs"]
+mod directory_owner;
+#[cfg(all(feature = "resident-storage", not(target_arch = "wasm32")))]
+pub use directory_owner::{CachedResidentSession, DirectoryHostCache};
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(crate) struct OwnedPersistenceStatus {
+    pub store: SessionStore,
+    pub publication_pending: bool,
+    pub error: Option<String>,
+}
+
+/// Read-only presentation observation actions on an admitted endpoint's session item.
+pub const DEMAND_INTENT: &str = "mere.resident.demand";
+pub const REFRESH_INTENT: &str = "mere.resident.refresh";
+pub const OBSERVATION_SCHEMA: &str = "mere.resident.observation/v1";
+
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ObservationRequestV1 {
+    pub schema: String,
+    /// Typed strata are preserved; UUID decoding rejects malformed external IDs.
+    pub address: Option<GraphAddress>,
+}
+
+pub fn observation_actions() -> Vec<chirograph::AdvertisedAction> {
+    [
+        (
+            DEMAND_INTENT,
+            "Load item",
+            "Load the named stored Surface or Resource into this presentation.",
+        ),
+        (
+            REFRESH_INTENT,
+            "Refresh",
+            "Check the current stored presentation without editing truth.",
+        ),
+    ]
+    .into_iter()
+    .map(
+        |(intent, label, explanation)| chirograph::AdvertisedAction {
+            intent: chirograph::IntentReference(intent.into()),
+            label: label.into(),
+            explanation: explanation.into(),
+            payload_schema: OBSERVATION_SCHEMA.into(),
+            input_form: None,
+            effect: chirograph::IntentEffect::Curation,
+        },
+    )
+    .collect()
+}
+
 /// Where the session's changes stand, as the page's `data-session-store` token.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum SessionStore {
@@ -245,6 +303,40 @@ impl HostRoots {
 }
 
 impl<B: Backend + Clone> MereHost<B> {
+    /// Persist through the cached owner's retained checkpoint, or the existing
+    /// Complete path when this host has no residency admission.
+    pub async fn persist_owned(&mut self, saved_at_secs: u64) -> Result<(), MereHostError> {
+        if !self.resident_admitted {
+            return self.persist(saved_at_secs).await;
+        }
+        self.persist_resident(
+            SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(saved_at_secs),
+        )
+        .await?;
+        self.persist_projection_epoch().await
+    }
+
+    /// Native cached owners retain the exact staged batch on uncertain storage.
+    /// Ordinary Complete hosts continue to use their original flush path.
+    pub(crate) async fn persist_resident(
+        &mut self,
+        at: SystemTime,
+    ) -> Result<(), ResidentHostError> {
+        if self.resident_settings_need_validation() {
+            let request = self
+                .prepare_resident_settings_validation()?
+                .ok_or(ResidentHostError::Busy)?;
+            self.install_resident_refresh(request.load().await)?;
+        }
+        let io = self.prepare_resident_io(at)?;
+        let write = io.write().await;
+        let generation = self.install_resident_io(&io)?;
+        if generation.is_none() {
+            return Err(write.err().unwrap_or(ResidentHostError::Busy));
+        }
+        self.refresh_resident_reader().await
+    }
+
     fn resident_key(&self, suffix: &str) -> String {
         format!(
             "graphs/{}/resident/v1/{suffix}",
@@ -358,6 +450,18 @@ impl<B: Backend + Clone> MereHost<B> {
         if revision != self.resident_roots.revision() {
             self.resident_refresh.notice();
         }
+    }
+    /// Supply host context to the installed immutable reader, never to truth.
+    pub fn set_resident_host_coverage(
+        &mut self,
+        note: mere::kernel::graph::CoverageNote,
+    ) -> Result<(), ResidentHostError> {
+        self.resident_reader
+            .as_mut()
+            .ok_or(ResidentHostError::Busy)?
+            .set_host_coverage(note);
+        self.sync_projection_context();
+        Ok(())
     }
     pub fn resident_reader(&self) -> Option<&ResidentGraph<B>> {
         self.resident_reader.as_ref()
@@ -528,6 +632,30 @@ impl<B: Backend + Clone> MereHost<B> {
             load,
         }))
     }
+    /// Decline installation during owned publication recovery, retiring only
+    /// the outstanding load that produced this completion. Newer notices stay
+    /// pending; the cached owner's publication work is not acknowledged here.
+    pub(crate) fn decline_resident_refresh(
+        &mut self,
+        completion: HostRefreshCompletion<B>,
+    ) -> Result<pandect::addressable_graph::RefreshOutcome, ResidentHostError> {
+        if !Arc::ptr_eq(&completion.identity, &self.resident_refresh.identity)
+            || !self
+                .resident_refresh
+                .gate
+                .in_flight
+                .as_ref()
+                .is_some_and(|(active, _)| active == &completion.token)
+        {
+            return Err(ResidentHostError::StaleCompletion);
+        }
+        self.resident_refresh.gate.fail(&completion.token);
+        match completion.result {
+            Err(error) => Err(error.into()),
+            Ok(_) => Err(ResidentHostError::Busy),
+        }
+    }
+
     pub fn install_resident_refresh(
         &mut self,
         completion: HostRefreshCompletion<B>,
@@ -571,6 +699,10 @@ impl<B: Backend + Clone> MereHost<B> {
                 .install_refresh(candidate)
                 .map_err(Into::into),
         };
+        if matches!(result, Ok(RefreshOutcome::TruthChanged)) {
+            self.projection_revision = self.projection_revision.wrapping_add(1);
+        }
+        self.sync_projection_context();
         if result.is_err() {
             self.resident_refresh.gate.invalidated = true;
         }
@@ -645,9 +777,20 @@ impl<B: Backend + Clone> MereHost<B> {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ResidentPersistence {
     Rejected,
-    AppliedButUnstored { first: u64, end: u64, revision: u64 },
-    Durable { generation: String },
-    PendingPublication { generation: String, reason: String },
+    /// The ordinary unrecorded Complete path has no resident generation.
+    Complete,
+    AppliedButUnstored {
+        first: u64,
+        end: u64,
+        revision: u64,
+    },
+    Durable {
+        generation: String,
+    },
+    PendingPublication {
+        generation: String,
+        reason: String,
+    },
 }
 #[derive(Debug)]
 pub enum ResidentHostError {
@@ -1036,6 +1179,20 @@ impl<B: Backend + Clone> ResidentHost<B> {
     }
 }
 
+/// An existing cloneable handle cannot prove unique writer ownership.
+/// Use the concrete DirectoryHostCache, which opens and contains its backend.
+#[cfg(all(feature = "resident-storage", not(target_arch = "wasm32")))]
+pub async fn open_directory_cached_checked(
+    _backend: muniment::DirectoryBackend,
+    _id: pandect::SessionId,
+    _persona: SelectedPersonaRef,
+    _handlers: HandlerRegistry,
+    _access: AccessContext,
+    _validator: Option<pandect::GraphValidator>,
+) -> Result<MereHost<muniment::DirectoryBackend>, MereHostError> {
+    Err(ResidentHostError::OwnershipUnproven.into())
+}
+
 #[cfg(all(feature = "resident-storage", not(target_arch = "wasm32")))]
 impl ResidentHost<muniment::DirectoryBackend> {
     pub async fn open_directory(
@@ -1301,6 +1458,381 @@ mod tests {
             definition: draft.to_definition().unwrap(),
             selected_occurrence: None,
         }
+    }
+
+    #[cfg(feature = "resident-storage")]
+    #[test]
+    fn unproven_directory_handle_and_duplicate_admission_refuse_before_write() {
+        pollster::block_on(async {
+            let root = tempfile::tempdir().unwrap();
+            let backend = muniment::DirectoryBackend::open(root.path()).unwrap();
+            let sessions = pandect::MereSessions::new(backend.clone());
+            let mut recorded = sessions.begin_recorded(mere::kernel::graph::Author::user(), None);
+            recorded.flush(SystemTime::UNIX_EPOCH).await.unwrap();
+            let id = recorded.id();
+            drop(recorded);
+            let before = directory_bytes(&backend).await;
+            let first = open_directory_cached_checked(
+                backend.clone(),
+                id,
+                persona(),
+                HandlerRegistry::default(),
+                access(),
+                None,
+            )
+            .await;
+            let duplicate = open_directory_cached_checked(
+                backend.clone(),
+                id,
+                persona(),
+                HandlerRegistry::default(),
+                access(),
+                None,
+            )
+            .await;
+            for result in [first, duplicate] {
+                assert!(
+                    matches!(result, Err(MereHostError::Resident(error))
+                    if matches!(*error, ResidentHostError::OwnershipUnproven)),
+                    "a supplied existing handle cannot prove sole writer ownership"
+                );
+            }
+            assert_eq!(
+                directory_bytes(&backend).await,
+                before,
+                "unproven and duplicate admission must not advance epoch or write storage"
+            );
+        });
+    }
+
+    #[cfg(feature = "resident-storage")]
+    #[test]
+    fn ordinary_live_directory_writer_blocks_admission_before_write() {
+        pollster::block_on(async {
+            let root = tempfile::tempdir().unwrap();
+            let backend = muniment::DirectoryBackend::open(root.path()).unwrap();
+            let sessions = pandect::MereSessions::new(backend.clone());
+            let mut recorded = sessions.begin_recorded(mere::kernel::graph::Author::user(), None);
+            recorded.flush(SystemTime::UNIX_EPOCH).await.unwrap();
+            let id = recorded.id();
+            drop(recorded);
+            let ordinary = MereHost::open_session_checked(
+                backend.clone(),
+                id,
+                persona(),
+                HandlerRegistry::default(),
+                access(),
+                None,
+            )
+            .await
+            .unwrap();
+            let before = directory_bytes(&backend).await;
+            let result = open_directory_cached_checked(
+                backend.clone(),
+                id,
+                persona(),
+                HandlerRegistry::default(),
+                access(),
+                None,
+            )
+            .await;
+            assert!(
+                matches!(result, Err(MereHostError::Resident(error))
+                if matches!(*error, ResidentHostError::OwnershipUnproven)),
+                "an ordinary live writer's backend clone is unproven"
+            );
+            assert_eq!(directory_bytes(&backend).await, before);
+            assert_eq!(ordinary.graph_session().id(), id);
+            assert!(
+                muniment::DirectoryBackend::open(root.path()).is_err(),
+                "an independently opened owner must honor the existing lifetime lease"
+            );
+            assert!(
+                DirectoryHostCache::open(root.path()).is_err(),
+                "the concrete cache cannot bypass an ordinary live writer lease"
+            );
+        });
+    }
+
+    #[cfg(feature = "resident-storage")]
+    async fn directory_bytes(backend: &muniment::DirectoryBackend) -> BTreeMap<String, Vec<u8>> {
+        let mut bytes = BTreeMap::new();
+        for key in backend.list("").await.unwrap() {
+            bytes.insert(key.clone(), backend.get(&key).await.unwrap().unwrap());
+        }
+        bytes
+    }
+
+    #[cfg(feature = "resident-storage")]
+    #[test]
+    fn cached_directory_factory_checks_before_epoch_and_preserves_placement() {
+        pollster::block_on(async {
+            let root = tempfile::tempdir().unwrap();
+            let (id, legacy_id) = {
+                let backend = muniment::DirectoryBackend::open(root.path()).unwrap();
+                let sessions = pandect::MereSessions::new(backend);
+                let mut recorded =
+                    sessions.begin_recorded(mere::kernel::graph::Author::user(), None);
+                recorded.flush(SystemTime::UNIX_EPOCH).await.unwrap();
+                let mut legacy = sessions.begin(
+                    mere::kernel::graph::Author::user(),
+                    Some(mere::kernel::graph::Graph::new()),
+                );
+                legacy.flush(SystemTime::UNIX_EPOCH).await.unwrap();
+                (recorded.id(), legacy.id())
+            };
+            let cache = DirectoryHostCache::open(root.path()).unwrap();
+            let before = cache.all_stored_bytes().await.unwrap();
+            assert!(!before.contains_key(crate::mere_host::EPOCH_SLOT));
+            let validator: pandect::GraphValidator =
+                Arc::new(|_| Err("fixture validation refusal".into()));
+            let rejected = cache
+                .host_checked(
+                    id,
+                    persona(),
+                    HandlerRegistry::default(),
+                    access(),
+                    Some(validator),
+                    chirograph::ProjectionSession("v1:test".into()),
+                )
+                .await;
+            assert!(matches!(
+                rejected,
+                Err(MereHostError::Session(pandect::SessionError::Validation(_)))
+            ));
+            assert_eq!(cache.all_stored_bytes().await.unwrap(), before);
+            assert_eq!(cache.cached_sessions().await, 0);
+            let host = cache
+                .host_checked(
+                    id,
+                    persona(),
+                    HandlerRegistry::default(),
+                    access(),
+                    None,
+                    chirograph::ProjectionSession("v1:test".into()),
+                )
+                .await
+                .unwrap();
+            let mut host = host.lock().await;
+            assert_eq!(host.graph_session().id(), id);
+            assert!(host.resident_reader().is_some());
+            assert!(matches!(
+                host.persist_owned(0).await.unwrap(),
+                ResidentPersistence::Durable { .. }
+            ));
+            drop(host);
+            // Supplied legacy baselines remain on the ordinary Complete path.
+            let host = cache
+                .host_checked(
+                    legacy_id,
+                    persona(),
+                    HandlerRegistry::default(),
+                    access(),
+                    None,
+                    chirograph::ProjectionSession("v1:test".into()),
+                )
+                .await
+                .unwrap();
+            let mut host = host.lock().await;
+            assert!(host.graph_session().placement().is_none());
+            assert!(matches!(
+                host.set_resident_settings(Default::default()),
+                Err(ResidentHostError::OwnershipUnproven)
+            ));
+            assert!(matches!(
+                host.prepare_resident_demand(GraphAddress::Surface(Uuid::from_u128(6199))),
+                Err(ResidentHostError::OwnershipUnproven)
+            ));
+            assert!(matches!(
+                host.persist_owned(0).await.unwrap(),
+                ResidentPersistence::Complete
+            ));
+            assert!(host.resident_reader().is_none());
+        });
+    }
+
+    #[cfg(feature = "resident-storage")]
+    #[test]
+    fn concrete_directory_cache_reuses_one_writer_and_refuses_second_owner() {
+        pollster::block_on(async {
+            let root = tempfile::tempdir().unwrap();
+            let cache = DirectoryHostCache::open(root.path()).unwrap();
+            let id = cache
+                .mint(mere::kernel::graph::Author::user(), None)
+                .await
+                .unwrap()
+                .session_id;
+            let first = cache
+                .host_checked(
+                    id,
+                    persona(),
+                    HandlerRegistry::default(),
+                    access(),
+                    None,
+                    chirograph::ProjectionSession("v1:test".into()),
+                )
+                .await
+                .unwrap();
+            let before = cache.all_stored_bytes().await.unwrap();
+            let duplicate = cache
+                .host_checked(
+                    id,
+                    persona(),
+                    HandlerRegistry::default(),
+                    access(),
+                    None,
+                    chirograph::ProjectionSession("v1:test".into()),
+                )
+                .await
+                .unwrap();
+            assert!(Arc::ptr_eq(&first, &duplicate));
+            assert_eq!(cache.cached_sessions().await, 1);
+            assert_eq!(
+                cache.all_stored_bytes().await.unwrap(),
+                before,
+                "duplicate selection does not reopen or advance the epoch"
+            );
+            assert!(
+                DirectoryHostCache::open(root.path()).is_err(),
+                "fresh second composition must respect the actual Directory lease"
+            );
+            assert!(
+                muniment::DirectoryBackend::open(root.path()).is_err(),
+                "an ordinary writer cannot reopen the admitted backend"
+            );
+            assert_eq!(cache.all_stored_bytes().await.unwrap(), before);
+        });
+    }
+
+    #[cfg(feature = "resident-storage")]
+    #[test]
+    fn concrete_directory_cache_does_not_replace_malformed_existing_head() {
+        pollster::block_on(async {
+            let root = tempfile::tempdir().unwrap();
+            let (id, head) = {
+                let backend = muniment::DirectoryBackend::open(root.path()).unwrap();
+                let sessions = pandect::MereSessions::new(backend.clone());
+                let mut recorded =
+                    sessions.begin_recorded(mere::kernel::graph::Author::user(), None);
+                recorded.flush(SystemTime::UNIX_EPOCH).await.unwrap();
+                let head = format!(
+                    "graphs/{}/resident/v1/head",
+                    recorded.manifest().root_graph_id.as_uuid()
+                );
+                backend.put(&head, b"malformed-head").await.unwrap();
+                (recorded.id(), head)
+            };
+            let cache = DirectoryHostCache::open(root.path()).unwrap();
+            let result = cache
+                .host_checked(
+                    id,
+                    persona(),
+                    HandlerRegistry::default(),
+                    access(),
+                    None,
+                    chirograph::ProjectionSession("v1:test".into()),
+                )
+                .await;
+            assert!(
+                result.is_err(),
+                "an existing malformed head is not a missing first publication"
+            );
+            assert_eq!(
+                cache.stored_bytes(&head).await.unwrap(),
+                Some(b"malformed-head".to_vec())
+            );
+            assert_eq!(cache.cached_sessions().await, 0);
+        });
+    }
+
+    #[test]
+    fn cached_host_persistence_retains_uncertain_batch_and_never_replays_command() {
+        pollster::block_on(async {
+            let (mut owner, backend) = owner().await;
+            let host = owner.host.as_mut().unwrap();
+            host.apply_edits(vec![
+                mere::kernel::graph::CapturedDelta::ReplayAddNodeWithIdIfMissing {
+                    id: Uuid::from_u128(6198).to_string(),
+                    url: "https://6198.test/".into(),
+                    position: [0.0, 0.0],
+                },
+            ])
+            .unwrap();
+            let cursor = host.graph_session().journal().live_cursor();
+            let revision = host.graph_session().revision();
+            let changes = host.graph_session().changes().len();
+            assert!(matches!(
+                host.undo("app").await,
+                Err(MereHostError::ResidentBusy)
+            ));
+            assert!(matches!(
+                host.redo("app").await,
+                Err(MereHostError::ResidentBusy)
+            ));
+            assert!(matches!(
+                host.set_view("app", "view", Default::default()).await,
+                Err(MereHostError::ResidentBusy)
+            ));
+            assert!(matches!(
+                host.archive_receipt("app", "invalid".into()).await,
+                Err(MereHostError::ResidentBusy)
+            ));
+            assert!(matches!(
+                host.trash("app").await,
+                Err(MereHostError::ResidentBusy)
+            ));
+            assert!(matches!(
+                host.restore("app").await,
+                Err(MereHostError::ResidentBusy)
+            ));
+            assert!(matches!(
+                host.prepare_store(0),
+                Err(MereHostError::ResidentBusy)
+            ));
+            assert_eq!(host.graph_session().journal().live_cursor(), cursor);
+            assert_eq!(host.graph_session().revision(), revision);
+            assert_eq!(host.graph_session().changes().len(), changes);
+            backend.mode.store(2, Ordering::SeqCst);
+            assert!(host.persist_owned(0).await.is_err());
+            let work = host
+                .retained_resident_work()
+                .expect("uncertain batch retained");
+            let prepared = work.state.parts.last().unwrap().ops.clone();
+            assert!(matches!(
+                host.persist(0).await,
+                Err(MereHostError::ResidentBusy)
+            ));
+            backend.mode.store(0, Ordering::SeqCst);
+            host.persist_owned(999).await.unwrap();
+            assert_eq!(host.graph_session().journal().live_cursor(), cursor);
+            assert!(host.retained_resident_work().is_none());
+            assert_eq!(backend.calls.lock().unwrap().as_slice(), &[prepared]);
+            assert_eq!(host.presentation_graph().node_count(), 1);
+        });
+    }
+
+    #[test]
+    fn observation_address_decoding_keeps_equal_uuid_strata_distinct() {
+        let id = Uuid::from_u128(6100);
+        let surface = ObservationRequestV1 {
+            schema: OBSERVATION_SCHEMA.into(),
+            address: Some(GraphAddress::Surface(id)),
+        };
+        let resource = ObservationRequestV1 {
+            schema: OBSERVATION_SCHEMA.into(),
+            address: Some(GraphAddress::Resource(id)),
+        };
+        let decoded_surface: ObservationRequestV1 =
+            serde_json::from_slice(&serde_json::to_vec(&surface).unwrap()).unwrap();
+        let decoded_resource: ObservationRequestV1 =
+            serde_json::from_slice(&serde_json::to_vec(&resource).unwrap()).unwrap();
+        assert_ne!(decoded_surface.address, decoded_resource.address);
+        assert!(
+            serde_json::from_str::<ObservationRequestV1>(
+                r#"{"schema":"mere.resident.observation/v1","address":{"Resource":"invalid"}}"#
+            )
+            .is_err()
+        );
     }
 
     #[test]

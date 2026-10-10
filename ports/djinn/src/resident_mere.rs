@@ -21,7 +21,7 @@
 //! revision bell. The application an edit comes through is the one the door
 //! admitted, never the client's claim.
 
-use std::collections::{BTreeMap, HashMap};
+use std::collections::BTreeMap;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
@@ -34,15 +34,20 @@ use chirograph::{
     PortableCardV1, PresentationBinding, PresentationCapability, PresentationCodec,
     PresentationKey, PresentationManifest, PresentationOffer, PresentationSemantics,
     ProjectionOffer, ProjectionRequest, ProjectionSession, ProjectionSnapshot, ProtocolVersion,
-    ResourceRequest, ResourceResponse, SemanticRole,
+    ResourceRequest, ResourceResponse, ResumeReply, ResumeRequest, SemanticRole,
 };
 use graphshell::access::AccessContext;
 use graphshell::handlers::HandlerRegistry;
 use graphshell::lifecycle::AdmittedEndpointContext;
-use graphshell::mere_host::{MereHost, SelectedPersonaRef};
+use graphshell::mere_host::SelectedPersonaRef;
 use graphshell::native::app_admission::{AppId, AppRequest, AppRouteGrants, AppRouteId};
 use graphshell::native::app_broker::AppEndpointCatalog;
 use graphshell::native::endpoint_catalog::ResidentEndpointRoute;
+#[cfg(test)]
+use graphshell::resident_host::test_support::{
+    DirectoryFaultControl, DirectoryFixture, FixtureDirectory as DirectoryBackend,
+};
+use graphshell::resident_host::{CachedResidentSession, DirectoryHostCache};
 use graphshell::session_item::{
     self, ARCHIVE_SCHEMA, ARCHIVE_SOURCE, ATTACH_SESSION_INTENT, ApplyEditsV1, ArchiveActionV1,
     COMPOSE_CODICILS_INTENT, FORK_SESSION_INTENT, MERE_ARCHIVE, MERE_GRAPH, MERE_SESSIONS,
@@ -51,11 +56,14 @@ use graphshell::session_item::{
 };
 use graphshell_endpoint::{
     IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource, ProjectionSource,
+    ResumableProjectionSource,
 };
-use muniment::{DirectoryBackend, RedbBackend};
+#[cfg(not(test))]
+use muniment::DirectoryBackend;
+use muniment::{Backend, RedbBackend};
 use pandect::{
-    Author, GraphSessionManifest, MereApplicationAccess, MereId, MereRecord, MereSessions,
-    SessionId, open_mere_archive_backend, open_mere_backend,
+    Author, GraphSessionManifest, MereApplicationAccess, MereId, MereRecord, SessionId,
+    open_mere_archive_backend,
 };
 use personae::PersonaId;
 use sceno::{
@@ -248,8 +256,22 @@ impl MereRoutes {
         if served.contains_key(&domain) {
             return Ok(route);
         }
-        let backend = open_mere_backend(&self.inner.shared_root, self.inner.persona, mere.id)
-            .map_err(|error| error.to_string())?;
+        #[cfg(not(test))]
+        let cache = DirectoryHostCache::open(pandect::mere_dir(
+            &self.inner.shared_root,
+            self.inner.persona,
+            mere.id,
+        ))
+        .map_err(|error| error.to_string())?;
+        #[cfg(test)]
+        let fixture_owner = DirectoryFixture::open(pandect::mere_dir(
+            &self.inner.shared_root,
+            self.inner.persona,
+            mere.id,
+        ))
+        .map_err(|error| error.to_string())?;
+        #[cfg(test)]
+        let (cache, fixture_owner) = fixture_owner.into_parts();
         let shared = Arc::new(MereShared {
             domain: domain.clone(),
             validator: self.inner.validators.get(&domain).cloned(),
@@ -259,9 +281,10 @@ impl MereRoutes {
                 mere.id,
             )
             .map_err(|e| e.to_string())?,
-            backend,
+            cache,
+            #[cfg(test)]
+            fixture_owner: Some(fixture_owner),
             persona: self.inner.persona,
-            hosts: Mutex::new(HashMap::new()),
             lifecycle: AtomicU64::new(1),
         });
         let opened = Arc::clone(&shared);
@@ -275,7 +298,7 @@ impl MereRoutes {
         self.inner
             .catalog
             .update(|catalog| {
-                catalog.register_notifying(
+                catalog.register_resumable_notifying(
                     route.id(),
                     format!("Mere: {domain}"),
                     move |context| {
@@ -288,7 +311,7 @@ impl MereRoutes {
                         )
                     },
                 )?;
-                catalog.register_notifying(
+                catalog.register_resumable_notifying(
                     ambient.id(),
                     format!("Ambient mere: {domain}"),
                     move |context| {
@@ -321,16 +344,16 @@ impl MereRoutes {
 /// Recheck live owner policy before factory construction and on every read
 /// or write. Existing sessions cannot keep reading after a denial or ambient
 /// opt-out. Ambient routes offer graph reads only and accept no intents.
-struct AccessEndpoint {
-    endpoint: MereEndpoint,
+struct AccessEndpoint<B: Backend + Clone + Send + Sync + 'static = DirectoryBackend> {
+    endpoint: MereEndpoint<B>,
     grants: AppRouteGrants,
     request: AppRequest,
     ambient: bool,
 }
 
-impl AccessEndpoint {
+impl<B: Backend + Clone + Send + Sync + 'static> AccessEndpoint<B> {
     fn open(
-        shared: Arc<MereShared>,
+        shared: Arc<MereShared<B>>,
         context: &AdmittedEndpointContext,
         grants: AppRouteGrants,
         route: &str,
@@ -363,7 +386,7 @@ impl AccessEndpoint {
     }
 }
 
-impl ProjectionCatalog for AccessEndpoint {
+impl<B: Backend + Clone + Send + Sync + 'static> ProjectionCatalog for AccessEndpoint<B> {
     fn describe(&self) -> EndpointDescriptor {
         let mut descriptor = self.endpoint.describe();
         if self.ambient {
@@ -374,7 +397,7 @@ impl ProjectionCatalog for AccessEndpoint {
         descriptor
     }
 }
-impl ProjectionSource for AccessEndpoint {
+impl<B: Backend + Clone + Send + Sync + 'static> ProjectionSource for AccessEndpoint<B> {
     type Error = String;
     fn snapshot(&mut self, request: ProjectionRequest) -> Result<ProjectionSnapshot, String> {
         self.check()?;
@@ -392,7 +415,23 @@ impl ProjectionSource for AccessEndpoint {
         Ok(snapshot)
     }
 }
-impl PresentationSource for AccessEndpoint {
+impl<B: Backend + Clone + Send + Sync + 'static> ResumableProjectionSource for AccessEndpoint<B> {
+    type Error = String;
+    fn resume(&mut self, request: ResumeRequest) -> Result<ResumeReply, String> {
+        self.check()?;
+        let projection = self
+            .describe()
+            .projections
+            .into_iter()
+            .find(|offer| offer.request.session == request.session)
+            .ok_or("resume names an undisclosed projection")?;
+        // Context is snapshot metadata, so a notice always obtains fresh context.
+        // The client retains unchanged resources through apply_snapshot.
+        self.snapshot(projection.request)
+            .map(|snapshot| ResumeReply::Snapshot(Box::new(snapshot)))
+    }
+}
+impl<B: Backend + Clone + Send + Sync + 'static> PresentationSource for AccessEndpoint<B> {
     type Error = String;
     fn resource(&mut self, request: ResourceRequest) -> Result<ResourceResponse, String> {
         self.check()?;
@@ -402,7 +441,7 @@ impl PresentationSource for AccessEndpoint {
         self.endpoint.resource(request)
     }
 }
-impl IntentSink for AccessEndpoint {
+impl<B: Backend + Clone + Send + Sync + 'static> IntentSink for AccessEndpoint<B> {
     type Error = String;
     fn invoke(&mut self, intent: IntentInvocation) -> Result<IntentResult, String> {
         self.check()?;
@@ -415,7 +454,7 @@ impl IntentSink for AccessEndpoint {
         self.endpoint.invoke(intent)
     }
 }
-impl ProjectionNoticeSource for AccessEndpoint {
+impl<B: Backend + Clone + Send + Sync + 'static> ProjectionNoticeSource for AccessEndpoint<B> {
     type Error = String;
     fn poll_notice(&mut self) -> Result<Option<CarrierNotice>, String> {
         self.check()?;
@@ -424,22 +463,23 @@ impl ProjectionNoticeSource for AccessEndpoint {
     }
 }
 
-type SharedHost = Arc<Mutex<MereHost<DirectoryBackend>>>;
+type SharedHost<B = DirectoryBackend> = Arc<Mutex<CachedResidentSession<B>>>;
 
 /// One mere's store, and the host of each of its sessions an application has
 /// attached to.
-struct MereShared {
+struct MereShared<B = DirectoryBackend> {
     domain: String,
     validator: Option<pandect::GraphValidator>,
-    backend: DirectoryBackend,
+    cache: DirectoryHostCache<B>,
+    #[cfg(test)]
+    fixture_owner: Option<DirectoryFaultControl>,
     archive: RedbBackend,
     persona: PersonaId,
-    hosts: Mutex<HashMap<SessionId, SharedHost>>,
     /// The sessions projection's revision: it moves with every lifecycle step.
     lifecycle: AtomicU64,
 }
 
-impl MereShared {
+impl<B: Backend + Clone + Send + Sync + 'static> MereShared<B> {
     fn validate(&self, graph: &pandect::graph_codicil::GraphCandidate) -> Result<(), String> {
         if let Some(validator) = &self.validator {
             validator(graph)?;
@@ -447,8 +487,8 @@ impl MereShared {
         Ok(())
     }
 
-    fn sessions(&self) -> MereSessions<DirectoryBackend> {
-        MereSessions::new(self.backend.clone())
+    fn sessions(&self) -> &DirectoryHostCache<B> {
+        &self.cache
     }
 
     fn persona_id(&self) -> String {
@@ -465,34 +505,26 @@ impl MereShared {
 
     /// The one host of session `id`, opened once and shared by every
     /// application attached to it.
-    async fn host(&self, id: SessionId) -> Result<SharedHost, String> {
-        let mut hosts = self.hosts.lock().await;
-        if let Some(host) = hosts.get(&id) {
-            return Ok(Arc::clone(host));
-        }
+    async fn host(&self, id: SessionId) -> Result<SharedHost<B>, String> {
         let persona = self.persona_id();
-        let host = MereHost::open_session_checked(
-            self.backend.clone(),
-            id,
-            SelectedPersonaRef {
-                persona: persona.clone(),
-                profile: "djinn".to_string(),
-            },
-            HandlerRegistry::new(Vec::new()),
-            AccessContext {
-                persona,
-                device: "djinn".to_string(),
-                at_ms: 0,
-            },
-            self.validator.clone(),
-        )
-        .await
-        .map_err(|error| error.to_string())?
-        .with_projection_session(ProjectionSession(MERE_GRAPH.to_string()))
-        .with_session_item();
-        let host = Arc::new(Mutex::new(host));
-        hosts.insert(id, Arc::clone(&host));
-        Ok(host)
+        self.cache
+            .host_checked(
+                id,
+                SelectedPersonaRef {
+                    persona: persona.clone(),
+                    profile: "djinn".to_string(),
+                },
+                HandlerRegistry::new(Vec::new()),
+                AccessContext {
+                    persona,
+                    device: "djinn".to_string(),
+                    at_ms: 0,
+                },
+                self.validator.clone(),
+                ProjectionSession(MERE_GRAPH.to_string()),
+            )
+            .await
+            .map_err(|error| error.to_string())
     }
 
     /// The live session changed last, minting one when there is none.
@@ -535,11 +567,11 @@ fn lifecycle_action(intent: &str, label: &str, explanation: &str) -> AdvertisedA
 }
 
 /// One admitted application's view of one mere.
-struct MereEndpoint {
-    shared: Arc<MereShared>,
+struct MereEndpoint<B: Backend + Clone + Send + Sync + 'static = DirectoryBackend> {
+    shared: Arc<MereShared<B>>,
     app: String,
     attached: SessionId,
-    host: SharedHost,
+    host: SharedHost<B>,
     /// Minted by the admitted endpoint, independent of any payload view name.
     pane: pandect::ViewKey,
     /// The graph epoch and revision this connection last saw or was told of.
@@ -549,9 +581,9 @@ struct MereEndpoint {
     seen_archive: u64,
 }
 
-impl MereEndpoint {
+impl<B: Backend + Clone + Send + Sync + 'static> MereEndpoint<B> {
     fn open_mode(
-        shared: Arc<MereShared>,
+        shared: Arc<MereShared<B>>,
         context: &AdmittedEndpointContext,
         ambient: bool,
     ) -> Result<Self, String> {
@@ -592,7 +624,7 @@ impl MereEndpoint {
         })
     }
 
-    fn attach_host(&mut self, id: SessionId, host: SharedHost) {
+    fn attach_host(&mut self, id: SessionId, host: SharedHost<B>) {
         if !Arc::ptr_eq(&self.host, &host) {
             run(async {
                 let mut previous = self.host.lock().await;
@@ -606,6 +638,7 @@ impl MereEndpoint {
         }
         self.attached = id;
         self.host = host;
+        self.seen_graph = (SceneEpoch(0), Revision(0));
     }
 
     fn sessions_session() -> ProjectionSession {
@@ -779,6 +812,7 @@ impl MereEndpoint {
             scene: SceneSnapshot::from_dense(SESSIONS_EPOCH, revision, scene)
                 .map_err(|error| format!("{error:?}"))?,
             presentation,
+            coverage: None,
             cache_policy: CachePolicy::default(),
         })
     }
@@ -854,7 +888,7 @@ impl MereEndpoint {
                 current_revision: self.sessions_revision(),
             });
         }
-        let outcome = (|| -> Result<Option<(SessionId, SharedHost)>, String> {
+        let outcome = (|| -> Result<Option<(SessionId, SharedHost<B>)>, String> {
             let payload: ArchiveActionV1 =
                 serde_json::from_slice(&intent.payload).map_err(|e| e.to_string())?;
             if payload.schema != ARCHIVE_SCHEMA {
@@ -874,6 +908,8 @@ impl MereEndpoint {
                         let id = payload.session.ok_or("save names no session")?;
                         let host = shared.host(id).await?;
                         let mut host = host.lock().await;
+                        host.ensure_metadata_idle()
+                            .map_err(|error| error.to_string())?;
                         let payload = host.graph_session().profiled_codicil_payload();
                         let id = pandect::graph_codicil::save_profiled_session_codicil_checked(
                             &mut store,
@@ -1004,7 +1040,7 @@ impl MereEndpoint {
         let shared = Arc::clone(&self.shared);
         let author = shared.author(&self.app);
         let app = self.app.clone();
-        let outcome: Result<Option<(SessionId, SharedHost)>, String> = run(async move {
+        let outcome: Result<Option<(SessionId, SharedHost<B>)>, String> = run(async move {
             match (intent.intent.as_str(), target) {
                 (MINT_SESSION_INTENT, None) => {
                     shared
@@ -1019,10 +1055,9 @@ impl MereEndpoint {
                 (FORK_SESSION_INTENT, Some(id)) => {
                     let parent = shared.host(id).await?;
                     let parent = parent.lock().await;
-                    let session = parent.graph_session();
                     shared
                         .sessions()
-                        .fork_at(session, session.journal().live_cursor(), author)
+                        .fork_at(&parent, author)
                         .await
                         .map_err(|error| error.to_string())?;
                 },
@@ -1061,6 +1096,81 @@ impl MereEndpoint {
     }
 
     fn invoke_graph(&mut self, intent: IntentInvocation) -> Result<IntentResult, String> {
+        use graphshell::resident_host::{
+            DEMAND_INTENT, OBSERVATION_SCHEMA, ObservationRequestV1, REFRESH_INTENT,
+        };
+        if matches!(intent.intent.as_str(), DEMAND_INTENT | REFRESH_INTENT) {
+            let payload: ObservationRequestV1 = match serde_json::from_slice(&intent.payload) {
+                Ok(payload) => payload,
+                Err(error) => {
+                    return Ok(IntentResult::Rejected {
+                        reason: format!("invalid observation payload: {error}"),
+                    });
+                },
+            };
+            if payload.schema != OBSERVATION_SCHEMA
+                || (intent.intent == DEMAND_INTENT) != payload.address.is_some()
+            {
+                return Ok(IntentResult::Rejected {
+                    reason: "observation schema or address does not match the advertised action"
+                        .into(),
+                });
+            }
+            let host = self.host.clone();
+            let request = run(async {
+                let mut host = host.lock().await;
+                host.sync_projection_context();
+                if intent.observed_epoch != host.projection_epoch()
+                    || intent.observed_revision != host.projection_revision()
+                {
+                    return Err(IntentResult::Stale {
+                        current_epoch: host.projection_epoch(),
+                        current_revision: host.projection_revision(),
+                    });
+                }
+                if Some(intent.target) != host.session_instance()
+                    || host.resident_reader().is_none()
+                {
+                    return Err(IntentResult::Rejected {
+                        reason: "observation action was not advertised for this target".into(),
+                    });
+                }
+                if intent.intent == REFRESH_INTENT && host.recovery_pending() {
+                    // An admitted owner retries its retained IO/publication only.
+                    // The original command is never submitted again.
+                    let _outcome = host.persist_owned(now_secs()).await;
+                    return Ok(None);
+                }
+                let request = if let Some(address) = payload.address {
+                    host.prepare_resident_demand(address)
+                } else {
+                    host.notice_resident_refresh();
+                    host.prepare_resident_refresh()
+                };
+                request
+                    .map_err(|e| IntentResult::Rejected {
+                        reason: e.to_string(),
+                    })?
+                    .ok_or_else(|| IntentResult::Rejected {
+                        reason: "presentation refresh is busy".into(),
+                    })
+                    .map(Some)
+            });
+            let request = match request {
+                Ok(Some(request)) => request,
+                Ok(None) => return Ok(IntentResult::Accepted),
+                Err(result) => return Ok(result),
+            };
+            // No shared host borrow survives I/O; installation verifies the owner token.
+            let completion = run(request.load());
+            let result = run(async { host.lock().await.install_resident_refresh(completion) });
+            return Ok(match result {
+                Ok(_) => IntentResult::Accepted,
+                Err(error) => IntentResult::Rejected {
+                    reason: error.to_string(),
+                },
+            });
+        }
         // Stage the first edit and its fork together. A refused candidate leaves
         // the thaw, session set and store byte-for-byte unchanged.
         let read_only = run(async {
@@ -1088,46 +1198,12 @@ impl MereEndpoint {
                         reason: "read-only archive; explicitly fork before node actions".into(),
                     }));
                 }
-                let source = parent.graph_session();
                 let author = shared.author(&app);
-                let mut fork = shared
+                let id = shared
                     .sessions()
-                    .begin_fork_at(source, source.journal().live_cursor(), author.clone())
-                    .map_err(|e| e.to_string())?;
-                match intent.intent.as_str() {
-                    session_item::APPLY_EDITS_INTENT => {
-                        let payload: ApplyEditsV1 =
-                            serde_json::from_slice(&intent.payload).map_err(|e| e.to_string())?;
-                        if payload.schema != session_item::APPLY_EDITS_SCHEMA
-                            || payload.edits.is_empty()
-                        {
-                            return Err("invalid or empty archive edit".into());
-                        }
-                        fork.apply_now(author, payload.edits)
-                            .map_err(|e| e.to_string())?;
-                        if fork.journal().live_cursor().0 == 0 {
-                            return Err("archive edit changes nothing".into());
-                        }
-                    },
-                    session_item::SET_VIEW_INTENT => {
-                        let payload: SetViewV1 =
-                            serde_json::from_slice(&intent.payload).map_err(|e| e.to_string())?;
-                        if payload.schema != session_item::SET_VIEW_SCHEMA {
-                            return Err("unknown view schema".into());
-                        }
-                        fork.set_view_now(
-                            author,
-                            pandect::ViewKey::new(&app, payload.view).map_err(|e| e.to_string())?,
-                            payload.state,
-                        )
-                        .map_err(|e| e.to_string())?;
-                    },
-                    _ => return Err("read-only archive; fork before this action".into()),
-                }
-                fork.flush(SystemTime::now())
-                    .await
-                    .map_err(|e| e.to_string())?;
-                Ok(Ok(fork.id()))
+                    .fork_with_intent(&parent, author, &app, &intent)
+                    .await?;
+                Ok(Ok(id))
             });
             match candidate {
                 Ok(Ok(id)) => {
@@ -1146,13 +1222,12 @@ impl MereEndpoint {
         let (result, seen) = run(async move {
             let mut host = host.lock().await;
             if Some(intent.target) != host.session_instance() {
-                let result = host.through(app.clone(), |host| host.invoke(intent));
+                let result = host.invoke_as(&app, intent);
                 let result = match result {
-                    Ok(IntentResult::Accepted) => host
-                        .persist(now_secs())
-                        .await
-                        .map(|()| IntentResult::Accepted)
-                        .map_err(|e| e.to_string()),
+                    Ok(IntentResult::Accepted) => {
+                        let _outcome = host.persist_owned(now_secs()).await;
+                        Ok(IntentResult::Accepted)
+                    },
                     Ok(result) => Ok(result),
                     Err(error) => Ok(IntentResult::Rejected {
                         reason: error.to_string(),
@@ -1176,9 +1251,11 @@ impl MereEndpoint {
                 session_item::APPLY_EDITS_INTENT => {
                     match serde_json::from_slice::<ApplyEditsV1>(&intent.payload) {
                         Ok(payload) if payload.schema == session_item::APPLY_EDITS_SCHEMA => {
-                            match host.through(app.clone(), |host| host.apply_edits(payload.edits))
-                            {
-                                Ok(()) => host.persist(now_secs()).await.map(|()| true),
+                            match host.apply_edits_as(&app, payload.edits) {
+                                Ok(()) => {
+                                    let _outcome = host.persist_owned(now_secs()).await;
+                                    Ok(true)
+                                },
                                 Err(error) => Err(error),
                             }
                             .map_err(|error| error.to_string())
@@ -1191,12 +1268,19 @@ impl MereEndpoint {
                     match serde_json::from_slice::<StepV1>(&intent.payload) {
                         Ok(payload) if payload.schema == session_item::STEP_SCHEMA => {
                             let step = if intent.intent == session_item::UNDO_INTENT {
-                                host.undo(&app).await
+                                host.undo_now(&app)
                             } else {
-                                host.redo(&app).await
+                                host.redo_now(&app)
                             };
-                            step.map(|reverted| reverted.is_some())
-                                .map_err(|error| error.to_string())
+                            match step {
+                                Ok(reverted) => {
+                                    if reverted.is_some() {
+                                        let _outcome = host.persist_owned(now_secs()).await;
+                                    }
+                                    Ok(reverted.is_some())
+                                },
+                                Err(error) => Err(error.to_string()),
+                            }
                         },
                         Ok(payload) => Err(format!("unknown step schema {:?}", payload.schema)),
                         Err(error) => Err(format!("invalid step payload: {error}")),
@@ -1204,11 +1288,15 @@ impl MereEndpoint {
                 },
                 session_item::SET_VIEW_INTENT => {
                     match serde_json::from_slice::<SetViewV1>(&intent.payload) {
-                        Ok(payload) if payload.schema == session_item::SET_VIEW_SCHEMA => host
-                            .set_view(&app, &payload.view, payload.state)
-                            .await
-                            .map(|()| true)
-                            .map_err(|error| error.to_string()),
+                        Ok(payload) if payload.schema == session_item::SET_VIEW_SCHEMA => {
+                            match host.set_view_now(&app, &payload.view, payload.state) {
+                                Ok(()) => {
+                                    let _outcome = host.persist_owned(now_secs()).await;
+                                    Ok(true)
+                                },
+                                Err(error) => Err(error.to_string()),
+                            }
+                        },
                         Ok(payload) => Err(format!("unknown view schema {:?}", payload.schema)),
                         Err(error) => Err(format!("invalid view payload: {error}")),
                     }
@@ -1233,7 +1321,7 @@ impl MereEndpoint {
     }
 }
 
-impl ProjectionCatalog for MereEndpoint {
+impl<B: Backend + Clone + Send + Sync + 'static> ProjectionCatalog for MereEndpoint<B> {
     fn describe(&self) -> EndpointDescriptor {
         let graph = run(async { self.host.lock().await.local_request() });
         EndpointDescriptor {
@@ -1260,7 +1348,7 @@ impl ProjectionCatalog for MereEndpoint {
     }
 }
 
-impl ProjectionSource for MereEndpoint {
+impl<B: Backend + Clone + Send + Sync + 'static> ProjectionSource for MereEndpoint<B> {
     type Error = String;
 
     fn snapshot(&mut self, request: ProjectionRequest) -> Result<ProjectionSnapshot, Self::Error> {
@@ -1284,7 +1372,7 @@ impl ProjectionSource for MereEndpoint {
     }
 }
 
-impl PresentationSource for MereEndpoint {
+impl<B: Backend + Clone + Send + Sync + 'static> PresentationSource for MereEndpoint<B> {
     type Error = String;
 
     fn resource(&mut self, request: ResourceRequest) -> Result<ResourceResponse, Self::Error> {
@@ -1318,7 +1406,7 @@ impl PresentationSource for MereEndpoint {
     }
 }
 
-impl IntentSink for MereEndpoint {
+impl<B: Backend + Clone + Send + Sync + 'static> IntentSink for MereEndpoint<B> {
     type Error = String;
 
     fn invoke(&mut self, intent: IntentInvocation) -> Result<IntentResult, Self::Error> {
@@ -1334,7 +1422,7 @@ impl IntentSink for MereEndpoint {
     }
 }
 
-impl ProjectionNoticeSource for MereEndpoint {
+impl<B: Backend + Clone + Send + Sync + 'static> ProjectionNoticeSource for MereEndpoint<B> {
     type Error = String;
 
     fn poll_notice(&mut self) -> Result<Option<CarrierNotice>, Self::Error> {
@@ -1357,7 +1445,8 @@ impl ProjectionNoticeSource for MereEndpoint {
         }
         let host = Arc::clone(&self.host);
         let (graph, now) = run(async move {
-            let host = host.lock().await;
+            let mut host = host.lock().await;
+            host.sync_projection_context();
             (
                 host.session(),
                 (host.projection_epoch(), host.projection_revision()),
@@ -1375,7 +1464,7 @@ impl ProjectionNoticeSource for MereEndpoint {
     }
 }
 
-impl Drop for MereEndpoint {
+impl<B: Backend + Clone + Send + Sync + 'static> Drop for MereEndpoint<B> {
     fn drop(&mut self) {
         run(async {
             let mut host = self.host.lock().await;
@@ -1396,6 +1485,7 @@ mod tests {
     use kernel::graph::{ContainmentSubKind, EdgeAssertion, SemanticSubKind};
     use mere_view::{MereViewModel, MereViewRequest, SessionStep};
     use pandect::{Change, ChangeKind, mere_dir};
+    use std::collections::HashMap;
     use uuid::Uuid;
 
     use crate::resident_reservoir::{
@@ -1472,7 +1562,7 @@ mod tests {
         assert!(host.resident_roots().union().transient.is_empty());
         assert_eq!(host.resident_roots().union().pinned, BTreeSet::from([pin]));
         assert_eq!(
-            shared.hosts.lock().await.len(),
+            shared.cache.cached_sessions().await,
             1,
             "one cached writer serves both endpoints"
         );
@@ -1633,6 +1723,919 @@ mod tests {
 
     fn nodes(snapshot: &ProjectionSnapshot) -> usize {
         snapshot.scene.active_items_in_order().len() - 1
+    }
+
+    async fn plain_directory_shared(
+        root: &std::path::Path,
+        validator: Option<pandect::GraphValidator>,
+    ) -> Arc<MereShared<muniment::DirectoryBackend>> {
+        Arc::new(MereShared {
+            domain: "plain-owner".into(),
+            validator,
+            cache: DirectoryHostCache::open(root.join("mere")).unwrap(),
+            fixture_owner: None,
+            archive: RedbBackend::open(root.join("archive.redb")).unwrap(),
+            persona: persona(73),
+            lifecycle: AtomicU64::new(1),
+        })
+    }
+
+    fn plain_endpoint(
+        shared: Arc<MereShared<muniment::DirectoryBackend>>,
+        app: &str,
+    ) -> AccessEndpoint<muniment::DirectoryBackend> {
+        let route =
+            ResidentEndpointRoute::new(mere_route_id("plain-owner"), MERE_NOTICE_POLL).unwrap();
+        let grants = AppRouteGrants::new(AllowedAppRoutes::none());
+        grants.grant(AppId::new(app), route.clone());
+        AccessEndpoint::open(shared, &context(app), grants, route.id(), false).unwrap()
+    }
+
+    fn plain_graph(
+        endpoint: &mut AccessEndpoint<muniment::DirectoryBackend>,
+    ) -> ProjectionSnapshot {
+        let request = endpoint
+            .describe()
+            .projections
+            .into_iter()
+            .find(|offer| offer.request.session.0 == MERE_GRAPH)
+            .unwrap()
+            .request;
+        endpoint.snapshot(request).unwrap()
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn plain_directory_admitted_endpoints_share_exact_cached_writer_and_lease() {
+        let root = tempfile::tempdir().unwrap();
+        let shared = plain_directory_shared(root.path(), None).await;
+        let mut first = plain_endpoint(shared.clone(), "turnstone");
+        let before = shared.cache.all_stored_bytes().await.unwrap();
+        let mut second = plain_endpoint(shared.clone(), "knot-editor");
+        assert!(
+            shared.fixture_owner.is_none(),
+            "this control uses the actual production Directory owner"
+        );
+        assert!(Arc::ptr_eq(&first.endpoint.host, &second.endpoint.host));
+        assert_eq!(shared.cache.cached_sessions().await, 1);
+        assert_eq!(
+            shared.cache.all_stored_bytes().await.unwrap(),
+            before,
+            "second endpoint selection must not advance a durable epoch"
+        );
+        assert!(DirectoryHostCache::open(shared.cache.root()).is_err());
+        assert!(muniment::DirectoryBackend::open(shared.cache.root()).is_err());
+        let snapshot = plain_graph(&mut first);
+        assert_eq!(
+            first.invoke(apply(&snapshot, vec![node(7301)])).unwrap(),
+            IntentResult::Accepted
+        );
+        let peer = plain_graph(&mut second);
+        assert_eq!(nodes(&peer), 1);
+        let host = second.endpoint.host.lock().await;
+        assert!(!host.has_unstored());
+        assert_eq!(
+            host.graph().node_count(),
+            host.presentation_graph().node_count()
+        );
+        assert!(host.resident_reader().is_some());
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn plain_directory_endpoints_share_validated_writer_after_peer_reconnect() {
+        let root = tempfile::tempdir().unwrap();
+        let validator: pandect::GraphValidator = Arc::new(|graph| {
+            if graph.get_node_by_url("https://7399.test/").is_some() {
+                Err("plain edit validation refusal".into())
+            } else {
+                Ok(())
+            }
+        });
+        let shared = plain_directory_shared(root.path(), Some(validator)).await;
+        let mut first = plain_endpoint(shared.clone(), "turnstone");
+        let snapshot = plain_graph(&mut first);
+        assert_eq!(
+            first.invoke(apply(&snapshot, vec![node(7302)])).unwrap(),
+            IntentResult::Accepted
+        );
+        let second = plain_endpoint(shared.clone(), "knot-editor");
+        assert!(Arc::ptr_eq(&first.endpoint.host, &second.endpoint.host));
+        drop(second);
+        let before = shared.cache.all_stored_bytes().await.unwrap();
+        let mut reconnected = plain_endpoint(shared.clone(), "knot-editor");
+        assert!(Arc::ptr_eq(
+            &first.endpoint.host,
+            &reconnected.endpoint.host
+        ));
+        assert_eq!(shared.cache.cached_sessions().await, 1);
+        assert_eq!(shared.cache.all_stored_bytes().await.unwrap(), before);
+        let peer = plain_graph(&mut reconnected);
+        assert_eq!(nodes(&peer), 1);
+        assert!(
+            matches!(reconnected.invoke(apply(&peer, vec![node(7399)])).unwrap(), IntentResult::Rejected { reason } if reason.contains("plain edit validation refusal"))
+        );
+        assert_eq!(
+            shared.cache.all_stored_bytes().await.unwrap(),
+            before,
+            "a refused peer edit writes no bytes"
+        );
+        let host = first.endpoint.host.lock().await;
+        assert_eq!(host.graph().node_count(), 1);
+        assert!(!host.has_unstored());
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn plain_directory_endpoint_owner_validates_before_epoch_and_refuses_unadmitted_access() {
+        let root = tempfile::tempdir().unwrap();
+        let validator: pandect::GraphValidator =
+            Arc::new(|_| Err("plain owner validation refusal".into()));
+        let shared = plain_directory_shared(root.path(), Some(validator)).await;
+        let id = shared.latest("turnstone").await.unwrap();
+        let before = shared.cache.all_stored_bytes().await.unwrap();
+        assert!(!before.contains_key(graphshell::mere_host::EPOCH_SLOT));
+        let route = mere_route_id("plain-owner");
+        let grants = AppRouteGrants::new(AllowedAppRoutes::none());
+        assert!(
+            AccessEndpoint::open(
+                shared.clone(),
+                &context("turnstone"),
+                grants.clone(),
+                &route,
+                false
+            )
+            .is_err()
+        );
+        assert_eq!(shared.cache.all_stored_bytes().await.unwrap(), before);
+        grants.grant(
+            AppId::new("turnstone"),
+            ResidentEndpointRoute::new(&route, MERE_NOTICE_POLL).unwrap(),
+        );
+        let result =
+            AccessEndpoint::open(shared.clone(), &context("turnstone"), grants, &route, false);
+        assert!(matches!(result, Err(reason) if reason.contains("plain owner validation refusal")));
+        assert_eq!(shared.cache.all_stored_bytes().await.unwrap(), before);
+        assert_eq!(shared.cache.cached_sessions().await, 0);
+        assert_eq!(shared.cache.list().await.unwrap()[0].session_id, id);
+    }
+
+    fn plain_session_card(
+        endpoint: &mut AccessEndpoint<muniment::DirectoryBackend>,
+        snapshot: &ProjectionSnapshot,
+    ) -> PortableCardV1 {
+        let instance = session_item_of(snapshot);
+        let binding = snapshot
+            .presentation
+            .bindings
+            .iter()
+            .find(|binding| binding.instance == instance)
+            .unwrap();
+        let offer = snapshot.presentation.offers[&binding.key]
+            .iter()
+            .find(|offer| offer.codec == PresentationCodec::PortableCardV1)
+            .unwrap();
+        let response = endpoint
+            .resource(ResourceRequest {
+                session: snapshot.session.clone(),
+                resource: offer.resource,
+            })
+            .unwrap();
+        serde_json::from_slice(&response.bytes).unwrap()
+    }
+
+    async fn held_refresh_completion_recovers_peer_publication(failed_load: bool) {
+        use graphshell::client::ClientState;
+        use graphshell::resident_host::{OBSERVATION_SCHEMA, ObservationRequestV1, REFRESH_INTENT};
+        use pandect::addressable_graph::GraphAddress;
+        let root = tempfile::tempdir().unwrap();
+        let shared = plain_directory_shared(root.path(), None).await;
+        let mut first = plain_endpoint(shared.clone(), "turnstone");
+        let mut peer = plain_endpoint(shared.clone(), "knot-editor");
+        assert!(Arc::ptr_eq(&first.endpoint.host, &peer.endpoint.host));
+        assert!(
+            shared.fixture_owner.is_none(),
+            "actual production plain Directory owner"
+        );
+        let before = plain_graph(&mut first);
+        assert_eq!(
+            first.invoke(apply(&before, vec![node(7401)])).unwrap(),
+            IntentResult::Accepted
+        );
+        let peer_before = plain_graph(&mut peer);
+        let mut client = ClientState::default();
+        client.apply_snapshot(peer_before.clone()).unwrap();
+        let owned = first.endpoint.host.clone();
+        let request = {
+            let mut host = owned.lock().await;
+            host.notice_resident_refresh();
+            if failed_load {
+                host.prepare_resident_demand(GraphAddress::Surface(Uuid::from_u128(7499)))
+            } else {
+                host.prepare_resident_refresh()
+            }
+            .unwrap()
+            .unwrap()
+        };
+        // Loading finishes outside the shared host lock, but its completion is
+        // held while the actual peer endpoint commits a different command.
+        let held = request.load().await;
+        assert_eq!(
+            held.failed_for_test(),
+            failed_load,
+            "assert the actual held load result"
+        );
+        assert!(owned.lock().await.refresh_in_flight_for_test());
+        assert_eq!(
+            peer.invoke(apply(&peer_before, vec![node(7402)])).unwrap(),
+            IntentResult::Accepted
+        );
+        let pending = plain_graph(&mut peer);
+        let card = plain_session_card(&mut peer, &pending);
+        assert_eq!(card_value(&card, "Store").as_deref(), Some("stored"));
+        assert_eq!(card_value(&card, "Unstored").as_deref(), Some("false"));
+        assert_eq!(card_value(&card, "Publication").as_deref(), Some("pending"));
+        assert!(
+            card_value(&card, "Store error").is_some(),
+            "the occupied slot prevents publication"
+        );
+        let (cursor, changes) = {
+            let mut host = owned.lock().await;
+            assert_eq!(host.graph().node_count(), 2);
+            assert_eq!(host.presentation_graph().node_count(), 1);
+            assert!(!host.has_unstored());
+            assert!(host.recovery_pending());
+            let cursor = host.graph_session().journal().live_cursor();
+            let changes = host.graph_session().changes().len();
+            let (newest_notice, consumed_notice) = host.refresh_notices_for_test();
+            assert!(newest_notice > consumed_notice);
+            let _outcome = host.install_resident_refresh(held);
+            assert!(
+                !host.refresh_in_flight_for_test(),
+                "matching held completion must retire its slot even during publication recovery; failed_load={failed_load}"
+            );
+            assert!(
+                host.recovery_pending(),
+                "retirement cannot consume the peer's newer publication work"
+            );
+            let (newest_after, consumed_after) = host.refresh_notices_for_test();
+            assert_eq!(
+                newest_after, newest_notice,
+                "retirement preserves the newer notice"
+            );
+            assert!(
+                newest_after > consumed_after,
+                "the peer publication notice remains pending"
+            );
+            assert_eq!(host.graph_session().journal().live_cursor(), cursor);
+            assert_eq!(host.graph_session().changes().len(), changes);
+            (cursor, changes)
+        };
+        let still_pending = plain_graph(&mut peer);
+        let card = plain_session_card(&mut peer, &still_pending);
+        assert_eq!(card_value(&card, "Publication").as_deref(), Some("pending"));
+        assert!(
+            matches!(
+                peer.invoke(apply(&still_pending, vec![node(7498)]))
+                    .unwrap(),
+                IntentResult::Rejected { .. }
+            ),
+            "edits remain paused until peer publication recovers"
+        );
+        let retry = plain_graph(&mut peer);
+        assert_eq!(
+            peer.invoke(on_item(
+                &retry,
+                REFRESH_INTENT,
+                serde_json::to_vec(&ObservationRequestV1 {
+                    schema: OBSERVATION_SCHEMA.into(),
+                    address: None
+                })
+                .unwrap()
+            ))
+            .unwrap(),
+            IntentResult::Accepted
+        );
+        {
+            let host = owned.lock().await;
+            assert!(!host.refresh_in_flight_for_test());
+            assert!(!host.recovery_pending());
+            assert_eq!(host.presentation_graph().node_count(), 2);
+            assert_eq!(
+                host.graph_session().journal().live_cursor(),
+                cursor,
+                "owner refresh cannot replay the peer command"
+            );
+            assert_eq!(host.graph_session().changes().len(), changes);
+        }
+        let settled = plain_graph(&mut peer);
+        let card = plain_session_card(&mut peer, &settled);
+        assert_eq!(card_value(&card, "Store").as_deref(), Some("stored"));
+        assert_eq!(card_value(&card, "Unstored").as_deref(), Some("false"));
+        assert_eq!(
+            card_value(&card, "Publication").as_deref(),
+            Some("published")
+        );
+        assert!(card_value(&card, "Store error").is_none());
+        assert!(first.poll_notice().unwrap().is_some());
+        client
+            .apply_resume(
+                &peer_before.session,
+                first
+                    .resume(client.resume_request(&peer_before.session).unwrap())
+                    .unwrap(),
+            )
+            .unwrap();
+        assert_eq!(
+            client
+                .mounted(&peer_before.session)
+                .unwrap()
+                .scene
+                .active_items_in_order()
+                .len()
+                - 1,
+            2
+        );
+        assert_eq!(
+            peer.invoke(apply(&settled, vec![node(7403)])).unwrap(),
+            IntentResult::Accepted
+        );
+        assert_eq!(nodes(&plain_graph(&mut first)), 3);
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn cached_endpoint_successful_held_refresh_completion_retires_during_peer_publication() {
+        held_refresh_completion_recovers_peer_publication(false).await;
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn cached_endpoint_failed_held_refresh_completion_retires_during_peer_publication() {
+        held_refresh_completion_recovers_peer_publication(true).await;
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn admitted_endpoint_write_after_apply_retries_without_command_replay() {
+        use graphshell::resident_host::test_support::DirectoryFault;
+        for operation in [
+            RecoveryOperation::Apply,
+            RecoveryOperation::Undo,
+            RecoveryOperation::View,
+        ] {
+            endpoint_recovers_without_replay(DirectoryFault::AfterApplyError, operation).await;
+        }
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn admitted_endpoint_post_commit_reader_failure_retries_only_publication() {
+        use graphshell::resident_host::test_support::DirectoryFault;
+        for operation in [RecoveryOperation::Apply, RecoveryOperation::Undo] {
+            endpoint_recovers_without_replay(DirectoryFault::ReadRecordsAfterApply, operation)
+                .await;
+        }
+    }
+
+    #[derive(Clone, Copy, Debug)]
+    enum RecoveryOperation {
+        Apply,
+        Undo,
+        View,
+    }
+
+    fn session_card(
+        endpoint: &mut ResidentEndpointSession,
+        snapshot: &ProjectionSnapshot,
+    ) -> PortableCardV1 {
+        let instance = session_item_of(snapshot);
+        let binding = snapshot
+            .presentation
+            .bindings
+            .iter()
+            .find(|b| b.instance == instance)
+            .unwrap();
+        let offer = snapshot.presentation.offers[&binding.key]
+            .iter()
+            .find(|offer| offer.codec == PresentationCodec::PortableCardV1)
+            .unwrap();
+        let response = endpoint
+            .resource(ResourceRequest {
+                session: snapshot.session.clone(),
+                resource: offer.resource,
+            })
+            .unwrap();
+        serde_json::from_slice(&response.bytes).unwrap()
+    }
+
+    fn card_value(card: &PortableCardV1, label: &str) -> Option<String> {
+        card.values
+            .iter()
+            .find(|value| value.label == label)
+            .map(|value| value.value.clone())
+    }
+
+    async fn endpoint_recovers_without_replay(
+        fault: graphshell::resident_host::test_support::DirectoryFault,
+        operation: RecoveryOperation,
+    ) {
+        use graphshell::client::ClientState;
+        use graphshell::resident_host::test_support::DirectoryFault;
+        use graphshell::resident_host::{OBSERVATION_SCHEMA, ObservationRequestV1, REFRESH_INTENT};
+        use muniment::WriteOp;
+        let fixture = fixture(
+            72,
+            &format!("recovery-{fault:?}-{operation:?}").to_lowercase(),
+        )
+        .await;
+        let mut first = fixture.attach("turnstone").await;
+        let mut peer = fixture.attach("knot-editor").await;
+        // Two independently journaled changes leave one resident record after undo.
+        for id in [7201, 7202] {
+            let snapshot = graph(&mut first);
+            assert_eq!(
+                first.invoke(apply(&snapshot, vec![node(id)])).unwrap(),
+                IntentResult::Accepted
+            );
+        }
+        let shared = fixture
+            .routes
+            .inner
+            .served
+            .lock()
+            .await
+            .values()
+            .next()
+            .unwrap()
+            .clone();
+        let owned = shared
+            .host(shared.latest("turnstone").await.unwrap())
+            .await
+            .unwrap();
+        assert_eq!(shared.cache.cached_sessions().await, 1);
+        let before = graph(&mut first);
+        let peer_before = graph(&mut peer);
+        let mut client = ClientState::default();
+        client.apply_snapshot(peer_before.clone()).unwrap();
+        let (cursor_before, revision_before) = {
+            let host = owned.lock().await;
+            (
+                host.graph_session().journal().live_cursor(),
+                host.graph().revision(),
+            )
+        };
+        shared.fixture_owner.as_ref().unwrap().clear_batches();
+        shared.fixture_owner.as_ref().unwrap().fault(fault);
+        let command = match operation {
+            RecoveryOperation::Apply => apply(&before, vec![node(7203)]),
+            RecoveryOperation::Undo => undo(&before),
+            RecoveryOperation::View => on_item(
+                &before,
+                session_item::SET_VIEW_INTENT,
+                serde_json::to_vec(&SetViewV1::new(
+                    "recovery-view",
+                    pandect::ViewIntent {
+                        focus: Some("https://7201.test/".into()),
+                        ..Default::default()
+                    },
+                ))
+                .unwrap(),
+            ),
+        };
+        assert_eq!(
+            first.invoke(command).unwrap(),
+            IntentResult::Accepted,
+            "a storage/publication failure must not reject the already applied {operation:?}"
+        );
+        if fault == DirectoryFault::ReadRecordsAfterApply {
+            let intercepted = shared.fixture_owner.as_ref().unwrap().intercepted_reads();
+            assert!(
+                intercepted
+                    .iter()
+                    .any(|key| key.contains("/resident/v1/catalog/")),
+                "{operation:?} must encounter an actual post-commit reader catalog fault; intercepted={intercepted:?}"
+            );
+        }
+        let pending = graph(&mut first);
+        let card = session_card(&mut first, &pending);
+        let uncertain = fault == DirectoryFault::AfterApplyError;
+        assert_eq!(
+            card_value(&card, "Store").as_deref(),
+            Some(if uncertain { "failed" } else { "stored" })
+        );
+        assert_eq!(
+            card_value(&card, "Unstored").as_deref(),
+            Some(if uncertain { "true" } else { "false" })
+        );
+        assert_eq!(card_value(&card, "Publication").as_deref(), Some("pending"));
+        assert!(
+            card_value(&card, "Store error")
+                .unwrap()
+                .contains(if uncertain {
+                    "fixture lost completion after apply"
+                } else {
+                    "fixture reader record failure"
+                })
+        );
+        let (cursor, changes, truth) = {
+            let host = owned.lock().await;
+            assert_eq!(host.has_unstored(), uncertain);
+            let expected_nodes = match operation {
+                RecoveryOperation::Apply => 3,
+                RecoveryOperation::Undo => 1,
+                RecoveryOperation::View => 2,
+            };
+            assert_eq!(
+                host.graph().node_count(),
+                expected_nodes,
+                "the original command already changed its complete writer"
+            );
+            if matches!(operation, RecoveryOperation::View) {
+                assert_eq!(
+                    host.graph_session().journal().live_cursor(),
+                    cursor_before,
+                    "view persistence creates no truth journal entry"
+                );
+                assert_eq!(host.graph().revision(), revision_before);
+                assert_eq!(
+                    host.view("turnstone", "recovery-view")
+                        .unwrap()
+                        .focus
+                        .as_deref(),
+                    Some("https://7201.test/")
+                );
+            }
+            (
+                host.graph_session().journal().live_cursor(),
+                host.graph_session().changes().len(),
+                host.graph().node_count(),
+            )
+        };
+        let batches = shared.fixture_owner.as_ref().unwrap().batches();
+        assert_eq!(
+            batches.len(),
+            1,
+            "one real Directory apply happened before the injected failure"
+        );
+        shared
+            .fixture_owner
+            .as_ref()
+            .unwrap()
+            .fault(DirectoryFault::None);
+        // The actual Directory values prove that an error is not evidence of no write.
+        for op in &batches[0] {
+            match op {
+                WriteOp::Put { key, value } => assert_eq!(
+                    shared.cache.stored_bytes(key).await.unwrap().as_ref(),
+                    Some(value)
+                ),
+                WriteOp::Delete { key } => {
+                    assert_eq!(shared.cache.stored_bytes(key).await.unwrap(), None)
+                },
+            }
+        }
+        assert!(
+            matches!(
+                first.invoke(apply(&pending, vec![node(7299)])).unwrap(),
+                IntentResult::Rejected { .. }
+            ),
+            "new edits remain paused until retained write/publication recovery"
+        );
+        assert_eq!(owned.lock().await.graph().node_count(), truth);
+        let retry = graph(&mut first);
+        assert_eq!(
+            first
+                .invoke(on_item(
+                    &retry,
+                    REFRESH_INTENT,
+                    serde_json::to_vec(&ObservationRequestV1 {
+                        schema: OBSERVATION_SCHEMA.into(),
+                        address: None,
+                    })
+                    .unwrap()
+                ))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        assert_eq!(
+            shared.fixture_owner.as_ref().unwrap().batches(),
+            batches,
+            "retry reconciles the exact retained bytes or reloads the reader, without a second apply"
+        );
+        {
+            let host = owned.lock().await;
+            assert_eq!(
+                host.graph_session().journal().live_cursor(),
+                cursor,
+                "retry cannot replay edit or undo"
+            );
+            assert_eq!(host.graph_session().changes().len(), changes);
+            assert!(!host.has_unstored());
+            assert_eq!(host.presentation_graph().node_count(), truth);
+        }
+        let settled = graph(&mut first);
+        let card = session_card(&mut first, &settled);
+        assert_eq!(card_value(&card, "Store").as_deref(), Some("stored"));
+        assert_eq!(card_value(&card, "Unstored").as_deref(), Some("false"));
+        assert_eq!(
+            card_value(&card, "Publication").as_deref(),
+            Some("published")
+        );
+        assert!(card_value(&card, "Store error").is_none_or(|error| error.is_empty()));
+        assert!(peer.poll_notice().unwrap().is_some());
+        client
+            .apply_resume(
+                &peer_before.session,
+                peer.resume(client.resume_request(&peer_before.session).unwrap())
+                    .unwrap(),
+            )
+            .unwrap();
+        assert_eq!(
+            client
+                .mounted(&peer_before.session)
+                .unwrap()
+                .scene
+                .active_items_in_order()
+                .len()
+                - 1,
+            truth
+        );
+        assert_eq!(
+            first.invoke(apply(&settled, vec![node(7204)])).unwrap(),
+            IntentResult::Accepted,
+            "editing resumes after recovery"
+        );
+        assert_eq!(nodes(&graph(&mut first)), truth + 1);
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn scoped_endpoint_coverage_demand_and_context_resume_retain_client_resources() {
+        use graphshell::client::ClientState;
+        use graphshell::projection_editor::{Channel, ProjectionDraft, Reading, SourceBinding};
+        use graphshell::resident_host::{
+            DEMAND_INTENT, OBSERVATION_SCHEMA, ObservationRequestV1, PaneRoots, REFRESH_INTENT,
+            ResidentSettings,
+        };
+        use kernel::graph::{CoverageLayer, CoverageLimit, CoverageNote, PendingLinkRetention};
+        use pandect::addressable_graph::{GraphAddress, ResidencyPolicy, ResidencyStatus};
+        use std::collections::BTreeSet;
+        let fixture = fixture(61, "portable-coverage").await;
+        let mut first = fixture.attach("turnstone").await;
+        let mut second = fixture.attach("knot-editor").await;
+        let initial = graph(&mut first);
+        let a = Uuid::from_u128(6101);
+        let b = Uuid::from_u128(6102);
+        assert_eq!(
+            first
+                .invoke(apply(&initial, vec![node(6101), node(6102)]))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        let shared = fixture
+            .routes
+            .inner
+            .served
+            .lock()
+            .await
+            .values()
+            .next()
+            .unwrap()
+            .clone();
+        let mut first_owner =
+            MereEndpoint::open_mode(shared.clone(), &context("turnstone"), false).unwrap();
+        let second_owner =
+            MereEndpoint::open_mode(shared.clone(), &context("knot-editor"), false).unwrap();
+        assert!(Arc::ptr_eq(&first_owner.host, &second_owner.host));
+        assert_eq!(shared.cache.cached_sessions().await, 1);
+        let owned = first_owner.host.clone();
+        {
+            let mut host = owned.lock().await;
+            assert!(shared.cache.root().is_dir());
+            let mut draft = ProjectionDraft::new();
+            draft.id = "coverage-scope".into();
+            draft.label = "Coverage scope".into();
+            draft.source = SourceBinding {
+                authority: "local".into(),
+                domain: "notes".into(),
+                resource: "graph:notes".into(),
+            };
+            draft.reading = Reading {
+                kind: "nodes".into(),
+                key: "id".into(),
+                value: None,
+            };
+            draft.encoding.x = Channel::Field("x".into());
+            draft.encoding.y = Channel::Field("y".into());
+            draft.appearance.title = "Coverage scope".into();
+            draft.appearance.realization = "canvas".into();
+            draft.provenance.author = "fixture-owner".into();
+            draft.provenance.source_revision = Some("1".into());
+            host.save_projection(&graphshell::projection_compile::ProjectionSnapshot {
+                definition: draft.to_definition().unwrap(),
+                selected_occurrence: None,
+            })
+            .unwrap();
+            host.persist_owned(0).await.unwrap();
+            host.set_resident_pane(
+                first_owner.pane.clone(),
+                PaneRoots {
+                    roster: BTreeSet::from([a]),
+                    focus: None,
+                },
+            );
+            host.set_resident_settings(ResidentSettings {
+                policy: ResidencyPolicy::Neighborhood { hops: 0 },
+                projection: Some("coverage-scope".into()),
+                ..Default::default()
+            })
+            .unwrap();
+            host.persist_owned(0).await.unwrap();
+            assert_eq!(
+                host.resident_reader()
+                    .unwrap()
+                    .status(GraphAddress::Surface(b)),
+                ResidencyStatus::NotLoaded
+            );
+            assert!(host.presentation_graph().node_count() < host.graph().node_count());
+        }
+        let scoped = graph(&mut first);
+        let peer = graph(&mut second);
+        assert_eq!(nodes(&scoped), 1);
+        assert_eq!(scoped.scene, peer.scene);
+        let limits = &scoped.coverage.as_ref().unwrap().limits;
+        assert!(limits.iter().any(|limit| limit.layer
+            == chirograph::PortableCoverageLayerV1::Residency
+            && limit.surfaces.contains(&b.to_string())));
+        assert!(scoped.presentation.offers.values().flatten().any(|offer| {
+            offer
+                .semantics
+                .actions
+                .iter()
+                .any(|action| action.intent.0 == DEMAND_INTENT)
+        }));
+        let mut client = ClientState::default();
+        client.apply_snapshot(peer.clone()).unwrap();
+        let offer = peer.presentation.offers.values().flatten().next().unwrap();
+        let resource = second
+            .resource(ResourceRequest {
+                session: peer.session.clone(),
+                resource: offer.resource,
+            })
+            .unwrap();
+        client.apply_resource(resource).unwrap();
+        let cached = offer.resource;
+        let demand = ObservationRequestV1 {
+            schema: OBSERVATION_SCHEMA.into(),
+            address: Some(GraphAddress::Surface(b)),
+        };
+        let malformed = on_item(
+            &scoped,
+            DEMAND_INTENT,
+            br#"{"schema":"mere.resident.observation/v1","address":{"Surface":"bad-uuid"}}"#
+                .to_vec(),
+        );
+        assert!(matches!(
+            first.invoke(malformed).unwrap(),
+            IntentResult::Rejected { .. }
+        ));
+        assert_eq!(
+            first
+                .invoke(on_item(
+                    &scoped,
+                    DEMAND_INTENT,
+                    serde_json::to_vec(&demand).unwrap()
+                ))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        let bell = second
+            .poll_notice()
+            .unwrap()
+            .expect("demand updates peer presentation");
+        assert_eq!(bell.session, peer.session);
+        client
+            .apply_resume(
+                &peer.session,
+                second
+                    .resume(client.resume_request(&peer.session).unwrap())
+                    .unwrap(),
+            )
+            .unwrap();
+        let loaded = graph(&mut first);
+        assert_eq!(nodes(&loaded), 2);
+        let before = client.mounted(&peer.session).unwrap().clone();
+        let (truth, journal, writer_revision) = {
+            let mut host = owned.lock().await;
+            assert_eq!(
+                host.resident_reader()
+                    .unwrap()
+                    .status(GraphAddress::Surface(b)),
+                ResidencyStatus::Loaded
+            );
+            let truth = host.presentation_graph().revision();
+            let journal = host.graph_session().journal().live_cursor();
+            let writer_revision = host.graph_session().revision();
+            let mut limit =
+                CoverageLimit::new(CoverageLayer::Disclosure, "private material withheld");
+            limit.resources.push(b);
+            host.set_resident_host_coverage(CoverageNote {
+                limits: vec![limit],
+            })
+            .unwrap();
+            assert_eq!(host.presentation_graph().revision(), truth);
+            (truth, journal, writer_revision)
+        };
+        assert!(second.poll_notice().unwrap().is_some());
+        client.mark_stale(&peer.session);
+        client
+            .apply_resume(
+                &peer.session,
+                second
+                    .resume(client.resume_request(&peer.session).unwrap())
+                    .unwrap(),
+            )
+            .unwrap();
+        let context = client.mounted(&peer.session).unwrap();
+        assert_eq!(context.scene.tables, before.scene.tables);
+        assert_eq!(context.presentation, before.presentation);
+        assert_eq!(context.status, chirograph::SessionStatus::Live);
+        assert!(
+            context
+                .coverage
+                .as_ref()
+                .unwrap()
+                .limits
+                .iter()
+                .any(|limit| limit.layer == chirograph::PortableCoverageLayerV1::Disclosure)
+        );
+        assert!(matches!(
+            client
+                .resolve(
+                    &peer.session,
+                    peer.presentation
+                        .bindings
+                        .iter()
+                        .find(|binding| peer.presentation.offers[&binding.key]
+                            .iter()
+                            .any(|offer| offer.resource == cached))
+                        .unwrap()
+                        .instance,
+                    &chirograph::CapabilityProfile::new([PresentationCapability::PortableCard])
+                )
+                .unwrap(),
+            graphshell::client::PresentationResolution::Ready(_)
+        ));
+        // Publish only retained Pending context through the same owner's store.
+        // Coverage and available truth stay equal, but the observation must ring.
+        let current = graph(&mut first);
+        {
+            let host = owned.lock().await;
+            host.publish_pending_retention_for_test(PendingLinkRetention::UntilPurged)
+                .await
+                .unwrap();
+        }
+        let refresh = ObservationRequestV1 {
+            schema: OBSERVATION_SCHEMA.into(),
+            address: None,
+        };
+        assert_eq!(
+            first
+                .invoke(on_item(
+                    &current,
+                    REFRESH_INTENT,
+                    serde_json::to_vec(&refresh).unwrap()
+                ))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        assert!(
+            second.poll_notice().unwrap().is_some(),
+            "Pending-only observation rings despite equal coverage"
+        );
+        let previous = client.mounted(&peer.session).unwrap().clone();
+        client
+            .apply_resume(
+                &peer.session,
+                second
+                    .resume(client.resume_request(&peer.session).unwrap())
+                    .unwrap(),
+            )
+            .unwrap();
+        assert_eq!(
+            client.mounted(&peer.session).unwrap().scene.tables,
+            previous.scene.tables
+        );
+        assert_eq!(
+            client.mounted(&peer.session).unwrap().coverage,
+            previous.coverage
+        );
+        let host = owned.lock().await;
+        assert_eq!(host.presentation_graph().revision(), truth);
+        assert_eq!(host.graph_session().journal().live_cursor(), journal);
+        assert_eq!(host.graph_session().revision(), writer_revision);
+        assert_eq!(
+            host.presentation_graph().pending_link_state().retention,
+            PendingLinkRetention::UntilPurged
+        );
+        drop(host);
+        // Attach/switch resets endpoint seen state without depending on epoch inequality.
+        first_owner.attach_host(first_owner.attached, first_owner.host.clone());
+        assert_eq!(first_owner.seen_graph, (SceneEpoch(0), Revision(0)));
+        assert!(first_owner.poll_notice().unwrap().is_some());
     }
 
     #[tokio::test(flavor = "multi_thread")]
@@ -2440,6 +3443,8 @@ mod tests {
                 .all(|offer| offer.semantics.actions.is_empty())
         );
         for intent in [
+            graphshell::resident_host::DEMAND_INTENT,
+            graphshell::resident_host::REFRESH_INTENT,
             MINT_SESSION_INTENT,
             FORK_SESSION_INTENT,
             TRASH_SESSION_INTENT,
@@ -2461,7 +3466,7 @@ mod tests {
                 .admit(&request("cleromancy", &ambient_mere_route_id("notes")))
                 .is_err()
         );
-        let sessions = MereEndpoint::sessions_request();
+        let sessions = MereEndpoint::<DirectoryBackend>::sessions_request();
         assert!(ambient.snapshot(sessions).is_err());
 
         fixture

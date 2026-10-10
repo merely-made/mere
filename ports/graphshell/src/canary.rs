@@ -273,6 +273,7 @@ impl FixtureEndpoint {
             session: session.clone(),
             scene,
             presentation,
+            coverage: None,
             cache_policy: CachePolicy::default(),
         };
         Self {

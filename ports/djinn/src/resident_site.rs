@@ -350,6 +350,7 @@ impl ProjectionSource for PublishedSiteEndpoint {
             scene: SceneSnapshot::from_dense(SceneEpoch(1), Revision(1), scene)
                 .map_err(|error| format!("{error:?}"))?,
             presentation,
+            coverage: None,
             cache_policy: CachePolicy::default(),
         })
     }

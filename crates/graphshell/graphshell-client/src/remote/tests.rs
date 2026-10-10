@@ -138,6 +138,7 @@ impl Board {
             scene: SceneSnapshot::from_dense(SceneEpoch(1), Revision(self.revision), scene)
                 .unwrap(),
             presentation,
+            coverage: None,
             cache_policy: CachePolicy {
                 retention: CacheRetention::MemoryOnly,
                 expires_at_ms: None,

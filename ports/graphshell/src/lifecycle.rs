@@ -460,6 +460,7 @@ mod tests {
             scene: SceneSnapshot::from_dense(SceneEpoch(1), Revision(1), Scene::new())
                 .expect("scene"),
             presentation: PresentationManifest::default(),
+            coverage: None,
             cache_policy: CachePolicy::default(),
         };
         snapshot.cache_policy = policy;

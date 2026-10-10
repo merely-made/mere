@@ -363,6 +363,7 @@ impl ChronicleEndpoint {
             )
             .expect("Chronicle realizes a valid dense scene"),
             presentation: state.presentation.clone(),
+            coverage: None,
             cache_policy: CachePolicy::default(),
         }
     }
