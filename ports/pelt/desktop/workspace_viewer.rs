@@ -52,6 +52,7 @@ use workbench::{
 
 use crate::appearance::{
     APPEARANCE_REFERENCE, AppearanceSettingsProvider, AppearanceTheme, CHROME_THEME_SETTING,
+    ThemeCatalog,
 };
 #[cfg(target_os = "windows")]
 use crate::dx12_surface::Dx12SurfaceCache;
@@ -66,6 +67,7 @@ use crate::{WindowingMode, static_viewer};
 use tabard::theme::choice::{InMemoryThemeChoiceStore, ThemeChoiceStore};
 
 mod accessibility;
+mod appearance_native;
 mod receipts;
 #[cfg(test)]
 mod tests;
@@ -353,6 +355,13 @@ pub struct WorkspaceViewerConfig {
     /// Caller-owned Pelt appearance storage. Without it Chrome selection stays
     /// in this process only; Pelt does not invent a config-directory owner.
     pub appearance_store: Option<Box<dyn ThemeChoiceStore>>,
+    /// Application-owned choice file, protected from workshop exports even if
+    /// loading its current bytes failed.
+    pub appearance_store_path: Option<PathBuf>,
+    /// Independent authored-definition library. The application entry point
+    /// supplies the shared default; embedders choose their own path explicitly.
+    pub theme_library: Option<PathBuf>,
+    pub appearance_error: Option<String>,
     /// Caller-owned cap and cadence for polling composited surface producers.
     pub surface_resource_policy: SurfaceResourcePolicy,
 }
@@ -375,6 +384,9 @@ impl WorkspaceViewerConfig {
             artifact: None,
             route_overrides: HashMap::new(),
             appearance_store: None,
+            appearance_store_path: None,
+            theme_library: None,
+            appearance_error: None,
             surface_resource_policy: SurfaceResourcePolicy::default(),
         }
     }
@@ -409,6 +421,21 @@ impl WorkspaceViewerConfig {
     /// Keep Pelt Chrome appearance in a caller-selected store.
     pub fn with_appearance_store(mut self, store: impl ThemeChoiceStore + 'static) -> Self {
         self.appearance_store = Some(Box::new(store));
+        self
+    }
+
+    /// Supply a durable choice store and its application-owned destination.
+    pub fn with_appearance_store_at(
+        mut self,
+        path: impl Into<PathBuf>,
+        store: impl ThemeChoiceStore + 'static,
+    ) -> Self {
+        self.appearance_store_path = Some(path.into());
+        self.with_appearance_store(store)
+    }
+
+    pub fn with_theme_library(mut self, path: impl Into<PathBuf>) -> Self {
+        self.theme_library = Some(path.into());
         self
     }
 
@@ -622,6 +649,7 @@ pub fn run_livery_workspace_viewer(
     let mut app = WorkspaceApp::new(config, workspace, frisket, scrying_host);
     #[cfg(not(target_os = "windows"))]
     let mut app = WorkspaceApp::new(config, workspace, frisket);
+    app.appearance_native = appearance_native::NativeAppearanceProof::from_env()?;
     event_loop
         .run_app(&mut app)
         .map_err(|error| format!("workspace event loop failed: {error}"))?;
@@ -979,11 +1007,12 @@ fn tabard_preview_stylesheet() -> String {
         ".pelt-workspace, .pelt-workspace.pelt-theme-light",
         1,
     );
-    // Pelt's Light appearance declares the same roles on the compound
-    // selector. Keep equal specificity here so a Tabard preview owns either
-    // Pelt appearance without making Tabard responsible for Chrome names.
-    stylesheet.push_str(
-        "\
+    stylesheet.push_str(PELT_TABARD_ROLES);
+    stylesheet
+}
+
+// Product-role mapping shared by durable application choices and the receipt.
+const PELT_TABARD_ROLES: &str = "\
 .pelt-workspace, .pelt-workspace.pelt-theme-light { \
 --pelt-chrome-workspace: var(--tabard-color-bg); --pelt-chrome-surface: var(--tabard-color-surface); --pelt-chrome-border: var(--tabard-color-surface-2); \
 --pelt-chrome-control-text: var(--tabard-color-text); --pelt-chrome-control-surface: var(--tabard-color-surface-2); --pelt-chrome-control-border: var(--tabard-color-surface-hover); \
@@ -1000,10 +1029,7 @@ fn tabard_preview_stylesheet() -> String {
 --pelt-chrome-diagnostic-address: var(--tabard-color-secondary); --pelt-chrome-diagnostic-note: var(--tabard-color-text-dim); \
 --pelt-chrome-tabbar: var(--tabard-color-surface-2); --pelt-chrome-tab-text: var(--tabard-color-text-dim); --pelt-chrome-tab-surface: var(--tabard-color-surface); \
 --pelt-chrome-tab-active-text: var(--tabard-color-on-primary); --pelt-chrome-tab-active-surface: var(--tabard-color-primary); --pelt-chrome-tab-close: var(--tabard-color-text); \
---pelt-chrome-content-surface: var(--tabard-color-bg); --pelt-chrome-divider: var(--tabard-color-surface-hover); }\n",
-    );
-    stylesheet
-}
+--pelt-chrome-content-surface: var(--tabard-color-bg); --pelt-chrome-divider: var(--tabard-color-surface-hover); }\n";
 
 fn capability_label(capability: inker::A11yCapability) -> &'static str {
     match capability {
@@ -1176,6 +1202,13 @@ struct WorkspaceApp {
     chrome_inspector_open: bool,
     appearance: AppearanceSettingsProvider<Box<dyn ThemeChoiceStore>>,
     chrome_appearance_open: bool,
+    theme_catalog: ThemeCatalog,
+    applied_theme: Result<tabard::ResolvedThemeChoice, String>,
+    editor_requested: bool,
+    editor: Option<crate::appearance_editor::EditorWindow>,
+    editor_idle: cambium_rootstock::IdlePolicy,
+    close_after_editor: bool,
+    appearance_native: Option<appearance_native::NativeAppearanceProof>,
     appearance_receipt_baseline: Option<AppearanceReceiptBaseline>,
     #[cfg(feature = "tabard-preview")]
     tabard_preview_baseline: Option<TabardPreviewBaseline>,
@@ -1523,6 +1556,10 @@ impl WorkspaceApp {
                 .take()
                 .unwrap_or_else(|| Box::new(InMemoryThemeChoiceStore::default())),
         );
+        let theme_catalog = ThemeCatalog::new(config.theme_library.clone());
+        let applied_theme =
+            tabard::resolve_theme_choice(&theme_catalog.registry, appearance.store().choice())
+                .map_err(|error| error.to_string());
         Self {
             config,
             workspace,
@@ -1562,6 +1599,13 @@ impl WorkspaceApp {
             chrome_inspector_open: false,
             appearance,
             chrome_appearance_open: false,
+            theme_catalog,
+            applied_theme,
+            editor_requested: false,
+            editor: None,
+            editor_idle: cambium_rootstock::IdlePolicy::Wait,
+            close_after_editor: false,
+            appearance_native: None,
             appearance_receipt_baseline: None,
             #[cfg(feature = "tabard-preview")]
             tabard_preview_baseline: None,
@@ -1584,10 +1628,47 @@ impl WorkspaceApp {
     }
 
     fn chrome_appearance(&self) -> ChromeAppearance {
-        ChromeAppearance {
-            theme: self.chrome_theme(),
-            persistent: self.appearance.store().is_persistent(),
+        let choice = self.appearance.store().choice();
+        let mut view =
+            ChromeAppearance::basic(self.chrome_theme(), self.appearance.store().is_persistent());
+        view.notice = self.config.appearance_error.clone();
+        if self.theme_catalog.path.is_some() {
+            view.builtin_selected = self
+                .applied_theme
+                .as_ref()
+                .is_ok_and(|resolved| resolved.resolved == view.theme.choice());
+            view.saved_themes = self
+                .theme_catalog
+                .user_themes()
+                .into_iter()
+                .map(|theme| (theme.name.clone(), theme.id == choice.theme_id))
+                .collect();
+            view.modes = self
+                .theme_catalog
+                .modes(choice)
+                .into_iter()
+                .map(|mode| (mode.label(), choice.theme_mode.as_ref() == Some(&mode)))
+                .collect();
+            view.editor_available = self.theme_catalog.error.is_none();
+            view.notice = self
+                .config
+                .appearance_error
+                .clone()
+                .or_else(|| self.theme_catalog.error.clone())
+                .or_else(|| {
+                    self.applied_theme.as_ref().ok().and_then(|resolved| {
+                        (!resolved.diagnostics.is_empty()).then(|| {
+                            resolved
+                                .diagnostics
+                                .iter()
+                                .map(ToString::to_string)
+                                .collect::<Vec<_>>()
+                                .join(" ")
+                        })
+                    })
+                });
         }
+        view
     }
 
     fn outcome(&self) -> WorkspaceViewerOutcome {
@@ -1646,6 +1727,40 @@ impl WorkspaceApp {
         self.dismiss_chrome_engine_menu_if_focus_changed();
         let chrome = self.config.chrome.then(|| self.chrome_model());
         self.frisket.set_chrome(chrome);
+        if self.theme_catalog.path.is_some() {
+            match &self.applied_theme {
+                Ok(resolved) => {
+                    let sheet = match &resolved.presentation {
+                        tabard::ThemePresentation::Derived(palette) => {
+                            format!("{}\n{}", palette.css_custom_properties(), PELT_TABARD_ROLES)
+                        },
+                        tabard::ThemePresentation::AuthoredStylesheet(rules) => {
+                            // Arbitrary CSS has no claimed derived palette. Supply
+                            // Pelt's default variables for roles the author omits.
+                            let fallback = tabard::resolve_theme_choice(
+                                &tabard::theme::registry::ThemeRegistry::default(),
+                                &tabard::theme::choice::ThemeChoice::default(),
+                            )
+                            .expect("built-in fallback is valid");
+                            let tabard::ThemePresentation::Derived(palette) = fallback.presentation
+                            else {
+                                unreachable!("built-in default is derived")
+                            };
+                            format!(
+                                "{}\n{}\n{}",
+                                palette.css_custom_properties(),
+                                PELT_TABARD_ROLES,
+                                rules.join("\n")
+                            )
+                        },
+                    };
+                    self.frisket.set_chrome_stylesheet(Some(sheet));
+                },
+                Err(error) => {
+                    self.chrome_status = ChromeStatus::Error(error.to_string());
+                },
+            }
+        }
     }
 
     fn chrome_engine_choices() -> Vec<ChromeEngineChoice> {
@@ -2045,6 +2160,39 @@ impl WorkspaceApp {
         self.chrome_appearance_open = !self.chrome_appearance_open;
         if self.chrome_appearance_open {
             self.chrome_inspector_open = false;
+            self.theme_catalog.reload();
+        }
+        true
+    }
+
+    fn choose_saved_appearance(&mut self, index: usize, mode: bool) -> bool {
+        if !self.chrome_appearance_open {
+            return false;
+        }
+        let choice = self.appearance.store().choice();
+        let choice = if mode {
+            let Some(selected) = self.theme_catalog.modes(choice).get(index).cloned() else {
+                return false;
+            };
+            tabard::theme::choice::ThemeChoice::new(choice.theme_id.clone(), Some(selected))
+        } else {
+            let Some(theme) = self.theme_catalog.user_themes().get(index).copied() else {
+                return false;
+            };
+            tabard::theme::choice::ThemeChoice::new(
+                theme.id.clone(),
+                Some(tabard::theme::seed::default_mode_for_def(theme)),
+            )
+        };
+        match self
+            .theme_catalog
+            .apply_choice(self.appearance.store_mut().as_mut(), choice)
+        {
+            Ok(()) => {
+                self.update_applied_theme();
+                self.chrome_status = ChromeStatus::Message("Pelt appearance applied".into());
+            },
+            Err(error) => self.chrome_status = ChromeStatus::Error(error),
         }
         true
     }
@@ -2068,9 +2216,21 @@ impl WorkspaceApp {
         } else {
             "session only"
         };
+        self.update_applied_theme();
         self.chrome_status =
             ChromeStatus::Message(format!("Chrome theme: {} ({persistence})", theme.label()));
         true
+    }
+
+    /// Library refresh supplies available definitions without activating edits
+    /// to the currently selected identity. Only explicit successful choices
+    /// update the presentation held by this browser session.
+    fn update_applied_theme(&mut self) {
+        self.applied_theme = tabard::resolve_theme_choice(
+            &self.theme_catalog.registry,
+            self.appearance.store().choice(),
+        )
+        .map_err(|error| error.to_string());
     }
 
     fn apply_chrome_action(&mut self, action: ChromeAction) -> bool {
@@ -2085,7 +2245,11 @@ impl WorkspaceApp {
         }
         if !matches!(
             action,
-            ChromeAction::ToggleAppearance | ChromeAction::ChooseTheme(_)
+            ChromeAction::ToggleAppearance
+                | ChromeAction::ChooseTheme(_)
+                | ChromeAction::ChooseSavedTheme(_)
+                | ChromeAction::ChooseThemeMode(_)
+                | ChromeAction::EditThemes
         ) {
             self.clear_chrome_appearance();
         }
@@ -2104,7 +2268,7 @@ impl WorkspaceApp {
                 true
             },
             ChromeAction::CloseWindow => {
-                self.close_requested = true;
+                self.request_application_close();
                 false
             },
             ChromeAction::Back => {
@@ -2134,6 +2298,13 @@ impl WorkspaceApp {
             ChromeAction::ToggleInspector => self.toggle_chrome_inspector(),
             ChromeAction::ToggleAppearance => self.toggle_chrome_appearance(),
             ChromeAction::ChooseTheme(theme) => self.choose_chrome_theme(theme),
+            ChromeAction::ChooseSavedTheme(index) => self.choose_saved_appearance(index, false),
+            ChromeAction::ChooseThemeMode(index) => self.choose_saved_appearance(index, true),
+            ChromeAction::EditThemes => {
+                self.editor_requested =
+                    self.theme_catalog.path.is_some() && self.theme_catalog.error.is_none();
+                self.editor_requested
+            },
         }
     }
 
@@ -2179,6 +2350,21 @@ impl WorkspaceApp {
         )
     }
 
+    fn scroll_primary_at_cursor(&mut self, dx: f32, dy: f32) -> bool {
+        if matches!(
+            self.frisket.hit(self.cursor.0, self.cursor.1),
+            Some(FrisketHit::Appearance | FrisketHit::ChromeAction(_))
+        ) {
+            self.chrome_appearance_open
+                && self
+                    .frisket
+                    .scroll_appearance_at(self.cursor.0, self.cursor.1, dx, dy)
+        } else {
+            self.workspace
+                .scroll_at(self.cursor.0, self.cursor.1, dx, dy)
+        }
+    }
+
     /// Route a physical winit coordinate through the same DPI conversion the
     /// live window uses before giving it to retained Chrome or Frisket.
     fn pointer_move_physical(&mut self, x: f32, y: f32) -> bool {
@@ -2189,6 +2375,11 @@ impl WorkspaceApp {
     }
 
     fn render(&mut self, event_loop: &ActiveEventLoop) {
+        if let Err(error) = self.drive_native_appearance() {
+            self.receipt_error = Some(error);
+            event_loop.exit();
+            return;
+        }
         if self.config.workspace_receipt.is_some() && self.redraws > 0 && !self.receipt_complete {
             match self.drive_workspace_receipt() {
                 Ok(Some(assertion)) => {
@@ -2684,8 +2875,120 @@ impl WorkspaceApp {
             || more
             || self.config.frames.is_some()
             || chrome_loading_settled
+            || self
+                .appearance_native
+                .as_ref()
+                .is_some_and(appearance_native::NativeAppearanceProof::needs_browser_frame)
         {
             self.request_redraw();
+        }
+    }
+
+    fn request_application_close(&mut self) {
+        if let Some(editor) = self.editor.as_mut() {
+            self.close_after_editor = true;
+            editor
+                .host
+                .request_close(cambium_genet_winit_host::CloseRequest::Native);
+            if let Some(window) = editor.host.native_window() {
+                window.focus_window();
+                window.request_redraw();
+            }
+        } else {
+            self.close_requested = true;
+        }
+    }
+
+    fn service_editor(&mut self, event_loop: &ActiveEventLoop) {
+        self.editor_idle = cambium_rootstock::IdlePolicy::Wait;
+        if self.editor_requested {
+            self.editor_requested = false;
+            if let Some(editor) = self.editor.as_ref() {
+                if let Some(window) = editor.host.native_window() {
+                    window.focus_window();
+                }
+            } else if let (Some(core), Some(library), Some(window)) = (
+                self.host.as_ref().map(SurfaceHost::shared_core),
+                self.theme_catalog.path.clone(),
+                self.window.clone(),
+            ) {
+                let wake = Arc::new(move || window.request_redraw());
+                match crate::appearance_editor::EditorWindow::open(
+                    event_loop,
+                    core,
+                    library,
+                    self.config.appearance_store_path.clone(),
+                    self.appearance.store().choice(),
+                    wake,
+                ) {
+                    Ok(editor) => self.editor = Some(editor),
+                    Err(error) => {
+                        self.chrome_status = ChromeStatus::Error(error.clone());
+                        if self.appearance_native.is_some() {
+                            self.receipt_error = Some(error);
+                            event_loop.exit();
+                        }
+                        self.request_redraw();
+                    },
+                }
+            }
+        }
+        if let Some(editor) = self.editor.as_mut() {
+            editor.host.wake_turn();
+            self.editor_idle = editor.host.idle_turn();
+            if self.close_after_editor
+                && !editor.host.s.close_requested
+                && editor
+                    .host
+                    .s
+                    .runner
+                    .as_ref()
+                    .is_some_and(|runner| !runner.state().close_requested())
+            {
+                self.close_after_editor = false;
+            }
+        }
+        if self
+            .editor
+            .as_ref()
+            .is_some_and(|editor| editor.host.s.close_requested)
+        {
+            let editor = self.editor.take().unwrap();
+            if let Some(proof) = self.appearance_native.as_mut() {
+                if editor.completion.get() != Some(true) {
+                    self.receipt_error =
+                        Some("Pelt appearance scenario failed or was interrupted".into());
+                    event_loop.exit();
+                    return;
+                }
+                match editor
+                    .host
+                    .s
+                    .runner
+                    .as_ref()
+                    .unwrap()
+                    .state()
+                    .saved_choice()
+                {
+                    Ok(choice) => proof.editor_closed(choice),
+                    Err(error) => {
+                        self.receipt_error = Some(error);
+                        event_loop.exit();
+                        return;
+                    },
+                }
+            }
+            self.refresh_saved_theme_catalog();
+            let (width, height) = self.logical_size();
+            if let Err(error) = self.frisket.frame(width, height) {
+                self.chrome_status = ChromeStatus::Error(error);
+            }
+            if self.close_after_editor {
+                self.close_requested = true;
+            } else if let Some(window) = self.window.as_ref() {
+                window.focus_window();
+                window.request_redraw();
+            }
         }
     }
 
@@ -2693,6 +2996,11 @@ impl WorkspaceApp {
         if let Some(window) = &self.window {
             window.request_redraw();
         }
+    }
+
+    fn refresh_saved_theme_catalog(&mut self) {
+        self.theme_catalog.reload();
+        self.refresh_chrome();
     }
 
     /// Named tearout receipts may wait for a native producer and a second
@@ -4734,8 +5042,42 @@ impl WorkspaceApp {
     }
 }
 
+fn primary_startup_retry(presented: u32, revealed: Instant, now: Instant) -> bool {
+    presented == 0 && now.saturating_duration_since(revealed) < Duration::from_secs(10)
+}
+
+fn workspace_idle_flow(
+    editor: cambium_rootstock::IdlePolicy,
+    awaiting_focus: bool,
+    startup_retry: bool,
+    now: Instant,
+) -> ControlFlow {
+    use cambium_rootstock::IdlePolicy;
+    if editor == IdlePolicy::A11yWake {
+        return ControlFlow::Poll;
+    }
+    let mut delay = match editor {
+        IdlePolicy::Animate(delay) => Some(delay),
+        IdlePolicy::Wait | IdlePolicy::A11yWake => None,
+    };
+    if awaiting_focus {
+        let retry = TEAROUT_FOCUS_RETRY_INTERVAL;
+        delay = Some(delay.map_or(retry, |delay| delay.min(retry)));
+    }
+    if startup_retry {
+        let retry = Duration::from_millis(100);
+        delay = Some(delay.map_or(retry, |delay| delay.min(retry)));
+    }
+    delay.map_or(ControlFlow::Wait, |delay| {
+        ControlFlow::WaitUntil(now + delay)
+    })
+}
+
 impl ApplicationHandler for WorkspaceApp {
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
+        if let Some(editor) = self.editor.as_mut() {
+            editor.host.resume_surface();
+        }
         if self.window.is_some() {
             return;
         }
@@ -4758,6 +5100,7 @@ impl ApplicationHandler for WorkspaceApp {
                 f64::from(height),
             ));
         }
+        let activate_after_reveal = attributes.active;
         let window = match event_loop.create_window(attributes) {
             Ok(window) => Arc::new(window),
             Err(error) => {
@@ -4839,6 +5182,19 @@ impl ApplicationHandler for WorkspaceApp {
             event_loop.exit();
             return;
         }
+        // The window was intentionally hidden while attaching accessibility.
+        // Restore the default activation requested by the initial attributes
+        // after that reveal, once, before scheduling its first presentation.
+        if activate_after_reveal {
+            window.focus_window();
+        }
+        if self.appearance_native.is_some() {
+            eprintln!(
+                "[pelt] primary initial reveal visible={:?} focused={} activation_requested={activate_after_reveal}",
+                window.is_visible(),
+                window.has_focus()
+            );
+        }
         // CSD: answer WM_NCHITTEST over the laid-out maximize button so the
         // Windows 11 Snap Layout flyout appears on hover, exactly as the
         // cambium host does for its apps.
@@ -4856,7 +5212,14 @@ impl ApplicationHandler for WorkspaceApp {
         window.request_redraw();
     }
 
+    fn suspended(&mut self, _: &ActiveEventLoop) {
+        if let Some(editor) = self.editor.as_mut() {
+            editor.host.suspend_surface();
+        }
+    }
+
     fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
+        self.service_editor(event_loop);
         // A caption Close can arrive through any dispatch path - the pointer,
         // or an AccessKit Click on the button - and this hook runs after all
         // of them.
@@ -4904,13 +5267,29 @@ impl ApplicationHandler for WorkspaceApp {
                 return;
             }
         }
-        if awaiting_focus {
-            event_loop.set_control_flow(ControlFlow::WaitUntil(
-                Instant::now() + TEAROUT_FOCUS_RETRY_INTERVAL,
-            ));
-        } else {
-            event_loop.set_control_flow(ControlFlow::Wait);
+        let now = Instant::now();
+        let startup_retry =
+            primary_startup_retry(self.redraws, self.workspace_receipt_stage_started, now);
+        if startup_retry {
+            self.request_redraw();
         }
+        if self.redraws == 0 && self.appearance_native.is_some() && !startup_retry {
+            self.receipt_error = Some(format!(
+                "Pelt primary surface did not present within the bounded startup wait; visible={:?}, focused={}",
+                self.window.as_ref().and_then(|window| window.is_visible()),
+                self.window
+                    .as_ref()
+                    .is_some_and(|window| window.has_focus())
+            ));
+            event_loop.exit();
+            return;
+        }
+        event_loop.set_control_flow(workspace_idle_flow(
+            self.editor_idle,
+            awaiting_focus,
+            startup_retry,
+            now,
+        ));
     }
 
     fn window_event(
@@ -4919,6 +5298,18 @@ impl ApplicationHandler for WorkspaceApp {
         window_id: WindowId,
         event: WindowEvent,
     ) {
+        if self
+            .editor
+            .as_ref()
+            .and_then(|editor| editor.host.native_window())
+            .map(|window| window.id())
+            == Some(window_id)
+        {
+            let editor = self.editor.as_mut().unwrap();
+            editor.host.handle_window_event(event);
+            self.request_redraw();
+            return;
+        }
         if self.window.as_ref().map(|window| window.id()) != Some(window_id) {
             if self.secondary_window_event(window_id, event) {
                 self.fail_expired_tearout_receipt();
@@ -4937,7 +5328,7 @@ impl ApplicationHandler for WorkspaceApp {
         match event {
             WindowEvent::CloseRequested => {
                 self.record_tearout_receipt_close("primary window", None, false);
-                event_loop.exit();
+                self.request_application_close();
             },
             WindowEvent::Resized(size) => {
                 self.width = size.width.max(1);
@@ -5013,19 +5404,8 @@ impl ApplicationHandler for WorkspaceApp {
                 }
             },
             WindowEvent::MouseWheel { delta, .. } => {
-                if matches!(
-                    self.frisket.hit(self.cursor.0, self.cursor.1),
-                    Some(FrisketHit::Appearance | FrisketHit::ChromeAction(_))
-                ) {
-                    return;
-                }
                 let (dx, dy) = wheel_delta_from_winit(delta);
-                if self.workspace.scroll_at(
-                    self.cursor.0,
-                    self.cursor.1,
-                    dx / self.scale_factor,
-                    dy / self.scale_factor,
-                ) {
+                if self.scroll_primary_at_cursor(dx / self.scale_factor, dy / self.scale_factor) {
                     self.request_redraw();
                 }
             },

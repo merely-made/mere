@@ -9,6 +9,7 @@ Not in scope, mapped in §3 and opened by later rounds:
 - wallpapers and props, the node, edge and field style editors, and authored motion.
 
 **Related:**
+- [cross-app design language record, 2026-10-09](../../2026-08-23_projection_scenes_and_graph_native_platform.md#9-configurable-visual-and-interaction-language-2026-10-09): selection-shaped context and swatches, themeable forme regions, configurable appearance; product direction with open choices identified, not an additional editor track.
 - [balaur review brief](../research/2026-10-06_balaur_review_brief.md): rulings A to E and the findings (§3.2, §3.3) this plan builds on.
 - [Scenograph expansion brief](../research/2026-08-10_scenograph_expansion_brief.md): lanes L1 to L5; L2 (backdrops) is landed, L4 and L5 wait on consumers.
 - [projection grammar adoption plan](2026-08-15_projection_grammar_adoption_plan.md) and [catalog](../research/2026-08-15_projection_grammar_catalog.md): the grammar the editor authors. The same lane owns both documents and this plan.
@@ -228,6 +229,10 @@ The mer3ly site session relayed its Ruling 158 (Mark: "Promote where a home exis
 
 **SE87, handing the next work to Codex (2026-10-09).** Mark: "could we hand it to codex? IDK, it's friday and i've got 25% usage left ;_;" Options: S2 and B1 (recommended); the dynamics slot (F192 to F195); all three. Mark: **"All three"**. *Follows:* `mere_docs/research/2026-10-09_scenograph_codex_handoff.md` hands the dynamics slot, the grid's dynamics axis, B1 and S2 to the Codex agent, in that order; the physics coordinator is told the slot moved.
 
+**SE88, the appearance-part name (2026-10-09).** Asked: "For linked swatches, what should a selection of an appearance part be called in the UI? The handoff leaves this name open." Options: Appearance part (recommended), Facet, Part. Mark: **"Appearance part (Recommended)"**. *Follows:* the user-facing name is "appearance part". *Reading, not ruled:* the migrated shelfmark section can use `mer3ly.appearance_parts`; readers should retain the old `mer3ly.facets` value when migrating.
+
+**SE89, physics bodies follow occurrences (2026-10-09).** Asked: "The practice grid has source occurrences, while Canvas physics uses graph nodes. Should each occurrence get its own preview body, with unavailable physics channels refused until an adapter supplies them? This preserves separate appearances of the same source." Options: Separate body per occurrence (recommended), Limit dynamics to graph-backed datasets. Mark: **"Separate body per occurrence (Recommended)"**. *Follows:* each preview occurrence has a separate transient body; an undisclosed physics channel is refused. The source identity remains the dataset's exact source reference. *Reading, not ruled:* a private per-cell controller may give each body a deterministic runtime UUID without writing those identities into the source dataset.
+
 ## 2. Tracks
 
 E1 and E2 carry ruling A; E3 to E5 carry ruling B. E2 needs E1; E4 needs E3; E5 needs E2 and E4. *Added 2026-10-07:* E2b carries SE11 and SE12, after E2.
@@ -371,6 +376,193 @@ Each comes back as its own round of questions.
 - **Wallpapers and props.** The backdrop table (L2) is landed and consumed by Isometry, Woodshed and Graphshell. Seiche's living backdrop and scene bodies have no Mere or Turnstone host. The games wing's `MapDocument` carries a `props` layer (§4, F7).
 - **Style editors.** Node: the body and face plan's B3 body designer is open. Edge: forme's `EdgeProjectionSpec`. Field: the scriptable field regions plan, where no host calls `add_field_at`. Appearance today is three strings (§4, F3).
 - **Motion.** Balaur rulings C and D, gated on L5's authored front-end.
+
+### Design-language follow-through (2026-10-09; research, not opened)
+
+Mark's [voice clarifications, design language §9.8](../../2026-08-23_projection_scenes_and_graph_native_platform.md#98-voice-clarifications-and-research-boundaries-2026-10-09)
+extend the mapped editor concerns. Deselection preserves edits and returns to
+an unselected view; it is not undo or snapshot restoration. Selection,
+inspection, opening and contextual previews need explicit responsibilities
+before assigning them to a HUD. Hover previews are welcomed; exact gestures
+and touch equivalents remain open. S2 must preserve previously selected
+background membership independently of temporary coordinated-selection clauses.
+
+Style authoring needs to distinguish data encoding, interaction state and
+theme values; channel assignments and precedence remain open. Node, link and
+field appearances should support meaningful dynamics explanations. Fields may
+scope a projection as well as placement and motion, with the behavior model
+researched in the field plan. These additions do not open a general style
+editor, script runner or HUD redesign, or reorder SE87's work.
+
+*Candidate proof, not opened:* select and edit a subject, preview another
+context, then deselect; edits survive while selection-driven context ends.
+Two linked appearances preserve independent visibility and distinguish
+selection from their data encoding. Exact preview commit/history behavior
+still returns as a fork before implementation.
+
+### Planning through nodes, links and fields (2026-10-09)
+
+Mark's [primitive planning direction, §9.9](../../2026-08-23_projection_scenes_and_graph_native_platform.md#99-plan-through-graph-primitives-2026-10-09)
+asks to represent nodes, links and fields in the graph and connect each to
+dynamics. Plan the same inspect/configure loop for all three, retaining each
+primitive's own authority and identity rather than equating every primitive
+with a rendered content node. The proposed link/edge and content/resource
+vocabulary must be reconciled with graph semantics before code or stored
+formats change. Graphshell is the reference host for the proposed
+primitive-authoring proof.
+
+*Candidate proof, not opened:* a visible content node exposes its own
+attributes and its resource association; two independent accesses to one
+resource retain their identities. A link is selectable and inspectable with
+its attributes/provenance and any explicit dynamics contribution. A field
+exposes its region, affected members and rules. Edit through each existing
+owner, save/reopen, and inspect an overlapping-field case without changing
+unrelated scene behavior. Scene appearance/selection and motion explanation
+must trace to those identities. Field trigger, attribute placement and
+terminology choices precede implementation; this records a candidate, not an
+additional SE track or replacement for the current B1/S2 sequence.
+
+#### Primitive and dynamics map (2026-10-09; source-backed planning)
+
+Checked against published Mere `b4e818b4`. This extends the candidate above;
+it is research and a proposed sequence, not a new SE ruling. Graph primitives
+already have several storage and presentation forms. Representing them in the
+graph means making their identities and relationships accessible to authoring;
+it does not yet choose whether each must also become an ordinary content node.
+
+| Primitive | Existing identity and authority | Proposed authoring and dynamics connection |
+|---|---|---|
+| Visible content node | `SurfaceNode` carries a `Container`; its UUID differs from the canonical Resource UUID it shows. `shown_resource_id` records that association. | Inspect surface-owned settings separately from Resource content and assertions. Bind each scene appearance to its chosen body and arrangement role; changing one appearance must not implicitly move every appearance of the Resource. |
+| Resource node | `ResourceNode` owns immutable canonical identity; graph resource content, properties, tags and assertions are accessed separately. Several surfaces may show it. | Expose metadata through the content node's inspection path and permit an explicit Resource appearance. A metadata Resource does not acquire a simulation body merely because it exists. |
+| Link | `RosterSubject` distinguishes a link bundle from a selected relation cell. `RelationKey` distinguishes surface and Resource relations; projected relations may include parallel records and self-loops. | Inspect the exact source assertion and provenance behind a displayed link. Disclose when one mark groups several assertions. An enabled spring or other contribution must trace back through the binding to those assertions. |
+| Field | Numen's `FieldId`, definition, extent and lifecycle are graph-held; a separate `CouplingId` names the field, selector, response and strength. | Inspect/edit the region and its couplings, show intended members separately from evaluated targets, and explain each recognized response. A region appearance and a field's simulation participation remain separate choices. |
+
+Source anchors: [surface substrate](../../../crates/graph/graph-kernel/src/graph/node.rs),
+[Resource association](../../../crates/graph/graph-kernel/src/graph/resource.rs),
+[relation reads](../../../crates/graph/graph-kernel/src/graph/relation_read.rs),
+[roster subjects and cards](../../../crates/mere/src/roster.rs),
+[field](../../../crates/conatus/numen/src/field.rs) and
+[coupling](../../../crates/conatus/numen/src/coupling.rs).
+The roster already offers nodes, links and fields in one model; this inspection
+does not establish that Graphshell exposes every roster action today.
+
+**Existing dynamics connection.** Pictograph's
+[Seiche bridge](../../../crates/canvas/pictograph/src/canvas/seiche_bridge.rs)
+currently creates a body per kernel surface node, springs per visible relation
+cell and forces from graph couplings. Springs carry endpoint pairs, so this
+bridge alone does not expose exact assertion provenance to a force inspector.
+Coupling conversion resolves a selector to a snapshot of node keys and copies
+the field definition and strength. It does not independently enforce the
+field's extent or detect entry/exit. An open response IRI is preserved by numen
+but is ignored by the force integrator until its owning consumer recognizes it.
+These are concrete gaps for the proposed authoring loop, not evidence that the
+expanded field behavior is implemented.
+
+**Proposed sequence and done-conditions:**
+
+1. Inventory the existing node, link and field cards in Graphshell and map each
+   editable value to graph/session authority, recipe authority or view state.
+   Done: every proposed control names its identity, storage owner and edit route;
+   absent controls are recorded rather than inferred from the roster model.
+2. Prepare one small authoring scene: two surfaces of one Resource, parallel
+   assertions between a pair, one self-link, a forme and a second overlapping
+   field. Done: each appearance resolves to its source, grouped links disclose
+   their members, and each field discloses its region, selector and responses.
+   This fixture is proposed; geometry and overlap policy are still to be chosen.
+3. Connect inspected identities to the existing recipe/binding/runtime path.
+   Done: two simultaneous contributions and one arrangement constraint can be
+   traced to their source and spec path; disabling one contribution changes only
+   its declared effect. A removed or missing target cannot silently retarget.
+4. Exercise edit, deselect, undo and save/reopen through their existing owners.
+   Done: edits survive deselection, shared Resource changes reach both surfaces,
+   appearance settings remain independent, and undo/reopen retain exact identities.
+   Native/Wasm dynamics and browser receipts follow the existing lane gates.
+
+Before implementation, return the actual forks: whether the proposed narrow
+*edge* vocabulary replaces or merely labels current relations; where arbitrary
+attributes on links/fields belong; and how incompatible overlapping placement,
+projection and behavior rules compose. A shared inspect/configure interaction
+can be researched before those storage and composition choices are ruled.
+The dynamics slot and settle work, then the grid dynamics axis, B1 and S2 retain
+their existing order and active-owner boundaries.
+
+#### Graphshell control inventory (2026-10-10; planning step 1)
+
+Checked against published Mere `6183006b`, independently of the dynamics draft
+being qualified in the primary checkout. This is source inspection of the
+browser reference host, not a new browser receipt or native-host qualification.
+
+| Control | Present browser route | Authority and missing work |
+|---|---|---|
+| Create a content node | `node:new` calls `create_address`, then refreshes the Canvas. | MereHost's recorded graph edit. A graph member is not a preview occurrence. |
+| Edit title and tags | `node:edit` opens detail; `save-metadata` calls `edit_node`. | The title delta addresses the Surface. Tag deltas route to the shown Resource and retain assertion authorship. Shared Resource changes can affect several surfaces. |
+| Edit a named JSON value | The same form optionally calls `set_product_facet`. | A separate journaled Surface-facet edit. This is not a general Resource, link or field attribute editor, nor the pending facet-dissolution design. |
+| Add a link | `add-relation` resolves a target by URL and calls `assert_product_relation` for one of five editable kinds. | A recorded assertion through MereHost. The form does not address an individual statement handle, its provenance or a link-owned dynamics rule. Selecting the pair selects its nodes. |
+| Inspect link bundles and cells | Shared roster has `LinkCard` and distinct bundle/cell subjects. | No Graphshell source calls these builders or consumes their subjects. Wiring an exact source assertion remains work. |
+| Inspect and configure fields | Shared roster has field detail and visibility/strength intents. Canvas has placement, strength and visibility methods. | No Graphshell source consumes these roster intents or calls `add_field_at`/`set_field_strength`. Canvas's field writes mutate its graph; a host control must route durable changes through the authoritative session before refreshing the view. |
+| Configure placement and motion | Browser arrangement, physics and role controls affect the Canvas; saved scenes retain the settings. | Distinct from a graph primitive's attributes. The pending occurrence-preview adapter is not assumed to supply field or link authoring. |
+
+Sources: [browser product dispatch and form](../../../ports/graphshell/src/web_product.rs),
+[recorded product edits](../../../ports/graphshell/src/product.rs),
+[MereHost edit and undo routes](../../../ports/graphshell/src/mere_host.rs),
+[tag routing](../../../crates/graph/graph-kernel/src/graph/resource_content.rs),
+[shared roster](../../../crates/mere/src/roster.rs),
+[Canvas field writes](../../../crates/canvas/pictograph/src/canvas/input.rs) and
+[field visibility](../../../crates/canvas/pictograph/src/canvas/fields.rs).
+Hiding a field is presentation-only; its coupling continues to exist. Field
+rule/extent cards currently describe values and select the field; they do not
+edit the rule, script or extent. Their script/template rows say not configured.
+
+**Edit boundary to resolve in the authoring proof:** `save_metadata` commits
+title/tags before parsing and writing the optional JSON facet. An invalid JSON
+value can therefore report failure after title/tags have changed. Two successful
+calls also make separate recorded edits. The proposed authoring loop must state
+whether a form submission is one change or several, validate the full draft
+before committing, and show which owner each value changes. This is a source
+finding; no repair or new undo semantics is claimed in this documentation pass.
+
+Step 1's inventory is complete at this source. Before opening step 2, prepare
+the explicit member-to-Resource inspection and exact-statement selection paths,
+then the field read/write adapter. Reuse the established session for writes and
+separate presentation intents. Arbitrary attribute storage, primitive node
+encoding and overlap policy remain the existing forks. The active dynamics
+qualification and B1/S2 owner boundaries retain their priority.
+
+#### Mixed-content study (2026-10-10; proposal, not opened)
+
+Mark forwarded the design-language agent's proposed
+[mixed-content scene and embedded forme study, §9.10](../../2026-08-23_projection_scenes_and_graph_native_platform.md#910-mixed-content-scene-and-embedded-forme-study-2026-10-10).
+It joins the existing style-editor and composition research; it creates no
+SE ruling or additional active track. The candidate theme axis is not an
+implemented facet axis. The existing dynamics qualification → B1 → S2 order
+and viewer-file ownership holds stand.
+
+*Reading, not ruled:* prepare the study in three reviewable parts:
+
+1. Establish one scene with document, image and video material, related nodes
+   and a forme corresponding to two existing side-by-side webpage accesses.
+   Record source, occurrence, arrangement-member, tile and session identities.
+   A captured face must be distinguishable from a working live surface.
+2. Compare editable appearance treatments and representation/arrangement
+   choices. Retain semantic font roles and selection cues. Separate paint-only
+   updates from footprint changes requiring measurement and placement.
+   A target → condition → effect sketch should expose matching inputs,
+   precedence, fallback and eligibility before becoming a rule schema.
+3. Exercise the tile-to-field bridge: hover subdivisions, selection, explicit
+   focus, moving the outer field and deliberately unlocking its internal
+   layout. Apply accepted tile edits to their owning state and refresh both
+   projections. Keep the semantic arrangement, projection geometry and
+   document-session ownership distinct.
+
+Candidate done-conditions: changing treatments preserves source/access
+identity and manual placement; font or face changes update measured extents;
+returning to the tile reuses its session; moving the field preserves a locked
+local split; selection and deselection preserve edits; unlocking a layout
+change round-trips through undo and save/reopen. Explain each displayed rule
+and overlapping-field contribution. Compact/detail thresholds must not
+oscillate merely because their own representation changes the measured size.
+These are acceptance proposals, not recorded receipts. SE36's Rhai choice
+does not establish that the pending rule runner or style editors exist.
 
 ## 4. Findings
 

@@ -154,6 +154,35 @@ replace-file writer are two atomic-write implementations; T4 moves Pelt's into
 tabard, and unifying the two is recorded rather than done here. After T4 both
 are safe temp-and-rename writers; pandect's also keeps a backup.
 
+**Boundary follow-up (2026-10-07, implemented).** T2–T4 made Tabard a shared
+library but retained its original port location. `check_port_boundaries.py`
+reproduced a shared-crate dependency on the old Tabard port; the full metadata audit also finds Tabard
+edges from pandect, registry and document-lanes. Move the entire existing
+package to `crates/system/tabard`, preserving its name, API and tests; update
+the workspace member and dependency paths, with no boundary-check exemption.
+Done when Tabard's suite and affected consumer checks pass and Cargo metadata
+shows no shared-crate dependency on a Tabard port.
+
+**Authorized follow-ups (2026-10-07, implemented).** The full gate exposed two more shared
+crate-to-port edges and a native test dependency in the web cone. Alembic's
+existing library moves to `crates/distillery/alembic` without changing its
+Distillery domain ownership. The Commons + Moot coop example moves to the
+Moot port, preserving Commons as the substrate and the existing coop API.
+Graphshell's native accessibility harness dependencies and test module become
+native-target-only. Done when the unmodified full boundary check passes,
+Alembic's recall tests pass, the moved example builds, and the native
+Graphshell test targets still type-check.
+
+**Validation (2026-10-07):** the unchanged
+`python3 scripts/check_port_boundaries.py` passes both the shared-crate/port
+rule and Graphshell's wasm web dependency cone. Locked, offline validation:
+Tabard 49 tests (including the workshop extension in the theme modes plan),
+Alembic 7 recall tests; `cargo check` passes for Mere with `graph`, registry,
+Pandect, document-lanes and Pelt desktop, the relocated
+`mere-moot --example commons_practice_peer`, and Graphshell's library/test
+targets with default native features plus `web`. The isolated checkout used
+the existing Woodshed sibling fixture for Graphshell's test targets.
+
 ### C3. Components folded
 
 Fold crates whose only role is a component of one parent, where no
