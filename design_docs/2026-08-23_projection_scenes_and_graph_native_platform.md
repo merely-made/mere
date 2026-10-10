@@ -825,3 +825,85 @@ this proof. The transcript's "GraphQL" spelling was interpreted too literally
 in the initial planning record and corrected on 2026-10-09. Storage mapping
 and dynamics participation remain planning questions; this record does not
 claim an implementation of them.
+
+### 9.10 Mixed-content scene and embedded forme study (2026-10-10)
+
+**Proposal forwarded by Mark from the design-language agent; not a new
+ruling or implementation receipt.** Use one small scene containing a
+document, images, a playing video, related nodes and a forme with two
+side-by-side webpage accesses. Dress the same material in several editable
+treatments. Paper and ink, a warm workshop and a luminous night are candidate
+presets, not a decision about Mere's palette. Compare typography, silhouettes,
+surfaces, borders, shadows, textures, backdrop, props and motion together.
+Recognizable identity, readable selection and continued reachability are
+part of the study, including Emblem and Pictograph identity cues.
+
+The proposed authoring breakdown is reading; representation; encoding;
+arrangement and dynamics; composition; appearance and interaction. It helps
+discuss independently editable choices, but is not a replacement recipe
+schema. In the [projection grammar catalog](mere_docs/research/2026-08-15_projection_grammar_catalog.md),
+representation choices belong to encoding; arrangement produces the scene,
+and realization supplies its measured content. A node may become an icon,
+card, thumbnail, live pane or nested view while retaining its source identity.
+A link may become a connector, adjacency, containment or a matrix cell. A
+field may disclose its boundary, subdivisions or influence. These are
+presentation alternatives; a drawn region alone does not implement field
+membership or behavior.
+
+**Candidate presentation rules:** target → condition → effect, with a live
+swatch and an explanation of the matched rule, precedence and fallback.
+Examples include thumbnail faces for image-bearing nodes, configured details
+on selection, containment for membership, provenance for an inspected derived
+link and drop previews for an unlocked forme. Compact/detail transitions need
+distinct entry and exit thresholds to avoid flickering near a size boundary;
+the relevant size and behavior after measurement remain design questions.
+Choose representation before measuring its footprint and arranging it.
+Paint-only changes can avoid a new layout; fonts, geometry and representation
+changes must invalidate affected measurements. Preserve authored placement
+and pins through that recomputation, and explain incompatible constraints.
+
+[Mosaic's core](https://idl.uw.edu/mosaic/core/) is a reference for coordinated
+selections and parameters. [Vega-Lite conditions](https://vega.github.io/vega-lite/docs/condition.html)
+are a reference for predicate/selection-driven visual encodings with fallbacks.
+They do not specify Mere's whole-representation dispatch or field actions.
+In particular, Vega-Lite's default treatment of an empty selection is not
+automatically Mere's deselection behavior. A presentation rule matching a
+node does not grant permission to run a graph-held applet.
+
+**The embedded forme:** opening webpages A and B establishes independent
+content accesses associated with their resources. Returning to the graph
+shows their forme as a field whose member placements correspond to the
+existing split. Hover reveals its subdivisions; ordinary selection changes
+context, while explicit open/focus returns to the existing tile and session.
+Unlocking exposes layout handles and drop previews. Accepted edits should
+update the owning workbench state and re-project both presentations.
+Deselection preserves those edits (§9.8).
+
+There are two coordinate levels: the forme in the surrounding scene, and
+members inside the forme. Moving the outer field can carry its members while
+their local composition stays fixed. An anchor, position pin, foreground pin
+and layout lock remain distinct. Overlap with another field must disclose
+which placement constraints and dynamics apply; this proposal does not decide
+that precedence or whether a layout lock pauses motion.
+
+**Checked substrate at published Mere `7bfb293d`:**
+[Forme's arrangement](../crates/forme/forme/src/arrangement.rs) is a semantic
+graph; it deliberately excludes coordinates and split ratios. Geometry belongs
+to projection state. [Platen's workbench](../crates/platen/platen/src/workbench.rs)
+already projects its recursive layout into Genet's `TileTree`, with host
+events applied back to the owning layout. The missing bridge is from those
+existing identities, geometry and document sessions into the scene's forme
+presentation, not a second authoritative tile tree. The current
+[Scenomise compiler](../crates/cambium/scenes/scenomise/src/projection.rs)
+emits card representations; the richer mixed-content realization and generic
+presentation-rule editor still need integration. Graphshell supplies graph
+context, Pelt retained document viewing, and Turnstone their browsing
+composition, as the [suite census](2026-08-22_turnstone_suite_composition_and_capability_census.md)
+describes. The composition is direction, not evidence of this bridge shipping.
+
+The [editor plan](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#mixed-content-study-2026-10-10-proposal-not-opened)
+records candidate steps and done-conditions. A study matrix may compare theme
+on one axis with representation or arrangement on another; the shipped grid's
+axis contract is not expanded by this proposal. Keep source material and access
+identities stable across comparisons, disclose live versus captured faces,
+and evaluate appearance and behavior together.
