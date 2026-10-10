@@ -10,6 +10,9 @@ fn dr_c_signalman_identity_stays_pending() {
         let status = authority.status().unwrap();
         assert_eq!(status.lock, graphshell::identity::VaultLockView::Locked);
         assert!(status.wallet_public_key.is_none());
+        let mut client = graphshell::native::custody_client::BlockingCustodyClient::open(
+            graphshell::native::app_admission::AppId::new("signalman")).unwrap();
+        assert!(!client.roster().unwrap().entries.is_empty(), "public persona roster remains readable");
     } else {
         assert_eq!(mode, "absent");
     }
@@ -21,4 +24,6 @@ fn dr_c_signalman_identity_stays_pending() {
         matches!(authority.release_storage(b"receipt".to_vec()), Err(error) if error.is_pending()),
         "no storage key"
     );
+    assert!(matches!(authority.release_controller(b"receipt"), Err(error) if error.is_pending()),
+        "no fallback controller identity");
 }

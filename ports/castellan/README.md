@@ -18,7 +18,7 @@ The vocabulary it keeps, per the dramatis tier model:
   lands in someone else's gaz.
 
 The boundaries are the point: not [personae](https://crates.io/crates/personae)
-(the faces and vault substrate castellan serves), and not
+(the faces and public identity vocabulary), and not
 [gaz](https://crates.io/crates/gaz) or gazette (which keep and find the other
 players; castellan guards and presents you). Castellan issues a persona's
 public presentation and gazette announces it (ruled 2026-09-30), so the port
@@ -83,8 +83,8 @@ artifacts. Fresh claims start Unverified; a new contact requires the host's
 LocalId. The receipt proves native sealed composition and persona isolation;
 live resolver transport and application contact UI remain separate work.
 
-Graphshell composes all three and re-exports them at its pre-founding paths,
-so it is the first host rather than the owner. The intent wire strings keep
+Djinn composes custody and serves the application route. Graphshell renders
+the public models and sends intents to djinn. The intent wire strings keep
 their `castellan.*` values for now; renaming the wire vocabulary is
 a separate decision. CXF import remains follow-on work; its policy was ruled
 on 2026-10-01. The everyday credentials are stored and SSH keys go through
