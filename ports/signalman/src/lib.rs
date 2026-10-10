@@ -18,12 +18,10 @@ use std::path::Path;
 use std::sync::Arc;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use castellan::reticulum::grant::{
-    SitedStationGrant, SitedStationGrantError, SitedStationGrantRequest,
-};
-use castellan::reticulum::{ReticulumControllerMaterial, ReticulumStationMaterial};
 use outrider::LxmfPayload;
+use pandect::station_grant::{SitedStationGrant, SitedStationGrantError, SitedStationGrantRequest};
 use pandect::{DeviceId, RemoteAuthRevocationOutcome};
+use personae::reticulum::{ReticulumControllerMaterial, ReticulumStationMaterial};
 use personae::{IdentityError, IdentityProvider, SealedRecordStorage};
 use postilion::control::first_owner::{
     ClaimOutcome, ClaimPlan, FirstOwnerController, FirstOwnerError, FirstOwnerExchange,
@@ -38,10 +36,14 @@ use retinue::identity::{Identity, PrivateIdentity};
 use tokio::sync::Mutex;
 use zeroize::Zeroize;
 
+mod authority;
 mod control;
 mod head;
 mod lease;
 
+pub use authority::{
+    DjinnStationAuthority, SIGNALMAN_APP, StationAuthority, controller_salts, station_salts,
+};
 pub use control::{
     SITED_STATION_CONTROL_ACK_TITLE, SITED_STATION_CONTROL_TITLE, SitedStationControl,
     SitedStationControlAck, SitedStationControlError, SitedStationControlReceiver,
@@ -120,7 +122,7 @@ impl<E: fmt::Debug> fmt::Display for ControllerStatusError<E> {
         match self {
             Self::Identity(_) => {
                 f.write_str("first-owner controller credential could not be derived")
-            }
+            },
             Self::Status(error) => write!(f, "signed status exchange failed: {error}"),
         }
     }
@@ -174,7 +176,7 @@ impl<E> fmt::Display for FirstOwnerCredentialError<E> {
         match self {
             Self::Identity(_) => {
                 f.write_str("first-owner controller credential could not be derived")
-            }
+            },
             Self::Claim(_) => f.write_str("first-owner claim workflow failed"),
         }
     }
@@ -294,12 +296,13 @@ impl SitedStationCredential {
 
     /// Issue the only grant shape an unattended station can receive.
     ///
-    /// The host wallet root must belong to the same Persona that derived this
-    /// credential. The resulting grant carries exactly `transport.egress`, no
-    /// personas, no private epochs, and a mandatory hard expiry.
+    /// `authority` (djinn) signs it with the wallet, which must belong to the
+    /// same Persona that derived this credential. The resulting grant carries
+    /// exactly `transport.egress`, no personas, no private epochs, and a
+    /// mandatory hard expiry; it is checked here before it is returned.
     pub fn issue_remote_auth_grant(
         &self,
-        data_root: &Path,
+        authority: &dyn StationAuthority,
         device_id: DeviceId,
         label: impl Into<String>,
         issued_at_ms: u64,
@@ -312,21 +315,28 @@ impl SitedStationCredential {
             issued_at_ms,
             expires_at_ms,
         )?;
-        SitedStationGrant::issue(data_root, self.issuer_public_key, request)
+        SitedStationGrant::from_signed(
+            authority.issue_station_grant(&request, self.issuer_public_key)?,
+        )
     }
 
     /// Acquire a host-side lease for this station's current active grant.
+    ///
+    /// `data_root` is where the wallet's public records live (djinn reports
+    /// it); `authority` is who revokes.
     pub fn acquire_lease(
         &self,
         data_root: &Path,
         device_id: DeviceId,
         now_ms: u64,
+        authority: Arc<dyn StationAuthority>,
     ) -> Result<SitedStationLease, SitedStationLeaseError> {
         SitedStationLease::acquire(
             data_root,
             device_id,
             *self.public_identity().ed25519_bytes(),
             now_ms,
+            authority,
         )
     }
 
@@ -342,9 +352,10 @@ impl SitedStationCredential {
         device_id: DeviceId,
         port: impl Into<String>,
         name: impl Into<String>,
+        authority: Arc<dyn StationAuthority>,
     ) -> Result<SitedStation, SitedStationError> {
         let now_ms = unix_time_ms()?;
-        let lease = self.acquire_lease(data_root, device_id, now_ms)?;
+        let lease = self.acquire_lease(data_root, device_id, now_ms, authority)?;
         let station = Station::open(self.station_config(port, name))
             .await
             .map_err(SitedStationError::Station)?;
@@ -555,7 +566,7 @@ impl SitedStation {
             Err(error) => {
                 self.station.lock().await.take();
                 Err(error.into())
-            }
+            },
         }
     }
 
@@ -655,7 +666,7 @@ async fn watch_station_lease(lease: SitedStationLease, station: Arc<Mutex<Option
                 lease.close();
                 station.lock().await.take();
                 return;
-            }
+            },
         };
         let expires_at_ms = lease.expires_at_ms();
         let window = remaining_window(now_ms, expires_at_ms);
@@ -667,7 +678,7 @@ async fn watch_station_lease(lease: SitedStationLease, station: Arc<Mutex<Option
                 lease.close();
                 station.lock().await.take();
                 return;
-            }
+            },
         };
         if lease.authorize_at(now_ms).is_err() {
             station.lock().await.take();
@@ -680,8 +691,10 @@ async fn watch_station_lease(lease: SitedStationLease, station: Arc<Mutex<Option
 mod tests {
     use std::collections::VecDeque;
 
-    use pandect::{DeviceId, ensure_wallet_state};
-    use personae::{InMemoryProvider, PersonaId};
+    use pandect::DeviceId;
+    use personae::InMemoryProvider;
+
+    use crate::authority::test_support::TestWallet;
     use postilion::control::first_owner::v4_usb_claim_plan;
     use radio_hand::control::{
         ClaimResponse, FirstOwnerRequest, FirstOwnerResponse, FirstWriteStatus, NodeId,
@@ -830,13 +843,13 @@ mod tests {
     #[test]
     fn station_lease_is_egress_only_renews_before_expiry_and_then_fails_closed() {
         let root = tempdir().unwrap();
-        let seed = ensure_wallet_state(root.path(), PersonaId::new(), "Station host").unwrap();
-        let provider = InMemoryProvider::from_seed(seed);
+        let wallet = TestWallet::new(root.path(), 0x5a);
+        let provider = wallet.provider();
         let device_id = DeviceId::new();
         let credential = SitedStationCredential::derive_for_device(&provider, device_id).unwrap();
 
         let grant = credential
-            .issue_remote_auth_grant(root.path(), device_id, "Ridge north", 100, 200)
+            .issue_remote_auth_grant(wallet.as_ref(), device_id, "Ridge north", 100, 200)
             .unwrap();
         let set = grant.signed();
         assert!(
@@ -856,11 +869,11 @@ mod tests {
         assert_eq!(certificate.certificate.remaining_delegation_depth, 0);
 
         let lease = credential
-            .acquire_lease(root.path(), device_id, 199)
+            .acquire_lease(root.path(), device_id, 199, wallet.clone())
             .unwrap();
         assert_eq!(lease.expires_at_ms(), 200);
         credential
-            .issue_remote_auth_grant(root.path(), device_id, "Ridge north", 199, 300)
+            .issue_remote_auth_grant(wallet.as_ref(), device_id, "Ridge north", 199, 300)
             .unwrap();
         assert_eq!(lease.authorize_at(199).unwrap(), 300);
         assert_eq!(lease.authorize_at(200).unwrap(), 300);
@@ -876,7 +889,7 @@ mod tests {
         assert!(lease.is_closed());
 
         credential
-            .issue_remote_auth_grant(root.path(), device_id, "Ridge north", 300, 400)
+            .issue_remote_auth_grant(wallet.as_ref(), device_id, "Ridge north", 300, 400)
             .unwrap();
         let closed = lease.authorize_at(301).unwrap_err();
         assert!(matches!(closed, SitedStationLeaseError::Closed { .. }));
@@ -885,15 +898,15 @@ mod tests {
     #[test]
     fn station_lease_fails_closed_when_the_host_revokes_the_device() {
         let root = tempdir().unwrap();
-        let seed = ensure_wallet_state(root.path(), PersonaId::new(), "Station host").unwrap();
-        let provider = InMemoryProvider::from_seed(seed);
+        let wallet = TestWallet::new(root.path(), 0x5a);
+        let provider = wallet.provider();
         let device_id = DeviceId::new();
         let credential = SitedStationCredential::derive_for_device(&provider, device_id).unwrap();
         credential
-            .issue_remote_auth_grant(root.path(), device_id, "Ridge north", 100, 200)
+            .issue_remote_auth_grant(wallet.as_ref(), device_id, "Ridge north", 100, 200)
             .unwrap();
         let lease = credential
-            .acquire_lease(root.path(), device_id, 199)
+            .acquire_lease(root.path(), device_id, 199, wallet.clone())
             .unwrap();
 
         let outcome = lease.revoke().unwrap();
@@ -906,19 +919,19 @@ mod tests {
     #[test]
     fn a_replacement_written_after_the_last_accepted_deadline_cannot_revive_a_lease() {
         let root = tempdir().unwrap();
-        let seed = ensure_wallet_state(root.path(), PersonaId::new(), "Station host").unwrap();
-        let provider = InMemoryProvider::from_seed(seed);
+        let wallet = TestWallet::new(root.path(), 0x5a);
+        let provider = wallet.provider();
         let device_id = DeviceId::new();
         let credential = SitedStationCredential::derive_for_device(&provider, device_id).unwrap();
         credential
-            .issue_remote_auth_grant(root.path(), device_id, "Ridge north", 100, 200)
+            .issue_remote_auth_grant(wallet.as_ref(), device_id, "Ridge north", 100, 200)
             .unwrap();
         let lease = credential
-            .acquire_lease(root.path(), device_id, 199)
+            .acquire_lease(root.path(), device_id, 199, wallet.clone())
             .unwrap();
 
         credential
-            .issue_remote_auth_grant(root.path(), device_id, "Ridge north", 200, 300)
+            .issue_remote_auth_grant(wallet.as_ref(), device_id, "Ridge north", 200, 300)
             .unwrap();
         let expired = lease.authorize_at(200).unwrap_err();
 
@@ -935,13 +948,13 @@ mod tests {
     #[test]
     fn commissioning_refuses_a_credential_from_another_persona() {
         let root = tempdir().unwrap();
-        ensure_wallet_state(root.path(), PersonaId::new(), "Station host").unwrap();
+        let wallet = TestWallet::new(root.path(), 0x5a);
         let foreign_provider = InMemoryProvider::from_seed([0x77; 32]);
         let credential =
             SitedStationCredential::derive_for_device(&foreign_provider, DeviceId::new()).unwrap();
 
         let error = credential
-            .issue_remote_auth_grant(root.path(), DeviceId::new(), "Ridge north", 100, 200)
+            .issue_remote_auth_grant(wallet.as_ref(), DeviceId::new(), "Ridge north", 100, 200)
             .unwrap_err();
         assert!(matches!(error, SitedStationGrantError::IssuerMismatch));
     }

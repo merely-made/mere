@@ -4,14 +4,16 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Atomic JSON/byte writes and tolerant reads shared by the store modules.
+//! Atomic JSON/byte writes and tolerant reads shared by the store modules,
+//! and by castellan's wallet custody, which writes into the same layout.
 
 use std::path::Path;
 use std::{fs, io};
 
 use serde::{Deserialize, Serialize};
 
-pub(super) fn load_json_optional<T>(path: &Path) -> io::Result<Option<T>>
+/// Read JSON at `path`, or `None` when the file is absent.
+pub fn load_json_optional<T>(path: &Path) -> io::Result<Option<T>>
 where
     T: for<'de> Deserialize<'de>,
 {
@@ -26,7 +28,8 @@ where
     }
 }
 
-pub(super) fn save_json_atomic<T>(path: &Path, value: &T) -> io::Result<()>
+/// Write `value` as pretty JSON at `path` atomically.
+pub fn save_json_atomic<T>(path: &Path, value: &T) -> io::Result<()>
 where
     T: Serialize,
 {
@@ -41,7 +44,8 @@ where
     serde_json::to_vec_pretty(value).map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))
 }
 
-pub(super) fn save_bytes_atomic(path: &Path, bytes: &[u8]) -> io::Result<()> {
+/// Write `bytes` at `path` atomically, creating its directory.
+pub fn save_bytes_atomic(path: &Path, bytes: &[u8]) -> io::Result<()> {
     let dir = path.parent().ok_or_else(|| {
         io::Error::new(
             io::ErrorKind::InvalidInput,

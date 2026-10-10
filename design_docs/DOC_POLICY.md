@@ -170,7 +170,8 @@ mere/design_docs/
 ├── armillary_docs/                ← the armillary crate
 ├── cambium_docs/                  ← the Cambium desktop-host/scene family
 │                                     (Meristem, Cambium, Sprigging, Workbench)
-├── dramatis_docs/                 ← identity and contacts (personae, gaz)
+├── dramatis_docs/                 ← castellan's custody (vault lock, Secret
+│                                     Service); the tier itself is in dramatis
 ├── eidetic_docs/                  ← the memory stack (Eidetic codicils,
 │                                     muniment journals, chartulary + RDF)
 ├── inker_docs/                    ← the engine controller (inker,
@@ -221,6 +222,22 @@ that plan is complete and archived. The work is recorded here, in this
 policy, instead: this addendum's area-root list and the round-trip
 paragraph above are the record of the 2026-09-03 return, and a later move
 is recorded the same way.
+
+**Eleven documents left for dramatis on 2026-10-09.** The identity tier's
+leaf crates (personae, insigne, gaz, chatelaine, notochord, the dramatis
+facade) moved to their own repository, `merely-made/dramatis`, under the
+dramatis repo plan's DR-D, and by its ruling D19 each document followed its
+subject: the tier architecture, the repo plan itself, the vault threat
+statement, the chatelaine CXF plan, personae's founding and suite briefs,
+the gaz founding plan and the SSH CA plan, plus three archived plans
+(the dramatis tier plan, the insigne proofs plan, the notochord session
+policy plan). They went with their history and are indexed in
+`repos/dramatis/design_docs/DOC_README.md`. `dramatis_docs/` stays, because
+castellan stays beside djinn (D6, D22) and its documents (the vault lock and
+Secret Service plans) stay with it, as do gazette and the persona picker
+(D7). Links from here to the moved documents became path citations
+(`repos/dramatis/...`, core §5), and code-font paths into the moved crates
+in active documents were repointed the same way.
 
 **Member-crate scatter was collapsed 2026-08-24.** Nine `crates/*/design_docs/`
 directories held 20 documents, 18 of which `DOC_README.md` did not index. They

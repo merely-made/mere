@@ -8,8 +8,8 @@
 
 use std::io;
 
+use crate::custody::IdentityStorage;
 use pandect::{PersonaId, WalletSealedBackend};
-use personae::IdentityStorage;
 
 use crate::authority::PersonaeHost;
 
