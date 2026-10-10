@@ -361,10 +361,16 @@ The first push raced additive Tabard strict-choice loading at `0669a9192`.
 That change is included; all 36 Tabard library tests and the six capsule-gate
 tests pass. The captured capsule execution paths and owned host sources are
 unchanged by this appearance-store API addition.
+Publication completed at `3055ae5af`; the remote main hash was checked after
+the successful fast-forward push.
 
 ### Independent capsule readings continuation (2026-10-09)
 
-**Status:** planned, following the authorized continuation. The
+**Status (2026-10-10):** all twenty browser checks pass on the repaired Classic
+renderer, with five inspected captures. Source and bundle hashes match the
+qualified `6a10ad673` source. Main publication follows this completed receipt;
+the historical held and failed candidates below remain separate evidence.
+The continuation starts from published `3055ae5af`. The
 [design language §9.2–9.3](../../2026-08-23_projection_scenes_and_graph_native_platform.md#92-selection-foreground-and-ambient-context)
 separates attention, activity, presentation and keeping, and distinguishes two
 accesses to the same resource. This capsule slice exercises that boundary with
@@ -385,6 +391,96 @@ and resident graph work keep their current lanes.
    deselection, catalogue filtering, distinct revision retention and wide/narrow
    actual Graphshell presentation. The existing grants, signature, replacement,
    interruption and offline-read checks must still pass.
+
+**Findings (2026-10-09):** the instance-local resource cache in
+`ports/graphshell/src/capsule_applet/readings.rs` shares one verified body across
+distinct, never-reused reading identities. Cambium's keyed sequence presents
+them independently. A confirmed Keep updates the observation of the exact
+revision; a delayed acknowledgment cannot attach to a closed or replaced
+reading. A failed IndexedDB write preserves execution and permits retry. The
+ten capsule-gate/resource tests pass; the applet Wasm build and ordinary viewer
+check pass. Existing warnings remain.
+
+The headed Chrome run at `targets/moot-capsule-readings-20261009-b` passed all
+nineteen checks on AMD `gcn-5` with no fallback or page/console errors. Its five
+captures were inspected. The narrow capture prompted an additional actual
+scroll-and-select check for controls below the initial viewport; its final
+receipt will be recorded here. The failed first run is preserved separately:
+its new test wait omitted a page argument; no product source changed to fix it.
+The peer/native fixture and signed component are reused unchanged, with explicit
+fixture origins beside each rebuilt browser host.
+
+Fetched design clarifications at `421818710` add §9.8's rule that deselection
+preserves edits and §9.9's source-attribute/per-view distinction. The bounded
+reading model follows those rules without changing the canonical node/link/
+field ownership or the reserved Scenograph viewer work.
+
+The additional narrow check exposed a shared browser input fault: DOM wheel
+deltas were negated a second time, so a downward gesture at the top could not
+advance the host's scroll offset. The correction keeps DOM signs and resolves
+pixel/line/page units; all eleven browser-host CPU tests pass. The corrected
+applet Wasm build and ordinary viewer Wasm check pass. The wheel correction
+itself does not change renderer, shader or dependency code. The last recorded browser diagnostic
+launch was 00:12 Eastern on October 10; the corrected source has not been
+browser-qualified. The nineteen-check receipt remains earlier evidence, not
+acceptance of the corrected source. The twentieth check and publication remain
+pending while headed/GPU runs are held. The activity audit is preserved at
+`targets/moot-gpu-activity-audit-20261010.json`; failed captures remain beside
+their original receipts.
+
+The integrated CPU rerun at `e446bb8ee` passes ten capsule tests and eleven
+browser-host tests, with the applet build and ordinary viewer check. The
+conversation slice qualifies independently and is published at `4e1811578`.
+That preparation includes the main head and guarded renderer from
+`11236fd4f` (Vello `491c376c`). Its fresh applet Wasm build passes; candidate
+`targets/moot-capsule-readings-20261010-g` was prepared without serving or opening
+a page. Byte/source verification has its own held receipt; all twenty browser
+checks and five inspected captures remain required before readings publication.
+Earlier artifacts, including the pre-guard prepared `20261010-f`, are preserved.
+
+The published resident-image atlas repair at `3808c5a22` is integrated into the
+held branch. The standalone browser workspace's three renderer patches now
+match the root at Vello `10f01d6d`; the coherent Genet dependency source stays at
+`7422e906` as on Mere main. On these patches the ten capsule tests, eleven
+browser-host CPU tests, applet Wasm build, ordinary viewer Wasm check and port /
+default-web boundary check pass. Candidate
+`targets/moot-capsule-readings-20261010-h` derives a new browser host bundle with
+unchanged signed component and peer fixtures. Its source/bundle verification
+records no browser checks or captures. The canonical-domain lane owns the GPU
+slot; all twenty checks and five inspected captures still gate readings
+publication. The earlier `20261010-g` artifact remains unchanged. The updated
+document audits add no subjects relative to the fetched `3808c5a22` baseline;
+existing coverage/index/header/ledger findings are retained.
+
+The final reconciliation includes Mere main `ef88b7739`, the Dramatis extraction,
+Knot `fef132ef`, and the existing Vello `10f01d6d` repair. Candidate
+`targets/moot-capsule-readings-20261010-i` passed ten browser checks before its
+narrow reachability assertion failed. Its nonblank capture showed the control
+inside the viewport: Rootstock's semantic projection still used unscrolled
+layout bounds while paint and pointer input used retained scroll planes. A new
+regression reproduces that disagreement for nested and document scrolling.
+Rootstock now derives projection bounds from the same `painted_rect` geometry;
+names, focus and identity-dispatched semantic actions remain intact. No shader
+or renderer implementation changed in this correction.
+
+The corrected candidate `targets/moot-capsule-readings-20261010-j` passed all
+twenty checks in one bounded headed Chrome `152.0.7977.83` run on AMD `gcn-5`,
+with `isFallbackAdapter=false`, no page/console errors and no new or modified
+GPU reset report. All five captures were inspected. At 520 by 1120 the scrolled
+Close control's semantic rectangle is `(33, 1057, 103, 30)` and pointer selection
+updates the intended reading. Browser and local server exited; the watchdog
+receipt records no remaining owned processes. `verification.json` binds the
+receipt to source, browser bundle, signed component and preserved fixture hashes.
+This run reuses the earlier peer/native fixture; it does not repeat transport
+acceptance. The failed `20261010-i` receipt is preserved unchanged apart from
+its explicit failure status.
+
+Renewed focused qualification passes ten capsule tests, eleven browser-host
+CPU tests, the applet Wasm build, ordinary viewer Wasm check, and port/default-web
+boundaries. The scroll regression fails before the correction and passes after
+it; the full Rootstock suite passes 75 tests, including its GPU producer tests.
+The existing Comms/coop/encrypted-conversation checks pass 32 tests and default
+Moot Wasm compilation passes. GPU producer tests are not a CPU-only receipt.
 
 ### Moot conversation and coop continuation (2026-10-10)
 
@@ -441,6 +537,18 @@ this receipt.
 Conversation qualification is independent of the held multiple-reading browser
 continuation. The coordinating instruction is to publish other integrations as
 their own receipts complete; no browser or GPU run belongs to this change.
+
+Publication of this CPU-qualified conversation slice completed on main at
+`4e1811578`; its remote hash was verified. The held readings continuation is
+separate; its completed browser receipt is recorded above.
+
+The next presentation slice should mount the derived conversation and coop
+states in Graphshell through normal Cambium controls: independent conversation
+selection and drafts, explicit send intent, and owner-confirmed success/refusal.
+The actual Commons owner must recheck current authority and keys at dispatch;
+observation does not grant permission. Use design language §9.8–9.9 to keep
+attention and per-view editing separate from shared records. Presence, media
+and a general applet ABI still require their own concrete owners and receipts.
 
 ### Capsule peer and standalone-browser reproduction
 

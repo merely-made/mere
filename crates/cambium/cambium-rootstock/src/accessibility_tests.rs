@@ -136,3 +136,57 @@ fn accessibility_sync_tracks_focus_changes_and_clear_without_hover() {
         ]
     );
 }
+
+#[test]
+fn accessibility_bounds_follow_nested_and_document_scroll() {
+    use layout_dom_api::{LayoutDomMut as _, LocalName, Namespace};
+
+    let mut dom = ScriptedDom::new();
+    let root = dom.document();
+    dom.set_inner_html(root,
+        "<main id=\"scroll\" style=\"display:block;width:280px;height:100px;overflow:auto\"><div style=\"height:50px\"></div><button aria-label=\"Nested\" style=\"display:block;width:80px;height:30px\">Nested</button><div style=\"height:200px\"></div></main><button aria-label=\"Document\" style=\"display:block;width:80px;height:30px\">Document</button><div style=\"width:600px;height:500px\"></div>");
+    let find = |attr: &str, value: &str| {
+        let mut pending = vec![root];
+        while let Some(node) = pending.pop() {
+            if dom.attribute(node, &Namespace::default(), &LocalName::from(attr)) == Some(value) {
+                return node;
+            }
+            pending.extend(dom.dom_children(node));
+        }
+        panic!("missing fixture node {attr}={value}");
+    };
+    let scroll = find("id", "scroll");
+    let nested = find("aria-label", "Nested");
+    let document = find("aria-label", "Document");
+    let window = WindowDom::document(&dom);
+    let mut layout = OwnedLayout::new(&window, &[""], 320.0, 200.0, &[], &Default::default());
+    let before = crate::document_projection(&window, &layout, Some(dom.opaque_id(nested)));
+    layout.set_element_scroll(&window, [(scroll, (0.0, 24.0))].into());
+    layout.set_viewport_scroll((13.0, 29.0));
+    assert_eq!(layout.element_scroll()[&scroll], (0.0, 24.0));
+    assert_eq!(layout.viewport_scroll(), (13.0, 29.0));
+    let after = crate::document_projection(&window, &layout, Some(dom.opaque_id(nested)));
+    for (target, expected_y_shift) in [(nested, 53.0), (document, 29.0)] {
+        let id = dom.opaque_id(target);
+        let prior = before
+            .nodes()
+            .iter()
+            .find(|node| node.id.get() == id)
+            .unwrap();
+        let current = after
+            .nodes()
+            .iter()
+            .find(|node| node.id.get() == id)
+            .unwrap();
+        let old = prior.bounds.unwrap();
+        let bounds = current.bounds.unwrap();
+        assert_eq!(bounds.x, old.x - 13.0);
+        assert_eq!(bounds.y, old.y - expected_y_shift);
+        let painted = layout.painted_rect(&window, target).unwrap();
+        assert_eq!((bounds.x, bounds.y, bounds.width, bounds.height), painted);
+        assert_eq!(current.name, prior.name);
+        assert_eq!(current.role, prior.role);
+        assert_eq!(current.actions, prior.actions);
+        assert_eq!(current.state.focused, prior.state.focused);
+    }
+}

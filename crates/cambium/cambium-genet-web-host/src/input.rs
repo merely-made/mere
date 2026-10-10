@@ -94,18 +94,16 @@ pub fn key_press_from_dom(event: &KeyboardEvent) -> KeyPress {
 /// takes logical pixels, so lines and pages are resolved here, the same
 /// normalization winit's source does with its own line constant.
 ///
-/// The sign is flipped for the same reason it is on the desktop: the DOM
-/// reports how far the *content* moves, and the host takes how far the *view*
-/// does.
+/// DOM deltas already advance the scroll offset when positive. Winit reports
+/// the opposite sign and its source flips it; flipping the DOM sign as well
+/// would turn a downward browser gesture into an upward host scroll.
 pub fn wheel_delta_from_dom(event: &WheelEvent, line_px: f32, page_px: f32) -> (f32, f32) {
-    let scale = match event.delta_mode() {
-        WheelEvent::DOM_DELTA_LINE => line_px,
-        WheelEvent::DOM_DELTA_PAGE => page_px,
-        _ => 1.0,
-    };
-    (
-        -(event.delta_x() as f32) * scale,
-        -(event.delta_y() as f32) * scale,
+    super::wheel_delta_pixels(
+        event.delta_x(),
+        event.delta_y(),
+        event.delta_mode(),
+        line_px,
+        page_px,
     )
 }
 
