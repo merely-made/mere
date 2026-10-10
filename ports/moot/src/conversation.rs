@@ -8,7 +8,7 @@
 //! coop report. Each pane owns attention and drafts; Gemot and Commons retain
 //! authority and history. No live presence, transport, or durable state here.
 //!
-//! With `commons-chat`, [`snapshot`] reads a real encrypted replica through
+//! With `commons-chat`, `snapshot` reads a real encrypted replica through
 //! `projection_with_authority`. Its channel messages keep Commons' causal order,
 //! stable Personae authors and original operation identities. Withheld records
 //! contribute counts only. The default port can render a snapshot on Wasm.
