@@ -426,6 +426,14 @@ applicable rendered acceptance pass against its published dependency set.
 - **Ruling (2026-10-10), landing.** Asked: fast-forward main without pushing
   (recommended), fast-forward and push, or leave it on the branch? Mark:
   "Fast-forward main, no push (Recommended)". The push waits for Mark.
+- Later the same day the dr-c merge landed as woodshed `7d33337`, which repins
+  every mere row to `5dca58a9`. That revision carries r44, `019e07a0` and
+  `d1ee0675`, so the dr-c bridge is no longer needed, and the scratch branch
+  `tabard-css-dr-c` was deleted. The dr-c worktree was gone, so
+  `native_workshop_routes_name_and_stylesheet_text_through_owned_model` was
+  rerun with `--locked` in a fresh detached woodshed worktree at `7d33337`, and
+  it passes. `5dca58a9` still lacks this entry's name-field fix, which reaches
+  woodshed at its next mere repin.
 - `shared_components.rs:126` still asserts that the code sample contains no
   native `input`/`textarea`. It stays, because it guards against native form
   elements; the `role=textbox` check beside it covers Cambium fields.
