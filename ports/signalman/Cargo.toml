@@ -6,11 +6,13 @@ rust-version = "1.96"
 license = "MPL-2.0"
 repository = "https://github.com/merely-made/mere"
 publish = false
-description = "Private Mere port for commissioning and operating Retinue stations through Castellan."
+description = "Private Mere port for commissioning and operating Retinue stations through djinn."
 
 [dependencies]
 blake3.workspace = true
-castellan = { workspace = true, features = ["station-grants"] }
+# The custody client: Signalman asks djinn for a station's keys, its grant
+# and its revocation, and opens no wallet (dramatis repo plan, D5, D17).
+graphshell = { path = "../graphshell", default-features = false, features = ["native"] }
 personae.workspace = true
 # The check conclusions and faults, named directly (insigne proofs plan, B).
 insigne = { workspace = true, features = ["verify"] }

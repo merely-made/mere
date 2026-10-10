@@ -8,9 +8,8 @@
 #
 #   cargo deny check bans
 #
-# Expected to fail until DR-C moves graphshell's adapters into djinn (D15)
-# and signalman's station grants behind djinn (D17); those are the two other
-# crates that name castellan today.
+# Passes since DR-C: graphshell's keeper adapters moved into djinn (D15) and
+# signalman's station grants go through djinn's custody route (D17).
 
 [graph]
 all-features = true
