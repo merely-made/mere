@@ -723,3 +723,105 @@ Moot applet experiment. The [Scenograph handoff](mere_docs/research/2026-10-09_s
 records current site state and overlapping viewer ownership. These are
 implementation context and proposals; they do not settle the open choices
 above or infer consumer completion from this direction record.
+
+### 9.8 Voice clarifications and research boundaries (2026-10-09)
+
+Recorded at Mark's request after discussing the six criticisms of §9. These
+clarifications amend the earlier wording without turning brainstorming
+examples into a finished specification or new implementation assignments.
+
+1. **Theme values and their use.** Mark agreed that color carries too many
+   meanings and that Tabard needs a token/presentation system for applying
+   authored themes. Data encodings, selection and activity need distinguishable
+   treatments. *Suggestion, not ruled:* category fill, selection outline and an
+   activity badge, with configurable assignments and conflict previews. Exact
+   token roles, defaults and precedence remain open.
+2. **Selection and inspection.** Mark agreed that selection carries too much
+   behavioral weight and some responsibilities should move to explicit
+   interactions. Hover previews are welcome; touch needs separate exploration.
+   The HUD and GUI are still being defined. Old Meerkat can supply precedents,
+   but copying its interface is not the chosen solution. Which actions establish
+   selection or retained background membership remains open; the existing rule
+   for previously selected material stands.
+3. **Deselecting preserves edits.** Changes made while selected "still count".
+   Returning to the preceding context means an unselected view, not restoration
+   of an earlier snapshot. This resolves §9.2 and §9.7's question about whether
+   deselection discards intervening edits. *Reading, not ruled:* context should
+   be recomputed against current edited state. Exact presentation and lifetime
+   across scene changes or reopening remain open.
+4. **Fields participate in the scene.** A forme arrangement should coexist
+   with other subgraphs and arrangements without taking over the whole scene.
+   Fields should be capable of applying arrangement, dynamics or a projection
+   to affected material. Scripting includes general-purpose behavior and
+   invoking a graph-held applet when a node enters a field. Mark's feed example
+   lets overflow enter a field and dissolve or move into the background; these
+   are examples, not a retention or deletion policy. Field overlap, membership
+   and entry semantics, nested layout composition and action authority need
+   research. Foreground pins, positional controls and layout locks keep their
+   distinct purposes; locking acquires no implicit scene-wide override.
+5. **Fonts retain configurable roles.** Defaults should expose granular font
+   roles so people can choose fonts while retaining useful heading, size and
+   text patterns. Installed fonts and alternative defaults stand. Browser font
+   preferences are a precedent, not a complete role schema. Font changes must
+   be considered with measurement and arrangement; exact remote/frozen fidelity
+   remains open.
+6. **Show dynamics through meaningful forms.** Mark wants visible accounts of
+   forces, especially simultaneous contributions. Vectors, shape and edge
+   treatments are candidates; arbitrary particle effects or more color alone
+   do not satisfy the intent. Nodes, edges and fields participate in a cohesive
+   scene. A relation's appearance may explain associated dynamics, but relation
+   membership does not automatically install a force. Exact marks, reveal
+   controls and contribution attribution remain open.
+
+The [Scenograph editor plan](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md)
+carries selection/preview and scene-authoring consequences; the
+[field regions plan](mere_docs/implementation_strategy/2026-06-13_scriptable_field_regions_plan.md)
+carries scoped behavior and composition questions; the
+[dynamics grammar plan](mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md)
+carries force explanation and constraints; the
+[theme modes plan](mere_docs/implementation_strategy/2026-07-05_theme_modes_plan.md)
+carries theme application and font-role research. Existing work order and
+viewer ownership holds stand. This pass records direction, not runtime proof.
+Tabard's §9.6 source links were corrected to its current system-crate home.
+
+### 9.9 Plan through graph primitives (2026-10-09)
+
+Mark's follow-up asks to plan through **nodes, links and fields**, represent
+all three in the graph, then connect them to dynamics. Their presentation,
+inspection, attributes and behavior should form a cohesive authoring model.
+This is direction for planning, not a requirement to turn every primitive
+into the same ordinary node representation.
+
+Mark proposes **link** for ordinary visible relationships and **edge**
+specifically for the association between a resource node and the normal
+visible "content node". The associated resource normally stays out of the
+typical graph view and carries metadata including RDF type information.
+Both resource and content nodes have their own attributes. This advances
+§9.5's terminology discussion; exact adoption still needs reconciliation
+with the graph-semantics owner and existing data contracts.
+
+*Checked boundary:* graph semantics already distinguishes `ResourceNode`
+from `SurfaceNode`, with `Node` retained as a compatibility alias. Multiple
+independent surfaces may show one resource. "Content node" therefore needs
+an explicit mapping before renaming types or describing the resource as
+owned exclusively by one appearance. Existing edge handles also address
+Surface-Surface and Resource-Resource assertions; the proposed narrower
+word cannot silently change their meaning. "Attributes" here is Mark's
+broad description; the pending attribute/resource/tag dissolution still
+needs an ownership mapping for each stored fact.
+
+*Planning proposal, not ruled:* identify each primitive's stable address,
+owned facts and attributes, permitted edits, scene appearances and explicit
+dynamics participation. Link identity and explanatory appearance should
+remain usable even when no force is attached. A field's rules and membership
+need an inspectable representation as well as its geometry. Shared source
+attributes stay with their owner while per-view choices stay with the view.
+
+The [Scenograph editor plan](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md)
+carries the proposed reference-host proof and the
+[facet dissolution brief](mere_docs/research/2026-10-08_facet_dissolution_brief.md)
+retains its graph-semantics ownership. Graphshell is the reference host for
+this proof. The transcript's "GraphQL" spelling was interpreted too literally
+in the initial planning record and corrected on 2026-10-09. Storage mapping
+and dynamics participation remain planning questions; this record does not
+claim an implementation of them.

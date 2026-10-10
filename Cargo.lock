@@ -6040,7 +6040,9 @@ dependencies = [
 name = "gemot"
 version = "0.1.1"
 dependencies = [
+ "app-host",
  "chartulary",
+ "eidetic",
  "errand",
  "gemini-protocol",
  "insigne",
@@ -6067,6 +6069,7 @@ dependencies = [
  "thiserror 1.0.69",
  "tokio",
  "tokio-stream",
+ "wasmtime",
 ]
 
 [[package]]

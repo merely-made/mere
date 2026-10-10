@@ -20,6 +20,24 @@ does not establish implementation or consumer adoption of those preferences.
 derivation), `crates/meerkat/src/theme_sheets.rs` *(historical citation)* <!-- doc-audit: historical-path --> + `theme_edit.rs` (current sheet baking +
 switch path).
 
+## Design-language clarification (2026-10-09; research)
+
+The [design language §9.8](../../2026-08-23_projection_scenes_and_graph_native_platform.md#98-voice-clarifications-and-research-boundaries-2026-10-09)
+records Mark's agreement that theme values need a system defining how they are
+used when data encoding, selection and activity compete. Fill, outline and
+badge assignments are suggestions, not defaults chosen here. Research semantic
+roles and configurable composition alongside projection style authoring; token
+interchange alone does not decide these meanings.
+
+Mark asks for granular font roles corresponding to the defaults, so a person
+can choose installed fonts while retaining useful heading, size and text
+patterns. Firefox's [font preferences](https://support.mozilla.org/en-US/kb/change-fonts-and-colors-websites-use)
+are a checked precedent for serif/sans-serif/monospace choices, sizes and minimum
+size. Those generic families do not themselves define Mere's UI, reading,
+heading or label roles. The role schema, override precedence and remote/frozen
+fidelity remain open; measurements must stay coherent with realized fonts.
+This note does not change adoption order or claim controls in every consumer.
+
 ## Application adoption (2026-10-09)
 
 **Status:** in progress. Mark selected this order: Pelt, Graphshell, Knot,
@@ -88,6 +106,12 @@ applicable rendered acceptance pass against its published dependency set.
   tests pass, including the two new host-file boundary regressions; this
   additive API was pushed and remote-verified as
   `d5679eba4aa1bc5e1a241c5df63d13490a5f46a7`.
+- The existing choice file store gains an additive strict loader. Missing files
+  keep the existing default, while malformed/non-UTF-8 preferences surface an
+  error without changing bytes; legacy lines and authored custom-mode JSON keep
+  their existing interpretation. All seven focused choice-store tests pass.
+  The compatibility loader remains unchanged for existing consumers. Pelt and
+  Signalman use this shared operation rather than duplicating file validation.
 - Editing and saving the currently selected theme under the same identity must
   not bypass explicit application Apply. Each native adapter holds the applied
   presentation while authoring updates the library, refreshing it only after
