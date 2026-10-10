@@ -302,3 +302,15 @@ recorded framing, host-input, Scenomise, exporter and wasm gates pass. This
 incremental check preserves the zoom-floor, node-centre, label/control-density,
 ambient-context, performance and deployment boundaries. The historical census
 totals above are unchanged.
+
+## 2026-10-10 incremental interaction-direction audit
+
+The one-tree plan's added gesture/command target records Mark's direction
+after inspecting the qualified viewer captures. Checked against Pictograph's
+left-background drag, `canvas_gestures::wheel_use`, the tree's wheel listener
+and primary-only pointer dispatch, the retained toolbar, and `web.rs`'s
+`main-page` gate on `web_commands`. The shared searchable menu exists on the
+older main page; it is not claimed to work in the viewer. The new wheel
+default, configuration and contextual surfaces are explicitly planned, with
+touch policy and scene/LOD ownership kept separate. Historical browser
+receipts and census totals remain unchanged; no new runtime pass is claimed.

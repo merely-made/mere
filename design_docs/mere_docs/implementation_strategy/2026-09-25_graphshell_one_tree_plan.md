@@ -694,6 +694,55 @@ and keyboard activation and a 420px viewport reach the new controls.
 Tab skips the disabled action, reaches it after selection, and graph input
 transfers DOM focus into the graph before traversal returns to the controls.
 
+### Graph gestures and contextual commands (2026-10-10, planned)
+
+After reviewing the combined viewer captures, Mark asked for most controls to
+be integrated into graph interaction: drag the background to pan, use the
+wheel to zoom by default, and make the mapping configurable. Scale/depth is
+central to detail, context and rendering in this view; document-style wheel
+panning is not its useful default. Other actions can be graph affordances or
+commands through the context menu with the palette's search field.
+
+**Current findings:** background left-drag already pans in Pictograph
+(`crates/canvas/pictograph/src/canvas/input.rs`, SE23–24 in the
+[Scenograph editor plan](2026-10-07_scenograph_editor_plan.md#13-the-canvas-and-command-rulings-2026-10-07)).
+The viewer's `canvas_gestures.rs` and `web_tree/gestures.rs` deliberately pass
+plain wheel events to the outer page and reserve Ctrl/Meta wheel for zoom.
+The older main page's searchable context menu uses Cambium's shared command
+set, but `web_commands` is gated by `main-page` in `ports/graphshell/src/web.rs`.
+The viewer still has the toolbar in `web_tree/controls.rs` and does not consume
+the canvas's context-menu request. Acceptance of those retained controls did
+not establish the intended final interaction design.
+
+**Next implementation target:** wheel over the graph zooms about the pointer;
+background dragging pans. Scrolling outside the graph remains the page's.
+Expose the wheel mapping as a view/host preference, with graph pan and outer
+page scroll as explicit alternatives. This revises the earlier default for
+graph interaction; the recorded page-scroll receipt remains evidence of the
+previous policy. Touch mappings require their own acceptance rather than an
+inferred change from the mouse ruling.
+
+**Proposed integration:** bring the shared command set and searchable context
+surface into the retained viewer without enabling the main-page product cone.
+Register commands for what the viewer supports. Right-click and keyboard
+invocation expose actions for the current node, link, group or background,
+with unavailable actions explaining their preconditions. Fit, restore,
+physics, arrangements, lenses, folds and relationship evidence can use this
+surface. Group disclosure and selection actions can also be offered beside
+their graph subjects; parameter editing opens an inspector when needed.
+Representation detail follows the chosen scene/LOD policy, while membership,
+scope and lens state remain owned by their existing contracts. This is an
+interaction proposal, not a new geometry or materialization implementation.
+
+**Done when:** a headed run verifies pointer-anchored wheel zoom without page
+scroll, background drag pan, node drag, configurable wheel alternatives and
+outer-page scrolling. Right-click opens commands; right-drag still selects
+under SE26. Keyboard invocation, search, disabled reasons, selection context,
+Escape and focus return work through the accessible retained tree. Wide and
+narrow captures show readable graph content. Remove redundant always-visible
+navigation buttons only after those routes provide equivalent access; the
+existing toolbar remains until this target passes.
+
 ## 5. Stop rules
 
 - Nothing a screen reader reaches today is lost: a control moves only once
