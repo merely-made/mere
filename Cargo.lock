@@ -16493,6 +16493,7 @@ dependencies = [
  "accesskit",
  "cambium",
  "cambium-genet-winit-host",
+ "cambium-rootstock",
  "genet-livery",
  "genet-scripted-dom",
  "inker",
