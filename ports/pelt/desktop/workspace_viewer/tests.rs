@@ -3596,6 +3596,7 @@ fn native_appearance_reveal_uses_the_production_wheel_and_physical_pointer_route
         .unwrap();
     assert!(dark.1.supports_action(accesskit::Action::ScrollIntoView));
     assert!(app.apply_accessibility_request(A11yActionRequest {
+        target_tree: accesskit::TreeId::ROOT,
         action: accesskit::Action::ScrollIntoView,
         target_node: dark.0,
         data: None,
