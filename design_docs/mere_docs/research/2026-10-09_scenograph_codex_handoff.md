@@ -23,7 +23,7 @@ ownership holds stand; this is not qualification of the shared checkout's
 concurrent dynamics implementation. The subsequent [primitive planning
 direction, §9.9](../../2026-08-23_projection_scenes_and_graph_native_platform.md#99-plan-through-graph-primitives-2026-10-09)
 asks for nodes, links and fields to be inspectable/configurable and connected
-to dynamics; the proposed terminology and reference-host name need
+to dynamics. Graphshell is the reference host; the proposed terminology needs
 reconciliation before a new proof is opened.
 
 ## The work, in order

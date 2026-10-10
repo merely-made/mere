@@ -820,7 +820,8 @@ attributes stay with their owner while per-view choices stay with the view.
 The [Scenograph editor plan](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md)
 carries the proposed reference-host proof and the
 [facet dissolution brief](mere_docs/research/2026-10-08_facet_dissolution_brief.md)
-retains its graph-semantics ownership. Mark named the reference host
-"GraphQL"; whether this means Graphshell or a GraphQL API is awaiting
-clarification. Host choice, storage mapping and dynamics participation are
-planning questions; this record does not claim an implementation of them.
+retains its graph-semantics ownership. Graphshell is the reference host for
+this proof. The transcript's "GraphQL" spelling was interpreted too literally
+in the initial planning record and corrected on 2026-10-09. Storage mapping
+and dynamics participation remain planning questions; this record does not
+claim an implementation of them.

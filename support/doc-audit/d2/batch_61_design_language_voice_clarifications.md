@@ -31,7 +31,7 @@ Resolve the recorded open choices before a new implementation proof is opened.
 
 Eight intent claims checked: theme use; selection responsibilities; preserved
 edits; scoped field behavior; font roles; meaningful dynamics forms; primitive
-planning and terminology; unresolved host name. Examples and assistant-derived
+planning and terminology; Graphshell reference host. Examples and assistant-derived
 proofs remain labelled. Existing runtime completion is not asserted.
 
 ## mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md
@@ -55,7 +55,7 @@ Keep primitive authoring and selection/preview proofs gated on the named choices
 ### Notes
 
 Checked preserved edits and background membership, separated style/behavior
-research, and the primitive-inspection candidate with unresolved host vocabulary.
+research, and the primitive-inspection candidate in Graphshell.
 
 ## mere_docs/implementation_strategy/2026-06-13_scriptable_field_regions_plan.md
 
