@@ -361,10 +361,14 @@ The first push raced additive Tabard strict-choice loading at `0669a9192`.
 That change is included; all 36 Tabard library tests and the six capsule-gate
 tests pass. The captured capsule execution paths and owned host sources are
 unchanged by this appearance-store API addition.
+Publication completed at `3055ae5af`; the remote main hash was checked after
+the successful fast-forward push.
 
 ### Independent capsule readings continuation (2026-10-09)
 
-**Status:** planned, following the authorized continuation. The
+**Status (2026-10-10):** source and CPU checks passed; final narrow scroll
+qualification is held during the concurrent GPU/WindowServer investigation.
+The continuation starts from published `3055ae5af`. The
 [design language §9.2–9.3](../../2026-08-23_projection_scenes_and_graph_native_platform.md#92-selection-foreground-and-ambient-context)
 separates attention, activity, presentation and keeping, and distinguishes two
 accesses to the same resource. This capsule slice exercises that boundary with
@@ -385,6 +389,42 @@ and resident graph work keep their current lanes.
    deselection, catalogue filtering, distinct revision retention and wide/narrow
    actual Graphshell presentation. The existing grants, signature, replacement,
    interruption and offline-read checks must still pass.
+
+**Findings (2026-10-09):** the instance-local resource cache in
+`ports/graphshell/src/capsule_applet/readings.rs` shares one verified body across
+distinct, never-reused reading identities. Cambium's keyed sequence presents
+them independently. A confirmed Keep updates the observation of the exact
+revision; a delayed acknowledgment cannot attach to a closed or replaced
+reading. A failed IndexedDB write preserves execution and permits retry. The
+ten capsule-gate/resource tests pass; the applet Wasm build and ordinary viewer
+check pass. Existing warnings remain.
+
+The headed Chrome run at `targets/moot-capsule-readings-20261009-b` passed all
+nineteen checks on AMD `gcn-5` with no fallback or page/console errors. Its five
+captures were inspected. The narrow capture prompted an additional actual
+scroll-and-select check for controls below the initial viewport; its final
+receipt will be recorded here. The failed first run is preserved separately:
+its new test wait omitted a page argument; no product source changed to fix it.
+The peer/native fixture and signed component are reused unchanged, with explicit
+fixture origins beside each rebuilt browser host.
+
+Fetched design clarifications at `421818710` add §9.8's rule that deselection
+preserves edits and §9.9's source-attribute/per-view distinction. The bounded
+reading model follows those rules without changing the canonical node/link/
+field ownership or the reserved Scenograph viewer work.
+
+The additional narrow check exposed a shared browser input fault: DOM wheel
+deltas were negated a second time, so a downward gesture at the top could not
+advance the host's scroll offset. The correction keeps DOM signs and resolves
+pixel/line/page units; all eleven browser-host CPU tests pass. The corrected
+applet Wasm build and ordinary viewer Wasm check pass. No renderer, shader or
+dependency changes belong to this slice. The last recorded browser diagnostic
+launch was 00:12 Eastern on October 10; the corrected source has not been
+browser-qualified. The nineteen-check receipt remains earlier evidence, not
+acceptance of the corrected source. The twentieth check and publication remain
+pending while headed/GPU runs are held. The activity audit is preserved at
+`targets/moot-gpu-activity-audit-20261010.json`; failed captures remain beside
+their original receipts.
 
 **Peer and standalone-browser reproduction (executable commands; start at the repository root):**
 
