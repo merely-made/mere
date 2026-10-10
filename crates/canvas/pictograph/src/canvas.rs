@@ -204,6 +204,8 @@ mod dynamics_record;
 /// The dynamics spec over this catalog: seiche's portable spec, with the
 /// laws and overlays as its presets. (Dynamics grammar plan, G4a.)
 pub mod dynamics_spec;
+pub mod dynamics_recipe;
+pub mod projection_dynamics;
 /// The physics catalog: the laws a graph can move under, the overlays composed
 /// onto them, and the named profiles. (Physics catalog — P1.)
 pub mod physics_catalog;
