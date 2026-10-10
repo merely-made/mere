@@ -219,6 +219,16 @@ applicable rendered acceptance pass against its published dependency set.
   Embedded roots inherit composing-host roles without reading or writing the
   application preference. Optional Moot capsule lifecycle and styling survive
   later appearance refreshes.
+- October 10 separately qualifies Graphshell's guarded Vello `491c376c`
+  default Wasm bundle on Chrome 152 / AMD gcn-5 without a fallback adapter.
+  The existing mode, reopen and embedding scenarios pass 97 frames and eight
+  internal captures; all 23 original scenario/browser/tree/main-control PNGs
+  were reviewed. Four modes, exact authored CSS/custom modes, corrupt-input
+  preservation, fresh reload, narrow layouts and embedded host ownership pass,
+  with no browser errors, product-storage changes or new GPU reset. Exact
+  bundle hash, adapter, pixel ledger and PNGs are retained under
+  `ports/graphshell/docs/receipts/tabard_renderer_20261010`. This qualification
+  covers the new renderer separately from the October 9 pre-guard receipts.
 - Native acceptance is paused after Pelt fresh runs 07 and 08 triggered GPU
   resets and WindowServer watchdog failures. The 01:46:41 October 10 kernel
   report identifies the fresh-08 Pelt process and its stalled Metal compute
