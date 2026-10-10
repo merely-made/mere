@@ -714,3 +714,12 @@ The [Scenograph editor plan](mere_docs/implementation_strategy/2026-10-07_scenog
 and the other owning plans linked above remain the implementation homes.
 Apps can cite this section as the shared design direction rather than copying
 it into separate competing records.
+
+**Consumer reconciliation (2026-10-09):** the [ambient relation-lens proposal](mere_docs/design/2026-09-23_ambiance_design.md#10-proposal-focus-driven-relation-lenses-2026-10-07)
+applies §9.2 to temporary lens reasons and previously selected background
+membership, while preserving the keeping axis. The [app composition brief](cambium_docs/research/2026-10-06_app_composition_brief.md#11-current-consumers-and-design-direction-2026-10-09)
+links retained sessions, owner-served projections and the separately granted
+Moot applet experiment. The [Scenograph handoff](mere_docs/research/2026-10-09_scenograph_codex_handoff.md)
+records current site state and overlapping viewer ownership. These are
+implementation context and proposals; they do not settle the open choices
+above or infer consumer completion from this direction record.
