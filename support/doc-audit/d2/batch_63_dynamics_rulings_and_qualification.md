@@ -112,3 +112,21 @@ Pictograph timing failure and passing targeted rerun, and the browser receipts.
 Paging does not rerun settled cells; R162 still owns overlapping viewer files.
 Earlier questions and measurements have explicit superseding checkpoints.
 Firefox, B1/S2, the second consumer and the coordinator's review remain open.
+
+
+## B1 backend draft continuation, 2026-10-10
+
+Supplemental implementing-agent judgment against Mere `71528a7a` plus the
+owned backend diff. The editor plan and handoff retain B1 as open and name
+the pending R162 handoff and mode fork. Read the binder, obstacle lifecycle,
+paint integration and retained idle-overlap probe directly. Their draft
+claims match the current source; no browser acceptance or refreshed dynamics
+identity is claimed. Existing totals above remain the earlier dynamics
+checkpoint's bounded judgment, not an aggregate for this draft.
+
+The final native receipts report four focused binder tests and 161 Seiche
+library tests passing (10 ignored). The locked wasm viewer compile check
+passes. The retained short-bound overlap failure is distinct from the final
+360-step active-law/control proof; no tolerance or settle budget was raised.
+The changed-doc audit reports no new findings. The D2 aggregate's eight errors
+are existing index/coverage issues outside these two changed documents.

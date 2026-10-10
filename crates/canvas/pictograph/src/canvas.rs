@@ -206,6 +206,7 @@ mod dynamics_record;
 pub mod dynamics_spec;
 pub mod dynamics_recipe;
 pub mod projection_dynamics;
+mod projection_backdrops;
 /// The physics catalog: the laws a graph can move under, the overlays composed
 /// onto them, and the named profiles. (Physics catalog — P1.)
 pub mod physics_catalog;
@@ -388,6 +389,7 @@ pub struct Canvas {
     /// The content-surface backdrop color (themed; the host pushes it via
     /// [`set_palette`](Self::set_palette)). Defaults to the dark slate.
     backdrop: ColorF,
+    projection_backdrops: Vec<projection_backdrops::ResolvedBackdrop>,
     /// Producer generation, bumped each rendered frame (positions / camera move).
     generation: u64,
     /// Last cursor position in screen px (zoom anchor + drag origin).
