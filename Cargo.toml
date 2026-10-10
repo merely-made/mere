@@ -666,9 +666,9 @@ stickleback = { path = "crates/stickleback" }
 vello = { git = "https://github.com/mark-ik/vello.git", tag = "vello-0.10.0" }
 # Radeon coarse repair plus validated native shader command progress guards.
 # Keep Classic and its encoding/shader types on the same 0.10 maintenance source.
-netrender-vello = { git = "https://github.com/mark-ik/vello.git", rev = "491c376cf2b01fc11132cf8f86419dec114ae032" }
-vello_encoding = { git = "https://github.com/mark-ik/vello.git", rev = "491c376cf2b01fc11132cf8f86419dec114ae032" }
-vello_shaders = { git = "https://github.com/mark-ik/vello.git", rev = "491c376cf2b01fc11132cf8f86419dec114ae032" }
+netrender-vello = { git = "https://github.com/mark-ik/vello.git", rev = "10f01d6d88e94eac087daf033b24895cf97b8e82" }
+vello_encoding = { git = "https://github.com/mark-ik/vello.git", rev = "10f01d6d88e94eac087daf033b24895cf97b8e82" }
+vello_shaders = { git = "https://github.com/mark-ik/vello.git", rev = "10f01d6d88e94eac087daf033b24895cf97b8e82" }
 # cubecl-wgpu 0.10.0, vendored from the registry and moved to wgpu 30. This is
 # the "narrow CubeCL backport" of the 2026-08-15 wgpu 30 unification: it is the
 # ONLY crate in the burn 0.21 / cubecl 0.10 stack that names wgpu at all, so
