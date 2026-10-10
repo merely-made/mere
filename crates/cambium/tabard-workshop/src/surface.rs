@@ -140,6 +140,14 @@ fn text_control(
                 text_field_typed(input)
             };
             field
+                .attr(
+                    "class",
+                    if multiline {
+                        "tabard-stylesheet-input"
+                    } else {
+                        "tabard-text-input"
+                    },
+                )
                 .attr("role", "textbox")
                 .attr("aria-label", label)
                 .attr("data-field", key)
