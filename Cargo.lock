@@ -12111,7 +12111,7 @@ dependencies = [
  "incipit",
  "insigne",
  "mere-alembic",
- "mere-forme",
+ "mere-curation",
  "mere-kernel",
  "muniment",
  "notochord",
