@@ -2666,6 +2666,69 @@ mod controls {
     /// routes to the captured element (cursor wherever), `up` routes `Up` and
     /// clears capture — the foundation under sliders / scrollbar-drag.
     #[test]
+    fn secondary_capture_is_opt_in_and_keeps_its_qualified_release() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner = GenetAppRunner::<_, _, _, ()>::new(
+            dom,
+            |_: &Vec<PointerPhase>| {
+                on_pointer(
+                    el::<_, Vec<PointerPhase>, ()>("div", "canvas"),
+                    |state: &mut Vec<PointerPhase>, event: PointerEvent| {
+                        if event.phase == PointerPhase::Down {
+                            event.capture_pointer();
+                        }
+                        state.push(event.phase);
+                    },
+                )
+            },
+            Vec::<PointerPhase>::new(),
+        );
+        let node = runner.root();
+        let event = |phase| {
+            PointerEvent::new(phase, (10.0, 10.0), (20.0, 20.0))
+                .with_button(crate::PointerButton::Secondary)
+                .with_pointer_id(9)
+        };
+        runner.dispatch_pointer_down(node, event(PointerPhase::Down));
+        assert_eq!(runner.pointer_capture(), Some(node));
+        runner.dispatch_pointer_up(event(PointerPhase::Up).with_pointer_id(10));
+        assert_eq!(runner.pointer_capture(), Some(node));
+        runner.dispatch_pointer_move(event(PointerPhase::Move));
+        runner.dispatch_pointer_up(event(PointerPhase::Up));
+        assert_eq!(
+            runner.state().as_slice(),
+            &[PointerPhase::Down, PointerPhase::Move, PointerPhase::Up]
+        );
+        assert_eq!(runner.pointer_capture(), None);
+    }
+
+    #[test]
+    fn unrelated_button_release_does_not_end_pointer_capture() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner = GenetAppRunner::<_, _, _, ()>::new(
+            dom,
+            |_: &Vec<PointerPhase>| {
+                on_pointer(
+                    el::<_, Vec<PointerPhase>, ()>("div", "track"),
+                    |s: &mut Vec<PointerPhase>, e: PointerEvent| s.push(e.phase),
+                )
+            },
+            Vec::<PointerPhase>::new(),
+        );
+        let node = runner.root();
+        runner.dispatch_pointer_down(
+            node,
+            PointerEvent::new(PointerPhase::Down, (0.0, 0.0), (20.0, 20.0)),
+        );
+        runner.dispatch_pointer_up(
+            PointerEvent::new(PointerPhase::Up, (0.0, 0.0), (20.0, 20.0))
+                .with_button(crate::PointerButton::Secondary),
+        );
+        assert_eq!(runner.pointer_capture(), Some(node));
+        assert_eq!(runner.state().as_slice(), &[PointerPhase::Down]);
+    }
+
+    #[test]
     fn pointer_drag_captures_and_routes() {
         #[derive(Default)]
         struct Drag {

@@ -49,6 +49,7 @@ pub trait HostTree<State>: sealed::Sealed {
     fn focusables(&self) -> Vec<NodeId>;
     fn default_prevented(&self) -> bool;
     fn pointer_capture(&self) -> Option<NodeId>;
+    fn pointer_capture_owner(&self) -> Option<(i32, cambium::PointerButton)>;
     fn pointer_target(&self, hit: NodeId) -> Option<NodeId>;
     fn wheel_target(&self, hit: NodeId) -> Option<NodeId>;
     fn take_file_request(&mut self) -> Option<FileRequest>;
@@ -59,6 +60,10 @@ pub trait HostTree<State>: sealed::Sealed {
     fn dispatch_pointer_down(&mut self, target: NodeId, event: PointerEvent);
     fn dispatch_pointer_move(&mut self, event: PointerEvent);
     fn dispatch_pointer_up(&mut self, event: PointerEvent);
+    fn dispatch_pointer_cancel(&mut self, mut event: PointerEvent) {
+        event.phase = cambium::PointerPhase::Cancel;
+        self.dispatch_pointer_up(event);
+    }
     fn dispatch_hover(&mut self, target: NodeId, event: HoverEvent);
     fn dispatch_wheel(&mut self, target: NodeId, event: WheelEvent);
 }
@@ -115,6 +120,10 @@ where
 
     fn default_prevented(&self) -> bool {
         GenetAppRunner::default_prevented(self)
+    }
+
+    fn pointer_capture_owner(&self) -> Option<(i32, cambium::PointerButton)> {
+        GenetAppRunner::pointer_capture_owner(self)
     }
 
     fn pointer_capture(&self) -> Option<NodeId> {

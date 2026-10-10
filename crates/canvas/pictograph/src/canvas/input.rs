@@ -245,6 +245,33 @@ impl Canvas {
         self.context_request.take()
     }
 
+    /// Release a canceled gesture without activating a click, selection or
+    /// context menu. Motion already applied remains; a moved node returns to
+    /// its arrangement role just as on release. Pan momentum stops with capture.
+    pub fn pointer_cancel(&mut self) -> bool {
+        let drag = self.drag.take();
+        let mut changed = drag.is_some();
+        if let Some(drag) = drag.filter(|drag| drag.moved) {
+            self.physics.set_dragging(false);
+            self.release_dragged(drag.node);
+        }
+        changed |= self.middle_drag.take().is_some();
+        changed |= self.orbit_drag.take().is_some();
+        changed |= self.empty_press.take().is_some();
+        changed |= self.marquee.take().is_some();
+        changed |= self.fold_press.take().is_some();
+        if self.end_field_drag() {
+            self.settle_physics(SETTLE_TICKS / 3);
+            changed = true;
+        }
+        changed |= self.pan_velocity != (0.0, 0.0);
+        self.pan_velocity = (0.0, 0.0);
+        self.ctrl = false;
+        self.shift = false;
+        self.alt = false;
+        changed
+    }
+
     /// A pointer button released at screen px `(x, y)`. Ends a middle-pan or a
     /// left pan; drops a dragged node (re-settling its neighborhood) or selects a
     /// clicked node; on a bare empty click, picks the nearest edge within

@@ -414,7 +414,8 @@ struct RoutedWorkspace<F> {
 /// for routing and frame sizing.
 pub struct PeltWorkspace<F> {
     workbench: Workbench,
-    contents: HashMap<TileId, PeltContent<F>>,
+    contents: crate::PeltControllerPool<TileId, TileId, F>,
+    closed_tiles: HashMap<TileId, Tile>,
     /// Each tile's route, refreshed whenever its content may have changed lane
     /// or engine, so hosts can borrow it.
     routes: HashMap<TileId, PeltTileRoute>,
@@ -519,7 +520,8 @@ impl<F: 'static> PeltWorkspace<F> {
             .find(|id| contents.contains_key(id));
         let mut workspace = Self {
             workbench: Workbench::new(tree),
-            contents,
+            contents: contents.into(),
+            closed_tiles: HashMap::new(),
             routes: HashMap::new(),
             content_rects: HashMap::new(),
             focused,
@@ -535,6 +537,71 @@ impl<F: 'static> PeltWorkspace<F> {
         Ok(workspace)
     }
 
+    pub fn pool(&self) -> &crate::PeltControllerPool<TileId, TileId, F> {
+        &self.contents
+    }
+    pub fn pool_mut(&mut self) -> &mut crate::PeltControllerPool<TileId, TileId, F> {
+        &mut self.contents
+    }
+
+    /// Explicitly retire content, unlike closing its last appearance.
+    pub fn remove_content(&mut self, tile: TileId) -> Option<PeltContent<F>> {
+        self.workbench.apply(&TileEvent::Closed(tile));
+        self.closed_tiles.remove(&tile);
+        self.routes.remove(&tile);
+        self.content_rects.remove(&tile);
+        if let Some(routed) = self.routed.as_mut() {
+            routed.base_titles.remove(&tile);
+        }
+        let content = self.contents.remove_content(&tile);
+        if self.focused == Some(tile) {
+            self.focused = None;
+        }
+        self.sync_visibility();
+        content
+    }
+
+    /// Restore a closed appearance without respawning or resetting its session.
+    pub fn reopen_tile(&mut self, tile: TileId) -> bool {
+        if self.tree().find(tile).is_some() || !self.contents.contains_key(&tile) {
+            return false;
+        }
+        let Some(record) = self.closed_tiles.remove(&tile) else {
+            return false;
+        };
+        let target = self.tree().tiles().first().map(|tile| tile.id);
+        if let Some(target) = target {
+            self.workbench.tree_mut().insert_tab_after(target, record);
+        } else {
+            *self.workbench.tree_mut() = TileTree::single(record);
+        }
+        self.focus(tile);
+        self.sync_tile_metadata();
+        self.sync_visibility();
+        true
+    }
+
+    /// Route the shared input envelope from workspace coordinates.
+    pub fn input_event(&mut self, input: crate::PeltInput) -> PeltHostEffect {
+        if let crate::PeltInput::Session(input) = input {
+            return self.input(input);
+        }
+        if matches!(input.pointer(), Some((_, inker::PointerPhase::Down, _))) {
+            if let Some((x, y)) = input.position() {
+                if let Some(tile) = self.tile_at(x, y) {
+                    self.focus(tile);
+                }
+            }
+        }
+        let effect = self.contents.input_at(0, input);
+        self.pointer_capture = self.contents.captured_placement(0).copied();
+        if effect.navigated {
+            self.sync_tile_metadata();
+            self.sync_visibility();
+        }
+        effect
+    }
+
     pub fn tree(&self) -> &TileTree {
         self.workbench.tree()
     }
@@ -547,7 +614,7 @@ impl<F: 'static> PeltWorkspace<F> {
     /// routing. Synthetic semantic activation must wait for that gesture to
     /// finish rather than borrowing its capture target.
     pub fn has_active_pointer_capture(&self) -> bool {
-        self.pointer_capture.is_some()
+        self.contents.has_pointer_capture()
     }
 
     /// One tile's routed content, whichever lane is live.
@@ -569,10 +636,12 @@ impl<F: 'static> PeltWorkspace<F> {
     }
 
     pub fn controller(&self, tile: TileId) -> Option<&PeltController<F>> {
+        self.tree().find(tile)?;
         self.contents.get(&tile).and_then(PeltContent::document)
     }
 
     pub fn controller_mut(&mut self, tile: TileId) -> Option<&mut PeltController<F>> {
+        self.tree().find(tile)?;
         self.contents
             .get_mut(&tile)
             .and_then(PeltContent::document_mut)
@@ -696,13 +765,19 @@ impl<F: 'static> PeltWorkspace<F> {
     /// Physical pixels per workspace unit for native surface producers.
     /// Document sessions continue to receive logical content-hole extents.
     pub fn set_surface_scale_factor(&mut self, scale_factor: f32) {
-        self.surface_scale_factor = scale_factor.max(1.0);
+        self.surface_scale_factor = if scale_factor.is_finite() && scale_factor > 0.0 {
+            scale_factor
+        } else {
+            1.0
+        };
+        self.sync_visibility();
     }
 
     /// Replace the content-hole geometry read from the latest Frisket layout.
     /// Rectangles for inactive or closed tiles are deliberately discarded.
     pub fn set_content_rects(&mut self, rects: impl IntoIterator<Item = (TileId, WorkspaceRect)>) {
         self.content_rects = rects.into_iter().collect();
+        self.sync_visibility();
     }
 
     /// Apply a standalone Pelt arrangement gesture through the shared
@@ -715,6 +790,10 @@ impl<F: 'static> PeltWorkspace<F> {
     /// host decision. A tearout leaves the tree and Pelt controller custody
     /// unchanged until that host accepts it.
     pub fn apply_outcome(&mut self, event: &TileEvent) -> PeltWorkspaceOutcome {
+        let closing = match event {
+            TileEvent::Closed(id) => self.tree().find(*id).cloned(),
+            _ => None,
+        };
         let workbench = self.workbench.apply(event);
         if !workbench.changed() {
             let mut focus_changed = false;
@@ -737,11 +816,13 @@ impl<F: 'static> PeltWorkspace<F> {
             .into_iter()
             .map(|tile| tile.id)
             .collect::<HashSet<_>>();
-        self.contents.retain(|id, _| retained.contains(id));
+        if let Some(tile) = closing {
+            self.closed_tiles.insert(tile.id, tile);
+        }
         self.routes.retain(|id, _| retained.contains(id));
         self.content_rects.retain(|id, _| retained.contains(id));
         if let Some(routed) = &mut self.routed {
-            routed.base_titles.retain(|id, _| retained.contains(id));
+            let _ = routed; // Titles belong to retained content, including closed placements.
         }
         if self
             .pointer_capture
@@ -839,6 +920,7 @@ impl<F: 'static> PeltWorkspace<F> {
         let mut destination = Self {
             workbench: Workbench::new(TileTree::single(tile_record)),
             contents: content.map(|content| (tile, content)).into_iter().collect(),
+            closed_tiles: HashMap::new(),
             routes: route.map(|route| (tile, route)).into_iter().collect(),
             content_rects: content_rect.map(|rect| (tile, rect)).into_iter().collect(),
             focused: None,
@@ -953,14 +1035,10 @@ impl<F: 'static> PeltWorkspace<F> {
                         .admits(frame_index, surface_refreshes)
                 {
                     surface_refreshes += 1;
-                    match self
-                        .contents
-                        .get_mut(&tile)
-                        .expect("surface tile has content")
-                        .frame(rect, self.surface_scale_factor)
-                    {
-                        PeltLayer::Surface(frame) => frame,
-                        PeltLayer::Document(_) => unreachable!("checked surface lane"),
+                    match self.contents.frame(&tile) {
+                        None => continue,
+                        Some(PeltLayer::Surface(frame)) => frame,
+                        Some(PeltLayer::Document(_)) => unreachable!("checked surface lane"),
                     }
                 } else {
                     Ok(None)
@@ -973,30 +1051,21 @@ impl<F: 'static> PeltWorkspace<F> {
                         frame,
                     });
                 }
-            } else if let Some(content) = self.contents.get_mut(&tile) {
-                if let PeltLayer::Document(frame) = content.frame(rect, self.surface_scale_factor) {
-                    tiles.push(PeltTileFrame { tile, rect, frame });
-                }
+            } else if let Some(PeltLayer::Document(frame)) = self.contents.frame(&tile) {
+                tiles.push(PeltTileFrame { tile, rect, frame });
             }
         }
         self.sync_tile_metadata();
         PeltWorkspaceFrame { tiles, surfaces }
     }
 
-    /// Advance visible sessions. Hidden tabs retain state without driving the
-    /// foreground frame loop.
+    /// Advance retained sessions, including engine-aware hidden work.
     pub fn pump(&mut self) -> bool {
-        let mut more = false;
-        for id in active_tiles(self.workbench.tree()) {
-            // Surface producers do not expose a settled bit. Keep polling every
-            // visible producer so a frame that arrives after the first acquire
-            // is not stranded until unrelated document activity causes a
-            // redraw.
-            if let Some(content) = self.contents.get_mut(&id) {
-                more |= content.pump();
-            }
-        }
-        more
+        self.contents.pump()
+    }
+
+    pub fn pump_at(&mut self, epoch_ms: f64) -> bool {
+        self.contents.pump_at(epoch_ms)
     }
 
     /// Mark every visible document session as composed by the embedding host.
@@ -1015,6 +1084,10 @@ impl<F: 'static> PeltWorkspace<F> {
     /// are translated into the selected Frisket content hole; keyboard, text,
     /// IME, and focus route to the focused tile.
     pub fn input(&mut self, input: SessionInput) -> PeltHostEffect {
+        if matches!(input, SessionInput::Focus(false)) {
+            self.pointer_capture = None;
+            return self.contents.input_at(0, input.into());
+        }
         let (target, local_input) = match input {
             SessionInput::PointerMoved { x, y, modifiers } => {
                 let target = self.pointer_capture.or_else(|| self.tile_at(x, y));
@@ -1062,11 +1135,9 @@ impl<F: 'static> PeltWorkspace<F> {
             },
         };
 
-        let scale_factor = self.surface_scale_factor;
-        let Some(content) = self.contents.get_mut(&target) else {
-            return PeltHostEffect::default();
-        };
-        let effect = content.input(local_input, scale_factor);
+        let effect = self
+            .contents
+            .input(&target, crate::PeltInput::Session(local_input));
         if let Some(capture) = effect.pointer_capture {
             self.pointer_capture = capture.then_some(target);
         }
@@ -1078,17 +1149,23 @@ impl<F: 'static> PeltWorkspace<F> {
     }
 
     pub fn scroll_at(&mut self, x: f32, y: f32, dx: f32, dy: f32) -> bool {
-        let Some(tile) = self.tile_at(x, y) else {
-            return false;
-        };
-        let Some(rect) = self.content_rect(tile) else {
-            return false;
-        };
-        let (x, y) = rect.local(x, y);
-        let scale_factor = self.surface_scale_factor;
-        self.contents
-            .get_mut(&tile)
-            .is_some_and(|content| content.scroll_at(x, y, dx, dy, scale_factor))
+        self.wheel_at(x, y, dx, dy, inker::SessionModifiers::default())
+    }
+
+    pub fn wheel_at(
+        &mut self,
+        x: f32,
+        y: f32,
+        dx: f32,
+        dy: f32,
+        modifiers: inker::SessionModifiers,
+    ) -> bool {
+        self.input_event(crate::PeltInput::Wheel {
+            position: inker::PhysicalPosition { x, y },
+            delta: (dx, dy),
+            modifiers,
+        })
+        .handled
     }
 
     pub fn scroll_for_key(&mut self, key: SessionScrollKey) -> bool {
@@ -1096,8 +1173,8 @@ impl<F: 'static> PeltWorkspace<F> {
             return false;
         };
         self.contents
-            .get_mut(&tile)
-            .is_some_and(|content| content.scroll_for_key(key))
+            .input(&tile, crate::PeltInput::ScrollKey(key))
+            .handled
     }
 
     pub fn command(&mut self, command: SessionNavigationCommand) -> PeltHostEffect {
@@ -1135,21 +1212,39 @@ impl<F: 'static> PeltWorkspace<F> {
         if self.focused == Some(tile) {
             return;
         }
-        if let Some(old) = self.focused.and_then(|id| self.contents.get_mut(&id)) {
-            old.focus(false);
-        }
         self.focused = Some(tile);
-        if let Some(new) = self.contents.get_mut(&tile) {
-            new.focus(true);
-        }
+        self.sync_visibility();
     }
 
     fn sync_visibility(&mut self) {
-        let active = active_tiles(self.workbench.tree())
+        let active = active_tiles(self.workbench.tree());
+        let placements = self
+            .workbench
+            .tree()
+            .tiles()
             .into_iter()
-            .collect::<HashSet<_>>();
-        for (id, content) in &mut self.contents {
-            content.set_hidden(!active.contains(id));
+            .filter(|tile| self.contents.contains_key(&tile.id))
+            .map(|tile| {
+                (
+                    tile.id,
+                    crate::PeltPlacement {
+                        content: tile.id,
+                        window: 0,
+                        rect: self
+                            .content_rects
+                            .get(&tile.id)
+                            .copied()
+                            .unwrap_or_default(),
+                        visible: active.contains(&tile.id),
+                        focused: self.focused == Some(tile.id),
+                        scale_factor: self.surface_scale_factor,
+                    },
+                )
+            })
+            .collect::<Vec<_>>();
+        self.contents.set_placements(placements);
+        if !self.contents.has_pointer_capture() {
+            self.pointer_capture = None;
         }
     }
 

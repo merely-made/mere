@@ -180,6 +180,13 @@ impl SurfaceProducer for PeltScryingProducer {
         self.ensure()?.send_mouse_input(event)
     }
 
+    fn send_wheel_input(&mut self, event: inker::SurfaceWheelEvent) -> Result<(), SurfaceError> {
+        self.ensure()?.send_wheel_input(event)
+    }
+    fn set_focus(&mut self, focused: bool) -> Result<(), SurfaceError> {
+        self.ensure()?.set_focus(focused)
+    }
+
     fn send_pointer_input(&mut self, event: PointerEvent) -> Result<(), SurfaceError> {
         self.ensure()?.send_pointer_input(event)
     }

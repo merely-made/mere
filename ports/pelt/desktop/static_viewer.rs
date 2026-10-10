@@ -716,7 +716,7 @@ mod livery_route_tests {
             content
                 .drive_product_receipt(StaticProductReceipt::Controls)
                 .as_deref(),
-            Ok("nested wheel stayed local and keyboard edit reached retained structure")
+            Ok("nested wheel stayed local and keyboard edit reached retained control value")
         );
     }
 
@@ -1392,26 +1392,54 @@ impl windowed::ViewerContent for ControllerViewerContent {
                 if !note.handled || !note.editable {
                     return Err("controls receipt did not focus the retained textarea".to_owned());
                 }
+                let note_id = self
+                    .controller
+                    .accessibility_projection()
+                    .and_then(|projection| {
+                        projection
+                            .nodes()
+                            .iter()
+                            .find(|node| {
+                                node.role == inker::DocumentA11yRole::TextField
+                                    && node.state.focused
+                            })
+                            .map(|node| node.id)
+                    })
+                    .ok_or_else(|| {
+                        "controls receipt focused textarea was not projected".to_owned()
+                    })?;
                 let edited = self
                     .controller
                     .input(inker::SessionInput::Text(" and ash".to_owned()));
                 if !edited.handled {
                     return Err("controls receipt textarea rejected text input".to_owned());
                 }
-                let retained = self.controller.inspect().is_some_and(|report| {
+                // Editing changes the live control value while preserving the
+                // authored textarea text reported by structural inspection.
+                let retained =
+                    self.controller
+                        .accessibility_projection()
+                        .is_some_and(|projection| {
+                            projection
+                                .node(note_id)
+                                .is_some_and(|node| node.value.as_deref() == Some("cedar and ash"))
+                        });
+                let authored = self.controller.inspect().is_some_and(|report| {
                     report
                         .outline
                         .iter()
-                        .any(|entry| entry.role == "textbox" && entry.name == "cedar and ash")
+                        .any(|entry| entry.role == "textbox" && entry.name == "cedar")
                 });
+                if !authored {
+                    return Err("controls receipt edit changed authored textarea text".to_owned());
+                }
                 if !retained {
                     return Err(
-                        "controls receipt edit did not reach retained document structure"
-                            .to_owned(),
+                        "controls receipt edit did not reach retained control value".to_owned()
                     );
                 }
                 Ok(
-                    "nested wheel stayed local and keyboard edit reached retained structure"
+                    "nested wheel stayed local and keyboard edit reached retained control value"
                         .to_owned(),
                 )
             },

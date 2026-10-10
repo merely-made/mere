@@ -165,6 +165,10 @@ where
         self.runner.default_prevented(self.window)
     }
 
+    fn pointer_capture_owner(&self) -> Option<(i32, cambium::PointerButton)> {
+        self.runner.pointer_capture_owner(self.window)
+    }
+
     fn pointer_capture(&self) -> Option<NodeId> {
         self.runner.pointer_capture(self.window)
     }
@@ -297,6 +301,9 @@ impl MutationRouter {
                 DomMutation::AttributeChanged { node, .. }
                 | DomMutation::CharacterDataChanged { node }
                 | DomMutation::FormControlStateChanged { node }
+                | DomMutation::FormControlInteractionStateChanged { node }
+                | DomMutation::OptionStateChanged { node }
+                | DomMutation::FormControlCustomValidityChanged { node }
                 | DomMutation::SubtreeReplaced { node } => vec![*node],
                 DomMutation::Moved {
                     from_parent,

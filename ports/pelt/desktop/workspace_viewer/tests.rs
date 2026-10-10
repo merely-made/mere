@@ -1380,7 +1380,17 @@ fn accessibility_focus_and_click_route_through_the_retained_shell_separately() {
     assert_eq!(initial_address_node.value(), Some(fixture.as_str()));
     let theme = a11y_node(&initial, "Toggle Pelt appearance settings", Role::Button)
         .expect("appearance toggle");
+    assert!(
+        !app.apply_accessibility_request(A11yActionRequest {
+            target_tree: accesskit::TreeId(accesskit::Uuid::from_u128(77)),
+            action: Action::Focus,
+            target_node: theme,
+            data: None,
+        }),
+        "a guest's colliding node id cannot act on host chrome"
+    );
     assert!(app.apply_accessibility_request(A11yActionRequest {
+        target_tree: accesskit::TreeId::ROOT,
         action: Action::Focus,
         target_node: theme,
         data: None,
@@ -1390,6 +1400,7 @@ fn accessibility_focus_and_click_route_through_the_retained_shell_separately() {
     assert!(app.accessibility.focus.is_some());
 
     assert!(app.apply_accessibility_request(A11yActionRequest {
+        target_tree: accesskit::TreeId::ROOT,
         action: Action::Click,
         target_node: theme,
         data: None,
@@ -1400,6 +1411,7 @@ fn accessibility_focus_and_click_route_through_the_retained_shell_separately() {
         .expect("appearance accessibility tree");
     let light = a11y_node(&drawer, "Light", Role::RadioButton).expect("Light radio");
     assert!(app.apply_accessibility_request(A11yActionRequest {
+        target_tree: accesskit::TreeId::ROOT,
         action: Action::Focus,
         target_node: light,
         data: None,
@@ -1407,6 +1419,7 @@ fn accessibility_focus_and_click_route_through_the_retained_shell_separately() {
     assert_eq!(app.chrome_theme(), AppearanceTheme::Dark);
 
     assert!(app.apply_accessibility_request(A11yActionRequest {
+        target_tree: accesskit::TreeId::ROOT,
         action: Action::Click,
         target_node: light,
         data: None,
@@ -1448,6 +1461,7 @@ fn accessibility_focus_and_click_route_through_the_retained_shell_separately() {
         .to_string_lossy()
         .into_owned();
     assert!(app.apply_accessibility_request(A11yActionRequest {
+        target_tree: accesskit::TreeId::ROOT,
         action: Action::SetValue,
         target_node: current_address,
         data: Some(ActionData::Value(next_fixture.clone().into())),
@@ -1488,21 +1502,25 @@ fn accessibility_focus_and_click_route_through_the_retained_shell_separately() {
     );
     assert!(replaced_address != address);
     assert!(!app.apply_accessibility_request(A11yActionRequest {
+        target_tree: accesskit::TreeId::ROOT,
         action: Action::SetValue,
         target_node: address,
         data: Some(ActionData::Value(fixture.clone().into())),
     }));
     assert!(!app.apply_accessibility_request(A11yActionRequest {
+        target_tree: accesskit::TreeId::ROOT,
         action: Action::SetValue,
         target_node: replaced_address,
         data: Some(ActionData::NumericValue(4.0)),
     }));
     assert!(!app.apply_accessibility_request(A11yActionRequest {
+        target_tree: accesskit::TreeId::ROOT,
         action: Action::SetValue,
         target_node: replaced_address,
         data: None,
     }));
     assert!(!app.apply_accessibility_request(A11yActionRequest {
+        target_tree: accesskit::TreeId::ROOT,
         action: Action::SetValue,
         target_node: current_tab,
         data: Some(ActionData::Value(next_fixture.clone().into())),
@@ -1521,6 +1539,7 @@ fn accessibility_focus_and_click_route_through_the_retained_shell_separately() {
         .expect("controller before missing navigation")
         .can_go_back();
     assert!(app.apply_accessibility_request(A11yActionRequest {
+        target_tree: accesskit::TreeId::ROOT,
         action: Action::SetValue,
         target_node: replaced_address,
         data: Some(ActionData::Value(missing_fixture.clone().into())),
@@ -1661,6 +1680,18 @@ fn secondary_accessibility_projection_keeps_tile_namespace_and_virtual_focus() {
         .expect("secondary projection after virtual focus");
     assert_eq!(second.tree.nodes.len(), first.tree.nodes.len());
     let prepared = accessibility.prepare(second, 1.0);
+    let mut request = A11yActionRequest {
+        target_tree: accesskit::TreeId(accesskit::Uuid::from_u128(77)),
+        action: Action::Focus,
+        target_node: action_id,
+        data: None,
+    };
+    assert!(
+        accessibility.action_for_request(&request).is_none(),
+        "the secondary-window gate rejects a foreign tree with the same local node id"
+    );
+    request.target_tree = accesskit::TreeId::ROOT;
+    assert!(accessibility.action_for_request(&request).is_some());
     assert_eq!(prepared.focus, action_id);
     let second_aperture = prepared
         .nodes
@@ -1827,6 +1858,7 @@ fn reader_child_accessibility_is_namespaced_virtual_and_stale_safe() {
             && second_action.supports(DocumentA11yAction::Focus)
     );
     assert!(app.apply_accessibility_request(A11yActionRequest {
+        target_tree: accesskit::TreeId::ROOT,
         action: Action::Focus,
         target_node: first_link,
         data: None,
@@ -1879,6 +1911,7 @@ fn reader_child_accessibility_is_namespaced_virtual_and_stale_safe() {
     );
     assert!(
         !app.apply_accessibility_request(A11yActionRequest {
+            target_tree: accesskit::TreeId::ROOT,
             action: Action::Focus,
             target_node: first_link,
             data: None,
@@ -2134,6 +2167,7 @@ fn livery_child_accessibility_is_namespaced_transformed_and_stale_safe() {
     );
 
     assert!(app.apply_accessibility_request(A11yActionRequest {
+        target_tree: accesskit::TreeId::ROOT,
         action: Action::Focus,
         target_node: link,
         data: None,
@@ -2184,6 +2218,7 @@ fn livery_child_accessibility_is_namespaced_transformed_and_stale_safe() {
     );
     assert!(
         !app.apply_accessibility_request(A11yActionRequest {
+            target_tree: accesskit::TreeId::ROOT,
             action: Action::Click,
             target_node: link,
             data: None,
@@ -2211,6 +2246,7 @@ fn livery_child_accessibility_is_namespaced_transformed_and_stale_safe() {
     );
     assert!(
         app.apply_accessibility_request(A11yActionRequest {
+            target_tree: accesskit::TreeId::ROOT,
             action: Action::Click,
             target_node: refreshed_link,
             data: None,
@@ -2231,10 +2267,12 @@ fn livery_child_accessibility_is_namespaced_transformed_and_stale_safe() {
     assert_eq!(controller.session_generation(), 2);
     assert!(
         !app.apply_accessibility_request(A11yActionRequest {
+            target_tree: accesskit::TreeId::ROOT,
             action: Action::Focus,
             target_node: link,
             data: None,
         }) && !app.apply_accessibility_request(A11yActionRequest {
+            target_tree: accesskit::TreeId::ROOT,
             action: Action::Click,
             target_node: link,
             data: None,
@@ -2370,6 +2408,7 @@ fn livery_accessibility_click_waits_for_a_physical_pointer_capture() {
     );
     assert!(
         !app.apply_accessibility_request(A11yActionRequest {
+            target_tree: accesskit::TreeId::ROOT,
             action: Action::Click,
             target_node: first_link,
             data: None,
@@ -2486,22 +2525,26 @@ fn livery_child_accessibility_text_values_are_namespaced_stale_safe_and_submit_f
             "{label} must not advertise SetValue"
         );
         assert!(!app.apply_accessibility_request(A11yActionRequest {
+            target_tree: accesskit::TreeId::ROOT,
             action: Action::SetValue,
             target_node: protected,
             data: Some(ActionData::Value("not writable".into())),
         }));
     }
     assert!(!app.apply_accessibility_request(A11yActionRequest {
+        target_tree: accesskit::TreeId::ROOT,
         action: Action::SetValue,
         target_node: note,
         data: Some(ActionData::NumericValue(4.0)),
     }));
     assert!(!app.apply_accessibility_request(A11yActionRequest {
+        target_tree: accesskit::TreeId::ROOT,
         action: Action::SetValue,
         target_node: note,
         data: None,
     }));
     assert!(app.apply_accessibility_request(A11yActionRequest {
+        target_tree: accesskit::TreeId::ROOT,
         action: Action::SetValue,
         target_node: note,
         data: Some(ActionData::Value("birch".into())),
@@ -2560,6 +2603,7 @@ fn livery_child_accessibility_text_values_are_namespaced_stale_safe_and_submit_f
         Role::Button,
     );
     assert!(app.apply_accessibility_request(A11yActionRequest {
+        target_tree: accesskit::TreeId::ROOT,
         action: Action::Click,
         target_node: submit,
         data: None,
@@ -2577,6 +2621,7 @@ fn livery_child_accessibility_text_values_are_namespaced_stale_safe_and_submit_f
     );
     assert_eq!(controller.session_generation(), 2);
     assert!(!app.apply_accessibility_request(A11yActionRequest {
+        target_tree: accesskit::TreeId::ROOT,
         action: Action::SetValue,
         target_node: changed_note,
         data: Some(ActionData::Value("stale".into())),
@@ -2668,6 +2713,7 @@ fn livery_nested_editor_rejects_a_queued_pre_scroll_set_value() {
 
     assert!(
         !app.apply_accessibility_request(A11yActionRequest {
+            target_tree: accesskit::TreeId::ROOT,
             action: Action::SetValue,
             target_node: note,
             data: Some(ActionData::Value("stale mutation".into())),
@@ -2892,6 +2938,7 @@ fn livery_child_accessibility_scroll_into_view_is_namespaced_and_tile_local() {
     assert_eq!(target.tile, TileId(1));
     assert_eq!(target.session_identity.generation, 1);
     assert!(app.apply_accessibility_request(A11yActionRequest {
+        target_tree: accesskit::TreeId::ROOT,
         action: Action::ScrollIntoView,
         target_node: link,
         data: None,
@@ -2931,12 +2978,14 @@ fn livery_child_accessibility_scroll_into_view_is_namespaced_and_tile_local() {
         "a revealed nested target has a concrete tile-local pointer point"
     );
     assert!(app.apply_accessibility_request(A11yActionRequest {
+        target_tree: accesskit::TreeId::ROOT,
         action: Action::Click,
         target_node: revealed_link,
         data: None,
     }));
     assert!(
         !app.apply_accessibility_request(A11yActionRequest {
+            target_tree: accesskit::TreeId::ROOT,
             action: Action::Click,
             target_node: revealed_link,
             data: None,
@@ -3095,4 +3144,128 @@ fn chrome_receipt_controls_one_focused_tile_without_disturbing_neighbors() {
         }
     }
     panic!("chrome receipt did not complete its bounded interaction sequence");
+}
+
+#[cfg(feature = "livery")]
+#[test]
+fn native_document_action_prepares_layout_before_revalidating_captured_revision() {
+    let fixture = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .unwrap()
+        .join("examples/workspace/p7-accessibility-children/index.html")
+        .to_string_lossy()
+        .into_owned();
+    #[cfg(target_os = "windows")]
+    let registries = workspace_registries(None);
+    #[cfg(not(target_os = "windows"))]
+    let registries = workspace_registries();
+    let urls = vec![fixture.clone()];
+    let workspace = PeltWorkspace::try_routed(tree_from_urls(&urls), registries, |tile| {
+        let ContentSource::Document(DocumentRef(address)) = &tile.content else { unreachable!() };
+        Ok(PeltTileRequest::from_request(inker::SessionSpawnRequest::new(address).with_viewport(960,640).with_content_type("text/html").with_body("<!doctype html><div id=spacer style=height:10px></div><a href=next.html>Target</a>")))
+    }, || Box::new(WorkspaceClock(Instant::now()))).unwrap();
+    let frisket = FrisketSurface::new(workspace.tree());
+    let config = WorkspaceViewerConfig::new(urls, WindowingMode::Headed);
+    #[cfg(target_os = "windows")]
+    let mut app = WorkspaceApp::new(config, workspace, frisket, None);
+    #[cfg(not(target_os = "windows"))]
+    let mut app = WorkspaceApp::new(config, workspace, frisket);
+    app.refresh_chrome();
+    let (width, height) = app.logical_size();
+    let pane = app.frisket.frame(width, height).unwrap();
+    app.workspace
+        .set_content_rects(pane.content_rects.iter().copied());
+    app.workspace.frame();
+    let tree = app.prepare_accessibility_tree().unwrap();
+    let node = tree
+        .nodes
+        .iter()
+        .find_map(|(id, node)| {
+            (node.role() == Role::Link && node.supports_action(Action::Focus)).then_some(*id)
+        })
+        .expect("real Livery link supports focus");
+    let Some(WorkspaceA11yActionTarget::Document(target)) = app.accessibility.action_for(node)
+    else {
+        panic!("namespaced document target")
+    };
+    let mutation = app
+        .workspace
+        .controller_mut(TileId(1))
+        .unwrap()
+        .session_mut()
+        .apply_host_mutations(&[inker::session_engine::HostMutation {
+            target_id: "spacer".into(),
+            op: inker::session_engine::HostMutationOp::SetAttribute {
+                name: "style".into(),
+                value: "height:100px".into(),
+            },
+        }])
+        .unwrap();
+    assert_eq!(mutation.applied, 1);
+    assert!(
+        !app.apply_accessibility_request(A11yActionRequest {
+            target_tree: accesskit::TreeId::ROOT,
+            action: Action::Focus,
+            target_node: node,
+            data: None,
+        }),
+        "preparation changes layout; the captured revision must be rejected, not renewed"
+    );
+    let fresh = app
+        .workspace
+        .controller(TileId(1))
+        .unwrap()
+        .accessibility_projection()
+        .unwrap();
+    assert_ne!(
+        fresh.revision(),
+        target.revision,
+        "the action path must prepare the changed layout before checking its captured revision"
+    );
+}
+
+#[test]
+fn native_surface_keyboard_retains_function_key_scan_code_modifiers_and_text() {
+    let input = native_keyboard_input(
+        true,
+        &Key::Named(NamedKey::F12),
+        0x1234,
+        Some("é JSON payload"),
+        ElementState::Pressed,
+        SessionModifiers {
+            shift: true,
+            control: true,
+            alt: true,
+            meta: true,
+        },
+        true,
+    );
+    let pelt_core::PeltInput::Keyboard(event) = input else {
+        panic!("surface must receive the full keyboard envelope")
+    };
+    assert_eq!(event.key_code, 0x7B);
+    assert_eq!(event.scan_code, 0x1234);
+    assert_eq!(event.text.as_deref(), Some("é JSON payload"));
+    assert!(
+        event.pressed
+            && event.modifiers.shift
+            && event.modifiers.ctrl
+            && event.modifiers.alt
+            && event.modifiers.meta
+    );
+    let pelt_core::PeltInput::Session(SessionInput::Key { key, repeat, .. }) =
+        native_keyboard_input(
+            false,
+            &Key::Character("é".into()),
+            44,
+            Some("é"),
+            ElementState::Pressed,
+            Default::default(),
+            true,
+        )
+    else {
+        panic!("document preserves its logical key and repeat vocabulary")
+    };
+    assert_eq!(key, SessionKey::Character("é".into()));
+    assert!(repeat);
 }
