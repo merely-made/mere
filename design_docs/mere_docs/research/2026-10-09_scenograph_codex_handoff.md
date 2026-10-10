@@ -172,22 +172,34 @@ lane coordinate overlapping edits through that site lane. Native fold Rulings
 163–166 belong to its separate S5 continuation. This handoff assigns none of
 those implementations to the editor lane.
 
-The nested branch's 2026-10-10 checkpoint combines the committed site cutover,
-Moot, shared capture polling/Genet `7422e906`, published Tabard appearance and
-the guarded renderer publication through `5cea11408`, followed by published
-Moot/Pelt continuation `4e1811578` at `5884b94a0` (Vello `491c376c`).
-The guard preserves the earlier Radeon coarse
-repair. Its 141 affected CPU tests, locked viewer build and main-page/applet
-Wasm check pass after the renderer update; the unchanged shared scene and
-exporter inputs retain their 254 and four passing tests. Both Wasm gates and
-the 22 host/history and six capsule tests were renewed after the Moot/Pelt
-merge. Main landing remains
-pending: the iMac's confirmed Radeon reset and
-WindowServer incident has put GPU/capture runs on hold, and seven Rootstock
-GPU fixtures failed to obtain a device. The
+The nested branch's 2026-10-10 acceptance closes the portable Fold and combined
+viewer slice for main integration. Source `8b8bd92b1` combines the committed
+site cutover, Moot, shared capture polling/Genet `7422e906`, Tabard appearance,
+maintained Vello `10f01d6d` and published Mere `0a3203f05` (including the
+occurrence-dynamics work above). Both Cargo roots resolve the maintained
+renderer/encoding/shader triple to the atlas repair, retaining the earlier
+Radeon coarse and native-compute guards. The legacy compatibility encoding
+remains separate.
+
+All 254 shared scene tests, 141 affected CPU tests and seven serialized GPU
+producer tests pass on this integration. Four unchanged exporter tests retain
+their result. The locked viewer build, main-page/applet compile check, portable
+metadata and header gate pass. Headed Chrome `152.0.7977.83` on the default
+`amd` / `gcn-5` adapter passes nested/camera/flat/fold-history/gesture receipts,
+all 15 site checkpoints and their keys, clean unknown-membership refusal,
+a planted propagation control, narrow keyboard recovery and the plain viewer's
+mount and actual page-wheel check. Actual captures were inspected; control
+density and small glyphs remain usability concerns. The
 [Fold receipt](../../../ports/graphshell/docs/receipts/host_dataset_folds.json)
-records current hashes, historical partial receipts and the exact remaining
-headed checks. The site lane's uncommitted docs/scenarios remain its own work.
+records fresh source and bundle hashes, commands and capture paths, preserving
+superseded device-loss and harness failures as history. Browser and receipt
+server are stopped; the coordinated GPU slot is released.
+
+This acceptance does not close native S5, saved ambient scenes, full compiled
+Cargo closure or live-site adoption. R162's site owner continues those assigned
+viewer edits; its uncommitted docs/scenarios and the primary checkout's five
+unpublished commits were untouched. B1/S2 and the dynamics lane retain their
+own done-conditions and acceptance boundaries above.
 
 ## Historical draft checkpoint, 2026-10-09
 

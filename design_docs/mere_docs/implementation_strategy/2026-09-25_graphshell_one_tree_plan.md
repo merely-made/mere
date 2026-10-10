@@ -1,10 +1,9 @@
 # Graphshell on one Cambium tree
 
 **Date:** 2026-09-25
-**Status (2026-10-10):** in progress. The combined viewer at `4c18d597d`
-integrates published Mere `3eda5d278`, Genet `7422e906`, guarded Vello
-`491c376c`, and the committed site
-cutover `bf626abd2`. Phases 1–2 are landed; phase 3 has its recorded headed producer
+**Status (2026-10-10):** in progress. The combined viewer qualified at `8b8bd92b1`
+integrates published Mere `0a3203f05`, Genet `7422e906`, maintained Vello
+`10f01d6d`, and the committed site cutover `bf626abd2`. Phases 1–2 are landed; phase 3 has its recorded headed producer
 receipts and Mark's approval to proceed. Phase 4 remains unfinished: canvas
 controls, elapsed-time physics, saved-graph editing and remote-session slices
 have landed, but the complete page/control migration and acceptance wall have
@@ -13,23 +12,24 @@ mere panel is its V2b step 5, after this cutover. §2's current handoff names
 the remaining gates; linked plans own later editor and dynamics status. The
 reservoir's V3–V5 resident implementation has advanced independently; its
 process fixtures do not close this browser cutover or mount the mere panel.
-**Nested host-dataset continuation (2026-10-10):** implemented on
-`codex/nested-graph-view`, with the site cutover combined at `25e356782`,
-current shared captures and Genet at `178779e2c`, published Tabard appearance
-at `6b0798a95`, guarded renderer publication at `5cea11408`, and the published
-Moot/Pelt continuation at `5884b94a0`. The earlier bounded headed proof passes on the default Radeon WebGPU
-adapter after the coarse bitmap traversal repair. Mark approved
-implementing expandable repository groups and entering their constituent graph.
-Rulings 161–162 now require portable `sceno::Fold` facts and give the site
-lane ownership of the shared viewer files. The branch now adapts its explicit
-membership to folds and integrates history and page gestures. Current CPU and
-build checks pass, but a confirmed iMac GPU reset/WindowServer incident has
-placed headed GPU checks on hold. The full Rootstock run also reports seven
-GPU fixtures failing to obtain a device. Combined GPU qualification and main
-landing remain pending; the source-bound
-[Fold receipt](../../../ports/graphshell/docs/receipts/host_dataset_folds.json)
-records these limits explicitly. Saved
-scene integration and the live site's viewer replacement remain separate work.
+**Nested host-dataset continuation (2026-10-10):** landed through
+`codex/nested-graph-view`. The portable `sceno::Fold` adapter required by site
+R161 combines expandable membership, entry, relationship witnesses, retained
+coordinates and checkpoint history with R162's committed viewer cutover.
+The former `scenomise::grouping` module is removed. The source at `8b8bd92b1`
+includes current occurrence dynamics and the atlas repair in both Cargo roots.
+Its 254 shared scene tests, 141 affected CPU tests and seven serialized GPU
+producer tests pass; four unchanged exporter tests retain their earlier result.
+Both locked Wasm gates and the complete headed viewer run pass on the default
+Radeon WebGPU adapter. The run covers nested/flat data, camera recovery,
+fold/checkpoint history, all 15 site checkpoints and their keys, gestures,
+a planted routing fault, clean unknown-group refusal, narrow keyboard focus,
+and the plain embed's mount and real page scrolling. The
+[source-bound Fold receipt](../../../ports/graphshell/docs/receipts/host_dataset_folds.json)
+retains commands, source/bundle hashes, captures and superseded failures.
+The coordinated GPU slot is released. Control density and small glyphs remain
+usability work; native S5, saved-scene integration and the live site's viewer
+replacement remain separate work.
 **Scope:** Graphshell's browser page becomes one retained Cambium tree. Its
 HTML controls become Cambium components, its display-only Cambium chrome
 joins them, pictograph's canvas renders into the tree as a texture producer,
@@ -695,6 +695,43 @@ transfers DOM focus into the graph before traversal returns to the controls.
 - No Graphshell-only UI pieces. What Cambium lacks is added to Cambium.
 
 ## 6. Progress
+
+- **2026-10-10 — combined Fold/viewer acceptance closed for main landing:**
+  integrated the published image-atlas repair (Mere `3808c5a22`, Vello
+  `10f01d6d`) at `07bc7af58`, aligned the independent web Cargo root at
+  `2fdeff569`, then combined current main `0a3203f05` and its occurrence
+  dynamics. The standalone lockfile needed one `scenograph` dependency entry
+  for pictograph (`8b8bd92b1`); no external dependency version changed.
+  - **Renewed gates:** 254 shared scene tests (including ten Fold cases),
+    141 affected CPU tests and all seven Rootstock GPU producer tests pass.
+    The latter ran one exact case per process on the assigned GPU slot,
+    with a 90-second bound and stop on failure. The viewer build and
+    main-page/applet compile check both pass locked and offline. The unchanged
+    exporter retains four passing tests. Portable-lock metadata and the owned
+    source header gate pass. The exact atlas reproduction is recorded in
+    `LICENSES.md` under the existing frozen-evidence rule, with its original
+    source digest verified; the recorded reproduction bytes are unchanged.
+  - **Headed acceptance:** Chrome `152.0.7977.83`, adapter `amd` / `gcn-5`,
+    passes all nested/camera/flat/fold-history/gesture scenarios and all 15 site
+    checkpoint buttons with Home, End, arrows and Page keys. Unknown membership
+    is refused visibly without page errors. The planted propagation fault
+    fails exactly the intended assertion. Tab skips the disabled selection
+    action, reaches it after selection and preserves graph focus; both camera
+    recovery actions work at 420 pixels. The plain embed has no loader or
+    scenario/receipt globals, mounts only the viewer, keeps its checkpoint
+    controls and lets a real wheel scroll the page from 0 to 240 pixels.
+  - **Evidence and limits:** the fresh bundle and actual readbacks/screenshots
+    are recorded in the Fold receipt. Its old device-loss and partial browser
+    failures remain historical evidence. The final harness corrected reversed
+    Page-key expectations, an already-paused history precondition and the
+    graph reader's group selector; no acceptance assertion was dropped.
+    Current controls are still dense and some graph glyphs small. This closes
+    the bounded hosted Fold/history slice, not the whole one-tree migration,
+    full compiled Cargo closure, performance budget, saved ambient state,
+    native S5 or live-site adoption. Site-owner WIP and the primary checkout's
+    five unpublished commits are untouched. Browser and receipt server are
+    stopped and the GPU slot is released. Earlier hold entries below describe
+    superseded checkpoints.
 
 - **2026-10-10 — source sync before the explicit GPU-slot handoff:** merged
   main `3eda5d278` at `4c18d597d`, including native workshop narrow-header
