@@ -13,6 +13,7 @@
 use std::sync::Arc;
 use std::time::Duration;
 
+use castellan::authority::PersonaeHost;
 use castellan::custody::{IdentityVault, InMemoryStorage, Profile};
 use djinn::resident_events::EVENTS_SCHEMA;
 use djinn::resident_status::{
@@ -29,7 +30,6 @@ use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
 use graphshell::native::app_client::{AppBrokerClient, AppClientError};
 use graphshell::native::device_broker::default_device_endpoint;
 use graphshell::native::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointRoute};
-use graphshell::native::personae_host::PersonaeHost;
 use personae::{Ed25519Keypair, ProfileId};
 use uuid::Uuid;
 
@@ -110,8 +110,15 @@ async fn only_djinn_reads_the_status_and_stops_the_resident() {
     let server = {
         let (endpoint, grants, catalog) = (endpoint.clone(), grants.clone(), catalog.clone());
         tokio::spawn(async move {
-            let _ =
-                serve_app_broker(&endpoint, resident_host(), grants, 60_000, None, catalog).await;
+            let _ = serve_app_broker(
+                &endpoint,
+                std::sync::Arc::new(djinn::keeper::Keeper::new(resident_host())),
+                grants,
+                60_000,
+                None,
+                catalog,
+            )
+            .await;
         })
     };
 
@@ -199,11 +206,7 @@ fn the_harness_walls_name_the_resident_defaults() {
     assert!(walls.contains(&default_app_endpoint()), "{walls:?}");
     assert!(walls.contains(&default_device_endpoint()), "{walls:?}");
     #[cfg(windows)]
-    assert!(
-        walls.contains(
-            &graphshell::native::personae_host::STANDARD_WINDOWS_AGENT_ENDPOINT.to_string()
-        )
-    );
+    assert!(walls.contains(&castellan::authority::STANDARD_WINDOWS_AGENT_ENDPOINT.to_string()));
 }
 
 /// The harness reads the status route and the event file with its own types.

@@ -42,9 +42,7 @@ pub enum VaultChoice {
 pub fn choose(vault_dir: &Path, passphrase_given: bool) -> VaultChoice {
     let os_root = cfg!(windows);
     let os_vault = vault_dir.join(AUTO_UNLOCK_ROOT_FILE).exists();
-    if !os_root
-        || vault_dir.join(PASSPHRASE_VAULT_FILE).exists()
-        || (passphrase_given && !os_vault)
+    if !os_root || vault_dir.join(PASSPHRASE_VAULT_FILE).exists() || (passphrase_given && !os_vault)
     {
         VaultChoice::Passphrase
     } else {
@@ -107,7 +105,7 @@ pub struct NativeOrTerminal<U> {
     pub native: U,
 }
 
-impl<U: graphshell::native::identity_ui::NativeIdentityUi> Prompt for NativeOrTerminal<U> {
+impl<U: crate::identity_ui::NativeIdentityUi> Prompt for NativeOrTerminal<U> {
     fn presence(&mut self) -> Option<OsPresence> {
         self.native.verify_presence().ok().flatten()
     }
@@ -180,8 +178,8 @@ pub fn open(
         return open_under_persisted_lock(vault_dir, prompt, waiting, sleep);
     }
     if choice == VaultChoice::AutoOs {
-        let opened =
-            bootstrap::open_storage(vault_dir, Unlock::AutoOs).map_err(|error| error.to_string())?;
+        let opened = bootstrap::open_storage(vault_dir, Unlock::AutoOs)
+            .map_err(|error| error.to_string())?;
         return Ok(Started {
             opened,
             choice,
@@ -236,7 +234,11 @@ pub fn open(
         let bytes = Zeroizing::new(passphrase.as_bytes().to_vec());
         match bootstrap::open_storage(vault_dir, Unlock::Passphrase(bytes.clone())) {
             Ok(opened) => {
-                let event = if exists { "unlocked-at-start" } else { "vault-created" };
+                let event = if exists {
+                    "unlocked-at-start"
+                } else {
+                    "vault-created"
+                };
                 waiting.emit(event, serde_json::json!({}));
                 return Ok(Started {
                     opened,
@@ -305,7 +307,10 @@ fn open_under_persisted_lock(
         }
     }
     castellan::custody::clear_persisted_lock(vault_dir).map_err(|error| error.to_string())?;
-    waiting.emit("unlocked-at-start", serde_json::json!({ "persisted_lock": true }));
+    waiting.emit(
+        "unlocked-at-start",
+        serde_json::json!({ "persisted_lock": true }),
+    );
     Ok(Started {
         opened: OpenedStorage {
             storage: Box::new(storage),
@@ -326,7 +331,9 @@ fn open_under_persisted_lock(
 pub fn read_passphrase_fd(fd: u32) -> Result<Zeroizing<String>, String> {
     use std::io::BufRead;
     if fd != 0 {
-        return Err(format!("--passphrase-fd {fd}: only 0 (standard input) is read"));
+        return Err(format!(
+            "--passphrase-fd {fd}: only 0 (standard input) is read"
+        ));
     }
     let mut line = Zeroizing::new(String::new());
     std::io::stdin()
@@ -397,7 +404,10 @@ mod tests {
         }
     }
 
-    fn start(dir: &Path, prompt: &mut Script) -> (Result<Started, String>, Vec<String>, Vec<Duration>) {
+    fn start(
+        dir: &Path,
+        prompt: &mut Script,
+    ) -> (Result<Started, String>, Vec<String>, Vec<Duration>) {
         start_as(dir, VaultChoice::Passphrase, prompt)
     }
 
@@ -445,13 +455,25 @@ mod tests {
         let started = started.unwrap();
         assert_eq!(
             events,
-            ["waiting-for-unlock", "unlock-refused", "unlock-cancelled", "unlocked-at-start"]
+            [
+                "waiting-for-unlock",
+                "unlock-refused",
+                "unlock-cancelled",
+                "unlocked-at-start"
+            ]
         );
-        assert_eq!(slept, [backoff(0)], "only the cancel waits; Argon2 throttles a miss");
+        assert_eq!(
+            slept,
+            [backoff(0)],
+            "only the cancel waits; Argon2 throttles a miss"
+        );
         assert!(matches!(prompt.1[1], Ask::Unlock { retry: Some(_) }));
         let (_, choice, second) = started.into_parts();
         assert_eq!(choice, VaultChoice::Passphrase);
-        assert!(matches!(second, Unlock::Passphrase(_)), "kept for the second open");
+        assert!(
+            matches!(second, Unlock::Passphrase(_)),
+            "kept for the second open"
+        );
     }
 
     #[test]
@@ -526,12 +548,18 @@ mod tests {
     fn a_persisted_lock_makes_the_os_vault_wait_for_its_passphrase() {
         let dir = tempfile::tempdir().unwrap();
         {
-            let storage = SealedProfileStorage::open_auto_os(dir.path()).unwrap().unwrap();
+            let storage = SealedProfileStorage::open_auto_os(dir.path())
+                .unwrap()
+                .unwrap();
             let id = personae::vault::ProfileId("p".into());
             bootstrap::load_or_create_profile(&storage, &id).unwrap();
             storage.enroll_passphrase(b"right").unwrap();
         }
-        assert_eq!(choose(dir.path(), true), VaultChoice::AutoOs, "the OS vault is there");
+        assert_eq!(
+            choose(dir.path(), true),
+            VaultChoice::AutoOs,
+            "the OS vault is there"
+        );
 
         let (unattended, events, _) = start_as(dir.path(), VaultChoice::AutoOs, &mut script(&[]));
         assert!(unattended.is_ok());
@@ -546,10 +574,18 @@ mod tests {
         assert!(!opened.storage.is_locked());
         assert_eq!(
             events,
-            ["waiting-for-unlock", "unlock-refused", "unlock-cancelled", "unlocked-at-start"]
+            [
+                "waiting-for-unlock",
+                "unlock-refused",
+                "unlock-cancelled",
+                "unlocked-at-start"
+            ]
         );
         assert_eq!(slept, [backoff(0)]);
-        assert!(!castellan::custody::lock_persisted(dir.path()), "the unlock cleared the marker");
+        assert!(
+            !castellan::custody::lock_persisted(dir.path()),
+            "the unlock cleared the marker"
+        );
         drop(opened);
 
         let (again, events, _) = start_as(dir.path(), VaultChoice::AutoOs, &mut script(&[]));

@@ -17,6 +17,7 @@ use std::sync::Arc;
 use std::sync::mpsc::{Receiver, channel};
 use std::time::Duration;
 
+use castellan::authority::PersonaeHost;
 use castellan::custody::{
     IdentityStorage, IdentityVault, InMemoryStorage, Profile, SealedProfileStorage,
 };
@@ -31,7 +32,6 @@ use graphshell::native::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants}
 use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
 use graphshell::native::app_client::AppBrokerClient;
 use graphshell::native::endpoint_catalog::ResidentEndpointCatalog;
-use graphshell::native::personae_host::PersonaeHost;
 use graphshell::native::tasks::ResidentTasks;
 use graphshell::session_item::{APPLY_EDITS_INTENT, ApplyEditsV1};
 use pandect::{CapturedDelta, DomainId};
@@ -512,7 +512,7 @@ async fn daemon_fixture(config: ReservoirAttachmentOptions) {
         scoped
             .scope(serve_app_broker(
                 &address,
-                identity(),
+                std::sync::Arc::new(djinn::keeper::Keeper::new(identity())),
                 grants,
                 60_000,
                 None,

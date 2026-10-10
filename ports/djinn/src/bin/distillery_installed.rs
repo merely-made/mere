@@ -4,17 +4,28 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Installed Distillery configuration and Personae bootstrap boundary.
+//! Installed Distillery configuration, answered by the running resident.
 //!
 //! This binary intentionally stops before starting a resident. The remaining
 //! construction inputs are a mesh-owned store/retention policy and a
 //! device-owned `HostConfig`/`ResidentSettings`; accepting defaults here would
 //! make Distillery the unchosen scheduler and device-policy authority.
+//!
+//! It opens no vault (dramatis repo plan, D5): `inspect` asks djinn's custody
+//! route for the roster and the protection, and says the identity is pending
+//! when djinn is absent or Locked (D12). It lives in djinn's package since
+//! DR-C because the client is graphshell's, and graphshell already depends on
+//! distillery, so distillery cannot depend back.
 
 use std::path::PathBuf;
 
-use distillery::InstalledAuthority;
+use distillery::{InstalledAuthority, InstalledSettings};
+use graphshell::native::app_admission::{AppId, configured_app_endpoint};
+use graphshell::native::custody_client::BlockingCustodyClient;
 use personae::ProfileId;
+
+/// The application name this tool connects to djinn as.
+const APP: &str = "distillery";
 
 fn main() {
     if let Err(error) = run(std::env::args().skip(1).collect()) {
@@ -43,23 +54,41 @@ fn run(args: Vec<String>) -> Result<(), String> {
             if options.profile.is_some() {
                 return Err("--profile only belongs to configure".into());
             }
-            // A CLI may read the passphrase from the environment; the
-            // library takes it explicitly (vault lock plan, rulings 7, 89).
-            let vault_dir = options
-                .vault_dir
-                .unwrap_or_else(personae::bootstrap::default_vault_dir);
-            let authority = InstalledAuthority::open_with(
-                &options.data_root,
-                &vault_dir,
-                personae::bootstrap::Unlock::from_env(),
-            )
-            .map_err(|error| error.to_string())?;
+            let settings = InstalledSettings::load(&options.data_root)
+                .map_err(|error| error.to_string())?
+                .ok_or("Distillery is not configured: run `configure` first")?;
+            let endpoint = options.app_endpoint.unwrap_or_else(configured_app_endpoint);
+            let answer = BlockingCustodyClient::open_at(&endpoint, AppId::new(APP))
+                .and_then(|mut djinn| Ok((djinn.status()?, djinn.roster()?)));
+            let (status, roster) = match answer {
+                Ok(answer) => answer,
+                Err(error) if error.is_pending() => {
+                    println!(
+                        "Distillery profile: {}\nPersonae identity: pending ({error})\nProduct root: {}",
+                        settings.profile,
+                        options.data_root.display()
+                    );
+                    return Ok(());
+                },
+                Err(error) => return Err(error.to_string()),
+            };
+            let known = roster
+                .entries
+                .iter()
+                .any(|entry| entry.id == settings.profile_id());
+            if !known {
+                return Err(format!(
+                    "the configured profile `{}` is not in djinn's vault",
+                    settings.profile
+                ));
+            }
             println!(
-                "Distillery profile: {}\nPersonae protection: {}\nProduct root: {}\n\
+                "Distillery profile: {}\nPersonae protection: {:?} ({:?})\nProduct root: {}\n\
                  Resident start remains gated on caller-supplied mesh retention and device host settings.",
-                authority.profile().0,
-                authority.protection(),
-                authority.data_root().display()
+                settings.profile,
+                status.protection,
+                status.lock,
+                options.data_root.display()
             );
         },
         _ => return Err(usage()),
@@ -69,27 +98,27 @@ fn run(args: Vec<String>) -> Result<(), String> {
 
 struct Options {
     data_root: PathBuf,
-    vault_dir: Option<PathBuf>,
+    app_endpoint: Option<String>,
     profile: Option<String>,
 }
 
 impl Options {
     fn parse(args: &[String]) -> Result<Self, String> {
         let mut data_root = None;
-        let mut vault_dir = None;
+        let mut app_endpoint = None;
         let mut profile = None;
         let mut values = args.iter();
         while let Some(option) = values.next() {
             match option.as_str() {
                 "--data-root" => data_root = Some(PathBuf::from(next(&mut values, option)?)),
-                "--vault-dir" => vault_dir = Some(PathBuf::from(next(&mut values, option)?)),
+                "--app-endpoint" => app_endpoint = Some(next(&mut values, option)?.to_string()),
                 "--profile" => profile = Some(next(&mut values, option)?.to_string()),
                 _ => return Err(usage()),
             }
         }
         Ok(Self {
             data_root: data_root.ok_or_else(usage)?,
-            vault_dir,
+            app_endpoint,
             profile,
         })
     }
@@ -106,16 +135,5 @@ fn next<'a>(
 }
 
 fn usage() -> String {
-    "usage:\n  distillery-installed configure --data-root <path> --profile <personae-profile>\n  distillery-installed inspect --data-root <path> [--vault-dir <path>]".into()
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn configure_requires_an_explicit_data_root_and_profile() {
-        assert!(Options::parse(&[]).is_err());
-        assert!(Options::parse(&["--data-root".into(), "x".into()]).is_ok());
-    }
+    "usage:\n  distillery-installed configure --data-root <path> --profile <personae-profile>\n  distillery-installed inspect --data-root <path> [--app-endpoint <endpoint>]".into()
 }

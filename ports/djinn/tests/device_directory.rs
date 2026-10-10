@@ -14,6 +14,7 @@
 use std::sync::Arc;
 use std::time::Duration;
 
+use castellan::authority::PersonaeHost;
 use castellan::custody::{IdentityVault, InMemoryStorage, Profile};
 use djinn::resident_devices::{
     self, DEVICE_DIRECTORY_APP, DEVICE_DIRECTORY_ROUTE, DeviceDirectoryEndpoint,
@@ -24,7 +25,6 @@ use graphshell::native::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants,
 use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
 use graphshell::native::app_client::{AppBrokerClient, AppClientError};
 use graphshell::native::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointRoute};
-use graphshell::native::personae_host::PersonaeHost;
 use personae::{Ed25519Keypair, ProfileId};
 use uuid::Uuid;
 
@@ -94,8 +94,15 @@ async fn only_the_granted_caller_reads_the_device_directory() {
     let server = {
         let (endpoint, grants, catalog) = (endpoint.clone(), grants.clone(), catalog.clone());
         tokio::spawn(async move {
-            let _ =
-                serve_app_broker(&endpoint, resident_host(), grants, 60_000, None, catalog).await;
+            let _ = serve_app_broker(
+                &endpoint,
+                std::sync::Arc::new(djinn::keeper::Keeper::new(resident_host())),
+                grants,
+                60_000,
+                None,
+                catalog,
+            )
+            .await;
         })
     };
 

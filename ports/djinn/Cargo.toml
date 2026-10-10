@@ -44,7 +44,6 @@ trainer-autodiff = ["trainer", "distillery/trainer-autodiff"]
 distillery-chronicle-receipt-host = [
     "personal-sync",
     "graphshell/webrtc-session",
-    "dep:rand_core",
     "dep:webrtc-carrier",
 ]
 
@@ -55,6 +54,8 @@ blake3.workspace = true
 # (vault lock ruling 47); it moved from personae with custody (DR-B).
 castellan = { workspace = true, features = ["keeper", "os-presence"] }
 chirograph.workspace = true
+# The identity tier's plain types: views, intents, the roster (DR-A, DR-C).
+dramatis.workspace = true
 incipit.workspace = true
 # The operational works composed as this resident's fourth lane
 # (`src/resident_distillery.rs`). Default features only unless djinn's own
@@ -64,6 +65,9 @@ distillery.workspace = true
 graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync"] }
 graphshell-endpoint.workspace = true
 knot-editor.workspace = true
+# The resident's own native dialogs (`src/identity_ui.rs`), moved from
+# graphshell with the keeper adapters (dramatis repo plan, D15).
+light-file-dialog = "3.21.3"
 # Immutable saved-site snapshot contract published by Knot, at the workspace's
 # Knot revision so knot-site and knot-editor share one Knot source.
 knot-site = { git = "https://github.com/merely-made/knot-editor.git", rev = "eabd44345c3d02110891dbda0a63930ba4841d18", package = "knot-site", features = ["retinue"] }
@@ -75,7 +79,11 @@ muniment.workspace = true
 notochord.workspace = true
 pandect.workspace = true
 personae = { workspace = true, features = ["ssh"] }
-rand_core = { version = "0.6", features = ["getrandom"], optional = true }
+# The receipt hosts' and the native picker's SSH keys (`src/bin/h4*`), and
+# the chronicle receipt host's nonces.
+rand_core = { version = "0.6", features = ["getrandom"] }
+# The H4d receipt host verifies the approved signature.
+signature = "2"
 sceno.workspace = true
 scenotime.workspace = true
 serde = { version = "1", features = ["derive"] }
@@ -91,6 +99,8 @@ tokio-rustls = { version = "0.26", default-features = false, features = ["ring",
 gemini-protocol = { version = "=0.1.7", features = ["server"] }
 sha2.workspace = true
 ssh-agent-lib = "0.6"
+# Importing an SSH key through the native picker (`src/identity_ui.rs`).
+ssh-key = { version = "0.6", features = ["ed25519", "encryption"] }
 thiserror = "1"
 # "signal" is what lets the run loop stop the mesh works deliberately on Ctrl-C
 # rather than being killed mid-lease.
@@ -154,6 +164,36 @@ required-features = ["personal-sync"]
 [[bin]]
 name = "djinn-devices"
 path = "src/bin/djinn_devices.rs"
+required-features = ["personal-sync"]
+
+# Distillery's installed configuration, answered by the running resident
+# over the custody route (dramatis repo plan, DR-C). Here rather than in
+# distillery because graphshell, which carries the client, depends on it.
+[[bin]]
+name = "distillery-installed"
+path = "src/bin/distillery_installed.rs"
+required-features = ["personal-sync"]
+
+# The keeper's identity receipts, moved from graphshell with the adapters
+# that hold the authority (D15).
+[[bin]]
+name = "h4_identity_receipt"
+path = "src/bin/h4_identity_receipt.rs"
+required-features = ["personal-sync"]
+
+[[bin]]
+name = "persona_switch_receipt"
+path = "src/bin/persona_switch_receipt.rs"
+required-features = ["personal-sync"]
+
+[[bin]]
+name = "h4d_browser_receipt_host"
+path = "src/bin/h4d_browser_receipt_host.rs"
+required-features = ["personal-sync"]
+
+[[bin]]
+name = "h4e_browser_import_receipt_host"
+path = "src/bin/h4e_browser_import_receipt_host.rs"
 required-features = ["personal-sync"]
 
 [[bin]]

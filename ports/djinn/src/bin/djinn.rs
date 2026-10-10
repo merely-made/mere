@@ -15,14 +15,20 @@ use std::sync::Arc;
 #[cfg(feature = "personal-sync")]
 use std::time::Duration;
 
+use castellan::authority::PersonaeHost;
+#[cfg(windows)]
+use castellan::authority::STANDARD_WINDOWS_AGENT_ENDPOINT;
 use castellan::custody::IdentityVault;
 use castellan::custody::bootstrap;
 #[cfg(feature = "personal-sync")]
 use distillery::ResidentReceipt;
+use djinn::identity_ui::SystemNativeIdentityUi;
+use djinn::keeper::Keeper;
 #[cfg(feature = "personal-sync")]
 use djinn::pairing;
 #[cfg(feature = "personal-sync")]
 use djinn::personal_sync as device_sync;
+use djinn::profile::resolve_selected_profile;
 use djinn::resident::DjinnResident;
 #[cfg(feature = "personal-sync")]
 use djinn::resident_devices::{self, DeviceDirectoryEndpoint, DeviceDirectorySource};
@@ -55,13 +61,8 @@ use graphshell::native::device_broker::{
 };
 #[cfg(feature = "personal-sync")]
 use graphshell::native::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointRoute};
-use graphshell::native::identity_ui::SystemNativeIdentityUi;
-use graphshell::native::personae_host::PersonaeHost;
-#[cfg(windows)]
-use graphshell::native::personae_host::STANDARD_WINDOWS_AGENT_ENDPOINT;
 use graphshell::native::tasks::ResidentTasks;
-use graphshell::profile::{default_vault_dir, resolve_selected_profile};
-use personae::ProfileId;
+use personae::{ProfileId, default_vault_dir};
 use serde_json::json;
 use ssh_agent_lib::agent::listen;
 
@@ -856,7 +857,7 @@ fn cli_open(args: &Args) -> Result<bootstrap::OpenedStorage, String> {
             &args.vault_dir,
             choice,
             &mut startup_vault::NativeOrTerminal {
-                native: graphshell::native::identity_ui::UnavailableNativeIdentityUi,
+                native: djinn::identity_ui::UnavailableNativeIdentityUi,
             },
             &mut quiet,
             &mut std::thread::sleep,
@@ -921,12 +922,18 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         // user act (vault lock rulings 5, 76, 80).
         .with_persisted_lock(args.vault_dir.clone()),
     );
+    // What Graphshell's doors and the custody route serve (dramatis repo
+    // plan, D15): the host, its native surface and its wallet root.
+    let keeper = Arc::new(
+        Keeper::new(Arc::clone(&personae))
+            .with_ui(Arc::new(SystemNativeIdentityUi::default()))
+            .with_wallet_root(args.data_root.clone()),
+    );
     // The status follows the lock (ruling 31's watch channel; harness H4).
     // The doors' kept keys are captured now, while unlocked, so the doors
     // stay open through any later lock (rulings 40, 46). A resident that
     // starts locked (ruling 42, L3) captures them at its first unlock.
-    if let Err(error) =
-        graphshell::native::local_session::DoorIdentity::door_keys(personae.as_ref())
+    if let Err(error) = graphshell::native::local_session::DoorIdentity::door_keys(keeper.as_ref())
     {
         tracing::warn!(%error, "door keys not captured at start");
     }
@@ -944,7 +951,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         let personae = Arc::clone(&personae);
         Arc::new(move || {
             let prompt = || {
-                graphshell::native::identity_ui::apply_native_identity_action(
+                djinn::identity_ui::apply_native_identity_action(
                     &personae,
                     &SystemNativeIdentityUi::default(),
                     graphshell::browser_carrier::NativeIdentityAction::UnlockVault,
@@ -1182,6 +1189,8 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                 })
                 .await?;
             resident_status::grant(&grants, route);
+            // Custody, for every first-party application (D5).
+            djinn::custody::grant(&grants)?;
             // The reservoir admits this door's first-party clients. Each
             // mere goes to the same clients on its own route (V2, step 5):
             // those the reservoir holds now, and each one ensured later.
@@ -1225,11 +1234,14 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
             (grants, catalog)
         };
         #[cfg(not(feature = "personal-sync"))]
-        let (allowed_app_routes, app_catalog) =
-            (AppRouteGrants::default(), AppEndpointCatalog::default());
+        let (allowed_app_routes, app_catalog) = {
+            let grants = AppRouteGrants::default();
+            djinn::custody::grant(&grants)?;
+            (grants, AppEndpointCatalog::default())
+        };
         let apps = serve_app_broker(
             &args.app_endpoint,
-            Arc::clone(&personae),
+            Arc::clone(&keeper),
             allowed_app_routes,
             session_duration_ms(),
             app_surface,
@@ -1241,8 +1253,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                 Some(cards) => {
                     serve_browser_broker_with_cards(
                         &args.browser_endpoint,
-                        Arc::clone(&personae),
-                        Arc::new(SystemNativeIdentityUi::default()),
+                        Arc::clone(&keeper),
                         allowlist,
                         session_duration_ms(),
                         cards,
@@ -1252,8 +1263,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                 None => {
                     serve_browser_broker(
                         &args.browser_endpoint,
-                        Arc::clone(&personae),
-                        Arc::new(SystemNativeIdentityUi::default()),
+                        Arc::clone(&keeper),
                         allowlist,
                         session_duration_ms(),
                     )
@@ -1264,8 +1274,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         #[cfg(not(feature = "personal-sync"))]
         let browser = serve_browser_broker(
             &args.browser_endpoint,
-            Arc::clone(&personae),
-            Arc::new(SystemNativeIdentityUi::default()),
+            Arc::clone(&keeper),
             allowlist,
             session_duration_ms(),
         );
@@ -1380,7 +1389,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                             if now == VaultLockView::Unlocked {
                                 // Kept from the first unlock on (ruling 46).
                                 let _ = graphshell::native::local_session::DoorIdentity::door_keys(
-                                    personae.as_ref(),
+                                    keeper.as_ref(),
                                 );
                             }
                             match now {
