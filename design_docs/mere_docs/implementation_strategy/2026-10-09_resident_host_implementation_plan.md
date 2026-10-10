@@ -62,7 +62,7 @@ New files; unfinished targets are annotated at their exact planned occurrence:
 
 - `crates/system/pandect/src/live_graph.rs` *(implemented in Task 2)*: portable typed command/precondition vocabulary and preflight/application helpers.
 - `crates/system/pandect/tests/live_graph.rs` *(implemented in Task 2)*: complete-writer live/observation parity tests.
-- `ports/graphshell/src/resident_host.rs` *(planned target)* <!-- doc-audit: planned-path -->: host settings, pane roots, refresh scheduling and staged state, beside MereHost.
+- `ports/graphshell/src/resident_host.rs` *(Task 3 in progress)*: host settings, pane roots, refresh scheduling and staged state, beside MereHost.
 - `ports/graphshell/src/web_resident.rs` *(planned target)* <!-- doc-audit: planned-path -->: browser controls, foreground/idle pump and lifecycle-safe async work.
 - `ports/graphshell/tests/resident_host.rs` *(planned target)* <!-- doc-audit: planned-path -->: native owned-host failure/reopen and memory fixture.
 - `ports/graphshell/tests/resident_host_browser.rs` *(planned target)* <!-- doc-audit: planned-path -->: wasm/browser host integration over real IndexedDB.

@@ -5,7 +5,7 @@ Audit base: Mere a8889f60e, 2026-10-09, with local documentation updates. Origin
 ## mere_docs/implementation_strategy/2026-10-09_graph_semantics_followons_plan.md
 
 - disposition: current
-- status line: "In progress; RDF qualified and published, consumer checkpoint qualified locally, Turnstone newer-main integration running, host Tasks 1–2 complete locally" - accurate: yes
+- status line: "In progress; RDF qualified and published, consumer checkpoint including Turnstone newer-main integration qualified and published, host Tasks 1–2 complete locally" - accurate: yes
 - claims checked: 5 - holds: 5, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -22,7 +22,7 @@ Audit base: Mere a8889f60e, 2026-10-09, with local documentation updates. Origin
 
 ### Notes
 
-Checked supplier source and six-gate repair receipt; verified published main/follow-on tips a8889f60e; counted 108 owned manifest rows in the repin report; provider receipt and local commits establish completed provider gates; original consumer binding proves scoped qualification; active newer-main Turnstone runner establishes integration qualification in progress. Future A2/C phases are done conditions, not capability claims.
+Checked supplier source and six-gate repair receipt; verified published main/follow-on tips a8889f60e; counted 108 owned manifest rows in the repin report; provider receipt and local commits establish completed provider gates; original consumer binding proves scoped qualification; completed newer-main Turnstone receipts, scoped review and committed-source binding establish integration qualification. Approved consumer publication receipt confirms all three remote main/topic tips; fresh canonical HTTPS archives reproduce the qualified file maps. All five fresh Cargo Git-cache locked metadata checks pass; all source and locks stay unchanged. Future A2/C phases are done conditions, not capability claims.
 
 ## mere_docs/technical_architecture/2026-10-09_resident_host_design.md
 

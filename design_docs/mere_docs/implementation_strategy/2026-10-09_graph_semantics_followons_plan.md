@@ -1,24 +1,22 @@
 # Graph semantics follow-ons: adoption, RDF cleanup and residency
 
 **Date:** 2026-10-09
-**Status (2026-10-09):** In progress. RDF cleanup is source-qualified at
-`2976821783cee6b24d13cacb046c1d99b1890fb4`: 91 linked-data tests, 54 Mere tests,
-feature-free/workspace checks and both query wasm checks pass. Fresh review
-found one Important parser-feature regression; the scoped repair has observed
-RED/GREEN controls and the full green gates. All 108 owned consumer Mere rows
-select this source in isolated successors. Knot and Redshank passed their provider
-gates and have local commits; Turnstone selects those commits and passed default
-and Piccolo libraries (751 and 784 tests, each with 9 existing skips), plus both
-all-target checks. One fresh consumer source review found no defects, and its full
-file freeze matches local Turnstone commit `767e1613ca4b35673d36260fd8c9e4fb3a305377`.
-Consumer publication remains pending approval. Fresh remote main is unchanged for
-Knot/Redshank, but Turnstone adds `25f85bd` document pumping; its conflict-free
-merge preview is not yet integration-qualified.
-The initial Graphshell/Djinn resident-host spec is approved, and its concrete
-implementation plan is approved; Tasks 1–2 are reviewed and locally committed,
-and Task 3 begins combined persistence staging. The
-RDF checkpoint and coordination documents are published at `a8889f60e`; consumer
-candidates remain local until their gates, review and publication approval.
+**Status (2026-10-10):** In progress. RDF retirement is qualified and published;
+source `2976821783cee6b24d13cacb046c1d99b1890fb4` passes all six gates. Consumer
+adoption is qualified, reviewed and published after Mark's approval: Knot
+`ab191d4d`, Redshank `fea7f0f7` and Turnstone `bf1e6a2f` are their confirmed main
+and adoption-branch tips. Turnstone includes the reviewed current-main document
+pump and passes 759 default and 792 Piccolo tests (nine inherited skips each),
+plus both all-target checks. Fresh canonical HTTPS fetches reproduce all three
+qualified file maps; all five locked Cargo metadata checks pass with a fresh Git cache and unchanged
+source/locks. Consumer adoption (A1) is complete.
+All 108 owned Mere dependency rows select the qualified source. This establishes
+source compatibility; actual Turnstone residency authority remains A2.
+The approved initial Graphshell/Djinn resident-host plan has Tasks 1–2 reviewed
+and locally committed at `a61dfb5c9` and `652acbb72`. Task 3 combined persistence
+staging is in progress. The initial host still retains its complete writer and
+history; native/product/browser host qualification and publication remain pending.
+Mere's last published checkpoint remains `a8889f60e`.
 
 ## Authority and intent
 
@@ -302,3 +300,9 @@ claims, each supported by its own evidence.
 - **2026-10-09:** Mark approves the concrete host plan. Task 1 starts with pure publication preparation and complete catalog observations. Turnstone’s one-file CoveredScene compatibility repair passes seven focused endpoint controls; full default/Piccolo qualification continues independently. Portable wire coverage and actual residency activation remain subsequent host tasks.
 
 - **2026-10-09:** Host Tasks 1–2 complete locally at `a61dfb5c9` and `652acbb72`, with focused tests, full Pandect/residency controls and independent task reviews. Task 3 begins storage staging; reader/product/browser integration remains pending. Turnstone newer-main integration passes 759 default library tests with nine inherited skips and its scoped source review; Piccolo and all-target gates remain active. Consumer and host publication approvals remain separate.
+
+- **2026-10-09:** Turnstone integration completes at `bf1e6a2fb9f0f4c9eba9c866de50a5505bd2404f`, a direct successor of current main `25f85bd`. All 2,968 tracked inputs match the reviewed freeze and completed gate receipts; original adoption commit `767e1613` is preserved. The updated publication request covers Knot `ab191d4d`, Redshank `fea7f0f7` and integrated Turnstone `bf1e6a2f`, including all three main fast-forwards. Provider publication/fresh HTTPS availability remains unproven until approval and execution.
+
+- **2026-10-10:** Mark approves the concrete consumer publication request with “go ahead.” Normal atomic pushes per repository publish the exact qualified topic/main refs: Knot `ab191d4d8808c709cc8ecba093298efa6b37c1e9`, Redshank `fea7f0f797bf8ec8adccf3f842a80c680e0d235c`, Turnstone `bf1e6a2fb9f0f4c9eba9c866de50a5505bd2404f`. Remote refs are confirmed and independent fresh canonical HTTPS fetches match all 376/733/2,968 qualified tracked files. Original provider workspaces, prior Turnstone adoption commit and all qualification receipts remain preserved. Fresh Cargo Git-cache resolution subsequently passes all five metadata gates; no temporary local route is required and every source/lock hash remains unchanged.
+
+- **2026-10-10:** A1 complete: fresh Cargo Git-cache resolution passes Knot workspace/standalone, Redshank and Turnstone default/Piccolo metadata. Canonical published Mere/Knot/Redshank sources are observed in the fresh checkout cache, with all tracked inputs and locks unchanged. The completion binding joins reviewed source, scoped execution gates, approved remote refs and independent availability proof. This does not activate Turnstone residency or qualify headed product behavior.
