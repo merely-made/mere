@@ -19,6 +19,7 @@ use serde::{Deserialize, Serialize};
 
 pub mod dataset;
 pub mod options;
+pub mod presentation;
 pub mod relationship;
 pub mod swatch;
 

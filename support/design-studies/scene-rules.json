@@ -1,0 +1,71 @@
+{
+  "rule_set": {
+    "version": 1,
+    "rules": [
+      {
+        "id": "image-overview", "label": "Images in an overview", "enabled": true, "priority": 10,
+        "target": { "kind": "node", "ids": [] },
+        "condition": { "kind": "all", "conditions": [
+          { "kind": "equals", "fact": "media", "value": "image" },
+          { "kind": "state", "state": "overview" }
+        ] },
+        "effects": [{ "kind": "representation", "value": "Snapshot" }]
+      },
+      {
+        "id": "selected-details", "label": "Attributes on selection", "enabled": true, "priority": 20,
+        "target": { "kind": "node", "ids": [] },
+        "condition": { "kind": "state", "state": "selected" },
+        "effects": [{ "kind": "details", "visible": true }]
+      },
+      {
+        "id": "compact-face", "label": "Compact faces at a distance", "enabled": true, "priority": 30,
+        "target": { "kind": "node", "ids": [] },
+        "condition": { "kind": "all", "conditions": [
+          { "kind": "screen_size", "enter_below": 48, "exit_above": 84 },
+          { "kind": "not", "condition": { "kind": "state", "state": "position_pinned" } }
+        ] },
+        "effects": [{ "kind": "representation", "value": "Glyph" }]
+      },
+      {
+        "id": "membership-containment", "label": "Membership as containment", "enabled": true, "priority": 10,
+        "target": { "kind": "relation", "ids": [] },
+        "condition": { "kind": "all", "conditions": [
+          { "kind": "equals", "fact": "family", "value": "membership" },
+          { "kind": "equals", "fact": "scene", "value": "hierarchy" }
+        ] },
+        "effects": [{ "kind": "relation_form", "value": "containment" }]
+      },
+      {
+        "id": "derived-provenance", "label": "Explain an inspected derivation", "enabled": true, "priority": 10,
+        "target": { "kind": "relation", "ids": [] },
+        "condition": { "kind": "all", "conditions": [
+          { "kind": "equals", "fact": "derived", "value": true },
+          { "kind": "state", "state": "inspected" }
+        ] },
+        "effects": [{ "kind": "provenance", "visible": true }]
+      },
+      {
+        "id": "forme-editing", "label": "Forme regions while editing", "enabled": true, "priority": 10,
+        "target": { "kind": "field", "ids": [] },
+        "condition": { "kind": "all", "conditions": [
+          { "kind": "equals", "fact": "role", "value": "forme" },
+          { "kind": "state", "state": "layout_unlocked" }
+        ] },
+        "effects": [{ "kind": "region_guides", "visible": true }, { "kind": "drop_previews", "visible": true }]
+      }
+    ]
+  },
+  "contexts": [
+    { "id": "notes", "kind": "node", "facts": { "media": "document", "resource": "mere://study/field-notes" }, "states": ["overview"], "screen_size": 120 },
+    { "id": "horizon-a", "kind": "node", "facts": { "media": "image", "resource": "mere://study/horizon" }, "states": ["overview"], "screen_size": 100 },
+    { "id": "horizon-b", "kind": "node", "facts": { "media": "image", "resource": "mere://study/horizon" }, "states": ["overview", "selected"], "screen_size": 100 },
+    { "id": "motion", "kind": "node", "facts": { "media": "video", "resource": "mere://study/motion" }, "states": ["overview", "position_pinned"], "screen_size": 30 },
+    { "id": "horizon-a", "kind": "node", "facts": { "media": "image" }, "states": ["overview"], "screen_size": 40 },
+    { "id": "horizon-a", "kind": "node", "facts": { "media": "image" }, "states": ["overview"], "screen_size": 70, "previous_matches": ["compact-face"] },
+    { "id": "horizon-a", "kind": "node", "facts": { "media": "image" }, "states": ["overview"], "screen_size": 84, "previous_matches": ["compact-face"] },
+    { "id": "belongs", "kind": "relation", "facts": { "family": "membership", "scene": "hierarchy" }, "states": [], "screen_size": null },
+    { "id": "similar", "kind": "relation", "facts": { "family": "similarity", "derived": true }, "states": ["inspected"], "screen_size": null },
+    { "id": "workbench", "kind": "field", "facts": { "role": "forme" }, "states": ["layout_unlocked"], "screen_size": null },
+    { "id": "workbench", "kind": "field", "facts": { "role": "forme" }, "states": [], "screen_size": null }
+  ]
+}
