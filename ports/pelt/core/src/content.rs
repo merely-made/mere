@@ -328,8 +328,8 @@ impl<F: 'static> PeltContent<F> {
             },
             PeltInput::Keyboard(event) => match &mut self.lane {
                 Lane::Surface(surface) => surface.keyboard(event),
-                Lane::Document(controller) => match crate::input::document_keyboard(event) {
-                    Ok(input) => controller.input(input),
+                Lane::Document(_) => match crate::input::document_keyboard(event) {
+                    Ok(input) => self.input(input, scale_factor),
                     Err(error) => PeltHostEffect {
                         error: Some(error),
                         ..Default::default()
