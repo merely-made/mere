@@ -12,12 +12,12 @@
 //! The source owner resolves the reference when a recipient opens the record,
 //! and reports a missing source, stale cursor, or denied disclosure explicitly.
 
+use curation::FOLD_RECORD_VERSION;
 use eidetic::{
     BlobSource, Error, ManifestId, NoFetcher, PayloadSealer, PrivacyClass, ProvenanceOrigin,
     ProvenanceRecord, Result, SchemaRef, Store, Timestamp, TrustEnvelope, TypedPayload,
     load_typed_sealed, save_typed_sealed,
 };
-use forme::FOLD_RECORD_VERSION;
 use serde::{Deserialize, Serialize};
 
 use crate::ViewIntent;
@@ -119,7 +119,7 @@ impl std::fmt::Display for LiveViewRecordError {
             Self::InvalidFoldMembers => {
                 write!(
                     formatter,
-                    "live-view fold must contain sorted, distinct members"
+                    "live-view fold must contain sorted, distinct members, its stand-in and rule root among them"
                 )
             },
         }
@@ -159,12 +159,7 @@ impl LiveViewRecord {
                     source_scope: self.source.scope.clone(),
                 });
             }
-            if fold.members.len() < 2
-                || fold
-                    .members
-                    .windows(2)
-                    .any(|members| members[0] >= members[1])
-            {
+            if fold.validate().is_err() {
                 return Err(LiveViewRecordError::InvalidFoldMembers);
             }
         }
@@ -298,7 +293,7 @@ pub async fn open_live_view_record<R: LiveViewSourceResolver>(
 mod tests {
     use std::collections::BTreeSet;
 
-    use forme::FoldRecord;
+    use curation::{FoldId, FoldRecord};
     use muniment::MemoryBackend as InMemoryStore;
     use uuid::Uuid;
 
@@ -316,8 +311,12 @@ mod tests {
             3,
         )]);
         view.folds = vec![
-            FoldRecord::from_selection(SOURCE_SCOPE, [Uuid::from_u128(2), Uuid::from_u128(1)])
-                .expect("two members form a fold"),
+            FoldRecord::selection(
+                FoldId::new(Uuid::from_u128(9).to_string()),
+                SOURCE_SCOPE,
+                [Uuid::from_u128(2), Uuid::from_u128(1)].map(|id| id.to_string()),
+            )
+            .expect("two members form a fold"),
         ];
         view.camera = Some(CameraSnapshot {
             coefficients: [1.0, 0.0, 0.0, 1.0, 20.0, -10.0],
