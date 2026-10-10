@@ -11,7 +11,7 @@
 **Spec:** [Approved initial resident host design](../technical_architecture/2026-10-09_resident_host_design.md). Read it alongside the [parent follow-ons plan](2026-10-09_graph_semantics_followons_plan.md).
 
 **Date:** 2026-10-09
-**Status (2026-10-09):** Written spec and concrete plan approved by Mark. Tasks 1–2 are complete and locally committed at a61dfb5c9 and 652acbb72 after independent reviews. Task 3 starts combined persistence staging; Tasks 4–8 remain pending. Root serializes compilation and preserves separate consumer qualification; independent runtime tests may overlap.
+**Status (2026-10-10):** Written spec and concrete plan approved by Mark. Tasks 1–3 are complete and locally committed at a61dfb5c9, 652acbb72 and 6b2f2860b after independent reviews. Task 3 includes combined persistence staging and a bounded navigation snapshot ordering repair. Task 4 pane settings and exact scopes is underway; Tasks 5–8 remain pending. Consumer A1 is separately qualified, published and remotely resolved. Host source stays local pending whole-host qualification and publication review.
 
 ## Global Constraints
 
@@ -62,9 +62,9 @@ New files; unfinished targets are annotated at their exact planned occurrence:
 
 - `crates/system/pandect/src/live_graph.rs` *(implemented in Task 2)*: portable typed command/precondition vocabulary and preflight/application helpers.
 - `crates/system/pandect/tests/live_graph.rs` *(implemented in Task 2)*: complete-writer live/observation parity tests.
-- `ports/graphshell/src/resident_host.rs` *(Task 3 in progress)*: host settings, pane roots, refresh scheduling and staged state, beside MereHost.
+- `ports/graphshell/src/resident_host.rs` *(staging implemented in Task 3; settings and refresh in Tasks 4–5)*: host settings, pane roots, refresh scheduling and staged state, beside MereHost.
 - `ports/graphshell/src/web_resident.rs` *(planned target)* <!-- doc-audit: planned-path -->: browser controls, foreground/idle pump and lifecycle-safe async work.
-- `ports/graphshell/tests/resident_host.rs` *(planned target)* <!-- doc-audit: planned-path -->: native owned-host failure/reopen and memory fixture.
+- `ports/graphshell/tests/resident_host.rs` *(native ownership/reopen controls implemented in Task 3; memory qualification in Task 8)*: native owned-host failure/reopen and memory fixture.
 - `ports/graphshell/tests/resident_host_browser.rs` *(planned target)* <!-- doc-audit: planned-path -->: wasm/browser host integration over real IndexedDB.
 
 Do not create a second writer, backend service, persistence log or a competing projection definition format. Module exports change in existing `crates/system/pandect/src/lib.rs` and `ports/graphshell/src/lib.rs`; browser wiring uses existing `ports/graphshell/src/web.rs`.
@@ -252,7 +252,7 @@ fn later_missing_target_rejects_entire_batch_and_capture() {
 
 ### Task 3: One retained checkpoint/publication batch under owned storage
 
-**Files:** Modify GraphSession residency helper, MereHost staging and web_session. Add staging state in the planned resident_host module and native host test. Preserve current Staged's retired-session handling.
+**Files:** Modify GraphSession residency helper, MereHost staging and web_session. Add staging state in the resident_host module and native host test. Preserve current Staged's retired-session handling. The 2026-10-10 diagnosis additionally permits a bounded repair to `crates/eidetic/chartulary/src/stemma/snapshot.rs` and its regression controls: emit unordered owned visits and bindings deterministically, preserving all ordered navigation data and metadata.
 
 **Consumes:** Task 1 pure publication; Pending::ops, GraphSession::pending_with(at,true)/stored, Applied { first,end,revision }; existing BrowserHost prepare/write/install and Djinn host cache.
 
@@ -735,3 +735,9 @@ Dependencies and signatures were checked: tasks consume only verified existing i
 - **2026-10-09:** Task 1 complete at local `a61dfb5c9bba1347965f9cfa8b0a936d4e1c1a7d`. Expected API RED followed by named GREEN (1), full native residency controls (10, including real redb) and Pandect libraries (349), with zero new skips and unchanged qualified source. Independent task review is spec compliant and quality approved. Firefox runtime controls are wired but their execution belongs Task 8. Task 2 starts with a fresh implementer and two test-only controls. All host source remains local pending whole-host qualification and publication approval.
 
 - **2026-10-09:** Task 2 complete at local `652acbb72cecb98ec341cedea84e17b88d0e134c`. Missing-API RED, a scoped test-inference repair, then eight live-command controls, 349 Pandect library tests and ten residency tests pass with unchanged runtime inputs. Independent review approves the exact four-file candidate without blocking findings. Qualified legacy admission, Surface placement for UserGrouped, and decoded input boundaries are recorded in the task. Malformed external text and the suggested shared-Resource creation control remain assigned to product integration. Task 3 begins one retained combined checkpoint/publication batch.
+
+- **2026-10-10:** Task 3 checkpoint control, complete Pandect tests and Graphshell library tests pass. Native integration remains unqualified: both replay-helper and live-navigation fixtures fail admission before the factory. An isolated 64-trial diagnostic confirms only unordered `owned_visits` array order differs between candidate and replay (29 combined edits and 23 separately applied second visits; zero add/first-visit mismatches). Root expands Task 3 narrowly to sort the semantically unordered visit set and binding map when creating Stemma snapshots. Replay comparison stays exact. Chartulary regression, complete Pandect/Graphshell gates, native reopen/navigation/Author/undo assertions and independent Task 3 review remain required. No host shared publication has occurred.
+
+- **2026-10-10:** The bounded snapshot ordering repair passes 67 Chartulary tests and four native host tests, including exact Directory reopen/navigation/Author/undo and zero-mismatch replay. Fresh complete Pandect gates pass 349 library, 12 residency, eight live-command and two archive tests (one inherited ignore), plus doc tests; Graphshell passes 328 library tests (five inherited ignores). All runtime source inputs and log hashes match the frozen 12-file candidate. Independent Task 3 spec/quality review is pending; Tasks 4–8 and whole-host publication remain pending.
+
+- **2026-10-10:** Task 3 complete at local `6b2f2860b59d2dd698b5cc8c02ac099073ce79df`. Independent spec/quality review approves all 12 frozen and gated source files without blocking findings, and committed blobs match the qualified hashes. Exact retained checkpoint/publication writes, private concrete-backend admission and native reopen controls are implemented. Task 4 starts graph settings, pane-root lifetime and exact authored scopes. Existing Djinn/browser composition activation and real poison/headed/Firefox runtime remain required in Tasks 7–8; host source is still local.
