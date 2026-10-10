@@ -28,6 +28,8 @@ struct Probe {
     async_scroll: Option<f32>,
     keys: Vec<(inker::SessionKey, SessionButtonState, SessionModifiers)>,
     ime: Vec<inker::SessionIme>,
+    points: Vec<(f32, f32)>,
+    wheels: Vec<(f32, f32, f32, f32)>,
 }
 
 struct FakeEngine(Arc<Mutex<Probe>>);
@@ -107,7 +109,8 @@ impl DocumentSession<String> for FakeSession {
         true
     }
 
-    fn click_at(&mut self, x: f32, _y: f32) -> SessionClick {
+    fn click_at(&mut self, x: f32, y: f32) -> SessionClick {
+        self.probe.lock().unwrap().points.push((x, y));
         self.probe
             .lock()
             .unwrap()
@@ -123,6 +126,21 @@ impl DocumentSession<String> for FakeSession {
         } else {
             SessionClick::Handled
         }
+    }
+
+    fn pointer_move(&mut self, x: f32, y: f32) -> bool {
+        self.probe.lock().unwrap().points.push((x, y));
+        true
+    }
+
+    fn pointer_up(&mut self, x: f32, y: f32) -> SessionClick {
+        self.probe.lock().unwrap().points.push((x, y));
+        SessionClick::Handled
+    }
+
+    fn scroll_at(&mut self, x: f32, y: f32, dx: f32, dy: f32) -> bool {
+        self.probe.lock().unwrap().wheels.push((x, y, dx, dy));
+        self.scroll_by(dx, dy)
     }
 
     fn links(&self) -> Vec<inker::SessionLink> {
@@ -789,4 +807,122 @@ fn keyboard_scroll_prepares_its_addressed_appearance_and_retires_old_hit_layout(
     );
     pool.input(&10, press(50.0, 50.0).into());
     assert_eq!(probe.lock().unwrap().input_scroll.last(), Some(&40.0));
+}
+
+fn overlap_pool() -> (PeltControllerPool<u64, u64, String>, [Arc<Mutex<Probe>>; 2]) {
+    let mut pool = pool();
+    let probes = [
+        Arc::new(Mutex::new(Probe::default())),
+        Arc::new(Mutex::new(Probe::default())),
+    ];
+    let route = pool.content(&1).unwrap().route().clone();
+    for (key, address, probe) in [
+        (1, "https://lower.test/index", &probes[0]),
+        (2, "https://upper.test/index", &probes[1]),
+    ] {
+        let mut sessions = SessionRegistry::new();
+        sessions.register(Box::new(FakeEngine(probe.clone())));
+        let controller = PeltController::new(
+            sessions,
+            SurfaceEngineRegistry::new(),
+            PeltControllerConfig::new("fake", address, (100, 100)).with_host_history(),
+            TestClock,
+        )
+        .unwrap();
+        pool.insert(
+            key,
+            pelt_core::PeltContent::from_controller(controller, route.clone()),
+        );
+    }
+    let mut lower = placement(0, 100.);
+    lower.rect = WorkspaceRect::new(0., 0., 100., 100.);
+    let mut upper = lower.clone();
+    upper.content = 2;
+    upper.rect = WorkspaceRect::new(20., 30., 100., 100.);
+    pool.set_placements([(10, lower), (11, upper)]);
+    (pool, probes)
+}
+
+#[test]
+fn review_overlap_pool_last_placement_receives_pointer_and_navigation() {
+    let (mut pool, probes) = overlap_pool();
+    let effect = pool.input_at(0, press(27., 39.).into());
+    assert_eq!(
+        pool.captured_placement(0),
+        Some(&11),
+        "last presented content is topmost"
+    );
+    assert_eq!(probes[1].lock().unwrap().points, vec![(7., 9.)]);
+    assert!(probes[0].lock().unwrap().points.is_empty());
+    assert_eq!(
+        effect.navigation.unwrap().request.address,
+        "https://upper.test/next.html"
+    );
+}
+
+#[test]
+fn review_overlap_pool_capture_outside_and_unrelated_release() {
+    let (mut pool, probes) = overlap_pool();
+    pool.input_at(0, press(27., 39.).into());
+    assert_eq!(pool.captured_placement(0), Some(&11));
+    let unrelated = pool.input_at(
+        0,
+        SessionInput::PointerButton {
+            x: 5.,
+            y: 6.,
+            button: SessionPointerButton::Secondary,
+            state: SessionButtonState::Released,
+            modifiers: Default::default(),
+        }
+        .into(),
+    );
+    assert!(!unrelated.handled);
+    assert_eq!(pool.captured_placement(0), Some(&11));
+    assert_eq!(probes[1].lock().unwrap().points.len(), 1);
+    pool.input_at(
+        0,
+        SessionInput::PointerMoved {
+            x: 207.,
+            y: 239.,
+            modifiers: Default::default(),
+        }
+        .into(),
+    );
+    pool.input_at(
+        0,
+        SessionInput::PointerButton {
+            x: 207.,
+            y: 239.,
+            button: SessionPointerButton::Primary,
+            state: SessionButtonState::Released,
+            modifiers: Default::default(),
+        }
+        .into(),
+    );
+    assert_eq!(pool.captured_placement(0), None);
+    assert_eq!(
+        probes[1].lock().unwrap().points,
+        vec![(7., 9.), (187., 209.), (187., 209.)]
+    );
+    assert!(probes[0].lock().unwrap().points.is_empty());
+}
+
+#[test]
+fn review_overlap_pool_wheel_follows_current_stacking_and_skips_hidden_top() {
+    let (mut pool, probes) = overlap_pool();
+    let wheel = || pelt_core::PeltInput::Wheel {
+        position: inker::PhysicalPosition { x: 27., y: 39. },
+        delta: (3., 23.),
+        modifiers: Default::default(),
+    };
+    assert!(pool.input_at(0, wheel()).handled);
+    assert_eq!(probes[1].lock().unwrap().wheels, vec![(7., 9., 3., 23.)]);
+    assert!(probes[0].lock().unwrap().wheels.is_empty());
+    let lower = pool.placement(&10).unwrap().clone();
+    let mut upper = pool.placement(&11).unwrap().clone();
+    upper.visible = false;
+    pool.set_placements([(10, lower), (11, upper)]);
+    assert!(pool.input_at(0, wheel()).handled);
+    assert_eq!(probes[0].lock().unwrap().wheels, vec![(27., 39., 3., 23.)]);
+    assert_eq!(probes[1].lock().unwrap().wheels.len(), 1);
 }
