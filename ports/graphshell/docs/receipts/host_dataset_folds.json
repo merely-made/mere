@@ -1,8 +1,8 @@
 {
   "schema": "graphshell.host-dataset-fold-receipt/v1",
-  "recorded_at": "2026-10-10T07:01:47.035257+00:00",
+  "recorded_at": "2026-10-10T08:57:20.908879+00:00",
   "qualification_status": "pending_gpu_acceptance",
-  "qualification_base": "5884b94a00ce907ca6ce4aa0f9a2eaca8b92f1f4",
+  "qualification_base": "4c18d597d7849482362c5f79f96bf20ef8ac7c5c",
   "check_source_base": "5884b94a00ce907ca6ce4aa0f9a2eaca8b92f1f4",
   "contract": "R161: membership becomes sceno::Fold facts, without scenomise::grouping. R162: committed site cutover and current appearance work combined, with owner WIP untouched.",
   "fold_semantics": {
@@ -698,5 +698,13 @@
     "changes": "Published Moot conversation adapter and Pelt durable appearance/acceptance. No viewer source or renderer-pin edits in this merge.",
     "renewed": "22 host/history tests, six capsule tests, both locked Wasm gates and lock/header checks passed; other retained gate inputs are unchanged.",
     "gpu_acceptance": "Held during serialized native application runs; no GPU test or capture launched here."
+  },
+  "pre_gpu_handoff_sync": {
+    "published_main": "3eda5d278",
+    "branch_integration": "4c18d597d7849482362c5f79f96bf20ef8ac7c5c",
+    "changes": "Native workshop narrow-header layout and published Graphshell appearance receipts. Viewer source/assets, renderer pins/locks, Rootstock, Mesquite and shared scene sources unchanged.",
+    "retained_check_source_base": "5884b94a00ce907ca6ce4aa0f9a2eaca8b92f1f4",
+    "gate_inputs_unchanged": true,
+    "hold": "Explicit single-GPU-slot handoff still pending. No headed/headless GPU or native capture launched here. The cooperative wait repair is scoped to Turnstone by its lane."
   }
 }
