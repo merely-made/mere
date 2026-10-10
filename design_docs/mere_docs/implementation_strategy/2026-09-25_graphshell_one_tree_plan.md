@@ -1,8 +1,9 @@
 # Graphshell on one Cambium tree
 
 **Date:** 2026-09-25
-**Status (2026-10-10):** in progress. The combined viewer at `2ef6e3207`
-integrates published Mere `6183006ba`, Genet `7422e906`, and the committed site
+**Status (2026-10-10):** in progress. The combined viewer at `5cea11408`
+integrates published Mere `11236fd4f`, Genet `7422e906`, guarded Vello
+`491c376c`, and the committed site
 cutover `bf626abd2`. Phases 1–2 are landed; phase 3 has its recorded headed producer
 receipts and Mark's approval to proceed. Phase 4 remains unfinished: canvas
 controls, elapsed-time physics, saved-graph editing and remote-session slices
@@ -14,8 +15,8 @@ reservoir's V3–V5 resident implementation has advanced independently; its
 process fixtures do not close this browser cutover or mount the mere panel.
 **Nested host-dataset continuation (2026-10-10):** implemented on
 `codex/nested-graph-view`, with the site cutover combined at `25e356782`,
-current shared captures and Genet at `178779e2c`, and the published Tabard
-appearance work at `6b0798a95`. The earlier bounded headed proof passes on the default Radeon WebGPU
+current shared captures and Genet at `178779e2c`, published Tabard appearance
+at `6b0798a95`, and guarded renderer publication at `5cea11408`. The earlier bounded headed proof passes on the default Radeon WebGPU
 adapter after the coarse bitmap traversal repair. Mark approved
 implementing expandable repository groups and entering their constituent graph.
 Rulings 161–162 now require portable `sceno::Fold` facts and give the site
@@ -693,6 +694,31 @@ transfers DOM focus into the graph before traversal returns to the controls.
 - No Graphshell-only UI pieces. What Cambium lacks is added to Cambium.
 
 ## 6. Progress
+
+- **2026-10-10 — published guarded renderer integrated; GPU hold continues:**
+  merged published Mere `11236fd4f` at `5cea11408`. Both Cargo roots and their
+  lockfiles now select maintained `netrender-vello`, its encoding and shaders
+  at `491c376c`. Git ancestry confirms that this retains the earlier Radeon
+  coarse traversal repair `865cbf419`; the resolved renderer dependencies also
+  use the guarded source. The existing compatibility `vello` tag keeps its
+  separate encoding entry, so this is not a claim that every encoding package
+  in the workspace has one source.
+  - **Renewed checks:** 141 affected CPU tests pass with this pin, including
+    all 67 CPU Rootstock tests; its seven GPU fixtures are explicitly filtered
+    out. Both locked Wasm gates and portable-lock/header checks pass. The 254
+    shared scene tests and four exporter tests retain their previous results:
+    their source/dependency inputs did not change in this renderer publication.
+    No prior result log was overwritten by the renewed run. The
+    [Fold receipt](../../../ports/graphshell/docs/receipts/host_dataset_folds.json)
+    carries the new source hashes, commands and separate evidence paths.
+  - **Acceptance boundary:** the renderer lane's
+    [theme-modes record](2026-07-05_theme_modes_plan.md) reports real
+    Radeon/Metal command guards, renderer regressions and 60 workshop preview
+    readbacks. Those diagnostics do not qualify the combined Graphshell
+    viewer. The coordinator continues the GPU hold during serialized native
+    application acceptance; this lane launched no GPU or native capture for
+    the integration. The historical seven device-loss failures and the final
+    headed viewer checks remain outstanding, and main landing remains pending.
 
 - **2026-10-10 — CPU/build qualification complete; GPU acceptance held:**
   incorporated published Mere `b513994ba` (shared capture polling and Genet

@@ -92,10 +92,13 @@ lane coordinate overlapping edits through that site lane. Native fold Rulings
 those implementations to the editor lane.
 
 The nested branch's 2026-10-10 checkpoint combines the committed site cutover,
-Moot, shared capture polling/Genet `7422e906`, and published Tabard appearance
-through `6b0798a95` (source notice completion `2ef6e3207`). Its 395 CPU Rust
-tests, four exporter tests, locked viewer build and main-page/applet Wasm check
-pass. Main landing remains pending: the iMac's confirmed Radeon reset and
+Moot, shared capture polling/Genet `7422e906`, published Tabard appearance and
+the guarded renderer publication through `5cea11408` (published main
+`11236fd4f`, Vello `491c376c`). The guard preserves the earlier Radeon coarse
+repair. Its 141 affected CPU tests, locked viewer build and main-page/applet
+Wasm check pass after the renderer update; the unchanged shared scene and
+exporter inputs retain their 254 and four passing tests. Main landing remains
+pending: the iMac's confirmed Radeon reset and
 WindowServer incident has put GPU/capture runs on hold, and seven Rootstock
 GPU fixtures failed to obtain a device. The
 [Fold receipt](../../../ports/graphshell/docs/receipts/host_dataset_folds.json)
