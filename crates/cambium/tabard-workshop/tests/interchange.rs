@@ -48,6 +48,42 @@ fn preference_path(path: &Path) -> PathBuf {
 }
 
 #[test]
+fn host_owned_export_paths_preserve_existing_and_missing_files_without_a_library() {
+    let directory = tempfile::tempdir().unwrap();
+    let existing = directory.path().join("appearance.json");
+    let missing = directory.path().join("new-document.djot");
+    fs::write(&existing, b"owned application bytes").unwrap();
+    let mut state = WorkshopState::in_memory();
+    state.set_protected_export_paths(vec![existing.clone(), missing.clone()]);
+    for path in [&existing, &missing] {
+        state.request_export();
+        let artifact = state.take_export().unwrap();
+        state.complete_export(artifact, Some(path.clone()));
+        assert!(state.status().contains("protected application files"));
+        assert!(state.replacement_path().is_none());
+    }
+    assert_eq!(fs::read(&existing).unwrap(), b"owned application bytes");
+    assert!(!missing.exists());
+}
+
+#[test]
+fn newly_protected_paths_are_checked_again_before_export_replacement() {
+    let directory = tempfile::tempdir().unwrap();
+    let path = directory.path().join("document.djot");
+    fs::write(&path, b"original document").unwrap();
+    let mut state = WorkshopState::in_memory();
+    state.request_export();
+    let artifact = state.take_export().unwrap();
+    state.complete_export(artifact, Some(path.clone()));
+    assert!(state.replacement_path().is_some());
+    let alias = directory.path().join(".").join("document.djot");
+    state.set_protected_export_paths(vec![alias]);
+    state.replace_export();
+    assert!(state.status().contains("protected application files"));
+    assert_eq!(fs::read(&path).unwrap(), b"original document");
+}
+
+#[test]
 fn imported_collision_and_builtin_become_unsaved_copies_without_replacing_sources() {
     let existing = user("theme:existing", "Existing");
     let (_directory, path) = library(std::slice::from_ref(&existing));

@@ -24,8 +24,8 @@ switch path).
 
 **Status:** in progress. Mark selected this order: Pelt, Graphshell, Knot,
 Turnstone, Woodshed, Redshank, Signalman. Isocosm is excluded while its own
-migration proceeds. Each application slice is qualified before moving to the
-next; discovery may run independently. Existing Woodshed adoption receives a
+migration proceeds. Publication follows this order; implementation and
+discovery can overlap, with each slice qualified before publication. Existing Woodshed adoption receives a
 reconciliation pass rather than a second editor implementation.
 
 ### Shared foundation and current origin
@@ -81,12 +81,73 @@ applicable rendered acceptance pass against its published dependency set.
 - The native host exposes an additive tool-window entry over a caller-owned
   event loop and existing render core. Its normal input, accessibility and
   close-policy pipeline remains the owner of the tool window's behavior.
+- Hosts also supply transient protected export paths to the existing workshop
+  writer. The shared identity comparison protects application settings and open
+  documents before both creation and replacement, including aliases. This
+  avoids each app duplicating export path normalization. All 17 interchange
+  tests pass, including the two new host-file boundary regressions; this
+  additive API was pushed and remote-verified as
+  `d5679eba4aa1bc5e1a241c5df63d13490a5f46a7`.
+- Editing and saving the currently selected theme under the same identity must
+  not bypass explicit application Apply. Each native adapter holds the applied
+  presentation while authoring updates the library, refreshing it only after
+  successful application selection or Apply; fresh launches resolve the saved
+  definition normally. Mounted regression qualification is in progress.
 - Current Cambium fields render semantic containers, so the workshop's old
   tag-based input/textarea CSS collapsed an empty stylesheet editor to zero
   height. Shared field classes restore its geometry. All 299 scoped Tabard,
   workshop, desktop and native-host tests pass against the fetched origin,
   including all six desktop usability tests. Two host documentation examples
   remain intentionally ignored. Pelt application/native qualification follows.
+- A subsequent fetch found origin `7c0c12008`; its design-context and app
+  composition documentation merged cleanly before consumer qualification.
+- Origin advanced again to `4d8bd7037` with the Conatus tenant and its plan.
+  The worktree fast-forwarded without changing application sources; the exact
+  seven local application dependency rows were preserved over the upstream
+  lockfile. Locked full metadata and the port/web boundary checker pass on
+  that baseline.
+- Shared foundation and current-source lock repair were pushed directly to
+  origin main as `3567c8e937b0e2ec8e2c670cfaf4289d4403d216`. A clean committed
+  snapshot independently passes locked full metadata and the port/web boundary
+  checker. Consumer work remains separate from this publication.
+- Canvas now accepts an already resolved Tinct palette for retained derived
+  faces, reusing its existing role mapping and companion mixing. This lets web
+  computed CSS roles and canonical Tabard profiles recolor existing face caches
+  without changing deterministic face bytes or semantic node-state accents.
+  All seven focused palette tests pass, including selected-mode and alpha
+  preservation plus unchanged legacy seed mapping. This addition is ready for
+  publication independently of the application adapters and was pushed as
+  `7a2a851fb0134a3cab7e1c4161c1c46f371d829a`.
+- Pelt's source adapter reaches the shared workshop through its real Theme
+  drawer and mounts a tool window over the existing render core. Application
+  choice and shared definitions have independent durable paths. Focused tests
+  and fresh native receipts are in progress; this is not yet an acceptance claim.
+- Pelt's 63 desktop tests pass. Its first current-source LaunchServices run
+  times out before initial presentation with repeated `Occluded` acquisitions,
+  so no editor capture or acceptance is claimed. The retained failed receipt
+  motivates bounded first-presentation retries, initial activation after the
+  accessibility reveal, and composition of the editor's existing idle policy
+  into the parent event loop. That lifecycle correction is being requalified.
+- The corrected Pelt source passes all 69 desktop tests, including application
+  export-path protection and saving an edited active theme without implicitly
+  applying it. Native presentation qualification remains open.
+- The second Pelt LaunchServices run reaches the embedded workshop and captures
+  Light and Dark but exceeds its scenario deadline: the driver did not owe the
+  redraw that follows its first successful browser presentation. Failed receipts
+  remain retained while that continuation is corrected. The shared launcher
+  now recognizes the canonical macOS `/private` spelling of its unique copied
+  executable during timeout cleanup; focused alias/argument/non-owned-process
+  checks pass. This cleanup change cannot make a failed receipt pass.
+- Graphshell's application routes are the web full app and tree `app=local`;
+  its native-messaging executable is a relay, not a settings window. The web
+  adapter is being built around shared Tabard intake and separate application
+  appearance persistence. Embedded roots must inherit their composing host's
+  roles without acquiring application settings authority.
+- Knot's fetched origin `802238cb` already has coherent Mere/Genet pins and
+  semantic-field adaptation. An isolated application worktree preserves its
+  primary checkout. Its shared-editor adapter extends local desktop preferences,
+  leaving persona sync, document contents and writing controls under their
+  current owners. Dependency publication and native qualification remain open.
 
 ## Shared authoring and title-bar composition (2026-10-08)
 
