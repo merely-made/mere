@@ -118,9 +118,12 @@ tangibility are retained when the obstacle set changes.
 SE90 in the editor plan supersedes the proposed mode/control fork: reset is
 an action, ambient context and props can coexist, and visibility is independent
 of collision, animation, picking and authored behavior. The static binder is
-one component of the set, not an interactive scenery implementation. The reset
-baseline and recently interacted foreground membership still need concrete
-reconciliation with §9.2. R162's viewer ownership has not been released.
+one component of the set, not an interactive scenery implementation. SE91
+resolves membership: selected or foreground-pinned nodes stay foregrounded;
+after deselection, interacted nodes recede but remain until dismissed.
+Untouched ambient suggestions may change with context. Reset's baseline and
+the interaction boundary for retention remain open. R162's viewer ownership
+has not been released.
 No reserved viewer files have been edited by this continuation. Scene state,
 viewer integration and Chrome/Firefox checks are still open. The retained
 `backdrops-idle-overlap.txt` probe retains the short 120-step, idle-body
