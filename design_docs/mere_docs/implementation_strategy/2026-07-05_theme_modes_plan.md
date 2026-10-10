@@ -419,6 +419,13 @@ applicable rendered acceptance pass against its published dependency set.
   the dr-c worktree was in the middle of merging woodshed `origin/main`
   (`4aa68bf`, which pins main `11236fd4` and so already carries the class fix),
   so it was left untouched.
+- **Ruling (2026-10-10), woodshed verification.** Asked: wait for that merge
+  and rerun the test there (recommended), build a separate woodshed worktree at
+  `d9d3f19` patched to the scratch branch, or skip woodshed? Mark: "Wait for
+  that merge (Recommended)".
+- **Ruling (2026-10-10), landing.** Asked: fast-forward main without pushing
+  (recommended), fast-forward and push, or leave it on the branch? Mark:
+  "Fast-forward main, no push (Recommended)". The push waits for Mark.
 - `shared_components.rs:126` still asserts that the code sample contains no
   native `input`/`textarea`. It stays, because it guards against native form
   elements; the `role=textbox` check beside it covers Cambium fields.
