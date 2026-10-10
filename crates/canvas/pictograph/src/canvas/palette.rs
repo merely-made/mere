@@ -22,8 +22,8 @@
 //!   cascade and cannot resolve a `var()`.
 
 use crate::canvas::types::NodeState;
+use tincture::{Palette, derive_palette, mix};
 pub use tincture::{Seeds as ThemeSeeds, Srgb as ThemeColor};
-use tincture::{derive_palette, mix};
 
 /// Number of caller-controlled colors a derived face may address.
 pub const DERIVED_FACE_COLOR_COUNT: usize = 8;
@@ -60,7 +60,13 @@ impl DerivedFacePalette {
 
     /// Derive the face colors from the same seed vocabulary as Mere themes.
     pub fn from_seeds(seeds: &ThemeSeeds) -> Self {
-        let palette = derive_palette(seeds);
+        Self::from_palette(&derive_palette(seeds))
+    }
+
+    /// Use an already resolved theme palette, including its selected mode and
+    /// authored role colors. No seed derivation runs here. Node activation
+    /// accents and deterministic face bytes remain separate Canvas state.
+    pub fn from_palette(palette: &Palette) -> Self {
         let companion = palette.text;
         Self::new([
             palette.primary.to_array(),
@@ -232,6 +238,22 @@ mod tests {
         assert!((r - 58.0 / 255.0).abs() < 1e-6);
         assert!((g - 140.0 / 255.0).abs() < 1e-6);
         assert!((b - 94.0 / 255.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn resolved_face_palette_keeps_selected_mode_roles_and_alpha() {
+        let mut resolved = tincture::derive_palette_with(
+            &DEFAULT_DERIVED_FACE_SEEDS,
+            tincture::ModeProfile::HC_LIGHT,
+        );
+        resolved.primary = ThemeColor::rgba(24, 46, 81, 127);
+        let faces = DerivedFacePalette::from_palette(&resolved);
+        assert_eq!(faces.colors()[0], [24, 46, 81, 127]);
+        assert_ne!(
+            faces.colors()[5],
+            DerivedFacePalette::from_seeds(&DEFAULT_DERIVED_FACE_SEEDS).colors()[5],
+            "the companion color uses resolved text instead of rederiving the default dark mode"
+        );
     }
 
     #[test]
