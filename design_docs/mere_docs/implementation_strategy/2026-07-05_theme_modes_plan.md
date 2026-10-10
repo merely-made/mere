@@ -271,6 +271,18 @@ applicable rendered acceptance pass against its published dependency set.
   primary checkout. Its shared-editor adapter extends local desktop preferences,
   leaving persona sync, document contents and writing controls under their
   current owners. Dependency publication and native qualification remain open.
+- October 10 narrow native inspection found the workshop brand overlapping
+  Undo/Redo/Save at 420 pixels. The shared workshop stylesheet now reserves
+  the brand width and moves its action slot to a wrapping row below 480 pixels.
+  Production `native_init` font/layout tests cover 360, 420 and 640 pixels with
+  platform and explicit caption policies, checking nonoverlap, viewport bounds,
+  pointer hit centres and Tab reachability. All 15 native-host library tests
+  pass; the same focused test rejects the original stylesheet at 420 pixels.
+  The windowless harness does not measure macOS traffic-light insets, so actual
+  narrow window acceptance remains required. Knot and Redshank also expose
+  intermittent missing title/control paint despite successful presentation and
+  nonblank frames. Those receipts are rejected pending shared renderer/retained
+  scene isolation; this geometry repair does not close that separate defect.
 
 ## Shared authoring and title-bar composition (2026-10-08)
 
