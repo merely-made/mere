@@ -58,10 +58,10 @@ These facts were read from source at `a8889f60e8eb11a72ad86498405d091f9ed8be7e` 
 | `ports/graphshell/src/web_product.rs` | sync_canvas replaces canvas from host.graph(); empty apply_filter clears to Show all | Task 7 |
 | `crates/canvas/pictograph/src/canvas/view.rs` | scope_to_members resolves resident members and clears an empty set; clear_scope explicitly shows all | Task 4 |
 
-New files, each annotated at its exact planned occurrence:
+New files; unfinished targets are annotated at their exact planned occurrence:
 
-- `crates/system/pandect/src/live_graph.rs` *(planned target)* <!-- doc-audit: planned-path -->: portable typed command/precondition vocabulary and preflight/application helpers.
-- `crates/system/pandect/tests/live_graph.rs` *(planned target)* <!-- doc-audit: planned-path -->: complete-writer live/observation parity tests.
+- `crates/system/pandect/src/live_graph.rs` *(implemented in Task 2)*: portable typed command/precondition vocabulary and preflight/application helpers.
+- `crates/system/pandect/tests/live_graph.rs` *(implemented in Task 2)*: complete-writer live/observation parity tests.
 - `ports/graphshell/src/resident_host.rs` *(planned target)* <!-- doc-audit: planned-path -->: host settings, pane roots, refresh scheduling and staged state, beside MereHost.
 - `ports/graphshell/src/web_resident.rs` *(planned target)* <!-- doc-audit: planned-path -->: browser controls, foreground/idle pump and lifecycle-safe async work.
 - `ports/graphshell/tests/resident_host.rs` *(planned target)* <!-- doc-audit: planned-path -->: native owned-host failure/reopen and memory fixture.
