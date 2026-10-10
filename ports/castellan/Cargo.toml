@@ -15,11 +15,13 @@ categories = ["authentication"]
 # storages, the unlock ladder, the SSH agent, and the wallet's seeds and
 # private epochs. Only djinn may link this crate (D4, D16: `deny.toml`).
 #
-# The SSH agent and its CLI (`personae-agent`, `personae-vault`), the
+# The SSH agent and its standalone listener (`personae-agent`), the
 # approval broker, and SSH keys as vault slots. RSA signs through ring; the
 # rsa crate only builds the key at load (rulings 52, 59: RUSTSEC-2023-0071
 # rules out its signing and decryption). ECDSA through RustCrypto's curves,
 # named here rather than left to ssh-agent-lib's feature unification.
+# `personae-vault` is a graphshell custody client; its command implementation
+# runs inside djinn through `keeper`, against the already-open vault.
 agent = [
   "personae/ssh",
   "dep:ring",
@@ -164,12 +166,4 @@ harness = false
 [[bin]]
 name = "personae-agent"
 path = "src/bin/personae-agent.rs"
-required-features = ["agent"]
-
-# Inspect and manage the vault from a terminal. `agent` because its `add-ssh`
-# door refuses keys the agent cannot sign, as `ssh-add` and the authority's
-# import do (chatelaine ruling 60). Moved from personae (DR-B).
-[[bin]]
-name = "personae-vault"
-path = "src/bin/personae-vault/main.rs"
 required-features = ["agent"]

@@ -13,12 +13,12 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use castellan::authority::PersonaeHost;
-use castellan::custody::{IdentityVault, InMemoryStorage, Profile};
+use castellan::custody::{IdentityStorage, IdentityVault, InMemoryStorage, Profile};
 use djinn::keeper::Keeper;
 use graphshell::identity::{VaultLockView, VaultProtectionView};
 use graphshell::native::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
 use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
-use graphshell::native::custody::{CustodyRefusal, KeySource};
+use graphshell::native::custody::{CustodyAnswer, CustodyCall, CustodyRefusal, KeySource};
 use graphshell::native::custody_client::{CustodyClient, CustodyClientError};
 use personae::{Ed25519Keypair, IdentityProvider, ProfileId};
 use uuid::Uuid;
@@ -39,8 +39,10 @@ fn resident_host() -> Arc<PersonaeHost<InMemoryStorage>> {
         "Default",
         Ed25519Keypair::from_seed([0x5c; 32]),
     );
+    let storage = InMemoryStorage::new();
+    storage.save_profile(&profile).unwrap();
     Arc::new(PersonaeHost::new(
-        IdentityVault::with_profile(InMemoryStorage::new(), profile),
+        IdentityVault::with_profile(storage, profile),
         None,
         VaultProtectionView::Ephemeral,
     ))
@@ -150,6 +152,63 @@ async fn an_app_reads_and_releases_through_djinn_and_nothing_else_leaves() {
             .to_bytes()
     );
     assert_eq!(signature.len(), 64);
+
+    // Administrative CLI operations stay in the live keeper and return public
+    // output only. Ordinary app identities cannot use this administrative door.
+    let command = CustodyCall::VaultCommand {
+        profile: ProfileId("default".into()),
+        command: "new-profile".into(),
+        args: vec!["cli-persona".into()],
+    };
+    assert!(matches!(
+        client.call(command.clone()).await,
+        Err(CustodyClientError::Refused(CustodyRefusal::NotServed))
+    ));
+    let mut cli = open(&endpoint, "personae-vault").await.unwrap();
+    assert!(matches!(cli.call(command).await.unwrap(),
+        CustodyAnswer::VaultOutput { text } if text.contains("created profile")));
+    assert!(host.has_profile(&ProfileId("cli-persona".into())).unwrap());
+    assert_eq!(
+        host.current_profile_id(),
+        ProfileId("default".into()),
+        "creation must not switch persona"
+    );
+    assert!(
+        cli.call(CustodyCall::VaultCommand {
+            profile: ProfileId("default".into()),
+            command: "new-profile".into(),
+            args: vec!["../escape".into()],
+        })
+        .await
+        .is_err()
+    );
+    let import = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../castellan/tests/fixtures/ssh/ed25519");
+    assert!(matches!(cli.call(CustodyCall::VaultCommand {
+        profile: ProfileId("default".into()), command: "add-ssh".into(),
+        args: vec![import.display().to_string()],
+    }).await.unwrap(), CustodyAnswer::VaultOutput { text } if text.contains("imported")));
+    assert!(matches!(cli.call(CustodyCall::VaultCommand {
+        profile: ProfileId("default".into()), command: "list".into(), args: vec![],
+    }).await.unwrap(), CustodyAnswer::VaultOutput { text } if text.contains("1 slot")));
+    use ssh_agent_lib::agent::Session;
+    assert_eq!(
+        host.agent_session()
+            .request_identities()
+            .await
+            .unwrap()
+            .len(),
+        2,
+        "the live agent sees the imported key and its certificate without restarting"
+    );
+
+    assert!(matches!(cli.call(CustodyCall::VaultCommand {
+        profile: ProfileId("default".into()), command: "enroll-host".into(),
+        args: vec!["user@unused.invalid".into()],
+    }).await.unwrap(), CustodyAnswer::VaultEnrollment { target, script, .. }
+        if target == "user@unused.invalid" && script.contains("cert-authority")
+            && !script.contains("PRIVATE KEY")));
+    assert_eq!(cli.status().await.unwrap().lock, VaultLockView::Unlocked);
 
     // An application the door does not know is refused before custody
     // answers, which the app shows as pending (D12).
