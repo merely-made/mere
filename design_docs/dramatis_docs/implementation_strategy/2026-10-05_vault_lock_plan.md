@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-08)**: rulings 1 to 90 in §3. L1 to L4 landed (L3
+**Status (2026-10-08)**: rulings 1 to 97 in §3. L1 to L4 landed (L3
 as `79fbbeb7`, its attended receipts as `303b5097`; L4 on 2026-10-08, §6);
 deployment is Mark's step. Not yet carried out: ruling 44's transport-key hard switch,
 so Distillery keeps the master keypair while locked, and pandect's wallets
@@ -1070,6 +1070,71 @@ payload.* Options:
 
 Mark: **"Box the key + record (Recommended)"**.
 
+**Ruling 91** *(amends ruling 42; asked 2026-10-09 beside the Secret
+Service plan's SS8).* *Ruling 42 started Linux locked, partly because the
+desktop keyring was awkward while castellan meant to be the Secret
+Service, which SS5 then SS8 removed. gnome-keyring is unlocked by the login
+password through PAM and stays unlocked all session.* Options: keep ruling
+42 (Linux asks once per login); keep djinn's root in the OS keyring, so it
+auto-unlocks at login like Windows; ask again at D2. Mark: **"Root in the
+OS keyring"**. Follows: Linux gets an auto-unlock root held in the
+desktop's Secret Service. It is built after its own assessment, which
+covers the client library, the persisted lock and the threat statement's
+Linux at-rest line.
+
+Rulings 92 to 95 were asked on 2026-10-09 from ruling 44's assessment
+(§6), before its build (dramatis repo plan D35).
+
+**Ruling 92** *(which key is Distillery's transport identity).* Options:
+reuse the mesh author key (`MESH_AUTHOR_SALT`), so the author becomes the
+address as personal sync and Knot already do, and the directory's
+author-to-master indirection goes away; a per-mesh transport salt, with a
+new master-signed attestation; one fixed transport salt, with a new
+attestation. Mark: **"Reuse the mesh author key (Recommended)"**.
+
+**Ruling 93** *(the landing's scope).* *Only tests exercise the
+address-by-master code; production never reaches a peer.* Options: the
+derivation plus the directory, courier and remote checks now, with a
+negative control that a master-bound transport is refused; the derivation
+only. Mark: **"Derivation and lookups now (Recommended)"**.
+
+**Ruling 94** *(rebinding while locked).* Options: no rebind while
+locked, since the lane drops its derived key after binding; the lane holds
+the derived key for its whole life to rebind. Mark: **"No rebind while
+locked (Recommended)"**.
+
+**Ruling 95** *(the master-taking `P2pandaTransport::builder`).* Options:
+retire it from production, which binds only from a derived key, keeping it
+for tests and probes with a check against production use; keep it. Mark:
+**"Retire it from production (Recommended)"**.
+
+**Ruling 96** *(amends ruling 95, whose premise was wrong).* *Ruling 95
+was put as "only tests and probes call the keypair builder". In fact
+graphshell's carriage host (`carriage_host.rs:168`) and personal-sync host
+(`personal_sync_host.rs:270`) call it in production with per-graph derived
+keys, which is correct; only Distillery's lane passes the master. A
+constructor named "derived" cannot tell the two apart, since both are an
+`Ed25519Keypair`.* Options:
+- a distinct `DerivedKeypair` type from personae's derivation, which the
+  transport's production constructor alone accepts, so a master is a
+  compile error, with the keypair builder kept for tests behind a
+  test-only feature;
+- no guard beyond ruling 92;
+- a source check in the gate.
+
+Mark: **"A derived-key type (Recommended)"**.
+
+**Ruling 97** *(ruling 96's reach outside mere).* *Two sibling repos call
+the keypair builder, in tests only: knot-editor (`sync.rs`, 2 calls) and
+Turnstone (`place/lanes.rs`, 3 calls). Their test builds need the
+test-only feature in their dev-dependencies.* Options: edit both repos'
+dev-dependencies, Knot first; mere only, with the siblings ledgered; keep
+the builder ungated and deprecated. Mark: **"Edit both repos' dev-deps
+(Recommended)"**. *Reading, not ruled:* a sibling can name the feature only
+once its pinned mere revision has it, so mere lands first, and each
+sibling turns the feature on in the repin commit that would otherwise
+break its tests.
+
 Still open: a threat statement naming hibernation and the pagefile.
 *2026-10-08:* closed by ruling 82.
 
@@ -1994,3 +2059,30 @@ dynamics grammar plan's F183).
     and A locked, `session-lock`, at 00:28:02.139, both with markers.
     Standby's next phase (566, 9 to 10) came at 00:28:02.357.
   - E's Windows legs hold on an isolated build.
+
+**2026-10-09, ruling 44 assessed** (Opus, read-only, at `5df06f80`; the
+headline checked in code).
+- **The hard switch breaks no live peer relationship.**
+  - Each vault generates its own master (`bootstrap.rs:138`), so two of
+    Mark's devices never share a Distillery mesh.
+  - The production lane binds gossip and blobs only, with no discovery
+    (`installed.rs:319-322`).
+  - djinn keeps `NoCourier` until a second device (`resident_distillery.rs:322-326`).
+  - Nothing in production announces on the mesh.
+  - So the mixed-version window ruling 44 worried about matters only once
+    multi-device Distillery is wired.
+- **Who keeps the master after a lock:** p2panda-net's `Endpoint`, its
+  gossip and discovery handles, and iroh's endpoint secret, held through
+  `ResidentDistillery` in `DjinnResident`, which ruling 24 keeps open.
+- **Address by master** exists only in code that tests exercise:
+  - `DeviceDirectory` (`crates/mesh/mesh/src/directory.rs`);
+  - the courier's `PeerID::from_bytes(master)`;
+  - `remote.rs`'s `master_of` checks.
+- **Not affected:** device pairing (per-graph derived node ids) and Knot
+  (its own derived seed).
+- **Rulings 92 to 95 settle the build.** Its checkpoints:
+  - A, the derivation;
+  - B, the lookups, with a master-bound negative control;
+  - C, a residue test that fails first on the current tree;
+  - D, the gates with the lane on and locked by the real trigger;
+  - E, the records.

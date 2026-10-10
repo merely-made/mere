@@ -278,3 +278,13 @@ async fn bilateral_round_trip_over_attached_packet_interfaces() {
     accept.await.expect("accept task");
     bridge.abort();
 }
+
+/// Path segments become separate aspects, and the expanded name (which the destination
+/// hash is taken over) is the same dotted string the single-aspect mapping produced.
+#[test]
+fn alpn_segments_map_to_aspects_with_the_same_expanded_name() {
+    let name = super::destination_name_for_alpn(&Alpn::new("mere/cable/v1"));
+    assert_eq!(name.expanded(), "mere.cable.v1");
+    let name = super::destination_name_for_alpn(&Alpn::new("mere/murm/v1"));
+    assert_eq!(name.expanded(), "mere.murm.v1");
+}

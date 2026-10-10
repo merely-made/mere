@@ -6,6 +6,10 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
+mod queries;
+
+pub(super) use queries::VoxelCellWalk;
+
 use rapier3d::control::{
     CharacterAutostep as RapierCharacterAutostep, CharacterLength, KinematicCharacterController,
 };
@@ -477,7 +481,8 @@ fn rapier_body_kind(kind: BodyKind) -> RigidBodyType {
 fn body_kind(kind: RigidBodyType) -> BodyKind {
     match kind {
         RigidBodyType::Fixed => BodyKind::Fixed,
-        RigidBodyType::Dynamic => BodyKind::Dynamic,
+        // conatus makes no soft bodies; rapier counts a soft frame as dynamic.
+        RigidBodyType::Dynamic | RigidBodyType::SoftFrame => BodyKind::Dynamic,
         RigidBodyType::KinematicPositionBased => BodyKind::KinematicPosition,
         RigidBodyType::KinematicVelocityBased => BodyKind::KinematicVelocity,
     }

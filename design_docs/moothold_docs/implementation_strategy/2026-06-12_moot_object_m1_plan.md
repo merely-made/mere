@@ -325,7 +325,7 @@ management require their own subsequent consumer receipts.
   16 anchors, a changed paragraph, independent journal forks and body-text queries.
   It exercised neither p2panda transport nor service commitments. Its sources and
   reproducible command are local artifacts, not checked-in shipping evidence.
-- Concurrent untracked `crates/moot/commons/examples/commons_practice_peer.rs`
+- Concurrent untracked `ports/moot/examples/commons_practice_peer.rs`
   describes a line-JSON retained Woodshed space with one redb store per process and
   explicitly no transport implementation. `ports/graphshell/web/co_op.*` and
   related projection work are another active lane. Their presence is not a landed

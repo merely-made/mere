@@ -32,7 +32,7 @@
 //! The sample graph, simulation, node-children pool, and the small paint/DOM
 //! helpers live in [`mod@build`].
 
-use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};
+use std::collections::{BTreeMap, HashMap, HashSet};
 
 use crate::canvas::scene_paint::{Camera, ScenePaintStyle};
 use euclid::default::{Box2D, Point2D};
@@ -151,12 +151,12 @@ pub use geometry::CartographyGeometry;
 pub mod palette;
 pub use palette::DerivedFacePalette;
 
+mod area_share;
 /// Query similarity over the canvas: the embedding→numen field bridge and the
 /// search surface built on it. Homed here in the 2026-08-12 eidetic reorg —
 /// they are canvas glue (numen fields over placed nodes) that had been parked
 /// in the intel tier, where nothing consumed them.
 pub mod canvas_search;
-mod area_share;
 mod edge_cells;
 pub mod field_bridge;
 mod fields;
@@ -200,6 +200,10 @@ pub use physics_device::{PhysicsDevice, physics_device_for};
 /// Compositions beyond a law and its overlays: a weighted mix of force laws
 /// and groups. (Dynamics grammar plan, G3.)
 pub mod composition;
+mod dynamics_record;
+/// The dynamics spec over this catalog: seiche's portable spec, with the
+/// laws and overlays as its presets. (Dynamics grammar plan, G4a.)
+pub mod dynamics_spec;
 /// The physics catalog: the laws a graph can move under, the overlays composed
 /// onto them, and the named profiles. (Physics catalog — P1.)
 pub mod physics_catalog;
@@ -207,14 +211,9 @@ mod physics_view;
 /// Schedules of compositions, each stage to its stop, with captures taken by
 /// role. (Dynamics grammar plan, G3.)
 pub mod schedule;
-/// The dynamics spec over this catalog: seiche's portable spec, with the
-/// laws and overlays as its presets. (Dynamics grammar plan, G4a.)
-pub mod dynamics_spec;
-mod dynamics_record;
 pub use board_scene::{
     BoardBackdrop, BoardCard, BoardFit, BoardFootprint, BoardRect, BoardScene, BoardText,
-    BoardTransform,
-    backdrop_color,
+    BoardTransform, backdrop_color,
 };
 pub use composition::{CompositionRefusal, GroupSource, PhysicsComposition, PhysicsGrouping};
 pub use dynamics_record::DynamicsReport;
@@ -222,9 +221,8 @@ pub use physics_board::{BoardItem, PhysicsBoard};
 pub use physics_catalog::{
     CANVAS_PHYSICS_DEPTH_SOURCES, CANVAS_PHYSICS_KIND_SOURCES, CANVAS_PHYSICS_LAWS,
     CANVAS_PHYSICS_MASS_SOURCES, CANVAS_PHYSICS_OVERLAYS, CANVAS_PHYSICS_PROFILES, LayoutStats,
-    OverlayRefusal,
-    PhysicsDepthSource, PhysicsKindSource, PhysicsLaw, PhysicsMassSource, PhysicsOverlay,
-    PhysicsProfile,
+    OverlayRefusal, PhysicsDepthSource, PhysicsKindSource, PhysicsLaw, PhysicsMassSource,
+    PhysicsOverlay, PhysicsProfile,
 };
 pub use physics_view::PhysicsChoice;
 /// The channel registry: every source the laws, overlays and slots read, by
@@ -235,12 +233,12 @@ pub mod meaning;
 /// A sentence model on the host's own device for the Meaning channel.
 #[cfg(feature = "meaning-gpu")]
 pub mod meaning_device;
+mod meaning_job;
+mod meaning_lane;
 /// The Meaning channel's sentence model, pinned: model, revision, licence,
 /// pooling, prefix and hashes (F56, F58).
 #[cfg(feature = "meaning-gpu")]
 pub mod meaning_model;
-mod meaning_job;
-mod meaning_lane;
 pub use channels::{Channel, ChannelFamily, ChannelValues};
 pub use meaning::{
     Embedded, LexicalMeaning, MeaningBackend, MeaningEngine, MeaningParams, MeaningSnapshot,
@@ -420,6 +418,10 @@ pub struct Canvas {
     /// spring persist; this is display-only. Persistence rides view-intent's
     /// `hidden_relations`.
     hidden_edges: HashSet<EdgeCell>,
+    /// The physics view's revision (F178): bumped whenever a hide or show
+    /// changes the visible relation cells, so the registry's physics channels
+    /// key by it beside the graph's structural revision.
+    physics_view_revision: u64,
     /// The field the cursor is over (hover) — drives box-on-interaction: a field's
     /// dashed extent box draws only while it is the active field; the soft disk well
     /// is always shown. `None` when the cursor is over no field. (Field regions.)
@@ -529,6 +531,8 @@ pub struct Canvas {
     /// is computed once per real dependency change. `focus` is only recorded for focus-driven
     /// strategies (radial). Reset when the strategy changes. (Arrangements — the layout cache.)
     last_strategy_inputs: Option<(String, u64, u64, u64, u32, u32, Option<NodeKey>)>,
+    /// Recheck exact visible inputs once per graph revision; steady frames reuse the stamp.
+    strategy_graph_memo: std::sync::Mutex<Option<strategy_inputs::StrategyGraphMemo>>,
     /// Monotonic generation for the Canvas-resolved geometry that analytic layouts consume through
     /// [`strategy_extents`](Self::strategy_extents). This stays local because explicit sizes and
     /// size channels are view state, not graph truth.
@@ -715,7 +719,7 @@ pub struct Canvas {
     /// How many times the law + overlay force set was rebuilt. Test only.
     #[cfg(test)]
     law_rebuilds: usize,
-    /// A restored score's `(strategy id, graph revision, URL-authority revision, footprint revision)`
+    /// A restored score's `(strategy id, visible graph stamp, URL-authority revision, footprint revision)`
     /// claim on the layout.
     /// [`restore_projection_score`](Self::restore_projection_score) buffers the
     /// score's own positions; without this the host's very next
@@ -756,18 +760,19 @@ impl Default for Canvas {
 }
 
 mod actions;
+pub(crate) mod at_rest;
 mod cartography;
 mod derived_face;
 mod gloss;
 mod framing;
 mod lifecycle;
 mod nodes;
-pub(crate) mod at_rest;
 mod reader;
 mod roles;
 mod selection;
 mod source_time;
 mod strategy;
+mod strategy_inputs;
 mod view;
 
 pub use actions::{

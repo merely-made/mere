@@ -83,6 +83,7 @@ mod surface;
 mod tabs;
 mod tags;
 mod text;
+mod title_bar;
 mod value;
 mod wheel;
 mod workspace;
@@ -148,8 +149,9 @@ pub use fold_projection::{
 };
 #[cfg(feature = "highlight")]
 pub use highlight::{
-    Highlight, entity_styles, highlighted_text_field, highlighted_textarea, note_styles,
-    role_class, styles_for, syntax_css,
+    Highlight, SYNTAX_HIGHLIGHT_CSS, code_styles, entity_styles, highlighted_code,
+    highlighted_text_field, highlighted_textarea, note_styles, role_class, styles_for, syntax_css,
+    syntax_css_with,
 };
 pub use hover::{HoverEvent, HoverPhase, OnHover, OnHoverState, on_hover};
 pub use key::{CompositionEvent, Key, KeyEvent, Modifiers, NamedKey, OnKey, OnKeyState, on_key};
@@ -182,7 +184,7 @@ pub use sprigging::{
 };
 pub use styled_field::{
     FIELD_CARET_CLASS, FIELD_PREEDIT_CLASS, FieldChild, StyleRange, caret_field_children,
-    caret_text_field, styled_text_field, styled_textarea,
+    caret_text_field, styled_text_children, styled_text_field, styled_textarea,
 };
 pub use summary_body::{SummaryBody, summary_body};
 // Per-tag element-view helpers: `div`, `span`, `p`, `input`, `label`, `a`,
@@ -216,6 +218,7 @@ pub use tabs::{
 };
 pub use tags::*;
 pub use text::text;
+pub use title_bar::{TITLE_BAR_CSS, TitleBarSlot, title_bar};
 pub use value::{OnValue, OnValueState, ValueEvent, on_value};
 pub use wheel::{OnWheel, WheelEvent, on_wheel};
 pub use workspace::{

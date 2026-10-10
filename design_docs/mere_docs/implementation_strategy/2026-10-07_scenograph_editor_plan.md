@@ -1,7 +1,7 @@
 # Scenograph Editor Plan
 
 **Date:** 2026-10-07
-**Status (2026-10-08):** tracks E1 to E5 and C1 complete, each with headed checks in Chrome and Firefox (Safari not run); C2 landed (SE45 to SE51; F11 to F13), with headed checks in Chrome and Firefox; its label revision (SE52) landed with the web host's genet repin. Rulings SE1 to SE82 (§1). Waiting: genet branch `value-engine` (SE39 to SE42) for Mark or genet's lane to land, then mere's rhai `ValueEngine` and the rule runner after a coordinated repin. The Turnstone follow-up (SE32, SE35) is on Turnstone main at `d0775a1` (§3). Mapped, not opened: wallpapers and props, the style editors, authored motion (§3).
+**Status (2026-10-08):** tracks E1 to E5 and C1 complete, each with headed checks in Chrome and Firefox (Safari not run); C2 landed (SE45 to SE51; F11 to F13), with headed checks in Chrome and Firefox; its label revision (SE52) landed with the web host's genet repin. S1, the swatch grid, landed 2026-10-09 (SE53 to SE83), its dynamics axis waiting on the dynamics lane (SE69). Rulings SE1 to SE87 (§1). Waiting: genet branch `value-engine` (SE39 to SE42) for Mark or genet's lane to land, then mere's rhai `ValueEngine` and the rule runner after a coordinated repin. The Turnstone follow-up (SE32, SE35) is on Turnstone main at `d0775a1` (§3). Mapped, not opened: wallpapers and props, the style editors, authored motion (§3).
 **Scope:** the editor foundation that Scenograph's editing surfaces stand on: one undo history in Cambium, and arrangement options declared as data. Carries out the balaur review's rulings A and B. The projection editor in Graphshell is the first consumer of both.
 
 Not in scope, mapped in §3 and opened by later rounds:
@@ -9,6 +9,7 @@ Not in scope, mapped in §3 and opened by later rounds:
 - wallpapers and props, the node, edge and field style editors, and authored motion.
 
 **Related:**
+- [cross-app design language record, 2026-10-09](../../2026-08-23_projection_scenes_and_graph_native_platform.md#9-configurable-visual-and-interaction-language-2026-10-09): selection-shaped context and swatches, themeable forme regions, configurable appearance; product direction with open choices identified, not an additional editor track.
 - [balaur review brief](../research/2026-10-06_balaur_review_brief.md): rulings A to E and the findings (§3.2, §3.3) this plan builds on.
 - [Scenograph expansion brief](../research/2026-08-10_scenograph_expansion_brief.md): lanes L1 to L5; L2 (backdrops) is landed, L4 and L5 wait on consumers.
 - [projection grammar adoption plan](2026-08-15_projection_grammar_adoption_plan.md) and [catalog](../research/2026-08-15_projection_grammar_catalog.md): the grammar the editor authors. The same lane owns both documents and this plan.
@@ -186,7 +187,7 @@ Mark: "proceed!" Evidence put: the June gloss design (`mere_docs/design/2026-06-
 
 **SE68, the types' home.** Options: Swatch, Facet and Scope in scenograph beside the recipe, a facet compiled by scenomise (recommended); all in scenomise. Mark: **"Types in scenograph, compile in scenomise (Recommended)"**.
 
-**SE69, the recipe's dynamics slot.** Evidence put: the dynamics grammar plan's F21 ruled "Two slots, one binding" (a recipe names an arrangement and, optionally, a dynamics recipe); seiche's `DynamicsSpec` is the portable spec (F4); the authored recipe has no dynamics slot; seiche has no serde and F104 settles its carrier. Options: the dynamics lane builds the slot and the grid consumes it (recommended); this lane builds it to F21. Mark: **"Dynamics lane builds it, grid consumes (Recommended)"**. *Follows:* the physics coordinator is briefed; the grid's dynamics axis waits for the slot.
+**SE69, the recipe's dynamics slot.** Evidence put: the dynamics grammar plan's F21 ruled "Two slots, one binding" (a recipe names an arrangement and, optionally, a dynamics recipe); seiche's `DynamicsSpec` is the portable spec (F4); the authored recipe has no dynamics slot; seiche has no serde and F104 settles its carrier. Options: the dynamics lane builds the slot and the grid consumes it (recommended); this lane builds it to F21. Mark: **"Dynamics lane builds it, grid consumes (Recommended)"**. *Follows:* the physics coordinator is briefed; the grid's dynamics axis waits for the slot. *Annotation 2026-10-09:* the dynamics grammar plan ruled the slot's shape as F192 to F195 (mere `f89b229b`): an opaque, versioned `DynamicsSlot { version, spec }` on the recipe, scenograph keeping only sceno and serde (F192); the recipe's arrangement and the spec's target must agree or binding refuses (F193); a variant varies dynamics by a catalog preset id or a whole slot (F194); SE70's settle is a seiche function every host calls, with a native-against-wasm receipt, its default step bound to come back as a measured number (F195). The dynamics lane builds it; the grid takes the axis when it lands.
 
 **SE70, settled frames.** Options: seeded, run from the spec's seed to its law's stop rule or a fixed step bound on libm maths (SE40), the settled positions written into the cell's scene (recommended); the host settles, best effort. Mark: **"Seeded, run to the spec's stop (Recommended)"**.
 
@@ -213,6 +214,20 @@ Mark: "proceed!" Evidence put: the June gloss design (`mere_docs/design/2026-06-
 **SE81, picking a cell.** Options: apply it as one undo step through E2's history, the grid staying open (recommended); focus, then apply with a button. Mark: **"Apply it, one undo step (Recommended)"**.
 
 **SE82, a scope axis in the editor.** Options: arrangement only in the editor, scope arriving with the gloss (recommended); both now. Mark: **"Both now"**. *Found after the answer:* the editor compiles a host-supplied `ProjectionDataset` (source, revision, fields, occurrences; no relationships), three occurrences in the practice fixture; every `Scope` variant names graph structure the dataset lacks, and `SubgraphKind` has no plain selection kind. Put back as SE83.
+
+**SE83, the editor's scope rows.** Evidence put: SE82's finding. Options: two rows, every occurrence and the occurrences selected, `Scope` gaining a `Selection` of explicit ids that the gloss can reuse, the selection row hidden until something is selected (recommended); defer scope to the gloss; give the editor graph datasets first. Mark: **"Whole set and the selection (Recommended)"**. *Follows:* `Scope::Selection(Vec<String>)`; the editor's selection is one occurrence today, so its row shows that one until multiple selection exists.
+
+### 1.7 The sandbox features (2026-10-09)
+
+The mer3ly site session relayed its Ruling 158 (Mark: "Promote where a home exists"): the `/repos/` graph sandbox's scatter, deck and facets map onto the swatch grid and its field and tangible backdrops onto L2's backdrops, each a stack capability this lane owns, the sandbox keeping them until they land. Evidence put, read from mer3ly's `assets/graph-sandbox.js`: scatter and deck are further appearances of the same sources (`buildRepeatedAppearances`), swatches under other recipes; the sandbox's "facets" are selected parts of one appearance (`{view, source, facet}`, facet one of cell, heading, summary or status), saved in the shelfmark as `mer3ly.facets`, the sense SE71 retired; its views are linked by a crossfilter selection and the deck dismisses one appearance as an instance delta (`visible: false`); S1's grid is view only (SE65); sceno's `Backdrop` carries a kind and `collidable`, pictograph paints kinds and collidable edges, the Graphshell viewer offers no backdrop mode, and "field" has no definition (the catalog's field rasters wait on a field consumer).
+
+**SE84, the site's facets.** Options: into a linked-selection track, renamed, the shelfmark key migrating (recommended); drop them; keep them site-local. Mark: **"Into a linked-selection track (Recommended)"**. *Follows:* appearance-part selection joins S2 under a new name, put to Mark there.
+
+**SE85, linked swatches.** Options: track S2, a facet's cells sharing a selection and hiding one appearance per cell, as host intents (recommended); selection only; not now. Mark: **"Track S2: linked swatches (Recommended)"**.
+
+**SE86, backdrops.** Options: track B1, the Graphshell viewer drawing a scene's backdrops with a mode control and tangible backdrops as physics obstacles, clear, ambient and props now and field once defined (recommended); all four now; fold into the swatch work. Mark: **"Track B1, field later (Recommended)"**.
+
+**SE87, handing the next work to Codex (2026-10-09).** Mark: "could we hand it to codex? IDK, it's friday and i've got 25% usage left ;_;" Options: S2 and B1 (recommended); the dynamics slot (F192 to F195); all three. Mark: **"All three"**. *Follows:* `mere_docs/research/2026-10-09_scenograph_codex_handoff.md` hands the dynamics slot, the grid's dynamics axis, B1 and S2 to the Codex agent, in that order; the physics coordinator is told the slot moved.
 
 ## 2. Tracks
 
@@ -297,6 +312,22 @@ Done when:
 - a settled cell is identical across two runs and across native and wasm;
 - the catalog carries the facet's and the swatch's addition record;
 - a headed check in Chrome and Firefox shows the grid, focuses a cell live, and applies a variant with undo.
+
+### S2 — linked swatches (SE84, SE85)
+
+A facet's cells act together, so the mer3ly sandbox's scatter, deck and linked views move onto the stack.
+- **Shared selection.** A facet carries a selection of clauses per cell (crossfilter or highlight, as the site's `selection.clauses`), which every cell reads; picking routes as a host intent.
+- **Appearance-part selection.** Selecting a part of one appearance (the site's cell, heading, summary, status) is a clause of its own, under a new name put to Mark; the site's `mer3ly.facets` shelfmark key migrates to it.
+- **Per-cell visibility.** A cell may hide one appearance while its source stays (the deck's dismiss), as a visibility delta on that cell.
+- **Consumers.** The projection editor's grid and the site's sandbox (scatter and deck as cells).
+
+Done when: the selection and visibility round-trip in a facet and replay through scenotime; a cell's hidden appearance leaves the source and the other cells untouched; the site's sandbox state maps onto it without loss; a headed check links two cells' selection in Chrome and Firefox.
+
+### B1 — backdrops in the Graphshell viewer (SE86)
+
+The viewer draws a scene's backdrops and offers the backdrop mode: clear, ambient and props now, field once defined; a tangible (collidable) backdrop is an obstacle to its physics.
+
+Done when: the viewer draws each kind and its tangible edge; a tangible backdrop holds nodes out in a physics test, with a control where an intangible one does not; the mode travels in the scene state; a headed check in Chrome and Firefox.
 
 ### E3 — the option declaration type (B, SE7)
 
@@ -430,3 +461,4 @@ Verified 2026-10-07 against mere's origin unless named.
 - **2026-10-08, SE52 built, held.** Branch `c2-labels` (`cddf72ac`): the four labels, Graphshell's buttons and pills on the catalogue, and `ports/graphshell/tests/button_labels.rs` with its control. command-menu 13 and button_labels 2 pass; the wasm build and the headed check wait on main's genet pin split.
 - **2026-10-08, the web host's genet pin, and SE52 landed.** Mark: "fix the web genet pin yourself". `ports/graphshell/web/Cargo.toml`'s seven genet pins move from `965b64e2` to `e84f9c7f`, the root's since `632c1d29`; the lock resolves one genet, netrender and taproot, and the host builds for wasm. SE52's labels landed on top. Headed on that build: Chrome, h3_boot and canvas_commands with its reopen; Firefox, canvas_commands with its reopen (the sink's log shows the fresh wasm fetched). Finding: on `e84f9c7f` some node bodies draw as circles where `965b64e2` drew squares, on the same stored data (a control build of `9e482f3a` showed squares). pictograph asks for them: `.gnode-representation-glyph` and `.gnode-circle` set `border-radius: 50%` (`crates/canvas/pictograph/src/canvas/build.rs`). *Reading, not ruled:* the newer genet honours a radius the older one dropped. Next door, not fixed: `ports/distillery/probe/Cargo.toml` still pins genet `965b64e2`.
   *Annotation 2026-10-08:* on the circles, Mark: **"that's also cool, if that's a fix, i can accept that"**. On the distillery pin, Mark: **"fix the distillery pin too"**: its three `[patch]` rows move to `e84f9c7f`; the probe checks for wasm32 and its committed lock resolves one genet and one taproot, also picking up `command-menu` and `edit-history` through cambium and genet's `wuff` in place of `fontsan-woff2`. Its real-model receipts were not rerun: they measure inference, which the repin does not reach, and need the fetched model matrix.
+- **2026-10-09, S1 landed: the swatch grid in the projection editor.** `mere-curation` 0.1.0 published (SE78) with `SubgraphSpec` and `SubgraphKind`, forme re-exporting; scenograph's `Scope` (with `Selection`, SE83), `Swatch`, `Facet`; scenomise's `compose_facet`; graphshell's `projection_compare` and the editor's Preview | Compare, the working draft first and every other family that compiles, over the whole set and the selection, a pick applying the family as one undo step. Tests: mere-curation 1, scenograph 13, scenomise 157 (8 facet), graphshell lib 212 (4 compare), graphshell-client facet_frozen 1. Headed: `projection_compare.scn` in Chrome and Firefox; the first runs failed at the pick (buttons kept stale ids when a pick renamed cells at an equal count, so the page stopped updating), fixed by keying the rebuild on the target ids; a screenshot found frames offset half a cell from their cards (a rect footprint centres on its item), fixed in `compose_facet` with a test that every cell's items lie inside its frame; headings now keep a readable size. Open: settled frames with dynamics (SE70) wait on the dynamics lane's slot (SE69); the gloss pane is the second consumer (SE62).

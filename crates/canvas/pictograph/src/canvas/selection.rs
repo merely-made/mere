@@ -157,9 +157,11 @@ impl Canvas {
         // already present), so we don't gate success on its return: for a clean
         // pair the relation is present afterwards either way, which is what
         // "relate these two" means. Reconcile rebuilds edges / springs.
+        let asserter_iri = self.graph.write_author().asserter_iri();
         let _ = apply_graph_delta(
             &mut self.graph,
             GraphDelta::AssertRelation {
+                asserter_iri,
                 from: pair[0],
                 to: pair[1],
                 assertion: EdgeAssertion::Semantic {
@@ -188,9 +190,11 @@ impl Canvas {
         let Some(to) = self.graph.get_node_key_by_id(to_id) else {
             return false;
         };
+        let asserter_iri = self.graph.write_author().asserter_iri();
         let _ = apply_graph_delta(
             &mut self.graph,
             GraphDelta::AssertRelation {
+                asserter_iri,
                 from,
                 to,
                 assertion: EdgeAssertion::Semantic {
@@ -505,11 +509,12 @@ impl Canvas {
         let to = self.graph.get_node_key_by_id(to_id)?;
         let cell = EdgeCell { from, to, selector };
         self.graph
-            .relations()
-            .any(|relation| {
+            .projected_relations()
+            .any(|(_, relation)| {
                 relation.from == from
                     && relation.to == to
-                    && crate::canvas::edge_cells::selector_for_relation_kind(relation.kind) == selector
+                    && crate::canvas::edge_cells::selector_for_relation_kind(relation.kind)
+                        == selector
             })
             .then_some(cell)
     }
@@ -527,8 +532,8 @@ impl Canvas {
     fn edge_cells_between_pair(&self, a: NodeKey, b: NodeKey) -> Vec<EdgeCell> {
         let pair = if a <= b { (a, b) } else { (b, a) };
         self.graph
-            .relations()
-            .filter_map(|relation| {
+            .projected_relations()
+            .filter_map(|(_, relation)| {
                 let rel_pair = if relation.from <= relation.to {
                     (relation.from, relation.to)
                 } else {
@@ -559,6 +564,7 @@ impl Canvas {
     /// reconcile it. (Swatch-primitive P5 — hiding relaxes the spring in that instance
     /// only; graph truth, membership, and every other instance are unaffected.)
     fn resync_edge_springs(&mut self) {
+        self.physics_view_revision += 1;
         self.physics
             .sync_edges(visible_relation_edges(&self.graph, &self.hidden_edges));
         self.settle_physics(SETTLE_TICKS / 3);

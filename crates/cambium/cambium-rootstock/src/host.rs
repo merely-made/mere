@@ -730,6 +730,10 @@ where
     /// CPU-side attribution for the frame that just completed. Present in
     /// `after_frame`; other hooks see the last completed frame, if any.
     pub frame_profile: Option<FrameProfile>,
+    /// Successful presentation from the most recent redraw attempt. A failed
+    /// acquisition clears this value; it never repeats an older presentation
+    /// as if the attempted frame reached the queue. Windowless layout has none.
+    pub presentation: Option<PresentedFrame>,
 }
 
 impl<State, Logic, V, T> AppCtx<'_, State, Logic, V, T>
@@ -824,8 +828,10 @@ where
     /// The tail of every input dispatch: persist, push state to backends,
     /// drain window-chrome requests.
     pub after_dispatch: AppHook<State, Logic, V, T>,
-    /// Runs after a frame is presented and the accessibility tree synced:
-    /// scenario pumping and other per-presented-frame work.
+    /// Runs after a redraw attempt and accessibility synchronization. Inspect
+    /// `AppCtx::presentation` before doing work that requires a new presented
+    /// frame. Failed acquisition still gives asynchronous readback and bounded
+    /// presentation waits a turn; it must not advance a presentation scenario.
     pub after_frame: AppHook<State, Logic, V, T>,
     /// Runs after an application-owned worker wakes the host, before the
     /// redraw it requested. Drain the application's own channel here.
@@ -1073,6 +1079,10 @@ where
     pub pending_stamped_capture: Option<StampedCaptureFn>,
     pub presentation_host: u64,
     pub presentation_sequence: u64,
+    /// The current redraw's successful presentation, cleared at the start of
+    /// each attempt. Separate from the monotonic sequence, which survives a
+    /// failed acquisition and a surface suspension.
+    pub last_redraw_presentation: Option<PresentedFrame>,
     pub pending_paint_capture: Option<PaintCaptureFn>,
     /// Pointer events an application hook asked the host to deliver to itself,
     /// drained through the real input path once the hook returns.
@@ -1148,6 +1158,7 @@ where
             pending_stamped_capture: None,
             presentation_host: next_host_identity(),
             presentation_sequence: 0,
+            last_redraw_presentation: None,
             pending_paint_capture: None,
             pending_pointer: Vec::new(),
             pending_scroll: Vec::new(),
@@ -1451,6 +1462,7 @@ where
                 render_core: self.s.shared.render_core.as_ref(),
                 geometry,
                 frame_profile,
+                presentation: self.s.last_redraw_presentation,
             };
             match which {
                 Hook::AfterDispatch => (self.hooks.after_dispatch)(&mut ctx),
@@ -1497,6 +1509,7 @@ where
             render_core: self.s.shared.render_core.as_ref(),
             geometry: self.s.geometry,
             frame_profile: self.s.last_frame_profile,
+            presentation: self.s.last_redraw_presentation,
         };
         observer(&ctx, frame);
     }
@@ -1589,6 +1602,7 @@ where
                 render_core: self.s.shared.render_core.as_ref(),
                 geometry,
                 frame_profile,
+                presentation: self.s.last_redraw_presentation,
             };
             (self.hooks.close_request)(&mut ctx, request)
         };

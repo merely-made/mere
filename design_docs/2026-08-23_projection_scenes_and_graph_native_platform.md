@@ -8,6 +8,12 @@
 derive the capabilities Mere, Scenograph, Cambium, and Genet need to extend the
 web platform with graph-native application behavior.
 
+**2026-10-09 continuation:** [§9](#9-configurable-visual-and-interaction-language-2026-10-09)
+records Mark's cross-app visual and interaction direction: selection and
+ambient context, the forme as a field, predictable dynamics, configurable
+themes and fonts, and Emblem/Pictograph iconography. It is a design record;
+implementation and consumer adoption remain with the owning plans.
+
 **Related:**
 
 - [projection grammar catalog](mere_docs/research/2026-08-15_projection_grammar_catalog.md)
@@ -441,6 +447,10 @@ itself neither proves wire exposure nor authorizes an alias.
 
 ## 8. Acceptance receipts
 
+The [projection receipts plan](archive_docs/2026-10-06_completed_plans/2026-08-23_projection_receipts_plan.md)
+owns completion evidence and receipt status; the list below records the
+original acceptance shape.
+
 The following receipts would prove the platform shape without requiring every
 scene in the catalog:
 
@@ -480,3 +490,236 @@ scene in the catalog:
 These receipts would demonstrate a graph-native application platform extending
 the web platform while preserving the authority and ownership boundaries of
 Mere, Scenograph, Cambium, Genet, and their applications.
+
+## 9. Configurable visual and interaction language (2026-10-09)
+
+**Status (2026-10-09):** recorded from Mark's *Explore Mere’s design language*
+conversation, at his request to record, commit and push it. This section is
+the shared home for that discussion across Mere and its apps. It extends this
+platform direction record; it does not assign new implementation tracks or
+change another plan's progress.
+
+The decisions below paraphrase Mark unless presented as quotations.
+*Inherited semantics* identifies an existing ruling; *checked precedent*
+identifies existing mechanisms; *suggestion, not ruled* identifies an option
+the discussion left open. Mark described the discussion as brainstorming, so
+these are product direction and constraints, not a complete interaction spec.
+
+### 9.1 Familiarity and the two working surfaces
+
+The game reference was Rimworld, especially the familiarity people acquire
+when an interface lets them interact with content, scenes and worlds. The
+desired qualities are control over placement, customization, predictable
+behavior, and keeping relevant things within reach without making everything
+demand attention. Familiarity comes from learning what an entity does and
+how the environment responds to its data and relationships.
+
+The workbench, Frisket and forme cater to the web platform and to presenting
+all kinds of content: recursively splittable tiles can present addressed
+content, media, documents, attributes and resources. The dataspace explores
+and contextualizes that content and its relationships. They are complementary
+ways to work with the same domain, with connections between their arrangements.
+
+Dataspace presentation can vary with the data and the chosen view: canvas,
+strata, planes, dimensionality, wallpaper, scenes and props; nodes, links and
+fields; different arrangements and dynamics. Background, foreground and
+overlay describe presentation roles here, not a ruling that every scene has
+exactly three physical or geometric planes.
+
+### 9.2 Selection, foreground and ambient context
+
+The foreground is the current selection, together with nodes explicitly
+pinned there. Selecting three nodes updates the HUD/GUI to reflect those
+three: controls, context, and the background's presentation, membership or
+scope can respond. Deselecting them returns the view to its preceding context.
+
+Mark:
+
+> things you've selected return to the background when you deselect them,
+> but remain in the background until dismissed. what you don't interact with
+> streams past with changing context, in the periphery.
+
+Interaction therefore makes a difference to background membership. Previously
+selected nodes remain available until dismissed; untouched peripheral content
+can change as context changes. A lens chooses which ambient context is
+relevant. This is how things stay in reach while attention moves elsewhere.
+
+A foreground pin keeps a node informing the view while the person selects
+other things. Deselecting a pinned node does not remove its foreground role.
+The exact handling of view edits made during a selection, and the lifetime of
+these choices across scenes or reopened sessions, need a later specification.
+
+*Inherited semantics:* the [ambiance record](mere_docs/design/2026-09-23_ambiance_design.md)
+separates attention from keeping. This selection behavior describes view
+curation; it does not equate foreground pins or retained background membership
+with long-term memory, nor silently change the ambient/short-term/long-term/
+codicil keeping levels.
+
+### 9.3 Opening, activity and resource identity
+
+Opening follows the node's registered presentation. An engine that presents
+through the workbench can open a tile or focus an existing one; related nodes
+with open tiles are also represented in the workbench. Other presentations,
+such as an applet, can unfold in situ or pop out into an overlay. The dataspace
+should make activity legible: inactive, active/open, and possibly doing work
+passively in the background. The final state names and indicators remain open.
+Selection, activity and where something is presented are separate concerns.
+
+Mark's example for identity was two browser tabs both showing Google: they
+are two accessings of the content, even when they share the same resource.
+
+*Inherited semantics:* the [graph semantics plan](mere_docs/implementation_strategy/2026-10-04_graph_semantics_plan.md),
+especially rulings 6 and 19 and its placement table, already distinguishes
+resources from surfaces. Resource identity and content statements are shared;
+surfaces retain independent traversal, arrangement and layout containment,
+and record which resource they show. The canvas can lift resource content
+links onto surfaces. Thus a resource need not appear as a second visible node
+in the familiar surface view; an appropriate lens may expose the resource
+graph directly. This discussion adopts that boundary. It does not reduce
+resources to addresses or contingent metadata, or merge independent accesses
+because they currently show the same resource.
+
+### 9.4 The forme as a field
+
+A particular field can be called the **forme**: it represents and configures
+the workbench's recursive tile arrangement in the dataspace. Its subregions
+correspond to tiles and their grouping/nesting. The arrangement of active
+nodes' tiles should be persisted and represented, so a connected subgraph can
+influence the forme while its field makes the working arrangement legible.
+
+Grouping and nesting are necessities. Relative placement is desirable;
+relative size is useful when configurable. Nodes can be anchored to positions
+derived from the forme arrangement, moved as needed, or position-pinned when
+movement is undesirable, such as when presenting video or other media.
+
+Layout manipulation should be an explicit gesture. Mark suggested locking
+and unlocking the field: when unlocked, moving the field/subregions, or
+explicitly treating a node as a tile's tab/handle, can expose drop-region
+previews of the proposed split or position. Ordinary node interaction should
+not inadvertently become a tile rearrangement gesture. The exact gesture and
+whether a layout lock also pauses dynamics were not settled.
+
+Keep these controls distinguishable:
+
+| Control | Intended role |
+|---|---|
+| Foreground pin | Keep a node contributing to the current context while selection changes. |
+| Position anchor | Give a node a target, including one derived from the forme arrangement. |
+| Position pin | Keep its position fixed against dynamics. |
+| Forme layout lock | Guard the explicit editing of the workbench arrangement. |
+
+The [dynamics grammar plan](mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md)
+owns the existing arrangement roles and their realization. This record gives
+the interaction intent; it does not declare a new dynamics role or storage
+schema.
+
+The field's regions exist independently of their visual treatment. Mark
+preferred a quiet outer region with subregions revealed on hover or selection,
+and also valued permanently visible recursive boundaries. Both should be
+themeable presentations of the same structure. HUD placement is configurable:
+panes, overlays and other arrangements are valid options. A dockable summary
+and local overlays were an assistant suggestion, not a chosen universal default.
+
+### 9.5 Dynamics and inspectable links
+
+Dynamics should follow the nature of the entities and their data, so the
+result becomes predictable as the person learns that data. Directly handled
+things should remain available and behave consistently; related peripheral
+things can be more fungible until selected. Dynamics can reveal a relationship
+before the person understands it, and inspection should explain what produced
+the relationship rather than leaving motion as the only evidence.
+
+Links should also explicate derived relationships beyond those covered by the
+existing families. A selection's context menu can choose which families matter;
+hovering a choice can show a swatch of what applying it would look like for
+that selection. Scripts, derived-link search, Eidetic history and search
+engines were named as possible ways to discover or produce context.
+
+Mark preferred the natural word **link** and floated using *link* and *edge*
+to distinguish explicit from derived/computed relationships. That split was
+not decided. Using *link* generally in the UI with authored/computed/inferred
+provenance was an assistant suggestion. The grammar's identifiers and
+relationship semantics remain with their owning records until that choice is
+made. Likewise, preview behavior does not establish a new truth mutation,
+undo policy or persistence policy by itself.
+
+### 9.6 Configurable appearance, iconography and fonts
+
+Mark, correcting the idea of one palette:
+
+> Have you seen tabard? One palette is not the vibe. Configurable, that is.
+> Maybe some defaults like woodshed used to have.
+
+The shared design language therefore includes configurable presentation and
+useful defaults. No single palette or quiet visual treatment is mandated
+across the apps. Defaults can provide coherent starting arrangements; users
+must be able to customize them.
+
+*Checked precedent:* [Tabard's theme model](../ports/tabard/src/lib.rs) carries
+seed-based definitions, modes and custom mode sheets; its
+[registry](../ports/tabard/src/theme/registry.rs) distinguishes built-ins from
+user themes and supports forking a user copy. Woodshed's
+`woodshed/crates/woodshed-views/src/theme.rs` at
+`e08bf4b9875a7efb02b1c17bf9fac56708712cee` has Slate, Ember, Light, Dusk,
+Meadow and Parchment definitions represented as built-in Tabard themes. These
+are precedents for variety, not a ruling to impose those six defaults on every
+app. The [theme modes plan](mere_docs/implementation_strategy/2026-07-05_theme_modes_plan.md)
+owns its implementation history and remaining consumer work.
+
+Mark also named **Emblem and Pictograph for iconography**. The existing roles
+fit together: [Emblem](https://crates.io/crates/emblem) encodes/decodes compact
+IconVG vector graphics, including icons and glyphs; palette references permit
+retheming. [Pictograph](../crates/canvas/pictograph/README.md) derives
+deterministic node faces from content addresses, with palette slots and
+coarse/full levels of detail, using Emblem's encoding. Authored symbols and
+derived entity faces can share the rendering and theme mechanisms. This does
+not claim that Emblem supplies a finished authored icon collection.
+
+Mark:
+
+> Fonts, whatever fonts you have on your computer. I would like people to be
+> able to configure that too. You can use a nice arrangement of open source
+> options for defaults.
+
+Installed fonts should be selectable by the person; curated openly licensed
+font combinations provide defaults. Role-based choices for UI, reading,
+source and labels, with size/weight/spacing controls and user overrides, were
+assistant suggestions, not a ruled settings schema. The defaults are not a
+requirement to use one family throughout the stack. As a checked precedent,
+`knot-editor/apps/desktop/assets/fonts/README.md` and
+`knot-editor/apps/desktop/src/fonts.rs` record bundled IBM Plex Mono and
+Source Serif 4, with SIL Open Font License notices. They demonstrate an
+existing openly licensed combination, not the default chosen here for Mere.
+
+### 9.7 Open choices and handoff
+
+Later implementation work should resolve the choices left open: link/edge
+terminology; exact HUD defaults and activity indicators; font preference
+roles and platform realization; selection restoration after intervening view
+edits; the lifetime of pins and retained background membership; family-choice
+persistence and swatch commit/undo behavior; and whether forme layout locking
+affects dynamics. No implementation completion is inferred from this record.
+
+| Consumer | Direction to carry into its existing work |
+|---|---|
+| Cambium/workbench/forme | Recursive regions, explicit layout manipulation, drop previews, persistent arrangement, configurable HUD placement. |
+| Graph semantics | Preserve resource/surface identity; keep attention, activity and presentation distinct. |
+| Scenograph/projections | Selection-shaped context, lens-defined ambiance, themeable field regions, and previews scoped to the selection. |
+| Dynamics | Meaningful and explainable relationships, stable direct interaction, distinct anchors and position pins. |
+| Tabard and appearance consumers | Configurable themes, varied defaults, installed-font choice with openly licensed defaults. |
+| Iconography consumers | Emblem for vector graphics and Pictograph for derived node faces, integrated with theme palettes. |
+
+The [Scenograph editor plan](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md),
+[Cambium architecture](cambium_docs/technical_architecture/2026-09-03_cambium_architecture.md),
+and the other owning plans linked above remain the implementation homes.
+Apps can cite this section as the shared design direction rather than copying
+it into separate competing records.
+
+**Consumer reconciliation (2026-10-09):** the [ambient relation-lens proposal](mere_docs/design/2026-09-23_ambiance_design.md#10-proposal-focus-driven-relation-lenses-2026-10-07)
+applies §9.2 to temporary lens reasons and previously selected background
+membership, while preserving the keeping axis. The [app composition brief](cambium_docs/research/2026-10-06_app_composition_brief.md#11-current-consumers-and-design-direction-2026-10-09)
+links retained sessions, owner-served projections and the separately granted
+Moot applet experiment. The [Scenograph handoff](mere_docs/research/2026-10-09_scenograph_codex_handoff.md)
+records current site state and overlapping viewer ownership. These are
+implementation context and proposals; they do not settle the open choices
+above or infer consumer completion from this direction record.

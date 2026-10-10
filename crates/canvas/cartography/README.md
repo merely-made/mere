@@ -44,7 +44,7 @@ Package `mere-cartography`, lib name `cartography`. Most contract types derive
 
 ## Scene output
 
-`scene_from_projection(&Projection, id_of, extent_of) -> sceno::Scene` lowers a
+`scene_from_projection(&Projection, id_of, extent_of) -> CoveredScene` lowers a
 projection into the portable scenograph contract. Nodes become
 `sceno::ProjectedItem`s (measured extent becomes `Footprint::Rect`, otherwise
 the projection radius becomes `Footprint::Circle`, otherwise `Footprint::Point`),
@@ -97,3 +97,5 @@ Pre-1.0.
 ## License
 
 MPL-2.0 (see LICENSE).
+
+`CoveredScene` keeps the portable scene in `scene` and graph coverage in `coverage`. An empty coverage note reports no known limit within the supplied graph; it does not claim world completeness.

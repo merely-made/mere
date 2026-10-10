@@ -56,7 +56,9 @@ pub fn load_graph(session_dir: &Path) -> io::Result<Option<Graph>> {
     let text = fs::read_to_string(&path)?;
     let snapshot: GraphSnapshot =
         serde_json::from_str(&text).map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
-    Ok(Some(Graph::from_snapshot(&snapshot)))
+    Graph::try_from_snapshot(&snapshot)
+        .map(Some)
+        .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))
 }
 
 /// True when the session directory has a graph file on disk.
@@ -134,6 +136,58 @@ mod tests {
         let dir = temp_session_dir("no-file");
         assert!(load_graph(&dir).unwrap().is_none());
         fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn checked_snapshot_file_load_rejects_invalid_resources_and_preserves_input() {
+        use crate::persistence::{PersistedResourceFacet, PersistedResourceRecord};
+
+        let dir = temp_session_dir("checked-load");
+        let mut valid = fixture_graph().to_snapshot();
+        valid.resources.push(PersistedResourceRecord {
+            canonical_iri: "urn:mere:test:store".into(),
+            facets: vec![PersistedResourceFacet {
+                facet: "foreign.metadata".into(),
+                value_json: "true".into(),
+            }],
+        });
+        let path = graph_path(&dir);
+        let content = valid
+            .resources
+            .iter()
+            .position(|record| record.canonical_iri == "urn:mere:test:store")
+            .unwrap();
+        fs::write(&path, serde_json::to_vec(&valid).unwrap()).unwrap();
+        let loaded = load_graph(&dir).unwrap().unwrap();
+        assert_eq!(loaded.to_snapshot().resources, valid.resources);
+        for conflict in [false, true] {
+            let mut invalid = valid.clone();
+            if conflict {
+                let mut record = invalid.resources[content].clone();
+                record.facets[0].value_json = "false".into();
+                invalid.resources.push(record);
+            } else {
+                invalid.resources[content].facets[0].value_json = "{".into();
+            }
+            let bytes = serde_json::to_vec(&invalid).unwrap();
+            fs::write(&path, &bytes).unwrap();
+            let error = match load_graph(&dir) {
+                Err(error) => error,
+                Ok(_) => panic!("invalid resources were loaded"),
+            };
+            assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+            assert!(!error.to_string().is_empty());
+            assert_eq!(fs::read(&path).unwrap(), bytes);
+        }
+        let mut legacy = serde_json::to_value(&valid).unwrap();
+        for column in ["resources", "resource_edges", "shown_resources"] {
+            legacy.as_object_mut().unwrap().remove(column);
+        }
+        fs::write(&path, serde_json::to_vec(&legacy).unwrap()).unwrap();
+        let loaded = load_graph(&dir).unwrap().unwrap();
+        assert_eq!(loaded.node_count(), valid.nodes.len());
+        assert!(loaded.to_snapshot().resources.is_empty());
+        fs::remove_dir_all(&dir).unwrap();
     }
 
     #[test]
