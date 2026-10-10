@@ -337,6 +337,23 @@ The viewer draws a scene's backdrops and offers the backdrop mode: clear, ambien
 
 Done when: the viewer draws each kind and its tangible edge; a tangible backdrop holds nodes out in a physics test, with a control where an intangible one does not; the mode travels in the scene state; a headed check in Chrome and Firefox.
 
+**B1 backend draft (2026-10-10):** `Canvas::set_projection_backdrops` resolves
+a scene's spaces and transforms for graph-canvas paint and static contact.
+Unknown appearance kinds use the existing stable kind paint. Invisible
+collidable geometry remains an obstacle. Concave contact polygons and
+contact paths/points refuse by path pending a footprint adapter; a refusal
+retains the previous bound layer. The separate Seiche obstacle set leaves
+living scenery, gravity and node tangibility intact. This is implementation
+work, not B1 acceptance. Viewer controls, mode persistence and headed checks
+remain open under R162's site ownership. The sandbox's current mode and
+tangibility separation is evidence for the control draft, not a new ruling.
+The retained short 120-step probe leaves residual overlap. Rapier caps
+correction at 3 world units per second; the active-law/control check uses
+the canvas's existing 360-step settle budget. All four focused native
+binder tests pass, and Seiche's library suite passes 161 with 10 ignored.
+Larger/deeper or idle placements retain an explicit qualification limit;
+the exclusion tolerance and host settle budget are unchanged.
+
 ### E3 — the option declaration type (B, SE7)
 
 A declaration type in `crates/cambium/scenes/scenograph`: per option, its key, one of the seven kinds (`finite`, `positive`, `count`, `depth`, `flag`, `choice` with its names, `list`), its default, and a label for the editor.

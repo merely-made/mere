@@ -107,6 +107,27 @@ probe remain in the existing testing directory. No isolated target, Cargo home
 or worktree was created. The shared `C:/t/cargo-targets/mere` target and browser
 package are retained for Mere's ongoing work and the open Firefox gate.
 
+**B1 backend continuation (2026-10-10, draft):** the graph canvas now has a
+portable backdrop binder with a separate static-obstacle set. Its resolved
+geometry supplies both camera-aligned paint and contact; visibility and
+collision stay independent. The binder preserves the previous layer on a
+path-specific refusal. Unsupported contact paths, points and concave polygons
+need a further footprint adapter. Living scene bodies, gravity and node
+tangibility are retained when the obstacle set changes.
+
+The mode/control fork and R162 viewer-file handoff have been put to Mark.
+No reserved viewer files have been edited by this continuation. Mode state,
+viewer integration and Chrome/Firefox checks are still open. The retained
+`backdrops-idle-overlap.txt` probe retains the short 120-step, idle-body
+failure. Rapier caps correction at 3 world units per second. The
+active-law/control check uses the canvas's existing 360-step settle budget;
+larger/deeper or idle placements remain a qualification limit. No exclusion
+tolerance or host settle budget changed. All four focused native binder tests
+pass, and Seiche's library suite passes 161 with 10 ignored. The locked
+standalone viewer wasm compile check passes on Genet `7422e906` and Vello
+`10f01d6d`. This backend draft neither closes B1 nor refreshes the earlier
+dynamics identity receipt.
+
 B1/S2 continue through the viewer owner assigned by site R162. The concrete
 next slices are: B1's three-mode control, backdrop drawing, tangible obstacle
 binding and its intangible control; then S2's clause selection, per-appearance
