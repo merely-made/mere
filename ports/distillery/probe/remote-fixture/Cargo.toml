@@ -14,7 +14,7 @@ burn-wgpu = { version = "=0.22.0", default-features = false, features = ["std"] 
 cubecl = { version = "=0.11.0", default-features = false }
 distillery = { path = "../..", features = ["remote"] }
 esp = { path = "../../../../crates/intel/esp", features = ["bert"] }
-identity = { package = "personae", path = "../../../../crates/dramatis/personae" }
+identity = { package = "personae", git = "https://github.com/merely-made/dramatis.git", rev = "c1d620764315b4c750fcffea30b8c898b8bb73bc" }
 mesh = { package = "mere-mesh", path = "../../../../crates/mesh/mesh" }
 muniment = { path = "../../../../crates/eidetic/muniment" }
 serde = { version = "1", features = ["derive"] }

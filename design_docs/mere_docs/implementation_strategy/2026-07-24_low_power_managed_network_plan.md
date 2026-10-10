@@ -33,7 +33,7 @@ boundary. The radio, Reticulum, and queue work lands in the Retinue workspace.
 ## Related work
 
 - The
-  [`2026-07-26_notochord_session_policy_spine_plan.md`](../../archive_docs/2026-08-06_completed_plans/2026-07-26_notochord_session_policy_spine_plan.md)
+  `2026-07-26_notochord_session_policy_spine_plan.md` (`repos/dramatis/design_docs/archive_docs/2026-08-06_completed_plans/2026-07-26_notochord_session_policy_spine_plan.md`)
   took the landed V3-V7 session-admission pieces through a shared facts and
   admitted-session boundary. Its two-consumer gate passed and `notochord` is
   now the authoritative package name.
@@ -147,7 +147,7 @@ authority.
 **Corrected 2026-10-06 (S14 pass):** the grammar has since split. `5364dfa0`
 (2026-09-24) moved the delegation statements and their checks from personae to
 insigne; notochord depends on insigne with its `verify` feature
-(`crates/system/notochord/Cargo.toml`), and personae keeps issuing.
+(`repos/dramatis/crates/notochord/Cargo.toml`), and personae keeps issuing.
 
 ### D6. The session proof signs the transport context
 
@@ -456,7 +456,7 @@ correct authenticated peer, and a wrong-peer assertion fails.
 ### V5. Minimal local evaluator
 
 **Repository:** Mere
-**New crate:** `crates/system/notochord`
+**New crate:** `repos/dramatis/crates/notochord`
 
 Add the crate to the Mere workspace and workspace dependency table.
 
@@ -526,7 +526,7 @@ transit independently.
 **Repository:** Mere
 **Files:**
 
-- `crates/system/notochord/src/handshake.rs`
+- `repos/dramatis/crates/notochord/src/handshake.rs`
 - focused integration tests in `notochord`
 - one Murm acceptance adapter
 
@@ -938,7 +938,7 @@ checkout.
 
 ### 2026-07-25 (evening) — V5 landed
 
-**V5 (Mere).** `crates/system/notochord` exists (package
+**V5 (Mere).** `repos/dramatis/crates/notochord` exists (package
 `notochord`, no prefix needed) with the planned vocabulary
 (`NetworkId`, `ProfileRef`, `LocalNetworkPolicy`, `SessionRequest`,
 `SessionDecision`, `DenyReason` + granular `ChainFault`, `TrafficClass`,

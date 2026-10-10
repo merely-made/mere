@@ -340,7 +340,7 @@ authority boundary prove useful. Until then it can remain a shared surface
 consumed by Castellan and the communications port.
 
 **Ruled 2026-08-22 (with Mark):** this is the **gazette port**, founded on
-the dramatis tier beside castellan (`crates/dramatis/gaz` + `gazette` +
+the dramatis tier beside castellan (`repos/dramatis/crates/gaz` + `gazette` +
 feeds, with `mere-crawl` as the feed engine per the
 [leverage census](2026-08-10_leverage_census_brief.md)). The two readings in
 this section are the port law's two halves rather than alternatives: the
@@ -357,7 +357,7 @@ dramatis resolver crate already held it — package and lib both, published,
 484 lines, no library consumers — and bare `gazetteer` is held by a stranger,
 so freeing the name by renaming the resolver was unavailable. Ruled: the
 resolver *is* the port, one directory earlier than expected.
-`crates/dramatis/gaz` moved to `ports/gazette`, keeping its package name,
+`repos/dramatis/crates/gaz` moved to `ports/gazette`, keeping its package name,
 version, and code; the manifest, README, and module doc were reframed to the
 port identity, and the workspace member and dependency entries follow. The
 reasoning is the 2026-08-10 brief's own: the word's three senses — an index,
@@ -556,7 +556,7 @@ incumbent application.
 7. Found the gazette port; its picker consumed by Knot, Moot, and Signalman
    is the boundary proof 7.3 asked for. *(Amended 2026-08-22. **Executed
    2026-08-23 by promotion**, per the naming ruling in 7.3: the resolver
-   crate moved `crates/dramatis/gaz` → `ports/gazette`, keeping its
+   crate moved `repos/dramatis/crates/gaz` → `ports/gazette`, keeping its
    package name and code, with the manifest, README, and module doc reframed
    to the port. Compiles from its new home; the picker and feed surfaces
    remain unbuilt.)*

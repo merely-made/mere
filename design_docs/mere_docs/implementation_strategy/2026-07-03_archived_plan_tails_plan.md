@@ -761,7 +761,7 @@ Archived as [2026-10-06_completed_plans/2026-08-14_castellan_keeper_founding_pla
   without the agent stack — here. The dramatis repo plan's cut through
   castellan may take it, but does not name it.
   **Amended 2026-10-06:** owner: the
-  [dramatis repo plan](../../dramatis_docs/implementation_strategy/2026-10-06_dramatis_repo_plan.md),
+  dramatis repo plan (`repos/dramatis/design_docs/2026-10-06_dramatis_repo_plan.md`),
   which took it in `73812e3a` and records, as a reading not ruled, that its
   rulings D14 and D15 make the split unnecessary.
 
@@ -968,7 +968,7 @@ Archived as [2026-10-06_completed_plans/2026-06-05_comms_shell_plan.md](../../ar
 - **Mooting protocol adapters** (Matrix, Nostr) as those backends land —
   here.
 - **The contact model**, deferred 2026-06-15 — here; the
-  [gaz founding plan](../../dramatis_docs/implementation_strategy/2026-08-08_gaz_founding_plan.md)
+  gaz founding plan (`repos/dramatis/design_docs/2026-08-08_gaz_founding_plan.md`)
   may own it, but not plainly.
 
 #### From tearout_gestures (S51)
@@ -1105,18 +1105,18 @@ Archived as [2026-10-06_completed_plans/2026-06-26_capture_provenance_consent_pl
 
 #### From insigne_proofs (S56)
 
-Archived as [2026-10-06_completed_plans/2026-09-23_insigne_proofs_plan.md](../../archive_docs/2026-10-06_completed_plans/2026-09-23_insigne_proofs_plan.md).
+Archived as 2026-10-06_completed_plans/2026-09-23_insigne_proofs_plan.md (`repos/dramatis/design_docs/archive_docs/2026-10-06_completed_plans/2026-09-23_insigne_proofs_plan.md`).
 
 - **The remaining sibling repins: Hocket, Woodshed and mer3ly** (Turnstone
   repinned in `d6b62ad`) — owner: the
-  [dramatis repo plan](../../dramatis_docs/implementation_strategy/2026-10-06_dramatis_repo_plan.md).
+  dramatis repo plan (`repos/dramatis/design_docs/2026-10-06_dramatis_repo_plan.md`).
 
 #### From identity-vault-ssh-agent (S56)
 
 Archived as [2026-10-06_completed_plans/2026-07-22_identity-vault-ssh-agent_plan.md](../../archive_docs/2026-10-06_completed_plans/2026-07-22_identity-vault-ssh-agent_plan.md).
 
 - **V4, broader item types** — owner: the
-  [chatelaine and CXF import plan](../../dramatis_docs/implementation_strategy/2026-10-01_chatelaine_cxf_plan.md).
+  chatelaine and CXF import plan (`repos/dramatis/design_docs/2026-10-01_chatelaine_cxf_plan.md`).
   S56 answers the plan's S14 question: yes, V4 moves to chatelaine.
 - **V5, sync** (no replicated `IdentityStorage` exists) — here.
 - **The V3 follow-ons**: a passphrase prompt, `generate`, and the ShortTtl
@@ -1141,7 +1141,7 @@ Archived as [2026-10-06_completed_plans/2026-08-10_castellan_otp_plan.md](../../
 
 #### From dramatis_tier (S57)
 
-Archived as [2026-10-06_completed_plans/2026-08-10_dramatis_tier_plan.md](../../archive_docs/2026-10-06_completed_plans/2026-08-10_dramatis_tier_plan.md).
+Archived as 2026-10-06_completed_plans/2026-08-10_dramatis_tier_plan.md (`repos/dramatis/design_docs/archive_docs/2026-10-06_completed_plans/2026-08-10_dramatis_tier_plan.md`).
 
 - **The `dramatis` facade**, ruled real on 2026-10-01 for repos outside Mere
   and unbuilt — owner: the dramatis repo plan, whose ruling D1 makes dramatis

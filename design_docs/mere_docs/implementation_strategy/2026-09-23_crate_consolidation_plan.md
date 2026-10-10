@@ -6,7 +6,7 @@
 `8167d196`, C4's last fold `cambium::nematic` on 2026-09-25). insigne's
 phases A to D have landed (A `5364dfa0`, B `538226a3`; C in Mere and Knot and
 D in Gaz on 2026-09-29, per the
-[insigne proofs plan](../../archive_docs/2026-10-06_completed_plans/2026-09-23_insigne_proofs_plan.md)),
+insigne proofs plan (`repos/dramatis/design_docs/archive_docs/2026-10-06_completed_plans/2026-09-23_insigne_proofs_plan.md`)),
 and chatelaine's P1 to P3 (`da3c50bc`, `3e4992ec`, `ff68e86c`, by 2026-10-02),
 which meets C5's conditions. Open: C5's version baseline; C6's crates.io
 deletions, which are Mark's; and the dramatis facade (C2's dramatis row,
@@ -373,7 +373,7 @@ crate inventory at the Code root.
   dramatis tier, chatelaine's CXF-shaped taxonomy remains.
 - 2026-10-01. Mark ruled the shapes of the two remaining dramatis
   reservations, recorded with the evidence in the
-  [dramatis tier architecture](../../dramatis_docs/technical_architecture/2026-09-30_dramatis_tier_architecture.md)
+  dramatis tier architecture (`repos/dramatis/design_docs/2026-09-30_dramatis_tier_architecture.md`)
   §7. chatelaine is a plain taxonomy like insigne's core, and castellan's OTP
   read model moves in; its CXF import policy is ruled for all 17 types.
   dramatis is a real facade for repos outside mere. Both are unbuilt. C5's
@@ -381,7 +381,7 @@ crate inventory at the Code root.
   its shape ruled, that condition is now buildable rather than waiting on
   design. The facade is not a C5 condition.
 - 2026-10-01, later. The
-  [chatelaine and CXF plan](../../dramatis_docs/implementation_strategy/2026-10-01_chatelaine_cxf_plan.md)
+  chatelaine and CXF plan (`repos/dramatis/design_docs/2026-10-01_chatelaine_cxf_plan.md`)
   is drafted. Mark ruled that chatelaine subsumes castellan's Secret Service
   store as part of founding (its ruling 17), so C5's chatelaine condition is
   met at that plan's P3: the taxonomy, OTP on it, and the Secret Service on
