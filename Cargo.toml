@@ -258,8 +258,8 @@ graphshell-endpoint = { version = "0.0.2", path = "crates/graphshell/graphshell-
 # with the lent signing seed (vault lock rulings 49, 57-59), on Knot's
 # current-family repin: every Mere row at `f1d169c7`, genet `965b64e`. Knot
 # moved first, and djinn's `knot-site` row follows this one.
-knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "e224748fb0b251c77963bce071cf08c0d9078708" }
-knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "e224748fb0b251c77963bce071cf08c0d9078708" }
+knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "fef132ef9922ede907d80950762a7f313508547e" }
+knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "fef132ef9922ede907d80950762a7f313508547e" }
 # The credential-keeper port (dramatis plan D4). No longer a reservation:
 # C1/C2 landed the OTP core, sealed OTP items, the release gate, and the
 # `keeper` identity surface graphshell re-exports.
