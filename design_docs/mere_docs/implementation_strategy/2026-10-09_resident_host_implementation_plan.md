@@ -1,6 +1,6 @@
 # Initial Resident Host Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (the user-selected orchestration method) to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. Root runs all Cargo commands serially; one writer owns each shared module.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (the user-selected orchestration method) to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. Root serializes compilation; independent runtime tests may overlap. One writer owns each shared module.
 
 **Goal:** Give Graphshell/Djinn's owned complete GraphSession a configurable partial presentation, typed live edits, explicit durability outcomes, staged checkpoint publication, refresh and portable coverage.
 
@@ -11,7 +11,7 @@
 **Spec:** [Approved initial resident host design](../technical_architecture/2026-10-09_resident_host_design.md). Read it alongside the [parent follow-ons plan](2026-10-09_graph_semantics_followons_plan.md).
 
 **Date:** 2026-10-09
-**Status (2026-10-09):** Written spec and concrete plan approved by Mark. Team implementation starts with Task 1; Tasks 2–8 remain pending. Root runs Cargo serially and preserves separate consumer qualification.
+**Status (2026-10-09):** Written spec and concrete plan approved by Mark. Tasks 1–2 are complete and locally committed at a61dfb5c9 and 652acbb72 after independent reviews. Task 3 starts combined persistence staging; Tasks 4–8 remain pending. Root serializes compilation and preserves separate consumer qualification; independent runtime tests may overlap.
 
 ## Global Constraints
 
@@ -110,7 +110,7 @@ pub fn shown_resource(&self, surface: uuid::Uuid) -> Option<uuid::Uuid>;
 
 The private Catalog uses the existing schema type inside addressable_graph. Use the existing catalog's complete incident records for observations. Never derive these hashes from ResidentGraph::graph().
 
-- [ ] Add this compile-ready test to the existing graph_residency integration test, which already supplies source(), roots(), Backend and MemoryBackend:
+- [x] Add this compile-ready test to the existing graph_residency integration test, which already supplies source(), roots(), Backend and MemoryBackend:
 
 ```rust
 #[cfg(not(target_arch = "wasm32"))]
@@ -135,11 +135,11 @@ fn preparation_has_no_writes_and_observations_use_complete_records() {
 }
 ```
 
-- [ ] Root runs `cargo test --locked -p pandect --test graph_residency preparation_has_no_writes_and_observations_use_complete_records -- --exact`; expect RED because preparation/accessors do not exist.
-- [ ] Extract the current serializer into the pure preparation function without changing JSON shape, edge indexes/order, navigation/pending ownership or digest rules. Preserve the existing write_recorded_graph public API by having it prepare, apply once, return generation. Add tests comparing prepared ops with current complete publication and rejecting Residency-limited/unrecorded input before writes.
-- [ ] Add a Surface with the same UUID as a Resource to the existing identity controls; assert separate digests and shown mapping. Add an incident edge whose other endpoint is unloaded; assert observed digest matches the complete publication even though the resident edge is filtered.
-- [ ] Root runs the named RED test, `cargo test --locked -p pandect --test graph_residency`, and the existing Pandect library tests. Require GREEN and exact recorded-snapshot round-trip.
-- [ ] Reviewer checks unchanged encoding and no partial-record hashing; root commits this task locally after review.
+- [x] Root runs `cargo test --locked -p pandect --test graph_residency preparation_has_no_writes_and_observations_use_complete_records -- --exact`; expect RED because preparation/accessors do not exist.
+- [x] Extract the current serializer into the pure preparation function without changing JSON shape, edge indexes/order, navigation/pending ownership or digest rules. Preserve the existing write_recorded_graph public API by having it prepare, apply once, return generation. Add tests comparing prepared ops with current complete publication and rejecting Residency-limited/unrecorded input before writes.
+- [x] Add a Surface with the same UUID as a Resource to the existing identity controls; assert separate digests and shown mapping. Add an incident edge whose other endpoint is unloaded; assert observed digest matches the complete publication even though the resident edge is filtered.
+- [x] Root runs the named RED test, `cargo test --locked -p pandect --test graph_residency`, and the existing Pandect library tests. Require GREEN and exact recorded-snapshot round-trip.
+- [x] Reviewer checks unchanged encoding and no partial-record hashing; root commits this task locally after review.
 
 **Done:** preparation performs zero backend writes and provides complete record observations, with old publication behavior intact.
 
@@ -187,7 +187,7 @@ pub fn edit_live_now(&mut self, author: kernel::graph::Author,
     commands: Vec<ObservedCommand>) -> Result<LiveApplied, LiveEditError>;
 ```
 
-- [ ] Add these compile-ready test functions to the planned integration test. Imports are `kernel::graph::{Author, Graph, apply::add_node}`, `muniment::MemoryBackend`, `pandect::{MereSessions, addressable_graph::GraphAddress, live_graph::*}`, and `uuid::Uuid`.
+- [x] Add these compile-ready test functions to the planned integration test. Imports are `kernel::graph::{Author, Graph, apply::add_node}`, `muniment::MemoryBackend`, `pandect::{MereSessions, addressable_graph::GraphAddress, live_graph::*}`, and `uuid::Uuid`.
 
 ```rust
 #[test]
@@ -240,13 +240,13 @@ fn later_missing_target_rejects_entire_batch_and_capture() {
 }
 ```
 
-- [ ] Root runs `cargo test --locked -p pandect --test live_graph`; expect RED for missing module/facade.
-- [ ] Implement preflight on a complete scratch clone with its per-graph recorder cleared and thread capture isolated. Check externally supplied record/shown/tag observations against the original complete source first. Then validate target existence, earlier creations and normalized operations in sequence on scratch; references to records created in the batch use scratch existence rather than invented original digests. Return a prevalidated stable-ID command program. Reject missing targets before mutation. Reject omitted mandatory checks for existing records; an Exists-only check is permitted for a record created within this batch. Do not accept an arbitrary closure, replay record or raw record replacement through this API.
-- [ ] Run the prevalidated program under one GraphSession::edit_now call, resolving keys anew **inside its complete candidate**. Preflight and application have no await, external callbacks or writer interleaving. Do not return a fallible Result from edit_now's closure and assume Err rolls it back: the closure's result is only payload. All input-driven refusal happens in preflight; product validator/replay errors still occur before session installation. The application program contains only already-validated operations and writer-local IDs.
-- [ ] Preserve URL lookup before absence checking for CreateAddress. A hit returns the existing UUID and creates no new Surface. Later batch references use actual stable IDs, not an implicit alias from a requested UUID to that hit. A miss uses AddNode { id: Some(id), url, position: Default::default() } and trimmed nonempty SetNodeTitle.
-- [ ] EditNode requires Surface existence, unchanged shown binding and unchanged observed Surface/Resource digests plus content tags. Normalize/trim tags; compute removals from complete node_content_tags. Use SetNodeTitle, RemoveNodeTag and InsertNodeTag. SetFacet/SetPinned/SetMimeHint require Surface record checks. Require qualified recorded placement for this partial-command facade, in addition to existing session writability. SetMimeHint uses the existing metadata operation. Relation checks distinguish Resource placement for Cites/Hyperlink/UserGrouped from Surface placement for CollectionMember/FrameMember. Emit AssertRelation with writer keys and current Author's asserter IRI.
-- [ ] Add table-driven parity tests for all six commands against direct complete live deltas, with two authors' tags, parallel/self assertions and UUID-stratum overlap. Compare full snapshots, facets, navigation and exact captured statements; flush/reopen and undo retain identical history. Test unqualified placement, read-only codicil, validator refusal, stale shown binding, changed hidden incident record, malformed boundary IDs/JSON, unsupported Complete operations, and a positive unrelated-source edit with unchanged observations. Parse external replay UUID fields before any existing captured replay parser is called; imports remain Complete-only.
-- [ ] Root runs `cargo test --locked -p pandect --test live_graph`, `cargo test --locked -p pandect --lib`, and graph_residency tests. Reviewer checks live/replay differences and capture isolation. Root commits locally.
+- [x] Root runs `cargo test --locked -p pandect --test live_graph`; expect RED for missing module/facade.
+- [x] Implement preflight on a complete scratch clone with its per-graph recorder cleared and thread capture isolated. Check externally supplied record/shown/tag observations against the original complete source first. Then validate target existence, earlier creations and normalized operations in sequence on scratch; references to records created in the batch use scratch existence rather than invented original digests. Return a prevalidated stable-ID command program. Reject missing targets before mutation. Reject omitted mandatory checks for existing records; an Exists-only check is permitted for a record created within this batch. Do not accept an arbitrary closure, replay record or raw record replacement through this API.
+- [x] Run the prevalidated program under one GraphSession::edit_now call, resolving keys anew **inside its complete candidate**. Preflight and application have no await, external callbacks or writer interleaving. Do not return a fallible Result from edit_now's closure and assume Err rolls it back: the closure's result is only payload. All input-driven refusal happens in preflight; product validator/replay errors still occur before session installation. The application program contains only already-validated operations and writer-local IDs.
+- [x] Preserve URL lookup before absence checking for CreateAddress. A hit returns the existing UUID and creates no new Surface. Later batch references use actual stable IDs, not an implicit alias from a requested UUID to that hit. A miss uses AddNode { id: Some(id), url, position: Default::default() } and trimmed nonempty SetNodeTitle.
+- [x] EditNode requires Surface existence, unchanged shown binding and unchanged observed Surface/Resource digests plus content tags. Normalize/trim tags; compute removals from complete node_content_tags. Use SetNodeTitle, RemoveNodeTag and InsertNodeTag. SetFacet/SetPinned/SetMimeHint require Surface record checks. Require qualified session placement for this partial-command facade, including recorded sessions and legacy sessions admitted through their validated durable translation receipt, in addition to existing session writability. SetMimeHint uses the existing metadata operation. Relation checks distinguish Resource placement for Cites/Hyperlink from Surface placement for UserGrouped/CollectionMember/FrameMember; use the existing effective placement authority for other relations. Emit AssertRelation with writer keys and current Author's asserter IRI.
+- [x] Add table-driven parity tests for all six commands against direct complete live deltas, with two authors' tags, parallel/self assertions and UUID-stratum overlap. Compare full snapshots, facets, navigation and exact captured statements; flush/reopen and undo retain identical history. Test unqualified placement, read-only codicil, validator refusal, stale shown binding, changed hidden incident record, invalid decoded command semantics, unsupported Complete-operation dependencies, and a positive unrelated-source edit with unchanged observations. This facade takes decoded UUID/JSON values and never admits raw replay. Malformed external UUID/JSON text is tested at Task 7's actual product boundary before any captured replay parser; imports remain Complete-only.
+- [x] Root runs `cargo test --locked -p pandect --test live_graph`, `cargo test --locked -p pandect --lib`, and graph_residency tests. Reviewer checks live/replay differences and capture isolation. Root commits locally.
 
 **Done:** no resident NodeKey crosses the adapter; rejected batches leave writer/history/reader untouched; exact live semantics survive replay/undo.
 
@@ -729,5 +729,9 @@ Dependencies and signatures were checked: tasks consume only verified existing i
 
 ## Progress
 
-- **2026-10-09:** Read approved spec, parent lane, canonical policy/index and relevant source interfaces. Concrete plan written and self-reviewed. No implementation, backend/consumer edit, Cargo run, commit or push performed. Awaiting the user's plan review before the preserved orchestration method proceeds.
+- **2026-10-09:** Read approved spec, parent lane, canonical policy/index and relevant source interfaces. Concrete plan written and self-reviewed, then approved by Mark. Local documentation checkpoints 59393140d and ec41bf4a2 retain that approval. Task 1 has a test-only preparation control staged; its expected-failure gate is running. No host production change has been made yet. Consumer default libraries pass 751 tests with 9 existing skips; the remaining consumer gates are separate from host qualification.
 - **2026-10-09:** Mark approves the concrete plan. Root records the interface/file preflight and starts Task 1 under the preserved team method. Each task receives observed tests and an independent task review; final host qualification and publication remain pending.
+
+- **2026-10-09:** Task 1 complete at local `a61dfb5c9bba1347965f9cfa8b0a936d4e1c1a7d`. Expected API RED followed by named GREEN (1), full native residency controls (10, including real redb) and Pandect libraries (349), with zero new skips and unchanged qualified source. Independent task review is spec compliant and quality approved. Firefox runtime controls are wired but their execution belongs Task 8. Task 2 starts with a fresh implementer and two test-only controls. All host source remains local pending whole-host qualification and publication approval.
+
+- **2026-10-09:** Task 2 complete at local `652acbb72cecb98ec341cedea84e17b88d0e134c`. Missing-API RED, a scoped test-inference repair, then eight live-command controls, 349 Pandect library tests and ten residency tests pass with unchanged runtime inputs. Independent review approves the exact four-file candidate without blocking findings. Qualified legacy admission, Surface placement for UserGrouped, and decoded input boundaries are recorded in the task. Malformed external text and the suggested shared-Resource creation control remain assigned to product integration. Task 3 begins one retained combined checkpoint/publication batch.

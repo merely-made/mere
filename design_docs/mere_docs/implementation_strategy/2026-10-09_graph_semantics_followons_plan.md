@@ -7,10 +7,16 @@ feature-free/workspace checks and both query wasm checks pass. Fresh review
 found one Important parser-feature regression; the scoped repair has observed
 RED/GREEN controls and the full green gates. All 108 owned consumer Mere rows
 select this source in isolated successors. Knot and Redshank passed their provider
-gates and have local commits; Turnstone now selects those commits and is under
-qualification. Consumer publication and the final family review remain pending.
+gates and have local commits; Turnstone selects those commits and passed default
+and Piccolo libraries (751 and 784 tests, each with 9 existing skips), plus both
+all-target checks. One fresh consumer source review found no defects, and its full
+file freeze matches local Turnstone commit `767e1613ca4b35673d36260fd8c9e4fb3a305377`.
+Consumer publication remains pending approval. Fresh remote main is unchanged for
+Knot/Redshank, but Turnstone adds `25f85bd` document pumping; its conflict-free
+merge preview is not yet integration-qualified.
 The initial Graphshell/Djinn resident-host spec is approved, and its concrete
-implementation plan is approved and entering Task 1. The
+implementation plan is approved; Tasks 1–2 are reviewed and locally committed,
+and Task 3 begins combined persistence staging. The
 RDF checkpoint and coordination documents are published at `a8889f60e`; consumer
 candidates remain local until their gates, review and publication approval.
 
@@ -294,3 +300,5 @@ claims, each supported by its own evidence.
 
 - **2026-10-09:** Knot `ab191d4d` and Redshank `fea7f0f7` pass provider gates and remain local. Turnstone now selects both provider commits and supplier `297682178`; its default/Piccolo qualification is running. The initial host implementation plan is written, source-checked and indexed for Mark’s review. Host code has not started.
 - **2026-10-09:** Mark approves the concrete host plan. Task 1 starts with pure publication preparation and complete catalog observations. Turnstone’s one-file CoveredScene compatibility repair passes seven focused endpoint controls; full default/Piccolo qualification continues independently. Portable wire coverage and actual residency activation remain subsequent host tasks.
+
+- **2026-10-09:** Host Tasks 1–2 complete locally at `a61dfb5c9` and `652acbb72`, with focused tests, full Pandect/residency controls and independent task reviews. Task 3 begins storage staging; reader/product/browser integration remains pending. Turnstone newer-main integration passes 759 default library tests with nine inherited skips and its scoped source review; Piccolo and all-target gates remain active. Consumer and host publication approvals remain separate.
