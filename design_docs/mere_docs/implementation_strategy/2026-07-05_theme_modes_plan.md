@@ -9,6 +9,12 @@ plan's P3 host half.
 native reader adapters and stock-client visual acceptance remain open below. The July
 receipts describe their original host; they do not establish current Knot or
 Turnstone settings, foreign exports or persistence.
+
+**2026-10-09 design direction:** the [cross-app design language record](../../2026-08-23_projection_scenes_and_graph_native_platform.md#9-configurable-visual-and-interaction-language-2026-10-09)
+records configurable themes with varied defaults, Emblem/Pictograph iconography,
+and user-selected installed fonts with openly licensed bundled defaults. It
+does not establish implementation or consumer adoption of those preferences.
+
 **Related**: `repos/genet/docs/2026-07-05_w3c_mechanism_adoption_plan.md` (P3 engine half landed:
 `IncrementalLayout::set_prefers_color_scheme`), `repos/tincture` *(historical citation)* <!-- doc-audit: historical-path --> (tinct seed-to-palette
 derivation), `crates/meerkat/src/theme_sheets.rs` *(historical citation)* <!-- doc-audit: historical-path --> + `theme_edit.rs` (current sheet baking +

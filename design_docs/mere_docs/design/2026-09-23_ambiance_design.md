@@ -12,6 +12,11 @@ memory design. No code.
 **Status (2026-09-23):** recorded; every question raised while writing it was
 ruled the same day (§9).
 
+**2026-10-09 continuation:** the [cross-app design language record](../../2026-08-23_projection_scenes_and_graph_native_platform.md#9-configurable-visual-and-interaction-language-2026-10-09)
+clarifies selection-driven foreground/context, foreground pins, and previously
+selected nodes remaining in the background until dismissed. It concerns view
+curation; the attention/keeping distinction and keeping levels below stand.
+
 The rulings in §2 are Mark's. Quoted text is verbatim. Several rulings were
 choices Mark made among options offered to him, and the text says so where it
 reports them. Sections marked *analysis* are the assistant's reading of the
