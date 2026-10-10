@@ -13,12 +13,14 @@ the remaining gates; linked plans own later editor and dynamics status. The
 reservoir's V3–V5 resident implementation has advanced independently; its
 process fixtures do not close this browser cutover or mount the mere panel.
 **Nested host-dataset continuation (2026-10-09):** implemented on
-`codex/nested-graph-view`, with published main `dafacc25c` merged at
-`6a7c7d8fa`. The bounded headed proof passes on the default Radeon WebGPU
+`codex/nested-graph-view`, with published main `3567c8e93` and the site
+cutover baseline `7c0c12008` merged at `86a8421db`. The bounded headed proof passes on the default Radeon WebGPU
 adapter after the coarse bitmap traversal repair. Mark approved
 implementing expandable repository groups and entering their constituent graph.
-This is a view-local projection over explicit membership; portable scene folds,
-saved scene integration and the live site's viewer replacement remain separate work.
+Rulings 161–162 now require portable `sceno::Fold` facts and give the site
+lane ownership of the shared viewer files. The branch is adapting its explicit
+membership to folds; combined qualification and landing are in progress. Saved
+scene integration and the live site's viewer replacement remain separate work.
 **Scope:** Graphshell's browser page becomes one retained Cambium tree. Its
 HTML controls become Cambium components, its display-only Cambium chrome
 joins them, pictograph's canvas renders into the tree as a texture producer,
@@ -608,8 +610,13 @@ this tree.
 ### Additional target: expandable host groups (2026-10-08)
 
 The host chooses a parent-to-member relationship kind through `?grouping=` or
-the root's `data-grouping-kind`. Scenomise validates this as a forest and
-projects a `GroupViewState`; dependency relationships never infer ownership.
+the root's `data-grouping-kind`. `scenomise::host_dataset::folds` validates
+this as a forest and lowers the closed frontier to portable `sceno::Fold`
+facts; dependency relationships never infer ownership. Visibility comes from
+`Scene::fold_effect`, with expansion choices in `FoldViewState`. Closed
+ancestors fold the union of their descendants and suppress inner facts, so
+active folds never overlap. Entering unfolds the ancestor path without
+overwriting remembered expansion choices.
 Graphshell consumes the result in its retained tree. No S1 schema extension,
 stored graph mutation, or second renderer is introduced. This first slice
 uses group nodes and membership edges, not nested frame geometry.
@@ -635,7 +642,8 @@ selected real member crates. It is a manifest-declaration slice, not a claim
 that current snapshot versions compile together or a full Cargo closure.
 The S1 byte and compiler budgets remain in force. Larger resolved-build
 datasets, lens reason accounting, scenes saved/reopened with group state,
-portable folds and nested frame layout follow after this bounded proof.
+nested frame layout follow after this bounded proof. Portable folds are now
+part of this target under Ruling 161; saved/reopened scenes remain later work.
 
 Input generation is reproducible: capture each named workspace with
 `cargo metadata --locked --no-deps --format-version 1`, then pass the files
@@ -678,6 +686,20 @@ transfers DOM focus into the graph before traversal returns to the controls.
 - No Graphshell-only UI pieces. What Cambium lacks is added to Cambium.
 
 ## 6. Progress
+
+- **2026-10-09 — Rulings 161–162 adaptation, in progress:** incorporated
+  published Mere `3567c8e93` and site cutover baseline `7c0c12008` without
+  rewriting the pushed branch. The only merge conflict was the root lockfile;
+  resolution retains current main's dependencies and the qualified renderer
+  source. The former `scenomise::grouping` module is removed. The host adapter
+  now emits `sceno::Fold` facts with exact instance membership, a member
+  stand-in, the explicit descendants rule, source label and boundary counts.
+  Viewer disclosure derives from the portable fold effect and retains original
+  relationship witnesses. The complete source scene remains available beside
+  the viewer graph, including hidden instances. Tests and headed receipts are
+  being renewed on the combined sources. The site lane is independently
+  implementing history in the shared viewer files; its uncommitted work is
+  untouched and requires a committed checkpoint before combined integration.
 
 - **2026-10-09 — hosted camera recovery and live accessibility focus:** merged
   published main `dafacc25c` at `6a7c7d8fa`, retaining both the grouping and
