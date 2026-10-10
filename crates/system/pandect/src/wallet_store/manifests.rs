@@ -75,7 +75,6 @@ mod tests {
         let root = temp_data_root("missing");
         assert!(load_identity_wallet(&root).unwrap().is_none());
         assert!(load_device_roster(&root).unwrap().is_none());
-        assert!(load_local_device_identity(&root).unwrap().is_none());
         assert!(
             load_persona_wallet(&root, fixture_persona())
                 .unwrap()

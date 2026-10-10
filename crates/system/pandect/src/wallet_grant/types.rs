@@ -160,8 +160,9 @@ pub struct RemoteAuthPairingMaterial {
     pub short_auth_string: String,
 }
 
-/// Summary of one remote-auth device revocation.
-#[derive(Clone, Debug, PartialEq, Eq)]
+/// Summary of one remote-auth device revocation. Serializable since DR-C,
+/// because a revocation djinn performs is answered to the app that asked.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RemoteAuthRevocationOutcome {
     pub device_id: DeviceId,
     pub already_revoked: bool,

@@ -14,7 +14,7 @@ publish = false
 
 [dependencies]
 eidetic = { path = "../../eidetic/eidetic-core" }
-identity = { package = "personae", path = "../../persona/personae" }
+identity = { package = "personae", git = "https://github.com/merely-made/dramatis.git", rev = "c1d620764315b4c750fcffea30b8c898b8bb73bc" }
 # The radio family merged into one workspace on 2026-07-23; both crates now live
 # under retinue/crates/. Probes stay on local paths by design (they are excluded
 # from the mere workspace and never published) and adapt to upstream layout.

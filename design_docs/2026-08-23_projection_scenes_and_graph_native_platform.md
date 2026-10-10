@@ -520,6 +520,14 @@ content, media, documents, attributes and resources. The dataspace explores
 and contextualizes that content and its relationships. They are complementary
 ways to work with the same domain, with connections between their arrangements.
 
+*Clarified by Mark after the first study, 2026-10-09:* "I guess i was thinking
+in terms of a force directed node graph, but that works too", followed by
+"This is not a bad thing to have either, though. I can appreciate that both
+are possible." The dataspace study should therefore lead with a force-directed
+graph, while keeping the deliberate workbench/forme view as another useful
+presentation of the same content. This is a clarification of the study's
+emphasis, not a requirement that every application or lens use forces.
+
 Dataspace presentation can vary with the data and the chosen view: canvas,
 strata, planes, dimensionality, wallpaper, scenes and props; nodes, links and
 fields; different arrangements and dynamics. Background, foreground and
@@ -598,6 +606,10 @@ explicitly treating a node as a tile's tab/handle, can expose drop-region
 previews of the proposed split or position. Ordinary node interaction should
 not inadvertently become a tile rearrangement gesture. The exact gesture and
 whether a layout lock also pauses dynamics were not settled.
+
+*Clarified 2026-10-10:* the [agreed forme draft session, §9.11](#911-forme-draft-session-2026-10-10),
+now specifies unlock, node-as-tile-handle previews, scoped undo, discard and
+lock-and-apply. Whether the layout lock also pauses dynamics remains open.
 
 Keep these controls distinguishable:
 
@@ -826,10 +838,86 @@ in the initial planning record and corrected on 2026-10-09. Storage mapping
 and dynamics participation remain planning questions; this record does not
 claim an implementation of them.
 
-### 9.10 Mixed-content scene and embedded forme study (2026-10-10)
+### 9.10 Presentation rules agreed (2026-10-09)
+
+Mark, on §9's follow-up discussion and the six examples below:
+
+> I think those are all wonderful graph interactions, your targets and
+> conditions and presentation decisions, they all make immediate sense to me.
+> Target->condition->effect, rhai, etc. all agreed. Proceed
+
+Agreed direction: author presentation as **target → condition → effect**, with
+explicit precedence, fallbacks and explanations of which rules matched.
+Representation decisions precede measurement and arrangement; user placement
+and pins survive presentation changes. The examples Mark accepted are:
+
+| Target and condition | Presentation decision |
+|---|---|
+| Image-bearing node in an overview | Thumbnail with its identity marker. |
+| Selected node | Configured attributes and controls. |
+| Node below a screen-size threshold | Compact face, with a separate threshold for restoring detail. |
+| Membership link in a hierarchy scene | Containment. |
+| Derived link being inspected | Its rule, inputs and explanation. |
+| Unlocked forme field | Subregions and applicable drop previews. |
+
+The interactive authoring surface is target → condition → effect with a live
+swatch; Rhai serves more involved rules, under the Scenograph editor plan's
+SE36–SE42 binding and dependency rulings. A first aesthetic study uses the
+same mixed-content scene across three editable starting treatments (paper
+and ink, workshop, night), independently of arrangement and representation.
+These are study presets, not prescribed palettes for every application.
+
+The [Scenograph editor plan](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md)
+owns track R1 for the shared declarative model and first interactive study.
+Production host adoption and the Rhai runner are separately qualified there.
+
+### 9.11 Forme draft session (2026-10-10)
+
+**Agreed interaction; implementation pending.** Mark described unlocked nodes
+as tile handles: dragging a handle previews the corresponding tile region,
+split and nesting; dragging another node into the forme adds it to the proposed
+arrangement. Locking agrees to commit those changes. Asked how to discard the
+draft, Mark accepted a per-forme draft and undo history with an explicit
+discard action: "Alright, I'm down!"
+
+| Action | Effect |
+|---|---|
+| Unlock | Start an editing draft from this forme's committed arrangement and projection geometry. |
+| Undo / redo | Step through arrangement gestures within this draft. |
+| Discard changes | Drop the draft, return to the committed arrangement and lock the forme. |
+| Lock and apply | Commit the draft as one arrangement change, undoable afterward, then lock the forme. |
+
+Both the graph field and the tiled workbench can preview the same draft.
+Pending changes must be visible. The saved arrangement remains unchanged
+until apply; hiding handles or ordinary node selection is not a commit gesture.
+Discard abandons the editing session, while undo reverses individual gestures.
+
+The draft covers membership, grouping, splits, nesting, proportions and local
+placement. Semantic arrangement facts stay in Forme; geometric details stay
+in their projection state. It does not snapshot document contents, playback,
+resource metadata or unrelated graph edits. Discarding a node's proposed
+membership leaves the node and its content accesses intact. Dropping the
+draft also drops its private history; future unlocking starts from the
+committed state rather than undoing into a previous editing session.
+
+Undo routing follows the active editor. Arrangement gestures use this forme's
+draft history, typing in a document uses its document history, and committed
+arrangement changes use the owning host's saved-change history. A position
+pin, foreground pin and dynamics controls retain their separate meanings.
+This interaction settles how layout edits are drafted and accepted; it does
+not require another force-composition model or prescribe a scene's appearance.
+
+The [editor plan](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#forme-draft-follow-through-2026-10-10-agreed-interaction)
+maps the shared history and layout substrate to implementation steps and
+qualification. The gesture bridge and committed arrangement undo are pending;
+this agreement is not a runtime receipt.
+
+### 9.12 Mixed-content scene and embedded forme study (2026-10-10)
 
 **Proposal forwarded by Mark from the design-language agent; not a new
-ruling or implementation receipt.** Use one small scene containing a
+ruling or implementation receipt.** The presentation-rule direction was
+separately accepted in §9.10; this subsection proposes its richer study and host
+integration. Use one small scene containing a
 document, images, a playing video, related nodes and a forme with two
 side-by-side webpage accesses. Dress the same material in several editable
 treatments. Paper and ink, a warm workshop and a luminous night are candidate
@@ -850,7 +938,7 @@ field may disclose its boundary, subdivisions or influence. These are
 presentation alternatives; a drawn region alone does not implement field
 membership or behavior.
 
-**Candidate presentation rules:** target → condition → effect, with a live
+**Accepted rule direction; proposed study:** target → condition → effect, with a live
 swatch and an explanation of the matched rule, precedence and fallback.
 Examples include thumbnail faces for image-bearing nodes, configured details
 on selection, containment for membership, provenance for an inspected derived
@@ -907,3 +995,64 @@ on one axis with representation or arrangement on another; the shipped grid's
 axis contract is not expanded by this proposal. Keep source material and access
 identities stable across comparisons, disclose live versus captured faces,
 and evaluate appearance and behavior together.
+
+### 9.13 Backdrop, context, props and reset (2026-10-10)
+
+**Mark's correction to the backdrop cut.** The earlier Clear / Ambient /
+Props / Field mode list mixes different concerns. Mark prefers Clear as a
+reset action: return the scene to its initial arrangement relative to its
+backdrop. Contextual ambient nodes and props are classes or roles of entities
+within a scene, with independently configurable presentation and behavior.
+This revises the consumer direction behind SE86, not the earlier mechanical
+backdrop receipts.
+
+| Concern | Direction |
+|---|---|
+| Reset | An action that restores an arrangement relative to the scene's backdrop. It is not another scenery mode. |
+| Ambient content | Contextual propositions about what is relevant to foreground entities; its display can be turned off. |
+| Props | Scene entities with authored attributes, presentation or scripted behavior, including objects relevant to contextualizing the content. Their display can be turned off. |
+| Backdrop | The scene's set, potentially with depth, animation and interaction, rather than only static wallpaper. |
+| Physical participation | Collision, forces and other behavior remain separately configured; being a prop or ambient entity does not decide tangibility. |
+
+Static wallpaper, animated scenery, interactive scenery and scenery with
+scripted entities are possible treatments. This is capability direction, not
+a mandatory ladder, four mutually exclusive modes or a claim of a shipped
+interactive-backdrop runtime. Turning off contextual content or props does
+not by itself specify collision or simulation participation. Define those
+controls by the effect they change rather than infer behavior from a class
+name. Context discovery, paint visibility, input interaction and physical
+participation are distinct questions.
+
+Mark describes the foreground as pinned, currently selected or recently
+interacted-with entities. This adds recent interaction to the foreground
+criteria in §9.2. Its duration and transition back to retained background
+membership remain to be designed; it does not repeal the previously selected
+material's availability until dismissed. Contextual relevance does not imply
+that an entity must be noninteractive, intangible or stored permanently.
+
+**Checked portable substrate at published Mere `773a0dc2`:**
+[Backdrop](../crates/cambium/scenes/sceno/src/scene.rs) already carries
+independent `visible` and `collidable` flags. It deliberately stays outside
+ordinary item picking. The canvas binder inspected separately at local main
+`d572b322` preserves that distinction, including invisible obstacles; its B1
+draft record is not a claim that this binder exists in the published baseline.
+Interactive props need a connection to scene entities and their existing
+input/action authority; painting a backdrop does not establish that connection.
+[AmbientSim](../crates/canvas/pictograph/src/canvas/ambient/mod.rs) is decorative
+animation, distinct from the contextual ambient nodes described here. Its
+advance/paint seam is not the interactive scenery or relation-lens contract.
+
+**Remaining design:** identify the reset baseline and what it restores.
+Resetting arrangement coordinates, rewinding animation and resetting a
+scripted world's state are separate effects. Their combination, camera and
+pin handling, undo and interaction with an open forme draft are not decided
+by renaming Clear to Reset. Depth and richer scenery also require a forcing
+consumer; today's portable 2D transform/footprint contract does not establish
+a complete spatial scene implementation.
+
+The [editor's B1 follow-through](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#b1--backdrops-in-the-graphshell-viewer-se86),
+[dynamics plan](mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md#backdrop-control-correction-2026-10-10)
+and [ambiance continuation](mere_docs/design/2026-09-23_ambiance_design.md#backdrop-and-context-distinction-2026-10-10)
+carry this correction. The shared design is recorded here; controls, legacy
+mode migration and richer input/runtime behavior remain implementation and
+design work with their existing owners.

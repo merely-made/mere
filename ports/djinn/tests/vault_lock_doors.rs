@@ -15,11 +15,16 @@ use std::path::Path;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
+use castellan::authority::PersonaeHost;
+use castellan::custody::{
+    IdentityStorage, IdentityVault, OsPresence, Profile, SealedProfileStorage, UnlockMethod,
+};
+use djinn::identity_ui::{NativeIdentityUi, apply_native_identity_action};
 use djinn::resident_status::{
     self, AgentListenerV1, ControlUnlock, LockStateV1, NativeUnlocker, RESIDENT_APP,
     RESIDENT_CONTROL_ROUTE, RESIDENT_STATUS_ROUTE, ResidentControlEndpoint, ResidentEndpointsV1,
-    ResidentStatusEndpoint, ResidentStatusSource, ResidentStatusV1, STATUS_SCHEMA,
-    StartupUnlockV1, StopSignal, Unlocker,
+    ResidentStatusEndpoint, ResidentStatusSource, ResidentStatusV1, STATUS_SCHEMA, StartupUnlockV1,
+    StopSignal, Unlocker,
 };
 use graphshell::browser_carrier::{
     NativeIdentityAction, NativeIdentityFailure, NativeIdentityResult,
@@ -29,14 +34,9 @@ use graphshell::native::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants,
 use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
 use graphshell::native::app_client::{AppBrokerClient, AppClientError};
 use graphshell::native::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointRoute};
-use graphshell::native::identity_ui::{NativeIdentityUi, apply_native_identity_action};
 use graphshell::native::local_session::{DoorIdentity, door_salts};
-use graphshell::native::personae_host::PersonaeHost;
 use notochord::{NetworkId, ProfileRef, ProofBinding, SessionHello, TrafficClass};
-use personae::{
-    Ed25519Keypair, IdentityError, IdentityProvider, IdentityStorage, IdentityVault, OsPresence,
-    Profile, ProfileId, SealedProfileStorage, UnlockMethod,
-};
+use personae::{Ed25519Keypair, IdentityError, IdentityProvider, ProfileId};
 use uuid::Uuid;
 use zeroize::Zeroizing;
 
@@ -125,7 +125,15 @@ async fn serve(host: Arc<Host>, unlock: ControlUnlock) -> (String, ResidentStatu
     {
         let endpoint = endpoint.clone();
         tokio::spawn(async move {
-            let _ = serve_app_broker(&endpoint, host, grants, 60_000, None, catalog).await;
+            let _ = serve_app_broker(
+                &endpoint,
+                Arc::new(djinn::keeper::Keeper::new(host)),
+                grants,
+                60_000,
+                None,
+                catalog,
+            )
+            .await;
         });
     }
     for _ in 0..100 {
@@ -155,9 +163,13 @@ fn the_door_keeps_two_keys_and_every_other_salt_is_locked() {
     let dir = tempfile::tempdir().unwrap();
     let host = lockable(dir.path());
     let subject = host.master_public_key().to_bytes();
-    let kept = host.door_keys().unwrap();
+    let kept = djinn::keeper::Keeper::new(Arc::clone(&host))
+        .door_keys()
+        .unwrap();
     host.lock_vault().unwrap();
-    let again = host.door_keys().expect("the lock leaves the door keys in place");
+    let again = djinn::keeper::Keeper::new(Arc::clone(&host))
+        .door_keys()
+        .expect("the lock leaves the door keys in place");
     assert!(Arc::ptr_eq(&kept, &again));
     assert_eq!(again.salts(), door_salts(subject));
     for salt in door_salts(subject) {
@@ -169,8 +181,14 @@ fn the_door_keeps_two_keys_and_every_other_salt_is_locked() {
         b"knot",
         b"",
     ] {
-        assert!(matches!(again.derive_keypair(salt), Err(IdentityError::Locked)));
-        assert!(matches!(again.attest_derived_key(salt), Err(IdentityError::Locked)));
+        assert!(matches!(
+            again.derive_keypair(salt),
+            Err(IdentityError::Locked)
+        ));
+        assert!(matches!(
+            again.attest_derived_key(salt),
+            Err(IdentityError::Locked)
+        ));
     }
     // A remote-style hello (the global salt) cannot be made with them.
     let hello = SessionHello::issue(
@@ -188,7 +206,10 @@ fn the_door_keeps_two_keys_and_every_other_salt_is_locked() {
     );
     assert!(hello.is_err());
     // And the vault itself is still locked behind them.
-    assert!(matches!(host.derive_keypair(b"knot"), Err(IdentityError::Locked)));
+    assert!(matches!(
+        host.derive_keypair(b"knot"),
+        Err(IdentityError::Locked)
+    ));
 }
 
 /// A resident that locked before its door was ever used has no door keys:
@@ -198,7 +219,10 @@ fn a_door_never_used_before_the_lock_stays_closed() {
     let dir = tempfile::tempdir().unwrap();
     let host = lockable(dir.path());
     host.lock_vault().unwrap();
-    assert!(matches!(host.door_keys(), Err(IdentityError::Locked)));
+    assert!(matches!(
+        djinn::keeper::Keeper::new(Arc::clone(&host)).door_keys(),
+        Err(IdentityError::Locked)
+    ));
 }
 
 #[tokio::test(flavor = "multi_thread")]
@@ -218,7 +242,11 @@ async fn while_locked_the_status_route_reads_and_the_control_route_unlocks() {
 
     let mut client = open(&endpoint, RESIDENT_STATUS_ROUTE).await.unwrap();
     let read = resident_status::read_status(&mut client).await.unwrap();
-    assert_eq!(read.lock, LockStateV1::Locked, "the door admits while locked");
+    assert_eq!(
+        read.lock,
+        LockStateV1::Locked,
+        "the door admits while locked"
+    );
     // The status route never takes the unlock.
     assert!(
         resident_status::request_unlock(&mut client, PASSPHRASE)
@@ -316,9 +344,7 @@ impl Scripted {
 }
 
 impl NativeIdentityUi for Scripted {
-    fn pick_ssh_private_key(
-        &self,
-    ) -> Result<Option<std::path::PathBuf>, NativeIdentityFailure> {
+    fn pick_ssh_private_key(&self) -> Result<Option<std::path::PathBuf>, NativeIdentityFailure> {
         Err(NativeIdentityFailure::UiUnavailable)
     }
 

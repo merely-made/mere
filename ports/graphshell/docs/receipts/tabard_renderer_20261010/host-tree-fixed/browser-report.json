@@ -1,0 +1,23 @@
+{
+  "dataset": {
+    "ready": "true",
+    "mounted": "true",
+    "appearanceOwner": "host",
+    "appearanceSource": "host-roles",
+    "appearanceBackground": "rgb(33, 49, 65)",
+    "appearanceStatus": "Composing host appearance"
+  },
+  "storage": "[[\"graphshell.application.appearance.v1\",\"{\\\"version\\\":1,\\\"choice\\\":{\\\"theme_id\\\":\\\"theme:default\\\",\\\"theme_mode\\\":\\\"hc_dark\\\"},\\\"themes\\\":[{\\\"id\\\":\\\"theme:graphshell-garden-receipt\\\",\\\"name\\\":\\\"Garden receipt\\\",\\\"source\\\":\\\"User\\\",\\\"seeds\\\":{\\\"primary\\\":{\\\"r\\\":70,\\\"g\\\":140,\\\"b\\\":95,\\\"a\\\":255},\\\"secondary\\\":{\\\"r\\\":75,\\\"g\\\":135,\\\"b\\\":180,\\\"a\\\":255},\\\"tertiary\\\":{\\\"r\\\":180,\\\"g\\\":130,\\\"b\\\":70,\\\"a\\\":255},\\\"neutral\\\":{\\\"r\\\":25,\\\"g\\\":36,\\\"b\\\":30,\\\"a\\\":255},\\\"text_header\\\":null,\\\"text_body\\\":null,\\\"success\\\":{\\\"r\\\":75,\\\"g\\\":170,\\\"b\\\":95,\\\"a\\\":255},\\\"danger\\\":{\\\"r\\\":205,\\\"g\\\":80,\\\"b\\\":65,\\\"a\\\":255},\\\"dark\\\":true},\\\"high_contrast\\\":false,\\\"harmony\\\":\\\"Custom\\\",\\\"mode_sheets\\\":{\\\"custom:garden\\\":[\\\":root { --tabard-color-bg: #203020; --tabard-color-primary: #a0d070; --tabard-color-text: #f0fff0; }\\\"],\\\"dark\\\":[\\\":root { --tabard-color-bg: #123456; --tabard-color-primary: #78c090; }\\\",\\\".topbar { border-width: 4px; }\\\"]}}]}\"]]",
+  "adapters": [
+    {
+      "options": {
+        "powerPreference": "high-performance"
+      },
+      "vendor": "amd",
+      "architecture": "gcn-5",
+      "device": "",
+      "description": "",
+      "fallback": false
+    }
+  ]
+}

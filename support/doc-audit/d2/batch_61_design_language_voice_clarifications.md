@@ -35,13 +35,53 @@ Mere `7bfb293d`: the projection grammar's encoding/representation boundary,
 Forme's geometry-free semantic arrangement, Platen's layout-to-`TileTree`
 projection, Scenomise's card realization and the suite's host/session ownership.
 Mosaic and Vega-Lite's official references support coordination and conditional
-encodings, not a Mere rule schema or execution grant. The canonical §9.10 and
+encodings, not a Mere rule schema or execution grant. The canonical §9.12 and
 editor/field follow-through retain proposal status, the existing work order
 and overlap/lock forks. No new palette decision, SE ruling or runtime receipt
 is inferred. Ten new local links and heading anchors resolve; whitespace
 checks pass. Complete doc-audit JSON is unchanged from the same checkout's
 baseline (`e563d41bb9a4c6b077b76232c65a0fe9bd01d90827f4c23885059afde5c13982`).
 No build or browser gate ran.
+
+**Concurrent-record reconciliation (2026-10-10):** the accepted presentation-rule
+record is §9.10; the richer mixed-content proposal above is now §9.12. The bounded
+Workbench Forme implementation and its separate qualification are tracked in the
+Scenograph editor plan. That bridge does not qualify the richer study.
+
+**Forme-draft agreement (2026-10-10):** Mark accepted scoped draft undo/redo,
+Discard changes and Lock and apply after explaining the node-as-tile-handle
+gesture. Canonical §9.11 records that agreement; the editor and field plans
+separate it from pending implementation. Source at published `e95326dc`
+supports FormeDocument identity, TileLayout cloning/mutations, the canonical
+arrangement/geometry bridge and shared History. The bridge's fresh local
+arrangement IDs are recorded as an adapter concern, not silently qualified
+as stable field identity. SE6 still excludes editor furniture from recipe
+undo; forme draft undo edits a different owned document. Ten new local links
+and anchors resolve and whitespace checks pass. Complete doc-audit JSON
+matches the pre-edit baseline
+(`bb5c69c6a21096c985caddebc261c0298e92eab26124678a5e1adf5bc12d7b1b`).
+D2 remains at 252/259 coverage with seven pre-existing missing records and
+duplicate README basenames; this pass adds no active doc or unknown record.
+No runtime code changed, and no build or browser gate ran.
+
+
+**Backdrop-cut correction (2026-10-10):** Mark rejects the Clear / Ambient /
+Props / Field cut: reset is an action; contextual ambient nodes and props are
+entity roles/classes; backdrop presentation and physical participation are
+independent. Canonical §9.13 and the editor/dynamics/ambiance follow-through
+record this correction. SE86's original words and minimum paint/contact
+receipts are preserved; its mode requirement is explicitly superseded.
+Source checks distinguish published `773a0dc2`'s visible/collidable and
+non-item-picking contract from the binder inspected at local `d572b322`.
+Decorative AmbientSim does not supply contextual discovery or interactive
+entity authority. Reset baseline, animation/script reset, recent-attention
+lifetime and legacy control migration remain open rather than inferred.
+Nine new local links/anchors resolve; whitespace checks pass. Complete
+doc-audit JSON matches the pre-edit baseline
+(`b93a685a2a57f5c1d029555fc44bec09116a6840fe8284f56c0c6d0075cf1daf`).
+D2 retains 252/259 coverage, seven existing missing records and duplicate
+README basenames, with no unknown supplemental record. No runtime source,
+viewer-owner files, build or browser qualification was changed by this pass.
 
 ## 2026-08-23_projection_scenes_and_graph_native_platform.md
 

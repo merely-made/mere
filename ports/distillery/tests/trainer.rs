@@ -260,7 +260,7 @@ async fn run_trainer_job(
     let author = provider.derive_keypair(MESH_AUTHOR_SALT).unwrap();
     let authority = author.public_key().to_bytes();
     let blobs = Arc::new(BlobStore::new_collecting(Duration::from_millis(10)));
-    let transport = P2pandaTransport::builder(provider.master_keypair())
+    let transport = P2pandaTransport::builder_for(&provider.derived_keypair(MESH_AUTHOR_SALT).unwrap())
         .gossip()
         .blobs(&blobs)
         .bind()
