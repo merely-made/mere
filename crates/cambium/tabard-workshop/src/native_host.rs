@@ -218,6 +218,151 @@ mod tests {
     }
 
     #[test]
+    fn native_header_keeps_brand_and_controls_visible_and_reachable_at_narrow_widths() {
+        // native_init supplies the production stylesheet and resource ledger;
+        // the host resolves and shapes its actual platform sans-serif fonts.
+        // Also cover the explicit native caption adapter on macOS, where the
+        // ordinary platform slot is empty because the OS owns traffic lights.
+        for width in [420.0, 360.0, 640.0] {
+            for explicit_captions in [false, true] {
+                let mut host = Harness::with_command_init(
+                    |commands| {
+                        let mut init = native_init(WorkshopState::in_memory(), commands);
+                        if explicit_captions {
+                            let commands = commands.clone();
+                            init.logic = Box::new(move |state| {
+                                workshop_view_with_captions(
+                                    state,
+                                    cambium_genet_winit_host::window_caption_controls(
+                                        &commands,
+                                        &CaptionLabels::default(),
+                                    ),
+                                )
+                            });
+                        }
+                        init
+                    },
+                    native_hooks(|_| panic!("header geometry cannot request an export")),
+                    cambium_genet_winit_host::HostOptions::default(),
+                );
+                host.layout_at(width, 900.0);
+                let brand = host.with_dom(|dom| {
+                    let nodes = taproot::matching(dom, &Selector::class("brand-title"));
+                    assert_eq!(nodes.len(), 1);
+                    nodes[0]
+                });
+                let mut brand_nodes = vec![brand];
+                host.with_dom(|dom| {
+                    let mut pending = vec![brand];
+                    while let Some(node) = pending.pop() {
+                        for child in dom.dom_children(node) {
+                            brand_nodes.push(child);
+                            pending.push(child);
+                        }
+                    }
+                });
+                let brand_rects: Vec<_> = brand_nodes
+                    .into_iter()
+                    .filter_map(|node| host.painted_rect(node))
+                    .filter(|(_, _, w, h)| *w > 0.0 && *h > 0.0)
+                    .collect();
+                assert!(!brand_rects.is_empty(), "brand must have real layout");
+                let mut controls = Vec::new();
+                for action in ["undo", "redo", "save"] {
+                    let selector = Selector::role("button").with_attr("data-action", action);
+                    let nodes = host.with_dom(|dom| taproot::matching(dom, &selector));
+                    assert_eq!(nodes.len(), 1, "missing header action {action}");
+                    controls.push((action, nodes[0]));
+                }
+                for action in ["minimize", "maximize", "close"] {
+                    let selector = Selector::role("button").with_attr("data-window-action", action);
+                    let nodes = host.with_dom(|dom| taproot::matching(dom, &selector));
+                    let available = explicit_captions || !cfg!(target_os = "macos");
+                    assert_eq!(nodes.len(), usize::from(available));
+                    if let Some(node) = nodes.first() {
+                        controls.push((action, *node));
+                    }
+                }
+                let control_rects: Vec<_> = controls
+                    .iter()
+                    .map(|(action, node)| {
+                        let rect = host.painted_rect(*node)
+                            .unwrap_or_else(|| panic!("{action} has no native layout"));
+                        let (x, y, w, h) = rect;
+                        assert!(
+                            w > 0.0 && h > 0.0 && x >= -0.01 && y >= -0.01
+                                && x + w <= width + 0.01 && y + h <= 900.01,
+                            "{width}px explicit_captions={explicit_captions}: {action} outside viewport: {rect:?}"
+                        );
+                        let visible = host.visible_rect(*node).expect("header control visible");
+                        assert!((visible.2 - w).abs() < 0.01 && (visible.3 - h).abs() < 0.01,
+                            "{action} clipped at {width}px");
+                        rect
+                    })
+                    .collect();
+                let overlaps = |a: &(f32, f32, f32, f32), b: &(f32, f32, f32, f32)| {
+                    a.0 < b.0 + b.2 - 0.01
+                        && b.0 < a.0 + a.2 - 0.01
+                        && a.1 < b.1 + b.3 - 0.01
+                        && b.1 < a.1 + a.3 - 0.01
+                };
+                for brand_rect in &brand_rects {
+                    for (index, action_rect) in control_rects.iter().enumerate() {
+                        assert!(
+                            !overlaps(brand_rect, action_rect),
+                            "{width}px explicit_captions={explicit_captions}: brand {brand_rect:?} overlaps {} {action_rect:?}",
+                            controls[index].0
+                        );
+                    }
+                }
+                for (index, rect) in control_rects.iter().enumerate() {
+                    for other in &control_rects[index + 1..] {
+                        assert!(
+                            !overlaps(rect, other),
+                            "header controls overlap at {width}px"
+                        );
+                    }
+                }
+                for ((action, node), (x, y, w, h)) in controls.iter().zip(&control_rects) {
+                    host.move_to(x + w / 2.0, y + h / 2.0);
+                    let hit = host
+                        .hit()
+                        .expect("header control centre receives native hit");
+                    assert!(
+                        host.with_dom(|dom| {
+                            let mut current = Some(hit);
+                            while let Some(candidate) = current {
+                                if candidate == *node {
+                                    return true;
+                                }
+                                current = dom.parent(candidate);
+                            }
+                            false
+                        }),
+                        "{action} occluded at {width}px"
+                    );
+                }
+                let mut reached = std::collections::HashSet::new();
+                for _ in 0..200 {
+                    host.tab(true);
+                    if let Some(node) = host.focus() {
+                        reached.insert(node);
+                    }
+                    if controls.iter().all(|(_, node)| reached.contains(node)) {
+                        break;
+                    }
+                }
+                for (action, node) in &controls {
+                    assert!(
+                        reached.contains(node),
+                        "{action} unreachable by Tab at {width}px"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
     fn preview_bindings_retain_identity_and_rebind_reopened_workshop_sources() {
         let mut bindings = PreviewBindings::default();
         let independent = PreviewBindings::default();
