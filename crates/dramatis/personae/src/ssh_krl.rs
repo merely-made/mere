@@ -36,11 +36,8 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::IdentityError;
 use crate::ssh_ca::{device_serial, key_id_for};
-use crate::vault::{
-    CredentialLineage, IdentitySlot, Profile, ProtocolKey, SecretBytes, UnlockTier,
-};
+use crate::vault::ProtocolKey;
 use insigne::delegation::{DelegationId, SignedDelegationRevocation};
 
 /// The `mod_id` the revocation ledger is stored under.
@@ -135,39 +132,13 @@ pub fn ledger_key() -> ProtocolKey {
     ProtocolKey::new(REVOCATION_MOD_ID, None)
 }
 
-/// Read a profile's revocation ledger, empty when it has none.
-pub fn load_ledger(profile: &Profile) -> Result<RevocationLedger, IdentityError> {
-    let Some(IdentitySlot::Direct { payload, .. }) = profile.slots.get(&ledger_key()) else {
-        return Ok(RevocationLedger::new());
-    };
-    serde_json::from_slice(payload.as_slice())
-        .map_err(|err| IdentityError::Backend(format!("decode revocation ledger: {err}")))
-}
-
-/// Write a profile's revocation ledger.
-pub fn store_ledger(profile: &mut Profile, ledger: &RevocationLedger) -> Result<(), IdentityError> {
-    let encoded = serde_json::to_vec(ledger)
-        .map_err(|err| IdentityError::Backend(format!("encode revocation ledger: {err}")))?;
-    profile.slots.insert(
-        ledger_key(),
-        IdentitySlot::Direct {
-            kind: REVOCATION_MOD_ID.to_string(),
-            payload: SecretBytes::new(encoded),
-            lineage: CredentialLineage::LocallyDerived,
-            unlock_tier: UnlockTier::Session,
-        },
-    );
-    Ok(())
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::carry::{ACTION_SSH_LOGIN, DeviceId, device_capability_scope};
     use crate::delegation::Issue;
     use crate::ssh_ca::{self, serial_for_device};
-    use crate::vault::ProfileId;
-    use crate::{Ed25519Keypair, IdentityProvider, InMemoryProvider};
+    use crate::{IdentityProvider, InMemoryProvider};
     use insigne::delegation::{DelegationRevocation, SignedDelegationCertificate};
 
     const NOW_MS: u64 = 1_760_000_000_000;
@@ -259,33 +230,5 @@ mod tests {
         assert!(spec.contains(&format!("serial: {}", serial_for_device(device(1)))));
         assert!(spec.contains(&format!("id: {}", key_id_for(&DelegationId([9; 32])))));
         assert!(spec.contains("# thinkpad revoked at"));
-    }
-
-    #[test]
-    fn a_ledger_round_trips_through_a_slot() {
-        let provider = InMemoryProvider::from_seed([1; 32]);
-        let mut ledger = RevocationLedger::new();
-        ledger.fold(
-            &revocation(&provider, device(3), DelegationId([2; 32])),
-            "imac",
-        );
-
-        let mut profile = Profile::new(
-            ProfileId("t".into()),
-            "t",
-            Ed25519Keypair::from_seed([5; 32]),
-        );
-        store_ledger(&mut profile, &ledger).unwrap();
-        assert_eq!(load_ledger(&profile).unwrap(), ledger);
-    }
-
-    #[test]
-    fn an_absent_ledger_reads_as_empty_rather_than_failing() {
-        let profile = Profile::new(
-            ProfileId("t".into()),
-            "t",
-            Ed25519Keypair::from_seed([5; 32]),
-        );
-        assert!(load_ledger(&profile).unwrap().is_empty());
     }
 }

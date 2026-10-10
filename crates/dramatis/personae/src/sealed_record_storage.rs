@@ -186,7 +186,7 @@ impl SealedRecordStorage {
 
     /// Lend the record key where it lives, or [`IdentityError::Locked`]: the
     /// passphrase enrolment wraps this same root (ruling 39).
-    pub(crate) fn with_key<R>(&self, f: impl FnOnce(&[u8; 32]) -> R) -> Result<R, IdentityError> {
+    pub fn with_key<R>(&self, f: impl FnOnce(&[u8; 32]) -> R) -> Result<R, IdentityError> {
         let key = self.key.read().unwrap_or_else(|e| e.into_inner());
         Ok(f(key.as_ref().ok_or(IdentityError::Locked)?))
     }

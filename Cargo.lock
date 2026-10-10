@@ -2301,14 +2301,19 @@ dependencies = [
 name = "castellan"
 version = "0.0.3"
 dependencies = [
+ "argon2",
  "base64 0.22.1",
  "blake3",
+ "chacha20poly1305 0.11.0",
  "chatelaine",
  "chirograph",
  "dramatis",
+ "eidetic",
  "futures-util",
  "gaz",
  "gazette",
+ "getrandom 0.3.4",
+ "hex",
  "hmac 0.13.0",
  "insigne",
  "muniment",
@@ -2317,6 +2322,8 @@ dependencies = [
  "personae",
  "pollster",
  "rand_core 0.6.4",
+ "ring",
+ "rsa",
  "serde",
  "serde_json",
  "sha1 0.11.0",
@@ -2328,7 +2335,10 @@ dependencies = [
  "thiserror 1.0.69",
  "tokio",
  "tracing",
+ "tracing-subscriber",
  "uuid",
+ "windows",
+ "windows-sys 0.59.0",
  "zbus",
  "zeroize",
 ]
@@ -12519,7 +12529,6 @@ checksum = "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220"
 name = "personae"
 version = "0.2.1"
 dependencies = [
- "argon2",
  "blake3",
  "chacha20poly1305 0.11.0",
  "ed25519-dalek 3.0.0",
@@ -12529,21 +12538,12 @@ dependencies = [
  "hex",
  "insigne",
  "rand_core 0.6.4",
- "ring",
- "rsa",
  "serde",
  "serde_json",
- "signature 2.2.0",
- "ssh-agent-lib",
  "ssh-key",
  "tempfile",
  "thiserror 1.0.69",
- "tokio",
- "tracing",
- "tracing-subscriber",
  "uuid",
- "windows",
- "windows-sys 0.59.0",
  "zeroize",
 ]
 

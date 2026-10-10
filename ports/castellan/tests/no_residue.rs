@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! The no-residue instrument over castellan's lock path (vault lock plan,
-//! rulings 1 and 6, L2): personae's tracker, included by path, watching a
+//! rulings 1 and 6, L2): the residue tracker (`tests/residue`), watching a
 //! resident host lock its vault and run its holder hook.
 //!
 //! Canaries: the master seed, the vault root, and the record and freshness
@@ -15,17 +15,16 @@
 //!
 //! No libtest harness: the allocator is process-wide.
 
-#[path = "../../../crates/dramatis/personae/tests/residue/mod.rs"]
 mod residue;
 
 use castellan::authority::PersonaeHost;
 use castellan::resident::{CastellanResident, CredentialSalts};
 use castellan::view::VaultProtectionView;
-use personae::sealed_profile_storage::PASSPHRASE_ROOT_FILE;
-use personae::{
-    Ed25519Keypair, IdentityStorage, IdentityVault, PersonaId, Profile, ProfileId,
-    SealedProfileStorage, UnlockMethod,
+use castellan::custody::sealed_profile_storage::PASSPHRASE_ROOT_FILE;
+use castellan::custody::{
+    IdentityStorage, IdentityVault, Profile, SealedProfileStorage, UnlockMethod,
 };
+use personae::{Ed25519Keypair, PersonaId, ProfileId};
 use residue::*;
 
 const SALTS: CredentialSalts = CredentialSalts {
@@ -48,7 +47,7 @@ fn main() {
     let freshness_key = master.derive_child(SALTS.freshness).to_seed();
     drop(master);
     // Argon2 runs before arming; personae's instrument covers its residue.
-    personae::save_passphrase_root(vault_dir.join(PASSPHRASE_ROOT_FILE), &root, b"lock").unwrap();
+    castellan::custody::save_passphrase_root(vault_dir.join(PASSPHRASE_ROOT_FILE), &root, b"lock").unwrap();
 
     plant(0, "master seed", &seed, true);
     plant(1, "vault root", &root, false);

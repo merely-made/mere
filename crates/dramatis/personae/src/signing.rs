@@ -12,8 +12,7 @@
 //!
 //! The records here are plain data and build without `agent`, so the identity
 //! surface's views can name them (dramatis repo plan, ruling D25). The broker
-//! that holds requests open is custody and stays behind `agent`, in its
-//! `broker` module; it moves with the rest of custody in DR-B.
+//! that holds requests open is custody, in castellan since DR-B.
 
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -268,11 +267,6 @@ impl std::fmt::Display for DecisionError {
 }
 
 impl std::error::Error for DecisionError {}
-
-#[cfg(feature = "agent")]
-mod broker;
-#[cfg(feature = "agent")]
-pub use broker::ApprovalBroker;
 
 fn now_ms() -> u64 {
     SystemTime::now()
