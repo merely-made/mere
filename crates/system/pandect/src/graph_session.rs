@@ -79,6 +79,7 @@ pub trait LegacyTransactionBackend: Backend {}
 impl<T: Backend + ?Sized> LegacyTransactionBackend for T {}
 
 mod residency;
+pub use residency::PreparedResidentCheckpoint;
 
 const MANIFEST: &str = "manifest.json";
 const BASELINE: &str = "baseline.json";

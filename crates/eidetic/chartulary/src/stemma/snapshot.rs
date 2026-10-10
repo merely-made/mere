@@ -167,15 +167,23 @@ where
                     created_at_ms: visit.created_at_ms,
                     context: visit.context.clone(),
                     inbound: visit.inbound,
-                    bindings: visit
-                        .bindings
-                        .iter()
-                        .map(|(owner_id, binding)| BindingSnapshot {
-                            owner: owner_index[owner_id],
-                            forward_child: binding.forward_child.map(|visit| visit_index[&visit]),
-                            last_accessed_at_ms: binding.last_accessed_at_ms,
-                        })
-                        .collect(),
+                    bindings: {
+                        let mut bindings: Vec<_> = visit
+                            .bindings
+                            .iter()
+                            .map(|(owner_id, binding)| BindingSnapshot {
+                                owner: owner_index[owner_id],
+                                forward_child: binding
+                                    .forward_child
+                                    .map(|visit| visit_index[&visit]),
+                                last_accessed_at_ms: binding.last_accessed_at_ms,
+                            })
+                            .collect();
+                        // Bindings are a map, so their snapshot order must not
+                        // depend on the hash seed used during rehydration.
+                        bindings.sort_unstable_by_key(|binding| binding.owner);
+                        bindings
+                    },
                 })
                 .collect(),
             owners: owners
@@ -188,11 +196,17 @@ where
                     pending_origin_parent: owner
                         .pending_origin_parent
                         .map(|visit| visit_index[&visit]),
-                    owned_visits: owner
-                        .owned_visits
-                        .iter()
-                        .map(|visit| visit_index[visit])
-                        .collect(),
+                    owned_visits: {
+                        let mut owned_visits: Vec<_> = owner
+                            .owned_visits
+                            .iter()
+                            .map(|visit| visit_index[visit])
+                            .collect();
+                        // Membership is a set; ordered visit/branch arrays
+                        // retain their original order above.
+                        owned_visits.sort_unstable();
+                        owned_visits
+                    },
                 })
                 .collect(),
         }

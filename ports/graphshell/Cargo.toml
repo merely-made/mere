@@ -8,6 +8,8 @@ description = "Graphshell presentation host and loopback acceptance view."
 autobins = false
 
 [features]
+# Concrete native resident ownership factories.
+resident-storage = ["web", "muniment/directory", "muniment/redb"]
 default = ["native", "image-decode"]
 # Forwards genet-livery's image decoding (mer3ly Ruling 111); on by default.
 image-decode = ["cambium-rootstock?/image-decode", "mere?/image-decode"]

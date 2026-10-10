@@ -16,6 +16,43 @@ use pandect::addressable_graph::*;
 use serde_json::json;
 use uuid::Uuid;
 
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn prepared_checkpoint_does_not_acknowledge_or_reapply() {
+    pollster::block_on(async {
+        let backend = MemoryBackend::new();
+        let mut session = pandect::MereSessions::new(backend.clone())
+            .begin_recorded(kernel::graph::Author::user(), None);
+        let id = Uuid::from_u128(3000);
+        session
+            .edit_now(kernel::graph::Author::user(), |graph| {
+                apply::add_node(
+                    graph,
+                    Some(id),
+                    "https://commit.test".into(),
+                    Default::default(),
+                );
+            })
+            .unwrap();
+        let cursor = session.journal().live_cursor();
+        let prepared = session
+            .prepare_resident_checkpoint(std::time::SystemTime::UNIX_EPOCH)
+            .unwrap();
+        assert!(session.has_unstored());
+        assert!(backend.list("graphs/").await.unwrap().is_empty());
+        backend.apply(prepared.ops()).await.unwrap();
+        let generation = session.acknowledge_resident_checkpoint(prepared).unwrap();
+        assert!(!session.has_unstored());
+        assert_eq!(session.journal().live_cursor(), cursor);
+        let view = pandect::MereSessions::new(backend)
+            .open_resident_graph(session.id(), Default::default())
+            .await
+            .unwrap();
+        assert_eq!(view.generation(), generation);
+        assert_eq!(view.graph().node_count(), 1);
+    });
+}
+
 fn source(count: usize) -> (Graph, Vec<Uuid>, Vec<Uuid>) {
     let mut graph = Graph::new();
     let mut surfaces = vec![];
@@ -1308,4 +1345,32 @@ async fn unloaded_only_cache_controls<B: Backend + Clone>(backend: B) {
 #[test]
 fn unloaded_checkpoint_keeps_available_query_cache() {
     pollster::block_on(unloaded_only_cache_controls(MemoryBackend::new()));
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn prepared_checkpoint_refuses_changed_writer_before_acknowledgement() {
+    let backend = MemoryBackend::new();
+    let mut session =
+        pandect::MereSessions::new(backend).begin_recorded(kernel::graph::Author::user(), None);
+    let prepared = session
+        .prepare_resident_checkpoint(std::time::SystemTime::UNIX_EPOCH)
+        .unwrap();
+    session
+        .edit_live_now(
+            kernel::graph::Author::user(),
+            vec![pandect::live_graph::ObservedCommand {
+                command: pandect::live_graph::LiveCommand::CreateAddress {
+                    id: Uuid::from_u128(3100),
+                    address: "https://stale.test".into(),
+                    title: String::new(),
+                },
+                checks: vec![pandect::live_graph::LiveCheck::Absent(
+                    GraphAddress::Surface(Uuid::from_u128(3100)),
+                )],
+            }],
+        )
+        .unwrap();
+    assert!(session.acknowledge_resident_checkpoint(prepared).is_err());
+    assert!(session.has_unstored());
 }

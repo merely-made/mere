@@ -63,6 +63,8 @@ pub mod local_intake;
 #[cfg(feature = "web")]
 pub mod mere_host;
 #[cfg(feature = "web")]
+pub mod resident_host;
+#[cfg(feature = "web")]
 mod mere_host_fixture;
 #[cfg(feature = "mere-route")]
 pub mod mere_route;

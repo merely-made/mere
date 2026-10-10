@@ -21,6 +21,11 @@ use web_sys::Event;
 
 use super::{BrowserHost, root};
 
+enum PreparedStore {
+    Ordinary(graphshell::mere_host::Staged),
+    Resident(graphshell::resident_host::ResidentIo<muniment::IndexedDbBackend>),
+}
+
 /// Where the session's changes stand, as the page's `data-session-store` token.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(super) enum SessionStore {
@@ -59,7 +64,24 @@ pub(super) fn store_pending(state: &Rc<RefCell<BrowserHost>>) {
             return;
         }
         let now_secs = (js_sys::Date::now() / 1_000.0) as u64;
-        match host.app.host.prepare_store(now_secs) {
+        // Resident preparation retains its batch in the existing host. This
+        // branch never creates another writer or grants backend admission.
+        let prepared = if host.app.host.resident_busy() {
+            host.app
+                .host
+                .prepare_resident_io(
+                    std::time::SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(now_secs),
+                )
+                .map(PreparedStore::Resident)
+                .map_err(|error| error.to_string())
+        } else {
+            host.app
+                .host
+                .prepare_store(now_secs)
+                .map(PreparedStore::Ordinary)
+                .map_err(|error| error.to_string())
+        };
+        match prepared {
             Ok(staged) => {
                 host.session_store = SessionStore::Writing;
                 (staged, host.app.host.store())
@@ -73,12 +95,32 @@ pub(super) fn store_pending(state: &Rc<RefCell<BrowserHost>>) {
     };
     let state = state.clone();
     spawn_local(async move {
-        let written = staged.write(&store).await;
+        let written = match &staged {
+            PreparedStore::Ordinary(staged) => staged
+                .write(&store)
+                .await
+                .map_err(|error| error.to_string()),
+            PreparedStore::Resident(staged) => {
+                staged.write().await.map_err(|error| error.to_string())
+            },
+        };
         {
             let mut host = state.borrow_mut();
             match written {
                 Ok(()) => {
-                    host.app.host.staged(staged);
+                    match staged {
+                        PreparedStore::Ordinary(staged) => host.app.host.staged(staged),
+                        PreparedStore::Resident(staged) => {
+                            if let Err(error) = host.app.host.install_resident_io(&staged) {
+                                host.session_store = SessionStore::Failed;
+                                host.session_store_error = error.to_string();
+                                host.chrome_dirty = true;
+                                drop(host);
+                                wake();
+                                return;
+                            }
+                        },
+                    }
                     // A change made during the write is still pending.
                     host.session_store = if host.app.host.has_unstored() {
                         SessionStore::Pending
@@ -87,6 +129,9 @@ pub(super) fn store_pending(state: &Rc<RefCell<BrowserHost>>) {
                     };
                 },
                 Err(error) => {
+                    if let PreparedStore::Resident(staged) = &staged {
+                        let _ = host.app.host.install_resident_io(staged);
+                    }
                     host.session_store = SessionStore::Failed;
                     host.session_store_error = error.to_string();
                 },

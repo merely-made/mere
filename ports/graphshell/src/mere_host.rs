@@ -97,6 +97,7 @@ pub enum MereHostError {
     InvalidSnapshot(String),
     WrongSession,
     MissingResource,
+    ResidentBusy,
 }
 
 impl std::fmt::Display for MereHostError {
@@ -108,6 +109,7 @@ impl std::fmt::Display for MereHostError {
             Self::Facet(error) => write!(formatter, "{error}"),
             Self::InvalidSnapshot(error) => write!(formatter, "Mere projection: {error}"),
             Self::WrongSession => write!(formatter, "request names another projection session"),
+            Self::ResidentBusy => write!(formatter, "resident write is pending"),
             Self::MissingResource => {
                 write!(formatter, "resource was not disclosed by this session")
             },
@@ -156,6 +158,11 @@ struct PersistedMereHost {
 /// [`GraphSession`]: every edit is journaled under the selected persona, via
 /// the channel it came through (reservoir plan §7 item 23).
 pub struct MereHost<B> {
+    #[cfg(test)]
+    pub(crate) resident_prepare_error: Option<StoreError>,
+    resident_admitted: bool,
+    resident_busy: bool,
+    resident_staged: Option<crate::resident_host::ResidentStaged>,
     sessions: MereSessions<B>,
     slots: JsonSlots<B>,
     graph_session: GraphSession<B>,
@@ -230,6 +237,11 @@ impl<B: Backend + Clone> MereHost<B> {
         reopened: bool,
     ) -> Self {
         Self {
+            #[cfg(test)]
+            resident_prepare_error: None,
+            resident_admitted: false,
+            resident_busy: false,
+            resident_staged: None,
             sessions: MereSessions::new(backend.clone()),
             slots: JsonSlots::new(backend),
             graph_session,
@@ -391,6 +403,7 @@ impl<B: Backend + Clone> MereHost<B> {
         graph: Graph,
         placement: Option<PlacementProfile>,
     ) -> Result<(), MereHostError> {
+        self.ensure_resident_idle()?;
         graph
             .validate_active_resource_assertion_handles()
             .map_err(|error| MereHostError::InvalidSnapshot(error.to_string()))?;
@@ -421,6 +434,136 @@ impl<B: Backend + Clone> MereHost<B> {
     }
 }
 
+impl<B: Backend + Clone> MereHost<B> {
+    /// Prepare detached I/O using this admitted owner's backend. This never
+    /// grants admission to an arbitrary host or lets a caller choose storage.
+    pub fn prepare_resident_io(
+        &mut self,
+        at: SystemTime,
+    ) -> Result<crate::resident_host::ResidentIo<B>, crate::resident_host::ResidentHostError> {
+        crate::resident_host::ResidentIo::prepare(self, at)
+    }
+    pub fn install_resident_io(
+        &mut self,
+        io: &crate::resident_host::ResidentIo<B>,
+    ) -> Result<Option<String>, crate::resident_host::ResidentHostError> {
+        self.install_resident_store(io.work())
+    }
+    pub(crate) fn retained_resident_work(&self) -> Option<crate::resident_host::ResidentWrite> {
+        self.resident_staged.as_ref().map(|staged| staged.work())
+    }
+    pub(crate) fn hold_resident(&mut self) {
+        self.resident_busy = true;
+    }
+    pub(crate) fn admit_resident(&mut self) {
+        self.resident_admitted = true;
+    }
+    pub(crate) fn edit_resident(
+        &mut self,
+        via: &str,
+        commands: Vec<pandect::live_graph::ObservedCommand>,
+    ) -> Result<pandect::Applied, crate::resident_host::ResidentHostError> {
+        use crate::resident_host::ResidentHostError;
+        if !self.resident_admitted {
+            return Err(ResidentHostError::OwnershipUnproven);
+        }
+        if self.resident_busy {
+            return Err(ResidentHostError::Busy);
+        }
+        let applied = self
+            .graph_session
+            .edit_live_now(author_of(&self.selected_persona, via), commands)
+            .map_err(ResidentHostError::Live)?
+            .applied;
+        self.projection_revision = self.projection_revision.wrapping_add(1);
+        self.resident_busy = true;
+        Ok(applied)
+    }
+    /// Prepare the existing admitted writer, retaining all bytes until install.
+    /// Generic hosts have no admission; composition factories grant it privately.
+    pub(crate) fn prepare_resident_store(
+        &mut self,
+        at: SystemTime,
+    ) -> Result<crate::resident_host::ResidentWrite, crate::resident_host::ResidentHostError> {
+        use crate::resident_host::{ResidentHostError, ResidentStaged};
+        if !self.resident_admitted {
+            return Err(ResidentHostError::OwnershipUnproven);
+        }
+        if let Some(staged) = &self.resident_staged {
+            return Ok(staged.work());
+        }
+        #[cfg(test)]
+        if let Some(error) = self.resident_prepare_error.take() {
+            return Err(error.into());
+        }
+        let current = self
+            .graph_session
+            .prepare_resident_checkpoint(at)
+            .map_err(MereHostError::from)?;
+        let retired = self
+            .retired
+            .iter()
+            .map(|s| s.pending(at))
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(MereHostError::from)?;
+        let staged = ResidentStaged::new(current, retired);
+        let work = staged.work();
+        self.resident_busy = true;
+        self.resident_staged = Some(staged);
+        Ok(work)
+    }
+    /// Acknowledge each independently committed retired session, then current.
+    /// Failure leaves the exact current batch and preimages available for retry.
+    pub(crate) fn install_resident_store(
+        &mut self,
+        work: &crate::resident_host::ResidentWrite,
+    ) -> Result<Option<String>, crate::resident_host::ResidentHostError> {
+        use crate::resident_host::ResidentHostError;
+        let staged = self
+            .resident_staged
+            .as_mut()
+            .ok_or(ResidentHostError::StaleCompletion)?;
+        if !staged.matches(work) {
+            return Err(ResidentHostError::StaleCompletion);
+        }
+        if staged.running() {
+            return Err(ResidentHostError::Busy);
+        }
+        for index in 0..staged.retired.len() {
+            if staged.complete(index) {
+                if let Some(pending) = staged.retired[index].take() {
+                    self.retired[index].stored(pending);
+                }
+            }
+        }
+        if !staged.complete(staged.retired.len()) {
+            return Ok(None);
+        }
+        // Validate while the only prepared checkpoint is still retained. A
+        // rejected completion must not discard the exact bytes or identity.
+        self.graph_session
+            .validate_resident_checkpoint(
+                staged
+                    .current
+                    .as_ref()
+                    .ok_or(ResidentHostError::StaleCompletion)?,
+            )
+            .map_err(|_| ResidentHostError::StaleCompletion)?;
+        let prepared = staged
+            .current
+            .take()
+            .ok_or(ResidentHostError::StaleCompletion)?;
+        let generation = self
+            .graph_session
+            .acknowledge_resident_checkpoint(prepared)
+            .map_err(|_| ResidentHostError::StaleCompletion)?;
+        self.retired.clear();
+        self.resident_staged = None;
+        self.resident_busy = false;
+        Ok(Some(generation))
+    }
+}
+
 impl<B: Backend> MereHost<B> {
     /// A qualified live session's current snapshot records both owning stores.
     pub fn snapshot_placement(&self) -> Option<PlacementProfile> {
@@ -433,6 +576,7 @@ impl<B: Backend> MereHost<B> {
     ///
     /// The clock is injected so tests and importing hosts stamp stable times.
     pub async fn persist(&mut self, saved_at_secs: u64) -> Result<(), MereHostError> {
+        self.ensure_resident_idle()?;
         let at = saved_at(saved_at_secs);
         for session in &mut self.retired {
             session.flush(at).await?;
@@ -465,6 +609,7 @@ impl<B: Backend> MereHost<B> {
     /// then hands it to [`staged`](Self::staged). Changes made in between stay
     /// pending for the next batch.
     pub fn prepare_store(&self, saved_at_secs: u64) -> Result<Staged, MereHostError> {
+        self.ensure_resident_idle()?;
         let at = saved_at(saved_at_secs);
         let retired = self
             .retired
@@ -473,6 +618,17 @@ impl<B: Backend> MereHost<B> {
             .collect::<Result<Vec<_>, _>>()?;
         let current = self.graph_session.pending(at)?;
         Ok(Staged { current, retired })
+    }
+
+    pub(crate) fn ensure_resident_idle(&self) -> Result<(), MereHostError> {
+        if self.resident_busy {
+            Err(MereHostError::ResidentBusy)
+        } else {
+            Ok(())
+        }
+    }
+    pub fn resident_busy(&self) -> bool {
+        self.resident_busy
     }
 
     /// Whether any change waits for the next store.
@@ -643,6 +799,7 @@ impl<B: Backend> MereHost<B> {
     /// Run `edit` on the graph as one journaled change by the selected
     /// persona, via the current channel.
     fn edit_graph<R>(&mut self, edit: impl FnOnce(&mut Graph) -> R) -> Result<R, MereHostError> {
+        self.ensure_resident_idle()?;
         let author = self.author();
         Ok(self.graph_session.edit_now(author, edit)?.0)
     }
@@ -694,6 +851,7 @@ impl<B: Backend> MereHost<B> {
     /// Apply edits in stable-id form as one change, such as an import's or an
     /// attached application's.
     pub fn apply_edits(&mut self, edits: Vec<CapturedDelta>) -> Result<(), MereHostError> {
+        self.ensure_resident_idle()?;
         let author = self.author();
         self.graph_session.apply_now(author, edits)?;
         self.projection_revision = self.projection_revision.wrapping_add(1);
@@ -703,6 +861,7 @@ impl<B: Backend> MereHost<B> {
     /// Undo `via`'s own latest change still in effect, and store the undo
     /// (reservoir plan §7 items 17 and 18).
     pub async fn undo(&mut self, via: &str) -> Result<Option<Reverted>, MereHostError> {
+        self.ensure_resident_idle()?;
         let author = author_of(&self.selected_persona, via);
         let reverted = self.graph_session.undo(author).await?;
         self.bump_if(reverted.is_some());
@@ -711,6 +870,7 @@ impl<B: Backend> MereHost<B> {
 
     /// Redo `via`'s most recent undo, and store it.
     pub async fn redo(&mut self, via: &str) -> Result<Option<Reverted>, MereHostError> {
+        self.ensure_resident_idle()?;
         let author = author_of(&self.selected_persona, via);
         let reverted = self.graph_session.redo(author).await?;
         self.bump_if(reverted.is_some());
@@ -719,6 +879,7 @@ impl<B: Backend> MereHost<B> {
 
     /// [`undo`](Self::undo), journaled but not stored until the next batch.
     pub fn undo_now(&mut self, via: &str) -> Result<Option<Reverted>, MereHostError> {
+        self.ensure_resident_idle()?;
         let author = author_of(&self.selected_persona, via);
         let reverted = self.graph_session.undo_now(author)?;
         self.bump_if(reverted.is_some());
@@ -727,6 +888,7 @@ impl<B: Backend> MereHost<B> {
 
     /// [`redo`](Self::redo), journaled but not stored until the next batch.
     pub fn redo_now(&mut self, via: &str) -> Result<Option<Reverted>, MereHostError> {
+        self.ensure_resident_idle()?;
         let author = author_of(&self.selected_persona, via);
         let reverted = self.graph_session.redo_now(author)?;
         self.bump_if(reverted.is_some());
@@ -740,6 +902,7 @@ impl<B: Backend> MereHost<B> {
         view: &str,
         state: ViewIntent,
     ) -> Result<(), MereHostError> {
+        self.ensure_resident_idle()?;
         let key = ViewKey::new(via, view)?;
         let author = author_of(&self.selected_persona, via);
         self.graph_session.set_view(author, key, state).await?;
@@ -759,6 +922,7 @@ impl<B: Backend> MereHost<B> {
         view: &str,
         state: ViewIntent,
     ) -> Result<(), MereHostError> {
+        self.ensure_resident_idle()?;
         let key = ViewKey::new(via, view)?;
         let author = author_of(&self.selected_persona, via);
         self.graph_session.set_view_now(author, key, state)?;
@@ -767,6 +931,7 @@ impl<B: Backend> MereHost<B> {
 
     /// Record the codicil returned by the reservoir's owner under the admitted app.
     pub async fn archive_receipt(&mut self, via: &str, id: String) -> Result<(), MereHostError> {
+        self.ensure_resident_idle()?;
         let id = pandect::graph_codicil::parse_codicil_id(&id)
             .map_err(pandect::SessionError::Corrupt)?;
         self.graph_session
@@ -777,6 +942,7 @@ impl<B: Backend> MereHost<B> {
 
     /// Put this session in the trash for `via`, and store it.
     pub async fn trash(&mut self, via: &str) -> Result<(), MereHostError> {
+        self.ensure_resident_idle()?;
         let author = author_of(&self.selected_persona, via);
         self.graph_session.trash(author, wall_clock_now()).await?;
         Ok(())
@@ -784,6 +950,7 @@ impl<B: Backend> MereHost<B> {
 
     /// Take this session back out of the trash for `via`, and store it.
     pub async fn restore(&mut self, via: &str) -> Result<(), MereHostError> {
+        self.ensure_resident_idle()?;
         let author = author_of(&self.selected_persona, via);
         self.graph_session.restore(author, wall_clock_now()).await?;
         Ok(())
@@ -1282,6 +1449,67 @@ mod tests {
             persona: FIXTURE_PERSONA_ADDRESS.to_string(),
             profile: "profile:graphshell-a3".to_string(),
         }
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    fn stale_resident_acknowledgement_keeps_the_prepared_batch() {
+        use crate::resident_host::ResidentHostError;
+        pollster::block_on(async {
+            let backend = MemoryBackend::new();
+            let mut host = MereHost::empty(
+                backend.clone(),
+                selected_persona(),
+                HandlerRegistry::default(),
+                AccessContext {
+                    persona: "test".into(),
+                    device: "test".into(),
+                    at_ms: 0,
+                },
+            );
+            host.begin_profiled_session(Graph::new(), Some(PlacementProfile::RecordedStrataV1))
+                .unwrap();
+            host.admit_resident();
+            let work = host.prepare_resident_store(SystemTime::UNIX_EPOCH).unwrap();
+            let prepared = host
+                .resident_staged
+                .as_ref()
+                .unwrap()
+                .current
+                .as_ref()
+                .unwrap();
+            let ops = prepared.ops().to_vec();
+            let generation = prepared.generation().to_owned();
+            work.write(&backend).await.unwrap();
+            // Bypass the public Busy guard only inside this module to exercise
+            // a stale completion against a changed session.
+            host.graph_session
+                .edit_now(Author::user(), |graph| {
+                    mere::kernel::graph::apply::add_node(
+                        graph,
+                        Some(uuid::Uuid::from_u128(6600)),
+                        "https://stale-owner.test/".into(),
+                        Default::default(),
+                    );
+                })
+                .unwrap();
+            for _ in 0..2 {
+                assert!(matches!(
+                    host.install_resident_store(&work),
+                    Err(ResidentHostError::StaleCompletion)
+                ));
+                let staged = host.resident_staged.as_ref().unwrap();
+                assert!(staged.matches(&work));
+                let prepared = staged
+                    .current
+                    .as_ref()
+                    .expect("stale completion retains checkpoint");
+                assert_eq!(prepared.ops(), ops);
+                assert_eq!(prepared.generation(), generation);
+                assert!(host.graph_session.has_unstored());
+                assert!(host.resident_busy());
+            }
+        });
     }
 
     /// The rung a served item carries, looked up by the node's address.
