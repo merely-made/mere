@@ -58,6 +58,65 @@ workbench and site viewer ownership, the B1/S2 sequence, F199's pause and
 qualification gates remain intact. This allocation is design ownership;
 it is not runtime completion or permission to reopen the coordinator's queue.
 
+### Field/editor runtime seam review (2026-10-10)
+
+Freshly fetched Mere `4f70d536` publishes the projection lane's
+[field draft](https://github.com/merely-made/mere/blob/4f70d536/design_docs/mere_docs/implementation_strategy/2026-06-13_scriptable_field_regions_plan.md#field-authoring-draft-2026-10-10)
+and primitive editor draft. Its separation of declared candidates,
+occurrence-local spatial eligibility and influence weight is a proposal that
+fits the existing owner boundaries. The reference-point membership test,
+conflicting-placement refusal, initial-match report-only policy and
+field/forme association/attribute storage are still checkpoints, not rulings.
+Previewing actions must not invoke an applet. Event cadence, debounce/re-entry,
+response composition, execution and explanations belong to the dynamics seam;
+this update does not dispatch implementation or change the B1/S2 order.
+
+Source findings checked against that published tree:
+
+- The [canvas bridge](../../../crates/canvas/pictograph/src/canvas/seiche_bridge.rs)
+  captures matching graph-node keys and a field definition/registry. It passes
+  no extent, occurrence mapping, `FieldId` or `CouplingId` into `CouplingForce`.
+  A visible explanation therefore needs an owner-held provenance map from the
+  runtime contribution back to the exact field, coupling and occurrence; a
+  vector index or endpoints alone cannot supply durable identity. The current
+  graph-node bridge is distinct from the occurrence preview adapter.
+- [Coupling execution](../../../crates/conatus/seiche/src/coupling_force.rs)
+  adds force for attraction, repulsion and `ContainmentWall`. The wall response
+  is a depth-scaled force, not an exact positional exclusion. `AlignVelocity`
+  overwrites velocity; `DampenInside` multiplies velocity by its factor and
+  currently does not use coupling strength; `FlowAdvect` directly advances a
+  dynamic body's position and skips pinned kinematic bodies. Explanations and
+  per-effect controls must disclose these actual effects, not promise one
+  generic strength or additive composition for all responses.
+- Graph [coupling iteration](../../../crates/graph/graph-kernel/src/graph/field_ops.rs)
+  has unspecified order. The bridge collects that order; Seiche's simulation
+  applies couplings sequentially, and `set_coupling_forces` simply installs the
+  vector. Multiple velocity assignments, damping mixed with assignment, and
+  sampled position writes can therefore depend on execution order. The catalog's
+  currency/admission contract does not establish an arbitration policy for this
+  direct coupling-install path. No priority or refusal rule is selected here.
+- Every field sample in `CouplingForce::apply` currently uses time `0.0`.
+  Spatial eligibility, entry/exit events and animation clocks are not supplied
+  by this path. Open responses apply no force; their owning consumers still need
+  execution. Runtime field actions need an explicit clock and event contract
+  before this becomes a script/motion authoring adapter.
+- The existing [field controls](../../../crates/canvas/pictograph/src/canvas/input.rs)
+  read the first coupling's strength and write every coupling for the field via
+  `SetFieldCouplingStrength`. The kernel implementation confirms the draft's
+  finding. A per-effect edit needs an exact coupling address and its recorded
+  host write; the existing convenience control cannot implement that editor.
+
+*Reading, not ruled:* the next seam design should carry exact source and
+occurrence identity, the evaluation revision/space, candidate and eligibility
+explanations, supported response and contribution provenance. Membership
+transitions need explicit cause and before/after evaluations; the observation
+of a transition must remain separate from permission to execute its action.
+Specify clock/reset/re-entry semantics and how conflicting state writers are
+handled before building the adapter. An explanation should distinguish declared,
+eligible, evaluated, applied, refused and unsupported effects without claiming
+that an unknown response executed. These are review requirements and proposed
+contract inputs, not a new serialized schema or measured runtime receipt.
+
 ## Ruled continuation, 2026-10-10
 
 F200 to F202 are recorded verbatim in the dynamics grammar plan, committed

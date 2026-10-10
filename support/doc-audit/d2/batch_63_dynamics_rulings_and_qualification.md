@@ -170,3 +170,14 @@ Tabard ownership, unassigned scene-authoring research and retained runtime
 gates. The forme draft summary matches the accepted scope conveyed by the
 allocation. This is a documentation-only acknowledgment, not an implementation
 receipt or reopening of F199. Concurrent CLI work is outside this change.
+
+## Field/editor runtime seam review, 2026-10-10
+
+Supplemental source inspection against freshly fetched Mere `4f70d536`, local
+base `99309dd7`. Read the published field/editor proposals, canvas coupling
+bridge, Seiche coupling application and install/tick loops, kernel coupling
+iteration/strength methods and canvas field controls. The handoff records
+lost provenance/extent at the bridge, response-specific writes, unspecified
+coupling order, time-zero sampling and per-field strength scope. Each claim
+matches that source. The four projection checkpoints and dynamics seam inputs
+remain proposals; no adapter, runtime arbitration or new test receipt is claimed.
