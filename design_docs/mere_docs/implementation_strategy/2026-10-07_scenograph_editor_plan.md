@@ -408,8 +408,8 @@ dynamics. Plan the same inspect/configure loop for all three, retaining each
 primitive's own authority and identity rather than equating every primitive
 with a rendered content node. The proposed link/edge and content/resource
 vocabulary must be reconciled with graph semantics before code or stored
-formats change. The reference-host name "GraphQL" is awaiting clarification;
-the existing Graphshell reference role is not sufficient to silently choose it.
+formats change. Graphshell is the reference host for the proposed
+primitive-authoring proof.
 
 *Candidate proof, not opened:* a visible content node exposes its own
 attributes and its resource association; two independent accesses to one
