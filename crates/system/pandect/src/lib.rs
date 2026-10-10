@@ -190,7 +190,7 @@ pub use facet_store::{
 pub use graph_session::fork_component_graph;
 pub use graph_session::{
     Applied, Change, ChangeKind, DEFAULT_CHECKPOINT_INTERVAL, GraphSession, GraphValidator, Kept,
-    MereSessions, Pending, Reverted, SESSIONS_PREFIX, SessionError, ViewEntry, ViewKey,
+    MereSessions, Pending, PreparedResidentCheckpoint, Reverted, SESSIONS_PREFIX, SessionError, ViewEntry, ViewKey,
 };
 pub use identity::{StartupUnlockMode, auto_unlock_backend_available};
 pub use wallet_sealed_backend::WalletSealedBackend;

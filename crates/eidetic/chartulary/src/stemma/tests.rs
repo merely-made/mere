@@ -356,3 +356,87 @@ fn deleting_last_owner_collects_ownerless_branch() {
     assert_eq!(memory.owner_count(), 0);
     assert_eq!(memory.visit_count(), 0);
 }
+
+#[test]
+fn snapshot_round_trip_canonicalizes_unordered_members_without_reordering_history() {
+    type Snapshot = StemmaSnapshot<String, String, String, String>;
+    type Lineage = Stemma<String, String, String, String>;
+    // Deliberately noncanonical set/map arrays. The other arrays are ordered
+    // history and include descending keys and a deliberately unsorted branch.
+    let input = Snapshot {
+        entries: (0..5)
+            .map(|index| EntrySnapshot {
+                key: format!("key-{}", 4 - index),
+                payload: format!("entry-{index}"),
+                first_seen_at_ms: 100 + index,
+                last_seen_at_ms: 200 + index,
+                visit_count: 1,
+                privacy: EntryPrivacy::ShareCandidate,
+            })
+            .collect(),
+        visits: (0..5)
+            .map(|index| VisitSnapshot {
+                entry: 4 - index,
+                parent: (index != 0).then_some(0),
+                children: if index == 0 {
+                    vec![4, 2, 3, 1]
+                } else {
+                    Vec::new()
+                },
+                created_at_ms: 300 + index as u64,
+                context: format!("visit-{index}"),
+                inbound: (index != 0).then_some(TransitionRecord {
+                    kind: TransitionKind::LinkClick,
+                    at_ms: 300 + index as u64,
+                }),
+                bindings: [2, 0, 1]
+                    .into_iter()
+                    .map(|owner| BindingSnapshot {
+                        owner,
+                        forward_child: if index == 0 {
+                            Some([4, 2, 3][owner])
+                        } else {
+                            None
+                        },
+                        last_accessed_at_ms: 400 + (index * 10 + owner) as u64,
+                    })
+                    .collect(),
+            })
+            .collect(),
+        owners: ["z", "a", "m"]
+            .into_iter()
+            .enumerate()
+            .map(|(index, identity)| OwnerSnapshot {
+                identity: identity.into(),
+                origin: Some(0),
+                current: Some([4, 2, 3][index]),
+                creator: (index != 0).then_some(0),
+                pending_origin_parent: None,
+                owned_visits: vec![4, 1, 3, 0, 2],
+            })
+            .collect(),
+    };
+    let mut expected = input.clone();
+    for owner in &mut expected.owners {
+        owner.owned_visits = vec![0, 1, 2, 3, 4];
+    }
+    for visit in &mut expected.visits {
+        let original = visit.bindings.clone();
+        visit.bindings = vec![
+            original[1].clone(),
+            original[2].clone(),
+            original[0].clone(),
+        ];
+    }
+    // Rehydration creates fresh hash tables. Their seeds must never affect the
+    // serialized value, even when reading an old noncanonical snapshot.
+    for _ in 0..32 {
+        let emitted = Lineage::from_snapshot(input.clone()).to_snapshot();
+        assert_eq!(
+            emitted, expected,
+            "only unordered membership arrays may change"
+        );
+        assert_eq!(emitted.visits[0].children, [4, 2, 3, 1]);
+        assert_eq!(Lineage::from_snapshot(emitted).to_snapshot(), expected);
+    }
+}
