@@ -15,11 +15,16 @@
 #![doc(html_no_source)]
 
 pub mod conditions;
+pub mod custody;
+pub mod hocket_adoption;
 pub mod embedded_reservoir;
 pub mod enrollment;
+pub mod identity_ui;
+pub mod keeper;
 pub mod lock_triggers;
 pub mod pairing;
 pub mod personal_sync;
+pub mod profile;
 pub mod resident;
 pub mod resident_blobs;
 pub mod resident_devices;
