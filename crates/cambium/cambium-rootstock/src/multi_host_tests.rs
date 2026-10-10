@@ -313,6 +313,63 @@ fn native_form_state_change_rebuilds_only_its_owning_window() {
     );
 }
 
+#[test]
+fn native_form_metadata_notifications_reach_only_the_owning_window() {
+    let (mut multi, a, b) = multi();
+    let dom = multi.dom();
+    let root = multi.window_root(a).unwrap();
+    let (input, option, button) = {
+        let mut document = dom.borrow_mut();
+        let input = document.create_element(html_qual("input"));
+        document.append_child(root, input);
+        let select = document.create_element(html_qual("select"));
+        document.append_child(root, select);
+        let option = document.create_element(html_qual("option"));
+        document.append_child(select, option);
+        let button = document.create_element(html_qual("button"));
+        document.append_child(root, button);
+        (input, option, button)
+    };
+    for _ in 0..2 {
+        layout_at(&mut multi, a, 400.0, 300.0);
+        layout_at(&mut multi, b, 300.0, 600.0);
+    }
+    assert!(multi.touched_windows().is_empty());
+    for notification in 0..3 {
+        {
+            let mut document = dom.borrow_mut();
+            match notification {
+                0 => assert!(document.set_form_control_interaction_state(
+                    input,
+                    layout_dom_api::FormControlInteractionState {
+                        last_change_by_user: true,
+                        ..Default::default()
+                    }
+                )),
+                1 => assert!(document.set_option_selected_state(
+                    option,
+                    layout_dom_api::SelectOptionState {
+                        selected: true,
+                        dirty: true
+                    }
+                )),
+                _ => assert!(document.set_custom_validity(button, "Choose an option")),
+            }
+        }
+        assert_eq!(
+            multi.touched_windows(),
+            HashSet::from([a]),
+            "form notification {notification} must reach its owner without invalidating the sibling"
+        );
+        layout_at(&mut multi, a, 400.0, 300.0);
+        layout_at(&mut multi, b, 300.0, 600.0);
+        assert!(
+            multi.touched_windows().is_empty(),
+            "the owner consumes its notification"
+        );
+    }
+}
+
 /// An accessibility bridge that records the node ids of the tree the host
 /// hands it, so the test reads what the host's own sync path projected.
 struct Recording(Rc<std::cell::RefCell<HashSet<u64>>>);
