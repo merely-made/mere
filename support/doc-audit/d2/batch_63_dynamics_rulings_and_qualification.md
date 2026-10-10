@@ -151,3 +151,13 @@ qualification counts are historical receipts; no runtime test was rerun for
 this documentation-only correction. The changed-doc comparison reports no new
 mechanical findings, and the scoped diff check passes. Earlier aggregate totals
 remain unchanged.
+
+## SE91 attention default, 2026-10-10
+
+Supplemental documentation judgment against Mere `9fb29896`: SE91 records
+Mark's acceptance verbatim and closes the foreground/background membership
+fork from SE90. The default agrees with design-language §9.2: selection and
+foreground pins bring nodes forward; deselected interacted nodes remain in
+the background until dismissed. The plan and handoff preserve independent
+physics/behavior and keeping state. Reset and qualifying-interaction details
+remain open. No viewer implementation or new runtime receipt is claimed.

@@ -1,7 +1,7 @@
 # Scenograph Editor Plan
 
 **Date:** 2026-10-07
-**Status (2026-10-10):** tracks E1 to E5 and C1 complete, each with headed checks in Chrome and Firefox (Safari not run); C2 landed (SE45 to SE51; F11 to F13), with headed checks in Chrome and Firefox; its label revision (SE52) landed with the web host's genet repin. S1, the swatch grid, landed 2026-10-09 (SE53 to SE83), its dynamics axis implemented in `e2543cee` (SE69, SE89; F200 to F202), with native/wasm fixture identity qualified against Genet `7422e906` and Vello `491c376c`; the handoff records browser qualification and its open Firefox gate. Rulings SE1 to SE90 (§1). Waiting: genet branch `value-engine` (SE39 to SE42) for Mark or genet's lane to land, then mere's rhai `ValueEngine` and the rule runner after a coordinated repin. The Turnstone follow-up (SE32, SE35) is on Turnstone main at `d0775a1` (§3). Mapped, not opened: wallpapers and props, the style editors, authored motion (§3).
+**Status (2026-10-10):** tracks E1 to E5 and C1 complete, each with headed checks in Chrome and Firefox (Safari not run); C2 landed (SE45 to SE51; F11 to F13), with headed checks in Chrome and Firefox; its label revision (SE52) landed with the web host's genet repin. S1, the swatch grid, landed 2026-10-09 (SE53 to SE83), its dynamics axis implemented in `e2543cee` (SE69, SE89; F200 to F202), with native/wasm fixture identity qualified against Genet `7422e906` and Vello `491c376c`; the handoff records browser qualification and its open Firefox gate. Rulings SE1 to SE91 (§1). Waiting: genet branch `value-engine` (SE39 to SE42) for Mark or genet's lane to land, then mere's rhai `ValueEngine` and the rule runner after a coordinated repin. The Turnstone follow-up (SE32, SE35) is on Turnstone main at `d0775a1` (§3). Mapped, not opened: wallpapers and props, the style editors, authored motion (§3).
 **Scope:** the editor foundation that Scenograph's editing surfaces stand on: one undo history in Cambium, and arrangement options declared as data. Carries out the balaur review's rulings A and B. The projection editor in Graphshell is the first consumer of both.
 
 **2026-10-09 addition:** R1's first declarative slice is implemented and qualified: the cross-app design conversation
@@ -258,11 +258,30 @@ simulation and interaction owners before adding a portable behavior carrier.
 The reset boundary still needs a concrete definition: arrangement baseline,
 body velocities, animation time and script state are distinct state owners.
 The current `restore_arrangement` restores stored positions and pauses physics;
-it does not reset a whole animated set. Also reconcile §9.2's retained
-background membership after deselection with the foreground role for recently
-interacted nodes in this answer. No recency cutoff or automatic promotion is
-chosen here. Field remains deferred; interactive/scripted scenery has not been
+it does not reset a whole animated set. The foreground/background membership
+question raised here is resolved by SE91 below. No recency cutoff is chosen.
+Field remains deferred; interactive/scripted scenery has not been
 implemented by this ruling.
+
+**SE91, recede but retain after interaction (2026-10-10).** Mark asked whether
+interacted nodes should remain foregrounded or recede into the background but
+persist when focus shifts. Recommendation put: selected nodes occupy the
+foreground, including a working multi-selection; after deselection, previously
+interacted nodes persist in the background until dismissed; explicit foreground
+pins retain their foreground role across focus changes. Untouched ambient
+suggestions may change with context. Recency can affect emphasis without
+retaining foreground status. Mark: **"Hm. Alright."**
+
+*Follows:* this is the default promotion/demotion behavior and reconciles SE90
+with §9.2. Moving focus within a still-selected working group does not by itself
+demote its selected members. Deselecting an unpinned node returns it to the
+background without discarding it. Attention/presentation changes do not
+implicitly change collision, animation, scripts or durable keeping levels;
+a foreground pin remains distinct from a position pin. The recommendation also
+offered an optional setting to retain the working selection across context
+changes. Its UI, persistence and the exact boundary of qualifying interaction
+remain to be specified. No automatic hover retention or recency timeout is
+introduced. This ruling records behavior, not viewer implementation.
 
 ## 2. Tracks
 
@@ -404,8 +423,9 @@ of its visibility or scene role.
 
 The former three-mode done-condition is superseded. The bounded static backend
 still needs viewer drawing, a disclosed collision edge and the tangible versus
-intangible exclusion control. Before viewer controls land, resolve the reset
-baseline and contextual membership seams, then define the saved scene state
+intangible exclusion control. SE91 resolves foreground/background retention.
+Before viewer controls land, resolve the reset baseline and the interaction
+boundary for retention, then define the saved scene state
 and animated/interactive set slice against their existing owners. Acceptance
 must cover independent visibility and collision, saved-state round trips and
 headed Chrome and Firefox checks. Static obstacle acceptance alone does not
