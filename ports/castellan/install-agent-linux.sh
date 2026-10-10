@@ -38,7 +38,7 @@
 
 set -euo pipefail
 
-MERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+MERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 BIN="${XDG_DATA_HOME:-$HOME/.local/share}/personae/bin"
 UNIT_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
 UNIT="$UNIT_DIR/personae-agent.service"
@@ -69,8 +69,8 @@ command -v cargo >/dev/null 2>&1 || {
     exit 1
 }
 
-echo "building personae bins (release, agent feature) from $MERE"
-( cd "$MERE" && cargo build -p personae --features agent --release )
+echo "building the personae bins (castellan, release, agent feature) from $MERE"
+( cd "$MERE" && cargo build -p castellan --features agent --release )
 
 mkdir -p "$BIN" "$UNIT_DIR" "$VAULT" "$(dirname "$PASSPHRASE_FILE")"
 

@@ -31,7 +31,7 @@
 
 set -euo pipefail
 
-MERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+MERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 BIN="$HOME/Library/Application Support/personae/bin"
 LOGDIR="$HOME/Library/Logs/personae"
 PLIST="$HOME/Library/LaunchAgents/org.merely.personae-agent.plist"
@@ -59,8 +59,8 @@ command -v cargo >/dev/null 2>&1 || {
     exit 1
 }
 
-echo "building personae bins (release, agent feature) from $MERE"
-( cd "$MERE" && cargo build -p personae --features agent --release )
+echo "building the personae bins (castellan, release, agent feature) from $MERE"
+( cd "$MERE" && cargo build -p castellan --features agent --release )
 
 mkdir -p "$BIN" "$LOGDIR" "$VAULT" "$(dirname "$PLIST")"
 
