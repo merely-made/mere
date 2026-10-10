@@ -568,6 +568,61 @@ oscillate merely because their own representation changes the measured size.
 These are acceptance proposals, not recorded receipts. SE36's Rhai choice
 does not establish that the pending rule runner or style editors exist.
 
+#### Forme draft follow-through (2026-10-10; agreed interaction)
+
+**Status:** interaction agreed; implementation and host qualification pending.
+Mark accepted the [forme draft session, design language §9.11](../../2026-08-23_projection_scenes_and_graph_native_platform.md#911-forme-draft-session-2026-10-10):
+unlock starts a private draft; nodes act as tile handles with split/drop
+previews; adding a node changes draft membership; undo/redo traverses draft
+gestures; Discard changes drops the draft and locks; Lock and apply commits
+one arrangement change and locks. Both graph and tiled presentations preview
+the draft. This records the accepted model without declaring a new SE track
+or changing another lane's assignment.
+
+**Source findings at published Mere `e95326dc`:**
+
+- [FormeDocument](../../../crates/forme/forme/src/forme_document.rs) addresses
+  the owning forme and graph and stores its semantic arrangement separately
+  from geometry and host persistence policy.
+- [Platen's TileLayout](../../../crates/platen/platen/src/workbench.rs) is
+  cloneable and already supplies membership, stack/split and fraction edits.
+  Its [bridge](../../../crates/platen/platen/src/workbench/bridge.rs) persists
+  the semantic arrangement and tree geometry together and reconstructs the
+  working layout. `to_arrangement` constructs fresh local arrangement-node
+  IDs; a persistent field bridge must deliberately retain/map its owning
+  identities rather than treat each preview conversion as a new forme.
+- Cambium's dependency-free [History](../../../crates/cambium/edit-history/src/lib.rs)
+  already records snapshots, coalesces gestures and provides undo/redo. Its
+  draft history is separate from the host's durable saved-change history.
+  The existing projection editor applies that separation to recipe edits;
+  it does not provide this forme editing session or its persistence adapter.
+
+**Implementation steps and done-conditions:**
+
+1. **Scoped draft model.** Bind each editing session to the existing forme
+   identity, semantic arrangement and projection geometry; reuse `History`
+   for arrangement snapshots. Coalesce a drag into one draft step. Discard
+   removes only this draft/history; another forme and unrelated source edits
+   survive. Done when membership and nested geometry undo/redo independently,
+   an added node survives discard, and reopening starts at committed state.
+2. **Shared preview and handles.** Feed graph-field regions and tiled
+   presentation from that draft using existing tile mutations. Make pending
+   state, Discard changes and Lock and apply visible; route undo by editor
+   focus. Done when node handles show meaningful split/drop previews, both
+   presentations agree and document editing retains its own undo routing.
+3. **Apply and saved undo.** Send the semantic arrangement and projection
+   geometry through the owning host's persistence boundary as one logical
+   arrangement edit. Keep the draft available if apply fails. Done when
+   successful apply locks, saved undo/redo restores both arrangement and
+   geometry, and save/reopen retains member/access identity without replacing
+   document sessions. Discard must not create a saved-change history entry.
+
+These done-conditions are pending verification. Draft membership and tile
+geometry are distinct from node content or resource attributes. SE6 still
+excludes the projection editor's own UI furniture from recipe undo; this
+forme draft edits the user's arrangement and does not amend SE6. Existing
+dynamics qualification, B1/S2 and viewer ownership remain with their owners.
+
 ## 4. Findings
 
 Verified 2026-10-07 against mere's origin unless named.
