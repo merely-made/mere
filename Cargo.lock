@@ -9578,6 +9578,7 @@ dependencies = [
  "genet-static-dom",
  "hex",
  "insigne",
+ "mere-comms",
  "mere-document-lanes",
  "muniment",
  "p2panda-core",
