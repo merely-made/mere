@@ -65,6 +65,7 @@ mod navigation;
 mod pending;
 mod read;
 mod residency;
+pub use residency::{RefreshOutcome, ResidentRefreshCandidate, ResidentRefreshRequest};
 mod schema;
 mod write;
 use kernel::graph::NodeFacetStore;
@@ -126,6 +127,8 @@ impl<B: Backend> AddressableGraphStore<B> {
         policy: ResidencyPolicy,
     ) -> Result<ResidentGraph<B>, StoreError> {
         let mut view = ResidentGraph {
+            identity: std::sync::Arc::new(()),
+            installation: 0,
             store: self,
             graph: Graph::new(),
             generation: String::new(),
@@ -146,6 +149,9 @@ impl<B: Backend> AddressableGraphStore<B> {
 }
 /// A read-only available-data view. Editing/checkpointing uses the recorded session.
 pub struct ResidentGraph<B> {
+    // A private reader-local identity, independent of backend implementation.
+    identity: std::sync::Arc<()>,
+    installation: u64,
     store: AddressableGraphStore<B>,
     graph: Graph,
     generation: String,

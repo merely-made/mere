@@ -154,7 +154,7 @@ fn invalid_query_preserves_roster_and_never_caches_refusal_then_spec_edit_recove
 #[test]
 fn coverage_refreshes_without_re_evaluation_and_unavailable_freeze_refuses() {
     use kernel::graph::{CoverageLayer, CoverageLimit, CoverageNote, ResourceNode};
-    let (mut graph, _, _, _) = source("coverage");
+    let (mut graph, source_resource, _, _) = source("coverage");
     let missing = ResourceNode::for_term("urn:missing:member").id();
     let mut query = spec();
     query.kind = SubgraphKind::Sparql {
@@ -179,7 +179,7 @@ fn coverage_refreshes_without_re_evaluation_and_unavailable_freeze_refuses() {
         limits: vec![limit],
     });
     assert_eq!(graph.revision(), revision);
-    assert!(index.reconcile(&graph, id).is_none());
+    assert!(index.try_reconcile(&graph, id).unwrap().is_none());
     assert_eq!(index.derive_calls.get(), calls);
     let coverage = index.coverage(&graph, id).unwrap();
     assert!(
@@ -196,6 +196,52 @@ fn coverage_refreshes_without_re_evaluation_and_unavailable_freeze_refuses() {
     );
     assert!(index.freeze_linked(&mut graph, id).is_err());
     assert_eq!(graph.revision(), revision);
+    let observation = graph.semantic_observation_revision();
+    graph.queue_pending_link(kernel::graph::PendingLink {
+        source_resource,
+        source_surface: None,
+        target_iri: "urn:pending:target".into(),
+        statement: SemanticStatementSpec {
+            predicate: "urn:test:pending".into(),
+            ..Default::default()
+        },
+    });
+    assert!(graph.semantic_observation_revision() > observation);
+    assert_eq!(graph.revision(), revision);
+    assert!(index.try_reconcile(&graph, id).unwrap().is_none());
+    assert_eq!(
+        index.derive_calls.get(),
+        calls,
+        "pending observations do not evaluate a cached successful query"
+    );
+    assert!(index.derivation_error(id).is_none());
+    graph.purge_pending_links();
+    graph.set_known_coverage(CoverageNote {
+        limits: vec![CoverageLimit::new(
+            CoverageLayer::Disclosure,
+            "latest host context",
+        )],
+    });
+    assert!(index.try_reconcile(&graph, id).unwrap().is_none());
+    assert_eq!(index.derive_calls.get(), calls);
+    // Pair the counted evaluator with the same replacement operation used by
+    // ResidentGraph when its available-truth digest changes.
+    let (replacement, _, _, _) = source("loaded-replacement");
+    graph
+        .replace_loaded_recorded_snapshot(
+            &replacement.to_snapshot_at(0),
+            replacement.facets(),
+            CoverageNote::default(),
+        )
+        .unwrap();
+    assert!(graph.revision() > revision);
+    assert!(index.try_reconcile(&graph, id).unwrap().is_none());
+    assert!(index.derivation_error(id).is_none());
+    assert_eq!(
+        index.derive_calls.get(),
+        calls + 1,
+        "changed loaded truth evaluates the successful query once"
+    );
 }
 
 #[test]
