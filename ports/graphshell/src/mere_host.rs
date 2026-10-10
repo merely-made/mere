@@ -164,6 +164,7 @@ pub struct MereHost<B> {
     pub(crate) resident_reader: Option<pandect::addressable_graph::ResidentGraph<B>>,
     pub(crate) resident_settings: crate::resident_host::ResidentSettings,
     pub(crate) resident_settings_dirty: bool,
+    pub(crate) resident_refresh: crate::resident_host::HostRefresh,
     pub(crate) resident_roots: crate::resident_host::HostRoots,
     resident_busy: bool,
     resident_staged: Option<crate::resident_host::ResidentStaged>,
@@ -247,6 +248,7 @@ impl<B: Backend + Clone> MereHost<B> {
             resident_reader: None,
             resident_settings: Default::default(),
             resident_settings_dirty: false,
+            resident_refresh: Default::default(),
             resident_roots: Default::default(),
             resident_busy: false,
             resident_staged: None,
@@ -440,6 +442,7 @@ impl<B: Backend + Clone> MereHost<B> {
             mere::canvas::ChannelRegistry::new();
         self.projection_epoch = self.projection_epoch.wrapping_add(1);
         self.projection_revision = 1;
+        self.resident_refresh.invalidate();
         self.resident_reader = None;
         self.resident_settings = Default::default();
         self.resident_settings_dirty = false;
@@ -507,6 +510,9 @@ impl<B: Backend + Clone> MereHost<B> {
         }
         if let Some(staged) = &self.resident_staged {
             return Ok(staged.work());
+        }
+        if self.resident_settings_need_validation() {
+            return Err(ResidentHostError::Busy);
         }
         #[cfg(test)]
         if let Some(error) = self.resident_prepare_error.take() {
@@ -577,6 +583,8 @@ impl<B: Backend + Clone> MereHost<B> {
         self.resident_staged = None;
         self.resident_busy = false;
         self.resident_settings_dirty = false;
+        self.resident_refresh.publication_since = None;
+        self.resident_refresh.notice();
         Ok(Some(generation))
     }
 }

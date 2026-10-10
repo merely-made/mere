@@ -17,6 +17,172 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::sync::{Arc, Mutex};
 use std::time::SystemTime;
 
+/// Where the session's changes stand, as the page's `data-session-store` token.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum SessionStore {
+    Stored,
+    Pending,
+    Writing,
+    Failed,
+}
+
+impl SessionStore {
+    /// The page's token. `unstored` is a settled state with changes nobody
+    /// asked to store, such as a scene save (Scenograph editor plan, E2b
+    /// findings), so the token never claims what the store does not hold.
+    pub fn token(self, unstored: bool) -> &'static str {
+        match self {
+            Self::Stored if unstored => "unstored",
+            Self::Stored => "stored",
+            Self::Pending => "pending",
+            Self::Writing => "writing",
+            Self::Failed => "failed",
+        }
+    }
+
+    /// Whether the frame pump should keep running until this settles.
+    pub fn busy(self) -> bool {
+        matches!(self, Self::Pending | Self::Writing)
+    }
+}
+
+/// Ownership of one browser store continuation, independent of refresh changes.
+pub struct SessionStoreAttempt {
+    identity: Arc<()>,
+    session: pandect::SessionId,
+    sequence: u64,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RefreshToken {
+    pub lifecycle: u64,
+    pub session: pandect::SessionId,
+    pub graph: uuid::Uuid,
+    pub roots_revision: u64,
+    pub policy_revision: u64,
+    pub request: u64,
+}
+#[derive(Default)]
+pub struct RefreshGate {
+    in_flight: Option<(RefreshToken, u64)>,
+    newest_notice: u64,
+    consumed_notice: u64,
+    invalidated: bool,
+}
+impl RefreshGate {
+    pub fn notice(&mut self, sequence: u64) {
+        self.newest_notice = self.newest_notice.max(sequence);
+    }
+    pub fn begin(&mut self, token: RefreshToken) -> bool {
+        if self.in_flight.is_some() {
+            return false;
+        }
+        self.in_flight = Some((token, self.newest_notice));
+        self.invalidated = false;
+        true
+    }
+    pub fn finish(&mut self, token: &RefreshToken, current: &RefreshToken) -> bool {
+        if !self
+            .in_flight
+            .as_ref()
+            .is_some_and(|(active, _)| active == token)
+        {
+            return false;
+        }
+        let (_, notice) = self.in_flight.take().expect("matched request");
+        if token != current || self.invalidated {
+            self.invalidated = true;
+            return false;
+        }
+        self.consumed_notice = self.consumed_notice.max(notice);
+        true
+    }
+    fn fail(&mut self, token: &RefreshToken) {
+        if self
+            .in_flight
+            .as_ref()
+            .is_some_and(|(active, _)| active == token)
+        {
+            self.in_flight = None;
+            self.invalidated = true;
+        }
+    }
+    pub fn needs_check(&self) -> bool {
+        self.invalidated || self.newest_notice > self.consumed_notice
+    }
+}
+#[derive(Default)]
+pub(crate) struct HostRefresh {
+    identity: Arc<()>,
+    gate: RefreshGate,
+    lifecycle: u64,
+    policy_revision: u64,
+    request: u64,
+    notice: u64,
+    suspended: bool,
+    last_clock: Option<f64>,
+    last_check: Option<f64>,
+    pub(crate) publication_since: Option<f64>,
+    validated_settings: Option<RefreshToken>,
+    store_attempt: u64,
+}
+impl HostRefresh {
+    pub(crate) fn invalidate(&mut self) {
+        self.lifecycle = self.lifecycle.wrapping_add(1);
+        self.gate.invalidated = true;
+        self.validated_settings = None;
+    }
+    pub(crate) fn notice(&mut self) {
+        self.notice = self
+            .notice
+            .checked_add(1)
+            .expect("refresh notice exhausted");
+        self.gate.notice(self.notice);
+    }
+}
+/// One owned load; neither its backend nor its token can be substituted by callers.
+pub struct HostRefreshRequest<B> {
+    identity: Arc<()>,
+    token: RefreshToken,
+    preflight: bool,
+    load: HostRefreshLoad<B>,
+}
+enum HostRefreshLoad<B> {
+    Open(
+        pandect::addressable_graph::AddressableGraphStore<B>,
+        ResidencyRoots,
+        ResidencyPolicy,
+    ),
+    Refresh(pandect::addressable_graph::ResidentRefreshRequest<B>),
+}
+enum HostRefreshView<B> {
+    Open(ResidentGraph<B>),
+    Refresh(pandect::addressable_graph::ResidentRefreshCandidate),
+}
+pub struct HostRefreshCompletion<B> {
+    identity: Arc<()>,
+    token: RefreshToken,
+    preflight: bool,
+    result: Result<HostRefreshView<B>, StoreError>,
+}
+impl<B: Backend> HostRefreshRequest<B> {
+    pub async fn load(self) -> HostRefreshCompletion<B> {
+        let result = match self.load {
+            HostRefreshLoad::Open(store, roots, policy) => store
+                .open_with_policy(roots, policy)
+                .await
+                .map(HostRefreshView::Open),
+            HostRefreshLoad::Refresh(request) => request.load().await.map(HostRefreshView::Refresh),
+        };
+        HostRefreshCompletion {
+            identity: self.identity,
+            token: self.token,
+            preflight: self.preflight,
+            result,
+        }
+    }
+}
+
 #[derive(Clone, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ResidentRefreshMode {
     #[default]
@@ -146,6 +312,11 @@ impl<B: Backend + Clone> MereHost<B> {
         }
         self.ensure_resident_idle()?;
         self.validate_resident_settings(&settings)?;
+        if self.resident_settings != settings {
+            self.resident_refresh.policy_revision =
+                self.resident_refresh.policy_revision.wrapping_add(1);
+            self.resident_refresh.invalidate();
+        }
         self.resident_settings_dirty |= self.resident_settings != settings;
         self.resident_settings = settings;
         Ok(())
@@ -167,37 +338,306 @@ impl<B: Backend + Clone> MereHost<B> {
         &self.resident_roots
     }
     pub fn set_resident_pane(&mut self, pane: pandect::ViewKey, roots: PaneRoots) {
+        let revision = self.resident_roots.revision();
         self.resident_roots.set_pane(pane, roots);
+        if revision != self.resident_roots.revision() {
+            self.resident_refresh.notice();
+        }
     }
     pub fn close_resident_pane(&mut self, pane: &pandect::ViewKey) {
+        let revision = self.resident_roots.revision();
         self.resident_roots.close_pane(pane);
+        if revision != self.resident_roots.revision() {
+            self.resident_refresh.notice();
+        }
     }
     /// These roots reflect explicit graph pinning, independently of per-view Keep.
     pub fn set_resident_pins(&mut self, pins: BTreeSet<GraphAddress>) {
+        let revision = self.resident_roots.revision();
         self.resident_roots.set_pins(pins);
+        if revision != self.resident_roots.revision() {
+            self.resident_refresh.notice();
+        }
     }
     pub fn resident_reader(&self) -> Option<&ResidentGraph<B>> {
         self.resident_reader.as_ref()
     }
-    /// Reconcile the installed reader in the same owner that holds the writer.
-    pub async fn refresh_resident_reader(&mut self) -> Result<(), ResidentHostError> {
+    fn refresh_token(&self) -> RefreshToken {
+        RefreshToken {
+            lifecycle: self.resident_refresh.lifecycle,
+            session: self.graph_session().id(),
+            graph: *self.graph_session().manifest().root_graph_id.as_uuid(),
+            roots_revision: self.resident_roots.revision(),
+            policy_revision: self.resident_refresh.policy_revision,
+            request: self.resident_refresh.request,
+        }
+    }
+    pub fn notice_resident_refresh(&mut self) {
+        self.resident_refresh.notice();
+    }
+    pub fn resident_needs_check(&self) -> bool {
+        self.resident_refresh.gate.needs_check()
+    }
+    /// Detach and suspension invalidate outstanding loads without releasing their
+    /// single-flight slot until completion. Resume checks immediately.
+    pub fn suspend_resident_refresh(&mut self, suspended: bool) {
+        if self.resident_refresh.suspended != suspended {
+            self.resident_refresh.suspended = suspended;
+            self.resident_refresh.invalidate();
+            if !suspended {
+                self.resident_refresh.notice();
+            }
+        }
+    }
+    pub fn detach_resident_refresh(&mut self) {
+        self.resident_refresh.suspended = true;
+        self.resident_refresh.invalidate();
+    }
+    pub fn attach_resident_refresh(&mut self) {
+        self.resident_refresh.suspended = false;
+        self.resident_refresh.invalidate();
+        self.resident_refresh.notice();
+    }
+    /// Host monotonic elapsed milliseconds, never wall time. Invalid samples
+    /// cannot move either the interval baseline or the pending notice backwards.
+    pub fn tick_resident_refresh(&mut self, elapsed_ms: f64) {
+        if self.resident_refresh.suspended
+            || !elapsed_ms.is_finite()
+            || elapsed_ms < 0.0
+            || self
+                .resident_refresh
+                .last_clock
+                .is_some_and(|old| elapsed_ms < old)
+        {
+            return;
+        }
+        self.resident_refresh.last_clock = Some(elapsed_ms);
+        if let ResidentRefreshMode::HostDriven { minimum_check_ms } = self.resident_settings.refresh
+        {
+            if self
+                .resident_refresh
+                .last_check
+                .is_none_or(|last| elapsed_ms - last >= minimum_check_ms as f64)
+            {
+                self.resident_refresh.notice();
+                self.resident_refresh.last_check = Some(elapsed_ms);
+            }
+        }
+    }
+    /// Idle publication cadence is independent from reader polling. Explicit
+    /// save/detach callers pass flush; persist() is already an explicit flush.
+    pub fn resident_publication_due(&mut self, elapsed_ms: f64, flush: bool) -> bool {
+        if !self.resident_admitted {
+            return true;
+        }
+        if self.resident_refresh.suspended {
+            return false;
+        }
+        if flush {
+            return true;
+        }
+        if !elapsed_ms.is_finite()
+            || elapsed_ms < 0.0
+            || self
+                .resident_refresh
+                .last_clock
+                .is_some_and(|old| elapsed_ms < old)
+        {
+            return false;
+        }
+        self.resident_refresh.last_clock = Some(elapsed_ms);
+        let start = *self
+            .resident_refresh
+            .publication_since
+            .get_or_insert(elapsed_ms);
+        elapsed_ms - start >= self.resident_settings.publication_batch_ms as f64
+    }
+    pub fn resident_settings_pending(&self) -> bool {
+        self.resident_settings_dirty
+    }
+    pub fn resident_settings_need_validation(&self) -> bool {
+        self.resident_settings_dirty
+            && self.retained_resident_work().is_none()
+            && self.resident_refresh.validated_settings.as_ref() != Some(&self.refresh_token())
+    }
+    pub fn prepare_resident_refresh(
+        &mut self,
+    ) -> Result<Option<HostRefreshRequest<B>>, ResidentHostError> {
+        self.prepare_refresh_request(false, None)
+    }
+    pub fn prepare_resident_settings_validation(
+        &mut self,
+    ) -> Result<Option<HostRefreshRequest<B>>, ResidentHostError> {
+        self.resident_refresh.notice();
+        self.prepare_refresh_request(true, None)
+    }
+    pub fn prepare_resident_demand(
+        &mut self,
+        address: GraphAddress,
+    ) -> Result<Option<HostRefreshRequest<B>>, ResidentHostError> {
+        self.resident_refresh.notice();
+        self.prepare_refresh_request(false, Some(address))
+    }
+    fn prepare_refresh_request(
+        &mut self,
+        preflight: bool,
+        demand: Option<GraphAddress>,
+    ) -> Result<Option<HostRefreshRequest<B>>, ResidentHostError> {
         if !self.resident_admitted {
             return Err(ResidentHostError::OwnershipUnproven);
         }
-        let roots = self.resident_roots.union();
-        if let Some(reader) = &mut self.resident_reader {
-            reader
-                .reconcile_with_policy(roots, self.resident_settings.policy)
-                .await?;
-        } else {
-            let reader = pandect::addressable_graph::AddressableGraphStore::new(
-                self.store(),
-                *self.graph_session().manifest().root_graph_id.as_uuid(),
-            )
-            .open_with_policy(roots, self.resident_settings.policy)
-            .await?;
-            self.resident_reader = Some(reader);
+        if self.resident_refresh.suspended
+            || !self.resident_refresh.gate.needs_check()
+            || self.resident_refresh.gate.in_flight.is_some()
+        {
+            return Ok(None);
         }
+        // Dirty settings need validation before writing, and must not become
+        // presentation policy until their retained settings batch is stored.
+        if !preflight && self.resident_settings_dirty {
+            return Ok(None);
+        }
+        self.resident_refresh.request = self.resident_refresh.request.wrapping_add(1);
+        let token = self.refresh_token();
+        if !self.resident_refresh.gate.begin(token.clone()) {
+            return Ok(None);
+        }
+        self.resident_refresh.last_check = self.resident_refresh.last_clock;
+        let roots = self.resident_roots.union();
+        let policy = self.resident_settings.policy;
+        let load = if let Some(reader) = &self.resident_reader {
+            HostRefreshLoad::Refresh(match demand {
+                Some(address) => reader.refresh_request(roots, policy).with_demand(address),
+                None => reader.refresh_request(roots, policy),
+            })
+        } else {
+            if demand.is_some() {
+                self.resident_refresh.gate.fail(&token);
+                return Err(ResidentHostError::Busy);
+            }
+            HostRefreshLoad::Open(
+                pandect::addressable_graph::AddressableGraphStore::new(self.store(), token.graph),
+                roots,
+                policy,
+            )
+        };
+        Ok(Some(HostRefreshRequest {
+            identity: self.resident_refresh.identity.clone(),
+            token,
+            preflight,
+            load,
+        }))
+    }
+    pub fn install_resident_refresh(
+        &mut self,
+        completion: HostRefreshCompletion<B>,
+    ) -> Result<pandect::addressable_graph::RefreshOutcome, ResidentHostError> {
+        use pandect::addressable_graph::RefreshOutcome;
+        let current = self.refresh_token();
+        if !Arc::ptr_eq(&completion.identity, &self.resident_refresh.identity) {
+            return Err(ResidentHostError::StaleCompletion);
+        }
+        if completion.token != current || self.resident_refresh.suspended {
+            self.resident_refresh.gate.fail(&completion.token);
+            return Err(ResidentHostError::StaleCompletion);
+        }
+        let view = match completion.result {
+            Ok(view) => view,
+            Err(error) => {
+                self.resident_refresh.gate.fail(&completion.token);
+                return Err(error.into());
+            },
+        };
+        if !self
+            .resident_refresh
+            .gate
+            .finish(&completion.token, &current)
+        {
+            return Err(ResidentHostError::StaleCompletion);
+        }
+        if completion.preflight {
+            self.resident_refresh.validated_settings = Some(current);
+            return Ok(RefreshOutcome::Unchanged);
+        }
+        let result = match view {
+            HostRefreshView::Open(reader) => {
+                self.resident_reader = Some(reader);
+                Ok(RefreshOutcome::TruthChanged)
+            },
+            HostRefreshView::Refresh(candidate) => self
+                .resident_reader
+                .as_mut()
+                .ok_or(ResidentHostError::StaleCompletion)?
+                .install_refresh(candidate)
+                .map_err(Into::into),
+        };
+        if result.is_err() {
+            self.resident_refresh.gate.invalidated = true;
+        }
+        result
+    }
+    /// Capture ownership before dispatching a browser store task.
+    pub fn begin_session_store_attempt(&mut self) -> SessionStoreAttempt {
+        self.resident_refresh.store_attempt = self
+            .resident_refresh
+            .store_attempt
+            .checked_add(1)
+            .expect("session store attempt exhausted");
+        SessionStoreAttempt {
+            identity: self.resident_refresh.identity.clone(),
+            session: self.graph_session().id(),
+            sequence: self.resident_refresh.store_attempt,
+        }
+    }
+
+    pub fn session_store_attempt_is_current(&self, attempt: &SessionStoreAttempt) -> bool {
+        Arc::ptr_eq(&attempt.identity, &self.resident_refresh.identity)
+            && attempt.session == self.graph_session().id()
+            && attempt.sequence == self.resident_refresh.store_attempt
+    }
+
+    /// Continue the browser's settings preflight after its owned load ends.
+    /// The returned flag permits synchronous write preparation only on success.
+    pub fn continue_settings_store(
+        &mut self,
+        attempt: &SessionStoreAttempt,
+        completion: HostRefreshCompletion<B>,
+        status: &mut SessionStore,
+        error: &mut String,
+    ) -> bool {
+        if !self.session_store_attempt_is_current(attempt) {
+            // Release only this completion's flight. A newer flight, notice,
+            // store status and diagnostic belong to the current operation.
+            if Arc::ptr_eq(&completion.identity, &self.resident_refresh.identity) {
+                self.resident_refresh.gate.fail(&completion.token);
+            }
+            return false;
+        }
+        match self.install_resident_refresh(completion) {
+            Ok(_) => true,
+            Err(ResidentHostError::StaleCompletion) => {
+                // Lifecycle/roots/settings changes cancel validation, but the
+                // settings are still dirty. Pending lets the pump retry after
+                // resume or once the current inputs can be validated.
+                *status = SessionStore::Pending;
+                false
+            },
+            Err(failure) => {
+                *status = SessionStore::Failed;
+                *error = failure.to_string();
+                false
+            },
+        }
+    }
+
+    /// Convenience for exclusively borrowed native owners. Browser callers use
+    /// prepare/load/install so their RefCell borrow ends before I/O starts.
+    pub async fn refresh_resident_reader(&mut self) -> Result<(), ResidentHostError> {
+        self.notice_resident_refresh();
+        let request = self
+            .prepare_resident_refresh()?
+            .ok_or(ResidentHostError::Busy)?;
+        self.install_resident_refresh(request.load().await)?;
         Ok(())
     }
 }
@@ -557,6 +997,12 @@ impl<B: Backend + Clone> ResidentHost<B> {
             return self.refresh().await;
         }
         let host = self.host.as_mut().ok_or(ResidentHostError::Busy)?;
+        if host.resident_settings_need_validation() && host.retained_resident_work().is_none() {
+            let request = host
+                .prepare_resident_settings_validation()?
+                .ok_or(ResidentHostError::Busy)?;
+            host.install_resident_refresh(request.load().await)?;
+        }
         let work = match host.prepare_resident_store(at) {
             Ok(w) => w,
             Err(_) => return Ok(self.unstored()),
@@ -659,6 +1105,34 @@ mod tests {
     use uuid::Uuid;
 
     #[test]
+    fn a_new_notice_survives_completion_and_switch_rejects_install() {
+        let session = pandect::MereSessions::new(muniment::MemoryBackend::new())
+            .begin_recorded(mere::kernel::graph::Author::user(), None)
+            .id();
+        let old = RefreshToken {
+            lifecycle: 1,
+            session,
+            graph: uuid::Uuid::from_u128(5000),
+            roots_revision: 1,
+            policy_revision: 1,
+            request: 1,
+        };
+        let mut gate = RefreshGate::default();
+        gate.notice(1);
+        assert!(gate.begin(old.clone()));
+        assert!(!gate.begin(old.clone()));
+        gate.notice(2);
+        assert!(gate.finish(&old, &old));
+        assert!(gate.needs_check());
+        let mut switched = old.clone();
+        switched.lifecycle += 1;
+        switched.request += 1;
+        assert!(gate.begin(old.clone()));
+        assert!(!gate.finish(&old, &switched));
+        assert!(gate.needs_check());
+    }
+
+    #[test]
     fn closing_one_pane_releases_only_its_transient_roots() {
         let first = ViewKey::new("graphshell", "first").unwrap();
         let second = ViewKey::new("graphshell", "second").unwrap();
@@ -700,6 +1174,14 @@ mod tests {
     #[async_trait::async_trait]
     impl Backend for Fault {
         async fn get(&self, key: &str) -> Result<Option<Vec<u8>>, StoreError> {
+            std::future::poll_fn(|_| {
+                if self.mode.load(Ordering::SeqCst) == 7 {
+                    std::task::Poll::Pending
+                } else {
+                    std::task::Poll::Ready(())
+                }
+            })
+            .await;
             if self.mode.load(Ordering::SeqCst) == 4 {
                 return Err(StoreError::Backend("read fault".into()));
             }
@@ -1339,6 +1821,533 @@ mod tests {
             assert_eq!(calls.len(), 3);
             assert_eq!(calls[1], calls[2]);
             assert!(!host.has_unstored());
+        });
+    }
+    fn pause_load<B: Backend>(
+        request: HostRefreshRequest<B>,
+    ) -> std::pin::Pin<Box<impl std::future::Future<Output = HostRefreshCompletion<B>>>> {
+        use std::future::Future;
+        let mut future = Box::pin(request.load());
+        let mut context = std::task::Context::from_waker(std::task::Waker::noop());
+        assert!(future.as_mut().poll(&mut context).is_pending());
+        future
+    }
+
+    #[test]
+    fn owned_load_releases_refcell_and_retains_newer_notices_and_context() {
+        pollster::block_on(async {
+            let (mut owner, backend) = owner().await;
+            let state = std::cell::RefCell::new(owner.host.take().unwrap());
+            let request = {
+                let mut host = state.borrow_mut();
+                host.notice_resident_refresh();
+                host.prepare_resident_refresh().unwrap().unwrap()
+            };
+            backend.mode.store(7, Ordering::SeqCst);
+            let pending = pause_load(request);
+            {
+                let mut host = state.borrow_mut();
+                for _ in 0..100 {
+                    host.notice_resident_refresh();
+                }
+                assert!(host.prepare_resident_refresh().unwrap().is_none());
+                let mut note = mere::kernel::graph::CoverageNote::default();
+                note.push(mere::kernel::graph::CoverageLimit::new(
+                    mere::kernel::graph::CoverageLayer::Disclosure,
+                    "arrived during load",
+                ));
+                host.resident_reader
+                    .as_mut()
+                    .unwrap()
+                    .set_host_coverage(note);
+            }
+            backend.mode.store(0, Ordering::SeqCst);
+            let completion = pending.await;
+            let mut host = state.borrow_mut();
+            assert_eq!(
+                host.install_resident_refresh(completion).unwrap(),
+                pandect::addressable_graph::RefreshOutcome::Unchanged
+            );
+            assert!(host.resident_needs_check());
+            assert!(
+                host.resident_reader()
+                    .unwrap()
+                    .graph()
+                    .known_coverage()
+                    .limits
+                    .iter()
+                    .any(|l| l.reason == "arrived during load")
+            );
+            let request = host.prepare_resident_refresh().unwrap().unwrap();
+            drop(host);
+            let completion = request.load().await;
+            let mut host = state.borrow_mut();
+            host.install_resident_refresh(completion).unwrap();
+            assert!(!host.resident_needs_check());
+        });
+    }
+
+    #[test]
+    fn controlled_load_rejects_roots_policy_session_and_lifecycle_switches() {
+        pollster::block_on(async {
+            for change in 0..5 {
+                let (mut owner, backend) = owner().await;
+                let host = owner.host.as_mut().unwrap();
+                host.notice_resident_refresh();
+                let request = host.prepare_resident_refresh().unwrap().unwrap();
+                backend.mode.store(7, Ordering::SeqCst);
+                let pending = pause_load(request);
+                match change {
+                    0 => host.set_resident_pane(
+                        ViewKey::new("test", "changed").unwrap(),
+                        PaneRoots::default(),
+                    ),
+                    1 => host
+                        .set_resident_settings(ResidentSettings {
+                            publication_batch_ms: 9,
+                            ..Default::default()
+                        })
+                        .unwrap(),
+                    2 => host
+                        .begin_profiled_session(
+                            mere::kernel::graph::Graph::new(),
+                            Some(pandect::graph_placement::PlacementProfile::RecordedStrataV1),
+                        )
+                        .unwrap(),
+                    3 => host.suspend_resident_refresh(true),
+                    _ => host.detach_resident_refresh(),
+                }
+                backend.mode.store(0, Ordering::SeqCst);
+                assert!(matches!(
+                    host.install_resident_refresh(pending.await),
+                    Err(ResidentHostError::StaleCompletion)
+                ));
+                assert!(host.resident_needs_check());
+                if change == 2 {
+                    assert!(host.resident_reader().is_none());
+                } else {
+                    assert_eq!(host.resident_reader().unwrap().graph().node_count(), 0);
+                }
+            }
+        });
+    }
+
+    #[test]
+    fn failed_load_and_failed_demand_preserve_reader_and_retry_notice() {
+        pollster::block_on(async {
+            let (mut owner, backend) = owner().await;
+            let host = owner.host.as_mut().unwrap();
+            let generation = host.resident_reader().unwrap().generation().to_owned();
+            host.notice_resident_refresh();
+            let request = host.prepare_resident_refresh().unwrap().unwrap();
+            backend.mode.store(7, Ordering::SeqCst);
+            let pending = pause_load(request);
+            backend.mode.store(4, Ordering::SeqCst);
+            assert!(host.install_resident_refresh(pending.await).is_err());
+            assert!(host.resident_needs_check());
+            backend.mode.store(0, Ordering::SeqCst);
+            let request = host
+                .prepare_resident_demand(GraphAddress::Surface(Uuid::from_u128(98765)))
+                .unwrap()
+                .unwrap();
+            assert!(host.install_resident_refresh(request.load().await).is_err());
+            assert!(host.resident_needs_check());
+            assert_eq!(host.resident_reader().unwrap().generation(), generation);
+            assert!(host.resident_roots().union().pinned.is_empty());
+            host.refresh_resident_reader().await.unwrap();
+            assert!(!host.resident_needs_check());
+        });
+    }
+
+    #[test]
+    fn staged_settings_validate_before_writes_and_keep_the_old_reader() {
+        pollster::block_on(async {
+            for change in 0..3 {
+                let (mut owner, backend) = owner().await;
+                let host = owner.host.as_mut().unwrap();
+                host.set_resident_settings(ResidentSettings {
+                    publication_batch_ms: 50,
+                    ..Default::default()
+                })
+                .unwrap();
+                assert!(host.prepare_resident_io(SystemTime::UNIX_EPOCH).is_err());
+                let request = host
+                    .prepare_resident_settings_validation()
+                    .unwrap()
+                    .unwrap();
+                backend.mode.store(7, Ordering::SeqCst);
+                let pending = pause_load(request);
+                if change == 1 {
+                    host.set_resident_settings(ResidentSettings {
+                        publication_batch_ms: 60,
+                        ..Default::default()
+                    })
+                    .unwrap();
+                }
+                if change == 2 {
+                    host.detach_resident_refresh();
+                    host.attach_resident_refresh();
+                }
+                backend
+                    .mode
+                    .store(if change == 0 { 4 } else { 0 }, Ordering::SeqCst);
+                assert!(host.install_resident_refresh(pending.await).is_err());
+                assert!(host.resident_settings_pending());
+                assert!(host.resident_needs_check());
+                assert!(backend.calls.lock().unwrap().is_empty());
+                assert_eq!(
+                    host.resident_reader().unwrap().policy(),
+                    ResidencyPolicy::Full
+                );
+                backend.mode.store(0, Ordering::SeqCst);
+                let request = host
+                    .prepare_resident_settings_validation()
+                    .unwrap()
+                    .unwrap();
+                host.install_resident_refresh(request.load().await).unwrap();
+                let work = host.prepare_resident_io(SystemTime::UNIX_EPOCH).unwrap();
+                assert!(backend.calls.lock().unwrap().is_empty());
+                work.write().await.unwrap();
+                host.install_resident_io(&work).unwrap();
+                assert!(host.resident_needs_check());
+                host.refresh_resident_reader().await.unwrap();
+                assert!(!host.resident_settings_pending());
+            }
+        });
+    }
+
+    async fn stale_settings_continuation_retries(change: u8) {
+        let (mut owner, backend) = owner().await;
+        let host = owner.host.as_mut().unwrap();
+        host.set_resident_settings(ResidentSettings {
+            publication_batch_ms: 50,
+            ..Default::default()
+        })
+        .unwrap();
+        let generation = host.resident_reader().unwrap().generation().to_owned();
+        let mut status = SessionStore::Writing;
+        let mut error = "existing diagnostic".to_owned();
+        let attempt = host.begin_session_store_attempt();
+        let request = host
+            .prepare_resident_settings_validation()
+            .unwrap()
+            .unwrap();
+        backend.mode.store(7, Ordering::SeqCst);
+        let pending = pause_load(request);
+        match change {
+            0 => host.suspend_resident_refresh(true),
+            1 => host
+                .set_resident_settings(ResidentSettings {
+                    publication_batch_ms: 60,
+                    ..Default::default()
+                })
+                .unwrap(),
+            _ => host.set_resident_pane(
+                ViewKey::new("test", "intervening-root").unwrap(),
+                PaneRoots::default(),
+            ),
+        }
+        backend.mode.store(0, Ordering::SeqCst);
+        assert!(!host.continue_settings_store(&attempt, pending.await, &mut status, &mut error));
+        assert_eq!(
+            status,
+            SessionStore::Pending,
+            "stale validation must remain schedulable"
+        );
+        assert_eq!(error, "existing diagnostic");
+        assert!(host.resident_settings_pending());
+        assert!(host.resident_needs_check());
+        assert!(backend.calls.lock().unwrap().is_empty());
+        assert_eq!(host.resident_reader().unwrap().generation(), generation);
+        if change == 0 {
+            assert!(
+                host.prepare_resident_settings_validation()
+                    .unwrap()
+                    .is_none()
+            );
+            host.suspend_resident_refresh(false);
+        }
+        // Exercise the same Pending guard and real continuation used by the pump.
+        assert_eq!(status, SessionStore::Pending);
+        status = SessionStore::Writing;
+        let attempt = host.begin_session_store_attempt();
+        let request = host
+            .prepare_resident_settings_validation()
+            .unwrap()
+            .unwrap();
+        assert!(host.continue_settings_store(
+            &attempt,
+            request.load().await,
+            &mut status,
+            &mut error
+        ));
+        let work = host.prepare_resident_io(SystemTime::UNIX_EPOCH).unwrap();
+        assert!(backend.calls.lock().unwrap().is_empty());
+        work.write().await.unwrap();
+        host.install_resident_io(&work).unwrap();
+        assert!(!host.resident_settings_pending());
+        host.refresh_resident_reader().await.unwrap();
+        assert!(!host.resident_needs_check());
+    }
+
+    #[test]
+    fn settings_continuation_retries_after_hide_resume() {
+        pollster::block_on(stale_settings_continuation_retries(0));
+    }
+
+    #[test]
+    fn settings_continuation_retries_after_settings_change() {
+        pollster::block_on(stale_settings_continuation_retries(1));
+    }
+
+    #[test]
+    fn settings_continuation_retries_after_roots_change() {
+        pollster::block_on(stale_settings_continuation_retries(2));
+    }
+
+    #[test]
+    fn settings_continuation_preserves_new_session_status_and_error() {
+        pollster::block_on(async {
+            for current in [
+                SessionStore::Stored,
+                SessionStore::Pending,
+                SessionStore::Writing,
+                SessionStore::Failed,
+            ] {
+                let (mut owner, backend) = owner().await;
+                let host = owner.host.as_mut().unwrap();
+                host.set_resident_settings(ResidentSettings {
+                    publication_batch_ms: 50,
+                    ..Default::default()
+                })
+                .unwrap();
+                let attempt = host.begin_session_store_attempt();
+                let request = host
+                    .prepare_resident_settings_validation()
+                    .unwrap()
+                    .unwrap();
+                backend.mode.store(7, Ordering::SeqCst);
+                let pending = pause_load(request);
+                host.begin_profiled_session(
+                    mere::kernel::graph::Graph::new(),
+                    Some(pandect::graph_placement::PlacementProfile::RecordedStrataV1),
+                )
+                .unwrap();
+                let mut status = current;
+                let mut error = "new session diagnostic".to_owned();
+                backend.mode.store(0, Ordering::SeqCst);
+                assert!(!host.continue_settings_store(
+                    &attempt,
+                    pending.await,
+                    &mut status,
+                    &mut error
+                ));
+                assert_eq!(status, current);
+                assert_eq!(error, "new session diagnostic");
+                assert!(host.resident_needs_check());
+                assert!(backend.calls.lock().unwrap().is_empty());
+                assert!(host.resident_reader().is_none());
+            }
+        });
+    }
+
+    #[test]
+    fn settings_continuation_current_read_failure_remains_actionable() {
+        pollster::block_on(async {
+            let (mut owner, backend) = owner().await;
+            let host = owner.host.as_mut().unwrap();
+            host.set_resident_settings(ResidentSettings {
+                publication_batch_ms: 50,
+                ..Default::default()
+            })
+            .unwrap();
+            let attempt = host.begin_session_store_attempt();
+            let request = host
+                .prepare_resident_settings_validation()
+                .unwrap()
+                .unwrap();
+            backend.mode.store(7, Ordering::SeqCst);
+            let pending = pause_load(request);
+            let mut status = SessionStore::Writing;
+            let mut error = String::new();
+            backend.mode.store(4, Ordering::SeqCst);
+            assert!(!host.continue_settings_store(
+                &attempt,
+                pending.await,
+                &mut status,
+                &mut error
+            ));
+            assert_eq!(status, SessionStore::Failed);
+            assert!(!error.is_empty());
+            assert!(host.resident_settings_pending());
+            assert!(host.resident_needs_check());
+            assert!(backend.calls.lock().unwrap().is_empty());
+        });
+    }
+
+    #[test]
+    fn settings_continuation_preserves_newer_store_attempt_and_queued_work() {
+        pollster::block_on(async {
+            for read_mode in [0, 4] {
+                for current in [
+                    SessionStore::Stored,
+                    SessionStore::Pending,
+                    SessionStore::Writing,
+                    SessionStore::Failed,
+                ] {
+                    let (mut owner, backend) = owner().await;
+                    let host = owner.host.as_mut().unwrap();
+                    host.set_resident_settings(ResidentSettings {
+                        publication_batch_ms: 50,
+                        ..Default::default()
+                    })
+                    .unwrap();
+                    let old_attempt = host.begin_session_store_attempt();
+                    let request = host
+                        .prepare_resident_settings_validation()
+                        .unwrap()
+                        .unwrap();
+                    backend.mode.store(7, Ordering::SeqCst);
+                    let pending = pause_load(request);
+                    // An actual browser Pending writer can dispatch a newer
+                    // attempt while the first preflight still owns the slot.
+                    let newer_attempt = host.begin_session_store_attempt();
+                    assert!(!host.session_store_attempt_is_current(&old_attempt));
+                    assert!(host.session_store_attempt_is_current(&newer_attempt));
+                    assert!(
+                        host.prepare_resident_settings_validation()
+                            .unwrap()
+                            .is_none()
+                    );
+                    host.notice_resident_refresh();
+                    let consumed = host.resident_refresh.gate.consumed_notice;
+                    let notice = host.resident_refresh.gate.newest_notice;
+                    let generation = host.resident_reader().unwrap().generation().to_owned();
+                    let mut status = current;
+                    let mut error = "new attempt diagnostic".to_owned();
+                    backend.mode.store(read_mode, Ordering::SeqCst);
+                    assert!(!host.continue_settings_store(
+                        &old_attempt,
+                        pending.await,
+                        &mut status,
+                        &mut error
+                    ));
+                    assert_eq!(status, current);
+                    assert_eq!(error, "new attempt diagnostic");
+                    assert_eq!(host.resident_refresh.gate.consumed_notice, consumed);
+                    assert_eq!(host.resident_refresh.gate.newest_notice, notice);
+                    assert!(host.resident_refresh.gate.in_flight.is_none());
+                    assert!(host.resident_settings_need_validation());
+                    assert!(host.resident_needs_check());
+                    assert!(backend.calls.lock().unwrap().is_empty());
+                    assert_eq!(host.resident_reader().unwrap().generation(), generation);
+                    // The current attempt can retry after the cancelled load
+                    // frees the slot. Its validation alone permits staging.
+                    backend.mode.store(0, Ordering::SeqCst);
+                    let request = host
+                        .prepare_resident_settings_validation()
+                        .unwrap()
+                        .unwrap();
+                    assert!(host.continue_settings_store(
+                        &newer_attempt,
+                        request.load().await,
+                        &mut status,
+                        &mut error
+                    ));
+                    let work = host.prepare_resident_io(SystemTime::UNIX_EPOCH).unwrap();
+                    assert!(backend.calls.lock().unwrap().is_empty());
+                    work.write().await.unwrap();
+                    host.install_resident_io(&work).unwrap();
+                    assert!(!host.resident_settings_pending());
+                }
+            }
+        });
+    }
+
+    #[test]
+    fn settings_continuation_retry_keeps_exact_uncertain_bytes() {
+        pollster::block_on(async {
+            let (mut owner, backend) = owner().await;
+            let host = owner.host.as_mut().unwrap();
+            host.set_resident_settings(ResidentSettings {
+                publication_batch_ms: 50,
+                ..Default::default()
+            })
+            .unwrap();
+            let attempt = host.begin_session_store_attempt();
+            let request = host
+                .prepare_resident_settings_validation()
+                .unwrap()
+                .unwrap();
+            let mut status = SessionStore::Writing;
+            let mut error = String::new();
+            assert!(host.continue_settings_store(
+                &attempt,
+                request.load().await,
+                &mut status,
+                &mut error
+            ));
+            let work = host.prepare_resident_io(SystemTime::UNIX_EPOCH).unwrap();
+            assert!(backend.calls.lock().unwrap().is_empty());
+            backend.mode.store(1, Ordering::SeqCst);
+            assert!(
+                work.write()
+                    .await
+                    .unwrap_err()
+                    .to_string()
+                    .contains("before apply")
+            );
+            assert!(host.install_resident_io(&work).unwrap().is_none());
+            let bytes = backend.calls.lock().unwrap().last().unwrap().clone();
+            host.suspend_resident_refresh(true);
+            host.suspend_resident_refresh(false);
+            let newer = host.begin_session_store_attempt();
+            assert!(!host.session_store_attempt_is_current(&attempt));
+            assert!(host.session_store_attempt_is_current(&newer));
+            assert!(
+                !host.resident_settings_need_validation(),
+                "retained bytes bypass fresh preflight"
+            );
+            let retry = host
+                .prepare_resident_io(SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(100))
+                .unwrap();
+            backend.mode.store(0, Ordering::SeqCst);
+            retry.write().await.unwrap();
+            assert_eq!(backend.calls.lock().unwrap().last(), Some(&bytes));
+            host.install_resident_io(&retry).unwrap();
+            assert!(!host.resident_settings_pending());
+            assert!(!host.resident_busy());
+        });
+    }
+
+    #[test]
+    fn foreground_catches_up_and_clocks_and_publication_intervals_are_separate() {
+        pollster::block_on(async {
+            let (mut owner, _) = owner().await;
+            let host = owner.host.as_mut().unwrap();
+            host.resident_settings.refresh = ResidentRefreshMode::HostDriven {
+                minimum_check_ms: 100,
+            };
+            host.resident_settings.publication_batch_ms = 500;
+            host.tick_resident_refresh(100.0);
+            let request = host.prepare_resident_refresh().unwrap().unwrap();
+            host.install_resident_refresh(request.load().await).unwrap();
+            for clock in [99.0, f64::NAN, f64::INFINITY, 199.0] {
+                host.tick_resident_refresh(clock);
+            }
+            assert!(!host.resident_needs_check());
+            assert!(!host.resident_publication_due(199.0, false));
+            assert!(host.resident_publication_due(199.0, true));
+            host.tick_resident_refresh(200.0);
+            assert!(host.resident_needs_check());
+            host.suspend_resident_refresh(true);
+            assert!(host.prepare_resident_refresh().unwrap().is_none());
+            host.tick_resident_refresh(1000.0);
+            host.suspend_resident_refresh(false);
+            let request = host.prepare_resident_refresh().unwrap().unwrap();
+            host.install_resident_refresh(request.load().await).unwrap();
+            assert!(!host.resident_needs_check());
+            assert!(host.resident_publication_due(1000.0, false));
         });
     }
 }

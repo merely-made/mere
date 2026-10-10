@@ -936,6 +936,7 @@ struct ReadProbe<B> {
     backend: B,
     reads: std::sync::Arc<std::sync::atomic::AtomicUsize>,
     bytes: std::sync::Arc<std::sync::atomic::AtomicUsize>,
+    keys: std::sync::Arc<std::sync::Mutex<Vec<String>>>,
     applies: std::sync::Arc<std::sync::atomic::AtomicUsize>,
     applied_ops: std::sync::Arc<std::sync::Mutex<Option<Vec<muniment::WriteOp>>>>,
 }
@@ -945,11 +946,13 @@ impl<B> ReadProbe<B> {
             backend,
             reads: Default::default(),
             bytes: Default::default(),
+            keys: Default::default(),
             applies: Default::default(),
             applied_ops: Default::default(),
         }
     }
     fn reset(&self) {
+        self.keys.lock().unwrap().clear();
         self.reads.store(0, std::sync::atomic::Ordering::SeqCst);
         self.bytes.store(0, std::sync::atomic::Ordering::SeqCst);
     }
@@ -964,6 +967,7 @@ impl<B> ReadProbe<B> {
 #[cfg_attr(target_arch="wasm32",async_trait::async_trait(?Send))]
 impl<B: ProbeBackend> Backend for ReadProbe<B> {
     async fn get(&self, key: &str) -> Result<Option<Vec<u8>>, muniment::StoreError> {
+        self.keys.lock().unwrap().push(key.to_owned());
         let data = self.backend.get(key).await?;
         if key.contains("/nodes/") {
             self.reads.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
@@ -1196,7 +1200,10 @@ async fn p3_context_and_cache_controls<B: Backend + Clone>(backend: B) {
         .await
         .unwrap();
     writer.publish_resident_checkpoint().await.unwrap();
-    view.refresh().await.unwrap();
+    assert_eq!(
+        view.refresh_if_changed().await.unwrap(),
+        RefreshOutcome::SourceOnly
+    );
     assert_eq!(
         view.graph().revision(),
         revision,
@@ -1223,7 +1230,10 @@ async fn p3_context_and_cache_controls<B: Backend + Clone>(backend: B) {
         .await
         .unwrap();
     writer.publish_resident_checkpoint().await.unwrap();
-    view.refresh().await.unwrap();
+    assert_eq!(
+        view.refresh_if_changed().await.unwrap(),
+        RefreshOutcome::ObservationOnly
+    );
     assert_eq!(
         view.graph().revision(),
         revision,
@@ -1253,7 +1263,10 @@ async fn p3_context_and_cache_controls<B: Backend + Clone>(backend: B) {
         .await
         .unwrap();
     writer.publish_resident_checkpoint().await.unwrap();
-    view.refresh().await.unwrap();
+    assert_eq!(
+        view.refresh_if_changed().await.unwrap(),
+        RefreshOutcome::TruthChanged
+    );
     assert!(view.graph().revision() > revision);
     view.set_host_coverage(Default::default());
     view.set_policy(ResidencyPolicy::Full).await.unwrap();
@@ -1277,7 +1290,10 @@ async fn p3_context_and_cache_controls<B: Backend + Clone>(backend: B) {
         })
         .unwrap();
     writer.publish_resident_checkpoint().await.unwrap();
-    view.refresh().await.unwrap();
+    assert_eq!(
+        view.refresh_if_changed().await.unwrap(),
+        RefreshOutcome::ObservationOnly
+    );
     assert_eq!(view.graph().revision(), old_revision);
     assert!(view.graph().semantic_observation_revision() > old_observation);
     assert!(view.graph().pending_links().is_empty());
@@ -1478,6 +1494,132 @@ fn pane_focus_is_individual_and_absent_authored_members_are_projection_context()
                 .limits
                 .iter()
                 .any(|l| l.layer == CoverageLayer::Disclosure)
+        );
+    });
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn refresh_head_only_and_owned_candidate_provenance() {
+    pollster::block_on(async {
+        let backend = ReadProbe::new(MemoryBackend::new());
+        let (graph, surfaces, _) = source(3);
+        let id = Uuid::from_u128(9000);
+        AddressableGraphStore::new(backend.clone(), id)
+            .write_recorded_graph(&graph)
+            .await
+            .unwrap();
+        let mut reader = AddressableGraphStore::new(backend.clone(), id)
+            .open_with_policy(
+                roots(surfaces[0]),
+                ResidencyPolicy::Neighborhood { hops: 0 },
+            )
+            .await
+            .unwrap();
+        backend.reset();
+        assert_eq!(
+            reader.refresh_if_changed().await.unwrap(),
+            RefreshOutcome::Unchanged
+        );
+        assert_eq!(
+            *backend.keys.lock().unwrap(),
+            vec![format!("graphs/{id}/resident/v1/head")]
+        );
+        assert_eq!(backend.counts().0, 0);
+        let revision = reader.graph().revision();
+        let candidate = reader
+            .refresh_request(
+                roots(surfaces[1]),
+                ResidencyPolicy::Neighborhood { hops: 0 },
+            )
+            .load()
+            .await
+            .unwrap();
+        assert_eq!(
+            reader.install_refresh(candidate).unwrap(),
+            RefreshOutcome::TruthChanged
+        );
+        assert!(reader.graph().revision() > revision);
+        assert_eq!(
+            reader.status(GraphAddress::Surface(surfaces[1])),
+            ResidencyStatus::Loaded
+        );
+        let candidate = reader
+            .refresh_request(roots(surfaces[1]), ResidencyPolicy::Full)
+            .load()
+            .await
+            .unwrap();
+        assert_eq!(
+            reader.install_refresh(candidate).unwrap(),
+            RefreshOutcome::TruthChanged
+        );
+        assert_eq!(reader.graph().node_count(), 3);
+        let candidate = reader
+            .refresh_request(roots(surfaces[0]), ResidencyPolicy::Full)
+            .load()
+            .await
+            .unwrap();
+        let mut foreign = AddressableGraphStore::new(backend.clone(), id)
+            .open(Default::default())
+            .await
+            .unwrap();
+        let before = foreign.generation().to_owned();
+        assert!(foreign.install_refresh(candidate).is_err());
+        assert_eq!(foreign.generation(), before);
+        let stale = reader
+            .refresh_request(roots(surfaces[0]), ResidencyPolicy::Full)
+            .load()
+            .await
+            .unwrap();
+        reader.reconcile(roots(surfaces[2])).await.unwrap();
+        assert!(reader.install_refresh(stale).is_err());
+    });
+}
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn owned_refresh_preserves_latest_context_and_replaces_projection_limits() {
+    pollster::block_on(async {
+        let backend = MemoryBackend::new();
+        let (graph, surfaces, _) = source(2);
+        let id = Uuid::from_u128(9001);
+        AddressableGraphStore::new(backend.clone(), id)
+            .write_recorded_graph(&graph)
+            .await
+            .unwrap();
+        let mut reader = AddressableGraphStore::new(backend, id)
+            .open_with_policy(
+                roots(Uuid::from_u128(9999)),
+                ResidencyPolicy::Neighborhood { hops: 0 },
+            )
+            .await
+            .unwrap();
+        let request = reader.refresh_request(
+            roots(surfaces[0]),
+            ResidencyPolicy::Neighborhood { hops: 0 },
+        );
+        let mut context = kernel::graph::CoverageNote::default();
+        context.push(kernel::graph::CoverageLimit::new(
+            CoverageLayer::Disclosure,
+            "latest host observation",
+        ));
+        reader.set_host_coverage(context.clone());
+        reader
+            .install_refresh(request.load().await.unwrap())
+            .unwrap();
+        assert!(
+            reader
+                .graph()
+                .known_coverage()
+                .limits
+                .contains(&context.limits[0])
+        );
+        assert!(
+            !reader
+                .graph()
+                .known_coverage()
+                .limits
+                .iter()
+                .any(|l| l.layer == CoverageLayer::Projection)
         );
     });
 }

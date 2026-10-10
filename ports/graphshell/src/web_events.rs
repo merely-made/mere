@@ -378,7 +378,8 @@ pub(super) fn schedule_frames(state: Rc<RefCell<BrowserHost>>) -> Result<(), Str
             host.probe_events.extend(events);
             let _ = update_semantics(&mut host);
         }
-        web_session::store_pending(&callback_state);
+        web_session::store_pending(&callback_state, host_ms);
+        web_session::refresh_pending(&callback_state, host_ms);
         let continue_frames = {
             let host = callback_state.borrow();
             host.practice
@@ -440,6 +441,28 @@ pub(super) fn schedule_frames(state: Rc<RefCell<BrowserHost>>) -> Result<(), Str
         .add_event_listener_with_callback("resize", resize.as_ref().unchecked_ref())
         .map_err(|_| "Could not attach resize wake")?;
     resize.forget();
+    // Visibility transitions invalidate requests even when hidden tabs stop
+    // producing frames. Resume wakes the existing frame pump immediately.
+    let visibility_state = state.clone();
+    let visibility = Closure::<dyn FnMut(Event)>::new(move |_| {
+        visibility_state
+            .borrow_mut()
+            .app
+            .host
+            .suspend_resident_refresh(super::web_timing::page_hidden());
+        if !super::web_timing::page_hidden() {
+            if let Ok(root) = root() {
+                if let Ok(event) = Event::new("graphshell-wake") {
+                    let _ = root.dispatch_event(&event);
+                }
+            }
+        }
+    });
+    document()?
+        .add_event_listener_with_callback("visibilitychange", visibility.as_ref().unchecked_ref())
+        .map_err(|_| "could not attach resident visibility")?;
+    visibility.forget();
+    state.borrow_mut().app.host.attach_resident_refresh();
     pending.set(true);
     let callback = next.borrow();
     window()?

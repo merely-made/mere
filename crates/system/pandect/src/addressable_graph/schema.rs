@@ -107,12 +107,17 @@ impl<B: Backend> AddressableGraphStore<B> {
             .await?
             .ok_or_else(|| fail(format!("missing addressable record: {key}")))
     }
-    pub(super) async fn catalog(&self) -> Result<(String, Catalog, usize), StoreError> {
-        let generation: String = decode(&self.required(&self.key("head")).await?)?;
+    pub(super) async fn head(&self) -> Result<String, StoreError> {
+        decode(&self.required(&self.key("head")).await?)
+    }
+    pub(super) async fn catalog_at(
+        &self,
+        generation: &str,
+    ) -> Result<(Catalog, usize), StoreError> {
         let bytes = self
             .required(&self.key(&format!("catalog/{generation}")))
             .await?;
-        let catalog: Catalog = checked(&bytes, &generation)?;
+        let catalog: Catalog = checked(&bytes, generation)?;
         if catalog.version != 1 {
             return Err(fail("unsupported addressable graph version"));
         }
@@ -120,7 +125,7 @@ impl<B: Backend> AddressableGraphStore<B> {
         if unique.len() != catalog.entries.len() {
             return Err(fail("duplicate catalog address"));
         }
-        Ok((generation, catalog, bytes.len()))
+        Ok((catalog, bytes.len()))
     }
     pub(super) async fn node(&self, row: &IndexRow) -> Result<StoredNode, StoreError> {
         let bytes = self
