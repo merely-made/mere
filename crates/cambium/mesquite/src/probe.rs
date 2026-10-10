@@ -152,6 +152,10 @@ impl<P: Product> Driveable for Probe<'_, '_, P> {
                     "ArrowRight" => Key::Named(NamedKey::ArrowRight),
                     "ArrowUp" => Key::Named(NamedKey::ArrowUp),
                     "ArrowDown" => Key::Named(NamedKey::ArrowDown),
+                    "Home" => Key::Named(NamedKey::Home),
+                    "End" => Key::Named(NamedKey::End),
+                    "PageUp" => Key::Named(NamedKey::PageUp),
+                    "PageDown" => Key::Named(NamedKey::PageDown),
                     name if name.chars().count() == 1 => Key::Character(name.into()),
                     _ => return Err(format!("unsupported scenario key {name}")),
                 };

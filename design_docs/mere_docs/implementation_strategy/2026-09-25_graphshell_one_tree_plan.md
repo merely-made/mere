@@ -693,7 +693,10 @@ transfers DOM focus into the graph before traversal returns to the controls.
   receipt passes. The gesture receipt exposed an inherited probe bug:
   `gesture_steps::pointer` read `cancelBubble` after dispatch, when the browser
   has reset its propagation flags. The probe now observes delivery at the
-  host's canvas; an injected routing fault will test that it can fail. The
+  host's canvas; an injected routing fault will test that it can fail.
+  The site walkthrough passed all checkpoint button steps but exposed the
+  shared scenario driver's missing Home/End/Page key names. Mesquite now
+  dispatches those existing named keys, matching the history slider's handlers. The
   viewer and main-page/app-host checks are being renewed for this probe change.
   Portable metadata/lock provenance passes. The CI header gate also caught
   the published macOS scenario runner's missing Exhibit A notice; adding the
