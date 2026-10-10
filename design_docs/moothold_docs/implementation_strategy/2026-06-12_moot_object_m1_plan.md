@@ -351,6 +351,13 @@ the unchanged capsule proof; the integrated native suite passed 187 tests with
 five existing ignored tests. Current
 documentation comparison adds no audit subjects; existing D2 gaps remain.
 
+The final integration also includes fetched `e5818742b`: resolved face palettes,
+protected shared theme exports and native launcher cleanup. Six capsule-gate
+tests and four native reader tests pass against that tree; the ordinary viewer
+check and locked applet build pass. Its actual browser run repeats all thirteen
+checks and the three inspected Radeon captures. The distinct accepted artifact
+is `targets/moot-main-published-20261009`; earlier receipts remain preserved.
+
 ### Independent capsule readings continuation (2026-10-09)
 
 **Status:** planned, following the authorized continuation. The
