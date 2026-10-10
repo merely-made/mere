@@ -12,9 +12,9 @@ qualified file maps; all five locked Cargo metadata checks pass with a fresh Git
 source/locks. Consumer adoption (A1) is complete.
 All 108 owned Mere dependency rows select the qualified source. This establishes
 source compatibility; actual Turnstone residency authority remains A2.
-The approved initial Graphshell/Djinn resident-host plan has Tasks 1–2 reviewed
-and locally committed at `a61dfb5c9` and `652acbb72`. Task 3 combined persistence
-staging is in progress. The initial host still retains its complete writer and
+The approved initial Graphshell/Djinn resident-host plan has Tasks 1–3 reviewed
+and locally committed at `a61dfb5c9`, `652acbb72` and `6b2f2860b`. Task 4 graph
+settings, pane roots and exact scopes is in progress. The initial host still retains its complete writer and
 history; native/product/browser host qualification and publication remain pending.
 Mere's last published checkpoint remains `a8889f60e`.
 
@@ -306,3 +306,5 @@ claims, each supported by its own evidence.
 - **2026-10-10:** Mark approves the concrete consumer publication request with “go ahead.” Normal atomic pushes per repository publish the exact qualified topic/main refs: Knot `ab191d4d8808c709cc8ecba093298efa6b37c1e9`, Redshank `fea7f0f797bf8ec8adccf3f842a80c680e0d235c`, Turnstone `bf1e6a2fb9f0f4c9eba9c866de50a5505bd2404f`. Remote refs are confirmed and independent fresh canonical HTTPS fetches match all 376/733/2,968 qualified tracked files. Original provider workspaces, prior Turnstone adoption commit and all qualification receipts remain preserved. Fresh Cargo Git-cache resolution subsequently passes all five metadata gates; no temporary local route is required and every source/lock hash remains unchanged.
 
 - **2026-10-10:** A1 complete: fresh Cargo Git-cache resolution passes Knot workspace/standalone, Redshank and Turnstone default/Piccolo metadata. Canonical published Mere/Knot/Redshank sources are observed in the fresh checkout cache, with all tracked inputs and locks unchanged. The completion binding joins reviewed source, scoped execution gates, approved remote refs and independent availability proof. This does not activate Turnstone residency or qualify headed product behavior.
+
+- **2026-10-10:** Host Task 3 complete locally at `6b2f2860b`: retained owned storage batches and the bounded deterministic navigation snapshot repair pass full scoped qualification and independent review. Task 4 begins settings/pane roots/exact scopes. Actual existing Djinn/browser activation, runtime coverage and whole-host publication remain pending. Consumer A1 and RDF publication receipts remain unchanged.
