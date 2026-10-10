@@ -29,6 +29,20 @@ pass. The complete doc-audit JSON has the same SHA256 before and after the
 inventory. D2 retains its six existing missing records, 259/265 coverage and
 no unknown supplemental records. No build or browser gate ran.
 
+**Scene-study continuation (2026-10-10):** Mark forwarded the design-language
+agent's mixed-content study and embedded-forme proposal. Checked published
+Mere `7bfb293d`: the projection grammar's encoding/representation boundary,
+Forme's geometry-free semantic arrangement, Platen's layout-to-`TileTree`
+projection, Scenomise's card realization and the suite's host/session ownership.
+Mosaic and Vega-Lite's official references support coordination and conditional
+encodings, not a Mere rule schema or execution grant. The canonical §9.10 and
+editor/field follow-through retain proposal status, the existing work order
+and overlap/lock forks. No new palette decision, SE ruling or runtime receipt
+is inferred. Ten new local links and heading anchors resolve; whitespace
+checks pass. Complete doc-audit JSON is unchanged from the same checkout's
+baseline (`e563d41bb9a4c6b077b76232c65a0fe9bd01d90827f4c23885059afde5c13982`).
+No build or browser gate ran.
+
 ## 2026-08-23_projection_scenes_and_graph_native_platform.md
 
 - disposition: current
