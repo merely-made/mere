@@ -252,6 +252,20 @@ applicable rendered acceptance pass against its published dependency set.
   explicitly: Cargo does not inherit Mere's root patches into consuming roots.
   Inspect the application's native host dependency closure before its receipt;
   an older unrelated Sprigging bridge may retain its existing Vello types.
+- October 10 Pelt native qualification follows the renderer publication.
+  The fixed binary passes fresh-10 and separate-process reopen-10 on Radeon
+  Pro Vega 56 / Metal: 85 presented editor frames, nine nonblank editor captures
+  and two application captures. All eleven PNGs were visually inspected.
+  The real workflow authors all four modes and exact CSS, saves, resizes the
+  same editor to 640×780, explicitly applies the choice in Pelt and restores
+  that exact choice in a new process. Workspace assertions preserve controller
+  identity, history, focus and aperture. No new GPU reset report appeared.
+  Original evidence is retained under
+  `tabard-app-receipts/2026-10-10/pelt/{fresh-10,reopen-10}`; the port's receipts
+  preserve logs, presentation counts, hashes and review records. Fresh-09 was
+  stopped prematurely as a precaution and is explicitly marked partial.
+  Native acceptance now proceeds one application at a time; simultaneous
+  browser/native GPU runs remain held while the other integrations qualify.
 - Knot's fetched origin `802238cb` already has coherent Mere/Genet pins and
   semantic-field adaptation. An isolated application worktree preserves its
   primary checkout. Its shared-editor adapter extends local desktop preferences,

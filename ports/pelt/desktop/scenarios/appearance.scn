@@ -1,0 +1,43 @@
+# Opened by the ordinary production Appearance → Edit themes controls.
+log Pelt shared workshop production authoring
+settle 4
+assert snap dirty == true
+capture initial_editor
+key tab-until data-field=name
+input-text Pelt-native-authored
+assert snap name == Pelt-native-authored
+click role:button @data-mode=light
+settle 3
+assert snap mode == light
+capture editor_light
+click role:button @data-mode=dark
+settle 3
+assert snap mode == dark
+capture editor_dark
+captures-differ editor_light editor_dark
+click role:button @data-mode=hc_light
+settle 3
+assert snap mode == hc_light
+capture editor_hc_light
+captures-differ editor_dark editor_hc_light
+click role:button @data-mode=hc_dark
+settle 3
+assert snap mode == hc_dark
+capture editor_hc_dark
+captures-differ editor_hc_light editor_hc_dark
+click role:button @data-action=default-mode
+click role:button @data-action=toggle-stylesheet
+key tab-until data-field=mode-sheet
+input-text :root{--tabard-color-bg:#142238;--tabard-color-surface:#1B2E49;--tabard-color-surface-2:#243D5E;--tabard-color-text:#EAF2FF;--tabard-color-text-header:#9CD5FF;--tabard-color-text-dim:#C0D5F2;--tabard-color-primary:#2F7FFF;--tabard-color-on-primary:white;}
+click role:button @data-action=apply-stylesheet
+click role:button @data-action=save
+settle 4
+assert snap dirty == false
+assert snap saved == true
+capture saved_editor
+resize 640 780
+settle 4
+capture narrow_editor
+click .chrome-specimen
+settle 4
+capture narrow_specimens
