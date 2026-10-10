@@ -1091,3 +1091,53 @@ protocol design.
   are recorded, the meerkat mention in Phase C is annotated, the duplicated
   constitution-producer entry is marked, and two open questions (closing Phase
   A, restating Phase F) are written in.
+
+### 2026-10-10: Murm's application read and exact channel addresses
+
+The Comms continuation of the
+[Moot plan](../../moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#moot-conversation-and-coop-continuation-2026-10-10)
+uses the existing native Murm owner, separately from Commons' Gemot-authorized
+chat. Source inspection found that both Murm's legacy history and its Comms
+adapter sorted by asserted timestamps, and the adapter addressed only the cabal
+even when configured for a different channel. Those addresses could alias local
+drafts and could not represent multiple channels in one adapter.
+
+`CabalHandle::causal_history` now reads every retained signed header through
+Stickleback's existing causal projection before selecting a channel. Per-author
+backlinks and cross-author references supply order, not wall clocks. A pruned
+body leaves its header available as a causal witness; a missing header withholds
+the dependent tail and reports the missing roots while unrelated complete posts
+remain readable. The read reports unavailable channel payloads and never mutates
+the retained store. Legacy `history` remains a timestamp-based API; this change
+does not invent another accepted-operation path or a new wire format.
+
+The native Comms adapter uses that explicit owner read. Conversation identifiers
+bind protocol, cabal and exact channel; one adapter can expose multiple channels
+of the same cabal. They are opaque local view addresses, not URLs, invitations
+or capabilities. Hosts should use the listed identities. Old bare-cabal view
+identifiers are refused rather than silently redirected to a default channel;
+custom `CabalSink` implementations now return an asynchronous `CabalHistory`.
+Empty bodies, unsupported subject lines, foreign protocols and unlisted channels
+are refused before authoring. Message authors remain observed authors, not a
+membership roster or presence observation.
+
+The focused receipt passes two Murm owner tests and 25 Comms tests, including two
+over real Murm handles. It exercises opposite clocks, a cross-channel ancestor,
+payload and header withdrawal, cross-author child-before-parent arrival,
+independent channel drafts, exact send routing, and unchanged owner store counts
+on refused inputs. Evidence is preserved at
+`targets/moot-murm-causal-history-tests.log` and
+`targets/moot-murm-comms-adapter-tests.log`. The in-process transport fixture is
+native-test-only; it opens no peer connection. This receipt does not qualify
+transport, delivery, rendered host controls, presence, or deletion/moderation
+folding. Those retain their current domain owners and acceptance boundaries.
+
+The full Murm library gate passes 59 tests; the existing Gemot-authorized Moot
+consumer gate passes ten coop tests and three encrypted-conversation tests.
+Default Moot compiles for Wasm with Comms/serde and no Murm, transport, Commons,
+Iroh, redb or tokio in its normal dependency cone. The native transport fixture
+is target-scoped so it does not widen that portable model. Logs are
+`targets/moot-murm-full-library-tests.log`,
+`targets/moot-murm-gemot-consumer-tests.log`,
+`targets/moot-murm-default-wasm-check.log` and
+`targets/moot-murm-default-wasm-cone.txt`.

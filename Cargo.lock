@@ -9375,6 +9375,7 @@ name = "mere-comms"
 version = "0.0.1"
 dependencies = [
  "async-trait",
+ "mere-transport",
  "misfin",
  "murm",
  "personae",
