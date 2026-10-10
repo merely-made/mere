@@ -1,9 +1,9 @@
 # Graphshell on one Cambium tree
 
 **Date:** 2026-09-25
-**Status (2026-10-09):** in progress, checked against the current Graphshell
-intake slice `da466027a`, based on published Mere `79fbbeb75` with Genet
-`15713014`. Phases 1–2 are landed; phase 3 has its recorded headed producer
+**Status (2026-10-10):** in progress. The combined viewer at `2ef6e3207`
+integrates published Mere `6183006ba`, Genet `7422e906`, and the committed site
+cutover `bf626abd2`. Phases 1–2 are landed; phase 3 has its recorded headed producer
 receipts and Mark's approval to proceed. Phase 4 remains unfinished: canvas
 controls, elapsed-time physics, saved-graph editing and remote-session slices
 have landed, but the complete page/control migration and acceptance wall have
@@ -12,15 +12,21 @@ mere panel is its V2b step 5, after this cutover. §2's current handoff names
 the remaining gates; linked plans own later editor and dynamics status. The
 reservoir's V3–V5 resident implementation has advanced independently; its
 process fixtures do not close this browser cutover or mount the mere panel.
-**Nested host-dataset continuation (2026-10-09):** implemented on
-`codex/nested-graph-view`, with published main `421818710` and the committed site
-cutover `bf626abd2` combined at `c8ac18ba9` (cutover merge `25e356782`). The earlier bounded headed proof passes on the default Radeon WebGPU
+**Nested host-dataset continuation (2026-10-10):** implemented on
+`codex/nested-graph-view`, with the site cutover combined at `25e356782`,
+current shared captures and Genet at `178779e2c`, and the published Tabard
+appearance work at `6b0798a95`. The earlier bounded headed proof passes on the default Radeon WebGPU
 adapter after the coarse bitmap traversal repair. Mark approved
 implementing expandable repository groups and entering their constituent graph.
 Rulings 161–162 now require portable `sceno::Fold` facts and give the site
 lane ownership of the shared viewer files. The branch now adapts its explicit
-membership to folds and integrates history and page gestures; combined
-qualification and landing are in progress. Saved
+membership to folds and integrates history and page gestures. Current CPU and
+build checks pass, but a confirmed iMac GPU reset/WindowServer incident has
+placed headed GPU checks on hold. The full Rootstock run also reports seven
+GPU fixtures failing to obtain a device. Combined GPU qualification and main
+landing remain pending; the source-bound
+[Fold receipt](../../../ports/graphshell/docs/receipts/host_dataset_folds.json)
+records these limits explicitly. Saved
 scene integration and the live site's viewer replacement remain separate work.
 **Scope:** Graphshell's browser page becomes one retained Cambium tree. Its
 HTML controls become Cambium components, its display-only Cambium chrome
@@ -688,16 +694,48 @@ transfers DOM focus into the graph before traversal returns to the controls.
 
 ## 6. Progress
 
-- **2026-10-10 — combined viewer qualification, in progress:** native checks
-  pass on the integrated site/Moot sources. The first headed Fold/history
+- **2026-10-10 — CPU/build qualification complete; GPU acceptance held:**
+  incorporated published Mere `b513994ba` (shared capture polling and Genet
+  `7422e906`) at `178779e2c`, then `6183006ba` (shared Tabard appearance)
+  at `6b0798a95`. The appearance merge retains both palette application and
+  reduced-motion pause. On these combined sources, 395 Rust tests and four
+  exporter tests pass: 254 shared scene tests, 22 host/history tests, six
+  gesture tests, six framing tests, 67 CPU Rootstock tests, 27 Mesquite tests,
+  one legacy-control test, six applet tests and six appearance tests. The
+  locked standalone viewer build, main-page/applet Wasm check, portable-lock
+  metadata verification and owned-source header gate pass. The latter needed
+  three Exhibit A comment lines in the published browser appearance adapter
+  (`2ef6e3207`); no executable behavior changed.
+  - **GPU boundary:** the full Rootstock suite ended at 01:51:43 Eastern with
+    67 passed and seven GPU producer fixtures failing with "Parent device is
+    lost". The CPU rerun explicitly excludes those fixtures and does not close
+    them. A separate native-acceptance lane supplied the 01:46:41 Radeon reset
+    report and WindowServer watchdog failure: FirstPendingCB identifies Pelt's
+    acceptance `product` PID 43570. This identifies a pending submission,
+    not a proven root cause. No headed GPU or native capture is being launched
+    by this lane while that incident is investigated.
+  - **Remaining acceptance:** regenerate bindgen output and refresh served
+    assets, then run the combined nested/camera/flat/history/gesture captures,
+    all 15 site checkpoints with Home/End/Page keys, planted gesture routing
+    control, plain viewer mount, real page wheel, and narrow keyboard/focus
+    checks on current sources. Historical headed receipts below do not qualify
+    the new Genet pin or appearance integration. The branch is not yet landed
+    on main; site-lane WIP and primary main's five unpublished commits remain
+    untouched. See the
+    [source-bound pending receipt](../../../ports/graphshell/docs/receipts/host_dataset_folds.json)
+    for commands, counts, hashes, incident evidence and local receipt paths.
+
+- **2026-10-10 — earlier combined viewer qualification:** native checks
+  passed on the integrated site/Moot sources. The first headed Fold/history
   receipt passes. The gesture receipt exposed an inherited probe bug:
   `gesture_steps::pointer` read `cancelBubble` after dispatch, when the browser
   has reset its propagation flags. The probe now observes delivery at the
   host's canvas; an injected routing fault will test that it can fail.
   The site walkthrough passed all checkpoint button steps but exposed the
   shared scenario driver's missing Home/End/Page key names. Mesquite now
-  dispatches those existing named keys, matching the history slider's handlers. The
-  viewer and main-page/app-host checks are being renewed for this probe change.
+  dispatches those existing named keys, matching the history slider's handlers.
+  Viewer and main-page/app-host checks passed after this probe change; the
+  final headed rerun remains held as recorded above.
   Portable metadata/lock provenance passes. The CI header gate also caught
   the published macOS scenario runner's missing Exhibit A notice; adding the
   standard owned-source header makes the gate and its planted controls pass.
