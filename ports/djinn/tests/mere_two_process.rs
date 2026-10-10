@@ -20,6 +20,7 @@ use std::sync::Arc;
 use std::sync::mpsc::{Receiver, channel};
 use std::time::Duration;
 
+use castellan::custody::{IdentityVault, InMemoryStorage, Profile};
 use chirograph::{
     CarrierRequestBody, CarrierResponseBody, IntentInvocation, IntentResult, ProjectionSession,
     ProjectionSnapshot,
@@ -38,7 +39,7 @@ use graphshell::native::personae_host::PersonaeHost;
 use graphshell::session_item::{APPLY_EDITS_INTENT, ApplyEditsV1};
 use graphshell_endpoint::{IntentSink, ProjectionCatalog, ProjectionSource};
 use pandect::{CapturedDelta, mere_dir};
-use personae::{Ed25519Keypair, IdentityVault, InMemoryStorage, PersonaId, Profile, ProfileId};
+use personae::{Ed25519Keypair, PersonaId, ProfileId};
 use sceno::InstanceId;
 use uuid::Uuid;
 

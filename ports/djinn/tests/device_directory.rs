@@ -14,6 +14,7 @@
 use std::sync::Arc;
 use std::time::Duration;
 
+use castellan::custody::{IdentityVault, InMemoryStorage, Profile};
 use djinn::resident_devices::{
     self, DEVICE_DIRECTORY_APP, DEVICE_DIRECTORY_ROUTE, DeviceDirectoryEndpoint,
     DeviceDirectorySource, DeviceDirectoryV1, read_directory,
@@ -24,7 +25,7 @@ use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
 use graphshell::native::app_client::{AppBrokerClient, AppClientError};
 use graphshell::native::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointRoute};
 use graphshell::native::personae_host::PersonaeHost;
-use personae::{Ed25519Keypair, IdentityVault, InMemoryStorage, Profile, ProfileId};
+use personae::{Ed25519Keypair, ProfileId};
 use uuid::Uuid;
 
 fn endpoint_name() -> String {

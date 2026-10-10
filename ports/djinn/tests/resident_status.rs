@@ -13,6 +13,7 @@
 use std::sync::Arc;
 use std::time::Duration;
 
+use castellan::custody::{IdentityVault, InMemoryStorage, Profile};
 use djinn::resident_events::EVENTS_SCHEMA;
 use djinn::resident_status::{
     self, AgentListenerV1, LockStateV1, RESIDENT_APP, RESIDENT_CONTROL_ROUTE,
@@ -29,7 +30,7 @@ use graphshell::native::app_client::{AppBrokerClient, AppClientError};
 use graphshell::native::device_broker::default_device_endpoint;
 use graphshell::native::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointRoute};
 use graphshell::native::personae_host::PersonaeHost;
-use personae::{Ed25519Keypair, IdentityVault, InMemoryStorage, Profile, ProfileId};
+use personae::{Ed25519Keypair, ProfileId};
 use uuid::Uuid;
 
 fn endpoint_name() -> String {

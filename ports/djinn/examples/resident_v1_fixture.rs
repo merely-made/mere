@@ -40,7 +40,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         return Err("resident_v1_fixture received unexpected arguments".into());
     }
 
-    pandect::wallet_store::ensure_wallet_state(&data_root, persona, "resident-v1")?;
+    castellan::custody::wallet::ensure_wallet_state(&data_root, persona, "resident-v1")?;
     let device_root = local_device_root(&data_root, "resident-v1")?;
     let authority = StartupUnlockedPersonalVault::open(&data_root, persona, device_root, [])?;
     authority.author_document(VaultDocument {
