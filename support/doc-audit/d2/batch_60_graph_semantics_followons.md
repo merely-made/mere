@@ -5,7 +5,7 @@ Audit base: Mere a8889f60e, 2026-10-09, with local documentation updates. Origin
 ## mere_docs/implementation_strategy/2026-10-09_graph_semantics_followons_plan.md
 
 - disposition: current
-- status line: "In progress; RDF qualified and published, providers qualified locally, Turnstone under qualification, host plan approved and entering Task 1" - accurate: yes
+- status line: "In progress; RDF qualified and published, consumer checkpoint qualified locally, Turnstone newer-main integration running, host Tasks 1–2 complete locally" - accurate: yes
 - claims checked: 5 - holds: 5, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -22,7 +22,7 @@ Audit base: Mere a8889f60e, 2026-10-09, with local documentation updates. Origin
 
 ### Notes
 
-Checked supplier source and six-gate repair receipt; verified published main/follow-on tips a8889f60e; counted 108 owned manifest rows in the repin report; provider receipt and local commits establish completed provider gates; active Turnstone runner establishes qualification in progress. Future A2/C phases are done conditions, not capability claims.
+Checked supplier source and six-gate repair receipt; verified published main/follow-on tips a8889f60e; counted 108 owned manifest rows in the repin report; provider receipt and local commits establish completed provider gates; original consumer binding proves scoped qualification; active newer-main Turnstone runner establishes integration qualification in progress. Future A2/C phases are done conditions, not capability claims.
 
 ## mere_docs/technical_architecture/2026-10-09_resident_host_design.md
 
@@ -49,7 +49,7 @@ User approval settles the complete-writer milestone. Existing GraphSession owns 
 ## mere_docs/implementation_strategy/2026-10-09_resident_host_implementation_plan.md
 
 - disposition: current
-- status line: "Written spec and concrete plan approved by Mark; team implementation starts with Task 1" - accurate: yes
+- status line: "Written spec and concrete plan approved by Mark; Tasks 1–2 complete locally and Task 3 starting" - accurate: yes
 - claims checked: 15 - holds: 15, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -66,4 +66,4 @@ User approval settles the complete-writer milestone. Existing GraphSession owns 
 
 ### Notes
 
-Checked all 15 existing-path responsibility rows against source at a8889f60e, including NodeFacetStore export, SessionId re-export, ViewKey::new, node_is_pinned, Applied fields and private pending_with(&self). New signatures and tests are expressly proposed; six new paths carry planned-path annotations. Eight tasks cover the approved spec and five review-focus failures. No new capability or successful host gate is claimed.
+Checked all 15 existing-path responsibility rows against source at a8889f60e, including NodeFacetStore export, SessionId re-export, ViewKey::new, node_is_pinned, Applied fields and private pending_with(&self). New signatures and tests are expressly proposed; six new paths carry planned-path annotations. Eight tasks cover the approved spec and five review-focus failures. Task 1 pure preparation/catalog observations and Task 2 typed facade are now implemented. Their exact source commits, root gate receipts and independent approved task reports substantiate the completion claims; combined persistence, product controls and browser runtime remain pending.
