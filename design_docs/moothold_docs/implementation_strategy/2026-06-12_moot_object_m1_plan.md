@@ -426,6 +426,16 @@ pending while headed/GPU runs are held. The activity audit is preserved at
 `targets/moot-gpu-activity-audit-20261010.json`; failed captures remain beside
 their original receipts.
 
+The integrated CPU rerun at `e446bb8ee` passes ten capsule tests and eleven
+browser-host tests, with the applet build and ordinary viewer check. The
+conversation slice qualifies independently and is published at `4e1811578`.
+The readings branch includes that main head and the guarded renderer from
+`11236fd4f` (Vello `491c376c`). Its fresh applet Wasm build passes; candidate
+`targets/moot-capsule-readings-20261010-g` is prepared without serving or opening
+a page. Byte/source verification has its own held receipt; all twenty browser
+checks and five inspected captures remain required before readings publication.
+Earlier artifacts, including the pre-guard prepared `20261010-f`, are preserved.
+
 ### Moot conversation and coop continuation (2026-10-10)
 
 **Status:** implementation and CPU receipt complete. Product browser and
