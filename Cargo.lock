@@ -6732,6 +6732,7 @@ dependencies = [
  "ssh-agent-lib",
  "ssh-key",
  "stickleback",
+ "tabard",
  "tempfile",
  "thiserror 1.0.69",
  "tokio",
