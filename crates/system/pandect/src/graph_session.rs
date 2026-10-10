@@ -579,6 +579,36 @@ pub struct GraphSession<B> {
     retained_pending_links_revision: u64,
 }
 
+impl<B: Backend + Clone> GraphSession<B> {
+    /// Preflight observed stable-ID commands against this complete writer, then
+    /// apply their live deltas as one validated, journaled session change.
+    pub fn edit_live_now(
+        &mut self,
+        author: Author,
+        commands: Vec<crate::live_graph::ObservedCommand>,
+    ) -> Result<crate::live_graph::LiveApplied, crate::live_graph::LiveEditError> {
+        use crate::live_graph::{LiveApplied, LiveEditError};
+        self.ensure_writable()?;
+        if self.placement.is_none() {
+            return Err(LiveEditError::Session(SessionError::Validation(
+                "live edits require qualified recorded placement".into(),
+            )));
+        }
+        let source = crate::addressable_graph::AddressableGraphStore::new(
+            self.slots.backend().clone(),
+            *self.manifest.root_graph_id.as_uuid(),
+        )
+        .prepare_recorded_graph(&self.graph)
+        .map_err(SessionError::Store)?;
+        let program = crate::live_graph::preflight(&self.graph, &source, &author, commands)?;
+        let (_, applied) = self.edit_now(author.clone(), |graph| program.apply(graph, &author))?;
+        Ok(LiveApplied {
+            applied,
+            created: program.created,
+        })
+    }
+}
+
 impl<B: Backend> GraphSession<B> {
     /// Begin a new session in memory, from `baseline` or empty, with `kind` as
     /// its first change. Nothing is written until the first flush, which
