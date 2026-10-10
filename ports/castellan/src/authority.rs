@@ -137,6 +137,24 @@ pub enum IdentityIntentError {
     /// Refused at import, with personae's reason (ruling 56).
     #[error("the agent cannot sign this SSH key: {0}")]
     UnsignableKey(String),
+    #[error("vault command failed: {0}")]
+    /// A terminal vault command was refused or could not complete.
+    VaultCommand(String),
+}
+
+/// Secret-free result of a terminal vault act.
+pub enum VaultCommandOutput {
+    /// Public text, keys or certificates.
+    Text(String),
+    /// Public CA installation material for the terminal to send over SSH.
+    Enrollment {
+        /// User-selected SSH target.
+        target: String,
+        /// Shell script carrying only the public CA trust line.
+        script: String,
+        /// Text shown after the target confirms installation.
+        confirmation: String,
+    },
 }
 
 impl From<IdentityError> for IdentityIntentError {
@@ -921,6 +939,52 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         }
         let vault = self.vault.lock().unwrap();
         roster::import_profile(vault.storage(), id, display_name, master).map(|_| ())
+    }
+
+    /// Run the terminal vault command inside the same lock boundary as the agent.
+    /// No storage is reopened and no secret is returned to the application.
+    pub fn vault_command(
+        &self,
+        profile: &ProfileId,
+        command: &str,
+        args: &[String],
+    ) -> Result<VaultCommandOutput, IdentityIntentError> {
+        let mut vault = self.vault.lock().unwrap();
+        if vault.is_locked() {
+            return Err(IdentityIntentError::Locked);
+        }
+        let valid_id = |id: &str| {
+            !id.is_empty()
+                && id.chars().count() <= 64
+                && id
+                    .chars()
+                    .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
+        };
+        // New names follow the native create intent. Existing profile ids
+        // remain addressable, including names created by older CLI versions.
+        if command == "new-profile" && args.first().is_some_and(|id| !valid_id(id)) {
+            return Err(IdentityIntentError::InvalidProfileId);
+        }
+        let mut output = Vec::new();
+        let result = crate::custody::vault_commands::execute(
+            vault.storage(),
+            profile,
+            &format!("{:?}", self.protection),
+            command,
+            args,
+            &mut output,
+        );
+        // Slot changes must be visible to the live agent, not just the next restart.
+        let selected = vault.profile_id().clone();
+        vault.switch_profile(&selected)?;
+        match result.map_err(IdentityIntentError::VaultCommand)? {
+            Some(enrollment) => Ok(VaultCommandOutput::Enrollment {
+                target: enrollment.target, script: enrollment.script,
+                confirmation: enrollment.confirmation,
+            }),
+            None => String::from_utf8(output).map(VaultCommandOutput::Text)
+                .map_err(|error| IdentityIntentError::VaultCommand(error.to_string())),
+        }
     }
 
     /// A provider for persona `id` without switching to it, for an

@@ -72,6 +72,11 @@ fn run(args: Vec<String>) -> Result<(), String> {
                 },
                 Err(error) => return Err(error.to_string()),
             };
+            if status.lock == graphshell::identity::VaultLockView::Locked {
+                println!("Distillery profile: {}\nPersonae identity: pending (the vault is locked)\nProduct root: {}",
+                    settings.profile, options.data_root.display());
+                return Ok(());
+            }
             let known = roster
                 .entries
                 .iter()

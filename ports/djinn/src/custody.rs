@@ -52,6 +52,7 @@ pub const CUSTODY_APPS: &[&str] = &[
     "hocket",
     "distillery",
     "signalman",
+    "personae-vault",
 ];
 
 /// Grant the custody route to [`CUSTODY_APPS`].
@@ -286,6 +287,34 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
         }
     }
     match call {
+        CustodyCall::VaultCommand {
+            profile,
+            command,
+            args,
+        } => {
+            if app.as_str() != "personae-vault" {
+                return Err(CustodyRefusal::NotServed);
+            }
+            unlocked(&keeper)?;
+            // File import and SSH commands are blocking. The keeper holds its
+            // vault mutex for the act, so a lock cannot interleave with it.
+            tokio::task::spawn_blocking(move || {
+                keeper
+                    .host()
+                    .vault_command(&profile, &command, &args)
+                    .map(|output| match output {
+                        castellan::authority::VaultCommandOutput::Text(text) => CustodyAnswer::VaultOutput { text },
+                        castellan::authority::VaultCommandOutput::Enrollment { target, script, confirmation } =>
+                            CustodyAnswer::VaultEnrollment { target, script, confirmation },
+                    })
+                    .map_err(|error| match error {
+                        castellan::authority::IdentityIntentError::Locked => CustodyRefusal::Locked,
+                        other => refused(other),
+                    })
+            })
+            .await
+            .map_err(failed)?
+        },
         CustodyCall::Status => status(&keeper).map(CustodyAnswer::Status),
         CustodyCall::Roster => roster(&keeper).map(CustodyAnswer::Roster),
         CustodyCall::ChooseProfile { profile } => {
@@ -417,6 +446,7 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
 
 fn call_name(call: &CustodyCall) -> &'static str {
     match call {
+        CustodyCall::VaultCommand { .. } => "vault_command",
         CustodyCall::Status => "status",
         CustodyCall::Roster => "roster",
         CustodyCall::ChooseProfile { .. } => "choose_profile",
