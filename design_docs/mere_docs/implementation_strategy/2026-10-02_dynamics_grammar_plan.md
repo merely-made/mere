@@ -930,6 +930,14 @@ reconciliation before it changes any channel or endpoint contract. The
 projection should explain a term using the primitive identities it actually
 reads; this direction does not attach dynamics to every stored relationship.
 
+The editor's [source-backed primitive map](2026-10-07_scenograph_editor_plan.md#primitive-and-dynamics-map-2026-10-09-source-backed-planning)
+records the existing bridge's body, visible-relation spring and field-coupling
+paths. A later explanation proof needs a binding from the evaluated term/spec
+path to the source assertion or `FieldId`/`CouplingId` and the affected body or
+appearance. The current endpoint-pair spring input alone does not supply that
+account. Preserve grouping disclosure where one visible relation cell covers
+multiple assertions; choosing a richer explanation seam remains design work.
+
 ## 4. Findings
 
 - 2026-10-02 (planning): P5's rungs and Density's tiers are unmerged. `gpu-repulsion` is at `60a990a5`, and `density-cpu` is at `c402d5e7`, a merge of main over `5f529c64`. Density's overlay refusal is `PhysicsLaw::overlay_refusal` on that branch (`density-cpu:crates/canvas/pictograph/src/canvas/physics_catalog.rs`, line 199). G3 and G5 build on these once they land.
