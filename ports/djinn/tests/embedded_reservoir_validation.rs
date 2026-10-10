@@ -19,6 +19,7 @@ use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::sync::mpsc::{Receiver, channel};
 use std::time::Duration;
 
+use castellan::authority::PersonaeHost;
 use castellan::custody::{IdentityVault, InMemoryStorage, Profile};
 use chirograph::{
     CarrierRequestBody, CarrierResponseBody, IntentInvocation, IntentResult, ProjectionSnapshot,
@@ -31,7 +32,6 @@ use graphshell::native::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants}
 use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
 use graphshell::native::app_client::AppBrokerClient;
 use graphshell::native::endpoint_catalog::ResidentEndpointCatalog;
-use graphshell::native::personae_host::PersonaeHost;
 use graphshell::native::tasks::ResidentTasks;
 use graphshell::session_item::{APPLY_EDITS_INTENT, ApplyEditsV1};
 use pandect::{CapturedDelta, DomainId, GraphValidator, MereId, mere_dir};
@@ -390,7 +390,7 @@ async fn child_serves_the_registered_domain() {
             scope
                 .scope(serve_app_broker(
                     &address,
-                    identity(),
+                    std::sync::Arc::new(djinn::keeper::Keeper::new(identity())),
                     grants,
                     60_000,
                     None,

@@ -15,14 +15,14 @@ use std::io::Write;
 use std::path::PathBuf;
 use std::sync::Arc;
 
+use castellan::authority::PersonaeHost;
+use castellan::custody::{IdentityVault, InMemoryStorage, Profile};
+use djinn::identity_ui::SystemNativeIdentityUi;
+use djinn::keeper::Keeper;
 use graphshell::browser_carrier::{AllowedExtensions, BrowserLauncher};
 use graphshell::identity::VaultProtectionView;
 use graphshell::native::browser_host::serve_identity_native_messages;
-use graphshell::native::identity_ui::SystemNativeIdentityUi;
-use graphshell::native::personae_host::PersonaeHost;
-use personae::{
-    Ed25519Keypair, IdentityVault, InMemoryProvider, InMemoryStorage, Profile, ProfileId,
-};
+use personae::{Ed25519Keypair, InMemoryProvider, ProfileId};
 use ssh_key::{Algorithm, LineEnding, PrivateKey};
 
 const RECEIPT_PASSPHRASE: &str = "graphshell H4e receipt";
@@ -59,8 +59,7 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut writer = tokio::io::stdout();
     let summary = serve_identity_native_messages(
         &identity,
-        Arc::clone(&host),
-        &ui,
+        Arc::new(Keeper::new(Arc::clone(&host)).with_ui(Arc::new(ui))),
         launcher,
         &mut reader,
         &mut writer,

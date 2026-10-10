@@ -10,19 +10,26 @@
 //! never supplies or receives a local path, private-key byte, or passphrase.
 //! A desktop UI implementation selects and unlocks the key inside the native
 //! host process, then returns only a public mutation receipt.
+//!
+//! Moved from graphshell in DR-C (dramatis repo plan, D15): the dialogs act
+//! on castellan's keeper, which only djinn links. Graphshell's doors reach
+//! them through `ResidentIdentity::native_action`, which [`crate::keeper`]
+//! answers here.
 
 use std::fs;
 use std::path::PathBuf;
 use std::sync::Arc;
 
+use castellan::authority::PersonaeHost;
+use castellan::custody::{IdentityStorage, OsPresence, UnlockMethod};
 use light_file_dialog::dialog::{Dialog, DialogBackend, InputBox, OpenFileDialog};
-use personae::{IdentityStorage, OsPresence, UnlockMethod};
 use ssh_key::PrivateKey;
 use zeroize::Zeroizing;
 
-use crate::browser_carrier::{NativeIdentityAction, NativeIdentityFailure, NativeIdentityResult};
-use crate::identity_projection::ImportSshKeyNativeIntentV1;
-use crate::native::personae_host::PersonaeHost;
+use dramatis::intents::ImportSshKeyNativeIntentV1;
+use graphshell::browser_carrier::{
+    NativeIdentityAction, NativeIdentityFailure, NativeIdentityResult,
+};
 
 const MAX_SSH_PRIVATE_KEY_BYTES: u64 = 1024 * 1024;
 const PICKER_START_ENV: &str = "GRAPHSHELL_NATIVE_PICKER_START";
@@ -120,10 +127,10 @@ impl NativeIdentityUi for SystemNativeIdentityUi {
 
     /// Windows Hello through personae's gate, which alone mints the proof.
     fn verify_presence(&self) -> Result<Option<OsPresence>, NativeIdentityFailure> {
-        if !personae::unlock::presence_availability().is_available() {
+        if !castellan::custody::unlock::presence_availability().is_available() {
             return Ok(None);
         }
-        match personae::unlock::verify_presence("Unlock your identity vault") {
+        match castellan::custody::unlock::verify_presence("Unlock your identity vault") {
             Ok(proof) => Ok(Some(proof)),
             Err(error) => {
                 tracing::info!(%error, "presence not verified; asking for the passphrase");
@@ -172,7 +179,7 @@ pub fn apply_native_identity_action<S, U>(
 ) -> NativeIdentityResult
 where
     S: IdentityStorage + 'static,
-    U: NativeIdentityUi,
+    U: NativeIdentityUi + ?Sized,
 {
     match action {
         NativeIdentityAction::ImportSshPrivate { unlock_policy } => {
@@ -186,7 +193,7 @@ where
 fn unlock_vault<S, U>(host: &Arc<PersonaeHost<S>>, ui: &U) -> NativeIdentityResult
 where
     S: IdentityStorage + 'static,
-    U: NativeIdentityUi,
+    U: NativeIdentityUi + ?Sized,
 {
     if !host.is_locked() {
         return NativeIdentityResult::UnlockedVault;
@@ -194,7 +201,9 @@ where
     if let Ok(Some(proof)) = ui.verify_presence() {
         match host.unlock_vault(UnlockMethod::OsPresence(proof)) {
             Ok(()) => return NativeIdentityResult::UnlockedVault,
-            Err(error) => tracing::warn!(%error, "presence unlock refused; asking for the passphrase"),
+            Err(error) => {
+                tracing::warn!(%error, "presence unlock refused; asking for the passphrase")
+            },
         }
     }
     let passphrase = match ui.prompt_vault_passphrase() {
@@ -222,7 +231,7 @@ fn import_ssh_private<S, U>(
 ) -> NativeIdentityResult
 where
     S: IdentityStorage + 'static,
-    U: NativeIdentityUi,
+    U: NativeIdentityUi + ?Sized,
 {
     let path = match ui.pick_ssh_private_key() {
         Ok(Some(path)) => path,
@@ -296,13 +305,13 @@ where
 mod tests {
     use std::sync::Mutex;
 
-    use personae::{Ed25519Keypair, IdentityVault, InMemoryStorage, Profile, ProfileId};
+    use castellan::custody::{IdentityVault, InMemoryStorage, Profile};
+    use dramatis::intents::SshUnlockPolicyIntentV1;
+    use dramatis::view::VaultProtectionView;
+    use personae::{Ed25519Keypair, ProfileId};
     use ssh_key::{Algorithm, LineEnding};
 
     use super::*;
-    use crate::browser_carrier::NativeIdentityAction;
-    use crate::identity::VaultProtectionView;
-    use crate::identity_projection::SshUnlockPolicyIntentV1;
 
     struct ScriptedUi {
         path: PathBuf,

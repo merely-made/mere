@@ -194,7 +194,13 @@ impl ResidentDistillery {
             },
         }
 
-        let authority = InstalledAuthority::open_with(data_root, vault_dir, unlock)
+        // djinn opens the vault and hands the works its identity; Distillery
+        // opens none of its own (dramatis repo plan, D5).
+        let opened = castellan::custody::bootstrap::open_storage(vault_dir, unlock)
+            .map_err(|error| format!("open the vault for the Distillery works: {error}"))?;
+        let vault = castellan::custody::IdentityVault::open(opened.storage, profile)
+            .map_err(|error| format!("open the Distillery works' profile: {error}"))?;
+        let authority = InstalledAuthority::open(data_root, Arc::new(vault), opened.description)
             .map_err(|error| format!("open the Distillery works: {error}"))?;
         let mesh_id = authority
             .personal_mesh_id()

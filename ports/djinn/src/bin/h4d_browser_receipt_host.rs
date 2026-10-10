@@ -13,16 +13,14 @@
 use std::sync::Arc;
 use std::time::Duration;
 
+use castellan::authority::PersonaeHost;
+use castellan::custody::ssh_slot::{protocol_key_for, slot_for};
+use castellan::custody::{IdentityVault, InMemoryStorage, Profile};
+use djinn::keeper::Keeper;
 use graphshell::browser_carrier::{AllowedExtensions, BrowserLauncher};
 use graphshell::identity::VaultProtectionView;
 use graphshell::native::browser_host::serve_identity_native_messages;
-use graphshell::native::identity_ui::UnavailableNativeIdentityUi;
-use graphshell::native::personae_host::PersonaeHost;
-use personae::ssh_slot::{protocol_key_for, slot_for};
-use personae::{
-    Ed25519Keypair, IdentityVault, InMemoryProvider, InMemoryStorage, Profile, ProfileId,
-    UnlockTier,
-};
+use personae::{Ed25519Keypair, InMemoryProvider, ProfileId, UnlockTier};
 use signature::Verifier;
 use ssh_agent_lib::agent::Session;
 use ssh_agent_lib::proto::SignRequest;
@@ -92,8 +90,7 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut writer = tokio::io::stdout();
     let summary = serve_identity_native_messages(
         &identity,
-        Arc::clone(&host),
-        &UnavailableNativeIdentityUi,
+        Arc::new(Keeper::new(Arc::clone(&host))),
         launcher,
         &mut reader,
         &mut writer,

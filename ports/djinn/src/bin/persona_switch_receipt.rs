@@ -23,13 +23,13 @@
 //! Run against a scratch vault directory:
 //!
 //! ```text
-//! cargo run -p graphshell --bin persona_switch_receipt -- <output-dir>
+//! cargo run -p djinn --bin persona_switch_receipt -- <output-dir>
 //! ```
 //!
-//! Since the keeper founding this receipt imports castellan directly, which is
-//! itself part of the proof: the port law wants the capability composable
-//! without going through its first application, and this binary is a consumer
-//! that never names graphshell's identity paths.
+//! It imports castellan directly, so it lives with djinn, the one crate that
+//! may link it (dramatis repo plan, D4, D15; moved from graphshell in DR-C).
+//! The cards it renders are graphshell's `identity_projection`, where they
+//! went home in the same move.
 //!
 //! The vault is created under the output directory and unlocked by a fixed
 //! passphrase, deliberately: `Unlock::AutoOs` exists on Windows only, and a
@@ -39,16 +39,16 @@
 use std::path::PathBuf;
 
 use castellan::authority::{IdentityIntentOutcome, PersonaeHost};
-use castellan::projection::{
+use castellan::custody::bootstrap::{self, Unlock};
+use castellan::custody::roster;
+use castellan::custody::ssh_slot::{protocol_key_for, slot_for};
+use castellan::custody::{IdentityStorage, IdentityVault, Profile};
+use castellan::view::VaultProtectionView;
+use graphshell::identity_projection::{
     CreateProfileIntentV1, PROFILE_CREATE_INTENT, PROFILE_SWITCH_INTENT, SwitchProfileIntentV1,
     project_identity, render_identity_surface,
 };
-use castellan::view::VaultProtectionView;
-use personae::bootstrap::{self, Unlock};
-use personae::roster;
-use personae::ssh_slot::{protocol_key_for, slot_for};
-use personae::vault::IdentityStorage;
-use personae::{Ed25519Keypair, IdentityVault, Profile, ProfileId, UnlockTier};
+use personae::{Ed25519Keypair, ProfileId, UnlockTier};
 use serde_json::json;
 use ssh_agent_lib::agent::Session;
 use ssh_key::Algorithm;

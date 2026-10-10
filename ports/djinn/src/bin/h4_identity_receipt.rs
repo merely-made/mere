@@ -9,17 +9,18 @@
 use std::path::PathBuf;
 use std::time::Duration;
 
+use castellan::authority::{
+    IdentityIntentError, IdentityIntentOutcome, PersonaeHost, SshKeyMutationReceipt,
+};
+use castellan::custody::ssh_slot::{protocol_key_for, slot_for};
+use castellan::custody::{IdentityVault, InMemoryStorage, Profile};
 use graphshell::identity::VaultProtectionView;
 use graphshell::identity_projection::{
     GenerateSshKeyIntentV1, ImportSshKeyNativeIntentV1, RemoveSshKeyIntentV1,
     SIGNING_APPROVE_ONCE_INTENT, SSH_GENERATE_INTENT, SSH_IMPORT_NATIVE_INTENT, SSH_REMOVE_INTENT,
     SigningDecisionIntentV1, SshUnlockPolicyIntentV1, render_identity_surface,
 };
-use graphshell::native::personae_host::{
-    IdentityIntentError, IdentityIntentOutcome, PersonaeHost, SshKeyMutationReceipt,
-};
-use personae::ssh_slot::{protocol_key_for, slot_for};
-use personae::{Ed25519Keypair, IdentityVault, InMemoryStorage, Profile, ProfileId, UnlockTier};
+use personae::{Ed25519Keypair, ProfileId, UnlockTier};
 use serde_json::json;
 use ssh_agent_lib::agent::Session;
 use ssh_agent_lib::proto::SignRequest;
