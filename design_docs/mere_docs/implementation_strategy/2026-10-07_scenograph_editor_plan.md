@@ -426,6 +426,112 @@ must trace to those identities. Field trigger, attribute placement and
 terminology choices precede implementation; this records a candidate, not an
 additional SE track or replacement for the current B1/S2 sequence.
 
+#### Primitive and dynamics map (2026-10-09; source-backed planning)
+
+Checked against published Mere `b4e818b4`. This extends the candidate above;
+it is research and a proposed sequence, not a new SE ruling. Graph primitives
+already have several storage and presentation forms. Representing them in the
+graph means making their identities and relationships accessible to authoring;
+it does not yet choose whether each must also become an ordinary content node.
+
+| Primitive | Existing identity and authority | Proposed authoring and dynamics connection |
+|---|---|---|
+| Visible content node | `SurfaceNode` carries a `Container`; its UUID differs from the canonical Resource UUID it shows. `shown_resource_id` records that association. | Inspect surface-owned settings separately from Resource content and assertions. Bind each scene appearance to its chosen body and arrangement role; changing one appearance must not implicitly move every appearance of the Resource. |
+| Resource node | `ResourceNode` owns immutable canonical identity; graph resource content, properties, tags and assertions are accessed separately. Several surfaces may show it. | Expose metadata through the content node's inspection path and permit an explicit Resource appearance. A metadata Resource does not acquire a simulation body merely because it exists. |
+| Link | `RosterSubject` distinguishes a link bundle from a selected relation cell. `RelationKey` distinguishes surface and Resource relations; projected relations may include parallel records and self-loops. | Inspect the exact source assertion and provenance behind a displayed link. Disclose when one mark groups several assertions. An enabled spring or other contribution must trace back through the binding to those assertions. |
+| Field | Numen's `FieldId`, definition, extent and lifecycle are graph-held; a separate `CouplingId` names the field, selector, response and strength. | Inspect/edit the region and its couplings, show intended members separately from evaluated targets, and explain each recognized response. A region appearance and a field's simulation participation remain separate choices. |
+
+Source anchors: [surface substrate](../../../crates/graph/graph-kernel/src/graph/node.rs),
+[Resource association](../../../crates/graph/graph-kernel/src/graph/resource.rs),
+[relation reads](../../../crates/graph/graph-kernel/src/graph/relation_read.rs),
+[roster subjects and cards](../../../crates/mere/src/roster.rs),
+[field](../../../crates/conatus/numen/src/field.rs) and
+[coupling](../../../crates/conatus/numen/src/coupling.rs).
+The roster already offers nodes, links and fields in one model; this inspection
+does not establish that Graphshell exposes every roster action today.
+
+**Existing dynamics connection.** Pictograph's
+[Seiche bridge](../../../crates/canvas/pictograph/src/canvas/seiche_bridge.rs)
+currently creates a body per kernel surface node, springs per visible relation
+cell and forces from graph couplings. Springs carry endpoint pairs, so this
+bridge alone does not expose exact assertion provenance to a force inspector.
+Coupling conversion resolves a selector to a snapshot of node keys and copies
+the field definition and strength. It does not independently enforce the
+field's extent or detect entry/exit. An open response IRI is preserved by numen
+but is ignored by the force integrator until its owning consumer recognizes it.
+These are concrete gaps for the proposed authoring loop, not evidence that the
+expanded field behavior is implemented.
+
+**Proposed sequence and done-conditions:**
+
+1. Inventory the existing node, link and field cards in Graphshell and map each
+   editable value to graph/session authority, recipe authority or view state.
+   Done: every proposed control names its identity, storage owner and edit route;
+   absent controls are recorded rather than inferred from the roster model.
+2. Prepare one small authoring scene: two surfaces of one Resource, parallel
+   assertions between a pair, one self-link, a forme and a second overlapping
+   field. Done: each appearance resolves to its source, grouped links disclose
+   their members, and each field discloses its region, selector and responses.
+   This fixture is proposed; geometry and overlap policy are still to be chosen.
+3. Connect inspected identities to the existing recipe/binding/runtime path.
+   Done: two simultaneous contributions and one arrangement constraint can be
+   traced to their source and spec path; disabling one contribution changes only
+   its declared effect. A removed or missing target cannot silently retarget.
+4. Exercise edit, deselect, undo and save/reopen through their existing owners.
+   Done: edits survive deselection, shared Resource changes reach both surfaces,
+   appearance settings remain independent, and undo/reopen retain exact identities.
+   Native/Wasm dynamics and browser receipts follow the existing lane gates.
+
+Before implementation, return the actual forks: whether the proposed narrow
+*edge* vocabulary replaces or merely labels current relations; where arbitrary
+attributes on links/fields belong; and how incompatible overlapping placement,
+projection and behavior rules compose. A shared inspect/configure interaction
+can be researched before those storage and composition choices are ruled.
+The dynamics slot and settle work, then the grid dynamics axis, B1 and S2 retain
+their existing order and active-owner boundaries.
+
+#### Graphshell control inventory (2026-10-10; planning step 1)
+
+Checked against published Mere `6183006b`, independently of the dynamics draft
+being qualified in the primary checkout. This is source inspection of the
+browser reference host, not a new browser receipt or native-host qualification.
+
+| Control | Present browser route | Authority and missing work |
+|---|---|---|
+| Create a content node | `node:new` calls `create_address`, then refreshes the Canvas. | MereHost's recorded graph edit. A graph member is not a preview occurrence. |
+| Edit title and tags | `node:edit` opens detail; `save-metadata` calls `edit_node`. | The title delta addresses the Surface. Tag deltas route to the shown Resource and retain assertion authorship. Shared Resource changes can affect several surfaces. |
+| Edit a named JSON value | The same form optionally calls `set_product_facet`. | A separate journaled Surface-facet edit. This is not a general Resource, link or field attribute editor, nor the pending facet-dissolution design. |
+| Add a link | `add-relation` resolves a target by URL and calls `assert_product_relation` for one of five editable kinds. | A recorded assertion through MereHost. The form does not address an individual statement handle, its provenance or a link-owned dynamics rule. Selecting the pair selects its nodes. |
+| Inspect link bundles and cells | Shared roster has `LinkCard` and distinct bundle/cell subjects. | No Graphshell source calls these builders or consumes their subjects. Wiring an exact source assertion remains work. |
+| Inspect and configure fields | Shared roster has field detail and visibility/strength intents. Canvas has placement, strength and visibility methods. | No Graphshell source consumes these roster intents or calls `add_field_at`/`set_field_strength`. Canvas's field writes mutate its graph; a host control must route durable changes through the authoritative session before refreshing the view. |
+| Configure placement and motion | Browser arrangement, physics and role controls affect the Canvas; saved scenes retain the settings. | Distinct from a graph primitive's attributes. The pending occurrence-preview adapter is not assumed to supply field or link authoring. |
+
+Sources: [browser product dispatch and form](../../../ports/graphshell/src/web_product.rs),
+[recorded product edits](../../../ports/graphshell/src/product.rs),
+[MereHost edit and undo routes](../../../ports/graphshell/src/mere_host.rs),
+[tag routing](../../../crates/graph/graph-kernel/src/graph/resource_content.rs),
+[shared roster](../../../crates/mere/src/roster.rs),
+[Canvas field writes](../../../crates/canvas/pictograph/src/canvas/input.rs) and
+[field visibility](../../../crates/canvas/pictograph/src/canvas/fields.rs).
+Hiding a field is presentation-only; its coupling continues to exist. Field
+rule/extent cards currently describe values and select the field; they do not
+edit the rule, script or extent. Their script/template rows say not configured.
+
+**Edit boundary to resolve in the authoring proof:** `save_metadata` commits
+title/tags before parsing and writing the optional JSON facet. An invalid JSON
+value can therefore report failure after title/tags have changed. Two successful
+calls also make separate recorded edits. The proposed authoring loop must state
+whether a form submission is one change or several, validate the full draft
+before committing, and show which owner each value changes. This is a source
+finding; no repair or new undo semantics is claimed in this documentation pass.
+
+Step 1's inventory is complete at this source. Before opening step 2, prepare
+the explicit member-to-Resource inspection and exact-statement selection paths,
+then the field read/write adapter. Reuse the established session for writes and
+separate presentation intents. Arbitrary attribute storage, primitive node
+encoding and overlap policy remain the existing forks. The active dynamics
+qualification and B1/S2 owner boundaries retain their priority.
+
 ## 4. Findings
 
 Verified 2026-10-07 against mere's origin unless named.

@@ -48,6 +48,42 @@ fn preference_path(path: &Path) -> PathBuf {
 }
 
 #[test]
+fn host_owned_export_paths_preserve_existing_and_missing_files_without_a_library() {
+    let directory = tempfile::tempdir().unwrap();
+    let existing = directory.path().join("appearance.json");
+    let missing = directory.path().join("new-document.djot");
+    fs::write(&existing, b"owned application bytes").unwrap();
+    let mut state = WorkshopState::in_memory();
+    state.set_protected_export_paths(vec![existing.clone(), missing.clone()]);
+    for path in [&existing, &missing] {
+        state.request_export();
+        let artifact = state.take_export().unwrap();
+        state.complete_export(artifact, Some(path.clone()));
+        assert!(state.status().contains("protected application files"));
+        assert!(state.replacement_path().is_none());
+    }
+    assert_eq!(fs::read(&existing).unwrap(), b"owned application bytes");
+    assert!(!missing.exists());
+}
+
+#[test]
+fn newly_protected_paths_are_checked_again_before_export_replacement() {
+    let directory = tempfile::tempdir().unwrap();
+    let path = directory.path().join("document.djot");
+    fs::write(&path, b"original document").unwrap();
+    let mut state = WorkshopState::in_memory();
+    state.request_export();
+    let artifact = state.take_export().unwrap();
+    state.complete_export(artifact, Some(path.clone()));
+    assert!(state.replacement_path().is_some());
+    let alias = directory.path().join(".").join("document.djot");
+    state.set_protected_export_paths(vec![alias]);
+    state.replace_export();
+    assert!(state.status().contains("protected application files"));
+    assert_eq!(fs::read(&path).unwrap(), b"original document");
+}
+
+#[test]
 fn imported_collision_and_builtin_become_unsaved_copies_without_replacing_sources() {
     let existing = user("theme:existing", "Existing");
     let (_directory, path) = library(std::slice::from_ref(&existing));
@@ -543,4 +579,62 @@ fn non_unicode_editor_paths_cannot_skip_case_alias_protection() {
     assert!(state.status().contains("separate"));
     assert!(state.replacement_path().is_none());
     assert!(!path.exists());
+}
+
+#[test]
+fn protected_storage_directories_cover_future_files_and_recheck_replacement() {
+    let directory = tempfile::tempdir().unwrap();
+    let storage = directory.path().join("listener-data");
+    let generated = storage.join("next-generation/state-42.json");
+    let mut state = WorkshopState::in_memory();
+    state.set_protected_export_directories(vec![storage.clone()]);
+    state.request_export();
+    let artifact = state.take_export().unwrap();
+    state.complete_export(artifact.clone(), Some(generated.clone()));
+    assert!(state.status().contains("protected application files"));
+    assert!(!generated.exists());
+    assert!(!storage.exists());
+    let adjacent = directory.path().join("listener-data-export/theme.json");
+    state.complete_export(artifact.clone(), Some(adjacent.clone()));
+    assert_eq!(fs::read_to_string(&adjacent).unwrap(), artifact.contents);
+    state.set_protected_export_directories(vec![]);
+    fs::create_dir_all(&storage).unwrap();
+    let current = storage.join("state-42.json");
+    fs::write(&current, b"owned generation").unwrap();
+    state.complete_export(artifact, Some(current.clone()));
+    assert!(state.replacement_path().is_some());
+    state.set_protected_export_directories(vec![storage]);
+    state.replace_export();
+    assert!(state.status().contains("protected application files"));
+    assert_eq!(fs::read(current).unwrap(), b"owned generation");
+}
+
+#[cfg(unix)]
+#[test]
+fn directory_export_guard_protects_aliases_and_owned_symlink_entries() {
+    let directory = tempfile::tempdir().unwrap();
+    let storage = directory.path().join("listener-data");
+    fs::create_dir_all(&storage).unwrap();
+    let alias = directory.path().join("storage-alias");
+    std::os::unix::fs::symlink(&storage, &alias).unwrap();
+    let outside = directory.path().join("outside.json");
+    fs::write(&outside, b"outside bytes").unwrap();
+    let link = storage.join("owned-link.json");
+    std::os::unix::fs::symlink(&outside, &link).unwrap();
+    let mut state = WorkshopState::in_memory();
+    state.set_protected_export_directories(vec![storage.clone()]);
+    for path in [
+        alias.join("future/state-43.json"),
+        link.clone(),
+        storage.join("missing/../state-44.json"),
+    ] {
+        state.request_export();
+        let artifact = state.take_export().unwrap();
+        state.complete_export(artifact, Some(path));
+        assert!(state.status().contains("protected application files"));
+        assert!(state.replacement_path().is_none());
+    }
+    assert!(fs::symlink_metadata(link).unwrap().file_type().is_symlink());
+    assert_eq!(fs::read(outside).unwrap(), b"outside bytes");
+    assert!(!storage.join("state-44.json").exists());
 }

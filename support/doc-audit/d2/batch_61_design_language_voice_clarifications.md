@@ -6,6 +6,29 @@ the evidence for intent. Existing source/plan boundaries were inspected;
 no build, browser or runtime gate was rerun. Concurrent dirty dynamics code
 is outside this qualification. This batch judges the changed claims only.
 
+**Planning continuation (2026-10-09):** source inspection at published
+`b4e818b4` checked the roster, Resource association, relation reads, numen field
+and coupling types, graph deltas and Pictograph's Seiche bridge. The added
+primitive map and proposed done-conditions remain research. The isolated
+publication checkout preserves the primary checkout's concurrent work.
+Validation: `git diff --check` passed and all 11 newly added local links,
+including heading anchors, resolve. Before/after doc-audit finding lists have
+identical counts and hashes. The global D2 checker retains its existing
+259/265 coverage and unrelated failures; no new missing or unknown record was
+introduced. No runtime source changed and no build or browser gate ran.
+
+**Control inventory continuation (2026-10-10):** checked published Mere
+`6183006b`, using browser dispatch/forms, product edits, session edit/undo,
+Resource tag routing, shared roster cards and Canvas field methods. The
+browser routes and missing roster consumers are source findings, not headed
+acceptance. The compound metadata form's sequential commits and validation
+order are recorded as an authoring boundary; no repair is claimed. Native
+controls and the concurrent dynamics draft are outside this pass.
+Validation: all nine new local links and anchors resolve; whitespace checks
+pass. The complete doc-audit JSON has the same SHA256 before and after the
+inventory. D2 retains its six existing missing records, 259/265 coverage and
+no unknown supplemental records. No build or browser gate ran.
+
 ## 2026-08-23_projection_scenes_and_graph_native_platform.md
 
 - disposition: current
@@ -38,7 +61,7 @@ proofs remain labelled. Existing runtime completion is not asserted.
 
 - disposition: current
 - status line: "Status (2026-10-08): tracks E1 to E5 and C1 complete; C2 and S1 recorded landed." — accurate: yes
-- claims checked: 3 — holds: 3, stale: 0, unverifiable: 0
+- claims checked: 7 — holds: 7, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -56,6 +79,11 @@ Keep primitive authoring and selection/preview proofs gated on the named choices
 
 Checked preserved edits and background membership, separated style/behavior
 research, and the primitive-inspection candidate in Graphshell.
+Continuation checks cover the four source-backed map rows. Host control
+availability is explicitly unqualified; dynamics attribution and the fixture
+are proposed. No new SE track or storage schema is claimed.
+The 2026-10-10 source inventory now qualifies the browser control routes and
+their missing consumers at `6183006b`; runtime behavior remains untested here.
 
 ## mere_docs/implementation_strategy/2026-06-13_scriptable_field_regions_plan.md
 
@@ -67,6 +95,8 @@ research, and the primitive-inspection candidate in Graphshell.
 
 The older force/visibility/layout scope is explicitly identified as incomplete
 for the newly stated direction; its historical implementation status is retained.
+The earlier extent-membership shorthand is corrected in a dated source refresh:
+selectors do not currently enforce the extent or provide entry/exit events.
 
 ### Contradictions
 
@@ -81,6 +111,10 @@ Research membership, overlap, entry/exit and action authority before implementat
 
 Checked the broadened field direction, the unchanged implementation boundary,
 and the proposed composition/action proof with lifecycle distinctions.
+The continuation verified selector variants, extent utilities and the bridge's
+actual inputs; spatial inclusion and declared membership remain distinct.
+The 2026-10-10 inventory verifies absent Graphshell field-authoring callers
+and distinguishes Canvas graph writes from view-only field visibility.
 
 ## mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md
 
@@ -105,6 +139,8 @@ Use evaluated term and primitive identities for a later explanation proof.
 
 Checked visible dynamics intent, existing composition/constraint ownership,
 and the proposed two-contribution control with unchanged continuation order.
+The continuation names the source attribution gap behind endpoint-pair springs
+and links the primitive map without claiming a completed explanation seam.
 
 ## mere_docs/implementation_strategy/2026-07-05_theme_modes_plan.md
 

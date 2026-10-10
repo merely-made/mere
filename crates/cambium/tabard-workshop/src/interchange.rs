@@ -277,6 +277,23 @@ impl WorkshopState {
         self.pending_export.take()
     }
 
+    /// Protect files owned by the embedding application, such as its settings
+    /// or open documents. The host supplies its current authorities; the shared
+    /// exporter checks their path identities before creation and replacement.
+    /// This transient list never enters a theme or the authored library. The
+    /// workshop's own library and preference files remain protected as well.
+    pub fn set_protected_export_paths(&mut self, paths: Vec<PathBuf>) {
+        self.protected_export_paths = paths;
+    }
+
+    /// Protect an application's storage directories, including future generated
+    /// files. Directory boundaries are compared by path components, using the
+    /// same alias handling as protected files. This transient policy does not
+    /// enter the authored theme or library.
+    pub fn set_protected_export_directories(&mut self, directories: Vec<PathBuf>) {
+        self.protected_export_directories = directories;
+    }
+
     pub fn complete_export(&mut self, artifact: ExportArtifact, path: Option<PathBuf>) {
         let Some(path) = path else {
             self.cancel_export();
@@ -284,7 +301,7 @@ impl WorkshopState {
         };
         if self.is_editor_path(&path) {
             self.status =
-                "Choose an export path separate from your library and workshop settings.".into();
+                "Choose an export path separate from your library and workshop settings or protected application files.".into();
             return;
         }
         match write_artifact(&path, &artifact.contents, WriteMode::CreateNew) {
@@ -306,7 +323,7 @@ impl WorkshopState {
         };
         if self.is_editor_path(path) {
             self.status =
-                "Choose an export path separate from your library and workshop settings.".into();
+                "Choose an export path separate from your library and workshop settings or protected application files.".into();
             return;
         }
         match write_artifact(path, &artifact.contents, WriteMode::Replace) {
@@ -391,6 +408,17 @@ impl WorkshopState {
     }
 
     fn is_editor_path(&self, path: &Path) -> bool {
+        if self
+            .protected_export_paths
+            .iter()
+            .any(|reserved| same_path(path, reserved))
+            || self
+                .protected_export_directories
+                .iter()
+                .any(|directory| within_directory(path, directory))
+        {
+            return true;
+        }
         let Some(library) = self.library_path() else {
             return false;
         };
@@ -436,58 +464,79 @@ fn suffixed(path: &Path, suffix: &str) -> PathBuf {
     PathBuf::from(name)
 }
 
-fn same_path(left: &Path, right: &Path) -> bool {
-    let normalize = |path: &Path| -> Option<PathBuf> {
-        let mut ancestor = if path.is_absolute() {
-            path.to_path_buf()
-        } else {
-            std::env::current_dir().ok()?.join(path)
-        };
-        let mut suffix = Vec::new();
-        // Missing output files still inherit the identity of their existing
-        // parent directories. Resolve symlinks at the longest canonicalizable
-        // ancestor before applying the missing suffix (including `..`).
-        let mut normalized = loop {
-            if let Ok(resolved) = ancestor.canonicalize() {
-                break resolved;
-            }
-            suffix.push(
-                ancestor
-                    .components()
-                    .next_back()?
-                    .as_os_str()
-                    .to_os_string(),
-            );
-            if !ancestor.pop() {
-                return None;
-            }
-        };
-        for segment in suffix.iter().rev() {
-            for component in Path::new(segment).components() {
-                match component {
-                    Component::CurDir => {},
-                    Component::ParentDir => {
-                        normalized.pop();
-                    },
-                    component => normalized.push(component.as_os_str()),
-                }
+fn normalized_identity(path: &Path, canonical: bool) -> Option<PathBuf> {
+    let mut ancestor = if path.is_absolute() {
+        path.to_path_buf()
+    } else {
+        std::env::current_dir().ok()?.join(path)
+    };
+    if !canonical {
+        let mut normalized = PathBuf::new();
+        for component in ancestor.components() {
+            match component {
+                Component::CurDir => {},
+                Component::ParentDir => {
+                    normalized.pop();
+                },
+                component => normalized.push(component.as_os_str()),
             }
         }
-        Some(normalized)
-    };
-    match (normalize(left), normalize(right)) {
-        (Some(left), Some(right)) => {
-            if cfg!(any(target_os = "macos", target_os = "windows")) {
-                // Protect case aliases even before files exist, conservatively
-                // including case-sensitive volumes on these platforms. Lossy
-                // decoding can overprotect ambiguous non-Unicode names, but
-                // never skips the comparison because decoding failed.
-                left.as_os_str().to_string_lossy().to_lowercase()
-                    == right.as_os_str().to_string_lossy().to_lowercase()
-            } else {
-                left == right
-            }
-        },
-        _ => false,
+        return Some(case_identity(normalized));
     }
+    let mut suffix = Vec::new();
+    // Missing output files still inherit the identity of their existing
+    // parent directories. Resolve symlinks at the longest canonicalizable
+    // ancestor before applying the missing suffix (including `..`).
+    let mut normalized = loop {
+        if let Ok(resolved) = ancestor.canonicalize() {
+            break resolved;
+        }
+        suffix.push(
+            ancestor
+                .components()
+                .next_back()?
+                .as_os_str()
+                .to_os_string(),
+        );
+        if !ancestor.pop() {
+            return None;
+        }
+    };
+    for segment in suffix.iter().rev() {
+        for component in Path::new(segment).components() {
+            match component {
+                Component::CurDir => {},
+                Component::ParentDir => {
+                    normalized.pop();
+                },
+                component => normalized.push(component.as_os_str()),
+            }
+        }
+    }
+    Some(case_identity(normalized))
+}
+
+fn case_identity(path: PathBuf) -> PathBuf {
+    if cfg!(any(target_os = "macos", target_os = "windows")) {
+        // Conservatively protect case aliases, including missing paths.
+        PathBuf::from(path.as_os_str().to_string_lossy().to_lowercase())
+    } else {
+        path
+    }
+}
+
+fn same_path(left: &Path, right: &Path) -> bool {
+    matches!((normalized_identity(left, true), normalized_identity(right, true)),
+        (Some(left), Some(right)) if left == right)
+}
+
+fn within_directory(path: &Path, directory: &Path) -> bool {
+    // Canonical comparison recognizes aliases into an owned directory. The
+    // lexical comparison also protects an owned symlink entry whose target
+    // lies outside it. Both retain component boundaries, so adjacent directory
+    // names never become accidental matches.
+    [true, false].into_iter().any(|canonical| {
+        matches!((normalized_identity(path, canonical), normalized_identity(directory, canonical)),
+            (Some(path), Some(directory)) if path.starts_with(&directory))
+    })
 }

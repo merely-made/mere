@@ -7,6 +7,9 @@
 //! Tabard's appearance workshop: one retained product model and Cambium
 //! surface for standalone and embedding hosts.
 
+#[cfg(all(feature = "native-host", not(target_arch = "wasm32")))]
+pub mod native_host;
+
 mod graph;
 mod interchange;
 mod reader;

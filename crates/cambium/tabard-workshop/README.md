@@ -65,6 +65,29 @@ Route close requests through `request_close()` and honor `exit_requested()`.
 The workshop keeps staged or unsaved work available when validation or saving
 fails. Native window and application-close policy belongs to the host.
 
+## Shared native binding
+
+Enable the optional `native-host` feature to use `native_host::WorkshopHost`,
+`native_init` and `native_hooks` for a workshop window. Pass the application's
+existing render core to the ordinary Winit host constructor and route that
+window's events from the application's event loop. The binding supplies
+preview registration, native caption controls, controlled text, explicit
+export effects and the shared dirty-close decision.
+
+For an embedded workshop within another application state, retain one
+`PreviewBindings` value and call `register` with the current workshop and the
+parent's leaf/producer registries. Call `sync_and_export` after dispatch and
+use `focused_field` to project the parent's controlled-text slot. Independent
+bindings allocate distinct retained raster identities on the same core.
+Application selection, persistence, window routing and final exit policy stay
+with the parent. The feature and its native dependencies are excluded on Wasm.
+
+The native binding's complete CPU gate is:
+
+```sh
+cargo test --locked --offline -p tabard-workshop --features native-host --lib
+```
+
 ## Fixtures and checks
 
 The reader source and isolated application document are checked-in
