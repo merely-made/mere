@@ -655,9 +655,9 @@ useful defaults. No single palette or quiet visual treatment is mandated
 across the apps. Defaults can provide coherent starting arrangements; users
 must be able to customize them.
 
-*Checked precedent:* [Tabard's theme model](../ports/tabard/src/lib.rs) carries
+*Checked precedent:* [Tabard's theme model](../crates/system/tabard/src/lib.rs) carries
 seed-based definitions, modes and custom mode sheets; its
-[registry](../ports/tabard/src/theme/registry.rs) distinguishes built-ins from
+[registry](../crates/system/tabard/src/theme/registry.rs) distinguishes built-ins from
 user themes and supports forking a user copy. Woodshed's
 `woodshed/crates/woodshed-views/src/theme.rs` at
 `e08bf4b9875a7efb02b1c17bf9fac56708712cee` has Slate, Ember, Light, Dusk,
