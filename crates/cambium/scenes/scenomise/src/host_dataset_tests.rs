@@ -301,6 +301,7 @@ fn compiler() -> ProjectionCompiler {
 /// A host's own definition over the envelope's dataset.
 fn definition(data: &HostDatasetV1, kind: &str, x: &str) -> ProjectionDefinition {
     ProjectionDefinition {
+        dynamics: None,
         version: 1,
         id: "host-view".into(),
         label: "Host view".into(),
