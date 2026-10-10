@@ -115,8 +115,13 @@ path-specific refusal. Unsupported contact paths, points and concave polygons
 need a further footprint adapter. Living scene bodies, gravity and node
 tangibility are retained when the obstacle set changes.
 
-The mode/control fork and R162 viewer-file handoff have been put to Mark.
-No reserved viewer files have been edited by this continuation. Mode state,
+SE90 in the editor plan supersedes the proposed mode/control fork: reset is
+an action, ambient context and props can coexist, and visibility is independent
+of collision, animation, picking and authored behavior. The static binder is
+one component of the set, not an interactive scenery implementation. The reset
+baseline and recently interacted foreground membership still need concrete
+reconciliation with §9.2. R162's viewer ownership has not been released.
+No reserved viewer files have been edited by this continuation. Scene state,
 viewer integration and Chrome/Firefox checks are still open. The retained
 `backdrops-idle-overlap.txt` probe retains the short 120-step, idle-body
 failure. Rapier caps correction at 3 world units per second. The
@@ -129,8 +134,9 @@ standalone viewer wasm compile check passes on Genet `7422e906` and Vello
 dynamics identity receipt.
 
 B1/S2 continue through the viewer owner assigned by site R162. The concrete
-next slices are: B1's three-mode control, backdrop drawing, tangible obstacle
-binding and its intangible control; then S2's clause selection, per-appearance
+next slices are: reconcile B1's reset/context/set state with the existing
+owners under SE90, then viewer backdrop drawing, independent controls and the
+tangible obstacle proof with its intangible control; then S2's clause selection, per-appearance
 visibility, shelfmark mapping and scenotime replay. SE88's UI name is
 "Appearance part"; a spelling for the replacement shelfmark key remains a
 reading, not a separate ruling. The site's current selection semantics must
@@ -303,6 +309,26 @@ The one `host_dataset_view.rs` change in the dynamics draft is the required
 `dynamics: None` initialization for the expanded recipe type. No new viewer
 behavior has been installed. The site's upstream sandbox still carries
 `mer3ly.facets`; SE88's key migration has not been applied.
+
+**Upstream check, 2026-10-10:** fresh fetches report Mere `773a0dc2` and site
+`87d7a3d` on `origin/main`. The viewer's Forme bridge `cf4f4c51` and reconciliation
+`70fb3aa4` are published. The reserved viewer files in local main `d572b322`
+match Mere upstream exactly, with no local edits at this checkpoint. The site
+plan still reserves those files under R162; committed/pushed work does not
+constitute an ownership release or proof that the cutover is complete. The
+B1 backend `e386e827` is local and is not an ancestor of published main.
+
+**SE90 source map:** portable `sceno::Backdrop` carries provenance, transforms,
+geometry, visibility and collision, but no behavior or item-picking identity.
+Pictograph's `AmbientSim` advances decorative simulations and paints them; it
+does not mean contextual graph nodes and has no picking or reset contract.
+Seiche's `SceneSpec` already supplies fixed/dynamic bodies, initial velocities,
+sprites, joints and perpetual motion, with tangibility separate. These are
+existing capabilities, not a unified portable set adapter. Graphshell's
+"Restore arrangement" calls `Canvas::restore_arrangement`, which restores
+stored placement and pauses physics without resetting scenic body, animation
+or script state. Use these seams to define the next bounded slice rather than
+turning the sandbox's mode labels into the scene model.
 
 **Workspace rules for this continuation:** Mark's current workspace
 instructions supersede the historical worktree/build-directory paragraph below.

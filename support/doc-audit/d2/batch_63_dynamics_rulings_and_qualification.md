@@ -130,3 +130,24 @@ passes. The retained short-bound overlap failure is distinct from the final
 360-step active-law/control proof; no tolerance or settle budget was raised.
 The changed-doc audit reports no new findings. The D2 aggregate's eight errors
 are existing index/coverage issues outside these two changed documents.
+
+## SE90 correction and upstream inspection, 2026-10-10
+
+Supplemental source judgment against local Mere `d572b322`, freshly fetched
+Mere `773a0dc2` and site `87d7a3d`. The editor plan records Mark's correction
+verbatim as SE90 and supersedes B1's three-mode control and done-condition.
+The handoff now distinguishes scene role, visibility, collision, animation,
+picking and behavior. Reset and recent-interaction membership boundaries remain
+explicitly open; this documentation change does not claim their implementation.
+
+Verified `sceno::Backdrop`, Pictograph's `AmbientSim`, Seiche's `SceneSpec`, the
+viewer toolbar and `Canvas::restore_arrangement` directly. The static backend
+remains useful but does not implement the animated/interactive set. Compared
+all R162 reserved viewer paths against freshly fetched Mere upstream: equal
+and locally unmodified. The published Forme bridge and reconciliation are
+ancestors of upstream; the B1 backend is not. Site R162 still assigns viewer
+ownership, with no published release in the current site plan. Earlier
+qualification counts are historical receipts; no runtime test was rerun for
+this documentation-only correction. The changed-doc comparison reports no new
+mechanical findings, and the scoped diff check passes. Earlier aggregate totals
+remain unchanged.
