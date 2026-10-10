@@ -1,6 +1,8 @@
 {
   "valid_contexts_compared": 116,
   "invalid_sets_refused": 4,
+  "force_checks_passed": 6,
   "fixture_sha256": "c628a6d8108995222993ab8b34cf92a8ccb682847e157289082aec33440fb8f1",
-  "browser_model_sha256": "abd4d1ff8dc421c698cf3b3fc54d19a5994f557bba4b2455802fe2d4e1cc090f"
+  "browser_model_sha256": "abd4d1ff8dc421c698cf3b3fc54d19a5994f557bba4b2455802fe2d4e1cc090f",
+  "force_model_sha256": "7944b619c71506a20284cde24d3a1a2c8f2b3e5ae7ed1d168c833bab98b01eb6"
 }
