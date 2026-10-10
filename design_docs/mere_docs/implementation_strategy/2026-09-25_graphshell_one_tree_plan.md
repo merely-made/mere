@@ -13,13 +13,14 @@ the remaining gates; linked plans own later editor and dynamics status. The
 reservoir's V3–V5 resident implementation has advanced independently; its
 process fixtures do not close this browser cutover or mount the mere panel.
 **Nested host-dataset continuation (2026-10-09):** implemented on
-`codex/nested-graph-view`, with published main `3567c8e93` and the site
-cutover baseline `7c0c12008` merged at `86a8421db`. The bounded headed proof passes on the default Radeon WebGPU
+`codex/nested-graph-view`, with published main `421818710` and the committed site
+cutover `bf626abd2` combined at `c8ac18ba9` (cutover merge `25e356782`). The earlier bounded headed proof passes on the default Radeon WebGPU
 adapter after the coarse bitmap traversal repair. Mark approved
 implementing expandable repository groups and entering their constituent graph.
 Rulings 161–162 now require portable `sceno::Fold` facts and give the site
-lane ownership of the shared viewer files. The branch is adapting its explicit
-membership to folds; combined qualification and landing are in progress. Saved
+lane ownership of the shared viewer files. The branch now adapts its explicit
+membership to folds and integrates history and page gestures; combined
+qualification and landing are in progress. Saved
 scene integration and the live site's viewer replacement remain separate work.
 **Scope:** Graphshell's browser page becomes one retained Cambium tree. Its
 HTML controls become Cambium components, its display-only Cambium chrome
@@ -697,9 +698,14 @@ transfers DOM focus into the graph before traversal returns to the controls.
   Viewer disclosure derives from the portable fold effect and retains original
   relationship witnesses. The complete source scene remains available beside
   the viewer graph, including hidden instances. Tests and headed receipts are
-  being renewed on the combined sources. The site lane is independently
-  implementing history in the shared viewer files; its uncommitted work is
-  untouched and requires a committed checkpoint before combined integration.
+  being renewed on the combined sources. The site's committed checkpoint
+  `bf626abd2` is merged at `25e356782`, followed by published main `421818710`
+  (including Moot) at `c8ac18ba9`. Uncommitted site-lane docs and scenarios
+  remain untouched. Checkpoint changes rebuild the same Fold reading: surviving
+  group choices and coordinates carry forward, choices naming removed groups
+  clear, and each fresh disclosure reapplies change marks once. A checkpoint
+  without the requested membership kind refuses without replacing the previous
+  view. The changes list remains complete even when occurrences are folded.
 
 - **2026-10-09 — hosted camera recovery and live accessibility focus:** merged
   published main `dafacc25c` at `6a7c7d8fa`, retaining both the grouping and

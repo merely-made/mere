@@ -18,8 +18,8 @@ clarifies that deselection preserves edits, welcomes hover previews, expands
 fields toward scoped projections and entry-triggered behavior, calls for
 granular configurable font roles and meaningful visible dynamics, and records
 the need to compose theme values with semantic channels. Owner plans carry
-research inputs and candidate proofs. Existing work order, R160 and viewer
-ownership holds stand; this is not qualification of the shared checkout's
+research inputs and candidate proofs. Existing work order and viewer ownership
+stand; site Rulings 161–162 below replace R160. This is not qualification of the shared checkout's
 concurrent dynamics implementation. The subsequent [primitive planning
 direction, §9.9](../../2026-08-23_projection_scenes_and_graph_native_platform.md#99-plan-through-graph-primitives-2026-10-09)
 asks for nodes, links and fields to be inspectable/configurable and connected
@@ -80,8 +80,9 @@ it can use, not a completed ambient reason controller. The new forme field
 represents the recursive tile arrangement (§9.4); it does not settle B1's
 deferred field physics or the layout-lock gesture.
 
-At this read, Moot's capsule-library lane is adding an opt-in applet mount in
-`web_tree.rs` and `web_tree/applet.rs` in its own dirty worktree. Its canonical
+Moot's capsule-library proof is now on published main (`f22205e4e`, followed by
+`0792da6a9` and `3055ae5af` integration fixes), with an opt-in applet mount in
+`web_tree.rs` and `web_tree/applet.rs`. Its canonical
 continuation is the [Moot plan](../../moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#capsule-library-composition-proof-2026-10-09).
 Site Rulings 161–162 supersede R160: the nested branch adapts its groups to
 `sceno::Fold`, and the site lane owns `web_tree*`, `host_dataset_view.rs` and
