@@ -6,10 +6,12 @@
 
 //! Resident Knot composition inside Djinn.
 //!
-//! Djinn owns process topology. Knot still owns document semantics,
-//! Personae owns startup unlock, Murm owns transport, and iroh-blobs owns the
-//! physical content store. This module only keeps those authorities alive in
-//! one resident and registers the stable local route.
+//! Djinn owns process topology. Knot still owns document semantics; djinn's
+//! custody derives the persona's Knot keys, the same release its custody
+//! route answers Knot's own processes with (dramatis DR-C); Murm owns
+//! transport, and iroh-blobs owns the physical content store. This module
+//! only keeps those authorities alive in one resident and registers the
+//! stable local route.
 //!
 //! ## Closed while the vault is locked (vault lock ruling 48)
 //!
@@ -36,7 +38,7 @@ use graphshell_endpoint::{
 use knot_editor::{
     KnotContentRetentionPort, KnotResidentSource, KnotRosetteConfig, KnotSettings,
     KnotSpaceAuthoritySnapshot, KnotSyncHost, KnotSyncHostConfig, KnotWriteGrant,
-    StartupUnlockedPersonalVault, knot_settings_path, local_device_root, persona_vault_root,
+    PersonalVaultKeys, StartupUnlockedPersonalVault, knot_settings_path, persona_vault_root,
 };
 use transport::BlobScope;
 
@@ -209,13 +211,17 @@ impl ResidentKnot {
         if device_label.is_empty() {
             return Err("resident Knot device label is empty".into());
         }
-        let device_root = local_device_root(data_root, device_label)?;
-        let startup = StartupUnlockedPersonalVault::open(
+        let released = crate::custody::epoch_keys(
+            &crate::custody::ReleasePolicy::default(),
             data_root,
             persona,
-            device_root,
-            authority.writers(),
-        )?;
+            Some(device_label),
+            &PersonalVaultKeys::requests(),
+        )
+        .map_err(|error| format!("could not derive resident Knot keys: {error}"))?;
+        let keys = PersonalVaultKeys::from_released(&released)?;
+        let startup =
+            StartupUnlockedPersonalVault::open(data_root, persona, keys, authority.writers())?;
         // Held across the awaits below, so cleared on drop (vault lock ruling 49).
         let signing_seed = zeroize::Zeroizing::new(*startup.signing_seed());
         let store = startup.store().clone();

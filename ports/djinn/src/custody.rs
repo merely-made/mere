@@ -16,7 +16,12 @@
 //!   names, never the master, each with the master's attestation. A lock
 //!   revokes them through the existing lock broadcast: `WatchLock` answers
 //!   from the host's lock watch channel, and the app drops what it holds.
+//! - **Epoch releases** hand over keys derived from a persona wallet's current
+//!   private epoch, for the derivations the policy names, never the epoch.
+//!   Knot's vault and writer keys are the first (DR-C): djinn derives them
+//!   with the same `blake3::derive_key` Knot used, so stores keep their keys.
 
+use std::path::Path;
 use std::sync::Arc;
 
 use castellan::custody::IdentityStorage;
@@ -25,12 +30,13 @@ use dramatis::roster::{Roster, RosterEntry};
 use dramatis::view::VaultLockView;
 use graphshell::native::app_admission::AppId;
 use graphshell::native::custody::{
-    CustodyAnswer, CustodyCall, CustodyRefusal, KeySource, ReleasedKey, ResidentStatus,
-    StationGrantRequest,
+    CustodyAnswer, CustodyCall, CustodyRefusal, EpochKeyRequest, KeySource, ReleasedEpochKey,
+    ReleasedKey, ResidentStatus, StationGrantRequest,
 };
 use pandect::DeviceId;
 use pandect::station_grant::{SitedStationGrant, SitedStationGrantRequest};
-use personae::{IdentityError, IdentityProvider, InMemoryProvider, ProfileId};
+use personae::{Ed25519Keypair, IdentityError, IdentityProvider, InMemoryProvider, ProfileId};
+use zeroize::Zeroizing;
 
 use crate::keeper::Keeper;
 
@@ -68,6 +74,25 @@ pub fn grant(
 #[derive(Clone)]
 pub struct ReleasePolicy {
     rules: Vec<(KeySource, SaltRule)>,
+    epoch: Vec<EpochRule>,
+}
+
+/// One epoch derivation a release may hand over: its context, whether it
+/// mixes in the device root, and whether its secret may leave or only its
+/// public key.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochRule {
+    pub context: String,
+    pub device_bound: bool,
+    pub secret: bool,
+}
+
+impl EpochRule {
+    fn allows(&self, request: &EpochKeyRequest) -> bool {
+        self.context == request.context
+            && self.device_bound == request.device_bound
+            && (self.secret || request.public_only)
+    }
 }
 
 /// One namespace a release may draw from.
@@ -94,7 +119,21 @@ impl SaltRule {
 impl ReleasePolicy {
     /// Release nothing.
     pub fn none() -> Self {
-        Self { rules: Vec::new() }
+        Self {
+            rules: Vec::new(),
+            epoch: Vec::new(),
+        }
+    }
+
+    /// Release the epoch derivation `rule` names as well.
+    pub fn with_epoch(mut self, rule: EpochRule) -> Self {
+        self.epoch.push(rule);
+        self
+    }
+
+    /// Whether the epoch derivation `request` may leave djinn.
+    pub fn allows_epoch(&self, request: &EpochKeyRequest) -> bool {
+        !request.context.is_empty() && self.epoch.iter().any(|rule| rule.allows(request))
     }
 
     /// Release salts matching `rule` from `source` as well.
@@ -119,9 +158,19 @@ impl Default for ReleasePolicy {
     /// the transport identity (vault lock ruling 92); Distillery's personal
     /// mesh name; Graphshell's per-session endpoint keys; and, from the
     /// wallet, the station- and controller-scoped Reticulum material a sited
-    /// station runs on (D17).
+    /// station runs on (D17). From the persona epoch: Knot's vault key and
+    /// device-bound writer seed, and only the public half of its legacy
+    /// writer.
     fn default() -> Self {
+        let knot = |context: &str, device_bound, secret| EpochRule {
+            context: context.into(),
+            device_bound,
+            secret,
+        };
         Self::none()
+            .with_epoch(knot(knot_editor::VAULT_KEY_CONTEXT, false, true))
+            .with_epoch(knot(knot_editor::SIGNING_KEY_CONTEXT, true, true))
+            .with_epoch(knot(knot_editor::SIGNING_KEY_CONTEXT, false, false))
             .with(
                 KeySource::Persona,
                 SaltRule::Exact(mesh::MESH_AUTHOR_SALT.to_vec()),
@@ -247,6 +296,23 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
             .map(CustodyAnswer::Revoked)
             .map_err(failed)
         },
+        CustodyCall::ReleaseEpochKeys {
+            persona,
+            device_label,
+            keys,
+        } => {
+            unlocked(&keeper)?;
+            let root = keeper.wallet_root().ok_or(CustodyRefusal::NoWallet)?;
+            let released = epoch_keys(
+                keeper.policy(),
+                root,
+                personae::PersonaId::from_uuid(persona),
+                device_label.as_deref(),
+                &keys,
+            )?;
+            tracing::info!(app = %app, keys = released.len(), "released epoch keys");
+            Ok(CustodyAnswer::EpochKeys(released))
+        },
         CustodyCall::WatchLock { seen } => {
             let mut lock = keeper.lock_state();
             loop {
@@ -276,6 +342,81 @@ fn call_name(call: &CustodyCall) -> &'static str {
         CustodyCall::IssueStationGrant { .. } => "issue_station_grant",
         CustodyCall::RevokeDevice { .. } => "revoke_device",
         CustodyCall::WatchLock { .. } => "watch_lock",
+        CustodyCall::ReleaseEpochKeys { .. } => "release_epoch_keys",
+    }
+}
+
+/// Derive `requests` from `persona`'s current private epoch under
+/// `data_root`, each checked against `policy`. djinn's own resident Knot
+/// opens through this too, so the route and the resident cannot drift.
+pub fn epoch_keys(
+    policy: &ReleasePolicy,
+    data_root: &Path,
+    persona: personae::PersonaId,
+    device_label: Option<&str>,
+    requests: &[EpochKeyRequest],
+) -> Result<Vec<ReleasedEpochKey>, CustodyRefusal> {
+    if requests.is_empty() || requests.iter().any(|request| !policy.allows_epoch(request)) {
+        return Err(CustodyRefusal::NotReleasable);
+    }
+    if pandect::wallet_store::load_persona_wallet(data_root, persona)
+        .map_err(failed)?
+        .is_none()
+    {
+        return Err(CustodyRefusal::NoPersona);
+    }
+    // A wallet whose epoch will not load is sealed and locked: pending (D12).
+    let epoch = castellan::custody::wallet::load_current_private_epoch(data_root, persona)
+        .map_err(failed)?
+        .ok_or(CustodyRefusal::Locked)?;
+    let epoch = Zeroizing::new(epoch.epoch_secret);
+    let device_root = match requests.iter().any(|request| request.device_bound) {
+        true => Some(device_root(data_root, device_label)?),
+        false => None,
+    };
+    Ok(requests
+        .iter()
+        .map(|request| {
+            let mut material = Zeroizing::new(Vec::with_capacity(64));
+            material.extend_from_slice(&epoch);
+            if let (true, Some(device_root)) = (request.device_bound, device_root.as_ref()) {
+                material.extend_from_slice(device_root);
+            }
+            let derived = Zeroizing::new(blake3::derive_key(&request.context, &material));
+            let key = match request.public_only {
+                true => Ed25519Keypair::from_seed(*derived).public_key().to_bytes(),
+                false => *derived,
+            };
+            ReleasedEpochKey {
+                request: request.clone(),
+                key,
+            }
+        })
+        .collect())
+}
+
+/// This machine's public device key: distinct per device, so a
+/// device-bound derivation differs between a persona's devices. A label
+/// mints the identity when there is none.
+fn device_root(data_root: &Path, label: Option<&str>) -> Result<[u8; 32], CustodyRefusal> {
+    let identity = match label {
+        Some(label) => castellan::custody::wallet::ensure_local_device_identity(data_root, label)
+            .map(Some)
+            .map_err(failed)?,
+        None => {
+            castellan::custody::wallet::load_local_device_identity(data_root).map_err(failed)?
+        },
+    };
+    match identity {
+        Some(identity) => Ok(Ed25519Keypair::from_seed(identity.device_seed)
+            .public_key()
+            .to_bytes()),
+        None if pandect::wallet_store::local_device_identity_path(data_root).is_file() => {
+            Err(CustodyRefusal::Locked)
+        },
+        None => Err(CustodyRefusal::Refused {
+            reason: "this device has no identity yet".into(),
+        }),
     }
 }
 
@@ -444,6 +585,21 @@ mod tests {
         let [station, _] = personae::reticulum::station_salts(b"device");
         assert!(policy.allows(KeySource::Wallet, &station));
         assert!(!policy.allows(KeySource::Persona, &station));
+        assert!(policy.allows_epoch(&EpochKeyRequest::secret(
+            knot_editor::SIGNING_KEY_CONTEXT,
+            true
+        )));
+        assert!(policy.allows_epoch(&EpochKeyRequest::public(
+            knot_editor::SIGNING_KEY_CONTEXT,
+            false
+        )));
+        assert!(
+            !policy.allows_epoch(&EpochKeyRequest::secret(
+                knot_editor::SIGNING_KEY_CONTEXT,
+                false
+            )),
+            "the legacy writer's secret stays in djinn"
+        );
         for door in graphshell::native::local_session::door_salts([7; 32]) {
             assert!(
                 !policy.allows(KeySource::Persona, &door),
