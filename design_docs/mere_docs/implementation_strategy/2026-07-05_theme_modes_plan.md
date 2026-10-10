@@ -263,6 +263,17 @@ applicable rendered acceptance pass against its published dependency set.
   explicitly: Cargo does not inherit Mere's root patches into consuming roots.
   Inspect the application's native host dependency closure before its receipt;
   an older unrelated Sprigging bridge may retain its existing Vello types.
+- October 10 interleaved image repair: maintained Vello `10f01d6d` retains
+  the image atlas extent across solid-only and empty scenes. The original
+  `491c376c` renderer reproduces loss of every image pixel after a patchless
+  frame on Radeon Pro Vega 56 / Metal; fresh raster identities do not repair
+  it. The fixed renderer passes 33 encoding tests, a 13-frame exact-pixel GPU
+  image/solid/empty sequence, and the existing repeated clipped-preview gate.
+  [The shared receipt](../../cambium_docs/testing/receipts/native_image_atlas_20261010/README.md)
+  preserves original failure and fixed test evidence. Mere's root patches the
+  maintained triple together; consuming roots must repeat that policy. This
+  closes the reproduced atlas defect, without identifying the earlier hung
+  kernel or qualifying Turnstone's still-pending production child preview.
 - October 10 Pelt native qualification follows the renderer publication.
   The fixed binary passes fresh-10 and separate-process reopen-10 on Radeon
   Pro Vega 56 / Metal: 85 presented editor frames, nine nonblank editor captures
