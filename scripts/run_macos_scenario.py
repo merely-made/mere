@@ -20,6 +20,16 @@ import time
 import uuid
 
 
+def owns_executable(process: str, executable: Path) -> bool:
+    """Match this temporary product, including macOS's canonical /private path.
+
+    The generated executable path has no spaces. Compare only its complete
+    path or the same path followed by arguments, never another bundle's name.
+    """
+    paths = {str(executable), str(executable.resolve())}
+    return any(process == path or process.startswith(path + " ") for path in paths)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--binary", type=Path, required=True)
@@ -85,7 +95,7 @@ def main():
             for line in listing.splitlines():
                 pid, _, process = line.strip().partition(" ")
                 process = process.lstrip()
-                if process == str(executable) or process.startswith(str(executable) + " "):
+                if owns_executable(process, executable):
                     owned.append(int(pid))
                     try:
                         os.kill(int(pid), 15)
