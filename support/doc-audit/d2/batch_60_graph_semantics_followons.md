@@ -5,7 +5,7 @@ Audit base: Mere a8889f60e, 2026-10-09, with local documentation updates. Origin
 ## mere_docs/implementation_strategy/2026-10-09_graph_semantics_followons_plan.md
 
 - disposition: current
-- status line: "In progress; RDF qualified and published, consumer checkpoint including Turnstone newer-main integration qualified and published, host Tasks 1–3 complete locally, Task 4 in progress" - accurate: yes
+- status line: "In progress; RDF qualified and published, consumer checkpoint including Turnstone newer-main integration qualified and published, host Tasks 1–4 complete locally, Task 5 in progress" - accurate: yes
 - claims checked: 5 - holds: 5, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -49,7 +49,7 @@ User approval settles the complete-writer milestone. Existing GraphSession owns 
 ## mere_docs/implementation_strategy/2026-10-09_resident_host_implementation_plan.md
 
 - disposition: current
-- status line: "Written spec and concrete plan approved by Mark; Tasks 1–3 complete locally and Task 4 in progress" - accurate: yes
+- status line: "Written spec and concrete plan approved by Mark; Tasks 1–4 complete locally and Task 5 in progress" - accurate: yes
 - claims checked: 15 - holds: 15, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -66,4 +66,4 @@ User approval settles the complete-writer milestone. Existing GraphSession owns 
 
 ### Notes
 
-Checked all 15 existing-path responsibility rows against source at a8889f60e, including NodeFacetStore export, SessionId re-export, ViewKey::new, node_is_pinned, Applied fields and private pending_with(&self). New signatures and tests are expressly proposed; implemented paths have resolved annotations; two remaining browser paths carry planned-path annotations. Eight tasks cover the approved spec and five review-focus failures. Task 1 pure preparation/catalog observations, Task 2 typed facade and Task 3 retained checkpoint/publication staging are now implemented. Their exact source commits, root gate receipts and independent approved task reports substantiate the completion claims; combined persistence is now qualified locally at 6b2f2860b, with the bounded deterministic snapshot repair, exact native reopen/navigation/Author/undo gates and an approved independent Task3 review. Pane settings/refresh, product controls, active existing Djinn/browser composition and poison/headed/Firefox runtime remain pending.
+Checked all 15 existing-path responsibility rows against source at a8889f60e, including NodeFacetStore export, SessionId re-export, ViewKey::new, node_is_pinned, Applied fields and private pending_with(&self). New signatures and tests are expressly proposed; implemented paths have resolved annotations; two remaining browser paths carry planned-path annotations. Eight tasks cover the approved spec and five review-focus failures. Task 1 pure preparation/catalog observations, Task 2 typed facade and Task 3 retained checkpoint/publication staging are now implemented. Their exact source commits, root gate receipts and independent approved task reports substantiate the completion claims; combined persistence is now qualified locally at 6b2f2860b, with the bounded deterministic snapshot repair, exact native reopen/navigation/Author/undo gates and an approved independent Task3 review. Task 4 settings/pane roots/exact scopes are qualified at 29ab75c56: Graphshell331, Pictograph379, residency13, Djinn8 and native4 pass with frozen input guards and a fresh independent approved spec/quality review. Asynchronous refresh, product controls, active existing Djinn/browser composition and poison/headed/Firefox runtime remain pending. Off-runtime/shutdown cleanup is an explicit later lifecycle/runtime qualification boundary.
