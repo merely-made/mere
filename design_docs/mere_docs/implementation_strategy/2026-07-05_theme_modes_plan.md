@@ -42,8 +42,9 @@ This note does not change adoption order or claim controls in every consumer.
 
 **Status:** in progress. Mark selected this order: Pelt, Graphshell, Knot,
 Turnstone, Woodshed, Redshank, Signalman. Isocosm is excluded while its own
-migration proceeds. Each application slice is qualified before moving to the
-next; discovery may run independently. Existing Woodshed adoption receives a
+migration proceeds. This is the implementation priority; the owner subsequently
+asked to push integrations as they qualify. Implementation and discovery can
+overlap, with each slice qualified before publication. Existing Woodshed adoption receives a
 reconciliation pass rather than a second editor implementation.
 
 ### Shared foundation and current origin
@@ -99,12 +100,137 @@ applicable rendered acceptance pass against its published dependency set.
 - The native host exposes an additive tool-window entry over a caller-owned
   event loop and existing render core. Its normal input, accessibility and
   close-policy pipeline remains the owner of the tool window's behavior.
+- Hosts also supply transient protected export paths to the existing workshop
+  writer. The shared identity comparison protects application settings and open
+  documents before both creation and replacement, including aliases. This
+  avoids each app duplicating export path normalization. All 17 interchange
+  tests pass, including the two new host-file boundary regressions; this
+  additive API was pushed and remote-verified as
+  `d5679eba4aa1bc5e1a241c5df63d13490a5f46a7`.
+- The existing choice file store gains an additive strict loader. Missing files
+  keep the existing default, while malformed/non-UTF-8 preferences surface an
+  error without changing bytes; legacy lines and authored custom-mode JSON keep
+  their existing interpretation. All seven focused choice-store tests pass.
+  The compatibility loader remains unchanged for existing consumers. Pelt and
+  Signalman use this shared operation rather than duplicating file validation.
+- Editing and saving the currently selected theme under the same identity must
+  not bypass explicit application Apply. Each native adapter holds the applied
+  presentation while authoring updates the library, refreshing it only after
+  successful application selection or Apply; fresh launches resolve the saved
+  definition normally. Mounted regression qualification is in progress.
 - Current Cambium fields render semantic containers, so the workshop's old
   tag-based input/textarea CSS collapsed an empty stylesheet editor to zero
   height. Shared field classes restore its geometry. All 299 scoped Tabard,
   workshop, desktop and native-host tests pass against the fetched origin,
   including all six desktop usability tests. Two host documentation examples
   remain intentionally ignored. Pelt application/native qualification follows.
+- A subsequent fetch found origin `7c0c12008`; its design-context and app
+  composition documentation merged cleanly before consumer qualification.
+- Origin advanced again to `4d8bd7037` with the Conatus tenant and its plan.
+  The worktree fast-forwarded without changing application sources; the exact
+  seven local application dependency rows were preserved over the upstream
+  lockfile. Locked full metadata and the port/web boundary checker pass on
+  that baseline.
+- Shared foundation and current-source lock repair were pushed directly to
+  origin main as `3567c8e937b0e2ec8e2c670cfaf4289d4403d216`. A clean committed
+  snapshot independently passes locked full metadata and the port/web boundary
+  checker. Consumer work remains separate from this publication.
+- Canvas now accepts an already resolved Tinct palette for retained derived
+  faces, reusing its existing role mapping and companion mixing. This lets web
+  computed CSS roles and canonical Tabard profiles recolor existing face caches
+  without changing deterministic face bytes or semantic node-state accents.
+  All seven focused palette tests pass, including selected-mode and alpha
+  preservation plus unchanged legacy seed mapping. This addition is ready for
+  publication independently of the application adapters and was pushed as
+  `7a2a851fb0134a3cab7e1c4161c1c46f371d829a`.
+- Pelt's source adapter reaches the shared workshop through its real Theme
+  drawer and mounts a tool window over the existing render core. Application
+  choice and shared definitions have independent durable paths. Focused tests
+  and fresh native receipts are in progress; this is not yet an acceptance claim.
+- Pelt's 63 desktop tests pass. Its first current-source LaunchServices run
+  times out before initial presentation with repeated `Occluded` acquisitions,
+  so no editor capture or acceptance is claimed. The retained failed receipt
+  motivates bounded first-presentation retries, initial activation after the
+  accessibility reveal, and composition of the editor's existing idle policy
+  into the parent event loop. That lifecycle correction is being requalified.
+- The corrected Pelt source passes all 69 desktop tests, including application
+  export-path protection and saving an edited active theme without implicitly
+  applying it. Native presentation qualification remains open.
+- The second Pelt LaunchServices run reaches the embedded workshop and captures
+  Light and Dark but exceeds its scenario deadline: the driver did not owe the
+  redraw that follows its first successful browser presentation. Failed receipts
+  remain retained while that continuation is corrected. The shared launcher
+  now recognizes the canonical macOS `/private` spelling of its unique copied
+  executable during timeout cleanup; focused alias/argument/non-owned-process
+  checks pass. This cleanup change cannot make a failed receipt pass.
+- The final Pelt desktop suite passes all 70 tests, including real nested wheel
+  delivery, scroll-aware accessibility bounds and Scroll Into View routing. The
+  library drawer and builtin radio state are qualified in the production adapter.
+- Fresh Pelt run 05 reaches the actual editor and captures all four modes, then
+  stalls in the shared texture readback. Its retained process sample identifies
+  `RenderCore::read_rgba8_texture` waiting indefinitely in Metal `Device.poll`.
+  This is a shared capture issue; partial images do not qualify the workflow.
+  Genet's owned pending readback is published and remote-verified as
+  `7422e90613f9017e5bb790e3acb48f61776b2eda`. All four renderer/readback
+  regressions pass on the AMD Radeon Pro Vega 56 / Metal discrete adapter,
+  including padded rows, independent queued captures and cancellation.
+  Rootstock starts the copy of the original presented frame; Mesquite polls
+  completion on later host turns with a five-second deadline, retaining the
+  original request and presentation identity. Synchronous callers wait only
+  for their own copy submission with a bounded timeout. Current Genet's added
+  form metadata notifications route through the owning Rootstock window.
+  Mere adopts the whole active Genet host/render/DOM family and its required
+  Boa/ICU lock update; its unchanged portable Knot dependency still carries
+  older Fleece/layout API packages, without a second host or renderer.
+  All 266 shared native tests pass (166 native host, 73 Rootstock, 27
+  Mesquite), with four documentation examples intentionally ignored. All 19
+  workshop interchange tests pass, including protection of entire owned
+  directories, future generated files, symlink aliases and late replacement
+  decisions. Directory protection uses the existing shared path identity
+  handling and component boundaries; it does not enter authored definitions.
+  A clean staged snapshot independently passes locked offline full metadata;
+  the port and Graphshell web boundary checker passes. Fresh native app
+  acceptance remains open.
+- Another origin fetch found `421818710`, including the Moot capsule host for
+  Graphshell. The worktree fast-forwarded and restored the application changes
+  from a preserved stash. Both capsule and appearance module/state/frame seams
+  remain; the tree stylesheet retains the capsule sheet on later appearance
+  refreshes. Reconciled browser and metadata gates are in progress.
+- Knot's initial adapter replaced the supplied sheet on unrelated dispatch,
+  breaking existing scroll and focus invariants. Explicit appearance/editor
+  refresh transitions repair that regression. Its full library now passes
+  298 tests, with one existing diagnostic ignored; all 17 appearance tests,
+  four preference tests, eight title-bar tests and eight existing scenario
+  tests pass, as do all three bundled-font tests (338 tests total). Native
+  qualification against the newly published capture stack remains open.
+- Graphshell's application routes are the web full app and tree `app=local`;
+  its native-messaging executable is a relay, not a settings window. The web
+  adapter now consumes shared Tabard intake with separate application appearance
+  persistence. Its six portable appearance regressions, locked default WASM
+  build, viewer-only check and optional applet check pass on the current shared
+  stack. Actual Chrome 152 / AMD Radeon Pro Vega 56 browser acceptance passes
+  four canonical modes, exact authored CSS, custom mode intake, corrupt-input
+  retention, fresh reload, embedded host/title/storage ownership, saved-tree
+  mode controls and narrow layout. All 23 retained captures were inspected;
+  browser/page/GPU error gates are clear and product storage remains unchanged
+  by appearance selection. Evidence is retained under
+  `tabard-app-receipts/2026-10-09/graphshell/visual-run-02.json` and
+  `graphshell/main-controls-02/browser-report.json` in the family workspace.
+  Embedded roots inherit composing-host roles without reading or writing the
+  application preference. Optional Moot capsule lifecycle and styling survive
+  later appearance refreshes.
+- Native acceptance is paused after Pelt fresh runs 07 and 08 triggered GPU
+  resets and WindowServer watchdog failures. The 01:46:41 October 10 kernel
+  report identifies the fresh-08 Pelt process and its stalled Metal compute
+  queue. Boot time remained October 2: this was a graphics-session reset, not
+  a full reboot. Fresh-08 reproduces with sleep prevention active and records
+  zero captures; no native application is visually qualified by this run.
+  Renderer compute isolation and repair must precede another native attempt.
+- Knot's fetched origin `802238cb` already has coherent Mere/Genet pins and
+  semantic-field adaptation. An isolated application worktree preserves its
+  primary checkout. Its shared-editor adapter extends local desktop preferences,
+  leaving persona sync, document contents and writing controls under their
+  current owners. Dependency publication and native qualification remain open.
 
 ## Shared authoring and title-bar composition (2026-10-08)
 

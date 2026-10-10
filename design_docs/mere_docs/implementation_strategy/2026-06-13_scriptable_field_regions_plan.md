@@ -80,6 +80,35 @@ membership, behavior and scene representation; a painted region alone does
 not establish that authoring loop. Representation does not by itself choose
 a new node encoding or replace the existing field/coupling stores.
 
+**Source refresh (2026-10-09, Mere `b4e818b4`):** the
+[primitive and dynamics map](2026-10-07_scenograph_editor_plan.md#primitive-and-dynamics-map-2026-10-09-source-backed-planning)
+records the current authoring seams. `NodeSelector` offers All, Tagged, Kind
+and NotTagged, not a spatial-membership selector. Pictograph's coupling bridge
+captures matching node keys and the field definition; it does not pass the
+extent into that conversion. A spatially shaped definition can produce a
+localized force, but this is different from enforcing membership in the
+authored extent. The earlier Findings shorthand equating a region coupling
+with "nodes in the field's extent" describes intended behavior, not this
+implementation. Extent tests already exist in numen; entry/exit tracking,
+composition and response consumers require their own host integration.
+
+*Reading, not ruled:* research placement, projection and action composition
+separately. Additive motion alone cannot decide which of two incompatible
+arrangements or projections wins. Likewise, changing a selector or moving a
+field may change membership without a node crossing a stationary boundary.
+The entry-action decision must cover those causes and initial scene loading,
+alongside jitter and re-entry; the current force evaluator is not an event log.
+
+**Host inventory (2026-10-10, Mere `6183006b`):** the editor plan's
+[Graphshell control inventory](2026-10-07_scenograph_editor_plan.md#graphshell-control-inventory-2026-10-10-planning-step-1)
+confirms that shared field cards and Canvas field methods have no Graphshell
+authoring caller. Visibility is presentation-only; hiding a field does not
+disable its coupling. Strength/placement mutate Canvas's graph, so wiring a
+button straight to those methods would not establish MereHost's session edit,
+undo and persistence path. A host adapter must distinguish that recorded write
+from the refreshed simulation and the visibility intent. No new placement or
+script UI is installed by this inventory.
+
 ## Findings (code-verified substrate)
 
 The pieces exist; what is missing is **placement, rendering, and the unifying

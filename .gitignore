@@ -8,6 +8,7 @@ target/
 Cargo.lock
 !/Cargo.lock
 !/crates/script/app-host/guest/Cargo.lock
+!/crates/moot/gemot/examples/capsule-library/guest/Cargo.lock
 !/crates/script/document-host/guest/Cargo.lock
 !/crates/script/document-host/guest-bomb/Cargo.lock
 **/.cargo/local/

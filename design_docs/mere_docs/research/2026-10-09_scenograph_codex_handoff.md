@@ -26,6 +26,14 @@ asks for nodes, links and fields to be inspectable/configurable and connected
 to dynamics. Graphshell is the reference host; the proposed terminology needs
 reconciliation before a new proof is opened.
 
+**Planning continuation (2026-10-09):** the editor plan's
+[primitive and dynamics map](../implementation_strategy/2026-10-07_scenograph_editor_plan.md#primitive-and-dynamics-map-2026-10-09-source-backed-planning)
+maps existing surface/Resource, relation and field/coupling identities to
+authoring controls and dynamics. It records source gaps and proposed
+done-conditions without taking over the active dynamics implementation or
+opening a new track. The field plan corrects the earlier assumption that a
+coupling selector already means membership in the field's extent.
+
 ## The work, in order
 
 1. **The dynamics slot** (dynamics grammar plan, `mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md`, F192 to F195; asked for by the Scenograph plan's SE69).
