@@ -1,6 +1,6 @@
 [package]
 name = "mere-forme"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 license.workspace = true
 # Publishable from 2026-08-14, in pandect's dependency closure. The
