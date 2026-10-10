@@ -29,6 +29,8 @@ Completed 2026-09-06; archived 2026-10-06: [projection refresh and surface reuse
 
 Active continuation (2026-09-05): [Moot collections and community publishing](moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#community-collections-and-author-offline-publishing-2026-09-04) extends the historical M1 plan. Its [same-machine live-peer proof](moothold_docs/research/2026-09-05_author_offline_publication_proof.md) passed scoped iroh transfer, stable-Persona binding, current Gemot contribution/hosting authority, unadmitted-peer refusal, author exit, durable host restart and ordinary Gemini retrieval. Production publication/hosting records, historical authority proof, the Persona-to-device adapter and a two-machine receipt remain open. Retention, Fleece collections, application co-op and addressed mesh delivery follow.
 
+Bounded continuation (2026-10-09): the same plan's [capsule-library proof](moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#capsule-library-composition-proof-2026-10-09) composes independent signed packs, Gemot collections, member retention after publisher exit and an index-only member refused the full payload. The same WIT applet now mounts in Graphshell's retained browser tree with explicit grants, Muniment retention, offline capsule reopening and verified hardware captures. Production publication lineage, browser Gemot replay, live collection subscription and native/Turnstone mounting remain open.
+
 1. [`DOC_POLICY.md`](DOC_POLICY.md) — documentation governance rules.
 2. [`TERMINOLOGY.md`](TERMINOLOGY.md) — canonical current terminology.
 3. [`2026-05-04_lexicon_brief.md`](2026-05-04_lexicon_brief.md) — naming history; its 2026-08-31 amendment points current terms back to `TERMINOLOGY.md`.
