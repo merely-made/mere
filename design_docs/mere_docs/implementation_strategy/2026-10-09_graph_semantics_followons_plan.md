@@ -12,9 +12,9 @@ qualified file maps; all five locked Cargo metadata checks pass with a fresh Git
 source/locks. Consumer adoption (A1) is complete.
 All 108 owned Mere dependency rows select the qualified source. This establishes
 source compatibility; actual Turnstone residency authority remains A2.
-The approved initial Graphshell/Djinn resident-host plan has Tasks 1–4 reviewed
-and locally committed at `a61dfb5c9`, `652acbb72`, `6b2f2860b` and `29ab75c56`.
-Task 4 settings, pane roots and exact scope gates pass; Task 5 lifecycle-safe refresh is in progress. The initial host still retains its complete writer and
+The approved initial Graphshell/Djinn resident-host plan has Tasks 1–5 reviewed
+and locally committed at `a61dfb5c9`, `652acbb72`, `6b2f2860b`, `29ab75c56` and `45239482c`.
+Task 5 head-only refresh and browser continuation repair are qualified locally; Task 6 endpoint/client coverage is in progress. The initial host still retains its complete writer and
 history; native/product/browser host qualification and publication remain pending.
 Mere's last published checkpoint remains `a8889f60e`.
 
@@ -308,3 +308,5 @@ claims, each supported by its own evidence.
 - **2026-10-10:** A1 complete: fresh Cargo Git-cache resolution passes Knot workspace/standalone, Redshank and Turnstone default/Piccolo metadata. Canonical published Mere/Knot/Redshank sources are observed in the fresh checkout cache, with all tracked inputs and locks unchanged. The completion binding joins reviewed source, scoped execution gates, approved remote refs and independent availability proof. This does not activate Turnstone residency or qualify headed product behavior.
 
 - **2026-10-10:** Host Task 3 complete locally at `6b2f2860b`: retained owned storage batches and the bounded deterministic navigation snapshot repair pass full scoped qualification and independent review. Task 4 begins settings/pane roots/exact scopes. Actual existing Djinn/browser activation, runtime coverage and whole-host publication remain pending. Consumer A1 and RDF publication receipts remain unchanged.
+
+- **2026-10-10:** Host Task 5 complete locally at `45239482c` after meaningful continuation RED/GREEN and approved scoped re-review. Current Graphshell344/native4/wasm gates and unchanged residency15/query54 evidence are bound to the committed nine-file source. Task 6 begins portable coverage and endpoint/client notices. Actual shell/runtime/RSS and host publication remain pending; A1/RDF receipts unchanged.
