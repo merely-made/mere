@@ -229,6 +229,10 @@ The mer3ly site session relayed its Ruling 158 (Mark: "Promote where a home exis
 
 **SE87, handing the next work to Codex (2026-10-09).** Mark: "could we hand it to codex? IDK, it's friday and i've got 25% usage left ;_;" Options: S2 and B1 (recommended); the dynamics slot (F192 to F195); all three. Mark: **"All three"**. *Follows:* `mere_docs/research/2026-10-09_scenograph_codex_handoff.md` hands the dynamics slot, the grid's dynamics axis, B1 and S2 to the Codex agent, in that order; the physics coordinator is told the slot moved.
 
+**SE88, the appearance-part name (2026-10-09).** Asked: "For linked swatches, what should a selection of an appearance part be called in the UI? The handoff leaves this name open." Options: Appearance part (recommended), Facet, Part. Mark: **"Appearance part (Recommended)"**. *Follows:* the user-facing name is "appearance part". *Reading, not ruled:* the migrated shelfmark section can use `mer3ly.appearance_parts`; readers should retain the old `mer3ly.facets` value when migrating.
+
+**SE89, physics bodies follow occurrences (2026-10-09).** Asked: "The practice grid has source occurrences, while Canvas physics uses graph nodes. Should each occurrence get its own preview body, with unavailable physics channels refused until an adapter supplies them? This preserves separate appearances of the same source." Options: Separate body per occurrence (recommended), Limit dynamics to graph-backed datasets. Mark: **"Separate body per occurrence (Recommended)"**. *Follows:* each preview occurrence has a separate transient body; an undisclosed physics channel is refused. The source identity remains the dataset's exact source reference. *Reading, not ruled:* a private per-cell controller may give each body a deterministic runtime UUID without writing those identities into the source dataset.
+
 ## 2. Tracks
 
 E1 and E2 carry ruling A; E3 to E5 carry ruling B. E2 needs E1; E4 needs E3; E5 needs E2 and E4. *Added 2026-10-07:* E2b carries SE11 and SE12, after E2.
@@ -372,6 +376,29 @@ Each comes back as its own round of questions.
 - **Wallpapers and props.** The backdrop table (L2) is landed and consumed by Isometry, Woodshed and Graphshell. Seiche's living backdrop and scene bodies have no Mere or Turnstone host. The games wing's `MapDocument` carries a `props` layer (§4, F7).
 - **Style editors.** Node: the body and face plan's B3 body designer is open. Edge: forme's `EdgeProjectionSpec`. Field: the scriptable field regions plan, where no host calls `add_field_at`. Appearance today is three strings (§4, F3).
 - **Motion.** Balaur rulings C and D, gated on L5's authored front-end.
+
+### Design-language follow-through (2026-10-09; research, not opened)
+
+Mark's [voice clarifications, design language §9.8](../../2026-08-23_projection_scenes_and_graph_native_platform.md#98-voice-clarifications-and-research-boundaries-2026-10-09)
+extend the mapped editor concerns. Deselection preserves edits and returns to
+an unselected view; it is not undo or snapshot restoration. Selection,
+inspection, opening and contextual previews need explicit responsibilities
+before assigning them to a HUD. Hover previews are welcomed; exact gestures
+and touch equivalents remain open. S2 must preserve previously selected
+background membership independently of temporary coordinated-selection clauses.
+
+Style authoring needs to distinguish data encoding, interaction state and
+theme values; channel assignments and precedence remain open. Node, link and
+field appearances should support meaningful dynamics explanations. Fields may
+scope a projection as well as placement and motion, with the behavior model
+researched in the field plan. These additions do not open a general style
+editor, script runner or HUD redesign, or reorder SE87's work.
+
+*Candidate proof, not opened:* select and edit a subject, preview another
+context, then deselect; edits survive while selection-driven context ends.
+Two linked appearances preserve independent visibility and distinguish
+selection from their data encoding. Exact preview commit/history behavior
+still returns as a fork before implementation.
 
 ## 4. Findings
 
