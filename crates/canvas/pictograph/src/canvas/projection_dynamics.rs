@@ -57,6 +57,7 @@ impl ProjectionDynamics {
             ));
         }
         if !compiled.scene.relations.is_empty()
+            || !compiled.scene.backdrops.is_empty()
             || !compiled.scene.regions.is_empty()
             || !compiled.scene.folds.is_empty()
             || compiled
@@ -67,7 +68,7 @@ impl ProjectionDynamics {
         {
             return Err(refuse(
                 "settle.inputs.scene",
-                "this occurrence adapter requires a flat scene without relations, regions or folds",
+                "this occurrence adapter requires a flat scene without relations, regions, folds or backdrops",
             ));
         }
         let mut graph = Graph::new();
