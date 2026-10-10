@@ -205,9 +205,27 @@ applicable rendered acceptance pass against its published dependency set.
   qualification against the newly published capture stack remains open.
 - Graphshell's application routes are the web full app and tree `app=local`;
   its native-messaging executable is a relay, not a settings window. The web
-  adapter is being built around shared Tabard intake and separate application
-  appearance persistence. Embedded roots must inherit their composing host's
-  roles without acquiring application settings authority.
+  adapter now consumes shared Tabard intake with separate application appearance
+  persistence. Its six portable appearance regressions, locked default WASM
+  build, viewer-only check and optional applet check pass on the current shared
+  stack. Actual Chrome 152 / AMD Radeon Pro Vega 56 browser acceptance passes
+  four canonical modes, exact authored CSS, custom mode intake, corrupt-input
+  retention, fresh reload, embedded host/title/storage ownership, saved-tree
+  mode controls and narrow layout. All 23 retained captures were inspected;
+  browser/page/GPU error gates are clear and product storage remains unchanged
+  by appearance selection. Evidence is retained under
+  `tabard-app-receipts/2026-10-09/graphshell/visual-run-02.json` and
+  `graphshell/main-controls-02/browser-report.json` in the family workspace.
+  Embedded roots inherit composing-host roles without reading or writing the
+  application preference. Optional Moot capsule lifecycle and styling survive
+  later appearance refreshes.
+- Native acceptance is paused after Pelt fresh runs 07 and 08 triggered GPU
+  resets and WindowServer watchdog failures. The 01:46:41 October 10 kernel
+  report identifies the fresh-08 Pelt process and its stalled Metal compute
+  queue. Boot time remained October 2: this was a graphics-session reset, not
+  a full reboot. Fresh-08 reproduces with sleep prevention active and records
+  zero captures; no native application is visually qualified by this run.
+  Renderer compute isolation and repair must precede another native attempt.
 - Knot's fetched origin `802238cb` already has coherent Mere/Genet pins and
   semantic-field adaptation. An isolated application worktree preserves its
   primary checkout. Its shared-editor adapter extends local desktop preferences,
