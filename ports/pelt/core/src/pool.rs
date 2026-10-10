@@ -194,8 +194,10 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
         self.remove_content(key)
     }
 
-    /// Atomically replace arrangement observations. Missing placements close;
-    /// missing content keys are not fabricated, retired, or respawned.
+    /// Atomically replace arrangement observations in back-to-front paint
+    /// order: the last admitted placement is topmost for positional input.
+    /// Missing placements close; missing content keys are not fabricated,
+    /// retired, or respawned.
     pub fn set_placements(&mut self, values: impl IntoIterator<Item = (P, PeltPlacement<K>)>) {
         let mut next = HashMap::new();
         let mut order = Vec::new();
@@ -491,20 +493,26 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
             .and_then(|(id, _, _)| self.captured_placement(id))
             .cloned();
         let target = capture.or_else(|| {
-            self.order
-                .iter()
-                .find(|id| {
-                    let Some(p) = self.placement(id) else {
-                        return false;
-                    };
-                    p.window == window
-                        && p.admits()
-                        && match input.position() {
-                            Some((x, y)) => p.rect.contains(x, y),
-                            None => p.focused,
-                        }
-                })
-                .cloned()
+            let position = input.position();
+            let mut admitted = self.order.iter().filter(|id| {
+                let Some(p) = self.placement(id) else {
+                    return false;
+                };
+                p.window == window
+                    && p.admits()
+                    && match position {
+                        Some((x, y)) => p.rect.contains(x, y),
+                        None => p.focused,
+                    }
+            });
+            // Positional input follows paint stacking. Nonpositional input
+            // keeps the existing first-admitted focused-placement contract.
+            if position.is_some() {
+                admitted.next_back()
+            } else {
+                admitted.next()
+            }
+            .cloned()
         });
         let Some(id) = target else {
             return PeltHostEffect::default();
