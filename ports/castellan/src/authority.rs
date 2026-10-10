@@ -32,14 +32,17 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use insigne::DerivedKeyAttestation;
-use pandect::{DeviceId, PersonaId, WalletEpochSealer, revoke_remote_auth_device};
-use personae::agent::{VaultAgent, VaultLockRequest};
-use personae::signing::{ApprovalBroker, DecisionError, RememberApproval, SigningDecision};
-use personae::ssh_slot;
+use pandect::{DeviceId, PersonaId, WalletEpochSealer};
+use personae::signing::{DecisionError, RememberApproval, SigningDecision};
 use personae::{
     CredentialLineage, Ed25519Keypair, Ed25519PublicKey, IdentityError, IdentityProvider,
-    IdentityStorage, IdentityVault, ProfileId, ProtocolKey, RetainedKeys, UnlockMethod,
-    UnlockTier, roster,
+    ProfileId, ProtocolKey, RetainedKeys, UnlockTier,
+};
+
+use crate::custody::agent::{VaultAgent, VaultLockRequest};
+use crate::custody::wallet::{epoch_sealer_for_persona, revoke_remote_auth_device};
+use crate::custody::{
+    ApprovalBroker, IdentityStorage, IdentityVault, UnlockMethod, roster, ssh_slot,
 };
 use ssh_key::{Algorithm, PrivateKey, PublicKey};
 use tokio::sync::watch;
@@ -47,17 +50,17 @@ use uuid::Uuid;
 
 use crate::lock::VaultLockHolder;
 
-use crate::projection::{
-    CreateProfileIntentV1, DEVICE_REVOKE_INTENT, GenerateSshKeyIntentV1,
-    ImportSshKeyNativeIntentV1, PROFILE_CREATE_INTENT, PROFILE_SWITCH_INTENT, RemoveSshKeyIntentV1,
-    RevokeDeviceIntentV1, LockVaultIntentV1, VAULT_LOCK_INTENT, VAULT_UNLOCK_INTENT,
-    SIGNING_APPROVE_IDLE_INTENT, SIGNING_APPROVE_ONCE_INTENT,
-    SIGNING_DENY_INTENT, SSH_GENERATE_INTENT, SSH_IMPORT_NATIVE_INTENT, SSH_REMOVE_INTENT,
-    SigningDecisionIntentV1, SshUnlockPolicyIntentV1, SwitchProfileIntentV1,
-};
 use crate::view::{
     AgentListenerView, CarryView, IdentitySurfaceSnapshot, ProfileView, SshKeyView, VaultLockView,
     VaultProtectionView, VaultView, load_carry_view,
+};
+use dramatis::intents::{
+    CreateProfileIntentV1, DEVICE_REVOKE_INTENT, GenerateSshKeyIntentV1,
+    ImportSshKeyNativeIntentV1, LockVaultIntentV1, PROFILE_CREATE_INTENT, PROFILE_SWITCH_INTENT,
+    RemoveSshKeyIntentV1, RevokeDeviceIntentV1, SIGNING_APPROVE_IDLE_INTENT,
+    SIGNING_APPROVE_ONCE_INTENT, SIGNING_DENY_INTENT, SSH_GENERATE_INTENT,
+    SSH_IMPORT_NATIVE_INTENT, SSH_REMOVE_INTENT, SigningDecisionIntentV1, SshUnlockPolicyIntentV1,
+    SwitchProfileIntentV1, VAULT_LOCK_INTENT, VAULT_UNLOCK_INTENT,
 };
 
 const MAX_SHORT_TTL_SECONDS: u32 = 24 * 60 * 60;
@@ -204,7 +207,7 @@ impl<S: IdentityStorage + 'static> ResidentLock<S> {
         drop(vault);
         // Every lock, the agent's `ssh-add -x` included, persists (ruling 5).
         if let Some(dir) = self.persisted.lock().unwrap().as_deref() {
-            if let Err(error) = personae::persist_lock(dir) {
+            if let Err(error) = crate::custody::persist_lock(dir) {
                 tracing::error!(%error, "the lock holds, but a restart could reopen the vault");
             }
         }
@@ -237,7 +240,7 @@ impl<S: IdentityStorage + 'static> ResidentLock<S> {
         *self.kept.lock().unwrap() = None;
         drop(vault);
         if let Some(dir) = self.persisted.lock().unwrap().as_deref() {
-            if let Err(error) = personae::clear_persisted_lock(dir) {
+            if let Err(error) = crate::custody::clear_persisted_lock(dir) {
                 tracing::error!(%error, "unlocked, but the next start will still ask");
             }
         }
@@ -609,7 +612,7 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
             });
         }
         // Ruling 56: only keys the agent can sign are taken in.
-        personae::ssh_sign::check_signable(private.key_data())
+        crate::custody::ssh_sign::check_signable(private.key_data())
             .map_err(|refused| IdentityIntentError::UnsignableKey(refused.to_string()))?;
         let slot = ssh_slot::slot_for(&private, tier)?;
         let comment = private.comment().to_string();
@@ -680,7 +683,7 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         let Some(data_root) = self.data_root.as_deref() else {
             return Ok(None);
         };
-        WalletEpochSealer::for_persona(data_root, persona)
+        epoch_sealer_for_persona(data_root, persona)
     }
 
     /// Revoke one delegated device through pandect's live authority.
@@ -872,7 +875,68 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         })
     }
 
-    /// Apply one typed action emitted by [`crate::projection`].
+    /// The persona currently spoken as.
+    pub fn current_profile_id(&self) -> ProfileId {
+        self.vault.lock().unwrap().profile_id().clone()
+    }
+
+    /// Whether the vault holds a persona `id`.
+    pub fn has_profile(&self, id: &ProfileId) -> Result<bool, IdentityError> {
+        let vault = self.vault.lock().unwrap();
+        Ok(vault
+            .storage()
+            .list_profiles()?
+            .iter()
+            .any(|summary| &summary.id == id))
+    }
+
+    /// The persona whose master is `master`, if any. Refused while Locked.
+    pub fn profile_holding(
+        &self,
+        master: &Ed25519PublicKey,
+    ) -> Result<Option<ProfileId>, IdentityError> {
+        if self.is_locked() {
+            return Err(IdentityError::Locked);
+        }
+        let vault = self.vault.lock().unwrap();
+        for summary in vault.storage().list_profiles()? {
+            if vault.storage().load_profile(&summary.id)?.master.public_key() == *master {
+                return Ok(Some(summary.id));
+            }
+        }
+        Ok(None)
+    }
+
+    /// Place an existing master in the vault as persona `id`, key unchanged,
+    /// without switching to it: an application's own identity adopted into
+    /// custody (dramatis D13). Refuses a taken id, as `create_profile` does.
+    pub fn import_profile(
+        &self,
+        id: &ProfileId,
+        display_name: &str,
+        master: Ed25519Keypair,
+    ) -> Result<(), IdentityError> {
+        if self.is_locked() {
+            return Err(IdentityError::Locked);
+        }
+        let vault = self.vault.lock().unwrap();
+        roster::import_profile(vault.storage(), id, display_name, master).map(|_| ())
+    }
+
+    /// A provider for persona `id` without switching to it, for an
+    /// application that speaks as a persona of its own (D13). Refused while
+    /// Locked; it lives only as long as the caller's act.
+    pub fn profile_provider(&self, id: &ProfileId) -> Result<personae::InMemoryProvider, IdentityError> {
+        if self.is_locked() {
+            return Err(IdentityError::Locked);
+        }
+        let vault = self.vault.lock().unwrap();
+        let profile = vault.storage().load_profile(id)?;
+        Ok(personae::InMemoryProvider::from_seed(profile.master.to_seed()))
+    }
+
+    /// Apply one typed action a card offered (graphshell's
+    /// `identity_projection`, names in [`dramatis::intents`]).
     pub fn apply_intent(
         &self,
         intent: &str,
@@ -989,8 +1053,9 @@ fn unlock_label(tier: UnlockTier) -> String {
 
 #[cfg(test)]
 mod tests {
-    use personae::ssh_slot::{protocol_key_for, slot_for};
-    use personae::{Ed25519Keypair, InMemoryStorage, Profile, ProfileId};
+    use crate::custody::ssh_slot::{protocol_key_for, slot_for};
+    use crate::custody::{InMemoryStorage, Profile};
+    use personae::{Ed25519Keypair, ProfileId};
     use signature::Verifier;
     use ssh_agent_lib::agent::Session;
     use ssh_agent_lib::proto::SignRequest;
@@ -1451,36 +1516,36 @@ mod tests {
     fn fixture(name: &str) -> PrivateKey {
         let text = match name {
             "ed25519" => {
-                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/ed25519")
+                include_str!("../tests/fixtures/ssh/ed25519")
             },
             "rsa2048" => {
-                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/rsa2048")
+                include_str!("../tests/fixtures/ssh/rsa2048")
             },
             "rsa4096" => {
-                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/rsa4096")
+                include_str!("../tests/fixtures/ssh/rsa4096")
             },
             "ecdsa256" => {
-                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/ecdsa256")
+                include_str!("../tests/fixtures/ssh/ecdsa256")
             },
             "ecdsa384" => {
-                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/ecdsa384")
+                include_str!("../tests/fixtures/ssh/ecdsa384")
             },
             "ecdsa521" => {
-                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/ecdsa521")
+                include_str!("../tests/fixtures/ssh/ecdsa521")
             },
             "rsa1024" => {
-                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/rsa1024")
+                include_str!("../tests/fixtures/ssh/rsa1024")
             },
             "rsa2560" => {
-                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/rsa2560")
+                include_str!("../tests/fixtures/ssh/rsa2560")
             },
             "rsa8192" => {
-                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/rsa8192")
+                include_str!("../tests/fixtures/ssh/rsa8192")
             },
             "rsa2048e3" => {
-                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/rsa2048e3")
+                include_str!("../tests/fixtures/ssh/rsa2048e3")
             },
-            "dsa" => include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/dsa"),
+            "dsa" => include_str!("../tests/fixtures/ssh/dsa"),
             other => panic!("no fixture {other}"),
         };
         PrivateKey::from_openssh(text).unwrap()
@@ -1571,8 +1636,14 @@ mod tests {
         key: &ProtocolKey,
     ) -> (String, Vec<u8>, CredentialLineage, UnlockTier) {
         let vault = host.vault.lock().unwrap();
-        match vault.current_profile().unwrap().slots.get(key).expect("slot held") {
-            personae::IdentitySlot::Direct {
+        match vault
+            .current_profile()
+            .unwrap()
+            .slots
+            .get(key)
+            .expect("slot held")
+        {
+            crate::custody::IdentitySlot::Direct {
                 kind,
                 payload,
                 lineage,

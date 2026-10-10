@@ -78,7 +78,7 @@ Every real gap is in **crypto agility**, not in crypto choice.
 
 Verified in code, 2026-08-24:
 
-- `crates/dramatis/personae/src/passphrase_storage.rs` — the on-disk
+- `repos/dramatis/crates/personae/src/passphrase_storage.rs` — the on-disk
   `EncryptedFile` carries `version`, `salt`, `profiles`. It does **not** carry
   the Argon2 cost parameters; `grep` for `m_cost`/`t_cost`/`p_cost` across both
   `passphrase_storage.rs` and `passphrase_root.rs` returns nothing. The module
@@ -89,7 +89,7 @@ Verified in code, 2026-08-24:
   compiled-in crate says: argon2 0.5.3 defaults to m=19456 KiB, t=2, p=1. That
   is the OWASP low-memory baseline, and it is below *both* of RFC 9106 §4's
   recommended options (first: t=1, p=4, m=2 GiB; second: t=3, p=4, m=64 MiB).
-- `crates/dramatis/personae/src/keypair.rs` — `derive_child` derives every
+- `repos/dramatis/crates/personae/src/keypair.rs` — `derive_child` derives every
   persona key as `Ed25519::from_seed(blake3::keyed_hash(master_key, salt))`. A
   sound PRF, but with no versioned context slot.
 
@@ -132,7 +132,7 @@ equivalent fix on the derivation side.
 > bundling them holds a cheap fix hostage to an expensive one.
 >
 > One further gap: the `argon2` hold recorded in the crypto stack decision is
-> **not enforced by the manifest**. `crates/dramatis/personae/Cargo.toml:44`
+> **not enforced by the manifest**. `repos/dramatis/crates/personae/Cargo.toml:44`
 > reads `argon2 = "0.5"` (caret); only `Cargo.lock` pins 0.5.3. Since 0.6 changes
 > the default parameters, a `cargo update` is exactly the silent-unlock-failure
 > path this section describes.
@@ -520,7 +520,7 @@ Three more cross-cutting items:
     WATCH grade stands for atproto's repository and sync layers; the identity
     layer (`did:plc` and handle resolution) is **ADOPT** for gaz and gazette.
   - Consequences for gaz (anchoring, collisions, proofs of key changes) live in
-    the [gaz founding plan](dramatis_docs/implementation_strategy/2026-08-08_gaz_founding_plan.md)
+    the gaz founding plan (`repos/dramatis/design_docs/2026-08-08_gaz_founding_plan.md`)
     §2 and §5.
 - **moot / murmur.** MLS (RFC 9420) is ADOPT *here* even though it is SKIP for
   the vault — group messaging is what it was designed for. MIMI is WATCH. Matrix:
@@ -1095,7 +1095,7 @@ answer and the choice is Mark's.
    which does it drop on the floor, and which does it quarantine and tell the
    user about? This is a product decision that blocks the parser, not a
    consequence of it. **Ruled 2026-10-01** (Mark, rulings 10 to 15 in the
-   [dramatis tier architecture](dramatis_docs/technical_architecture/2026-09-30_dramatis_tier_architecture.md)
+   dramatis tier architecture (`repos/dramatis/design_docs/2026-09-30_dramatis_tier_architecture.md`)
    §7): the everyday credentials, notes, custom fields, addresses and names
    are stored as chatelaine kinds; SSH keys go through castellan's SSH import;
    item references become links. Identity documents, payment cards, passkeys,

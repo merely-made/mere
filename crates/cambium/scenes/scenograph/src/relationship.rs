@@ -89,7 +89,8 @@ pub fn relationship_recipe(
     let label = label.into();
     RelationshipRecipe {
         definition: AuthoredProjectionDefinition {
-            version: PROJECTION_DEFINITION_VERSION, id: id.into(), label: label.clone(), sources,
+            dynamics: None,
+        version: PROJECTION_DEFINITION_VERSION, id: id.into(), label: label.clone(), sources,
             reading: Reading { kind: "nodes".into(), key: "occurrence_id".into(), value: None },
             encoding: Encoding { x: Channel::Field("order".into()), y: Channel::Constant("0".into()), color: None, label: Some(Channel::Field("label".into())) },
             arrangement: Arrangement { kind: "grid.default".into(), direction: "coordinates".into(), spacing: 16, options: BTreeMap::new() },

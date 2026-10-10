@@ -11,46 +11,39 @@
 //! CBOR bytes, a signed delegation payload, and verification helpers. Pairing
 //! UX, wrapped-key generation, and revocation flow still layer on top.
 //!
+//! The flows that sign with the wallet's seed or touch its secrets (issuing,
+//! refreshing and revoking remote-auth grants, the wrapping keys, installing an
+//! enrollment bundle, re-issuing a legacy grant) moved to castellan in the
+//! dramatis repo plan's DR-B (ruling D8). This module keeps the grant
+//! vocabulary: types, certificates, codecs, pairing, trust and revocation
+//! records, and the helpers those flows call.
+//!
 //! Split 2026-08-10 (wallet carry fold-in plan, W3). The envelope codec stays
 //! here rather than moving into `personae::carry`: personae already owns a
 //! delegation model, and a second one beside it would be duplication, not a
 //! fold-in. See the plan's W3 ruling.
 
 use std::collections::BTreeSet;
-use std::fmt;
 use std::io;
-use std::path::Path;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use chacha20poly1305::aead::{Aead, KeyInit, Payload};
-use chacha20poly1305::{Key, XChaCha20Poly1305, XNonce};
-use identity::{
-    Ed25519Keypair, Ed25519PublicKey, Ed25519Signature, IdentityProvider, InMemoryProvider,
-};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use uuid::Uuid;
 
-use crate::manifest::PersonaId;
 use crate::wallet_store::{
-    CapabilitySlotRef, CarryRef, DeviceExposure, DeviceGrantRef, DeviceId, DeviceMode,
-    DevicePublicKey, DeviceRecord, DeviceRoster, IdentityWalletManifest, KeyEpochId,
-    LocalDeviceIdentity, PersonaWalletManifest, PersonaWalletRef, RemoteAuthWrappingKeyBridge,
-    RemoteAuthWrappingKeyRecord, device_grant_path, device_roster_ref, ensure_persona_epoch_bridge,
-    load_current_private_epoch, load_device_grant, load_device_roster, load_identity_seed,
-    load_identity_wallet, load_local_device_identity, load_persona_wallet,
-    load_remote_auth_wrapping_key_bridge, save_device_grant, save_device_roster,
-    save_identity_wallet, save_persona_wallet, save_remote_auth_wrapping_key_bridge,
-    stage_persona_private_epoch,
+    CarryRef, DeviceExposure, DeviceId, DeviceMode, DevicePublicKey, KeyEpochId,
+    PersonaWalletManifest,
 };
 
 /// Canonical CBOR, byte for byte what p2panda-core's helpers wrote.
-fn encode_cbor<T: Serialize>(value: &T) -> Result<Vec<u8>, ciborium::ser::Error<io::Error>> {
+pub fn encode_cbor<T: Serialize>(value: &T) -> Result<Vec<u8>, ciborium::ser::Error<io::Error>> {
     let mut bytes = Vec::new();
     ciborium::ser::into_writer(value, &mut bytes)?;
     Ok(bytes)
 }
 
-fn decode_cbor<T: serde::de::DeserializeOwned>(
+/// Decode canonical CBOR.
+pub fn decode_cbor<T: serde::de::DeserializeOwned>(
     reader: impl io::Read,
 ) -> Result<T, ciborium::de::Error<io::Error>> {
     ciborium::from_reader(reader)
@@ -60,19 +53,15 @@ mod certificate;
 mod enroll;
 mod epochs;
 mod errors;
-mod issue;
 mod migrate;
 mod pairing;
 mod records;
-mod refresh;
 mod revocation;
-mod revoke;
 #[cfg(test)]
 mod test_support;
 mod trust;
 mod types;
 mod validate;
-mod wrapping;
 
 /// Current schema version for typed device grants.
 pub const DEVICE_GRANT_SCHEMA_VERSION: u32 = 1;
@@ -89,20 +78,22 @@ pub const REMOTE_AUTH_PAIRING_SECRET_LEN: usize = 16;
 /// Schema version for a typed remote-auth enrollment bundle.
 pub const REMOTE_AUTH_ENROLLMENT_BUNDLE_SCHEMA_VERSION: u32 = 1;
 
-pub(crate) fn unix_time_ms() -> io::Result<u64> {
+/// Milliseconds since the Unix epoch, from the system clock.
+pub fn unix_time_ms() -> io::Result<u64> {
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map_err(|err| io::Error::other(format!("system clock before unix epoch: {err}")))?;
     u64::try_from(now.as_millis()).map_err(|_| io::Error::other("unix time overflowed u64"))
 }
 
-pub(crate) fn is_expired(expires_at_ms: Option<u64>, now_ms: u64) -> bool {
+/// Whether `expires_at_ms` has passed at `now_ms`.
+pub fn is_expired(expires_at_ms: Option<u64>, now_ms: u64) -> bool {
     matches!(expires_at_ms, Some(expires_at_ms) if expires_at_ms <= now_ms)
 }
 
 /// Check every certificate in a grant set, keeping the first fault in the
 /// error so a refusal says which step failed.
-fn check_grant_set(set: &identity::carry::DeviceGrantSet, context: &str) -> io::Result<()> {
+pub fn check_grant_set(set: &identity::carry::DeviceGrantSet, context: &str) -> io::Result<()> {
     for certificate in set.certificates() {
         certificate.check().map_err(|fault| {
             io::Error::new(
@@ -119,29 +110,18 @@ fn check_grant_set(set: &identity::carry::DeviceGrantSet, context: &str) -> io::
 /// The `device-grant:` prefix is a persisted key: it is matched when slots are
 /// upserted and when a revocation clears them, so changing it would orphan
 /// every slot already written.
-pub(crate) fn remote_auth_capability_slot_id(device_id: DeviceId) -> String {
+pub fn remote_auth_capability_slot_id(device_id: DeviceId) -> String {
     format!("device-grant:{}", device_id.as_uuid())
 }
 
-pub(crate) use enroll::{
-    install_remote_auth_enrollment_bundle_inner, restore_wrapped_private_epochs,
-};
-pub(crate) use epochs::wrapped_epoch_aad;
-pub(crate) use pairing::{derive_pairing_key_from_transcript, remote_auth_pairing_transcript};
-pub(crate) use records::{
+pub use epochs::wrapped_epoch_aad;
+pub use pairing::{derive_pairing_key_from_transcript, remote_auth_pairing_transcript};
+pub use records::{
     upsert_grant_index, upsert_local_remote_auth_record, upsert_remote_auth_device_record,
 };
-pub(crate) use refresh::{
-    refresh_remote_auth_private_read_grant, refresh_remote_auth_private_read_grants,
-    upsert_persona_capability_slots,
-};
-pub(crate) use revoke::revoke_persona_grant_access;
-pub(crate) use validate::{
+pub use validate::{
     validate_paired_remote_auth_spec, validate_remote_auth_enrollment_bundle,
     validate_remote_auth_spec,
-};
-pub(crate) use wrapping::{
-    load_remote_auth_wrapping_key, remove_remote_auth_wrapping_key, upsert_remote_auth_wrapping_key,
 };
 
 pub use certificate::{
@@ -154,8 +134,7 @@ pub use certificate::{
 };
 pub use enroll::{
     build_remote_auth_enrollment_bundle, decode_remote_auth_enrollment_bundle,
-    encode_remote_auth_enrollment_bundle, install_remote_auth_enrollment_bundle,
-    install_remote_auth_enrollment_bundle_with_wrapping_key,
+    encode_remote_auth_enrollment_bundle,
 };
 pub use epochs::{
     BlindedEpochIndex, BlindedSlotId, blinded_epoch_index, blinded_slot_id,
@@ -165,12 +144,7 @@ pub use errors::{
     DeviceGrantError, EnrollmentBundleError, PairingCodeError, PairingMaterialError,
     PairingTicketError, WrappedEpochError,
 };
-pub use issue::{
-    issue_remote_auth_device_grant, issue_remote_auth_device_grant_from_pairing,
-    issue_remote_auth_device_grant_from_ticket,
-};
-pub(crate) use migrate::legacy_grant_hint;
-pub use migrate::{LegacyGrant, reissue_legacy_grant, retire_legacy_grant, survey_legacy_grants};
+pub use migrate::{LegacyGrant, legacy_grant_hint, retire_legacy_grant, survey_legacy_grants};
 pub use pairing::{
     decode_remote_auth_pairing_ticket, derive_remote_auth_pairing_material,
     encode_remote_auth_pairing_ticket, format_remote_auth_pairing_code,
@@ -180,7 +154,6 @@ pub use revocation::{
     device_is_fully_revoked, fold_revocations, load_revocation_ledger, revocation_ledger_path,
     revoke_device_certificates, revoked_certificate_count, save_revocation_ledger,
 };
-pub use revoke::revoke_remote_auth_device;
 pub use trust::{GrantStanding, assess_device_grant, wallet_trusted_roots};
 pub use types::{
     EpochCarriage, PairedRemoteAuthGrantSpec, PrivateEpochPlaintext, RemoteAuthEnrollmentBundle,

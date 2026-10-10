@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! What a transport bind leaves of its signing seed (vault lock ruling 51):
-//! personae's tracker, included by path, in one process.
+//! castellan's residue tracker, included by path, in one process.
 //!
 //! Each run binds and closes once, armed, as a spawned task (so its frames
 //! are heap allocations the tracker sees, as in a resident), and lists the
@@ -31,7 +31,7 @@
 //!
 //! No libtest harness: the allocator is process-wide.
 
-#[path = "../../../dramatis/personae/tests/residue/mod.rs"]
+#[path = "../../../../ports/castellan/tests/residue/mod.rs"]
 mod residue;
 
 use std::collections::BTreeSet;

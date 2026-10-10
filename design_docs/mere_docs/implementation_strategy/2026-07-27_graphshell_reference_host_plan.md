@@ -648,8 +648,8 @@ one should not lose:
 - `ports/graphshell/src/bin/graphshell_native_host.rs` (new relay)
 - `ports/graphshell/install-device-host-windows.ps1` *(historical citation)* <!-- doc-audit: historical-path --> (new)
 - `ports/graphshell/src/session_loop.rs`
-- `crates/dramatis/personae/src/agent.rs`
-- `crates/dramatis/personae/src/signing.rs` (new only if the approval seam is
+- `repos/dramatis/crates/personae/src/agent.rs`
+- `repos/dramatis/crates/personae/src/signing.rs` (new only if the approval seam is
   independently useful outside Graphshell)
 - current `crates/system/session-runtime/src/wallet_store.rs` *(historical citation)* <!-- doc-audit: historical-path --> and
   `wallet_grant.rs` carry sources, through a narrow read/intent adapter

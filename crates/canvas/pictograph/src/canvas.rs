@@ -160,6 +160,8 @@ pub mod canvas_search;
 mod edge_cells;
 pub mod field_bridge;
 mod fields;
+mod forme_region;
+pub use forme_region::{FormeCell, FormeRegion};
 pub use canvas_search::CanvasSearchSurface;
 pub use field_bridge::{build_query_similarity_field, register_query_similarity_field};
 mod elapsed;
@@ -204,6 +206,8 @@ mod dynamics_record;
 /// The dynamics spec over this catalog: seiche's portable spec, with the
 /// laws and overlays as its presets. (Dynamics grammar plan, G4a.)
 pub mod dynamics_spec;
+pub mod dynamics_recipe;
+pub mod projection_dynamics;
 /// The physics catalog: the laws a graph can move under, the overlays composed
 /// onto them, and the named profiles. (Physics catalog — P1.)
 pub mod physics_catalog;
@@ -409,6 +413,8 @@ pub struct Canvas {
     pinned_nodes: HashSet<NodeKey>,
     /// An in-progress field move / resize drag, if any. (Field regions.)
     field_drag: Option<fields::FieldDrag>,
+    forme_region: Option<FormeRegion>,
+    forme_held: HashSet<NodeKey>,
     /// Currently-selected nodes (click selects one; marquee selects many).
     selected: HashSet<NodeKey>,
     /// Currently-selected relation cells (edge-pick, or covered by a marquee).
@@ -764,6 +770,7 @@ pub(crate) mod at_rest;
 mod cartography;
 mod derived_face;
 mod gloss;
+mod framing;
 mod lifecycle;
 mod nodes;
 mod reader;

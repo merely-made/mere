@@ -347,7 +347,7 @@ authority boundary prove useful. Until then it can remain a shared surface
 consumed by Castellan and the communications port.
 
 **Ruled 2026-08-22 (with Mark):** this is the **gazette port**, founded on
-the dramatis tier beside castellan (`crates/dramatis/gaz` + `gazette` +
+the dramatis tier beside castellan (`repos/dramatis/crates/gaz` + `gazette` +
 feeds, with `mere-crawl` as the feed engine per the
 [leverage census](2026-08-10_leverage_census_brief.md)). The two readings in
 this section are the port law's two halves rather than alternatives: the
@@ -364,7 +364,7 @@ dramatis resolver crate already held it — package and lib both, published,
 484 lines, no library consumers — and bare `gazetteer` is held by a stranger,
 so freeing the name by renaming the resolver was unavailable. Ruled: the
 resolver *is* the port, one directory earlier than expected.
-`crates/dramatis/gaz` moved to `ports/gazette`, keeping its package name,
+`repos/dramatis/crates/gaz` moved to `ports/gazette`, keeping its package name,
 version, and code; the manifest, README, and module doc were reframed to the
 port identity, and the workspace member and dependency entries follow. The
 reasoning is the 2026-08-10 brief's own: the word's three senses — an index,
@@ -563,7 +563,7 @@ incumbent application.
 7. Found the gazette port; its picker consumed by Knot, Moot, and Signalman
    is the boundary proof 7.3 asked for. *(Amended 2026-08-22. **Executed
    2026-08-23 by promotion**, per the naming ruling in 7.3: the resolver
-   crate moved `crates/dramatis/gaz` → `ports/gazette`, keeping its
+   crate moved `repos/dramatis/crates/gaz` → `ports/gazette`, keeping its
    package name and code, with the manifest, README, and module doc reframed
    to the port. Compiles from its new home; the picker and feed surfaces
    remain unbuilt.)*
@@ -644,7 +644,7 @@ work. Mere's generic Comms layer must not depend on a Retinue application.
 | I1: Tucket contact preservation (Terra) | `retinue/crates/tucket/src/node.rs`: refuse different full identities sharing an occupied short address; retain the accepted identity and route | Implemented this pass. Collision and same-identity refresh regressions; 69 Tucket tests, strict clippy and formatting pass. Wider address/path parity remains open. |
 | I2: protocol-faithful conversation presentation | First add only consumer-needed delivery/privacy facts to Comms, then a consumer-side mapping beside Signalman's existing Messages view; native Murm and LXMF/Sennet/Tucket retain explicit protocol identity | Next code lane, scoped but not implemented. Replay existing message events through the mapping; preserve queued, handed-to-radio, propagation acceptance, fetched, direct receipt, cancellation, and failure distinctly. Unknown receipt never means read. Keep unsupported operations visible. Render from the existing store. |
 | I3: coop ceremony | Audit and extend Turnstone's existing place-session commands and Woodshed's peer comparison proof before extracting a common invite/join/leave/reconnect view contract | Next activity lane, scoped but not implemented. Two concrete application consumers must demonstrate the same lifecycle facts. Domain state, history, merge, and authorization stay with their existing owners. |
-| I4: Gemot composition | Canonical terminology, port manifest/module/README, Murm README and Turnstone plan aligned in this pass; conversation components mount independently | Documentation aligned. Product rendering remains open; the port's existing captured-web implementation is not a completed conversation or coop surface. No package rename is required for this slice. |
+| I4: Gemot composition | Canonical terminology, port manifest/module/README, Murm README and Turnstone plan aligned; conversation components mount independently | The 2026-10-10 [Moot conversation receipt](moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#moot-conversation-and-coop-continuation-2026-10-10) composes a portable Comms pane and coop report over authority-filtered encrypted Commons chat. CPU model qualification is complete; product rendering, transport sessions and live coop remain open. No package rename is required. |
 | I5: PPK2 measurements | Inventory kit, target SKU, power path, voltage, USB/backfeed behavior, and event markers; capture baseline and idle/RX/TX/transition traces for a named build/configuration | Physical lane pending fixture setup. Record raw trace, integration window, voltage/current ranges and charge per operation; compare identical fixtures. Treat power-cut durability as a separate witnessed receipt. |
 
 I2 must describe actual privacy: public traffic and shared-key radio messages

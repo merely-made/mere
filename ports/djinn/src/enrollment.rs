@@ -15,7 +15,7 @@
 use std::io;
 use std::path::Path;
 
-use personae::{IdentityStorage, SealedProfileStorage};
+use castellan::custody::{IdentityStorage, SealedProfileStorage};
 use zeroize::Zeroizing;
 
 /// Reads one secret line for a prompt. The terminal in production; scripted
@@ -61,9 +61,8 @@ pub fn enroll_passphrase(vault_dir: &Path, read: &mut ReadSecret<'_>) -> Result<
 
 #[cfg(test)]
 mod tests {
-    use personae::{
-        Ed25519Keypair, IdentityVault, Profile, ProfileId, UnlockMethod,
-    };
+    use castellan::custody::{IdentityVault, Profile, UnlockMethod};
+    use personae::{Ed25519Keypair, ProfileId};
 
     use super::*;
 

@@ -1,13 +1,13 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-08)**: rulings 1 to 97 in §3. L1 to L4 landed (L3
+**Status (2026-10-09)**: rulings 1 to 97 in §3. L1 to L4 landed (L3
 as `79fbbeb7`, its attended receipts as `303b5097`; L4 on 2026-10-08, §6);
-deployment is Mark's step. Not yet carried out: ruling 44's transport-key hard switch,
-so Distillery keeps the master keypair while locked, and pandect's wallets
-until D8 (ruling 81). The [vault threat statement](../technical_architecture/2026-10-08_vault_threat_statement.md)
+deployment is Mark's step. Ruling 44's hard switch landed on 2026-10-09 (§6), so Distillery no longer
+keeps the master while locked. Not yet carried out: pandect's wallets
+until D8 (ruling 81). The vault threat statement (`repos/dramatis/design_docs/2026-10-08_vault_threat_statement.md`)
 says what the lock defends and leaves open. The
-[dramatis repo plan](2026-10-06_dramatis_repo_plan.md) moves this code
+dramatis repo plan (`repos/dramatis/design_docs/2026-10-06_dramatis_repo_plan.md`) moves this code
 later. Chatelaine P4 (CXF import) waits on this plan (chatelaine rulings
 64, 65).
 **Scope**: the resident's secrets can be locked. While locked, no secret
@@ -18,9 +18,9 @@ locked.
 
 **Related**:
 
-- [chatelaine and CXF import plan](2026-10-01_chatelaine_cxf_plan.md):
+- chatelaine and CXF import plan (`repos/dramatis/design_docs/2026-10-01_chatelaine_cxf_plan.md`):
   rulings 63 to 65 and the finding "the vault never locks".
-- [dramatis tier architecture](../technical_architecture/2026-09-30_dramatis_tier_architecture.md):
+- dramatis tier architecture (`repos/dramatis/design_docs/2026-09-30_dramatis_tier_architecture.md`):
   the tier's invariants (1, custody; 12, quarantine).
 - [protocol architecture plan](../../mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md):
   §3.6 and §3.7 describe `UnlockTier` as custody tiers, and its line 349
@@ -28,10 +28,10 @@ locked.
 - [persona wallet carry layer plan](../../archive_docs/2026-10-06_completed_plans/2026-06-25_persona_wallet_carry_layer_plan.md):
   the "one unlock ladder" rule (:358-362), and Meerkat's 2026-07-04 "Lock
   now" (:788-792).
-- [vault threat statement](../technical_architecture/2026-10-08_vault_threat_statement.md):
+- vault threat statement (`repos/dramatis/design_docs/2026-10-08_vault_threat_statement.md`):
   what the lock defends, what stays while locked, and what it does not
   defend (ruling 82).
-- [dramatis repo plan](2026-10-06_dramatis_repo_plan.md): moves the
+- dramatis repo plan (`repos/dramatis/design_docs/2026-10-06_dramatis_repo_plan.md`): moves the
   vault's custody from personae into castellan and the tier out of mere;
   sequenced after this plan's L2 at the earliest.
 
@@ -956,7 +956,7 @@ in-process mods), and what is fixed only by reading. The protocol plan's
 - left open past L4.
 
 Mark: **"Own doc in dramatis (Recommended)"**. Follows:
-[the vault threat statement](../technical_architecture/2026-10-08_vault_threat_statement.md).
+the vault threat statement (`repos/dramatis/design_docs/2026-10-08_vault_threat_statement.md`).
 
 **Ruling 83.** *Should the dramatis tier architecture gain an invariant for
 the lock? Its §4 lists 12, each with where it is enforced, and breaking
@@ -1233,7 +1233,7 @@ breaking change is built, Knot first.
 **2026-10-05, L1 checkpoint A reached** (Opus lane, branch
 `worktree-agent-a014d67042870a2b4`, base `24bfe7be`, not merged):
 - `fea481a3` adds the no-residue instrument
-  (`crates/dramatis/personae/tests/no_residue.rs`). It is a test-only
+  (`repos/dramatis/crates/personae/tests/no_residue.rs`). It is a test-only
   tracking allocator with three canaries: the master seed, a slot payload,
   and a DPAPI root in a temp dir. It is red on purpose at that commit.
 - `ffd3279b` adds the residue fixes:
@@ -1993,7 +1993,7 @@ L3's `79fbbeb7`) on both machines.
     holds now;
   - the tier architecture gains invariant 13 with its four enforcement
     points;
-  - the [vault threat statement](../technical_architecture/2026-10-08_vault_threat_statement.md)
+  - the vault threat statement (`repos/dramatis/design_docs/2026-10-08_vault_threat_statement.md`)
     is new.
 - **The gates** ran on mere `526cbb3b` plus this work, in fresh worktrees.
   - **Windows:** personae, castellan and djinn give 477 passed across 37
@@ -2086,3 +2086,57 @@ headline checked in code).
   - C, a residue test that fails first on the current tree;
   - D, the gates with the lane on and locked by the real trigger;
   - E, the records.
+
+**2026-10-09, ruling 44 built** (rulings 92 to 97; worktree `mere-r44`, with
+its own build directory).
+- **C, red first** (`3f5d0022`): `ports/distillery/tests/transport_residue.rs`
+  plants the master and the mesh author's seed, then opens the vault and
+  binds the lane inside the armed region.
+  - On the old tree: 28 hits, with the master live in seven blocks after
+    the bind and freed uncleared in others (p2panda and iroh).
+  - The author key was already live (the mesh host signs with it), which
+    proves the instrument sees the transport's key.
+- **A, the derivation:**
+  - `transport_identity()` returns the mesh author key as a
+    `DerivedKeypair` (ruling 92), and the lane binds through
+    `P2pandaTransport::builder_for`.
+  - personae gains `DerivedKeypair`, which only its derivation builds, and
+    `IdentityProvider::derived_keypair`. The 153 existing `derive_keypair`
+    callers are unchanged.
+  - The transport's four master-taking constructors (`builder`, `bind`,
+    `bind_with_blobs`, `bind_with_authorized_blobs`) sit behind a new
+    `test-identity` feature, turned on only in dev-dependencies: mesh,
+    commons, gemot, mien, murm, eidetic, Distillery, graphshell, and the
+    remote-fixture probe.
+  - graphshell's carriage and personal-sync hosts bind from their derived
+    keys through `builder_for`.
+  - *Control:* putting the master back into Distillery's lane fails a
+    production build: "no associated function `builder`".
+- **B, the lookups** (ruling 93):
+  - The courier and the blob sources address mesh authors.
+  - The directory now records which persona an attested author belongs to,
+    with `is_attested`.
+  - The remote checks require the connected peer to be its own attested
+    author, the same strength as before.
+  - `a_device_answering_as_its_master_is_refused` is the control: a client
+    or server at its master is refused (`WrongClientPeer`,
+    `UnattestedServer`).
+  - Distillery's tests bind their transports with author keys. Two of them
+    (`mesh_host_blob_delivery` and `mesh_host_supervised_reclaim`) also
+    dialled peers by master, and now dial by author.
+- **C, green:** the residue test is clean, and the transport key is live.
+- **Windows tests:**
+  - personae, the transport, mesh and eidetic (with `iroh-fetcher`);
+  - Distillery's 11 targets with `--no-fail-fast`;
+  - gemot, mien, murm, commons and djinn;
+  - graphshell's library (212) and with `personal-sync` (412).
+  - A single graphshell run showed three failure lines that did not
+    reproduce on two reruns.
+- **E, the records:** the comments in `peer_id.rs`, `directory.rs`,
+  `courier.rs` and `installed.rs`, and the threat statement's §3 (the gap
+  is closed).
+- **Still to do:**
+  - D, the Fedora gate;
+  - the push;
+  - then knot-editor and Turnstone turn the feature on in their next
+    repins (ruling 97).

@@ -122,6 +122,16 @@ neither additive forces nor an outer rectangle resolves that policy. The
 [editor study](2026-10-07_scenograph_editor_plan.md#mixed-content-study-2026-10-10-proposal-not-opened)
 carries candidate done-conditions, not an opened field implementation track.
 
+**Agreed forme editing (2026-10-10):**
+[design language §9.11](../../2026-08-23_projection_scenes_and_graph_native_platform.md#911-forme-draft-session-2026-10-10)
+settles the editing interaction: unlock a scoped draft, drag nodes as tile
+handles with region/drop previews, undo/redo within that draft, discard it
+without changing content, or lock-and-apply it as one arrangement change.
+Both presentations may show the draft; committed arrangement and geometry
+change only on apply. The [editor follow-through](2026-10-07_scenograph_editor_plan.md#forme-draft-follow-through-2026-10-10-agreed-interaction)
+carries the implementation steps. This does not imply that locking pauses
+dynamics or that the field/workbench gesture bridge is implemented.
+
 ## Findings (code-verified substrate)
 
 The pieces exist; what is missing is **placement, rendering, and the unifying
