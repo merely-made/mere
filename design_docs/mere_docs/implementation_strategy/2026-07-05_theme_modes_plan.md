@@ -20,6 +20,24 @@ does not establish implementation or consumer adoption of those preferences.
 derivation), `crates/meerkat/src/theme_sheets.rs` *(historical citation)* <!-- doc-audit: historical-path --> + `theme_edit.rs` (current sheet baking +
 switch path).
 
+## Design-language clarification (2026-10-09; research)
+
+The [design language §9.8](../../2026-08-23_projection_scenes_and_graph_native_platform.md#98-voice-clarifications-and-research-boundaries-2026-10-09)
+records Mark's agreement that theme values need a system defining how they are
+used when data encoding, selection and activity compete. Fill, outline and
+badge assignments are suggestions, not defaults chosen here. Research semantic
+roles and configurable composition alongside projection style authoring; token
+interchange alone does not decide these meanings.
+
+Mark asks for granular font roles corresponding to the defaults, so a person
+can choose installed fonts while retaining useful heading, size and text
+patterns. Firefox's [font preferences](https://support.mozilla.org/en-US/kb/change-fonts-and-colors-websites-use)
+are a checked precedent for serif/sans-serif/monospace choices, sizes and minimum
+size. Those generic families do not themselves define Mere's UI, reading,
+heading or label roles. The role schema, override precedence and remote/frozen
+fidelity remain open; measurements must stay coherent with realized fonts.
+This note does not change adoption order or claim controls in every consumer.
+
 ## Application adoption (2026-10-09)
 
 **Status:** in progress. Mark selected this order: Pelt, Graphshell, Knot,

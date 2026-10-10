@@ -400,6 +400,28 @@ Two linked appearances preserve independent visibility and distinguish
 selection from their data encoding. Exact preview commit/history behavior
 still returns as a fork before implementation.
 
+### Planning through nodes, links and fields (2026-10-09)
+
+Mark's [primitive planning direction, §9.9](../../2026-08-23_projection_scenes_and_graph_native_platform.md#99-plan-through-graph-primitives-2026-10-09)
+asks to represent nodes, links and fields in the graph and connect each to
+dynamics. Plan the same inspect/configure loop for all three, retaining each
+primitive's own authority and identity rather than equating every primitive
+with a rendered content node. The proposed link/edge and content/resource
+vocabulary must be reconciled with graph semantics before code or stored
+formats change. The reference-host name "GraphQL" is awaiting clarification;
+the existing Graphshell reference role is not sufficient to silently choose it.
+
+*Candidate proof, not opened:* a visible content node exposes its own
+attributes and its resource association; two independent accesses to one
+resource retain their identities. A link is selectable and inspectable with
+its attributes/provenance and any explicit dynamics contribution. A field
+exposes its region, affected members and rules. Edit through each existing
+owner, save/reopen, and inspect an overlapping-field case without changing
+unrelated scene behavior. Scene appearance/selection and motion explanation
+must trace to those identities. Field trigger, attribute placement and
+terminology choices precede implementation; this records a candidate, not an
+additional SE track or replacement for the current B1/S2 sequence.
+
 ## 4. Findings
 
 Verified 2026-10-07 against mere's origin unless named.

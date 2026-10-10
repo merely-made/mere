@@ -38,6 +38,48 @@ placeable, scriptable spatial primitive, and it is the third rhai lane after the
 knot note-blocks and the omnibar command shell: one scripting language, now
 governing a region of space.
 
+## Expanded field direction (2026-10-09; research, not implemented)
+
+The [design language §9.8](../../2026-08-23_projection_scenes_and_graph_native_platform.md#98-voice-clarifications-and-research-boundaries-2026-10-09)
+records Mark's clarification: fields participate in a scene and can apply an
+arrangement, dynamics or a projection to affected material. Scripting includes
+general-purpose behavior and invoking a graph-held applet on entry. The forme
+is a particular field representing the recursive workbench arrangement,
+existing alongside other arrangements rather than controlling the whole scene.
+Earlier force/visibility/layout scope is incomplete as a description of the
+intended capability.
+
+This direction does not establish that the current scalar/vector field AST
+implements region events or applet execution, or select Rhai as the universal
+backend. Scenograph's scripting comparison and application execution owners
+retain those decisions. The partial implementation status above stands.
+
+Research must distinguish spatial inclusion from declared membership and
+define how overlapping or nested regions compose placement, projection and
+motion without creating a second workbench layout authority. Entry/exit needs
+defined behavior when nodes, regions or arrangements move, including avoiding
+repeated actions caused only by boundary jitter. Foreground pin, position
+anchor, position pin and layout lock remain separate controls; whether a lock
+affects local dynamics remains open.
+
+Mark's feed-overflow example is exploratory: excess material enters a field
+and dissolves or moves to background. *Reading, not ruled:* an action must
+identify whether it changes an appearance, attention, residency, keeping or
+source truth; these effects cannot be inferred from the word "dissolve".
+
+*Candidate proof, not opened:* a forme region and another field overlap;
+their contributions and constraints are explainable, unrelated scene items
+continue their own behavior, and one deliberate entry invokes the chosen
+action through its existing authority. Overlap policy, event cadence and
+execution grants must be ruled before that proof is implemented.
+
+The [primitive planning direction, §9.9](../../2026-08-23_projection_scenes_and_graph_native_platform.md#99-plan-through-graph-primitives-2026-10-09)
+also asks to represent fields alongside nodes and links in the graph, then
+connect them to dynamics. Research each field's address, owned attributes,
+membership, behavior and scene representation; a painted region alone does
+not establish that authoring loop. Representation does not by itself choose
+a new node encoding or replace the existing field/coupling stores.
+
 ## Findings (code-verified substrate)
 
 The pieces exist; what is missing is **placement, rendering, and the unifying

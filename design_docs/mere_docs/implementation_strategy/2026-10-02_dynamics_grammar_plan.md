@@ -902,6 +902,34 @@ when G3 reports.
 
 This pass decides none of them.
 
+### Design-language research inputs (2026-10-09)
+
+Mark's [voice clarifications, design language §9.8](../../2026-08-23_projection_scenes_and_graph_native_platform.md#98-voice-clarifications-and-research-boundaries-2026-10-09)
+ask for visible explanations of simultaneous forces through vectors, shape or
+relationship treatments. These are candidate forms, not chosen marks. A link's
+projection can explain its dynamics contribution; relationship membership alone
+does not install a force. Nodes, links and fields are considered together.
+
+The field plan carries overlapping and nested region behavior. This grammar
+must supply the motion/constraint account those projections explain, including
+anchors and pins; common-scale, composition and satisfaction semantics remain
+authoritative. A forme arrangement coexists with other scene behavior. Layout
+locking does not imply a global pause or override.
+
+*Candidate proof, not opened:* inspect an item with two active contributions
+and an arrangement constraint; distinguish contributions, resultant and
+constraint satisfaction, with a control disabling one contribution. Derive
+the explanation from the terms actually evaluated. Composition across fields
+and its inspector remain open. This is research context, not a new F ruling,
+completed G6 surface or change to F192-F199's order.
+
+The [primitive planning direction, §9.9](../../2026-08-23_projection_scenes_and_graph_native_platform.md#99-plan-through-graph-primitives-2026-10-09)
+connects nodes, links and fields to dynamics through explicit participation.
+The proposed edge/resource-association terminology needs graph-semantics
+reconciliation before it changes any channel or endpoint contract. The
+projection should explain a term using the primitive identities it actually
+reads; this direction does not attach dynamics to every stored relationship.
+
 ## 4. Findings
 
 - 2026-10-02 (planning): P5's rungs and Density's tiers are unmerged. `gpu-repulsion` is at `60a990a5`, and `density-cpu` is at `c402d5e7`, a merge of main over `5f529c64`. Density's overlay refusal is `PhysicsLaw::overlay_refusal` on that branch (`density-cpu:crates/canvas/pictograph/src/canvas/physics_catalog.rs`, line 199). G3 and G5 build on these once they land.

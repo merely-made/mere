@@ -13,6 +13,19 @@ The work order below stands. The [ambiance proposal](../design/2026-09-23_ambian
 and [app composition reconciliation](../../cambium_docs/research/2026-10-06_app_composition_brief.md#11-current-consumers-and-design-direction-2026-10-09)
 carry the wider site and cross-app context; neither is a receipt for these tracks.
 
+**Voice continuation (2026-10-09):** [design language §9.8](../../2026-08-23_projection_scenes_and_graph_native_platform.md#98-voice-clarifications-and-research-boundaries-2026-10-09)
+clarifies that deselection preserves edits, welcomes hover previews, expands
+fields toward scoped projections and entry-triggered behavior, calls for
+granular configurable font roles and meaningful visible dynamics, and records
+the need to compose theme values with semantic channels. Owner plans carry
+research inputs and candidate proofs. Existing work order, R160 and viewer
+ownership holds stand; this is not qualification of the shared checkout's
+concurrent dynamics implementation. The subsequent [primitive planning
+direction, §9.9](../../2026-08-23_projection_scenes_and_graph_native_platform.md#99-plan-through-graph-primitives-2026-10-09)
+asks for nodes, links and fields to be inspectable/configurable and connected
+to dynamics; the proposed terminology and reference-host name need
+reconciliation before a new proof is opened.
+
 ## The work, in order
 
 1. **The dynamics slot** (dynamics grammar plan, `mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md`, F192 to F195; asked for by the Scenograph plan's SE69).
