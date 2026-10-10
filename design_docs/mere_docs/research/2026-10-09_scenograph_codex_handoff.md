@@ -34,12 +34,93 @@ done-conditions without taking over the active dynamics implementation or
 opening a new track. The field plan corrects the earlier assumption that a
 coupling selector already means membership in the field's extent.
 
+## Ruled continuation, 2026-10-10
+
+F200 to F202 are recorded verbatim in the dynamics grammar plan, committed
+as `38cdebca`. The carrier, fixed-step runner, occurrence adapter and dynamics
+matrix are committed as `e2543cee`; `40aac7fc` integrates upstream Mere
+`6183006b`, preserving Tabard's host stylesheet alongside live dynamics.
+That integration also adopts upstream's Genet `7422e906` pin. The subsequent
+`601b6dd1` merge adopts Vello `491c376c`; `3d40d546` adds the upstream workshop
+header and appearance receipts without moving the qualified physics sources.
+
+- Direct coordinate and embedding families hold their encoded data axes;
+  Timeline holds its continuous x position. Grid ranks, ordering, layers,
+  buckets and ring slots remain free. With both axes encoded, F47 permits
+  contact-only separation. A one-axis position-writing law refuses by path
+  until an adapter can preserve that coordinate; unknown solvers likewise
+  need a disclosed constraint adapter. Regions, relations and folds still
+  require a broader scene-input adapter.
+- A variant carries a preset or a complete spec. Naming both is refused (F201).
+- The host's editable preview limit starts at 60 (F202). Capped cells visibly
+  say "Step limit reached". The matrix pages across the complete axes;
+  only its working cell advances. Paging does not rerun settled cells.
+- The six focused native matrix tests pass, including the held-coordinate
+  test and its moving-grid control. The pre-integration paged scenario passes
+  34 steps / 55 frames in the in-app browser at 520×604 and 1280×720, and in
+  standalone Chrome at 1037×583. These receipts precede the final stylesheet,
+  refusal-card and newer-Genet qualification. Firefox remains open.
+
+**Native and identity qualification:** the full native Graphshell web library
+passes on Genet `7422e906` (194 passed, 5 ignored, before the final caption
+changes). The six comparison tests pass after `72ce892d`, including the live
+working-state label and unchanged snapshot states. Scenograph passes 16,
+Scenomise 157, and Seiche 159 (10 ignored). Pictograph's full single-thread run
+passes 381 with 18 ignored and one frame-timing failure under concurrent build
+load. That speed test passes its targeted rerun with the original tolerance;
+the loaded run is retained as `dynamics-pictograph-loaded-run.txt`.
+
+`Code/testing/mere/scenograph-editor/receipts/dynamics-identity-ruled.json`
+records all twelve presets twice per target at 0, 59, 60 and 4,000 steps:
+native and Node wasm agree exactly, including float words and stop results.
+Six laws change positions between 59 and 60 (the control). The direct-coordinate
+probe agrees across targets and keeps its coordinates at 0 and 60. The receipt
+names source `72ce892d`, both lock hashes, source and binary hashes, and Node
+24.11.0; covered source stayed unchanged during the run. Its covered hashes
+also match after the presentation-only `34539624` contrast correction, which
+uses the existing on-tertiary theme role for selected captions. The final wasm
+host builds on Genet `7422e906` and Vello `491c376c`. This supersedes the older
+identity measurements below. Measured wasm runs average 3.85 s at 60 and
+42.27 s at 4,000, including startup and concurrent system load; these are
+three-occurrence fixture receipts, not a large-scene performance claim.
+
+**Browser qualification:** the final 48-step scenario passes over 77 frames
+with four captures in standalone Chrome at 1037×639 and the in-app Chromium
+browser at 520×604 and 1440×900, with no errors or gate failures. The whole
+captures were inspected: paging leaves captions readable, capped snapshots
+say "Step limit reached", refusal cards name the missing input adapter, and
+the applied working frame is brought into view with its current live state.
+The selected captions now use the existing on-tertiary role; all six native
+appearance tests pass after that correction. Final browser receipt names are
+`chrome_dynamics-contrast-chrome-scenario-receipt.json`,
+`chrome_dynamics-contrast-narrow-scenario-receipt.json`, and
+`chrome_dynamics-contrast-desktop-scenario-receipt.json` in the receipts folder.
+`dynamics-qualification.json` records their hashes, the browser package and
+scenario hashes, source bases, the native results and the unchanged physics
+source control. Firefox is unavailable in this session's browser control
+inventory and retains its separate qualification gate. S1's final acceptance
+and the physics coordinator's review remain open.
+
+**Cleanup:** the receipt server is stopped, the temporary Node bindings are
+removed, and the viewport override is reset. Receipts and the reproducible
+probe remain in the existing testing directory. No isolated target, Cargo home
+or worktree was created. The shared `C:/t/cargo-targets/mere` target and browser
+package are retained for Mere's ongoing work and the open Firefox gate.
+
+B1/S2 continue through the viewer owner assigned by site R162. The concrete
+next slices are: B1's three-mode control, backdrop drawing, tangible obstacle
+binding and its intangible control; then S2's clause selection, per-appearance
+visibility, shelfmark mapping and scenotime replay. SE88's UI name is
+"Appearance part"; a spelling for the replacement shelfmark key remains a
+reading, not a separate ruling. The site's current selection semantics must
+be preserved during that owner's cutover. F199's broader queue stays paused.
+
 ## The work, in order
 
 1. **The dynamics slot** (dynamics grammar plan, `mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md`, F192 to F195; asked for by the Scenograph plan's SE69).
    - F192: `scenograph::AuthoredProjectionDefinition` gains `dynamics: Option<DynamicsSlot { version, spec }>`, the spec as canonical JSON. scenograph stays on sceno and serde and keeps `Eq`; no seiche dependency. The binding host reads the spec through seiche and refuses by path.
    - F193: the recipe's `arrangement.kind` and the spec's `target.arrangement` must agree; binding refuses a mismatch, naming both paths.
-   - F194: `ProjectionVariant` varies dynamics by a catalog preset id or a whole `DynamicsSlot`, one or the other (naming both is refused, a reading not yet ruled: confirm with Mark).
+   - F194: `ProjectionVariant` varies dynamics by a catalog preset id or a whole `DynamicsSlot`, one or the other (naming both is refused under F201).
    - F195: SE70's settle is a seiche function, `settle(spec, inputs, bound) -> positions`, every host calls, with a native-against-wasm identity receipt. The default step bound for a spec with no stop rule goes back to Mark as a measured number.
 2. **The grid's dynamics axis** (Scenograph plan SE54, SE55, SE70, track S1's last open item). After the slot: `scenograph::swatch::AxisKind` gains `Dynamics`; the projection editor's comparison (`ports/graphshell/src/projection_compare.rs`) can vary it; settled cells call F195's settle; the focused cell runs live (SE55).
 3. **B1, backdrops in the Graphshell viewer** (Scenograph plan §2 B1, SE86). Independent of the others.
@@ -108,7 +189,88 @@ GPU fixtures failed to obtain a device. The
 records current hashes, historical partial receipts and the exact remaining
 headed checks. The site lane's uncommitted docs/scenarios remain its own work.
 
-## Where things are
+## Historical draft checkpoint, 2026-10-09
+
+**Codex checkpoint (2026-10-09, implementation draft):** SE88 names the UI
+concept "appearance part"; SE89 gives every occurrence a separate transient
+physics body and refuses undisclosed channels. The carrier, preset/full-spec
+variant binding, fixed-step settle loop, and Arrangement/Dynamics matrix are
+being implemented. Native checks cover repeatability, a changed-bound control,
+independent bodies for a repeated source, display refresh without restarting
+motion, and one undo for a comparison pick. Native suites pass: Scenograph 16,
+Scenomise 157, Seiche 159 (10 ignored), Pictograph with canvas 381 (18 ignored),
+and Graphshell's no-default-features web library 187 (5 ignored). The full
+browser host builds for wasm. The encoded-position interpretation, variant
+precedence and measured default bound remain open, as do the browser and
+readability qualification gates described below.
+The broader F199 pause remains in effect.
+
+**Final draft receipts:** `Code/testing/mere/scenograph-editor/receipts/dynamics-identity-final.json`
+records two fresh runs per target for all twelve presets, with exact float-word
+identity between native and Node wasm at bounds 0, 59, 60 and 4,000. The 59/60
+control changes positions for six laws. It records source/binary/lock hashes;
+source was unchanged during the probe. `dynamics_identity.py` beside the sink
+server reproduces the probe after building the native example and generating
+the Node wasm bindings. These are three-occurrence fixture receipts, not a
+large-scene performance claim. The earlier `dynamics-identity.json` is superseded
+because its attempted Anneal tick-demand change was removed.
+The standalone web lock is ignored by Git and was regenerated against its
+existing manifests after the stale lock could not satisfy Rapier's glamx
+requirement. Its transitive resolution changed; no Genet manifest pin was
+changed by this lane. The two lock hashes in the final receipt identify the
+actual graphs used, rather than claiming a one-entry dependency update.
+
+The corrected `projection_dynamics.scn` passes 27 steps over 46 frames in the
+Codex in-app Chromium browser at 520×604 and 1440×900, with two captures per run
+and no reported errors or gate failures. The sink labels this browser "chrome";
+it is not a standalone Chrome receipt. Desktop headings are readable, but the
+narrow matrix overlaps labels and the desktop footer covers part of the last
+row. Capped-state wording is present in semantic buttons but needs visible
+treatment. Standalone Chrome and Firefox remain unqualified. The receipt names
+are `chrome_dynamics-final-scenario-receipt.json` and
+`chrome_dynamics-desktop-scenario-receipt.json` in that receipts directory.
+
+The final twelve-preset probe measured about 0.96 s per wasm run at 60 ticks and
+14.79 s at 4,000; these include process/module startup and concurrent workspace
+load. The earlier 0.30/13.84 s measurement is superseded. A configurable default
+of 60 ticks was recommended from this receipt and installed under F202; a capped
+cell is "Step limit reached", not "At rest".
+
+**Stop-condition correction:** an attempted Anneal tick-demand change failed
+the existing Seiche speed/settle contract and was removed. The occurrence
+preview now reads the catalog's derived currencies. A kinematic or resident
+law does not acquire an RMS-velocity rest claim; explicit schedule stops and
+existing completion signals remain usable, otherwise the caller's step limit
+ends the snapshot. Anneal's own completion is not qualified by this lane.
+This does not change the shared Canvas runtime's ordinary settle budgets.
+
+**Design-language reconciliation:** upstream §9.8/§9.9 keeps resource identity
+separate from multiple appearances and makes deselection preserve edits.
+The draft uses one body per occurrence and refreshes presentation without
+restarting a reused placement. A footprint change rebuilds the preview,
+because measurement is a physics input. Foreground attention, positional
+pins and layout locks remain distinct. Fields and relationship explanations
+do not install forces implicitly; their broader proofs remain with their
+owners. Those three questions were resolved as F200 to F202 on 2026-10-10; the checkpoint above supersedes their pending state. Consumer qualification remains separate from implementation.
+
+**Viewer ownership refresh:** the site source was refreshed against upstream
+`87d7a3d`. Ruling 161 replaces the deferred grouping choice with folds; Ruling
+162 assigns `web_tree*`, `host_dataset_view.rs` and `web_dataset.rs` to the site
+lane for its cutover. B1/S2 edits to those files must go through that owner.
+The one `host_dataset_view.rs` change in the dynamics draft is the required
+`dynamics: None` initialization for the expanded recipe type. No new viewer
+behavior has been installed. The site's upstream sandbox still carries
+`mer3ly.facets`; SE88's key migration has not been applied.
+
+**Workspace rules for this continuation:** Mark's current workspace
+instructions supersede the historical worktree/build-directory paragraph below.
+Use main unless an actual concurrent collision requires isolation, and reuse
+`C:/t/cargo-targets/mere`. No dynamics worktree or isolated Cargo home has been
+created.
+The temporary browser tab and receipt server were closed, and the generated
+Node bindings were removed after the identity gate. Receipts and the reusable
+probe remain under the existing testing directory. The shared Mere target and
+the browser package remain available for the open qualification gates.
 
 - Swatch types: `crates/cambium/scenes/scenograph/src/swatch.rs`. Composition: `crates/cambium/scenes/scenomise/src/facet.rs` (`compose_facet`), tests in `facet_tests.rs`. Subgraph specs: `crates/forme/curation` (published as `mere-curation`).
 - The editor's grid: `ports/graphshell/src/projection_compare.rs` and `web_projection.rs` (`compare_targets`, `toggle_projection_compare`, `pick_projection_compare`); headed scenario `ports/graphshell/web/scenarios/projection_compare.scn`.
