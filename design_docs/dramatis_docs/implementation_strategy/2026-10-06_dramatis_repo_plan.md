@@ -446,6 +446,18 @@ dr-d, dr-c, test"**. Follows:
 - ruling 44, already built, rides the same branch;
 - ruling 91 is not in this batch.
 
+**Ruling D37** *(the callers between DR-B and DR-C; not put as options).*
+Raised as the open question of how DR-B avoids breaking the crates that
+still open a vault, storage or wallet before DR-C moves them to djinn.
+Mark: **"Look, you keep saying that, but that's a momentary issue unless
+you spend hours building and mitigating instead of just making the
+cut"**. Follows:
+- DR-B makes the cut with no shims, temporary paths or re-exports for those
+  callers;
+- they may stop compiling until DR-C fixes them;
+- DR-B lists them as DR-C's worklist;
+- only D36's combined test run must pass.
+
 Still open: whether gazette gets a matching facade name over gaz, the way
 chatelaine is the keychain.
 
