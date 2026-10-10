@@ -607,6 +607,10 @@ previews of the proposed split or position. Ordinary node interaction should
 not inadvertently become a tile rearrangement gesture. The exact gesture and
 whether a layout lock also pauses dynamics were not settled.
 
+*Clarified 2026-10-10:* the [agreed forme draft session, §9.11](#911-forme-draft-session-2026-10-10),
+now specifies unlock, node-as-tile-handle previews, scoped undo, discard and
+lock-and-apply. Whether the layout lock also pauses dynamics remains open.
+
 Keep these controls distinguishable:
 
 | Control | Intended role |
@@ -867,7 +871,48 @@ The [Scenograph editor plan](mere_docs/implementation_strategy/2026-10-07_scenog
 owns track R1 for the shared declarative model and first interactive study.
 Production host adoption and the Rhai runner are separately qualified there.
 
-### 9.11 Mixed-content scene and embedded forme study (2026-10-10)
+### 9.11 Forme draft session (2026-10-10)
+
+**Agreed interaction; implementation pending.** Mark described unlocked nodes
+as tile handles: dragging a handle previews the corresponding tile region,
+split and nesting; dragging another node into the forme adds it to the proposed
+arrangement. Locking agrees to commit those changes. Asked how to discard the
+draft, Mark accepted a per-forme draft and undo history with an explicit
+discard action: "Alright, I'm down!"
+
+| Action | Effect |
+|---|---|
+| Unlock | Start an editing draft from this forme's committed arrangement and projection geometry. |
+| Undo / redo | Step through arrangement gestures within this draft. |
+| Discard changes | Drop the draft, return to the committed arrangement and lock the forme. |
+| Lock and apply | Commit the draft as one arrangement change, undoable afterward, then lock the forme. |
+
+Both the graph field and the tiled workbench can preview the same draft.
+Pending changes must be visible. The saved arrangement remains unchanged
+until apply; hiding handles or ordinary node selection is not a commit gesture.
+Discard abandons the editing session, while undo reverses individual gestures.
+
+The draft covers membership, grouping, splits, nesting, proportions and local
+placement. Semantic arrangement facts stay in Forme; geometric details stay
+in their projection state. It does not snapshot document contents, playback,
+resource metadata or unrelated graph edits. Discarding a node's proposed
+membership leaves the node and its content accesses intact. Dropping the
+draft also drops its private history; future unlocking starts from the
+committed state rather than undoing into a previous editing session.
+
+Undo routing follows the active editor. Arrangement gestures use this forme's
+draft history, typing in a document uses its document history, and committed
+arrangement changes use the owning host's saved-change history. A position
+pin, foreground pin and dynamics controls retain their separate meanings.
+This interaction settles how layout edits are drafted and accepted; it does
+not require another force-composition model or prescribe a scene's appearance.
+
+The [editor plan](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#forme-draft-follow-through-2026-10-10-agreed-interaction)
+maps the shared history and layout substrate to implementation steps and
+qualification. The gesture bridge and committed arrangement undo are pending;
+this agreement is not a runtime receipt.
+
+### 9.12 Mixed-content scene and embedded forme study (2026-10-10)
 
 **Proposal forwarded by Mark from the design-language agent; not a new
 ruling or implementation receipt.** The presentation-rule direction was

@@ -434,9 +434,59 @@ applicable rendered acceptance pass against its published dependency set.
   rerun with `--locked` in a fresh detached woodshed worktree at `7d33337`, and
   it passes. `5dca58a9` still lacks this entry's name-field fix, which reaches
   woodshed at its next mere repin.
+- The Lagrange golden failure was a lost fix. `b7ed0bdc` (2026-09-24) had
+  pinned `ports/tabard/tests/fixtures/** text eol=lf`; when Tabard moved to
+  `crates/system/tabard`, that row was left matching nothing, the only dead
+  row among the 15 line-ending rows. **Ruling (2026-10-10).** Asked: retarget
+  the row (recommended), normalize newlines in the test, or both? Mark:
+  "Retarget the row (Recommended)". The row now names
+  `crates/system/tabard/tests/fixtures/**`. With the fixture checked out again
+  as LF, `cargo test --locked -p tabard --test theme` passes 10 of 10 at
+  `ef88b773`, where it had failed. The workshop's own fixtures are parsed as
+  inputs, never compared byte for byte, so they need no row.
 - `shared_components.rs:126` still asserts that the code sample contains no
   native `input`/`textarea`. It stays, because it guards against native form
   elements; the `role=textbox` check beside it covers Cambium fields.
+
+### Consumer adoption of the field fix (2026-10-10)
+
+- Knot `59db666b3186d0256dde87b27fa9ce128dbc0eae` and Woodshed
+  `cf9b070b38c75377b037578d13bdba8208265cc6` publish coherent Mere
+  `e95326dc08446a9256d3e340c63e571684afe697` dependencies, including the
+  workshop name/seed field fix and Rootstock's painted accessibility bounds.
+  Woodshed's Redshank, Hocket and recipe graphs retain their existing renderer
+  scopes. Full metadata resolves one Mere source in each graph. The final
+  sibling checks pass 42 targeted CPU tests, including the exact native
+  workshop name/stylesheet routing regression and the shared field-height test.
+  These dependency updates do not renew the standalone native visual receipts.
+- Turnstone `1ee6521cd7c14ec5a56a1ec55448a68d1605e0fc` publishes the renewed
+  native13 candidate using those sibling revisions and Mere
+  `e95326dc`, with the maintained Vello triple still at `10f01d6d`. Its 32
+  focused appearance/Settings/provider tests pass with ordinary test startup;
+  together the final dependency set passes 74 targeted CPU checks. Locked
+  metadata, portable dependency provenance, the production build and Mere's
+  port/web boundary checker pass. These are scoped results, not a new full-suite
+  claim. The
+  [application receipt ledger](https://github.com/merely-made/turnstone/blob/1ee6521cd7c14ec5a56a1ec55448a68d1605e0fc/docs/receipts/tabard_adoption_20261010/README.md)
+  records the source closure and each check separately.
+- Native13 passes four serialized production LaunchServices processes on Radeon
+  Pro Vega 56 / Metal: 521 presentations, 19 visually inspected nonblank original
+  captures, no new GPU reset and all owned processes exited. Theme name and
+  seed-hex fields each paint at 34 CSS px (68 physical pixels at 2x), agreeing
+  with the retained geometry test. Populated wide/narrow application previews
+  contain all six exact authored palette roles. Exact 255-byte CSS, ordinary
+  Save/Apply and separate-process restoration pass for both the initial theme
+  and the edited same-ID theme.
+- The same-ID pixel verifier initially used a stale fixed crop that excluded
+  the higher Explore button after scrolling. The failed result is preserved;
+  an independent original-image review and painted-preview boundary measurement
+  correct the external verifier while retaining every color threshold. The
+  existing images pass; no native lane was retried and no product source changed.
+  Partial native12 remains historical evidence for its older binary. Native11
+  also retains its original qualification. Other platforms, physical assistive
+  technology, formal contrast and independent Reader/browser rollout gates stay
+  outside this macOS appearance receipt; the original reset's exact faulting
+  kernel remains unattributed.
 
 ## Shared authoring and title-bar composition (2026-10-08)
 
