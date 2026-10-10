@@ -1063,3 +1063,11 @@ The next bounded ambient proof should qualify the lifecycle above with the
 existing disclosed site graph before expanding to member crates and a named
 Cargo configuration. No larger graph or live app mount is qualified by this
 documentation pass.
+
+**Voice clarification (2026-10-09):** [design language §9.8](../../2026-08-23_projection_scenes_and_graph_native_platform.md#98-voice-clarifications-and-research-boundaries-2026-10-09)
+amends the earlier "Clear selected subjects" row: deselection preserves edits
+made while selected and returns to an unselected view; it does not restore a
+prior snapshot. Exact context recomputation remains to be specified against
+current state. Previously selected background membership and the keeping axis
+stand. Selection's overload and hover previews need interaction research;
+this does not make hover establish retained membership or keeping.
