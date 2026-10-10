@@ -1,0 +1,86 @@
+Analysis of sampling product (pid 88930) every 1 millisecond
+Process:         product [88930]
+Path:            /private/var/folders/*/MesquiteAcceptance.app/Contents/MacOS/product
+Load Address:    0x100d1c000
+Identifier:      made.merely.mesquite.acceptance.bcbaf6eec1b84701bd009a5b96ee9b6a
+Version:         1
+Code Type:       X86-64
+Platform:        macOS
+Parent Process:  launchd [1]
+Target Type:     live task
+
+Date/Time:       2026-10-09 21:52:17.167 -0400
+Launch Time:     2026-10-09 21:51:16.436 -0400
+OS Version:      macOS 15.8.1 (24H32)
+Report Version:  7
+Analysis Tool:   /usr/bin/sample
+
+Physical footprint:         98.3M
+Physical footprint (peak):  102.8M
+Idle exit:                  untracked
+----
+
+Call graph:
+    1588 Thread_19140795   DispatchQueue_1: com.apple.main-thread  (serial)
+    + 1588 start  (in dyld) + 3056  [0x7ff816784530]
+    +   1588 main  (in product) + 24  [0x100d1d048]
+    +     1588 _RINvNtCsiQed00ZjcMq_3std2rt10lang_startuECsgETj97iwOCT_4pelt  (in product) + 55  [0x100d1cf57]  rt.rs:205
+    +       1588 _RNvNtCsiQed00ZjcMq_3std2rt19lang_start_internal  (in product) + 875  [0x1046f54eb]
+    +         1588 _RNCINvNtCsiQed00ZjcMq_3std2rt10lang_startuE0CsgETj97iwOCT_4pelt  (in product) + 20  [0x100d1cf74]  rt.rs:206
+    +           1588 _RINvNtNtCsiQed00ZjcMq_3std3sys9backtrace28___rust_begin_short_backtraceFEuuECsgETj97iwOCT_4pelt  (in product) + 17  [0x100d1cf11]  backtrace.rs:166
+    +             1588 _RNvYFEuINtNtNtCsjLnd7uqfVBb_4core3ops8function6FnOnceuE9call_onceCsgETj97iwOCT_4pelt  (in product) + 14  [0x100d1cfbe]  function.rs:250
+    +               1588 _RNvCsgETj97iwOCT_4pelt4main  (in product) + 9  [0x100d1d029]  main.rs:16
+    +                 1588 _RNvCslOor7kV02V1_4pelt4main  (in product) + 9  [0x100d311d9]
+    +                   1588 _RNvNtCslOor7kV02V1_4pelt6viewer4main  (in product) + 24962  [0x100d2e7f2]
+    +                     1588 _RNvNtCslOor7kV02V1_4pelt6viewer21run_workspace_profile  (in product) + 4015  [0x100d2541f]
+    +                       1588 _RNvNtCseYm4p2cbYQP_12pelt_desktop16workspace_viewer27run_livery_workspace_viewer  (in product) + 3383  [0x100e92777]
+    +                         1588 _RINvMs4_NtCscPAMFfKuHap_5winit10event_loopINtB6_9EventLoopuE7run_appNtNtCseYm4p2cbYQP_12pelt_desktop16workspace_viewer12WorkspaceAppEB18_  (in product) + 55  [0x100d33b97]
+    +                           1588 _RINvMs3_NtNtNtCscPAMFfKuHap_5winit13platform_impl5macos10event_loopINtB6_9EventLoopuE3runNCINvMs4_NtBc_10event_loopINtB1y_9EventLoopuE7run_appNtNtCseYm4p2cbYQP_12pelt_desktop16workspace_viewer12WorkspaceAppE0EB2k_  (in product) + 28  [0x100d3a63c]
+    +                             1588 _RINvMs3_NtNtNtCscPAMFfKuHap_5winit13platform_impl5macos10event_loopINtB6_9EventLoopuE13run_on_demandNCINvMs4_NtBc_10event_loopINtB1J_9EventLoopuE7run_appNtNtCseYm4p2cbYQP_12pelt_desktop16workspace_viewer12WorkspaceAppE0EB2v_  (in product) + 261  [0x100d3a585]
+    +                               1588 _RINvMNtNtNtCscPAMFfKuHap_5winit13platform_impl5macos9app_stateNtB3_19ApplicationDelegate17set_event_handleruNCINvNtB5_10event_loop14map_user_eventuNCINvMs4_NtB9_10event_loopINtB2u_9EventLoopuE7run_appNtNtCseYm4p2cbYQP_12pelt_desktop16workspace_viewer12WorkspaceAppE0E0NCINvMs3_B1N_INtB1N_9EventLoopuE13run_on_demandB2l_E0EB3g_  (in product) + 140  [0x100e099ec]
+    +                                 1588 _RINvMs_NtNtNtCscPAMFfKuHap_5winit13platform_impl5macos13event_handlerNtB5_12EventHandler3setuNCINvNtB7_10event_loop14map_user_eventuNCINvMs4_NtBb_10event_loopINtB2f_9EventLoopuE7run_appNtNtCseYm4p2cbYQP_12pelt_desktop16workspace_viewer12WorkspaceAppE0E0NCINvMs3_B1y_INtB1y_9EventLoopuE13run_on_demandB26_E0EB31_  (in product) + 712  [0x100e9b938]
+    +                                   1588 _RNCINvMs3_NtNtNtCscPAMFfKuHap_5winit13platform_impl5macos10event_loopINtB8_9EventLoopuE13run_on_demandNCINvMs4_NtBe_10event_loopINtB1L_9EventLoopuE7run_appNtNtCseYm4p2cbYQP_12pelt_desktop16workspace_viewer12WorkspaceAppE0E0B2x_  (in product) + 40  [0x100d3a718]
+    +                                     1588 _RINvNtNtCscwPvlU5L0wH_5objc22rc11autorelease15autoreleasepooluNCNCINvMs3_NtNtNtCscPAMFfKuHap_5winit13platform_impl5macos10event_loopINtB19_9EventLoopuE13run_on_demandNCINvMs4_NtB1f_10event_loopINtB2N_9EventLoopuE7run_appNtNtCseYm4p2cbYQP_12pelt_desktop16workspace_viewer12WorkspaceAppE0E00EB3A_  (in product) + 169  [0x10100f269]
+    +                                       1588 _RNCNCINvMs3_NtNtNtCscPAMFfKuHap_5winit13platform_impl5macos10event_loopINtBa_9EventLoopuE13run_on_demandNCINvMs4_NtBg_10event_loopINtB1N_9EventLoopuE7run_appNtNtCseYm4p2cbYQP_12pelt_desktop16workspace_viewer12WorkspaceAppE0E00B2z_  (in product) + 152  [0x100d3ad88]
+    +                                         1588 _RNvMs1G_NtNtCsgwbpWBwdU5m_13objc2_app_kit9generated15___NSApplicationNtB6_13NSApplication3run  (in product) + 59  [0x1025c776b]
+    +                                           1588 _RINvYRNtNtNtCsgwbpWBwdU5m_13objc2_app_kit9generated15___NSApplication13NSApplicationNtNtNtCscwPvlU5L0wH_5objc215___macro_helpers8msg_send7MsgSend12send_messageuuEBa_  (in product) + 154  [0x1025c747a]
+    +                                             1588 _RINvYONtNtCscwPvlU5L0wH_5objc27runtime9AnyObjectNtNtB6_16message_receiver15MessageReceiver12send_messageuuECsmBSlJD5252_16objc2_foundation  (in product) + 144  [0x1025d4290]
+    +                                               1588 _RINvNtNtNtCscwPvlU5L0wH_5objc27runtime16message_receiver18msg_send_primitive4senduuECsmBSlJD5252_16objc2_foundation  (in product) + 48  [0x1025db1a0]
+    +                                                 1588 _RINvXsh_NtCscwPvlU5L0wH_5objc26encodeuNtB6_15EncodeArguments8___invokeuECsmBSlJD5252_16objc2_foundation  (in product) + 48  [0x1025d9b90]
+    +                                                   1588 -[NSApplication run]  (in AppKit) + 610  [0x7ff81a669ea9]
+    +                                                     1588 -[NSApplication(NSEventRouting) _nextEventMatchingEventMask:untilDate:inMode:dequeue:]  (in AppKit) + 1263  [0x7ff81b106c17]
+    +                                                       1588 _DPSNextEvent  (in AppKit) + 912  [0x7ff81a678dc1]
+    +                                                         1588 _BlockUntilNextEventMatchingListInModeWithFilter  (in HIToolbox) + 63  [0x7ff82289019a]
+    +                                                           1588 ReceiveNextEventCommon  (in HIToolbox) + 499  [0x7ff822706f97]
+    +                                                             1588 RunCurrentEventLoopInMode  (in HIToolbox) + 281  [0x7ff8227040d4]
+    +                                                               1588 CFRunLoopRunSpecific  (in CoreFoundation) + 536  [0x7ff816c12332]
+    +                                                                 1588 __CFRunLoopRun  (in CoreFoundation) + 1430  [0x7ff816c12eff]
+    +                                                                   1588 __CFRunLoopServiceMachPort  (in CoreFoundation) + 145  [0x7ff816c144b2]
+    +                                                                     1588 mach_msg  (in libsystem_kernel.dylib) + 19  [0x7ff816ae7e3b]
+    +                                                                       1588 mach_msg_overwrite  (in libsystem_kernel.dylib) + 574  [0x7ff816aeebc3]
+    +                                                                         1588 mach_msg2_internal  (in libsystem_kernel.dylib) + 83  [0x7ff816af66bc]
+    +                                                                           1588 mach_msg2_trap  (in libsystem_kernel.dylib) + 10  [0x7ff816ae7b4a]
+    1588 Thread_19142580
+    + 1588 start_wqthread  (in libsystem_pthread.dylib) + 15  [0x7ff816b25843]
+    +   1588 _pthread_wqthread  (in libsystem_pthread.dylib) + 387  [0x7ff816b268ba]
+    +     1588 __workq_kernreturn  (in libsystem_kernel.dylib) + 10  [0x7ff816ae9286]
+    1588 Thread_19142586: com.apple.NSEventThread
+      1588 thread_start  (in libsystem_pthread.dylib) + 15  [0x7ff816b25857]
+        1588 _pthread_start  (in libsystem_pthread.dylib) + 115  [0x7ff816b29e05]
+          1588 _NSEventThread  (in AppKit) + 127  [0x7ff81a7cd9ff]
+            1588 CFRunLoopRunSpecific  (in CoreFoundation) + 536  [0x7ff816c12332]
+              1588 __CFRunLoopRun  (in CoreFoundation) + 1430  [0x7ff816c12eff]
+                1588 __CFRunLoopServiceMachPort  (in CoreFoundation) + 145  [0x7ff816c144b2]
+                  1588 mach_msg  (in libsystem_kernel.dylib) + 19  [0x7ff816ae7e3b]
+                    1588 mach_msg_overwrite  (in libsystem_kernel.dylib) + 574  [0x7ff816aeebc3]
+                      1588 mach_msg2_internal  (in libsystem_kernel.dylib) + 83  [0x7ff816af66bc]
+                        1588 mach_msg2_trap  (in libsystem_kernel.dylib) + 10  [0x7ff816ae7b4a]
+
+Total number in stack (recursive counted multiple, when >=5):
+
+Sort by top of stack, same collapsed (when >= 5):
+        mach_msg2_trap  (in libsystem_kernel.dylib)        3176
+        __workq_kernreturn  (in libsystem_kernel.dylib)        1588
+
+
+[Excerpt: first 84 of 1034 lines. Complete sample retained at /Users/markik/Code/tabard-app-receipts/2026-10-09/pelt/fresh-02/startup.sample.txt.]
