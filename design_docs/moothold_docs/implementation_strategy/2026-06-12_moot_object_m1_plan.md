@@ -366,8 +366,9 @@ the successful fast-forward push.
 
 ### Independent capsule readings continuation (2026-10-09)
 
-**Status (2026-10-10):** source and CPU checks passed; final narrow scroll
-qualification is held during the concurrent GPU/WindowServer investigation.
+**Status (2026-10-10):** final narrow scroll and reading qualification waits
+for the coordinated browser GPU slot. Source/CPU results below are recorded
+separately from browser acceptance.
 The continuation starts from published `3055ae5af`. The
 [design language §9.2–9.3](../../2026-08-23_projection_scenes_and_graph_native_platform.md#92-selection-foreground-and-ambient-context)
 separates attention, activity, presentation and keeping, and distinguishes two
@@ -417,8 +418,8 @@ The additional narrow check exposed a shared browser input fault: DOM wheel
 deltas were negated a second time, so a downward gesture at the top could not
 advance the host's scroll offset. The correction keeps DOM signs and resolves
 pixel/line/page units; all eleven browser-host CPU tests pass. The corrected
-applet Wasm build and ordinary viewer Wasm check pass. No renderer, shader or
-dependency changes belong to this slice. The last recorded browser diagnostic
+applet Wasm build and ordinary viewer Wasm check pass. The wheel correction
+itself does not change renderer, shader or dependency code. The last recorded browser diagnostic
 launch was 00:12 Eastern on October 10; the corrected source has not been
 browser-qualified. The nineteen-check receipt remains earlier evidence, not
 acceptance of the corrected source. The twentieth check and publication remain
@@ -429,12 +430,26 @@ their original receipts.
 The integrated CPU rerun at `e446bb8ee` passes ten capsule tests and eleven
 browser-host tests, with the applet build and ordinary viewer check. The
 conversation slice qualifies independently and is published at `4e1811578`.
-The readings branch includes that main head and the guarded renderer from
+That preparation includes the main head and guarded renderer from
 `11236fd4f` (Vello `491c376c`). Its fresh applet Wasm build passes; candidate
-`targets/moot-capsule-readings-20261010-g` is prepared without serving or opening
+`targets/moot-capsule-readings-20261010-g` was prepared without serving or opening
 a page. Byte/source verification has its own held receipt; all twenty browser
 checks and five inspected captures remain required before readings publication.
 Earlier artifacts, including the pre-guard prepared `20261010-f`, are preserved.
+
+The published resident-image atlas repair at `3808c5a22` is integrated into the
+held branch. The standalone browser workspace's three renderer patches now
+match the root at Vello `10f01d6d`; the coherent Genet dependency source stays at
+`7422e906` as on Mere main. On these patches the ten capsule tests, eleven
+browser-host CPU tests, applet Wasm build, ordinary viewer Wasm check and port /
+default-web boundary check pass. Candidate
+`targets/moot-capsule-readings-20261010-h` derives a new browser host bundle with
+unchanged signed component and peer fixtures. Its source/bundle verification
+records no browser checks or captures. The canonical-domain lane owns the GPU
+slot; all twenty checks and five inspected captures still gate readings
+publication. The earlier `20261010-g` artifact remains unchanged. The updated
+document audits add no subjects relative to the fetched `3808c5a22` baseline;
+existing coverage/index/header/ledger findings are retained.
 
 ### Moot conversation and coop continuation (2026-10-10)
 
