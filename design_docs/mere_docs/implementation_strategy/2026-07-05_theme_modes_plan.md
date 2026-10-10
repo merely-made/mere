@@ -229,7 +229,7 @@ applicable rendered acceptance pass against its published dependency set.
   bundle hash, adapter, pixel ledger and PNGs are retained under
   `ports/graphshell/docs/receipts/tabard_renderer_20261010`. This qualification
   covers the new renderer separately from the October 9 pre-guard receipts.
-- Native acceptance is paused after Pelt fresh runs 07 and 08 triggered GPU
+- Native acceptance was paused after Pelt fresh runs 07 and 08 triggered GPU
   resets and WindowServer watchdog failures. The 01:46:41 October 10 kernel
   report identifies the fresh-08 Pelt process and its stalled Metal compute
   queue. Boot time remained October 2: this was a graphics-session reset, not
@@ -256,8 +256,9 @@ applicable rendered acceptance pass against its published dependency set.
   Twenty representative images were visually inspected. Evidence is retained
   under `tabard-app-receipts/2026-10-09/shared-renderer/offscreen-previews-03`.
   No new GPU reset report appeared during these diagnostics. The exact hung
-  kernel remains unidentified, and native window acceptance remains pending;
-  these offscreen results do not qualify application presentation or reopen.
+  kernel remains unidentified. Native window acceptance was still pending at
+  this isolation stage; the later application receipts below qualify actual
+  presentation and reopen separately from these offscreen results.
   Each standalone application root must patch the maintained renderer triple
   explicitly: Cargo does not inherit Mere's root patches into consuming roots.
   Inspect the application's native host dependency closure before its receipt;
@@ -276,11 +277,12 @@ applicable rendered acceptance pass against its published dependency set.
   stopped prematurely as a precaution and is explicitly marked partial.
   Native acceptance now proceeds one application at a time; simultaneous
   browser/native GPU runs remain held while the other integrations qualify.
-- Knot's fetched origin `802238cb` already has coherent Mere/Genet pins and
-  semantic-field adaptation. An isolated application worktree preserves its
+- Knot's initial fetched origin `802238cb` already had coherent Mere/Genet pins
+  and semantic-field adaptation. An isolated application worktree preserved its
   primary checkout. Its shared-editor adapter extends local desktop preferences,
   leaving persona sync, document contents and writing controls under their
-  current owners. Dependency publication and native qualification remain open.
+  current owners. Publication and native qualification were pending at that
+  discovery point; the October 10 accepted consumer receipt below closes them.
 - October 10 narrow native inspection found the workshop brand overlapping
   Undo/Redo/Save at 420 pixels. The shared workshop stylesheet now reserves
   the brand width and moves its action slot to a wrapping row below 480 pixels.
@@ -291,11 +293,61 @@ applicable rendered acceptance pass against its published dependency set.
   The windowless harness does not measure macOS traffic-light insets, so actual
   narrow window acceptance remains required. Initial full-image review also
   suggested missing title/control paint in Knot and Redshank. Independent PNG
-  byte checks and cropped views disprove the Redshank omissions: title regions
-  are identical across the affected frames, and parent controls are present.
-  The image tool supplied an incorrect generic binary MIME envelope for valid
-  PNGs. Normalize the envelope and inspect exact pixels before attributing a
-  rendering defect; remaining native receipts are undergoing that review.
+  byte checks and cropped views disprove the reported omissions: title and
+  control regions are identical across the affected frames, and the original
+  parent controls are present. The image tool supplied an incorrect generic
+  binary MIME envelope for valid PNGs. Normalize the envelope and inspect exact
+  pixels before attributing a rendering defect; the paint-loss reports are
+  retracted. The confirmed narrow header overlap was repaired and recaptured.
+
+- October 10 qualified consumer publication: Woodshed `32d335986` passes 444
+  CPU tests and four native lanes (242 presentations, 20 reviewed nonblank
+  captures); Knot `95849aea` passes 338 CPU tests with one existing ignored
+  diagnostic and six accepted native lanes (173 presentations, 21 reviewed
+  captures); Redshank atop Woodshed `4aa68bfb` passes 253 CPU tests with seven
+  existing hardware/fixture ignores and six accepted native lanes (191
+  presentations, 22 reviewed captures). Their acceptance ledgers distinguish
+  the earlier guarded-renderer wide runs from the final Mere `7019f07d` narrow
+  header and authored-definition runs. Fresh processes restore the exact saved
+  identity and mode; authored colors and custom modes remain separate from
+  seed derivation. Knot's document fixture stays byte-exact; Redshank's isolated
+  listener directories stay empty. Product ownership and preserved failed
+  receipts are recorded in each app's existing owning plan and checked-in
+  acceptance ledger. No new GPU reset appeared during these serialized lanes.
+
+- Signalman `937eba84` publishes the shared workshop in Retinue's existing
+  standalone desktop app. All 69 CPU tests and the production build pass;
+  four device-free native lanes record 247 presentations, 22 reviewed nonblank
+  captures and fresh-process restoration in wide/narrow profiles. Exact authored
+  roles remain CSS and preserve network-state semantics; appearance does not
+  exercise firmware installation, microphone inventory or device collection.
+  The checked-in app scenario ledger records the coherent Mere `7019f07d`,
+  Genet `7422e906` and guarded renderer `491c376c` family. A generated test
+  executable initially stalled before libtest with only a dyld startup frame;
+  preserved artifact hashes and ad hoc signing of the generated test binaries
+  qualify the successful CPU retry without attributing it to rendering.
+  Native runs use the ordinary production binary and LaunchServices. No new GPU
+  reset appeared; all owned processes exited before the next app handoff.
+
+- Turnstone's application adapter remains a candidate while its native preview
+  gate is open. The full serial candidate suite passes 777 tests with nine
+  existing ignores; the subsequent retained Settings and cooperative-wait
+  changes pass 28 focused checks. A process sample identifies the original
+  child presentation starvation in the legacy synchronous `wait-file` fixture.
+  The fixtures now use shared Taproot `wait`, and the existing busy report
+  covers both a requested and open workshop. Native seed 04 records 198 main
+  and 51 child presentations with nine nonblank captures, and the four modes,
+  saved definition, explicit Apply and narrow application pixels pass. The
+  workshop's application preview nevertheless has a flat-color interior at
+  both sizes. Native diagnostics 05–06 prove producer staging and retain
+  presented-frame PaintLists; those packets contain correctly placed external
+  images with valid clips and full opacity. Moving Turnstone chrome out of the
+  shared child host's low raster identity range repairs a concrete cache-key
+  collision, but native diagnostic 07 still has the empty preview and no
+  document-rendering diagnostic. Its intentional diagnostic assertion is a
+  failed receipt, not acceptance. Fresh-process and same-ID lanes remain held;
+  Turnstone publication awaits the preview repair. None of these serialized
+  attempts added a GPU restart report.
 
 ## Shared authoring and title-bar composition (2026-10-08)
 
