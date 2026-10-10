@@ -25,7 +25,8 @@ bundled-contexts = []
 # Off by default: base linked-data stays slim, only consumers that want SPARQL
 # pull the evaluator. Tests retain a materialized spareval dataset as the
 # parity oracle for the borrowed adapter.
-query = ["dep:spareval", "dep:spargebra"]
+# Preserve directional JSON-LD terms previously enabled through Oxigraph.
+query = ["dep:spareval", "dep:spargebra", "oxjsonld/rdf-12"]
 
 [dependencies]
 # The statement vocabulary (`LinkStatement`) produced by inker's pure
