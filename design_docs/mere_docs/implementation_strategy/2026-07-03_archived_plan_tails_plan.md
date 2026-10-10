@@ -1,7 +1,7 @@
 # Archived-plan tails — deferred items spun out of the archive passes
 
-**Date**: 2026-07-03, extended 2026-08-06, 2026-09-02 and 2026-10-07.
-**Status (2026-10-07)**: backlog holder. Each item below was explicitly deferred by a plan that
+**Date**: 2026-07-03, extended 2026-08-06, 2026-09-02, 2026-10-07 and 2026-10-09.
+**Status (2026-10-09)**: backlog holder. Each item below was explicitly deferred by a plan that
 is otherwise complete and now lives under
 [`archive_docs/`](../../archive_docs/), in the checkpoint folder named by the
 section it sits under. None of these gate anything today; pick up when the
@@ -33,6 +33,25 @@ independent tails here. They do not gate P2–P5 completion.
   remove the independent test-only old Store path and its query dependency,
   with a narrow reviewed lock change if needed. It must preserve the active
   materialized parity control; it does not replace the backend or query model.
+
+**Reviewed and locally completed 2026-10-09:** the
+[follow-on lane](2026-10-09_graph_semantics_followons_plan.md) reviews both tails.
+ExampleOf remains MereOnly: its generic meaning exceeds Schema.org's
+creative-work instance relation. Summarizes retains the current approximate
+`cito:cites` alignment; changing to `cito:describes` remains a separate explicit
+vocabulary ruling because the exported alignment quad would change.
+
+The old Store path, timing-only test and optional Oxigraph dependency are removed
+at locally qualified source `297682178`. The active borrowed/materialized
+spareval parity battery remains. Explicit features preserve SEP-0002, SEP-0006,
+calendar support and directional JSON-LD behavior previously inherited through
+Oxigraph. Six meaningful feature controls have observed negatives; the full
+linked suite passes 91 tests and Mere passes 54, with feature-free/workspace and
+both query wasm checks green. Fresh review's one Important direction-matching
+regression is repaired and requalified. Only three unreachable packages and
+unused canonicalization feature edges leave the lock; surviving package versions
+and checksums are unchanged. Publication is pending user approval. Historical
+receipts above remain historical; these counts describe the new source gates.
 
 Term dictionaries/interned slotmaps remain separately gated in the existing
 petgraph-RDF record. New CONSTRUCT/DESCRIBE capability is also outside the

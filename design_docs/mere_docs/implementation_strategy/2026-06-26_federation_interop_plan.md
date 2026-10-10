@@ -36,7 +36,7 @@ bidirectionality lets a write flow back.
 vocabulary (`SchemaRef`, pointing at a schema codicil) lives in
 `crates/eidetic/eidetic-core/src/schema.rs`, but no schema registry type exists,
 and "alembic" now names Distillery's recall component
-(`ports/distillery/alembic/README.md`). The lens registry's neighbour is
+(`crates/distillery/alembic/README.md`). The lens registry's neighbour is
 therefore eidetic-core's schema vocabulary, not an alembic registry.
 
 **Decisions to settle.**
