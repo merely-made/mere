@@ -305,6 +305,15 @@ impl EdgePayload {
         true
     }
 
+    pub(crate) fn upsert_persisted_semantic_statement(
+        &mut self,
+        statement: SemanticStatement,
+    ) -> bool {
+        self.semantic
+            .get_or_insert_with(SemanticData::default)
+            .upsert_persisted_statement(statement)
+    }
+
     pub(crate) fn push_persisted_semantic_statement(
         &mut self,
         statement: SemanticStatement,

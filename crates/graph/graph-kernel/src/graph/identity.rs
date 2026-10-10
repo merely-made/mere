@@ -28,11 +28,42 @@ use rkyv::{
 };
 use uuid::Uuid;
 
-/// Stable node handle (petgraph NodeIndex — survives other deletions).
-pub type NodeKey = NodeIndex;
+/// Stable surface handle (petgraph NodeIndex — survives other deletions).
+pub type SurfaceNodeKey = NodeIndex;
 
-/// Stable edge handle (petgraph EdgeIndex).
+/// Compatibility name for a stable surface handle.
+pub type NodeKey = SurfaceNodeKey;
+
+/// Stable surface edge handle (petgraph EdgeIndex).
 pub type EdgeKey = EdgeIndex;
+
+/// A resource edge handle. Its raw index never crosses into surface APIs.
+///
+/// ```compile_fail
+/// use kernel::graph::{Graph, ResourceEdgeKey};
+/// fn surface_read(graph: &Graph, resource: ResourceEdgeKey) {
+///     graph.get_edge(resource);
+/// }
+/// ```
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct ResourceEdgeKey(EdgeIndex);
+
+impl ResourceEdgeKey {
+    pub(crate) fn from_raw(key: EdgeIndex) -> Self {
+        Self(key)
+    }
+
+    pub(crate) fn raw(self) -> EdgeIndex {
+        self.0
+    }
+}
+
+/// An edge handle together with its owning graph stratum.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum RelationKey {
+    Surface(EdgeKey),
+    Resource(ResourceEdgeKey),
+}
 
 /// Graph backend direction type exposed for adapter integration.
 pub type GraphDirection = Directed;

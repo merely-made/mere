@@ -4,7 +4,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! The kernel's physical node wrapper around chartulary's neutral Container.
+//! A browsing surface around chartulary's neutral Container.
 //!
 //! Extracted from `graph/mod.rs` per the 2026-04-30 renderer plan §6.4
 //! decomposition target. The history-projection types (`NodeNavigationMemory`,
@@ -26,13 +26,13 @@ use uuid::Uuid;
 use crate::address::{Address, address_from_url};
 use crate::types::{ImageRef, ImageRole};
 
-/// A neutral Container in the kernel graph.
+/// A browsing surface in the kernel's surface stratum.
 ///
 /// The only physical residue outside Container is the D0 image-reference map.
 /// Those small, content-addressed experience handles stay here so paint can
 /// resolve them without consulting a metadata facet; pixels remain out of line.
 #[derive(Debug, Clone)]
-pub struct Node {
+pub struct SurfaceNode {
     /// The one node substrate. Identity, primary-first addresses, authored
     /// content, media type, title, tags, and nested-graph bearing live here.
     ///
@@ -56,7 +56,10 @@ pub struct Node {
     pub images: BTreeMap<ImageRole, ImageRef>,
 }
 
-impl Deref for Node {
+/// Compatibility name for a browsing surface.
+pub type Node = SurfaceNode;
+
+impl Deref for SurfaceNode {
     type Target = chartulary::Container<Uuid, Address>;
 
     fn deref(&self) -> &Self::Target {
@@ -64,13 +67,13 @@ impl Deref for Node {
     }
 }
 
-impl DerefMut for Node {
+impl DerefMut for SurfaceNode {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.container
     }
 }
 
-impl Node {
+impl SurfaceNode {
     /// The image reference held for `role`, if any.
     pub fn image(&self, role: ImageRole) -> Option<&ImageRef> {
         self.images.get(&role)

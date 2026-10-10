@@ -44,7 +44,12 @@ fn cell_scene(adapter: &str, extent: f32, generation: u64) -> Scene {
         boundary: None,
         label: None,
     });
-    scene.bounds = Rect::new(Vec2::ZERO, Size2::new(extent + 10.0, extent + 10.0));
+    // Items are centred on their positions, so the bounds start half a
+    // footprint before the first.
+    scene.bounds = Rect::new(
+        Vec2::new(-5.0, -5.0),
+        Size2::new(extent + 10.0, extent + 10.0),
+    );
     scene.generation = generation;
     scene
 }
@@ -274,4 +279,65 @@ fn a_missing_or_stray_scene_is_refused() {
         ),
         Err(FacetError::UnknownCell("ghost".into()))
     );
+}
+
+#[test]
+fn every_item_a_cell_holds_lies_inside_its_frame() {
+    let composed = compose_facet(
+        &facet(AxisScale::Shared, Some(AxisScale::Independent)),
+        &scenes(&[
+            ("grid", 90.0),
+            ("spiral", 190.0),
+            ("grid-b", 390.0),
+            ("spiral-b", 90.0),
+        ]),
+        &FacetLayout::default(),
+    )
+    .expect("composes");
+    let world_rect = |item: &ProjectedItem| {
+        let world = composed.to_world(item.space).unwrap().then(&item.transform);
+        let local = item.footprint.bounds().unwrap();
+        Rect::new(
+            Vec2::new(
+                world.translate.x + local.origin.x * world.scale,
+                world.translate.y + local.origin.y * world.scale,
+            ),
+            Size2::new(local.size.w * world.scale, local.size.h * world.scale),
+        )
+    };
+    let inside = |inner: Rect, outer: Rect| {
+        inner.origin.x >= outer.origin.x - 0.01
+            && inner.origin.y >= outer.origin.y - 0.01
+            && inner.origin.x + inner.size.w <= outer.origin.x + outer.size.w + 0.01
+            && inner.origin.y + inner.size.h <= outer.origin.y + outer.size.h + 0.01
+    };
+    for frame in composed.items.iter().filter(|item| {
+        item.representation
+            == Representation::Open {
+                kind: "facet.cell".into(),
+            }
+    }) {
+        let cell = &composed.sources[frame.source.0 as usize].id;
+        let frame_rect = world_rect(frame);
+        let held: Vec<_> = composed
+            .items
+            .iter()
+            .filter(|item| &composed.sources[item.source.0 as usize].adapter == cell)
+            .collect();
+        assert_eq!(held.len(), 2, "{cell} holds its two items");
+        for item in held {
+            assert!(
+                inside(world_rect(item), frame_rect),
+                "{cell}'s item escapes its frame"
+            );
+        }
+    }
+    // Headings sit above the cells, inside the scene's bounds.
+    for heading in composed
+        .items
+        .iter()
+        .filter(|item| composed.sources[item.source.0 as usize].adapter == FACET_AXIS_ADAPTER)
+    {
+        assert!(inside(world_rect(heading), composed.bounds));
+    }
 }

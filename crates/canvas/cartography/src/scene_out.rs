@@ -46,7 +46,21 @@ pub const HEAT_CHANNEL: &str = "heat";
 /// Channel name carrying `Overlay::BridgeEmphasis` weight.
 pub const BRIDGE_CHANNEL: &str = "bridge";
 
-/// Lower `projection` into a [`sceno::Scene`].
+/// Graph-specific context stays beside the portable scene.
+#[derive(Clone, Debug, PartialEq)]
+pub struct CoveredScene {
+    pub scene: Scene,
+    pub coverage: kernel::graph::CoverageNote,
+}
+
+impl std::ops::Deref for CoveredScene {
+    type Target = Scene;
+    fn deref(&self) -> &Scene {
+        &self.scene
+    }
+}
+
+/// Lower `projection` into a covered portable scene.
 ///
 /// - `id_of` supplies each node's stable source id (the node Uuid string;
 ///   never the session-local `NodeKey`).
@@ -60,7 +74,7 @@ pub fn scene_from_projection(
     projection: &Projection,
     id_of: impl Fn(NodeKey) -> String,
     extent_of: impl Fn(NodeKey) -> Option<(f32, f32)>,
-) -> Scene {
+) -> CoveredScene {
     let mut scene = Scene::new();
     let mut instance_of: HashMap<NodeKey, sceno::InstanceId> = HashMap::new();
 
@@ -170,7 +184,10 @@ pub fn scene_from_projection(
             projection.content_bounds.size.height,
         ),
     );
-    scene
+    CoveredScene {
+        scene,
+        coverage: projection.metadata.coverage.clone(),
+    }
 }
 
 #[cfg(test)]

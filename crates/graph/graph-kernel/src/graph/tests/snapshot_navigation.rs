@@ -23,6 +23,9 @@ fn snapshot_with(
         fields: vec![],
         couplings: vec![],
         navigation: nav,
+        resources: vec![],
+        resource_edges: vec![],
+        shown_resources: vec![],
     }
 }
 

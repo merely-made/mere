@@ -1,0 +1,224 @@
+// Copyright 2026 Mark Alan Boykin
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// SPDX-License-Identifier: MPL-2.0
+
+//! Known limits of the supplied graph, not a claim of world completeness.
+
+use super::{Graph, ResourceNode};
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum CoverageLayer {
+    Possession,
+    Residency,
+    Disclosure,
+    Synchronization,
+    Projection,
+}
+
+impl CoverageLayer {
+    pub const ALL: [Self; 5] = [
+        Self::Possession,
+        Self::Residency,
+        Self::Disclosure,
+        Self::Synchronization,
+        Self::Projection,
+    ];
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CoverageLimit {
+    pub layer: CoverageLayer,
+    pub reason: String,
+    /// Empty scope means the entire supplied graph. Hosts own these observations.
+    #[serde(default)]
+    pub resources: Vec<Uuid>,
+    /// Surface scope; empty scopes together mean the supplied graph.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub surfaces: Vec<Uuid>,
+    /// None means the number beyond this boundary is unknown.
+    #[serde(default)]
+    pub count: Option<usize>,
+}
+
+impl CoverageLimit {
+    pub fn new(layer: CoverageLayer, reason: impl Into<String>) -> Self {
+        Self {
+            layer,
+            reason: reason.into(),
+            resources: vec![],
+            surfaces: vec![],
+            count: None,
+        }
+    }
+}
+
+/// An empty note means no known limit within this supplied graph.
+/// It never means all relevant data exists here or anywhere else.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CoverageNote {
+    pub limits: Vec<CoverageLimit>,
+}
+
+impl CoverageNote {
+    pub fn push(&mut self, limit: CoverageLimit) {
+        if !self.limits.contains(&limit) {
+            self.limits.push(limit);
+        }
+    }
+    pub fn add_count(&mut self, layer: CoverageLayer, reason: impl Into<String>, count: usize) {
+        if count == 0 {
+            return;
+        }
+        let mut limit = CoverageLimit::new(layer, reason);
+        limit.count = Some(count);
+        self.push(limit);
+    }
+}
+
+impl Graph {
+    pub fn known_coverage(&self) -> &CoverageNote {
+        &self.known_coverage
+    }
+
+    /// Runtime host context, never graph truth, a journal edit or a geometry key.
+    pub fn set_known_coverage(&mut self, note: CoverageNote) {
+        if self.known_coverage != note {
+            self.known_coverage = note;
+            self.semantic_observation_revision += 1;
+        }
+    }
+
+    pub fn coverage_note(&self) -> CoverageNote {
+        let mut note = self.known_coverage.clone();
+        let mut unavailable = 0;
+        let mut unasserted = 0;
+        for link in self.pending_links() {
+            let missing: Vec<_> = [
+                link.source_resource,
+                ResourceNode::new(&link.target_iri).id(),
+            ]
+            .into_iter()
+            .filter(|id| self.resource(*id).is_none())
+            .collect();
+            if missing.is_empty() {
+                unasserted += 1;
+                continue;
+            }
+            if missing.iter().any(|id| {
+                !self.known_coverage.limits.iter().any(|limit| {
+                    limit.layer == CoverageLayer::Residency
+                        && ((limit.resources.is_empty() && limit.surfaces.is_empty())
+                            || limit.resources.contains(id))
+                })
+            }) {
+                unavailable += 1;
+            }
+        }
+        // Aggregate counts carry no private target IRIs or derived target ids.
+        note.add_count(
+            CoverageLayer::Possession,
+            "pending source claims have unavailable endpoints",
+            unavailable,
+        );
+        note.add_count(
+            CoverageLayer::Possession,
+            "pending source claims await assertion placement",
+            unasserted,
+        );
+        note
+    }
+
+    /// Coverage for explicit portable references, without inventing absent records.
+    pub fn coverage_for_resource_refs(&self, references: &[Uuid]) -> CoverageNote {
+        let mut note = self.coverage_note();
+        let missing: std::collections::BTreeSet<_> = references
+            .iter()
+            .copied()
+            .filter(|id| self.resource(*id).is_none())
+            .filter(|id| {
+                !self.known_coverage.limits.iter().any(|limit| {
+                    limit.layer == CoverageLayer::Residency
+                        && ((limit.resources.is_empty() && limit.surfaces.is_empty())
+                            || limit.resources.contains(id))
+                })
+            })
+            .collect();
+        if !missing.is_empty() {
+            let mut limit = CoverageLimit::new(
+                CoverageLayer::Possession,
+                "referenced resources are unavailable",
+            );
+            limit.count = Some(missing.len());
+            limit.resources = missing.into_iter().collect();
+            note.push(limit);
+        }
+        note
+    }
+
+    pub fn copy_semantic_context_from(&mut self, graph: &Self) {
+        self.restore_pending_link_state(graph.pending_link_state.clone());
+        self.set_known_coverage(graph.known_coverage.clone());
+    }
+
+    /// History starts from truth only, never an ambient extraction input.
+    pub fn clear_semantic_context(&mut self) {
+        self.restore_pending_link_state(Default::default());
+        self.set_known_coverage(Default::default());
+    }
+}
+
+#[cfg(test)]
+mod residency_scope_tests {
+    use super::*;
+    #[test]
+    fn surface_scope_does_not_hide_absent_resources() {
+        let mut graph = Graph::new();
+        let mut limit = CoverageLimit::new(CoverageLayer::Residency, "surface unloaded");
+        limit.surfaces.push(Uuid::from_u128(1));
+        graph.set_known_coverage(CoverageNote {
+            limits: vec![limit.clone()],
+        });
+        let unknown = Uuid::from_u128(2);
+        assert!(
+            graph
+                .coverage_for_resource_refs(&[unknown])
+                .limits
+                .iter()
+                .any(|l| l.layer == CoverageLayer::Possession)
+        );
+        limit.resources.push(unknown);
+        graph.set_known_coverage(CoverageNote {
+            limits: vec![limit.clone()],
+        });
+        assert!(
+            !graph
+                .coverage_for_resource_refs(&[unknown])
+                .limits
+                .iter()
+                .any(|l| l.layer == CoverageLayer::Possession)
+        );
+        limit.surfaces.clear();
+        limit.resources.clear();
+        assert!(
+            serde_json::to_value(&limit)
+                .unwrap()
+                .get("surfaces")
+                .is_none()
+        );
+        graph.set_known_coverage(CoverageNote {
+            limits: vec![limit],
+        });
+        assert!(
+            !graph
+                .coverage_for_resource_refs(&[unknown])
+                .limits
+                .iter()
+                .any(|l| l.layer == CoverageLayer::Possession)
+        );
+    }
+}

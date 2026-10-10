@@ -27,6 +27,12 @@
 //!
 //! Ruled 2026-10-01: this becomes the facade that repos outside mere pin,
 //! re-exporting personae, insigne and gaz behind features, so one dependency
-//! at one revision carries the tier. No implementation yet.
+//! at one revision carries the tier. The dramatis repo plan's DR-A moves the
+//! identity surface's plain types here first (ruling D24): [`intents`],
+//! [`view`] and [`receipts`] so far.
 
 #![doc(html_no_source)]
+
+pub mod intents;
+pub mod receipts;
+pub mod view;

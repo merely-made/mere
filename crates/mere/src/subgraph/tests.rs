@@ -465,3 +465,29 @@ fn a_deserialized_index_reconciles_on_its_first_call() {
     assert!(!loaded.reconcile_all(&graph));
     assert_eq!(loaded.derive_calls.get(), walks + 1, "gated from then on");
 }
+
+#[cfg(not(feature = "query"))]
+#[test]
+fn graph_only_saved_query_refusal_is_observable_and_not_cached_as_empty_success() {
+    let graph = Graph::new();
+    let spec = SubgraphSpec {
+        kind: SubgraphKind::Sparql {
+            query: "SELECT ?member WHERE { ?member ?p ?o }".into(),
+            member_variable: "member".into(),
+        },
+        anchors: vec![],
+        primary_anchor: None,
+        selectors: vec![],
+    };
+    let mut index = SessionSubgraphs::new();
+    assert!(index.try_record_linked(&graph, spec.clone()).is_err());
+    assert!(index.subgraphs().is_empty());
+    let id = index.record_linked(&graph, spec);
+    assert!(
+        index
+            .derivation_error(id)
+            .unwrap()
+            .contains("query capability")
+    );
+    assert_eq!(index.reconciled_revision(id), None);
+}

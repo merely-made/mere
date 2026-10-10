@@ -9,14 +9,171 @@ plan's P3 host half.
 native reader adapters and stock-client visual acceptance remain open below. The July
 receipts describe their original host; they do not establish current Knot or
 Turnstone settings, foreign exports or persistence.
+
+**2026-10-09 design direction:** the [cross-app design language record](../../2026-08-23_projection_scenes_and_graph_native_platform.md#9-configurable-visual-and-interaction-language-2026-10-09)
+records configurable themes with varied defaults, Emblem/Pictograph iconography,
+and user-selected installed fonts with openly licensed bundled defaults. It
+does not establish implementation or consumer adoption of those preferences.
+
 **Related**: `repos/genet/docs/2026-07-05_w3c_mechanism_adoption_plan.md` (P3 engine half landed:
 `IncrementalLayout::set_prefers_color_scheme`), `repos/tincture` *(historical citation)* <!-- doc-audit: historical-path --> (tinct seed-to-palette
 derivation), `crates/meerkat/src/theme_sheets.rs` *(historical citation)* <!-- doc-audit: historical-path --> + `theme_edit.rs` (current sheet baking +
 switch path).
 
+## Application adoption (2026-10-09)
+
+**Status:** in progress. Mark selected this order: Pelt, Graphshell, Knot,
+Turnstone, Woodshed, Redshank, Signalman. Isocosm is excluded while its own
+migration proceeds. Each application slice is qualified before moving to the
+next; discovery may run independently. Existing Woodshed adoption receives a
+reconciliation pass rather than a second editor implementation.
+
+### Shared foundation and current origin
+
+Reconcile the published Tabard library/workshop, Cambium title bar and native
+scene adapter with current Mere origin before consumer edits. Preserve newer
+fetch, retained session, graph and domain changes. Keep primary checkouts'
+unpublished commits intact, and fetch again before integration/push. Done when
+the current resolved graph keeps one shared source identity, scoped foundation
+checks pass and the port boundary remains one way. Historical native receipts
+describe their original binaries; they do not qualify the new integration.
+
+### Pelt durable application appearance
+
+Add a reachable application appearance workflow using the shared workshop,
+library and title-bar slots. Store application selection separately from
+authored definitions, use normal host text/file/close seams, and preserve
+controller/session and loaded-document authority. Custom authored stylesheets
+remain authored stylesheets rather than being silently reduced to tokens.
+Done when saved selection and mode survive a fresh process, editor preview
+does not apply implicitly, invalid/corrupt saves remain recoverable, and native
+wide/narrow rendering and same-window resize have actual nonblank captures.
+
+### Remaining consumers in order
+
+Graphshell qualifies its actual application presentation rather than mistaking
+the native-messaging relay for a window. Its embedded projections inherit the
+composing host's roles. Knot keeps writing/measure/font preferences and document
+authority; Turnstone keeps settings, surface routing and reader precedence.
+Woodshed preserves its accepted legacy themes and persona-owned selection.
+Redshank and Signalman retain their product/domain contracts. Every host uses
+shared authoring and theme resolution; no consumer grows another palette
+engine, draft model, file format, renderer or caption-command queue. Done for
+each when its reachable controls, durable selection, failure handling and
+applicable rendered acceptance pass against its published dependency set.
+
+### Findings and progress — 2026-10-09
+
+- Mere's primary main has unpublished local commits and is behind the fetched
+  origin. It was preserved. A separate worktree starts at origin
+  `6708bfcd0`; the seven published Tabard commits were replayed cleanly there,
+  retaining the intervening upstream changes and excluding unrelated local
+  ambient-design history.
+- The moved Tabard/workshop manifests require two lockfile references to adopt
+  current Genet `15713014` rather than the older `965b64e2` used in historical
+  acceptance. Full metadata resolves successfully with the current Genet source;
+  the port and Graphshell web boundary checker passes.
+- The shared theme resolver keeps the requested choice intact, reports missing
+  theme/mode fallback, and distinguishes exact authored CSS from a derived
+  palette. The workshop exposes validated definition intake and a saved-choice
+  accessor that rejects unsaved or staged edits. Nine focused contract tests
+  cover these embedding seams.
+- The native host exposes an additive tool-window entry over a caller-owned
+  event loop and existing render core. Its normal input, accessibility and
+  close-policy pipeline remains the owner of the tool window's behavior.
+- Current Cambium fields render semantic containers, so the workshop's old
+  tag-based input/textarea CSS collapsed an empty stylesheet editor to zero
+  height. Shared field classes restore its geometry. All 299 scoped Tabard,
+  workshop, desktop and native-host tests pass against the fetched origin,
+  including all six desktop usability tests. Two host documentation examples
+  remain intentionally ignored. Pelt application/native qualification follows.
+
+## Shared authoring and title-bar composition (2026-10-08)
+
+**Decision:** expose the existing workshop as `crates/cambium/tabard-workshop`
+and add reusable composition to existing Cambium/native-host crates. The
+standalone desktop port remains the reference consumer. Turnstone, Woodshed,
+Knot editor and Cleromancy are adoption candidates; this change does not claim
+that their independent dependency pins or application settings are migrated.
+
+**Context:** theme derivation and syntax/document/graph previews already use
+Tinct, Illume and the existing document and graph components. The workshop
+lived under a product port, and native title-bar views were assembled locally
+by consumers even though the host already owned window behavior.
+
+**Ownership:** Tabard keeps definitions, modes, libraries and interchange;
+`tabard-workshop` keeps authoring state and its portable surface. Cambium owns
+`title_bar`, its ornament/title/action/caption slots and inset-aware stylesheet.
+The native host owns accessible caption adapters and `SceneProducer<T>` on its
+existing render device. Hosts choose application appearance, reader precedence,
+frame policy and native commands. Product identity is slot content and CSS,
+not another palette or window-control engine.
+
+**Alternatives:** copying the workshop or caption event handlers into each app
+would multiply the authoring and platform behavior. A new desktop-chrome crate
+would add a package for composition that fits existing ownership. Moving native
+commands into portable workshop state would couple embedded editors to a
+window. Callback adapters and view slots keep these seams additive.
+
+**Consequences:** consumers can share the complete authoring model and choose
+ornament content without replacing their command model. App-frame hosts mount
+`TITLE_BAR_CSS`, provide native captions (macOS retains traffic lights), and
+match the configured Maximize label to the Windows Snap label. Preview hosts
+register retained scenes with distinct raster keys and current semantic
+callbacks. Close still passes through each product's unsaved-work policy.
+
+**Adoption work:** integrate one consumer at a time, starting with an existing
+Cambium desktop host; preserve each app's settings, reader precedence and
+identity. Turnstone's browser-specific adapter and custom calculator editor
+remain separate follow-ups. Native Windows/Linux behavior needs platform
+acceptance beyond the windowless caption tests. The shared-kit slice passes
+285 windowless tests and the native authoring/narrow-layout scenario (five
+nonblank captures). Fresh-process state assertions pass but native acquisition
+can remain `Occluded`; a fresh empty-library control reproduces it. Preserve
+this presentation boundary in the desktop receipts.
+
+**Presentation lifecycle follow-up (2026-10-08):** Rootstock now exposes the
+current redraw's existing `PresentedFrame` identity and clears it on an
+unsuccessful attempt. Mesquite advances native scenario steps, settling,
+frame limits and capture grace only after a new presentation; asynchronous
+readbacks still receive every hook turn. A separate ten-second continuous
+presentation deadline fails with presentation/redraw counts and cancels only
+that lane's capture callbacks. Explicit windowless harness turns keep their
+test clock. Validation passes 69 Rootstock tests, 24 Mesquite tests, 18 native
+host library tests and four windowless capture/pairing regressions.
+
+Fresh and saved-library native retries produce zero presentations and zero
+captures, with 218 and 201 lane redraw turns respectively before the elapsed
+deadline; an additional native-state diagnostic produces 129 turns. The owned
+macOS window has valid geometry, is visible, can become key and is on the active
+Space, but the application remains inactive and its native occlusion state
+lacks the Visible bit that Metal checks before acquiring a drawable. A one-time
+`focus_window` experiment did not change that result and was removed. The host
+retains an owed redraw after initial reveal and opt-in native diagnostics.
+Fresh-process presentation remains open at the activation/compositor boundary;
+these failed receipts do not replace the earlier five successful captures.
+[Concise native evidence and structured receipt projections](../../../ports/tabard/desktop/receipts/2026-10-08_stack/presentation_wait/README.md)
+preserve the exact results without attributing the failure to authored state.
+
+**macOS visual acceptance follow-up (2026-10-08):** the production binary from
+`7d2a5f3cfe97174058368073d2bae809fffbf902` succeeds when launched as a normal
+application through LaunchServices. No renderer, host or occlusion override was
+needed. The reusable `scripts/run_macos_scenario.py` launches an isolated
+temporary bundle and checks Mesquite's receipt in addition to the launcher's
+exit. Three standalone lanes pass with 192 presentations and 15 nonblank
+captures: four modes, shared reader/syntax/graph, keyboard seed edit/undo,
+authored CSS, resizing and fresh-process reopen. All images were inspected.
+[Complete acceptance artifacts](../../../ports/tabard/desktop/receipts/2026-10-08_stack/launchservices/README.md)
+supersede the open macOS presentation claim for this launch path, while keeping
+the failed background-child receipts. Woodshed has separately qualified its
+embedded workshop with four seed/reopen lanes, 132 presentations and 14
+nonblank images on its `2fa89ca61d75a9a03bf5e301eb658e696d74e44f` source.
+Other consumers, Windows/Linux headed behavior, native OS decorations and live
+screen-reader acceptance still require their own evidence.
+
 ## Tabard small-web adapters (2026-09-13 scope)
 
-**Current code:** `ports/tabard/src/lib.rs::Theme` derives a Tinct palette and
+**Current code:** `Theme` in `crates/system/tabard/src/lib.rs` derives a Tinct palette and
 emits DTCG color JSON, deterministic CSS custom properties, and
 `lagrange_palette_txt()` with typed mapping diagnostics. It is a library. The recorded Pelt chrome/Reader preview
 receipts prove consumer mappings, not installed user settings. In Mere,
@@ -38,7 +195,7 @@ reader overrides their appearance. Gemtext needs no styling extension.
 1. **Native reader adapter.** Map existing Tabard roles into the shared reader
    palette/style sheet, with Knot and Turnstone owning selection, persistence
    and precedence over site-derived defaults. Knot's current
-   `apps/desktop/src/appearance.rs` derives its own Tinct palette; its consumer
+   `knot-editor/apps/desktop/src/appearance.rs` derives its own Tinct palette; its consumer
    can reuse Tabard while keeping editor appearance separate from published CSS.
    Done when one theme is selected, previewed and restored in both apps, while
    document bytes, history, selection and viewport remain held; ordinary,
@@ -79,10 +236,217 @@ consumer evidence before entering implementation. The shared Micron presentation
 scope lives in the
 [fidelity plan](../../nematic_docs/implementation_strategy/2026-07-01_smolweb_fidelity_plan.md#micron-completion-scope-2026-09-13).
 
-**Open, raised by the S14 pass (2026-10-06):** the "tabard fill" commits of
-2026-09-24 (T2a to T4, among them `7f133433` and `d16f055f`) have no plan in
-Mere's design_docs. Which plan owns the Tabard scope? Options: this plan
-absorbs it; a separate Tabard plan owns it.
+**Ownership clarified 2026-10-07:** the September T1–T5 theme consolidation
+is owned by [crate consolidation, C2a](2026-09-23_crate_consolidation_plan.md#c2a-filling-tabard).
+That plan also records Tabard's move to `crates/system/tabard` to restore its
+shared-library dependency direction. This plan owns theme modes and the
+remaining consumer adapter and exporter acceptance work above.
+
+## Appearance workshop (2026-10-07)
+
+**Status (2026-10-08):** W1–W2 implemented; W3 authored-library persistence, portable
+interchange, isolated stylesheet authoring and canonical-mode export parity implemented.
+Custom-calculator authoring and Turnstone mounting remain open. Mark asked to start Tabard's larger authoring role,
+with the browser's SC step 2 proceeding independently. The suite census owns
+its product charter: an appearance workshop with authored themes and live
+preview, shared by a standalone host and Turnstone.
+
+- **W1 — Draft authoring model.** An isolated draft supports typed edits,
+  undo/redo, discard, canonical-mode previews, and explicit commit to the theme
+  registry. Built-ins require a fork; a commit refuses a destination collision
+  or a concurrently changed/deleted source. Previewing does not activate a
+  theme or rewrite reader content. Done when tests prove those boundaries.
+- **W2 — Visible authoring surface.** Compose W1 into the reusable Cambium
+  surface with seed controls, mode selection and representative chrome,
+  reader, syntax and graph specimens. Mark authorized proceeding with a native
+  standalone host and the reusable surface. Done when real-control retained
+  tests and headed native captures show edits, modes, history and save/reopen.
+- **W3 — Artifact fidelity and persistence.** Keep authored definitions
+  distinct from exports and host appearance preferences; carry explicit modes,
+  harmony and unsupported-role diagnostics through preview/export adapters.
+  Done for the library when versioned authored definitions survive save/reload
+  and stale/busy/failed writes cannot advance the editing save point. Current
+  Legacy CSS/DTCG methods retain their documented normal-contrast profile. The
+  workshop uses explicit-mode artifact APIs sharing its exact harmony, base
+  palette and syntax derivation; selected stylesheet overrides/custom modes
+  refuse a derived color export and can be preserved as authored theme JSON.
+
+**Findings (2026-10-07):** `ThemeRegistry` already supports CRUD, but editing
+through it writes immediately. `derive_from_def_for_mode` supplies canonical
+previews; custom modes need a calculator or authored sheet and must not be
+presented as a successful canonical fallback by the authoring model.
+
+**Progress (2026-10-07):** W1 is implemented in
+`crates/system/tabard/src/workshop.rs`. All 49 Tabard tests pass (34 unit,
+10 artifact integration, 5 workshop integration). The new tests cover
+non-mutating preview, built-in protection, concurrent-edit/deletion/collision
+refusal, undo/redo branching, discard, and stylesheet/custom-mode handling.
+
+The workshop package is `crates/cambium/tabard-workshop` (`tabard-workshop`),
+with its thin desktop host in `ports/tabard/desktop`. The package moved out of
+the product port on 2026-10-08 so sibling applications can embed the same
+surface and authoring workflow. One retained state/view provides seed HSL controls, accent harmonies,
+four canonical preview modes and chrome/reader/syntax/graph specimens. A
+secondary or tertiary hue under locked harmony is explained rather than
+offered as an ineffective control. Native name edits synchronize before
+navigation and save guards. Previewing never changes the registry's active
+appearance; built-ins are forked into user definitions.
+
+`tabard::library::ThemeLibraryStore` persists version 1 authored definitions,
+including mode sheets, separately from host appearance preferences. Save
+validates and persists a candidate before replacing the live draft/registry;
+failure retains edits and history. The store rejects corrupt/future files,
+invalid definitions, external changes and cooperating busy writers. Read does
+not create a missing library. External editors must honor the lock to exclude
+all concurrent check/rename races.
+
+The syntax specimen uses `tinct::derive_syntax_palette_with`: its surface is
+the exact selected profile's surface and all syntax roles clear 4.5:1 at
+normal contrast or 7:1 at high contrast. The existing syntax API and CSS/DTCG
+export behavior remain compatible. Derived specimens explicitly disclose an
+attached mode sheet; rendering/editing that sheet, custom calculators,
+portable import/export controls and Turnstone mounting remain open.
+
+**Initial surface validation (2026-10-07, macOS x86_64):** 55 shared Tabard tests, 8 retained
+workshop tests, 4 desktop tests and 17 Tinct tests pass, plus Tinct's doctest.
+The surface tests operate real pointer/keyboard controls and assert laid-out
+specimen styles, all four profiles, history, native text synchronization,
+save/reload, failed-write recovery and exact AccessKit names/roles/hit boxes.
+The desktop wheel test reaches specimens in the stacked 640 × 780 layout.
+This verifies the accessibility projection, not a live screen-reader session.
+
+All three headed Mesquite scenarios exit successfully: workshop (8 captures),
+fresh-process reopen (1), and narrow preview (3); no captured frame is blank.
+The wide logical size is 1180 × 800 at 2× scale; the narrow size is 640 × 780.
+Representative images and complete scenario receipts are retained in
+[`ports/tabard/desktop/receipts/2026-10-07`](../../../ports/tabard/desktop/receipts/2026-10-07).
+Initial/seed/dark frame digests are `7fbfa063e24fb8f2`, `f91bc08134eeb2aa` and
+`fd2ddd39027ee59e`; fresh-process reopen is `d4ac3b00f6859e3b`, and the revealed
+narrow specimen is `60601a374190fd4c`. The narrow headed lane uses normal
+selector scroll-into-view; its wheel behavior is covered by the host test.
+
+`check_port_boundaries.py` passes with both new packages. Strict Clippy with
+`--no-deps` passes for `tabard-workshop`, `tabard-desktop` and Tinct. Broader
+strict dependency linting remains blocked by existing Meristem type-complexity
+and shared Tabard documentation/large-enum/filter-map lints. The documentation
+judgment audit reports inherited snapshot-digest and browser-receipt coverage
+errors (257/258 active documents); this slice creates no active design document.
+
+### Shared-component specimens (2026-10-07)
+
+**Status (2026-10-07):** implemented. Mark confirmed that the workshop should
+exercise the existing stack and authorized extending existing crates as needed.
+Cambium now exposes Illume-backed `code_styles`/`highlighted_code`, shared
+read-only styled runs, local syntax palette CSS and explicit-mode syntax CSS.
+The existing editor APIs retain their behavior; invalid UTF-8 style boundaries
+are ignored by the common run builder. The workshop uses these APIs instead of
+manually assigned token roles.
+
+The reader extracts the checked-in HTML through Fleece, lowers it to the shared
+Inker document and uses document-lanes/document-canvas for shaping and reflow.
+Mode and seed changes preserve the source packet. The native producer uses the
+host's existing render core/device and invalidates its retained texture when
+the library replaces the reader instance. The graph uses Cambium's actual
+`GraphCanvasSwatch` and Sprigging leaf, including pointer, hover, focus and
+keyboard selection. Its lower-62-bit key follows the shared leaf/producer
+namespace. `workshop_stylesheet()` composes the shared component rules.
+
+Native inspection exposed a document-canvas font identity bug: regular and
+bold faces in the same collection shared a blob ID and collapsed to the first
+face. `FontInterner` now keys by both blob ID and collection index. Its new
+regression proves separate faces and same-face clone deduplication; fresh
+native reader images show a bold heading followed by regular body text.
+
+**Validation:** Cambium's highlight-enabled suite passes 263 unit tests and its
+compile-fail doctest (one existing editor doctest remains ignored). The workshop
+passes 6 specimen unit tests and 12 retained surface/component tests; the desktop
+passes 4 tests. The mounted tests prove real Rust lexer spans, all 16 syntax
+variables in all four modes, stable reader source and real graph selection
+without authored-theme mutation. Shared graph tests check paint/target geometry.
+Strict Clippy with `--no-deps` passes for both Tabard packages; Cambium's broader
+lint run succeeds with existing warnings outside the changed highlighting files.
+Port boundaries and scoped formatting pass. Cambium's root module has inherited
+ordering differences under rustfmt, left untouched.
+
+The wider document-canvas suite reports 85 passes and one table-wrapping failure
+(`normal_width_table_wraps_unbroken_link_inside_its_cell`). A controlled comparison
+against the original `HEAD` font interner reproduces the same assertion; the
+fixed interner's two identity tests pass. This inherited geometry failure remains
+open. The documentation judgment audit retains its initial 257/258 coverage and
+snapshot/browser-receipt errors; no active design document was added.
+
+Before the font correction, all four native Mesquite scenarios pass: shared
+components (9 captures), authoring (8), fresh-process reopen (1) and narrow (3),
+with 181 scenario frames and no blank captures. These prove all four modes,
+real graph selection, seed edit/undo, save/reopen and narrow composition. Fresh
+font-corrected light/dark images confirm the typography fix. Subsequent full
+recapture attempts hit surface occlusion before pending captures could present;
+the failed receipts are retained and do not constitute passing scenario runs.
+Representative images and receipts are retained in
+[`ports/tabard/desktop/receipts/2026-10-07_shared_components`](../../../ports/tabard/desktop/receipts/2026-10-07_shared_components).
+
+This is a bounded read-only reader appearance and selectable graph specimen.
+Reader link activation/session accessibility, source editing, full graph
+workspace behavior and host appearance activation remain separate capabilities.
+
+### Standalone authoring and interchange (2026-10-08)
+
+The existing surface now supports direct six-digit RGB entry alongside HSL;
+Apply preserves authored alpha, invalid/incomplete text stays visible, and
+Save/export/navigation cannot silently drop staged color input. The selected
+canonical mode can become the theme's authored default in one undoable edit.
+
+A separate application document uses the existing ScriptedDom/Livery cascade,
+layout and paint translation. Exact authored mode CSS replaces the derived
+sheet in that document; Apply, Clear, parser diagnostics and ordinary selectors
+are available through Cambium's shared text input. Editor styles never enter
+that document, and authored rules never enter the editor's cascade. Its scene
+and the reader share one generic adapter on the native host's existing render
+core/device. The typed reader, syntax and graph continue to show derived seed
+appearance, with that boundary stated on the surface.
+
+Portable theme JSON preserves authored fields, provenance, harmony and all
+mode sheets. Import validates first and forks built-in/colliding identities;
+it remains unpublished until Save. The shared crate owns this validation,
+draft construction and atomic artifact writer. CSS and DTCG export use the
+selected canonical mode and the same effective seeds/contrast/syntax profiles
+as the preview. Arbitrary stylesheet overrides and custom calculators cannot
+be represented as these derived color artifacts; exporting the full theme
+preserves their source. Existing legacy exports retain their behavior.
+
+The desktop chooses export destinations through its existing platform dialog
+backend. An occupied destination requires an explicit replacement; export
+captures the authored bytes before opening the chooser, never advances the
+save point and cannot replace the active library, editor preferences or their
+locks through lexical/symlink aliases. Delete validates a candidate library,
+persists it, then changes the editor. Failed writes preserve draft/history and
+registered definitions. Last selected saved theme and preview mode use the
+existing host-choice store in a separate `.workshop.json` sidecar; they do not
+activate an appearance in another host. Closing offers Save and close, Close
+without saving, or Keep editing, including unfinished fields and unchanged
+imported/copied definitions.
+
+**Validation (macOS x86_64):** shared Tabard 70 tests, workshop 40 tests and
+native desktop 9 tests pass. Retained acceptance uses actual control dispatch,
+native text/file/close hooks and real temporary-file writes. It verifies exact
+computed CSS and editor-cascade isolation, RGB/alpha/history, default flags,
+import collisions, explicit replacement and protected destinations (including
+missing files through parent symlinks and case aliases), transactional deletion,
+choice restoration and invalid-input/failed-save recovery. The ordinary native
+run composes the same close policy with its scenario lifecycle.
+
+Headed authoring passes 95 frames / 5 captures, then a fresh process passes
+18 frames / 1 capture; all six are nonblank. Native wide and narrow images,
+authored fixture data and receipts are retained in
+[`ports/tabard/desktop/receipts/2026-10-08_usable`](../../../ports/tabard/desktop/receipts/2026-10-08_usable).
+The host file-routing suite passes 4 tests; strict Clippy with `--no-deps`
+passes for both ports, and the shared crate completes with its existing warnings.
+Port boundaries and scoped formatting pass. The documentation audit retains
+its inherited digest/browser-receipt errors (257/258 active documents).
+OS dialog panels and live screen-reader interaction were not automated.
+
+Custom calculator creation/editing, Turnstone activation, editable content,
+full graph workspaces and live screen-reader validation remain open.
 
 ## The model (decision record)
 

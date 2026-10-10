@@ -44,6 +44,10 @@ const EPSILON: f32 = 0.01;
 /// for spectral, and a node count (7) whose square root is not an integer so
 /// the grid's auto columns have to round.
 fn fixture() -> (Graph, Vec<NodeKey>) {
+    fixture_in_store(false)
+}
+
+fn fixture_in_store(legacy_surface: bool) -> (Graph, Vec<NodeKey>) {
     let mut graph = Graph::new();
     let keys: Vec<NodeKey> = (0..7u8)
         .map(|i| {
@@ -62,10 +66,31 @@ fn fixture() -> (Graph, Vec<NodeKey>) {
         label: None,
         decay_progress: None,
     };
+    let mut assert = |from, to| {
+        if legacy_surface {
+            let from_id = graph.get_node(from).unwrap().id.to_string();
+            let to_id = graph.get_node(to).unwrap().id.to_string();
+            kernel::graph::replay_captured_deltas_onto(
+                &mut graph,
+                [kernel::graph::CapturedDelta::ReplayAssertRelationByIds {
+                    from_id,
+                    to_id,
+                    assertion: hyperlink(),
+                }],
+            );
+        } else {
+            graph.assert_relation(from, to, hyperlink());
+        }
+    };
     for spoke in 1..=3 {
-        graph.assert_relation(keys[0], keys[spoke], hyperlink());
+        assert(keys[0], keys[spoke]);
     }
-    graph.assert_relation(keys[4], keys[5], hyperlink());
+    assert(keys[4], keys[5]);
+    assert_eq!(graph.edge_count(), if legacy_surface { 4 } else { 0 });
+    assert_eq!(
+        graph.resource_relations().count(),
+        if legacy_surface { 0 } else { 4 }
+    );
     (graph, keys)
 }
 

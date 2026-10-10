@@ -7,8 +7,9 @@
 //! Projection: the output handed to canvas swatches.
 
 use kernel::geometry::{PortablePoint, PortableRect};
-use kernel::graph::{EdgeKey, NodeKey};
+use kernel::graph::{CoverageLayer, CoverageLimit, CoverageNote, EdgeKey, Graph, NodeKey};
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 
 use crate::minimap::MinimapDescriptor;
 use crate::overlay::Overlay;
@@ -38,6 +39,77 @@ impl Projection {
     pub fn empty() -> Self {
         Self::default()
     }
+
+    /// Refresh runtime coverage from the actual output, independently of geometry caches.
+    pub fn with_graph_coverage(mut self, graph: &Graph) -> Self {
+        let mut coverage = graph.coverage_note();
+        let nodes: HashSet<_> = self.nodes.iter().map(|node| node.node).collect();
+        let resources: HashSet<_> = nodes
+            .iter()
+            .filter_map(|&node| graph.shown_resource_id(node))
+            .collect();
+        coverage.add_count(
+            CoverageLayer::Projection,
+            "Surfaces omitted from projection",
+            graph
+                .nodes()
+                .filter(|(key, _)| !nodes.contains(key))
+                .count(),
+        );
+        coverage.add_count(
+            CoverageLayer::Projection,
+            "held Resources without a projected appearance",
+            graph
+                .resource_nodes()
+                .filter(|resource| !resources.contains(&resource.id()))
+                .count(),
+        );
+        let pair = |a, b| if a <= b { (a, b) } else { (b, a) };
+        let represented: HashSet<_> = self
+            .edges
+            .iter()
+            .filter(|edge| nodes.contains(&edge.from) && nodes.contains(&edge.to))
+            .map(|edge| pair(edge.from, edge.to))
+            .collect();
+        let held: HashSet<_> = graph
+            .projected_relations()
+            .map(|(_, relation)| pair(relation.from, relation.to))
+            .collect();
+        coverage.add_count(
+            CoverageLayer::Projection,
+            "relation pairs omitted from projection",
+            held.difference(&represented).count(),
+        );
+        if !self.metadata.faults.is_empty() {
+            coverage.add_count(
+                CoverageLayer::Projection,
+                "required projection channels unavailable",
+                self.metadata.faults.len(),
+            );
+        }
+        // Preserve only projection-local reasons across refresh, never stale host context.
+        for limit in &self.metadata.coverage.limits {
+            if limit.layer == CoverageLayer::Projection
+                && matches!(
+                    limit.reason.as_str(),
+                    "projection focus unavailable" | "projection strategy unavailable"
+                )
+            {
+                coverage.push(limit.clone());
+            }
+        }
+        self.metadata.coverage = coverage;
+        self
+    }
+
+    pub fn unavailable(graph: &Graph, reason: &str) -> Self {
+        let mut projection = Self::empty();
+        projection
+            .metadata
+            .coverage
+            .push(CoverageLimit::new(CoverageLayer::Projection, reason));
+        projection.with_graph_coverage(graph)
+    }
 }
 
 /// Per-projection metadata that doesn't fit elsewhere.
@@ -56,6 +128,9 @@ pub struct ProjectionMetadata {
     /// fault places nothing.
     #[serde(default)]
     pub faults: Vec<crate::signals::SignalFault>,
+    /// Known limits of this supplied graph and this projection.
+    #[serde(default)]
+    pub coverage: CoverageNote,
 }
 
 /// One node with a positioned point.
@@ -105,5 +180,151 @@ mod tests {
         assert!(p.edges.is_empty());
         assert!(p.overlays.is_empty());
         assert!(p.minimap.is_none());
+    }
+}
+
+#[cfg(test)]
+mod coverage_tests {
+    use super::*;
+    use kernel::graph::{
+        CoverageLayer, CoverageLimit, CoverageNote, Graph, SemanticStatementSpec, SemanticSubKind,
+        predicate_iri,
+    };
+
+    #[test]
+    fn output_omissions_and_scene_lowering_preserve_coverage() {
+        let mut graph = Graph::new();
+        let a = kernel::graph::apply::add_node(
+            &mut graph,
+            None,
+            "https://example.org/a".into(),
+            Default::default(),
+        );
+        let b = kernel::graph::apply::add_node(
+            &mut graph,
+            None,
+            "https://example.org/b".into(),
+            Default::default(),
+        );
+        graph
+            .try_assert_semantic_statement(
+                a,
+                a,
+                SemanticStatementSpec {
+                    predicate: predicate_iri(SemanticSubKind::Cites).into(),
+                    recognized_sub_kind: Some(SemanticSubKind::Cites),
+                    ..Default::default()
+                },
+            )
+            .unwrap();
+        let known = CoverageNote {
+            limits: CoverageLayer::ALL
+                .into_iter()
+                .map(|layer| CoverageLimit::new(layer, "host boundary"))
+                .collect(),
+        };
+        graph.set_known_coverage(known.clone());
+        let mut projection = Projection {
+            nodes: vec![PositionedNode {
+                node: a,
+                position: Default::default(),
+                radius: 0.0,
+            }],
+            ..Projection::empty()
+        }
+        .with_graph_coverage(&graph);
+        assert!(
+            known
+                .limits
+                .iter()
+                .all(|limit| projection.metadata.coverage.limits.contains(limit))
+        );
+        for reason in [
+            "Surfaces omitted from projection",
+            "held Resources without a projected appearance",
+            "relation pairs omitted from projection",
+        ] {
+            assert!(
+                projection
+                    .metadata
+                    .coverage
+                    .limits
+                    .iter()
+                    .any(|limit| limit.reason == reason && limit.count == Some(1)),
+                "{reason}"
+            );
+        }
+        let scene = crate::scene_from_projection(
+            &projection,
+            |key| graph.get_node(key).unwrap().id.to_string(),
+            |_| None,
+        );
+        assert_eq!(scene.coverage, projection.metadata.coverage);
+        assert_eq!(scene.scene.items.len(), 1);
+        let geometry = projection.nodes.clone();
+        graph.set_known_coverage(Default::default());
+        projection = projection.with_graph_coverage(&graph);
+        assert_eq!(projection.nodes, geometry);
+        assert!(
+            !projection
+                .metadata
+                .coverage
+                .limits
+                .iter()
+                .any(|limit| limit.reason == "host boundary")
+        );
+        projection.nodes.push(PositionedNode {
+            node: b,
+            position: Default::default(),
+            radius: 0.0,
+        });
+        projection.edges.push(PositionedEdge {
+            edge: None,
+            from: a,
+            to: a,
+            path: vec![],
+            weight: 1.0,
+        });
+        assert!(
+            projection
+                .with_graph_coverage(&graph)
+                .metadata
+                .coverage
+                .limits
+                .is_empty()
+        );
+    }
+    #[test]
+    fn missing_channels_on_an_empty_graph_are_a_projection_limit() {
+        use crate::{IntelligenceSignals, LayoutStrategy, ProjectionRequest, ViewIntent};
+        let graph = Graph::new();
+        let signals = IntelligenceSignals::default();
+        let request = ProjectionRequest {
+            graph: &graph,
+            signals: &signals,
+            intent: ViewIntent::default(),
+        };
+        let projection = crate::adapters::GridAdapter::default().project(&request);
+        assert!(!projection.metadata.faults.is_empty());
+        assert!(
+            projection
+                .metadata
+                .coverage
+                .limits
+                .iter()
+                .any(|limit| limit.layer == CoverageLayer::Projection
+                    && limit.reason == "required projection channels unavailable")
+        );
+        let spiral =
+            crate::project_spiral_score(&graph, &signals, crate::ORDER_TIMELINE, None, None);
+        assert!(
+            spiral
+                .projection
+                .metadata
+                .coverage
+                .limits
+                .iter()
+                .any(|limit| limit.reason == "required projection channels unavailable")
+        );
     }
 }

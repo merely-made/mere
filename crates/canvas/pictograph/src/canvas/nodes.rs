@@ -383,30 +383,12 @@ impl Canvas {
         self.reconcile_derived();
     }
 
-    /// The members in `member`'s connected component — `member` plus every node
-    /// reachable from it through relations (undirected), breadth-first from the
-    /// queried node. Empty if `member` is not in the graph. This is the node's
+    /// Surface members reachable through either stratum's undirected relations.
+    /// Shown bindings join at zero hops; unshown resources can carry the walk.
+    /// The queried surface comes first. Empty if `member` is absent. This is its
     /// "subgraph"; the host intersects it with the warm-tab set to decide what to
     /// tile.
     pub fn connected_members(&self, member: uuid::Uuid) -> Vec<uuid::Uuid> {
-        let Some((start, _)) = self.graph.get_node_by_id(member) else {
-            return Vec::new();
-        };
-        let mut seen = HashSet::new();
-        let mut order = Vec::new();
-        let mut queue = VecDeque::new();
-        seen.insert(start);
-        queue.push_back(start);
-        while let Some(key) = queue.pop_front() {
-            if let Some(node) = self.graph.get_node(key) {
-                order.push(node.id);
-            }
-            for neighbor in self.graph.neighbors_undirected_sorted(key) {
-                if seen.insert(neighbor) {
-                    queue.push_back(neighbor);
-                }
-            }
-        }
-        order
+        self.graph.component_members(member, &[])
     }
 }

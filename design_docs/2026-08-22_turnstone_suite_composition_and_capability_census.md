@@ -53,6 +53,13 @@ domain authority or application mere
 The standalone host and Turnstone must consume the same product model and
 surface. A second implementation with similar labels does not pass this test.
 
+**2026-10-07 implementation boundary:** Tabard's shared authoring library now
+lives at `crates/system/tabard`; its product charter remains the appearance
+workshop below. Alembic's embeddable recall library lives at
+`crates/distillery/alembic`, with Distillery retaining its domain ownership.
+These shared libraries cannot live under ports once platform crates consume
+them. The earlier port-location rulings below remain historical evidence.
+
 ## 2. The suite
 
 | Tool | Plain job | Authority | What Turnstone composes |
@@ -429,7 +436,7 @@ furnace pass is, what it may propose, the grants, runs, petitions, and
 revocation over bounded actors) in Distillery, with Djinn scheduling it and
 keeping the proposals-not-truth invariant. **Shape:** flat under the port, as
 `ports/graphshell/web` and `knot-editor/crates/knot-editor` already are —
-`ports/distillery/alembic` (moved) and `ports/distillery/athanor` (founded);
+`ports/distillery/alembic` *(historical citation)* <!-- doc-audit: historical-path --> (moved) and `ports/distillery/athanor` (founded);
 no intermediate `ports/` or `crates/` directory. **Names:** `mere-alembic` /
 `alembic` unchanged; `mere-athanor` / `athanor`, free on crates.io at the
 ruling and claimed the same day: `mere-athanor 0.0.1` published from mere
@@ -562,7 +569,7 @@ incumbent application.
    remain unbuilt.)*
 8. Keep the Alembic workshop behind one bounded two-host workflow receipt;
    the receipt is its founding gate, per 7.4. *(Amended 2026-08-22. **Stub
-   founded 2026-08-23** at `ports/distillery/alembic`, MPL-2.0, with the `recall`
+   founded 2026-08-23** at `ports/distillery/alembic` *(historical citation)* <!-- doc-audit: historical-path -->, MPL-2.0, with the `recall`
    feature declared and empty; the two-host receipt still gates
    implementation. **Published 2026-08-24** as `mere-alembic` 0.0.1. One
    correction was needed first: the fleece scope's F5 pass had added

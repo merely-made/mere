@@ -117,7 +117,11 @@ struct Shape {
     mdns: bool,
 }
 
-type Bound = (Box<Endpoint>, Option<Box<MdnsDiscovery>>, Option<Box<Gossip>>);
+type Bound = (
+    Box<Endpoint>,
+    Option<Box<MdnsDiscovery>>,
+    Option<Box<Gossip>>,
+);
 
 /// Two async layers, as the transport's `bind` and `bind_inner`.
 async fn bind_outer(address_book: AddressBook, seed: &'static [u8; 32], shape: Shape) -> Bound {
@@ -249,12 +253,23 @@ fn main() {
     let iroh = measure(&rt, "iroh endpoint alone", || iroh_alone(seed, false));
     let iroh_mdns = measure(&rt, "iroh endpoint alone, mDNS", || iroh_alone(seed, true));
     let [plain, gossip, policy] = [
-        Shape { gossip: false, mdns: false },
-        Shape { gossip: true, mdns: false },
-        Shape { gossip: true, mdns: true },
+        Shape {
+            gossip: false,
+            mdns: false,
+        },
+        Shape {
+            gossip: true,
+            mdns: false,
+        },
+        Shape {
+            gossip: true,
+            mdns: true,
+        },
     ];
     let net = measure(&rt, "p2panda-net alone", || p2panda_net(seed, plain));
-    let net_gossip = measure(&rt, "p2panda-net alone, gossip", || p2panda_net(seed, gossip));
+    let net_gossip = measure(&rt, "p2panda-net alone, gossip", || {
+        p2panda_net(seed, gossip)
+    });
     let net_policy = measure(&rt, "p2panda-net alone, gossip, mDNS", || {
         p2panda_net(seed, policy)
     });

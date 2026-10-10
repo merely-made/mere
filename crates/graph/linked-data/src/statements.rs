@@ -27,7 +27,8 @@
 
 use inker::LinkStatement;
 use kernel::graph::{
-    EdgeAssertion, Graph, NodeKey, REL_VOCAB, SemanticSubKind, predicate_iri, sub_kind_from_iri,
+    Graph, NodeKey, REL_VOCAB, SemanticStatementSpec, SemanticSubKind, predicate_iri,
+    sub_kind_from_iri,
 };
 
 /// Resolve a knot `rel` to a recognized Mere relation: its [`SemanticSubKind`]
@@ -50,19 +51,76 @@ pub fn resolve_rel(rel: &str) -> Option<(SemanticSubKind, &'static str)> {
 pub struct StatementOutcome {
     /// Number of `Semantic` edges asserted (each with its predicate stamped).
     pub edges_asserted: usize,
-    /// Target URLs not yet present in the graph — the host follows the link
-    /// first (creating the node), then re-applies.
+    /// Target URLs still pending after this apply. Recognized links remain in
+    /// the derived cache and retry after a completed live endpoint admission.
     pub pending_targets: Vec<String>,
     /// Statements whose `rel` is outside Mere's vocabulary — a raw predicate
     /// awaiting the raw-IRI `Semantic` edge path (linked-data plan Phase 2).
     pub unrecognized: Vec<LinkStatement>,
 }
 
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct PendingLinkRebuild {
+    pub queued: usize,
+    pub missing_sources: Vec<String>,
+    pub unrecognized: Vec<LinkStatement>,
+    pub retry: kernel::graph::PendingLinkRetry,
+}
+
+/// Rebuild page extraction inputs using Inker's real document walk. Documents
+/// stay caller-owned. Missing sources are reported rather than materialized.
+pub fn rebuild_pending_links(
+    graph: &mut Graph,
+    documents: &[inker::EngineDocument],
+) -> PendingLinkRebuild {
+    rebuild_pending_links_from_sources(
+        graph,
+        documents
+            .iter()
+            .map(|doc| (kernel::graph::ResourceNode::new(&doc.address).id(), doc)),
+    )
+}
+
+/// The host can supply an already prepared Resource identity for foreign-exact
+/// or redirected sources, without guessing identity from a document's address.
+pub fn rebuild_pending_links_from_sources<'a>(
+    graph: &mut Graph,
+    sources: impl IntoIterator<Item = (uuid::Uuid, &'a inker::EngineDocument)>,
+) -> PendingLinkRebuild {
+    let mut result = PendingLinkRebuild::default();
+    for (source_resource, doc) in sources {
+        if graph.resource(source_resource).is_none() {
+            result.missing_sources.push(doc.address.clone());
+            continue;
+        }
+        for link in inker::link_statements(doc) {
+            let Some((kind, predicate)) = resolve_rel(&link.rel) else {
+                result.unrecognized.push(link);
+                continue;
+            };
+            result.queued += usize::from(graph.queue_pending_link(kernel::graph::PendingLink {
+                source_resource,
+                source_surface: None,
+                target_iri: link.target_url,
+                statement: SemanticStatementSpec {
+                    predicate: predicate.into(),
+                    recognized_sub_kind: Some(kind),
+                    graph_scope: kernel::types::GraphScope::Source,
+                    provenance_iri: Some(doc.address.clone()),
+                    ..Default::default()
+                },
+            }));
+        }
+    }
+    result.retry = graph.retry_pending_links();
+    result
+}
+
 /// Apply predicate-bearing link statements to `graph` as `Semantic` edges from
 /// `source`. For each statement whose `rel` resolves to a recognized relation
 /// and whose target node already exists, asserts
-/// `EdgeAssertion::Semantic { sub_kind, .. }` and stamps the canonical predicate
-/// IRI via `EdgePayload::set_semantic_predicate`. Compose with inker's walk:
+/// a statement with the canonical predicate IRI, attributed to the source page
+/// in source scope. Compose with inker's walk:
 /// `apply_link_statements(graph, source, &inker::link_statements(&doc))`. See
 /// [`StatementOutcome`] and the module docs for the (intentional) deferrals.
 pub fn apply_link_statements(
@@ -71,6 +129,12 @@ pub fn apply_link_statements(
     statements: &[LinkStatement],
 ) -> StatementOutcome {
     let mut outcome = StatementOutcome::default();
+    let Some(asserter) = graph.get_node(source).map(|node| node.url().to_owned()) else {
+        return outcome;
+    };
+    let source_resource = graph
+        .shown_resource_id(source)
+        .unwrap_or_else(|| kernel::graph::ResourceNode::new(&asserter).id());
     for stmt in statements {
         let Some((sub_kind, predicate)) = resolve_rel(&stmt.rel) else {
             outcome.unrecognized.push(stmt.clone());
@@ -79,30 +143,47 @@ pub fn apply_link_statements(
         // Edge only to a target already in the graph; the immutable lookup ends
         // before the mutation below (`NodeKey` is `Copy`).
         let Some(target) = graph.get_node_by_url(&stmt.target_url).map(|(key, _)| key) else {
+            graph.queue_pending_link(kernel::graph::PendingLink {
+                source_resource,
+                source_surface: (graph.effective_predicate_stratum(predicate)
+                    == Ok(kernel::graph::GraphStratum::Surface))
+                .then(|| graph.get_node(source).map(|node| node.id))
+                .flatten(),
+                target_iri: stmt.target_url.clone(),
+                statement: SemanticStatementSpec {
+                    predicate: predicate.into(),
+                    recognized_sub_kind: Some(sub_kind),
+                    graph_scope: kernel::types::GraphScope::Source,
+                    provenance_iri: Some(asserter.clone()),
+                    ..Default::default()
+                },
+            });
             outcome.pending_targets.push(stmt.target_url.clone());
             continue;
         };
-        let edge = kernel::graph::apply::assert_relation(
-            graph,
+        let edge = graph.assert_semantic_statement(
             source,
             target,
-            EdgeAssertion::Semantic {
-                sub_kind,
+            SemanticStatementSpec {
+                predicate: predicate.into(),
+                recognized_sub_kind: Some(sub_kind),
                 label: None,
-                decay_progress: None,
+                graph_scope: kernel::types::GraphScope::Source,
+                provenance_iri: Some(asserter.clone()),
+                asserted_at_ms: None,
             },
         );
-        if let Some(key) = edge {
-            let _ = kernel::graph::apply::apply_graph_delta(
-                graph,
-                kernel::graph::apply::GraphDelta::SetEdgeSemanticPredicate {
-                    edge: key,
-                    predicate: Some(predicate.to_string()),
-                },
-            );
+        if edge.is_some_and(|(_, assertion)| assertion.changed) {
             outcome.edges_asserted += 1;
         }
     }
+    outcome.edges_asserted += graph.retry_pending_links().asserted;
+    outcome.pending_targets.retain(|url| {
+        let target = kernel::graph::ResourceNode::new(url);
+        graph.pending_links().iter().any(|link| {
+            link.source_resource == source_resource && link.target_iri == target.canonical_iri()
+        })
+    });
     outcome
 }
 
@@ -156,9 +237,25 @@ mod tests {
         assert!(outcome.pending_targets.is_empty());
         assert!(outcome.unrecognized.is_empty());
 
-        let key = graph.find_edge_key(source, target).expect("edge created");
-        let payload = graph.get_edge(key).expect("edge payload");
+        assert!(graph.find_edge_key(source, target).is_none());
+        let key = graph
+            .find_resource_edge_key(
+                graph.shown_resource_id(source).expect("source resource"),
+                graph.shown_resource_id(target).expect("target resource"),
+            )
+            .expect("resource edge created");
+        let payload = graph.get_resource_edge(key).expect("resource edge payload");
         assert!(payload.has_relation(RelationSelector::Semantic(SemanticSubKind::Cites)));
+        assert_eq!(payload.semantic_statements().len(), 1);
+        assert_eq!(
+            payload.semantic_statements()[0].provenance_iri.as_deref(),
+            Some("knot:test")
+        );
+        assert_eq!(
+            payload.semantic_statements()[0].graph_scope,
+            kernel::types::GraphScope::Source
+        );
+
         assert_eq!(
             payload.semantic_data().and_then(|d| d.predicate.as_deref()),
             Some("https://mere.computer/ns/rel#cites")
@@ -205,3 +302,7 @@ mod tests {
         );
     }
 }
+
+#[cfg(test)]
+#[path = "statements_pending_tests.rs"]
+mod pending_tests;

@@ -25,8 +25,17 @@ use super::Graph;
 use super::identity::NodeKey;
 use crate::persistence::GraphSnapshot;
 
+mod checked;
 pub mod from;
 pub mod to;
+
+pub use checked::ResourceSnapshotError;
+
+pub(crate) use from::payload_from_persisted;
+pub(crate) use to::persisted_edge_for_ids;
+
+#[cfg(test)]
+mod tests;
 
 impl Graph {
     pub(crate) fn remove_url_mapping(&mut self, url: &str, key: NodeKey) {

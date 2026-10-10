@@ -21,6 +21,8 @@ members = [
     "crates/system/shell-state",
     "crates/system/notochord",
     "crates/system/registry",
+    "crates/system/tabard",
+    "crates/distillery/alembic",
     "crates/system/ux-events",
     "crates/forme/curation",
     "crates/forme/forme",
@@ -84,7 +86,6 @@ members = [
     "ports/castellan",
     "ports/distillery",
     "ports/moot",
-    "ports/distillery/alembic",
     "ports/distillery/athanor",
     "ports/gazette",
     # Commissions and operates Retinue stations through Castellan. A member
@@ -93,20 +94,20 @@ members = [
     # ─── Landed 2026-09-03 from genet (design_docs/mere_docs/implementation_
     # strategy/2026-09-02_platform_boundary_and_repository_topology_plan.md,
     # the consumers-first half of P3) ───
-    # Pelt is the reference-browser port and Tabard the theme-authoring port;
-    # both keep their `ports/` shape. The document lanes are a content lane,
-    # not a widget, so they land in `crates/system/` beside `fetch`. Package
-    # names are unchanged.
+    # Pelt is the reference-browser port. Tabard moved to `crates/system/`
+    # on 2026-10-07 after becoming the shared theme library. The document lanes
+    # are a content lane, not a widget, so they land in `crates/system/` beside
+    # `fetch`. Package names are unchanged.
     # The Knot editor host moved to `crates/inker/knot-editor-host` on
     # 2026-09-04, when Knot's own sources left this repository (knot-editor
     # `design_docs/2026-09-01_knot_editor_repository_extraction_plan.md`, E2).
     # It is inker-family integration code, not Knot product source, so it
     # stays here; `ports/knot/` does not survive as a directory holding only
     # it.
+    "ports/tabard/desktop",
     "ports/pelt",
     "ports/pelt/core",
     "ports/pelt/desktop",
-    "ports/tabard",
     "crates/inker/knot-editor-host",
     "crates/system/document-lanes",
     # ─── Landed 2026-09-03 from genet (the same plan, P2) ───
@@ -119,6 +120,8 @@ members = [
     "crates/cambium/cambium-winit",
     "crates/cambium/cambium-winit-a11y",
     "crates/cambium/cambium-genet-winit-host",
+    # Shared authoring surface; the standalone product is ports/tabard/desktop.
+    "crates/cambium/tabard-workshop",
     "crates/cambium/cambium-genet-web-host",
     "crates/cambium/command-menu",
     "crates/cambium/edit-history",
@@ -263,11 +266,11 @@ distillery = { version = "0.0.1", path = "ports/distillery" }
 # their authority. Founding reservation, no implementation. Package is
 # `mere-moot` because crates.io `moot` and `murmur` are both held elsewhere.
 moot = { package = "mere-moot", version = "0.0.1", path = "ports/moot" }
-# The recall-and-workshop port: memory surfaces behind `recall`, the granted
-# agent workshop over them, Athanor as its first actor. Founding reservation,
-# no implementation. Package is `mere-alembic`; crates.io `alembic` is the
-# Linux Foundation VFX binding.
-alembic = { package = "mere-alembic", version = "0.0.1", path = "ports/distillery/alembic" }
+# Distillery's shared recall-and-workshop library: memory levels behind
+# `recall`, with the granted-agent workshop still reserved. Athanor is its
+# first actor. Package is `mere-alembic`; crates.io `alembic` is the Linux
+# Foundation VFX binding.
+alembic = { package = "mere-alembic", version = "0.0.1", path = "crates/distillery/alembic" }
 athanor = { package = "mere-athanor", version = "0.0.1", path = "ports/distillery/athanor" }
 # Shared pins the graphshell crates inherit.
 base64 = "0.22"
@@ -387,7 +390,8 @@ pelt-core = { path = "ports/pelt/core" }
 # pelt's line: cargo will not let a member turn an inherited dependency's
 # defaults off. Pelt re-enables livery/reader/netfetch through its own features.
 pelt-desktop = { path = "ports/pelt/desktop", default-features = false }
-tabard = { version = "0.0.1", path = "ports/tabard" }
+tabard = { version = "0.0.1", path = "crates/system/tabard" }
+tabard-workshop = { path = "crates/cambium/tabard-workshop" }
 mere-document-lanes = { version = "0.1.0", path = "crates/system/document-lanes" }
 
 # Genet crates the landed ports reach. In genet these were relative paths into

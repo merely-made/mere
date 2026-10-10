@@ -96,7 +96,7 @@ pub use request::{
     AxisValue, FormFactor, NodeFilter, ProjectionDimension, ProjectionRequest, TargetSize,
     ViewIntent,
 };
-pub use scene_out::{MERE_GRAPH_ADAPTER, scene_from_projection};
+pub use scene_out::{CoveredScene, MERE_GRAPH_ADAPTER, scene_from_projection};
 pub use signals::{
     AffinityScores, BridgeNodes, COORDS_HOST, COORDS_SPECTRAL, Cluster, ClusterSet,
     ImportanceWeights, IntelligenceSignals, NodeEmbeddings, NodeOrder, NodeRings, ORDER_RECENCY,

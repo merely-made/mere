@@ -46,6 +46,7 @@
 pub mod content_store;
 // Application-scoped preferences live under the host's data root rather than
 // in one session's settings sidecar.
+pub mod addressable_graph;
 pub mod application_settings_store;
 // Durable content-addressed store for node preview imagery (favicons, previews,
 // snapshots) — the sibling of content_store, keyed by BLAKE3 digest so identical
@@ -96,6 +97,7 @@ pub mod scene_facets;
 // filesystem). Save redacts private fields by default; open thaws read-only.
 pub mod codicil_seal;
 pub mod graph_codicil;
+pub mod graph_placement;
 // A mere's sessions over one muniment store: the session schema, the live
 // session core and the lifecycle (reservoir plan V2).
 pub mod graph_session;
@@ -107,6 +109,8 @@ pub mod live_view;
 // compose op (`graph_codicil::compose_graph_codicils`) layers on top.
 #[cfg(not(target_arch = "wasm32"))]
 pub mod notochord_policy_store;
+#[cfg(test)]
+mod resource_content_merge_tests;
 pub mod snapshot_merge;
 // The frame.json pane-layout store moved OUT with the pane model at
 // meerkat's deletion (2026-07-18): it lives in turnstone's `frisket::store`
