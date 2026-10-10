@@ -1071,3 +1071,18 @@ prior snapshot. Exact context recomputation remains to be specified against
 current state. Previously selected background membership and the keeping axis
 stand. Selection's overload and hover previews need interaction research;
 this does not make hover establish retained membership or keeping.
+
+### Backdrop and context distinction (2026-10-10)
+
+[Design language §9.13](../../2026-08-23_projection_scenes_and_graph_native_platform.md#913-backdrop-context-props-and-reset-2026-10-10)
+records Mark's correction: ambient nodes are contextual propositions relevant
+to foreground entities, not a wallpaper/simulation mode. Showing that context
+can be turned off independently of an entity's input, collision and dynamics
+participation. Props may have attributes and scripted behavior and contextualize
+the same content within a scene set. Decorative `AmbientSim` is a separate
+implementation seam; it does not discover relevant nodes or maintain their
+reasons. The foreground may include recent interactions as well as current
+selection and foreground pins; the recent-attention lifetime remains open.
+Resetting the scene arrangement is distinct from clearing selected subjects
+or withdrawing a context reason. Existing keeping and source-authority
+boundaries stand; this correction supplies no automatic storage promotion.

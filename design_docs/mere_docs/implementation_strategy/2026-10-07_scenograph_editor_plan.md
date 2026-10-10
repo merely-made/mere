@@ -370,9 +370,27 @@ Done when: the selection and visibility round-trip in a facet and replay through
 
 ### B1 — backdrops in the Graphshell viewer (SE86)
 
-The viewer draws a scene's backdrops and offers the backdrop mode: clear, ambient and props now, field once defined; a tangible (collidable) backdrop is an obstacle to its physics.
+**Earlier cut (SE86):** the viewer draws a scene's backdrops and offers the backdrop mode: clear, ambient and props now, field once defined; a tangible (collidable) backdrop is an obstacle to its physics.
 
-Done when: the viewer draws each kind and its tangible edge; a tangible backdrop holds nodes out in a physics test, with a control where an intangible one does not; the mode travels in the scene state; a headed check in Chrome and Firefox.
+**Earlier done-conditions:** the viewer draws each kind and its tangible edge; a tangible backdrop holds nodes out in a physics test, with a control where an intangible one does not; the mode travels in the scene state; a headed check in Chrome and Firefox.
+
+**Mark's correction (2026-10-10):** [design language §9.13](../../2026-08-23_projection_scenes_and_graph_native_platform.md#913-backdrop-context-props-and-reset-2026-10-10)
+supersedes the single mode list. Clear belongs to a reset action; contextual
+ambient nodes and props are entity roles/classes whose display is independently
+configurable. A backdrop is a scene set that may have depth, animation,
+interaction and scripted entities. Neither the prop class nor ambient relevance
+decides collision or dynamics participation. Field effects likewise need not
+be mutually exclusive with scenery or contextual content.
+
+**Updated control-design target:** separate reset, contextual-content display,
+prop display, scenery behavior and physical participation. Exact control names,
+off/pause semantics, persistence and migration of legacy mode state remain to
+be designed through the viewer owner. Define the reset baseline and its effects
+before implementation; do not turn Clear into a state-rewinding operation by
+label alone. Paint/contact receipts below remain valid for the minimum binder.
+Interactive props need explicit entity/input/action wiring, and animated or
+scripted reset requires its own behavioral qualification. B1 acceptance still
+requires headed viewer checks; this correction does not qualify that consumer.
 
 ### E3 — the option declaration type (B, SE7)
 
