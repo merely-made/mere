@@ -1,8 +1,8 @@
 # Graphshell on one Cambium tree
 
 **Date:** 2026-09-25
-**Status (2026-10-10):** in progress. The combined viewer at `5884b94a0`
-integrates published Mere `4e1811578`, Genet `7422e906`, guarded Vello
+**Status (2026-10-10):** in progress. The combined viewer at `4c18d597d`
+integrates published Mere `3eda5d278`, Genet `7422e906`, guarded Vello
 `491c376c`, and the committed site
 cutover `bf626abd2`. Phases 1–2 are landed; phase 3 has its recorded headed producer
 receipts and Mark's approval to proceed. Phase 4 remains unfinished: canvas
@@ -695,6 +695,17 @@ transfers DOM focus into the graph before traversal returns to the controls.
 - No Graphshell-only UI pieces. What Cambium lacks is added to Cambium.
 
 ## 6. Progress
+
+- **2026-10-10 — source sync before the explicit GPU-slot handoff:** merged
+  main `3eda5d278` at `4c18d597d`, including native workshop narrow-header
+  layout and the renderer lane's Graphshell appearance receipts. Viewer
+  source/assets, renderer pins/locks, Rootstock, Mesquite and shared scene
+  inputs are unchanged, so their gates retain the checked source bases in
+  the Fold receipt. The coordinator still holds all headed/headless GPU runs
+  pending a single-slot handoff after Turnstone acceptance. Its cooperative
+  wait repair belongs to Turnstone; no new shared-renderer fix is reported.
+  Upstream appearance receipts do not close this branch's combined Fold and
+  history acceptance. This lane has launched no GPU or native capture.
 
 - **2026-10-10 — published Moot/Pelt continuation combined:** merged main
   `4e1811578` at `5884b94a0`, including Moot's Commons conversation adapter
