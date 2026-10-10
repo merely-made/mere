@@ -12,11 +12,11 @@
 
 use personae::delegation::Issue;
 use std::io::Write;
-use std::process::{Command, Stdio};
+use std::process::Command;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use castellan::custody::vault::Profile;
-use castellan::custody::{ssh_face, ssh_krl, ssh_slot};
+use crate::custody::vault::Profile;
+use crate::custody::{ssh_face, ssh_krl, ssh_slot};
 use insigne::delegation::{DelegationRevocation, SignedDelegationRevocation};
 use personae::enroll::{self, device_id_for_host};
 use personae::ssh_ca::{SshCertAuthority, UserCertRequest};
@@ -24,7 +24,7 @@ use personae::ssh_face::FacePolicy;
 use personae::{IdentityProvider, InMemoryProvider};
 use ssh_key::public::PublicKey;
 
-use crate::format_key;
+use super::format_key;
 
 // ─── the certificate authority ────────────────────────────────────────────
 
@@ -41,21 +41,41 @@ fn now_ms() -> u64 {
         .unwrap_or_default()
 }
 
-pub(crate) fn cmd_ca(profile: &Profile, rest: &[String]) -> Result<(), String> {
+pub(crate) fn cmd_ca(
+    output: &mut dyn Write,
+    profile: &Profile,
+    rest: &[String],
+) -> Result<(), String> {
     let ca = authority(profile)?;
     let patterns = flag(rest, "--patterns").unwrap_or_else(|| "*".to_string());
-    println!("fingerprint: {}", ca.fingerprint());
-    println!("\n# TrustedUserCAKeys / cert-authority key");
-    println!("{}", ca.trusted_user_ca_line().map_err(str_err)?.trim_end());
-    println!("\n# ~/.ssh/known_hosts line for hosts serving a host certificate");
-    println!(
+    writeln!(output, "fingerprint: {}", ca.fingerprint()).map_err(|error| error.to_string())?;
+    writeln!(output, "\n# TrustedUserCAKeys / cert-authority key")
+        .map_err(|error| error.to_string())?;
+    writeln!(
+        output,
+        "{}",
+        ca.trusted_user_ca_line().map_err(str_err)?.trim_end()
+    )
+    .map_err(|error| error.to_string())?;
+    writeln!(
+        output,
+        "\n# ~/.ssh/known_hosts line for hosts serving a host certificate"
+    )
+    .map_err(|error| error.to_string())?;
+    writeln!(
+        output,
         "{}",
         enroll::known_hosts_line(&ca, &patterns).map_err(str_err)?
-    );
+    )
+    .map_err(|error| error.to_string())?;
     Ok(())
 }
 
-pub(crate) fn cmd_mint(profile: &Profile, rest: &[String]) -> Result<(), String> {
+pub(crate) fn cmd_mint(
+    output: &mut dyn Write,
+    profile: &Profile,
+    rest: &[String],
+) -> Result<(), String> {
     let slot_key = rest
         .first()
         .ok_or("mint needs a slot, e.g. `mint ssh:SHA256:d3tQ --host q-pc.local`")?;
@@ -111,18 +131,43 @@ pub(crate) fn cmd_mint(profile: &Profile, rest: &[String]) -> Result<(), String>
         Some(path) => {
             std::fs::write(&path, format!("{encoded}\n"))
                 .map_err(|err| format!("write {path}: {err}"))?;
-            println!("wrote {path}");
+            writeln!(output, "wrote {path}").map_err(|error| error.to_string())?;
         },
-        None => println!("{encoded}"),
+        None => writeln!(output, "{encoded}").map_err(|error| error.to_string())?,
     }
-    eprintln!(
+    writeln!(
+        output,
         "minted for {principal}, held by {device_name}, valid {hours}h, grant {}",
         &personae::ssh_ca::key_id_for(&grant.certificate.id())[..16]
-    );
+    )
+    .map_err(|error| error.to_string())?;
     Ok(())
 }
 
-pub(crate) fn cmd_enroll_host(profile: &Profile, rest: &[String]) -> Result<(), String> {
+pub(crate) fn cmd_enroll_host(
+    output: &mut dyn Write,
+    profile: &Profile,
+    rest: &[String],
+) -> Result<(), String> {
+    rest.first().ok_or("enroll-host needs a target")?;
+    let ca = authority(profile)?;
+    writeln!(
+        output,
+        "{}",
+        enroll::system_sshd_snippet(
+            &ca,
+            "/etc/ssh/personae_ca.pub",
+            Some("/etc/ssh/ssh_host_ed25519_key-cert.pub"),
+        )
+        .map_err(str_err)?
+    )
+    .map_err(|error| error.to_string())
+}
+
+pub(crate) fn prepare_enrollment(
+    profile: &Profile,
+    rest: &[String],
+) -> Result<super::Enrollment, String> {
     let target = rest
         .first()
         .ok_or("enroll-host needs a target, e.g. `enroll-host markik@q-pc.local`")?;
@@ -139,52 +184,17 @@ pub(crate) fn cmd_enroll_host(profile: &Profile, rest: &[String]) -> Result<(), 
         });
     let ca = authority(profile)?;
 
-    if rest.iter().any(|arg| arg == "--system") {
-        println!(
-            "{}",
-            enroll::system_sshd_snippet(
-                &ca,
-                "/etc/ssh/personae_ca.pub",
-                Some("/etc/ssh/ssh_host_ed25519_key-cert.pub"),
-            )
-            .map_err(str_err)?
-        );
-        return Ok(());
-    }
-
     let line = enroll::user_trust_line(&ca, &[principal.clone()]).map_err(str_err)?;
     let script = enroll::user_install_script(&line);
-    let output = Command::new("ssh")
-        .args(["-o", "BatchMode=yes", target, "sh -s"])
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .spawn()
-        .and_then(|mut child| {
-            child
-                .stdin
-                .take()
-                .expect("piped stdin")
-                .write_all(script.as_bytes())?;
-            child.wait_with_output()
-        })
-        .map_err(|err| format!("run ssh {target}: {err}"))?;
-
-    if !String::from_utf8_lossy(&output.stdout).contains("enrolled") {
-        return Err(format!(
-            "enrollment did not confirm on {host}:\n{}",
-            String::from_utf8_lossy(&output.stderr)
-        ));
-    }
-    println!("enrolled {host}: certificates for principal {principal:?} are now accepted");
-    println!(
-        "  no authorized_keys entry per client machine, and re-running this replaces \
-         the line rather than stacking one"
-    );
-    println!(
-        "  host-key prompts still apply; `enroll-host {target} --system` prints the root half"
-    );
-    Ok(())
+    Ok(super::Enrollment {
+        target: target.clone(),
+        script,
+        confirmation: format!(
+            "enrolled {host}: certificates for principal {principal:?} are now accepted\n\
+            re-running replaces the authorized_keys CA line\n\
+            host-key prompts still apply; `enroll-host {target} --system` prints the root half\n"
+        ),
+    })
 }
 
 /// Resolve a slot name among this profile's SSH *keys* only.
@@ -215,7 +225,8 @@ fn resolve_ssh_key(profile: &Profile, typed: &str) -> Result<ssh_key::PrivateKey
 
 /// Revoke a device: this vault stops certifying it, immediately.
 pub(crate) fn cmd_revoke(
-    storage: &dyn castellan::custody::IdentityStorage,
+    output: &mut dyn Write,
+    storage: &dyn crate::custody::IdentityStorage,
     id: &personae::vault::ProfileId,
     rest: &[String],
 ) -> Result<(), String> {
@@ -258,25 +269,44 @@ pub(crate) fn cmd_revoke(
         .map_err(|err| format!("save profile: {err}"))?;
 
     let serial = personae::ssh_ca::serial_for_device(device);
-    println!("revoked {name} (certificate serial {serial})");
-    println!("  this vault will not certify it again, so its access ends when its");
-    println!("  last certificate expires (at most 12h)");
-    println!("  to close it on a host now: personae-vault krl --out <file>, then");
-    println!("  RevokedKeys in that host's sshd_config");
+    writeln!(output, "revoked {name} (certificate serial {serial})")
+        .map_err(|error| error.to_string())?;
+    writeln!(
+        output,
+        "  this vault will not certify it again, so its access ends when its"
+    )
+    .map_err(|error| error.to_string())?;
+    writeln!(output, "  last certificate expires (at most 12h)")
+        .map_err(|error| error.to_string())?;
+    writeln!(
+        output,
+        "  to close it on a host now: personae-vault krl --out <file>, then"
+    )
+    .map_err(|error| error.to_string())?;
+    writeln!(output, "  RevokedKeys in that host's sshd_config")
+        .map_err(|error| error.to_string())?;
     Ok(())
 }
 
 /// Render the revocation list, and compile it when ssh-keygen is present.
-pub(crate) fn cmd_krl(profile: &Profile, rest: &[String]) -> Result<(), String> {
+pub(crate) fn cmd_krl(
+    output: &mut dyn Write,
+    profile: &Profile,
+    rest: &[String],
+) -> Result<(), String> {
     let ledger = ssh_krl::load_ledger(profile).map_err(str_err)?;
     if ledger.is_empty() {
-        println!("nothing is revoked");
+        writeln!(output, "nothing is revoked").map_err(|error| error.to_string())?;
         return Ok(());
     }
     let spec = ledger.krl_spec();
     let Some(out) = flag(rest, "--out") else {
-        print!("{spec}");
-        println!("# compile with: ssh-keygen -k -s <ca.pub> -f <krl> <this file>");
+        write!(output, "{spec}").map_err(|error| error.to_string())?;
+        writeln!(
+            output,
+            "# compile with: ssh-keygen -k -s <ca.pub> -f <krl> <this file>"
+        )
+        .map_err(|error| error.to_string())?;
         return Ok(());
     };
 
@@ -300,17 +330,24 @@ pub(crate) fn cmd_krl(profile: &Profile, rest: &[String]) -> Result<(), String> 
             "ssh-keygen could not compile the KRL (spec left at {spec_path})"
         ));
     }
-    println!(
+    writeln!(
+        output,
         "wrote {out} ({} device(s) revoked)",
         ledger.devices().count()
-    );
-    println!("  deploy: copy to the host and name it in sshd_config's RevokedKeys");
+    )
+    .map_err(|error| error.to_string())?;
+    writeln!(
+        output,
+        "  deploy: copy to the host and name it in sshd_config's RevokedKeys"
+    )
+    .map_err(|error| error.to_string())?;
     Ok(())
 }
 
 /// Show or set this face's SSH policy.
 pub(crate) fn cmd_face(
-    storage: &dyn castellan::custody::IdentityStorage,
+    output: &mut dyn Write,
+    storage: &dyn crate::custody::IdentityStorage,
     id: &personae::vault::ProfileId,
     rest: &[String],
 ) -> Result<(), String> {
@@ -337,12 +374,14 @@ pub(crate) fn cmd_face(
         storage
             .save_profile(&profile)
             .map_err(|err| format!("save profile: {err}"))?;
-        println!("face {:?} is now a {shape} face", id.0);
+        writeln!(output, "face {:?} is now a {shape} face", id.0)
+            .map_err(|error| error.to_string())?;
     }
 
     let policy = ssh_face::effective_policy(&profile).map_err(str_err)?;
     let stored = ssh_face::load_policy(&profile).map_err(str_err)?.is_some();
-    println!(
+    writeln!(
+        output,
         "face: {:?}{}",
         id.0,
         if stored {
@@ -350,14 +389,17 @@ pub(crate) fn cmd_face(
         } else {
             " (no stored policy; showing the default)"
         }
-    );
-    println!("  principals: {}", policy.principals.join(", "));
-    println!("  actions:    {}", policy.action_refs().join(", "));
+    )
+    .map_err(|error| error.to_string())?;
+    writeln!(output, "  principals: {}", policy.principals.join(", "))
+        .map_err(|error| error.to_string())?;
+    writeln!(output, "  actions:    {}", policy.action_refs().join(", "))
+        .map_err(|error| error.to_string())?;
     if let Some(command) = &policy.force_command {
-        println!("  forced:     {command}");
+        writeln!(output, "  forced:     {command}").map_err(|error| error.to_string())?;
     }
     if let Some(addresses) = &policy.source_address {
-        println!("  from:       {addresses}");
+        writeln!(output, "  from:       {addresses}").map_err(|error| error.to_string())?;
     }
     Ok(())
 }

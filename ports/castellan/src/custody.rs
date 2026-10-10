@@ -42,6 +42,8 @@ pub mod ssh_slot;
 pub mod startup_unlock;
 pub mod unlock;
 pub mod vault;
+#[cfg(feature = "keeper")]
+pub(crate) mod vault_commands;
 #[cfg(feature = "wallet")]
 pub mod wallet;
 
