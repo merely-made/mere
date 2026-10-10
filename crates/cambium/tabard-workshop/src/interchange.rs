@@ -277,6 +277,15 @@ impl WorkshopState {
         self.pending_export.take()
     }
 
+    /// Protect files owned by the embedding application, such as its settings
+    /// or open documents. The host supplies its current authorities; the shared
+    /// exporter checks their path identities before creation and replacement.
+    /// This transient list never enters a theme or the authored library. The
+    /// workshop's own library and preference files remain protected as well.
+    pub fn set_protected_export_paths(&mut self, paths: Vec<PathBuf>) {
+        self.protected_export_paths = paths;
+    }
+
     pub fn complete_export(&mut self, artifact: ExportArtifact, path: Option<PathBuf>) {
         let Some(path) = path else {
             self.cancel_export();
@@ -284,7 +293,7 @@ impl WorkshopState {
         };
         if self.is_editor_path(&path) {
             self.status =
-                "Choose an export path separate from your library and workshop settings.".into();
+                "Choose an export path separate from your library and workshop settings or protected application files.".into();
             return;
         }
         match write_artifact(&path, &artifact.contents, WriteMode::CreateNew) {
@@ -306,7 +315,7 @@ impl WorkshopState {
         };
         if self.is_editor_path(path) {
             self.status =
-                "Choose an export path separate from your library and workshop settings.".into();
+                "Choose an export path separate from your library and workshop settings or protected application files.".into();
             return;
         }
         match write_artifact(path, &artifact.contents, WriteMode::Replace) {
@@ -391,6 +400,13 @@ impl WorkshopState {
     }
 
     fn is_editor_path(&self, path: &Path) -> bool {
+        if self
+            .protected_export_paths
+            .iter()
+            .any(|reserved| same_path(path, reserved))
+        {
+            return true;
+        }
         let Some(library) = self.library_path() else {
             return false;
         };
