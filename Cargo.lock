@@ -12947,6 +12947,7 @@ dependencies = [
  "paint_list_render",
  "petgraph 0.8.3",
  "sceno",
+ "scenograph",
  "scenomise",
  "seiche",
  "serde",
