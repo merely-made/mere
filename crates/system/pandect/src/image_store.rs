@@ -7,7 +7,7 @@
 //! Durable content-addressed store for node preview imagery (node image
 //! externalization plan) — favicons, previews, and last-render snapshots.
 //!
-//! The sibling of [`content_store`](crate::content_store): where that keys a
+//! The sibling of [`content_store`](eidetic::content_store): where that keys a
 //! fetched page body by its URL, this keys an image blob by the **BLAKE3 digest
 //! of its bytes** under `content/image/<hex>`, so identical images across nodes
 //! (every github.com favicon, a re-deposited snapshot of an unchanged page)
@@ -20,17 +20,10 @@
 //! caller-guarded: a blob is shared, so it is dropped only once no live node
 //! references it — the Athanor orphan sweep, not a per-node drop.
 
-use eidetic::{Hash, Result, Store};
+use eidetic::image_content;
+use eidetic::{Result, Store};
 use kernel::persistence::GraphSnapshot;
 use kernel::types::{ImageRef, ImageRole};
-
-/// Blob-key prefix, namespacing image blobs away from `content_store` bodies and
-/// the manifests / schemas that share the same store.
-const IMAGE_PREFIX: &str = "content/image/";
-
-fn image_key(hex: &str) -> String {
-    format!("{IMAGE_PREFIX}{hex}")
-}
 
 /// Store `png` bytes content-addressed and return an [`ImageRef`] (digest +
 /// dimensions). Saving identical bytes twice writes one blob at one key, so two
@@ -42,15 +35,14 @@ pub async fn save_image(
     width: u32,
     height: u32,
 ) -> Result<ImageRef> {
-    let hash = Hash::of(png);
-    store.put(&image_key(&hash.to_hex()), png).await?;
+    let hash = image_content::save_image_bytes(store, png).await?;
     Ok(ImageRef::new(*hash.as_bytes(), width, height))
 }
 
 /// Load the PNG bytes an [`ImageRef`] names, or `None` when the blob is absent
 /// (e.g. a reference that outlived an orphan sweep, or a not-yet-synced blob).
 pub async fn load_image(store: &mut dyn Store, image: &ImageRef) -> Result<Option<Vec<u8>>> {
-    Ok(store.get(&image_key(&image.hex())).await?)
+    image_content::load_image_bytes(store, &image.hex()).await
 }
 
 /// Drop the blob an [`ImageRef`] names, returning whether one was removed.
@@ -65,13 +57,7 @@ pub async fn delete_image(store: &mut dyn Store, image: &ImageRef) -> Result<boo
 /// Drop a blob by digest hex. This is the apply half used by Athanor's
 /// mark/sweep proposal, which inventories keys before it has an `ImageRef`.
 pub async fn delete_image_hex(store: &mut dyn Store, hex: &str) -> Result<bool> {
-    // Probe first: muniment's delete is idempotent (absent keys are not an
-    // error), but this reports whether a blob was actually removed — the
-    // orphan sweep counts reclamations.
-    let key = image_key(hex);
-    let existed = store.get(&key).await?.is_some();
-    store.delete(&key).await?;
-    Ok(existed)
+    image_content::delete_image_bytes(store, hex).await
 }
 
 /// The hex digest of every stored image blob. The input to the orphan sweep:
@@ -79,12 +65,7 @@ pub async fn delete_image_hex(store: &mut dyn Store, hex: &str) -> Result<bool> 
 /// blobs. Order is store-defined; sort at the call site if a stable order is
 /// wanted.
 pub async fn stored_image_hexes(store: &mut dyn Store) -> Result<Vec<String>> {
-    Ok(store
-        .list(IMAGE_PREFIX)
-        .await?
-        .into_iter()
-        .filter_map(|key| key.strip_prefix(IMAGE_PREFIX).map(str::to_string))
-        .collect())
+    image_content::stored_image_hexes(store).await
 }
 
 /// Externalize pre-phase-2 inline imagery in `snapshot`, in place.
@@ -152,8 +133,6 @@ pub async fn migrate_legacy_images(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use async_trait::async_trait;
-    use std::collections::HashMap;
 
     /// Minimal in-memory [`Store`] for the round-trip tests (mirrors the ones in
     /// `content_store` / `athanor`, with `iter_keys` for the sweep helper).
