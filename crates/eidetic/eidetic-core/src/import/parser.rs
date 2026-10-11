@@ -7,36 +7,56 @@
 use super::*;
 use serde_json::Value;
 
+use super::intake::{IntakeNotice, IntakeNoticeKind};
+
 pub(super) fn parse_chrome_bookmark_json(
     contents: &str,
 ) -> Result<Vec<ImportedBookmarkItem>, BookmarkImportError> {
+    parse_chrome_bookmark_json_with_notices(contents).map(|(items, _)| items)
+}
+
+pub(super) fn parse_chrome_bookmark_json_with_notices(
+    contents: &str,
+) -> Result<(Vec<ImportedBookmarkItem>, Vec<IntakeNotice>), BookmarkImportError> {
     let root: Value = serde_json::from_str(contents)
         .map_err(|error| BookmarkImportError::InvalidJson(error.to_string()))?;
     let mut items = Vec::new();
+    let mut notices = Vec::new();
+    report_fields(&root, &["roots"], None, &mut notices);
     let Some(roots) = root.get("roots") else {
-        return Ok(items);
+        notices.push(skipped(None, "bookmark JSON has no roots"));
+        return Ok((items, notices));
     };
+    report_fields(
+        roots,
+        &["bookmark_bar", "other", "synced"],
+        Some("roots".into()),
+        &mut notices,
+    );
 
     collect_chrome_root(
         roots.get("bookmark_bar"),
         BookmarkLocation::Toolbar,
         &mut Vec::new(),
         &mut items,
+        &mut notices,
     );
     collect_chrome_root(
         roots.get("other"),
         BookmarkLocation::Other,
         &mut Vec::new(),
         &mut items,
+        &mut notices,
     );
     collect_chrome_root(
         roots.get("synced"),
         BookmarkLocation::Other,
         &mut Vec::new(),
         &mut items,
+        &mut notices,
     );
 
-    Ok(items)
+    Ok((items, notices))
 }
 
 fn collect_chrome_root(
@@ -44,6 +64,7 @@ fn collect_chrome_root(
     location: BookmarkLocation,
     folder_path: &mut Vec<ImportedFolderSegment>,
     items: &mut Vec<ImportedBookmarkItem>,
+    notices: &mut Vec<IntakeNotice>,
 ) {
     let Some(node) = node else {
         return;
@@ -53,7 +74,7 @@ fn collect_chrome_root(
     // Recurse into its children directly instead of pushing it as a folder.
     if let Some(children) = node.get("children").and_then(Value::as_array) {
         for child in children {
-            collect_chrome_node(child, location, folder_path, items);
+            collect_chrome_node(child, location, folder_path, items, notices);
         }
     }
 }
@@ -63,11 +84,20 @@ fn collect_chrome_node(
     location: BookmarkLocation,
     folder_path: &mut Vec<ImportedFolderSegment>,
     items: &mut Vec<ImportedBookmarkItem>,
+    notices: &mut Vec<IntakeNotice>,
 ) {
     let node_type = node.get("type").and_then(Value::as_str).unwrap_or_default();
     match node_type {
         "url" => {
+            let locator = node.get("id").and_then(Value::as_str).map(str::to_string);
+            report_fields(
+                node,
+                &["type", "url", "name", "id", "date_added", "date_last_used"],
+                locator.clone(),
+                notices,
+            );
             let Some(raw_url) = node.get("url").and_then(Value::as_str) else {
+                notices.push(skipped(locator, "bookmark has no URL"));
                 return;
             };
             if let Some(page) =
@@ -82,9 +112,25 @@ fn collect_chrome_node(
                     modified_at_unix_secs: parse_chrome_timestamp(node.get("date_last_used")),
                     tags: Vec::new(),
                 });
+            } else {
+                notices.push(skipped(locator, "bookmark has an empty URL"));
             }
         },
         "folder" => {
+            let locator = node.get("id").and_then(Value::as_str).map(str::to_string);
+            report_fields(
+                node,
+                &["type", "name", "id", "children"],
+                locator.clone(),
+                notices,
+            );
+            if node
+                .get("children")
+                .and_then(Value::as_array)
+                .is_none_or(Vec::is_empty)
+            {
+                notices.push(skipped(locator, "empty folder has no bookmark records"));
+            }
             let label = normalize_optional_text(node.get("name").and_then(Value::as_str));
             let next_depth = folder_path.len();
             let stable_id = node.get("id").and_then(Value::as_str).map(str::to_string);
@@ -97,7 +143,7 @@ fn collect_chrome_node(
             }
             if let Some(children) = node.get("children").and_then(Value::as_array) {
                 for child in children {
-                    collect_chrome_node(child, location, folder_path, items);
+                    collect_chrome_node(child, location, folder_path, items, notices);
                 }
             }
             if node.get("name").and_then(Value::as_str).is_some() && !folder_path.is_empty() {
@@ -105,9 +151,13 @@ fn collect_chrome_node(
             }
         },
         _ => {
+            notices.push(skipped(
+                node.get("id").and_then(Value::as_str).map(str::to_string),
+                "unknown bookmark node type",
+            ));
             if let Some(children) = node.get("children").and_then(Value::as_array) {
                 for child in children {
-                    collect_chrome_node(child, location, folder_path, items);
+                    collect_chrome_node(child, location, folder_path, items, notices);
                 }
             }
         },
@@ -115,6 +165,13 @@ fn collect_chrome_node(
 }
 
 pub(super) fn parse_netscape_bookmark_html(contents: &str) -> Vec<ImportedBookmarkItem> {
+    parse_netscape_bookmark_html_with_notices(contents).0
+}
+
+pub(super) fn parse_netscape_bookmark_html_with_notices(
+    contents: &str,
+) -> (Vec<ImportedBookmarkItem>, Vec<IntakeNotice>) {
+    let mut notices = Vec::new();
     let mut items = Vec::new();
     let mut folder_path: Vec<ImportedFolderSegment> = Vec::new();
     let mut pending_folder_label: Option<String> = None;
@@ -157,7 +214,29 @@ pub(super) fn parse_netscape_bookmark_html(contents: &str) -> Vec<ImportedBookma
                 }
             },
             HtmlToken::Tag(tag) if tag.is_opening("a") => {
+                for field in [
+                    "icon",
+                    "icon_uri",
+                    "tags",
+                    "last_charset",
+                    "shortcuturl",
+                    "feedurl",
+                ] {
+                    if tag.attr(field).is_some() {
+                        notices.push(IntakeNotice {
+                            kind: IntakeNoticeKind::UnrepresentedField,
+                            source_locator: Some(match tag.attr("href") {
+                                Some(href) => format!("{href}.{field}"),
+                                None => field.into(),
+                            }),
+                            message: format!(
+                                "{field} remains in source evidence; browser output does not represent it"
+                            ),
+                        });
+                    }
+                }
                 let Some(raw_url) = tag.attr("href") else {
+                    notices.push(skipped(None, "bookmark anchor has no HREF"));
                     index += 1;
                     continue;
                 };
@@ -192,6 +271,8 @@ pub(super) fn parse_netscape_bookmark_html(contents: &str) -> Vec<ImportedBookma
                         modified_at_unix_secs,
                         tags: Vec::new(),
                     });
+                } else {
+                    notices.push(skipped(Some(decoded_url), "bookmark has an empty HREF"));
                 }
             },
             _ => {},
@@ -199,7 +280,40 @@ pub(super) fn parse_netscape_bookmark_html(contents: &str) -> Vec<ImportedBookma
         index += 1;
     }
 
-    items
+    (items, notices)
+}
+
+fn skipped(source_locator: Option<String>, message: &str) -> IntakeNotice {
+    IntakeNotice {
+        kind: IntakeNoticeKind::SkippedRecord,
+        source_locator,
+        message: message.into(),
+    }
+}
+
+fn report_fields(
+    node: &Value,
+    represented: &[&str],
+    locator: Option<String>,
+    notices: &mut Vec<IntakeNotice>,
+) {
+    if let Some(fields) = node.as_object() {
+        for field in fields
+            .keys()
+            .filter(|name| !represented.contains(&name.as_str()))
+        {
+            notices.push(IntakeNotice {
+                kind: IntakeNoticeKind::UnrepresentedField,
+                source_locator: Some(match &locator {
+                    Some(locator) => format!("{locator}.{field}"),
+                    None => field.clone(),
+                }),
+                message: format!(
+                    "{field} remains in source evidence; browser output does not represent it"
+                ),
+            });
+        }
+    }
 }
 
 fn build_page_seed(

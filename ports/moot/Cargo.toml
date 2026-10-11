@@ -23,7 +23,7 @@ commons-chat = ["dep:commons-spine", "dep:muniment"]
 captured-web = [
     "dep:gemot",
     "dep:servitor",
-    "dep:mere-document-lanes",
+    "dep:fleece",
     "dep:eidetic-search",
 ]
 
@@ -33,7 +33,7 @@ commons-spine = { workspace = true, optional = true }
 muniment = { workspace = true, optional = true }
 gemot = { workspace = true, optional = true }
 servitor = { workspace = true, optional = true }
-mere-document-lanes = { workspace = true, optional = true, features = ["eidetic-bridge"] }
+fleece = { workspace = true, optional = true, features = ["eidetic-bridge"] }
 eidetic-search = { workspace = true, optional = true }
 # The coop lifecycle contract is data plus a harness: serde only, never gated.
 serde = { workspace = true }

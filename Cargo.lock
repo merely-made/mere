@@ -4979,7 +4979,6 @@ dependencies = [
  "bytes",
  "chacha20poly1305 0.11.0",
  "chartulary",
- "fjall",
  "jsonschema",
  "mere-transport",
  "mockito",
@@ -4990,7 +4989,7 @@ dependencies = [
  "serde_json",
  "tempfile",
  "tokio",
- "ureq 2.12.1",
+ "url",
 ]
 
 [[package]]
@@ -5000,7 +4999,6 @@ dependencies = [
  "eidetic",
  "esp",
  "genet-text",
- "import",
  "muniment",
  "pollster 0.4.0",
  "serde",
@@ -5908,12 +5906,12 @@ name = "gazette"
 version = "0.0.1"
 dependencies = [
  "chirograph",
- "fleece",
  "gaz",
  "genet-static-dom",
  "graphshell-client",
  "incipit",
  "iri-string",
+ "mere-fleece",
  "reqwest 0.12.28",
  "sceno",
  "scenomise",
@@ -7596,23 +7594,6 @@ name = "imgref"
 version = "1.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6e44b0a4eaa4c82f441d50a963f2d5f05a787240aeee097597033e72accfd22f"
-
-[[package]]
-name = "import"
-version = "0.0.1"
-dependencies = [
- "eidetic",
- "fleece",
- "genet-static-dom",
- "image",
- "inker",
- "mere-forme",
- "mere-kernel",
- "nematic",
- "serde",
- "serde_json",
- "url",
-]
 
 [[package]]
 name = "incipit"
@@ -9314,6 +9295,7 @@ dependencies = [
  "euclid",
  "inker",
  "mere-apparatus",
+ "mere-fleece",
  "mere-forme",
  "mere-kernel",
  "mere-linked-data",
@@ -9405,21 +9387,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "mere-crawl"
-version = "0.0.1"
-dependencies = [
- "armillary",
- "fleece",
- "genet-static-dom",
- "incipit",
- "mere-fetch",
- "mere-linked-data",
- "tokio",
- "tracing",
- "url",
-]
-
-[[package]]
 name = "mere-curation"
 version = "0.1.0"
 dependencies = [
@@ -9434,24 +9401,18 @@ dependencies = [
  "bytes",
  "document-canvas",
  "document-session-api",
- "eidetic",
  "errand",
- "fleece",
  "genet-host-api",
  "genet-static-dom",
  "image",
  "inker",
- "mere-linked-data",
- "mere-transport",
+ "mere-fleece",
  "mockito",
  "nematic",
  "netfetcher",
  "netrender",
- "oxjsonld",
- "oxrdf",
  "pollster 0.4.0",
  "serde",
- "serde_json",
  "tabard",
  "tempfile",
  "tokio",
@@ -9464,21 +9425,61 @@ name = "mere-fetch"
 version = "0.0.1"
 dependencies = [
  "armillary",
+ "async-trait",
+ "bytes",
  "eidetic",
  "errand",
+ "futures-util",
  "genet-host-api",
+ "http",
+ "http-body-util",
+ "hyper-rustls",
+ "hyper-util",
  "inker",
  "mere-page-load",
+ "mere-transport",
+ "mockito",
  "netfetcher",
  "pandect",
+ "personae",
  "pollster 0.4.0",
+ "rustls",
  "rustls-pki-types",
  "serde",
  "serde_json",
  "tokio",
  "tracing",
+ "ureq 2.12.1",
  "url",
  "zeroize",
+]
+
+[[package]]
+name = "mere-fleece"
+version = "0.0.1"
+dependencies = [
+ "armillary",
+ "eidetic",
+ "fleece",
+ "genet-host-api",
+ "genet-static-dom",
+ "image",
+ "incipit",
+ "inker",
+ "mere-fetch",
+ "mere-linked-data",
+ "mere-transport",
+ "muniment",
+ "nematic",
+ "oxjsonld",
+ "oxrdf",
+ "pollster 0.4.0",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "tokio",
+ "tracing",
+ "url",
 ]
 
 [[package]]
@@ -9582,13 +9583,12 @@ dependencies = [
  "commons-spine",
  "eidetic",
  "eidetic-search",
- "fleece",
  "gemot",
  "genet-static-dom",
  "hex",
  "insigne",
  "mere-comms",
- "mere-document-lanes",
+ "mere-fleece",
  "muniment",
  "p2panda-core",
  "personae",
@@ -10075,6 +10075,7 @@ version = "0.1.2"
 dependencies = [
  "async-trait",
  "blake3",
+ "fjall",
  "futures-channel",
  "js-sys",
  "pollster 0.4.0",
@@ -12634,7 +12635,6 @@ dependencies = [
  "dirs 6.0.0",
  "dpi",
  "encoding_rs",
- "fleece",
  "genet-compositor",
  "genet-document-resources",
  "genet-documents",
@@ -12648,6 +12648,7 @@ dependencies = [
  "inker",
  "layout-dom-api",
  "mere-document-lanes",
+ "mere-fleece",
  "mere-surface-api",
  "mesquite",
  "mockito",

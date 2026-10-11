@@ -7,10 +7,16 @@ into one volume. This crate is that for a running session: the record it
 accretes while it is alive.
 
 - Session manifests, graph and view sidecars, worker declarations.
-- Content, image, facet, and manifest stores.
+- Graph image-reference adapters, facet and manifest stores.
 - Application, device, and persona settings.
 - The persona wallet carry lane: the device roster, signed device grants,
   epoch history, and the family-shared identity root.
+
+Eidetic owns portable intake, retained content and image bytes, content caching,
+and schema validation. Pandect binds those records to the session and graph,
+including graph codicils and retention decisions. Muniment supplies the backend.
+Published schema helper names remain as forwarding reexports for consumers such
+as Knot; their implementation and schema identity are owned by Eidetic.
 
 Renamed from `session-runtime` on 2026-08-15 when it was published: the crate
 was named for what it did in one host, and the family names published crates

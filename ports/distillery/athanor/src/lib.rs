@@ -66,10 +66,10 @@ use kernel::graph::Graph;
 use kernel::persistence::GraphSnapshot;
 use kernel::types::ImageRole;
 
-use pandect::content_store;
+use alembic::memory_levels::{EvictionPolicy, evictable_short_term};
+use eidetic::content_store;
 use pandect::graph_codicil::{self, RedactionPolicy};
 use pandect::image_store;
-use alembic::memory_levels::{EvictionPolicy, evictable_short_term};
 
 /// How many of the most-recently-created codicils a consolidation pass considers.
 /// Bounds the pairwise scan (thaw is per-candidate, comparison is per-pair) as the
@@ -449,8 +449,8 @@ pub async fn apply_retirement(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use pandect::content_store::{StoredContent, save_content};
     use async_trait::async_trait;
+    use eidetic::content_store::{StoredContent, save_content};
     use euclid::default::Point2D;
     use kernel::graph::Graph;
     use kernel::graph::fixtures::GraphFixtures;
