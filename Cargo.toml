@@ -81,6 +81,7 @@ members = [
     "crates/graphshell/graphshell-endpoint",
     "ports/graphshell",
     "ports/djinn",
+    "ports/dramatis",
     "ports/castellan",
     "ports/distillery",
     "ports/moot",

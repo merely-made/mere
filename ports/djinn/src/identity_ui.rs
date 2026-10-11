@@ -39,6 +39,15 @@ const PICKER_START_ENV: &str = "GRAPHSHELL_NATIVE_PICKER_START";
 /// Implementations own the selected path and passphrase. Neither appears in
 /// the browser request or response types.
 pub trait NativeIdentityUi: Send + Sync {
+    /// Resident-owned confirmation; apps cannot supply the answer.
+    fn confirm_quarantine(
+        &self,
+        _profile: &str,
+        _title: &str,
+        _action: &str,
+    ) -> Result<bool, NativeIdentityFailure> {
+        Err(NativeIdentityFailure::UiUnavailable)
+    }
     fn pick_ssh_private_key(&self) -> Result<Option<PathBuf>, NativeIdentityFailure>;
 
     fn prompt_ssh_private_key_passphrase(
@@ -97,6 +106,32 @@ impl SystemNativeIdentityUi {
 }
 
 impl NativeIdentityUi for SystemNativeIdentityUi {
+    fn confirm_quarantine(
+        &self,
+        profile: &str,
+        title: &str,
+        action: &str,
+    ) -> Result<bool, NativeIdentityFailure> {
+        self.require_graphical_backend()?;
+        let question = if action == "Assign all items to this persona" {
+            "Assign this older import namespace to the persona above?\nThis assigns every item without accepting quarantined credentials.".to_string()
+        } else if action == "Accept" {
+            "Accept this quarantined item?\nIts supported credentials become available for use."
+                .to_string()
+        } else {
+            format!("{action} this quarantined item?")
+        };
+        let message = format!(
+            "Persona: {profile}\nReview: {title}\n\n{question}\nThis decision is made by Djinn."
+        );
+        Ok(
+            light_file_dialog::dialog::MessageBox::new("Djinn · Quarantine review", &message)
+                .buttons(light_file_dialog::MessageBoxType::YesNo)
+                .default_button(0)
+                .show()
+                == light_file_dialog::MessageBoxButton::Ok,
+        )
+    }
     fn pick_ssh_private_key(&self) -> Result<Option<PathBuf>, NativeIdentityFailure> {
         self.require_graphical_backend()?;
         let mut dialog = OpenFileDialog::new("Import SSH private key")
