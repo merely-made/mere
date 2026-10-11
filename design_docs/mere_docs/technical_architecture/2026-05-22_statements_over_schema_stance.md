@@ -18,6 +18,23 @@ This holds uniformly across what the kernel currently treats as three separate t
 
 All three are statements about a subject. The only real distinction is whether Mere *recognizes* the predicate and gives it behavior.
 
+### Primary graph model and specialized representations (2026-10-11)
+
+The [family composition brief §8](../../2026-08-12_family_composition_thesis_brief.md#8-primary-data-model-clips-and-live-entities-2026-10-11)
+records Mark's accepted direction: the graph is the primary data model, with
+portable clips and live entities. This statement stance describes meaningful
+relationships and attributes at graph scope. Documents, media and domain data
+can retain their internal structures and out-of-line payloads; their every
+element need not become a statement or node. The brief owns clip boundaries
+and the proposed lifecycle, live-sharing and cross-domain edit policies.
+
+The recognized-core/open-tail distinction applies to interpretation: preserve
+unfamiliar material and vocabulary, disclose unsupported behavior. A statement
+about an entity does not itself confer authority to change or execute it.
+Graph-primary design adopts neither RDF serialization nor a separate quad
+store as the universal internal representation. The 2026-10-04 native resource
+and surface graph split remains the adopted storage direction below.
+
 ## Why we adopted it
 
 We keep reinventing linked-data primitives and finding our version is the rigid one. That is not coincidence: we are building a graph of the web, which is the territory RDF mapped. The friction is always the same shape, a closed schema meeting an open world:
@@ -55,15 +72,21 @@ RDF describes resources. It never described the reading of them. RDF was built t
 
 **The cut this draws.** RDF's value is shared vocabulary for shared facts about the world, and it pays off exactly where the facts are shared. The two-layer model cuts on *recognized-behavior vs stored-tail*. Underneath it sits a second, sharper cut: **shared-world-fact (RDF-native) vs private-experiential-fact (Mere's own).** The two cuts mostly coincide, which is why the model works; the world/experience cut is the one that predicts whether RDF has words for a relation at all.
 
-**What it means for the substrate question.** "Build Mere-specifics on SPARQL, Turtle, JSON-LD" is right for the content graph and wrong for the workspace graph. Three positions:
+**What it means for the substrate question.** "Build Mere-specifics on SPARQL, Turtle, JSON-LD" is right for the content graph and wrong for the workspace graph. Three original positions, followed by the adopted 2026-10-04 amendment:
 
-1. **Conservative (current).** One native kernel; add an open `predicate` IRI; curate. RDF stays a projection in and out. This is the [linked-data ingest/export plan](../implementation_strategy/2026-05-22_linked_data_ingest_export_plan.md) *(historical citation)* <!-- doc-audit: historical-link -->.
+1. **Conservative (original baseline).** One native kernel; add an open `predicate` IRI; curate. RDF stays a projection in and out. This is the [linked-data ingest/export plan](../implementation_strategy/2026-05-22_linked_data_ingest_export_plan.md) *(historical citation)* <!-- doc-audit: historical-link -->.
 2. **Radical.** Internal store becomes a quad store, everything is quads, SPARQL is the internal query, families become vocabulary on top. Rejected as the *substrate*: the workspace half runs at frame rate over mutable state, behavior dispatch wants exhaustive closed enums, a SPARQL engine is heavy in wasm, and "natively RDF" pulls toward the OWL/RDFS reasoning footgun this doc already excludes.
-3. **Split (the live option).** The content subgraph becomes a real SPARQL-queryable RDF store ([Oxigraph](https://crates.io/crates/oxigraph) is the wasm-capable Rust candidate); the browse and workspace graphs stay in the native kernel; the node IRI is the join key. This makes "build on RDF" true for the half where facts are shared, without the kernel becoming RDF.
+3. **Split (the original candidate).** The content subgraph becomes a real SPARQL-queryable RDF store ([Oxigraph](https://crates.io/crates/oxigraph) was the wasm-capable Rust candidate); the browse and workspace graphs stay in the native kernel; the node IRI is the join key. This proposed "build on RDF" for the half where facts are shared, without the kernel becoming RDF. The amendment below supersedes its store choice.
 
    > **Amended 2026-10-04 (Mark, [graph semantics plan](../implementation_strategy/2026-10-04_graph_semantics_plan.md) ruling 6):** the split is taken, in petgraph form rather than as a separate RDF store: each mere holds a resource graph (content statements, one resource per canonical URL, keyed by the UUIDv5 of its IRI) beside the surface graph (browse and workspace), joined by the resource a surface shows. SPARQL runs over the resource graph through a `QueryableDataset` adapter. A table-as-truth form was compared and declined, since it is the held-RDF-truth design measured on 2026-06-18.
 
-**Disposition.** Hold position 1 now: the native kernel stays the substrate, and the world/experience cut is a conceptual layer over it. Treat position 3, promoting the content subgraph into an actual SPARQL store, as a future projection that earns its place when federated or semantic query over the content graph is a real requirement. This is the same slot the [event-DAG substrate brief](../implementation_strategy/2026-05-07_event_dag_substrate_brief.md) assigns Oxigraph and NextGraph at the engram boundary.
+**Current disposition (reconciled 2026-10-11).** The 2026-10-04 ruling adopts
+the resource/surface split in the native kernel, with SPARQL through a
+`QueryableDataset` adapter. The earlier advice to hold position 1 while
+waiting for position 3 is superseded by that ruling. RDF remains an
+interchange/query interpretation of the appropriate graph data; the ruling
+does not promote a separate Oxigraph/NextGraph store or make payloads and
+workspace state uniformly RDF.
 
 ## The posture
 

@@ -31,6 +31,17 @@ host/realization rows (§1, §7, §9, §12) are pre-flip; read them through the
 > (forme, platen) and the arrangement ontology are unaffected. A full
 > §1/§7/§9/§12 refresh is still owed (topology doc, staleness flag).
 
+> **2026-10-11 data-model clarification.** The
+> [family composition brief §8](../../2026-08-12_family_composition_thesis_brief.md#8-primary-data-model-clips-and-live-entities-2026-10-11)
+> records the graph as the primary data model, with portable clips and live
+> entities, while domains retain specialized internal representations. Content
+> ordering, containment and references may be semantic structure; authored
+> arrangement remains under its own authority, and projection derives current
+> geometry and appearances. The spine does not flatten document internals or
+> turn every runtime value into graph truth. Clip lifecycle, live sharing and
+> cross-domain edit proposals have their canonical home in that brief. This
+> clarification leaves the historical host/realization rows identified above.
+
 Refines (does not
 replace) [`2026-05-21_app_architecture_rescaffold.md`](../../archive_docs/2026-06-09_pivot_superseded/2026-05-21_app_architecture_rescaffold.md)
 — that doc fixed the *framework* question (chrome = idiomatic Xilem, retire
