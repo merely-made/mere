@@ -34,6 +34,11 @@ specifies the retained-origin scenario order for agents on the other machines.
 The [Forme fixes](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#forme-identity-and-validation-fixes-2026-10-11)
 cover occurrence identity, collapsed regions, malformed divider edits and shared
 Resource tags; the new qualification record keeps browser acceptance separate.
+The [link/assertion inspector draft](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#link-and-exact-assertion-inspector-draft-2026-10-11)
+expands held bundles by direction and source stratum and re-resolves exact
+statement handles. Native model and product wasm checks pass; headed qualification
+remains pending in its owning plan. Field inspection remains next; derived-link
+explanations and primitive writes retain their owners.
 
 Primary data model (2026-10-11): the
 [family composition brief §8](2026-08-12_family_composition_thesis_brief.md#8-primary-data-model-clips-and-live-entities-2026-10-11)
