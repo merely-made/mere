@@ -383,5 +383,10 @@ also passes. The new session regression
 checks refusal without losing draft state or saved undo bytes. The owning plan
 and index link the portable source-hashed qualification record and retain the
 browser handoff. Complete citation and D2 audit JSON match the pre-edit baseline;
-D2 retains 252/259 coverage and its nine existing errors. New local links resolve
+D2 retains 252/259 coverage and its eight existing errors. New local links resolve
 and whitespace checks pass. No active document or unknown audit record was added.
+
+The primary checkout's citation report differs from the isolated worktree
+because sibling paths resolve relative to the checkout parent. A read-only
+comparison substituting the pre-edit Git documents on that same primary
+filesystem confirms unchanged citation and D2 findings there as well.

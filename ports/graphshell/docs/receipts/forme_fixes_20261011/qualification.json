@@ -48,8 +48,10 @@
     "d2_json_unchanged": true,
     "active_docs": 259,
     "covered_active_docs": 252,
-    "existing_d2_errors": 9,
+    "existing_d2_errors": 8,
     "added_local_links_resolve": 2,
-    "whitespace_check": "passed"
+    "whitespace_check": "passed",
+    "primary_checkout_before_after_identical": true,
+    "citation_scope_note": "Citation path resolution uses the checkout parent. The worktree and primary reports differ in sibling-path availability; both scopes retain their own unchanged before/after findings."
   }
 }
