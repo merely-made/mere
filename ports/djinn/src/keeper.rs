@@ -42,6 +42,10 @@ pub struct Keeper<S: IdentityStorage + 'static> {
     policy: ReleasePolicy,
     #[cfg(feature = "cxf")]
     credentials: std::sync::OnceLock<castellan::resident::CastellanResident>,
+    #[cfg(feature = "cxf")]
+    credential_stores: std::sync::OnceLock<
+        std::collections::BTreeMap<personae::ProfileId, castellan::resident::CastellanResident>,
+    >,
 }
 
 impl<S: IdentityStorage + 'static> Keeper<S> {
@@ -55,6 +59,8 @@ impl<S: IdentityStorage + 'static> Keeper<S> {
             policy: ReleasePolicy::default(),
             #[cfg(feature = "cxf")]
             credentials: std::sync::OnceLock::new(),
+            #[cfg(feature = "cxf")]
+            credential_stores: std::sync::OnceLock::new(),
         }
     }
 
@@ -88,11 +94,35 @@ impl<S: IdentityStorage + 'static> Keeper<S> {
         &self,
         credentials: castellan::resident::CastellanResident,
     ) -> Result<(), String> {
-        self.credentials
-            .set(credentials)
-            .map_err(|_| "credential authority already attached".into())
+        let profile = self.host.current_profile_id();
+        self.attach_credential_stores(
+            profile.clone(),
+            std::collections::BTreeMap::from([(profile, credentials)]),
+        )
     }
 
+    /// Attach the startup catalog before serving the app door. Each store keeps
+    /// its original key persona; CXF commands retain the primary resident store.
+    #[cfg(feature = "cxf")]
+    pub fn attach_credential_stores(
+        &self,
+        primary: personae::ProfileId,
+        stores: std::collections::BTreeMap<
+            personae::ProfileId,
+            castellan::resident::CastellanResident,
+        >,
+    ) -> Result<(), String> {
+        let initial = stores
+            .get(&primary)
+            .ok_or("primary credential store is unavailable")?
+            .clone();
+        self.credential_stores
+            .set(stores)
+            .map_err(|_| "credential authority already attached".to_string())?;
+        self.credentials
+            .set(initial)
+            .map_err(|_| "credential authority already attached".into())
+    }
     /// Execute owner-only CXF commands without opening another vault.
     #[cfg(feature = "cxf")]
     pub(crate) fn cxf_command(&self, command: &str, args: &[String]) -> Result<String, String> {

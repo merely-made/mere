@@ -68,6 +68,7 @@ fn state(locked: bool, unsupported: bool) -> State {
                 vec![]
             } else {
                 vec![QuarantineCard {
+                    store: ProfileId("family".into()),
                     persona: *personae::PersonaId::new().as_uuid(),
                     item,
                     revision: "exact-reviewed-metadata".into(),
@@ -143,6 +144,7 @@ fn older_import_assignment_names_the_destination_and_exact_revision() {
     let persona = *personae::PersonaId::new().as_uuid();
     s.snapshot.as_mut().unwrap().unassigned.push(
         graphshell::native::quarantine::UnassignedImport {
+            store: ProfileId("family".into()),
             persona,
             titles: vec!["Older imported card".into()],
             item_count: 1,

@@ -61,8 +61,9 @@ def main():
     if not args.skip_build:
         run("host-build",cargo("build","-p","djinn","--bin","dramatis-review-host","--features","custody-receipt-host,cxf"))
         run("app-build",cargo("build","-p","dramatis-app","--bin","dramatis-ui"))
+    run("resident-check",cargo("check","-p","djinn","--bin","djinn","--features","cxf"))
     log = run("green",cargo("test","-p","djinn","--test","quarantine_review","--features","cxf"))
-    assert "running 14 tests" in log
+    assert "running 16 tests" in log
     run("app-state",cargo("test","-p","dramatis-app","--test","state"))
     run("interaction",cargo("test","-p","dramatis-app","--test","interaction"))
     run("castellan",cargo("test","-p","castellan","--features","cxf","--lib"))
@@ -81,6 +82,7 @@ def main():
         source.write_bytes(original)
     assert source.read_bytes()==original
     run("restored",cargo("test","-p","djinn","--test","quarantine_review","--features","cxf"))
+    run("store-discovery",cargo("test","-p","djinn","--lib","--features","cxf")+["--","--exact","resident::tests::startup_discovers_original_store_after_selected_persona_changes"])
     # Rebuild the receipt host after restoring the production consent gate.
     run("restored-build",cargo("build","-p","djinn","--bin","dramatis-review-host","--features","custody-receipt-host,cxf"))
     absent = r"\\.\pipe\dramatis-app-receipt-absent"
@@ -89,8 +91,9 @@ def main():
     run("window-absent",[str(TARGET/"debug/dramatis-ui.exe")],env)
     fixture("locked"); fixture("unlocked")
     hashes={p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in ROOT.glob("ports/dramatis/**/*.rs")}
-    for p in [source,ROOT/"Cargo.lock",ROOT/"ports/castellan/src/review.rs"]:
+    owned = subprocess.check_output(["git", "diff", "--name-only", "origin/main"],cwd=ROOT,text=True).splitlines()
+    for p in [ROOT/name for name in owned if name.endswith((".rs", ".toml", "Cargo.lock"))]:
         hashes[p.relative_to(ROOT).as_posix()]=hashlib.sha256(p.read_bytes()).hexdigest()
     artifacts={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in OUT.iterdir() if p.suffix in [".png",".log"]}
-    (OUT/"receipt.json").write_text(json.dumps({"platform":"Windows native Cambium/Genet","base":subprocess.check_output(["git","rev-parse","HEAD"],cwd=ROOT,text=True).strip(),"commands":records,"source_sha256":hashes,"artifacts_sha256":artifacts,"scope":"synthetic fixtures; no actual vault; native captures require separate visual review; consent gate restored byte-exact"},indent=2)+"\n",encoding="utf-8")
+    (OUT/"receipt.json").write_text(json.dumps({"platform":"Windows native Cambium/Genet","base":subprocess.check_output(["git","rev-parse","HEAD"],cwd=ROOT,text=True).strip(),"commands":records,"source_sha256":hashes,"artifacts_sha256":artifacts,"restored_consent_sha256":hashlib.sha256(original).hexdigest(),"scope":"synthetic fixtures; no actual vault; native captures require separate visual review; consent gate restored byte-exact"},indent=2)+"\n",encoding="utf-8")
 if __name__=="__main__": main()

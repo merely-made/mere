@@ -90,6 +90,7 @@ pub fn root(state: &State) -> Child {
                     contents.push(action(
                         "Assign to this persona",
                         Request::Assign(graphshell::native::quarantine::AssignImportRequest {
+                            store: import.store.clone(),
                             profile: snapshot.roster.chosen.clone(),
                             persona: import.persona,
                             revision: import.revision.clone(),
@@ -109,6 +110,7 @@ pub fn root(state: &State) -> Child {
             }
             for card in &snapshot.cards {
                 let mut contents = vec![Box::new(el("h3", text(card.item.title.clone()))) as Child];
+                contents.push(line(format!("Import store: {}", card.store.0)));
                 if let Some(subtitle) = &card.item.subtitle {
                     contents.push(line(subtitle.clone()));
                 }

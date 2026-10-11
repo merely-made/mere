@@ -244,7 +244,14 @@ impl<S: IdentityStorage + 'static> ResidentLock<S> {
         vault.unlock(method)?;
         let holders = self.holders.lock().unwrap().clone();
         for holder in &holders {
-            if let Err(error) = holder.unlock(&*vault) {
+            let restored = match holder.key_profile() {
+                Some(id) => vault.storage().load_profile(id).and_then(|profile| {
+                    let provider = personae::InMemoryProvider::from_seed(profile.master.to_seed());
+                    holder.unlock(&provider)
+                }),
+                None => holder.unlock(&*vault),
+            };
+            if let Err(error) = restored {
                 tracing::error!(holder = holder.name(), %error, "holder could not re-derive; relocking");
                 for holder in &holders {
                     holder.lock();

@@ -84,6 +84,7 @@ impl State {
             return;
         }
         self.queue(Request::Review(ReviewRequest {
+            store: card.store.clone(),
             profile,
             persona: card.persona,
             item: card.item.id,
