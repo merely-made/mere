@@ -1,0 +1,6 @@
+{
+  "new_or_changed_matching_reports": [],
+  "matched_report_count_before": 10,
+  "matched_report_count_after": 10,
+  "scope": "filename and metadata comparison only; no forced reset or systemwide health claim"
+}

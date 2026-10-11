@@ -1,0 +1,99 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `netrender_text v0.1.1 (/Users/markik/Code/worktrees/netrender-cambium-resource-bridge/netrender_text)` was not used in the crate graph
+help: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+   Compiling syn v3.0.6
+   Compiling smallvec v1.16.1
+   Compiling stable_deref_trait v1.2.1
+   Compiling num-traits v0.2.19
+   Compiling parking_lot_core v0.9.12
+   Compiling parking_lot v0.12.5
+   Compiling synstructure v0.14.0
+   Compiling litemap v0.8.3
+   Compiling writeable v0.6.4
+   Compiling serde_derive v1.0.229
+   Compiling zerofrom-derive v0.1.8
+   Compiling zerofrom v0.1.8
+   Compiling yoke-derive v0.8.3
+   Compiling yoke v0.8.3
+   Compiling zerovec-derive v0.11.6
+   Compiling serde v1.0.229
+   Compiling zerovec v0.11.8
+   Compiling displaydoc v0.2.7
+   Compiling tinystr v0.8.4
+   Compiling euclid v0.22.14
+   Compiling icu_locale_core v2.3.0
+   Compiling zerotrie v0.2.5
+   Compiling potential_utf v0.1.6
+   Compiling bytemuck_derive v1.12.1
+   Compiling string_cache v0.9.0
+   Compiling phf v0.13.1
+   Compiling icu_collections v2.3.0
+   Compiling web_atoms v0.2.6
+   Compiling bytemuck v1.25.2
+   Compiling icu_provider v2.3.1
+   Compiling polycool v0.4.0
+   Compiling markup5ever v0.39.0
+   Compiling font-types v0.12.5
+   Compiling icu_properties v2.3.0
+   Compiling read-fonts v0.41.0
+   Compiling icu_normalizer v2.3.0
+   Compiling kurbo v0.13.1
+   Compiling linebender_resource_handle v0.1.1
+   Compiling color v0.3.3
+   Compiling peniko v0.6.1
+   Compiling guillotiere v0.7.0
+   Compiling idna_adapter v1.2.2
+   Compiling app_units v0.7.8
+   Compiling thiserror-impl v2.0.21
+   Compiling png v0.18.1
+   Compiling skrifa v0.44.0
+   Compiling hashbrown v0.16.1
+   Compiling thiserror v2.0.21
+   Compiling vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a#5862bba2)
+   Compiling genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?rev=cec760f4ae6ce336823bc2be250d9ab4e35a8a47#cec760f4)
+   Compiling idna v1.1.0
+   Compiling xml5ever v0.39.0
+   Compiling html5ever v0.39.0
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=cec760f4ae6ce336823bc2be250d9ab4e35a8a47#cec760f4)
+   Compiling uuid v1.27.0
+   Compiling encoding_rs v0.8.42
+   Compiling accesskit v0.24.1
+   Compiling netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a#5862bba2)
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?rev=cec760f4ae6ce336823bc2be250d9ab4e35a8a47#cec760f4)
+   Compiling engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?rev=cec760f4ae6ce336823bc2be250d9ab4e35a8a47#cec760f4)
+   Compiling url v2.5.8
+   Compiling regress v0.11.1 (https://github.com/merely-made/genet.git?rev=cec760f4ae6ce336823bc2be250d9ab4e35a8a47#cec760f4)
+   Compiling paint_list_api v0.1.2 (/Users/markik/Code/worktrees/netrender-cambium-resource-bridge/paint_list_api)
+   Compiling sprigging v0.2.1 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/sprigging)
+   Compiling genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?rev=cec760f4ae6ce336823bc2be250d9ab4e35a8a47#cec760f4)
+   Compiling sceno v0.0.4 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/scenes/sceno)
+   Compiling command-menu v0.1.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/command-menu)
+   Compiling cambium v0.3.3 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium)
+warning: function `find_element_by_name` is never used
+    --> crates/cambium/cambium/src/tests.rs:1838:8
+     |
+1838 |     fn find_element_by_name(dom: &ScriptedDom, node: NodeId, name: &str) -> Option<NodeId> {
+     |        ^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `cambium` (lib test) generated 1 warning
+    Finished `test` profile [unoptimized] target(s) in 53.56s
+     Running unittests src/lib.rs (/Users/markik/Code/targets/vello-producer-gates-20261011/debug/deps/cambium-c9316b78f03dd7c4)
+
+running 2 tests
+test slider::tests::accessibility_values_route_to_the_slider_and_respect_its_range ... ok
+test slider::tests::new_clamps ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 252 filtered out; finished in 0.00s
+

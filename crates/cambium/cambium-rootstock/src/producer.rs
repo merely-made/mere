@@ -16,8 +16,27 @@ use std::{cell::RefCell, collections::BTreeMap, rc::Rc};
 pub use netrender::SourceAlpha;
 
 mod bridge;
-mod registry;
+pub(crate) mod registry;
+pub use paint_list_render::bundle::{PortablePaintCapture, ProducerSource};
+pub use registry::PortableCaptureError;
 pub use registry::ProducerRegistry;
+
+/// Application-owned portable scene; its viewport is the same rounded logical
+/// extent used by the producer's GPU callback. Identity changes on source rebind.
+#[derive(Clone, Debug)]
+pub struct ProducedScene {
+    pub scene: netrender::Scene,
+    pub source_identity: u64,
+    pub source_revision: u64,
+    pub alpha: SourceAlpha,
+    pub encoding: SourceEncoding,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum PortableProducerError {
+    Unsupported,
+    InvalidSource,
+}
 
 /// Colour values observed at the producer view's sampling boundary.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -95,6 +114,16 @@ pub trait TextureProducer {
     /// image; it leaves an empty slot when `needs_frame` is true. Cheaply skip
     /// unchanged world/appearance inputs here. Depth remains producer-owned.
     fn render(&mut self, cx: &ProducerContext<'_>) -> Option<ProducedTexture>;
+
+    /// Export the currently bound application scene without acquiring a device.
+    /// GPU-only producers explicitly refuse; a capture never substitutes pixels
+    /// or removes their authored external-texture command.
+    fn portable_scene(
+        &mut self,
+        _frame: &ProducerFrameInfo,
+    ) -> Result<ProducedScene, PortableProducerError> {
+        Err(PortableProducerError::Unsupported)
+    }
 
     /// Once on entering a non-painted or surface-suspended state. Releasing
     /// transient targets is optional; retained geometry can stay cached.
@@ -205,6 +234,12 @@ impl ProducerRole {
 impl<P: TextureProducer> TextureProducer for Rc<RefCell<P>> {
     fn render(&mut self, cx: &ProducerContext<'_>) -> Option<ProducedTexture> {
         self.borrow_mut().render(cx)
+    }
+    fn portable_scene(
+        &mut self,
+        frame: &ProducerFrameInfo,
+    ) -> Result<ProducedScene, PortableProducerError> {
+        self.borrow_mut().portable_scene(frame)
     }
     fn suspend(&mut self) {
         self.borrow_mut().suspend();

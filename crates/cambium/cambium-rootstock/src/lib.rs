@@ -44,10 +44,11 @@ mod owned_layout;
 pub use owned_layout::{OwnedLayout, ScrollAlign, ScrollTarget};
 pub mod producer;
 pub use producer::{
-    ProducedAction, ProducedTexture, ProducerAction, ProducerContext, ProducerError,
+    PortableCaptureError, PortablePaintCapture, PortableProducerError, ProducedAction,
+    ProducedScene, ProducedTexture, ProducerAction, ProducerContext, ProducerError,
     ProducerFrameInfo, ProducerFrameStats, ProducerNode, ProducerRegistrationError,
-    ProducerRegistry, ProducerRole, ProducerSemantics, ResolvedAppearance, SourceAlpha,
-    SourceEncoding, TextureProducer,
+    ProducerRegistry, ProducerRole, ProducerSemantics, ProducerSource, ResolvedAppearance,
+    SourceAlpha, SourceEncoding, TextureProducer,
 };
 
 /// The host's clock.

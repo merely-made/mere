@@ -1,0 +1,113 @@
+{
+  "date": "2026-10-11",
+  "status": "implementation draft; headed and Canvas native qualification pending",
+  "integration_base": "e56f7a3f784faac9f5eeebc4110d70653a504028",
+  "upstream_review": {
+    "checked": "2026-10-11 before implementation and delivery",
+    "result": "No newer commits or adoption of the prior editor draft at fetch; earlier Forme Chrome receipts retain their own source scope"
+  },
+  "native": {
+    "status": "passed",
+    "tests": 31,
+    "new_binding_tests": 7,
+    "retained_editor_tests": 9,
+    "actual_access_link_tests": 15,
+    "command": "cargo test --locked --manifest-path ports/graphshell/docs/receipts/presentation_live_20261011/harness/Cargo.toml --lib",
+    "scope": "Actual checked-in portable binding/editor/inspection modules, graph-only Mere and standalone locked dependencies; not full Graphshell native, Canvas tests or IndexedDB",
+    "existing_kernel_warnings": 13,
+    "log": "checks/native.log"
+  },
+  "wasm": {
+    "product_check": "passed",
+    "command": "cargo check --locked --target wasm32-unknown-unknown --no-default-features --features product",
+    "working_directory": "ports/graphshell/web",
+    "existing_web_warnings": 18,
+    "log": "checks/product-check.log",
+    "default_viewer_release": "not built"
+  },
+  "canvas_native": {
+    "status": "not run; pending",
+    "added_test": "canvas::forme_region::tests::rule_guides_restore_base_without_moving_or_unpinning_members",
+    "command": "cargo test --locked -p pictograph --features canvas --lib canvas::forme_region::tests",
+    "scope": "Override/base restoration, wrong-ID isolation, hidden boundary, selection/pin/position preservation and graph replacement; source compiled for product wasm, cfg(test) native execution unqualified"
+  },
+  "limits": {
+    "cargo_jobs": 1,
+    "memory_max_mib": 1280,
+    "swap_max_mib": 0,
+    "free_memory_guard_mib": 256
+  },
+  "contracts": {
+    "occurrences": "Access UUID; held assertion plus canonical displayed access pair; Numen FieldId; Forme UUID. No local indexes, shared-source coalescing or equal-address retargeting",
+    "unknown_inputs": "Disclosed available states; skip entire rules referencing unmapped state or missing measurements, even under Not/Any, after validating original whole set",
+    "bound_preview": "Exact held-owner/context read; view changes invalidate preview; empty prior matches disclosed. Reads pause while editor closed. Samples/manual copied context stay explicit and never affect Canvas",
+    "live": "View-local default-off switch; acknowledged saved rules only, saved undo/redo after acknowledgment; current Forme context independent of preview binding; cached resolution installed before Canvas composition",
+    "effect": "RegionGuides Forme subdivisions only, exact UUID, hidden boundaries stay hidden, outer outline preserved, absent/mismatched override restores hover/member-selection/unlocked base; graph replacement clears override",
+    "unsupported": "Other winning properties, Numen guides, unavailable state, sidecar-only/derived relation identity explained or gated; no lower-priority fallback to hidden unsupported effects",
+    "owners_preserved": "No graph writes or AST/script evaluation; no geometry, placement, lock, selection, pin, Forme tile-session or source-assertion snapshots/mutations",
+    "load_error": "Rule restoration error is no longer overwritten by loading the initial preview sample"
+  },
+  "interactive": {
+    "status": "not run; pending on compatible connected browser",
+    "route": "tree.html?app=local&fixture=field-inspection",
+    "order": [
+      "p4_tree_presentation_live.scn",
+      "p4_tree_presentation_live_reopen.scn"
+    ],
+    "prerequisites": "Fresh dedicated profile/origin, normal motion; retained origin with fresh page/process for reopen. Separate origins from earlier authoring cases expecting no rule record",
+    "captures": "four planned; none generated/reviewed",
+    "browser_limit": "Connected S-PC browser lacks WebGPU; known boot gate not retried",
+    "scope": "Exact access retention through selection, private draft isolation, Forme/Numen previews, saved opt-in/undo/redo/disable, independent boundary visibility, stored history and view-local enable reset; source/session/layout identities preserved"
+  },
+  "deferred": [
+    "Canvas native regression execution and headed capture review",
+    "Bound-preview hit-test/read costs, long context, narrow scrolling, IME/keyboard/theme/physical input",
+    "Pin/manual placement and actual live tile-session continuity in headed host",
+    "Sidecar-only and derived relation occurrence identities, ForegroundPinned/Overview state adapters",
+    "Representation/details measurement, relation/provenance/drop-preview renderer adoption, live per-occurrence LOD hysteresis",
+    "Multi-tab IndexedDB races/conflicts, large-store costs, release performance, other hosts",
+    "Scene composition, font/theme authoring, field/script/primitive writes and coordinated Rhai SE39\u2013SE42"
+  ],
+  "documentation": {
+    "citation_audit": "Complete JSON equals pre-edit integration-base baseline",
+    "d2_audit": "Complete JSON equals pre-edit integration-base baseline; 260/261 D2 coverage and two existing errors",
+    "whitespace": "passed"
+  },
+  "source_sha256": {
+    "crates/cambium/scenes/scenograph/src/presentation.rs": "a7d556b5564060d19c9dd75628850051c9af39b0c243c6ea27a9ab276229e034",
+    "crates/canvas/pictograph/src/canvas.rs": "3b69207a62f9cc2801899d134bdbcb4b7a998892e07393bd6c65e8f632b7004e",
+    "crates/canvas/pictograph/src/canvas/forme_region.rs": "2d64eb51e7827424dcff6502b1d187e4e0e4be0c93a8a8994c9d8ad55f12d8cc",
+    "crates/canvas/pictograph/src/canvas/lifecycle.rs": "f604663d6b54ac0a75b3fefc72c99d342783f7f801f39987ff26c0e613e6c8cf",
+    "ports/graphshell/docs/receipts/presentation_live_20261011/harness/Cargo.lock": "18a48be1c336a2b19b32301158046708621723759637b3bd103b6f97be075e86",
+    "ports/graphshell/docs/receipts/presentation_live_20261011/harness/Cargo.toml": "a0b209bf732aa081fbd74fa85c9948723e8042a5ab46c6a2531a9aa0e1352f71",
+    "ports/graphshell/docs/receipts/presentation_live_20261011/harness/src/lib.rs": "1f515e0f47c232f9c4641cc869169441a4da239f2f9dd02ad36ff7c44118a170",
+    "ports/graphshell/src/access_inspection.rs": "d6d27835e79071a2bf1e562975c6458af40365c57c44c735782ad5e213d551c7",
+    "ports/graphshell/src/lib.rs": "14a1e87a19469c6f0a1ed163e48a5cb817488b9e616fd7ee90014181726a2b1a",
+    "ports/graphshell/src/link_inspection.rs": "7412f8b83fa0ccc06319e368dc4d7eb546aa85e8f11ff41c70ef3e4ec9355cf4",
+    "ports/graphshell/src/link_inspection/tests.rs": "bdfb9e58b7a7ff693d04e3bf7551aa51a33f8d3e94148ad724b88aca15aadef8",
+    "ports/graphshell/src/presentation_binding.rs": "665d48ae089fa82dfd9332cd47a0014eecf5f7b88ab1afbbaea77fed9060af0d",
+    "ports/graphshell/src/presentation_binding_tests.rs": "37de5ab11d22e447b6fc384173d605ef08e1fa3ecdf0b2ccc98dbc9ec7290f2a",
+    "ports/graphshell/src/presentation_editor.rs": "36859c843a47a11428c5b5d4d549cf8568323245d0bb45a107d8a519404aebd5",
+    "ports/graphshell/src/presentation_editor_tests.rs": "039239a188a15b057926da5d2024fb1e74ef3c39f9f3e00ff16eae5d11174541",
+    "ports/graphshell/src/web_tree.rs": "555780f8aaf012b1602eeaac396ef433d0bca321c378822cffc5b29eb72c635c",
+    "ports/graphshell/src/web_tree/field_inspection.rs": "596e8fc8f8d8423f1a82619c258f1afa92b2d4ed0edd015f28eede95382fdf2f",
+    "ports/graphshell/src/web_tree/forme.rs": "997604b04d20eb20bdfa3fb33d62c428819a2ff1fdf6d462c6ef80a4722e1f4b",
+    "ports/graphshell/src/web_tree/presentation.rs": "cc98bdc6651d465aaed08b2b4ce87fc8faea0a144b40aa78ff3f591914dad5db",
+    "ports/graphshell/src/web_tree/product.rs": "a8e396409b37e7b47227438b1314faf69a57b580723e6118ae523ceea0cf6583",
+    "ports/graphshell/web/Cargo.lock": "9fcf67c9f396e1b6b3b5ca29490683bccc897ec69d5928b95e1dbc0d85f48da3",
+    "ports/graphshell/web/Cargo.toml": "723ebabab9f033336c9d0cc1edd7938896b04afcde0c87e3d5a82315d96fb22f",
+    "ports/graphshell/web/scenarios/p4_tree_presentation_live.scn": "75029c26da556105f1d6759ede48185191164339f682da4f34ac2d59183f8ec8",
+    "ports/graphshell/web/scenarios/p4_tree_presentation_live_reopen.scn": "ee35d030ff3347f56dd524640fdbde812277e54357ca5e8b4f8388d88b154b28"
+  },
+  "check_sha256": {
+    "checks/native.log": "9a4c668f8dd1b1ed7f0dd4b457de3d8c9f5c4fbda1160f6c4bbcc8263c4f7e3d",
+    "checks/product-check.log": "468ab0ca3367101e79378a063bbde9d979f46eadac9960018f4c096ab9c31af1"
+  },
+  "log_normalization": {
+    "change": "Removed trailing blank lines only for git whitespace checking",
+    "raw_sha256": {
+      "native.log": "4f2a20e58e64db9f6e1c0af0817799bd28c9b0cb85b818c7892ad71ff436748d",
+      "product-check.log": "468ab0ca3367101e79378a063bbde9d979f46eadac9960018f4c096ab9c31af1"
+    }
+  }
+}

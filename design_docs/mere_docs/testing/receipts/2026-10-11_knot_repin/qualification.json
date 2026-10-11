@@ -1,0 +1,305 @@
+{
+  "schema": "mere.knot-embedded-adoption/v1",
+  "status": "qualified",
+  "mere_base": "8f61cfe524b9bf3be70ec371ae05dc8581289852",
+  "knot_revision": "19b99042d6c6708854f64e6187429da839a1c82c",
+  "consumer_native_receipt": "knot-editor/docs/receipts/2026-10-11_authored_scene/README.md",
+  "source_sha256": {
+    "Cargo.toml": "133afd6857c04a297fa1ba35fade5db5d74e157fda4c923bddae47c2418060c6",
+    "ports/djinn/Cargo.toml": "b956ba1ced38e73d6d96dae04abaa37bc2f6359621334fa26f0bef8cc1d15350",
+    "Cargo.lock": "f73f8a667e9ddad5acf59af389013a175cce9f00318fba908a61dba1cdf2765f"
+  },
+  "embedded_resolution": {
+    "scope": "djinn resolved dependency closure",
+    "knots": [
+      {
+        "name": "knot-capture",
+        "source": "git+https://github.com/merely-made/knot-editor.git?rev=19b99042d6c6708854f64e6187429da839a1c82c#19b99042d6c6708854f64e6187429da839a1c82c"
+      },
+      {
+        "name": "knot-composition",
+        "source": "git+https://github.com/merely-made/knot-editor.git?rev=19b99042d6c6708854f64e6187429da839a1c82c#19b99042d6c6708854f64e6187429da839a1c82c"
+      },
+      {
+        "name": "knot-document",
+        "source": "git+https://github.com/merely-made/knot-editor.git?rev=19b99042d6c6708854f64e6187429da839a1c82c#19b99042d6c6708854f64e6187429da839a1c82c"
+      },
+      {
+        "name": "knot-editor",
+        "source": "git+https://github.com/merely-made/knot-editor.git?rev=19b99042d6c6708854f64e6187429da839a1c82c#19b99042d6c6708854f64e6187429da839a1c82c"
+      },
+      {
+        "name": "knot-file-catalog",
+        "source": "git+https://github.com/merely-made/knot-editor.git?rev=19b99042d6c6708854f64e6187429da839a1c82c#19b99042d6c6708854f64e6187429da839a1c82c"
+      },
+      {
+        "name": "knot-site",
+        "source": "git+https://github.com/merely-made/knot-editor.git?rev=19b99042d6c6708854f64e6187429da839a1c82c#19b99042d6c6708854f64e6187429da839a1c82c"
+      }
+    ],
+    "shared": {
+      "sceno": [
+        {
+          "version": "0.0.4",
+          "source": null
+        }
+      ],
+      "scenograph": [
+        {
+          "version": "0.0.4",
+          "source": null
+        }
+      ],
+      "scenomise": [
+        {
+          "version": "0.0.4",
+          "source": null
+        }
+      ],
+      "scenotime": [
+        {
+          "version": "0.0.4",
+          "source": null
+        }
+      ],
+      "graphshell": [
+        {
+          "version": "0.0.2",
+          "source": null
+        }
+      ],
+      "pandect": [
+        {
+          "version": "0.1.1",
+          "source": null
+        }
+      ],
+      "muniment": [
+        {
+          "version": "0.1.2",
+          "source": null
+        }
+      ],
+      "knot-editor-host": [
+        {
+          "version": "0.1.1",
+          "source": null
+        }
+      ],
+      "netrender": [
+        {
+          "version": "0.1.2",
+          "source": "git+https://github.com/merely-made/netrender.git?rev=ef5412d760a978584c8c1801e8a765c51aecd403#ef5412d760a978584c8c1801e8a765c51aecd403"
+        }
+      ],
+      "netrender_device": [
+        {
+          "version": "0.1.2",
+          "source": "git+https://github.com/merely-made/netrender.git?rev=ef5412d760a978584c8c1801e8a765c51aecd403#ef5412d760a978584c8c1801e8a765c51aecd403"
+        }
+      ],
+      "netrender-vello": [
+        {
+          "version": "0.11.0",
+          "source": "git+https://github.com/mark-ik/vello?rev=5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a#5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a"
+        }
+      ],
+      "vello_encoding": [
+        {
+          "version": "0.11.0",
+          "source": "git+https://github.com/mark-ik/vello?rev=5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a#5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a"
+        }
+      ],
+      "vello_shaders": [
+        {
+          "version": "0.11.0",
+          "source": "git+https://github.com/mark-ik/vello?rev=5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a#5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a"
+        }
+      ],
+      "personae": [
+        {
+          "version": "0.3.0",
+          "source": "git+https://github.com/merely-made/dramatis.git?rev=0234e7eea6f2ddf2330a71b9425da01b06ae0391#0234e7eea6f2ddf2330a71b9425da01b06ae0391"
+        }
+      ]
+    },
+    "duplicate_selected_shared_packages": {},
+    "mere_git_packages": []
+  },
+  "lock_delta": {
+    "removed": [
+      {
+        "name": "fleece",
+        "version": "0.5.0",
+        "source": "git+https://github.com/merely-made/genet.git?rev=7422e90613f9017e5bb790e3acb48f61776b2eda#7422e90613f9017e5bb790e3acb48f61776b2eda"
+      },
+      {
+        "name": "knot-capture",
+        "version": "0.0.1",
+        "source": "git+https://github.com/merely-made/knot-editor.git?rev=4d8b81c5ed8fbe29bac9fc762cb71f161e00c784#4d8b81c5ed8fbe29bac9fc762cb71f161e00c784"
+      },
+      {
+        "name": "knot-composition",
+        "version": "0.0.1",
+        "source": "git+https://github.com/merely-made/knot-editor.git?rev=4d8b81c5ed8fbe29bac9fc762cb71f161e00c784#4d8b81c5ed8fbe29bac9fc762cb71f161e00c784"
+      },
+      {
+        "name": "knot-document",
+        "version": "0.0.1",
+        "source": "git+https://github.com/merely-made/knot-editor.git?rev=4d8b81c5ed8fbe29bac9fc762cb71f161e00c784#4d8b81c5ed8fbe29bac9fc762cb71f161e00c784"
+      },
+      {
+        "name": "knot-editor",
+        "version": "0.0.3",
+        "source": "git+https://github.com/merely-made/knot-editor.git?rev=4d8b81c5ed8fbe29bac9fc762cb71f161e00c784#4d8b81c5ed8fbe29bac9fc762cb71f161e00c784"
+      },
+      {
+        "name": "knot-file-catalog",
+        "version": "0.0.1",
+        "source": "git+https://github.com/merely-made/knot-editor.git?rev=4d8b81c5ed8fbe29bac9fc762cb71f161e00c784#4d8b81c5ed8fbe29bac9fc762cb71f161e00c784"
+      },
+      {
+        "name": "knot-site",
+        "version": "0.0.1",
+        "source": "git+https://github.com/merely-made/knot-editor.git?rev=4d8b81c5ed8fbe29bac9fc762cb71f161e00c784#4d8b81c5ed8fbe29bac9fc762cb71f161e00c784"
+      },
+      {
+        "name": "layout-dom-api",
+        "version": "0.1.1",
+        "source": "git+https://github.com/merely-made/genet.git?rev=7422e90613f9017e5bb790e3acb48f61776b2eda#7422e90613f9017e5bb790e3acb48f61776b2eda"
+      }
+    ],
+    "added": [
+      {
+        "name": "knot-capture",
+        "version": "0.0.1",
+        "source": "git+https://github.com/merely-made/knot-editor.git?rev=19b99042d6c6708854f64e6187429da839a1c82c#19b99042d6c6708854f64e6187429da839a1c82c"
+      },
+      {
+        "name": "knot-composition",
+        "version": "0.0.1",
+        "source": "git+https://github.com/merely-made/knot-editor.git?rev=19b99042d6c6708854f64e6187429da839a1c82c#19b99042d6c6708854f64e6187429da839a1c82c"
+      },
+      {
+        "name": "knot-document",
+        "version": "0.0.1",
+        "source": "git+https://github.com/merely-made/knot-editor.git?rev=19b99042d6c6708854f64e6187429da839a1c82c#19b99042d6c6708854f64e6187429da839a1c82c"
+      },
+      {
+        "name": "knot-editor",
+        "version": "0.0.3",
+        "source": "git+https://github.com/merely-made/knot-editor.git?rev=19b99042d6c6708854f64e6187429da839a1c82c#19b99042d6c6708854f64e6187429da839a1c82c"
+      },
+      {
+        "name": "knot-file-catalog",
+        "version": "0.0.1",
+        "source": "git+https://github.com/merely-made/knot-editor.git?rev=19b99042d6c6708854f64e6187429da839a1c82c#19b99042d6c6708854f64e6187429da839a1c82c"
+      },
+      {
+        "name": "knot-site",
+        "version": "0.0.1",
+        "source": "git+https://github.com/merely-made/knot-editor.git?rev=19b99042d6c6708854f64e6187429da839a1c82c#19b99042d6c6708854f64e6187429da839a1c82c"
+      }
+    ],
+    "registry_version_changes": []
+  },
+  "gates": {
+    "locked_metadata": {
+      "result": "passed",
+      "command": "cargo metadata --locked --offline --format-version 1",
+      "knot_sources": [
+        "git+https://github.com/merely-made/knot-editor.git?rev=19b99042d6c6708854f64e6187429da839a1c82c#19b99042d6c6708854f64e6187429da839a1c82c"
+      ]
+    },
+    "isolated_djinn_all_targets_check": {
+      "result": "passed",
+      "command": "TMPDIR=/tmp cargo check --locked -p djinn --all-targets -j 2",
+      "elapsed": "2m 29s"
+    },
+    "focused_trace_compiler_tests": {
+      "result": "passed",
+      "command": "TMPDIR=/tmp cargo test --locked -p scenotime -p scenomise -p scenograph -j 2",
+      "passed": 243,
+      "failed": 0,
+      "ignored": 0,
+      "harness_results": [
+        "test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 167 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s",
+        "test result: ok. 41 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ]
+    },
+    "embedded_consumer_checks": {
+      "result": "passed",
+      "command": "TMPDIR=/tmp cargo test --locked -p knot-composition --test recipes -j 2",
+      "passed": 17,
+      "failed": 0,
+      "ignored": 0
+    },
+    "documentation_audit": {
+      "result": "matches pre-edit HEAD exactly",
+      "counts": {
+        "active_docs": 261,
+        "indexed_active_docs": 260,
+        "index_orphans": 0,
+        "index_ghosts": 0,
+        "memory_directory_links": 0,
+        "statusless_plans": 0,
+        "broken_relative_links": 32,
+        "historical_broken_relative_links": 245,
+        "planned_broken_relative_links": 0,
+        "ambiguous_known_root_paths": 101,
+        "ignored_known_root_patterns": 22,
+        "reserved_identifier_paths": 24,
+        "missing_known_root_paths": 259,
+        "historical_missing_known_root_paths": 238,
+        "planned_missing_known_root_paths": 7,
+        "invalid_historical_annotations": 0,
+        "stale_historical_annotations": 0,
+        "unheaded_owned_sources": 0,
+        "exhibit_b_sources": 0
+      }
+    },
+    "documentation_judgment": {
+      "result": "matches pre-edit HEAD exactly",
+      "existing_findings": [
+        "snapshot aggregate digest mismatch",
+        "producer_gates/README.md lacks D2 record"
+      ],
+      "active_coverage": "260/261"
+    }
+  },
+  "native_requalification_in_mere": false,
+  "personal_custody_native": false,
+  "live_dynamics_in_this_adoption": false,
+  "build_target": "isolated target /Users/markik/Code/testing/stack-state-20261011/mere-knot-repin-target",
+  "evidence_root": "/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin-results",
+  "evidence_sha256": {
+    "djinn-isolated-check.log": "cacf84b980a56e753d2936c28b9fd4394142df55d1ee62259761861ae879bbf3",
+    "embedded-recipes.log": "66b40f5d7ac2ce8e85cf66560877a169afe22c38117bf5427b8d9e9de1bba4cc",
+    "shared-scene-tests.log": "ea5c0b9b2cb18f511b55c1cc15378c34af51904289a6ee8f625b414a9ee02162",
+    "metadata.json": "c138b710b2a8e5b15cf5179850fa47faf35cd8acf0270525019e9d3585a6fe8f",
+    "embedded-family.json": "64a9d494c06fa412701fc8f1b78df6e1e8111f5dc0a8b78cb10be6fb001504d6",
+    "lock-delta.json": "6b5546c1896ea45419ffc2c34841d7b00062f7b39983dd2735585dbc4811a5ce",
+    "doc-audit-before.json": "45316ef1b8aa67fc9e58a6ecfe1d130a0f54db1ded1505fb4d0d6bb1b3247297",
+    "doc-audit-after.json": "45316ef1b8aa67fc9e58a6ecfe1d130a0f54db1ded1505fb4d0d6bb1b3247297",
+    "doc-judgment-before.log": "0c9d7df7d0bee0a3132e2cbdc5c4854aa80ef42e835edc79bb4bc8298992417c",
+    "doc-judgment.log": "0c9d7df7d0bee0a3132e2cbdc5c4854aa80ef42e835edc79bb4bc8298992417c",
+    "metadata-locked.json": "78273f21510ef3094cd45597e1f5a5b94e4458cce8c488d8611cbb8fa2b8eefb",
+    "metadata-locked.log": "c9f44fedbd013a1e170e2aadb4047ffd0ad5fe6fd97c79e7d69a01d6affc4469",
+    "doc-audit-final.json": "45316ef1b8aa67fc9e58a6ecfe1d130a0f54db1ded1505fb4d0d6bb1b3247297"
+  },
+  "abandoned_diagnostic": "An initial shared-target Djinn check was stopped by this lane; only the completed isolated-target check qualifies this revision.",
+  "consumer_publication": {
+    "knot": "19b99042d6c6708854f64e6187429da839a1c82c",
+    "woodshed_family_adoption": "8846b13d7e52ec7d351a16001c5cd503a02f6097",
+    "woodshed_port_reopen": "0032f35",
+    "native_order": "Woodshed finished and released foreground before Knot next live-dynamics lane"
+  },
+  "publication_note": "Publication is verified separately by Git; this receipt records the qualified tree."
+}
