@@ -94,8 +94,10 @@ def main():
                     time.sleep(.2)
                     assert window(host.pid)==hwnd,"only the synthetic resident's observed window"
                     capture(hwnd,R.OUT/("native-consent-"+answer+".png"))
+                    no_button=next(child for child,id,label in parts if id==7)
+                    assert u.SendMessageW(no_button,0x0087,0,0) & 0x0010, "No must be the native default pushbutton"
                     target=next(child for child,id,label in parts if id==button_id)
-                    observed.append({"answer":answer,"owner_process":"dramatis-review-host","title":text(hwnd),"contents":[t for _,_,t in parts],"button_id":button_id,"command":command})
+                    observed.append({"default_button_id":7,"answer":answer,"owner_process":"dramatis-review-host","title":text(hwnd),"contents":[t for _,_,t in parts],"button_id":button_id,"command":command})
                     u.SendMessageW(target,0x00F5,0,0) # BM_CLICK on the observed button
                     assert test.wait(timeout=60)==0,answer
                     test=None
