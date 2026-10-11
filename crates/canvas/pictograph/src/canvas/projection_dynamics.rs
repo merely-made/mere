@@ -12,7 +12,7 @@ use euclid::default::Point2D;
 use kernel::graph::apply::add_node;
 use kernel::graph::{Graph, NodeKey};
 use scenograph::{DynamicsSlot, ProjectionDefinition};
-use scenomise::projection::CompiledProjection;
+use scenomise::projection::{CompiledProjection, CompiledRelationshipProjection};
 use seiche::{DynamicsRunner, NodeCollider, SettleEnd, SettleError, SettleReport};
 use std::collections::BTreeMap;
 use uuid::Uuid;
@@ -31,6 +31,7 @@ pub struct ProjectionDynamics {
     started: bool,
     finished: Option<SettleEnd>,
     ticks: u64,
+    relationship_ids: Vec<String>,
 }
 
 fn refuse(place: &str, reason: &str) -> BindError {
@@ -49,6 +50,109 @@ impl ProjectionDynamics {
         compiled: &CompiledProjection,
         slot: &DynamicsSlot,
     ) -> Result<Self, BindError> {
+        Self::build(definition, compiled, slot, &BTreeMap::new(), None)
+    }
+
+    /// Bind disclosed relationships and occurrence-scoped role overrides to
+    /// the same disposable fixed-step controller. Positions and measured
+    /// footprints come from `compiled`; the host may seed its authored pose
+    /// there before binding. Source facts and original graph-item role
+    /// addressing remain unchanged. Named channels and groups stay refused.
+    pub fn new_relationship(
+        definition: &ProjectionDefinition,
+        compiled: &CompiledRelationshipProjection,
+        slot: &DynamicsSlot,
+        occurrence_roles: &BTreeMap<String, seiche::Role>,
+    ) -> Result<Self, BindError> {
+        let spec = bind_slot(slot, &definition.arrangement.kind)?;
+        if reads_partition(&spec.root) {
+            return Err(refuse(
+                "dynamics.spec.root.partition",
+                "this occurrence adapter has no disclosed grouping channel",
+            ));
+        }
+        let projection = &compiled.projection;
+        if projection.occurrence_by_instance.len() != projection.scene.items.len()
+            || projection.instance_by_occurrence.len() != projection.scene.items.len()
+            || projection
+                .scene
+                .items
+                .iter()
+                .enumerate()
+                .any(|(index, item)| {
+                    let instance = sceno::InstanceId(index as u32);
+                    projection
+                        .occurrence_by_instance
+                        .get(&instance)
+                        .is_none_or(|id| {
+                            id.is_empty()
+                                || projection.instance_by_occurrence.get(id) != Some(&instance)
+                        })
+                        || item.source.0 as usize >= projection.scene.sources.len()
+                })
+        {
+            return Err(refuse(
+                "settle.inputs.occurrences",
+                "occurrence mapping is incomplete or inconsistent",
+            ));
+        }
+        if compiled.relationships.len() != projection.scene.relations.len() {
+            return Err(refuse(
+                "settle.inputs.relationships",
+                "relationship disclosure does not cover the scene relations",
+            ));
+        }
+        let mut ids = std::collections::BTreeSet::new();
+        let mut edges = Vec::new();
+        for (disclosed, relation) in compiled
+            .relationships
+            .iter()
+            .zip(&projection.scene.relations)
+        {
+            let from = projection
+                .instance_by_occurrence
+                .get(&disclosed.disclosure.from_occurrence);
+            let to = projection
+                .instance_by_occurrence
+                .get(&disclosed.disclosure.to_occurrence);
+            if disclosed.disclosure.id.is_empty()
+                || !ids.insert(disclosed.disclosure.id.clone())
+                || from != Some(&disclosed.from)
+                || to != Some(&disclosed.to)
+                || disclosed.from == disclosed.to
+                || relation.from != disclosed.from
+                || relation.to != disclosed.to
+                || relation.space != sceno::Scene::WORLD
+                || relation.kind.as_deref() != Some(disclosed.disclosure.kind.as_str())
+                || relation
+                    .points
+                    .iter()
+                    .any(|point| !point.x.is_finite() || !point.y.is_finite())
+                || relation.weight.is_some_and(|weight| !weight.is_finite())
+            {
+                return Err(refuse(
+                    "settle.inputs.relationships",
+                    "relationship identity, endpoints, or geometry do not match the disclosed occurrences",
+                ));
+            }
+            edges.push((disclosed.from, disclosed.to));
+        }
+        let mut out = Self::build(definition, projection, slot, occurrence_roles, Some(&edges))?;
+        out.relationship_ids = compiled
+            .relationships
+            .iter()
+            .map(|relation| relation.disclosure.id.clone())
+            .collect();
+        Ok(out)
+    }
+
+    fn build(
+        definition: &ProjectionDefinition,
+        compiled: &CompiledProjection,
+        slot: &DynamicsSlot,
+        occurrence_roles: &BTreeMap<String, seiche::Role>,
+        relationship_edges: Option<&[(sceno::InstanceId, sceno::InstanceId)]>,
+    ) -> Result<Self, BindError> {
         let mut spec = bind_slot(slot, &definition.arrangement.kind)?;
         if !spec.channels.is_empty() || spec.target.as_ref().is_some_and(|t| t.groups.is_some()) {
             return Err(refuse(
@@ -56,7 +160,7 @@ impl ProjectionDynamics {
                 "this occurrence adapter has no disclosed physics channels or groups",
             ));
         }
-        if !compiled.scene.relations.is_empty()
+        if (relationship_edges.is_none() && !compiled.scene.relations.is_empty())
             || !compiled.scene.backdrops.is_empty()
             || !compiled.scene.regions.is_empty()
             || !compiled.scene.folds.is_empty()
@@ -123,7 +227,37 @@ impl ProjectionDynamics {
             }
             target.items = roles;
         }
+        for (occurrence, role) in occurrence_roles {
+            let instance = compiled
+                .instance_by_occurrence
+                .get(occurrence)
+                .ok_or_else(|| BindError::Unbound {
+                    place: format!("dynamics.occurrence_roles.{occurrence}"),
+                    reason: "role has no disclosed occurrence".into(),
+                })?;
+            let id = ids.get(instance.0 as usize).ok_or_else(|| {
+                refuse("settle.inputs.occurrences", "role occurrence has no body")
+            })?;
+            let target = spec
+                .target
+                .get_or_insert_with(|| super::dynamics_spec::Target {
+                    arrangement: definition.arrangement.kind.clone(),
+                    anchored_pull: f64::from(seiche::DEFAULT_ANCHOR_STIFFNESS),
+                    default_role: seiche::Role::Seeded,
+                    groups: None,
+                    items: BTreeMap::new(),
+                });
+            target.items.insert(id.to_string(), *role);
+        }
         let mut canvas = Canvas::with_graph(graph);
+        if let Some(edges) = relationship_edges {
+            let edges: Vec<_> = edges
+                .iter()
+                .map(|(from, to)| (keys[from.0 as usize], keys[to.0 as usize]))
+                .collect();
+            canvas.physics.sync_edges(edges.clone());
+            canvas.occurrence_edges = Some(edges);
+        }
         canvas.set_physics_paused(true);
         canvas.set_layout_strategy(Some(definition.arrangement.kind.clone()));
         canvas.apply_strategy_positions(&positions);
@@ -138,6 +272,7 @@ impl ProjectionDynamics {
             started: false,
             finished: None,
             ticks: 0,
+            relationship_ids: Vec::new(),
         };
         out.install_colliders()?;
         let axes = encoded_axes(definition)?;
@@ -231,6 +366,11 @@ impl ProjectionDynamics {
         self.ticks
     }
 
+    /// Disclosure identities in the same order as `scene().relations`.
+    pub fn relationship_ids(&self) -> &[String] {
+        &self.relationship_ids
+    }
+
     /// Refresh presentation without resetting the bodies or their trajectory.
     /// The caller must first establish that placement was reused.
     pub fn refresh_display(&mut self, slot: &DynamicsSlot, scene: &sceno::Scene) -> bool {
@@ -244,6 +384,18 @@ impl ProjectionDynamics {
                     || a.transform.scale != b.transform.scale
                     || a.transform.rotate != b.transform.rotate
             })
+            || scene.relations.len() != self.scene.relations.len()
+            || scene
+                .relations
+                .iter()
+                .zip(&self.scene.relations)
+                .any(|(a, b)| {
+                    a.from != b.from
+                        || a.to != b.to
+                        || a.space != b.space
+                        || a.kind != b.kind
+                        || a.weight != b.weight
+                })
         {
             return false;
         }
@@ -321,9 +473,34 @@ impl ProjectionDynamics {
                 bounds = Some(bounds.map_or(rect, |b| b.union(rect)));
             }
         }
+        for relation in &mut self.scene.relations {
+            relation.points = vec![
+                self.scene.items[relation.from.0 as usize]
+                    .transform
+                    .translate,
+                self.scene.items[relation.to.0 as usize].transform.translate,
+            ];
+        }
         self.scene.bounds = bounds.unwrap_or_default();
     }
 }
+
+fn reads_partition(node: &super::dynamics_spec::Node) -> bool {
+    use super::dynamics_spec::Node;
+    matches!(node, Node::Grouped { .. })
+        || match node {
+            Node::Mix { parts, .. } => parts.iter().any(reads_partition),
+            Node::Schedule { stages, .. } => {
+                stages.iter().any(|stage| reads_partition(&stage.node))
+            },
+            _ => false,
+        }
+        || node.overlays().iter().any(reads_partition)
+}
+
+#[cfg(test)]
+#[path = "projection_dynamics_tests.rs"]
+mod tests;
 
 /// F200: classify what placement means, rather than locking every Field.
 /// Grid cells, ring indices, layers, buckets and order are layout slots.

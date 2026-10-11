@@ -428,6 +428,9 @@ pub struct Canvas {
     /// spring persist; this is display-only. Persistence rides view-intent's
     /// `hidden_relations`.
     hidden_edges: HashSet<EdgeCell>,
+    /// Disposable occurrence controllers supply disclosed endpoint pairs
+    /// without minting graph assertions. Ordinary graph canvases use `None`.
+    occurrence_edges: Option<Vec<(NodeKey, NodeKey)>>,
     /// The physics view's revision (F178): bumped whenever a hide or show
     /// changes the visible relation cells, so the registry's physics channels
     /// key by it beside the graph's structural revision.
