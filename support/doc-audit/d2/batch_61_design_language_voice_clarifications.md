@@ -370,3 +370,46 @@ No new runtime track, storage/composition ruling, external message or browser
 pass is inferred. Full citation-audit and D2 JSON match their pre-edit baselines;
 D2 retains 252/259 coverage and its nine existing errors. Whitespace checks
 pass. No active document or unknown audit record was added.
+
+
+**Forme review fixes (2026-10-11):** Mark authorized source fixes and further
+inspection. The shared matcher now preserves repeated occurrence IDs without
+merging them and avoids overwriting rebound nodes. The Graphshell adapter
+rejects collapsed projected regions and divider-share arity mismatches; its
+reading tiles follow shared Resource tags. Six new regressions failed on the
+prior source, then passed after the fixes; native qualification includes 120
+Forme library cases and 19 workspace/session cases; the product Wasm host check
+also passes. The new session regression
+checks refusal without losing draft state or saved undo bytes. The owning plan
+and index link the portable source-hashed qualification record and retain the
+browser handoff. Complete citation and D2 audit JSON match the pre-edit baseline;
+D2 retains 252/259 coverage and its eight existing errors. New local links resolve
+and whitespace checks pass. No active document or unknown audit record was added.
+
+The primary checkout's citation report differs from the isolated worktree
+because sibling paths resolve relative to the checkout parent. A read-only
+comparison substituting the pre-edit Git documents on that same primary
+filesystem confirms unchanged citation and D2 findings there as well.
+
+
+**Link/assertion inspector draft (2026-10-11):** Mark's direct-main draft
+sequence now includes held-link expansion and exact assertion inspection in the
+local Graphshell product. Access UUID pairs retain displayed direction and
+owning stratum/source endpoints; statement handles resolve their held owner
+after access rebinding and never fall back to a same-predicate replacement.
+Non-statement family data stays data, including session arrangement and
+traversal sidecars. The owning editor plan and index disclose the access-list
+entry path, deferred direct-link/roster and derived-rule adapters, and pending
+headed scenarios. Nine actual-source native model tests and the product wasm
+check pass under the existing memory limits; the source-hashed qualification
+JSON records their scope. No browser receipt, primitive write or other-agent
+review is inferred. Complete citation and D2 JSON match this worktree's pre-edit
+baseline, retaining 252/259 coverage and nine existing D2 errors. Added local
+links and whitespace checks pass. No active document or judgment identity was
+added.
+
+The draft was then rebased onto primary-model reconciliation `3d21c352`, whose
+changes are documentation only. Qualified runtime/scenario source hashes remain
+unchanged. A read-only audit comparison substituting that published main's
+three edited documents on this same filesystem matches the final citation and
+D2 reports, with the same 252/259 coverage and nine existing errors.

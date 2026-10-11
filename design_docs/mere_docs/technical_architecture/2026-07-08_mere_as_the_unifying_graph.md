@@ -54,6 +54,16 @@ This is the payoff, and it is why the substrate was built the way it was.
   app-specific relations stay private (the two-ring split); only the shared semantic
   ring crosses vault boundaries.
 
+> **Research qualification (2026-10-11).** Content addresses and predicate IRIs
+> make material and relationships identifiable; interoperable meaning still
+> requires compatible vocabularies or adapters. The paragraph above records
+> an architectural aim, rather than a general proof of cross-vault semantic
+> understanding. The current unit is one mere per data domain, and orrery
+> names a form factor. The
+> [family composition brief §8](../../2026-08-12_family_composition_thesis_brief.md#8-primary-data-model-clips-and-live-entities-2026-10-11)
+> owns the current primary-model direction, clips and live entities, and its
+> research review distinguishes identification, interpretation and action.
+
 mere is the orrery that makes the pool one legible whole while each vault stays its
 own store.
 
