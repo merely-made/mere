@@ -11,6 +11,38 @@ use std::path::Path;
 use std::process::Command;
 
 const SOURCES: &[(&str, &[u8])] = &[
+    (
+        "crates/stickleback/Cargo.toml",
+        include_bytes!("../../../../stickleback/Cargo.toml"),
+    ),
+    (
+        "crates/stickleback/src/lib.rs",
+        include_bytes!("../../../../stickleback/src/lib.rs"),
+    ),
+    (
+        "crates/murm/transport/src/transport.rs",
+        include_bytes!("../../../../murm/transport/src/transport.rs"),
+    ),
+    (
+        "crates/mesh/mesh/examples/retained_receive/carrier.rs",
+        include_bytes!("carrier.rs"),
+    ),
+    (
+        "crates/stickleback/src/object_stream.rs",
+        include_bytes!("../../../../stickleback/src/object_stream.rs"),
+    ),
+    (
+        "crates/murm/transport/src/p2panda_transport.rs",
+        include_bytes!("../../../../murm/transport/src/p2panda_transport.rs"),
+    ),
+    (
+        "crates/murm/transport/src/accepted.rs",
+        include_bytes!("../../../../murm/transport/src/accepted.rs"),
+    ),
+    (
+        "crates/murm/transport/src/peer_route.rs",
+        include_bytes!("../../../../murm/transport/src/peer_route.rs"),
+    ),
     ("Cargo.lock", include_bytes!("../../../../../Cargo.lock")),
     ("Cargo.toml", include_bytes!("../../../../../Cargo.toml")),
     (
@@ -102,7 +134,7 @@ pub fn mere_identity() -> Result<Value> {
             "blake3":blake3::hash(bytes).to_hex().as_str()}));
     }
     Ok(json!({
-        "scope":"compile_time_probe_and_selected_owner_sources",
+        "scope":"compile_time_probe_and_selected_owner_and_carrier_sources",
         "source_manifest_blake3":digest.finalize().to_hex().as_str(),
         "sources":sources,
         "executable_blake3":file_digest(&std::env::current_exe()?)?,
