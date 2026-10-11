@@ -413,3 +413,22 @@ changes are documentation only. Qualified runtime/scenario source hashes remain
 unchanged. A read-only audit comparison substituting that published main's
 three edited documents on this same filesystem matches the final citation and
 D2 reports, with the same 252/259 coverage and nine existing errors.
+
+
+**Forme browser qualification (2026-10-11):** Mark authorized the four-page
+retained-origin run. Two fixture errors were corrected, tile controls gained
+specific accessible names, graph controls moved above workbench tiles and waits
+now include Forme persistence while excluding hidden-canvas motion. Failed
+attempts remain as evidence. At `c33534bf` all four Chrome cases pass, with nine
+reviewed captures; the source-hashed receipt and owning plan distinguish that
+functional dev-build qualification from Firefox's controller block, physical
+input, release performance and preview-feedback design. Product build and
+viewer-only Wasm check pass. Upstream link inspection was integrated with a
+separate product Wasm check; its new source does not inherit the browser pass.
+No active Markdown document or judgment identity was added by this lane.
+
+Complete citation and D2 reports are unchanged in a controlled before/after
+comparison on the current primary filesystem. Only this lane's three document
+edits are substituted; concurrent Fleece edits stay fixed. That shared snapshot
+has 252/260 D2 coverage and nine errors, including the concurrent new plan.
+Whitespace checks pass; browser JSON receipt hashes use portable LF content.
