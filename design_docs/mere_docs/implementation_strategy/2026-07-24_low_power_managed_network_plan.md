@@ -32,6 +32,15 @@ boundary. The radio, Reticulum, and queue work lands in the Retinue workspace.
 
 ## Related work
 
+- **Embedding continuation, 2026-10-10:** Retinue's
+  `retinue/design_docs/2026-09-07_radio_hand_hardware_family_plan.md` owns the
+  full-iroh/LAN-direct-noq/radio-device profile assessment;
+  `retinue/design_docs/2026-08-30_wall_node_management_plan.md` owns the proposed
+  iroh carrier for the existing signed control exchange; and
+  `retinue/design_docs/2026-08-25_compact_signed_feed_and_local_control_plan.md`
+  owns the canonical device-operation probe across LoRa and IP. These are
+  source-reviewed proposals, not new firmware or physical results. V9-V11 and
+  this plan's existing power/session completion conditions retain their status.
 - The
   `2026-07-26_notochord_session_policy_spine_plan.md` (`repos/dramatis/design_docs/archive_docs/2026-08-06_completed_plans/2026-07-26_notochord_session_policy_spine_plan.md`)
   took the landed V3-V7 session-admission pieces through a shared facts and
@@ -1087,6 +1096,24 @@ that gap above.
   bench) and names V9-V11 as not started; Retinue's 2026-07-29 partial
   Light-sleep and RF-wake receipt is recorded against the "unproven" claims;
   D5 and Ownership name insigne for the proof primitives (`5364dfa0`).
+
+## 2026-10-10 — embedding and transport reuse
+
+Source at Mere `4f70d5362f9c365b28caa5a8496755fab27a0eca` resolves iroh 1.3.0
+and the exact `mere-p2panda-net` 0.7.5 fork. Its p2panda core/sync 0.7.1 already
+contains the log-height/range sync API; the core still uses `std`.
+`crates/stickleback/src/lib.rs` owns joined-space receive processing,
+policy-before-insert storage, and domain-supplied authorization. Prefer those
+existing primitives while the domain and carrier retain their own semantics.
+
+The Retinue probes cited above first establish signed management over a new
+carrier and one canonical device-authored operation. Forwarding retains the
+original signed bytes and operation id; gateway re-origination is a separate
+authorship event with explicit provenance. Carrier authentication, session
+admission, device authority, and operation admission remain distinct. The
+existing Insigne/Notochord/Personae grammar remains authoritative; neither an
+iroh endpoint key nor p2panda topic access substitutes for it. This pass updated
+documentation only and supplied no MCU build, RF, power, or reopen receipt.
 
 ## Completion
 
