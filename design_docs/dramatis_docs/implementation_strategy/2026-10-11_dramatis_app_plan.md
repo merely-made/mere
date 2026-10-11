@@ -28,7 +28,7 @@ with Djinn owning custody and consent and concurrent work preserved.
 The app is `ports/dramatis` in Mere, package `dramatis-app`, binary
 `dramatis-ui`. This keeps Cambium and Graphshell client dependencies outside
 Dramatis's portable identity workspace, which Mere already pins. There is
-one existing Djinn process and one Castellan credential authority; the app
+one existing Djinn process owning Castellan authorities for its existing credential stores; the app
 requests public state and acts through the owner-local custody door.
 `AppId` is a label, not a security credential. Resident consent remains the
 boundary for review mutations even from an owner-local caller.
@@ -50,6 +50,13 @@ rechecks its whole metadata revision before binding it. Assignment does not
 accept quarantined items. Profile selection changes Djinn's chosen profile, consistent
 with the existing custody API, rather than inventing a separate app identity.
 
+A store's sealing persona remains fixed across profile selection, lock/unlock
+and restart. The resident catalog discovers existing profile-scoped roots
+through the persisted roster. Cards and mutation requests identify both the
+original store and the explicitly assigned destination profile; selecting a
+persona does not re-derive another store's keys or hide older imports after
+restart. No empty store is created for a persona by discovery.
+
 Cards contain public Chatelaine metadata only. Listing never reads a payload.
 The revision digest names exactly the metadata Djinn shows before asking
 for consent. Djinn asks on its native surface without holding the vault
@@ -70,3 +77,8 @@ contacts, persona creation, CXF export and packaging remain follow-on work.
 Added the first public review protocol, sealed namespace/profile bindings,
 resident-native confirmation seam and Cambium app skeleton. Verification is
 pending; source drafts do not establish runtime or visual acceptance.
+
+2026-10-11: regression testing exposed credential keys being re-derived from
+the newly selected profile on unlock. Restored holders now name their original
+sealing profile. The first 15 wire tests pass after the fix; multi-store,
+startup discovery, negative consent and native receipts are still running.
