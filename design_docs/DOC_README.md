@@ -63,7 +63,11 @@ records the graph as the primary model, portable clips and live entities, with
 domain-specific representations and one mere per data domain. It separates the
 accepted direction from proposed captured-version, compound-clip, live-sharing
 and cross-domain edit policies. Scene, vocabulary and architecture records link
-to that home; existing implementation and qualification gates remain separate.
+to that home. Its [shared semantic core review](2026-08-12_family_composition_thesis_brief.md#shared-semantic-core-existing-contracts-and-missing-seams-2026-10-11)
+compares existing identity, bundle, annotation and intent contracts against
+Turnstone/Knot, Redshank and Cleromancy consumers. The remaining seams are clip
+profiles, selector meaning, source-owner resolution, lifecycle policy and
+qualified adoption; existing implementation gates remain separate.
 
 ## Required reading order
 
