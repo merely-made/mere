@@ -14,6 +14,7 @@ OUT = ROOT / "support/receipts/dramatis-app"
 TARGET = Path("C:/t/cargo-targets/mere")
 CARGO = ["cargo", "+1.98.1"]
 records = []
+JOBS = 1
 def run(name, args, env=None, expected=0):
     with (OUT / (name + ".log")).open("w", encoding="utf-8") as log:
         result = subprocess.run(args, cwd=ROOT, env=env, stdout=log, stderr=subprocess.STDOUT)
@@ -22,7 +23,7 @@ def run(name, args, env=None, expected=0):
     assert result.returncode == expected, name
     return (OUT / (name + ".log")).read_text(encoding="utf-8", errors="replace")
 def cargo(*args):
-    return CARGO + list(args) + ["--locked", "--offline", "--target-dir", str(TARGET), "-j4"]
+    return CARGO + list(args) + ["--locked", "--offline", "--target-dir", str(TARGET), "-j" + str(JOBS)]
 def remove_runtime(root):
     absolute = root.resolve()
     assert absolute.parent == OUT.resolve() and root.name.startswith("runtime-")
@@ -54,9 +55,13 @@ def fixture(mode, capture=True):
             host.wait(timeout=30)
         remove_runtime(root)
 def main():
+    global JOBS
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--skip-build",action="store_true")
+    parser.add_argument("--jobs",type=int,default=1,help="Compiler jobs; keep memory available for concurrent lanes")
     args=parser.parse_args()
+    assert args.jobs > 0
+    JOBS = args.jobs
     OUT.mkdir(parents=True,exist_ok=True)
     if not args.skip_build:
         run("host-build",cargo("build","-p","djinn","--bin","dramatis-review-host","--features","custody-receipt-host,cxf"))
@@ -85,13 +90,14 @@ def main():
     run("store-discovery",cargo("test","-p","djinn","--lib","--features","cxf")+["--","--exact","resident::tests::startup_discovers_original_store_after_selected_persona_changes"])
     # Rebuild the receipt host after restoring the production consent gate.
     run("restored-build",cargo("build","-p","djinn","--bin","dramatis-review-host","--features","custody-receipt-host,cxf"))
+    run("capture-build",cargo("build","-p","dramatis-app","--bin","dramatis-ui"))
     absent = r"\\.\pipe\dramatis-app-receipt-absent"
     env=dict(os.environ,DRAMATIS_RECEIPT_ENDPOINT=absent,DRAMATIS_RECEIPT_MODE="absent",GRAPHSHELL_APP_ENDPOINT=absent,DRAMATIS_CAPTURE=str(OUT/"absent.png"),DRAMATIS_CAPTURE_MODE="absent")
     run("app-wire-absent",cargo("test","-p","dramatis-app","--test","state")+["--","--ignored","--exact","app_wire_receipt"],env)
     run("window-absent",[str(TARGET/"debug/dramatis-ui.exe")],env)
     fixture("locked"); fixture("unlocked")
     hashes={p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in ROOT.glob("ports/dramatis/**/*.rs")}
-    owned = subprocess.check_output(["git", "diff", "--name-only", "origin/main"],cwd=ROOT,text=True).splitlines()
+    owned = subprocess.check_output(["git", "ls-files", "ports/castellan", "ports/djinn", "ports/graphshell", "ports/dramatis"],cwd=ROOT,text=True).splitlines() + ["Cargo.toml", "Cargo.lock"]
     for p in [ROOT/name for name in owned if name.endswith((".rs", ".toml", "Cargo.lock"))]:
         hashes[p.relative_to(ROOT).as_posix()]=hashlib.sha256(p.read_bytes()).hexdigest()
     artifacts={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in OUT.iterdir() if p.suffix in [".png",".log"]}

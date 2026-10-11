@@ -80,12 +80,13 @@ pub fn root(state: &State) -> Child {
             }
             if !locked && !snapshot.unassigned.is_empty() {
                 body.push(Box::new(el("h2", text("Older imports awaiting a persona"))));
-                body.push(line("Choose the persona these imports belong to, then ask Djinn to assign them. Items remain sealed and quarantined until separately reviewed."));
+                body.push(line("Choose the persona these imports belong to, then ask Djinn to assign them. Assignment preserves each item’s state. Quarantined items still need review."));
                 for import in &snapshot.unassigned {
                     let mut contents = vec![line(format!(
                         "{} items · {}",
                         import.item_count, import.persona
                     ))];
+                    contents.push(line(format!("Import store: {}", import.store.0)));
                     contents.extend(import.titles.iter().take(8).map(|t| line(t.clone())));
                     contents.push(action(
                         "Assign to this persona",
