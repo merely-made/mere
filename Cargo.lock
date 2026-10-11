@@ -8443,7 +8443,7 @@ dependencies = [
 [[package]]
 name = "knot-capture"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=9fd8834421589d9d9a9542ee6aaf4e7efa52de6a#9fd8834421589d9d9a9542ee6aaf4e7efa52de6a"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=4d8b81c5ed8fbe29bac9fc762cb71f161e00c784#4d8b81c5ed8fbe29bac9fc762cb71f161e00c784"
 dependencies = [
  "knot-file-catalog",
 ]
@@ -8451,7 +8451,7 @@ dependencies = [
 [[package]]
 name = "knot-composition"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=9fd8834421589d9d9a9542ee6aaf4e7efa52de6a#9fd8834421589d9d9a9542ee6aaf4e7efa52de6a"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=4d8b81c5ed8fbe29bac9fc762cb71f161e00c784#4d8b81c5ed8fbe29bac9fc762cb71f161e00c784"
 dependencies = [
  "blake3",
  "knot-capture",
@@ -8469,7 +8469,7 @@ dependencies = [
 [[package]]
 name = "knot-document"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=9fd8834421589d9d9a9542ee6aaf4e7efa52de6a#9fd8834421589d9d9a9542ee6aaf4e7efa52de6a"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=4d8b81c5ed8fbe29bac9fc762cb71f161e00c784#4d8b81c5ed8fbe29bac9fc762cb71f161e00c784"
 dependencies = [
  "cambium",
  "illume",
@@ -8485,7 +8485,7 @@ dependencies = [
 [[package]]
 name = "knot-editor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=9fd8834421589d9d9a9542ee6aaf4e7efa52de6a#9fd8834421589d9d9a9542ee6aaf4e7efa52de6a"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=4d8b81c5ed8fbe29bac9fc762cb71f161e00c784#4d8b81c5ed8fbe29bac9fc762cb71f161e00c784"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -8554,7 +8554,7 @@ dependencies = [
 [[package]]
 name = "knot-file-catalog"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=9fd8834421589d9d9a9542ee6aaf4e7efa52de6a#9fd8834421589d9d9a9542ee6aaf4e7efa52de6a"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=4d8b81c5ed8fbe29bac9fc762cb71f161e00c784#4d8b81c5ed8fbe29bac9fc762cb71f161e00c784"
 dependencies = [
  "muniment",
  "pollster 0.4.0",
@@ -8567,7 +8567,7 @@ dependencies = [
 [[package]]
 name = "knot-site"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=9fd8834421589d9d9a9542ee6aaf4e7efa52de6a#9fd8834421589d9d9a9542ee6aaf4e7efa52de6a"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=4d8b81c5ed8fbe29bac9fc762cb71f161e00c784#4d8b81c5ed8fbe29bac9fc762cb71f161e00c784"
 dependencies = [
  "blake3",
  "gemini-protocol",
@@ -9602,7 +9602,7 @@ dependencies = [
 [[package]]
 name = "mere-p2panda-net"
 version = "0.7.5"
-source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5#1bec457efe7df4dd85f657902f7333ce857620d8"
+source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261011#d8acabc96ecc59016e40edf4a47ed5eaf5360285"
 dependencies = [
  "futures-channel",
  "futures-util",
@@ -10097,6 +10097,7 @@ dependencies = [
  "blake3",
  "hex",
  "insigne",
+ "mere-proofs",
  "mere-transport",
  "muniment",
  "notochord",
@@ -12173,7 +12174,7 @@ dependencies = [
 [[package]]
 name = "p2panda-auth"
 version = "0.7.1"
-source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5#1bec457efe7df4dd85f657902f7333ce857620d8"
+source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261011#d8acabc96ecc59016e40edf4a47ed5eaf5360285"
 dependencies = [
  "p2panda-core",
  "petgraph 0.8.3",
@@ -12184,7 +12185,7 @@ dependencies = [
 [[package]]
 name = "p2panda-core"
 version = "0.7.1"
-source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5#1bec457efe7df4dd85f657902f7333ce857620d8"
+source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261011#d8acabc96ecc59016e40edf4a47ed5eaf5360285"
 dependencies = [
  "blake3",
  "cbor-core",
@@ -12199,7 +12200,7 @@ dependencies = [
 [[package]]
 name = "p2panda-discovery"
 version = "0.7.1"
-source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5#1bec457efe7df4dd85f657902f7333ce857620d8"
+source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261011#d8acabc96ecc59016e40edf4a47ed5eaf5360285"
 dependencies = [
  "blake3",
  "futures-util",
@@ -12214,7 +12215,7 @@ dependencies = [
 [[package]]
 name = "p2panda-encryption"
 version = "0.7.1"
-source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5#1bec457efe7df4dd85f657902f7333ce857620d8"
+source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261011#d8acabc96ecc59016e40edf4a47ed5eaf5360285"
 dependencies = [
  "chacha20poly1305 0.10.1",
  "curve25519-dalek 5.0.0",
@@ -12237,7 +12238,7 @@ dependencies = [
 [[package]]
 name = "p2panda-store"
 version = "0.7.1"
-source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5#1bec457efe7df4dd85f657902f7333ce857620d8"
+source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261011#d8acabc96ecc59016e40edf4a47ed5eaf5360285"
 dependencies = [
  "async-stream",
  "futures-util",
@@ -12247,7 +12248,7 @@ dependencies = [
 [[package]]
 name = "p2panda-stream"
 version = "0.7.1"
-source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5#1bec457efe7df4dd85f657902f7333ce857620d8"
+source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261011#d8acabc96ecc59016e40edf4a47ed5eaf5360285"
 dependencies = [
  "futures-util",
  "p2panda-core",
@@ -12261,7 +12262,7 @@ dependencies = [
 [[package]]
 name = "p2panda-sync"
 version = "0.7.1"
-source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5#1bec457efe7df4dd85f657902f7333ce857620d8"
+source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261011#d8acabc96ecc59016e40edf4a47ed5eaf5360285"
 dependencies = [
  "futures-channel",
  "futures-util",
