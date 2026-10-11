@@ -1127,7 +1127,8 @@ answer and the choice is Mark's.
 ## 10. Transport composition and a shared conformance corpus — 2026-10-11
 
 **Status:** owner-authorized direction; catalog and executable suite foundation
-implemented and validated locally; retained-repair prototype implemented;
+implemented and validated locally; retained-repair and bounded signed-object
+owner receive prototypes implemented;
 later integration and qualification open. Mark prefers published standards for covered behavior and asked
 for orchestration, the useful specification scope, prior art and a WPT-like
 testing set. This section is the canonical cross-repository research record.
@@ -1302,8 +1303,23 @@ preconfigured channel/manifest cadence and a common slot clock. Findings and
 the historical source-fingerprinted report live once in
 `retinue/design_docs/2026-10-11_retained_repair_simulation_profile.md` and
 `retinue/testing/transport-conformance/results/retained-repair-exploration-20261011.json`.
-The next prototype is the owner-local signed-object receive/admission seam;
-the model does not establish application adoption or physical Mbps.
+The owner-local receive continuation below now exercises application admission;
+the model does not establish live carrier integration or physical Mbps.
+
+**2026-10-11 signed-object receive continuation:** the Mere-owned
+[host example](../crates/mesh/mesh/examples/retained_receive/README.md) preserves
+one original signed V2 job record through actual RaptorQ recovery and passes it
+to the existing mesh/operation processor admission path. The receiver chooses
+its expected mesh independently of the offered record. The selected
+[source-bound report](../crates/mesh/mesh/examples/retained_receive/receive-exploration-20261011.json)
+observes one durable operation and posted job across four-radio and late
+one-radio arrival, then unchanged state after three invalid-inner-record
+refusals and in-process store reopen. Exact record/header/body bytes and the
+operation ID are preserved; the record digest and generation identities retain
+their separate purposes. The example records codec, processor and domain
+refusals without adding an admission owner. It transfers job metadata, not
+referenced blobs or worker execution. Live carrier composition is the next
+bounded step; wider evaluation remains deferred until stable contracts.
 
 ### MemoryLAN: adapt inventory policy and keep a baseline
 
