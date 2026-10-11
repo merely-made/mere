@@ -10,6 +10,12 @@ explicit precedence and match explanations, and an interactive aesthetic study.
 The Rhai runner still waits on SE39–SE42's coordinated Genet repin. The
 declarative model and study do not reopen S2/B1 or claim their completion.
 
+**2026-10-10 continuation:** the bounded Graphshell Forme draft and saved layout
+undo are implemented in `69f17908`, with native/build qualification and an open
+[visual test handoff](#forme-visual-test-handoff-2026-10-10). The next primitive
+editor design stages exact-owner inspection before writes; general field
+authoring and the unresolved storage/composition policies remain planned.
+
 Not in scope, mapped in §3 and opened by later rounds:
 - the scripting comparison (SE3), which is the next assessment;
 - wallpapers and props, the node, edge and field style editors, and authored motion.
@@ -671,6 +677,76 @@ must reach the same inspection and apply/discard actions. The
 [field authoring draft](2026-06-13_scriptable_field_regions_plan.md#field-authoring-draft-2026-10-10)
 owns membership, overlap checkpoints and the field-specific walkthrough.
 
+#### Identity inspection follow-through (2026-10-10; next design steps)
+
+**Status:** planned adapters; no new runtime track or receipt. Mark asked this
+agent to keep working on plans while agents on O-PC, the ThinkPad and the Macs
+perform visual tests. The implemented forme draft remains the bounded runtime
+proof. This sequence prepares the primitive-editor walkthrough without choosing
+the outstanding attribute-storage or field-composition policies.
+
+Source checked at published Mere `69f17908`:
+
+- [Resource reads](../../../crates/graph/graph-kernel/src/graph/resource.rs)
+  expose `shown_resource_id`, `resource_record` and
+  `surface_ids_showing_resource`. The inspector can disclose the recorded shared
+  owner and its held accesses without grouping accesses by equal URL.
+- [Projected relation reads](../../../crates/graph/graph-kernel/src/graph/relation_read.rs)
+  retain `RelationKey::Surface` or `RelationKey::Resource` for parallel records
+  and self-links. One visual pair can therefore disclose several owning records.
+  [Assertion lookup](../../../crates/graph/graph-kernel/src/graph/assertion_write.rs)
+  resolves a held `statement_id` to its recorded store. A statement's scope,
+  provenance, predicate and assertion time are available in
+  [SemanticStatement](../../../crates/graph/graph-kernel/src/graph/edge_data.rs).
+- The [roster](../../../crates/mere/src/roster.rs) carries member pairs and
+  family/subkind selectors in link rows, but does not carry the exact statement
+  identity or a Resource inspection subject. Its existing editable flag alone
+  cannot authorize an exact-record edit. These are adapter gaps, not evidence
+  that the kernel lacks assertion identity.
+
+**Proposed sequence and done-conditions:**
+
+1. **Inspect the access and its shared source.** Resolve a clicked appearance
+   to its graph member, then read its recorded Resource association. Show this
+   access's title and address, the shared source's facts, and the other held
+   accesses. Inspection keeps the working selection and open content sessions
+   intact. A missing association is disclosed; an equal address is not enough
+   to invent one. Done: two surfaces showing one Resource remain distinct, a
+   changed shown Resource refreshes the inspector, and incomplete residency is
+   labelled rather than presented as a complete list of all accesses.
+2. **Expand a link into its source records.** A bundle first lists its directed
+   endpoints and contributing records, including self-links and parallel facts.
+   Retain the source stratum and statement handle wherever one exists. A
+   family/selector row may group records, but must lead to an exact record before
+   editing. Non-statement relations retain their actual owning data; do not mint
+   a statement merely to fit this inspector. Derived marks disclose the rule
+   and inputs through their owner, with missing provenance shown. Done: the
+   walkthrough distinguishes two assertions of the same predicate and a
+   Resource relation lifted onto two different access pairs. Reopen resolves
+   stable identities rather than storing local edge indexes as durable targets.
+3. **Bind an edit to the inspected owner.** Begin with separate access metadata
+   and shared-source editing actions. Read and retain a baseline for the chosen
+   owner, validate the full draft, and re-resolve its identity before apply.
+   A deleted or changed target keeps the draft with an explanation; it cannot
+   retarget to another node at the same address. Exact assertion mutation needs
+   its existing authorship/retraction contract, and general Resource attributes
+   need graph semantics' storage decision before those controls open. Done:
+   malformed input changes nothing in the promised single-owner operation,
+   discard preserves other owners, and saved undo names its scope. The current
+   sequential title/tag/facet form is not treated as this compound operation.
+4. **Join field inspection to the same interaction.** Use the
+   [field adapter sequence](2026-06-13_scriptable_field_regions_plan.md#field-inspection-adapter-sequence-2026-10-10)
+   for exact field/coupling subjects and overlap discovery. A forme opens its
+   implemented arrangement draft; a Numen field opens its own inspection.
+   Done: the same scene can explain both owners without fabricating an
+   association between them or invoking an action during preview.
+
+The first deliverable is read-only inspection with identity receipts. Subsequent
+writes must prove their owning transaction and save/reopen path before adding
+Apply. Keyboard inspection reaches the same subjects as pointer inspection.
+Tabard owns appearance roles; dynamics owns effect explanations and execution.
+The existing dynamics qualification → B1 → S2 order remains with that lane.
+
 #### Mixed-content study (2026-10-10; proposal, not opened)
 
 Mark forwarded the design-language agent's proposed
@@ -1076,3 +1152,71 @@ geometry/bounds unchanged until Lock and apply. The added
 local-origin sequence with real host pointer handle drags, draft undo/redo,
 added membership/discard, saved undo and reopened redo. Those headed scenarios
 remain pending on a WebGPU-capable browser.
+
+#### Forme visual test handoff (2026-10-10)
+
+**Status:** ready for another machine to run; no host or browser pass claimed.
+Mark assigned this machine continued planning and expects agents on O-PC, the
+ThinkPad or the Macs to test. This record supplies the shared handoff through
+the repository; it does not claim that another chat received or accepted work.
+The implementation to qualify is Mere `69f1790834a0de8885a4ab58f907343b09d2d0a6`.
+If testing a later main, record that revision and distinguish intervening source
+changes from this receipt's hashes.
+
+Build the [web host](../../../ports/graphshell/web/Cargo.toml) with `product`
+enabled, package with the lock's `wasm-bindgen` 0.2.129, and serve the web
+directory with its generated `pkg` beside `tree.html`. The scoped source build
+used `--no-default-features --features product`; default-feature build checks
+also passed. The viewer-only build has no local-product adapter. The committed
+[qualification summary](../../../ports/graphshell/docs/receipts/forme_draft_20261010/qualification.json)
+is portable evidence of source checks; its S-PC log paths and build outputs are
+local artifacts, not prerequisites on another machine.
+
+Use a dedicated browser profile/origin with empty Graphshell IndexedDB for the
+first run, then retain that same origin, profile and storage for this sequence.
+Open a fresh page for every row; do not clear storage between rows. Keep the tab
+visible and wait for completion before navigating onward.
+
+| Order | Route relative to the served web directory | Purpose |
+|---|---|---|
+| 1 | `tree.html?app=local&scenario=scenarios/p4_tree_forme.scn` | Create two accesses, hover subdivisions, preview/edit and apply the arrangement. |
+| 2 | `tree.html?app=local&scenario=scenarios/p4_tree_forme_reopen.scn` | Reopen committed layout and focus an existing access. |
+| 3 | `tree.html?app=local&scenario=scenarios/p4_tree_forme_draft.scn` | Real host pointer drops, draft undo/redo/discard, membership and saved undo. |
+| 4 | `tree.html?app=local&scenario=scenarios/p4_tree_forme_draft_reopen.scn` | Reopen the saved redo cursor and verify stable forme identity. |
+
+The [loader](../../../ports/graphshell/web/loader.js) accepts an additional
+`sink` query parameter naming a receipt endpoint; it posts the result and
+captures to `/scenario-receipt` and live progress to `/scenario-progress`.
+Existing host test harnesses can collect these, or collect the scenario result
+and named captures from the page. Use separate clean profiles/origins for each
+browser's four-run sequence. Record browser/version, OS, viewport, WebGPU boot
+result, source revision, feature set and generated wasm hash with each receipt.
+Chrome and Firefox checks are the existing headed targets; record Safari on a
+Mac if run, keeping unsupported boot separate from an interaction failure.
+
+Review the captures as well as scenario assertions: graph regions and tiles
+should agree, hover guides should remain legible, and drop previews should be
+distinct from committed layout. Add real pointer and keyboard checks for
+Escape/outside-release cancellation, click-without-drag selection, undo in an
+open draft, saved undo in Forme controls, and another editor retaining its own
+undo. The scripted lane queues host pointer input; it does not qualify every
+physical-device/focus path. Failure/retry already has an injected native test;
+do not claim a browser persistence-failure receipt unless it is exercised there.
+
+Done: all four runs and reviewed captures are tied to the tested build, reopen
+really uses retained storage, and focus/cancellation observations are recorded.
+Append results here, link portable receipts, and leave any failed or unrun gate
+explicit. A fresh rerun after a partial failure starts with a new dedicated
+origin/profile because the sequence intentionally changes retained state.
+
+#### Planning and remote-machine qualification (2026-10-10)
+
+Mark: "you keep working plans and the other agents on o-pc, the thinkpad, or the
+macs will test it." The identity inspection follow-through and field inspection
+adapter sequence now name available read APIs, missing roster subjects and the
+write gates for shared sources, exact assertions and individual couplings.
+The forme handoff records its published revision, product-feature requirement,
+`app=local` route, four fresh-page runs on one retained origin/profile, capture
+review and extra physical-input/focus checks. The field plan's earlier pending
+forme-draft wording is reconciled with the implemented adapter. All are plan
+updates; no new runtime source, browser receipt or agent dispatch is claimed.

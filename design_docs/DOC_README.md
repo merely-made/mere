@@ -23,6 +23,11 @@ make the assigned inspect/edit flows concrete. They refresh the implemented
 forme bridge, identify overlap-picking and multi-coupling edit gaps, and retain
 explicit membership, placement, event and storage checkpoints. These are design
 proposals, distinct from the agreed forme draft and existing runtime receipts.
+The [identity inspection sequence](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#identity-inspection-follow-through-2026-10-10-next-design-steps)
+now stages read-only access/Resource, exact-assertion and individual-coupling
+inspection before their write adapters. The implemented forme draft's
+[visual test handoff](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#forme-visual-test-handoff-2026-10-10)
+specifies the retained-origin scenario order for agents on the other machines.
 
 ## Required reading order
 
@@ -714,6 +719,13 @@ is historical evidence, not the current path or ownership inventory. For the wor
 [`2026-05-24_external_deps_topology_brief.md`](2026-05-24_external_deps_topology_brief.md).
 
 ## Working principles
+
+- **Portable qualification handoffs (2026-10-10):** when one machine supplies
+  implementation and another supplies visual testing, keep the tested revision,
+  build/features, scenario order, retained-state prerequisites and open gates
+  in the owning plan. Local artifact paths are not portable prerequisites.
+  Source/build checks and actual interactive results remain separately labelled;
+  a committed handoff does not imply another agent ran it.
 
 - **Configurable presentation, stable meaning (2026-10-09):** learnable behavior and user control carry the shared design language across apps. Themes and installed fonts are configurable; defaults are starting points. Keep foreground pins, position pins, anchors and forme layout locks distinct, and preserve the resource/surface identity boundary. See the [design language record](2026-08-23_projection_scenes_and_graph_native_platform.md#9-configurable-visual-and-interaction-language-2026-10-09). The [2026-10-10 design allocation](2026-08-23_projection_scenes_and_graph_native_platform.md#914-design-work-ownership-2026-10-10) assigns theme/typography to Tabard on q-pc, field and primitive editors to the projection grammar agent, and visible dynamics plus script/motion authoring to the dynamics agent; selection fundamentals are established, and broader scene authoring remains a research lane.
 

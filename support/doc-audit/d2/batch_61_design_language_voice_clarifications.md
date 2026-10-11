@@ -336,3 +336,17 @@ is inferred. Complete D2 JSON was compared with an archive of committed main
 `4f70d536` and is identical: 252/259 coverage, the seven missing records,
 duplicate README basenames and aggregate-digest mismatch are pre-existing.
 No active Markdown document or unknown audit record was added.
+
+**Planning and test handoff (2026-10-10):** Mark assigned continued planning to
+this machine while agents on O-PC, the ThinkPad or the Macs test. Source checked
+at published `69f17908`: Resource association/access reads, stratum-preserving
+projected relations, exact semantic-statement lookup and attribution, roster
+subjects, field/coupling reads and graph deltas, the product route and scenario
+loader. The editor plan stages exact-owner inspection before mutation and owns
+the portable four-run Forme qualification handoff; the field plan stages
+individual field/coupling inspection and reconciles its old draft status.
+The index links both and records the portable-qualification working principle.
+No new runtime track, storage/composition ruling, external message or browser
+pass is inferred. Full citation-audit and D2 JSON match their pre-edit baselines;
+D2 retains 252/259 coverage and its nine existing errors. Whitespace checks
+pass. No active document or unknown audit record was added.
