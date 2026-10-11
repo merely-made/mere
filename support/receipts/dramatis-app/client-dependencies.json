@@ -1,0 +1,17 @@
+{
+  "command": [
+    "cargo",
+    "+1.98.1",
+    "tree",
+    "--locked",
+    "--offline",
+    "-p",
+    "dramatis-app",
+    "--prefix",
+    "none",
+    "--format",
+    "{p}"
+  ],
+  "exit_code": 0,
+  "castellan_in_app_graph": false
+}

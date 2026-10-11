@@ -858,4 +858,4 @@ Pre-1.0 development. Index compacted in the 2026-06-09 design-docs audit (37 doc
 - [mere_docs/testing/receipts/2026-10-11_vello_releases/README.md](mere_docs/testing/receipts/2026-10-11_vello_releases/README.md).
 - [mere_docs/testing/receipts/2026-10-11_producer_gates/README.md](mere_docs/testing/receipts/2026-10-11_producer_gates/README.md).
 
-- [Dramatis app slice](dramatis_docs/implementation_strategy/2026-10-11_dramatis_app_plan.md): persona selection and quarantine review through Djinn; implementation and receipts in progress.
+- [Dramatis app slice](dramatis_docs/implementation_strategy/2026-10-11_dramatis_app_plan.md): persona selection and quarantine review through Djinn; first Windows slice qualified, with native consent and custody controls.

@@ -1,26 +1,28 @@
 # Dramatis persona selection and quarantine review
 
-**Status (2026-10-11):** in progress. Mark authorized the first app slice,
-with Djinn owning custody and consent and concurrent work preserved.
+**Status (2026-10-11):** first Windows app slice complete and qualified.
+Djinn owns custody and consent; concurrent main work is retained. Persona
+creation, contacts, credential fill, CXF export, distribution packaging and
+Linux/macOS host qualification remain open.
 
 ## Phases and done-conditions
 
 - [x] Map the existing picker, public roster, custody route and sealed item
   authority. Isolate Graphshell changes from concurrent primary edits.
-- [ ] Add secret-free quarantine cards and per-item resident actions, with
+- [x] Add secret-free quarantine cards and per-item resident actions, with
   explicit profile/namespace ownership, exact reviewed metadata and native
   Djinn consent. Locked, stale, denied, unsupported and wrong-persona acts
   must leave items sealed and unchanged.
-- [ ] Ship a runnable Cambium window with persona selection, reconnect,
+- [x] Ship a runnable Cambium window with persona selection, reconnect,
   native unlock, lock, cards and reasoned accept/delete controls. The client
   must never open custody or render a passphrase field.
-- [ ] Qualify real absent/Locked and unlocked wire flows, resident consent
+- [x] Qualify real absent/Locked and unlocked wire flows, resident consent
   denial, acceptance, deletion, stale revision and cross-persona refusal.
   A deliberately broken consent or quarantine gate must fail the controls;
   restore source exactly before recording green receipts.
-- [ ] Run the native window and inspect retained layout, keyboard focus and
+- [x] Run the native window and inspect retained layout, keyboard focus and
   resize behavior on synthetic fixtures. Record only exercised host gates.
-- [ ] Commit, push and integrate the isolated lane, preserving other edits;
+- [x] Commit, push and integrate the isolated lane, preserving other edits;
   update the owning CXF P5 status and retain reproducible evidence.
 
 ## Findings (2026-10-11)
@@ -37,7 +39,7 @@ The existing public roster is in the Dramatis facade. The persona picker
 provides shared row conventions. The client transport already reads roster
 and status while Locked and requests profile switches when Unlocked. Djinn
 already has native unlock dialogs and a lock-bound credential authority.
-The missing P5 behavior is listing and changing quarantined item state.
+The app now lists quarantined items and requests their state changes through Djinn.
 
 CXF destinations contain two distinct identifiers: an identity `ProfileId`
 and a sealed item namespace `PersonaId`. The earlier importer checked both
@@ -82,3 +84,31 @@ pending; source drafts do not establish runtime or visual acceptance.
 the newly selected profile on unlock. Restored holders now name their original
 sealing profile. The first 15 wire tests pass after the fix; multi-store,
 startup discovery, negative consent and native receipts are still running.
+
+2026-10-11: qualification complete. The custody suite passes 16 tests, startup
+store discovery passes one, Castellan passes 303, app state passes four, and
+retained interaction passes seven. Real app wire runs pass for absent,
+Locked and unlocked Djinn. The consent control passes without the synthetic
+bypass, fails as expected with it enabled (exit 101), and passes all 16
+custody tests after byte-exact source restoration. The flag is absent from
+restored production source.
+
+Five native GPU captures were visually reviewed: absent, Locked and unlocked,
+with wide and narrow Locked/unlocked windows. The retained host harness
+exercises pointer activation, Enter, keyboard order, scroll preservation,
+resize and zoom. Native Windows consent was exercised separately: No keeps
+three cards; Yes deletes only the selected card. The receipt also verifies
+No is the native default button. Native screenshots caught and corrected the
+root background and Windows' different default-button indexing; the harness
+caught disabled controls in Tab order and missing focus reveal.
+
+Evidence is [the Windows receipt](../../../support/receipts/dramatis-app/README.md),
+including source hashes, commands, logs, screenshots and archived failed
+controls. Production Djinn checks, portable metadata verification and
+`cargo deny --offline check bans` pass. These are synthetic vault receipts,
+not qualification of an actual user's vault or other platforms. Documentation
+audit baseline findings are recorded separately in that receipt.
+
+The focused lane integrates concurrent documentation changes without
+changing their source. Its temporary worktree and synthetic runtime roots
+are removed after integration. Builds reuse `C:/t/cargo-targets/mere`.
