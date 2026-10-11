@@ -4,11 +4,10 @@
 
 A castellan holds a keep in trust for its lord: custody without ownership, and
 the office of the gate. This port is that keeper for your credentials. It
-splits in two: an embeddable half any host app composes (vault browse, status,
-code tiles; views that render *about* secrets and never contain them), and an
-authority half that lives with the resident (release, signing, presentation),
-answering participant-gate petitions over an agent-style channel the way the
-personae ssh-agent already works. Apps talk to a pipe; apps never see the key.
+holds secret custody inside djinn (release, signing, presentation), answering
+participant-gate petitions over an agent-style channel. Secret-free views live
+in graphshell. Applications call djinn's custody route; only djinn links
+castellan, as enforced by Mere's `deny.toml`.
 
 The vocabulary it keeps, per the dramatis tier model:
 
@@ -19,7 +18,7 @@ The vocabulary it keeps, per the dramatis tier model:
   lands in someone else's gaz.
 
 The boundaries are the point: not [personae](https://crates.io/crates/personae)
-(the faces and vault substrate castellan serves), and not
+(the faces and public identity vocabulary), and not
 [gaz](https://crates.io/crates/gaz) or gazette (which keep and find the other
 players; castellan guards and presents you). Castellan issues a persona's
 public presentation and gazette announces it (ruled 2026-09-30), so the port
@@ -29,6 +28,14 @@ Lives in the [mere](https://github.com/merely-made/mere) workspace at
 `ports/castellan`.
 
 ## State (2026-08-21)
+
+**2026-10-10, DR-C:** `personae-vault` is now a graphshell client. Install it
+with `cargo install --path ports/graphshell --bin personae-vault` from Mere.
+It accepts `--app-endpoint` and `--profile`; vault location and unlocking belong
+to djinn. Command implementations run against djinn's already-open storage,
+within its lock boundary. Private slots never cross this terminal route.
+`profiles` reads the public roster even while Locked; identity-bound commands
+report pending when djinn is absent or Locked.
 
 Implemented:
 
@@ -53,12 +60,10 @@ Implemented:
   callers, and delegates every operation to a host policy over bus credentials
   and `/proc` executable identity. A `secret-tool` store/lookup/clear receipt
   runs under a disposable session bus.
-- `reticulum` — the first device-identity issue seam: a radio credential
-  derived from a Persona provider, no device-local account file.
+- The Reticulum station derivation that began here is `personae::reticulum`
+  now, and the station grant policy `pandect::station_grant` (DR-C, D17).
 - feature `keeper` — the two halves made real, moved home from graphshell
-  where they first grew: `view` (the secret-free read model), `projection`
-  (the cards and typed intents: signing decisions, SSH generate/import/
-  remove, device revoke, persona switch, persona create), and `authority`
+  where they first grew: `view` (the secret-free read model) and `authority`
   (`PersonaeHost`, the resident keeper that holds the vault, serves the SSH
   agent, and brokers approvals).
 
@@ -78,8 +83,8 @@ artifacts. Fresh claims start Unverified; a new contact requires the host's
 LocalId. The receipt proves native sealed composition and persona isolation;
 live resolver transport and application contact UI remain separate work.
 
-Graphshell composes all three and re-exports them at its pre-founding paths,
-so it is the first host rather than the owner. The intent wire strings keep
+Djinn composes custody and serves the application route. Graphshell renders
+the public models and sends intents to djinn. The intent wire strings keep
 their `castellan.*` values for now; renaming the wire vocabulary is
 a separate decision. CXF import remains follow-on work; its policy was ruled
 on 2026-10-01. The everyday credentials are stored and SSH keys go through

@@ -14,10 +14,10 @@
 
 use std::fmt;
 
-use castellan::reticulum::grant::{SitedStationGrant, SitedStationGrantError};
 use insigne::CheckFault;
 use insigne::DerivedKeyAttestation;
 use p2panda_core::cbor::{decode_cbor, decode_cbor_strict, encode_cbor};
+use pandect::station_grant::{SitedStationGrant, SitedStationGrantError};
 use pandect::{DeviceGrantError, DeviceId, decode_device_grant_set, encode_device_grant_set};
 use personae::{
     Ed25519Keypair, Ed25519PublicKey, Ed25519Signature, IdentityError, IdentityProvider,
@@ -31,7 +31,6 @@ pub const SITED_STATION_CONTROL_TITLE: &[u8] = b"mere.sited-station-control/v1";
 pub const SITED_STATION_CONTROL_ACK_TITLE: &[u8] = b"mere.sited-station-control-ack/v1";
 
 const CONTROL_SCHEMA_VERSION: u16 = 1;
-const CONTROL_ATTESTATION_DOMAIN: &[u8] = b"mere/signalman/sited-station-control/v1/";
 const MAX_CONTROL_FRAME_BYTES: usize = 4096;
 
 /// The host-only signing authority for one station's control frames.
@@ -193,7 +192,7 @@ impl SitedStationControl {
         match &self.body.command {
             SitedStationControlCommand::Grant { grant } => {
                 Ok(SitedStationGrant::from_signed(decode_device_grant_set(grant)?)?.device_id())
-            }
+            },
             SitedStationControlCommand::Revoke { device_id, .. } => Ok(*device_id),
         }
     }
@@ -491,7 +490,7 @@ impl SitedStationControlReceiver {
         let result = match &frame.body.command {
             SitedStationControlCommand::Grant { grant } => {
                 self.install_grant(frame, grant, now_ms)?
-            }
+            },
             SitedStationControlCommand::Revoke {
                 device_id,
                 revoked_at_ms: _,
@@ -754,7 +753,7 @@ impl fmt::Display for SitedStationControlError {
             Self::Decode => f.write_str("could not decode sited-station control frame"),
             Self::UnsupportedSchema { actual } => {
                 write!(f, "unsupported sited-station control schema {actual}")
-            }
+            },
             Self::FrameTooLarge { actual } => write!(
                 f,
                 "sited-station control frame is {actual} bytes, over the {MAX_CONTROL_FRAME_BYTES}-byte carrier limit"
@@ -769,20 +768,20 @@ impl fmt::Display for SitedStationControlError {
             ),
             Self::InvalidControlSignatureLength => {
                 f.write_str("sited-station control signature was not 64 bytes")
-            }
+            },
             Self::InvalidControlSignature => f.write_str("sited-station control signature failed"),
             Self::InvalidAckSignatureLength => {
                 f.write_str("sited-station control acknowledgement signature was not 64 bytes")
-            }
+            },
             Self::InvalidAckSignature => {
                 f.write_str("sited-station control acknowledgement signature failed")
-            }
+            },
             Self::AckControlMismatch => {
                 f.write_str("sited-station acknowledgement names a different control frame")
-            }
+            },
             Self::AckDeviceMismatch => {
                 f.write_str("sited-station acknowledgement names a different device")
-            }
+            },
             Self::WrongDevice { expected, actual } => write!(
                 f,
                 "sited-station control targets {}, not expected device {}",
@@ -806,7 +805,7 @@ impl fmt::Display for SitedStationControlError {
             ),
             Self::Revoked { device_id } => {
                 write!(f, "sited-station device {} is revoked", device_id.as_uuid())
-            }
+            },
             Self::DeadlineElapsed {
                 device_id,
                 expires_at_ms,
@@ -833,10 +832,7 @@ impl fmt::Display for SitedStationControlError {
 impl std::error::Error for SitedStationControlError {}
 
 fn control_salt(device_id: DeviceId) -> Vec<u8> {
-    let mut salt = Vec::with_capacity(CONTROL_ATTESTATION_DOMAIN.len() + 16);
-    salt.extend_from_slice(CONTROL_ATTESTATION_DOMAIN);
-    salt.extend_from_slice(device_id.as_uuid().as_bytes());
-    salt
+    personae::reticulum::station_control_salt(device_id.as_uuid().as_bytes())
 }
 
 fn encode<T: Serialize>(value: &T) -> Result<Vec<u8>, SitedStationControlError> {
@@ -856,29 +852,43 @@ fn decode_snapshot<T: for<'de> Deserialize<'de>>(
 
 #[cfg(test)]
 mod tests {
-    use pandect::{DeviceId, ensure_wallet_state};
-    use personae::{InMemoryProvider, PersonaId};
+    use pandect::DeviceId;
+    use personae::InMemoryProvider;
+
+    use crate::authority::test_support::TestWallet;
+
+    /// The test wallet and the directory it writes in, kept alive together.
+    struct Commissioned {
+        _dir: tempfile::TempDir,
+        wallet: std::sync::Arc<TestWallet>,
+    }
     use tempfile::tempdir;
 
     use super::*;
     use crate::SitedStationCredential;
 
     fn commissioned() -> (
-        tempfile::TempDir,
+        Commissioned,
         InMemoryProvider,
         DeviceId,
         SitedStationCredential,
         SitedStationGrant,
     ) {
-        let root = tempdir().unwrap();
-        let seed = ensure_wallet_state(root.path(), PersonaId::new(), "Station host").unwrap();
-        let provider = InMemoryProvider::from_seed(seed);
+        let dir = tempdir().unwrap();
+        let wallet = TestWallet::new(dir.path(), 0x5a);
+        let provider = wallet.provider();
         let device_id = DeviceId::new();
         let credential = SitedStationCredential::derive_for_device(&provider, device_id).unwrap();
         let grant = credential
-            .issue_remote_auth_grant(root.path(), device_id, "Ridge north", 100, 200)
+            .issue_remote_auth_grant(wallet.as_ref(), device_id, "Ridge north", 100, 200)
             .unwrap();
-        (root, provider, device_id, credential, grant)
+        (
+            Commissioned { _dir: dir, wallet },
+            provider,
+            device_id,
+            credential,
+            grant,
+        )
     }
 
     #[test]
@@ -999,7 +1009,7 @@ mod tests {
             .unwrap();
 
         let renewed = credential
-            .issue_remote_auth_grant(root.path(), device_id, "Ridge north", 150, 300)
+            .issue_remote_auth_grant(root.wallet.as_ref(), device_id, "Ridge north", 150, 300)
             .unwrap();
         let renewal = credential.control_signer().grant(&renewed).unwrap();
         let ack = receiver
@@ -1048,7 +1058,7 @@ mod tests {
             ))
         ));
         let renewed = credential
-            .issue_remote_auth_grant(root.path(), device_id, "Ridge north", 150, 300)
+            .issue_remote_auth_grant(root.wallet.as_ref(), device_id, "Ridge north", 150, 300)
             .unwrap();
         assert!(matches!(
             receiver.receive(

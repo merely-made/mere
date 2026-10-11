@@ -15,6 +15,7 @@ use std::{
 };
 
 use crate::{CaptureBackend, Readback, capture::NativeCapture};
+use cambium_rootstock::{Duration, Instant, PresentedFrame};
 use serde::Serialize;
 use taproot::{Outcome, Progress, Scenario};
 
@@ -99,6 +100,11 @@ pub struct Lane<P: Product> {
     exit_code: Rc<Cell<i32>>,
     frame_limit: Option<u32>,
     frames: u64,
+    redraws: u64,
+    unpresented_redraws: u64,
+    last_frame_presentation: Option<PresentedFrame>,
+    unpresented_since: Option<Instant>,
+    presentation_timeout: Duration,
     finished: bool,
     pub(crate) costs: Costs,
     pub(crate) script_files: Option<crate::scenario::ScriptFiles>,
@@ -143,6 +149,11 @@ impl<P: Product> Lane<P> {
             exit_code,
             frame_limit: None,
             frames: 0,
+            redraws: 0,
+            unpresented_redraws: 0,
+            last_frame_presentation: None,
+            unpresented_since: None,
+            presentation_timeout: Duration::from_secs(10),
             finished: false,
             costs: Costs::default(),
             script_files: None,
@@ -195,6 +206,15 @@ impl<P: Product> Lane<P> {
     /// Use the host's readback mechanism with the shared capture lifecycle.
     pub fn with_capture_backend(mut self, backend: impl CaptureBackend + 'static) -> Self {
         self.capture_backend = Box::new(backend);
+        self
+    }
+
+    /// Bound a continuous native presentation stall independently of frame
+    /// budgets. Readback polling continues during the wait. Defaults to ten
+    /// seconds; windowless explicit harness turns do not use this deadline.
+    #[must_use]
+    pub fn with_presentation_timeout(mut self, timeout: Duration) -> Self {
+        self.presentation_timeout = timeout;
         self
     }
 
@@ -273,6 +293,7 @@ impl<P: Product> Lane<P> {
             .map_or(&[] as &[String], |o| o.log.as_slice());
         let mut receipt = serde_json::json!({
             "ok": ok, "kind": P::KIND, "frames": self.frames,
+            "redraws": self.redraws, "unpresented_redraws": self.unpresented_redraws,
             "scenario": self.had_scenario, "scenario_log": log,
             "errors": self.errors, "final": final_fields,
             "checkpoints": self.checkpoints, "captures": self.captures,
@@ -286,45 +307,117 @@ impl<P: Product> Lane<P> {
         receipt
     }
 
-    /// Call once per presented frame, from the host's `after_frame` hook.
+    // Explicit windowless turns are a test clock. A native turn counts only
+    // when the host reports a new successful presentation identity.
+    fn admit_frame(
+        &mut self,
+        native: bool,
+        presentation: Option<PresentedFrame>,
+        now: Instant,
+    ) -> bool {
+        self.redraws += 1;
+        let presented = !native
+            || presentation.is_some_and(|frame| {
+                self.last_frame_presentation
+                    .is_none_or(|last| last.host != frame.host || frame.sequence > last.sequence)
+            });
+        if presented {
+            self.frames += 1;
+            self.last_frame_presentation = presentation;
+            self.unpresented_since = None;
+        } else {
+            self.unpresented_redraws += 1;
+            if self.scenario.is_some()
+                || self.pending.is_some()
+                || self.frame_limit.is_some()
+                || self.outcome.is_some()
+            {
+                self.unpresented_since.get_or_insert(now);
+            }
+        }
+        presented
+    }
+
+    /// Call after every redraw attempt. Successful native presentations advance
+    /// the scenario and frame budgets; failed attempts still poll readbacks.
     pub fn after_frame(&mut self, ctx: &mut Ctx<'_, P>) {
+        self.after_frame_at(ctx, Instant::now());
+    }
+
+    fn after_frame_at(&mut self, ctx: &mut Ctx<'_, P>, now: Instant) {
         if self.finished {
             return;
         }
         if let Some(files) = &mut self.script_files {
             files.install(ctx.files);
         }
-        self.frames += 1;
-        let observation = self.product.cost_observation(ctx);
-        if let Err(why) = self.costs.observe(
-            self.frames,
-            ctx.frame_profile,
-            observation.totals,
-            self.pending.is_some(),
-            observation.valid,
-            observation.populated,
-        ) {
-            self.errors.push(why);
+        let presented = self.admit_frame(ctx.window.is_some(), ctx.presentation, now);
+        if presented {
+            let observation = self.product.cost_observation(ctx);
+            if let Err(why) = self.costs.observe(
+                self.frames,
+                ctx.frame_profile,
+                observation.totals,
+                self.pending.is_some(),
+                observation.valid,
+                observation.populated,
+            ) {
+                self.errors.push(why);
+            }
         }
         self.collect_capture(ctx);
-        let clicked = match self.clicks.after_frame(ctx, |ctx, node, rect| {
-            self.product.target_point(ctx, node, rect)
-        }) {
-            Ok(clicked) => clicked,
-            Err(error) => {
-                self.errors.push(error);
-                true
-            },
-        };
-        if !clicked
-            && self.pending.is_none()
-            && let Some(mut scenario) = self.scenario.take()
+        if self
+            .unpresented_since
+            .is_some_and(|since| now.duration_since(since) >= self.presentation_timeout)
         {
-            let progress = scenario.tick(&mut Probe { ctx, lane: self });
-            if progress == Progress::Done {
-                self.outcome = Some(scenario.finish());
-            } else {
-                self.scenario = Some(scenario);
+            self.errors.push(format!(
+                "native presentation stalled for {} ms ({} redraws, {} presented frames)",
+                self.presentation_timeout.as_millis(),
+                self.redraws,
+                self.frames
+            ));
+            // These callbacks belong to this lane's pending request. Cancel
+            // them before finishing, so a late wake cannot manufacture a receipt.
+            if let Some(pending) = self.pending.take() {
+                match pending.readback {
+                    PendingReadback::Legacy(_) => *ctx.capture = None,
+                    PendingReadback::Stamped(_) => {
+                        *ctx.capture_stamped = None;
+                        *ctx.presentation_observer = None;
+                    },
+                }
+                if pending.paint.is_some() {
+                    *ctx.capture_paint = None;
+                }
+            }
+            self.outcome = Some(self.scenario.take().map_or(
+                Outcome {
+                    ok: false,
+                    log: Vec::new(),
+                },
+                |scenario| scenario.finish(),
+            ));
+            self.final_armed = true;
+        } else if presented {
+            let clicked = match self.clicks.after_frame(ctx, |ctx, node, rect| {
+                self.product.target_point(ctx, node, rect)
+            }) {
+                Ok(clicked) => clicked,
+                Err(error) => {
+                    self.errors.push(error);
+                    true
+                },
+            };
+            if !clicked
+                && self.pending.is_none()
+                && let Some(mut scenario) = self.scenario.take()
+            {
+                let progress = scenario.tick(&mut Probe { ctx, lane: self });
+                if progress == Progress::Done {
+                    self.outcome = Some(scenario.finish());
+                } else {
+                    self.scenario = Some(scenario);
+                }
             }
         }
         if self.outcome.is_none() && self.frame_limit_reached(self.frames) {
@@ -528,7 +621,7 @@ impl<P: Product> Lane<P> {
             if self.frames.saturating_sub(pending.armed) > patience {
                 self.errors.push(if self.script_files.is_some() {
                     format!(
-                        "capture {} never landed after {patience} frames",
+                        "capture {} never landed after {patience} presented frames",
                         pending.name
                     )
                 } else {
@@ -743,6 +836,10 @@ impl<P: Product> Lane<P> {
             self.records.len(),
             distinct.len()
         ));
+        lines.push(format!(
+            "presentation: {} frames, {} redraws, {} unpresented redraws",
+            self.frames, self.redraws, self.unpresented_redraws
+        ));
         lines.extend(self.product.receipt_lines());
         if let Some(diagnostics) = &self.diagnostics {
             // Value payloads and integer timing fields have a JSON encoding;
@@ -901,4 +998,220 @@ fn write_paint_sidecar(
     file.write_all(&bytes)
         .map_err(|error| format!("{}: {error}", path.display()))?;
     Ok(Some(path))
+}
+
+#[cfg(test)]
+mod presentation_tests {
+    use super::*;
+    use crate::tests::Headless;
+    use cambium::{AnyView, GenetCtx, GenetElement, el};
+    use cambium_rootstock::{
+        Hook, Host, HostHooks, HostOptions, HostState, HostWake, HostWindow, Runner,
+    };
+    use genet_scripted_dom::ScriptedDom;
+    use std::sync::Arc;
+
+    type View = Box<dyn AnyView<(), (), GenetCtx, GenetElement>>;
+    type Logic = fn(&()) -> View;
+    fn view(_: &()) -> View {
+        Box::new(el("main", "presentation test"))
+    }
+    struct Window;
+    impl HostWindow for Window {
+        fn request_redraw(&self) {}
+        fn inner_size(&self) -> (u32, u32) {
+            (100, 100)
+        }
+        fn scale_factor(&self) -> f64 {
+            1.0
+        }
+        fn set_ime_allowed(&self, _: bool) {}
+        fn set_ime_cursor_area(&self, _: f64, _: f64, _: f64, _: f64) {}
+    }
+    fn frame(sequence: u64) -> PresentedFrame {
+        PresentedFrame {
+            host: 1,
+            sequence,
+            width: 100,
+            height: 100,
+            layout_scale: 1.0,
+        }
+    }
+    fn host(lane: Rc<RefCell<Lane<Headless>>>, clock: Rc<Cell<Instant>>) -> Host<(), Logic, View> {
+        let mut state = HostState::new();
+        state.window = Some(Box::new(Window));
+        state.runner = Some(Runner::new(
+            Rc::new(RefCell::new(ScriptedDom::new())),
+            view as Logic,
+            (),
+        ));
+        let wake = HostWake::new(state.wake_pending.clone(), Arc::new(|| {}));
+        let hooks = HostHooks {
+            after_frame: Box::new(move |ctx| lane.borrow_mut().after_frame_at(ctx, clock.get())),
+            ..HostHooks::inert()
+        };
+        Host::new(HostOptions::default(), None, hooks, state, wake)
+    }
+    fn lane(scenario: &str) -> Lane<Headless> {
+        Lane::new(
+            Headless,
+            Some(Scenario::parse(scenario).unwrap()),
+            None,
+            None,
+            Rc::new(Cell::new(0)),
+        )
+    }
+
+    #[test]
+    fn unavailable_and_duplicate_native_turns_do_not_spend_scenario_frames() {
+        let now = Instant::now();
+        let clock = Rc::new(Cell::new(now));
+        let lane = Rc::new(RefCell::new(lane("settle 2\nlog completed\n")));
+        let mut host = host(lane.clone(), clock.clone());
+        for _ in 0..150 {
+            host.with_ctx(Hook::AfterFrame);
+        }
+        assert_eq!(lane.borrow().frames, 0);
+        assert!(lane.borrow().outcome.is_none());
+        host.s.last_redraw_presentation = Some(frame(1));
+        host.with_ctx(Hook::AfterFrame);
+        host.with_ctx(Hook::AfterFrame); // same presentation cannot satisfy settle
+        assert_eq!(lane.borrow().frames, 1);
+        assert!(lane.borrow().outcome.is_none());
+        for sequence in 2..=5 {
+            host.s.last_redraw_presentation = Some(frame(sequence));
+            host.with_ctx(Hook::AfterFrame);
+        }
+        assert!(lane.borrow().finished);
+        assert!(lane.borrow().errors.is_empty());
+        assert_eq!(lane.borrow().unpresented_redraws, 151);
+        assert_eq!(lane.borrow().redraws, lane.borrow().frames + 151);
+    }
+
+    struct Delayed;
+    impl CaptureBackend for Delayed {
+        fn arm(&mut self, _: &mut Option<cambium_rootstock::CaptureFn>) -> Readback {
+            let mut polls = 0;
+            Box::new(move || {
+                polls += 1;
+                (polls == 3).then(|| {
+                    Ok(cambium_rootstock::Frame {
+                        width: 2,
+                        height: 1,
+                        rgba: vec![1, 2, 3, 255, 4, 5, 6, 255],
+                    })
+                })
+            })
+        }
+        fn writes_files(&self) -> bool {
+            false
+        }
+    }
+    #[test]
+    fn asynchronous_readback_is_polled_while_native_presentation_is_unavailable() {
+        let clock = Rc::new(Cell::new(Instant::now()));
+        let lane = Rc::new(RefCell::new(
+            lane("capture asynchronous\n").with_capture_backend(Delayed),
+        ));
+        let mut host = host(lane.clone(), clock);
+        host.s.last_redraw_presentation = Some(frame(1));
+        host.with_ctx(Hook::AfterFrame); // arm
+        host.s.last_redraw_presentation = None;
+        for _ in 0..3 {
+            host.with_ctx(Hook::AfterFrame);
+        }
+        assert_eq!(lane.borrow().captures.len(), 1);
+        assert_eq!(lane.borrow().frames, 1);
+        assert!(lane.borrow().errors.is_empty());
+        host.s.last_redraw_presentation = Some(frame(2));
+        host.with_ctx(Hook::AfterFrame);
+        assert!(lane.borrow().finished);
+    }
+
+    #[test]
+    fn continuous_native_stall_has_an_independent_clock_deadline_and_honest_receipt() {
+        let now = Instant::now();
+        let clock = Rc::new(Cell::new(now));
+        let lane = Rc::new(RefCell::new(
+            lane("capture never\n").with_presentation_timeout(Duration::from_secs(1)),
+        ));
+        let mut host = host(lane.clone(), clock.clone());
+        host.s.last_redraw_presentation = Some(frame(1));
+        // A separate paint reader can coexist with this lane's legacy pixels.
+        host.s.pending_paint_capture = Some(Box::new(|_| {}));
+        host.with_ctx(Hook::AfterFrame); // arm native callbacks
+        assert!(host.s.pending_capture.is_some());
+        host.s.last_redraw_presentation = None;
+        for _ in 0..150 {
+            host.with_ctx(Hook::AfterFrame);
+        }
+        assert!(
+            lane.borrow().errors.is_empty(),
+            "failed acquisitions do not spend capture grace"
+        );
+        assert_eq!(lane.borrow().frames, 1);
+        clock.set(now + Duration::from_secs(1));
+        host.with_ctx(Hook::AfterFrame);
+        let lane = lane.borrow();
+        assert!(lane.finished);
+        assert_eq!(lane.frames, 1);
+        assert_eq!(lane.captures.len(), 0);
+        assert!(
+            lane.errors
+                .iter()
+                .any(|error| error.contains("native presentation stalled for 1000 ms"))
+        );
+        assert!(host.s.pending_capture.is_none());
+        assert!(
+            host.s.pending_paint_capture.is_some(),
+            "do not cancel another reader's paint request"
+        );
+        assert!(host.s.close_requested);
+        let receipt = lane.receipt_value(false, &BTreeMap::new());
+        assert_eq!(receipt["frames"], 1);
+        assert_eq!(receipt["redraws"], 152);
+        assert_eq!(receipt["unpresented_redraws"], 151);
+    }
+
+    #[test]
+    fn a_stall_before_the_first_presentation_finishes_without_arming_a_final_capture() {
+        let now = Instant::now();
+        let clock = Rc::new(Cell::new(now));
+        let mut run = lane("log must wait for presentation\n")
+            .with_presentation_timeout(Duration::from_secs(1));
+        run.final_capture = Some(PathBuf::from("unpresented-final.png"));
+        let lane = Rc::new(RefCell::new(run));
+        let mut host = host(lane.clone(), clock.clone());
+        host.with_ctx(Hook::AfterFrame);
+        clock.set(now + Duration::from_secs(1));
+        host.with_ctx(Hook::AfterFrame);
+        let lane = lane.borrow();
+        assert!(lane.finished);
+        assert_eq!(lane.frames, 0);
+        assert_eq!(lane.redraws, 2);
+        assert_eq!(lane.unpresented_redraws, 2);
+        assert!(lane.captures.is_empty());
+        assert!(host.s.pending_capture.is_none());
+        assert!(host.s.close_requested);
+        assert!(
+            !lane
+                .outcome
+                .as_ref()
+                .unwrap()
+                .log
+                .iter()
+                .any(|entry| entry.contains("must wait"))
+        );
+    }
+
+    #[test]
+    fn failed_host_redraw_clears_the_previous_presentation_identity() {
+        let clock = Rc::new(Cell::new(Instant::now()));
+        let lane = Rc::new(RefCell::new(lane("log pending\n")));
+        let mut host = host(lane, clock);
+        host.s.last_redraw_presentation = Some(frame(7));
+        // No surface/render core: this attempt cannot possibly present.
+        host.redraw();
+        assert!(host.s.last_redraw_presentation.is_none());
+    }
 }

@@ -35,8 +35,9 @@ use std::path::{Path, PathBuf};
 use djinn::resident::DjinnResident;
 use djinn::settings::{DistilleryLaneSettings, OwnerSettings};
 use pandect::{DeviceSettings, MeshLendingSettings, StatedConditionSettings};
-use personae::bootstrap::{self, Unlock};
-use personae::{IdentityVault, ProfileId};
+use castellan::custody::IdentityVault;
+use castellan::custody::bootstrap::{self, Unlock};
+use personae::ProfileId;
 
 pub const PASSPHRASE: &[u8] = b"djinn-distillery-lane-receipt-passphrase";
 
@@ -62,7 +63,9 @@ pub fn now_ms() -> u64 {
 /// mesh author from the same vault directory and therefore opens it a *second*
 /// time in this process. If Personae's storage opens were exclusive, every test
 /// here would fail at that second open rather than at its assertion.
-pub fn open_vault(root: &Path) -> (PathBuf, IdentityVault<Box<dyn personae::IdentityStorage>>) {
+pub fn open_vault(
+    root: &Path,
+) -> (PathBuf, IdentityVault<Box<dyn castellan::custody::IdentityStorage>>) {
     let vault_dir = root.join("vault");
     let opened = bootstrap::open_storage(&vault_dir, unlock()).expect("open vault storage");
     let (record, _created) =

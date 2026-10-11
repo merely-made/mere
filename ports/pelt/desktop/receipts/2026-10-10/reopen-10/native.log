@@ -1,0 +1,15 @@
+pelt host profile=livery url=/Users/markik/Code/worktrees/mere-tabard-apps/ports/pelt/examples/workspace/p6-appearance/index.html javascript=false webdriver=false devtools=false webgpu=false webxr=false
+[pelt] accessibility Installed, 22 retained workspace nodes projected
+[pelt] primary initial reveal visible=Some(true) focused=true activation_requested=true
+[genet-render-host] surface acquire skipped: Occluded
+[genet-render-host] surface acquire skipped: Occluded
+[genet-render-host] surface acquire skipped: Occluded
+[cambium-winit] accessibility Installed, 197 nodes projected
+[genet-render-host] surface acquire skipped: Occluded
+[genet-render-host] surface acquire skipped: Occluded
+[genet-render-host] surface acquire skipped: Occluded
+pelt-appearance: Pelt fresh process restores saved app choice and shared definition
+pelt-appearance: captured reopened_editor
+pelt-appearance: RESULT ok (11 frames, 1 captures)
+pelt workspace first_url=/Users/markik/Code/worktrees/mere-tabard-apps/ports/pelt/examples/workspace/p6-appearance/index.html window=true redraws=19 size=1180x800 tiles=1 interaction_receipt=false capability_receipt=false tearout_receipt=false tearout_cancellation_receipt=false workspace_receipt=appearance routes=1=genet.livery:document
+pelt workspace product receipt=appearance assertion=shared workshop native controls saved a definition; ordinary Pelt appearance controls applied and persisted its exact mode while the held controller, history, focused tile and content aperture remained unchanged artifact=/Users/markik/Code/tabard-app-receipts/2026-10-10/pelt/reopen-10/browser.png digest=8b3eb6e1c9b85b84 verified_sizes=1180x800

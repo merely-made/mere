@@ -986,6 +986,7 @@ fn validation_issues(
             // Definitions are normally promoted through ProjectionDraft. Keep
             // the compiler independently defensive for persisted input.
             let draft = scenograph::ProjectionDraft {
+                dynamics: definition.dynamics.clone(),
                 version: definition.version,
                 id: definition.id.clone(),
                 label: definition.label.clone(),

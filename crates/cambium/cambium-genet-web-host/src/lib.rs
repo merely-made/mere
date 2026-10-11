@@ -41,6 +41,37 @@
 
 pub mod mirror;
 
+/// DOM delta modes are pixels (0), lines (1) and pages (2). Preserve the
+/// DOM sign while resolving units into the host's logical scroll pixels.
+#[cfg(any(target_arch = "wasm32", test))]
+fn wheel_delta_pixels(x: f64, y: f64, mode: u32, line_px: f32, page_px: f32) -> (f32, f32) {
+    let scale = match mode {
+        1 => line_px,
+        2 => page_px,
+        _ => 1.0,
+    };
+    (x as f32 * scale, y as f32 * scale)
+}
+
+#[cfg(test)]
+mod wheel_tests {
+    use super::wheel_delta_pixels;
+
+    #[test]
+    fn browser_direction_and_units_match_host_scroll_offsets() {
+        assert_eq!(wheel_delta_pixels(5.0, 40.0, 0, 20.0, 300.0), (5.0, 40.0));
+        assert_eq!(
+            wheel_delta_pixels(-5.0, -40.0, 0, 20.0, 300.0),
+            (-5.0, -40.0)
+        );
+        assert_eq!(wheel_delta_pixels(1.0, 2.0, 1, 20.0, 300.0), (20.0, 40.0));
+        assert_eq!(
+            wheel_delta_pixels(-1.0, -2.0, 2, 20.0, 300.0),
+            (-300.0, -600.0)
+        );
+    }
+}
+
 #[cfg(target_arch = "wasm32")]
 mod a11y;
 #[cfg(target_arch = "wasm32")]

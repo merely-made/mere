@@ -52,7 +52,9 @@ use std::sync::{Arc, Mutex as StdMutex};
 use std::task::{Context, Poll};
 use std::time::Duration;
 
+#[cfg(any(test, feature = "test-identity"))]
 use identity::Ed25519Keypair;
+use identity::DerivedKeypair;
 use iroh::EndpointAddr;
 use iroh::endpoint::{Connection, RecvStream, SendStream};
 use iroh::protocol::{AcceptError, ProtocolHandler};
@@ -603,6 +605,7 @@ pub struct P2pandaTransport {
 impl P2pandaTransport {
     /// Start a builder for a new p2panda-net transport. The key is read once,
     /// here, into the builder's held seed.
+    #[cfg(any(test, feature = "test-identity"))]
     pub fn builder(master: &Ed25519Keypair) -> P2pandaTransportBuilder<'static> {
         let mut seed = master.to_seed();
         let builder = Self::builder_from_seed_ref(&seed);
@@ -613,6 +616,16 @@ impl P2pandaTransport {
     /// Start a builder from borrowed Ed25519 seed material: the borrowing
     /// path (ruling 51). The seed is copied once into the builder's held
     /// seed, and no future frame ever holds it by value.
+    /// Start a transport from a key personae derived. The production
+    /// constructor: a master cannot be passed here (vault lock plan, ruling
+    /// 96), and the keypair builder is for tests only.
+    pub fn builder_for(key: &DerivedKeypair) -> P2pandaTransportBuilder<'static> {
+        let mut seed = key.to_seed();
+        let builder = Self::builder_from_seed_ref(&seed);
+        seed.zeroize();
+        builder
+    }
+
     pub fn builder_from_seed_ref(signing_seed: &[u8; 32]) -> P2pandaTransportBuilder<'static> {
         P2pandaTransportBuilder {
             signing_seed: hold(signing_seed),
@@ -643,6 +656,7 @@ impl P2pandaTransport {
 
     /// Bind with just the given Mere ALPNs (no discovery; explicit `add_peer`).
     /// The seed is taken before the future exists, so no frame holds it.
+    #[cfg(any(test, feature = "test-identity"))]
     pub fn bind(
         master: &Ed25519Keypair,
         alpns: Vec<Alpn>,
@@ -671,6 +685,7 @@ impl P2pandaTransport {
     }
 
     /// Bind with the given ALPNs and serve iroh-blobs against the provided store.
+    #[cfg(any(test, feature = "test-identity"))]
     pub async fn bind_with_blobs(
         master: &Ed25519Keypair,
         alpns: Vec<Alpn>,
@@ -684,6 +699,7 @@ impl P2pandaTransport {
     }
 
     /// Bind and serve blobs only to transport-authenticated admitted peers.
+    #[cfg(any(test, feature = "test-identity"))]
     pub async fn bind_with_authorized_blobs(
         master: &Ed25519Keypair,
         alpns: Vec<Alpn>,

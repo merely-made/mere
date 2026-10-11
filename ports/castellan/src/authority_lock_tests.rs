@@ -11,7 +11,8 @@
 
 use std::path::Path;
 
-use personae::{Ed25519Keypair, PersonaId, Profile, ProfileId, SealedProfileStorage};
+use crate::custody::{Profile, SealedProfileStorage};
+use personae::{Ed25519Keypair, PersonaId, ProfileId};
 use ssh_agent_lib::agent::Session;
 use ssh_agent_lib::proto::SignRequest;
 use tempfile::tempdir;
@@ -188,7 +189,7 @@ fn a_refused_lock_leaves_the_holders_their_keys() {
     let dir = tempdir().unwrap();
     let host = PersonaeHost::new(
         IdentityVault::with_profile(
-            personae::InMemoryStorage::new(),
+            crate::custody::InMemoryStorage::new(),
             Profile::new(
                 ProfileId("research".into()),
                 "Research",
@@ -470,14 +471,14 @@ fn a_kept_persisted_lock_follows_lock_and_unlock() {
     let vault_dir = dir.path().join("vault");
     let Locked { host, resident, .. } = lockable(dir.path());
     host.lock_vault().unwrap();
-    assert!(!personae::lock_persisted(&vault_dir), "only a host that keeps it writes it");
+    assert!(!crate::custody::lock_persisted(&vault_dir), "only a host that keeps it writes it");
     unlock(&host);
 
     let host = host.with_persisted_lock(vault_dir.clone());
     host.lock_vault().unwrap();
-    assert!(personae::lock_persisted(&vault_dir));
+    assert!(crate::custody::lock_persisted(&vault_dir));
     assert!(resident.is_locked());
     unlock(&host);
-    assert!(!personae::lock_persisted(&vault_dir), "an unlock by a user act clears it");
+    assert!(!crate::custody::lock_persisted(&vault_dir), "an unlock by a user act clears it");
     assert!(host.unlock_vault(UnlockMethod::Passphrase(PASSPHRASE)).is_ok());
 }

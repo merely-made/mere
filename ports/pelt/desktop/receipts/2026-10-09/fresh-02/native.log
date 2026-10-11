@@ -1,0 +1,11 @@
+pelt host profile=livery url=/Users/markik/Code/worktrees/mere-tabard-apps/ports/pelt/examples/workspace/p6-appearance/index.html javascript=false webdriver=false devtools=false webgpu=false webxr=false
+[pelt] accessibility Installed, 22 retained workspace nodes projected
+[pelt] primary initial reveal visible=Some(true) focused=true activation_requested=true
+[genet-render-host] surface acquire skipped: Occluded
+[genet-render-host] surface acquire skipped: Occluded
+[genet-render-host] surface acquire skipped: Occluded
+[genet-render-host] surface acquire skipped: Occluded
+[cambium-winit] accessibility Installed, 195 nodes projected
+[genet-render-host] surface acquire skipped: Occluded
+[genet-render-host] surface acquire skipped: Occluded
+Pelt appearance workflow timed out at stage 2

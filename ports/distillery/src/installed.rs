@@ -15,13 +15,12 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
-use mesh::{MESH_AUTHOR_SALT, MeshStore, SyncedMesh};
 use crate::mesh_host::{HostConfig, MeshHost};
-use muniment::Backend;
-use personae::bootstrap::{self, Unlock};
-use personae::vault::{IdentityStorage, IdentityVault, ProfileId};
-use personae::{Ed25519Keypair, IdentityError, IdentityProvider};
 use insigne::DerivedKeyAttestation;
+use mesh::{MESH_AUTHOR_SALT, MeshStore, SyncedMesh};
+use muniment::Backend;
+use personae::vault::ProfileId;
+use personae::{DerivedKeypair, Ed25519Keypair, IdentityError, IdentityProvider};
 use serde::{Deserialize, Serialize};
 use transport::{P2pandaTransport, TransportError};
 
@@ -35,7 +34,9 @@ use crate::{ResidentAuthority, ResidentError, ResidentSettings, ResidentStorage}
 /// 64-hex identifier would only invite them to mistype one and silently join
 /// nothing. Deriving it under a product-owned salt gives the same profile the
 /// same mesh on every device it unlocks, and gives a different profile a
-/// different one, with no stored value to drift.
+/// different one, with no stored value to drift. Every device holding one
+/// master shares a mesh; today each vault mints its own master, so in practice
+/// a mesh is one device's (vault lock plan §6, 2026-10-09).
 ///
 /// The salt is product-owned rather than borrowed from
 /// [`MESH_AUTHOR_SALT`]: reusing the author's salt would make the mesh id equal
@@ -198,7 +199,7 @@ impl DistilleryPaths {
 pub struct InstalledAuthority {
     data_root: PathBuf,
     settings: InstalledSettings,
-    vault: IdentityVault<Box<dyn IdentityStorage>>,
+    identity: Arc<dyn IdentityProvider>,
     protection: String,
 }
 
@@ -213,24 +214,33 @@ impl InstalledAuthority {
         Ok(settings)
     }
 
-    /// Open against a named vault and unlock method.
+    /// The salts the installed lane derives from: the mesh author (also the
+    /// transport identity, ruling 92) and the personal mesh's name. These are
+    /// what a resident releases to a lane outside it (dramatis repo plan,
+    /// D11); the master never comes with them.
+    pub fn release_salts() -> Vec<Vec<u8>> {
+        vec![MESH_AUTHOR_SALT.to_vec(), DISTILLERY_MESH_SALT.to_vec()]
+    }
+
+    /// Open over the configured profile's identity, which the caller supplies.
     ///
-    /// This refuses an absent profile rather than silently minting a new one:
-    /// configuring an installed port must bind the owner's existing face, not
-    /// surprise them with another identity.
-    pub fn open_with(
+    /// Distillery opens no vault (dramatis repo plan, D5): djinn opens the
+    /// profile [`InstalledSettings::profile_id`] names and hands in either the
+    /// unlocked vault (its own resident lane) or the keys it released for
+    /// [`Self::release_salts`]. `protection` is the custodian's account of
+    /// what protects that identity at rest, shown and never guessed. An
+    /// unconfigured product is refused rather than bound to a guessed face.
+    pub fn open(
         data_root: &Path,
-        vault_dir: &Path,
-        unlock: Unlock,
+        identity: Arc<dyn IdentityProvider>,
+        protection: impl Into<String>,
     ) -> Result<Self, InstalledError> {
         let settings = InstalledSettings::load(data_root)?.ok_or(InstalledError::Unconfigured)?;
-        let opened = bootstrap::open_storage(vault_dir, unlock)?;
-        let vault = IdentityVault::open(opened.storage, &settings.profile_id())?;
         Ok(Self {
             data_root: data_root.to_path_buf(),
             settings,
-            vault,
-            protection: opened.description,
+            identity,
+            protection: protection.into(),
         })
     }
 
@@ -249,22 +259,23 @@ impl InstalledAuthority {
         self.settings.profile_id()
     }
 
-    /// Personae's account of how the selected profile is protected at rest.
+    /// The custodian's account of how the selected profile is protected at
+    /// rest.
     pub fn protection(&self) -> &str {
         &self.protection
     }
 
-    /// The master transport identity belonging to the selected Personae profile.
-    ///
-    /// Errors while the vault is locked (rulings 2 and 24 replace it with a
-    /// derived transport key).
-    pub fn transport_identity(&self) -> Result<&Ed25519Keypair, InstalledError> {
-        Ok(&self.vault.current_profile()?.master)
+    /// The transport identity: the mesh author key, derived under the
+    /// selected profile (vault lock plan, rulings 2, 44 and 92). The master
+    /// never reaches the transport, so a locked vault leaves the running lane
+    /// nothing of it. Errors while the vault is locked.
+    pub fn transport_identity(&self) -> Result<DerivedKeypair, InstalledError> {
+        Ok(self.identity.derived_keypair(MESH_AUTHOR_SALT)?)
     }
 
     /// The mesh author derived under the selected profile.
     pub fn mesh_author(&self) -> Result<Ed25519Keypair, InstalledError> {
-        Ok(self.vault.derive_keypair(MESH_AUTHOR_SALT)?)
+        Ok(self.identity.derive_keypair(MESH_AUTHOR_SALT)?)
     }
 
     /// The mesh this profile's personal ring uses, derived under
@@ -276,16 +287,17 @@ impl InstalledAuthority {
     /// own salt.
     pub fn personal_mesh_id(&self) -> Result<[u8; 32], InstalledError> {
         Ok(self
-            .vault
+            .identity
             .derive_keypair(DISTILLERY_MESH_SALT)?
             .public_key()
             .to_bytes())
     }
 
-    /// The evidence peers need to connect the mesh author to this profile's
-    /// transport identity.
+    /// The evidence peers need to connect this device's mesh author, which is
+    /// also its transport identity (ruling 92), to the persona that authorized
+    /// it.
     pub fn mesh_author_attestation(&self) -> Result<DerivedKeyAttestation, InstalledError> {
-        Ok(self.vault.attest_derived_key(MESH_AUTHOR_SALT)?)
+        Ok(self.identity.attest_derived_key(MESH_AUTHOR_SALT)?)
     }
 
     /// Product-owned locations for one mesh. The caller still supplies its
@@ -316,7 +328,7 @@ impl InstalledAuthority {
             ResidentStorage::open(paths.blob_store_root(), mesh_id, settings.blob_gc_every).await?;
         let blobs = storage.blobs();
         let transport = Arc::new(
-            P2pandaTransport::builder(self.transport_identity()?)
+            P2pandaTransport::builder_for(&self.transport_identity()?)
                 .gossip()
                 .blobs(&blobs)
                 .bind()
@@ -369,21 +381,19 @@ mod tests {
         AvailabilityPolicy, ErasurePolicy, KeepBound, LeasePolicy, MeshRetentionPolicy,
         PolicyRevision,
     };
-    use personae::bootstrap::load_or_create_profile;
+    use personae::{InMemoryProvider, RetainedKeys};
 
     use super::*;
     use crate::RetentionSettings;
 
     const MESH: [u8; 32] = [0xD1; 32];
+    const PROTECTION: &str = "released by the test custodian";
 
-    fn unlock() -> Unlock {
-        Unlock::passphrase(b"distillery-installed-test-passphrase")
-    }
-
-    fn provision_profile(vault_dir: &Path, profile: &ProfileId) {
-        let opened = bootstrap::open_storage(vault_dir, unlock()).unwrap();
-        let (_, created) = load_or_create_profile(&*opened.storage, profile).unwrap();
-        assert!(created, "test profile starts absent");
+    /// What djinn hands an installed lane outside it: the released keys for
+    /// [`InstalledAuthority::release_salts`], never the master.
+    fn released(seed: u8) -> Arc<dyn IdentityProvider> {
+        let persona = InMemoryProvider::from_seed([seed; 32]);
+        Arc::new(RetainedKeys::capture(&persona, &InstalledAuthority::release_salts()).unwrap())
     }
 
     #[test]
@@ -422,19 +432,19 @@ mod tests {
     #[test]
     fn configured_profile_reopens_stably_and_names_private_mesh_paths() {
         let directory = tempfile::tempdir().unwrap();
-        let vault_dir = directory.path().join("vault");
         let profile = ProfileId("research".into());
-        provision_profile(&vault_dir, &profile);
         InstalledAuthority::configure(directory.path(), profile.clone()).unwrap();
 
-        let first = InstalledAuthority::open_with(directory.path(), &vault_dir, unlock()).unwrap();
+        let first = InstalledAuthority::open(directory.path(), released(0x61), PROTECTION).unwrap();
         let first_author = first.mesh_author().unwrap().public_key().to_bytes();
         let first_transport = first.transport_identity().unwrap().public_key().to_bytes();
+        let master = first.identity.master_public_key().to_bytes();
         assert_eq!(first.profile(), profile);
-        assert!(first.protection().contains("passphrase-encrypted"));
-        assert_ne!(
-            first_author, first_transport,
-            "mesh author is profile-derived"
+        assert_eq!(first.protection(), PROTECTION);
+        assert_ne!(first_author, master, "mesh author is profile-derived");
+        assert_eq!(
+            first_transport, first_author,
+            "the mesh author is the transport identity (ruling 92)"
         );
         let paths = first.paths(MESH);
         assert_eq!(paths.mesh_store_path(), paths.root().join("mesh.redb"));
@@ -442,7 +452,7 @@ mod tests {
         drop(first);
 
         let reopened =
-            InstalledAuthority::open_with(directory.path(), &vault_dir, unlock()).unwrap();
+            InstalledAuthority::open(directory.path(), released(0x61), PROTECTION).unwrap();
         assert_eq!(
             reopened.mesh_author().unwrap().public_key().to_bytes(),
             first_author,
@@ -453,23 +463,24 @@ mod tests {
     #[test]
     fn the_personal_mesh_is_derived_stably_and_is_not_the_author_or_the_transport() {
         let directory = tempfile::tempdir().unwrap();
-        let vault_dir = directory.path().join("vault");
         let profile = ProfileId("research".into());
-        provision_profile(&vault_dir, &profile);
         InstalledAuthority::configure(directory.path(), profile).unwrap();
 
-        let first = InstalledAuthority::open_with(directory.path(), &vault_dir, unlock()).unwrap();
+        let first = InstalledAuthority::open(directory.path(), released(0x62), PROTECTION).unwrap();
         let mesh_id = first.personal_mesh_id().unwrap();
         assert_ne!(
             mesh_id,
             first.mesh_author().unwrap().public_key().to_bytes(),
             "the name of the room must not be the name of the speaker"
         );
-        assert_ne!(mesh_id, first.transport_identity().unwrap().public_key().to_bytes());
+        assert_ne!(
+            mesh_id,
+            first.transport_identity().unwrap().public_key().to_bytes()
+        );
         drop(first);
 
         let reopened =
-            InstalledAuthority::open_with(directory.path(), &vault_dir, unlock()).unwrap();
+            InstalledAuthority::open(directory.path(), released(0x62), PROTECTION).unwrap();
         assert_eq!(
             reopened.personal_mesh_id().unwrap(),
             mesh_id,
@@ -479,21 +490,19 @@ mod tests {
         // A different profile is a different personal mesh, which is what makes
         // the derivation safe to do without asking.
         let other = ProfileId("burner".into());
-        provision_profile(&vault_dir, &other);
         InstalledAuthority::configure(directory.path(), other).unwrap();
-        let burner = InstalledAuthority::open_with(directory.path(), &vault_dir, unlock()).unwrap();
+        let burner =
+            InstalledAuthority::open(directory.path(), released(0x63), PROTECTION).unwrap();
         assert_ne!(burner.personal_mesh_id().unwrap(), mesh_id);
     }
 
     #[tokio::test]
     async fn binding_requires_mesh_and_device_facts_from_the_caller() {
         let directory = tempfile::tempdir().unwrap();
-        let vault_dir = directory.path().join("vault");
         let profile = ProfileId("research".into());
-        provision_profile(&vault_dir, &profile);
         InstalledAuthority::configure(directory.path(), profile).unwrap();
         let authority =
-            InstalledAuthority::open_with(directory.path(), &vault_dir, unlock()).unwrap();
+            InstalledAuthority::open(directory.path(), released(0x64), PROTECTION).unwrap();
         let author = authority.mesh_author().unwrap();
         let policy = MeshRetentionPolicy {
             revision: PolicyRevision([0x41; 32]),

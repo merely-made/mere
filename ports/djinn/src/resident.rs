@@ -20,7 +20,7 @@ use distillery::lifecycle::{CloseAction, CloseFuture, close_all};
 use graphshell::native::endpoint_catalog::{
     ResidentEndpointCatalog, ResidentEndpointCatalogError, ResidentEndpointRoute,
 };
-use personae::bootstrap::Unlock;
+use castellan::custody::bootstrap::Unlock;
 use personae::{IdentityProvider, ProfileId};
 use transport::BlobScope;
 

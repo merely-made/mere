@@ -33,6 +33,8 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use castellan::custody::IdentityVault;
+use castellan::custody::bootstrap::{self, Unlock};
 use chirograph::ProjectionSession;
 use distillery::{
     ChronicleEndpoint, ChronicleObserver, ChronicleRevision, ResidentReceipt,
@@ -54,8 +56,7 @@ use mesh::spec::{DeterminismClass, JobSpec};
 use mesh::{Job, JobBoard, JobBoardSnapshot, ResourceId};
 use notochord::{NetworkId, ProfileRef, TrustedRoot};
 use pandect::{DeviceSettings, MeshLendingSettings, StatedConditionSettings};
-use personae::bootstrap::{self, Unlock};
-use personae::{IdentityProvider, IdentityVault, InMemoryProvider, ProfileId};
+use personae::{IdentityProvider, InMemoryProvider, ProfileId};
 use rand_core::{OsRng, RngCore};
 use serde::Deserialize;
 use serde_json::json;
@@ -477,8 +478,13 @@ fn temporary_root() -> Result<PathBuf, std::io::Error> {
 
 fn open_vault(
     root: &Path,
-) -> Result<(PathBuf, IdentityVault<Box<dyn personae::IdentityStorage>>), Box<dyn std::error::Error>>
-{
+) -> Result<
+    (
+        PathBuf,
+        IdentityVault<Box<dyn castellan::custody::IdentityStorage>>,
+    ),
+    Box<dyn std::error::Error>,
+> {
     let vault_dir = root.join("vault");
     let opened = bootstrap::open_storage(&vault_dir, Unlock::passphrase(PASSPHRASE))?;
     let profile = ProfileId(PROFILE.into());

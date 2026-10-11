@@ -26,6 +26,11 @@ noise = ["dep:snow", "dep:hkdf", "dep:sha2"]
 # `notochord` stays carrier-neutral and never learns about iroh, p2panda,
 # or retinue, which is what keeps the cycle from forming (Notochord N1).
 notochord = ["dep:notochord"]
+# `P2pandaTransport::builder(&Ed25519Keypair)`, for tests, examples and probes
+# with throwaway identities. Production binds from a personae
+# `DerivedKeypair` through `builder_for`, so a master cannot reach a transport
+# (vault lock plan, ruling 96). Turn it on in dev-dependencies only.
+test-identity = []
 
 [lib]
 name = "transport"

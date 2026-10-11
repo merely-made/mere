@@ -70,8 +70,8 @@ graphshell (the reference graph host and web presenter), djinn (the local
 desktop resident), castellan (credential keeper), distillery (model works),
 gazette (the directory port), moot (community: murmurs, moots, and coop), pelt
 (the reference browser port over Genet's engine and Cambium's shell), signalman
-(commissioning and operating Retinue stations), and tabard (theme authoring
-for Genet).
+(commissioning and operating Retinue stations). Tabard is the shared theme
+authoring library under `crates/system/tabard`, used by platform crates and ports.
 [Knot Editor](https://github.com/merely-made/knot-editor) is an independent
 repository, not a Mere port: it owns files-in-place authoring, document and
 vault authority, evidence, sync and publishing, and Djinn and Turnstone consume

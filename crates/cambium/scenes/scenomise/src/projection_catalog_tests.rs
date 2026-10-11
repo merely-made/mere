@@ -61,6 +61,7 @@ fn dataset() -> ProjectionDataset {
 fn definition(kind: &str, x: &str) -> ProjectionDefinition {
     let data = dataset();
     ProjectionDefinition {
+        dynamics: None,
         version: 1,
         id: "catalog".into(),
         label: "Catalog".into(),

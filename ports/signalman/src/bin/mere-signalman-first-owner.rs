@@ -7,10 +7,11 @@
 
 //! Explicit USB first-owner claim through an existing Signalman credential.
 //!
-//! This command has three explicit lifecycle actions: `init` creates a controller scope after
-//! a read-only authority check, `claim` requires that existing scope, and `status` asks an
-//! already-claimed board for its control status under the same controller identity. None of
-//! them bootstraps a wallet or exports private key material.
+//! This command has three explicit lifecycle actions: `init` creates a controller scope,
+//! `claim` requires that existing scope, and `status` asks an already-claimed board for its
+//! control status under the same controller identity. None of them opens or bootstraps a
+//! wallet: the controller's scoped keys are released by djinn (dramatis repo plan, D11, D17),
+//! and with djinn absent or Locked the controller is pending (D12).
 //!
 //! `status` keeps the controller's outer replay counter in a small record beside the scope.
 //! The next counter is written atomically before the command is sent: a board may accept and
@@ -24,9 +25,11 @@ use std::io;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
-use mere_signalman::{claim_first_owner, first_owner_controller_fingerprint, first_owner_status};
-use pandect::load_identity_seed_read_only;
-use personae::InMemoryProvider;
+use mere_signalman::{
+    DjinnStationAuthority, claim_first_owner, first_owner_controller_fingerprint,
+    first_owner_status,
+};
+use personae::RetainedKeys;
 use postilion::control::first_owner::{
     ClaimOutcome, FirstOwnerController, UsbFirstOwnerConfig, UsbFirstOwnerTransport,
     v4_usb_claim_plan,
@@ -34,7 +37,6 @@ use postilion::control::first_owner::{
 use postilion::control::verified::{UsbControlConfig, UsbControlTransport};
 use radio_hand::control::{ControlStatusBootFact, ControlStatusEvidence, NodeId};
 use radio_hand::region::Region;
-use zeroize::Zeroize;
 
 enum Command {
     Init { authority_root: PathBuf },
@@ -82,9 +84,7 @@ async fn run() -> Result<(), Box<dyn Error>> {
 
 async fn status(args: StatusArgs) -> Result<(), Box<dyn Error>> {
     let controller_scope = load_controller_scope(&args.authority_root)?;
-    let mut seed = load_read_only_authority_seed(&args.authority_root)?;
-    let provider = InMemoryProvider::from_seed(seed);
-    seed.zeroize();
+    let provider = released_controller(controller_scope.as_bytes())?;
 
     // Spend the counter durably before the board can see it.
     let counter = reserve_next_counter(&args.authority_root)?;
@@ -164,7 +164,7 @@ fn reserve_next_counter(authority_root: &Path) -> Result<u64, Box<dyn Error>> {
                 )
             })?;
             record.last_used
-        }
+        },
         Err(error) if error.kind() == io::ErrorKind::NotFound => 0,
         Err(error) => return Err(error.into()),
     };
@@ -191,9 +191,7 @@ fn controller_counter_path(authority_root: &Path) -> PathBuf {
 
 async fn claim(args: ClaimArgs) -> Result<(), Box<dyn Error>> {
     let controller_scope = load_controller_scope(&args.authority_root)?;
-    let mut seed = load_read_only_authority_seed(&args.authority_root)?;
-    let provider = InMemoryProvider::from_seed(seed);
-    seed.zeroize();
+    let provider = released_controller(controller_scope.as_bytes())?;
 
     let mut phy = postilion::profile(args.bandwidth_hz);
     phy.frequency_hz = args.frequency_hz;
@@ -213,17 +211,22 @@ async fn claim(args: ClaimArgs) -> Result<(), Box<dyn Error>> {
         ClaimOutcome::Committed => println!("claim outcome=committed"),
         ClaimOutcome::CommittedCleanupPending => {
             println!("claim outcome=committed-cleanup-pending")
-        }
+        },
     }
     Ok(())
 }
 
 fn initialize_controller_scope(authority_root: &Path) -> Result<(), Box<dyn Error>> {
-    let mut seed = load_read_only_authority_seed(authority_root)?;
-    let provider = InMemoryProvider::from_seed(seed);
-    seed.zeroize();
+    initialize_controller_scope_with(authority_root, released_controller)
+}
 
+/// `init`, with the release supplied: djinn's in production, a test's own.
+fn initialize_controller_scope_with(
+    authority_root: &Path,
+    release: impl FnOnce(&[u8]) -> Result<RetainedKeys, Box<dyn Error>>,
+) -> Result<(), Box<dyn Error>> {
     let scope = uuid::Uuid::new_v4();
+    let provider = release(scope.as_bytes())?;
     let fingerprint = first_owner_controller_fingerprint(&provider, scope.as_bytes())?;
     let path = controller_scope_path(authority_root);
     let contents = serde_json::to_vec(&scope)?;
@@ -238,14 +241,14 @@ fn initialize_controller_scope(authority_root: &Path) -> Result<(), Box<dyn Erro
     Ok(())
 }
 
-fn load_read_only_authority_seed(authority_root: &Path) -> Result<[u8; 32], Box<dyn Error>> {
-    load_identity_seed_read_only(authority_root)?.ok_or_else(|| {
-        io::Error::new(
-            io::ErrorKind::PermissionDenied,
-            "existing Signalman wallet is unavailable or locked",
-        )
-        .into()
-    })
+/// The controller's keys for `scope`, released by djinn from the wallet.
+fn released_controller(scope: &[u8]) -> Result<RetainedKeys, Box<dyn Error>> {
+    DjinnStationAuthority::default()
+        .release_controller(scope)
+        .map_err(|error| match error.is_pending() {
+            true => format!("the Signalman controller is pending: {error}").into(),
+            false => error.into(),
+        })
 }
 
 fn load_controller_scope(authority_root: &Path) -> Result<uuid::Uuid, Box<dyn Error>> {
@@ -284,7 +287,7 @@ fn parse_command() -> Result<Command, Box<dyn Error>> {
                 return Err(format!("unknown argument {flag}").into());
             }
             Ok(Command::Init { authority_root })
-        }
+        },
         "claim" => parse_claim_args(&mut values).map(Command::Claim),
         "status" => parse_status_args(&mut values).map(Command::Status),
         _ => Err(format!("unknown command {command:?}; use init, claim, or status").into()),
@@ -374,29 +377,28 @@ fn print_usage() {
 mod tests {
     use std::fs;
 
-    use pandect::identity_seed_path;
     use tempfile::tempdir;
 
     use super::*;
 
     #[test]
-    fn init_creates_one_scope_from_an_existing_read_only_authority() {
+    fn init_creates_one_scope_from_released_controller_keys() {
         let root = tempdir().unwrap();
-        let seed_path = identity_seed_path(root.path());
-        fs::create_dir_all(seed_path.parent().unwrap()).unwrap();
-        let seed = [0x4a; 32];
-        fs::write(&seed_path, seed).unwrap();
-        let before = fs::read(&seed_path).unwrap();
+        let wallet = personae::InMemoryProvider::from_seed([0x4a; 32]);
+        let release = |scope: &[u8]| -> Result<RetainedKeys, Box<dyn Error>> {
+            Ok(RetainedKeys::capture(
+                &wallet,
+                &mere_signalman::controller_salts(scope),
+            )?)
+        };
 
-        initialize_controller_scope(root.path()).unwrap();
+        initialize_controller_scope_with(root.path(), release).unwrap();
 
         let scope_path = controller_scope_path(root.path());
         let scope: uuid::Uuid = serde_json::from_slice(&fs::read(&scope_path).unwrap()).unwrap();
         assert_ne!(scope, uuid::Uuid::nil());
-        assert_eq!(fs::read(&seed_path).unwrap(), before);
-        assert!(load_read_only_authority_seed(root.path()).is_ok());
 
-        let error = initialize_controller_scope(root.path()).unwrap_err();
+        let error = initialize_controller_scope_with(root.path(), release).unwrap_err();
         assert_eq!(
             error.downcast_ref::<io::Error>().unwrap().kind(),
             io::ErrorKind::AlreadyExists

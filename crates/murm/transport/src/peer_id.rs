@@ -10,9 +10,10 @@ use identity::{Ed25519PublicKey, IdentityError};
 
 /// A peer's identifier on the transport network.
 ///
-/// Derived from the peer's master Ed25519 public key (the same key managed
-/// by [`identity`]). For iroh-backed transports, this maps directly to
-/// iroh's `NodeId` (their term for the same underlying public key).
+/// The peer's transport public key: a key [`identity`] derives for that
+/// transport, never a persona's master (vault lock plan, rulings 92 and 96).
+/// For iroh-backed transports, this maps directly to iroh's `NodeId` (their
+/// term for the same underlying public key).
 ///
 /// Named `PeerID` rather than `NodeId` to disambiguate from
 /// `kernel::Graph` node identity — graph-object identity and peer

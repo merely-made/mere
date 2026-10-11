@@ -71,6 +71,7 @@ The tool skips them, as it skips Retained licenses.
 | Path | Pinned by | Ruled |
 |---|---|---|
 | `design_docs/mere_docs/testing/receipts/2026-09-08_stack_pillar_probes` | `artifact-sha256.json` at its root and in `custody-backend/`, and the arena's run JSONs; its `.gitattributes` keeps the bytes so the digests survive checkout | 2026-10-06, ruling S79 of the [stack seams plan](design_docs/mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md) |
+| `design_docs/cambium_docs/testing/receipts/native_image_atlas_20261010/original-control/tabard-patchless-atlas-repro.rs` | `tabard-patchless-atlas-repro-build.json` beside it, `source_sha256` verified against the retained bytes | Existing frozen-source rule, 2026-10-06 ruling S79 of the [stack seams plan](design_docs/mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md); recorded 2026-10-10 |
 
 A receipt that does not pin its sources' bytes is not frozen evidence: its
 sources take the header like any other (so the 2026-09-20 resource resolution

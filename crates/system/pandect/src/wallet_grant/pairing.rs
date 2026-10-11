@@ -74,7 +74,7 @@ pub fn parse_remote_auth_pairing_code(
     Ok(secret)
 }
 
-pub(crate) fn remote_auth_pairing_transcript(
+pub fn remote_auth_pairing_transcript(
     pairing_secret: &[u8],
     delegator_pubkey: DevicePublicKey,
     delegatee_pubkey: DevicePublicKey,
@@ -94,7 +94,7 @@ pub(crate) fn remote_auth_pairing_transcript(
     Ok(transcript)
 }
 
-pub(crate) fn derive_pairing_key_from_transcript(context: &str, transcript: &[u8]) -> [u8; 32] {
+pub fn derive_pairing_key_from_transcript(context: &str, transcript: &[u8]) -> [u8; 32] {
     let mut hasher = blake3::Hasher::new_derive_key(context);
     hasher.update(transcript);
     *hasher.finalize().as_bytes()

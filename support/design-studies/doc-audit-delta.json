@@ -1,0 +1,40 @@
+{
+  "scope": "Mechanical documentation delta against HEAD document text, in the same sparse checkout; existing findings remain. D2 retains baseline digest/coverage failures.",
+  "base": "0669a9192ba98c686fdd37bbefe2021d460566cc",
+  "added_findings": {},
+  "removed_findings": {
+    "broken_relative_links": [
+      {
+        "detail": "relative link target does not exist",
+        "source": "2026-08-23_projection_scenes_and_graph_native_platform.md",
+        "subject": "../ports/tabard/src/lib.rs"
+      },
+      {
+        "detail": "relative link target does not exist",
+        "source": "2026-08-23_projection_scenes_and_graph_native_platform.md",
+        "subject": "../ports/tabard/src/theme/registry.rs"
+      }
+    ]
+  },
+  "current_counts": {
+    "active_docs": 265,
+    "indexed_active_docs": 261,
+    "index_orphans": 3,
+    "index_ghosts": 0,
+    "memory_directory_links": 0,
+    "statusless_plans": 0,
+    "broken_relative_links": 92,
+    "historical_broken_relative_links": 246,
+    "planned_broken_relative_links": 0,
+    "ambiguous_known_root_paths": 107,
+    "ignored_known_root_patterns": 19,
+    "reserved_identifier_paths": 24,
+    "missing_known_root_paths": 819,
+    "historical_missing_known_root_paths": 223,
+    "planned_missing_known_root_paths": 8,
+    "invalid_historical_annotations": 0,
+    "stale_historical_annotations": 0,
+    "unheaded_owned_sources": 1,
+    "exhibit_b_sources": 0
+  }
+}

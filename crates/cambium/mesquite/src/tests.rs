@@ -22,7 +22,7 @@ use super::*;
 /// A product that needs no host: only the three required hooks, and they are
 /// never called by the tests below (which stay off `after_frame`, the one
 /// entry point that needs a live `AppCtx`).
-struct Headless;
+pub(super) struct Headless;
 
 impl Product for Headless {
     type State = ();
@@ -137,8 +137,10 @@ fn the_receipt_carries_every_named_section_and_its_kind() {
             "ok",
             "pixel_checks",
             "product_log",
+            "redraws",
             "scenario",
-            "scenario_log"
+            "scenario_log",
+            "unpresented_redraws"
         ]
     );
     assert_eq!(value["kind"], "test-lane");

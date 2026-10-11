@@ -31,6 +31,7 @@ mod density_admits;
 mod density_probe;
 mod density_wander;
 mod face_on_body;
+mod framing;
 mod fold_and_source_time;
 mod gloss;
 mod grouped;

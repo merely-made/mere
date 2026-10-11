@@ -249,6 +249,24 @@ impl TileLayout {
             .is_some_and(|r| r.stack_into(dragged, target))
     }
 
+    /// Move an open access into `target`'s stack at an insertion index, made active.
+    /// The index is measured after removing the moved access and clamped to the
+    /// stack's end. Drops onto the moved access itself and unknown accesses are no-ops.
+    pub fn move_to_stack_index_of(
+        &mut self,
+        dragged: GraphMemberId,
+        target: GraphMemberId,
+        index: usize,
+    ) -> bool {
+        if dragged == target || !self.has_tile(dragged) || !self.has_tile(target) {
+            return false;
+        }
+        self.detach(dragged);
+        self.root
+            .as_mut()
+            .is_some_and(|r| r.stack_into_at(dragged, target, index))
+    }
+
     /// Split `dragged` out as its own cell beside `target`, along the **Row** axis, on
     /// the left (`after == false`) or right (`after == true`) — the back-compatible
     /// horizontal split. See [`split_beside_axis`](Self::split_beside_axis) for vertical

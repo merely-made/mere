@@ -15,8 +15,9 @@ mod resident_harness;
 
 use std::path::{Path, PathBuf};
 
+use castellan::custody::{IdentityStorage, SealedProfileStorage, bootstrap};
 use djinn_testkit::Bound;
-use personae::{IdentityStorage, ProfileId, SealedProfileStorage, bootstrap};
+use personae::ProfileId;
 use resident_harness::*;
 use serde_json::json;
 
@@ -88,9 +89,11 @@ fn a_lock_persists_across_a_restart_and_waits_for_a_user_act() {
         json!({
             "exit": locked.status.code(),
             "lock": status.lock,
-            "marker": personae::lock_persisted(&vault),
+            "marker": castellan::custody::lock_persisted(&vault),
         }),
-        locked.status.success() && status.lock == "locked" && personae::lock_persisted(&vault),
+        locked.status.success()
+            && status.lock == "locked"
+            && castellan::custody::lock_persisted(&vault),
     );
 
     // A crash, not a stop: the launcher would start it again.
@@ -105,9 +108,9 @@ fn a_lock_persists_across_a_restart_and_waits_for_a_user_act() {
         "restarted, it waits for a user act before any door, then the marker clears",
         Bound::State,
         json!({ "order": "waiting-for-unlock < unlocked-at-start < listening", "marker": false, "lock": "unlocked" }),
-        json!({ "events": restarted, "marker": personae::lock_persisted(&vault), "lock": again.lock }),
+        json!({ "events": restarted, "marker": castellan::custody::lock_persisted(&vault), "lock": again.lock }),
         matches!((waited, unlocked, listening), (Some(w), Some(u), Some(l)) if w < u && u < l)
-            && !personae::lock_persisted(&vault)
+            && !castellan::custody::lock_persisted(&vault)
             && again.lock == "unlocked",
     );
     r.stop(STOP);

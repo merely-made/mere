@@ -29,6 +29,16 @@
 //! core and a native window per projection, each a lens over the state, every
 //! window through the same per-window pipeline `run` drives.
 //!
+//! Applications with an existing winit event loop and [`RenderCore`] can embed
+//! a tool window through [`WinitHost::with_shared_render_core`]. Call
+//! [`WinitHost::open`] from the active event loop, route events for its
+//! [`WinitHost::native_window`] through [`WinitHost::handle_window_event`],
+//! and forward wake, idle, suspend and resume turns to that host. Its wake
+//! callback must wake the owning event loop; it does not create another loop
+//! or render device. Close commands still pass through the supplied
+//! [`HostHooks`] close policy. The application retains its own window routing
+//! and removes the tool host after its close policy allows the native window to close.
+//!
 //! ```ignore
 //! let options = HostOptions { title: "App".into(), ..Default::default() };
 //! run(options, |window, commands, wake| Init { state, logic, sheet, fonts, images }, hooks)
@@ -47,11 +57,13 @@ use winit::window::{Window, WindowId};
 use genet_scripted_dom::ScriptedDom;
 use std::{cell::RefCell, rc::Rc};
 
+mod caption_controls;
 mod decorations;
 mod files;
 mod harness;
 #[cfg(test)]
 mod headed_tests;
+mod scene_producer;
 mod windows;
 #[cfg(target_os = "windows")]
 mod windows_snap;
@@ -68,8 +80,10 @@ pub use cambium_rootstock::{
     RelayoutProfile, Runner, ScrollAlign, ScrollIntoView, Surface, WindowCommand, WindowCommands,
     WindowFrame, WindowGeometry, WindowTree, ZOOM_LADDER, fit_zoom, ladder_step, read_frame,
 };
-pub use files::{DialogFileChooser, read_file};
+pub use caption_controls::{CaptionLabels, platform_caption_controls, window_caption_controls};
+pub use files::{DialogFileChooser, choose_save_path, read_file};
 pub use harness::{Harness, inert_hooks};
+pub use scene_producer::SceneProducer;
 pub use windows::{WindowHooks, WindowHost, WindowsInit, run_windows};
 // Scenario execution lives in Mesquite; applications implement mesquite::Product.
 
@@ -93,6 +107,40 @@ enum HostEvent {
 /// the application, so it has no reason to branch between them.
 fn frame_trace() -> bool {
     std::env::var_os("CAMBIUM_HOST_FRAME_TRACE").is_some_and(|value| value != "0")
+}
+
+#[cfg(target_os = "macos")]
+fn trace_owned_macos_window(window: &Window, stage: &str) {
+    use objc2_app_kit::NSRunningApplication;
+    use raw_window_handle::{HasWindowHandle, RawWindowHandle};
+    if !frame_trace() {
+        return;
+    }
+    let Ok(handle) = window.window_handle() else {
+        return;
+    };
+    let RawWindowHandle::AppKit(handle) = handle.as_raw() else {
+        return;
+    };
+    // Called by the event-loop thread while this owned winit handle is alive.
+    let view: &objc2_app_kit::NSView = unsafe { handle.ns_view.cast().as_ref() };
+    let Some(native) = view.window() else {
+        return;
+    };
+    let app = NSRunningApplication::currentApplication();
+    eprintln!(
+        "[cambium-host] {stage} macos app_active={} app_hidden={} policy={:?} launched={} window_visible={} key={} can_key={} active_space={} occlusion={:?} frame={:?}",
+        app.isActive(),
+        app.isHidden(),
+        app.activationPolicy(),
+        app.isFinishedLaunching(),
+        native.isVisible(),
+        native.isKeyWindow(),
+        native.canBecomeKeyWindow(),
+        native.isOnActiveSpace(),
+        native.occlusionState(),
+        native.frame()
+    );
 }
 
 /// Opt-in CPU-side frame attribution. Kept separate from the frame-policy
@@ -524,7 +572,7 @@ where
     /// Run the application's close policy, then do what only a desktop window
     /// can: hide on [`CloseDisposition::Hide`], repaint on
     /// [`CloseDisposition::KeepVisible`].
-    pub(crate) fn request_close(&mut self, request: CloseRequest) {
+    pub fn request_close(&mut self, request: CloseRequest) {
         match self.core.decide_close(request) {
             Some(CloseDisposition::KeepVisible) => {
                 if let Some(window) = self.core.s.window.as_ref() {
@@ -540,6 +588,69 @@ where
             },
             Some(CloseDisposition::Exit) | None => {},
         }
+    }
+}
+
+impl<State, Logic, V> WinitHost<State, Logic, V>
+where
+    State: 'static,
+    Logic: FnMut(&State) -> V + 'static,
+    V: RootView<State>,
+{
+    /// Attach a retained Cambium window to another application's event loop
+    /// and render core. The caller routes this window's events and wake/idle
+    /// turns; this host retains the ordinary input, caption, accessibility,
+    /// chooser and presentation lifecycle. No device is booted here.
+    pub fn with_shared_render_core(
+        options: HostOptions,
+        init: impl FnOnce(&dyn HostWindow, &WindowCommands, &HostWake) -> Init<State, Logic> + 'static,
+        hooks: HostHooks<State, Logic, V>,
+        render_core: Arc<RenderCore>,
+        wake_event_loop: Arc<dyn Fn() + Send + Sync>,
+    ) -> Self {
+        let mut state = HostState::new();
+        state.shared.render_core = Some(render_core);
+        let wake = HostWake::new(state.wake_pending.clone(), wake_event_loop);
+        Self::new(Host::new(options, Some(Box::new(init)), hooks, state, wake))
+    }
+
+    /// Open or resume the owned window within the caller's active event loop.
+    /// Initialization runs once, after a render core is available. Its state
+    /// survives suspension; only the drawing surface is recreated on resume.
+    pub fn open(&mut self, event_loop: &ActiveEventLoop) -> Result<Arc<Window>, String> {
+        if self.resume_surface() {
+            return Ok(self.native_window.as_ref().expect("resumed window").clone());
+        }
+        let (window, restored) = self.open_native_window(event_loop);
+        self.render_core()?;
+        let init = self
+            .init
+            .take()
+            .ok_or("window initialization was already consumed")?;
+        let Init {
+            state,
+            logic,
+            sheet,
+            fonts,
+            images,
+        } = init(
+            &WinitWindow(window.clone()),
+            &self.s.commands.clone(),
+            &self.wake,
+        );
+        let dom = Rc::new(RefCell::new(ScriptedDom::new()));
+        let runner = Runner::new(dom, logic, state);
+        self.s.shared.sheet = sheet;
+        self.s.set_resources(fonts, images);
+        self.install_window(window.clone(), restored)?;
+        self.s.runner = Some(runner);
+        self.first_frame();
+        Ok(window)
+    }
+
+    /// The owned native window, for routing by window ID in a composing host.
+    pub fn native_window(&self) -> Option<&Arc<Window>> {
+        self.native_window.as_ref()
     }
 }
 /// Run a single-root Cambium application to completion.
@@ -680,7 +791,7 @@ where
     /// drawing surface was taken away, so make a new one from the same core
     /// against the same window and repaint. No device is created. `false`
     /// when the window was never opened, which is a first resume's job.
-    pub(crate) fn resume_surface(&mut self) -> bool {
+    pub fn resume_surface(&mut self) -> bool {
         let Some(window) = self.native_window.clone() else {
             return false;
         };
@@ -893,6 +1004,16 @@ where
     pub(crate) fn first_frame(&mut self) {
         self.redraw();
         self.sync_a11y();
+        #[cfg(target_os = "macos")]
+        if let Some(window) = self.native_window.as_ref() {
+            trace_owned_macos_window(window, "initial reveal");
+        }
+        // The synchronous frame was attempted while hidden. Showing the
+        // window must owe a fresh attempt even on platforms that do not send
+        // another RedrawRequested for this visibility transition.
+        if let Some(window) = self.native_window.as_ref() {
+            window.request_redraw();
+        }
     }
 
     /// The platform is taking the drawing surface away (Android, iOS; never on
@@ -902,13 +1023,13 @@ where
     /// new surface from the same core and repaints the same application rather
     /// than restarting it. The renderer's retained leaf fragments live in that
     /// core, so they survive too.
-    pub(crate) fn suspend_surface(&mut self) {
+    pub fn suspend_surface(&mut self) {
         self.suspend_producers();
         self.s.surface = None;
     }
 
     /// This window's idle policy, with the redraw it asks for requested.
-    pub(crate) fn idle_turn(&mut self) -> IdlePolicy {
+    pub fn idle_turn(&mut self) -> IdlePolicy {
         let policy = self.idle_policy(cambium_rootstock::Instant::now());
         if matches!(policy, IdlePolicy::A11yWake | IdlePolicy::Animate(_)) {
             if let Some(window) = self.s.window.as_ref() {
@@ -920,7 +1041,7 @@ where
 
     /// A worker woke the application: drain it, then run what the drain
     /// queued for the window.
-    pub(crate) fn wake_turn(&mut self) {
+    pub fn wake_turn(&mut self) {
         self.process_wake();
         self.sync_app_frame_extents();
         self.run_window_commands();
@@ -928,7 +1049,7 @@ where
 
     /// One window event, through the host's routing, and the window verbs it
     /// queued. Whether the window should now close is in `s.close_requested`.
-    pub(crate) fn handle_window_event(&mut self, event: WindowEvent) {
+    pub fn handle_window_event(&mut self, event: WindowEvent) {
         match event {
             WindowEvent::CloseRequested => {
                 self.refresh_geometry();
@@ -1023,9 +1144,10 @@ where
                 // sees where the window is now, as the live query used to.
                 self.refresh_geometry();
                 self.redraw();
-                // After the frame is laid out and presented, refresh the
-                // accessibility tree and drain any screen-reader actions,
-                // then let the application pump per-presented-frame work.
+                // Layout and a11y still advance if acquiring a drawable failed.
+                // The hook receives this attempt's presentation identity (or
+                // None), so scenarios pause while async readback and bounded
+                // presentation waits keep receiving turns.
                 let a11y_started = std::time::Instant::now();
                 self.sync_a11y();
                 if let Some(profile) = self.s.last_frame_profile.as_mut() {
@@ -1035,6 +1157,19 @@ where
                     if perf_trace() {
                         eprintln!("[cambium-host] frame {}", profile.summary());
                     }
+                }
+                if frame_trace()
+                    && self.s.last_redraw_presentation.is_none()
+                    && let Some(window) = self.native_window.as_ref()
+                {
+                    #[cfg(target_os = "macos")]
+                    trace_owned_macos_window(window, "unpresented redraw");
+                    eprintln!(
+                        "[cambium-host] unpresented redraw visible={:?} focused={} minimized={:?}",
+                        window.is_visible(),
+                        window.has_focus(),
+                        window.is_minimized()
+                    );
                 }
                 self.with_ctx(Hook::AfterFrame);
             },
@@ -1067,35 +1202,7 @@ where
     V: RootView<State>,
 {
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
-        if self.resume_surface() {
-            return;
-        }
-        let (window, restored) = self.open_native_window(event_loop);
-        // The core boots before the application's init, as it always has, so
-        // a machine with no usable device fails before any app state exists.
-        self.render_core().expect("boot genet host");
-        let init = self.init.take().expect("resumed once");
-        // The application takes its end of the window-verb seam here, stores
-        // it in its own state, and calls it from ordinary click handlers.
-        let Init {
-            state,
-            logic,
-            sheet,
-            fonts,
-            images,
-        } = init(
-            &WinitWindow(window.clone()),
-            &self.s.commands.clone(),
-            &self.wake,
-        );
-        let dom = Rc::new(RefCell::new(ScriptedDom::new()));
-        let runner = Runner::new(dom, logic, state);
-        self.s.shared.sheet = sheet;
-        self.s.set_resources(fonts, images);
-        self.install_window(window, restored)
-            .expect("boot genet host");
-        self.s.runner = Some(runner);
-        self.first_frame();
+        self.open(event_loop).expect("boot genet host");
     }
 
     fn suspended(&mut self, _event_loop: &ActiveEventLoop) {

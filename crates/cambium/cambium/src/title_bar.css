@@ -1,0 +1,42 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
+
+.cambium-title-bar {
+    --app-region: drag;
+    display: flex;
+    align-items: center;
+    gap: var(--titlebar-gap, 10px);
+    box-sizing: border-box;
+    width: 100%;
+    min-height: max(var(--titlebar-area-height, 0px), var(--titlebar-min-height, 36px));
+    padding-left: calc(var(--titlebar-area-x, 0px) + var(--titlebar-padding, 12px));
+    padding-right: calc(100% - var(--titlebar-area-x, 0px) - var(--titlebar-area-width, 100%) + var(--titlebar-padding, 12px));
+    flex-shrink: 0;
+}
+.title-bar-ornament,
+.title-bar-title,
+.title-bar-actions,
+.title-bar-captions {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+.title-bar-ornament,
+.title-bar-actions,
+.title-bar-captions {
+    flex-shrink: 0;
+}
+.title-bar-title {
+    flex: 1;
+}
+.title-bar-actions,
+.title-bar-captions {
+    --app-region: no-drag;
+    gap: var(--titlebar-action-gap, 8px);
+}
+.title-bar-captions button {
+    min-width: 32px;
+    min-height: 30px;
+    padding: 4px 8px;
+}

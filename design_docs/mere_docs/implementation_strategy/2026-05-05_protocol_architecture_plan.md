@@ -8,8 +8,8 @@
 
 **Corrected 2026-10-06 (S14 pass):** §2, §3 and §4 no longer remain authoritative as wholes.
 §2: the `mere-transport` iroh path retired (the banner below); `crates/murm/transport/src/` has `p2panda_transport.rs` and `reticulum_transport.rs` and no iroh transport, and gossip is p2panda-net's `GossipHandle`, so §2's iroh-gossip and iroh-docs rows, the Cable choice rule and the ALPN ledger are superseded. Its iroh and iroh-blobs rows hold: iroh stays the QUIC byte plane under p2panda-net, and `crates/murm/transport/src/p2panda_transport.rs` uses iroh and iroh-blobs directly.
-§3: the vault types hold (`crates/dramatis/personae/src/vault.rs`), but the [vault lock plan](../../dramatis_docs/implementation_strategy/2026-10-05_vault_lock_plan.md)'s ruling 12 rules `UnlockTier` consent, not custody, and records that §3.6's custody tiers and §3.7's swap-leakage defence are not true today.
-§4: `verso-tile` was folded into `inker::flip` on 2026-09-05, and the [dramatis tier architecture](../../dramatis_docs/technical_architecture/2026-09-30_dramatis_tier_architecture.md)'s rulings 3 and 6 put announcing in gazette (castellan issues, gazette announces), as a djinn service that exports static well-known files first; that document also records that no earlier document named an owner for announcing.
+§3: the vault types hold (`repos/dramatis/crates/personae/src/vault.rs`), but the [vault lock plan](../../dramatis_docs/implementation_strategy/2026-10-05_vault_lock_plan.md)'s ruling 12 rules `UnlockTier` consent, not custody, and records that §3.6's custody tiers and §3.7's swap-leakage defence are not true today.
+§4: `verso-tile` was folded into `inker::flip` on 2026-09-05, and the dramatis tier architecture (`repos/dramatis/design_docs/2026-09-30_dramatis_tier_architecture.md`)'s rulings 3 and 6 put announcing in gazette (castellan issues, gazette announces), as a djinn service that exports static well-known files first; that document also records that no earlier document named an owner for announcing.
 
 **Open, raised by the S14 pass (2026-10-06):** do §2's surviving rows and §3 stay authoritative in this plan? Options: they stay authoritative here; this plan keeps them as history, deferring to the p2panda transport for §2 and to the vault lock plan for §3.
 
@@ -19,7 +19,7 @@
 
 > **Crate-name + substrate note (2026-06-09 audit):** crate names below predate the 2026-05-19 supercrate naming pass and the `graphshell` dissolution: `mere-identity`→`persona/identity`, `mere-transport`→`murm/transport`, `mere-kernel`→`graph/graph-kernel`, `mere-host-runtime`→`system/session-runtime`. The bilateral substrate has since pivoted Cable→p2panda (the `mere-transport` iroh path retired, BLAKE2b→BLAKE3), so the Cable wire-format and iroh-transport sections are partially superseded by the [p2panda spike](../../archive_docs/2026-06-09_completed_plans/2026-06-01_p2panda_substrate_spike_plan.md). Dated "shipped"/progress receipts below are left as historical record.
 >
-> **Corrected 2026-10-06 (S14 pass):** two of these targets have moved again: `persona/identity` is now `crates/dramatis/personae`, and `system/session-runtime` was renamed pandect in `441e70f0` (2026-08-15), now `crates/system/pandect`.
+> **Corrected 2026-10-06 (S14 pass):** two of these targets have moved again: `persona/identity` is now `repos/dramatis/crates/personae`, and `system/session-runtime` was renamed pandect in `441e70f0` (2026-08-15), now `crates/system/pandect`.
 
 **Related**:
 
@@ -385,7 +385,7 @@ A future doc under `mere_docs/technical_architecture/` will own the full threat 
 **Corrected 2026-10-06 (S14 pass):** the [vault lock plan](../../dramatis_docs/implementation_strategy/2026-10-05_vault_lock_plan.md)'s ruling 12 rules `UnlockTier` consent, not custody: §3.6's tiers are approval policy, not custody tiers, and that plan records that this section's swap-leakage defence is not true today.
 
 **Annotated 2026-10-08 (vault lock plan L4, ruling 82):** the
-[vault threat statement](../../dramatis_docs/technical_architecture/2026-10-08_vault_threat_statement.md) now owns the vault's part of the threat model
+vault threat statement (`repos/dramatis/design_docs/2026-10-08_vault_threat_statement.md`) now owns the vault's part of the threat model
 this section promised. Swap is not defended: a page written to the
 pagefile or the hibernation file while the vault is unlocked survives the
 lock. The lock defends a locked device, and the disk alone.

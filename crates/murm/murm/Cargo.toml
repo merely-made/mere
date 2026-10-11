@@ -49,6 +49,8 @@ tokio-stream = "0.1"
 thiserror = "1"
 
 [dev-dependencies]
+# Tests and examples bind throwaway identities (vault lock plan, ruling 96).
+transport = { workspace = true, features = ["test-identity"] }
 insigne = { workspace = true, features = ["verify"] }
 tokio = { version = "1", features = ["io-util", "macros", "rt", "rt-multi-thread", "time"] }
 tempfile = "3"

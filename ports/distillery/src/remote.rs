@@ -421,11 +421,11 @@ mod tests {
         let poster_key = poster_provider.derive_keypair(MESH_AUTHOR_SALT).unwrap();
         let server_key = server_provider.derive_keypair(MESH_AUTHOR_SALT).unwrap();
 
-        let server_transport = P2pandaTransport::builder(server_provider.master_keypair())
+        let server_transport = P2pandaTransport::builder_for(&server_provider.derived_keypair(MESH_AUTHOR_SALT).unwrap())
             .bind()
             .await
             .unwrap();
-        let client_transport = P2pandaTransport::builder(poster_provider.master_keypair())
+        let client_transport = P2pandaTransport::builder_for(&poster_provider.derived_keypair(MESH_AUTHOR_SALT).unwrap())
             .bind()
             .await
             .unwrap();
@@ -615,13 +615,13 @@ mod tests {
         let poster_key = poster_provider.derive_keypair(MESH_AUTHOR_SALT).unwrap();
         let server_key = server_provider.derive_keypair(MESH_AUTHOR_SALT).unwrap();
         let server_transport = Arc::new(
-            P2pandaTransport::builder(server_provider.master_keypair())
+            P2pandaTransport::builder_for(&server_provider.derived_keypair(MESH_AUTHOR_SALT).unwrap())
                 .gossip()
                 .bind()
                 .await
                 .unwrap(),
         );
-        let client_transport = P2pandaTransport::builder(poster_provider.master_keypair())
+        let client_transport = P2pandaTransport::builder_for(&poster_provider.derived_keypair(MESH_AUTHOR_SALT).unwrap())
             .bind()
             .await
             .unwrap();

@@ -1317,10 +1317,7 @@ fn file_appearance_store_restores_theme_after_workspace_recreation() {
     assert!(restored.apply_chrome_action(ChromeAction::ToggleAppearance));
     assert_eq!(
         restored.chrome_model().appearance,
-        Some(ChromeAppearance {
-            theme: AppearanceTheme::Light,
-            persistent: true,
-        })
+        Some(ChromeAppearance::basic(AppearanceTheme::Light, true))
     );
     let _ = std::fs::remove_file(path);
 }
@@ -3095,4 +3092,360 @@ fn chrome_receipt_controls_one_focused_tile_without_disturbing_neighbors() {
         }
     }
     panic!("chrome receipt did not complete its bounded interaction sequence");
+}
+
+fn authored_appearance_app(library: &Path, store: FileThemeChoiceStore) -> WorkspaceApp {
+    let fixture = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .unwrap()
+        .join("examples/workspace/p6-appearance/index.html")
+        .to_string_lossy()
+        .into_owned();
+    let tree = tree_from_urls(&[fixture.clone()]);
+    #[cfg(target_os = "windows")]
+    let registries = workspace_registries(None);
+    #[cfg(not(target_os = "windows"))]
+    let registries = workspace_registries();
+    let workspace = PeltWorkspace::try_routed(
+        tree,
+        registries,
+        |tile| {
+            let ContentSource::Document(DocumentRef(address)) = &tile.content else {
+                unreachable!()
+            };
+            Ok(PeltTileRequest::new(address, (960, 640)))
+        },
+        || Box::new(WorkspaceClock(Instant::now())),
+    )
+    .unwrap();
+    let frisket = FrisketSurface::new(workspace.tree());
+    let selection = store.path().to_path_buf();
+    let config = WorkspaceViewerConfig::new(vec![fixture], WindowingMode::Headed)
+        .with_size(960, 640)
+        .with_appearance_store_at(selection, store)
+        .with_theme_library(library);
+    #[cfg(target_os = "windows")]
+    {
+        WorkspaceApp::new(config, workspace, frisket, None)
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        WorkspaceApp::new(config, workspace, frisket)
+    }
+}
+
+fn compose_authored_appearance(app: &mut WorkspaceApp) {
+    app.refresh_chrome();
+    let pane = app
+        .frisket
+        .frame(app.logical_size().0, app.logical_size().1)
+        .unwrap();
+    app.workspace
+        .set_content_rects(pane.content_rects.iter().copied());
+    let _ = app.workspace.pump();
+    let _ = app.workspace.frame();
+    app.workspace.mark_visible_documents_presented();
+}
+
+#[test]
+fn saved_theme_pointer_controls_apply_exact_css_mode_without_replacing_the_held_session() {
+    let temporary = tempfile::tempdir().unwrap();
+    let library = temporary.path().join("themes.json");
+    let selection = temporary.path().join("appearance.json");
+    let registry = tabard::theme::registry::ThemeRegistry::default();
+    let mut theme = tabard::Theme::new(
+        "theme:pelt-authored",
+        "Pelt authored",
+        registry
+            .theme_def(tabard::theme::registry::THEME_ID_DEFAULT)
+            .unwrap()
+            .seeds,
+    );
+    let rules = vec![".pelt-toolbar { background: #713f92; }".into()];
+    theme
+        .mode_sheets
+        .insert("custom:concert".into(), rules.clone());
+    tabard::library::ThemeLibraryStore::load(&library)
+        .unwrap()
+        .save(&[theme.clone()])
+        .unwrap();
+    let mut app =
+        authored_appearance_app(&library, crate::load_appearance_store(&selection).unwrap());
+    compose_authored_appearance(&mut app);
+    let tile = app.workspace.focused_tile().unwrap();
+    let controller = app.workspace.controller(tile).unwrap();
+    let identity = controller.session_identity();
+    let address = controller.address().to_owned();
+    let history = (controller.can_go_back(), controller.can_go_forward());
+    let aperture = app.workspace.content_rect(tile);
+    app.click_chrome_physical("appearance").unwrap();
+    compose_authored_appearance(&mut app);
+    app.click_chrome_physical("edit-themes").unwrap();
+    assert!(app.editor_requested);
+    assert_eq!(
+        app.appearance.store().choice(),
+        &tabard::theme::choice::ThemeChoice::default()
+    );
+    app.editor_requested = false;
+    app.click_chrome_physical("appearance-saved-0").unwrap();
+    compose_authored_appearance(&mut app);
+    app.click_chrome_physical("appearance-mode-4").unwrap();
+    compose_authored_appearance(&mut app);
+    let expected = tabard::theme::choice::ThemeChoice::new(
+        &theme.id,
+        Some(tabard::theme::registry::Mode::Custom("concert".into())),
+    );
+    assert_eq!(app.appearance.store().choice(), &expected);
+    assert!(!app.chrome_appearance().builtin_selected);
+    let projection = app.frisket.accessibility_projection(None).unwrap();
+    for (_, node) in &projection.tree.nodes {
+        if node.role() == accesskit::Role::RadioButton
+            && matches!(node.label(), Some("Dark" | "Light"))
+        {
+            assert_eq!(node.toggled(), Some(accesskit::Toggled::False));
+        }
+    }
+    assert_eq!(
+        tabard::resolve_theme_choice(&app.theme_catalog.registry, app.appearance.store().choice())
+            .unwrap()
+            .presentation,
+        tabard::ThemePresentation::AuthoredStylesheet(rules)
+    );
+    assert_eq!(
+        app.frisket
+            .chrome_computed_style("pelt-toolbar", "background-color")
+            .as_deref(),
+        Some("rgb(113, 63, 146)"),
+        "exact authored CSS reached the production Chrome cascade"
+    );
+    let controller = app.workspace.controller(tile).unwrap();
+    assert_eq!(controller.session_identity(), identity);
+    assert_eq!(controller.address(), address);
+    assert_eq!(
+        (controller.can_go_back(), controller.can_go_forward()),
+        history
+    );
+    assert_eq!(app.workspace.focused_tile(), Some(tile));
+    assert_eq!(app.workspace.content_rect(tile), aperture);
+    drop(app);
+    let mut restored =
+        authored_appearance_app(&library, crate::load_appearance_store(&selection).unwrap());
+    compose_authored_appearance(&mut restored);
+    assert_eq!(restored.appearance.store().choice(), &expected);
+    assert!(restored.theme_catalog.error.is_none());
+    restored.click_chrome_physical("appearance").unwrap();
+    compose_authored_appearance(&mut restored);
+    restored.click_chrome_physical("appearance-dark").unwrap();
+    compose_authored_appearance(&mut restored);
+    assert!(restored.chrome_appearance().builtin_selected);
+    let projection = restored.frisket.accessibility_projection(None).unwrap();
+    let selected = projection
+        .tree
+        .nodes
+        .iter()
+        .find(|(_, node)| {
+            node.role() == accesskit::Role::RadioButton && node.label() == Some("Dark")
+        })
+        .unwrap();
+    assert_eq!(selected.1.toggled(), Some(accesskit::Toggled::True));
+}
+
+#[test]
+fn saving_an_active_theme_refreshes_the_catalog_without_implicitly_applying_its_new_css() {
+    use tabard::theme::choice::ThemeChoiceStore;
+    use tabard::theme::{
+        choice::ThemeChoice,
+        registry::{Mode, THEME_ID_DEFAULT, ThemeRegistry},
+    };
+    let temporary = tempfile::tempdir().unwrap();
+    let library = temporary.path().join("themes.json");
+    let selection = temporary.path().join("appearance.json");
+    let registry = ThemeRegistry::default();
+    let mut theme = tabard::Theme::new(
+        "theme:pelt-active",
+        "Pelt active",
+        registry.theme_def(THEME_ID_DEFAULT).unwrap().seeds,
+    );
+    let mode = Mode::Custom("concert".into());
+    theme.mode_sheets.insert(
+        mode.as_key(),
+        vec![".pelt-toolbar { background: #713f92; }".into()],
+    );
+    tabard::library::ThemeLibraryStore::load(&library)
+        .unwrap()
+        .save(&[theme.clone()])
+        .unwrap();
+    let mut store = crate::load_appearance_store(&selection).unwrap();
+    let choice = ThemeChoice::new(&theme.id, Some(mode.clone()));
+    store.set_choice(choice.clone()).unwrap();
+    let original_choice = std::fs::read(&selection).unwrap();
+    let mut app = authored_appearance_app(&library, store);
+    compose_authored_appearance(&mut app);
+    assert_eq!(
+        app.frisket
+            .chrome_computed_style("pelt-toolbar", "background-color")
+            .as_deref(),
+        Some("rgb(113, 63, 146)")
+    );
+
+    let mut editor = tabard_workshop::WorkshopState::load(&library).unwrap();
+    editor.edit_definition(&theme, Some(mode.clone())).unwrap();
+    *editor.text_field_mut("mode-sheet").unwrap() =
+        cambium::TextInput::new(".pelt-toolbar { background: #227744; }");
+    editor.apply_stylesheet();
+    editor.save();
+    assert_eq!(editor.saved_choice().unwrap(), choice);
+    assert!(editor.request_close());
+    app.refresh_saved_theme_catalog();
+    compose_authored_appearance(&mut app);
+    assert_eq!(
+        app.frisket
+            .chrome_computed_style("pelt-toolbar", "background-color")
+            .as_deref(),
+        Some("rgb(113, 63, 146)")
+    );
+    assert_eq!(std::fs::read(&selection).unwrap(), original_choice);
+
+    // The ordinary drawer controls adopt the newly saved definition explicitly.
+    app.click_chrome_physical("appearance").unwrap();
+    compose_authored_appearance(&mut app);
+    app.click_chrome_physical("appearance-mode-4").unwrap();
+    compose_authored_appearance(&mut app);
+    assert_eq!(
+        app.frisket
+            .chrome_computed_style("pelt-toolbar", "background-color")
+            .as_deref(),
+        Some("rgb(34, 119, 68)")
+    );
+    assert_eq!(app.appearance.store().choice(), &choice);
+    let mut restarted =
+        authored_appearance_app(&library, crate::load_appearance_store(&selection).unwrap());
+    compose_authored_appearance(&mut restarted);
+    assert_eq!(
+        restarted
+            .frisket
+            .chrome_computed_style("pelt-toolbar", "background-color")
+            .as_deref(),
+        Some("rgb(34, 119, 68)")
+    );
+}
+
+#[test]
+fn startup_retries_preserve_owed_first_presentation_without_waking_a_settled_browser() {
+    let revealed = Instant::now();
+    assert!(primary_startup_retry(0, revealed, revealed));
+    assert!(primary_startup_retry(
+        0,
+        revealed,
+        revealed + Duration::from_secs(9)
+    ));
+    assert!(!primary_startup_retry(
+        0,
+        revealed,
+        revealed + Duration::from_secs(10)
+    ));
+    assert!(!primary_startup_retry(1, revealed, revealed));
+}
+
+#[test]
+fn parent_wait_preserves_editor_animation_and_accessibility_wakes_and_existing_focus_deadline() {
+    use cambium_rootstock::IdlePolicy;
+    let now = Instant::now();
+    assert_eq!(
+        workspace_idle_flow(IdlePolicy::Wait, false, false, now),
+        ControlFlow::Wait
+    );
+    assert_eq!(
+        workspace_idle_flow(IdlePolicy::Wait, true, false, now),
+        ControlFlow::WaitUntil(now + TEAROUT_FOCUS_RETRY_INTERVAL)
+    );
+    assert_eq!(
+        workspace_idle_flow(IdlePolicy::Wait, false, true, now),
+        ControlFlow::WaitUntil(now + Duration::from_millis(100))
+    );
+    assert_eq!(
+        workspace_idle_flow(
+            IdlePolicy::Animate(Duration::from_millis(16)),
+            true,
+            true,
+            now
+        ),
+        ControlFlow::WaitUntil(now + Duration::from_millis(16))
+    );
+    assert_eq!(
+        workspace_idle_flow(IdlePolicy::A11yWake, false, false, now),
+        ControlFlow::Poll
+    );
+}
+
+#[test]
+fn native_appearance_reveal_uses_the_production_wheel_and_physical_pointer_route_at_two_x() {
+    let temporary = tempfile::tempdir().unwrap();
+    let library = temporary.path().join("missing-library.json");
+    let mut app = authored_appearance_app(
+        &library,
+        crate::load_appearance_store(temporary.path().join("choice.json")).unwrap(),
+    );
+    app.width = 1280;
+    app.height = 480;
+    app.scale_factor = 2.0;
+    compose_authored_appearance(&mut app);
+    let tile = app.workspace.focused_tile().unwrap();
+    let aperture = app.workspace.content_rect(tile);
+    let identity = app.workspace.controller(tile).unwrap().session_identity();
+    app.click_chrome_physical("appearance").unwrap();
+    compose_authored_appearance(&mut app);
+    let before = app.frisket.chrome_rect("edit-themes").unwrap();
+    assert!(
+        before.y >= 240.0,
+        "editor initially lies below the short drawer"
+    );
+    app.click_appearance_control("edit-themes").unwrap();
+    assert!(app.editor_requested);
+    let projection = app.frisket.accessibility_projection(None).unwrap();
+    let edit = projection
+        .tree
+        .nodes
+        .iter()
+        .find(|(_, node)| node.label() == Some("Edit themes"))
+        .unwrap();
+    let painted = app.frisket.chrome_rect("edit-themes").unwrap();
+    assert!((edit.1.bounds().unwrap().y0 - f64::from(painted.y)).abs() < 0.01);
+    assert!(edit.1.supports_action(accesskit::Action::Click));
+    let before_reveal = app.frisket.chrome_rect("appearance-dark").unwrap();
+    let tree = app.prepare_accessibility_tree().unwrap();
+    let dark = tree
+        .nodes
+        .iter()
+        .find(|(_, node)| {
+            node.role() == accesskit::Role::RadioButton && node.label() == Some("Dark")
+        })
+        .unwrap();
+    assert!(dark.1.supports_action(accesskit::Action::ScrollIntoView));
+    assert!(app.apply_accessibility_request(A11yActionRequest {
+        action: accesskit::Action::ScrollIntoView,
+        target_node: dark.0,
+        data: None,
+    }));
+    compose_authored_appearance(&mut app);
+    let after_reveal = app.frisket.chrome_rect("appearance-dark").unwrap();
+    assert!(after_reveal.y > before_reveal.y);
+    let tree = app.prepare_accessibility_tree().unwrap();
+    let dark = tree
+        .nodes
+        .iter()
+        .find(|(_, node)| {
+            node.role() == accesskit::Role::RadioButton && node.label() == Some("Dark")
+        })
+        .unwrap();
+    assert!(dark.1.supports_action(accesskit::Action::Click));
+    assert_eq!(
+        app.appearance.store().choice(),
+        &tabard::theme::choice::ThemeChoice::default()
+    );
+    assert_eq!(
+        app.workspace.controller(tile).unwrap().session_identity(),
+        identity
+    );
+    assert_eq!(app.workspace.content_rect(tile), aperture);
 }

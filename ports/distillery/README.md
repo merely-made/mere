@@ -82,15 +82,19 @@ recovery boundaries.
 
 The installed-authority slice now persists one explicit Personae profile at
 `<data-root>/distillery/settings.json`. The record contains no seed, vault
-secret, scheduler cadence, device policy, or mesh-retention policy. Opening it
-requires that selected profile to already exist in the shared Personae vault;
-the mesh author is derived under `mesh::MESH_AUTHOR_SALT` and the transport
-uses that profile's master identity. Per-mesh private paths live below
-`<data-root>/distillery/meshes/<mesh-id>/`.
+secret, scheduler cadence, device policy, or mesh-retention policy. Distillery
+opens no vault (dramatis repo plan, D5): `InstalledAuthority::open` takes the
+profile's identity from djinn, either the unlocked vault (djinn's own works
+lane) or the derived keys djinn releases for `InstalledAuthority::release_salts`
+(D11). The mesh author is derived under `mesh::MESH_AUTHOR_SALT` and is also
+the transport identity (vault lock ruling 92). Per-mesh private paths live
+below `<data-root>/distillery/meshes/<mesh-id>/`.
 
 `distillery-installed configure --data-root <path> --profile <id>` persists
-that selection. `inspect` opens it and reports the selected profile and
-Personae protection, but intentionally does not start a resident. A real start
+that selection. `inspect` asks djinn's custody route for the roster and the
+protection, reports the identity as pending when djinn is absent or Locked
+(D12), and intentionally does not start a resident. The binary is built from
+djinn's package since DR-C. A real start
 still requires a mesh owner to supply its store and retention policy, and a
 device owner to supply `HostConfig` and `ResidentSettings`; Distillery must not
 invent scheduler or device-policy authority. The read-only

@@ -23,6 +23,7 @@ DOCS = ROOT / "design_docs"
 LEDGER = ROOT / "support" / "doc-audit" / "d2"
 SNAPSHOT = LEDGER / "snapshot_281_aggregate.json"
 CORRECTIONS = LEDGER / "legacy_corrections.json"
+MOVED_OUT = LEDGER / "moved_out.json"
 SNAPSHOT_SHA256 = "f0b64eef4cd5514157bb1b49d389b84db29a1e823d6f3e2cebf827337fe56abf"
 
 DOC_HEADER = re.compile(r"^##\s+`?(.+?\.md)`?\s*$", re.MULTILINE)
@@ -153,9 +154,13 @@ def audit() -> dict[str, object]:
     # A batch record whose document has moved into archive_docs remains as
     # history, like an archived snapshot record; any other unknown path is an error.
     archived_names = {path.name for path in (DOCS / "archive_docs").rglob("*.md")}
+    # So does one whose document left this repository with its subject.
+    moved_out = json.loads(MOVED_OUT.read_text(encoding="utf-8"))["moved"]
     not_active = sorted(set(supplements) - set(active))
-    inactive_supplements = [path for path in not_active if Path(path).name in archived_names]
-    unknown_supplements = [path for path in not_active if Path(path).name not in archived_names]
+    inactive_supplements = [
+        path for path in not_active if Path(path).name in archived_names or path in moved_out
+    ]
+    unknown_supplements = [path for path in not_active if path not in inactive_supplements]
     # A batch record for a path the snapshot covers is a later judgment and
     # supersedes the snapshot's record (stack seams plan, ruling S34).
     superseded = sorted(legacy_active & supplemental_active)

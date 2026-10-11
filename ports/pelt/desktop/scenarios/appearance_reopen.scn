@@ -1,0 +1,6 @@
+log Pelt fresh process restores saved app choice and shared definition
+settle 4
+assert snap dirty == false
+assert snap saved == true
+assert snap mode == hc_dark
+capture reopened_editor

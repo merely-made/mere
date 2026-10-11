@@ -31,6 +31,12 @@
 //!
 //! This module owns the file layout and typed serde shapes. Pairing, wrapped-key
 //! semantics, and transport resolution layer on top.
+//!
+//! The secret half (the identity seed and the unlock ladder that opens it, this
+//! host's delegated-device identity, the remote-auth wrapping keys, the
+//! private-epoch bridge, and the first-launch bootstrap that mints them) moved
+//! to castellan in the dramatis repo plan's DR-B (ruling D8). This tree keeps
+//! the public manifests, the roster, the grant bytes and the path layout.
 
 //!
 //! Split 2026-08-10 (wallet carry fold-in plan, W2): the carry *model* now
@@ -38,13 +44,10 @@
 //! per concern. The re-exports below keep every existing consumer path
 //! (`pandect::wallet_store::*`) spelled the same.
 
-mod bootstrap;
 mod devices;
-mod epochs;
 mod io;
 mod manifests;
 mod paths;
-mod secrets;
 #[cfg(test)]
 mod test_support;
 
@@ -106,16 +109,8 @@ pub use identity::carry::{
     WALLET_SCHEMA_VERSION, derive_persona_chain_root, persona_wallet_salt,
 };
 
-pub use bootstrap::{WalletBootstrapMode, bootstrap_wallet_state, ensure_wallet_state};
-pub use devices::{
-    ensure_local_device_identity, load_device_grant, load_local_device_identity,
-    load_remote_auth_wrapping_key_bridge, save_device_grant, save_local_device_identity,
-    save_remote_auth_wrapping_key_bridge,
-};
-pub use epochs::{
-    ensure_persona_epoch_bridge, load_current_private_epoch, load_persona_epoch_bridge,
-    save_persona_epoch_bridge, stage_persona_private_epoch,
-};
+pub use devices::{load_device_grant, save_device_grant};
+pub use io::{load_json_optional, save_bytes_atomic, save_json_atomic};
 pub use manifests::{
     device_roster_ref, load_device_roster, load_identity_wallet, load_persona_wallet,
     save_device_roster, save_identity_wallet, save_persona_wallet,
@@ -126,12 +121,6 @@ pub use paths::{
     local_device_identity_path, persona_epoch_bridge_path, persona_wallet_path,
     remote_auth_wrapping_keys_path, resolve_persona,
 };
-pub use secrets::{
-    identity_seed_locked_at_startup, load_identity_seed, load_identity_seed_read_only,
-    relock_wallet_after_manual_unlock, save_identity_seed, unlock_wallet_with_auto_os,
-    wallet_local_secrets_locked,
-};
-
 #[cfg(test)]
 mod tests {
     use super::test_support::*;

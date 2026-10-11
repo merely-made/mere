@@ -16,16 +16,30 @@ use std::fmt;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 
-use castellan::reticulum::grant::{SitedStationGrant, SitedStationGrantError};
-use pandect::{DeviceId, RemoteAuthRevocationOutcome, revoke_remote_auth_device};
+use pandect::station_grant::{SitedStationGrant, SitedStationGrantError};
+use pandect::{DeviceId, RemoteAuthRevocationOutcome};
+
+use crate::authority::StationAuthority;
 
 /// Host-side authorization state for one running station.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct SitedStationLease {
     data_root: PathBuf,
     device_id: DeviceId,
     station_ed25519_public_key: [u8; 32],
     state: Arc<Mutex<LeaseState>>,
+    /// Who revokes: the wallet's custodian, djinn (D17).
+    authority: Arc<dyn StationAuthority>,
+}
+
+impl fmt::Debug for SitedStationLease {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("SitedStationLease")
+            .field("data_root", &self.data_root)
+            .field("device_id", &self.device_id)
+            .field("state", &self.state)
+            .finish_non_exhaustive()
+    }
 }
 
 #[derive(Debug)]
@@ -41,6 +55,7 @@ impl SitedStationLease {
         device_id: DeviceId,
         station_ed25519_public_key: [u8; 32],
         now_ms: u64,
+        authority: Arc<dyn StationAuthority>,
     ) -> Result<Self, SitedStationLeaseError> {
         let data_root = data_root.as_ref().to_path_buf();
         let grant = SitedStationGrant::load_active(
@@ -57,6 +72,7 @@ impl SitedStationLease {
                 closed: false,
                 expires_at_ms: grant.expires_at_ms(),
             })),
+            authority,
         })
     }
 
@@ -92,11 +108,11 @@ impl SitedStationLease {
                 }
                 state.expires_at_ms = grant.expires_at_ms();
                 Ok(state.expires_at_ms)
-            }
+            },
             Err(error) => {
                 self.close();
                 Err(error.into())
-            }
+            },
         }
     }
 
@@ -132,13 +148,16 @@ impl SitedStationLease {
             .closed = true;
     }
 
-    /// Revoke this device in the host wallet and close the lease immediately.
+    /// Revoke this device in the host wallet, through djinn, and close the
+    /// lease immediately.
     ///
     /// This is the local host action. Propagating the revocation to a remote
     /// unattended station remains a carrier concern, but the host process does
     /// not wait for that carrier before dropping its own authority.
     pub fn revoke(&self) -> Result<RemoteAuthRevocationOutcome, SitedStationLeaseError> {
-        let outcome = revoke_remote_auth_device(&self.data_root, self.device_id)
+        let outcome = self
+            .authority
+            .revoke_device(self.device_id)
             .map_err(SitedStationLeaseError::Storage)?;
         self.close();
         Ok(outcome)

@@ -62,7 +62,7 @@ mod session_lane;
 
 pub use crate::cabal::{CabalHandle, CabalId, CabalKey, CabalMembership};
 pub use crate::conversation_backend::{ConversationBackend, ConversationStorage};
-pub use crate::conversation_engine::{ConversationEngine, ConversationRefresh};
+pub use crate::conversation_engine::{CabalHistory, ConversationEngine, ConversationRefresh};
 pub use crate::conversation_store::{ConversationStore, ConversationStoreError};
 pub use crate::drop_export::{
     ConversationDropPriorities, ConversationDropPrivacy, ConversationDropProfile,
@@ -321,6 +321,111 @@ mod tests {
 
         // Channel isolation.
         assert!(cabal.history("links").is_empty());
+    }
+
+    #[tokio::test]
+    async fn causal_history_keeps_pruned_cross_channel_witnesses_and_reports_missing_headers() {
+        let murm = make_murm();
+        let cabal = murm.open_cabal(&CabalKey::new([0x34; 32])).await.unwrap();
+        let first = cabal.send_text_at("session", "first", 9_000).await.unwrap();
+        let bridge = cabal
+            .send_text_at("links", "between channels", 8_000)
+            .await
+            .unwrap();
+        let last = cabal.send_text_at("session", "last", 1).await.unwrap();
+        let store = murm
+            .conversation_engine()
+            .sync_store(cabal.id().as_bytes())
+            .unwrap();
+        assert!(
+            store
+                .delete_operation_payload(&bridge.0.into())
+                .await
+                .unwrap()
+        );
+        let read = cabal.causal_history("session").await.unwrap();
+        assert_eq!(
+            read.posts.iter().map(hash_post).collect::<Vec<_>>(),
+            [first, last]
+        );
+        assert!(read.pending.is_empty());
+        assert_eq!(read.unavailable_payloads, 0);
+        assert_eq!(store.operation_count().await.unwrap(), 3);
+
+        // A payload can disappear without breaking its header's causal witness.
+        assert!(
+            store
+                .delete_operation_payload(&first.0.into())
+                .await
+                .unwrap()
+        );
+        let read = cabal.causal_history("session").await.unwrap();
+        assert_eq!(read.posts.iter().map(hash_post).collect::<Vec<_>>(), [last]);
+        assert_eq!(read.unavailable_payloads, 1);
+        assert!(read.pending.is_empty());
+        assert_eq!(store.operation_count().await.unwrap(), 3);
+
+        // Header withdrawal is different: no valid complete tail can be claimed.
+        assert!(store.delete_operation(&bridge.0.into()).await.unwrap());
+        let read = cabal.causal_history("session").await.unwrap();
+        assert!(read.posts.is_empty());
+        assert_eq!(read.pending.len(), 1);
+        assert_eq!(read.pending[0].operation, last.0);
+        assert_eq!(read.pending[0].missing, [bridge.0]);
+        assert_eq!(read.unavailable_payloads, 1);
+        assert_eq!(store.operation_count().await.unwrap(), 2);
+    }
+
+    #[tokio::test]
+    async fn causal_history_withholds_cross_author_child_until_its_parent_arrives() {
+        let murm = make_murm();
+        let key = CabalKey::new([0x35; 32]);
+        let cabal = murm.open_cabal(&key).await.unwrap();
+        let alice = identity::InMemoryProvider::from_seed([0x36; 32]);
+        let bob = identity::InMemoryProvider::from_seed([0x37; 32]);
+        let parent = sign_post(
+            &alice.derive_keypair(key.as_bytes()).unwrap(),
+            *cabal.id().as_bytes(),
+            0,
+            None,
+            vec![],
+            PostKind::Text {
+                channel: ChannelName::new("session"),
+                text: "parent".into(),
+                timestamp_ms: 9_000,
+            },
+        );
+        let child = sign_post(
+            &bob.derive_keypair(key.as_bytes()).unwrap(),
+            *cabal.id().as_bytes(),
+            0,
+            None,
+            vec![hash_post(&parent)],
+            PostKind::Text {
+                channel: ChannelName::new("session"),
+                text: "child".into(),
+                timestamp_ms: 1,
+            },
+        );
+        cabal.ingest_post(child.clone()).await.unwrap();
+        let unrelated = cabal.send_text_at("session", "unrelated", 2).await.unwrap();
+        let before = cabal.causal_history("session").await.unwrap();
+        assert_eq!(
+            before.posts.iter().map(hash_post).collect::<Vec<_>>(),
+            [unrelated]
+        );
+        assert_eq!(before.pending[0].operation, hash_post(&child).0);
+        assert_eq!(before.pending[0].missing, [hash_post(&parent).0]);
+        cabal.ingest_post(parent.clone()).await.unwrap();
+        let after = cabal.causal_history("session").await.unwrap();
+        let ids: Vec<_> = after.posts.iter().map(hash_post).collect();
+        assert_eq!(ids.len(), 3);
+        assert!(
+            ids.iter().position(|id| *id == hash_post(&parent)).unwrap()
+                < ids.iter().position(|id| *id == hash_post(&child)).unwrap()
+        );
+        assert!(after.pending.is_empty());
+        assert!(cabal.causal_history("").await.is_err());
     }
 
     #[tokio::test]

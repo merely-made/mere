@@ -1,0 +1,22 @@
+# cargo-deny configuration for mere.
+#
+# Today it holds one rule, the custody boundary (dramatis repo plan, rulings
+# D4 and D16): castellan keeps every secret at rest and in hand (the vault,
+# its storages and unlock ladder, the SSH agent, the wallet's seeds and
+# private epochs), so only the resident, djinn, may link it. Anything else
+# reaches identity and secrets by calling djinn (D5).
+#
+#   cargo deny check bans
+#
+# Passes since DR-C: graphshell's keeper adapters moved into djinn (D15) and
+# signalman's station grants go through djinn's custody route (D17).
+
+[graph]
+all-features = true
+
+[bans]
+multiple-versions = "allow"
+wildcards = "allow"
+deny = [
+  { crate = "castellan", wrappers = ["djinn"], reason = "castellan is secret custody; only the resident (djinn) links it (dramatis repo plan, D4, D16)" },
+]

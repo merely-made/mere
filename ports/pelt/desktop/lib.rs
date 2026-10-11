@@ -9,6 +9,12 @@
 //! above `genet-host-api` and below the UI chrome crate.
 
 mod appearance;
+#[cfg(feature = "livery")]
+mod appearance_editor;
+#[cfg(feature = "livery")]
+pub use appearance::{
+    default_appearance_store_path, default_theme_library_path, load_appearance_store,
+};
 #[cfg(all(feature = "livery", target_os = "windows"))]
 mod dx12_surface;
 #[cfg(feature = "livery")]

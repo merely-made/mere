@@ -204,11 +204,10 @@ impl RemoteSessionClaim {
         if self.server_peer != admission.server_peer {
             return Err(RemoteClaimError::WrongServer);
         }
-        if admission
-            .board
-            .devices()
-            .master_of(&admission.server_author)
-            != Some(admission.server_peer)
+        // The server answers as its own mesh author (vault lock plan, ruling
+        // 92), and that author must be an attested device.
+        if admission.server_peer != admission.server_author
+            || !admission.board.devices().is_attested(&admission.server_author)
         {
             return Err(RemoteClaimError::UnattestedServer);
         }
@@ -226,7 +225,9 @@ impl RemoteSessionClaim {
         if job.posted_by != self.client {
             return Err(RemoteClaimError::NotJobPoster);
         }
-        if admission.board.devices().master_of(&self.client) != Some(admission.connected_peer) {
+        if admission.connected_peer != self.client
+            || !admission.board.devices().is_attested(&self.client)
+        {
             return Err(RemoteClaimError::WrongClientPeer);
         }
         if job.spec.as_deref().map(|spec| &spec.resource) != Some(admission.expected_resource) {
@@ -315,7 +316,13 @@ mod tests {
             self.author.public_key().to_bytes()
         }
 
+        /// The transport address: the mesh author key (ruling 92).
         fn peer_id(&self) -> [u8; 32] {
+            self.author_id()
+        }
+
+        /// The address transports used before ruling 92.
+        fn master_id(&self) -> [u8; 32] {
             self.provider.master_public_key().to_bytes()
         }
 
@@ -519,6 +526,35 @@ mod tests {
         wrong_server.server_author = fixture.stranger.author_id();
         assert_eq!(
             fixture.claim().authorize(&wrong_server),
+            Err(RemoteClaimError::UnattestedServer)
+        );
+    }
+
+    /// Ruling 92's control: a device is addressed by its author key, so one
+    /// answering as its master, the address transports used before, is
+    /// refused on either side.
+    #[test]
+    fn a_device_answering_as_its_master_is_refused() {
+        let fixture = Fixture::new();
+        assert_eq!(
+            fixture
+                .claim()
+                .authorize(&fixture.admission(fixture.poster.master_id())),
+            Err(RemoteClaimError::WrongClientPeer)
+        );
+
+        let at_master = fixture.signed_by(
+            &fixture.poster.author,
+            MESH,
+            fixture.lease,
+            0,
+            fixture.server.master_id(),
+            2,
+        );
+        let mut admission = fixture.admission(fixture.poster.peer_id());
+        admission.server_peer = fixture.server.master_id();
+        assert_eq!(
+            at_master.authorize(&admission),
             Err(RemoteClaimError::UnattestedServer)
         );
     }

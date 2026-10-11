@@ -1,0 +1,23 @@
+{
+  "success": true,
+  "modes": [
+    {
+      "mode": "light",
+      "bg": "rgb(225, 231, 252)"
+    },
+    {
+      "mode": "dark",
+      "bg": "rgb(9, 12, 26)"
+    },
+    {
+      "mode": "hc_light",
+      "bg": "rgb(238, 245, 255)"
+    },
+    {
+      "mode": "hc_dark",
+      "bg": "rgb(0, 0, 3)"
+    }
+  ],
+  "errors": [],
+  "productStoragePreserved": true
+}

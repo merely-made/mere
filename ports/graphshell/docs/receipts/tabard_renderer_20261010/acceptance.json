@@ -1,0 +1,28 @@
+{
+  "success": true,
+  "renderer_rev": "491c376cf2b01fc11132cf8f86419dec114ae032",
+  "genet_rev": "7422e90613f9017e5bb790e3acb48f61776b2eda",
+  "wasm_sha256": "ad7da0952ebd706da4ccbad1be3d917724d0902456e92f85c69d75dc92a4d613",
+  "wasm_bytes": 438002016,
+  "browser": "152.0.7977.83",
+  "adapters": [
+    {
+      "options": {
+        "powerPreference": "high-performance"
+      },
+      "vendor": "amd",
+      "architecture": "gcn-5",
+      "device": "",
+      "description": "",
+      "fallback": false
+    }
+  ],
+  "scenario_frames": 97,
+  "scenario_captures": 8,
+  "inspected_images": 23,
+  "errors": [],
+  "product_storage_preserved": true,
+  "review": "All23 original PNGs reviewed via image/png MIME. Actual graph/chrome across4 modes, authored CSS/custom mode, corrupt intake preservation, fresh reload, embedded host ownership, application tree/host tree, main controls and narrow layouts remain visible. Color/pixel ledger guards against blank output; this is not formal accessibility contrast qualification.",
+  "latest_gpu_reset_report": "Kernel_2026-10-10-014641_Q-PC.gpuRestart",
+  "new_gpu_reset": false
+}

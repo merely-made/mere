@@ -1,0 +1,246 @@
+{
+  "schema": "graphshell.hosted-camera-recovery-receipt/v1",
+  "recorded_at": "2026-10-09T06:26:05.441805+00:00",
+  "qualification_status": "passed",
+  "qualification_base": "6a7c7d8fa (main dafacc25c) plus camera/focus sources identified below",
+  "scope": "One-shot camera framing of visible placement and selection; retained keyboard focus; bounded hosted manifest fixture. No saved scene, ambient lens implementation, large-graph performance, transfer budget or deployment claim.",
+  "provider": {
+    "genet": "15713014e2e23b887360471552f75f60684f5384",
+    "vello": "865cbf419668a6fb5b5e96ea54eaaf9be160fd92"
+  },
+  "checks": {
+    "rootstock_library": {
+      "passed": 73,
+      "command": "cargo test --locked -p cambium-rootstock --lib -j2",
+      "focus_regression": "accessibility_tests::accessibility_sync_tracks_focus_changes_and_clear_without_hover"
+    },
+    "pictograph_framing": {
+      "passed": 6,
+      "command": "cargo test --locked -p pictograph --no-default-features --features canvas canvas::tests::framing --lib -j2"
+    },
+    "graphshell_host_input": {
+      "passed": 8,
+      "command": "cargo test --locked -p graphshell --no-default-features --features web host_dataset_view --lib -j2"
+    },
+    "legacy_zoom_command": {
+      "passed": 1,
+      "command": "cargo test --locked -p graphshell --no-default-features --features web canvas_controls --lib -j2"
+    },
+    "scenomise": {
+      "passed": 162,
+      "command": "cargo test --locked -p scenomise -j2"
+    },
+    "cargo_declaration_exporter": {
+      "passed": 4,
+      "command": "python3 scripts/test_export_grouped_cargo.py"
+    },
+    "viewer": {
+      "result": "passed",
+      "command": "cargo build --locked --target wasm32-unknown-unknown --no-default-features -j2",
+      "directory": "ports/graphshell/web"
+    },
+    "main_page_without_gpu_physics": {
+      "result": "passed",
+      "command": "cargo check --locked --target wasm32-unknown-unknown --no-default-features --features main-page -j2",
+      "directory": "ports/graphshell/web"
+    }
+  },
+  "browser": {
+    "runs": [
+      "nested-groups",
+      "camera-recovery",
+      "flat-site",
+      "unknown-grouping"
+    ],
+    "keyboard": true,
+    "headed": true,
+    "width": 1440,
+    "height": 1000,
+    "browser": "152.0.7977.83",
+    "adapter": {
+      "vendor": "amd",
+      "architecture": "gcn-5",
+      "device": "",
+      "description": ""
+    },
+    "launch_flags": [
+      "--enable-unsafe-webgpu"
+    ],
+    "shader_hooks": false,
+    "scenario_results": {
+      "nested-groups": {
+        "result": "ok",
+        "page_errors": [],
+        "gate_failures": [],
+        "failures": []
+      },
+      "camera-recovery": {
+        "result": "ok",
+        "page_errors": [],
+        "gate_failures": [],
+        "failures": []
+      },
+      "flat-site": {
+        "result": "ok",
+        "page_errors": [],
+        "gate_failures": [],
+        "failures": []
+      },
+      "unknown-grouping": {
+        "result": "refused",
+        "page_errors": [],
+        "gate_failures": [],
+        "failures": []
+      }
+    },
+    "keyboard_checks": {
+      "disabledTab": "Restore arrangement",
+      "enabledTab": "Fit selection",
+      "graphFocus": {
+        "role": "group",
+        "tabindex": "-1",
+        "text": "DragPinDragPinDragPinDragPinDragPinDragPin"
+      },
+      "narrowKeyboard": true
+    },
+    "narrow_viewport": [
+      420,
+      800
+    ],
+    "capture_gate": "Original strict detail checks on three group captures, two camera captures and flat S1 capture.",
+    "framing_observations": "Entered view has nine nodes including two external context representatives. Recovery reaches layout-outside=0 (centres only), retains geometry/picked/nodes/edges, holds camera/zoom through 60-frame waits, and centres the singleton within one pixel."
+  },
+  "sources": {
+    "crates/cambium/cambium-rootstock/src/frame.rs": {
+      "bytes": 38713,
+      "sha256": "0c9abfe7a69cce6d6bbb8653804cf4adaa78b3c2d0a163c5b560573288f1e2ea"
+    },
+    "crates/cambium/cambium-rootstock/src/lib.rs": {
+      "bytes": 40429,
+      "sha256": "41406041c8d8957c2a82145ba5c9a00af91e8f4a251249b62a849defe21c1146"
+    },
+    "crates/cambium/cambium-rootstock/src/accessibility_tests.rs": {
+      "bytes": 4112,
+      "sha256": "3caf459edb3b37d2869cc1aa4c03c2377ec41b205ae049832cbf91fca2c05e6e"
+    },
+    "crates/canvas/pictograph/src/canvas.rs": {
+      "bytes": 44775,
+      "sha256": "156cdcccce13d5f139a0cc53d3c7431e76ab83a3dbeb31774f6fcca618d0bd88"
+    },
+    "crates/canvas/pictograph/src/canvas/tests.rs": {
+      "bytes": 2334,
+      "sha256": "9f44662a6163c639624efa4605d2b04c7b44228cd4afa637dac4ac10390bb3a4"
+    },
+    "crates/canvas/pictograph/src/canvas/framing.rs": {
+      "bytes": 4171,
+      "sha256": "135834f63b4cb3acbf414b8e020890fb4073599425fab75599531953e8112ab7"
+    },
+    "crates/canvas/pictograph/src/canvas/tests/framing.rs": {
+      "bytes": 4931,
+      "sha256": "1eae44e5bb3ce21244d9dd1a54cdfe76064382f5ecd9a57a92fb3bfbac972c73"
+    },
+    "ports/graphshell/src/canvas_controls.rs": {
+      "bytes": 4185,
+      "sha256": "683bd465982bcf4c3fe9fc98a27930e850dbff2a3c25bf072bdb1b6ee5b95bd5"
+    },
+    "ports/graphshell/src/web_tree.rs": {
+      "bytes": 48942,
+      "sha256": "6850a63f68091897985761b3e63679df27c96063c5cd1e38d3b4d81706fa2107"
+    },
+    "ports/graphshell/src/web_tree/controls.rs": {
+      "bytes": 8884,
+      "sha256": "577e5236e520c495a04d83f75ab7001e57197abaf42d87d3337936c469cd5fc9"
+    },
+    "ports/graphshell/src/web_tree/lane.rs": {
+      "bytes": 49507,
+      "sha256": "6f1e605b13e4230e18e6b25c6e1cebc25800523d426f8d3cfd1faf53f1927381"
+    },
+    "ports/graphshell/web/scenarios/hosted_camera_recovery.scn": {
+      "bytes": 1553,
+      "sha256": "0c524a023ef4079caa6e7c182d697562c67cdeddbb17999bcf846c09d6f5d77f"
+    },
+    "ports/graphshell/web/fixtures/grouped-manifest-components.json": {
+      "bytes": 51298,
+      "sha256": "5b853515896c986a5347a72100794b8b698718c572462725a72e2e18ae51f48d"
+    },
+    "Cargo.lock": {
+      "bytes": 456947,
+      "sha256": "f5344f86644ec2b3912781eb472067bf3b34f5c8c57e36a62a3c409229aa125a"
+    },
+    "ports/graphshell/web/Cargo.lock": {
+      "bytes": 223829,
+      "sha256": "f52600158d5fde5bdbcb74dbaf68b626d84cdceb70988f7da00129718bb82f6e"
+    }
+  },
+  "bundle": {
+    "graphshell_web_bg.wasm": {
+      "bytes": 218270150,
+      "sha256": "52ece816e5bbb80901e10bf06381cfa3b08ea9b3f85ea1b1fe936fee635ba5ca"
+    },
+    "graphshell_web.js": {
+      "bytes": 119359,
+      "sha256": "5f0214b7ad87b757dd82e05422c2e079d8a3fc3fab570d4f2f31ec71a40170ee"
+    }
+  },
+  "captures": {
+    "camera-recovery.png": {
+      "bytes": 180898,
+      "sha256": "2d4f9b347164cd228c342ef955a121b108dad0fcbf503dd55d0b1d7e0aa39ce8"
+    },
+    "flat-site.png": {
+      "bytes": 200652,
+      "sha256": "20527c0c70e472aa1e1f8961cd3a09670f3b4a5aa869f64116af74066f746600"
+    },
+    "groups_collapsed.png": {
+      "bytes": 263339,
+      "sha256": "365cb6ec5bc69ff605c28f2758caebb0907d69cb9dddc2cdb0bdd1622360563a"
+    },
+    "groups_entered.png": {
+      "bytes": 331038,
+      "sha256": "1d66cef80eea04c2015ae242376f3fe3a7a409339963c89abe9aeb6bb7f0c4a4"
+    },
+    "groups_expanded.png": {
+      "bytes": 308616,
+      "sha256": "1845c1f605525bae1eb2e2bea79b344af54073d76c620ac22b6ba043ff340bab"
+    },
+    "hosted_selection_fit.png": {
+      "bytes": 245519,
+      "sha256": "72d2b23064af051665713faddbf9417ace9e7caadee246791e9a8a0ab7877d26"
+    },
+    "hosted_visible_fit.png": {
+      "bytes": 254976,
+      "sha256": "e3fa5596f3817ed870d6e4558b9e9e0accb1d601198471bb19eecee700d0960d"
+    },
+    "keyboard-selection-fit.png": {
+      "bytes": 180893,
+      "sha256": "9261e4ba8690b3e36a3853da4dbc7dc9402ab052a8a7cdf88b5c45e14205bf16"
+    },
+    "narrow-selection-fit.png": {
+      "bytes": 91415,
+      "sha256": "97c356cd720360ba2fa1dccb700af134d9635205090322ceb17fb9c806f163ba"
+    },
+    "narrow-visible-fit.png": {
+      "bytes": 98598,
+      "sha256": "bd0c3a3ec0c0221c16ec9e2a0d70bd551fd5a718cf80e46b3fd5971da0965b6b"
+    },
+    "nested-groups.png": {
+      "bytes": 194044,
+      "sha256": "39e63b61caab44d7e17e845bc35d76bf033561713f9a17b5fc4bb15976f69222"
+    },
+    "tree_host_dataset.png": {
+      "bytes": 263632,
+      "sha256": "c3b8f950647dd283b25f0ca6075a1c04847779dd760962e45efc8d2f9ea83cf8"
+    },
+    "unknown-grouping.png": {
+      "bytes": 66620,
+      "sha256": "ee126dbc46e7fcacc754c3bc19c5fe40b84c22a7a31d12893f2e9d8ebb4004bb"
+    }
+  },
+  "harness_history": [
+    "First camera script used unsupported strict comparison operators; corrected to >= and <= before execution.",
+    "Camera and existing dataset scenarios passed, but the combined synthetic-pointer/mirror-keyboard sequence initially disagreed about focus. Fresh focus and an explicit focus transition passed as diagnostics, not as final qualification.",
+    "The graph leaf now advertises its retained keyboard focusability through tabindex. Rootstock accessibility sync now reads current runner focus instead of the hover/restyle cache; a native regression covers focus changes and clear without hover while leaving that cache untouched.",
+    "The original combined sequence verifies graph DOM focus, disabled Tab skip, enabled Tab reach, Enter and narrow keyboard use. No focus-transition workaround or shader substitution is used."
+  ],
+  "visual_boundary": "Screenshots display recovered glyphs and reachable controls. Tiny glyphs, missing on-canvas labels, dense relationship/group chrome, and large graphs at the 0.1 zoom floor remain outside this qualification."
+}

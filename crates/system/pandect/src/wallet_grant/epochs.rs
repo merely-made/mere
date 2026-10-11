@@ -84,7 +84,7 @@ pub fn blinded_slot_id(
     BlindedSlotId(*blake3::keyed_hash(&blinding_key, &certificate.0).as_bytes())
 }
 
-pub(crate) fn wrapped_epoch_aad(persona_id: PersonaId, epoch_id: KeyEpochId) -> Vec<u8> {
+pub fn wrapped_epoch_aad(persona_id: PersonaId, epoch_id: KeyEpochId) -> Vec<u8> {
     let mut aad = Vec::with_capacity(16 + 16 + 30);
     aad.extend_from_slice(b"mere.wallet.private-epoch.v1");
     aad.extend_from_slice(persona_id.as_uuid().as_bytes());

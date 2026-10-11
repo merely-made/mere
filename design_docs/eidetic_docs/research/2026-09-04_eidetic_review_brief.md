@@ -70,7 +70,7 @@ domain the crate is named for — `PageRef`, `TraceEvent`, `BrowsingTrace`,
 `IrohFetcher` are thin `Backend` / `BlobFetcher` implementations.
 `hagiograph` (`hagiograph/src/lib.rs`) is 26 lines of doc comment ending
 "No implementation yet." Its only appearance elsewhere in the workspace is a
-prose mention in a doc comment at `ports/distillery/alembic/src/lib.rs:33`.
+prose mention in a doc comment at `crates/distillery/alembic/src/lib.rs:33`.
 
 **`mere-eidetic-search`** — `index.rs` (546) is `TrailIndex`; `spec.rs`
 (211) is the `SearchIndexSpec` sidecar and format-compatibility check;

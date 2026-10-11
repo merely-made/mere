@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-09",
+  "upstream_base": "0669a9192ba98c686fdd37bbefe2021d460566cc",
+  "scope": "Exact copied source and manifests of three crates in an isolated workspace; not a full repository or root lockfile qualification.",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "unit_tests_passed": 57,
+  "doc_tests_passed": 1,
+  "commands": [
+    "cargo test --workspace",
+    "cargo build --example presentation_rules"
+  ],
+  "qualified_lockfile_sha256": "8acdd84ab8c503b609d0d3f760195c3ca64a7678b824f06bf11b690625b7c0cc",
+  "source_sha256": {
+    "crates/cambium/scenes/sceno/Cargo.toml": "5beca8c495463edfca566782699ec138fc109d8d0570230735cd59231a144b42",
+    "crates/cambium/scenes/sceno/src/fold.rs": "db65269a752439fbc8e04bd6bdbdd4305daab259e0786a41b8a831a99401d03b",
+    "crates/cambium/scenes/sceno/src/footprint.rs": "31b5806ad0b8289050efad84600f771c2cf2448ddb38bb61291b5209d8fd0739",
+    "crates/cambium/scenes/sceno/src/geometry.rs": "e5750eca5ede9e58493629a6027ff384e71c83c7b55cd6ce394e2521a6c86a43",
+    "crates/cambium/scenes/sceno/src/lib.rs": "5ec8c9c6a7dd51b11c51e8121e1b67a6441d500df38720be779a953e54123705",
+    "crates/cambium/scenes/sceno/src/scene.rs": "578a17571192be46677d0e0ff20684696e824893276a82c08cbef89bf26d2b24",
+    "crates/cambium/scenes/sceno/src/score.rs": "ae3f42624d50c929d2ff85a2de5cd5e8f8f7474f1b77e9b548820b20e96a0052",
+    "crates/cambium/scenes/scenograph/Cargo.toml": "d06c02bda5b9bfe3c4c0f3ff6a03991e7f934a9031f4159bf993e07c3ed7fef4",
+    "crates/cambium/scenes/scenograph/examples/presentation_rules.rs": "a4bb98a936e1169b57f8ca73e9da7c89b438ba72c2eaf6e9913f1891bce36f05",
+    "crates/cambium/scenes/scenograph/src/dataset.rs": "22185b7f7e7fb117d866af168eb4665b97807433b62d125fb7d3d2879f3dda98",
+    "crates/cambium/scenes/scenograph/src/lib.rs": "c171830dabf1fc705160af561e872f54265f00831ca556b92a6b380050905052",
+    "crates/cambium/scenes/scenograph/src/options.rs": "5626033cac9548d8ea76d4eb827e0939fcf3529300f4e1a4b18006babff53049",
+    "crates/cambium/scenes/scenograph/src/presentation.rs": "a7d556b5564060d19c9dd75628850051c9af39b0c243c6ea27a9ab276229e034",
+    "crates/cambium/scenes/scenograph/src/relationship.rs": "b13e16723a27fd361f8619b5720c7d432c616ed2a15b1fb06145d0283b5f17d6",
+    "crates/cambium/scenes/scenograph/src/swatch.rs": "df2056c13546a6d08101ce64cefc87ec74619f6c216344070519b750b40d7b79",
+    "crates/forme/curation/Cargo.toml": "072aa340371292b3b3fd4675370fb3de7679c28ad85033acc3e28595d1a770d4",
+    "crates/forme/curation/src/lib.rs": "a502860fb79a6e115ffa072c7be23e93f967f30c01dcb87856f6dfb77ce1b2d6"
+  }
+}

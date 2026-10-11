@@ -25,8 +25,12 @@
 //! named PNG files, scripted file chooser and `RESULT ok` text sentinel. Native
 //! file reading is supplied by the host. Both formats use the same frame pump,
 //! deferred clicks, capture collection and product acceptance hooks. Text mode
-//! preserves its 120-frame capture grace and accepts uniform nonblank frames;
-//! the JSON constructor defaults to eight frames and detail checks.
+//! preserves its 120-presented-frame capture grace and accepts uniform nonblank
+//! frames; the JSON constructor defaults to eight frames and detail checks.
+//! Failed native acquisition neither ticks scenarios nor consumes that grace.
+//! Readbacks continue polling, while a separate ten-second continuous native
+//! presentation stall fails with attempt/presentation counts in the receipt.
+//! Explicit windowless harness turns retain their synthetic scenario clock.
 //! `Lane::with_capture_backend` lets a browser supply nonblocking readback
 //! and its own bounded grace period. The product receives pixels through
 //! `Product::inspect` and publishes its receipt through `Product::complete`.

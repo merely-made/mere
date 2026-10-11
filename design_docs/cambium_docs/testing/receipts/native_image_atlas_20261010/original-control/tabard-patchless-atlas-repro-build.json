@@ -1,0 +1,31 @@
+{
+  "command": [
+    "rustc",
+    "+1.98.1",
+    "--edition=2024",
+    "/tmp/tabard-patchless-atlas-repro.rs",
+    "-o",
+    "/tmp/tabard-patchless-atlas-repro",
+    "-L",
+    "dependency=/Users/markik/Code/targets/knot-tabard-apps/debug/deps",
+    "--extern",
+    "genet_render_host=/Users/markik/Code/targets/knot-tabard-apps/debug/deps/libgenet_render_host-22828c93ddf6bbfb.rlib",
+    "--extern",
+    "netrender=/Users/markik/Code/targets/knot-tabard-apps/debug/deps/libnetrender-9687927825bbbd1f.rlib",
+    "--extern",
+    "wgpu=/Users/markik/Code/targets/knot-tabard-apps/debug/deps/libwgpu-99cd5a821a7b1d28.rlib",
+    "--extern",
+    "png=/Users/markik/Code/targets/knot-tabard-apps/debug/deps/libpng-fe762255abb3d040.rlib",
+    "--extern",
+    "serde_json=/Users/markik/Code/targets/knot-tabard-apps/debug/deps/libserde_json-4ab04cffaa7b5895.rlib"
+  ],
+  "source_sha256": "f923289b1778216153f0a12f848b8c798d0f061060c8d074923cb5073836d273",
+  "binary_sha256": "03c558bdfef6f985e8182e6b02cef2097408bd395cdc739dae04639cb36635e8",
+  "rlib_sha256": {
+    "genet_render_host": "ce3f59dbd3d58c25b6eeee2b8008948aea6bfad23695d6cb0efdf1e7bce591ec",
+    "netrender": "6b772721c2f7765991411a576c4de88c230911f944c24e4c9258710d1c415ec7",
+    "wgpu": "72a1e6cc3ccd3e226e493625a8f6dd96d387d1206a1513ae9383dfe27db13272",
+    "png": "732645bd25c302153e07fdb8b79c0d862da877700d5e53c261c8621268a87a51",
+    "serde_json": "5319faf917a63a6926bc235b0532718012814ea9803654a202e6850d0ec9d723"
+  }
+}

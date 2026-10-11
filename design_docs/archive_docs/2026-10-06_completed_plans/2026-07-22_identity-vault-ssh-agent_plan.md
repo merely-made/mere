@@ -5,7 +5,7 @@ executed 2026-07-24 (`crates/dramatis/personae`). The resident host the
 2026-07-22 ruling called for has landed: castellan hosts `VaultAgent` with
 approval (`ports/castellan/src/authority.rs`, `b53ba480`, 2026-08-14). V4's
 passwords and TOTP now have a taxonomy under the
-[chatelaine plan](../../dramatis_docs/implementation_strategy/2026-10-01_chatelaine_cxf_plan.md),
+chatelaine plan (`repos/dramatis/design_docs/2026-10-01_chatelaine_cxf_plan.md`),
 whose P1–P3 have landed (`da3c50bc`, `3e4992ec`, `ff68e86c`); see the open
 question under V4. V5 sync remains deferred: no replicated `IdentityStorage`
 exists.
@@ -120,7 +120,7 @@ need before building; §3's `Custom` slot may already cover it.
 
 **Corrected 2026-10-06 (S14 pass):** V4 is no longer only demand-driven.
 Passwords and TOTP have a taxonomy under the
-[chatelaine plan](../../dramatis_docs/implementation_strategy/2026-10-01_chatelaine_cxf_plan.md),
+chatelaine plan (`repos/dramatis/design_docs/2026-10-01_chatelaine_cxf_plan.md`),
 whose P1–P3 have landed (`da3c50bc`, `3e4992ec`, `ff68e86c`).
 
 **Open, raised by the S14 pass (2026-10-06):** does the chatelaine plan now

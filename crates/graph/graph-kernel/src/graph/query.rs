@@ -700,7 +700,10 @@ impl Graph {
         has_path_connecting(&UndirectedAdaptor(self.inner.inner()), from, to, None)
     }
 
-    /// Weakly connected components (undirected projection).
+    /// Weakly connected components of the surface stratum (undirected projection),
+    /// a topology metric like [`Self::orphan_node_keys`]. Resource relations and
+    /// shown bindings do not join here; the semantic Component is
+    /// [`Self::component_members`].
     pub fn weakly_connected_components(&self) -> Vec<Vec<NodeKey>> {
         let mut visited = HashSet::new();
         let mut components = Vec::new();

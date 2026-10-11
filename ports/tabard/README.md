@@ -1,93 +1,110 @@
-# tabard
+# Tabard appearance workshop
 
-Tabard is the theme-authoring port of the Genet engine.
+Tabard is the standalone appearance workshop. [`desktop`](desktop) mounts the
+shared [`tabard-workshop`](../../crates/cambium/tabard-workshop) surface in a
+native window. Its retained authoring state, controls, specimens, tests and
+fixtures live in that Cambium package, so other applications can embed the
+same workshop. The shared theme, draft and file-library APIs live in
+[`crates/system/tabard`](../../crates/system/tabard). See the
+[embedding guide](../../crates/cambium/tabard-workshop/README.md) for host seams.
 
-A tabard is the garment that displays a household's livery. This port is where
-a household's livery gets authored: seeds in, liveries out. It composes what
-already interlocks: [tinct](https://crates.io/crates/tinct) derives the full
-palette from a few seed colours, [illume](https://crates.io/crates/illume)
-emits syntax spans that the derived syntax palette colours, and palette-aware
-icons can recolour at render time.
+The workshop edits an isolated user draft. Pick a primary, secondary, tertiary
+or neutral seed, adjust its hue/saturation/lightness, or enter a six-digit RGB
+hex color and press **Apply color**. RGB edits preserve the seed's existing
+alpha. Incomplete hex input stays visible and blocks Save, export and navigation
+until corrected or discarded. Locked accent harmony explains dependent hues
+and keeps their saturation/lightness editable.
 
-Tabard authors portable theme artifacts. Livery consumes stylesheets Tabard
-emits. Pelt has an optional named preview receipt for those artifacts, but does
-not own their model.
-Tinct remains the small, serde-only derivation crate. Illume continues to name
-syntax spans rather than decide their appearance.
+Inspect the specimens in light, dark or either high contrast mode. Preview
+mode is local to the workshop and does not activate the theme in another host.
+**Use preview as default** authors the theme's standard light/dark and contrast
+defaults; changing the preview mode alone does not change those defaults.
 
-## Current artifact
+The **Application stylesheet** preview is a separate real HTML document with
+its own Livery cascade and media device. **Edit this mode's stylesheet** opens
+a CSS field; **Apply to preview** applies its exact text to the selected mode,
+and **Clear to derived** removes the override. Save also applies staged CSS.
+Ordinary selectors such as `body`, `.toolbar`, `.address-field`, `button`,
+`h1`, `p`, `a` and `.token-keyword` target the checked-in
+[application fixture](../../crates/cambium/tabard-workshop/fixtures/application.html). Its
+[fixture rules](../../crates/cambium/tabard-workshop/fixtures/application.css) consume `--tabard-color-*` and
+`--tabard-syntax-*` properties with neutral fallbacks. Without an override,
+Tabard supplies the selected mode's derived properties. With an override,
+the exact authored sheet replaces that derived sheet and follows the fixture
+rules in the cascade. The editor frame keeps its own appearance. CSS recovery
+diagnostics come from the shared Livery parser; valid rules can still render
+when another rule is rejected.
 
-The first implementation is deliberately portable and library-only:
+Undo, Redo and Discard operate on the draft. Undo first discards unapplied hex
+or CSS input when present, then earlier applied edits can be undone. Choosing a
+built-in creates a user copy. **New copy** creates another identity. Switching
+themes, importing, deleting or reopening the library requires saving or
+discarding edited work, including a newly imported theme or explicit new copy.
+Save validates a candidate registry and persists authored definitions before
+accepting the new save point. A failed write leaves the draft, history and
+registry intact. **Delete theme…** asks for confirmation and removes only a
+saved user definition; built-ins remain protected.
 
-- Theme owns an id, a name and tinct::Seeds, plus the registry's derivation
-  settings (source, high contrast, harmony, per-mode sheets), then derives
-  Tinct's normal-contrast base palette. It is also the registry's authored
-  theme, which was a separate ThemeDef until 2026-09-24.
-- The theme module holds the host theme model, moved from Mere's registry on
-  2026-09-24: ThemeTokenSet and its ThemeRegistry, seed derivation, custom
-  modes, chrome colours, edge-style tokens, and the theme a lens carries.
-- theme::choice holds the user's theme choice (a theme id and an optional
-  mode) and where it is kept: the store seam, an in-memory store, and an
-  atomic JSON file store that still reads Pelt's one-line appearance files.
-- The smolweb module holds the smolweb document palettes, which Nematic's views
-  and Mere's document lanes each defined until 2026-09-24: SmolwebTheme,
-  SmolwebPalette, and the palette choice, including the per-site tint.
-- Theme::design_tokens emits a typed DTCG 2025.10 color document. Every token
-  has an explicit color type and a structured sRGB value, while the name,
-  seeds, and derivation choice live under org.merely.tabard in $extensions.
-- Theme::css_custom_properties emits a deterministic :root stylesheet with the
-  same palette as --tabard-color-* custom properties. Livery can consume it
-  as an ordinary author sheet.
-- Theme::lagrange_palette_txt emits a deterministic `palette.txt` for
-  Lagrange's application UI. It writes the documented `# Dark` and `# Light`
-  sections in Lagrange's neutral, accent, and status-label order using
-  `#RRGGBB` values. The return value carries diagnostics for Tabard roles
-  which collapse into one Lagrange label or have no representation. This
-  exporter does not change Lagrange page themes, which are selected separately
-  from a site palette seed.
+**Import theme…** accepts one complete theme JSON file into an unpublished
+draft. A built-in marker or occupied identity produces a fresh user copy,
+preserving existing definitions. **Export…** captures the current draft,
+including unsaved edits, for the host to write to a selected destination.
+Theme JSON preserves seeds, alpha, harmony, default mode flags and exact mode
+stylesheet text using the existing `Theme` schema; JSON formatting is generated
+by the shared serializer. CSS colors and DTCG tokens export the selected
+canonical mode through Tabard's shared mode resolver, including high contrast.
+Those derived formats refuse a selected custom mode or a nonempty stylesheet
+attached to the selected mode; export Theme JSON to preserve such appearances.
+Export does not save the library or clear Undo history. Existing destinations
+require **Replace file** confirmation. The authored library, workshop settings
+and their lock files cannot be used as export destinations.
 
-  The emitted label list follows the [v1.21.1 help vocabulary](https://raw.githubusercontent.com/skyjake/lagrange/v1.21.1/res/about/help.gmi).
-  That release's stock [`loadPalette_Color` table](https://raw.githubusercontent.com/skyjake/lagrange/v1.21.1/src/color.c)
-  omits the documented `yellow` and `magenta` labels, so the artifact retains
-  those lines for documented-shape compatibility and reports a
-  `StockVersionIgnored` diagnostic for each mode. A headed load receipt for a
-  specific Lagrange build is required before claiming that all emitted labels
-  are applied.
+The versioned library stores definitions. A separate `themes.json.workshop.json`
+file, when the library is named `themes.json`, remembers the editor's last saved
+user-theme selection and preview mode; it is not exported as theme data and
+does not activate a theme elsewhere. In-memory hosts use
+`WorkshopState::in_memory()` and save for the session. Native close requests
+offer Save and close, Close without saving, or Keep editing when user work is
+pending. Invalid input or a failed save keeps the window and draft available.
 
-Its documented projection is explicit: dark neutrals are `bg`, `surface`,
-`surface-2`, `surface-hover`, `text`; light neutrals are `text`, `text-dim`,
-`surface-2`, `surface-hover`, `surface`. The remaining labels map as
-`brown`/`orange` dim/bright variants of `primary`, and `teal`/`cyan` as
-dim/bright variants of `secondary`. `red=danger` and `green=success` are used
-only when their authored hues pass the exporter’s red/green semantic checks;
-otherwise Lagrange’s documented defaults are emitted. Lagrange’s `yellow`,
-`magenta`, and `blue` reserved colors likewise use its documented defaults.
-The repeated accent mappings, defaults, omitted Tabard roles, and discarded
-alpha are returned as diagnostics rather than hidden in the artifact.
-- Pelt's optional `tabard-preview` receipt maps those generic properties onto
-  Pelt-owned Chrome roles. It proves the shell recolors while the focused
-  document, session history, tabs, and content aperture remain held. It is not
-  a persistent appearance setting and does not recolor document content.
-- Pelt's optional `tabard-reader-preview` receipt maps the same portable
-  palette onto Reader's existing host palette. It proves a Fleece article
-  keeps its held source and route-restoration behavior while Pelt supplies the
-  Reader colors. Fleece and `genet-documents` do not depend on Tabard.
+The syntax specimen uses Cambium's read-only `highlighted_code` view: Illume
+lexes the Rust source, Cambium maps its token kinds to Tinct roles, and the
+selected mode supplies the local palette. These APIs also serve other Cambium
+consumers; unknown languages retain plain source text.
 
-Recorded 2026-08-28: both named headed Windows consumer receipts passed at
-960x640. `tabard-preview` completed after three redraws with compositor digest
-`d0affd3746b03554`; `tabard-reader-preview` completed after nine redraws with
-digest `ea505825544747b9`. The latter held a `genet.reader` Fleece article
-beside a `genet.livery` neighbor and retained the Reader inspector's lineage.
-These receipts validate consumer seams, not persistence or a platform theme
-policy.
+The reader specimen extracts the checked-in HTML fixture through Fleece,
+lowers it into Inker's shared document, and uses document-lanes and
+document-canvas for shaping, reflow and paint. Palette changes preserve its
+source document. The bounded preview exposes its extracted prose as a
+read-only image; link activation and rich reader-session accessibility are
+later capabilities. The graph specimen uses Cambium's `GraphCanvasSwatch`
+and Sprigging paint, with real pointer, hover, focus and keyboard selection.
 
-Theme::design_tokens carries Tinct's syntax palette as a color.syntax group,
-one token per syntax role, and Theme::css_custom_properties emits the same
-roles as --tabard-syntax-* properties.
+The chrome, reader, syntax and graph specimens remain typed seed-derived
+appearances. Arbitrary authored CSS applies to the isolated application
+document; it is not projected into reader or graph paint roles. Imported custom
+modes with attached stylesheets can be previewed and edited there. Clearing a
+custom sheet returns the preview to the theme's standard default mode.
+Custom-mode calculator authoring and evaluation, Turnstone integration,
+interactive reader navigation,
+structured accessibility for the two document images and a full graph
+workspace remain open. The bounded document previews expose names derived
+from their actual source content, rather than presenting a rich reader or
+interactive application session.
 
-Icon policy, imports, a DTCG resolver and a Geopard exporter are not here yet;
-the host theme model and its persistence arrived with the theme module.
+Run the desktop workshop from the repository root:
 
-## License
+```sh
+cargo run -p tabard-desktop
+```
 
-MPL-2.0 (see the repository `LICENSE`)
+Use `-- --library /path/to/themes.json` for a separate authored library. See
+the [desktop README](desktop/README.md) for native capture scenarios.
+
+The retained acceptance tests cover actual controls and keyboard routing,
+AccessKit names/roles, isolated computed CSS, preserved alpha, save/reload,
+native chooser/export transactions, history, close guards and failed writes:
+
+```sh
+cargo test -p cambium --features highlight -p tabard-workshop -p tabard-desktop -p tabard -p tinct
+```

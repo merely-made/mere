@@ -419,18 +419,19 @@ impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
     /// Every other attested device follows, because a peer that already fetched
     /// the blob is just as good a source and the directory knows who they are.
     /// This device is never in the list: it has already looked locally.
+    ///
+    /// Sources are author keys, which are transport addresses (ruling 92).
     fn blob_sources(&self, board: &mesh::JobBoard, posted_by: [u8; 32]) -> Vec<[u8; 32]> {
         let directory = board.devices();
-        let mut sources: Vec<[u8; 32]> = directory
-            .master_of(&posted_by)
-            .filter(|_| posted_by != self.me)
+        let mut sources: Vec<[u8; 32]> = Some(posted_by)
+            .filter(|author| *author != self.me && directory.is_attested(author))
             .into_iter()
             .collect();
         sources.extend(
             directory
                 .entries()
-                .filter(|(author, _)| **author != posted_by && **author != self.me)
-                .map(|(_, master)| *master),
+                .map(|(author, _)| *author)
+                .filter(|author| *author != posted_by && *author != self.me),
         );
         sources
     }

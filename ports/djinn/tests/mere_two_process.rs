@@ -20,6 +20,8 @@ use std::sync::Arc;
 use std::sync::mpsc::{Receiver, channel};
 use std::time::Duration;
 
+use castellan::authority::PersonaeHost;
+use castellan::custody::{IdentityVault, InMemoryStorage, Profile};
 use chirograph::{
     CarrierRequestBody, CarrierResponseBody, IntentInvocation, IntentResult, ProjectionSession,
     ProjectionSnapshot,
@@ -34,11 +36,10 @@ use graphshell::native::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants,
 use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
 use graphshell::native::app_client::AppBrokerClient;
 use graphshell::native::endpoint_catalog::ResidentEndpointCatalog;
-use graphshell::native::personae_host::PersonaeHost;
 use graphshell::session_item::{APPLY_EDITS_INTENT, ApplyEditsV1};
 use graphshell_endpoint::{IntentSink, ProjectionCatalog, ProjectionSource};
 use pandect::{CapturedDelta, mere_dir};
-use personae::{Ed25519Keypair, IdentityVault, InMemoryStorage, PersonaId, Profile, ProfileId};
+use personae::{Ed25519Keypair, PersonaId, ProfileId};
 use sceno::InstanceId;
 use uuid::Uuid;
 
@@ -176,8 +177,15 @@ async fn two_processes_edit_one_session_through_djinn_and_hear_each_other() {
     let server = {
         let (endpoint, grants, catalog) = (endpoint.clone(), grants.clone(), catalog.clone());
         tokio::spawn(async move {
-            let _ =
-                serve_app_broker(&endpoint, resident_host(), grants, 60_000, None, catalog).await;
+            let _ = serve_app_broker(
+                &endpoint,
+                std::sync::Arc::new(djinn::keeper::Keeper::new(resident_host())),
+                grants,
+                60_000,
+                None,
+                catalog,
+            )
+            .await;
         })
     };
     // Wait for the door on the mere's own route.

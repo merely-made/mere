@@ -3,7 +3,7 @@
 **Status (2026-10-06):** partially implemented. Slices A-C landed 2026-06-24, their host
 halves in meerkat, retired with it 2026-07-18 (`c5f01064`); surviving library parts:
 the codicil spine (`crates/system/pandect/src/graph_codicil.rs`) and the memory levels
-(`ports/distillery/alembic/src/memory_levels.rs`). Slice D is half landed: the
+(`crates/distillery/alembic/src/memory_levels.rs`). Slice D is half landed: the
 forgetting (`d3893dd`, `95f3a20`) and consolidation passes live in `mere-athanor`
 (`ports/distillery/athanor/src/lib.rs`, moved in `1bda73d5`). Merge landed as
 `compose_graph_codicils` (`3e828a48`, 2026-06-30). Slice E's successor, the event log

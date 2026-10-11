@@ -64,7 +64,7 @@ Mere's [Apparatus crate](../../../crates/domain/apparatus/src/lib.rs) now expose
 a renderer-independent observation store. Its older empty diagnostic groups
 remain behind the default `projection` feature; those placeholders do not
 establish a working inspection interface.
-[Alembic](../../../ports/distillery/alembic/src/lib.rs)
+[Alembic](../../../crates/distillery/alembic/src/lib.rs)
 already owns Distillery recall/workshop scope; Eidetic owns retained artifacts;
 [Armillary](../../../crates/armillary/README.md) owns actor execution and messaging.
 
