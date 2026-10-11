@@ -200,11 +200,19 @@ below says why that posture is unusual and right.
 | **AT Protocol** | PDS: a user repository of lexicon-typed records | DID | Relay firehose | — | **AppView** indexes the firehose into one application's UI | *Data-in-repos versus app-views-as-a-named-layer.* AppView is Mere's projection layer with a name; Lexicon versions records **and** APIs together, which is the score/scene versioning discipline. Difference: their AppView is a big-world server; ours is per-device and granted. |
 | **Holochain** | per-agent source chain plus a per-DNA DHT | agent keypair | DHT gossip | — | UI over the conductor's local RPC | ***Integrity versus coordinator zomes*** — deterministic validation split from effectful code by construction. That is "solver proposes, score records" as a crate-placement test. UI-over-local-RPC is Graphshell-over-endpoints. |
 | **Urbit** | Clay, a versioned filesystem | Azimuth, on-chain | Ames, encrypted p2p | — | Gall agents; Landscape | *One OS, concerns as vanes.* The closest to "storage, identity, networking, projection as one stack." Borrow the vane discipline — each concern a kernel module with a narrow API — as the post-boundary shape; the monolith and the bespoke language are the anti-pattern. |
-| **Solid** | pods (RDF, LDP) | WebID | HTTP | — | applications read and write pods directly | *Data versus app, with a universal schema.* The Drive inversion without p2p and with the up-front schema unification the family thesis rejects (a mere is a dataspace: pay-as-you-go). Little to borrow beyond the framing. |
+| **Solid** | controlled resource storages with RDF descriptions | WebID | HTTP | — | applications can read and write across storages | **Corrected 2026-10-11:** the [Solid Protocol](https://solidproject.org/TR/protocol) supports more than one storage and media-typed resources; it does not prescribe a universal application schema. Study resource discovery, metadata and access alongside Mere's domain authority, local operation, carriers and composed scenes. Shared meaning requires vocabularies or adapters in either architecture. |
 | **Willow / Meadowcap** | namespaces as (time, path, subspace) | keys only | sideloading and a general sync protocol | — | — | *Storage and capability as one layer.* Meadowcap's delegable, attenuable, provenance-chained capabilities are the thing to compare Notochord/personae grants against; `willow-rs` exists. |
 | **Spritely Goblins / OCapN** | — | petnames over global identifiers | CapTP over pluggable **netlayers** | — | — | *Capability transport over swappable substrates.* Netlayers are murm carriers; petnames are gazette's handle resolution and the insigne grammar. |
 | **Anytype** | local-first objects, types, relations; CRDTs | recovery phrase | any-sync blind relays | — | graph, sets, views | The closest *UX* analog to types-and-relations-become-views, as a monolithic product. Its "set" views are scene-shaped. |
 | **Plan 9** | everything is a file | — | 9P | — | per-process namespaces | *One resource protocol plus per-process composition.* Graphshell's endpoint protocol is 9P for projections; a per-persona namespace that mounts ports' projections is how a shell composes them. |
+
+**Research qualification (2026-10-11).** The older Solid comparison conflated
+linked-data representation with universal domain-schema agreement. That
+objection is withdrawn. The
+[family composition brief §8](../../2026-08-12_family_composition_thesis_brief.md#research-review-logical-model-and-usable-sharing-2026-10-11)
+owns the current comparison with dataspaces, iDM/iMeMex and Web Annotation.
+This is a research correction, not refreshed runtime qualification of the
+dated port inventory above.
 
 **Two findings from the table.**
 
