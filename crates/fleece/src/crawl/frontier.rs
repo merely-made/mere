@@ -15,9 +15,9 @@ use super::*;
 pub enum HostScope {
     /// Only the seed's exact host (`docs.example.com` stays on `docs.example.com`).
     SameHost,
-    /// The seed's registrable domain — its host and any subdomain
-    /// (`example.com` admits `docs.example.com`). Approximated by domain suffix; a
-    /// full Public Suffix List is a follow-on (so `*.co.uk` is over-broad today).
+    /// The seed's host and its subdomains (`example.com` admits
+    /// `docs.example.com`). This conservative suffix test does not infer sibling
+    /// hosts through a Public Suffix List.
     SameDomain,
     /// Any host. The open web; only sane with a tight depth/page cap and politeness.
     AnyHost,
@@ -71,6 +71,16 @@ pub struct CrawlPolicy {
     /// default (a focused crawl stays the seed's neighborhood); a "crawl whole site"
     /// mode turns it on. Still bounded by `max_pages`.
     pub seed_sitemap: bool,
+    /// All transport attempts, including robots, sitemap and failed requests.
+    pub max_requests: usize,
+    /// Maximum raw response bytes supplied to a request adapter.
+    pub max_response_bytes: usize,
+    /// Maximum raw response bytes across the whole explicit crawl.
+    pub max_total_bytes: usize,
+    /// Minimum interval between every request to the same host.
+    pub polite_delay: Duration,
+    /// Deadline for one adapter operation. The runtime drops its future on expiry.
+    pub request_timeout: Duration,
 }
 
 impl Default for CrawlPolicy {
@@ -78,11 +88,16 @@ impl Default for CrawlPolicy {
     /// accidental crawl is cheap and polite by default.
     fn default() -> Self {
         Self {
-            max_depth: 2,
-            max_pages: 50,
+            max_depth: 1,
+            max_pages: 25,
             max_fanout: 20,
             scope: HostScope::SameHost,
             seed_sitemap: false,
+            max_requests: 32,
+            max_response_bytes: 256 * 1024,
+            max_total_bytes: 2 * 1024 * 1024,
+            polite_delay: Duration::from_secs(1),
+            request_timeout: Duration::from_secs(30),
         }
     }
 }
@@ -109,8 +124,10 @@ impl Frontier {
         let seed_host = host_of(&seed).unwrap_or_default();
         let mut seen = HashSet::new();
         let mut queue = VecDeque::new();
-        seen.insert(seed.clone());
-        queue.push_back((seed, 0));
+        if is_http(&seed) && policy.max_pages > 0 {
+            seen.insert(seed.clone());
+            queue.push_back((seed, 0));
+        }
         Self {
             policy,
             seed_host,
@@ -136,13 +153,15 @@ impl Frontier {
     /// cap, the host scope, and visited-dedup; non-http(s) URLs are dropped. Returns
     /// how many were newly enqueued.
     pub fn enqueue(&mut self, links: &[String], depth: u32) -> usize {
-        let child_depth = depth + 1;
+        let Some(child_depth) = depth.checked_add(1) else {
+            return 0;
+        };
         if child_depth > self.policy.max_depth {
             return 0;
         }
         let mut added = 0;
         for link in links {
-            if added >= self.policy.max_fanout {
+            if added >= self.policy.max_fanout || self.seen.len() >= self.policy.max_pages {
                 break;
             }
             let url = normalize(link);
@@ -157,21 +176,10 @@ impl Frontier {
     }
 
     /// Enqueue bulk seed URLs (e.g. a site's `sitemap.xml`), at depth 1, with host
-    /// scope + visited-dedup but **without** the per-page fan-out cap — a sitemap is a
-    /// legitimate bulk source, not one page's links, so it is not flooding; `max_pages`
-    /// still bounds the total fetched. Returns how many were newly enqueued.
+    /// scope + visited-dedup and the same depth, fanout and page bounds as links.
+    /// A sitemap does not authorize broader acquisition than a page does.
     pub fn enqueue_seeds(&mut self, urls: &[String]) -> usize {
-        let mut added = 0;
-        for link in urls {
-            let url = normalize(link);
-            if !is_http(&url) || !self.in_scope(&url) || self.seen.contains(&url) {
-                continue;
-            }
-            self.seen.insert(url.clone());
-            self.queue.push_back((url, 1));
-            added += 1;
-        }
-        added
+        self.enqueue(urls, 0)
     }
 
     /// Pages handed out by [`next`](Self::next) so far (against `max_pages`).
@@ -199,6 +207,11 @@ pub(crate) fn host_of(url: &str) -> Option<String> {
         .map(|h| h.to_ascii_lowercase())
 }
 
+/// Robots policies belong to an origin, including scheme and effective port.
+pub(crate) fn origin_of(url: &str) -> Option<String> {
+    Some(url::Url::parse(url).ok()?.origin().ascii_serialization())
+}
+
 /// The `/robots.txt` URL for `page_url`'s origin, or `None` if it does not parse.
 pub(crate) fn robots_url(page_url: &str) -> Option<String> {
     url::Url::parse(page_url)
@@ -221,7 +234,10 @@ pub(crate) fn sitemap_url(page_url: &str) -> Option<String> {
 /// does not parse.
 pub(crate) fn path_of(page_url: &str) -> String {
     url::Url::parse(page_url)
-        .map(|u| u.path().to_string())
+        .map(|u| match u.query() {
+            Some(query) => format!("{}?{query}", u.path()),
+            None => u.path().to_string(),
+        })
         .unwrap_or_else(|_| "/".to_string())
 }
 
@@ -241,15 +257,18 @@ pub(crate) fn normalize(url: &str) -> String {
 /// Whether `url` is http(s) — the schemes a web crawl follows.
 pub(crate) fn is_http(url: &str) -> bool {
     url::Url::parse(url)
-        .map(|u| matches!(u.scheme(), "http" | "https"))
+        .map(|u| {
+            matches!(u.scheme(), "http" | "https")
+                && u.host_str().is_some()
+                && u.username().is_empty()
+                && u.password().is_none()
+        })
         .unwrap_or(false)
 }
 
-/// Approximate registrable-domain match: `host` equals `seed_host`, or `host` ends
+/// Conservative domain match: `host` equals `seed_host`, or `host` ends
 /// with `.seed_host` (so `docs.example.com` matches a seed host of `example.com`).
-/// Without a Public Suffix List this is over-broad for multi-label public suffixes
-/// (it cannot tell `a.co.uk` from `b.co.uk`), an acknowledged follow-on; for the
-/// common case it scopes a crawl to one site.
+/// It does not infer a common registrable parent from two sibling hosts.
 pub(crate) fn same_registrable_domain(host: &str, seed_host: &str) -> bool {
     host == seed_host || host.ends_with(&format!(".{seed_host}"))
 }

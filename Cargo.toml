@@ -29,8 +29,7 @@ members = [
     "crates/domain/apparatus",
     "crates/platen/platen",
     "crates/eidetic/eidetic-core",
-    "crates/import",
-    "crates/crawl",
+    "crates/fleece",
     "crates/intel/esp",
     "crates/intel/eidetic-search",
     "crates/intel/mora-cmudict",
@@ -320,7 +319,8 @@ document-canvas = { version = "0.1.0", path = "crates/inker/document-canvas" }
 # `crates/inker/knot-editor-host` opts back into `html-fragment` explicitly, and
 # so does the external knot-editor.
 nematic = { version = "0.1.1", path = "crates/nematic/nematic", default-features = false }
-fleece = { version = "0.5.0", git = "https://github.com/merely-made/genet.git", rev = "7422e90613f9017e5bb790e3acb48f61776b2eda" }
+fleece-extract = { package = "fleece", version = "0.5.0", git = "https://github.com/merely-made/genet.git", rev = "7422e90613f9017e5bb790e3acb48f61776b2eda" }
+fleece = { package = "mere-fleece", path = "crates/fleece", version = "0.0.1" }
 genet-text = { version = "0.1.0", git = "https://github.com/merely-made/genet.git", rev = "7422e90613f9017e5bb790e3acb48f61776b2eda" }
 # Landed here from genet 2026-09-03 (platform boundary plan, P3): a workspace
 # member now, so it is a path dep and must NOT appear in .cargo/config.toml's
@@ -458,12 +458,6 @@ eidetic = { version = "0.0.2", path = "crates/eidetic/eidetic-core", default-fea
 # portable eidetic core it was sitting beside reaches neither.
 eidetic-search = { path = "crates/intel/eidetic-search" }
 
-# Browser-data ingest (bookmarks/history/session models + parsers); consumed
-# by the eidetic-recall bridge and, later, the shell's import verbs.
-import = { path = "crates/import" }
-crawl = { package = "mere-crawl", path = "crates/crawl" }
-
-
 # Standalone spec-B misfin implementation (promoted out of this workspace
 # 2026-07-03). It moved into the smolweb workspace in the 2026-07-23
 # consolidation and its own repo was deleted, so this is a crates.io pin rather
@@ -514,7 +508,7 @@ muniment = { version = "0.1.2", path = "crates/eidetic/muniment" }
 # an index, being gazetted, and the paper you read — so the resolver grows
 # into the port rather than sitting beside one. Built today: WebFinger
 # resolution. Unbuilt: the contact and recipient surfaces over `gaz`, feed
-# polling over `mere-crawl`, and the reading room. Its blocking reqwest
+# polling over `fleece::crawl`, and the reading room. Its blocking reqwest
 # still needs an async port before a resident polls with it.
 gazette = { version = "0.0.1", path = "ports/gazette" }
 # Stored key-rooted contacts (the "them" side personae keeps): petnames, handles,

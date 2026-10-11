@@ -4,7 +4,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Browser-data import for Mere.
+//! Source intake and browser-data interchange for Eidetic.
 //!
 //! Portable models and parsers for ingesting another browser's bookmarks,
 //! history, and sessions into Mere. The unit of output is an
@@ -13,7 +13,7 @@
 //! and batched with a [`BrowserImportRun`] that records provenance (source
 //! browser family, mode, observation time).
 //!
-//! This crate is the *ingest* half only: it has no graph dependency and
+//! This module is the intake half only: it has no graph dependency and
 //! performs no mutation. A consumer maps each page seed onto a kernel
 //! address claim and seeds `node-lineage` from history visits / session
 //! navigation, but that mapping lives at the call site, not here.
@@ -28,7 +28,11 @@
 use serde::{Deserialize, Serialize};
 
 pub mod history;
-pub mod web_clip;
+pub mod intake;
+
+pub use intake::{
+    Intake, IntakeNotice, IntakeNoticeKind, IntakeSource, parse_bookmark_file_to_intake,
+};
 
 pub use history::{HISTORY_SEGMENT_SIZE, history_event, history_to_traces, history_to_traces_with};
 

@@ -4,16 +4,13 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Host-neutral web-clip capture and projection helpers.
+//! Host-neutral clipping of selected and engine-generated content.
 
-use forme::GraphMemberId;
 use image::ImageEncoder;
 use inker::{
-    Block, DocumentProvenance, DocumentTrustState, EngineDocument, EngineInput, EngineRegistry,
-    EngineRoutePolicy, EngineRouteRequest, InlineSpan, WorkspaceRouteId,
+    Block, EngineDocument, EngineInput, EngineRegistry, EngineRoutePolicy, EngineRouteRequest,
+    InlineSpan, WorkspaceRouteId,
 };
-use kernel::graph::{EdgeAssertion, Graph, NodeKey, ProvenanceSubKind};
-use kernel::types::{ImageRef, ImageRole};
 use serde::Deserialize;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -290,65 +287,6 @@ pub fn clip_title(fragment: &ClipFragment) -> String {
     title
 }
 
-pub fn write_clip_node(
-    graph: &mut Graph,
-    source_key: NodeKey,
-    clip_url: &str,
-    fragment: &ClipFragment,
-    visual: Option<ImageRef>,
-) -> Option<GraphMemberId> {
-    if graph.get_node(source_key).is_none() {
-        return None;
-    }
-    use kernel::graph::apply::{self as graph_apply, GraphDelta, apply_graph_delta};
-
-    let clip_key = graph_apply::add_node(graph, None, clip_url.to_string(), Default::default());
-    let _ = apply_graph_delta(
-        graph,
-        GraphDelta::SetNodeTitle {
-            key: clip_key,
-            title: clip_title(fragment),
-        },
-    );
-    let _ = apply_graph_delta(
-        graph,
-        GraphDelta::SetNodeMimeHint {
-            key: clip_key,
-            mime_hint: Some("text/x-knot".to_string()),
-        },
-    );
-    let _ = apply_graph_delta(
-        graph,
-        GraphDelta::SetNodeBody {
-            key: clip_key,
-            body: Some(fragment_to_knot(fragment)),
-        },
-    );
-    let member = graph.get_node(clip_key).map(|n| n.id);
-    // The caller stores `fragment.visual`'s bytes (it holds the image store,
-    // and saving is async) and hands back the reference; the graph carries the
-    // handle only.
-    if let Some(visual) = visual {
-        let _ = apply_graph_delta(
-            graph,
-            GraphDelta::SetNodeImage {
-                key: clip_key,
-                role: ImageRole::Preview,
-                image: visual,
-            },
-        );
-    }
-    let _ = graph_apply::assert_relation(
-        graph,
-        clip_key,
-        source_key,
-        EdgeAssertion::Provenance {
-            sub_kind: ProvenanceSubKind::ClippedFrom,
-        },
-    );
-    member
-}
-
 fn parse_payload(raw: &str) -> Result<WebClipPayload, String> {
     let trimmed = raw.trim();
     if let Ok(decoded) = serde_json::from_str::<String>(trimmed) {
@@ -392,7 +330,7 @@ fn document_text(content_type: Option<&str>, body: &str) -> String {
         .unwrap_or(false)
     {
         let doc = genet_static_dom::StaticDocument::parse(body);
-        if let Some(text) = fleece::extract_main_text(&doc) {
+        if let Some(text) = crate::extract_main_text(&doc) {
             return text;
         }
     }
@@ -457,42 +395,9 @@ fn encode_base64(data: &[u8]) -> String {
     out
 }
 
-fn fragment_to_knot(fragment: &ClipFragment) -> String {
-    let mut source = DocumentProvenance::default();
-    source.canonical_uri = Some(fragment.source_url.clone());
-    source.source_kind = Some("meerkat.web_clip".to_string());
-    source.source_label = fragment.title.clone();
-    nematic::knot::build_clip_knot(
-        &fragment_blocks(fragment),
-        &source,
-        DocumentTrustState::Tofu,
-        Some("clip"),
-    )
-}
-
-/// Render only the semantic Knot blocks of a clip.
-///
-/// The receiving Knot endpoint owns document provenance and records it from
-/// the typed clip intent. Omitting frontmatter here prevents a second
-/// document header from being inserted into an existing note.
-pub fn fragment_to_knot_body(fragment: &ClipFragment) -> String {
-    let mut body = String::new();
-    EngineDocument {
-        address: fragment.source_url.clone(),
-        title: None,
-        content_type: "text/x-knot".into(),
-        lang: None,
-        provenance: DocumentProvenance::default(),
-        trust: DocumentTrustState::Unknown,
-        diagnostics: Vec::new(),
-        navigation: Default::default(),
-        blocks: fragment_blocks(fragment),
-    }
-    .write_knot_body(&mut body);
-    body
-}
-
-fn fragment_blocks(fragment: &ClipFragment) -> Vec<Block> {
+/// Semantic blocks of the clip, including its optional visual.
+/// The receiving authoring or graph adapter chooses the destination format.
+pub fn fragment_blocks(fragment: &ClipFragment) -> Vec<Block> {
     if let Some(source_blocks) = &fragment.blocks {
         let mut blocks = Vec::new();
         if let Some(visual) = &fragment.visual {
@@ -769,8 +674,6 @@ fn first_nonempty(values: impl IntoIterator<Item = Option<String>>) -> Option<St
 #[cfg(test)]
 mod tests {
     use super::*;
-    use kernel::graph::RelationKind;
-    use kernel::graph::fixtures::GraphFixtures;
 
     #[test]
     fn parses_webview2_quoted_json_result() {
@@ -795,43 +698,6 @@ mod tests {
         assert!(script.contains("const rawX = 12;"));
         assert!(script.contains("const rawY = 34;"));
         assert!(script.contains("document.elementFromPoint"));
-    }
-
-    #[test]
-    fn fragment_to_knot_records_clip_provenance() {
-        let clip = ClipFragment {
-            source_url: "https://example.test/post".to_string(),
-            title: Some("Interesting bit".to_string()),
-            text: "A useful paragraph.".to_string(),
-            html: None,
-            selector: None,
-            links: vec!["https://example.test/ref".to_string()],
-            rect: None,
-            visual: None,
-            blocks: None,
-        };
-        let knot = fragment_to_knot(&clip);
-        assert!(knot.contains("source: https://example.test/post"));
-        assert!(knot.contains("note_kind: clip"));
-        assert!(knot.contains("A useful paragraph."));
-        assert!(knot.contains("https://example.test/ref"));
-    }
-
-    #[test]
-    fn semantic_clip_body_omits_document_frontmatter() {
-        let clip = fragment_from_text(
-            "https://example.test/post",
-            Some("Interesting bit".into()),
-            "A useful paragraph.",
-            Some("main > article".into()),
-            vec!["https://example.test/ref".into()],
-        );
-        let body = fragment_to_knot_body(&clip);
-        assert!(body.contains("# Interesting bit"));
-        assert!(body.contains("A useful paragraph."));
-        assert!(body.contains("https://example.test/ref"));
-        assert!(!body.starts_with("---\n"));
-        assert!(!body.contains("source: https://example.test/post"));
     }
 
     #[test]
@@ -926,7 +792,7 @@ mod tests {
             clip.links,
             vec!["0123456789abcdef0123456789abcdef:/page/ref.mu"]
         );
-        assert!(!fragment_to_knot_body(&clip).contains("#setup"));
+        assert!(!clip.links.iter().any(|link| link.contains("#setup")));
     }
 
     #[test]
@@ -971,46 +837,5 @@ mod tests {
         let visual = clip.visual.as_ref().expect("visual");
         assert_eq!((visual.width, visual.height), (2, 2));
         assert!(visual.data_uri.starts_with("data:image/png;base64,"));
-    }
-
-    #[test]
-    fn write_clip_node_records_graph_relation_and_thumbnail() {
-        let mut graph = Graph::new();
-        let source = graph.add_node("https://example.test/post".to_string(), Default::default());
-        let png = encode_png_rgba(&vec![128u8; 2 * 2 * 4], 2, 2).expect("png");
-        let clip = ClipFragment {
-            source_url: "https://example.test/post".to_string(),
-            title: Some("Interesting bit".to_string()),
-            text: "A useful paragraph.".to_string(),
-            html: None,
-            selector: None,
-            links: Vec::new(),
-            rect: None,
-            visual: Some(ClipVisual {
-                png_bytes: png.clone(),
-                width: 2,
-                height: 2,
-                data_uri: format!("data:image/png;base64,{}", encode_base64(&png)),
-            }),
-            blocks: None,
-        };
-
-        let stored = ImageRef::new([21u8; 32], 2, 2);
-        let member = write_clip_node(&mut graph, source, "knot://clip/test", &clip, Some(stored))
-            .expect("clip member");
-        let (clip_key, clip_node) = graph.get_node_by_id(member).expect("clip node");
-        assert_eq!(clip_node.preview(), Some(&stored));
-        assert!(
-            clip_node
-                .body
-                .as_deref()
-                .unwrap_or("")
-                .contains("A useful paragraph.")
-        );
-        assert!(graph.relations().any(|relation| {
-            relation.from == clip_key
-                && relation.to == source
-                && relation.kind == RelationKind::Provenance(ProvenanceSubKind::ClippedFrom)
-        }));
     }
 }

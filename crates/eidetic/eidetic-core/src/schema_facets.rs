@@ -8,18 +8,18 @@
 //!
 //! [`chartulary::FacetValidator`] is synchronous while schema resolution from
 //! an eidetic store is asynchronous. The host therefore resolves schema
-//! codicils once, registers the parsed [`eidetic::SchemaDefinition`]s here, and
+//! codicils once, registers the parsed [`crate::SchemaDefinition`]s here, and
 //! uses this immutable in-memory adapter on every write. Unknown facet ids
 //! remain forward-compatible and pass through unchanged.
 
 use std::collections::BTreeMap;
 
-use chartulary::{ContentClass, FacetError, FacetId, FacetValidator};
-use eidetic::{
+use crate::{
     BlobFetcher, BlobSource, Hash, ManifestId, MereNativeFieldSpec, MereNativeSchemaBuilder,
     PrivacyClass, ProvenanceRecord, SchemaDefinition, SchemaRef, Store, Timestamp, TrustEnvelope,
     TypedPayload, bootstrap_meta_schema, load_typed, save_schema, save_typed,
 };
+use chartulary::{ContentClass, FacetError, FacetId, FacetValidator};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -66,7 +66,7 @@ impl SchemaFacetValidator {
         provenance: ProvenanceRecord,
         trust: TrustEnvelope,
         created_at: Timestamp,
-    ) -> eidetic::Result<BTreeMap<FacetId, ManifestId>> {
+    ) -> crate::Result<BTreeMap<FacetId, ManifestId>> {
         bootstrap_meta_schema(store).await?;
         let mut persisted = BTreeMap::new();
         for (facet, definition) in &self.schemas {
@@ -94,7 +94,7 @@ impl FacetValidator for SchemaFacetValidator {
             facet: facet_id.clone(),
             reason: format!("payload serialization failed: {error}"),
         })?;
-        eidetic::validate_payload(definition, &bytes).map_err(|error| FacetError {
+        crate::validate_payload(definition, &bytes).map_err(|error| FacetError {
             facet: facet_id.clone(),
             reason: error.to_string(),
         })
@@ -143,7 +143,7 @@ pub async fn save_content_class(
     provenance: ProvenanceRecord,
     trust: TrustEnvelope,
     created_at: Timestamp,
-) -> eidetic::Result<ManifestId> {
+) -> crate::Result<ManifestId> {
     bootstrap_meta_schema(store).await?;
     let schema = content_class_schema_definition();
     let schema_id = save_schema(
@@ -173,7 +173,7 @@ pub async fn load_content_class(
     store: &mut dyn Store,
     fetcher: &mut dyn BlobFetcher,
     id: ManifestId,
-) -> eidetic::Result<Option<ContentClass>> {
+) -> crate::Result<Option<ContentClass>> {
     Ok(load_typed::<ContentClassCodicil>(store, fetcher, id)
         .await?
         .map(|codicil| codicil.0))
@@ -182,7 +182,7 @@ pub async fn load_content_class(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use eidetic::{NoFetcher, ProvenanceOrigin};
+    use crate::{NoFetcher, ProvenanceOrigin};
     use muniment::MemoryBackend;
     use serde_json::json;
 
@@ -255,7 +255,7 @@ mod tests {
                 .await
                 .unwrap();
             let schema_id = ids[&FacetId::new("note.document")];
-            let loaded_schema = eidetic::load_schema(&mut store, &mut NoFetcher, schema_id)
+            let loaded_schema = crate::load_schema(&mut store, &mut NoFetcher, schema_id)
                 .await
                 .unwrap()
                 .unwrap();
