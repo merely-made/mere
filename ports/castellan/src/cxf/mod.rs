@@ -15,7 +15,7 @@ use std::collections::BTreeMap;
 use zeroize::Zeroizing;
 
 mod commit;
-mod erase;
+pub(crate) mod erase;
 mod parse;
 pub use commit::CommitFailure;
 mod ssh;

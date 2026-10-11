@@ -24,7 +24,9 @@ use std::collections::BTreeMap;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 
-use personae::{IdentityError, IdentityProvider, PersonaId, SealedRecordStorage};
+use personae::{
+    IdentityError, IdentityProvider, PersonaId, ProfileId, SealedRecordChange, SealedRecordStorage,
+};
 use zeroize::Zeroizing;
 
 use crate::items::ItemStore;
@@ -59,6 +61,7 @@ impl CredentialSalts {
 #[derive(Clone)]
 pub struct CastellanResident {
     records: SealedRecordStorage,
+    records_root: PathBuf,
     transactions: Arc<Mutex<BTreeMap<PersonaId, Arc<Mutex<()>>>>>,
 }
 
@@ -75,7 +78,9 @@ impl CastellanResident {
         freshness_root: impl Into<PathBuf>,
         freshness_key: [u8; 32],
     ) -> Result<Self, IdentityError> {
+        let records_root = records_root.into();
         Ok(Self {
+            records_root: records_root.clone(),
             records: SealedRecordStorage::claim_with_file_freshness(
                 records_root,
                 record_key,
@@ -104,7 +109,11 @@ impl CastellanResident {
     }
 
     /// Take both keys back.
-    pub fn unlock(&self, record_key: [u8; 32], freshness_key: [u8; 32]) -> Result<(), IdentityError> {
+    pub fn unlock(
+        &self,
+        record_key: [u8; 32],
+        freshness_key: [u8; 32],
+    ) -> Result<(), IdentityError> {
         self.records.unlock(record_key, Some(freshness_key))
     }
 
@@ -122,6 +131,152 @@ impl CastellanResident {
         })
     }
 
+    /// Bind an item namespace to its explicitly chosen profile, without reassignment.
+    pub fn bind_profile(
+        &self,
+        persona: PersonaId,
+        profile: &ProfileId,
+    ) -> Result<(), IdentityError> {
+        self.bind_profiles(&BTreeMap::from([(persona, profile.clone())]))
+    }
+    /// Check all destinations before changing the sealed ownership record.
+    pub fn bind_profiles(
+        &self,
+        owners: &BTreeMap<PersonaId, ProfileId>,
+    ) -> Result<(), IdentityError> {
+        self.records.update_record(
+            "castellan/items/v1/profile-bindings.json",
+            |old: Option<BTreeMap<String, ProfileId>>| {
+                let mut map = old.unwrap_or_default();
+                for (persona, profile) in owners {
+                    if map
+                        .get(&persona.as_uuid().to_string())
+                        .is_some_and(|bound| bound != profile)
+                    {
+                        return Err(IdentityError::Backend(
+                            "item namespace already belongs to another profile".into(),
+                        ));
+                    }
+                }
+                let mut changed = false;
+                for (persona, profile) in owners {
+                    if map
+                        .insert(persona.as_uuid().to_string(), profile.clone())
+                        .is_none()
+                    {
+                        changed = true;
+                    }
+                }
+                Ok((
+                    (),
+                    if changed {
+                        SealedRecordChange::Replace(map)
+                    } else {
+                        SealedRecordChange::Keep
+                    },
+                ))
+            },
+        )
+    }
+    /// Only explicitly bound namespaces. Never infer legacy ownership from a name.
+    pub fn profile_personas(&self, profile: &ProfileId) -> Result<Vec<PersonaId>, IdentityError> {
+        let map: BTreeMap<String, ProfileId> = self
+            .records
+            .load_record("castellan/items/v1/profile-bindings.json")?
+            .unwrap_or_default();
+        map.into_iter()
+            .filter(|(_, owner)| owner == profile)
+            .map(|(id, _)| {
+                uuid::Uuid::parse_str(&id)
+                    .map(PersonaId::from_uuid)
+                    .map_err(|_| IdentityError::Backend("invalid item namespace binding".into()))
+            })
+            .collect()
+    }
+    /// Discover older namespaces through authenticated public indexes only.
+    /// Directory names do not assign identity ownership.
+    #[cfg(feature = "cxf")]
+    pub fn unassigned_items(
+        &self,
+    ) -> Result<Vec<(PersonaId, Vec<chatelaine::Item>)>, IdentityError> {
+        let map: BTreeMap<String, ProfileId> = self
+            .records
+            .load_record("castellan/items/v1/profile-bindings.json")?
+            .unwrap_or_default();
+        let entries = match std::fs::read_dir(self.records_root.join("castellan/items/v1")) {
+            Ok(entries) => entries,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(vec![]),
+            Err(_) => {
+                return Err(IdentityError::Backend(
+                    "older import namespaces are unavailable".into(),
+                ));
+            },
+        };
+        let mut namespaces = Vec::new();
+        for entry in entries {
+            let entry = entry.map_err(|_| {
+                IdentityError::Backend("older import namespace is unavailable".into())
+            })?;
+            if !entry
+                .file_type()
+                .map_err(|_| {
+                    IdentityError::Backend("older import namespace is unavailable".into())
+                })?
+                .is_dir()
+            {
+                continue;
+            }
+            let name = entry.file_name().to_string_lossy().into_owned();
+            let Ok(id) = uuid::Uuid::parse_str(&name) else {
+                continue;
+            };
+            if map.contains_key(&id.to_string()) {
+                continue;
+            }
+            let persona = PersonaId::from_uuid(id);
+            let items = self.items(persona).list().map_err(|_| {
+                IdentityError::Backend("older import metadata is unavailable".into())
+            })?;
+            if !items.is_empty() {
+                namespaces.push((persona, items));
+            }
+        }
+        namespaces.sort_by_key(|(persona, _)| *persona);
+        Ok(namespaces)
+    }
+    /// Associate the precise reviewed namespace, under its transaction lock.
+    #[cfg(feature = "cxf")]
+    pub fn assign_import(
+        &self,
+        persona: PersonaId,
+        profile: &ProfileId,
+        revision: &str,
+    ) -> Result<(), IdentityError> {
+        let store = self.items(persona);
+        let held = store.begin();
+        let items = held
+            .list()
+            .map_err(|_| IdentityError::Backend("older import metadata is unavailable".into()))?;
+        if items.is_empty() || crate::review::namespace_revision(&items) != revision {
+            return Err(IdentityError::Backend(
+                "older import changed; review it again".into(),
+            ));
+        }
+        self.records.update_record(
+            "castellan/items/v1/profile-bindings.json",
+            |old: Option<BTreeMap<String, ProfileId>>| {
+                let mut map = old.unwrap_or_default();
+                let key = persona.as_uuid().to_string();
+                if map.contains_key(&key) {
+                    return Err(IdentityError::Backend(
+                        "older import was already assigned".into(),
+                    ));
+                }
+                map.insert(key, profile.clone());
+                Ok(((), SealedRecordChange::Replace(map)))
+            },
+        )
+    }
     /// Open one persona's sealed items under this authority.
     pub fn items(&self, persona: PersonaId) -> ItemStore {
         ItemStore::with_transaction(self.records.clone(), persona, self.transaction(persona))
@@ -191,6 +346,34 @@ mod tests {
             [0x82; 32],
         )
         .unwrap()
+    }
+
+    #[test]
+    fn conflicting_batch_does_not_partly_bind_destinations() {
+        let dir = tempdir().unwrap();
+        let resident = claim(dir.path());
+        let bound = PersonaId::new();
+        let fresh = PersonaId::new();
+        resident
+            .bind_profile(bound, &ProfileId("family".into()))
+            .unwrap();
+        let owners = BTreeMap::from([
+            (fresh, ProfileId("work".into())),
+            (bound, ProfileId("work".into())),
+        ]);
+        assert!(resident.bind_profiles(&owners).is_err());
+        assert!(
+            resident
+                .profile_personas(&ProfileId("work".into()))
+                .unwrap()
+                .is_empty()
+        );
+        assert_eq!(
+            resident
+                .profile_personas(&ProfileId("family".into()))
+                .unwrap(),
+            vec![bound]
+        );
     }
 
     #[test]

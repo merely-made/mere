@@ -971,6 +971,18 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         })
     }
 
+    /// Execute a resident act while profile authority and vault lock are stable.
+    /// The callback must never prompt or wait for user input.
+    pub fn with_profile_authority<R>(
+        &self,
+        profile: &ProfileId,
+        act: impl FnOnce() -> R,
+    ) -> Result<R, IdentityError> {
+        let vault = self.vault.lock().unwrap();
+        vault.current_profile()?;
+        vault.storage().load_profile(profile)?;
+        Ok(act())
+    }
     /// The persona currently spoken as.
     pub fn current_profile_id(&self) -> ProfileId {
         self.vault.lock().unwrap().profile_id().clone()

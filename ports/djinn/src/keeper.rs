@@ -28,6 +28,7 @@ use graphshell::native::resident_identity::{CustodyFuture, ResidentIdentity};
 use personae::{IdentityError, IdentityProvider, RetainedKeys};
 
 use crate::custody::ReleasePolicy;
+mod review;
 use crate::identity_ui::{
     NativeIdentityUi, UnavailableNativeIdentityUi, apply_native_identity_action,
 };
