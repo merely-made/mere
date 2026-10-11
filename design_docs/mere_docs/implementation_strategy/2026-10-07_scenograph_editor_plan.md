@@ -709,11 +709,15 @@ unresolved field event/composition choices retain their named owners.
 
 #### Identity inspection follow-through (2026-10-10; next design steps)
 
-**Status:** planned adapters; no new runtime track or receipt. Mark asked this
-agent to keep working on plans while agents on O-PC, the ThinkPad and the Macs
-perform visual tests. The implemented forme draft remains the bounded runtime
+**Status:** access/Resource inspection implemented as a draft; link, field and
+write adapters remain planned. Mark asked this agent to keep working on plans
+while agents on O-PC, the ThinkPad and the Macs perform visual tests. The implemented forme draft remains the bounded runtime
 proof. This sequence prepares the primitive-editor walkthrough without choosing
 the outstanding attribute-storage or field-composition policies.
+
+**Implementation continuation:** the access/Resource read-only adapter is now
+an implementation draft, described in [Progress](#accessresource-inspector-draft-2026-10-10).
+The remaining link, field and edit adapters retain their planned status.
 
 Source checked at published Mere `69f17908`:
 
@@ -1259,3 +1263,73 @@ checks. The delivery workflow and five bounded candidates above record that
 authorization. This pass changes documentation only; no candidate implementation
 or new runtime qualification is claimed. The canonical working principles now
 preserve direct-main draft delivery and explicit check status for future passes.
+
+#### Access/Resource inspector draft (2026-10-10)
+
+**Status:** implemented draft for other-machine review and host testing. Mark
+approved starting the candidate sequence ("hell yeah, go ahead"). This pass
+implements the access/Resource inspector first, based on `d541416e`; it does
+not complete the broader primitive-editor walkthrough.
+
+The portable [inspection model](../../../ports/graphshell/src/access_inspection.rs)
+reads the owner's graph by Surface/member UUID and follows its recorded shown
+Resource association. It returns the access's title/address/identity, shared
+Resource identity/address/tags and held facts, and other accesses held here.
+Known coverage limits are scoped to the target Resource and its held accesses,
+while global limits remain visible. Even an empty coverage note never claims
+the access list is globally complete. Facts retain unknown keys and values;
+no attribute storage or schema rename is introduced.
+
+The [retained inspector](../../../ports/graphshell/src/web_tree/inspection.rs)
+is available on `tree.html?app=local`. Select an object and activate **Inspect
+selected access**. Its panel appears in Graph tools, opening the narrow-window
+tools overlay when necessary. **Inspect access: …** beside another held access
+changes only the inspection target. Selecting another graph object does not
+retarget the open inspector; **Close access inspection** clears inspection.
+These controls neither open content nor change workbench membership. Existing
+detail editing retains its selection and draft. Reads use the local owner,
+not its Canvas clone or unsaved detail values; the chosen target is retained
+while an in-flight save temporarily makes that owner unavailable. A removed
+target reports absence rather than looking up another object at the same URL.
+
+The panel composes existing Cambium detail sections and buttons with the host's
+current appearance sheet. Generic Resource facts are a first inspection
+presentation; semantic labels, large-value disclosure and the fuller attribute
+editor remain review work. Inspector state is temporary view state, not saved
+graph truth. Hosted datasets, generated graphs and other hosts do not yet mount
+this local-product panel. Link inspection and general Resource writes remain
+the next adapters, with their existing ownership gates.
+
+**Qualification:** six model tests pass through the bounded native harness,
+importing the tracked inspection source and actual Mere graph dependencies.
+They cover distinct accesses sharing a Resource, immutable inspection, missing
+association without address-based inference, changed live bindings, scoped
+coverage, shared-fact/snapshot roundtrip and removed-target refusal. This is a
+Graph snapshot roundtrip, not an IndexedDB reopen receipt. The product wasm
+check passes from `ports/graphshell/web` with its committed target flags and
+`--no-default-features --features product`. Both checks used one Cargo job, a
+1280 MiB process-scope cap, no scope swap and the 256 MiB available-memory guard.
+Formatting and whitespace checks pass. The
+[qualification summary](../../../ports/graphshell/docs/receipts/access_inspection_20261010/qualification.json)
+records exact source hashes and local log references. No new release bundle,
+default/viewer check, browser run or capture is claimed; headed verification
+remains with the other machines.
+
+**Review and host-test handoff:**
+
+- Build the web host with `product` (as in the Forme handoff) and run
+  `tree.html?app=local&scenario=scenarios/p4_tree_access_inspection.scn` in a
+  visible tab on a dedicated origin/profile. This
+  [scenario](../../../ports/graphshell/web/scenarios/p4_tree_access_inspection.scn)
+  checks independent selection/inspection and unchanged Forme identity and
+  membership, with two named captures. It does not prove two accesses sharing
+  one Resource in the browser; that case has a native fixture and needs a host
+  fixture/receipt as the mixed-content example develops.
+- Review long addresses/facts, empty and missing associations, known coverage
+  disclosures, two equal-address accesses with distinct titles, and changing a
+  held access's shown Resource. Check keyboard activation and focus in both
+  docked tools and the narrow overlay, including an open detail editor.
+- Confirm another-access inspection leaves graph selection, camera, content
+  sessions and Forme layout alone. Test source saving/failure and target removal
+  while inspection remains open. Append actual results and tested source/build
+  identity here; the added observation fields are instruments, not receipts.

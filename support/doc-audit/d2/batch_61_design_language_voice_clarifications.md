@@ -337,6 +337,17 @@ is inferred. Complete D2 JSON was compared with an archive of committed main
 duplicate README basenames and aggregate-digest mismatch are pre-existing.
 No active Markdown document or unknown audit record was added.
 
+**Access/Resource inspection draft (2026-10-10):** Mark approved the candidate
+sequence. The first adapter now has a read-only portable model, local retained
+inspector, observation fields and a pending host scenario. The editor plan and
+canonical index distinguish this implementation draft from the remaining
+primitive editors. Six actual-source native model tests and the product wasm
+check pass under the existing memory limits; source hashes and exact check
+scope live in the portable qualification JSON. No browser receipt or other
+agent's review is inferred. Full citation and D2 audit JSON match the pre-edit
+baseline, retaining 252/259 coverage and nine existing D2 errors. New local
+links resolve and whitespace checks pass. No active document was added.
+
 **Implementation-draft delivery (2026-10-10):** Mark authorizes direct-main
 implementation drafts for other machines to review, test and improve. The
 editor plan ranks bounded candidates against existing Resource/relation/field
