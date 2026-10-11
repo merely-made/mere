@@ -1493,3 +1493,60 @@ baseline and whether it also rewinds animation/scripted state remain design
 questions. Coordinate reset, simulation reset and content/source undo must
 not be silently conflated. This is a consumer-control correction, not a new
 F ruling, changed force-composition policy or a qualification of B1.
+
+## Relationship consumer qualification (2026-10-11)
+
+Mark authorized taking up the fixture-only relationship-adapter gap. During this
+continuation, Knot published the production consumer at `195758b`, with final
+runtime `552640f` and its [qualification receipt](https://github.com/merely-made/knot-editor/blob/1674d6d/docs/receipts/2026-10-11_live_dynamics/README.md).
+The consumer pins Mere `3a8f3813` and Genet `4bc75583` coherently. It invokes
+`ProjectionDynamics::new_relationship` with exact compiled occurrence mappings,
+disclosed endpoints and independent occurrence roles. Repeated source references
+remain distinct bodies; transient controller edges create no kernel assertions.
+
+Knot owns session controls and display mapping. Slots, occurrence roles and
+authored traces survive signed/encrypted retention; running poses, clocks and
+controller handles do not. Hidden scenes pause without automatic resume. The
+host's explicit bounded spring choice is a shared 120-frame schedule; F202's
+editable 60-step comparison default remains a separate host policy. There is no
+implicit conversion of motion into retained source or placement edits.
+
+The recorded macOS qualification has 662 passing workspace tests, final check
+and build, and 15 reviewed native captures. The supplier's five adapter tests
+pass, while its wider canvas receipt has 401 passed, one reproduced untouched
+baseline topic-radial golden failure and 18 ignored. These counts belong to
+their recorded sources and platforms; they are not an all-green stack claim.
+
+The [Windows consumer review at Knot `9790938`](https://github.com/merely-made/knot-editor/blob/9790938/docs/receipts/2026-10-11_relationship_consumer_review/README.md)
+adds 13 focused dynamics tests, including a real sound disclosure with repeated
+source occurrences, independent roles and an edge-free negative control. The
+complete Windows workspace has 659 passed, zero failed and six platform/existing
+ignored across 44 harnesses. All 15 native Windows captures are reviewed, with
+wide/compact fresh-process reopen and unchanged source bytes. The initial ten
+appearance-test failures are preserved; a test-only navigation repair opens
+Windows' actual View > Appearance menu without changing application behavior.
+
+**Explicit placement ruling:** Mark chose **Preview; keep placement explicitly**.
+The running pose remains session state. Keep placement records the paused or
+finished displayed pose as one undoable authored placement edit; Retain still
+saves that recipe version deliberately. Roles, the dynamics slot, copied
+disclosure and source documents retain their own authority. This does not make
+foreground/background categories into physics roles or reopen shared-force
+policy. The bounded Knot continuation is qualified separately from the preceding
+Windows consumer review.
+
+**Review boundary:** Knot uses compiled card footprints in a fixed physics plane,
+then clamps its normalized glyph display to that plane. This is a consumer
+presentation choice, not a physical wall, a glyph collision guarantee or a
+universal scene adapter. Playback advances one fixed tick per eligible frame;
+it is not wall-clock simulation. Field provenance, named channels/groups,
+nonflat scenes, ambient inference and unsupported body forms remain outside this
+binding. The native receipt exposes these limits and keeps authoring guards
+separate from foreground/background paint categories.
+
+**Open gates:** Firefox and the physics coordinator's independent review remain
+open. The Windows Computer Use helper stopped Firefox inspection because URL
+policy enforcement is unsupported for that browser; no browser-policy bypass
+was attempted. Coordinator-owned Mere/Knot and Djinn/Knot-site adoption pins
+remain unchanged. This bounded consumer review introduces no F ruling and does
+not reopen F199's T2/G4b2 work order.
