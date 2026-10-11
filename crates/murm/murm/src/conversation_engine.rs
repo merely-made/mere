@@ -16,9 +16,10 @@ use stickleback::{DropImportReport, DropLimits, MunimentStore, ProcessOutcome};
 use tokio::sync::{Mutex as AsyncMutex, broadcast};
 
 use crate::{
-    CabalExt, CabalId, CabalKey, CabalKeyEpoch, CabalKeyring, ChannelName, ConversationBackend,
-    ConversationStorage, ConversationStore, InfoEntry, MurmError, Post, PostId, PostKind,
-    hash_cabal_id, hash_post, operation_to_post, post_to_operation, sign_post,
+    CabalCheckpointAuthority, CabalExt, CabalId, CabalKey, CabalKeyEpoch, CabalKeyring,
+    ChannelName, ConversationBackend, ConversationStorage, ConversationStore, InfoEntry, MurmError,
+    Post, PostId, PostKind, hash_cabal_id, hash_post, operation_to_post, post_to_operation,
+    sign_post,
 };
 
 const EVENT_CHANNEL_CAPACITY: usize = 256;
@@ -44,6 +45,9 @@ pub struct CabalHistory {
     pub pending: Vec<stickleback::PendingCausalOperation>,
     /// Complete channel headers whose content body is no longer retained.
     pub unavailable_payloads: usize,
+    /// Authorized retained log roots across the cabal. Earlier records may
+    /// have been intentionally removed; these are not message read receipts.
+    pub retention_checkpoints: Vec<PostId>,
 }
 
 /// Murm's native conversation runtime.
@@ -172,6 +176,36 @@ impl ConversationEngine {
         Ok(self.session(conversation_id)?.store.sync_store())
     }
 
+    /// Install the policy owner's exact retention authority snapshot.
+    pub async fn set_checkpoint_authority(
+        &self,
+        conversation_id: &[u8; 32],
+        authority: Option<CabalCheckpointAuthority>,
+    ) -> Result<(), MurmError> {
+        let session = self.session(conversation_id)?;
+        let _ingest = session.ingest.lock().await;
+        session.store.set_checkpoint_authority(authority);
+        Ok(())
+    }
+
+    /// Sign an explicit root permitting removal of this author's earlier log.
+    /// The policy owner must have authorized this signer and revision first.
+    pub async fn post_retention_checkpoint(
+        &self,
+        conversation_id: &[u8; 32],
+        authority_revision: proofs::Digest,
+        timestamp_ms: u64,
+    ) -> Result<PostId, MurmError> {
+        self.post_with_kind(
+            conversation_id,
+            PostKind::RetentionCheckpoint {
+                authority_revision,
+                timestamp_ms,
+            },
+        )
+        .await
+    }
+
     /// Author a text message.
     pub async fn post_text(
         &self,
@@ -286,21 +320,52 @@ impl ConversationEngine {
         let session = self.session(conversation_id)?;
         let _ingest = session.ingest.lock().await;
         let mut head = session.author_head.lock().await;
-        let (seq_num, backlink) = *head;
+        let operations = session.store.operations().await?;
+        let entries = session.store.causal_entries(&operations)?;
+        let author = session.keypair.public_key().to_bytes();
+        let (seq_num, backlink) = stickleback::author_head(&entries, author, &0)?;
+        let next_seq = seq_num
+            .checked_add(1)
+            .ok_or(stickleback::CausalError::SequenceExhausted)?;
+        let checkpoint = matches!(&kind, PostKind::RetentionCheckpoint { .. });
+        let parents = if checkpoint {
+            // A retention root makes no claim to preserve other authors'
+            // history. Their references to the removed prefix remain pending.
+            Vec::new()
+        } else {
+            let projection = stickleback::causal_projection(&entries)?;
+            if backlink.is_some_and(|id| {
+                !projection
+                    .order
+                    .iter()
+                    .any(|index| entries[*index].operation == id)
+            }) {
+                return Err(MurmError::IncompleteAuthorHead);
+            }
+            stickleback::complete_frontier(&entries)?
+                .into_iter()
+                .filter(|id| Some(*id) != backlink)
+                .map(PostId::new)
+                .collect()
+        };
         let post = sign_post(
             &session.keypair,
             *conversation_id,
             seq_num,
-            backlink,
-            Vec::new(),
+            backlink.map(PostId::new),
+            parents,
             kind,
         );
         let operation = post_to_operation(&post)?;
         let outcome = session.store.accept(&operation).await?;
         let post_id = PostId::new(*operation.hash.as_bytes());
-        *head = (seq_num + 1, Some(post_id));
+        *head = (next_seq, Some(post_id));
         drop(head);
-        Self::materialize(&session, post, outcome);
+        if outcome.pruned_entries() > 0 {
+            Self::rebuild(&session, true).await?;
+        } else {
+            Self::materialize(&session, post, outcome);
+        }
         Ok(post_id)
     }
 
@@ -350,7 +415,11 @@ impl ConversationEngine {
                 && operation.header.seq_num >= local_head.0
             {
                 local_head = (
-                    operation.header.seq_num + 1,
+                    operation
+                        .header
+                        .seq_num
+                        .checked_add(1)
+                        .ok_or(stickleback::CausalError::SequenceExhausted)?,
                     Some(PostId::new(*operation.hash.as_bytes())),
                 );
             }
@@ -439,10 +508,22 @@ impl ConversationEngine {
         let outcome = session.store.accept(operation).await?;
         let post_id = PostId::new(*operation.hash.as_bytes());
 
+        if outcome.pruned_entries() > 0 {
+            Self::rebuild(&session, true).await?;
+            return Ok(post_id);
+        }
+
         if *operation.header.verifying_key.as_bytes() == session.keypair.public_key().to_bytes() {
             let mut head = session.author_head.lock().await;
             if operation.header.seq_num >= head.0 {
-                *head = (operation.header.seq_num + 1, Some(post_id));
+                *head = (
+                    operation
+                        .header
+                        .seq_num
+                        .checked_add(1)
+                        .ok_or(stickleback::CausalError::SequenceExhausted)?,
+                    Some(post_id),
+                );
             }
         }
         if Self::materializable(operation) {
@@ -511,19 +592,15 @@ impl ConversationEngine {
         let session = self.session(conversation_id)?;
         let _ingest = session.ingest.lock().await;
         let operations = session.store.operations().await?;
-        let entries: Vec<_> = operations
-            .iter()
-            .map(|operation| {
-                stickleback::CausalEntry::from_operation(
-                    operation,
-                    0u64,
-                    operation.header.extensions.parents.clone(),
-                )
-            })
-            .collect();
+        let entries = session.store.causal_entries(&operations)?;
         let causal = stickleback::causal_projection(&entries)?;
         let mut history = CabalHistory {
             pending: causal.pending,
+            retention_checkpoints: operations
+                .iter()
+                .filter(|operation| operation.header.extensions.prune_flag.is_set())
+                .map(|operation| PostId::new(*operation.hash.as_bytes()))
+                .collect(),
             ..Default::default()
         };
         for index in causal.order {
@@ -548,3 +625,6 @@ impl ConversationEngine {
         Ok(self.session(conversation_id)?.events.subscribe())
     }
 }
+
+#[cfg(test)]
+mod tests;

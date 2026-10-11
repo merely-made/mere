@@ -6,16 +6,19 @@
 
 //! Native conversation storage over the shared replication substrate.
 
+use std::collections::{BTreeSet, HashMap};
 use std::io::Read;
 use std::path::Path;
+use std::sync::{Arc, RwLock};
 
 use muniment::{Backend, MemoryBackend, RedbBackend, StoreError};
 use p2panda_core::{Operation, Topic};
+use proofs::Digest;
 use stickleback::{
-    Admission, DropExportProfile, DropImportReport, DropIoError, DropLimits, DropProtector,
-    MunimentStore, OperationPolicy, OperationProcessor, ProcessError, ProcessOutcome, Reject,
-    StoreTarget, decode_operation_record, export_topic_operations, import_plain_drop,
-    import_protected_drop,
+    Admission, CausalEntry, CausalLimits, CheckpointAuthority, DropExportProfile, DropImportReport,
+    DropIoError, DropLimits, DropProtector, MunimentStore, OperationPolicy, OperationProcessor,
+    ProcessError, ProcessOutcome, Reject, StoreTarget, decode_operation_record,
+    export_topic_operations, import_plain_drop, import_protected_drop, validate_causal_metadata,
 };
 
 use crate::{CabalExt, ChannelName};
@@ -37,9 +40,50 @@ pub enum ConversationStoreError {
     Drop(#[from] DropIoError),
 }
 
-#[derive(Clone, Copy)]
+/// Owner-supplied authority for pruning an author's own cabal log.
+///
+/// The host resolves this from its accepted policy; holding a cabal key, joining
+/// a channel, or carrying an operation never supplies this permission. Reopened
+/// stores need the corresponding authority installed before reading a pruned
+/// root or admitting a new checkpoint.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CabalCheckpointAuthority {
+    revision: Digest,
+    signers: BTreeSet<[u8; 32]>,
+}
+
+impl CabalCheckpointAuthority {
+    /// Bind the exact accepted policy revision to its permitted signers.
+    pub fn new(revision: Digest, signers: impl IntoIterator<Item = [u8; 32]>) -> Self {
+        Self {
+            revision,
+            signers: signers.into_iter().collect(),
+        }
+    }
+}
+
+impl CheckpointAuthority for CabalCheckpointAuthority {
+    fn authority_revision(&self) -> Digest {
+        self.revision.clone()
+    }
+
+    fn permits_checkpoint(&self, author: [u8; 32], named_revision: &Digest) -> bool {
+        *named_revision == self.revision && self.signers.contains(&author)
+    }
+}
+
+#[derive(Default)]
+struct RetentionAuthorities {
+    current: Option<CabalCheckpointAuthority>,
+    // Historical revisions justify retained roots, never new ingress. The
+    // policy owner reinstalls accepted history after a durable reopen.
+    history: HashMap<Digest, CabalCheckpointAuthority>,
+}
+
+#[derive(Clone)]
 struct ConversationPolicy {
     conversation_id: [u8; 32],
+    checkpoint_authority: Option<CabalCheckpointAuthority>,
 }
 
 impl ConversationPolicy {
@@ -49,6 +93,11 @@ impl ConversationPolicy {
 
     fn validate_grammar(&self, operation: &Operation<CabalExt>) -> Result<(), Reject> {
         let ext = &operation.header.extensions;
+        validate_causal_metadata(operation, &ext.parents, CausalLimits::default())
+            .map_err(|error| Self::reject(error.to_string()))?;
+        if ext.post_type != 6 && (ext.prune_flag.is_set() || ext.authority_revision.is_some()) {
+            return Err(Self::reject("ordinary post carries checkpoint fields"));
+        }
         let body = operation.body.as_ref().map(|body| body.to_bytes());
         let requires_channel = matches!(ext.post_type, 0 | 3 | 4 | 5);
         if requires_channel && !ChannelName::is_valid_name(&ext.channel) {
@@ -99,6 +148,18 @@ impl ConversationPolicy {
                     return Err(Self::reject("membership operation carries a body"));
                 }
             },
+            6 => {
+                if !ext.prune_flag.is_set()
+                    || ext.authority_revision.is_none()
+                    || !ext.info.is_empty()
+                    || !ext.deletes.is_empty()
+                    || !ext.parents.is_empty()
+                    || operation.header.payload_hash.is_some()
+                    || operation.header.payload_size != 0
+                {
+                    return Err(Self::reject("invalid retention checkpoint grammar"));
+                }
+            },
             _ => return Err(Self::reject("unknown conversation post type")),
         }
         Ok(())
@@ -116,10 +177,26 @@ impl OperationPolicy<CabalExt> for ConversationPolicy {
             ));
         }
         self.validate_grammar(operation)?;
-        Ok(Admission::keep(StoreTarget::new(
-            Topic::from(self.conversation_id),
-            0,
-        )))
+        let target = StoreTarget::new(Topic::from(self.conversation_id), 0);
+        if operation.header.extensions.prune_flag.is_set() {
+            let revision = operation
+                .header
+                .extensions
+                .authority_revision
+                .as_ref()
+                .unwrap();
+            if !self.checkpoint_authority.as_ref().is_some_and(|authority| {
+                authority.permits_checkpoint(*operation.header.verifying_key.as_bytes(), revision)
+            }) {
+                return Err(Reject::new(
+                    "unauthorized-retention-checkpoint",
+                    "checkpoint signer or authority revision is not permitted",
+                ));
+            }
+            Ok(Admission::prune_before_current(target))
+        } else {
+            Ok(Admission::keep(target))
+        }
     }
 }
 
@@ -131,6 +208,7 @@ impl OperationPolicy<CabalExt> for ConversationPolicy {
 pub struct ConversationStore<B> {
     conversation_id: [u8; 32],
     store: MunimentStore<B, CabalExt>,
+    checkpoint_authority: Arc<RwLock<RetentionAuthorities>>,
 }
 
 impl ConversationStore<MemoryBackend> {
@@ -139,6 +217,7 @@ impl ConversationStore<MemoryBackend> {
         Self {
             conversation_id,
             store: MunimentStore::new(MemoryBackend::new()),
+            checkpoint_authority: Arc::new(RwLock::new(RetentionAuthorities::default())),
         }
     }
 }
@@ -152,6 +231,7 @@ impl ConversationStore<RedbBackend> {
         Ok(Self {
             conversation_id,
             store: MunimentStore::new(RedbBackend::open(path)?),
+            checkpoint_authority: Arc::new(RwLock::new(RetentionAuthorities::default())),
         })
     }
 }
@@ -162,6 +242,7 @@ impl<B: Backend + Clone> ConversationStore<B> {
         Self {
             conversation_id,
             store: MunimentStore::new(backend),
+            checkpoint_authority: Arc::new(RwLock::new(RetentionAuthorities::default())),
         }
     }
 
@@ -175,27 +256,75 @@ impl<B: Backend + Clone> ConversationStore<B> {
         self.store.clone()
     }
 
+    /// Install or withdraw authority for new checkpoints. Installed historical
+    /// revisions continue to justify retained roots. After reopen, the policy
+    /// owner reinstalls accepted revisions, ending with the current one.
+    pub fn set_checkpoint_authority(&self, authority: Option<CabalCheckpointAuthority>) {
+        let mut state = self.checkpoint_authority.write().unwrap();
+        if let Some(authority) = authority.as_ref() {
+            state
+                .history
+                .insert(authority.authority_revision(), authority.clone());
+        }
+        state.current = authority;
+    }
+
+    fn policy(&self) -> ConversationPolicy {
+        ConversationPolicy {
+            conversation_id: self.conversation_id,
+            checkpoint_authority: self.checkpoint_authority.read().unwrap().current.clone(),
+        }
+    }
+
+    /// Retained metadata with only authorized checkpoint backlinks cut.
+    /// Cross-author parents are never excused by another author's prune flag.
+    pub(crate) fn causal_entries(
+        &self,
+        operations: &[Operation<CabalExt>],
+    ) -> Result<Vec<CausalEntry<u64>>, ConversationStoreError> {
+        let history = self.checkpoint_authority.read().unwrap().history.clone();
+        operations
+            .iter()
+            .map(|operation| {
+                let mut entry = CausalEntry::from_operation(
+                    operation,
+                    0,
+                    operation.header.extensions.parents.clone(),
+                );
+                if operation.header.extensions.prune_flag.is_set() {
+                    let authority = operation
+                        .header
+                        .extensions
+                        .authority_revision
+                        .as_ref()
+                        .and_then(|revision| history.get(revision))
+                        .cloned();
+                    let processor = OperationProcessor::new(
+                        self.store.clone(),
+                        ConversationPolicy {
+                            conversation_id: self.conversation_id,
+                            checkpoint_authority: authority,
+                        },
+                    );
+                    processor.preflight(operation)?;
+                    entry.backlink = None;
+                }
+                Ok(entry)
+            })
+            .collect()
+    }
+
     /// Validate, admit, and atomically index one conversation operation.
     pub async fn accept(
         &self,
         operation: &Operation<CabalExt>,
     ) -> Result<ProcessOutcome, ConversationStoreError> {
-        let processor = OperationProcessor::new(
-            self.store.clone(),
-            ConversationPolicy {
-                conversation_id: self.conversation_id,
-            },
-        );
+        let processor = self.processor();
         Ok(processor.process(operation).await?)
     }
 
     fn processor(&self) -> OperationProcessor<B, CabalExt, ConversationPolicy> {
-        OperationProcessor::new(
-            self.store.clone(),
-            ConversationPolicy {
-                conversation_id: self.conversation_id,
-            },
-        )
+        OperationProcessor::new(self.store.clone(), self.policy())
     }
 
     /// Read every retained operation for rebuilding the materialized view.

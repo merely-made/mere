@@ -1,0 +1,78 @@
+{
+  "date": "2026-10-11",
+  "scope": "Read-only exact field/coupling inspection and deterministic authored-region discovery draft",
+  "base_commit": "19b00c8d",
+  "integration": {
+    "onto_commit": "4b491d950927f84cdc3a0d0efdb96fbae04015a4",
+    "upstream_changes": "Fleece/Eidetic content-intake move, Forme control/save-wait fixes and Chrome qualification, followed by custody/CXF and Dramatis repin, projected-tag reads and Fleece URL feature correction; source checks repeated for combined source.",
+    "field_browser_acceptance": "not implied by the upstream Forme receipt",
+    "final_upstream_changes": "Knot/djinn lockstep, then Murm conversation changes and inactive p2panda patch tags; no inspector source or enabled package in the qualified cones changed."
+  },
+  "native": {
+    "status": "passed",
+    "model_tests": 10,
+    "harness": "Code/testing/mere/field-inspection-qualification",
+    "command": "cargo test --manifest-path Code/testing/mere/field-inspection-qualification/Cargo.toml --lib field_inspection",
+    "tracked_source_import": "ports/graphshell/src/field_inspection.rs",
+    "log": "Code/testing/mere/field-inspection-native.log",
+    "snapshot_roundtrip": "Graph snapshot and actual app MemoryBackend persist/reopen; no IndexedDB/browser reopening claimed",
+    "fixture_seeding": "Only empty stores; standard reference fixture remains separate; existing graphs are not reseeded",
+    "qualified_integration_commit": "d5f60e5c1a05379af8ea11ce48053140b2db2853"
+  },
+  "wasm": {
+    "product_check": "passed",
+    "command": "cargo check --locked --target wasm32-unknown-unknown --no-default-features --features product",
+    "working_directory": "ports/graphshell/web",
+    "log": "Code/testing/mere/field-inspection-product-check.log",
+    "release_bundle": "not built for this draft",
+    "default_and_viewer_checks": "not run for this draft",
+    "lockfile_refresh": "Adds eidetic url dependency and follows published main Dramatis 0234e7ee repin: insigne 0.0.2, notochord 0.1.1, personae 0.3.0. Offline check passes, then locked product check repeated."
+  },
+  "limits": {
+    "cargo_jobs": 1,
+    "memory_max_mib": 1280,
+    "swap_max_mib": 0,
+    "free_memory_guard_mib": 256
+  },
+  "interactive": {
+    "status": "pending on other machines",
+    "scenario_order": [
+      "p4_tree_field_inspection.scn",
+      "p4_tree_field_inspection_reopen.scn"
+    ],
+    "route": "tree.html?app=local&fixture=field-inspection",
+    "store": "graphshell-field-inspection-draft-v1",
+    "prerequisite": "Fresh dedicated profile/origin first; fresh page/process retaining the same origin second",
+    "captures": "five planned; none generated or reviewed in this pass",
+    "source": "Existing connected browser has no WebGPU adapter; no new browser run attempted."
+  },
+  "deferred": [
+    "Exact-coupling scoped host writes, saved undo, stale-target handling and failure retention",
+    "Spatial membership, event/script execution and overlap-composition policy",
+    "Startup/rebuild active-field eligibility consistency review by runtime owner",
+    "Keyboard/focus, narrow overlay, cancelled/drag-outside pointer release and long record presentation",
+    "Full-list/AST materialization costs on large graphs",
+    "Other hosts and generated datasets"
+  ],
+  "source_sha256": {
+    "ports/graphshell/src/field_inspection.rs": "0cd0a7c8be5625a5a16e364cd889cd528da10341466391cb910a0b74bd0e8827",
+    "ports/graphshell/src/field_inspection/tests.rs": "0612000f93ef88c61f89debf840c5e65d4e833cab25e0bb8d7dc3dbdec5d0719",
+    "ports/graphshell/src/mere_host_fixture.rs": "d97fa3c779eab819e8e7402ea395a4593185557e8d7e24569ed1252922ba9273",
+    "ports/graphshell/src/app.rs": "896320c1886ceb4d07a6791ae4d11cd08273ad95aca3f117f270624276d3936e",
+    "ports/graphshell/src/lib.rs": "a936b68ea2c6d03333a4af6267d0cc557803c8ed0f2b8703161b8b72d92959d6",
+    "ports/graphshell/src/web_tree/field_inspection.rs": "596e8fc8f8d8423f1a82619c258f1afa92b2d4ed0edd015f28eede95382fdf2f",
+    "ports/graphshell/src/web_tree/field_inspection_probe.rs": "30ac9eac7cbe5d933335b5c7ae796386dccf610687ee842cd5733883b27eca6b",
+    "ports/graphshell/src/web_tree/product.rs": "a8e396409b37e7b47227438b1314faf69a57b580723e6118ae523ceea0cf6583",
+    "ports/graphshell/src/web_tree/controls.rs": "1e660e644421c0d78c5e23f2baf3fde4635a7e5af000529c19c9ceb87342fb47",
+    "ports/graphshell/src/web_tree.rs": "68842ef51378e5285f70b3f24ee5940858f707f65e6c5243af26f1a80d4477d8",
+    "ports/graphshell/src/web_tree/lane.rs": "60444fa242dc713440f85346399924726616338101bc431e33e2cc71ea34681b",
+    "ports/graphshell/web/scenarios/p4_tree_field_inspection.scn": "dcac836e1bf787b77cb271c45b0ff24e7ab59a050c01ad546186ae472bbcd84f",
+    "ports/graphshell/web/scenarios/p4_tree_field_inspection_reopen.scn": "3361544fdeae22c1290ef2ad7b5ea89ebfa19d5ca53613aec418e252da59f565",
+    "ports/graphshell/web/Cargo.lock": "c9c8ae7d30b4c3b2b37f7437d650c5de77900215aac45cb21d713dad8a2e2fa8"
+  },
+  "documentation": {
+    "citation_audit": "equal to integrated main pre-edit baseline",
+    "d2_audit": "equal to integrated main pre-edit baseline; 252/260 coverage, ten existing errors",
+    "whitespace": "passed"
+  }
+}

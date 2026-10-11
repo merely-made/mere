@@ -782,8 +782,8 @@ unresolved field event/composition choices retain their named owners.
 
 #### Identity inspection follow-through (2026-10-10; next design steps)
 
-**Status (2026-10-11):** access/Resource and link/assertion inspection implemented
-as drafts; field and write adapters remain planned. Mark asked this agent to
+**Status (2026-10-11):** access/Resource, link/assertion and field/coupling
+inspection implemented as drafts; write adapters remain planned. Mark asked this agent to
 keep working on plans while agents on O-PC, the ThinkPad and the Macs perform
 visual tests. The implemented forme draft remains the bounded runtime proof. This sequence prepares the primitive-editor walkthrough without choosing
 the outstanding attribute-storage or field-composition policies.
@@ -791,9 +791,10 @@ the outstanding attribute-storage or field-composition policies.
 **Implementation continuation:** the access/Resource read-only adapter is
 described in [Progress](#accessresource-inspector-draft-2026-10-10), followed by
 the [link/assertion draft](#link-and-exact-assertion-inspector-draft-2026-10-11).
-Field and edit adapters retain their planned status. The link draft reads held
-source records; rule-derived display marks still need their owning explanation
-adapter.
+The [field/coupling draft](2026-06-13_scriptable_field_regions_plan.md#field-inspection-draft-2026-10-11)
+adds deterministic boundary discovery and independent Forme-owner reads. Edit
+adapters retain their planned status. The link draft reads held source records;
+rule-derived display marks still need their owning explanation adapter.
 
 Source checked at published Mere `69f17908`:
 
@@ -1595,3 +1596,19 @@ other hosts. The browser fixture shows Resource tags on two different resources;
 it does not qualify shared-Resource identity across multiple accesses. The
 native 120-library/19-adapter receipts above remain their recorded checks,
 not new reruns in this browser pass.
+
+
+#### Field inspection continuation (2026-10-11)
+
+The [field owner](2026-06-13_scriptable_field_regions_plan.md#field-inspection-draft-2026-10-11)
+records the implemented read-only field/coupling model, retained roster, exact
+identity lookup and all-candidate region discovery. Forme reads its current
+arrangement owner without synthesizing a Numen field. Selection and discovery
+do not retarget inspection implicitly; visibility is separate from force effects
+and selector matches are separate from boundary hits. Ten native model checks
+and the integrated product wasm check pass. The opt-in isolated fixture and
+two-page browser handoff remain unrun here. The other agent's Forme Chrome
+receipt above qualifies its recorded source, not this new inspector. Primitive
+writes, derived-link explanation and the field composition/event policies
+retain their existing gates; the declarative rule editor remains the next
+bounded appearance-authoring candidate.

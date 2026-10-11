@@ -6,11 +6,10 @@
 
 //! Cable-shaped post types, post IDs, and channel names.
 //!
-//! These types model the Cable wire-protocol post shapes from the upstream
-//! [Cable spec](https://github.com/cabal-club/cable). The in-memory
-//! representation here matches the wire format precisely so that
-//! `cable::wire::{encode_post, decode_post}` can round-trip without lossy
-//! conversion.
+//! These types retain the chat shapes from the upstream
+//! [Cable spec](https://github.com/cabal-club/cable), with an explicit native
+//! retention checkpoint. Murm's wire is signed p2panda operations; these shapes
+//! do not assert literal Cable wire compatibility.
 
 use identity::{Ed25519PublicKey, Ed25519Signature};
 
@@ -22,8 +21,8 @@ use crate::MurmError;
 /// is more than generous for channel-naming use.
 pub const MAX_CHANNEL_NAME_BYTES: usize = 255;
 
-/// A post identifier — the BLAKE3-256 hash of a post's canonical wire
-/// encoding (see [`crate::post_hash`]).
+/// A post identifier — its signed p2panda header hash, binding the payload
+/// commitment as well as the author's causal metadata (see [`crate::hash_post`]).
 ///
 /// Per Cable's content-addressing model, posts are identified by their
 /// hash; references to posts (in subsequent posts' `links` field, or in
@@ -218,6 +217,7 @@ pub struct Post {
 /// - `3` = [`PostKind::Topic`]
 /// - `4` = [`PostKind::Join`]
 /// - `5` = [`PostKind::Leave`]
+/// - `6` = [`PostKind::RetentionCheckpoint`] (Murm extension)
 ///
 /// (See [`PostKind::post_type`] for programmatic access.)
 #[derive(Clone, Debug)]
@@ -271,6 +271,15 @@ pub enum PostKind {
         /// Author-asserted timestamp.
         timestamp_ms: u64,
     },
+    /// Murm extension `post_type = 6`: an explicitly authorized root of this
+    /// author's retained log. It removes the author's earlier headers and
+    /// bodies, not other authors' records or a materialized community snapshot.
+    RetentionCheckpoint {
+        /// Exact authority revision supplied by the conversation owner.
+        authority_revision: proofs::Digest,
+        /// Author-asserted timestamp.
+        timestamp_ms: u64,
+    },
 }
 
 impl PostKind {
@@ -282,7 +291,8 @@ impl PostKind {
             | PostKind::Info { timestamp_ms, .. }
             | PostKind::Topic { timestamp_ms, .. }
             | PostKind::Join { timestamp_ms, .. }
-            | PostKind::Leave { timestamp_ms, .. } => *timestamp_ms,
+            | PostKind::Leave { timestamp_ms, .. }
+            | PostKind::RetentionCheckpoint { timestamp_ms, .. } => *timestamp_ms,
         }
     }
 
@@ -294,11 +304,13 @@ impl PostKind {
             | PostKind::Topic { channel, .. }
             | PostKind::Join { channel, .. }
             | PostKind::Leave { channel, .. } => Some(channel),
-            PostKind::Info { .. } | PostKind::Delete { .. } => None,
+            PostKind::Info { .. }
+            | PostKind::Delete { .. }
+            | PostKind::RetentionCheckpoint { .. } => None,
         }
     }
 
-    /// The Cable wire `post_type` discriminator (0–5).
+    /// The Cable-shaped `post_type` discriminator (0–5) or Murm extension (6).
     pub fn post_type(&self) -> u64 {
         match self {
             PostKind::Text { .. } => 0,
@@ -307,6 +319,7 @@ impl PostKind {
             PostKind::Topic { .. } => 3,
             PostKind::Join { .. } => 4,
             PostKind::Leave { .. } => 5,
+            PostKind::RetentionCheckpoint { .. } => 6,
         }
     }
 
@@ -319,6 +332,7 @@ impl PostKind {
             PostKind::Topic { .. } => "topic",
             PostKind::Join { .. } => "join",
             PostKind::Leave { .. } => "leave",
+            PostKind::RetentionCheckpoint { .. } => "retention-checkpoint",
         }
     }
 }
@@ -419,12 +433,16 @@ mod tests {
                 channel: ChannelName::new("c"),
                 timestamp_ms: 0,
             },
+            PostKind::RetentionCheckpoint {
+                authority_revision: proofs::Digest::blake3(b"policy"),
+                timestamp_ms: 0,
+            },
         ];
 
         let names: std::collections::HashSet<_> = kinds.iter().map(PostKind::kind_name).collect();
         let discriminants: std::collections::HashSet<_> =
             kinds.iter().map(PostKind::post_type).collect();
-        assert_eq!(names.len(), 6);
-        assert_eq!(discriminants.len(), 6);
+        assert_eq!(names.len(), 7);
+        assert_eq!(discriminants.len(), 7);
     }
 }
