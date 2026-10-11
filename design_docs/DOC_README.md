@@ -720,6 +720,14 @@ is historical evidence, not the current path or ownership inventory. For the wor
 
 ## Working principles
 
+- **Implementation drafts for other machines (2026-10-10):** Mark authorizes
+  bounded implementations of existing plans to be committed and pushed directly
+  to main for other agents to review, test and improve; PRs are optional. Record
+  the implementation, exact check status, unresolved decisions and next review
+  steps in its owning plan. Draft source may precede host testing; distinguish
+  that delivery from a qualified or completed phase. Use existing owners and
+  contracts, and keep unresolved architecture choices explicit.
+
 - **Portable qualification handoffs (2026-10-10):** when one machine supplies
   implementation and another supplies visual testing, keep the tested revision,
   build/features, scenario order, retained-state prerequisites and open gates

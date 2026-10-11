@@ -337,6 +337,15 @@ is inferred. Complete D2 JSON was compared with an archive of committed main
 duplicate README basenames and aggregate-digest mismatch are pre-existing.
 No active Markdown document or unknown audit record was added.
 
+**Implementation-draft delivery (2026-10-10):** Mark authorizes direct-main
+implementation drafts for other machines to review, test and improve. The
+editor plan ranks bounded candidates against existing Resource/relation/field
+reads and the declarative presentation resolver; the index preserves the
+working agreement. Candidate scope and actual implementation/qualification
+remain distinct. No source, host test or agent dispatch is claimed by this
+documentation pass. Citation and D2 audit JSON retain their pre-edit baseline;
+no active document or supplemental judgment identity was added.
+
 **Planning and test handoff (2026-10-10):** Mark assigned continued planning to
 this machine while agents on O-PC, the ThinkPad or the Macs test. Source checked
 at published `69f17908`: Resource association/access reads, stratum-preserving
