@@ -1,7 +1,8 @@
 # Fleece gathering and Eidetic intake
 
 **Date:** 2026-10-11
-**Status:** in progress. Mark approved the five dependency shuffles and integration.
+**Status (2026-10-11):** landed. All five dependency shuffles and the portable
+Turnstone consumer integration are qualified below.
 
 ## Accepted direction
 
@@ -118,11 +119,74 @@ Native automated receipts on 2026-10-11, using `C:/t/cargo-targets/mere`:
   sources, using `C:/t/cargo-targets/turnstone`. The portable lock was unchanged.
   Knot still consumes Pandect's published schema helper names, so forwarding
   reexports preserve that API while Eidetic owns their implementation.
-- The initial concrete Fetch gate passed 25 tests. Source review then found
+- `cargo test -p mere-fetch --no-default-features --features https-blobs,iroh-blobs
+  --lib --offline -j 2`: 25 passed after the retry-free client change, including
+  seven streaming crawler tests and HTTPS/Iroh adapters. Source review found
   Hyper's hidden canceled pooled-request retry; the default crawler adapter now
   constructs a separate client with retries explicitly disabled and explicit
-  TLS trust. Its rerun is pending; pooled-cancellation race coverage is not claimed.
+  TLS trust. Pooled-cancellation race coverage is not claimed.
 
-Consumer aggregate, retry-free Fetch and wasm gates are running. Exact portable
-consumer pins still require integration. These receipts do not establish headed
-product acceptance or an implemented inference model.
+- `cargo check -p eidetic -p mere-fleece --no-default-features --features
+  mere-fleece/clip,mere-fleece/eidetic-bridge,mere-fleece/structured-data
+  --target wasm32-unknown-unknown --lib --offline -j 2`: passed. Native HTTP
+  crawling is cfg-gated; the pure traversal runtime remains portable.
+
+- `cargo test -p mere -p pandect -p mere-alembic -p mere-athanor -p mere-moot
+  -p mere-document-lanes -p eidetic --no-default-features --features
+  mere/clip,mere-moot/captured-web,eidetic/json-schema,mere-alembic/recall
+  --lib --offline -j 2`: 493 passed. A stale surface-only clip relation assertion
+  now checks the public resource projection. Athanor's tagged-retention failures
+  exposed Alembic's old raw-tag read; `node_content_tags` preserves the existing
+  tag-promotion rule and physics-pin independence. No new retention policy.
+- Capture-only consumer gate, without clipping: `cargo test -p pandect
+  -p mere-moot -p mere-document-lanes --no-default-features --features
+  mere-moot/captured-web --lib --offline -j 2`: 309 passed after declaring capture's
+  explicit URL dependency.
+
+- Portable Turnstone metadata gate: `python scripts/cargo_mode.py verify
+  --metadata-only` passed, 1,291 packages, zero external path overrides. The
+  source-family audit resolved 75 Mere packages at `5758724e`, five Knot packages
+  at `e2bc47cf`, six Woodshed packages at `3c8e4edb`, 30 Genet packages at
+  `7422e906` and four Dramatis packages at `c1d62076`, one revision per family.
+  All 1,444 registry package/version/source entries match the prior lock.
+  Portable lock SHA256:
+  `1505845c225549367fb93ef9c4c0cdd15a5b1e86a1fb84198ae09b06273b5cd2`.
+- `cargo check --lib --tests --locked --offline -j 2` in the primary Turnstone
+  checkout: passed using `C:/t/cargo-targets/turnstone`, after the final source
+  migration and formatting corrections. This qualifies the library and test
+  targets against the portable source family above; it does not execute
+  Turnstone tests. Cargo emits a discovery diagnostic for Servo's intentionally
+  invalid tidy fixture, but the locked update, metadata and check commands all
+  complete with exit status zero.
+
+The compatible Knot and Woodshed commits were based on Turnstone's prior pins
+in clean worktrees because both primary checkouts had concurrent work. Their
+branches preserve those changes and keep the qualified commits reachable. Mere's
+primary main subsequently accepted a concurrent custody/RC dependency lane;
+these source receipts and Turnstone pins qualify `5758724e`, before that lane.
+
+These receipts do not establish headed product acceptance or an implemented
+inference model. The deferred Eidetic plan retains the concrete consumer and
+pooled-cancellation race test follow-through before this plan is archived.
+
+
+## Completion (2026-10-11)
+
+All approved moves are implemented and pushed. Source-qualified consumer pins
+avoid pulling concurrent Knot RC and Woodshed transcript work into this pass.
+The open query/model consumer, headed acceptance and deterministic HTTP pool
+race test were extracted into the deferred Eidetic plan before archival.
+The task reused stable Mere and Turnstone targets; no isolated Cargo home was
+created. Turnstone's consumer migration is committed and pushed as
+`1034fb64b133022926bb4c7135b2b3281d09cc3b`. Both clean owned Knot/Woodshed
+worktrees were removed; their local and pushed `fleece-integration` branches
+remain for exact consumer-pin reachability. Concurrent primary work is preserved.
+
+The completion pass repaired active links to relocated clip/Fjall files and
+marked Micron's old import-path log citation as historical. Missing Exhibit A
+headers in seven new owned sources were filled; `relicense_headers.py --check`
+passes for the complete owned source tree. These final source edits are comments.
+The D2 audit remains at its existing 252/259 active-path baseline: seven
+unrelated missing records and a duplicate README basename finding. The scoped
+judgments and completed checkpoint are recorded in batch 66; this task leaves no
+new missing active judgment.

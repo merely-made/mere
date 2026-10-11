@@ -159,6 +159,27 @@ impl CabalHandle {
         self.engine.keyring(self.cabal_id.as_bytes())
     }
 
+    /// Install or withdraw retention authority resolved by this cabal's owner.
+    pub async fn set_checkpoint_authority(
+        &self,
+        authority: Option<crate::CabalCheckpointAuthority>,
+    ) -> Result<(), MurmError> {
+        self.engine
+            .set_checkpoint_authority(self.cabal_id.as_bytes(), authority)
+            .await
+    }
+
+    /// Remove this author's earlier log through an explicitly authorized root.
+    pub async fn retention_checkpoint_at(
+        &self,
+        authority_revision: proofs::Digest,
+        timestamp_ms: u64,
+    ) -> Result<PostId, MurmError> {
+        self.engine
+            .post_retention_checkpoint(self.cabal_id.as_bytes(), authority_revision, timestamp_ms)
+            .await
+    }
+
     /// Install the next key produced by the cabal's group-state owner.
     ///
     /// This is deliberately an installation hook, not an authorization API:

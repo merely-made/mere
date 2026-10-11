@@ -273,3 +273,49 @@ fn operation_to_post_handles_bodyless_posts() {
     let back = operation_to_post(&op).unwrap();
     assert_eq!(encode_post(&post), encode_post(&back));
 }
+
+#[test]
+fn retention_checkpoint_round_trip_and_ordinary_wire_compatibility() {
+    assert_round_trip(
+        PostKind::RetentionCheckpoint {
+            authority_revision: proofs::Digest::blake3(b"policy"),
+            timestamp_ms: 0,
+        },
+        Vec::new(),
+    );
+
+    // Model the previous extension grammar: absent new fields must decode as
+    // defaults, and ordinary posts must retain exactly the old signed bytes.
+    #[derive(Clone, Debug, Serialize, Deserialize)]
+    struct LegacyExt {
+        cabal_id: [u8; 32],
+        channel: String,
+        post_type: u64,
+        timestamp_ms: u64,
+        parents: Vec<[u8; 32]>,
+        info: Vec<(String, Vec<u8>)>,
+        deletes: Vec<[u8; 32]>,
+    }
+    let kind = PostKind::Text {
+        channel: ChannelName::new("session"),
+        text: "unchanged".into(),
+        timestamp_ms: 1,
+    };
+    let post = sign_post(&keypair(), TEST_CABAL, 0, None, Vec::new(), kind);
+    let legacy = Header::builder().body(b"unchanged").build(
+        &SigningKey::from_bytes(&keypair().to_seed()),
+        LegacyExt {
+            cabal_id: TEST_CABAL,
+            channel: "session".into(),
+            post_type: 0,
+            timestamp_ms: 1,
+            parents: Vec::new(),
+            info: Vec::new(),
+            deletes: Vec::new(),
+        },
+    );
+    assert_eq!(post.header, legacy.encode());
+    let decoded = Header::<CabalExt>::decode(&legacy.encode()).unwrap();
+    assert!(decoded.extensions.prune_flag.is_not_set());
+    assert!(decoded.extensions.authority_revision.is_none());
+}
