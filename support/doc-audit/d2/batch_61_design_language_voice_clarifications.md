@@ -323,3 +323,50 @@ Use the existing named homes rather than a duplicate synthesis document.
 Checked the four updated index entries against their owners; all previous
 unrelated index lines are preserved. Whole-tree pre-existing audit failures
 remain outside this pass.
+
+
+**Scoped Forme draft adapter (2026-10-10):** Mark explicitly selected its
+implementation in the design-language chat after the initial bridge was
+published. The editor plan's new Progress entry and the portable Graphshell
+qualification JSON record 28 native checks and product/default/viewer wasm
+checks plus compact release packaging. The root brief and index now identify
+that bounded adapter as implemented, with headed qualification pending; other
+hosts and general field/editor work retain their own gates. No browser receipt
+is inferred. Complete D2 JSON was compared with an archive of committed main
+`4f70d536` and is identical: 252/259 coverage, the seven missing records,
+duplicate README basenames and aggregate-digest mismatch are pre-existing.
+No active Markdown document or unknown audit record was added.
+
+**Access/Resource inspection draft (2026-10-10):** Mark approved the candidate
+sequence. The first adapter now has a read-only portable model, local retained
+inspector, observation fields and a pending host scenario. The editor plan and
+canonical index distinguish this implementation draft from the remaining
+primitive editors. Six actual-source native model tests and the product wasm
+check pass under the existing memory limits; source hashes and exact check
+scope live in the portable qualification JSON. No browser receipt or other
+agent's review is inferred. Full citation and D2 audit JSON match the pre-edit
+baseline, retaining 252/259 coverage and nine existing D2 errors. New local
+links resolve and whitespace checks pass. No active document was added.
+
+**Implementation-draft delivery (2026-10-10):** Mark authorizes direct-main
+implementation drafts for other machines to review, test and improve. The
+editor plan ranks bounded candidates against existing Resource/relation/field
+reads and the declarative presentation resolver; the index preserves the
+working agreement. Candidate scope and actual implementation/qualification
+remain distinct. No source, host test or agent dispatch is claimed by this
+documentation pass. Citation and D2 audit JSON retain their pre-edit baseline;
+no active document or supplemental judgment identity was added.
+
+**Planning and test handoff (2026-10-10):** Mark assigned continued planning to
+this machine while agents on O-PC, the ThinkPad or the Macs test. Source checked
+at published `69f17908`: Resource association/access reads, stratum-preserving
+projected relations, exact semantic-statement lookup and attribution, roster
+subjects, field/coupling reads and graph deltas, the product route and scenario
+loader. The editor plan stages exact-owner inspection before mutation and owns
+the portable four-run Forme qualification handoff; the field plan stages
+individual field/coupling inspection and reconciles its old draft status.
+The index links both and records the portable-qualification working principle.
+No new runtime track, storage/composition ruling, external message or browser
+pass is inferred. Full citation-audit and D2 JSON match their pre-edit baselines;
+D2 retains 252/259 coverage and its nine existing errors. Whitespace checks
+pass. No active document or unknown audit record was added.

@@ -1,0 +1,70 @@
+{
+  "date": "2026-10-10",
+  "scope": "Graphshell retained Forme draft and saved layout history",
+  "base_commit": "4f70d5362f9c365b28caa5a8496755fab27a0eca",
+  "native": {
+    "passed": 28,
+    "new_draft_history_cases": 8,
+    "harness": "Code/testing/mere/forme-qualification",
+    "tracked_source_imports": [
+      "forme_workspace.rs",
+      "forme_session.rs",
+      "presentation.rs"
+    ],
+    "integrations": [
+      "pictograph Forme region",
+      "real-layout rootstock hover"
+    ]
+  },
+  "wasm": {
+    "product_check": "passed",
+    "default_feature_check": "passed",
+    "viewer_only_check": "passed",
+    "compact_release_product_build": "passed",
+    "matching_bindgen": "0.2.129",
+    "packaging": "passed",
+    "release_input_bytes": 21718200,
+    "release_input_sha256": "febe5177f57d7ba986bf82544dbd4f996d36e53f16e4a664c1d744d113c8fbb8",
+    "packaging_max_rss_kib": 1070348
+  },
+  "limits": {
+    "cargo_jobs": 1,
+    "native_and_packaging_memory_max_mib": 1280,
+    "full_check_memory_max_mib": 1536,
+    "swap_max_mib": 0,
+    "free_memory_guard_mib": 256
+  },
+  "logs": [
+    "Code/testing/mere/forme-draft-native.log",
+    "Code/testing/mere/forme-draft-product-check.log",
+    "Code/testing/mere/forme-draft-default-final.log",
+    "Code/testing/mere/forme-draft-viewer-check.log",
+    "Code/testing/mere/forme-draft-release.log",
+    "Code/testing/mere/forme-draft-bindgen.log"
+  ],
+  "source_sha256": {
+    "crates/forme/forme/src/arrangement.rs": "eee7b9c0b010a2e4680acabe043e26edfe35ad78887bf6e25403fb0081c70f4d",
+    "ports/graphshell/src/forme_workspace.rs": "6423b3310086d539c8c886092df1c2c8179bfb7024f4cc4435f315fbc84a88a5",
+    "ports/graphshell/src/forme_session.rs": "7d51b8ddc753150ada6c03c2802adf6f3ae158f497e17825f000285810f1e1e4",
+    "ports/graphshell/src/web_tree/forme.rs": "8d69ca35f44c6db96f59de623f4b1c15552a375a9264a8e70c1abfa97964ed62",
+    "ports/graphshell/src/web_tree/controls.rs": "d30c4768c5aa3b7c1acec817a8b5e7b49fa24aacbb156787ea9ba09993f35aea",
+    "ports/graphshell/src/web_tree/lane.rs": "8272a0c5feadb56a3d3fdab61bd663ee18c46366d0e1bdef78845ca87942308e",
+    "ports/graphshell/src/web_tree.rs": "d002477f8673df0a29cbeacd00a82759582dce85b86b9bc4ebf53cf0bf1a88ec"
+  },
+  "interactive": {
+    "status": "pending",
+    "blocker": "Connected in-app browser exposes no WebGPU adapter; no interactive run or screenshot claimed.",
+    "scenarios": [
+      "p4_tree_forme.scn",
+      "p4_tree_forme_reopen.scn",
+      "p4_tree_forme_draft.scn",
+      "p4_tree_forme_draft_reopen.scn"
+    ]
+  },
+  "doc_audit": {
+    "baseline_json_identical": true,
+    "active_docs": 259,
+    "covered_active_docs": 252,
+    "existing_errors_unchanged": true
+  }
+}

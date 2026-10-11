@@ -112,3 +112,72 @@ Pictograph timing failure and passing targeted rerun, and the browser receipts.
 Paging does not rerun settled cells; R162 still owns overlapping viewer files.
 Earlier questions and measurements have explicit superseding checkpoints.
 Firefox, B1/S2, the second consumer and the coordinator's review remain open.
+
+
+## B1 backend draft continuation, 2026-10-10
+
+Supplemental implementing-agent judgment against Mere `71528a7a` plus the
+owned backend diff. The editor plan and handoff retain B1 as open and name
+the pending R162 handoff and mode fork. Read the binder, obstacle lifecycle,
+paint integration and retained idle-overlap probe directly. Their draft
+claims match the current source; no browser acceptance or refreshed dynamics
+identity is claimed. Existing totals above remain the earlier dynamics
+checkpoint's bounded judgment, not an aggregate for this draft.
+
+The final native receipts report four focused binder tests and 161 Seiche
+library tests passing (10 ignored). The locked wasm viewer compile check
+passes. The retained short-bound overlap failure is distinct from the final
+360-step active-law/control proof; no tolerance or settle budget was raised.
+The changed-doc audit reports no new findings. The D2 aggregate's eight errors
+are existing index/coverage issues outside these two changed documents.
+
+## SE90 correction and upstream inspection, 2026-10-10
+
+Supplemental source judgment against local Mere `d572b322`, freshly fetched
+Mere `773a0dc2` and site `87d7a3d`. The editor plan records Mark's correction
+verbatim as SE90 and supersedes B1's three-mode control and done-condition.
+The handoff now distinguishes scene role, visibility, collision, animation,
+picking and behavior. Reset and recent-interaction membership boundaries remain
+explicitly open; this documentation change does not claim their implementation.
+
+Verified `sceno::Backdrop`, Pictograph's `AmbientSim`, Seiche's `SceneSpec`, the
+viewer toolbar and `Canvas::restore_arrangement` directly. The static backend
+remains useful but does not implement the animated/interactive set. Compared
+all R162 reserved viewer paths against freshly fetched Mere upstream: equal
+and locally unmodified. The published Forme bridge and reconciliation are
+ancestors of upstream; the B1 backend is not. Site R162 still assigns viewer
+ownership, with no published release in the current site plan. Earlier
+qualification counts are historical receipts; no runtime test was rerun for
+this documentation-only correction. The changed-doc comparison reports no new
+mechanical findings, and the scoped diff check passes. Earlier aggregate totals
+remain unchanged.
+
+## SE91 attention default, 2026-10-10
+
+Supplemental documentation judgment against Mere `9fb29896`: SE91 records
+Mark's acceptance verbatim and closes the foreground/background membership
+fork from SE90. The default agrees with design-language §9.2: selection and
+foreground pins bring nodes forward; deselected interacted nodes remain in
+the background until dismissed. The plan and handoff preserve independent
+physics/behavior and keeping state. Reset and qualifying-interaction details
+remain open. No viewer implementation or new runtime receipt is claimed.
+
+## Design ownership continuation, 2026-10-10
+
+Read published Mere `79115edd` §9.14 directly after a fresh fetch, against
+local base `ad376e26`. The handoff matches its projection/dynamics boundary,
+Tabard ownership, unassigned scene-authoring research and retained runtime
+gates. The forme draft summary matches the accepted scope conveyed by the
+allocation. This is a documentation-only acknowledgment, not an implementation
+receipt or reopening of F199. Concurrent CLI work is outside this change.
+
+## Field/editor runtime seam review, 2026-10-10
+
+Supplemental source inspection against freshly fetched Mere `4f70d536`, local
+base `99309dd7`. Read the published field/editor proposals, canvas coupling
+bridge, Seiche coupling application and install/tick loops, kernel coupling
+iteration/strength methods and canvas field controls. The handoff records
+lost provenance/extent at the bridge, response-specific writes, unspecified
+coupling order, time-zero sampling and per-field strength scope. Each claim
+matches that source. The four projection checkpoints and dynamics seam inputs
+remain proposals; no adapter, runtime arbitration or new test receipt is claimed.

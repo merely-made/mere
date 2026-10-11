@@ -11,6 +11,8 @@
 
 #[cfg(feature = "web")]
 pub mod access;
+#[cfg(feature = "web")]
+pub mod access_inspection;
 #[cfg(any(
     all(feature = "native", not(target_arch = "wasm32")),
     feature = "webrtc-join"
@@ -47,6 +49,8 @@ pub mod carriage;
 pub mod carrier;
 #[cfg(any(feature = "native", feature = "web"))]
 pub mod distillery_w1;
+#[cfg(feature = "web")]
+pub mod forme_session;
 #[cfg(feature = "web")]
 pub mod forme_workspace;
 #[cfg(feature = "web")]

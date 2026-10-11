@@ -143,8 +143,11 @@ handles with region/drop previews, undo/redo within that draft, discard it
 without changing content, or lock-and-apply it as one arrangement change.
 Both presentations may show the draft; committed arrangement and geometry
 change only on apply. The [editor follow-through](2026-10-07_scenograph_editor_plan.md#forme-draft-follow-through-2026-10-10-agreed-interaction)
-carries the implementation steps. This does not imply that locking pauses
-dynamics or that the field/workbench gesture bridge is implemented.
+carries the implementation steps and the now-implemented Graphshell draft
+adapter. Its native/build qualification passes; its
+[visual test handoff](2026-10-07_scenograph_editor_plan.md#forme-visual-test-handoff-2026-10-10)
+remains open. This does not imply that locking pauses dynamics or supplies a
+general field editor.
 
 ## Field authoring draft (2026-10-10)
 
@@ -179,9 +182,10 @@ Checked at published Mere `86f2a3b8`:
 - The [Workbench Forme bridge](2026-10-07_scenograph_editor_plan.md#workbench-forme-bridge-2026-10-10)
   now supplies reading tiles, corresponding canvas regions and existing-field
   inspect/locate/hide controls. This updates the earlier no-inspection-caller
-  inventory. General field creation/effect editing and whole-forme draft undo
-  remain separate work. Native/build receipts exist; headed acceptance remains
-  pending in that record.
+  inventory. The later scoped forme draft adds arrangement undo/discard/apply
+  and saved layout history. General field creation/effect editing remains
+  separate work. Native/build receipts exist; headed acceptance remains pending
+  in the editor plan.
 
 ### Proposed controls
 
@@ -276,6 +280,43 @@ content loss; and qualify the agreed forme draft against the existing bridge.
 Runtime tests must include repeated appearances, conflicting placement, an empty
 or limited query result and failed apply. Entry-action execution is a separate
 dynamics-owned acceptance case. This pass adds design and source findings only.
+
+### Field inspection adapter sequence (2026-10-10)
+
+**Status:** planned; source checked at published Mere `69f17908`. This narrows
+the first editor delivery to inspection, so the unresolved spatial/event and
+storage decisions above do not have to be invented to make fields understandable.
+
+1. **Enumerate exact owners.** Read each Numen `FieldId` and its couplings from
+   [Graph's field reads](../../../crates/graph/graph-kernel/src/graph/field_ops.rs).
+   Show lifecycle, authored extent/definition, and each `CouplingId` with its
+   selector, response and strength. Sort rows deterministically for inspection;
+   that order does not establish simulation or placement precedence. Display
+   unrecognized responses as stored but unsupported by the current consumer.
+   Done: two couplings on one field remain individually identifiable and an
+   inactive field can still be inspected.
+2. **Discover an overlap without changing the edit target.** Offer all matching
+   visible fields and preserve the chosen identity throughout the gesture.
+   Roster inspection also reaches hidden boundaries. Distinguish an authored
+   region hit from selector matches and actual evaluated influence; current
+   force conversion does not consume extent as a membership filter. Done:
+   repeated picking presents the same candidate identities, and hiding a
+   boundary does not imply disabling its effects.
+3. **Prepare one-coupling editing.** Resolve the exact coupling again before
+   apply, retain the other couplings, and validate its complete candidate. The
+   [graph deltas](../../../crates/graph/graph-kernel/src/graph/apply.rs) provide
+   add/replace and retract by coupling identity; their existence alone does not
+   qualify a stale-safe host operation or its saved undo. A field-wide strength
+   shortcut must not service an individual coupling row. Done before a write
+   control opens: a host-level scoped transaction changes one coupling,
+   undo/reopen restores that exact value, and failure preserves its draft.
+
+The [primitive inspection sequence](2026-10-07_scenograph_editor_plan.md#identity-inspection-follow-through-2026-10-10-next-design-steps)
+owns the common access/link/field inspector. A forme resolves to its arrangement
+and geometry owner, independently of the Numen field roster. This pass does not
+choose an association record, new attributes, event triggers or conflict policy.
+Read-only inspection can land first; the remaining controls follow their named
+write and composition gates.
 
 ## Findings (code-verified substrate)
 

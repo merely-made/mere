@@ -34,6 +34,89 @@ done-conditions without taking over the active dynamics implementation or
 opening a new track. The field plan corrects the earlier assumption that a
 coupling selector already means membership in the field's extent.
 
+**Design ownership continuation (2026-10-10):** verified the projection
+grammar agent's notice against freshly fetched Mere `79115edd`. Mark's
+allocation is recorded in
+[published design language §9.14](https://github.com/merely-made/mere/blob/79115edd7b5b2c6ef7c14b8700dd2b66ecb49873/design_docs/2026-08-23_projection_scenes_and_graph_native_platform.md#914-design-work-ownership-2026-10-10).
+The dynamics lane owns visible explanations of contributions/constraints,
+script and motion authoring, force execution and runtime field actions.
+The projection grammar lane owns selection, inspection, ambient context,
+node/link/field editors and the user's field membership, extent, placement,
+influence and projection controls, including workbench/forme correspondence
+and overlapping-field inspection. Tabard's q-pc lane owns theme and typography.
+Scene authoring and presentation rules remain a research lane without an
+individual owner assigned by this allocation; preserve accepted R1 evidence.
+
+At the projection/dynamics seam, agree exact target identities, triggering
+events and emitted effects, and disclose applicable forces and constraints
+without silently retargeting. Ordinary additive forces compose; incompatible
+placement or state writers require explicit treatment. The accepted per-forme
+draft has unlock, scoped gesture undo/redo, discard to committed arrangement,
+and lock-and-apply as one undoable arrangement change. It does not snapshot
+document contents, playback or unrelated graph edits. Existing source,
+workbench and site viewer ownership, the B1/S2 sequence, F199's pause and
+qualification gates remain intact. This allocation is design ownership;
+it is not runtime completion or permission to reopen the coordinator's queue.
+
+### Field/editor runtime seam review (2026-10-10)
+
+Freshly fetched Mere `4f70d536` publishes the projection lane's
+[field draft](https://github.com/merely-made/mere/blob/4f70d536/design_docs/mere_docs/implementation_strategy/2026-06-13_scriptable_field_regions_plan.md#field-authoring-draft-2026-10-10)
+and primitive editor draft. Its separation of declared candidates,
+occurrence-local spatial eligibility and influence weight is a proposal that
+fits the existing owner boundaries. The reference-point membership test,
+conflicting-placement refusal, initial-match report-only policy and
+field/forme association/attribute storage are still checkpoints, not rulings.
+Previewing actions must not invoke an applet. Event cadence, debounce/re-entry,
+response composition, execution and explanations belong to the dynamics seam;
+this update does not dispatch implementation or change the B1/S2 order.
+
+Source findings checked against that published tree:
+
+- The [canvas bridge](../../../crates/canvas/pictograph/src/canvas/seiche_bridge.rs)
+  captures matching graph-node keys and a field definition/registry. It passes
+  no extent, occurrence mapping, `FieldId` or `CouplingId` into `CouplingForce`.
+  A visible explanation therefore needs an owner-held provenance map from the
+  runtime contribution back to the exact field, coupling and occurrence; a
+  vector index or endpoints alone cannot supply durable identity. The current
+  graph-node bridge is distinct from the occurrence preview adapter.
+- [Coupling execution](../../../crates/conatus/seiche/src/coupling_force.rs)
+  adds force for attraction, repulsion and `ContainmentWall`. The wall response
+  is a depth-scaled force, not an exact positional exclusion. `AlignVelocity`
+  overwrites velocity; `DampenInside` multiplies velocity by its factor and
+  currently does not use coupling strength; `FlowAdvect` directly advances a
+  dynamic body's position and skips pinned kinematic bodies. Explanations and
+  per-effect controls must disclose these actual effects, not promise one
+  generic strength or additive composition for all responses.
+- Graph [coupling iteration](../../../crates/graph/graph-kernel/src/graph/field_ops.rs)
+  has unspecified order. The bridge collects that order; Seiche's simulation
+  applies couplings sequentially, and `set_coupling_forces` simply installs the
+  vector. Multiple velocity assignments, damping mixed with assignment, and
+  sampled position writes can therefore depend on execution order. The catalog's
+  currency/admission contract does not establish an arbitration policy for this
+  direct coupling-install path. No priority or refusal rule is selected here.
+- Every field sample in `CouplingForce::apply` currently uses time `0.0`.
+  Spatial eligibility, entry/exit events and animation clocks are not supplied
+  by this path. Open responses apply no force; their owning consumers still need
+  execution. Runtime field actions need an explicit clock and event contract
+  before this becomes a script/motion authoring adapter.
+- The existing [field controls](../../../crates/canvas/pictograph/src/canvas/input.rs)
+  read the first coupling's strength and write every coupling for the field via
+  `SetFieldCouplingStrength`. The kernel implementation confirms the draft's
+  finding. A per-effect edit needs an exact coupling address and its recorded
+  host write; the existing convenience control cannot implement that editor.
+
+*Reading, not ruled:* the next seam design should carry exact source and
+occurrence identity, the evaluation revision/space, candidate and eligibility
+explanations, supported response and contribution provenance. Membership
+transitions need explicit cause and before/after evaluations; the observation
+of a transition must remain separate from permission to execute its action.
+Specify clock/reset/re-entry semantics and how conflicting state writers are
+handled before building the adapter. An explanation should distinguish declared,
+eligible, evaluated, applied, refused and unsupported effects without claiming
+that an unknown response executed. These are review requirements and proposed
+contract inputs, not a new serialized schema or measured runtime receipt.
+
 ## Ruled continuation, 2026-10-10
 
 F200 to F202 are recorded verbatim in the dynamics grammar plan, committed
@@ -107,9 +190,39 @@ probe remain in the existing testing directory. No isolated target, Cargo home
 or worktree was created. The shared `C:/t/cargo-targets/mere` target and browser
 package are retained for Mere's ongoing work and the open Firefox gate.
 
+**B1 backend continuation (2026-10-10, draft):** the graph canvas now has a
+portable backdrop binder with a separate static-obstacle set. Its resolved
+geometry supplies both camera-aligned paint and contact; visibility and
+collision stay independent. The binder preserves the previous layer on a
+path-specific refusal. Unsupported contact paths, points and concave polygons
+need a further footprint adapter. Living scene bodies, gravity and node
+tangibility are retained when the obstacle set changes.
+
+SE90 in the editor plan supersedes the proposed mode/control fork: reset is
+an action, ambient context and props can coexist, and visibility is independent
+of collision, animation, picking and authored behavior. The static binder is
+one component of the set, not an interactive scenery implementation. SE91
+resolves membership: selected or foreground-pinned nodes stay foregrounded;
+after deselection, interacted nodes recede but remain until dismissed.
+Untouched ambient suggestions may change with context. Reset's baseline and
+the interaction boundary for retention remain open. R162's viewer ownership
+has not been released.
+No reserved viewer files have been edited by this continuation. Scene state,
+viewer integration and Chrome/Firefox checks are still open. The retained
+`backdrops-idle-overlap.txt` probe retains the short 120-step, idle-body
+failure. Rapier caps correction at 3 world units per second. The
+active-law/control check uses the canvas's existing 360-step settle budget;
+larger/deeper or idle placements remain a qualification limit. No exclusion
+tolerance or host settle budget changed. All four focused native binder tests
+pass, and Seiche's library suite passes 161 with 10 ignored. The locked
+standalone viewer wasm compile check passes on Genet `7422e906` and Vello
+`10f01d6d`. This backend draft neither closes B1 nor refreshes the earlier
+dynamics identity receipt.
+
 B1/S2 continue through the viewer owner assigned by site R162. The concrete
-next slices are: B1's three-mode control, backdrop drawing, tangible obstacle
-binding and its intangible control; then S2's clause selection, per-appearance
+next slices are: reconcile B1's reset/context/set state with the existing
+owners under SE90, then viewer backdrop drawing, independent controls and the
+tangible obstacle proof with its intangible control; then S2's clause selection, per-appearance
 visibility, shelfmark mapping and scenotime replay. SE88's UI name is
 "Appearance part"; a spelling for the replacement shelfmark key remains a
 reading, not a separate ruling. The site's current selection semantics must
@@ -282,6 +395,26 @@ The one `host_dataset_view.rs` change in the dynamics draft is the required
 `dynamics: None` initialization for the expanded recipe type. No new viewer
 behavior has been installed. The site's upstream sandbox still carries
 `mer3ly.facets`; SE88's key migration has not been applied.
+
+**Upstream check, 2026-10-10:** fresh fetches report Mere `773a0dc2` and site
+`87d7a3d` on `origin/main`. The viewer's Forme bridge `cf4f4c51` and reconciliation
+`70fb3aa4` are published. The reserved viewer files in local main `d572b322`
+match Mere upstream exactly, with no local edits at this checkpoint. The site
+plan still reserves those files under R162; committed/pushed work does not
+constitute an ownership release or proof that the cutover is complete. The
+B1 backend `e386e827` is local and is not an ancestor of published main.
+
+**SE90 source map:** portable `sceno::Backdrop` carries provenance, transforms,
+geometry, visibility and collision, but no behavior or item-picking identity.
+Pictograph's `AmbientSim` advances decorative simulations and paints them; it
+does not mean contextual graph nodes and has no picking or reset contract.
+Seiche's `SceneSpec` already supplies fixed/dynamic bodies, initial velocities,
+sprites, joints and perpetual motion, with tangibility separate. These are
+existing capabilities, not a unified portable set adapter. Graphshell's
+"Restore arrangement" calls `Canvas::restore_arrangement`, which restores
+stored placement and pauses physics without resetting scenic body, animation
+or script state. Use these seams to define the next bounded slice rather than
+turning the sandbox's mode labels into the scene model.
 
 **Workspace rules for this continuation:** Mark's current workspace
 instructions supersede the historical worktree/build-directory paragraph below.

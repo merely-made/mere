@@ -873,7 +873,10 @@ Production host adoption and the Rhai runner are separately qualified there.
 
 ### 9.11 Forme draft session (2026-10-10)
 
-**Agreed interaction; implementation pending.** Mark described unlocked nodes
+**Agreed interaction; Graphshell adapter implemented, headed qualification pending.**
+The [editor plan's draft progress](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#workbench-forme-draft-2026-10-10)
+records its scoped native/build checks; other-host adoption remains separate.
+Mark described unlocked nodes
 as tile handles: dragging a handle previews the corresponding tile region,
 split and nesting; dragging another node into the forme adds it to the proposed
 arrangement. Locking agrees to commit those changes. Asked how to discard the
@@ -909,8 +912,9 @@ not require another force-composition model or prescribe a scene's appearance.
 
 The [editor plan](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#forme-draft-follow-through-2026-10-10-agreed-interaction)
 maps the shared history and layout substrate to implementation steps and
-qualification. The gesture bridge and committed arrangement undo are pending;
-this agreement is not a runtime receipt.
+qualification. The first Graphshell adapter now implements the draft and saved
+arrangement undo, with its interactive check pending; this agreement and source
+qualification do not substitute for a headed runtime receipt.
 
 ### 9.12 Mixed-content scene and embedded forme study (2026-10-10)
 
