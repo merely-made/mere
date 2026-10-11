@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-10",
+  "scope": "Read-only access/Resource inspector draft",
+  "base_commit": "d541416e1c971af96f36a8041485ea5547116191",
+  "native": {
+    "status": "passed",
+    "model_tests": 6,
+    "harness": "Code/testing/mere/forme-qualification",
+    "tracked_source_import": "ports/graphshell/src/access_inspection.rs",
+    "log": "Code/testing/mere/access-inspection-native.log",
+    "snapshot_roundtrip": "Graph snapshot only; no IndexedDB/browser reopening claimed"
+  },
+  "wasm": {
+    "product_check": "passed",
+    "command": "cargo check --locked --target wasm32-unknown-unknown --no-default-features --features product",
+    "working_directory": "ports/graphshell/web",
+    "log": "Code/testing/mere/access-inspection-product-check.log",
+    "release_bundle": "not built for this draft"
+  },
+  "limits": {
+    "cargo_jobs": 1,
+    "memory_max_mib": 1280,
+    "swap_max_mib": 0,
+    "free_memory_guard_mib": 256
+  },
+  "interactive": {
+    "status": "pending on other machines",
+    "scenario": "p4_tree_access_inspection.scn",
+    "shared_resource_two_access_browser_fixture": "pending",
+    "source": "Existing connected browser has no WebGPU adapter; no new browser run attempted."
+  },
+  "source_sha256": {
+    "ports/graphshell/src/access_inspection.rs": "d6d27835e79071a2bf1e562975c6458af40365c57c44c735782ad5e213d551c7",
+    "ports/graphshell/src/lib.rs": "6e37c36ff10323f2a40de0abc9e61e46cb991591089caf2d87482266914e3c6b",
+    "ports/graphshell/src/web_tree/inspection.rs": "79949297f8f7b387cbb56f87264f4af5fd184db73fa4bb2b1477eaa0bbb03642",
+    "ports/graphshell/src/web_tree/product.rs": "cef624f288c99934d1cdd2ae1f98a84b331f1ebd26b949a89fc5b90dee8a6f9d",
+    "ports/graphshell/src/web_tree.rs": "7c0574aa13cfe0583e216429e70076f0f81ebb6ca2f287b7225cfe8f6b92d7f5",
+    "ports/graphshell/src/web_tree/lane.rs": "d677b8be22bc14ae22913b017641bfad5a46c781f951715981e65f576faf1f84",
+    "ports/graphshell/web/scenarios/p4_tree_access_inspection.scn": "74743fef444e3cc56e685e84cb8677aab7a78e5a4a265756854e43d928b7bbdf"
+  }
+}

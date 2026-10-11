@@ -25,7 +25,10 @@ explicit membership, placement, event and storage checkpoints. These are design
 proposals, distinct from the agreed forme draft and existing runtime receipts.
 The [identity inspection sequence](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#identity-inspection-follow-through-2026-10-10-next-design-steps)
 now stages read-only access/Resource, exact-assertion and individual-coupling
-inspection before their write adapters. The implemented forme draft's
+inspection before their write adapters. The first
+[access/Resource inspector draft](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#accessresource-inspector-draft-2026-10-10)
+now has a portable read model, local retained controls and a host scenario;
+its review and visual-test gates are explicit. The implemented forme draft's
 [visual test handoff](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#forme-visual-test-handoff-2026-10-10)
 specifies the retained-origin scenario order for agents on the other machines.
 
