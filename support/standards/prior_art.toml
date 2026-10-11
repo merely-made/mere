@@ -1,0 +1,281 @@
+schema = 1
+as_of = "2026-10-11"
+scope = "Reusable corpora, independent peers, transport runners, dissemination policies, and radio testing prior art. Standards definitions live in the separate catalogue."
+revision_policy = "Observed revisions normally record live default-branch commits, not selected releases or evidence of successful local execution. Local patched evidence identifies its upstream base and local revisions explicitly. Pin corpus hashes, dependencies, submodules, toolchains, and container image digests for actual campaigns."
+claim_policy = "Conformance, interoperability, composition, simulation, performance, and physical qualification are separate evidence classes. Unsupported, skipped, expected failure, timeout, and unexecuted cases are not passes."
+exclusions = ["Prns is excluded as an implementation donor or trusted independent reference for new qualification."]
+
+[[sources]]
+id = "wpt"
+name = "Web Platform Tests"
+url = "https://web-platform-tests.org/test-suite-design.html"
+repository_url = "https://github.com/web-platform-tests/wpt"
+license = "BSD-3-Clause"
+license_url = "https://github.com/web-platform-tests/wpt/blob/ddb25fdfff7766af4cd75eac3fb3b6ac206140ce/LICENSE.md"
+observed_revision = "ddb25fdfff7766af4cd75eac3fb3b6ac206140ce"
+scope = "Implementation-independent cases, specification-oriented layout, atomic results, optional features, environment metadata, and structured reports."
+limitations = ["Browser-specific runners and APIs need not be adopted.", "Expected-failure metadata tracks implementation debt and does not redefine normative success.", "A single aggregate pass percentage hides profile applicability and coverage gaps."]
+selected_action = "Adopt the case, metadata, governance, and result design principles; author a transport-specific runner."
+
+[[sources]]
+id = "blake3-vectors"
+name = "Official BLAKE3 implementations and vectors"
+url = "https://github.com/BLAKE3-team/BLAKE3/tree/f55849f89cd85083c1c9daa2c5de20766f309c00/test_vectors"
+repository_url = "https://github.com/BLAKE3-team/BLAKE3"
+license = "CC0-1.0 OR Apache-2.0 OR Apache-2.0 WITH LLVM-exception"
+license_url = "https://github.com/BLAKE3-team/BLAKE3/blob/f55849f89cd85083c1c9daa2c5de20766f309c00/README.md#licenses"
+observed_revision = "f55849f89cd85083c1c9daa2c5de20766f309c00"
+scope = "Official test_vectors/test_vectors.json covers input lengths, all three modes, and extended outputs. Reference and optimized implementations are available."
+limitations = ["Author-maintained vectors establish known expected bytes; their generator is not an independent implementation oracle.", "Record the imported artifact hash and selected upstream license."]
+selected_action = "Import the pinned corpus with attribution and run it against the selected stack dependency."
+
+[[sources]]
+id = "wycheproof"
+name = "C2SP Wycheproof"
+url = "https://github.com/C2SP/wycheproof"
+repository_url = "https://github.com/C2SP/wycheproof"
+license = "Apache-2.0"
+license_url = "https://github.com/C2SP/wycheproof/blob/12fd3aaf33eb5fa1f52e026912ee00c054f9d984/LICENSE"
+observed_revision = "12fd3aaf33eb5fa1f52e026912ee00c054f9d984"
+scope = "JSON crypto edge-case and negative vectors with accompanying schemas."
+limitations = ["Select algorithms and verification policy explicitly.", "Policy-dependent outcomes require profile review; crypto vectors do not cover protocol-level authorization or replay."]
+selected_action = "Evaluate a pinned Ed25519 subset alongside RFC positive examples and documented verification semantics."
+
+[[sources]]
+id = "cbor-example-vectors"
+name = "CBOR machine-readable Appendix A examples"
+url = "https://github.com/cbor/test-vectors"
+repository_url = "https://github.com/cbor/test-vectors"
+license = "unknown: no license file visible in inspected repository tree"
+license_url = "unknown"
+observed_revision = "aba89b653e484bc8573c22f3ff35641d79dfd8c1"
+scope = "RFC 7049 Appendix A examples in JSON, with base64, hex, decoded or diagnostic representations, and roundtrip hints."
+limitations = ["Basic examples rather than full current CBOR or deterministic-profile conformance.", "Reuse permission is unresolved; do not copy the repository corpus until resolved."]
+selected_action = "Use as a locator; author current requirement cases and select vectors with explicit reuse permission."
+
+[[sources]]
+id = "cose-examples"
+name = "COSE Working Group Examples"
+url = "https://github.com/cose-wg/Examples"
+repository_url = "https://github.com/cose-wg/Examples"
+license = "Unlicense"
+license_url = "https://github.com/cose-wg/Examples/blob/53c9d634333bb4f529d78f5980fffa2667ee2c12/LICENSE"
+observed_revision = "53c9d634333bb4f529d78f5980fffa2667ee2c12"
+scope = "COSE message and algorithm examples, including EdDSA, Sign1, and a CDDL example schema."
+limitations = ["Upstream warns examples can trail current specifications.", "Select the actual message and algorithm profile rather than treating all examples as required."]
+selected_action = "Review and import the chosen COSE profile vectors when its wire adapter is implemented."
+
+[[sources]]
+id = "quic-interop-runner"
+name = "QUIC and WebTransport Interop Runner"
+url = "https://github.com/quic-interop/quic-interop-runner"
+repository_url = "https://github.com/quic-interop/quic-interop-runner"
+license = "Apache-2.0"
+license_url = "https://github.com/quic-interop/quic-interop-runner/blob/740c05a10b61d65e8abd3ad38d60898004d335d9/LICENSE.md"
+observed_revision = "740c05a10b61d65e8abd3ad38d60898004d335d9"
+scope = "Containerized independent client/server matrix, testcase capability negotiation, network simulation, logs, pcaps, and optional qlog."
+limitations = ["Runner revision alone does not pin endpoint images or simulator dependencies.", "Unsupported testcase exit 127 is not a pass.", "Application identity and authorization need separate composition cases."]
+selected_action = "Reuse as the external QUIC campaign and model the new endpoint-adapter contract on its narrow process interface."
+
+[[sources]]
+id = "quinn-interop"
+name = "Quinn interop endpoint container"
+url = "https://github.com/quinn-rs/quinn-interop"
+repository_url = "https://github.com/quinn-rs/quinn-interop"
+license = "MIT"
+license_url = "https://github.com/quinn-rs/quinn-interop/blob/82c845f6e5399ef15fac217ba2799c2a233d875b/LICENSE"
+observed_revision = "82c845f6e5399ef15fac217ba2799c2a233d875b"
+scope = "Existing Rust QUIC endpoint packaging for the interop runner."
+limitations = ["Validate against the selected Quinn or noq revision; wrapper availability does not qualify a changed implementation.", "Nested runner revision and built image digest must be pinned."]
+selected_action = "Use as adapter prior art and evaluate a revision-matched endpoint for the existing IP stack."
+
+[[sources]]
+id = "tlsfuzzer"
+name = "tlsfuzzer"
+url = "https://github.com/tlsfuzzer/tlsfuzzer"
+repository_url = "https://github.com/tlsfuzzer/tlsfuzzer"
+license = "GPL-2.0"
+license_url = "https://github.com/tlsfuzzer/tlsfuzzer/blob/5eebc4464e5197a7f7392fb9acda99cfc32441f7/LICENSE"
+observed_revision = "5eebc4464e5197a7f7392fb9acda99cfc32441f7"
+scope = "TLS protocol tests and fuzz scripts verifying expected error behavior beyond crash-only checks."
+limitations = ["Upstream explicitly excludes hostname, CA signature, and certificate key-usage verification.", "Early API stability and script applicability require revision-specific review."]
+selected_action = "Evaluate as an external TLS negative-case runner; maintain separate identity/certificate policy cases."
+
+[[sources]]
+id = "tls-anvil"
+name = "TLS-Anvil"
+url = "https://github.com/tls-attacker/TLS-Anvil"
+repository_url = "https://github.com/tls-attacker/TLS-Anvil"
+license = "Apache-2.0 for TLS-Testsuite and TLS-Test-Framework; dependencies separately reviewed"
+license_url = "https://github.com/tls-attacker/TLS-Anvil/blob/e9e9ac7160789d66736d36f3bc62430f6a49d497/TLS-Testsuite/LICENSE"
+observed_revision = "e9e9ac7160789d66736d36f3bc62430f6a49d497"
+scope = "Combinatorial TLS client/server conformance tests, requirement-linked source classes, structured reports, and container support."
+limitations = ["Existing test organization references older RFC revisions; compare clauses against the selected current specification.", "Source suite presence is not evidence of a completed local campaign."]
+selected_action = "Evaluate as a complementary external TLS campaign and reporting precedent."
+
+[[sources]]
+id = "raptorq-rust"
+name = "cberner RaptorQ"
+url = "https://github.com/cberner/raptorq"
+repository_url = "https://github.com/cberner/raptorq"
+license = "Apache-2.0"
+license_url = "https://github.com/cberner/raptorq/blob/83cf19434fdd15888f33872704d3aff873839c92/LICENSE"
+observed_revision = "83cf19434fdd15888f33872704d3aff873839c92"
+scope = "Rust codec, allocation-based no_std path, source tests, fuzzing support, and upstream errata/optimization notes."
+limitations = ["If this is the implementation dependency, its own encoder/decoder is not an independent conformance oracle.", "Bindings to the same implementation are one lineage.", "Untrusted input needs length and parameter validation before asserting or directly indexing APIs.", "No broadly maintained canonical independent RaptorQ vector corpus was identified in this bounded survey."]
+selected_action = "Evaluate a pinned bounded dependency profile and compare against independent implementations before claiming codec interoperability."
+
+[[sources]]
+id = "openrq"
+name = "OpenRQ"
+url = "https://github.com/openrq-team/OpenRQ"
+repository_url = "https://github.com/openrq-team/OpenRQ"
+license = "Apache-2.0"
+license_url = "https://github.com/openrq-team/OpenRQ/blob/45f4437ba96d7e69a6ee05a2e51cf79cda90448e/LICENSE"
+observed_revision = "45f4437ba96d7e69a6ee05a2e51cf79cda90448e"
+scope = "Independent Java RaptorQ encoder/decoder candidate with source-block partitioning and packet parameter configuration."
+limitations = ["Upstream is not actively maintained.", "Only one sub-block per source block and byte-array object input are supported.", "Fresh build and cross-implementation qualification remain required."]
+selected_action = "Build an external-process oracle for the shared supported profile and produce provenance-bearing byte fixtures."
+
+[[sources]]
+id = "libraptorq"
+name = "libRaptorQ"
+url = "https://github.com/LucaFulchir/libRaptorQ"
+repository_url = "https://github.com/LucaFulchir/libRaptorQ"
+license = "GPL-3.0 and LGPL-3.0 license files; exact file/build terms require review"
+license_url = "https://github.com/LucaFulchir/libRaptorQ/tree/a394b22af6e8fc742ce88eacf9af5343ecded9d7"
+observed_revision = "a394b22af6e8fc742ce88eacf9af5343ecded9d7"
+scope = "Independent C++ RaptorQ implementation candidate with distinct RFC API and RFC test targets."
+limitations = ["Fresh build, profile comparison, and source-specific licensing remain required.", "Its own RFC tests are not a canonical external vector corpus."]
+selected_action = "Evaluate as an additional isolated peer after OpenRQ; avoid production linking before licensing and qualification."
+
+[[sources]]
+id = "nrl-norm"
+name = "NRL NORM implementation"
+url = "https://github.com/USNavalResearchLaboratory/norm"
+repository_url = "https://github.com/USNavalResearchLaboratory/norm"
+license = "Custom NRL source/binary redistribution and attribution terms"
+license_url = "https://github.com/USNavalResearchLaboratory/norm/blob/961f37f7b4b3d8d3472a2c4640d61452c0cee60b/README.md"
+observed_revision = "961f37f7b4b3d8d3472a2c4640d61452c0cee60b"
+scope = "Actual NORM library, transfer/demo applications, examples, and Docker support for independent transport peers."
+limitations = ["Protolib is a separately pinned submodule.", "Upstream describes normTest as a playground rather than a substantial conformance suite.", "NORM-like custom feedback is not NORM wire interoperability."]
+selected_action = "Use as an external peer when an actual NORM profile and adapter exist."
+
+[[sources]]
+id = "openfec"
+name = "OpenFEC"
+url = "https://github.com/OpenFEC/OpenFEC"
+repository_url = "https://github.com/OpenFEC/OpenFEC"
+license = "CeCILL and CeCILL-C license files; codec-specific terms require review"
+license_url = "https://github.com/OpenFEC/OpenFEC/tree/6caea60b24a05a3173edc3fd176070abfc21e3cf"
+observed_revision = "6caea60b24a05a3173edc3fd176070abfc21e3cf"
+scope = "Alternative FEC implementations, unit tests, parameterized performance campaigns, and analysis tooling."
+limitations = ["Inspected stable codec enumeration contains Reed-Solomon and LDPC schemes, not RaptorQ.", "Do not use it as a RaptorQ independent oracle.", "Old upstream and codec-specific licensing require evaluation."]
+selected_action = "Retain as optional alternative-codec and measurement prior art."
+
+[[sources]]
+id = "gpac-route"
+name = "GPAC ROUTE sender and receiver"
+url = "https://wiki.gpac.io/Howtos/route/"
+repository_url = "https://github.com/gpac/gpac"
+license = "LGPL-2.1 detected for main repository; optional dependencies and separate testsuite separately reviewed"
+license_url = "https://github.com/gpac/gpac/tree/7d451dbd08232df6cc5a2c8dfb2d59bfa3877db7"
+observed_revision = "7d451dbd08232df6cc5a2c8dfb2d59bfa3877db7"
+scope = "FLUTE-derived ROUTE object broadcast, carousel, low-latency transfer, sender/receiver, and gateway prior art."
+limitations = ["ROUTE support is not evidence of exact FLUTE plus the chosen FEC profile.", "A media-oriented implementation needs a deliberate profile match before interoperability use."]
+selected_action = "Study scheduling/catalogue behavior; evaluate an external peer only for an implemented matching ROUTE profile."
+
+[[sources]]
+id = "nasa-dtn-tools"
+name = "NASA DTNTools"
+url = "https://github.com/nasa/dtn-tools"
+repository_url = "https://github.com/nasa/dtn-tools"
+license = "BSD-3-Clause"
+license_url = "https://github.com/nasa/dtn-tools/blob/9bcc6f16c99ae0db56431657022f4cf2923a8419/LICENSE"
+observed_revision = "9bcc6f16c99ae0db56431657022f4cf2923a8419"
+scope = "Python toolkit explicitly designed to independently test BPv7 implementations."
+limitations = ["Inspect concrete case coverage and convergence-layer expectations before claiming completeness.", "Toolkit adoption does not implement the corresponding bundle adapter."]
+selected_action = "Reuse for an optional BPv7 external conformance campaign when that adapter is selected."
+
+[[sources]]
+id = "ion-dtn"
+name = "NASA/JPL ION"
+url = "https://github.com/nasa-jpl/ION-DTN/blob/integration/site-docs/docs/testset-readme.md"
+repository_url = "https://github.com/nasa-jpl/ION-DTN"
+license = "unknown: custom project terms and bundled component licenses require review; GitHub reports NOASSERTION"
+license_url = "unknown"
+observed_revision = "c9cb166ad37134a7476e46edd32061bd5b103d39"
+scope = "Independent DTN peer, convergence layers, source regression scenarios, version/OS applicability metadata, and optional expert campaigns."
+limitations = ["Pin branch, protocol version, crypto configuration, and convergence-layer profile.", "Some expert tests alter host networking or require elevated capabilities.", "Platform support and a source test set are not local run evidence."]
+selected_action = "Evaluate in an isolated controlled environment as an optional DTN interoperability peer."
+
+[[sources]]
+id = "hdtn"
+name = "NASA HDTN"
+url = "https://github.com/nasa/HDTN"
+repository_url = "https://github.com/nasa/HDTN"
+license = "Apache-2.0 detected for main repository; bundled components separately reviewed"
+license_url = "https://github.com/nasa/HDTN/tree/7fbe90cdbe3c8c737efaacb5985f881f95fc7d2a"
+observed_revision = "7fbe90cdbe3c8c737efaacb5985f881f95fc7d2a"
+scope = "Independent high-rate DTN peer with test scripts, BPSec examples, and simulation support."
+limitations = ["Pin protocol, convergence layer, crypto settings, and build dependencies.", "Source scenarios do not imply successful interoperability with our adapter."]
+selected_action = "Evaluate as a second optional DTN peer and measurement reference after a bundle profile exists."
+
+[[sources]]
+id = "ns3-lorawan"
+name = "SIGNET ns-3 LoRaWAN model"
+url = "https://github.com/signetlabdei/lorawan"
+repository_url = "https://github.com/signetlabdei/lorawan"
+license = "GPL-2.0"
+license_url = "https://github.com/signetlabdei/lorawan/blob/e45b4af428c92f30b2e6c201055809110758125f/LICENSE"
+observed_revision = "e45b4af428c92f30b2e6c201055809110758125f"
+scope = "Network simulation, parallel reception, ALOHA throughput, energy examples, and model tests."
+limitations = ["Pin the corresponding ns-3 revision from NS3-VERSION.", "LoRaWAN MAC/model assumptions do not automatically apply to raw-LoRa or Reticulum.", "Simulation does not qualify board isolation, RF range, or energy consumption."]
+selected_action = "Study or adapt model assumptions for explicit simulation campaigns; retain physical qualification separately."
+
+[[sources]]
+id = "gnu-radio"
+name = "GNU Radio channel modeling"
+url = "https://github.com/gnuradio/gnuradio/blob/7a45079b1d42ba7b94b50f23c1414c8d2f334622/gr-channels/grc/channels_dynamic_channel_model.block.yml"
+repository_url = "https://github.com/gnuradio/gnuradio"
+license = "GPL-3.0"
+license_url = "https://github.com/gnuradio/gnuradio/tree/7a45079b1d42ba7b94b50f23c1414c8d2f334622"
+observed_revision = "7a45079b1d42ba7b94b50f23c1414c8d2f334622"
+scope = "Seeded noise, fading, Doppler, delay, center-frequency offset, and sample-rate offset experiments."
+limitations = ["Modeled channels are not measurements of actual radio hardware.", "A physical SDR campaign additionally needs instrument and calibration provenance."]
+selected_action = "Retain for optional signal-level impairment experiments after packet-level campaigns."
+
+[[sources]]
+id = "lorawan-lctt"
+name = "LoRa Alliance Certification Test Tool"
+url = "https://lora-alliance.org/lorawan-certification/"
+repository_url = "unknown: not an open repository corpus"
+license = "Licensed LoRa Alliance membership/pre-certification program"
+license_url = "https://lora-alliance.org/lorawan-certification/"
+observed_revision = "unknown: product/tool version not inspected"
+scope = "LoRaWAN end-device pre-certification, self-test eligibility, and authorized test-lab ecosystem."
+limitations = ["Not an open WPT-style corpus.", "LoRaWAN certification does not qualify Reticulum or custom raw-LoRa scheduling."]
+selected_action = "Consider only if the selected hardware profile actually implements LoRaWAN and needs certification."
+
+[[sources]]
+id = "memorylan"
+name = "p2panda MemoryLAN"
+url = "https://github.com/p2panda/memorylan/tree/f76039fc585b3f417e372167aa5825561fc9dd88"
+repository_url = "https://github.com/p2panda/memorylan"
+license = "MIT OR Apache-2.0"
+license_url = "https://github.com/p2panda/memorylan/blob/f76039fc585b3f417e372167aa5825561fc9dd88/README.md#license"
+observed_revision = "f76039fc585b3f417e372167aa5825561fc9dd88"
+local_patch_revision = "44610185aa074fe264df08b6de635766d1113c8e"
+local_research_revision = "493652cd980eab53a35920b9cb5d11c28f794c88"
+local_evidence_locator = "Workspace testing/memorylan-20261011.piWoiq/artifacts/simulation-final; unsubmitted source and host experiment evidence, reviewed without rerun in this transport pass."
+local_metadata_sha256 = "b80a159ddf1c2564ef6ecf6890a74942bf9a741b27ae4b2a56c4d90ddbde5169"
+scope = "Whole-page fast flooding with probabilistic Cuckoo-summary hot-cache repair; a dissemination/inventory policy candidate and patched host baseline beside retained-object scheduling."
+limitations = [
+ "Local evidence requires the eviction fix that inserts the incoming page fingerprint; do not attribute its observations to unmodified upstream.",
+ "Cache/history limits count items, not bytes; full-page replies lack MTU/rate budgets and state is volatile.",
+ "Generic Hash and DefaultHasher also determine filter indices; a canonical BLAKE3 object ID alone does not make the existing wire hash stable.",
+ "Neighbor IDs accumulate before validation without aging; failed filter insertions need fallback/rebuild or transactional handling.",
+ "No RaptorQ generation/ESI/decoder-progress semantics, durable recovery, authenticated operation admission or measured RF throughput are established.",
+ "Source-hashed host evidence uses synthetic pages/discrete ticks; byte ratios exclude actual signatures, framing, fragmentation, contention, duty cycle and physical time."
+]
+selected_action = "ADAPT inventory/hot-cache policy and retain as BASELINE; use explicit stable/versioned wire hashing and encoding, byte bounds, capped authenticated/aged neighbors and filter-failure recovery, while preserving signed object bytes/IDs and the existing admission owner. No production import or upstream submission."

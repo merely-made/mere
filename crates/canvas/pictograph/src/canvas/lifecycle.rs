@@ -68,6 +68,7 @@ impl Canvas {
             .get_mut()
             .expect("strategy input cache") = None;
         self.forme_region = None;
+        self.forme_guides = None;
         self.forme_held.clear();
         self.selected.clear();
         self.selected_edges.clear();
@@ -155,10 +156,12 @@ impl Canvas {
             pinned_nodes: HashSet::new(),
             field_drag: None,
             forme_region: None,
+            forme_guides: None,
             forme_held: HashSet::new(),
             selected: HashSet::new(),
             selected_edges: HashSet::new(),
             hidden_edges: HashSet::new(),
+            occurrence_edges: None,
             physics_view_revision: 0,
             active_field: None,
             hidden_fields: HashSet::new(),
@@ -387,8 +390,7 @@ impl Canvas {
             .map(|(key, _node)| (key, Point2D::zero()))
             .collect();
         self.physics.sync_nodes(nodes);
-        self.physics
-            .sync_edges(visible_relation_edges(&self.graph, &self.hidden_edges));
+        self.physics.sync_edges(self.controller_edges());
         self.pinned_nodes
             .retain(|key| self.graph.get_node(*key).is_some());
         for positions in [&mut self.strategy_positions, &mut self.paused_positions]

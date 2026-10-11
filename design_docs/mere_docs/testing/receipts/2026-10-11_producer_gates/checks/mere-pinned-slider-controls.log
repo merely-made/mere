@@ -1,0 +1,34 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?rev=ef5412d760a978584c8c1801e8a765c51aecd403#ef5412d7)
+   Compiling genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling sprigging v0.2.1 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/sprigging)
+   Compiling cambium v0.3.3 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium)
+warning: function `find_element_by_name` is never used
+    --> crates/cambium/cambium/src/tests.rs:1838:8
+     |
+1838 |     fn find_element_by_name(dom: &ScriptedDom, node: NodeId, name: &str) -> Option<NodeId> {
+     |        ^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `cambium` (lib test) generated 1 warning
+    Finished `test` profile [unoptimized] target(s) in 22.49s
+     Running unittests src/lib.rs (/Users/markik/Code/targets/vello-producer-gates-20261011/debug/deps/cambium-67ea760cd72b42e4)
+
+running 2 tests
+test slider::tests::accessibility_values_route_to_the_slider_and_respect_its_range ... ok
+test slider::tests::new_clamps ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 252 filtered out; finished in 0.00s
+

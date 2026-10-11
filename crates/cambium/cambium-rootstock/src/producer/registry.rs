@@ -14,6 +14,12 @@ use paint_list_api::{
 use super::*;
 use crate::{NodeId, OwnedLayout, Surface};
 
+#[path = "portable.rs"]
+mod portable;
+pub use portable::PortableCaptureError;
+pub(crate) use portable::PortablePlan;
+use portable::PortableSlot;
+
 struct Image {
     output: ProducedTexture,
     size: [u32; 2],
@@ -28,6 +34,7 @@ struct Entry {
     image: Option<Image>,
     logical_size: (f32, f32),
     error: Option<ProducerError>,
+    portable: Option<PortableSlot>,
 }
 
 /// Registrations survive CSS hiding; removing a previously bound DOM node
@@ -74,6 +81,7 @@ impl ProducerRegistry {
                 image: None,
                 logical_size: (0.0, 0.0),
                 error: None,
+                portable: None,
             },
         );
         Ok(())

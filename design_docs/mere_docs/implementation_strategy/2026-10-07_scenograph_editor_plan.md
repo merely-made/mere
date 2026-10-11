@@ -18,9 +18,13 @@ authoring and the unresolved storage/composition policies remain planned.
 
 **2026-10-11 continuation:** access/Resource and
 [link/assertion inspection](#link-and-exact-assertion-inspector-draft-2026-10-11)
-now have read-only local-product drafts. Field inspection and overlap discovery
-are next in the approved sequence; primitive writes and derived-link owner
-explanations retain their existing gates.
+now have read-only local-product drafts. The
+[field/coupling draft](2026-06-13_scriptable_field_regions_plan.md#field-inspection-draft-2026-10-11)
+adds exact records and overlap discovery. The
+[declarative rule editor](#declarative-presentation-rule-editor-draft-2026-10-11)
+adds scoped authoring, explicit decision preview and saved history; primitive
+writes, live presentation adapters and derived-link owner explanations retain
+their existing gates.
 
 Not in scope, mapped in §3 and opened by later rounds:
 - the scripting comparison (SE3), which is the next assessment;
@@ -1610,8 +1614,227 @@ and the integrated product wasm check pass. The opt-in isolated fixture and
 two-page browser handoff remain unrun here. The other agent's Forme Chrome
 receipt above qualifies its recorded source, not this new inspector. Primitive
 writes, derived-link explanation and the field composition/event policies
-retain their existing gates; the declarative rule editor remains the next
-bounded appearance-authoring candidate.
+retain their existing gates; the [declarative rule editor draft](#declarative-presentation-rule-editor-draft-2026-10-11)
+continues the bounded appearance-authoring sequence.
+
+
+#### Declarative presentation rule editor draft (2026-10-11)
+
+**Status:** implemented draft for review and headed qualification. Mark's
+"proceed! next uuup?" continues direct-main delivery. Based on published Mere
+`a1acb6b9`, including the current Vello/Genet release adoption and documentation
+repair; no previous Forme or study browser receipt qualifies this new editor.
+
+The [portable authoring session](../../../ports/graphshell/src/presentation_editor.rs)
+reuses `scenograph::presentation` version 1. It does not introduce a second
+resolver or open Rhai adoption. Each rule retains its ID, label, enabled flag,
+signed priority, occurrence target, condition and effects. The retained
+[Graph tools editor](../../../ports/graphshell/src/web_tree/presentation.rs) is
+available through **Presentation rules** on `tree.html?app=local`. **Begin rule
+draft** opens private authoring. Add node/link/field rule buttons supply valid
+starting rows; the target, condition and effects use the existing model's JSON
+vocabulary, with separate ID, label and priority controls. Reordering is
+semantic: later authored rules win equal-priority property ties. Disabled rules
+still validate. Unknown input properties are refused instead of silently lost;
+the shared resolver's compatibility policy remains unchanged.
+
+**Draft interaction:** text controls hold editable buffers. **Update rule
+draft**, **Preview rule decisions**, switching rows and **Apply rules** record
+the current row before their operation. Malformed input remains undoable but
+cannot preview or save. **Undo rule draft** first records pending input, then
+undoes one draft step. Undo/redo clears the active row, requiring an explicit
+choice before further row edits; it never selects or opens graph content. Redo
+refuses unstaged input rather than dropping it. **Discard rule draft** drops
+only this editor's buffers and history. Closing the panel retains its draft.
+Text caret/IME/local text undo remains Cambium's existing input path; the rule
+buttons own whole-set history. No graph-wide keyboard undo is intercepted.
+
+**Decision preview:** node, link and field samples are clearly identified inputs,
+editable through the context JSON control. All facts, states, occurrence ID,
+screen size and previous matches are disclosed. Resolve shows each winning
+property's effect, rule ID and priority, and every rule's match explanation and
+winning properties. A changed buffer/context hides the stale result until
+Preview runs again. An absent winning property uses the host's base presentation.
+Preview is pure and does not carry hidden hysteresis state between occurrences,
+samples, committed sets or drafts; prior matches are supplied explicitly.
+At this authoring checkpoint the preview has no live graph-to-context adapter
+or Canvas consumer. The [exact-occurrence and Forme guide continuation](#exact-occurrence-previews-and-live-forme-guides-draft-2026-10-11)
+below adds disclosed bindings and the first supported overlay effect; faces,
+containment, provenance and drop zones retain their renderer gates.
+
+**Persistence:** rules, generation and up to 32 saved undo/redo steps commit in
+one Muniment workspace record, `graphshell/presentation-rules/v1/<graph-session-uuid>`.
+The graph session identifies the workspace scope; graph/source records, selection,
+content sessions, theme preferences and Forme layout are absent from snapshots.
+The record and malformed draft each have a 1 MiB bound; the resolver's 256-rule
+and condition-depth/count limits remain. Every saved history entry, version and
+scope is validated before reopening. Apply creates one saved undo step, freezes
+rule changes while in flight and changes the committed version only after store
+acknowledgment. Failure retains the draft and saved version for retry. Saved
+undo/redo requires no open draft and survives reopening.
+
+The prepared save uses `Backend::transact` to compare the exact previously loaded
+bytes and replace the record atomically. A stale workspace refuses with a named
+explanation, leaving the newer saved record and local draft intact. There is no
+racy fallback for a backend without transactions. After a conflict, this first
+UI requires reopening/reconciling explicitly; an in-panel merge or draft export
+is not implemented. The current IndexedDB transaction adapter snapshots its
+whole object store, so storage size and transaction cost remain a backend/host
+qualification gate, not a claim of bounded total-store work.
+
+**Qualification and handoff:** the [source receipt](../../../ports/graphshell/docs/receipts/presentation_rules_20261011/qualification.json)
+records the actual-source native harness and locked product wasm check (both
+pass). Replay the native checks with
+`cargo test --locked --manifest-path ports/graphshell/docs/receipts/presentation_rules_20261011/harness/Cargo.toml --lib`.
+Nine portable
+session tests cover malformed/unknown inputs and disabled-rule validity,
+priority/order undo, explicit occurrence-local hysteresis, acknowledged saves,
+failure retention, stale-write refusal, graph-scoped MemoryBackend reopen and
+saved history validation/limits. Native tests qualify this portable module with
+an isolated lockfile, not the complete Graphshell native host or IndexedDB.
+The integrated product check uses the web host's current locked dependencies
+and committed wasm configuration; default/viewer and release bundles were not
+built in this pass.
+Browser checks remain pending on O-PC, the ThinkPad or a Mac with a connected
+WebGPU-capable browser. The existing connected S-PC browser has no WebGPU adapter.
+
+Use a **fresh dedicated profile/origin** on `tree.html?app=local` for
+[`p4_tree_presentation_rules.scn`](../../../ports/graphshell/web/scenarios/p4_tree_presentation_rules.scn),
+then a **fresh page/process on the same retained origin/profile** for
+[`p4_tree_presentation_rules_reopen.scn`](../../../ports/graphshell/web/scenarios/p4_tree_presentation_rules_reopen.scn).
+Use a normal-motion profile (the scripts pause physics explicitly); scenario
+waits now include the rule-store write. The first requires an absent rule record; it exercises all three primitive kinds,
+preview precedence/reorder/undo, invalid apply refusal, acknowledged apply,
+saved undo/redo and discard. The second exercises stored history and decisions
+on reopen. Both check graph membership, graph session and Forme access count
+remain unchanged. Their two captures are planned, not generated or reviewed here.
+Run at normal and narrow widths; review scrolling, long JSON input, caret/IME,
+Tab/keyboard activation, disabled controls, source-editor undo independence and
+Tabard theme changes. Physical input, fresh-origin negative control, actual
+IndexedDB failure/conflict injection, multi-tab races, large-record costs,
+release performance and other hosts remain separate acceptance gates.
+
+**Next done-condition at this checkpoint:** bind preview inputs to stable
+projected occurrences and an explicit disclosed fact/state adapter; realize
+supported effects before measurement/placement, explain unsupported ones, and
+qualify scene changes with source, selection, pins, manual placement and live
+tile sessions preserved. The bounded continuation below implements these
+bindings and Forme guides; its remaining acceptance gates stay open. This
+bounded authoring draft does not complete primitive writes, field action/script
+execution, theme/font authoring, scene composition or Rhai SE39–SE42 adoption.
+
+
+#### Exact-occurrence previews and live Forme guides draft (2026-10-11)
+
+**Status:** implemented draft, portable native and product wasm checks passed;
+headed acceptance remains open. Mark's continuing “proceed!” authorizes direct
+main delivery and review/testing handoff. Published `e56f7a3f` is the integration
+base. Fetches before implementation and delivery found no newer upstream
+adoption; earlier Forme Chrome receipts remain limited to their recorded source.
+
+The [binding adapter](../../../ports/graphshell/src/presentation_binding.rs)
+reads current held owners and receives disclosed state from one Canvas view.
+**Use inspected access**, **Use inspected assertion** and **Use inspected field**
+explicitly bind a preview. Selection does not retarget it. Missing/departed or
+rebound targets produce an explanation and invalidate the previous preview;
+there is no equal-address fallback. A held assertion must still contribute to
+the exact displayed access pair, even if its Resource owner remains inspectable
+elsewhere. Sidecar-only families do not acquire synthetic assertion handles.
+
+Occurrence IDs are `access:<surface-uuid>`, `numen:<field-uuid>`,
+`forme:<forme-uuid>` and `assertion:<JSON of canonical access pair and assertion
+handle>`. The same Resource and assertion can supply facts to distinct access
+or relation occurrences. Local node/edge indexes and URLs are not durable
+occurrence IDs. Numen and Forme remain separate owners even with equal UUID
+payloads. The read model does not write graph facts or evaluate field ASTs.
+
+**Disclosed inputs:** accesses expose held label/address, optional MIME and its
+known image/video/audio/text category, recorded Resource identity/address and
+scalar Resource facets under `resource.<key>`. Complex facet values are omitted;
+missing metadata is not a completeness claim. Access Selected and PositionPinned
+come from this Canvas; Forme holds are not position pins. The optional screen
+size uses the measured body hit rectangle's smaller dimension, including the
+existing occlusion behavior; no first-frame measurement is invented. Held
+assertions expose predicate, actual `Semantic` family, scope, provenance and
+source/displayed endpoints; `derived` is not fabricated. Numen exposes name,
+lifecycle, definition/extent kinds and this view's boundary visibility. Forme
+exposes label, role, lock, visibility, member count and actual boundary hover
+when presented. LayoutUnlocked belongs to the Forme owner. Inspected identifies
+the retained exact inspector target, independently of graph selection.
+
+The JSON report includes the occurrence, context, available states and limits.
+Unknown state differs from known false. Rules that reference unavailable state
+or measurement are skipped with a trace explanation, including references
+under `Not` or `Any`. Other valid rules can still win. Original whole-set
+validation runs before this host filter; malformed or disabled rules are not
+silently repaired. ForegroundPinned, Overview, exact assertion selection and
+field selection have no adapter yet. Child selection is not promoted to a
+selected field. Missing facts retain the shared resolver's existing semantics.
+Bound previews use an empty disclosed prior-match set, without hidden hysteresis.
+Manual samples/context editing retain their explicit-input behavior; copying a
+bound context to manual input stops tracking the owner. Changes to a bound input
+invalidate its decision result; Preview must run again. Reads pause while the
+editor is closed and refresh when reopened.
+
+**First live effect:** **Enable saved rules in this view** opts into acknowledged
+saved rules, including acknowledged saved Undo/Redo. The switch is view-local,
+defaults off on a fresh page, and is not stored in graph or rule history. Private
+drafts and manual previews never affect the Canvas. Live evaluation reads the
+current exact Forme owner independently of the chosen preview target. It caches
+resolution by generation and disclosed inputs; the frame installs its effect
+before Canvas composition. An unavailable owner restores base guides with an
+explanation. `RegionGuides` affects only Forme subdivisions. The [Canvas override](../../../crates/canvas/pictograph/src/canvas/forme_region.rs)
+is scoped to the Forme UUID; absent/mismatched overrides use the existing
+hover/member-selection/unlocked behavior. A hidden Forme stays hidden and the
+outer outline remains. Bounds, cells, locks, selection, explicit pins, manual
+placement, source assertions and live tile sessions keep their owners. Whole
+graph replacement clears the override. Unsupported winning effects are
+disclosed as decisions with no live renderer here; they do not silently invoke
+a lower-priority effect or mutate a Numen field.
+
+**Qualification:** the [source-hashed receipt](../../../ports/graphshell/docs/receipts/presentation_live_20261011/qualification.json)
+records **31 native tests passed**: seven new binding tests, nine retained
+editor/session tests and fifteen actual access/link inspection tests. The small
+standalone graph-only harness imports checked-in modules and locks its own
+resolved dependencies; it does not qualify the complete native host, Canvas
+unit suite or IndexedDB. Replay with
+`cargo test --locked --manifest-path ports/graphshell/docs/receipts/presentation_live_20261011/harness/Cargo.toml --lib`.
+The current locked product wasm check passes with the same eighteen existing
+web warnings. One compiler ran at a time under the 1280 MiB/zero-swap scope and
+free-memory guard. Default/viewer/release bundles were not built. A Canvas
+regression test is added for show/hide/base restoration, wrong-ID isolation,
+hidden boundaries, selection/position/pin preservation and graph replacement;
+its native execution remains a handoff gate. Run
+`cargo test --locked -p pictograph --features canvas --lib canvas::forme_region::tests`
+on a suitable native host before marking that gate passed.
+
+**Browser handoff:** use a fresh dedicated origin/profile and normal motion on
+`tree.html?app=local&fixture=field-inspection` for
+[`p4_tree_presentation_live.scn`](../../../ports/graphshell/web/scenarios/p4_tree_presentation_live.scn),
+then a fresh page/process retaining that origin for
+[`p4_tree_presentation_live_reopen.scn`](../../../ports/graphshell/web/scenarios/p4_tree_presentation_live_reopen.scn).
+The fixture retains its isolated store. The first checks exact access retention
+across selection, private draft isolation, bound Forme/Numen decisions, saved
+opt-in, acknowledged Undo/Redo, independent boundary visibility and base
+restoration; the second checks stored rules/history and the view switch's
+fresh-page default. Both preserve source/session and Forme layout identities.
+Four captures are planned, not generated/reviewed. The connected S-PC browser
+still lacks WebGPU. Review actual subdivisions, unsupported-effect explanations,
+scrolling/narrow width, keyboard/IME, theme changes, physical input, tile session
+continuity and pin/manual-placement invariants on a compatible connected
+browser. Existing authoring scenarios remain useful regressions; separate fresh
+origins are required because they expect an absent rule record.
+
+**Remaining done-conditions:** qualify the renderer and headed cases above;
+measure bound-preview hit-test/read costs and long-context presentation before
+large-graph adoption; add exact occurrence adapters for sidecar-only and derived
+relations; map ForegroundPinned/Overview when their owners exist; add supported
+node representation/detail measurement and relation/provenance/drop-preview
+consumers before claiming broad effect adoption. Reconcile preview hysteresis
+with future live LOD state per view/occurrence. Multi-tab IndexedDB races,
+conflict recovery, large-store costs and release performance retain the previous
+editor gates. Scene composition, theme/font authoring, general primitive writes,
+field actions/scripts, other hosts and Rhai SE39–SE42 remain separate work.
 
 #### Forme drop feedback and field browser qualification (2026-10-11)
 

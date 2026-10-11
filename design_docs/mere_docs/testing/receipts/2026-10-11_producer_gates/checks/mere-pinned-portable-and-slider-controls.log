@@ -1,0 +1,52 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling regress v0.11.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?rev=ef5412d760a978584c8c1801e8a765c51aecd403#ef5412d7)
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling netrender v0.1.2 (https://github.com/merely-made/netrender.git?rev=ef5412d760a978584c8c1801e8a765c51aecd403#ef5412d7)
+   Compiling sprigging v0.2.1 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/sprigging)
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling genet-livery v0.0.4 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?rev=ef5412d760a978584c8c1801e8a765c51aecd403#ef5412d7)
+   Compiling cambium v0.3.3 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium)
+   Compiling cambium-winit v0.3.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium-winit)
+   Compiling genet-render v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+warning: function `find_element_by_name` is never used
+    --> crates/cambium/cambium/src/tests.rs:1838:8
+     |
+1838 |     fn find_element_by_name(dom: &ScriptedDom, node: NodeId, name: &str) -> Option<NodeId> {
+     |        ^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling cambium-rootstock v0.1.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium-rootstock)
+warning: `cambium` (lib test) generated 1 warning
+    Finished `test` profile [unoptimized] target(s) in 35.31s
+     Running unittests src/lib.rs (/Users/markik/Code/targets/vello-producer-gates-20261011/debug/deps/cambium-ba65727217ac1ab4)
+
+running 3 tests
+test tests::portable::cross_parent_move_preserves_element_state_and_handlers ... ok
+test tests::portable::removed_key_parks_then_drains_to_real_teardown ... ok
+test tests::portable::target_before_source_falls_back_to_fresh_build_and_drain ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 251 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/Users/markik/Code/targets/vello-producer-gates-20261011/debug/deps/cambium_rootstock-e3253d12dc3ca971)
+
+running 5 tests
+test producer::registry::portable::tests::default_gpu_only_source_refuses_without_registry_mutation ... ok
+test producer::registry::portable::tests::late_whole_envelope_refusal_preserves_prior_stamps_and_registration ... ok
+test producer::registry::portable::tests::oversized_callback_scene_refuses_before_digest_and_preserves_accepted_stamp ... ok
+test producer::registry::portable::tests::portable_refusal_preserves_live_gpu_view_and_stamp ... ignored, real-device cache proof; root serializes GPU acceptance
+test producer::registry::portable::tests::two_source_aggregate_refusal_preserves_all_accepted_metadata ... ok
+
+test result: ok. 4 passed; 0 failed; 1 ignored; 0 measured; 75 filtered out; finished in 0.39s
+

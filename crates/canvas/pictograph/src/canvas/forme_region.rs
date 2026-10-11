@@ -102,6 +102,29 @@ impl Canvas {
             .as_ref()
             .is_some_and(|r| r.visible && r.contains(self.world_point_at(self.cursor)))
     }
+    /// View-only effect. None returns to hover/selection/unlocked behavior.
+    /// An override for another Forme is inert; it never changes placement.
+    pub fn set_forme_guides(&mut self, value: Option<(uuid::Uuid, bool)>) -> bool {
+        if self.forme_guides == value {
+            return false;
+        }
+        self.forme_guides = value;
+        true
+    }
+    pub fn forme_guides_visible(&self) -> bool {
+        let Some(region) = self.forme_region.as_ref().filter(|r| r.visible) else {
+            return false;
+        };
+        if let Some((_, visible)) = self.forme_guides.filter(|(id, _)| *id == region.id) {
+            return visible;
+        }
+        self.forme_region_hovered()
+            || !region.locked
+            || region
+                .cells
+                .iter()
+                .any(|c| self.selected_members().contains(&c.member))
+    }
     pub(crate) fn apply_forme_region(&mut self) {
         let Some(region) = self.forme_region.clone() else {
             return;
@@ -129,11 +152,7 @@ impl Canvas {
         let Some(region) = self.forme_region.as_ref().filter(|r| r.visible) else {
             return Vec::new();
         };
-        let selected = region
-            .cells
-            .iter()
-            .any(|c| self.selected_members().contains(&c.member));
-        let guides = self.forme_region_hovered() || selected || !region.locked;
+        let guides = self.forme_guides_visible();
         let mut cmds = vec![outline(region.bounds, self.style.node_color, 0.28)];
         if guides {
             cmds.extend(
@@ -171,6 +190,41 @@ fn outline([x, y, r, b]: [f32; 4], mut color: ColorF, alpha: f32) -> PaintCmd {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn rule_guides_restore_base_without_moving_or_unpinning_members() {
+        let (mut c, a, _, _) = fixture();
+        c.cursor = (-10000., -10000.);
+        c.select_member(a);
+        c.pin_focused();
+        let before = c.forme_region().unwrap().clone();
+        let key = c.graph.get_node_key_by_id(a).unwrap();
+        let position = c.view.position_of(key);
+        let selected = c.selected_members();
+        let role = c.arrangement_role_of(key);
+        assert_eq!(c.forme_overlay().len(), 3);
+        c.set_forme_guides(Some((before.id, false)));
+        assert_eq!(c.forme_overlay().len(), 1);
+        c.set_forme_guides(Some((uuid::Uuid::from_u128(999), false)));
+        assert_eq!(c.forme_overlay().len(), 3);
+        c.clear_selection();
+        c.set_forme_guides(Some((before.id, true)));
+        assert_eq!(c.forme_overlay().len(), 3);
+        c.set_forme_guides(None);
+        assert_eq!(c.forme_overlay().len(), 1);
+        c.select_member(a);
+        assert_eq!(c.selected_members(), selected);
+        assert_eq!(c.forme_region(), Some(&before));
+        assert_eq!(c.view.position_of(key), position);
+        assert_eq!(c.arrangement_role_of(key), role);
+        let mut hidden = before.clone();
+        hidden.visible = false;
+        c.set_forme_region(Some(hidden)).unwrap();
+        c.set_forme_guides(Some((before.id, true)));
+        assert!(!c.forme_guides_visible());
+        assert!(c.forme_overlay().is_empty());
+        c.set_graph(Graph::new());
+        assert!(c.forme_guides.is_none());
+    }
     fn fixture() -> (Canvas, uuid::Uuid, uuid::Uuid, uuid::Uuid) {
         let mut c = Canvas::with_sample_graph();
         let ids: Vec<_> = c.graph.nodes().map(|(_, n)| n.id).take(3).collect();
