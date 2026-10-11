@@ -19,8 +19,11 @@ their recorded source family; this pass establishes no new runtime receipt.
 
 Validation: owned-document mechanical audit compared with their committed
 versions introduces no findings or count changes. All 14 new relative targets
-and anchors resolve. Current-path D2 coverage is complete, with no parser or
-coverage errors. Scoped `git diff --check` passes.
+and anchors resolve. At the review base, D2 coverage is 260/260 with no errors.
+Publication against upstream `a85942c7` has 260/261 coverage: the newly upstream
+producer-gates receipt README lacks a D2 record. That existing coverage error
+is outside these two reviewed documents; their records parse without errors.
+Scoped `git diff --check` passes on both bases.
 
 ## 2026-08-12_family_composition_thesis_brief.md
 
