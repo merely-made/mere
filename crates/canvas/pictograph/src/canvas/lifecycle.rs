@@ -68,6 +68,7 @@ impl Canvas {
             .get_mut()
             .expect("strategy input cache") = None;
         self.forme_region = None;
+        self.forme_guides = None;
         self.forme_held.clear();
         self.selected.clear();
         self.selected_edges.clear();
@@ -155,6 +156,7 @@ impl Canvas {
             pinned_nodes: HashSet::new(),
             field_drag: None,
             forme_region: None,
+            forme_guides: None,
             forme_held: HashSet::new(),
             selected: HashSet::new(),
             selected_edges: HashSet::new(),

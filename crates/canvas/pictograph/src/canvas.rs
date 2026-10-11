@@ -416,6 +416,8 @@ pub struct Canvas {
     /// An in-progress field move / resize drag, if any. (Field regions.)
     field_drag: Option<fields::FieldDrag>,
     forme_region: Option<FormeRegion>,
+    /// Presentation-only subdivisions override, scoped to an exact Forme.
+    forme_guides: Option<(uuid::Uuid, bool)>,
     forme_held: HashSet<NodeKey>,
     /// Currently-selected nodes (click selects one; marquee selects many).
     selected: HashSet<NodeKey>,

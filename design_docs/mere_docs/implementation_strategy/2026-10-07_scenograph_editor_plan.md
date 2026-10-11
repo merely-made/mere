@@ -1657,10 +1657,10 @@ winning properties. A changed buffer/context hides the stale result until
 Preview runs again. An absent winning property uses the host's base presentation.
 Preview is pure and does not carry hidden hysteresis state between occurrences,
 samples, committed sets or drafts; prior matches are supplied explicitly.
-This draft does not infer scene facts or claim a live graph-to-context adapter.
-It previews decisions rather than realizing faces, containment, provenance,
-region guides or drop zones on the Canvas. Live input/occurrence adapters and
-measurement-before-placement integration are the next presentation-owner work.
+At this authoring checkpoint the preview has no live graph-to-context adapter
+or Canvas consumer. The [exact-occurrence and Forme guide continuation](#exact-occurrence-previews-and-live-forme-guides-draft-2026-10-11)
+below adds disclosed bindings and the first supported overlay effect; faces,
+containment, provenance and drop zones retain their renderer gates.
 
 **Persistence:** rules, generation and up to 32 saved undo/redo steps commit in
 one Muniment workspace record, `graphshell/presentation-rules/v1/<graph-session-uuid>`.
@@ -1714,9 +1714,124 @@ Tabard theme changes. Physical input, fresh-origin negative control, actual
 IndexedDB failure/conflict injection, multi-tab races, large-record costs,
 release performance and other hosts remain separate acceptance gates.
 
-**Next done-condition:** bind preview inputs to stable projected occurrences and
-an explicit disclosed fact/state adapter; realize supported effects before
-measurement/placement, explain unsupported ones, and qualify scene changes with
-source, selection, pins, manual placement and live tile sessions preserved. This
+**Next done-condition at this checkpoint:** bind preview inputs to stable
+projected occurrences and an explicit disclosed fact/state adapter; realize
+supported effects before measurement/placement, explain unsupported ones, and
+qualify scene changes with source, selection, pins, manual placement and live
+tile sessions preserved. The bounded continuation below implements these
+bindings and Forme guides; its remaining acceptance gates stay open. This
 bounded authoring draft does not complete primitive writes, field action/script
 execution, theme/font authoring, scene composition or Rhai SE39–SE42 adoption.
+
+
+#### Exact-occurrence previews and live Forme guides draft (2026-10-11)
+
+**Status:** implemented draft, portable native and product wasm checks passed;
+headed acceptance remains open. Mark's continuing “proceed!” authorizes direct
+main delivery and review/testing handoff. Published `e56f7a3f` is the integration
+base. Fetches before implementation and delivery found no newer upstream
+adoption; earlier Forme Chrome receipts remain limited to their recorded source.
+
+The [binding adapter](../../../ports/graphshell/src/presentation_binding.rs)
+reads current held owners and receives disclosed state from one Canvas view.
+**Use inspected access**, **Use inspected assertion** and **Use inspected field**
+explicitly bind a preview. Selection does not retarget it. Missing/departed or
+rebound targets produce an explanation and invalidate the previous preview;
+there is no equal-address fallback. A held assertion must still contribute to
+the exact displayed access pair, even if its Resource owner remains inspectable
+elsewhere. Sidecar-only families do not acquire synthetic assertion handles.
+
+Occurrence IDs are `access:<surface-uuid>`, `numen:<field-uuid>`,
+`forme:<forme-uuid>` and `assertion:<JSON of canonical access pair and assertion
+handle>`. The same Resource and assertion can supply facts to distinct access
+or relation occurrences. Local node/edge indexes and URLs are not durable
+occurrence IDs. Numen and Forme remain separate owners even with equal UUID
+payloads. The read model does not write graph facts or evaluate field ASTs.
+
+**Disclosed inputs:** accesses expose held label/address, optional MIME and its
+known image/video/audio/text category, recorded Resource identity/address and
+scalar Resource facets under `resource.<key>`. Complex facet values are omitted;
+missing metadata is not a completeness claim. Access Selected and PositionPinned
+come from this Canvas; Forme holds are not position pins. The optional screen
+size uses the measured body hit rectangle's smaller dimension, including the
+existing occlusion behavior; no first-frame measurement is invented. Held
+assertions expose predicate, actual `Semantic` family, scope, provenance and
+source/displayed endpoints; `derived` is not fabricated. Numen exposes name,
+lifecycle, definition/extent kinds and this view's boundary visibility. Forme
+exposes label, role, lock, visibility, member count and actual boundary hover
+when presented. LayoutUnlocked belongs to the Forme owner. Inspected identifies
+the retained exact inspector target, independently of graph selection.
+
+The JSON report includes the occurrence, context, available states and limits.
+Unknown state differs from known false. Rules that reference unavailable state
+or measurement are skipped with a trace explanation, including references
+under `Not` or `Any`. Other valid rules can still win. Original whole-set
+validation runs before this host filter; malformed or disabled rules are not
+silently repaired. ForegroundPinned, Overview, exact assertion selection and
+field selection have no adapter yet. Child selection is not promoted to a
+selected field. Missing facts retain the shared resolver's existing semantics.
+Bound previews use an empty disclosed prior-match set, without hidden hysteresis.
+Manual samples/context editing retain their explicit-input behavior; copying a
+bound context to manual input stops tracking the owner. Changes to a bound input
+invalidate its decision result; Preview must run again. Reads pause while the
+editor is closed and refresh when reopened.
+
+**First live effect:** **Enable saved rules in this view** opts into acknowledged
+saved rules, including acknowledged saved Undo/Redo. The switch is view-local,
+defaults off on a fresh page, and is not stored in graph or rule history. Private
+drafts and manual previews never affect the Canvas. Live evaluation reads the
+current exact Forme owner independently of the chosen preview target. It caches
+resolution by generation and disclosed inputs; the frame installs its effect
+before Canvas composition. An unavailable owner restores base guides with an
+explanation. `RegionGuides` affects only Forme subdivisions. The [Canvas override](../../../crates/canvas/pictograph/src/canvas/forme_region.rs)
+is scoped to the Forme UUID; absent/mismatched overrides use the existing
+hover/member-selection/unlocked behavior. A hidden Forme stays hidden and the
+outer outline remains. Bounds, cells, locks, selection, explicit pins, manual
+placement, source assertions and live tile sessions keep their owners. Whole
+graph replacement clears the override. Unsupported winning effects are
+disclosed as decisions with no live renderer here; they do not silently invoke
+a lower-priority effect or mutate a Numen field.
+
+**Qualification:** the [source-hashed receipt](../../../ports/graphshell/docs/receipts/presentation_live_20261011/qualification.json)
+records **31 native tests passed**: seven new binding tests, nine retained
+editor/session tests and fifteen actual access/link inspection tests. The small
+standalone graph-only harness imports checked-in modules and locks its own
+resolved dependencies; it does not qualify the complete native host, Canvas
+unit suite or IndexedDB. Replay with
+`cargo test --locked --manifest-path ports/graphshell/docs/receipts/presentation_live_20261011/harness/Cargo.toml --lib`.
+The current locked product wasm check passes with the same eighteen existing
+web warnings. One compiler ran at a time under the 1280 MiB/zero-swap scope and
+free-memory guard. Default/viewer/release bundles were not built. A Canvas
+regression test is added for show/hide/base restoration, wrong-ID isolation,
+hidden boundaries, selection/position/pin preservation and graph replacement;
+its native execution remains a handoff gate. Run
+`cargo test --locked -p pictograph --features canvas --lib canvas::forme_region::tests`
+on a suitable native host before marking that gate passed.
+
+**Browser handoff:** use a fresh dedicated origin/profile and normal motion on
+`tree.html?app=local&fixture=field-inspection` for
+[`p4_tree_presentation_live.scn`](../../../ports/graphshell/web/scenarios/p4_tree_presentation_live.scn),
+then a fresh page/process retaining that origin for
+[`p4_tree_presentation_live_reopen.scn`](../../../ports/graphshell/web/scenarios/p4_tree_presentation_live_reopen.scn).
+The fixture retains its isolated store. The first checks exact access retention
+across selection, private draft isolation, bound Forme/Numen decisions, saved
+opt-in, acknowledged Undo/Redo, independent boundary visibility and base
+restoration; the second checks stored rules/history and the view switch's
+fresh-page default. Both preserve source/session and Forme layout identities.
+Four captures are planned, not generated/reviewed. The connected S-PC browser
+still lacks WebGPU. Review actual subdivisions, unsupported-effect explanations,
+scrolling/narrow width, keyboard/IME, theme changes, physical input, tile session
+continuity and pin/manual-placement invariants on a compatible connected
+browser. Existing authoring scenarios remain useful regressions; separate fresh
+origins are required because they expect an absent rule record.
+
+**Remaining done-conditions:** qualify the renderer and headed cases above;
+measure bound-preview hit-test/read costs and long-context presentation before
+large-graph adoption; add exact occurrence adapters for sidecar-only and derived
+relations; map ForegroundPinned/Overview when their owners exist; add supported
+node representation/detail measurement and relation/provenance/drop-preview
+consumers before claiming broad effect adoption. Reconcile preview hysteresis
+with future live LOD state per view/occurrence. Multi-tab IndexedDB races,
+conflict recovery, large-store costs and release performance retain the previous
+editor gates. Scene composition, theme/font authoring, general primitive writes,
+field actions/scripts, other hosts and Rhai SE39–SE42 remain separate work.
