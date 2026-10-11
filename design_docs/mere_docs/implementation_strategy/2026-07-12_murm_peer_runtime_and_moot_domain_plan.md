@@ -1201,3 +1201,33 @@ remote application acceptance or a human read; this slice adds no delivery or
 read-receipt claims. The retained deterministic read complements upstream's
 incremental dependency orderer and its replay fixes; it does not replace upstream
 network processing or qualify a rendered Graphshell client.
+
+The current [family composition research review](../../2026-08-12_family_composition_thesis_brief.md#research-review-logical-model-and-usable-sharing-2026-10-11)
+distinguishes identification, interpretation and authorized action. Shared
+addresses and causal references provide the first; compatible domain profiles
+or adapters provide the second; accepted policy and named capabilities provide
+the third. The [Fleece/Eidetic capability plan](../../eidetic_docs/implementation_strategy/2026-10-11_fleece_eidetic_capability_plan.md)
+places gathering and explicit capture in Fleece and durable typed content in
+Eidetic, while graph mutation, session authority and retention policy retain
+their domain owners. A replication frontier or checkpoint notice does not grant
+permission to gather, capture, fork or mutate the content it references.
+
+The fork receipt passes 263 tests across core, store, stream, networking, auth,
+spaces and node replay, with one existing network test ignored. On the combined
+Mere tree including main `522a6e7a7`, the locked consumer gate passes 199 tests
+across Murm, Stickleback, Comms and Moot, with one existing doctest ignored.
+Coverage includes delayed ancestors, cross-author and cross-channel frontiers,
+fan-out refusal without mutation, signer/revision refusal, own-prefix pruning,
+durable reopen, withdrawn authority and protected native-drop bootstrap.
+Default Moot compiles for Wasm; its normal cone contains Comms and serde without
+Murm, transport, Commons, Iroh, redb or tokio. Port boundaries and formatting pass.
+
+Evidence is preserved in `targets/moot-p2panda-continuation-20261011.json`,
+`targets/moot-p2panda-integrated-consumer-tests-retry-20261011.log`,
+`targets/moot-p2panda-default-wasm-check-20261011.log` and
+`targets/moot-p2panda-default-wasm-cone-20261011.txt`. The initial integrated Murm
+test launch stalled before the harness at macOS's loader entry point; restarting
+only that executable allowed the complete gate to pass. Documentation comparison
+against current main introduces no new subjects; the same ten existing D2
+judgment errors remain. These automated receipts do not establish headed/native
+presentation, a rendered client, delivery or human-read acknowledgment.
