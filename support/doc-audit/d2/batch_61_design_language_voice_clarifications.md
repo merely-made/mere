@@ -432,3 +432,21 @@ comparison on the current primary filesystem. Only this lane's three document
 edits are substituted; concurrent Fleece edits stay fixed. That shared snapshot
 has 252/260 D2 coverage and nine errors, including the concurrent new plan.
 Whitespace checks pass; browser JSON receipt hashes use portable LF content.
+
+
+**Field/coupling inspection draft (2026-10-11):** Mark's direct-main draft
+authorization continues with an exact-owner read model, retained field roster,
+individually identified couplings, deterministic all-candidate rectangular region
+discovery and independent Forme arrangement-owner reads. Hidden boundaries do
+not disable couplings; selector matches, extent hits and measured effects stay
+distinct. The opt-in fixture has its own browser store and never reseeds an
+existing graph. Ten actual-source native checks, including app MemoryBackend
+persist/reopen, and the integrated product wasm check pass under the established
+memory limits. Published `d5f60e5c`'s content/custody/dependency changes and the earlier Forme
+control/save-wait fixes and Chrome receipt are retained; that receipt does not
+qualify this new inspector. The field owner carries the two-page fixture handoff and explicit interaction,
+startup/rebuild lifecycle and exact-coupling write gates. No field browser run,
+capture or other agent review is inferred. Full citation and D2 audit JSON equal
+the integrated main pre-edit baseline, retaining 252/260 coverage and ten
+existing D2 errors. Added local links and anchors resolve; whitespace checks
+pass. No active Markdown document or parser-shaped audit record was added.
