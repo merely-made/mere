@@ -1,0 +1,338 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+    Checking serde_core v1.0.229
+    Checking libc v0.2.190
+    Checking cfg-if v1.0.5
+    Checking bitflags v2.13.2
+    Checking libm v0.2.16
+    Checking serde v1.0.229
+    Checking num-traits v0.2.19
+    Checking smallvec v1.16.1
+    Checking objc2-encode v4.1.0
+    Checking stable_deref_trait v1.2.1
+    Checking scopeguard v1.2.0
+    Checking log v0.4.34
+    Checking lock_api v0.4.14
+    Checking objc2 v0.6.4
+    Checking arrayvec v0.7.8
+    Checking foldhash v0.2.0
+    Checking bytemuck v1.25.2
+    Checking parking_lot_core v0.9.12
+    Checking parking_lot v0.12.5
+    Checking objc2-core-foundation v0.3.2
+    Checking equivalent v1.0.2
+    Checking thiserror v2.0.21
+    Checking hashbrown v0.17.1
+    Checking once_cell v1.21.4
+    Checking zerofrom v0.1.8
+    Checking yoke v0.8.3
+    Checking objc2-foundation v0.3.2
+    Checking memchr v2.8.3
+    Checking zerovec v0.11.8
+    Checking indexmap v2.14.2
+    Checking siphasher v1.0.3
+    Checking phf_shared v0.13.1
+    Checking profiling v1.0.18
+    Checking new_debug_unreachable v1.0.6
+    Checking writeable v0.6.4
+    Checking block2 v0.6.2
+    Checking euclid v0.22.14
+    Checking simd-adler32 v0.3.10
+    Checking rustc-hash v1.1.0
+    Checking naga-types v30.0.1
+    Checking phf v0.13.1
+    Checking tinystr v0.8.4
+    Checking objc2-core-graphics v0.3.2
+    Checking objc2-metal v0.3.2
+    Checking zerocopy v0.8.57
+    Checking serde_bytes v0.11.19
+    Checking raw-window-handle v0.6.2
+    Checking adler2 v2.0.1
+    Checking litemap v0.8.3
+    Checking unicode-width v0.2.2
+    Checking bit-vec v0.9.1
+    Checking codespan-reporting v0.13.1
+    Checking bit-set v0.10.0
+    Checking icu_locale_core v2.3.0
+    Checking half v2.7.1
+    Checking linebender_resource_handle v0.1.1
+    Checking objc2-quartz-core v0.3.2
+    Checking potential_utf v0.1.6
+    Checking zerotrie v0.2.5
+    Checking static_assertions v1.1.0
+    Checking unicode-ident v1.0.26
+    Checking naga v30.0.1
+    Checking icu_provider v2.3.1
+    Checking wgpu-types v30.0.1
+    Checking crc32fast v1.5.2
+    Checking miniz_oxide v0.9.1
+    Checking utf8_iter v1.0.4
+    Checking precomputed-hash v0.1.1
+    Checking itoa v1.0.18
+    Checking string_cache v0.9.0
+    Checking icu_collections v2.3.0
+    Checking flate2 v1.1.10
+    Checking raw-window-metal v1.1.0
+    Checking miniz_oxide v0.8.9
+    Checking fdeflate v0.3.7
+    Checking libloading v0.8.9
+    Checking typenum v1.20.1
+    Checking wgpu-naga-bridge v30.0.1
+    Checking wgpu-hal v30.0.1
+    Checking web_atoms v0.2.6
+    Checking tendril v0.5.1
+    Checking font-types v0.12.5
+    Checking polycool v0.4.0
+    Checking kurbo v0.13.1
+    Checking read-fonts v0.41.0
+    Checking wgpu-core-deps-apple v30.0.1
+    Checking markup5ever v0.39.0
+    Checking icu_properties_data v2.3.0
+    Checking png v0.18.1
+    Checking color v0.3.3
+    Checking svg_fmt v0.4.5
+    Checking guillotiere v0.7.0
+    Checking peniko v0.6.1
+    Checking icu_properties v2.3.0
+    Checking wgpu-core v30.0.1
+    Checking skrifa v0.44.0
+    Checking crossbeam-utils v0.8.23
+    Checking icu_normalizer_data v2.3.0
+    Checking tracing-core v0.1.36
+    Checking pin-project-lite v0.2.17
+    Checking tracing v0.1.44
+    Checking icu_normalizer v2.3.0
+    Checking crossbeam-epoch v0.9.21
+    Checking vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a#5862bba2)
+    Checking wgpu v30.0.1
+    Checking zmij v1.0.23
+    Checking getrandom v0.4.3
+    Checking futures-core v0.3.34
+    Checking futures-intrusive v0.5.0
+    Checking equator v0.4.2
+    Checking uuid v1.27.0
+    Checking serde_json v1.0.151
+    Checking vello_shaders v0.11.0 (https://github.com/mark-ik/vello?rev=5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a#5862bba2)
+    Checking crossbeam-deque v0.8.8
+    Checking layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+    Checking num-integer v0.1.47
+    Checking either v1.18.0
+    Checking accesskit v0.24.1
+    Checking num-bigint v0.4.8
+    Checking rayon-core v1.13.0
+    Checking netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a#5862bba2)
+    Checking aligned-vec v0.6.4
+    Checking font-types v0.11.3
+    Checking allocator-api2 v0.2.21
+    Checking byteorder v1.5.0
+    Checking hashbrown v0.16.1
+    Checking hash32 v0.2.1
+    Checking read-fonts v0.39.2
+    Checking v_frame v0.3.9
+    Checking rayon v1.12.0
+    Checking num-rational v0.4.2
+    Checking anyhow v1.0.104
+    Checking paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?rev=ef5412d760a978584c8c1801e8a765c51aecd403#ef5412d7)
+    Checking spin v0.9.9
+    Checking as-slice v0.2.1
+    Checking aligned v0.4.3
+    Checking heapless v0.7.17
+    Checking icu_locale_fallback_data v2.3.0
+    Checking idna_adapter v1.2.2
+    Checking hybrid-array v0.4.15
+    Checking no_std_io2 v0.9.4
+    Checking nom v8.0.0
+    Checking objc2-core-text v0.3.2
+    Checking cobs v0.3.0
+    Checking y4m v0.8.0
+    Checking percent-encoding v2.3.2
+    Checking pollster v1.0.1
+    Checking netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?rev=ef5412d760a978584c8c1801e8a765c51aecd403#ef5412d7)
+    Checking form_urlencoded v1.2.2
+    Checking av-scenechange v0.14.1
+    Checking postcard v1.1.3
+    Checking av1-grain v0.2.5
+    Checking bitstream-io v4.10.0
+    Checking idna v1.1.0
+    Checking icu_locale_fallback v2.3.0
+    Checking icu_segmenter_data v2.3.0
+    Checking objc-sys v0.3.5
+    Checking maybe-rayon v0.1.1
+    Checking itertools v0.14.0
+    Checking xml5ever v0.39.0
+    Checking html5ever v0.39.0
+    Checking app_units v0.7.8
+    Checking memmap2 v0.9.11
+    Checking parlance v0.1.0
+    Checking alloc-no-stdlib v2.0.4
+    Checking imgref v1.12.3
+    Checking dtoa v1.0.11
+    Checking quick-error v2.0.1
+    Checking loop9 v0.1.5
+    Checking dtoa-short v0.3.5
+    Checking brotli-decompressor v5.0.3
+    Checking genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+    Checking rav1e v0.8.1
+    Checking genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+    Checking genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+    Checking icu_segmenter v2.3.0
+    Checking objc2 v0.5.2
+    Checking url v2.5.8
+    Checking netrender v0.1.2 (https://github.com/merely-made/netrender.git?rev=ef5412d760a978584c8c1801e8a765c51aecd403#ef5412d7)
+    Checking block-buffer v0.12.1
+    Checking crypto-common v0.2.2
+    Checking harfrust v0.8.4
+    Checking skrifa v0.42.1
+    Checking parley_data v0.10.0
+    Checking avif-serialize v0.8.9
+    Checking weezl v0.1.12
+    Checking simdutf8 v0.1.5
+    Checking unicode-segmentation v1.13.3
+    Checking pxfm v0.1.30
+    Checking byteorder-lite v0.1.0
+    Checking core_detect v1.0.0
+    Checking rgb v0.8.53
+    Checking zune-core v0.5.3
+    Checking bytes v1.12.1
+    Checking const-oid v0.10.2
+    Checking color_quant v1.1.0
+    Checking gif v0.14.2
+    Checking moxcms v0.8.1
+    Checking digest v0.11.3
+    Checking wuff v0.2.9
+    Checking zune-jpeg v0.5.15
+    Checking ravif v0.13.0
+    Checking encoding_rs v0.8.42
+    Checking image-webp v0.2.4
+    Checking genet-parley v0.10.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+    Checking cssparser v0.37.0
+    Checking psm v0.1.32
+    Checking block2 v0.5.1
+    Checking engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+    Checking regress v0.11.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+    Checking document-session-api v0.1.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+    Checking core-foundation-sys v0.8.7
+    Checking dispatch v0.2.0
+    Checking bitflags v1.3.2
+    Checking cpufeatures v0.3.1
+    Checking genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+    Checking sha2 v0.11.0
+    Checking core-foundation v0.9.4
+    Checking objc2-foundation v0.2.2
+    Checking genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+    Checking cadency v0.0.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+    Checking stacker v0.1.25
+    Checking image v0.25.10
+    Checking wuff-capi v0.2.0
+    Checking libz-sys v1.1.29
+    Checking genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+    Checking tinct v0.1.2 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/tinct)
+    Checking foreign-types-shared v0.3.1
+    Checking foreign-types v0.5.0
+    Checking fontsan v0.7.0
+    Checking logos v0.16.1
+    Checking generic-array v0.14.7
+    Checking buckram v0.0.3 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+    Checking objc2-app-kit v0.2.2
+    Checking livery v0.0.5 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+    Checking paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?rev=ef5412d760a978584c8c1801e8a765c51aecd403#ef5412d7)
+    Checking core-graphics-types v0.1.3
+    Checking genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+    Checking workbench v0.1.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/workbench)
+    Checking anymore v1.0.0
+    Checking jotdown v0.10.0
+    Checking data-url v0.3.2
+    Checking genet-livery v0.0.4 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+    Checking illume v0.0.2 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/nematic/illume)
+    Checking meristem v0.2.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/meristem)
+    Checking mere-surface-api v0.1.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/system/surface-api)
+    Checking core-graphics v0.23.2
+    Checking genet-text v0.1.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+    Checking sprigging v0.2.1 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/sprigging)
+    Checking sceno v0.0.4 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/scenes/sceno)
+    Checking command-menu v0.1.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/command-menu)
+    Checking smol_str v0.2.2
+    Checking cursor-icon v1.2.0
+    Checking edit-history v0.1.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/edit-history)
+    Checking dpi v0.1.2
+    Checking winit v0.30.13
+    Checking cambium v0.3.3 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium)
+    Checking crypto-common v0.1.7
+    Checking block-buffer v0.10.4
+    Checking foldhash v0.1.5
+    Checking hashbrown v0.15.5
+    Checking digest v0.10.7
+    Checking genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+    Checking fixedbitset v0.5.7
+    Checking web-time v1.1.0
+    Checking cpufeatures v0.2.17
+    Checking cambium-winit v0.3.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium-winit)
+    Checking sha2 v0.10.9
+    Checking petgraph v0.8.3
+    Checking genet-render v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+    Checking accesskit_consumer v0.38.0
+    Checking unicode-bidi v0.3.18
+    Checking fleece v0.5.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+    Checking accesskit_macos v0.26.3
+    Checking inker v0.1.1 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/inker/inker)
+    Checking cambium-rootstock v0.1.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium-rootstock)
+    Checking genet-winit-host v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+    Checking mere-fleece v0.0.1 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/fleece)
+    Checking taproot v0.1.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+    Checking tabard v0.0.1 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/system/tabard)
+    Checking document-canvas v0.1.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/inker/document-canvas)
+    Checking objc2-cloud-kit v0.3.2
+    Checking objc2-core-data v0.3.2
+    Checking objc2-core-image v0.3.2
+    Checking objc2-core-video v0.3.2
+    Checking option-ext v0.2.0
+    Checking dirs-sys v0.4.1
+    Checking objc2-app-kit v0.3.2
+    Checking mere-document-lanes v0.1.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/system/document-lanes)
+    Checking cambium-winit-a11y v0.3.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium-winit-a11y)
+    Checking png v0.17.16
+    Checking mere-apparatus v0.0.1 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/domain/apparatus)
+    Checking light-file-dialog v3.21.3
+    Checking mesquite v0.1.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/mesquite)
+    Checking tabard-workshop v0.0.1 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/tabard-workshop)
+    Checking dirs v5.0.1
+    Checking cambium-genet-winit-host v0.1.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium-genet-winit-host)
+warning: unused import: `NSWindow`
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:511:25
+    |
+511 |     use objc2_app_kit::{NSWindow, NSWindowButton};
+    |                         ^^^^^^^^
+    |
+    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unnecessary `unsafe` block
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:540:46
+    |
+540 |             view.convertRect_fromView(frame, unsafe { ns_window.contentView() }.as_deref());
+    |                                              ^^^^^^ unnecessary `unsafe` block
+    |
+    = note: `#[warn(unused_unsafe)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `window_control_node` is never used
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:113:4
+    |
+113 | fn window_control_node<D>(dom: &D, root: NodeId, accessible_label: &str) -> Option<NodeId>
+    |    ^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `window_control_rect` is never used
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:139:15
+    |
+139 | pub(crate) fn window_control_rect<D>(
+    |               ^^^^^^^^^^^^^^^^^^^
+
+warning: `cambium-genet-winit-host` (lib) generated 4 warnings (run `cargo fix --lib -p cambium-genet-winit-host` to apply 1 suggestion)
+    Checking tabard-desktop v0.1.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/ports/tabard/desktop)
+    Finished `dev` profile [unoptimized] target(s) in 1m 59s

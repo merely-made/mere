@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "tabard-workshop",
+    "--features",
+    "native-host",
+    "--test",
+    "portable_capture",
+    "-j",
+    "2",
+    "--",
+    "--test-threads=1"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-vello-release-adoption",
+  "deadline_seconds": 600,
+  "elapsed_seconds": 22.934,
+  "exit_code": 0,
+  "timed_out": false,
+  "log": "/Users/markik/Code/output/vello-producer-gates-20261011/checks/mere-pinned-production-capture.log"
+}

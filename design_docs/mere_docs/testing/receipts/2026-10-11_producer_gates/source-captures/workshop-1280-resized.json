@@ -1,0 +1,265 @@
+{
+  "authored_window_width": 1280.0,
+  "capture_bytes": 13662917,
+  "capture_digest": [
+    129,
+    70,
+    226,
+    94,
+    6,
+    224,
+    24,
+    8,
+    13,
+    6,
+    152,
+    119,
+    33,
+    244,
+    97,
+    8,
+    71,
+    191,
+    51,
+    110,
+    170,
+    165,
+    217,
+    129,
+    56,
+    29,
+    67,
+    211,
+    15,
+    44,
+    221,
+    81
+  ],
+  "case": "resized",
+  "commands": 408,
+  "external_draws": 2,
+  "fonts": 3,
+  "images": 0,
+  "producers": [
+    {
+      "alpha": "Straight",
+      "content_generation": 7,
+      "encoding": "Srgb",
+      "layout_scale": 1.0,
+      "logical_size": [
+        1031.0,
+        328.0
+      ],
+      "physical_size": [
+        1031,
+        328
+      ],
+      "scene_digest": [
+        104,
+        229,
+        57,
+        14,
+        230,
+        232,
+        156,
+        203,
+        210,
+        83,
+        86,
+        231,
+        163,
+        210,
+        188,
+        253,
+        39,
+        124,
+        186,
+        212,
+        109,
+        66,
+        198,
+        15,
+        16,
+        153,
+        69,
+        113,
+        188,
+        146,
+        150,
+        17
+      ],
+      "scene_fonts": 4,
+      "scene_ops": 24,
+      "source_identity": 2,
+      "source_revision": 4,
+      "texture_key": 1952539235
+    },
+    {
+      "alpha": "Straight",
+      "content_generation": 8,
+      "encoding": "Srgb",
+      "layout_scale": 1.0,
+      "logical_size": [
+        506.0,
+        215.0
+      ],
+      "physical_size": [
+        506,
+        215
+      ],
+      "scene_digest": [
+        119,
+        14,
+        32,
+        195,
+        146,
+        150,
+        125,
+        105,
+        5,
+        173,
+        51,
+        93,
+        204,
+        232,
+        66,
+        203,
+        91,
+        231,
+        99,
+        222,
+        217,
+        24,
+        96,
+        111,
+        163,
+        192,
+        7,
+        65,
+        69,
+        117,
+        188,
+        186
+      ],
+      "scene_fonts": 3,
+      "scene_ops": 7,
+      "source_identity": 1,
+      "source_revision": 4,
+      "texture_key": 1952539250
+    }
+  ],
+  "qualification": "CPU source capture and admission only",
+  "schema": "tabard-production-portable-capture-v1",
+  "shadow_masks": 0,
+  "state_after": {
+    "authored_theme": {
+      "harmony": "Custom",
+      "high_contrast": false,
+      "id": "theme:copy-1",
+      "mode_sheets": {},
+      "name": "Portable capture authored appearance copy",
+      "seeds": {
+        "danger": {
+          "a": 255,
+          "b": 78,
+          "g": 78,
+          "r": 213
+        },
+        "dark": true,
+        "neutral": {
+          "a": 255,
+          "b": 34,
+          "g": 20,
+          "r": 16
+        },
+        "primary": {
+          "a": 73,
+          "b": 86,
+          "g": 52,
+          "r": 18
+        },
+        "secondary": {
+          "a": 255,
+          "b": 166,
+          "g": 157,
+          "r": 46
+        },
+        "success": {
+          "a": 255,
+          "b": 110,
+          "g": 179,
+          "r": 79
+        },
+        "tertiary": {
+          "a": 255,
+          "b": 70,
+          "g": 168,
+          "r": 224
+        },
+        "text_body": null,
+        "text_header": null
+      },
+      "source": "User"
+    },
+    "dirty": true,
+    "preview_mode": "dark"
+  },
+  "state_before": {
+    "authored_theme": {
+      "harmony": "Custom",
+      "high_contrast": false,
+      "id": "theme:copy-1",
+      "mode_sheets": {},
+      "name": "Portable capture authored appearance copy",
+      "seeds": {
+        "danger": {
+          "a": 255,
+          "b": 78,
+          "g": 78,
+          "r": 213
+        },
+        "dark": true,
+        "neutral": {
+          "a": 255,
+          "b": 34,
+          "g": 20,
+          "r": 16
+        },
+        "primary": {
+          "a": 73,
+          "b": 86,
+          "g": 52,
+          "r": 18
+        },
+        "secondary": {
+          "a": 255,
+          "b": 166,
+          "g": 157,
+          "r": 46
+        },
+        "success": {
+          "a": 255,
+          "b": 110,
+          "g": 179,
+          "r": 79
+        },
+        "tertiary": {
+          "a": 255,
+          "b": 70,
+          "g": 168,
+          "r": 224
+        },
+        "text_body": null,
+        "text_header": null
+      },
+      "source": "User"
+    },
+    "dirty": true,
+    "preview_mode": "dark"
+  },
+  "state_unchanged": true,
+  "viewport": [
+    1380,
+    960
+  ]
+}
