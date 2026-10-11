@@ -19,9 +19,8 @@
 //!
 //! - `author`    ↔ `Header::verifying_key`
 //! - `signature` ↔ `Header::signature` (Ed25519 over the canonical header)
-//! - `links`     ↔ `CabalExt::parents` (app-level causal refs; see Probe 1 —
-//!   p2panda's own per-author `seq_num`/`backlink` log is left unused for now,
-//!   multi-parent causality rides as application data)
+//! - `seq_num` / `backlink` ↔ the per-author p2panda log
+//! - `links`     ↔ `CabalExt::parents` (complete observed causal frontier)
 //! - `kind`      ↔ `CabalExt::{channel, post_type, timestamp_ms, info, deletes}`
 //!   plus the operation `Body` (text / topic bytes; empty for the others)
 //!
@@ -34,6 +33,7 @@
 
 use identity::{Ed25519PublicKey, Ed25519Signature};
 use p2panda_core::cbor::{decode_cbor_strict, encode_cbor};
+use p2panda_core::prune::PruneFlag;
 use p2panda_core::{Body, Hash, Header, Operation, Signature, SigningKey, VerifyingKey};
 use serde::{Deserialize, Serialize};
 
@@ -55,7 +55,7 @@ pub struct CabalExt {
     pub cabal_id: [u8; 32],
     /// Channel name (`""` for channel-less kinds: info, delete).
     pub channel: String,
-    /// Cable `post_type` discriminator (0..=5).
+    /// Cable-shaped discriminator (0..=5); 6 is Murm's retention extension.
     pub post_type: u64,
     /// Author-asserted millisecond timestamp.
     pub timestamp_ms: u64,
@@ -65,6 +65,13 @@ pub struct CabalExt {
     pub info: Vec<(String, Vec<u8>)>,
     /// `post/delete` targets (only populated for `post_type == 1`).
     pub deletes: Vec<[u8; 32]>,
+    /// Upstream p2panda prune marker, admitted only on an authorized checkpoint.
+    /// Omitted when false, preserving ordinary posts' existing wire bytes.
+    #[serde(default, skip_serializing_if = "PruneFlag::is_not_set")]
+    pub prune_flag: PruneFlag,
+    /// Signed authority revision for a retention checkpoint only.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub authority_revision: Option<proofs::Digest>,
 }
 
 /// The canonical wire form: a signed header plus its body bytes, CBOR-encoded
@@ -108,6 +115,8 @@ pub(crate) fn decompose(
         parents,
         info: Vec::new(),
         deletes: Vec::new(),
+        prune_flag: PruneFlag::default(),
+        authority_revision: None,
     };
     let body = match kind {
         PostKind::Text { channel, text, .. } => {
@@ -131,6 +140,13 @@ pub(crate) fn decompose(
         },
         PostKind::Delete { posts, .. } => {
             ext.deletes = posts.iter().map(|p| *p.as_bytes()).collect();
+            Vec::new()
+        },
+        PostKind::RetentionCheckpoint {
+            authority_revision, ..
+        } => {
+            ext.prune_flag = PruneFlag::new(true);
+            ext.authority_revision = Some(authority_revision.clone());
             Vec::new()
         },
     };
@@ -173,6 +189,13 @@ fn recompose(ext: &CabalExt, body: &[u8]) -> Result<PostKind, MurmError> {
         }),
         5 => Ok(PostKind::Leave {
             channel: ChannelName::new(ext.channel.clone()),
+            timestamp_ms,
+        }),
+        6 if ext.prune_flag.is_set() => Ok(PostKind::RetentionCheckpoint {
+            authority_revision: ext
+                .authority_revision
+                .clone()
+                .ok_or(MurmError::MalformedPost)?,
             timestamp_ms,
         }),
         _ => Err(MurmError::MalformedPost),

@@ -31,7 +31,7 @@ pub enum ConversationDropProfile {
 /// Highest observed sequence number for each conversation author.
 ///
 /// Murm currently has a single log per author and conversation. This frontier
-/// deliberately does not pretend that a retention checkpoint has landed.
+/// reports replication coverage, not retention permission or human reads.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct ConversationFrontier {
     authors: BTreeMap<[u8; 32], u32>,
@@ -190,6 +190,8 @@ impl DropExportSelector<CabalExt> for ConversationDropSelector {
             3 => self.body_or_header(self.privacy.include_topic_bodies, self.priorities.topic),
             4 | 5 if self.privacy.include_membership => self.header(self.priorities.membership),
             4 | 5 => DropExportDecision::Omit,
+            // Required continuity evidence for a deliberately pruned log.
+            6 => self.header(self.priorities.deletion),
             _ => DropExportDecision::Omit,
         }
     }
