@@ -5,10 +5,10 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! The Dramatis window, on the shared Cambium native host.
-use cambium_genet_winit_host::{HostHooks, HostOptions, Init, run};
+use cambium_genet_winit_host::{HostOptions, Init, run};
 use dramatis_app::{
     State,
-    views::{Child, Logic, SHEET, root},
+    views::{Logic, SHEET, root},
     worker::Worker,
 };
 use std::{cell::RefCell, rc::Rc};
@@ -16,7 +16,8 @@ fn main() {
     let slot = Rc::new(RefCell::new(None::<Worker>));
     let drain = slot.clone();
     let dispatch = slot.clone();
-    let mut hooks: HostHooks<State, Logic, Child> = HostHooks::inert();
+    let mut hooks = dramatis_app::host_hooks();
+    let mut follow_focus = hooks.after_dispatch;
     hooks.after_wake = Box::new(move |ctx| {
         if let Some(worker) = drain.borrow().as_ref() {
             let replies = worker.drain();
@@ -32,6 +33,7 @@ fn main() {
         }
     });
     hooks.after_dispatch = Box::new(move |ctx| {
+        follow_focus(ctx);
         let mut request = None;
         ctx.runner.update(|s| request = s.request.take());
         if let (Some(request), Some(worker)) = (request, dispatch.borrow().as_ref()) {

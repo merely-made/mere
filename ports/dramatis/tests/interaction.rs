@@ -4,7 +4,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 //! Production retained views, layout, focus and action routing.
-use cambium_genet_winit_host::{Harness, Key, KeyPress, NamedKey};
+use cambium_genet_winit_host::{Harness, Init, Key, KeyPress, NamedKey};
 use dramatis::{
     roster::{Roster, RosterEntry},
     view::VaultLockView,
@@ -80,8 +80,20 @@ fn state(locked: bool, unsupported: bool) -> State {
         ..Default::default()
     }
 }
+fn harness(state: State) -> Harness<State, Logic, Child> {
+    Harness::with_hooks(
+        Init {
+            state,
+            logic: root as Logic,
+            sheet: SHEET.into(),
+            fonts: vec![],
+            images: vec![],
+        },
+        dramatis_app::host_hooks(),
+    )
+}
 fn host(locked: bool, unsupported: bool, width: f32) -> Harness<State, Logic, Child> {
-    let mut h = Harness::new(SHEET, state(locked, unsupported), root as Logic);
+    let mut h = harness(state(locked, unsupported));
     h.layout_at(width, 720.0);
     h
 }
@@ -128,6 +140,11 @@ fn narrow_layout_and_zoom_keep_a_review_action_reachable() {
     h.set_ui_zoom(2.0);
     for _ in 0..12 {
         h.tab(true);
+        let focus = h.focus().expect("keyboard has a focused control");
+        assert!(
+            h.visible_rect(focus).is_some(),
+            "every tabbed control is revealed at double zoom"
+        );
     }
     assert!(h.focus().is_some());
     let node = h.focus().unwrap();
@@ -156,10 +173,32 @@ fn older_import_assignment_names_the_destination_and_exact_revision() {
             revision: "older-reviewed-metadata".into(),
         },
     );
-    let mut h = Harness::new(SHEET, s, root as Logic);
+    let mut h = harness(s);
     h.layout_at(860.0, 1100.0);
     assert!(h.click_on(&Selector::role("button").containing("Assign to this persona")));
     assert!(
         matches!(h.state().request,Some(Request::Assign(ref r)) if r.profile.0=="family" && r.persona==persona && r.revision=="older-reviewed-metadata")
     );
+}
+
+#[test]
+fn focus_follow_preserves_manual_scrolling_until_focus_changes() {
+    let mut h = host(false, false, 420.0);
+    h.set_ui_zoom(2.0);
+    for _ in 0..6 {
+        h.tab(true);
+    }
+    let focus = h.focus().unwrap();
+    assert!(h.visible_rect(focus).is_some());
+    let before = h.element_scroll_total();
+    assert!(before > 0.0);
+    h.move_to(100.0, 100.0);
+    h.wheel(0.0, -2000.0);
+    assert_eq!(h.focus(), Some(focus));
+    assert!(
+        h.element_scroll_total() < before,
+        "manual scroll is not undone by focus following"
+    );
+    h.tab(true);
+    assert!(h.visible_rect(h.focus().unwrap()).is_some());
 }
