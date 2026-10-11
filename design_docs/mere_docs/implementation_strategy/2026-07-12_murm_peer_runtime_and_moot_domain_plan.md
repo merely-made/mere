@@ -1141,3 +1141,63 @@ is target-scoped so it does not widen that portable model. Logs are
 `targets/moot-murm-gemot-consumer-tests.log`,
 `targets/moot-murm-default-wasm-check.log` and
 `targets/moot-murm-default-wasm-cone.txt`.
+
+### 2026-10-11: observed frontiers and authorized retention roots
+
+The native Murm writer now records the complete history it observed under its
+owner ingestion lock. Stickleback's `complete_frontier` returns the minimal
+complete DAG frontier: heads already covered by later records are omitted,
+pending records do not acknowledge missing history, and the local backlink
+covers the local author's head. Per-cabal log scope remains shared across its
+channels. Parent fan-out and payload limits are checked before insertion;
+oversized frontiers are refused rather than truncated. An incomplete local
+author tail refuses ordinary authoring without consuming a sequence number.
+
+Murm's explicit `RetentionCheckpoint` extension (post type 6) carries upstream
+p2panda's `PruneFlag` and a signed authority revision. Default conversation policy
+refuses it. The host supplies `CabalCheckpointAuthority` from its accepted policy,
+with exact per-cabal signing keys; possession of a cabal secret, roster visibility,
+or network reachability grants no retention authority. Admission uses the existing
+Stickleback atomic prefix removal and p2panda `validate_prunable_backlink` contract.
+It removes only the signer's earlier log records, including their header metadata;
+it is not a snapshot retaining old topics, joins, profiles or messages. Commons'
+existing governed snapshots retain their separate grammar and owner.
+
+The causal read cuts only an authorized checkpoint's own backlink. References
+from other authors to removed records remain pending, and unexplained missing
+headers continue to withhold their dependent tail. `CabalHistory` exposes retained
+checkpoint identities alongside missing roots and unavailable bodies. Materialized
+legacy views are refreshed after prefix removal. Installed historical authority
+revisions continue to explain retained roots; the current revision alone admits
+new checkpoints. On durable reopen the policy owner must reinstall accepted
+retention revisions, ending with its current authority. The operation store does
+not manufacture or persist that policy as a second constitution.
+
+Ordinary extension bytes omit the two new fields, preserving existing signed
+post identities. The new checkpoint kind requires upgraded readers; older Murm
+readers refuse the unknown kind. Native protected drops carry the surviving root
+and tail and still pass owner admission before committing. Default Moot's portable
+model and independent channel drafts retain their existing boundaries.
+
+This slice incorporates upstream p2panda main `3e84cac4` in the fork, preserving
+Mere's exact external ALPN routing, store-agnostic address book and late-record
+topic-watcher fixes. The fork networking tests bind assertions to the selected
+sync session and exact live operation, since discovery may open concurrent
+sessions whose events interleave. Local raw-Iroh fixtures use bound loopback
+sockets and close endpoints explicitly. Mere's root workspace pins the immutable
+`mere-p2panda-net-0.7.5-upstream-20261011` source across its p2panda patches.
+The compatibility tag preserves net package version 0.7.5 required exactly by
+the pinned Knot supplier; fork main and its 0.7.6 tag contain the same upstream
+and fixture fixes. This keeps one p2panda source graph without advancing an
+unqualified application supplier.
+
+The current design language [§9.16](../../2026-08-23_projection_scenes_and_graph_native_platform.md#916-primary-model-portable-clips-and-live-entities-2026-10-11)
+keeps live entities, explicit captures with lineage and their scene appearances
+distinct. Receiving or showing a conversation does not capture content, grant a
+capability or permit retention. A scene arrangement change does not prune the
+shared log or send a draft. Successful local authoring, upstream consumer/cursor
+acknowledgment and QUIC stream acknowledgment remain different evidence from
+remote application acceptance or a human read; this slice adds no delivery or
+read-receipt claims. The retained deterministic read complements upstream's
+incremental dependency orderer and its replay fixes; it does not replace upstream
+network processing or qualify a rendered Graphshell client.
