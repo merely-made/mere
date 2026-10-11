@@ -1,0 +1,16 @@
+   Compiling presentation-editor-qualification v0.1.0 (/home/markik/Code/worktrees/mere-design-rules/ports/graphshell/docs/receipts/presentation_rules_20261011/harness)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.97s
+     Running unittests src/lib.rs (/home/markik/Code/testing/mere/forme-native-target/debug/deps/presentation_editor_qualification-ae87b35c597ee36d)
+
+running 9 tests
+test presentation_editor::tests::failed_acknowledgment_keeps_draft_and_allows_retry ... ok
+test presentation_editor::tests::malformed_input_is_undoable_but_never_applied_or_previewed ... ok
+test presentation_editor::tests::target_kind_unknown_properties_and_disabled_invalid_rules_are_refused ... ok
+test presentation_editor::tests::stale_workspace_write_refuses_atomically_and_preserves_both_drafts ... ok
+test presentation_editor::tests::saved_history_and_identity_are_validated_before_reopen ... ok
+test presentation_editor::tests::reordering_equal_priority_rules_changes_the_winner_and_undo_restores_it ... ok
+test presentation_editor::tests::preview_does_not_change_context_and_hysteresis_is_explicit_per_occurrence ... ok
+test presentation_editor::tests::one_acknowledged_apply_reopens_with_saved_undo_redo_scoped_to_this_graph ... ok
+test presentation_editor::tests::draft_and_saved_history_are_bounded_and_noop_apply_does_not_save ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s

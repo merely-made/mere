@@ -45,7 +45,11 @@ remains pending in its owning plan. The
 adds exact records, deterministic region discovery and independent Forme reads;
 ten native model checks and the integrated product wasm check pass. Its isolated
 fixture/browser handoff remains pending. Derived-link explanations and primitive
-writes retain their owners; declarative rule authoring remains the next draft.
+writes retain their owners. The
+[declarative presentation-rule editor draft](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#declarative-presentation-rule-editor-draft-2026-10-11)
+adds scoped draft/undo, explicit decision previews and transactional saved
+history. Nine native model checks and the product wasm check pass; browser
+qualification remains pending in its receipt. Live context/effect adapters remain a follow-through.
 
 Primary data model (2026-10-11): the
 [family composition brief §8](2026-08-12_family_composition_thesis_brief.md#8-primary-data-model-clips-and-live-entities-2026-10-11)

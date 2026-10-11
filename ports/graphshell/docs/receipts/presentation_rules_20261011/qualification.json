@@ -1,0 +1,95 @@
+{
+  "date": "2026-10-11",
+  "status": "implementation draft; browser and renderer adoption pending",
+  "integration_base": "a1acb6b9ba9b33cb8535a46f56ff80841d044837",
+  "upstream_review": {
+    "checked": "2026-10-11 before delivery",
+    "forme_followthrough": "63ddbb2c: tile-specific targets, controls above tiles, store-aware waits and four retained-origin Chrome cases with nine reviewed captures; integrated",
+    "inspection_rule_adoption": "No newer field inspector or presentation-rule adoption at the latest fetch; this draft receives no prior browser pass"
+  },
+  "native": {
+    "status": "passed",
+    "tests": 9,
+    "command": "cargo test --locked --manifest-path ports/graphshell/docs/receipts/presentation_rules_20261011/harness/Cargo.toml --lib",
+    "scope": "actual checked-in portable module, standalone harness lockfile, MemoryBackend; not complete Graphshell native or IndexedDB",
+    "log": "checks/native.log",
+    "harness": "harness/Cargo.toml"
+  },
+  "wasm": {
+    "product_check": "passed",
+    "command": "cargo check --locked --target wasm32-unknown-unknown --no-default-features --features product",
+    "working_directory": "ports/graphshell/web",
+    "log": "checks/product-check.log",
+    "existing_warnings": 18,
+    "default_viewer_release": "not run or built"
+  },
+  "limits": {
+    "cargo_jobs": 1,
+    "memory_max_mib": 1280,
+    "swap_max_mib": 0,
+    "free_memory_guard_mib": 256
+  },
+  "contracts": {
+    "authoring": "existing Scenograph version-1 target/condition/effect model; editor refuses unknown input properties",
+    "draft": "raw malformed fields undoable, atomic whole-set validation before preview/apply",
+    "saved": "one acknowledged apply is one saved step; 32 saved undo/redo steps and 1 MiB record limit; scope/version/all history validated",
+    "concurrency": "transaction compares previous exact bytes; stale or nontransactional save refuses; failure retains local draft and committed version",
+    "preview": "explicit editable context/sample, pure decisions with match/winner traces; no implicit occurrence state or live graph fact adapter",
+    "storage_slot": "graphshell/presentation-rules/v1/<graph-session-uuid>"
+  },
+  "interactive": {
+    "status": "not run; pending on other machines",
+    "route": "tree.html?app=local",
+    "order": [
+      "p4_tree_presentation_rules.scn",
+      "p4_tree_presentation_rules_reopen.scn"
+    ],
+    "prerequisite": "Fresh dedicated origin/profile, normal motion preference, absent rule record first; fresh page/process with retained origin second",
+    "captures": "two planned; none generated/reviewed",
+    "browser_limit": "Connected S-PC browser lacks a WebGPU adapter; known blocked boot not retried",
+    "scenario_waits": "Include presentation store writes, pause physics explicitly"
+  },
+  "deferred": [
+    "Live disclosed occurrence/fact/state adapters and rule-derived display explanations",
+    "Renderer effect adoption before measurement/placement with unsupported effects disclosed",
+    "In-panel conflict reconciliation/draft export; multiple-tab IndexedDB race/failure injection",
+    "Long JSON/caret/IME, keyboard/focus, narrow overlay, theme change and other editor undo independence",
+    "Whole-store IndexedDB transaction snapshot cost, large-record costs and release performance",
+    "Other hosts, general primitive writes, field actions/scripts, scene composition, font/theme authoring and coordinated Rhai adoption"
+  ],
+  "documentation": {
+    "citation_audit": "complete JSON equals integration-base pre-edit baseline",
+    "d2_audit": "complete JSON equals integration-base pre-edit baseline; 260/261 coverage and two existing errors",
+    "whitespace": "passed"
+  },
+  "source_sha256": {
+    "crates/cambium/edit-history/src/lib.rs": "be552a519506a54cf2136642429ccc57b662348f9b5b934675d6e1dbf300f518",
+    "crates/cambium/scenes/scenograph/Cargo.toml": "d06c02bda5b9bfe3c4c0f3ff6a03991e7f934a9031f4159bf993e07c3ed7fef4",
+    "crates/cambium/scenes/scenograph/src/presentation.rs": "a7d556b5564060d19c9dd75628850051c9af39b0c243c6ea27a9ab276229e034",
+    "crates/eidetic/muniment/Cargo.toml": "ba8de5dbd9ccec28e6ec5d08884ca8c49f14b8319019c3045cd6845df8269986",
+    "crates/eidetic/muniment/src/backend.rs": "ab9c0aca6290bac0663fc535c8f946a1a2d6f1e659d141a65e65bcf629b0d96b",
+    "crates/eidetic/muniment/src/indexeddb_backend.rs": "42a8c9611ccd44e12c21ffea72a0f6575ff56163d1dca28868810bcb09a655f1",
+    "ports/graphshell/docs/receipts/presentation_rules_20261011/harness/Cargo.lock": "0a5859939f9762d85fc4c9dc1f4e69ec8c7574743cd6d849b74625c0624b4e01",
+    "ports/graphshell/docs/receipts/presentation_rules_20261011/harness/Cargo.toml": "0891dcf64a8ef23846928f8b247d58e8ffa54da7548147de219e08ea134c400c",
+    "ports/graphshell/docs/receipts/presentation_rules_20261011/harness/src/lib.rs": "7a6e4e054a2e2f04d68e9a93ff0622d07664dd5f4692fc80ead00c06b50addf3",
+    "ports/graphshell/src/appearance.rs": "b78ab61f4ac24f865b75b0875288f6c1202bf5765c630a9ab21087d1b1a1797b",
+    "ports/graphshell/src/lib.rs": "da51a537a318fff4ae624a06bd569b77cfaf10dd937bff5bcc08848dc300bf31",
+    "ports/graphshell/src/presentation_editor.rs": "36859c843a47a11428c5b5d4d549cf8568323245d0bb45a107d8a519404aebd5",
+    "ports/graphshell/src/presentation_editor_tests.rs": "039239a188a15b057926da5d2024fb1e74ef3c39f9f3e00ff16eae5d11174541",
+    "ports/graphshell/src/web_tree.rs": "8c88ab5f589fd6a064cb03d7c9c68aba2e67cded269e4b95bda607390d6016cc",
+    "ports/graphshell/src/web_tree/lane.rs": "261347276202725bd42f9002f46c430d4c3df8047c178afef02632a54f151a68",
+    "ports/graphshell/src/web_tree/presentation.rs": "e30aeb8b0df73bf446ec43f5b2712fc221ff0b642149538731e0573b53632a2b",
+    "ports/graphshell/web/Cargo.lock": "9fcf67c9f396e1b6b3b5ca29490683bccc897ec69d5928b95e1dbc0d85f48da3",
+    "ports/graphshell/web/Cargo.toml": "723ebabab9f033336c9d0cc1edd7938896b04afcde0c87e3d5a82315d96fb22f",
+    "ports/graphshell/web/scenarios/p4_tree_presentation_rules.scn": "9e7ccef6a35186fa7ccc777c2643d58e3dad4a444fe9bcc5a512f815088812df",
+    "ports/graphshell/web/scenarios/p4_tree_presentation_rules_reopen.scn": "2d5dd012836ca7743167868bd2873330542bc7c6d3818037097004e38c7ad98a"
+  },
+  "check_sha256": {
+    "checks/product-check.log": "8ab3a6396d91a5024797fe41980226374594841dcd0604192b1806fbe1150710",
+    "checks/native.log": "361064604a697a2e7c18b934957b2657b7c37e8a7996db33dcaf601edabd78f0"
+  },
+  "log_normalization": {
+    "native": "Removed trailing blank line only for git whitespace check",
+    "native_raw_sha256": "3bdcf5051ac83703475f6140ce0411274ee2dd00b1e98eb9c2a4dfe63f0f773b"
+  }
+}

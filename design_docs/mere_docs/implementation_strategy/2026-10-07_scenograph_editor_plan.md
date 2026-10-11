@@ -18,9 +18,13 @@ authoring and the unresolved storage/composition policies remain planned.
 
 **2026-10-11 continuation:** access/Resource and
 [link/assertion inspection](#link-and-exact-assertion-inspector-draft-2026-10-11)
-now have read-only local-product drafts. Field inspection and overlap discovery
-are next in the approved sequence; primitive writes and derived-link owner
-explanations retain their existing gates.
+now have read-only local-product drafts. The
+[field/coupling draft](2026-06-13_scriptable_field_regions_plan.md#field-inspection-draft-2026-10-11)
+adds exact records and overlap discovery. The
+[declarative rule editor](#declarative-presentation-rule-editor-draft-2026-10-11)
+adds scoped authoring, explicit decision preview and saved history; primitive
+writes, live presentation adapters and derived-link owner explanations retain
+their existing gates.
 
 Not in scope, mapped in §3 and opened by later rounds:
 - the scripting comparison (SE3), which is the next assessment;
@@ -1610,5 +1614,109 @@ and the integrated product wasm check pass. The opt-in isolated fixture and
 two-page browser handoff remain unrun here. The other agent's Forme Chrome
 receipt above qualifies its recorded source, not this new inspector. Primitive
 writes, derived-link explanation and the field composition/event policies
-retain their existing gates; the declarative rule editor remains the next
-bounded appearance-authoring candidate.
+retain their existing gates; the [declarative rule editor draft](#declarative-presentation-rule-editor-draft-2026-10-11)
+continues the bounded appearance-authoring sequence.
+
+
+#### Declarative presentation rule editor draft (2026-10-11)
+
+**Status:** implemented draft for review and headed qualification. Mark's
+"proceed! next uuup?" continues direct-main delivery. Based on published Mere
+`a1acb6b9`, including the current Vello/Genet release adoption and documentation
+repair; no previous Forme or study browser receipt qualifies this new editor.
+
+The [portable authoring session](../../../ports/graphshell/src/presentation_editor.rs)
+reuses `scenograph::presentation` version 1. It does not introduce a second
+resolver or open Rhai adoption. Each rule retains its ID, label, enabled flag,
+signed priority, occurrence target, condition and effects. The retained
+[Graph tools editor](../../../ports/graphshell/src/web_tree/presentation.rs) is
+available through **Presentation rules** on `tree.html?app=local`. **Begin rule
+draft** opens private authoring. Add node/link/field rule buttons supply valid
+starting rows; the target, condition and effects use the existing model's JSON
+vocabulary, with separate ID, label and priority controls. Reordering is
+semantic: later authored rules win equal-priority property ties. Disabled rules
+still validate. Unknown input properties are refused instead of silently lost;
+the shared resolver's compatibility policy remains unchanged.
+
+**Draft interaction:** text controls hold editable buffers. **Update rule
+draft**, **Preview rule decisions**, switching rows and **Apply rules** record
+the current row before their operation. Malformed input remains undoable but
+cannot preview or save. **Undo rule draft** first records pending input, then
+undoes one draft step. Undo/redo clears the active row, requiring an explicit
+choice before further row edits; it never selects or opens graph content. Redo
+refuses unstaged input rather than dropping it. **Discard rule draft** drops
+only this editor's buffers and history. Closing the panel retains its draft.
+Text caret/IME/local text undo remains Cambium's existing input path; the rule
+buttons own whole-set history. No graph-wide keyboard undo is intercepted.
+
+**Decision preview:** node, link and field samples are clearly identified inputs,
+editable through the context JSON control. All facts, states, occurrence ID,
+screen size and previous matches are disclosed. Resolve shows each winning
+property's effect, rule ID and priority, and every rule's match explanation and
+winning properties. A changed buffer/context hides the stale result until
+Preview runs again. An absent winning property uses the host's base presentation.
+Preview is pure and does not carry hidden hysteresis state between occurrences,
+samples, committed sets or drafts; prior matches are supplied explicitly.
+This draft does not infer scene facts or claim a live graph-to-context adapter.
+It previews decisions rather than realizing faces, containment, provenance,
+region guides or drop zones on the Canvas. Live input/occurrence adapters and
+measurement-before-placement integration are the next presentation-owner work.
+
+**Persistence:** rules, generation and up to 32 saved undo/redo steps commit in
+one Muniment workspace record, `graphshell/presentation-rules/v1/<graph-session-uuid>`.
+The graph session identifies the workspace scope; graph/source records, selection,
+content sessions, theme preferences and Forme layout are absent from snapshots.
+The record and malformed draft each have a 1 MiB bound; the resolver's 256-rule
+and condition-depth/count limits remain. Every saved history entry, version and
+scope is validated before reopening. Apply creates one saved undo step, freezes
+rule changes while in flight and changes the committed version only after store
+acknowledgment. Failure retains the draft and saved version for retry. Saved
+undo/redo requires no open draft and survives reopening.
+
+The prepared save uses `Backend::transact` to compare the exact previously loaded
+bytes and replace the record atomically. A stale workspace refuses with a named
+explanation, leaving the newer saved record and local draft intact. There is no
+racy fallback for a backend without transactions. After a conflict, this first
+UI requires reopening/reconciling explicitly; an in-panel merge or draft export
+is not implemented. The current IndexedDB transaction adapter snapshots its
+whole object store, so storage size and transaction cost remain a backend/host
+qualification gate, not a claim of bounded total-store work.
+
+**Qualification and handoff:** the [source receipt](../../../ports/graphshell/docs/receipts/presentation_rules_20261011/qualification.json)
+records the actual-source native harness and locked product wasm check (both
+pass). Replay the native checks with
+`cargo test --locked --manifest-path ports/graphshell/docs/receipts/presentation_rules_20261011/harness/Cargo.toml --lib`.
+Nine portable
+session tests cover malformed/unknown inputs and disabled-rule validity,
+priority/order undo, explicit occurrence-local hysteresis, acknowledged saves,
+failure retention, stale-write refusal, graph-scoped MemoryBackend reopen and
+saved history validation/limits. Native tests qualify this portable module with
+an isolated lockfile, not the complete Graphshell native host or IndexedDB.
+The integrated product check uses the web host's current locked dependencies
+and committed wasm configuration; default/viewer and release bundles were not
+built in this pass.
+Browser checks remain pending on O-PC, the ThinkPad or a Mac with a connected
+WebGPU-capable browser. The existing connected S-PC browser has no WebGPU adapter.
+
+Use a **fresh dedicated profile/origin** on `tree.html?app=local` for
+[`p4_tree_presentation_rules.scn`](../../../ports/graphshell/web/scenarios/p4_tree_presentation_rules.scn),
+then a **fresh page/process on the same retained origin/profile** for
+[`p4_tree_presentation_rules_reopen.scn`](../../../ports/graphshell/web/scenarios/p4_tree_presentation_rules_reopen.scn).
+Use a normal-motion profile (the scripts pause physics explicitly); scenario
+waits now include the rule-store write. The first requires an absent rule record; it exercises all three primitive kinds,
+preview precedence/reorder/undo, invalid apply refusal, acknowledged apply,
+saved undo/redo and discard. The second exercises stored history and decisions
+on reopen. Both check graph membership, graph session and Forme access count
+remain unchanged. Their two captures are planned, not generated or reviewed here.
+Run at normal and narrow widths; review scrolling, long JSON input, caret/IME,
+Tab/keyboard activation, disabled controls, source-editor undo independence and
+Tabard theme changes. Physical input, fresh-origin negative control, actual
+IndexedDB failure/conflict injection, multi-tab races, large-record costs,
+release performance and other hosts remain separate acceptance gates.
+
+**Next done-condition:** bind preview inputs to stable projected occurrences and
+an explicit disclosed fact/state adapter; realize supported effects before
+measurement/placement, explain unsupported ones, and qualify scene changes with
+source, selection, pins, manual placement and live tile sessions preserved. This
+bounded authoring draft does not complete primitive writes, field action/script
+execution, theme/font authoring, scene composition or Rhai SE39–SE42 adoption.

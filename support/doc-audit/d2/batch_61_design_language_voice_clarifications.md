@@ -450,3 +450,23 @@ capture or other agent review is inferred. Full citation and D2 audit JSON equal
 the integrated main pre-edit baseline, retaining 252/260 coverage and ten
 existing D2 errors. Added local links and anchors resolve; whitespace checks
 pass. No active Markdown document or parser-shaped audit record was added.
+
+
+**Declarative rule editor draft (2026-10-11):** Mark authorized continuing the
+published draft sequence and requested an upstream adoption check. Current main
+`a1acb6b9` retains the Forme Chrome fixes/qualification, newer render-stack
+releases and documentation repairs; the repeated fetch found no subsequent
+field/rule implementation to reconcile. The retained rule editor reuses
+Scenograph's declarative model with editable target/condition/effect rows,
+private draft undo/discard, disclosed context decision traces and acknowledged
+saved undo/redo. An atomic backend transaction refuses stale workspace saves;
+no graph/source/content/selection/Forme state enters its snapshots. Preview
+samples remain explicit and canvas effect/live-input adoption stays open.
+Nine actual-source native tests pass through the committed standalone harness,
+and the locked product wasm check passes under the S-PC memory cap. Two
+retained-origin scenarios/captures are prepared but not run here. The owning
+plan records actual IndexedDB, focus/narrow input, theme, conflict/failure,
+record/transaction costs and live renderer adapter gates. Citation and D2 audit
+JSON equal this pass's integrated-main pre-edit baseline: 260/261 D2 coverage,
+two existing errors (snapshot digest and the producer receipt's missing record).
+No active document, judgment identity or claim aggregate was added or changed.
