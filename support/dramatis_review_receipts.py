@@ -54,15 +54,61 @@ def fixture(mode, capture=True):
             if host.poll() is None: host.terminate()
             host.wait(timeout=30)
         remove_runtime(root)
+def consent_control():
+    source=ROOT/"ports/djinn/src/keeper/review.rs"
+    original=source.read_bytes()
+    focused=cargo("test","-p","djinn","--test","quarantine_review","--features","cxf")+["--","--exact","cards_are_secret_free_scoped_and_denial_preserves_the_item"]
+    flag="DRAMATIS_SYNTHETIC_CONSENT_CONTROL"
+    ordinary=dict(os.environ); ordinary.pop(flag,None)
+    try:
+        offset=original.rfind(b"if !self")
+        assert offset >= 0
+        replacement=b'if std::env::var_os("DRAMATIS_SYNTHETIC_CONSENT_CONTROL").is_none() && !self'
+        broken=original[:offset]+original[offset:].replace(b"if !self",replacement,1)
+        assert broken != original
+        source.write_bytes(broken)
+        # Shared debug artifacts retain ordinary consent without this explicit
+        # process-scoped flag. The fixture alone opts into the forbidden bypass.
+        run("control-unflagged",focused,ordinary)
+        log=run("negative-consent",focused,dict(ordinary,**{flag:"1"}),expected=101)
+        assert "cards_are_secret_free_scoped_and_denial_preserves_the_item ... FAILED" in log
+        assert "error[E" not in log
+    finally:
+        source.write_bytes(original)
+    assert source.read_bytes()==original
+    run("restored",cargo("test","-p","djinn","--test","quarantine_review","--features","cxf"))
+    run("restored-build",cargo("build","-p","djinn","--bin","dramatis-review-host","--features","custody-receipt-host,cxf"))
+    return original
+
 def main():
     global JOBS
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--skip-build",action="store_true")
     parser.add_argument("--jobs",type=int,default=1,help="Compiler jobs; keep memory available for concurrent lanes")
+    parser.add_argument("--window-only",action="store_true",help="Rebuild and requalify app views without repeating unchanged custody tests")
+    parser.add_argument("--control-only",action="store_true",help="Requalify the scoped control and restore source and fixture binary")
     args=parser.parse_args()
     assert args.jobs > 0
     JOBS = args.jobs
     OUT.mkdir(parents=True,exist_ok=True)
+    if args.window_only:
+        run("app-build",cargo("build","-p","dramatis-app","--bin","dramatis-ui"))
+        run("app-state",cargo("test","-p","dramatis-app","--test","state"))
+        run("interaction",cargo("test","-p","dramatis-app","--test","interaction"))
+        absent = r"\\.\pipe\dramatis-app-receipt-absent"
+        env=dict(os.environ,DRAMATIS_RECEIPT_ENDPOINT=absent,DRAMATIS_RECEIPT_MODE="absent",GRAPHSHELL_APP_ENDPOINT=absent,DRAMATIS_CAPTURE=str(OUT/"absent.png"),DRAMATIS_CAPTURE_MODE="absent")
+        run("app-wire-absent",cargo("test","-p","dramatis-app","--test","state")+["--","--ignored","--exact","app_wire_receipt"],env)
+        run("window-absent",[str(TARGET/"debug/dramatis-ui.exe")],env)
+        fixture("locked"); fixture("unlocked")
+        hashes={p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in ROOT.glob("ports/dramatis/**/*.rs")}
+        artifacts={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in OUT.iterdir() if p.name.startswith(("app-","interaction","window-","host-","locked-","unlocked-","absent")) and p.suffix in [".png",".log"]}
+        (OUT/"window-scope.json").write_text(json.dumps({"base":subprocess.check_output(["git","rev-parse","HEAD"],cwd=ROOT,text=True).strip(),"commands":records,"source_sha256":hashes,"app_executable_sha256":hashlib.sha256((TARGET/"debug/dramatis-ui.exe").read_bytes()).hexdigest(),"artifacts_sha256":artifacts},indent=2)+"\n",encoding="utf-8")
+        return
+    if args.control_only:
+        original=consent_control()
+        artifacts={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in OUT.iterdir() if p.name in ["control-unflagged.log","negative-consent.log","restored.log","restored-build.log"]}
+        (OUT/"control-scope.json").write_text(json.dumps({"synthetic_process_flag":"DRAMATIS_SYNTHETIC_CONSENT_CONTROL","commands":records,"restored_consent_sha256":hashlib.sha256(original).hexdigest(),"artifacts_sha256":artifacts},indent=2)+"\n",encoding="utf-8")
+        return
     if not args.skip_build:
         run("host-build",cargo("build","-p","djinn","--bin","dramatis-review-host","--features","custody-receipt-host,cxf"))
         run("app-build",cargo("build","-p","dramatis-app","--bin","dramatis-ui"))
@@ -73,23 +119,8 @@ def main():
     run("interaction",cargo("test","-p","dramatis-app","--test","interaction"))
     run("castellan",cargo("test","-p","castellan","--features","cxf","--lib"))
     source=ROOT/"ports/djinn/src/keeper/review.rs"
-    original=source.read_bytes()
-    try:
-        offset=original.rfind(b"if !self")
-        assert offset >= 0
-        broken=original[:offset]+original[offset:].replace(b"if !self",b"if false && !self",1)
-        assert broken != original
-        source.write_bytes(broken)
-        log=run("negative-consent",cargo("test","-p","djinn","--test","quarantine_review","--features","cxf")+["--","--exact","cards_are_secret_free_scoped_and_denial_preserves_the_item"],expected=101)
-        assert "cards_are_secret_free_scoped_and_denial_preserves_the_item ... FAILED" in log
-        assert "error[E" not in log
-    finally:
-        source.write_bytes(original)
-    assert source.read_bytes()==original
-    run("restored",cargo("test","-p","djinn","--test","quarantine_review","--features","cxf"))
+    original=consent_control()
     run("store-discovery",cargo("test","-p","djinn","--lib","--features","cxf")+["--","--exact","resident::tests::startup_discovers_original_store_after_selected_persona_changes"])
-    # Rebuild the receipt host after restoring the production consent gate.
-    run("restored-build",cargo("build","-p","djinn","--bin","dramatis-review-host","--features","custody-receipt-host,cxf"))
     run("capture-build",cargo("build","-p","dramatis-app","--bin","dramatis-ui"))
     absent = r"\\.\pipe\dramatis-app-receipt-absent"
     env=dict(os.environ,DRAMATIS_RECEIPT_ENDPOINT=absent,DRAMATIS_RECEIPT_MODE="absent",GRAPHSHELL_APP_ENDPOINT=absent,DRAMATIS_CAPTURE=str(OUT/"absent.png"),DRAMATIS_CAPTURE_MODE="absent")
