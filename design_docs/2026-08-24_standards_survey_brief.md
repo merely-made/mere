@@ -1271,3 +1271,15 @@ sequences the executable seed, independent codec peers, portable adapters,
 retained-repair simulation, original-byte admission, embedded resource profiles
 and physical multi-radio qualification. Later protocol branches retain their
 own gates.
+
+**2026-10-11 implementation continuation:** Retinue's isolated
+`testing/transport-conformance` workspace now contains a selected independent
+OpenRQ/Rust RaptorQ corpus: six objects, 264 exact source/repair symbol
+comparisons and 24 live cross-decoding scenarios per direction. Its shared
+profile is `Al=1, N=1`, with full T-byte symbols and explicit restoration of
+OpenRQ's omitted final-source zero padding. The offline runner verifies imported
+artifact hashes, replays the Rust decoder and checks retained Java observations
+against current Rust packet bytes; an external-process campaign reruns both
+implementations. Complete RFC 6330 conformance remains explicitly unsupported.
+The corpus, provenance, reproduction guide and per-case receipts live with the
+Retinue execution plan, rather than duplicating them in this research catalog.
