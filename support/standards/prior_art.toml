@@ -1,7 +1,7 @@
 schema = 1
 as_of = "2026-10-11"
-scope = "Reusable conformance corpora, independent peers, transport runners, and radio testing prior art. Standards definitions live in the separate catalogue."
-revision_policy = "Observed revisions are live default-branch commits, not selected releases or evidence of successful local execution. Pin corpus hashes, dependencies, submodules, toolchains, and container image digests for actual campaigns."
+scope = "Reusable corpora, independent peers, transport runners, dissemination policies, and radio testing prior art. Standards definitions live in the separate catalogue."
+revision_policy = "Observed revisions normally record live default-branch commits, not selected releases or evidence of successful local execution. Local patched evidence identifies its upstream base and local revisions explicitly. Pin corpus hashes, dependencies, submodules, toolchains, and container image digests for actual campaigns."
 claim_policy = "Conformance, interoperability, composition, simulation, performance, and physical qualification are separate evidence classes. Unsupported, skipped, expected failure, timeout, and unexecuted cases are not passes."
 exclusions = ["Prns is excluded as an implementation donor or trusted independent reference for new qualification."]
 
@@ -256,3 +256,26 @@ observed_revision = "unknown: product/tool version not inspected"
 scope = "LoRaWAN end-device pre-certification, self-test eligibility, and authorized test-lab ecosystem."
 limitations = ["Not an open WPT-style corpus.", "LoRaWAN certification does not qualify Reticulum or custom raw-LoRa scheduling."]
 selected_action = "Consider only if the selected hardware profile actually implements LoRaWAN and needs certification."
+
+[[sources]]
+id = "memorylan"
+name = "p2panda MemoryLAN"
+url = "https://github.com/p2panda/memorylan/tree/f76039fc585b3f417e372167aa5825561fc9dd88"
+repository_url = "https://github.com/p2panda/memorylan"
+license = "MIT OR Apache-2.0"
+license_url = "https://github.com/p2panda/memorylan/blob/f76039fc585b3f417e372167aa5825561fc9dd88/README.md#license"
+observed_revision = "f76039fc585b3f417e372167aa5825561fc9dd88"
+local_patch_revision = "44610185aa074fe264df08b6de635766d1113c8e"
+local_research_revision = "493652cd980eab53a35920b9cb5d11c28f794c88"
+local_evidence_locator = "Workspace testing/memorylan-20261011.piWoiq/artifacts/simulation-final; unsubmitted source and host experiment evidence, reviewed without rerun in this transport pass."
+local_metadata_sha256 = "b80a159ddf1c2564ef6ecf6890a74942bf9a741b27ae4b2a56c4d90ddbde5169"
+scope = "Whole-page fast flooding with probabilistic Cuckoo-summary hot-cache repair; a dissemination/inventory policy candidate and patched host baseline beside retained-object scheduling."
+limitations = [
+ "Local evidence requires the eviction fix that inserts the incoming page fingerprint; do not attribute its observations to unmodified upstream.",
+ "Cache/history limits count items, not bytes; full-page replies lack MTU/rate budgets and state is volatile.",
+ "Generic Hash and DefaultHasher also determine filter indices; a canonical BLAKE3 object ID alone does not make the existing wire hash stable.",
+ "Neighbor IDs accumulate before validation without aging; failed filter insertions need fallback/rebuild or transactional handling.",
+ "No RaptorQ generation/ESI/decoder-progress semantics, durable recovery, authenticated operation admission or measured RF throughput are established.",
+ "Source-hashed host evidence uses synthetic pages/discrete ticks; byte ratios exclude actual signatures, framing, fragmentation, contention, duty cycle and physical time."
+]
+selected_action = "ADAPT inventory/hot-cache policy and retain as BASELINE; use explicit stable/versioned wire hashing and encoding, byte bounds, capped authenticated/aged neighbors and filter-failure recovery, while preserving signed object bytes/IDs and the existing admission owner. No production import or upstream submission."

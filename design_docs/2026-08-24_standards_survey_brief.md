@@ -1127,11 +1127,19 @@ answer and the choice is Mark's.
 ## 10. Transport composition and a shared conformance corpus — 2026-10-11
 
 **Status:** owner-authorized direction; catalog and executable suite foundation
-implemented and validated locally; later integration and qualification open. Mark prefers published standards for covered behavior and asked
+implemented and validated locally; retained-repair prototype implemented;
+later integration and qualification open. Mark prefers published standards for covered behavior and asked
 for orchestration, the useful specification scope, prior art and a WPT-like
 testing set. This section is the canonical cross-repository research record.
 Implementation sequencing lives in
 `retinue/design_docs/2026-10-11_transport_conformance_plan.md`.
+
+**Execution posture, owner clarification:** prototype the composed stack toward
+its final shape using code and canonical documents as the execution frontier.
+Small local checks and design experiments support that work. Broad conformance
+and regression automation follow stable behavior/contracts; they are not a
+requirement for every interim state. Publish directly to `main`. GitHub Actions
+is disabled in Mere/Retinue; this work adds no workflows, PRs or issue ledger.
 
 The reviewed transport inventory is
 [transport_catalog.toml](../support/standards/transport_catalog.toml), with
@@ -1283,3 +1291,63 @@ against current Rust packet bytes; an external-process campaign reruns both
 implementations. Complete RFC 6330 conformance remains explicitly unsupported.
 The corpus, provenance, reproduction guide and per-case receipts live with the
 Retinue execution plan, rather than duplicating them in this research catalog.
+
+**2026-10-11 prototype continuation:** the same isolated workspace now models
+retained originals, authenticated generation manifests/symbols, fresh priority,
+a repair floor, expiry and partial-state resume with actual RaptorQ coding.
+Four editable design experiments compare one/four-radio finite catch-up,
+zero/one-floor scheduling and sustained overload. The model counts actual
+authored frame/signature bytes and uses ideal simultaneous transmitter lanes,
+preconfigured channel/manifest cadence and a common slot clock. Findings and
+the historical source-fingerprinted report live once in
+`retinue/design_docs/2026-10-11_retained_repair_simulation_profile.md` and
+`retinue/testing/transport-conformance/results/retained-repair-exploration-20261011.json`.
+The next prototype is the owner-local signed-object receive/admission seam;
+the model does not establish application adoption or physical Mbps.
+
+### MemoryLAN: adapt inventory policy and keep a baseline
+
+[MemoryLAN](https://github.com/p2panda/memorylan/tree/f76039fc585b3f417e372167aa5825561fc9dd88)
+combines whole-page fast flooding with probabilistic Cuckoo-filter summaries
+for bounded hot-cache repair. Its useful place is an opportunistic inventory
+and gossip policy alongside retained-object delivery. A summary can suggest an
+object to request or schedule. It does not represent RaptorQ generation state,
+decoder progress, symbol IDs or durable retention. Select **ADAPT** for the
+policy and **BASELINE** for comparison; no production import is implied.
+
+This assessment inspected upstream base
+`f76039fc585b3f417e372167aa5825561fc9dd88`, local eviction-fix revision
+`44610185aa074fe264df08b6de635766d1113c8e`, and local research revision
+`493652cd980eab53a35920b9cb5d11c28f794c88`. The latter adds the harness and
+evidence; both local commits are unsubmitted. The existing source-hashed host
+report was reviewed rather than rerun in this transport pass. Its eight-node
+ring has 512 synthetic pages, volatile caches and discrete ticks. Across the
+ten-seed combined-fault experiment, mean historical remote delivery was 74.99%
+with summary repair versus 46.34% with fast flooding alone, at roughly 4.9 times
+the modeled bytes. Cache sensitivity was substantial: 16/64/256-page caches
+delivered 59.34%/74.99%/97.37%. Extending one combined run from 1,024 to 8,192
+ticks increased traffic without improving historical delivery; globally cold
+restarting all switches left every cache empty. These findings support
+hot-working-set repair and expose the need for a retained/durable layer.
+
+The prototype uses hypothetical page/envelope byte costs and omits radio
+contention, fragmentation, signatures, duty cycle, physical time and actual
+operation admission. The ratios cannot be converted to radio Mbps. The local
+eviction fix inserts an incoming page's fingerprint after removing the evicted
+one; comparison must identify that patched behavior instead of claiming the
+unmodified upstream revision produced these observations.
+
+A downstream adapter should preserve original signed operation bytes and
+canonical IDs, carry bounded envelopes over Reticulum, Dash or IP, and pass
+recovered objects through the existing single admission owner. Required profile
+choices are explicit versioned stable hashing of IDs and filter indices
+(MemoryLAN uses Rust `DefaultHasher` internally), byte-budgeted caches and
+replies, authenticated and aged/capped neighbor accounting, and fallback or
+rebuild when filter insertion fails. Periodic exact inventory/durable
+reconciliation can complement probabilistic summaries. Current cache/history
+limits count items; full-page replies are not MTU/rate-limited, and filter
+parameters lack negotiated wire identity. Those are adapter design questions,
+not failures of the reported synthetic corpus. The source declares
+`MIT OR Apache-2.0`; license and observed/evidence revisions are recorded in the
+prior-art catalog. No maintainer contact or generated upstream submission is
+part of this work.
