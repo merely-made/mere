@@ -1,0 +1,32 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling num-traits v0.2.19
+   Compiling syn v3.0.6
+    Checking arrayvec v0.7.8
+    Checking polycool v0.4.0
+    Checking smallvec v1.16.1
+    Checking once_cell v1.21.4
+    Checking kurbo v0.13.1
+   Compiling bytemuck_derive v1.12.1
+    Checking euclid v0.22.14
+    Checking guillotiere v0.7.0
+    Checking bytemuck v1.25.2
+    Checking peniko v0.6.1
+   Compiling thiserror-impl v2.0.21
+    Checking font-types v0.12.5
+    Checking read-fonts v0.41.0
+    Checking bitflags v2.13.2
+    Checking png v0.18.1
+    Checking thiserror v2.0.21
+    Checking emblem v0.2.0
+    Checking skrifa v0.44.0
+    Checking vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a#5862bba2)
+    Checking netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a#5862bba2)
+    Checking pictograph v0.2.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/canvas/pictograph)
+    Finished `dev` profile [unoptimized] target(s) in 20.35s

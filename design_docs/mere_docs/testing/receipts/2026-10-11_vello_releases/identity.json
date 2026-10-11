@@ -1,0 +1,542 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-11",
+  "status": "passed_scoped_consumer_and_cpu_adoption",
+  "mere_base_commit": "e99add00413b97ede6566a16b33045fd302476ee",
+  "pins": {
+    "vello_provider": {
+      "url": "https://github.com/mark-ik/vello",
+      "rev": "5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a",
+      "classic_version": "0.11.0"
+    },
+    "netrender": {
+      "url": "https://github.com/merely-made/netrender.git",
+      "rev": "46606610cd387e2e6956d8a3ebbcf442eab210d9"
+    },
+    "genet": {
+      "url": "https://github.com/merely-made/genet.git",
+      "rev": "cec760f4ae6ce336823bc2be250d9ab4e35a8a47",
+      "genet_parley_version": "0.10.0"
+    }
+  },
+  "manifests": [
+    {
+      "path": "Cargo.toml",
+      "sha256": "d35fbfd19cda723b54f8d790362e1a3093b113f784a07b9a9e6186fffc0a7529",
+      "bytes": 50498
+    },
+    {
+      "path": "crates/cambium/sprigging/Cargo.toml",
+      "sha256": "2611d8debcc0136cfa81b35da3f90ec1cea9d88600e4a8e5bf2076dba4ef88cf",
+      "bytes": 379
+    },
+    {
+      "path": "ports/graphshell/web/Cargo.toml",
+      "sha256": "6fec699e02d8387698c5c9ee8cf6b82d43766815981ae1148ca78dc63576d550",
+      "bytes": 11051
+    },
+    {
+      "path": "crates/cambium/examples/genet_web_smoke/Cargo.toml",
+      "sha256": "73fd8bfef9a48a43a8d8cca580de71e18f9f9404b77ba6ba610a25d6cef425bb",
+      "bytes": 4907
+    },
+    {
+      "path": "ports/distillery/probe/Cargo.toml",
+      "sha256": "82988c2d9bd0739e9b3fff9bd0d0f4a9e61c2a3d27fcffa4c481061b69416130",
+      "bytes": 2691
+    },
+    {
+      "path": "ports/distillery/probe/remote-fixture/Cargo.toml",
+      "sha256": "85fe7979a307c462c98f35521434e83e9f3cb7fbec716a142a0a013846682ae1",
+      "bytes": 2833
+    }
+  ],
+  "lockfiles": [
+    {
+      "path": "Cargo.lock",
+      "sha256": "42c2b03480514c555ff8ff28a80fa85f8a1b686e41992b90b798ef6a7ad0c16b",
+      "bytes": 467146
+    },
+    {
+      "path": "ports/graphshell/web/Cargo.lock",
+      "sha256": "394419020a98c343d014ff8593f72f80db4c83b368565c847f7e70f14e77711e",
+      "bytes": 226479
+    },
+    {
+      "path": "crates/cambium/examples/genet_web_smoke/Cargo.lock",
+      "sha256": "e7fe589cd677376c1f8aef520402697ad122bfa253f28f25765657bfb9900433",
+      "bytes": 82453
+    },
+    {
+      "path": "ports/distillery/probe/Cargo.lock",
+      "sha256": "fb92af0cdfb8f7ae11dd81d30772e7a9b72a2cf3a98c6d7f3da30f1002e78743",
+      "bytes": 202739
+    },
+    {
+      "path": "ports/distillery/probe/remote-fixture/Cargo.lock",
+      "sha256": "226ff06c9106daf37a79bc918ff70779117189e5cfbb9229b8f88938733d46d7",
+      "bytes": 257367
+    }
+  ],
+  "resolved_identities": {
+    "genet-fontique@0.10.0#cec760f4ae6c": {
+      "name": "genet-fontique",
+      "version": "0.10.0",
+      "source": "git+https://github.com/merely-made/genet.git?rev=cec760f4ae6ce336823bc2be250d9ab4e35a8a47#cec760f4ae6ce336823bc2be250d9ab4e35a8a47"
+    },
+    "genet-parley@0.10.0#cec760f4ae6c": {
+      "name": "genet-parley",
+      "version": "0.10.0",
+      "source": "git+https://github.com/merely-made/genet.git?rev=cec760f4ae6ce336823bc2be250d9ab4e35a8a47#cec760f4ae6ce336823bc2be250d9ab4e35a8a47"
+    },
+    "genet-taffy@0.14.0#cec760f4ae6c": {
+      "name": "genet-taffy",
+      "version": "0.14.0",
+      "source": "git+https://github.com/merely-made/genet.git?rev=cec760f4ae6ce336823bc2be250d9ab4e35a8a47#cec760f4ae6ce336823bc2be250d9ab4e35a8a47"
+    },
+    "netrender-vello@0.11.0#5862bba26c8a": {
+      "name": "netrender-vello",
+      "version": "0.11.0",
+      "source": "git+https://github.com/mark-ik/vello?rev=5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a#5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a"
+    },
+    "netrender@0.1.2#46606610cd38": {
+      "name": "netrender",
+      "version": "0.1.2",
+      "source": "git+https://github.com/merely-made/netrender.git?rev=46606610cd387e2e6956d8a3ebbcf442eab210d9#46606610cd387e2e6956d8a3ebbcf442eab210d9"
+    },
+    "netrender_device@0.1.2#46606610cd38": {
+      "name": "netrender_device",
+      "version": "0.1.2",
+      "source": "git+https://github.com/merely-made/netrender.git?rev=46606610cd387e2e6956d8a3ebbcf442eab210d9#46606610cd387e2e6956d8a3ebbcf442eab210d9"
+    },
+    "paint_list_api@0.1.2#46606610cd38": {
+      "name": "paint_list_api",
+      "version": "0.1.2",
+      "source": "git+https://github.com/merely-made/netrender.git?rev=46606610cd387e2e6956d8a3ebbcf442eab210d9#46606610cd387e2e6956d8a3ebbcf442eab210d9"
+    },
+    "paint_list_render@0.1.2#46606610cd38": {
+      "name": "paint_list_render",
+      "version": "0.1.2",
+      "source": "git+https://github.com/merely-made/netrender.git?rev=46606610cd387e2e6956d8a3ebbcf442eab210d9#46606610cd387e2e6956d8a3ebbcf442eab210d9"
+    },
+    "vello_encoding@0.11.0#5862bba26c8a": {
+      "name": "vello_encoding",
+      "version": "0.11.0",
+      "source": "git+https://github.com/mark-ik/vello?rev=5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a#5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a"
+    },
+    "vello_shaders@0.11.0#5862bba26c8a": {
+      "name": "vello_shaders",
+      "version": "0.11.0",
+      "source": "git+https://github.com/mark-ik/vello?rev=5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a#5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a"
+    },
+    "wgpu@30.0.1#registry": {
+      "name": "wgpu",
+      "version": "30.0.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    }
+  },
+  "metadata_snapshots": [
+    {
+      "manifest": "Cargo.toml",
+      "artifact": "/Users/markik/Code/output/vello-release-adoption-20261011/mere-metadata.json",
+      "sha256": "d700b78f5f214fd474d8e443fe86c6c78864f903f3bbf9b412e0cdeeeb6c0899",
+      "bytes": 8523918,
+      "package_count": 1611,
+      "selected_identity_keys": [
+        "genet-fontique@0.10.0#cec760f4ae6c",
+        "genet-parley@0.10.0#cec760f4ae6c",
+        "genet-taffy@0.14.0#cec760f4ae6c",
+        "netrender-vello@0.11.0#5862bba26c8a",
+        "netrender@0.1.2#46606610cd38",
+        "netrender_device@0.1.2#46606610cd38",
+        "paint_list_api@0.1.2#46606610cd38",
+        "paint_list_render@0.1.2#46606610cd38",
+        "vello_encoding@0.11.0#5862bba26c8a",
+        "vello_shaders@0.11.0#5862bba26c8a",
+        "wgpu@30.0.1#registry"
+      ],
+      "status": "passed"
+    },
+    {
+      "manifest": "ports/graphshell/web/Cargo.toml",
+      "artifact": "/Users/markik/Code/output/vello-release-adoption-20261011/graphshell-web-metadata.json",
+      "sha256": "8edc07ad7ade8260e61fc5d130e6d39c723b03afb9b664664e6c864df5b084d8",
+      "bytes": 4409770,
+      "package_count": 894,
+      "selected_identity_keys": [
+        "genet-fontique@0.10.0#cec760f4ae6c",
+        "genet-parley@0.10.0#cec760f4ae6c",
+        "genet-taffy@0.14.0#cec760f4ae6c",
+        "netrender-vello@0.11.0#5862bba26c8a",
+        "netrender@0.1.2#46606610cd38",
+        "netrender_device@0.1.2#46606610cd38",
+        "paint_list_api@0.1.2#46606610cd38",
+        "paint_list_render@0.1.2#46606610cd38",
+        "vello_encoding@0.11.0#5862bba26c8a",
+        "vello_shaders@0.11.0#5862bba26c8a",
+        "wgpu@30.0.1#registry"
+      ],
+      "status": "passed"
+    },
+    {
+      "manifest": "crates/cambium/examples/genet_web_smoke/Cargo.toml",
+      "artifact": "/Users/markik/Code/output/vello-release-adoption-20261011/genet-web-smoke-metadata.json",
+      "sha256": "2489b0d5878f71fdc18c21ca24f9a6906f62968476414025b0cc679d0b1b8d8c",
+      "bytes": 1565921,
+      "package_count": 341,
+      "selected_identity_keys": [
+        "genet-fontique@0.10.0#cec760f4ae6c",
+        "genet-parley@0.10.0#cec760f4ae6c",
+        "genet-taffy@0.14.0#cec760f4ae6c",
+        "netrender-vello@0.11.0#5862bba26c8a",
+        "netrender@0.1.2#46606610cd38",
+        "netrender_device@0.1.2#46606610cd38",
+        "paint_list_api@0.1.2#46606610cd38",
+        "paint_list_render@0.1.2#46606610cd38",
+        "vello_encoding@0.11.0#5862bba26c8a",
+        "vello_shaders@0.11.0#5862bba26c8a",
+        "wgpu@30.0.1#registry"
+      ],
+      "status": "passed"
+    },
+    {
+      "manifest": "ports/distillery/probe/Cargo.toml",
+      "artifact": "/Users/markik/Code/output/vello-release-adoption-20261011/distillery-probe-metadata.json",
+      "sha256": "bc77fa364a3ab7e937275b527a3202d50d1b56e05bdf4e3691fff8b2a7368338",
+      "bytes": 3802073,
+      "package_count": 793,
+      "selected_identity_keys": [
+        "genet-fontique@0.10.0#cec760f4ae6c",
+        "genet-parley@0.10.0#cec760f4ae6c",
+        "genet-taffy@0.14.0#cec760f4ae6c",
+        "netrender-vello@0.11.0#5862bba26c8a",
+        "netrender@0.1.2#46606610cd38",
+        "netrender_device@0.1.2#46606610cd38",
+        "paint_list_api@0.1.2#46606610cd38",
+        "paint_list_render@0.1.2#46606610cd38",
+        "vello_encoding@0.11.0#5862bba26c8a",
+        "vello_shaders@0.11.0#5862bba26c8a",
+        "wgpu@30.0.1#registry"
+      ],
+      "status": "passed"
+    },
+    {
+      "manifest": "ports/distillery/probe/remote-fixture/Cargo.toml",
+      "artifact": "/Users/markik/Code/output/vello-release-adoption-20261011/distillery-remote-metadata.json",
+      "sha256": "35736a6aa6463e557231ad2cf2d6f8c8cecb8f5871ccf1cd5405a604cda37f43",
+      "bytes": 4800460,
+      "package_count": 990,
+      "selected_identity_keys": [
+        "netrender-vello@0.11.0#5862bba26c8a",
+        "paint_list_api@0.1.2#46606610cd38",
+        "vello_encoding@0.11.0#5862bba26c8a",
+        "wgpu@30.0.1#registry"
+      ],
+      "status": "passed"
+    }
+  ],
+  "identity_findings": [
+    {
+      "package": "netrender_device",
+      "finding": "Initial root metadata resolved a registry dev/test copy through Pictograph. The root registry patch now redirects it to the qualified Git revision.",
+      "status": "resolved_verified",
+      "qualified_rev": "46606610cd387e2e6956d8a3ebbcf442eab210d9"
+    }
+  ],
+  "validation": {
+    "port_boundaries": {
+      "status": "passed",
+      "exit_code": 0,
+      "artifact": "/Users/markik/Code/output/vello-release-adoption-20261011/mere-boundaries.log",
+      "sha256": "ed6e8e6214358ac43d6f72e8549446b5ce8170b62a9813b557dc1d130eb24186",
+      "result": "Mere port and Graphshell web dependency boundaries passed",
+      "saved_artifact": "checks/mere-boundaries.log"
+    },
+    "native_host_consumer_check": {
+      "status": "passed",
+      "artifact": "/Users/markik/Code/output/vello-release-adoption-20261011/mere-render-consumers-check.log",
+      "exit_code": 0,
+      "sha256": "5532ec8a10a9e5cc9d8cf33d54be1f99a7229933ec3b45d04cdd23bf0023d067",
+      "command": "cargo check --locked -p tabard-workshop --features native-host -p cambium-rootstock -p sprigging -j 2",
+      "duration_seconds": 6.92,
+      "environment": {
+        "CARGO_INCREMENTAL": "0",
+        "CARGO_PROFILE_DEV_DEBUG": "0"
+      },
+      "saved_artifact": "checks/mere-render-consumers-check.log"
+    },
+    "production_cpu_frames": {
+      "status": "passed",
+      "artifact": "/Users/markik/Code/output/vello-release-adoption-20261011/production-cpu-frames/receipt.json",
+      "exit_code": 0,
+      "saved_artifact": "production-cpu-frames/receipt.json",
+      "sha256": "945c6ecad57b33539504cd1cab0569fc3474e070c6e17c1aae6b24cb6d27d723",
+      "log_artifact": "/Users/markik/Code/output/vello-release-adoption-20261011/production-cpu-probe.log",
+      "saved_log": "checks/production-cpu-probe.log",
+      "log_sha256": "2d3c261e789701b8027547b2e1bf9a9dd24b5aaa1a4874ea927f8076baa2f14c",
+      "frame_count": 12,
+      "real_component_frames": 8,
+      "opaque_cpu_snapshot_compositions": 4,
+      "all_direct_retained_pixels_identical": true,
+      "application_authority_preserved": true,
+      "gpu_initialized": false,
+      "retention": "source expansion and re-lowering, no packet cache",
+      "scope": "production Tabard reader and stylesheet preview components; whole workshop external-texture capture remains refused",
+      "visual_inspection": {
+        "labels": [
+          "composed-authored",
+          "composed-narrow"
+        ],
+        "inspected_by": "Root agent",
+        "scope": "Local PNG inspection; no GPU or host-presentation acceptance"
+      }
+    },
+    "gpu_host_browser_and_reset_acceptance": {
+      "status": "not_run_in_this_receipt",
+      "requires": "Serialized validation handoff and presentation/pixel receipts"
+    },
+    "wasm_target_compile": {
+      "status": "passed",
+      "command": "cargo check --manifest-path ports/graphshell/web/Cargo.toml --target wasm32-unknown-unknown --locked -j 2",
+      "exit_code": 0,
+      "artifact": "/Users/markik/Code/output/vello-release-adoption-20261011/mere-graphshell-wasm-check.log",
+      "sha256": "8b50f85cb03871352578dc563a581ea66c820f564b1b1abbd08560005c57390e",
+      "duration_seconds": 452,
+      "saved_artifact": "checks/mere-graphshell-wasm-check.log"
+    },
+    "pictograph_vello_adapter_compile": {
+      "status": "passed",
+      "artifact": "/Users/markik/Code/output/vello-release-adoption-20261011/mere-pictograph-vello-check.log",
+      "command": "cargo check --locked -p pictograph --no-default-features --features vello --lib -j 2",
+      "exit_code": 0,
+      "sha256": "10e000abe3616d66c27fc2766dc23f082e5aacd3685d3660bc2384c454f2f381",
+      "saved_artifact": "checks/mere-pictograph-vello-check.log"
+    }
+  },
+  "limits": [
+    "Metadata proves resolved source/package identity, not compilation or rendered pixels.",
+    "These consumer graphs select Classic; CPU/GPU/glifo provider identity is qualified separately.",
+    "Full metadata artifacts remain outside Git; this receipt records their hashes and selected identities.",
+    "CPU frames compare direct and retained rendering on the new provider; they do not establish old/new or cross-renderer pixel parity."
+  ],
+  "initial_mere_base_commit": "21bc504ab18dd4b3dca199fbffb6389a08d545df",
+  "standalone_cpu_probe": {
+    "directory": "/Users/markik/Code/output/vello-release-adoption-20261011/production-cpu-probe",
+    "status": "passed",
+    "provenance_method": "Actual build Cargo.lock, separate from Mere workspace/standalone host locks",
+    "files": [
+      {
+        "path": "/Users/markik/Code/output/vello-release-adoption-20261011/production-cpu-probe/Cargo.toml",
+        "sha256": "a21ec5f3dfee7882155a0af1bafcb7b6bb3d3d772d5b945f39afdde1505881f1",
+        "bytes": 13054,
+        "saved_path": "probe/Cargo.toml"
+      },
+      {
+        "path": "/Users/markik/Code/output/vello-release-adoption-20261011/production-cpu-probe/Cargo.lock",
+        "sha256": "dc732aa737928591b3a9d3d4d00a5e4c5920e3707c00e88dde166b5778c5901e",
+        "bytes": 97543,
+        "saved_path": "probe/Cargo.lock"
+      },
+      {
+        "path": "/Users/markik/Code/output/vello-release-adoption-20261011/production-cpu-probe/src/main.rs",
+        "sha256": "0f82ab4fd6eadca9c0027a6c63cc519b6b4c2b6e656eeb4014f55383bd46692e",
+        "bytes": 8355,
+        "saved_path": "probe/src/main.rs"
+      }
+    ],
+    "selected_lock_identities": [
+      {
+        "name": "genet-fontique",
+        "version": "0.10.0",
+        "source": "git+https://github.com/merely-made/genet.git?rev=cec760f4ae6ce336823bc2be250d9ab4e35a8a47#cec760f4ae6ce336823bc2be250d9ab4e35a8a47"
+      },
+      {
+        "name": "genet-parley",
+        "version": "0.10.0",
+        "source": "git+https://github.com/merely-made/genet.git?rev=cec760f4ae6ce336823bc2be250d9ab4e35a8a47#cec760f4ae6ce336823bc2be250d9ab4e35a8a47"
+      },
+      {
+        "name": "glifo",
+        "version": "0.4.0",
+        "source": "git+https://github.com/mark-ik/vello?rev=5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a#5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a"
+      },
+      {
+        "name": "netrender",
+        "version": "0.1.2",
+        "source": "git+https://github.com/merely-made/netrender.git?rev=46606610cd387e2e6956d8a3ebbcf442eab210d9#46606610cd387e2e6956d8a3ebbcf442eab210d9"
+      },
+      {
+        "name": "netrender-vello",
+        "version": "0.11.0",
+        "source": "git+https://github.com/mark-ik/vello?rev=5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a#5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a"
+      },
+      {
+        "name": "netrender_device",
+        "version": "0.1.2",
+        "source": "git+https://github.com/merely-made/netrender.git?rev=46606610cd387e2e6956d8a3ebbcf442eab210d9#46606610cd387e2e6956d8a3ebbcf442eab210d9"
+      },
+      {
+        "name": "paint_list_api",
+        "version": "0.1.2",
+        "source": "git+https://github.com/merely-made/netrender.git?rev=46606610cd387e2e6956d8a3ebbcf442eab210d9#46606610cd387e2e6956d8a3ebbcf442eab210d9"
+      },
+      {
+        "name": "paint_list_render",
+        "version": "0.1.2",
+        "source": "git+https://github.com/merely-made/netrender.git?rev=46606610cd387e2e6956d8a3ebbcf442eab210d9#46606610cd387e2e6956d8a3ebbcf442eab210d9"
+      },
+      {
+        "name": "vello_common",
+        "version": "0.3.0",
+        "source": "git+https://github.com/mark-ik/vello?rev=5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a#5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a"
+      },
+      {
+        "name": "vello_cpu",
+        "version": "0.3.0",
+        "source": "git+https://github.com/mark-ik/vello?rev=5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a#5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a"
+      },
+      {
+        "name": "vello_encoding",
+        "version": "0.11.0",
+        "source": "git+https://github.com/mark-ik/vello?rev=5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a#5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a"
+      },
+      {
+        "name": "vello_shaders",
+        "version": "0.11.0",
+        "source": "git+https://github.com/mark-ik/vello?rev=5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a#5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a"
+      },
+      {
+        "name": "wgpu",
+        "version": "30.0.1",
+        "source": "registry+https://github.com/rust-lang/crates.io-index"
+      }
+    ],
+    "full_metadata": "not_claimed",
+    "optional_metadata_attempt": {
+      "status": "not_used",
+      "exit_code": 101,
+      "reason": "Locked full metadata requested additional lock resolution; the actual build lock was preserved during the running CPU probe."
+    },
+    "preparation_snapshot": "probe/preparation.json",
+    "reproduction_limit": "Manifest path dependencies and patches are absolute paths to this checkout; source fonts are local machine inputs. No font-bearing .scene files are copied.",
+    "saved_executable": {
+      "path": "/Users/markik/Code/output/vello-release-adoption-20261011/production-cpu-probe/cambium-cpu-source-proof",
+      "sha256": "e3e27fb8f45e3f559b0d16204d309971dc0a746d71f2e31842744ee00913efd4",
+      "bytes": 67188280,
+      "in_git": false
+    }
+  },
+  "saved_artifacts": [
+    {
+      "path": "production-cpu-frames/reader-light.png",
+      "sha256": "2cf2210c759e915b8c28d5a069345411556204c37067d17bf179d02bf3120137",
+      "bytes": 75138
+    },
+    {
+      "path": "production-cpu-frames/stylesheet-light.png",
+      "sha256": "d4c0173ed0745fa091ad73c580db2661503bf9ae2382a2ba6a82456c96b126b3",
+      "bytes": 43578
+    },
+    {
+      "path": "production-cpu-frames/composed-light.png",
+      "sha256": "37d9f59b5953c69967e3b14c4f6f824e4eaafcd8df6182101530c7320e43623f",
+      "bytes": 118600
+    },
+    {
+      "path": "production-cpu-frames/reader-dark.png",
+      "sha256": "e705755c65cd0aa9148610d18e64ad9167cdd65b8be5d732b1fa01e907ba1aad",
+      "bytes": 74908
+    },
+    {
+      "path": "production-cpu-frames/stylesheet-dark.png",
+      "sha256": "aa0455762f7d77c6f647977d51be83ca28969c626b4ec7a39df0c18993cb78be",
+      "bytes": 43208
+    },
+    {
+      "path": "production-cpu-frames/composed-dark.png",
+      "sha256": "ed47085915b3e74681510678ef302fc18ae2a12d409d7cdbee7e5f5391a36698",
+      "bytes": 117999
+    },
+    {
+      "path": "production-cpu-frames/reader-narrow.png",
+      "sha256": "107ed17b4a3e918ef6edd4574fd9ecadd755f2f1d4611c8bd4b636a4d792673a",
+      "bytes": 73893
+    },
+    {
+      "path": "production-cpu-frames/stylesheet-narrow.png",
+      "sha256": "7f93edb7182896129995771fa0ec5ac025679f4b6158cb39b461daf5b1baf4fe",
+      "bytes": 42145
+    },
+    {
+      "path": "production-cpu-frames/composed-narrow.png",
+      "sha256": "eb9cacb40ffc63bb0b1c4bd859cdd8797f2d5a19638a512fef0a9157be35db92",
+      "bytes": 115922
+    },
+    {
+      "path": "production-cpu-frames/reader-authored.png",
+      "sha256": "2cf2210c759e915b8c28d5a069345411556204c37067d17bf179d02bf3120137",
+      "bytes": 75138
+    },
+    {
+      "path": "production-cpu-frames/stylesheet-authored.png",
+      "sha256": "422ae41a43d084b428d678d40e72c39c38312afb04992d90c41b94b97560d2d1",
+      "bytes": 37081
+    },
+    {
+      "path": "production-cpu-frames/composed-authored.png",
+      "sha256": "5a8bd2aa6937697d1cb77e39927b03718316d03d9e074e0b36eb4d95abde2967",
+      "bytes": 112102
+    },
+    {
+      "path": "production-cpu-frames/receipt.json",
+      "sha256": "945c6ecad57b33539504cd1cab0569fc3474e070c6e17c1aae6b24cb6d27d723",
+      "bytes": 7736
+    },
+    {
+      "path": "probe/Cargo.toml",
+      "sha256": "a21ec5f3dfee7882155a0af1bafcb7b6bb3d3d772d5b945f39afdde1505881f1",
+      "bytes": 13054
+    },
+    {
+      "path": "probe/Cargo.lock",
+      "sha256": "dc732aa737928591b3a9d3d4d00a5e4c5920e3707c00e88dde166b5778c5901e",
+      "bytes": 97543
+    },
+    {
+      "path": "probe/src/main.rs",
+      "sha256": "0f82ab4fd6eadca9c0027a6c63cc519b6b4c2b6e656eeb4014f55383bd46692e",
+      "bytes": 8355
+    },
+    {
+      "path": "probe/preparation.json",
+      "sha256": "0a653f42adf97d3075ab46b293db30135233c7db225c7b8387b2a3b0271a9b87",
+      "bytes": 983
+    },
+    {
+      "path": "checks/mere-boundaries.log",
+      "sha256": "ed6e8e6214358ac43d6f72e8549446b5ce8170b62a9813b557dc1d130eb24186",
+      "bytes": 58
+    },
+    {
+      "path": "checks/mere-render-consumers-check.log",
+      "sha256": "5532ec8a10a9e5cc9d8cf33d54be1f99a7229933ec3b45d04cdd23bf0023d067",
+      "bytes": 2408
+    },
+    {
+      "path": "checks/mere-graphshell-wasm-check.log",
+      "sha256": "8b50f85cb03871352578dc563a581ea66c820f564b1b1abbd08560005c57390e",
+      "bytes": 37876
+    },
+    {
+      "path": "checks/mere-pictograph-vello-check.log",
+      "sha256": "10e000abe3616d66c27fc2766dc23f082e5aacd3685d3660bc2384c454f2f381",
+      "bytes": 1481
+    },
+    {
+      "path": "checks/production-cpu-probe.log",
+      "sha256": "2d3c261e789701b8027547b2e1bf9a9dd24b5aaa1a4874ea927f8076baa2f14c",
+      "bytes": 26022
+    }
+  ],
+  "mere_source_commit": "e3ed4d65d31b27c21aa8322a4546982173ed1d33"
+}
