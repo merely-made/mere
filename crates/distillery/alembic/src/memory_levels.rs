@@ -13,8 +13,9 @@
 //! Alembic Recent / Saved sections rendering over this, the policy as a setting, the
 //! actual eviction pass) layers on top once it lands.
 //!
-//! The model (Alembic plan, decision #2, confirmed with Mark): **a tag or a pin
-//! promotes a node to long-term**, retained and never evicted. Everything else is
+//! The model (Alembic plan, decision #2, confirmed with Mark): **a tag
+//! promotes a node to long-term**, retained and never evicted. A physics position
+//! pin is independent of retention. Everything else is
 //! short-term working memory, subject to the eviction policy. Codicils (slice A) are
 //! the third level and are not nodes, so they are out of scope here.
 
@@ -27,7 +28,7 @@ use kernel::graph::{Graph, NodeKey};
 pub enum MemoryLevel {
     /// Working memory: auto-captured from browsing, evictable by default.
     ShortTerm,
-    /// Promoted memory: kept across sessions because the user tagged or pinned it.
+    /// Promoted memory: kept across sessions because the user tagged it.
     /// Never evicted by any policy.
     LongTerm,
 }
@@ -36,11 +37,12 @@ pub enum MemoryLevel {
 /// at least one tag (decision #2 — "tagging adds to long-term, retained"). `is_pinned`
 /// is deliberately *not* a promotion signal: it pins a node's physics position, an
 /// orthogonal spatial choice, not a memory-keep. (A dedicated bookmark flag, if one is
-/// added later, would join `tags` here.)
+/// added later, would join content tags here.) The graph's content-tag projection
+/// reads canonical resource tags and supports unbound legacy nodes.
 pub fn is_promoted(graph: &Graph, key: NodeKey) -> bool {
     graph
-        .get_node(key)
-        .is_some_and(|node| !node.tags.is_empty())
+        .node_content_tags(key)
+        .is_some_and(|tags| !tags.is_empty())
 }
 
 /// The memory level of a node.
