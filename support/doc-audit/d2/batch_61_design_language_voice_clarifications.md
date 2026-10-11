@@ -323,3 +323,16 @@ Use the existing named homes rather than a duplicate synthesis document.
 Checked the four updated index entries against their owners; all previous
 unrelated index lines are preserved. Whole-tree pre-existing audit failures
 remain outside this pass.
+
+
+**Scoped Forme draft adapter (2026-10-10):** Mark explicitly selected its
+implementation in the design-language chat after the initial bridge was
+published. The editor plan's new Progress entry and the portable Graphshell
+qualification JSON record 28 native checks and product/default/viewer wasm
+checks plus compact release packaging. The root brief and index now identify
+that bounded adapter as implemented, with headed qualification pending; other
+hosts and general field/editor work retain their own gates. No browser receipt
+is inferred. Complete D2 JSON was compared with an archive of committed main
+`4f70d536` and is identical: 252/259 coverage, the seven missing records,
+duplicate README basenames and aggregate-digest mismatch are pre-existing.
+No active Markdown document or unknown audit record was added.

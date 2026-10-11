@@ -640,7 +640,8 @@ provide field inspection and bounded workbench projection. This supersedes
 the earlier inventory's no-field-inspection-caller finding for that retained
 host, without claiming shared roster-card adoption or a general field editor.
 Existing workspace records hold arrangement, geometry, bounds, lock and
-visibility; the whole-forme draft/history remains pending as recorded below.
+visibility; the [draft adapter recorded in Progress](#workbench-forme-draft-2026-10-10)
+now adds private draft history and saved layout undo, with headed checks pending.
 
 **Proposed edit flow:** Inspect → Edit → Preview → Apply / Discard changes.
 Use the agreed Unlock → Lock and apply wording for a forme. Show pending state
@@ -708,7 +709,9 @@ does not establish that the pending rule runner or style editors exist.
 
 #### Forme draft follow-through (2026-10-10; agreed interaction)
 
-**Status:** interaction agreed; implementation and host qualification pending.
+**Status (2026-10-10):** interaction agreed; the bounded Graphshell adapter is
+implemented with native/build checks recorded in [Progress](#workbench-forme-draft-2026-10-10).
+Headed host qualification and adoption by other hosts remain pending.
 Mark accepted the [forme draft session, design language §9.11](../../2026-08-23_projection_scenes_and_graph_native_platform.md#911-forme-draft-session-2026-10-10):
 unlock starts a private draft; nodes act as tile handles with split/drop
 previews; adding a node changes draft membership; undo/redo traverses draft
@@ -755,7 +758,8 @@ or changing another lane's assignment.
    geometry, and save/reopen retains member/access identity without replacing
    document sessions. Discard must not create a saved-change history entry.
 
-These done-conditions are pending verification. Draft membership and tile
+The Graphshell adapter's scoped source checks are recorded in Progress; headed
+verification of these done-conditions remains pending. Draft membership and tile
 geometry are distinct from node content or resource attributes. SE6 still
 excludes the projection editor's own UI furniture from recipe undo; this
 forme draft edits the user's arrangement and does not amend SE6. Existing
@@ -1009,5 +1013,66 @@ are `p4_tree_forme.scn` and
 The first bridge uses a layout-edit gate and immediate saves for accepted
 gestures; move previews have their own apply/cancel. The subsequently agreed
 [whole-forme draft and undo model](#forme-draft-follow-through-2026-10-10-agreed-interaction)
-remains a follow-through target. Unlock-to-draft, draft undo/redo, Discard changes
-and Lock and apply are not qualified by the bridge checks above.
+was the follow-through target at that checkpoint. It is now implemented in the
+separate adapter below; the bridge checks above do not qualify that later work.
+
+### Workbench Forme draft (2026-10-10)
+
+Mark selected **"Implement Forme draft/undo (Recommended)"** after the first
+bridge was published and this machine's in-app browser could not provide
+WebGPU. This opens the scoped draft/history follow-through for that Graphshell
+adapter, without opening generic field editors or changing another host.
+
+The host now keeps a committed `FormeWorkspace` and an optional private draft.
+Unlock clones the committed arrangement/geometry; layout gestures, including
+membership and outer-region placement, edit the draft with Cambium `History`.
+Graph regions and reading tiles use the same draft and temporary drop preview.
+The Forme id, arrangement root and existing member-intent ids survive conversion
+from the working tile tree; tile ids still address distinct content accesses.
+
+- Unlocked graph nodes act as tile handles after four pixels of movement. Edge
+  drops split; central drops tab. Another source node can be added this way.
+  Release outside the field and Escape cancel the temporary preview. A completed
+  drop is one draft history step; mere selection does not save an arrangement.
+- Draft undo/redo and Discard changes are visible. Discard drops the private
+  history and locks at the committed state, leaving source nodes and content
+  intact. A new unlock starts fresh. Pending changes have a visible status.
+- Lock and apply writes the canonical workspace and its saved layout history in
+  one record. An unfinished tile preview must be applied or cancelled first.
+  While writing, session mutations wait. A failed write retains the draft and
+  its history, and the committed record/cursor stay unchanged for retry.
+- A successful apply locks and becomes one saved arrangement undo step. Saved
+  undo/redo survives reopen; its snapshots contain semantic arrangement, tree
+  geometry and region bounds, with a cap of 32 steps and a 4 MiB record limit.
+  Node content, resources, source edits, boundary visibility and document
+  sessions are outside those snapshots. Removed graph members reconcile in
+  every reachable saved layout, so undo cannot resurrect removed source nodes.
+- Keyboard undo is scoped to an open graph Forme draft, Forme controls and the
+  reading workbench. A locked graph view does not capture saved-Forme shortcuts;
+  saved-layout undo remains available in the Forme controls and workbench.
+  It does not intercept keys at the whole-page/document level or override an
+  already handled editor key. Existing text/editor histories retain ownership.
+  Divider samples can coalesce within 400 ms; discrete size buttons and completed
+  drops break that run. General tiled-divider drag plumbing remains host-owned.
+
+**Qualification:** 28 native checks pass: eight new draft/history cases plus the
+previous twenty presentation, workspace, Canvas and real-layout hover checks.
+They exercise nested geometry and membership undo/redo, stable identities,
+preview cancellation, source preservation, discard/new-unlock, injected write
+failure and retry, one saved step per applied draft, reopened saved undo/redo,
+independent visibility, removed-member reconciliation and malformed-history
+refusal. Product and default-feature wasm checks pass; viewer-only checking
+also passes. The compact release product builds and `wasm-bindgen` 0.2.129
+packages its 21,718,200-byte wasm under the 1280 MiB cap (maximum RSS 1,070,348
+KiB, no swap, exit 0). The [portable qualification summary](../../../ports/graphshell/docs/receipts/forme_draft_20261010/qualification.json)
+records source hashes, counts, build scope and the open browser gate. Logs are
+`Code/testing/mere/forme-draft-{native,product-check,default-final,viewer-check,
+release,bindgen}.log` on S-PC. Browser compilation is source
+qualification; no interactive receipt is claimed while WebGPU is unavailable.
+
+The existing `p4_tree_forme.scn` now checks that draft edits leave committed
+geometry/bounds unchanged until Lock and apply. The added
+`p4_tree_forme_draft.scn` and `p4_tree_forme_draft_reopen.scn` extend the same
+local-origin sequence with real host pointer handle drags, draft undo/redo,
+added membership/discard, saved undo and reopened redo. Those headed scenarios
+remain pending on a WebGPU-capable browser.
