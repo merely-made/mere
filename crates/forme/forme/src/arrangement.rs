@@ -173,18 +173,29 @@ impl Arrangement {
     }
 
     /// Retain the root and existing member-intent identities when a tree
-    /// projection rebuilds its semantic arrangement. New members still get
-    /// fresh local ids; this never merges distinct accesses by resource.
+    /// projection rebuilds its semantic arrangement. Reuse a member's id only
+    /// when its occurrence is unique in both arrangements. Repeated references
+    /// keep their supplied occurrence ids: member identity alone cannot match
+    /// mirrors or compares. Never overwrite a node that now has another kind.
     pub fn preserve_member_identity(&mut self, previous: &Self) {
+        let member_ids = |arrangement: &Self| {
+            let mut members = BTreeMap::<GraphMemberId, Vec<ArrangementNodeId>>::new();
+            for node in arrangement.nodes.values() {
+                if let ArrangementNodeKind::MemberIntent { member } = node.kind {
+                    members.entry(member).or_default().push(node.id);
+                }
+            }
+            members
+        };
+        let old_members = member_ids(previous);
         let mut ids = BTreeMap::from([(self.root, previous.root)]);
-        for node in self.nodes.values() {
-            if let ArrangementNodeKind::MemberIntent { member } = node.kind
-                && let Some(old) = previous
-                    .nodes
-                    .values()
-                    .find(|old| old.kind == ArrangementNodeKind::MemberIntent { member })
+        for (member, current) in member_ids(self) {
+            if let [id] = current.as_slice()
+                && let Some(old) = old_members.get(&member)
+                && let [old_id] = old.as_slice()
+                && (id == old_id || !self.nodes.contains_key(old_id))
             {
-                ids.insert(node.id, old.id);
+                ids.insert(*id, *old_id);
             }
         }
         self.root = previous.root;
@@ -347,6 +358,69 @@ impl Default for Arrangement {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn identity_preservation_does_not_merge_repeated_member_appearances() {
+        let member = Uuid::from_u128(1);
+        let mut previous = Arrangement::new();
+        previous.add_member_intent(member);
+        previous.add_member_intent(member);
+        let mut next = Arrangement::new();
+        let first = next.add_member_intent(member);
+        let second = next.add_member_intent(member);
+        next.stack(first, second);
+        next.preserve_member_identity(&previous);
+        assert_eq!(next.len(), 3);
+        assert!(next.node(first).is_some());
+        assert!(next.node(second).is_some());
+        assert!(next.edges().any(|edge| {
+            edge.from == first && edge.to == second && edge.kind == ArrangementEdgeKind::StackedWith
+        }));
+        assert_eq!(next.root(), previous.root());
+    }
+
+    #[test]
+    fn identity_preservation_reuses_only_unambiguous_member_ids() {
+        let member = Uuid::from_u128(1);
+        let mut previous = Arrangement::new();
+        let old = previous.add_member_intent(member);
+        let mut next = Arrangement::new();
+        next.add_member_intent(member);
+        next.preserve_member_identity(&previous);
+        assert!(next.node(old).is_some());
+
+        let mut repeated = Arrangement::new();
+        let first = repeated.add_member_intent(member);
+        let second = repeated.add_member_intent(member);
+        repeated.preserve_member_identity(&previous);
+        assert_eq!(repeated.len(), 3);
+        assert!(repeated.node(first).is_some());
+        assert!(repeated.node(second).is_some());
+        repeated.preserve_member_identity(&repeated.clone());
+        assert!(repeated.node(first).is_some());
+        assert!(repeated.node(second).is_some());
+    }
+
+    #[test]
+    fn identity_preservation_does_not_overwrite_a_rebound_node() {
+        let member = Uuid::from_u128(1);
+        let mut previous = Arrangement::new();
+        let old = previous.add_member_intent(member);
+        let mut next = previous.clone();
+        next.nodes.get_mut(&old).unwrap().kind = ArrangementNodeKind::TileIntent {
+            member: Some(member),
+        };
+        let new = next.add_member_intent(member);
+        next.preserve_member_identity(&previous);
+        assert_eq!(next.len(), 3);
+        assert_eq!(
+            next.node(old).unwrap().kind,
+            ArrangementNodeKind::TileIntent {
+                member: Some(member)
+            }
+        );
+        assert!(next.node(new).is_some());
+    }
 
     #[test]
     fn new_arrangement_has_only_root() {
