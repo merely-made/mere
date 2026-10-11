@@ -15,15 +15,17 @@ fn line(s: impl Into<String>) -> Child {
     Box::new(el("p", text(s.into())))
 }
 fn action(label: &str, request: Request, disabled: bool) -> Child {
-    let view = button(label.to_string(), move |state: &mut State, _| {
-        if !disabled {
-            state.queue(request.clone());
-        }
-    });
     if disabled {
-        Box::new(view.attr("disabled", ""))
+        Box::new(
+            el("button", text(label.to_string()))
+                .attr("disabled", "true")
+                .attr("aria-disabled", "true")
+                .attr("tabindex", "-1"),
+        )
     } else {
-        Box::new(view)
+        Box::new(button(label.to_string(), move |state: &mut State, _| {
+            state.queue(request.clone());
+        }))
     }
 }
 pub fn root(state: &State) -> Child {
@@ -139,7 +141,12 @@ pub fn root(state: &State) -> Child {
                     }
                 });
                 contents.push(if blocked {
-                    Box::new(accept_view.attr("disabled", ""))
+                    Box::new(
+                        el("button", text("Accept"))
+                            .attr("disabled", "true")
+                            .attr("aria-disabled", "true")
+                            .attr("tabindex", "-1"),
+                    )
                 } else {
                     Box::new(accept_view)
                 });
@@ -150,7 +157,12 @@ pub fn root(state: &State) -> Child {
                     }
                 });
                 contents.push(if blocked {
-                    Box::new(delete_view.attr("disabled", ""))
+                    Box::new(
+                        el("button", text("Delete"))
+                            .attr("disabled", "true")
+                            .attr("aria-disabled", "true")
+                            .attr("tabindex", "-1"),
+                    )
                 } else {
                     Box::new(delete_view)
                 });
@@ -158,18 +170,17 @@ pub fn root(state: &State) -> Child {
             }
         },
     }
-    Box::new(el("main", body).attr("class", "dramatis"))
+    Box::new(el("main", el("div", body).attr("class", "contents")).attr("class", "dramatis"))
 }
 pub const SHEET: &str = r#"
-html { background: #f4f1e9; color: #25251f; font-family: system-ui; }
-body { margin: 0; }
-main { padding: 24px; max-width: 820px; height: 100vh; box-sizing: border-box; overflow-y: auto; overflow-x: hidden; }
+main { background: #f4f1e9; color: #25251f; font-family: system-ui; padding: 24px; height: 100vh; box-sizing: border-box; overflow-y: auto; overflow-x: hidden; }
+.contents { max-width: 820px; margin: 0 auto; }
 h1 { font-size: 30px; margin: 0 0 8px; }
 h2 { font-size: 20px; margin: 24px 0 12px; }
 h3 { font-size: 17px; margin: 0 0 8px; }
 p { line-height: 1.5; margin: 8px 0; }
 button { margin: 6px 10px 6px 0; padding: 10px 16px; border: 1px solid #76766b; border-radius: 6px; background: #fffdf7; color: #25251f; }
 button:focus-visible { outline: 3px solid #315e75; outline-offset: 2px; }
-button:disabled { opacity: 0.55; }
+button[aria-disabled="true"] { background: #e6e4dc; color: #77766d; border-color: #aaa99d; }
 .card { background: #fffdf7; border: 1px solid #c6c6b6; border-radius: 8px; padding: 16px; margin: 12px 0; }
 "#;
