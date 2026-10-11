@@ -40,9 +40,12 @@ web-sys = { version = "=0.3.106", features = [
 [patch.crates-io]
 # cambium-genet-web-host rides Genet; [patch] is not inherited, so these rows
 # restate graphshell-web's, at the same immutable Genet revision.
-taffy = { package = "genet-taffy", version = "=0.14.0", git = "https://github.com/merely-made/genet.git", rev = "7422e90613f9017e5bb790e3acb48f61776b2eda" }
-layout-dom-api = { git = "https://github.com/merely-made/genet.git", rev = "7422e90613f9017e5bb790e3acb48f61776b2eda", version = "=0.1.1" }
-genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", rev = "7422e90613f9017e5bb790e3acb48f61776b2eda", version = "=0.1.2" }
-vello = { git = "https://github.com/mark-ik/vello.git", tag = "vello-0.10.0" }
+taffy = { package = "genet-taffy", version = "=0.14.0", git = "https://github.com/merely-made/genet.git", rev = "cec760f4ae6ce336823bc2be250d9ab4e35a8a47" }
+layout-dom-api = { git = "https://github.com/merely-made/genet.git", rev = "cec760f4ae6ce336823bc2be250d9ab4e35a8a47", version = "=0.1.1" }
+genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", rev = "cec760f4ae6ce336823bc2be250d9ab4e35a8a47", version = "=0.1.2" }
+# Classic 0.11 and its owned repairs, coherent with Mere's root Scene aliases.
+netrender-vello = { git = "https://github.com/mark-ik/vello", rev = "5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a" }
+vello_encoding = { git = "https://github.com/mark-ik/vello", rev = "5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a" }
+vello_shaders = { git = "https://github.com/mark-ik/vello", rev = "5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a" }
 cubecl-runtime = { path = "../../../support/patches/cubecl-runtime" }
 cubek-reduce = { path = "../../../support/patches/cubek-reduce" }
