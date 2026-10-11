@@ -172,6 +172,35 @@ impl Arrangement {
         self.root
     }
 
+    /// Retain the root and existing member-intent identities when a tree
+    /// projection rebuilds its semantic arrangement. New members still get
+    /// fresh local ids; this never merges distinct accesses by resource.
+    pub fn preserve_member_identity(&mut self, previous: &Self) {
+        let mut ids = BTreeMap::from([(self.root, previous.root)]);
+        for node in self.nodes.values() {
+            if let ArrangementNodeKind::MemberIntent { member } = node.kind
+                && let Some(old) = previous
+                    .nodes
+                    .values()
+                    .find(|old| old.kind == ArrangementNodeKind::MemberIntent { member })
+            {
+                ids.insert(node.id, old.id);
+            }
+        }
+        self.root = previous.root;
+        self.nodes = std::mem::take(&mut self.nodes)
+            .into_values()
+            .map(|mut node| {
+                node.id = ids.get(&node.id).copied().unwrap_or(node.id);
+                (node.id, node)
+            })
+            .collect();
+        for edge in &mut self.edges {
+            edge.from = ids.get(&edge.from).copied().unwrap_or(edge.from);
+            edge.to = ids.get(&edge.to).copied().unwrap_or(edge.to);
+        }
+    }
+
     /// Insert a node of `kind` with an optional label; returns its id. The
     /// node is *not* attached to anything — use [`attach`](Self::attach) or the
     /// `add_*` helpers, which attach to the root by default.

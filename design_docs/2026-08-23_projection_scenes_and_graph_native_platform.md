@@ -873,7 +873,10 @@ Production host adoption and the Rhai runner are separately qualified there.
 
 ### 9.11 Forme draft session (2026-10-10)
 
-**Agreed interaction; implementation pending.** Mark described unlocked nodes
+**Agreed interaction; Graphshell adapter implemented, headed qualification pending.**
+The [editor plan's draft progress](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#workbench-forme-draft-2026-10-10)
+records its scoped native/build checks; other-host adoption remains separate.
+Mark described unlocked nodes
 as tile handles: dragging a handle previews the corresponding tile region,
 split and nesting; dragging another node into the forme adds it to the proposed
 arrangement. Locking agrees to commit those changes. Asked how to discard the
@@ -909,8 +912,9 @@ not require another force-composition model or prescribe a scene's appearance.
 
 The [editor plan](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#forme-draft-follow-through-2026-10-10-agreed-interaction)
 maps the shared history and layout substrate to implementation steps and
-qualification. The gesture bridge and committed arrangement undo are pending;
-this agreement is not a runtime receipt.
+qualification. The first Graphshell adapter now implements the draft and saved
+arrangement undo, with its interactive check pending; this agreement and source
+qualification do not substitute for a headed runtime receipt.
 
 ### 9.12 Mixed-content scene and embedded forme study (2026-10-10)
 
@@ -995,3 +999,127 @@ on one axis with representation or arrangement on another; the shipped grid's
 axis contract is not expanded by this proposal. Keep source material and access
 identities stable across comparisons, disclose live versus captured faces,
 and evaluate appearance and behavior together.
+
+### 9.13 Backdrop, context, props and reset (2026-10-10)
+
+**Mark's correction to the backdrop cut.** The earlier Clear / Ambient /
+Props / Field mode list mixes different concerns. Mark prefers Clear as a
+reset action: return the scene to its initial arrangement relative to its
+backdrop. Contextual ambient nodes and props are classes or roles of entities
+within a scene, with independently configurable presentation and behavior.
+This revises the consumer direction behind SE86, not the earlier mechanical
+backdrop receipts.
+
+| Concern | Direction |
+|---|---|
+| Reset | An action that restores an arrangement relative to the scene's backdrop. It is not another scenery mode. |
+| Ambient content | Contextual propositions about what is relevant to foreground entities; its display can be turned off. |
+| Props | Scene entities with authored attributes, presentation or scripted behavior, including objects relevant to contextualizing the content. Their display can be turned off. |
+| Backdrop | The scene's set, potentially with depth, animation and interaction, rather than only static wallpaper. |
+| Physical participation | Collision, forces and other behavior remain separately configured; being a prop or ambient entity does not decide tangibility. |
+
+Static wallpaper, animated scenery, interactive scenery and scenery with
+scripted entities are possible treatments. This is capability direction, not
+a mandatory ladder, four mutually exclusive modes or a claim of a shipped
+interactive-backdrop runtime. Turning off contextual content or props does
+not by itself specify collision or simulation participation. Define those
+controls by the effect they change rather than infer behavior from a class
+name. Context discovery, paint visibility, input interaction and physical
+participation are distinct questions.
+
+Mark describes the foreground as pinned, currently selected or recently
+interacted-with entities. This adds recent interaction to the foreground
+criteria in §9.2. Its duration and transition back to retained background
+membership remain to be designed; it does not repeal the previously selected
+material's availability until dismissed. Contextual relevance does not imply
+that an entity must be noninteractive, intangible or stored permanently.
+
+**Checked portable substrate at published Mere `773a0dc2`:**
+[Backdrop](../crates/cambium/scenes/sceno/src/scene.rs) already carries
+independent `visible` and `collidable` flags. It deliberately stays outside
+ordinary item picking. The canvas binder inspected separately at local main
+`d572b322` preserves that distinction, including invisible obstacles; its B1
+draft record is not a claim that this binder exists in the published baseline.
+Interactive props need a connection to scene entities and their existing
+input/action authority; painting a backdrop does not establish that connection.
+[AmbientSim](../crates/canvas/pictograph/src/canvas/ambient/mod.rs) is decorative
+animation, distinct from the contextual ambient nodes described here. Its
+advance/paint seam is not the interactive scenery or relation-lens contract.
+
+**Remaining design:** identify the reset baseline and what it restores.
+Resetting arrangement coordinates, rewinding animation and resetting a
+scripted world's state are separate effects. Their combination, camera and
+pin handling, undo and interaction with an open forme draft are not decided
+by renaming Clear to Reset. Depth and richer scenery also require a forcing
+consumer; today's portable 2D transform/footprint contract does not establish
+a complete spatial scene implementation.
+
+The [editor's B1 follow-through](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#b1--backdrops-in-the-graphshell-viewer-se86),
+[dynamics plan](mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md#backdrop-control-correction-2026-10-10)
+and [ambiance continuation](mere_docs/design/2026-09-23_ambiance_design.md#backdrop-and-context-distinction-2026-10-10)
+carry this correction. The shared design is recorded here; controls, legacy
+mode migration and richer input/runtime behavior remain implementation and
+design work with their existing owners.
+
+### 9.14 Design work ownership (2026-10-10)
+
+**Mark's allocation of the remaining design work:**
+
+| Work | Owner and scope |
+|---|---|
+| Scene authoring and presentation rules | A research lane; no individual owner named in this allocation. Carry forward the accepted rule direction and R1 evidence while researching broader authoring. |
+| Theme and typography roles | Tabard agent on q-pc. Editable theme definitions, semantic roles and typography customization. |
+| Selection, inspection and ambient context | Projection grammar agent, this conversation. Fundamentals are established; concentrate on remaining integration and concrete controls rather than another foundational design round. |
+| Field authoring and behavior | Projection grammar agent, this conversation. Membership, extent, placement, influence and projection, including the workbench/forme correspondence. |
+| Node, link and field editors | Projection grammar agent, this conversation. Inspect and edit the intended entity or occurrence through its existing authority. |
+| Visible dynamics explanations | Dynamics agent. Disclose applicable contributions, constraints and their effects through inspectable visual explanations. |
+| Script and motion authoring | Dynamics agent. Scripted behavior and authored motion, including the runtime side of field actions. |
+
+This allocation does not reopen the established distinction between selection,
+inspection and explicit open/focus. Deselection preserves edits; attention is
+separate from keeping, and foreground pins are separate from position pins.
+The [ambiance design](mere_docs/design/2026-09-23_ambiance_design.md) and
+Scenograph's selection rulings remain the starting contracts. Residual gesture,
+retention and linked-appearance integration should resolve specific gaps.
+
+For fields and primitive editors, the next design pass should make the
+inspect/configure loop concrete: which identity is edited, which members are
+affected, which placement constraints apply, and how overlapping fields are
+explained. Ordinary additive forces already compose; incompatible placement
+or state writers need explicit treatment. The agreed forme draft in §9.11
+supplies unlock, scoped undo/redo, discard and lock-and-apply behavior.
+
+Field authoring owns how a user selects members and configures a field's
+effects. The dynamics lane owns force execution, visual explanations and the
+script/motion authoring seam; their interface must describe targets, events
+and effects consistently. Theme values and font roles come from Tabard.
+Graphshell remains the reference host. Existing source authority, workbench
+arrangement ownership and site viewer ownership are preserved. This is a
+design allocation, not a new runtime receipt or a dispatch to another agent.
+
+### 9.15 Field and primitive editor draft (2026-10-10)
+
+Mark asked the projection grammar lane to proceed with its assigned design
+work. The [field authoring draft](mere_docs/implementation_strategy/2026-06-13_scriptable_field_regions_plan.md#field-authoring-draft-2026-10-10)
+specifies member/extent, placement, influence, projection, action and appearance
+controls. The [primitive editor draft](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#primitive-editor-draft-2026-10-10)
+specifies inspect/edit flows for content accesses, Resources, scene appearances,
+link bundles/source records and fields. These are reviewable proposals, not
+additional rulings. The established selection fundamentals and agreed forme
+draft behavior remain their starting contracts.
+
+Source at published Mere `86f2a3b8` supports a bounded workbench/forme bridge
+and existing-field inspection, with headed acceptance pending. It also exposes
+two editor gaps: overlapping field picking follows hash-map paint order, and
+the field-level strength shortcut reads one coupling but writes all of them.
+The drafts propose explicit edit targets and per-effect controls. They preserve
+the difference between declared arrangement membership, occurrence-local
+spatial eligibility and influence weight, and between an inspected link family
+and an exact source assertion.
+
+Open checkpoints are the spatial-membership test, incompatible exact-placement
+policy, membership-event causes and field/forme storage association. Refusing a
+conflicting placement edit and reporting initial matches without firing entry
+actions are recommendations pending rulings. Theme roles, presentation-rule
+precedence, visual force explanations and script execution remain with their
+assigned lanes. No runtime source or qualification was changed by this pass.
