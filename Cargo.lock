@@ -6697,6 +6697,7 @@ dependencies = [
  "cambium-winit-a11y",
  "chartulary",
  "chirograph",
+ "command-menu",
  "distillery",
  "dramatis",
  "edit-history",

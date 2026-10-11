@@ -694,7 +694,7 @@ and keyboard activation and a 420px viewport reach the new controls.
 Tab skips the disabled action, reaches it after selection, and graph input
 transfers DOM focus into the graph before traversal returns to the controls.
 
-### Graph gestures and contextual commands (2026-10-10, planned)
+### Graph gestures and contextual commands (2026-10-10; implementation started 2026-10-11)
 
 After reviewing the combined viewer captures, Mark asked for most controls to
 be integrated into graph interaction: drag the background to pan, use the
@@ -703,7 +703,7 @@ central to detail, context and rendering in this view; document-style wheel
 panning is not its useful default. Other actions can be graph affordances or
 commands through the context menu with the palette's search field.
 
-**Current findings:** background left-drag already pans in Pictograph
+**Baseline findings (before this continuation):** background left-drag already pans in Pictograph
 (`crates/canvas/pictograph/src/canvas/input.rs`, SE23–24 in the
 [Scenograph editor plan](2026-10-07_scenograph_editor_plan.md#13-the-canvas-and-command-rulings-2026-10-07)).
 The viewer's `canvas_gestures.rs` and `web_tree/gestures.rs` deliberately pass
@@ -742,6 +742,24 @@ Escape and focus return work through the accessible retained tree. Wide and
 narrow captures show readable graph content. Remove redundant always-visible
 navigation buttons only after those routes provide equivalent access; the
 existing toolbar remains until this target passes.
+
+**Implementation scope (2026-10-11):** Mark authorized continuing after an
+upstream refresh. Work starts from published `f8d8c1a79`, preserving the new
+Forme draft and access/link inspection adapters. This slice carries the
+viewer-supported camera, wheel preference and fold/evidence commands through
+Cambium's command model and retained text/button components. It does not
+implement new lens providers, field editors or scene materialization. CPU and
+Wasm checks precede a coordinated GPU/browser handoff; redundant toolbar
+navigation is removed only after command/gesture parity is demonstrated.
+
+**Validation so far:** the focused command, gesture, canvas-control and host
+dataset CPU suites pass (32 tests); the locked/offline viewer build and the
+main-page/applets Wasm check pass. The source-bound browser candidate is
+prepared under `Code/output/graphshell-viewer-commands-20261011/`. No new
+headed, GPU or visual acceptance is claimed. Toolbar navigation remains
+present while the serialized browser handoff is pending. The read-only viewer
+keeps menu choices only for its mounted lifetime; saved-product command-view
+persistence remains a migration target under SE31, not a new storage lane.
 
 ## 5. Stop rules
 

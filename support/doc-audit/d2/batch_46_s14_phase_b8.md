@@ -376,3 +376,14 @@ These symbols exist at base: OperationProcessor (stickleback/src/processor.rs), 
 - Genet* types: context.rs:71, pod.rs:29, runner.rs:1074. Deprecated Serval* aliases: cambium/src/lib.rs:226-239. Tab traversal tests: tests.rs:1230-1272.
 - Sampled genet stage commits exist (cc4b30a, ef4c026, e10a3211f82, 42d9d04c4e0, 1ea6ab4c153). pelt-live was retired in genet b108fb509ca; the status cites it only as history.
 - The cross-repo links use relative `../../../../genet/docs/` paths, which DOC_POLICY §5 discourages, but they resolve.
+
+### One-tree viewer controls continuation, 2026-10-11
+
+Incremental review of the command/gesture target in the one-tree plan: the
+implementation composes the existing command set and retained text/button
+components, keeps Fold membership and geometry ownership unchanged, and
+records CPU/Wasm evidence separately from pending headed acceptance. The
+original audit counts above remain historical. The toolbar is not retired
+before replacement access is demonstrated. SE31 session view persistence is
+explicitly retained as an open saved-product migration target; this read-only
+viewer does not create a second persistence mechanism.
