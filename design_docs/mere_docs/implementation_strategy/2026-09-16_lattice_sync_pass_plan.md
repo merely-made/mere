@@ -171,7 +171,7 @@ which does not record the filesystem path of a path package.
   pins with 1.98.1, track their portable locks, make build-script child commands
   locked, and explicitly qualify all three WASI guests before claiming them.
 - Crate-level cycle inventory: Mere's root points to `retinue`; Retinue's Mere
-  dependencies are in `apps/signalman` and `apps/signalman-desktop`. Mere also
+  dependencies are in `repos/retinue/apps/signalman` and `repos/retinue/apps/signalman-desktop`. Mere also
   consumes Knot's editor/document packages and Djinn consumes `knot-site`;
   Knot declares 35 Mere dependency/patch entries. This does not establish a
   removable shared-interface crate. Defer extraction until a concrete type or
@@ -316,7 +316,7 @@ all three. No pass can leave every pin at head, hence the cycle rule.
   (`conatus/quint`, `eidetic/codicil`, `eidetic/scholia`).
 - Hocket's config has 1 dead path of 40. It is not in the rulings, so it stays.
 - `hocket` and `ringdown` fetch with "Repository not found" from origin.
-- `crates/cargo-gpu` holds one unpushed commit pointing spirv-builder at the
+- `crates/cargo-gpu` *(historical citation)* <!-- doc-audit: historical-path --> holds one unpushed commit pointing spirv-builder at the
   local rust-gpu fork. It is local by design and stays unpushed.
 - Rev pins on `mark-ik/*` forks (isometry, retinue and netrender on vello; genet
   on boa) are Mark's to move and are left alone.

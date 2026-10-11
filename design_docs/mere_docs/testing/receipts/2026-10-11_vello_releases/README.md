@@ -1,5 +1,8 @@
 # Mere Vello release adoption — 2026-10-11
 
+**Status:** Historical receipt at the recorded source revisions. Later stack
+repins require their own qualification.
+
 Status: passed for the scoped consumer and CPU adoption. Consumer, Wasm target
 and direct Pictograph adapter compilation passed on the final base. All twelve
 refreshed production CPU comparisons passed. Root metadata and boundary reruns
@@ -101,3 +104,10 @@ GPU pixel parity, full producer external-resource replay, native or browser
 presentation, input/accessibility acceptance, and driver-reset recovery require
 their coordinated validation receipts. This directory does not claim those
 gates passed.
+
+## Source-header amendment (2026-10-11)
+
+The retained probe source now carries its MPL-2.0 Exhibit A header. Runtime
+code is unchanged. `identity.json` retains the qualified original source hash
+and records the current header-added hash separately; prior compile and pixel
+receipts continue to describe the original input bytes.

@@ -1206,7 +1206,7 @@ The current [family composition research review](../../2026-08-12_family_composi
 distinguishes identification, interpretation and authorized action. Shared
 addresses and causal references provide the first; compatible domain profiles
 or adapters provide the second; accepted policy and named capabilities provide
-the third. The [Fleece/Eidetic capability plan](../../eidetic_docs/implementation_strategy/2026-10-11_fleece_eidetic_capability_plan.md)
+the third. The [Fleece/Eidetic capability plan](../../archive_docs/2026-10-11_completed_plans/2026-10-11_fleece_eidetic_capability_plan.md)
 places gathering and explicit capture in Fleece and durable typed content in
 Eidetic, while graph mutation, session authority and retention policy retain
 their domain owners. A replication frontier or checkpoint notice does not grant
