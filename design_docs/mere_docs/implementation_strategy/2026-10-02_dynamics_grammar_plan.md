@@ -1475,3 +1475,21 @@ multiple assertions; choosing a richer explanation seam remains design work.
     - Headed, on that bundle (`receipts-merged.log`; ports 9180 to 9196, one port and Chrome profile per receipt): 16 of 16 pass. They are the eleven `p4_tree_physics_*` law receipts, `physics_profiles` on both pages, `scene_save_reopen`, `codicil_grouping` and Density's tree control. The page-error control fails by the receipt gate, as it should. Load during the set averaged 51 %, at most 63 %.
     - The release receipts (Density's and F73's five, `release-receipts-merged.log`): 5 passed. `compare-release.py` against rapier-036's clean round at `f8ced613` held 62 of 62 figure lines unchanged (`compare-release-merged.log`). Load during the run averaged 40 %, at most 76 %, its own release build included.
   - No number moved.
+
+## Backdrop control correction (2026-10-10)
+
+Mark's [design-language correction, §9.13](../../2026-08-23_projection_scenes_and_graph_native_platform.md#913-backdrop-context-props-and-reset-2026-10-10)
+separates Reset from contextual ambient content, prop display, animated or
+interactive scenery, and physical participation. A backdrop is a scene set;
+props can have authored attributes and scripted behavior. Ambient nodes are
+contextual entities, not necessarily decorative animation or intangible
+bodies. Their roles do not imply collision masks or install a force.
+
+The portable backdrop's independent visibility/collision contract and the
+minimum static-obstacle binder remain applicable. Interactive or moving
+scenery requires its entity/action and runtime integration, rather than
+expanding the decorative `AmbientSim` paint seam by assumption. Reset's target
+baseline and whether it also rewinds animation/scripted state remain design
+questions. Coordinate reset, simulation reset and content/source undo must
+not be silently conflated. This is a consumer-control correction, not a new
+F ruling, changed force-composition policy or a qualification of B1.
