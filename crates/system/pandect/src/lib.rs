@@ -40,17 +40,13 @@
 
 #![doc(html_root_url = "https://docs.rs/host-runtime/0.0.1")]
 
-// Durable web-content cache over an eidetic Store (wasm-clean; the host supplies
-// the concrete backend). Persists fetched pages / subresources so a reload need
-// not re-fetch.
-pub mod content_store;
 // Application-scoped preferences live under the host's data root rather than
 // in one session's settings sidecar.
 pub mod addressable_graph;
 pub mod application_settings_store;
 // Durable content-addressed store for node preview imagery (favicons, previews,
-// snapshots) — the sibling of content_store, keyed by BLAKE3 digest so identical
-// images dedup. The pixels live here; the kernel Node holds only an ImageRef.
+// snapshots). Eidetic owns the content-addressed bytes; this adapter owns
+// ImageRef conversion and graph-aware retention decisions.
 pub mod image_store;
 // Per-node browser-state working set (scroll / form draft / viewer override /
 // compat mode / content-on / page-zoom scale) — browser-runtime state that
@@ -77,9 +73,6 @@ pub mod shared_root;
 // graph.json. The durable home the bespoke per-node sidecars (browser/participant/
 // arrangement) converge onto. Wraps chartulary's FacetStore.
 pub mod facet_store;
-// Mere-side adapter from eidetic SchemaDefinition codicils to chartulary's
-// synchronous FacetValidator seam.
-pub mod schema_facets;
 // The arrangement.* facet namespace: cartography's per-node data (position
 // first; size/sprite/hull/material/face follow) as facets in facets.json —
 // born as facets, since the bespoke cartography sidecar was never wired.
@@ -177,6 +170,12 @@ pub use device_settings_store::{
     QuietHoursSettings, StatedConditionSettings, device_settings_exist, device_settings_path,
     load_device_settings, save_device_settings,
 };
+/// Compatibility names for published consumers. Schema content and validation
+/// are implemented by Eidetic; new callers use `eidetic::schema_facets`.
+pub use eidetic::schema_facets::{
+    ContentClassCodicil, SchemaFacetValidator, content_class_schema_definition,
+    content_class_schema_ref, load_content_class, save_content_class,
+};
 pub use engine_profile_store::{
     ENGINE_PROFILES_DIR, EngineProfileScope, GRAPHS_DIR, PERSONAS_DIR, SESSIONS_DIR,
     engine_profile_path, engine_profile_path_for_session,
@@ -227,10 +226,6 @@ pub use scene_facets::{
     DEFAULT_PHYSICS_DAMPING, SCENE_IMPORTANCE_METRIC, SCENE_PHYSICS_DAMPING, SCENE_SIZE_BY_DEGREE,
     SCENE_SIZE_BY_IMPORTANCE, SceneFacets, copy_scene_facets, read_scene_facets,
     write_scene_facets,
-};
-pub use schema_facets::{
-    ContentClassCodicil, SchemaFacetValidator, content_class_schema_definition,
-    content_class_schema_ref, load_content_class, save_content_class,
 };
 #[cfg(not(target_arch = "wasm32"))]
 pub use script_bindings_store::{SCRIPT_BINDINGS_FILENAME, ScriptBinding};

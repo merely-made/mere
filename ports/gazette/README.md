@@ -64,7 +64,7 @@ NIP-05 and checked PLC resolution remain open.
 
 **Unbuilt:** attaching the Ledger and recipient picker to the live
 [gaz](https://crates.io/crates/gaz) store in a host, feed polling (whose engine is
-`mere-crawl`), and the reading room over extracted articles.
+`fleece::crawl`), and the reading room over extracted articles.
 
 WebFinger's wire code moves to
 [finger-protocol](https://crates.io/crates/finger-protocol)'s sans-io

@@ -15,9 +15,9 @@
 //! not by name similarity: the point of importing a transition is that the
 //! behavioural lane can tell a typed address from a subframe load.
 
-use eidetic::browsing::{BrowsingTrace, PageRef, TraceEvent, TraceTransition};
+use crate::browsing::{BrowsingTrace, PageRef, TraceEvent, TraceTransition};
 
-use crate::{HistoryTransitionKind, ImportedHistoryVisitItem};
+use super::{HistoryTransitionKind, ImportedHistoryVisitItem};
 
 /// Events per stored trace segment. Matches turnstone's own `SEGMENT_SIZE`, so
 /// an imported corpus segments the way a captured one does and the two are
@@ -78,10 +78,7 @@ pub fn history_event(item: &ImportedHistoryVisitItem) -> TraceEvent {
 }
 
 /// Imported visits as one owner's trace corpus, at the default segment size.
-pub fn history_to_traces(
-    items: &[ImportedHistoryVisitItem],
-    owner: &str,
-) -> Vec<BrowsingTrace> {
+pub fn history_to_traces(items: &[ImportedHistoryVisitItem], owner: &str) -> Vec<BrowsingTrace> {
     history_to_traces_with(items, owner, HISTORY_SEGMENT_SIZE)
 }
 
@@ -114,7 +111,7 @@ pub fn history_to_traces_with(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ImportedPageSeed;
+    use crate::import::ImportedPageSeed;
 
     fn visit(
         url: &str,
@@ -143,7 +140,7 @@ mod tests {
 
     #[test]
     fn transitions_map_onto_the_frecency_weights_they_were_chosen_for() {
-        use eidetic::browsing::frecency::TransitionWeights;
+        use crate::browsing::frecency::TransitionWeights;
         let weights = TransitionWeights::default();
         let weight_of = |kind: HistoryTransitionKind| weights.of(TraceTransition::from(&kind));
         assert_eq!(weight_of(HistoryTransitionKind::Typed), 20.0);

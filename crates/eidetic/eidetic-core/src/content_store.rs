@@ -12,13 +12,13 @@
 //! under `content/body/<url>`, with the response content-type alongside under
 //! `content/ct/<url>`. The host supplies the concrete [`Store`] (fjall on native,
 //! OPFS on wasm), so this seam is backend- and host-agnostic — hence wasm-clean,
-//! unlike the filesystem [`session_graph_store`](crate::session_graph_store).
+//! unlike the filesystem Pandect session graph persistence.
 //!
 //! These calls are `async` (the `Store` trait is, for wasm OPFS). A native host
-//! `pollster::block_on`s them over an `eidetic::fjall` store whose futures are
+//! `pollster::block_on`s them over an `muniment::fjall_backend` store whose futures are
 //! ready, so the call is effectively synchronous on the UI thread.
 
-use eidetic::{Result, Store};
+use crate::{Result, Store};
 
 /// Blob-key prefixes, namespacing cached content away from the manifests /
 /// schemas / typed payloads that may share the same store.
@@ -84,8 +84,6 @@ pub async fn evict_content(store: &mut dyn Store, url: &str) -> Result<bool> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use async_trait::async_trait;
-    use std::collections::HashMap;
 
     /// Minimal in-memory [`Store`] for the round-trip tests (mirrors the one in
     /// eidetic's own tests).

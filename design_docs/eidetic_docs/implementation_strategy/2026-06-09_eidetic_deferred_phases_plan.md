@@ -26,6 +26,11 @@ pulls.
 
 ---
 
+**Amended 2026-10-11:** the capability shuffle moves Fjall to Muniment and concrete
+HTTPS/Iroh blob acquisition to Fetch (`https-blobs`, `iroh-blobs`). Eidetic keeps
+manifest contracts, hashing, typed retained content and portable intake. See
+[the active gathering/intake plan](2026-10-11_fleece_eidetic_capability_plan.md).
+
 ## Phases
 
 ### Phase 7 — `eidetic-opfs` (browser Store backend)
