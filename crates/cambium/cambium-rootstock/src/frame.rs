@@ -34,10 +34,17 @@ fn elapsed_us(elapsed: crate::Duration) -> u64 {
 struct SpriggingSource<'a> {
     rendered: &'a sprigging::RenderedLeaves,
     producers: &'a crate::ProducerRegistry,
+    portable: Option<&'a crate::producer::registry::PortablePlan>,
 }
 
 impl SpriggingSource<'_> {
     fn leaf_commands(&self, key: u64) -> Option<Vec<paint_list_api::PaintCmd>> {
+        if let Some(plan) = self.portable {
+            return plan
+                .commands(key)
+                .or_else(|| self.producers.contains(key).then(Vec::new))
+                .or_else(|| self.rendered.get(key).map(<[_]>::to_vec));
+        }
         self.producers
             .commands(key)
             .or_else(|| self.rendered.get(key).map(<[_]>::to_vec))
@@ -439,7 +446,12 @@ where
     /// Emit this frame's paint list with selection and caret inside the text
     /// field's CSS paint context, then any active overlay scrollbars, and
     /// lower it to a netrender scene plus the GPU resources that scene names.
-    fn emit_scene(&mut self, lw: f32, lh: f32) -> Option<EmittedScene> {
+    fn emit_paint_list(
+        &mut self,
+        lw: f32,
+        lh: f32,
+        portable: Option<&crate::producer::registry::PortablePlan>,
+    ) -> Option<genet_livery::LiveryPaintList> {
         let focused_overlay = self.focused_overlay();
         let runner = self.s.runner.as_ref()?;
         let layout = self.s.layout.as_mut()?;
@@ -449,6 +461,7 @@ where
         let source = SpriggingSource {
             rendered: &self.s.shared.rendered,
             producers: &self.s.shared.producers,
+            portable,
         };
         let mut list = layout.emit_paint_list_with_leaves(
             &view,
@@ -466,6 +479,52 @@ where
         let now = crate::Instant::now();
         let fade = &self.s.scrollbar_fade;
         layout.append_scrollbars(&view, &mut list, &|t| fade.alpha(t, now));
+        Some(list)
+    }
+
+    /// Capture the current retained layout and actual producer callbacks without
+    /// acquiring a device. Call frame preparation and relayout before this, as
+    /// the host does for a presented frame. No cache/lifecycle commit precedes
+    /// complete envelope admission.
+    pub fn capture_portable(
+        &mut self,
+    ) -> Result<crate::PortablePaintCapture, crate::PortableCaptureError> {
+        use crate::PortableCaptureError;
+        let scale = self.layout_scale() as f32;
+        let plan = {
+            let runner = self
+                .s
+                .runner
+                .as_ref()
+                .ok_or(PortableCaptureError::MissingLayout)?;
+            let layout = self
+                .s
+                .layout
+                .as_ref()
+                .ok_or(PortableCaptureError::MissingLayout)?;
+            let dom = runner.dom();
+            let dom = dom.borrow();
+            let view = crate::WindowDom::new(&dom, runner.mount());
+            let shared = &mut self.s.shared;
+            let held = &shared.held_elsewhere;
+            shared
+                .producers
+                .plan_portable(layout, &view, scale, &|key, owner| {
+                    held.contains(&key) || owner.is_some_and(|node| view.elsewhere(node))
+                })?
+        };
+        let (width, height) = self.s.layout_size;
+        let list = self
+            .emit_paint_list(width, height, Some(&plan))
+            .ok_or(PortableCaptureError::MissingLayout)?;
+        self.s
+            .shared
+            .producers
+            .admit_portable(plan, PaintEnvelope::from_list(&list))
+    }
+
+    fn emit_scene(&mut self, lw: f32, lh: f32) -> Option<EmittedScene> {
+        let list = self.emit_paint_list(lw, lh, None)?;
         let paint_capture = self
             .s
             .pending_paint_capture

@@ -41,16 +41,16 @@ cambium = { path = "../../cambium" }
 # genet engine core. These were relative paths into genet's `components/`;
 # from mere they are git pins at the revision every genet.git pin in this
 # repository names.
-genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", rev = "cec760f4ae6ce336823bc2be250d9ab4e35a8a47" }
-genet-livery = { git = "https://github.com/merely-made/genet.git", rev = "cec760f4ae6ce336823bc2be250d9ab4e35a8a47" }
+genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", rev = "4bc75583865c2fb862b7acd7fe16dc28eb591042" }
+genet-livery = { git = "https://github.com/merely-made/genet.git", rev = "4bc75583865c2fb862b7acd7fe16dc28eb591042" }
 
 # rasterizer stack — git deps matching the genet workspace's own
 # netrender source, so paint_list_api unifies with genet-livery's copy
 # (the per-target-webgpu commit is on main; the netrender_smoke pattern).
-netrender = { git = "https://github.com/merely-made/netrender.git", rev = "46606610cd387e2e6956d8a3ebbcf442eab210d9" }
-netrender_device = { git = "https://github.com/merely-made/netrender.git", rev = "46606610cd387e2e6956d8a3ebbcf442eab210d9" }
-paint_list_api = { git = "https://github.com/merely-made/netrender.git", rev = "46606610cd387e2e6956d8a3ebbcf442eab210d9" }
-paint_list_render = { git = "https://github.com/merely-made/netrender.git", rev = "46606610cd387e2e6956d8a3ebbcf442eab210d9" }
+netrender = { git = "https://github.com/merely-made/netrender.git", rev = "ef5412d760a978584c8c1801e8a765c51aecd403" }
+netrender_device = { git = "https://github.com/merely-made/netrender.git", rev = "ef5412d760a978584c8c1801e8a765c51aecd403" }
+paint_list_api = { git = "https://github.com/merely-made/netrender.git", rev = "ef5412d760a978584c8c1801e8a765c51aecd403" }
+paint_list_render = { git = "https://github.com/merely-made/netrender.git", rev = "ef5412d760a978584c8c1801e8a765c51aecd403" }
 
 wgpu = { version = "30", default-features = false, features = ["std", "wgsl", "webgpu"] }
 
@@ -74,13 +74,13 @@ console_error_panic_hook = "0.1"
 [patch.crates-io]
 # Keep the standalone smoke on this checkout's current scripted-DOM and
 # render-neutral DOM contracts instead of a previously published graph.
-genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", rev = "cec760f4ae6ce336823bc2be250d9ab4e35a8a47", version = "=0.1.2" }
-layout-dom-api = { git = "https://github.com/merely-made/genet.git", rev = "cec760f4ae6ce336823bc2be250d9ab4e35a8a47", version = "=0.1.1" }
+genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", rev = "4bc75583865c2fb862b7acd7fe16dc28eb591042", version = "=0.1.2" }
+layout-dom-api = { git = "https://github.com/merely-made/genet.git", rev = "4bc75583865c2fb862b7acd7fe16dc28eb591042", version = "=0.1.1" }
 # Published Genet Taffy fork, locally patched to this checkout for smoke builds.
 # The exact versions pick one package each: genet holds two `genet-taffy`s.
-genet-taffy = { git = "https://github.com/merely-made/genet.git", rev = "cec760f4ae6ce336823bc2be250d9ab4e35a8a47", version = "=0.14.0" }
+genet-taffy = { git = "https://github.com/merely-made/genet.git", rev = "4bc75583865c2fb862b7acd7fe16dc28eb591042", version = "=0.14.0" }
 # ahash runtime-rng/getrandom-0.3 drop for the wasm graph.
-sonic-rs = { git = "https://github.com/merely-made/genet.git", rev = "cec760f4ae6ce336823bc2be250d9ab4e35a8a47" }
+sonic-rs = { git = "https://github.com/merely-made/genet.git", rev = "4bc75583865c2fb862b7acd7fe16dc28eb591042" }
 # Classic 0.11 and its owned repairs; standalone patches are not inherited.
 netrender-vello = { git = "https://github.com/mark-ik/vello", rev = "5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a" }
 vello_encoding = { git = "https://github.com/mark-ik/vello", rev = "5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a" }

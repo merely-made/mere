@@ -1,0 +1,26 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `netrender_text v0.1.1 (/Users/markik/Code/worktrees/netrender-cambium-resource-bridge/netrender_text)` was not used in the crate graph
+help: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+   Compiling cambium-rootstock v0.1.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium-rootstock)
+    Finished `test` profile [unoptimized] target(s) in 8.19s
+     Running unittests src/lib.rs (/Users/markik/Code/targets/vello-producer-gates-20261011/debug/deps/cambium_rootstock-ce269b6b69cbd68b)
+
+running 5 tests
+test producer::registry::portable::tests::default_gpu_only_source_refuses_without_registry_mutation ... ok
+test producer::registry::portable::tests::late_whole_envelope_refusal_preserves_prior_stamps_and_registration ... ok
+test producer::registry::portable::tests::oversized_callback_scene_refuses_before_digest_and_preserves_accepted_stamp ... ok
+test producer::registry::portable::tests::portable_refusal_preserves_live_gpu_view_and_stamp ... ignored, real-device cache proof; root serializes GPU acceptance
+test producer::registry::portable::tests::two_source_aggregate_refusal_preserves_all_accepted_metadata ... ok
+
+test result: ok. 4 passed; 0 failed; 1 ignored; 0 measured; 75 filtered out; finished in 0.41s
+

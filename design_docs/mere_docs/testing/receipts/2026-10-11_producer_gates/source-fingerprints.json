@@ -1,0 +1,19 @@
+{
+  "netrender": "ef5412d760a978584c8c1801e8a765c51aecd403",
+  "genet": "4bc75583865c2fb862b7acd7fe16dc28eb591042",
+  "vello_provider": "5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a",
+  "mere_source_sha256": {
+    "Cargo.toml": "79a88c1007a3216affbd46d6bea84a57bc3e79c03f12f488a0a6f5c4f0d7fdfd",
+    "Cargo.lock": "1c3f8e3027dda214b5c9a916dbed79044e94a492edd2f996034dddc64df17bcf",
+    "crates/cambium/cambium-rootstock/src/producer/portable.rs": "6f5131225f1acbd04c4ee1b0d972ed5e8f025635765182de902fc010f3da1906",
+    "crates/cambium/cambium-rootstock/src/frame.rs": "35975500ea3ef9470580f4fb596485b901a5127d73ced08460eb87ec7de143fc",
+    "crates/cambium/cambium-genet-winit-host/src/scene_producer.rs": "d545619db1b65235b8b28e7974259b5e0cc68a79a1940d9f1d0957d0f3a0fe83",
+    "crates/cambium/cambium-genet-winit-host/src/harness.rs": "33aa1fc3e5cf4b68e0ff4921bac72d79751c5ab3c02603fd0813a3034de1c60a",
+    "crates/cambium/cambium/src/slider.rs": "7d3285cc8b9c4b8ddce05c0943f2301c682e4785da3e4e803281e188ddabb9b4",
+    "crates/cambium/tabard-workshop/tests/portable_capture.rs": "887de80a24322e3d04dd3b4f727471d2b37d65fb5718f72fb343551e81922f99",
+    "crates/cambium/tabard-workshop/tests/release_host_acceptance.rs": "bb5116c6471f46099dacef34aac9f5521b7136639315f2d2501cf49b4f6b70fd",
+    "crates/cambium/tabard-workshop/tests/release_device_rehydration.rs": "cabb84fbd39f2c10da0135c33f7139bbaa2b24360d14b9ac824642087395d132",
+    "ports/tabard/desktop/scenarios/release_presentation.scn": "96f64dd4a425a0978ed366cb3c6823d1cc675f85fe46a82dfa130366409c27cf"
+  },
+  "scope": "published dependency pins and exact candidate source file fingerprints; runtime receipts keep separate executable hashes"
+}
