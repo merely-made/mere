@@ -152,3 +152,21 @@ pub async fn execute_at(endpoint: &str, request: Request) -> Reply {
 pub fn endpoint() -> String {
     configured_app_endpoint()
 }
+
+/// Reveal a newly focused control without undoing deliberate wheel scrolling.
+/// Shared by the native window and the retained interaction receipt.
+pub fn host_hooks() -> cambium_genet_winit_host::HostHooks<State, views::Logic, views::Child> {
+    use cambium_genet_winit_host::{HostHooks, ScrollAlign};
+    let mut hooks: HostHooks<State, views::Logic, views::Child> = HostHooks::inert();
+    let mut followed = None;
+    hooks.after_dispatch = Box::new(move |ctx| {
+        let focus = ctx.runner.focus();
+        if focus != followed {
+            followed = focus;
+            if let Some(node) = focus {
+                ctx.scroll_into_view(node, ScrollAlign::Nearest);
+            }
+        }
+    });
+    hooks
+}

@@ -163,7 +163,7 @@ pub fn root(state: &State) -> Child {
 pub const SHEET: &str = r#"
 html { background: #f4f1e9; color: #25251f; font-family: system-ui; }
 body { margin: 0; }
-main { padding: 24px; max-width: 820px; }
+main { padding: 24px; max-width: 820px; height: 100vh; box-sizing: border-box; overflow-y: auto; overflow-x: hidden; }
 h1 { font-size: 30px; margin: 0 0 8px; }
 h2 { font-size: 20px; margin: 24px 0 12px; }
 h3 { font-size: 17px; margin: 0 0 8px; }
