@@ -100,6 +100,7 @@ def main():
     owned = subprocess.check_output(["git", "ls-files", "ports/castellan", "ports/djinn", "ports/graphshell", "ports/dramatis"],cwd=ROOT,text=True).splitlines() + ["Cargo.toml", "Cargo.lock"]
     for p in [ROOT/name for name in owned if name.endswith((".rs", ".toml", "Cargo.lock"))]:
         hashes[p.relative_to(ROOT).as_posix()]=hashlib.sha256(p.read_bytes()).hexdigest()
+    executables={name:hashlib.sha256((TARGET/"debug"/name).read_bytes()).hexdigest() for name in ["dramatis-ui.exe","dramatis-review-host.exe"]}
     artifacts={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in OUT.iterdir() if p.suffix in [".png",".log"]}
-    (OUT/"receipt.json").write_text(json.dumps({"platform":"Windows native Cambium/Genet","base":subprocess.check_output(["git","rev-parse","HEAD"],cwd=ROOT,text=True).strip(),"commands":records,"source_sha256":hashes,"artifacts_sha256":artifacts,"restored_consent_sha256":hashlib.sha256(original).hexdigest(),"scope":"synthetic fixtures; no actual vault; native captures require separate visual review; consent gate restored byte-exact"},indent=2)+"\n",encoding="utf-8")
+    (OUT/"receipt.json").write_text(json.dumps({"platform":"Windows native Cambium/Genet","base":subprocess.check_output(["git","rev-parse","HEAD"],cwd=ROOT,text=True).strip(),"commands":records,"source_sha256":hashes,"executables_sha256":executables,"artifacts_sha256":artifacts,"restored_consent_sha256":hashlib.sha256(original).hexdigest(),"scope":"synthetic fixtures; no actual vault; native captures require separate visual review; consent gate restored byte-exact"},indent=2)+"\n",encoding="utf-8")
 if __name__=="__main__": main()

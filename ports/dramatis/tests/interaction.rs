@@ -4,7 +4,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 //! Production retained views, layout, focus and action routing.
-use cambium_genet_winit_host::{Harness, NamedKey};
+use cambium_genet_winit_host::{Harness, Key, KeyPress, NamedKey};
 use dramatis::{
     roster::{Roster, RosterEntry},
     view::VaultLockView,
@@ -90,7 +90,12 @@ fn keyboard_reconnect_and_pointer_persona_selection_use_the_real_controls() {
     let mut h = host(false, false, 860.0);
     h.tab(true);
     assert!(h.focus().is_some());
-    h.key_named(NamedKey::Enter);
+    h.press_key(&KeyPress {
+        key: Key::Named(NamedKey::Enter),
+        text: None,
+        modifiers: Default::default(),
+        repeat: false,
+    });
     assert!(matches!(h.state().request, Some(Request::Refresh)));
     h.update(|s| {
         s.busy = false;
