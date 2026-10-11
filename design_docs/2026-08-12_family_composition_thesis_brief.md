@@ -1032,8 +1032,9 @@ completed general clip system:
   surface graphs with explicit shown-resource bindings.
   [`SourceRef` and scene instances](../crates/cambium/scenes/sceno/src/scene.rs)
   distinguish source identity from projected occurrences.
-- [`write_clip_node`](../crates/import/src/web_clip.rs) creates editable Knot
-  content from a selected web fragment and asserts `ClippedFrom` provenance.
+- [`write_clip_node`](../crates/mere/src/clip.rs) records a caller-formatted clip
+  and asserts resource `ClippedFrom` provenance. Semantic clip lowering belongs
+  to [Fleece](../crates/fleece/src/clip.rs); the receiving document owns formatting.
   Image storage remains caller-owned. This does not establish the proposed
   captured-version policy or a general compound media package.
 - Fleece (`genet/components/fleece/README.md` and

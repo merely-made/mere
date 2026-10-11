@@ -731,18 +731,17 @@ taffy = { package = "genet-taffy", version = "=0.14.0", git = "https://github.co
 # `parley` and a patch row here would match no package and fail resolution.
 # genet-livery reaches the fork by path inside the git checkout, and Mere's own
 # `parley` workspace dep names the fork by package (see [workspace.dependencies]).
-# The tagged `mere-p2panda-net =0.7.5` fork release owns the exact-ALPN net
-# crate and its seven sibling packages. The correctly named net patch supplies
-# the renamed package while the sibling patches keep the dalek-3 family on the
-# same immutable release tag.
-mere-p2panda-net = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5" }
-p2panda-auth = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5" }
-p2panda-core = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5" }
-p2panda-discovery = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5" }
-p2panda-encryption = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5" }
-p2panda-store = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5" }
-p2panda-stream = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5" }
-p2panda-sync = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5" }
+# The upstream-20261011 compatibility tag keeps net =0.7.5 for the pinned
+# Knot supplier while adopting current upstream. Net and its seven sibling
+# packages share one immutable source; fork main also offers net 0.7.6.
+mere-p2panda-net = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261011" }
+p2panda-auth = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261011" }
+p2panda-core = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261011" }
+p2panda-discovery = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261011" }
+p2panda-encryption = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261011" }
+p2panda-store = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261011" }
+p2panda-stream = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261011" }
+p2panda-sync = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261011" }
 
 # ─── LAN peer discovery (H10): one dead theory ───────────────────────────────
 # swarm-discovery 0.6.3 keeps its sockets for the life of the process. The
