@@ -538,5 +538,13 @@
       "bytes": 26022
     }
   ],
-  "mere_source_commit": "e3ed4d65d31b27c21aa8322a4546982173ed1d33"
+  "mere_source_commit": "e3ed4d65d31b27c21aa8322a4546982173ed1d33",
+  "retained_source_header_amendment": {
+    "date": "2026-10-11",
+    "path": "probe/src/main.rs",
+    "qualified_original_sha256": "0f82ab4fd6eadca9c0027a6c63cc519b6b4c2b6e656eeb4014f55383bd46692e",
+    "current_header_added_sha256": "8bf6fc229b5298846fdd6d484f54a60df02e11302526c68cff9aabe9cece1cac",
+    "runtime_changed": false,
+    "line_endings": "LF, pinned by .gitattributes"
+  }
 }

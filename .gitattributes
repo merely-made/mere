@@ -80,3 +80,6 @@ ports/distillery/probe/receipts/2026-09-30_pre4_allocator_control.log -text
 ports/distillery/probe/receipts/2026-09-30_pre4_allocator_completion_poll.log -text
 # Preserve the exact tested standalone dependency receipt across checkouts.
 design_docs/cambium_docs/testing/receipts/generated-names/graphshell-web-Cargo.lock.txt text eol=lf
+
+# Preserve the amended source bytes alongside the Vello qualification hashes.
+design_docs/mere_docs/testing/receipts/2026-10-11_vello_releases/probe/src/main.rs text eol=lf

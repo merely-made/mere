@@ -326,7 +326,7 @@ baseline rather than a reproducible test receipt. Repin before experiments.
 - Genet `components/shared/document-session-api/src/session_engine.rs` keeps
   sessions single-owner and host-driven. `pump(now_ms)` and `settled()` expose
   driving and quiescence, without a deadline or an external-wake contract.
-  `ports/ortet/src/shell.rs` currently redraws while unsettled.
+  `genet/ports/ortet/src/shell.rs` currently redraws while unsettled.
 - Genet `components/script-runtime-api/lib.rs` already exposes timer delay,
   worker work/pumping and worker shutdown. In the inspected
   `components/genet-scripted/document.rs`, the Livery pump advances timers,
@@ -335,9 +335,9 @@ baseline rather than a reproducible test receipt. Repin before experiments.
   evidence that worker support is absent from the runtime.
 - Genet `components/genet-render-host/src/lib.rs` and Netrender
   `netrender/src/renderer/init.rs` already place device creation with the
-  embedder. Isometry `crates/isometry-runtime/src/render.rs` owns its tenant
+  embedder. Isometry `crates/isometry-runtime/src/render.rs` *(historical citation)* <!-- doc-audit: historical-path --> owns its tenant
   and stale-view refusal. Mesocosm
-  `crates/mesocosm-core/src/voxel_profile.rs` gates disposable derived state
+  `repos/isometry/mesocosm/crates/mesocosm-runtime/src/voxel_profile.rs` gates disposable derived state
   against durable source revisions. These challenge lifetime assumptions
   without requiring the same clock or a universal resource lease.
 
@@ -395,7 +395,7 @@ Evidence homes are Genet `components/genet-scripted-dom/lib.rs`,
 `crates/eidetic/muniment/src/blob.rs`,
 `crates/eidetic/eidetic-core/src/deleted.rs` and `schema.rs`; Turnstone
 `src/action.rs` and
-`design_docs/2026-09-05_reader_appearance_isolation_plan.md`.
+`repos/turnstone/design_docs/2026-09-05_reader_appearance_isolation_plan.md`.
 
 Genet's current arena fence is enabled only on 64-bit debug builds. Release
 and wasm need an explicit refusal/translation contract for foreign handles.
@@ -418,7 +418,7 @@ preserves required DOM identity and references; it cannot simply reinterpret
 a raw id in another arena. A globally shared arena is not required by either
 design.
 
-Turnstone's `design_docs/2026-08-28_page_capture_plan.md` already scopes P2/P3:
+Turnstone's `repos/turnstone/design_docs/2026-08-28_page_capture_plan.md` already scopes P2/P3:
 freeze the session, durable node, document/navigation generation and
 surface/request correlation at capture start; attach to that exact target or
 refuse a stale completion. Engine results supply observed facts. The domain
@@ -602,7 +602,7 @@ Existing owner plans remain the implementation homes.
 | S4 | Genet G5 handle implementation | Implement the selected boundary, with foreign/stale refusal and exhaustion tests through the supported backends and compiled target configurations; retain a separate wasm residual if it is not executed | Open: discard unused parallel-handle sketch; migrate approximately 70 runtime conversions coherently with semantic NodeId, high-bit engine and wasm execution gates |
 | S5 | Genet runtime worker delivery | Run actual runtime message/timer/completion and shutdown assertions, including duplicate/stale cases, with a named regression manifest and isolated build provenance | Real Boa Runtime probe passes with pinned overlay: timer-only negative, worker-pump delivery and acknowledged idle; Genet S2/S5 backend receipt checked in; shutdown, stale and duplicate runtime cases remain open |
 | S6 | Genet session drive contract | Expose the selected minimal runnable/deadline/external facts and lossless wake/cancellation protocol through a real retained session; test completion during registration and replacement | S6a committed `790ba660396`: worker forwarding and retained loader implemented; 2 actual Boa document tests pass (reply/reaction, freeze/resume, missing-route error and idle), preforward negative fails; automatic session-loader wiring, Livery/Nova and additive wake/drive gates remain open |
-| S7 | Genet Ortet O5 integration | Wire native host wake and replacement to the real scripted session and obtain explicit Boa/Nova host receipts; automated conformance remains with genet-wpt | Native O5 hosting for Boa and Nova accepted 2026-09-08 (`genet/design_docs/2026-09-03_ortet_founding_plan.md`). G5 headed arena sequence accepted on both engines 2026-09-09 on branch `slice/s7-ortet-g5-20260909` (`genet/design_docs/receipts/2026-09-09_g5_ortet/receipt.md`); found and fixed Boa `force_gc` never calling `clear_kept_objects`; residual: page-level `WeakRef` over a DOM reflector never reports collection under Boa, folded into the realms lane. Merge into genet main waits on the realms continuation committing. AccessKit bridge-action receipt still open |
+| S7 | Genet Ortet O5 integration | Wire native host wake and replacement to the real scripted session and obtain explicit Boa/Nova host receipts; automated conformance remains with genet-wpt | Native O5 hosting for Boa and Nova accepted 2026-09-08 (`genet/design_docs/2026-09-03_ortet_founding_plan.md`). G5 headed arena sequence accepted on both engines 2026-09-09 on branch `slice/s7-ortet-g5-20260909` (`genet/design_docs/receipts/2026-09-09_g5_ortet/receipt.md` *(historical citation)* <!-- doc-audit: historical-path -->); found and fixed Boa `force_gc` never calling `clear_kept_objects`; residual: page-level `WeakRef` over a DOM reflector never reports collection under Boa, folded into the realms lane. Merge into genet main waits on the realms continuation committing. AccessKit bridge-action receipt still open |
 | S8 | Host visibility and resource disposal | Exercise real hidden/suspended/resumed session behavior and product-owned resource removal/stale-revision refusal; record policy ownership and any required local correction | Cambium native invalidation committed `fe2e24e9`; independent source reviews and diff check pass, actual GPU suspend/resume remains open |
 | S9 | Turnstone capture correlation | Integrate exact target and nonreused request identity into the actual capture path, with stale/duplicate/unsupported refusal; keep envelope and pixel-storage acceptance explicit | Committed `c5f991e`: action-to-host correlation, replacement-id alias and bulk teardown corrections; 5 production-module tests plus external Inker sanity pass, no-default library check passes. Weld adapter compile is blocked before Turnstone by pinned Welding/current local Grafting API mismatch; headed pixels and durable deposit remain open. 2026-09-09: the Weld blocker was Turnstone drift, not the pin; the adapter had been uncompiled since the P1 contract landed. Migrated to welding/grafting heads and merged to turnstone main; hosted capture returns `Unsupported` until Inker's `WeldSurface` grows a capture hook (P2), the S9 Weld-side wiring was deleted and will be reimplemented then. Mark ruled Chromium's process sandbox the default: turnstone `436e087` adds the Windows bootstrap client-DLL route (`sandbox_bootstrap_win` crate, `RunWinMain`), `Sandboxed` by default when launched through CEF's bootstrap and `UnsandboxedTrustedContent` on the direct executable route, with `TURNSTONE_WELD_SANDBOX` as an explicit override that refuses unsupported combinations; a headed sandboxed boot succeeded on a local CEF 151.3.24 bundle (`turnstone/design_docs/2026-08-03_turnstone_engine_adoption_plan.md`) |
 | S10 | Turnstone/Mere custody lifecycle | Integrate owner-specific references and a serialized/transactional transfer/collection boundary with recovery and disclosure policy, including same-kind multiple owners and stale collection proposals | Actual Muniment/redb probe: 3 pass, including reopen and stale-delete negative control; production writer/envelope integration remains open. 2026-09-09 ruling: a transactional read-then-write method on Muniment's `Backend` trait (redb and IndexedDB honor it, zip refuses); pricing in the orchestration scratch report, implementation lane launched 2026-09-09: `Backend::transact` landed on `slice/s10-custody-20260909` (`9ba9f790`) — honest for redb (one write transaction), memory (single mutex), and IndexedDB (one Readwrite transaction, wasm32 offline check-compiles); zip and the trait default both refuse with a typed `StoreError::NotTransactional`. The probe's scenarios pass as positive controls against the real backends (59 tests total); the apply-alone negative control is retained as a documented regression. Verified, not just read from source: redb's Windows `LockFile` is cross-process, held for the `Database` handle's whole lifetime (`design_docs/mere_docs/testing/receipts/2026-09-09_s10_custody_transact_receipt.md`). Turnstone wiring and process-kill recovery remain open |
@@ -716,7 +716,7 @@ API/contract) and `components/script-runtime-api` (worker mechanism);
 `genet/design_docs/2026-09-07_worker_plan.md` (dedicated-worker
 implementation, landed `6155c8ab4ff`).
 
-**Consumers:** `ports/ortet/src/shell.rs` (drives `pump`/`settled` before
+**Consumers:** `genet/ports/ortet/src/shell.rs` (drives `pump`/`settled` before
 redraw); `components/genet-scripted/document.rs` scripted-document routes.
 
 **Failure tests (exist):**

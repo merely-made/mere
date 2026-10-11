@@ -66,8 +66,8 @@ work. First run 2026-06-12: green across the lattice, ~3 minutes warm.
 
 Local overrides are repo-scoped. Do not put `paths = [...]` overrides in
 `Code/.cargo/config.toml`; Cargo inherits that parent config into every repo
-under `Code/`, so a package-name match can affect unrelated workspaces. Mere's
-ignored `repos/mere/.cargo/config.toml` owns its local edit loop with
+under `Code/`, so a package-name match can affect unrelated workspaces. At the May survey, Mere's
+ignored `repos/mere/.cargo/config.toml` *(historical citation)* <!-- doc-audit: historical-path --> owned its local edit loop with
 source-specific `[patch."https://github.com/merely-made/<repo>.git"]` entries
 for genet, netrender, wgpu-scry, wgpu-graft, and retinue.
 

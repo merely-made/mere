@@ -166,7 +166,7 @@ remain follow-ons; this bounded host slice does not complete A5 or dynamics G1â€
 Publication verified: Woodshed main and origin/main match
 `dad3f6240bef8339432effa2d9fe7840d5035612`, with a clean checkout. That
 acceptance-only commit follows the native-qualified implementation `c55461cc`.
-The existing Woodshed `design_docs/2026-07-11_stage_set_tools_plan.md` and
+The existing Woodshed `repos/woodshed/design_docs/2026-07-11_stage_set_tools_plan.md` and
 document index record the final gates and their limits; no parallel plan was
 introduced. Mere's shared behavior fix is on main at
 `5011e2f90e988775410fe4b4213e9895fe64538e`.
@@ -1028,7 +1028,7 @@ is that objective's assessment.
   realization (recommended); a duplicate whose retirement the native phase
   plans. Mark: **"Not a duplicate (Recommended)"**. *Follows:* the record
   names mer3ly's copies as the duplicates that retire (`visibility_diff` in
-  `crates/repo-graph`, the `["fold",1]` channel, the `+N` count in
+  `repos/mer3ly/crates/repo-graph`, the `["fold",1]` channel, the `+N` count in
   `assets/projection-proof.js`), in the site's follow-up to S5. *Open:*
   pictograph's `FoldProjection` summary logic overlaps the fact's summary
   stand-in; whether it retires is native-phase work, not yet ruled.
