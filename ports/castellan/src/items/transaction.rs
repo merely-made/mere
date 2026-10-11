@@ -104,6 +104,45 @@ impl<'a> Transaction<'a> {
         Ok(record.item)
     }
 
+    /// Seal a CXF persona batch before exposing any new index entries.
+    #[cfg(feature = "cxf")]
+    pub(crate) fn import_batch(
+        &self,
+        batch: Vec<(Item, Vec<(CredentialId, Payload)>)>,
+        collections: Vec<Collection>,
+    ) -> Result<usize, ItemStoreError> {
+        if batch.is_empty() && collections.is_empty() {
+            return Ok(0);
+        }
+        let index = self.index()?;
+        for (item, payloads) in &batch {
+            validate(item, payloads)?;
+            if index.items.contains(&item.id) {
+                return Err(ItemStoreError::InvalidItem(
+                    "an item with this id is stored",
+                ));
+            }
+        }
+        let ids: Vec<_> = batch.iter().map(|(item, _)| item.id).collect();
+        for (item, payloads) in batch {
+            for (credential, payload) in payloads {
+                self.save_payload(item.id, credential, payload)?;
+            }
+            self.store.crash_point(WriteStep::Payloads)?;
+            let record = StoredItem::new(self.store.persona, item);
+            self.store
+                .storage
+                .save_record(self.store.item_path(record.item.id), &record)?;
+            self.store.crash_point(WriteStep::Metadata)?;
+        }
+        self.update_index(|index| {
+            index.items.extend(&ids);
+            index.collections.extend(collections);
+            Ok(())
+        })?;
+        Ok(ids.len())
+    }
+
     /// Remove one item: its index entry and memberships first, then its
     /// records. Removing an absent item succeeds.
     pub(crate) fn delete(&self, id: ItemId) -> Result<(), ItemStoreError> {

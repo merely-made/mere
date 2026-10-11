@@ -86,15 +86,50 @@ live resolver transport and application contact UI remain separate work.
 Djinn composes custody and serves the application route. Graphshell renders
 the public models and sends intents to djinn. The intent wire strings keep
 their `castellan.*` values for now; renaming the wire vocabulary is
-a separate decision. CXF import remains follow-on work; its policy was ruled
-on 2026-10-01. The everyday credentials are stored and SSH keys go through
+a separate decision. Feature `cxf` implements the two-step CXF import inside
+custody; its policy was ruled on 2026-10-01. The everyday credentials are stored and SSH keys go through
 the native SSH import. Identity documents, payment cards, passkeys, files and
-unknown types are quarantined: sealed, never exercised, and accepted one at a
-time by the user. The secret-free item taxonomy moves to chatelaine. The file freshness
+unknown types are quarantined: sealed and never exercised. The review and
+export interfaces remain P5 and P6 in Dramatis's Chatelaine plan. Chatelaine
+supplies the secret-free item taxonomy. The file freshness
 ledger detects rollback of the credential-record root only when its separate
 root was not restored with it; stronger platform monotonic storage remains a
 host deployment choice. See the keeper founding plan and the credential port
 brief in mere's `design_docs`.
+
+## CXF import
+
+The terminal path is Djinn's `cxf` feature, enabled by default:
+
+```text
+personae-vault cxf-preview credentials.cxf
+personae-vault cxf-import credentials.cxf destinations.json <source_sha256-from-preview>
+```
+
+`destinations.json` maps each account id shown by preview to an explicit
+persona id and an existing identity profile for native SSH imports:
+
+```json
+{
+  "YWNjb3VudA": {
+    "persona": "00000000-0000-0000-0000-000000000001",
+    "profile": "family",
+    "ssh_unlock_policy": { "kind": "per_use" }
+  }
+}
+```
+
+The persona controls the item-store scope; the profile owns the SSH slots.
+`ssh_unlock_policy` is optional and otherwise follows native import's Session
+default. A held key keeps its existing bytes, comment and policy. Cross-persona
+links are omitted and reported. Commit checks the source hash and holds the
+vault's lock boundary for the whole act; each persona batch has one sealed
+index commit. Failures return counts for completed writes. The source is
+plaintext and remains the user's file to delete after import.
+
+CXF sharing accessors are filtered according to the format's enum rules and
+reported. Exporter grants are not recreated: the explicit destination owns
+the local import, and this port does not supply a sharing provider.
 
 ## License
 

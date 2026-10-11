@@ -56,7 +56,7 @@ impl std::error::Error for Base32Error {}
 
 /// Decode an RFC 4648 base32 string. Padding optional, case insensitive.
 pub fn decode(input: &str) -> Result<Vec<u8>, Base32Error> {
-    let mut out = Vec::with_capacity(input.len() * 5 / 8);
+    let mut out = zeroize::Zeroizing::new(Vec::with_capacity(input.len() * 5 / 8));
     let mut buffer: u16 = 0;
     let mut bits: u32 = 0;
     let mut significant = 0usize;
@@ -85,7 +85,7 @@ pub fn decode(input: &str) -> Result<Vec<u8>, Base32Error> {
             Err(Base32Error::NonCanonical)
         };
     }
-    Ok(out)
+    Ok(std::mem::take(&mut *out))
 }
 
 fn symbol_value(c: char) -> Option<u8> {
