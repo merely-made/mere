@@ -24,6 +24,13 @@ Mark subsequently chose **Preview; keep placement explicitly**: motion stays
 transient until the consumer records its displayed pose as one undoable authored
 placement edit; retaining that edit is still deliberate. This introduces no
 implicit source mutation or change to shared force policy.
+The [explicit-placement continuation](https://github.com/merely-made/knot-editor/blob/63aa695/docs/receipts/2026-10-11_keep_motion_placement/README.md)
+implements that action with atomic exact-occurrence validation. Its complete
+Windows workspace records 662 passed, zero failed and six ignored; 21 reviewed
+native captures cover motion, one-edit undo/redo, deliberate retention and the
+exact kept version's fresh-process reopen. The receipt identifies two executable
+phases and the known offscreen/cropped scene layout. Source bytes, copied
+disclosure, dynamics and roles remain unchanged; runtime is discarded.
 
 Three pieces of ruled work, each with done-conditions in its plan. Read the
 plan sections first; they hold Mark's rulings verbatim, and those govern.

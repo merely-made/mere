@@ -1532,8 +1532,16 @@ finished displayed pose as one undoable authored placement edit; Retain still
 saves that recipe version deliberately. Roles, the dynamics slot, copied
 disclosure and source documents retain their own authority. This does not make
 foreground/background categories into physics roles or reopen shared-force
-policy. The bounded Knot continuation is qualified separately from the preceding
-Windows consumer review.
+policy. The [bounded Knot continuation](https://github.com/merely-made/knot-editor/blob/63aa695/docs/receipts/2026-10-11_keep_motion_placement/README.md)
+is qualified separately from the preceding Windows consumer review: 662 passed,
+zero failed and six ignored across 44 workspace harnesses; 21 reviewed native
+captures. A paused or finished complete occurrence pose is validated atomically
+against the existing trace bound; one Undo restores all prior placement. The
+native digest matches preview, kept, redone, retained and exact-version reopened
+placement. Two executable phases distinguish the Keep runtime from the added
+immutable-item selector/fixture inspection. Known panel cropping and offscreen
+bodies remain visual defects; these passing state/interaction receipts do not
+constitute full visual acceptance or coordinator-owned adoption.
 
 **Review boundary:** Knot uses compiled card footprints in a fixed physics plane,
 then clamps its normalized glyph display to that plane. This is a consumer
