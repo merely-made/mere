@@ -17,7 +17,7 @@
 //! theme and the whole syntax palette rotates with the brand.
 
 use crate::oklch::Oklch;
-use crate::{Palette, Seeds, Srgb, contrast, derive_palette};
+use crate::{ModeProfile, Palette, Seeds, Srgb, best_on, contrast, derive_palette_with};
 
 /// A canonical highlight role. A host maps its lexer's finer token kinds onto
 /// these, and [`derive_syntax_palette`] gives each a themed colour.
@@ -137,15 +137,17 @@ impl SyntaxPalette {
 
 /// WCAG contrast floor a syntax colour must clear against the surface.
 const MIN_CONTRAST: f64 = 4.5;
+/// High-contrast syntax roles use WCAG's enhanced text contrast floor.
+const HC_MIN_CONTRAST: f64 = 7.0;
 /// Shared chroma for the fanned accents (readable saturation, not neon).
 const ACCENT_C: f64 = 0.13;
 
-/// Nudge `col`'s lightness toward the text end until it clears [`MIN_CONTRAST`]
+/// Nudge `col`'s lightness toward the text end until it clears `minimum`
 /// against `surface` (or it hits the lightness rail), then return sRGB. Measures
 /// contrast on the post-gamut-clamp colour, so out-of-gamut accents still gate.
-fn gate(mut col: Oklch, surface: Srgb, dark: bool) -> Srgb {
+fn gate(mut col: Oklch, surface: Srgb, dark: bool, minimum: f64) -> Srgb {
     for _ in 0..40 {
-        if contrast(col.to_srgb(), surface) >= MIN_CONTRAST {
+        if contrast(col.to_srgb(), surface) >= minimum {
             break;
         }
         col = if dark {
@@ -160,16 +162,70 @@ fn gate(mut col: Oklch, surface: Srgb, dark: bool) -> Srgb {
     col.to_srgb()
 }
 
+/// Retain the authored/gated colour whenever it already clears the floor.
+/// Extreme seed chroma can exhaust the lightness rail after gamut clipping;
+/// use the existing contrast-picked text helper, then a pure extreme if needed.
+fn gated_text(color: Srgb, surface: Srgb, dark: bool, minimum: f64) -> Srgb {
+    if contrast(color, surface) >= minimum {
+        return color;
+    }
+    let adjusted = gate(Oklch::from_srgb(color), surface, dark, minimum);
+    if contrast(adjusted, surface) >= minimum {
+        return adjusted;
+    }
+    let text = best_on(surface);
+    if contrast(text, surface) >= minimum {
+        return text;
+    }
+    if contrast(Srgb::WHITE, surface) >= contrast(Srgb::BLACK, surface) {
+        Srgb::WHITE
+    } else {
+        Srgb::BLACK
+    }
+}
+
 /// Derive a contrast-gated [`SyntaxPalette`] from the seeds. Accents fan off the
 /// brand primary's hue at [`ACCENT_C`] and a per-mode base lightness, each gated
 /// against the derived surface; muted roles ride the base palette's dim text;
 /// emphasis / strong carry no own hue (the host applies weight).
 pub fn derive_syntax_palette(seeds: &Seeds) -> SyntaxPalette {
-    let base: Palette = derive_palette(seeds);
+    derive(seeds, ModeProfile::from_seeds(seeds), false)
+}
+
+/// Derive syntax colours for the exact explicit base-palette profile.
+///
+/// Every role is gated against [`SyntaxPalette::surface`], which equals
+/// [`derive_palette_with`] for this profile. The contrast floor is 4.5:1 at
+/// normal contrast and 7:1 at high contrast, including muted roles and authored
+/// body/header overrides. `mode`, rather than `Seeds::dark`, chooses the scheme.
+/// [`derive_syntax_palette`] retains its original normal-contrast behaviour,
+/// including using authored body/header and derived dim colours unchanged.
+pub fn derive_syntax_palette_with(seeds: &Seeds, mode: ModeProfile) -> SyntaxPalette {
+    derive(seeds, mode, true)
+}
+
+fn derive(seeds: &Seeds, mode: ModeProfile, enforce_floor: bool) -> SyntaxPalette {
+    let base: Palette = derive_palette_with(seeds, mode);
     let surface = base.surface;
-    let dark = seeds.dark;
+    let dark = mode.dark;
+    let minimum = if mode.high_contrast {
+        HC_MIN_CONTRAST
+    } else {
+        MIN_CONTRAST
+    };
     let base_l = if dark { 0.74 } else { 0.46 };
     let primary_h = Oklch::from_srgb(seeds.primary).h;
+    let text = |color: Srgb| {
+        if enforce_floor {
+            gated_text(color, surface, dark, minimum)
+        } else {
+            color
+        }
+    };
+    let accent_gate = |color: Oklch| {
+        let color = gate(color, surface, dark, minimum);
+        text(color)
+    };
 
     // An accent `offset` degrees off the primary hue: shared chroma + base
     // lightness, gated for contrast against the surface.
@@ -180,24 +236,22 @@ pub fn derive_syntax_palette(seeds: &Seeds) -> SyntaxPalette {
             h: primary_h,
         }
         .rotate_hue(offset);
-        gate(col, surface, dark)
+        accent_gate(col)
     };
 
     SyntaxPalette {
         surface,
         // Structure: heading is the brand primary, prominent; emphasis / strong
         // ride the text tiers (weight + italic carry them); quote is dimmed.
-        heading: gate(
+        heading: accent_gate(
             Oklch::from_srgb(seeds.primary)
                 .with_c(ACCENT_C * 1.2)
                 .with_l(base_l),
-            surface,
-            dark,
         ),
-        emphasis: base.text,
-        strong: base.text_header,
+        emphasis: text(base.text),
+        strong: text(base.text_header),
         link: accent(-40.0),
-        quote: base.text_dim,
+        quote: text(base.text_dim),
         verbatim: accent(180.0),
         // Code accents, fanned around the wheel so kinds stay distinguishable.
         keyword: accent(0.0),
@@ -205,8 +259,8 @@ pub fn derive_syntax_palette(seeds: &Seeds) -> SyntaxPalette {
         type_: accent(80.0),
         string: accent(150.0),
         number: accent(210.0),
-        comment: base.text_dim,
-        punctuation: base.text_dim,
+        comment: text(base.text_dim),
+        punctuation: text(base.text_dim),
         // Inline entities: links / urls share the navigational hue; mention + tag
         // take their own.
         url: accent(-40.0),
@@ -288,5 +342,124 @@ mod tests {
             let _ = pal.role(role);
         }
         assert_eq!(SyntaxRole::ALL.len(), 16);
+    }
+
+    #[test]
+    fn explicit_profiles_gate_against_the_exact_rendered_surface() {
+        let seeds = seeds();
+        let modes = [
+            ModeProfile::LIGHT,
+            ModeProfile::DARK,
+            ModeProfile::HC_LIGHT,
+            ModeProfile::HC_DARK,
+        ];
+        let mut surfaces = Vec::new();
+        for mode in modes {
+            let syntax = derive_syntax_palette_with(&seeds, mode);
+            let palette = derive_palette_with(&seeds, mode);
+            assert_eq!(syntax.surface, palette.surface, "{mode:?}");
+            let minimum = if mode.high_contrast {
+                HC_MIN_CONTRAST
+            } else {
+                MIN_CONTRAST
+            };
+            for role in SyntaxRole::ALL {
+                let ratio = contrast(syntax.role(role), syntax.surface);
+                assert!(
+                    ratio >= minimum,
+                    "{mode:?} {role:?} contrast {ratio:.3} below {minimum}"
+                );
+            }
+            let opposite_seeds = Seeds {
+                dark: !seeds.dark,
+                ..seeds
+            };
+            assert_eq!(
+                syntax,
+                derive_syntax_palette_with(&opposite_seeds, mode),
+                "explicit profile must own the scheme"
+            );
+            assert!(
+                !surfaces.contains(&syntax.surface),
+                "{mode:?} must have its own derived surface"
+            );
+            surfaces.push(syntax.surface);
+        }
+    }
+
+    #[test]
+    fn adversarial_chroma_and_text_overrides_clear_each_profiles_floor() {
+        let colors = [
+            Srgb::BLACK,
+            Srgb::WHITE,
+            Srgb::GRAY,
+            Srgb::rgb(255, 0, 0),
+            Srgb::rgb(0, 255, 0),
+            Srgb::rgb(0, 0, 255),
+            Srgb::rgb(255, 0, 255),
+            Srgb::rgb(255, 255, 0),
+            Srgb::rgb(0, 255, 255),
+        ];
+        for neutral in colors {
+            for primary in colors {
+                for mode in [
+                    ModeProfile::LIGHT,
+                    ModeProfile::DARK,
+                    ModeProfile::HC_LIGHT,
+                    ModeProfile::HC_DARK,
+                ] {
+                    let mut adversarial = Seeds {
+                        neutral,
+                        primary,
+                        ..seeds()
+                    };
+                    let surface = derive_palette_with(&adversarial, mode).surface;
+                    // Explicit authored overrides are allowed by the base
+                    // palette. Syntax text must still remain legible.
+                    adversarial.text_body = Some(surface);
+                    adversarial.text_header = Some(surface);
+                    let syntax = derive_syntax_palette_with(&adversarial, mode);
+                    assert_eq!(syntax.surface, surface);
+                    let minimum = if mode.high_contrast {
+                        HC_MIN_CONTRAST
+                    } else {
+                        MIN_CONTRAST
+                    };
+                    for role in SyntaxRole::ALL {
+                        let ratio = contrast(syntax.role(role), surface);
+                        assert!(
+                            ratio >= minimum,
+                            "{mode:?}, neutral {neutral:?}, primary {primary:?}, {role:?}: {ratio:.3} below {minimum}"
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn legacy_api_retains_normal_text_tiers_and_existing_accent_derivation() {
+        for dark in [false, true] {
+            let seeds = Seeds { dark, ..seeds() };
+            let legacy = derive_syntax_palette(&seeds);
+            let explicit = derive_syntax_palette_with(&seeds, ModeProfile::from_seeds(&seeds));
+            // Default normal palettes already clear the stronger API's floor,
+            // so the entire existing result is unchanged for those seeds.
+            assert_eq!(legacy, explicit);
+            let authored = Seeds {
+                text_body: Some(legacy.surface),
+                text_header: Some(legacy.surface),
+                ..seeds
+            };
+            let legacy = derive_syntax_palette(&authored);
+            let base = derive_palette_with(&authored, ModeProfile::from_seeds(&authored));
+            assert_eq!(legacy.emphasis, base.text);
+            assert_eq!(legacy.strong, base.text_header);
+            assert_eq!(legacy.quote, base.text_dim);
+            assert_eq!(legacy.comment, base.text_dim);
+            assert_eq!(legacy.punctuation, base.text_dim);
+            assert_eq!(legacy.keyword, explicit.keyword);
+            assert_eq!(legacy.heading, explicit.heading);
+        }
     }
 }

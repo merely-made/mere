@@ -1359,6 +1359,16 @@ impl windowed::ViewerContent for ControllerViewerContent {
                 Ok("jump-link press/release moved the retained viewport".to_owned())
             },
             StaticProductReceipt::Controls => {
+                let glyph_count = |scene: &netrender::Scene| {
+                    scene
+                        .ops
+                        .iter()
+                        .filter_map(|operation| match operation {
+                            netrender::SceneOp::GlyphRun(run) => Some(run.glyphs.len()),
+                            _ => None,
+                        })
+                        .sum::<usize>()
+                };
                 let scroll_target = self
                     .controller
                     .text_target("Control log start")
@@ -1382,6 +1392,7 @@ impl windowed::ViewerContent for ControllerViewerContent {
                     );
                 }
 
+                let initial_glyphs = glyph_count(&self.controller.frame(960, 640));
                 let tab = || inker::SessionInput::Key {
                     key: inker::SessionKey::Tab,
                     state: inker::SessionButtonState::Pressed,
@@ -1392,23 +1403,47 @@ impl windowed::ViewerContent for ControllerViewerContent {
                 if !note.handled || !note.editable {
                     return Err("controls receipt did not focus the retained textarea".to_owned());
                 }
+                let end = self.controller.input(inker::SessionInput::Key {
+                    key: inker::SessionKey::End,
+                    state: inker::SessionButtonState::Pressed,
+                    modifiers: inker::SessionModifiers::default(),
+                    repeat: false,
+                });
+                if !end.handled {
+                    return Err(
+                        "controls receipt could not move the retained caret to the end".to_owned(),
+                    );
+                }
                 let edited = self
                     .controller
                     .input(inker::SessionInput::Text(" and ash".to_owned()));
                 if !edited.handled {
                     return Err("controls receipt textarea rejected text input".to_owned());
                 }
-                let retained = self.controller.inspect().is_some_and(|report| {
+                // Reconcile the retained edit with layout/paint before reading
+                // its semantic projection. The native render then frames at
+                // the actual host size for the final artifact.
+                let edited_glyphs = glyph_count(&self.controller.frame(960, 640));
+                // Edited form values belong to Genet's retained control state;
+                // source textarea text remains its HTML default value. Read the
+                // live semantic value and retain the source-structure assertion.
+                let retained = self
+                    .controller
+                    .accessibility_projection()
+                    .is_some_and(|report| {
+                        report
+                            .nodes()
+                            .iter()
+                            .any(|entry| entry.value.as_deref() == Some("cedar and ash"))
+                    });
+                let source_preserved = self.controller.inspect().is_some_and(|report| {
                     report
                         .outline
                         .iter()
-                        .any(|entry| entry.role == "textbox" && entry.name == "cedar and ash")
+                        .any(|entry| entry.role == "textbox" && entry.name == "cedar")
                 });
-                if !retained {
-                    return Err(
-                        "controls receipt edit did not reach retained document structure"
-                            .to_owned(),
-                    );
+                if !retained || !source_preserved || edited_glyphs <= initial_glyphs {
+                    return Err("controls receipt keyboard edit did not reach paint and retained value while preserving its HTML default".to_owned());
                 }
                 Ok(
                     "nested wheel stayed local and keyboard edit reached retained structure"

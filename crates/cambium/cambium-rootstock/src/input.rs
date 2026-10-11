@@ -146,7 +146,7 @@ where
     /// Use Genet's inverse accumulated paint transform and scroll geometry.
     /// Custom leaves use their content box; ordinary controls use their border box.
     /// `((0, 0), (0, 0))` when the node has no laid-out box.
-    fn local_in(&self, node: NodeId) -> ((f32, f32), (f32, f32)) {
+    pub(crate) fn local_in(&self, node: NodeId) -> ((f32, f32), (f32, f32)) {
         let local =
             self.s
                 .runner

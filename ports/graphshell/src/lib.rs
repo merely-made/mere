@@ -18,6 +18,8 @@ pub mod access;
 pub mod admission;
 #[cfg(feature = "web")]
 pub mod app;
+#[cfg(feature = "web")]
+pub mod appearance;
 #[cfg(all(feature = "native", not(target_arch = "wasm32")))]
 pub mod browser_carrier;
 #[cfg(feature = "web")]
@@ -28,9 +30,13 @@ pub mod canvas_controls;
 #[cfg(feature = "web")]
 pub mod canvas_faces;
 #[cfg(feature = "web")]
+pub mod canvas_gestures;
+#[cfg(feature = "web")]
 pub mod canvas_physics;
 #[cfg(feature = "web")]
 pub mod canvas_reader;
+#[cfg(feature = "applets")]
+pub mod capsule_applet;
 #[cfg(feature = "web")]
 pub mod capture;
 #[cfg(all(test, feature = "web"))]
@@ -42,11 +48,15 @@ pub mod carrier;
 #[cfg(any(feature = "native", feature = "web"))]
 pub mod distillery_w1;
 #[cfg(feature = "web")]
+pub mod forme_workspace;
+#[cfg(feature = "web")]
 pub mod frame_budget;
 #[cfg(feature = "web")]
 pub mod handlers;
 #[cfg(feature = "web")]
 pub mod host_dataset_view;
+#[cfg(feature = "web")]
+pub mod host_history_view;
 #[cfg(all(feature = "native", not(target_arch = "wasm32")))]
 pub mod identity;
 #[cfg(all(feature = "native", not(target_arch = "wasm32")))]
@@ -62,8 +72,6 @@ pub mod local_edit;
 pub mod local_intake;
 #[cfg(feature = "web")]
 pub mod mere_host;
-#[cfg(feature = "web")]
-pub mod resident_host;
 #[cfg(feature = "web")]
 mod mere_host_fixture;
 #[cfg(feature = "mere-route")]
@@ -83,6 +91,8 @@ pub mod profile;
 #[cfg(feature = "web")]
 pub mod remote_board;
 #[cfg(feature = "web")]
+pub mod resident_host;
+#[cfg(feature = "web")]
 pub mod session_item;
 #[cfg(feature = "web")]
 pub mod speed_bar;
@@ -95,6 +105,10 @@ pub mod practice_workspace;
 pub mod projection_compare;
 #[cfg(any(feature = "native", feature = "web"))]
 pub mod projection_compile;
+#[cfg(feature = "web")]
+pub mod projection_dynamics_compare;
+#[cfg(feature = "web")]
+pub mod projection_dynamics_receipt;
 #[cfg(any(feature = "native", feature = "web"))]
 pub mod projection_editor;
 /// Receipt ingest: a scenario-receipt directory becomes personal-graph facts.

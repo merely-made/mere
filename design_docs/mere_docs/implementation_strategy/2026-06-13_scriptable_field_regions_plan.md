@@ -38,6 +38,245 @@ placeable, scriptable spatial primitive, and it is the third rhai lane after the
 knot note-blocks and the omnibar command shell: one scripting language, now
 governing a region of space.
 
+## Expanded field direction (2026-10-09; research, not implemented)
+
+**Design owner assigned 2026-10-10:** Mark assigns field authoring and behavior,
+and node/link/field editors, to the projection grammar agent in the current
+conversation. The [shared allocation](../../2026-08-23_projection_scenes_and_graph_native_platform.md#914-design-work-ownership-2026-10-10)
+places visible dynamics explanations and script/motion authoring with the
+dynamics agent, and theme/typography roles with Tabard on q-pc.
+
+The field design pass should specify the user's membership/extent controls,
+placement/influence/projection controls and overlapping-field inspection.
+The forme case carries the agreed scoped draft and discard model. A concrete
+editor design is ready when its walkthrough identifies the edited entity,
+affected members, owning writes, draft/apply/discard behavior and explanations
+for conflicting constraints. Force and script execution stay with their
+existing owners; this allocation does not qualify a runtime implementation.
+
+The [design language §9.8](../../2026-08-23_projection_scenes_and_graph_native_platform.md#98-voice-clarifications-and-research-boundaries-2026-10-09)
+records Mark's clarification: fields participate in a scene and can apply an
+arrangement, dynamics or a projection to affected material. Scripting includes
+general-purpose behavior and invoking a graph-held applet on entry. The forme
+is a particular field representing the recursive workbench arrangement,
+existing alongside other arrangements rather than controlling the whole scene.
+Earlier force/visibility/layout scope is incomplete as a description of the
+intended capability.
+
+This direction does not establish that the current scalar/vector field AST
+implements region events or applet execution, or select Rhai as the universal
+backend. Scenograph's scripting comparison and application execution owners
+retain those decisions. The partial implementation status above stands.
+
+Research must distinguish spatial inclusion from declared membership and
+define how overlapping or nested regions compose placement, projection and
+motion without creating a second workbench layout authority. Entry/exit needs
+defined behavior when nodes, regions or arrangements move, including avoiding
+repeated actions caused only by boundary jitter. Foreground pin, position
+anchor, position pin and layout lock remain separate controls; whether a lock
+affects local dynamics remains open.
+
+Mark's feed-overflow example is exploratory: excess material enters a field
+and dissolves or moves to background. *Reading, not ruled:* an action must
+identify whether it changes an appearance, attention, residency, keeping or
+source truth; these effects cannot be inferred from the word "dissolve".
+
+*Candidate proof, not opened:* a forme region and another field overlap;
+their contributions and constraints are explainable, unrelated scene items
+continue their own behavior, and one deliberate entry invokes the chosen
+action through its existing authority. Overlap policy, event cadence and
+execution grants must be ruled before that proof is implemented.
+
+The [primitive planning direction, §9.9](../../2026-08-23_projection_scenes_and_graph_native_platform.md#99-plan-through-graph-primitives-2026-10-09)
+also asks to represent fields alongside nodes and links in the graph, then
+connect them to dynamics. Research each field's address, owned attributes,
+membership, behavior and scene representation; a painted region alone does
+not establish that authoring loop. Representation does not by itself choose
+a new node encoding or replace the existing field/coupling stores.
+
+**Source refresh (2026-10-09, Mere `b4e818b4`):** the
+[primitive and dynamics map](2026-10-07_scenograph_editor_plan.md#primitive-and-dynamics-map-2026-10-09-source-backed-planning)
+records the current authoring seams. `NodeSelector` offers All, Tagged, Kind
+and NotTagged, not a spatial-membership selector. Pictograph's coupling bridge
+captures matching node keys and the field definition; it does not pass the
+extent into that conversion. A spatially shaped definition can produce a
+localized force, but this is different from enforcing membership in the
+authored extent. The earlier Findings shorthand equating a region coupling
+with "nodes in the field's extent" describes intended behavior, not this
+implementation. Extent tests already exist in numen; entry/exit tracking,
+composition and response consumers require their own host integration.
+
+*Reading, not ruled:* research placement, projection and action composition
+separately. Additive motion alone cannot decide which of two incompatible
+arrangements or projections wins. Likewise, changing a selector or moving a
+field may change membership without a node crossing a stationary boundary.
+The entry-action decision must cover those causes and initial scene loading,
+alongside jitter and re-entry; the current force evaluator is not an event log.
+
+**Host inventory (2026-10-10, Mere `6183006b`):** the editor plan's
+[Graphshell control inventory](2026-10-07_scenograph_editor_plan.md#graphshell-control-inventory-2026-10-10-planning-step-1)
+confirms that shared field cards and Canvas field methods have no Graphshell
+authoring caller. Visibility is presentation-only; hiding a field does not
+disable its coupling. Strength/placement mutate Canvas's graph, so wiring a
+button straight to those methods would not establish MereHost's session edit,
+undo and persistence path. A host adapter must distinguish that recorded write
+from the refreshed simulation and the visibility intent. No new placement or
+script UI is installed by this inventory.
+
+**Embedded forme study (2026-10-10; proposal):**
+[design language §9.12](../../2026-08-23_projection_scenes_and_graph_native_platform.md#912-mixed-content-scene-and-embedded-forme-study-2026-10-10)
+makes the two-coordinate problem concrete: a field can move in the scene
+while two webpage members retain their local split. Forme's semantic
+arrangement excludes geometry; proportions and positions belong to projection
+state. The bridge must reuse the owning layout and document accesses rather
+than make the field another tile authority. Hovered subdivisions and explicit
+unlocking are proposed presentations of that same structure. Define how local
+placement constraints compose with outside dynamics and overlapping fields;
+neither additive forces nor an outer rectangle resolves that policy. The
+[editor study](2026-10-07_scenograph_editor_plan.md#mixed-content-study-2026-10-10-proposal-not-opened)
+carries candidate done-conditions, not an opened field implementation track.
+
+**Agreed forme editing (2026-10-10):**
+[design language §9.11](../../2026-08-23_projection_scenes_and_graph_native_platform.md#911-forme-draft-session-2026-10-10)
+settles the editing interaction: unlock a scoped draft, drag nodes as tile
+handles with region/drop previews, undo/redo within that draft, discard it
+without changing content, or lock-and-apply it as one arrangement change.
+Both presentations may show the draft; committed arrangement and geometry
+change only on apply. The [editor follow-through](2026-10-07_scenograph_editor_plan.md#forme-draft-follow-through-2026-10-10-agreed-interaction)
+carries the implementation steps. This does not imply that locking pauses
+dynamics or that the field/workbench gesture bridge is implemented.
+
+## Field authoring draft (2026-10-10)
+
+**Design proposal for review, following Mark's instruction to proceed.** This
+turn specifies controls and editing boundaries. The forme draft interaction
+above is agreed; the membership and overlap policies below are recommendations,
+not new rulings or implemented behavior. Ownership follows
+[design language §9.14](../../2026-08-23_projection_scenes_and_graph_native_platform.md#914-design-work-ownership-2026-10-10).
+
+### Current substrate and corrections
+
+Checked at published Mere `86f2a3b8`:
+
+- [Numen's Field](../../../crates/conatus/numen/src/field.rs) supplies stable
+  `FieldId`, definition, extent and lifecycle. Its extent can be global, a box,
+  an attached-node reference or a polygon. An attached extent needs host
+  resolution. Shape support in data does not establish corresponding handles.
+- [Coupling](../../../crates/conatus/numen/src/coupling.rs) has its own
+  `CouplingId`, selector, response and strength. The selector remains All,
+  Tagged, Kind or NotTagged. The [canvas bridge](../../../crates/canvas/pictograph/src/canvas/seiche_bridge.rs)
+  captures selector matches and the definition, without passing extent.
+  An extent membership editor therefore needs an explicit evaluation adapter.
+- [Field picking](../../../crates/canvas/pictograph/src/canvas/fields.rs)
+  currently handles visible active boxes and takes the last matching field in
+  hash-map iteration/paint order. This is an authoring ambiguity when fields
+  overlap; it is not a declared placement or force precedence.
+- [Field strength](../../../crates/graph/graph-kernel/src/graph/field_ops.rs)
+  reads the first matching coupling but sets every coupling for that field.
+  That shortcut fits the original one-well control, not an editor for several
+  independently authored effects. Address a specific coupling for an effect
+  edit; do not silently apply one row's value to every effect.
+- The [Workbench Forme bridge](2026-10-07_scenograph_editor_plan.md#workbench-forme-bridge-2026-10-10)
+  now supplies reading tiles, corresponding canvas regions and existing-field
+  inspect/locate/hide controls. This updates the earlier no-inspection-caller
+  inventory. General field creation/effect editing and whole-forme draft undo
+  remain separate work. Native/build receipts exist; headed acceptance remains
+  pending in that record.
+
+### Proposed controls
+
+Inspecting a field opens its identity, affected material and effects. A quiet
+scene boundary remains a representation choice; the inspector and roster make
+the same field findable when that boundary is hidden. Use the existing shared
+roster subjects and the [primitive editor draft](2026-10-07_scenograph_editor_plan.md#primitive-editor-draft-2026-10-10)
+rather than fabricating a content node for every field.
+
+| Section | User controls and explanation |
+|---|---|
+| Members | Choose a declared set, query result or spatial eligibility rule; inspect the matched material and why each member qualifies. Preserve disclosed limits for incomplete readings. |
+| Extent | Inspect or edit the field's location and shape in its containing scene space. Show handles when editing. Distinguish moving the boundary from moving its members. |
+| Placement | Select a local arrangement and its seed/anchor/pin roles, or inspect the owning workbench arrangement for a forme. Show which occurrences are constrained. |
+| Influence | List individual couplings with their targets, response, strength and current support. Additive forces can coexist; velocity assignment, damping and pushout need the dynamics lane's composition semantics. |
+| Projection | Choose the scoped presentation treatment and inspect matched rules. Preserve source identity and distinguish a representation change from a source edit. |
+| Actions | Show configured entry/exit behavior, its trigger causes and executing owner. Script/motion authoring belongs to the dynamics lane; an unrecognized response remains visible as unsupported. |
+| Appearance | Show/hide the boundary and use Tabard's theme roles. This control does not change membership, collision or execution. |
+
+These sections describe capabilities, not three mutually exclusive field kinds.
+A field may combine placement, influence and projection. A forme's membership
+comes from its owning arrangement; placing an unrelated node inside its drawn
+rectangle must not add a tile. A deliberate drop into an unlocked forme changes
+draft membership through the agreed arrangement gesture.
+
+**Proposed membership model:** keep eligible subjects, occurrence-local spatial
+tests and influence weight separate. A tag/query selects candidates; an optional
+extent test chooses which appearances in the field's space qualify; falloff
+determines influence strength. A shared Resource may have two appearances with
+different spatial results. Moving the camera should not change membership.
+For declared arrangement membership, extent describes its presentation rather
+than rediscovering members on every tick. This is a model to map onto existing
+Scope/selector/arrangement owners, not a new serialized selector introduced here.
+
+### Draft, preview and apply
+
+Propose an Edit action for a general field's authored values, using scoped
+draft history, Preview, Apply and Discard changes. Visibility and inspection
+can remain immediate view actions. The accepted forme wording stays Unlock and
+Lock and apply. Preview reports added/removed members and affected placements;
+another field and unrelated graph edits keep their own state. Previewing an
+action does not invoke its applet or mutate source content.
+
+Apply validates the complete draft before any durable write and addresses the
+existing Field/Coupling or workbench owner. A field definition and its changed
+couplings need a coherent owner edit; the present
+[graph deltas](../../../crates/graph/graph-kernel/src/graph/apply.rs) do not by
+themselves establish a host transaction for every proposed control. Keep the
+draft and describe the failure if the host cannot apply it. Discard removes
+draft changes, not content, committed memberships or another editor's history.
+If the committed target changed while editing, show that change before apply;
+do not silently replace a newer arrangement with a stale snapshot.
+
+### Overlap walkthrough and decision checkpoints
+
+Consider a forme containing webpages A and B, with a second field over A.
+The inspector lists both fields by stable identity and explains why A is
+affected. Picking an overlap should offer the matching fields by name; an
+already chosen edit target stays chosen during its gesture. A preview exposes
+the second field's effects while B's tile remains identifiable. Existing
+forme-local holds and explicit pins have the precedence recorded by the bounded
+bridge; this proposal does not reverse it or treat a layout lock as physics pause.
+
+For two incompatible exact placements of one occurrence, propose retaining the
+last committed placement and refusing the conflicting placement edit with both
+constraints shown. Compatible additive forces continue to compose. Nested local
+coordinates may compose through a parent transform; they are not automatically
+conflicting world-position writers. Projection-rule precedence belongs to the
+presentation-rule lane, with the field providing scope and match explanation.
+
+The following forks need concrete rulings before their runtime adapters:
+
+1. **Spatial eligibility:** reference point, whole footprint or intersection?
+   Recommend a reference-point test as the initial explicit choice, with the
+   measured footprint available to a later mode. Keep boundary policy visible.
+2. **Conflicting placement:** refuse the incompatible edit, designate one owner,
+   or supply an explicit priority? The refusal above is recommended, not ruled.
+3. **Membership events:** distinguish movement, field edits, query/source changes
+   and initial loading. Recommend reporting initial matches without running
+   entry actions; deliberate entry and automatic changes need separate policy.
+   Debouncing, jitter and re-entry belong in the dynamics lane's event contract.
+4. **Field attachment and authored attributes:** a forme representation and a
+   Numen force field have different owners today. Their association and arbitrary
+   attributes need the existing graph-semantics/storage seam resolved before
+   persistence changes; a painted region must not create a synthetic force field.
+
+**Done-conditions for the first implementation:** inspect two overlapping fields
+without hash-order-dependent edits; tune one named coupling without changing
+another; show matched/unsupported effects; save/reopen field identity and authored
+values through the owning host; demonstrate scoped apply/discard/undo without
+content loss; and qualify the agreed forme draft against the existing bridge.
+Runtime tests must include repeated appearances, conflicting placement, an empty
+or limited query result and failed apply. Entry-action execution is a separate
+dynamics-owned acceptance case. This pass adds design and source findings only.
+
 ## Findings (code-verified substrate)
 
 The pieces exist; what is missing is **placement, rendering, and the unifying

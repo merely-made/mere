@@ -19,7 +19,7 @@ use crate::A11yAction;
 use cambium::PointerClick;
 use genet_render::VisualCaret;
 use genet_scripted_dom::NodeId;
-use layout_dom_api::DomMutation;
+use layout_dom_api::{DomMutation, LayoutDom as _};
 use netrender::{ColorLoad, ExternalTexturePlacement};
 use paint_list_api::{DeviceIntSize, PaintEnvelope, PaintList as _};
 
@@ -98,6 +98,7 @@ where
                 render_core: self.s.shared.render_core.as_ref(),
                 geometry,
                 frame_profile,
+                presentation: self.s.last_redraw_presentation,
             };
             (self.hooks.frame)(&mut ctx)
         };
@@ -480,6 +481,7 @@ where
     }
 
     pub fn redraw(&mut self) {
+        self.s.last_redraw_presentation = None;
         self.deliver_files();
         let frame_started = crate::Instant::now();
         let mut profile = FrameProfile::default();
@@ -662,6 +664,7 @@ where
             height: ph,
             layout_scale: scale,
         };
+        self.s.last_redraw_presentation = Some(presented);
         // Freeze product state before any capture callback, queued pointer
         // dispatch or platform accessibility action can change the product.
         self.observe_presentation(presented);
@@ -713,21 +716,25 @@ where
         // device scale alone would point at a control's unzoomed position.
         let layout_scale = self.layout_scale();
         let requests = {
-            let (dom, mount) = match self.s.runner.as_ref() {
-                Some(runner) => (runner.dom(), runner.mount()),
+            let (dom, mount, focus) = match self.s.runner.as_ref() {
+                Some(runner) => (runner.dom(), runner.mount(), runner.focus()),
                 None => return,
             };
             let dom_ref = dom.borrow();
+            let view = crate::WindowDom::new(&dom_ref, mount);
+            // Focus can change without hover; last_focus belongs to restyling,
+            // not to the accessibility adapter's current focus report.
+            let focus = focus.map(|node| view.opaque_id(node));
             let (Some(a11y), Some(layout)) = (self.s.a11y.as_mut(), self.s.layout.as_ref()) else {
                 return;
             };
             // The window is the adapter's own now, so the seam does not carry it.
             a11y.sync(
-                &crate::WindowDom::new(&dom_ref, mount),
+                &view,
                 layout,
                 &mut self.s.shared.leaves,
                 &mut self.s.shared.producers,
-                self.s.last_focus,
+                focus,
                 layout_scale,
             )
         };
@@ -824,31 +831,32 @@ where
     }
 
     /// Route Cambium `on_hover` Enter/Leave as the hit node changes. The host
-    /// owns transition detection; Move is not routed, so idle motion within a
-    /// target stays free. Coordinates are zeroed — a peek only needs which
-    /// target.
+    /// owns transition detection. Registered hover handlers also receive local
+    /// coordinates on Move; motion over unregistered content does no dispatch.
     pub fn hover_dispatch(&mut self) {
         use cambium::{HoverEvent, HoverPhase};
-        let hit = self.hit_at_cursor();
-        if hit == self.s.last_hover_hit {
+        let target = self
+            .hit_at_cursor()
+            .and_then(|hit| self.s.runner.as_ref()?.hover_target(hit));
+        if target == self.s.last_hover_hit {
+            if let Some(target) = target {
+                let (local, size) = self.local_in(target);
+                if let Some(runner) = self.s.runner.as_mut() {
+                    runner.dispatch_hover(target, HoverEvent::new(HoverPhase::Move, local, size));
+                }
+                self.after_dispatch();
+            }
             return;
         }
         let old = self.s.last_hover_hit.take();
-        self.s.last_hover_hit = hit;
-        let Some(runner) = self.s.runner.as_mut() else {
-            return;
-        };
-        if let Some(old) = old {
-            runner.dispatch_hover(
-                old,
-                HoverEvent::new(HoverPhase::Leave, (0.0, 0.0), (0.0, 0.0)),
-            );
-        }
-        if let Some(new) = hit {
-            runner.dispatch_hover(
-                new,
-                HoverEvent::new(HoverPhase::Enter, (0.0, 0.0), (0.0, 0.0)),
-            );
+        self.s.last_hover_hit = target;
+        for (node, phase) in [(old, HoverPhase::Leave), (target, HoverPhase::Enter)] {
+            if let Some(node) = node {
+                let (local, size) = self.local_in(node);
+                if let Some(runner) = self.s.runner.as_mut() {
+                    runner.dispatch_hover(node, HoverEvent::new(phase, local, size));
+                }
+            }
         }
         self.after_dispatch();
     }

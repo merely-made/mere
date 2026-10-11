@@ -11,7 +11,7 @@
 **Spec:** [Approved initial resident host design](../technical_architecture/2026-10-09_resident_host_design.md). Read it alongside the [parent follow-ons plan](2026-10-09_graph_semantics_followons_plan.md).
 
 **Date:** 2026-10-09
-**Status (2026-10-10):** Written spec and concrete plan approved by Mark. Tasks 1–6 are complete and locally committed at a61dfb5c9, 652acbb72, 6b2f2860b, 29ab75c56, 45239482c and bb9025752 after independent reviews. Task 3 includes combined persistence staging and a bounded navigation snapshot ordering repair. Task 5 includes head-only refresh, lifecycle/notice checks and the reviewed browser continuation repair. Task 6 includes portable coverage, exclusive Directory cache ownership and retained endpoint recovery. Current-main reconciliation and Tasks 7–8 remain pending. Consumer A1 is separately qualified, published and remotely resolved. Host source stays local pending whole-host qualification and publication review.
+**Status (2026-10-10):** Written spec and concrete plan approved by Mark. Tasks 1–6 are complete and locally committed at a61dfb5c9, 652acbb72, 6b2f2860b, 29ab75c56, 45239482c and bb9025752 after independent reviews. Task 3 includes combined persistence staging and a bounded navigation snapshot ordering repair. Task 5 includes head-only refresh, lifecycle/notice checks and the reviewed browser continuation repair. Task 6 includes portable coverage, exclusive Directory cache ownership and retained endpoint recovery. The isolated current-main candidate passes ten fresh qualification gates and independent integration review; Tasks 7–8 remain pending. Consumer A1 is separately qualified, published and remotely resolved. Host source stays local pending whole-host qualification and publication review.
 
 ## Global Constraints
 
@@ -23,7 +23,7 @@
 - “Do not collect generations in this milestone.” Turnstone authority migration, genuinely bounded writers and detailed GC/scoped-transaction design remain separate reviewed work.
 - “Report process memory separately from reader-record savings; this milestone makes no bounded-process-memory claim.” Full writer/baseline/history and candidate/replay peaks remain.
 - Preserve transport modularity, data projections, the shared wgpu device and existing Author, qualification, validation, replay, journal, undo and kept-part controls.
-- No backend implementation changes or consumer authority changes belong to these tasks. Consumer repins are excluded except the Task6 prerequisite Knot compatibility revision: its default-off snapshot coverage feature preserves the older standalone Mere pin while Mere enables the new field. Unsupported or unproven ownership/backend composition returns a typed refusal.
+- Backend work is limited to Task7's concrete IndexedDB lifetime admission and version2 cutover correction, required to exclude independently opened and legacy v1 browser writers. It adds no general Backend trait capability, lock service, authority epoch or persistent receipt log. Consumer authority migration remains excluded. Consumer repins are limited to the Task6/current-main Knot compatibility revisions, preserving each baseline's standalone pins/defaults. Unsupported or unproven ownership/backend composition returns a typed refusal.
 - Each code sample below is either a proposed compile-ready declaration/test after its named task, or explicitly labelled implementation pseudocode. Proposed signatures are decisions of this plan, not claims that those APIs already exist.
 - Changes and commits stay local until the user reviews a qualified candidate. Root owns canonical index, D2 judgment and status updates. Protect the separate Dramatis writer and A1 consumer worktrees.
 
@@ -617,31 +617,142 @@ fn context_only_coverage_updates_preserve_cached_resources() {
 
 **Produces:** named partial operations from the approved spec, settings/demand/refresh endpoint actions, visible coverage and persistence state. New intent payloads live beside the existing session_item vocabulary, using decoded typed UUID/JSON at admission. They do not contain Author, NodeKey or storage capability claims.
 
-- [ ] Add this compile-ready RED test in existing product.rs tests, which supplies open_on(), MemoryBackend and Uuid:
+- [ ] First establish a test-only admitted, recorded-placement host and publish its complete reader. Run the fixture control alone before adding missing-API tests; an ordinary unadmitted Memory host cannot prove observation validation. No production admission constructor is added.
+
+```rust
+async fn observed_product_owner() -> (MereHost<MemoryBackend>, Uuid) {
+    let backend = MemoryBackend::new();
+    let mut host = open_on(&backend).await;
+    host.begin_profiled_session(Graph::new(), Some(PlacementProfile::RecordedStrataV1))
+        .expect("recorded placement is required");
+    let id = host
+        .create_address("https://product.test/observed", "Original")
+        .expect("seed complete product path");
+    // Explicit test-only admission; no backend or raw host factory is exported.
+    host.admit_resident();
+    host.persist_owned(1).await.expect("publish initial reader");
+    assert!(!host.resident_busy());
+    assert!(host.resident_reader().is_some());
+    assert!(!host.has_unstored());
+    (host, id)
+}
+
+fn observed_pin_command(
+    host: &MereHost<MemoryBackend>,
+    id: Uuid,
+) -> pandect::live_graph::ObservedCommand {
+    use pandect::addressable_graph::GraphAddress;
+    use pandect::live_graph::{LiveCheck, LiveCommand, ObservedCommand};
+    let address = GraphAddress::Surface(id);
+    let digest = host
+        .resident_reader()
+        .expect("published reader")
+        .record_digest(address)
+        .expect("complete Surface observation")
+        .to_owned();
+    ObservedCommand {
+        command: LiveCommand::SetPinned { surface: id, pinned: true },
+        checks: vec![LiveCheck::RecordUnchanged { address, digest }],
+    }
+}
+
+#[test]
+fn observed_product_fixture_accepts_complete_observation() {
+    pollster::block_on(async {
+        let (mut host, id) = observed_product_owner().await;
+        let command = observed_pin_command(&host, id);
+        let cursor = host.graph_session().journal().live_cursor();
+        host.edit_resident("task7.fixture-control", vec![command])
+            .expect("existing admitted edit must accept this observation");
+        assert!(host.graph_session().journal().live_cursor() > cursor);
+        let key = host.graph().get_node_key_by_id(id).unwrap();
+        assert_eq!(host.graph().node_is_pinned(key), Some(true));
+        host.persist_owned(2).await.expect("persist fixture control");
+        let reader = host.resident_reader().unwrap();
+        let key = reader.graph().get_node_key_by_id(id).unwrap();
+        assert_eq!(reader.graph().node_is_pinned(key), Some(true));
+    });
+}
+```
+
+- [ ] Root runs `cargo test --locked -j1 -p graphshell --features web --lib product::tests::observed_product_fixture_accepts_complete_observation -- --exact`; require exactly one passing test. Then add the following negative and positive adapter controls, and run the `product::tests::observed_product_edit_` prefix. Require the specific missing `apply_observed_commands` API error for the initial RED; after implementation both tests must execute and pass.
 
 ```rust
 #[test]
 fn observed_product_edit_requires_the_observed_record() {
     pollster::block_on(async {
-        use pandect::live_graph::{ObservedCommand, LiveCommand, LiveCheck};
+        use crate::resident_host::ResidentHostError;
         use pandect::addressable_graph::GraphAddress;
-        let backend = MemoryBackend::new();
-        let mut host = open_on(&backend).await;
-        let id = host.create_address("https://product.test/observed", "Original").unwrap();
+        use pandect::live_graph::{LiveCheck, LiveCommand, LiveEditError, ObservedCommand};
+        let (mut host, id) = observed_product_owner().await;
         let before = serde_json::to_vec(&host.graph().to_snapshot_at(0)).unwrap();
+        let reader_before = serde_json::to_vec(
+            &host.resident_reader().unwrap().graph().to_snapshot_at(0),
+        ).unwrap();
         let cursor = host.graph_session().journal().live_cursor();
-        assert!(host.apply_observed_commands(vec![ObservedCommand {
+        let changes = host.graph_session().changes().to_vec();
+        let result = host.apply_observed_commands(vec![ObservedCommand {
             command: LiveCommand::SetPinned { surface: id, pinned: true },
             checks: vec![LiveCheck::Exists(GraphAddress::Surface(id))],
-        }]).is_err());
+        }]);
+        assert!(matches!(
+            result,
+            Err(ResidentHostError::Live(LiveEditError::MissingObservation(address)))
+                if address == GraphAddress::Surface(id)
+        ));
         assert_eq!(serde_json::to_vec(&host.graph().to_snapshot_at(0)).unwrap(), before);
         assert_eq!(host.graph_session().journal().live_cursor(), cursor);
+        assert_eq!(host.graph_session().changes(), changes.as_slice());
+        assert_eq!(serde_json::to_vec(
+            &host.resident_reader().unwrap().graph().to_snapshot_at(0),
+        ).unwrap(), reader_before);
+        assert!(!host.resident_busy());
+        assert!(!host.has_unstored());
+    });
+}
+
+#[test]
+fn observed_product_edit_accepts_the_observed_record_with_host_author() {
+    pollster::block_on(async {
+        let (mut host, id) = observed_product_owner().await;
+        let command = observed_pin_command(&host, id);
+        let reader_before = serde_json::to_vec(
+            &host.resident_reader().unwrap().graph().to_snapshot_at(0),
+        ).unwrap();
+        let cursor = host.graph_session().journal().live_cursor();
+        let changes = host.graph_session().changes().len();
+        let applied: pandect::live_graph::LiveApplied = host
+            .through("task7.observed".into(), |host| {
+                host.apply_observed_commands(vec![command])
+            })
+            .expect("fully observed admitted edit must succeed");
+        assert!(applied.created.is_empty());
+        assert_eq!(applied.applied.first, cursor);
+        assert_eq!(applied.applied.end, host.graph_session().journal().live_cursor());
+        assert!(applied.applied.end > cursor);
+        assert_eq!(host.graph_session().changes().len(), changes + 1);
+        assert_eq!(
+            host.graph_session().changes().last().unwrap().author,
+            pandect::Author::person(FIXTURE_PERSONA_ADDRESS).via("task7.observed"),
+        );
+        let key = host.graph().get_node_key_by_id(id).unwrap();
+        assert_eq!(host.graph().node_is_pinned(key), Some(true));
+        assert!(host.has_unstored());
+        assert_eq!(serde_json::to_vec(
+            &host.resident_reader().unwrap().graph().to_snapshot_at(0),
+        ).unwrap(), reader_before);
+        host.persist_owned(2).await.expect("store the accepted edit");
+        assert!(!host.has_unstored());
+        let reader = host.resident_reader().unwrap();
+        let key = reader.graph().get_node_key_by_id(id).unwrap();
+        assert_eq!(reader.graph().node_is_pinned(key), Some(true));
     });
 }
 ```
 
-- [ ] Root runs `cargo test --locked -p graphshell --features web --lib product::tests::observed_product_edit_requires_the_observed_record -- --exact`; expect RED for absent host adapter.
-- [ ] Write failing integration assertions in the planned resident_host tests: open owned host with Full, create three addresses, choose an authored one-member projection and Neighborhood(0), confirm presentation has one Surface plus shown Resource. Invoke observed title/tag/facet/pin/relation commands through the host, assert complete writer truth changes and the old reader stays coherent until publication/refresh. Reopen/undo must match the direct Complete product path. Root runs `cargo test --locked -p graphshell --features web --test resident_host`; expect RED for absent host integration.
+- [ ] Add target-wasm `wasm-bindgen-test = "=0.3.79"` test support to Muniment and inspect only the required existing-family lock edge. Using the existing `IndexedDbBackend::open`, run an actual Firefox positive clone/write control and a separate independent-second-open control while the first handle remains live. The initial runtime RED must show the second handle sees the same sentinel and succeeds where refusal is required. Tool startup, timeout, compilation failure and zero tests do not count as that RED. Qualification uses disposable names and a fresh profile, then exact typed admission errors replace the initial generic refusal assertion.
+
+- [ ] Write failing integration assertions in the planned resident_host tests: open owned host with Full, create three addresses, choose an authored one-member projection and Neighborhood(0), confirm presentation has one Surface plus shown Resource. Invoke observed title/tag/facet/pin/relation commands through the host, assert complete writer truth changes and the old reader stays coherent until publication/refresh. Reopen/undo must match the direct Complete product path. Root runs `cargo test --locked -j1 -p graphshell --no-default-features --features web,resident-storage --test resident_host`; expect RED for absent host integration.
 - [ ] Adapt existing product operations to build ObservedCommand with Task 1 digests and the correct checks. Expose only supported partial commands; unsupported closure/global/import/delete/withdraw/history/fields/couplings operations return NeedsCompleteOperation or the explicit Full owned-writer path. Keep existing global undo/redo on that same host with their kept-part semantics. Require explicit Complete operation setting instead of silently opening another writer.
 - [ ] Keep file content-reference validation and address reuse first. Preserve existing create_file_metadata change grouping: address/title, MIME and the two facets remain the existing separate changes. Hold the host operation boundary over the sequence, stage once at its existing store boundary and do not infer byte custody from resident metadata. Input validation completes before any phase; report already-applied state if a later existing phase refuses, rather than pretending the sequence rolled back.
 - [ ] Parse UUID strings and facet JSON fallibly at the external boundary; retain distinct invalid-ID, invalid-JSON, missing, stale, unqualified/read-only/product-validation errors. The typed adapter uses complete lookup for address reuse and tag diffs. Preserve supplied exact relation assertions and capture handles; no selector-family substitute for exact withdrawal is added.
@@ -652,9 +763,12 @@ fn observed_product_edit_requires_the_observed_record() {
 
 **Done:** the shell actually exposes residency, edits, manual/host refresh and clear recovery actions. Endpoint/client behavior and local browser behavior are exercised, not inferred from library tests.
 
+
+**Ownership correction (controller ruling, 2026-10-10):** Inspection proves no current IndexedDB lifetime mechanism excludes another ordinary Full writer or browser tab. Task7 must implement mandatory database-name lifetime admission for every revised writable open, then schema/open version2 before writer boot. Version2 preserves existing stores/indexes/record bytes; it blocks existing v1 connections and prevents fresh inspected old-v1 bundles from reopening. A blocked attempt refuses admission and drains its submitted request under the retained lease, aborting a later upgrade before application actions. Cancellation is a request, never immediate evidence of release or absent writes. Supervise open/upgrade/transaction callbacks through actual terminal events; keep clones and detached I/O inside a private browser owner facade. Replace raw capture/workbench backend escapes with named operations. Full remains the presentation default after admission. No user database is modified during qualification; legacy cutover controls use disposable data and fresh browser profiles. Actual browser tests must cover both construction routes, old v1 blockers/fresh v1 refusal, cancellation/close/transaction drain and exact uncertain-write recovery. This corrects the plan's backend exclusion to meet the approved spec's explicit independently-opened-writer refusal; it does not qualify browser ownership before those gates.
+
 ### Task 8: Native durable, Firefox and memory qualification
 
-**Files:** Tests in the planned native/browser host tests and existing Djinn resident_mere tests. Root appends qualification receipts to this plan's Findings/Progress and owns index/D2/spec/parent status changes. Add target-wasm test dependencies `wasm-bindgen-test = "=0.3.79"` and `uuid` with `js` in existing `ports/graphshell/Cargo.toml`, matching Pandect's verified browser test floor; no production dependency or backend change. Enable `pictograph`'s existing `canvas` feature for its scope tests.
+**Files:** Tests in the planned native/browser host tests and existing Djinn resident_mere tests. Root appends qualification receipts to this plan's Findings/Progress and owns index/D2/spec/parent status changes. Add target-wasm test dependencies `wasm-bindgen-test = "=0.3.79"` and `uuid` with `js` in existing `ports/graphshell/Cargo.toml`, matching Pandect's verified browser test floor; Task7 owns the separately ruled narrow IndexedDB lifetime changes. Enable `pictograph`'s existing `canvas` feature for its scope tests.
 
 **Consumes:** complete implemented candidate and reviewed Tasks 1–7. Browser tests use existing wasm_bindgen_test_configure!(run_in_browser), IndexedDbBackend::open(name,"records") and Firefox.
 
@@ -690,9 +804,16 @@ async fn owned_checkpoint_resident_refresh_and_reopen_use_real_indexeddb() {
     assert_eq!(reader.graph().node_count(), 1);
     assert_eq!(reader.status(GraphAddress::Surface(Uuid::from_u128(8001))), pandect::addressable_graph::ResidencyStatus::NotLoaded);
     assert!(matches!(reader.refresh_if_changed().await.unwrap(), pandect::addressable_graph::RefreshOutcome::Unchanged));
+    let session_id = writer.id();
+    let expected = serde_json::to_vec(&writer.graph().to_snapshot_at(0)).unwrap();
+    // Every lease-retaining clone must drain before an independent reopen.
+    drop(reader);
+    drop(sessions);
+    drop(writer);
+    drop(backend);
     let reopened_store = muniment::IndexedDbBackend::open(&name, "records").await.unwrap();
-    let reopened = pandect::GraphSession::open(reopened_store, writer.id()).await.unwrap();
-    assert_eq!(serde_json::to_vec(&reopened.graph().to_snapshot_at(0)).unwrap(), serde_json::to_vec(&writer.graph().to_snapshot_at(0)).unwrap());
+    let reopened = pandect::GraphSession::open(reopened_store, session_id).await.unwrap();
+    assert_eq!(serde_json::to_vec(&reopened.graph().to_snapshot_at(0)).unwrap(), expected);
 }
 ```
 
@@ -783,3 +904,7 @@ A fresh remote comparison after local Task6 source commit `bb9025752` found `ori
 The locked p2panda input is fork commit `1bec457e` at tag `mere-p2panda-net-0.7.5`; the observed upstream main has 26 commits absent from that fork, which has 20 unique commits. Iroh 1.3.0 and iroh-blobs 0.103.1 are current releases, including the blob push fix; their upstream main branches also contain 19 and 7 newer unreleased commits respectively. Dependency reconciliation is separate from the resident-host implementation and does not silently change its frozen test inputs. The p2panda counts describe ancestry, not proof that every upstream change is absent semantically; preserve the fork's exact ALPN, rejoin, topic-update and shutdown behavior during a separate upstream review.
 
 Before Task7, prepare an isolated local candidate combining the qualified Task6 source with freshly observed Mere main. Current main changes the product/browser controls and identity boundary. Keep its Dramatis extraction and newer Knot family input. Knot `fef132ef9922ede907d80950762a7f313508547e` still needs the three default-off snapshot coverage constructor fields; carry that narrow compatibility amendment onto the newer Knot input and qualify its original defaults and the embedded forward build again. Original commits and receipts remain historical evidence. The combined candidate needs its own affected gates and integration review before controls continue. Shared push and main merge still require approval of the concrete qualified candidate.
+
+- **2026-10-10:** Current-main source reconciliation combines host metadata parent `25cbff5be` with freshly observed main `4f70d5362` in an isolated local candidate. Both-parent inspection preserves the native custody separation, Forme hold release and exact authored scopes alongside the qualified resident host. Three manifest/lock conflicts are resolved at source level; actual Cargo lock acceptance and integration review remain pending. Knot compatibility is carried onto main's `fef132ef` family as local immutable candidate `fb415b8014c017ccd0a6dd4dddf2c003b101680c`, with original-default byte restoration proven. Fresh default, wire/client, Pandect, Pictograph, Graphshell, Djinn, owner, native all-target and wasm gates must qualify these combined inputs before Task7 production begins. Browser ownership preflight is read-only; no owned-browser qualification or shared publication is claimed.
+
+- **2026-10-10:** Current-main integration prerequisite qualified and independently reviewed. The frozen combined source joins host parent `25cbff5be` and freshly verified upstream main `4f70d5362`; all ten gates pass: locked dependency resolution, Knot original-default check, wire47/client84, Pandect321, Pictograph395 with canvas, Graphshell402, Djinn122, native owner4, native all-target check and Wasm library check. Existing ignored probes and diagnostics remain explicit. Knot `fb415b8014c017ccd0a6dd4dddf2c003b101680c` retains its unchanged standalone pins/defaults; embedded Mere enables the compatibility construction feature. The source-only lock replaces six Knot IDs and preserves every other main dependency edge. Integration review finds no blocking issue; Root corrects the stale index summary and retains the unused Wasm helper warning for Task7. The Wasm library check does not compile the separate browser presenter, and library/fixed-authority tests do not prove the real keeper route. Task7 product/ownership controls, Task8 running native/client and actual Firefox/memory qualification, final whole-host review and shared publication remain pending. The local merge commit must retain every qualified runtime blob; compatibility remains unpublished until concrete publication approval.

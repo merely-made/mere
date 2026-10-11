@@ -55,6 +55,11 @@ impl Canvas {
     /// without the sim re-scrambling first (positions are no longer graph truth, S2).
     /// This is the Model-A graph swap the multi-graph switch drives. (Multi-graph MG2.)
     pub fn set_graph(&mut self, graph: Graph) {
+        // Node keys can be reused by another graph; release this view's local
+        // holds before syncing bodies under the replacement graph.
+        for key in self.forme_held.drain() {
+            self.physics.unpin(key);
+        }
         self.graph = graph;
         if let Some(members) = self.exact_scope.clone() {
             self.scope_to_exact_members(members);
@@ -65,6 +70,8 @@ impl Canvas {
             .strategy_graph_memo
             .get_mut()
             .expect("strategy input cache") = None;
+        self.forme_region = None;
+        self.forme_held.clear();
         self.selected.clear();
         self.selected_edges.clear();
         self.hidden_edges.clear();
@@ -149,6 +156,8 @@ impl Canvas {
             drag: None,
             pinned_nodes: HashSet::new(),
             field_drag: None,
+            forme_region: None,
+            forme_held: HashSet::new(),
             selected: HashSet::new(),
             selected_edges: HashSet::new(),
             hidden_edges: HashSet::new(),

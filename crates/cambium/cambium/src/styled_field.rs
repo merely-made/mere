@@ -17,7 +17,8 @@
 //! runs concatenate to the same text, so the host's `caret_rect` lines up exactly
 //! as over the plain field (which is already several inline nodes: text, the
 //! preedit span, text, the ghost span). Style ranges are byte ranges over the same
-//! buffer the host highlighted, so their bounds fall on char boundaries.
+//! buffer the host highlighted. Invalid bounds, including those that split UTF-8
+//! characters, are ignored.
 
 use std::ops::Range;
 
@@ -46,13 +47,20 @@ pub type FieldChild<State = TextInput, Action = ()> =
 
 /// Flatten possibly-overlapping `styles` over `len` bytes into non-overlapping
 /// runs, the innermost (smallest) range winning on overlap. Runs cover `0..len`
-/// with no gaps; a `None` class is unstyled text. Empty `styles` yields a single
+/// with no gaps; ranges with invalid bounds are ignored. A `None` class is
+/// unstyled text. Empty `styles` yields a single
 /// `None` run (the plain field).
-fn flatten(len: usize, styles: &[StyleRange]) -> Vec<(Range<usize>, Option<String>)> {
+fn flatten(text: &str, styles: &[StyleRange]) -> Vec<(Range<usize>, Option<String>)> {
+    let len = text.len();
     // Paint per byte, largest range first so a smaller (inner) range overwrites it.
     let mut ordered: Vec<&StyleRange> = styles
         .iter()
-        .filter(|s| s.range.start < s.range.end && s.range.end <= len)
+        .filter(|s| {
+            s.range.start < s.range.end
+                && s.range.end <= len
+                && text.is_char_boundary(s.range.start)
+                && text.is_char_boundary(s.range.end)
+        })
         .collect();
     ordered.sort_by_key(|s| std::cmp::Reverse(s.range.end - s.range.start));
     let mut paint: Vec<Option<&str>> = vec![None; len];
@@ -100,6 +108,21 @@ fn emit<State: 'static, Action: 'static>(
     }
 }
 
+/// Render committed text as styled runs without installing an editor.
+///
+/// This shares the same overlap handling as editable fields but has no caret,
+/// IME, ghost completion, or input routing. Ranges outside the text or whose
+/// bounds split a UTF-8 character are ignored; every source byte is preserved.
+pub fn styled_text_children<State: 'static, Action: 'static>(
+    text: &str,
+    styles: &[StyleRange],
+) -> Vec<FieldChild<State, Action>> {
+    let runs = flatten(text, styles);
+    let mut kids = Vec::new();
+    emit(&mut kids, text, &runs, 0, text.len());
+    kids
+}
+
 /// The children of a field element: the committed text as (styled) runs split at
 /// the caret to splice the IME preedit (an underlined span), then the ghost suffix.
 /// Empty `styles` renders the plain field (unstyled text nodes); non-empty paints
@@ -127,7 +150,7 @@ fn field_children_impl<State: 'static, Action: 'static>(
     let (before, preedit, after) = input.render_parts();
     let start = before.len();
     let end = text.len() - after.len();
-    let runs = flatten(text.len(), styles);
+    let runs = flatten(text, styles);
 
     let mut kids: Vec<FieldChild<State, Action>> = Vec::new();
     emit(&mut kids, text, &runs, 0, start);
@@ -237,7 +260,7 @@ mod tests {
 
     #[test]
     fn flatten_empty_styles_is_one_unstyled_run() {
-        assert_eq!(flatten(5, &[]), vec![(0..5, None)]);
+        assert_eq!(flatten("abcde", &[]), vec![(0..5, None)]);
     }
 
     #[test]
@@ -254,7 +277,7 @@ mod tests {
             },
         ];
         assert_eq!(
-            flatten(10, &styles),
+            flatten("abcdefghij", &styles),
             vec![
                 (0..2, Some("a".into())),
                 (2..5, Some("b".into())),
@@ -270,7 +293,100 @@ mod tests {
             class: "x".into(),
         }];
         // end past len is filtered, leaving a plain run.
-        assert_eq!(flatten(4, &styles), vec![(0..4, None)]);
+        assert_eq!(flatten("abcd", &styles), vec![(0..4, None)]);
+    }
+
+    #[test]
+    fn flatten_ignores_ranges_that_split_utf8_and_preserves_overlapping_text() {
+        let text = "aé🦀z";
+        let styles = vec![
+            StyleRange {
+                range: 0..text.len(),
+                class: "outer".into(),
+            },
+            StyleRange {
+                range: 1..7,
+                class: "inner".into(),
+            },
+            StyleRange {
+                range: 2..5,
+                class: "invalid".into(),
+            },
+            StyleRange {
+                range: 6..99,
+                class: "outside".into(),
+            },
+            StyleRange {
+                range: Range { start: 7, end: 1 },
+                class: "reversed".into(),
+            },
+        ];
+        let runs = flatten(text, &styles);
+        assert_eq!(
+            runs,
+            vec![
+                (0..1, Some("outer".into())),
+                (1..7, Some("inner".into())),
+                (7..8, Some("outer".into())),
+            ]
+        );
+        let rendered: String = runs.iter().map(|(range, _)| &text[range.clone()]).collect();
+        assert_eq!(rendered, text);
+        assert!(flatten("", &styles).is_empty());
+    }
+
+    #[test]
+    fn readonly_styled_children_preserve_utf8_text_with_no_field_artifacts() {
+        use crate::{DomHandle, runner::GenetAppRunner};
+        use genet_scripted_dom::ScriptedDom;
+        use layout_dom_api::{LayoutDom, LocalName, Namespace};
+        use std::cell::RefCell;
+        use std::rc::Rc;
+
+        const SOURCE: &str = "aé🦀z\n";
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let runner = GenetAppRunner::new(
+            dom.clone(),
+            |_: &()| {
+                el(
+                    "pre",
+                    styled_text_children::<(), ()>(
+                        SOURCE,
+                        &[
+                            StyleRange {
+                                range: 0..SOURCE.len(),
+                                class: "outer".into(),
+                            },
+                            StyleRange {
+                                range: 1..7,
+                                class: "inner".into(),
+                            },
+                            StyleRange {
+                                range: 2..5,
+                                class: "invalid".into(),
+                            },
+                        ],
+                    ),
+                )
+            },
+            (),
+        );
+        let dom = runner.dom();
+        let dom = dom.borrow();
+        let mut rendered = String::new();
+        let mut classes = Vec::new();
+        for kid in dom.dom_children(runner.root()) {
+            classes.push(
+                dom.attribute(kid, &Namespace::from(""), &LocalName::from("class"))
+                    .unwrap()
+                    .to_owned(),
+            );
+            for text in dom.dom_children(kid) {
+                rendered.push_str(dom.text(text).unwrap());
+            }
+        }
+        assert_eq!(rendered, SOURCE);
+        assert_eq!(classes, vec!["outer", "inner", "outer"]);
     }
 
     /// The caret field mounts with the `▍` span *at the split*: text-before,

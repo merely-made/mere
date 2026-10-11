@@ -7,6 +7,10 @@ repository.workspace = true
 description = "Graphshell presentation host and loopback acceptance view."
 autobins = false
 
+[[example]]
+name = "projection_dynamics_receipt"
+required-features = ["web"]
+
 [features]
 # Concrete native resident ownership factories.
 resident-storage = ["web", "muniment/directory", "muniment/redb", "dep:tokio"]
@@ -22,11 +26,10 @@ native = [
     "dep:blake3",
     "graphshell-endpoint/network",
     "graphshell-endpoint/stdio",
-    "dep:light-file-dialog",
     "dep:notochord",
-    "dep:castellan",
+    "dep:dramatis",
     "dep:personae",
-    "personae/agent",
+    "personae/ssh",
     "dep:rand_core",
     "dep:serde",
     "dep:pandect",
@@ -59,7 +62,7 @@ distillery-chronicle-fixture = ["webrtc-session", "dep:distillery", "dep:mesh"]
 # functions. No runtime, no transport, no carrier beyond its Wasm-clean core.
 # `webrtc-session` implies it. A wasm build also needs
 # `--cfg getrandom_backend="wasm_js"` in the target's rustflags — see
-# `crates/dramatis/personae/Cargo.toml` for why that cannot live here.
+# personae's `Cargo.toml` (in merely-made/dramatis) for why that cannot live here.
 # The browser's glue over the join: a `BrowserInitiator` as the join's frame
 # channel and the NDJSON session over its frames. wasm32 only in effect — the
 # carrier's `browser` adapter declares its JS bindings for that target alone,
@@ -92,6 +95,7 @@ webrtc-join = [
 # (physics catalog plan, P5c; mere `canvas-gpu`, ruled 2026-10-02).
 canvas-gpu = ["web", "mere/canvas-gpu"]
 web = [
+    "dep:tabard",
     "dep:async-trait",
     # The canvas's producer semantics for a screen reader (`canvas_reader`;
     # dynamics grammar plan, F67).
@@ -101,11 +105,15 @@ web = [
     "dep:mere",
     "dep:muniment",
     "dep:pandect",
+    "dep:platen",
     "dep:serde",
     "dep:sha2",
     "dep:uuid",
     "dep:url",
 ]
+# A bounded app-core host dialect over a disclosed capsule collection. Pack
+# verification is portable; the browser owns worker execution and its view.
+applets = ["web", "eidetic/pack-signing", "dep:personae"]
 # `mere_route`: a mere route's two projections as the mere view's model, and
 # the view's requests as the route's intents (reservoir plan V2b step 3, §7
 # item 42). It brings in `mere-view`, and with it Cambium, so it is opt-in.
@@ -142,6 +150,7 @@ muniment = { workspace = true, optional = true }
 # too, so it sits here rather than in the native-only table (reservoir plan
 # §7 item 26).
 pandect = { workspace = true, optional = true }
+platen = { workspace = true, optional = true }
 scenograph.workspace = true
 sceno.workspace = true
 scenomise.workspace = true
@@ -149,6 +158,7 @@ scenotime.workspace = true
 serde = { version = "1", features = ["derive"], optional = true }
 serde_json.workspace = true
 workbench.workspace = true
+tabard = { workspace = true, optional = true }
 # The projection editor's undo (Scenograph editor plan, E2 and SE10).
 edit-history.workspace = true
 sha2 = { workspace = true, optional = true }
@@ -174,13 +184,11 @@ webrtc-carrier = { workspace = true, optional = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 blake3 = { workspace = true, optional = true }
-light-file-dialog = { version = "3.21.3", optional = true }
-# The application composes Personae: the profile Graphshell speaks as. The
-# protocol and client crates deliberately do not depend on it.
-# The identity keeper: view, projection, authority. Graphshell composes it
-# and re-exports it at the pre-founding paths (identity, identity_projection,
-# native::personae_host).
-castellan = { workspace = true, features = ["keeper"], optional = true }
+# The identity read model and intents (`identity`, `identity_projection`).
+# Graphshell no longer links castellan (dramatis repo plan, D4, D15): its
+# doors serve whatever `native::resident_identity::ResidentIdentity` djinn
+# hands them, and applications reach custody through `native::custody_client`.
+dramatis = { workspace = true, optional = true }
 p2panda-core = { version = "0.7.0", optional = true }
 p2panda-store = { version = "0.7.0", default-features = false, optional = true }
 rand_core = { version = "0.6", features = ["getrandom"], optional = true }
@@ -216,6 +224,11 @@ path = "src/bin/g1_receipt.rs"
 required-features = ["native"]
 
 [[bin]]
+name = "personae-vault"
+path = "src/bin/personae_vault.rs"
+required-features = ["native"]
+
+[[bin]]
 name = "g4_sessions"
 path = "src/bin/g4_sessions.rs"
 required-features = ["native"]
@@ -241,16 +254,6 @@ path = "src/bin/n4_policy_receipt.rs"
 required-features = ["native"]
 
 [[bin]]
-name = "h4_identity_receipt"
-path = "src/bin/h4_identity_receipt.rs"
-required-features = ["native"]
-
-[[bin]]
-name = "persona_switch_receipt"
-path = "src/bin/persona_switch_receipt.rs"
-required-features = ["native"]
-
-[[bin]]
 name = "graphshell_native_host"
 path = "src/bin/graphshell_native_host.rs"
 required-features = ["native"]
@@ -263,29 +266,18 @@ path = "src/bin/receipt_ingest.rs"
 required-features = ["personal-sync"]
 
 [[bin]]
-name = "h4d_browser_receipt_host"
-path = "src/bin/h4d_browser_receipt_host.rs"
-required-features = ["native"]
-
-[[bin]]
-name = "h4e_browser_import_receipt_host"
-path = "src/bin/h4e_browser_import_receipt_host.rs"
-required-features = ["native"]
-
-[[bin]]
 name = "h4f_agent_probe"
 path = "src/bin/h4f_agent_probe.rs"
 required-features = ["native"]
 
 [dev-dependencies]
+# Tests and examples bind throwaway identities (vault lock plan, ruling 96).
+transport = { workspace = true, features = ["test-identity"] }
 # The native accessibility receipt (dynamics grammar plan, F67): the canvas's
 # producer semantics through cambium-winit-a11y's AccessKit lowering, driven
 # by the headless harness, its view built with Cambium, the tree read in
 # AccessKit's own types.
-accesskit = "0.24"
 cambium = { workspace = true }
-cambium-genet-winit-host = { workspace = true }
-cambium-winit-a11y = { workspace = true }
 # W1's integration receipt drives the actual Distillery Chronicle endpoint.
 # Distillery depends on Mere's substrate, not Graphshell, so this test-only
 # edge does not enter the product dependency graph.
@@ -311,6 +303,13 @@ tokio = { version = "1", features = [
     "rt-multi-thread",
     "time",
 ] }
+
+# These fixtures lower into the native AccessKit host, not the browser mirror.
+# Cargo's browser cone includes dev dependencies, so keep this lane scoped.
+[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
+accesskit = "0.24"
+cambium-genet-winit-host = { workspace = true }
+cambium-winit-a11y = { workspace = true }
 
 [[bin]]
 name = "c4_webrtc_host"

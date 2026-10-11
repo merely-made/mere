@@ -24,6 +24,19 @@ notices. Reuse that ownership and event path. Refuse an independently opened
 writer without proven ownership. Do not add a general multiwriter lock service,
 authority epochs or persistent request-receipt log for this milestone.
 
+**Implementation ruling (2026-10-10):** Browser admission needs a concrete storage
+lifetime guard because the current IndexedDB backend permits independent complete
+writers. Revised opens hold exclusive database-name admission, and version2
+cutover excludes the inspected old backend's explicit version1 opens. Existing
+record bytes, stores and indexes are preserved. A blocked or canceled submitted
+open remains visibly draining under its guard until terminal cleanup; it cannot
+release ownership while a request or transaction may still finish. The private
+browser owner withholds raw backend and writer clones. Full stays the default
+presentation for an admitted revised host. This limited backend correction
+satisfies the ownership requirement above; a generic lock service, authority
+epochs and persistent receipts remain outside the milestone. Disposable legacy
+fixtures and real browser lifecycle controls must qualify it before publication.
+
 Turnstone's custom snapshot/facet persistence is a subsequent explicit authority
 boundary. A dependency repin does not activate residency or migrate authority.
 Its later design must preserve legacy open/save/refusal behavior and prevent old

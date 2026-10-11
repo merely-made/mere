@@ -210,6 +210,10 @@ where
         self.runner.dispatch_pointer_up(self.window, event);
     }
 
+    fn hover_target(&self, hit: NodeId) -> Option<NodeId> {
+        self.runner.hover_target(self.window, hit)
+    }
+
     fn dispatch_hover(&mut self, target: NodeId, event: HoverEvent) {
         self.runner.dispatch_hover(self.window, target, event);
     }
@@ -297,6 +301,9 @@ impl MutationRouter {
                 DomMutation::AttributeChanged { node, .. }
                 | DomMutation::CharacterDataChanged { node }
                 | DomMutation::FormControlStateChanged { node }
+                | DomMutation::FormControlInteractionStateChanged { node }
+                | DomMutation::OptionStateChanged { node }
+                | DomMutation::FormControlCustomValidityChanged { node }
                 | DomMutation::SubtreeReplaced { node } => vec![*node],
                 DomMutation::Moved {
                     from_parent,

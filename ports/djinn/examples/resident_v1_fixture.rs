@@ -14,7 +14,7 @@
 use std::path::PathBuf;
 
 use djinn::settings::{KnotResidentSettings, OwnerSettings, settings_path};
-use knot_editor::{StartupUnlockedPersonalVault, VaultDocument, local_device_root};
+use knot_editor::{PersonalVaultKeys, StartupUnlockedPersonalVault, VaultDocument};
 use personae::{PersonaId, ProfileId};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -40,9 +40,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         return Err("resident_v1_fixture received unexpected arguments".into());
     }
 
-    pandect::wallet_store::ensure_wallet_state(&data_root, persona, "resident-v1")?;
-    let device_root = local_device_root(&data_root, "resident-v1")?;
-    let authority = StartupUnlockedPersonalVault::open(&data_root, persona, device_root, [])?;
+    castellan::custody::wallet::ensure_wallet_state(&data_root, persona, "resident-v1")?;
+    // The resident's own derivation, so the fixture writes what it will read.
+    let released = djinn::custody::epoch_keys(
+        &djinn::custody::ReleasePolicy::default(),
+        &data_root,
+        persona,
+        Some("resident-v1"),
+        &PersonalVaultKeys::requests(),
+    )?;
+    let keys = PersonalVaultKeys::from_released(&released)?;
+    let authority = StartupUnlockedPersonalVault::open(&data_root, persona, keys, [])?;
     authority.author_document(VaultDocument {
         id: "field-note".into(),
         title: "Resident V1".into(),

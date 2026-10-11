@@ -1,7 +1,9 @@
 # Dynamics Grammar Plan
 
 **Date:** 2026-10-02
-**Status (2026-10-08):** G1 merged 2026-10-03 (`39787d82`): the declarations, the instruments, F7's relabel and exponent, and F10's measurement and change, with the four questions G1 returned ruled as F14 to F17 (§1.1) and carried out. G7, arrangement roles, merged 2026-10-04 (`2d4b1ee9`), and G9, permitted actions, 2026-10-05 (`c1cd69ff`). G3, combinators and currencies, merged 2026-10-07 (`356a832c`, F91), with F70 to F83 and F90 carried out and F72's within-group stress bar still open. G4a, the spec's core, merged 2026-10-08 (F93 to F115). G2, one channel registry with Meaning included, merged 2026-10-08 (`grammar-g2` at its landing round, origin's main `329d60d0` merged in; the push to main follows, made by the coordinator), with F31 to F39, F42, F43, F50 to F59, F84 to F89, F70's follow-through and F132 to F136 carried out; G4b, the binding, follows it. G8 is open. The gate on G3 to G6 that the S14 pass raised was ruled cleared on 2026-10-06 (§3). Written from the [dynamics grammar brief](../research/2026-10-02_dynamics_grammar_brief.md) and Mark's rulings of 2026-10-02.
+**Status (2026-10-10):** the bounded Scenograph dynamics slot and occurrence matrix are committed (`e2543cee`, `4de119d3`, `72ce892d`; F192 to F195, F200 to F202). Native/wasm fixture identity is qualified against integrated upstream Genet `7422e906` and Vello `491c376c`; the [handoff](../research/2026-10-09_scenograph_codex_handoff.md#ruled-continuation-2026-10-10) records browser qualification and its open Firefox gate. The physics coordinator retains review and the broader queue under F198/F199. The earlier milestone snapshot below is historical.
+
+**Historical status (2026-10-08):** G1 merged 2026-10-03 (`39787d82`): the declarations, the instruments, F7's relabel and exponent, and F10's measurement and change, with the four questions G1 returned ruled as F14 to F17 (§1.1) and carried out. G7, arrangement roles, merged 2026-10-04 (`2d4b1ee9`), and G9, permitted actions, 2026-10-05 (`c1cd69ff`). G3, combinators and currencies, merged 2026-10-07 (`356a832c`, F91), with F70 to F83 and F90 carried out and F72's within-group stress bar still open. G4a, the spec's core, merged 2026-10-08 (F93 to F115). G2, one channel registry with Meaning included, merged 2026-10-08 (`grammar-g2` at its landing round, origin's main `329d60d0` merged in; the push to main follows, made by the coordinator), with F31 to F39, F42, F43, F50 to F59, F84 to F89, F70's follow-through and F132 to F136 carried out; G4b, the binding, follows it. G8 is open. The gate on G3 to G6 that the S14 pass raised was ruled cleared on 2026-10-06 (§3). Written from the [dynamics grammar brief](../research/2026-10-02_dynamics_grammar_brief.md) and Mark's rulings of 2026-10-02.
 **Scope:** turn the physics catalog's laws, overlays and slots into one specification model of *terms and targets*. Every term declares what it is, and two instruments check each declaration. Sources become one channel registry. Composition gets declared semantics (a weighted sum at a common scale, groups, schedules, currencies). Choices travel as a portable `DynamicsSpec`. Annealing and one optimizer join integration as realizations, gated on each term's class. Pins, anchors and contacts report whether they were satisfied. This plan is P7 of the physics catalog plan, moved here by ruling F2.
 
 Not in scope:
@@ -11,6 +13,7 @@ Not in scope:
 - Any change to `sceno::Score`.
 
 **Related:**
+- [cross-app design language record, 2026-10-09](../../2026-08-23_projection_scenes_and_graph_native_platform.md#9-configurable-visual-and-interaction-language-2026-10-09): predictable behavior informed by entity data, inspectable derived links, and the interaction distinction between foreground pins, position pins, anchors and forme layout locks. No new grammar role or realization is declared there.
 - [dynamics grammar brief](../research/2026-10-02_dynamics_grammar_brief.md): the evidence, the decomposition tables (§5) and the hypothesis test (§6) this plan builds on.
 - [physics catalog plan](2026-09-02_physics_catalog_plan.md): the catalog, P5 and P6, and the record of every ruling below.
 - [projection grammar adoption plan](2026-08-15_projection_grammar_adoption_plan.md): the sibling this plan stands beside, and its discipline, "Solver proposes, the score records".
@@ -460,6 +463,12 @@ Mark's words are quoted as the physics catalog plan records them (§3, P7, and �
 **F198, who builds SE69's dynamics slot (2026-10-09).** Question: asked whether to open the slot lane (F192 to F195) in a free slot, Mark answered "Open it now (Recommended)"; the coordinator then found Scenograph's SE87 (main `db24dbe9`) handing the slot, the grid's dynamics axis, S2 and B1 to the Codex agent ("All three"), its brief `mere_docs/research/2026-10-09_scenograph_codex_handoff.md` quoting F192 to F195, and put the conflict back. Options: Codex has it, the coordinator's lane dropped; the coordinator builds the slot and Codex keeps the rest. Mark: **"Eh, I just don’t have enough usage limit here :c let’s pass it to codex! But feel free to review"**. *Follows:* SE87 stands and supersedes "Open it now"; the coordinator opens no slot lane, reviews Codex's build when it lands, and takes its forks as rounds here.
 
 **F199, pace while Mark's usage is short (2026-10-09).** Question: SE87 records about 25% of Mark's usage left; queued were T2, G4b2's design round and genet's mere adoption (D21). Options: land what is done, then pause, opening no lane and prompting nothing until Mark says, peers answered only where something blocks; one lane at a time; carry on. Mark: **"Land what's done, then pause (Recommended)"**.
+
+**F200, direct data positions in occurrence previews (2026-10-10).** Question: should positions that directly represent data stay fixed while ranks, ordering and layout slots may move, keeping scatter coordinates faithful while allowing dynamics on grid and spiral layouts? Mark: **"Hold direct data positions (Recommended)"**. *Follows:* the occurrence adapter distinguishes direct coordinates from ranked cells and ordinal layout slots. F28/F47 still govern encoded axes and contact-only overlap separation. *Reading, not ruled:* the catalog's Timeline holds its continuous x axis; Radial's ring index is a layout slot, not a Cartesian coordinate. An unknown solver needs an explicit constraint adapter rather than an inferred free axis.
+
+**F201, refusing both dynamics alternatives (2026-10-10).** Question: should a variant naming both a preset and a full dynamics spec be refused, as the draft's tagged choice does? Mark: **"Refuse both (Recommended)"**. *Follows:* F194's earlier reading is now ruled: a variant carries one alternative; binding resolves a preset through the host catalog and refuses unknown ids by path.
+
+**F202, configurable preview step limit (2026-10-10).** Question: should the configurable preview limit default to 60 ticks, with capped cells labeled "Step limit reached"? Mark: **"60 ticks (Recommended)"**. *Follows:* the host installs 60 as its editable default; a capped snapshot does not claim rest. F195's three-occurrence, twelve-preset probe supplied the choice. The corrected source-hashed receipt measured about 0.96 seconds per wasm run at 60 ticks versus 14.79 seconds at 4,000, including startup and concurrent workspace load; it supersedes the initial 0.30/13.84-second estimate in the question. This is a fixture measurement, not a large-scene performance claim. F199's broader pause remains in effect.
 **F40, G7 (2026-10-03).** Question: approve G7, arrangement roles (§2, proposed at `784ce5b5`), which carries out F18 to F30, and place it. Options: approve, with G7 before G3; approve, after G2; amend first. Mark: **"Approve; G7 before G3"**. *Follows:* G7 starts now beside G2's open work, and G3 follows it, since G3's schedules use captures with a role (F27).
 
 **F41, the README's text (2026-10-03).** Question: the design-vocabulary section F13 placed in the README, its projection half in Mark's words and its dynamics half drafted from the rulings, placed after Status. Options: use the text as shown; the projection half only; edit the wording. Mark: **"Use this text"**. *Follows:* the section is committed as shown.
@@ -900,6 +909,42 @@ cleared with G7's merge. G3 starts now, and Mark sets the order of G4 to G6
 when G3 reports.
 
 This pass decides none of them.
+
+### Design-language research inputs (2026-10-09)
+
+Mark's [voice clarifications, design language §9.8](../../2026-08-23_projection_scenes_and_graph_native_platform.md#98-voice-clarifications-and-research-boundaries-2026-10-09)
+ask for visible explanations of simultaneous forces through vectors, shape or
+relationship treatments. These are candidate forms, not chosen marks. A link's
+projection can explain its dynamics contribution; relationship membership alone
+does not install a force. Nodes, links and fields are considered together.
+
+The field plan carries overlapping and nested region behavior. This grammar
+must supply the motion/constraint account those projections explain, including
+anchors and pins; common-scale, composition and satisfaction semantics remain
+authoritative. A forme arrangement coexists with other scene behavior. Layout
+locking does not imply a global pause or override.
+
+*Candidate proof, not opened:* inspect an item with two active contributions
+and an arrangement constraint; distinguish contributions, resultant and
+constraint satisfaction, with a control disabling one contribution. Derive
+the explanation from the terms actually evaluated. Composition across fields
+and its inspector remain open. This is research context, not a new F ruling,
+completed G6 surface or change to F192-F199's order.
+
+The [primitive planning direction, §9.9](../../2026-08-23_projection_scenes_and_graph_native_platform.md#99-plan-through-graph-primitives-2026-10-09)
+connects nodes, links and fields to dynamics through explicit participation.
+The proposed edge/resource-association terminology needs graph-semantics
+reconciliation before it changes any channel or endpoint contract. The
+projection should explain a term using the primitive identities it actually
+reads; this direction does not attach dynamics to every stored relationship.
+
+The editor's [source-backed primitive map](2026-10-07_scenograph_editor_plan.md#primitive-and-dynamics-map-2026-10-09-source-backed-planning)
+records the existing bridge's body, visible-relation spring and field-coupling
+paths. A later explanation proof needs a binding from the evaluated term/spec
+path to the source assertion or `FieldId`/`CouplingId` and the affected body or
+appearance. The current endpoint-pair spring input alone does not supply that
+account. Preserve grouping disclosure where one visible relation cell covers
+multiple assertions; choosing a richer explanation seam remains design work.
 
 ## 4. Findings
 
@@ -1430,3 +1475,21 @@ This pass decides none of them.
     - Headed, on that bundle (`receipts-merged.log`; ports 9180 to 9196, one port and Chrome profile per receipt): 16 of 16 pass. They are the eleven `p4_tree_physics_*` law receipts, `physics_profiles` on both pages, `scene_save_reopen`, `codicil_grouping` and Density's tree control. The page-error control fails by the receipt gate, as it should. Load during the set averaged 51 %, at most 63 %.
     - The release receipts (Density's and F73's five, `release-receipts-merged.log`): 5 passed. `compare-release.py` against rapier-036's clean round at `f8ced613` held 62 of 62 figure lines unchanged (`compare-release-merged.log`). Load during the run averaged 40 %, at most 76 %, its own release build included.
   - No number moved.
+
+## Backdrop control correction (2026-10-10)
+
+Mark's [design-language correction, §9.13](../../2026-08-23_projection_scenes_and_graph_native_platform.md#913-backdrop-context-props-and-reset-2026-10-10)
+separates Reset from contextual ambient content, prop display, animated or
+interactive scenery, and physical participation. A backdrop is a scene set;
+props can have authored attributes and scripted behavior. Ambient nodes are
+contextual entities, not necessarily decorative animation or intangible
+bodies. Their roles do not imply collision masks or install a force.
+
+The portable backdrop's independent visibility/collision contract and the
+minimum static-obstacle binder remain applicable. Interactive or moving
+scenery requires its entity/action and runtime integration, rather than
+expanding the decorative `AmbientSim` paint seam by assumption. Reset's target
+baseline and whether it also rewinds animation/scripted state remain design
+questions. Coordinate reset, simulation reset and content/source undo must
+not be silently conflated. This is a consumer-control correction, not a new
+F ruling, changed force-composition policy or a qualification of B1.

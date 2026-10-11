@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-10
 **Status:** COMPLETE 2026-08-10 (W0-W4). One question spun out; see W3.
-**Anchors:** [dramatis tier plan](2026-08-10_dramatis_tier_plan.md) D4,
+**Anchors:** dramatis tier plan (`repos/dramatis/design_docs/archive_docs/2026-10-06_completed_plans/2026-08-10_dramatis_tier_plan.md`) D4,
 [credential port + gazette brief](../../mere_docs/research/2026-08-10_credential_port_gazette_brief.md),
 the 2026-07-08 personae founding ruling ("the carry layer folds into the same
 crate later"), the 2026-08-08 family-shared identity plan.

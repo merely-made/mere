@@ -6,7 +6,7 @@
 `8167d196`, C4's last fold `cambium::nematic` on 2026-09-25). insigne's
 phases A to D have landed (A `5364dfa0`, B `538226a3`; C in Mere and Knot and
 D in Gaz on 2026-09-29, per the
-[insigne proofs plan](../../archive_docs/2026-10-06_completed_plans/2026-09-23_insigne_proofs_plan.md)),
+insigne proofs plan (`repos/dramatis/design_docs/archive_docs/2026-10-06_completed_plans/2026-09-23_insigne_proofs_plan.md`)),
 and chatelaine's P1 to P3 (`da3c50bc`, `3e4992ec`, `ff68e86c`, by 2026-10-02),
 which meets C5's conditions. Open: C5's version baseline; C6's crates.io
 deletions, which are Mark's; and the dramatis facade (C2's dramatis row,
@@ -153,6 +153,35 @@ Finding: pandect's `atomic_file::write_bytes_with_backup` and Pelt's
 replace-file writer are two atomic-write implementations; T4 moves Pelt's into
 tabard, and unifying the two is recorded rather than done here. After T4 both
 are safe temp-and-rename writers; pandect's also keeps a backup.
+
+**Boundary follow-up (2026-10-07, implemented).** T2–T4 made Tabard a shared
+library but retained its original port location. `check_port_boundaries.py`
+reproduced a shared-crate dependency on the old Tabard port; the full metadata audit also finds Tabard
+edges from pandect, registry and document-lanes. Move the entire existing
+package to `crates/system/tabard`, preserving its name, API and tests; update
+the workspace member and dependency paths, with no boundary-check exemption.
+Done when Tabard's suite and affected consumer checks pass and Cargo metadata
+shows no shared-crate dependency on a Tabard port.
+
+**Authorized follow-ups (2026-10-07, implemented).** The full gate exposed two more shared
+crate-to-port edges and a native test dependency in the web cone. Alembic's
+existing library moves to `crates/distillery/alembic` without changing its
+Distillery domain ownership. The Commons + Moot coop example moves to the
+Moot port, preserving Commons as the substrate and the existing coop API.
+Graphshell's native accessibility harness dependencies and test module become
+native-target-only. Done when the unmodified full boundary check passes,
+Alembic's recall tests pass, the moved example builds, and the native
+Graphshell test targets still type-check.
+
+**Validation (2026-10-07):** the unchanged
+`python3 scripts/check_port_boundaries.py` passes both the shared-crate/port
+rule and Graphshell's wasm web dependency cone. Locked, offline validation:
+Tabard 49 tests (including the workshop extension in the theme modes plan),
+Alembic 7 recall tests; `cargo check` passes for Mere with `graph`, registry,
+Pandect, document-lanes and Pelt desktop, the relocated
+`mere-moot --example commons_practice_peer`, and Graphshell's library/test
+targets with default native features plus `web`. The isolated checkout used
+the existing Woodshed sibling fixture for Graphshell's test targets.
 
 ### C3. Components folded
 
@@ -373,7 +402,7 @@ crate inventory at the Code root.
   dramatis tier, chatelaine's CXF-shaped taxonomy remains.
 - 2026-10-01. Mark ruled the shapes of the two remaining dramatis
   reservations, recorded with the evidence in the
-  [dramatis tier architecture](../../dramatis_docs/technical_architecture/2026-09-30_dramatis_tier_architecture.md)
+  dramatis tier architecture (`repos/dramatis/design_docs/2026-09-30_dramatis_tier_architecture.md`)
   §7. chatelaine is a plain taxonomy like insigne's core, and castellan's OTP
   read model moves in; its CXF import policy is ruled for all 17 types.
   dramatis is a real facade for repos outside mere. Both are unbuilt. C5's
@@ -381,7 +410,7 @@ crate inventory at the Code root.
   its shape ruled, that condition is now buildable rather than waiting on
   design. The facade is not a C5 condition.
 - 2026-10-01, later. The
-  [chatelaine and CXF plan](../../dramatis_docs/implementation_strategy/2026-10-01_chatelaine_cxf_plan.md)
+  chatelaine and CXF plan (`repos/dramatis/design_docs/2026-10-01_chatelaine_cxf_plan.md`)
   is drafted. Mark ruled that chatelaine subsumes castellan's Secret Service
   store as part of founding (its ruling 17), so C5's chatelaine condition is
   met at that plan's P3: the taxonomy, OTP on it, and the Secret Service on

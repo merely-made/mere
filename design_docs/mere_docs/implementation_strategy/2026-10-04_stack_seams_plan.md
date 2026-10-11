@@ -126,7 +126,7 @@ in two or more crates.
   (`crates/system/pandect/src/view_intent_store.rs` 118), which is the swatch
   design's curation plane.
 - **F10. Two `PersonaId`s, an id and a key.** personae's is a UUID
-  (`crates/dramatis/personae/src/lib.rs` 120); mien's is "a persona's leaf
+  (`repos/dramatis/crates/personae/src/lib.rs` 120); mien's is "a persona's leaf
   identity (its public key)" that "derives in production from master +
   persona_id" (`crates/moot/mien/src/persona_chain.rs` 35).
 - **F11. The README and TERMINOLOGY behind the record.** The README called Mere
