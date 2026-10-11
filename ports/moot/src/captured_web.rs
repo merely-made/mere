@@ -14,10 +14,10 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use eidetic_search::{DocumentIndex, DocumentIndexConfig, SearchDocument};
-use gemot::moot::{FaunaEntry, MootRoster};
-use mere_document_lanes::eidetic_bridge::{
+use fleece::eidetic_bridge::{
     CaptureIdentity, FLEECE_ANNOTATION_SCHEMA_ID, FleeceAnnotationRecord,
 };
+use gemot::moot::{FaunaEntry, MootRoster};
 use servitor::AuthorityProvider;
 
 /// Exact Fleece identity used for display and search grouping.

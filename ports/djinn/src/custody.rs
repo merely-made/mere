@@ -296,6 +296,17 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
                 return Err(CustodyRefusal::NotServed);
             }
             unlocked(&keeper)?;
+            #[cfg(feature = "cxf")]
+            if matches!(command.as_str(), "cxf-preview" | "cxf-import") {
+                return tokio::task::spawn_blocking(move || {
+                    keeper
+                        .cxf_command(&command, &args)
+                        .map(|text| CustodyAnswer::VaultOutput { text })
+                        .map_err(refused)
+                })
+                .await
+                .map_err(failed)?;
+            }
             // File import and SSH commands are blocking. The keeper holds its
             // vault mutex for the act, so a lock cannot interleave with it.
             tokio::task::spawn_blocking(move || {
@@ -303,9 +314,18 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
                     .host()
                     .vault_command(&profile, &command, &args)
                     .map(|output| match output {
-                        castellan::authority::VaultCommandOutput::Text(text) => CustodyAnswer::VaultOutput { text },
-                        castellan::authority::VaultCommandOutput::Enrollment { target, script, confirmation } =>
-                            CustodyAnswer::VaultEnrollment { target, script, confirmation },
+                        castellan::authority::VaultCommandOutput::Text(text) => {
+                            CustodyAnswer::VaultOutput { text }
+                        },
+                        castellan::authority::VaultCommandOutput::Enrollment {
+                            target,
+                            script,
+                            confirmation,
+                        } => CustodyAnswer::VaultEnrollment {
+                            target,
+                            script,
+                            confirmation,
+                        },
                     })
                     .map_err(|error| match error {
                         castellan::authority::IdentityIntentError::Locked => CustodyRefusal::Locked,
@@ -347,7 +367,12 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
         },
         CustodyCall::Attest { source, salt } => {
             unlocked(&keeper)?;
-            attest(keeper.policy(), source, root(&keeper, source)?.provider(), &salt)
+            attest(
+                keeper.policy(),
+                source,
+                root(&keeper, source)?.provider(),
+                &salt,
+            )
         },
         CustodyCall::Sign {
             source,
@@ -776,14 +801,21 @@ mod tests {
             )),
             "the legacy writer's secret stays in djinn"
         );
-        let install = insigne::delegation::delegation_signing_salt(&insigne::delegation::CapabilityScope {
-            domain: "mere.denizen".into(),
-            resource: b"resident".to_vec(),
-            path_prefix: "scope/".into(),
-            actions: ["write".to_string()].into_iter().collect(),
-        });
-        assert!(policy.allows_act(KeySource::Persona, &install), "djinn signs an install");
-        assert!(!policy.allows(KeySource::Persona, &install), "and never releases its key");
+        let install =
+            insigne::delegation::delegation_signing_salt(&insigne::delegation::CapabilityScope {
+                domain: "mere.denizen".into(),
+                resource: b"resident".to_vec(),
+                path_prefix: "scope/".into(),
+                actions: ["write".to_string()].into_iter().collect(),
+            });
+        assert!(
+            policy.allows_act(KeySource::Persona, &install),
+            "djinn signs an install"
+        );
+        assert!(
+            !policy.allows(KeySource::Persona, &install),
+            "and never releases its key"
+        );
         for door in graphshell::native::local_session::door_salts([7; 32]) {
             assert!(
                 !policy.allows(KeySource::Persona, &door),

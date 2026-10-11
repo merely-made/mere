@@ -29,8 +29,7 @@ members = [
     "crates/domain/apparatus",
     "crates/platen/platen",
     "crates/eidetic/eidetic-core",
-    "crates/import",
-    "crates/crawl",
+    "crates/fleece",
     "crates/intel/esp",
     "crates/intel/eidetic-search",
     "crates/intel/mora-cmudict",
@@ -233,8 +232,8 @@ scenograph = { version = "0.0.4", path = "crates/cambium/scenes/scenograph" }
 # this graph (Knot, through djinn) must pin the same revision too. Until
 # dramatis is pushed, the gitignored `.cargo/config.toml` patches these to a
 # local checkout.
-personae = { version = "0.2.1", git = "https://github.com/merely-made/dramatis.git", rev = "c1d620764315b4c750fcffea30b8c898b8bb73bc" }
-notochord = { version = "0.1.0", git = "https://github.com/merely-made/dramatis.git", rev = "c1d620764315b4c750fcffea30b8c898b8bb73bc" }
+personae = { version = "0.3.0", git = "https://github.com/merely-made/dramatis.git", rev = "0234e7eea6f2ddf2330a71b9425da01b06ae0391" }
+notochord = { version = "0.1.1", git = "https://github.com/merely-made/dramatis.git", rev = "0234e7eea6f2ddf2330a71b9425da01b06ae0391" }
 chartulary = { version = "0.2.1", path = "crates/eidetic/chartulary" }
 # The legend/memorial view over journals and codicils; reservation only.
 hagiograph = { version = "0.0.1", path = "crates/eidetic/hagiograph" }
@@ -258,8 +257,8 @@ graphshell-endpoint = { version = "0.0.2", path = "crates/graphshell/graphshell-
 # with the lent signing seed (vault lock rulings 49, 57-59), on Knot's
 # current-family repin: every Mere row at `f1d169c7`, genet `965b64e`. Knot
 # moved first, and djinn's `knot-site` row follows this one.
-knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "fef132ef9922ede907d80950762a7f313508547e" }
-knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "fef132ef9922ede907d80950762a7f313508547e" }
+knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "4d8b81c5ed8fbe29bac9fc762cb71f161e00c784" }
+knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "4d8b81c5ed8fbe29bac9fc762cb71f161e00c784" }
 # The credential-keeper port (dramatis plan D4). No longer a reservation:
 # C1/C2 landed the OTP core, sealed OTP items, the release gate, and the
 # `keeper` identity surface graphshell re-exports.
@@ -320,7 +319,8 @@ document-canvas = { version = "0.1.0", path = "crates/inker/document-canvas" }
 # `crates/inker/knot-editor-host` opts back into `html-fragment` explicitly, and
 # so does the external knot-editor.
 nematic = { version = "0.1.1", path = "crates/nematic/nematic", default-features = false }
-fleece = { version = "0.5.0", git = "https://github.com/merely-made/genet.git", rev = "7422e90613f9017e5bb790e3acb48f61776b2eda" }
+fleece-extract = { package = "fleece", version = "0.5.0", git = "https://github.com/merely-made/genet.git", rev = "7422e90613f9017e5bb790e3acb48f61776b2eda" }
+fleece = { package = "mere-fleece", path = "crates/fleece", version = "0.0.1" }
 genet-text = { version = "0.1.0", git = "https://github.com/merely-made/genet.git", rev = "7422e90613f9017e5bb790e3acb48f61776b2eda" }
 # Landed here from genet 2026-09-03 (platform boundary plan, P3): a workspace
 # member now, so it is a path dep and must NOT appear in .cargo/config.toml's
@@ -458,12 +458,6 @@ eidetic = { version = "0.0.2", path = "crates/eidetic/eidetic-core", default-fea
 # portable eidetic core it was sitting beside reaches neither.
 eidetic-search = { path = "crates/intel/eidetic-search" }
 
-# Browser-data ingest (bookmarks/history/session models + parsers); consumed
-# by the eidetic-recall bridge and, later, the shell's import verbs.
-import = { path = "crates/import" }
-crawl = { package = "mere-crawl", path = "crates/crawl" }
-
-
 # Standalone spec-B misfin implementation (promoted out of this workspace
 # 2026-07-03). It moved into the smolweb workspace in the 2026-07-23
 # consolidation and its own repo was deleted, so this is a crates.io pin rather
@@ -502,7 +496,7 @@ mesh = { package = "mere-mesh", path = "crates/mesh/mesh" }
 # The same crate as `personae` above, under mere's historical alias. Both
 # entries must carry the SAME version: they resolve to one package, and a
 # stale pin here is invisible from the personae line.
-identity = { package = "personae", version = "0.2.1", git = "https://github.com/merely-made/dramatis.git", rev = "c1d620764315b4c750fcffea30b8c898b8bb73bc" }
+identity = { package = "personae", version = "0.3.0", git = "https://github.com/merely-made/dramatis.git", rev = "0234e7eea6f2ddf2330a71b9425da01b06ae0391" }
 # The participant authority gate (participant gate B1/B3): document-host derives
 # its import-level Grant from a servitor authority — one grant, two faces.
 servitor = { version = "0.0.2", path = "crates/servitor" }
@@ -514,17 +508,17 @@ muniment = { version = "0.1.2", path = "crates/eidetic/muniment" }
 # an index, being gazetted, and the paper you read — so the resolver grows
 # into the port rather than sitting beside one. Built today: WebFinger
 # resolution. Unbuilt: the contact and recipient surfaces over `gaz`, feed
-# polling over `mere-crawl`, and the reading room. Its blocking reqwest
+# polling over `fleece::crawl`, and the reading room. Its blocking reqwest
 # still needs an async port before a resident polls with it.
 gazette = { version = "0.0.1", path = "ports/gazette" }
 # Stored key-rooted contacts (the "them" side personae keeps): petnames, handles,
 # per-endpoint trust, kith/kin tiers, recency. Relocated from repos/gaz 2026-08-10.
-gaz = { version = "0.0.1", git = "https://github.com/merely-made/dramatis.git", rev = "c1d620764315b4c750fcffea30b8c898b8bb73bc" }
+gaz = { version = "0.0.2", git = "https://github.com/merely-made/dramatis.git", rev = "0234e7eea6f2ddf2330a71b9425da01b06ae0391" }
 # The cast-list tier's facade reservation; empty until something imports it.
-dramatis = { version = "0.0.2", git = "https://github.com/merely-made/dramatis.git", rev = "c1d620764315b4c750fcffea30b8c898b8bb73bc" }
+dramatis = { version = "0.0.3", git = "https://github.com/merely-made/dramatis.git", rev = "0234e7eea6f2ddf2330a71b9425da01b06ae0391" }
 # The graded identity proofs and the never-shown secrets; reservations, no code.
-insigne = { version = "0.0.1", git = "https://github.com/merely-made/dramatis.git", rev = "c1d620764315b4c750fcffea30b8c898b8bb73bc" }
-chatelaine = { version = "0.0.2", git = "https://github.com/merely-made/dramatis.git", rev = "c1d620764315b4c750fcffea30b8c898b8bb73bc" }
+insigne = { version = "0.0.2", git = "https://github.com/merely-made/dramatis.git", rev = "0234e7eea6f2ddf2330a71b9425da01b06ae0391" }
+chatelaine = { version = "0.0.3", git = "https://github.com/merely-made/dramatis.git", rev = "0234e7eea6f2ddf2330a71b9425da01b06ae0391" }
 # The shared "which persona am I?" list. A Cambium view over the personae
 # roster, so the four applications with a GUI draw one picker rather than four.
 persona-picker = { package = "mere-persona-picker", path = "crates/dramatis/persona-picker" }
@@ -640,7 +634,7 @@ graphshell = { path = "ports/graphshell" }
 graphshell-endpoint = { path = "crates/graphshell/graphshell-endpoint" }
 illume = { path = "crates/nematic/illume" }
 inker = { path = "crates/inker/inker" }
-insigne = { git = "https://github.com/merely-made/dramatis.git", rev = "c1d620764315b4c750fcffea30b8c898b8bb73bc" }
+insigne = { git = "https://github.com/merely-made/dramatis.git", rev = "0234e7eea6f2ddf2330a71b9425da01b06ae0391" }
 knot-editor-host = { path = "crates/inker/knot-editor-host" }
 mere-proofs = { path = "crates/system/proofs" }
 mere-surface-api = { path = "crates/system/surface-api" }
@@ -649,9 +643,9 @@ mora-cmudict = { path = "crates/intel/mora-cmudict" }
 reference-data = { path = "crates/intel/reference-data" }
 muniment = { path = "crates/eidetic/muniment" }
 nematic = { path = "crates/nematic/nematic" }
-notochord = { git = "https://github.com/merely-made/dramatis.git", rev = "c1d620764315b4c750fcffea30b8c898b8bb73bc" }
+notochord = { git = "https://github.com/merely-made/dramatis.git", rev = "0234e7eea6f2ddf2330a71b9425da01b06ae0391" }
 pandect = { path = "crates/system/pandect" }
-personae = { git = "https://github.com/merely-made/dramatis.git", rev = "c1d620764315b4c750fcffea30b8c898b8bb73bc" }
+personae = { git = "https://github.com/merely-made/dramatis.git", rev = "0234e7eea6f2ddf2330a71b9425da01b06ae0391" }
 sceno = { path = "crates/cambium/scenes/sceno" }
 # Knot has named these two since its `5516606`; they arrived with the
 # `c966e31` pin (wing ruling 586, "With djinn's Knot repin (Recommended)").

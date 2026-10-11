@@ -59,8 +59,10 @@ query = ["linked-data", "linked-data/query"]
 # Test-only fixture escape hatch. This mirrors kernel's gate without exposing
 # the fixture API to ordinary library consumers.
 fixtures = ["graph", "kernel/fixtures"]
+clip = ["graph", "dep:fleece", "fleece/clip"]
 
 [dependencies]
+fleece = { workspace = true, optional = true }
 accesskit = { workspace = true, optional = true }
 netrender = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
