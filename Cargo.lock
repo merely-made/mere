@@ -9611,6 +9611,7 @@ dependencies = [
  "p2panda-store",
  "personae",
  "serde",
+ "serde_json",
  "stickleback",
  "tempfile",
  "thiserror 1.0.69",
