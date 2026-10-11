@@ -211,6 +211,7 @@ pub mod dynamics_spec;
 /// onto them, and the named profiles. (Physics catalog — P1.)
 pub mod physics_catalog;
 mod physics_view;
+mod projection_backdrops;
 pub mod projection_dynamics;
 /// Schedules of compositions, each stage to its stop, with captures taken by
 /// role. (Dynamics grammar plan, G3.)
@@ -390,6 +391,7 @@ pub struct Canvas {
     /// The content-surface backdrop color (themed; the host pushes it via
     /// [`set_palette`](Self::set_palette)). Defaults to the dark slate.
     backdrop: ColorF,
+    projection_backdrops: Vec<projection_backdrops::ResolvedBackdrop>,
     /// Producer generation, bumped each rendered frame (positions / camera move).
     generation: u64,
     /// Last cursor position in screen px (zoom anchor + drag origin).
