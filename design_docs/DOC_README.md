@@ -26,6 +26,13 @@ proposals, distinct from the agreed forme draft and existing runtime receipts.
 
 ## Required reading order
 
+Embedding continuation (2026-10-10): the
+[low-power managed-network plan](mere_docs/implementation_strategy/2026-07-24_low_power_managed_network_plan.md#2026-10-10--embedding-and-transport-reuse)
+records current iroh/p2panda host reuse and points to Retinue's management and
+canonical device-operation probes. Host composition, MCU execution, and
+physical qualification remain separate; no existing gate closes from this
+documentation update.
+
 Terminology amendment (2026-09-20): [TERMINOLOGY.md](TERMINOLOGY.md) restores
 **participant** for platform admission and assigns **denizen** to Isometry's
 individually remembered simulation inhabitants. Use the new terms in current
@@ -714,6 +721,13 @@ is historical evidence, not the current path or ownership inventory. For the wor
 [`2026-05-24_external_deps_topology_brief.md`](2026-05-24_external_deps_topology_brief.md).
 
 ## Working principles
+
+- **Embedding follows a bounded responsibility (2026-10-10):** host-library
+  composition does not establish MCU execution. Reuse existing carrier,
+  signed-operation, control, and custody contracts while retaining domain
+  authority. Forwarding preserves original signed object identity; gateway
+  re-origination records its own authorship and source provenance. Physical
+  memory, runtime, power, and recovery claims require the exact device profile.
 
 - **Configurable presentation, stable meaning (2026-10-09):** learnable behavior and user control carry the shared design language across apps. Themes and installed fonts are configurable; defaults are starting points. Keep foreground pins, position pins, anchors and forme layout locks distinct, and preserve the resource/surface identity boundary. See the [design language record](2026-08-23_projection_scenes_and_graph_native_platform.md#9-configurable-visual-and-interaction-language-2026-10-09). The [2026-10-10 design allocation](2026-08-23_projection_scenes_and_graph_native_platform.md#914-design-work-ownership-2026-10-10) assigns theme/typography to Tabard on q-pc, field and primitive editors to the projection grammar agent, and visible dynamics plus script/motion authoring to the dynamics agent; selection fundamentals are established, and broader scene authoring remains a research lane.
 
