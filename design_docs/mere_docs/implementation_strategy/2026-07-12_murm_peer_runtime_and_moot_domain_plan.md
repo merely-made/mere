@@ -1214,7 +1214,8 @@ permission to gather, capture, fork or mutate the content it references.
 
 The fork receipt passes 263 tests across core, store, stream, networking, auth,
 spaces and node replay, with one existing network test ignored. On the combined
-Mere tree including main `522a6e7a7`, the locked consumer gate passes 199 tests
+Mere tree including main `13394d830` and its Dramatis/Personae and Knot supplier
+update, the locked consumer gate passes 199 tests
 across Murm, Stickleback, Comms and Moot, with one existing doctest ignored.
 Coverage includes delayed ancestors, cross-author and cross-channel frontiers,
 fan-out refusal without mutation, signer/revision refusal, own-prefix pruning,
@@ -1223,9 +1224,9 @@ Default Moot compiles for Wasm; its normal cone contains Comms and serde without
 Murm, transport, Commons, Iroh, redb or tokio. Port boundaries and formatting pass.
 
 Evidence is preserved in `targets/moot-p2panda-continuation-20261011.json`,
-`targets/moot-p2panda-integrated-consumer-tests-retry-20261011.log`,
-`targets/moot-p2panda-default-wasm-check-20261011.log` and
-`targets/moot-p2panda-default-wasm-cone-20261011.txt`. The initial integrated Murm
+`targets/moot-p2panda-publish-consumer-tests-20261011.log`,
+`targets/moot-p2panda-publish-wasm-check-20261011.log` and
+`targets/moot-p2panda-publish-wasm-cone-20261011.txt`. The initial integrated Murm
 test launch stalled before the harness at macOS's loader entry point; restarting
 only that executable allowed the complete gate to pass. Documentation comparison
 against current main introduces no new subjects; the same ten existing D2
