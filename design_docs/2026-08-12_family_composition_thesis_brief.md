@@ -3,7 +3,8 @@
 **Date:** 2026-08-12
 **Kind:** research brief digesting a chat chain (Mark's framing prompt + assistant
 response, 2026-08-12); analysis, terminology alignment, and system-shape prior
-art added here. Extended 2026-09-08 with stack-pillar research lanes (§7).
+art added here. Extended 2026-09-08 with stack-pillar research lanes (§7), and
+2026-10-11 with the primary data model, clips and live entities (§8).
 Research includes initial model and Rust arena experiments; full consumer experiments and
 implementation promotion remain open (see §7's experiment results).
 **Anchors:** [application prospects brief](2026-07-24_application_prospects_brief.md)
@@ -206,7 +207,7 @@ the data, and how applications compose over it. One lesson each.
 
 | System | Decomposition | Lesson for this thesis |
 |---|---|---|
-| **Solid** (pods) | One user-owned pod; apps are views requesting access | The inverse split. A universal personal store pushes cross-app schema agreement onto every app pair, and the app ecosystem never came. Mere's per-app authority avoids the shared-schema tax; the projection contract, not a shared store, is the interop surface. |
+| **Solid** (storages/pods) | Controlled resource storages; an app can read and write across more than one storage; RDF descriptions accompany media-typed resources | **Corrected 2026-10-11:** the [Solid Protocol](https://solidproject.org/TR/protocol) does not mandate one pod or a universal application schema. Shared meaning still requires compatible vocabularies or adapters, as it does in Mere. Compare domain authority, local operation, carrier contracts and composition rather than infer a schema requirement from linked data. The earlier adoption claim was unsupported by this survey. |
 | **AT Protocol** (PDS repos) | One signed repo per *user*; apps are lexicon-namespaced collections inside it; portable DID identity | The nearest modern analog, mirrored: atproto = one datalake per person, apps as namespaces; mere = one datalake per app, personae across. Lexicons are its projection-contract analog. Validates identity-crosses-apps; hosting stays server-shaped. |
 | **Sandstorm** (grains + Powerbox) | Per-instance app data ownership; user-mediated capability picker brokers all cross-app access | Per-app ownership plus consent-brokered composition worked; packaging a whole SPA per grain made composition heavy. The Powerbox is the ancestor of "only the resident asks for consent" (castellan's anti-spoofing rule). Keep the embeddable unit a *scene*, not an app. |
 | **Plan 9** | Every program a file server; one tiny protocol (9P); per-process namespace composition | The cleanest ancestor of "every app exposes projections over a common contract." Composition was free because the contract was minimal and uniform. Sceno scenes + typed intents are the family's 9P; contract growth is the thing to resist. |
@@ -881,6 +882,229 @@ wake is sufficient; a desire to found another platform crate is not. Reconcile
 concurrent edits before promoting a slice, and record research-only, compiled,
 runtime and headed outcomes separately. The scope permits progression through
 the sequence without a new approval for each routine slice.
+
+## 8. Primary data model, clips and live entities (2026-10-11)
+
+### Accepted direction
+
+Mark, after the document-graph discussion and its critical review:
+
+> yeah, primary data model, not one universal representation. clips are the
+> portable content units, but live entities belong too.
+
+The graph is the primary model through which Mere applications identify,
+relate, retain, query, share and act on their data. A content or document graph
+is a crucial dimension of that model, alongside live entities, activities and
+arrangements. Graph structure carries meaningful relationships; it does not
+require every byte, document element, event or simulation value to become a
+separate graph node.
+
+The unit remains **one mere per data domain**, as ruled on 2026-09-23. Several
+applications can work in one mere; one application can work across meres.
+An identity's meres form its reservoir. An application adapter exposes the
+domain's identities, relationships, disclosed state and named operations
+without replacing its authoritative document, media, game or device model.
+Content principally authored and manipulated in graph scope may have native
+graph structure. Foreign content keeps the structure its own renderer or
+domain requires. These are compatible uses of the primary model.
+
+This section is the canonical home for that direction. The
+[scene record](2026-08-23_projection_scenes_and_graph_native_platform.md#916-primary-model-portable-clips-and-live-entities-2026-10-11),
+[statement stance](mere_docs/technical_architecture/2026-05-22_statements_over_schema_stance.md)
+and [composition spine](mere_docs/technical_architecture/2026-05-21_mere_composition_spine.md)
+apply it at their respective seams.
+
+### Clips, live entities and appearances
+
+A **clip** is content made into a portable unit by meaningful selection,
+capture or export. The boundary is what a person can usefully take and share:
+a selected passage, whole document, screenshot, recording, or supported
+structured-data export. It need not be the smallest grammatical or semantic
+part. A gameplay clip can contain video and a meaningful description; a game
+can also export structured state when its domain defines a useful portable
+form. Capturing gameplay does not require atomizing the game's simulation.
+
+A clip can be compound and internally structured. Text, images, time ranges,
+tables, semantic descriptions and source anchors can describe one clip without
+each becoming an independent graph entity. Creating a separately shareable
+subclip is an explicit operation, with its own identity and lineage. A
+selector into a clip is not automatically another node.
+
+A **live entity** has domain identity and operations before, and independently
+of, any capture: an authored object, field, device, active session or shared
+activity, for example. A disclosed view of one is not automatically a portable
+copy. A clip can refer to a live entity or capture some of its state; the
+capture has its own identity and does not inherit the source's operational
+authority. Captured content and a live source may coexist in the graph.
+
+These are roles rather than disjoint node types. An editable clip can also
+have live authoring state; its captured version and its current operations
+must be distinguishable. Domain identities retain their own contracts: the
+browser's canonical-URL Resource binding does not require every field or
+device to adopt that same identity scheme.
+
+An **appearance** is a projected occurrence of either kind. Multiple
+appearances can reference the same source, with separate positions, selection
+and local view state. Showing, selecting or moving an appearance does not
+create a clip, clone its source or transfer ownership. The resource identity,
+access identity and occurrence identity remain distinct.
+
+### What the common model governs
+
+| Concern | Shared meaning and owner |
+|---|---|
+| Identity and relationships | Domain identities and attributed assertions connect content and entities. Source, capture, revision and occurrence are distinguishable. Two equal payloads need not be the same clip or have the same provenance. |
+| Content structure | Ordering, containment, references and selectors may be meaningful content. Their interpretation belongs to the named domain or format. They are distinct from an appearance's current coordinates or layout. |
+| Arrangement and projection | An arrangement can itself be authored and shared graph data. Its authority governs edits; projection produces its present geometry and appearances. Per-view focus, camera and transient state keep their declared scope. |
+| Dynamics | Declared forces, constraints, event responses and scripts operate on named targets through owned interfaces. Focus, synchronization and every state change do not become physics by being represented in the graph. |
+| Governance | Owners, attributed writes, grants, petitions, disclosure and retention give relationships operational consequences. Graph connectivity alone grants neither read nor write nor execution rights. |
+| Transport | Carriers move disclosed data and permitted requests. Transport independence preserves these contracts while exposing availability, latency, ordering and other carrier limits. Connectivity is not authorization. |
+
+This is Mere's architectural answer for the family, rather than a claim that
+all decentralized applications require graphs. It makes participation and
+cross-application composition addressable without dictating one domain schema,
+one renderer, one process or one user interface. Genet still owns document and
+web-platform behavior, including the long-term standards-compliance work;
+Mere's graph model does not replace those semantics. A unified GPU device is a
+composition direction, not evidence that every source is already rendered in
+one display list.
+
+### Open questions: proposed policies and remaining decisions
+
+The accepted direction above settles the model and its units. The following
+are concrete recommendations for the unresolved lifecycle and interoperability
+questions. They are **proposals pending ruling**, not new editor rulings or
+claims of implemented platform contracts.
+
+1. **Captured evidence and subsequent editing.** Preserve the captured version
+   and its available source/revision provenance. Make edits explicit revisions
+   or derivatives, and keep annotations attributable to their own author.
+   An editable note can remain editable; presenting it as captured evidence
+   should identify which retained version supports that presentation. A live
+   reference is labelled as live, with freshness and availability disclosed.
+   The remaining decision is whether every capture retains original material
+   by default, or retention is configurable with a visible consequence for
+   later verification. The existing editable Knot clip is not evidence of an
+   immutable-capture contract.
+2. **Compound clips and addressable parts.** Give the portable clip an identity
+   and describe its payload roles, media/schema versions and source anchors.
+   Parts can be addressed within it; promote a part to a separate clip when a
+   user takes it independently. The remaining decision is the first concrete
+   compound profile and which payloads it promises to carry. Retained bytes,
+   external references and unresolved dependencies must be distinguishable.
+   Content hashes identify bytes, not authorship, entity identity or rights.
+   A portable reference is not a guarantee that its content is available offline.
+3. **Sharing a live entity.** Distinguish sharing a captured snapshot, sharing
+   a disclosed view and granting permission to act on the live source. Name the
+   owner, observed revision or time, supported operations and offline behavior.
+   When disconnected, show retained state with its freshness; refuse operations
+   that require the owner unless that domain explicitly supports queued writes.
+   Cloning material creates a new owned entity with lineage rather than silently
+   claiming the source's live identity. The remaining decision is which live
+   domain supplies the first shared-operation and reconnect contract.
+4. **Cross-domain edits and semantic portability.** Preserve unfamiliar content
+   and schema identifiers without claiming to understand or execute them.
+   Recognized adapters can expose inspect, annotate, reclip, open, play, edit or
+   apply as separate operations, subject to their actual capabilities and
+   grants. Route changes to the named owner; an annotation in one domain need
+   not mutate its source in another. A compound edit is atomic only when an
+   owner supplies that contract; otherwise show the separate applies and
+   failures. The remaining decision is the first edit adapter, including its
+   conflict, undo and failure semantics. Common graph structure supplies no
+   universal merge or distributed undo guarantee.
+
+The distinction is **portable material, interpretable meaning and authorized
+behavior**. A receiver may retain and show a clip without supporting its
+structured data or being able to operate its live source. Scripts carried as
+content remain inert until an authorized runtime admits them. Missing or
+unsupported capability must be visible; a generic appearance is not a promise
+of equivalent behavior in every application.
+
+### Current evidence and a forcing consumer
+
+Source inspection on 2026-10-11 supports the bounded seams, rather than a
+completed general clip system:
+
+- [`Container`](../crates/eidetic/chartulary/src/container.rs) separates identity,
+  addresses and content references, permits inline authored text and nested
+  graph references. Payloads can remain outside the graph's individual nodes.
+- [`Graph`](../crates/graph/graph-kernel/src/graph/mod.rs) holds resource and
+  surface graphs with explicit shown-resource bindings.
+  [`SourceRef` and scene instances](../crates/cambium/scenes/sceno/src/scene.rs)
+  distinguish source identity from projected occurrences.
+- [`write_clip_node`](../crates/import/src/web_clip.rs) creates editable Knot
+  content from a selected web fragment and asserts `ClippedFrom` provenance.
+  Image storage remains caller-owned. This does not establish the proposed
+  captured-version policy or a general compound media package.
+- Fleece (`genet/components/fleece/README.md` and
+  `genet/components/fleece/src/lib.rs`) extracts document
+  content from a caller-supplied DOM and provides versioned canonical-text
+  anchors. Capture, media recording, source identity, storage and disclosure
+  remain with the caller and domain owners. Extraction alone is not portability.
+
+A useful next research proof would take a document clip and a gameplay media
+clip, with an optional domain-defined data export, through a second application.
+It should retain, inspect, annotate, reclip and reopen the portable material;
+preserve unfamiliar payloads and schema identifiers; distinguish source,
+capture and occurrence identities; and disclose an unavailable live owner.
+An unsupported action must leave the source untouched. A captured scene face
+must remain distinct from the live entity it describes. This is a candidate
+consumer proof, not a claim that a game exporter or portable package exists.
+
+Promote only the shared contract that heterogeneous consumers actually require,
+with a named owner, identity and lifetime, capability/refusal behavior and a
+receipt. Wire formats, storage migrations and generalized entity APIs stay in
+their owner-specific plans. This reconciliation opens no implementation lane:
+the field/editor checkpoints, B1/S2 consumer gates, coordinator review and F199
+pause retain their existing meaning.
+
+### Research review: logical model and usable sharing (2026-10-11)
+
+The closest internal predecessor is the
+[2026-07-08 unifying-graph vision](mere_docs/technical_architecture/2026-07-08_mere_as_the_unifying_graph.md):
+heterogeneous app data becomes a legible pool through graph relationships.
+The [generic substrate plan](mere_docs/technical_architecture/2026-07-08_generic_graph_substrate_plan.md)
+separates stable identity from optional content, address and graph capabilities.
+The [2026-09-02 composition assessment](mere_docs/research/2026-09-02_port_gui_composition_and_comparable_stacks_brief.md#4-the-crux-deterministic-domain-aware-projections-out-of-app-pattern-data)
+adds purposeful, domain-aware projections and typed intents. These are earlier
+forms of this direction, with dated mechanisms and different levels of proof.
+
+External research provides useful tests of the model:
+
+- [iDM/iMeMex (Dittrich and Vaz Salles, VLDB 2006)](https://www.vldb.org/conf/2006/p367-dittrich.pdf)
+  models heterogeneous personal data, including file contents and streams, as
+  a logical graph of resource views. Components can be computed on demand;
+  the logical model does not require prior materialization. **Reading for
+  Mere:** expose useful structure without requiring wholesale conversion of
+  each domain. Queryable structure and a retained portable clip have different
+  lifetimes; the latter needs an explicit capture/export contract.
+- [Dataspaces (Franklin, Halevy and Maier, 2005)](https://sigmodrecord.org/?download_id=4825&smd_process_download=1)
+  combines autonomous, heterogeneous participants with differing query and
+  update capabilities. Integration becomes more precise where its benefit
+  warrants the work. **Reading for Mere:** common graph structure can connect
+  sources before complete semantic integration; disclose gaps and capabilities
+  instead of presenting a shared identifier as shared understanding.
+- [Web Annotation](https://www.w3.org/TR/annotation-model/#specific-resources)
+  distinguishes a source resource, a selector for its relevant part, and state
+  identifying the appropriate representation. **Reading for Mere:** preserve
+  the distinction between a live target and an observed version. This is a
+  useful anchor vocabulary; it does not supply a self-contained clip package
+  or permission to operate the source.
+- [Solid Protocol](https://solidproject.org/TR/protocol) describes apps using
+  one or more controlled storages and media-typed resources with RDF metadata.
+  It does not impose a universal application schema. The older Solid rows here
+  and in the composition assessment have been corrected. A common graph model
+  and common domain schemas are separate architectural choices.
+
+The important engineering distinction is between **identifying material,
+interpreting it and acting on it**. Content hashes and predicate identifiers
+help with the first; agreed profiles or adapters supply the second; named
+owners and authorized operations supply the third. Graph-primary design must
+make those agreements concrete where an application promises interoperability.
+Optional feature traits are not permission grants, and exposing an appearance
+does not establish either semantic understanding or mutation authority. This
+review refines the rationale without adopting another system's node schema or
+changing the unresolved lifecycle policies above.
 
 ## What this brief deliberately does not do
 

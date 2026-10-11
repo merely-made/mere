@@ -1,7 +1,7 @@
 # Scenograph Editor Plan
 
 **Date:** 2026-10-07
-**Status (2026-10-10):** tracks E1 to E5 and C1 complete, each with headed checks in Chrome and Firefox (Safari not run); C2 landed (SE45 to SE51; F11 to F13), with headed checks in Chrome and Firefox; its label revision (SE52) landed with the web host's genet repin. S1, the swatch grid, landed 2026-10-09 (SE53 to SE83), its dynamics axis implemented in `e2543cee` (SE69, SE89; F200 to F202), with native/wasm fixture identity qualified against Genet `7422e906` and Vello `491c376c`; the handoff records browser qualification and its open Firefox gate. Rulings SE1 to SE89 (§1). Waiting: genet branch `value-engine` (SE39 to SE42) for Mark or genet's lane to land, then mere's rhai `ValueEngine` and the rule runner after a coordinated repin. The Turnstone follow-up (SE32, SE35) is on Turnstone main at `d0775a1` (§3). Mapped, not opened: wallpapers and props, the style editors, authored motion (§3).
+**Status (2026-10-10):** tracks E1 to E5 and C1 complete, each with headed checks in Chrome and Firefox (Safari not run); C2 landed (SE45 to SE51; F11 to F13), with headed checks in Chrome and Firefox; its label revision (SE52) landed with the web host's genet repin. S1, the swatch grid, landed 2026-10-09 (SE53 to SE83), its dynamics axis implemented in `e2543cee` (SE69, SE89; F200 to F202), with native/wasm fixture identity qualified against Genet `7422e906` and Vello `491c376c`; the handoff records browser qualification and its open Firefox gate. Rulings SE1 to SE91 (§1). Waiting: genet branch `value-engine` (SE39 to SE42) for Mark or genet's lane to land, then mere's rhai `ValueEngine` and the rule runner after a coordinated repin. The Turnstone follow-up (SE32, SE35) is on Turnstone main at `d0775a1` (§3). Mapped, not opened: wallpapers and props, the style editors, authored motion (§3).
 **Scope:** the editor foundation that Scenograph's editing surfaces stand on: one undo history in Cambium, and arrangement options declared as data. Carries out the balaur review's rulings A and B. The projection editor in Graphshell is the first consumer of both.
 
 **2026-10-09 addition:** R1's first declarative slice is implemented and qualified: the cross-app design conversation
@@ -15,6 +15,12 @@ undo are implemented in `69f17908`, with native/build qualification and an open
 [visual test handoff](#forme-visual-test-handoff-2026-10-10). The next primitive
 editor design stages exact-owner inspection before writes; general field
 authoring and the unresolved storage/composition policies remain planned.
+
+**2026-10-11 continuation:** access/Resource and
+[link/assertion inspection](#link-and-exact-assertion-inspector-draft-2026-10-11)
+now have read-only local-product drafts. Field inspection and overlap discovery
+are next in the approved sequence; primitive writes and derived-link owner
+explanations retain their existing gates.
 
 Not in scope, mapped in §3 and opened by later rounds:
 - the scripting comparison (SE3), which is the next assessment;
@@ -245,6 +251,50 @@ The mer3ly site session relayed its Ruling 158 (Mark: "Promote where a home exis
 
 **SE89, physics bodies follow occurrences (2026-10-09).** Asked: "The practice grid has source occurrences, while Canvas physics uses graph nodes. Should each occurrence get its own preview body, with unavailable physics channels refused until an adapter supplies them? This preserves separate appearances of the same source." Options: Separate body per occurrence (recommended), Limit dynamics to graph-backed datasets. Mark: **"Separate body per occurrence (Recommended)"**. *Follows:* each preview occurrence has a separate transient body; an undisclosed physics channel is refused. The source identity remains the dataset's exact source reference. *Reading, not ruled:* a private per-cell controller may give each body a deterministic runtime UUID without writing those identities into the source dataset.
 
+**SE90, reset, context and scenery (2026-10-10).** Mark corrected the proposed
+Clear / Ambient / Props control, which had made visibility and collision
+consequences of the selected mode. His answer, verbatim:
+
+> i feel like clear is better as reset, like resetting the scene to its initial arrangement w/rt your backdrop (which should be able to be interactive, or at least animated, right? that in my mind makes it more of the backdrop of a scene's set, or almost diorama-esque, compared to a static wallpaper), but ambient content and props are both more like classes of entity in the scene; ambient nodes are like propositions for what's relevant to the entities in the foreground, which are either pinned, currently selected, or recently interacted with. you can turn that off, of course, but that's not the same thing as saying they do or don't interact with the scene. and props, likewise, can be turned off; you could have a static wallpaper, an animated wallpaper, an interactive wallpaper, or an interactive wallpaper that contains entities with scripted behavior, authored attributes, or presentation relevant to the backdrop, aside from but relevant to contextualizing the nodes in the foreground and the ambient nodes in the background in the backdrop and scene. but that's not the same as saying props are tangible or not. you have the wrong cut for what matters on that front.
+
+*Follows:* SE86's three-mode wording is amended. Reset is an action restoring
+the initial arrangement in relation to the backdrop. Ambient context and props
+can coexist and have separate visibility choices. Neither role nor visibility
+determines collision, animation, picking or authored behavior. The backdrop
+may be a scene's animated or interactive set; static geometry is one supported
+part, not the complete backdrop model. F199's pause and R162 ownership remain.
+
+*Reading, not ruled:* keep contextual graph occurrences separate from scenic
+entities even when both have a visible presentation. Reuse existing scene,
+simulation and interaction owners before adding a portable behavior carrier.
+The reset boundary still needs a concrete definition: arrangement baseline,
+body velocities, animation time and script state are distinct state owners.
+The current `restore_arrangement` restores stored positions and pauses physics;
+it does not reset a whole animated set. The foreground/background membership
+question raised here is resolved by SE91 below. No recency cutoff is chosen.
+Field remains deferred; interactive/scripted scenery has not been
+implemented by this ruling.
+
+**SE91, recede but retain after interaction (2026-10-10).** Mark asked whether
+interacted nodes should remain foregrounded or recede into the background but
+persist when focus shifts. Recommendation put: selected nodes occupy the
+foreground, including a working multi-selection; after deselection, previously
+interacted nodes persist in the background until dismissed; explicit foreground
+pins retain their foreground role across focus changes. Untouched ambient
+suggestions may change with context. Recency can affect emphasis without
+retaining foreground status. Mark: **"Hm. Alright."**
+
+*Follows:* this is the default promotion/demotion behavior and reconciles SE90
+with §9.2. Moving focus within a still-selected working group does not by itself
+demote its selected members. Deselecting an unpinned node returns it to the
+background without discarding it. Attention/presentation changes do not
+implicitly change collision, animation, scripts or durable keeping levels;
+a foreground pin remains distinct from a position pin. The recommendation also
+offered an optional setting to retain the working selection across context
+changes. Its UI, persistence and the exact boundary of qualifying interaction
+remain to be specified. No automatic hover retention or recency timeout is
+introduced. This ruling records behavior, not viewer implementation.
+
 ## 2. Tracks
 
 E1 and E2 carry ruling A; E3 to E5 carry ruling B. E2 needs E1; E4 needs E3; E5 needs E2 and E4. *Added 2026-10-07:* E2b carries SE11 and SE12, after E2.
@@ -374,29 +424,52 @@ A facet's cells act together, so the mer3ly sandbox's scatter, deck and linked v
 
 Done when: the selection and visibility round-trip in a facet and replay through scenotime; a cell's hidden appearance leaves the source and the other cells untouched; the site's sandbox state maps onto it without loss; a headed check links two cells' selection in Chrome and Firefox.
 
-### B1 — backdrops in the Graphshell viewer (SE86)
+### B1 — backdrops in the Graphshell viewer (SE86, amended by SE90)
 
-**Earlier cut (SE86):** the viewer draws a scene's backdrops and offers the backdrop mode: clear, ambient and props now, field once defined; a tangible (collidable) backdrop is an obstacle to its physics.
+The viewer draws a scene's set, with independently visible ambient context
+and props. Reset restores the initial arrangement in relation to that set.
+Visibility, collision, animation, picking and authored behavior are separate
+choices; ambient and props are not mutually exclusive modes. Field waits until
+defined. A collidable backdrop footprint is an obstacle to physics, regardless
+of its visibility or scene role.
 
-**Earlier done-conditions:** the viewer draws each kind and its tangible edge; a tangible backdrop holds nodes out in a physics test, with a control where an intangible one does not; the mode travels in the scene state; a headed check in Chrome and Firefox.
+The former three-mode done-condition is superseded. The bounded static backend
+still needs viewer drawing, a disclosed collision edge and the tangible versus
+intangible exclusion control. SE91 resolves foreground/background retention.
+Before viewer controls land, resolve the reset baseline and the interaction
+boundary for retention, then define the saved scene state
+and animated/interactive set slice against their existing owners. Acceptance
+must cover independent visibility and collision, saved-state round trips and
+headed Chrome and Firefox checks. Static obstacle acceptance alone does not
+establish animated or interactive scenery.
 
-**Mark's correction (2026-10-10):** [design language §9.13](../../2026-08-23_projection_scenes_and_graph_native_platform.md#913-backdrop-context-props-and-reset-2026-10-10)
-supersedes the single mode list. Clear belongs to a reset action; contextual
-ambient nodes and props are entity roles/classes whose display is independently
-configurable. A backdrop is a scene set that may have depth, animation,
-interaction and scripted entities. Neither the prop class nor ambient relevance
-decides collision or dynamics participation. Field effects likewise need not
-be mutually exclusive with scenery or contextual content.
+**Cross-lane control design:** [design language §9.13](../../2026-08-23_projection_scenes_and_graph_native_platform.md#913-backdrop-context-props-and-reset-2026-10-10)
+records the same correction. Separate reset, contextual-content display,
+prop display, scenery behavior and physical participation. Field effects may
+coexist with scenery and contextual content. Exact control names, off/pause
+semantics, persistence and legacy-mode migration go through the viewer owner.
+Define the reset baseline and its effects before implementation; the label
+Clear alone does not authorize state rewind. Interactive props need explicit
+entity/input/action wiring; animated or scripted reset needs its own behavioral
+qualification. Existing paint/contact receipts qualify only the minimum binder.
 
-**Updated control-design target:** separate reset, contextual-content display,
-prop display, scenery behavior and physical participation. Exact control names,
-off/pause semantics, persistence and migration of legacy mode state remain to
-be designed through the viewer owner. Define the reset baseline and its effects
-before implementation; do not turn Clear into a state-rewinding operation by
-label alone. Paint/contact receipts below remain valid for the minimum binder.
-Interactive props need explicit entity/input/action wiring, and animated or
-scripted reset requires its own behavioral qualification. B1 acceptance still
-requires headed viewer checks; this correction does not qualify that consumer.
+**B1 backend draft (2026-10-10):** `Canvas::set_projection_backdrops` resolves
+a scene's spaces and transforms for graph-canvas paint and static contact.
+Unknown appearance kinds use the existing stable kind paint. Invisible
+collidable geometry remains an obstacle. Concave contact polygons and
+contact paths/points refuse by path pending a footprint adapter; a refusal
+retains the previous bound layer. The separate Seiche obstacle set leaves
+living scenery, gravity and node tangibility intact. This is implementation
+work, not B1 acceptance. Viewer controls, scene-state persistence and headed checks
+remain open under R162's site ownership. SE90 supersedes the pending mode
+fork and the sandbox's three-mode cut; the backend does not implement that
+expanded set or determine contextual membership.
+The retained short 120-step probe leaves residual overlap. Rapier caps
+correction at 3 world units per second; the active-law/control check uses
+the canvas's existing 360-step settle budget. All four focused native
+binder tests pass, and Seiche's library suite passes 161 with 10 ignored.
+Larger/deeper or idle placements retain an explicit qualification limit;
+the exclusion tolerance and host settle budget are unchanged.
 
 ### E3 — the option declaration type (B, SE7)
 
@@ -709,15 +782,18 @@ unresolved field event/composition choices retain their named owners.
 
 #### Identity inspection follow-through (2026-10-10; next design steps)
 
-**Status:** access/Resource inspection implemented as a draft; link, field and
-write adapters remain planned. Mark asked this agent to keep working on plans
-while agents on O-PC, the ThinkPad and the Macs perform visual tests. The implemented forme draft remains the bounded runtime
-proof. This sequence prepares the primitive-editor walkthrough without choosing
+**Status (2026-10-11):** access/Resource and link/assertion inspection implemented
+as drafts; field and write adapters remain planned. Mark asked this agent to
+keep working on plans while agents on O-PC, the ThinkPad and the Macs perform
+visual tests. The implemented forme draft remains the bounded runtime proof. This sequence prepares the primitive-editor walkthrough without choosing
 the outstanding attribute-storage or field-composition policies.
 
-**Implementation continuation:** the access/Resource read-only adapter is now
-an implementation draft, described in [Progress](#accessresource-inspector-draft-2026-10-10).
-The remaining link, field and edit adapters retain their planned status.
+**Implementation continuation:** the access/Resource read-only adapter is
+described in [Progress](#accessresource-inspector-draft-2026-10-10), followed by
+the [link/assertion draft](#link-and-exact-assertion-inspector-draft-2026-10-11).
+Field and edit adapters retain their planned status. The link draft reads held
+source records; rule-derived display marks still need their owning explanation
+adapter.
 
 Source checked at published Mere `69f17908`:
 
@@ -1333,3 +1409,141 @@ remains with the other machines.
   sessions and Forme layout alone. Test source saving/failure and target removal
   while inspection remains open. Append actual results and tested source/build
   identity here; the added observation fields are instruments, not receipts.
+
+#### Forme identity and validation fixes (2026-10-11)
+
+**Status:** source fixes with native qualification and a passed product
+Wasm host check. Mark asked to fix the review findings and inspect nearby paths.
+The source began at `1081987c` and was rebased onto published `c397f33b`; this pass
+preserves the existing scoped draft, saved layout history and v1 record format.
+
+- The shared arrangement matcher reuses a member-intent ID only when that
+  member occurs once in both arrangements and the ID is free or already belongs
+  to that occurrence. Repeated appearances keep their supplied occurrence IDs.
+  This prevents both appearance collapse and overwriting a node rebound to
+  another kind. It does not invent correspondence between rebuilt duplicates.
+- Workspace validation checks positive, finite projected cell extents in both
+  relative and world coordinates. Positive split shares alone were insufficient:
+  normalization or coordinate rounding could produce an empty tile region.
+- Divider events require exactly one share per split child. Too few or too many
+  shares previously changed only the children matched by a zip. Invalid events
+  now leave the workspace unchanged.
+- Workbench reading tiles use the shared Resource content-tag accessor, retaining
+  its legacy fallback for unassociated accesses. Titles and authored bodies
+  remain access-specific. This follows the existing access/Resource boundary.
+
+Three native identity regressions and three workspace regressions failed before
+these fixes. Afterward all 120 Forme library tests and 19 Graphshell workspace/
+session tests pass. The product web host also passes its locked, offline Wasm
+check. The added session case checks that collapsed geometry cannot enter draft
+history and that an invalid saved undo state is refused
+without rewriting its retained bytes. Workspace tests now live in a child
+module, including the existing stable-ID and tab-placement cases.
+
+The [qualification summary](../../../ports/graphshell/docs/receipts/forme_fixes_20261011/qualification.json)
+records exact source hashes, commands and check status. The earlier `69f17908`
+receipt remains historical evidence; it does not qualify these changed sources.
+Run the existing four-page retained-origin Forme sequence on the new build and
+review pointer previews, saved undo/reopen and shared Resource tags in separate
+accesses. No browser pass, capture, release package or physical-input receipt is
+claimed by this pass.
+
+
+#### Link and exact-assertion inspector draft (2026-10-11)
+
+**Status:** implemented read-only draft, based on published `ebfa5be8`, under
+Mark's direct-main draft-delivery authorization, then rebased onto `3d21c352`
+before delivery. It preserves the Forme fixes and scene/dynamics work now on
+main. The integrated primary-model reconciliation changes documentation only;
+qualified runtime/scenario hashes remain unchanged. Field inspection and overlap discovery
+remain the next bounded adapter; this pass introduces no primitive writes.
+
+The portable [link model](../../../ports/graphshell/src/link_inspection.rs)
+resolves a bundle by two access UUIDs and expands both directed pairs, visiting
+an access self-pair once. Each contributing edge bucket retains its displayed
+direction, owning Access/Resource stratum, stable source endpoint identities,
+exact semantic statements and actual family sidecars. Parallel buckets are
+retained; deterministic content ordering does not assign them durable identities.
+One Resource relation lifted onto distinct access pairs shows the same source
+owner and statement handles with different displayed endpoints. A Resource
+self-link lifted between two distinct accesses contributes once per displayed
+direction. Missing recorded associations and relevant known coverage limits are
+disclosed; held records never imply global completeness.
+
+Each assertion retains its handle, predicate, recognized kind, label, scope,
+asserter and assertion time. Exact inspection re-resolves the held handle in
+its recorded store, independent of current predicate placement or access binding.
+If an access navigates away from a Resource, its bundle refreshes while an
+already inspected Resource assertion remains inspectable. Retraction or access
+removal reports absence, without substituting a same-predicate assertion or an
+equal-address access. Non-statement sidecars retain their real owning values,
+including session arrangements, traversal events and navigation aggregates;
+no statement handles are manufactured for them. Family summaries are labelled
+as grouping, separate from exact assertions.
+
+The [retained controls](../../../ports/graphshell/src/web_tree/link_inspection.rs)
+are mounted in Graph tools on `tree.html?app=local`. Select an access, activate
+**Inspect selected access**, then **Inspect links: …** in its held-link list.
+**Inspect assertion N** retains that row's exact statement handle; N is a
+presentation ordinal only. Both endpoint directions and Resource source
+identities are visible. Graph selection changes do not retarget either panel.
+Closing access inspection leaves link inspection open; closing the exact
+assertion leaves its bundle open; closing the bundle clears both link targets.
+These actions change temporary view state without opening content, changing
+selection, moving the camera or editing Forme membership/layout. Reads use the
+acknowledged local owner, retaining targets during its in-flight save.
+
+**Scope and findings:** Canvas currently exposes selected-link presence, but
+not a stable public bundle subject for this host. The access inspector's incoming
+and outgoing held-link list provides the initial keyboard/pointer entry path;
+direct canvas-link activation and shared roster subjects remain follow-through.
+The list covers held access neighbors, including lifts through recorded
+Resource associations. A Resource with no held access cannot appear as an
+adjacent displayed access. This is not a general Resource graph browser.
+
+Rule-derived display marks are not yet connected to this adapter. A held
+`AgentDerived` assertion shows its stored attribution and explicitly reports
+that its rule and inputs are not held in that record; an asserter is not a rule
+explanation. Other derived marks still need their execution owner's explanation
+adapter. Unknown-legacy attribution remains the recorded marker. Generic JSON
+sidecar values, long handles, disclosure sizing and large-neighborhood costs
+need presentation review. Other hosts and generated datasets are not mounted.
+Exact-record mutation still requires the existing authorship/retraction contract.
+
+**Qualification:** nine actual-source native model tests pass. They cover
+same-predicate assertions with distinct handles/attribution, lifted Resource
+ownership across access pairs, both directions and strata, parallel buckets,
+self-links, non-statement session data, mixed family/traversal data, exact lookup
+after rebinding/retraction, missing targets and associations, scoped coverage,
+and stable bundle/assertion Graph-snapshot roundtrip. The initial external
+harness needed adjustment for main's extracted Forme test module; the dedicated
+link harness imports the tracked link/access sources and actual Mere graph
+implementation. The Graph-snapshot check does not qualify IndexedDB reopening.
+The product wasm check passes with the web host's committed target flags and
+`--no-default-features --features product`; exact scope is recorded in the
+[check summary](../../../ports/graphshell/docs/receipts/link_inspection_20261011/qualification.json).
+Native and product checks run sequentially with one Cargo job, a 1280 MiB scope
+cap, no scope swap and the 256 MiB available-memory guard. No release bundle,
+default/viewer check, browser run or capture is claimed for this draft.
+
+**Review and host-test handoff:**
+
+- Build with `product` and run
+  `tree.html?app=local&scenario=scenarios/p4_tree_link_inspection.scn` in a visible
+  tab on a dedicated origin/profile seeded with the reference fixture. The
+  [scenario](../../../ports/graphshell/web/scenarios/p4_tree_link_inspection.scn)
+  inspects the existing webpage → file citation, opens its exact assertion,
+  changes selection, closes each inspector independently and checks unchanged
+  Forme identity/membership. Its two named captures and observation fields are
+  instruments; the scenario has not been run here.
+- Add host cases for two same-predicate assertions, parallel source buckets,
+  opposite directions, self-links, session sidecars and a Resource relation
+  lifted through two distinct access pairs. Review source/displayed endpoint
+  labels and unknown/missing attribution. The native cases do not substitute
+  for browser receipts of those interactions.
+- Check keyboard activation and focus in docked tools and the narrow overlay,
+  long records, another open detail draft, in-flight source saves/failure,
+  access rebinding/removal and exact-statement retraction. Confirm inspection
+  does not change selection, camera, content sessions or Forme arrangement.
+  Append actual outcomes and source/build/browser identity here. Review the
+  unqualified list/record materialization costs before large-graph adoption.
