@@ -10,6 +10,7 @@ keywords = ["credentials", "identity", "vault", "agent", "persona"]
 categories = ["authentication"]
 
 [features]
+cxf = ["keeper", "dep:credential-exchange-format", "dep:ed25519-dalek", "dep:p256", "dep:p384"]
 # Secret custody moved here from personae and pandect in DR-B (dramatis repo
 # plan, rulings D3, D8, D9 and D22): the vault, its passphrase and OS-sealed
 # storages, the unlock ladder, the SSH agent, and the wallet's seeds and
@@ -56,6 +57,10 @@ keeper = [
 secret-service = ["dep:thiserror", "dep:tokio", "dep:zbus"]
 
 [dependencies]
+credential-exchange-format = { version = "=0.4.0", optional = true }
+ed25519-dalek = { version = "2", features = ["pkcs8"], optional = true }
+p256 = { version = "0.13", features = ["pkcs8"], optional = true }
+p384 = { version = "0.13", features = ["pkcs8"], optional = true }
 # The check conclusions and faults, named directly (insigne proofs plan, B).
 insigne = { workspace = true, features = ["verify"] }
 # HMAC + the three hashes RFC 6238 allows. RustCrypto, and sha2 is already a
@@ -82,7 +87,7 @@ blake3.workspace = true
 # `zeroize` clears the cipher's copy of the key on drop (ruling 37).
 chacha20poly1305 = { version = "0.11", features = ["zeroize"] }
 getrandom = "0.3"
-serde_json.workspace = true
+serde_json = { workspace = true, features = ["raw_value"] }
 tracing.workspace = true
 # ── agent ─────────────────────────────────────────────────────────────────
 # SSH key generation inside the authority mints with the OS RNG.
