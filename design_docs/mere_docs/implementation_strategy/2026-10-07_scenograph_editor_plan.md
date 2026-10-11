@@ -677,6 +677,36 @@ must reach the same inspection and apply/discard actions. The
 [field authoring draft](2026-06-13_scriptable_field_regions_plan.md#field-authoring-draft-2026-10-10)
 owns membership, overlap checkpoints and the field-specific walkthrough.
 
+#### Implementation draft delivery (2026-10-10)
+
+**Status:** delivery workflow authorized; candidates below are recommended,
+not claimed implementations. Mark authorizes drafting existing plans and
+pushing directly to main so agents on the other machines have code to review,
+test and improve. A PR is optional. Host testing may follow the draft rather
+than block its delivery. Each implementation pass records its scope, source
+revision, checks actually performed, unfinished behavior and concrete next
+review/test steps in the owning plan. An unrun check remains unrun; publishing
+a draft does not complete the plan's acceptance gate.
+
+The most useful candidates at source `559a3e90` are:
+
+| Candidate | Bounded draft to publish | Review and continuation |
+|---|---|---|
+| Access / Resource inspector | Use recorded associations to show this access, its shared Resource and other held accesses, through read-only retained controls. | Verify separate access identities, incomplete-residency disclosure, selection/focus and keyboard behavior. Then add the exact owner's editing draft. |
+| Link bundle inspector | Expand a displayed pair into its directed source records, keeping relation stratum, exact assertion handle and available provenance. | Exercise parallel assertions, self-links and lifted Resource links. Exact-record editing follows its authorship/write contract. |
+| Field inspector and overlap discovery | List exact fields and individual couplings; expose all matching region candidates and keep the chosen target stable. | Check hidden/inactive inspection, deterministic candidate lists and pointer behavior. One-coupling editing follows a scoped host transaction. |
+| Presentation-rule editor | Bind controls for target → condition → effect to the existing declarative resolver; preview and explain matches, missing inputs and overrides. | Review swatches, precedence, hysteresis, measurement and owning persistence. This slice can exercise the existing rule model while Rhai awaits its runner seam. |
+| Mixed-content authoring fixture | Compose distinct content accesses, a forme, parallel links and another field into one inspectable Graphshell example. | Other machines can pressure-test the assembled interactions and expose layout/identity integration faults. Its fixture does not decide overlap precedence or applet execution. |
+
+Recommended order: access/Resource inspection, link inspection, then field
+inspection/overlap discovery. These expose the identities the later editors
+need and can be delivered without choosing new attribute storage. A rule-editor
+draft is the next appearance-authoring candidate, scoped to the implemented
+[declarative model](../../../crates/cambium/scenes/scenograph/src/presentation.rs).
+The mixed fixture becomes more useful as these inspection paths arrive.
+Tabard's theme/font work, the dynamics lane's active runtime work and the
+unresolved field event/composition choices retain their named owners.
+
 #### Identity inspection follow-through (2026-10-10; next design steps)
 
 **Status:** planned adapters; no new runtime track or receipt. Mark asked this
@@ -1220,3 +1250,12 @@ The forme handoff records its published revision, product-feature requirement,
 review and extra physical-input/focus checks. The field plan's earlier pending
 forme-draft wording is reconciled with the implemented adapter. All are plan
 updates; no new runtime source, browser receipt or agent dispatch is claimed.
+
+#### Draft delivery authorization (2026-10-10)
+
+Mark proposed publishing implementation drafts directly for the other agents to
+review, test and improve, including when this machine cannot run their host
+checks. The delivery workflow and five bounded candidates above record that
+authorization. This pass changes documentation only; no candidate implementation
+or new runtime qualification is claimed. The canonical working principles now
+preserve direct-main draft delivery and explicit check status for future passes.
