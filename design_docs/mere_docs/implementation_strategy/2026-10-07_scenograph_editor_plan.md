@@ -1863,3 +1863,10 @@ drag run found lowercase `key escape` unsupported by the scenario runner;
 the scenario now uses its existing `key Escape` route. That failed run is
 retained alongside the corrected sequence in the
 [qualification record](../../../ports/graphshell/docs/receipts/forme_feedback_field_browser_20261011/qualification.json).
+
+The integration at `9d8ea699` retains upstream presentation controls and live
+Forme guides. Its product and viewer-only Wasm checks pass separately; Chrome
+was not rerun on that newer source. The canonical primary documentation audit
+has no index or current-link findings. Its remaining upstream findings are
+recorded in the qualification summary. The temporary browser package is removed;
+peer documentation work is preserved.
