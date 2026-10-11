@@ -63,6 +63,10 @@
 //!
 //! (Copy `places.sqlite` out of the profile first if Firefox is running.)
 
+use eidetic::import::{
+    HistoryTransitionKind, ImportedBookmarkItem, ImportedHistoryVisitItem, ImportedPageSeed,
+    parse_bookmark_items,
+};
 use eidetic::schema::{
     ModerationState, PrivacyClass, ProvenanceOrigin, ProvenanceRecord, Timestamp, TrustEnvelope,
     TrustLevel,
@@ -71,14 +75,10 @@ use eidetic::{
     BrowsingMemory, BrowsingTrace, NoFetcher, PageRef, TraceEvent, TraceTransition,
     bootstrap_browsing_schema, save_trace,
 };
-use eidetic::fjall::FjallStore;
 use eidetic_search::{SearchError, TrailIndex, bootstrap_search_schema, fuse};
 use esp::embed::VectorIndex;
 use esp::embed::provider::EmbeddingProvider;
-use import::{
-    HistoryTransitionKind, ImportedBookmarkItem, ImportedHistoryVisitItem, ImportedPageSeed,
-    parse_bookmark_items,
-};
+use muniment::FjallStore;
 
 /// Texts per embedding batch (CPU-friendly).
 const EMBED_BATCH: usize = 16;
@@ -588,20 +588,20 @@ mod tests {
     #[test]
     fn bookmarks_become_sorted_imported_origin_events() {
         let items = vec![
-            import::ImportedBookmarkItem {
+            eidetic::import::ImportedBookmarkItem {
                 page: seed("https://b.example", Some("B")),
                 bookmark_id: None,
                 folder_path: Vec::new(),
-                location: import::BookmarkLocation::Toolbar,
+                location: eidetic::import::BookmarkLocation::Toolbar,
                 created_at_unix_secs: Some(200),
                 modified_at_unix_secs: None,
                 tags: Vec::new(),
             },
-            import::ImportedBookmarkItem {
+            eidetic::import::ImportedBookmarkItem {
                 page: seed("https://a.example", Some("A")),
                 bookmark_id: None,
                 folder_path: Vec::new(),
-                location: import::BookmarkLocation::Menu,
+                location: eidetic::import::BookmarkLocation::Menu,
                 created_at_unix_secs: Some(100),
                 modified_at_unix_secs: None,
                 tags: Vec::new(),
