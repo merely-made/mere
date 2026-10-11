@@ -33,7 +33,8 @@ its review and visual-test gates are explicit. The implemented forme draft's
 specifies the retained-origin scenario order for agents on the other machines.
 The [Forme fixes](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#forme-identity-and-validation-fixes-2026-10-11)
 cover occurrence identity, collapsed regions, malformed divider edits and shared
-Resource tags; the new qualification record keeps browser acceptance separate.
+Resource tags. The [browser qualification](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#forme-browser-qualification-2026-10-11)
+records the retained-origin run and its browser-specific acceptance limits.
 The [link/assertion inspector draft](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#link-and-exact-assertion-inspector-draft-2026-10-11)
 expands held bundles by direction and source stratum and re-resolves exact
 statement handles. Native model and product wasm checks pass; headed qualification
