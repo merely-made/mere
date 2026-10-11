@@ -1,0 +1,102 @@
+{
+  "synthetic_process_flag": "DRAMATIS_SYNTHETIC_CONSENT_CONTROL",
+  "commands": [
+    {
+      "name": "control-unflagged",
+      "command": [
+        "cargo",
+        "+1.98.1",
+        "test",
+        "-p",
+        "djinn",
+        "--test",
+        "quarantine_review",
+        "--features",
+        "cxf",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "C:\\t\\cargo-targets\\mere",
+        "-j1",
+        "--",
+        "--exact",
+        "cards_are_secret_free_scoped_and_denial_preserves_the_item"
+      ],
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "name": "negative-consent",
+      "command": [
+        "cargo",
+        "+1.98.1",
+        "test",
+        "-p",
+        "djinn",
+        "--test",
+        "quarantine_review",
+        "--features",
+        "cxf",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "C:\\t\\cargo-targets\\mere",
+        "-j1",
+        "--",
+        "--exact",
+        "cards_are_secret_free_scoped_and_denial_preserves_the_item"
+      ],
+      "exit_code": 101,
+      "expected": 101
+    },
+    {
+      "name": "restored",
+      "command": [
+        "cargo",
+        "+1.98.1",
+        "test",
+        "-p",
+        "djinn",
+        "--test",
+        "quarantine_review",
+        "--features",
+        "cxf",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "C:\\t\\cargo-targets\\mere",
+        "-j1"
+      ],
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "name": "restored-build",
+      "command": [
+        "cargo",
+        "+1.98.1",
+        "build",
+        "-p",
+        "djinn",
+        "--bin",
+        "dramatis-review-host",
+        "--features",
+        "custody-receipt-host,cxf",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "C:\\t\\cargo-targets\\mere",
+        "-j1"
+      ],
+      "exit_code": 0,
+      "expected": 0
+    }
+  ],
+  "restored_consent_sha256": "cd238ae65f6006764e1a21e9120a707bfcfff899475f8547171be7f164304ec3",
+  "artifacts_sha256": {
+    "control-unflagged.log": "4b830bbe595ef366f19e3984b7fef4bd96c096bbbd0e6c9d7a0f724646fb3a75",
+    "negative-consent.log": "e72277ed3e3ae9f0c6970c5771fe30f7d03f36cdc677f734a9e6b6d7f6a22fa0",
+    "restored-build.log": "f30f436bcea2650a5f8d52b9be1cf44cdc7443c1e54ccc03c833a5afde08ff5b",
+    "restored.log": "8d36bce88df9396784e175f6cf79dc5a53dce6ce9ff83357237e301d85c72f69"
+  }
+}
