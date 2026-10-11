@@ -26,10 +26,30 @@ pulls.
 
 ---
 
-**Amended 2026-10-11:** the capability shuffle moves Fjall to Muniment and concrete
+**Amended 2026-10-11:** the capability shuffle moved Fjall to Muniment and concrete
 HTTPS/Iroh blob acquisition to Fetch (`https-blobs`, `iroh-blobs`). Eidetic keeps
 manifest contracts, hashing, typed retained content and portable intake. See
-[the active gathering/intake plan](2026-10-11_fleece_eidetic_capability_plan.md).
+[the completed gathering/intake plan](../../archive_docs/2026-10-11_completed_plans/2026-10-11_fleece_eidetic_capability_plan.md).
+
+## Goal-directed gathering consumer (2026-10-11)
+
+Fleece now provides bounded traversal over caller-supplied content references,
+local graphs and engine results, with injected goal/query selection and
+assessment. A real query UI or inference consumer triggers the next slice:
+connect its ranking to this seam, retain source observations in Eidetic, and
+apply accepted graph contributions through the application's session authority.
+Model choice and compute scheduling remain consumer choices. Ordinary browsing
+must not start a crawl; network acquisition remains an explicit, finite adapter.
+
+**Done conditions:** a consumer demonstrates a query over local/engine content,
+keeps traversal inside configured node/depth/fan-out limits, explains selections
+with retained source receipts, and supports cancellation. A headed product run
+must qualify the user flow separately from the library's native and wasm checks.
+
+**Network test follow-through:** the default crawler client explicitly disables
+Hyper's pooled canceled-request retry. A deterministic pooled-cancellation race
+negative control remains open; the seven streaming tests do not establish that
+race receipt. Add it when the HTTP adapter lane can control pool cancellation.
 
 ## Phases
 

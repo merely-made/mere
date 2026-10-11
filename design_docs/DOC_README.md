@@ -1,6 +1,6 @@
 # Mere Documentation Index
 
-Active integration (2026-10-11): [Fleece gathering and Eidetic intake](eidetic_docs/implementation_strategy/2026-10-11_fleece_eidetic_capability_plan.md) records the approved five dependency moves, source-neutral goal-directed traversal, explicit network budgets and the retained-content/session boundary. Implementation and receipts are in progress.
+Completed integration (2026-10-11): [Fleece gathering and Eidetic intake](archive_docs/2026-10-11_completed_plans/2026-10-11_fleece_eidetic_capability_plan.md) records the five landed dependency moves, source-neutral goal-directed traversal, explicit network budgets, the retained-content/session boundary and native/wasm/portable-consumer receipts. Query/model and headed follow-through stays in the [deferred Eidetic plan](eidetic_docs/implementation_strategy/2026-06-09_eidetic_deferred_phases_plan.md).
 
 The design-docs index for the [Mere](../README.md) workspace. All authoritative
 project documentation belongs under `design_docs/`. Entries are one line each;
