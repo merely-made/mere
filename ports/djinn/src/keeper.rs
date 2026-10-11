@@ -39,6 +39,8 @@ pub struct Keeper<S: IdentityStorage + 'static> {
     ui: Arc<dyn NativeIdentityUi>,
     wallet_root: Option<PathBuf>,
     policy: ReleasePolicy,
+    #[cfg(feature = "cxf")]
+    credentials: std::sync::OnceLock<castellan::resident::CastellanResident>,
 }
 
 impl<S: IdentityStorage + 'static> Keeper<S> {
@@ -50,6 +52,8 @@ impl<S: IdentityStorage + 'static> Keeper<S> {
             ui: Arc::new(UnavailableNativeIdentityUi),
             wallet_root: None,
             policy: ReleasePolicy::default(),
+            #[cfg(feature = "cxf")]
+            credentials: std::sync::OnceLock::new(),
         }
     }
 
@@ -75,6 +79,62 @@ impl<S: IdentityStorage + 'static> Keeper<S> {
     /// The authority itself, for the resident's own composition.
     pub fn host(&self) -> &Arc<PersonaeHost<S>> {
         &self.host
+    }
+
+    /// Attach the resident's existing, lock-bound credential authority.
+    #[cfg(feature = "cxf")]
+    pub fn attach_credentials(
+        &self,
+        credentials: castellan::resident::CastellanResident,
+    ) -> Result<(), String> {
+        self.credentials
+            .set(credentials)
+            .map_err(|_| "credential authority already attached".into())
+    }
+
+    /// Execute owner-only CXF commands without opening another vault.
+    #[cfg(feature = "cxf")]
+    pub(crate) fn cxf_command(&self, command: &str, args: &[String]) -> Result<String, String> {
+        if self.host.is_locked() {
+            return Err("vault is locked".into());
+        }
+        let source = args.first().ok_or("CXF command requires a source file")?;
+        let bytes = std::fs::read(source).map_err(|_| "cannot read CXF source file")?;
+        let import = castellan::cxf::Import::read(bytes).map_err(|error| error.to_string())?;
+        if command == "cxf-preview" {
+            if args.len() != 1 {
+                return Err("usage: cxf-preview <source.cxf>".into());
+            }
+            return serde_json::to_string_pretty(import.preview())
+                .map(|s| format!("{s}\n"))
+                .map_err(|_| "cannot encode CXF preview".into());
+        }
+        if args.len() != 3 {
+            return Err(
+                "usage: cxf-import <source.cxf> <destinations.json> <preview-sha256>".into(),
+            );
+        }
+        if args[2] != import.preview().source_sha256 {
+            return Err("CXF source changed; preview it again".into());
+        }
+        let choices = std::fs::read(&args[1]).map_err(|_| "cannot read destination choices")?;
+        let destinations =
+            serde_json::from_slice(&choices).map_err(|_| "invalid destination choices")?;
+        let resident = self
+            .credentials
+            .get()
+            .ok_or("credential authority is unavailable")?;
+        match import.commit(destinations, resident, self.host.as_ref()) {
+            Ok(receipt) => serde_json::to_string_pretty(&receipt)
+                .map(|s| format!("{s}\n"))
+                .map_err(|_| "cannot encode CXF receipt".into()),
+            Err(failure) => Err(format!(
+                "{}\n{}",
+                failure.reason,
+                serde_json::to_string_pretty(&failure.receipt)
+                    .map_err(|_| "cannot encode partial CXF receipt")?
+            )),
+        }
     }
 
     pub(crate) fn wallet_root(&self) -> Option<&Path> {
