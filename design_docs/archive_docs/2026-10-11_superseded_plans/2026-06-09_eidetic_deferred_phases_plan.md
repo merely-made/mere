@@ -1,5 +1,10 @@
 # Eidetic Deferred Phases — Implementation Plan (2026-06-09)
 
+**Status (2026-10-11):** superseded by the
+[Eidetic development plan](../../eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md).
+The earlier proposals, dated measurements and status below are historical
+evidence. Storage, exchange and gathering follow-through now live in that plan.
+
 **Status (2026-10-06):** Active, the open tail of the completed layered-stack
 plan. Phase 8 and Phase 9's producer half moved to the browsing derivation
 plan (active), where `BrowsingMemory` and `crates/intel/eidetic-search` exist.
@@ -7,7 +12,7 @@ Open here, with no code landed: Phase 7 (`eidetic-opfs`) and Phase 9's
 consume half (`EngramDirectory`).
 **Spun out of**: `archive_docs/.../2026-05-09_eidetic_layered_stack_plan.md` (Phases 1-6
 plus all nine sidequests shipped; that plan is archived as complete).
-**Source design**: [`../research/2026-05-09_eidetic_design_pass.md`](../research/2026-05-09_eidetic_design_pass.md)
+**Source design**: [Eidetic design pass](../../eidetic_docs/research/2026-05-09_eidetic_design_pass.md)
 **Crate family**: `repos/mere/crates/eidetic/` (`eidetic-core`, `eidetic-fjall`,
 `eidetic-https-fetcher`, `eidetic-iroh-fetcher` shipped).
 **Corrected 2026-10-06 (S14 pass):** `eidetic-fjall`, `eidetic-https-fetcher`

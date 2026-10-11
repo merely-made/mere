@@ -19,7 +19,7 @@ not restate them):
   reports), hybrid lexical+vector recall. It explicitly parks **full page-text
   capture** out of scope with the named trigger *"a genet-side text-extraction
   seam."* The V1 materializer below is that trigger.
-- [Eidetic Deferred Phases](../../eidetic_docs/implementation_strategy/2026-06-09_eidetic_deferred_phases_plan.md)
+- [Eidetic Deferred Phases](../2026-10-11_superseded_plans/2026-06-09_eidetic_deferred_phases_plan.md)
   — Phase 9 **consume half** (federated index merge: `EngramDirectory`,
   per-moot merge, defensive ingestion) is the index-federation lane, gated on a
   moot-side consumer.

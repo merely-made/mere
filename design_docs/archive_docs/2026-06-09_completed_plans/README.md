@@ -6,7 +6,7 @@ audit. Kept for historical traceability, not for guidance.
 
 Two plans had a live tail spun out to a fresh active plan **before** archiving:
 - `2026-05-09_eidetic_layered_stack_plan` → deferred Phases 7-9 live in
-  `eidetic_docs/implementation_strategy/2026-06-09_eidetic_deferred_phases_plan.md`.
+  `archive_docs/2026-10-11_superseded_plans/2026-06-09_eidetic_deferred_phases_plan.md`.
 - `2026-06-07_card_system_and_staging_plan` → the unbuilt #5 staging flow lives in
   `mere_docs/implementation_strategy/2026-06-09_workbench_staging_plan.md`.
 
