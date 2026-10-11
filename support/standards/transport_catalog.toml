@@ -1,0 +1,1731 @@
+# Authored transport standards catalog. Review changes as decisions, not generated census data.
+# No implementation, conformance, publication, or physical qualification is claimed by this inventory.
+
+schema = "mere.transport-standards-catalog"
+version = 1
+as_of = "2026-10-11"
+owner = "mere/support/standards"
+consumer = ["mere transport qualification corpus", "retinue delivery and radio profile planning", "independent implementations through optional adapters"]
+status = "authored research catalog for human review; implementation and qualification not asserted"
+entry_count = 71
+profile_count = 25
+scope = "Selected useful specifications for preserved signed objects, IP carriers, retained radio repair, multicast interoperability and optional courier/constrained-IP branches. Includes specification families where normative vendor pins remain pending."
+dependency_closure = "not_exhaustive; normative dependencies outside this catalog require feature-specific audit before implementation or conformance claims"
+relation_semantics = "Known relationships reflect checked relevant metadata, not exhaustive dependency closure. An absent relationship is not evidence that no relationship exists."
+selection_semantics = "core/next/optional/alternative/guidance are proposed evaluation priorities; they do not assert completed implementation, adoption approval or conformance"
+profile_semantics = "Profiles compose through adapters. Alternative codecs and RMT transports are mutually selected per transfer/session, while independent profiles can coexist in the same stack."
+conformance_claim = "none"
+errata_review = "incomplete; RaptorQ verified erratum 5548 checked; other RFC errata not reviewed"
+physical_qualification = "none; PHY rates, driver support, multi-radio interference, power and RF compliance need separate hardware-profile evidence"
+original_object_rule = "Retain the original signed operation bytes and IDs. Additional manifests, FEC symbols, link receipts and courier receipts do not grant application admission or author authority."
+rf_schedule_rule = "No cataloged RFC independently standardizes our radio/channel rotation, tuning guard, repair reservation, retained floor, fairness or application admission policy. These need a separately versioned project profile."
+codec_source_caution = "The inspected Mere p2panda-core 0.7.1 header is CBOR; upstream v0.7.0 release prose says all wire protocols moved to Postcard. Source-derived operation encoding and release prose are recorded separately; no implicit migration."
+
+[sources.ietf]
+authority = "RFC Editor and IETF Datatracker"
+url = "https://www.rfc-editor.org/"
+status = "Primary publication metadata and selected clauses checked; errata review incomplete except recorded RaptorQ erratum."
+
+[sources.mere_pin]
+authority = "Mere Cargo.lock at inspected origin/main"
+path = "Cargo.lock"
+revision = "0e78fcffb140395a5c0d2f64a4dfda2b81751681"
+status = "Source locator and exact p2panda dependency family; no downstream behavior qualification."
+
+[sources.blake3_project]
+authority = "BLAKE3 official project"
+url = "https://github.com/BLAKE3-team/BLAKE3"
+status = "Tag source revision observed; no dependency repin performed."
+
+[sources.bao_project]
+authority = "Bao official project"
+url = "https://github.com/oconnor663/bao"
+status = "HEAD revision observed; actual consumer Bao dialect must be selected before conformance."
+
+[sources.reticulum_project]
+authority = "Reticulum official project"
+url = "https://pypi.org/project/rns/1.5.7/"
+status = "Selected consumer oracle package RNS 1.5.7; PyPI JSON wheel digest checked against the existing Retinue receipt. No matching upstream Git tag was observed."
+package = "rns-1.5.7-py3-none-any.whl"
+sha256 = "0e4aaf8cc47f770da34572d2215b45fea900e104b009551600eb9741a41faddf"
+metadata_url = "https://pypi.org/pypi/rns/1.5.7/json"
+
+[sources.reticulum_manual_locator]
+authority = "Reticulum official public manual"
+url = "https://reticulum.network/manual/understanding.html"
+status = "Manual identifies version 1.5.5 and matching Git tag 07bf986f31d54266a59ca1438176564677845d5b was observed; this locator does not replace the selected RNS 1.5.7 consumer oracle."
+
+[sources.retinue_oracle_pin]
+authority = "Retinue inspected oracle requirements and repin receipt"
+path = "../retinue/crates/retinue/oracle/requirements.txt"
+revision = "7aa87f2e9fdd973e4729e610d7130189dc22c0a0"
+receipt_path = "../retinue/testing/receipts/rns-1.5.7-repin/README.md"
+status = "Requirements select rns==1.5.7 and lxmf==1.2.0. Existing subset qualification receipts remain scoped historical evidence, not a conformance claim from this catalog."
+
+[sources.lxmf_oracle_package]
+authority = "LXMF official package"
+url = "https://pypi.org/project/lxmf/1.2.0/"
+package = "lxmf-1.2.0-py3-none-any.whl"
+sha256 = "805f053e61082f585efc6d09beffd039fd921174c5e1547a2e690bc479d75b85"
+metadata_url = "https://pypi.org/pypi/lxmf/1.2.0/json"
+status = "Selected companion consumer oracle pin; primary PyPI JSON wheel digest checked against the existing Retinue receipt."
+
+[sources.p2panda_project]
+authority = "Pinned Mere p2panda source family"
+url = "https://github.com/mark-ik/p2panda/tree/d8acabc96ecc59016e40edf4a47ed5eaf5360285"
+status = "Operation header source inspected; stable protocol claims remain profile-specific."
+
+[sources.p2panda_upstream_release]
+authority = "p2panda upstream release notes"
+url = "https://github.com/p2panda/p2panda/releases/tag/v0.7.0"
+revision = "37be61875f285956c906002d74a2d0370df5b2c1"
+status = "Release codec statement contrasts with pinned downstream header source; recorded as a source discrepancy."
+
+[sources.dash_project]
+authority = "p2panda/Dash collaboration architecture report"
+url = "https://p2panda.org/2026/09/16/dash-router-sync-api.html"
+status = "Dated architecture evidence; stable Dash Router wire contract not established."
+
+[sources.postcard_project]
+authority = "Postcard official wire specification"
+url = "https://postcard.jamesmunns.com/wire-format.html"
+status = "Stable v1 wire-format assertion checked; application schema compatibility is outside the wire specification."
+
+[sources.ieee]
+authority = "IEEE Standards Association"
+url = "https://standards.ieee.org/ieee/802.11/10548/"
+status = "Public metadata checked; complete normative text and certification behavior not reviewed."
+
+[sources.semtech]
+authority = "Semtech primary product and protocol publications"
+url = "https://www.semtech.com/"
+status = "Vendor capability and architecture sources; normative board/driver pins and physical evidence remain separate."
+
+[counts.by_classification]
+ieee_standard = 1
+ietf_bcp = 4
+ietf_experimental = 1
+ietf_informational = 3
+ietf_standards_track = 46
+irtf_experimental = 1
+irtf_informational = 5
+project_specification = 7
+vendor_specification_family = 3
+
+[counts.by_selection]
+alternative = 7
+core = 13
+guidance = 7
+next = 8
+optional = 36
+
+[[profiles]]
+id = "foundation"
+selection = "core"
+slot = "shared_foundation"
+specs = ["rfc8949", "rfc8032", "blake3", "postcard"]
+purpose = "Qualify selected primitive formats; external CBOR and internal Postcard remain separate contracts."
+
+[[profiles]]
+id = "p2panda_preserved_object"
+selection = "core"
+slot = "application_object_contract"
+specs = ["p2panda", "rfc8032", "rfc8949", "blake3"]
+purpose = "Preserve operation bytes and IDs from the pinned Mere p2panda-core 0.7.1 source; metadata disagreement with upstream release prose is recorded."
+
+[[profiles]]
+id = "quic_ip"
+selection = "core"
+slot = "carrier"
+specs = ["rfc9000", "rfc9001", "rfc9002", "rfc9846", "rfc8446", "rfc8489"]
+purpose = "Existing QUIC/TLS carrier qualification; does not automatically claim full ICE or TURN."
+
+[[profiles]]
+id = "signed_manifest"
+selection = "next"
+slot = "transfer_manifest"
+specs = ["rfc8949", "rfc8610", "rfc9682", "rfc9052", "rfc9053", "rfc9864"]
+purpose = "Interoperable additional manifests and receipts without replacing the original signed operation envelope."
+
+[[profiles]]
+id = "reticulum_carrier"
+selection = "core"
+slot = "carrier"
+specs = ["reticulum"]
+purpose = "Qualify the existing Retinue reference subset against the selected RNS 1.5.7 oracle; preserved application objects remain external to transport authority."
+consumer_oracle = "Retinue requirements at 7aa87f2e9fdd973e4729e610d7130189dc22c0a0: RNS 1.5.7; selected package hash recorded under sources."
+
+[[profiles]]
+id = "lxmf_courier"
+selection = "core"
+slot = "courier_binding"
+specs = ["reticulum", "lxmf"]
+purpose = "Qualify the existing Outrider LXMF reference subset and propagation/delivery behavior against LXMF 1.2.0 over RNS 1.5.7. Courier observations do not grant application admission."
+consumer_oracle = "Retinue oracle requirements select RNS 1.5.7 and LXMF 1.2.0; immutable package hashes recorded under sources."
+
+[[profiles]]
+id = "rq_retained_radio"
+selection = "next"
+slot = "fec_per_transfer"
+specs = ["rfc5052", "rfc6330", "reticulum"]
+mutually_exclusive_with = ["sliding_window_fec", "tetrys_live"]
+purpose = "Exact RaptorQ codec inside a separately specified constrained-radio schedule, bounded retained repair and recovery policy. A Reticulum binding is selected here; this new profile does not replace qualification of the existing carrier or LXMF courier."
+consumer_oracle = "Retinue requirements at 7aa87f2e9fdd973e4729e610d7130189dc22c0a0: RNS 1.5.7 with LXMF 1.2.0; selected package hashes recorded under sources."
+
+[[profiles]]
+id = "quic_symbol_datagrams"
+selection = "next"
+slot = "carrier_binding"
+specs = ["rfc9221", "rfc9000", "rfc9001", "rfc9002"]
+purpose = "Same object coding carried through unreliable point-to-point QUIC datagrams."
+
+[[profiles]]
+id = "verified_blob_ranges"
+selection = "optional"
+slot = "blob_delivery"
+specs = ["blake3", "bao"]
+purpose = "Range verification and resumable blob reads; choose and pin the actual Bao dialect before vectors are admitted."
+
+[[profiles]]
+id = "full_ice_turn"
+selection = "optional"
+slot = "connectivity"
+specs = ["rfc8489", "rfc8445", "rfc8838", "rfc8863", "rfc8656"]
+purpose = "Standards interoperability option alongside carrier-native connectivity."
+
+[[profiles]]
+id = "lan_service_discovery"
+selection = "optional"
+slot = "discovery"
+specs = ["rfc6762", "rfc6763", "rfc8553"]
+purpose = "Local service browsing and endpoint discovery; authentication and authority remain separate."
+
+[[profiles]]
+id = "full_alc_flute"
+selection = "optional"
+slot = "rmt_per_session"
+specs = ["rfc5651", "rfc5775", "rfc6726", "rfc5052", "rfc6330", "rfc3738", "rfc6584"]
+mutually_exclusive_with = ["full_norm"]
+purpose = "Exact RMT interoperability branch with UDP/LCT, FDT, WEBRC and required security support; profile list is not complete dependency closure."
+
+[[profiles]]
+id = "full_norm"
+selection = "optional"
+slot = "rmt_per_session"
+specs = ["rfc5740", "rfc5052", "rfc6584"]
+mutually_exclusive_with = ["full_alc_flute"]
+purpose = "Alternative exact RMT transport when return-path feedback is selected; audit all normative dependencies before implementation."
+
+[[profiles]]
+id = "sliding_window_fec"
+selection = "alternative"
+slot = "fec_per_transfer"
+specs = ["rfc6363", "rfc8680", "rfc8681"]
+mutually_exclusive_with = ["rq_retained_radio", "tetrys_live"]
+purpose = "Live-flow coding option; independent of block RaptorQ."
+
+[[profiles]]
+id = "tetrys_live"
+selection = "alternative"
+slot = "fec_per_transfer"
+specs = ["rfc9407"]
+mutually_exclusive_with = ["rq_retained_radio", "sliding_window_fec"]
+purpose = "Experimental research comparison for live recovery."
+
+[[profiles]]
+id = "bpv7_courier"
+selection = "optional"
+slot = "courier_interoperability"
+specs = ["rfc9171", "rfc9713", "rfc9758", "rfc9172", "rfc9173", "rfc9174"]
+purpose = "Actual DTN peer interoperability; retained repair alone does not imply BPv7 conformance."
+
+[[profiles]]
+id = "schc_lorawan"
+selection = "optional"
+slot = "constrained_ip"
+specs = ["rfc8724", "rfc9441", "rfc9011"]
+purpose = "Constrained-IP adapter for real LoRaWAN peers, separate from the raw Reticulum radio lane."
+
+[[profiles]]
+id = "coap_security"
+selection = "optional"
+slot = "constrained_application"
+specs = ["rfc7252", "rfc7959", "rfc6690", "rfc8613", "rfc9528"]
+purpose = "CoAP/OSCORE/EDHOC peer interoperability; requires feature-specific review of out-of-catalog updates."
+
+[[profiles]]
+id = "hpke_recipient"
+selection = "optional"
+slot = "object_security"
+specs = ["rfc9180", "rfc7748", "rfc5869", "rfc8439"]
+purpose = "A concrete recipient-encryption suite and key-management contract if not covered by the existing application."
+
+[[profiles]]
+id = "mls_group"
+selection = "optional"
+slot = "object_security"
+specs = ["rfc9420", "rfc9750", "rfc9180"]
+purpose = "MLS peer interoperability; no equivalence to existing p2panda group encryption assumed."
+
+[[profiles]]
+id = "dash_delivery"
+selection = "optional"
+slot = "delivery_strategy"
+specs = ["dash_router", "p2panda"]
+purpose = "Candidate delivery strategy based on the dated project architecture report; no stable router wire protocol qualified."
+
+[[profiles]]
+id = "sx126x_radio"
+selection = "core"
+slot = "radio_hardware_per_link"
+specs = ["semtech_sx126x"]
+purpose = "Existing LoRa-class hardware family source; support declarations do not qualify RF coexistence or delivered throughput."
+
+[[profiles]]
+id = "lr2021_flrp_radio"
+selection = "alternative"
+slot = "radio_hardware_per_link"
+specs = ["semtech_lr2021", "semtech_flrp"]
+purpose = "Faster vendor PHY/protocol evaluation; requires driver, peer and physical measurements."
+
+[[profiles]]
+id = "halow_ip_radio"
+selection = "alternative"
+slot = "radio_hardware_per_link"
+specs = ["ieee80211_subghz"]
+purpose = "Standards-based sub-GHz IP bearer alternative; full PHY/MAC conformance lies beyond a software packet suite."
+
+[[profiles]]
+id = "review_guidance"
+selection = "guidance"
+slot = "requirements_and_transport_review"
+specs = ["rfc2119", "rfc8174", "rfc8085", "rfc9265", "rfc8899"]
+purpose = "Requirement interpretation and transport review; guidance does not become a new wire protocol."
+
+[[specifications]]
+id = "rfc2119"
+title = "Key words for use in RFCs to Indicate Requirement Levels"
+selection = "guidance"
+family = "requirements"
+role = "Interpret normative requirements; map tests to clauses rather than keywords alone."
+url = "https://datatracker.ietf.org/doc/rfc2119/"
+classification = "ietf_bcp"
+status = "Best Current Practice"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["review_guidance"]
+known_updated_by = ["rfc8174"]
+
+[[specifications]]
+id = "rfc8174"
+title = "Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"
+selection = "guidance"
+family = "requirements"
+role = "Distinguish normative uppercase keywords from ordinary prose."
+url = "https://datatracker.ietf.org/doc/rfc8174/"
+classification = "ietf_bcp"
+status = "Best Current Practice"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["review_guidance"]
+known_updates = ["rfc2119"]
+
+[[specifications]]
+id = "rfc8949"
+title = "Concise Binary Object Representation (CBOR)"
+selection = "core"
+family = "serialization"
+role = "Compact external manifests and pinned CBOR operation bytes; define deterministic encoding and strict decoding explicitly."
+url = "https://datatracker.ietf.org/doc/rfc8949/"
+classification = "ietf_standards_track"
+status = "Internet Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["foundation", "p2panda_preserved_object", "signed_manifest"]
+known_obsoletes = ["rfc7049"]
+
+[[specifications]]
+id = "rfc8610"
+title = "Concise Data Definition Language (CDDL): A Notational Convention to Express Concise Binary Object Representation (CBOR) and JSON Data Structures"
+selection = "next"
+family = "serialization"
+role = "Reviewable schemas for manifests, schedule descriptions and feedback."
+url = "https://datatracker.ietf.org/doc/rfc8610/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["signed_manifest"]
+known_updated_by = ["rfc9682"]
+
+[[specifications]]
+id = "rfc9682"
+title = "Updates to the Concise Data Definition Language (CDDL) Grammar"
+selection = "next"
+family = "serialization"
+role = "Apply the current CDDL grammar update to schema tooling."
+url = "https://datatracker.ietf.org/doc/rfc9682/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["signed_manifest"]
+known_updates = ["rfc8610"]
+
+[[specifications]]
+id = "rfc8742"
+title = "Concise Binary Object Representation (CBOR) Sequences"
+selection = "optional"
+family = "serialization"
+role = "Sequence framing if concatenated CBOR items are selected for a stream."
+url = "https://datatracker.ietf.org/doc/rfc8742/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = []
+
+[[specifications]]
+id = "rfc9052"
+title = "CBOR Object Signing and Encryption (COSE): Structures and Process"
+selection = "next"
+family = "object_security"
+role = "Interoperable additional manifests and receipts; preserve the original operation envelope."
+url = "https://datatracker.ietf.org/doc/rfc9052/"
+classification = "ietf_standards_track"
+status = "Internet Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["signed_manifest"]
+known_updated_by = ["rfc9338"]
+known_obsoletes = ["rfc8152"]
+
+[[specifications]]
+id = "rfc9053"
+title = "CBOR Object Signing and Encryption (COSE): Initial Algorithms"
+selection = "next"
+family = "object_security"
+role = "Algorithm and key conventions, interpreted with RFC 9864 updates."
+url = "https://datatracker.ietf.org/doc/rfc9053/"
+classification = "ietf_informational"
+status = "Informational"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["signed_manifest"]
+known_updated_by = ["rfc9864"]
+known_obsoletes = ["rfc8152"]
+
+[[specifications]]
+id = "rfc9864"
+title = "Fully-Specified Algorithms for JSON Object Signing and Encryption (JOSE) and CBOR Object Signing and Encryption (COSE)"
+selection = "next"
+family = "object_security"
+role = "Select fully specified COSE Ed25519 -19; handle deprecated EdDSA -8 only through explicit compatibility policy."
+url = "https://datatracker.ietf.org/doc/rfc9864/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["signed_manifest"]
+known_updates = ["rfc7518", "rfc8037", "rfc9053"]
+conformance_targets = ["COSE Ed25519 algorithm -19 for selected new profile", "Explicit legacy EdDSA -8 compatibility policy", "Key/algorithm matching and signature validation"]
+
+[[specifications]]
+id = "rfc9338"
+title = "CBOR Object Signing and Encryption (COSE): Countersignatures"
+selection = "optional"
+family = "object_security"
+role = "Countersignatures only for a defined interoperable receipt or witness requirement."
+url = "https://datatracker.ietf.org/doc/rfc9338/"
+classification = "ietf_standards_track"
+status = "Internet Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = []
+known_updates = ["rfc9052"]
+
+[[specifications]]
+id = "rfc8032"
+title = "Edwards-Curve Digital Signature Algorithm (EdDSA)"
+selection = "core"
+family = "crypto"
+role = "Ed25519 byte-level vectors and rejection behavior; pin the algorithm variant."
+url = "https://datatracker.ietf.org/doc/rfc8032/"
+classification = "irtf_informational"
+status = "Informational"
+stream = "IRTF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["foundation", "p2panda_preserved_object"]
+
+[[specifications]]
+id = "rfc7748"
+title = "Elliptic Curves for Security"
+selection = "optional"
+family = "crypto"
+role = "X25519 key exchange if a chosen security profile requires it; distinct from Ed25519 signing keys."
+url = "https://datatracker.ietf.org/doc/rfc7748/"
+classification = "irtf_informational"
+status = "Informational"
+stream = "IRTF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["hpke_recipient"]
+
+[[specifications]]
+id = "rfc5869"
+title = "HMAC-based Extract-and-Expand Key Derivation Function (HKDF)"
+selection = "optional"
+family = "crypto"
+role = "Key derivation for selected TLS, HPKE or other interoperable suites; does not replace BLAKE3 application identities."
+url = "https://datatracker.ietf.org/doc/rfc5869/"
+classification = "ietf_informational"
+status = "Informational"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["hpke_recipient"]
+
+[[specifications]]
+id = "rfc8439"
+title = "ChaCha20 and Poly1305 for IETF Protocols"
+selection = "optional"
+family = "crypto"
+role = "Selected AEAD suite vectors, nonce rules and tamper rejection; this RFC does not specify XChaCha20."
+url = "https://datatracker.ietf.org/doc/rfc8439/"
+classification = "irtf_informational"
+status = "Informational"
+stream = "IRTF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["hpke_recipient"]
+known_obsoletes = ["rfc7539"]
+
+[[specifications]]
+id = "rfc9180"
+title = "Hybrid Public Key Encryption"
+selection = "optional"
+family = "object_security"
+role = "Defined recipient encryption use case; suite, context and key-management policy remain explicit."
+url = "https://datatracker.ietf.org/doc/rfc9180/"
+classification = "irtf_informational"
+status = "Informational"
+stream = "IRTF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["hpke_recipient", "mls_group"]
+
+[[specifications]]
+id = "rfc9420"
+title = "The Messaging Layer Security (MLS) Protocol"
+selection = "optional"
+family = "object_security"
+role = "Interoperable asynchronous group security when that requirement is selected; not assumed to describe p2panda encryption."
+url = "https://datatracker.ietf.org/doc/rfc9420/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["mls_group"]
+
+[[specifications]]
+id = "rfc9750"
+title = "The Messaging Layer Security (MLS) Architecture"
+selection = "guidance"
+family = "object_security"
+role = "Understand MLS roles, delivery-service assumptions and application integration."
+url = "https://datatracker.ietf.org/doc/rfc9750/"
+classification = "ietf_informational"
+status = "Informational"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["mls_group"]
+
+[[specifications]]
+id = "rfc9000"
+title = "QUIC: A UDP-Based Multiplexed and Secure Transport"
+selection = "core"
+family = "ip_transport"
+role = "Qualify the selected QUIC implementation and the application adapter; no new QUIC implementation proposed."
+url = "https://datatracker.ietf.org/doc/rfc9000/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:existing carrier adapters", "retinue:signalman gateway", "mere:transport qualification corpus"]
+profiles = ["quic_ip", "quic_symbol_datagrams"]
+
+[[specifications]]
+id = "rfc9001"
+title = "Using TLS to Secure QUIC"
+selection = "core"
+family = "ip_transport"
+role = "QUIC handshake and packet protection binding; original normative TLS reference is RFC 8446."
+url = "https://datatracker.ietf.org/doc/rfc9001/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:existing carrier adapters", "retinue:signalman gateway", "mere:transport qualification corpus"]
+profiles = ["quic_ip", "quic_symbol_datagrams"]
+
+[[specifications]]
+id = "rfc9002"
+title = "QUIC Loss Detection and Congestion Control"
+selection = "core"
+family = "ip_transport"
+role = "Loss, recovery and congestion behavior; source and repair datagrams share capacity."
+url = "https://datatracker.ietf.org/doc/rfc9002/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:existing carrier adapters", "retinue:signalman gateway", "mere:transport qualification corpus"]
+profiles = ["quic_ip", "quic_symbol_datagrams"]
+
+[[specifications]]
+id = "rfc9221"
+title = "An Unreliable Datagram Extension to QUIC"
+selection = "next"
+family = "ip_transport"
+role = "Authenticated congestion-controlled unreliable symbol delivery on point-to-point IP paths."
+url = "https://datatracker.ietf.org/doc/rfc9221/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:existing carrier adapters", "retinue:signalman gateway", "mere:transport qualification corpus"]
+profiles = ["quic_symbol_datagrams"]
+
+[[specifications]]
+id = "rfc9846"
+title = "The Transport Layer Security (TLS) Protocol Version 1.3"
+selection = "core"
+family = "ip_transport"
+role = "Current TLS 1.3 specification; track differences from the original QUIC RFC 8446 reference without inventing a new wire version."
+url = "https://datatracker.ietf.org/doc/rfc9846/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:existing carrier adapters", "retinue:signalman gateway", "mere:transport qualification corpus"]
+profiles = ["quic_ip"]
+known_obsoletes = ["rfc5077", "rfc5246", "rfc6961", "rfc7627", "rfc8422", "rfc8446"]
+known_updates = ["rfc5705", "rfc6066"]
+
+[[specifications]]
+id = "rfc8446"
+title = "The Transport Layer Security (TLS) Protocol Version 1.3"
+selection = "guidance"
+family = "ip_transport"
+role = "Historical TLS 1.3 baseline cited normatively by QUIC; superseded by RFC 9846."
+url = "https://datatracker.ietf.org/doc/rfc8446/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:existing carrier adapters", "retinue:signalman gateway", "mere:transport qualification corpus"]
+profiles = ["quic_ip"]
+known_obsoleted_by = ["rfc9846"]
+known_obsoletes = ["rfc5077", "rfc5246", "rfc6961"]
+known_updates = ["rfc5705", "rfc6066"]
+
+[[specifications]]
+id = "rfc8489"
+title = "Session Traversal Utilities for NAT (STUN)"
+selection = "core"
+family = "nat"
+role = "Binding and address-discovery interoperability; STUN alone does not guarantee connectivity."
+url = "https://datatracker.ietf.org/doc/rfc8489/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:existing carrier adapters", "retinue:signalman gateway", "mere:transport qualification corpus"]
+profiles = ["quic_ip", "full_ice_turn"]
+known_obsoletes = ["rfc5389"]
+
+[[specifications]]
+id = "rfc8445"
+title = "Interactive Connectivity Establishment (ICE): A Protocol for Network Address Translator (NAT) Traversal"
+selection = "optional"
+family = "nat"
+role = "Full ICE interoperability only if selected; native carrier traversal is not assumed to be ICE."
+url = "https://datatracker.ietf.org/doc/rfc8445/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:existing carrier adapters", "retinue:signalman gateway", "mere:transport qualification corpus"]
+profiles = ["full_ice_turn"]
+known_updated_by = ["rfc8863"]
+known_obsoletes = ["rfc5245"]
+
+[[specifications]]
+id = "rfc8863"
+title = "Interactive Connectivity Establishment Patiently Awaiting Connectivity (ICE PAC)"
+selection = "optional"
+family = "nat"
+role = "Apply the ICE failure-timing update where full ICE is selected."
+url = "https://datatracker.ietf.org/doc/rfc8863/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:existing carrier adapters", "retinue:signalman gateway", "mere:transport qualification corpus"]
+profiles = ["full_ice_turn"]
+known_updates = ["rfc8445", "rfc8838"]
+
+[[specifications]]
+id = "rfc8838"
+title = "Trickle ICE: Incremental Provisioning of Candidates for the Interactive Connectivity Establishment (ICE) Protocol"
+selection = "optional"
+family = "nat"
+role = "Incremental candidate gathering; selected with the ICE PAC update."
+url = "https://datatracker.ietf.org/doc/rfc8838/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:existing carrier adapters", "retinue:signalman gateway", "mere:transport qualification corpus"]
+profiles = ["full_ice_turn"]
+known_updated_by = ["rfc8863"]
+
+[[specifications]]
+id = "rfc8656"
+title = "Traversal Using Relays around NAT (TURN): Relay Extensions to Session Traversal Utilities for NAT (STUN)"
+selection = "optional"
+family = "nat"
+role = "TURN relay interoperability when required; an iroh relay is not automatically TURN."
+url = "https://datatracker.ietf.org/doc/rfc8656/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:existing carrier adapters", "retinue:signalman gateway", "mere:transport qualification corpus"]
+profiles = ["full_ice_turn"]
+known_obsoletes = ["rfc6156", "rfc5766"]
+
+[[specifications]]
+id = "rfc6762"
+title = "Multicast DNS"
+selection = "optional"
+family = "discovery"
+role = "Local-link endpoint discovery; discovery is not peer authorization."
+url = "https://datatracker.ietf.org/doc/rfc6762/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:existing carrier adapters", "retinue:signalman gateway", "mere:transport qualification corpus"]
+profiles = ["lan_service_discovery"]
+
+[[specifications]]
+id = "rfc6763"
+title = "DNS-Based Service Discovery"
+selection = "optional"
+family = "discovery"
+role = "Interoperable service advertisements and browsing."
+url = "https://datatracker.ietf.org/doc/rfc6763/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:existing carrier adapters", "retinue:signalman gateway", "mere:transport qualification corpus"]
+profiles = ["lan_service_discovery"]
+known_updated_by = ["rfc8553"]
+
+[[specifications]]
+id = "rfc8553"
+title = "DNS Attrleaf Changes: Fixing Specifications That Use Underscored Node Names"
+selection = "guidance"
+family = "discovery"
+role = "Observe updated service-label registry rules when using DNS-SD."
+url = "https://datatracker.ietf.org/doc/rfc8553/"
+classification = "ietf_bcp"
+status = "Best Current Practice"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:existing carrier adapters", "retinue:signalman gateway", "mere:transport qualification corpus"]
+profiles = ["lan_service_discovery"]
+known_updates = ["rfc6763"]
+relation_note = "Relevant DNS-SD update only; the RFC updates other specifications outside this catalog."
+
+[[specifications]]
+id = "rfc8085"
+title = "UDP Usage Guidelines"
+selection = "guidance"
+family = "transport_guidance"
+role = "Datagram sizing, congestion, fairness and multicast guidance."
+url = "https://datatracker.ietf.org/doc/rfc8085/"
+classification = "ietf_bcp"
+status = "Best Current Practice"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["review_guidance"]
+known_updated_by = ["rfc8899"]
+known_obsoletes = ["rfc5405"]
+
+[[specifications]]
+id = "rfc8899"
+title = "Packetization Layer Path MTU Discovery for Datagram Transports"
+selection = "optional"
+family = "ip_transport"
+role = "Black-hole recovery and datagram MTU behavior where exposed by the carrier."
+url = "https://datatracker.ietf.org/doc/rfc8899/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:existing carrier adapters", "retinue:signalman gateway", "mere:transport qualification corpus"]
+profiles = ["review_guidance"]
+known_updates = ["rfc8085", "rfc6951", "rfc4960", "rfc8261", "rfc4821"]
+
+[[specifications]]
+id = "rfc5052"
+title = "Forward Error Correction (FEC) Building Block"
+selection = "next"
+family = "fec"
+role = "Codec, payload identification and object transmission information boundary."
+url = "https://datatracker.ietf.org/doc/rfc5052/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["retinue:tulle candidate delivery adapters", "mere:transport qualification corpus"]
+profiles = ["rq_retained_radio", "full_alc_flute", "full_norm"]
+known_obsoletes = ["rfc3452"]
+
+[[specifications]]
+id = "rfc6330"
+title = "RaptorQ Forward Error Correction Scheme for Object Delivery"
+selection = "next"
+family = "fec"
+role = "Exact encoding ID 6 codec, OTI, partitioning, padding and SBN/ESI semantics, with verified erratum 5548."
+url = "https://datatracker.ietf.org/doc/rfc6330/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "verified_erratum_5548_checked; broader implementation-clause review pending"
+conformance_claim = "none"
+consumers = ["retinue:tulle candidate delivery adapters", "mere:transport qualification corpus"]
+profiles = ["rq_retained_radio", "full_alc_flute"]
+known_errata = [5548]
+errata_url = "https://errata.rfc-editor.org/search/?rfc_number=6330"
+errata_detail = "Verified technical erratum 5548 corrects maximum transfer length to 942574504275 octets; source-block count is at most 255."
+conformance_targets = ["Encoding ID 6 and OTI fields", "SBN/ESI and exact symbol bytes", "Source-block and sub-block partitioning", "Padding and corrected size bounds", "Independent codec interoperability", "RFC 6330 section 5.8 recovery properties assessed separately from a few deterministic passing seeds"]
+
+[[specifications]]
+id = "rfc5651"
+title = "Layered Coding Transport (LCT) Building Block"
+selection = "optional"
+family = "rmt"
+role = "Exact session and object framing for a full RMT adapter; not a definition of physical RF channels."
+url = "https://datatracker.ietf.org/doc/rfc5651/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["retinue:tulle candidate delivery adapters", "mere:transport qualification corpus"]
+profiles = ["full_alc_flute"]
+known_obsoletes = ["rfc3451"]
+
+[[specifications]]
+id = "rfc5775"
+title = "Asynchronous Layered Coding (ALC) Protocol Instantiation"
+selection = "optional"
+family = "rmt"
+role = "Full UDP/IP multicast delivery with required congestion-control behavior and signaling."
+url = "https://datatracker.ietf.org/doc/rfc5775/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["retinue:tulle candidate delivery adapters", "mere:transport qualification corpus"]
+profiles = ["full_alc_flute"]
+known_obsoletes = ["rfc3450"]
+conformance_targets = ["UDP/LCT packet/session semantics", "RFC 3738 WEBRC mandatory support", "Congestion accounting for every source and repair packet", "Profile-specific complete normative dependency audit before interoperability claim"]
+
+[[specifications]]
+id = "rfc6726"
+title = "FLUTE - File Delivery over Unidirectional Transport"
+selection = "optional"
+family = "rmt"
+role = "Full file delivery and XML FDT handling; substituting a CBOR manifest is a separate project profile."
+url = "https://datatracker.ietf.org/doc/rfc6726/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["retinue:tulle candidate delivery adapters", "mere:transport qualification corpus"]
+profiles = ["full_alc_flute"]
+known_obsoletes = ["rfc3926"]
+relation_note = "Body defines EXT_FDT and EXT_CENC extensions to ALC and LCT; not represented as a replacement codec."
+conformance_targets = ["Version 2 FDT XML and expiry semantics", "LCT extensions and OTI delivery", "Mandatory-to-implement security support", "Independent FLUTE peer interoperability"]
+
+[[specifications]]
+id = "rfc5740"
+title = "NACK-Oriented Reliable Multicast (NORM) Transport Protocol"
+selection = "optional"
+family = "rmt"
+role = "Alternative reliable multicast transport with feedback suppression; custom deficit reports are not NORM conformance."
+url = "https://datatracker.ietf.org/doc/rfc5740/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["retinue:tulle candidate delivery adapters", "mere:transport qualification corpus"]
+profiles = ["full_norm"]
+known_obsoletes = ["rfc3940"]
+
+[[specifications]]
+id = "rfc3738"
+title = "Wave and Equation Based Rate Control (WEBRC) Building Block"
+selection = "optional"
+family = "rmt"
+role = "Mandatory-to-support congestion-control building block for full ALC RFC 5775 conformance, despite Experimental status."
+url = "https://datatracker.ietf.org/doc/rfc3738/"
+classification = "ietf_experimental"
+status = "Experimental"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["retinue:tulle candidate delivery adapters", "mere:transport qualification corpus"]
+profiles = ["full_alc_flute"]
+
+[[specifications]]
+id = "rfc6584"
+title = "Simple Authentication Schemes for the Asynchronous Layered Coding (ALC) and NACK-Oriented Reliable Multicast (NORM) Protocols"
+selection = "optional"
+family = "rmt"
+role = "Per-packet authentication for a selected full RMT interoperability profile."
+url = "https://datatracker.ietf.org/doc/rfc6584/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["retinue:tulle candidate delivery adapters", "mere:transport qualification corpus"]
+profiles = ["full_alc_flute", "full_norm"]
+
+[[specifications]]
+id = "rfc6363"
+title = "Forward Error Correction (FEC) Framework"
+selection = "alternative"
+family = "fec"
+role = "FECFRAME packet-flow coding alternative; not a dependency of the object RaptorQ profile."
+url = "https://datatracker.ietf.org/doc/rfc6363/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["retinue:tulle candidate delivery adapters", "mere:transport qualification corpus"]
+profiles = ["sliding_window_fec"]
+known_updated_by = ["rfc8680"]
+
+[[specifications]]
+id = "rfc8680"
+title = "Forward Error Correction (FEC) Framework Extension to Sliding Window Codes"
+selection = "alternative"
+family = "fec"
+role = "Sliding-window framework update for live flows."
+url = "https://datatracker.ietf.org/doc/rfc8680/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["retinue:tulle candidate delivery adapters", "mere:transport qualification corpus"]
+profiles = ["sliding_window_fec"]
+known_updates = ["rfc6363"]
+
+[[specifications]]
+id = "rfc8681"
+title = "Sliding Window Random Linear Code (RLC) Forward Erasure Correction (FEC) Schemes for FECFRAME"
+selection = "alternative"
+family = "fec"
+role = "Exact live-flow coding alternative; evaluate memory and latency separately from RaptorQ."
+url = "https://datatracker.ietf.org/doc/rfc8681/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["retinue:tulle candidate delivery adapters", "mere:transport qualification corpus"]
+profiles = ["sliding_window_fec"]
+
+[[specifications]]
+id = "rfc9265"
+title = "Forward Erasure Correction (FEC) Coding and Congestion Control in Transport"
+selection = "guidance"
+family = "transport_guidance"
+role = "Research guidance on capacity and repair traffic; no independent wire-conformance claim."
+url = "https://datatracker.ietf.org/doc/rfc9265/"
+classification = "irtf_informational"
+status = "Informational"
+stream = "IRTF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["review_guidance"]
+
+[[specifications]]
+id = "rfc9407"
+title = "Tetrys: An On-the-Fly Network Coding Protocol"
+selection = "alternative"
+family = "fec"
+role = "Experimental live-flow comparison; not an initial production adoption target."
+url = "https://datatracker.ietf.org/doc/rfc9407/"
+classification = "irtf_experimental"
+status = "Experimental"
+stream = "IRTF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["retinue:tulle candidate delivery adapters", "mere:transport qualification corpus"]
+profiles = ["tetrys_live"]
+
+[[specifications]]
+id = "rfc9171"
+title = "Bundle Protocol Version 7"
+selection = "optional"
+family = "dtn"
+role = "Actual BPv7 interoperability adapter with endpoint, lifetime and administrative semantics."
+url = "https://datatracker.ietf.org/doc/rfc9171/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["retinue:outrider candidate interoperability adapter", "mere:transport qualification corpus"]
+profiles = ["bpv7_courier"]
+known_updated_by = ["rfc9713", "rfc9758"]
+
+[[specifications]]
+id = "rfc9713"
+title = "Bundle Protocol Version 7 Administrative Record Types Registry"
+selection = "optional"
+family = "dtn"
+role = "Current BPv7 administrative record registry update."
+url = "https://datatracker.ietf.org/doc/rfc9713/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["retinue:outrider candidate interoperability adapter", "mere:transport qualification corpus"]
+profiles = ["bpv7_courier"]
+known_updates = ["rfc9171"]
+
+[[specifications]]
+id = "rfc9758"
+title = "Updates to the 'ipn' URI Scheme"
+selection = "optional"
+family = "dtn"
+role = "Updated ipn endpoint identifier encoding for selected BPv7 interoperability."
+url = "https://datatracker.ietf.org/doc/rfc9758/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["retinue:outrider candidate interoperability adapter", "mere:transport qualification corpus"]
+profiles = ["bpv7_courier"]
+known_updates = ["rfc6260", "rfc7116", "rfc9171"]
+
+[[specifications]]
+id = "rfc9172"
+title = "Bundle Protocol Security (BPSec)"
+selection = "optional"
+family = "dtn"
+role = "Bundle integrity and confidentiality contexts; independent of original operation author admission."
+url = "https://datatracker.ietf.org/doc/rfc9172/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["retinue:outrider candidate interoperability adapter", "mere:transport qualification corpus"]
+profiles = ["bpv7_courier"]
+
+[[specifications]]
+id = "rfc9173"
+title = "Default Security Contexts for Bundle Protocol Security (BPSec)"
+selection = "optional"
+family = "dtn"
+role = "Default interoperable BPSec contexts and associated test vectors."
+url = "https://datatracker.ietf.org/doc/rfc9173/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["retinue:outrider candidate interoperability adapter", "mere:transport qualification corpus"]
+profiles = ["bpv7_courier"]
+
+[[specifications]]
+id = "rfc9174"
+title = "Delay-Tolerant Networking TCP Convergence-Layer Protocol Version 4"
+selection = "optional"
+family = "dtn"
+role = "Standard TCP convergence layer if interoperating with TCPCLv4 peers."
+url = "https://datatracker.ietf.org/doc/rfc9174/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["retinue:outrider candidate interoperability adapter", "mere:transport qualification corpus"]
+profiles = ["bpv7_courier"]
+
+[[specifications]]
+id = "rfc8724"
+title = "SCHC: Generic Framework for Static Context Header Compression and Fragmentation"
+selection = "optional"
+family = "constrained_ip"
+role = "IPv6/UDP compression and fragmentation only for a selected constrained-IP profile."
+url = "https://datatracker.ietf.org/doc/rfc8724/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["retinue:tulle candidate delivery adapters", "mere:transport qualification corpus"]
+profiles = ["schc_lorawan"]
+known_updated_by = ["rfc9441"]
+
+[[specifications]]
+id = "rfc9441"
+title = "Static Context Header Compression (SCHC) Compound Acknowledgement (ACK)"
+selection = "optional"
+family = "constrained_ip"
+role = "SCHC compound acknowledgement update."
+url = "https://datatracker.ietf.org/doc/rfc9441/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["retinue:tulle candidate delivery adapters", "mere:transport qualification corpus"]
+profiles = ["schc_lorawan"]
+known_updates = ["rfc9363", "rfc8724"]
+
+[[specifications]]
+id = "rfc9011"
+title = "Static Context Header Compression and Fragmentation (SCHC) over LoRaWAN"
+selection = "optional"
+family = "constrained_ip"
+role = "LoRaWAN-specific SCHC binding; does not specify raw LoRa or Reticulum transport."
+url = "https://datatracker.ietf.org/doc/rfc9011/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["retinue:tulle candidate delivery adapters", "mere:transport qualification corpus"]
+profiles = ["schc_lorawan"]
+
+[[specifications]]
+id = "rfc7252"
+title = "The Constrained Application Protocol (CoAP)"
+selection = "optional"
+family = "constrained_application"
+role = "Separate constrained REST interoperability profile; subsequent updates need feature-specific review."
+url = "https://datatracker.ietf.org/doc/rfc7252/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["coap_security"]
+known_updated_by = ["rfc7959", "rfc8974", "rfc9175", "rfc8613", "rfc9876"]
+
+[[specifications]]
+id = "rfc7959"
+title = "Block-Wise Transfers in the Constrained Application Protocol (CoAP)"
+selection = "optional"
+family = "constrained_application"
+role = "Interoperable CoAP block transfers if CoAP is selected; distinct from RaptorQ symbol recovery."
+url = "https://datatracker.ietf.org/doc/rfc7959/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["coap_security"]
+known_updated_by = ["rfc8323"]
+known_updates = ["rfc7252"]
+
+[[specifications]]
+id = "rfc6690"
+title = "Constrained RESTful Environments (CoRE) Link Format"
+selection = "optional"
+family = "constrained_application"
+role = "CoAP resource discovery representation, distinct from peer identity and authority."
+url = "https://datatracker.ietf.org/doc/rfc6690/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["coap_security"]
+
+[[specifications]]
+id = "rfc8613"
+title = "Object Security for Constrained RESTful Environments (OSCORE)"
+selection = "optional"
+family = "constrained_application"
+role = "End-to-end CoAP object security across intermediary hops."
+url = "https://datatracker.ietf.org/doc/rfc8613/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["coap_security"]
+known_updates = ["rfc7252"]
+
+[[specifications]]
+id = "rfc9528"
+title = "Ephemeral Diffie-Hellman Over COSE (EDHOC)"
+selection = "optional"
+family = "constrained_application"
+role = "Constrained authenticated key exchange, principally for establishing an OSCORE context."
+url = "https://datatracker.ietf.org/doc/rfc9528/"
+classification = "ietf_standards_track"
+status = "Proposed Standard"
+stream = "IETF"
+sources = ["ietf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+metadata_review = "Primary document metadata and selected relevant clauses; not a full normative dependency audit."
+errata_review = "not_reviewed"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["coap_security"]
+
+[[specifications]]
+id = "blake3"
+title = "BLAKE3 hash specification and official vectors"
+url = "https://github.com/BLAKE3-team/BLAKE3/tree/f3149ec5bb5449af877ba20377a11008ff499fa2"
+source_revision = "f3149ec5bb5449af877ba20377a11008ff499fa2"
+source_version = "1.8.7 source snapshot"
+selection = "core"
+family = "crypto"
+status = "Versioned project specification"
+role = "Object identities and official hash vectors; a source snapshot is not a downstream dependency repin."
+sources = ["blake3_project"]
+classification = "project_specification"
+stream = "project"
+metadata_review = "Primary project source/documentation and declared source revision checked; no implementation conformance qualified."
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+errata_review = "not_applicable_rfc_registry; project_or_vendor_issue_review_pending"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["foundation", "p2panda_preserved_object", "verified_blob_ranges"]
+
+[[specifications]]
+id = "bao"
+title = "Bao verified streaming encoding specification"
+url = "https://github.com/oconnor663/bao/blob/3466bb34287f10f746d29d899d92429b81cf4302/docs/spec.md"
+source_revision = "3466bb34287f10f746d29d899d92429b81cf4302"
+source_version = "Observed repository HEAD; dialect selection pending"
+selection = "optional"
+family = "blob_delivery"
+status = "Versioned project specification"
+role = "Verified range delivery; choose the actual Bao/bao-tree representation before byte vectors are admitted."
+sources = ["bao_project"]
+classification = "project_specification"
+stream = "project"
+metadata_review = "Primary project source/documentation and declared source revision checked; no implementation conformance qualified."
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+errata_review = "not_applicable_rfc_registry; project_or_vendor_issue_review_pending"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["verified_blob_ranges"]
+
+[[specifications]]
+id = "reticulum"
+title = "Reticulum Network Stack protocol and reference implementation"
+url = "https://pypi.org/project/rns/1.5.7/"
+source_version = "RNS 1.5.7 consumer oracle with LXMF 1.2.0 companion oracle"
+source_package_sha256 = "0e4aaf8cc47f770da34572d2215b45fea900e104b009551600eb9741a41faddf"
+upstream_git_revision = "unresolved; no matching 1.5.7 Git tag observed"
+selection = "core"
+family = "radio"
+status = "Versioned project protocol"
+role = "Destination, packet and link semantics against a declared reference subset; this catalog does not qualify the local Rust implementation."
+sources = ["reticulum_project", "reticulum_manual_locator", "retinue_oracle_pin", "lxmf_oracle_package"]
+classification = "project_specification"
+stream = "project"
+metadata_review = "Actual consumer requirements select RNS 1.5.7 and LXMF 1.2.0; primary PyPI metadata and package digests checked. Public manual 1.5.5 is a separate locator. Existing Retinue reference-subset receipts were not rerun and do not confer complete compatibility."
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+errata_review = "not_applicable_rfc_registry; project_or_vendor_issue_review_pending"
+conformance_claim = "none"
+consumers = ["retinue:tulle candidate delivery adapters", "mere:transport qualification corpus"]
+profiles = ["reticulum_carrier", "lxmf_courier", "rq_retained_radio"]
+
+[[specifications]]
+id = "lxmf"
+title = "LXMF messaging and propagation project protocol"
+url = "https://pypi.org/project/lxmf/1.2.0/"
+additional_urls = ["https://github.com/markqvist/LXMF", "https://github.com/markqvist/LXMF/releases/tag/1.2.0"]
+source_version = "LXMF 1.2.0 consumer oracle over RNS 1.5.7"
+source_package_sha256 = "805f053e61082f585efc6d09beffd039fd921174c5e1547a2e690bc479d75b85"
+source_revision = "c3ff2d6dc2f256daab896dadc044dd5a913ecbb7"
+selection = "core"
+family = "courier"
+status = "Versioned project protocol"
+role = "Existing Outrider message/courier and propagation reference subset; application object authority and admission remain separate."
+sources = ["lxmf_oracle_package", "retinue_oracle_pin", "reticulum_project"]
+classification = "project_specification"
+stream = "project"
+metadata_review = "Retinue oracle requirements, primary PyPI package metadata/digest and official annotated 1.2.0 tag target checked. Existing subset receipts were not rerun; complete protocol conformance is not claimed."
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+errata_review = "not_applicable_rfc_registry; project_issue_review_pending"
+conformance_claim = "none"
+consumers = ["retinue:outrider courier", "mere:transport qualification corpus"]
+profiles = ["lxmf_courier"]
+
+[[specifications]]
+id = "p2panda"
+title = "p2panda preserved operation and synchronization project profile"
+url = "https://github.com/mark-ik/p2panda/tree/d8acabc96ecc59016e40edf4a47ed5eaf5360285"
+source_revision = "d8acabc96ecc59016e40edf4a47ed5eaf5360285"
+source_version = "Mere family tag mere-p2panda-net-0.7.5-upstream-20261011; p2panda-core 0.7.1"
+selection = "core"
+family = "application_object"
+status = "Pinned downstream project protocol"
+role = "Preserve original signed bytes and operation IDs across carriers; actual pinned header encoder is CBOR. Upstream v0.7.0 release prose says all wire protocols moved to Postcard; that statement does not establish the pinned operation encoding."
+sources = ["p2panda_project", "mere_pin", "p2panda_upstream_release"]
+metadata_review = "Cargo.lock core version/source verified plus primary pinned header.rs encode_header and extensions_cbor inspected. Upstream release-note discrepancy recorded; sync/carrier framing needs separate source review."
+additional_urls = ["https://raw.githubusercontent.com/mark-ik/p2panda/d8acabc96ecc59016e40edf4a47ed5eaf5360285/p2panda-core/src/operation/header.rs", "https://github.com/p2panda/p2panda/releases/tag/v0.7.0"]
+conflicting_source_claim = "Upstream v0.7.0 release at 37be61875f285956c906002d74a2d0370df5b2c1 claims all wire protocols use Postcard; pinned downstream header source explicitly uses CBOR. Do not infer a codec migration from the release prose."
+classification = "project_specification"
+stream = "project"
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+errata_review = "not_applicable_rfc_registry; project_or_vendor_issue_review_pending"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["p2panda_preserved_object", "dash_delivery"]
+
+[[specifications]]
+id = "dash_router"
+title = "Dash Router delivery-strategy architecture report"
+url = "https://p2panda.org/2026/09/16/dash-router-sync-api.html"
+source_revision = "dated report 2026-09-16"
+source_version = "Architecture/PoC report; no stable wire specification pin established"
+selection = "optional"
+family = "delivery_strategy"
+status = "Project architecture report; protocol qualification pending"
+role = "Candidate standalone networking, routing and synchronization strategy emitting events for p2panda processing; stable interoperability contract remains unqualified."
+sources = ["dash_project"]
+additional_urls = ["https://github.com/dash-chat/dash-chat"]
+classification = "project_specification"
+stream = "project"
+metadata_review = "Primary project source/documentation and declared source revision checked; no implementation conformance qualified."
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+errata_review = "not_applicable_rfc_registry; project_or_vendor_issue_review_pending"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["dash_delivery"]
+
+[[specifications]]
+id = "postcard"
+title = "Postcard Wire Specification"
+url = "https://postcard.jamesmunns.com/wire-format.html"
+source_revision = "Stable v1 wire specification observed 2026-10-11; immutable documentation snapshot pending"
+source_version = "Wire format stable since library v1.0.0"
+selection = "core"
+family = "serialization"
+status = "Project serialization specification"
+role = "Existing internal stack positional encoding; stable wire format requires a shared schema and application version framing. Does not imply a p2panda operation migration."
+sources = ["postcard_project"]
+classification = "project_specification"
+stream = "project"
+metadata_review = "Primary project source/documentation and declared source revision checked; no implementation conformance qualified."
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+errata_review = "not_applicable_rfc_registry; project_or_vendor_issue_review_pending"
+conformance_claim = "none"
+consumers = ["mere:transport qualification corpus", "mere and retinue:profile-specific consumers"]
+profiles = ["foundation"]
+
+[[specifications]]
+id = "ieee80211_subghz"
+title = "IEEE 802.11-2024 MAC/PHY family: sub-1 GHz operation originating in 802.11ah-2016"
+url = "https://standards.ieee.org/ieee/802.11/10548/"
+classification = "ieee_standard"
+stream = "IEEE"
+selection = "alternative"
+family = "radio"
+status = "802.11-2024 Active Standard; original ah-2016 amendment superseded"
+source_revision = "IEEE 802.11-2024; originating amendment IEEE 802.11ah-2016"
+role = "Standards-based sub-GHz IP bearer alternative; catalog metadata review does not qualify a PHY/MAC or Wi-Fi certification."
+sources = ["ieee"]
+additional_urls = ["https://standards.ieee.org/ieee/802.11ah/4960/"]
+metadata_review = "Official public standard metadata checked; full normative standard not reviewed."
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+errata_review = "not_applicable_rfc_registry; project_or_vendor_issue_review_pending"
+conformance_claim = "none"
+consumers = ["retinue:tulle candidate delivery adapters", "mere:transport qualification corpus"]
+profiles = ["halow_ip_radio"]
+
+[[specifications]]
+id = "semtech_sx126x"
+title = "Semtech SX126x LoRa/FSK PHY and radio-command family"
+url = "https://www.semtech.com/products/wireless-rf/lora-connect/sx1261"
+classification = "vendor_specification_family"
+stream = "Semtech"
+selection = "core"
+family = "radio"
+status = "Vendor silicon/specification family"
+source_revision = "SX1261/2/8 family public specification observed 2026-10-11; exact datasheet and silicon revision required per board profile"
+role = "Existing sub-GHz LoRa-class PHY capability family; nominal rates do not establish delivered throughput, RF coexistence, board support or physical qualification."
+sources = ["semtech"]
+metadata_review = "Primary product capability page and published family guide reviewed; exact board-profile datasheet revision pending."
+additional_urls = ["https://www.semtech.com/uploads/common/LoRa_products_sx126x.pdf"]
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+errata_review = "not_applicable_rfc_registry; project_or_vendor_issue_review_pending"
+conformance_claim = "none"
+consumers = ["retinue:tulle candidate delivery adapters", "mere:transport qualification corpus"]
+profiles = ["sx126x_radio"]
+
+[[specifications]]
+id = "semtech_lr2021"
+title = "Semtech LR2021 LoRa and Fast Long-Range Communication (FLRC) family"
+url = "https://blog.semtech.com/fast-long-range-communication-semtech-lr2021-enables-high-speed-image-transfer-without-compromise"
+classification = "vendor_specification_family"
+stream = "Semtech"
+selection = "alternative"
+family = "radio"
+status = "Vendor PHY family; local driver and peer qualification pending"
+source_revision = "LR2021 primary vendor capability report observed 2026-10-11; normative driver/datasheet pin pending"
+role = "Candidate faster PHY; vendor capability claims are not measurements of the local hardware or application throughput."
+sources = ["semtech"]
+metadata_review = "Primary vendor capability report checked; no complete normative command or PHY specification reviewed."
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+errata_review = "not_applicable_rfc_registry; project_or_vendor_issue_review_pending"
+conformance_claim = "none"
+consumers = ["retinue:tulle candidate delivery adapters", "mere:transport qualification corpus"]
+profiles = ["lr2021_flrp_radio"]
+
+[[specifications]]
+id = "semtech_flrp"
+title = "Semtech Fast Long-Range Protocol (FLRP) Burst"
+url = "https://blog.semtech.com/fast-long-range-protocol-burst-megabit-speeds-meet-kilometer-range-wireless-links"
+classification = "vendor_specification_family"
+stream = "Semtech"
+selection = "alternative"
+family = "radio"
+status = "Vendor protocol and example family; interoperability qualification pending"
+source_revision = "Primary vendor report dated 2026-09-14; complete protocol/example revision pin pending"
+role = "LoRa wake/synchronization and FLRC burst candidate; not an IETF standard and not a general multi-radio retained-repair schedule."
+sources = ["semtech"]
+metadata_review = "Dated vendor protocol report checked; full wire contract, implementation and physical transfer claims unqualified."
+metadata_checked = true
+metadata_checked_on = "2026-10-11"
+errata_review = "not_applicable_rfc_registry; project_or_vendor_issue_review_pending"
+conformance_claim = "none"
+consumers = ["retinue:tulle candidate delivery adapters", "mere:transport qualification corpus"]
+profiles = ["lr2021_flrp_radio"]

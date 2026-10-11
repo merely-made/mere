@@ -1121,3 +1121,153 @@ answer and the choice is Mark's.
 10. **One out-of-scope one-liner.** `smolweb/crates/scorpion-protocol/src/tls.rs:29`
    cites RFC 8446, now obsoleted by RFC 9846. Flagged, not fixed — smolweb was
    outside this pass's scope.
+
+---
+
+## 10. Transport composition and a shared conformance corpus — 2026-10-11
+
+**Status:** owner-authorized direction; catalog and executable suite foundation
+implemented and validated locally; later integration and qualification open. Mark prefers published standards for covered behavior and asked
+for orchestration, the useful specification scope, prior art and a WPT-like
+testing set. This section is the canonical cross-repository research record.
+Implementation sequencing lives in
+`retinue/design_docs/2026-10-11_transport_conformance_plan.md`.
+
+The reviewed transport inventory is
+[transport_catalog.toml](../support/standards/transport_catalog.toml), with
+[prior_art.toml](../support/standards/prior_art.toml) recording reusable corpora,
+tools, licenses and independent peers. These are authored TOML under the
+[data-formats ruling](2026-10-06_data_formats_brief.md); generated run receipts
+are JSON. The catalog contains 71 specifications or specification families, grouped into
+25 candidate profiles: 60 RFCs, seven project specifications, one IEEE family
+and three vendor families. It includes current baselines, updates, older normative
+references, guidance and alternatives. It is a scoped inventory, not the full
+transitive closure of every selected RFC, the whole Internet stack, or an
+implementation/compliance assertion. Select a profile before expanding its
+normative dependencies. Metadata verification and full errata review are
+separate fields; unreviewed errata must not be recorded as absent.
+
+### Composition target
+
+Preserve original signed object bytes and identity across delivery paths.
+Stickleback owns replicated-space verification/retention/store mechanics;
+domain policy owns admission; Murm supplies carriers; Tulle/radio-hand own
+radio interfaces and device execution. A portable FEC leaf owns coding. It
+does not become another replication or authorization authority.
+
+The resulting delivery choices are existing QUIC/IP, compatible Reticulum,
+an optional Outrider/Dash courier, and a separately specified multi-channel
+object-repair profile. A fast PHY can carry bulk traffic while LoRa supplies
+reachability/control when that deployment supports it. Hardware candidates do
+not establish board support or measured throughput. Full Internet multicast,
+DTN and constrained-IP interoperability are additional profiles selected for
+real peers, not obligatory layers under every application.
+
+Adopt standards-compatible implementations where available and qualify the
+adapter; implementing a standard does not imply writing new cryptography or a
+new QUIC implementation. Do not substitute BLAKE3 into Reticulum's specified
+SHA-256/HKDF-SHA256 wire algorithms. New COSE manifests/receipts may wrap transfer
+metadata while retaining the original operation's signature and identity.
+
+The exact operation profile must be revisioned. At inspected Mere
+`0e78fcffb140395a5c0d2f64a4dfda2b81751681`, the lock selects p2panda-core 0.7.1
+from the patched family at `d8acabc96ecc59016e40edf4a47ed5eaf5360285`. Its
+[pinned header source](https://github.com/mark-ik/p2panda/blob/d8acabc96ecc59016e40edf4a47ed5eaf5360285/p2panda-core/src/operation/header.rs)
+uses CBOR and preserves extension representation. The upstream release page's
+Postcard statement is not sufficient evidence to change this pinned wire
+profile. Signed bytes and compatibility follow the actual selected source.
+
+### What the standards do and what remains ours
+
+RFC 6330 supplies RaptorQ coding and exact payload-ID/OTI semantics. A CBOR
+manifest over raw radio is a named project profile around that codec.
+[ALC RFC 5775 §2.2](https://www.rfc-editor.org/rfc/rfc5775.html#section-2.2)
+requires support for WEBRC and congestion control over repair as well as source
+packets. [FLUTE RFC 6726](https://www.rfc-editor.org/rfc/rfc6726.html) has FDT,
+expiry, format and security requirements. A private manifest/schedule does not
+establish either transport's conformance. NORM is a separate return-path
+interoperability branch; its name does not apply to custom deficit feedback.
+
+RaptorQ's [verified technical erratum 5548](https://www.rfc-editor.org/errata/eid5548)
+corrects maximum transfer length to 942,574,504,275 bytes. A profile can set far
+smaller resource limits. Four-octet payload IDs and twelve-octet combined OTI
+need exact vectors and malformed-input guards. Codec self-roundtrips are useful
+composition evidence; exact symbol comparisons and decoding between independent
+implementations remain a separate qualification gate. Arbitrary K received
+symbols are not an unconditional recovery promise.
+
+Our retained-repair design must define generations, authenticated metadata,
+symbol namespaces, replay behavior, decoder/retention limits, repair floors,
+receiver sleep/restart, clock/tuning costs and expiry. An object signature
+detects failed reconstruction but does not reject each poisoned symbol before
+expensive decoding; the profile needs authenticated delivery and bounded work.
+The long-run source rate intended for a receiver must remain below its useful
+collection capacity, and retained generations must survive long enough for
+catch-up. More radios help collection; repair coding does not overcome a
+permanent single-radio capacity deficit.
+
+BPv7/BPSec is an optional real DTN adapter. SCHC's LoRaWAN binding applies to
+LoRaWAN, not any raw-LoRa bearer. CoAP/OSCORE/EDHOC is an optional constrained
+application interface. MLS/HPKE is selected only against an actual security
+contract and existing group-security ownership. FECFRAME/RLC and Tetrys are
+live-flow alternatives/research comparisons, not RaptorQ dependencies.
+
+Metadata checked live also confirms [TLS 1.3 RFC 9846](https://datatracker.ietf.org/doc/rfc9846/)
+obsoletes RFC 8446. Published QUIC RFCs still cite their original RFC 8446
+baseline; record current deltas explicitly without implying a new TLS wire
+version. RFC 8032 and RFC 9180 are Informational IRTF specifications, and
+RFC 9407 is Experimental. BLAKE3, Bao, p2panda and Reticulum are project
+specifications; PHY and IEEE specifications retain their own classification.
+
+### Prior art and evidence model
+
+Borrow [WPT's specification-organized design](https://web-platform-tests.org/test-suite-design.html):
+stable cases, implementation-independent requirements, explicit optional
+capabilities and per-environment metadata. Use a common control/report layer
+with specialized upstream vectors and external peers. The browser harness is
+not required for a transport corpus.
+
+Useful seeds include official BLAKE3 vectors, RFC 8032 examples and reviewed
+Wycheproof negative cases; selected COSE WG examples; QUIC Interop Runner and
+Quinn endpoints; TLS-Anvil/tlsfuzzer; OpenRQ or another independently qualified
+RaptorQ peer; NRL NORM; and NASA DTNTools/ION/HDTN for a selected BPv7 adapter.
+Retinue already has a stock-RNS process oracle. Its currently pinned requirements
+are RNS 1.5.7/LXMF 1.2.0; old captured-vector versions remain historical evidence.
+Prns is withdrawn as a trusted donor/reference under Retinue's existing policy.
+The catalog records license and profile restrictions before any corpus import.
+
+No broadly maintained independent RaptorQ vector corpus was found in this
+bounded survey. This is a useful potential contribution after comparing actual
+independent encoders, not proof that none exists. OpenRQ's supported domain is
+restricted and its maintenance is old. OpenFEC's inspected codec list does not
+make it a RaptorQ oracle. GPAC's ROUTE support does not prove full FLUTE support.
+CBOR RFC 7049 example vectors alone do not qualify RFC 8949 deterministic
+encoding. Detailed source/provenance is in the prior-art catalog.
+
+Report requirement/vector conformance, independent interoperability, composition,
+simulation, fuzz/resource behavior, performance and physical qualification
+separately. Unsupported, skipped, timeout, infrastructure failure and inconclusive
+results remain visible. Expected failure tracks debt without changing the
+requirement. Performance records useful admitted bytes, completion latency,
+repair amplification, CPU/memory, storage, airtime and energy with assumptions.
+The end product is a profile/requirement matrix and reusable corpus, with a
+benchmark companion; no single compliance score or invented certification.
+
+### Source verification and next implementation
+
+Current source inspected at Mere `0e78fcffb140395a5c0d2f64a4dfda2b81751681` and
+Retinue `7aa87f2e9fdd973e4729e610d7130189dc22c0a0`. Tulle's heterogeneous sans-io
+modem seam still uses LoRaParams; Murm's Reticulum carrier is bilateral and
+default-off; JoinedSpace still uses p2panda Endpoint/Gossip/LogSync; the
+OperationProcessor verifies then asks domain policy before store mutation.
+No production RaptorQ/FLUTE/NORM implementation was found in these trees.
+These are current source findings, not device or RF qualification.
+
+[Dash's September 16 update](https://p2panda.org/2026/09/16/dash-router-sync-api.html)
+places routing/networking/sync together behind an external event stream into
+p2panda processing and says proof-of-concept hacking is next. Preserve that
+adapter boundary and test its delivery behavior when selected. The Retinue plan
+sequences the executable seed, independent codec peers, portable adapters,
+retained-repair simulation, original-byte admission, embedded resource profiles
+and physical multi-radio qualification. Later protocol branches retain their
+own gates.
