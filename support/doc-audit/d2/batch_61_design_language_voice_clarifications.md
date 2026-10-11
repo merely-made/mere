@@ -370,3 +370,18 @@ No new runtime track, storage/composition ruling, external message or browser
 pass is inferred. Full citation-audit and D2 JSON match their pre-edit baselines;
 D2 retains 252/259 coverage and its nine existing errors. Whitespace checks
 pass. No active document or unknown audit record was added.
+
+
+**Forme review fixes (2026-10-11):** Mark authorized source fixes and further
+inspection. The shared matcher now preserves repeated occurrence IDs without
+merging them and avoids overwriting rebound nodes. The Graphshell adapter
+rejects collapsed projected regions and divider-share arity mismatches; its
+reading tiles follow shared Resource tags. Six new regressions failed on the
+prior source, then passed after the fixes; native qualification includes 120
+Forme library cases and 19 workspace/session cases; the product Wasm host check
+also passes. The new session regression
+checks refusal without losing draft state or saved undo bytes. The owning plan
+and index link the portable source-hashed qualification record and retain the
+browser handoff. Complete citation and D2 audit JSON match the pre-edit baseline;
+D2 retains 252/259 coverage and its nine existing errors. New local links resolve
+and whitespace checks pass. No active document or unknown audit record was added.

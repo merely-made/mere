@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-11",
+  "scope": "Forme occurrence identity, projected region validation, divider event arity and reading-tile Resource tags",
+  "base_commit": "c397f33bfa2de1853cad25a948d7c9046ca01348",
+  "tested_source_commit": "d97398e02281c38642123557403bbbaef10d635e",
+  "source_sha256": {
+    "crates/forme/forme/src/arrangement.rs": "ce6d6ec783be40196d52121f3689efe8d4efc978a5cd5280c4ef245d78981590",
+    "ports/graphshell/src/forme_workspace.rs": "6f71fe849c3d2813d3e0bc88fbc2c2ccab81590ccabf507c8570831da3810c0a",
+    "ports/graphshell/src/forme_workspace/tests.rs": "bfe86cb095210528e1bf51e337c76b35bb49fcce9b3bc0fefaf5d37cbc78e47a",
+    "ports/graphshell/src/forme_session.rs": "bbf5d16d45b0eb6fb1f3ccabed967ba32056b8382dc43da231131e937c786bc2",
+    "ports/graphshell/src/web_tree/forme.rs": "fc13ccbfe697a1bdbcc2790f5012c20a27cabeeda848fddae51a0774be7ee68c",
+    "crates/graph/graph-kernel/src/graph/resource_tags.rs": "14639c7c2b376dafbe788a9dfc3fff7bb43cd1830ada592ca4357636a49c743f"
+  },
+  "native": {
+    "graphshell_workspace_and_session": {
+      "passed": 19,
+      "command": "cargo test -p graphshell --lib --no-default-features --features web forme_ --locked --offline --target-dir C:/t/cargo-targets/mere -j 2"
+    },
+    "before_fix": {
+      "identity_regressions_failed": 3,
+      "workspace_regressions_failed": 3,
+      "baseline": "1081987c with only the new regression tests"
+    },
+    "saved_history_regression": "Invalid projected geometry is refused in draft edits and saved undo history; draft state and saved bytes remain unchanged.",
+    "forme_library": {
+      "passed": 120,
+      "command": "cargo test -p mere-forme --lib --locked --offline --target-dir C:/t/cargo-targets/mere"
+    }
+  },
+  "wasm": {
+    "product_check": "passed",
+    "command": "cargo check --target wasm32-unknown-unknown --no-default-features --features product --locked --offline --target-dir C:/t/cargo-targets/mere -j 2",
+    "directory": "ports/graphshell/web"
+  },
+  "interactive": {
+    "status": "not run",
+    "followup": "Run the existing four-page retained-origin Forme sequence at this source revision; review pointer input, undo/reopen and shared Resource tags across accesses."
+  },
+  "not_run": [
+    "default-feature web check",
+    "viewer-only web check",
+    "release packaging",
+    "browser scenarios and captures",
+    "physical-device/focus checks"
+  ],
+  "doc_audit": {
+    "citation_json_unchanged": true,
+    "d2_json_unchanged": true,
+    "active_docs": 259,
+    "covered_active_docs": 252,
+    "existing_d2_errors": 9,
+    "added_local_links_resolve": 2,
+    "whitespace_check": "passed"
+  }
+}
