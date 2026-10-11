@@ -24,8 +24,12 @@ smolweb = ["dep:errand"]
 persona-cookies = ["dep:eidetic", "dep:pandect", "dep:serde", "dep:serde_json", "dep:pollster"]
 # The session's cookies as portable records for an engine flip.
 flip = ["dep:inker"]
+https-blobs = ["dep:eidetic", "dep:ureq"]
+iroh-blobs = ["dep:eidetic", "dep:transport"]
 
 [dependencies]
+async-trait = "0.1"
+futures-util = "0.3"
 # Genet's host-side resource contract, so a handle can serve a document
 # engine's images and stylesheets under the same policy as every other fetch.
 genet-host-api = { workspace = true }
@@ -49,3 +53,21 @@ zeroize = "1"
 
 [lints]
 workspace = true
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+bytes = "1"
+http = "1"
+http-body-util = "0.1"
+hyper-util = { version = "0.1", features = ["client", "client-legacy", "http1", "http2", "tokio"] }
+hyper-rustls = { version = "0.27", default-features = false, features = ["webpki-roots", "http1", "http2", "ring", "tls12"] }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+ureq = { version = "2.10", default-features = false, features = ["tls"], optional = true }
+transport = { workspace = true, optional = true }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
+transport = { workspace = true, features = ["test-identity"] }
+identity.workspace = true
+bytes = "1"
+mockito = "1.4"
+pollster = "0.4"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }

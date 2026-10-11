@@ -948,3 +948,10 @@ async fn fetch_bytes(url: &str, stores: &Stores) -> Result<Vec<u8>, String> {
 
 #[cfg(all(test, feature = "smolweb", feature = "actor"))]
 mod tests;
+
+#[cfg(all(feature = "https-blobs", not(target_arch = "wasm32")))]
+pub mod https_blob;
+#[cfg(all(feature = "iroh-blobs", not(target_arch = "wasm32")))]
+pub mod iroh_blob;
+
+pub mod crawler;
