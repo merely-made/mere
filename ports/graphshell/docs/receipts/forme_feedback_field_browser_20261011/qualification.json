@@ -139,7 +139,7 @@
     "browser_tabs": "Owned tabs closed; other agent tab preserved",
     "servers": "Owned ports 9873 and 9875 stopped",
     "generated_package": "Removed owned stable browser package and stripped input; shared Cargo target retained",
-    "worktree": "Temporary merge worktree will be removed after push and final fast-forward",
+    "worktree": "Temporary merge worktree removed after publication and primary integration; no isolated target or Cargo home created",
     "peer_wip": "Peer DOC_README changes restored by clean three-way merge; all other dirty/untracked peer bytes unchanged"
   },
   "documentation": {
