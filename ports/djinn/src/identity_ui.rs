@@ -127,7 +127,8 @@ impl NativeIdentityUi for SystemNativeIdentityUi {
         Ok(
             light_file_dialog::dialog::MessageBox::new("Djinn · Quarantine review", &message)
                 .buttons(light_file_dialog::MessageBoxType::YesNo)
-                .default_button(0)
+                // Windows indexes visible buttons; Unix backends use 0 for No.
+                .default_button(if cfg!(windows) { 1 } else { 0 })
                 .show()
                 == light_file_dialog::MessageBoxButton::Ok,
         )
