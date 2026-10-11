@@ -1547,3 +1547,51 @@ default/viewer check, browser run or capture is claimed for this draft.
   does not change selection, camera, content sessions or Forme arrangement.
   Append actual outcomes and source/build/browser identity here. Review the
   unqualified list/record materialization costs before large-graph adoption.
+
+
+#### Forme browser qualification (2026-10-11)
+
+Mark authorized browser qualification of the review fixes. The first Chrome
+run at `ebfa5be8` failed on four unsupported `dom click` steps. At `4a47b488`,
+reading-tile move and preview controls gained tile-specific accessible names;
+the scenario uses the standard retained host click path, including scrolling,
+hit testing and actual callbacks. The failed receipt is preserved.
+
+The intermediate sequence passed editing, reopen and saved-history reopen;
+the draft case failed on an unnecessary "Return to Mere" click because fresh
+pages already show Mere. Its behavior assertions passed. That failed receipt
+is preserved, and `c33534bf` fixes the setup. Capture review also found graph
+controls obscuring the first workbench tab. `c433519f` places those controls
+above the tiles and makes scenario waits ignore hidden-canvas motion while
+waiting for Forme saves. `c33534bf` changes only the script, with identical
+compiled Rust sources to `c433519f`.
+
+The locked, offline product Wasm dev build and viewer-only Wasm check pass.
+Packaging uses `wasm-bindgen 0.2.129` after stripping debug information, with a
+separate package directory. The loopback-only qualification server collects the
+existing scenario results, semantic receipts and PNGs. A clean worktree excludes
+concurrent dependency WIP from the build. Source/build hashes and both earlier
+attempts are in the [browser qualification record](../../../ports/graphshell/docs/receipts/forme_browser_20261011/qualification.json).
+
+Chrome final sequence: **all four cases pass at `c33534bf`**, with nine reviewed
+2074×1166 PNGs at a 1037×583 viewport and DPR 2. The new
+`127.0.0.1:9871` origin was verified with empty IndexedDB. Each case opens in a
+fresh page while retaining that origin. Preview/cancel/apply, draft undo/redo
+and discard, source preservation, placement during live dynamics, saved history
+and both reopens pass without scenario or runtime gate failures. The workbench
+tab-title obstruction is fixed. The center-drop stack preview has a weak visual
+cue because its bounds stay the same and sidebar feedback may be below the
+viewport; preview-feedback design remains open. Release-step NaN diagnostic
+sentinels are not movement-distance or physics qualification.
+
+Upstream link inspection was merged at `f2bda7cf`; its product Wasm integration
+check passes. This does not extend the browser receipt to that newer source.
+
+Firefox is blocked: its Windows Computer Use controller refused browser control
+because browser URL policy enforcement is unsupported. No further native input
+was attempted after that refusal. Firefox acceptance remains open. This dev
+build does not qualify release performance, physical touch/focus behavior or
+other hosts. The browser fixture shows Resource tags on two different resources;
+it does not qualify shared-Resource identity across multiple accesses. The
+native 120-library/19-adapter receipts above remain their recorded checks,
+not new reruns in this browser pass.

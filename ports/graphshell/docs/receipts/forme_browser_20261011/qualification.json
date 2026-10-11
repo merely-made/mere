@@ -1,0 +1,268 @@
+{
+  "date": "2026-10-11",
+  "source_commit": "c33534bffd35784cdd32ff29ecdcc181ee47224a",
+  "build": {
+    "profile": "dev",
+    "features": [
+      "product"
+    ],
+    "default_features": false,
+    "target": "wasm32-unknown-unknown",
+    "locked": true,
+    "offline": true,
+    "jobs": 2,
+    "command": "cargo build --target wasm32-unknown-unknown --no-default-features --features product --locked --offline --target-dir C:/t/cargo-targets/mere -j 2",
+    "debug_strip_command": "llvm-strip --strip-debug -o C:/t/cargo-targets/mere/forme-browser-input.wasm C:/t/cargo-targets/mere/wasm32-unknown-unknown/debug/graphshell_web.wasm",
+    "bindgen_version": "wasm-bindgen 0.2.129",
+    "package_command": "wasm-bindgen --target web --out-name graphshell_web --out-dir C:/t/cargo-targets/mere/forme-browser-pkg C:/t/cargo-targets/mere/forme-browser-input.wasm",
+    "artifacts": {
+      "forme-browser-input.wasm": {
+        "bytes": 106888021,
+        "sha256": "4837dca6d972c32fb3a7342db726a5f75111c1ea792cbe526123b9b6a6538e63"
+      },
+      "graphshell_web_bg.wasm": {
+        "bytes": 354657353,
+        "sha256": "c48e0dfdfbd2a004a6156a184f461587300201789fbbb80585e739755ba8598d"
+      },
+      "graphshell_web.js": {
+        "bytes": 138627,
+        "sha256": "29e62a1dcfb297e08770160b231b33d697354458518857836c25f6a54fedc76c"
+      }
+    },
+    "compiled_source_commit": "c433519f92f06d177548ad81558b2d7007ae5df2",
+    "source_note": "c33534bf changes only the draft scenario; compiled Rust sources match c433519f. Built from a clean detached worktree to exclude concurrent dependency WIP.",
+    "directory": "C:/Users/mark_/Code/worktrees/mere-forme-browser/ports/graphshell/web"
+  },
+  "chrome": {
+    "status": "passed",
+    "origin": "http://127.0.0.1:9871",
+    "profile": "Mark AB; isolated test origin with initially empty IndexedDB",
+    "scenario_order": [
+      "p4_tree_forme",
+      "p4_tree_forme_reopen",
+      "p4_tree_forme_draft",
+      "p4_tree_forme_draft_reopen"
+    ],
+    "receipt_directory": "chrome/final",
+    "input": "Scenario click steps use retained host pointer routing and scripted drags use HostPointer. Physical input is unqualified.",
+    "capture_count": 9,
+    "cases": [
+      {
+        "name": "p4_tree_forme",
+        "result": "passed",
+        "receipt": "chrome/final/p4_tree_forme/result.json",
+        "capture_count": 4,
+        "sha256": "91d2048ea5c082b7c714ea5cbaf59f24d74c6a57db7474e5457bb7303c1feebe"
+      },
+      {
+        "name": "p4_tree_forme_reopen",
+        "result": "passed",
+        "receipt": "chrome/final/p4_tree_forme_reopen/result.json",
+        "capture_count": 2,
+        "sha256": "1c7a4f45bd55a70b04b442c12e1e862aadb5d96b99c9913ba470b8f8d97f94fc"
+      },
+      {
+        "name": "p4_tree_forme_draft",
+        "result": "passed",
+        "receipt": "chrome/final/p4_tree_forme_draft/result.json",
+        "capture_count": 2,
+        "sha256": "4b2f43f996681c97c39545cc613efc034f415f17f6242f1f60d38e31a5d6b928"
+      },
+      {
+        "name": "p4_tree_forme_draft_reopen",
+        "result": "passed",
+        "receipt": "chrome/final/p4_tree_forme_draft_reopen/result.json",
+        "capture_count": 1,
+        "sha256": "e55ece3a114a255e505d44c5efebfd97f94cdb6783a6df9a24b988f03f4eba89"
+      }
+    ],
+    "capture_review": {
+      "status": "reviewed",
+      "viewport": [
+        1037,
+        583
+      ],
+      "device_pixel_ratio": 2,
+      "capture_dimensions": [
+        2074,
+        1166
+      ],
+      "observations": [
+        "Reading-tile tab titles are visible above their content; graph controls now occupy a separate row.",
+        "Hover reveals the field subdivisions; saved two-region layout reopens in graph and workbench.",
+        "Handle preview, committed tab grouping and reopened saved redo are captured; assertions check candidate state and geometry."
+      ],
+      "followup": "A center-drop stack preview has a weak visual cue: its outer bounds remain the same, and the sidebar status may be below the viewport. This functional receipt does not close preview-feedback design."
+    },
+    "receipt_hash_format": "SHA-256 of UTF-8 JSON bytes with LF newlines, matching Git content."
+  },
+  "firefox": {
+    "status": "blocked",
+    "reason": "Windows Computer Use refused Firefox because browser URL policy enforcement is unsupported; no native input attempted after refusal."
+  },
+  "physical_device": "not run",
+  "initial_attempt": {
+    "source_commit": "ebfa5be8cd55e8c6e31a3a97c6e132fe52ad86a7",
+    "build": {
+      "profile": "dev",
+      "features": [
+        "product"
+      ],
+      "default_features": false,
+      "target": "wasm32-unknown-unknown",
+      "locked": true,
+      "offline": true,
+      "jobs": 2,
+      "command": "cargo build --target wasm32-unknown-unknown --no-default-features --features product --locked --offline --target-dir C:/t/cargo-targets/mere -j 2",
+      "debug_strip_command": "llvm-strip --strip-debug -o C:/t/cargo-targets/mere/forme-browser-input.wasm C:/t/cargo-targets/mere/wasm32-unknown-unknown/debug/graphshell_web.wasm",
+      "bindgen_version": "wasm-bindgen 0.2.129",
+      "package_command": "wasm-bindgen --target web --out-name graphshell_web --out-dir C:/t/cargo-targets/mere/forme-browser-pkg C:/t/cargo-targets/mere/forme-browser-input.wasm",
+      "artifacts": {
+        "forme-browser-input.wasm": {
+          "bytes": 106914319,
+          "sha256": "4245489848d03adbde890ffb6c1d40ffe0eb2c8bab6311e303459d69c79e100e"
+        },
+        "graphshell_web_bg.wasm": {
+          "bytes": 354643446,
+          "sha256": "ada507cc7c932bb88cafe6c1c8cac6d4b59aaee1b81f96f4e3ac3930c9e07e61"
+        },
+        "graphshell_web.js": {
+          "bytes": 138627,
+          "sha256": "d5240f426eb9ea5820a0c680e25908a9c01f44202bd89a5d5ca10f79ed59ab72"
+        }
+      }
+    },
+    "origin": "http://127.0.0.1:9867",
+    "result": "failed",
+    "receipt": "chrome/p4_tree_forme/result.json",
+    "reason": "Four unsupported dom click steps; dependent preview/apply assertions failed."
+  },
+  "source_sha256": {
+    "ports/graphshell/src/web_tree/forme.rs": "997604b04d20eb20bdfa3fb33d62c428819a2ff1fdf6d462c6ef80a4722e1f4b",
+    "ports/graphshell/src/web_tree/lane.rs": "d85aa11fdb2432b5be1e233a7ac382280c000f7fd3a81b66bf339bc06b2df6da",
+    "ports/graphshell/web/scenario_qualification_server.py": "a85229fcd370f95520acf5fab150fc89ec9f97b41cda9f13cc37d3269a7dd894",
+    "ports/graphshell/web/loader.js": "0da55ad0c684b4171bfbb92f47b727f620076a54f0c9f6c963de9a6b423f01eb",
+    "ports/graphshell/web/tree.html": "08e72416e63df14031b7dd0cbf4856fd505f1123e3a107b85412751b00502c7b",
+    "ports/graphshell/web/Cargo.lock": "c7d8bfb92bb1e6c87c7c11cc46c4eb408f51900fdb8e42a291b7915daeb75ee4",
+    "ports/graphshell/web/scenarios/p4_tree_forme.scn": "54048db8701e05f7a33533a28d8307dbb5513fab9415940be152d09cce92ad6a",
+    "ports/graphshell/web/scenarios/p4_tree_forme_reopen.scn": "9b48204a57ebd101fa6c249aad275d9f04c66b65e9158e19d709f8a1472224a4",
+    "ports/graphshell/web/scenarios/p4_tree_forme_draft.scn": "3576212eca4429b78d5fbf3f627336132f5e6ab5b38e4e20a18bc6f9ef51cc1a",
+    "ports/graphshell/web/scenarios/p4_tree_forme_draft_reopen.scn": "6b6943e0396993f70653b61faf81b482ecabd475607040abaf954759b39519b6",
+    "ports/graphshell/src/web_tree.rs": "b93203336809cd46297bc1c61482a1663a839215bbe08ffdda0e83951742f8bd",
+    "ports/graphshell/src/web_tree/product.rs": "907662027a1bd6791232edbba7d1cdeb6160854cbbc2c97a2a7de21a9caee5d2"
+  },
+  "server": {
+    "command": "python ports/graphshell/web/scenario_qualification_server.py --package C:/t/cargo-targets/mere/forme-browser-pkg --output C:/Users/mark_/Code/repos/mere/ports/graphshell/docs/receipts/forme_browser_20261011/chrome/final --port 9871",
+    "bind": "127.0.0.1",
+    "browser_navigation_template": "http://127.0.0.1:9871/tree.html?app=local&scenario=scenarios/<scenario>.scn&sink=http://127.0.0.1:9871/scenario-receipt",
+    "storage": "Same origin retained across four fresh pages; existing profiles and origins were not cleared."
+  },
+  "intermediate_attempt": {
+    "source_commit": "4a47b488ce3778ba120da0841accf75a0f38687d",
+    "build": {
+      "profile": "dev",
+      "features": [
+        "product"
+      ],
+      "default_features": false,
+      "target": "wasm32-unknown-unknown",
+      "locked": true,
+      "offline": true,
+      "jobs": 2,
+      "command": "cargo build --target wasm32-unknown-unknown --no-default-features --features product --locked --offline --target-dir C:/t/cargo-targets/mere -j 2",
+      "debug_strip_command": "llvm-strip --strip-debug -o C:/t/cargo-targets/mere/forme-browser-input.wasm C:/t/cargo-targets/mere/wasm32-unknown-unknown/debug/graphshell_web.wasm",
+      "bindgen_version": "wasm-bindgen 0.2.129",
+      "package_command": "wasm-bindgen --target web --out-name graphshell_web --out-dir C:/t/cargo-targets/mere/forme-browser-pkg C:/t/cargo-targets/mere/forme-browser-input.wasm",
+      "artifacts": {
+        "forme-browser-input.wasm": {
+          "bytes": 106914319,
+          "sha256": "4245489848d03adbde890ffb6c1d40ffe0eb2c8bab6311e303459d69c79e100e"
+        },
+        "graphshell_web_bg.wasm": {
+          "bytes": 354643446,
+          "sha256": "ada507cc7c932bb88cafe6c1c8cac6d4b59aaee1b81f96f4e3ac3930c9e07e61"
+        },
+        "graphshell_web.js": {
+          "bytes": 138627,
+          "sha256": "d5240f426eb9ea5820a0c680e25908a9c01f44202bd89a5d5ca10f79ed59ab72"
+        }
+      },
+      "compiled_source_commit": "4a47b488ce3778ba120da0841accf75a0f38687d",
+      "directory": "C:/Users/mark_/Code/repos/mere/ports/graphshell/web"
+    },
+    "source_sha256": {
+      "ports/graphshell/src/web_tree/forme.rs": "997604b04d20eb20bdfa3fb33d62c428819a2ff1fdf6d462c6ef80a4722e1f4b",
+      "ports/graphshell/src/web_tree/lane.rs": "d677b8be22bc14ae22913b017641bfad5a46c781f951715981e65f576faf1f84",
+      "ports/graphshell/web/scenario_qualification_server.py": "a85229fcd370f95520acf5fab150fc89ec9f97b41cda9f13cc37d3269a7dd894",
+      "ports/graphshell/web/loader.js": "0da55ad0c684b4171bfbb92f47b727f620076a54f0c9f6c963de9a6b423f01eb",
+      "ports/graphshell/web/tree.html": "08e72416e63df14031b7dd0cbf4856fd505f1123e3a107b85412751b00502c7b",
+      "ports/graphshell/web/Cargo.lock": "c7d8bfb92bb1e6c87c7c11cc46c4eb408f51900fdb8e42a291b7915daeb75ee4",
+      "ports/graphshell/web/scenarios/p4_tree_forme.scn": "54048db8701e05f7a33533a28d8307dbb5513fab9415940be152d09cce92ad6a",
+      "ports/graphshell/web/scenarios/p4_tree_forme_reopen.scn": "9b48204a57ebd101fa6c249aad275d9f04c66b65e9158e19d709f8a1472224a4",
+      "ports/graphshell/web/scenarios/p4_tree_forme_draft.scn": "d8263f0f615edd02813f2b9e5e7ef38a3e9841232887a24ec85f38aed4e25b9c",
+      "ports/graphshell/web/scenarios/p4_tree_forme_draft_reopen.scn": "6b6943e0396993f70653b61faf81b482ecabd475607040abaf954759b39519b6"
+    },
+    "origin": "http://127.0.0.1:9869",
+    "receipt_directory": "chrome/fixed_tile_targets",
+    "status": "retained; visual overlay defect and draft fresh-page setup failure",
+    "input": "Scenario clicks use retained host pointer routing; scripted drags use HostPointer. Two harmless heading-focus clicks were made (AX and coordinate); they did not invoke model actions. Physical input is unqualified."
+  },
+  "wasm_viewer_check": {
+    "status": "passed",
+    "command": "cargo check --target wasm32-unknown-unknown --no-default-features --locked --offline --target-dir C:/t/cargo-targets/mere -j 2",
+    "directory": "C:/Users/mark_/Code/worktrees/mere-forme-browser/ports/graphshell/web",
+    "note": "Product dev build passes separately; default-feature and release-performance gates were not rerun."
+  },
+  "integration": {
+    "source_commit": "f2bda7cf54b69b88e3cb4197a0b906113f0c46c6",
+    "upstream": "19b00c8d82350806758c14627f2a83d6d10d9fa3",
+    "product_wasm_check": "passed",
+    "command": "cargo check --target wasm32-unknown-unknown --no-default-features --features product --locked --offline --target-dir C:/t/cargo-targets/mere -j 2",
+    "scope": "Merged upstream read-only link inspection with Forme fixes. Browser results remain tied to c33534bf; this integration has compile evidence only.",
+    "merge_review": "Confirmed TreeLane snapshot additions coexist with its Forme-aware busy condition and workbench control placement; Forme module and four scenario files unchanged."
+  },
+  "diagnostic_limits": [
+    "Release-step diagnostics use NaN sentinels for unavailable focused/press-point measurements. These traces are not qualified movement-distance or physics evidence.",
+    "Functional dev build; no release-performance, physical touch/focus, or shared-Resource repeated-access browser qualification."
+  ],
+  "artifact_sha256": {
+    "chrome/final/p4_tree_forme/forme_hover_regions.png": "d4342eea18a73aca473cbc559391a107b3656cc4f7268a7afa60740405e93123",
+    "chrome/final/p4_tree_forme/forme_reading_tiles.png": "72c49da553ea71347ff42afd2e1e2dbbf7f0e7dabd464e6cd18470d9cc27a3cc",
+    "chrome/final/p4_tree_forme/forme_saved_regions.png": "6909865429c3ea7e2c48a49e670270f373a1bc376db3c2438d789e5161d55d98",
+    "chrome/final/p4_tree_forme/forme_tab_stack.png": "59fd2dd5074b467df5e1a14020a5be9961bd73c2615c0e5f7f105dd5a502ec37",
+    "chrome/final/p4_tree_forme_draft/forme_draft_applied.png": "e11e04ee23e98cccd34a32229651e2629db389866a0a0c6c9902a92e155a7f71",
+    "chrome/final/p4_tree_forme_draft/forme_handle_preview.png": "ae331bde0a913f9b8276796554ae54a0731318f029b76f0178b79dd8335ddf20",
+    "chrome/final/p4_tree_forme_draft_reopen/forme_saved_redo_reopened.png": "7f4b6c20b912734ed713f237304b0a5fba0856988bdd752750d1817aa44f844e",
+    "chrome/final/p4_tree_forme_reopen/forme_reopened_graph.png": "17fd00845e615078e6c7aad941fbf76a616c4f3b537cf001a9620ba016b46476",
+    "chrome/final/p4_tree_forme_reopen/forme_reopened_tiles.png": "c484757fa87df5b0a0c442af53d06d950c476b7ed8897eb94d3589c0b15fbf1f"
+  },
+  "retained_outputs": {
+    "package": "C:/t/cargo-targets/mere/forme-browser-pkg",
+    "owner": "Forme browser qualification",
+    "reason": "Retained matching package for the outstanding Firefox gate; strip input and server are removed after collection."
+  },
+  "doc_audit": {
+    "mere_doc_audit": {
+      "unchanged": true,
+      "before_sha256": "ad29d5af4316b2b75e18a0759557ea4705c2b62dc4ca9a4da7bf2ab7e19ed156",
+      "after_sha256": "ad29d5af4316b2b75e18a0759557ea4705c2b62dc4ca9a4da7bf2ab7e19ed156"
+    },
+    "mere_doc_judgment_audit": {
+      "unchanged": true,
+      "before_sha256": "738ffd99c2f286c9099f31fdf66cc0ac407381ce2537745f44ba457be873fef5",
+      "after_sha256": "738ffd99c2f286c9099f31fdf66cc0ac407381ce2537745f44ba457be873fef5"
+    },
+    "scope": "Current primary filesystem with only the three Forme document edits substituted for the before report; concurrent Fleece source, index and plan edits remain fixed in both reports.",
+    "active_docs": 260,
+    "covered_active_docs": 252,
+    "existing_d2_errors": 9,
+    "whitespace_check": "passed"
+  },
+  "cleanup": {
+    "servers": "stopped",
+    "temporary_worktree": "removed after push and main integration",
+    "cargo_home": "none created",
+    "strip_input": "removed after packaging",
+    "shared_target": "C:/t/cargo-targets/mere reused"
+  }
+}
