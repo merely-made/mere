@@ -125,11 +125,34 @@
     "Newer upstream integrations require separate evidence; this Chrome receipt applies to the named source only."
   ],
   "integration": {
-    "status": "pending"
+    "status": "pass",
+    "source_commit": "9d8ea69969ed48a2dfd120b516f9135119504df9",
+    "upstream_base": "30b40622e2bb0157a9eb5b4c388c3a520ebc471a",
+    "product_check": "integration_product_check.log",
+    "viewer_check": "integration_viewer_check.log",
+    "command_base": "cargo check --target wasm32-unknown-unknown --no-default-features --locked --offline --target-dir C:/t/cargo-targets/mere -j 2",
+    "product_addition": "--features product",
+    "cwd": "ports/graphshell/web",
+    "browser_status": "Not rerun on this newer source; earlier Chrome pass remains source-bound."
   },
   "cleanup": {
     "browser_tabs": "Owned tabs closed; other agent tab preserved",
     "servers": "Owned ports 9873 and 9875 stopped",
-    "generated_package": "Pending removal after integration checks"
+    "generated_package": "Removed owned stable browser package and stripped input; shared Cargo target retained",
+    "worktree": "Temporary merge worktree will be removed after push and final fast-forward",
+    "peer_wip": "Peer DOC_README changes restored by clean three-way merge; all other dirty/untracked peer bytes unchanged"
+  },
+  "documentation": {
+    "primary_after": "doc_audit_primary_after.json",
+    "d2_primary_after": "d2_audit_primary_after.json",
+    "active_docs": 261,
+    "d2_covered": 260,
+    "index_and_current_relative_links": "No index orphans/ghosts, statusless plans or broken current relative links.",
+    "remaining_upstream_findings": [
+      "Missing D2 record for mere_docs/testing/receipts/2026-10-11_producer_gates/README.md",
+      "Missing Exhibit A header on crates/canvas/pictograph/src/canvas/projection_dynamics_tests.rs"
+    ],
+    "worktree_audit": "Integrated worktree reports 28 absent sibling/source relative targets because sibling repos are not beside it; primary after report is the canonical path-resolution check.",
+    "comparison": "Upstream and concurrent docs changed since initial audit; these are dated snapshots, not a controlled before/after equality claim."
   }
 }
