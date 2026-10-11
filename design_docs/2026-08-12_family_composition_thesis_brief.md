@@ -984,8 +984,9 @@ claims of implemented platform contracts.
    reference is labelled as live, with freshness and availability disclosed.
    The remaining decision is whether every capture retains original material
    by default, or retention is configurable with a visible consequence for
-   later verification. The existing editable Knot clip is not evidence of an
-   immutable-capture contract.
+   later verification. Knot can retain immutable source artifacts beside an
+   editable clip note; that specific path does not establish a family-wide
+   captured-version or default-retention policy.
 2. **Compound clips and addressable parts.** Give the portable clip an identity
    and describe its payload roles, media/schema versions and source anchors.
    Parts can be addressed within it; promote a part to a separate clip when a
@@ -1106,6 +1107,94 @@ Optional feature traits are not permission grants, and exposing an appearance
 does not establish either semantic understanding or mutation authority. This
 review refines the rationale without adopting another system's node schema or
 changing the unresolved lifecycle policies above.
+
+### Shared semantic core: existing contracts and missing seams (2026-10-11)
+
+**Assessment:** the shared core already has most of its structural mechanisms.
+The missing work is agreement on a small content profile, source-owner adapters
+and heterogeneous consumer qualification. General graph identity, blob storage
+or another universal entity representation are not the first missing pieces.
+
+This is source inspection at Mere `8601f759`, Turnstone `1034fb6`, Knot Editor
+`4d8b81c`, Woodshed `9e4b372` and Cleromancy `ff3b1f5`. Product paths below are
+cross-repository citations. Concurrent Forme and Redshank scenario work is
+outside the review. Existing automated receipts are cited separately; this
+pass runs documentation checks and establishes no fresh runtime acceptance.
+
+#### What exists and what it establishes
+
+| Existing contract | Established boundary |
+|---|---|
+| [Chartulary capabilities](../crates/eidetic/chartulary/src/caps.rs), [reservoir index](../crates/system/pandect/src/reservoir.rs), [scene sources](../crates/cambium/scenes/sceno/src/scene.rs) | Stable domain/node identity, persona/domain-derived mere identity, and separate projected occurrence identity. These do not automatically resolve every foreign source to its current owner. |
+| [Eidetic manifests](../crates/eidetic/eidetic-core/src/manifest.rs), [bundles](../crates/eidetic/eidetic-core/src/bundle.rs), [portable content references](../crates/chirograph/src/titulus.rs) | Verified bytes, schema references, provenance/privacy metadata and composite members with required flags. Bundle member kinds remain domain vocabulary; required-member verification does not define a recursive clip export or retention policy. |
+| [Schema definitions](../crates/eidetic/eidetic-core/src/schema_def.rs), [opaque facets](../crates/eidetic/chartulary/src/facet.rs), [Fleece acquisition and annotation records](../crates/fleece/src/eidetic_bridge.rs) | Versioned interpretation seams, preservation of unfamiliar facet data, and bound source/capture/canonical-text/selector evidence. Validation is distinct from another app understanding a payload. |
+| [Chirograph](../crates/chirograph/src/lib.rs), [Pandect live-view records](../crates/system/pandect/src/live_view.rs) | Advertised actions, payload schemas, scene revision checks, explicit session states and source-owned live/historical cursors. A persisted reference or advertised action supplies no grant. |
+
+The [completed Fleece/Eidetic plan](archive_docs/2026-10-11_completed_plans/2026-10-11_fleece_eidetic_capability_plan.md)
+records authenticated annotation-plus-source transfer and receiver-only disk
+reopen, alongside native and wasm checks. Its transfer test constructs a
+[specific envelope](../crates/fleece/tests/eidetic_peer_transfer.rs) containing
+both manifests and both byte payloads. This proves that bounded path; it does
+not establish a family clip package or arbitrary dependency traversal. The
+recorded consumer pins qualify `5758724e`, before later Mere dependency work.
+
+#### Actual consumer paths
+
+- **Turnstone to Knot:** `turnstone/src/knot_authoring.rs` lowers a document
+  clip into the advertised `InsertKnotClipV2` action, with source/observed
+  artifacts, selectors and fidelity facts. Knot retains artifact references
+  through `knot-editor/crates/knot-editor/src/clip_evidence.rs` and authors the
+  editable note through its endpoint. That endpoint checks both the delivered
+  scene revision and the document's source `base_token`, with an injected write
+  grant. This is an existing cross-app document operation, not a missing intent
+  protocol or proof of general media support.
+- **Retained source documents:** `turnstone/src/trail_memory.rs` deposits exact
+  acquired bytes and a Fleece record as `LocalOnly`. Its captured-collection
+  adapter and [Moot projection](../ports/moot/src/captured_web.rs) consume
+  authority-filtered contributions, retain separate share/capture provenance,
+  and expose missing or unsupported records explicitly. The Fleece record
+  carries its canonical text, which may extend beyond the selected passage.
+  A selection boundary therefore cannot by itself determine what is disclosed.
+- **Timed media:** `woodshed/ports/redshank/model/src/lib.rs` exports shareable
+  text/audio annotations with media-fragment selectors. Its internal
+  representation receipts distinguish same, different and unproven copies;
+  local seek policy uses that evidence. The annotation export names an audio
+  body by its blob identifier and omits the internal representation receipt.
+  A receiver needs the corresponding bytes and a declared identity/seek
+  contract to reproduce those behaviors. Exported JSON alone supplies neither.
+- **Live authority:** `cleromancy/src/admitted.rs` exposes several endpoint
+  views over one durable app authority, forwarding typed intents under admitted
+  subjects. Knot likewise supplies live document operations. However, searches
+  of Mere and these four product source trees found only a fixture implementation
+  of `LiveViewSourceResolver`; `LiveViewReferenceGate` implementations in Mere
+  were fixtures/canaries. General persisted live-view reopening is an adapter
+  gap, distinct from the existing live endpoint paths.
+
+#### The bounded gaps
+
+| Missing seam | Concrete requirement and owner |
+|---|---|
+| Durable source resolution | Product adapters must map a retained domain/source reference to the current admitted owner and its current offers, with missing/denied/stale outcomes. Reuse Pandect/resident routing. A saved scene `InstanceId`, endpoint action or document base token must not become the durable identity of a live entity. |
+| A usable clip profile | Fleece gathering and domain exporters need one agreed profile over Eidetic's existing mechanisms: payload roles, stable part names/selectors, schema versions, lineage, and required versus optional material. Distinguish retained bytes, external references and unresolved dependencies. A selected note, a captured page and a media excerpt make different promises. |
+| Selector and meaning interoperability | Adapters must preserve each selector's representation and units. Fleece positions count Unicode code points in normalized DOM text; Knot quotation anchors can count UTF-8 source bytes; Redshank targets count media time. Define explicit supported mappings and refusals. Shared profiles can agree on source, part, annotation and derivative roles while leaving domain schemas specialized. |
+| Capture, disclosure and keeping policy | Session/custody owners must connect graph references to the package's required material, decide what is retained/released, and check disclosure for each exported part. A byte reference, transferable source kind or selected passage is not permission to share its enclosing document. Default original-material retention and the consequences of revocation remain policy decisions above. |
+| Live operations and outcomes | Each domain must supply source revision checks, admitted operations, conflict/failure behavior and reconnect semantics. Chirograph's scene revision is delivery state; Knot's additional base-token check is the concrete precedent. Queued writes, durable completion and undo need owner contracts rather than inference from an `Accepted` reply. |
+| Adoption and qualification | Hosts must advertise which profiles, selectors and operations they support, preserve unfamiliar material through the appropriate opaque path, and visibly refuse unavailable capabilities. Different current product pins require qualification; source availability on Mere main is not uniform consumer adoption. |
+
+**Recommended forcing proof, pending implementation choice:** use the existing
+Knot document lane and Redshank timed-media lane before requiring a game
+exporter. Retain a text clip and an audio annotation/excerpt through a second
+host, then reopen with their source app stopped. Verify required bytes, source
+and capture identities, exact selector units, opaque unsupported payloads and
+independently owned annotations. Exercise one already-supported owner edit,
+then a stale edit and denied operation; neither refusal may mutate the source.
+Restart the owner and resolve a fresh target instead of replaying saved scene
+handles. The media export must state whether it carries the excerpt or merely
+points to it. This is a proposed proof, not a claim that these flows all exist.
+
+The open questions above now concern concrete profiles and policies, not
+whether the stack needs foundational graph, bundle or action machinery. This
+review adds no crate, changes no lifecycle ruling and opens no paused lane.
 
 ## What this brief deliberately does not do
 
