@@ -1400,3 +1400,41 @@ remains with the other machines.
   sessions and Forme layout alone. Test source saving/failure and target removal
   while inspection remains open. Append actual results and tested source/build
   identity here; the added observation fields are instruments, not receipts.
+
+#### Forme identity and validation fixes (2026-10-11)
+
+**Status:** source fixes with native qualification and a passed product
+Wasm host check. Mark asked to fix the review findings and inspect nearby paths.
+The source began at `1081987c` and was rebased onto published `c397f33b`; this pass
+preserves the existing scoped draft, saved layout history and v1 record format.
+
+- The shared arrangement matcher reuses a member-intent ID only when that
+  member occurs once in both arrangements and the ID is free or already belongs
+  to that occurrence. Repeated appearances keep their supplied occurrence IDs.
+  This prevents both appearance collapse and overwriting a node rebound to
+  another kind. It does not invent correspondence between rebuilt duplicates.
+- Workspace validation checks positive, finite projected cell extents in both
+  relative and world coordinates. Positive split shares alone were insufficient:
+  normalization or coordinate rounding could produce an empty tile region.
+- Divider events require exactly one share per split child. Too few or too many
+  shares previously changed only the children matched by a zip. Invalid events
+  now leave the workspace unchanged.
+- Workbench reading tiles use the shared Resource content-tag accessor, retaining
+  its legacy fallback for unassociated accesses. Titles and authored bodies
+  remain access-specific. This follows the existing access/Resource boundary.
+
+Three native identity regressions and three workspace regressions failed before
+these fixes. Afterward all 120 Forme library tests and 19 Graphshell workspace/
+session tests pass. The product web host also passes its locked, offline Wasm
+check. The added session case checks that collapsed geometry cannot enter draft
+history and that an invalid saved undo state is refused
+without rewriting its retained bytes. Workspace tests now live in a child
+module, including the existing stable-ID and tab-placement cases.
+
+The [qualification summary](../../../ports/graphshell/docs/receipts/forme_fixes_20261011/qualification.json)
+records exact source hashes, commands and check status. The earlier `69f17908`
+receipt remains historical evidence; it does not qualify these changed sources.
+Run the existing four-page retained-origin Forme sequence on the new build and
+review pointer previews, saved undo/reopen and shared Resource tags in separate
+accesses. No browser pass, capture, release package or physical-input receipt is
+claimed by this pass.

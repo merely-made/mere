@@ -31,6 +31,9 @@ now has a portable read model, local retained controls and a host scenario;
 its review and visual-test gates are explicit. The implemented forme draft's
 [visual test handoff](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#forme-visual-test-handoff-2026-10-10)
 specifies the retained-origin scenario order for agents on the other machines.
+The [Forme fixes](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#forme-identity-and-validation-fixes-2026-10-11)
+cover occurrence identity, collapsed regions, malformed divider edits and shared
+Resource tags; the new qualification record keeps browser acceptance separate.
 
 ## Required reading order
 
