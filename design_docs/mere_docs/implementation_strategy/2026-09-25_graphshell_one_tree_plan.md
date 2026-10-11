@@ -751,6 +751,10 @@ Cambium's command model and retained text/button components. It does not
 implement new lens providers, field editors or scene materialization. CPU and
 Wasm checks precede a coordinated GPU/browser handoff; redundant toolbar
 navigation is removed only after command/gesture parity is demonstrated.
+The capture bridge also reconciles a completed rectangle selection with the
+retained selection/detail state. Ordinary header space passes wheel events to
+the embedding page; actual tools, relation lists and the command menu keep
+their own scrolling.
 
 **Validation so far:** the focused command, gesture, canvas-control and host
 dataset CPU suites pass (32 tests); the locked/offline viewer build and the
