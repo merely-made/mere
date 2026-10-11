@@ -109,6 +109,17 @@ async fn app_wire_receipt() {
     let work = reply.snapshot.unwrap();
     assert_eq!(work.roster.chosen, ProfileId("work".into()));
     assert!(work.cards.is_empty());
+    let locked = dramatis_app::execute_at(&endpoint, Request::Lock)
+        .await
+        .snapshot
+        .unwrap();
+    assert_eq!(locked.lock, VaultLockView::Locked);
+    let unlocked = dramatis_app::execute_at(&endpoint, Request::Unlock).await;
+    assert!(unlocked.notice.is_empty(), "{}", unlocked.notice);
+    assert_eq!(
+        unlocked.snapshot.unwrap().roster.chosen,
+        ProfileId("work".into())
+    );
     let reply =
         dramatis_app::execute_at(&endpoint, Request::Select(ProfileId("family".into()))).await;
     assert!(reply.notice.is_empty());
@@ -119,6 +130,7 @@ async fn app_wire_receipt() {
         .find(|c| c.accept_blocked.is_none())
         .unwrap();
     let request = graphshell::native::quarantine::ReviewRequest {
+        store: card.store.clone(),
         profile: ProfileId("family".into()),
         persona: card.persona,
         item: card.item.id,
@@ -141,7 +153,7 @@ async fn app_wire_receipt() {
 
 #[tokio::test]
 #[ignore = "requires synthetic native Djinn UI and resident denial"]
-async fn native_consent_denial_receipt() {
+async fn native_consent_receipt() {
     let endpoint = std::env::var("DRAMATIS_RECEIPT_ENDPOINT").unwrap();
     let snapshot = dramatis_app::execute_at(&endpoint, Request::Refresh)
         .await
@@ -153,6 +165,7 @@ async fn native_consent_denial_receipt() {
         .find(|c| c.accept_blocked.is_none())
         .unwrap();
     let request = graphshell::native::quarantine::ReviewRequest {
+        store: card.store.clone(),
         profile: ProfileId("family".into()),
         persona: card.persona,
         item: card.item.id,
@@ -160,6 +173,13 @@ async fn native_consent_denial_receipt() {
         action: graphshell::native::quarantine::ReviewAction::Delete,
     };
     let reply = dramatis_app::execute_at(&endpoint, Request::Review(request)).await;
-    assert!(reply.notice.contains("cancelled"));
-    assert_eq!(reply.snapshot.unwrap().cards, snapshot.cards);
+    if std::env::var("DRAMATIS_NATIVE_RESPONSE").as_deref() == Ok("approve") {
+        assert!(reply.notice.is_empty(), "{}", reply.notice);
+        let remaining = reply.snapshot.unwrap().cards;
+        assert_eq!(remaining.len(), snapshot.cards.len() - 1);
+        assert!(!remaining.iter().any(|c| c.item.id == card.item.id));
+    } else {
+        assert!(reply.notice.contains("cancelled"));
+        assert_eq!(reply.snapshot.unwrap().cards, snapshot.cards);
+    }
 }

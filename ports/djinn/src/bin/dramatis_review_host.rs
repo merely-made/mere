@@ -100,7 +100,7 @@ async fn main() {
         salts,
     )
     .unwrap();
-    host.register_lock_holder(resident.lock_holder(salts));
+    host.register_lock_holder(resident.lock_holder_for_profile(salts, ProfileId("family".into())));
     let persona = PersonaId::new();
     let source = json!({"version":{"major":1,"minor":0},"exporterRpId":"example.invalid","exporterDisplayName":"Receipt","timestamp":1,"accounts":[{"id":"YQ","username":"Receipt","email":"fixture@example.invalid","collections":[],"items":[
         {"id":"Yw","title":"Personal payment card","credentials":[{"type":"credit-card","number":{"fieldType":"concealed-string","value":"4111111111111111"}}]},

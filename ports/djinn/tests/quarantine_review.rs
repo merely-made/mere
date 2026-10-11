@@ -8,8 +8,8 @@
 #![cfg(feature = "cxf")]
 use castellan::{
     authority::PersonaeHost,
-    custody::{IdentityStorage, IdentityVault, InMemoryStorage, Profile},
-    resident::CastellanResident,
+    custody::{IdentityStorage, IdentityVault, Profile, SealedProfileStorage},
+    resident::{CastellanResident, CredentialSalts},
 };
 use chatelaine::ItemState;
 use djinn::{identity_ui::NativeIdentityUi, keeper::Keeper};
@@ -70,8 +70,9 @@ impl NativeIdentityUi for Ui {
 }
 struct Fixture {
     _dir: tempfile::TempDir,
-    host: Arc<PersonaeHost<InMemoryStorage>>,
+    host: Arc<PersonaeHost<SealedProfileStorage>>,
     resident: CastellanResident,
+    work_resident: CastellanResident,
     ui: Arc<Ui>,
     persona: PersonaId,
     endpoint: String,
@@ -85,7 +86,10 @@ impl Drop for Fixture {
 impl Fixture {
     async fn new(credential: serde_json::Value) -> Self {
         let dir = tempfile::tempdir().unwrap();
-        let storage = InMemoryStorage::new();
+        let storage = SealedProfileStorage::open_with_key(dir.path().join("vault"), [0x53; 32]);
+        storage
+            .enroll_passphrase(b"synthetic review receipt")
+            .unwrap();
         let family = Profile::new(
             ProfileId("family".into()),
             "Family",
@@ -101,15 +105,33 @@ impl Fixture {
         let host = Arc::new(PersonaeHost::new(
             IdentityVault::with_profile(storage, family),
             None,
-            VaultProtectionView::Ephemeral,
+            VaultProtectionView::Passphrase,
         ));
-        let resident = CastellanResident::claim(
+        let salts = CredentialSalts {
+            record: b"review-fixture/records",
+            freshness: b"review-fixture/freshness",
+        };
+        let resident = CastellanResident::claim_derived(
             dir.path().join("records"),
-            [0x51; 32],
             dir.path().join("freshness"),
-            [0x52; 32],
+            host.as_ref(),
+            salts,
         )
         .unwrap();
+        host.register_lock_holder(
+            resident.lock_holder_for_profile(salts, ProfileId("family".into())),
+        );
+        let work_provider = host.profile_provider(&ProfileId("work".into())).unwrap();
+        let work_resident = CastellanResident::claim_derived(
+            dir.path().join("work-records"),
+            dir.path().join("work-freshness"),
+            &work_provider,
+            salts,
+        )
+        .unwrap();
+        host.register_lock_holder(
+            work_resident.lock_holder_for_profile(salts, ProfileId("work".into())),
+        );
         let persona = PersonaId::new();
         let bytes = serde_json::to_vec(&json!({"version":{"major":1,"minor":0},"exporterRpId":"example.invalid","exporterDisplayName":"Receipt","timestamp":1,"accounts":[{"id":"YQ","username":"Account","email":"test@example.invalid","collections":[],"items":[{"id":"aQ","title":"Review card","credentials":[credential]}]}]})).unwrap();
         let choices = BTreeMap::from([(
@@ -126,7 +148,15 @@ impl Fixture {
             .unwrap();
         let ui = Arc::new(Ui::default());
         let keeper = Arc::new(Keeper::new(host.clone()).with_ui(ui.clone()));
-        keeper.attach_credentials(resident.clone()).unwrap();
+        keeper
+            .attach_credential_stores(
+                ProfileId("family".into()),
+                BTreeMap::from([
+                    (ProfileId("family".into()), resident.clone()),
+                    (ProfileId("work".into()), work_resident.clone()),
+                ]),
+            )
+            .unwrap();
         let grants = AppRouteGrants::new(AllowedAppRoutes::none());
         djinn::custody::grant(&grants).unwrap();
         #[cfg(windows)]
@@ -149,6 +179,7 @@ impl Fixture {
             _dir: dir,
             host,
             resident,
+            work_resident,
             ui,
             persona,
             endpoint,
@@ -179,6 +210,7 @@ impl Fixture {
             .unwrap()
             .remove(0);
         ReviewRequest {
+            store: card.store,
             profile: ProfileId("family".into()),
             persona: card.persona,
             item: card.item.id,
@@ -224,7 +256,11 @@ async fn cards_are_secret_free_scoped_and_denial_preserves_the_item() {
     );
     assert_eq!(
         f.ui.seen.lock().unwrap()[0],
-        ("family".into(), "Review card".into(), "Accept".into())
+        (
+            "family".into(),
+            "Review card (import store family)".into(),
+            "Accept".into()
+        )
     );
 }
 #[tokio::test(flavor = "multi_thread")]
@@ -297,6 +333,11 @@ async fn lock_during_native_consent_refuses_the_commit() {
         f.client("dramatis").await.review_quarantine(r).await,
         Err(CustodyClientError::Refused(CustodyRefusal::Locked))
     ));
+    f.host
+        .unlock_vault(castellan::custody::UnlockMethod::Passphrase(
+            b"synthetic review receipt",
+        ))
+        .unwrap();
     assert_eq!(f.state(), ItemState::Quarantined);
 }
 #[tokio::test(flavor = "multi_thread")]
@@ -424,7 +465,9 @@ fn older_namespace(f: &Fixture) -> PersonaId {
     let persona = PersonaId::new();
     f.resident
         .otp_items(persona)
-        .import_otpauth_uri("otpauth://totp/Receipt:older?secret=MY======&issuer=Receipt")
+        .import_otpauth_uri(
+            "otpauth://totp/Receipt:older?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&issuer=Receipt",
+        )
         .unwrap();
     persona
 }
@@ -442,6 +485,7 @@ async fn older_import_assignment_needs_consent_and_preserves_item_state() {
             .contains("MY======")
     );
     let request = graphshell::native::quarantine::AssignImportRequest {
+        store: ProfileId("family".into()),
         profile: ProfileId("work".into()),
         persona: *persona.as_uuid(),
         revision: imports[0].revision.clone(),
@@ -469,6 +513,7 @@ async fn older_import_assignment_rechecks_revision_and_lock_after_consent() {
         let mut c = f.client("dramatis").await;
         let import = c.unassigned_imports().await.unwrap().remove(0);
         let request = graphshell::native::quarantine::AssignImportRequest {
+            store: ProfileId("family".into()),
             profile: ProfileId("work".into()),
             persona: *persona.as_uuid(),
             revision: import.revision,
@@ -485,6 +530,13 @@ async fn older_import_assignment_rechecks_revision_and_lock_after_consent() {
             }
         }));
         assert!(c.assign_import(request).await.is_err());
+        if locked {
+            f.host
+                .unlock_vault(castellan::custody::UnlockMethod::Passphrase(
+                    b"synthetic review receipt",
+                ))
+                .unwrap();
+        }
         assert!(
             f.resident
                 .profile_personas(&ProfileId("work".into()))
@@ -492,4 +544,96 @@ async fn older_import_assignment_rechecks_revision_and_lock_after_consent() {
                 .is_empty()
         );
     }
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn persona_selection_and_lock_preserve_the_original_credential_root() {
+    let f = Fixture::new(credit_card()).await;
+    f.host
+        .switch_profile(dramatis::intents::SwitchProfileIntentV1 {
+            profile: "work".into(),
+        })
+        .unwrap();
+    f.host.lock_vault().unwrap();
+    f.host
+        .unlock_vault(castellan::custody::UnlockMethod::Passphrase(
+            b"synthetic review receipt",
+        ))
+        .unwrap();
+    assert_eq!(f.host.current_profile_id(), ProfileId("work".into()));
+    assert_eq!(f.state(), ItemState::Quarantined);
+    assert_eq!(
+        f.client("dramatis")
+            .await
+            .quarantine(ProfileId("family".into()))
+            .await
+            .unwrap()
+            .len(),
+        1
+    );
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn multiple_stores_keep_keys_and_review_targets_distinct() {
+    let f = Fixture::new(credit_card()).await;
+    let persona = PersonaId::new();
+    let bytes = serde_json::to_vec(&json!({"version":{"major":1,"minor":0},"exporterRpId":"example.invalid","exporterDisplayName":"Receipt","timestamp":1,"accounts":[{"id":"YQ","username":"Work","email":"test@example.invalid","collections":[],"items":[{"id":"aQ","title":"Work card","credentials":[credit_card()]}]}]})).unwrap();
+    castellan::cxf::Import::read(bytes)
+        .unwrap()
+        .commit(
+            BTreeMap::from([(
+                "YQ".into(),
+                castellan::cxf::Destination {
+                    persona,
+                    profile: ProfileId("work".into()),
+                    ssh_unlock_policy: dramatis::intents::SshUnlockPolicyIntentV1::Session,
+                },
+            )]),
+            &f.work_resident,
+            &f.host,
+        )
+        .unwrap();
+    f.host
+        .switch_profile(dramatis::intents::SwitchProfileIntentV1 {
+            profile: "work".into(),
+        })
+        .unwrap();
+    f.host.lock_vault().unwrap();
+    f.host
+        .unlock_vault(castellan::custody::UnlockMethod::Passphrase(
+            b"synthetic review receipt",
+        ))
+        .unwrap();
+    let mut c = f.client("dramatis").await;
+    let family = c.quarantine(ProfileId("family".into())).await.unwrap();
+    let work = c.quarantine(ProfileId("work".into())).await.unwrap();
+    assert_eq!(family.len(), 1);
+    assert_eq!(work.len(), 1);
+    assert_eq!(family[0].store, ProfileId("family".into()));
+    assert_eq!(work[0].store, ProfileId("work".into()));
+    let request = ReviewRequest {
+        store: work[0].store.clone(),
+        profile: ProfileId("work".into()),
+        persona: work[0].persona,
+        item: work[0].item.id,
+        revision: work[0].revision.clone(),
+        action: ReviewAction::Accept,
+    };
+    let mut forged = request.clone();
+    forged.store = ProfileId("family".into());
+    assert!(c.review_quarantine(forged).await.is_err());
+    assert_eq!(f.ui.count.load(Ordering::SeqCst), 0);
+    f.ui.allow.store(true, Ordering::SeqCst);
+    c.review_quarantine(request).await.unwrap();
+    assert_eq!(
+        f.work_resident.items(persona).list().unwrap()[0].state,
+        ItemState::Vault
+    );
+    assert_eq!(f.state(), ItemState::Quarantined);
+    assert!(
+        c.quarantine(ProfileId("work".into()))
+            .await
+            .unwrap()
+            .is_empty()
+    );
 }

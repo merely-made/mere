@@ -128,9 +128,22 @@ impl CastellanResident {
         Arc::new(CredentialLockHolder {
             resident: self.clone(),
             salts,
+            key_profile: None,
         })
     }
 
+    /// Reopen this store from its original key persona, independent of selection.
+    pub fn lock_holder_for_profile(
+        &self,
+        salts: CredentialSalts,
+        profile: ProfileId,
+    ) -> Arc<dyn VaultLockHolder> {
+        Arc::new(CredentialLockHolder {
+            resident: self.clone(),
+            salts,
+            key_profile: Some(profile),
+        })
+    }
     /// Bind an item namespace to its explicitly chosen profile, without reassignment.
     pub fn bind_profile(
         &self,
@@ -313,11 +326,15 @@ impl CastellanResident {
 pub struct CredentialLockHolder {
     resident: CastellanResident,
     salts: CredentialSalts,
+    key_profile: Option<ProfileId>,
 }
 
 impl VaultLockHolder for CredentialLockHolder {
     fn name(&self) -> &str {
         "castellan credentials"
+    }
+    fn key_profile(&self) -> Option<&ProfileId> {
+        self.key_profile.as_ref()
     }
 
     fn lock(&self) {
