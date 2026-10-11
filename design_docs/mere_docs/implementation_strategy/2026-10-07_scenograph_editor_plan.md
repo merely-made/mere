@@ -16,6 +16,12 @@ undo are implemented in `69f17908`, with native/build qualification and an open
 editor design stages exact-owner inspection before writes; general field
 authoring and the unresolved storage/composition policies remain planned.
 
+**2026-10-11 continuation:** access/Resource and
+[link/assertion inspection](#link-and-exact-assertion-inspector-draft-2026-10-11)
+now have read-only local-product drafts. Field inspection and overlap discovery
+are next in the approved sequence; primitive writes and derived-link owner
+explanations retain their existing gates.
+
 Not in scope, mapped in §3 and opened by later rounds:
 - the scripting comparison (SE3), which is the next assessment;
 - wallpapers and props, the node, edge and field style editors, and authored motion.
@@ -776,15 +782,18 @@ unresolved field event/composition choices retain their named owners.
 
 #### Identity inspection follow-through (2026-10-10; next design steps)
 
-**Status:** access/Resource inspection implemented as a draft; link, field and
-write adapters remain planned. Mark asked this agent to keep working on plans
-while agents on O-PC, the ThinkPad and the Macs perform visual tests. The implemented forme draft remains the bounded runtime
-proof. This sequence prepares the primitive-editor walkthrough without choosing
+**Status (2026-10-11):** access/Resource and link/assertion inspection implemented
+as drafts; field and write adapters remain planned. Mark asked this agent to
+keep working on plans while agents on O-PC, the ThinkPad and the Macs perform
+visual tests. The implemented forme draft remains the bounded runtime proof. This sequence prepares the primitive-editor walkthrough without choosing
 the outstanding attribute-storage or field-composition policies.
 
-**Implementation continuation:** the access/Resource read-only adapter is now
-an implementation draft, described in [Progress](#accessresource-inspector-draft-2026-10-10).
-The remaining link, field and edit adapters retain their planned status.
+**Implementation continuation:** the access/Resource read-only adapter is
+described in [Progress](#accessresource-inspector-draft-2026-10-10), followed by
+the [link/assertion draft](#link-and-exact-assertion-inspector-draft-2026-10-11).
+Field and edit adapters retain their planned status. The link draft reads held
+source records; rule-derived display marks still need their owning explanation
+adapter.
 
 Source checked at published Mere `69f17908`:
 
@@ -1438,3 +1447,103 @@ Run the existing four-page retained-origin Forme sequence on the new build and
 review pointer previews, saved undo/reopen and shared Resource tags in separate
 accesses. No browser pass, capture, release package or physical-input receipt is
 claimed by this pass.
+
+
+#### Link and exact-assertion inspector draft (2026-10-11)
+
+**Status:** implemented read-only draft, based on published `ebfa5be8`, under
+Mark's direct-main draft-delivery authorization, then rebased onto `3d21c352`
+before delivery. It preserves the Forme fixes and scene/dynamics work now on
+main. The integrated primary-model reconciliation changes documentation only;
+qualified runtime/scenario hashes remain unchanged. Field inspection and overlap discovery
+remain the next bounded adapter; this pass introduces no primitive writes.
+
+The portable [link model](../../../ports/graphshell/src/link_inspection.rs)
+resolves a bundle by two access UUIDs and expands both directed pairs, visiting
+an access self-pair once. Each contributing edge bucket retains its displayed
+direction, owning Access/Resource stratum, stable source endpoint identities,
+exact semantic statements and actual family sidecars. Parallel buckets are
+retained; deterministic content ordering does not assign them durable identities.
+One Resource relation lifted onto distinct access pairs shows the same source
+owner and statement handles with different displayed endpoints. A Resource
+self-link lifted between two distinct accesses contributes once per displayed
+direction. Missing recorded associations and relevant known coverage limits are
+disclosed; held records never imply global completeness.
+
+Each assertion retains its handle, predicate, recognized kind, label, scope,
+asserter and assertion time. Exact inspection re-resolves the held handle in
+its recorded store, independent of current predicate placement or access binding.
+If an access navigates away from a Resource, its bundle refreshes while an
+already inspected Resource assertion remains inspectable. Retraction or access
+removal reports absence, without substituting a same-predicate assertion or an
+equal-address access. Non-statement sidecars retain their real owning values,
+including session arrangements, traversal events and navigation aggregates;
+no statement handles are manufactured for them. Family summaries are labelled
+as grouping, separate from exact assertions.
+
+The [retained controls](../../../ports/graphshell/src/web_tree/link_inspection.rs)
+are mounted in Graph tools on `tree.html?app=local`. Select an access, activate
+**Inspect selected access**, then **Inspect links: …** in its held-link list.
+**Inspect assertion N** retains that row's exact statement handle; N is a
+presentation ordinal only. Both endpoint directions and Resource source
+identities are visible. Graph selection changes do not retarget either panel.
+Closing access inspection leaves link inspection open; closing the exact
+assertion leaves its bundle open; closing the bundle clears both link targets.
+These actions change temporary view state without opening content, changing
+selection, moving the camera or editing Forme membership/layout. Reads use the
+acknowledged local owner, retaining targets during its in-flight save.
+
+**Scope and findings:** Canvas currently exposes selected-link presence, but
+not a stable public bundle subject for this host. The access inspector's incoming
+and outgoing held-link list provides the initial keyboard/pointer entry path;
+direct canvas-link activation and shared roster subjects remain follow-through.
+The list covers held access neighbors, including lifts through recorded
+Resource associations. A Resource with no held access cannot appear as an
+adjacent displayed access. This is not a general Resource graph browser.
+
+Rule-derived display marks are not yet connected to this adapter. A held
+`AgentDerived` assertion shows its stored attribution and explicitly reports
+that its rule and inputs are not held in that record; an asserter is not a rule
+explanation. Other derived marks still need their execution owner's explanation
+adapter. Unknown-legacy attribution remains the recorded marker. Generic JSON
+sidecar values, long handles, disclosure sizing and large-neighborhood costs
+need presentation review. Other hosts and generated datasets are not mounted.
+Exact-record mutation still requires the existing authorship/retraction contract.
+
+**Qualification:** nine actual-source native model tests pass. They cover
+same-predicate assertions with distinct handles/attribution, lifted Resource
+ownership across access pairs, both directions and strata, parallel buckets,
+self-links, non-statement session data, mixed family/traversal data, exact lookup
+after rebinding/retraction, missing targets and associations, scoped coverage,
+and stable bundle/assertion Graph-snapshot roundtrip. The initial external
+harness needed adjustment for main's extracted Forme test module; the dedicated
+link harness imports the tracked link/access sources and actual Mere graph
+implementation. The Graph-snapshot check does not qualify IndexedDB reopening.
+The product wasm check passes with the web host's committed target flags and
+`--no-default-features --features product`; exact scope is recorded in the
+[check summary](../../../ports/graphshell/docs/receipts/link_inspection_20261011/qualification.json).
+Native and product checks run sequentially with one Cargo job, a 1280 MiB scope
+cap, no scope swap and the 256 MiB available-memory guard. No release bundle,
+default/viewer check, browser run or capture is claimed for this draft.
+
+**Review and host-test handoff:**
+
+- Build with `product` and run
+  `tree.html?app=local&scenario=scenarios/p4_tree_link_inspection.scn` in a visible
+  tab on a dedicated origin/profile seeded with the reference fixture. The
+  [scenario](../../../ports/graphshell/web/scenarios/p4_tree_link_inspection.scn)
+  inspects the existing webpage → file citation, opens its exact assertion,
+  changes selection, closes each inspector independently and checks unchanged
+  Forme identity/membership. Its two named captures and observation fields are
+  instruments; the scenario has not been run here.
+- Add host cases for two same-predicate assertions, parallel source buckets,
+  opposite directions, self-links, session sidecars and a Resource relation
+  lifted through two distinct access pairs. Review source/displayed endpoint
+  labels and unknown/missing attribution. The native cases do not substitute
+  for browser receipts of those interactions.
+- Check keyboard activation and focus in docked tools and the narrow overlay,
+  long records, another open detail draft, in-flight source saves/failure,
+  access rebinding/removal and exact-statement retraction. Confirm inspection
+  does not change selection, camera, content sessions or Forme arrangement.
+  Append actual outcomes and source/build/browser identity here. Review the
+  unqualified list/record materialization costs before large-graph adoption.
