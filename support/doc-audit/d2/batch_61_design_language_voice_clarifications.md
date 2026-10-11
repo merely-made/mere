@@ -450,3 +450,14 @@ capture or other agent review is inferred. Full citation and D2 audit JSON equal
 the integrated main pre-edit baseline, retaining 252/260 coverage and ten
 existing D2 errors. Added local links and anchors resolve; whitespace checks
 pass. No active Markdown document or parser-shaped audit record was added.
+
+**Forme feedback and Chrome field inspection (2026-10-11):** Target-local
+split and tab-stack feedback now shares the drop resolver's original bounds
+and action. Nine Forme session tests, the product Wasm build and viewer-only
+check pass. Six Chrome scenarios and fifteen reviewed captures qualify the
+recorded `eb804d07` Rust source, with `eac1524f` correcting the scenario's
+Escape key spelling. The collected failing spelling run is retained. The
+field fixture's two pages establish exact records and retained IndexedDB
+reopen; inspector spacing and focus/scroll polish remain open. Subsequent
+integration checks are separate from this browser source receipt. See the
+Scenograph and field owner continuations; no active document identity is added.

@@ -1612,3 +1612,31 @@ receipt above qualifies its recorded source, not this new inspector. Primitive
 writes, derived-link explanation and the field composition/event policies
 retain their existing gates; the declarative rule editor remains the next
 bounded appearance-authoring candidate.
+
+#### Forme drop feedback and field browser qualification (2026-10-11)
+
+Mark authorized the Forme feedback fix followed by Chrome field-inspector
+qualification. The Forme session now returns the drop action and original
+target bounds together with its candidate. The graph renders a target-local
+outline and action label: a half-region for an edge split, or a tab-header
+cue for a center stack. The cue is temporary, takes no pointer input and
+clears on acceptance, Escape, outside release or draft reset. Zone changes
+rebuild the retained cue; motion within a zone keeps pointer capture. The
+existing scoped draft, Lock and apply, discard and saved history retain their
+authority.
+
+The product Wasm build, viewer-only Wasm check and nine native Forme session
+cases pass. All six Chrome scenarios pass: Forme arrangement/reopen,
+draft/reopen and field inspection/reopen. Fifteen successful captures were
+reviewed. The drag cases verify Escape then release and valid-target to outside
+release without changing the draft. Field inspection verifies exact identities,
+overlapping candidates, hidden boundaries, retired records, independent Forme
+reads and retained IndexedDB reopen. Inspector label/value spacing and focus
+or scroll follow-through remain open; functional acceptance does not close
+those visual review gates. The browser source is `eb804d07`, with the scenario
+key correction at `eac1524f`; subsequent integrations do not inherit this pass.
+An initial unsunk launch was closed without a qualification claim. A collected
+drag run found lowercase `key escape` unsupported by the scenario runner;
+the scenario now uses its existing `key Escape` route. That failed run is
+retained alongside the corrected sequence in the
+[qualification record](../../../ports/graphshell/docs/receipts/forme_feedback_field_browser_20261011/qualification.json).

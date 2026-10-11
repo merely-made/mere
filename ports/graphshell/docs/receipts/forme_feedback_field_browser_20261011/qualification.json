@@ -1,0 +1,135 @@
+{
+  "date": "2026-10-11",
+  "owner": "Forme feedback and field inspector Chrome qualification",
+  "rust_source_commit": "eb804d07a650cda80399916ac67ac3879a63c920",
+  "scenario_source_commit": "eac1524f2d3629f0757508650b7528ee84c46b1c",
+  "source_hashes_git_blob_sha256": {
+    "ports/graphshell/src/forme_session.rs": "e903f1a7c23ca738b163d6f72ceff454535cdf0cf54466f32729530df0f006b0",
+    "ports/graphshell/src/web_tree/forme.rs": "111f47999149ea8e863451edbe7a8c657a36059a4883011c5444fe4124e8f1c3",
+    "ports/graphshell/src/web_tree.rs": "c922f657eda5c6ad3614132227cd1d97b8c7ea655ac29ff21f54d0eafdf6764d",
+    "ports/graphshell/src/web_tree/lane.rs": "48a0a6976535991d325657aa68183ee050ea488886dcd542c75f2ad29fb2f2a1",
+    "ports/graphshell/src/web_tree/field_inspection.rs": "596e8fc8f8d8423f1a82619c258f1afa92b2d4ed0edd015f28eede95382fdf2f"
+  },
+  "build": {
+    "result": "pass",
+    "command": "cargo build --target wasm32-unknown-unknown --no-default-features --features product --locked --offline --target-dir C:/t/cargo-targets/mere -j 2",
+    "cwd": "ports/graphshell/web",
+    "profile": "debug",
+    "log": "product_build.log",
+    "packaging": "llvm-strip --strip-debug then wasm-bindgen 0.2.129 --target web --out-name graphshell_web",
+    "artifacts": {
+      "graphshell_web.js": {
+        "sha256": "2664d30bbc2947b4ebd0b5c07b5eec59cec4b0c4154724ec2a4b00ca3b5a53c4",
+        "bytes": 138632
+      },
+      "graphshell_web_bg.wasm": {
+        "sha256": "ef1dfd06cfc6baab2c27efbe2239d287e2c757199b169c5e0918f2a24bad02f7",
+        "bytes": 356730015
+      }
+    }
+  },
+  "native": {
+    "result": "pass",
+    "passed": 9,
+    "failed": 0,
+    "command": "cargo test --locked --offline -p graphshell --no-default-features --features web --lib forme_session --target-dir C:/t/cargo-targets/mere -j 2",
+    "log": "forme_session_tests.log"
+  },
+  "viewer": {
+    "result": "pass",
+    "command": "cargo check --target wasm32-unknown-unknown --no-default-features --locked --offline --target-dir C:/t/cargo-targets/mere -j 2",
+    "cwd": "ports/graphshell/web",
+    "log": "viewer_check.log"
+  },
+  "browser": {
+    "environment": "chrome/final/probe/environment.json",
+    "origin": "http://127.0.0.1:9875",
+    "fresh_origin_initial_databases": [],
+    "probe_viewport": [
+      1037,
+      639
+    ],
+    "app_capture_logical_viewport": [
+      1037,
+      583
+    ],
+    "app_capture_physical_size": [
+      2074,
+      1166
+    ],
+    "device_pixel_ratio": 2,
+    "scenarios_in_order": [
+      {
+        "scenario": "p4_tree_forme.scn",
+        "result": "ok",
+        "captures": 4,
+        "receipt": "chrome/final/p4_tree_forme/result.json"
+      },
+      {
+        "scenario": "p4_tree_forme_reopen.scn",
+        "result": "ok",
+        "captures": 2,
+        "receipt": "chrome/final/p4_tree_forme_reopen/result.json"
+      },
+      {
+        "scenario": "p4_tree_forme_draft.scn",
+        "result": "ok",
+        "captures": 3,
+        "receipt": "chrome/final/p4_tree_forme_draft/result.json"
+      },
+      {
+        "scenario": "p4_tree_forme_draft_reopen.scn",
+        "result": "ok",
+        "captures": 1,
+        "receipt": "chrome/final/p4_tree_forme_draft_reopen/result.json"
+      },
+      {
+        "scenario": "p4_tree_field_inspection.scn",
+        "result": "ok",
+        "captures": 4,
+        "receipt": "chrome/final/p4_tree_field_inspection/result.json"
+      },
+      {
+        "scenario": "p4_tree_field_inspection_reopen.scn",
+        "result": "ok",
+        "captures": 1,
+        "receipt": "chrome/final/p4_tree_field_inspection_reopen/result.json"
+      }
+    ],
+    "successful_captures_reviewed": 15,
+    "reopen": "Fresh page on the same retained origin, not a fresh browser process",
+    "field_store": "graphshell-field-inspection-draft-v1",
+    "assessment": [
+      "Target-local double-border/tab header for stacking and half-region dashed outline for splits are readable.",
+      "Escape then release and moving from a valid target outside the Forme leave the draft unchanged.",
+      "Exact field and coupling identities/values persist through IndexedDB reopen; discovery, visibility and selection do not implicitly retarget inspection.",
+      "Inspector label/value spacing is crowded; some selected details are below the clicked control. Spacing and focus/scroll follow-through remain open."
+    ]
+  },
+  "retained_attempts": [
+    {
+      "attempt": "Initial port 9873 launch omitted collection sink",
+      "claim": "Aborted; no qualification claimed",
+      "environment": "chrome/probe/environment.json"
+    },
+    {
+      "attempt": "Lowercase key escape unsupported by the scenario parser",
+      "receipt": "chrome/failed_key_case/p4_tree_forme_draft/result.json",
+      "claim": "Failed run retained; corrected to existing key Escape route and reran all assertions successfully"
+    }
+  ],
+  "limits": [
+    "Dev product build only; release performance, Firefox, physical touch/focus and other hosts unqualified.",
+    "Field fixture uses neutral forces; no force runtime or exact-coupling writes qualified.",
+    "Earlier ten field model tests and older 120/19 Forme tests are recorded owner receipts, not new reruns.",
+    "Newer upstream integrations require separate evidence; this Chrome receipt applies to the named source only."
+  ],
+  "integration": {
+    "status": "pending"
+  },
+  "cleanup": {
+    "browser_tabs": "Owned tabs closed; other agent tab preserved",
+    "servers": "Owned ports 9873 and 9875 stopped",
+    "generated_package": "Pending removal after integration checks"
+  }
+}

@@ -409,6 +409,21 @@ Checks run sequentially with one Cargo job, a 1280 MiB scope cap, no scope swap
 and the 256 MiB available-memory guard. No field browser run, capture, release
 bundle or default/viewer qualification is claimed by this pass.
 
+**Chrome continuation (2026-10-11):** Both tracked field-inspection pages now
+pass on Chrome 154 with WebGPU, including retained IndexedDB reopen. Five
+captures were reviewed. Exact field/coupling values, all overlapping boundary
+candidates, hidden boundaries with unchanged couplings, retired records and
+independent Forme arrangement-owner reads pass without scenario or runtime
+gate failures. Discovery and ordinary selection leave exact inspection targets
+unchanged until explicit inspection. The fixture remains force-neutral and
+read-only. Inspector label/value spacing and focus/scroll follow-through need
+further design and visual qualification. The product build, viewer-only check
+and nine Forme session cases pass; the earlier ten field model checks are not
+rerun by this browser pass. The tested Rust cut is `eb804d07`, with scenario
+key correction `eac1524f`; newer integrations do not inherit its browser proof.
+The [collected qualification](../../../ports/graphshell/docs/receipts/forme_feedback_field_browser_20261011/qualification.json)
+also records the four Forme pages, all fifteen reviewed captures and limits.
+
 **Review and host-test handoff:**
 
 - On a host with sufficient build memory, run the tracked native cases from the
