@@ -4,7 +4,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-use crate::{Result, hex, identity, peer, require};
+use crate::{Result, carrier, hex, identity, peer, require};
 use ::identity::{IdentityProvider, InMemoryProvider};
 use mesh::{
     BlobRef, DeterminismClass, JobId, JobSpec, JobState, MESH_AUTHOR_SALT, MeshEvent, MeshExt,
@@ -21,7 +21,7 @@ use stickleback::{
 
 const EXPECTED_MESH: [u8; 32] = [0x4d; 32];
 
-pub async fn run(peer_path: &Path) -> Result<Value> {
+pub async fn run(peer_path: &Path, quic: bool) -> Result<Value> {
     let peer_path = peer_path.canonicalize()?;
     let peer_digest = identity::file_digest(&peer_path)?;
     let mere_identity = identity::mere_identity()?;
@@ -43,7 +43,13 @@ pub async fn run(peer_path: &Path) -> Result<Value> {
     let directory = tempfile::tempdir()?;
     let database = directory.path().join("receive.redb");
     let store = MeshStore::at_path(&database)?;
+    let mut carrier = if quic {
+        Some(carrier::Carrier::bind(original.header.verifying_key.as_bytes()).await?)
+    } else {
+        None
+    };
     let mut observations = Vec::new();
+    let mut carrier_runs = Vec::new();
     let mut transport_runs = Vec::new();
 
     let recovered = peer::recover(&peer_path, "authentic-original", &record_bytes, true)?;
@@ -58,31 +64,36 @@ pub async fn run(peer_path: &Path) -> Result<Value> {
     )?;
     for (lane, expected_outcome) in [("pinned-four", "inserted"), ("late-one", "duplicate")] {
         let bytes = recovered.recovered(lane, &record_bytes)?;
+        let (owner, carried) = receive(&mut carrier, &store, &bytes).await?;
+        require(
+            owner["outcome"] == expected_outcome,
+            "unexpected durable admission outcome",
+        )?;
         let operation = decode(&bytes)?;
         require(
             exact_operation(&operation, &original),
             "inner operation bytes or identity changed",
         )?;
-        let before = snapshot(&store).await?;
-        let outcome = store.accept_outcome(EXPECTED_MESH, &operation).await?;
-        let label = outcome_label(outcome);
         require(
-            label == expected_outcome,
-            "unexpected durable admission outcome",
+            owner["header_hex"] == hex(&original.header.encode()),
+            "receiver header bytes changed",
         )?;
-        let after = snapshot(&store).await?;
         require(
-            after["operation_count"] == 1 && after["board_jobs"] == 1,
+            owner["body_hex"] == json!(original.body.as_ref().map(|body| hex(&body.to_bytes()))),
+            "receiver body bytes changed",
+        )?;
+        require(
+            owner["owner_after"]["operation_count"] == 1 && owner["owner_after"]["board_jobs"] == 1,
             "owner should retain exactly one operation and posted job",
         )?;
-        if label == "duplicate" {
-            require(before == after, "duplicate changed durable owner state")?;
-        }
         observations.push(json!({"id":format!("receive-{lane}"),"receiver_lane":lane,
             "completion_slot":recovered.receiver(lane)?["generations"][0]["completion_slot"],
             "operation_id":hex(operation.hash.as_bytes()),"record_bytes_equal":true,
-            "header_bytes_equal":true,"body_bytes_equal":true,"outcome":label,
-            "owner_before":before,"owner_after":after}));
+            "header_bytes_equal":true,"body_bytes_equal":true,"outcome":owner["outcome"],
+            "owner_before":owner["owner_before"],"owner_after":owner["owner_after"]}));
+        if let Some(carried) = carried {
+            carrier_runs.push(carried);
+        }
     }
     let late_join_observation = json!({"join_slot":join,
         "source_drain_upper_bound_exclusive":source_bound,
@@ -136,40 +147,51 @@ pub async fn run(peer_path: &Path) -> Result<Value> {
         )?;
         let recovered = peer::recover(&peer_path, id, &input, false)?;
         let bytes = recovered.recovered("pinned-four", &input)?;
-        let before = snapshot(&store).await?;
-        let rejection = match decode(&bytes) {
-            Err(error) if expected_stage == "operation-codec" => {
-                require(
-                    error.to_string().contains("invalid signature"),
-                    "unexpected header decode refusal",
-                )?;
-                json!({"stage":"operation-codec","code":"invalid-signature","detail":error.to_string()})
-            },
-            Err(error) => return Err(error),
-            Ok(operation) => match store.accept_outcome(EXPECTED_MESH, &operation).await {
-                Err(MeshStoreError::Process(ProcessError::Rejected(refusal)))
-                    if expected_stage == "mesh-policy" && refusal.code == "wrong-mesh" =>
-                {
-                    json!({"stage":"mesh-policy","code":refusal.code,"detail":refusal.detail})
-                },
-                Err(MeshStoreError::Process(ProcessError::InvalidOperation(detail)))
-                    if expected_stage == "operation-structure" && detail.contains("payload") =>
-                {
-                    json!({"stage":"operation-structure","code":"payload-mismatch","detail":detail})
-                },
-                Err(error) => return Err(format!("unexpected refusal for {id}: {error}").into()),
-                Ok(_) => return Err(format!("owner admitted {id}").into()),
-            },
-        };
-        let after = snapshot(&store).await?;
-        require(before == after, "refused inner record changed owner state")?;
+        let (owner, carried) = receive(&mut carrier, &store, &bytes).await?;
+        require(
+            owner["rejection"]["stage"] == expected_stage,
+            "unexpected inner refusal stage",
+        )?;
+        require(
+            owner["owner_before"] == owner["owner_after"],
+            "refused inner record changed owner state",
+        )?;
         observations.push(json!({"id":id,"receiver_lane":"pinned-four",
             "outer_authenticated_reconstruction":true,"record_bytes_equal":true,
-            "rejection":rejection,"owner_before":before,"owner_after":after,
-            "owner_unchanged":true}));
+            "rejection":owner["rejection"],"owner_before":owner["owner_before"],
+            "owner_after":owner["owner_after"],"owner_unchanged":true}));
+        if let Some(carried) = carried {
+            carrier_runs.push(carried);
+        }
         transport_runs.push(recovered.observation());
     }
 
+    let mut boundary_observations = Vec::new();
+    if let Some(carrier) = &mut carrier {
+        for fault in [
+            carrier::Fault::Oversized,
+            carrier::Fault::Truncated,
+            carrier::Fault::Stalled,
+        ] {
+            let before = snapshot(&store).await?;
+            let boundary = carrier.boundary(&store, &record_bytes, fault).await?;
+            let after = snapshot(&store).await?;
+            require(before == after, "framing refusal changed owner state")?;
+            let (owner, following) = carrier.transfer(&store, &record_bytes).await?;
+            require(
+                owner["outcome"] == "duplicate",
+                "valid stream after refusal failed",
+            )?;
+            boundary_observations.push(json!({"boundary":boundary,
+                "owner_before":before,"owner_after":after,"owner_unchanged":true,
+                "following_valid_stream":following}));
+        }
+    }
+    let carrier_summary = if let Some(carrier) = &carrier {
+        Some(carrier.finish().await?)
+    } else {
+        None
+    };
     let before_reopen = snapshot(&store).await?;
     drop(store);
     let reopened = MeshStore::at_path(&database)?;
@@ -203,14 +225,80 @@ pub async fn run(peer_path: &Path) -> Result<Value> {
             "child_timeout_seconds":peer::CHILD_TIMEOUT_SECONDS},
         "scope":{"actual_raptorq_codec":true,"production_mesh_admission":true,"durable_redb":true,
             "modeled_receiver_lanes":true,"physical_throughput_claim":false,
-            "reticulum_carrier_exercised":false,"quic_carrier_exercised":false,
+            "reticulum_carrier_exercised":false,"quic_carrier_exercised":quic,
             "mcu_or_rf_exercised":false,"job_execution_or_blob_delivery":false},
         "fixture":{"public_throwaway_identity":true,"operation_id":hex(original.hash.as_bytes()),
             "author_key_hex":hex(original.header.verifying_key.as_bytes()),
             "expected_mesh_hex":hex(&EXPECTED_MESH),"original_record_hex":hex(&record_bytes),
             "late_join":late_join_observation},
-        "observations":observations,"transport_runs":transport_runs
+        "observations":observations,"transport_runs":transport_runs,
+        "carrier_runs":carrier_runs,"carrier_boundaries":boundary_observations,"carrier":carrier_summary
     }))
+}
+
+async fn receive(
+    carrier: &mut Option<carrier::Carrier>,
+    store: &MeshStore<RedbBackend>,
+    bytes: &[u8],
+) -> Result<(Value, Option<Value>)> {
+    if let Some(carrier) = carrier {
+        let (owner, evidence) = carrier.transfer(store, bytes).await?;
+        Ok((owner, Some(evidence)))
+    } else {
+        Ok((admit_received(store, bytes).await?, None))
+    }
+}
+
+// This same receiver-owned callback handles direct model handoff and QUIC bytes.
+// A verified transport peer is never substituted for the signed operation author.
+pub(super) async fn admit_received(store: &MeshStore<RedbBackend>, bytes: &[u8]) -> Result<Value> {
+    let before = snapshot(store).await?;
+    let mut operation_id = None;
+    let mut header_hex = None;
+    let mut body_hex = None;
+    let mut outcome = None;
+    let rejection = match decode(bytes) {
+        Err(error) if error.to_string().contains("invalid signature") => Some(
+            json!({"stage":"operation-codec","code":"invalid-signature","detail":error.to_string()}),
+        ),
+        Err(error) => return Err(error),
+        Ok(operation) => {
+            operation_id = Some(hex(operation.hash.as_bytes()));
+            header_hex = Some(hex(&operation.header.encode()));
+            body_hex = operation.body.as_ref().map(|body| hex(&body.to_bytes()));
+            match store.accept_outcome(EXPECTED_MESH, &operation).await {
+                Ok(accepted) => {
+                    outcome = Some(outcome_label(accepted));
+                    None
+                },
+                Err(MeshStoreError::Process(ProcessError::Rejected(refusal)))
+                    if refusal.code == "wrong-mesh" =>
+                {
+                    Some(json!({"stage":"mesh-policy","code":refusal.code,"detail":refusal.detail}))
+                },
+                Err(MeshStoreError::Process(ProcessError::InvalidOperation(detail)))
+                    if detail.contains("payload") =>
+                {
+                    Some(
+                        json!({"stage":"operation-structure","code":"payload-mismatch","detail":detail}),
+                    )
+                },
+                Err(error) => return Err(error.into()),
+            }
+        },
+    };
+    let after = snapshot(store).await?;
+    if rejection.is_some() || outcome == Some("duplicate") {
+        require(
+            before == after,
+            "refused or duplicate record changed owner state",
+        )?;
+    }
+    Ok(
+        json!({"operation_id":operation_id,"header_hex":header_hex,"body_hex":body_hex,
+        "record_blake3":blake3::hash(bytes).to_hex().as_str(),"outcome":outcome,"rejection":rejection,
+        "owner_before":before,"owner_after":after}),
+    )
 }
 
 fn decode(bytes: &[u8]) -> Result<Operation<MeshExt>> {

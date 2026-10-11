@@ -7,6 +7,7 @@
 //! One opaque recovered signed record offered to the existing mesh owner.
 
 mod campaign;
+mod carrier;
 mod identity;
 mod peer;
 
@@ -27,6 +28,7 @@ fn execute() -> Result<()> {
     let mut args = std::env::args_os().skip(1);
     let mut peer_path = None;
     let mut output = None;
+    let mut quic = false;
     while let Some(argument) = args.next() {
         match argument.to_str() {
             Some("--retinue-peer") => {
@@ -41,16 +43,26 @@ fn execute() -> Result<()> {
                 }
                 output = Some(PathBuf::from(args.next().ok_or("missing output path")?));
             },
+            Some("--carrier") => {
+                if quic || args.next().as_deref() != Some(std::ffi::OsStr::new("quic")) {
+                    return Err("--carrier requires quic and may appear once".into());
+                }
+                quic = true;
+            },
             Some("--help" | "-h") => {
-                println!("retained_receive --retinue-peer PATH [--output NEW_PATH]");
+                println!(
+                    "retained_receive --retinue-peer PATH [--carrier quic] [--output NEW_PATH]"
+                );
                 return Ok(());
             },
             _ => return Err(format!("unknown argument: {}", argument.to_string_lossy()).into()),
         }
     }
     let peer_path = peer_path.ok_or("--retinue-peer PATH is required")?;
-    let runtime = tokio::runtime::Builder::new_current_thread().build()?;
-    let report = runtime.block_on(campaign::run(&peer_path))?;
+    let runtime = tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()?;
+    let report = runtime.block_on(campaign::run(&peer_path, quic))?;
     let bytes = serde_json::to_vec_pretty(&report)?;
     if let Some(path) = output {
         let mut file = std::fs::OpenOptions::new()
