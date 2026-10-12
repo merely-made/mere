@@ -1115,7 +1115,7 @@ Archived as [2026-10-06_completed_plans/2026-06-26_capture_provenance_consent_pl
   disabled and opt-in, as Graphshell's policy is) — with the gate, to both
   owners.
 - **Phase 9 federation promotion and consumption** — carried by the
-  [eidetic deferred phases plan](../../eidetic_docs/implementation_strategy/2026-06-09_eidetic_deferred_phases_plan.md).
+  [Eidetic development plan P6](../../eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md#p6-qualify-storage-custody-retention-and-exchange).
 - **Forget's provenance cleanup** — here.
 - **C3's excerpt, summarize and generated-node cases** — here.
 - **The plan's other open questions**: the legality policy for federating a
@@ -1387,8 +1387,10 @@ Archived as [2026-10-06_completed_plans/2026-08-22_redb_opfs_feasibility_plan.md
 - **Whether adoption requires the adapter to implement `Backend::transact`**
   (muniment gained it in `9ba9f790`, defaulting to `NotTransactional`), its
   S14 question: yes, adoption requires it; or the default is acceptable for
-  this backend — here, for the pass. The eidetic deferred phases plan's Phase 7 touches this area
-  but does not plainly own it.
+  this backend — here, for the pass. The
+  [Eidetic development plan P6](../../eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md#p6-qualify-storage-custody-retention-and-exchange)
+  now owns the consumer/backend requirements and retains this transaction
+  decision as an explicit checkpoint before adoption.
 
 #### From intel_vector_index_burn_lift (the mere-side twin)
 

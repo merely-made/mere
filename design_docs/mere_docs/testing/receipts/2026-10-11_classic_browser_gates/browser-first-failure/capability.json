@@ -1,0 +1,50 @@
+{
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+  "platform": "MacIntel",
+  "viewport": [
+    1440,
+    1000
+  ],
+  "devicePixelRatio": 1,
+  "secureContext": true,
+  "databases": [],
+  "webgpu": true,
+  "adapter": {
+    "vendor": "amd",
+    "architecture": "gcn-5",
+    "device": "",
+    "description": "",
+    "features": [
+      "depth32float-stencil8",
+      "rg11b10ufloat-renderable",
+      "texture-formats-tier1",
+      "bgra8unorm-storage",
+      "texture-compression-bc",
+      "dual-source-blending",
+      "core-features-and-limits",
+      "float32-filterable",
+      "indirect-first-instance",
+      "float32-blendable",
+      "depth-clip-control",
+      "texture-compression-bc-sliced-3d",
+      "shader-f16",
+      "timestamp-query",
+      "clip-distances",
+      "texture-formats-tier2",
+      "texture-component-swizzle",
+      "subgroups"
+    ]
+  },
+  "actualDefaultAdapter": {
+    "available": true,
+    "request": "default",
+    "info": {
+      "vendor": "amd",
+      "architecture": "gcn-5",
+      "device": "",
+      "description": ""
+    },
+    "isFallbackAdapter": false,
+    "classificationSource": "GPUAdapterInfo.isFallbackAdapter"
+  }
+}

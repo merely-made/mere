@@ -1,0 +1,118 @@
+{
+  "date": "2026-10-11",
+  "status": "implementation draft; native Canvas and headed qualification pending",
+  "implementation_base": "ec1e65caed335010308566c8db51ad0e1e002799",
+  "integrated_base": "578c8e366d60fb47b41aa32cc522b2c157a12c20",
+  "upstream_review": {
+    "forme": "Target-local split/tab feedback and six Chrome Forme/field-inspector scenarios with fifteen captures are integrated; source scoped to their receipt",
+    "relationship_dynamics": "Shared occurrence relationship adapter and production Knot consumer reviews retained; not implicitly installed into local Graphshell Canvas",
+    "during_delivery": "578c8e36 integrates newer renderer-browser and Knot viewport receipts; no runtime/dependency changes to this qualification cone; no inherited new-inspector acceptance"
+  },
+  "native": {
+    "status": "passed",
+    "tests": 38,
+    "new_topology_tests": 7,
+    "retained_tests": 31,
+    "command": "cargo test --locked --offline --manifest-path ports/graphshell/docs/receipts/relationship_dynamics_20261011/harness/Cargo.toml --lib",
+    "scope": "Actual checked-in shared topology helper, graph-only Kernel/Mere and binding/editor/access/link models; not full native Canvas/Graphshell or IndexedDB",
+    "log": "checks/native.log"
+  },
+  "wasm": {
+    "product_check": "passed",
+    "command": "cargo check --locked --offline --target wasm32-unknown-unknown --no-default-features --features product",
+    "working_directory": "ports/graphshell/web",
+    "existing_web_warnings": 18,
+    "log": "checks/product-check.log",
+    "default_viewer_release": "not built"
+  },
+  "canvas_native": {
+    "status": "not run; pending on suitable native host",
+    "new_tests": 3,
+    "command": "cargo test --locked -p pictograph --features canvas --lib canvas::dynamics_inspection",
+    "scope": "Read-only graph/selection/pose/pause, hidden Forme versus explicit pin and missing member checks added; production report compiles for wasm, cfg(test) native execution unqualified"
+  },
+  "limits": {
+    "cargo_jobs": 1,
+    "memory_max_mib": 1280,
+    "swap_max_mib": 0,
+    "free_memory_guard_mib": 256
+  },
+  "contracts": {
+    "targets": "Exact access UUID or displayed pair, independent of selection and source inspectors; no URL fallback or persisted inspector state",
+    "topology": "Same helper and selector mapping feed existing controller bridge and inspector; preserve hidden-cell filtering and projected row multiplicity; group explanatory rows by direction/source owner/selector, exact assertion handles deduplicated",
+    "multiplicity_finding": "Existing kernel relation_rows emits each semantic assertion separately, including same-predicate assertions. A native expectation of one subkind row was corrected; no weighting policy changed",
+    "record": "Current Canvas readback versus current stage; schedule record survives execution. A record read is not a source-history snapshot or storage acknowledgment; mixed/grouped stages retain full JSON and errors",
+    "constraints": "Read explicit position pin, installed arrangement pin, role/item/group policy, slot availability, configured anchor target/stiffness, same axis-lock helper, Forme owner/hold and pointer drag; Forme hidden boundary does not remove hold",
+    "assertion_route": "Explicitly inspect exact input assertion through existing source inspector; preserve dynamics target and selection",
+    "effects": "Read-only; no controller stepping, source/selection/pose/role/pin/Forme/tile-session writes",
+    "unsupported": "Measured per-assertion force vectors, installed coupling snapshots, derived display execution evidence and foreground attention mapping are unavailable and disclosed"
+  },
+  "interactive": {
+    "status": "not run; pending on compatible connected browser",
+    "route": "tree.html?app=local",
+    "order": [
+      "p4_tree_dynamics_inspection.scn",
+      "p4_tree_dynamics_inspection_reopen.scn"
+    ],
+    "prerequisites": "Fresh dedicated normal-motion origin/profile, visible tab; retained origin with fresh page/process for reopen",
+    "captures": "four planned; none generated/reviewed",
+    "browser_limit": "S-PC connected browser lacks WebGPU; known gate not retried",
+    "scope": "Exact target retention, source assertion routing, live pause, source-inspector closure, hidden Forme holds and transient inspector reopen"
+  },
+  "deferred": [
+    "Canvas native report tests and headed handoff",
+    "Physical pin/manual-placement/tile continuity, hidden-cell controls, schedule transitions and other hosts",
+    "Open-inspector traversal/grouping cost and long JSON/keyboard/focus/narrow/theme acceptance",
+    "Derived execution-owner/compiled-scene mapping and measured per-term/per-assertion contribution adapters",
+    "Installed field coupling snapshots, attention/foreground state adapters, node representation ladder",
+    "General writes, scene composition, scripts/field execution and force-policy changes"
+  ],
+  "documentation": {
+    "citation_audit": "Complete JSON equals controlled published 578c8e36 baseline with all source files held fixed",
+    "d2_audit": "Complete JSON equals controlled published 578c8e36 baseline: 261/264 covered and four existing errors",
+    "whitespace": "passed",
+    "baseline_policy": "Only this lane's three document edits were temporarily replaced with integrated HEAD bytes for the baseline and restored; code/receipts and upstream documentation stayed fixed"
+  },
+  "source_hash_policy": "SHA-256 after CRLF-to-LF normalization of text source bytes; raw check logs are preserved as -text with only trailing blank lines removed",
+  "source_sha256_lf": {
+    ".gitattributes": "5d660261cf0509f561e961be625b200f268ac4c5f67bdb057ed871542e5d7c0d",
+    "crates/canvas/pictograph/src/canvas.rs": "e2ee0aea98795383e80bf1c60ffbc1530bbbc3f9cf5d5c5385c34f74631f034d",
+    "crates/canvas/pictograph/src/canvas/dynamics_inspection.rs": "202eaa34032e463e05b2c65b2be755993a85402195a77e98b9484a0185555f47",
+    "crates/canvas/pictograph/src/canvas/dynamics_inspection_tests.rs": "5b6d1b62a76f8e424dd88110fe6289065d3402fd1e1eec77a18c9fd034d46093",
+    "crates/canvas/pictograph/src/canvas/dynamics_record.rs": "36c36a5ff9b1da5a926ca5ed82c4de7258c7fc9b78341613a0b12cb459a8589b",
+    "crates/canvas/pictograph/src/canvas/edge_cells.rs": "855399ff09ef58faf56280f157735825140ef0bfc15a180c6222c1d36ceadb4f",
+    "crates/canvas/pictograph/src/canvas/physics_catalog.rs": "045f88ea499b5eccbb55e4e08b586f279f8e4ff9d4804b9b104cd2e102ce00d0",
+    "crates/canvas/pictograph/src/canvas/relationship_topology.rs": "c5987e4f6faffb5ae5365560b787f8cc70dd3ca19c29192b5267dabf190d1af6",
+    "crates/canvas/pictograph/src/canvas/relationship_topology_tests.rs": "696a7c0c80ecdc8056f8d621e0f5a713f4845115f1193255db2162e6743a16df",
+    "crates/canvas/pictograph/src/canvas/roles.rs": "8ddb9b8bbb27b464472716764eb1c7e64fda4c039d693532dcc10472e3e34371",
+    "crates/canvas/pictograph/src/canvas/seiche_bridge.rs": "647995d388dc67e1deb912f3d72513d981ac7c9ff6915ae8f84e410190872075",
+    "crates/graph/graph-kernel/src/graph/query.rs": "096b1cd2323541f862aba8e8025484d1b5264c70021c229d777d5397f8fa29e6",
+    "ports/graphshell/docs/receipts/relationship_dynamics_20261011/harness/Cargo.lock": "3b1553a0c2b371d54d3624e0e8683123b89d1fb03e5d54dd86dd6289125601c5",
+    "ports/graphshell/docs/receipts/relationship_dynamics_20261011/harness/Cargo.toml": "4c1ae2bd4384c149422f4b20df07e8deade47285fa654afb17d2c5913c7f7ca8",
+    "ports/graphshell/docs/receipts/relationship_dynamics_20261011/harness/src/lib.rs": "94526b4d3c3bec7396d3570b6a0c1b7ea78a9a99451be59a9f5b9aab6e4e82f7",
+    "ports/graphshell/src/access_inspection.rs": "d6d27835e79071a2bf1e562975c6458af40365c57c44c735782ad5e213d551c7",
+    "ports/graphshell/src/link_inspection.rs": "7412f8b83fa0ccc06319e368dc4d7eb546aa85e8f11ff41c70ef3e4ec9355cf4",
+    "ports/graphshell/src/link_inspection/tests.rs": "bdfb9e58b7a7ff693d04e3bf7551aa51a33f8d3e94148ad724b88aca15aadef8",
+    "ports/graphshell/src/presentation_binding.rs": "665d48ae089fa82dfd9332cd47a0014eecf5f7b88ab1afbbaea77fed9060af0d",
+    "ports/graphshell/src/presentation_binding_tests.rs": "37de5ab11d22e447b6fc384173d605ef08e1fa3ecdf0b2ccc98dbc9ec7290f2a",
+    "ports/graphshell/src/presentation_editor.rs": "36859c843a47a11428c5b5d4d549cf8568323245d0bb45a107d8a519404aebd5",
+    "ports/graphshell/src/presentation_editor_tests.rs": "039239a188a15b057926da5d2024fb1e74ef3c39f9f3e00ff16eae5d11174541",
+    "ports/graphshell/src/web_tree.rs": "310214ba9e767f241573c6d21c74bf9a87d86ece4ab796994d556d82762eb2de",
+    "ports/graphshell/src/web_tree/dynamics_inspection.rs": "a340b752019f6fda59bb2f91ea87d7fa999af441ea2b4f7eb47dc1134b31e388",
+    "ports/graphshell/src/web_tree/inspection.rs": "16eef52488e20ba18c2096bceec5dc9527c12e1bba210bee3bea3baae32da8df",
+    "ports/graphshell/src/web_tree/lane.rs": "612167ed9ea4310f9143fd7aca751d40b960b8a6ad96d684a97f24dd7b71afc7",
+    "ports/graphshell/src/web_tree/link_inspection.rs": "d253bbfd26c98fd13d7bba166ba31a37e2fbfda43bf8cbd6659583d412ba6015",
+    "ports/graphshell/web/Cargo.lock": "9fcf67c9f396e1b6b3b5ca29490683bccc897ec69d5928b95e1dbc0d85f48da3",
+    "ports/graphshell/web/Cargo.toml": "723ebabab9f033336c9d0cc1edd7938896b04afcde0c87e3d5a82315d96fb22f",
+    "ports/graphshell/web/scenarios/p4_tree_dynamics_inspection.scn": "61b109ad341eb95005e4a13157efe1502b6a52612efcb715ae864f94316aa308",
+    "ports/graphshell/web/scenarios/p4_tree_dynamics_inspection_reopen.scn": "b90331f2420761eaeff84405f48c7641ba5008912edd2b7392fe35ed416ee6e7"
+  },
+  "check_sha256_raw": {
+    "checks/native.log": "4ee7493cedef0584e78bd8c24a294286291e2c467a021b5a3fe66671388fb339",
+    "checks/product-check.log": "94026ec320d54a6b99ada2b92036e7a7a87fa3edd929585e6b23272af71da015"
+  },
+  "raw_log_sha256": {
+    "native.log": "93a10aa1e288d012040170403713450a77690160d692521d25cba1a6b0a3dd6e",
+    "product-check.log": "94026ec320d54a6b99ada2b92036e7a7a87fa3edd929585e6b23272af71da015"
+  }
+}

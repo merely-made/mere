@@ -1128,7 +1128,7 @@ answer and the choice is Mark's.
 
 **Status:** owner-authorized direction; catalog and executable suite foundation
 implemented and validated locally; retained-repair and bounded signed-object
-owner receive prototypes implemented;
+owner receive prototypes implemented, including a real local QUIC handoff;
 later integration and qualification open. Mark prefers published standards for covered behavior and asked
 for orchestration, the useful specification scope, prior art and a WPT-like
 testing set. This section is the canonical cross-repository research record.
@@ -1318,8 +1318,32 @@ refusals and in-process store reopen. Exact record/header/body bytes and the
 operation ID are preserved; the record digest and generation identities retain
 their separate purposes. The example records codec, processor and domain
 refusals without adding an admission owner. It transfers job metadata, not
-referenced blobs or worker execution. Live carrier composition is the next
-bounded step; wider evaluation remains deferred until stable contracts.
+referenced blobs or worker execution. The QUIC continuation below now composes
+a real carrier; wider evaluation remains deferred until stable contracts.
+
+**2026-10-11 real carrier continuation:** the same example now has an explicit
+`--carrier quic` path using production `P2pandaTransport` over p2panda-net/iroh.
+Stickleback's generic object-stream leaf preserves opaque bytes, caps declared
+length before allocation and requires complete payload plus clean FIN within
+one deadline. The receiver checks protocol and authenticated transport peer,
+then freshly decodes the operation and calls the same mesh admission owner.
+The chosen expected mesh and inner author remain separate from carrier facts.
+A compact acknowledgement follows the owner's result and binds record digest
+and operation ID; sender receipt is reported separately from local admission.
+
+The [example guide](../crates/mesh/mesh/examples/retained_receive/README.md) owns
+the bounds and reproduction command; its
+[QUIC report](../crates/mesh/mesh/examples/retained_receive/quic-handoff-exploration-20261011.json)
+owns the source/executable identity and observations. The finite host permits
+one in-flight exchange, at most 12 attempted sessions, 16 KiB objects, 2 KiB
+acknowledgements, 64 KiB of request frames and 128 KiB reserved request/reply
+frames. Refusals count before dialing. It observes actual encrypted loopback
+QUIC, unchanged signed bytes, insertion/duplicate/domain refusals, three
+pre-owner framing refusals and valid subsequent handoffs. Loopback peer routes
+and active paths are checked; endpoints retain production bind defaults.
+Production global session admission, additional carriers and cross-host/device
+integration remain later composition work. Modeled radio opportunities do not
+acquire physical throughput evidence from this local IP handoff.
 
 ### MemoryLAN: adapt inventory policy and keep a baseline
 

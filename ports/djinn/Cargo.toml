@@ -51,6 +51,7 @@ distillery-chronicle-receipt-host = [
 
 [dependencies]
 blake3.workspace = true
+chatelaine.workspace = true
 # The one crate allowed to link castellan (dramatis repo plan, D4, D16).
 # `os-presence`: the resident's own unlock prompt asks Windows Hello first
 # (vault lock ruling 47); it moved from personae with custody (DR-B).
@@ -256,3 +257,8 @@ harness = false
 name = "dr-c-receipt-host"
 path = "src/bin/dr_c_receipt_host.rs"
 required-features = ["custody-receipt-host"]
+
+[[bin]]
+name = "dramatis-review-host"
+path = "src/bin/dramatis_review_host.rs"
+required-features = ["custody-receipt-host", "cxf"]

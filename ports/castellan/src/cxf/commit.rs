@@ -84,6 +84,21 @@ impl Import {
                 return Err(fail(receipt, "destination item store is unavailable"));
             }
         }
+        let mut owners = BTreeMap::new();
+        for destination in destinations.values() {
+            if owners
+                .insert(destination.persona, destination.profile.clone())
+                .is_some_and(|old| old != destination.profile)
+            {
+                return Err(fail(
+                    receipt,
+                    "one item namespace cannot belong to different profiles",
+                ));
+            }
+        }
+        if resident.bind_profiles(&owners).is_err() {
+            return Err(fail(receipt, "item namespace belongs to another profile"));
+        }
         // Source ids are scoped by account, even when accounts choose the
         // same persona. Only items with real stored/quarantined credentials
         // receive an index entry; reference-only inputs never mint an item.

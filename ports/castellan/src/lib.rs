@@ -86,6 +86,8 @@ pub mod items;
 pub mod lock;
 pub mod otp;
 pub mod resident;
+#[cfg(feature = "cxf")]
+pub mod review;
 #[cfg(feature = "keeper")]
 mod sealed_storage;
 #[cfg(feature = "secret-service")]

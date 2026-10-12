@@ -1,0 +1,2 @@
+D2 coverage: 261/262 active; 186 legacy + 227 supplemental (56 superseding legacy, 88 superseding earlier batches); 95 inactive legacy, 96 inactive supplemental
+error: active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_producer_gates/README.md

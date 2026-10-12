@@ -7,7 +7,7 @@
 //! Consume parsed CXF allocations without formatting credential values.
 use credential_exchange_format::*;
 use zeroize::Zeroize;
-pub(super) trait Erase {
+pub(crate) trait Erase {
     fn erase(self);
 }
 impl Erase for String {

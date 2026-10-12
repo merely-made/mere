@@ -53,6 +53,7 @@ pub const CUSTODY_APPS: &[&str] = &[
     "distillery",
     "signalman",
     "personae-vault",
+    "dramatis",
 ];
 
 /// Grant the custody route to [`CUSTODY_APPS`].
@@ -287,6 +288,74 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
         }
     }
     match call {
+        CustodyCall::LockVault => {
+            keeper.host().lock_vault().map_err(refused)?;
+            Ok(CustodyAnswer::Done)
+        },
+        CustodyCall::UnlockNative => tokio::task::spawn_blocking(move || keeper.unlock_native())
+            .await
+            .map_err(failed)?,
+        CustodyCall::UnassignedImports => {
+            #[cfg(feature = "cxf")]
+            {
+                unlocked(&keeper)?;
+                keeper
+                    .unassigned_imports()
+                    .map(|imports| CustodyAnswer::UnassignedImports { imports })
+            }
+            #[cfg(not(feature = "cxf"))]
+            {
+                Err(CustodyRefusal::NotServed)
+            }
+        },
+        CustodyCall::AssignImport(request) => {
+            if app.as_str() != "dramatis" {
+                return Err(CustodyRefusal::NotServed);
+            }
+            #[cfg(feature = "cxf")]
+            {
+                unlocked(&keeper)?;
+                tokio::task::spawn_blocking(move || keeper.assign_import(request))
+                    .await
+                    .map_err(failed)?
+            }
+            #[cfg(not(feature = "cxf"))]
+            {
+                let _ = request;
+                Err(CustodyRefusal::NotServed)
+            }
+        },
+        CustodyCall::Quarantine { profile } => {
+            #[cfg(feature = "cxf")]
+            {
+                unlocked(&keeper)?;
+                keeper
+                    .quarantine(&profile)
+                    .map(|cards| CustodyAnswer::Quarantine { cards })
+            }
+            #[cfg(not(feature = "cxf"))]
+            {
+                let _ = profile;
+                Err(CustodyRefusal::NotServed)
+            }
+        },
+        CustodyCall::ReviewQuarantine(request) => {
+            if app.as_str() != "dramatis" {
+                return Err(CustodyRefusal::NotServed);
+            }
+            #[cfg(feature = "cxf")]
+            {
+                unlocked(&keeper)?;
+                tokio::task::spawn_blocking(move || keeper.review_quarantine(request))
+                    .await
+                    .map_err(failed)?
+            }
+            #[cfg(not(feature = "cxf"))]
+            {
+                let _ = request;
+                Err(CustodyRefusal::NotServed)
+            }
+        },
         CustodyCall::VaultCommand {
             profile,
             command,
@@ -472,6 +541,12 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
 fn call_name(call: &CustodyCall) -> &'static str {
     match call {
         CustodyCall::VaultCommand { .. } => "vault_command",
+        CustodyCall::UnlockNative => "unlock_native",
+        CustodyCall::UnassignedImports => "unassigned_imports",
+        CustodyCall::AssignImport(_) => "assign_import",
+        CustodyCall::LockVault => "lock_vault",
+        CustodyCall::Quarantine { .. } => "quarantine",
+        CustodyCall::ReviewQuarantine(_) => "review_quarantine",
         CustodyCall::Status => "status",
         CustodyCall::Roster => "roster",
         CustodyCall::ChooseProfile { .. } => "choose_profile",

@@ -203,6 +203,9 @@ pub use physics_device::{PhysicsDevice, physics_device_for};
 /// and groups. (Dynamics grammar plan, G3.)
 pub mod composition;
 mod dynamics_record;
+pub mod relationship_topology;
+mod dynamics_inspection;
+pub use dynamics_inspection::{DynamicsInspection, DynamicsTarget, MemberDynamics};
 /// The dynamics spec over this catalog: seiche's portable spec, with the
 /// laws and overlays as its presets. (Dynamics grammar plan, G4a.)
 pub mod dynamics_spec;

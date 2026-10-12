@@ -451,6 +451,16 @@ the integrated main pre-edit baseline, retaining 252/260 coverage and ten
 existing D2 errors. Added local links and anchors resolve; whitespace checks
 pass. No active Markdown document or parser-shaped audit record was added.
 
+**Forme feedback and Chrome field inspection (2026-10-11):** Target-local
+split and tab-stack feedback now shares the drop resolver's original bounds
+and action. Nine Forme session tests, the product Wasm build and viewer-only
+check pass. Six Chrome scenarios and fifteen reviewed captures qualify the
+recorded `eb804d07` Rust source, with `eac1524f` correcting the scenario's
+Escape key spelling. The collected failing spelling run is retained. The
+field fixture's two pages establish exact records and retained IndexedDB
+reopen; inspector spacing and focus/scroll polish remain open. Subsequent
+integration checks are separate from this browser source receipt. See the
+Scenograph and field owner continuations; no active document identity is added.
 
 **Declarative rule editor draft (2026-10-11):** Mark authorized continuing the
 published draft sequence and requested an upstream adoption check. Current main
@@ -487,3 +497,24 @@ Markdown or parser-shaped judgment record is added or altered by this lane.
 Complete before/after citation and D2 JSON reports match the integration-base
 baseline: 260/261 D2 coverage and the same two existing errors. Whitespace checks
 pass. The remaining acceptance gates are recorded in the existing owner plan.
+
+
+**Relationship/dynamics inspection draft (2026-10-11):** Mark chose this next
+draft and authorized “Sure. Go ahead”. Published `ec1e65ca` is integrated;
+upstream Forme/field qualification and occurrence-relationship dynamics remain
+at their recorded limits. A shared relation-cell input seam supplies the
+existing bridge and inspector without changing input weighting. Exact targets,
+source handles, current versus authored dynamics, position pins, role policy,
+installed arrangement constraints and Forme holds are disclosed separately.
+The current kernel's statement-row multiplicity is preserved. Thirty-eight
+portable checks and the product wasm check pass; Canvas native and headed gates
+remain open. Measured contributions and missing derivation evidence are not
+fabricated. The existing owner records the two-page/four-capture handoff and
+remaining adapters; no active Markdown or parser-shaped judgment is added.
+
+Complete citation and D2 reports match a controlled comparison with integrated
+published `578c8e36`: only this lane's three document edits were substituted,
+with source files and upstream receipts fixed. The baseline is 261/264 D2
+coverage and four existing errors, including the two newly published renderer
+receipt documents. Whitespace passes. New receipt logs preserve raw bytes and
+text-source hashes normalize CRLF to LF for portable qualification.

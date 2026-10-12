@@ -1,0 +1,12 @@
+{
+  "driver_reset" : false,
+  "elapsed_seconds" : 0.043736934661865234,
+  "executed" : true,
+  "harness" : false,
+  "node_limit" : 2048,
+  "permission_prompt" : false,
+  "scope" : "actual macOS AX server tree and actions for one explicitly owned PID",
+  "status" : "permission_unavailable_no_prompt_no_actions",
+  "timeout_seconds" : 20,
+  "trusted" : false
+}

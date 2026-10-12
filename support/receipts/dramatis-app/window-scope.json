@@ -1,0 +1,203 @@
+{
+  "base": "234a8dae742eb83d5a643b81c9f3dd3be1c96a61",
+  "commands": [
+    {
+      "name": "app-build",
+      "command": [
+        "cargo",
+        "+1.98.1",
+        "build",
+        "-p",
+        "dramatis-app",
+        "--bin",
+        "dramatis-ui",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "C:\\t\\cargo-targets\\mere",
+        "-j1"
+      ],
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "name": "app-state",
+      "command": [
+        "cargo",
+        "+1.98.1",
+        "test",
+        "-p",
+        "dramatis-app",
+        "--test",
+        "state",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "C:\\t\\cargo-targets\\mere",
+        "-j1"
+      ],
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "name": "interaction",
+      "command": [
+        "cargo",
+        "+1.98.1",
+        "test",
+        "-p",
+        "dramatis-app",
+        "--test",
+        "interaction",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "C:\\t\\cargo-targets\\mere",
+        "-j1"
+      ],
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "name": "app-wire-absent",
+      "command": [
+        "cargo",
+        "+1.98.1",
+        "test",
+        "-p",
+        "dramatis-app",
+        "--test",
+        "state",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "C:\\t\\cargo-targets\\mere",
+        "-j1",
+        "--",
+        "--ignored",
+        "--exact",
+        "app_wire_receipt"
+      ],
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "name": "window-absent",
+      "command": [
+        "C:\\t\\cargo-targets\\mere\\debug\\dramatis-ui.exe"
+      ],
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "name": "app-wire-locked",
+      "command": [
+        "cargo",
+        "+1.98.1",
+        "test",
+        "-p",
+        "dramatis-app",
+        "--test",
+        "state",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "C:\\t\\cargo-targets\\mere",
+        "-j1",
+        "--",
+        "--ignored",
+        "--exact",
+        "app_wire_receipt",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "name": "window-locked-860x900",
+      "command": [
+        "C:\\t\\cargo-targets\\mere\\debug\\dramatis-ui.exe"
+      ],
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "name": "window-locked-420x900",
+      "command": [
+        "C:\\t\\cargo-targets\\mere\\debug\\dramatis-ui.exe"
+      ],
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "name": "app-wire-unlocked",
+      "command": [
+        "cargo",
+        "+1.98.1",
+        "test",
+        "-p",
+        "dramatis-app",
+        "--test",
+        "state",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "C:\\t\\cargo-targets\\mere",
+        "-j1",
+        "--",
+        "--ignored",
+        "--exact",
+        "app_wire_receipt",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "name": "window-unlocked-860x900",
+      "command": [
+        "C:\\t\\cargo-targets\\mere\\debug\\dramatis-ui.exe"
+      ],
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "name": "window-unlocked-420x900",
+      "command": [
+        "C:\\t\\cargo-targets\\mere\\debug\\dramatis-ui.exe"
+      ],
+      "exit_code": 0,
+      "expected": 0
+    }
+  ],
+  "source_sha256": {
+    "ports/dramatis/src/lib.rs": "e84d5a63888d348033ab8d88098575c38988eba6cf3091e6b186d102ea309799",
+    "ports/dramatis/src/main.rs": "b5d7b5a88c4b8d46daf2ffbda7a38ac58835f7b2ff637fe4b411e7fe85d100b6",
+    "ports/dramatis/src/views.rs": "29e76445a83397453e6f3c431c35ca85d124738544015e62c9737695969ef0a8",
+    "ports/dramatis/src/worker.rs": "c1608fea821cac4e9f07a6755d5d6050d7cf9b6c4df86cd3d19872306c2a284c",
+    "ports/dramatis/tests/interaction.rs": "85fad736bfc22cc5f59184ee1f1face968724c0a5b68dd5657a7801597de7c51",
+    "ports/dramatis/tests/state.rs": "f147ce72aa23b6723249f675cf938bfde783cc6e3c9da620f49b12a2269e1fed"
+  },
+  "app_executable_sha256": "c3b28390ccf104dbb2ed6fca50005fb8d823ec9000ee753daf2cfe2c4329a0a7",
+  "artifacts_sha256": {
+    "absent.png": "280a84c5253f0152187338b6227d0aece995ded231fd20ae2813f2b5c157bba8",
+    "app-build.log": "b62299adf0e855761aed0bdfd727220cc936a200533696c6a142e1c6c9b6d9a6",
+    "app-state.log": "7724dca2dd42f283b9c0404e0bb7fb2800f0f0f9b7ee7b4eb1fd328fa42fa9a5",
+    "app-wire-absent.log": "9a8700cda9d8f9d2f5f94687768668670c317404e9c66a2e144c26cdc3a8a4b4",
+    "app-wire-locked.log": "3927bbfed540f6dd79f653627f6a2b83dc778c7ffcfecd4df66fe5b61df2050a",
+    "app-wire-unlocked.log": "913b1f8505153de9d65129f61c6c4350cac159f04895e5705d0e3f5c54427b3f",
+    "host-build.log": "67f7dba46912ea60b9bc6006b70855e2c22aaabb0ec4a55e50ecf3069472657d",
+    "host-locked.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "host-unlocked.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "interaction.log": "45634e02eb913c4ac30874edd451665d261593d396838a7711c53597a78c7844",
+    "locked-420x900.png": "ae5d79dc48394a058f1d152478cadf9116bebfe01d06b187b70e3b1ee913306c",
+    "locked-860x900.png": "fafbf263d174f9bfd1edc7101131a680f2402814dbadf824598b1131a37a6304",
+    "unlocked-420x900.png": "e234d7b5464fad696a83d18ed8d335568d75b1160db425dd98c37a3c62a044df",
+    "unlocked-860x900.png": "7db7be1d32bcf5243ac976b29c0e8f7cba091ca0932d86f76dba427c0e7da4fc",
+    "window-absent.log": "6aab66f73f46e5510af7c1ce27d131b7603a4ab4e0cd5fade160909fd2b1e8ca",
+    "window-locked-420x900.log": "6aab66f73f46e5510af7c1ce27d131b7603a4ab4e0cd5fade160909fd2b1e8ca",
+    "window-locked-860x900.log": "6aab66f73f46e5510af7c1ce27d131b7603a4ab4e0cd5fade160909fd2b1e8ca",
+    "window-unlocked-420x900.log": "6aab66f73f46e5510af7c1ce27d131b7603a4ab4e0cd5fade160909fd2b1e8ca",
+    "window-unlocked-860x900.log": "6aab66f73f46e5510af7c1ce27d131b7603a4ab4e0cd5fade160909fd2b1e8ca"
+  }
+}

@@ -281,6 +281,14 @@ impl Canvas {
             .map(|(_, p)| *p)
     }
 
+    pub(crate) fn arrangement_pin_installed(&self, key: NodeKey) -> bool {
+        self.roles.pinned.contains(&key)
+    }
+
+    pub(crate) fn arrangement_axis_locks(&self) -> seiche::Axes {
+        if self.roles.encoded == seiche::Axes::BOTH { seiche::Axes::NONE } else { self.roles.encoded }
+    }
+
     /// Realize the roles over the active arrangement: pinned items kinematic
     /// at their positions, anchored items on springs while playing, seeded
     /// items left alone. With no arrangement nothing is held but explicit pins.
@@ -320,9 +328,7 @@ impl Canvas {
             }
         }
         self.roles.pinned = pinned;
-        let held = if self.roles.encoded == seiche::Axes::BOTH {
-            seiche::Axes::NONE
-        } else { self.roles.encoded };
+        let held = self.arrangement_axis_locks();
         self.physics.set_axis_locks(self.view.positions().map(|(key, _)| (key, held)).collect());
         let force = (playing && !anchors.is_empty())
             .then(|| seiche::AnchorSpring::new(anchors).with_stiffness(self.roles.stiffness));

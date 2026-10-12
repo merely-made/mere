@@ -36,7 +36,7 @@ eidetic concern. It does **not** re-derive the eidetic stack or the front-end.
   candidate-set enrichment alone; this plan unifies it with the live recorder,
   provenance, and consent so all four ride one record written from the first
   traversal.
-- [Eidetic Deferred Phases](../../eidetic_docs/implementation_strategy/2026-06-09_eidetic_deferred_phases_plan.md)
+- [Eidetic Deferred Phases](../2026-10-11_superseded_plans/2026-06-09_eidetic_deferred_phases_plan.md)
   — Phase 9 **consume half** (federated index merge) reads the federatability
   class this plan's C4 sets.
 - [Graph Projections Research](../../mere_docs/research/2026-06-22_graph_projections_research.md)

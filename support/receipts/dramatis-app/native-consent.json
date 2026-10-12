@@ -1,0 +1,79 @@
+{
+  "platform": "Windows native MessageBox",
+  "synthetic_only": true,
+  "observed": [
+    {
+      "default_button_id": 7,
+      "answer": "deny",
+      "owner_process": "dramatis-review-host",
+      "title": "Djinn \u00b7 Quarantine review",
+      "contents": [
+        "&Yes",
+        "&No",
+        "",
+        "Persona: family\nReview: Personal payment card (import store family)\n\nPermanently delete this quarantined item?\nThis decision is made by Djinn."
+      ],
+      "button_id": 7,
+      "command": [
+        "cargo",
+        "+1.98.1",
+        "test",
+        "-p",
+        "dramatis-app",
+        "--test",
+        "state",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "C:\\t\\cargo-targets\\mere",
+        "-j1",
+        "--",
+        "--ignored",
+        "--exact",
+        "native_consent_receipt",
+        "--nocapture"
+      ]
+    },
+    {
+      "default_button_id": 7,
+      "answer": "approve",
+      "owner_process": "dramatis-review-host",
+      "title": "Djinn \u00b7 Quarantine review",
+      "contents": [
+        "&Yes",
+        "&No",
+        "",
+        "Persona: family\nReview: Personal payment card (import store family)\n\nPermanently delete this quarantined item?\nThis decision is made by Djinn."
+      ],
+      "button_id": 6,
+      "command": [
+        "cargo",
+        "+1.98.1",
+        "test",
+        "-p",
+        "dramatis-app",
+        "--test",
+        "state",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "C:\\t\\cargo-targets\\mere",
+        "-j1",
+        "--",
+        "--ignored",
+        "--exact",
+        "native_consent_receipt",
+        "--nocapture"
+      ]
+    }
+  ],
+  "artifacts_sha256": {
+    "native-approve.log": "898d6c25556f7218013006e51919b798f26e9d3e66788785bb0b22b17ed3aef8",
+    "native-consent-approve.png": "860867b2e294ee77d6dbc5f41b029d7eddd636ecf72342bb88c8e2d0cd051015",
+    "native-consent-deny.png": "860867b2e294ee77d6dbc5f41b029d7eddd636ecf72342bb88c8e2d0cd051015",
+    "native-consent.json": "0736b73ed6a08cb29d6b3117d5cb742ec189e039b1c63e8caff6d747d6b667c3",
+    "native-default-build.log": "27e30a3432931135bba79a782a117130a6fc2e14897544865f47ac84e0157bd5",
+    "native-deny.log": "00f87838e6d32ae432e21020c66744fbb9127cacb3d41df23718932ddbea8614",
+    "native-host.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

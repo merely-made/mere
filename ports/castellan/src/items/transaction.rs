@@ -179,7 +179,7 @@ impl<'a> Transaction<'a> {
     }
 
     /// Rewrite an indexed item's metadata. Its payloads are untouched.
-    #[cfg(feature = "secret-service")]
+    #[cfg(any(feature = "secret-service", feature = "cxf"))]
     pub(crate) fn save_metadata(&self, item: Item) -> Result<Item, ItemStoreError> {
         let record = StoredItem::new(self.store.persona, item);
         self.store
