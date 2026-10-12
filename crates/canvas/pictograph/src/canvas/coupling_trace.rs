@@ -30,6 +30,7 @@ mod tests {
     use super::*;
     use kernel::geometry::PortablePoint;
     use kernel::graph::apply::{GraphDelta, apply_graph_delta};
+    use kernel::graph::fixtures::GraphFixtures;
     use kernel::graph::{
         Coupling, CouplingId, CouplingResponse, Field, FieldDefinition, FieldId, Graph,
         NodeSelector, VectorField,

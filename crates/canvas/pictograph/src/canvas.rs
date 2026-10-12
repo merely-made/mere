@@ -157,10 +157,10 @@ mod area_share;
 /// they are canvas glue (numen fields over placed nodes) that had been parked
 /// in the intel tier, where nothing consumed them.
 pub mod canvas_search;
+mod coupling_trace;
 mod edge_cells;
 pub mod field_bridge;
 mod fields;
-mod coupling_trace;
 mod forme_region;
 pub use forme_region::{FormeCell, FormeRegion};
 pub use canvas_search::CanvasSearchSurface;
