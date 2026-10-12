@@ -328,7 +328,7 @@ genet's `design_docs/`, not here.
   rate-limit before rollout. Turnstone has no notification concept (its
   `AppEvent` stream is telemetry for the a11y and app arms).
 - **Dead code**: `ToastSpec` / `ToastSeverity` / `FrameViewModel.toasts` at
-  `crates/shell/chrome/src/frame_model.rs:404-416` *(historical citation)* <!-- doc-audit: historical-path -->, egui/iced-era, no producer,
+  `crates/shell/chrome/src/frame_model.rs:404-416`, egui/iced-era, no producer,
   no consumer. A code ruling.
 
 ### From graph_object_roster_detail_cards (model migrated, views deleted)
@@ -347,7 +347,7 @@ genet's `design_docs/`, not here.
 
 ### From kith_capability_sharing (gate cleared 2026-08-09, never started)
 
-- **Owed by name**: `crates/mesh/mesh/src/lease.rs:22-26` *(historical citation)* <!-- doc-audit: historical-path --> — "the kith plan,
+- **Owed by name**: `crates/mesh/mesh/src/lease.rs:22-26` — "the kith plan,
   which widens the ring beyond one owner, has to revisit it"; gemot is still
   at the ring rule with capability gating a later milestone. **Re-scope onto
   the shipped vocabulary** — `servitor::cap` (`crates/servitor/src/cap.rs`, `Cap::{Power,Scope,Facet}`),
@@ -1115,7 +1115,7 @@ Archived as [2026-10-06_completed_plans/2026-06-26_capture_provenance_consent_pl
   disabled and opt-in, as Graphshell's policy is) — with the gate, to both
   owners.
 - **Phase 9 federation promotion and consumption** — carried by the
-  [eidetic deferred phases plan](../../eidetic_docs/implementation_strategy/2026-06-09_eidetic_deferred_phases_plan.md).
+  [Eidetic development plan P6](../../eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md#p6-qualify-storage-custody-retention-and-exchange).
 - **Forget's provenance cleanup** — here.
 - **C3's excerpt, summarize and generated-node cases** — here.
 - **The plan's other open questions**: the legality policy for federating a
@@ -1387,8 +1387,10 @@ Archived as [2026-10-06_completed_plans/2026-08-22_redb_opfs_feasibility_plan.md
 - **Whether adoption requires the adapter to implement `Backend::transact`**
   (muniment gained it in `9ba9f790`, defaulting to `NotTransactional`), its
   S14 question: yes, adoption requires it; or the default is acceptable for
-  this backend — here, for the pass. The eidetic deferred phases plan's Phase 7 touches this area
-  but does not plainly own it.
+  this backend — here, for the pass. The
+  [Eidetic development plan P6](../../eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md#p6-qualify-storage-custody-retention-and-exchange)
+  now owns the consumer/backend requirements and retains this transaction
+  decision as an explicit checkpoint before adoption.
 
 #### From intel_vector_index_burn_lift (the mere-side twin)
 

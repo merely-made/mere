@@ -1,0 +1,9 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+Verified C:\Users\mark_\Code\worktrees\mere-dramatis-review: cargo 1.98.1 (797e8a9bc 2026-08-05); lock sha256=9e7982eaefe3c67359c0043f215d0ae4e0547ec90b45a0d61400cfb5f8715d39; packages=1614

@@ -11,7 +11,7 @@ Date: 2026-09-08
 - `DocumentSession` supplies `pump(now_ms)` and `settled()` at
   `components/shared/document-session-api/src/session_engine.rs:852-858`.
 - Ortet calls `session.pump(now_ms)` before `frame()` and requests another
-  redraw while `!session.settled()` at `ports/ortet/src/shell.rs:382-467`.
+  redraw while `!session.settled()` at `genet/ports/ortet/src/shell.rs:382-467`.
 - The runtime supplies `next_timer_delay`, `pump_workers`, and
   `has_worker_work`; dropping a runtime calls worker shutdown. The inspected
   Livery document pump advanced timers, microtasks, DOM capture and GC, while

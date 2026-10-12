@@ -450,3 +450,50 @@ capture or other agent review is inferred. Full citation and D2 audit JSON equal
 the integrated main pre-edit baseline, retaining 252/260 coverage and ten
 existing D2 errors. Added local links and anchors resolve; whitespace checks
 pass. No active Markdown document or parser-shaped audit record was added.
+
+**Forme feedback and Chrome field inspection (2026-10-11):** Target-local
+split and tab-stack feedback now shares the drop resolver's original bounds
+and action. Nine Forme session tests, the product Wasm build and viewer-only
+check pass. Six Chrome scenarios and fifteen reviewed captures qualify the
+recorded `eb804d07` Rust source, with `eac1524f` correcting the scenario's
+Escape key spelling. The collected failing spelling run is retained. The
+field fixture's two pages establish exact records and retained IndexedDB
+reopen; inspector spacing and focus/scroll polish remain open. Subsequent
+integration checks are separate from this browser source receipt. See the
+Scenograph and field owner continuations; no active document identity is added.
+
+**Declarative rule editor draft (2026-10-11):** Mark authorized continuing the
+published draft sequence and requested an upstream adoption check. Current main
+`a1acb6b9` retains the Forme Chrome fixes/qualification, newer render-stack
+releases and documentation repairs; the repeated fetch found no subsequent
+field/rule implementation to reconcile. The retained rule editor reuses
+Scenograph's declarative model with editable target/condition/effect rows,
+private draft undo/discard, disclosed context decision traces and acknowledged
+saved undo/redo. An atomic backend transaction refuses stale workspace saves;
+no graph/source/content/selection/Forme state enters its snapshots. Preview
+samples remain explicit and canvas effect/live-input adoption stays open.
+Nine actual-source native tests pass through the committed standalone harness,
+and the locked product wasm check passes under the S-PC memory cap. Two
+retained-origin scenarios/captures are prepared but not run here. The owning
+plan records actual IndexedDB, focus/narrow input, theme, conflict/failure,
+record/transaction costs and live renderer adapter gates. Citation and D2 audit
+JSON equal this pass's integrated-main pre-edit baseline: 260/261 D2 coverage,
+two existing errors (snapshot digest and the producer receipt's missing record).
+No active document, judgment identity or claim aggregate was added or changed.
+
+
+**Exact-occurrence presentation continuation (2026-10-11):** Mark's direct-main
+draft authorization continues from published `e56f7a3f`. Current access, exact
+assertion/displayed-pair, Numen and Forme bindings disclose their held facts and
+available state; unknown negated state/measurement cannot become a spurious
+match. Retained preview targets never retarget through selection or equal
+addresses. Saved-rule opt-in realizes Forme subdivisions only, with acknowledged
+history and unsupported effects explained. The source-hashed receipt records
+31 actual-source portable tests and the locked product wasm check passing;
+Canvas native execution and the two-page/four-capture headed handoff remain
+open. No later upstream adoption was found at delivery review. No active
+Markdown or parser-shaped judgment record is added or altered by this lane.
+
+Complete before/after citation and D2 JSON reports match the integration-base
+baseline: 260/261 D2 coverage and the same two existing errors. Whitespace checks
+pass. The remaining acceptance gates are recorded in the existing owner plan.

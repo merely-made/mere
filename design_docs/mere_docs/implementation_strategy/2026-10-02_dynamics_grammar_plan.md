@@ -987,7 +987,7 @@ multiple assertions; choosing a richer explanation seam remains design work.
 - 2026-10-03 (G2, F37): both web UIs gain a Groups picker over the kind sources (the tree's `web_tree/physics.rs`, the page's `component.html` and `web_product.rs`), and `SavedSceneV1` gains `physics_group_source` with a serde default of site (`ports/graphshell/src/product.rs`); a scene saved before reads site (`saved_scene_physics_fields_default_and_round_trip`), and a chosen source round-trips. The tree snapshot reports `physics-group-source` and `panel-group-source`.
 - 2026-10-03 (G2, the arXiv fixture; F39, F42, F43): the purity receipts move to `crates/canvas/pictograph/src/canvas/tests/data/arxiv_topics.tsv` (900 titles, 150 in each of astro-ph.GA, cs.CL, q-bio.NC, econ.GN, cond-mat.mes-hall and math.PR; SHA-256 `942a7716…`, checked before the commit), committed with the coordinator's provenance note and read at compile time (`include_str!`), native tests only, since no wasm test uses it. `.gitattributes` pins the directory `text eol=lf` so a Windows checkout keeps the hashed bytes, and `LICENSES.md` carries a Retained-licenses row (G2 fork 10). The 32-title fixture stays for the wiring receipts that need sites and structure, which a flat title list lacks. On the arXiv list, site and structure are the two degenerate partitions: every title is on `arxiv.org` (one group, F 0.286) and no title links another (every title alone, F 0.013). The lexical fallback, at the recorded tuning (top-k 4, floor 0.1), scores purity 0.383, inverse purity 0.290 and F 0.330 in 11 groups, against 0.184 on shuffled categories, so it beats all three controls, site narrowly (`arxiv-lexical.log`, release). Its sweep's best is F 0.374 at top-k 16, floor 0.15 (G2 fork 11).
 - 2026-10-03 (G2, F34 on arXiv): MiniLM, at the recorded tuning (top-k 4, floor 0.15), gives purity 0.874, inverse purity 0.800 and F 0.836 in 8 groups on the host's GPU, against 0.213 on shuffled categories. On the CPU the partition is identical (3 130 pairs each). The bar of F ≥ 0.9 fails, and the receipt keeps asserting it (`meaning-device-arxiv.log`, release; G2 fork 12). The sweep, over vectors embedded once on the GPU: the floor barely matters (titles in one category sit above 0.4 of their neighbours), and top-k drives F: 0.768, 0.836, 0.850 and 0.870 at k = 2, 4, 8 and 16. At k = 32 with a floor of 0.2 or less, F is 0.900, with purity and inverse purity both 0.900 (810 of 900) in 6 groups: exactly on the bar, with no margin. At k = 64 it is 0.899 (`meaning-device-arxiv-sweep-2.log`). The single-device receipt holds on this fixture: `Existing(0)`, 86.1 MiB on the host's client, the control device moving it by 0 bytes. The first GPU run on a cold CubeCL autotune cache took 48.5 s (`meaning-device-arxiv.log`). With the cache warm it took 2.6 s, with 123 frames drawn meanwhile (median 14.6 ms, slowest 36.7 ms) once the canvas was warmed first. The 900-node canvas's first frame takes 3.3 s, which is what the cold run's 2.39 s slowest frame was, and a run landing inside it had hidden the in-flight frames (the receipt now warms the canvas before dispatching). A second content took 3.6 s, and the CPU model's load and run took 46 to 66 s.
-- 2026-10-03 (G2, Knot): `knot-editor` calls `esp::embed::bert::load_wgpu(&weights.path)` (`crates/knot-editor/src/embedding.rs:436`, `embed-bert-wgpu`), so the signature G2 ruled breaks Knot when Knot repins mere's ESP past `9310518b` (G2 fork 13). No Knot code was touched.
+- 2026-10-03 (G2, Knot): `knot-editor` calls `esp::embed::bert::load_wgpu(&weights.path)` (`repos/knot-editor/crates/knot-editor/src/embedding.rs:436`, `embed-bert-wgpu`), so the signature G2 ruled breaks Knot when Knot repins mere's ESP past `9310518b` (G2 fork 13). No Knot code was touched.
 - 2026-10-03 (G2, the web page's boot): two attempts to read the 2 000-node run's step count on the web (a temporary scenario of failing asserts) died at boot. wgpu's WebGPU backend panicked ("Unexpected error", `wgpu-30.0.0/src/backend/webgpu.rs:85`), and then the module trapped. The same bundle had passed six cost runs and the eleven receipts minutes before; the panicked run is kept as `Code/testing/mere/grammar-g2/scenarios/zz_g2_meaning_steps-webgpu-panic`. Not this lane's code by any evidence found, and not verified either way.
 - 2026-10-04 (G2, the merge of main `fdb1f5df`): twenty files changed on both sides, and each weave result was compared with `git merge-file`'s three-way merge of the same base (`32651b01`). Sixteen matched. In two, weave dropped main's lines without a conflict marker: in `pictograph/src/canvas.rs` it reported a conflict, wrote no markers and lost main's `OverlayRefusal` re-export, and in `ports/graphshell/src/canvas_physics.rs` it lost main's `SETTLED_ARRANGEMENT` re-export outside its conflict block. merge-file's results were taken there and in two cosmetic cases (`58db893d`'s message lists each). `bd119a69` (the plan only) merged as `f993c863`, weave's result equal to merge-file's.
 - 2026-10-04 (G2, the partition's resolution; F50): Louvain's modularity gains a resolution γ (Reichardt and Bornholdt): a move's gain is `w_ic − γ·Σ_tot·k_i / 2m` (`pictograph/src/signals/community.rs` lines 93 and 127–130), reached through `community_louvain_on_snapshot_at` (line 217); `community_louvain_on_snapshot` is it at 1. `MeaningParams` gains `resolution` (`canvas/meaning.rs` line 86), 1 in both recorded tunings, and the Meaning job's partition reads it (`canvas/meaning_job.rs` line 203). At 1 the partition equals classical Louvain's on the same pairs; on the topic fixture, γ 0.2, 1 and 3 give 1, 5 and 9 groups over unchanged pairs (`the_partitions_resolution_is_one_by_default_and_moves_the_partition`, the control).
@@ -1493,3 +1493,68 @@ baseline and whether it also rewinds animation/scripted state remain design
 questions. Coordinate reset, simulation reset and content/source undo must
 not be silently conflated. This is a consumer-control correction, not a new
 F ruling, changed force-composition policy or a qualification of B1.
+
+## Relationship consumer qualification (2026-10-11)
+
+Mark authorized taking up the fixture-only relationship-adapter gap. During this
+continuation, Knot published the production consumer at `195758b`, with final
+runtime `552640f` and its [qualification receipt](https://github.com/merely-made/knot-editor/blob/1674d6d/docs/receipts/2026-10-11_live_dynamics/README.md).
+The consumer pins Mere `3a8f3813` and Genet `4bc75583` coherently. It invokes
+`ProjectionDynamics::new_relationship` with exact compiled occurrence mappings,
+disclosed endpoints and independent occurrence roles. Repeated source references
+remain distinct bodies; transient controller edges create no kernel assertions.
+
+Knot owns session controls and display mapping. Slots, occurrence roles and
+authored traces survive signed/encrypted retention; running poses, clocks and
+controller handles do not. Hidden scenes pause without automatic resume. The
+host's explicit bounded spring choice is a shared 120-frame schedule; F202's
+editable 60-step comparison default remains a separate host policy. There is no
+implicit conversion of motion into retained source or placement edits.
+
+The recorded macOS qualification has 662 passing workspace tests, final check
+and build, and 15 reviewed native captures. The supplier's five adapter tests
+pass, while its wider canvas receipt has 401 passed, one reproduced untouched
+baseline topic-radial golden failure and 18 ignored. These counts belong to
+their recorded sources and platforms; they are not an all-green stack claim.
+
+The [Windows consumer review at Knot `9790938`](https://github.com/merely-made/knot-editor/blob/9790938/docs/receipts/2026-10-11_relationship_consumer_review/README.md)
+adds 13 focused dynamics tests, including a real sound disclosure with repeated
+source occurrences, independent roles and an edge-free negative control. The
+complete Windows workspace has 659 passed, zero failed and six platform/existing
+ignored across 44 harnesses. All 15 native Windows captures are reviewed, with
+wide/compact fresh-process reopen and unchanged source bytes. The initial ten
+appearance-test failures are preserved; a test-only navigation repair opens
+Windows' actual View > Appearance menu without changing application behavior.
+
+**Explicit placement ruling:** Mark chose **Preview; keep placement explicitly**.
+The running pose remains session state. Keep placement records the paused or
+finished displayed pose as one undoable authored placement edit; Retain still
+saves that recipe version deliberately. Roles, the dynamics slot, copied
+disclosure and source documents retain their own authority. This does not make
+foreground/background categories into physics roles or reopen shared-force
+policy. The [bounded Knot continuation](https://github.com/merely-made/knot-editor/blob/63aa695/docs/receipts/2026-10-11_keep_motion_placement/README.md)
+is qualified separately from the preceding Windows consumer review: 662 passed,
+zero failed and six ignored across 44 workspace harnesses; 21 reviewed native
+captures. A paused or finished complete occurrence pose is validated atomically
+against the existing trace bound; one Undo restores all prior placement. The
+native digest matches preview, kept, redone, retained and exact-version reopened
+placement. Two executable phases distinguish the Keep runtime from the added
+immutable-item selector/fixture inspection. Known panel cropping and offscreen
+bodies remain visual defects; these passing state/interaction receipts do not
+constitute full visual acceptance or coordinator-owned adoption.
+
+**Review boundary:** Knot uses compiled card footprints in a fixed physics plane,
+then clamps its normalized glyph display to that plane. This is a consumer
+presentation choice, not a physical wall, a glyph collision guarantee or a
+universal scene adapter. Playback advances one fixed tick per eligible frame;
+it is not wall-clock simulation. Field provenance, named channels/groups,
+nonflat scenes, ambient inference and unsupported body forms remain outside this
+binding. The native receipt exposes these limits and keeps authoring guards
+separate from foreground/background paint categories.
+
+**Open gates:** Firefox and the physics coordinator's independent review remain
+open. The Windows Computer Use helper stopped Firefox inspection because URL
+policy enforcement is unsupported for that browser; no browser-policy bypass
+was attempted. Coordinator-owned Mere/Knot and Djinn/Knot-site adoption pins
+remain unchanged. This bounded consumer review introduces no F ruling and does
+not reopen F199's T2/G4b2 work order.

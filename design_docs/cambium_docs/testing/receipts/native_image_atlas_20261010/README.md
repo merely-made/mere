@@ -1,5 +1,8 @@
 # Interleaved image atlas qualification, 2026-10-10
 
+**Status:** Historical receipt at the recorded source revisions. Later stack
+repins require their own qualification.
+
 Maintained Vello `10f01d6d88e94eac087daf033b24895cf97b8e82` preserves the
 resident image atlas when rendering a solid-only or empty scene. The resolver
 begins the resource-cache pass before returning retained dimensions, clearing

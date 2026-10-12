@@ -1,0 +1,16 @@
+RESULT ok
+Upgraded production host presentation preserves draft and selected graph
+captured initial
+captured seed_edited
+captured dark
+captured named
+captured resized
+captured restored_size
+capture initial 2360x1600 digest=a32049e06deeb372 file=/Users/markik/Code/output/vello-producer-gates-20261011/native-presentation-qualified/initial.png
+capture seed_edited 2360x1600 digest=5da3453a4022c972 file=/Users/markik/Code/output/vello-producer-gates-20261011/native-presentation-qualified/seed_edited.png
+capture dark 2360x1600 digest=b8ae422e103f4d0f file=/Users/markik/Code/output/vello-producer-gates-20261011/native-presentation-qualified/dark.png
+capture named 2360x1600 digest=457fac7ac9af85f7 file=/Users/markik/Code/output/vello-producer-gates-20261011/native-presentation-qualified/named.png
+capture resized 1920x1560 digest=f03daa9ded9479f2 file=/Users/markik/Code/output/vello-producer-gates-20261011/native-presentation-qualified/resized.png
+capture restored_size 2560x2200 digest=66d181c1abebe6b0 file=/Users/markik/Code/output/vello-producer-gates-20261011/native-presentation-qualified/restored_size.png
+frames: 6 captured, 0 blank, 6 distinct digests
+presentation: 53 frames, 58 redraws, 5 unpresented redraws

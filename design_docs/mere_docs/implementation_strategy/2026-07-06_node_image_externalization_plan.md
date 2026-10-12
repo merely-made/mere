@@ -11,7 +11,7 @@ yet; Phase 4's done-condition names the meerkat render-perf harness, which left
 with meerkat (`c5f01064`); and Phase 6's re-measure.
 
 Motivated by a measurement: the petgraph-RDF plan's Phase 4
-footprint probe (`crates/probes/rdf-kernel-footprint/` *(historical citation)* <!-- doc-audit: historical-path -->, see that plan's Phase 4
+footprint probe (`crates/probes/rdf-kernel-footprint/`, see that plan's Phase 4
 gate note) found that at 50k nodes the kernel's live heap is **64% inline image
 bytes** (`Node::thumbnail_png` + `Node::favicon_rgba`), dwarfing every other
 category and dwarfing what a term dictionary could reclaim (~1%). This plan moves
@@ -263,7 +263,7 @@ alone.
 
 ### Phase 6 — Re-measure (the receipt)
 
-- Re-run `crates/probes/rdf-kernel-footprint/` *(planned target)* <!-- doc-audit: planned-path --> with images externalized: the
+- Re-run `crates/probes/rdf-kernel-footprint/` with images externalized: the
   probe's "images" category should collapse from ~352 MiB to the reference size
   (~2 MB of `ImageRef`s), moving the graph's live truth footprint at 50k nodes
   from ~553 MiB into the low 200s, with the render cache accounting for the

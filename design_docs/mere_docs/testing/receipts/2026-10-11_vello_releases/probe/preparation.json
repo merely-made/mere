@@ -1,0 +1,14 @@
+{
+  "status": "prepared_not_executed",
+  "mere_workspace": "/Users/markik/Code/worktrees/mere-vello-release-adoption",
+  "mere_root_manifest_sha256": "d35fbfd19cda723b54f8d790362e1a3093b113f784a07b9a9e6186fffc0a7529",
+  "probe_manifest_sha256": "a21ec5f3dfee7882155a0af1bafcb7b6bb3d3d772d5b945f39afdde1505881f1",
+  "probe_main_sha256": "0f82ab4fd6eadca9c0027a6c63cc519b6b4c2b6e656eeb4014f55383bd46692e",
+  "probe_main_byte_identical_to": "/Users/markik/Code/output/vello-cambium-cpu-20261010/probe/src/main.rs",
+  "netrender_revision": "46606610cd387e2e6956d8a3ebbcf442eab210d9",
+  "genet_revision": "cec760f4ae6ce336823bc2be250d9ab4e35a8a47",
+  "vello_provider_revision": "5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a",
+  "scope": "12 production reader and stylesheet preview CPU frames; full producer bundle remains unqualified",
+  "mere_candidate_revision": "e99add00413b97ede6566a16b33045fd302476ee",
+  "netrender_device_patch_revision": "46606610cd387e2e6956d8a3ebbcf442eab210d9"
+}

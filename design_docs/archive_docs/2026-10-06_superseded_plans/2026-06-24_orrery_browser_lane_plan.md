@@ -113,7 +113,7 @@ layer** is the underlay (edges / fields) in the WebGPU Scene.
 - `orrery` (graph + gyre + camera + arrangements + cartography + node-body/face), the
   same component; the browser is its new host.
 - `eidetic-core` + `eidetic-opfs`, the data model + the OPFS Store. **This lane is the
-  browser-side consumer that activates [Phase 7](../../eidetic_docs/implementation_strategy/2026-06-09_eidetic_deferred_phases_plan.md)**
+  browser-side consumer that activates [Phase 7](../2026-10-11_superseded_plans/2026-06-09_eidetic_deferred_phases_plan.md)**
   (gates a/b/c measured; pack small blobs).
 - `genet-extract`, the capture's content half (render-free; depends only on
   `layout-dom-api`, no engine rides in).
@@ -193,7 +193,7 @@ Nova/Boa, the companion (deferred with sync).
 - [substrate parallelism brief](../../2026-06-21_substrate_parallelism_composition_brief.md)
   and the genet Nova-Memory64 lane (why running a web engine is the hard path this
   sidesteps; the actor-per-origin substrate).
-- [eidetic Phase 7](../../eidetic_docs/implementation_strategy/2026-06-09_eidetic_deferred_phases_plan.md)
+- [eidetic Phase 7](../2026-10-11_superseded_plans/2026-06-09_eidetic_deferred_phases_plan.md)
   (the OPFS Store this lane activates; gates measured, pack small blobs).
 - [gloss outline lens](../../mere_docs/implementation_strategy/2026-06-23_gloss_outline_lens_plan.md),
   [relational browse](../2026-08-06_completed_plans/2026-06-23_relational_browse_graphlet_plan.md),

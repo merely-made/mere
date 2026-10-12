@@ -1,0 +1,826 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling zeroize v1.9.1
+   Compiling generic-array v0.14.7
+   Compiling subtle v2.6.1
+   Compiling crypto-common v0.1.7
+   Compiling serde_core v1.0.229
+   Compiling serde v1.0.229
+   Compiling getrandom v0.4.3
+   Compiling smallvec v1.16.1
+   Compiling block-buffer v0.10.4
+   Compiling digest v0.10.7
+   Compiling crypto-common v0.2.2
+   Compiling der v0.7.10
+   Compiling spki v0.7.3
+   Compiling num-traits v0.2.19
+   Compiling uuid v1.27.0
+   Compiling serde_json v1.0.151
+   Compiling pkcs8 v0.10.2
+   Compiling sha2 v0.10.9
+   Compiling windows-sys v0.61.2
+   Compiling block-padding v0.3.3
+   Compiling inout v0.1.4
+   Compiling zerocopy v0.8.57
+   Compiling cipher v0.4.4
+   Compiling hmac v0.12.1
+   Compiling bytes v1.12.1
+   Compiling constant_time_eq v0.4.2
+   Compiling blake3 v1.8.7
+   Compiling digest v0.11.3
+   Compiling signature v2.2.0
+   Compiling ff v0.13.1
+   Compiling slab v0.4.12
+   Compiling futures-io v0.3.34
+   Compiling sec1 v0.7.3
+   Compiling futures-util v0.3.34
+   Compiling group v0.13.0
+   Compiling hkdf v0.12.4
+   Compiling crypto-bigint v0.5.5
+   Compiling elliptic-curve v0.13.8
+   Compiling parking_lot_core v0.9.12
+   Compiling mio v1.2.3
+   Compiling socket2 v0.6.5
+   Compiling universal-hash v0.5.1
+   Compiling once_cell v1.21.4
+   Compiling tokio v1.53.2
+   Compiling heapless v0.7.17
+   Compiling parking_lot v0.12.5
+   Compiling icu_normalizer v2.3.0
+   Compiling rfc6979 v0.4.0
+   Compiling ppv-lite86 v0.2.21
+   Compiling curve25519-dalek v5.0.0
+   Compiling string_cache v0.9.0
+   Compiling rand_chacha v0.3.1
+   Compiling ecdsa v0.16.9
+   Compiling postcard v1.1.3
+   Compiling idna_adapter v1.2.2
+   Compiling polyval v0.6.2
+   Compiling primeorder v0.13.6
+   Compiling form_urlencoded v1.2.2
+   Compiling sha2 v0.11.0
+   Compiling num-integer v0.1.47
+   Compiling signature v3.0.0
+   Compiling ed25519 v3.0.0
+   Compiling web_atoms v0.2.6
+   Compiling num-iter v0.1.46
+   Compiling ghash v0.5.1
+   Compiling idna v1.1.0
+   Compiling rand v0.8.8
+   Compiling http v1.5.0
+   Compiling ctr v0.9.2
+   Compiling aes v0.8.4
+   Compiling aead v0.5.2
+   Compiling hashbrown v0.17.1
+   Compiling simdutf8 v0.1.5
+   Compiling bytecheck v0.8.3
+   Compiling aes-gcm v0.10.3
+   Compiling http-body v1.1.0
+   Compiling markup5ever v0.39.0
+   Compiling muniment v0.1.2 (C:\Users\mark_\Code\worktrees\mere-dramatis-review\crates\eidetic\muniment)
+   Compiling ed25519-dalek v3.0.0
+   Compiling num-bigint-dig v0.8.6
+   Compiling url v2.5.8
+   Compiling curve25519-dalek v4.1.3
+   Compiling slotmap v1.1.1
+   Compiling poly1305 v0.8.0
+   Compiling tracing-core v0.1.36
+   Compiling ed25519 v2.2.3
+   Compiling cbc v0.1.2
+   Compiling blowfish v0.9.1
+   Compiling chacha20 v0.9.1
+   Compiling ssh-encoding v0.2.0
+   Compiling pkcs1 v0.7.5
+   Compiling pbkdf2 v0.12.2
+   Compiling rustls-pki-types v1.15.1
+   Compiling indexmap v2.14.2
+   Compiling bcrypt-pbkdf v0.10.0
+   Compiling rsa v0.9.10
+   Compiling ssh-cipher v0.2.0
+   Compiling ed25519-dalek v2.2.0
+   Compiling insigne v0.0.2 (https://github.com/merely-made/dramatis.git?rev=0234e7eea6f2ddf2330a71b9425da01b06ae0391#0234e7ee)
+   Compiling rend v0.5.4
+   Compiling cipher v0.5.2
+   Compiling p521 v0.13.3
+   Compiling p384 v0.13.1
+   Compiling p256 v0.13.2
+   Compiling universal-hash v0.6.1
+   Compiling petgraph v0.8.3
+   Compiling rustls v0.23.45
+   Compiling rkyv v0.8.18
+   Compiling poly1305 v0.9.1
+   Compiling ssh-key v0.6.7
+   Compiling chacha20 v0.10.2
+   Compiling rustls-webpki v0.103.15
+   Compiling aead v0.6.1
+   Compiling taffy v0.11.0-experimental-cache-fix.3
+   Compiling hyper v1.11.1
+   Compiling cfb v0.7.3
+   Compiling tracing v0.1.44
+   Compiling chacha20poly1305 v0.11.0
+   Compiling chartulary v0.2.2 (C:\Users\mark_\Code\worktrees\mere-dramatis-review\crates\eidetic\chartulary)
+   Compiling crossbeam-utils v0.8.23
+   Compiling getrandom v0.3.4
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling mere-curation v0.1.0 (C:\Users\mark_\Code\worktrees\mere-dramatis-review\crates\forme\curation)
+   Compiling time v0.3.55
+   Compiling tower v0.5.3
+   Compiling hyper-util v0.1.20
+   Compiling accesskit v0.24.1
+   Compiling mere-forme v0.1.0 (C:\Users\mark_\Code\worktrees\mere-dramatis-review\crates\forme\forme)
+   Compiling personae v0.3.0 (https://github.com/merely-made/dramatis.git?rev=0234e7eea6f2ddf2330a71b9425da01b06ae0391#0234e7ee)
+   Compiling crossbeam-channel v0.5.17
+   Compiling numen v0.2.0 (C:\Users\mark_\Code\worktrees\mere-dramatis-review\crates\conatus\numen)
+   Compiling tokio-rustls v0.26.6
+   Compiling infer v0.19.0
+   Compiling webpki-roots v1.0.9
+   Compiling half v2.7.1
+   Compiling euclid v0.22.14
+   Compiling sceno v0.0.4 (C:\Users\mark_\Code\worktrees\mere-dramatis-review\crates\cambium\scenes\sceno)
+   Compiling command-menu v0.1.0 (C:\Users\mark_\Code\worktrees\mere-dramatis-review\crates\cambium\command-menu)
+   Compiling serde_urlencoded v0.7.1
+   Compiling fleece v0.5.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling mere-kernel v0.0.2 (C:\Users\mark_\Code\worktrees\mere-dramatis-review\crates\graph\graph-kernel)
+warning: unused imports: `astar`, `dijkstra`, `has_path_connecting`, and `kosaraju_scc`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:21:22
+   |
+21 | use petgraph::algo::{astar, dijkstra, has_path_connecting, kosaraju_scc};
+   |                      ^^^^^  ^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `Archived`, `Place`, and `Resolver`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:25:21
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                     ^^^^^^^^               ^^^^^  ^^^^^^^^
+
+warning: unused import: `HashSet`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:26:43
+   |
+26 | use std::collections::{BTreeMap, HashMap, HashSet};
+   |                                           ^^^^^^^
+
+warning: unused imports: `GraphSnapshot`, `PersistedAddress`, `PersistedArrangementEdgeData`, `PersistedArrangementSubKind`, `PersistedContainmentEdgeData`, `PersistedContainmentSubKind`, `PersistedEdgeFamily`, `PersistedEdge`, `PersistedImportedEdgeData`, `PersistedImportedSubKind`, `PersistedNavigationTrigger`, `PersistedNodeSessionState`, `PersistedNode`, `PersistedProvenanceEdgeData`, `PersistedProvenanceSubKind`, `PersistedSemanticEdgeData`, `PersistedSemanticSubKind`, `PersistedTraversalEdgeData`, `PersistedTraversalMetrics`, and `PersistedTraversalRecord`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:35:5
+   |
+35 |     GraphSnapshot, PersistedAddress, PersistedArrangementEdgeData, PersistedArrangementSubKind,
+   |     ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+36 |     PersistedContainmentEdgeData, PersistedContainmentSubKind, PersistedEdge, PersistedEdgeFamily,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+37 |     PersistedImportedEdgeData, PersistedImportedSubKind, PersistedNavigationTrigger, PersistedNode,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+38 |     PersistedNodeSessionState, PersistedProvenanceEdgeData, PersistedProvenanceSubKind,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+39 |     PersistedSemanticEdgeData, PersistedSemanticSubKind, PersistedTraversalEdgeData,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+40 |     PersistedTraversalMetrics, PersistedTraversalRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `NodeTagPresentationState`
+  --> crates\graph\graph-kernel\src\graph\node_facets.rs:17:54
+   |
+17 | use crate::types::{NodeClassification, NodeProperty, NodeTagPresentationState};
+   |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `EdgeRef`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:24:23
+   |
+24 | use petgraph::visit::{EdgeRef, IntoEdgeReferences};
+   |                       ^^^^^^^
+
+warning: unused import: `rancor::Fallible`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:25:72
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                                                                        ^^^^^^^^^^^^^^^^
+
+warning: methods `navigate_node`, `branch_history`, `node_history_back`, and `node_history_forward` are never used
+   --> crates\graph\graph-kernel\src\graph\mod.rs:707:19
+    |
+404 | impl Graph {
+    | ---------- methods in this implementation
+...
+707 |     pub(crate) fn navigate_node(&mut self, key: NodeKey, url: &str) {
+    |                   ^^^^^^^^^^^^^
+...
+721 |     pub(crate) fn branch_history(&mut self, child: NodeKey, parent: NodeKey) {
+    |                   ^^^^^^^^^^^^^^
+...
+733 |     pub(crate) fn node_history_back(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+743 |     pub(crate) fn node_history_forward(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `assert_semantic_predicate`, `assert_semantic_relation_in_scope`, and `assert_semantic_predicate_in_scope` are never used
+   --> crates\graph\graph-kernel\src\graph\edge_payload.rs:258:19
+    |
+ 45 | impl EdgePayload {
+    | ---------------- methods in this implementation
+...
+258 |     pub(crate) fn assert_semantic_predicate(&mut self, predicate: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+262 |     pub(crate) fn assert_semantic_relation_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+271 |     pub(crate) fn assert_semantic_predicate_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `LogIdAsString` is never constructed
+   --> crates\graph\graph-kernel\src\graph\identity.rs:160:19
+    |
+160 | pub(crate) struct LogIdAsString;
+    |                   ^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> crates\graph\graph-kernel\src\graph\resource_content.rs:86:19
+    |
+ 85 | impl Graph {
+    | ---------- methods in this implementation
+ 86 |     pub(crate) fn insert_node_tag(&mut self, key: NodeKey, tag: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 89 |     pub(crate) fn remove_node_tag(&mut self, key: NodeKey, tag: &str) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 92 |     pub(crate) fn append_node_property(&mut self, key: NodeKey, property: NodeProperty) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+ 95 |     pub(crate) fn add_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub(crate) fn remove_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+116 |     pub(crate) fn set_node_classification_status(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+131 |     pub(crate) fn set_node_primary_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> crates\graph\graph-kernel\src\graph\edge_ops.rs:177:19
+    |
+ 32 | impl Graph {
+    | ---------- methods in this implementation
+...
+177 |     pub(crate) fn assert_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+244 |     pub(crate) fn replay_assert_relation_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+261 |     pub(crate) fn replay_set_edge_semantic_predicate_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+279 |     pub(crate) fn replay_assert_semantic_predicate_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+307 |     pub(crate) fn dissolve_remove_node_collect_traversals(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+418 |     pub(crate) fn assert_surface_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+601 |     pub(crate) fn set_edge_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `get_node_mut` is never used
+   --> crates\graph\graph-kernel\src\graph\query.rs:227:19
+    |
+220 | impl Graph {
+    | ---------- method in this implementation
+...
+227 |     pub(crate) fn get_node_mut(&mut self, key: NodeKey) -> Option<&mut Node> {
+    |                   ^^^^^^^^^^^^
+
+warning: `mere-kernel` (lib) generated 13 warnings (run `cargo fix --lib -p mere-kernel` to apply 5 suggestions)
+   Compiling tower-http v0.6.11
+   Compiling ciborium-ll v0.2.2
+   Compiling scenotime v0.0.4 (C:\Users\mark_\Code\worktrees\mere-dramatis-review\crates\cambium\scenes\scenotime)
+   Compiling hyper-rustls v0.27.9
+   Compiling xml5ever v0.39.0
+   Compiling html5ever v0.39.0
+   Compiling http-body-util v0.1.5
+   Compiling futures-executor v0.3.34
+   Compiling incipit v0.2.0 (C:\Users\mark_\Code\worktrees\mere-dramatis-review\crates\incipit)
+   Compiling tinct v0.1.2 (C:\Users\mark_\Code\worktrees\mere-dramatis-review\crates\cambium\tinct)
+   Compiling tabard v0.0.1 (C:\Users\mark_\Code\worktrees\mere-dramatis-review\crates\system\tabard)
+   Compiling futures v0.3.34
+   Compiling reqwest v0.12.28
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling chirograph v0.0.2 (C:\Users\mark_\Code\worktrees\mere-dramatis-review\crates\chirograph)
+   Compiling ciborium v0.2.2
+   Compiling mere-alembic v0.0.1 (C:\Users\mark_\Code\worktrees\mere-dramatis-review\crates\distillery\alembic)
+   Compiling mere-fleece v0.0.1 (C:\Users\mark_\Code\worktrees\mere-dramatis-review\crates\fleece)
+   Compiling notochord v0.1.1 (https://github.com/merely-made/dramatis.git?rev=0234e7eea6f2ddf2330a71b9425da01b06ae0391#0234e7ee)
+   Compiling eidetic v0.0.2 (C:\Users\mark_\Code\worktrees\mere-dramatis-review\crates\eidetic\eidetic-core)
+   Compiling gaz v0.0.2 (https://github.com/merely-made/dramatis.git?rev=0234e7eea6f2ddf2330a71b9425da01b06ae0391#0234e7ee)
+   Compiling tracing-log v0.2.0
+   Compiling tokio-util v0.7.19
+   Compiling chrono v0.4.45
+   Compiling nu-ansi-term v0.50.3
+   Compiling password-hash v0.5.0
+   Compiling blake2 v0.10.6
+   Compiling secrecy v0.10.3
+   Compiling hex v0.4.3
+   Compiling iri-string v0.7.14
+   Compiling ssh-agent-lib v0.6.0
+   Compiling tempfile v3.27.0
+   Compiling gazette v0.0.1 (C:\Users\mark_\Code\worktrees\mere-dramatis-review\ports\gazette)
+   Compiling credential-exchange-format v0.4.0
+   Compiling pandect v0.1.1 (C:\Users\mark_\Code\worktrees\mere-dramatis-review\crates\system\pandect)
+warning: unused import: `std::io`
+  --> crates\system\pandect\src\wallet_grant\pairing.rs:10:5
+   |
+10 | use std::io;
+   |     ^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `std::io`
+  --> crates\system\pandect\src\wallet_grant\records.rs:10:5
+   |
+10 | use std::io;
+   |     ^^^^^^^
+
+warning: unused import: `std::path::Path`
+  --> crates\system\pandect\src\wallet_grant\records.rs:11:5
+   |
+11 | use std::path::Path;
+   |     ^^^^^^^^^^^^^^^
+
+warning: unused imports: `Ed25519Keypair`, `IdentityProvider`, `InMemoryProvider`, and `PersonaId`
+  --> crates\system\pandect\src\wallet_grant\records.rs:13:16
+   |
+13 | use identity::{Ed25519Keypair, IdentityProvider, InMemoryProvider, PersonaId};
+   |                ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^
+
+warning: unused import: `Ed25519Signature`
+  --> crates\system\pandect\src\wallet_grant\types.rs:14:16
+   |
+14 | use identity::{Ed25519Signature, PersonaId};
+   |                ^^^^^^^^^^^^^^^^
+
+warning: unused imports: `DEVICE_GRANT_SCHEMA_VERSION` and `DeviceGrantError`
+  --> crates\system\pandect\src\wallet_grant\types.rs:19:5
+   |
+19 |     DEVICE_GRANT_SCHEMA_VERSION, DeviceExposure, DeviceGrantError, DeviceId, DevicePublicKey,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^                  ^^^^^^^^^^^^^^^^
+
+warning: method `into_graph` is never used
+   --> crates\system\pandect\src\graph_codicil.rs:149:19
+    |
+148 | impl GraphCodicil {
+    | ----------------- method in this implementation
+149 |     pub(crate) fn into_graph(self) -> Result<Graph> {
+    |                   ^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `pandect` (lib) generated 7 warnings (run `cargo fix --lib -p pandect` to apply 6 suggestions)
+   Compiling tracing-subscriber v0.3.23
+   Compiling argon2 v0.5.3
+   Compiling windows-sys v0.59.0
+   Compiling dramatis v0.0.3 (https://github.com/merely-made/dramatis.git?rev=0234e7eea6f2ddf2330a71b9425da01b06ae0391#0234e7ee)
+   Compiling sha1 v0.11.0
+   Compiling hmac v0.13.0
+   Compiling chatelaine v0.0.3 (https://github.com/merely-made/dramatis.git?rev=0234e7eea6f2ddf2330a71b9425da01b06ae0391#0234e7ee)
+   Compiling castellan v0.0.3 (C:\Users\mark_\Code\worktrees\mere-dramatis-review\ports\castellan)
+warning: unused variable: `provider`
+  --> ports\castellan\src\custody\wallet\refresh.rs:51:5
+   |
+51 |     provider: &InMemoryProvider,
+   |     ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_provider`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: missing documentation for a constant
+  --> ports\castellan\src\authority.rs:68:1
+   |
+68 | pub const STANDARD_WINDOWS_AGENT_ENDPOINT: &str = r"\\.\pipe\openssh-ssh-agent";
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+note: the lint level is defined here
+  --> ports\castellan\src\lib.rs:78:9
+   |
+78 | #![warn(missing_docs)]
+   |         ^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> ports\castellan\src\authority.rs:97:5
+   |
+97 |     UnknownIntent,
+   |     ^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> ports\castellan\src\authority.rs:99:5
+   |
+99 |     InvalidPayload(#[from] serde_json::Error),
+   |     ^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\castellan\src\authority.rs:101:5
+    |
+101 |     Decision(#[from] DecisionError),
+    |     ^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\castellan\src\authority.rs:103:5
+    |
+103 |     Identity(IdentityError),
+    |     ^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\castellan\src\authority.rs:111:5
+    |
+111 |     KeyGeneration,
+    |     ^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\castellan\src\authority.rs:113:5
+    |
+113 |     PublicEncoding,
+    |     ^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\castellan\src\authority.rs:115:5
+    |
+115 |     InvalidComment,
+    |     ^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\castellan\src\authority.rs:120:5
+    |
+120 |     InvalidProfileId,
+    |     ^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\castellan\src\authority.rs:122:5
+    |
+122 |     InvalidProfileName,
+    |     ^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\castellan\src\authority.rs:124:5
+    |
+124 |     InvalidIdleWindow,
+    |     ^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\castellan\src\authority.rs:126:5
+    |
+126 |     ConfirmationRequired,
+    |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\castellan\src\authority.rs:128:5
+    |
+128 |     KeyNotFound,
+    |     ^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\castellan\src\authority.rs:130:5
+    |
+130 |     NativeHandoffRequired,
+    |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\castellan\src\authority.rs:132:5
+    |
+132 |     DeviceRevocationConfirmationRequired,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\castellan\src\authority.rs:134:5
+    |
+134 |     CarryUnavailable,
+    |     ^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\castellan\src\authority.rs:136:5
+    |
+136 |     DeviceRevocation(std::io::ErrorKind),
+    |     ^^^^^^^^^^^^^^^^
+
+warning: `castellan` (lib test) generated 18 warnings (run `cargo fix --lib -p castellan --tests` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4m 55s
+     Running unittests src\lib.rs (C:\t\cargo-targets\mere\debug\deps\castellan-20c8c2bb17e788e8.exe)
+
+running 303 tests
+test authority::tests::an_id_that_would_not_survive_becoming_a_filename_is_refused ... ok
+test authority::tests::a_created_persona_joins_the_vault_and_the_host_stays_where_it_was ... ok
+test authority::tests::creating_over_an_existing_persona_is_refused ... ok
+test authority::lock_tests::a_refused_lock_leaves_the_holders_their_keys ... ok
+test authority::tests::a_projected_switch_is_live_and_remembered_for_the_family ... ok
+test authority::tests::native_import_holds_rsa_and_ecdsa_beside_an_untouched_ed25519_slot ... ok
+test authority::tests::native_import_never_accepts_private_key_bytes_as_an_intent ... ok
+test authority::tests::isolated_named_pipe_lists_and_signs_through_the_ssh_wire_protocol ... ok
+test authority::tests::projected_approval_intent_releases_the_real_ssh_adapter ... ok
+test authority::tests::reimporting_a_held_key_rewrites_nothing ... ok
+test authority::tests::snapshot_discloses_public_ssh_material_but_not_the_private_slot ... ok
+test authority::tests::the_users_agent_socket_is_the_standard_endpoint ... ok
+test authority::tests::typed_generation_and_confirmed_removal_mutate_the_shared_vault ... ok
+test authority::tests::native_import_refuses_unsignable_keys_with_the_reason ... ok
+test custody::agent::tests::a_certificate_credential_signs_with_its_underlying_key ... ok
+test custody::agent::tests::added_identity_is_listed_and_stored ... ok
+test authority::tests::imported_rsa_and_ecdsa_keys_sign_over_the_named_pipe_wire ... ok
+test custody::agent::tests::an_rsa_certificate_credential_signs_with_its_underlying_key ... ok
+test custody::agent::tests::ecdsa_signs_through_the_agent_on_p256_and_p384 ... ok
+test custody::agent::tests::per_use_slot_denial_returns_to_the_ssh_adapter ... ok
+test custody::agent::tests::per_use_slot_refuses_to_sign ... ok
+test custody::agent::tests::per_use_slot_signs_only_after_broker_approval ... ok
+test custody::agent::tests::readding_a_held_key_rewrites_nothing_its_tier_included ... ok
+test custody::agent::tests::readding_the_same_key_is_idempotent ... ok
+test custody::agent::tests::an_existing_ed25519_slot_is_byte_identical_and_signs_as_before ... ok
+test custody::agent::tests::remove_and_remove_all_clear_slots ... ok
+test custody::agent::tests::sign_round_trips_and_verifies ... ok
+test authority::lock_tests::the_agent_locks_the_whole_resident_and_refuses_to_unlock_it ... ok
+test authority::lock_tests::the_snapshot_reports_locked_with_the_view_kept_at_lock_time ... ok
+test custody::agent::tests::rsa_signs_through_the_agent_as_its_flags_ask ... ok
+test custody::agent::tests::ssh_add_refuses_unsignable_keys_with_the_reason ... ok
+test custody::agent::tests::unknown_key_is_refused ... ok
+test custody::bootstrap::tests::load_or_create_mints_once_then_loads ... ok
+test custody::agent::tests::without_a_vault_lock_the_lock_message_is_refused ... ok
+test custody::bootstrap::tests::default_vault_dir_is_under_a_personae_directory ... ok
+test custody::broker::tests::per_use_cannot_be_widened_into_a_cached_approval ... ok
+test custody::broker::tests::denial_returns_to_the_adapter_and_appends_one_record ... ok
+test custody::broker::tests::per_use_waits_for_a_visible_decision_and_records_the_result ... ok
+test authority::lock_tests::revocation_and_the_wallet_sealer_are_refused_while_locked ... ok
+test custody::passphrase_root::tests::load_absent_root_is_none ... ok
+test authority::lock_tests::a_holder_joining_a_locked_vault_locks ... ok
+test custody::agent::tests::a_lock_during_an_approval_refuses_the_sign ... ok
+test custody::agent::tests::the_lock_message_engages_the_vault_lock_and_unlock_is_refused ... ok
+test authority::lock_tests::a_switch_is_refused_while_locked ... ok
+test authority::lock_tests::observers_see_every_change ... ok
+test authority::lock_tests::key_mutations_and_creation_are_refused_while_locked ... ok
+test custody::bootstrap::tests::passphrase_unlock_opens_a_portable_vault ... ok
+test authority::lock_tests::a_holder_that_cannot_rederive_relocks_everything ... ok
+test authority::lock_tests::a_lock_drops_the_credential_keys_so_items_and_the_otp_gate_say_locked ... ok
+test custody::broker::tests::short_ttl_reuses_then_expires_the_visible_approval ... ok
+test custody::agent::tests::a_locked_agent_lists_nothing_and_refuses_sign_add_and_remove_with_the_reason ... ok
+test authority::lock_tests::over_an_isolated_pipe_the_agent_locks_by_the_wire_and_unlocks_only_natively ... ok
+test custody::passphrase_storage::tests::ciphertext_bytes_do_not_contain_plaintext_secrets ... ok
+test custody::passphrase_root::tests::wrapped_file_does_not_contain_the_raw_root ... ok
+test custody::roster::tests::a_created_persona_keeps_the_name_it_was_given ... ok
+test custody::roster::tests::a_fresh_vault_has_an_empty_roster_but_still_names_what_it_would_open ... ok
+test authority::lock_tests::a_kept_persisted_lock_follows_lock_and_unlock ... ok
+test custody::roster::tests::adopting_over_an_existing_persona_is_refused_and_changes_nothing ... ok
+test custody::roster::tests::an_adopted_identity_keeps_the_key_it_arrived_with ... ok
+test custody::roster::tests::a_remembered_choice_survives_and_is_what_every_app_reads ... ok
+test custody::roster::tests::an_unchosen_vault_with_one_persona_opens_that_one ... ok
+test custody::roster::tests::minting_over_an_existing_persona_is_refused ... ok
+test custody::roster::tests::an_unchosen_vault_with_several_personas_falls_back_to_default ... ok
+test custody::roster::tests::nothing_chosen_reads_as_nothing_rather_than_as_default ... ok
+test custody::roster::tests::switching_personas_switches_the_derived_key ... ok
+test custody::passphrase_root::tests::passphrase_root_opens_a_sealed_record_store ... ok
+test custody::roster::tests::the_roster_marks_the_chosen_persona_and_sorts_stably ... ok
+test custody::roster::tests::the_env_override_beats_the_remembered_choice ... ok
+test custody::sealed_profile_storage::tests::awkward_profile_ids_are_filesystem_safe ... ok
+test custody::passphrase_root::tests::tampered_ciphertext_is_rejected ... ok
+test custody::sealed_profile_storage::tests::delete_profile_removes_the_record ... ok
+test custody::sealed_profile_storage::tests::list_recovers_ids_from_hashed_filenames ... ok
+test custody::sealed_profile_storage::tests::save_and_load_round_trips_through_sealed_records ... ok
+test authority::lock_tests::the_lock_intent_works_from_any_surface_and_unlock_is_native_only ... ok
+test custody::sealed_profile_storage::tests::survives_reopen_with_the_same_key ... ok
+test custody::sealed_profile_storage::tests::vault_works_against_sealed_profile_storage ... ok
+test custody::sealed_profile_storage::tests::wrong_key_fails_to_decrypt ... ok
+test custody::sealed_profile_storage::tests::open_auto_os_round_trips_on_windows ... ok
+test custody::ssh_face::tests::a_policy_round_trips_through_a_slot ... ok
+test custody::sealed_provider::tests::sealed_provider_is_stable_across_reopen ... ok
+test custody::ssh_face::tests::storing_twice_replaces_rather_than_accumulates ... ok
+test custody::ssh_face::tests::the_default_face_is_named_for_its_profile ... ok
+test custody::ssh_krl::tests::an_absent_ledger_reads_as_empty_rather_than_failing ... ok
+test custody::sealed_provider::tests::sealed_provider_rejects_the_wrong_record_root ... ok
+test custody::ssh_krl::tests::a_ledger_round_trips_through_a_slot ... ok
+test custody::ssh_sign::tests::p521_is_refused_until_upstream_decodes_every_key ... ok
+test custody::ssh_sign::tests::rsa_outside_rings_bounds_is_refused_by_name ... ok
+test custody::ssh_sign::tests::every_signable_key_passes_the_door ... ok
+test custody::ssh_sign::tests::rsa_signatures_are_deterministic_pkcs1 ... ok
+test custody::ssh_sign::tests::rsa_without_a_sha2_flag_is_refused ... ok
+test custody::ssh_sign::tests::rsa_with_both_flags_signs_sha2_256_as_openssh_does ... ok
+test custody::ssh_sign::tests::ed25519_signs_exactly_as_before ... ok
+test custody::ssh_sign::tests::the_rsa_crate_only_builds_the_key ... ok
+test custody::passphrase_storage::tests::delete_profile_removes_from_file ... ok
+test custody::passphrase_root::tests::save_and_load_round_trips_through_disk ... ok
+test custody::ssh_slot::tests::protocol_key_is_the_fingerprint_so_reimport_is_idempotent ... ok
+test custody::ssh_slot::tests::slot_round_trips_the_private_key_and_comment ... ok
+test custody::ssh_slot::tests::non_ssh_slots_are_ignored ... ok
+test custody::ssh_slot::tests::find_by_public_ignores_comments ... ok
+test custody::ssh_slot::tests::ssh_slots_skips_undecodable_payloads ... ok
+test custody::startup_unlock::persisted_lock_tests::a_marker_elsewhere_does_not_refuse ... ok
+test custody::ssh_sign::tests::rsa_signature_claims_only_the_hash_it_used ... ok
+test custody::unlock::tests::no_methods_means_none ... ok
+test custody::startup_unlock::persisted_lock_tests::the_marker_refuses_the_loaders_until_it_is_cleared ... ok
+test custody::startup_unlock::tests::loading_existing_auto_unlock_root_never_initializes_it ... ok
+test custody::unlock::tests::availability_answers_without_prompting ... ok
+test custody::unlock::tests::without_the_gate_presence_is_unavailable_and_never_minted ... ok
+test custody::vault::lock_tests::a_locked_storage_cannot_be_enrolled ... ok
+test custody::startup_unlock::tests::auto_unlock_root_round_trips_through_dpapi ... ok
+test custody::ssh_sign::tests::unsignable_keys_are_refused_with_the_reason ... ok
+test custody::passphrase_storage::tests::save_and_load_round_trips_through_passphrase_encrypt ... ok
+test custody::ssh_sign::tests::ecdsa_signs_on_p256_and_p384_and_ignores_flags ... ok
+test custody::ssh_sign::tests::rsa_signs_sha2_256_and_512_per_flag_and_verifies_independently ... ok
+test custody::vault::lock_tests::an_authoritative_store_needs_its_freshness_key_back ... ok
+test custody::passphrase_storage::tests::correct_passphrase_on_existing_file_succeeds ... ok
+test custody::passphrase_root::tests::wrap_then_unwrap_round_trips ... ok
+test custody::passphrase_root::tests::wrong_passphrase_is_rejected ... ok
+test custody::passphrase_storage::tests::vault_works_against_passphrase_storage ... ok
+test custody::vault::lock_tests::a_locked_sealed_storage_refuses_every_profile_call ... ok
+test custody::passphrase_storage::tests::wrong_passphrase_on_existing_file_errors ... ok
+test custody::vault::lock_tests::boxed_and_borrowed_storages_lock_through_their_delegates ... ok
+test custody::vault::lock_tests::a_passphrase_unlock_restores_the_same_slots_and_signatures ... ok
+test custody::vault::lock_tests::lock_is_refused_without_an_unlock_method ... ok
+test custody::vault::lock_tests::opening_an_existing_auto_os_root_never_mints_one ... ok
+test custody::vault::lock_tests::os_presence_reads_the_root_back_from_the_os_store ... ok
+test custody::vault::lock_tests::a_locked_passphrase_storage_refuses_every_profile_call ... ok
+test custody::vault::lock_tests::sealed_record_clones_share_one_lock ... ok
+test custody::passphrase_root::tests::two_passphrases_wrap_the_same_root ... ok
+test custody::vault::lock_tests::attestation_is_refused_while_locked ... ok
+test custody::vault::lock_tests::add_slot_is_refused_while_locked ... ok
+test custody::vault::slot_map::tests::it_behaves_as_a_map_through_growth_and_removal ... ok
+test custody::vault::tests::add_and_retrieve_slot_round_trip ... ok
+test custody::vault::tests::bootstrap_slot_carries_state_dir ... ok
+test custody::vault::tests::list_profiles_summarizes_each ... ok
+test custody::passphrase_root::tests::change_passphrase_preserves_root_and_rejects_the_old_one ... ok
+test custody::vault::lock_tests::lock_and_unlock_are_idempotent ... ok
+test custody::vault::tests::missing_profile_returns_backend_error ... ok
+test custody::vault::tests::remove_slot_returns_true_when_present_and_persists ... ok
+test custody::vault::lock_tests::current_profile_is_refused_while_locked ... ok
+test custody::vault::tests::vault_provides_master_public_key_and_derives ... ok
+test custody::vault::tests::save_then_load_round_trips_profile_and_slots ... ok
+test custody::vault_commands::tests::add_ssh_leaves_a_held_key_untouched ... ok
+test custody::vault::tests::switching_profiles_is_live_and_a_failed_switch_changes_nothing ... ok
+test custody::vault_commands::tests::ambiguous_prefix_lists_candidates ... ok
+test custody::vault_commands::tests::exact_key_resolves_including_colons_in_the_instance ... ok
+test custody::vault_commands::tests::instanceless_key_resolves_exactly ... ok
+test custody::vault_commands::tests::unique_prefix_resolves ... ok
+test custody::vault_commands::tests::unknown_key_is_an_error ... ok
+test custody::wallet::bootstrap::tests::bootstrap_wallet_state_preserves_a_pending_delegated_identity ... ok
+test custody::wallet::bootstrap::tests::bootstrap_wallet_state_preserves_an_enrolled_delegated_wallet ... ok
+test custody::vault_commands::tests::add_ssh_refuses_unsignable_keys_with_the_reason ... ok
+test custody::wallet::bootstrap::tests::bootstrap_wallet_state_reports_locked_when_copy_seed_is_sealed_but_startup_stays_locked ... ok
+test custody::wallet::bootstrap::tests::bootstrap_wallet_state_reports_locked_when_delegated_identity_is_sealed_but_startup_stays_locked ... ok
+test custody::wallet::bootstrap::tests::bootstrap_wallet_state_seeds_a_fresh_copy_root ... ok
+test custody::vault::lock_tests::a_second_enrolment_is_refused_and_the_first_kept ... ok
+test custody::wallet::bootstrap::tests::ensure_wallet_state_seeds_identity_and_persona_files ... ok
+test custody::wallet::bootstrap::tests::ensure_wallet_state_is_idempotent_for_existing_seeded_files ... ok
+test custody::wallet::devices::tests::ensure_local_device_identity_is_idempotent ... ok
+test custody::wallet::devices::tests::loading_a_legacy_local_device_identity_migrates_it_to_a_sealed_record ... ok
+test custody::wallet::devices::tests::remote_auth_wrapping_key_bridge_round_trips_as_a_sealed_record ... ok
+test custody::vault::lock_tests::a_wrong_passphrase_leaves_the_vault_locked ... ok
+test custody::wallet::devices::tests::local_device_identity_round_trips ... ok
+test custody::wallet::epochs::tests::copy_seeded_persona_epoch_bridge_round_trips_as_a_sealed_record ... ok
+test custody::vault::lock_tests::enrolment_is_refused_while_locked ... ok
+test custody::wallet::enroll::tests::build_remote_auth_enrollment_bundle_includes_granted_persona_wallets ... ok
+test custody::wallet::epochs::tests::ensure_persona_epoch_bridge_is_idempotent_for_the_same_epoch ... ok
+test custody::wallet::epochs::tests::delegated_persona_epoch_bridge_round_trips_as_a_sealed_record ... ok
+test custody::wallet::enroll::tests::install_remote_auth_enrollment_bundle_rejects_expired_grant ... ok
+test custody::wallet::epochs::tests::persona_epoch_bridge_round_trips ... ok
+test custody::vault::lock_tests::a_passphrase_vault_takes_no_os_presence ... ok
+test custody::wallet::epochs::tests::stage_persona_private_epoch_replaces_existing_secret ... ok
+test custody::wallet::issue::tests::issue_remote_auth_device_grant_from_pairing_rejects_epoch_outside_persona_set ... ok
+test custody::wallet::enroll::tests::install_remote_auth_enrollment_bundle_restores_wallet_state_for_local_device ... ok
+test custody::vault::lock_tests::derivation_is_refused_while_locked ... ok
+test custody::wallet::epochs::tests::loading_a_legacy_plaintext_persona_epoch_bridge_migrates_it_to_a_sealed_record ... ok
+test custody::wallet::issue::tests::issue_remote_auth_device_grant_from_ticket_rejects_expired_ticket ... ok
+test custody::wallet::issue::tests::issue_remote_auth_device_grant_from_pairing_rejects_private_read_without_epochs ... ok
+test custody::vault::lock_tests::a_persisted_lock_holds_the_auto_os_root_until_a_user_act ... ok
+test custody::wallet::issue::tests::issue_remote_auth_device_grant_refuses_a_revoked_device_before_writing_a_grant ... ok
+test custody::wallet::migrate::tests::a_copy_mode_device_is_not_re_issuable ... ok
+test custody::wallet::migrate::tests::a_wallet_with_no_roster_surveys_clean ... ok
+test custody::wallet::migrate::tests::a_stranded_device_keeps_its_legacy_file ... ok
+test custody::wallet::issue::tests::issue_remote_auth_device_grant_from_ticket_wraps_private_epochs ... ok
+test custody::wallet::enroll::tests::install_remote_auth_enrollment_bundle_with_wrapping_key_restores_private_epoch_bridge ... ok
+test custody::wallet::migrate::tests::re_issuing_without_restated_scopes_is_refused ... ok
+test custody::wallet::issue::tests::issue_remote_auth_device_grant_updates_wallet_and_roster_state ... ok
+test custody::wallet::issue::tests::issue_remote_auth_device_grant_from_pairing_wraps_private_epochs ... ok
+test custody::wallet::issue::tests::issue_remote_auth_device_grant_updates_capability_slots_for_every_granted_persona ... ok
+test custody::wallet::migrate::tests::a_legacy_grant_is_found_and_reads_as_stranded ... ok
+test custody::wallet::migrate::tests::retiring_removes_the_file_once_certificates_exist ... ok
+test custody::wallet::migrate::tests::re_issuing_restores_a_stranded_device ... ok
+test custody::wallet::revocation_tests::tests::an_unwritten_ledger_loads_empty ... ok
+test custody::vault::lock_tests::the_public_view_survives_a_lock ... ok
+test custody::wallet::revocation_tests::tests::revoking_a_device_withdraws_every_certificate_it_held ... ok
+test custody::wallet::revocation_tests::tests::a_tampered_statement_is_refused_by_the_fold ... ok
+test custody::wallet::revocation_tests::tests::withdrawing_one_certificate_does_not_revoke_the_device ... ok
+test custody::wallet::revocation_tests::tests::the_ledger_survives_a_round_trip_through_disk ... ok
+test custody::wallet::revoke::tests::revoke_remote_auth_device_rejects_copy_mode_devices ... ok
+test custody::wallet::sealer::tests::for_persona_is_none_without_a_staged_epoch ... ok
+test custody::wallet::secrets::tests::identity_seed_round_trips ... ok
+test custody::wallet::secrets::tests::read_only_seed_load_preserves_a_legacy_raw_seed_byte_for_byte ... ok
+test custody::wallet::secrets::tests::loading_a_legacy_raw_seed_migrates_it_to_a_sealed_record ... ok
+test custody::wallet::secrets::tests::explicit_auto_os_unlock_opens_a_locked_seed_without_changing_startup_mode ... ok
+test custody::wallet::secrets::tests::read_only_seed_load_reads_an_accessible_sealed_record_without_rewriting_it ... ok
+test custody::wallet::sealer::tests::for_persona_builds_a_working_sealer_from_a_staged_epoch ... ok
+test custody::wallet::secrets::tests::read_only_seed_load_refuses_a_locked_sealed_record_without_rewriting_it ... ok
+test custody::wallet::revoke::tests::revoking_returns_portable_statements_and_folds_them ... ok
+test custody::wallet::secrets::tests::relock_after_manual_unlock_hides_the_seed_again_under_locked_startup ... ok
+test custody::wallet::trust_tests::tests::a_persona_certificate_needs_its_own_root_to_be_trusted ... ok
+test custody::wallet::trust_tests::tests::a_fresh_grant_stands_on_every_certificate ... ok
+test custody::wallet::trust_tests::tests::a_certificate_does_not_travel_to_another_holder ... ok
+test custody::wallet::revoke::tests::revoke_remote_auth_device_clears_slots_and_rotates_future_write_epochs ... ok
+test custody::wallet::validate_tests::tests::issue_remote_auth_device_grant_rejects_wrapped_epoch_outside_persona_set ... ok
+test custody::wallet::trust_tests::tests::a_revoked_grant_reports_revoked_rather_than_merely_failing ... ok
+test custody::wallet::refresh::tests::revoke_remote_auth_device_blocks_revoked_enrollment_and_remaining_device_can_restore_refreshed_epoch ... ok
+test custody::wallet::validate_tests::tests::private_read_free_grant_can_skip_wrapped_epoch_material ... ok
+test custody::wallet::trust_tests::tests::an_expired_grant_does_not_stand ... ok
+test custody::wallet::trust_tests::tests::the_trusted_set_carries_one_root_per_persona ... ok
+test custody::wallet::revoke::tests::revoke_remote_auth_device_is_idempotent_once_rotation_has_landed ... ok
+test cxf::tests::invalid_version_or_missing_string_type_refuses_the_document ... ok
+test custody::wallet::validate_tests::tests::issue_remote_auth_device_grant_rejects_unknown_persona_wallet ... ok
+test custody::wallet::validate_tests::tests::issue_remote_auth_device_grant_rejects_private_read_without_wrapped_epoch ... ok
+test custody::wallet::refresh::tests::revoke_remote_auth_device_refreshes_remaining_private_read_grants ... ok
+test custody::vault::lock_tests::remove_slot_is_refused_while_locked ... ok
+test custody::vault::lock_tests::delegates_and_other_backends_answer_enrolment ... ok
+test items::tests::a_quarantined_item_is_never_petitioned_or_exercised ... ok
+test items::tests::a_store_refuses_records_filed_under_another_persona_by_name ... ok
+test custody::vault::lock_tests::slot_is_refused_while_locked ... ok
+test custody::vault::lock_tests::switch_profile_is_refused_while_locked ... ok
+test items::tests::listing_and_metadata_reads_never_open_a_payload ... ok
+test items::tests::an_interrupted_insert_never_shows_an_item_without_its_payload ... ok
+test otp::admitted::tests::an_item_level_grant_covers_each_of_its_credentials ... ok
+test otp::admitted::tests::a_signed_notochord_admission_flows_into_the_release_adapter ... ok
+test otp::admitted::tests::approval_is_opaque_until_the_same_carrier_begins_delivery ... ok
+test otp::admitted::tests::another_session_cannot_take_an_approved_value ... ok
+test otp::admitted::tests::dropping_a_session_cancels_its_unresolved_petitions ... ok
+test otp::admitted::tests::policy_requires_member_authority_and_transport_identity ... ok
+test otp::admitted::tests::expiry_and_wrong_scope_are_refused_at_the_adapter_boundary ... ok
+test otp::base32::tests::a_lone_trailing_character_cannot_form_a_byte ... ok
+test otp::base32::tests::case_and_grouping_whitespace_are_tolerated ... ok
+test otp::admitted::tests::petition_identity_comes_from_the_admitted_transcript ... ok
+test otp::base32::tests::characters_outside_the_alphabet_are_rejected ... ok
+test otp::base32::tests::non_zero_padding_bits_are_rejected ... ok
+test otp::base32::tests::padding_is_optional_the_way_authenticator_uris_write_it ... ok
+test otp::base32::tests::rfc4648_section_10_vectors ... ok
+test otp::admitted::tests::revocation_is_rechecked_before_approval_and_delivery ... ok
+test otp::item::tests::an_imported_item_is_titled_by_its_issuer_or_else_its_account ... ok
+test otp::item::tests::an_item_handle_has_no_meaning_in_another_persona_namespace ... ok
+test cxf::tests::imported_totp_exercises_existing_release_gate_and_locked_commit_writes_nothing ... ok
+test otp::item::tests::deletion_closes_the_item_without_affecting_the_persona_namespace ... ok
+test otp::item::tests::imported_item_reopens_with_its_secret_free_metadata ... ok
+test cxf::tests::enum_ignore_rules_and_sharing_do_not_create_local_grants ... ok
+test cxf::tests::nested_collections_resolve_aliases_and_report_dangling_links ... ok
+test cxf::tests::custom_fields_are_recovered_element_by_element_and_known_extra_fields_are_ignored ... ok
+test otp::item::tests::steam_guard_import_does_not_reclassify_otpauth_extensions ... ok
+test cxf::tests::known_failures_are_not_classified_as_new_types_and_totp_uses_original_base32 ... ok
+test otp::release::tests::approved_hotp_counter_survives_gate_reopen ... ok
+test otp::item::tests::steam_guard_is_an_explicit_stored_style_and_uses_the_release_tile ... ok
+test otp::item::tests::stored_record_contains_neither_seed_nor_display_metadata_in_plaintext ... ok
+test otp::release::tests::participant_facts_must_be_presentable_and_session_debug_is_redacted ... ok
+test otp::steam_guard::tests::refuses_non_steam_secret_shapes ... ok
+test otp::tests::a_parsed_uri_reproduces_the_rfc_vector ... ok
+test otp::release::tests::denial_removes_the_petition_without_consuming_hotp ... ok
+test otp::steam_guard::tests::matches_the_steamguard_cli_compatibility_corpus ... ok
+test otp::tests::a_zero_period_is_refused ... ok
+test otp::release::tests::approval_uses_gate_time_and_releases_a_live_tile ... ok
+test otp::item::tests::no_chatelaine_value_in_the_read_model_holds_secret_material ... ok
+test otp::tests::a_secret_below_the_rfc_minimum_is_refused_at_construction ... ok
+test otp::release::tests::pending_capacity_is_configurable_and_bounded ... ok
+test otp::tests::a_typical_authenticator_uri_parses ... ok
+test otp::release::tests::expired_petition_cannot_release_a_code ... ok
+test otp::tests::an_excessive_skew_window_is_refused_before_iteration ... ok
+test otp::tests::an_unpadded_secret_parses_the_way_qr_codes_write_it ... ok
+test otp::tests::conflicting_issuer_identities_are_refused ... ok
+test otp::tests::debug_does_not_print_the_secret ... ok
+test otp::tests::defaults_apply_when_optional_parameters_are_absent ... ok
+test otp::tests::an_hotp_uri_carries_its_counter ... ok
+test otp::release::concurrency_tests::independent_gates_over_one_open_store_serialize_hotp ... ok
+test otp::tests::an_hotp_uri_without_a_counter_is_refused ... ok
+test otp::tests::rfc6238_appendix_b_totp_values ... ok
+test otp::tests::digit_counts_outside_the_representable_range_are_refused ... ok
+test otp::tests::seconds_remaining_counts_down_within_the_step ... ok
+test otp::tests::malformed_uris_are_refused_with_a_reason ... ok
+test otp::tests::matching_accepts_the_adjacent_step_when_skew_is_allowed ... ok
+test otp::tests::security_relevant_uri_ambiguities_are_refused ... ok
+test otp::tests::rfc4226_appendix_d_hotp_values ... ok
+test otp::tests::the_label_prefix_is_used_when_no_issuer_parameter_is_given ... ok
+test otp::tests::the_scheme_is_matched_case_insensitively ... ok
+test otp::tests::totp_counter_is_the_step_count_since_t0 ... ok
+test otp::tests::unknown_parameters_are_ignored_rather_than_rejected ... ok
+test cxf::tests::account_choices_are_complete_before_writes_and_cross_persona_links_are_omitted ... ok
+test cxf::tests::unknown_credential_bytes_are_preserved_exactly_in_sealed_payload ... ok
+test view::tests::carry_adapter_projects_public_roster_facts_without_secret_bridges ... ok
+test resident::tests::conflicting_batch_does_not_partly_bind_destinations ... ok
+test cxf::tests::quarantine_refuses_exercise_before_opening_payload ... ok
+test cxf::tests::unsupported_otp_counts_survive_import_and_cannot_be_exercised ... ok
+test resident::tests::resident_rejects_restored_hotp_state_before_releasing_it_again ... ok
+test resident::tests::independent_gates_under_one_resident_cannot_repeat_an_hotp_counter ... ok
+test review::tests::supported_acceptance_opens_the_existing_exercise_gate_without_replacing_payload ... ok
+test custody::vault::lock_tests::enrolment_then_a_passphrase_unlock_works_end_to_end ... ok
+test cxf::tests::all_seventeen_types_and_future_type_use_the_ruled_dispositions ... ok
+test cxf::tests::persona_batch_has_one_index_commit_after_all_payloads_and_metadata ... ok
+test cxf::tests::pkcs8_keys_join_native_slots_preserve_existing_keys_and_reimport_is_a_noop ... ok
+
+test result: ok. 303 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 18.52s
+

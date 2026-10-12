@@ -185,8 +185,8 @@ in two or more crates.
   `19e6dc9f`). P1 breaks Knot.** P1 made `compile_relationship_snapshot` and
   its `_with_limits` form methods on `ProjectionCompiler`, built from
   `ItemSizes`, which has no default on purpose (S20). Knot `54bb8cd` still calls
-  the free function: `crates/knot-composition/src/retention.rs` 39, a test
-  support file, and `apps/desktop/src/composition/recipe.rs` (checked here:
+  the free function: `repos/knot-editor/crates/knot-composition/src/retention.rs` 39, a test
+  support file, and `repos/knot-editor/apps/desktop/src/composition/recipe.rs` (checked here:
   eight calls in that file). Mere builds today only because its
   `[patch."…mere.git"]` table serves Knot no `scenomise`; ruling 586's row,
   added with djinn's Knot repin, makes `knot-composition` fail with E0425.
@@ -199,7 +199,7 @@ in two or more crates.
   does not touch `ProjectionCompiler` or `ItemSizes`.
   **Corrected 2026-10-05:** the counts above are wrong. Knot `54bb8cd` has
   twelve call sites: one in `retention.rs` and eleven in
-  `apps/desktop/src/composition/recipe.rs` (five in code, six in its tests; the
+  `repos/knot-editor/apps/desktop/src/composition/recipe.rs` (five in code, six in its tests; the
   twelfth mention there is the import), and `tests/support/recipe.rs` makes
   none; "eight" came from output cut off at ten lines. The Knot lane reports
   Mark's ruling on Knot's card, "Measured from Knot's font": the desktop
@@ -801,7 +801,7 @@ Round 20, 2026-10-06. Evidence: phase C's per-plan open items for the next sixte
 
 **Ruling S61.** *Projection and publishing plans: which are archived?* Options: projection receipts; native smolweb rendering; the graphshell remote projection host; the knot publishing protocol (multi-select). Mark: **"Projection receipts, Native smolweb rendering, Graphshell remote projection host, Knot publishing protocol, Explain the difference for 2"**. Follows: all four are archived: projection receipts' FT9/FT10 gates to the projection grammar adoption plan, the remote projection host's G6/G7 to the reference host plan's H-series, Knot's copy of the publishing protocol canonical; native smolweb rendering's question of which render design stands (its "2") is explained to Mark and put back before its host-integration tail is placed.
 
-Round 21, 2026-10-06. Evidence: the code of the two smolweb render designs (`crates/cambium/cambium/src/nematic.rs` and `views.rs`; `crates/system/document-lanes/src/smolweb.rs`), and phase C's open items for the last six of S49's plans.
+Round 21, 2026-10-06. Evidence: the code of the two smolweb render designs (`crates/cambium/cambium/src/nematic.rs` *(historical citation)* <!-- doc-audit: historical-path --> and `views.rs`; `crates/system/document-lanes/src/smolweb.rs`), and phase C's open items for the last six of S49's plans.
 
 **Ruling S62.** *Native smolweb's two render designs: per-format Cambium views over Errand's ASTs (no host uses them), or the EngineDocument lane (Nematic lowers every format into Inker blocks that document-canvas lays out; Pelt, Turnstone and Signalman read it). Which stands?* Options: the lane as default with bespoke views only where the line model is not box-shaped; the EngineDocument lane only; the per-format views. Mark: **"Wait, the fidelity work can enrich the asts that feed engine documents? Why wouldn’t we do that?"**. Follows: not yet settled. Answered: yes, enriching the ASTs that feed EngineDocument is the fidelity plan's own central finding ("the losses are at the parse ASTs") and applies under every option; what remains open is a format whose structure blocks cannot carry even with richer ASTs (gopher's typed column), which needs a new block kind or a bespoke view. Put back in round 22.
 
@@ -1062,7 +1062,7 @@ The done-conditions handed over for S3 and S4, kept for reference:
   recommended actions (92 wrong status lines, 440 stale claims); about 67
   are archive candidates under S36; DOC_README has dozens of stale entries
   and 10 orphans; the doc audit reports 14 resolved annotations; about 33
-  documents carry the dead `crates/graph/subgraph` banner; and 27 of the 166
+  documents carry the dead `crates/graph/subgraph` *(historical citation)* <!-- doc-audit: historical-path --> banner; and 27 of the 166
   were touched by other lanes since 2026-09-29, about a dozen of them heavily
   (physics catalog, dynamics grammar, burn, the one-tree plan, vault lock,
   device pairing, chatelaine, projection grammar). How phase C runs goes to

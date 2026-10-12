@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--config",
+    "/Users/markik/Code/output/vello-producer-gates-20261011/local-netrender-validation.toml",
+    "-p",
+    "cambium-rootstock",
+    "--lib",
+    "producer::registry::portable::tests",
+    "-j",
+    "2",
+    "--",
+    "--test-threads=1"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-vello-release-adoption",
+  "deadline_seconds": 600,
+  "elapsed_seconds": 10.032,
+  "exit_code": 0,
+  "timed_out": false,
+  "log": "/Users/markik/Code/output/vello-producer-gates-20261011/checks/aggregate-registry-qualified.log"
+}
