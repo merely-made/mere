@@ -981,6 +981,26 @@ not headed acceptance. The citation audit passes; existing D2 digest/receipt
 coverage gaps are retained separately. Main landing waits for the source-bound
 browser run and capture review.
 
+**Qualification continuation (2026-10-12):** the candidate at `41a064ea0`
+remains old-pin/unqualified. The renderer coordinator requires the final
+coherent Genet/Netrender/provider/Fleece/Knot/Mere family before browser
+acceptance; interim supplier heads are not that basis. Merge its published
+Mere revision, renew the affected gates and packages, and take only its explicit
+finite runtime release. No headed/GPU launch has occurred from this lane.
+The dev package's function-name custom section was removed with
+`wasm-bindgen --remove-name-section`; all other Wasm sections are byte-identical,
+reducing viewer transfer from 344.7 MB to 43.6 MB for the dev checks.
+
+The old-pin release size gate also exposes an inherited delivery gap. With
+P0's `s`/thin-LTO/symbol-strip/one-codegen-unit settings, published `04a48c2d6`
+is 6,186,727 B gzip and this presenter/command continuation is 6,271,451 B
+(+84,724 B). Both exceed R157's 3.25 MiB viewer cap. Glue, mount and history
+fit their individual caps. These are source-bound measurements in
+`baseline-size-comparison.json` and `release-size.json` under the candidate
+output, not current-coherent-family or live-site delivery qualification. Keep
+the cap unchanged: shared presenter integration after browser acceptance does
+not authorize deploying an oversized viewer or retiring the site's fallback.
+
 ## 5. Stop rules
 
 - Nothing a screen reader reaches today is lost: a control moves only once
