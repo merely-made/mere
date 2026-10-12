@@ -497,3 +497,24 @@ Markdown or parser-shaped judgment record is added or altered by this lane.
 Complete before/after citation and D2 JSON reports match the integration-base
 baseline: 260/261 D2 coverage and the same two existing errors. Whitespace checks
 pass. The remaining acceptance gates are recorded in the existing owner plan.
+
+
+**Relationship/dynamics inspection draft (2026-10-11):** Mark chose this next
+draft and authorized “Sure. Go ahead”. Published `ec1e65ca` is integrated;
+upstream Forme/field qualification and occurrence-relationship dynamics remain
+at their recorded limits. A shared relation-cell input seam supplies the
+existing bridge and inspector without changing input weighting. Exact targets,
+source handles, current versus authored dynamics, position pins, role policy,
+installed arrangement constraints and Forme holds are disclosed separately.
+The current kernel's statement-row multiplicity is preserved. Thirty-eight
+portable checks and the product wasm check pass; Canvas native and headed gates
+remain open. Measured contributions and missing derivation evidence are not
+fabricated. The existing owner records the two-page/four-capture handoff and
+remaining adapters; no active Markdown or parser-shaped judgment is added.
+
+Complete citation and D2 reports match a controlled comparison with integrated
+published `578c8e36`: only this lane's three document edits were substituted,
+with source files and upstream receipts fixed. The baseline is 261/264 D2
+coverage and four existing errors, including the two newly published renderer
+receipt documents. Whitespace passes. New receipt logs preserve raw bytes and
+text-source hashes normalize CRLF to LF for portable qualification.
