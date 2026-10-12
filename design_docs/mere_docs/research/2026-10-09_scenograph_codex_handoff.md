@@ -18,8 +18,9 @@ six platform/existing ignored, and 15 reviewed native captures across wide and
 compact fresh-process reopen. Its appearance-test navigation repair preserves
 the production Windows menu and the original assertions.
 The broader canvas suite retains its reproduced topic-radial baseline golden
-failure. Firefox and the original physics coordinator's independent review remain
-open. Mark has authorized this bounded consumer review; F199's T2/G4b2 pause stands.
+failure. Firefox verification is parked at Mark's direction while browser control
+is blocked; the original physics coordinator's independent review remains open.
+Mark has authorized this bounded consumer review; F199's T2/G4b2 pause stands.
 Mark subsequently chose **Preview; keep placement explicitly**: motion stays
 transient until the consumer records its displayed pose as one undoable authored
 placement edit; retaining that edit is still deliberate. This introduces no
@@ -31,6 +32,15 @@ native captures cover motion, one-edit undo/redo, deliberate retention and the
 exact kept version's fresh-process reopen. The receipt identifies two executable
 phases and the known offscreen/cropped scene layout. Source bytes, copied
 disclosure, dynamics and roles remain unchanged; runtime is discarded.
+The [preview layout continuation](https://github.com/merely-made/knot-editor/blob/156626f/docs/receipts/2026-10-11_dynamics_viewport/README.md)
+places the canvas above a compact motion toolbar and uses the existing host
+scroll request once per playback action to reveal the whole group. Native
+capture metadata compares painted and visible camera rectangles; ordinary
+scrolling remains free and hides/pauses motion without automatic resume.
+The final focused suite passes 80 tests and all 16 final native captures are
+reviewed. The complete camera box is visible after playback actions at both
+native sizes, with preserved Keep/undo/redo pose identity and unchanged source.
+This remains Knot-owned presentation, not a new force policy or consumer repin.
 
 Three pieces of ruled work, each with done-conditions in its plan. Read the
 plan sections first; they hold Mark's rulings verbatim, and those govern.

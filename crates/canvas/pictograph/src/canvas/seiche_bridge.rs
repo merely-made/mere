@@ -33,15 +33,9 @@ pub(crate) fn visible_relation_edges(
     graph: &Graph,
     hidden_edges: &HashSet<crate::canvas::EdgeCell>,
 ) -> Vec<(NodeKey, NodeKey)> {
-    graph
-        .projected_relations()
-        .filter(|(_, r)| {
-            !hidden_edges.contains(&crate::canvas::edge_cells::edge_cell_for_relation(
-                r.from, r.to, r.kind,
-            ))
-        })
-        .map(|(_, r)| (r.from, r.to))
-        .collect()
+    super::relationship_topology::visible_edges(graph, |from, to, selector| {
+        hidden_edges.contains(&crate::canvas::EdgeCell { from, to, selector })
+    })
 }
 
 /// Build the force-directed simulation from `graph`: a body per node, one spring
