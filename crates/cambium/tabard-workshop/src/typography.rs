@@ -180,7 +180,8 @@ pub(crate) fn controls(state: &WorkshopState) -> WorkshopView {
                     s.fonts.family = TextInput::new(family);
                     s.apply_fonts();
                 })
-                .attr("data-font-family", family),
+                .attr("data-font-family", family)
+                .attr("class", format!("font-family-{family}")),
             ) as WorkshopView
         })
         .collect();

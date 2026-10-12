@@ -41,7 +41,8 @@ captures-differ authored_previews reading_undone
 click role:button @data-action=redo
 assert snap paragraph_size == 24px
 click role:button @data-font-role=interface
-click role:button @data-font-family=serif
+click .font-family-serif
+assert snap font_family == serif
 key tab-until data-field=font-size
 input-text 15
 key tab-until data-field=font-line-height
