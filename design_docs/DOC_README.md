@@ -857,5 +857,7 @@ Pre-1.0 development. Index compacted in the 2026-06-09 design-docs audit (37 doc
 - [inker_docs/testing/receipts/2026-10-07_current_browser_family/README.md](inker_docs/testing/receipts/2026-10-07_current_browser_family/README.md).
 - [mere_docs/testing/receipts/2026-10-11_vello_releases/README.md](mere_docs/testing/receipts/2026-10-11_vello_releases/README.md).
 - [mere_docs/testing/receipts/2026-10-11_producer_gates/README.md](mere_docs/testing/receipts/2026-10-11_producer_gates/README.md).
+- [mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md](mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md).
+- [mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md](mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md).
 
 - [Dramatis app slice](dramatis_docs/implementation_strategy/2026-10-11_dramatis_app_plan.md): persona selection and quarantine review through Djinn; first Windows slice qualified, with native consent and custody controls.

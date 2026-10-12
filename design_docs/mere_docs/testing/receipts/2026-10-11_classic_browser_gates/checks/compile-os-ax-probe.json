@@ -1,0 +1,19 @@
+{
+  "command": [
+    "xcrun",
+    "swiftc",
+    "-framework",
+    "ApplicationServices",
+    "-framework",
+    "AppKit",
+    "output/vello-classic-browser-gates-20261011/accessibility-reset/ax_probe.swift",
+    "-o",
+    "output/vello-classic-browser-gates-20261011/accessibility-reset/ax-probe"
+  ],
+  "cwd": "/Users/markik/Code",
+  "deadline_seconds": 180,
+  "elapsed_seconds": 87.193,
+  "exit_code": 0,
+  "timed_out": false,
+  "log": "/Users/markik/Code/output/vello-classic-browser-gates-20261011/checks/compile-os-ax-probe.log"
+}
