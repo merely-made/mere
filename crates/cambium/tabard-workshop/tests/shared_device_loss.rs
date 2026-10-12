@@ -31,6 +31,7 @@ use std::{
     },
     time::{Duration, Instant},
 };
+use tabard::theme::registry::Mode;
 use tabard_workshop::{ReaderSpecimen, WorkshopState};
 
 const WIDTH: u32 = 160;
@@ -86,7 +87,16 @@ fn host(key: u64, primary_hex: &str, wakes: Arc<AtomicUsize>) -> WindowHost {
     let mut authored = workshop.draft_theme().clone();
     authored.name = format!("Shared recovery authored source {key}");
     authored.seeds.primary.a = 73;
-    workshop.edit_definition(&authored, None).unwrap();
+    // The first 120px of the real article contains neutral paper/text, before
+    // any accent-bearing links. Distinct primary seeds alone do not make this
+    // visible band distinct. Select real application modes so its background
+    // and foreground are observably different without altering reader content.
+    let mode = if key == FIRST_KEY {
+        Mode::Light
+    } else {
+        Mode::Dark
+    };
+    workshop.edit_definition(&authored, Some(mode)).unwrap();
     *workshop.text_field_mut("seed-hex").unwrap() = cambium::TextInput::new(primary_hex);
     assert!(workshop.apply_hex());
     let mut state = HostState::new();
@@ -268,6 +278,36 @@ fn arm_refusal_checks(host: &mut WindowHost, notices: Rc<RefCell<Vec<(&'static s
     }));
 }
 
+fn write_frame_diagnostics(label: &str, frames: &[(&str, &RgbaFrame)]) {
+    let rows: Vec<_> = frames.iter().map(|(name, frame)| serde_json::json!({
+        "name":name,"width":frame.width,"height":frame.height,
+        "byte_count":frame.rgba.len(),"fnv1a_digest":format!("{:016x}",frame.digest()),
+        "distinct_colors":frame.rgba.chunks_exact(4).collect::<std::collections::BTreeSet<_>>().len(),
+    })).collect();
+    eprintln!(
+        "recovery pixel diagnostic {label}: {}",
+        serde_json::to_string(&rows).unwrap()
+    );
+    if let Some(directory) = std::env::var_os("SHARED_DEVICE_RECOVERY_OUT") {
+        let directory = std::path::PathBuf::from(directory).join(label);
+        std::fs::create_dir_all(&directory).unwrap();
+        for (name, frame) in frames {
+            let mut file = std::fs::OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(directory.join(format!("{name}.rgba")))
+                .unwrap();
+            std::io::Write::write_all(&mut file, &frame.rgba).unwrap();
+        }
+        let mut file = std::fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(directory.join("diagnostics.json"))
+            .unwrap();
+        std::io::Write::write_all(&mut file, &serde_json::to_vec_pretty(&rows).unwrap()).unwrap();
+    }
+}
+
 #[test]
 fn real_two_host_detachment_bounds_failed_factory_and_preserves_workshop_sources() {
     let attempts = Arc::new(AtomicUsize::new(0));
@@ -407,11 +447,25 @@ fn actual_shared_device_destroy_replaces_once_rehydrates_producers_then_bounds_l
     second.attach_shared_recovery(owner.clone());
     let first_state = authority(&first);
     let second_state = authority(&second);
+    let first_reader_bg = first_state.3.borrow().palette().bg.clone();
+    let second_reader_bg = second_state.3.borrow().palette().bg.clone();
+    assert_ne!(
+        first_reader_bg, second_reader_bg,
+        "application-owned mode must distinguish actual reader paper before GPU staging"
+    );
     let before_first = producer_pixels(&mut first, FIRST_KEY);
     let before_second = producer_pixels(&mut second, SECOND_KEY);
-    assert_ne!(
-        before_first.rgba, before_second.rgba,
-        "distinct application sources must not alias one global image key"
+    write_frame_diagnostics(
+        "before-distinctness",
+        &[("first", &before_first), ("second", &before_second)],
+    );
+    assert!(
+        before_first.rgba != before_second.rgba,
+        "distinct application sources must not alias one global image key; first={:016x} second={:016x}, reader paper first={} second={}",
+        before_first.digest(),
+        before_second.digest(),
+        first_reader_bg,
+        second_reader_bg
     );
     let refusals = Rc::new(RefCell::new(Vec::new()));
     arm_refusal_checks(&mut first, refusals.clone());
@@ -484,6 +538,10 @@ fn actual_shared_device_destroy_replaces_once_rehydrates_producers_then_bounds_l
     install_surface(&mut second, new_second, drops.clone());
     let after_first = producer_pixels(&mut first, FIRST_KEY);
     let after_second = producer_pixels(&mut second, SECOND_KEY);
+    write_frame_diagnostics(
+        "after-rehydration",
+        &[("first", &after_first), ("second", &after_second)],
+    );
     assert!(
         matches!(
             inflight.poll(),
@@ -492,13 +550,17 @@ fn actual_shared_device_destroy_replaces_once_rehydrates_producers_then_bounds_l
         "replacement cannot deliver old capture pixels"
     );
     drop(inflight);
-    assert_eq!(
-        before_first.rgba, after_first.rgba,
-        "first actual registered reader producer rehydrates identically"
+    assert!(
+        before_first.rgba == after_first.rgba,
+        "first actual registered reader producer rehydrates identically; before={:016x} after={:016x}",
+        before_first.digest(),
+        after_first.digest()
     );
-    assert_eq!(
-        before_second.rgba, after_second.rgba,
-        "second actual registered reader producer rehydrates identically"
+    assert!(
+        before_second.rgba == after_second.rgba,
+        "second actual registered reader producer rehydrates identically; before={:016x} after={:016x}",
+        before_second.digest(),
+        after_second.digest()
     );
     assert_authority(&first, &first_state);
     assert_authority(&second, &second_state);
@@ -559,6 +621,7 @@ fn actual_shared_device_destroy_replaces_once_rehydrates_producers_then_bounds_l
             "factory_attempts":attempts.load(Ordering::SeqCst),"surface_drops":drops.load(Ordering::SeqCst),
             "host_wakes":wakes.load(Ordering::SeqCst),"source_authority_preserved":true,
             "source_authority":{"first":{"mode":first_state.1,"dirty":first_state.2,"reader_rc_preserved":true},"second":{"mode":second_state.1,"dirty":second_state.2,"reader_rc_preserved":true}},
+            "source_reader_paper":{"first":first_reader_bg,"second":second_reader_bg},
             "stale_notice_deduplicated":true,"inflight_old_generation_refused_once":true,"no_late_old_pixels":true,
             "all_owned_old_core_references_released_before_boot":true,
             "capture_refusals":&*refusals.borrow(),"pixel_equality":{"first":true,"second":true},"frames":frames,
