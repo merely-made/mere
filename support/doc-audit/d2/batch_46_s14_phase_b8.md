@@ -425,3 +425,7 @@ is locked. The linked candidate receipt retains false runtime/visual/main
 flags. Its new release size is measured against the unchanged cap; the seven
 global D2 findings are identified as inherited coverage, rather than passed
 audit or presenter acceptance. No whole-document claim census is repeated.
+
+Renderer documentation followup `e0dae9c9` supplies the three missing records
+and reduces that seven-finding baseline to the four older findings. Integration
+leaves source/pin/lockfile bytes unchanged; it adds no runtime acceptance.

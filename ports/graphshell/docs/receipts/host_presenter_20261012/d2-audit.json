@@ -1,32 +1,29 @@
 {
   "active_docs": 268,
-  "covered_active_docs": 262,
+  "covered_active_docs": 265,
   "legacy_records": 281,
   "legacy_snapshot_sha256": "2046e1eec3018b7dd288e794326090f1b7f9a889043d53e45530271d0b32be1e",
   "legacy_corrections": 2,
   "legacy_active_records": 186,
-  "supplemental_records": 228,
+  "supplemental_records": 231,
   "superseded_legacy_records": 56,
-  "superseded_supplemental_records": 91,
+  "superseded_supplemental_records": 92,
   "inactive_legacy_records": 95,
-  "combined_records": 453,
+  "combined_records": 456,
   "combined_dispositions": {
-    "current": 250,
+    "current": 253,
     "dead": 17,
     "historical-marked": 102,
     "historical-unmarked": 80,
     "superseded": 4
   },
   "combined_claim_totals": {
-    "claims": 5855,
-    "holds": 4468,
+    "claims": 5884,
+    "holds": 4497,
     "stale": 1224,
     "unverifiable": 163
   },
   "missing_active_records": [
-    "cambium_docs/technical_architecture/2026-10-11_shared_device_recovery_owner.md",
-    "cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/README.md",
-    "cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/performance-analysis.md",
     "mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md",
     "mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md",
     "mere_docs/testing/receipts/2026-10-11_producer_gates/README.md"
@@ -132,9 +129,6 @@
   ],
   "errors": [
     "snapshot aggregate digest changed: 2046e1eec3018b7dd288e794326090f1b7f9a889043d53e45530271d0b32be1e != f0b64eef4cd5514157bb1b49d389b84db29a1e823d6f3e2cebf827337fe56abf",
-    "active document lacks D2 record: cambium_docs/technical_architecture/2026-10-11_shared_device_recovery_owner.md",
-    "active document lacks D2 record: cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/README.md",
-    "active document lacks D2 record: cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/performance-analysis.md",
     "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md",
     "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md",
     "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_producer_gates/README.md"
