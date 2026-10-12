@@ -99,3 +99,5 @@ Browser readbacks share cancellation and typed refusal. The default synchronous
 replacement recipe cannot request a new WebGPU device on the browser event
 loop and therefore reports explicit failure there. A browser asynchronous
 replacement owner is a separate extension; native success does not qualify it.
+
+Native checked raster targets now require current Classic shader-counter completion before success. Genet observes zero pending counter frames/bytes inside loss admission and API scopes, with a five-second deadline enforced before polling, before success and after scope observation. Current shader-limit failures refuse the frame before producer registration, presentation or capture. Browser asynchronous counter/error-scope qualification remains open; this native blocking completion cost is separate from render encode/submit timing.

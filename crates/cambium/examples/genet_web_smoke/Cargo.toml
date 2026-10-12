@@ -41,8 +41,8 @@ cambium = { path = "../../cambium" }
 # genet engine core. These were relative paths into genet's `components/`;
 # from mere they are git pins at the revision every genet.git pin in this
 # repository names.
-genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", rev = "5fc1836936f2d7ce6d103b8081b537e8bd922c1d" }
-genet-livery = { git = "https://github.com/merely-made/genet.git", rev = "5fc1836936f2d7ce6d103b8081b537e8bd922c1d" }
+genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", rev = "2c7ef73bfa44c07744e0643e3c6f98be3cbd7947" }
+genet-livery = { git = "https://github.com/merely-made/genet.git", rev = "2c7ef73bfa44c07744e0643e3c6f98be3cbd7947" }
 
 # rasterizer stack — git deps matching the genet workspace's own
 # netrender source, so paint_list_api unifies with genet-livery's copy
@@ -74,13 +74,13 @@ console_error_panic_hook = "0.1"
 [patch.crates-io]
 # Keep the standalone smoke on this checkout's current scripted-DOM and
 # render-neutral DOM contracts instead of a previously published graph.
-genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", rev = "5fc1836936f2d7ce6d103b8081b537e8bd922c1d", version = "=0.1.2" }
-layout-dom-api = { git = "https://github.com/merely-made/genet.git", rev = "5fc1836936f2d7ce6d103b8081b537e8bd922c1d", version = "=0.1.1" }
+genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", rev = "2c7ef73bfa44c07744e0643e3c6f98be3cbd7947", version = "=0.1.2" }
+layout-dom-api = { git = "https://github.com/merely-made/genet.git", rev = "2c7ef73bfa44c07744e0643e3c6f98be3cbd7947", version = "=0.1.1" }
 # Published Genet Taffy fork, locally patched to this checkout for smoke builds.
 # The exact versions pick one package each: genet holds two `genet-taffy`s.
-genet-taffy = { git = "https://github.com/merely-made/genet.git", rev = "5fc1836936f2d7ce6d103b8081b537e8bd922c1d", version = "=0.14.0" }
+genet-taffy = { git = "https://github.com/merely-made/genet.git", rev = "2c7ef73bfa44c07744e0643e3c6f98be3cbd7947", version = "=0.14.0" }
 # ahash runtime-rng/getrandom-0.3 drop for the wasm graph.
-sonic-rs = { git = "https://github.com/merely-made/genet.git", rev = "5fc1836936f2d7ce6d103b8081b537e8bd922c1d" }
+sonic-rs = { git = "https://github.com/merely-made/genet.git", rev = "2c7ef73bfa44c07744e0643e3c6f98be3cbd7947" }
 # Classic 0.11 and its owned repairs; standalone patches are not inherited.
 netrender-vello = { git = "https://github.com/mark-ik/vello", rev = "2eae6243881d5b24c984d5ee35dde509ca5db782" }
 vello_encoding = { git = "https://github.com/mark-ik/vello", rev = "2eae6243881d5b24c984d5ee35dde509ca5db782" }
