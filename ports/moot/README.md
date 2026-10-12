@@ -83,6 +83,24 @@ bindings, Cambium controls, Graphshell rendering and actual peer activity retain
 their separate gates in the
 [Moot plan](../../design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#shared-resources-and-coop-interaction-draft-2026-10-11).
 
+## Resource owner and Cambium controls
+
+`resource-owner` connects an admitted reader to current Gemot collections and
+Eidetic local content. The first reader verifies public local blobs up to 4 MiB;
+private/sealed content requires a separate access/key adapter. Reads acquire no
+remote content and write no storage. A reviewed destination is bound into each
+collection-fork intention and checked against current Gemot authority again at
+dispatch. Reference forks retain ancestry and copy no content bytes. Unsupported
+content-copy, content-fork, hosting and application actions need their owners.
+
+`resource-view` supplies host-neutral Cambium summaries, an adjacent inspector
+and coop controls. Each reading has independent attention and a scoped request
+outbox. Hosts consume requests, deliver owner feedback and refresh authoritative
+reads; rebuilding or arranging the UI performs no domain action. The host owns
+mounting, style, rendering and application-session routing. See the
+[owner and control continuation](../../design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#resource-owners-and-cambium-controls-2026-10-11)
+for acceptance boundaries.
+
 ## License
 
 MPL-2.0
