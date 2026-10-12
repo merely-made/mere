@@ -65,6 +65,24 @@ in this view. The CPU receipt uses two encrypted replicas and signed Gemot
 delegation/revocation facts; it qualifies no network, browser UI, presence or
 media path. See the [Moot implementation plan](../../design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#moot-conversation-and-coop-continuation-2026-10-10).
 
+## Shared resources and coop draft
+
+`moot::resource_coop` is the portable interaction model for a disclosed shared
+collection beside a domain-owned activity. Each reading keeps independent exact
+resource and activity attention. Preparation returns an owner-routed intention;
+the owner must check current authority, revision, storage, audience and quotas.
+Offers and coop reports grant no rights. A collection fork preserves references
+and ancestry; content copying and content forking remain separate actions.
+
+The model distinguishes address-only/resolved content, hosting promises and
+observed retrievals, and owner acceptance/refusal. Acceptance feedback does not
+invent custody, availability or participation. Refreshes invalidate stale local
+completions; a new contribution does not retarget an exact selected revision.
+The first source harness qualifies these view contracts. Production owner
+bindings, Cambium controls, Graphshell rendering and actual peer activity retain
+their separate gates in the
+[Moot plan](../../design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#shared-resources-and-coop-interaction-draft-2026-10-11).
+
 ## License
 
 MPL-2.0

@@ -574,6 +574,80 @@ a forme draft must not author a message or discard an independent conversation
 edit. This continuation qualifies channel-local editing, not the pending forme
 gesture/undo implementation.
 
+### Shared resources and coop interaction draft (2026-10-11)
+
+Mark asked whether the next work should repin Knot to p2panda net 0.7.6 or
+reconcile current origins/plans and develop testable application drafts. He
+selected **shared resources and coop** as the first interaction. The fresh
+origin review found that Knot already adopts the immutable
+`mere-p2panda-net-0.7.5-upstream-20261011` source. That source differs from the
+fork's 0.7.6 tag only in the net package version. A version migration is
+dependency maintenance, not a prerequisite for this application draft.
+
+The draft is a shared collection beside a domain-owned activity. It preserves
+the exact signed contribution and manifest selected by this reading, even when
+another revision appears. Collection lineage, content copying/forking, hosting
+and activity participation are separate requested actions. A hosting promise is
+distinct from an observed retrieval; resolved content does not imply durable
+custody. Membership counts and lifecycle reports supply no live presence or
+action permission.
+
+The portable [resource/coop model](../../../ports/moot/src/resource_coop.rs)
+composes disclosed values with the existing `LifecycleReport`. It adds no
+publication/collection wire format, store or authority owner. Gemot supplies
+effective contributions and exact collection frontier/commitment; Eidetic
+supplies manifests and verified content; the existing application supplies the
+activity address and report. The first native adapter must map those actual
+reads, not manufacture an all-authorizing fixture authority. Existing
+`declare_collection_for_identity` and `set_collection_membership_for_identity`
+remain the collection mutation owners. A collection fork cannot stand in for
+a grant to copy or fork content.
+
+**Draft flow:** inspect a disclosed resource summary and its contribution/version
+evidence; inspect a related activity without changing resource selection;
+prepare an explicitly offered action; dispatch through its existing owner with
+current authority, key, revision, storage/audience and quota checks; show that
+owner's acceptance/refusal; then refresh from an owner read. Preparation and
+acceptance feedback never mark bytes retained, hosting available or a profile
+joined. Different readers and Moots require a fresh pane. A refresh or selection
+change invalidates local completion bindings without claiming cancellation of
+an already-dispatched domain command.
+
+The current S-PC [rule-editor and live binding](../../mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#exact-occurrence-previews-and-live-forme-guides-draft-2026-10-11)
+provide the presentation grammar. A future resource/activity occurrence adapter
+must disclose only available owner facts, keep unknown state distinct from false,
+and preserve per-view attention and prior matches. Summary-first inspection,
+optional exact evidence and host-composed controls follow the one-tree presenter
+review. Rules, Forme arrangement history, captures and resource authority remain
+separate: opening, arranging or restyling this surface cannot author a hosting,
+fork or join operation.
+
+**Validation targets:** equal payloads preserve independent contributions; a new
+revision does not retarget an exact selection; reference/collection fork offers
+do not grant content-copy rights; independent readings reject each other's
+completions; current refusal, withdrawal and refresh invalidate stale responses;
+membership and promises create no offers or presence; bad scopes and changed
+contribution bindings refuse before replacing the view. The small source harness
+imports the checked-in portable model and lifecycle sources. It qualifies these
+interaction contracts, not Gemot authorization, network transfer, application
+dispatch or rendered Graphshell acceptance.
+
+**Source qualification:** the [receipt](../../../ports/moot/docs/receipts/resource_coop_draft_20261011/qualification.json)
+records 20 passing harness tests (10 resource/coop contracts plus 10 existing
+lifecycle tests), strict harness Clippy, the actual default Moot Wasm check and
+the portable dependency cone. The Mere port and Graphshell web boundary checker
+also passes. Reproduce the contract tests with
+`cargo test --locked --offline --manifest-path ports/moot/docs/receipts/resource_coop_draft_20261011/harness/Cargo.toml --lib -j1`.
+No production owner adapter, rendered controls, live peer interaction, browser
+or GPU acceptance is claimed by this draft.
+
+**Next consumer gates:** bind production collection/capture and activity reads;
+add ordinary Cambium resource summaries, an adjacent inspector and owner-routed
+controls; qualify two independent readings and refused/stale actions; then
+exercise real signed Gemot revocation and collection/content fork distinctions
+across retained peers. GPU/browser acceptance stays under the current serialized
+handoff. The separate producer/presenter lanes are preserved.
+
 ### Capsule peer and standalone-browser reproduction
 
 The following commands execute the earlier capsule-library proof. Start at the
