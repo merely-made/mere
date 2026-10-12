@@ -20,8 +20,9 @@
     "netrender": "c74b7cb28090c28b1c6d80b08dcdea18aff48d3e",
     "provider": "2eae6243881d5b24c984d5ee35dde509ca5db782"
   },
-  "status": "correctedfixtureproduction and6CPUcontrols passed; explicitNative retry handoff pending",
-  "pixel_criterion": "Existing stricter interior RGB3/alpha2/mean1 applied uniformly to displayedwindow; exactvisibleReader/Stylesheetregions checked separately; originalstrictnegative retained",
+  "status": "executed native r2 RESULTok:56presentations,4nonblankcaptures,actual owned-device destruction and new-surface recovery; qualified under existing pixel limits",
+  "pixel_criterion": "Existing stricter interiorRGB3/alpha2/mean1 uniformly across displayedwindow; visible Reader oneRGB1pixel, visibleStylesheet byte-identical; no hidden completeSource comparison",
   "runtime_injection": "one explicit ownedDevice.destroy after completed baseline capture; no driver reset",
-  "source_checkpoint": "6b95cdd03a3cbec407f2a39d397bbca024a9d256"
+  "source_checkpoint": "6b95cdd03a3cbec407f2a39d397bbca024a9d256",
+  "native_qualification": "native-r2-qualification.json"
 }
