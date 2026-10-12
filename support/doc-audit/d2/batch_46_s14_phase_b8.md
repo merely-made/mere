@@ -387,3 +387,16 @@ original audit counts above remain historical. The toolbar is not retired
 before replacement access is demonstrated. SE31 session view persistence is
 explicitly retained as an open saved-product migration target; this read-only
 viewer does not create a second persistence mechanism.
+
+### One-tree presenter flow review, 2026-10-11
+
+Incremental review against published `ec1e65cae`, integrated at `2bb2e7d72`:
+the new product presentation binder/editor and live Forme-guides draft are
+acknowledged with their existing CPU/Wasm and pending headed boundaries.
+The host-dataset adapter, automatic footprint/LOD integration and complete
+comparison-selection restoration are recorded as gaps, with the actual
+source modules linked. The site flow, adjacent-inspector starting treatment
+and implementation gates are recommendations, not new user rulings or passed
+runtime checks. Existing authoring, context, typography, document-session and
+renderer ownership remain explicit. The original whole-document audit counts
+are unchanged; this addendum reviews only the new continuation.
