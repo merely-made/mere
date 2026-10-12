@@ -16542,11 +16542,14 @@ dependencies = [
  "cambium-genet-winit-host",
  "cambium-rootstock",
  "dirs 5.0.1",
+ "genet-render-host",
  "layout-dom-api",
  "mesquite",
+ "serde_json",
  "tabard-workshop",
  "taproot",
  "tempfile",
+ "wgpu",
 ]
 
 [[package]]
@@ -16557,6 +16560,7 @@ dependencies = [
  "cambium",
  "cambium-genet-winit-host",
  "cambium-rootstock",
+ "document-canvas",
  "genet-livery",
  "genet-render-host",
  "genet-scripted-dom",

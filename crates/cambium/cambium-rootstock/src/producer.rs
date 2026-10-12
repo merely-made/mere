@@ -19,7 +19,7 @@ mod bridge;
 pub(crate) mod registry;
 pub use paint_list_render::bundle::{PortablePaintCapture, ProducerSource};
 pub use registry::PortableCaptureError;
-pub use registry::ProducerRegistry;
+pub use registry::{ProducerImageIdentity, ProducerRegistry};
 
 /// Application-owned portable scene; its viewport is the same rounded logical
 /// extent used by the producer's GPU callback. Identity changes on source rebind.

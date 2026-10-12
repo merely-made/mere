@@ -1,0 +1,210 @@
+{
+  "scope": "Edited theme plan and index; unrelated active-tree debt is retained",
+  "counts": {
+    "active_docs": 268,
+    "indexed_active_docs": 267,
+    "index_orphans": 0,
+    "index_ghosts": 0,
+    "memory_directory_links": 0,
+    "statusless_plans": 0,
+    "broken_relative_links": 28,
+    "historical_broken_relative_links": 245,
+    "planned_broken_relative_links": 0,
+    "ambiguous_known_root_paths": 101,
+    "ignored_known_root_patterns": 23,
+    "reserved_identifier_paths": 24,
+    "missing_known_root_paths": 200,
+    "historical_missing_known_root_paths": 237,
+    "planned_missing_known_root_paths": 6,
+    "invalid_historical_annotations": 0,
+    "stale_historical_annotations": 0,
+    "unheaded_owned_sources": 0,
+    "exhibit_b_sources": 0
+  },
+  "scoped_findings": {
+    "broken_relative_links": [
+      {
+        "source": "DOC_README.md",
+        "subject": "../../genet/docs/2026-06-24_grand_audit.md",
+        "detail": "relative link target does not exist"
+      }
+    ],
+    "ambiguous_known_root_paths": [
+      {
+        "source": "DOC_README.md",
+        "subject": "tests/boundary.rs",
+        "detail": "bare src/tests/examples path has no crate context"
+      }
+    ],
+    "ignored_known_root_patterns": [
+      {
+        "source": "DOC_README.md",
+        "subject": "ports/distillery/{alembic,athanor}",
+        "detail": "glob or pattern syntax is not a concrete path"
+      },
+      {
+        "source": "mere_docs/implementation_strategy/2026-07-05_theme_modes_plan.md",
+        "subject": "crates/system/tabard/tests/fixtures/**",
+        "detail": "glob or pattern syntax is not a concrete path"
+      }
+    ],
+    "reserved_identifier_paths": [
+      {
+        "source": "DOC_README.md",
+        "subject": "mere/misfin/v1",
+        "detail": "versioned Mere protocol/schema identifier is not a filesystem path"
+      }
+    ],
+    "missing_known_root_paths": [
+      {
+        "source": "DOC_README.md",
+        "subject": "repos/emblem",
+        "detail": "resolved path does not exist: /Users/markik/Code/repos/emblem"
+      },
+      {
+        "source": "DOC_README.md",
+        "subject": "genet/design_docs/",
+        "detail": "resolved path does not exist: /Users/markik/Code/worktrees/genet/design_docs"
+      },
+      {
+        "source": "DOC_README.md",
+        "subject": "repos/dramatis/design_docs/archive_docs/2026-10-06_completed_plans/2026-08-10_dramatis_tier_plan.md",
+        "detail": "resolved path does not exist: /Users/markik/Code/repos/dramatis/design_docs/archive_docs/2026-10-06_completed_plans/2026-08-10_dramatis_tier_plan.md"
+      },
+      {
+        "source": "DOC_README.md",
+        "subject": "repos/mer3ly",
+        "detail": "resolved path does not exist: /Users/markik/Code/repos/mer3ly"
+      },
+      {
+        "source": "DOC_README.md",
+        "subject": "repos/dramatis/design_docs/archive_docs/2026-08-06_completed_plans/2026-07-26_notochord_session_policy_spine_plan.md",
+        "detail": "resolved path does not exist: /Users/markik/Code/repos/dramatis/design_docs/archive_docs/2026-08-06_completed_plans/2026-07-26_notochord_session_policy_spine_plan.md"
+      },
+      {
+        "source": "DOC_README.md",
+        "subject": "crates/probes/document-script-p0/",
+        "detail": "resolved path does not exist: /Users/markik/Code/worktrees/mere-tabard-typography/crates/probes/document-script-p0"
+      },
+      {
+        "source": "DOC_README.md",
+        "subject": "crates/probes/resident-graph",
+        "detail": "resolved path does not exist: /Users/markik/Code/worktrees/mere-tabard-typography/crates/probes/resident-graph"
+      },
+      {
+        "source": "DOC_README.md",
+        "subject": "genet/design_docs/archive_docs/2026-09-02/",
+        "detail": "resolved path does not exist: /Users/markik/Code/worktrees/genet/design_docs/archive_docs/2026-09-02"
+      },
+      {
+        "source": "DOC_README.md",
+        "subject": "genet/design_docs/archive_docs/2026-09-02/2026-06-12_knot_evaluation_export_plan.md",
+        "detail": "resolved path does not exist: /Users/markik/Code/worktrees/genet/design_docs/archive_docs/2026-09-02/2026-06-12_knot_evaluation_export_plan.md"
+      },
+      {
+        "source": "DOC_README.md",
+        "subject": "repos/dramatis/design_docs/DOC_README.md",
+        "detail": "resolved path does not exist: /Users/markik/Code/repos/dramatis/design_docs/DOC_README.md"
+      },
+      {
+        "source": "DOC_README.md",
+        "subject": "genet/design_docs/archive_docs/2026-09-02/2026-06-12_knot_evaluation_export_plan.md",
+        "detail": "resolved path does not exist: /Users/markik/Code/worktrees/genet/design_docs/archive_docs/2026-09-02/2026-06-12_knot_evaluation_export_plan.md"
+      }
+    ],
+    "historical_missing_known_root_paths": [
+      {
+        "source": "DOC_README.md",
+        "subject": "crates/dramatis/gazette",
+        "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/worktrees/mere-tabard-typography/crates/dramatis/gazette"
+      },
+      {
+        "source": "DOC_README.md",
+        "subject": "ports/alembic",
+        "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/worktrees/mere-tabard-typography/ports/alembic"
+      },
+      {
+        "source": "DOC_README.md",
+        "subject": "crates/persona/",
+        "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/worktrees/mere-tabard-typography/crates/persona"
+      },
+      {
+        "source": "DOC_README.md",
+        "subject": "ports/knot",
+        "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/worktrees/mere-tabard-typography/ports/knot"
+      },
+      {
+        "source": "DOC_README.md",
+        "subject": "crates/meerkat/src/graphlets.rs",
+        "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/worktrees/mere-tabard-typography/crates/meerkat/src/graphlets.rs"
+      },
+      {
+        "source": "DOC_README.md",
+        "subject": "crates/probes/rdf-kernel-bench/",
+        "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/worktrees/mere-tabard-typography/crates/probes/rdf-kernel-bench"
+      },
+      {
+        "source": "DOC_README.md",
+        "subject": "crates/graph/glossary/",
+        "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/worktrees/mere-tabard-typography/crates/graph/glossary"
+      },
+      {
+        "source": "DOC_README.md",
+        "subject": "crates/xilem-woodshed",
+        "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/worktrees/mere-tabard-typography/crates/xilem-woodshed"
+      },
+      {
+        "source": "DOC_README.md",
+        "subject": "crates/murm/misfin",
+        "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/worktrees/mere-tabard-typography/crates/murm/misfin"
+      },
+      {
+        "source": "DOC_README.md",
+        "subject": "crates/meerkat",
+        "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/worktrees/mere-tabard-typography/crates/meerkat"
+      },
+      {
+        "source": "DOC_README.md",
+        "subject": "crates/cambium/docs/",
+        "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/worktrees/mere-tabard-typography/crates/cambium/docs"
+      },
+      {
+        "source": "DOC_README.md",
+        "subject": "crates/cambium/ARCHITECTURE.md",
+        "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/worktrees/mere-tabard-typography/crates/cambium/ARCHITECTURE.md"
+      },
+      {
+        "source": "DOC_README.md",
+        "subject": "components/inker/",
+        "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/worktrees/genet/components/inker"
+      },
+      {
+        "source": "DOC_README.md",
+        "subject": "components/verso-tile",
+        "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/worktrees/genet/components/verso-tile"
+      },
+      {
+        "source": "mere_docs/implementation_strategy/2026-07-05_theme_modes_plan.md",
+        "subject": "repos/tincture",
+        "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/tincture"
+      },
+      {
+        "source": "mere_docs/implementation_strategy/2026-07-05_theme_modes_plan.md",
+        "subject": "crates/meerkat/src/theme_sheets.rs",
+        "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/worktrees/mere-tabard-typography/crates/meerkat/src/theme_sheets.rs"
+      },
+      {
+        "source": "mere_docs/implementation_strategy/2026-07-05_theme_modes_plan.md",
+        "subject": "repos/tincture",
+        "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/tincture"
+      },
+      {
+        "source": "mere_docs/implementation_strategy/2026-07-05_theme_modes_plan.md",
+        "subject": "repos/tincture",
+        "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/tincture"
+      }
+    ]
+  },
+  "full_report_external": "/Users/markik/Code/tabard-app-receipts/2026-10-11/typography/cpu/merged-doc-audit.json",
+  "new_source_header_findings": 0
+}
