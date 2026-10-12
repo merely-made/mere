@@ -25,6 +25,12 @@ import tomllib
 PACKAGE = Path(__file__).resolve().parent
 ROOT = PACKAGE.parent.parent
 MARKER = ".dramatis-packaging.json"
+DJINN_SOURCE_FLOOR = "ec1e65caed335010308566c8db51ad0e1e002799"
+
+
+def require(condition, message):
+    if not condition:
+        raise ValueError(message)
 
 
 def source_hash():
@@ -75,7 +81,7 @@ def output_dir(args):
         raise ValueError(f"Unowned package directory: {parent}")
     parent.mkdir(parents=True, exist_ok=True)
     if marker.exists():
-        assert json.loads(marker.read_text(encoding="utf-8"))["owner"] == "dramatis-packaging"
+        require(json.loads(marker.read_text(encoding="utf-8"))["owner"] == "dramatis-packaging", "package directory has another owner")
     else:
         marker.write_text(json.dumps({"owner": "dramatis-packaging", "kind": "generated package output"}) + "\n", encoding="utf-8")
     result = parent / args.profile
@@ -93,10 +99,10 @@ def metadata():
 
 def validate_binary(path):
     info = json.loads(output([str(path), "--build-info"]))
-    assert info["product"] == "Dramatis"
-    assert info["version"] == metadata()["version"], "binary version differs from Cargo.toml"
-    assert info["source_sha256"] == source_hash(), "binary does not match current source/lock"
-    assert output([str(path), "--version"]) == "Dramatis " + info["version"]
+    require(info["product"] == "Dramatis", "wrong packaged product")
+    require(info["version"] == metadata()["version"], "binary version differs from Cargo.toml")
+    require(info["source_sha256"] == source_hash(), "binary does not match current source/lock")
+    require(output([str(path), "--version"]) == "Dramatis " + info["version"], "binary version display differs from build info")
     return info
 
 
@@ -105,10 +111,11 @@ def prepare(args):
         raise ValueError("Package natively on each host; unset CARGO_BUILD_TARGET.")
     initial = source_hash()
     run(cargo(args, "build", "-p", "dramatis-app", "--bin", "dramatis-ui", "--profile", args.profile, "-j", str(args.jobs)))
-    assert source_hash() == initial, "source/lock changed during package build; rerun after its owner finishes"
+    require(source_hash() == initial, "source/lock changed during package build; rerun after its owner finishes")
     info = validate_binary(binary(args))
     info.update(source_revision=output(["git", "rev-parse", "HEAD"]), profile=args.profile,
-                runtime_dependency="existing user-scoped Djinn resident")
+                runtime_dependency="existing user-scoped Djinn resident",
+                djinn_min_source_revision=DJINN_SOURCE_FLOOR, djinn_required_features=["cxf"])
     (output_dir(args) / "release-info.json").write_text(json.dumps(info, indent=2) + "\n", encoding="utf-8")
     return info
 
@@ -138,6 +145,8 @@ def config(args):
     command = [sys.executable, str(Path(__file__).resolve()), "prepare", "--profile", args.profile,
                "--jobs", str(args.jobs), "--toolchain", args.toolchain, "--target-dir", str(target_dir(args))]
     cfg["beforePackagingCommand"] = {"script": subprocess.list2cmdline(command) if os.name == "nt" else shlex.join(command), "dir": str(ROOT)}
+    if args.format == "app" and args.macos_signing_identity:
+        cfg.setdefault("macos", {})["signingIdentity"] = args.macos_signing_identity
     path = out / "packager.json"
     path.write_text(json.dumps(cfg, indent=2) + "\n", encoding="utf-8")
     return path
@@ -153,15 +162,15 @@ def pack(args):
     if args.profile == "release":
         dirty = output(["git", "diff", "--name-only", "HEAD"]).splitlines()
         dirty += output(["git", "ls-files", "--others", "--exclude-standard"]).splitlines()
-        assert not any(p.endswith((".rs", "Cargo.toml", "Cargo.lock")) for p in dirty), "commit compiled source before a release build"
+        require(not any(p.endswith((".rs", "Cargo.toml", "Cargo.lock")) for p in dirty), "commit compiled source before a release build")
     run(["cargo", "packager", "--config", str(config(args)), "--formats", args.format])
     info = validate_binary(binary(args))
     out = output_dir(args) / args.format
     suffix = {"nsis": "-setup.exe", "app": ".app.tar.gz", "appimage": ".AppImage"}[args.format]
     artifacts = [p for p in out.iterdir() if p.is_file() and p.name.endswith(suffix) and info["version"] in p.name]
-    assert len(artifacts) == 1, f"Expected one {suffix} artifact, found {artifacts}"
+    require(len(artifacts) == 1, f"Expected one {suffix} artifact, found {artifacts}")
     artifact = artifacts[0]
-    assert Path(str(artifact) + ".sig").is_file(), "packager did not sign the artifact"
+    require(Path(str(artifact) + ".sig").is_file(), "packager did not sign the artifact")
     manifest = out / "luggage.json"
     command = cargo(args, "run", "-p", "luggage", "--bin", "luggage-manifest", "-j", str(args.jobs))
     command += ["--", "--artifact", str(artifact), "--version", info["version"], "--format", args.format, "--out", str(manifest)]
@@ -183,6 +192,7 @@ def main():
     parser.add_argument("--target-dir")
     parser.add_argument("--toolchain", default="1.98.1")
     parser.add_argument("--artifact-url")
+    parser.add_argument("--macos-signing-identity", default=os.environ.get("DRAMATIS_MACOS_SIGNING_IDENTITY"), help="Public code-signing identity on the signing Mac; does not contain notarization credentials")
     args = parser.parse_args()
     if args.jobs < 1:
         parser.error("--jobs must be positive")

@@ -4,6 +4,9 @@ The app uses Hocket's `cargo-packager` → `luggage-manifest` → signed Luggage
 feed path. Its package contains `dramatis-ui`, license notices and public build
 information. Djinn remains the existing user-scoped resident. Install/remove
 of this app must preserve that resident and its vault.
+The resident needs the quarantine API from Mere `ec1e65ca` or a descendant,
+with its default `cxf` feature. `release-info.json` declares that source floor;
+Djinn's `0.0.2` package version spans builds before and after those routes.
 
 Run these commands from Mere's root with Python 3.11+ and cargo-packager.
 On Windows, builds reuse `C:/t/cargo-targets/mere`; other hosts must set
@@ -55,8 +58,9 @@ using `luggage-manifest`. Match the version across entries, preserve the
 artifact signatures/digests, and sign the combined manifest **after** the
 last host is added. For macOS the feed points at the packer's signed
 `.app.tar.gz`, not the `.app` directory. Set the real host's code-signing
-identity/notarization through cargo-packager's configuration on that Mac;
-another app's identity is not copied into Dramatis. Windows Authenticode and
+identity with `--macos-signing-identity` or `DRAMATIS_MACOS_SIGNING_IDENTITY`;
+notarization uses cargo-packager's Apple environment/keychain settings.
+Windows Authenticode and
 macOS Gatekeeper trust are separate from Luggage's release signatures.
 
 On Linux, a host without libfuse2 may need `APPIMAGE_EXTRACT_AND_RUN=1` to run

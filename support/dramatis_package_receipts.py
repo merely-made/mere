@@ -86,7 +86,7 @@ def main():
             capture_env = dict(os.environ, GRAPHSHELL_APP_ENDPOINT=r"\\.\pipe\dramatis-package-receipt-absent",
                                DRAMATIS_CAPTURE=str(OUT / "packaged-absent.png"), DRAMATIS_CAPTURE_MODE="absent")
             run("native-extracted", [str(apps[0])], capture_env)
-            (OUT / "contents.json").write_text(json.dumps({"package_entries": entries, "build_info": info}, indent=2) + "\n", encoding="utf-8")
+            (OUT / "contents.json").write_text(json.dumps({"package_entries": entries, "build_info": info, "extracted_binary_sha256": digest(apps[0])}, indent=2) + "\n", encoding="utf-8")
         finally:
             # Only marker-owned generated extraction, after its app exits.
             assert scratch.resolve().parent == (GENERATED / "dev").resolve()
@@ -98,7 +98,7 @@ def main():
         assert all(digest(feed / name) == sha for name, sha in before.items()), "tamper controls must restore every feed byte"
         run("app-controls", ["cargo", "+1.98.1", "test", "--locked", "--offline", "-p", "dramatis-app", "--test", "state", "--test", "interaction", "--target-dir", str(TARGET), "-j1"])
         receipt = {"platform": "windows-x86_64", "profile": "dev", "synthetic_signing_only": True,
-                   "native_host_qualification": {"Windows": "passed", "Fedora": "pending; wait until reachable", "macOS Intel": "pending; wait until reachable", "macOS ARM": "pending; wait until reachable"},
+                   "native_host_qualification": {"Windows": "debug package pipeline passed; release/installed trust pending", "Fedora": "pending; wait until reachable", "macOS Intel": "pending; wait until reachable", "macOS ARM": "pending; wait until reachable"},
                    "source_revision": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
                    "compiled_source_sha256": package.source_hash(), "commands": records, "manifest": manifest,
                    "package_path": str(artifact), "package_feed_sha256": before,
