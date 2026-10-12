@@ -26,6 +26,16 @@ struct Image {
     stamp: u64,
 }
 
+/// Copied identity of a currently staged producer image. It retains no GPU
+/// resource and permits presentation observers to attribute rehydrated views.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct ProducerImageIdentity {
+    pub owner: Option<NodeId>,
+    pub generation: u64,
+    pub stamp: u64,
+    pub size: [u32; 2],
+}
+
 struct Entry {
     producer: Box<dyn TextureProducer>,
     properties: Vec<String>,
@@ -91,6 +101,17 @@ impl ProducerRegistry {
 
     pub fn contains(&self, key: u64) -> bool {
         self.entries.contains_key(&key)
+    }
+
+    pub fn image_identity(&self, key: u64) -> Option<ProducerImageIdentity> {
+        let entry = self.entries.get(&key)?;
+        let image = entry.image.as_ref()?;
+        Some(ProducerImageIdentity {
+            owner: entry.owner,
+            generation: self.device_generation?,
+            stamp: image.stamp,
+            size: image.size,
+        })
     }
 
     /// Removal is immediate for the producer; the next host synchronization
