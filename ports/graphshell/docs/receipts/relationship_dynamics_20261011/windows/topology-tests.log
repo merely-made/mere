@@ -1,0 +1,13 @@
+
+running 8 tests
+test canvas::relationship_topology::tests::absent_access_refuses_instead_of_retargeting_equal_address ... ok
+test canvas::relationship_topology::tests::repeated_accesses_share_owner_but_keep_displayed_pair ... ok
+test canvas::relationship_topology::tests::directions_strata_and_self_links_do_not_collapse ... ok
+test canvas::relationship_topology::tests::open_predicates_keep_handles_without_recognized_kind_invention ... ok
+test canvas::relationship_topology::tests::visibility_and_controller_share_exact_cell_filter ... ok
+test canvas::relationship_topology::tests::assertions_preserve_current_projected_row_multiplicity ... ok
+test canvas::relationship_topology::tests::parallel_buckets_preserve_input_multiplicity_and_assertion_handles ... ok
+test canvas::relationship_topology::tests::shared_bucket_keeps_every_kind_and_repeated_access_direction ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 423 filtered out; finished in 0.01s
+
