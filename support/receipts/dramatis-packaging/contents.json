@@ -1,0 +1,23 @@
+{
+  "package_entries": [
+    "dramatis-ui.exe",
+    "LICENSE",
+    "LICENSES.md",
+    "package-requirements.txt",
+    "release-info.json",
+    "uninstall.exe",
+    "$PLUGINSDIR/ApplicationID.dll",
+    "$PLUGINSDIR/modern-wizard.bmp",
+    "$PLUGINSDIR/nsDialogs.dll",
+    "$PLUGINSDIR/nsis_tauri_utils.dll",
+    "$PLUGINSDIR/StartMenu.dll",
+    "$PLUGINSDIR/System.dll"
+  ],
+  "build_info": {
+    "product": "Dramatis",
+    "source_sha256": "d562c2a31ae1b2543764d97773542e3b6e2dffc5b583a7fe33ab040e44dc8290",
+    "target": "x86_64-pc-windows-msvc",
+    "version": "0.0.1"
+  },
+  "extracted_binary_sha256": "4b4a855350a51e6a182d57073cb91d3678ae7a5e73a4a4910449e0888eb95974"
+}
