@@ -1,0 +1,182 @@
+{
+  "date": "2026-10-12",
+  "platform": "Windows x64",
+  "scope": "Independent native fixtures; no app adoption, publication, installed package or remote jobs",
+  "luggage_source_revision": "28d43dd5cba7c1042190188e5c08aa2293247ad8",
+  "luggage_version": "0.1.0",
+  "upstream_updater_version": "0.2.3",
+  "velopack_sdk_helper_packer": "1.2.161",
+  "hocket_binding_unmodified": "1.2.0",
+  "tough": "0.24.0",
+  "cargo_lock": "support/luggage-comparison/Cargo.lock",
+  "cargo_lock_sha256": "4cf54a2d3f8d17a3309a3fab3bb8126c5073b366c2be75b305be61238d800a81",
+  "independent_dependencies_not_product_workspace_lock": true,
+  "negative_control": "TUF Unsafe expiration accepts expired fixture; production unchanged",
+  "known_gaps": [
+    "Luggage joint stage artifact/digest edit accepted",
+    "Luggage unsigned staged format/version/destination accepted by reader",
+    "Luggage lower signed offer accepted after observing higher offer",
+    "Velopack pending asset edit applied",
+    "Velopack replacement failure removed current and backup"
+  ],
+  "not_qualified": [
+    "Power-cut or kill recovery",
+    "Real application schema rollback",
+    "Production OS signing",
+    "TUF product delegation and persistent metadata rollback across boots",
+    "TUF integration with Merely apply and browser/Wasm",
+    "Native macOS/Fedora apply faults",
+    "Delta reconstruction for real Genet artifacts"
+  ],
+  "evidence": [
+    {
+      "path": "doc-audit.json",
+      "sha256": "76cdf90d988d463c811918e945721e05d157166318b107ad51bd8e22690e818d",
+      "bytes": 170263
+    },
+    {
+      "path": "doc-judgment.json",
+      "sha256": "b46ffc89b141b3f1bdec594746b1b5320608799cb5d527a2a74b5b4cb46c2eeb",
+      "bytes": 9490
+    },
+    {
+      "path": "luggage.json",
+      "sha256": "c71bf0d47feab0461859f7ecb59066506209119d01861bbd6b0f8b79af82c3e8",
+      "bytes": 634
+    },
+    {
+      "path": "pack-0.1.0.log",
+      "sha256": "1024b876e482caedcf4b19704644ba9c7f69b5df93b585072fd302d9da388b55",
+      "bytes": 1408
+    },
+    {
+      "path": "pack-0.2.0.log",
+      "sha256": "524cd0f0e708ea8e8a9466b8d2035402944010382dd59477db2f25e1188b02fc",
+      "bytes": 1692
+    },
+    {
+      "path": "portable-apply.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "portable-check.log",
+      "sha256": "5cfc363e83bd9f5f096d4cf89d9337b1eec909d93a1230b8dc35d317e9dd0ecb",
+      "bytes": 53
+    },
+    {
+      "path": "portable-download.log",
+      "sha256": "b4f441f047e65d1da90ed4f1cd221c337eb538614f7bd283c499157b8d3c4692",
+      "bytes": 52
+    },
+    {
+      "path": "replacement-failure.log",
+      "sha256": "18ab5b06084755f17b303e0d71b62967253810ded0778be0b160b261c5ab1634",
+      "bytes": 10522
+    },
+    {
+      "path": "tampered-stage-apply.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "tuf-build.log",
+      "sha256": "3dc6df85e6bdcf0ab1a2374b5b06d1f80cfd6c26f568fd0b84f92fe24fdc2480",
+      "bytes": 3892
+    },
+    {
+      "path": "tuf.json",
+      "sha256": "6e866f03d2f4463a52f32ee79e8bd594466238849e61d4746a0dc5f66e926905",
+      "bytes": 361
+    },
+    {
+      "path": "velopack.json",
+      "sha256": "64082b9334f2e190a170cb316ab2b40daab4ff086f3d59e6c178faed1d958123",
+      "bytes": 830
+    }
+  ],
+  "luggage_sources": [
+    {
+      "path": "crates/system/luggage/src/config.rs",
+      "sha256": "d2a6805c6c9e8777286773c4e8ad11a9dd8910ab52433b588262a7225855ee48"
+    },
+    {
+      "path": "crates/system/luggage/src/error.rs",
+      "sha256": "2ba50b8c7b597f92f331bd354f913c57e8b3dc958196aeb9351d208f658e3d52"
+    },
+    {
+      "path": "crates/system/luggage/src/install.rs",
+      "sha256": "d7debaf9825d7f599c9fcd6f7df4170b2f322a09481b38c4ba76f715848d6621"
+    },
+    {
+      "path": "crates/system/luggage/src/lib.rs",
+      "sha256": "aa0253e9acf9c7cd1b719182c98fa316f841e106572895ab8cd5895f1f2efccb"
+    },
+    {
+      "path": "crates/system/luggage/src/release.rs",
+      "sha256": "5731bdb117fcc1deeb4d8b1e7d448d6612b83d359b2b3634a4e505ed4ccdb3a7"
+    },
+    {
+      "path": "crates/system/luggage/src/signing.rs",
+      "sha256": "491bf25d667a1404f2655bb6f9670e2446a7836e4b8a1b6080f44e310a38b9e7"
+    },
+    {
+      "path": "crates/system/luggage/src/staging.rs",
+      "sha256": "baff77efb779a375c8dec0ad2c125a0097cd25815048d1a48c8ecfab6c5a5841"
+    },
+    {
+      "path": "crates/system/luggage/src/updater.rs",
+      "sha256": "7132dd717cea63fc0619f2e092dd48586ed68edc89462d23b1e4ddfda6c660a5"
+    },
+    {
+      "path": "crates/system/luggage/src/bin/luggage-manifest.rs",
+      "sha256": "091c6bc9d4bb788947544dc8b6c6d60d450ea247617ebf232e5a2cd7d6c0d720"
+    }
+  ],
+  "fixture_packages": [
+    {
+      "path": "Merely.ReleaseComparison-0.1.0-full.nupkg",
+      "bytes": 22196499,
+      "sha256": "ca6404b392e7b8ba092214f9916ed5dbbc40509c0265d09e5718ba6010e50382"
+    },
+    {
+      "path": "Merely.ReleaseComparison-0.2.0-delta.nupkg",
+      "bytes": 4173,
+      "sha256": "13e31ad3b67afe4d42fabc804602933ae8b0783097099ab1b03d579980805d8e"
+    },
+    {
+      "path": "Merely.ReleaseComparison-0.2.0-full.nupkg",
+      "bytes": 22196517,
+      "sha256": "226cd83c310855dd63efcc6aa72b8deadb80fc72940292c62f1ef4426a43f5ae"
+    },
+    {
+      "path": "Merely.ReleaseComparison-win-Portable.zip",
+      "bytes": 22195489,
+      "sha256": "8a83c8a6c1314ec07cba75648ff07d4ede4a3abb4da0c587ec6443d7c3cb91a1"
+    },
+    {
+      "path": "Merely.ReleaseComparison-win-Setup.exe",
+      "bytes": 29710629,
+      "sha256": "67880c45297fc34943f84940d193694580801b4cfad684c913bdc0336bb97723"
+    }
+  ],
+  "qualification": {
+    "mechanical_docs": "zero broken current links, missing current source paths, unheaded sources or index defects",
+    "d2": "changed brief covered; three existing unrelated missing receipt records",
+    "python": "syntax checks and observation/provenance verifier pass",
+    "vpk_nuget_sha256": "ac9be73846d9a7a76483f8684abd1503cd50703b992727429dcdc045589c5e08"
+  },
+  "verified_origin_main": "050e7d54284f22943fd7ffe8297a3b736691bf17",
+  "luggage_matches_origin_main": true,
+  "cleanup": {
+    "status": "recursive deletion blocked by automatic approval review",
+    "stated_reason": "blocked by policy; no further reason",
+    "owner": "release comparison lane",
+    "retained_generated_output": [
+      "C:/t/cargo-targets/mere/luggage-comparison",
+      "C:/Users/mark_/Code/repos/mere/support/luggage-comparison/__pycache__"
+    ],
+    "live_owner_at_check": false,
+    "isolated_target_home_worktree": false
+  }
+}

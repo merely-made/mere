@@ -1,0 +1,4 @@
+fixtures/** -text
+Cargo.lock text eol=lf
+*.py text eol=lf
+src/*.rs text eol=lf
