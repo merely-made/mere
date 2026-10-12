@@ -1,18 +1,7 @@
 {
   "active_docs": 268,
-  "indexed_active_docs": 265,
-  "index_orphans": [
-    {
-      "source": "cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/README.md",
-      "subject": "cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/README.md",
-      "detail": "active document is absent from DOC_README.md"
-    },
-    {
-      "source": "cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/performance-analysis.md",
-      "subject": "cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/performance-analysis.md",
-      "detail": "active document is absent from DOC_README.md"
-    }
-  ],
+  "indexed_active_docs": 267,
+  "index_orphans": [],
   "index_ghosts": [],
   "memory_directory_links": [],
   "statusless_plans": [],
@@ -4365,8 +4354,8 @@
   "exhibit_b_sources": [],
   "counts": {
     "active_docs": 268,
-    "indexed_active_docs": 265,
-    "index_orphans": 2,
+    "indexed_active_docs": 267,
+    "index_orphans": 0,
     "index_ghosts": 0,
     "memory_directory_links": 0,
     "statusless_plans": 0,

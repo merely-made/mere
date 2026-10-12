@@ -1033,10 +1033,11 @@ from compilation.
 The release viewer on this final family measures 6,378,552 B gzip against
 R157's unchanged 3,407,872 B cap. Glue (18,730 B), mount (588 B) and history
 (6,254 B) fit their respective gzip limits. Live-site delivery remains gated
-independently. The citation/source audit passes; D2 has seven inherited
-findings, including three active renderer documents added by the final supplier
-publication without records. That coverage has been flagged to its owner; this
-plan's incremental record remains present.
+independently. The citation/source audit passes. D2 initially had seven
+findings; the renderer owner reconciled its three new document records at
+`e0dae9c9`, a documentation-only descendant integrated here with all recorded
+source and lockfile byte hashes unchanged. Four older D2 findings remain, and
+this plan's incremental record remains present.
 
 ## 5. Stop rules
 

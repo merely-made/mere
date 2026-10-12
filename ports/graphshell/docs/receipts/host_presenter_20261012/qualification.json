@@ -90,7 +90,7 @@
   "live_site_delivery_cap_pass": false,
   "browser_acceptance_status": "queued; current console locked; no browser launched",
   "doc_audit": "doc-audit.json",
-  "d2_audit_baseline_findings": 7,
+  "d2_audit_baseline_findings": 4,
   "status": "final-family build candidate; browser acceptance pending console unlock",
   "cpu_and_wasm_gate_records": "gates.json",
   "browser_execution": false,
@@ -98,7 +98,8 @@
   "native_host_execution": false,
   "visual_acceptance": false,
   "browser_driver_inputs": "prepared in Code/output/graphshell-site-presenter-20261011; not executed",
-  "audit_baseline": "citation/source audit passes; seven inherited D2 findings, including three from final renderer publication",
+  "audit_baseline": "citation/source audit passes; four inherited D2 findings remain",
   "d2_audit": "d2-audit.json",
-  "http_servers_active": false
+  "http_servers_active": false,
+  "documentation_followup": "Renderer D2 coverage reconciled on e0dae9c99423210b82bc24e0518739d2c9fefe34; source/pin/lockfile byte hashes unchanged"
 }
