@@ -32,9 +32,9 @@ fusion-autotune = ["fusion", "autotune"]
 
 [patch.crates-io]
 # Match the root's render source policy; patches are not inherited by this workspace.
-netrender-vello = { git = "https://github.com/mark-ik/vello", rev = "5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a" }
-vello_encoding = { git = "https://github.com/mark-ik/vello", rev = "5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a" }
-vello_shaders = { git = "https://github.com/mark-ik/vello", rev = "5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a" }
+netrender-vello = { git = "https://github.com/mark-ik/vello", rev = "2eae6243881d5b24c984d5ee35dde509ca5db782" }
+vello_encoding = { git = "https://github.com/mark-ik/vello", rev = "2eae6243881d5b24c984d5ee35dde509ca5db782" }
+vello_shaders = { git = "https://github.com/mark-ik/vello", rev = "2eae6243881d5b24c984d5ee35dde509ca5db782" }
 burn-remote = { path = "../../../../support/patches/burn-remote" }
 cubecl-runtime = { path = "../../../../support/patches/cubecl-runtime" }
 cubek-reduce = { path = "../../../../support/patches/cubek-reduce" }

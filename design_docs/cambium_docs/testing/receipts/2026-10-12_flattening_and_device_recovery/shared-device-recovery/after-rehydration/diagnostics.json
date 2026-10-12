@@ -1,0 +1,18 @@
+[
+  {
+    "byte_count": 76800,
+    "distinct_colors": 324,
+    "fnv1a_digest": "5a96f667c510791d",
+    "height": 120,
+    "name": "first",
+    "width": 160
+  },
+  {
+    "byte_count": 76800,
+    "distinct_colors": 327,
+    "fnv1a_digest": "9a478d0a877d29f2",
+    "height": 120,
+    "name": "second",
+    "width": 160
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "console_screen_locked": true,
+  "display_power_state": [
+    "4"
+  ],
+  "native_result": "pending unlocked session; repeated swapchain Occluded; no raster refusal observed",
+  "thresholds_changed": false,
+  "temporary_diagnostic_source_removed": true,
+  "owned_display_inhibitor_pid": 16446,
+  "owned_display_inhibitor_seconds": 600
+}

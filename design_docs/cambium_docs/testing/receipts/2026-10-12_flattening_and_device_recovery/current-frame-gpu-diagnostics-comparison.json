@@ -1,0 +1,7 @@
+{
+  "before_count": 10,
+  "after_count": 10,
+  "new_or_changed": [],
+  "physical_driver_reset": false,
+  "scope": "Diagnostics inventory after current-frame GPU controls and locked-console native attempts; zero delta is not proof of physical-reset recovery."
+}
