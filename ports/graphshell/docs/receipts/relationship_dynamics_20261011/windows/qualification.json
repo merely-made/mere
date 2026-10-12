@@ -1,0 +1,150 @@
+{
+  "date_local": "2026-10-11",
+  "timezone": "America/New_York",
+  "owner": "upstream relationship inspection integration",
+  "runtime_source_commit": "2fc4024ae54d82ab9be8df2a48d8d804e05a68e3",
+  "source_sha256_lf": {
+    "crates/canvas/pictograph/src/canvas/dynamics_inspection.rs": "202eaa34032e463e05b2c65b2be755993a85402195a77e98b9484a0185555f47",
+    "crates/canvas/pictograph/src/canvas/dynamics_inspection_tests.rs": "5b6d1b62a76f8e424dd88110fe6289065d3402fd1e1eec77a18c9fd034d46093",
+    "crates/canvas/pictograph/src/canvas/relationship_topology.rs": "7d444dc9420d6e095a40e538aa0d26689653e38fe8332162f08e65ad378c31b9",
+    "crates/canvas/pictograph/src/canvas/relationship_topology_tests.rs": "c4e665cf3fcf970f87bca27415d0707aa7ca7fab93cd0a923e92b715157f8d6d",
+    "ports/graphshell/src/web_tree.rs": "24485441f6288b61c479937cc153eb58db4994edc254a0ad62fec75f147b66d5",
+    "ports/graphshell/src/web_tree/dynamics_inspection.rs": "a340b752019f6fda59bb2f91ea87d7fa999af441ea2b4f7eb47dc1134b31e388",
+    "ports/graphshell/src/web_tree/lane.rs": "d55e177f823700b2ae01548aa7e7f84f222469eed9c9e6d96817a1ac6a824476",
+    "ports/graphshell/web/Cargo.toml": "723ebabab9f033336c9d0cc1edd7938896b04afcde0c87e3d5a82315d96fb22f",
+    "ports/graphshell/web/Cargo.lock": "9fcf67c9f396e1b6b3b5ca29490683bccc897ec69d5928b95e1dbc0d85f48da3"
+  },
+  "package_sha256": {
+    "graphshell_web.d.ts": "b937af81f6a562e01d5bfade1e2d260b50a6f4111732968ff70702985d8a32d6",
+    "graphshell_web.js": "e2d22006019a406fad464bae7314720b4c8b02c0198ec44ee6d0fabb0045bf4b",
+    "graphshell_web_bg.wasm": "8eeab6ff18251b456d0099243fb694934b671a15439be7dd08d7832c9fb751f7",
+    "graphshell_web_bg.wasm.d.ts": "850a549676a06b0aa9c0e649852f666ea2178e7754bc4afac26092b653a6e592"
+  },
+  "native": {
+    "canvas_report": {
+      "passed": 3,
+      "log": "canvas-tests.log"
+    },
+    "topology": {
+      "passed": 8,
+      "log": "topology-tests.log"
+    },
+    "cargo_commands": [
+      "cargo test --offline -p pictograph --features canvas --lib canvas::dynamics_inspection",
+      "cargo test --locked --offline -p pictograph --features canvas --lib canvas::relationship_topology"
+    ],
+    "final_canvas_report_execution": "C:/t/cargo-targets/mere/debug/deps/pictograph-b7f698ef426ed9e2.exe canvas::dynamics_inspection",
+    "final_topology_execution": "C:/t/cargo-targets/mere/debug/deps/pictograph-b7f698ef426ed9e2.exe canvas::relationship_topology"
+  },
+  "product_build": {
+    "command": "cargo build --locked --offline --target wasm32-unknown-unknown --no-default-features --features product",
+    "cwd": "ports/graphshell/web",
+    "passed": true,
+    "warnings": 18,
+    "log": "product-build.log"
+  },
+  "initial_attempt": {
+    "status": "incomplete; stopped with Graph tools collapsed",
+    "evidence": "chrome/p4_tree_dynamics_inspection/progress.json"
+  },
+  "browser": {
+    "status": "qualified for named source cuts and cases",
+    "browser": "Chrome 154, Windows",
+    "origin": "http://127.0.0.1:8877",
+    "normal_motion": true,
+    "fresh_page_same_retained_origin": true,
+    "cases": {
+      "p4_tree_dynamics_inspection": {
+        "passed": true,
+        "result": "chrome-accepted/p4_tree_dynamics_inspection/result.json",
+        "captures": [
+          "dynamics_exact_access",
+          "dynamics_exact_pair_inputs",
+          "dynamics_forme_hold"
+        ],
+        "saved_source_address": "https://example.test/i2p-port",
+        "graph_session": "9a7bf8cd-5e8a-425f-b76e-f6e150e2d2de",
+        "viewport": {
+          "width": 615,
+          "height": 608
+        }
+      },
+      "p4_tree_dynamics_inspection_reopen": {
+        "passed": true,
+        "result": "chrome-accepted/p4_tree_dynamics_inspection_reopen/result.json",
+        "captures": [
+          "dynamics_reopened_forme_owner",
+          "dynamics_reopened_placement_constraints"
+        ],
+        "saved_source_address": "https://example.test/i2p-port",
+        "graph_session": "9a7bf8cd-5e8a-425f-b76e-f6e150e2d2de",
+        "viewport": {
+          "width": 615,
+          "height": 608
+        }
+      }
+    },
+    "reviewed_captures": 5,
+    "visual_limits": [
+      "615x664 logical viewport at scale 2; graph is cropped by the two-pane layout",
+      "Composition capture does not show every inspector value at once",
+      "420px keyboard/focus and wider layout are unqualified"
+    ]
+  },
+  "remaining": [
+    "native headed and Firefox",
+    "stage transitions and hidden-relation controls",
+    "live document/tile continuity",
+    "measured force contributions and derived execution-owner adapters",
+    "large-graph and long-record refresh costs",
+    "420px keyboard/focus and broader layout review"
+  ],
+  "cleanup": {
+    "target": "reused C:/t/cargo-targets/mere",
+    "isolated_target": null,
+    "cargo_home": null,
+    "worktree": null,
+    "temporary_package": {
+      "path": "C:/t/cargo-targets/mere/relationship-dynamics-browser",
+      "owner": "relationship dynamics browser qualification",
+      "retained_reason": "Automatic approval review rejected recursive removal as blocked by policy; owner marker verified and no live process remains."
+    },
+    "server": "stopped",
+    "browser_tabs": "closed"
+  },
+  "corrected_menu_attempt": {
+    "status": "failed",
+    "log": "chrome-final/p4_tree_dynamics_inspection/result.json",
+    "reason": "The initial Pause physics action was absent because the seeded analytic arrangement starts paused. All captures and later checks completed; this remains failed evidence."
+  },
+  "first_reopen_attempt": {
+    "status": "failed",
+    "log": "chrome-qualified/p4_tree_dynamics_inspection_reopen/result.json",
+    "reason": "Pointer selection behind the tools overlay had retained Reference notes rather than I2P port notes; the strengthened fixture now centres an unobstructed pointer target and asserts its acknowledged address before saving. Heading selectors also needed explicit DOM classes."
+  },
+  "scenario_source_commits": {
+    "main": "f4f2dfd5",
+    "reopen": "00baf869"
+  },
+  "scenario_sha256_lf": {
+    "ports/graphshell/web/scenarios/p4_tree_dynamics_inspection.scn": "b38a8d0c8d726ca4423ceb71541d4073a0622e46185c1a50b9d9f9df18b4cb65",
+    "ports/graphshell/web/scenarios/p4_tree_dynamics_inspection_reopen.scn": "eff213e46366304e0e1abb020089dc7cf212347e574db9775582765ba8ead0b5"
+  },
+  "status": "bounded integration and native/Chrome qualification complete",
+  "log_sha256_raw": {
+    "canvas-tests.log": "4fd0bcf79d53f5250bdac051c70ee82bfa13e56994426f0b70ceb75a085efdc2",
+    "product-build.log": "b810c6a0d0cf3af8b22f2d672039af217e35d79a03c907e9ccbca3134053f28d",
+    "topology-tests.log": "8013875438f3673241d53ec88a3d9d30679557c11982004888d0ec266b1b699b"
+  },
+  "documentation": {
+    "citation_counts_equal": true,
+    "d2_equal": true,
+    "covered_active_docs": 261,
+    "active_docs": 264,
+    "remaining_errors": [
+      "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md",
+      "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md",
+      "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_producer_gates/README.md"
+    ]
+  }
+}
