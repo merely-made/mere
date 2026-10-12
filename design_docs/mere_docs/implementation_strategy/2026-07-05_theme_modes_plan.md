@@ -85,6 +85,25 @@ Genet's existing Parley/Fontique stack owns installed-font discovery, resolution
   coherent provider/Netrender/Genet/Mere/Fleece/Knot repin before typography GPU
   acceptance, so rebuilding on that final published set is a required gate.
 
+### Coherent supplier rebuild — 2026-10-12
+
+Typography was rebased cleanly onto published Mere
+`631355a2fcbc6d5e88b1b1040d401a0e0b08bfab`, with Genet `2c7ef73b`,
+Netrender `c74b7cb2`, provider `2eae6243` and Knot `3af93add`. Locked/offline
+checks pass: **243 shared tests** (one real-GPU test ignored), **73 Pelt tests**,
+the ordinary production Pelt build and the port/Graphshell web boundary gate.
+The known table-wrapping test was also run separately on this supplier set and
+still fails at the unchanged `layout/tests.rs:1159` predicate.
+
+The current-supplier production binary and changed source files are frozen
+with hashes in the external typography receipt directory. The earlier-supplier
+candidate is retained separately and has no native acceptance claim. Three
+finite author/reopen/uninstalled-family scenarios remain queued behind the
+canonical presenter's explicitly owned runtime window. macOS console lock was
+confirmed read-only; the renderer owner already requested unlock. No typography
+adapter, native window, browser or server was started. GPU acceptance and push
+remain pending that unlocked-session handoff; predicates are unchanged.
+
 Open bounds: exact remote/frozen font fidelity, bundled/open-license font packaging, global minimum-reading-size policy, typed DTCG typography export and the remaining app rollout are separate follow-ups. Existing color token exports retain their scope; portable theme JSON and CSS preserve this slice's role preferences.
 
 ## Application adoption (2026-10-09)
