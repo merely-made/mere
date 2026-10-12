@@ -1,0 +1,107 @@
+{
+  "date": "2026-10-11",
+  "status": "Portable interaction draft; production owner adapters and Graphshell presentation pending",
+  "integration_base": "2aecdf9559b766951c66cb1b16c0b84ac7963d0e",
+  "choice": "shared resources and coop",
+  "origin_review": "checks/origins.json",
+  "p2panda_version_review": "checks/version-review.json",
+  "native": {
+    "status": "passed",
+    "tests": 20,
+    "new_resource_coop_tests": 10,
+    "existing_coop_tests": 10,
+    "command": "cargo test --locked --offline --manifest-path ports/moot/docs/receipts/resource_coop_draft_20261011/harness/Cargo.toml --lib -j1",
+    "scope": "Imports the actual portable resource_coop.rs and coop.rs sources, without a duplicated implementation. Tests use disclosed-view fixtures; they do not qualify current Gemot authority, actual application dispatch or network transfer.",
+    "log": "checks/native.log"
+  },
+  "wasm": {
+    "status": "passed",
+    "command": "cargo check -p mere-moot --target wasm32-unknown-unknown --no-default-features --locked --offline -j1",
+    "scope": "Actual production Moot port with the new exported portable module. No governance, network, renderer or store dependencies are added to its normal Wasm cone.",
+    "log": "checks/wasm-check.log",
+    "cone": "checks/wasm-cone.txt"
+  },
+  "clippy": {
+    "status": "passed",
+    "command": "cargo clippy --manifest-path ports/moot/docs/receipts/resource_coop_draft_20261011/harness/Cargo.toml --offline --lib --tests -j1 -- -D warnings",
+    "log": "checks/clippy.log"
+  },
+  "boundaries": {
+    "status": "passed",
+    "command": "CARGO_NET_OFFLINE=true python3 scripts/check_port_boundaries.py",
+    "log": "checks/boundaries.log"
+  },
+  "format": {
+    "status": "passed",
+    "command": "cargo fmt --manifest-path ports/moot/docs/receipts/resource_coop_draft_20261011/harness/Cargo.toml -- --check"
+  },
+  "contracts": {
+    "identities": "Exact contribution and manifest preserve provenance and revision attention; equal payloads do not merge contributions.",
+    "collection_fork": "Copies the disclosed exact frontier and membership commitment into an owner intention; grants no content-copy or content-fork right.",
+    "actions": "Only an explicit owner offer prepares an intention. Current owner dispatch must recheck authority, revision, key access, storage, audience and quota.",
+    "evidence": "Address-only, resolved content, hosting promises, observed retrievals and participation remain separate facts.",
+    "readings": "Selections are local. Refresh invalidates completion bindings; exact selected revisions do not follow a moving latest. A stale or relabelled response cannot attach to a different pane or target.",
+    "acceptance": "Owner acceptance changes local feedback only. An owner read is required before custody, availability or participation changes.",
+    "serialization": "Snapshot JSON is disclosed view data, not a grant. Local completion identities cannot be serialized."
+  },
+  "runtime": {
+    "cargo_jobs": 1,
+    "incremental": false,
+    "debug_info": false,
+    "target_directory": "/Users/markik/Code/targets/moot-resource-coop-draft-20261011",
+    "gpu_executed": false,
+    "browser_executed": false,
+    "native_window_executed": false
+  },
+  "deferred": [
+    "Production Gemot/Eidetic collection and content read adapters and current-owner dispatch",
+    "Domain-owned activity adapters for real app sessions",
+    "Cambium resource summaries, adjacent inspector and owner-routed controls",
+    "Exact-occurrence Scenograph facts with unknown disclosed separately from false",
+    "Real signed revocation and collection/content fork distinctions across retained peers",
+    "Two independently rendered readings, host interactions and serialized GPU/browser acceptance"
+  ],
+  "source_sha256": {
+    "ports/moot/src/coop.rs": "abe95d0aa0466beb5be90ab7de16c5aea6b053e9cc5627f47cc92ab6e05bb880",
+    "ports/moot/src/lib.rs": "f62f5f64ea7738b228c3d183ff63efecfbb17df73284f07f2c47a852c06a62e2",
+    "ports/moot/src/resource_coop.rs": "2db38e9720b7e6ad71c547a87c21243c470e2948a51b84a4f9626fa1b788915f",
+    "ports/moot/src/resource_coop/tests.rs": "873a31c53dd0ebc316787bb18105e7314e464640fa8640c240df6687065c86e4",
+    "ports/moot/Cargo.toml": "50d9aa3f9a087f6bcb2c366239d8097c9b35c70f53090286b44b47b30cf70bb5",
+    "ports/moot/docs/receipts/resource_coop_draft_20261011/harness/Cargo.toml": "d30b85c90dfc11634b299ea56d8660d840ec0cbf53874fc80abe7badb7076976",
+    "ports/moot/docs/receipts/resource_coop_draft_20261011/harness/Cargo.lock": "34ecb077d02e385a057359a7f06dd05ccdfeaaadb74e8655ccf1f854f09bc83b",
+    "ports/moot/docs/receipts/resource_coop_draft_20261011/harness/src/lib.rs": "651e666c0593c69159f8471dcdecefcd654aaea1becf09a9941d3aa1b0c9d0ce"
+  },
+  "check_sha256": {
+    "checks/boundaries.log": "ed6e8e6214358ac43d6f72e8549446b5ce8170b62a9813b557dc1d130eb24186",
+    "checks/clippy.log": "0bf82a13a96a776f56ee1e2ef504931d5692e0345d4717d70541bc2b8b37855b",
+    "checks/native.log": "adfe1fb7925e67285f1ab375954dec7345b66f736eccf6e026b8d308151f5280",
+    "checks/origins.json": "bc697a3b2138fe454ecb082d6fea85da15875b36a68d81c5ba1c303a8542c90d",
+    "checks/version-review.json": "37c3ee5c787d8aaecf78b989432b10464946d46b5370fe998911ead9ddd9f051",
+    "checks/wasm-check.log": "9be62c46cd558f6ffe5c69b8ec58a524c3195dd3bc28fe14d912a68e127324f0",
+    "checks/wasm-cone.txt": "37b533d3e07d0bbbe13ddfb048789945baf4f388de09f25f17e1d0dbc6470b90",
+    "checks/doc-audit-comparison.json": "633fd691aa6fe5f7f7e7d0ef185d41be3d00fcede8152594b957673450a5e77a"
+  },
+  "log_normalization": {
+    "change": "Trimmed trailing whitespace, retained one final newline, and expanded tabs in the Wasm warning log for Git whitespace checks. Raw local logs remain in the task target directory.",
+    "raw_sha256": {
+      "native.log": "1cc47c1edb5ee78ba1f24a28e381ed6bfdaacccd2e1302415ecd64c88dcfdcd5",
+      "wasm-check.log": "872796463efb721c31424a835bc6b7c80339c8c3bef46b342a46c2654349024a",
+      "clippy.log": "0bf82a13a96a776f56ee1e2ef504931d5692e0345d4717d70541bc2b8b37855b",
+      "boundaries.log": "ed6e8e6214358ac43d6f72e8549446b5ce8170b62a9813b557dc1d130eb24186",
+      "wasm-cone.txt": "37b533d3e07d0bbbe13ddfb048789945baf4f388de09f25f17e1d0dbc6470b90"
+    }
+  },
+  "documentation": {
+    "new_findings": false,
+    "comparison": "checks/doc-audit-comparison.json",
+    "global_status": "Existing citation/path/header and 4 D2 audit findings remain; this is no-new-findings qualification, not a global clean audit."
+  },
+  "upstream_review_before_integration": {
+    "main": "6a1962278ae6802b48029ac32171ca254ab092f8",
+    "relationship_and_dynamics": "04a48c2d6 adds exact, independently retained read-only inspector targets; no new permission or application dispatch owner. Graphshell adopts disclosed owner facts only.",
+    "retained_clip_receiver": "6a1962278 records Turnstone native selected text/WAV receiving in an unsealed store; it supplies no Moot retention, encrypted custody or peer-hosting qualification.",
+    "knot_viewport": "578c8e366 records host-owned camera/reveal qualification; no supplier repin or physics-coordinator adoption is inferred.",
+    "moot_source_cone_changed": false
+  },
+  "integrated_parent": "6a1962278ae6802b48029ac32171ca254ab092f8"
+}
