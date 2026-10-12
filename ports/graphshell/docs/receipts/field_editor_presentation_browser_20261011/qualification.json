@@ -1,0 +1,698 @@
+{
+  "date_local": "2026-10-11",
+  "timezone": "America/New_York",
+  "owner": "Inspector, presentation and exact coupling strength qualification",
+  "status": "qualified for the named source cuts and scope",
+  "integration": {
+    "source_commit": "be6c09a114e51902ff10666e264d85d6c6ab41d6",
+    "included": "Remote Moot commit f197cadf and peer dynamics inspector commit 2fc4024a, merged without conflicts in an isolated checkout.",
+    "product": {
+      "result": "passed",
+      "command": "cargo check --target wasm32-unknown-unknown --no-default-features --features product --locked --offline --target-dir C:/t/cargo-targets/mere -j 2",
+      "cwd": "ports/graphshell/web",
+      "log": "integration_final_product_check.log",
+      "sha256": "5188b442c3e35cbf80f57033421c3135bf60ee7bcb72f42580fdddd841c037c0",
+      "bytes": 18306
+    },
+    "viewer": {
+      "result": "passed",
+      "command": "cargo check --target wasm32-unknown-unknown --no-default-features --locked --offline --target-dir C:/t/cargo-targets/mere -j 2",
+      "cwd": "ports/graphshell/web",
+      "log": "integration_final_viewer_check.log",
+      "sha256": "e5c9975792c9565e1dd784be461c0689fbc47015406cea1d9b950a954ac2ebae",
+      "bytes": 20304
+    },
+    "earlier_checks": [
+      {
+        "source_commit": "84f18ca9b160ac445d1ef57fe16a5ede2814f54c",
+        "log": "integration_product_check.log",
+        "result": "passed before the newer peer commit",
+        "sha256": "5a4e417a402dba67bd3d0bfd063e832594f552bb8a9b6c6523f7335a14875f24",
+        "bytes": 22494
+      },
+      {
+        "log": "integration_viewer_check.log",
+        "result": "aborted while waiting for the shared target lock before compilation, to include the newer peer commit",
+        "sha256": "a0fa31e7b98c66477bbba56c910c4583ca9c2166b39266c969446ae9c20139f8",
+        "bytes": 206
+      }
+    ],
+    "limit": "Integrated source has compile evidence only; the Chrome cases below remain bound to their named earlier packages."
+  },
+  "packages": {
+    "inspection": {
+      "owner": "Field editor and presentation Chrome qualification",
+      "source_commit": "c74411edf1c58218b0272d62a76f6e41ea03c1ba",
+      "artifacts": {
+        "graphshell_web_bg.wasm": {
+          "sha256": "c25ec002ba7e2779cb39318164be52ea9dfeb9d1c9d56d89a0b2c3d22b708b13",
+          "bytes": 360245159
+        },
+        "graphshell_web.js": {
+          "sha256": "8720a70622e38525997c8acebff9149c98bf37932e0841a3d791b6726c7ffd88",
+          "bytes": 138795
+        }
+      }
+    },
+    "presentation": {
+      "owner": "Field editor and presentation Chrome qualification",
+      "source_commit": "670e2850905cd5fb256886507dc07495c0fbabc4",
+      "artifacts": {
+        "graphshell_web_bg.wasm": {
+          "sha256": "a83a26912a18eff54268267492093aa8a2b3b2b57431e930e4200b296c902857",
+          "bytes": 360254179
+        },
+        "graphshell_web.js": {
+          "sha256": "8720a70622e38525997c8acebff9149c98bf37932e0841a3d791b6726c7ffd88",
+          "bytes": 138795
+        }
+      }
+    },
+    "strength": {
+      "owner": "Field editor and presentation Chrome qualification",
+      "source_commit": "1e47059c3c8e4d4c3ed8eb2770df81fae026f0a2",
+      "artifacts": {
+        "graphshell_web_bg.wasm": {
+          "sha256": "840299ff6bf2e6ee4946a17fe08c1dd1fa2dd351023c9536352de386aca4bb27",
+          "bytes": 360262480
+        },
+        "graphshell_web.js": {
+          "sha256": "6c120ee44c4c035267e5a6b868428163a97a5f9cab77cbe6e54e05bb540958de",
+          "bytes": 138790
+        }
+      }
+    },
+    "final": {
+      "owner": "Field editor and presentation Chrome qualification",
+      "source_commit": "aa0b94d0cba0b7106a8346a35d7c14e2dbf8a503",
+      "artifacts": {
+        "graphshell_web_bg.wasm": {
+          "sha256": "b93aee6b07aa06d805de5f52e31177a7fc510574dcb31e35203d1d9de6514190",
+          "bytes": 360262492
+        },
+        "graphshell_web.js": {
+          "sha256": "6c120ee44c4c035267e5a6b868428163a97a5f9cab77cbe6e54e05bb540958de",
+          "bytes": 138790
+        }
+      }
+    }
+  },
+  "final_rust_build_cut": "08efdd4a264a157710d5df9f8c708207322091b3",
+  "final_package_recorded_head": "aa0b94d0cba0b7106a8346a35d7c14e2dbf8a503",
+  "final_package_equivalence": "08efdd4a to aa0b94d0 changes documentation only; Rust/manifests/locks compare equal. Later 5845d006 adds the final visual scenario only.",
+  "source_hashes_git_blob_lf": {
+    "inspection": {
+      "crates/system/pandect/src/graph_session.rs": "e7c6053bd337446c148aa8dd68c589b6462f9e5d2ccb0b7e32791ef75c4be4bf",
+      "crates/system/pandect/src/graph_session_transaction.rs": "bffbd5c168b64d25353f98e5480c97101a2c8b6b3a8c100b2d3c2a97f13c657a",
+      "ports/graphshell/src/coupling_edit.rs": "ad2497c011d633ec38a3565c5861f1c744519168477edae4a1c931cea569846a",
+      "ports/graphshell/src/coupling_edit_tests.rs": "46d488a5d8610d32e941e13060b76def55d51ba159b511b0feb797f0d4063851",
+      "ports/graphshell/src/mere_host_coupling.rs": "7fda442a9843aa47786501b0d6a3c641c0639d86c0275930092764c9f7720b6b",
+      "ports/graphshell/src/web_tree.rs": "8e808d1a44bf1f3204a1b7e606e93266a51727484e09fda6a364949366a0298b",
+      "ports/graphshell/src/web_tree/field_inspection.rs": "e5b9492a497253cc672aabe476e197685efb57293724aa9e75501020289b8d8d",
+      "ports/graphshell/src/web_tree/coupling.rs": "8879a400ca3d85830cacd894c85a3ab69b18bceb15ffa3b2036cceda9f8c5c9b",
+      "ports/graphshell/src/web_tree/product.rs": "a4c043b8c4443be03a14544cf402f302ad952b3668a6361a384ba972fb2ad9c5",
+      "ports/graphshell/src/web_tree/lane.rs": "b9d19a99a699901ddbaca6982dace90fa54c7650153abcdcec9cda14f6f5ed3b",
+      "ports/graphshell/src/web_tree/gestures.rs": "5b2efe8bcb8db3731e578f954a0f8f0530f1e2a10bb279c53575e93d091f4cf8",
+      "crates/canvas/pictograph/src/canvas/forme_region.rs": "2d64eb51e7827424dcff6502b1d187e4e0e4be0c93a8a8994c9d8ad55f12d8cc",
+      "ports/graphshell/web/Cargo.toml": "723ebabab9f033336c9d0cc1edd7938896b04afcde0c87e3d5a82315d96fb22f",
+      "ports/graphshell/web/Cargo.lock": "9fcf67c9f396e1b6b3b5ca29490683bccc897ec69d5928b95e1dbc0d85f48da3",
+      "ports/graphshell/web/.cargo/config.toml": "b8d07a292ec30cde3dd292ac28fefaec28ac3cb6707d79160b76f3893e268758"
+    },
+    "presentation": {
+      "crates/system/pandect/src/graph_session.rs": "e7c6053bd337446c148aa8dd68c589b6462f9e5d2ccb0b7e32791ef75c4be4bf",
+      "crates/system/pandect/src/graph_session_transaction.rs": "bffbd5c168b64d25353f98e5480c97101a2c8b6b3a8c100b2d3c2a97f13c657a",
+      "ports/graphshell/src/coupling_edit.rs": "ad2497c011d633ec38a3565c5861f1c744519168477edae4a1c931cea569846a",
+      "ports/graphshell/src/coupling_edit_tests.rs": "46d488a5d8610d32e941e13060b76def55d51ba159b511b0feb797f0d4063851",
+      "ports/graphshell/src/mere_host_coupling.rs": "7fda442a9843aa47786501b0d6a3c641c0639d86c0275930092764c9f7720b6b",
+      "ports/graphshell/src/web_tree.rs": "8e808d1a44bf1f3204a1b7e606e93266a51727484e09fda6a364949366a0298b",
+      "ports/graphshell/src/web_tree/field_inspection.rs": "fae88a6c3180d98b9dafb0317e302fbf47d2eb3f5756176f89fba982c9c7c5e2",
+      "ports/graphshell/src/web_tree/coupling.rs": "8879a400ca3d85830cacd894c85a3ab69b18bceb15ffa3b2036cceda9f8c5c9b",
+      "ports/graphshell/src/web_tree/product.rs": "a4c043b8c4443be03a14544cf402f302ad952b3668a6361a384ba972fb2ad9c5",
+      "ports/graphshell/src/web_tree/lane.rs": "b9d19a99a699901ddbaca6982dace90fa54c7650153abcdcec9cda14f6f5ed3b",
+      "ports/graphshell/src/web_tree/gestures.rs": "5b2efe8bcb8db3731e578f954a0f8f0530f1e2a10bb279c53575e93d091f4cf8",
+      "crates/canvas/pictograph/src/canvas/forme_region.rs": "2d64eb51e7827424dcff6502b1d187e4e0e4be0c93a8a8994c9d8ad55f12d8cc",
+      "ports/graphshell/web/Cargo.toml": "723ebabab9f033336c9d0cc1edd7938896b04afcde0c87e3d5a82315d96fb22f",
+      "ports/graphshell/web/Cargo.lock": "9fcf67c9f396e1b6b3b5ca29490683bccc897ec69d5928b95e1dbc0d85f48da3",
+      "ports/graphshell/web/.cargo/config.toml": "b8d07a292ec30cde3dd292ac28fefaec28ac3cb6707d79160b76f3893e268758"
+    },
+    "strength": {
+      "crates/system/pandect/src/graph_session.rs": "e7c6053bd337446c148aa8dd68c589b6462f9e5d2ccb0b7e32791ef75c4be4bf",
+      "crates/system/pandect/src/graph_session_transaction.rs": "bffbd5c168b64d25353f98e5480c97101a2c8b6b3a8c100b2d3c2a97f13c657a",
+      "ports/graphshell/src/coupling_edit.rs": "630bbaef9bcdbffbf967459563b8843d9b912a51d6dbe4e8c87f0202f1596dfb",
+      "ports/graphshell/src/coupling_edit_tests.rs": "a7594b91325f4e7f81d41b9eb2be2e07eb853e73d358dec8c9ecc14d9d0daa32",
+      "ports/graphshell/src/mere_host_coupling.rs": "d031d840f9fbf5d7b15e5499c0fb750d4fea72390a3459561e143aac3dec9ef2",
+      "ports/graphshell/src/web_tree.rs": "8e808d1a44bf1f3204a1b7e606e93266a51727484e09fda6a364949366a0298b",
+      "ports/graphshell/src/web_tree/field_inspection.rs": "fae88a6c3180d98b9dafb0317e302fbf47d2eb3f5756176f89fba982c9c7c5e2",
+      "ports/graphshell/src/web_tree/coupling.rs": "83270ced31216b2741592ec816e9e511c2ff108898533fc3db49130c9f073916",
+      "ports/graphshell/src/web_tree/product.rs": "c43cbb315b9ce4e1bdf6cf0370964b33339662c5a3df271eb184e2e55d9af5b5",
+      "ports/graphshell/src/web_tree/lane.rs": "b9d19a99a699901ddbaca6982dace90fa54c7650153abcdcec9cda14f6f5ed3b",
+      "ports/graphshell/src/web_tree/gestures.rs": "5b2efe8bcb8db3731e578f954a0f8f0530f1e2a10bb279c53575e93d091f4cf8",
+      "crates/canvas/pictograph/src/canvas/forme_region.rs": "2d64eb51e7827424dcff6502b1d187e4e0e4be0c93a8a8994c9d8ad55f12d8cc",
+      "ports/graphshell/web/Cargo.toml": "723ebabab9f033336c9d0cc1edd7938896b04afcde0c87e3d5a82315d96fb22f",
+      "ports/graphshell/web/Cargo.lock": "9fcf67c9f396e1b6b3b5ca29490683bccc897ec69d5928b95e1dbc0d85f48da3",
+      "ports/graphshell/web/.cargo/config.toml": "b8d07a292ec30cde3dd292ac28fefaec28ac3cb6707d79160b76f3893e268758"
+    },
+    "final": {
+      "crates/system/pandect/src/graph_session.rs": "e7c6053bd337446c148aa8dd68c589b6462f9e5d2ccb0b7e32791ef75c4be4bf",
+      "crates/system/pandect/src/graph_session_transaction.rs": "bffbd5c168b64d25353f98e5480c97101a2c8b6b3a8c100b2d3c2a97f13c657a",
+      "ports/graphshell/src/coupling_edit.rs": "630bbaef9bcdbffbf967459563b8843d9b912a51d6dbe4e8c87f0202f1596dfb",
+      "ports/graphshell/src/coupling_edit_tests.rs": "a7594b91325f4e7f81d41b9eb2be2e07eb853e73d358dec8c9ecc14d9d0daa32",
+      "ports/graphshell/src/mere_host_coupling.rs": "d031d840f9fbf5d7b15e5499c0fb750d4fea72390a3459561e143aac3dec9ef2",
+      "ports/graphshell/src/web_tree.rs": "d4d2c518d4b0dd13c538bff5aa8765ae82ac3e7c852f47da5e0de5dbc8414d04",
+      "ports/graphshell/src/web_tree/field_inspection.rs": "fae88a6c3180d98b9dafb0317e302fbf47d2eb3f5756176f89fba982c9c7c5e2",
+      "ports/graphshell/src/web_tree/coupling.rs": "db42cbf47dbfb0dcb6c6bf7cd5d2acdc27e524bbb2cf3633425e0f04ee038202",
+      "ports/graphshell/src/web_tree/product.rs": "c43cbb315b9ce4e1bdf6cf0370964b33339662c5a3df271eb184e2e55d9af5b5",
+      "ports/graphshell/src/web_tree/lane.rs": "b9d19a99a699901ddbaca6982dace90fa54c7650153abcdcec9cda14f6f5ed3b",
+      "ports/graphshell/src/web_tree/gestures.rs": "5b2efe8bcb8db3731e578f954a0f8f0530f1e2a10bb279c53575e93d091f4cf8",
+      "crates/canvas/pictograph/src/canvas/forme_region.rs": "2d64eb51e7827424dcff6502b1d187e4e0e4be0c93a8a8994c9d8ad55f12d8cc",
+      "ports/graphshell/web/Cargo.toml": "723ebabab9f033336c9d0cc1edd7938896b04afcde0c87e3d5a82315d96fb22f",
+      "ports/graphshell/web/Cargo.lock": "9fcf67c9f396e1b6b3b5ca29490683bccc897ec69d5928b95e1dbc0d85f48da3",
+      "ports/graphshell/web/.cargo/config.toml": "b8d07a292ec30cde3dd292ac28fefaec28ac3cb6707d79160b76f3893e268758"
+    }
+  },
+  "build": {
+    "target_dir": "C:/t/cargo-targets/mere",
+    "cwd": "ports/graphshell/web",
+    "command": "cargo build --target wasm32-unknown-unknown --no-default-features --features product --locked --offline --target-dir C:/t/cargo-targets/mere -j 2",
+    "result": "passed",
+    "final_log": "product_build_reveal.log",
+    "packaging": "llvm-strip --strip-debug, wasm-bindgen 0.2.129 --target web --out-name graphshell_web",
+    "profile": "debug"
+  },
+  "viewer": {
+    "result": "passed",
+    "log": "viewer_check_final.log",
+    "command": "cargo check --target wasm32-unknown-unknown --no-default-features --locked --offline --target-dir C:/t/cargo-targets/mere -j 2"
+  },
+  "native": {
+    "forme_renderer": {
+      "result": "passed",
+      "passed": 5,
+      "failed": 0,
+      "log": "canvas_forme_tests.log",
+      "source_cut": "dd0c620c5fb07c9a990edb496cf39b2aeb5215d0",
+      "command": "cargo test --locked --offline -p pictograph --features canvas --lib canvas::forme_region::tests --target-dir C:/t/cargo-targets/mere -j 2",
+      "note": "Renderer code unchanged in this lane; the later Exhibit A addition is a comment-only source notice repair in another renderer test."
+    },
+    "coupling_owner": {
+      "result": "passed",
+      "passed": 5,
+      "failed": 0,
+      "log": "coupling_owner_tests.log",
+      "source_cut": "1e47059c3c8e4d4c3ed8eb2770df81fae026f0a2",
+      "command": "cargo test --locked --offline -p graphshell --no-default-features --features web --lib coupling_edit --target-dir C:/t/cargo-targets/mere -j 2",
+      "scope": "Exact save/undo/reopen; sibling and unrelated-edit preservation; failed and nontransactional storage; competing durable saves; invalid/withdrawn targets and private history; equal-ID foreign graph refusal."
+    }
+  },
+  "browser": {
+    "browser": "Chrome 154.0.0.0",
+    "platform": "Windows",
+    "adapter": "Nvidia Lovelace WebGPU",
+    "environment_reports": [
+      "chrome/inspection/probe/environment.json",
+      "chrome/rules/probe/environment.json",
+      "chrome/live/probe/environment.json",
+      "chrome/strength/probe/environment.json"
+    ],
+    "normal_page_motion": "?motion=normal. Explicit root motion attributes still take priority; browser preference is otherwise the fallback.",
+    "physics_precondition": "The analytic initial arrangement is already paused, independently of browser reduced-motion preference.",
+    "reopen": "Fresh page on retained origin; fresh browser/native process not claimed.",
+    "cases_in_order": [
+      {
+        "name": "p4_tree_field_inspection",
+        "result": "ok",
+        "origin": "http://127.0.0.1:9891",
+        "package": "inspection",
+        "rust_cut": "c74411edf1c58218b0272d62a76f6e41ea03c1ba",
+        "scenario_blob_sha256": "47c2b6f074d1bb40699722574e6f6bbd513dde6fcfac3d475c714ad3cc9ad397",
+        "receipt": "chrome/inspection/p4_tree_field_inspection/result.json",
+        "receipt_hash": {
+          "sha256": "535c3fbe2b2b971c8a7fb17fa2c52b07ac7ad7b568d81381279fb8c2ab391218",
+          "bytes": 28235
+        },
+        "captures": [
+          "chrome/inspection/p4_tree_field_inspection/exact_scalar_coupling.png",
+          "chrome/inspection/p4_tree_field_inspection/forme_arrangement_owner.png",
+          "chrome/inspection/p4_tree_field_inspection/overlapping_field_candidates.png",
+          "chrome/inspection/p4_tree_field_inspection/retired_field_record.png"
+        ],
+        "app_capture": {},
+        "canvas_logical_size": [
+          737,
+          504
+        ],
+        "canvas_physical_size": [
+          1474,
+          1008
+        ],
+        "collected_at_utc": "2026-10-12T02:06:24.229493+00:00"
+      },
+      {
+        "name": "p4_tree_field_inspection_reopen",
+        "result": "ok",
+        "origin": "http://127.0.0.1:9891",
+        "package": "presentation",
+        "rust_cut": "670e2850905cd5fb256886507dc07495c0fbabc4",
+        "scenario_blob_sha256": "3361544fdeae22c1290ef2ad7b5ea89ebfa19d5ca53613aec418e252da59f565",
+        "receipt": "chrome/inspection/p4_tree_field_inspection_reopen/result.json",
+        "receipt_hash": {
+          "sha256": "de6b205521cb2d29f6842fb8968c3aa0320b3bcf34287caff45c6a98975be4bc",
+          "bytes": 36094
+        },
+        "captures": [
+          "chrome/inspection/p4_tree_field_inspection_reopen/reopened_field_records.png"
+        ],
+        "app_capture": {},
+        "canvas_logical_size": [
+          737,
+          504
+        ],
+        "canvas_physical_size": [
+          1474,
+          1008
+        ],
+        "collected_at_utc": "2026-10-12T02:10:23.200023+00:00"
+      },
+      {
+        "name": "p4_tree_presentation_rules",
+        "result": "ok",
+        "origin": "http://127.0.0.1:9903",
+        "package": "presentation",
+        "rust_cut": "670e2850905cd5fb256886507dc07495c0fbabc4",
+        "scenario_blob_sha256": "cf07b3b5398216d26c6a20a5b6b3c9d42b016c12f632b4b3387794b885c54d43",
+        "receipt": "chrome/rules/p4_tree_presentation_rules/result.json",
+        "receipt_hash": {
+          "sha256": "bce6e5afa34063d43b9b901cb9468d1fe5e209e0f71481b42a06001dc2b4ac3c",
+          "bytes": 31096
+        },
+        "captures": [
+          "chrome/rules/p4_tree_presentation_rules/presentation_rule_decisions.png"
+        ],
+        "app_capture": {},
+        "canvas_logical_size": [
+          737,
+          504
+        ],
+        "canvas_physical_size": [
+          1474,
+          1008
+        ],
+        "collected_at_utc": "2026-10-12T02:20:43.012232+00:00"
+      },
+      {
+        "name": "p4_tree_presentation_rules_reopen",
+        "result": "ok",
+        "origin": "http://127.0.0.1:9903",
+        "package": "presentation",
+        "rust_cut": "670e2850905cd5fb256886507dc07495c0fbabc4",
+        "scenario_blob_sha256": "7ce86a80dc96655736526c0e67ebcd018af58f10d8da9d1d6130b8f277c923d7",
+        "receipt": "chrome/rules/p4_tree_presentation_rules_reopen/result.json",
+        "receipt_hash": {
+          "sha256": "e23ed531960cf8c3a687535eb7f122e39df90d54e148203f80dbdc415333db01",
+          "bytes": 31069
+        },
+        "captures": [
+          "chrome/rules/p4_tree_presentation_rules_reopen/presentation_rules_reopened.png"
+        ],
+        "app_capture": {},
+        "canvas_logical_size": [
+          737,
+          448
+        ],
+        "canvas_physical_size": [
+          1474,
+          896
+        ],
+        "collected_at_utc": "2026-10-12T02:23:33.571669+00:00"
+      },
+      {
+        "name": "p4_tree_presentation_live",
+        "result": "ok",
+        "origin": "http://127.0.0.1:9895",
+        "package": "presentation",
+        "rust_cut": "670e2850905cd5fb256886507dc07495c0fbabc4",
+        "scenario_blob_sha256": "ffcf609666f1a1bef1c0c4157aa01b32eefc75c35b82fb1ee3d240d1525543c2",
+        "receipt": "chrome/live/p4_tree_presentation_live/result.json",
+        "receipt_hash": {
+          "sha256": "bf385e303c12b3cb865d2273ba14a44017e4d1fc8eb1717d3f86cbad1b0d3898",
+          "bytes": 43995
+        },
+        "captures": [
+          "chrome/live/p4_tree_presentation_live/presentation_guides_base_restored.png",
+          "chrome/live/p4_tree_presentation_live/presentation_numen_unsupported_effect.png",
+          "chrome/live/p4_tree_presentation_live/presentation_saved_forme_guides_hidden.png"
+        ],
+        "app_capture": {},
+        "canvas_logical_size": [
+          737,
+          448
+        ],
+        "canvas_physical_size": [
+          1474,
+          896
+        ],
+        "collected_at_utc": "2026-10-12T02:29:19.989314+00:00"
+      },
+      {
+        "name": "p4_tree_presentation_live_reopen",
+        "result": "ok",
+        "origin": "http://127.0.0.1:9895",
+        "package": "presentation",
+        "rust_cut": "670e2850905cd5fb256886507dc07495c0fbabc4",
+        "scenario_blob_sha256": "91ac35c4322d8d74b7a2551219190a6f4625d5fa9e83d93edf21e27a6c1affb0",
+        "receipt": "chrome/live/p4_tree_presentation_live_reopen/result.json",
+        "receipt_hash": {
+          "sha256": "a838f78755b62cbed75cc45146cd1c925f2b47b314b43413eafa4314c6d4d768",
+          "bytes": 30920
+        },
+        "captures": [
+          "chrome/live/p4_tree_presentation_live_reopen/presentation_live_reopen.png"
+        ],
+        "app_capture": {},
+        "canvas_logical_size": [
+          737,
+          448
+        ],
+        "canvas_physical_size": [
+          1474,
+          896
+        ],
+        "collected_at_utc": "2026-10-12T02:35:21.091416+00:00"
+      },
+      {
+        "name": "p4_tree_coupling_strength",
+        "result": "ok",
+        "origin": "http://127.0.0.1:9897",
+        "package": "strength",
+        "rust_cut": "1e47059c3c8e4d4c3ed8eb2770df81fae026f0a2",
+        "scenario_blob_sha256": "15c25bed4ec35905171e66f318c609e3c472be19c2a4e223bcf5a8aebb8641dd",
+        "receipt": "chrome/strength/p4_tree_coupling_strength/result.json",
+        "receipt_hash": {
+          "sha256": "fde484953a34ddf392afc7fe68807ac2ac449df3f5dd7b554369079bc8ff546f",
+          "bytes": 36828
+        },
+        "captures": [
+          "chrome/strength/p4_tree_coupling_strength/exact_strength_preview.png",
+          "chrome/strength/p4_tree_coupling_strength/exact_strength_saved.png"
+        ],
+        "app_capture": {},
+        "canvas_logical_size": [
+          737,
+          504
+        ],
+        "canvas_physical_size": [
+          1474,
+          1008
+        ],
+        "collected_at_utc": "2026-10-12T02:51:32.324648+00:00"
+      },
+      {
+        "name": "p4_tree_coupling_strength_reopen",
+        "result": "ok",
+        "origin": "http://127.0.0.1:9897",
+        "package": "final",
+        "rust_cut": "aa0b94d0cba0b7106a8346a35d7c14e2dbf8a503",
+        "scenario_blob_sha256": "436539394e90e94db3df27e3df6c2581733415bb7b51bde4a043717dd60aa318",
+        "receipt": "chrome/strength/p4_tree_coupling_strength_reopen/result.json",
+        "receipt_hash": {
+          "sha256": "6fd87da7880bfd942f81d9b52e6454f855e7b111d64e4d16e8d5d1f2cede950e",
+          "bytes": 36064
+        },
+        "captures": [
+          "chrome/strength/p4_tree_coupling_strength_reopen/reopened_strength_history.png"
+        ],
+        "app_capture": {},
+        "canvas_logical_size": [
+          737,
+          504
+        ],
+        "canvas_physical_size": [
+          1474,
+          1008
+        ],
+        "collected_at_utc": "2026-10-12T03:03:04.625709+00:00"
+      },
+      {
+        "name": "p4_tree_field_inspection_narrow",
+        "result": "ok",
+        "origin": "http://127.0.0.1:9891",
+        "package": "final",
+        "rust_cut": "aa0b94d0cba0b7106a8346a35d7c14e2dbf8a503",
+        "scenario_blob_sha256": "cbce49f96550d808572ce2790344284a641951c6aa14dc121b0804217f529de3",
+        "receipt": "chrome/inspection/p4_tree_field_inspection_narrow/result.json",
+        "receipt_hash": {
+          "sha256": "3d1782507ec921852d8438eb1002aca0b706ab1ceb3defb8117c8001d43806a4",
+          "bytes": 35942
+        },
+        "captures": [
+          "chrome/inspection/p4_tree_field_inspection_narrow/narrow_coupling_details.png",
+          "chrome/inspection/p4_tree_field_inspection_narrow/narrow_field_details.png"
+        ],
+        "app_capture": {},
+        "canvas_logical_size": [
+          420,
+          597
+        ],
+        "canvas_physical_size": [
+          420,
+          597
+        ],
+        "collected_at_utc": "2026-10-12T03:04:19.279194+00:00"
+      },
+      {
+        "name": "p4_tree_coupling_strength_visual",
+        "result": "ok",
+        "origin": "http://127.0.0.1:9897",
+        "package": "final",
+        "rust_cut": "aa0b94d0cba0b7106a8346a35d7c14e2dbf8a503",
+        "scenario_blob_sha256": "02b324c892fe7035409e33c7daf12d96b7d820dbb7710d52ecbdf11e628136b1",
+        "receipt": "chrome/strength/p4_tree_coupling_strength_visual/result.json",
+        "receipt_hash": {
+          "sha256": "ad8e6d6fa7024bf9447dfa9c829061b81f70127fd59334de07c97c5b2309d69b",
+          "bytes": 42678
+        },
+        "captures": [
+          "chrome/strength/p4_tree_coupling_strength_visual/final_saved_strength_details.png",
+          "chrome/strength/p4_tree_coupling_strength_visual/final_strength_draft_controls.png"
+        ],
+        "app_capture": {},
+        "canvas_logical_size": [
+          737,
+          448
+        ],
+        "canvas_physical_size": [
+          1474,
+          896
+        ],
+        "collected_at_utc": "2026-10-12T03:07:28.602770+00:00"
+      }
+    ],
+    "passed_cases": 10,
+    "captures_reviewed": 18,
+    "captures": [
+      {
+        "path": "chrome/inspection/p4_tree_field_inspection/exact_scalar_coupling.png",
+        "width": 2074,
+        "height": 1278,
+        "sha256": "e13467f13dabbea75f3c8af65837d39b8b4f673f2dbf0f59b69ee9d068e8f177",
+        "bytes": 517411
+      },
+      {
+        "path": "chrome/inspection/p4_tree_field_inspection/forme_arrangement_owner.png",
+        "width": 2074,
+        "height": 1278,
+        "sha256": "e6b8d8b71e962f96ccc3951750bf6cb672dc6a8786e3958b481a7ee6de4a60b4",
+        "bytes": 571255
+      },
+      {
+        "path": "chrome/inspection/p4_tree_field_inspection/overlapping_field_candidates.png",
+        "width": 2074,
+        "height": 1278,
+        "sha256": "8272acaf7f3b8b24c07485570c7d39fe19078877a980b25b55cdccaa0eb8af2e",
+        "bytes": 496923
+      },
+      {
+        "path": "chrome/inspection/p4_tree_field_inspection/retired_field_record.png",
+        "width": 2074,
+        "height": 1278,
+        "sha256": "f8ab8f23419ca76e509bc192c505220b3df58c3ba2ed7bf9b13d51c4f6735892",
+        "bytes": 523699
+      },
+      {
+        "path": "chrome/inspection/p4_tree_field_inspection_reopen/reopened_field_records.png",
+        "width": 2074,
+        "height": 1278,
+        "sha256": "46e1e144d6bc29f870b06cc57c97f05d125434f3372a9eae38eee2bb3204cf61",
+        "bytes": 486495
+      },
+      {
+        "path": "chrome/rules/p4_tree_presentation_rules/presentation_rule_decisions.png",
+        "width": 2074,
+        "height": 1278,
+        "sha256": "d91bddf59b6c4613b4ff7f52959e0ebc56d6d7c295b09b975d0df6bd62209331",
+        "bytes": 303537
+      },
+      {
+        "path": "chrome/rules/p4_tree_presentation_rules_reopen/presentation_rules_reopened.png",
+        "width": 2074,
+        "height": 1166,
+        "sha256": "fa965fe2acfdc9e1308bee1ac203cfd4eb5bda23a59529b9be15f1fbeddd72df",
+        "bytes": 264561
+      },
+      {
+        "path": "chrome/live/p4_tree_presentation_live/presentation_guides_base_restored.png",
+        "width": 2074,
+        "height": 1166,
+        "sha256": "977400d72b5c13b3900dd612affa2f8f76f6f5114f6296a6567871a6a5d2771b",
+        "bytes": 477227
+      },
+      {
+        "path": "chrome/live/p4_tree_presentation_live/presentation_numen_unsupported_effect.png",
+        "width": 2074,
+        "height": 1166,
+        "sha256": "87ae3fe1c71bea3ed393335c41fb1eee887287113469d35a84b9e1ebd7760ad4",
+        "bytes": 585381
+      },
+      {
+        "path": "chrome/live/p4_tree_presentation_live/presentation_saved_forme_guides_hidden.png",
+        "width": 2074,
+        "height": 1166,
+        "sha256": "4897d2b039db4ca6608adcc3324b8b42e0e3b6e0a11cdc7e9341e9b40733df6e",
+        "bytes": 481261
+      },
+      {
+        "path": "chrome/live/p4_tree_presentation_live_reopen/presentation_live_reopen.png",
+        "width": 2074,
+        "height": 1166,
+        "sha256": "b6f8f0393c9da496dfb87c804354a09e6eeeb55234a3ebb6d426c423dc0d36bc",
+        "bytes": 485649
+      },
+      {
+        "path": "chrome/strength/p4_tree_coupling_strength/exact_strength_preview.png",
+        "width": 2074,
+        "height": 1278,
+        "sha256": "dc709eb29d954de226c0e8b47b577faf7a566e0ea8b68a151c3924f10ec619cb",
+        "bytes": 467210
+      },
+      {
+        "path": "chrome/strength/p4_tree_coupling_strength/exact_strength_saved.png",
+        "width": 2074,
+        "height": 1278,
+        "sha256": "605bd52ce3835dbf2f38ddf782ca66da097a80213ba30d1230f7d390d5317ce3",
+        "bytes": 657941
+      },
+      {
+        "path": "chrome/strength/p4_tree_coupling_strength_reopen/reopened_strength_history.png",
+        "width": 2074,
+        "height": 1278,
+        "sha256": "19611a35624ef20d25ec3d79b5271c32d9d9427db2c68dd009fbe1557bed2ff5",
+        "bytes": 646356
+      },
+      {
+        "path": "chrome/inspection/p4_tree_field_inspection_narrow/narrow_coupling_details.png",
+        "width": 420,
+        "height": 800,
+        "sha256": "2b45d2de43bcec46c13d16fc171217533a8835ce58967c7f3235a18b8acdd2c6",
+        "bytes": 160804
+      },
+      {
+        "path": "chrome/inspection/p4_tree_field_inspection_narrow/narrow_field_details.png",
+        "width": 420,
+        "height": 800,
+        "sha256": "f71ebb13cf65c5101f83b4182e0cffeb56b42efa691ccf39c792e357e41c9688",
+        "bytes": 114743
+      },
+      {
+        "path": "chrome/strength/p4_tree_coupling_strength_visual/final_saved_strength_details.png",
+        "width": 2074,
+        "height": 1166,
+        "sha256": "0bdefd7697968edf82959b3eaa0df194933c930b1e8ca3465eabf8b8c070fdda",
+        "bytes": 455742
+      },
+      {
+        "path": "chrome/strength/p4_tree_coupling_strength_visual/final_strength_draft_controls.png",
+        "width": 2074,
+        "height": 1166,
+        "sha256": "6708b91c27fb5c64b53d8cad650d9c75012bf954342f92cb395abb55bff308d6",
+        "bytes": 459424
+      }
+    ],
+    "narrow_viewport": {
+      "configured": [
+        420,
+        800
+      ],
+      "capture_device_pixel_ratio": 1,
+      "note": "Temporary Chrome viewport override, reset after the case; capture dimensions are recorded per image."
+    },
+    "assessment": [
+      "Fact labels and values are separated and long values wrap. Exact field/coupling and Forme details are visible after explicit inspection.",
+      "The corrected 420px keyboard case enters the exact coupling and returns to its field; final capture review confirms both displayed sections.",
+      "Saved rules hide Forme subdivisions while preserving the outer boundary. Disable/undo restores base guides. Unsupported Numen effects are disclosed.",
+      "Strength preview remains private; invalid finite checks, scoped draft history/discard, target retention, exact apply and saved undo/redo/reopen pass without changing siblings or Forme geometry.",
+      "Final visual follow-through shows saved strength 0.125 and the readable private 0.125 to 0.25 preview, then discards it.",
+      "Rule-editor JSON inputs and missing symbol-font fallback still need visual follow-through; early strength captures include the prior arrow glyph, replaced with plain words in the final view."
+    ]
+  },
+  "retained_attempts": [
+    {
+      "path": "chrome/failed_cases/inspection",
+      "source_cut": "dd0c620c5fb07c9a990edb496cf39b2aeb5215d0",
+      "outcome": "Failed: older assert focused syntax unsupported. Replaced by observation of actual retained focus, then reran."
+    },
+    {
+      "path": "chrome/failed_cases/rules",
+      "source_cut": "dd0c620c5fb07c9a990edb496cf39b2aeb5215d0",
+      "outcome": "Failed: Pause physics button absent; other rule steps completed but this is not a passing qualification."
+    },
+    {
+      "path": "chrome/failed_cases/rules_normal_motion",
+      "source_cut": "670e2850905cd5fb256886507dc07495c0fbabc4",
+      "outcome": "Failed: normal browser motion does not unpause an analytic arrangement. Corrected the scenario precondition and reran on a fresh origin."
+    },
+    {
+      "path": "chrome/failed_cases/narrow_before_reveal",
+      "source_cut": "670e2850905cd5fb256886507dc07495c0fbabc4",
+      "outcome": "Model assertions passed but visual reveal failed. Retained as partial evidence; frame-hook reveal plus layout waits passed with reviewed new captures."
+    }
+  ],
+  "limits": [
+    "Force fixture is neutral; physical force effects, magnitude tuning and runtime cost not measured.",
+    "No field definition/selector/response writes, field association/event policy or script execution qualified.",
+    "Native failures/concurrency use controlled memory-backed stores; multi-tab IndexedDB conflicts, IME, physical input, theme/font changes, other browsers/hosts, release performance and large-session costs remain open.",
+    "Earlier portable presentation model and full-host receipts are not new reruns.",
+    "Tests compile and packages are sourced from named cuts; later changes do not inherit browser evidence automatically."
+  ],
+  "documentation": {
+    "before": "doc_audit_before.json",
+    "d2_before": "d2_audit_before.json",
+    "after": "doc_audit_after.json",
+    "note": "Concurrent upstream documentation may change counts; preserve actual dated snapshots. Receipt-local gitattributes preserves collected bytes and line endings.",
+    "d2_after": "d2_audit_after.json",
+    "active_docs": 264,
+    "indexed_active_docs": 263,
+    "covered_active_docs": 261,
+    "d2_remaining": [
+      "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md",
+      "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md",
+      "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_producer_gates/README.md"
+    ],
+    "current_index_link_source_notice_findings": {
+      "orphans": [],
+      "ghosts": [],
+      "broken_relative_links": [],
+      "missing_source_paths": [],
+      "unheaded_sources": []
+    },
+    "comparison": "Concurrent classic-browser receipt docs appeared during the run. Their two D2 omissions and the existing producer receipt omission remain with their owners; no active Markdown was added by this lane."
+  },
+  "cleanup": {
+    "browser_tabs": "Owned tabs closed; other agent tab preserved",
+    "viewport": "Reset to default",
+    "servers": "Owned qualification ports stopped; no unrelated processes stopped",
+    "generated_package": "Owned stable package and stripped input removed after marker/hash/type checks",
+    "worktree": "Temporary C:/Users/mark_/Code/worktrees/mere-field-editor created for the actual integration collision; removal follows delivery to main",
+    "cargo_target": "Shared stable C:/t/cargo-targets/mere retained; no isolated Cargo home/target created",
+    "browser_stores": "Isolated qualification IndexedDB origins retained for evidence/reopen; no personal store used"
+  }
+}

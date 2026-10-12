@@ -48,3 +48,4 @@ pub mod captured_web;
 
 pub mod conversation;
 pub mod coop;
+pub mod resource_coop;

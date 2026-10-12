@@ -1,0 +1,40 @@
+     Locking 11 packages to latest Rust 1.98.1 compatible versions
+      Adding serde_json v1.0.151 (available: v1.0.152)
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.26
+   Compiling serde_core v1.0.229
+   Compiling zmij v1.0.23
+   Compiling syn v3.0.7
+   Compiling serde v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling serde_derive v1.0.229
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling moot-resource-coop-draft-proof v0.0.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/ports/moot/docs/receipts/resource_coop_draft_20261011/harness)
+    Finished `test` profile [unoptimized] target(s) in 17.91s
+     Running unittests src/lib.rs (/Users/markik/Code/targets/moot-resource-coop-draft-20261011/debug/deps/moot_resource_coop_draft_proof-53b094e83dfbed9d)
+
+running 20 tests
+test coop::tests::joined_has_no_reason_and_every_other_verdict_has_one ... ok
+test coop::tests::a_declared_capability_does_not_skip_the_verdict_check ... ok
+test coop::tests::a_grant_that_is_all_authority_must_refuse_reconnect_after_expiry ... ok
+test coop::tests::every_step_is_walked_in_order ... ok
+test coop::tests::the_reference_driver_conforms_under_the_fixture_profile ... ok
+test coop::tests::a_driver_that_reports_joined_after_revoke_fails_at_the_revoke_step ... ok
+test coop::tests::the_reference_driver_conforms_under_the_turnstone_profile ... ok
+test resource_coop::tests::a_collection_fork_offers_no_copy_or_content_fork_right ... ok
+test resource_coop::tests::membership_and_a_hosting_promise_never_supply_action_offers_or_live_presence ... ok
+test resource_coop::tests::independent_readings_keep_resource_and_activity_attention_and_completions_separate ... ok
+test resource_coop::tests::duplicate_payloads_keep_contributions_and_new_revisions_do_not_retarget_attention ... ok
+test resource_coop::tests::owner_acceptance_changes_feedback_only_and_cannot_invent_retained_bytes_or_hosting ... ok
+test resource_coop::tests::bad_reads_are_refused_without_replacing_the_current_snapshot ... ok
+test coop::tests::a_report_round_trips_through_serde ... ok
+test coop::tests::the_wire_shape_is_pinned ... ok
+test coop::tests::a_conformance_walk_round_trips_through_serde ... ok
+test resource_coop::tests::refreshed_authority_invalidates_the_old_request_and_preserves_exact_resource_attention ... ok
+test resource_coop::tests::requests_cannot_be_relabelled_to_attach_a_completion_to_another_resource ... ok
+test resource_coop::tests::withdrawal_clears_only_missing_attention_and_does_not_fabricate_content_for_activity_links ... ok
+test resource_coop::tests::view_json_round_trips_without_becoming_a_capability_and_future_reports_are_refused ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

@@ -1870,3 +1870,203 @@ was not rerun on that newer source. The canonical primary documentation audit
 has no index or current-link findings. Its remaining upstream findings are
 recorded in the qualification summary. The temporary browser package is removed;
 peer documentation work is preserved.
+
+#### Inspector, presentation and exact strength qualification (2026-10-11)
+
+The next authorized slices add shared fact-row spacing to the local inspector
+stylesheet and one-shot focus/reveal for an explicitly chosen field or coupling.
+Those detail headings participate in the retained keyboard order. Requests are
+processed after dispatch and in the frame hook, so keyboard/programmatic
+activation receives the same next-layout reveal. Discovery and ordinary graph
+selection do not retarget inspection. A page-local `?motion=normal|reduced`
+override follows an explicit root motion attribute and precedes the browser
+preference. Motion preference and the analytic arrangement's paused physics
+are separate; the tracked qualification checks both preconditions explicitly.
+
+Ten Chrome scenarios pass, with eighteen final captures reviewed: field
+inspection/reopen and 420px keyboard reading; declarative rule authoring/reopen;
+exact-occurrence live Forme guides/reopen; and exact strength draft/save/reopen
+plus a final visible-value/draft capture. The rule cases establish invalid-draft
+refusal, decision traces, acknowledged saved undo/redo, opt-in guide adoption,
+independent boundary visibility and restored base guides. Unsupported Numen
+effects are disclosed rather than applied. The source-hashed
+[qualification](../../../ports/graphshell/docs/receipts/field_editor_presentation_browser_20261011/qualification.json)
+binds each page to its actual package/source cut. Fresh pages retain their own
+origin's IndexedDB; fresh native/browser processes are not inferred.
+
+Five native Forme renderer tests pass, including guide/base restoration,
+wrong-identity isolation and pin/placement preservation. Five exact-coupling
+tests pass, including failed/nontransactional storage, competing saves,
+equal-ID foreign graph refusal and scoped history with unrelated-edit
+preservation. The final product build and viewer-only check pass. Older portable
+model and full-host receipts are not new reruns. Functional plus capture
+acceptance does not qualify IME, physical touch/focus, other browsers, release
+performance, theme/font changes or large-context costs. Rule-editor JSON input
+and missing symbol-font fallback remain visual follow-through; the new strength
+preview uses plain words for its old/new values.
+
+The [field owner](2026-06-13_scriptable_field_regions_plan.md#field-inspection-adapter-sequence-2026-10-10)
+records the graph-session-bound strength draft and staged graph/journal
+transaction. Its acknowledged update refreshes the portable local client and
+the exact Canvas coupling, preserving geometry and Forme identity. It opens
+strength only; selector/response/definition editing, primitive associations and
+entry/exit scripts keep their gates. The composition walkthrough separates
+arrangement, additive influence and presentation scope without ruling the
+remaining spatial or incompatible-placement policies.
+
+Failed parser/precondition runs and the earlier narrow capture that focused
+without revealing are retained. The corrected narrow capture shows the actual
+exact-coupling details, not just a successful model assertion. Generated browser
+packages and owned processes are removed after recording; the shared Mere Cargo
+target is reused and concurrent documentation work is preserved.
+#### Relationship and dynamics inspector draft (2026-10-11)
+
+**Status:** implemented bounded draft; portable source checks and integrated
+product wasm check passed. Mark chose the relationship/dynamics inspector next
+and said “Sure. Go ahead”. Delivery continues directly to main. Integration
+base was published `ec1e65ca`, with the later renderer/Knot viewport receipts
+through `578c8e36` integrated before delivery. Runtime sources and dependencies
+in this check cone are unchanged by those documentation/test-receipt commits.
+Upstream Forme target-local feedback, Chrome
+field inspection/reopen receipts and the shared occurrence-relationship dynamics
+adapter are preserved. Those receipts retain their own source/platform limits
+and do not qualify this new UI. The dynamics owner's production Knot consumer
+review remains its own adoption and qualification record.
+
+**Findings:** Graphshell's local Canvas can disclose the authored dynamics
+record, its current running stage, controller topology inputs and placement
+constraints. It has no measured per-assertion force vectors or installed
+coupling-target snapshot readout. The projection relationship controller is
+available to compiled-scene consumers; it is not implicitly installed in the
+local graph view. Held `AgentDerived` assertions still have the existing exact
+inspector's explicit missing-rule/input explanation. This draft does not invent
+derived display marks, execution evidence or a new force law.
+
+The [Canvas report](../../../crates/canvas/pictograph/src/canvas/dynamics_inspection.rs)
+reads an exact access UUID or displayed pair without stepping the controller.
+It separates the current record (including an authored schedule retained after
+its run) from the current stage, carrying errors for undisclosed channel/partition cases.
+The record is Canvas readback, not a storage acknowledgment or source-history
+snapshot. The law label is a flat picker summary; the full stage remains the explanation
+for mixtures/groupings. Overlays, pause state, arrangement and topology source
+are disclosed. Inspection does not change source, selection, velocity, pose,
+role, pin, Forme lock/geometry, tile sessions or controller lifetime.
+
+The [shared topology seam](../../../crates/canvas/pictograph/src/canvas/relationship_topology.rs)
+now supplies both the existing controller bridge and its inspector. It retains
+every projected relation row, hidden-cell filtering and parallel multiplicity.
+The selector conversion also remains shared with edge painting/picking. A pair
+report groups rows by displayed direction, source stratum/endpoints and actual
+relation selector; exact assertion handles are deduplicated within that group.
+Grouping is explanatory, not a new durable source handle. Surface and Resource
+owners, repeated accesses, both directions, parallel buckets, open predicates
+and self-links remain distinct where the current input seam distinguishes them.
+Missing accesses refuse; equal addresses do not retarget inspection.
+
+A native probe corrected an assumed one-row-per-subkind expectation: current
+`relation_rows` in the kernel emits each semantic statement as a separate row,
+including two assertions with the same predicate. The report preserves that
+existing behavior. Input-row count and assertion count are shown with their
+own meaning; neither is a measured force count or strength. Hiding removes the
+same row slots the controller consumes. A disclosed occurrence controller
+reports its own input-edge count and does not claim a kernel-cell mapping.
+No topology weighting or assertion-to-force policy was changed by this lane.
+
+**Placement disclosure:** each target reports its role policy and item/group
+sources, explicit position pin, installed arrangement pin, arrangement-slot
+availability, configured live anchor target/stiffness, axis locks, Forme owner
+and current hold, and pointer drag. Axis-lock policy is read through the same
+helper used to install it. A Forme hold remains independent of boundary
+visibility; an explicit pin takes priority. Role policy without a slot is not
+claimed as an installed arrangement pin. An anchor target is configuration,
+not a sampled contribution; Forme or other constraints can govern its body.
+Attention/foreground pins are not mapped onto these position constraints.
+
+**Interaction:** [Dynamics inspector](../../../ports/graphshell/src/web_tree/dynamics_inspection.rs)
+lives in Graph tools. **Explain selected dynamics** binds one selected access;
+**Explain this access dynamics** binds the exact retained access inspector target;
+**Explain pair dynamics** binds the exact link inspector pair. Subsequent
+selection or source-inspector closure does not retarget or close it. Changes
+in current view inputs refresh its report; **Close dynamics inspection** clears
+only this transient inspector. Pair groups provide **Inspect dynamics input
+assertion** buttons to explicitly open the existing exact source owner, preserving
+the dynamics target and selection. Derivation metadata remains sourced from that
+owner, with absence shown. There are no inspector write controls or persisted
+inspector snapshots. JSON stage/record blocks wrap in the existing themed pane.
+
+**Qualification:** the [source receipt](../../../ports/graphshell/docs/receipts/relationship_dynamics_20261011/qualification.json)
+records **38 portable native checks passed**: seven new topology tests and the
+31 retained binding/editor/access/link tests. The locked graph-only harness
+imports the actual shared helper and checked-in model sources; it does not
+compile the complete native Canvas or exercise IndexedDB. Replay with
+`cargo test --locked --offline --manifest-path ports/graphshell/docs/receipts/relationship_dynamics_20261011/harness/Cargo.toml --lib`.
+The locked offline product wasm check passes with the same eighteen existing
+web warnings. One compiler ran at a time under the established 1280 MiB,
+zero-swap and free-memory guard. Canvas report regressions are added for
+read-only graph/selection/pose/pause, Forme-versus-explicit-pin behavior and
+missing exact members; their native execution remains open. On a suitable host,
+run `cargo test --locked -p pictograph --features canvas --lib canvas::dynamics_inspection`.
+Default/viewer and release bundles were not built in this pass.
+
+**Headed handoff:** use a fresh dedicated origin/profile with normal motion on
+`tree.html?app=local` for
+[`p4_tree_dynamics_inspection.scn`](../../../ports/graphshell/web/scenarios/p4_tree_dynamics_inspection.scn),
+then a fresh page/process retaining that origin for
+[`p4_tree_dynamics_inspection_reopen.scn`](../../../ports/graphshell/web/scenarios/p4_tree_dynamics_inspection_reopen.scn).
+They exercise independent exact targets, live pause changes, exact assertion
+routing, Forme holds despite hidden boundaries, source-inspector closure and
+reopen without persisted inspector state. Four captures are planned, none
+produced/reviewed here. S-PC's connected browser still lacks WebGPU. Review
+labels/values, long JSON, keyboard/focus, scrolling and narrow widths; qualify
+explicit pin/manual placement, hidden relation controls, stage transitions,
+live tile continuity and applicable native/Firefox hosts separately.
+
+**Remaining done-conditions:** execute the Canvas report tests and headed
+handoff; measure open-inspector graph traversal/grouping and long-record costs
+before large-graph adoption; add an execution-owner adapter for actual derived
+relationships and compiled-scene occurrence mapping; add measured per-term or
+per-assertion contributions only through their dynamics owner. Installed field
+coupling snapshots, foreground-pin/overview adapters and full node presentation
+remain separate. No script/field execution, primitive writes, broad scene
+composition or force-policy adoption is completed by this read-only draft.
+
+#### Relationship inspection integration and native checks (2026-10-11)
+
+Merged upstream `6a196227` into local main as `208e134e`, preserving the exact
+coupling-strength editor and both inspector styles. Existing uncommitted
+documentation was restored, reconciled and subsequently recorded by its owner.
+The three actual Canvas report tests now pass on Windows. Eight actual Canvas
+topology tests pass, including a new mixed-kind Resource self-link projected
+between repeated accesses in both directions, with 67 retained input rows.
+
+Assertion readback now uses the typed relation handle directly and visits each
+bucket/kind/displayed direction once. It still counts every projected row and
+deduplicates only assertion handles. This removes repeated bucket searches and
+same-kind statement scans; full-graph projection and long-record refresh costs
+remain unmeasured. The original seven topology cases preserve hidden cells,
+parallel buckets, source strata, exact targets and open predicates.
+
+The combined product browser host builds with locked offline dependencies.
+The root native gate initially required an offline lock reconciliation for four
+already-existing Dramatis dependencies; it upgraded no packages. That lock and
+the concurrent Dramatis source changes remain with their owner. Native tests
+reuse `C:\\t\\cargo-targets\\mere`; no isolated build tree or Cargo home is created.
+The [Windows receipt](../../../ports/graphshell/docs/receipts/relationship_dynamics_20261011/windows/qualification.json)
+records source hashes and separate native/browser outcomes.
+
+Both incoming scenario scripts now explicitly open Graph tools before revealing
+the inspector controls. The original fresh-origin attempt reached a collapsed
+tools pane and was stopped; it is retained as incomplete evidence. Corrected
+fresh-origin and retained-origin browser qualification is in progress.
+
+#### Field editor delivery integration (2026-10-11)
+
+The field editor lane integrated remote Moot work `f197cadf` and the newer
+relationship-inspection source `2fc4024a` at `be6c09a1`. Locked offline product
+and viewer-only Wasm checks both pass from `ports/graphshell/web`, using the
+shared stable Cargo target. These compile checks are recorded separately in the
+[field editor receipt](../../../ports/graphshell/docs/receipts/field_editor_presentation_browser_20261011/qualification.json).
+Its ten passing Chrome cases and eighteen reviewed captures remain bound to
+their named package cuts; the newer integrated source does not inherit those
+browser results. The temporary integration checkout preserves concurrent
+Dramatis packaging work in the primary checkout and is removed after delivery.
