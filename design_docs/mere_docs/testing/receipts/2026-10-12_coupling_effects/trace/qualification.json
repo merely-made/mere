@@ -1,0 +1,394 @@
+{
+  "base": "e0dae9c9",
+  "engine_checkpoint": "feba92092caa56139d6af2f3425893dc46b5e4c9",
+  "canvas_checkpoint": "899edbe3be78fa937a61921cae8b0381f393a4cf",
+  "engine_source_unchanged_between_checkpoints": true,
+  "target": "C:/t/cargo-targets/mere",
+  "jobs": 2,
+  "test_threads": 4,
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "cargo": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+  "source_sha256": {
+    "crates/canvas/pictograph/src/canvas.rs": "ae73d74c00680c734e20ac3214dbcdf9994538299ed6a5be750a888d7605282e",
+    "crates/canvas/pictograph/src/canvas/coupling_trace.rs": "36f5a019002011a27987ca3554bd18141353ab2cd2ca57043f7d8a841b8ab7f1",
+    "crates/canvas/pictograph/src/canvas/seiche_bridge.rs": "c6d920b3e091549e5666f1f9e7630c0bfe88cbd2ac22523db8e470fc4eadc821",
+    "crates/conatus/seiche/examples/coupling_trace.rs": "5da685a91f0059ec1a6965477e4c23f56667eb2ff7ae90113f339c7500ca39de",
+    "crates/conatus/seiche/src/coupling_effect_tests.rs": "5fcf4438217014b58960a1c58bf362c7f3b0d870b334c1e90af4c09276e35783",
+    "crates/conatus/seiche/src/coupling_force.rs": "f262e726b741ba3d63ec8beae64728cf900b169dfbaf686950076e69a943399e",
+    "crates/conatus/seiche/src/coupling_trace.rs": "fdf7a9c789eccf33abb6506abe0c97f759470f52c5739811a4ff76f48811a7d1",
+    "crates/conatus/seiche/src/coupling_trace_tests.rs": "0f191675176dea8f2e6f11ceb13a7e72f7d7a1de182948527e5dd5cffabff0d6",
+    "crates/conatus/seiche/src/lib.rs": "a04aa4b9c5d56ecc3d56317840bf57496b91a70832c1f8376b01ec1f591fd295",
+    "crates/conatus/seiche/src/runtime.rs": "31f93df51425c959fcdc52999de2c019219b42901853197557f75fb82f6521f7",
+    "crates/conatus/seiche/src/runtime/actor.rs": "f11efb63ce608f3c8629c6f9f5a9dec720d18c9d5abbe83a22914d3106f70b55",
+    "crates/conatus/seiche/src/runtime/coupling_trace_delivery.rs": "570d962218f7da2cf79acf36729e34d665fd043b9cb8ec3f2a12efb01c12d023",
+    "crates/conatus/seiche/src/runtime/coupling_trace_tests.rs": "d5f88168163d64fba87d441822fbfdd65482033f9e85a3e535d025854ed40c78",
+    "crates/conatus/seiche/src/runtime/elapsed/tests.rs": "865e3a3080b4a9783afaee7ea3e9f0e2e98a4308e1afcf05c82efb39a17fb845",
+    "crates/conatus/seiche/src/runtime/pause_tests.rs": "527778139c100c6ec49fffa42888bbea7359379dd155140cbd2c33af70f4347f"
+  },
+  "canonical_lf_source_sha256": {
+    "crates/canvas/pictograph/src/canvas.rs": "34f5c0678da4056b1412bc589e9556d5bc75ca0f5a399ad2adee1d1043b003c0",
+    "crates/canvas/pictograph/src/canvas/coupling_trace.rs": "1538d619df5bc3cbafe9f2560803e044bb864792c67d7f07f838c2ebe2437943",
+    "crates/canvas/pictograph/src/canvas/seiche_bridge.rs": "c6d920b3e091549e5666f1f9e7630c0bfe88cbd2ac22523db8e470fc4eadc821",
+    "crates/conatus/seiche/examples/coupling_trace.rs": "5da685a91f0059ec1a6965477e4c23f56667eb2ff7ae90113f339c7500ca39de",
+    "crates/conatus/seiche/src/coupling_effect_tests.rs": "5fcf4438217014b58960a1c58bf362c7f3b0d870b334c1e90af4c09276e35783",
+    "crates/conatus/seiche/src/coupling_force.rs": "f262e726b741ba3d63ec8beae64728cf900b169dfbaf686950076e69a943399e",
+    "crates/conatus/seiche/src/coupling_trace.rs": "fdf7a9c789eccf33abb6506abe0c97f759470f52c5739811a4ff76f48811a7d1",
+    "crates/conatus/seiche/src/coupling_trace_tests.rs": "0f191675176dea8f2e6f11ceb13a7e72f7d7a1de182948527e5dd5cffabff0d6",
+    "crates/conatus/seiche/src/lib.rs": "2155029d8057a14be1dd1a369c65792f5ae7943cfd68c2895f25db7b6a329b88",
+    "crates/conatus/seiche/src/runtime.rs": "47b4d296a5d733ddbee6f8681511ce6a89a85d75195d29d66bc5adfc5f741c41",
+    "crates/conatus/seiche/src/runtime/actor.rs": "d2548734cbbac341c0dfd32ed30ae7e62b138eec7ab7f72e7ec2ec5de05180ac",
+    "crates/conatus/seiche/src/runtime/coupling_trace_delivery.rs": "570d962218f7da2cf79acf36729e34d665fd043b9cb8ec3f2a12efb01c12d023",
+    "crates/conatus/seiche/src/runtime/coupling_trace_tests.rs": "d5f88168163d64fba87d441822fbfdd65482033f9e85a3e535d025854ed40c78",
+    "crates/conatus/seiche/src/runtime/elapsed/tests.rs": "4c389c8189b24831f4b3d42d0015a6df04fb13a33cbba3324f86ad36cc20db7f",
+    "crates/conatus/seiche/src/runtime/pause_tests.rs": "22e91e883e0372cd609d16b49e93ed1e8389408f6d058ecb460a4f249149a072"
+  },
+  "test_results": {
+    "default": [
+      "ok. 182 passed; 0 failed; 10 ignored; 0 measured; 0 filtered out; finished in 1.38s",
+      "ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+    ],
+    "inline": [
+      "ok. 173 passed; 0 failed; 10 ignored; 0 measured; 0 filtered out; finished in 1.37s",
+      "ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+    ],
+    "serde": [
+      "ok. 189 passed; 0 failed; 10 ignored; 0 measured; 0 filtered out; finished in 1.35s",
+      "ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+    ],
+    "focused": [
+      "ok. 24 passed; 0 failed; 0 ignored; 0 measured; 168 filtered out; finished in 0.02s"
+    ],
+    "host-bridge": [
+      "ok. 10 passed; 0 failed; 0 ignored; 0 measured; 425 filtered out; finished in 0.01s"
+    ]
+  },
+  "trajectory_digests": [
+    [
+      "advect",
+      "54b5cd56e7b80b83"
+    ],
+    [
+      "align",
+      "bf3c47d11ff264bf"
+    ],
+    [
+      "attract",
+      "c717ab2701156915"
+    ],
+    [
+      "dampen",
+      "26b550ad4cdbd84f"
+    ],
+    [
+      "duplicate-advect",
+      "1798dfbd94938d15"
+    ],
+    [
+      "duplicate-attract",
+      "cac4854c803f022f"
+    ],
+    [
+      "duplicate-dampen",
+      "4ba4c04b15203996"
+    ],
+    [
+      "open",
+      "22f06774732f2065"
+    ],
+    [
+      "outside-dampen",
+      "22f06774732f2065"
+    ],
+    [
+      "repel",
+      "79743f9bd576ab4e"
+    ],
+    [
+      "wall",
+      "5978bb7ef06dc2bf"
+    ],
+    [
+      "wrong-scalar",
+      "22f06774732f2065"
+    ],
+    [
+      "wrong-vector",
+      "22f06774732f2065"
+    ]
+  ],
+  "gates": [
+    {
+      "name": "default",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "seiche",
+        "--locked",
+        "--offline",
+        "-j",
+        "2",
+        "--",
+        "--test-threads=4"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 46.125
+    },
+    {
+      "name": "inline",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "seiche",
+        "--no-default-features",
+        "--locked",
+        "--offline",
+        "-j",
+        "2",
+        "--",
+        "--test-threads=4"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 54.61
+    },
+    {
+      "name": "serde",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "seiche",
+        "--features",
+        "serde",
+        "--locked",
+        "--offline",
+        "-j",
+        "2",
+        "--",
+        "--test-threads=4"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 83.11
+    },
+    {
+      "name": "wasm",
+      "command": [
+        "cargo",
+        "check",
+        "-p",
+        "seiche",
+        "--lib",
+        "--no-default-features",
+        "--target",
+        "wasm32-unknown-unknown",
+        "--locked",
+        "--offline",
+        "-j",
+        "2"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.844
+    },
+    {
+      "name": "example",
+      "command": [
+        "cargo",
+        "run",
+        "-p",
+        "seiche",
+        "--no-default-features",
+        "--example",
+        "coupling_trace",
+        "--locked",
+        "--offline",
+        "-j",
+        "2"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 3.671
+    },
+    {
+      "name": "host-bridge",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "pictograph",
+        "--features",
+        "canvas",
+        "--lib",
+        "coupling",
+        "--locked",
+        "--offline",
+        "-j",
+        "2",
+        "--",
+        "--test-threads=4",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "elapsed_seconds": 92.406
+    }
+  ],
+  "final_gates": [
+    {
+      "name": "negative-cap-skips-physics",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "seiche",
+        "--no-default-features",
+        "--lib",
+        "coupling_trace::tests::capped_latest_tick",
+        "--locked",
+        "--offline",
+        "-j",
+        "2",
+        "--",
+        "--nocapture"
+      ],
+      "expected_test": "capped_latest_tick_does_not_skip_physics_or_accumulate_history",
+      "exit_code": 101,
+      "restored": true,
+      "sha256_before": "fdf7a9c789eccf33abb6506abe0c97f759470f52c5739811a4ff76f48811a7d1",
+      "sha256_after": "fdf7a9c789eccf33abb6506abe0c97f759470f52c5739811a4ff76f48811a7d1"
+    },
+    {
+      "name": "negative-local-index-identity",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "pictograph",
+        "--features",
+        "canvas",
+        "--lib",
+        "canvas::coupling_trace::tests::",
+        "--locked",
+        "--offline",
+        "-j",
+        "2",
+        "--",
+        "--nocapture"
+      ],
+      "expected_test": "canvas_live_rebuild_keeps_exact_owners_and_clears_retired_binding_trace",
+      "exit_code": 101,
+      "restored": true,
+      "sha256_before": "c6d920b3e091549e5666f1f9e7630c0bfe88cbd2ac22523db8e470fc4eadc821",
+      "sha256_after": "c6d920b3e091549e5666f1f9e7630c0bfe88cbd2ac22523db8e470fc4eadc821"
+    },
+    {
+      "name": "focused",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "seiche",
+        "--lib",
+        "coupling",
+        "--locked",
+        "--offline",
+        "-j",
+        "2",
+        "--",
+        "--test-threads=4",
+        "--nocapture"
+      ],
+      "checkpoint": "899edbe3be78fa937a61921cae8b0381f393a4cf",
+      "exit_code": 0,
+      "elapsed_seconds": 4.797
+    },
+    {
+      "name": "host-bridge",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "pictograph",
+        "--features",
+        "canvas",
+        "--lib",
+        "coupling",
+        "--locked",
+        "--offline",
+        "-j",
+        "2",
+        "--",
+        "--test-threads=4",
+        "--nocapture"
+      ],
+      "checkpoint": "899edbe3be78fa937a61921cae8b0381f393a4cf",
+      "exit_code": 0,
+      "elapsed_seconds": 17.172
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "-p",
+        "seiche",
+        "--all-targets",
+        "--locked",
+        "--offline",
+        "-j",
+        "2"
+      ],
+      "checkpoint": "899edbe3be78fa937a61921cae8b0381f393a4cf",
+      "exit_code": 0,
+      "elapsed_seconds": 39.562
+    }
+  ],
+  "logs_sha256": {
+    "clippy.log": "38a94feb40a58180e46e6acf2cf0761b79f5fcae602555b64d4626154cad6093",
+    "default.log": "b26b98e4cc61ed9a2173372a3367cd1ad59128a1a63cec427a55e40eb5816f12",
+    "example.log": "f6fafe802f622f028f0cbf6150f6b7ee31fcace289f327d8364d18a03dedfcfc",
+    "focused.log": "8a7f744a7844b8e147db56510c00e03b06b7513c29b774ad4b5468309ff3aa56",
+    "headers-seiche.log": "44427467ce700e3bb30dfde1d82aa78ee3567bb873d7baf7532f06e9d1e2cfbe",
+    "host-bridge.log": "847bee07efa743cf4ad55d5584e1f25504b69cc9f10a1022385f85ac36d41a19",
+    "host-fixture-import-failure.log": "52b7da06a3b18bad62539d3b4e604f7c2a1e78c44d09b78f266f4a532cae4e64",
+    "inline.log": "d5fa701c817f96e174ff457a7cd7a6f191c728f310b6a0537f49b898da3a57f6",
+    "negative-cap-skips-physics.log": "e1658861f443422da65c0d649d56126c0e9294ecb837085098f73f2bb2f20d45",
+    "negative-local-index-identity.log": "4051445577c9489d1c621aabd14181efe827e5106cf1fbf42c145b9e01427b45",
+    "serde.log": "d69e770b1eb8c653c1cbcdffaa50601717f1ad9c349f2d63e29a93c6b9224075",
+    "sleep-assumption-failure.log": "0347f03f939a533249de980454735a11ca8e3f84ef25db5fe7fa7b0f8b80af40",
+    "wasm.log": "cbae606eb8835e7784687598a5f6591b4d37847aefa4432d8bb4a3e4f33c63fa",
+    "docs-comparison.log": "e36ee21ee4fc973683518d39567ec39b3b997dbc444c3cc707872774c7cc38a7"
+  },
+  "metadata_canonical_lf_sha256": {
+    "final-gates.json": "a87b002990bb1ef3eeedf2089008a96e4c95dfa371c8c42d4c4d7a96200db359",
+    "gates.json": "84ddb0fef6e2e0cd2c11c92cf424384f7c836f2f4c558d995ad6f5afe3200074",
+    "negative-controls.json": "ddb4f94524e69ab3ef446a1f478d6f44c42d39ab9997c8af4d06a5a72d880d9e",
+    "source-format-headers.json": "b3a5597318becd0422b151f88e40f99f4f944c58ce5342f87b5cad75759894d3",
+    "docs-comparison.json": "06ed3c1c1b578586a4ca0be33b4bc559447796425d3897d1bfeecef2458b192a",
+    "docs-d2.json": "8b0092fb5e2a86604ff23490d9663d35433baa0a32985634b035fa27fce146f1"
+  },
+  "harness_canonical_lf_sha256": {
+    "finish.py": "de1edced40e5f4226b4506d9ac7c856c4777199d725d98f20dc8def0a4e6e10c",
+    "qualify.py": "9b04d30d6606ff5922dd75245197e534575843c721ea0f2fba2df462550e2ad4",
+    "audit_docs.py": "55815946da93ad0cbf7229d1df936e5a35916c9ea2897484695abba4606ec1ba"
+  },
+  "limits": [
+    "Only the dedicated coupling slot is observed before integration.",
+    "Field clock remains t=0; captured query matches are not extent membership.",
+    "Owner-supplied identities are not authenticated; graph members are not asserted as content IDs.",
+    "Trace row cap is caller-selected; actor transport retains one latest result.",
+    "Visible UI, consumer pin adoption, coordinator review, Firefox and GPU acceptance are not qualified."
+  ],
+  "rulings": {
+    "F203": "Simulation clock; Pause freezes, Reset rewinds (Recommended)",
+    "F204": "Reference point, including boundary (Recommended)",
+    "F205": "Report initial matches; entry actions start on later transitions (Recommended)"
+  }
+}

@@ -1,0 +1,115 @@
+[
+  {
+    "name": "default",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "seiche",
+      "--locked",
+      "--offline",
+      "-j",
+      "2",
+      "--",
+      "--test-threads=4"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 46.125
+  },
+  {
+    "name": "inline",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "seiche",
+      "--no-default-features",
+      "--locked",
+      "--offline",
+      "-j",
+      "2",
+      "--",
+      "--test-threads=4"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 54.61
+  },
+  {
+    "name": "serde",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "seiche",
+      "--features",
+      "serde",
+      "--locked",
+      "--offline",
+      "-j",
+      "2",
+      "--",
+      "--test-threads=4"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 83.11
+  },
+  {
+    "name": "wasm",
+    "command": [
+      "cargo",
+      "check",
+      "-p",
+      "seiche",
+      "--lib",
+      "--no-default-features",
+      "--target",
+      "wasm32-unknown-unknown",
+      "--locked",
+      "--offline",
+      "-j",
+      "2"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 5.844
+  },
+  {
+    "name": "example",
+    "command": [
+      "cargo",
+      "run",
+      "-p",
+      "seiche",
+      "--no-default-features",
+      "--example",
+      "coupling_trace",
+      "--locked",
+      "--offline",
+      "-j",
+      "2"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 3.671
+  },
+  {
+    "name": "host-bridge",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "pictograph",
+      "--features",
+      "canvas",
+      "--lib",
+      "coupling",
+      "--locked",
+      "--offline",
+      "-j",
+      "2",
+      "--",
+      "--test-threads=4",
+      "--nocapture"
+    ],
+    "exit_code": 101,
+    "elapsed_seconds": 92.406
+  }
+]
