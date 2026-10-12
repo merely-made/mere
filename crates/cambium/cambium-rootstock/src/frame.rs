@@ -541,6 +541,21 @@ where
 
     pub fn redraw(&mut self) {
         self.s.last_redraw_presentation = None;
+        if !matches!(
+            self.poll_device_recovery(),
+            genet_render_host::RecoveryStatus::Ready { .. }
+        ) {
+            return;
+        }
+        if self
+            .s
+            .surface
+            .as_ref()
+            .is_some_and(|surface| surface.core().device_failure().is_some())
+        {
+            self.poll_device_recovery();
+            return;
+        }
         self.deliver_files();
         let frame_started = crate::Instant::now();
         let mut profile = FrameProfile::default();
@@ -635,14 +650,17 @@ where
         let phase = crate::Instant::now();
         // Keyed by this host: several windows rasterize through one core, and
         // an unkeyed raster diffs against whichever surface drew last (F17).
-        let (_tex, view) = surface.core().rasterize_scaled_for(
+        let Ok((_tex, view)) = surface.core().try_rasterize_scaled_for(
             self.s.presentation_host,
             scene,
             pw,
             ph,
             ColorLoad::Clear(clear),
             scale,
-        );
+        ) else {
+            self.poll_device_recovery();
+            return;
+        };
         profile.raster_us = elapsed_us(phase.elapsed());
         if let Some(timings) = surface.renderer().last_frame_timings() {
             let span = |name: &str| timings.span(name).map(elapsed_us).unwrap_or_default();
@@ -657,11 +675,26 @@ where
             .vello_last_dirty_count()
             .unwrap_or_default() as u64;
         let phase = crate::Instant::now();
-        let Some(frame) = surface.acquire() else {
-            profile.acquire_us = elapsed_us(phase.elapsed());
-            profile.total_us = elapsed_us(frame_started.elapsed());
-            self.s.last_frame_profile = Some(profile);
-            return;
+        let frame = match surface.acquire_status() {
+            genet_render_host::SurfaceAcquire::Frame(frame) => frame,
+            genet_render_host::SurfaceAcquire::DeviceLost(_) => {
+                self.poll_device_recovery();
+                return;
+            },
+            genet_render_host::SurfaceAcquire::SurfaceLost => {
+                self.s.surface = None;
+                self.s.needs_recovery_surface = true;
+                if let Some(window) = &self.s.window {
+                    window.request_redraw();
+                }
+                return;
+            },
+            genet_render_host::SurfaceAcquire::Unavailable { .. } => {
+                profile.acquire_us = elapsed_us(phase.elapsed());
+                profile.total_us = elapsed_us(frame_started.elapsed());
+                self.s.last_frame_profile = Some(profile);
+                return;
+            },
         };
         profile.acquire_us = elapsed_us(phase.elapsed());
         let target = frame
@@ -707,6 +740,11 @@ where
             ExternalTexturePlacement::new([0.0, 0.0, pw as f32, ph as f32]),
         );
         profile.compose_us = elapsed_us(phase.elapsed());
+        if surface.core().device_failure().is_some() {
+            drop(frame);
+            self.poll_device_recovery();
+            return;
+        }
         // wgpu 30 moved presentation from SurfaceTexture to Queue.
         let phase = crate::Instant::now();
         surface.queue().present(frame);
@@ -734,13 +772,22 @@ where
         if let Some(envelope) = paint_capture
             && let Some(capture) = self.s.pending_paint_capture.take()
         {
-            capture(envelope);
+            capture(Ok(envelope));
         }
         if let Some(capture) = self.s.pending_capture.take() {
-            capture(&**surface, &view, pw, ph);
+            capture(Ok(crate::CaptureFrame {
+                surface: &**surface,
+                view: &view,
+                width: pw,
+                height: ph,
+            }));
         }
         if let Some(capture) = self.s.pending_stamped_capture.take() {
-            capture(&**surface, &view, presented);
+            capture(Ok(crate::StampedCaptureFrame {
+                surface: &**surface,
+                view: &view,
+                presentation: presented,
+            }));
         }
         profile.capture_us = elapsed_us(phase.elapsed());
         if (animating || anim_active)
