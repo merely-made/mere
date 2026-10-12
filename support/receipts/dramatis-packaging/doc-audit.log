@@ -1,0 +1,91 @@
+Mere active-doc audit
+  active_docs: 264
+  indexed_active_docs: 263
+  index_orphans: 0
+  index_ghosts: 0
+  memory_directory_links: 0
+  statusless_plans: 0
+  broken_relative_links: 0
+  historical_broken_relative_links: 245
+  planned_broken_relative_links: 0
+  ambiguous_known_root_paths: 101
+  ignored_known_root_patterns: 23
+  reserved_identifier_paths: 24
+  missing_known_root_paths: 0
+  historical_missing_known_root_paths: 237
+  planned_missing_known_root_paths: 6
+  invalid_historical_annotations: 0
+  stale_historical_annotations: 0
+  unheaded_owned_sources: 0
+  exhibit_b_sources: 0
+  historical_broken_relative_links: 2026-05-04_lexicon_brief.md: ../../graphshell/design_docs/2026-05-03_lexicon_brief.md (unresolved relative link is explicitly historical)
+  historical_broken_relative_links: 2026-05-04_lexicon_brief.md: ../../graphshell/design_docs/verse_docs/implementation_strategy/engram_spec.md (unresolved relative link is explicitly historical)
+  historical_broken_relative_links: 2026-05-04_lexicon_brief.md: ../../graphshell/design_docs/TERMINOLOGY.md (unresolved relative link is explicitly historical)
+  historical_broken_relative_links: 2026-05-04_lexicon_brief.md: ../../graphshell/design_docs/verse_docs/implementation_strategy/engram_spec.md (unresolved relative link is explicitly historical)
+  historical_broken_relative_links: 2026-05-04_lexicon_brief.md: ../../graphshell/design_docs/verso_docs/technical_architecture/VERSO_AS_PEER.md (unresolved relative link is explicitly historical)
+  historical_broken_relative_links: 2026-05-04_lexicon_brief.md: ../../graphshell/design_docs/verso_docs/implementation_strategy/2026-03-28_cable_coop_minichat_spec.md (unresolved relative link is explicitly historical)
+  historical_broken_relative_links: 2026-05-04_lexicon_brief.md: ../../graphshell/design_docs/graphshell_docs/implementation_strategy/social/comms/COMMS_AS_APPLETS.md (unresolved relative link is explicitly historical)
+  historical_broken_relative_links: 2026-06-21_substrate_parallelism_composition_brief.md: ../crates/meerkat/src/content/transfer.rs (unresolved relative link is explicitly historical)
+  historical_broken_relative_links: 2026-06-21_substrate_parallelism_composition_brief.md: ../crates/meerkat/src/content/actor.rs (unresolved relative link is explicitly historical)
+  historical_broken_relative_links: 2026-06-21_substrate_parallelism_composition_brief.md: ../crates/meerkat/src/constellation/mod.rs (unresolved relative link is explicitly historical)
+  historical_broken_relative_links: 2026-07-02_data_oriented_doctrine_brief.md: ../crates/meerkat/src/content/transfer.rs (unresolved relative link is explicitly historical)
+  historical_broken_relative_links: mere_docs/design/2026-06-07_graph_roster_and_frame_taxonomy.md: ../implementation_strategy/2026-06-07_card_system_and_staging_plan.md (unresolved relative link is explicitly historical)
+  historical_broken_relative_links: ... 233 more
+  ambiguous_known_root_paths: 2026-08-12_family_composition_thesis_brief.md: src/action.rs (bare src/tests/examples path has no crate context)
+  ambiguous_known_root_paths: 2026-08-12_family_composition_thesis_brief.md: src/shell/page_capture.rs (bare src/tests/examples path has no crate context)
+  ambiguous_known_root_paths: 2026-08-12_family_composition_thesis_brief.md: src/shell/page_capture.rs (bare src/tests/examples path has no crate context)
+  ambiguous_known_root_paths: 2026-08-12_family_composition_thesis_brief.md: src/lib.rs (bare src/tests/examples path has no crate context)
+  ambiguous_known_root_paths: 2026-10-06_data_formats_brief.md: src/wallet_grant/mod.rs (bare src/tests/examples path has no crate context)
+  ambiguous_known_root_paths: DOC_README.md: tests/boundary.rs (bare src/tests/examples path has no crate context)
+  ambiguous_known_root_paths: dramatis_docs/implementation_strategy/2026-10-08_secret_service_plan.md: tests/secret_service_linux.rs (bare src/tests/examples path has no crate context)
+  ambiguous_known_root_paths: eidetic_docs/research/2026-05-09_eidetic_design_pass.md: src/blob.rs (bare src/tests/examples path has no crate context)
+  ambiguous_known_root_paths: eidetic_docs/research/2026-05-09_eidetic_design_pass.md: src/manifest.rs (bare src/tests/examples path has no crate context)
+  ambiguous_known_root_paths: eidetic_docs/research/2026-05-09_eidetic_design_pass.md: src/typed.rs (bare src/tests/examples path has no crate context)
+  ambiguous_known_root_paths: eidetic_docs/research/2026-05-09_eidetic_design_pass.md: src/schema.rs (bare src/tests/examples path has no crate context)
+  ambiguous_known_root_paths: eidetic_docs/research/2026-05-09_eidetic_design_pass.md: src/engram.rs (bare src/tests/examples path has no crate context)
+  ambiguous_known_root_paths: ... 89 more
+  ignored_known_root_patterns: DOC_POLICY.md: crates/*/design_docs/ (glob or pattern syntax is not a concrete path)
+  ignored_known_root_patterns: DOC_POLICY.md: components/{inker,nematic,verso-tile} (glob or pattern syntax is not a concrete path)
+  ignored_known_root_patterns: DOC_POLICY.md: crates/*/design_docs/ (glob or pattern syntax is not a concrete path)
+  ignored_known_root_patterns: DOC_README.md: ports/distillery/{alembic,athanor} (glob or pattern syntax is not a concrete path)
+  ignored_known_root_patterns: inker_docs/research/2026-09-03_web_surface_contract_assessment.md: crates/system/surface-api/{lib.rs,surface.rs,settings.rs} (glob or pattern syntax is not a concrete path)
+  ignored_known_root_patterns: mere_docs/implementation_strategy/2026-07-05_theme_modes_plan.md: crates/system/tabard/tests/fixtures/** (glob or pattern syntax is not a concrete path)
+  ignored_known_root_patterns: mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md: crates/graphshell/* (glob or pattern syntax is not a concrete path)
+  ignored_known_root_patterns: mere_docs/implementation_strategy/2026-08-09_burn_0_22_migration_plan.md: crates/probes/* (glob or pattern syntax is not a concrete path)
+  ignored_known_root_patterns: mere_docs/implementation_strategy/2026-08-09_burn_0_22_migration_plan.md: design_docs/.../testing/receipts (glob or pattern syntax is not a concrete path)
+  ignored_known_root_patterns: mere_docs/implementation_strategy/2026-09-02_distillery_projection_walk_plan.md: ports/distillery/{alembic,athanor} (glob or pattern syntax is not a concrete path)
+  ignored_known_root_patterns: mere_docs/implementation_strategy/2026-09-02_distillery_projection_walk_plan.md: ports/distillery/tests/fixtures/** (glob or pattern syntax is not a concrete path)
+  ignored_known_root_patterns: mere_docs/implementation_strategy/2026-09-02_distillery_projection_walk_plan.md: crates/cambium/* (glob or pattern syntax is not a concrete path)
+  ignored_known_root_patterns: ... 11 more
+  reserved_identifier_paths: DOC_README.md: mere/misfin/v1 (versioned Mere protocol/schema identifier is not a filesystem path)
+  reserved_identifier_paths: mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md: mere/cable/v1 (versioned Mere protocol/schema identifier is not a filesystem path)
+  reserved_identifier_paths: mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md: mere/coop/v1 (versioned Mere protocol/schema identifier is not a filesystem path)
+  reserved_identifier_paths: mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md: mere/mls/v1 (versioned Mere protocol/schema identifier is not a filesystem path)
+  reserved_identifier_paths: mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md: mere/blobs/v1 (versioned Mere protocol/schema identifier is not a filesystem path)
+  reserved_identifier_paths: mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md: mere/gossip/v1 (versioned Mere protocol/schema identifier is not a filesystem path)
+  reserved_identifier_paths: mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md: mere/docs/v1 (versioned Mere protocol/schema identifier is not a filesystem path)
+  reserved_identifier_paths: mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md: mere/moothold/primitive-node/v1 (versioned Mere protocol/schema identifier is not a filesystem path)
+  reserved_identifier_paths: mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md: mere/webfinger-bridge/v1 (versioned Mere protocol/schema identifier is not a filesystem path)
+  reserved_identifier_paths: mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md: mere/webfinger-bridge/v1 (versioned Mere protocol/schema identifier is not a filesystem path)
+  reserved_identifier_paths: mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md: mere/moothold/primitive-node/v1 (versioned Mere protocol/schema identifier is not a filesystem path)
+  reserved_identifier_paths: mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md: mere/moothold/primitive-node/v1 (versioned Mere protocol/schema identifier is not a filesystem path)
+  reserved_identifier_paths: ... 12 more
+  historical_missing_known_root_paths: 2026-05-24_external_deps_topology_brief.md: repos/mere/.cargo/config.toml (unresolved known-root path is explicitly historical: C:\Users\mark_\Code\repos\mere\.cargo\config.toml)
+  historical_missing_known_root_paths: 2026-05-24_external_deps_topology_brief.md: crates/weave (unresolved known-root path is explicitly historical: C:\Users\mark_\Code\repos\mere\crates\weave)
+  historical_missing_known_root_paths: 2026-07-02_data_oriented_doctrine_brief.md: components/genet-layout/box_tree.rs (unresolved known-root path is explicitly historical: C:\Users\mark_\Code\repos\genet\components\genet-layout\box_tree.rs)
+  historical_missing_known_root_paths: 2026-07-02_data_oriented_doctrine_brief.md: components/xilem-serval/src/lib.rs (unresolved known-root path is explicitly historical: C:\Users\mark_\Code\repos\genet\components\xilem-serval\src\lib.rs)
+  historical_missing_known_root_paths: 2026-07-04_dependency_footprint_brief.md: components/fonts (unresolved known-root path is explicitly historical: C:\Users\mark_\Code\repos\genet\components\fonts)
+  historical_missing_known_root_paths: 2026-07-04_dependency_footprint_brief.md: components/malloc_size_of (unresolved known-root path is explicitly historical: C:\Users\mark_\Code\repos\genet\components\malloc_size_of)
+  historical_missing_known_root_paths: 2026-08-12_family_composition_thesis_brief.md: apps/signalman-desktop (unresolved known-root path is explicitly historical: C:\Users\mark_\Code\repos\mere\apps\signalman-desktop)
+  historical_missing_known_root_paths: 2026-08-12_family_composition_thesis_brief.md: crates/isometry-runtime/src/render.rs (unresolved known-root path is explicitly historical: C:\Users\mark_\Code\repos\mere\crates\isometry-runtime\src\render.rs)
+  historical_missing_known_root_paths: 2026-08-12_family_composition_thesis_brief.md: genet/design_docs/receipts/2026-09-09_g5_ortet/receipt.md (unresolved known-root path is explicitly historical: C:\Users\mark_\Code\repos\genet\design_docs\receipts\2026-09-09_g5_ortet\receipt.md)
+  historical_missing_known_root_paths: 2026-08-22_license_posture_brief.md: components/genet-layout/Cargo.toml (unresolved known-root path is explicitly historical: C:\Users\mark_\Code\repos\genet\components\genet-layout\Cargo.toml)
+  historical_missing_known_root_paths: 2026-08-22_turnstone_suite_composition_and_capability_census.md: ports/distillery/alembic (unresolved known-root path is explicitly historical: C:\Users\mark_\Code\repos\mere\ports\distillery\alembic)
+  historical_missing_known_root_paths: 2026-08-22_turnstone_suite_composition_and_capability_census.md: ports/distillery/alembic (unresolved known-root path is explicitly historical: C:\Users\mark_\Code\repos\mere\ports\distillery\alembic)
+  historical_missing_known_root_paths: ... 225 more
+  planned_missing_known_root_paths: mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md: ports/retinue-agent (unresolved known-root path is an explicit planned target: C:\Users\mark_\Code\repos\mere\ports\retinue-agent)
+  planned_missing_known_root_paths: mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md: ports/retinue-agent/Cargo.toml (unresolved known-root path is an explicit planned target: C:\Users\mark_\Code\repos\mere\ports\retinue-agent\Cargo.toml)
+  planned_missing_known_root_paths: mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md: ports/retinue-agent/src/main.rs (unresolved known-root path is an explicit planned target: C:\Users\mark_\Code\repos\mere\ports\retinue-agent\src\main.rs)
+  planned_missing_known_root_paths: mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md: ports/retinue-agent/src/endpoint.rs (unresolved known-root path is an explicit planned target: C:\Users\mark_\Code\repos\mere\ports\retinue-agent\src\endpoint.rs)
+  planned_missing_known_root_paths: mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md: ports/retinue-agent/src/projection.rs (unresolved known-root path is an explicit planned target: C:\Users\mark_\Code\repos\mere\ports\retinue-agent\src\projection.rs)
+  planned_missing_known_root_paths: mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md: ports/retinue-agent/src/intents.rs (unresolved known-root path is an explicit planned target: C:\Users\mark_\Code\repos\mere\ports\retinue-agent\src\intents.rs)

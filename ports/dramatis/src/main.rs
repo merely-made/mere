@@ -13,6 +13,28 @@ use dramatis_app::{
 };
 use std::{cell::RefCell, rc::Rc};
 fn main() {
+    match std::env::args().skip(1).collect::<Vec<_>>().as_slice() {
+        [flag] if flag == "--version" => {
+            println!("Dramatis {}", env!("CARGO_PKG_VERSION"));
+            return;
+        },
+        [flag] if flag == "--build-info" => {
+            println!(
+                "{}",
+                serde_json::json!({
+                    "product": "Dramatis", "version": env!("CARGO_PKG_VERSION"),
+                    "source_sha256": env!("DRAMATIS_SOURCE_SHA256"),
+                    "target": env!("DRAMATIS_BUILD_TARGET"),
+                })
+            );
+            return;
+        },
+        [] => {},
+        _ => {
+            eprintln!("Usage: dramatis-ui [--version | --build-info]");
+            std::process::exit(2);
+        },
+    }
     let slot = Rc::new(RefCell::new(None::<Worker>));
     let drain = slot.clone();
     let dispatch = slot.clone();

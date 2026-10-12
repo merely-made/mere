@@ -5,6 +5,22 @@ edition.workspace = true
 license.workspace = true
 repository.workspace = true
 publish = false
+description = "Persona selection and quarantine review through the Djinn resident."
+
+[package.metadata.packager]
+product-name = "Dramatis"
+identifier = "com.merely.dramatis"
+publisher = "Merely"
+authors = ["Mark Alan Boykin"]
+icons = ["icons/merely.png"]
+binaries = [{ path = "dramatis-ui", main = true }]
+# Run from Mere's root. The driver supplies profile/target paths to this hook.
+before-packaging-command = "python ports/dramatis/package.py prepare"
+
+[package.metadata.packager.nsis]
+install-mode = "currentUser"
+# Vault data belongs to the shared Djinn resident, not this uninstaller.
+
 
 [[bin]]
 name = "dramatis-ui"
@@ -25,3 +41,8 @@ image = { version = "0.25", default-features = false, features = ["png"] }
 [dev-dependencies]
 chatelaine.workspace = true
 taproot.workspace = true
+luggage = { workspace = true, features = ["native"] }
+tempfile = "3"
+
+[build-dependencies]
+sha2.workspace = true

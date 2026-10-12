@@ -518,3 +518,39 @@ with source files and upstream receipts fixed. The baseline is 261/264 D2
 coverage and four existing errors, including the two newly published renderer
 receipt documents. Whitespace passes. New receipt logs preserve raw bytes and
 text-source hashes normalize CRLF to LF for portable qualification.
+
+**Inspector/presentation/strength continuation (2026-10-11):** Mark authorized
+the proposed next slices. The retained inspector now spaces facts and reveals
+explicit details, including keyboard traversal at 420px. Exact strength editing
+is bound to a graph session and coupling; a private graph/journal candidate is
+validated and committed through one stale-safe backend transaction before
+installation. Saved history uses that coupling's own channel. Five native
+transaction tests and five Forme renderer cases pass. Ten Chrome scenarios and
+eighteen reviewed captures establish inspection/reopen, rule authoring/history,
+live guide opt-in/base restoration, and exact strength draft/save/reopen.
+Actual source/package cuts and retained failed attempts are explicit in the
+existing owner plans and receipt. The larger field composition walkthrough is
+design work; spatial/placement/event decisions and measured force effects stay
+open. No active Markdown or parser-shaped judgment identity is added. The
+source notice repair is a comment-only change to an upstream renderer test.
+
+
+**Windows relationship inspection follow-through (2026-10-11):** upstream and exact-strength source are integrated on main. Three actual Canvas report and eight topology tests pass; direct typed bucket readback retains row multiplicity and assertion handles. The combined product browser host builds with locked offline dependencies. Two Chrome scenarios pass with exact pointer selection, acknowledged Forme membership and fresh-page retained-origin reopening; five captures are reviewed. Failed and incomplete fixture attempts remain in the Windows receipt. Native headed, Firefox, narrow keyboard, long-record costs and execution-owner evidence retain separate gates. No active Markdown document or parser-shaped judgment identity is added.
+**Node ladder and inspector continuation (2026-10-11):** Mark requested “Both.
+Plus pull”; the explicit fast-forward pull was already current at `04a48c2d`.
+Saved-rule opt-in adds exact-access Glyph/Card face treatments and selected
+scalar attributes, with editable defaults and view/generation/occurrence-local
+hysteresis. Footprint input is shared with the frame composer; face changes
+retain geometry, placement, source, Forme and content-session owners. The
+inspector explains the actual face layer and can explicitly bind its target
+for rule preview. Unsupported content representations and resource/performance
+bounds remain explicit. Forty-seven portable tests and the product wasm check
+pass; six scoped native Canvas cases and headed gates are recorded in
+the source receipt. No active Markdown or parser-shaped judgment is added.
+
+The latest `e6192a18` upstream qualification and exact strength-editor work are
+retained. Complete citation/D2 reports match controlled published-head baselines
+with only this lane's three doc edits substituted: 261/264 D2 coverage and four
+existing errors. Source hashes normalize text line endings; raw proof logs are
+preserved. Six integrated native Canvas tests pass with Pictograph debug symbols
+disabled under the unchanged 1280 MiB cap; the earlier capped OOM is retained.

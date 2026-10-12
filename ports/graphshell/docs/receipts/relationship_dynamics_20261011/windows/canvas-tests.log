@@ -1,0 +1,8 @@
+
+running 3 tests
+test canvas::dynamics_inspection::tests::forme_hold_is_separate_from_explicit_pin_and_hidden_boundary ... ok
+test canvas::dynamics_inspection::tests::reading_dynamics_preserves_graph_selection_pose_and_pause ... ok
+test canvas::dynamics_inspection::tests::missing_exact_member_cannot_bind_to_new_graph ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 428 filtered out; finished in 0.08s
+

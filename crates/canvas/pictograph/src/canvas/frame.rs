@@ -414,11 +414,7 @@ impl Canvas {
             // face request here, not a claim that interactive content has been
             // embedded. The open representation tail falls back to Card.
             // (Projection proofs — P3b renderer consumption.)
-            let representation_class = match self.projection_representation(key) {
-                Some(sceno::Representation::Glyph) => " gnode-representation-glyph",
-                Some(sceno::Representation::LivePane) => " gnode-representation-live-pane",
-                _ => " gnode-representation-card",
-            };
+            let representation_class = self.node_representation_class(key);
             let class = format!("{state_class}{shape_class}{representation_class}");
             gnode_updates.push((gnode, style, Some(class)));
         }

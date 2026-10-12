@@ -1,0 +1,7 @@
+error: failed to load source for dependency `mere-p2panda-net`
+
+Caused by:
+  unable to update https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261011#d8acabc9
+
+Caused by:
+  can't checkout from 'https://github.com/mark-ik/p2panda.git': you are in the offline mode (--offline)

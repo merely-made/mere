@@ -1,12 +1,12 @@
 # Mere Documentation Index
 
-Completed integration (2026-10-11): [Fleece gathering and Eidetic intake](archive_docs/2026-10-11_completed_plans/2026-10-11_fleece_eidetic_capability_plan.md) records the five landed dependency moves, source-neutral goal-directed traversal, explicit network budgets, the retained-content/session boundary and native/wasm/portable-consumer receipts. The [Eidetic development plan](eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md) sequences encounter preservation, general intake, session admission, engine capture, computed recall, browser use and dependency capabilities. Its first Knot/Redshank clip-transfer draft has native offline-store tests and browser compilation; receiving-host acceptance and the broader implementation remain open.
+Completed integration (2026-10-11): [Fleece gathering and Eidetic intake](archive_docs/2026-10-11_completed_plans/2026-10-11_fleece_eidetic_capability_plan.md) records the five landed dependency moves, source-neutral goal-directed traversal, explicit network budgets, the retained-content/session boundary and native/wasm/portable-consumer receipts. The [Eidetic development plan](eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md) sequences encounter preservation, general intake, session admission, engine capture, computed recall, browser use and dependency capabilities. Its first Knot/Redshank clip-transfer draft has native offline-store tests and browser compilation. Turnstone now qualifies selected text/WAV receiving, fresh-process local playback and selected onward copy into a second mere; browser/structured receiving, source excerpts, tags, reviewed edits and custody retain their separate gates.
 
 The design-docs index for the [Mere](../README.md) workspace. All authoritative
 project documentation belongs under `design_docs/`. Entries are one line each;
 the deep rationale lives in the doc itself.
 
-Knot adoption (2026-10-11): the [projection grammar adoption plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#knot-authored-scene-adoption-in-mere-2026-10-11) records Knot's published retained-placement qualification and Mere's coordinated editor/document/site repin. Embedded resolution, isolated host checks and publication are recorded separately from Knot's native synthetic-identity receipt. Knot's newer live-dynamics consumer, explicit Keep placement and preview-toolbar qualification are recorded in the [dynamics handoff](mere_docs/research/2026-10-09_scenograph_codex_handoff.md); personal custody and coordinated adoption of that newer milestone remain separate gates.
+Knot adoption (2026-10-11): the [projection grammar adoption plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#knot-authored-scene-adoption-in-mere-2026-10-11) records Knot's published retained-placement qualification and Mere's coordinated editor/document/site repin. Embedded resolution, isolated host checks and publication are recorded separately from Knot's native synthetic-identity receipt. Knot's newer live-dynamics consumer, explicit Keep placement, preview-toolbar qualification and completion/refusal feedback are recorded in the [dynamics handoff](mere_docs/research/2026-10-09_scenograph_codex_handoff.md); personal custody and coordinated adoption of that newer milestone remain separate gates.
 
 Current bounded proofs (2026-09-05): the [projection grammar adoption plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md) records executable Graphshell authoring, the interactive practice workspace with retained rendering and measured compiler improvements, and the two-peer Woodshed comparison space with signed admission, authority filtering, and offline disk reopening; fixture scope and source-hashed receipts are explicit.
 
@@ -46,21 +46,35 @@ remains pending in its owning plan. The
 [field/coupling inspection draft](mere_docs/implementation_strategy/2026-06-13_scriptable_field_regions_plan.md#field-inspection-draft-2026-10-11)
 adds exact records, deterministic region discovery and independent Forme reads;
 ten native model checks and the integrated product wasm check pass. Both Chrome
-fixture pages now pass with retained IndexedDB reopen; inspector spacing and
-focus/scroll review remain open. Derived-link explanations and primitive
-writes retain their owners. The
+fixture pages now pass with retained IndexedDB reopen. The continuation adds
+readable fact rows, exact-detail focus/reveal and qualified 420px keyboard
+traversal. Five native transaction checks and three Chrome strength cases
+qualify one exact coupling's strength draft, acknowledged apply and saved
+history; general field/primitive writes and derived-link explanations retain
+their owners. The
 [declarative presentation-rule editor draft](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#declarative-presentation-rule-editor-draft-2026-10-11)
 adds scoped draft/undo, explicit decision previews and transactional saved
-history. Nine native model checks and the product wasm check pass; browser
-qualification remains pending in its receipt. The
+history. Nine native model checks and the product wasm check pass; both Chrome
+authoring/history pages now pass. The
 [exact-occurrence/Forme guide continuation](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#exact-occurrence-previews-and-live-forme-guides-draft-2026-10-11)
 adds disclosed held-owner bindings and opt-in saved subdivision rules. Thirty-one
-native checks and the product wasm check pass; Canvas native and headed
-qualification remain handoff gates. Other effects retain their renderer owners.
+native checks and the product wasm check pass. Five native Forme renderer tests
+and both Chrome live-guide pages now pass with reviewed captures; source cuts
+and remaining acceptance limits are recorded in the owning plan. Other effects
+retain their renderer owners.
 The [relationship/dynamics inspector draft](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#relationship-and-dynamics-inspector-draft-2026-10-11)
 adds exact-target reads of live stages, topology inputs and placement constraints;
-38 portable native checks and the product wasm check pass. Canvas native and
-headed cases remain open; missing force/derivation evidence is disclosed.
+38 portable source checks retain their original receipt. The Windows continuation
+adds three Canvas report and eight topology tests, a combined product Wasm build,
+and two passing Chrome scenarios with retained-origin reopening and five reviewed
+captures. Native headed, Firefox, keyboard/narrow review and measured force or
+derivation evidence retain their separate gates.
+The [node ladder and inspector continuation](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#node-ladder-and-inspector-continuation-draft-2026-10-11)
+adds scoped saved Glyph/Card face decisions, selected scalar attributes,
+editable defaults and occurrence-local hysteresis; 47 portable tests and the
+product wasm check pass. Six scoped native Canvas tests also pass with reduced
+debug symbols; headed acceptance and content-renderer adapters retain their
+explicit receipt gates.
 
 Primary data model (2026-10-11): the
 [family composition brief §8](2026-08-12_family_composition_thesis_brief.md#8-primary-data-model-clips-and-live-entities-2026-10-11)
@@ -308,7 +322,7 @@ receipts. The banner gives the current mapping.
 - [engram_compose_merge_plan](archive_docs/2026-07-03_completed_plans/2026-06-25_engram_compose_merge_plan.md) — **P1+P2+P3 done 2026-06-30**. Spun out of the Alembic tail handoff B7 + decision #1 (merge-by-identity, layer the context, post-A/D, does not gate save/open). Unions two graph engrams by URL identity: same-URL nodes layer (union tags, append both sources' `import_provenance` so they coexist), distinct nodes added, edges deduped; the merged engram's `ProvenanceRecord.upstream` (previously always empty) records the source ids. P1 snapshot-level `merge_snapshots` (no kernel edit — `PersistedEdge` is `node_id`-keyed) → P2 `compose_graph_engrams` → P3 shipped as a direct host action (`>compose_engrams("<id-a>","<id-b>")` verb + an Alembic Engrams two-select gesture), deliberately **not** a `ShellCommand` (compose never touches the orrery pool) or an Athanor propose/apply (the user already names both ids, so there's no discovery judgment to propose). rkyv engram compaction (B6) is parked here as a deferred follow-on, not yet started.
 - [athanor_steady_heat_actor_plan](archive_docs/2026-10-06_completed_plans/2026-06-25_athanor_steady_heat_actor_plan.md) — **status 2026-10-06: P1 + P2 landed; P1 retired with meerkat; scheduling ruled to Djinn; archived 2026-10-06**: spun out of the Alembic tail handoff B1 (slice D's remainder): schedule the forgetting pass steady-heat (idle-throttled, yields to foreground) instead of the manual click, then add consolidation + facet passes. P1 shipped 2026-06-30 as a meerkat host-side idle cadence and was retired with meerkat 2026-07-18 (`c5f01064`); P2 (consolidation, 2026-07-01) and the forgetting pass survive in `mere-athanor` (`ports/distillery/athanor/src/lib.rs`, `1bda73d5`). Nothing schedules them today (Turnstone runs only the retirement pass, on session open); a 2026-09-02 ruling gives the scheduler to Djinn ("scheduled, not resident"), overtaking P3's resident `spawn_athanor` actor. Open: scheduling the passes, and the facet pass.
 - [workbench_staging_plan](archive_docs/2026-09-02_retired_plans/2026-06-09_workbench_staging_plan.md) — the #5 staging flow (stage nodes → commit to workbench → latent staging relation), spun out of the completed card-system plan. **Archived 2026-09-02** — retired by the active-tree audit (subject deleted or abandoned); open points extracted to the [archived-plan tails](mere_docs/implementation_strategy/2026-07-03_archived_plan_tails_plan.md).
-- [scriptable_field_regions_plan](mere_docs/implementation_strategy/2026-06-13_scriptable_field_regions_plan.md) — **partially implemented; expanded direction 2026-10-09**: placed spatial rule regions with force/visibility/layout mechanisms; no host field-placement UI is established by the recorded status. Projection-scoped behavior, general-purpose entry actions, forme coexistence, overlapping/nested composition and primitive inspection are research inputs; the 2026-10-11 read-only field/coupling draft adds exact owners and deterministic boundary discovery, with native/product checks and both Chrome fixture pages passing, including retained IndexedDB reopen; inspector spacing and focus/scroll review remain open. Trigger, execution, attribute, retention and exact-coupling write policies remain open.
+- [scriptable_field_regions_plan](mere_docs/implementation_strategy/2026-06-13_scriptable_field_regions_plan.md) — **partially implemented; expanded direction 2026-10-09**: placed spatial rule regions with force/visibility/layout mechanisms; no host field-placement UI is established by the recorded status. Projection-scoped behavior, general-purpose entry actions, forme coexistence, overlapping/nested composition and primitive inspection are research inputs; the 2026-10-11 read-only field/coupling draft adds exact owners and deterministic boundary discovery, with native/product checks and both Chrome fixture pages passing, including retained IndexedDB reopen. The continuation qualifies readable fact rows, 420px keyboard reveal and exact coupling strength drafts with acknowledged scoped save/history. Its field-composition walkthrough keeps spatial, incompatible-placement and event decisions explicit. Trigger, execution, attributes, general field writes, force measurements and large-session costs remain open.
 - [lane0_sidequests_plan](archive_docs/2026-09-02_retired_plans/2026-06-16_lane0_sidequests_plan.md) — **active**: the Tier-A glue-only wins from the in-the-wings audit (deps already present, each a `Command` + thin host method): JSON-LD export, recover-deleted-node, relation-kind picker, tessera score+ticket on the chip, Trail shellbar button, Barnes-Hut repulsion, Steward per-row controls. Carries the 2026-06-16 cross-agent handoff (Lane 2 tiled-render + genet threads owned elsewhere; forme parked-submodule delete is non-mechanical; `wry.web` already deleted). **Archived 2026-09-02** — retired by the active-tree audit (subject deleted or abandoned); open points extracted to the [archived-plan tails](mere_docs/implementation_strategy/2026-07-03_archived_plan_tails_plan.md).
 - [find_in_page_host_ui_plan](archive_docs/2026-07-03_completed_plans/2026-06-16_find_in_page_host_ui_plan.md) — **planned**: the Ctrl+F find-bar + match-highlight overlay over the HTML/genet lane, on the committed find-in-page backend (`Constellation::request_find`/`find_matches`, genet `28e3e553` + mere `eefbed6`). Host pieces mirror the palette + drop-target-overlay patterns; built in two compile-checked stages (input/bar half → overlay/scroll half). Gemtext-lane find is a follow-on (needs a glyph→char map on `DocumentRenderPacket`).
 - [retained_text_tiled_render_plan](archive_docs/2026-07-04_completed_plans/2026-06-15_retained_text_tiled_render_plan.md) — **user-facing slice landed; active only for precision tails**: the audit's Lane 2 / §5 foundation. The document lane now lays out once, retains the `DocumentRenderPacket`, lowers/rasterizes only the scrolled-to band, uses the retained packet for host-side Ctrl+F, and supports block-scoped page-text selection/copy. The 12 KiB body cap and 8192 px texture cap are retired; the remaining tail is precise glyph→char cluster geometry for intra-block highlights/carets.
@@ -855,6 +869,8 @@ Pre-1.0 development. Index compacted in the 2026-06-09 design-docs audit (37 doc
 **2026-06-15 doc-hygiene pass** (alongside the [in-the-wings audit](mere_docs/research/2026-06-15_in_the_wings_and_browser_bar_audit.md)): 3 completed plans archived to `2026-06-15_completed_plans/` (host_cheap_path, mesh_m1, omnibar_command_shell); 5 active docs reconciled against the live code where their headlines had gone stale (edge_system_audit, engine_picker §2, multi_graph MG6, window_composition, host_wiring_grabbag). The recurring lesson, per the standing rule to verify against the codebase: a plan's headline or Findings section can lag its own Progress log, so trust the code.
 
 ## Receipt index additions (2026-10-11)
+
+- [Coupling effect evaluation draft (2026-10-12)](mere_docs/testing/receipts/2026-10-12_coupling_effects/README.md): report-only proposed writes reused by the existing Seiche executor, unchanged original trajectories, a failing deduplication control, CPU/wasm/bridge qualification and explicit host-provenance limits.
 
 - [cambium_docs/testing/receipts/native_image_atlas_20261010/original_reset_analysis.md](cambium_docs/testing/receipts/native_image_atlas_20261010/original_reset_analysis.md).
 - [cambium_docs/testing/receipts/native_image_atlas_20261010/README.md](cambium_docs/testing/receipts/native_image_atlas_20261010/README.md).
