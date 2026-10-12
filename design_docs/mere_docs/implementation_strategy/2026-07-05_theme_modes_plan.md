@@ -1265,3 +1265,24 @@ batch is preserved externally under `initial-selector-failure`, without a
 qualification claim. Runtime was explicitly returned to the renderer recovery
 owner before rebuilding this candidate. A fresh three-process retry remains
 required.
+
+### Prominent typography preview correction — 2026-10-12
+
+The corrected three-process native author/reopen/fallback batch passed on frozen
+`f5fa2d91b`: 145 presentations, 16 scenario captures and zero blank frames. Exact
+Interface `serif`/15 px/1.2 chrome values, fresh process choice restoration,
+Reading reset/Discard and missing-family request preservation all passed.
+Visual review withheld final publication because the prominent seed-derived
+chrome sample still used baseline fonts, although the isolated stylesheet,
+reader and production Pelt chrome were wired.
+
+`73f7173e1` now maps the same shared declarations onto the visible chrome and
+syntax samples. Custom properties stay scoped to each specimen. Cambium's
+append-style seam preserves the Illume palette instead of replacing it. A real
+mounted-style test checks Interface/Heading/Label/Code and neutral authoring UI;
+all 252 scoped shared tests and 75 Pelt tests pass. The table exclusion and GPU
+ignore remain explicit. Final production build and dependency boundary pass.
+The finite script now also captures the isolated stylesheet, narrow font fields
+and narrow reader. Final native refresh remains queued after the explicitly
+owned Canonical browser batch. Earlier successful and failed batches are retained
+separately; they are not substituted for this source's final visual review.
