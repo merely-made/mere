@@ -1,0 +1,27 @@
+{
+  "basis": "829e91c7aa8040c40e468b1c594cf3412f67d355",
+  "binary": "/Users/markik/Code/output/vello-native-recovery-20261012/tabard-native-recovery-common-limits-frozen",
+  "binary_sha256": "982471384a3d5a155eccc46e0d504581586f5870c781ad58fcd8970c35c31442",
+  "binary_bytes": 111641816,
+  "source_sha256": {
+    "Cargo.toml": "f303a24af6a2aa0082a217df6f84bfdaf77d241b41fb3f85c0184cf76241893c",
+    "Cargo.lock": "a64eb6c13c3a3ceede654ebe069c01536241e4125fcfd3292de42c4e3383bdcf",
+    "ports/tabard/desktop/Cargo.toml": "c04b152ceb79c53421f3bcc90e7279f31de1d76c8ae5f622980b6ba3447cbbd6",
+    "ports/tabard/desktop/src/lib.rs": "db4b9acbbdb8acd64dcd68fffb4d8ddf65d431fb68984dcfa6b184c9db5c861e",
+    "ports/tabard/desktop/src/recovery_control.rs": "1b92929486c3c7e42f645c5148a128bcdb4c66892221232c995fdfe5b066dfdd",
+    "ports/tabard/desktop/scenarios/native_device_recovery.scn": "4601391aa6b8bed67cb6d5f45ebd0285def5d240b32a98109180decd26ab615f",
+    "crates/cambium/cambium-rootstock/src/frame.rs": "8bd2af82c8a7dbc95bf351aecc44da7eb84b4a4d1cf6d727627000339b34044d",
+    "crates/cambium/cambium-rootstock/src/producer.rs": "c2a9e3573035ddae8925b353a05a41a67f92e3ad7dd261326a826f998e4b4550",
+    "crates/cambium/cambium-rootstock/src/producer/registry.rs": "709b74a944759cf0edba01b34ffa91ff0469f2532bcb1f527f1883a36f9536b3",
+    "crates/cambium/cambium-rootstock/src/lib.rs": "0c10bfd102d278d5aad6f646e2561b4fdd62d08ebe2f591cf5ba060d0231d464"
+  },
+  "suppliers": {
+    "genet": "2c7ef73bfa44c07744e0643e3c6f98be3cbd7947",
+    "netrender": "c74b7cb28090c28b1c6d80b08dcdea18aff48d3e",
+    "provider": "2eae6243881d5b24c984d5ee35dde509ca5db782"
+  },
+  "status": "correctedfixtureproduction and6CPUcontrols passed; explicitNative retry handoff pending",
+  "pixel_criterion": "Existing stricter interior RGB3/alpha2/mean1 applied uniformly to displayedwindow; exactvisibleReader/Stylesheetregions checked separately; originalstrictnegative retained",
+  "runtime_injection": "one explicit ownedDevice.destroy after completed baseline capture; no driver reset",
+  "source_checkpoint": "6b95cdd03a3cbec407f2a39d397bbca024a9d256"
+}
