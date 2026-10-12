@@ -1011,6 +1011,17 @@ fn tabard_preview_stylesheet() -> String {
     stylesheet
 }
 
+// Font policy stays with Tabard; Pelt maps it onto its ordinary chrome only.
+pub(crate) fn pelt_typography_css(fonts: &tabard::Typography) -> String {
+    use tabard::FontRole;
+    [
+        fonts.role_css(FontRole::Ui, ".pelt-address,.pelt-engine,.pelt-engine-option,.pelt-chrome-button,.pelt-chrome-toggle,.pelt-appearance-option,.frisket-label"),
+        fonts.role_css(FontRole::Heading, ".pelt-title,.pelt-inspector-heading,.pelt-appearance-heading,.pelt-diagnostic-heading,h1,h2,h3"),
+        fonts.role_css(FontRole::Label, ".pelt-status,.pelt-route,.pelt-appearance-label,.pelt-appearance-note,label"),
+        fonts.role_css(FontRole::Code, "pre,code"),
+    ].concat()
+}
+
 // Product-role mapping shared by durable application choices and the receipt.
 const PELT_TABARD_ROLES: &str = "\
 .pelt-workspace, .pelt-workspace.pelt-theme-light { \
@@ -1657,14 +1668,13 @@ impl WorkspaceApp {
                 .or_else(|| self.theme_catalog.error.clone())
                 .or_else(|| {
                     self.applied_theme.as_ref().ok().and_then(|resolved| {
-                        (!resolved.diagnostics.is_empty()).then(|| {
-                            resolved
-                                .diagnostics
-                                .iter()
-                                .map(ToString::to_string)
-                                .collect::<Vec<_>>()
-                                .join(" ")
-                        })
+                        let mut notices = resolved
+                            .diagnostics
+                            .iter()
+                            .map(ToString::to_string)
+                            .collect::<Vec<_>>();
+                        notices.extend(self.theme_catalog.font_notices(&resolved.theme));
+                        (!notices.is_empty()).then(|| notices.join(" "))
                     })
                 });
         }
@@ -1732,7 +1742,12 @@ impl WorkspaceApp {
                 Ok(resolved) => {
                     let sheet = match &resolved.presentation {
                         tabard::ThemePresentation::Derived(palette) => {
-                            format!("{}\n{}", palette.css_custom_properties(), PELT_TABARD_ROLES)
+                            format!(
+                                "{}\n{}\n{}",
+                                palette.css_custom_properties(),
+                                PELT_TABARD_ROLES,
+                                pelt_typography_css(&resolved.theme.typography)
+                            )
                         },
                         tabard::ThemePresentation::AuthoredStylesheet(rules) => {
                             // Arbitrary CSS has no claimed derived palette. Supply
@@ -1747,9 +1762,10 @@ impl WorkspaceApp {
                                 unreachable!("built-in default is derived")
                             };
                             format!(
-                                "{}\n{}\n{}",
+                                "{}\n{}\n{}\n{}",
                                 palette.css_custom_properties(),
                                 PELT_TABARD_ROLES,
+                                pelt_typography_css(&resolved.theme.typography),
                                 rules.join("\n")
                             )
                         },

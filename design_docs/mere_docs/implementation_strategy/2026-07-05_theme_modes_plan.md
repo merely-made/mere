@@ -38,6 +38,55 @@ heading or label roles. The role schema, override precedence and remote/frozen
 fidelity remain open; measurements must stay coherent with realized fonts.
 This note does not change adoption order or claim controls in every consumer.
 
+## Typography role authoring (2026-10-11)
+
+**Status:** in progress; explicitly authorized after the nine application appearance integrations. No new typography runtime acceptance is claimed yet.
+
+Tabard owns portable UI, reading, heading, label and code preferences: requested font family, optional CSS-pixel size and optional unitless line height. Absent preferences preserve each host's defaults, heading hierarchy and control geometry. Existing JSON libraries remain readable without rewrites. Theme drafts own undo/redo, Save, Discard and conflict handling. Author CSS remains exact and last; requested font names are retained when a receiving host lacks them, with a visible generic-fallback diagnostic.
+
+Genet's existing Parley/Fontique stack owns installed-font discovery, resolution and measurement. The native Cambium host exposes a small family catalogue; the workshop receives it without a platform font implementation or another shaping engine. Font bytes are neither embedded nor fetched by this slice. The editor's own readable neutral style stays isolated from authored typography.
+
+1. **Portable model and compatibility.** Validate family names and finite size/leading values, preserve old artifacts when preferences are absent, retain typography in fork/history/save/import/export, and keep authored CSS precedence. Done when focused model/library tests and shared boundary checks pass.
+2. **Shared controls and actual previews.** Add retained role/family/size/leading controls, installed-family suggestions, invalid-input feedback and per-role reset. Reuse native text hooks. Feed the isolated stylesheet and document-canvas previews through existing style/measurement seams. Done when actual control dispatch, resolved CSS, changed geometry, undo/discard and wide/narrow layout checks pass.
+3. **One production consumer and native acceptance.** Wire Pelt's app role mapping without changing its controller, loaded-document authority or choice persistence. Done when a finite native author/edit/Save/Apply/reopen scenario measures changed typography on the selected role, retains other role defaults and session state, and produces nonblank captures. Runtime/build lanes remain serialized by explicit handoff. Fetch current origin before publication.
+
+### Findings and progress — 2026-10-11 typography
+
+- Source started at `6a1962278` and was refreshed to origin `db26bb527`; the primary checkout and
+  earlier integration captures remain preserved. Font-bearing library and
+  portable exports use version 2; color-only writes retain their old shapes.
+  Mislabelled version 1 font data is refused rather than silently downgraded.
+- The shared native family catalogue uses Genet Parley/Fontique. Role controls
+  reuse existing controlled-text/focus hooks. The editor stays neutral; the
+  separate Livery specimen accepts role rules before exact author CSS.
+- `mere-document-lanes::document_style_with_typography` projects preferences
+  onto the existing canvas style sheet. Reading changes leave heading/code/
+  label defaults intact; heading size keeps its existing relative hierarchy.
+  Per-role leading is optional and old style-sheet data still round-trips.
+  Restyling retains the held source, folds, focus and scroll, and remeasures
+  through the existing canvas layout. A code role's explicit family now reaches
+  Parley's actual matcher instead of being forced back to generic monospace.
+- The scoped shared CPU gate passed **243 tests**, with one explicit real-GPU
+  test ignored and one existing table test excluded. The excluded
+  `normal_width_table_wraps_unbroken_link_inside_its_cell` also fails with
+  unmodified current-origin canvas source at `layout/tests.rs:1159`; preserved
+  baseline evidence is in the typography receipt directory. No table code was
+  changed in this slice. The port/Graphshell web dependency boundary passes.
+- Pelt's default CPU suite passes **73 tests**, including the new production
+  role styles, preserved content aperture and native scenario parsing. Two
+  pre-existing article receipts compared raw fragment hrefs despite Genet's
+  resolved-link contract; both now use Genet's existing navigation resolver.
+- Pelt maps Interface, Heading and Label preferences onto its ordinary chrome.
+  Its loaded document sessions and the Code role have no new application
+  binding here. Production native author/reopen scenarios are prepared; GPU/
+  native acceptance waits for the renderer owner's explicit finite-batch handoff.
+  The production Pelt build passed on the earlier published renderer set; its
+  frozen candidate has no native receipt. The renderer owner now requires a
+  coherent provider/Netrender/Genet/Mere/Fleece/Knot repin before typography GPU
+  acceptance, so rebuilding on that final published set is a required gate.
+
+Open bounds: exact remote/frozen font fidelity, bundled/open-license font packaging, global minimum-reading-size policy, typed DTCG typography export and the remaining app rollout are separate follow-ups. Existing color token exports retain their scope; portable theme JSON and CSS preserve this slice's role preferences.
+
 ## Application adoption (2026-10-09)
 
 **Status:** all seven selected application integrations published with platform

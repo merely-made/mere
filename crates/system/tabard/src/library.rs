@@ -20,6 +20,7 @@ use crate::portable::WriteMode;
 use crate::theme::registry::{Harmony, ThemeRegistry, ThemeSource};
 
 const LIBRARY_VERSION: u32 = 1;
+const TYPOGRAPHY_LIBRARY_VERSION: u32 = 2;
 static TEMP_SEQUENCE: AtomicU64 = AtomicU64::new(0);
 
 #[derive(Serialize, Deserialize)]
@@ -70,10 +71,21 @@ impl ThemeLibraryStore {
                         format!("invalid theme library: {error}"),
                     )
                 })?;
-                if document.version != LIBRARY_VERSION {
+                if ![LIBRARY_VERSION, TYPOGRAPHY_LIBRARY_VERSION].contains(&document.version) {
                     return Err(io::Error::new(
                         io::ErrorKind::InvalidData,
                         format!("unsupported theme library version {}", document.version),
+                    ));
+                }
+                if document.version == LIBRARY_VERSION
+                    && document
+                        .themes
+                        .iter()
+                        .any(|theme| !theme.typography.is_empty())
+                {
+                    return Err(io::Error::new(
+                        io::ErrorKind::InvalidData,
+                        "Font preferences require theme library version 2.",
                     ));
                 }
                 validate(&document.themes)
@@ -105,7 +117,11 @@ impl ThemeLibraryStore {
     pub fn save(&mut self, themes: &[Theme]) -> io::Result<()> {
         validate(themes).map_err(|error| io::Error::new(io::ErrorKind::InvalidInput, error))?;
         let document = LibraryDocument {
-            version: LIBRARY_VERSION,
+            version: if themes.iter().any(|t| !t.typography.is_empty()) {
+                TYPOGRAPHY_LIBRARY_VERSION
+            } else {
+                LIBRARY_VERSION
+            },
             themes: themes.to_vec(),
         };
         let mut bytes = serde_json::to_vec_pretty(&document).map_err(io::Error::other)?;
@@ -132,6 +148,7 @@ fn validate(themes: &[Theme]) -> Result<(), String> {
 /// Validation shared by the library, portable artifacts and draft constructors.
 /// A portable built-in remains an inert definition until explicitly forked.
 pub(crate) fn validate_definition(theme: &Theme) -> Result<(), String> {
+    theme.typography.validate()?;
     let id = theme.id.trim().to_ascii_lowercase();
     if id.is_empty() || theme.name.trim().is_empty() {
         return Err("themes must have a nonblank id and name".into());

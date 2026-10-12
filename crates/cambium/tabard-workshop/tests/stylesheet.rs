@@ -149,3 +149,70 @@ fn appearance_edits_leave_source_and_accessible_content_unchanged() {
     assert_eq!(specimen.accessible_name(), name);
     assert_eq!(specimen.revision(), revision + 1);
 }
+
+#[test]
+fn fonts_resolve_per_role_without_restyling_the_neighbor_and_author_css_wins() {
+    use tabard::{FontPreferences, FontRole, Typography};
+    let mut specimen = StylesheetSpecimen::default();
+    let neighbor = StylesheetSpecimen::default();
+    let heading = specimen.computed_style("preview-heading", "font-size");
+    let mut fonts = Typography::default();
+    fonts
+        .set(
+            FontRole::Reading,
+            FontPreferences {
+                family: Some("Georgia".into()),
+                size_px: Some(24.0),
+                line_height: Some(1.7),
+            },
+        )
+        .unwrap();
+    assert!(specimen.set_typography(&fonts).unwrap());
+    assert_eq!(
+        specimen
+            .computed_style("preview-paragraph", "font-size")
+            .as_deref(),
+        Some("24px")
+    );
+    assert_eq!(
+        specimen.computed_style("preview-heading", "font-size"),
+        heading
+    );
+    assert_ne!(
+        specimen.computed_style("preview-paragraph", "font-size"),
+        neighbor.computed_style("preview-paragraph", "font-size")
+    );
+    assert!(
+        specimen
+            .computed_style("preview-paragraph", "font-family")
+            .unwrap()
+            .contains("Georgia")
+    );
+    assert!(
+        specimen.diagnostics().is_empty(),
+        "{:?}",
+        specimen.diagnostics()
+    );
+    let frame = specimen.frame(420, 340);
+    assert!(
+        frame
+            .ops
+            .iter()
+            .any(|op| matches!(op,netrender::SceneOp::GlyphRun(run) if run.font_size==24.0))
+    );
+    let rules = vec!["p { font-size: 18px; font-family: monospace; line-height: 1.2; }".into()];
+    specimen.set_appearance(&Mode::Light, &rules);
+    assert_eq!(
+        specimen
+            .computed_style("preview-paragraph", "font-size")
+            .as_deref(),
+        Some("18px")
+    );
+    assert_eq!(specimen.rules(), rules);
+    specimen.set_appearance(&Mode::Light, &[]);
+    specimen.set_typography(&Typography::default()).unwrap();
+    assert_eq!(
+        specimen.computed_style("preview-paragraph", "font-size"),
+        neighbor.computed_style("preview-paragraph", "font-size")
+    );
+}

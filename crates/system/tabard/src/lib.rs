@@ -24,7 +24,9 @@ pub mod library;
 pub mod portable;
 pub mod smolweb;
 pub mod theme;
+pub mod typography;
 pub mod workshop;
+pub use typography::{FontPreferences, FontRole, Typography};
 
 pub use appearance::{
     ResolvedThemeChoice, ThemeChoiceDiagnostic, ThemePresentation, resolve_theme_choice,
@@ -75,7 +77,8 @@ pub const LAGRANGE_V1_21_1_IGNORED_LABELS: [&str; 2] = ["yellow", "magenta"];
 /// The legacy no-argument exports derive raw authored seeds at normal
 /// contrast, selected by `Seeds::dark`. Explicit-mode exports apply harmony
 /// and the selected canonical contrast profile; see [`Theme::palette_for_mode`].
-/// Product roles are outside the current CSS/DTCG color artifact.
+/// Hosts map semantic roles onto controls and document styles. CSS carries
+/// optional font properties; typed DTCG tokens remain color-only.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Theme {
     pub id: String,
@@ -101,6 +104,9 @@ pub struct Theme {
     /// routes that theme through the sheet-swap path (correctness first).
     #[serde(default)]
     pub mode_sheets: BTreeMap<String, Vec<String>>,
+    /// Portable role preferences; absent fields preserve host defaults.
+    #[serde(default, skip_serializing_if = "Typography::is_empty")]
+    pub typography: Typography,
 }
 
 impl Theme {
@@ -115,6 +121,7 @@ impl Theme {
             high_contrast: false,
             harmony: Harmony::default(),
             mode_sheets: BTreeMap::new(),
+            typography: Typography::default(),
         }
     }
 
@@ -162,7 +169,11 @@ impl Theme {
     /// roles as --tabard-syntax-keyword and the like. A host may append
     /// ordinary author rules which use them through var().
     pub fn css_custom_properties(&self) -> String {
-        custom_properties(self.palette(), self.syntax_palette())
+        format!(
+            "{}{}",
+            custom_properties(self.palette(), self.syntax_palette()),
+            self.typography.css_custom_properties()
+        )
     }
 
     /// Emit Lagrange's documented UI `palette.txt` artifact for both modes.

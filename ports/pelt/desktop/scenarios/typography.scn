@@ -1,0 +1,62 @@
+# Ordinary Pelt Appearance -> Edit themes, private stores only.
+log Pelt shared typography native authoring
+settle 4
+assert snap dirty == true
+assert snap font_catalog == ready
+capture initial_editor
+key tab-until data-field=name
+input-text Pelt-typography-authored
+click role:button @data-mode=light
+click role:button @data-font-role=reading
+assert snap font_role == reading
+key tab-until data-field=font-size
+input-text NaN
+click role:button @data-action=save
+assert snap saved == false
+assert snap font_size == NaN
+capture invalid_size
+click role:button @data-action=undo
+assert snap paragraph_size == 14px
+key tab-until data-field=font-family
+input-text Georgia
+click role:button @data-installed-font=Georgia
+key tab-until data-field=font-size
+input-text 24
+key tab-until data-field=font-line-height
+input-text 1.7
+click role:button @data-action=apply-fonts
+assert snap font_family == Georgia
+assert snap font_size == 24
+assert snap font_line_height == 1.7
+assert snap paragraph_size == 24px
+assert snap font_diagnostics == none
+capture reading_authored
+click .chrome-specimen
+settle 4
+capture authored_previews
+click role:button @data-action=undo
+assert snap paragraph_size == 14px
+capture reading_undone
+captures-differ authored_previews reading_undone
+click role:button @data-action=redo
+assert snap paragraph_size == 24px
+click role:button @data-font-role=ui
+click role:button @data-font-family=serif
+key tab-until data-field=font-size
+input-text 15
+key tab-until data-field=font-line-height
+input-text 1.2
+click role:button @data-action=apply-fonts
+assert snap font_size == 15
+assert snap font_line_height == 1.2
+capture interface_authored
+click role:button @data-action=save
+assert snap dirty == false
+assert snap saved == true
+capture saved_editor
+resize 640 780
+settle 4
+capture narrow_editor
+click .chrome-specimen
+settle 4
+capture narrow_previews

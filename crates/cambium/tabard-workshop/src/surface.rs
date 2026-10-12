@@ -126,7 +126,7 @@ fn body(state: &WorkshopState) -> WorkshopView {
     Box::new(el("div", vec![editor(state), previews(state)]).attr("class", "workshop-body"))
 }
 
-fn text_control(
+pub(crate) fn text_control(
     key: &'static str,
     label: &'static str,
     multiline: bool,
@@ -194,7 +194,7 @@ fn export_controls(state: &WorkshopState) -> WorkshopView {
                         "Complete editable theme, including harmony and mode stylesheets."
                     },
                     ExportFormat::Css => {
-                        "CSS color variables for the selected standard preview mode."
+                        "Color, syntax and font variables for the selected standard preview mode."
                     },
                     ExportFormat::Dtcg => "Design tokens for the selected standard preview mode.",
                 },
@@ -528,6 +528,7 @@ fn editor(state: &WorkshopState) -> WorkshopView {
         )
         .attr("class", "control-group"),
     ));
+    controls.push(crate::typography::controls(state));
     let themes: Vec<WorkshopView> = state
         .registry()
         .list()
