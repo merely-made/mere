@@ -2,13 +2,13 @@
 7-Zip 25.01 (x64) : Copyright (c) 1999-2025 Igor Pavlov : 2025-08-03
 
 Scanning the drive for archives:
-1 file, 11356647 bytes (11 MiB)
+1 file, 11356678 bytes (11 MiB)
 
 Extracting archive: C:\t\cargo-targets\mere\dramatis-packaging\dev\nsis\dramatis-ui_0.0.1_x64-setup.exe
 --
 Path = C:\t\cargo-targets\mere\dramatis-packaging\dev\nsis\dramatis-ui_0.0.1_x64-setup.exe
 Type = Nsis
-Physical Size = 11356647
+Physical Size = 11356678
 Method = LZMA:23
 Solid = +
 Headers Size = 78474
@@ -19,4 +19,4 @@ Everything is Ok
 
 Files: 12
 Size:       58659163
-Compressed: 11356647
+Compressed: 11356678

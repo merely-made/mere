@@ -235,7 +235,7 @@ warning: unused import: `personae::AttestationKeys`
    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
 
 warning: `graphshell` (lib) generated 1 warning
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.63s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.60s
      Running tests\interaction.rs (C:\t\cargo-targets\mere\debug\deps\interaction-fba2f6e9c10e01b6.exe)
 
 running 7 tests
@@ -247,7 +247,7 @@ test keyboard_reconnect_and_pointer_persona_selection_use_the_real_controls ... 
 test focus_follow_preserves_manual_scrolling_until_focus_changes ... ok
 test narrow_layout_and_zoom_keep_a_review_action_reachable ... ok
 
-test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.27s
 
      Running tests\state.rs (C:\t\cargo-targets\mere\debug\deps\state-3441ef31bea9f5f5.exe)
 
@@ -255,8 +255,8 @@ running 6 tests
 test app_wire_receipt ... ignored, requires dramatis-review-host and DRAMATIS_RECEIPT_ENDPOINT
 test native_consent_receipt ... ignored, requires synthetic native Djinn UI and resident denial
 test a_failed_refresh_clears_the_previous_live_surface ... ok
-test the_choice_comes_from_djinn_and_is_not_remembered_in_app_storage ... ok
 test one_outstanding_request_cannot_be_overwritten_by_another_click ... ok
+test the_choice_comes_from_djinn_and_is_not_remembered_in_app_storage ... ok
 test an_absent_custodian_leaves_the_app_pending ... ok
 
 test result: ok. 4 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.00s

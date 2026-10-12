@@ -236,12 +236,12 @@ warning: unused import: `personae::AttestationKeys`
 
 warning: `graphshell` (lib) generated 1 warning
    Compiling dramatis-app v0.0.1 (C:\Users\mark_\Code\repos\mere\ports\dramatis)
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 19.40s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 14.31s
      Running tests\package_feed.rs (C:\t\cargo-targets\mere\debug\deps\package_feed-38472385e3de2a93.exe)
 
 running 1 test
 Signed package, durable staging, unsigned/edited manifests, artifact and staged-byte tampering qualified; feed restored.
 test real_signed_package_and_tamper_controls ... ok
 
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.49s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.43s
 
