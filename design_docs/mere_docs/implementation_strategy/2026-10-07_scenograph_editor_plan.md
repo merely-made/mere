@@ -1871,7 +1871,54 @@ has no index or current-link findings. Its remaining upstream findings are
 recorded in the qualification summary. The temporary browser package is removed;
 peer documentation work is preserved.
 
+#### Inspector, presentation and exact strength qualification (2026-10-11)
 
+The next authorized slices add shared fact-row spacing to the local inspector
+stylesheet and one-shot focus/reveal for an explicitly chosen field or coupling.
+Those detail headings participate in the retained keyboard order. Requests are
+processed after dispatch and in the frame hook, so keyboard/programmatic
+activation receives the same next-layout reveal. Discovery and ordinary graph
+selection do not retarget inspection. A page-local `?motion=normal|reduced`
+override follows an explicit root motion attribute and precedes the browser
+preference. Motion preference and the analytic arrangement's paused physics
+are separate; the tracked qualification checks both preconditions explicitly.
+
+Ten Chrome scenarios pass, with eighteen final captures reviewed: field
+inspection/reopen and 420px keyboard reading; declarative rule authoring/reopen;
+exact-occurrence live Forme guides/reopen; and exact strength draft/save/reopen
+plus a final visible-value/draft capture. The rule cases establish invalid-draft
+refusal, decision traces, acknowledged saved undo/redo, opt-in guide adoption,
+independent boundary visibility and restored base guides. Unsupported Numen
+effects are disclosed rather than applied. The source-hashed
+[qualification](../../../ports/graphshell/docs/receipts/field_editor_presentation_browser_20261011/qualification.json)
+binds each page to its actual package/source cut. Fresh pages retain their own
+origin's IndexedDB; fresh native/browser processes are not inferred.
+
+Five native Forme renderer tests pass, including guide/base restoration,
+wrong-identity isolation and pin/placement preservation. Five exact-coupling
+tests pass, including failed/nontransactional storage, competing saves,
+equal-ID foreign graph refusal and scoped history with unrelated-edit
+preservation. The final product build and viewer-only check pass. Older portable
+model and full-host receipts are not new reruns. Functional plus capture
+acceptance does not qualify IME, physical touch/focus, other browsers, release
+performance, theme/font changes or large-context costs. Rule-editor JSON input
+and missing symbol-font fallback remain visual follow-through; the new strength
+preview uses plain words for its old/new values.
+
+The [field owner](2026-06-13_scriptable_field_regions_plan.md#field-inspection-adapter-sequence-2026-10-10)
+records the graph-session-bound strength draft and staged graph/journal
+transaction. Its acknowledged update refreshes the portable local client and
+the exact Canvas coupling, preserving geometry and Forme identity. It opens
+strength only; selector/response/definition editing, primitive associations and
+entry/exit scripts keep their gates. The composition walkthrough separates
+arrangement, additive influence and presentation scope without ruling the
+remaining spatial or incompatible-placement policies.
+
+Failed parser/precondition runs and the earlier narrow capture that focused
+without revealing are retained. The corrected narrow capture shows the actual
+exact-coupling details, not just a successful model assertion. Generated browser
+packages and owned processes are removed after recording; the shared Mere Cargo
+target is reused and concurrent documentation work is preserved.
 #### Relationship and dynamics inspector draft (2026-10-11)
 
 **Status:** implemented bounded draft; portable source checks and integrated
