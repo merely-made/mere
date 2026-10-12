@@ -2029,3 +2029,32 @@ per-assertion contributions only through their dynamics owner. Installed field
 coupling snapshots, foreground-pin/overview adapters and full node presentation
 remain separate. No script/field execution, primitive writes, broad scene
 composition or force-policy adoption is completed by this read-only draft.
+
+#### Relationship inspection integration and native checks (2026-10-11)
+
+Merged upstream `6a196227` into local main as `208e134e`, preserving the exact
+coupling-strength editor and both inspector styles. Existing uncommitted
+documentation was restored, reconciled and subsequently recorded by its owner.
+The three actual Canvas report tests now pass on Windows. Eight actual Canvas
+topology tests pass, including a new mixed-kind Resource self-link projected
+between repeated accesses in both directions, with 67 retained input rows.
+
+Assertion readback now uses the typed relation handle directly and visits each
+bucket/kind/displayed direction once. It still counts every projected row and
+deduplicates only assertion handles. This removes repeated bucket searches and
+same-kind statement scans; full-graph projection and long-record refresh costs
+remain unmeasured. The original seven topology cases preserve hidden cells,
+parallel buckets, source strata, exact targets and open predicates.
+
+The combined product browser host builds with locked offline dependencies.
+The root native gate initially required an offline lock reconciliation for four
+already-existing Dramatis dependencies; it upgraded no packages. That lock and
+the concurrent Dramatis source changes remain with their owner. Native tests
+reuse `C:\\t\\cargo-targets\\mere`; no isolated build tree or Cargo home is created.
+The [Windows receipt](../../../ports/graphshell/docs/receipts/relationship_dynamics_20261011/windows/qualification.json)
+records source hashes and separate native/browser outcomes.
+
+Both incoming scenario scripts now explicitly open Graph tools before revealing
+the inspector controls. The original fresh-origin attempt reached a collapsed
+tools pane and was stopped; it is retained as incomplete evidence. Corrected
+fresh-origin and retained-origin browser qualification is in progress.
