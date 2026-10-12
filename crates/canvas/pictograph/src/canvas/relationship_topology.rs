@@ -9,7 +9,7 @@ use kernel::graph::{
     EdgeFamily, Graph, GraphStratum, NodeKey, RelationKey, RelationKind, RelationSelector,
 };
 use serde::{Deserialize, Serialize};
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::{BTreeMap, BTreeSet, HashSet};
 use uuid::Uuid;
 
 pub fn selector_for_relation_kind(kind: RelationKind) -> RelationSelector {
@@ -73,6 +73,7 @@ pub fn inspect_pair(
         .get_node_key_by_id(second)
         .ok_or_else(|| format!("Access {second} is absent from this view"))?;
     let mut cells = BTreeMap::<String, CellInput>::new();
+    let mut read_assertions = HashSet::new();
     for (key, row) in graph
         .projected_relations()
         .filter(|(_, row)| (row.from == a && row.to == b) || (row.from == b && row.to == a))
@@ -112,9 +113,15 @@ pub fn inspect_pair(
                 assertions: BTreeSet::new(),
             });
         group.rows += 1;
-        if let Some((_, payload)) = graph
-            .projected_relations_between(row.from, row.to)
-            .find(|(held, _)| *held == key)
+        // Each semantic statement supplies a row. Read its owning bucket only
+        // once per displayed direction and kind, while still counting every row.
+        // Resource self-links may project in both directions between repeated
+        // accesses, so the displayed endpoints belong in this read key.
+        if matches!(
+            row.kind,
+            RelationKind::Semantic(_) | RelationKind::OpenPredicate
+        ) && read_assertions.insert((key, row.from, row.to, row.kind))
+            && let Some(payload) = graph.get_relation(key)
         {
             for statement in payload.semantic_statements() {
                 let matches = match row.kind {

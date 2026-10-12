@@ -193,3 +193,63 @@ fn absent_access_refuses_instead_of_retargeting_equal_address() {
     assert!(inspect_pair(&graph, a, b, |_, _, _| false).is_err());
     assert!(inspect_pair(&graph, c, b, |_, _, _| false).is_ok());
 }
+
+#[test]
+fn shared_bucket_keeps_every_kind_and_repeated_access_direction() {
+    let (mut graph, [a, _, c, _]) = fixture();
+    // a and c show the same Resource. Its self-link lifts to a->c and c->a.
+    let cites: BTreeSet<_> = (0..32)
+        .map(|i| {
+            assertion(
+                &mut graph,
+                a,
+                a,
+                Some(SemanticSubKind::Cites),
+                &format!("urn:author:{i}"),
+            )
+        })
+        .collect();
+    let open = assertion(&mut graph, a, a, None, "urn:open-author");
+    let grouped = assertion(
+        &mut graph,
+        a,
+        c,
+        Some(SemanticSubKind::UserGrouped),
+        "urn:group-author",
+    );
+    let before = serde_json::to_value(graph.to_snapshot()).unwrap();
+    let pair = inspect_pair(&graph, a, c, |_, _, _| false).unwrap();
+    assert_eq!((pair.held_rows, pair.visible_rows), (67, 67));
+    for (from, to) in [(a, c), (c, a)] {
+        for (selector, handles) in [
+            (
+                RelationSelector::Semantic(SemanticSubKind::Cites),
+                cites.clone(),
+            ),
+            (
+                RelationSelector::Family(EdgeFamily::Semantic),
+                BTreeSet::from([open.clone()]),
+            ),
+        ] {
+            let cell = pair
+                .cells
+                .iter()
+                .find(|cell| {
+                    cell.owner.from == from
+                        && cell.owner.to == to
+                        && cell.owner.selector == selector
+                })
+                .unwrap();
+            assert_eq!(cell.owner.stratum, GraphStratum::Resource);
+            assert_eq!(cell.assertions, handles);
+            assert_eq!(cell.rows, handles.len());
+        }
+    }
+    let cell = pair
+        .cells
+        .iter()
+        .find(|cell| cell.owner.stratum == GraphStratum::Surface)
+        .unwrap();
+    assert_eq!(cell.assertions, BTreeSet::from([grouped]));
+    assert_eq!(serde_json::to_value(graph.to_snapshot()).unwrap(), before);
+}
