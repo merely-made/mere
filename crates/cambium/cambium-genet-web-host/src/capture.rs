@@ -34,7 +34,7 @@ impl PendingFrame {
         self.ready();
         self.result
             .into_inner()
-            .ok_or_else(|| "browser readback not ready".into())?
+            .ok_or_else(|| "browser readback not ready".to_owned())?
     }
 }
 pub fn capture_into(slot: Rc<RefCell<Option<Result<PendingFrame, String>>>>) -> CaptureFn {
