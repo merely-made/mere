@@ -107,6 +107,7 @@ fn user_theme_crud_fork_rename_remove_add() {
         high_contrast: false,
         harmony: Default::default(),
         mode_sheets: Default::default(),
+        typography: Default::default(),
     };
     reg.add_user_theme(def)
         .expect("user theme passes validation");
@@ -139,6 +140,7 @@ fn locked_harmony_rotates_accents_to_primary_plus_offset_and_validates() {
             tertiary_deg: 240.0,
         },
         mode_sheets: Default::default(),
+        typography: Default::default(),
     };
 
     // The accents' hue is the primary's hue plus the locked offset; each accent

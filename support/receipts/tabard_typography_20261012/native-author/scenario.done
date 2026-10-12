@@ -1,0 +1,26 @@
+RESULT ok
+Pelt shared typography native authoring
+captured initial_editor
+captured invalid_size
+captured reading_authored
+captured authored_previews
+captured reading_undone
+captured interface_authored
+captured authored_stylesheet
+captured saved_editor
+captured narrow_editor
+captured narrow_previews
+captured narrow_reader
+capture initial_editor 2360x1600 digest=04eb0aca106d9f9b file=/Users/markik/Code/tabard-app-receipts/2026-10-11/typography/native-author/initial_editor.png
+capture invalid_size 2360x1600 digest=4ea14edf1862b4ce file=/Users/markik/Code/tabard-app-receipts/2026-10-11/typography/native-author/invalid_size.png
+capture reading_authored 2360x1600 digest=621e85b4661d9892 file=/Users/markik/Code/tabard-app-receipts/2026-10-11/typography/native-author/reading_authored.png
+capture authored_previews 2360x1600 digest=1846ed384af0f122 file=/Users/markik/Code/tabard-app-receipts/2026-10-11/typography/native-author/authored_previews.png
+capture reading_undone 2360x1600 digest=bf5edae21b7e1062 file=/Users/markik/Code/tabard-app-receipts/2026-10-11/typography/native-author/reading_undone.png
+capture interface_authored 2360x1600 digest=b6d241e31f2e2eea file=/Users/markik/Code/tabard-app-receipts/2026-10-11/typography/native-author/interface_authored.png
+capture authored_stylesheet 2360x1600 digest=f00c47df52e0b629 file=/Users/markik/Code/tabard-app-receipts/2026-10-11/typography/native-author/authored_stylesheet.png
+capture saved_editor 2360x1600 digest=360af12836e21493 file=/Users/markik/Code/tabard-app-receipts/2026-10-11/typography/native-author/saved_editor.png
+capture narrow_editor 1280x1560 digest=3bdbff82c6341147 file=/Users/markik/Code/tabard-app-receipts/2026-10-11/typography/native-author/narrow_editor.png
+capture narrow_previews 1280x1560 digest=63d621321fb76d70 file=/Users/markik/Code/tabard-app-receipts/2026-10-11/typography/native-author/narrow_previews.png
+capture narrow_reader 1280x1560 digest=96f2786323e7501e file=/Users/markik/Code/tabard-app-receipts/2026-10-11/typography/native-author/narrow_reader.png
+frames: 11 captured, 0 blank, 11 distinct digests
+presentation: 101 frames, 103 redraws, 2 unpresented redraws

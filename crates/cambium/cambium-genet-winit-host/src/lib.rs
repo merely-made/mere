@@ -1314,3 +1314,8 @@ pub fn available_font_families(fonts: &[HostFont]) -> Vec<String> {
     families.dedup_by(|a, b| a.eq_ignore_ascii_case(b));
     families
 }
+
+/// Installed-only catalogue, reusing the shared system/bundled inventory owner.
+pub fn installed_font_families() -> Vec<String> {
+    available_font_families(&[])
+}

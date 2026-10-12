@@ -1,0 +1,93 @@
+{
+  "window": {
+    "changed_pixels": 26,
+    "max_rgba": 1,
+    "max_alpha": 0,
+    "mean_rgba": 1.376065340909091e-06,
+    "conservative_uniform_existing_limits": {
+      "rgb": 3,
+      "alpha": 2,
+      "mean": 1.0
+    },
+    "passes": true
+  },
+  "regions": [
+    {
+      "producer": "reader",
+      "visible_rect_logical": [
+        797.0,
+        229.0,
+        456.0,
+        215.0
+      ],
+      "crop_pixels": [
+        1594,
+        458,
+        2506,
+        888
+      ],
+      "exact_displayed_region_rgba": false,
+      "changed_pixels": 1,
+      "max_rgba": 1,
+      "max_alpha": 0,
+      "mean_rgba": 6.374949000407996e-07,
+      "passes_existing_limits": true,
+      "gen_before": "1",
+      "gen_after": "2",
+      "stamp_before": "8",
+      "stamp_after": "10"
+    },
+    {
+      "producer": "stylesheet",
+      "visible_rect_logical": [
+        321.0,
+        911.0,
+        933.0,
+        157.0
+      ],
+      "crop_pixels": [
+        642,
+        1822,
+        2508,
+        2136
+      ],
+      "exact_displayed_region_rgba": true,
+      "changed_pixels": 0,
+      "max_rgba": 0,
+      "max_alpha": 0,
+      "mean_rgba": 0.0,
+      "passes_existing_limits": true,
+      "gen_before": "1",
+      "gen_after": "2",
+      "stamp_before": "7",
+      "stamp_after": "9"
+    }
+  ],
+  "before_presentation": {
+    "height": 2200,
+    "host": 1,
+    "layout_scale": 2.0,
+    "sequence": 26,
+    "width": 2560
+  },
+  "after_presentation": {
+    "height": 2200,
+    "host": 1,
+    "layout_scale": 2.0,
+    "sequence": 40,
+    "width": 2560
+  },
+  "postloss_authority": {
+    "core_generation": "2",
+    "loss_reason": "Destroyed",
+    "lost_generation": "1",
+    "old_core_released": "true",
+    "owner_same": "true",
+    "reader_source_same": "true",
+    "recovery_ready": "true",
+    "runner_same": "true",
+    "stylesheet_source_same": "true"
+  },
+  "capture_count": 4,
+  "scope": "Controlled ownedDevice.destroy after collectedbaseline; healthynew-surface queuepresentation; displayedReader/Stylesheetregions underexistinglimits, nothidden completeSourcepixels; notphysicaldriverreset orOSAT; no factory-countinferred fromoneobservedgenerationtransition"
+}

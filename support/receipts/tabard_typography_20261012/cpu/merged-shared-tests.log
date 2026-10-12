@@ -1,0 +1,462 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling cambium-rootstock v0.1.0 (/Users/markik/Code/worktrees/mere-tabard-typography/crates/cambium/cambium-rootstock)
+   Compiling cambium-winit-a11y v0.3.0 (/Users/markik/Code/worktrees/mere-tabard-typography/crates/cambium/cambium-winit-a11y)
+   Compiling cambium-genet-winit-host v0.1.0 (/Users/markik/Code/worktrees/mere-tabard-typography/crates/cambium/cambium-genet-winit-host)
+warning: unused import: `NSWindow`
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:511:25
+    |
+511 |     use objc2_app_kit::{NSWindow, NSWindowButton};
+    |                         ^^^^^^^^
+    |
+    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unnecessary `unsafe` block
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:540:46
+    |
+540 |             view.convertRect_fromView(frame, unsafe { ns_window.contentView() }.as_deref());
+    |                                              ^^^^^^ unnecessary `unsafe` block
+    |
+    = note: `#[warn(unused_unsafe)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `window_control_node` is never used
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:113:4
+    |
+113 | fn window_control_node<D>(dom: &D, root: NodeId, accessible_label: &str) -> Option<NodeId>
+    |    ^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `window_control_rect` is never used
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:139:15
+    |
+139 | pub(crate) fn window_control_rect<D>(
+    |               ^^^^^^^^^^^^^^^^^^^
+
+warning: `cambium-genet-winit-host` (lib) generated 4 warnings (run `cargo fix --lib -p cambium-genet-winit-host` to apply 1 suggestion)
+warning: unused imports: `BlockProvenanceMap`, `DocumentProvenance`, and `DocumentTrustState`
+  --> crates/nematic/nematic/src/knot/expand.rs:20:12
+   |
+20 |     Block, BlockProvenanceMap, DocumentProvenance, DocumentTrustState, Engine, EngineInput,
+   |            ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `EngineDocument`
+ --> crates/nematic/nematic/src/knot/expand/build.rs:7:80
+  |
+7 | use inker::{Block, BlockProvenanceMap, DocumentProvenance, DocumentTrustState, EngineDocument};
+  |                                                                                ^^^^^^^^^^^^^^
+
+warning: `nematic` (lib) generated 2 warnings (run `cargo fix --lib -p nematic` to apply 2 suggestions)
+warning: method `packet` is never used
+   --> crates/system/document-lanes/src/smolweb.rs:579:19
+    |
+136 | impl SmolwebDocument {
+    | -------------------- method in this implementation
+...
+579 |     pub(crate) fn packet(&self) -> Option<&DocumentRenderPacket> {
+    |                   ^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mere-document-lanes` (lib test) generated 1 warning
+   Compiling tabard-workshop v0.0.1 (/Users/markik/Code/worktrees/mere-tabard-typography/crates/cambium/tabard-workshop)
+    Finished `test` profile [unoptimized] target(s) in 32.76s
+     Running unittests src/lib.rs (/Users/markik/Code/targets/knot-tabard-apps/debug/deps/document_canvas-053f369c9e4f7987)
+
+running 87 tests
+test font_table::tests::empty_table_get_is_none ... ok
+test font_table::tests::collection_faces_intern_separately_and_same_face_clones_dedup ... ok
+test layout::tests::document_dedups_shared_face ... ok
+test layout::fold_tests::top_level_block_skips_group_children_that_reuse_its_index ... ok
+test layout::tests::a_feed_entry_with_a_body_offers_its_own_document_first ... ok
+test layout::tests::a_long_menu_row_overflows_instead_of_wrapping ... ok
+test layout::fold_tests::a_wide_table_in_a_closed_fold_does_not_widen_the_content ... ok
+test layout::tests::capped_content_column_is_centred_and_preserves_narrow_view_padding ... ok
+test layout::tests::duplicate_link_targets_keep_distinct_identities_and_lowered_labels ... ok
+test layout::tests::empty_document_lays_out_to_empty_block_list ... ok
+test layout::tests::content_bounds_grow_with_blocks ... ok
+test layout::tests::feed_entry_composes_into_group_with_h2_summary_link ... ok
+test layout::tests::glyph_runs_carry_per_role_colors ... ok
+test layout::tests::heading_is_taller_than_paragraph ... ok
+test layout::tests::image_emits_image_block_with_url_and_alt ... ok
+test layout::tests::in_page_span_in_a_stale_table_is_an_inert_link_region ... ok
+test layout::tests::list_emits_group_block_with_children ... ok
+test layout::fold_tests::probes_09_03_in_page_links_get_link_regions_that_never_navigate ... ok
+test layout::tests::many_narrow_table_columns_overflow_without_cell_overlap ... ok
+test layout::tests::menu_label_column_starts_at_one_x_in_every_row ... ok
+test layout::tests::metadata_row_lays_out_label_and_value ... ok
+test layout::tests::paragraph_with_link_emits_interaction_region ... ok
+test layout::fold_tests::link_identity_after_a_closed_fold_matches_the_open_layout ... ok
+test layout::tests::quote_emits_group_block_with_indented_children ... ok
+test layout::tests::rule_emits_rule_block ... ok
+test layout::tests::single_paragraph_produces_one_text_block ... ok
+test layout::fold_tests::p1b_probe_09_in_page_and_network_adornments_paint_independently ... ok
+test layout::tests::submission_span_emits_a_non_navigation_interaction ... ok
+test layout::tests::nowrap_role_overflows_instead_of_wrapping ... ok
+test layout::tests::table_alignment_keeps_wrapped_mixed_style_links_inside_the_cell ... ok
+test layout::tests::table_links_with_same_target_keep_distinct_semantic_identities ... ok
+test layout::tests::table_renders_header_body_ragged_rows_with_source_identity ... ok
+test layout::tests::table_wraps_narrow_cells_and_aligns_link_hit_regions ... ok
+test layout::fold_tests::probe_08_a_heading_gets_a_fold_region_and_the_style_sheet_marker ... ok
+test layout::tests::text_populates_font_sidecar ... ok
+test layout::tests::soft_breaks_reflow_by_default_and_are_kept_when_preserved ... ok
+test layout::tests::source_presentation_controls_inline_paint_and_block_geometry ... ok
+test netrender_backend::tests::empty_packet_produces_empty_scene ... ok
+test netrender_backend::tests::text_lowers_to_glyph_run ... ok
+test netrender_backend::tests::viewport_rounds_to_u32 ... ok
+test layout::fold_tests::p1c_probe_05_a_custom_in_page_glyph_paints_beside_the_network_arrow ... ok
+test paint_list::tests::decoded_image_emits_draw_image_and_resource_sidecar ... ok
+test style_sheet::tests::badge_role_matches_badge_defaults ... ok
+test style_sheet::tests::block_spacing_equals_paragraph_spacing ... ok
+test style_sheet::tests::body_role_matches_paragraph_defaults ... ok
+test style_sheet::tests::code_role_matches_code_block_defaults ... ok
+test style_sheet::tests::explicit_family_and_absolute_size_resolve ... ok
+test style_sheet::tests::globals_are_built_in_defaults ... ok
+test style_sheet::tests::glyph_adornment_prefixes_every_link_verbatim ... ok
+test style_sheet::tests::heading_level_clamps_to_h1_h6 ... ok
+test style_sheet::tests::heading_role_matches_heading_defaults_every_level ... ok
+test style_sheet::tests::in_page_link_adornment_defaults_to_the_link_adornment ... ok
+test style_sheet::tests::line_height_uses_the_shared_ratio ... ok
+test style_sheet::tests::link_adornment_serde_keeps_old_spellings_and_round_trips_glyphs ... ok
+test style_sheet::tests::metadata_role_matches_metadata_row_defaults ... ok
+test style_sheet::tests::role_leading_is_optional_and_old_styles_round_trip_unchanged ... ok
+test style_sheet::tests::sheet_round_trips_through_serde ... ok
+test text::tests::adornment_prefix_carries_link_style ... ok
+test layout::fold_tests::p1c_probe_05_a_custom_network_glyph_leaves_the_in_page_arrows ... ok
+test text::tests::external_link_gets_single_rightwards_arrow ... ok
+test text::tests::in_page_and_network_adornments_apply_independently_in_one_run ... ok
+test text::tests::in_page_link_flattens_as_an_in_protocol_link ... ok
+test text::tests::in_protocol_link_gets_rightwards_double_arrow ... ok
+test text::tests::no_adornment_leaves_link_text_unprefixed ... ok
+test text::tests::relative_link_is_in_protocol ... ok
+test types::window_tests::block_at_finds_the_deepest_block ... ok
+test types::window_tests::link_at_returns_the_innermost_link_url ... ok
+test types::window_tests::window_filters_and_translates_interactions ... ok
+test types::window_tests::window_filters_group_children_to_the_band ... ok
+test types::window_tests::window_keeps_a_block_straddling_the_band_edge ... ok
+test types::window_tests::window_keeps_only_intersecting_blocks_translated_to_band_origin ... ok
+test types::window_tests::window_rect_clips_and_translates_x_coordinates_with_link_regions ... ok
+test paint_list::tests::draw_text_carries_per_run_role_color ... ok
+test paint_list::tests::empty_packet_produces_no_commands ... ok
+test paint_list::tests::each_run_ships_the_face_it_was_shaped_against ... ok
+test layout::tests::wrapped_link_rectangles_share_one_identity_and_label ... ok
+test paint_list::tests::group_recurses_into_children ... ok
+test paint_list::tests::rule_emits_line_command_in_rule_color ... ok
+test paint_list::tests::repeated_runs_share_one_font_side_table_entry ... ok
+test paint_list::tests::shipped_faces_come_from_the_sidecar ... ok
+test paint_list::tests::source_background_and_underline_paint_around_the_shaped_run ... ok
+test paint_list::tests::viewport_rounds_to_device_int_size ... ok
+test paint_list::tests::text_emits_drawtext_and_populates_fonts ... ok
+test text::tests::explicit_code_family_is_the_actual_shaping_request ... ok
+test layout::fold_tests::closed_extents_are_skipped_like_a_filtered_copy_but_keep_block_indices ... ok
+test layout::fold_tests::fold_pages_with_nothing_closed_lay_out_like_the_unfolded_document ... ok
+test layout::fold_tests::p1b_probes_05_09_17_default_tokens_paint_as_p1_did ... ok
+
+test result: ok. 87 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 4.24s
+
+     Running unittests src/lib.rs (/Users/markik/Code/targets/knot-tabard-apps/debug/deps/mere_document_lanes-084020c6ec3db4b5)
+
+running 12 tests
+test reader::tests::presented_headings_remain_in_reader_outline_order ... ok
+test typography::tests::heading_override_preserves_relative_hierarchy_and_code_style ... ok
+test typography::tests::code_can_explicitly_choose_a_generic_ui_face_without_being_forced_to_monospace ... ok
+test typography::tests::reading_override_preserves_heading_code_and_label_defaults ... ok
+test reader::tests::reader_requires_held_bytes_and_declines_non_articles ... ok
+test reader::tests::article_lowering_preserves_table_header_and_figure_caption ... ok
+test reader::tests::reader_projection_is_partial_with_virtual_focus_only ... ok
+test reader::tests::reader_route_lowers_renders_links_and_reports_lineage ... ok
+test reader::tests::reader_pointer_target_rechecks_current_scroll_and_content_hole ... ok
+test reader::tests::reader_snapshot_waits_for_frame_and_groups_wrapped_links_across_reflow ... ok
+test reader::tests::reader_appearances_share_content_but_keep_viewport_and_scroll_independent ... ok
+test smolweb::typography_tests::restyling_reflows_without_replacing_source_or_session_state ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.82s
+
+     Running tests/smolweb_streaming_render.rs (/Users/markik/Code/targets/knot-tabard-apps/debug/deps/smolweb_streaming_render-e3cd91f8255c68b9)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/Users/markik/Code/targets/knot-tabard-apps/debug/deps/tabard-815b14bccc337c20)
+
+running 40 tests
+test smolweb::tests::default_is_site ... ok
+test smolweb::tests::app_passes_through_and_system_falls_back_to_light ... ok
+test theme::choice::tests::in_memory_store_updates_live_value ... ok
+test smolweb::tests::site_hue_is_stable_and_host_scoped ... ok
+test theme::edge_style::tests::grayscale_luminance_separates_semantic_from_arrangement ... ok
+test theme::edge_style::tests::monochrome_mode_preserves_pattern_identity ... ok
+test theme::mode_calc::tests::calculator_covers_every_role_and_transforms_apply ... ok
+test theme::choice::tests::legacy_lines_and_json_both_read ... ok
+test theme::edge_style::tests::agent_decay_reduces_opacity ... ok
+test theme::edge_style::tests::family_styles_have_distinct_non_color_signatures ... ok
+test theme::edge_style::tests::theme_tokens_satisfy_default_contract ... ok
+test theme::mode_calc::tests::on_picks_readable_text_over_the_computed_fill ... ok
+test theme::data::tests::theme_lookup_falls_back_for_unknown_id ... ok
+test theme::choice::tests::file_store_surfaces_nonrecoverable_load_errors ... ok
+test theme::mode_calc::tests::partial_or_unknown_tables_are_rejected_by_name ... ok
+test theme::data::tests::saved_lens_themes_read_by_id_and_by_value ... ok
+test theme::mode_calc::tests::mode_file_json_roundtrips ... ok
+test theme::data::tests::built_in_ids_resolve_to_their_token_sets ... ok
+test theme::registry::tests::all_seed_derived_builtins_pass_wcag_validation ... ok
+test theme::registry::tests::mode_key_roundtrips ... ok
+test theme::registry::tests::builtin_themes_include_edge_tokens ... ok
+test theme::registry::tests::a_theme_file_saved_before_the_merge_still_reads ... ok
+test theme::registry::tests::default_mode_for_def_matches_legacy_builtins ... ok
+test theme::mode_calc::tests::template_is_complete_and_valid_for_all_flag_combos ... ok
+test theme::registry::tests::locked_harmony_rotates_accents_to_primary_plus_offset_and_validates ... ok
+test theme::registry::tests::theme_def_round_trips_through_serde ... ok
+test theme::registry::tests::user_theme_edit_helpers_only_mutate_user_defs ... ok
+test theme::registry::tests::mode_tokens_derive_four_distinct_palettes_from_one_theme ... ok
+test theme::registry::tests::registry_lists_built_ins_in_order ... ok
+test typography::tests::names_cannot_escape_a_css_string_and_invalid_json_is_refused ... ok
+test theme::registry::tests::theme_registry_resolves_builtin_themes_and_fallbacks ... ok
+test theme::registry::tests::user_theme_crud_fork_rename_remove_add ... ok
+test theme::registry::tests::mode_sheets_roundtrip_and_gate_on_non_empty ... ok
+test typography::tests::requested_order_and_missing_names_survive_resolution_and_serialization ... ok
+test typography::tests::unavailable_request_uses_host_default_without_rewriting_intent ... ok
+test theme::choice::tests::strict_load_preserves_malformed_and_non_utf8_preferences ... ok
+test theme::choice::tests::an_existing_pelt_appearance_file_reads ... ok
+test theme::choice::tests::strict_load_keeps_missing_and_legacy_choice_semantics ... ok
+test theme::choice::tests::file_store_defaults_missing_or_invalid_and_round_trips ... ok
+test theme::choice::font_store_tests::font_requests_round_trip_and_failed_write_retains_previous_choice ... ok
+
+test result: ok. 40 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+
+     Running tests/choice_resolution.rs (/Users/markik/Code/targets/knot-tabard-apps/debug/deps/choice_resolution-d7f3edc42acc2912)
+
+running 6 tests
+test font_requests_survive_theme_fallback_without_entering_the_definition ... ok
+test fallback_preserves_request_reports_both_missing_identity_and_mode_and_recovers ... ok
+test empty_sheets_derive_and_default_mode_respects_authored_contrast_flags ... ok
+test invalid_definitions_do_not_gain_authority_via_css_and_inert_builtins_still_validate ... ok
+test authored_sheets_are_authority_for_canonical_and_custom_modes_without_claimed_palette ... ok
+test canonical_choice_uses_exact_shared_mode_math_and_does_not_activate_registry ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/library.rs (/Users/markik/Code/targets/knot-tabard-apps/debug/deps/library-f33b3c492cc6fba6)
+
+running 7 tests
+test corrupt_and_unsupported_libraries_are_visible_and_left_untouched ... ok
+test busy_lock_preserves_memory_and_disk_then_allows_retry ... ok
+test failed_filesystem_save_preserves_snapshot_and_allows_retry ... ok
+test missing_library_loads_without_creating_files_and_saves_authored_shape ... ok
+test stale_writers_refuse_changes_deletions_and_newly_created_libraries ... ok
+test typography_library_is_versioned_round_trips_and_refuses_invalid_writes ... ok
+test inadmissible_definitions_are_rejected_on_both_load_and_save ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+     Running tests/mode_artifacts.rs (/Users/markik/Code/targets/knot-tabard-apps/debug/deps/mode_artifacts-3644f5aa0f128def)
+
+running 6 tests
+test explicit_artifacts_reject_invalid_authored_definitions_before_exporting ... ok
+test strict_exports_refuse_selected_overrides_and_custom_modes ... ok
+test authored_body_overrides_are_preserved_but_syntax_is_contrast_gated_for_selected_mode ... ok
+test no_argument_exports_keep_legacy_raw_seed_behavior_and_document_shape ... ok
+test selected_mode_provenance_roundtrips_the_authored_definition_and_effective_inputs ... ok
+test canonical_artifacts_export_the_exact_harmonized_mode_and_all_roles ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/portable.rs (/Users/markik/Code/targets/knot-tabard-apps/debug/deps/portable-49b481744d109a2b)
+
+running 9 tests
+test authored_default_mode_updates_both_flags_in_one_history_action ... ok
+test corrupt_or_inadmissible_payloads_return_visible_errors ... ok
+test portable_roundtrip_preserves_authored_fields_and_normalizes_identity ... ok
+test invalid_new_draft_edit_cannot_change_registry_or_save_point ... ok
+test builtin_artifacts_are_inert_until_explicitly_forked_to_user_identity ... ok
+test imported_draft_checks_commit_collisions_and_copy_preserves_unregistered_source ... ok
+test explicit_replacement_preserves_existing_permissions_and_refuses_symlink_clobber ... ok
+test blocked_and_failed_replacement_preserve_existing_artifact ... ok
+test exporting_a_draft_does_not_save_it_and_never_clobbers_by_default ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+
+     Running tests/theme.rs (/Users/markik/Code/targets/knot-tabard-apps/debug/deps/theme-0540fd95882ffb59)
+
+running 10 tests
+test exported_palette_keeps_tinct_contrast_roles ... ok
+test lagrange_palette_falls_back_for_non_semantic_status_hues ... ok
+test lagrange_palette_reports_rgb_alpha_loss ... ok
+test lagrange_palette_orders_neutrals_and_accent_variants_for_adversarial_seeds ... ok
+test lagrange_palette_reports_collapsed_and_unrepresented_roles_per_mode ... ok
+test lagrange_palette_matches_golden_documented_shape ... ok
+test token_and_css_output_are_deterministic_and_map_every_base_role ... ok
+test dtcg_document_preserves_tabard_provenance ... ok
+test tokens_and_stylesheet_carry_every_syntax_role ... ok
+test livery_resolves_the_emitted_custom_properties ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/typography.rs (/Users/markik/Code/targets/knot-tabard-apps/debug/deps/typography-086219871201e6f6)
+
+running 7 tests
+test missing_family_notices_are_read_only_and_generic_families_need_no_catalogue_entry ... ok
+test requested_faces_are_escaped_and_retained_with_explicit_fallback ... ok
+test absent_preferences_preserve_old_json_and_css ... ok
+test invalid_metrics_are_refused_before_library_or_export ... ok
+test explicitly_empty_role_data_round_trips_without_changing_css ... ok
+test typography_is_history_and_css_keeps_final_authority ... ok
+test portable_fonts_require_a_versioned_envelope_and_round_trip ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/workshop.rs (/Users/markik/Code/targets/knot-tabard-apps/debug/deps/workshop-11b34d0f5d175d08)
+
+running 5 tests
+test invalid_and_colliding_identities_never_change_registry ... ok
+test stylesheet_previews_never_pretend_to_be_derived_tokens ... ok
+test undo_redo_branching_and_discard_return_to_save_point ... ok
+test draft_preview_and_commit_preserve_builtin_and_active_appearance ... ok
+test commit_refuses_concurrent_edits_deletion_and_fork_collisions ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/Users/markik/Code/targets/knot-tabard-apps/debug/deps/tabard_workshop-e12e3505142d818a)
+
+running 14 tests
+test fonts::tests::draft_preserves_unedited_stacks_and_default_is_explicit_apply ... ok
+test typography::tests::role_navigation_keeps_imported_empty_role_data_unchanged ... ok
+test graph::tests::leaf_and_hit_targets_share_fixture_projection ... ok
+test state::embedded_close_tests::cancelling_saved_exit_does_not_skip_guards_after_the_next_edit ... ok
+test state::embedded_close_tests::failed_save_of_initial_blank_draft_does_not_authorize_exit ... ok
+test state::embedded_close_tests::cancelling_discard_exit_restores_the_unsaved_guard_for_an_embedded_session ... ok
+test state::embedded_close_tests::failed_save_of_an_untouched_import_does_not_authorize_exit ... ok
+test graph::tests::shared_leaf_paints_draft_accents_and_mode_feedback_tokens ... ok
+test reader::tests::mode_changes_preserve_source_and_refresh_the_shared_reader_palette ... ok
+test reader::tests::specimen_is_extracted_and_uses_real_shaped_reader_output ... ok
+test reader::tests::font_changes_remeasure_the_existing_source_and_reset_its_defaults ... ok
+test graph::tests::actual_node_targets_update_selection_focus_and_hover ... ok
+test fonts::picker_tests::native_picker_filters_available_families_and_only_stages_the_choice ... ok
+test reader::tests::all_profiles_paint_actual_reader_surface_and_foreground ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.55s
+
+     Running tests/embedding_api.rs (/Users/markik/Code/targets/knot-tabard-apps/debug/deps/embedding_api-a0074cee53c94229)
+
+running 4 tests
+test invalid_or_staged_intake_is_transactional_and_name_buffers_cannot_apply ... ok
+test a_failed_persistent_save_cannot_produce_an_application_choice ... ok
+test editing_a_builtin_forks_preserving_fields_and_saved_choice_requires_actual_save ... ok
+test matching_saved_user_opens_in_place_but_external_collision_gets_a_fresh_copy ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.04s
+
+     Running tests/interchange.rs (/Users/markik/Code/targets/knot-tabard-apps/debug/deps/interchange-49f27a75dc2f056d)
+
+running 19 tests
+test host_owned_export_paths_preserve_existing_and_missing_files_without_a_library ... ok
+test newly_protected_paths_are_checked_again_before_export_replacement ... ok
+test protected_storage_directories_cover_future_files_and_recheck_replacement ... ok
+test non_unicode_editor_paths_cannot_skip_case_alias_protection ... ok
+test filenames_are_safe_and_exports_cannot_replace_library_or_preferences ... ok
+test missing_editor_files_are_protected_through_symlinked_parent_aliases ... ok
+test corrupt_utf8_cancelled_and_multiple_file_imports_preserve_current_editor ... ok
+test directory_export_guard_protects_aliases_and_owned_symlink_entries ... ok
+test pending_edits_block_import_and_delete_without_losing_the_text ... ok
+test imported_collision_and_builtin_become_unsaved_copies_without_replacing_sources ... ok
+test draft_export_is_a_snapshot_and_collision_replacement_is_explicit ... ok
+test deleting_last_user_retains_builtins_and_pristine_copies_cannot_be_deleted ... ok
+test editor_destinations_are_protected_through_case_variants_before_and_after_save ... ok
+test failed_replace_keeps_pending_artifact_and_allows_retry ... ok
+test strict_mode_exports_match_preview_and_refuse_authored_sheet_projection ... ok
+test delete_confirmation_and_failed_persistence_preserve_current_library ... ok
+test a_remembered_custom_mode_requires_a_preserved_authored_sheet ... ok
+test remembered_selection_and_preview_mode_survive_without_activating_host_theme ... ok
+test removing_custom_stylesheet_by_apply_or_clear_restores_and_remembers_authored_default ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.59s
+
+     Running tests/native_preview_render.rs (/Users/markik/Code/targets/knot-tabard-apps/debug/deps/native_preview_render-574e822335f62f03)
+
+running 2 tests
+test production_reader_and_css_previews_share_one_gpu_with_retained_original_copies ... ignored, requires a real GPU; run explicitly with an external process timeout
+test pixel_precision_allowance_rejects_larger_or_more_widespread_changes ... ok
+
+test result: ok. 1 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/portable_capture.rs (/Users/markik/Code/targets/knot-tabard-apps/debug/deps/portable_capture-6d486e32fc84afed)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/release_device_rehydration.rs (/Users/markik/Code/targets/knot-tabard-apps/debug/deps/release_device_rehydration-83a46d47bd19e2ba)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/release_host_acceptance.rs (/Users/markik/Code/targets/knot-tabard-apps/debug/deps/release_host_acceptance-233499ce8acee4d6)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/shared_components.rs (/Users/markik/Code/targets/knot-tabard-apps/debug/deps/shared_components-f33b493a7ae1f5c5)
+
+running 4 tests
+test canonical_modes_retheme_shared_runs_without_rewriting_the_source ... ok
+test workshop_code_is_actual_readonly_rust_with_illume_runs ... ok
+test graph_native_selection_is_preview_state_and_never_saves_a_theme ... ok
+test reader_mount_keeps_the_extracted_source_across_modes_and_seed_edits ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.11s
+
+     Running tests/shared_device_loss.rs (/Users/markik/Code/targets/knot-tabard-apps/debug/deps/shared_device_loss-f30e2690135b34b2)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/stylesheet.rs (/Users/markik/Code/targets/knot-tabard-apps/debug/deps/stylesheet-fc2f7b1da15cc655)
+
+running 6 tests
+test appearance_edits_leave_source_and_accessible_content_unchanged ... ok
+test invalid_rules_report_real_diagnostics_and_valid_rules_still_render ... ok
+test exact_author_css_resolves_in_its_own_document ... ok
+test media_prefers_color_scheme_follows_explicit_preview_mode ... ok
+test derived_mode_variables_paint_the_actual_application_roles ... ok
+test fonts_resolve_per_role_without_restyling_the_neighbor_and_author_css_wins ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.33s
+
+     Running tests/surface.rs (/Users/markik/Code/targets/knot-tabard-apps/debug/deps/surface-67e54eeba16d0878)
+
+running 8 tests
+test native_accessibility_announces_named_controls_and_their_hit_boxes ... ok
+test a_failed_save_keeps_the_draft_and_does_not_register_a_saved_theme ... ok
+test all_four_mode_controls_change_the_rendered_specimens ... ok
+test pointer_seed_edit_updates_the_specimen_and_history_without_activating_it ... ok
+test native_keyboard_reaches_edits_and_can_undo_them ... ok
+test locked_harmony_explains_dependent_hues_and_keeps_other_channels_editable ... ok
+test save_and_reopen_keep_authored_data_and_protect_built_ins ... ok
+test pending_native_text_is_synchronized_before_controls_replace_or_guard_the_draft ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.11s
+
+     Running tests/usability.rs (/Users/markik/Code/targets/knot-tabard-apps/debug/deps/usability-3de7ae53296ac1a0)
+
+running 7 tests
+test visible_chrome_and_syntax_font_roles_change_without_styling_the_editor ... ok
+test every_text_field_lays_out_at_its_authored_height ... ok
+test generic_font_buttons_select_the_exact_family_despite_shared_name_substrings ... ok
+test applying_a_color_keeps_staged_font_input_until_its_own_action ... ok
+test incomplete_hex_blocks_save_and_navigation_and_undo_keeps_authored_alpha ... ok
+test applied_css_is_isolated_and_save_reopen_keeps_exact_css_and_default_mode ... ok
+test font_controls_are_retained_guard_invalid_input_and_save_reopen ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.82s
+

@@ -77,7 +77,13 @@ impl Theme {
     pub fn presentation_for_mode(&self, mode: &Mode) -> Result<ThemePresentation, ModeExportError> {
         if let Some(rules) = self.mode_sheet(mode) {
             validate_definition(self).map_err(ModeExportError::InvalidTheme)?;
-            return Ok(ThemePresentation::AuthoredStylesheet(rules.clone()));
+            let mut sheets = Vec::new();
+            let fonts = self.typography.css_custom_properties();
+            if !fonts.is_empty() {
+                sheets.push(fonts);
+            }
+            sheets.extend(rules.clone());
+            return Ok(ThemePresentation::AuthoredStylesheet(sheets));
         }
         if matches!(mode, Mode::Custom(_)) {
             validate_definition(self).map_err(ModeExportError::InvalidTheme)?;

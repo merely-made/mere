@@ -166,6 +166,43 @@ impl mesquite::Product for EditorLane {
         let state = ctx.runner.state();
         ProbeSnapshot::default()
             .with_field("name", state.draft_theme().name.clone())
+            .with_field("font_role", state.font_role().key())
+            .with_field(
+                "font_family",
+                state.text_field("font-family").unwrap().text(),
+            )
+            .with_field("font_size", state.text_field("font-size").unwrap().text())
+            .with_field(
+                "font_line_height",
+                state.text_field("font-line-height").unwrap().text(),
+            )
+            .with_field(
+                "font_catalog",
+                if state
+                    .installed_font_families()
+                    .is_some_and(|names| !names.is_empty())
+                {
+                    "ready"
+                } else {
+                    "unavailable"
+                },
+            )
+            .with_field(
+                "font_diagnostics",
+                if state.font_diagnostics().is_empty() {
+                    "none"
+                } else {
+                    "fallback"
+                },
+            )
+            .with_field(
+                "paragraph_size",
+                state
+                    .stylesheet_preview()
+                    .borrow()
+                    .computed_style("preview-paragraph", "font-size")
+                    .unwrap_or_default(),
+            )
             .with_field("mode", state.mode_key())
             .with_field("dirty", state.is_dirty().to_string())
             .with_field("theme", state.draft_theme().id.clone())
@@ -211,6 +248,17 @@ mod tests {
     use super::*;
     use cambium_genet_winit_host::{CloseRequest, Harness};
     use taproot::Selector;
+
+    #[test]
+    fn typography_native_scenarios_use_supported_shared_probe_verbs() {
+        for source in [
+            include_str!("scenarios/typography.scn"),
+            include_str!("scenarios/typography_reopen.scn"),
+            include_str!("scenarios/typography_fallback.scn"),
+        ] {
+            taproot::Scenario::parse(source).expect("shared typography scenario parses");
+        }
+    }
 
     #[test]
     fn editor_exports_preserve_the_application_choice_bytes_and_allow_other_destinations() {

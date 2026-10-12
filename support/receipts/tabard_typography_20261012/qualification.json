@@ -1,0 +1,394 @@
+{
+  "scope": "Shared authored typography, retained controls/previews and Pelt ordinary chrome; bounded macOS Intel native acceptance",
+  "native_source": "184c854505be5ca4c5cee46047e52d5cde32d99e",
+  "native_binary_sha256": "be431b983eb7e0e21af9cd8f286b92719e7a50f740463d715eecb701d8f0bf70",
+  "merged_renderer_publication": "be9b97da0a888e7083f99d5c15899a6f08d4937c",
+  "merged_source": "121c1925566c7df1ba8fb63c37151fe9ec70e946",
+  "native_runs": [
+    {
+      "label": "native-author",
+      "presented": 101,
+      "scenario_captures": 11,
+      "blank": 0,
+      "browser_capture": "browser.png",
+      "process": {
+        "launch_method": "LaunchServices temporary application bundle",
+        "launcher_exit": 0,
+        "timeout": false,
+        "success": true,
+        "elapsed_seconds": 70.932,
+        "binary_sha256": "be431b983eb7e0e21af9cd8f286b92719e7a50f740463d715eecb701d8f0bf70",
+        "scenario_sha256": "97a482d165d9d32a2a8c77387616bcf5b77eeb657d9a40fcc4e7ab7a0b2bf8a3",
+        "receipt": "scenario.done",
+        "captures": 12
+      },
+      "computed_css": [
+        "pelt-typography role=interface class=pelt-address family=Some(\"serif\") size=Some(\"15px\") line-height=Some(\"1.2\")"
+      ]
+    },
+    {
+      "label": "native-reopen",
+      "presented": 40,
+      "scenario_captures": 5,
+      "blank": 0,
+      "browser_capture": "browser.png",
+      "process": {
+        "launch_method": "LaunchServices temporary application bundle",
+        "launcher_exit": 0,
+        "timeout": false,
+        "success": true,
+        "elapsed_seconds": 33.832,
+        "binary_sha256": "be431b983eb7e0e21af9cd8f286b92719e7a50f740463d715eecb701d8f0bf70",
+        "scenario_sha256": "f3cc065c2a11782da43db0e4d0a0c018004fabc47bea80edbe886cf4154190fc",
+        "receipt": "scenario.done",
+        "captures": 6
+      },
+      "computed_css": [
+        "pelt-typography role=interface class=pelt-address family=Some(\"serif\") size=Some(\"15px\") line-height=Some(\"1.2\")"
+      ]
+    },
+    {
+      "label": "native-fallback",
+      "presented": 21,
+      "scenario_captures": 2,
+      "blank": 0,
+      "browser_capture": "browser.png",
+      "process": {
+        "launch_method": "LaunchServices temporary application bundle",
+        "launcher_exit": 0,
+        "timeout": false,
+        "success": true,
+        "elapsed_seconds": 24.623,
+        "binary_sha256": "be431b983eb7e0e21af9cd8f286b92719e7a50f740463d715eecb701d8f0bf70",
+        "scenario_sha256": "b5142e12d43bd088f4a379054275722f027d9fc78c0c4923befba7c3febe2e16",
+        "receipt": "scenario.done",
+        "captures": 3
+      },
+      "computed_css": [
+        "pelt-typography role=interface class=pelt-address family=Some(\"\\\"Tabard unavailable receipt face\\\", sans-serif\") size=Some(\"15px\") line-height=Some(\"1.2\")",
+        "pelt-typography fallback-notice=Interface: Tabard unavailable receipt face is not installed on this device; sans-serif is the fallback."
+      ]
+    }
+  ],
+  "totals": {
+    "processes": 3,
+    "presented": 162,
+    "scenario_captures": 18,
+    "browser_captures": 3,
+    "blank": 0
+  },
+  "manual_review": [
+    "native-author/interface_authored.png",
+    "native-author/authored_stylesheet.png",
+    "native-author/narrow_editor.png",
+    "native-author/narrow_reader.png",
+    "native-author/reading_undone.png",
+    "native-author/reading_authored.png",
+    "native-author/browser.png",
+    "native-reopen/discarded_previews.png",
+    "native-fallback/unavailable_family_editor.png",
+    "native-fallback/browser.png"
+  ],
+  "durability": {
+    "library_and_choice_bytes_unchanged_after_reopen_and_discard": true,
+    "fallback_copy_preserved_requested_family_and_choice": true,
+    "interface_family": "serif",
+    "interface_size_px": 15,
+    "interface_line_height": 1.2,
+    "reading_family": "Georgia",
+    "reading_size_px": 24,
+    "reading_line_height": 1.7
+  },
+  "preserved_host_authority": [
+    "held controller and session identity",
+    "address and history",
+    "focused tile and tile count",
+    "content aperture",
+    "Save versus Apply separation"
+  ],
+  "bounds": [
+    "Pelt loaded-document sessions retain engine-owned appearance; no Reading application binding",
+    "Code has no ordinary Pelt chrome binding",
+    "Named-family availability/computed CSS is not exact glyph or frozen/remote face fidelity",
+    "No font packaging/download, global minimum size, typed DTCG typography or OS VoiceOver qualification",
+    "Other consumer font-role adoption remains separate"
+  ],
+  "merged_native_scope": "Native receipt belongs to frozen184c85450. Renderer publication adds gated standalone recovery controls, copied producer identities, and old GPU handle drops only on device-loss branches; reviewed and separately qualified by its owner. Combined source gets CPU/build/boundary verification, not an invented native rerun.",
+  "files": {
+    "native-author/authored_previews.png": {
+      "sha256": "51621c0398a145994edd4d8b3b629ae2f21e0e8d43ca35c7fa0ca6d7e58fa010",
+      "bytes": 769679,
+      "size": [
+        2360,
+        1600
+      ]
+    },
+    "native-author/authored_stylesheet.png": {
+      "sha256": "a95050e5dfebdb12ad1ac1012b3f3aaa2b641427ef826e31c8a0d67495445910",
+      "bytes": 690660,
+      "size": [
+        2360,
+        1600
+      ]
+    },
+    "native-author/browser.png": {
+      "sha256": "64c6d6882a87a0a6b3ea720af92acb3d59ccfbb524416e1f9f12d07304ca1f96",
+      "bytes": 155352,
+      "size": [
+        1180,
+        800
+      ]
+    },
+    "native-author/initial_editor.png": {
+      "sha256": "e4e79ad8577fc005318b7299cdcb8493009650e90993b9d8605cf8edac0cdc50",
+      "bytes": 742330,
+      "size": [
+        2360,
+        1600
+      ]
+    },
+    "native-author/interface_authored.png": {
+      "sha256": "29a57bce38b6627e17b7dbf28f4733dc4e8cf37cd4121e4c3191a63780eb0452",
+      "bytes": 788141,
+      "size": [
+        2360,
+        1600
+      ]
+    },
+    "native-author/invalid_size.png": {
+      "sha256": "3255947eb8143f1b03539613b2e25125ab882504c276a3e3350f8971bb880635",
+      "bytes": 773651,
+      "size": [
+        2360,
+        1600
+      ]
+    },
+    "native-author/launcher.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "native-author/narrow_editor.png": {
+      "sha256": "6b606b668788e64fa51a41ab8c8330b758da8346066683bbed03f275cabba162",
+      "bytes": 343702,
+      "size": [
+        1280,
+        1560
+      ]
+    },
+    "native-author/narrow_previews.png": {
+      "sha256": "5def981d8660d87ab9693943e4c4c5bcdaa8d7f413d47f963192156c7d8a03e9",
+      "bytes": 333591,
+      "size": [
+        1280,
+        1560
+      ]
+    },
+    "native-author/narrow_reader.png": {
+      "sha256": "8cc4124612d9700d261366c2a70ed96d3697ff3650e3cff5aeb71374aa2d8bc6",
+      "bytes": 368402,
+      "size": [
+        1280,
+        1560
+      ]
+    },
+    "native-author/native.log": {
+      "sha256": "5b72109ea34b55b450c297a14fe693866856a51c4c3bfcefe08dce93fec33c20",
+      "bytes": 1865
+    },
+    "native-author/process.json": {
+      "sha256": "2e111c1841dbb2228e098274c8da330f7bb5bc28942084ee79635e5ee435fe4c",
+      "bytes": 383
+    },
+    "native-author/reading_authored.png": {
+      "sha256": "29b591df46ca4265e191a8d08f8c23f43bec08baf9430c966a41ef012c2410a6",
+      "bytes": 769679,
+      "size": [
+        2360,
+        1600
+      ]
+    },
+    "native-author/reading_undone.png": {
+      "sha256": "25db274ad28a33b262bc63579016fddcd361e361a4e3c855c884e3d42cd6c751",
+      "bytes": 798470,
+      "size": [
+        2360,
+        1600
+      ]
+    },
+    "native-author/saved_editor.png": {
+      "sha256": "6df78fc4ea8df9bd1247d156505b9d3c9714278c4feed9824bc1179079bdb697",
+      "bytes": 679318,
+      "size": [
+        2360,
+        1600
+      ]
+    },
+    "native-author/scenario.done": {
+      "sha256": "bb9b66277116204ea8a574a896cb29dc45ce02bb0b6516f38932a18cb78ce3ef",
+      "bytes": 2168
+    },
+    "native-reopen/browser.png": {
+      "sha256": "3e59583cb2f58b361051ab313b8c80d24b179b4ec698a7aca173c2fa5d5136f3",
+      "bytes": 155352,
+      "size": [
+        1180,
+        800
+      ]
+    },
+    "native-reopen/discarded_previews.png": {
+      "sha256": "9e69ba87d694e5ff4fb58b709db53eb00f40106e64206abfef84a1a675a780a0",
+      "bytes": 706003,
+      "size": [
+        2360,
+        1600
+      ]
+    },
+    "native-reopen/launcher.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "native-reopen/native.log": {
+      "sha256": "55407391cf2f3d180a25139dc0713ed431df3cda88c9eb11b11716c76ea202e6",
+      "bytes": 1641
+    },
+    "native-reopen/process.json": {
+      "sha256": "caa544ea2b8f529000e5dd0ebfeb2c84ec9abd54652742a895dda43172e18cfd",
+      "bytes": 382
+    },
+    "native-reopen/reopened_interface.png": {
+      "sha256": "5d4c2c6c3b39bd60700246b8230fb0bd0b86696a7b263c1a3408cf3ca199fe8f",
+      "bytes": 754847,
+      "size": [
+        2360,
+        1600
+      ]
+    },
+    "native-reopen/reopened_previews.png": {
+      "sha256": "a808796b5dea4d02ec69b463e5dd5b98cb80017a295caebfa0442a40208a002a",
+      "bytes": 754846,
+      "size": [
+        2360,
+        1600
+      ]
+    },
+    "native-reopen/reopened_reading.png": {
+      "sha256": "245941f2df614e4cd72212e18b84e26b3555d0d67ee4a5b1e1c28929ed9b01aa",
+      "bytes": 754846,
+      "size": [
+        2360,
+        1600
+      ]
+    },
+    "native-reopen/reset_previews.png": {
+      "sha256": "e15207a24f59fa5e45bc9abba24ed08f7b38cc61e365fe634db2359ff4c6bdfd",
+      "bytes": 823646,
+      "size": [
+        2360,
+        1600
+      ]
+    },
+    "native-reopen/scenario.done": {
+      "sha256": "6185b5b1ab9946e5bb0738da2291e5cb221a52b4439b33f8cce1d94056f385da",
+      "bytes": 1117
+    },
+    "native-fallback/browser.png": {
+      "sha256": "c8f50033b9531f9a4117b58d932879ca64be1111031a8e01b5c608012e0a1c36",
+      "bytes": 166077,
+      "size": [
+        1180,
+        800
+      ]
+    },
+    "native-fallback/fallback_previews.png": {
+      "sha256": "bfae1a616da97c54b4e06b45b9aa1b7cdba42080f9e91a544d9b26c9446ac0c6",
+      "bytes": 708791,
+      "size": [
+        2360,
+        1600
+      ]
+    },
+    "native-fallback/launcher.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "native-fallback/native.log": {
+      "sha256": "1b8074e6f608daeb33afab58eb0a29761bf9a657e6110ca8bc672bc898f85bee",
+      "bytes": 1713
+    },
+    "native-fallback/process.json": {
+      "sha256": "9dcfbdee25948797193d25a6afe27844e2460811176d25c93b5cb11c82676575",
+      "bytes": 382
+    },
+    "native-fallback/scenario.done": {
+      "sha256": "8a053b48a2b82c0b7c3dc9d128d93bfb7f3ee06ff232de7a0feea407701bb84a",
+      "bytes": 598
+    },
+    "native-fallback/unavailable_family_editor.png": {
+      "sha256": "d7820752bb9cc4d7bf14ac12863a23b83619f25823b282969678daa0b8e8d9af",
+      "bytes": 708791,
+      "size": [
+        2360,
+        1600
+      ]
+    },
+    "cpu/baseline-table.json": {
+      "sha256": "6a04079f187ba79ede35fe716da18987eacb7ab4b4bb69e78d878618bee21765",
+      "bytes": 582
+    },
+    "cpu/baseline-table.log": {
+      "sha256": "7e9c321c8f27fb45f7e1ffb9412d0cfd751de4f34402b110424a91b6f47d7f53",
+      "bytes": 5681
+    },
+    "cpu/coherent-table-test.log": {
+      "sha256": "7faa27d0641648a9e0bde127edad2567c62ddafca85ab7f73a6c40616d4c3a5c",
+      "bytes": 4023
+    },
+    "cpu/font-precedence.log": {
+      "sha256": "69f60122e87056296e3ef05c57b736397993704a733395d85d9ecd582af47c9b",
+      "bytes": 4622
+    },
+    "cpu/generic-font-selector.log": {
+      "sha256": "ec523669ae1750487a73e34c1ad3e298ffe7c5f5c98b5797fd42e34796fe1135",
+      "bytes": 5329
+    },
+    "cpu/merged-doc-audit.json": {
+      "sha256": "d4b79b78f169444f323527db878d30507a29cb6c465d1cc906ed3dfb20da5fa0",
+      "bytes": 9354
+    },
+    "cpu/merged-doc-judgment.json": {
+      "sha256": "8b8a0c14cc38f219a5a88a9bde7ff81e9984e0f1a67964bd5dbdba271365ddfb",
+      "bytes": 9531
+    },
+    "cpu/merged-pelt-build.log": {
+      "sha256": "89492b2b7cc7a3bc627b28d506dcf2fb99a168a5e77f21a889621cfe69cee9ad",
+      "bytes": 5501
+    },
+    "cpu/merged-pelt-tests.log": {
+      "sha256": "39fc987d3038e8d75290c817a733e8cb6122164a6a1a7c0e6a18f709112447a8",
+      "bytes": 12885
+    },
+    "cpu/merged-port-boundaries.log": {
+      "sha256": "ed6e8e6214358ac43d6f72e8549446b5ce8170b62a9813b557dc1d130eb24186",
+      "bytes": 58
+    },
+    "cpu/merged-shared-tests.log": {
+      "sha256": "1ca3a45be6c9e2071f9b7b05e3d40ce3d39c73a2cf0d82e16b5d1101a683cd14",
+      "bytes": 29173
+    }
+  },
+  "cpu": {
+    "shared_passed": 252,
+    "pelt_passed": 75,
+    "shared_ignored_gpu": 1,
+    "known_table_exclusion": "layout::tests::normal_width_table_wraps_unbroken_link_inside_its_cell",
+    "build": "production Pelt passed after renderer merge",
+    "boundary": "passed after renderer merge",
+    "doc_source_headers": "all owned headers pass",
+    "doc_baseline": "Inherited broken references and D2 snapshot digest/three uncovered paths retained; scoped plan/index judgment added."
+  },
+  "merged_binary": {
+    "source_commit": "121c1925566c7df1ba8fb63c37151fe9ec70e946",
+    "sha256": "1521b4a5036e450e75e79ea25a67da141f1ffeb14faca28ef7834f963bcde879",
+    "native_executed": false
+  }
+}

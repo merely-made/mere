@@ -3449,3 +3449,84 @@ fn native_appearance_reveal_uses_the_production_wheel_and_physical_pointer_route
     );
     assert_eq!(app.workspace.content_rect(tile), aperture);
 }
+
+#[test]
+fn application_font_requests_override_theme_defaults_but_exact_author_css_remains_last() {
+    use tabard::theme::choice::ThemeChoiceStore;
+    use tabard::{FontFamily, FontRole, ThemeFontStyle};
+    let temporary = tempfile::tempdir().unwrap();
+    let library = temporary.path().join("themes.json");
+    let registry = tabard::theme::registry::ThemeRegistry::default();
+    let mut theme = tabard::Theme::new(
+        "theme:pelt-font-precedence",
+        "Font precedence",
+        registry
+            .theme_def(tabard::theme::registry::THEME_ID_DEFAULT)
+            .unwrap()
+            .seeds,
+    );
+    theme.typography.0.insert(
+        FontRole::Interface,
+        ThemeFontStyle {
+            family: Some("monospace".into()),
+            size_px: Some(15.0),
+            line_height: Some(1.2),
+        },
+    );
+    theme.typography.0.insert(
+        FontRole::Label,
+        ThemeFontStyle {
+            family: Some("monospace".into()),
+            ..Default::default()
+        },
+    );
+    theme.mode_sheets.insert(
+        "custom:defaults".into(),
+        vec![".pelt-toolbar { background: #713f92; }".into()],
+    );
+    theme.mode_sheets.insert(
+        "custom:exact".into(),
+        vec![".pelt-address { font-family: cursive; font-size: 17px; }".into()],
+    );
+    tabard::library::ThemeLibraryStore::load(&library)
+        .unwrap()
+        .save(&[theme.clone()])
+        .unwrap();
+    for (mode, expected_family, expected_size) in
+        [("defaults", "serif", "15px"), ("exact", "cursive", "17px")]
+    {
+        let selection = temporary.path().join(format!("{mode}.json"));
+        let mut choice = tabard::theme::choice::ThemeChoice::new(
+            &theme.id,
+            Some(tabard::theme::registry::Mode::Custom(mode.into())),
+        );
+        choice
+            .fonts
+            .0
+            .insert(FontRole::Interface, vec![FontFamily::new("serif").unwrap()]);
+        let mut store = crate::load_appearance_store(&selection).unwrap();
+        store.set_choice(choice.clone()).unwrap();
+        let mut app = authored_appearance_app(&library, store);
+        compose_authored_appearance(&mut app);
+        assert_eq!(
+            app.frisket
+                .chrome_computed_style("pelt-address", "font-family")
+                .as_deref(),
+            Some(expected_family)
+        );
+        assert_eq!(
+            app.frisket
+                .chrome_computed_style("pelt-address", "font-size")
+                .as_deref(),
+            Some(expected_size)
+        );
+        assert_eq!(
+            app.frisket
+                .chrome_computed_style("pelt-status", "font-family")
+                .as_deref(),
+            Some("monospace"),
+            "an Interface request must not override the Label default"
+        );
+        assert_eq!(app.appearance.store().choice(), &choice);
+    }
+}

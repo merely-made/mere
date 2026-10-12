@@ -46,9 +46,10 @@ pub mod producer;
 pub use producer::{
     PortableCaptureError, PortablePaintCapture, PortableProducerError, ProducedAction,
     ProducedScene, ProducedTexture, ProducerAction, ProducerContext, ProducerError,
-    ProducerFrameInfo, ProducerFrameStats, ProducerNode, ProducerRegistrationError,
-    ProducerRegistry, ProducerRenderFailure, ProducerRole, ProducerSemantics, ProducerSource,
-    ResolvedAppearance, SourceAlpha, SourceEncoding, TextureProducer,
+    ProducerFrameInfo, ProducerFrameStats, ProducerImageIdentity, ProducerNode,
+    ProducerRegistrationError, ProducerRegistry, ProducerRenderFailure, ProducerRole,
+    ProducerSemantics, ProducerSource, ResolvedAppearance, SourceAlpha, SourceEncoding,
+    TextureProducer,
 };
 
 /// The host's clock.
