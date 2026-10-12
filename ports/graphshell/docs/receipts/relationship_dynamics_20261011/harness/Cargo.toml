@@ -1,0 +1,15 @@
+[package]
+name="relationship-dynamics-qualification"
+version="0.1.0"
+edition="2024"
+[workspace]
+[dependencies]
+scenograph={path="../../../../../../crates/cambium/scenes/scenograph"}
+edit-history={path="../../../../../../crates/cambium/edit-history"}
+muniment={path="../../../../../../crates/eidetic/muniment"}
+serde={version="1",features=["derive"]}
+serde_json="1"
+uuid={version="1",features=["v4","serde"]}
+pollster="0.4"
+mere={path="../../../../../../crates/mere",default-features=false,features=["graph"]}
+kernel={package="mere-kernel",path="../../../../../../crates/graph/graph-kernel"}

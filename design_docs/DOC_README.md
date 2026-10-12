@@ -57,6 +57,10 @@ qualification remains pending in its receipt. The
 adds disclosed held-owner bindings and opt-in saved subdivision rules. Thirty-one
 native checks and the product wasm check pass; Canvas native and headed
 qualification remain handoff gates. Other effects retain their renderer owners.
+The [relationship/dynamics inspector draft](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#relationship-and-dynamics-inspector-draft-2026-10-11)
+adds exact-target reads of live stages, topology inputs and placement constraints;
+38 portable native checks and the product wasm check pass. Canvas native and
+headed cases remain open; missing force/derivation evidence is disclosed.
 
 Primary data model (2026-10-11): the
 [family composition brief §8](2026-08-12_family_composition_thesis_brief.md#8-primary-data-model-clips-and-live-entities-2026-10-11)
