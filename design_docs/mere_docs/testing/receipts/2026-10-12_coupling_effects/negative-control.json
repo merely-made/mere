@@ -1,0 +1,6 @@
+{
+  "control": "incorrect duplicate-target deduplication",
+  "expected_failure": true,
+  "exit_code": 101,
+  "restored_source_sha256": "b8d6c033c9bc97088b502c56f660ebbab98102e1a257d887b117289f5ea8e203"
+}

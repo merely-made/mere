@@ -41,6 +41,17 @@ The final focused suite passes 80 tests and all 16 final native captures are
 reviewed. The complete camera box is visible after playback actions at both
 native sizes, with preserved Keep/undo/redo pose identity and unchanged source.
 This remains Knot-owned presentation, not a new force policy or consumer repin.
+The [completion/refusal follow-up at Knot `e944fca`](https://github.com/merely-made/knot-editor/blob/e944fca/docs/receipts/2026-10-11_dynamics_status/README.md)
+uses the pinned controller's end result to distinguish pause, rest, completion
+and refusal. Step is guarded after completion/refusal; ordinary pauses resume,
+while explicit Play rebinds completed/refused runs from authored placement.
+A failed tick preserves the last valid displayed pose. Its separate Windows
+qualification has 84 focused passing tests and 18 reviewed native captures;
+the authored 120-tick schedule finishes without implying physical rest, and
+Keep/Undo/Redo preserve its exact final pose. No new whole-workspace or shared
+supplier receipt is claimed. Mark's private-Firefox retry found the existing
+private window, but the same URL-policy block stopped inspection; Firefox
+remains unqualified while blocked.
 
 Three pieces of ruled work, each with done-conditions in its plan. Read the
 plan sections first; they hold Mark's rulings verbatim, and those govern.
@@ -154,6 +165,21 @@ handled before building the adapter. An explanation should distinguish declared,
 eligible, evaluated, applied, refused and unsupported effects without claiming
 that an unknown response executed. These are review requirements and proposed
 contract inputs, not a new serialized schema or measured runtime receipt.
+
+**Coupling evaluation continuation (2026-10-12):** Mark authorized continuing
+dynamics-related plans with implemented/tested drafts. Seiche now exposes
+`CouplingForce::evaluate_at`, a report-only point evaluation of the current
+response, and the executor consumes that same evaluation. Additive force,
+velocity scaling, velocity assignment and displacement are distinct; inert
+reasons disclose captured-target mismatch, field type, positive-region boundary,
+non-dynamic advection hold and unsupported physical responses. Sampling still
+uses time zero. This replaces the missing evaluation API, not the missing
+stable field/coupling/occurrence provenance or applied-effect trace.
+The [engine draft receipt](../testing/receipts/2026-10-12_coupling_effects/README.md)
+records the original-executor trajectory comparison, the failing deduplication
+control, read-only query checks, runnable real integration and its qualification
+boundaries. Membership, clocks, event execution and conflicting writers remain
+open. The point probe invokes no applet and changes no graph assertion.
 
 ## Ruled continuation, 2026-10-10
 
@@ -460,8 +486,9 @@ turning the sandbox's mode labels into the scene model.
 **Workspace rules for this continuation:** Mark's current workspace
 instructions supersede the historical worktree/build-directory paragraph below.
 Use main unless an actual concurrent collision requires isolation, and reuse
-`C:/t/cargo-targets/mere`. No dynamics worktree or isolated Cargo home has been
-created.
+`C:/t/cargo-targets/mere`. No dynamics implementation worktree or isolated Cargo
+home has been created. Temporary documentation checkouts preserve concurrent
+primary work and are removed after their own amendments are published.
 The temporary browser tab and receipt server were closed, and the generated
 Node bindings were removed after the identity gate. Receipts and the reusable
 probe remain under the existing testing directory. The shared Mere target and

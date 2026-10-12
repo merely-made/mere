@@ -1550,6 +1550,17 @@ regression, focused composition tests and native wide/compact receipts qualify
 that change separately; the earlier full workspace counts retain their own
 source identity. Ordinary scrolling does not repeatedly reveal the preview.
 
+The [completion/refusal follow-up at Knot `e944fca`](https://github.com/merely-made/knot-editor/blob/e944fca/docs/receipts/2026-10-11_dynamics_status/README.md)
+then discloses the pinned controller's pause, rest, completion and refusal
+states. Step is guarded after completion/refusal. Play resumes an ordinary
+pause, but rebinds a completed/refused controller from authored positions;
+a failed tick preserves the last valid displayed pose. Its 84 focused tests
+and 18 reviewed wide/compact native captures qualify this consumer feedback
+separately. The 120-tick authored schedule finishes without asserting physical
+rest; deliberate replay and exact final-pose Keep/Undo/Redo remain qualified.
+Runtime status enters neither source facts nor retained recipes. No force,
+dependency pin, new full-workspace receipt or F ruling changes here.
+
 **Review boundary:** Knot uses compiled card footprints in a fixed physics plane,
 then clamps its normalized glyph display to that plane. This is a consumer
 presentation choice, not a physical wall, a glyph collision guarantee or a
@@ -1561,9 +1572,47 @@ separate from foreground/background paint categories.
 
 **Parked gate:** Mark said **"No need to do firefox verification while it’s blocked"**.
 Firefox remains deferred while the Windows helper lacks URL-policy support.
+Mark's subsequent private-window retry found the existing private Firefox
+window, but inspection was stopped by the same browser URL-policy block.
+That retry provides no new Firefox qualification and navigated no user tabs.
 The physics coordinator's independent review remains open. The Windows Computer
 Use helper stopped Firefox inspection because URL
 policy enforcement is unsupported for that browser; no browser-policy bypass
 was attempted. Coordinator-owned Mere/Knot and Djinn/Knot-site adoption pins
 remain unchanged. This bounded consumer review introduces no F ruling and does
 not reopen F199's T2/G4b2 work order.
+
+## Coupling effect evaluation draft (2026-10-12)
+
+**Status:** implemented bounded engine draft; final qualification is recorded in
+the [coupling receipt](../testing/receipts/2026-10-12_coupling_effects/README.md).
+Mark authorized continued dynamics-plan implementation and testing. This is the
+visible-contribution seam's report-only foundation, separate from T2/G4b2,
+viewer ownership and host adoption.
+
+**Findings:** `CouplingForce` previously applied each response directly without
+exposing the proposed write. A single generic force or strength explanation
+would misdescribe velocity assignment, multiplicative damping and positional
+advection. Damping ignores coupling strength; the wall is a depth-scaled force,
+not exact positional exclusion. Sampling remains at time zero, and target
+membership is the previously captured selector result.
+
+**Done-conditions and progress:** `CouplingForce::evaluate_at` now reports one
+point's proposed `AddForce`, `ScaleVelocity`, `SetVelocity`, `Displace` or inert
+reason. It carries the configured sample time and leaves simulation state alone.
+The existing executor consumes the same private evaluation, preserving its
+snapshot points, duplicate target applications, write order and body hold test.
+Thirteen original-executor trajectory digests remain unchanged; a deliberately
+incorrect deduplication control fails and the source is restored. The runnable
+kernel-free example separates the proposed write from motion after actual ticks.
+Engine feature, wasm compile and graph-bridge checks retain separate receipts.
+
+**Limits and next adapter:** a point evaluation is not an applied-effect trace,
+aggregate force, complete validator or serialized source fact. The caller still
+needs exact field/coupling/occurrence identity, source revision and body inputs.
+It must disclose missing-reference resolution rather than treating numen's zero
+fallback as proof of valid backing. Actual contribution inspection needs a
+record of the write's execution, with stable provenance and evaluation order.
+Extent eligibility, field clocks, membership events, conflicting state writers
+and applet execution retain their existing policy checkpoints. No new F ruling,
+force-composition policy, dependency pin or UI acceptance is inferred.

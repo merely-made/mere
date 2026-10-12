@@ -1,0 +1,18 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+            https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+            https://github.com/mark-ik/boa.git
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling syn v3.0.6
+   Compiling serde_core v1.0.229
+   Compiling serde v1.0.229
+   Compiling serde_derive v1.0.229
+   Compiling async-trait v0.1.92
+    Checking mere-comms v0.0.1 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/shell/comms)
+    Checking mere-moot v0.0.1 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/ports/moot)
+    Finished `dev` profile [unoptimized] target(s) in 16.87s

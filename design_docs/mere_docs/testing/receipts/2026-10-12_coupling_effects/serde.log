@@ -1,0 +1,255 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling indexmap v2.14.2
+   Compiling serde v1.0.229
+   Compiling uuid v1.27.0
+   Compiling naga-types v30.0.1
+   Compiling naga v30.0.1
+   Compiling wgpu-types v30.0.1
+   Compiling parry2d v0.31.1
+   Compiling wgpu-naga-bridge v30.0.1
+   Compiling wgpu-hal v30.0.1
+   Compiling wgpu-core-deps-windows-linux-android v30.0.1
+   Compiling toml_datetime v0.6.11
+   Compiling serde_spanned v0.6.9
+   Compiling toml_edit v0.22.27
+   Compiling petgraph v0.8.3
+   Compiling numen v0.2.0 (C:\Users\mark_\Code\worktrees\mere-coupling-effects\crates\conatus\numen)
+   Compiling wgpu-core v30.0.1
+   Compiling rapier2d v0.36.0
+   Compiling serde_path_to_error v0.1.20
+   Compiling serde_json v1.0.151
+   Compiling wgpu v30.0.1
+   Compiling toml v0.8.23
+   Compiling seiche v0.0.6 (C:\Users\mark_\Code\worktrees\mere-coupling-effects\crates\conatus\seiche)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 42s
+     Running unittests src\lib.rs (C:\t\cargo-targets\mere\debug\deps\seiche-dd92a925ea6c1057.exe)
+
+running 185 tests
+test affinity_force::tests::attract_only_does_not_push_a_close_pair_apart ... ok
+test affinity_force::tests::a_zero_affinity_pair_exerts_no_force ... ok
+test affinity_force::tests::a_high_affinity_pair_is_pulled_together ... ok
+test anchor_force::tests::empty_anchors_report_empty ... ok
+test anchor_force::tests::negative_stiffness_clamps_to_inert ... ok
+test anchor_force::tests::zero_stiffness_is_inert ... ok
+test affinity_force::tests::clearing_the_force_leaves_the_layout_in_place ... ok
+test barnes_hut::tests::empty_input_yields_no_forces ... ok
+test barnes_hut::tests::coincident_bodies_do_not_infinite_recurse ... ok
+test barnes_hut::tests::far_apart_bodies_repel_less_than_near_ones ... ok
+test barnes_hut::tests::repulsion_pushes_nearby_bodies_apart ... ok
+test compose::tests::a_test_per_currency_pair ... ok
+test compose::tests::a_weighted_mix_takes_force_laws_only ... ok
+test barnes_hut::tests::repulsion_force_separates_bodies_over_a_tick ... ok
+test affinity_force::tests::a_high_affinity_pair_draws_in_more_than_a_low_affinity_pair ... ok
+test compose::tests::every_law_kind_reports_its_currency_from_its_terms ... ok
+test coupling_force::effect_tests::damping_reports_its_factor_without_inventing_strength_scaling ... ok
+test coupling_force::effect_tests::gradient_and_wall_reports_are_forces_not_position_exclusions ... ok
+test coupling_force::effect_tests::sampling_time_and_registry_fallback_match_the_existing_executor ... ok
+test compose::tests::a_kinematic_law_takes_forces_converted_and_a_force_law_integrates_them ... ok
+test coupling_force::effect_tests::unsupported_response_wrong_field_and_unmatched_target_stay_distinct ... ok
+test coupling_force::effect_tests::velocity_assignment_and_advection_have_distinct_hold_behavior ... ok
+test coupling_force::effect_tests::querying_an_installed_coupling_does_not_advance_or_mutate_the_simulation ... ok
+test coupling_force::tests::flow_advect_leaves_a_pinned_body_at_its_kinematic_target ... ok
+test fluid::tests::contacts_push_particles_out_and_report_reaction ... ok
+test fluid::tests::empty_fluid_step_is_a_noop ... ok
+test coupling_force::tests::open_response_applies_no_force ... ok
+test fluid::tests::obb_contact_pushes_particles_out_of_the_box ... ok
+test coupling_force::tests::attract_to_min_centers_like_boundary ... ok
+test grouped::tests::the_inner_law_acts_only_within_a_group ... ok
+test grouped::tests::the_partition_masks_edges_and_builds_the_groups_graph ... ok
+test coupling_force::effect_tests::execution_trajectory_receipt ... ok
+test instruments::tests::a_gradient_passes_and_a_curl_fails_the_descent_test ... ok
+test instruments::tests::linlog_at_exponent_zero_runs_and_descends_its_own_energy ... ok
+test instruments::tests::the_energy_instruments_pass_a_true_energy_and_catch_a_wrong_one ... ok
+test instruments::tests::kinds_seeded_fails_and_symmetrized_passes_on_the_p2_fixture ... ok
+test lagged_tests::an_answer_applies_from_the_step_after_its_positions ... ok
+test lagged_tests::an_answer_for_a_changed_body_set_is_discarded ... ok
+test lagged_tests::an_answer_older_than_the_limit_leaves_the_step_to_the_cpu ... ok
+test lagged_tests::a_refused_device_leaves_the_cpu_run ... ok
+test lagged_tests::an_answer_that_fails_is_counted_and_covered ... ok
+test lagged_tests::lagged_forces_reach_the_bodies_and_respect_the_threshold ... ok
+test laws::anneal::tests::a_pinned_body_stays_at_its_kinematic_target ... ok
+test laws::boids::tests::a_flock_moves_together ... ok
+test laws::anneal::tests::energy_falls_and_the_seed_reproduces ... ok
+test laws::density::tests::a_lone_particle_feels_no_self_flow ... ok
+test fluid::tests::fluid_settles_in_the_basin_and_stays_finite ... ok
+test laws::density::tests::a_crowd_spreads_and_the_heavy_node_gets_room ... ok
+test laws::density::tests::jacobi_diffusion_matches_the_spectral_reference ... ok
+test laws::density::tests::a_pinned_body_is_never_moved ... ok
+test laws::density::tests::the_evolving_field_conserves_mass_and_evens ... ok
+test laws::density::tests::the_splat_is_cloud_in_cell_and_conserves_mass ... ok
+test laws::gravity::diag::diag_orbit_candidates ... ignored, diagnostic: prints the candidate fixes' readings
+test laws::gravity::diag::diag_orbit_floor ... ignored, diagnostic: prints the floored Orbit at four dampings
+test laws::gravity::diag::diag_orbit_leading ... ignored, diagnostic: prints the leading candidate's readings
+test laws::gravity::diag::diag_orbit_no_damping ... ignored, diagnostic: prints the ruled Orbit and floored variants at no damping
+test laws::gravity::diag::diag_orbit_p2_detail ... ignored, diagnostic: prints P2's per-seed readings for the tangential candidates
+test laws::gravity::diag::diag_orbit_ruled ... ignored, diagnostic: prints the ruled Orbit over the sweep and at no damping
+test laws::gravity::diag::diag_orbit_sweep ... ignored, diagnostic: prints the candidates over five seeds and both dampings
+test laws::gravity::diag::diag_orbit_sweep_refined ... ignored, diagnostic: prints the refinements over five seeds and both dampings
+test laws::gravity::diag::diag_orbit_terms ... ignored, diagnostic: prints Orbit's term ledger
+test laws::gravity::tests::a_solar_system_never_rests ... ok
+test laws::density::tests::converting_changes_density_alone_on_a_crowded_start ... ok
+test grouped::tests::weight_share_passes_descent_and_reciprocity_and_full_force_fails_on_unequal_groups ... ok
+test laws::hold::tests::a_held_body_stops_where_it_is ... ok
+test laws::hold::tests::overlapping_held_bodies_do_not_explode ... ok
+test laws::kuramoto::tests::communities_become_phase_clusters ... ok
+test laws::kuramoto::tests::the_phase_step_descends_and_balances_in_the_degree_metric ... ok
+test laws::linlog::tests::communities_separate_further_than_under_springs ... ok
+test laws::linlog::tests::diag_energy_scale_on_the_p2_fixture ... ignored, diagnostic: prints the scale readings
+test laws::linlog::tests::linlog_proper_runs_as_a_tuning ... ok
+test laws::linlog::tests::the_fixture_islands_separate_further_than_under_springs ... ok
+test laws::magnetic::tests::a_directed_chain_lines_up_with_the_field ... ok
+test laws::particle_life::tests::a_seeded_matrix_is_reproducible ... ok
+test laws::particle_life::tests::like_kinds_gather_and_unlike_kinds_part ... ok
+test laws::stress::tests::a_path_unrolls_to_its_graph_length ... ok
+test laws::stress::tests::distances_count_hops_along_a_path ... ok
+test observe::tests::group_stress_is_zero_for_a_straight_path_and_not_for_a_folded_one ... ok
+test observe::tests::per_group_stress_forgives_a_group_drawn_at_its_own_scale ... ok
+test observe::tests::separation_reads_apart_groups_high_and_mixed_groups_low ... ok
+test obstacles::tests::a_fixed_obstacle_excludes_a_node_under_the_running_law ... ok
+test obstacles::tests::replacing_obstacles_preserves_nodes_and_living_scene_state ... ok
+test overlays::degree_repulsion::tests::a_hub_clears_room ... ok
+test overlays::depth_gravity::tests::a_tree_reads_top_down ... ok
+test overlays::domain_cluster::tests::groups_gather ... ok
+test overlays::gravity_locus::tests::a_still_locus_draws_the_graph_in ... ok
+test overlays::gravity_locus::tests::a_tidal_locus_never_settles ... ok
+test overlays::grid_snap::tests::bodies_land_on_the_grid ... ok
+test overlays::hub_gravity::tests::host_weights_name_the_hub ... ok
+test laws::gravity::tests::tangential_counter_damping_keeps_the_orbits_bound ... ok
+test query::tests::edge_hit_test_picks_near_segment_only ... ok
+test query::tests::edge_segments_resolves_endpoints ... ok
+test query::tests::rect_select_returns_nodes_and_crossed_edges ... ok
+test roles::tests::a_held_axis_stays_exact_while_the_free_axis_separates ... ok
+test roles::tests::a_held_axis_survives_a_pin_and_release ... ok
+test roles::tests::the_most_specific_scope_wins ... ok
+test overlays::hub_gravity::tests::strays_gather_around_the_hub ... ok
+test runtime::elapsed::tests::actor_elapsed_calls_only_drain_and_send_no_commands ... ok
+test runtime::elapsed::tests::deterministic_calls_still_integrate_exactly_one_step ... ok
+test runtime::elapsed::tests::different_render_rates_integrate_the_same_elapsed_ticks ... ok
+test runtime::elapsed::tests::halt_seed_suspend_and_deterministic_mode_clear_fractional_debt ... ok
+test runtime::elapsed::tests::nominal_sixty_hz_rounding_is_explicit_at_nanosecond_boundary ... ok
+test runtime::elapsed::tests::settling_end_drops_unused_elapsed_including_fraction ... ok
+test runtime::elapsed::tests::stalls_drop_excess_time_and_never_queue_whole_step_debt ... ok
+test runtime::elapsed::tests::zero_limits_drop_whole_steps_and_keep_only_fractional_time ... ok
+test runtime::pause_tests::actor_acknowledges_seed_and_halt_without_a_tick ... ok
+test runtime::pause_tests::halt_stops_perpetual_inline_motion_until_settle ... ok
+test runtime::pause_tests::stale_actor_snapshots_cannot_undo_reseed_or_halt ... ok
+test runtime::speed::tests::a_budget_from_the_display_refresh_rate ... ok
+test runtime::speed::tests::a_seed_snaps_instead_of_gliding_in_slow_motion ... ok
+test runtime::speed::tests::at_real_time_nothing_is_drawn_between ... ok
+test laws::gravity::tests::the_radial_floor_keeps_the_orbits_at_no_damping ... ok
+test runtime::speed::tests::fast_forward_stops_at_the_budget_and_reports_the_speed_it_reached ... ok
+test runtime::actor::tests::actor_syncs_settles_and_emits_snapshots ... ok
+test runtime::speed::tests::resetting_elapsed_time_keeps_a_deterministic_fraction ... ok
+test runtime::speed::tests::slow_motion_draws_every_frame_and_steps_every_fifth ... ok
+test runtime::speed::tests::speeds_clamp_to_the_ruled_range_in_thousandths ... ok
+test runtime::speed::tests::one_trajectory_at_every_speed_and_a_different_dt_differs ... ok
+test runtime::speed::tests::the_actor_draws_between_ticks_in_slow_motion ... ok
+test runtime::speed::tests::the_margin_keeps_a_dearer_tick_inside_the_budget_and_the_grain ... ok
+test runtime::speed::tests::the_report_bounds_only_the_ticks_the_gate_admitted ... ok
+test runtime::speed::tests::uncapped_runs_until_the_budget_is_spent ... ok
+test scale::tests::a_term_whose_declared_weight_is_wrong_fails_the_receipt ... ok
+test scale::tests::boids_cohesion_varies_with_offset_at_contact ... ok
+test scale::tests::every_scaled_term_pushes_with_unit_force_at_its_reference ... ok
+test scale::tests::the_tent_at_contact_reads_its_core_whatever_the_rule ... ok
+test scene_tests::emitter_spawns_then_reaps_to_a_bounded_count ... ok
+test scene_tests::load_scene_falls_under_gravity_while_nodes_float ... ok
+test scene_tests::node_tangibility_toggles_scene_collision ... ok
+test scene_tests::scene_body_is_intangible_to_nodes_and_ignored_by_forces ... ok
+test scene_tests::scene_prop_carries_its_sprite_handle_through_to_the_view ... ok
+test scene_tests::tangible_node_displaces_the_fluid_pool ... ok
+test scene_tests::vortex_field_swirls_scene_bodies ... ok
+test scenes::tests::bridge_sags_under_the_dropped_weight ... ok
+test scenes::tests::catalog_scenes_load_and_report_perpetual ... ok
+test scenes::tests::chain_joints_anchor_the_links ... ok
+test scenes::tests::mixer_motor_spins_the_paddle ... ok
+test scenes::tests::perpetual_drifts_while_settling_scene_comes_to_rest ... ok
+test settle::tests::a_continuous_run_is_bounded_and_a_law_stop_is_distinct ... ok
+test sift::tests::kinds_do_not_disturb_the_existing_axes ... ok
+test sift::tests::the_pairwise_test_is_kinds_intersect_blocks ... ok
+test spec::tests::a_law_that_writes_state_is_refused_where_weights_scale_force ... ok
+test spec::tests::a_required_parameter_or_input_left_out_is_refused_by_name ... ok
+test spec::tests::a_rung_is_reserved ... ok
+test spec::tests::a_seeded_kind_matrix_derives_n_and_a_symmetric_one_e ... ok
+test spec::tests::a_target_keys_group_roles_by_a_groups_channel ... ok
+test spec::tests::a_term_override_reads_absolute_with_a_reference_and_a_multiplier_without ... ok
+test spec::tests::depth_32_is_taken_and_33_refused ... ok
+test spec::tests::derived_fields_come_from_the_declarations ... ok
+test spec::tests::every_raw_kind_declares_what_its_force_declares ... ok
+test spec::tests::numbers_out_of_range_are_refused_not_clamped ... ok
+test spec::tests::omitted_parameters_take_the_constructors_defaults ... ok
+test spec::tests::shapes_the_canvas_cannot_run_are_refused_by_path ... ok
+test spec::tests::the_shapes_the_canvas_runs_derive ... ok
+test spec::tests::unknown_presets_and_terms_fail_by_path ... ok
+test laws::density::tests::passes_stop_on_the_test_or_the_cap_and_a_drag_rearms_them ... ok
+test spec::tests::wire::a_depth_32_chain_round_trips_through_json_text ... ok
+test spec::tests::wire::a_field_on_the_wrong_kind_of_node_is_refused_where_it_sits ... ok
+test spec::tests::wire::a_newer_spec_is_refused_for_its_version_and_an_older_one_stamped ... ok
+test spec::tests::wire::a_hand_written_toml_recipe_reads_with_defaults ... ok
+test spec::tests::wire::json_round_trips_byte_for_byte_and_writes_no_derived_field ... ok
+test spec::tests::wire::toml_round_trips_a_tree_four_deep ... ok
+test spec::tests::wire::unknown_names_are_refused_where_they_sit ... ok
+test tests::boundary_centers_toward_origin ... ok
+test tests::edge_spring_pulls_together ... ok
+test sync::tests::physics_runs_on_abstract_nodes_without_a_graph ... ok
+test tests::empty_simulation_settles_to_rest ... ok
+test tests::hit_test_and_cull_resolve_nodes_by_position ... ok
+test tests::node_collider_lowers_to_the_matching_parry_shape ... ok
+test tests::node_exclusion_pushes_apart ... ok
+test tests::node_exclusion_scales_to_many_nodes ... ok
+test tests::node_queries_handle_orrery_scale ... ok
+test tests::repulsion_solver_output_is_checked_before_rapier_sees_it ... ok
+test tests::repulsion_solver_routes_only_above_threshold ... ok
+test tests::seed_positions_overrides_placement_and_round_trips ... ok
+test tests::seeded_overlap_separates_under_physics ... ok
+test tests::sync_creates_bodies_for_new_nodes ... ok
+test tests::sync_is_idempotent ... ok
+test view::tests::per_node_radius_grows_the_pick_and_cull ... ok
+test view::tests::snapshot_round_trips_and_drag_override_sticks ... ok
+test view::tests::view_edge_picks_match_the_simulation ... ok
+test view::tests::view_node_picks_and_cull_match_the_simulation ... ok
+test runtime::speed::tests::the_actor_keeps_the_trajectory_at_fifty_times ... ok
+test tests::full_layout_settles_separated_and_bounded ... ok
+test runtime::speed::tests::every_force_is_reproducible_run_to_run ... ok
+
+test result: ok. 175 passed; 0 failed; 10 ignored; 0 measured; 0 filtered out; finished in 1.35s
+
+     Running tests\contact_to_fact.rs (C:\t\cargo-targets\mere\debug\deps\contact_to_fact-25ad774854956d56.exe)
+
+running 5 tests
+test the_record_carries_no_trajectory ... ok
+test a_release_inside_mints_exactly_one_fact ... ok
+test facts_replay_with_no_simulation_present ... ok
+test a_pass_through_the_bin_mints_nothing ... ok
+test two_runs_agree_on_the_facts_and_are_never_asked_about_positions ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\gpu_repulsion.rs (C:\t\cargo-targets\mere\debug\deps\gpu_repulsion-b8a6495468eaa36f.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\tactile.rs (C:\t\cargo-targets\mere\debug\deps\tactile-86a8519de23eed4a.exe)
+
+running 4 tests
+test the_live_body_carries_the_material_that_was_set ... ok
+test a_weighted_node_falls_while_a_default_node_hangs ... ok
+test restitution_decides_whether_a_fall_bounces ... ok
+test a_sieve_blocks_its_kinds_and_supports_name_the_holder ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests seiche
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
