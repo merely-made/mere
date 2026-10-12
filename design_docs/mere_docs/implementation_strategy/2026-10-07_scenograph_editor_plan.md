@@ -2055,9 +2055,15 @@ The [Windows receipt](../../../ports/graphshell/docs/receipts/relationship_dynam
 records source hashes and separate native/browser outcomes.
 
 Both incoming scenario scripts now explicitly open Graph tools before revealing
-the inspector controls. The original fresh-origin attempt reached a collapsed
-tools pane and was stopped; it is retained as incomplete evidence. Corrected
-fresh-origin and retained-origin browser qualification is in progress.
+the inspector controls and assert the seeded arrangement's paused state. The
+first script closes the tools overlay and centres its pointer target before
+selecting another access; it asserts the acknowledged address before creating
+the Forme. The earlier occluded click retained Reference notes instead of I2P
+port notes, which the reopen assertion correctly rejected. Capture reveals use
+the existing detail classes rather than an absent DOM heading-role attribute.
+Earlier incomplete and failed attempts are retained. The strengthened fresh-origin
+script passes with I2P port notes actually retained; its fresh-page retained-origin
+qualification is in progress.
 
 #### Field editor delivery integration (2026-10-11)
 
