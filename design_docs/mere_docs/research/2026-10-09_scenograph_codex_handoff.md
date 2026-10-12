@@ -174,12 +174,27 @@ velocity scaling, velocity assignment and displacement are distinct; inert
 reasons disclose captured-target mismatch, field type, positive-region boundary,
 non-dynamic advection hold and unsupported physical responses. Sampling still
 uses time zero. This replaces the missing evaluation API, not the missing
-stable field/coupling/occurrence provenance or applied-effect trace.
+stable field/coupling/occurrence provenance or applied-effect trace at that
+foundation checkpoint; the tracing continuation below supplies the next adapter.
 The [engine draft receipt](../testing/receipts/2026-10-12_coupling_effects/README.md)
 records the original-executor trajectory comparison, the failing deduplication
 control, read-only query checks, runnable real integration and its qualification
 boundaries. Membership, clocks, event execution and conflicting writers remain
 open. The point probe invokes no applet and changes no graph assertion.
+
+**Exact binding and execution continuation (2026-10-12):** the authorized
+[next dynamics draft](../implementation_strategy/2026-10-02_dynamics_grammar_plan.md#exact-coupling-bindings-and-applied-effect-tracing-2026-10-12)
+now retains compiled inputs and graph-supplied field/coupling/member IDs, and
+observes actual writes with immediate body state. It keeps configured row caps,
+truncation counts, binding generations and distinct runtime owners; the actor
+holds one latest result and rejects pre-rebind evidence. The Canvas accessor is
+read-only and requests no ticks. Its graph bodies claim no occurrence identity.
+The current t=0 clock and selector-only target policy are preserved while the
+runtime adapters remain pending. Mark's answers are recorded verbatim as
+F203 to F205: simulation clock with Pause freezing and Reset rewinding;
+reference-point spatial membership including the boundary; initial matches
+reported without entry actions, which start on later transitions. The receipt distinguishes this backend qualification from
+visible UI explanation, external consumer adoption and coordinator review.
 
 ## Ruled continuation, 2026-10-10
 
@@ -499,6 +514,11 @@ the browser package remain available for the open qualification gates.
 - The catalog's addition records: `mere_docs/research/2026-08-15_projection_grammar_catalog.md`, "Addition records". Each promoted primitive needs one.
 
 ## How this lane works (Mark's standing rules)
+
+**Dynamics ruling refresh (2026-10-12):** F203 to F205 are recorded verbatim
+in the dynamics grammar plan. F205 is the latest F ruling in this continuation;
+check the current owner plan before allocating the next number. This does not
+renumber or reopen the separate Scenograph SE lane.
 
 - **Forks go to Mark.** Any decision with more than one defensible answer becomes a question with evidence and options, recommendation first. Record his answer verbatim as the next unused numbered ruling in the owning plan and commit it the same turn. Check the current plan first: SE87 and F199 are the latest at this context refresh, so the next numbers are SE88 and F200. Mark anything beyond his words *Reading, not ruled*.
 - **Evidence before claims.** Check code, counts and paths before writing them down; when evidence contradicts a ruling, reopen it with Mark.
