@@ -1,0 +1,41 @@
+{
+  "source": "91f46146d5c9d3cb492f8e868c00ca12a0b793eb",
+  "final_mere_basis": "631355a2fcbc6d5e88b1b1040d401a0e0b08bfab",
+  "profile": {
+    "opt_level": "s",
+    "lto": "thin",
+    "strip": "symbols",
+    "codegen_units": 1
+  },
+  "sizes": {
+    "wasm": {
+      "raw_bytes": 16834134,
+      "gzip9_bytes": 6378552,
+      "cap_bytes": 3407872,
+      "cap_pass": false,
+      "sha256": "4f1002822598c0f516b46eb97d9805e155cafdb9f9299d8b6b1033011c0cb5b4"
+    },
+    "glue": {
+      "raw_bytes": 120913,
+      "gzip9_bytes": 18730,
+      "cap_bytes": 20480,
+      "cap_pass": true,
+      "sha256": "d720246d640445fdd0af22690ea9c80519bf43fb4b87792864ab5a40796daf55"
+    },
+    "mount": {
+      "raw_bytes": 998,
+      "gzip9_bytes": 588,
+      "cap_bytes": 8192,
+      "cap_pass": true,
+      "sha256": "d36f0c879683b0f18e27d31b67162055fab268377ad04c2d0039f1aaf116419f"
+    },
+    "history": {
+      "raw_bytes": 271932,
+      "gzip9_bytes": 6254,
+      "cap_bytes": 131072,
+      "cap_pass": true,
+      "sha256": "aa3411e8b7eb9d4b145ed895c5330ef3be47c31746a5ac9b61f4f7fe1452289d"
+    }
+  },
+  "live_site_deployed": false
+}
