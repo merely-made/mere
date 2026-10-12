@@ -107,6 +107,7 @@ def validate_binary(path):
 
 
 def prepare(args):
+    require(not output(["git", "ls-files", "-u"]), "finish resolving the merge before packaging")
     if os.environ.get("CARGO_BUILD_TARGET"):
         raise ValueError("Package natively on each host; unset CARGO_BUILD_TARGET.")
     initial = source_hash()
