@@ -105,6 +105,19 @@ pub fn view<S: 'static, A: 'static, F: Fn(&mut S, Intent) + Clone + 'static>(
                     DetailRow::new("Exact manifest", hex(selected.manifest)),
                     DetailRow::new("Schema", &resource.schema),
                     DetailRow::new(
+                        "Local copy",
+                        match &resource.retention {
+                            RetentionRead::Unknown => "Not disclosed".into(),
+                            RetentionRead::Held {
+                                owner_receipt,
+                                retained_at_ms,
+                            } => format!("Verified held copy at {retained_at_ms}: {owner_receipt}"),
+                            RetentionRead::Unavailable { reason } => {
+                                format!("Unavailable: {reason}")
+                            },
+                        },
+                    ),
+                    DetailRow::new(
                         "Hosting",
                         match &resource.hosting {
                             HostingRead::Unknown => "Not disclosed".into(),
@@ -143,6 +156,9 @@ pub fn view<S: 'static, A: 'static, F: Fn(&mut S, Intent) + Clone + 'static>(
                     "p",
                     format!("{label}: {}", offer_label(offer)),
                 )));
+                if let Some(terms) = resource.terms.get(&action_kind) {
+                    children.push(Box::new(el("p", terms.description.clone())));
+                }
             }
         }
     }

@@ -23,6 +23,8 @@ use serde::{Deserialize, Serialize};
 use crate::coop::LifecycleReport;
 
 pub mod control;
+#[cfg(feature = "resource-handlers")]
+pub mod handlers;
 #[cfg(feature = "resource-owners")]
 pub mod owners;
 #[cfg(feature = "presentation")]
@@ -52,6 +54,24 @@ pub enum ContentRead {
     AddressOnly,
     Resolved,
     Unavailable { reason: String },
+}
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum RetentionRead {
+    #[default]
+    Unknown,
+    Held {
+        owner_receipt: String,
+        retained_at_ms: u64,
+    },
+    Unavailable {
+        reason: String,
+    },
+}
+/// Owner-disclosed terms captured at preparation and rechecked at dispatch.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ActionTerms {
+    pub revision: [u8; 32],
+    pub description: String,
 }
 
 /// Hosting evidence supplied by its owner. An observation reports a particular
@@ -105,6 +125,10 @@ pub struct ResourceRead {
     pub title: String,
     pub schema: String,
     pub content: ContentRead,
+    #[serde(default)]
+    pub retention: RetentionRead,
+    #[serde(default)]
+    pub terms: BTreeMap<ResourceAction, ActionTerms>,
     pub hosting: HostingRead,
     pub offers: BTreeMap<ResourceAction, Offer>,
 }
@@ -192,6 +216,7 @@ pub enum Refusal {
     DifferentReader,
     DuplicateContribution,
     ChangedContribution,
+    ChangedOfferTerms,
     ChangedCollection,
     DuplicateActivity,
     MissingActivityOwner,
@@ -223,6 +248,7 @@ pub enum Target {
     Resource {
         reference: ResourceRef,
         action: ResourceAction,
+        observed_terms: Option<ActionTerms>,
     },
     CollectionFork {
         moot: [u8; 32],
@@ -398,7 +424,12 @@ impl Pane {
             .find(|item| item.reference == reference)
             .ok_or(Refusal::UnknownResource)?;
         require_offer(item.offers.get(&action))?;
-        Ok(self.prepare(Target::Resource { reference, action }))
+        let observed_terms = item.terms.get(&action).cloned();
+        Ok(self.prepare(Target::Resource {
+            reference,
+            action,
+            observed_terms,
+        }))
     }
 
     pub fn prepare_collection_fork(&mut self) -> Result<Request, Refusal> {
@@ -483,7 +514,11 @@ pub fn validate_request(request: &Request, current: &Snapshot) -> Result<(), Ref
                 Err(Refusal::ForeignMoot)
             }
         },
-        Target::Resource { reference, action } => {
+        Target::Resource {
+            reference,
+            action,
+            observed_terms,
+        } => {
             if reference.moot != current.moot {
                 return Err(Refusal::ForeignMoot);
             }
@@ -492,7 +527,11 @@ pub fn validate_request(request: &Request, current: &Snapshot) -> Result<(), Ref
                 .iter()
                 .find(|item| item.reference == *reference)
                 .ok_or(Refusal::UnknownResource)?;
-            require_offer(item.offers.get(action))
+            require_offer(item.offers.get(action))?;
+            if item.terms.get(action) != observed_terms.as_ref() {
+                return Err(Refusal::ChangedOfferTerms);
+            }
+            Ok(())
         },
         Target::Activity { reference, action } => {
             if reference.moot != current.moot {

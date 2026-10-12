@@ -11,6 +11,8 @@ use servitor::AuthorityProvider;
 /// Only facts already disclosed by the content/action owner to this reader.
 pub struct ResourceFacts {
     pub content: ContentRead,
+    pub retention: RetentionRead,
+    pub terms: BTreeMap<ResourceAction, ActionTerms>,
     pub hosting: HostingRead,
     pub offers: BTreeMap<ResourceAction, Offer>,
 }
@@ -72,6 +74,8 @@ pub fn snapshot(
                 title: share.title.clone(),
                 schema: share.schema_id.clone(),
                 content: facts.content,
+                retention: facts.retention,
+                terms: facts.terms,
                 hosting: facts.hosting,
                 offers: facts.offers,
             }
@@ -326,6 +330,8 @@ mod tests {
         fn resource(&mut self, _: [u8; 32], _: ResourceRef) -> ResourceFacts {
             ResourceFacts {
                 content: ContentRead::AddressOnly,
+                retention: RetentionRead::Unknown,
+                terms: BTreeMap::new(),
                 hosting: HostingRead::Unknown,
                 offers: BTreeMap::new(),
             }

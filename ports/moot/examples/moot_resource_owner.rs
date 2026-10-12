@@ -14,6 +14,7 @@ use gemot::moot::{
 use moot::coop::{LifecycleReport, Verdict};
 use moot::resource_coop::owners::{self, Disclosures, ResourceFacts};
 use moot::resource_coop::*;
+use std::collections::BTreeMap;
 use std::io::Read;
 const MOOT: [u8; 32] = [1; 32];
 const READER: [u8; 32] = [9; 32];
@@ -26,6 +27,8 @@ struct Facts {
 impl Disclosures for Facts {
     fn resource(&mut self, _: [u8; 32], _: ResourceRef) -> ResourceFacts {
         ResourceFacts {
+            retention: RetentionRead::Unknown,
+            terms: BTreeMap::new(),
             content: self.content.clone(),
             hosting: HostingRead::Promise {
                 owner_record: "fixture-host-promise; no retrieval receipt".into(),

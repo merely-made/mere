@@ -9638,6 +9638,8 @@ dependencies = [
  "insigne",
  "mere-comms",
  "mere-fleece",
+ "mere-proofs",
+ "mien",
  "muniment",
  "p2panda-core",
  "personae",

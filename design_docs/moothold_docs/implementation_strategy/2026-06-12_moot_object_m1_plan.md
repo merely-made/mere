@@ -1,8 +1,8 @@
 # Moot Object M1 — a moot you can declare, join, and share into
 
 **Date**: 2026-06-12
-**Status (2026-10-06)**: Historical M1 landed as recorded below. The active
-continuation is [Community collections and author-offline publishing](#community-collections-and-author-offline-publishing-2026-09-04). Its same-machine live-peer process proof passed with stable-Persona binding and current Gemot command authority. P3b (contribution withdrawal, `b99e532a`) and P3d (collection lineage, `6f1f73bf`) landed in Gemot on 2026-09-09. Turnstone has landed P3a's source capture (`b4e69ce`), the P3c collection consumer (`6b77e34`) and collection-scoped search (`aa515bd`) on 2026-09-09 and 2026-09-10; its page capture plan (`turnstone/design_docs/2026-08-28_page_capture_plan.md`) calls P3a in progress. Production publication/hosting records, historical authority proof, the Persona-to-device adapter, and a two-machine receipt remain open.
+**Status (2026-10-12)**: Historical M1 landed as recorded below. The active
+continuation is [Community collections and author-offline publishing](#community-collections-and-author-offline-publishing-2026-09-04). Its same-machine live-peer process proof passed with stable-Persona binding and current Gemot command authority. P3b (contribution withdrawal, `b99e532a`) and P3d (collection lineage, `6f1f73bf`) landed in Gemot on 2026-09-09. Turnstone has landed P3a's source capture (`b4e69ce`), the P3c collection consumer (`6b77e34`) and collection-scoped search (`aa515bd`) on 2026-09-09 and 2026-09-10; its page capture plan (`turnstone/design_docs/2026-08-28_page_capture_plan.md`) calls P3a in progress. Bounded copy retention and signed hosting commands are now qualified in the 2026-10-12 continuation below. Production publication lineage, network/protected serving, historical authority proof, the Persona-to-device adapter, and a two-machine receipt remain open.
 The original M1 body preserves its dated vocabulary and ownership. Current owners
 are Gemot for community authority and recognition, Commons for shared graph
 operations, and Stickleback for accepted-operation replication. Historical
@@ -716,10 +716,89 @@ for the retained host to mount before installing owner reads. Stop the owner hos
 and close its tabs before deleting the five exact generated package files and
 the empty package directory. Build outputs remain in the reusable repository target.
 
-**Next gate:** install real application handlers for retention/hosting, collection
-reference forks and content forks, then qualify current signed admission and
-revocation across retained peers. Keep these operations and activity participation
-with their established domain owners.
+**Next gate:** retention/hosting handlers are implemented by the continuation
+below. Collection-reference and content forks, live peer revocation and activity
+participation retain their established owners and separate acceptance gates.
+
+### Retention and hosting handlers (2026-10-12)
+
+**Status:** implemented and qualified as a bounded native handler slice. Eidetic
+owns explicit owner-scoped copies in the caller's Muniment backend, with atomic
+quota/body/manifest/receipt writes and required wallet sealing for private content.
+Gemot owns bounded signed hosting promises through its existing Standing lane;
+the handler derives audience authority, checks current membership/contribution,
+intersects configured community/device ceilings and records the observed authority
+cut. A promise is not measured retrieval and creates no erasure permission.
+
+**Done-conditions:** actual durable copy/reopen, idempotency and quota refusal;
+wrong identity/content and private keyless refusal without writes; signed hosting
+record/reopen, current authorization, policy/expiry refusal and serve-time checks;
+resource controls routed to these owners with refreshed facts; focused tests,
+native durable receipt and rendered acceptance. Automatic deletion, peer transport,
+full historical-authority replay and device-key distribution retain their gates.
+
+**Findings:** `eidetic::retention` commits quota, owner copy receipt, exact manifest
+and payload atomically. It verifies existing custody before returning an idempotent
+receipt, counts stored encryption overhead and refuses nontransactional backends.
+Redb passed durable reopening; Fjall currently returns `NotTransactional` and does
+not write. Private payloads require the existing wallet sealer and authenticated
+unsealing; inconsistent privacy/seal metadata refuses. Metadata and other namespaces
+are outside this payload quota; backend reads materialize values before checks.
+
+`gemot::moot::hosting` carries a canonical full promise in the existing signed
+Standing scope, derives audience capability internally, checks current membership
+and contribution authority and binds the observed authority cut. Community limits
+are explicit host-supplied settings for a named accepted constitution, distinct
+from a new constitutional clause. Serving rechecks audience, policy, expiry, current
+authority, withdrawal and device ceilings. The cut is bound evidence, not a completed
+historical-authority verdict. Automatic heartbeats/Standing completion remain open.
+
+`resource_coop::handlers::Owner` composes these actual services with a signing
+identity, encounter/custody stores and explicit read/copy powers. The current
+Moot command gate requires Write/Manage membership plus the configured powers.
+Public hosting additionally requires content-owner approval of that exact payload;
+an unsigned privacy tag does not grant export. This adapter currently serves
+public-portable content only. Private copies support the wallet seam independently.
+The supplying host serializes configuration/authority ingestion with dispatch.
+Copy and Standing are separate transactions: failure after custody leaves the copy;
+the host refreshes owner records before retrying an uncertain hosting command.
+
+**Progress (2026-10-12):** 6 retention tests, 5 hosting tests, 19 port tests and
+5 Graphshell host tests passed; product Wasm and dependency boundaries passed.
+An intentionally restored private plaintext fallback failed its negative-control
+test; the guarded source was restored and all six retention tests passed again.
+Two headed Chrome scenarios qualify actual retain/sign/refresh and durable
+reopening through the native owner. The first failed timing attempt is preserved:
+awaited owner requests were missing from host quiescence. `Host::in_flight` now
+keeps scenario waits active until the owner completes or refuses that local request.
+Closing a reading still makes no cancellation or erasure claim.
+The fixture's ten-minute promise expired during capture review; that failed
+recapture is preserved. An explicit hosting renewal, owner refresh and fresh-page
+scenario then passed, preserving the original held-copy receipt and timestamp.
+
+The [qualification receipt](../../../ports/moot/docs/receipts/resource_handlers_20261012/qualification.json)
+contains reviewed captures, fresh-process source-absent copy reads and serving,
+audience refusal, raw signed owner evidence in the existing NativeDrop format,
+source/artifact hashes and cleanup. Identities are synthetic, while the signed
+membership/contribution/Standing services and Redb transactions are real. This
+qualifies neither a live peer network nor a public protocol endpoint. Turnstone
+mounting, protected hosting/key distribution, historical-cut validation and
+collection/content forks remain open. User data and concurrent lanes are preserved.
+
+**Reproduction:** reuse `C:\t\cargo-targets\mere`; run the focused tests with
+`cargo test --locked --offline -p eidetic --lib retention::`,
+`cargo test --locked --offline -p gemot --lib moot::hosting::`, and
+`cargo test --locked --offline -p mere-moot --features resource-handlers,presentation --lib resource_coop`.
+Build `moot_resource_handlers` with `--features resource-handlers`; supply a
+fixture-state path whose `MERE_BUILD_OWNER.json` identifies `Moot resource handler
+acceptance`. Serve the product+`moot-resources` package through the existing
+qualification server with `--moot-owner <executable> --moot-owner-state <state>`.
+Run `p4_tree_moot_resource_handlers.scn` then its `_reopen.scn` on the retained
+origin. `read-offline` verifies custody without encounter content; `serve` checks
+the exact addressed audience request; `export` preserves raw signed Moot evidence.
+The fixture's identity seeds, limits and approvals are explicit example settings,
+not production defaults. Close its tab and server before exact-file cleanup of
+marker-owned generated packages/databases; preserve the exported receipt evidence.
 
 ### Capsule peer and standalone-browser reproduction
 

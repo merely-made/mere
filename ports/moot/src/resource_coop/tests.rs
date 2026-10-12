@@ -20,6 +20,8 @@ fn resource(contribution: u8, manifest: u8) -> ResourceRead {
         title: format!("Notebook contribution {contribution}"),
         schema: "fixture/notebook/v1".into(),
         content: ContentRead::AddressOnly,
+        retention: RetentionRead::Unknown,
+        terms: BTreeMap::new(),
         hosting: HostingRead::Unknown,
         offers: [(ResourceAction::Open, Offer::Offered)].into(),
     }
@@ -78,7 +80,8 @@ fn duplicate_payloads_keep_contributions_and_new_revisions_do_not_retarget_atten
         request.target,
         Target::Resource {
             reference: original,
-            action: ResourceAction::Open
+            action: ResourceAction::Open,
+            observed_terms: None,
         }
     );
 }
@@ -290,6 +293,7 @@ fn requests_cannot_be_relabelled_to_attach_a_completion_to_another_resource() {
     relabelled.target = Target::Resource {
         reference: read.resources[1].reference,
         action: ResourceAction::Open,
+        observed_terms: None,
     };
     assert!(!pane.complete(
         &relabelled,

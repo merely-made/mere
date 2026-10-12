@@ -16,11 +16,15 @@ path = "src/lib.rs"
 [[example]]
 name = "moot_resource_owner"
 required-features = ["resource-owners"]
+[[example]]
+name = "moot_resource_handlers"
+required-features = ["resource-handlers"]
 
 [features]
 default = []
 presentation = ["dep:cambium"]
 resource-owners = ["dep:gemot", "dep:servitor", "dep:eidetic"]
+resource-handlers = ["resource-owners", "dep:personae", "dep:muniment", "dep:mien", "dep:serde_json"]
 # A native read bridge over Commons' existing encrypted chat replica. The
 # conversation view itself stays available without transport or store crates.
 commons-chat = ["dep:commons-spine", "dep:muniment"]
@@ -34,6 +38,9 @@ captured-web = [
 ]
 
 [dependencies]
+serde_json = { workspace = true, optional = true }
+personae = { workspace = true, optional = true }
+mien = { workspace = true, optional = true }
 comms.workspace = true
 cambium = { workspace = true, optional = true }
 eidetic = { workspace = true, optional = true }
@@ -47,6 +54,7 @@ eidetic-search = { workspace = true, optional = true }
 serde = { workspace = true }
 
 [dev-dependencies]
+proofs.workspace = true
 serde_json = { workspace = true }
 eidetic = { workspace = true }
 fleece = { workspace = true }

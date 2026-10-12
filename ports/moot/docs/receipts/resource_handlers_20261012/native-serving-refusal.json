@@ -1,0 +1,5 @@
+{
+  "audience": "friends",
+  "exit_code": 1,
+  "refusal": "Error: \"Hosting refused: Hosting audience, policy, expiry or local ceiling refused serving\"\n"
+}
