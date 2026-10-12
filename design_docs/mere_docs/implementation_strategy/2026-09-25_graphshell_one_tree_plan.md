@@ -1015,6 +1015,29 @@ acceptance or main landing is implied. The combined-source records are
 `candidate.json` in the existing output directory. The earlier release-size
 measurements remain bound to their recorded source commits.
 
+**Final supplier rebuild (2026-10-12):** published Mere `631355a2f` is
+integrated at compiled source `91f46146d`, with Genet `2c7ef73b`, Netrender
+`c74b7cb2`, provider `2eae6243` and Knot `3af93add`. All 67 focused CPU tests,
+viewer/product debug builds and main-page checking pass again; locked metadata
+in both consumer roots contains only the expected supplier revisions. The
+[source-bound candidate receipt](../../../ports/graphshell/docs/receipts/host_presenter_20261012/qualification.json)
+records source/package hashes and retains false browser/GPU/visual/main flags.
+The renderer explicitly offered and this lane accepted a finite Chrome window
+of up to 30 minutes after rebuilding and confirming an unlocked console.
+`CGSSessionScreenIsLocked` still reports true, so no browser has launched and
+the following Tabard typography window remains queued. Each prepared driver
+checks console unlock before Chromium launch; main integration still requires
+the browser checks and capture review. No toolbar/parity acceptance is inferred
+from compilation.
+
+The release viewer on this final family measures 6,378,552 B gzip against
+R157's unchanged 3,407,872 B cap. Glue (18,730 B), mount (588 B) and history
+(6,254 B) fit their respective gzip limits. Live-site delivery remains gated
+independently. The citation/source audit passes; D2 has seven inherited
+findings, including three active renderer documents added by the final supplier
+publication without records. That coverage has been flagged to its owner; this
+plan's incremental record remains present.
+
 ## 5. Stop rules
 
 - Nothing a screen reader reaches today is lost: a control moves only once

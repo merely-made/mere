@@ -417,3 +417,11 @@ viewer/product builds and main-page checking pass, while the final coherent
 supplier family and explicit renderer handoff still precede headed acceptance.
 The inherited R157 delivery gap remains separate from shared presenter
 integration. These updates do not close phase 4 or qualify live deployment.
+
+The final-supplier continuation records compiled `91f46146d` on Mere
+`631355a2f`, renewed 67-test/three-cone gates and locked supplier metadata,
+with an explicitly accepted but unused finite browser window while the console
+is locked. The linked candidate receipt retains false runtime/visual/main
+flags. Its new release size is measured against the unchanged cap; the seven
+global D2 findings are identified as inherited coverage, rather than passed
+audit or presenter acceptance. No whole-document claim census is repeated.
