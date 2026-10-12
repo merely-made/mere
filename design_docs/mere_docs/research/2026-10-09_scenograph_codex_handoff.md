@@ -4,6 +4,44 @@
 **Status:** open: handed to the Codex agent by Mark (Scenograph editor plan, SE87).
 **From:** the Scenograph editor lane (Claude). **For:** the Codex agent.
 
+**Dynamics consumer refresh (2026-10-11):** the relationship adapter is no longer
+fixture-only. Published Mere `3a8f3813` is called by the production
+[Knot scene runtime](https://github.com/merely-made/knot-editor/blob/552640f/apps/desktop/src/composition/recipe/dynamics.rs), introduced at `195758b` and
+qualified at runtime source `552640f`. The
+[Knot consumer receipt](https://github.com/merely-made/knot-editor/blob/1674d6d/docs/receipts/2026-10-11_live_dynamics/README.md)
+records the frozen dependency family, 662 passing workspace tests and 15 reviewed
+macOS captures, including fresh-process reopen. This closes the first production
+caller gap; it does not qualify other hosts or advance coordinator-owned pins.
+The subsequent [Windows consumer review](https://github.com/merely-made/knot-editor/blob/9790938/docs/receipts/2026-10-11_relationship_consumer_review/README.md)
+adds a real disclosed-edge negative control, 659 passing workspace tests with
+six platform/existing ignored, and 15 reviewed native captures across wide and
+compact fresh-process reopen. Its appearance-test navigation repair preserves
+the production Windows menu and the original assertions.
+The broader canvas suite retains its reproduced topic-radial baseline golden
+failure. Firefox verification is parked at Mark's direction while browser control
+is blocked; the original physics coordinator's independent review remains open.
+Mark has authorized this bounded consumer review; F199's T2/G4b2 pause stands.
+Mark subsequently chose **Preview; keep placement explicitly**: motion stays
+transient until the consumer records its displayed pose as one undoable authored
+placement edit; retaining that edit is still deliberate. This introduces no
+implicit source mutation or change to shared force policy.
+The [explicit-placement continuation](https://github.com/merely-made/knot-editor/blob/63aa695/docs/receipts/2026-10-11_keep_motion_placement/README.md)
+implements that action with atomic exact-occurrence validation. Its complete
+Windows workspace records 662 passed, zero failed and six ignored; 21 reviewed
+native captures cover motion, one-edit undo/redo, deliberate retention and the
+exact kept version's fresh-process reopen. The receipt identifies two executable
+phases and the known offscreen/cropped scene layout. Source bytes, copied
+disclosure, dynamics and roles remain unchanged; runtime is discarded.
+The [preview layout continuation](https://github.com/merely-made/knot-editor/blob/156626f/docs/receipts/2026-10-11_dynamics_viewport/README.md)
+places the canvas above a compact motion toolbar and uses the existing host
+scroll request once per playback action to reveal the whole group. Native
+capture metadata compares painted and visible camera rectangles; ordinary
+scrolling remains free and hides/pauses motion without automatic resume.
+The final focused suite passes 80 tests and all 16 final native captures are
+reviewed. The complete camera box is visible after playback actions at both
+native sizes, with preserved Keep/undo/redo pose identity and unchanged source.
+This remains Knot-owned presentation, not a new force policy or consumer repin.
+
 Three pieces of ruled work, each with done-conditions in its plan. Read the
 plan sections first; they hold Mark's rulings verbatim, and those govern.
 
@@ -132,8 +170,11 @@ header and appearance receipts without moving the qualified physics sources.
   buckets and ring slots remain free. With both axes encoded, F47 permits
   contact-only separation. A one-axis position-writing law refuses by path
   until an adapter can preserve that coordinate; unknown solvers likewise
-  need a disclosed constraint adapter. Regions, relations and folds still
-  require a broader scene-input adapter.
+  need a disclosed constraint adapter. Regions and folds still require a broader
+  scene-input adapter. Since `3a8f3813`, explicitly compiled relationship inputs
+  bind through `ProjectionDynamics::new_relationship`; the relation-free
+  constructor retains its refusal. This adds no inferred relationships or graph
+  assertions.
 - A variant carries a preset or a complete spec. Naming both is refused (F201).
 - The host's editable preview limit starts at 60 (F202). Capped cells visibly
   say "Step limit reached". The matrix pages across the complete axes;

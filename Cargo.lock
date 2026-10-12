@@ -4625,6 +4625,7 @@ version = "0.0.2"
 dependencies = [
  "blake3",
  "castellan",
+ "chatelaine",
  "chirograph",
  "chrono",
  "distillery",
@@ -4812,6 +4813,23 @@ dependencies = [
  "serde",
  "serde_json",
  "uuid",
+]
+
+[[package]]
+name = "dramatis-app"
+version = "0.0.1"
+dependencies = [
+ "cambium",
+ "cambium-genet-winit-host",
+ "chatelaine",
+ "dramatis",
+ "graphshell",
+ "image",
+ "mere-persona-picker",
+ "personae",
+ "serde_json",
+ "taproot",
+ "tokio",
 ]
 
 [[package]]
@@ -6736,6 +6754,7 @@ dependencies = [
  "cambium-rootstock",
  "cambium-winit-a11y",
  "chartulary",
+ "chatelaine",
  "chirograph",
  "distillery",
  "dramatis",

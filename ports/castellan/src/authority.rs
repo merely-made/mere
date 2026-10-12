@@ -244,7 +244,14 @@ impl<S: IdentityStorage + 'static> ResidentLock<S> {
         vault.unlock(method)?;
         let holders = self.holders.lock().unwrap().clone();
         for holder in &holders {
-            if let Err(error) = holder.unlock(&*vault) {
+            let restored = match holder.key_profile() {
+                Some(id) => vault.storage().load_profile(id).and_then(|profile| {
+                    let provider = personae::InMemoryProvider::from_seed(profile.master.to_seed());
+                    holder.unlock(&provider)
+                }),
+                None => holder.unlock(&*vault),
+            };
+            if let Err(error) = restored {
                 tracing::error!(holder = holder.name(), %error, "holder could not re-derive; relocking");
                 for holder in &holders {
                     holder.lock();
@@ -971,6 +978,18 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         })
     }
 
+    /// Execute a resident act while profile authority and vault lock are stable.
+    /// The callback must never prompt or wait for user input.
+    pub fn with_profile_authority<R>(
+        &self,
+        profile: &ProfileId,
+        act: impl FnOnce() -> R,
+    ) -> Result<R, IdentityError> {
+        let vault = self.vault.lock().unwrap();
+        vault.current_profile()?;
+        vault.storage().load_profile(profile)?;
+        Ok(act())
+    }
     /// The persona currently spoken as.
     pub fn current_profile_id(&self) -> ProfileId {
         self.vault.lock().unwrap().profile_id().clone()

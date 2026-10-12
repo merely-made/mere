@@ -1835,3 +1835,150 @@ with future live LOD state per view/occurrence. Multi-tab IndexedDB races,
 conflict recovery, large-store costs and release performance retain the previous
 editor gates. Scene composition, theme/font authoring, general primitive writes,
 field actions/scripts, other hosts and Rhai SE39–SE42 remain separate work.
+
+#### Forme drop feedback and field browser qualification (2026-10-11)
+
+Mark authorized the Forme feedback fix followed by Chrome field-inspector
+qualification. The Forme session now returns the drop action and original
+target bounds together with its candidate. The graph renders a target-local
+outline and action label: a half-region for an edge split, or a tab-header
+cue for a center stack. The cue is temporary, takes no pointer input and
+clears on acceptance, Escape, outside release or draft reset. Zone changes
+rebuild the retained cue; motion within a zone keeps pointer capture. The
+existing scoped draft, Lock and apply, discard and saved history retain their
+authority.
+
+The product Wasm build, viewer-only Wasm check and nine native Forme session
+cases pass. All six Chrome scenarios pass: Forme arrangement/reopen,
+draft/reopen and field inspection/reopen. Fifteen successful captures were
+reviewed. The drag cases verify Escape then release and valid-target to outside
+release without changing the draft. Field inspection verifies exact identities,
+overlapping candidates, hidden boundaries, retired records, independent Forme
+reads and retained IndexedDB reopen. Inspector label/value spacing and focus
+or scroll follow-through remain open; functional acceptance does not close
+those visual review gates. The browser source is `eb804d07`, with the scenario
+key correction at `eac1524f`; subsequent integrations do not inherit this pass.
+An initial unsunk launch was closed without a qualification claim. A collected
+drag run found lowercase `key escape` unsupported by the scenario runner;
+the scenario now uses its existing `key Escape` route. That failed run is
+retained alongside the corrected sequence in the
+[qualification record](../../../ports/graphshell/docs/receipts/forme_feedback_field_browser_20261011/qualification.json).
+
+The integration at `9d8ea699` retains upstream presentation controls and live
+Forme guides. Its product and viewer-only Wasm checks pass separately; Chrome
+was not rerun on that newer source. The canonical primary documentation audit
+has no index or current-link findings. Its remaining upstream findings are
+recorded in the qualification summary. The temporary browser package is removed;
+peer documentation work is preserved.
+
+
+#### Relationship and dynamics inspector draft (2026-10-11)
+
+**Status:** implemented bounded draft; portable source checks and integrated
+product wasm check passed. Mark chose the relationship/dynamics inspector next
+and said “Sure. Go ahead”. Delivery continues directly to main. Integration
+base was published `ec1e65ca`, with the later renderer/Knot viewport receipts
+through `578c8e36` integrated before delivery. Runtime sources and dependencies
+in this check cone are unchanged by those documentation/test-receipt commits.
+Upstream Forme target-local feedback, Chrome
+field inspection/reopen receipts and the shared occurrence-relationship dynamics
+adapter are preserved. Those receipts retain their own source/platform limits
+and do not qualify this new UI. The dynamics owner's production Knot consumer
+review remains its own adoption and qualification record.
+
+**Findings:** Graphshell's local Canvas can disclose the authored dynamics
+record, its current running stage, controller topology inputs and placement
+constraints. It has no measured per-assertion force vectors or installed
+coupling-target snapshot readout. The projection relationship controller is
+available to compiled-scene consumers; it is not implicitly installed in the
+local graph view. Held `AgentDerived` assertions still have the existing exact
+inspector's explicit missing-rule/input explanation. This draft does not invent
+derived display marks, execution evidence or a new force law.
+
+The [Canvas report](../../../crates/canvas/pictograph/src/canvas/dynamics_inspection.rs)
+reads an exact access UUID or displayed pair without stepping the controller.
+It separates the current record (including an authored schedule retained after
+its run) from the current stage, carrying errors for undisclosed channel/partition cases.
+The record is Canvas readback, not a storage acknowledgment or source-history
+snapshot. The law label is a flat picker summary; the full stage remains the explanation
+for mixtures/groupings. Overlays, pause state, arrangement and topology source
+are disclosed. Inspection does not change source, selection, velocity, pose,
+role, pin, Forme lock/geometry, tile sessions or controller lifetime.
+
+The [shared topology seam](../../../crates/canvas/pictograph/src/canvas/relationship_topology.rs)
+now supplies both the existing controller bridge and its inspector. It retains
+every projected relation row, hidden-cell filtering and parallel multiplicity.
+The selector conversion also remains shared with edge painting/picking. A pair
+report groups rows by displayed direction, source stratum/endpoints and actual
+relation selector; exact assertion handles are deduplicated within that group.
+Grouping is explanatory, not a new durable source handle. Surface and Resource
+owners, repeated accesses, both directions, parallel buckets, open predicates
+and self-links remain distinct where the current input seam distinguishes them.
+Missing accesses refuse; equal addresses do not retarget inspection.
+
+A native probe corrected an assumed one-row-per-subkind expectation: current
+`relation_rows` in the kernel emits each semantic statement as a separate row,
+including two assertions with the same predicate. The report preserves that
+existing behavior. Input-row count and assertion count are shown with their
+own meaning; neither is a measured force count or strength. Hiding removes the
+same row slots the controller consumes. A disclosed occurrence controller
+reports its own input-edge count and does not claim a kernel-cell mapping.
+No topology weighting or assertion-to-force policy was changed by this lane.
+
+**Placement disclosure:** each target reports its role policy and item/group
+sources, explicit position pin, installed arrangement pin, arrangement-slot
+availability, configured live anchor target/stiffness, axis locks, Forme owner
+and current hold, and pointer drag. Axis-lock policy is read through the same
+helper used to install it. A Forme hold remains independent of boundary
+visibility; an explicit pin takes priority. Role policy without a slot is not
+claimed as an installed arrangement pin. An anchor target is configuration,
+not a sampled contribution; Forme or other constraints can govern its body.
+Attention/foreground pins are not mapped onto these position constraints.
+
+**Interaction:** [Dynamics inspector](../../../ports/graphshell/src/web_tree/dynamics_inspection.rs)
+lives in Graph tools. **Explain selected dynamics** binds one selected access;
+**Explain this access dynamics** binds the exact retained access inspector target;
+**Explain pair dynamics** binds the exact link inspector pair. Subsequent
+selection or source-inspector closure does not retarget or close it. Changes
+in current view inputs refresh its report; **Close dynamics inspection** clears
+only this transient inspector. Pair groups provide **Inspect dynamics input
+assertion** buttons to explicitly open the existing exact source owner, preserving
+the dynamics target and selection. Derivation metadata remains sourced from that
+owner, with absence shown. There are no inspector write controls or persisted
+inspector snapshots. JSON stage/record blocks wrap in the existing themed pane.
+
+**Qualification:** the [source receipt](../../../ports/graphshell/docs/receipts/relationship_dynamics_20261011/qualification.json)
+records **38 portable native checks passed**: seven new topology tests and the
+31 retained binding/editor/access/link tests. The locked graph-only harness
+imports the actual shared helper and checked-in model sources; it does not
+compile the complete native Canvas or exercise IndexedDB. Replay with
+`cargo test --locked --offline --manifest-path ports/graphshell/docs/receipts/relationship_dynamics_20261011/harness/Cargo.toml --lib`.
+The locked offline product wasm check passes with the same eighteen existing
+web warnings. One compiler ran at a time under the established 1280 MiB,
+zero-swap and free-memory guard. Canvas report regressions are added for
+read-only graph/selection/pose/pause, Forme-versus-explicit-pin behavior and
+missing exact members; their native execution remains open. On a suitable host,
+run `cargo test --locked -p pictograph --features canvas --lib canvas::dynamics_inspection`.
+Default/viewer and release bundles were not built in this pass.
+
+**Headed handoff:** use a fresh dedicated origin/profile with normal motion on
+`tree.html?app=local` for
+[`p4_tree_dynamics_inspection.scn`](../../../ports/graphshell/web/scenarios/p4_tree_dynamics_inspection.scn),
+then a fresh page/process retaining that origin for
+[`p4_tree_dynamics_inspection_reopen.scn`](../../../ports/graphshell/web/scenarios/p4_tree_dynamics_inspection_reopen.scn).
+They exercise independent exact targets, live pause changes, exact assertion
+routing, Forme holds despite hidden boundaries, source-inspector closure and
+reopen without persisted inspector state. Four captures are planned, none
+produced/reviewed here. S-PC's connected browser still lacks WebGPU. Review
+labels/values, long JSON, keyboard/focus, scrolling and narrow widths; qualify
+explicit pin/manual placement, hidden relation controls, stage transitions,
+live tile continuity and applicable native/Firefox hosts separately.
+
+**Remaining done-conditions:** execute the Canvas report tests and headed
+handoff; measure open-inspector graph traversal/grouping and long-record costs
+before large-graph adoption; add an execution-owner adapter for actual derived
+relationships and compiled-scene occurrence mapping; add measured per-term or
+per-assertion contributions only through their dynamics owner. Installed field
+coupling snapshots, foreground-pin/overview adapters and full node presentation
+remain separate. No script/field execution, primitive writes, broad scene
+composition or force-policy adoption is completed by this read-only draft.

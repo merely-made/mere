@@ -1,0 +1,18 @@
+{
+  "command": [
+    "wasm-bindgen",
+    "/Users/markik/Code/targets/mere-s2s3/wasm32-unknown-unknown/debug/graphshell_web.wasm",
+    "--target",
+    "web",
+    "--out-name",
+    "graphshell_web",
+    "--out-dir",
+    "/Users/markik/Code/output/vello-classic-browser-gates-20261011/browser/pkg"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-vello-release-adoption",
+  "deadline_seconds": 180,
+  "elapsed_seconds": 8.188,
+  "exit_code": 0,
+  "timed_out": false,
+  "log": "/Users/markik/Code/output/vello-classic-browser-gates-20261011/checks/package-current-browser.log"
+}

@@ -86,3 +86,8 @@ design_docs/mere_docs/testing/receipts/2026-10-11_vello_releases/probe/src/main.
 
 # Exact fresh-device RGBA receipts must keep binary bytes across checkouts.
 design_docs/mere_docs/testing/receipts/2026-10-11_producer_gates/device-rehydration-qualified/*.rgba binary
+
+# Relationship/dynamics inspector receipts: stable raw logs and LF proof metadata.
+ports/graphshell/docs/receipts/relationship_dynamics_20261011/checks/*.log -text
+ports/graphshell/docs/receipts/relationship_dynamics_20261011/qualification.json text eol=lf
+ports/graphshell/docs/receipts/relationship_dynamics_20261011/harness/** text eol=lf

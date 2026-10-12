@@ -7,7 +7,7 @@ tantivy, which `7a5b7e19` (2026-09-07) replaced with an in-tree BM25 and
 stored-column reports. E5 is partly delivered in Turnstone under the
 [search surface wiring plan](../../mere_docs/implementation_strategy/2026-08-12_search_surface_wiring_plan.md)'s
 W2 (omnibar recall); W3's reports and the corridor strip are not delivered. The
-plan activated two of the [deferred phases](../../eidetic_docs/implementation_strategy/2026-06-09_eidetic_deferred_phases_plan.md),
+plan activated two of the [deferred phases](../2026-10-11_superseded_plans/2026-06-09_eidetic_deferred_phases_plan.md),
 Phase 8 (browsing memory) in full and Phase 9's producer half native-first; the
 deferred-phases plan stays the umbrella for what this plan does not pull in
 (Phase 7 / OPFS, the wasm probe, and Phase 9's moot-consume half:

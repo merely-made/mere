@@ -914,6 +914,22 @@ This section is the canonical home for that direction. The
 and [composition spine](mere_docs/technical_architecture/2026-05-21_mere_composition_spine.md)
 apply it at their respective seams.
 
+### Browsing encounters (2026-10-11)
+
+Mark agreed to preserve visits while reviewing Eidetic's foundations. Resource
+identity, an individual encounter and a captured representation are distinct.
+Revisiting one resource retains another encounter; two branches through the same
+resource do not collapse into one trail. Preserve source-scoped visit identity,
+parent references and known context, including an unresolved parent outside an
+import range. Followed navigation, links contained in captured content, clipping
+provenance and computed relationships retain their different evidence meanings.
+
+The [Eidetic development plan](eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md)
+owns the proposed intake and admission work with Chartulary/Stemma, Pandect,
+Inker, Fleece and ESP. It treats dependency capabilities as part of development.
+This direction does not claim that current browser intake preserves those facts
+end to end; concrete wire, migration and retention decisions remain in the plan.
+
 ### Clips, live entities and appearances
 
 A **clip** is content made into a portable unit by meaningful selection,
@@ -951,6 +967,16 @@ access identity and occurrence identity remain distinct.
 
 ### What the common model governs
 
+**Portable collections (2026-10-11):** Mark's intended dataspace can selectively
+replicate a collection of notes, clips, documents and recognized structured
+exports gathered from the applications' various runtimes. The receiving mere
+uses a declared content profile, carrying required bytes and meaningful
+relationships so supported content remains accessible with the source apps
+stopped. Format understanding and complete retained material each need a
+qualified receiving path. The [Eidetic development plan's collection gate](eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md#p6-qualify-storage-custody-retention-and-exchange)
+now makes this outcome explicit. It preserves the existing distinction between
+portable content and live source authority; general replication remains planned.
+
 | Concern | Shared meaning and owner |
 |---|---|
 | Identity and relationships | Domain identities and attributed assertions connect content and entities. Source, capture, revision and occurrence are distinguishable. Two equal payloads need not be the same clip or have the same provenance. |
@@ -969,12 +995,51 @@ Mere's graph model does not replace those semantics. A unified GPU device is a
 composition direction, not evidence that every source is already rendered in
 one display list.
 
-### Open questions: proposed policies and remaining decisions
+### Clip policy rulings (2026-10-11)
 
-The accepted direction above settles the model and its units. The following
-are concrete recommendations for the unresolved lifecycle and interoperability
-questions. They are **proposals pending ruling**, not new editor rulings or
-claims of implemented platform contracts.
+Mark selected Knot Editor and Redshank as the forcing pair, with a real shared
+host receiving their exports. He settled these four questions in **Assess Mere
+dynamics status** (`01a122a7-f13f-7d11-af4f-0361e1b9492e`). The Eidetic/Fleece
+lane owns the profile, owner-adapter and tag design in the
+[development plan](eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md#knotredshank-profile-and-owner-adapters).
+The rulings settle policy, not a wire schema or implementation receipt.
+
+1. **CP1, retained source backing.** Mark: **"Keep selected material plus private
+   source backing when available (Recommended)"**. Keep the selected material
+   and available source evidence under configurable storage limits. Sharing
+   discloses the selection; including enclosing material or more source context
+   requires an explicit choice. Private backing and the disclosed package have
+   separate dependency sets. Availability, retention limits and later removal
+   remain visible; the default does not invent unavailable source bytes.
+2. **CP2, Redshank's first shared profile.** Mark: **"Note/body first; source
+   excerpt is explicit (Recommended)"**. Retain the text or voice-note body plus
+   its recording reference and frozen target. A voice body carries its required
+   audio bytes. The original recording is distinct backing; when its bytes are
+   absent the receiver can use the note and reports source playback unavailable.
+   Exporting a recording excerpt is an explicit operation with declared
+   representation, timebase mapping and lineage.
+3. **CP3, generated tags.** Mark: **"Queryable suggestions; become personal tags
+   when accepted (Recommended)"**. Engine suggestions remain queryable with
+   producer, run, input revision and generation evidence. Acceptance creates a
+   personal tagging assertion citing that evidence; it preserves the engine's
+   attribution and does not rewrite the suggestion as a human observation.
+   Existing concept identity and asserter rules remain governed by C7/ruling 20
+   of the [graph semantics plan](mere_docs/implementation_strategy/2026-10-04_graph_semantics_plan.md).
+4. **CP4, unavailable source owner.** Mark: **"Queue domain-supported edits for
+   review when the owner returns"**. Retain supported inert edit requests with
+   source-owner/entity reference, expected source revision, payload schema,
+   author and request identity. On return, resolve a fresh admitted target and
+   review the request; recheck grants and source revision before submitting it.
+   Persisted scene handles or session tokens cannot authorize replay. Independent
+   local annotations remain usable. Unsupported operations refuse; submission,
+   owner acceptance and durable completion remain separate outcomes.
+
+### Remaining policies and adapter decisions
+
+The accepted direction and CP1 to CP4 above settle the model, units and named
+policy choices. The remaining lifecycle and interoperability recommendations
+below are **proposals pending ruling**, not additional editor rulings or claims
+of implemented platform contracts.
 
 1. **Captured evidence and subsequent editing.** Preserve the captured version
    and its available source/revision provenance. Make edits explicit revisions
@@ -982,24 +1047,24 @@ claims of implemented platform contracts.
    An editable note can remain editable; presenting it as captured evidence
    should identify which retained version supports that presentation. A live
    reference is labelled as live, with freshness and availability disclosed.
-   The remaining decision is whether every capture retains original material
-   by default, or retention is configurable with a visible consequence for
-   later verification. Knot can retain immutable source artifacts beside an
-   editable clip note; that specific path does not establish a family-wide
-   captured-version or default-retention policy.
+   CP1 settles selected material plus available private backing as the default.
+   Configurable limits, rights, deletion/reference behavior and the consequence
+   of losing backing still need owner-specific decisions. Knot can retain
+   immutable source artifacts beside an editable clip note; the family-wide
+   producer and custody integration remains to be qualified.
 2. **Compound clips and addressable parts.** Give the portable clip an identity
    and describe its payload roles, media/schema versions and source anchors.
    Parts can be addressed within it; promote a part to a separate clip when a
-   user takes it independently. The remaining decision is the first concrete
-   compound profile and which payloads it promises to carry. Retained bytes,
+   user takes it independently. Knot and Redshank now force the first profile;
+   its exact shape and capability promises still need qualification. Retained bytes,
    external references and unresolved dependencies must be distinguishable.
    Content hashes identify bytes, not authorship, entity identity or rights.
    A portable reference is not a guarantee that its content is available offline.
 3. **Sharing a live entity.** Distinguish sharing a captured snapshot, sharing
    a disclosed view and granting permission to act on the live source. Name the
    owner, observed revision or time, supported operations and offline behavior.
-   When disconnected, show retained state with its freshness; refuse operations
-   that require the owner unless that domain explicitly supports queued writes.
+   When disconnected, show retained state with its freshness. CP4 queues only
+   domain-supported source edits for reviewed admission when the owner returns.
    Cloning material creates a new owned entity with lineage rather than silently
    claiming the source's live identity. The remaining decision is which live
    domain supplies the first shared-operation and reconnect contract.
@@ -1177,24 +1242,27 @@ recorded consumer pins qualify `5758724e`, before later Mere dependency work.
 | Durable source resolution | Product adapters must map a retained domain/source reference to the current admitted owner and its current offers, with missing/denied/stale outcomes. Reuse Pandect/resident routing. A saved scene `InstanceId`, endpoint action or document base token must not become the durable identity of a live entity. |
 | A usable clip profile | Fleece gathering and domain exporters need one agreed profile over Eidetic's existing mechanisms: payload roles, stable part names/selectors, schema versions, lineage, and required versus optional material. Distinguish retained bytes, external references and unresolved dependencies. A selected note, a captured page and a media excerpt make different promises. |
 | Selector and meaning interoperability | Adapters must preserve each selector's representation and units. Fleece positions count Unicode code points in normalized DOM text; Knot quotation anchors can count UTF-8 source bytes; Redshank targets count media time. Define explicit supported mappings and refusals. Shared profiles can agree on source, part, annotation and derivative roles while leaving domain schemas specialized. |
-| Capture, disclosure and keeping policy | Session/custody owners must connect graph references to the package's required material, decide what is retained/released, and check disclosure for each exported part. A byte reference, transferable source kind or selected passage is not permission to share its enclosing document. Default original-material retention and the consequences of revocation remain policy decisions above. |
+| Capture, disclosure and keeping policy | Session/custody owners must connect graph references to the package's required material, implement CP1's private-backing default, and check disclosure for each exported part. A byte reference, transferable source kind or selected passage is not permission to share its enclosing document. Configurable limits, release and revocation consequences remain explicit owner decisions. |
 | Live operations and outcomes | Each domain must supply source revision checks, admitted operations, conflict/failure behavior and reconnect semantics. Chirograph's scene revision is delivery state; Knot's additional base-token check is the concrete precedent. Queued writes, durable completion and undo need owner contracts rather than inference from an `Accepted` reply. |
 | Adoption and qualification | Hosts must advertise which profiles, selectors and operations they support, preserve unfamiliar material through the appropriate opaque path, and visibly refuse unavailable capabilities. Different current product pins require qualification; source availability on Mere main is not uniform consumer adoption. |
 
-**Recommended forcing proof, pending implementation choice:** use the existing
-Knot document lane and Redshank timed-media lane before requiring a game
-exporter. Retain a text clip and an audio annotation/excerpt through a second
+**Chosen forcing pair; implementation proof pending:** Mark selected the existing
+Knot document lane and Redshank timed-media lane. Retain a text clip and a
+text/voice note through a second
 host, then reopen with their source app stopped. Verify required bytes, source
 and capture identities, exact selector units, opaque unsupported payloads and
 independently owned annotations. Exercise one already-supported owner edit,
 then a stale edit and denied operation; neither refusal may mutate the source.
 Restart the owner and resolve a fresh target instead of replaying saved scene
-handles. The media export must state whether it carries the excerpt or merely
-points to it. This is a proposed proof, not a claim that these flows all exist.
+handles. CP2 keeps source excerpts explicit; CP1's private backing must stay
+outside selection-only sharing. Test attributed personal tags, queryable engine
+suggestions and CP4's reviewed reconnect edits. This is a proposed proof, not a
+claim that these flows all exist.
 
 The open questions above now concern concrete profiles and policies, not
 whether the stack needs foundational graph, bundle or action machinery. This
-review adds no crate, changes no lifecycle ruling and opens no paused lane.
+review adds no crate and opens no paused lane. The four later policy rulings
+above now govern the profile design; broader lifecycle checkpoints remain open.
 
 ## What this brief deliberately does not do
 

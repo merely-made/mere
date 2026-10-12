@@ -1,0 +1,481 @@
+{
+  "scenario": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        420,
+        697
+      ],
+      "canvas_physical_size": [
+        420,
+        697
+      ],
+      "log": [
+        "captured renderer_narrow",
+        "waited 0 frames",
+        "gpu timestamps: no"
+      ],
+      "result": "ok",
+      "saved_graph": {
+        "address": "https://example.test/i2p-port",
+        "file": null,
+        "reopened": false,
+        "save_state": "idle",
+        "selected": "81b91a6b-52ef-5751-b497-15f711cf9c70",
+        "session": "316c3353-ffa1-4739-8238-876ae830f392",
+        "tags": "research, transport",
+        "title": "I2P port notes"
+      },
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "renderer_cold",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 187818
+      },
+      {
+        "name": "renderer_repeat",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 187334
+      },
+      {
+        "name": "renderer_draft",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 212826
+      },
+      {
+        "name": "renderer_zoom",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 216358
+      },
+      {
+        "name": "renderer_input",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 249190
+      },
+      {
+        "name": "renderer_mode_dark",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 218470
+      },
+      {
+        "name": "renderer_mode_light",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 217914
+      },
+      {
+        "name": "renderer_mode_hc_dark",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 220622
+      },
+      {
+        "name": "renderer_mode_hc_light",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 217458
+      },
+      {
+        "name": "renderer_narrow",
+        "width": 420,
+        "height": 900,
+        "bytes": 74886
+      }
+    ]
+  },
+  "receipt": {
+    "page": "tree",
+    "semanticTree": {
+      "role": "region",
+      "label": "Graphshell, one tree",
+      "children": [
+        {
+          "role": "main",
+          "children": [
+            {
+              "role": "heading",
+              "label": "Graphshell, one tree",
+              "children": []
+            },
+            {
+              "role": "status",
+              "label": "saved graph · 11 nodes · picked: https://example.test/i2p-port",
+              "children": []
+            },
+            {
+              "role": "navigation",
+              "label": "Graph controls",
+              "children": [
+                {
+                  "role": "button",
+                  "label": "Pan left",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan right",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan up",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan down",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Zoom in",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Zoom out",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Fit graph",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Fit selection",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Restore arrangement",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Play physics",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Graph tools",
+                  "expanded": false,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "role": "button",
+                  "label": "Open selected in workbench",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Show workbench",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Add an object",
+                          "expanded": false,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "role": "button",
+                      "label": "Inspect selected access",
+                      "children": []
+                    },
+                    {
+                      "role": "button",
+                      "label": "Inspect fields",
+                      "children": []
+                    },
+                    {
+                      "role": "button",
+                      "label": "Open details",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "children": [
+                    {
+                      "role": "group",
+                      "label": "11 of 11 shown",
+                      "children": [
+                        {
+                          "role": "group",
+                          "label": "I2P port notes",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "I2P service",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Reference notes",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Reference-host scene",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Mounted remote projection",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Alice",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Alice's laptop",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Alice's phone",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "SSH signing key reference",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Open-address grant",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Synthetic signing receipt",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "title": "Graphshell, one tree",
+    "visibility": "visible",
+    "viewport": {
+      "width": 420,
+      "height": 900
+    }
+  },
+  "hidden": false,
+  "appearance": {
+    "data-appearance-application": "",
+    "data-appearance-owner": "application",
+    "data-appearance-theme": "theme:default",
+    "data-appearance-mode": "hc_light",
+    "data-appearance-source": "derived",
+    "data-appearance-background": "rgb(238, 245, 255)",
+    "data-appearance-status": "Appearance saved"
+  },
+  "pixelMetrics": [
+    {
+      "name": "renderer_narrow",
+      "sha256": "1f802c218c42b26f907eaefa58746c52f759cc65e57ce1e62589d9209176ec02",
+      "x": 0,
+      "y": 0,
+      "width": 420,
+      "height": 900,
+      "idleNodeAccentPixels": 6385,
+      "sampled": 94500,
+      "colors": 979,
+      "dominantFraction": 0.7031428571428572,
+      "opaqueFraction": 1,
+      "producer": {
+        "x": 0,
+        "y": 203,
+        "width": 420,
+        "height": 697,
+        "idleNodeAccentPixels": 6385,
+        "sampled": 73185,
+        "colors": 487,
+        "dominantFraction": 0.9079319532691125,
+        "opaqueFraction": 1
+      },
+      "producerSemanticName": "11 of 11 shown"
+    }
+  ],
+  "errors": []
+}

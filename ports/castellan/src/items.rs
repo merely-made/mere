@@ -33,7 +33,7 @@ use std::sync::{Arc, Mutex, MutexGuard};
 use chatelaine::{CollectionId, Credential, CredentialId, Item, ItemId};
 use personae::{IdentityError, PersonaId, SealedRecordStorage};
 
-mod records;
+pub(crate) mod records;
 mod transaction;
 
 pub(crate) use records::Payload;
@@ -143,7 +143,7 @@ pub(crate) enum WriteStep {
 /// store for a persona the same lock.
 #[derive(Clone)]
 pub struct ItemStore {
-    storage: SealedRecordStorage,
+    pub(crate) storage: SealedRecordStorage,
     persona: PersonaId,
     transaction: Arc<Mutex<()>>,
     #[cfg(test)]
