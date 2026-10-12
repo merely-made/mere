@@ -1,0 +1,52 @@
+{
+  "captures": [
+    {
+      "file": "dark.png",
+      "png_sha256": "1aaae39081453bc45dea31895a9c80915476bed6638e4cf9c7634c64dac10acb",
+      "bytes": 730984
+    },
+    {
+      "file": "initial.png",
+      "png_sha256": "11bba2a48bd872e281c36354e1f889bc8bd3a7782cafcb2a70b3575ecc4cf012",
+      "bytes": 735678
+    },
+    {
+      "file": "named.png",
+      "png_sha256": "455ff856e8a08d8699a3b11b350f5577c38ffae9565e6ec906c66b89a5496aab",
+      "bytes": 734070
+    },
+    {
+      "file": "resized.png",
+      "png_sha256": "ea5b958f56da450ea69b21e22cd12d287f94cc3c8177036cd62fbf46646ba749",
+      "bytes": 645717
+    },
+    {
+      "file": "restored_size.png",
+      "png_sha256": "744e6cecd736382c5d0f109532baace2c370a65ee9063c08e0ccc468ad43e871",
+      "bytes": 1000261
+    },
+    {
+      "file": "seed_edited.png",
+      "png_sha256": "b1b2842c6f62d7309eaa315ff2dc32ea63a35d292f9e2a5565130a2e3f45e888",
+      "bytes": 728904
+    }
+  ],
+  "visually_reviewed": [
+    "dark.png",
+    "initial.png",
+    "named.png",
+    "resized.png",
+    "restored_size.png",
+    "seed_edited.png"
+  ],
+  "nonblank_capture_count": 6,
+  "distinct_capture_digest_count": 6,
+  "presented_frames": 53,
+  "redraws": 56,
+  "unpresented_redraws": 3,
+  "elapsed_seconds": 17.68,
+  "criteria_changed": false,
+  "same_frozen_binary_and_scenario_as_occluded_attempt": true,
+  "visual_findings": "Visible chrome, reader/syntax/graph/stylesheet content; seed hex changes #3366C8 to #3364C8; dark preview surfaces and contrasting text; Release-host-draft with caret; narrower reading wraps after resize and restores wider layout. Authored draft and selected graph assertions passed. No blank/stale target observed in six captures.",
+  "qualification_limits": "Healthy native surface presentation with current completion fence; does not qualify swapchain presentation after device destruction, OS accessibility, browser async recovery or physical driver reset."
+}
