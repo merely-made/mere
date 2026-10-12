@@ -1133,3 +1133,12 @@ family availability does not close its recorded-loop glyph coverage gate.
   same controlled text/IME slot seam as direct family entry. Picking stages a
   draft; only Apply emits a host persistence request. All 17 workshop library
   tests pass, including actual native input, filtering and staged selection.
+
+- **2026-10-12 native feedback:** Cleromancy's first headed font flow failed
+  because Mesquite split `input-text` into whitespace arguments and delegated
+  multiword font names as unknown product verbs. Its eight frames are rejected
+  evidence. The shared command now delivers the full remainder through the
+  existing controlled keyboard path. All 28 Mesquite library tests pass,
+  including actual retained text replacement with multiword family names,
+  authored CSS and double-space Unicode text. This repairs acceptance input;
+  it does not convert the failed native receipt into a pass.
