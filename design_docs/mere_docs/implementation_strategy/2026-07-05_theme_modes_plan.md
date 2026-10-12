@@ -44,7 +44,7 @@ This note does not change adoption order or claim controls in every consumer.
 
 **Status:** in progress; explicitly authorized after the nine application appearance integrations. No new typography runtime acceptance is claimed yet.
 
-Tabard owns portable UI, reading, heading, label and code preferences: requested font family, optional CSS-pixel size and optional unitless line height. Absent preferences preserve each host's defaults, heading hierarchy and control geometry. Existing JSON libraries remain readable without rewrites. Theme drafts own undo/redo, Save, Discard and conflict handling. Author CSS remains exact and last; requested font names are retained when a receiving host lacks them, with a visible generic-fallback diagnostic.
+Tabard authored themes carry explicit Interface, Reading, Heading, Label and Code styles: requested font family, optional CSS-pixel size and optional unitless line height. Application-owned family requests remain separate on `ThemeChoice.fonts`. Absent preferences preserve each host's defaults, heading hierarchy and control geometry. Existing JSON libraries remain readable without rewrites. Theme drafts own undo/redo, Save, Discard and conflict handling. Author CSS remains exact and last; requested font names are retained when a receiving host lacks them, with a visible generic-fallback diagnostic.
 
 Genet's existing Parley/Fontique stack owns installed-font discovery, resolution and measurement. The native Cambium host exposes a small family catalogue; the workshop receives it without a platform font implementation or another shaping engine. Font bytes are neither embedded nor fetched by this slice. The editor's own readable neutral style stays isolated from authored typography.
 
@@ -1249,3 +1249,19 @@ family availability does not close its recorded-loop glyph coverage gate.
   Family availability, scripted native receipts and mounted input do not certify
   glyph coverage, remote/frozen faces, physical IME, formal OS accessibility or
   general layout/contrast acceptance.
+
+### Typography native selector correction — 2026-10-12
+
+Current origin `fae241ddb` is merged, preserving the shared searchable application
+font editor, complete native scenario text payloads and published Cleromancy
+qualification. The first Pelt author process presented 82 frames with nine
+nonblank captures. Its subsequent fresh-process gate correctly refused a saved
+`sans-serif` value when the scenario expected `serif`: Taproot's attribute filter
+uses substring matching. Generic-family buttons now expose unique class tokens,
+and the scenario selects `.font-family-serif` and immediately asserts its exact
+value. Mounted-control regression and production chrome family-precedence tests
+pass; native family validation also compares complete stack entries. The failed
+batch is preserved externally under `initial-selector-failure`, without a
+qualification claim. Runtime was explicitly returned to the renderer recovery
+owner before rebuilding this candidate. A fresh three-process retry remains
+required.
