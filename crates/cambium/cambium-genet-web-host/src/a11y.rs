@@ -98,8 +98,10 @@ impl MirrorHandle {
             .focused
             .clone()
             .unwrap_or_else(|| self.root.clone());
+        let options = web_sys::FocusOptions::new();
+        options.set_prevent_scroll(true);
         self.moving.set(true);
-        let _ = element.focus();
+        let _ = element.focus_with_options(&options);
         self.moving.set(false);
     }
 }
