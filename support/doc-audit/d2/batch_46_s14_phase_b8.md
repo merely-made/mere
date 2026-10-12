@@ -400,3 +400,13 @@ and implementation gates are recommendations, not new user rulings or passed
 runtime checks. Existing authoring, context, typography, document-session and
 renderer ownership remain explicit. The original whole-document audit counts
 are unchanged; this addendum reviews only the new continuation.
+
+### First site presenter implementation, 2026-10-11
+
+Incremental review records Mark's explicit stable-face/adjacent-inspector/Fold
+selection scope. The implementation target preserves occurrence/source identity,
+keeps hidden subjects in mount-local selection, and separates inspector reading
+from source edits and automatic representation/LOD changes. It names the actual
+hosted scenarios and hardware-browser gate before landing, with wider site
+retirement and one-tree phase 4 still open. No new runtime acceptance or whole
+document claim census is asserted by this addendum.
