@@ -12,6 +12,7 @@ const READER: [u8; 32] = [2; 32];
 
 fn resource(contribution: u8, manifest: u8) -> ResourceRead {
     ResourceRead {
+        shared_by: None,
         reference: ResourceRef {
             moot: MOOT,
             contribution: [contribution; 32],
@@ -42,6 +43,10 @@ fn snapshot() -> Snapshot {
             heads: vec![[6; 32], [7; 32]],
             membership_commitment: [8; 32],
             fork: Some(Offer::Offered),
+            fork_destination: Some(ForkDestination {
+                id: [19; 32],
+                name: "Our collection copy".into(),
+            }),
         }),
         activities: vec![ActivityRead {
             reference: ActivityRef {
@@ -324,4 +329,40 @@ fn view_json_round_trips_without_becoming_a_capability_and_future_reports_are_re
         Pane::new(unknown_owner),
         Err(Refusal::MissingActivityOwner)
     ));
+}
+
+#[test]
+fn offered_collection_fork_requires_a_named_different_reviewed_destination() {
+    for destination in [
+        None,
+        Some(ForkDestination {
+            id: [5; 32],
+            name: "Same source".into(),
+        }),
+        Some(ForkDestination {
+            id: [19; 32],
+            name: " ".into(),
+        }),
+    ] {
+        let mut read = snapshot();
+        read.collection.as_mut().unwrap().fork_destination = destination;
+        let mut pane = Pane::new(read).unwrap();
+        assert_eq!(
+            pane.prepare_collection_fork().unwrap_err(),
+            Refusal::InvalidForkDestination
+        );
+    }
+}
+
+#[test]
+fn a_disclosed_sharing_root_is_immutable_without_inventing_content_authorship() {
+    let mut read = snapshot();
+    read.resources[0].shared_by = Some([17; 32]);
+    let mut pane = Pane::new(read.clone()).unwrap();
+    read.resources[0].shared_by = Some([18; 32]);
+    assert_eq!(
+        pane.refresh(read).unwrap_err(),
+        Refusal::ChangedContribution
+    );
+    assert_eq!(pane.snapshot().resources[0].shared_by, Some([17; 32]));
 }

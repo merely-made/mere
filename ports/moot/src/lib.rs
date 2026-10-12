@@ -49,3 +49,8 @@ pub mod captured_web;
 pub mod conversation;
 pub mod coop;
 pub mod resource_coop;
+
+#[cfg(feature = "resource-owner")]
+pub mod resource_owner;
+#[cfg(feature = "resource-view")]
+pub mod resource_view;
