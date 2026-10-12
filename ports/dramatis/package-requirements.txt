@@ -1,0 +1,7 @@
+Dramatis uses the shared Djinn resident for identity, custody and native consent.
+Run your installed Djinn resident before unlocking or reviewing imports.
+An absent resident leaves identity pending; Locked exposes only public roster/status.
+This package does not install or replace Djinn and its uninstaller does not remove vault data.
+
+Source and license: MPL-2.0, https://github.com/merely-made/mere
+The packaged release-info.json records the exact source revision and compiled-source hash.
