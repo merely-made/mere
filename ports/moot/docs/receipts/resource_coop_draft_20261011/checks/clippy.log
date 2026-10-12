@@ -1,0 +1,8 @@
+    Checking serde_core v1.0.229
+    Checking zmij v1.0.23
+    Checking itoa v1.0.18
+    Checking memchr v2.8.3
+    Checking serde_json v1.0.151
+    Checking serde v1.0.229
+    Checking moot-resource-coop-draft-proof v0.0.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/ports/moot/docs/receipts/resource_coop_draft_20261011/harness)
+    Finished `dev` profile [unoptimized] target(s) in 5.68s
