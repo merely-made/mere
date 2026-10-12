@@ -429,3 +429,22 @@ audit or presenter acceptance. No whole-document claim census is repeated.
 Renderer documentation followup `e0dae9c9` supplies the three missing records
 and reduces that seven-finding baseline to the four older findings. Integration
 leaves source/pin/lockfile bytes unchanged; it adds no runtime acceptance.
+
+
+### First site presenter hardware continuation, 2026-10-12
+
+Incremental review distinguishes the eleven passing headed AMD presenter cases
+at `4a090af1a` from incomplete later command/product acceptance. It records the
+current authority-export fixture without enriching historical disclosure,
+supported inspector semantics, details-before-roster correction and the three
+actual input/focus repairs. The final `8ad44a5c7` reconciliation with typography
+and native-recovery main `050e7d542` renews affected compilation; it does not
+inherit either the earlier presenter's browser qualification or the other
+owners' native receipts. The console-lock refusal and explicit runtime release
+are stated, with final browser/capture/main gates still open. This addendum
+neither repeats a whole-document census nor relaxes the live-site size cap.
+
+The combined source renews all 68 focused CPU tests, three Wasm gates and both
+locked supplier audits. Its release Wasm is measured at 6,398,022 B gzip;
+the unchanged 3,407,872 B live-site cap remains failed. Compiled/debug/release
+and earlier hardware bases are kept distinct in the updated qualification.

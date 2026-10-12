@@ -928,8 +928,8 @@ sandbox retirement or phase-4 page migration.
 
 The `inspector` presentation profile is selected by `data-presenter` or the
 `presenter` query option. A host supplies its caption, summary field and link
-field roles. The plain `viewer.html` consumes the actual exported site history
-with that profile. The reference fixture/product routes retain their existing
+field roles. The plain `viewer.html` consumes the actual current exported site dataset
+with that profile and links to a separately retained historical capture. The reference fixture/product routes retain their existing
 chrome and owners. In this profile the graph keeps its faces and footprint;
 Cambium mounts the inspector beside it, or stacks a scrollable inspector under
 the graph at narrow widths. Commands, fit and deeper tools remain reachable;
@@ -986,7 +986,7 @@ remains old-pin/unqualified. The renderer coordinator requires the final
 coherent Genet/Netrender/provider/Fleece/Knot/Mere family before browser
 acceptance; interim supplier heads are not that basis. Merge its published
 Mere revision, renew the affected gates and packages, and take only its explicit
-finite runtime release. No headed/GPU launch has occurred from this lane.
+finite runtime release. At that old-pin qualification stage no headed/GPU launch had occurred.
 The dev package's function-name custom section was removed with
 `wasm-bindgen --remove-name-section`; all other Wasm sections are byte-identical,
 reducing viewer transfer from 344.7 MB to 43.6 MB for the dev checks.
@@ -1021,11 +1021,12 @@ integrated at compiled source `91f46146d`, with Genet `2c7ef73b`, Netrender
 viewer/product debug builds and main-page checking pass again; locked metadata
 in both consumer roots contains only the expected supplier revisions. The
 [source-bound candidate receipt](../../../ports/graphshell/docs/receipts/host_presenter_20261012/qualification.json)
-records source/package hashes and retains false browser/GPU/visual/main flags.
+records that source/package basis with false browser/GPU/visual/main flags;
+those historical flags do not describe the later partial runs below.
 The renderer explicitly offered and this lane accepted a finite Chrome window
 of up to 30 minutes after rebuilding and confirming an unlocked console.
-`CGSSessionScreenIsLocked` still reports true, so no browser has launched and
-the following Tabard typography window remains queued. Each prepared driver
+At that rebuild checkpoint `CGSSessionScreenIsLocked` reported true, so the
+browser window remained unused and Tabard typography remained queued. Each prepared driver
 checks console unlock before Chromium launch; main integration still requires
 the browser checks and capture review. No toolbar/parity acceptance is inferred
 from compilation.
@@ -1038,6 +1039,49 @@ findings; the renderer owner reconciled its three new document records at
 `e0dae9c9`, a documentation-only descendant integrated here with all recorded
 source and lockfile byte hashes unchanged. Four older D2 findings remain, and
 this plan's incremental record remains present.
+
+
+**Hardware continuation and current disclosure (2026-10-12):** the first
+complete presenter batch, `presenter-browser-r8`, ran headed Chrome on the
+AMD `gcn-5` adapter with compiled source `4a090af1a`. All eleven cases passed:
+Fold and checkpoint selection, keyboard and narrow inspector access, independent
+related inspection, clear/focus return, the planted selection-loss control,
+unknown-profile refusal, omission of undisclosed historical links, and actual
+Enter activation of a current disclosed project URL. Wide and plain-page
+captures were inspected. This is earlier-source presenter proof, not final
+combined command/product acceptance or main landing.
+
+The exact public site's current `scenomise.host-dataset/v1` export is now a
+separate 66,623-byte fixture, SHA-256 `69b322357acaa034c47887cbce560815f089a63304582fd8fd803c5145cb3380`,
+with 22 repositories and authority-authored summaries, relationship scope and
+project/GitHub URLs. The old thin history stays unchanged and exposes no
+invented links. The inspector's supported named region and placement of subject
+details before the expanded roster were corrected during browser review.
+
+The physical command batch found three real input seams: DOM wheel direction
+needed translation into the native canvas convention; DOM F10 needed its named
+key mapping; and removing a focused accessibility proxy needed to retain page
+focus ownership before mutation. These repairs are `659274653`, `aae20fb9f`
+and `7cd9a985e`. The last headed attempt confirmed that physical Shift+F10
+reaches the graph and opens command search after dismissal; the full batch
+still awaited completion after fixing an asynchronous harness wait. A later
+console lock stopped the guard before Chrome launch. That finite runtime slot
+was released, with no owned browser/GPU/server left running.
+
+Current source `8ad44a5c7` integrates main `050e7d542`, including the typography
+and native-recovery owners' publications. All 68 focused CPU tests, viewer/product debug builds and main-page checking
+pass on that combined source. Its renewed packages and release measurement
+remain separate from browser acceptance while the human unlock is pending.
+The final command/gesture and fresh-profile saved-product matrix, a renewed
+presenter batch on the final combined package, and visual review remain the
+main-landing gates. Earlier-source browser records retain their own hashes;
+no acceptance is transferred from the other owners' native receipts. The release measurement on `8ad44a5c7` is 6,398,022 B gzip against the
+unchanged 3,407,872 B cap. Glue (18,728 B), mount (588 B) and history
+(6,254 B) pass their individual caps. This records the existing live-delivery
+gate separately from shared presenter landing. The browser slot is released
+while the console remains locked; no owned browser, server, build or inhibitor
+is left running. The feature branch is reviewable; main integration awaits
+the remaining hardware checks.
 
 ## 5. Stop rules
 
