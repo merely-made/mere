@@ -1,0 +1,10 @@
+{
+  "source_url": "https://merelyllc.com/repository-host-dataset.json",
+  "download_date": "2026-10-12",
+  "sha256": "69b322357acaa034c47887cbce560815f089a63304582fd8fd803c5145cb3380",
+  "bytes": 66623,
+  "site_checkout": "87d7a3dde32e4538dd4115b7c13d4aecb76dc639",
+  "fixture": "ports/graphshell/web/fixtures/site-presenter-host-dataset.json",
+  "purpose": "Current authority-disclosed summaries and navigation fields for the plain presenter; older history fixture remains unchanged and separately selectable",
+  "dataset_revision": "sha256:8384757760a2f4f8cd59d34f76213a49f29356bce136a88371c26b0eca1e6bb0"
+}
