@@ -34,8 +34,10 @@ can choose installed fonts while retaining useful heading, size and text
 patterns. Firefox's [font preferences](https://support.mozilla.org/en-US/kb/change-fonts-and-colors-websites-use)
 are a checked precedent for serif/sans-serif/monospace choices, sizes and minimum
 size. Those generic families do not themselves define Mere's UI, reading,
-heading or label roles. The role schema, override precedence and remote/frozen
-fidelity remain open; measurements must stay coherent with realized fonts.
+heading or label roles. The bounded family-role schema and application preference precedence are now
+implemented below in the 2026-10-12 continuation. Size/minimum-size controls and
+remote/frozen face fidelity remain open; measurements must stay coherent with
+realized fonts.
 This note does not change adoption order or claim controls in every consumer.
 
 ## Application adoption (2026-10-09)
@@ -1058,8 +1060,8 @@ T4 and T5 ride settings passes; T5 last.
 
 ## Granular font roles — 2026-10-12
 
-**Status:** shared family contract and reusable preference editor implemented;
-Cleromancy adoption and native qualification in progress. Coordinated with
+**Status:** shared family contract, reusable preference editor and Cleromancy
+macOS adoption qualified and published. Coordinated with
 Knot and Woodshed against Mere `22c0dbc5d`; neither consumer is repinned or
 qualified by this shared publication. No exposed chat identifies the q-pc
 owner, so its remote/unpublished work has not been reconciled.
@@ -1142,3 +1144,19 @@ family availability does not close its recorded-loop glyph coverage gate.
   including actual retained text replacement with multiword family names,
   authored CSS and double-space Unicode text. This repairs acceptance input;
   it does not convert the failed native receipt into a pass.
+
+- **2026-10-12 downstream publication:** Cleromancy `6cf1e405` publishes the
+  bounded macOS arm64 font-role slice, with runtime `c1fb4ce7` pinned to Mere
+  `addccab32` and the current coherent supplier family. Its 101 root and 17
+  portable-core tests pass; two native processes pass nine reviewed captures
+  and 123 presentations. Shared font picker Apply, all four canonical modes,
+  authored restoration, compact Reading entry and fresh reopening are recorded
+  in `cleromancy/design_docs/receipts/tabard_20261011/font-roles/qualification.json`.
+  Exact font request/library bytes, card data, all three durable IDs and 1/3/1
+  counts survive reopening. The original eight-capture text-input attempt stays
+  rejected. Knot/Woodshed have the published contract, metric/cache/dynamics
+  prerequisites and serialized native-lane handoff; their adoption remains open.
+  Current role mappings preserve host default sizes and explicit authored CSS.
+  Family availability, scripted native receipts and mounted input do not certify
+  glyph coverage, remote/frozen faces, physical IME, formal OS accessibility or
+  general layout/contrast acceptance.
