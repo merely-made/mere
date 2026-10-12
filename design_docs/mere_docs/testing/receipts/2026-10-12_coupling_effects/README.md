@@ -17,6 +17,10 @@ keeps Rapier 0.36 with enhanced determinism. No manifest, dependency or version
 changes accompany this draft. Qualification uses the existing
 `C:/t/cargo-targets/mere` target with two build jobs and four test threads.
 
+The point-evaluation and tracing sections below retain the facts qualified at
+their named source checkpoints. The latest field-runtime continuation implements
+F203 to F205; earlier t=0/selector-only limits are historical checkpoint limits.
+
 ## What is implemented
 
 [CouplingForce](../../../../../crates/conatus/seiche/src/coupling_force.rs)
@@ -229,3 +233,142 @@ per-appearance reference-point membership including the boundary, and initial
 matches reported without entry actions. Their runtime adapters remain pending;
 this trace still reports current t=0 sampling and captured selector targets. No Firefox, native UI, GPU, whole-stack adoption or persistent
 trace format is claimed by this source/API draft.
+
+
+## Field clock and membership runtime (2026-10-12)
+
+**Status:** implemented F203 to F205 source/API and Canvas adapter. Source
+checkpoint `bb2591c08032226506b986f19fd9ab1ec131b69e` is based on published Mere
+`050e7d54`. The shared target is `C:/t/cargo-targets/mere`, with two build jobs
+and four test threads. Dependency/manifest changes do not belong to this slice.
+Frozen source hashes, commands and outcomes are in
+[runtime/qualification.json](runtime/qualification.json). Qualification is
+implementing-agent evidence, with coordinator review and external adoption
+separate.
+
+The field clock accumulates valid tick intervals in f64. Each physical evaluation
+and trace retains the actual f32 value consumed by Numen; field time is separate
+from the monotonically increasing step counter used to age lagged answers.
+Pause freezes it, including pointer-driven body ticks, and positive settle/Play
+resumes. Reset restores supplied node positions, rewinds field time on a new
+epoch and clears old traces and membership baselines. It preserves paused state.
+Ordinary seeding and source rebuilds do not rewind time. Grouped force contexts
+carry the same clock. Recognized Time-dependent couplings request continued
+ticks, while unsupported physical responses make no animation-execution claim.
+
+Each candidate body is tested at its reference point in the bound world extent.
+Region and polygon boundaries are inclusive; collinear/empty polygon behavior
+remains empty, and no epsilon/hysteresis policy is invented. Camera transforms
+and rendered footprints do not drive this test. Extent and available selector
+metadata are retained in the exact input snapshot. Scope eligibility remains
+separate from the response's positive-scalar and dynamic-body guards. Attached
+extents refuse physical execution until an owner supplies resolved geometry.
+Missing bodies, invalid reference points/sample time and unresolved scope do
+not become a fabricated outside-to-inside transition.
+
+First observations report initial membership without invoking entry callbacks.
+Known appearances survive valid binding changes. Reports retain field, query,
+source-identity/revision, actual point-movement and Reset causes; several may
+coincide. Candidate removal/restoration is a later transition for a known live
+appearance. A new/reused body generation or changed identity starts initial
+reporting. Repeated physical target slots keep their original multiplicity and
+sample-point snapshot, but one appearance receives one membership observation
+and one eligible entry callback. Separate bodies with a shared member ID and
+different occurrence IDs can have different membership.
+
+Entry callbacks are explicitly owner-registered and run synchronously on the
+simulation thread. Only later observed entries invoke them. Results distinguish
+not requested, unregistered, completed and refused. Completion means the callback
+returned success; the domain owner still owns any pending work, source validation
+and durable transaction. Duplicate named coupling bindings have distinct compiled
+histories and refuse ambiguous entry dispatch. Physical effects remain separately
+observed. No serialized applet or general script engine is executed here.
+
+The trace's row cap still discloses omitted rows while executing all physical
+applications and eligible membership callbacks. Reports are latest diagnostics,
+not a retained event log. The actor shares one latest membership frame, so queued
+layout packets cannot accumulate diagnostic history. Callbacks execute at the
+observation rather than on report folding; reading/dropping a report cannot
+replay or suppress an already eligible callback. A reset barrier rejects delayed
+clock, membership and physical-trace evidence. Historical reports retain their
+original binding and clock epoch instead of resolving today's source by index.
+
+The live Canvas force bridge now passes extent and selector plus the existing
+stable field/coupling/member IDs, without fabricating occurrence IDs for graph
+bodies. It excludes retired fields at initial construction as well as rebuild.
+Canvas's existing node-reseed and graph-replacement paths call the explicit
+field-runtime reset; this is not a complete backdrop/media/law-state reset.
+Visible scripting controls, app-specific receivers, UI/platform acceptance,
+Firefox, GPU execution and external consumer pins are not qualified by this
+backend adapter.
+
+The [runnable example](../../../../../crates/conatus/seiche/examples/field_runtime.rs)
+shows real Time-driven displacement, an initial inside match with zero callbacks,
+an observed exit, a field edit admitting a known appearance with one callback,
+clock freezing and a reset that re-establishes initial membership without replay.
+Run from Mere:
+
+```text
+cargo run --locked --offline -p seiche --no-default-features --example field_runtime -j 2
+```
+
+Gradient declarations follow the new execution. Global autonomous fields retain
+their existing energy path. Timed or extent-clipped gradient terms conservatively
+declare nonautonomous N and expose no timeless global potential; a bounded field
+cannot certify the unbounded potential when it stops applying outside scope.
+State-writing responses retain K. The original trajectory fixtures use global
+static fields and remain the direct regression baseline.
+
+The final gates pass:
+
+| Gate | Result |
+|---|---|
+| [New runtime cases](runtime/focused.log) | 19 passed, including three actor cases |
+| [Original trajectories](runtime/trajectory.log) | All 13 original digests agree; fixture checks tracing off/on |
+| [Default engine](runtime/default.log) | 201 library passed, 10 ignored; integrations 5 and 4 passed |
+| [Inline engine](runtime/inline.log) | 189 library passed, 10 ignored; integrations 5 and 4 passed |
+| [Serde engine](runtime/serde.log) | 208 library passed, 10 ignored; integrations 5 and 4 passed |
+| [Numen](runtime/numen.log) | 53 passed, including every polygon edge/vertex, reversed winding and collinear controls |
+| [Wasm inline library](runtime/wasm.log) | Compile passed |
+| [Example](runtime/example.log) | Real clock, scope, entry and reset assertions passed; one owner entry callback |
+| [Canvas runtime](runtime/host-field-runtime.log) | 4 passed; 435 other library tests filtered |
+| [Canvas coupling bridge](runtime/host-coupling.log) | 14 passed; 425 other tests filtered |
+| [Canvas live physics](runtime/host-live-physics.log) | 10 passed; 429 other tests filtered |
+| [Clippy all targets](runtime/clippy.log) | Passed; 15 Seiche library warnings, 17 test warnings including 15 duplicates; inherited diagnostics recorded |
+
+Three source controls prove the tests reject broken rulings. The
+[zero-clock control](runtime/negative-zero-clock.log) samples a timed force at
+zero instead of accepted time; the real-motion test fails. The
+[exclusive-boundary control](runtime/negative-exclusive-boundary.log) excludes
+a region's lower boundary; the physical-write test fails. The
+[initial-entry control](runtime/negative-initial-entry.log) invokes a registered
+callback on an initial inside match; the initial-suppression test fails.
+[Restoration](runtime/negative-controls.json) verifies every mutated source is
+restored byte for byte. Focused, original-trajectory and Canvas runtime gates
+then pass again on the restored source.
+
+Prototype failures are retained. An
+[import failure](runtime/tick-demand-import-failure.log) was corrected by importing
+the existing force trait for tick demand. A
+[gradient assertion](runtime/gradient-exactness-assumption-failure.log) incorrectly
+expected an analytical 0.25 gradient where Numen's unchanged Mul/Sample path
+uses finite differences and returns about 0.24986266 at this scale. The corrected
+fixture checks an explicit 1e-3 numerical tolerance, while clock/displacement
+fixtures retain exact power-of-two assertions. A
+[camera fixture](runtime/camera-no-new-tick-assumption-failure.log) expected an
+unchanged membership event after rendering an idle world without taking a new
+tick; the accessor correctly retained its historical initial report. The fixture
+now takes a new sample after the camera operations. Product behavior was not
+changed to fit either mistaken assertion.
+
+All 25 owned source files pass the
+[header/baseline-aware formatting check](runtime/source-format-headers.json).
+The current index-wide [header audit](runtime/headers.log) passes; the earlier
+tracing phase's header finding is historical at its own checkpoint. Existing
+Seiche export/runtime-line format debt is preserved. Documentation self-test,
+comparison against the published base and D2 coverage results accompany this
+phase. The [mechanical comparison](runtime/docs-comparison.json) against
+published `050e7d54` introduces zero findings across five amended documents.
+[D2 verification](runtime/docs-d2.json) accepts batch 76's five bounded records,
+with the same three unrelated missing coverage records for the classic-browser
+and producer receipts. These outcomes do not requalify the whole document tree.
