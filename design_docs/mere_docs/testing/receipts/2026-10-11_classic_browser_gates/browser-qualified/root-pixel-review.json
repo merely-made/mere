@@ -1,0 +1,284 @@
+{
+  "accepted": true,
+  "captures": 12,
+  "independent_pixel_checks": [
+    {
+      "stage": "mode-dark",
+      "capture": "renderer_mode_dark",
+      "sha256": "c3f5e3a40f5fa22c365b813dbf5e3fa796a6e5d680a439c5a1283a26b163159c",
+      "producer_idle_node_pixels": 6983,
+      "producer_rgba_sha256": "ad193ac05990dd487fc5b8945b30cfacc8ad5eda9cfd6166916f75836dec7984",
+      "producer_rect": {
+        "x": 0,
+        "y": 135,
+        "width": 1140,
+        "height": 865,
+        "idleNodeAccentPixels": 6983,
+        "sampled": 246525,
+        "colors": 463,
+        "dominantFraction": 0.9719217117939357,
+        "opaqueFraction": 1
+      },
+      "capture_dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "stage": "mode-hc_dark",
+      "capture": "renderer_mode_hc_dark",
+      "sha256": "9ce589bdc53f4f12eeab39fdd224afc70087efb464011f7eff5408a964e41d3a",
+      "producer_idle_node_pixels": 6950,
+      "producer_rgba_sha256": "c1d8ece83a69dec51188e9d1d3e4745526b2e89079c78867c71f3fe73286309e",
+      "producer_rect": {
+        "x": 0,
+        "y": 135,
+        "width": 1140,
+        "height": 865,
+        "idleNodeAccentPixels": 6950,
+        "sampled": 246525,
+        "colors": 484,
+        "dominantFraction": 0.9719217117939357,
+        "opaqueFraction": 1
+      },
+      "capture_dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "stage": "mode-hc_light",
+      "capture": "renderer_mode_hc_light",
+      "sha256": "537b17d68800c4e2b988522a8468d13559d9c34ee214642c7733cf60189ff35a",
+      "producer_idle_node_pixels": 6948,
+      "producer_rgba_sha256": "8be901f6ccb52cfca3dd71c970b97e8db68ffc6478a75d0d94d440032ecd5b21",
+      "producer_rect": {
+        "x": 0,
+        "y": 135,
+        "width": 1140,
+        "height": 865,
+        "idleNodeAccentPixels": 6948,
+        "sampled": 246525,
+        "colors": 479,
+        "dominantFraction": 0.9719217117939357,
+        "opaqueFraction": 1
+      },
+      "capture_dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "stage": "mode-light",
+      "capture": "renderer_mode_light",
+      "sha256": "c7ec252d42e903ed3d7e1c8a78e503e6bf9f1a831820d4dc501d96e32c324f14",
+      "producer_idle_node_pixels": 6950,
+      "producer_rgba_sha256": "3de1d365a3fc60ba7c7cca8e5b07d2a0ff2d0d08957f4a26a03e75af3f9a01ee",
+      "producer_rect": {
+        "x": 0,
+        "y": 135,
+        "width": 1140,
+        "height": 865,
+        "idleNodeAccentPixels": 6950,
+        "sampled": 246525,
+        "colors": 452,
+        "dominantFraction": 0.9719217117939357,
+        "opaqueFraction": 1
+      },
+      "capture_dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "stage": "narrow",
+      "capture": "renderer_narrow",
+      "sha256": "1f802c218c42b26f907eaefa58746c52f759cc65e57ce1e62589d9209176ec02",
+      "producer_idle_node_pixels": 6385,
+      "producer_rgba_sha256": "9522ff6cce82ca6f94fff543fb9e6229355abd593d2b3ae73014254a0970e21b",
+      "producer_rect": {
+        "x": 0,
+        "y": 203,
+        "width": 420,
+        "height": 697,
+        "idleNodeAccentPixels": 6385,
+        "sampled": 73185,
+        "colors": 487,
+        "dominantFraction": 0.9079319532691125,
+        "opaqueFraction": 1
+      },
+      "capture_dimensions": [
+        420,
+        900
+      ]
+    },
+    {
+      "stage": "production",
+      "capture": "renderer_cold",
+      "sha256": "cc1f34ff2ef31e11577a7162779136b6f914b745fd1e467d8bd4677c2c1c4d3f",
+      "producer_idle_node_pixels": 7694,
+      "producer_rgba_sha256": "20a55659c923790256e0d8613e8cd548ba2829279b5c3c1c0b9796a287241ffe",
+      "producer_rect": {
+        "x": 0,
+        "y": 135,
+        "width": 1140,
+        "height": 865,
+        "idleNodeAccentPixels": 7694,
+        "sampled": 246525,
+        "colors": 433,
+        "dominantFraction": 0.9747125038028598,
+        "opaqueFraction": 1
+      },
+      "capture_dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "stage": "production",
+      "capture": "renderer_repeat",
+      "sha256": "2d90616d81c336e11f030d359e9cae60666caefc567cd4337b263e1925f6af4b",
+      "producer_idle_node_pixels": 7694,
+      "producer_rgba_sha256": "20a55659c923790256e0d8613e8cd548ba2829279b5c3c1c0b9796a287241ffe",
+      "producer_rect": {
+        "x": 0,
+        "y": 135,
+        "width": 1140,
+        "height": 865,
+        "idleNodeAccentPixels": 7694,
+        "sampled": 246525,
+        "colors": 433,
+        "dominantFraction": 0.9747125038028598,
+        "opaqueFraction": 1
+      },
+      "capture_dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "stage": "production",
+      "capture": "renderer_draft",
+      "sha256": "f33d51c5349a3da9784c894188e2db3bdcfdb8bab6c19ef9707627d779d8d325",
+      "producer_idle_node_pixels": 7694,
+      "producer_rgba_sha256": "20a55659c923790256e0d8613e8cd548ba2829279b5c3c1c0b9796a287241ffe",
+      "producer_rect": {
+        "x": 0,
+        "y": 135,
+        "width": 1140,
+        "height": 865,
+        "idleNodeAccentPixels": 7694,
+        "sampled": 246525,
+        "colors": 433,
+        "dominantFraction": 0.9747125038028598,
+        "opaqueFraction": 1
+      },
+      "capture_dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "stage": "production",
+      "capture": "renderer_zoom",
+      "sha256": "9dfb77a6613c9bf170edfd3bd3fe572f514f0b5145ac1504cc2156d2c7214a21",
+      "producer_idle_node_pixels": 10450,
+      "producer_rgba_sha256": "4679108a2fe157fe1a463dc743ab542074d4ddece380217a6239f28c52745267",
+      "producer_rect": {
+        "x": 0,
+        "y": 135,
+        "width": 1140,
+        "height": 865,
+        "idleNodeAccentPixels": 10450,
+        "sampled": 246525,
+        "colors": 461,
+        "dominantFraction": 0.9698488997059121,
+        "opaqueFraction": 1
+      },
+      "capture_dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "stage": "production",
+      "capture": "renderer_input",
+      "sha256": "e260b296712751e1ee31c9052d6d41594632365a68f8015d3dccee3f0ba0fbe3",
+      "producer_idle_node_pixels": 6969,
+      "producer_rgba_sha256": "751775018b95a6dd25a6d1383ecaf2470404d1d2ed54641e2fffc2de771cbeec",
+      "producer_rect": {
+        "x": 0,
+        "y": 135,
+        "width": 1140,
+        "height": 865,
+        "idleNodeAccentPixels": 6969,
+        "sampled": 246525,
+        "colors": 744,
+        "dominantFraction": 0.878564040158199,
+        "opaqueFraction": 1
+      },
+      "capture_dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "stage": "rebound",
+      "capture": "renderer_rebound",
+      "sha256": "8cbfca60e1db224bc12f8861e3d19ae0196c3b48ebcbf9a44f15af0b8013bcdb",
+      "producer_idle_node_pixels": 7638,
+      "producer_rgba_sha256": "628a0ac231879ac18153a683bc75f0578674e70f6a2412ae605aa1a95cf483d1",
+      "producer_rect": {
+        "x": 0,
+        "y": 135,
+        "width": 1140,
+        "height": 865,
+        "idleNodeAccentPixels": 7638,
+        "sampled": 246525,
+        "colors": 451,
+        "dominantFraction": 0.9747125038028598,
+        "opaqueFraction": 1
+      },
+      "capture_dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "stage": "resized",
+      "capture": "renderer_resized",
+      "sha256": "05ef9bd52769c2484ca34e77898547b3f93cab424f4526bcde03d6c88011b3fe",
+      "producer_idle_node_pixels": 6385,
+      "producer_rgba_sha256": "e3a721af558a45f5a564c85995dac8ac22da6242856e76d857a51b31ef678480",
+      "producer_rect": {
+        "x": 0,
+        "y": 135,
+        "width": 1140,
+        "height": 865,
+        "idleNodeAccentPixels": 6385,
+        "sampled": 246525,
+        "colors": 489,
+        "dominantFraction": 0.9726680864009736,
+        "opaqueFraction": 1
+      },
+      "capture_dimensions": [
+        1440,
+        1000
+      ]
+    }
+  ],
+  "cold_repeat_producer_exact": true,
+  "saved_session": "316c3353-ffa1-4739-8238-876ae830f392",
+  "rebound_reopened": true,
+  "visually_inspected": [
+    "production/renderer_cold.png",
+    "mode-hc_light/renderer_mode_hc_light.png",
+    "narrow/renderer_narrow.png"
+  ],
+  "rejected_prior_run": "run-3/root-visual-review.json",
+  "limits": [
+    "Browser DOM/keyboard scenario routing; actual OS assistive actions unexecuted",
+    "Actual GPU readback and node-paint presence; cross-renderer browser parity unqualified",
+    "Narrow visibility restored with ordinary drawer-close and Fit graph actions"
+  ]
+}

@@ -1,0 +1,17 @@
+# Copyright 2026 Mark Alan Boykin
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# SPDX-License-Identifier: MPL-2.0
+
+# Fresh isolated --library only. Root schedules PID-validated OS AX actions
+# while this finite presented-frame window is alive. No scripted edit actions.
+log Actual OS AX probe session: mode press and numeric hue value
+settle 4
+remember original
+capture ax_initial
+settle 1500
+assert snap mode == dark
+differs original primary
+same original name theme graph_selected
+capture ax_mutated

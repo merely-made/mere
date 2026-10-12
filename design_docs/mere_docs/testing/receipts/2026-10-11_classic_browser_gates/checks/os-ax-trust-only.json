@@ -1,0 +1,14 @@
+{
+  "command": [
+    "output/vello-classic-browser-gates-20261011/accessibility-reset/ax-probe",
+    "--trust-only",
+    "--output",
+    "/Users/markik/Code/output/vello-classic-browser-gates-20261011/accessibility-reset/swift-trust.json"
+  ],
+  "cwd": "/Users/markik/Code",
+  "deadline_seconds": 25,
+  "elapsed_seconds": 0.42,
+  "exit_code": 2,
+  "timed_out": false,
+  "log": "/Users/markik/Code/output/vello-classic-browser-gates-20261011/checks/os-ax-trust-only.log"
+}

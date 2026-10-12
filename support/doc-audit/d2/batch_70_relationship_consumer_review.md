@@ -7,25 +7,31 @@ requalification. Base: Mere `74c1d810`; consumer inspection: published Knot
 the separate clip export and `9790938` Windows qualification. Mark's explicit
 placement ruling and Knot `63aa695` continuation are recorded with
 their separate Windows and native qualification. Existing historical progress and broader paused
-physics work remain outside this pass.
+physics work remain outside this pass. The subsequent viewport continuation
+uses Mere `ec1e65ca` as its doc base and Knot `156626f` for its
+consumer proof. Mark's instruction parks Firefox while browser control is blocked.
 
 | doc | disposition | status accurate | claims | holds | stale | unverifiable |
 |---|---|---|---:|---:|---:|---:|
-| mere_docs/research/2026-10-09_scenograph_codex_handoff.md | current | yes | 9 | 9 | 0 | 0 |
-| mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md | current | yes | 11 | 11 | 0 | 0 |
+| mere_docs/research/2026-10-09_scenograph_codex_handoff.md | current | yes | 10 | 10 | 0 | 0 |
+| mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md | current | yes | 12 | 12 | 0 | 0 |
 | DOC_README.md | current | yes | 2 | 2 | 0 | 0 |
 
-Totals: 3 documents, 22 claims checked, 22 holds, zero stale or unverifiable
+Totals: 3 documents, 24 claims checked, 24 holds, zero stale or unverifiable
 claims in these amendments; zero remaining contradictions within this pass.
 The owned-document mechanical comparison introduces zero findings. Full-tree
 findings and the pre-existing producer-gates README's missing D2 record remain
 separate. Runtime receipts belong to their named source/platform families.
+After the viewport continuation rebased onto `2aecdf95`, three upstream coverage
+gaps remain: the producer-gates README and the classic-browser-gates README and
+browser-preparation document. None is created or amended by this pass; the
+amended documents retain their D2 coverage.
 
 ## mere_docs/research/2026-10-09_scenograph_codex_handoff.md
 
 - disposition: current
 - status line: "Dynamics consumer refresh (2026-10-11)" — accurate: yes
-- claims checked: 9 — holds: 9, stale: 0, unverifiable: 0
+- claims checked: 10 — holds: 10, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -50,12 +56,14 @@ Checked constructor/caller identity, occurrence mapping, original flat refusal,
 source provenance boundaries, published macOS/Windows receipts, the explicit
 placement ruling, exact-pose Keep/undo/redo/reopen qualification and remaining
 gate scope. The two executable phases and known visual defects are explicit.
+The newer toolbar/reveal qualification uses captured host-owned geometry and
+preserves source authority, ordinary scrolling and the parked Firefox scope.
 
 ## mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md
 
 - disposition: current
 - status line: "Relationship consumer qualification (2026-10-11)" — accurate: yes
-- claims checked: 11 — holds: 11, stale: 0, unverifiable: 0
+- claims checked: 12 — holds: 12, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -80,6 +88,8 @@ lifecycle, fixed-plane display limits, recorded shared/native gate evidence,
 Windows navigation repair and explicit placement policy/qualification. The
 complete final-source workspace is distinguished from the earlier Keep-runtime
 gate, and fresh reopen selects the exact immutable version.
+The viewport continuation has its own focused/native evidence and one-shot
+scroll-away guard. It does not inherit a new full-workspace pass from `63aa695`.
 The golden failure is reported rather than changed. This review is not the
 original physics coordinator's independent review.
 
