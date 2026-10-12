@@ -275,7 +275,7 @@ struct Checkpoint {
     translated_receipt_digest: Option<String>,
 }
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 struct View {
     current: ViewIntent,
     log: Journal<ViewEntry>,
@@ -578,6 +578,9 @@ pub struct GraphSession<B> {
     saved_pending_links_revision: u64,
     retained_pending_links_revision: u64,
 }
+
+#[path = "graph_session_transaction.rs"]
+mod transaction;
 
 impl<B: Backend> GraphSession<B> {
     /// Begin a new session in memory, from `baseline` or empty, with `kind` as
