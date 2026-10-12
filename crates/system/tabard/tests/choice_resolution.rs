@@ -155,3 +155,18 @@ fn invalid_definitions_do_not_gain_authority_via_css_and_inert_builtins_still_va
     assert_eq!(tabard::portable::parse_theme_json(&json).unwrap(), *builtin);
     assert!(builtin.presentation_for_mode(&Mode::Dark).is_ok());
 }
+
+#[test]
+fn font_requests_survive_theme_fallback_without_entering_the_definition() {
+    let registry = ThemeRegistry::default();
+    let mut choice = ThemeChoice::new("unavailable", Some(Mode::Dark));
+    choice.fonts = serde_json::from_str(r#"{"reading":["Missing face","serif"]}"#).unwrap();
+    let resolved = resolve_theme_choice(&registry, &choice).unwrap();
+    assert_eq!(resolved.requested, choice);
+    assert_eq!(resolved.resolved.fonts, choice.fonts);
+    assert!(
+        !serde_json::to_string(&resolved.theme)
+            .unwrap()
+            .contains("Missing face")
+    );
+}
