@@ -2058,3 +2058,15 @@ Both incoming scenario scripts now explicitly open Graph tools before revealing
 the inspector controls. The original fresh-origin attempt reached a collapsed
 tools pane and was stopped; it is retained as incomplete evidence. Corrected
 fresh-origin and retained-origin browser qualification is in progress.
+
+#### Field editor delivery integration (2026-10-11)
+
+The field editor lane integrated remote Moot work `f197cadf` and the newer
+relationship-inspection source `2fc4024a` at `be6c09a1`. Locked offline product
+and viewer-only Wasm checks both pass from `ports/graphshell/web`, using the
+shared stable Cargo target. These compile checks are recorded separately in the
+[field editor receipt](../../../ports/graphshell/docs/receipts/field_editor_presentation_browser_20261011/qualification.json).
+Its ten passing Chrome cases and eighteen reviewed captures remain bound to
+their named package cuts; the newer integrated source does not inherit those
+browser results. The temporary integration checkout preserves concurrent
+Dramatis packaging work in the primary checkout and is removed after delivery.

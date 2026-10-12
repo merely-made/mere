@@ -1,0 +1,2 @@
+    Blocking waiting for file lock on build directory
+Stopped by owner while waiting for the shared target lock, before compilation, to include the newer peer source commit. This is not a completed gate.

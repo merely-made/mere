@@ -3,6 +3,42 @@
   "timezone": "America/New_York",
   "owner": "Inspector, presentation and exact coupling strength qualification",
   "status": "qualified for the named source cuts and scope",
+  "integration": {
+    "source_commit": "be6c09a114e51902ff10666e264d85d6c6ab41d6",
+    "included": "Remote Moot commit f197cadf and peer dynamics inspector commit 2fc4024a, merged without conflicts in an isolated checkout.",
+    "product": {
+      "result": "passed",
+      "command": "cargo check --target wasm32-unknown-unknown --no-default-features --features product --locked --offline --target-dir C:/t/cargo-targets/mere -j 2",
+      "cwd": "ports/graphshell/web",
+      "log": "integration_final_product_check.log",
+      "sha256": "5188b442c3e35cbf80f57033421c3135bf60ee7bcb72f42580fdddd841c037c0",
+      "bytes": 18306
+    },
+    "viewer": {
+      "result": "passed",
+      "command": "cargo check --target wasm32-unknown-unknown --no-default-features --locked --offline --target-dir C:/t/cargo-targets/mere -j 2",
+      "cwd": "ports/graphshell/web",
+      "log": "integration_final_viewer_check.log",
+      "sha256": "e5c9975792c9565e1dd784be461c0689fbc47015406cea1d9b950a954ac2ebae",
+      "bytes": 20304
+    },
+    "earlier_checks": [
+      {
+        "source_commit": "84f18ca9b160ac445d1ef57fe16a5ede2814f54c",
+        "log": "integration_product_check.log",
+        "result": "passed before the newer peer commit",
+        "sha256": "5a4e417a402dba67bd3d0bfd063e832594f552bb8a9b6c6523f7335a14875f24",
+        "bytes": 22494
+      },
+      {
+        "log": "integration_viewer_check.log",
+        "result": "aborted while waiting for the shared target lock before compilation, to include the newer peer commit",
+        "sha256": "a0fa31e7b98c66477bbba56c910c4583ca9c2166b39266c969446ae9c20139f8",
+        "bytes": 206
+      }
+    ],
+    "limit": "Integrated source has compile evidence only; the Chrome cases below remain bound to their named earlier packages."
+  },
   "packages": {
     "inspection": {
       "owner": "Field editor and presentation Chrome qualification",
@@ -655,7 +691,7 @@
     "viewport": "Reset to default",
     "servers": "Owned qualification ports stopped; no unrelated processes stopped",
     "generated_package": "Owned stable package and stripped input removed after marker/hash/type checks",
-    "worktree": "None created",
+    "worktree": "Temporary C:/Users/mark_/Code/worktrees/mere-field-editor created for the actual integration collision; removal follows delivery to main",
     "cargo_target": "Shared stable C:/t/cargo-targets/mere retained; no isolated Cargo home/target created",
     "browser_stores": "Isolated qualification IndexedDB origins retained for evidence/reopen; no personal store used"
   }
