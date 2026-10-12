@@ -351,3 +351,66 @@ fn generic_font_buttons_select_the_exact_family_despite_shared_name_substrings()
         Some("sans-serif")
     );
 }
+
+#[test]
+fn visible_chrome_and_syntax_font_roles_change_without_styling_the_editor() {
+    use tabard::FontRole;
+    let mut state = WorkshopState::in_memory();
+    for (role, family, size) in [
+        (FontRole::Interface, "serif", "18"),
+        (FontRole::Heading, "serif", "26"),
+        (FontRole::Label, "monospace", "13"),
+        (FontRole::Code, "sans-serif", "19"),
+    ] {
+        state.set_font_role(role);
+        *state.text_field_mut("font-family").unwrap() = cambium::TextInput::new(family);
+        *state.text_field_mut("font-size").unwrap() = cambium::TextInput::new(size);
+        assert!(state.apply_fonts());
+    }
+    let syntax_color = format!(
+        "rgb({}, {}, {})",
+        state.preview_syntax().surface.r,
+        state.preview_syntax().surface.g,
+        state.preview_syntax().surface.b
+    );
+    let host = mount(state);
+    host.with_surfaces(|surfaces| {
+        let surface = &surfaces[0];
+        let plane = resolve_styles(
+            surface.dom,
+            &StyleSet::cambium(&[surface.sheet]),
+            &Device::screen(surface.rect[2], surface.rect[3]),
+            &InteractionStates::default(),
+        );
+        for (class, family, size) in [
+            ("chrome-bar", "serif", "18px"),
+            ("specimen-action", "serif", "18px"),
+            ("specimen-title", "serif", "26px"),
+            ("address-field", "monospace", "13px"),
+            ("code-filename", "monospace", "13px"),
+            ("syntax-code", "sans-serif", "19px"),
+        ] {
+            let nodes = taproot::matching(surface.dom, &Selector::class(class));
+            assert_eq!(nodes.len(), 1, "{class}");
+            let actual = plane.computed_style(nodes[0], "font-family").unwrap();
+            assert_eq!(actual.split(',').next().unwrap().trim(), family, "{class}");
+            assert_eq!(
+                plane.computed_style(nodes[0], "font-size").as_deref(),
+                Some(size),
+                "{class}"
+            );
+        }
+        let syntax = taproot::matching(surface.dom, &Selector::class("syntax-code"))[0];
+        assert_eq!(
+            plane.computed_style(syntax, "background-color").as_deref(),
+            Some(syntax_color.as_str()),
+            "font styles must preserve Illume's local palette"
+        );
+        let save = taproot::matching(surface.dom, &action("save"))[0];
+        assert_eq!(
+            plane.computed_style(save, "font-family").as_deref(),
+            Some("sans-serif"),
+            "authoring UI stays neutral"
+        );
+    });
+}

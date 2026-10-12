@@ -677,6 +677,13 @@ fn previews(state: &WorkshopState) -> WorkshopView {
 }
 
 fn specimen_grid(state: &WorkshopState) -> WorkshopView {
+    use tabard::FontRole;
+    let fonts = &state.draft_theme().typography;
+    let font_variables = fonts.css_property_declarations();
+    let interface = fonts.role_declarations(FontRole::Interface);
+    let heading = fonts.role_declarations(FontRole::Heading);
+    let label = fonts.role_declarations(FontRole::Label);
+    let code = fonts.role_declarations(FontRole::Code);
     let palette = state.preview_palette();
     let tokens = derive_from_def_for_mode(state.draft_theme(), state.mode());
     let chrome = tokens.chrome;
@@ -695,7 +702,7 @@ fn specimen_grid(state: &WorkshopState) -> WorkshopView {
                 .attr(
                     "style",
                     format!(
-                        "background: {}; color: {};",
+                        "background: {}; color: {}; {interface}",
                         css_color(chrome.toolbar_bg),
                         css_color(chrome.body_text)
                     ),
@@ -708,12 +715,14 @@ fn specimen_grid(state: &WorkshopState) -> WorkshopView {
                             .attr(
                                 "style",
                                 format!(
-                                    "background: {}; color: {};",
+                                    "background: {}; color: {}; {label}",
                                     css_color(chrome.field_bg),
                                     css_color(chrome.field_text)
                                 ),
                             ),
-                        el("p", "A place to begin").attr("class", "specimen-title"),
+                        el("p", "A place to begin")
+                            .attr("class", "specimen-title")
+                            .attr("style", heading),
                         el("p", "Chrome, controls, and the space around your content.")
                             .attr("class", "specimen-copy"),
                         el("button", "Explore")
@@ -723,7 +732,7 @@ fn specimen_grid(state: &WorkshopState) -> WorkshopView {
                             .attr(
                                 "style",
                                 format!(
-                                    "background: {}; color: {};",
+                                    "background: {}; color: {}; {interface}",
                                     css_color(palette.primary),
                                     css_color(palette.on_primary)
                                 ),
@@ -738,7 +747,7 @@ fn specimen_grid(state: &WorkshopState) -> WorkshopView {
         .attr(
             "style",
             format!(
-                "background: {}; color: {};",
+                "background: {}; color: {}; {font_variables}",
                 css_color(chrome.surface_bg),
                 css_color(chrome.body_text)
             ),
@@ -772,12 +781,14 @@ fn specimen_grid(state: &WorkshopState) -> WorkshopView {
         el(
             "div",
             (
-                el("div", "garden.rs")
-                    .attr("class", "code-filename")
-                    .attr("style", format!("color: {};", css_color(syntax.comment))),
+                el("div", "garden.rs").attr("class", "code-filename").attr(
+                    "style",
+                    format!("color: {}; {label}", css_color(syntax.comment)),
+                ),
                 highlighted_code::<WorkshopState, ()>(WORKSHOP_CODE_SAMPLE, "rust", &syntax)
                     .attr("id", "syntax-code")
                     .attr("class", "syntax-highlight syntax-code")
+                    .append_style(code)
                     .attr("aria-label", "Read-only Rust syntax preview"),
             ),
         )
@@ -786,7 +797,7 @@ fn specimen_grid(state: &WorkshopState) -> WorkshopView {
         .attr(
             "style",
             format!(
-                "background: {}; color: {};",
+                "background: {}; color: {}; {font_variables}",
                 css_color(syntax.surface),
                 css_color(syntax.emphasis)
             ),

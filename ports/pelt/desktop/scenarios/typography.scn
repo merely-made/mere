@@ -51,13 +51,20 @@ click role:button @data-action=apply-fonts
 assert snap font_size == 15
 assert snap font_line_height == 1.2
 capture interface_authored
+click .application-canvas
+settle 4
+capture authored_stylesheet
 click role:button @data-action=save
 assert snap dirty == false
 assert snap saved == true
 capture saved_editor
 resize 640 780
 settle 4
+key tab-until data-field=font-family
 capture narrow_editor
 click .chrome-specimen
 settle 4
 capture narrow_previews
+click .reader-specimen
+settle 4
+capture narrow_reader

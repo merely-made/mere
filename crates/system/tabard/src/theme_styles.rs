@@ -102,11 +102,9 @@ impl Typography {
         }
         Ok(())
     }
-    pub fn css_custom_properties(&self) -> String {
-        if self.0.values().all(ThemeFontStyle::is_empty) {
-            return String::new();
-        }
-        let mut css = String::from(":root {\n");
+    /// Custom-property declarations for an isolated specimen or host boundary.
+    pub fn css_property_declarations(&self) -> String {
+        let mut css = String::new();
         for (role, preferences) in &self.0 {
             if let Some(family) = preferences.css_family(*role) {
                 css.push_str(&format!("  --tabard-font-{}: {family};\n", role.key()));
@@ -121,12 +119,19 @@ impl Typography {
                 ));
             }
         }
-        css.push_str("}\n");
         css
+    }
+    pub fn css_custom_properties(&self) -> String {
+        let declarations = self.css_property_declarations();
+        if declarations.is_empty() {
+            String::new()
+        } else {
+            format!(":root {{\n{declarations}}}\n")
+        }
     }
     /// Only authored properties are projected. Missing size/family/leading
     /// preserves the consumer's existing hierarchy and control geometry.
-    pub fn role_css(&self, role: FontRole, selector: &str) -> String {
+    pub fn role_declarations(&self, role: FontRole) -> String {
         let Some(p) = self.0.get(&role) else {
             return String::new();
         };
@@ -143,6 +148,11 @@ impl Typography {
                 ));
             }
         }
+        declarations
+    }
+    /// Project the same optional declarations into an ordinary selector rule.
+    pub fn role_css(&self, role: FontRole, selector: &str) -> String {
+        let declarations = self.role_declarations(role);
         if declarations.is_empty() {
             String::new()
         } else {
