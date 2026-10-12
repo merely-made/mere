@@ -917,6 +917,70 @@ are recorded under `Code/output/graphshell-presenter-review-20261011/`; the
 complete citation audit is unchanged, and D2 retains its two pre-existing
 baseline errors. No fresh GPU/browser/native-host run was performed.
 
+### First site presenter (2026-10-11)
+
+**Status:** implementation in progress, authorized by Mark: "stable project
+faces, an adjacent inspector, and selection preserved through folds. Coordinate
+the browser checks, then land it when those pass." The review's broader
+automatic LOD, live content and context-lens targets remain later work. This
+slice is a read-only host-dataset viewer treatment, not the complete live-site
+sandbox retirement or phase-4 page migration.
+
+The `inspector` presentation profile is selected by `data-presenter` or the
+`presenter` query option. A host supplies its caption, summary field and link
+field roles. The plain `viewer.html` consumes the actual exported site history
+with that profile. The reference fixture/product routes retain their existing
+chrome and owners. In this profile the graph keeps its faces and footprint;
+Cambium mounts the inspector beside it, or stacks a scrollable inspector under
+the graph at narrow widths. Commands, fit and deeper tools remain reachable;
+Fold controls and the equivalent project list are disclosed in the inspector.
+The initial view has no selected project or automatic detail popup.
+
+The [host presenter model](../../../ports/graphshell/src/host_presenter.rs)
+reads validated disclosure occurrences, scalar values and relationship witnesses.
+Its selection is keyed by occurrence ID within one source binding, independent
+of visible Canvas members. A Fold projection changes that visible subset;
+hidden selected subjects remain named and removable in the inspector, and regain
+their Canvas selection on return. Inspecting another subject does not replace
+the comparison set. Explicit clear removes the complete view selection. A
+checkpoint preserves surviving IDs; a departed occurrence is removed from this
+view with a notice. A different authority is refused before model mutation.
+These choices last for the mount only; there is no new storage mechanism or
+claim that a view selection performs durable keeping.
+
+The first R1 adapter supplies exact scalar facts and known Selected/Inspected
+state to an adjacent-details rule. It introduces no automatic screen-size,
+foreground-pin or representation change. Unsupported navigation remains text;
+only disclosed HTTP(S) addresses without credentials become navigation actions.
+The inspector leads with the label, summary and disclosed relationship scope;
+exact IDs, scalar fields and full witness provenance remain under source details.
+Equal labels or shared sources do not merge occurrences; duplicate labels are
+disambiguated in selection controls. The existing Fold adapter also preserves
+every surviving visible selected member instead of just one focused URL.
+
+**Done when:** CPU tests cover hidden/returning subjects, multiple visible
+selections through the real Fold adapter, shared-source occurrences, explicit
+departure/authority refusal, source immutability and navigation refusal. The
+locked viewer and product gates pass. On the assigned hardware browser, run
+`hosted_presenter.scn`, `hosted_presenter_history.scn` and the command/gesture
+regressions, including real pointer and keyboard input, accessible selection
+and inspector controls, wide/narrow captures, page/inspector scrolling and a
+planted selection-loss control. Check the actual site disclosure, a fresh
+mount's empty selection, link activation and clean unknown-profile refusal.
+Keep source/bundle hashes and update the final acceptance before direct main
+integration. The source owner coordinates the finite browser slot with the
+renderer lane; no concurrent headed/GPU launch is implied by this plan.
+
+**Candidate checks:** 54 focused CPU tests pass, including five new presenter
+cases and the real Fold multi-selection regression. Locked/offline viewer and
+product/applets debug builds and the main-page/applets Wasm check pass. Related
+inspection preserves comparison subjects; removing a selection returns focus
+through the retained graph route. The two packages and prepared browser drivers
+live under `Code/output/graphshell-site-presenter-20261011/`. They are candidates,
+not headed acceptance. The citation audit passes; existing D2 digest/receipt
+coverage gaps are retained separately. Main landing waits for the source-bound
+browser run and capture review.
+
 ## 5. Stop rules
 
 - Nothing a screen reader reaches today is lost: a control moves only once
