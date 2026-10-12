@@ -1,0 +1,24 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--config",
+    "/Users/markik/Code/output/vello-producer-gates-20261011/local-netrender-validation.toml",
+    "-p",
+    "tabard-workshop",
+    "--features",
+    "native-host",
+    "--test",
+    "release_host_acceptance",
+    "-j",
+    "2",
+    "--",
+    "--test-threads=1"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-vello-release-adoption",
+  "deadline_seconds": 600,
+  "elapsed_seconds": 22.607,
+  "exit_code": 0,
+  "timed_out": false,
+  "log": "/Users/markik/Code/output/vello-producer-gates-20261011/checks/release-host-acceptance-fixed-slider.log"
+}

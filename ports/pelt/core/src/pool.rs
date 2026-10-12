@@ -5,6 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! Retained content custody independent of arrangement and window lifetime.
+use crate::content::PeltReceiverIdentity;
 use crate::{
     PeltContent, PeltHostEffect, PeltInput, PeltLane, PeltLayer, PeltSessionIdentity, WorkspaceRect,
 };
@@ -40,8 +41,10 @@ struct Placement<K> {
 }
 struct Capture<P> {
     placement: P,
+    receiver: PeltReceiverIdentity,
     buttons: u16,
     last: PeltInput,
+    scale_factor: f32,
 }
 
 struct Prepared<P> {
@@ -199,6 +202,7 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
     /// Missing placements close; missing content keys are not fabricated,
     /// retired, or respawned.
     pub fn set_placements(&mut self, values: impl IntoIterator<Item = (P, PeltPlacement<K>)>) {
+        self.discard_stale_captures();
         let mut next = HashMap::new();
         let mut order = Vec::new();
         for (id, value) in values {
@@ -362,7 +366,13 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
             return Ok(());
         }
         self.prepared.remove(&p.content);
-        content.prepare_input(p.rect, p.scale_factor)?;
+        if let Err(error) = content.prepare_input(p.rect, p.scale_factor) {
+            // Failed preparation revokes this appearance's input admission,
+            // including preparation requested by focus/visibility projection.
+            // Retire with the last accepted envelope before focus can drop.
+            self.cancel_placement(id);
+            return Err(error);
+        }
         self.prepared.insert(
             p.content.clone(),
             Prepared {
@@ -435,10 +445,38 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
         more
     }
     pub fn captured_placement(&self, pointer_id: i32) -> Option<&P> {
-        self.captures.get(&pointer_id).map(|c| &c.placement)
+        self.captures
+            .get(&pointer_id)
+            .filter(|capture| self.capture_is_current(capture))
+            .map(|c| &c.placement)
     }
     pub fn has_pointer_capture(&self) -> bool {
-        !self.captures.is_empty()
+        self.captures
+            .values()
+            .any(|capture| self.capture_is_current(capture))
+    }
+    fn capture_is_current(&self, capture: &Capture<P>) -> bool {
+        self.placements.get(&capture.placement).is_some_and(|p| {
+            p.value.admits()
+                && self
+                    .contents
+                    .get(&p.value.content)
+                    .is_some_and(|content| content.receiver_identity() == capture.receiver)
+        })
+    }
+    fn discard_stale_captures(&mut self) {
+        let placements = &self.placements;
+        let contents = &self.contents;
+        // Accepted replacement already cancelled the old receiver before
+        // destruction. Sending these envelopes to the new receiver is wrong.
+        self.captures.retain(|_, capture| {
+            placements.get(&capture.placement).is_some_and(|p| {
+                p.value.admits()
+                    && contents
+                        .get(&p.value.content)
+                        .is_some_and(|content| content.receiver_identity() == capture.receiver)
+            })
+        });
     }
     pub fn focused_content(&self, window: u64) -> Option<&K> {
         self.order
@@ -446,6 +484,33 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
             .filter_map(|id| self.placement(id))
             .find(|p| p.window == window && p.admits() && p.focused)
             .map(|p| &p.content)
+    }
+    fn cancel_pointer(&mut self, pointer: i32) -> bool {
+        let Some(capture) = self.captures.remove(&pointer) else {
+            return false;
+        };
+        if let Some(p) = self.placements.get(&capture.placement) {
+            if let Some(content) = self.contents.get_mut(&p.value.content) {
+                if content.receiver_identity() == capture.receiver {
+                    let _ = content.input_event(capture.last.cancel(), capture.scale_factor);
+                }
+            }
+        }
+        true
+    }
+    /// Retire all retained pointer gestures owned by one host window.
+    /// Preserves logical content focus, physical button bookkeeping and other
+    /// windows; cancellation uses each capture's last receiver-local envelope.
+    pub fn cancel_window_pointers(&mut self, window: u64) {
+        let targets: Vec<P> = self
+            .placements
+            .iter()
+            .filter(|(_, placement)| placement.value.window == window)
+            .map(|(id, _)| id.clone())
+            .collect();
+        for id in targets {
+            self.cancel_placement(&id);
+        }
     }
     fn cancel_placement(&mut self, id: &P) {
         let ids: Vec<i32> = self
@@ -455,17 +520,46 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
             .map(|(id, _)| *id)
             .collect();
         for pointer in ids {
-            if let Some(capture) = self.captures.remove(&pointer) {
-                if let Some(p) = self.placements.get(id) {
-                    if let Some(content) = self.contents.get_mut(&p.value.content) {
-                        let _ = content.input_event(capture.last.cancel(), p.value.scale_factor);
-                    }
-                }
-            }
+            self.cancel_pointer(pointer);
         }
+    }
+    /// Select the same admitted receiver used by dispatch, before a caller
+    /// changes focus. Pointer ids, window custody and paint stacking stay here.
+    pub(crate) fn input_target(&self, window: u64, input: &PeltInput) -> Option<P> {
+        let capture = input
+            .pointer()
+            .and_then(|(id, _, _)| self.captured_placement(id))
+            .cloned();
+        if let Some(id) = capture {
+            return self
+                .placement(&id)
+                .filter(|p| p.window == window)
+                .map(|_| id);
+        }
+        let position = input.position();
+        let mut admitted = self.order.iter().filter(|id| {
+            let Some(p) = self.placement(id) else {
+                return false;
+            };
+            p.window == window
+                && p.admits()
+                && match position {
+                    Some((x, y)) => p.rect.contains(x, y),
+                    None => p.focused,
+                }
+        });
+        // Positional input follows paint stacking. Nonpositional input keeps
+        // the existing first-admitted focused-placement contract.
+        if position.is_some() {
+            admitted.next_back()
+        } else {
+            admitted.next()
+        }
+        .cloned()
     }
     /// Route host/window coordinates through authoritative placements.
     pub fn input_at(&mut self, window: u64, mut input: PeltInput) -> PeltHostEffect {
+        self.discard_stale_captures();
         if matches!(
             &input,
             PeltInput::Session(inker::SessionInput::Focus(false))
@@ -488,32 +582,7 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
             }
             return effect;
         }
-        let capture = input
-            .pointer()
-            .and_then(|(id, _, _)| self.captured_placement(id))
-            .cloned();
-        let target = capture.or_else(|| {
-            let position = input.position();
-            let mut admitted = self.order.iter().filter(|id| {
-                let Some(p) = self.placement(id) else {
-                    return false;
-                };
-                p.window == window
-                    && p.admits()
-                    && match position {
-                        Some((x, y)) => p.rect.contains(x, y),
-                        None => p.focused,
-                    }
-            });
-            // Positional input follows paint stacking. Nonpositional input
-            // keeps the existing first-admitted focused-placement contract.
-            if position.is_some() {
-                admitted.next_back()
-            } else {
-                admitted.next()
-            }
-            .cloned()
-        });
+        let target = self.input_target(window, &input);
         let Some(id) = target else {
             return PeltHostEffect::default();
         };
@@ -528,6 +597,7 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
     }
     /// Dispatch content-local input to one current, visible appearance.
     pub fn input(&mut self, id: &P, input: PeltInput) -> PeltHostEffect {
+        self.discard_stale_captures();
         let Some(p) = self.placement(id).cloned().filter(|p| p.admits()) else {
             return PeltHostEffect::default();
         };
@@ -560,9 +630,12 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
         let cancelling = matches!(&input, PeltInput::Session(inker::SessionInput::Cancel))
             || pointer.is_some_and(|(_, phase, _)| phase == inker::PointerPhase::Cancel);
         if !losing_focus && !cancelling {
+            let had_capture = self.captures.values().any(|c| &c.placement == id);
             if let Err(error) = self.prepare(id) {
                 return PeltHostEffect {
                     error: Some(error),
+                    redraw: had_capture,
+                    pointer_capture: had_capture.then_some(false),
                     ..Default::default()
                 };
             }
@@ -571,7 +644,16 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
         let Some(content) = self.contents.get_mut(&p.content) else {
             return PeltHostEffect::default();
         };
+        let receiver = content.receiver_identity();
         let mut effect = content.input_event(input.clone(), p.scale_factor);
+        if content.receiver_identity() != receiver {
+            self.discard_stale_captures();
+            effect.pointer_capture = Some(false);
+            if effect.handled {
+                self.a11y_invalidate(&p.content);
+            }
+            return effect;
+        }
         if losing_focus {
             effect.pointer_capture = Some(false);
         }
@@ -585,8 +667,10 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
                         pointer_id,
                         Capture {
                             placement: id.clone(),
+                            receiver,
                             buttons,
                             last: input,
+                            scale_factor: p.scale_factor,
                         },
                     );
                     effect.pointer_capture = Some(true);
@@ -594,12 +678,14 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
                 PointerPhase::Move => {
                     if let Some(c) = self.captures.get_mut(&pointer_id) {
                         c.last = input;
+                        c.scale_factor = p.scale_factor;
                     }
                 },
                 PointerPhase::Up => {
                     if let Some(c) = self.captures.get_mut(&pointer_id) {
                         c.buttons &= !crate::input::button_bit(button);
                         c.last = input;
+                        c.scale_factor = p.scale_factor;
                     }
                     if self
                         .captures

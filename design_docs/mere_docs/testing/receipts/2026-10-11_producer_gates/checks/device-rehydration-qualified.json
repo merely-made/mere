@@ -1,0 +1,16 @@
+{
+  "command": [
+    "env",
+    "TABARD_RELEASE_DEVICE_RECEIPT=/Users/markik/Code/output/vello-producer-gates-20261011/device-rehydration-qualified",
+    "/Users/markik/Code/targets/vello-producer-gates-20261011/debug/deps/release_device_rehydration-97c2f2a4bc1b08fc",
+    "--ignored",
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-vello-release-adoption",
+  "deadline_seconds": 120,
+  "elapsed_seconds": 1.464,
+  "exit_code": 0,
+  "timed_out": false,
+  "log": "/Users/markik/Code/output/vello-producer-gates-20261011/checks/device-rehydration-qualified.log"
+}

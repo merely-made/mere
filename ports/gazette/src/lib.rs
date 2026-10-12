@@ -47,7 +47,7 @@
 //! migration in that field. It does not fetch or mutate a contact book.
 //!
 //! **Unbuilt:** hosting the Ledger and recipient picker over live `gaz`, feed polling
-//! (whose engine is `mere-crawl`), and the reading room over fleeced
+//! (whose engine is `fleece::crawl`), and the reading room over fleeced
 //! articles. The blocking `reqwest` fetch below gives way to
 //! `finger-protocol`'s sans-io WebFinger, with the caller supplying HTTP.
 //!

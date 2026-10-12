@@ -46,3 +46,6 @@ pub mod roster;
 pub mod trail;
 #[cfg(feature = "workbench")]
 pub use workbench;
+
+#[cfg(feature = "clip")]
+pub mod clip;

@@ -1,0 +1,12 @@
+{
+  "command": [
+    "python3",
+    "/Users/markik/Code/output/vello-producer-gates-20261011/qualify_pins.py"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-vello-release-adoption",
+  "deadline_seconds": 600,
+  "elapsed_seconds": 11.091,
+  "exit_code": 0,
+  "timed_out": false,
+  "log": "/Users/markik/Code/output/vello-producer-gates-20261011/checks/five-root-pin-qualification.log"
+}

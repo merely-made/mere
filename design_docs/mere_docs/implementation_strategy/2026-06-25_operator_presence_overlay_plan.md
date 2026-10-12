@@ -64,16 +64,16 @@ Picking a document element is picking a document element, whether your cursor do
 operator's focus does. The web-clip inspector (planned, the
 [djot editor plan](../../archive_docs/2026-08-06_completed_plans/2026-06-24_djot_editor_knot_nodes_plan.md) P4/P5: hover-pick an element
 on a live scrying tile via `elementFromPoint`, capture its HTML subtree, crop its rect,
-`build_clip_knot`, assert `ProvenanceSubKind::ClippedFrom`) **is the element-highlight UI**.
+format for the receiving document, assert `ProvenanceSubKind::ClippedFrom`) **is the element-highlight UI**.
 So three features share one element-targeting primitive:
 
-**Corrected 2026-10-06 (S14 pass):** the inspector's building blocks now exist in
-`crates/import/src/web_clip.rs`: `web_clip_script` with an `elementFromPoint` picker
-(`:63`, `:94`), `ClipRect` (`:33`), `write_clip_node` writing a `ClippedFrom` edge
-(`:293`, `:346`), and a call to `build_clip_knot` (`:465`). No host calls the picker or
-`write_clip_node`; Turnstone uses only the text-fragment half
-(`turnstone/src/knot_authoring.rs:364`, `:375`), and the hover-pick inspector itself is
-unbuilt.
+**Corrected 2026-10-11:** `crates/fleece/src/clip.rs` owns `web_clip_script` with
+its `elementFromPoint` picker, `ClipRect` and semantic clip lowering.
+`crates/mere/src/clip.rs` owns `write_clip_node`, which records a caller-formatted
+body and resource `ClippedFrom` relation. The receiving document owns formatting
+and visual storage. No host calls the picker or `write_clip_node`; Turnstone's
+Knot consumer uses semantic fragments and its private `clip_knot_body` formatter.
+The hover-pick inspector itself remains unbuilt.
 
 > a focusable **target** (a graph node, or a document element) + its **rect / position** +
 > a **coloured highlight**, with the **source** being your cursor, an agent's

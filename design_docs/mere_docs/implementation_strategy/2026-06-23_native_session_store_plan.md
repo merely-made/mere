@@ -45,7 +45,7 @@ already uses, make it persistent + durable + partitioned, and let every consumer
 | Where | What it is | Used by meerkat today |
 | --- | --- | --- |
 | **netfetcher** `cookie_jar.rs` | `InMemoryCookieJar` + the `CookieStore` trait. Full RFC 6265bis: domain/path match, `Secure`, `Max-Age` over `Expires`, `SameSite` gating, longest-path serialization. Built on the [`cookie`](https://crates.io/crates/cookie) crate. **Pluggable** (`Box<dyn CookieStore>`). | **Yes** — the http(s) WHATWG-Fetch lane (`fetch::do_fetch`). |
-| **genet** `components/shared/net` (Servo net) | Full Servo jar: `cookies_for_url`/`set_cookie_for_url`, `CookieSource` (the HTTP-vs-script HttpOnly gate), `CookieStoreId` partitioning. Same `cookie` crate. | No — meerkat chose netfetcher over the heavy Servo resource thread. |
+| **genet** `components/shared/net` *(historical citation)* <!-- doc-audit: historical-path --> (Servo net) | Full Servo jar: `cookies_for_url`/`set_cookie_for_url`, `CookieSource` (the HTTP-vs-script HttpOnly gate), `CookieStoreId` partitioning. Same `cookie` crate. | No — meerkat chose netfetcher over the heavy Servo resource thread. |
 | **system WebView** (scrying) | The native OS cookie store. Black box: `set_cookie` in, `request_all_cookies` out. | Only at a flip boundary. |
 
 All three model the cookie record with the **same `cookie` crate**, so the record

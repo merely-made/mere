@@ -1,0 +1,17 @@
+RESULT fail
+Upgraded production host presentation preserves draft and selected graph
+captured initial
+captured seed_edited
+FAIL: assert snap mode Eq 'dark': got 'light'
+captured dark
+captured named
+captured resized
+captured restored_size
+capture initial 2360x1600 digest=fe04d72aaa1cca05 file=/Users/markik/Code/output/vello-producer-gates-20261011/native-presentation/initial.png
+capture seed_edited 2360x1600 digest=a71617ba5fd971c1 file=/Users/markik/Code/output/vello-producer-gates-20261011/native-presentation/seed_edited.png
+capture dark 2360x1600 digest=4f4182051aa581c0 file=/Users/markik/Code/output/vello-producer-gates-20261011/native-presentation/dark.png
+capture named 2360x1600 digest=021305bbb7b07f38 file=/Users/markik/Code/output/vello-producer-gates-20261011/native-presentation/named.png
+capture resized 1920x1560 digest=3b5c707b7b73e70c file=/Users/markik/Code/output/vello-producer-gates-20261011/native-presentation/resized.png
+capture restored_size 2560x2200 digest=913457b6d72b7bc8 file=/Users/markik/Code/output/vello-producer-gates-20261011/native-presentation/restored_size.png
+frames: 6 captured, 0 blank, 6 distinct digests
+presentation: 53 frames, 58 redraws, 5 unpresented redraws

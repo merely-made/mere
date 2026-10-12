@@ -6,13 +6,27 @@
 
 //! Retained application scenes on the host's existing renderer and device.
 
-use std::{cell::RefCell, rc::Rc};
+use std::{
+    cell::RefCell,
+    rc::Rc,
+    sync::atomic::{AtomicU64, Ordering},
+};
 
 use cambium_rootstock::{
-    ProducedTexture, ProducerContext, ProducerSemantics, SourceAlpha, SourceEncoding,
-    TextureProducer,
+    PortableProducerError, ProducedScene, ProducedTexture, ProducerContext, ProducerFrameInfo,
+    ProducerSemantics, SourceAlpha, SourceEncoding, TextureProducer,
 };
 use netrender::{ColorLoad, Scene};
+
+static NEXT_SOURCE_IDENTITY: AtomicU64 = AtomicU64::new(1);
+
+fn source_identity() -> u64 {
+    NEXT_SOURCE_IDENTITY
+        .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+            value.checked_add(1)
+        })
+        .expect("scene producer source identity exhausted")
+}
 
 /// Rasterize an application's scene through its host's render core. The
 /// application supplies its existing scene, revision and accessibility APIs;
@@ -25,6 +39,7 @@ use netrender::{ColorLoad, Scene};
 /// reopen replaces an otherwise identically revisioned source.
 pub struct SceneProducer<T> {
     source: Rc<RefCell<T>>,
+    source_identity: u64,
     raster_key: u64,
     frame_callback: fn(&mut T, u32, u32) -> Scene,
     revision_callback: fn(&T) -> u64,
@@ -47,6 +62,7 @@ impl<T> SceneProducer<T> {
     ) -> Self {
         Self {
             source,
+            source_identity: source_identity(),
             raster_key,
             frame_callback: frame,
             revision_callback: revision,
@@ -67,6 +83,7 @@ impl<T> SceneProducer<T> {
             return false;
         }
         self.source = source;
+        self.source_identity = source_identity();
         self.revision = 0;
         self.texture = None;
         true
@@ -82,6 +99,22 @@ impl<T> SceneProducer<T> {
 }
 
 impl<T> TextureProducer for SceneProducer<T> {
+    fn portable_scene(
+        &mut self,
+        frame: &ProducerFrameInfo,
+    ) -> Result<ProducedScene, PortableProducerError> {
+        let width = frame.logical_size.0.round().max(1.0) as u32;
+        let height = frame.logical_size.1.round().max(1.0) as u32;
+        let scene = self.scene(width, height);
+        Ok(ProducedScene {
+            scene,
+            source_identity: self.source_identity,
+            source_revision: self.source_revision(),
+            alpha: SourceAlpha::Straight,
+            encoding: SourceEncoding::Srgb,
+        })
+    }
+
     fn render(&mut self, cx: &ProducerContext<'_>) -> Option<ProducedTexture> {
         let logical_size = (
             cx.frame.logical_size.0.round().max(1.0) as u32,

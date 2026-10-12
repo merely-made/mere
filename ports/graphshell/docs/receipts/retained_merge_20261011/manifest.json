@@ -1,0 +1,13 @@
+{
+  "schema": "graphshell.retained-merge-source-custody/v1",
+  "runtime_qualified": false,
+  "canonical_scenario": "../../../web/scenarios/p4_tree_forme.scn",
+  "canonical_sha256": "0eb76fe9b98ed7ded0f829bca58356e2eba1f9d4c8b2362e3bf4c13624f0509a",
+  "files": {
+    "p4_tree_forme-retained-before.scn": "02326d8c2397e07756cd5e28351504f22217d3df6a37831d9bf607a3568fab64",
+    "p4_tree_forme-current-upstream.scn": "54048db8701e05f7a33533a28d8307dbb5513fab9415940be152d09cce92ad6a",
+    "harmonization-proof.json": "8e77afb85bb3429eb2c9f13b1267857c56aff8bae02f80e72481c95f3f5e7c7e",
+    "originals.json": "701efc4eda51573f95fb2293be17fab521a9b52b48f0ec004fe06a03b81d29f4",
+    "README.md": "4c354132368d7aba23ee120893866015f29cd74c4ab6d2a5737ba8129c5e733a"
+  }
+}

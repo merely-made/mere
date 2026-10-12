@@ -767,6 +767,26 @@ where
         layout.visible_rect(&view, node)
     }
 
+    /// A computed value from the retained layout's own style set. No layout
+    /// or absent property is unavailable, rather than a synthesized default.
+    /// This observes an existing layout and never triggers style or layout work.
+    pub fn painted_style_value(&self, node: NodeId, property: &str) -> Option<String> {
+        self.layout?.computed_value(node, property)
+    }
+
+    /// The same retained hit test used by this host's input routing, in logical
+    /// pointer coordinates. This does not dispatch input or change focus/capture.
+    pub fn painted_hit(&self, x: f32, y: f32) -> Option<NodeId> {
+        if !x.is_finite() || !y.is_finite() {
+            return None;
+        }
+        let layout = self.layout?;
+        let dom = self.runner.dom();
+        let dom = dom.borrow();
+        let view = crate::WindowDom::new(&dom, self.runner.mount());
+        layout.hit_test(&view, x, y)
+    }
+
     /// Names and roles from the same retained document projection the host
     /// exposes to accessibility. No layout means no semantic observation yet.
     /// This observes the current DOM and layout without computing another layout

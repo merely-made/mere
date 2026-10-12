@@ -143,8 +143,11 @@ handles with region/drop previews, undo/redo within that draft, discard it
 without changing content, or lock-and-apply it as one arrangement change.
 Both presentations may show the draft; committed arrangement and geometry
 change only on apply. The [editor follow-through](2026-10-07_scenograph_editor_plan.md#forme-draft-follow-through-2026-10-10-agreed-interaction)
-carries the implementation steps. This does not imply that locking pauses
-dynamics or that the field/workbench gesture bridge is implemented.
+carries the implementation steps and the now-implemented Graphshell draft
+adapter. Its native/build qualification passes; its
+[visual test handoff](2026-10-07_scenograph_editor_plan.md#forme-visual-test-handoff-2026-10-10)
+remains open. This does not imply that locking pauses dynamics or supplies a
+general field editor.
 
 ## Field authoring draft (2026-10-10)
 
@@ -179,9 +182,10 @@ Checked at published Mere `86f2a3b8`:
 - The [Workbench Forme bridge](2026-10-07_scenograph_editor_plan.md#workbench-forme-bridge-2026-10-10)
   now supplies reading tiles, corresponding canvas regions and existing-field
   inspect/locate/hide controls. This updates the earlier no-inspection-caller
-  inventory. General field creation/effect editing and whole-forme draft undo
-  remain separate work. Native/build receipts exist; headed acceptance remains
-  pending in that record.
+  inventory. The later scoped forme draft adds arrangement undo/discard/apply
+  and saved layout history. General field creation/effect editing remains
+  separate work. Native/build receipts exist; headed acceptance remains pending
+  in the editor plan.
 
 ### Proposed controls
 
@@ -276,6 +280,163 @@ content loss; and qualify the agreed forme draft against the existing bridge.
 Runtime tests must include repeated appearances, conflicting placement, an empty
 or limited query result and failed apply. Entry-action execution is a separate
 dynamics-owned acceptance case. This pass adds design and source findings only.
+
+### Field inspection adapter sequence (2026-10-10)
+
+**Status (2026-10-11):** steps 1–2 implemented as a read-only draft; step 3
+remains planned. The [implementation and host handoff](#field-inspection-draft-2026-10-11)
+record current source and qualification. The sequence was first source checked
+at published Mere `69f17908`; inspection leaves the unresolved spatial/event
+and storage decisions explicit.
+
+1. **Enumerate exact owners.** Read each Numen `FieldId` and its couplings from
+   [Graph's field reads](../../../crates/graph/graph-kernel/src/graph/field_ops.rs).
+   Show lifecycle, authored extent/definition, and each `CouplingId` with its
+   selector, response and strength. Sort rows deterministically for inspection;
+   that order does not establish simulation or placement precedence. Display
+   unrecognized responses as stored but unsupported by the current consumer.
+   Done: two couplings on one field remain individually identifiable and an
+   inactive field can still be inspected.
+2. **Discover an overlap without changing the edit target.** Offer all matching
+   visible fields and preserve the chosen identity throughout the gesture.
+   Roster inspection also reaches hidden boundaries. Distinguish an authored
+   region hit from selector matches and actual evaluated influence; current
+   force conversion does not consume extent as a membership filter. Done:
+   repeated picking presents the same candidate identities, and hiding a
+   boundary does not imply disabling its effects.
+3. **Prepare one-coupling editing.** Resolve the exact coupling again before
+   apply, retain the other couplings, and validate its complete candidate. The
+   [graph deltas](../../../crates/graph/graph-kernel/src/graph/apply.rs) provide
+   add/replace and retract by coupling identity; their existence alone does not
+   qualify a stale-safe host operation or its saved undo. A field-wide strength
+   shortcut must not service an individual coupling row. Done before a write
+   control opens: a host-level scoped transaction changes one coupling,
+   undo/reopen restores that exact value, and failure preserves its draft.
+
+The [primitive inspection sequence](2026-10-07_scenograph_editor_plan.md#identity-inspection-follow-through-2026-10-10-next-design-steps)
+owns the common access/link/field inspector. A forme resolves to its arrangement
+and geometry owner, independently of the Numen field roster. This pass does not
+choose an association record, new attributes, event triggers or conflict policy.
+Read-only inspection can land first; the remaining controls follow their named
+write and composition gates.
+
+### Field inspection draft (2026-10-11)
+
+**Status:** implemented read-only draft, based on `19b00c8d` and integrated with
+published `d5f60e5c`, retaining the Fleece/Eidetic content-intake move, later
+custody/dependency updates and the other agent's Forme control/save-wait fixes
+and Chrome qualification. Later Knot/djinn and Murm updates through `4b491d95`
+change no inspector source or enabled package in the qualified cones. Mark authorized direct-main draft delivery with
+review/testing notes. This draft adds no field or coupling authoring controls;
+step 3's exact-coupling write gate remains open.
+
+The portable [inspection model](../../../ports/graphshell/src/field_inspection.rs)
+reads the acknowledged local graph's exact `FieldId` and every individually
+identified `CouplingId`. The roster includes hidden and retired fields and
+sorts by identity. Details disclose authored extent, scalar/vector definition,
+lifecycle, selector, response and strength. Exact coupling inspection re-resolves
+that same coupling each time; owner rebinding refreshes its recorded field,
+while retraction reports absence without substituting a neighboring coupling.
+Held selector matches retain distinct access UUIDs, including repeated addresses.
+They are not filtered through the authored extent and are not an evaluated
+influence result. Known coverage limits come from the graph owner and retain
+their actual scopes; no field-specific coverage claim is manufactured.
+
+[Retained Graph tools controls](../../../ports/graphshell/src/web_tree/field_inspection.rs)
+provide **Inspect fields**, an all-field roster, exact-coupling rows and an
+explicit **Pick field regions** mode. The primary press supplies a world point;
+its gesture is consumed before ordinary selection and Forme dragging. The narrow
+tools overlay closes while picking and returns after release or cancellation. Discovery
+lists all matching candidates without changing the retained inspection target.
+The candidate order is owner kind then UUID, for inspection only. Choosing a
+candidate is explicit. **Discover regions at Forme center** supplies the same
+list through a keyboard-accessible button. Closing or cancelling inspection
+does not perform a graph, coupling, selection or arrangement edit.
+
+Boundary discovery uses today's inclusive rectangle hit test for active,
+visible `Region` extents. Global, attached and polygon extents remain inspectable
+in the roster; today's Canvas does not paint their boundaries. This is not the
+pending general spatial-membership or overlap-composition policy. **Hide/Show
+boundary: …** changes the Canvas's temporary visibility only, leaving lifecycle,
+couplings and their effects intact. Hidden and retired records remain in the
+roster. Repeating a pick yields stable candidate identities for unchanged data
+and view visibility; it does not choose a force or placement priority.
+
+Forme resolves through its own current `FormeWorkspace`, with exact document and
+graph identity, lock/visibility, bounds, member UUIDs and recursive arrangement.
+Its current/draft/placement-preview/save-pending state is labelled. It can appear
+alongside Numen region candidates, but no Numen field or association record is
+created for it. A missing or changed Forme identity reports absence. Its existing
+arrangement owner continues to own layout edits, saved apply and undo.
+
+**Runtime findings and limits:** the panel labels response eligibility against
+[Canvas rebuild](../../../crates/canvas/pictograph/src/canvas/fields.rs), without
+claiming a measured force result. Rebuild omits retired/missing owners; the
+[force bridge](../../../crates/canvas/pictograph/src/canvas/seiche_bridge.rs)
+resolves selector members independently of extent. The force consumer ignores
+open responses and scalar/vector shape mismatches. The separate startup builder
+passes couplings to the bridge without that active-owner filter; reconcile
+rebuilds them later. Startup/lifecycle consistency needs runtime-owner review
+before retired-field force behavior is treated as universally qualified. No
+runtime force change is made here. Region events, scripts and conflict resolution
+retain their existing design gates. Field-wide strength APIs still affect all
+couplings and cannot service an individual row.
+
+The standard reference graph has no fields. The opt-in
+`tree.html?app=local&fixture=field-inspection` route uses only the separate
+`graphshell-field-inspection-draft-v1` IndexedDB namespace, with a visible fixture
+label. Fresh stores add two overlapping active rectangles, one retired rectangle,
+two different couplings on the first field, and a vector coupling on the second.
+Zero scalar/vector definitions keep the fixture's force additions neutral; no
+force-runtime receipt is inferred. Existing stores are reopened without reseeding. The native check also reopens a
+normal saved graph through the opt-in opener and confirms that it gains no fields.
+Normal `?app=local` keeps its existing namespace and reference fixture. Temporary
+inspection targets and boundary visibility are not saved as graph truth.
+
+**Qualification:** ten actual-source native model tests pass, including exact
+lookup after rebinding/retraction, missing owners, lifecycle/shape distinctions,
+multiple coupling values, distinct accesses with repeated addresses, reversed
+insertion/equal-name overlap, hidden boundaries, unpainted extent shapes,
+nonfinite point refusal, independent Forme identity and Graph-snapshot roundtrip.
+The fixture persists and reopens through the actual app with `MemoryBackend`;
+that check does not qualify IndexedDB or browser reopening. The product wasm
+check passes from `ports/graphshell/web` with its committed target flags, including
+the integrated Forme and Fleece/Eidetic changes. The standalone web lockfile
+records Eidetic's newly required `url` dependency and main's Dramatis repin
+(`insigne` 0.0.2, `notochord` 0.1.1, `personae` 0.3.0 at `0234e7ee`). Commands, source hashes and limits are in the
+[qualification summary](../../../ports/graphshell/docs/receipts/field_inspection_20261011/qualification.json).
+Checks run sequentially with one Cargo job, a 1280 MiB scope cap, no scope swap
+and the 256 MiB available-memory guard. No field browser run, capture, release
+bundle or default/viewer qualification is claimed by this pass.
+
+**Review and host-test handoff:**
+
+- On a host with sufficient build memory, run the tracked native cases from the
+  workspace root with `cargo test --locked -p graphshell --no-default-features
+  --features web --lib field_inspection`. The temporary local qualification
+  harness is a check detail, not a portable prerequisite.
+- Build with `product` and use a fresh dedicated browser profile/origin. Run
+  `tree.html?app=local&fixture=field-inspection&scenario=scenarios/p4_tree_field_inspection.scn`,
+  then a fresh page/process on the same origin with
+  `tree.html?app=local&fixture=field-inspection&scenario=scenarios/p4_tree_field_inspection_reopen.scn`.
+  The [first scenario](../../../ports/graphshell/web/scenarios/p4_tree_field_inspection.scn)
+  opens two reading tiles, inspects both coupling identities, queues real pointer
+  picks at their overlapping regions, chooses an explicit candidate, hides and
+  re-inspects a boundary, reads a retired field and Forme, changes selection and
+  closes panels. The [reopen scenario](../../../ports/graphshell/web/scenarios/p4_tree_field_inspection_reopen.scn)
+  checks persisted field/coupling identities and Forme membership. Probe fields
+  and five named captures are instruments; neither scenario has run here.
+- Check keyboard activation and focus, Escape/cancel, drag-outside release and
+  closing while a pick is pressed. Confirm no selection or arrangement gesture
+  leaks from a consumed press, and that the normal graph remains usable afterward.
+  Review narrow overlay and docked tools, long ASTs/IDs, overlap-list readability,
+  an open detail draft, source save failure/busy state and changing visibility.
+- Review the startup/rebuild lifecycle difference above, open-response wording,
+  identity refresh after source changes and selector-versus-boundary labels.
+  Check large graphs before adopting the current full-list/AST materialization.
+  Add actual source/build/browser receipts here. Follow with the exact-coupling
+  host transaction/undo gate before opening write controls; a declarative
+  presentation-rule editor remains the next independent appearance draft.
 
 ## Findings (code-verified substrate)
 

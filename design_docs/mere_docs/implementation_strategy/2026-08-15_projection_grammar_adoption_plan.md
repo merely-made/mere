@@ -106,6 +106,51 @@ unrun native personal-wallet gate remains separate. The compact native receipt
 is `/Users/markik/Code/testing/knot-editor/recipe-responsive-20261005/receipt.json`;
 no retained collection reopen, browser runtime or other-platform claim is added.
 
+### Knot authored-scene adoption in Mere (2026-10-11)
+
+Status: consumer qualification is published; Mere's embedded adoption is
+qualified. Knot `19b99042d6c6708854f64e6187429da839a1c82c` adds bounded,
+source-bound occurrence translations through the shared `SceneTrace`. Its own
+mere retains immutable signed/encrypted versions; copied analysis, occurrence
+identity, source anchors and source bytes keep their original authority. Drag
+release and keyboard controls use Knot's existing undo/redo history.
+
+Knot's canonical receipt is
+`knot-editor/docs/receipts/2026-10-11_authored_scene/README.md`. It records 647
+workspace tests, 45 default and 61 engine/highlight document tests, four native
+save/fresh-process-reopen runs at 1100×900 and 420×900, and 28 inspected captures.
+That native evidence uses disposable synthetic identities. Personal-custody
+native acceptance, unattended background presentation and live dynamics remain
+separate gates.
+
+Mere moves workspace `knot-editor`, workspace `knot-document` and Djinn's
+`knot-site` together. The regenerated root lock contains all six Knot packages
+at that one revision and removes the old Genet `7422e906` Fleece/layout copies;
+no registry version changes occur. Djinn's resolved closure redirects the
+shared scene, host and storage contracts to this Mere workspace, with no second
+Mere git source. The existing `scenotime` patch supplies the new retained trace
+dependency; no desktop-only contract is added to the embedded patch table.
+
+The supplier family remains Genet `4bc75583`, Dramatis `0234e7ee`, Netrender
+`ef5412d7` and maintained Vello `5862bba2` (Classic/encoding/shaders 0.11.0).
+Standalone Knot and Woodshed's published `8846b13` adoption qualify Mere
+`0e78fcff`; Mere's embedded contracts use its own current source. Woodshed's Hocket/Redshank appearance reopen continuation is published at
+`0032f35`: two fresh processes, 33 presentations and four reviewed captures,
+with both saved profile identities preserved. Knot's next live-dynamics work
+retains its owner.
+Native execution stays serialized, Woodshed before Knot.
+
+Qualification: isolated `cargo check --locked -p djinn --all-targets -j 2` passes.
+The pinned `knot-composition` recipe suite passes 17 tests against Mere's local
+contracts; shared Scenograph/Scenomise/Scenotime suites pass 243 tests, including
+the authoring compile-fail doctest. Documentation findings and D2 judgment
+coverage match pre-edit HEAD exactly; the existing snapshot-digest and producer
+receipt coverage defects remain baseline debt. All three pins and the root lock
+publish together. These checks establish embedded source/type and tested scene
+contract compatibility; no new Mere native launch or personal-custody acceptance
+is claimed. Exact results and source bounds belong in the
+[embedded qualification record](../testing/receipts/2026-10-11_knot_repin/qualification.json).
+
 Host continuation starting point (2026-10-05): refreshed Woodshed main `c92e7c9` matches the
 published disclosure/session proof. Its production Mere `8106c7c` / Genet
 `34626a6` pair predates the shared compiler. The next bounded pass integrates
@@ -166,7 +211,7 @@ remain follow-ons; this bounded host slice does not complete A5 or dynamics G1�
 Publication verified: Woodshed main and origin/main match
 `dad3f6240bef8339432effa2d9fe7840d5035612`, with a clean checkout. That
 acceptance-only commit follows the native-qualified implementation `c55461cc`.
-The existing Woodshed `design_docs/2026-07-11_stage_set_tools_plan.md` and
+The existing Woodshed `repos/woodshed/design_docs/2026-07-11_stage_set_tools_plan.md` and
 document index record the final gates and their limits; no parallel plan was
 introduced. Mere's shared behavior fix is on main at
 `5011e2f90e988775410fe4b4213e9895fe64538e`.
@@ -1028,7 +1073,7 @@ is that objective's assessment.
   realization (recommended); a duplicate whose retirement the native phase
   plans. Mark: **"Not a duplicate (Recommended)"**. *Follows:* the record
   names mer3ly's copies as the duplicates that retire (`visibility_diff` in
-  `crates/repo-graph`, the `["fold",1]` channel, the `+N` count in
+  `repos/mer3ly/crates/repo-graph`, the `["fold",1]` channel, the `+N` count in
   `assets/projection-proof.js`), in the site's follow-up to S5. *Open:*
   pictograph's `FoldProjection` summary logic overlaps the fact's summary
   stand-in; whether it retires is native-phase work, not yet ruled.

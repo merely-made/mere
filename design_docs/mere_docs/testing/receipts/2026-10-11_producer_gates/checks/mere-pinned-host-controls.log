@@ -1,0 +1,138 @@
+    Updating git repository `https://github.com/merely-made/genet.git`
+    Updating git repository `https://github.com/merely-made/netrender.git`
+    Updating crates.io index
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+    Blocking waiting for file lock on package cache
+     Locking 38 packages to latest compatible versions
+      Adding browsing-context-api v0.1.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding buckram v0.0.3 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding cadency v0.0.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding document-session-api v0.1.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding fleece v0.5.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding genet-compositor v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding genet-documents v0.1.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding genet-livery v0.0.4 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding genet-parley v0.10.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding genet-render v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding genet-scripted v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding genet-text v0.1.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding genet-winit-host v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding livery v0.0.5 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding netfetcher v0.1.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding netrender v0.1.2 (https://github.com/merely-made/netrender.git?rev=ef5412d760a978584c8c1801e8a765c51aecd403#ef5412d7)
+      Adding netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?rev=ef5412d760a978584c8c1801e8a765c51aecd403#ef5412d7)
+      Adding paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?rev=ef5412d760a978584c8c1801e8a765c51aecd403#ef5412d7)
+      Adding paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?rev=ef5412d760a978584c8c1801e8a765c51aecd403#ef5412d7)
+      Adding regress v0.11.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding script-engine-api v0.1.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding script-engine-boa v0.0.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding script-engine-nova v0.0.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding script-runtime-api v0.0.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding servo-webgl-essl v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding servo-webgl-wgpu v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding servo-xpath v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+      Adding taproot v0.1.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?rev=ef5412d760a978584c8c1801e8a765c51aecd403#ef5412d7)
+   Compiling netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?rev=ef5412d760a978584c8c1801e8a765c51aecd403#ef5412d7)
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling netrender v0.1.2 (https://github.com/merely-made/netrender.git?rev=ef5412d760a978584c8c1801e8a765c51aecd403#ef5412d7)
+   Compiling genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling livery v0.0.5 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling regress v0.11.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling document-session-api v0.1.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling cadency v0.0.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling buckram v0.0.3 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?rev=ef5412d760a978584c8c1801e8a765c51aecd403#ef5412d7)
+   Compiling genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling genet-livery v0.0.4 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling genet-text v0.1.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling sprigging v0.2.1 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/sprigging)
+   Compiling cambium v0.3.3 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium)
+   Compiling genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling cambium-winit v0.3.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium-winit)
+   Compiling genet-render v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling fleece v0.5.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling genet-winit-host v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling inker v0.1.1 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/inker/inker)
+   Compiling cambium-rootstock v0.1.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium-rootstock)
+   Compiling cambium-winit-a11y v0.3.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium-winit-a11y)
+   Compiling document-canvas v0.1.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/inker/document-canvas)
+   Compiling mere-fleece v0.0.1 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/fleece)
+   Compiling taproot v0.1.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling mere-document-lanes v0.1.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/system/document-lanes)
+   Compiling cambium-genet-winit-host v0.1.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium-genet-winit-host)
+warning: unused import: `NSWindow`
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:511:25
+    |
+511 |     use objc2_app_kit::{NSWindow, NSWindowButton};
+    |                         ^^^^^^^^
+    |
+    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unnecessary `unsafe` block
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:540:46
+    |
+540 |             view.convertRect_fromView(frame, unsafe { ns_window.contentView() }.as_deref());
+    |                                              ^^^^^^ unnecessary `unsafe` block
+    |
+    = note: `#[warn(unused_unsafe)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `window_control_node` is never used
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:113:4
+    |
+113 | fn window_control_node<D>(dom: &D, root: NodeId, accessible_label: &str) -> Option<NodeId>
+    |    ^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `window_control_rect` is never used
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:139:15
+    |
+139 | pub(crate) fn window_control_rect<D>(
+    |               ^^^^^^^^^^^^^^^^^^^
+
+warning: `cambium-genet-winit-host` (lib) generated 4 warnings (run `cargo fix --lib -p cambium-genet-winit-host` to apply 1 suggestion)
+   Compiling tabard-workshop v0.0.1 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/tabard-workshop)
+    Finished `test` profile [unoptimized] target(s) in 1m 56s
+     Running tests/release_device_rehydration.rs (/Users/markik/Code/targets/vello-producer-gates-20261011/debug/deps/release_device_rehydration-e6efd1c532d08053)
+
+running 1 test
+test release_headless_cpu_upload_survives_orderly_new_device_and_session_rehydration ... ignored, real-adapter headless upload/recreate gate; explicit GPU handoff and finite process timeout
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/release_host_acceptance.rs (/Users/markik/Code/targets/vello-producer-gates-20261011/debug/deps/release_host_acceptance-5825cc8d9b996374)
+
+running 3 tests
+test release_accessibility_focus_click_and_numeric_value_keep_separate_authority ... ok
+test release_native_text_selection_and_dirty_close_preserve_application_authority ... ok
+test release_production_preview_semantics_follow_native_bindings_and_geometry ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.20s
+

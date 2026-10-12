@@ -241,6 +241,17 @@ where
         self.host.prepare_frame()
     }
 
+    /// Prepare, lay out, and capture the real host frame with portable producer
+    /// resources. No window, adapter, or secondary application DOM is created.
+    pub fn capture_portable(
+        &mut self,
+    ) -> Result<cambium_rootstock::PortablePaintCapture, cambium_rootstock::PortableCaptureError>
+    {
+        self.prepare_frame();
+        self.relayout();
+        self.host.capture_portable()
+    }
+
     /// The effective interface zoom: the fit factor times the user's own.
     pub fn ui_zoom(&self) -> f32 {
         self.host.ui_zoom()

@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-11",
+  "scope": "Read-only held-link bundle and exact-assertion inspector draft",
+  "base_commit": "ebfa5be8",
+  "native": {
+    "status": "passed",
+    "model_tests": 9,
+    "harness": "Code/testing/mere/link-inspection-qualification",
+    "command": "cargo test --locked --manifest-path Code/testing/mere/link-inspection-qualification/Cargo.toml --lib link_inspection",
+    "tracked_source_import": "ports/graphshell/src/link_inspection.rs",
+    "log": "Code/testing/mere/link-inspection-native.log",
+    "snapshot_roundtrip": "Graph snapshot only; no IndexedDB/browser reopening claimed"
+  },
+  "wasm": {
+    "product_check": "passed",
+    "command": "cargo check --locked --target wasm32-unknown-unknown --no-default-features --features product",
+    "working_directory": "ports/graphshell/web",
+    "log": "Code/testing/mere/link-inspection-product-check.log",
+    "release_bundle": "not built for this draft",
+    "default_and_viewer_checks": "not run for this draft"
+  },
+  "limits": {
+    "cargo_jobs": 1,
+    "memory_max_mib": 1280,
+    "swap_max_mib": 0,
+    "free_memory_guard_mib": 256
+  },
+  "interactive": {
+    "status": "pending on other machines",
+    "scenario": "p4_tree_link_inspection.scn",
+    "parallel_and_lifted_resource_browser_fixtures": "pending",
+    "source": "Existing connected browser has no WebGPU adapter; no new browser run attempted."
+  },
+  "deferred": [
+    "Direct canvas-link and shared roster entry paths",
+    "Derived display-link owning rule/input explanation adapter",
+    "Primitive writes and exact-record mutation contracts",
+    "Large-value and large-neighborhood presentation/performance qualification"
+  ],
+  "source_sha256": {
+    "ports/graphshell/src/link_inspection.rs": "7412f8b83fa0ccc06319e368dc4d7eb546aa85e8f11ff41c70ef3e4ec9355cf4",
+    "ports/graphshell/src/link_inspection/tests.rs": "bdfb9e58b7a7ff693d04e3bf7551aa51a33f8d3e94148ad724b88aca15aadef8",
+    "ports/graphshell/src/lib.rs": "53491bc9fc3945f0c1a1e32f75b5a7a2f4eb2ca770f1cf87d063e9ce0f4584fa",
+    "ports/graphshell/src/web_tree/link_inspection.rs": "c85612ac07f8cae7862bc4ebbb922726b5b05dbcf6845a05b1c6887fb478e87e",
+    "ports/graphshell/src/web_tree/inspection.rs": "c0ec227a15653c0c0c211335913b4be2a99fec902854435d1ea3e29e6ccdb82f",
+    "ports/graphshell/src/web_tree/product.rs": "30a51ba79f9b0cad310631ec077cbe708f3c736f1d250eef475b57169fec6522",
+    "ports/graphshell/src/web_tree.rs": "f32e7ee9a30854e82d07955825732df1eb68d92ddf4fcd83db33fb1b32cb9d6a",
+    "ports/graphshell/src/web_tree/lane.rs": "68a63aae5d40c5376612d06b56baa4f3ebbad459e6b29fc738a3e0fa6f22522c",
+    "ports/graphshell/web/scenarios/p4_tree_link_inspection.scn": "896cdefa978618f4f8aeed963ad23bd333825c1f7779fc3030b167640625aa51"
+  },
+  "integration": {
+    "onto_commit": "3d21c352e6b24d9ee67d650a82fec93b2c349905",
+    "upstream_changes": "Documentation-only primary graph model reconciliation; qualified runtime/scenario hashes unchanged.",
+    "audit_comparison": "Final citation and D2 reports equal published-main documents substituted read-only on the same filesystem; 252/259 D2 coverage, nine existing errors."
+  }
+}

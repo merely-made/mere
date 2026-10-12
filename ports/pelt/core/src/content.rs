@@ -14,6 +14,7 @@
 //! holds one per tile; a host with its own arrangement (Turnstone keys by
 //! graph node) holds one per key.
 
+use std::collections::HashMap;
 use std::sync::Arc;
 
 use inker::{
@@ -49,6 +50,14 @@ pub struct PeltContent<F> {
     lane: Lane<F>,
     route: PeltRoute,
     routed: Option<Routed<F>>,
+}
+
+/// Identity of the receiver beneath a retained content key. Cache/layout
+/// invalidation does not replace this lifetime.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub(crate) enum PeltReceiverIdentity {
+    Document(PeltSessionIdentity),
+    Surface(u64),
 }
 
 enum Lane<F> {
@@ -117,6 +126,8 @@ impl<F: 'static> PeltContent<F> {
         Self {
             lane: Lane::Surface(PeltSurface {
                 producer,
+                instance_id: crate::next_controller_instance_id(),
+                pointers: HashMap::new(),
                 viewport,
                 offset: None,
                 last_pointer: None,
@@ -195,6 +206,22 @@ impl<F: 'static> PeltContent<F> {
         self.document().map(PeltController::session_identity)
     }
 
+    pub(crate) fn receiver_identity(&self) -> PeltReceiverIdentity {
+        match &self.lane {
+            Lane::Document(controller) => {
+                PeltReceiverIdentity::Document(controller.session_identity())
+            },
+            Lane::Surface(surface) => PeltReceiverIdentity::Surface(surface.instance_id),
+        }
+    }
+
+    fn retire_receiver(&mut self) {
+        match &mut self.lane {
+            Lane::Document(controller) => controller.cancel_pointer_capture(),
+            Lane::Surface(surface) => surface.cancel_pointers(),
+        }
+    }
+
     /// Replace or clear the user engine choice. The held address and body
     /// stay, and the content is reconstructed through the same registries; a
     /// failed reconstruction leaves it unchanged.
@@ -208,11 +235,13 @@ impl<F: 'static> PeltContent<F> {
         }
         let mut request = routed.request.clone();
         request.engine_override = engine_id;
-        *self = Self::routed(
+        let replacement = Self::routed(
             routed.registries.clone(),
             request,
             Arc::clone(&routed.clock_for),
         )?;
+        self.retire_receiver();
+        *self = replacement;
         Ok(true)
     }
 
@@ -336,44 +365,48 @@ impl<F: 'static> PeltContent<F> {
                     },
                 },
             },
-            PeltInput::Pointer(event) => match &mut self.lane {
-                Lane::Surface(surface) => surface.pointer(event, scale_factor),
-                Lane::Document(_) => {
-                    let modifiers = inker::SessionModifiers {
-                        shift: event.modifiers.shift,
-                        control: event.modifiers.ctrl,
-                        alt: event.modifiers.alt,
-                        meta: event.modifiers.meta,
-                    };
-                    let input = match event.phase {
-                        inker::PointerPhase::Move => SessionInput::PointerMoved {
-                            x: event.position.x,
-                            y: event.position.y,
-                            modifiers,
-                        },
-                        inker::PointerPhase::Cancel => SessionInput::Cancel,
-                        phase => {
-                            let button = match event.button {
-                                Some(MouseButton::Left) => SessionPointerButton::Primary,
-                                Some(MouseButton::Right) => SessionPointerButton::Secondary,
-                                Some(MouseButton::Middle) => SessionPointerButton::Auxiliary,
-                                _ => return PeltHostEffect::default(),
-                            };
-                            SessionInput::PointerButton {
+            PeltInput::Pointer(event) => {
+                let pointer = (event.pointer_id, event.phase, event.button);
+                match &mut self.lane {
+                    Lane::Surface(surface) => surface.pointer(event, scale_factor),
+                    Lane::Document(controller) => {
+                        let modifiers = inker::SessionModifiers {
+                            shift: event.modifiers.shift,
+                            control: event.modifiers.ctrl,
+                            alt: event.modifiers.alt,
+                            meta: event.modifiers.meta,
+                        };
+                        let input = match event.phase {
+                            inker::PointerPhase::Move => SessionInput::PointerMoved {
                                 x: event.position.x,
                                 y: event.position.y,
-                                button,
-                                state: if phase == inker::PointerPhase::Down {
-                                    SessionButtonState::Pressed
-                                } else {
-                                    SessionButtonState::Released
-                                },
                                 modifiers,
-                            }
-                        },
-                    };
-                    self.input(input, scale_factor)
-                },
+                            },
+                            inker::PointerPhase::Cancel => SessionInput::Cancel,
+                            phase => {
+                                let button = match event.button {
+                                    Some(MouseButton::Left) => SessionPointerButton::Primary,
+                                    Some(MouseButton::Right) => SessionPointerButton::Secondary,
+                                    Some(MouseButton::Middle) => SessionPointerButton::Auxiliary,
+                                    _ => return PeltHostEffect::default(),
+                                };
+                                SessionInput::PointerButton {
+                                    x: event.position.x,
+                                    y: event.position.y,
+                                    button,
+                                    state: if phase == inker::PointerPhase::Down {
+                                        SessionButtonState::Pressed
+                                    } else {
+                                        SessionButtonState::Released
+                                    },
+                                    modifiers,
+                                }
+                            },
+                        };
+                        let effect = controller.input_for_pointer(input, Some(pointer));
+                        self.after_document(effect)
+                    },
+                }
             },
             PeltInput::Drag(mut event) => match &mut self.lane {
                 Lane::Surface(surface) => {
@@ -666,6 +699,7 @@ impl<F: 'static> PeltContent<F> {
         };
         match open_lane(&routed.registries, &request, &routed.clock_for, choice) {
             Ok((lane, route)) => {
+                self.retire_receiver();
                 self.lane = lane;
                 self.route = route;
                 if let Some(routed) = &mut self.routed {
@@ -742,6 +776,8 @@ fn open_lane<F: 'static>(
             Ok((
                 Lane::Surface(PeltSurface {
                     producer,
+                    instance_id: crate::next_controller_instance_id(),
+                    pointers: HashMap::new(),
                     viewport,
                     offset: None,
                     last_pointer: None,
@@ -766,6 +802,10 @@ fn retained_source_address(canonical_uri: &str, requested_address: &str) -> Stri
 /// A live composited surface producer and the geometry it was last given.
 pub(crate) struct PeltSurface {
     pub(crate) producer: Box<dyn SurfaceProducer>,
+    instance_id: u64,
+    // Accepted button masks are independent of physical buttons; retain each
+    // gesture with the envelope and scale used at the producer boundary.
+    pointers: HashMap<i32, (inker::PointerEvent, f32, u16)>,
     viewport: (u32, u32),
     offset: Option<(i32, i32)>,
     last_pointer: Option<inker::PointerEvent>,
@@ -809,6 +849,7 @@ impl PeltSurface {
     }
 
     fn pointer(&mut self, mut event: inker::PointerEvent, scale_factor: f32) -> PeltHostEffect {
+        let admitted = event.clone();
         self.buttons = event.buttons.0;
         self.last_pointer = if event.phase == inker::PointerPhase::Cancel
             || (event.phase == inker::PointerPhase::Up
@@ -829,10 +870,49 @@ impl PeltSurface {
             inker::PointerPhase::Move => None,
         };
         let mut effect = surface_effect(self.producer.send_pointer_input(event));
+        match admitted.phase {
+            inker::PointerPhase::Down if effect.handled => {
+                let buttons = self.pointers.get(&admitted.pointer_id).map_or(0, |p| p.2)
+                    | crate::input::button_bit(admitted.button);
+                self.pointers
+                    .insert(admitted.pointer_id, (admitted, scale_factor, buttons));
+            },
+            // Terminal custody ends even when delivery fails, as in the pool.
+            // Physical buttons may include a Down this receiver never admitted.
+            inker::PointerPhase::Cancel => {
+                self.pointers.remove(&admitted.pointer_id);
+            },
+            inker::PointerPhase::Up => {
+                if let Some(pointer) = self.pointers.get_mut(&admitted.pointer_id) {
+                    let buttons = pointer.2 & !crate::input::button_bit(admitted.button);
+                    *pointer = (admitted.clone(), scale_factor, buttons);
+                    if buttons == 0 {
+                        self.pointers.remove(&admitted.pointer_id);
+                    }
+                }
+            },
+            _ if effect.handled => {
+                if let Some(pointer) = self.pointers.get_mut(&admitted.pointer_id) {
+                    let buttons = pointer.2;
+                    *pointer = (admitted, scale_factor, buttons);
+                }
+            },
+            _ => {},
+        }
         if effect.handled {
             effect.pointer_capture = capture;
         }
         effect
+    }
+
+    fn cancel_pointers(&mut self) {
+        let pointers = std::mem::take(&mut self.pointers);
+        for (_, (mut event, scale, _)) in pointers {
+            event.phase = inker::PointerPhase::Cancel;
+            event.button = None;
+            event.buttons = inker::PointerButtons::NONE;
+            let _ = self.pointer(event, scale);
+        }
     }
 
     fn mouse(&mut self, event: MouseEvent) -> PeltHostEffect {

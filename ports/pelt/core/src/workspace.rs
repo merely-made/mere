@@ -587,10 +587,8 @@ impl<F: 'static> PeltWorkspace<F> {
             return self.input(input);
         }
         if matches!(input.pointer(), Some((_, inker::PointerPhase::Down, _))) {
-            if let Some((x, y)) = input.position() {
-                if let Some(tile) = self.tile_at(x, y) {
-                    self.focus(tile);
-                }
+            if let Some(tile) = self.contents.input_target(0, &input) {
+                self.focus(tile);
             }
         }
         let effect = self.contents.input_at(0, input);
@@ -1088,9 +1086,12 @@ impl<F: 'static> PeltWorkspace<F> {
             self.pointer_capture = None;
             return self.contents.input_at(0, input.into());
         }
+        let admitted = self
+            .contents
+            .input_target(0, &crate::PeltInput::Session(input.clone()));
         let (target, local_input) = match input {
             SessionInput::PointerMoved { x, y, modifiers } => {
-                let target = self.pointer_capture.or_else(|| self.tile_at(x, y));
+                let target = admitted;
                 let Some(target) = target else {
                     return PeltHostEffect::default();
                 };
@@ -1107,7 +1108,7 @@ impl<F: 'static> PeltWorkspace<F> {
                 state,
                 modifiers,
             } => {
-                let target = self.pointer_capture.or_else(|| self.tile_at(x, y));
+                let target = admitted;
                 let Some(target) = target else {
                     return PeltHostEffect::default();
                 };
@@ -1138,9 +1139,7 @@ impl<F: 'static> PeltWorkspace<F> {
         let effect = self
             .contents
             .input(&target, crate::PeltInput::Session(local_input));
-        if let Some(capture) = effect.pointer_capture {
-            self.pointer_capture = capture.then_some(target);
-        }
+        self.pointer_capture = self.contents.captured_placement(0).copied();
         if effect.navigated {
             self.sync_one_tile_metadata(target);
             self.sync_visibility();
@@ -1198,14 +1197,6 @@ impl<F: 'static> PeltWorkspace<F> {
             self.sync_visibility();
         }
         effect
-    }
-
-    fn tile_at(&self, x: f32, y: f32) -> Option<TileId> {
-        active_tiles(self.workbench.tree()).into_iter().find(|id| {
-            self.content_rects
-                .get(id)
-                .is_some_and(|rect| rect.contains(x, y))
-        })
     }
 
     fn focus(&mut self, tile: TileId) {

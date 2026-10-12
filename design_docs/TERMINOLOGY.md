@@ -115,6 +115,19 @@ the product. The active execution plan is the
 
 ## In-product vocabulary
 
+- **clip** — a portable content unit made by meaningful selection, capture or
+  export: a passage, document, screenshot, recording or supported structured
+  data, for example. It may have several payloads and internal semantic
+  structure. Its boundary is what can usefully be taken and shared, rather
+  than a required smallest atom. A clip's source, captured version and projected
+  appearance are distinct. Accepted direction and proposed lifecycle policies:
+  [family composition brief §8](2026-08-12_family_composition_thesis_brief.md#8-primary-data-model-clips-and-live-entities-2026-10-11).
+- **live entity** — an entity with domain identity and operations independently
+  of any capture, such as an authored object, field, device, active session or
+  shared activity. A disclosed projection, captured clip and permission to act
+  on its source are different things. Its domain retains operational authority.
+  This is a model term, not a new universal runtime type. See the
+  [family composition brief §8](2026-08-12_family_composition_thesis_brief.md#8-primary-data-model-clips-and-live-entities-2026-10-11).
 - **murmur** — a secret, invitation-scoped conversation
   between identified participants. A murmur is the container, and individual
   posts are utterances within it. Participant count does not select Murm versus

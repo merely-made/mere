@@ -4857,7 +4857,7 @@ here.
 stack seams P1 (on origin since `19e6dc9f`) made
 `compile_relationship_snapshot` a `ProjectionCompiler` method, built from
 host-supplied `ItemSizes`, with no default card on purpose. Knot `54bb8cd`
-still calls the old free function (`crates/knot-composition/src/retention.rs:39`,
+still calls the old free function (`repos/knot-editor/crates/knot-composition/src/retention.rs:39`,
 plus a desktop site and a test site). djinn's repin with ruling 586's
 `scenomise` row therefore fails to compile (E0425 in `knot-composition`). It
 compiles today only because mere serves no `scenomise` to Knot. Under the

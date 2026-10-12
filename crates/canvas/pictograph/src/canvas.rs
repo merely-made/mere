@@ -208,6 +208,7 @@ mod dynamics_record;
 pub mod dynamics_spec;
 pub mod dynamics_recipe;
 pub mod projection_dynamics;
+mod projection_backdrops;
 /// The physics catalog: the laws a graph can move under, the overlays composed
 /// onto them, and the named profiles. (Physics catalog — P1.)
 pub mod physics_catalog;
@@ -390,6 +391,7 @@ pub struct Canvas {
     /// The content-surface backdrop color (themed; the host pushes it via
     /// [`set_palette`](Self::set_palette)). Defaults to the dark slate.
     backdrop: ColorF,
+    projection_backdrops: Vec<projection_backdrops::ResolvedBackdrop>,
     /// Producer generation, bumped each rendered frame (positions / camera move).
     generation: u64,
     /// Last cursor position in screen px (zoom anchor + drag origin).
@@ -414,6 +416,8 @@ pub struct Canvas {
     /// An in-progress field move / resize drag, if any. (Field regions.)
     field_drag: Option<fields::FieldDrag>,
     forme_region: Option<FormeRegion>,
+    /// Presentation-only subdivisions override, scoped to an exact Forme.
+    forme_guides: Option<(uuid::Uuid, bool)>,
     forme_held: HashSet<NodeKey>,
     /// Currently-selected nodes (click selects one; marquee selects many).
     selected: HashSet<NodeKey>,
@@ -424,6 +428,9 @@ pub struct Canvas {
     /// spring persist; this is display-only. Persistence rides view-intent's
     /// `hidden_relations`.
     hidden_edges: HashSet<EdgeCell>,
+    /// Disposable occurrence controllers supply disclosed endpoint pairs
+    /// without minting graph assertions. Ordinary graph canvases use `None`.
+    occurrence_edges: Option<Vec<(NodeKey, NodeKey)>>,
     /// The physics view's revision (F178): bumped whenever a hide or show
     /// changes the visible relation cells, so the registry's physics channels
     /// key by it beside the graph's structural revision.

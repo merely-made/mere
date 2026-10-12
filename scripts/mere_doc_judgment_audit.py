@@ -136,10 +136,13 @@ def audit() -> dict[str, object]:
     for path in active:
         basenames.setdefault(Path(path).name, []).append(path)
     duplicate_basenames = {name: paths for name, paths in basenames.items() if len(paths) > 1}
-    if duplicate_basenames:
+    # Full relative paths disambiguate supplemental records. Only a legacy
+    # basename-only record is ambiguous when several active paths share it.
+    ambiguous_legacy = {name: paths for name, paths in duplicate_basenames.items() if name in legacy}
+    if ambiguous_legacy:
         errors.extend(
             f"duplicate active basename {name}: {', '.join(paths)}"
-            for name, paths in sorted(duplicate_basenames.items())
+            for name, paths in sorted(ambiguous_legacy.items())
         )
 
     legacy_root_names = {name for name in legacy if "/" not in name and "\\" not in name}

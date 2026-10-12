@@ -65,7 +65,7 @@ STATUS_LINE = re.compile(
     r"(?im)^\s*(?:\*\*)?status(?:\s*\([^\)\r\n]*\))?(?:\*\*)?\s*:(?:\*\*)?"
 )
 PLAN_HEADING = re.compile(r"(?im)^#.*\bplan\b")
-LINE_SUFFIX = re.compile(r":\d+(?::\d+)?$")
+LINE_SUFFIX = re.compile(r":\d+(?:[-\u2013\u2014\ufffd]\d+)?(?::\d+)?$")
 
 # Paths in prose can be checked only when their starting point is unambiguous.
 # `components/` is deliberately mapped to the Genet sibling: it is a common
@@ -291,6 +291,8 @@ def is_plan(path: Path, text: str) -> bool:
 def normalise_code_span(span: str) -> str | None:
     candidate = span.strip().replace("\\", "/")
     candidate = LINE_SUFFIX.sub("", candidate).rstrip(".,;:)")
+    # Qualified Rust items cite a file followed by its item path.
+    candidate = re.sub(r"(?<=\.rs)::[A-Za-z_][A-Za-z_0-9:]*$", "", candidate)
     if not candidate or " " in candidate or "/" not in candidate or "<" in candidate or ">" in candidate:
         return None
     return candidate
@@ -300,7 +302,7 @@ def known_root_candidate(span: str) -> str | None:
     candidate = normalise_code_span(span)
     if candidate is None:
         return None
-    if any(marker in candidate for marker in GLOB_MARKERS):
+    if "..." in candidate or any(marker in candidate for marker in GLOB_MARKERS):
         return None
     if candidate.startswith(AMBIGUOUS_LOCAL_ROOTS):
         return None
@@ -325,7 +327,7 @@ def excluded_known_root_candidate(span: str) -> tuple[str, str] | None:
         return None
     if candidate.startswith(AMBIGUOUS_LOCAL_ROOTS):
         return candidate, "ambiguous_known_root_paths"
-    if any(marker in candidate for marker in GLOB_MARKERS):
+    if "..." in candidate or any(marker in candidate for marker in GLOB_MARKERS):
         return candidate, "ignored_known_root_patterns"
     if VERSIONED_MERE_PATH.fullmatch(candidate):
         return candidate, "reserved_identifier_paths"
@@ -598,6 +600,12 @@ def run_self_test() -> None:
     for sample in status_negative:
         if STATUS_LINE.search(sample) is not None:
             raise AssertionError(f"status negative control was detected: {sample!r}")
+
+    for citation in ("crates/a/src/lib.rs:10-20", "crates/a/src/lib.rs:10\u201320",
+                     "crates/a/src/lib.rs:10:2", "crates/a/src/lib.rs::Thing"):
+        assert normalise_code_span(citation) == "crates/a/src/lib.rs", citation
+    assert known_root_candidate("crates/.../curation") is None
+    assert known_root_candidate("crates/a/src/missing.rs:10-20") == "crates/a/src/missing.rs"
 
     informational_only = Report(
         ambiguous_known_root_paths=[Finding("doc.md", "src/missing.rs", "bare root")],

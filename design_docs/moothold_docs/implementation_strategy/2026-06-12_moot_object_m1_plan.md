@@ -558,6 +558,15 @@ in the
 [Murm runtime plan](../../mere_docs/implementation_strategy/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md#2026-10-10-murms-application-read-and-exact-channel-addresses).
 Graphshell presentation remains the next consumer step; these library checks
 do not establish a rendered community client.
+The upstream-aligned authoring and retention continuation is recorded in the
+[Murm runtime plan](../../mere_docs/implementation_strategy/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md#2026-10-11-observed-frontiers-and-authorized-retention-roots).
+It adds complete observed frontiers and owner-authorized per-author retention
+roots, with explicit late-bootstrap and policy-reinstall boundaries. Design
+language §9.16 distinguishes disclosed live entities, captures with lineage and
+scene appearances; none of their presentation actions grants pruning or sending
+authority. The native bilateral checkpoint is distinct from Commons' governed
+snapshot and does not establish a new Moot constitution or delivery receipt.
+
 The fetched [forme draft agreement §9.11](../../2026-08-23_projection_scenes_and_graph_native_platform.md#911-forme-draft-session-2026-10-10)
 keeps arrangement undo/discard scoped to the active editor. Conversation drafts
 and shared records are not part of an arrangement snapshot; hiding or discarding

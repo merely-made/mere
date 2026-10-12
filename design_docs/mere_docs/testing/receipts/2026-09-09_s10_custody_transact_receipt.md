@@ -122,7 +122,7 @@ this worktree before any muniment work could run. Genet is out of this
 slice's scope, so the entry was commented out in this worktree's local config
 only (not committed; does not touch the genet repo or the other active mere
 session) rather than repaired. Whoever next touches genet's paint rename
-should also update `mere/.cargo/config.toml` on any machine that still has the
+should also update `mere/.cargo/config.toml` *(historical citation)* <!-- doc-audit: historical-path --> on any machine that still has the
 old entry.
 
 **Corrected 2026-10-06 (S14 pass):** the paint component was not renamed.

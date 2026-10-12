@@ -14,6 +14,7 @@ pub use pool_a11y::PeltPlacementA11y;
 mod surface_policy;
 mod workspace;
 
+use std::collections::HashMap;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
 
@@ -301,6 +302,7 @@ pub struct PeltController<F> {
     document_state: PeltDocumentState,
     instance_id: u64,
     session_generation: u64,
+    pointer_buttons: HashMap<i32, u16>,
     load_mode: PeltLoadMode,
     history_mode: PeltHistoryMode,
     load: PageLoad,
@@ -418,6 +420,7 @@ impl<F: 'static> PeltController<F> {
             // Generation zero is reserved as "no successfully opened
             // session" for hosts that retain child trees across tiles.
             session_generation: 1,
+            pointer_buttons: HashMap::new(),
             load_mode: config.load_mode,
             history_mode: config.history_mode,
             load: PageLoad::default(),
@@ -737,14 +740,55 @@ impl<F: 'static> PeltController<F> {
     }
 
     pub fn input(&mut self, input: SessionInput) -> PeltHostEffect {
+        // Session Cancel is global; only a lossless Pointer Cancel names one
+        // pointer id. Keep that distinction before lowering either envelope.
+        let pointer = if matches!(&input, SessionInput::Cancel) {
+            None
+        } else {
+            PeltInput::Session(input.clone()).pointer()
+        };
+        self.input_for_pointer(input, pointer)
+    }
+
+    pub(crate) fn input_for_pointer(
+        &mut self,
+        input: SessionInput,
+        pointer: Option<(i32, inker::PointerPhase, Option<inker::MouseButton>)>,
+    ) -> PeltHostEffect {
         self.framed = None;
         let modifiers = input_modifiers(&input);
+        let losing_focus = matches!(&input, SessionInput::Focus(false));
+        let global_cancel = pointer.is_none() && matches!(&input, SessionInput::Cancel);
         let SessionInputResult {
             effect,
             cursor,
             capture,
             editable,
         } = self.session.input(input);
+        // Remember admission before following an input-driven navigation: its
+        // successful session install must cancel this exact old receiver.
+        if let Some((id, phase, button)) = pointer {
+            match phase {
+                inker::PointerPhase::Down if effect.is_handled() || capture == Some(true) => {
+                    *self.pointer_buttons.entry(id).or_default() |= input::button_bit(button);
+                },
+                inker::PointerPhase::Up => {
+                    if let Some(buttons) = self.pointer_buttons.get_mut(&id) {
+                        *buttons &= !input::button_bit(button);
+                    }
+                    if self.pointer_buttons.get(&id) == Some(&0) {
+                        self.pointer_buttons.remove(&id);
+                    }
+                },
+                inker::PointerPhase::Cancel => {
+                    self.pointer_buttons.remove(&id);
+                },
+                _ => {},
+            }
+        }
+        if losing_focus || global_cancel {
+            self.pointer_buttons.clear();
+        }
         let mut host_effect = PeltHostEffect {
             handled: effect.is_handled(),
             redraw: matches!(effect, SessionEffect::Handled | SessionEffect::Cancelled),
@@ -1288,12 +1332,23 @@ impl<F: 'static> PeltController<F> {
     /// Install a session only after its factory has completed successfully.
     /// Failed replacement attempts retain both this session and its generation.
     fn install_session(&mut self, session: Box<dyn DocumentSession<F>>) {
+        self.cancel_pointer_capture();
         self.framed = None;
         self.session = session;
         self.session_generation = self
             .session_generation
             .checked_add(1)
             .expect("Pelt session generation exhausted");
+    }
+
+    /// Retire admitted input while the old receiver is still alive. Do not
+    /// route the cancellation's effect through navigation or replacement.
+    pub(crate) fn cancel_pointer_capture(&mut self) {
+        if !self.pointer_buttons.is_empty() {
+            self.pointer_buttons.clear();
+            self.framed = None;
+            let _ = self.session.input(SessionInput::Cancel);
+        }
     }
 
     fn document_error(
