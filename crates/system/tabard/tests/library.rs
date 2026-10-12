@@ -240,7 +240,7 @@ fn failed_filesystem_save_preserves_snapshot_and_allows_retry() {
 
 #[test]
 fn typography_library_is_versioned_round_trips_and_refuses_invalid_writes() {
-    use tabard::{FontPreferences, FontRole};
+    use tabard::{FontRole, ThemeFontStyle};
     let directory = TestDirectory::new();
     let path = directory.library();
     let mut store = ThemeLibraryStore::load(&path).unwrap();
@@ -249,7 +249,7 @@ fn typography_library_is_versioned_round_trips_and_refuses_invalid_writes() {
         .typography
         .set(
             FontRole::Reading,
-            FontPreferences {
+            ThemeFontStyle {
                 family: Some("Georgia".into()),
                 size_px: Some(22.0),
                 line_height: Some(1.6),

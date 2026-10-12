@@ -188,7 +188,7 @@ fn make_document(
     let font_sheet = format!(
         "{}{}{}{}{}{}",
         typography.css_custom_properties(),
-        typography.role_css(FontRole::Ui, ":where(.toolbar),:where(button)"),
+        typography.role_css(FontRole::Interface, ":where(.toolbar),:where(button)"),
         typography.role_css(FontRole::Reading, ":where(p)"),
         typography.role_css(FontRole::Heading, ":where(h1)"),
         typography.role_css(FontRole::Label, ":where(.address-field)"),

@@ -4,7 +4,7 @@ assert snap dirty == false
 assert snap saved == true
 assert snap mode == light
 assert snap font_catalog == ready
-click role:button @data-font-role=ui
+click role:button @data-font-role=interface
 assert snap font_family == serif
 assert snap font_size == 15
 assert snap font_line_height == 1.2

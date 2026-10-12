@@ -119,16 +119,19 @@ follow-ups in the theme modes plan.
 
 MPL-2.0 (see the repository `LICENSE`)
 
-## Portable typography preferences
+## Authored typography styles
 
-`Theme::typography` carries optional Interface, Reading, Heading, Label and Code
-preferences. Each role can request a family, CSS-pixel size and unitless leading.
+`Theme::typography` carries optional explicit Interface, Reading, Heading, Label
+and Code styles through `ThemeFontStyle`. The role enum and family validation
+reuse the published `typography` contract. Application-owned ordered family
+requests remain separate on `ThemeChoice.fonts` and take precedence over theme
+family defaults. Each role can request a family, CSS-pixel size and unitless leading.
 Empty preferences preserve host defaults. Validation rejects blank/control
 character family names and nonfinite or out-of-range metrics before save or
 export. Named families emit safely quoted CSS plus an explicit generic fallback;
 `missing_families` reports availability without rewriting the definition.
 
-CSS exports include `--tabard-font-{role}-family`, `-size` and `-line-height`
+CSS exports include `--tabard-font-{role}`, `--tabard-font-{role}-size` and `-line-height`
 only when authored. `Typography::role_css` lets each consumer supply its own
 semantic selectors. Hosts retain layout, installed-face discovery and font
 measurement authority; this model carries no font bytes. Authored mode sheets

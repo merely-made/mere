@@ -152,7 +152,7 @@ fn appearance_edits_leave_source_and_accessible_content_unchanged() {
 
 #[test]
 fn fonts_resolve_per_role_without_restyling_the_neighbor_and_author_css_wins() {
-    use tabard::{FontPreferences, FontRole, Typography};
+    use tabard::{FontRole, ThemeFontStyle, Typography};
     let mut specimen = StylesheetSpecimen::default();
     let neighbor = StylesheetSpecimen::default();
     let heading = specimen.computed_style("preview-heading", "font-size");
@@ -160,7 +160,7 @@ fn fonts_resolve_per_role_without_restyling_the_neighbor_and_author_css_wins() {
     fonts
         .set(
             FontRole::Reading,
-            FontPreferences {
+            ThemeFontStyle {
                 family: Some("Georgia".into()),
                 size_px: Some(24.0),
                 line_height: Some(1.7),

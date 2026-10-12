@@ -5,7 +5,7 @@
 use crate::{WorkshopState, WorkshopView};
 use cambium::{PointerClick, TextInput, button, el};
 use tabard::workshop::Edit;
-use tabard::{FontPreferences, FontRole};
+use tabard::{FontRole, ThemeFontStyle};
 
 pub(crate) struct FontControls {
     pub role: FontRole,
@@ -18,7 +18,7 @@ pub(crate) struct FontControls {
 impl Default for FontControls {
     fn default() -> Self {
         Self {
-            role: FontRole::Ui,
+            role: FontRole::Interface,
             family: TextInput::new(""),
             size: TextInput::new(""),
             height: TextInput::new(""),
@@ -28,7 +28,7 @@ impl Default for FontControls {
     }
 }
 impl FontControls {
-    pub fn refresh(&mut self, preferences: Option<&FontPreferences>) {
+    pub fn refresh(&mut self, preferences: Option<&ThemeFontStyle>) {
         self.family = TextInput::new(
             preferences
                 .and_then(|p| p.family.clone())
@@ -48,7 +48,7 @@ impl FontControls {
         );
         self.error = None;
     }
-    fn parse(&self) -> Result<FontPreferences, String> {
+    fn parse(&self) -> Result<ThemeFontStyle, String> {
         fn number(text: &str, label: &str) -> Result<Option<f32>, String> {
             if text.trim().is_empty() {
                 Ok(None)
@@ -59,7 +59,7 @@ impl FontControls {
                     .map_err(|_| format!("{label} must be a number, or empty to inherit."))
             }
         }
-        let p = FontPreferences {
+        let p = ThemeFontStyle {
             family: (!self.family.text().trim().is_empty())
                 .then(|| self.family.text().trim().to_owned()),
             size_px: number(self.size.text(), "Font size")?,
@@ -68,9 +68,9 @@ impl FontControls {
         p.validate()?;
         Ok(p)
     }
-    pub fn pending(&self, saved: Option<&FontPreferences>) -> bool {
+    pub fn pending(&self, saved: Option<&ThemeFontStyle>) -> bool {
         self.parse()
-            .map_or(true, |p| &p != saved.unwrap_or(&FontPreferences::default()))
+            .map_or(true, |p| &p != saved.unwrap_or(&ThemeFontStyle::default()))
     }
 }
 impl WorkshopState {
@@ -278,7 +278,7 @@ mod tests {
         definition
             .typography
             .0
-            .insert(FontRole::Ui, FontPreferences::default());
+            .insert(FontRole::Interface, ThemeFontStyle::default());
         state.import_theme_json(&tabard::portable::theme_json(&definition).unwrap());
         let before = state.draft_theme().clone();
         state.set_font_role(FontRole::Reading);
