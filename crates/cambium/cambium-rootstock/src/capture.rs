@@ -37,6 +37,9 @@ pub fn start_frame_readback(
     width: u32,
     height: u32,
 ) -> Result<PendingFrame, String> {
+    if let Some(loss) = surface.core().loss_notice() {
+        return Err(format!("capture refused: DeviceLost({loss:?})"));
+    }
     let target = capture_target(surface, view, width, height);
     surface.core().start_rgba8_readback(&target, width, height)
 }

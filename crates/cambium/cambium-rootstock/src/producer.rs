@@ -93,7 +93,9 @@ pub struct ProducerContext<'a> {
     /// The host's render core, on the same device. A producer whose content
     /// is a netrender scene rasterizes it here under a key of its own
     /// (`RenderCore::rasterize_scaled_for`), sharing the host's renderer and
-    /// glyph cache instead of booting another.
+    /// glyph cache instead of booting another. `core.generation()` is the
+    /// immutable device lifetime identity; use it rather than pointer identity
+    /// for any producer-owned GPU cache. CPU source identity remains separate.
     pub core: &'a genet_render_host::RenderCore,
 }
 

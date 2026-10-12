@@ -42,3 +42,6 @@ layout-dom-api.workspace = true
 accesskit = "0.24"
 winit.workspace = true
 tempfile = "3"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
+wgpu = { version = "30.0.1", default-features = false, features = ["std", "wgsl"] }

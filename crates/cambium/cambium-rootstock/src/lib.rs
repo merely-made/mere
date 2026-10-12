@@ -188,6 +188,19 @@ pub trait Surface {
     /// Acquire the next backbuffer, or `None` when the surface is not
     /// presentable this frame.
     fn acquire(&self) -> Option<wgpu::SurfaceTexture>;
+    /// Typed native acquisition. Existing custom/headless surfaces retain
+    /// their unavailable behavior; event-source surfaces distinguish loss.
+    fn acquire_status(&self) -> genet_render_host::SurfaceAcquire {
+        if let Some(loss) = self.core().device_failure() {
+            return genet_render_host::SurfaceAcquire::DeviceLost(loss);
+        }
+        match self.acquire() {
+            Some(frame) => genet_render_host::SurfaceAcquire::Frame(frame),
+            None => genet_render_host::SurfaceAcquire::Unavailable {
+                reason: "custom surface unavailable".into(),
+            },
+        }
+    }
 
     /// The netrender renderer.
     fn renderer(&self) -> &netrender::Renderer {
@@ -1078,6 +1091,8 @@ mod spatial_tests {
     }
 }
 
+#[cfg(test)]
+mod accessibility_tests;
 mod capture;
 mod frame;
 mod host;
@@ -1085,8 +1100,7 @@ mod input;
 mod multi_host;
 #[cfg(test)]
 mod multi_host_tests;
-#[cfg(test)]
-mod accessibility_tests;
+mod recovery;
 mod spatial;
 mod tree;
 mod wake;
@@ -1110,12 +1124,12 @@ pub mod meristem_bounds {
 
 pub use capture::{Frame, PendingFrame, read_frame, start_frame_readback};
 pub use host::{
-    AppCtx, AppFrameInsets, AppHook, AppShared, CaptureFn, CloseDisposition, CloseRequest,
-    CloseRequestHook, FocusedTextHook, FocusedTextSlot, FrameHook, FrameProfile, Hook, Host,
-    HostFont, HostHooks, HostImage, HostOptions, HostPointer, HostState, IdlePolicy, Init,
-    KeyInterceptHook, PaintCaptureFn, PresentationObserver, PresentedFrame, RelayoutProfile,
-    Runner, ScrollIntoView, StampedCaptureFn, WindowFrame, ZOOM_LADDER, env_size, fit_zoom,
-    ladder_step,
+    AppCtx, AppFrameInsets, AppHook, AppShared, CaptureFn, CaptureFrame, CaptureRefusal,
+    CloseDisposition, CloseRequest, CloseRequestHook, FocusedTextHook, FocusedTextSlot, FrameHook,
+    FrameProfile, Hook, Host, HostFont, HostHooks, HostImage, HostOptions, HostPointer, HostState,
+    IdlePolicy, Init, KeyInterceptHook, PaintCaptureFn, PresentationObserver, PresentedFrame,
+    RelayoutProfile, Runner, ScrollIntoView, StampedCaptureFn, StampedCaptureFrame, WindowFrame,
+    ZOOM_LADDER, env_size, fit_zoom, ladder_step,
 };
 pub use multi_host::{MultiHost, MultiRunner, WindowRequests, WindowSlot, WindowTree};
 pub use tree::HostTree;

@@ -131,14 +131,17 @@ impl<T> TextureProducer for SceneProducer<T> {
         }
         let scene = self.scene(logical_size.0, logical_size.1);
         let [width, height] = cx.frame.physical_size;
-        let (texture, view) = cx.core.rasterize_scaled_for(
-            self.raster_key,
-            &scene,
-            width,
-            height,
-            ColorLoad::Clear(wgpu::Color::TRANSPARENT),
-            cx.frame.layout_scale,
-        );
+        let (texture, view) = cx
+            .core
+            .try_rasterize_scaled_for(
+                self.raster_key,
+                &scene,
+                width,
+                height,
+                ColorLoad::Clear(wgpu::Color::TRANSPARENT),
+                cx.frame.layout_scale,
+            )
+            .ok()?;
         self.texture = Some(texture);
         self.physical_size = cx.frame.physical_size;
         self.logical_size = logical_size;

@@ -282,6 +282,15 @@ where
         }
     }
 
+    // Recovery participation cannot depend on a visible window receiving a
+    // redraw. Application worker draining remains first-window-only below.
+    fn poll_shared_device_recovery(&mut self) {
+        let multi = self.multi();
+        for id in multi.windows().collect::<Vec<_>>() {
+            multi.with_window(id, |window| window.core.poll_device_recovery());
+        }
+    }
+
     fn launch(&mut self, event_loop: &ActiveEventLoop) {
         let init = self.init.take().expect("launched once");
         let WindowsInit {
@@ -415,6 +424,7 @@ where
             // The wake is the application's, not a window's: its drain hook
             // runs once, in the first open window's turn.
             HostEvent::Wake => {
+                self.poll_shared_device_recovery();
                 let multi = self.multi();
                 let first = multi.windows().next();
                 if let Some(id) = first {
@@ -438,5 +448,105 @@ where
         self.multi()
             .with_window(id, |window| window.handle_window_event(event));
         self.after_turn(event_loop, &[id]);
+    }
+}
+
+#[cfg(test)]
+mod recovery_tests {
+    use super::*;
+    use cambium::{AnyView, GenetCtx, GenetElement, el, text};
+    use genet_render_host::{DeviceLossNotice, RecoveryStatus, SharedRenderCore};
+    use std::sync::atomic::{AtomicUsize, Ordering};
+
+    struct App {
+        draft: String,
+    }
+    type Child = Box<dyn AnyView<App, (), GenetCtx, GenetElement>>;
+    type Logic = fn(&App) -> Child;
+    fn root(app: &App) -> Child {
+        Box::new(el("div", text(app.draft.clone())))
+    }
+
+    #[test]
+    fn wake_recovery_polls_hidden_multiwindow_host_without_a_redraw() {
+        let wake = HostWake::new(Arc::new(AtomicBool::new(false)), Arc::new(|| {}));
+        let mut multi: MultiHost<App, Logic, Child, WindowHost<App, Logic, Child>> = MultiHost::new(
+            App {
+                draft: "retained authored draft".into(),
+            },
+            AppShared::default(),
+            HostHooks::inert(),
+        );
+        let mut open = |hidden| {
+            let mut state = HostState::new();
+            state.hidden = hidden;
+            multi.open(
+                root as Logic,
+                WinitHost::new(Host::new(
+                    HostOptions::default(),
+                    None,
+                    HostHooks::inert(),
+                    state,
+                    wake.clone(),
+                )),
+            )
+        };
+        let visible = open(false);
+        let hidden = open(true);
+        let calls = Arc::new(AtomicUsize::new(0));
+        let counted = calls.clone();
+        let owner = SharedRenderCore::from_detached_loss(
+            DeviceLossNotice {
+                generation: 903,
+                reason: wgpu::DeviceLostReason::Unknown,
+                message: "CPU-only actual multiwindow routing control".into(),
+            },
+            Arc::new(move || {
+                counted.fetch_add(1, Ordering::SeqCst);
+                Err("deliberate bounded replacement refusal".into())
+            }),
+        );
+        for id in [visible, hidden] {
+            multi.with_window(id, |window| {
+                window.core.attach_shared_recovery(owner.clone())
+            });
+        }
+        assert!(matches!(
+            multi.with_window(visible, |window| window.core.poll_device_recovery()),
+            Some(RecoveryStatus::Waiting {
+                remaining_hosts: 1,
+                ..
+            })
+        ));
+        assert_eq!(
+            calls.load(Ordering::SeqCst),
+            0,
+            "first-window drain alone leaves the hidden host's barrier closed"
+        );
+        let mut windows = WinitWindows {
+            multi: Some(multi),
+            init: None,
+            hooks: None,
+            wake,
+            by_native: HashMap::new(),
+        };
+        // This is the exact pre-drain method called by HostEvent::Wake; no
+        // event loop, adapter, native window or frame is constructed.
+        windows.poll_shared_device_recovery();
+        assert!(matches!(owner.status(), RecoveryStatus::Failed { .. }));
+        assert_eq!(calls.load(Ordering::SeqCst), 1);
+        windows.poll_shared_device_recovery();
+        assert_eq!(calls.load(Ordering::SeqCst), 1);
+        let multi = windows.multi.as_ref().unwrap();
+        assert!(multi.slot(hidden).unwrap().s.hidden);
+        assert_eq!(multi.state().draft, "retained authored draft");
+        for id in [visible, hidden] {
+            let host = multi.slot(id).unwrap();
+            assert!(host.s.surface.is_none());
+            assert!(matches!(
+                host.s.recovery_status,
+                Some(RecoveryStatus::Failed { .. })
+            ));
+        }
     }
 }

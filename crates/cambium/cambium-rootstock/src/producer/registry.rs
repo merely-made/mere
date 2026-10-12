@@ -50,6 +50,7 @@ pub struct ProducerRegistry {
     entries: BTreeMap<u64, Entry>,
     pending_retire: Vec<u64>,
     device: Option<wgpu::Device>,
+    device_generation: Option<u64>,
     next_stamp: u64,
     pub(super) timestamp: Option<std::time::Duration>,
 }
@@ -138,6 +139,7 @@ impl ProducerRegistry {
     pub(crate) fn suspend_all(&mut self, renderer: Option<&netrender::Renderer>) {
         self.suspend_except(&|_, _| false, renderer);
         self.device = None;
+        self.device_generation = None;
     }
 
     /// Suspend every producer but those another window owns (see
@@ -171,6 +173,7 @@ impl ProducerRegistry {
     /// takes whichever it is given.
     pub(crate) fn forget_device(&mut self) {
         self.device = None;
+        self.device_generation = None;
     }
 
     /// Retire every producer whose owner node left the document: under
@@ -220,13 +223,17 @@ impl ProducerRegistry {
         let mut stats = ProducerFrameStats::default();
         let renderer = surface.renderer();
         if self
-            .device
-            .as_ref()
-            .is_some_and(|device| device != surface.device())
+            .device_generation
+            .is_some_and(|generation| generation != surface.core().generation())
+            || self
+                .device
+                .as_ref()
+                .is_some_and(|device| device != surface.device())
         {
             self.suspend_all(None);
         }
         self.device = Some(surface.device().clone());
+        self.device_generation = Some(surface.core().generation());
         for key in self.pending_retire.drain(..) {
             renderer.unregister_external_image(netrender::external_image_key(key));
             stats.retirements += 1;
