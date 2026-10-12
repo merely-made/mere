@@ -1,0 +1,29 @@
+{
+  "provider": {
+    "head": "2eae6243881d5b24c984d5ee35dde509ca5db782",
+    "source_tree_sha256": "91049a918c2bc1492c516129d708a25e44cb0228d5a033ed49170db847fff027",
+    "tracked_rust_files": 311
+  },
+  "netrender": {
+    "head": "c74b7cb28090c28b1c6d80b08dcdea18aff48d3e",
+    "source_tree_sha256": "b5216cd14f4fad369ffaf08cbf6de9d3894a6ed7bb793961c80e8efb303d968a",
+    "tracked_rust_files": 134
+  },
+  "genet": {
+    "head": "5fc1836936f2d7ce6d103b8081b537e8bd922c1d",
+    "source_tree_sha256": "f20d79b5bd11cade6e21ef2cfb7b586950b900fb13220747a3e61505ee9d7893",
+    "tracked_rust_files": 874
+  },
+  "mere": {
+    "head": "29e54fd349f7e35303d09d4e737d508c9748d546",
+    "source_tree_sha256": "ddae4415fbf3936c78be18c696d9b99c29664050478e065dc27c6bc514913ea9",
+    "tracked_rust_files": 2338
+  },
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "bounds": {
+    "cargo_jobs": 2,
+    "test_threads": 1,
+    "readback_seconds": 5,
+    "physical_driver_reset": false
+  }
+}

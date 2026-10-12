@@ -21,21 +21,33 @@ impl CaptureBackend for WebCapture {
     ) -> Result<StampedReadback, String> {
         let slot = Rc::new(RefCell::new(None));
         let sink = slot.clone();
-        *capture = Some(Box::new(move |surface, view, presentation| {
-            *sink.borrow_mut() = Some((
-                presentation,
-                crate::capture::start(surface, view, presentation.width, presentation.height),
+        *capture = Some(Box::new(move |capture| {
+            *sink.borrow_mut() = Some(capture.map_err(|error| error.to_string()).and_then(
+                |frame| {
+                    crate::capture::start(
+                        frame.surface,
+                        frame.view,
+                        frame.presentation.width,
+                        frame.presentation.height,
+                    )
+                    .map(|pending| (frame.presentation, pending))
+                },
             ));
         }));
         Ok(Box::new(move || {
             if !slot
                 .borrow()
                 .as_ref()
-                .is_some_and(|(_, frame): &(_, PendingFrame)| frame.ready())
+                .is_some_and(|result: &Result<(_, PendingFrame), String>| {
+                    result.is_err() || result.as_ref().is_ok_and(|(_, frame)| frame.ready())
+                })
             {
                 return None;
             }
-            let (presentation, frame) = slot.borrow_mut().take()?;
+            let (presentation, frame) = match slot.borrow_mut().take()? {
+                Ok(frame) => frame,
+                Err(error) => return Some(Err(error)),
+            };
             Some(frame.take().map(|pixels| StampedFrame {
                 identity: identity.clone(),
                 presentation,
@@ -47,10 +59,16 @@ impl CaptureBackend for WebCapture {
         let slot = Rc::new(RefCell::new(None));
         *capture = Some(capture_into(slot.clone()));
         Box::new(move || {
-            if !slot.borrow().as_ref().is_some_and(PendingFrame::ready) {
+            if !slot
+                .borrow()
+                .as_ref()
+                .is_some_and(|result: &Result<PendingFrame, String>| {
+                    result.is_err() || result.as_ref().is_ok_and(|frame| frame.ready())
+                })
+            {
                 return None;
             }
-            Some(slot.borrow_mut().take()?.take())
+            Some(slot.borrow_mut().take()?.and_then(PendingFrame::take))
         })
     }
     fn writes_files(&self) -> bool {

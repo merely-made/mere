@@ -1,0 +1,35 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling netrender v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling genet-livery v0.0.4 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling sprigging v0.2.1 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/sprigging)
+   Compiling cambium v0.3.3 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium)
+   Compiling paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling cambium-winit v0.3.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium-winit)
+   Compiling genet-render v0.2.0 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling taproot v0.1.0 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling cambium-rootstock v0.1.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium-rootstock)
+   Compiling mesquite v0.1.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/mesquite)
+    Finished `test` profile [unoptimized] target(s) in 26.89s
+     Running unittests src/lib.rs (/Users/markik/Code/targets/mere-s2s3/debug/deps/mesquite-103b18ea36e6f703)
+
+running 5 tests
+test lane::presentation_tests::a_stall_before_the_first_presentation_finishes_without_arming_a_final_capture ... ok
+test lane::presentation_tests::asynchronous_readback_is_polled_while_native_presentation_is_unavailable ... ok
+test lane::presentation_tests::continuous_native_stall_has_an_independent_clock_deadline_and_honest_receipt ... ok
+test lane::presentation_tests::failed_host_redraw_clears_the_previous_presentation_identity ... ok
+test lane::presentation_tests::unavailable_and_duplicate_native_turns_do_not_spend_scenario_frames ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 22 filtered out; finished in 1.17s
+
