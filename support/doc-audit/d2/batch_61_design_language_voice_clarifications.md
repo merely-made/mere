@@ -518,3 +518,18 @@ with source files and upstream receipts fixed. The baseline is 261/264 D2
 coverage and four existing errors, including the two newly published renderer
 receipt documents. Whitespace passes. New receipt logs preserve raw bytes and
 text-source hashes normalize CRLF to LF for portable qualification.
+
+**Inspector/presentation/strength continuation (2026-10-11):** Mark authorized
+the proposed next slices. The retained inspector now spaces facts and reveals
+explicit details, including keyboard traversal at 420px. Exact strength editing
+is bound to a graph session and coupling; a private graph/journal candidate is
+validated and committed through one stale-safe backend transaction before
+installation. Saved history uses that coupling's own channel. Five native
+transaction tests and five Forme renderer cases pass. Ten Chrome scenarios and
+eighteen reviewed captures establish inspection/reopen, rule authoring/history,
+live guide opt-in/base restoration, and exact strength draft/save/reopen.
+Actual source/package cuts and retained failed attempts are explicit in the
+existing owner plans and receipt. The larger field composition walkthrough is
+design work; spatial/placement/event decisions and measured force effects stay
+open. No active Markdown or parser-shaped judgment identity is added. The
+source notice repair is a comment-only change to an upstream renderer test.
