@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "build",
+    "--locked",
+    "--manifest-path",
+    "ports/graphshell/web/Cargo.toml",
+    "--target",
+    "wasm32-unknown-unknown",
+    "--no-default-features",
+    "--features",
+    "product",
+    "-j",
+    "2"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-vello-release-adoption",
+  "deadline_seconds": 180,
+  "elapsed_seconds": 3.489,
+  "exit_code": 0,
+  "timed_out": false,
+  "log": "/Users/markik/Code/output/vello-classic-browser-gates-20261011/checks/build-browser-scenario-corrected.log"
+}

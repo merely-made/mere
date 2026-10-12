@@ -1,0 +1,13 @@
+AssertionError [ERR_ASSERTION]: {"state":"fail","errors":[],"gate_failures":[],"result":{"canvas_logical_size":[1140,865],"canvas_physical_size":[1140,865],"log":["captured renderer_cold","waited 43 frames","captured renderer_repeat","waited 0 frames","captured renderer_draft","waited 0 frames","captured renderer_zoom","waited 0 frames","captured renderer_input","waited 27 frames","production producer renderer authority receipt complete","FAIL: no current DOM target for Selector { surface: None, matcher: Role(\"button\"), text: Some(\"Pause physics\"), attr: None }","gpu timestamps: no"],"result":"fail","saved_graph":{"address":"https://example.test/i2p-port","file":null,"reopened":false,"save_state":"idle","selected":"81b91a6b-52ef-5751-b497-15f711cf9c70","session":"206d2d5b-0696-4f5b-85be-11be0b6ef8f2","tags":"research, transport","title":"I2P port notes"},"timings":[]},"captures":[{"name":"renderer_cold","width":1440,"height":1000,"bytes":187766},{"name":"renderer_repeat","width":1440,"height":1000,"bytes":187318},{"name":"renderer_draft","width":1440,"height":1000,"bytes":212930},{"name":"renderer_zoom","width":1440,"height":1000,"bytes":216346},{"name":"renderer_input","width":1440,"height":1000,"bytes":249182}]}
+
+'fail' !== 'ok'
+
+    at run (/Users/markik/Code/output/vello-classic-browser-gates-20261011/browser/qualify.cjs:75:10)
+    at async /Users/markik/Code/output/vello-classic-browser-gates-20261011/browser/qualify.cjs:137:18 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 'fail',
+  expected: 'ok',
+  operator: 'strictEqual',
+  diff: 'simple'
+}

@@ -1,0 +1,20 @@
+{
+  "command": [
+    "/Users/markik/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "output/vello-classic-browser-gates-20261011/browser/qualify.cjs",
+    "--base",
+    "http://127.0.0.1:8897",
+    "--output",
+    "output/vello-classic-browser-gates-20261011/browser/run-2",
+    "--identity",
+    "output/vello-classic-browser-gates-20261011/browser/identity-rerun.json",
+    "--scenario",
+    "/Users/markik/Code/worktrees/mere-vello-release-adoption/ports/graphshell/web/scenarios/renderer_acceptance.scn"
+  ],
+  "cwd": "/Users/markik/Code",
+  "deadline_seconds": 600,
+  "elapsed_seconds": 44.536,
+  "exit_code": 1,
+  "timed_out": false,
+  "log": "/Users/markik/Code/output/vello-classic-browser-gates-20261011/checks/browser-current-product-corrected-runtime.log"
+}
