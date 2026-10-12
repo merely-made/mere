@@ -1,0 +1,70 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling objc2-foundation v0.3.2
+   Compiling objc2-core-graphics v0.3.2
+   Compiling objc2-core-text v0.3.2
+   Compiling objc2-app-kit v0.2.2
+   Compiling objc2-metal v0.3.2
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling objc2-quartz-core v0.3.2
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling raw-window-metal v1.1.0
+   Compiling wgpu-hal v30.0.1
+   Compiling genet-livery v0.0.4 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling wgpu-core-deps-apple v30.0.1
+   Compiling wgpu-core v30.0.1
+   Compiling winit v0.30.13
+   Compiling taproot v0.1.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling wgpu v30.0.1
+   Compiling netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling netrender v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling sprigging v0.2.1 (/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin/crates/cambium/sprigging)
+   Compiling cambium v0.3.3 (/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin/crates/cambium/cambium)
+   Compiling paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling genet-render v0.2.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling cambium-winit v0.3.0 (/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin/crates/cambium/cambium-winit)
+   Compiling genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling cambium-rootstock v0.1.0 (/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin/crates/cambium/cambium-rootstock)
+   Compiling mesquite v0.1.0 (/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin/crates/cambium/mesquite)
+    Finished `test` profile [unoptimized] target(s) in 16.19s
+     Running unittests src/lib.rs (/Users/markik/Code/testing/font-roles-20261012/target/debug/deps/mesquite-2d375cd612c949f9)
+
+running 28 tests
+test capture::tests::expired_native_readback_refuses_late_pixels_without_polling_gpu ... ok
+test capture::tests::pending_native_readback_yields_until_completion_and_preserves_errors ... ok
+test capture::tests::delayed_native_pixels_keep_the_original_request_and_presentation ... ok
+test checkpoints::tests::differs_holds_for_every_moved_field_and_names_the_one_that_did_not ... ok
+test checkpoints::tests::dropped_holds_only_for_a_number_that_fell ... ok
+test cost::tests::retained_calls_remain_distinct_from_redraws_and_startup_frames ... ok
+test checkpoints::tests::an_unknown_checkpoint_field_or_verb_fails_before_any_comparison ... ok
+test checkpoints::tests::same_and_more_keep_the_meanings_the_new_verbs_mirror ... ok
+test cost::tests::percentile_uses_nearest_rank_and_even_median_is_not_truncated ... ok
+test cost::tests::capture_and_invalid_outliers_do_not_pollute_first_or_steady_summary ... ok
+test checkpoints::tests::a_view_reads_the_names_and_fields_remember_took ... ok
+test tests::a_capture_name_with_a_separator_is_taken_literally_and_others_are_sanitized ... ok
+test tests::a_close_with_no_scenario_is_an_ordinary_successful_end ... ok
+test tests::a_close_before_the_scenario_completes_fails_the_run_and_a_second_close_is_inert ... ok
+test tests::a_named_capture_hangs_off_the_run_s_own_artifact_stem ... ok
+test tests::requested_diagnostic_failure_is_visible_and_absent_hook_preserves_receipt_shape ... ok
+test tests::a_declared_transform_round_trips_a_point_and_shows_in_the_receipt ... ok
+test tests::the_frame_limit_decides_only_once_and_only_after_the_limit ... ok
+test tests::the_viewport_mask_insets_its_border_and_drops_an_overlay ... ok
+test tests::the_receipt_carries_every_named_section_and_its_kind ... ok
+test tests::diagnostic_export_carries_loss_without_inventing_success_or_frame_causality ... ok
+test lane::presentation_tests::a_stall_before_the_first_presentation_finishes_without_arming_a_final_capture ... ok
+test lane::presentation_tests::asynchronous_readback_is_polled_while_native_presentation_is_unavailable ... ok
+test lane::presentation_tests::unavailable_and_duplicate_native_turns_do_not_spend_scenario_frames ... ok
+test lane::presentation_tests::continuous_native_stall_has_an_independent_clock_deadline_and_honest_receipt ... ok
+test probe::text_tests::scenario_text_replaces_the_control_value_with_the_complete_payload ... ok
+test cost::tests::phase_and_sample_limits_refuse_instead_of_silently_truncating ... ok
+test lane::presentation_tests::failed_host_redraw_clears_the_previous_presentation_identity ... ok
+
+test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+

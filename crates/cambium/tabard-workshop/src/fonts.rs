@@ -14,6 +14,9 @@ pub struct FontRoleEditor {
     baseline: FontPreferences,
     requested: Option<FontPreferences>,
     pub notice: Option<String>,
+    available_families: Vec<String>,
+    choosing: Option<FontRole>,
+    pub search: TextInput,
 }
 impl FontRoleEditor {
     pub fn new(preferences: FontPreferences) -> Self {
@@ -33,7 +36,14 @@ impl FontRoleEditor {
             baseline: preferences,
             requested: None,
             notice: None,
+            available_families: Vec::new(),
+            choosing: None,
+            search: TextInput::new(""),
         }
+    }
+    /// Host-local inventory is never serialized into preferences.
+    pub fn set_available_families(&mut self, families: Vec<String>) {
+        self.available_families = families;
     }
     pub fn field(&self, role: FontRole) -> &TextInput {
         &self.fields[&role]
@@ -79,6 +89,53 @@ impl FontRoleEditor {
         self.requested = Some(preferences);
     }
 }
+/// Controlled text slots for family entry and local inventory search.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum FontRoleField {
+    Family(FontRole),
+    Search,
+}
+impl FontRoleEditor {
+    pub fn text_field(&self, field: FontRoleField) -> &TextInput {
+        match field {
+            FontRoleField::Family(role) => self.field(role),
+            FontRoleField::Search => &self.search,
+        }
+    }
+    pub fn text_field_mut(&mut self, field: FontRoleField) -> &mut TextInput {
+        match field {
+            FontRoleField::Family(role) => self.field_mut(role),
+            FontRoleField::Search => &mut self.search,
+        }
+    }
+}
+/// Native hosts project these slots into their own state; the editor keeps
+/// ordinary caret, keyboard and IME ownership through shared text controls.
+pub fn focused_font_field(
+    dom: &cambium::DomHandle,
+    node: genet_scripted_dom::NodeId,
+) -> Option<FontRoleField> {
+    use layout_dom_api::{LayoutDom, LocalName, Namespace};
+    let dom = dom.borrow();
+    if dom.attribute(
+        node,
+        &Namespace::from(""),
+        &LocalName::from("data-font-search"),
+    ) == Some("true")
+    {
+        return Some(FontRoleField::Search);
+    }
+    let key = dom.attribute(
+        node,
+        &Namespace::from(""),
+        &LocalName::from("data-font-role"),
+    )?;
+    FontRole::ALL
+        .into_iter()
+        .find(|role| role.key() == key)
+        .map(FontRoleField::Family)
+}
+
 pub type FontRoleView = Box<dyn AnyView<FontRoleEditor, (), GenetCtx, GenetElement>>;
 /// Family entry accepts installed names, bundled names and CSS generics. The
 /// host supplies availability and fallback diagnostics outside this draft.
@@ -115,9 +172,62 @@ pub fn font_role_view(state: &FontRoleEditor) -> FontRoleView {
                         },
                     )
                     .attr("data-font-default", role.key()),
+                    button(
+                        "Choose…",
+                        move |state: &mut FontRoleEditor, _: PointerClick| {
+                            state.choosing = Some(role);
+                            state.search = TextInput::new("");
+                        },
+                    )
+                    .attr("data-font-choose", role.key()),
                 ),
             )
             .attr("class", "tabard-font-role"),
+        ));
+    }
+    if let Some(role) = state.choosing {
+        let mut picker: Vec<FontRoleView> = vec![
+            Box::new(el(
+                "h4",
+                text(format!("Choose {} font", role.label().to_lowercase())),
+            )),
+            Box::new(lens(
+                |search: &mut TextInput| {
+                    text_field_typed(search)
+                        .attr("class", "tabard-font-family-input")
+                        .attr("role", "textbox")
+                        .attr("aria-label", "Find a font family")
+                        .attr("data-font-search", "true")
+                },
+                |state: &mut FontRoleEditor| &mut state.search,
+            )),
+        ];
+        let query = state.search.text().to_lowercase();
+        let matches: Vec<_> = state
+            .available_families
+            .iter()
+            .filter(|name| name.to_lowercase().contains(&query))
+            .collect();
+        for name in matches.iter().take(30) {
+            let family = (*name).clone();
+            picker.push(Box::new(
+                button(
+                    family.clone(),
+                    move |state: &mut FontRoleEditor, _: PointerClick| {
+                        *state.field_mut(role) = TextInput::new(family.clone());
+                        state.choosing = None;
+                    },
+                )
+                .attr("data-font-family", (*name).clone()),
+            ));
+        }
+        picker.push(Box::new(el("p", text(format!("{} available families match. Showing up to 30; type to narrow the list. Availability does not guarantee every glyph.", matches.len())))));
+        picker.push(Box::new(button(
+            "Close font list",
+            |state: &mut FontRoleEditor, _: PointerClick| state.choosing = None,
+        )));
+        children.push(Box::new(
+            el("div", picker).attr("class", "tabard-font-picker"),
         ));
     }
     children.push(Box::new(
@@ -160,5 +270,55 @@ mod tests {
         assert!(editor.take_requested().is_none());
         editor.request_apply();
         assert!(editor.take_requested().unwrap().is_empty());
+    }
+}
+
+#[cfg(test)]
+mod picker_tests {
+    use super::*;
+    use cambium_genet_winit_host::{FocusedTextSlot, Harness, Init, inert_hooks};
+    use taproot::Selector;
+    #[test]
+    fn native_picker_filters_available_families_and_only_stages_the_choice() {
+        let mut state = FontRoleEditor::new(Default::default());
+        state.set_available_families(vec!["Face A".into(), "Face B".into()]);
+        let mut hooks = inert_hooks();
+        hooks.focused_text = Box::new(|runner| {
+            let node = runner.focus()?;
+            let field = focused_font_field(&runner.dom(), node)?;
+            Some(FocusedTextSlot {
+                node,
+                get: Box::new(move |state: &FontRoleEditor| state.text_field(field)),
+                get_mut: Box::new(move |state: &mut FontRoleEditor| state.text_field_mut(field)),
+            })
+        });
+        let mut host = Harness::with_hooks(
+            Init {
+                state,
+                logic: font_role_view as fn(&FontRoleEditor) -> FontRoleView,
+                sheet: FONT_ROLE_CSS.into(),
+                fonts: vec![],
+                images: vec![],
+            },
+            hooks,
+        );
+        host.layout_at(600.0, 900.0);
+        assert!(host.click_on(&Selector::role("button").with_attr("data-font-choose", "reading")));
+        assert!(host.click_on(&Selector::role("textbox").with_attr("data-font-search", "true")));
+        host.key_injected("Face B");
+        assert_eq!(host.state().search.text(), "Face B");
+        assert!(!host.click_on(&Selector::role("button").with_attr("data-font-family", "Face A")));
+        assert!(host.click_on(&Selector::role("button").with_attr("data-font-family", "Face B")));
+        assert_eq!(host.state().field(FontRole::Reading).text(), "Face B");
+        host.update(|state| assert!(state.take_requested().is_none()));
+        assert!(
+            host.click_on(&Selector::role("button").with_attr("data-action", "apply-font-roles"))
+        );
+        host.update(|state| {
+            assert_eq!(
+                state.take_requested().unwrap().0[&FontRole::Reading][0].name(),
+                "Face B"
+            )
+        });
     }
 }
