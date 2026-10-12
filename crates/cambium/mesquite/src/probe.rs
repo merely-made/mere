@@ -137,6 +137,17 @@ impl<P: Product> Driveable for Probe<'_, '_, P> {
         {
             return files.answer(argument.trim());
         }
+        // Text payload is the remainder, not whitespace-separated arguments:
+        // font names, prose and authored CSS may all contain spaces.
+        if let Some(value) = line.strip_prefix("input-text ") {
+            let mut select = cambium::KeyEvent::new(cambium::Key::Character("a".into()));
+            select.mods.ctrl = true;
+            self.ctx.runner.dispatch_key(select);
+            self.ctx.runner.dispatch_key(cambium::KeyEvent::new(
+                cambium::Key::Character(value.into()),
+            ));
+            return Ok(());
+        }
         let words: Vec<_> = line.split_whitespace().collect();
         match words.as_slice() {
             ["cost-begin", name] => self.lane.costs.begin(name)?,
@@ -162,16 +173,6 @@ impl<P: Product> Driveable for Probe<'_, '_, P> {
                 let mut event = KeyEvent::new(key);
                 event.mods.shift = *name == "Shift+Tab";
                 self.ctx.runner.dispatch_key(event);
-            },
-            ["input-text", value] => {
-                let mut select = cambium::KeyEvent::new(cambium::Key::Character("a".into()));
-                select.mods.ctrl = true;
-                self.ctx.runner.dispatch_key(select);
-                self.ctx
-                    .runner
-                    .dispatch_key(cambium::KeyEvent::new(cambium::Key::Character(
-                        (*value).into(),
-                    )));
             },
             ["resize", width, height] => {
                 let dimension = |value: &str| {
@@ -264,5 +265,94 @@ impl<P: Product> Driveable for Probe<'_, '_, P> {
             },
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod text_tests {
+    use super::*;
+    use cambium::{AnyView, GenetCtx, GenetElement, TextInput, text_field_typed};
+    use cambium_rootstock::{
+        Hook, Host, HostHooks, HostOptions, HostState, HostWake, HostWindow, Runner,
+    };
+    use genet_scripted_dom::ScriptedDom;
+    use std::{
+        cell::{Cell, RefCell},
+        path::PathBuf,
+        rc::Rc,
+        sync::Arc,
+    };
+    type View = Box<dyn AnyView<TextInput, (), GenetCtx, GenetElement>>;
+    type Logic = fn(&TextInput) -> View;
+    fn view(state: &TextInput) -> View {
+        Box::new(text_field_typed(state).attr("role", "textbox"))
+    }
+    struct TextProduct;
+    impl Product for TextProduct {
+        type State = TextInput;
+        type Logic = Logic;
+        type View = View;
+        const KIND: &'static str = "text-test";
+        const SURFACE: &'static str = "text-test";
+        const LOG_PREFIX: &'static str = "text-test";
+        fn sheet(&self) -> &str {
+            ""
+        }
+        fn snapshot(&self, _: &Ctx<'_, Self>, _: usize, _: f32) -> ProbeSnapshot {
+            ProbeSnapshot::default()
+        }
+        fn drain_events(&mut self, _: &mut Ctx<'_, Self>) -> Vec<String> {
+            vec![]
+        }
+        fn default_capture_path(&self) -> PathBuf {
+            PathBuf::new()
+        }
+    }
+    struct Window;
+    impl HostWindow for Window {
+        fn request_redraw(&self) {}
+        fn inner_size(&self) -> (u32, u32) {
+            (100, 100)
+        }
+        fn scale_factor(&self) -> f64 {
+            1.0
+        }
+        fn set_ime_allowed(&self, _: bool) {}
+        fn set_ime_cursor_area(&self, _: f64, _: f64, _: f64, _: f64) {}
+    }
+    #[test]
+    fn scenario_text_replaces_the_control_value_with_the_complete_payload() {
+        let mut state = HostState::new();
+        state.window = Some(Box::new(Window));
+        let mut runner = Runner::new(
+            Rc::new(RefCell::new(ScriptedDom::new())),
+            view as Logic,
+            TextInput::new("previous"),
+        );
+        let node = taproot::matching(&*runner.dom().borrow(), &Selector::role("textbox"))[0];
+        runner.set_focus(Some(node));
+        state.runner = Some(runner);
+        let wake = HostWake::new(state.wake_pending.clone(), Arc::new(|| {}));
+        let hooks = HostHooks {
+            after_dispatch: Box::new(|ctx| {
+                let mut lane = Lane::new(TextProduct, None, None, None, Rc::new(Cell::new(0)));
+                let mut probe = Probe {
+                    ctx,
+                    lane: &mut lane,
+                };
+                for payload in [
+                    "IBM Plex Mono",
+                    "Source Serif 4",
+                    "p { font-family: serif; }",
+                    "α  β",
+                ] {
+                    probe.app_step(&format!("input-text {payload}")).unwrap();
+                    assert_eq!(probe.ctx.runner.state().text(), payload);
+                }
+            }),
+            ..HostHooks::inert()
+        };
+        let mut host = Host::new(HostOptions::default(), None, hooks, state, wake);
+        host.with_ctx(Hook::AfterDispatch);
     }
 }

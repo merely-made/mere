@@ -3,10 +3,21 @@
   "platform": "macOS arm64",
   "gates": {
     "tabard": 82,
-    "workshop_library": 16,
-    "native_font_inventory": 1
+    "workshop_library": 17,
+    "native_font_inventory": 1,
+    "mesquite_library": 28
   },
   "failures": 0,
-  "native_application_qualification": "consumer pending",
-  "documentation": "navigation audit byte-identical to baseline; D2 retains original digest mismatch and three uncovered documents; edited plan/index have scoped judgment"
+  "native_application_qualification": {
+    "cleromancy": {
+      "published": "6cf1e405042455dd5d0ca314b45e92721997ca9d",
+      "runtime": "c1fb4ce7f28f0f599e3c3ce876bfcf128046fb1b",
+      "mere_pin": "addccab32fe45e54f99cae26ab03cf6aa9432f7e",
+      "receipt": "cleromancy/design_docs/receipts/tabard_20261011/font-roles/qualification.json",
+      "scope": "bounded macOS arm64; 2 processes, 9 reviewed captures, 123 presentations; exact font/library/card/ID reopening"
+    },
+    "other_consumers": "adoption remains separate"
+  },
+  "documentation": "navigation audit byte-identical to baseline; D2 retains original digest mismatch and three uncovered documents; edited plan/index have scoped judgment",
+  "picker": "native controlled search filters available families; selection remains a draft until explicit Apply"
 }
