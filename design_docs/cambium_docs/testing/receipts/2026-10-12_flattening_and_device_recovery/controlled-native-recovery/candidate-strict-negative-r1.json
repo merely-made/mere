@@ -20,7 +20,7 @@
     "netrender": "c74b7cb28090c28b1c6d80b08dcdea18aff48d3e",
     "provider": "2eae6243881d5b24c984d5ee35dde509ca5db782"
   },
-  "status": "production compilation and CPU guards passed; native controlled-loss gate queued for explicit runtime handoff",
+  "status": "preserved strict-zero preparation for executed native-r1 failure:30pixelsRGB1 alpha0; actualresult and metadata in native-r1",
   "pixel_criterion": "exact displayed RGBA byte and dimension equality; bounded32MiB baseline; does not imply complete hidden producer source pixel comparison",
   "runtime_injection": "one explicit ownedDevice.destroy after completed baseline capture; no driver reset",
   "source_checkpoint": "fc55b89676b22495abdc382ce510054b28579dac"
