@@ -1,0 +1,146 @@
+{
+  "date": "2026-10-11",
+  "status": "bounded draft; headed/content-renderer adoption pending",
+  "implementation_base": "04a48c2d64752d5da56e523bdd0ed93b1ef2f37e",
+  "integrated_base": "e6192a18491cc62517de3bf98062f0b1b5cddf22",
+  "pull": {
+    "initial": "git pull --ff-only origin main: already up to date at 04a48c2d",
+    "later": "Integrated 3162f302 exact coupling edits, browser/focus qualification and bounded assertion readback. Source merged cleanly; two append-only docs retained both lanes. Other receipts retain their source scope. The final e6192a18 Knot completion/refusal documentation is also retained; it changes no runtime source in this qualification cone."
+  },
+  "portable": {
+    "status": "passed",
+    "tests": 47,
+    "new_node_runtime_tests": 8,
+    "retained_tests": 39,
+    "command": "cargo test --locked --offline --manifest-path ports/graphshell/docs/receipts/node_ladder_20261011/harness/Cargo.toml --lib",
+    "scope": "Actual-source graph-only runtime/binding/editor/topology/access/link models; not IndexedDB or full native host",
+    "log": "checks/portable.log"
+  },
+  "wasm": {
+    "product_check": "passed",
+    "command": "cargo check --locked --offline --target wasm32-unknown-unknown --no-default-features --features product",
+    "cwd": "ports/graphshell/web",
+    "existing_web_warnings": 18,
+    "log": "checks/product-check.log",
+    "viewer_default_release": "not built"
+  },
+  "canvas_native": {
+    "preintegration": "Three inspector and three face tests pass at the 04a48c2d-plus-draft source; product dependencies unchanged by later integration, topology readback changed",
+    "integrated": "passed: three dynamics-inspector and three node-face tests at 3162f302 plus this draft; e6192a18 is documentation-only",
+    "profile_override": "--config profile.dev.package.pictograph.debug=0",
+    "feature_scope": "-p pictograph --no-default-features --features canvas --lib",
+    "commands": [
+      "cargo test --locked --offline --config profile.dev.package.pictograph.debug=0 -p pictograph --no-default-features --features canvas --lib canvas::dynamics_inspection",
+      "cargo test --locked --offline --config profile.dev.package.pictograph.debug=0 -p pictograph --no-default-features --features canvas --lib canvas::node_presentation"
+    ],
+    "broader_suite": "not run; no all-green native/renderer claim",
+    "scoped_tests": 6,
+    "logs": [
+      "checks/native-inspector-integrated.log",
+      "checks/native-faces-integrated.log"
+    ]
+  },
+  "native_attempts": {
+    "offline_source_block": "Root workspace patch revision was uncached; ended before compile. Online locked source fetch changed no manifest or lockfile",
+    "full_debug": "Ended during Pictograph compile before tests; exit 143. systemd scope Result=oom-kill, MemoryPeak=MemoryMax=1342177280 bytes, OOMPolicy=stop",
+    "debug0": "Same memory cap, Pictograph debug information disabled; cached dependencies and scoped tests qualify their named source"
+  },
+  "limits": {
+    "cargo_jobs": 1,
+    "one_compiler_at_a_time": true,
+    "memory_max_mib": 1280,
+    "swap_max_mib": 0,
+    "free_memory_guard_mib": 256,
+    "live_visible_accesses": 128,
+    "serialized_context_kib": 256
+  },
+  "contracts": {
+    "face_support": "Exact-access saved Glyph/Card face treatments over existing body dimensions and base score; not full content summary cards. Atomic UUID/current-view-epoch setter; whole graph replacement clears layer",
+    "hysteresis": "Prior matches scoped to view epoch, saved generation and exact access. Reset on generation/view change, disable/refusal; prune departed contexts. Caller matches not imported",
+    "measurement": "Same resolved logical body size times camera zoom used before frame face paint; captions and occlusion do not feed back into LOD. Bound preview uses same convention",
+    "attributes": "Separate current-selection scalar-fact lane; source inspector handles tags/complex values. Attention inspection/content opening/pins/Forme remain independent",
+    "unknowns": "Unavailable state/measurement rules skipped with trace; unsupported winning Snapshot/Sprite/LivePane/Open face preserves host base, without lower-rule substitution",
+    "defaults": "Four private editable rules, priorities 0/10/20/30; compact enter40 exit56, selection attributes, positional-pin guard. Apply/undo/redo retains existing transactional rule store",
+    "inspector": "Face treatment, rule override and input size disclosed per exact target; explicit bridge to rule preview without retargeting selection",
+    "bounds": "Exceed node/context bounds: refuse complete node layer and restore base, explain why. Forme guides independent. Cache unchanged inputs/rules",
+    "read_cost": "Access scalar facts read directly without repeated sibling-access/coverage roster. Open-context collection/large-rule/long-record costs remain unqualified",
+    "owners": "No geometry/collider/pose/velocity/selection/pin/Forme/content-session/source writes or dynamics restart"
+  },
+  "interactive": {
+    "status": "not run; pending",
+    "route": "tree.html?app=local",
+    "viewport": "logical 860x720; Graph tools begins collapsed and is explicitly opened",
+    "order": [
+      "p4_tree_node_ladder.scn",
+      "p4_tree_node_ladder_reopen.scn"
+    ],
+    "origin": "Fresh dedicated normal-motion profile/origin first; fresh page/process retaining origin second",
+    "captures": "four planned, none generated/reviewed",
+    "thresholds": "Browser fixture uses 10000/20000 to decouple viewport-fit zoom; portable model tests cover ordinary 40/56 hysteresis",
+    "browser_limit": "Connected S-PC browser lacks WebGPU; known gate not retried"
+  },
+  "deferred": [
+    "Headed captures, normal zoom, physical pins/selection/focus, narrow/theme/font cases and tile continuity",
+    "Actual compact summary card, snapshot/sprite textures and embedded live-content measurement/renderers",
+    "Live-context/rule costs and large graphs/release performance",
+    "Attention/foreground state and exact derived execution/contribution adapters, field snapshots",
+    "Broader scripts/primitive/source/scene writes and force-policy adoption"
+  ],
+  "documentation": {
+    "citation_audit": "Complete JSON equals controlled published e6192a18 baseline",
+    "d2_audit": "Complete JSON equals controlled published e6192a18 baseline: 261/264 covered, four existing errors",
+    "baseline_method": "Only this lane's three document edits substituted with integrated HEAD bytes; code, receipts and upstream docs fixed",
+    "whitespace": "passed"
+  },
+  "source_hash_policy": "SHA-256 of text bytes with CRLF normalized to LF; raw logs -text, trailing blank lines removed only. Cargo diagnostic space-before-tab indentation preserved and exempted only for these proof logs",
+  "source_sha256_lf": {
+    ".gitattributes": "98f1ce4a03d51fd70e71869460553c86e355c5cfece870a8c3b55e6bc36eaf32",
+    "Cargo.lock": "87650f32f967b070a7ddc6872eb797c87e425ba4f7ac84505568f08174fb8840",
+    "Cargo.toml": "fdab12429439c9d40c9a8f008c728ecaa315de6b90f7ebd573c699c57ec4b770",
+    "crates/canvas/pictograph/src/canvas.rs": "8249bdd19d8367b82420aa3c06a5f70eebdd7ef7bcb39534e40b3a59a21899c9",
+    "crates/canvas/pictograph/src/canvas/dynamics_inspection.rs": "00bc275c33ce846556fac14b6bec3605fbccb9b90588bb89fc02f7c6c26d2fe1",
+    "crates/canvas/pictograph/src/canvas/dynamics_inspection_tests.rs": "5b6d1b62a76f8e424dd88110fe6289065d3402fd1e1eec77a18c9fd034d46093",
+    "crates/canvas/pictograph/src/canvas/frame.rs": "0f906654b49924b663e86100c7a2c99d16ad56143c3db47c2e7744646eb7a2fd",
+    "crates/canvas/pictograph/src/canvas/lifecycle.rs": "5dd1ac0c31cbc2d968e76d364459f02e2e399090a394399c219c304221df2d9e",
+    "crates/canvas/pictograph/src/canvas/node_presentation.rs": "70b050e3abb403517240f1fef89c25b4f47405d017ae4a67ffeb818e04ce9e01",
+    "crates/canvas/pictograph/src/canvas/node_presentation_tests.rs": "f186b3bf3f367f12931eb41ff3678bd76300231814fc84cd52b09361d489c1bc",
+    "crates/canvas/pictograph/src/canvas/relationship_topology.rs": "7d444dc9420d6e095a40e538aa0d26689653e38fe8332162f08e65ad378c31b9",
+    "crates/canvas/pictograph/src/canvas/relationship_topology_tests.rs": "c4e665cf3fcf970f87bca27415d0707aa7ca7fab93cd0a923e92b715157f8d6d",
+    "ports/graphshell/docs/receipts/node_ladder_20261011/harness/Cargo.lock": "ec2e97043d7300d3d50786acda17f86f9e4e6815316cb92bae6a3efe2c672883",
+    "ports/graphshell/docs/receipts/node_ladder_20261011/harness/Cargo.toml": "cc7a4570dcb7dedf975f82d65ffeda65352c08dac412bc81ec390f661bb1eee9",
+    "ports/graphshell/docs/receipts/node_ladder_20261011/harness/src/lib.rs": "d49fad059e4cc67d242e7a7b1eb27fbf89ccd37115dff26a09e4a8eb408c5f39",
+    "ports/graphshell/src/lib.rs": "d1107e040e25cee843db5bfdf044b7aa121456995336aff1457415d46a079ed8",
+    "ports/graphshell/src/node_presentation.rs": "ec83b73ff69a55fea69970b02c1c101ddf867fed6af0cc74e3ae913053eb17d9",
+    "ports/graphshell/src/node_presentation_tests.rs": "19e2a3358c74b5723ac6a8fcfb17b4fe19af230c8b8adbc29b2443acd4d20ba9",
+    "ports/graphshell/src/presentation_binding.rs": "0d4c2664cdbfd37eedfc244f08b7580ef4fb7fb3a9f0bbd599c48b079c5d0bbb",
+    "ports/graphshell/src/web_tree.rs": "d79fe6ed0af1c2f45e7481516d09336b0c0d40b60d9200963e730e85acbcdcbd",
+    "ports/graphshell/src/web_tree/dynamics_inspection.rs": "1fe29983c3b11e3b6a8e125bba1fe29342f6fb4536ab868a740e59b90c279f36",
+    "ports/graphshell/src/web_tree/lane.rs": "32710c41f06801419b560426d1f2b557fe0209dae274dece68f515fe36b444e6",
+    "ports/graphshell/src/web_tree/node_presentation.rs": "baa3e0fb543218ab7af4267c69ffbf8f11574c3b341b963066273051b0aef03e",
+    "ports/graphshell/src/web_tree/presentation.rs": "b0f7dc077f267bbcab5288dd8bd960463fa309d8c7ca1827bf1c5eda432d8b49",
+    "ports/graphshell/web/Cargo.lock": "9fcf67c9f396e1b6b3b5ca29490683bccc897ec69d5928b95e1dbc0d85f48da3",
+    "ports/graphshell/web/Cargo.toml": "723ebabab9f033336c9d0cc1edd7938896b04afcde0c87e3d5a82315d96fb22f",
+    "ports/graphshell/web/scenarios/p4_tree_node_ladder.scn": "bd0c52b10deac14763ab15bbd2914a04bc2b25d6ae3158e60c0fc552eebfd0ce",
+    "ports/graphshell/web/scenarios/p4_tree_node_ladder_reopen.scn": "46df5c5dcf863c7ac9f3762f32c0cdf8d21401bdb98314ce07df4cf27ef7e135"
+  },
+  "check_sha256_raw": {
+    "checks/native-faces-integrated.log": "0dd832542fc6b12c1953182faeffe6ed5b00625a97dd9a0431ef68b1384ea3da",
+    "checks/native-faces-preintegration.log": "fc686d2696b6b657b8020beb3447f7a661ae78e1476b81ff67a64b532b50f30c",
+    "checks/native-full-debug-oom.log": "2e76110e1a658ecfb907eff1ec27765a459458e57b1c866a0bc6c3b91888825f",
+    "checks/native-inspector-integrated.log": "616806a33e36e7a95b216b68e07088e7ea3546d26bfaf6fea5e6f8df9411bc89",
+    "checks/native-inspector-preintegration.log": "999bf3549496044b34104bb88eee71757641f633ee8bed84c94f1966708c80be",
+    "checks/native-offline-source-block.log": "796af3e28486d373631b7a4a93c1d8f0aa5df3b16b5ac675be0d13995d03ebb7",
+    "checks/portable.log": "5aa5b793467250a97ce6fa1c5eaeae90f51844e9e4075dfdebd8e7ee8f98d481",
+    "checks/product-check.log": "af0cbd5e7126d15d94ac6c31bc3f17fbc4e3625dbb384119d57b8fe0f928446b"
+  },
+  "raw_log_sha256": {
+    "portable.log": "8a3017898ea78789a96536e69704e5bcc8b1e518784527b6425d95b0471b8b4c",
+    "product-check.log": "af0cbd5e7126d15d94ac6c31bc3f17fbc4e3625dbb384119d57b8fe0f928446b",
+    "native-inspector-preintegration.log": "f9791e7d29f902c8a2e152e8bb54ddac53e49b8414269f31b810484fc80a3cb0",
+    "native-faces-preintegration.log": "36d13c37a565ad1cc170bdb0dc8dbbf76e5dbbfb764e826c2b6d832b7b089084",
+    "native-offline-source-block.log": "796af3e28486d373631b7a4a93c1d8f0aa5df3b16b5ac675be0d13995d03ebb7",
+    "native-full-debug-oom.log": "7b2dcfb20cc9a65a977d03263e8067d01a575411d2514d2fbde246b1be4c53ac",
+    "native-inspector-integrated.log": "fee6fa0c6cb409306a2c9c038bbe9767c5dd813e1bb480c23fca5cdb128e283f",
+    "native-faces-integrated.log": "3f5292bb1863d7d74124e199c557dc149ea5bc0c5101d55a354181a7f2bd84bd"
+  }
+}

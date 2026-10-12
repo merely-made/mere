@@ -1,6 +1,6 @@
 # Mere Documentation Index
 
-Completed integration (2026-10-11): [Fleece gathering and Eidetic intake](archive_docs/2026-10-11_completed_plans/2026-10-11_fleece_eidetic_capability_plan.md) records the five landed dependency moves, source-neutral goal-directed traversal, explicit network budgets, the retained-content/session boundary and native/wasm/portable-consumer receipts. The [Eidetic development plan](eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md) sequences encounter preservation, general intake, session admission, engine capture, computed recall, browser use and dependency capabilities. Its first Knot/Redshank clip-transfer draft has native offline-store tests and browser compilation. Turnstone now qualifies selected text/WAV receiving and fresh-process local playback; browser/structured receiving, source excerpts, tags, reviewed edits and custody retain their separate gates.
+Completed integration (2026-10-11): [Fleece gathering and Eidetic intake](archive_docs/2026-10-11_completed_plans/2026-10-11_fleece_eidetic_capability_plan.md) records the five landed dependency moves, source-neutral goal-directed traversal, explicit network budgets, the retained-content/session boundary and native/wasm/portable-consumer receipts. The [Eidetic development plan](eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md) sequences encounter preservation, general intake, session admission, engine capture, computed recall, browser use and dependency capabilities. Its first Knot/Redshank clip-transfer draft has native offline-store tests and browser compilation. Turnstone now qualifies selected text/WAV receiving, fresh-process local playback and selected onward copy into a second mere; browser/structured receiving, source excerpts, tags, reviewed edits and custody retain their separate gates.
 
 The design-docs index for the [Mere](../README.md) workspace. All authoritative
 project documentation belongs under `design_docs/`. Entries are one line each;
@@ -64,8 +64,17 @@ and remaining acceptance limits are recorded in the owning plan. Other effects
 retain their renderer owners.
 The [relationship/dynamics inspector draft](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#relationship-and-dynamics-inspector-draft-2026-10-11)
 adds exact-target reads of live stages, topology inputs and placement constraints;
-38 portable native checks and the product wasm check pass. Canvas native and
-headed cases remain open; missing force/derivation evidence is disclosed.
+38 portable source checks retain their original receipt. The Windows continuation
+adds three Canvas report and eight topology tests, a combined product Wasm build,
+and two passing Chrome scenarios with retained-origin reopening and five reviewed
+captures. Native headed, Firefox, keyboard/narrow review and measured force or
+derivation evidence retain their separate gates.
+The [node ladder and inspector continuation](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#node-ladder-and-inspector-continuation-draft-2026-10-11)
+adds scoped saved Glyph/Card face decisions, selected scalar attributes,
+editable defaults and occurrence-local hysteresis; 47 portable tests and the
+product wasm check pass. Six scoped native Canvas tests also pass with reduced
+debug symbols; headed acceptance and content-renderer adapters retain their
+explicit receipt gates.
 
 Primary data model (2026-10-11): the
 [family composition brief §8](2026-08-12_family_composition_thesis_brief.md#8-primary-data-model-clips-and-live-entities-2026-10-11)

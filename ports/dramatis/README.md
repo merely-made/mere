@@ -26,7 +26,9 @@ The CXF importer records each explicitly chosen profile/item-namespace
 association. Older unbound namespaces appear under “Older imports awaiting a persona”.
 Choose their persona and request assignment; Djinn confirms the whole namespace
 and rechecks its revision. Assignment does not accept its quarantined items. Persona creation, contacts,
-credential fill, CXF export and distribution packaging are follow-on slices.
+credential fill and CXF export are follow-on slices. Packaging follows the
+Hocket/Luggage release path; see [RELEASING.md](RELEASING.md) for the bounded
+native-host commands, signing and qualification gates.
 
 `python support/dramatis_review_receipts.py` reproduces synthetic owner-local
 wire tests, a deliberately bypassed consent control followed by byte-exact

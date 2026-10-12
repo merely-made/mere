@@ -4825,10 +4825,13 @@ dependencies = [
  "dramatis",
  "graphshell",
  "image",
+ "luggage",
  "mere-persona-picker",
  "personae",
  "serde_json",
+ "sha2 0.11.0",
  "taproot",
+ "tempfile",
  "tokio",
 ]
 
