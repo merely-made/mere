@@ -1784,7 +1784,7 @@ impl WorkspaceApp {
                                 pelt_application_font_css(&resolved.resolved.fonts)
                             )
                         },
-                        tabard::ThemePresentation::AuthoredStylesheet(rules) => {
+                        tabard::ThemePresentation::AuthoredStylesheet(_) => {
                             // Arbitrary CSS has no claimed derived palette. Supply
                             // Pelt's default variables for roles the author omits.
                             let fallback = tabard::resolve_theme_choice(
@@ -1797,14 +1797,25 @@ impl WorkspaceApp {
                                 unreachable!("built-in default is derived")
                             };
                             format!(
-                                "{}\n{}\n{}\n{}\n{}\n{}",
+                                "{}\n{}\n{}\n{}\n{}\n{}\n{}",
                                 palette.css_custom_properties(),
                                 PELT_TABARD_ROLES,
+                                resolved.theme.typography.css_custom_properties(),
                                 pelt_typography_css(&resolved.theme.typography),
                                 self.theme_catalog
                                     .application_font_css(&resolved.resolved.fonts),
                                 pelt_application_font_css(&resolved.resolved.fonts),
-                                rules.join("\n")
+                                resolved
+                                    .theme
+                                    .mode_sheet(
+                                        resolved
+                                            .resolved
+                                            .theme_mode
+                                            .as_ref()
+                                            .expect("resolved mode")
+                                    )
+                                    .expect("authored mode")
+                                    .join("\n")
                             )
                         },
                     };
