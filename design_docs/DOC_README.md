@@ -6,7 +6,7 @@ The design-docs index for the [Mere](../README.md) workspace. All authoritative
 project documentation belongs under `design_docs/`. Entries are one line each;
 the deep rationale lives in the doc itself.
 
-Knot adoption (2026-10-11): the [projection grammar adoption plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#knot-authored-scene-adoption-in-mere-2026-10-11) records Knot's published retained-placement qualification and Mere's coordinated editor/document/site repin. Embedded resolution, isolated host checks and publication are recorded separately from Knot's native synthetic-identity receipt. Knot's newer live-dynamics consumer, explicit Keep placement and preview-toolbar qualification are recorded in the [dynamics handoff](mere_docs/research/2026-10-09_scenograph_codex_handoff.md); personal custody and coordinated adoption of that newer milestone remain separate gates.
+Knot adoption (2026-10-11): the [projection grammar adoption plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#knot-authored-scene-adoption-in-mere-2026-10-11) records Knot's published retained-placement qualification and Mere's coordinated editor/document/site repin. Embedded resolution, isolated host checks and publication are recorded separately from Knot's native synthetic-identity receipt. Knot's newer live-dynamics consumer, explicit Keep placement, preview-toolbar qualification and completion/refusal feedback are recorded in the [dynamics handoff](mere_docs/research/2026-10-09_scenograph_codex_handoff.md); personal custody and coordinated adoption of that newer milestone remain separate gates.
 
 Current bounded proofs (2026-09-05): the [projection grammar adoption plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md) records executable Graphshell authoring, the interactive practice workspace with retained rendering and measured compiler improvements, and the two-peer Woodshed comparison space with signed admission, authority filtering, and offline disk reopening; fixture scope and source-hashed receipts are explicit.
 
@@ -69,6 +69,12 @@ adds three Canvas report and eight topology tests, a combined product Wasm build
 and two passing Chrome scenarios with retained-origin reopening and five reviewed
 captures. Native headed, Firefox, keyboard/narrow review and measured force or
 derivation evidence retain their separate gates.
+The [node ladder and inspector continuation](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#node-ladder-and-inspector-continuation-draft-2026-10-11)
+adds scoped saved Glyph/Card face decisions, selected scalar attributes,
+editable defaults and occurrence-local hysteresis; 47 portable tests and the
+product wasm check pass. Six scoped native Canvas tests also pass with reduced
+debug symbols; headed acceptance and content-renderer adapters retain their
+explicit receipt gates.
 
 Primary data model (2026-10-11): the
 [family composition brief §8](2026-08-12_family_composition_thesis_brief.md#8-primary-data-model-clips-and-live-entities-2026-10-11)

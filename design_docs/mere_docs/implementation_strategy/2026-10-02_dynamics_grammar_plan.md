@@ -1550,6 +1550,17 @@ regression, focused composition tests and native wide/compact receipts qualify
 that change separately; the earlier full workspace counts retain their own
 source identity. Ordinary scrolling does not repeatedly reveal the preview.
 
+The [completion/refusal follow-up at Knot `e944fca`](https://github.com/merely-made/knot-editor/blob/e944fca/docs/receipts/2026-10-11_dynamics_status/README.md)
+then discloses the pinned controller's pause, rest, completion and refusal
+states. Step is guarded after completion/refusal. Play resumes an ordinary
+pause, but rebinds a completed/refused controller from authored positions;
+a failed tick preserves the last valid displayed pose. Its 84 focused tests
+and 18 reviewed wide/compact native captures qualify this consumer feedback
+separately. The 120-tick authored schedule finishes without asserting physical
+rest; deliberate replay and exact final-pose Keep/Undo/Redo remain qualified.
+Runtime status enters neither source facts nor retained recipes. No force,
+dependency pin, new full-workspace receipt or F ruling changes here.
+
 **Review boundary:** Knot uses compiled card footprints in a fixed physics plane,
 then clamps its normalized glyph display to that plane. This is a consumer
 presentation choice, not a physical wall, a glyph collision guarantee or a
@@ -1561,6 +1572,9 @@ separate from foreground/background paint categories.
 
 **Parked gate:** Mark said **"No need to do firefox verification while it’s blocked"**.
 Firefox remains deferred while the Windows helper lacks URL-policy support.
+Mark's subsequent private-window retry found the existing private Firefox
+window, but inspection was stopped by the same browser URL-policy block.
+That retry provides no new Firefox qualification and navigated no user tabs.
 The physics coordinator's independent review remains open. The Windows Computer
 Use helper stopped Firefox inspection because URL
 policy enforcement is unsupported for that browser; no browser-policy bypass
