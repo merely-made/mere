@@ -2021,8 +2021,8 @@ labels/values, long JSON, keyboard/focus, scrolling and narrow widths; qualify
 explicit pin/manual placement, hidden relation controls, stage transitions,
 live tile continuity and applicable native/Firefox hosts separately.
 
-**Remaining done-conditions:** execute the Canvas report tests and headed
-handoff; measure open-inspector graph traversal/grouping and long-record costs
+**Remaining done-conditions (after the Windows continuation below):** measure
+open-inspector graph traversal/grouping and long-record costs
 before large-graph adoption; add an execution-owner adapter for actual derived
 relationships and compiled-scene occurrence mapping; add measured per-term or
 per-assertion contributions only through their dynamics owner. Installed field
@@ -2050,7 +2050,7 @@ The combined product browser host builds with locked offline dependencies.
 The root native gate initially required an offline lock reconciliation for four
 already-existing Dramatis dependencies; it upgraded no packages. That lock and
 the concurrent Dramatis source changes remain with their owner. Native tests
-reuse `C:\\t\\cargo-targets\\mere`; no isolated build tree or Cargo home is created.
+reuse `C:\t\cargo-targets\mere`; no isolated build tree or Cargo home is created.
 The [Windows receipt](../../../ports/graphshell/docs/receipts/relationship_dynamics_20261011/windows/qualification.json)
 records source hashes and separate native/browser outcomes.
 
@@ -2062,8 +2062,18 @@ the Forme. The earlier occluded click retained Reference notes instead of I2P
 port notes, which the reopen assertion correctly rejected. Capture reveals use
 the existing detail classes rather than an absent DOM heading-role attribute.
 Earlier incomplete and failed attempts are retained. The strengthened fresh-origin
-script passes with I2P port notes actually retained; its fresh-page retained-origin
-qualification is in progress.
+script passes with I2P port notes actually retained. Its fresh-page retained-origin
+case also passes: the inspector begins closed, binds that exact access and reports
+its restored Forme owner/hold without changing source or Forme geometry. Chrome
+154 on Windows, WebGPU/Nvidia, 615 by 664 logical pixels at scale 2 supplies five
+reviewed captures. Pair source strata/handles and reopened access identity,
+placement constraints and Forme ownership are readable in the scrolled views.
+The Forme graph capture records composition, not every inspector value in one
+frame. The final placement capture reveals past the hold so its value is visible.
+The root graph is cropped by the narrow two-pane layout; full graph visibility,
+keyboard/focus at 420px, long-record costs, hidden-relation controls, stage
+transitions, live tile continuity, native headed and Firefox remain separate.
+No force vector, contribution attribution or missing derivation owner is invented.
 
 #### Field editor delivery integration (2026-10-11)
 

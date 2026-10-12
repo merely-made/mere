@@ -64,8 +64,11 @@ and remaining acceptance limits are recorded in the owning plan. Other effects
 retain their renderer owners.
 The [relationship/dynamics inspector draft](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#relationship-and-dynamics-inspector-draft-2026-10-11)
 adds exact-target reads of live stages, topology inputs and placement constraints;
-38 portable native checks and the product wasm check pass. Canvas native and
-headed cases remain open; missing force/derivation evidence is disclosed.
+38 portable source checks retain their original receipt. The Windows continuation
+adds three Canvas report and eight topology tests, a combined product Wasm build,
+and two passing Chrome scenarios with retained-origin reopening and five reviewed
+captures. Native headed, Firefox, keyboard/narrow review and measured force or
+derivation evidence retain their separate gates.
 
 Primary data model (2026-10-11): the
 [family composition brief §8](2026-08-12_family_composition_thesis_brief.md#8-primary-data-model-clips-and-live-entities-2026-10-11)

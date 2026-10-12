@@ -533,3 +533,6 @@ existing owner plans and receipt. The larger field composition walkthrough is
 design work; spatial/placement/event decisions and measured force effects stay
 open. No active Markdown or parser-shaped judgment identity is added. The
 source notice repair is a comment-only change to an upstream renderer test.
+
+
+**Windows relationship inspection follow-through (2026-10-11):** upstream and exact-strength source are integrated on main. Three actual Canvas report and eight topology tests pass; direct typed bucket readback retains row multiplicity and assertion handles. The combined product browser host builds with locked offline dependencies. Two Chrome scenarios pass with exact pointer selection, acknowledged Forme membership and fresh-page retained-origin reopening; five captures are reviewed. Failed and incomplete fixture attempts remain in the Windows receipt. Native headed, Firefox, narrow keyboard, long-record costs and execution-owner evidence retain separate gates. No active Markdown document or parser-shaped judgment identity is added.
