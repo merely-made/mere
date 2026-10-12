@@ -103,3 +103,9 @@ support/receipts/font_roles_20261012/*.log -text whitespace=-blank-at-eof,-space
 # Preserve raw Cargo diagnostics and exact replay metadata for the inventory experiment.
 crates/stickleback/examples/inventory_compare/results/**/*.log -text -whitespace
 crates/stickleback/examples/inventory_compare/results/**/*.json text eol=lf
+
+# Typography receipts retain exact native logs, proof JSON and capture bytes.
+support/receipts/tabard_typography_20261012/**/*.log -text -whitespace
+support/receipts/tabard_typography_20261012/**/*.json text eol=lf
+support/receipts/tabard_typography_20261012/**/scenario.done text eol=lf
+support/receipts/tabard_typography_20261012/**/*.png binary

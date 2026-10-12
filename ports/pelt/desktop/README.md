@@ -96,3 +96,10 @@ The fallback run uses a separate copy of the private library with a deliberately
 uninstalled Interface family; it checks visible notices and preserves the
 requested definition and choice.
 Use the same private stores and native launcher as above.
+
+The bounded macOS Intel typography qualification is recorded in
+`support/receipts/tabard_typography_20261012/qualification.json`: three processes,
+162 presentations, 18 nonblank scenario captures plus three application captures,
+and ten reviewed images. Font family/metrics, reopen/Discard, unavailable-family
+request preservation and held-session authority pass. The frozen native source
+and later merged renderer CPU/build checks remain separately attributed.
