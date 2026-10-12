@@ -1,0 +1,16 @@
+{
+  "command": [
+    "/Users/markik/Code/targets/mere-s2s3/debug/examples/resource_bundle_parity",
+    "/Users/markik/Code/output/vello-producer-gates-20261011/production-sparse-parity/workshop-1280-cold/complete-bundle.postcard",
+    "/Users/markik/Code/output/vello-production-fixes-20261011/final-git-only-production-parity",
+    "all",
+    "--bundle"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/netrender-cambium-resource-bridge",
+  "deadline_seconds": 120,
+  "elapsed_seconds": 16.079,
+  "exit_code": 0,
+  "timed_out": false,
+  "disk_refused": false,
+  "log": "/Users/markik/Code/output/vello-production-fixes-20261011/checks/final-git-only-production-parity-gpu.log"
+}

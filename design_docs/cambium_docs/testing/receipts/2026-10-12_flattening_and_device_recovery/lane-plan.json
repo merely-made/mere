@@ -1,0 +1,23 @@
+{
+  "netrender_base": "a30c7db42710c6f0cf38d8ed66ac876eb3a29802",
+  "genet_base": "4bc75583865c2fb862b7acd7fe16dc28eb591042",
+  "mere_base": "2aecdf9559b766951c66cb1b16c0b84ac7963d0e",
+  "provider_base": "5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a",
+  "runtime_handoff": "Both Moot and Tabard explicitly released runtime lane; Root owns finite serialized batch",
+  "cargo_target": "/Users/markik/Code/targets/mere-s2s3",
+  "target_lease": "Moot exclusive handoff; announce target release separately from runtime release",
+  "bounds": {
+    "build_jobs": 2,
+    "incremental": false,
+    "debug": 0,
+    "readback_seconds": 5
+  },
+  "thresholds": {
+    "edge_rgba": 32,
+    "edge_alpha": 16,
+    "interior_rgba": 3,
+    "interior_alpha": 2,
+    "mean": 1.0
+  },
+  "forced_driver_reset": false
+}

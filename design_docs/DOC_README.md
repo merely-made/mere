@@ -882,4 +882,4 @@ Pre-1.0 development. Index compacted in the 2026-06-09 design-docs audit (37 doc
 
 - [Dramatis app slice](dramatis_docs/implementation_strategy/2026-10-11_dramatis_app_plan.md): persona selection and quarantine review through Djinn; first Windows slice qualified, with native consent and custody controls.
 
-- [Shared device recovery owner](cambium_docs/technical_architecture/2026-10-11_shared_device_recovery_owner.md): one factory, generation notices and a host-detachment barrier; qualification pending.
+- [Shared device recovery owner](cambium_docs/technical_architecture/2026-10-11_shared_device_recovery_owner.md): implemented one factory, generation notices and a host-detachment barrier; controlled native device loss, two-host pixel rehydration and current-frame shader refusal passed. Current-supplier native presentation awaits an unlocked console; browser async recovery and OS acceptance remain open. Executed evidence and exact supplier scope are linked from the ADR.

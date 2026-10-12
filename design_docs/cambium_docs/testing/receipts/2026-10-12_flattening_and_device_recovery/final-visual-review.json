@@ -1,0 +1,20 @@
+{
+  "headless_recovery": [
+    "first-before.png",
+    "second-after.png"
+  ],
+  "native": [
+    "initial.png",
+    "dark.png",
+    "resized.png"
+  ],
+  "review": "Actual light/dark registered reader pixels remain equal after replacement. Native initial/dark/resize images show changed mode, authored color and name, visible caret and reflow; fixed reading-preview bounds clip as expected. Six native captures are nonblank with distinct digests.",
+  "native_counts": {
+    "presented_frames": 60,
+    "redraws": 64,
+    "unpresented_redraws": 4,
+    "captures": 6,
+    "blank": 0
+  },
+  "scope": "native healthy-device surface presentation; no swapchain presentation after device destruction; no OS accessibility claim"
+}

@@ -1,0 +1,93 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling vello_common v0.3.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling vello_shaders v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling glifo v0.4.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling vello_cpu v0.3.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling netrender v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling regress v0.11.1 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling document-session-api v0.1.0 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling cadency v0.0.1 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling livery v0.0.5 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling buckram v0.0.3 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling genet-livery v0.0.4 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling genet-text v0.1.0 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling sprigging v0.2.1 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/sprigging)
+   Compiling cambium v0.3.3 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium)
+   Compiling genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling cambium-winit v0.3.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium-winit)
+   Compiling genet-render v0.2.0 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling fleece v0.5.0 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling genet-winit-host v0.2.0 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling inker v0.1.1 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/inker/inker)
+   Compiling cambium-rootstock v0.1.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium-rootstock)
+   Compiling cambium-winit-a11y v0.3.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium-winit-a11y)
+   Compiling document-canvas v0.1.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/inker/document-canvas)
+   Compiling mere-fleece v0.0.1 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/fleece)
+   Compiling taproot v0.1.0 (https://github.com/merely-made/genet.git?rev=5fc1836936f2d7ce6d103b8081b537e8bd922c1d#5fc18369)
+   Compiling cambium-genet-winit-host v0.1.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium-genet-winit-host)
+warning: unused import: `NSWindow`
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:511:25
+    |
+511 |     use objc2_app_kit::{NSWindow, NSWindowButton};
+    |                         ^^^^^^^^
+    |
+    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unnecessary `unsafe` block
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:540:46
+    |
+540 |             view.convertRect_fromView(frame, unsafe { ns_window.contentView() }.as_deref());
+    |                                              ^^^^^^ unnecessary `unsafe` block
+    |
+    = note: `#[warn(unused_unsafe)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `window_control_node` is never used
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:113:4
+    |
+113 | fn window_control_node<D>(dom: &D, root: NodeId, accessible_label: &str) -> Option<NodeId>
+    |    ^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `window_control_rect` is never used
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:139:15
+    |
+139 | pub(crate) fn window_control_rect<D>(
+    |               ^^^^^^^^^^^^^^^^^^^
+
+warning: `cambium-genet-winit-host` (lib) generated 4 warnings (run `cargo fix --lib -p cambium-genet-winit-host` to apply 1 suggestion)
+   Compiling mere-document-lanes v0.1.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/system/document-lanes)
+   Compiling tabard-workshop v0.0.1 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/tabard-workshop)
+    Finished `test` profile [unoptimized] target(s) in 55.43s
+     Running tests/shared_device_loss.rs (/Users/markik/Code/targets/mere-s2s3/debug/deps/shared_device_loss-f08bc211e3f3c0fa)
+
+running 2 tests
+test actual_shared_device_destroy_replaces_once_rehydrates_producers_then_bounds_later_failure ... recovery pixel diagnostic before-distinctness: [{"byte_count":76800,"distinct_colors":324,"fnv1a_digest":"5a96f667c510791d","height":120,"name":"first","width":160},{"byte_count":76800,"distinct_colors":327,"fnv1a_digest":"9a478d0a877d29f2","height":120,"name":"second","width":160}]
+recovery pixel diagnostic after-rehydration: [{"byte_count":76800,"distinct_colors":324,"fnv1a_digest":"5a96f667c510791d","height":120,"name":"first","width":160},{"byte_count":76800,"distinct_colors":327,"fnv1a_digest":"9a478d0a877d29f2","height":120,"name":"second","width":160}]
+ok
+test real_two_host_detachment_bounds_failed_factory_and_preserves_workshop_sources ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.83s
+

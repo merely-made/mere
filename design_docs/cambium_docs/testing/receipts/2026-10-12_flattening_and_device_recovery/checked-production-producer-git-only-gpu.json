@@ -1,0 +1,23 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--offline",
+    "--locked",
+    "-p",
+    "cambium-genet-winit-host",
+    "--test",
+    "checked_producer_refusal",
+    "-j2",
+    "--",
+    "--ignored",
+    "--test-threads=1"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-vello-release-adoption",
+  "deadline_seconds": 300,
+  "elapsed_seconds": 35.534,
+  "exit_code": 0,
+  "timed_out": false,
+  "disk_refused": false,
+  "log": "/Users/markik/Code/output/vello-production-fixes-20261011/checks/checked-production-producer-git-only-gpu.log"
+}
