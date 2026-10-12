@@ -52,10 +52,18 @@ pub type Runner<State, Logic, V> = GenetAppRunner<State, Logic, V, ()>;
 
 /// A capture armed by the application, run inside the next frame while the
 /// rasterized view is still alive (scenario screenshots).
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug)]
 pub enum CaptureRefusal {
     DeviceLost(genet_render_host::DeviceLossNotice),
-    SurfaceUnavailable { generation: u64, error: String },
+    SurfaceUnavailable {
+        generation: u64,
+        error: String,
+    },
+    ProviderError {
+        generation: u64,
+        source_key: Option<u64>,
+        error: Arc<netrender::VelloError>,
+    },
 }
 impl std::fmt::Display for CaptureRefusal {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -1017,6 +1025,8 @@ where
     /// source supplies the same pair against a canvas.
     pub surface: Option<Box<dyn Surface>>,
     pub recovery_status: Option<genet_render_host::RecoveryStatus>,
+    /// Current checked raster refusal; cleared at the next redraw admission.
+    pub last_raster_failure: Option<genet_render_host::RasterizeFailure>,
     pub(crate) detached_generation: Option<u64>,
     pub needs_recovery_surface: bool,
     /// The tree this window drives.
@@ -1145,6 +1155,7 @@ where
             titlebar_sheet: String::new(),
             surface: None,
             recovery_status: None,
+            last_raster_failure: None,
             recovery_subscription: None,
             detached_generation: None,
             needs_recovery_surface: false,

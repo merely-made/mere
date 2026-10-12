@@ -541,6 +541,7 @@ where
 
     pub fn redraw(&mut self) {
         self.s.last_redraw_presentation = None;
+        self.s.last_raster_failure = None;
         if !matches!(
             self.poll_device_recovery(),
             genet_render_host::RecoveryStatus::Ready { .. }
@@ -605,6 +606,10 @@ where
         profile.leaf_render_us = self.s.last_leaf_render_us;
         profile.leaf_repaints = self.s.last_leaf_repaints;
         profile.producers = self.prepare_producers(scale);
+        if let Some(refusal) = self.s.shared.producers.render_failure().cloned() {
+            self.refuse_rasterization(refusal.failure, Some(refusal.source_key));
+            return;
+        }
         let phase = crate::Instant::now();
         self.sync_leaf_fragments();
         profile.leaf_fragments_us = elapsed_us(phase.elapsed());
@@ -650,16 +655,20 @@ where
         let phase = crate::Instant::now();
         // Keyed by this host: several windows rasterize through one core, and
         // an unkeyed raster diffs against whichever surface drew last (F17).
-        let Ok((_tex, view)) = surface.core().try_rasterize_scaled_for(
+        let raster = surface.core().try_rasterize_scaled_for(
             self.s.presentation_host,
             scene,
             pw,
             ph,
             ColorLoad::Clear(clear),
             scale,
-        ) else {
-            self.poll_device_recovery();
-            return;
+        );
+        let (_tex, view) = match raster {
+            Ok(output) => output,
+            Err(failure) => {
+                self.refuse_rasterization(failure, None);
+                return;
+            },
         };
         profile.raster_us = elapsed_us(phase.elapsed());
         if let Some(timings) = surface.renderer().last_frame_timings() {

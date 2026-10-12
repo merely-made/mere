@@ -54,6 +54,31 @@ request; paint sidecars also preserve explicit failure. This is an intentional
 public callback ABI change, ported through the workspace's native/browser
 consumers and receipt examples.
 
+## Checked raster and producer refusals
+
+Host rasterization uses Netrender's checked rendering API, including filtered
+scene prefixes. Provider errors return normally through Genet's
+`RasterizeFailure::ProviderError`, preserving the actual typed Vello error.
+The installed loss monitor is checked after raster admission/submission: a
+recorded device loss takes precedence and becomes `DeviceLost`. Raster creation
+holds an admission lifetime so replacement cannot begin while it still owns
+resources on the old generation.
+
+`TextureProducer::render_checked` defaults to the existing producer contract;
+`SceneProducer` overrides it to report the checked raster result. The registry
+invalidates a refused source's previous image and transient texture, records
+its source key, and stops the current host frame. It retains the registration
+and application-owned portable source. A healthy provider refusal must never
+be interpreted as unchanged output, missing content, or device loss.
+
+Rootstock resolves armed captures with `CaptureRefusal::ProviderError` on a
+healthy provider refusal. It clears that frame's presentation identity and
+keeps the same recovery owner/device; no replacement factory runs. Actual
+device loss uses the existing detach/barrier recovery path. The capture
+refusal and raster failure types preserve provider errors through `Arc`;
+provider errors are not equality-comparable, so `CaptureRefusal` no longer
+implements `PartialEq`/`Eq`.
+
 ## Validation scope
 
 The coordinator runs pure controls through the production monitor, owner,
