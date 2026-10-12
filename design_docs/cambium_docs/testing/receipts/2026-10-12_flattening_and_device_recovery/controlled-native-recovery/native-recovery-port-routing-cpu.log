@@ -1,0 +1,61 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: unused import: `NSWindow`
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:511:25
+    |
+511 |     use objc2_app_kit::{NSWindow, NSWindowButton};
+    |                         ^^^^^^^^
+    |
+    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unnecessary `unsafe` block
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:540:46
+    |
+540 |             view.convertRect_fromView(frame, unsafe { ns_window.contentView() }.as_deref());
+    |                                              ^^^^^^ unnecessary `unsafe` block
+    |
+    = note: `#[warn(unused_unsafe)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `window_control_node` is never used
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:113:4
+    |
+113 | fn window_control_node<D>(dom: &D, root: NodeId, accessible_label: &str) -> Option<NodeId>
+    |    ^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `window_control_rect` is never used
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:139:15
+    |
+139 | pub(crate) fn window_control_rect<D>(
+    |               ^^^^^^^^^^^^^^^^^^^
+
+warning: `cambium-genet-winit-host` (lib) generated 4 warnings (run `cargo fix --lib -p cambium-genet-winit-host` to apply 1 suggestion)
+   Compiling tabard-desktop v0.1.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/ports/tabard/desktop)
+    Finished `test` profile [unoptimized] target(s) in 8.48s
+     Running tests/usability.rs (/Users/markik/Code/targets/mere-s2s3/debug/deps/usability-bc9cc0e0e14030ad)
+
+running 6 tests
+test application_close_failed_save_keeps_the_draft_until_explicit_discard ... ok
+test export_format_controls_reach_native_destinations_for_the_selected_mode ... ok
+test export_replacement_writes_the_captured_unsaved_draft_and_keeps_undo_history ... ok
+test native_close_preserves_invalid_input_until_a_successful_save_and_close ... ok
+test native_import_chooser_returns_a_colliding_file_without_replacing_the_saved_theme ... ok
+test shared_caption_close_uses_the_workshops_unsaved_work_policy ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 29.49s
+
+     Running tests/workshop_routing.rs (/Users/markik/Code/targets/mere-s2s3/debug/deps/workshop_routing-20b84ffff79c122e)
+
+running 2 tests
+test narrow_workshop_wheel_reaches_the_preview_specimens ... ok
+test native_text_input_updates_the_same_draft_and_discard_restores_its_baseline ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.45s
+

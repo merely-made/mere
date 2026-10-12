@@ -1,0 +1,11 @@
+[cambium-winit] accessibility Installed, 195 nodes projected
+tabard: Native device recovery preserves the actual workshop and preview sources
+tabard: captured before_loss
+tabard: captured after_loss
+tabard: captured after_input
+tabard: captured after_resize
+tabard: FAIL: unchanged full-workshop pixels differ after owned device recovery
+tabard: FAIL: actual displayed RGBA bytes or dimensions changed across device recovery
+tabard: FAIL: actual recovery RGBA comparison did not pass
+tabard: RESULT fail (56 frames, 4 captures)
+tabard: The Tabard acceptance scenario failed or did not complete.

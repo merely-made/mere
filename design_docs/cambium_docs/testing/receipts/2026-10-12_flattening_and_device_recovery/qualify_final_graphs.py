@@ -1,3 +1,9 @@
+# Copyright 2026 Mark Alan Boykin
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# SPDX-License-Identifier: MPL-2.0
+
 import pathlib, subprocess, json, re,sys,time
 out=pathlib.Path(__file__).parent;root=pathlib.Path('/Users/markik/Code/worktrees/mere-vello-release-adoption')
 expected={'genet':'2c7ef73bfa44c07744e0643e3c6f98be3cbd7947','netrender':'c74b7cb28090c28b1c6d80b08dcdea18aff48d3e','vello':'2eae6243881d5b24c984d5ee35dde509ca5db782','knot-editor':sys.argv[1]}

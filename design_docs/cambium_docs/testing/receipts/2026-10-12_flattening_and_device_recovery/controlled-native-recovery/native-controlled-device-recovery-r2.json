@@ -1,0 +1,30 @@
+{
+  "command": [
+    "python3",
+    "scripts/run_macos_scenario.py",
+    "--binary",
+    "/Users/markik/Code/output/vello-native-recovery-20261012/tabard-native-recovery-common-limits-frozen",
+    "--prefix",
+    "TABARD",
+    "--scenario",
+    "ports/tabard/desktop/scenarios/native_device_recovery.scn",
+    "--output",
+    "/Users/markik/Code/output/vello-native-recovery-20261012/native-r2",
+    "--timeout",
+    "60",
+    "--env",
+    "TABARD_CONTROLLED_DEVICE_LOSS=1",
+    "--env",
+    "TABARD_RECOVERY_RUN=ea652cfc-3cee-4d6a-8e88-8e836a52b0c6",
+    "--",
+    "--library",
+    "/Users/markik/Code/output/vello-native-recovery-20261012/isolated-library-r2/themes.json"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-vello-release-adoption",
+  "deadline_seconds": 90,
+  "elapsed_seconds": 20.223,
+  "exit_code": 0,
+  "timed_out": false,
+  "disk_refused": false,
+  "log": "/Users/markik/Code/output/vello-production-fixes-20261011/checks/native-controlled-device-recovery-r2.log"
+}
