@@ -63,7 +63,9 @@ mod session_lane;
 pub use crate::cabal::{CabalHandle, CabalId, CabalKey, CabalMembership};
 pub use crate::conversation_backend::{ConversationBackend, ConversationStorage};
 pub use crate::conversation_engine::{CabalHistory, ConversationEngine, ConversationRefresh};
-pub use crate::conversation_store::{ConversationStore, ConversationStoreError};
+pub use crate::conversation_store::{
+    CabalCheckpointAuthority, ConversationStore, ConversationStoreError,
+};
 pub use crate::drop_export::{
     ConversationDropPriorities, ConversationDropPrivacy, ConversationDropProfile,
     ConversationDropSelector, ConversationFrontier,

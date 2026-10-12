@@ -846,7 +846,7 @@ contract declared in advance.
     rust-gpu's version-gate bug has no upstream fix but is latent (upstream
     pins nightly-2026-07-03, 1.98). Mark chose "cargo-gpu 0.10.0 from
     crates.io": the binary comes from the published release, the fork branch
-    stays as the record, and the standalone `crates/cargo-gpu` fork is no
+    stays as the record, and the standalone `crates/cargo-gpu` *(historical citation)* <!-- doc-audit: historical-path --> fork is no
     longer used. The alternatives were building from tag v0.10.0, rebasing
     and carrying the patch, or rebasing and filing it upstream. Renderling's
     one upstream commit (`46bf54c`, manual chapters and a
@@ -873,7 +873,7 @@ contract declared in advance.
     the installed default and the unused caches are gone. A throwaway trial
     ported renderling's shaders to spirv-std 0.10 with version and toolchain
     moves only: 95 of 95 tests, WGSL byte-identical, 44 of 45 `.spv` rebuilt.
-    It is blocked by crabslab (`crates/crabslab`, `mark-ik/wgpu-30`
+    It is blocked by crabslab (`crates/crabslab` *(historical citation)* <!-- doc-audit: historical-path -->, `mark-ik/wgpu-30`
     `a1ffc17`), which requires `spirv-std = "0.9.0"`; eponym builds against
     the live crabslab and renderling checkouts. Mark chose "Sync crabslab
     upstream first" (13 behind, upstream `f990323` on wgpu 26 and spirv-std
@@ -1369,7 +1369,7 @@ Wing rulings 471, 472, 606, 732, 734 and 735, in the Isocosm migration push.
 Branch `isocosm/kiss3d-tenant`, not on main. *Annotation, 2026-10-09:* on main at `e1bf0601`,
 Mark approving the push ("Yes, push to main").
 
-**The fork.** `crates/kiss3d`, branch `mark-ik/tenant` over upstream
+**The fork.** `crates/kiss3d` *(historical citation)* <!-- doc-audit: historical-path -->, branch `mark-ik/tenant` over upstream
 `03727cd2` (v0.47.0), pushed to `mark-ik/kiss3d` at `c362cd58`. No balaur
 commit was needed. Seven commits, each compiling under
 `cargo check --all-targets`:

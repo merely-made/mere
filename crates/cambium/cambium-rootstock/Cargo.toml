@@ -44,7 +44,7 @@ wgpu = { workspace = true }
 meristem = { version = "0.2.0", path = "../meristem" }
 cambium-winit = { version = "0.3.0", path = "../cambium-winit" }
 paint_list_api = { workspace = true }
-paint_list_render = { workspace = true }
+paint_list_render = { workspace = true, features = ["resource-bundle"] }
 layout_dom_api = { workspace = true }
 # The host clock. `std::time::Instant::now()` compiles for
 # wasm32-unknown-unknown and panics when called, so a browser host built on

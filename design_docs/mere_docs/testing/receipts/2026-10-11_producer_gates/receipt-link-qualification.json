@@ -1,0 +1,92 @@
+[
+  {
+    "label": "capture control",
+    "target": "checks/production-capture-final.log",
+    "exists": true
+  },
+  {
+    "label": "registry controls",
+    "target": "checks/aggregate-registry-qualified.log",
+    "exists": true
+  },
+  {
+    "label": "real-device control",
+    "target": "checks/portable-live-gpu-refusal.log",
+    "exists": true
+  },
+  {
+    "label": "host controls",
+    "target": "checks/release-host-acceptance-fixed-slider.log",
+    "exists": true
+  },
+  {
+    "label": "slider controls",
+    "target": "checks/slider-value-controls.log",
+    "exists": true
+  },
+  {
+    "label": "metrics",
+    "target": "qualified-parity-metrics.json",
+    "exists": true
+  },
+  {
+    "label": "scenario receipt",
+    "target": "native-presentation-qualified/scenario.done",
+    "exists": true
+  },
+  {
+    "label": "process",
+    "target": "native-presentation-qualified/process.json",
+    "exists": true
+  },
+  {
+    "label": "pixel verification",
+    "target": "native-presentation-qualified/capture-verification.json",
+    "exists": true
+  },
+  {
+    "label": "recovery receipt",
+    "target": "device-rehydration-qualified/receipt.json",
+    "exists": true
+  },
+  {
+    "label": "control",
+    "target": "checks/device-rehydration-qualified.log",
+    "exists": true
+  },
+  {
+    "label": "dark",
+    "target": "native-presentation-qualified/dark.png",
+    "exists": true
+  },
+  {
+    "label": "resized",
+    "target": "native-presentation-qualified/resized.png",
+    "exists": true
+  },
+  {
+    "label": "comparison",
+    "target": "gpu-diagnostics-comparison.json",
+    "exists": true
+  },
+  {
+    "label": "acceptance plan",
+    "target": "../../../../../ports/tabard/desktop/scenarios/release_acceptance.plan.json",
+    "exists": true
+  },
+  {
+    "label": "native scenario",
+    "target": "../../../../../ports/tabard/desktop/scenarios/release_presentation.scn",
+    "exists": true
+  },
+  {
+    "label": "pin qualification",
+    "target": "pin-qualification.json",
+    "exists": true
+  },
+  {
+    "label": "port boundaries",
+    "target": "checks/mere-port-boundaries.log",
+    "exists": true
+  }
+]

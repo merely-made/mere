@@ -1622,7 +1622,7 @@ Ruled 2026-10-01, the GPU-tier law lane's first forks:
   decomposed, never adopted" ruling is the frame.
 
 Ruled 2026-10-01, after the Nexus assessment. Verified in the checkout
-(`crates/nexus` `3bf7c6d`): its rigid-body solver applies gravity only ("no
+(`crates/nexus` *(historical citation)* <!-- doc-audit: historical-path --> `3bf7c6d`): its rigid-body solver applies gravity only ("no
 user forces yet", `src_rbd_shaders/dynamics/solver.rs:290`), it has no
 repulsion force, it takes a host's device through `WebGpu::from_device`, its
 step reads back without blocking, and linking it adds about 164 crates with
@@ -1643,7 +1643,7 @@ binning are the useful patterns.
   grid, or patching Nexus's solver.
 - **The Nexus build blocker.** "Fix now": the Windows failure is
   `cargo-gpu-install` removing `Cargo.lock` when spirv-std comes from
-  crates.io (`crates/cargo-gpu/crates/cargo-gpu-install/src/install.rs:311`),
+  crates.io (`crates/cargo-gpu/crates/cargo-gpu-install/src/install.rs:311` *(historical citation)* <!-- doc-audit: historical-path -->),
   a different step from the version gate the local fork fixed. The
   alternative deferred it until a vessel gate needs GPU dynamic bodies.
 - **Licensing.** Mark said: "Doublecheck. Otherwise, 1". Double-checked:

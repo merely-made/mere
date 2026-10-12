@@ -603,8 +603,71 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         self.store_ssh_private(private, tier, SshKeyMutationKind::Imported)
     }
 
+    /// Import into a named CXF destination without changing the selected
+    /// persona. Uses the native import's validation and held-key no-op.
+    #[cfg(feature = "cxf")]
+    pub fn import_ssh_private_for(
+        &self,
+        profile: &ProfileId,
+        private: PrivateKey,
+        options: ImportSshKeyNativeIntentV1,
+    ) -> Result<SshKeyMutationReceipt, IdentityIntentError> {
+        validate_comment(private.comment())?;
+        let tier = unlock_tier(options.unlock_policy)?;
+        self.store_ssh_private_in(Some(profile), private, tier, SshKeyMutationKind::Imported)
+    }
+
     fn store_ssh_private(
         &self,
+        private: PrivateKey,
+        tier: UnlockTier,
+        operation: SshKeyMutationKind,
+    ) -> Result<SshKeyMutationReceipt, IdentityIntentError> {
+        self.store_ssh_private_in(None, private, tier, operation)
+    }
+
+    fn store_ssh_private_in(
+        &self,
+        destination: Option<&ProfileId>,
+        private: PrivateKey,
+        tier: UnlockTier,
+        operation: SshKeyMutationKind,
+    ) -> Result<SshKeyMutationReceipt, IdentityIntentError> {
+        let mut vault = self.vault.lock().unwrap();
+        Self::store_ssh_private_held(&mut vault, destination, private, tier, operation)
+    }
+
+    #[cfg(feature = "cxf")]
+    pub(crate) fn with_cxf_vault<R>(
+        &self,
+        act: impl FnOnce(&mut IdentityVault<S>) -> R,
+    ) -> Result<R, IdentityError> {
+        let mut vault = self.vault.lock().unwrap();
+        vault.current_profile()?;
+        Ok(act(&mut vault))
+    }
+
+    #[cfg(feature = "cxf")]
+    pub(crate) fn import_ssh_private_for_held_vault(
+        vault: &mut IdentityVault<S>,
+        profile: &ProfileId,
+        private: PrivateKey,
+        options: ImportSshKeyNativeIntentV1,
+    ) -> Result<SshKeyMutationReceipt, IdentityIntentError> {
+        validate_comment(private.comment())?;
+        let tier = unlock_tier(options.unlock_policy)?;
+        Self::store_ssh_private_held(
+            vault,
+            Some(profile),
+            private,
+            tier,
+            SshKeyMutationKind::Imported,
+        )
+    }
+
+    fn store_ssh_private_held(
+        vault: &mut IdentityVault<S>,
+        destination: Option<&ProfileId>,
         private: PrivateKey,
         tier: UnlockTier,
         operation: SshKeyMutationKind,
@@ -615,10 +678,19 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         let public_openssh = public
             .to_openssh()
             .map_err(|_| IdentityIntentError::PublicEncoding)?;
-        let mut vault = self.vault.lock().unwrap();
+        vault.current_profile()?;
+        let destination = destination
+            .cloned()
+            .unwrap_or_else(|| vault.profile_id().clone());
+        let mut other_profile = if &destination == vault.profile_id() {
+            None
+        } else {
+            Some(vault.storage().load_profile(&destination)?)
+        };
         // Ruling 54: a held key is never rewritten; the receipt describes the
         // slot as held, comment and tier included.
-        if let Some(held) = vault.current_profile()?.slots.get(&key) {
+        let profile = other_profile.as_ref().unwrap_or(vault.current_profile()?);
+        if let Some(held) = profile.slots.get(&key) {
             let held_private = ssh_slot::private_key_from_slot(held)?;
             return Ok(SshKeyMutationReceipt {
                 operation,
@@ -634,7 +706,13 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
             .map_err(|refused| IdentityIntentError::UnsignableKey(refused.to_string()))?;
         let slot = ssh_slot::slot_for(&private, tier)?;
         let comment = private.comment().to_string();
-        vault.add_slot(key, slot)?;
+        if &destination == vault.profile_id() {
+            vault.add_slot(key, slot)?;
+        } else {
+            let profile = other_profile.as_mut().expect("named non-selected profile");
+            profile.slots.insert(key, slot);
+            vault.storage().save_profile(profile)?;
+        }
         Ok(SshKeyMutationReceipt {
             operation,
             fingerprint,
@@ -918,7 +996,13 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         }
         let vault = self.vault.lock().unwrap();
         for summary in vault.storage().list_profiles()? {
-            if vault.storage().load_profile(&summary.id)?.master.public_key() == *master {
+            if vault
+                .storage()
+                .load_profile(&summary.id)?
+                .master
+                .public_key()
+                == *master
+            {
                 return Ok(Some(summary.id));
             }
         }
@@ -979,10 +1063,12 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         vault.switch_profile(&selected)?;
         match result.map_err(IdentityIntentError::VaultCommand)? {
             Some(enrollment) => Ok(VaultCommandOutput::Enrollment {
-                target: enrollment.target, script: enrollment.script,
+                target: enrollment.target,
+                script: enrollment.script,
                 confirmation: enrollment.confirmation,
             }),
-            None => String::from_utf8(output).map(VaultCommandOutput::Text)
+            None => String::from_utf8(output)
+                .map(VaultCommandOutput::Text)
                 .map_err(|error| IdentityIntentError::VaultCommand(error.to_string())),
         }
     }
@@ -990,13 +1076,18 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
     /// A provider for persona `id` without switching to it, for an
     /// application that speaks as a persona of its own (D13). Refused while
     /// Locked; it lives only as long as the caller's act.
-    pub fn profile_provider(&self, id: &ProfileId) -> Result<personae::InMemoryProvider, IdentityError> {
+    pub fn profile_provider(
+        &self,
+        id: &ProfileId,
+    ) -> Result<personae::InMemoryProvider, IdentityError> {
         if self.is_locked() {
             return Err(IdentityError::Locked);
         }
         let vault = self.vault.lock().unwrap();
         let profile = vault.storage().load_profile(id)?;
-        Ok(personae::InMemoryProvider::from_seed(profile.master.to_seed()))
+        Ok(personae::InMemoryProvider::from_seed(
+            profile.master.to_seed(),
+        ))
     }
 
     /// Apply one typed action a card offered (graphshell's

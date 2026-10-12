@@ -1,0 +1,12 @@
+{
+  "scope": "static predicate/source custody checks, not Rust type/parser/runtime PASS",
+  "retained_predicates": 29,
+  "upstream_predicates": 35,
+  "harmonized_predicates": 35,
+  "retained_and_upstream_predicates_preserved": true,
+  "original_strict_scene_and_owner_bytes_unchanged": true,
+  "optional_observers_not_reapplied": true,
+  "public_retained_mount_preserved": true,
+  "rustfmt_parse_only_files": 5,
+  "harmonized_sha256": "0eb76fe9b98ed7ded0f829bca58356e2eba1f9d4c8b2362e3bf4c13624f0509a"
+}

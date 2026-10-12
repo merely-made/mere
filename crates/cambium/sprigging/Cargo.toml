@@ -11,4 +11,4 @@ publish = true
 [dependencies]
 paint_list_api.workspace = true
 accesskit = { version = "0.24.0", features = ["serde"] }
-vello = { version = "0.10", default-features = false }
+vello = { workspace = true }

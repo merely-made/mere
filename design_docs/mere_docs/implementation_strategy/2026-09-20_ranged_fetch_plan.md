@@ -58,7 +58,7 @@ download never needs the body held whole. Nothing new is needed from netfetcher.
   its window, validator, budget and stats over the trait. Its existing tests run
   against the real implementation and the in-test server, plus a fake.
 - R2: `redshank-cache`'s download and the desktop's feed fetch use the same
-  handle (per D1). `ureq` is absent from `ports/redshank/Cargo.lock`.
+  handle (per D1). `ureq` is absent from `ports/redshank/Cargo.lock` *(historical citation)* <!-- doc-audit: historical-path -->.
 - R3: the `remote-buffering` and `longnames` scenario receipts return
   `RESULT ok`; workspace tests and strict Clippy pass; the measured build-time
   and binary-size change is recorded beside R3-C's prediction.

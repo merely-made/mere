@@ -68,6 +68,7 @@ impl Canvas {
             .get_mut()
             .expect("strategy input cache") = None;
         self.forme_region = None;
+        self.forme_guides = None;
         self.forme_held.clear();
         self.selected.clear();
         self.selected_edges.clear();
@@ -144,6 +145,7 @@ impl Canvas {
             camera: Camera::default(),
             style: dark_scene_style(),
             backdrop: surface_bg(),
+            projection_backdrops: Vec::new(),
             generation: 0,
             cursor: (0.0, 0.0),
             pan_velocity: (0.0, 0.0),
@@ -154,10 +156,12 @@ impl Canvas {
             pinned_nodes: HashSet::new(),
             field_drag: None,
             forme_region: None,
+            forme_guides: None,
             forme_held: HashSet::new(),
             selected: HashSet::new(),
             selected_edges: HashSet::new(),
             hidden_edges: HashSet::new(),
+            occurrence_edges: None,
             physics_view_revision: 0,
             active_field: None,
             hidden_fields: HashSet::new(),
@@ -386,8 +390,7 @@ impl Canvas {
             .map(|(key, _node)| (key, Point2D::zero()))
             .collect();
         self.physics.sync_nodes(nodes);
-        self.physics
-            .sync_edges(visible_relation_edges(&self.graph, &self.hidden_edges));
+        self.physics.sync_edges(self.controller_edges());
         self.pinned_nodes
             .retain(|key| self.graph.get_node(*key).is_some());
         for positions in [&mut self.strategy_positions, &mut self.paused_positions]
@@ -624,6 +627,33 @@ impl Canvas {
         self.physics.seed(seeds);
         self.settle_physics(SETTLE_TICKS);
         true
+    }
+
+    /// Install returned owner data when its physical topology is unchanged.
+    /// Refuse additions, removals or changed projected relations before mutation;
+    /// the caller uses structural ingest for those. Like recorded metadata
+    /// refresh, this rebuilds derived data without restarting the settled layout.
+    pub fn refresh_same_topology_graph(&mut self, source: &Graph) -> Result<(), String> {
+        if self.graph.node_count() != source.node_count()
+            || self.graph.nodes().any(|(key, node)| {
+                source.get_node(key).is_none_or(|next| next.id != node.id)
+            })
+        {
+            return Err("owner metadata changes the canvas node topology".into());
+        }
+        let relations = |graph: &Graph| {
+            let mut counts = std::collections::HashMap::new();
+            for (key, relation) in graph.projected_relations() {
+                *counts.entry((key, relation)).or_insert(0usize) += 1;
+            }
+            counts
+        };
+        if relations(&self.graph) != relations(source) {
+            return Err("owner metadata changes the canvas relation topology".into());
+        }
+        self.graph = source.clone();
+        self.reconcile_derived();
+        Ok(())
     }
 
     /// Refresh runtime cache and known coverage independently of geometry.

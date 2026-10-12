@@ -80,6 +80,8 @@
 #[cfg(feature = "keeper")]
 pub mod authority;
 pub mod custody;
+#[cfg(feature = "cxf")]
+pub mod cxf;
 pub mod items;
 pub mod lock;
 pub mod otp;

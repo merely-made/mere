@@ -873,7 +873,10 @@ Production host adoption and the Rhai runner are separately qualified there.
 
 ### 9.11 Forme draft session (2026-10-10)
 
-**Agreed interaction; implementation pending.** Mark described unlocked nodes
+**Agreed interaction; Graphshell adapter implemented, headed qualification pending.**
+The [editor plan's draft progress](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#workbench-forme-draft-2026-10-10)
+records its scoped native/build checks; other-host adoption remains separate.
+Mark described unlocked nodes
 as tile handles: dragging a handle previews the corresponding tile region,
 split and nesting; dragging another node into the forme adds it to the proposed
 arrangement. Locking agrees to commit those changes. Asked how to discard the
@@ -909,8 +912,9 @@ not require another force-composition model or prescribe a scene's appearance.
 
 The [editor plan](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#forme-draft-follow-through-2026-10-10-agreed-interaction)
 maps the shared history and layout substrate to implementation steps and
-qualification. The gesture bridge and committed arrangement undo are pending;
-this agreement is not a runtime receipt.
+qualification. The first Graphshell adapter now implements the draft and saved
+arrangement undo, with its interactive check pending; this agreement and source
+qualification do not substitute for a headed runtime receipt.
 
 ### 9.12 Mixed-content scene and embedded forme study (2026-10-10)
 
@@ -1023,12 +1027,13 @@ controls by the effect they change rather than infer behavior from a class
 name. Context discovery, paint visibility, input interaction and physical
 participation are distinct questions.
 
-Mark describes the foreground as pinned, currently selected or recently
-interacted-with entities. This adds recent interaction to the foreground
-criteria in §9.2. Its duration and transition back to retained background
-membership remain to be designed; it does not repeal the previously selected
-material's availability until dismissed. Contextual relevance does not imply
-that an entity must be noninteractive, intangible or stored permanently.
+Mark initially described the foreground as pinned, currently selected or
+recently interacted-with entities. The subsequent SE91 ruling resolves the
+transition: working selection and foreground pins remain forward; deselected
+interacted-with nodes recede into retained background until dismissed, as in
+§9.2. Untouched ambient content may change with context. There is no fixed
+recency timeout or automatic retention on hover. Contextual relevance does not
+imply that an entity must be noninteractive, intangible or stored permanently.
 
 **Checked portable substrate at published Mere `773a0dc2`:**
 [Backdrop](../crates/cambium/scenes/sceno/src/scene.rs) already carries
@@ -1050,7 +1055,7 @@ by renaming Clear to Reset. Depth and richer scenery also require a forcing
 consumer; today's portable 2D transform/footprint contract does not establish
 a complete spatial scene implementation.
 
-The [editor's B1 follow-through](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#b1--backdrops-in-the-graphshell-viewer-se86),
+The [editor's B1 follow-through](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#b1--backdrops-in-the-graphshell-viewer-se86-amended-by-se90),
 [dynamics plan](mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md#backdrop-control-correction-2026-10-10)
 and [ambiance continuation](mere_docs/design/2026-09-23_ambiance_design.md#backdrop-and-context-distinction-2026-10-10)
 carry this correction. The shared design is recorded here; controls, legacy
@@ -1119,3 +1124,27 @@ conflicting placement edit and reporting initial matches without firing entry
 actions are recommendations pending rulings. Theme roles, presentation-rule
 precedence, visual force explanations and script execution remain with their
 assigned lanes. No runtime source or qualification was changed by this pass.
+
+### 9.16 Primary model, portable clips and live entities (2026-10-11)
+
+The [family composition brief §8](2026-08-12_family_composition_thesis_brief.md#8-primary-data-model-clips-and-live-entities-2026-10-11)
+records Mark's accepted direction: the graph is the primary data model, with
+portable clips and live entities, while domains retain their own internal
+representations. It owns the definitions and proposed policies for captured
+versions, compound clips, live sharing and cross-domain edits.
+
+For scenes, either a clip or a live entity can have several appearances with
+independent occurrence geometry and local selection. Semantic content ordering
+and containment remain distinct from the arrangement and projected geometry.
+Showing, selecting, retaining background membership or moving an appearance
+does not itself capture content or change source ownership. A capture is an
+explicit operation creating a clip with lineage; it is distinct from a live
+source and from the scene face that depicts it.
+
+Inspect, open, play, edit and apply refer to different capabilities and owners.
+A disclosed live view names freshness and availability; a retained clip does
+not implicitly supply live operations. Scene realization and dynamics consume
+declared source and occurrence contracts, preserving unsupported-capability
+refusals. This direction adds no universal document representation, renderer
+or script authority. Genet's document behavior, the existing field/editor
+checkpoints and the B1/S2 consumer gates retain their owners and scope.

@@ -323,3 +323,167 @@ Use the existing named homes rather than a duplicate synthesis document.
 Checked the four updated index entries against their owners; all previous
 unrelated index lines are preserved. Whole-tree pre-existing audit failures
 remain outside this pass.
+
+
+**Scoped Forme draft adapter (2026-10-10):** Mark explicitly selected its
+implementation in the design-language chat after the initial bridge was
+published. The editor plan's new Progress entry and the portable Graphshell
+qualification JSON record 28 native checks and product/default/viewer wasm
+checks plus compact release packaging. The root brief and index now identify
+that bounded adapter as implemented, with headed qualification pending; other
+hosts and general field/editor work retain their own gates. No browser receipt
+is inferred. Complete D2 JSON was compared with an archive of committed main
+`4f70d536` and is identical: 252/259 coverage, the seven missing records,
+duplicate README basenames and aggregate-digest mismatch are pre-existing.
+No active Markdown document or unknown audit record was added.
+
+**Access/Resource inspection draft (2026-10-10):** Mark approved the candidate
+sequence. The first adapter now has a read-only portable model, local retained
+inspector, observation fields and a pending host scenario. The editor plan and
+canonical index distinguish this implementation draft from the remaining
+primitive editors. Six actual-source native model tests and the product wasm
+check pass under the existing memory limits; source hashes and exact check
+scope live in the portable qualification JSON. No browser receipt or other
+agent's review is inferred. Full citation and D2 audit JSON match the pre-edit
+baseline, retaining 252/259 coverage and nine existing D2 errors. New local
+links resolve and whitespace checks pass. No active document was added.
+
+**Implementation-draft delivery (2026-10-10):** Mark authorizes direct-main
+implementation drafts for other machines to review, test and improve. The
+editor plan ranks bounded candidates against existing Resource/relation/field
+reads and the declarative presentation resolver; the index preserves the
+working agreement. Candidate scope and actual implementation/qualification
+remain distinct. No source, host test or agent dispatch is claimed by this
+documentation pass. Citation and D2 audit JSON retain their pre-edit baseline;
+no active document or supplemental judgment identity was added.
+
+**Planning and test handoff (2026-10-10):** Mark assigned continued planning to
+this machine while agents on O-PC, the ThinkPad or the Macs test. Source checked
+at published `69f17908`: Resource association/access reads, stratum-preserving
+projected relations, exact semantic-statement lookup and attribution, roster
+subjects, field/coupling reads and graph deltas, the product route and scenario
+loader. The editor plan stages exact-owner inspection before mutation and owns
+the portable four-run Forme qualification handoff; the field plan stages
+individual field/coupling inspection and reconciles its old draft status.
+The index links both and records the portable-qualification working principle.
+No new runtime track, storage/composition ruling, external message or browser
+pass is inferred. Full citation-audit and D2 JSON match their pre-edit baselines;
+D2 retains 252/259 coverage and its nine existing errors. Whitespace checks
+pass. No active document or unknown audit record was added.
+
+
+**Forme review fixes (2026-10-11):** Mark authorized source fixes and further
+inspection. The shared matcher now preserves repeated occurrence IDs without
+merging them and avoids overwriting rebound nodes. The Graphshell adapter
+rejects collapsed projected regions and divider-share arity mismatches; its
+reading tiles follow shared Resource tags. Six new regressions failed on the
+prior source, then passed after the fixes; native qualification includes 120
+Forme library cases and 19 workspace/session cases; the product Wasm host check
+also passes. The new session regression
+checks refusal without losing draft state or saved undo bytes. The owning plan
+and index link the portable source-hashed qualification record and retain the
+browser handoff. Complete citation and D2 audit JSON match the pre-edit baseline;
+D2 retains 252/259 coverage and its eight existing errors. New local links resolve
+and whitespace checks pass. No active document or unknown audit record was added.
+
+The primary checkout's citation report differs from the isolated worktree
+because sibling paths resolve relative to the checkout parent. A read-only
+comparison substituting the pre-edit Git documents on that same primary
+filesystem confirms unchanged citation and D2 findings there as well.
+
+
+**Link/assertion inspector draft (2026-10-11):** Mark's direct-main draft
+sequence now includes held-link expansion and exact assertion inspection in the
+local Graphshell product. Access UUID pairs retain displayed direction and
+owning stratum/source endpoints; statement handles resolve their held owner
+after access rebinding and never fall back to a same-predicate replacement.
+Non-statement family data stays data, including session arrangement and
+traversal sidecars. The owning editor plan and index disclose the access-list
+entry path, deferred direct-link/roster and derived-rule adapters, and pending
+headed scenarios. Nine actual-source native model tests and the product wasm
+check pass under the existing memory limits; the source-hashed qualification
+JSON records their scope. No browser receipt, primitive write or other-agent
+review is inferred. Complete citation and D2 JSON match this worktree's pre-edit
+baseline, retaining 252/259 coverage and nine existing D2 errors. Added local
+links and whitespace checks pass. No active document or judgment identity was
+added.
+
+The draft was then rebased onto primary-model reconciliation `3d21c352`, whose
+changes are documentation only. Qualified runtime/scenario source hashes remain
+unchanged. A read-only audit comparison substituting that published main's
+three edited documents on this same filesystem matches the final citation and
+D2 reports, with the same 252/259 coverage and nine existing errors.
+
+
+**Forme browser qualification (2026-10-11):** Mark authorized the four-page
+retained-origin run. Two fixture errors were corrected, tile controls gained
+specific accessible names, graph controls moved above workbench tiles and waits
+now include Forme persistence while excluding hidden-canvas motion. Failed
+attempts remain as evidence. At `c33534bf` all four Chrome cases pass, with nine
+reviewed captures; the source-hashed receipt and owning plan distinguish that
+functional dev-build qualification from Firefox's controller block, physical
+input, release performance and preview-feedback design. Product build and
+viewer-only Wasm check pass. Upstream link inspection was integrated with a
+separate product Wasm check; its new source does not inherit the browser pass.
+No active Markdown document or judgment identity was added by this lane.
+
+Complete citation and D2 reports are unchanged in a controlled before/after
+comparison on the current primary filesystem. Only this lane's three document
+edits are substituted; concurrent Fleece edits stay fixed. That shared snapshot
+has 252/260 D2 coverage and nine errors, including the concurrent new plan.
+Whitespace checks pass; browser JSON receipt hashes use portable LF content.
+
+
+**Field/coupling inspection draft (2026-10-11):** Mark's direct-main draft
+authorization continues with an exact-owner read model, retained field roster,
+individually identified couplings, deterministic all-candidate rectangular region
+discovery and independent Forme arrangement-owner reads. Hidden boundaries do
+not disable couplings; selector matches, extent hits and measured effects stay
+distinct. The opt-in fixture has its own browser store and never reseeds an
+existing graph. Ten actual-source native checks, including app MemoryBackend
+persist/reopen, and the integrated product wasm check pass under the established
+memory limits. Published `d5f60e5c`'s content/custody/dependency changes and the earlier Forme
+control/save-wait fixes and Chrome receipt are retained; that receipt does not
+qualify this new inspector. The field owner carries the two-page fixture handoff and explicit interaction,
+startup/rebuild lifecycle and exact-coupling write gates. No field browser run,
+capture or other agent review is inferred. Full citation and D2 audit JSON equal
+the integrated main pre-edit baseline, retaining 252/260 coverage and ten
+existing D2 errors. Added local links and anchors resolve; whitespace checks
+pass. No active Markdown document or parser-shaped audit record was added.
+
+
+**Declarative rule editor draft (2026-10-11):** Mark authorized continuing the
+published draft sequence and requested an upstream adoption check. Current main
+`a1acb6b9` retains the Forme Chrome fixes/qualification, newer render-stack
+releases and documentation repairs; the repeated fetch found no subsequent
+field/rule implementation to reconcile. The retained rule editor reuses
+Scenograph's declarative model with editable target/condition/effect rows,
+private draft undo/discard, disclosed context decision traces and acknowledged
+saved undo/redo. An atomic backend transaction refuses stale workspace saves;
+no graph/source/content/selection/Forme state enters its snapshots. Preview
+samples remain explicit and canvas effect/live-input adoption stays open.
+Nine actual-source native tests pass through the committed standalone harness,
+and the locked product wasm check passes under the S-PC memory cap. Two
+retained-origin scenarios/captures are prepared but not run here. The owning
+plan records actual IndexedDB, focus/narrow input, theme, conflict/failure,
+record/transaction costs and live renderer adapter gates. Citation and D2 audit
+JSON equal this pass's integrated-main pre-edit baseline: 260/261 D2 coverage,
+two existing errors (snapshot digest and the producer receipt's missing record).
+No active document, judgment identity or claim aggregate was added or changed.
+
+
+**Exact-occurrence presentation continuation (2026-10-11):** Mark's direct-main
+draft authorization continues from published `e56f7a3f`. Current access, exact
+assertion/displayed-pair, Numen and Forme bindings disclose their held facts and
+available state; unknown negated state/measurement cannot become a spurious
+match. Retained preview targets never retarget through selection or equal
+addresses. Saved-rule opt-in realizes Forme subdivisions only, with acknowledged
+history and unsupported effects explained. The source-hashed receipt records
+31 actual-source portable tests and the locked product wasm check passing;
+Canvas native execution and the two-page/four-capture headed handoff remain
+open. No later upstream adoption was found at delivery review. No active
+Markdown or parser-shaped judgment record is added or altered by this lane.
+
+Complete before/after citation and D2 JSON reports match the integration-base
+baseline: 260/261 D2 coverage and the same two existing errors. Whitespace checks
+pass. The remaining acceptance gates are recorded in the existing owner plan.

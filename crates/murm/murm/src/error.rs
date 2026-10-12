@@ -35,6 +35,10 @@ pub enum MurmError {
     #[error(transparent)]
     Causality(#[from] stickleback::CausalError),
 
+    /// The local author's retained tail is blocked on unavailable history.
+    #[error("local author head is causally incomplete")]
+    IncompleteAuthorHead,
+
     /// A key epoch was missing or installed out of order.
     #[error(transparent)]
     Keyring(#[from] crate::CabalKeyringError),

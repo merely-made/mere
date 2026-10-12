@@ -4,8 +4,7 @@ The durable-memory family covering raw bytes, append-only journals, the
 container graph, semantic projection, the typed memory lane, and its backends.
 
 **This directory is the portable core.** `muniment`, `chartulary`,
-`hagiograph` and eidetic's `fjall`, `https-fetcher` and `iroh-fetcher`
-features reach nothing that is
+`hagiograph` and Eidetic's typed content model reach nothing that is
 specific to the Mere product. Seven repositories outside this one already
 consume `chartulary` and `muniment` on that basis.
 
@@ -33,7 +32,7 @@ Published under their own names. Formerly four sibling repos, merged into one
 
 | Directory | Package | Contents |
 |---|---|---|
-| [`muniment`](muniment) | `muniment` | The storage floor: host-supplied backends, mutable typed slots, immutable content-addressed blobs, and `Journal<T>` append-only histories addressed by `Seq`. Ships memory, redb, zip, and IndexedDB backends. |
+| [`muniment`](muniment) | `muniment` | The storage floor: host-supplied backends, mutable typed slots, immutable content-addressed blobs, and `Journal<T>` append-only histories addressed by `Seq`. Ships memory, redb, Fjall, zip, and IndexedDB backends. |
 | [`chartulary`](chartulary) | `chartulary` | The content-addressed container graph. `Graph<N, E>` on petgraph with capability traits, default `Container`/`Relation` payloads, the `GraphLog` edit spine, runtime `facet` metadata, `content_class`, the `stemma` lineage layer, and the semantic-ring RDF projection at `chartulary::rdf`. |
 
 ## The eidetic lane
@@ -46,7 +45,7 @@ names; `mere-eidetic` stays frozen at 0.0.2 on crates.io. Each sets a
 
 | Directory | Package | Lib name | Contents |
 |---|---|---|---|
-| [`eidetic-core`](eidetic-core) | `eidetic` | `eidetic` | Manifests, typed payloads, schemas, codicils, bundles, packs, sealing, browsing traces, model artifacts. `Store` is an alias for `muniment::Backend`. `FjallStore`, the production-default native backend, sits behind feature `fjall`; `HttpsFetcher` and `IrohFetcher`, the `BlobFetcher`s for `BlobSource::Https` and `BlobSource::Iroh`, sit behind features `https-fetcher` and `iroh-fetcher`. |
+| [`eidetic-core`](eidetic-core) | `eidetic` | `eidetic` | Manifests, typed payloads, schemas, codicils, bundles, packs, sealing, browsing traces, model artifacts. `Store` is an alias for `muniment::Backend`; `BlobFetcher` is the injected acquisition contract, and `resolve_blob` verifies content identity. Concrete Fjall storage lives in Muniment; HTTPS/Iroh fetchers live in Mere Fetch. |
 
 ## Design docs
 

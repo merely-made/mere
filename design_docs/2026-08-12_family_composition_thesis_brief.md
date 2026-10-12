@@ -3,7 +3,8 @@
 **Date:** 2026-08-12
 **Kind:** research brief digesting a chat chain (Mark's framing prompt + assistant
 response, 2026-08-12); analysis, terminology alignment, and system-shape prior
-art added here. Extended 2026-09-08 with stack-pillar research lanes (§7).
+art added here. Extended 2026-09-08 with stack-pillar research lanes (§7), and
+2026-10-11 with the primary data model, clips and live entities (§8).
 Research includes initial model and Rust arena experiments; full consumer experiments and
 implementation promotion remain open (see §7's experiment results).
 **Anchors:** [application prospects brief](2026-07-24_application_prospects_brief.md)
@@ -206,7 +207,7 @@ the data, and how applications compose over it. One lesson each.
 
 | System | Decomposition | Lesson for this thesis |
 |---|---|---|
-| **Solid** (pods) | One user-owned pod; apps are views requesting access | The inverse split. A universal personal store pushes cross-app schema agreement onto every app pair, and the app ecosystem never came. Mere's per-app authority avoids the shared-schema tax; the projection contract, not a shared store, is the interop surface. |
+| **Solid** (storages/pods) | Controlled resource storages; an app can read and write across more than one storage; RDF descriptions accompany media-typed resources | **Corrected 2026-10-11:** the [Solid Protocol](https://solidproject.org/TR/protocol) does not mandate one pod or a universal application schema. Shared meaning still requires compatible vocabularies or adapters, as it does in Mere. Compare domain authority, local operation, carrier contracts and composition rather than infer a schema requirement from linked data. The earlier adoption claim was unsupported by this survey. |
 | **AT Protocol** (PDS repos) | One signed repo per *user*; apps are lexicon-namespaced collections inside it; portable DID identity | The nearest modern analog, mirrored: atproto = one datalake per person, apps as namespaces; mere = one datalake per app, personae across. Lexicons are its projection-contract analog. Validates identity-crosses-apps; hosting stays server-shaped. |
 | **Sandstorm** (grains + Powerbox) | Per-instance app data ownership; user-mediated capability picker brokers all cross-app access | Per-app ownership plus consent-brokered composition worked; packaging a whole SPA per grain made composition heavy. The Powerbox is the ancestor of "only the resident asks for consent" (castellan's anti-spoofing rule). Keep the embeddable unit a *scene*, not an app. |
 | **Plan 9** | Every program a file server; one tiny protocol (9P); per-process namespace composition | The cleanest ancestor of "every app exposes projections over a common contract." Composition was free because the contract was minimal and uniform. Sceno scenes + typed intents are the family's 9P; contract growth is the thing to resist. |
@@ -325,7 +326,7 @@ baseline rather than a reproducible test receipt. Repin before experiments.
 - Genet `components/shared/document-session-api/src/session_engine.rs` keeps
   sessions single-owner and host-driven. `pump(now_ms)` and `settled()` expose
   driving and quiescence, without a deadline or an external-wake contract.
-  `ports/ortet/src/shell.rs` currently redraws while unsettled.
+  `genet/ports/ortet/src/shell.rs` currently redraws while unsettled.
 - Genet `components/script-runtime-api/lib.rs` already exposes timer delay,
   worker work/pumping and worker shutdown. In the inspected
   `components/genet-scripted/document.rs`, the Livery pump advances timers,
@@ -334,9 +335,9 @@ baseline rather than a reproducible test receipt. Repin before experiments.
   evidence that worker support is absent from the runtime.
 - Genet `components/genet-render-host/src/lib.rs` and Netrender
   `netrender/src/renderer/init.rs` already place device creation with the
-  embedder. Isometry `crates/isometry-runtime/src/render.rs` owns its tenant
+  embedder. Isometry `crates/isometry-runtime/src/render.rs` *(historical citation)* <!-- doc-audit: historical-path --> owns its tenant
   and stale-view refusal. Mesocosm
-  `crates/mesocosm-core/src/voxel_profile.rs` gates disposable derived state
+  `repos/isometry/mesocosm/crates/mesocosm-runtime/src/voxel_profile.rs` gates disposable derived state
   against durable source revisions. These challenge lifetime assumptions
   without requiring the same clock or a universal resource lease.
 
@@ -394,7 +395,7 @@ Evidence homes are Genet `components/genet-scripted-dom/lib.rs`,
 `crates/eidetic/muniment/src/blob.rs`,
 `crates/eidetic/eidetic-core/src/deleted.rs` and `schema.rs`; Turnstone
 `src/action.rs` and
-`design_docs/2026-09-05_reader_appearance_isolation_plan.md`.
+`repos/turnstone/design_docs/2026-09-05_reader_appearance_isolation_plan.md`.
 
 Genet's current arena fence is enabled only on 64-bit debug builds. Release
 and wasm need an explicit refusal/translation contract for foreign handles.
@@ -417,7 +418,7 @@ preserves required DOM identity and references; it cannot simply reinterpret
 a raw id in another arena. A globally shared arena is not required by either
 design.
 
-Turnstone's `design_docs/2026-08-28_page_capture_plan.md` already scopes P2/P3:
+Turnstone's `repos/turnstone/design_docs/2026-08-28_page_capture_plan.md` already scopes P2/P3:
 freeze the session, durable node, document/navigation generation and
 surface/request correlation at capture start; attach to that exact target or
 refuse a stale completion. Engine results supply observed facts. The domain
@@ -601,7 +602,7 @@ Existing owner plans remain the implementation homes.
 | S4 | Genet G5 handle implementation | Implement the selected boundary, with foreign/stale refusal and exhaustion tests through the supported backends and compiled target configurations; retain a separate wasm residual if it is not executed | Open: discard unused parallel-handle sketch; migrate approximately 70 runtime conversions coherently with semantic NodeId, high-bit engine and wasm execution gates |
 | S5 | Genet runtime worker delivery | Run actual runtime message/timer/completion and shutdown assertions, including duplicate/stale cases, with a named regression manifest and isolated build provenance | Real Boa Runtime probe passes with pinned overlay: timer-only negative, worker-pump delivery and acknowledged idle; Genet S2/S5 backend receipt checked in; shutdown, stale and duplicate runtime cases remain open |
 | S6 | Genet session drive contract | Expose the selected minimal runnable/deadline/external facts and lossless wake/cancellation protocol through a real retained session; test completion during registration and replacement | S6a committed `790ba660396`: worker forwarding and retained loader implemented; 2 actual Boa document tests pass (reply/reaction, freeze/resume, missing-route error and idle), preforward negative fails; automatic session-loader wiring, Livery/Nova and additive wake/drive gates remain open |
-| S7 | Genet Ortet O5 integration | Wire native host wake and replacement to the real scripted session and obtain explicit Boa/Nova host receipts; automated conformance remains with genet-wpt | Native O5 hosting for Boa and Nova accepted 2026-09-08 (`genet/design_docs/2026-09-03_ortet_founding_plan.md`). G5 headed arena sequence accepted on both engines 2026-09-09 on branch `slice/s7-ortet-g5-20260909` (`genet/design_docs/receipts/2026-09-09_g5_ortet/receipt.md`); found and fixed Boa `force_gc` never calling `clear_kept_objects`; residual: page-level `WeakRef` over a DOM reflector never reports collection under Boa, folded into the realms lane. Merge into genet main waits on the realms continuation committing. AccessKit bridge-action receipt still open |
+| S7 | Genet Ortet O5 integration | Wire native host wake and replacement to the real scripted session and obtain explicit Boa/Nova host receipts; automated conformance remains with genet-wpt | Native O5 hosting for Boa and Nova accepted 2026-09-08 (`genet/design_docs/2026-09-03_ortet_founding_plan.md`). G5 headed arena sequence accepted on both engines 2026-09-09 on branch `slice/s7-ortet-g5-20260909` (`genet/design_docs/receipts/2026-09-09_g5_ortet/receipt.md` *(historical citation)* <!-- doc-audit: historical-path -->); found and fixed Boa `force_gc` never calling `clear_kept_objects`; residual: page-level `WeakRef` over a DOM reflector never reports collection under Boa, folded into the realms lane. Merge into genet main waits on the realms continuation committing. AccessKit bridge-action receipt still open |
 | S8 | Host visibility and resource disposal | Exercise real hidden/suspended/resumed session behavior and product-owned resource removal/stale-revision refusal; record policy ownership and any required local correction | Cambium native invalidation committed `fe2e24e9`; independent source reviews and diff check pass, actual GPU suspend/resume remains open |
 | S9 | Turnstone capture correlation | Integrate exact target and nonreused request identity into the actual capture path, with stale/duplicate/unsupported refusal; keep envelope and pixel-storage acceptance explicit | Committed `c5f991e`: action-to-host correlation, replacement-id alias and bulk teardown corrections; 5 production-module tests plus external Inker sanity pass, no-default library check passes. Weld adapter compile is blocked before Turnstone by pinned Welding/current local Grafting API mismatch; headed pixels and durable deposit remain open. 2026-09-09: the Weld blocker was Turnstone drift, not the pin; the adapter had been uncompiled since the P1 contract landed. Migrated to welding/grafting heads and merged to turnstone main; hosted capture returns `Unsupported` until Inker's `WeldSurface` grows a capture hook (P2), the S9 Weld-side wiring was deleted and will be reimplemented then. Mark ruled Chromium's process sandbox the default: turnstone `436e087` adds the Windows bootstrap client-DLL route (`sandbox_bootstrap_win` crate, `RunWinMain`), `Sandboxed` by default when launched through CEF's bootstrap and `UnsandboxedTrustedContent` on the direct executable route, with `TURNSTONE_WELD_SANDBOX` as an explicit override that refuses unsupported combinations; a headed sandboxed boot succeeded on a local CEF 151.3.24 bundle (`turnstone/design_docs/2026-08-03_turnstone_engine_adoption_plan.md`) |
 | S10 | Turnstone/Mere custody lifecycle | Integrate owner-specific references and a serialized/transactional transfer/collection boundary with recovery and disclosure policy, including same-kind multiple owners and stale collection proposals | Actual Muniment/redb probe: 3 pass, including reopen and stale-delete negative control; production writer/envelope integration remains open. 2026-09-09 ruling: a transactional read-then-write method on Muniment's `Backend` trait (redb and IndexedDB honor it, zip refuses); pricing in the orchestration scratch report, implementation lane launched 2026-09-09: `Backend::transact` landed on `slice/s10-custody-20260909` (`9ba9f790`) — honest for redb (one write transaction), memory (single mutex), and IndexedDB (one Readwrite transaction, wasm32 offline check-compiles); zip and the trait default both refuse with a typed `StoreError::NotTransactional`. The probe's scenarios pass as positive controls against the real backends (59 tests total); the apply-alone negative control is retained as a documented regression. Verified, not just read from source: redb's Windows `LockFile` is cross-process, held for the `Database` handle's whole lifetime (`design_docs/mere_docs/testing/receipts/2026-09-09_s10_custody_transact_receipt.md`). Turnstone wiring and process-kill recovery remain open |
@@ -715,7 +716,7 @@ API/contract) and `components/script-runtime-api` (worker mechanism);
 `genet/design_docs/2026-09-07_worker_plan.md` (dedicated-worker
 implementation, landed `6155c8ab4ff`).
 
-**Consumers:** `ports/ortet/src/shell.rs` (drives `pump`/`settled` before
+**Consumers:** `genet/ports/ortet/src/shell.rs` (drives `pump`/`settled` before
 redraw); `components/genet-scripted/document.rs` scripted-document routes.
 
 **Failure tests (exist):**
@@ -881,6 +882,319 @@ wake is sufficient; a desire to found another platform crate is not. Reconcile
 concurrent edits before promoting a slice, and record research-only, compiled,
 runtime and headed outcomes separately. The scope permits progression through
 the sequence without a new approval for each routine slice.
+
+## 8. Primary data model, clips and live entities (2026-10-11)
+
+### Accepted direction
+
+Mark, after the document-graph discussion and its critical review:
+
+> yeah, primary data model, not one universal representation. clips are the
+> portable content units, but live entities belong too.
+
+The graph is the primary model through which Mere applications identify,
+relate, retain, query, share and act on their data. A content or document graph
+is a crucial dimension of that model, alongside live entities, activities and
+arrangements. Graph structure carries meaningful relationships; it does not
+require every byte, document element, event or simulation value to become a
+separate graph node.
+
+The unit remains **one mere per data domain**, as ruled on 2026-09-23. Several
+applications can work in one mere; one application can work across meres.
+An identity's meres form its reservoir. An application adapter exposes the
+domain's identities, relationships, disclosed state and named operations
+without replacing its authoritative document, media, game or device model.
+Content principally authored and manipulated in graph scope may have native
+graph structure. Foreign content keeps the structure its own renderer or
+domain requires. These are compatible uses of the primary model.
+
+This section is the canonical home for that direction. The
+[scene record](2026-08-23_projection_scenes_and_graph_native_platform.md#916-primary-model-portable-clips-and-live-entities-2026-10-11),
+[statement stance](mere_docs/technical_architecture/2026-05-22_statements_over_schema_stance.md)
+and [composition spine](mere_docs/technical_architecture/2026-05-21_mere_composition_spine.md)
+apply it at their respective seams.
+
+### Clips, live entities and appearances
+
+A **clip** is content made into a portable unit by meaningful selection,
+capture or export. The boundary is what a person can usefully take and share:
+a selected passage, whole document, screenshot, recording, or supported
+structured-data export. It need not be the smallest grammatical or semantic
+part. A gameplay clip can contain video and a meaningful description; a game
+can also export structured state when its domain defines a useful portable
+form. Capturing gameplay does not require atomizing the game's simulation.
+
+A clip can be compound and internally structured. Text, images, time ranges,
+tables, semantic descriptions and source anchors can describe one clip without
+each becoming an independent graph entity. Creating a separately shareable
+subclip is an explicit operation, with its own identity and lineage. A
+selector into a clip is not automatically another node.
+
+A **live entity** has domain identity and operations before, and independently
+of, any capture: an authored object, field, device, active session or shared
+activity, for example. A disclosed view of one is not automatically a portable
+copy. A clip can refer to a live entity or capture some of its state; the
+capture has its own identity and does not inherit the source's operational
+authority. Captured content and a live source may coexist in the graph.
+
+These are roles rather than disjoint node types. An editable clip can also
+have live authoring state; its captured version and its current operations
+must be distinguishable. Domain identities retain their own contracts: the
+browser's canonical-URL Resource binding does not require every field or
+device to adopt that same identity scheme.
+
+An **appearance** is a projected occurrence of either kind. Multiple
+appearances can reference the same source, with separate positions, selection
+and local view state. Showing, selecting or moving an appearance does not
+create a clip, clone its source or transfer ownership. The resource identity,
+access identity and occurrence identity remain distinct.
+
+### What the common model governs
+
+| Concern | Shared meaning and owner |
+|---|---|
+| Identity and relationships | Domain identities and attributed assertions connect content and entities. Source, capture, revision and occurrence are distinguishable. Two equal payloads need not be the same clip or have the same provenance. |
+| Content structure | Ordering, containment, references and selectors may be meaningful content. Their interpretation belongs to the named domain or format. They are distinct from an appearance's current coordinates or layout. |
+| Arrangement and projection | An arrangement can itself be authored and shared graph data. Its authority governs edits; projection produces its present geometry and appearances. Per-view focus, camera and transient state keep their declared scope. |
+| Dynamics | Declared forces, constraints, event responses and scripts operate on named targets through owned interfaces. Focus, synchronization and every state change do not become physics by being represented in the graph. |
+| Governance | Owners, attributed writes, grants, petitions, disclosure and retention give relationships operational consequences. Graph connectivity alone grants neither read nor write nor execution rights. |
+| Transport | Carriers move disclosed data and permitted requests. Transport independence preserves these contracts while exposing availability, latency, ordering and other carrier limits. Connectivity is not authorization. |
+
+This is Mere's architectural answer for the family, rather than a claim that
+all decentralized applications require graphs. It makes participation and
+cross-application composition addressable without dictating one domain schema,
+one renderer, one process or one user interface. Genet still owns document and
+web-platform behavior, including the long-term standards-compliance work;
+Mere's graph model does not replace those semantics. A unified GPU device is a
+composition direction, not evidence that every source is already rendered in
+one display list.
+
+### Open questions: proposed policies and remaining decisions
+
+The accepted direction above settles the model and its units. The following
+are concrete recommendations for the unresolved lifecycle and interoperability
+questions. They are **proposals pending ruling**, not new editor rulings or
+claims of implemented platform contracts.
+
+1. **Captured evidence and subsequent editing.** Preserve the captured version
+   and its available source/revision provenance. Make edits explicit revisions
+   or derivatives, and keep annotations attributable to their own author.
+   An editable note can remain editable; presenting it as captured evidence
+   should identify which retained version supports that presentation. A live
+   reference is labelled as live, with freshness and availability disclosed.
+   The remaining decision is whether every capture retains original material
+   by default, or retention is configurable with a visible consequence for
+   later verification. Knot can retain immutable source artifacts beside an
+   editable clip note; that specific path does not establish a family-wide
+   captured-version or default-retention policy.
+2. **Compound clips and addressable parts.** Give the portable clip an identity
+   and describe its payload roles, media/schema versions and source anchors.
+   Parts can be addressed within it; promote a part to a separate clip when a
+   user takes it independently. The remaining decision is the first concrete
+   compound profile and which payloads it promises to carry. Retained bytes,
+   external references and unresolved dependencies must be distinguishable.
+   Content hashes identify bytes, not authorship, entity identity or rights.
+   A portable reference is not a guarantee that its content is available offline.
+3. **Sharing a live entity.** Distinguish sharing a captured snapshot, sharing
+   a disclosed view and granting permission to act on the live source. Name the
+   owner, observed revision or time, supported operations and offline behavior.
+   When disconnected, show retained state with its freshness; refuse operations
+   that require the owner unless that domain explicitly supports queued writes.
+   Cloning material creates a new owned entity with lineage rather than silently
+   claiming the source's live identity. The remaining decision is which live
+   domain supplies the first shared-operation and reconnect contract.
+4. **Cross-domain edits and semantic portability.** Preserve unfamiliar content
+   and schema identifiers without claiming to understand or execute them.
+   Recognized adapters can expose inspect, annotate, reclip, open, play, edit or
+   apply as separate operations, subject to their actual capabilities and
+   grants. Route changes to the named owner; an annotation in one domain need
+   not mutate its source in another. A compound edit is atomic only when an
+   owner supplies that contract; otherwise show the separate applies and
+   failures. The remaining decision is the first edit adapter, including its
+   conflict, undo and failure semantics. Common graph structure supplies no
+   universal merge or distributed undo guarantee.
+
+The distinction is **portable material, interpretable meaning and authorized
+behavior**. A receiver may retain and show a clip without supporting its
+structured data or being able to operate its live source. Scripts carried as
+content remain inert until an authorized runtime admits them. Missing or
+unsupported capability must be visible; a generic appearance is not a promise
+of equivalent behavior in every application.
+
+### Current evidence and a forcing consumer
+
+Source inspection on 2026-10-11 supports the bounded seams, rather than a
+completed general clip system:
+
+- [`Container`](../crates/eidetic/chartulary/src/container.rs) separates identity,
+  addresses and content references, permits inline authored text and nested
+  graph references. Payloads can remain outside the graph's individual nodes.
+- [`Graph`](../crates/graph/graph-kernel/src/graph/mod.rs) holds resource and
+  surface graphs with explicit shown-resource bindings.
+  [`SourceRef` and scene instances](../crates/cambium/scenes/sceno/src/scene.rs)
+  distinguish source identity from projected occurrences.
+- [`write_clip_node`](../crates/mere/src/clip.rs) records a caller-formatted clip
+  and asserts resource `ClippedFrom` provenance. Semantic clip lowering belongs
+  to [Fleece](../crates/fleece/src/clip.rs); the receiving document owns formatting.
+  Image storage remains caller-owned. This does not establish the proposed
+  captured-version policy or a general compound media package.
+- Fleece (`genet/components/fleece/README.md` and
+  `genet/components/fleece/src/lib.rs`) extracts document
+  content from a caller-supplied DOM and provides versioned canonical-text
+  anchors. Capture, media recording, source identity, storage and disclosure
+  remain with the caller and domain owners. Extraction alone is not portability.
+
+A useful next research proof would take a document clip and a gameplay media
+clip, with an optional domain-defined data export, through a second application.
+It should retain, inspect, annotate, reclip and reopen the portable material;
+preserve unfamiliar payloads and schema identifiers; distinguish source,
+capture and occurrence identities; and disclose an unavailable live owner.
+An unsupported action must leave the source untouched. A captured scene face
+must remain distinct from the live entity it describes. This is a candidate
+consumer proof, not a claim that a game exporter or portable package exists.
+
+Promote only the shared contract that heterogeneous consumers actually require,
+with a named owner, identity and lifetime, capability/refusal behavior and a
+receipt. Wire formats, storage migrations and generalized entity APIs stay in
+their owner-specific plans. This reconciliation opens no implementation lane:
+the field/editor checkpoints, B1/S2 consumer gates, coordinator review and F199
+pause retain their existing meaning.
+
+### Research review: logical model and usable sharing (2026-10-11)
+
+The closest internal predecessor is the
+[2026-07-08 unifying-graph vision](mere_docs/technical_architecture/2026-07-08_mere_as_the_unifying_graph.md):
+heterogeneous app data becomes a legible pool through graph relationships.
+The [generic substrate plan](mere_docs/technical_architecture/2026-07-08_generic_graph_substrate_plan.md)
+separates stable identity from optional content, address and graph capabilities.
+The [2026-09-02 composition assessment](mere_docs/research/2026-09-02_port_gui_composition_and_comparable_stacks_brief.md#4-the-crux-deterministic-domain-aware-projections-out-of-app-pattern-data)
+adds purposeful, domain-aware projections and typed intents. These are earlier
+forms of this direction, with dated mechanisms and different levels of proof.
+
+External research provides useful tests of the model:
+
+- [iDM/iMeMex (Dittrich and Vaz Salles, VLDB 2006)](https://www.vldb.org/conf/2006/p367-dittrich.pdf)
+  models heterogeneous personal data, including file contents and streams, as
+  a logical graph of resource views. Components can be computed on demand;
+  the logical model does not require prior materialization. **Reading for
+  Mere:** expose useful structure without requiring wholesale conversion of
+  each domain. Queryable structure and a retained portable clip have different
+  lifetimes; the latter needs an explicit capture/export contract.
+- [Dataspaces (Franklin, Halevy and Maier, 2005)](https://sigmodrecord.org/?download_id=4825&smd_process_download=1)
+  combines autonomous, heterogeneous participants with differing query and
+  update capabilities. Integration becomes more precise where its benefit
+  warrants the work. **Reading for Mere:** common graph structure can connect
+  sources before complete semantic integration; disclose gaps and capabilities
+  instead of presenting a shared identifier as shared understanding.
+- [Web Annotation](https://www.w3.org/TR/annotation-model/#specific-resources)
+  distinguishes a source resource, a selector for its relevant part, and state
+  identifying the appropriate representation. **Reading for Mere:** preserve
+  the distinction between a live target and an observed version. This is a
+  useful anchor vocabulary; it does not supply a self-contained clip package
+  or permission to operate the source.
+- [Solid Protocol](https://solidproject.org/TR/protocol) describes apps using
+  one or more controlled storages and media-typed resources with RDF metadata.
+  It does not impose a universal application schema. The older Solid rows here
+  and in the composition assessment have been corrected. A common graph model
+  and common domain schemas are separate architectural choices.
+
+The important engineering distinction is between **identifying material,
+interpreting it and acting on it**. Content hashes and predicate identifiers
+help with the first; agreed profiles or adapters supply the second; named
+owners and authorized operations supply the third. Graph-primary design must
+make those agreements concrete where an application promises interoperability.
+Optional feature traits are not permission grants, and exposing an appearance
+does not establish either semantic understanding or mutation authority. This
+review refines the rationale without adopting another system's node schema or
+changing the unresolved lifecycle policies above.
+
+### Shared semantic core: existing contracts and missing seams (2026-10-11)
+
+**Assessment:** the shared core already has most of its structural mechanisms.
+The missing work is agreement on a small content profile, source-owner adapters
+and heterogeneous consumer qualification. General graph identity, blob storage
+or another universal entity representation are not the first missing pieces.
+
+This is source inspection at Mere `8601f759`, Turnstone `1034fb6`, Knot Editor
+`4d8b81c`, Woodshed `9e4b372` and Cleromancy `ff3b1f5`. Product paths below are
+cross-repository citations. Concurrent Forme and Redshank scenario work is
+outside the review. Existing automated receipts are cited separately; this
+pass runs documentation checks and establishes no fresh runtime acceptance.
+
+#### What exists and what it establishes
+
+| Existing contract | Established boundary |
+|---|---|
+| [Chartulary capabilities](../crates/eidetic/chartulary/src/caps.rs), [reservoir index](../crates/system/pandect/src/reservoir.rs), [scene sources](../crates/cambium/scenes/sceno/src/scene.rs) | Stable domain/node identity, persona/domain-derived mere identity, and separate projected occurrence identity. These do not automatically resolve every foreign source to its current owner. |
+| [Eidetic manifests](../crates/eidetic/eidetic-core/src/manifest.rs), [bundles](../crates/eidetic/eidetic-core/src/bundle.rs), [portable content references](../crates/chirograph/src/titulus.rs) | Verified bytes, schema references, provenance/privacy metadata and composite members with required flags. Bundle member kinds remain domain vocabulary; required-member verification does not define a recursive clip export or retention policy. |
+| [Schema definitions](../crates/eidetic/eidetic-core/src/schema_def.rs), [opaque facets](../crates/eidetic/chartulary/src/facet.rs), [Fleece acquisition and annotation records](../crates/fleece/src/eidetic_bridge.rs) | Versioned interpretation seams, preservation of unfamiliar facet data, and bound source/capture/canonical-text/selector evidence. Validation is distinct from another app understanding a payload. |
+| [Chirograph](../crates/chirograph/src/lib.rs), [Pandect live-view records](../crates/system/pandect/src/live_view.rs) | Advertised actions, payload schemas, scene revision checks, explicit session states and source-owned live/historical cursors. A persisted reference or advertised action supplies no grant. |
+
+The [completed Fleece/Eidetic plan](archive_docs/2026-10-11_completed_plans/2026-10-11_fleece_eidetic_capability_plan.md)
+records authenticated annotation-plus-source transfer and receiver-only disk
+reopen, alongside native and wasm checks. Its transfer test constructs a
+[specific envelope](../crates/fleece/tests/eidetic_peer_transfer.rs) containing
+both manifests and both byte payloads. This proves that bounded path; it does
+not establish a family clip package or arbitrary dependency traversal. The
+recorded consumer pins qualify `5758724e`, before later Mere dependency work.
+
+#### Actual consumer paths
+
+- **Turnstone to Knot:** `turnstone/src/knot_authoring.rs` lowers a document
+  clip into the advertised `InsertKnotClipV2` action, with source/observed
+  artifacts, selectors and fidelity facts. Knot retains artifact references
+  through `knot-editor/crates/knot-editor/src/clip_evidence.rs` and authors the
+  editable note through its endpoint. That endpoint checks both the delivered
+  scene revision and the document's source `base_token`, with an injected write
+  grant. This is an existing cross-app document operation, not a missing intent
+  protocol or proof of general media support.
+- **Retained source documents:** `turnstone/src/trail_memory.rs` deposits exact
+  acquired bytes and a Fleece record as `LocalOnly`. Its captured-collection
+  adapter and [Moot projection](../ports/moot/src/captured_web.rs) consume
+  authority-filtered contributions, retain separate share/capture provenance,
+  and expose missing or unsupported records explicitly. The Fleece record
+  carries its canonical text, which may extend beyond the selected passage.
+  A selection boundary therefore cannot by itself determine what is disclosed.
+- **Timed media:** `woodshed/ports/redshank/model/src/lib.rs` exports shareable
+  text/audio annotations with media-fragment selectors. Its internal
+  representation receipts distinguish same, different and unproven copies;
+  local seek policy uses that evidence. The annotation export names an audio
+  body by its blob identifier and omits the internal representation receipt.
+  A receiver needs the corresponding bytes and a declared identity/seek
+  contract to reproduce those behaviors. Exported JSON alone supplies neither.
+- **Live authority:** `cleromancy/src/admitted.rs` exposes several endpoint
+  views over one durable app authority, forwarding typed intents under admitted
+  subjects. Knot likewise supplies live document operations. However, searches
+  of Mere and these four product source trees found only a fixture implementation
+  of `LiveViewSourceResolver`; `LiveViewReferenceGate` implementations in Mere
+  were fixtures/canaries. General persisted live-view reopening is an adapter
+  gap, distinct from the existing live endpoint paths.
+
+#### The bounded gaps
+
+| Missing seam | Concrete requirement and owner |
+|---|---|
+| Durable source resolution | Product adapters must map a retained domain/source reference to the current admitted owner and its current offers, with missing/denied/stale outcomes. Reuse Pandect/resident routing. A saved scene `InstanceId`, endpoint action or document base token must not become the durable identity of a live entity. |
+| A usable clip profile | Fleece gathering and domain exporters need one agreed profile over Eidetic's existing mechanisms: payload roles, stable part names/selectors, schema versions, lineage, and required versus optional material. Distinguish retained bytes, external references and unresolved dependencies. A selected note, a captured page and a media excerpt make different promises. |
+| Selector and meaning interoperability | Adapters must preserve each selector's representation and units. Fleece positions count Unicode code points in normalized DOM text; Knot quotation anchors can count UTF-8 source bytes; Redshank targets count media time. Define explicit supported mappings and refusals. Shared profiles can agree on source, part, annotation and derivative roles while leaving domain schemas specialized. |
+| Capture, disclosure and keeping policy | Session/custody owners must connect graph references to the package's required material, decide what is retained/released, and check disclosure for each exported part. A byte reference, transferable source kind or selected passage is not permission to share its enclosing document. Default original-material retention and the consequences of revocation remain policy decisions above. |
+| Live operations and outcomes | Each domain must supply source revision checks, admitted operations, conflict/failure behavior and reconnect semantics. Chirograph's scene revision is delivery state; Knot's additional base-token check is the concrete precedent. Queued writes, durable completion and undo need owner contracts rather than inference from an `Accepted` reply. |
+| Adoption and qualification | Hosts must advertise which profiles, selectors and operations they support, preserve unfamiliar material through the appropriate opaque path, and visibly refuse unavailable capabilities. Different current product pins require qualification; source availability on Mere main is not uniform consumer adoption. |
+
+**Recommended forcing proof, pending implementation choice:** use the existing
+Knot document lane and Redshank timed-media lane before requiring a game
+exporter. Retain a text clip and an audio annotation/excerpt through a second
+host, then reopen with their source app stopped. Verify required bytes, source
+and capture identities, exact selector units, opaque unsupported payloads and
+independently owned annotations. Exercise one already-supported owner edit,
+then a stale edit and denied operation; neither refusal may mutate the source.
+Restart the owner and resolve a fresh target instead of replaying saved scene
+handles. The media export must state whether it carries the excerpt or merely
+points to it. This is a proposed proof, not a claim that these flows all exist.
+
+The open questions above now concern concrete profiles and policies, not
+whether the stack needs foundational graph, bundle or action machinery. This
+review adds no crate, changes no lifecycle ruling and opens no paused lane.
 
 ## What this brief deliberately does not do
 

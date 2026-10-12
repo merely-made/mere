@@ -1,0 +1,25 @@
+{
+  "command": [
+    "python3",
+    "scripts/run_macos_scenario.py",
+    "--binary",
+    "/Users/markik/Code/targets/vello-producer-gates-20261011/debug/tabard-desktop",
+    "--prefix",
+    "TABARD",
+    "--scenario",
+    "ports/tabard/desktop/scenarios/release_presentation.scn",
+    "--output",
+    "/Users/markik/Code/output/vello-producer-gates-20261011/native-presentation-qualified",
+    "--timeout",
+    "60",
+    "--",
+    "--library",
+    "/Users/markik/Code/output/vello-producer-gates-20261011/native-isolated-library-qualified/themes.json"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-vello-release-adoption",
+  "deadline_seconds": 90,
+  "elapsed_seconds": 14.938,
+  "exit_code": 0,
+  "timed_out": false,
+  "log": "/Users/markik/Code/output/vello-producer-gates-20261011/checks/native-presentation-qualified.log"
+}
