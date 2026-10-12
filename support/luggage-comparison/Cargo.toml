@@ -1,0 +1,37 @@
+[package]
+name = "merely-release-comparison"
+version = "0.1.0"
+edition = "2021"
+publish = false
+license = "MPL-2.0"
+
+# Independent research fixture; does not change the family workspace lock.
+[workspace]
+
+[dependencies]
+luggage = { path = "../../crates/system/luggage" }
+velopack = "=1.2.161"
+minisign = "0.7"
+blake3 = "1"
+serde_json = "1"
+tempfile = "3"
+url = "2"
+base64 = "0.22"
+tough = { version = "=0.24.0", default-features = false, optional = true }
+tokio = { version = "1", features = ["rt", "fs"], optional = true }
+
+[features]
+tuf = ["dep:tough", "dep:tokio"]
+
+[[bin]]
+name = "merely-release-comparison"
+path = "src/main.rs"
+
+[[bin]]
+name = "tuf-comparison"
+path = "src/tuf.rs"
+required-features = ["tuf"]
+
+[profile.dev]
+debug = 0
+incremental = false
