@@ -24,6 +24,7 @@ pub mod library;
 pub mod portable;
 pub mod smolweb;
 pub mod theme;
+pub mod typography;
 pub mod workshop;
 
 pub use appearance::{

@@ -97,3 +97,5 @@ ports/graphshell/docs/receipts/relationship_dynamics_20261011/harness/** text eo
 ports/graphshell/docs/receipts/node_ladder_20261011/checks/*.log -text whitespace=-space-before-tab
 ports/graphshell/docs/receipts/node_ladder_20261011/qualification.json text eol=lf
 ports/graphshell/docs/receipts/node_ladder_20261011/harness/** text eol=lf
+
+support/receipts/font_roles_20261012/*.log -text whitespace=-blank-at-eof,-space-before-tab
