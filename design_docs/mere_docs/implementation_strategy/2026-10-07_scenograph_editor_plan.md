@@ -2070,3 +2070,135 @@ Its ten passing Chrome cases and eighteen reviewed captures remain bound to
 their named package cuts; the newer integrated source does not inherit those
 browser results. The temporary integration checkout preserves concurrent
 Dramatis packaging work in the primary checkout and is removed after delivery.
+
+
+#### Node ladder and inspector continuation draft (2026-10-11)
+
+**Status:** implemented bounded draft; portable native and product wasm checks
+passed; headed acceptance remains open. Mark requested “Both. Plus pull”,
+continuing relationship/dynamics inspection and the node presentation ladder.
+An explicit `git pull --ff-only origin main` reported the existing `04a48c2d`
+checkout up to date. During delivery, source and qualification work through
+`3162f302` was integrated, including exact coupling edits, browser/focus receipts
+and bounded assertion readback. The two append-only document conflicts were
+reconciled while preserving both lanes. Final Knot completion/refusal
+documentation `e6192a18` is also retained; runtime checks remain applicable.
+Delivery continues directly to main. No prior Forme,
+renderer or Knot receipt qualifies this new face/attribute consumer.
+
+The [node rule runtime](../../../ports/graphshell/src/node_presentation.rs)
+reuses the saved version-1 presentation rules and their disclosed occurrence
+contexts. **Add node ladder defaults** appends four editable rules to the
+private draft: ordinary Canvas face, compact Glyph at a 40/56 logical-pixel
+hysteresis band, selected ordinary face plus attributes, and the positional-pin
+face guard. Priorities are 0/10/20/30 respectively. Users can edit targets,
+conditions, values, thresholds and priorities before applying. The existing
+acknowledged Apply/Undo/Redo, stale-write refusal, bounds and private draft
+history remain the persistence contract. Adding defaults does not apply them.
+
+**Supported presentation:** saved-rule view opt-in now also drives node
+`Representation::Glyph` and `Card` through an independent
+[Canvas face layer](../../../crates/canvas/pictograph/src/canvas/node_presentation.rs).
+Glyph uses the existing terse icon/caption treatment; Card is the existing
+ordinary Canvas face, not a newly embedded content summary. The layer is keyed
+by exact access UUID, validates the current local view epoch atomically and
+leaves the analytic projection score intact. Whole graph replacement clears
+faces and increments that view epoch. Disabling rules, undoing to an empty set,
+leaving a scope lens or refusing a context returns to the base score/Canvas
+presentation. It never substitutes a shared Resource identity or URL.
+
+Face changes retain the existing resolved body dimensions, geometry, collision
+and placement owners. They do not restart dynamics, modify pins, change Forme
+holds/layout or replace tile/content sessions. Full content-card measurement,
+media/snapshot textures and interactive panes need their own renderer adapters.
+A winning Snapshot/Sprite/LivePane/open request is disclosed as unsupported by
+this rule consumer; no lower-priority representation is silently substituted.
+Other supported properties can still win independently. Existing legacy
+projection-score face treatments remain the base behavior.
+
+**Attributes and explanation:** `Details` controls a separate current-selection
+attribute lane in Graph tools. It shows held scalar facts for selected accesses,
+including label/address, MIME and recorded Resource metadata; complex values and
+tags remain in the exact source inspector, reachable explicitly. It does not
+retarget or hide that inspector. [Retained node controls](../../../ports/graphshell/src/web_tree/node_presentation.rs)
+report supported-face counts, refusal reasons and unsupported requests.
+The dynamics inspector now reports each exact target's face treatment, rule
+face override and the body-size input, and can explicitly bind that access in
+Presentation rules. Selection, motion inspection and rule preview remain
+independent. Neither these controls nor rule matching opens content implicitly.
+
+**Stable input and hysteresis:** the Canvas exposes its resolved logical body
+footprint multiplied by camera zoom before choosing the face treatment. This
+is the same width used by its frame composer, rather than the prior preview's
+occlusion-sensitive body-hit rectangle. Caption hiding, selection or partial
+occlusion therefore cannot feed back as a rung-size change. Both bound preview
+and live evaluation disclose this footprint convention. Pure previews still
+use explicit/empty prior matches; live matches belong to one view epoch, saved
+rule generation and exact access occurrence. Graph replacement, saved-rule
+changes, disable/refusal or departure from the current lens reset/prune that
+history. Caller-supplied prior matches are not imported into live state. Equal
+addresses and shared Resources do not share hysteresis.
+
+The access fact adapter now reads the recorded binding and scalar Resource
+facts directly; constructing a sibling-access roster/coverage inspection for
+every live node was unnecessary and would repeat whole-graph work. Inspector
+read models and their coverage semantics remain unchanged. Unknown states and
+missing measurements retain the explicit refusal behavior, including under
+negation; foreground attention pins are not inferred from positional pins.
+
+**Bounds:** this first consumer requires at most 128 individually visible
+accesses and 256 KiB of serialized contexts. Exceeding either refuses the node
+layer with an explanation and restores base faces. It does not partially apply
+a subset. Forme guide consumption remains independent. The runtime reuses
+unchanged inputs/rules and stores only current occurrence matches/decisions;
+scene, source and content sessions are absent from these transient snapshots.
+Open-context collection and large rule-set costs still need performance
+measurement. No release or large-graph frame-budget claim is made.
+
+**Qualification:** the [source receipt](../../../ports/graphshell/docs/receipts/node_ladder_20261011/qualification.json)
+records 47 portable native checks passing: eight new node-runtime tests plus
+the retained 39 binding/editor/topology/inspection tests. Cases include repeated
+Resource occurrences, independent hysteresis, selection versus position pins,
+view/generation reset, departure/reentry, unsupported winners, unknown negated
+state, immutable inputs and atomic bounds/identity/rule refusal. Replay with
+`cargo test --locked --offline --manifest-path ports/graphshell/docs/receipts/node_ladder_20261011/harness/Cargo.toml --lib`.
+The integrated product wasm check passes with eighteen existing web warnings.
+One compiler ran at a time under the existing 1280 MiB/zero-swap and free-memory
+guard. Default/viewer/release packages were not built.
+
+Native Canvas node regressions additionally cover source/pose/selection/pin/
+footprint preservation, atomic unsupported/missing-member refusal and old-epoch
+rejection. The existing dynamics-inspector cases are included in the native
+qualification attempt. Its first offline run could not load an uncached
+upstream P2P patch; fetching locked sources left manifests and lockfiles intact.
+The full-debug native compile then reached the scope's 1342177280-byte peak
+and was terminated with `Result=oom-kill` before tests ran. The retry disables
+Pictograph debug symbols while retaining that memory cap. Three inspector and
+three new face-layer tests pass; the latest integrated-source reruns are recorded
+in the receipt. This is six scoped native cases, not an all-green Canvas suite.
+
+**Headed handoff:** on a fresh dedicated normal-motion origin/profile and a
+logical 860×720 viewport, run
+[`p4_tree_node_ladder.scn`](../../../ports/graphshell/web/scenarios/p4_tree_node_ladder.scn)
+on `tree.html?app=local`, followed by a fresh page/process retaining that origin
+for [`p4_tree_node_ladder_reopen.scn`](../../../ports/graphshell/web/scenarios/p4_tree_node_ladder_reopen.scn).
+The fixture deliberately uses large compact thresholds to avoid dependence on
+viewport-fit zoom; the scripts explicitly open the collapsed Graph tools pane.
+Native cases qualify the ordinary hysteresis band separately.
+Four captures are planned, none generated/reviewed here. Scenarios cover private
+draft isolation, saved opt-in, selected attributes, independent dynamics targets,
+unsupported Snapshot precedence, acknowledged saved undo, disable/base restore
+and retained rules with a fresh transient view. They preserve graph/session and
+Forme membership/geometry/locks. Review actual glyph/caption/attribute rendering,
+normal zoom thresholds, pinned nodes, physical input, themes/fonts, narrow
+scroll/focus, tile continuity and other hosts separately. S-PC's connected
+browser still lacks WebGPU.
+
+**Remaining done-conditions:** complete headed acceptance;
+measure live-context/rule costs; add actual compact content cards, snapshots,
+sprites and interactive representations through their content/measurement
+owners; extend exact occurrence adapters, attention states and measured force/
+derivation evidence through their existing owners. This draft completes only
+the bounded face/selected-attribute consumers and inspector integration. It
+introduces no force policy, source/script/field execution, primitive writes or
+broad scene-composition completion.

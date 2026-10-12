@@ -533,3 +533,23 @@ existing owner plans and receipt. The larger field composition walkthrough is
 design work; spatial/placement/event decisions and measured force effects stay
 open. No active Markdown or parser-shaped judgment identity is added. The
 source notice repair is a comment-only change to an upstream renderer test.
+
+
+**Node ladder and inspector continuation (2026-10-11):** Mark requested “Both.
+Plus pull”; the explicit fast-forward pull was already current at `04a48c2d`.
+Saved-rule opt-in adds exact-access Glyph/Card face treatments and selected
+scalar attributes, with editable defaults and view/generation/occurrence-local
+hysteresis. Footprint input is shared with the frame composer; face changes
+retain geometry, placement, source, Forme and content-session owners. The
+inspector explains the actual face layer and can explicitly bind its target
+for rule preview. Unsupported content representations and resource/performance
+bounds remain explicit. Forty-seven portable tests and the product wasm check
+pass; six scoped native Canvas cases and headed gates are recorded in
+the source receipt. No active Markdown or parser-shaped judgment is added.
+
+The latest `e6192a18` upstream qualification and exact strength-editor work are
+retained. Complete citation/D2 reports match controlled published-head baselines
+with only this lane's three doc edits substituted: 261/264 D2 coverage and four
+existing errors. Source hashes normalize text line endings; raw proof logs are
+preserved. Six integrated native Canvas tests pass with Pictograph debug symbols
+disabled under the unchanged 1280 MiB cap; the earlier capped OOM is retained.

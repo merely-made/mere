@@ -66,6 +66,12 @@ The [relationship/dynamics inspector draft](mere_docs/implementation_strategy/20
 adds exact-target reads of live stages, topology inputs and placement constraints;
 38 portable native checks and the product wasm check pass. Canvas native and
 headed cases remain open; missing force/derivation evidence is disclosed.
+The [node ladder and inspector continuation](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#node-ladder-and-inspector-continuation-draft-2026-10-11)
+adds scoped saved Glyph/Card face decisions, selected scalar attributes,
+editable defaults and occurrence-local hysteresis; 47 portable tests and the
+product wasm check pass. Six scoped native Canvas tests also pass with reduced
+debug symbols; headed acceptance and content-renderer adapters retain their
+explicit receipt gates.
 
 Primary data model (2026-10-11): the
 [family composition brief §8](2026-08-12_family_composition_thesis_brief.md#8-primary-data-model-clips-and-live-entities-2026-10-11)

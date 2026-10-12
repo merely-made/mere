@@ -205,6 +205,7 @@ pub mod composition;
 mod dynamics_record;
 pub mod relationship_topology;
 mod dynamics_inspection;
+mod node_presentation;
 pub use dynamics_inspection::{DynamicsInspection, DynamicsTarget, MemberDynamics};
 /// The dynamics spec over this catalog: seiche's portable spec, with the
 /// laws and overlays as its presets. (Dynamics grammar plan, G4a.)
@@ -698,6 +699,8 @@ pub struct Canvas {
     /// geometry authority for layout, collision, picking, and paint bounds.
     /// (Projection proofs — P3b renderer consumption.)
     projection_representations: HashMap<NodeKey, sceno::Representation>,
+    graph_view_epoch: u64,
+    node_rule_faces: HashMap<uuid::Uuid, sceno::Representation>,
     /// The roles the active arrangement's positions play once physics runs
     /// (seeded, anchored, pinned), the anchored return's stiffness, and the
     /// latest settle. (Dynamics grammar plan, G7.)
