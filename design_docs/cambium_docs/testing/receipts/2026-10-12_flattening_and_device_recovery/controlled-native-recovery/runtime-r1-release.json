@@ -1,0 +1,7 @@
+{
+  "owned_inhibitor_pid": 49628,
+  "termination": "finite180s inhibitor already expired before cleanup check",
+  "native_runner_exited": true,
+  "runtime_returned_to": "Focus on Tabard port boundary",
+  "status": "strict exactWholeWindowRGBA control failed; actual30pixels RGB1 alpha0"
+}

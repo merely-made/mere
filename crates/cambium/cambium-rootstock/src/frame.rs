@@ -687,6 +687,10 @@ where
         let frame = match surface.acquire_status() {
             genet_render_host::SurfaceAcquire::Frame(frame) => frame,
             genet_render_host::SurfaceAcquire::DeviceLost(_) => {
+                // Release this frame's old-device resources before the host
+                // acknowledges detachment and can open the replacement factory.
+                drop(view);
+                drop(_tex);
                 self.poll_device_recovery();
                 return;
             },
@@ -751,6 +755,9 @@ where
         profile.compose_us = elapsed_us(phase.elapsed());
         if surface.core().device_failure().is_some() {
             drop(frame);
+            drop(target);
+            drop(view);
+            drop(_tex);
             self.poll_device_recovery();
             return;
         }
