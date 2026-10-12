@@ -160,6 +160,7 @@ pub mod canvas_search;
 mod edge_cells;
 pub mod field_bridge;
 mod fields;
+mod coupling_trace;
 mod forme_region;
 pub use forme_region::{FormeCell, FormeRegion};
 pub use canvas_search::CanvasSearchSurface;
