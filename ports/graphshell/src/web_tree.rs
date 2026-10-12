@@ -93,9 +93,13 @@ const SHEET: &str = "\
     .tree-tools h2 { font-size:14px; margin:2px 0 4px; } \
     .tree-tools h3 { font-size:13px; margin:4px 0 2px; } \
     .tree-rules [data-cambium-text-value] { display:block; width:260px; min-height:26px; color:inherit; background:#263640; border:1px solid #637581; } \
-    .tree-rules pre { white-space:pre-wrap; overflow-wrap:anywhere; font-size:12px; } \
+    .tree-rules pre, .tree-dynamics pre { white-space:pre-wrap; overflow-wrap:anywhere; font-size:12px; } \
+    .tree-coupling [data-cambium-text-value] { display:block; width:260px; min-height:26px; color:inherit; background:#263640; border:1px solid #637581; } \
     .tree-inspection { overflow-wrap:anywhere; } \
     .tree-inspection p, .tree-inspection li { font-size:12px; } \
+    .tree-tools .detail-section-title { font-weight:bold; margin:6px 0 4px; } \
+    .tree-tools .detail-key { display:block; font-size:12px; color:#9fb0bb; } \
+    .tree-tools .detail-value { display:block; margin:2px 0 8px; overflow-wrap:anywhere; } \
     .tools-section + .tools-section { margin-top:10px; border-top:1px solid #2c3b44; padding-top:4px; } \
     .tools-switch button[aria-pressed=true] { background:#2d5a63; border-color:#79a9be; } \
     .tools-active { margin:4px 0; color:#f0dfb8; font-size:12px; } \
@@ -505,6 +509,8 @@ pub(crate) struct TreePage {
     field_inspector: field_inspection::Pane,
     #[cfg(feature = "product")]
     presentation: presentation::Pane,
+    #[cfg(feature = "product")]
+    dynamics_inspector: dynamics_inspection::Pane,
     #[cfg(feature = "applets")]
     applet_seen: u64,
     #[cfg(feature = "applets")]
@@ -756,6 +762,8 @@ fn tools_region(page: &TreePage) -> Child {
         ));
     }
     children.push(physics::section(page));
+    #[cfg(feature = "product")]
+    children.push(dynamics_inspection::section(page));
     #[cfg(feature = "product")]
     children.push(inspection::section(page));
     #[cfg(feature = "product")]
@@ -1079,6 +1087,8 @@ async fn boot(root: Element) -> Result<(), String> {
                 field_inspector: field_inspection::Pane::default(),
                 #[cfg(feature = "product")]
                 presentation,
+                #[cfg(feature = "product")]
+                dynamics_inspector: dynamics_inspection::Pane::default(),
                 #[cfg(feature = "applets")]
                 applet_seen: 0,
                 #[cfg(feature = "applets")]
@@ -1214,6 +1224,12 @@ fn hooks(shared: Rc<Shared>) -> HostHooks<TreePage, Logic, Child> {
                     .is_some_and(|product| product.selection_locked()),
             );
             #[cfg(feature = "product")]
+            coupling::poll(ctx);
+            #[cfg(feature = "product")]
+            field_inspection::reveal(ctx);
+            #[cfg(feature = "product")]
+            coupling::reveal(ctx);
+            #[cfg(feature = "product")]
             if ctx.runner.state().forme.as_ref().is_some_and(|f| f.ready()) {
                 ctx.runner.update(|page| {
                     forme::poll(page);
@@ -1229,6 +1245,9 @@ fn hooks(shared: Rc<Shared>) -> HostHooks<TreePage, Logic, Child> {
                     ctx.runner.update(|page| presentation::update(page, inputs));
                 }
                 presentation::install(ctx.runner.state());
+                if let Some(report) = dynamics_inspection::refresh(ctx.runner.state()) {
+                    ctx.runner.update(|page| dynamics_inspection::update(page, report));
+                }
             }
             // The remote session moves outside the runner (its channel's
             // pumps); rebuild the view when it has.
@@ -1291,6 +1310,10 @@ fn hooks(shared: Rc<Shared>) -> HostHooks<TreePage, Logic, Child> {
             true
         }),
         after_dispatch: Box::new(|ctx| {
+            #[cfg(feature = "product")]
+            field_inspection::reveal(ctx);
+            #[cfg(feature = "product")]
+            coupling::reveal(ctx);
             ctx.runner.state().shared.selection_locked.set(
                 ctx.runner
                     .state()
@@ -1326,6 +1349,10 @@ fn hooks(shared: Rc<Shared>) -> HostHooks<TreePage, Logic, Child> {
         after_wake: Box::new(|_ctx| {}),
         close_request: Box::new(|_ctx, _request| CloseDisposition::KeepVisible),
         focused_text: Box::new(|runner| {
+            #[cfg(feature = "product")]
+            if let Some(slot) = coupling::focused_text(runner) {
+                return Some(slot);
+            }
             #[cfg(feature = "product")]
             if let Some(slot) = presentation::focused_text(runner) {
                 return Some(slot);
@@ -1444,9 +1471,9 @@ impl NoRepulsionLane for mere::canvas::Canvas {
 mod applet;
 mod controls;
 #[cfg(feature = "product")]
-mod field_inspection;
+mod coupling;
 #[cfg(feature = "product")]
-mod presentation;
+mod field_inspection;
 #[cfg(feature = "product")]
 mod forme;
 mod gesture_steps;
@@ -1459,6 +1486,10 @@ mod lane;
 #[cfg(feature = "product")]
 mod link_inspection;
 mod physics;
+#[cfg(feature = "product")]
+mod presentation;
+#[cfg(feature = "product")]
+mod dynamics_inspection;
 #[cfg(feature = "product")]
 mod product;
 #[cfg(not(feature = "product"))]

@@ -1542,6 +1542,24 @@ placement. Two executable phases distinguish the Keep runtime from the added
 immutable-item selector/fixture inspection. Known panel cropping and offscreen
 bodies remain visual defects; these passing state/interaction receipts do not
 constitute full visual acceptance or coordinator-owned adoption.
+The [preview layout follow-up](https://github.com/merely-made/knot-editor/blob/156626f/docs/receipts/2026-10-11_dynamics_viewport/README.md)
+then moves the canvas above a wrapping toolbar and requests a one-shot reveal
+through the existing host API after playback actions. Host-owned camera
+rectangles are recorded in capture metadata. Its geometry and scroll-away
+regression, focused composition tests and native wide/compact receipts qualify
+that change separately; the earlier full workspace counts retain their own
+source identity. Ordinary scrolling does not repeatedly reveal the preview.
+
+The [completion/refusal follow-up at Knot `e944fca`](https://github.com/merely-made/knot-editor/blob/e944fca/docs/receipts/2026-10-11_dynamics_status/README.md)
+then discloses the pinned controller's pause, rest, completion and refusal
+states. Step is guarded after completion/refusal. Play resumes an ordinary
+pause, but rebinds a completed/refused controller from authored positions;
+a failed tick preserves the last valid displayed pose. Its 84 focused tests
+and 18 reviewed wide/compact native captures qualify this consumer feedback
+separately. The 120-tick authored schedule finishes without asserting physical
+rest; deliberate replay and exact final-pose Keep/Undo/Redo remain qualified.
+Runtime status enters neither source facts nor retained recipes. No force,
+dependency pin, new full-workspace receipt or F ruling changes here.
 
 **Review boundary:** Knot uses compiled card footprints in a fixed physics plane,
 then clamps its normalized glyph display to that plane. This is a consumer
@@ -1552,8 +1570,13 @@ nonflat scenes, ambient inference and unsupported body forms remain outside this
 binding. The native receipt exposes these limits and keeps authoring guards
 separate from foreground/background paint categories.
 
-**Open gates:** Firefox and the physics coordinator's independent review remain
-open. The Windows Computer Use helper stopped Firefox inspection because URL
+**Parked gate:** Mark said **"No need to do firefox verification while it’s blocked"**.
+Firefox remains deferred while the Windows helper lacks URL-policy support.
+Mark's subsequent private-window retry found the existing private Firefox
+window, but inspection was stopped by the same browser URL-policy block.
+That retry provides no new Firefox qualification and navigated no user tabs.
+The physics coordinator's independent review remains open. The Windows Computer
+Use helper stopped Firefox inspection because URL
 policy enforcement is unsupported for that browser; no browser-policy bypass
 was attempted. Coordinator-owned Mere/Knot and Djinn/Knot-site adoption pins
 remain unchanged. This bounded consumer review introduces no F ruling and does

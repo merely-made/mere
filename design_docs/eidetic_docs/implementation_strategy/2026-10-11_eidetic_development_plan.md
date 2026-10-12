@@ -2,8 +2,9 @@
 
 **Date:** 2026-10-11
 **Status (2026-10-11):** active plan. The first Fleece portable-clip draft has
-native transfer tests and browser compilation; the broader phases and receiving
-host gates remain open. The five gathering/intake dependency
+native transfer tests and browser compilation. Turnstone now qualifies native
+selected text/WAV receiving, restart and local playback; the broader phases
+and remaining host checkpoints stay open. The five gathering/intake dependency
 moves are already complete in the
 [Fleece and Eidetic checkpoint](../../archive_docs/2026-10-11_completed_plans/2026-10-11_fleece_eidetic_capability_plan.md).
 **Scope:** develop Eidetic's retained-content and memory capabilities together
@@ -135,9 +136,18 @@ The dependency check adds no external library: the enabled production edges
 are Eidetic, Genet's extractor, Serde and Serde JSON. Eidetic remains built with
 its existing default features disabled.
 
-Receiving-host rendering/playback, complete source-backing adapters, signed
-source tags, generated suggestions and reviewed reconnect queues remain under
-the host gate below. The native transfer test does not close that gate. See the
+Turnstone's first receiving host now reads selected plain text and plays a
+retained WAV body through its existing Inker/Redshank seams. Committed-source
+native import, fresh-process restart with the package paths unavailable, and
+missing-content refusal pass. Original recording bytes remain unavailable;
+source selectors and unknown source-tag attribution stay distinct from playback.
+The receiver uses an explicitly unsealed store and makes no encrypted-custody
+claim. Its exact source, nine reviewed captures and limits are recorded in
+`turnstone/docs/receipts/2026-10-11_retained_clip_receiver/README.md`
+(Turnstone `bb09931`, implementation `d2fb07c`). Complete source-backing adapters,
+browser receiving, additional assets/structured formats, signed source tags,
+generated suggestions and reviewed reconnect queues remain under the host gate
+below. This partial native receipt does not close that gate. See the
 [Fleece fixture receipt](../../../crates/fleece/tests/fixtures/portable_clip/README.md)
 for producer generation and qualification scope.
 
@@ -615,3 +625,19 @@ The implementation proposals still need these concrete decisions:
   `a7dcb54066d37ec53b182d7ffe75dd6952fb09df`, published through the source-identical
   documentation merge `961731ace9ae9e687bdf8d40a032f2e1fbbf3321`. Only owned
   export paths were integrated; temporary collision worktrees were removed.
+- **2026-10-11, native receiver slice.** Turnstone `d2fb07c` admits selected
+  packages to the receiving mere's Muniment/Fjall store, resolves retained
+  addresses locally with NoFetcher, lowers a real Inker view and plays held WAV
+  bodies on its existing Redshank output runtime. Receipt publication `bb09931`
+  qualifies import, package-unavailable fresh-process reopening and missing
+  local identity refusal in Windows, with nine reviewed native captures. The
+  reopened Play link reaches Ended 500 ms through ordinary pointer routing.
+  All accepted runs have zero acquisition attempts and eager peer services;
+  62 sampled TCP/UDP endpoint observations are empty. The broad library gate
+  passes 789 tests with ten existing ignores; six final receiver tests and one
+  offline-port test cover the later focus repair and host-only read/control
+  hardening. One immutable Mere source supplies 75 resolved packages after
+  coherent producer/renderer/identity adoption. This is a synthetic text/WAV
+  native receiver receipt, with unsealed retained storage; acoustic quality,
+  browser/structured receiving, recording excerpts, tag acceptance, reviewed
+  reconnect edits and P6 custody/retention remain open.

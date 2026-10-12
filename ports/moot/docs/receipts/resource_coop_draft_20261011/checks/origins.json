@@ -1,0 +1,72 @@
+[
+  {
+    "name": "mere",
+    "path": "/Users/markik/Code/repos/mere",
+    "branch": "main",
+    "before": "0e78fcffb140395a5c0d2f64a4dfda2b81751681",
+    "remote": "2aecdf9559b766951c66cb1b16c0b84ac7963d0e",
+    "after": "2aecdf9559b766951c66cb1b16c0b84ac7963d0e",
+    "ahead_behind_before": [
+      0,
+      34
+    ],
+    "dirty": false,
+    "action": "fast-forwarded clean checkout"
+  },
+  {
+    "name": "knot",
+    "path": "/Users/markik/Code/repos/knot-editor",
+    "branch": "main",
+    "before": "8d71fa9cbc3a0720e5708b605442f301332cdb56",
+    "remote": "156626fb97284db8032f02651bf4118ba52fbbd9",
+    "after": "156626fb97284db8032f02651bf4118ba52fbbd9",
+    "ahead_behind_before": [
+      0,
+      18
+    ],
+    "dirty": false,
+    "action": "fast-forwarded clean checkout"
+  },
+  {
+    "name": "genet",
+    "path": "/Users/markik/Code/repos/genet",
+    "branch": "main",
+    "before": "4bc75583865c2fb862b7acd7fe16dc28eb591042",
+    "remote": "4bc75583865c2fb862b7acd7fe16dc28eb591042",
+    "after": "4bc75583865c2fb862b7acd7fe16dc28eb591042",
+    "ahead_behind_before": [
+      0,
+      0
+    ],
+    "dirty": false,
+    "action": "already current"
+  },
+  {
+    "name": "turnstone",
+    "path": "/Users/markik/Code/repos/turnstone",
+    "branch": "main",
+    "before": "53fa5675da237db0dd2fbb4bf80795091efb13bb",
+    "remote": "1034fb64b133022926bb4c7135b2b3281d09cc3b",
+    "after": "1034fb64b133022926bb4c7135b2b3281d09cc3b",
+    "ahead_behind_before": [
+      0,
+      1
+    ],
+    "dirty": false,
+    "action": "fast-forwarded clean checkout"
+  },
+  {
+    "name": "moot-worktree",
+    "path": "/Users/markik/Code/worktrees/mere-moot-capsule-proof",
+    "branch": "codex/moot-capsule-readings",
+    "before": "4b491d950927f84cdc3a0d0efdb96fbae04015a4",
+    "remote": "2aecdf9559b766951c66cb1b16c0b84ac7963d0e",
+    "after": "2aecdf9559b766951c66cb1b16c0b84ac7963d0e",
+    "ahead_behind_before": [
+      0,
+      41
+    ],
+    "dirty": false,
+    "action": "fast-forwarded clean checkout"
+  }
+]
