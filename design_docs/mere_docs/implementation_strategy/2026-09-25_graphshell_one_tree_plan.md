@@ -1001,6 +1001,20 @@ output, not current-coherent-family or live-site delivery qualification. Keep
 the cap unchanged: shared presenter integration after browser acceptance does
 not authorize deploying an oversized viewer or retiring the site's fallback.
 
+**Published-source reconciliation (2026-10-12):** `f39f6ab0b` combines this
+presenter with published Mere `d46b0f5ca`, preserving the coupling editor,
+node-presentation ladder and their inspector/text-input focus owners. All 67
+focused CPU tests pass (the previous 54 plus eight node-presentation and five
+coupling-edit cases); locked/offline viewer and product/applets debug builds
+and the main-page/applets Wasm check pass on this combined source. The finite
+browser batch also includes both new owners' saved-state reopen scenarios in
+fresh, separate profiles. This remains an old-pin build candidate awaiting the
+renderer coordinator's coherent family and explicit runtime release; no headed
+acceptance or main landing is implied. The combined-source records are
+`merged-source-cpu/gates.json`, `merged-source-wasm/gates.json` and the updated
+`candidate.json` in the existing output directory. The earlier release-size
+measurements remain bound to their recorded source commits.
+
 ## 5. Stop rules
 
 - Nothing a screen reader reaches today is lost: a control moves only once
