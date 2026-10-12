@@ -41,6 +41,17 @@ The final focused suite passes 80 tests and all 16 final native captures are
 reviewed. The complete camera box is visible after playback actions at both
 native sizes, with preserved Keep/undo/redo pose identity and unchanged source.
 This remains Knot-owned presentation, not a new force policy or consumer repin.
+The [completion/refusal follow-up at Knot `e944fca`](https://github.com/merely-made/knot-editor/blob/e944fca/docs/receipts/2026-10-11_dynamics_status/README.md)
+uses the pinned controller's end result to distinguish pause, rest, completion
+and refusal. Step is guarded after completion/refusal; ordinary pauses resume,
+while explicit Play rebinds completed/refused runs from authored placement.
+A failed tick preserves the last valid displayed pose. Its separate Windows
+qualification has 84 focused passing tests and 18 reviewed native captures;
+the authored 120-tick schedule finishes without implying physical rest, and
+Keep/Undo/Redo preserve its exact final pose. No new whole-workspace or shared
+supplier receipt is claimed. Mark's private-Firefox retry found the existing
+private window, but the same URL-policy block stopped inspection; Firefox
+remains unqualified while blocked.
 
 Three pieces of ruled work, each with done-conditions in its plan. Read the
 plan sections first; they hold Mark's rulings verbatim, and those govern.
@@ -460,8 +471,9 @@ turning the sandbox's mode labels into the scene model.
 **Workspace rules for this continuation:** Mark's current workspace
 instructions supersede the historical worktree/build-directory paragraph below.
 Use main unless an actual concurrent collision requires isolation, and reuse
-`C:/t/cargo-targets/mere`. No dynamics worktree or isolated Cargo home has been
-created.
+`C:/t/cargo-targets/mere`. No dynamics implementation worktree or isolated Cargo
+home has been created. Temporary documentation checkouts preserve concurrent
+primary work and are removed after their own amendments are published.
 The temporary browser tab and receipt server were closed, and the generated
 Node bindings were removed after the identity gate. Receipts and the reusable
 probe remain under the existing testing directory. The shared Mere target and
