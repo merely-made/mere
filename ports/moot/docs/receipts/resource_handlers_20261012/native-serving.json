@@ -1,0 +1,3 @@
+{
+  "text": "Shared resource handler notes\n\nA verified owner copy survives source absence and restart. Hosting is a separate signed, bounded promise.\n"
+}

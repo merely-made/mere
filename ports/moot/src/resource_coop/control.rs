@@ -105,6 +105,8 @@ mod tests {
                 title: "Note".into(),
                 schema: "text/plain".into(),
                 content: ContentRead::Resolved,
+                retention: RetentionRead::Unknown,
+                terms: BTreeMap::new(),
                 hosting: HostingRead::Unknown,
                 offers: [(ResourceAction::Open, Offer::Offered)].into(),
             }],

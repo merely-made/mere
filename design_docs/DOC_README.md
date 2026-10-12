@@ -118,6 +118,8 @@ Bounded continuation (2026-10-09): the same plan's [capsule-library proof](mooth
 
 Bounded continuation (2026-10-12): [Shared resource controls and owner reads](moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#shared-resource-controls-and-owner-reads-2026-10-12) adds ordinary Cambium controls and Graphshell rendering over current Gemot collection/contribution reads and verified local Eidetic content. Independent readings, refusal reasons, exact completion bindings and refresh/close behavior are qualified in native tests and headed Chrome. Live signed peers, actual retention/hosting/fork/participation handlers and Turnstone mounting retain separate gates.
 
+Handler continuation (2026-10-12): [Retention and hosting handlers](moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#retention-and-hosting-handlers-2026-10-12) qualifies atomic Eidetic copies, wallet-sealed private retention, bounded signed Gemot promises and owner-routed controls. Native tests and headed Chrome cover quota/refusal, source-absent reads, serving checks and durable reopen. Public export requires explicit content-owner approval; peer transport, protected hosting, heartbeat/completion, historical-cut validation and Turnstone mounting remain separate gates.
+
 1. [`DOC_POLICY.md`](DOC_POLICY.md) — documentation governance rules.
 2. [`TERMINOLOGY.md`](TERMINOLOGY.md) — canonical current terminology.
 3. [`2026-05-04_lexicon_brief.md`](2026-05-04_lexicon_brief.md) — naming history; its 2026-08-31 amendment points current terms back to `TERMINOLOGY.md`.

@@ -117,6 +117,16 @@ Checked: `c5f01064` ancestry, `git grep MEERKAT_SCENARIO`, `.cargo/` at the base
   synthetic unsealed identities; real signed peers, retention/hosting/fork writes,
   activity participation and Turnstone mounting remain explicit gates. Earlier
   judgment counts above describe the original pass.
+- Handler amendment 2026-10-12: checked atomic Eidetic copy/receipt/quota storage,
+  authenticated wallet-sealed private copies, audience-derived signed Gemot
+  hosting and current serving checks. The actual owner composition binds action
+  terms and requires independent content-owner public-export approval. Six
+  retention, five hosting, nineteen port and five host tests passed; two headed
+  Chrome scenarios qualify retain/sign/refresh/reopen. Current Fjall custody
+  refusal and the deliberately restored forbidden plaintext fallback are recorded;
+  guarded source is restored. NativeDrop preserves actual signed fixture evidence
+  before generated database cleanup. Peer transport, protected hosting, automatic
+  heartbeats/completion, historical-cut validation and Turnstone mounting are open.
 
 ## moothold_docs/implementation_strategy/2026-08-31_flora_tulpa_standing_plan.md
 

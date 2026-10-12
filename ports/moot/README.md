@@ -103,9 +103,34 @@ end the request with a refusal. Closing never means leaving an activity.
 
 The `moot_resource_owner` example is an explicit local acceptance fixture using
 scoped Gemot authority and real Eidetic verification. Its identities are synthetic
-and unsealed. Live signed peer revocation, production activity adapters, retention,
-hosting and collection/content fork writes retain separate gates in the
+and unsealed. Its first receipt covers Open; the handler continuation below adds
+retention and hosting. Live signed peer revocation, production activity adapters,
+and collection/content fork writes retain separate gates in the
 [Moot plan](../../design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#shared-resource-controls-and-owner-reads-2026-10-12).
+
+`resource-handlers` adds the native composition of those actual owners.
+`handlers::Owner` receives the existing Moot service, signing identity, encounter
+and custody backends, optional wallet sealer, and explicit configuration. Current
+Moot admission and configured read/copy powers are checked at dispatch. Retention
+uses Eidetic's atomic owner-scoped copy. Hosting additionally requires explicit
+content-owner approval for that exact public payload and Gemot's audience power;
+an unsigned privacy tag supplies neither. The current hosting adapter serves
+public-portable content only; private retention supports the wallet sealing seam.
+
+Disclosed action terms are bound to preparation, so changed settings require
+another request. Acceptance feedback changes no custody or hosting fact until a
+new owner read. A hosting command can fail after a copy succeeds; the owners use
+separate stores, so the copy remains and the host must refresh records before
+retrying. The supplying application serializes dispatch with authority/configuration
+ingestion. Automatic deletion and cancellation are not introduced.
+
+`moot_resource_handlers` exercises this composition with synthetic identities,
+real signed membership/contribution/Standing facts and durable Redb databases.
+Its rendered host qualifies retain, bounded public hosting, refresh and restart;
+the native serving API separately checks held bytes and current authority. Network
+serving, live peer revocation, full historical-cut validation and native Turnstone
+mounting remain separate gates. See the
+[handler continuation](../../design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#retention-and-hosting-handlers-2026-10-12).
 
 ## License
 

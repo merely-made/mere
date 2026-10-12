@@ -1,0 +1,35 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling eidetic v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\eidetic-core)
+warning: missing documentation for an associated function
+   --> crates\murm\transport\src\p2panda_transport.rs:629:5
+    |
+629 |     pub fn builder_from_seed_ref(signing_seed: &[u8; 32]) -> P2pandaTransportBuilder<'static> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+note: the lint level is defined here
+   --> crates\murm\transport\src\lib.rs:46:9
+    |
+ 46 | #![warn(missing_docs)]
+    |         ^^^^^^^^^^^^
+
+warning: `mere-transport` (lib) generated 1 warning
+   Compiling gemot v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\moot\gemot)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 24.82s
+     Running unittests src\lib.rs (C:\t\cargo-targets\mere\debug\deps\gemot-7239eeca7f789c92.exe)
+
+running 5 tests
+test moot::hosting::tests::malformed_typed_standing_cannot_poison_other_hosting_records ... ok
+test moot::hosting::tests::signed_bounded_promise_replays_and_expiry_is_not_availability ... ok
+test moot::hosting::tests::denied_scopes_ceilings_revocation_and_stale_preparation_do_not_sign ... ok
+test moot::hosting::tests::withdrawn_contribution_and_local_ceiling_changes_stop_serving ... ok
+test moot::hosting::tests::full_signed_record_reopens_from_the_existing_standing_backend ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 97 filtered out; finished in 2.12s
+
