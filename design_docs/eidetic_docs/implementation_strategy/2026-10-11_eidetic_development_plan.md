@@ -3,7 +3,7 @@
 **Date:** 2026-10-11
 **Status (2026-10-11):** active plan. The first Fleece portable-clip draft has
 native transfer tests and browser compilation. Turnstone now qualifies native
-selected text/WAV receiving, restart and local playback; the broader phases
+selected text/WAV receiving, restart, local playback and onward copy; the broader phases
 and remaining host checkpoints stay open. The five gathering/intake dependency
 moves are already complete in the
 [Fleece and Eidetic checkpoint](../../archive_docs/2026-10-11_completed_plans/2026-10-11_fleece_eidetic_capability_plan.md).
@@ -641,3 +641,18 @@ The implementation proposals still need these concrete decisions:
   native receiver receipt, with unsealed retained storage; acoustic quality,
   browser/structured receiving, recording excerpts, tag acceptance, reviewed
   reconnect edits and P6 custody/retention remain open.
+- **2026-10-12, selected onward copy.** Turnstone implementation `97c1394` and
+  qualification `9412077` expose the existing Fleece selected-body exporter
+  through a host-only clip link and contextual command. A first receiver with
+  original package paths unavailable exports only chosen Knot/WAV clips; a
+  second independent native mere receives their unchanged envelopes, retains
+  the same content references and source facts, and reopens/plays after both
+  sending app and all package paths disappear. The unselected note stays
+  unavailable. Nine onward captures qualify the default Windows host; 794
+  library tests pass with ten existing ignores, and ten final focused tests
+  include changed/missing held-body refusal, budgets, excluded backing and
+  unselected data, distinct tag-owner metadata, frozen Workbench selection and
+  replacement policy. No schema, collection format, dependency or supplier pin
+  changed. This uses the existing bounded dependency closure and NoFetcher.
+  The store stays unsealed. Browser/structured receiving, recording excerpts,
+  signed/accepted tags, reviewed owner edits, peer delivery and P6 remain open.
