@@ -1,0 +1,9 @@
+{
+  "owned_display_inhibitor_pid": 43253,
+  "verified_command": "caffeinate -dimsu -t 180",
+  "stopped": true,
+  "runtime_returned_to": "Fix canonical domain references",
+  "new_cpu_builds": false,
+  "native_process_completed": true,
+  "current_supplier_native_gate": "passed; visual/pixel capture review pending"
+}

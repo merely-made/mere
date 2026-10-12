@@ -34,8 +34,10 @@ can choose installed fonts while retaining useful heading, size and text
 patterns. Firefox's [font preferences](https://support.mozilla.org/en-US/kb/change-fonts-and-colors-websites-use)
 are a checked precedent for serif/sans-serif/monospace choices, sizes and minimum
 size. Those generic families do not themselves define Mere's UI, reading,
-heading or label roles. The role schema, override precedence and remote/frozen
-fidelity remain open; measurements must stay coherent with realized fonts.
+heading or label roles. The bounded family-role schema and application preference precedence are now
+implemented below in the 2026-10-12 continuation. Size/minimum-size controls and
+remote/frozen face fidelity remain open; measurements must stay coherent with
+realized fonts.
 This note does not change adoption order or claim controls in every consumer.
 
 ## Application adoption (2026-10-09)
@@ -1055,3 +1057,106 @@ T4 and T5 ride settings passes; T5 last.
   section marked historical (genet-layout and Stylo retired in genet `55c05d11759`),
   `SmolwebTheme`'s move into `tabard::smolweb` (`d16f055f`) noted, and the Tabard scope's
   owning plan opened as a question.
+
+## Granular font roles — 2026-10-12
+
+**Status:** shared family contract, reusable preference editor and Cleromancy
+macOS adoption qualified and published. Coordinated with
+Knot and Woodshed against Mere `22c0dbc5d`; neither consumer is repinned or
+qualified by this shared publication. No exposed chat identifies the q-pc
+owner, so its remote/unpublished work has not been reconciled.
+
+### Contract and done-conditions
+
+1. **Portable requests.** Tabard `typography` owns optional interface, reading,
+   heading, label and code family stacks. `ThemeChoice.fonts` defaults empty
+   and is omitted when empty, preserving legacy JSON/line behavior. Named
+   requests retain order and unavailable names across theme fallback and file
+   reopening. Definitions and color artifacts remain independent. Done when
+   malformed font preferences are refused by strict loading, safe CSS output
+   cannot inject declarations, and failed writes retain the applied choice.
+2. **Host realization and editing.** The native host exposes a transient
+   Fontique family inventory over the same system/bundled resource ledger as
+   layout. Tabard workshop exposes reusable controlled fields and an explicit
+   Apply request, leaving host persistence authoritative. Blank/Default removes
+   the override on Apply. Editing an unchanged first family preserves any saved
+   ordered fallback tail; replacing it starts a new preferred family. Done when
+   real input, availability, save failure and resize resource geometry pass.
+3. **Consumer adoption.** Cleromancy uses shared properties for its existing
+   interface, reading paragraphs, reading headings, labels and code. It supplies
+   unmodified OFL IBM Plex Mono and Source Serif 4 metadata faces. Done when
+   exact font advances, four theme modes, authored precedence, fresh-process
+   preference reopening and unchanged reading/reflection identities qualify.
+   Knot and Woodshed adoption remain separately owned subsequent slices.
+
+### Precedence and fidelity
+
+Unset roles preserve existing host declarations. A host provides role defaults;
+resolution emits available requested families in order, followed by a host
+fallback when no generic is requested. Named-family inventory is not per-glyph
+coverage or proof of an exact face. The engine owns glyph fallback and shaping;
+remote/frozen receipts need realized face identity and metrics, not only a
+family string. Unavailable requests stay saved and produce local diagnostics.
+
+Consumer styles consume `--tabard-font-interface`, `--tabard-font-reading`,
+`--tabard-font-heading`, `--tabard-font-label` and `--tabard-font-code`. Applied
+application preferences follow theme property definitions in the ordinary
+cascade. Explicit authored `font-family`, specificity and `!important` retain
+ordinary CSS authority. No font-size, minimum-size, weight, line-height,
+content or writer measure is silently rewritten. The application editor uses
+its isolated sheet, retaining the established theme-preview boundary.
+
+Knot's explicit writer `SourceFace` remains authoritative and code is not a
+writer alias. Reading can supply an optional preview default. Its label-card
+cache must invalidate on realized typography identity and reconcile hit targets
+and dependent dynamics before adoption. Arbitrary writer faces require a new
+resolved-face/size metric probe identity; the existing Plex shortcut remains
+specific to Plex. Woodshed's label role includes musical/fret/tempo labels;
+family availability does not close its recorded-loop glyph coverage gate.
+
+### Findings and progress
+
+- **2026-10-12:** Shared Tabard library passed 39 tests before the added file
+  round-trip regression; full Tabard and workshop gates are recorded with the
+  publication. Workshop's 16 library tests passed, including preserved fallback
+  stacks and explicit draft/Apply behavior. Actual Cleromancy geometry and
+  native acceptance remain the consumer gate, not inferred from these results.
+
+- **2026-10-12 publication gate:** all 82 Tabard tests, 16 workshop library
+  tests and the native inventory regression pass on macOS arm64. The inventory
+  regression proves a metadata override is discoverable and malformed bytes
+  cannot advertise an available face. Evidence is in
+  `support/receipts/font_roles_20261012/qualification.json`. Navigation audit
+  output is byte-identical to baseline. D2 retains its original digest mismatch
+  and three uncovered documents; the amended plan/index have scoped judgments.
+
+- **2026-10-12 picker follow-through:** the shared preference surface adds a
+  searchable host-local family list, limited to 30 matches per query, with the
+  same controlled text/IME slot seam as direct family entry. Picking stages a
+  draft; only Apply emits a host persistence request. All 17 workshop library
+  tests pass, including actual native input, filtering and staged selection.
+
+- **2026-10-12 native feedback:** Cleromancy's first headed font flow failed
+  because Mesquite split `input-text` into whitespace arguments and delegated
+  multiword font names as unknown product verbs. Its eight frames are rejected
+  evidence. The shared command now delivers the full remainder through the
+  existing controlled keyboard path. All 28 Mesquite library tests pass,
+  including actual retained text replacement with multiword family names,
+  authored CSS and double-space Unicode text. This repairs acceptance input;
+  it does not convert the failed native receipt into a pass.
+
+- **2026-10-12 downstream publication:** Cleromancy `6cf1e405` publishes the
+  bounded macOS arm64 font-role slice, with runtime `c1fb4ce7` pinned to Mere
+  `addccab32` and the current coherent supplier family. Its 101 root and 17
+  portable-core tests pass; two native processes pass nine reviewed captures
+  and 123 presentations. Shared font picker Apply, all four canonical modes,
+  authored restoration, compact Reading entry and fresh reopening are recorded
+  in `cleromancy/design_docs/receipts/tabard_20261011/font-roles/qualification.json`.
+  Exact font request/library bytes, card data, all three durable IDs and 1/3/1
+  counts survive reopening. The original eight-capture text-input attempt stays
+  rejected. Knot/Woodshed have the published contract, metric/cache/dynamics
+  prerequisites and serialized native-lane handoff; their adoption remains open.
+  Current role mappings preserve host default sizes and explicit authored CSS.
+  Family availability, scripted native receipts and mounted input do not certify
+  glyph coverage, remote/frozen faces, physical IME, formal OS accessibility or
+  general layout/contrast acceptance.

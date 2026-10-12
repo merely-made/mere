@@ -125,7 +125,10 @@ pub fn resolve_theme_choice(
     let presentation = theme.presentation_for_mode(&mode)?;
     Ok(ResolvedThemeChoice {
         requested: choice.clone(),
-        resolved: ThemeChoice::new(theme.id.clone(), Some(mode)),
+        resolved: ThemeChoice {
+            fonts: choice.fonts.clone(),
+            ..ThemeChoice::new(theme.id.clone(), Some(mode))
+        },
         theme,
         presentation,
         diagnostics,

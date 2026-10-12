@@ -26,6 +26,12 @@ pub struct ThemeChoice {
     pub theme_id: String,
     #[serde(default, with = "mode_key")]
     pub theme_mode: Option<Mode>,
+    /// Application-owned family requests, independent of authored definitions.
+    #[serde(
+        default,
+        skip_serializing_if = "crate::typography::FontPreferences::is_empty"
+    )]
+    pub fonts: crate::typography::FontPreferences,
 }
 
 impl ThemeChoice {
@@ -33,6 +39,7 @@ impl ThemeChoice {
         Self {
             theme_id: theme_id.into(),
             theme_mode,
+            fonts: Default::default(),
         }
     }
 
@@ -351,5 +358,28 @@ mod tests {
             &choice
         );
         fs::remove_file(path).unwrap();
+    }
+}
+
+#[cfg(test)]
+mod font_store_tests {
+    use super::*;
+    #[test]
+    fn font_requests_round_trip_and_failed_write_retains_previous_choice() {
+        let path = std::env::temp_dir().join(format!("tabard-font-choice-{}", std::process::id()));
+        let _ = fs::remove_file(&path);
+        let mut store = FileThemeChoiceStore::load_strict(&path).unwrap();
+        let mut choice = ThemeChoice::default();
+        choice.fonts = serde_json::from_str(r#"{"reading":["Missing face","serif"]}"#).unwrap();
+        store.set_choice(choice.clone()).unwrap();
+        assert_eq!(
+            FileThemeChoiceStore::load_strict(&path).unwrap().choice(),
+            &choice
+        );
+        fs::remove_file(&path).unwrap();
+        fs::create_dir(&path).unwrap();
+        assert!(store.set_choice(ThemeChoice::default()).is_err());
+        assert_eq!(store.choice(), &choice);
+        fs::remove_dir(path).unwrap();
     }
 }
