@@ -1,0 +1,124 @@
+{
+  "status": "helper_compiled_trust_preflight_executed_permission_unavailable_AX_tree_actions_and_host_reset_unexecuted",
+  "base": "ec1e65cae",
+  "branch": "codex/vello-classic-browser-gates",
+  "observed_execution": {
+    "executor": "coordinator; preparation agent performed only source/protocol work and receipt reads",
+    "swift_helper_compilation": {
+      "status": "passed",
+      "elapsed_seconds_reported": 87
+    },
+    "compiled_swift_trust_preflight": {
+      "executed": true,
+      "command": "/Users/markik/Code/output/vello-classic-browser-gates-20261011/accessibility-reset/ax-probe --trust-only --output /Users/markik/Code/output/vello-classic-browser-gates-20261011/accessibility-reset/swift-trust.json",
+      "receipt": "/Users/markik/Code/output/vello-classic-browser-gates-20261011/accessibility-reset/swift-trust.json",
+      "exit_code": 2,
+      "trusted": false,
+      "status": "permission_unavailable_no_prompt_no_actions",
+      "elapsed_seconds": 0.043736934661865234,
+      "permission_prompt": false,
+      "OS_settings_changed": false,
+      "interpretation": "Only the nonprompt trust preflight executed. The receipt's scope describes the helper's capabilities; it does not establish that AX tree queries or actions ran. This helper returned before selecting a target PID."
+    },
+    "actual_OS_AX_tree_query_executed": false,
+    "actual_OS_AX_action_executed": false,
+    "host_device_loss_or_reset_executed": false,
+    "production_device_loss_monitor_implemented_in_this_batch": false,
+    "forced_driver_reset_executed": false
+  },
+  "prior_qualified_scope": [
+    "production native-hook CPU input/accessibility routing and retained application authority",
+    "native production presentation with isolated library and state preservation",
+    "orderly two-device and CPU-session recreation with exact full-frame RGBA equality"
+  ],
+  "os_accessibility": {
+    "scope": "Actual macOS AX server tree and actions reaching AccessKit's installed native NSView adapter, not Harness::a11y_request or a projected-only tree",
+    "tool_availability": {
+      "native_cua": "disabled",
+      "swift": "/usr/bin/swift",
+      "xcrun": "/usr/bin/xcrun",
+      "osascript": "/usr/bin/osascript",
+      "checked": "binary paths are available; coordinator successfully compiled the Swift helper and executed its trust-only preflight. Preparation agent ran no builds, launches or OS queries/actions."
+    },
+    "existing_permission_observation": "Coordinator's quiet Python helper and the actual compiled Swift helper each returned AXIsProcessTrusted=false without prompting. The compiled Swift helper exited 2 with permission_unavailable_no_prompt_no_actions, so actual OS AX tree/action qualification remains unavailable for that helper identity. No trust is inferred for Codex or Terminal.",
+    "permission_policy": "Call AXIsProcessTrusted without prompt options. A false result produces permission_unavailable and exits before AX tree/actions. Do not modify Accessibility/privacy settings, use System Events to solicit consent, or infer permission from another process.",
+    "probe_source": "crates/cambium/tabard-workshop/tests/os_accessibility/ax_probe.swift",
+    "build_command_prepared": "xcrun swiftc -framework ApplicationServices -framework AppKit crates/cambium/tabard-workshop/tests/os_accessibility/ax_probe.swift -o /Users/markik/Code/output/vello-classic-browser-gates-20261011/accessibility-reset/ax-probe",
+    "trust_command_prepared": "/Users/markik/Code/output/vello-classic-browser-gates-20261011/accessibility-reset/ax-probe --trust-only --output <fresh-trust-receipt.json>",
+    "inspect_command_prepared": "/Users/markik/Code/output/vello-classic-browser-gates-20261011/accessibility-reset/ax-probe --pid <owned-pid> --executable <exact-owned-LaunchServices-product-path> --output <fresh-AX-tree.json> --action inspect",
+    "action_commands_prepared": [
+      "/Users/markik/Code/output/vello-classic-browser-gates-20261011/accessibility-reset/ax-probe --pid <owned-pid> --executable <exact-owned-product-path> --output <fresh-mode-action.json> --action mode-press",
+      "/Users/markik/Code/output/vello-classic-browser-gates-20261011/accessibility-reset/ax-probe --pid <owned-pid> --executable <exact-owned-product-path> --output <fresh-hue-action.json> --action hue-set",
+      "/Users/markik/Code/output/vello-classic-browser-gates-20261011/accessibility-reset/ax-probe --pid <owned-pid> --executable <exact-owned-product-path> --output <fresh-name-focus.json> --action focus-name",
+      "/Users/markik/Code/output/vello-classic-browser-gates-20261011/accessibility-reset/ax-probe --pid <owned-pid> --executable <exact-owned-product-path> --output <fresh-text-capability.json> --action text-set"
+    ],
+    "bounds": {
+      "process_deadline_seconds_required": 25,
+      "internal_deadline_seconds": 20,
+      "per_AX_message_timeout_seconds": 0.25,
+      "max_nodes": 2048,
+      "max_depth": 32,
+      "post_action_effect_poll_seconds": 3
+    },
+    "selectors": [
+      "AXButton label exactly Dark under the AX ancestor named Preview mode; require exactly one match, excluding the library Dark button",
+      "AXSlider label exactly Primary hue; require exactly one match and AXValue settable, then write normalized finite NSNumber(0.37)",
+      "AXTextField label exactly Theme name; require exactly one match; focus is separate from changing its value"
+    ],
+    "proof_requirements": [
+      "Target PID must belong to the coordinator's isolated fresh-library app and match the exact executable path; never select the foreground user app",
+      "Before/after trees are read from AXUIElementCreateApplication(pid); receipts include roles, labels, values, actions, AX settable status, and action error codes",
+      "OS action success alone is insufficient: numeric setter must become observable through AXValue, focus through AXFocused, and mode must satisfy the actual application's mode assertion",
+      "Application receipt must preserve theme id, draft name and graph selection while mode and primary change through OS actions",
+      "Unsupported or permission-unavailable text actions remain open; never replace them with injected keyboard events and claim OS text editing",
+      "No forced driver loss, settings changes, user-profile mutation or unowned process termination"
+    ],
+    "prepared_native_action_window": "crates/cambium/tabard-workshop/tests/os_accessibility/os_ax_session.scn",
+    "native_window_limit": "The prepared scenario waits 1500 presented frames under WorkshopLane's existing 1800-frame limit. This is not a wall-clock synchronization guarantee. Coordinator must schedule actions while its known owned PID remains alive, or add a bounded test-only acknowledgement/wait seam before treating the protocol as runnable end-to-end. Process timeout and fresh library/output remain mandatory.",
+    "scope_limits": [
+      "The finite scenario drives redraws, so it cannot independently prove waking a completely idle document",
+      "This protocol tests the OS AX client/server bridge, not VoiceOver speech/navigation behavior",
+      "TextInput currently exposes value and focus but no SetValue action or text-selection range implementation"
+    ],
+    "minimal_text_fix_candidate": "Add a typed retained text-value request alongside numeric SetValue, accept ActionData::Value only for editable retained textbox owners, apply it through the authoritative TextInput editing transaction, sync the application model, and advertise the action only when this handler exists. Selection/range actions require a separate typed text-range transaction; do not mutate DOM attributes as an editing substitute. Existing NumericValue finite guards must remain."
+  },
+  "device_loss": {
+    "status": "actual production loss notification/replacement seam missing; deterministic seam tests require the narrow production implementation first",
+    "observed_sources": [
+      "genet-render-host RenderCore boots and retains Renderer; no Device::set_device_lost_callback, loss event or device-generation replacement API",
+      "WindowSurface::acquire returns Option; CurrentSurfaceTexture::Lost and Outdated reconfigure the same device and return None; other failures are logged and erased",
+      "Rootstock Surface::acquire Option erases retryable versus fatal cause; Host::redraw rasterizes before acquire and records no typed loss status",
+      "WinitHost::render_core retains shared core for life; suspend_surface and resume_surface preserve that device",
+      "ProducerRegistry detects changed device and suspend_all(None) drops old images while preserving registrations; no actual host replacement currently initiates that path"
+    ],
+    "verified_wgpu_version": "30.0.1",
+    "verified_wgpu_30_APIs": [
+      "Device::set_device_lost_callback(callback: impl Fn(DeviceLostReason, String) + Send + 'static)",
+      "Device::destroy() is available for later bounded controlled-device-destruction acceptance; it is not a forced driver reset"
+    ],
+    "minimal_production_candidate": [
+      "RenderCore owns one thread-safe DeviceLossMonitor registered once on its device and immutable core_generation; a typed loss notice includes that generation and reason",
+      "All hosts sharing a core subscribe their wake callbacks; never overwrite wgpu's single callback per window or recover independently per window",
+      "The host consumes this same typed notice before producer/raster work, rejects stale generations, deduplicates repeated notices, and marks affected presentations unavailable",
+      "One shared owner detaches all lost-generation surfaces/pending readbacks, calls actual ProducerRegistry::suspend_all(None), clears GPU retained-fragment synchronization state, and drops the lost core without reinitializing the app runner/layout/library",
+      "A typed injectable replacement factory attempts boot once per recovery transition; boot failure leaves a reported Failed or Pending recovery state and never resumes the detached old device",
+      "Successful replacement uses a new generation, recreates surfaces from the existing native windows, and rehydrates producer/renderer resources from application-owned CPU sources; stale old-generation handles/refusals cannot enter the new frame",
+      "Surface acquisition exposes typed retryable/unavailable/device-lost outcomes instead of silently equating them; surface Lost alone must not be mislabeled device loss"
+    ],
+    "pure_test_cases_after_production_seam": [
+      "Inject the same typed loss notice emitted by the installed callback into the actual production monitor/host handler, verify subscribed wake and deduplication",
+      "Inject a stale-generation notice and assert no core, presentation or actual registry mutation",
+      "Inject current-generation loss and verify the actual registry's suspend callbacks run, registrations and portable CPU sources survive, and presentation identity is invalidated",
+      "Use the actual injectable boot factory returning a typed failure; verify exactly one attempt, retained WorkshopState/draft/caret/selection/theme/graph authority, and no stale raster/acquire operation",
+      "A pure test cannot prove dropping real GPU handles or a successful real replacement factory; do not use a synthetic state-machine mirror as that proof"
+    ],
+    "bounded_GPU_cases_after_seam_and_handoff": [
+      "Create actual host resources, request Device::destroy on the explicitly owned old device, await the real loss callback under a 5-second deadline, and invoke the production replacement handler",
+      "Require new core generation and device identity, no old device handles in producer images/readbacks/retained fragments, stale-resource typed refusal, source rehydration, and exact or declared meaningful pixel acceptance",
+      "Repeat with the actual replacement factory failing to prove retained application authority and a bounded typed failure without a retry loop",
+      "Real driver reset remains a separate platform gate; controlled Device::destroy and injected loss notification receipts must declare forced_driver_reset=false"
+    ],
+    "resource_constraints": "Coordinator restored about 9.9 GiB of disk headroom through owned cache cleanup. Builds and runtime checks remain serialized with two build jobs; this preparation itself runs no builds/adapters/tests.",
+    "batch_scope": "Device-loss monitor and replacement remain an architecture proposal pending a core-ownership design decision; this batch implements no production monitor or tests against a synthetic seam."
+  }
+}

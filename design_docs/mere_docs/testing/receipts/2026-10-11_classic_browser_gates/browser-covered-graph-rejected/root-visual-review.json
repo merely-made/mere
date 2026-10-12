@@ -1,0 +1,7 @@
+{
+  "accepted": false,
+  "reason": "Narrow graph covered by open tools drawer; nonblank guard counted overlay controls, not graph nodes",
+  "narrow_idle_node_accent_pixels": 0,
+  "other_stage_minimum_idle_node_accent_pixels": 6948,
+  "next_control": "Close actual Graph tools drawer, Fit graph, require source-bound IDLE graph-node paint in every producer crop"
+}
