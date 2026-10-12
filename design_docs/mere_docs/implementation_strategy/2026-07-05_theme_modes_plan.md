@@ -42,7 +42,7 @@ This note does not change adoption order or claim controls in every consumer.
 
 ## Typography role authoring (2026-10-11)
 
-**Status:** in progress; explicitly authorized after the nine application appearance integrations. No new typography runtime acceptance is claimed yet.
+**Status:** shared authored typography and Pelt chrome adoption qualified on macOS Intel, 2026-10-12; native source and later merged-source checks are recorded separately below. Other application/platform rollout remains open.
 
 Tabard authored themes carry explicit Interface, Reading, Heading, Label and Code styles: requested font family, optional CSS-pixel size and optional unitless line height. Application-owned family requests remain separate on `ThemeChoice.fonts`. Absent preferences preserve each host's defaults, heading hierarchy and control geometry. Existing JSON libraries remain readable without rewrites. Theme drafts own undo/redo, Save, Discard and conflict handling. Author CSS remains exact and last; requested font names are retained when a receiving host lacks them, with a visible generic-fallback diagnostic.
 
@@ -1286,3 +1286,31 @@ The finite script now also captures the isolated stylesheet, narrow font fields
 and narrow reader. Final native refresh remains queued after the explicitly
 owned Canonical browser batch. Earlier successful and failed batches are retained
 separately; they are not substituted for this source's final visual review.
+
+### Typography qualification — 2026-10-12
+
+The final frozen source `184c85450` passed three finite production Pelt processes:
+**162 presentations, 18 scenario captures, three application captures, zero
+blank scenario frames**. Ten selected images were reviewed, including the visible
+serif chrome sample, isolated stylesheet, authored/undone reading, narrow controls
+and reader, Discard restoration, actual Pelt chrome and visible fallback notice.
+Interface is `serif`, 15 CSS px, 1.2 leading; Reading is installed `Georgia`,
+24 CSS px, 1.7 leading. Fresh reopen/Discard keep library and application-choice
+bytes unchanged. An unavailable requested family remains intact in the private
+fallback copy and is explained by the ordinary Pelt Appearance notice. The held
+controller/session, history, focus, tile count and content aperture are preserved.
+
+Durable artifacts and exact frozen provenance are in
+[support/receipts/tabard_typography_20261012/qualification.json](../../../support/receipts/tabard_typography_20261012/qualification.json).
+The shared CPU gate passes 252 tests with the documented unchanged table failure
+excluded and one explicit GPU test ignored; Pelt passes 75 tests and the boundary
+and production build pass. Runtime was explicitly returned to Canonical after
+the processes, with no owned app/runner/inhibitor left active.
+
+Renderer publication `be9b97da0` arrived after these native processes and is now
+merged. Its standalone controls are gated by explicit recovery environment;
+outside them, production changes drop old GPU handles only on device-loss branches
+and expose copied producer identities. Typography styles/controls/mappings are
+unchanged. Combined-source CPU/build/boundary checks are recorded separately;
+this does not invent a native rerun of the merged binary. The renderer owner's
+controlled device-loss receipt retains its own source and acceptance bounds.

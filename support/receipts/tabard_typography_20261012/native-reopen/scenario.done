@@ -1,0 +1,14 @@
+RESULT ok
+Pelt fresh process restores shared typography and app choice
+captured reopened_interface
+captured reopened_reading
+captured reopened_previews
+captured reset_previews
+captured discarded_previews
+capture reopened_interface 2360x1600 digest=4ec49601f3fbeaf0 file=/Users/markik/Code/tabard-app-receipts/2026-10-11/typography/native-reopen/reopened_interface.png
+capture reopened_reading 2360x1600 digest=074986d2337d1a92 file=/Users/markik/Code/tabard-app-receipts/2026-10-11/typography/native-reopen/reopened_reading.png
+capture reopened_previews 2360x1600 digest=0b875271dfceaa16 file=/Users/markik/Code/tabard-app-receipts/2026-10-11/typography/native-reopen/reopened_previews.png
+capture reset_previews 2360x1600 digest=5b5c151476345b34 file=/Users/markik/Code/tabard-app-receipts/2026-10-11/typography/native-reopen/reset_previews.png
+capture discarded_previews 2360x1600 digest=1781c85b5974e6d6 file=/Users/markik/Code/tabard-app-receipts/2026-10-11/typography/native-reopen/discarded_previews.png
+frames: 5 captured, 0 blank, 5 distinct digests
+presentation: 40 frames, 42 redraws, 2 unpresented redraws
