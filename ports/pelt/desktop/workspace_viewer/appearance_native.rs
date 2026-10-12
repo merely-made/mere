@@ -244,10 +244,12 @@ impl WorkspaceApp {
                                 .frisket
                                 .chrome_computed_style(class, "font-family")
                                 .unwrap_or_default();
-                            if !actual
-                                .to_ascii_lowercase()
-                                .contains(&family.to_ascii_lowercase())
-                            {
+                            if !actual.split(',').any(|candidate| {
+                                candidate
+                                    .trim()
+                                    .trim_matches(['\"', '\''])
+                                    .eq_ignore_ascii_case(family)
+                            }) {
                                 return Err(format!(
                                     "{class} lost requested font {family}: {actual}"
                                 ));

@@ -328,3 +328,26 @@ fn applying_a_color_keeps_staged_font_input_until_its_own_action() {
         Some(26.0)
     );
 }
+
+#[test]
+fn generic_font_buttons_select_the_exact_family_despite_shared_name_substrings() {
+    let mut host = mount(WorkshopState::in_memory());
+    click(&mut host, &Selector::class("font-family-serif"));
+    assert_eq!(
+        host.state().text_field("font-family").unwrap().text(),
+        "serif"
+    );
+    assert_eq!(
+        host.state().draft_theme().typography.0[&tabard::FontRole::Interface]
+            .family
+            .as_deref(),
+        Some("serif")
+    );
+    click(&mut host, &Selector::class("font-family-sans-serif"));
+    assert_eq!(
+        host.state().draft_theme().typography.0[&tabard::FontRole::Interface]
+            .family
+            .as_deref(),
+        Some("sans-serif")
+    );
+}
