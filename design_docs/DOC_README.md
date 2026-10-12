@@ -116,6 +116,8 @@ Active continuation (2026-09-05): [Moot collections and community publishing](mo
 
 Bounded continuation (2026-10-09): the same plan's [capsule-library proof](moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#capsule-library-composition-proof-2026-10-09) composes independent signed packs, Gemot collections, member retention after publisher exit and an index-only member refused the full payload. The same WIT applet now mounts in Graphshell's retained browser tree with explicit grants, Muniment retention, offline capsule reopening and verified hardware captures. Production publication lineage, browser Gemot replay, live collection subscription and native/Turnstone mounting remain open.
 
+Bounded continuation (2026-10-12): [Shared resource controls and owner reads](moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#shared-resource-controls-and-owner-reads-2026-10-12) adds ordinary Cambium controls and Graphshell rendering over current Gemot collection/contribution reads and verified local Eidetic content. Independent readings, refusal reasons, exact completion bindings and refresh/close behavior are qualified in native tests and headed Chrome. Live signed peers, actual retention/hosting/fork/participation handlers and Turnstone mounting retain separate gates.
+
 1. [`DOC_POLICY.md`](DOC_POLICY.md) — documentation governance rules.
 2. [`TERMINOLOGY.md`](TERMINOLOGY.md) — canonical current terminology.
 3. [`2026-05-04_lexicon_brief.md`](2026-05-04_lexicon_brief.md) — naming history; its 2026-08-31 amendment points current terms back to `TERMINOLOGY.md`.

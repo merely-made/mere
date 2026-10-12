@@ -1,0 +1,40 @@
+{
+  "verified_open": {
+    "outcome": {
+      "Accepted": {
+        "owner_receipt": "Verified local read blake3:38a0865442f2217adce77166e8b5437fa92b06bcbf5b413371e1adc69c4964cc"
+      }
+    },
+    "text": "Shared protocol notes\n\nThis exact local reading is verified by Eidetic.\nOpening it does not retain a copy, offer hosting, or join an activity.\n"
+  },
+  "refused": {
+    "foreign-reader": {
+      "outcome": {
+        "Refused": {
+          "reason": "Exact owner policy or current content verification refused the request"
+        }
+      }
+    },
+    "unknown-contribution": {
+      "outcome": {
+        "Refused": {
+          "reason": "Exact owner policy or current content verification refused the request"
+        }
+      }
+    },
+    "wrong-manifest": {
+      "outcome": {
+        "Refused": {
+          "reason": "Exact owner policy or current content verification refused the request"
+        }
+      }
+    },
+    "retain-without-offer": {
+      "outcome": {
+        "Refused": {
+          "reason": "Exact owner policy or current content verification refused the request"
+        }
+      }
+    }
+  }
+}

@@ -12,7 +12,8 @@
 //! owner supplies its address and lifecycle report. Each action goes back to its
 //! owner for current authority, custody, quota and revision checks at dispatch.
 //! An offer, membership report, selection or accepted UI completion grants none
-//! of those rights. This module never reads a store or authors an operation.
+//! of those rights. The core model never reads a store or authors an operation;
+//! opt-in owner adapters read existing stores through their established APIs.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::Arc;
@@ -20,6 +21,12 @@ use std::sync::Arc;
 use serde::{Deserialize, Serialize};
 
 use crate::coop::LifecycleReport;
+
+pub mod control;
+#[cfg(feature = "resource-owners")]
+pub mod owners;
+#[cfg(feature = "presentation")]
+pub mod view;
 
 /// A disclosed Gemot contribution and its exact Eidetic manifest. Equal bytes
 /// do not merge independent contributions. This does not name a moving "latest".
@@ -125,7 +132,7 @@ pub struct ActivityRead {
 }
 
 /// A fresh owner read for one reader and Moot. It is neither durable nor a
-/// capability. Native owner adapters and Graphshell rendering are subsequent gates.
+/// capability. Its supplying application keeps owner authorization at dispatch.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Snapshot {
     pub moot: [u8; 32],
@@ -185,6 +192,7 @@ pub enum Refusal {
     DifferentReader,
     DuplicateContribution,
     ChangedContribution,
+    ChangedCollection,
     DuplicateActivity,
     MissingActivityOwner,
     InvalidLifecycle(String),
@@ -209,6 +217,9 @@ impl std::error::Error for Refusal {}
 /// A collection fork is reference/lineage work, separate from copying content.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Target {
+    Refresh {
+        moot: [u8; 32],
+    },
     Resource {
         reference: ResourceRef,
         action: ResourceAction,
@@ -234,7 +245,7 @@ pub struct Request {
 
 /// Reported by the actual action owner. Acceptance does not refresh custody,
 /// hosting or participation; only a new owner Snapshot changes those reads.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Outcome {
     Accepted { owner_receipt: String },
     Refused { reason: String },
@@ -253,6 +264,22 @@ pub struct Pane {
 }
 
 impl Pane {
+    pub fn prepare_refresh(&mut self) -> Request {
+        self.prepare(Target::Refresh {
+            moot: self.snapshot.moot,
+        })
+    }
+    pub fn complete_refresh(
+        &mut self,
+        request: &Request,
+        snapshot: Snapshot,
+    ) -> Result<bool, Refusal> {
+        if !self.is_pending(request) || !matches!(request.target, Target::Refresh { .. }) {
+            return Ok(false);
+        }
+        self.refresh(snapshot)?;
+        Ok(true)
+    }
     pub fn new(snapshot: Snapshot) -> Result<Self, Refusal> {
         snapshot.check()?;
         Ok(Self {
@@ -275,6 +302,18 @@ impl Pane {
     }
     pub fn outcome(&self) -> Option<&Outcome> {
         self.outcome.as_ref()
+    }
+
+    pub fn pending(&self) -> Option<&Request> {
+        self.pending.as_ref()
+    }
+
+    pub fn is_pending(&self, request: &Request) -> bool {
+        self.pending.as_ref().is_some_and(|pending| {
+            Arc::ptr_eq(&pending.identity, &request.identity)
+                && pending.reader == request.reader
+                && pending.target == request.target
+        })
     }
 
     pub fn select_resource(&mut self, reference: ResourceRef) -> Result<(), Refusal> {
@@ -396,11 +435,7 @@ impl Pane {
     /// Stale or other-pane completions cannot attach. This does not cancel an
     /// owner command already dispatched; its authoritative receipt remains there.
     pub fn complete(&mut self, request: &Request, outcome: Outcome) -> bool {
-        if !self.pending.as_ref().is_some_and(|pending| {
-            Arc::ptr_eq(&pending.identity, &request.identity)
-                && pending.reader == request.reader
-                && pending.target == request.target
-        }) {
+        if !self.is_pending(request) {
             return false;
         }
         self.pending = None;
@@ -430,6 +465,60 @@ fn require_offer(offer: Option<&Offer>) -> Result<(), Refusal> {
         Some(Offer::Offered) => Ok(()),
         Some(other) => Err(Refusal::OwnerOffer(other.clone())),
         None => Err(Refusal::UnknownOffer),
+    }
+}
+
+/// Re-resolve an intention against a fresh owner read before dispatch. This
+/// supplies no authority itself; the command owner still checks its own policy.
+pub fn validate_request(request: &Request, current: &Snapshot) -> Result<(), Refusal> {
+    current.check()?;
+    if current.reader != request.reader {
+        return Err(Refusal::DifferentReader);
+    }
+    match &request.target {
+        Target::Refresh { moot } => {
+            if *moot == current.moot {
+                Ok(())
+            } else {
+                Err(Refusal::ForeignMoot)
+            }
+        },
+        Target::Resource { reference, action } => {
+            if reference.moot != current.moot {
+                return Err(Refusal::ForeignMoot);
+            }
+            let item = current
+                .resources
+                .iter()
+                .find(|item| item.reference == *reference)
+                .ok_or(Refusal::UnknownResource)?;
+            require_offer(item.offers.get(action))
+        },
+        Target::Activity { reference, action } => {
+            if reference.moot != current.moot {
+                return Err(Refusal::ForeignMoot);
+            }
+            let item = current
+                .activities
+                .iter()
+                .find(|item| item.reference == *reference)
+                .ok_or(Refusal::UnknownActivity)?;
+            require_offer(item.offers.get(action))
+        },
+        Target::CollectionFork { moot, observed } => {
+            if *moot != current.moot {
+                return Err(Refusal::ForeignMoot);
+            }
+            let collection = current.collection.as_ref().ok_or(Refusal::NoCollection)?;
+            require_offer(collection.fork.as_ref())?;
+            if collection.id != observed.id
+                || collection.heads != observed.heads
+                || collection.membership_commitment != observed.membership_commitment
+            {
+                return Err(Refusal::ChangedCollection);
+            }
+            Ok(())
+        },
     }
 }
 
