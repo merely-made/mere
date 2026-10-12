@@ -1127,3 +1127,9 @@ family availability does not close its recorded-loop glyph coverage gate.
   `support/receipts/font_roles_20261012/qualification.json`. Navigation audit
   output is byte-identical to baseline. D2 retains its original digest mismatch
   and three uncovered documents; the amended plan/index have scoped judgments.
+
+- **2026-10-12 picker follow-through:** the shared preference surface adds a
+  searchable host-local family list, limited to 30 matches per query, with the
+  same controlled text/IME slot seam as direct family entry. Picking stages a
+  draft; only Apply emits a host persistence request. All 17 workshop library
+  tests pass, including actual native input, filtering and staged selection.
