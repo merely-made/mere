@@ -1,0 +1,22 @@
+START viewer_commands
+DONE viewer_commands 0
+START canvas_gestures
+DONE canvas_gestures 0
+START canvas_controls
+DONE canvas_controls 0
+START host_
+DONE host_ 0
+START presentation_binding
+DONE presentation_binding 0
+START presentation_editor
+DONE presentation_editor 0
+START node_presentation
+DONE node_presentation 0
+START coupling_edit
+DONE coupling_edit 0
+START viewer-build
+DONE viewer-build 0
+START product-build
+DONE product-build 0
+START main-check
+DONE main-check 0
