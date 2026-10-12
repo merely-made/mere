@@ -1,8 +1,9 @@
 # Coupling effect evaluation draft, October 12, 2026
 
 **Status:** implemented engine draft; this receipt qualifies a point-evaluation
-API and its reuse by the existing executor. Host inspection, applied-effect
-tracing and coordinator-owned adoption remain separate. The owning
+API and its reuse by the existing executor. The tracing continuation below
+qualifies exact compiled bindings and actual execution observations. Visible
+host inspection and coordinator-owned adoption remain separate. The owning
 [dynamics plan](../../../implementation_strategy/2026-10-02_dynamics_grammar_plan.md#coupling-effect-evaluation-draft-2026-10-12)
 and [handoff](../../../research/2026-10-09_scenograph_codex_handoff.md#fieldeditor-runtime-seam-review-2026-10-10)
 retain the field membership, clock, conflict and script checkpoints.
@@ -116,3 +117,115 @@ Raw logs and the reproducible fixture remain under
 because the primary checkout contains concurrent unpublished work. No isolated
 Cargo target/home was created. Source-bearing receipts and other owners' work
 are preserved.
+
+
+## Exact bindings and applied-effect tracing (2026-10-12)
+
+The engine checkpoint is `feba92092caa56139d6af2f3425893dc46b5e4c9`,
+built on published Mere `e0dae9c9`. Final Canvas fixture/module-order corrections
+are `899edbe3`; Seiche source is identical across these checkpoints. No dependency or manifest change belongs to
+this continuation. It uses `C:/t/cargo-targets/mere`, two Cargo jobs and four
+test threads. The frozen source hashes and gate commands accompany the raw logs
+in [trace/qualification.json](trace/qualification.json). This is implementing-agent
+qualification, with external consumer adoption and coordinator review separate.
+
+The exact compiled input snapshot retains the physical response, strength,
+scalar/vector definition, registry and ordered target slots. The live Canvas
+graph bridge now supplies exact field/coupling IDs and stable owner member IDs.
+Graph structural revision is a hint, not proof of unchanged backing: field
+writes need not advance it. No occurrence ID is fabricated for graph-node
+bodies. A body owner with an occurrence adapter may supply an explicit occurrence
+ID for each target slot. Anonymous callers remain visibly unprovenanced.
+
+Observation is opt-in through `set_coupling_trace_limit`; the caller supplies a
+positive row cap, with `None` disabling capture. Each row records the exact
+binding instance and target slot, execution order, sample point, configured
+sample time, proposed response and actual outcome. Immediate before/after state
+covers position, linear velocity, user-force accumulator, dynamic state and
+sleeping state. `Write` means the call executed, not that Rapier accepted a state
+change. Inert results invoke no write; a missing body has no evaluation. The
+report discloses omitted rows while physics executes every application.
+
+Only the most recent valid tick is retained. A process-local simulation token
+prevents equal step/binding-generation numbers from conflating separate worlds.
+Force rebuild and observation configuration clear old evidence. Actor commands
+use barriers to reject delayed snapshots from an old configuration. The actor
+publishes through a single replaceable trace slot shared by queued layout
+packets. A superseded packet yields unavailable evidence, so an unread queue
+cannot accumulate trace history. Hosts can deliberately retain returned reports;
+that caller-owned history is outside the runtime retention guarantee.
+
+The trace covers the dedicated coupling slot before integration. Generic boxed
+forces, anchor/affinity writes, collision and fluid response, and final integrated
+motion are outside its contribution claim. The original field sampling clock
+remains t=0, even where an inert evaluation does not sample the field. Captured
+query targets are not filtered through field extent. Source IDs are supplied by
+the owner adapter; Seiche does not authenticate them or infer content resource
+identity from an owner member ID. A host must rebuild bindings when its target
+mapping or source backing changes.
+
+The [runnable trace example](../../../../../crates/conatus/seiche/examples/coupling_trace.rs)
+uses two separately identified couplings, each with a repeated target. A three-row
+cap records only three of four actual displacement calls, reports one omitted
+row, and still arrives at x=58 from x=50. Repeated slots sample the original
+per-coupling point while their writes accumulate on current body state. Run:
+
+```text
+cargo run --locked --offline -p seiche --no-default-features --example coupling_trace -j 2
+```
+
+The final source/API gates pass:
+
+| Gate | Result |
+|---|---|
+| [Focused coupling tests](trace/focused.log) | 24 passed; all 13 original digests agree with tracing off/on |
+| [Default engine](trace/default.log) | 182 library passed, 10 ignored; integrations 5 and 4 passed |
+| [Inline engine](trace/inline.log) | 173 library passed, 10 ignored; integrations 5 and 4 passed |
+| [Serde engine](trace/serde.log) | 189 library passed, 10 ignored; integrations 5 and 4 passed |
+| [Wasm inline library](trace/wasm.log) | Compile passed |
+| [Canvas bridge](trace/host-bridge.log) | 10 passed, 425 other library tests filtered |
+| [Runnable example](trace/example.log) | Four writes execute with three recorded and one omitted |
+| [Clippy all targets](trace/clippy.log) | Passed; 16 library warnings, 18 test warnings including 16 duplicates; Numen 2 warnings |
+
+The [cap control](trace/negative-cap-skips-physics.log) deliberately skips
+physical applications when recording is capped; the test fails on the wrong
+position. The [identity control](trace/negative-local-index-identity.log)
+substitutes a local node index for the stable member ID; the Canvas test fails.
+The [restoration record](trace/negative-controls.json) verifies both production
+files are restored byte for byte, followed by passing focused and bridge gates.
+These are deliberately wrong source controls, not accepted implementation.
+
+Two implementation failures are retained for clarity. The first
+[Canvas compile](trace/host-fixture-import-failure.log) lacked the existing
+`GraphFixtures` trait import; `899edbe3` fixes the test import and module placement.
+A [sleeping-state test](trace/sleep-assumption-failure.log) initially expected an
+identical zero velocity assignment to wake a sleeping body. The current Rapier
+source and observed behavior contradict that assumption: it changes neither
+velocity nor sleeping state. The corrected test verifies the ignored assignment
+and a later changed assignment that does wake the body. The executor was not
+changed to satisfy the mistaken expectation.
+
+All fifteen owned Rust source files pass the
+[header and baseline-aware format check](trace/source-format-headers.json).
+Existing format differences in Canvas and Seiche module/export blocks and the
+runtime's obstacle command line are preserved without introducing new format
+debt. The index-wide [header check](trace/headers-seiche.log), despite its prefix
+argument, reports one inherited missing header in the renderer receipt's
+`qualify_final_graphs.py`, already present at `e0dae9c9`. This continuation does
+not repair that unrelated owner file or claim a clean repository-wide header
+check. Dependency patch warnings and Clippy diagnostics remain in the raw logs.
+
+The mechanical audit self-test passed. The
+[comparison against published e0dae9c9](trace/docs-comparison.json) introduces
+zero findings across the five amended documents; inherited findings remain.
+[D2 verification](trace/docs-d2.json) accepts this continuation's five records
+in batch 73, with the same three unrelated missing coverage records for the
+classic-browser and producer receipts. These are bounded documentation results,
+not a clean whole-tree audit.
+ The earlier point-evaluation receipt
+and its counts remain frozen above. Clock and membership answers are recorded verbatim as F203 to F205 in the
+owning plan. Their defaults are simulation time (Pause freezes, Reset rewinds),
+per-appearance reference-point membership including the boundary, and initial
+matches reported without entry actions. Their runtime adapters remain pending;
+this trace still reports current t=0 sampling and captured selector targets. No Firefox, native UI, GPU, whole-stack adoption or persistent
+trace format is claimed by this source/API draft.
