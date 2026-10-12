@@ -3,10 +3,11 @@
   "platform": "macOS arm64",
   "gates": {
     "tabard": 82,
-    "workshop_library": 16,
+    "workshop_library": 17,
     "native_font_inventory": 1
   },
   "failures": 0,
   "native_application_qualification": "consumer pending",
-  "documentation": "navigation audit byte-identical to baseline; D2 retains original digest mismatch and three uncovered documents; edited plan/index have scoped judgment"
+  "documentation": "navigation audit byte-identical to baseline; D2 retains original digest mismatch and three uncovered documents; edited plan/index have scoped judgment",
+  "picker": "native controlled search filters available families; selection remains a draft until explicit Apply"
 }
