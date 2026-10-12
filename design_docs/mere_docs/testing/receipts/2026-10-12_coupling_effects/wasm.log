@@ -1,0 +1,69 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+    Checking libm v0.2.16
+   Compiling syn v3.0.6
+    Checking num-traits v0.2.19
+   Compiling syn v2.0.119
+   Compiling serde_core v1.0.229
+    Checking foldhash v0.2.0
+    Checking approx v0.5.1
+    Checking bytemuck v1.25.2
+   Compiling matrixmultiply v0.3.11
+    Checking num-complex v0.4.6
+    Checking wide v1.7.1
+    Checking num-integer v0.1.47
+    Checking once_cell v1.21.4
+    Checking rawpointer v0.2.1
+   Compiling wasm-bindgen-macro-support v0.2.129
+    Checking simba v0.10.2
+    Checking num-rational v0.4.2
+   Compiling nalgebra-macros v0.3.0
+    Checking glam v0.33.8
+    Checking hashbrown v0.17.1
+    Checking allocator-api2 v0.2.21
+    Checking unicode-ident v1.0.26
+    Checking wasm-bindgen-shared v0.2.129
+    Checking hashbrown v0.16.1
+    Checking indexmap v2.14.2
+    Checking nalgebra v0.35.0
+   Compiling wasm-bindgen-macro v0.2.129
+   Compiling thiserror-impl v2.0.21
+    Checking robust v1.2.0
+    Checking smallvec v1.16.1
+   Compiling strum_macros v0.28.0
+   Compiling serde v1.0.229
+    Checking glamx v0.3.1
+    Checking spade v2.15.1
+    Checking wasm-bindgen v0.2.129
+    Checking ena v0.14.4
+    Checking thiserror v2.0.21
+   Compiling profiling-procmacros v1.0.18
+   Compiling num-derive v0.5.1
+   Compiling serde_derive v1.0.229
+    Checking ordered-float v5.5.0
+    Checking bitflags v2.13.2
+    Checking either v1.18.0
+    Checking downcast-rs v2.0.2
+    Checking arrayvec v0.7.8
+    Checking slab v0.4.12
+    Checking parry2d v0.31.1
+    Checking profiling v1.0.18
+    Checking uuid v1.27.0
+    Checking strum v0.28.0
+    Checking tracing-core v0.1.36
+   Compiling tracing-attributes v0.1.31
+    Checking static_assertions v1.1.0
+    Checking pin-project-lite v0.2.17
+    Checking petgraph v0.8.3
+    Checking rapier2d v0.36.0
+    Checking tracing v0.1.44
+    Checking numen v0.2.0 (C:\Users\mark_\Code\worktrees\mere-coupling-effects\crates\conatus\numen)
+    Checking euclid v0.22.14
+    Checking seiche v0.0.6 (C:\Users\mark_\Code\worktrees\mere-coupling-effects\crates\conatus\seiche)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 42.38s

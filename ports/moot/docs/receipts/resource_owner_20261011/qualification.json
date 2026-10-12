@@ -1,0 +1,142 @@
+{
+  "date": "2026-10-12",
+  "started": "2026-10-11",
+  "status": "Owner bridge and host-neutral controls qualified; admitted Graphshell mounting and real activity dispatch pending",
+  "integration_base": "f197cadf9c222267ed2d2c36e84fb31ad277fed3",
+  "owner_tests": {
+    "status": "passed",
+    "tests": 11,
+    "command": "cargo test --locked --offline --manifest-path ports/moot/docs/receipts/resource_owner_20261011/harness/Cargo.toml --lib -j1",
+    "scope": "Actual port dependency plus checked-in integration test source. Signed Gemot constitutions and independent Personae writers, p2panda membership/object accept boundaries, real Eidetic and Cambium APIs. Two independent semantic DOMs; no layout/paint or live application session.",
+    "policy": "Explicit signed MembersOnly fixture constitution with scoped grants and rate bounds; a separately signed OpenWithFloor amendment must refuse a prepared request. Production defaults unchanged.",
+    "storage": "Unsealed in-memory public content; the peer receives signed reference records without payloads. No encryption, persistent restart or network transport qualification.",
+    "log": "checks/native.log"
+  },
+  "portable_contracts": {
+    "status": "passed",
+    "tests": 22,
+    "command": "cargo test --locked --offline --manifest-path ports/moot/docs/receipts/resource_coop_draft_20261011/harness/Cargo.toml --lib -j1",
+    "log": "checks/core.log"
+  },
+  "clippy": {
+    "status": "passed for actual selected port library",
+    "command": "cargo clippy --locked --offline -p mere-moot --no-default-features --features resource-owner,resource-view --lib --no-deps -j1 -- -D warnings",
+    "log": "checks/clippy.log",
+    "broader_attempt": "Without --no-deps, unchanged Stickleback store.rs reports multiple_bound_locations and type_complexity; no global Clippy pass is claimed."
+  },
+  "wasm": {
+    "resource_view": "passed",
+    "default_port": "passed",
+    "view_command": "cargo check --locked --offline -p mere-moot --no-default-features --features resource-view --target wasm32-unknown-unknown -j1",
+    "default_command": "cargo check --locked --offline -p mere-moot --no-default-features --target wasm32-unknown-unknown -j1",
+    "view_log": "checks/wasm-view.log",
+    "default_log": "checks/wasm-default.log",
+    "view_cone": "checks/wasm-view-cone.txt",
+    "forbidden_native_packages_found": [],
+    "native_owner_feature": "Not a Wasm qualification; uses current Gemot/native storage and identity libraries."
+  },
+  "boundaries": {
+    "status": "passed",
+    "command": "CARGO_NET_OFFLINE=true python3 scripts/check_port_boundaries.py",
+    "log": "checks/boundaries.log",
+    "full_metadata_shared_crate_to_port_edges": [],
+    "full_metadata_packages": 1614,
+    "integrated_log": "checks/boundaries-integrated.log"
+  },
+  "format": {
+    "status": "passed",
+    "command": "cargo fmt --manifest-path ports/moot/docs/receipts/resource_owner_20261011/harness/Cargo.toml -- --check",
+    "log": "checks/format.log"
+  },
+  "contracts": {
+    "disclosure": "Current member, authorized collection/contributions, immutable exact manifest and disclosed sharing root. Sharing root does not assert content authorship.",
+    "local_read": "PublicPortable, current format, identity/content hash and byte size checked; declared/accepted 4 MiB limit. Local/Embedded sources only with NoFetcher; no acquisition or storage writes. No streaming/bounded-backend memory claim.",
+    "fork": "Reviewed destination included in the exact intention. Current destination authority, membership, exact parent frontier/commitment, effective members and unused destination history checked; Gemot command rechecks authority. References and ancestry only, no copied bytes.",
+    "unsupported": "Private/sealed/large content uses explicit unsupported feedback. Content-copy, content-fork, hosting and application actions require their own owners.",
+    "readings": "Independent DOM scopes, exact resource/activity attention and local completion identities. Refresh/selection invalidates queued/stale feedback, without cancelling already-dispatched commands.",
+    "authority_read": "Current owner reads rechecked before disclosure/dispatch; no cross-lane transaction or new historical authorization cut is claimed."
+  },
+  "runtime": {
+    "cargo_jobs": 1,
+    "debug_info": false,
+    "incremental": false,
+    "target": "/Users/markik/Code/targets/moot-resource-coop-draft-20261011",
+    "disk_stop_mib": 1280,
+    "initial_gate": "Stopped before tests at the disk guard; partial dependencies preserved.",
+    "retirement_receipt": "/Users/markik/Code/targets/moot-capsule-incremental-retirement-20261011.json",
+    "borrowed_mere_s2s3_used": false,
+    "gpu_executed": false,
+    "browser_executed": false,
+    "native_window_executed": false
+  },
+  "lockfile_resolution": "The offline test resolver reordered unused patch records only; no active package version/source repin. Final locked test gate passed. Avoid attributing this bookkeeping to 0.7.6 adoption.",
+  "deferred": [
+    "Mount in an admitted Graphshell host with actual owner dispatch/refresh",
+    "Actual application session reads and activity commands; coop test is disclosed fixture data only",
+    "Private capability/key adapter and streaming content reader",
+    "Content retention/fork and production publication/hosting records and commands",
+    "Persistent reopen, transport peers and historical authority-cut qualification",
+    "Measured layout/paint, themes, keyboard/focus, narrow widths and serialized GPU/browser acceptance"
+  ],
+  "documentation": {
+    "comparison": "checks/doc-audit-comparison.json",
+    "new_findings": false,
+    "existing_d2_errors": 4,
+    "global_audit_clean": false
+  },
+  "source_sha256": {
+    "Cargo.toml": "fdab12429439c9d40c9a8f008c728ecaa315de6b90f7ebd573c699c57ec4b770",
+    "Cargo.lock": "7ab79e9300d95690ed7365b35751213d0050865f2b4de261b6e9ef25e2716dcd",
+    "ports/moot/Cargo.toml": "3c34bf40cdf2f7dbe34e98070c7cc93d230d6fc4734f3ca9eda1667c15ab4678",
+    "ports/moot/src/lib.rs": "d32e7bd6f265645a810af2b75b237efb1e35d95135007a4835d9c3db360304f9",
+    "ports/moot/src/coop.rs": "abe95d0aa0466beb5be90ab7de16c5aea6b053e9cc5627f47cc92ab6e05bb880",
+    "ports/moot/src/resource_coop.rs": "890aaf69a4a6738ecd7992937273a516747a177b0a611b0f991e3abe8688b336",
+    "ports/moot/src/resource_coop/tests.rs": "950d18de9383a6b5929250dfb7e493bcc698ef4cd90ba5b118b0fec817804d5e",
+    "ports/moot/src/resource_owner.rs": "cdb7542e00a6c70361c9fc91232de177e4fd1844e5325a1abd0d8ea1735289ab",
+    "ports/moot/src/resource_view.rs": "f13c2792afc3ad8ad4e4c4e8d2f285b09af050046fce45ab5e453bc8796f320b",
+    "ports/moot/tests/resource_owner.rs": "7cd8d29f1539d028e05723b9eba1cf69481e89e030bbc444b45dcdbad6cc1180",
+    "ports/moot/docs/receipts/resource_owner_20261011/harness/Cargo.toml": "94524e3b89e1456796ad9b349a44349989a5722980cce3051913db372ac0d47c",
+    "ports/moot/docs/receipts/resource_owner_20261011/harness/Cargo.lock": "78fd64bf9add8a29de1fed2c7dcce627823b5e8f2074b615c10e11cef33b87a5",
+    "ports/moot/docs/receipts/resource_owner_20261011/harness/src/lib.rs": "3598b86db571177a129cd4d04f0a167567684aa3a635f8a6bc8b6c95e2865127",
+    "crates/moot/gemot/src/moot/service.rs": "dea834e9d0b66226f003857d654b515e9c03b7b5b6dd4b4f1971212e02e6a969",
+    "crates/moot/gemot/src/moot/records/collection.rs": "f73a071963b5cb162efcc05e2ddb2070491b679b8fe6dadc5f98bd87d2a81dfd",
+    "crates/eidetic/eidetic-core/src/manifest.rs": "45a8efbbfd338c7f24fd0c1f0c358ef292610897508ca22c1009cb9ff8f65a35"
+  },
+  "check_sha256": {
+    "checks/doc-audit-comparison.json": "4b2799688fcb5b42c25c44b272c7a380c145e0d51832d81c0ce393d8df32538d",
+    "checks/wasm-view-cone.txt": "05b5269ef30270c13323a1a9622aa67a6fdd8aeb3301c9ef6516f003c61628e7",
+    "checks/core.log": "42db1692fa176fc80e1ecc0b8cbb17b02bc7bde31f1cc6a81506beb5a27a8334",
+    "checks/format.log": "13fe86859f478a11b750616f52104bf5fb0f48fab5d60b962eb7de521e73cbf8",
+    "checks/clippy.log": "4cefdb847e4a36123d043eacf7f5c249a4709f6ad34d5e8df5a7a26d722cab76",
+    "checks/boundaries.log": "ed6e8e6214358ac43d6f72e8549446b5ce8170b62a9813b557dc1d130eb24186",
+    "checks/wasm-default.log": "aea6dced4714ec3affaa84c89944cf488bbd8f97c4f07cf660c99ee0ec7d10d1",
+    "checks/native.log": "c96dfb804a92904f34ed57cda7fc9ce213b626bd05b7f58bda7b44fa76025758",
+    "checks/wasm-view.log": "6d62d553544b121115edacb230a9909848d321c3ded024d707535fc7919c264d",
+    "checks/boundaries-integrated.log": "ed6e8e6214358ac43d6f72e8549446b5ce8170b62a9813b557dc1d130eb24186"
+  },
+  "log_normalization": {
+    "change": "Expanded tabs and removed trailing blank whitespace for Git; empty successful logs are labelled. Raw machine logs retained in the task target.",
+    "raw_sha256": {
+      "native.log": "0c583d503f3927cab49cc131a28d8c6816edb651248da92ea0bf66a53b3f7246",
+      "core.log": "8886f48acb15458a2910ef7742c433bf8af1acb9917d1e39ce97af5485e983a8",
+      "clippy.log": "ed74b1e5c56f5fd90d43e985c6df61297242b511a1c46a11e1e1deade2f50131",
+      "wasm-view.log": "22d01cf415bae150d2e780aebb1b871744f1b00652b2d54da1f6734d93d97bd0",
+      "wasm-default.log": "9b9e1b4413ae8651b01ff4c7a558a89c1f79e24d581bcd9e9ad506928ba797ce",
+      "wasm-view-cone.txt": "05b5269ef30270c13323a1a9622aa67a6fdd8aeb3301c9ef6516f003c61628e7",
+      "boundaries.log": "ed6e8e6214358ac43d6f72e8549446b5ce8170b62a9813b557dc1d130eb24186",
+      "format.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "upstream_review": {
+    "main": "d46b0f5cae28afc7af9ca95edfb6792f0172329b",
+    "scope": "Current node-presentation ladder, exact inspector/strength work and effect evaluation retain per-occurrence display and owner authority. Interactive panes/content measurement and activity owners remain their own gates. The latest record/receiver/package receipts supply no Moot private custody or host acceptance.",
+    "moot_owner_view_source_changes": false,
+    "workspace_lock_change": "Dramatis fixture adds existing Luggage/sha2/tempfile dependencies; no version/source repin for this cone."
+  },
+  "integrated_parent": "d46b0f5cae28afc7af9ca95edfb6792f0172329b",
+  "integration": {
+    "qualified_sources_unchanged": true,
+    "package_versions_sources_unchanged": true,
+    "workspace_lock_dependency_entry_changed": "dramatis-app, outside the owner harness"
+  }
+}

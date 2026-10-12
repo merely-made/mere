@@ -1581,3 +1581,38 @@ policy enforcement is unsupported for that browser; no browser-policy bypass
 was attempted. Coordinator-owned Mere/Knot and Djinn/Knot-site adoption pins
 remain unchanged. This bounded consumer review introduces no F ruling and does
 not reopen F199's T2/G4b2 work order.
+
+## Coupling effect evaluation draft (2026-10-12)
+
+**Status:** implemented bounded engine draft; final qualification is recorded in
+the [coupling receipt](../testing/receipts/2026-10-12_coupling_effects/README.md).
+Mark authorized continued dynamics-plan implementation and testing. This is the
+visible-contribution seam's report-only foundation, separate from T2/G4b2,
+viewer ownership and host adoption.
+
+**Findings:** `CouplingForce` previously applied each response directly without
+exposing the proposed write. A single generic force or strength explanation
+would misdescribe velocity assignment, multiplicative damping and positional
+advection. Damping ignores coupling strength; the wall is a depth-scaled force,
+not exact positional exclusion. Sampling remains at time zero, and target
+membership is the previously captured selector result.
+
+**Done-conditions and progress:** `CouplingForce::evaluate_at` now reports one
+point's proposed `AddForce`, `ScaleVelocity`, `SetVelocity`, `Displace` or inert
+reason. It carries the configured sample time and leaves simulation state alone.
+The existing executor consumes the same private evaluation, preserving its
+snapshot points, duplicate target applications, write order and body hold test.
+Thirteen original-executor trajectory digests remain unchanged; a deliberately
+incorrect deduplication control fails and the source is restored. The runnable
+kernel-free example separates the proposed write from motion after actual ticks.
+Engine feature, wasm compile and graph-bridge checks retain separate receipts.
+
+**Limits and next adapter:** a point evaluation is not an applied-effect trace,
+aggregate force, complete validator or serialized source fact. The caller still
+needs exact field/coupling/occurrence identity, source revision and body inputs.
+It must disclose missing-reference resolution rather than treating numen's zero
+fallback as proof of valid backing. Actual contribution inspection needs a
+record of the write's execution, with stable provenance and evaluation order.
+Extent eligibility, field clocks, membership events, conflicting state writers
+and applet execution retain their existing policy checkpoints. No new F ruling,
+force-composition policy, dependency pin or UI acceptance is inferred.

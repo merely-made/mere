@@ -9626,16 +9626,21 @@ dependencies = [
 name = "mere-moot"
 version = "0.0.1"
 dependencies = [
+ "cambium",
  "chartulary",
  "commons-spine",
  "eidetic",
  "eidetic-search",
  "gemot",
+ "genet-scripted-dom",
  "genet-static-dom",
  "hex",
  "insigne",
+ "layout-dom-api",
  "mere-comms",
  "mere-fleece",
+ "mere-proofs",
+ "mien",
  "muniment",
  "p2panda-core",
  "personae",
