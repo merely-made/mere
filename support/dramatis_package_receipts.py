@@ -76,7 +76,7 @@ def main():
         (scratch / ".dramatis-generated").write_text("synthetic Dramatis installer extraction", encoding="utf-8")
         try:
             run("extract", ["7z", "x", "-y", "-o" + str(scratch), str(artifact)])
-            entries = [p.relative_to(scratch).as_posix() for p in scratch.rglob("*") if p.is_file()]
+            entries = [p.relative_to(scratch).as_posix() for p in scratch.rglob("*") if p.is_file() and p.name != ".dramatis-generated"]
             forbidden = [p for p in entries if any(s in p.lower() for s in ["djinn.exe", "dramatis-review-host", "personae-vault", ".key", "luggage.json"])]
             assert not forbidden, forbidden
             apps = list(scratch.rglob("dramatis-ui.exe"))

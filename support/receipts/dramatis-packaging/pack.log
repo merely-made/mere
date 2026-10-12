@@ -1,0 +1,18 @@
+cargo packager --config C:\t\cargo-targets\mere\dramatis-packaging\dev\packager.json --formats nsis
+cargo +1.98.1 run -p luggage --bin luggage-manifest -j 1 --locked --target-dir C:\t\cargo-targets\mere -- --artifact C:\t\cargo-targets\mere\dramatis-packaging\dev\nsis\dramatis-ui_0.0.1_x64-setup.exe --version 0.0.1 --format nsis --out C:\t\cargo-targets\mere\dramatis-packaging\dev\nsis\luggage.json
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.57s
+     Running `C:\t\cargo-targets\mere\debug\luggage-manifest.exe --artifact C:\t\cargo-targets\mere\dramatis-packaging\dev\nsis\dramatis-ui_0.0.1_x64-setup.exe --version 0.0.1 --format nsis --out C:\t\cargo-targets\mere\dramatis-packaging\dev\nsis\luggage.json`
+  version:  0.0.1
+  target:   windows-x86_64
+  blake3:   8f65d24a8c31ecd31165589ad136712f8471989dec90f7dab4566482284556b4
+wrote C:\t\cargo-targets\mere\dramatis-packaging\dev\nsis\luggage.json
+cargo packager signer sign C:\t\cargo-targets\mere\dramatis-packaging\dev\nsis\luggage.json
+Signed dev package and feed: C:\t\cargo-targets\mere\dramatis-packaging\dev\nsis

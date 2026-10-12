@@ -1,0 +1,207 @@
+{
+  "platform": "windows-x86_64",
+  "profile": "dev",
+  "synthetic_signing_only": true,
+  "native_host_qualification": {
+    "Windows": "debug package pipeline passed; release/installed trust pending",
+    "Fedora": "pending; wait until reachable",
+    "macOS Intel": "pending; wait until reachable",
+    "macOS ARM": "pending; wait until reachable"
+  },
+  "source_revision": "c4565d514ece72c0c6e158c471dd38aa0898e8bf",
+  "compiled_source_sha256": "d562c2a31ae1b2543764d97773542e3b6e2dffc5b583a7fe33ab040e44dc8290",
+  "commands": [
+    {
+      "name": "pack",
+      "command": [
+        "C:\\Users\\mark_\\AppData\\Local\\hermes\\hermes-agent\\venv\\Scripts\\python.exe",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\dramatis\\package.py",
+        "pack",
+        "--profile",
+        "dev",
+        "--jobs",
+        "1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "extract",
+      "command": [
+        "7z",
+        "x",
+        "-y",
+        "-oC:\\t\\cargo-targets\\mere\\dramatis-packaging\\dev\\extracted",
+        "C:\\t\\cargo-targets\\mere\\dramatis-packaging\\dev\\nsis\\dramatis-ui_0.0.1_x64-setup.exe"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "version",
+      "command": [
+        "C:\\t\\cargo-targets\\mere\\dramatis-packaging\\dev\\extracted\\dramatis-ui.exe",
+        "--version"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "native-extracted",
+      "command": [
+        "C:\\t\\cargo-targets\\mere\\dramatis-packaging\\dev\\extracted\\dramatis-ui.exe"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "signed-feed",
+      "command": [
+        "cargo",
+        "+1.98.1",
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "dramatis-app",
+        "--test",
+        "package_feed",
+        "--target-dir",
+        "C:\\t\\cargo-targets\\mere",
+        "-j1",
+        "--",
+        "--ignored",
+        "--exact",
+        "real_signed_package_and_tamper_controls",
+        "--nocapture"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "app-controls",
+      "command": [
+        "cargo",
+        "+1.98.1",
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "dramatis-app",
+        "--test",
+        "state",
+        "--test",
+        "interaction",
+        "--target-dir",
+        "C:\\t\\cargo-targets\\mere",
+        "-j1"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "manifest": {
+    "platforms": {
+      "windows-x86_64": {
+        "blake3": "8f65d24a8c31ecd31165589ad136712f8471989dec90f7dab4566482284556b4",
+        "format": "nsis",
+        "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIGNhcmdvLXBhY2thZ2VyIHNlY3JldCBrZXkKUlVTYjlJUEx0dmF2SkJIU0MzSEZ2QXRUR0hKbTVUd2RRR2VKWk1uN1BhdDlvU09nRVppL0YyZEtDRklGVU45N29GcXppRTFuajIxWDF1eEdzMUhmc2Fwd0NVYnpTMkRzbkFVPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNzc2Njk1CWZpbGU6ZHJhbWF0aXMtdWlfMC4wLjFfeDY0LXNldHVwLmV4ZQpveHRTLzBTYTJKTis2aTlSc1lGcHVkUEs4WFZxSWsxMFpUSzJITGJZcHUvVXA3eXRMNkRXa2wwZEg1dG44NEQ4UndTR2VoRXcyRTVFSlZ6aEpxeDZDQT09Cg==",
+        "url": "file:///C:/t/cargo-targets/mere/dramatis-packaging/dev/nsis/dramatis-ui_0.0.1_x64-setup.exe"
+      }
+    },
+    "version": "0.0.1"
+  },
+  "package_path": "C:\\t\\cargo-targets\\mere\\dramatis-packaging\\dev\\nsis\\dramatis-ui_0.0.1_x64-setup.exe",
+  "package_feed_sha256": {
+    "dramatis-ui_0.0.1_x64-setup.exe": "39cd9c244a698fd89361aaea8597e2018e86249f6c72b4ea950e3b2152e191cd",
+    "dramatis-ui_0.0.1_x64-setup.exe.sig": "d20f526698b1cfd9a61911dc438ba4a6a857eb09cf20abf290085bafbb2db786",
+    "luggage.json": "5478ac7bb3e6fe2866f29063ae4fcbcb7e85069ee94e1cfadc70adc7640c84b7",
+    "luggage.json.sig": "d50ce779d03548ba8e1170926d6b7211c7442be9405a2ebccca196eb3324263c"
+  },
+  "scope": "test-signed debug installer; extracted native client; signed manifest/artifact, publisher, staging tamper gates; no installation, publication or actual vault",
+  "artifacts_sha256": {
+    "app-controls.log": "53f8a7f575b95bfafbf468a384561257ba60beaad6f12eb4db0c3ff9f403ad97",
+    "bans.log": "7bcfaa9b32c5b066628c1f4ebc0116fda8d789b6e08c0c1bee4edf7f76e07a71",
+    "contents.json": "33b3b55ac110f14258646c2d8bcf44d7c4c909f7e69372190e792399d89cf5c8",
+    "doc-audit.log": "9d1f7c07ac22c998f1b80412e0c612eedf189107cd650845ef57e696942259e2",
+    "doc-judgment.log": "fbbea19f92000a6791cf3a384db6a2a2b349d902c4505881717c6d33c3a8383b",
+    "extract.log": "bdaf21edfccf7b20742a4ca29600fea2de1250e45dccc2590fab9333ee41c1b6",
+    "native-extracted.log": "6aab66f73f46e5510af7c1ce27d131b7603a4ab4e0cd5fade160909fd2b1e8ca",
+    "pack.log": "ce2c615b193b69115ae438fe8921e76e0c35362302fbbda03b38a9b98d7c250d",
+    "packaged-absent.png": "280a84c5253f0152187338b6227d0aece995ded231fd20ae2813f2b5c157bba8",
+    "portable-metadata.log": "f88a8290fc8527eba882627063e45ee5973d9841756ec7919966b937685936bb",
+    "preliminary.zip": "791334e8acb7494994a44b88926f37e572ecfb9ed5273207358bd068686ee76b",
+    "signed-feed.log": "b33f4956af8cd19e2fcde57ce5e5c1eb88ebe14364c2f24b54bcce2405e618a7",
+    "synthetic-other.pub": "049e39c323a76109424deeb9cc082507b92ab6667b918da911f0fa260e8fae8b",
+    "synthetic-package.pub": "b089058429d47efe4606eaaf65253be403864f09e2dda00aff95cd635a7e1fb9",
+    "version.log": "dc1ceb472282e857790dd8ce6cb3267e01d559ce0365b02e02bb6fcbfab40d1c"
+  },
+  "package_release_info": {
+    "product": "Dramatis",
+    "source_sha256": "d562c2a31ae1b2543764d97773542e3b6e2dffc5b583a7fe33ab040e44dc8290",
+    "target": "x86_64-pc-windows-msvc",
+    "version": "0.0.1",
+    "source_revision": "c4565d514ece72c0c6e158c471dd38aa0898e8bf",
+    "profile": "dev",
+    "runtime_dependency": "existing user-scoped Djinn resident",
+    "djinn_min_source_revision": "ec1e65caed335010308566c8db51ad0e1e002799",
+    "djinn_required_features": [
+      "cxf"
+    ]
+  },
+  "qualified_source_sha256_lf": {
+    "ports/dramatis/Cargo.toml": "0138dc4165603e0b99e29f31d623631a53537dab0c7a7a7d722501977996f02b",
+    "ports/dramatis/README.md": "8855b7e4d2dab33381f6483542666cf5bcb1bfff3f3c30bfa59cb0501c8dcf30",
+    "ports/dramatis/RELEASING.md": "2be603dd34aef98677651e5e2d41b13e1e82e5530b15eb18f5ab80e7007c172d",
+    "ports/dramatis/build.rs": "0d3bcc3280acf7f47bf3c4d03de27bd852ef69bc65e17505cb086c4d30f99841",
+    "ports/dramatis/icons/merely.svg": "6d42862ea771f7a3e4d642798416cb02aeb45fde002de7cb592147d7b88faba5",
+    "ports/dramatis/package-requirements.txt": "f4349492cf52690d1a293ce9a61eaa9eccdac702c842f931e226da5865b961c9",
+    "ports/dramatis/package.py": "8df0fc60863e734adf5b8216dd5f7f88993d7aaff9f0ef79e6e7cdf95a4967fa",
+    "ports/dramatis/src/lib.rs": "54bc0551c402272f1ad51fc3ac833337d5313df3640d43d0a712a61d7c5c993b",
+    "ports/dramatis/src/main.rs": "f906a889a46b5905637e3465b518456d4ff983c11e54b0a6b466c1073a2a3b7e",
+    "ports/dramatis/src/views.rs": "29e76445a83397453e6f3c431c35ca85d124738544015e62c9737695969ef0a8",
+    "ports/dramatis/src/worker.rs": "772548b5d0a821f4a9e28893877374b554a49ea14bd819a74e7aba4de40710f0",
+    "ports/dramatis/tests/interaction.rs": "85fad736bfc22cc5f59184ee1f1face968724c0a5b68dd5657a7801597de7c51",
+    "ports/dramatis/tests/package_feed.rs": "86a6d9701d8d7e30e2c5ebf40c8a376b99135f33dc2a69489118933be6964eba",
+    "ports/dramatis/tests/state.rs": "7fa8a2f783d2c7cd503e57df9c27c43b40954fdc6d1b4b78d911f8a9a2a8222a",
+    "support/dramatis_package_receipts.py": "2a2f8184f50db119e90fd6bd429d8298009af6a3a0b5ad4a7b08d16a3bd55c93",
+    "Cargo.toml": "fdab12429439c9d40c9a8f008c728ecaa315de6b90f7ebd573c699c57ec4b770",
+    "Cargo.lock": "19c79f695aeb119433f3d895e1d979414a45b831e8d0931bf41905db2a2faaae"
+  },
+  "package_assets_sha256": {
+    "ports/dramatis/icons/merely.png": "dd68754806df1423a5cf8a3ec3adafd21317b1632efe0c4bda38fc86e835754f"
+  },
+  "counts": {
+    "real_package_test": 1,
+    "app_state": 4,
+    "retained_interaction": 7
+  },
+  "additional_checks": [
+    {
+      "command": [
+        "cargo",
+        "deny",
+        "--offline",
+        "check",
+        "bans"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "scripts/cargo_mode.py",
+        "verify",
+        "--metadata-only"
+      ],
+      "exit_code": 0,
+      "environment": {
+        "CARGO_NET_OFFLINE": "true"
+      }
+    }
+  ],
+  "documentation_checks": {
+    "mechanical": "passed; zero broken current links, missing current source paths or unheaded sources",
+    "judgment": "three unrelated receipt documents lack D2 records; see doc-judgment.log",
+    "app_plan_findings": 0
+  },
+  "retained_output": {
+    "owner": "Dramatis packaging lane",
+    "reason": "test-signed Windows installer/feed for review",
+    "path": "C:\\t\\cargo-targets\\mere\\dramatis-packaging\\dev"
+  }
+}
