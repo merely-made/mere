@@ -9,7 +9,7 @@
 use std::collections::{HashMap, HashSet};
 
 use euclid::default::{Box2D, Point2D};
-use kernel::graph::{EdgeFamily, Graph, NodeKey, RelationKind, RelationSelector};
+use kernel::graph::{EdgeFamily, Graph, NodeKey, RelationKind};
 use paint_list_api::{
     ColorF, CommonPlacement, LayoutPoint, LayoutRect, PaintCmd, PathCommand, PathData, StrokeCap,
     StrokeItem, StrokeJoin,
@@ -132,17 +132,7 @@ pub(crate) fn visible_edge_cell_segments(
     segments
 }
 
-pub(crate) fn selector_for_relation_kind(kind: RelationKind) -> RelationSelector {
-    match kind {
-        RelationKind::Semantic(sub) => RelationSelector::Semantic(sub),
-        RelationKind::OpenPredicate => RelationSelector::Family(EdgeFamily::Semantic),
-        RelationKind::Traversal => RelationSelector::Family(EdgeFamily::Traversal),
-        RelationKind::Containment(sub) => RelationSelector::Containment(sub),
-        RelationKind::Arrangement(sub) => RelationSelector::Arrangement(sub),
-        RelationKind::Imported(sub) => RelationSelector::Imported(sub),
-        RelationKind::Provenance(sub) => RelationSelector::Provenance(sub),
-    }
-}
+pub(crate) use super::relationship_topology::selector_for_relation_kind;
 
 pub(crate) fn edge_cell_for_relation(from: NodeKey, to: NodeKey, kind: RelationKind) -> EdgeCell {
     EdgeCell {
