@@ -117,6 +117,15 @@ pub trait TextureProducer {
     /// unchanged world/appearance inputs here. Depth remains producer-owned.
     fn render(&mut self, cx: &ProducerContext<'_>) -> Option<ProducedTexture>;
 
+    /// A changed frame, reuse, or explicit rendering refusal. Existing GPU
+    /// producers retain their contract; scene adapters override this method.
+    fn render_checked(
+        &mut self,
+        cx: &ProducerContext<'_>,
+    ) -> Result<Option<ProducedTexture>, genet_render_host::RasterizeFailure> {
+        Ok(self.render(cx))
+    }
+
     /// Export the currently bound application scene without acquiring a device.
     /// GPU-only producers explicitly refuse; a capture never substitutes pixels
     /// or removes their authored external-texture command.
@@ -237,6 +246,12 @@ impl<P: TextureProducer> TextureProducer for Rc<RefCell<P>> {
     fn render(&mut self, cx: &ProducerContext<'_>) -> Option<ProducedTexture> {
         self.borrow_mut().render(cx)
     }
+    fn render_checked(
+        &mut self,
+        cx: &ProducerContext<'_>,
+    ) -> Result<Option<ProducedTexture>, genet_render_host::RasterizeFailure> {
+        self.borrow_mut().render_checked(cx)
+    }
     fn portable_scene(
         &mut self,
         frame: &ProducerFrameInfo,
@@ -269,6 +284,14 @@ pub enum ProducerError {
     InvalidTexture,
     UnsupportedEncoding,
     DuplicateDomKey,
+    RenderRefused,
+}
+
+/// The source whose checked render refused the current host frame.
+#[derive(Clone, Debug)]
+pub struct ProducerRenderFailure {
+    pub source_key: u64,
+    pub failure: genet_render_host::RasterizeFailure,
 }
 
 /// Per-frame CPU attribution, separate from document raster and present wait.

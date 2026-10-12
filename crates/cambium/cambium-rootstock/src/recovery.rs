@@ -29,6 +29,50 @@ where
         }
         self.s.pending_presentation_observer = None;
     }
+    /// Refuse the current frame explicitly. Only an actual installed loss
+    /// notice enters recovery; healthy provider refusal preserves this core.
+    pub fn refuse_rasterization(
+        &mut self,
+        failure: genet_render_host::RasterizeFailure,
+        source_key: Option<u64>,
+    ) {
+        let failure = if matches!(
+            failure,
+            genet_render_host::RasterizeFailure::ProviderError(_)
+        ) {
+            self.s
+                .shared
+                .render_core
+                .as_ref()
+                .and_then(|core| core.device_failure())
+                .map(genet_render_host::RasterizeFailure::DeviceLost)
+                .unwrap_or(failure)
+        } else {
+            failure
+        };
+        self.s.last_redraw_presentation = None;
+        self.s.last_raster_failure = Some(failure.clone());
+        match failure {
+            genet_render_host::RasterizeFailure::DeviceLost(loss) => {
+                self.refuse_pending_captures(CaptureRefusal::DeviceLost(loss));
+                self.poll_device_recovery();
+            },
+            genet_render_host::RasterizeFailure::ProviderError(error) => {
+                let generation = self
+                    .s
+                    .shared
+                    .render_core
+                    .as_ref()
+                    .map_or(0, |core| core.generation());
+                self.refuse_pending_captures(CaptureRefusal::ProviderError {
+                    generation,
+                    source_key,
+                    error,
+                });
+            },
+        }
+    }
+
     pub fn attach_shared_recovery(&mut self, owner: Arc<SharedRenderCore>) {
         if self
             .s
@@ -123,5 +167,114 @@ where
         });
         let refusal = CaptureRefusal::SurfaceUnavailable { generation, error };
         self.refuse_pending_captures(refusal);
+    }
+}
+
+#[cfg(test)]
+mod raster_refusal_tests {
+    use super::*;
+    use crate::{HostHooks, HostOptions, HostState, HostWake, Runner, ScriptedDom};
+    use cambium::{AnyView, GenetCtx, GenetElement, el, text};
+    use genet_render_host::{DeviceLossNotice, RasterizeFailure};
+    use std::{
+        cell::RefCell,
+        rc::Rc,
+        sync::atomic::{AtomicUsize, Ordering},
+    };
+
+    struct App {
+        draft: String,
+        source: Rc<RefCell<String>>,
+    }
+    type Child = Box<dyn AnyView<App, (), GenetCtx, GenetElement>>;
+    type Logic = fn(&App) -> Child;
+    fn root(app: &App) -> Child {
+        Box::new(el("div", text(app.draft.clone())))
+    }
+
+    #[test]
+    fn healthy_provider_failure_refuses_all_captures_once_without_recovery() {
+        let source = Rc::new(RefCell::new("bound application source".to_owned()));
+        let mut state: HostState<App, Logic, Child> = HostState::new();
+        state.runner = Some(Runner::new(
+            Rc::new(RefCell::new(ScriptedDom::new())),
+            root as Logic,
+            App {
+                draft: "authored pending draft".into(),
+                source: source.clone(),
+            },
+        ));
+        let wake = HostWake::new(state.wake_pending.clone(), Arc::new(|| {}));
+        let hooks: HostHooks<App, Logic, Child> = HostHooks::inert();
+        let mut host: Host<App, Logic, Child> =
+            Host::new(HostOptions::default(), None, hooks, state, wake);
+        let calls = Arc::new(AtomicUsize::new(0));
+        let counted = calls.clone();
+        let owner = SharedRenderCore::from_detached_loss(
+            DeviceLossNotice {
+                generation: 811,
+                reason: wgpu::DeviceLostReason::Unknown,
+                message: "CPU-only owner state; no GPU loss claimed".into(),
+            },
+            Arc::new(move || {
+                counted.fetch_add(1, Ordering::SeqCst);
+                Err("must not run".into())
+            }),
+        );
+        host.attach_shared_recovery(owner.clone());
+        let before = owner.status();
+        let refusals = Rc::new(RefCell::new(Vec::new()));
+        fn check(refusal: CaptureRefusal, out: &Rc<RefCell<Vec<u64>>>) {
+            match refusal {
+                CaptureRefusal::ProviderError {
+                    source_key: Some(7),
+                    error,
+                    ..
+                } => {
+                    assert!(matches!(
+                        &*error,
+                        netrender::VelloError::CurveQualityReadbackFailed
+                    ));
+                    out.borrow_mut().push(7);
+                },
+                other => panic!("healthy provider error was misclassified: {other:?}"),
+            }
+        }
+        let image = refusals.clone();
+        host.s.pending_capture = Some(Box::new(move |result| check(result.err().unwrap(), &image)));
+        let stamped = refusals.clone();
+        host.s.pending_stamped_capture = Some(Box::new(move |result| {
+            check(result.err().unwrap(), &stamped)
+        }));
+        let paint = refusals.clone();
+        host.s.pending_paint_capture =
+            Some(Box::new(move |result| check(result.err().unwrap(), &paint)));
+        for _ in 0..2 {
+            host.refuse_rasterization(
+                RasterizeFailure::ProviderError(Arc::new(
+                    netrender::VelloError::CurveQualityReadbackFailed,
+                )),
+                Some(7),
+            );
+        }
+        assert_eq!(&*refusals.borrow(), &[7, 7, 7]);
+        assert_eq!(owner.status(), before);
+        assert_eq!(calls.load(Ordering::SeqCst), 0);
+        assert!(
+            host.s
+                .shared
+                .render_recovery
+                .as_ref()
+                .is_some_and(|actual| Arc::ptr_eq(actual, &owner))
+        );
+        assert!(!host.s.needs_recovery_surface);
+        let app = host.s.runner.as_ref().unwrap().state();
+        assert_eq!(app.draft, "authored pending draft");
+        assert!(Rc::ptr_eq(&app.source, &source));
+        assert_eq!(&*source.borrow(), "bound application source");
+        assert!(matches!(
+            host.s.last_raster_failure,
+            Some(RasterizeFailure::ProviderError(_))
+        ));
     }
 }

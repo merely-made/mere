@@ -52,6 +52,7 @@ pub struct ProducerRegistry {
     device: Option<wgpu::Device>,
     device_generation: Option<u64>,
     next_stamp: u64,
+    render_failure: Option<ProducerRenderFailure>,
     pub(super) timestamp: Option<std::time::Duration>,
 }
 
@@ -118,6 +119,15 @@ impl ProducerRegistry {
 
     pub fn error(&self, key: u64) -> Option<ProducerError> {
         self.entries.get(&key)?.error
+    }
+
+    /// The first checked producer refusal from the latest preparation.
+    pub fn render_failure(&self) -> Option<&ProducerRenderFailure> {
+        self.render_failure.as_ref()
+    }
+
+    pub(crate) fn clear_render_failure(&mut self) {
+        self.render_failure = None;
     }
 
     pub(crate) fn commands(&self, key: u64) -> Option<Vec<PaintCmd>> {
@@ -220,6 +230,7 @@ impl ProducerRegistry {
         scale: f32,
         elsewhere: Elsewhere<'_>,
     ) -> ProducerFrameStats {
+        self.render_failure = None;
         let mut stats = ProducerFrameStats::default();
         let renderer = surface.renderer();
         if self
@@ -327,7 +338,7 @@ impl ProducerRegistry {
                 appearance: layout.resolved_appearance(node, &entry.properties),
             };
             let phase = crate::Instant::now();
-            let output = entry.producer.render(&ProducerContext {
+            let output = entry.producer.render_checked(&ProducerContext {
                 device: surface.device(),
                 queue: surface.queue(),
                 frame: &frame,
@@ -335,6 +346,21 @@ impl ProducerRegistry {
             });
             stats.render_us += micros(phase.elapsed());
             stats.render_calls += 1;
+            let output = match output {
+                Ok(output) => output,
+                Err(failure) => {
+                    refuse_render_entry(entry);
+                    renderer.unregister_external_image(image_key);
+                    stats.invalid_frames += 1;
+                    self.render_failure = Some(ProducerRenderFailure {
+                        source_key: key,
+                        failure,
+                    });
+                    // A refused source cannot be silently omitted/reused in a
+                    // successfully presented document. Stop this host frame.
+                    break;
+                },
+            };
             let Some(output) = output else { continue };
             if let Err(error) = validate_output(&output, size) {
                 entry.error = Some(error);
@@ -404,6 +430,15 @@ fn suspend_entry(
     renderer.unregister_external_image(key);
 }
 
+// The same invalidation path is exercised by CPU registry controls and
+// actual GPU staging. Source bindings and portable bytes remain authoritative.
+fn refuse_render_entry(entry: &mut Entry) {
+    entry.error = Some(ProducerError::RenderRefused);
+    entry.image = None;
+    entry.active = false;
+    entry.producer.suspend();
+}
+
 pub(super) fn physical_size(logical: (f32, f32), scale: f32, limit: u32) -> Option<[u32; 2]> {
     if !scale.is_finite() || scale <= 0.0 {
         return None;
@@ -441,4 +476,82 @@ fn validate_output(output: &ProducedTexture, size: [u32; 2]) -> Result<(), Produ
         return Err(ProducerError::InvalidTexture);
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod checked_refusal_tests {
+    use super::*;
+    use std::{
+        cell::{Cell, RefCell},
+        rc::Rc,
+    };
+    struct BoundSource {
+        source: Rc<RefCell<String>>,
+        suspended: Rc<Cell<usize>>,
+    }
+    impl TextureProducer for BoundSource {
+        fn render(&mut self, _: &ProducerContext<'_>) -> Option<ProducedTexture> {
+            None
+        }
+        fn suspend(&mut self) {
+            self.suspended.set(self.suspended.get() + 1);
+        }
+        fn portable_scene(
+            &mut self,
+            _: &ProducerFrameInfo,
+        ) -> Result<ProducedScene, PortableProducerError> {
+            assert_eq!(&*self.source.borrow(), "retained scene authority");
+            Ok(ProducedScene {
+                scene: netrender::Scene::new(12, 9),
+                source_identity: 73,
+                source_revision: 19,
+                alpha: SourceAlpha::Straight,
+                encoding: SourceEncoding::Srgb,
+            })
+        }
+    }
+    #[test]
+    fn checked_refusal_invalidates_slot_without_retiring_bound_source() {
+        let source = Rc::new(RefCell::new("retained scene authority".to_owned()));
+        let suspended = Rc::new(Cell::new(0));
+        let mut registry = ProducerRegistry::new();
+        registry
+            .register(
+                7,
+                BoundSource {
+                    source: source.clone(),
+                    suspended: suspended.clone(),
+                },
+                &[],
+            )
+            .unwrap();
+        let entry = registry.entries.get_mut(&7).unwrap();
+        entry.active = true;
+        entry.logical_size = (12.0, 9.0);
+        // This CPU control exercises real slot invalidation and source binding;
+        // only the separate GPU gate can populate a hardware texture/view.
+        refuse_render_entry(entry);
+        assert!(!entry.active);
+        assert!(entry.image.is_none());
+        let portable = entry
+            .producer
+            .portable_scene(&ProducerFrameInfo {
+                logical_size: (12.0, 9.0),
+                physical_size: [12, 9],
+                layout_scale: 1.0,
+                needs_frame: true,
+                timestamp: None,
+                appearance: ResolvedAppearance::default(),
+            })
+            .unwrap();
+        assert_eq!(
+            (portable.source_identity, portable.source_revision),
+            (73, 19)
+        );
+        assert_eq!(registry.error(7), Some(ProducerError::RenderRefused));
+        assert!(registry.commands(7).unwrap().is_empty());
+        assert!(registry.contains(7));
+        assert_eq!(suspended.get(), 1);
+        assert_eq!(&*source.borrow(), "retained scene authority");
+    }
 }
