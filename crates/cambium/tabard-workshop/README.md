@@ -53,7 +53,8 @@ without allocating a second editor model or renderer.
 
 Ordinary control messages synchronize the authoring model. Native text and IME
 integration supplies focused slots through `text_field` and `text_field_mut`
-for `name`, `seed-hex` and `mode-sheet`, then calls `sync_controls()` after
+for `name`, `seed-hex`, `mode-sheet`, `font-family`, `font-size` and
+`font-line-height`, then calls `sync_controls()` after
 dispatch.
 
 Supply Cambium's existing file-chooser seam for imports. For exports, consume
@@ -104,3 +105,24 @@ Native lifecycle tests and GPU capture scenarios are documented by the
 ## License
 
 MPL-2.0 (see the repository [LICENSE](../../../LICENSE)).
+
+## Typography
+
+The shared workshop edits Tabard's five optional font roles: Interface, Reading,
+Headings, Labels and Code. Blank fields preserve the consumer's defaults. Sizes
+use CSS pixels; line height is a multiplier. Apply font preferences updates the
+isolated previews, while Save persists the definition and the application owns
+its separate Apply action. Invalid input stays visible and blocks publication
+and navigation. Undo, Redo, Discard and per-role reset use the existing draft.
+
+Supply `set_installed_font_families` from the host's existing font discovery
+owner. The native binding uses Genet Parley/Fontique through the shared Cambium
+host helper. Availability is unknown when a host supplies no catalogue; an
+unavailable requested family is retained with a visible generic fallback notice.
+Families are searchable suggestions rather than downloaded or embedded faces.
+
+The application stylesheet specimen maps roles through ordinary CSS. The reader
+specimen uses `mere_document_lanes::document_style_with_typography` and the
+existing document-canvas style/measurement path, preserving heading hierarchy
+and unrelated role defaults. The author CSS follows preferences in the cascade.
+The editor's own neutral text remains independent of the authored theme.

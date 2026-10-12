@@ -107,3 +107,7 @@ button[aria-pressed="true"] { background: #e8eef5; color: #254e72; border-color:
   .tabard-workshop > .cambium-title-bar > .title-bar-actions { flex-basis: 100%; flex-wrap: wrap; }
   .tabard-workshop .header-actions { flex-wrap: wrap; }
 }
+
+.font-role-picker, .font-family-picker { display:flex;flex-wrap:wrap;gap:6px;margin:8px 0; }
+.typography-controls .tabard-text-input { margin-bottom:10px; }
+.typography-controls button[aria-pressed="true"] { background:#304a60;color:#fff; }

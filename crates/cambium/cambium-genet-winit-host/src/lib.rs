@@ -1287,3 +1287,15 @@ where
         }
     }
 }
+
+/// Read installed family names through Genet's existing Parley/Fontique
+/// discovery. This catalogue contains names only; normal host layout owns
+/// face matching, font resources and measurement. Bundled/document faces are
+/// not reported as installed fonts. This API neither exports nor persists font bytes.
+pub fn installed_font_families() -> Vec<String> {
+    let mut fonts = parley::FontContext::new();
+    let mut names: Vec<String> = fonts.collection.family_names().map(str::to_owned).collect();
+    names.sort_by_key(|name| name.to_ascii_lowercase());
+    names.dedup_by(|a, b| a.eq_ignore_ascii_case(b));
+    names
+}

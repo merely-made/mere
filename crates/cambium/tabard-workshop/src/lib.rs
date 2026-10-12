@@ -16,6 +16,7 @@ mod reader;
 mod state;
 mod stylesheet;
 mod surface;
+mod typography;
 
 pub use interchange::{ExportArtifact, ExportFormat};
 pub use reader::{READER_LEAF_KEY, ReaderSpecimen};

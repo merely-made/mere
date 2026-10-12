@@ -70,3 +70,29 @@ its choice before opening the editor. Preserve every run's `scenario.done`,
 `process.json`, `native.log` and PNGs. Acceptance requires `RESULT ok`, successful
 presentation/nonblank evidence, and the final Pelt workspace assertion and frame
 digest in the native log; the launcher exit alone is insufficient.
+
+## Typography
+
+Pelt maps the shared Tabard Interface, Heading and Label roles to its own chrome
+controls, title and status/appearance labels. The selected theme's font variables
+and ordinary role rules enter the existing Chrome cascade. Application-owned
+Save/Apply and durable choice are unchanged. A font change does not replace the
+held content controller, history or focused tile. Unspecified roles retain
+existing defaults; authored CSS retains normal cascade authority. The Appearance
+notice reports named chrome families missing from the installed catalogue without
+rewriting the theme or durable choice.
+
+Reading typography is visible in the workshop's real document preview but is not
+yet applied to Pelt's loaded document sessions. Those sessions keep their own
+engine/source presentation authority. The Code role currently has no ordinary
+Pelt chrome specimen. Other applications must adopt their own semantic mapping
+when they update the shared dependency; this slice does not claim that rollout.
+
+`scenarios/typography.scn`, `typography_reopen.scn` and `typography_fallback.scn`
+extend the ordinary native
+acceptance lane with role editing, installed-family selection, invalid-input
+refusal, resolved font metrics, narrow captures and fresh-process restoration.
+The fallback run uses a separate copy of the private library with a deliberately
+uninstalled Interface family; it checks visible notices and preserves the
+requested definition and choice.
+Use the same private stores and native launcher as above.

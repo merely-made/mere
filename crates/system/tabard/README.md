@@ -118,3 +118,25 @@ follow-ups in the theme modes plan.
 ## License
 
 MPL-2.0 (see the repository `LICENSE`)
+
+## Portable typography preferences
+
+`Theme::typography` carries optional Interface, Reading, Heading, Label and Code
+preferences. Each role can request a family, CSS-pixel size and unitless leading.
+Empty preferences preserve host defaults. Validation rejects blank/control
+character family names and nonfinite or out-of-range metrics before save or
+export. Named families emit safely quoted CSS plus an explicit generic fallback;
+`missing_families` reports availability without rewriting the definition.
+
+CSS exports include `--tabard-font-{role}-family`, `-size` and `-line-height`
+only when authored. `Typography::role_css` lets each consumer supply its own
+semantic selectors. Hosts retain layout, installed-face discovery and font
+measurement authority; this model carries no font bytes. Authored mode sheets
+remain exact and follow the font variable definitions.
+
+Libraries containing font preferences use version 2; color-only writes preserve
+version 1. Portable font-bearing exports use `{ "version": 2, "theme": ... }`.
+The new reader accepts existing color-only files, while old hosts refuse the
+new version rather than silently losing fonts. Theme drafts, forks, history,
+conflict checks and library persistence retain the role map. Typed DTCG tokens
+remain color-only; explicit-mode provenance retains the complete definition.

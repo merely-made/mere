@@ -84,7 +84,14 @@ fn every_text_field_lays_out_at_its_authored_height() {
     let mut host = mount(WorkshopState::load(&directory.path().join("themes.json")).unwrap());
     click(&mut host, &action("toggle-stylesheet"));
     let mut collapsed = Vec::new();
-    for (field, min_height) in [("name", 34.0), ("seed-hex", 34.0), ("mode-sheet", 200.0)] {
+    for (field, min_height) in [
+        ("name", 34.0),
+        ("seed-hex", 34.0),
+        ("mode-sheet", 200.0),
+        ("font-family", 34.0),
+        ("font-size", 34.0),
+        ("font-line-height", 34.0),
+    ] {
         let selector = Selector::role("textbox").with_attr("data-field", field);
         let node = host.with_dom(|dom| {
             let nodes = taproot::matching(dom, &selector);
@@ -93,10 +100,15 @@ fn every_text_field_lays_out_at_its_authored_height() {
         });
         let (_, _, width, height) = host.painted_rect(node).expect("field paints");
         if !(width > 0.0 && height >= min_height - 0.5) {
-            collapsed.push(format!("{field} at {width}x{height}, wants height {min_height}"));
+            collapsed.push(format!(
+                "{field} at {width}x{height}, wants height {min_height}"
+            ));
         }
     }
-    assert!(collapsed.is_empty(), "fields lose their geometry: {collapsed:?}");
+    assert!(
+        collapsed.is_empty(),
+        "fields lose their geometry: {collapsed:?}"
+    );
 }
 
 #[test]
@@ -223,4 +235,96 @@ fn applied_css_is_isolated_and_save_reopen_keeps_exact_css_and_default_mode() {
     click(&mut host, &action("undo"));
     assert_eq!(host.state().draft_theme(), &authored);
     assert_eq!(host.state().text_field("mode-sheet").unwrap().text(), css);
+}
+
+#[test]
+fn font_controls_are_retained_guard_invalid_input_and_save_reopen() {
+    use tabard::FontRole;
+    let directory = tempfile::tempdir().unwrap();
+    let path = directory.path().join("themes.json");
+    let mut state = WorkshopState::load(&path).unwrap();
+    state.set_installed_font_families(vec!["Georgia".into(), "Menlo".into(), "georgia".into()]);
+    let mut host = mount(state);
+    click(
+        &mut host,
+        &Selector::role("button").with_attr("data-font-role", "reading"),
+    );
+    let before = host.state().draft_theme().clone();
+    let editor = editor_colors(&host);
+    replace_text(&mut host, "font-size", "NaN");
+    for selector in [
+        action("save"),
+        Selector::role("button").with_attr("data-font-role", "code"),
+        Selector::role("button").with_attr("data-mode", "dark"),
+    ] {
+        click(&mut host, &selector);
+        assert_eq!(host.state().draft_theme(), &before);
+        assert_eq!(host.state().font_role(), FontRole::Reading);
+        assert_eq!(host.state().text_field("font-size").unwrap().text(), "NaN");
+        assert!(!path.exists());
+    }
+    assert!(host.with_dom(|dom| {
+        !taproot::matching(
+            dom,
+            &Selector::role("textbox")
+                .with_attr("data-field", "font-size")
+                .with_attr("aria-invalid", "true"),
+        )
+        .is_empty()
+    }));
+    click(&mut host, &action("undo"));
+    assert!(!host.state().has_pending_fields());
+    replace_text(&mut host, "font-family", "Georgia");
+    click(
+        &mut host,
+        &Selector::role("button").with_attr("data-installed-font", "Georgia"),
+    );
+    replace_text(&mut host, "font-size", "24");
+    replace_text(&mut host, "font-line-height", "1.7");
+    click(&mut host, &action("apply-fonts"));
+    let authored = host.state().draft_theme().clone();
+    let reading = &authored.typography.0[&FontRole::Reading];
+    assert_eq!(reading.family.as_deref(), Some("Georgia"));
+    assert_eq!(reading.size_px, Some(24.0));
+    assert_eq!(reading.line_height, Some(1.7));
+    assert_eq!(editor_colors(&host), editor);
+    assert!(!path.exists());
+    assert_eq!(
+        host.state()
+            .stylesheet_preview()
+            .borrow()
+            .computed_style("preview-paragraph", "font-size")
+            .as_deref(),
+        Some("24px")
+    );
+    click(&mut host, &action("undo"));
+    assert_eq!(
+        host.state().draft_theme().typography.0[&FontRole::Reading].size_px,
+        None
+    );
+    click(&mut host, &action("redo"));
+    assert_eq!(host.state().draft_theme(), &authored);
+    click(&mut host, &action("save"));
+    assert!(!host.state().is_dirty());
+    let reopened = WorkshopState::load(&path).unwrap();
+    assert_eq!(reopened.draft_theme(), &authored);
+    click(&mut host, &action("reset-font-role"));
+    assert!(host.state().draft_theme().typography.is_empty());
+    click(&mut host, &action("discard"));
+    assert_eq!(host.state().draft_theme(), &authored);
+}
+
+#[test]
+fn applying_a_color_keeps_staged_font_input_until_its_own_action() {
+    let mut host = mount(WorkshopState::in_memory());
+    replace_text(&mut host, "font-size", "26");
+    replace_text(&mut host, "seed-hex", "#123456");
+    click(&mut host, &action("apply-hex"));
+    assert_eq!(host.state().text_field("font-size").unwrap().text(), "26");
+    assert!(host.state().draft_theme().typography.is_empty());
+    click(&mut host, &action("apply-fonts"));
+    assert_eq!(
+        host.state().draft_theme().typography.0[&tabard::FontRole::Ui].size_px,
+        Some(26.0)
+    );
 }

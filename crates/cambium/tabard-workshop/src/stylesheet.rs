@@ -49,6 +49,7 @@ pub struct StylesheetSpecimen {
     rules: Vec<String>,
     accessible_name: String,
     revision: u64,
+    typography: tabard::Typography,
     last_error: Option<String>,
 }
 
@@ -60,7 +61,7 @@ impl Default for StylesheetSpecimen {
 
 impl StylesheetSpecimen {
     pub fn new(mode: &Mode, rules: &[String]) -> Self {
-        let document = make_document(mode, rules);
+        let document = make_document(mode, rules, &tabard::Typography::default());
         let mut text = Vec::new();
         if let Some(body) = node_with_id(document.dom(), "application-body") {
             collect_text(document.dom(), body, &mut text);
@@ -75,6 +76,7 @@ impl StylesheetSpecimen {
             rules: rules.to_vec(),
             accessible_name,
             revision: 1,
+            typography: Default::default(),
             last_error: None,
         }
     }
@@ -86,7 +88,7 @@ impl StylesheetSpecimen {
         if &self.mode == mode && self.rules == rules {
             return false;
         }
-        self.document = make_document(mode, rules);
+        self.document = make_document(mode, rules, &self.typography);
         self.mode = mode.clone();
         self.rules = rules.to_vec();
         self.last_error = None;
@@ -95,6 +97,21 @@ impl StylesheetSpecimen {
             .checked_add(1)
             .expect("stylesheet revision exhausted");
         true
+    }
+
+    pub fn set_typography(&mut self, typography: &tabard::Typography) -> Result<bool, String> {
+        typography.validate()?;
+        if &self.typography == typography {
+            return Ok(false);
+        }
+        self.typography = typography.clone();
+        self.document = make_document(&self.mode, &self.rules, &self.typography);
+        self.last_error = None;
+        self.revision = self
+            .revision
+            .checked_add(1)
+            .expect("stylesheet revision exhausted");
+        Ok(true)
     }
 
     pub fn source(&self) -> &'static str {
@@ -161,9 +178,24 @@ impl PreviewScene for StylesheetSpecimen {
     }
 }
 
-fn make_document(mode: &Mode, rules: &[String]) -> LiveryDocument<ScriptedDom> {
+fn make_document(
+    mode: &Mode,
+    rules: &[String],
+    typography: &tabard::Typography,
+) -> LiveryDocument<ScriptedDom> {
     let dom = ScriptedDom::from_serialized_document(APPLICATION_SOURCE);
+    use tabard::FontRole;
+    let font_sheet = format!(
+        "{}{}{}{}{}{}",
+        typography.css_custom_properties(),
+        typography.role_css(FontRole::Ui, ":where(.toolbar),:where(button)"),
+        typography.role_css(FontRole::Reading, ":where(p)"),
+        typography.role_css(FontRole::Heading, ":where(h1)"),
+        typography.role_css(FontRole::Label, ":where(.address-field)"),
+        typography.role_css(FontRole::Code, ":where(pre)")
+    );
     let sheets: Vec<&str> = std::iter::once(APPLICATION_STRUCTURE)
+        .chain(std::iter::once(font_sheet.as_str()))
         .chain(rules.iter().map(String::as_str))
         .collect();
     let mut document = LiveryDocument::new(

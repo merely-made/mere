@@ -30,6 +30,7 @@ pub struct ModePalette {
     pub effective_seeds: Seeds,
     pub palette: Palette,
     pub syntax: SyntaxPalette,
+    pub typography: crate::Typography,
 }
 
 impl ModePalette {
@@ -38,9 +39,10 @@ impl ModePalette {
     /// the exact palette for its current seeds, harmony and selected mode.
     pub fn css_custom_properties(&self) -> String {
         format!(
-            "/* Tabard derived mode: {}; harmony applied; Tinct explicit-mode base and syntax palettes. */\n{}",
+            "/* Tabard derived mode: {}; harmony applied; Tinct explicit-mode base and syntax palettes. */\n{}{}",
             self.mode.as_key(),
             custom_properties(self.palette, self.syntax),
+            self.typography.css_custom_properties(),
         )
     }
 }
@@ -127,12 +129,14 @@ impl Theme {
             effective_seeds,
             palette: tinct::derive_palette_with(&effective_seeds, profile),
             syntax: tinct::derive_syntax_palette_with(&effective_seeds, profile),
+            typography: self.typography.clone(),
         })
     }
 
-    /// Export the exact selected canonical mode as base and syntax properties
-    /// at `:root`. This is a derived color artifact, not a complete application
-    /// stylesheet; arbitrary mode-sheet overrides cannot be projected into it.
+    /// Export the selected canonical mode's base/syntax colors and authored
+    /// font properties at `:root`. Consumers supply semantic role selectors.
+    /// This is not a complete application stylesheet; arbitrary mode-sheet
+    /// overrides cannot be projected into it.
     pub fn css_custom_properties_for_mode(&self, mode: &Mode) -> Result<String, ModeExportError> {
         let derived = self.palette_for_mode(mode)?;
         Ok(derived.css_custom_properties())
