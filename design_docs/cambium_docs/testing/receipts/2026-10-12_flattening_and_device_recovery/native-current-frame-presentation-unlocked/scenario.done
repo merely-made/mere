@@ -1,0 +1,16 @@
+RESULT ok
+Upgraded production host presentation preserves draft and selected graph
+captured initial
+captured seed_edited
+captured dark
+captured named
+captured resized
+captured restored_size
+capture initial 2360x1600 digest=8d822901717a6ca6 file=/Users/markik/Code/output/vello-production-fixes-20261011/native-current-frame-presentation-unlocked/initial.png
+capture seed_edited 2360x1600 digest=25a44d0a4cf2f6fb file=/Users/markik/Code/output/vello-production-fixes-20261011/native-current-frame-presentation-unlocked/seed_edited.png
+capture dark 2360x1600 digest=f156a76467f44f96 file=/Users/markik/Code/output/vello-production-fixes-20261011/native-current-frame-presentation-unlocked/dark.png
+capture named 2360x1600 digest=0598a74f2f67e28d file=/Users/markik/Code/output/vello-production-fixes-20261011/native-current-frame-presentation-unlocked/named.png
+capture resized 1920x1560 digest=9350268c160e9b68 file=/Users/markik/Code/output/vello-production-fixes-20261011/native-current-frame-presentation-unlocked/resized.png
+capture restored_size 2560x2200 digest=b7bb97063774e2cb file=/Users/markik/Code/output/vello-production-fixes-20261011/native-current-frame-presentation-unlocked/restored_size.png
+frames: 6 captured, 0 blank, 6 distinct digests
+presentation: 53 frames, 56 redraws, 3 unpresented redraws
