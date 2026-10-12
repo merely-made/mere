@@ -13,8 +13,14 @@ categories = ["network-programming"]
 name = "moot"
 path = "src/lib.rs"
 
+[[example]]
+name = "moot_resource_owner"
+required-features = ["resource-owners"]
+
 [features]
 default = []
+presentation = ["dep:cambium"]
+resource-owners = ["dep:gemot", "dep:servitor", "dep:eidetic"]
 # A native read bridge over Commons' existing encrypted chat replica. The
 # conversation view itself stays available without transport or store crates.
 commons-chat = ["dep:commons-spine", "dep:muniment"]
@@ -29,6 +35,8 @@ captured-web = [
 
 [dependencies]
 comms.workspace = true
+cambium = { workspace = true, optional = true }
+eidetic = { workspace = true, optional = true }
 commons-spine = { workspace = true, optional = true }
 muniment = { workspace = true, optional = true }
 gemot = { workspace = true, optional = true }

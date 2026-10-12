@@ -107,6 +107,16 @@ Checked: `c5f01064` ancestry, `git grep MEERKAT_SCENARIO`, `.cargo/` at the base
   - No two-machine receipt exists; the control grep found the proof doc's own mention.
   - These symbols are present: `CaptureEvidenceV1` (`document-lanes/src/eidetic_bridge.rs:142`), `DocumentIndex<K>` (`eidetic-search/src/document.rs:67`), `Withdrawn` (`records/roster.rs:275`), `withdraw_share_for_identity` (`service.rs:809`), `Replica::accept` (`commons/src/lib.rs:955`), and `AvailabilityPolicy` plus `lease.rs` in mesh.
 - Not recorded in the plan: the co-op lifecycle contract in `ports/moot/src/coop.rs` (`4837248d`, 2026-09-17), which is P4-adjacent.
+- Amendment 2026-10-12: the plan's dated shared-resource continuation now records
+  the portable contract, optional current Gemot/Eidetic read adapter, ordinary
+  Cambium controls and Graphshell host. Checked the implementation and its receipt:
+  16 port tests and 5 host tests passed; product Wasm and port boundaries passed;
+  two headed Chrome scenarios cover independent readings, verified local Open,
+  activity attention, refresh/close isolation and reopening. Reader metadata
+  admission is the supplying application's prerequisite. The local fixture has
+  synthetic unsealed identities; real signed peers, retention/hosting/fork writes,
+  activity participation and Turnstone mounting remain explicit gates. Earlier
+  judgment counts above describe the original pass.
 
 ## moothold_docs/implementation_strategy/2026-08-31_flora_tulpa_standing_plan.md
 

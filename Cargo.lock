@@ -6769,6 +6769,7 @@ dependencies = [
  "insigne",
  "mere",
  "mere-mesh",
+ "mere-moot",
  "mere-transport",
  "mere-view",
  "mere-webrtc-carrier",
@@ -9626,6 +9627,7 @@ dependencies = [
 name = "mere-moot"
 version = "0.0.1"
 dependencies = [
+ "cambium",
  "chartulary",
  "commons-spine",
  "eidetic",

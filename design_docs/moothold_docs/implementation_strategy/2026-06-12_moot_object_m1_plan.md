@@ -648,6 +648,79 @@ exercise real signed Gemot revocation and collection/content fork distinctions
 across retained peers. GPU/browser acceptance stays under the current serialized
 handoff. The separate producer/presenter lanes are preserved.
 
+### Shared resource controls and owner reads (2026-10-12)
+
+**Status:** implemented and qualified as a bounded owner-read/control slice.
+The portable model remains the presentation
+boundary. Optional `resource-owners` maps Gemot's current authorized fauna and
+exact collection version; content disclosures, hosting observations, operation
+offers and lifecycle reports still come from their respective application owners.
+Eidetic verifies an explicitly permitted local content read with a caller-selected
+byte budget. This read neither fetches remote sources nor authors custody facts.
+
+Optional `presentation` supplies ordinary Cambium summaries, exact-resource and
+activity inspection, and explicit owner-routed controls. Graphshell is the first
+rendered host, using an opt-in feature and locally retained completion bindings.
+Hosts supply owner reads and dispatch requested operations through their existing
+authority/custody/lifecycle paths. A UI completion never substitutes for a fresh
+owner read. General live peer dispatch, signed revocation across peers and actual
+collection/content fork writes remain later acceptance gates.
+
+**Done-conditions:** current collection filtering and local content verification;
+independent resource/activity attention; disabled unknown/withheld actions with
+readable reasons; current-read refusal before dispatch; completion isolation and
+late-response refusal; actual Cambium controls in Graphshell; native tests and
+product Wasm build; browser interaction and reviewed captures. Shared build
+outputs use `C:\t\cargo-targets\mere`; temporary packages have an owner marker
+and are removed by exact verified file paths when their host is closed.
+
+**Findings:** `resource_coop::owners` uses current Gemot author authority and the
+selected collection's effective membership, frontier and commitment. Reader
+admission and metadata disclosure remain the application's prerequisite. Content
+reads verify local/embedded bytes through Eidetic at the owner's chosen budget;
+the backend still materializes a stored value before the actual-size check.
+`resource_coop::view` renders summaries and independent resource/activity attention.
+Graphshell's opt-in host requires a fresh owner read before dispatch and keeps
+non-serializable local completion bindings. Opened text belongs only to its exact
+live reading. Owner read/transport failure ends that request with a refusal;
+refresh or close invalidates stale replies without inventing domain actions.
+
+**Evidence:** the [qualification receipt](../../../ports/moot/docs/receipts/resource_controls_20261012/qualification.json)
+records 16 port tests, 5 host tests, the product Wasm build, dependency boundaries,
+two headed Chrome scenarios and reviewed captures. The compiled local owner uses
+actual scoped Gemot reads and Eidetic verification with synthetic unsealed
+identities. It supports verified Open only. Retention, content/collection fork,
+hosting and activity participation remain withheld, unsupported or undisclosed
+until actual application handlers exist. This qualifies neither live signed peers
+nor production Turnstone mounting. The first scenario's two mismatched expected
+owner labels are retained in the failed receipt; corrected assertions passed.
+
+**Reproduction:** from the repository root in PowerShell, reuse the stable target:
+
+```powershell
+$env:CARGO_TARGET_DIR = 'C:\t\cargo-targets\mere'
+cargo test --locked --offline -p mere-moot --features presentation,resource-owners --lib resource_coop
+cargo test --locked --offline -p graphshell --no-default-features --features web,moot-resources --lib moot_resources
+cargo build --locked --offline -p mere-moot --features resource-owners --example moot_resource_owner
+cargo build --manifest-path ports/graphshell/web/Cargo.toml --locked --offline --target wasm32-unknown-unknown --no-default-features --features product,moot-resources
+```
+
+Package `graphshell_web.wasm` using `wasm-bindgen --target web --out-name
+graphshell_web` in a marker-owned temporary package beneath the same target.
+From `ports/graphshell/web`, serve it with `scenario_qualification_server.py
+--package <package> --output ../../moot/docs/receipts/resource_controls_20261012/chrome
+--port <dedicated-port> --moot-owner C:\t\cargo-targets\mere\debug\examples\moot_resource_owner.exe`.
+Open `tree.html?app=local&motion=normal&resource-owner=/moot-resource/read&scenario=scenarios/p4_tree_moot_resources.scn&sink=/scenario-receipt`,
+then `p4_tree_moot_resources_reopen.scn` on the retained origin. The loader waits
+for the retained host to mount before installing owner reads. Stop the owner host
+and close its tabs before deleting the five exact generated package files and
+the empty package directory. Build outputs remain in the reusable repository target.
+
+**Next gate:** install real application handlers for retention/hosting, collection
+reference forks and content forks, then qualify current signed admission and
+revocation across retained peers. Keep these operations and activity participation
+with their established domain owners.
+
 ### Capsule peer and standalone-browser reproduction
 
 The following commands execute the earlier capsule-library proof. Start at the
