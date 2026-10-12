@@ -752,6 +752,13 @@ pub(crate) struct LawInputs<'a> {
 }
 
 impl<'a> LawInputs<'a> {
+    /// A controller's explicit transient topology, without source assertions.
+    fn with_occurrence_edges(mut self, edges: Option<&[(NodeKey, NodeKey)]>) -> Self {
+        if let Some(edges) = edges {
+            self.edges = edges.to_vec();
+        }
+        self
+    }
     /// The inputs over `graph`, reading `sites` when the caller's registry
     /// holds them (computing them here otherwise, as a stats reader does).
     pub(crate) fn new(
@@ -1169,6 +1176,11 @@ impl<'a> LawInputs<'a> {
 }
 
 impl Canvas {
+    pub(crate) fn controller_edges(&self) -> Vec<(NodeKey, NodeKey)> {
+        self.occurrence_edges
+            .clone()
+            .unwrap_or_else(|| visible_relation_edges(&self.graph, &self.hidden_edges))
+    }
     /// Whether the live law or an overlay snapshots graph structure, so a
     /// topology change must rebuild it.
     pub(crate) fn physics_forces_are_graph_bound(&self) -> bool {
@@ -1238,6 +1250,7 @@ impl Canvas {
                 },
                 self.channels.sites_fresh(&self.graph),
             )
+            .with_occurrence_edges(self.occurrence_edges.as_deref())
             .with_meaning(self.meaning.snapshot())
             .with_registry(&self.channels, self.physics_view_key());
             self.composed_forces(&inputs, sources)
@@ -1326,7 +1339,7 @@ impl Canvas {
             crate::canvas::area_share::mass_area_stats(&points, &weights)
         };
         let at: HashMap<NodeKey, euclid::default::Point2D<f32>> = positions.into_iter().collect();
-        let edges = visible_relation_edges(&self.graph, &self.hidden_edges);
+        let edges = self.controller_edges();
         let lengths: Vec<f32> = edges
             .iter()
             .filter_map(|(a, b)| Some((*at.get(a)? - *at.get(b)?).length()))
@@ -1362,6 +1375,7 @@ impl Canvas {
     /// the physics channels read from the registry.
     fn law_inputs_now(&self) -> LawInputs<'_> {
         LawInputs::new(&self.graph, &self.hidden_edges, None, None)
+            .with_occurrence_edges(self.occurrence_edges.as_deref())
             .with_registry(&self.channels, self.physics_view_key())
     }
 

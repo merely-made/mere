@@ -20,6 +20,13 @@ pub trait VaultLockHolder: Send + Sync {
     /// What the log calls it.
     fn name(&self) -> &str;
 
+    /// The persisted persona that sealed this holder's data, when fixed.
+    /// Selection must not change a store's key source. `None` follows the
+    /// current vault identity, preserving existing single-persona holders.
+    fn key_profile(&self) -> Option<&personae::ProfileId> {
+        None
+    }
+
     /// Drop every vault-derived key now. Infallible: a lock never waits on
     /// a holder's opinion.
     fn lock(&self);

@@ -10,7 +10,9 @@
 //! its own range.
 
 use crate::pod::GenetElement;
-use crate::{GenetCtx, Key, NamedKey, PointerEvent, View, el, on_key, on_pointer};
+use crate::{
+    GenetCtx, Key, NamedKey, PointerEvent, ValueEvent, View, el, on_key, on_pointer, on_value,
+};
 
 /// The state of a [`slider`]: a normalized value in `0.0..=1.0`. Composable via
 /// [`lens`](crate::lens).
@@ -90,7 +92,7 @@ pub fn slider(state: &Slider) -> impl View<Slider, (), GenetCtx, Element = Genet
             }
         },
     );
-    on_key(pointer, |s: &mut Slider, event| {
+    let keyed = on_key(pointer, |s: &mut Slider, event| {
         let handled = match &event.key {
             Key::Named(NamedKey::ArrowLeft | NamedKey::ArrowDown) => {
                 s.value = (s.value - s.step).clamp(0.0, 1.0);
@@ -121,6 +123,11 @@ pub fn slider(state: &Slider) -> impl View<Slider, (), GenetCtx, Element = Genet
         if handled {
             event.prevent_default();
         }
+    });
+    on_value(keyed, |s: &mut Slider, event: ValueEvent| {
+        if event.value.is_finite() {
+            s.value = event.value.clamp(0.0, 1.0) as f32;
+        }
     })
 }
 
@@ -133,5 +140,29 @@ mod tests {
         assert_eq!(Slider::new(0.5).value, 0.5);
         assert_eq!(Slider::new(-1.0).value, 0.0);
         assert_eq!(Slider::new(2.0).value, 1.0);
+    }
+
+    #[test]
+    fn accessibility_values_route_to_the_slider_and_respect_its_range() {
+        use std::{cell::RefCell, rc::Rc};
+
+        use crate::{AnyView, DomHandle, GenetAppRunner};
+        use genet_scripted_dom::ScriptedDom;
+
+        type SliderView = Box<dyn AnyView<Slider, (), GenetCtx, GenetElement>>;
+        fn view(state: &Slider) -> SliderView {
+            Box::new(slider(state))
+        }
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner = GenetAppRunner::<_, _, _, ()>::new(dom, view, Slider::new(0.5));
+        let root = runner.root();
+        for (requested, expected) in [(0.37, 0.37), (-1.0, 0.0), (2.0, 1.0)] {
+            runner.dispatch_value(root, ValueEvent { value: requested });
+            assert_eq!(runner.state().value, expected);
+        }
+        for refused in [f64::NAN, f64::INFINITY, f64::NEG_INFINITY] {
+            runner.dispatch_value(root, ValueEvent { value: refused });
+            assert_eq!(runner.state().value, 1.0);
+        }
     }
 }

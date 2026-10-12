@@ -1016,7 +1016,10 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
     #[cfg(feature = "personal-sync")]
     personae.register_lock_holder(resident.credential_lock_holder());
     #[cfg(feature = "cxf")]
-    keeper.attach_credentials(resident.credentials().clone())?;
+    keeper.attach_credential_stores(
+        profile_id.clone(),
+        resident.credential_stores(personae.as_ref(), &data_root)?,
+    )?;
     // The reservoir lives under the family-shared root, not this resident's
     // data root: every application of the identity reaches the same meres.
     #[cfg(feature = "personal-sync")]

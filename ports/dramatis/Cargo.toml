@@ -1,0 +1,27 @@
+[package]
+name = "dramatis-app"
+version = "0.0.1"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[[bin]]
+name = "dramatis-ui"
+path = "src/main.rs"
+
+[dependencies]
+cambium.workspace = true
+cambium-genet-winit-host.workspace = true
+persona-picker.workspace = true
+graphshell = { path = "../graphshell" }
+dramatis.workspace = true
+personae.workspace = true
+serde_json.workspace = true
+tokio = { version = "1", features = ["rt", "time", "macros"] }
+
+image = { version = "0.25", default-features = false, features = ["png"] }
+
+[dev-dependencies]
+chatelaine.workspace = true
+taproot.workspace = true

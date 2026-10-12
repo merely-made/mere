@@ -379,7 +379,7 @@ applicable rendered acceptance pass against its published dependency set.
 
 - Woodshed's dr-c worktree failed
   `native_workshop_routes_name_and_stylesheet_text_through_owned_model`
-  (`crates/woodshed-genet/src/main.rs:368`) with the stylesheet field at
+  (`repos/woodshed/crates/woodshed-genet/src/main.rs:368`) with the stylesheet field at
   833×0. Its local patch builds against `dr-c-verify-tabard` (`00b43558`):
   unmerged r44 plus `codex/tabard-boundary` `7d2a5f3`. That Tabard predates
   `d1ee0675`, so its `workshop.css` still styles `input` and `textarea`, which

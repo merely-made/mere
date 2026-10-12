@@ -397,7 +397,7 @@ names a mere package. Which?* Options: move signalman to `85e716c7`, with
 85e716c7 (Recommended)"**. Follows: one Retinue in mere; any code change the
 61 commits need comes back as a fork.
 
-**Ruling 43.** *Mark's local `crates/p2panda` was clean on `main` at
+**Ruling 43.** *Mark's local `crates/p2panda` *(historical citation)* <!-- doc-audit: historical-path --> was clean on `main` at
 `0a54ab82`, behind GitHub's `1bec457e`. Bring it up to date?* Options:
 fast-forward it; leave it. Mark: **"Fast-forward it (Recommended)"**. Done
 2026-10-03 with `--ff-only`; clean afterwards.
@@ -589,7 +589,7 @@ lockstep (Recommended)"**. Follows: before such a push, `cargo check
 tree; recorded in the mere/Knot lockstep memory the same day.
 
 **Ruling 63.** *Push (c) is ready apart from three knot-desktop Collapse
-tests failing with "missing Show Preview" (`apps/desktop/tests/collapse.rs:44`),
+tests failing with "missing Show Preview" (`repos/knot-editor/apps/desktop/tests/collapse.rs:44`),
 which fail identically on Knot's `main` before the repin (`ea3e99e`, a clean
 control worktree on its own lock); every other check passes. Commit and push
 (c)?* Options: push, naming the three failures; hold until Collapse is fixed
@@ -1041,7 +1041,7 @@ earlier unexplained hang (the test now logs the stall and moves on).
     patched to the 0.7.5 tag, since signalman now calls
     `decode_cbor_strict`.
   - Isometry decodes a peer's operation body leniently
-    (`crates/isonetry/src/campaign_space/space.rs:77`, checked) and should
+    (`repos/isometry/crates/isonetry/src/campaign_space/space.rs:77`, checked) and should
     go strict at its next repin (ruling 24).
 
 **2026-10-03: ruling 31 landed; iroh 1.3 is not slower.**

@@ -321,7 +321,7 @@ shadow-DOM and spec work; keep the plan in place as a historical design record.
   content emission unchanged, clear restores parity), and geometry
   **re-derives across relayout** (a wrapped narrow layout moves the
   highlighted word's fill down with no re-registration). 242/242
-  genet-layout lib tests green (genet `components/genet-layout` *(historical citation)* <!-- doc-audit: historical-path -->, one
+  genet-layout lib tests green (genet `components/genet-layout`, one
   commit). Next: P2 wires the find worker's matches onto `set_highlight` in
   the content actor and deletes the render.rs match-rect compositing — or the
   P0 top-layer/anchor probe, whichever lane is quiet.

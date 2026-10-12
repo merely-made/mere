@@ -1465,7 +1465,7 @@ V2b's rulings, all 2026-09-25:
 - 2026-09-25: the two-process receipt, `ports/djinn/tests/mere_two_process.rs`.
   The parent serves djinn's door with the reservoir route and the mere routes
   over one catalog, and ensures `divination`. Two children, this test binary
-  re-run, attach through the door on `mere/divination`:
+  re-run, attach through the door on `AppRouteId::new("mere/divination")`:
   - the Knot editor, attached first, hears Turnstone's edit at revision 2,
     sees the node and adds its own;
   - Turnstone hears that at revision 3 and sees both nodes, with no stale

@@ -143,7 +143,7 @@ impl ItemStore {
         Ok(record.item)
     }
 
-    pub(super) fn check_payload(
+    pub(crate) fn check_payload(
         &self,
         item: ItemId,
         credential: CredentialId,

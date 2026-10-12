@@ -1,0 +1,16 @@
+{
+  "command": [
+    "/Users/markik/Code/targets/vello-producer-gates-20261011/debug/deps/cambium_rootstock-ce269b6b69cbd68b",
+    "producer::registry::portable::tests::portable_refusal_preserves_live_gpu_view_and_stamp",
+    "--exact",
+    "--ignored",
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-vello-release-adoption",
+  "deadline_seconds": 120,
+  "elapsed_seconds": 0.633,
+  "exit_code": 0,
+  "timed_out": false,
+  "log": "/Users/markik/Code/output/vello-producer-gates-20261011/checks/portable-live-gpu-refusal.log"
+}

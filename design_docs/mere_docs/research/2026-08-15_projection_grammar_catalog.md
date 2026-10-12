@@ -546,7 +546,7 @@ fold fact's promotion, 2026-10-08).
   older reader ignores `folds` and shows every member, and cannot parse the new
   ops.
 - **Removed on promotion:** the site's own fold (`visibility_diff` in
-  `crates/repo-graph`, the `["fold",1]` channel, the "+N" count in
+  `repos/mer3ly/crates/repo-graph`, the `["fold",1]` channel, the "+N" count in
   `assets/projection-proof.js`), in the site's follow-up. `forme::FoldRecord` is
   not a duplicate (Mark, "Not a duplicate"): it is the authored record a host
   lowers into the fact. Open for the native phase: pictograph's

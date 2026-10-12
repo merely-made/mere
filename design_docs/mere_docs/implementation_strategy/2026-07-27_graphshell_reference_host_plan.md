@@ -642,13 +642,13 @@ one should not lose:
 - `ports/graphshell/src/identity.rs` (new)
 - `ports/graphshell/src/identity_endpoint.rs` (new)
 - `ports/graphshell/src/identity_projection.rs` (new)
-- `ports/graphshell/src/native/personae_host.rs` (new)
+- `ports/graphshell/src/native/personae_host.rs` *(historical citation)* <!-- doc-audit: historical-path --> (new)
 - `ports/graphshell/src/native/device_broker.rs` (new)
 - `ports/graphshell/src/bin/graphshell_device_host.rs` *(historical citation)* <!-- doc-audit: historical-path --> (new)
 - `ports/graphshell/src/bin/graphshell_native_host.rs` (new relay)
 - `ports/graphshell/install-device-host-windows.ps1` *(historical citation)* <!-- doc-audit: historical-path --> (new)
 - `ports/graphshell/src/session_loop.rs`
-- `repos/dramatis/crates/personae/src/agent.rs`
+- `repos/dramatis/crates/personae/src/agent.rs` *(historical citation)* <!-- doc-audit: historical-path -->
 - `repos/dramatis/crates/personae/src/signing.rs` (new only if the approval seam is
   independently useful outside Graphshell)
 - current `crates/system/session-runtime/src/wallet_store.rs` *(historical citation)* <!-- doc-audit: historical-path --> and
@@ -801,7 +801,7 @@ interim task was restored with the same fingerprint. The known laptop was
 offline, so remote login remains open. The Graphshell logon task was not
 installed or used to retire the interim task because a real sign-out or reboot
 receipt is still required. See the
-[H4f resident device-host receipt](../../../ports/graphshell/docs/2026-07-28_h4f_resident_device_host_receipt.md) *(historical citation)* <!-- doc-audit: historical-link -->.
+[H4f resident device-host receipt](../../../ports/graphshell/docs/2026-07-28_h4f_resident_device_host_receipt.md).
 
 **H4g receipt (2026-07-28):** the final mixed-scene done-condition is now
 closed. Active delegated-device cards advertise one typed, native-only

@@ -1,5 +1,8 @@
 # Earlier native GPU resets: evidence and limits
 
+**Status:** Historical receipt at the recorded source revisions. Later stack
+repins require their own qualification.
+
 The earlier Pelt acceptance resets and the image-atlas defect qualified by this
 receipt are separate findings. The reset reports establish recurring compute
 queue and memory-fault symptoms; they do not identify an exact Vello kernel or

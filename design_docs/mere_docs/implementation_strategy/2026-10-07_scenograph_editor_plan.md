@@ -18,9 +18,13 @@ authoring and the unresolved storage/composition policies remain planned.
 
 **2026-10-11 continuation:** access/Resource and
 [link/assertion inspection](#link-and-exact-assertion-inspector-draft-2026-10-11)
-now have read-only local-product drafts. Field inspection and overlap discovery
-are next in the approved sequence; primitive writes and derived-link owner
-explanations retain their existing gates.
+now have read-only local-product drafts. The
+[field/coupling draft](2026-06-13_scriptable_field_regions_plan.md#field-inspection-draft-2026-10-11)
+adds exact records and overlap discovery. The
+[declarative rule editor](#declarative-presentation-rule-editor-draft-2026-10-11)
+adds scoped authoring, explicit decision preview and saved history; primitive
+writes, live presentation adapters and derived-link owner explanations retain
+their existing gates.
 
 Not in scope, mapped in §3 and opened by later rounds:
 - the scripting comparison (SE3), which is the next assessment;
@@ -149,7 +153,7 @@ Mark chose the scripting comparison (SE3) while E3 and E4 wait. Evidence put: th
 
 **SE45, one store for the command menu's choices (2026-10-08).** Evidence put: Turnstone keeps the kept and dropped commands in its own session view sidecar (`ViewIntentV1.command_menu`); Graphshell keeps them in pandect's `CommandMenuView`; both are views, not graph truth, as SE31 asks, but two stores hold the same thing. Options: leave it and note it (recommended: Turnstone's view is its own storage and it does not run on pandect's `GraphSession`); brief Turnstone to converge on `CommandMenuView` inside its sidecar; hoist the type out of pandect into Cambium beside `CommandSet`, with Graphshell and Turnstone repointing. Mark: **"Brief to converge and houst"**. *Follows:* both: the type is hoisted out of pandect into the Cambium family, and Turnstone's lane is briefed to store that type. *Reading, not ruled:* "houst" is "hoist". *Found after the answer:* cambium's `CommandChoices` already has the same three fields as `CommandMenuView` (`added`, `removed`, `recent`) without serde; the cambium crate has no serde dependency, and pandect does not depend on cambium (SE10 measured cambium at 46 crates for a build without it). Where the hoisted type lives is put back as SE46.
 
-**SE46, where the hoisted type lives, and its name (2026-10-08).** Question 1: cambium's `CommandChoices` matches `CommandMenuView` field for field but has no serde, cambium has no serde dependency, and pandect does not depend on cambium (46 crates, SE10); both serialize to the same field names, so stored sessions keep loading. Options: a leaf crate holding the choices only (recommended); a leaf crate holding the whole set (`Command`, `CommandChoices`, `CommandSet`, with cambium keeping the drawing as `CommandItem`); pandect takes cambium. Mark: **"Think about it this way: what apps shouldn't have this capability? Commands feel pretty fundamental. Are choices (1) sufficient?"** Question 2, the crate's name. Options: `command-choices`; `command-set`; `command-menu`. Mark: **"command-menu"**. *Follows:* the crate is `command-menu`. Question 1 is answered by evidence and put back. *Reading, not ruled:* choices alone are not sufficient. Without the set, a host with commands but no cambium has to rebuild the composition (context first, then kept, then recent, with a query searching everything) to use the stored choices, and nine of the ten ports under `ports/` do not depend on cambium, nor does Graphshell's native build. Earlier portable runs at the same thing exist: graph-kernel's `ActionId` (`crates/graph/graph-kernel/src/actions.rs`), a closed enum of about 130 actions read by ux-events' diagnostics and probes, and mere-chrome's `CommandPaletteSession` (`crates/shell/chrome/src/command_palette.rs`, 332 lines), which no crate in mere's tree depends on. *Correction 2026-10-08:* "about 130 actions" is 68 (F12).
+**SE46, where the hoisted type lives, and its name (2026-10-08).** Question 1: cambium's `CommandChoices` matches `CommandMenuView` field for field but has no serde, cambium has no serde dependency, and pandect does not depend on cambium (46 crates, SE10); both serialize to the same field names, so stored sessions keep loading. Options: a leaf crate holding the choices only (recommended); a leaf crate holding the whole set (`Command`, `CommandChoices`, `CommandSet`, with cambium keeping the drawing as `CommandItem`); pandect takes cambium. Mark: **"Think about it this way: what apps shouldn't have this capability? Commands feel pretty fundamental. Are choices (1) sufficient?"** Question 2, the crate's name. Options: `command-choices`; `command-set`; `command-menu`. Mark: **"command-menu"**. *Follows:* the crate is `command-menu`. Question 1 is answered by evidence and put back. *Reading, not ruled:* choices alone are not sufficient. Without the set, a host with commands but no cambium has to rebuild the composition (context first, then kept, then recent, with a query searching everything) to use the stored choices, and nine of the ten ports under `ports/` do not depend on cambium, nor does Graphshell's native build. Earlier portable runs at the same thing exist: graph-kernel's `ActionId` (`crates/graph/graph-kernel/src/actions.rs`), a closed enum of about 130 actions read by ux-events' diagnostics and probes, and mere-chrome's `CommandPaletteSession` (`crates/shell/chrome/src/command_palette.rs` *(historical citation)* <!-- doc-audit: historical-path -->, 332 lines), which no crate in mere's tree depends on. *Correction 2026-10-08:* "about 130 actions" is 68 (F12).
 
 **SE47, what `command-menu` holds, where, and the older runs (2026-10-08).** Question 1: what goes in. Options: the whole set (recommended: `Command`, `CommandChoices` with serde, `CommandSet`, with cambium keeping the drawing as `CommandItem`); the set plus a palette session (the in-progress query, cursor and scope that mere-chrome's `CommandPaletteSession` held for the egui-era host), so a host only draws; the choices only. Mark: **"Set plus palette session"**. Question 2: where. Options: `crates/cambium/` beside `edit-history` (recommended); `crates/system/` beside pandect. Mark: **"crates/cambium/ (Recommended)"**. Question 3: graph-kernel's `ActionId` and mere-chrome's `CommandPaletteSession`. Options: note them and map them for later (recommended); fold them in during the hoist; leave them be. Mark: **"Note, map, then fold in depending on the results. We don't need duplicate commands or anything"**. *Follows:* track C2 (§2). `crates/cambium/command-menu` holds the command set, the stored choices and a palette session; cambium re-exports it and keeps the drawing; pandect's `CommandMenuView` becomes the crate's choices type. The two older runs are mapped against it first, and what folds in follows from the map, with no command defined twice.
 
@@ -219,7 +223,7 @@ Mark: "proceed!" Evidence put: the June gloss design (`mere_docs/design/2026-06-
 
 **SE75, dissolving node facets (2026-10-08).** Evidence put: SE72's inventory; claims fit resources and their assertions, labels are tags already, view state and whole app documents are versioned structured JSON that tags cannot carry without becoming a document store. Options: rename to attribute now and redistribute separately (recommended); redesign first and rename what is left; tags take everything. Mark: **"2; we could use attribute as an abstraction belonging to or characteristic of an entity sounds like view state to me. attribute, resource, tag... dissolving into those three sounds good to me"**. *Follows:* node facets dissolve into three: **attribute** (view state, what belongs to or characterizes an entity), **resource** (claims about what a thing is, through graph semantics' assertions), and **tag** (labels). The rename waits on that design; meanwhile the swatch grid's facet coexists with node facets in code. The design goes to graph-semantics' owner (SE74) as `mere_docs/research/2026-10-08_facet_dissolution_brief.md`, handed over by Mark. *Reading, not ruled:* whole app documents at a node (`saved-scene/v4`, `projection-definition/v1`, `content/v1`, `local-file/v1`, the transfers, `receipt.*`, contact records) become resources, as content the node shows; the brief puts this as its first question.
 
-**SE76, the curation crate's place (2026-10-09).** Mark: "Go" (S1). Evidence put: its types come from forme (`SubgraphSpec`, later `FoldRecord`); forme's family holds forme and uxtree, the graph family the kernel and linked-data. Options: `crates/forme/curation` (recommended); `crates/graph/curation`. Mark: **"crates/forme/curation (Recommended)"**.
+**SE76, the curation crate's place (2026-10-09).** Mark: "Go" (S1). Evidence put: its types come from forme (`SubgraphSpec`, later `FoldRecord`); forme's family holds forme and uxtree, the graph family the kernel and linked-data. Options: `crates/forme/curation` (recommended); `crates/graph/curation` *(historical citation)* <!-- doc-audit: historical-path -->. Mark: **"crates/forme/curation (Recommended)"**.
 
 **SE77, its package name.** Options: `curation`, plain, as edit-history and command-menu (recommended); `mere-curation` with lib `curation`, as mere-forme and mere-kernel. Mark: **"mere-curation, lib curation"**.
 
@@ -962,7 +966,7 @@ Verified 2026-10-07 against mere's origin unless named.
 - **F4, options.** Eleven families (`Family`, `FAMILIES` in `scenomise/src/catalog.rs`) read 26 distinct keys through seven readers (counted by literal call; E4's test finds any other): `finite`, `positive`, `count`, `depth`, `flag`, `choice`, `list`. `finish` refuses any key not read. A custom solver receives the options as a JSON object and judges them when it solves (`scenomise/src/projection.rs`). `SolverCapability` (`registry.rs`) carries no options. The only `Solver` implementations in mere, Isometry, Turnstone, Woodshed, Knot and mer3ly are test fixtures.
 - **F5, the games wing.** Answering read-only (Isometric game engine architecture session), the wing took balaur's determinism recipe and labelled digest (wing rulings 603 to 611, 633 to 636, in `isometry/mesocosm/design_docs/2026-09-18_wing_design_plan.md`) and none of the editor slices. Ruling 609 builds one labelled-digest crate in mere under G8.
 - **F6, scripting.** Genet's `script-engine-api` (`components/script-engine-api/lib.rs`, 975 lines) is a JavaScript-shaped contract: realms, `WindowProxy` traps, reflectors carrying a DOM `NodeId`, host promises. Its backends are Nova, Boa and piccolo; piccolo's documents its deviations and does not yet honour step budgets. Outside it: mere's rhai crate, behind inker's `BlockEvaluator` and "deliberately *not* genet's full DOM-shaped `ScriptEngine` seam" (`crates/script/rhai/src/lib.rs`); mere's Wasmtime hosts on the `mere:script` WIT world (`crates/script/wit/world.wit`); and Isometry's piccolo, which `isometry-system` and `mesocosm-phenotype` depend on directly. No manifest in mere, Isometry, Turnstone, Woodshed or Knot names Rune. *Reading, not ruled:* values cross the seam as strings and node handles only, so scene logic may want a value-level seam beside it.
-- **F7, the wing's stagecraft.** Isometry's `MapDocument` (`crates/isometry-core`) carries tile layers including `props`; appearance binds through CSS classes with tilesets as stylesheets (`crates/isometry-views`); the shared scene is `shared/isometer`.
+- **F7, the wing's stagecraft.** Isometry's `MapDocument` (`repos/isometry/crates/isometry-core`) carries tile layers including `props`; appearance binds through CSS classes with tilesets as stylesheets (`repos/isometry/crates/isometry-views`); the shared scene is `shared/isometer`.
 
 - **F8, the engine probes (SE38, 2026-10-07).** Scratch at `Code/testing/mere/scripting-probes` (outside the tree): one rule (a Gaussian falloff with `exp`, `sin`, `cos`, `sqrt` and a power over 10,000 generated positions), hashed by FNV-1a over the float bits; release builds at `opt-level = "s"` with LTO; wasm32 run under Node 24 (V8). Rune's float module has `sqrt` and `powf` but no transcendentals, and Starlark has no maths library, so both take host functions on `libm`; rhai ran on its built-in maths and on `libm`.
 
@@ -976,10 +980,10 @@ Verified 2026-10-07 against mere's origin unless named.
   Medians of five runs, each including the engine's setup and compile. Every budget stopped a runaway on both targets: rhai's operation limit, Rune's `budget::with`, Starlark's `set_max_tick_count` (calls and loop back-edges; it also caps heap). The wasm32 builds needed `getrandom`'s `wasm_js` backend: rhai and Rune through `ahash` (0.3, also the `--cfg getrandom_backend`), and Starlark through `pagable` → `sorted_vector_map` → `quickcheck` → `rand` (0.4), a property-testing crate in its normal dependency tree. Starlark's `range` takes a 32-bit int. *Reading, not ruled:* rhai is the slowest by two to three times but the smallest, and rules run on events, so its speed does not argue against SE36.
 - **F9, next door (2026-10-07).** numen's CPU field evaluator (`crates/conatus/numen/src/eval.rs`) uses std `.exp()` and `.sqrt()`, so field maths that feeds seiche's couplings is not yet on `libm` under S4; G8's lint is the dynamics lane's to apply.
 
-- **F10, the trait fits rhai (2026-10-07).** genet branch `value-engine` at `27477d3e` (off genet main `161b1a89`): `components/script-engine-api/value.rs` adds `ScriptValue` (unit, bool, int, float, string, list, ordered map), `HostFunction` (`Arc<dyn Fn(&[ScriptValue]) -> Result<ScriptValue, String> + Send + Sync>`), `ValueError` (budget, script, host, value) and `ValueEngine` (`set_global`, `register`, `eval` under `Budget`); three tests through a toy backend, including use behind `dyn ValueEngine`. A scratch rhai implementation (`Code/testing/mere/scripting-probes/probe-value-rhai`, outside both trees) loads rhai's core, array and map packages but not its maths package, registers `libm` maths through the trait, and reproduced the probe rule's hash `028dc38f…` exactly; `sin(1.0)` without a host function fails as "Function not found", and a runaway returns `ValueError::Budget`.
+- **F10, the trait fits rhai (2026-10-07).** genet branch `value-engine` at `27477d3e` (off genet main `161b1a89`): `components/script-engine-api/value.rs` *(historical citation)* <!-- doc-audit: historical-path --> adds `ScriptValue` (unit, bool, int, float, string, list, ordered map), `HostFunction` (`Arc<dyn Fn(&[ScriptValue]) -> Result<ScriptValue, String> + Send + Sync>`), `ValueError` (budget, script, host, value) and `ValueEngine` (`set_global`, `register`, `eval` under `Budget`); three tests through a toy backend, including use behind `dyn ValueEngine`. A scratch rhai implementation (`Code/testing/mere/scripting-probes/probe-value-rhai`, outside both trees) loads rhai's core, array and map packages but not its maths package, registers `libm` maths through the trait, and reproduced the probe rule's hash `028dc38f…` exactly; `sin(1.0)` without a host function fails as "Function not found", and a runaway returns `ValueError::Budget`.
 - **F11, the command map (C2, 2026-10-08).** Read against mere main `81b6ad78` and Turnstone main `d0775a1`.
   - *The person's choices, three times.* cambium's `CommandChoices`, pandect's `CommandMenuView` (`view_intent_store.rs`) and Turnstone's `CommandMenuV1` (`src/session.rs`) are the same three lists, `added`, `removed`, `recent`; the two stored ones both carry `#[serde(default)]` on each, so one type in `command-menu` reads what either wrote. graph-kernel adds a fourth, narrower run: `CATEGORY_RECENCY_PERSIST_KEY` and `CATEGORY_PIN_ORDER_PERSIST_KEY`, recency and pins for its four categories.
-  - *A palette's in-progress state, three times.* mere-chrome's `CommandPaletteSession` (`crates/shell/chrome/src/command_palette.rs`): query, a four-way search scope (current target, active pane, active graph, workbench), a selected index with a wrapping `step_selection`, a focus-the-search flag, an egui frame flag, and a selected `ActionCategory`; nothing in mere or Turnstone reads it. Graphshell web's `OpenMenu` (`web_commands.rs`): where it opened, its context, query, a redraw flag, a focus-the-search flag. Turnstone's `OmnibarState` (`src/ui.rs`): the command lane is the omnibar's text after `>`, its `selected` row and `all_commands` (the "All commands…" expansion); the rest is the address bar's. Shared by all three: query, selected row, focus the search. Shared by two: the context it opened over, an expansion or tier. Host-only: position, redraw, frame flags, the address bar.
+  - *A palette's in-progress state, three times.* mere-chrome's `CommandPaletteSession` (`crates/shell/chrome/src/command_palette.rs` *(historical citation)* <!-- doc-audit: historical-path -->): query, a four-way search scope (current target, active pane, active graph, workbench), a selected index with a wrapping `step_selection`, a focus-the-search flag, an egui frame flag, and a selected `ActionCategory`; nothing in mere or Turnstone reads it. Graphshell web's `OpenMenu` (`web_commands.rs`): where it opened, its context, query, a redraw flag, a focus-the-search flag. Turnstone's `OmnibarState` (`src/ui.rs`): the command lane is the omnibar's text after `>`, its `selected` row and `all_commands` (the "All commands…" expansion); the rest is the address bar's. Shared by all three: query, selected row, focus the search. Shared by two: the context it opened over, an expansion or tier. Host-only: position, redraw, frame flags, the address bar.
   - *Commands defined twice.* graph-kernel's `ActionId` (`crates/graph/graph-kernel/src/actions.rs`, 588 lines): a closed enum of 68 actions with namespaced keys (`graph:fit`), labels, short labels and four categories, read by ux-events (diagnostics, observability, the destructive-action probe) and by mere-chrome's and shell-state's `HostIntent::Action`. No live host registers it: Graphshell web registers 32 commands under its own kebab ids, and Turnstone registers its composed rows under their labels, which its automation runner resolves. The same verbs appear under different ids: `graph:fit` and `fit-content`, `graph:toggle_physics` and `toggle-physics`, `persistence:undo`/`redo` and `session-undo`/`redo`, and Turnstone's Fit view. Turnstone reads mere-chrome only for history navigation (3 files).
 
 
@@ -1610,5 +1614,259 @@ and the integrated product wasm check pass. The opt-in isolated fixture and
 two-page browser handoff remain unrun here. The other agent's Forme Chrome
 receipt above qualifies its recorded source, not this new inspector. Primitive
 writes, derived-link explanation and the field composition/event policies
-retain their existing gates; the declarative rule editor remains the next
-bounded appearance-authoring candidate.
+retain their existing gates; the [declarative rule editor draft](#declarative-presentation-rule-editor-draft-2026-10-11)
+continues the bounded appearance-authoring sequence.
+
+
+#### Declarative presentation rule editor draft (2026-10-11)
+
+**Status:** implemented draft for review and headed qualification. Mark's
+"proceed! next uuup?" continues direct-main delivery. Based on published Mere
+`a1acb6b9`, including the current Vello/Genet release adoption and documentation
+repair; no previous Forme or study browser receipt qualifies this new editor.
+
+The [portable authoring session](../../../ports/graphshell/src/presentation_editor.rs)
+reuses `scenograph::presentation` version 1. It does not introduce a second
+resolver or open Rhai adoption. Each rule retains its ID, label, enabled flag,
+signed priority, occurrence target, condition and effects. The retained
+[Graph tools editor](../../../ports/graphshell/src/web_tree/presentation.rs) is
+available through **Presentation rules** on `tree.html?app=local`. **Begin rule
+draft** opens private authoring. Add node/link/field rule buttons supply valid
+starting rows; the target, condition and effects use the existing model's JSON
+vocabulary, with separate ID, label and priority controls. Reordering is
+semantic: later authored rules win equal-priority property ties. Disabled rules
+still validate. Unknown input properties are refused instead of silently lost;
+the shared resolver's compatibility policy remains unchanged.
+
+**Draft interaction:** text controls hold editable buffers. **Update rule
+draft**, **Preview rule decisions**, switching rows and **Apply rules** record
+the current row before their operation. Malformed input remains undoable but
+cannot preview or save. **Undo rule draft** first records pending input, then
+undoes one draft step. Undo/redo clears the active row, requiring an explicit
+choice before further row edits; it never selects or opens graph content. Redo
+refuses unstaged input rather than dropping it. **Discard rule draft** drops
+only this editor's buffers and history. Closing the panel retains its draft.
+Text caret/IME/local text undo remains Cambium's existing input path; the rule
+buttons own whole-set history. No graph-wide keyboard undo is intercepted.
+
+**Decision preview:** node, link and field samples are clearly identified inputs,
+editable through the context JSON control. All facts, states, occurrence ID,
+screen size and previous matches are disclosed. Resolve shows each winning
+property's effect, rule ID and priority, and every rule's match explanation and
+winning properties. A changed buffer/context hides the stale result until
+Preview runs again. An absent winning property uses the host's base presentation.
+Preview is pure and does not carry hidden hysteresis state between occurrences,
+samples, committed sets or drafts; prior matches are supplied explicitly.
+At this authoring checkpoint the preview has no live graph-to-context adapter
+or Canvas consumer. The [exact-occurrence and Forme guide continuation](#exact-occurrence-previews-and-live-forme-guides-draft-2026-10-11)
+below adds disclosed bindings and the first supported overlay effect; faces,
+containment, provenance and drop zones retain their renderer gates.
+
+**Persistence:** rules, generation and up to 32 saved undo/redo steps commit in
+one Muniment workspace record, `graphshell/presentation-rules/v1/<graph-session-uuid>`.
+The graph session identifies the workspace scope; graph/source records, selection,
+content sessions, theme preferences and Forme layout are absent from snapshots.
+The record and malformed draft each have a 1 MiB bound; the resolver's 256-rule
+and condition-depth/count limits remain. Every saved history entry, version and
+scope is validated before reopening. Apply creates one saved undo step, freezes
+rule changes while in flight and changes the committed version only after store
+acknowledgment. Failure retains the draft and saved version for retry. Saved
+undo/redo requires no open draft and survives reopening.
+
+The prepared save uses `Backend::transact` to compare the exact previously loaded
+bytes and replace the record atomically. A stale workspace refuses with a named
+explanation, leaving the newer saved record and local draft intact. There is no
+racy fallback for a backend without transactions. After a conflict, this first
+UI requires reopening/reconciling explicitly; an in-panel merge or draft export
+is not implemented. The current IndexedDB transaction adapter snapshots its
+whole object store, so storage size and transaction cost remain a backend/host
+qualification gate, not a claim of bounded total-store work.
+
+**Qualification and handoff:** the [source receipt](../../../ports/graphshell/docs/receipts/presentation_rules_20261011/qualification.json)
+records the actual-source native harness and locked product wasm check (both
+pass). Replay the native checks with
+`cargo test --locked --manifest-path ports/graphshell/docs/receipts/presentation_rules_20261011/harness/Cargo.toml --lib`.
+Nine portable
+session tests cover malformed/unknown inputs and disabled-rule validity,
+priority/order undo, explicit occurrence-local hysteresis, acknowledged saves,
+failure retention, stale-write refusal, graph-scoped MemoryBackend reopen and
+saved history validation/limits. Native tests qualify this portable module with
+an isolated lockfile, not the complete Graphshell native host or IndexedDB.
+The integrated product check uses the web host's current locked dependencies
+and committed wasm configuration; default/viewer and release bundles were not
+built in this pass.
+Browser checks remain pending on O-PC, the ThinkPad or a Mac with a connected
+WebGPU-capable browser. The existing connected S-PC browser has no WebGPU adapter.
+
+Use a **fresh dedicated profile/origin** on `tree.html?app=local` for
+[`p4_tree_presentation_rules.scn`](../../../ports/graphshell/web/scenarios/p4_tree_presentation_rules.scn),
+then a **fresh page/process on the same retained origin/profile** for
+[`p4_tree_presentation_rules_reopen.scn`](../../../ports/graphshell/web/scenarios/p4_tree_presentation_rules_reopen.scn).
+Use a normal-motion profile (the scripts pause physics explicitly); scenario
+waits now include the rule-store write. The first requires an absent rule record; it exercises all three primitive kinds,
+preview precedence/reorder/undo, invalid apply refusal, acknowledged apply,
+saved undo/redo and discard. The second exercises stored history and decisions
+on reopen. Both check graph membership, graph session and Forme access count
+remain unchanged. Their two captures are planned, not generated or reviewed here.
+Run at normal and narrow widths; review scrolling, long JSON input, caret/IME,
+Tab/keyboard activation, disabled controls, source-editor undo independence and
+Tabard theme changes. Physical input, fresh-origin negative control, actual
+IndexedDB failure/conflict injection, multi-tab races, large-record costs,
+release performance and other hosts remain separate acceptance gates.
+
+**Next done-condition at this checkpoint:** bind preview inputs to stable
+projected occurrences and an explicit disclosed fact/state adapter; realize
+supported effects before measurement/placement, explain unsupported ones, and
+qualify scene changes with source, selection, pins, manual placement and live
+tile sessions preserved. The bounded continuation below implements these
+bindings and Forme guides; its remaining acceptance gates stay open. This
+bounded authoring draft does not complete primitive writes, field action/script
+execution, theme/font authoring, scene composition or Rhai SE39–SE42 adoption.
+
+
+#### Exact-occurrence previews and live Forme guides draft (2026-10-11)
+
+**Status:** implemented draft, portable native and product wasm checks passed;
+headed acceptance remains open. Mark's continuing “proceed!” authorizes direct
+main delivery and review/testing handoff. Published `e56f7a3f` is the integration
+base. Fetches before implementation and delivery found no newer upstream
+adoption; earlier Forme Chrome receipts remain limited to their recorded source.
+
+The [binding adapter](../../../ports/graphshell/src/presentation_binding.rs)
+reads current held owners and receives disclosed state from one Canvas view.
+**Use inspected access**, **Use inspected assertion** and **Use inspected field**
+explicitly bind a preview. Selection does not retarget it. Missing/departed or
+rebound targets produce an explanation and invalidate the previous preview;
+there is no equal-address fallback. A held assertion must still contribute to
+the exact displayed access pair, even if its Resource owner remains inspectable
+elsewhere. Sidecar-only families do not acquire synthetic assertion handles.
+
+Occurrence IDs are `access:<surface-uuid>`, `numen:<field-uuid>`,
+`forme:<forme-uuid>` and `assertion:<JSON of canonical access pair and assertion
+handle>`. The same Resource and assertion can supply facts to distinct access
+or relation occurrences. Local node/edge indexes and URLs are not durable
+occurrence IDs. Numen and Forme remain separate owners even with equal UUID
+payloads. The read model does not write graph facts or evaluate field ASTs.
+
+**Disclosed inputs:** accesses expose held label/address, optional MIME and its
+known image/video/audio/text category, recorded Resource identity/address and
+scalar Resource facets under `resource.<key>`. Complex facet values are omitted;
+missing metadata is not a completeness claim. Access Selected and PositionPinned
+come from this Canvas; Forme holds are not position pins. The optional screen
+size uses the measured body hit rectangle's smaller dimension, including the
+existing occlusion behavior; no first-frame measurement is invented. Held
+assertions expose predicate, actual `Semantic` family, scope, provenance and
+source/displayed endpoints; `derived` is not fabricated. Numen exposes name,
+lifecycle, definition/extent kinds and this view's boundary visibility. Forme
+exposes label, role, lock, visibility, member count and actual boundary hover
+when presented. LayoutUnlocked belongs to the Forme owner. Inspected identifies
+the retained exact inspector target, independently of graph selection.
+
+The JSON report includes the occurrence, context, available states and limits.
+Unknown state differs from known false. Rules that reference unavailable state
+or measurement are skipped with a trace explanation, including references
+under `Not` or `Any`. Other valid rules can still win. Original whole-set
+validation runs before this host filter; malformed or disabled rules are not
+silently repaired. ForegroundPinned, Overview, exact assertion selection and
+field selection have no adapter yet. Child selection is not promoted to a
+selected field. Missing facts retain the shared resolver's existing semantics.
+Bound previews use an empty disclosed prior-match set, without hidden hysteresis.
+Manual samples/context editing retain their explicit-input behavior; copying a
+bound context to manual input stops tracking the owner. Changes to a bound input
+invalidate its decision result; Preview must run again. Reads pause while the
+editor is closed and refresh when reopened.
+
+**First live effect:** **Enable saved rules in this view** opts into acknowledged
+saved rules, including acknowledged saved Undo/Redo. The switch is view-local,
+defaults off on a fresh page, and is not stored in graph or rule history. Private
+drafts and manual previews never affect the Canvas. Live evaluation reads the
+current exact Forme owner independently of the chosen preview target. It caches
+resolution by generation and disclosed inputs; the frame installs its effect
+before Canvas composition. An unavailable owner restores base guides with an
+explanation. `RegionGuides` affects only Forme subdivisions. The [Canvas override](../../../crates/canvas/pictograph/src/canvas/forme_region.rs)
+is scoped to the Forme UUID; absent/mismatched overrides use the existing
+hover/member-selection/unlocked behavior. A hidden Forme stays hidden and the
+outer outline remains. Bounds, cells, locks, selection, explicit pins, manual
+placement, source assertions and live tile sessions keep their owners. Whole
+graph replacement clears the override. Unsupported winning effects are
+disclosed as decisions with no live renderer here; they do not silently invoke
+a lower-priority effect or mutate a Numen field.
+
+**Qualification:** the [source-hashed receipt](../../../ports/graphshell/docs/receipts/presentation_live_20261011/qualification.json)
+records **31 native tests passed**: seven new binding tests, nine retained
+editor/session tests and fifteen actual access/link inspection tests. The small
+standalone graph-only harness imports checked-in modules and locks its own
+resolved dependencies; it does not qualify the complete native host, Canvas
+unit suite or IndexedDB. Replay with
+`cargo test --locked --manifest-path ports/graphshell/docs/receipts/presentation_live_20261011/harness/Cargo.toml --lib`.
+The current locked product wasm check passes with the same eighteen existing
+web warnings. One compiler ran at a time under the 1280 MiB/zero-swap scope and
+free-memory guard. Default/viewer/release bundles were not built. A Canvas
+regression test is added for show/hide/base restoration, wrong-ID isolation,
+hidden boundaries, selection/position/pin preservation and graph replacement;
+its native execution remains a handoff gate. Run
+`cargo test --locked -p pictograph --features canvas --lib canvas::forme_region::tests`
+on a suitable native host before marking that gate passed.
+
+**Browser handoff:** use a fresh dedicated origin/profile and normal motion on
+`tree.html?app=local&fixture=field-inspection` for
+[`p4_tree_presentation_live.scn`](../../../ports/graphshell/web/scenarios/p4_tree_presentation_live.scn),
+then a fresh page/process retaining that origin for
+[`p4_tree_presentation_live_reopen.scn`](../../../ports/graphshell/web/scenarios/p4_tree_presentation_live_reopen.scn).
+The fixture retains its isolated store. The first checks exact access retention
+across selection, private draft isolation, bound Forme/Numen decisions, saved
+opt-in, acknowledged Undo/Redo, independent boundary visibility and base
+restoration; the second checks stored rules/history and the view switch's
+fresh-page default. Both preserve source/session and Forme layout identities.
+Four captures are planned, not generated/reviewed. The connected S-PC browser
+still lacks WebGPU. Review actual subdivisions, unsupported-effect explanations,
+scrolling/narrow width, keyboard/IME, theme changes, physical input, tile session
+continuity and pin/manual-placement invariants on a compatible connected
+browser. Existing authoring scenarios remain useful regressions; separate fresh
+origins are required because they expect an absent rule record.
+
+**Remaining done-conditions:** qualify the renderer and headed cases above;
+measure bound-preview hit-test/read costs and long-context presentation before
+large-graph adoption; add exact occurrence adapters for sidecar-only and derived
+relations; map ForegroundPinned/Overview when their owners exist; add supported
+node representation/detail measurement and relation/provenance/drop-preview
+consumers before claiming broad effect adoption. Reconcile preview hysteresis
+with future live LOD state per view/occurrence. Multi-tab IndexedDB races,
+conflict recovery, large-store costs and release performance retain the previous
+editor gates. Scene composition, theme/font authoring, general primitive writes,
+field actions/scripts, other hosts and Rhai SE39–SE42 remain separate work.
+
+#### Forme drop feedback and field browser qualification (2026-10-11)
+
+Mark authorized the Forme feedback fix followed by Chrome field-inspector
+qualification. The Forme session now returns the drop action and original
+target bounds together with its candidate. The graph renders a target-local
+outline and action label: a half-region for an edge split, or a tab-header
+cue for a center stack. The cue is temporary, takes no pointer input and
+clears on acceptance, Escape, outside release or draft reset. Zone changes
+rebuild the retained cue; motion within a zone keeps pointer capture. The
+existing scoped draft, Lock and apply, discard and saved history retain their
+authority.
+
+The product Wasm build, viewer-only Wasm check and nine native Forme session
+cases pass. All six Chrome scenarios pass: Forme arrangement/reopen,
+draft/reopen and field inspection/reopen. Fifteen successful captures were
+reviewed. The drag cases verify Escape then release and valid-target to outside
+release without changing the draft. Field inspection verifies exact identities,
+overlapping candidates, hidden boundaries, retired records, independent Forme
+reads and retained IndexedDB reopen. Inspector label/value spacing and focus
+or scroll follow-through remain open; functional acceptance does not close
+those visual review gates. The browser source is `eb804d07`, with the scenario
+key correction at `eac1524f`; subsequent integrations do not inherit this pass.
+An initial unsunk launch was closed without a qualification claim. A collected
+drag run found lowercase `key escape` unsupported by the scenario runner;
+the scenario now uses its existing `key Escape` route. That failed run is
+retained alongside the corrected sequence in the
+[qualification record](../../../ports/graphshell/docs/receipts/forme_feedback_field_browser_20261011/qualification.json).
+
+The integration at `9d8ea699` retains upstream presentation controls and live
+Forme guides. Its product and viewer-only Wasm checks pass separately; Chrome
+was not rerun on that newer source. The canonical primary documentation audit
+has no index or current-link findings. Its remaining upstream findings are
+recorded in the qualification summary. The temporary browser package is removed;
+peer documentation work is preserved.

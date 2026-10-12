@@ -326,7 +326,7 @@ baseline rather than a reproducible test receipt. Repin before experiments.
 - Genet `components/shared/document-session-api/src/session_engine.rs` keeps
   sessions single-owner and host-driven. `pump(now_ms)` and `settled()` expose
   driving and quiescence, without a deadline or an external-wake contract.
-  `ports/ortet/src/shell.rs` currently redraws while unsettled.
+  `genet/ports/ortet/src/shell.rs` currently redraws while unsettled.
 - Genet `components/script-runtime-api/lib.rs` already exposes timer delay,
   worker work/pumping and worker shutdown. In the inspected
   `components/genet-scripted/document.rs`, the Livery pump advances timers,
@@ -335,9 +335,9 @@ baseline rather than a reproducible test receipt. Repin before experiments.
   evidence that worker support is absent from the runtime.
 - Genet `components/genet-render-host/src/lib.rs` and Netrender
   `netrender/src/renderer/init.rs` already place device creation with the
-  embedder. Isometry `crates/isometry-runtime/src/render.rs` owns its tenant
+  embedder. Isometry `crates/isometry-runtime/src/render.rs` *(historical citation)* <!-- doc-audit: historical-path --> owns its tenant
   and stale-view refusal. Mesocosm
-  `crates/mesocosm-core/src/voxel_profile.rs` gates disposable derived state
+  `repos/isometry/mesocosm/crates/mesocosm-runtime/src/voxel_profile.rs` gates disposable derived state
   against durable source revisions. These challenge lifetime assumptions
   without requiring the same clock or a universal resource lease.
 
@@ -395,7 +395,7 @@ Evidence homes are Genet `components/genet-scripted-dom/lib.rs`,
 `crates/eidetic/muniment/src/blob.rs`,
 `crates/eidetic/eidetic-core/src/deleted.rs` and `schema.rs`; Turnstone
 `src/action.rs` and
-`design_docs/2026-09-05_reader_appearance_isolation_plan.md`.
+`repos/turnstone/design_docs/2026-09-05_reader_appearance_isolation_plan.md`.
 
 Genet's current arena fence is enabled only on 64-bit debug builds. Release
 and wasm need an explicit refusal/translation contract for foreign handles.
@@ -418,7 +418,7 @@ preserves required DOM identity and references; it cannot simply reinterpret
 a raw id in another arena. A globally shared arena is not required by either
 design.
 
-Turnstone's `design_docs/2026-08-28_page_capture_plan.md` already scopes P2/P3:
+Turnstone's `repos/turnstone/design_docs/2026-08-28_page_capture_plan.md` already scopes P2/P3:
 freeze the session, durable node, document/navigation generation and
 surface/request correlation at capture start; attach to that exact target or
 refuse a stale completion. Engine results supply observed facts. The domain
@@ -602,7 +602,7 @@ Existing owner plans remain the implementation homes.
 | S4 | Genet G5 handle implementation | Implement the selected boundary, with foreign/stale refusal and exhaustion tests through the supported backends and compiled target configurations; retain a separate wasm residual if it is not executed | Open: discard unused parallel-handle sketch; migrate approximately 70 runtime conversions coherently with semantic NodeId, high-bit engine and wasm execution gates |
 | S5 | Genet runtime worker delivery | Run actual runtime message/timer/completion and shutdown assertions, including duplicate/stale cases, with a named regression manifest and isolated build provenance | Real Boa Runtime probe passes with pinned overlay: timer-only negative, worker-pump delivery and acknowledged idle; Genet S2/S5 backend receipt checked in; shutdown, stale and duplicate runtime cases remain open |
 | S6 | Genet session drive contract | Expose the selected minimal runnable/deadline/external facts and lossless wake/cancellation protocol through a real retained session; test completion during registration and replacement | S6a committed `790ba660396`: worker forwarding and retained loader implemented; 2 actual Boa document tests pass (reply/reaction, freeze/resume, missing-route error and idle), preforward negative fails; automatic session-loader wiring, Livery/Nova and additive wake/drive gates remain open |
-| S7 | Genet Ortet O5 integration | Wire native host wake and replacement to the real scripted session and obtain explicit Boa/Nova host receipts; automated conformance remains with genet-wpt | Native O5 hosting for Boa and Nova accepted 2026-09-08 (`genet/design_docs/2026-09-03_ortet_founding_plan.md`). G5 headed arena sequence accepted on both engines 2026-09-09 on branch `slice/s7-ortet-g5-20260909` (`genet/design_docs/receipts/2026-09-09_g5_ortet/receipt.md`); found and fixed Boa `force_gc` never calling `clear_kept_objects`; residual: page-level `WeakRef` over a DOM reflector never reports collection under Boa, folded into the realms lane. Merge into genet main waits on the realms continuation committing. AccessKit bridge-action receipt still open |
+| S7 | Genet Ortet O5 integration | Wire native host wake and replacement to the real scripted session and obtain explicit Boa/Nova host receipts; automated conformance remains with genet-wpt | Native O5 hosting for Boa and Nova accepted 2026-09-08 (`genet/design_docs/2026-09-03_ortet_founding_plan.md`). G5 headed arena sequence accepted on both engines 2026-09-09 on branch `slice/s7-ortet-g5-20260909` (`genet/design_docs/receipts/2026-09-09_g5_ortet/receipt.md` *(historical citation)* <!-- doc-audit: historical-path -->); found and fixed Boa `force_gc` never calling `clear_kept_objects`; residual: page-level `WeakRef` over a DOM reflector never reports collection under Boa, folded into the realms lane. Merge into genet main waits on the realms continuation committing. AccessKit bridge-action receipt still open |
 | S8 | Host visibility and resource disposal | Exercise real hidden/suspended/resumed session behavior and product-owned resource removal/stale-revision refusal; record policy ownership and any required local correction | Cambium native invalidation committed `fe2e24e9`; independent source reviews and diff check pass, actual GPU suspend/resume remains open |
 | S9 | Turnstone capture correlation | Integrate exact target and nonreused request identity into the actual capture path, with stale/duplicate/unsupported refusal; keep envelope and pixel-storage acceptance explicit | Committed `c5f991e`: action-to-host correlation, replacement-id alias and bulk teardown corrections; 5 production-module tests plus external Inker sanity pass, no-default library check passes. Weld adapter compile is blocked before Turnstone by pinned Welding/current local Grafting API mismatch; headed pixels and durable deposit remain open. 2026-09-09: the Weld blocker was Turnstone drift, not the pin; the adapter had been uncompiled since the P1 contract landed. Migrated to welding/grafting heads and merged to turnstone main; hosted capture returns `Unsupported` until Inker's `WeldSurface` grows a capture hook (P2), the S9 Weld-side wiring was deleted and will be reimplemented then. Mark ruled Chromium's process sandbox the default: turnstone `436e087` adds the Windows bootstrap client-DLL route (`sandbox_bootstrap_win` crate, `RunWinMain`), `Sandboxed` by default when launched through CEF's bootstrap and `UnsandboxedTrustedContent` on the direct executable route, with `TURNSTONE_WELD_SANDBOX` as an explicit override that refuses unsupported combinations; a headed sandboxed boot succeeded on a local CEF 151.3.24 bundle (`turnstone/design_docs/2026-08-03_turnstone_engine_adoption_plan.md`) |
 | S10 | Turnstone/Mere custody lifecycle | Integrate owner-specific references and a serialized/transactional transfer/collection boundary with recovery and disclosure policy, including same-kind multiple owners and stale collection proposals | Actual Muniment/redb probe: 3 pass, including reopen and stale-delete negative control; production writer/envelope integration remains open. 2026-09-09 ruling: a transactional read-then-write method on Muniment's `Backend` trait (redb and IndexedDB honor it, zip refuses); pricing in the orchestration scratch report, implementation lane launched 2026-09-09: `Backend::transact` landed on `slice/s10-custody-20260909` (`9ba9f790`) — honest for redb (one write transaction), memory (single mutex), and IndexedDB (one Readwrite transaction, wasm32 offline check-compiles); zip and the trait default both refuse with a typed `StoreError::NotTransactional`. The probe's scenarios pass as positive controls against the real backends (59 tests total); the apply-alone negative control is retained as a documented regression. Verified, not just read from source: redb's Windows `LockFile` is cross-process, held for the `Database` handle's whole lifetime (`design_docs/mere_docs/testing/receipts/2026-09-09_s10_custody_transact_receipt.md`). Turnstone wiring and process-kill recovery remain open |
@@ -716,7 +716,7 @@ API/contract) and `components/script-runtime-api` (worker mechanism);
 `genet/design_docs/2026-09-07_worker_plan.md` (dedicated-worker
 implementation, landed `6155c8ab4ff`).
 
-**Consumers:** `ports/ortet/src/shell.rs` (drives `pump`/`settled` before
+**Consumers:** `genet/ports/ortet/src/shell.rs` (drives `pump`/`settled` before
 redraw); `components/genet-scripted/document.rs` scripted-document routes.
 
 **Failure tests (exist):**
@@ -914,6 +914,22 @@ This section is the canonical home for that direction. The
 and [composition spine](mere_docs/technical_architecture/2026-05-21_mere_composition_spine.md)
 apply it at their respective seams.
 
+### Browsing encounters (2026-10-11)
+
+Mark agreed to preserve visits while reviewing Eidetic's foundations. Resource
+identity, an individual encounter and a captured representation are distinct.
+Revisiting one resource retains another encounter; two branches through the same
+resource do not collapse into one trail. Preserve source-scoped visit identity,
+parent references and known context, including an unresolved parent outside an
+import range. Followed navigation, links contained in captured content, clipping
+provenance and computed relationships retain their different evidence meanings.
+
+The [Eidetic development plan](eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md)
+owns the proposed intake and admission work with Chartulary/Stemma, Pandect,
+Inker, Fleece and ESP. It treats dependency capabilities as part of development.
+This direction does not claim that current browser intake preserves those facts
+end to end; concrete wire, migration and retention decisions remain in the plan.
+
 ### Clips, live entities and appearances
 
 A **clip** is content made into a portable unit by meaningful selection,
@@ -951,6 +967,16 @@ access identity and occurrence identity remain distinct.
 
 ### What the common model governs
 
+**Portable collections (2026-10-11):** Mark's intended dataspace can selectively
+replicate a collection of notes, clips, documents and recognized structured
+exports gathered from the applications' various runtimes. The receiving mere
+uses a declared content profile, carrying required bytes and meaningful
+relationships so supported content remains accessible with the source apps
+stopped. Format understanding and complete retained material each need a
+qualified receiving path. The [Eidetic development plan's collection gate](eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md#p6-qualify-storage-custody-retention-and-exchange)
+now makes this outcome explicit. It preserves the existing distinction between
+portable content and live source authority; general replication remains planned.
+
 | Concern | Shared meaning and owner |
 |---|---|
 | Identity and relationships | Domain identities and attributed assertions connect content and entities. Source, capture, revision and occurrence are distinguishable. Two equal payloads need not be the same clip or have the same provenance. |
@@ -969,12 +995,51 @@ Mere's graph model does not replace those semantics. A unified GPU device is a
 composition direction, not evidence that every source is already rendered in
 one display list.
 
-### Open questions: proposed policies and remaining decisions
+### Clip policy rulings (2026-10-11)
 
-The accepted direction above settles the model and its units. The following
-are concrete recommendations for the unresolved lifecycle and interoperability
-questions. They are **proposals pending ruling**, not new editor rulings or
-claims of implemented platform contracts.
+Mark selected Knot Editor and Redshank as the forcing pair, with a real shared
+host receiving their exports. He settled these four questions in **Assess Mere
+dynamics status** (`01a122a7-f13f-7d11-af4f-0361e1b9492e`). The Eidetic/Fleece
+lane owns the profile, owner-adapter and tag design in the
+[development plan](eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md#knotredshank-profile-and-owner-adapters).
+The rulings settle policy, not a wire schema or implementation receipt.
+
+1. **CP1, retained source backing.** Mark: **"Keep selected material plus private
+   source backing when available (Recommended)"**. Keep the selected material
+   and available source evidence under configurable storage limits. Sharing
+   discloses the selection; including enclosing material or more source context
+   requires an explicit choice. Private backing and the disclosed package have
+   separate dependency sets. Availability, retention limits and later removal
+   remain visible; the default does not invent unavailable source bytes.
+2. **CP2, Redshank's first shared profile.** Mark: **"Note/body first; source
+   excerpt is explicit (Recommended)"**. Retain the text or voice-note body plus
+   its recording reference and frozen target. A voice body carries its required
+   audio bytes. The original recording is distinct backing; when its bytes are
+   absent the receiver can use the note and reports source playback unavailable.
+   Exporting a recording excerpt is an explicit operation with declared
+   representation, timebase mapping and lineage.
+3. **CP3, generated tags.** Mark: **"Queryable suggestions; become personal tags
+   when accepted (Recommended)"**. Engine suggestions remain queryable with
+   producer, run, input revision and generation evidence. Acceptance creates a
+   personal tagging assertion citing that evidence; it preserves the engine's
+   attribution and does not rewrite the suggestion as a human observation.
+   Existing concept identity and asserter rules remain governed by C7/ruling 20
+   of the [graph semantics plan](mere_docs/implementation_strategy/2026-10-04_graph_semantics_plan.md).
+4. **CP4, unavailable source owner.** Mark: **"Queue domain-supported edits for
+   review when the owner returns"**. Retain supported inert edit requests with
+   source-owner/entity reference, expected source revision, payload schema,
+   author and request identity. On return, resolve a fresh admitted target and
+   review the request; recheck grants and source revision before submitting it.
+   Persisted scene handles or session tokens cannot authorize replay. Independent
+   local annotations remain usable. Unsupported operations refuse; submission,
+   owner acceptance and durable completion remain separate outcomes.
+
+### Remaining policies and adapter decisions
+
+The accepted direction and CP1 to CP4 above settle the model, units and named
+policy choices. The remaining lifecycle and interoperability recommendations
+below are **proposals pending ruling**, not additional editor rulings or claims
+of implemented platform contracts.
 
 1. **Captured evidence and subsequent editing.** Preserve the captured version
    and its available source/revision provenance. Make edits explicit revisions
@@ -982,23 +1047,24 @@ claims of implemented platform contracts.
    An editable note can remain editable; presenting it as captured evidence
    should identify which retained version supports that presentation. A live
    reference is labelled as live, with freshness and availability disclosed.
-   The remaining decision is whether every capture retains original material
-   by default, or retention is configurable with a visible consequence for
-   later verification. The existing editable Knot clip is not evidence of an
-   immutable-capture contract.
+   CP1 settles selected material plus available private backing as the default.
+   Configurable limits, rights, deletion/reference behavior and the consequence
+   of losing backing still need owner-specific decisions. Knot can retain
+   immutable source artifacts beside an editable clip note; the family-wide
+   producer and custody integration remains to be qualified.
 2. **Compound clips and addressable parts.** Give the portable clip an identity
    and describe its payload roles, media/schema versions and source anchors.
    Parts can be addressed within it; promote a part to a separate clip when a
-   user takes it independently. The remaining decision is the first concrete
-   compound profile and which payloads it promises to carry. Retained bytes,
+   user takes it independently. Knot and Redshank now force the first profile;
+   its exact shape and capability promises still need qualification. Retained bytes,
    external references and unresolved dependencies must be distinguishable.
    Content hashes identify bytes, not authorship, entity identity or rights.
    A portable reference is not a guarantee that its content is available offline.
 3. **Sharing a live entity.** Distinguish sharing a captured snapshot, sharing
    a disclosed view and granting permission to act on the live source. Name the
    owner, observed revision or time, supported operations and offline behavior.
-   When disconnected, show retained state with its freshness; refuse operations
-   that require the owner unless that domain explicitly supports queued writes.
+   When disconnected, show retained state with its freshness. CP4 queues only
+   domain-supported source edits for reviewed admission when the owner returns.
    Cloning material creates a new owned entity with lineage rather than silently
    claiming the source's live identity. The remaining decision is which live
    domain supplies the first shared-operation and reconnect contract.
@@ -1106,6 +1172,97 @@ Optional feature traits are not permission grants, and exposing an appearance
 does not establish either semantic understanding or mutation authority. This
 review refines the rationale without adopting another system's node schema or
 changing the unresolved lifecycle policies above.
+
+### Shared semantic core: existing contracts and missing seams (2026-10-11)
+
+**Assessment:** the shared core already has most of its structural mechanisms.
+The missing work is agreement on a small content profile, source-owner adapters
+and heterogeneous consumer qualification. General graph identity, blob storage
+or another universal entity representation are not the first missing pieces.
+
+This is source inspection at Mere `8601f759`, Turnstone `1034fb6`, Knot Editor
+`4d8b81c`, Woodshed `9e4b372` and Cleromancy `ff3b1f5`. Product paths below are
+cross-repository citations. Concurrent Forme and Redshank scenario work is
+outside the review. Existing automated receipts are cited separately; this
+pass runs documentation checks and establishes no fresh runtime acceptance.
+
+#### What exists and what it establishes
+
+| Existing contract | Established boundary |
+|---|---|
+| [Chartulary capabilities](../crates/eidetic/chartulary/src/caps.rs), [reservoir index](../crates/system/pandect/src/reservoir.rs), [scene sources](../crates/cambium/scenes/sceno/src/scene.rs) | Stable domain/node identity, persona/domain-derived mere identity, and separate projected occurrence identity. These do not automatically resolve every foreign source to its current owner. |
+| [Eidetic manifests](../crates/eidetic/eidetic-core/src/manifest.rs), [bundles](../crates/eidetic/eidetic-core/src/bundle.rs), [portable content references](../crates/chirograph/src/titulus.rs) | Verified bytes, schema references, provenance/privacy metadata and composite members with required flags. Bundle member kinds remain domain vocabulary; required-member verification does not define a recursive clip export or retention policy. |
+| [Schema definitions](../crates/eidetic/eidetic-core/src/schema_def.rs), [opaque facets](../crates/eidetic/chartulary/src/facet.rs), [Fleece acquisition and annotation records](../crates/fleece/src/eidetic_bridge.rs) | Versioned interpretation seams, preservation of unfamiliar facet data, and bound source/capture/canonical-text/selector evidence. Validation is distinct from another app understanding a payload. |
+| [Chirograph](../crates/chirograph/src/lib.rs), [Pandect live-view records](../crates/system/pandect/src/live_view.rs) | Advertised actions, payload schemas, scene revision checks, explicit session states and source-owned live/historical cursors. A persisted reference or advertised action supplies no grant. |
+
+The [completed Fleece/Eidetic plan](archive_docs/2026-10-11_completed_plans/2026-10-11_fleece_eidetic_capability_plan.md)
+records authenticated annotation-plus-source transfer and receiver-only disk
+reopen, alongside native and wasm checks. Its transfer test constructs a
+[specific envelope](../crates/fleece/tests/eidetic_peer_transfer.rs) containing
+both manifests and both byte payloads. This proves that bounded path; it does
+not establish a family clip package or arbitrary dependency traversal. The
+recorded consumer pins qualify `5758724e`, before later Mere dependency work.
+
+#### Actual consumer paths
+
+- **Turnstone to Knot:** `turnstone/src/knot_authoring.rs` lowers a document
+  clip into the advertised `InsertKnotClipV2` action, with source/observed
+  artifacts, selectors and fidelity facts. Knot retains artifact references
+  through `knot-editor/crates/knot-editor/src/clip_evidence.rs` and authors the
+  editable note through its endpoint. That endpoint checks both the delivered
+  scene revision and the document's source `base_token`, with an injected write
+  grant. This is an existing cross-app document operation, not a missing intent
+  protocol or proof of general media support.
+- **Retained source documents:** `turnstone/src/trail_memory.rs` deposits exact
+  acquired bytes and a Fleece record as `LocalOnly`. Its captured-collection
+  adapter and [Moot projection](../ports/moot/src/captured_web.rs) consume
+  authority-filtered contributions, retain separate share/capture provenance,
+  and expose missing or unsupported records explicitly. The Fleece record
+  carries its canonical text, which may extend beyond the selected passage.
+  A selection boundary therefore cannot by itself determine what is disclosed.
+- **Timed media:** `woodshed/ports/redshank/model/src/lib.rs` exports shareable
+  text/audio annotations with media-fragment selectors. Its internal
+  representation receipts distinguish same, different and unproven copies;
+  local seek policy uses that evidence. The annotation export names an audio
+  body by its blob identifier and omits the internal representation receipt.
+  A receiver needs the corresponding bytes and a declared identity/seek
+  contract to reproduce those behaviors. Exported JSON alone supplies neither.
+- **Live authority:** `cleromancy/src/admitted.rs` exposes several endpoint
+  views over one durable app authority, forwarding typed intents under admitted
+  subjects. Knot likewise supplies live document operations. However, searches
+  of Mere and these four product source trees found only a fixture implementation
+  of `LiveViewSourceResolver`; `LiveViewReferenceGate` implementations in Mere
+  were fixtures/canaries. General persisted live-view reopening is an adapter
+  gap, distinct from the existing live endpoint paths.
+
+#### The bounded gaps
+
+| Missing seam | Concrete requirement and owner |
+|---|---|
+| Durable source resolution | Product adapters must map a retained domain/source reference to the current admitted owner and its current offers, with missing/denied/stale outcomes. Reuse Pandect/resident routing. A saved scene `InstanceId`, endpoint action or document base token must not become the durable identity of a live entity. |
+| A usable clip profile | Fleece gathering and domain exporters need one agreed profile over Eidetic's existing mechanisms: payload roles, stable part names/selectors, schema versions, lineage, and required versus optional material. Distinguish retained bytes, external references and unresolved dependencies. A selected note, a captured page and a media excerpt make different promises. |
+| Selector and meaning interoperability | Adapters must preserve each selector's representation and units. Fleece positions count Unicode code points in normalized DOM text; Knot quotation anchors can count UTF-8 source bytes; Redshank targets count media time. Define explicit supported mappings and refusals. Shared profiles can agree on source, part, annotation and derivative roles while leaving domain schemas specialized. |
+| Capture, disclosure and keeping policy | Session/custody owners must connect graph references to the package's required material, implement CP1's private-backing default, and check disclosure for each exported part. A byte reference, transferable source kind or selected passage is not permission to share its enclosing document. Configurable limits, release and revocation consequences remain explicit owner decisions. |
+| Live operations and outcomes | Each domain must supply source revision checks, admitted operations, conflict/failure behavior and reconnect semantics. Chirograph's scene revision is delivery state; Knot's additional base-token check is the concrete precedent. Queued writes, durable completion and undo need owner contracts rather than inference from an `Accepted` reply. |
+| Adoption and qualification | Hosts must advertise which profiles, selectors and operations they support, preserve unfamiliar material through the appropriate opaque path, and visibly refuse unavailable capabilities. Different current product pins require qualification; source availability on Mere main is not uniform consumer adoption. |
+
+**Chosen forcing pair; implementation proof pending:** Mark selected the existing
+Knot document lane and Redshank timed-media lane. Retain a text clip and a
+text/voice note through a second
+host, then reopen with their source app stopped. Verify required bytes, source
+and capture identities, exact selector units, opaque unsupported payloads and
+independently owned annotations. Exercise one already-supported owner edit,
+then a stale edit and denied operation; neither refusal may mutate the source.
+Restart the owner and resolve a fresh target instead of replaying saved scene
+handles. CP2 keeps source excerpts explicit; CP1's private backing must stay
+outside selection-only sharing. Test attributed personal tags, queryable engine
+suggestions and CP4's reviewed reconnect edits. This is a proposed proof, not a
+claim that these flows all exist.
+
+The open questions above now concern concrete profiles and policies, not
+whether the stack needs foundational graph, bundle or action machinery. This
+review adds no crate and opens no paused lane. The four later policy rulings
+above now govern the profile design; broader lifecycle checkpoints remain open.
 
 ## What this brief deliberately does not do
 

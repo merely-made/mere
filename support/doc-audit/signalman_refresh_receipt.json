@@ -1,0 +1,91 @@
+{
+  "date": "2026-10-11",
+  "source_base": "43cd7f24afea6b2d3b54939f2093c098da50713b",
+  "mechanical_before": {
+    "active_docs": 260,
+    "indexed_active_docs": 255,
+    "index_orphans": 4,
+    "index_ghosts": 0,
+    "memory_directory_links": 0,
+    "statusless_plans": 0,
+    "broken_relative_links": 2,
+    "historical_broken_relative_links": 245,
+    "planned_broken_relative_links": 0,
+    "ambiguous_known_root_paths": 101,
+    "ignored_known_root_patterns": 20,
+    "reserved_identifier_paths": 24,
+    "missing_known_root_paths": 70,
+    "historical_missing_known_root_paths": 219,
+    "planned_missing_known_root_paths": 7,
+    "invalid_historical_annotations": 0,
+    "stale_historical_annotations": 7,
+    "unheaded_owned_sources": 1,
+    "exhibit_b_sources": 0
+  },
+  "mechanical_after": {
+    "active_docs": 260,
+    "indexed_active_docs": 259,
+    "index_orphans": 0,
+    "index_ghosts": 0,
+    "memory_directory_links": 0,
+    "statusless_plans": 0,
+    "broken_relative_links": 0,
+    "historical_broken_relative_links": 245,
+    "planned_broken_relative_links": 0,
+    "ambiguous_known_root_paths": 101,
+    "ignored_known_root_patterns": 22,
+    "reserved_identifier_paths": 24,
+    "missing_known_root_paths": 0,
+    "historical_missing_known_root_paths": 238,
+    "planned_missing_known_root_paths": 7,
+    "invalid_historical_annotations": 0,
+    "stale_historical_annotations": 0,
+    "unheaded_owned_sources": 0,
+    "exhibit_b_sources": 0
+  },
+  "judgment_after": {
+    "active_docs": 260,
+    "covered_active_docs": 260,
+    "missing_active_records": [],
+    "errors": []
+  },
+  "judgment_scope": "Scoped implementing-agent review of amended owner/reference passages, not a fresh whole-document revalidation of all past numerical, external or hardware claims. One original OS-report claim remains unverifiable in batch 67.",
+  "commands": [
+    {
+      "command": "python scripts/mere_doc_audit.py --json --fail-on-findings",
+      "exit": 0
+    },
+    {
+      "command": "python scripts/mere_doc_judgment_audit.py --json",
+      "exit": 0
+    },
+    {
+      "command": "python scripts/mere_doc_audit.py --self-test",
+      "exit": 0
+    },
+    {
+      "command": "python scripts/test_mere_doc_judgment_audit.py",
+      "exit": 0,
+      "tests": 3
+    },
+    {
+      "command": "cargo +1.98.1 build --locked --offline --target-dir C:/t/cargo-targets/mere -j4 -p djinn --features custody-receipt-host --bin dr-c-receipt-host",
+      "exit": 0
+    }
+  ],
+  "archive": "signalman_refresh_logs.zip",
+  "archive_sha256": "b4a830259c66b614093aff0d83816b029d18ec12c8c43bab1fd169a04b650c2f",
+  "logs": {
+    "signalman_refresh_before.json": "d0480c38e4fb1948397600dcaea773991c97a580199054855e122a5c7d2fc020",
+    "signalman_refresh_normalised.json": "c957ca297cc4066a82ce5ce2b8b5b40f0def03e02314b1f64d0cdeb0191dfd92",
+    "signalman_refresh_after.json": "085f77c1f9adc696eb09d258aeecf4da962ef053caa707e007c118a118d7626c",
+    "signalman_refresh_d2_before.json": "21ac86444a207f0880c0a7954f2c90cd4bef5a77f029c0381ec8e51748a7810c",
+    "signalman_refresh_d2_after.json": "ecb39cae9d77376a85f64002f8f7e2f2d64645aa733e8dea952c10d83b39c201",
+    "signalman_refresh_path_decisions.json": "f857043dac42dae8256bc2e5ca95d77aee0f67f7ddddc49584eaf888741dd47f",
+    "signalman_refresh_audit_control.log": "bfaada5d3ecddaa2be1f4f3c07cac5059708b4ae30543d134ca10a07182deaaf",
+    "signalman_refresh_d2_control.log": "9f8ba3f7ceb6896ab70ac081016993f48f206cedb268904529630f9a70772130",
+    "signalman_refresh_keeper_build.log": "26c55fa460d849db0b1c1737e5970966af6c26ca9f767bd1fa1cf170b7fc5871"
+  },
+  "keeper_executable_sha256": "5bb95a9f23ae534faae898e34452bb033f3e47305b0d2ef907523888aa5ad88d",
+  "cleanup": "Primary Mere and Retinue caches reused; no worktree or isolated Cargo home created. Exact raw log/report copies consolidated into verified archive."
+}

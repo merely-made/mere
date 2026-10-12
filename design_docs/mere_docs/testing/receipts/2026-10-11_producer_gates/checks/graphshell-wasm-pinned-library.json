@@ -1,0 +1,20 @@
+{
+  "command": [
+    "cargo",
+    "check",
+    "--manifest-path",
+    "ports/graphshell/web/Cargo.toml",
+    "--target",
+    "wasm32-unknown-unknown",
+    "--lib",
+    "--locked",
+    "-j",
+    "2"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-vello-release-adoption",
+  "deadline_seconds": 1200,
+  "elapsed_seconds": 292.11,
+  "exit_code": 0,
+  "timed_out": false,
+  "log": "/Users/markik/Code/output/vello-producer-gates-20261011/checks/graphshell-wasm-pinned-library.log"
+}
