@@ -166,6 +166,21 @@ eligible, evaluated, applied, refused and unsupported effects without claiming
 that an unknown response executed. These are review requirements and proposed
 contract inputs, not a new serialized schema or measured runtime receipt.
 
+**Coupling evaluation continuation (2026-10-12):** Mark authorized continuing
+dynamics-related plans with implemented/tested drafts. Seiche now exposes
+`CouplingForce::evaluate_at`, a report-only point evaluation of the current
+response, and the executor consumes that same evaluation. Additive force,
+velocity scaling, velocity assignment and displacement are distinct; inert
+reasons disclose captured-target mismatch, field type, positive-region boundary,
+non-dynamic advection hold and unsupported physical responses. Sampling still
+uses time zero. This replaces the missing evaluation API, not the missing
+stable field/coupling/occurrence provenance or applied-effect trace.
+The [engine draft receipt](../testing/receipts/2026-10-12_coupling_effects/README.md)
+records the original-executor trajectory comparison, the failing deduplication
+control, read-only query checks, runnable real integration and its qualification
+boundaries. Membership, clocks, event execution and conflicting writers remain
+open. The point probe invokes no applet and changes no graph assertion.
+
 ## Ruled continuation, 2026-10-10
 
 F200 to F202 are recorded verbatim in the dynamics grammar plan, committed

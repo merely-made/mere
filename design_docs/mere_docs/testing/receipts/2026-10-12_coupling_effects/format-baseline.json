@@ -1,0 +1,12 @@
+{
+  "introduced_formatting_differences": [],
+  "preexisting_formatting_differences": [
+    "--- \n",
+    "+++ \n",
+    "@@ -199,0 +200 @@\n",
+    "+pub use node_body::{NodeCollider, NodeMaterial};",
+    "@@ -201 +201,0 @@\n",
+    "-pub use node_body::{NodeCollider, NodeMaterial};"
+  ],
+  "source": "seiche/src/lib.rs"
+}

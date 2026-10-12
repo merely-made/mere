@@ -1,0 +1,57 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling seiche v0.0.6 (C:\Users\mark_\Code\worktrees\mere-coupling-effects\crates\conatus\seiche)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 37.65s
+     Running unittests src\lib.rs (C:\t\cargo-targets\mere\debug\deps\seiche-26a0e793e179e9c4.exe)
+
+running 10 tests
+test coupling_force::effect_tests::damping_reports_its_factor_without_inventing_strength_scaling ... ok
+test coupling_force::effect_tests::gradient_and_wall_reports_are_forces_not_position_exclusions ... ok
+test coupling_force::effect_tests::unsupported_response_wrong_field_and_unmatched_target_stay_distinct ... ok
+test coupling_force::effect_tests::sampling_time_and_registry_fallback_match_the_existing_executor ... ok
+test coupling_force::effect_tests::velocity_assignment_and_advection_have_distinct_hold_behavior ... ok
+test coupling_force::tests::flow_advect_leaves_a_pinned_body_at_its_kinematic_target ... ok
+test coupling_force::tests::open_response_applies_no_force ... ok
+test coupling_force::tests::attract_to_min_centers_like_boundary ... ok
+test coupling_force::effect_tests::querying_an_installed_coupling_does_not_advance_or_mutate_the_simulation ... ok
+coupling_trajectory advect 54b5cd56e7b80b83
+coupling_trajectory align bf3c47d11ff264bf
+coupling_trajectory attract c717ab2701156915
+coupling_trajectory dampen 26b550ad4cdbd84f
+coupling_trajectory duplicate-advect 1798dfbd94938d15
+coupling_trajectory duplicate-attract cac4854c803f022f
+coupling_trajectory duplicate-dampen 4ba4c04b15203996
+coupling_trajectory open 22f06774732f2065
+coupling_trajectory outside-dampen 22f06774732f2065
+coupling_trajectory repel 79743f9bd576ab4e
+coupling_trajectory wall 5978bb7ef06dc2bf
+coupling_trajectory wrong-scalar 22f06774732f2065
+coupling_trajectory wrong-vector 22f06774732f2065
+test coupling_force::effect_tests::execution_trajectory_receipt ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 168 filtered out; finished in 0.01s
+
+     Running tests\contact_to_fact.rs (C:\t\cargo-targets\mere\debug\deps\contact_to_fact-fa783d85f5cc4d6b.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests\gpu_repulsion.rs (C:\t\cargo-targets\mere\debug\deps\gpu_repulsion-468f6a39830e765b.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\tactile.rs (C:\t\cargo-targets\mere\debug\deps\tactile-dc6694d3adc1ad36.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+

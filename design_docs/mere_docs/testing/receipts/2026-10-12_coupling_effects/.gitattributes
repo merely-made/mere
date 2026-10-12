@@ -1,0 +1,3 @@
+# Preserve original tool output and stable manifest bytes.
+*.log -text -diff whitespace=-blank-at-eof,-space-before-tab
+*.json text eol=lf
