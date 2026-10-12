@@ -1,0 +1,60 @@
+{
+  "citation_new_categories": [],
+  "d2_same_baseline": true,
+  "d2_existing_errors": [
+    "snapshot aggregate digest changed: 2046e1eec3018b7dd288e794326090f1b7f9a889043d53e45530271d0b32be1e != f0b64eef4cd5514157bb1b49d389b84db29a1e823d6f3e2cebf827337fe56abf",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_producer_gates/README.md"
+  ],
+  "citation_counts": {
+    "active_docs": 264,
+    "indexed_active_docs": 263,
+    "index_orphans": 0,
+    "index_ghosts": 0,
+    "memory_directory_links": 0,
+    "statusless_plans": 0,
+    "broken_relative_links": 28,
+    "historical_broken_relative_links": 245,
+    "planned_broken_relative_links": 0,
+    "ambiguous_known_root_paths": 101,
+    "ignored_known_root_patterns": 23,
+    "reserved_identifier_paths": 24,
+    "missing_known_root_paths": 200,
+    "historical_missing_known_root_paths": 237,
+    "planned_missing_known_root_paths": 6,
+    "invalid_historical_annotations": 0,
+    "stale_historical_annotations": 0,
+    "unheaded_owned_sources": 1,
+    "exhibit_b_sources": 0
+  },
+  "exit_codes": [
+    0,
+    1,
+    0,
+    1
+  ],
+  "method": "Same worktree path, temporarily restored only the two owned Markdown files to HEAD, restored the draft, and compared complete finding identities. New owned sources have headers.",
+  "final_before_integration": {
+    "citation_new_categories": [],
+    "d2_same_baseline": true,
+    "existing_d2_errors": 4
+  },
+  "after_integration": {
+    "parent": "d46b0f5cae28afc7af9ca95edfb6792f0172329b",
+    "citation_new_categories": [],
+    "d2_same_baseline": true,
+    "d2_errors": [
+      "snapshot aggregate digest changed: 2046e1eec3018b7dd288e794326090f1b7f9a889043d53e45530271d0b32be1e != f0b64eef4cd5514157bb1b49d389b84db29a1e823d6f3e2cebf827337fe56abf",
+      "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md",
+      "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md",
+      "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_producer_gates/README.md"
+    ],
+    "exit_codes": [
+      0,
+      1,
+      0,
+      1
+    ]
+  }
+}
