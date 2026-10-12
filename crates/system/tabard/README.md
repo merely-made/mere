@@ -133,7 +133,9 @@ export. Named families emit safely quoted CSS plus an explicit generic fallback;
 
 CSS exports include `--tabard-font-{role}`, `--tabard-font-{role}-size` and `-line-height`
 only when authored. `Typography::role_css` lets each consumer supply its own
-semantic selectors. Hosts retain layout, installed-face discovery and font
+semantic selectors. `css_property_declarations` and `role_declarations` also
+scope these same declarations to isolated retained specimens without changing
+the surrounding editor. Hosts retain layout, installed-face discovery and font
 measurement authority; this model carries no font bytes. Authored mode sheets
 remain exact and follow the font variable definitions.
 

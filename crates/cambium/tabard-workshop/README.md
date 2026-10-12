@@ -126,3 +126,10 @@ specimen uses `mere_document_lanes::document_style_with_typography` and the
 existing document-canvas style/measurement path, preserving heading hierarchy
 and unrelated role defaults. The author CSS follows preferences in the cascade.
 The editor's own neutral text remains independent of the authored theme.
+
+The visible application chrome and syntax samples consume the same Tabard role
+declarations as the isolated stylesheet and production adapters. Interface fonts
+reach sample toolbar/actions, Heading reaches the sample title, Label reaches
+address/filename text, and Code reaches the Illume-highlighted runs. Font variables
+stay within each sample; Cambium appends font declarations while retaining the
+local syntax palette. The authoring controls keep their neutral font styles.
