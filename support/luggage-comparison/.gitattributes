@@ -1,4 +1,4 @@
-fixtures/** -text
+fixtures/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 Cargo.lock text eol=lf
 *.py text eol=lf
 src/*.rs text eol=lf
