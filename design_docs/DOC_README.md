@@ -870,6 +870,8 @@ Pre-1.0 development. Index compacted in the 2026-06-09 design-docs audit (37 doc
 
 ## Receipt index additions (2026-10-11)
 
+- [Coupling effect evaluation draft (2026-10-12)](mere_docs/testing/receipts/2026-10-12_coupling_effects/README.md): report-only proposed writes reused by the existing Seiche executor, unchanged original trajectories, a failing deduplication control, CPU/wasm/bridge qualification and explicit host-provenance limits.
+
 - [cambium_docs/testing/receipts/native_image_atlas_20261010/original_reset_analysis.md](cambium_docs/testing/receipts/native_image_atlas_20261010/original_reset_analysis.md).
 - [cambium_docs/testing/receipts/native_image_atlas_20261010/README.md](cambium_docs/testing/receipts/native_image_atlas_20261010/README.md).
 - [inker_docs/testing/receipts/2026-10-07_current_browser_family/README.md](inker_docs/testing/receipts/2026-10-07_current_browser_family/README.md).
