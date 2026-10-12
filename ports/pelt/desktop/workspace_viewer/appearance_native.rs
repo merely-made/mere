@@ -225,7 +225,7 @@ impl WorkspaceApp {
                 // These are production chrome computed values, independent of
                 // the editor's specimen and of loaded document/session content.
                 for (role, class) in [
-                    (tabard::FontRole::Ui, "pelt-address"),
+                    (tabard::FontRole::Interface, "pelt-address"),
                     (tabard::FontRole::Heading, "pelt-title"),
                     (tabard::FontRole::Label, "pelt-status"),
                 ] {

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 use tabard::theme::registry::{Mode, ThemeRegistry};
 use tabard::workshop::{Edit, ThemeDraft};
-use tabard::{FontPreferences, FontRole, Theme, ThemePresentation, Typography};
+use tabard::{FontRole, Theme, ThemeFontStyle, ThemePresentation, Typography};
 
 fn theme() -> Theme {
     ThemeRegistry::default()
@@ -15,7 +15,7 @@ fn fonts() -> Typography {
     fonts
         .set(
             FontRole::Reading,
-            FontPreferences {
+            ThemeFontStyle {
                 family: Some("A \"named\"; family".into()),
                 size_px: Some(21.5),
                 line_height: Some(1.6),
@@ -52,15 +52,15 @@ fn requested_faces_are_escaped_and_retained_with_explicit_fallback() {
             .role_css(FontRole::Reading, ".reader")
             .contains("font-weight")
     );
-    assert!(fonts.role_css(FontRole::Ui, ".app").is_empty());
+    assert!(fonts.role_css(FontRole::Interface, ".app").is_empty());
 }
 #[test]
 fn invalid_metrics_are_refused_before_library_or_export() {
     for value in [f32::NAN, f32::INFINITY, 0.0, 129.0] {
         let mut t = theme();
         t.typography.0.insert(
-            FontRole::Ui,
-            FontPreferences {
+            FontRole::Interface,
+            ThemeFontStyle {
                 size_px: Some(value),
                 ..Default::default()
             },
@@ -69,7 +69,7 @@ fn invalid_metrics_are_refused_before_library_or_export() {
         assert!(tabard::portable::theme_json(&t).is_err());
     }
     assert!(
-        FontPreferences {
+        ThemeFontStyle {
             family: Some("bad\nfamily".into()),
             ..Default::default()
         }
@@ -135,7 +135,7 @@ fn missing_family_notices_are_read_only_and_generic_families_need_no_catalogue_e
     fonts
         .set(
             FontRole::Code,
-            FontPreferences {
+            ThemeFontStyle {
                 family: Some("My portable code face".into()),
                 ..Default::default()
             },
@@ -143,8 +143,8 @@ fn missing_family_notices_are_read_only_and_generic_families_need_no_catalogue_e
         .unwrap();
     fonts
         .set(
-            FontRole::Ui,
-            FontPreferences {
+            FontRole::Interface,
+            ThemeFontStyle {
                 family: Some("SYSTEM-UI".into()),
                 ..Default::default()
             },
@@ -167,12 +167,12 @@ fn explicitly_empty_role_data_round_trips_without_changing_css() {
     let mut t = theme();
     t.typography
         .0
-        .insert(FontRole::Ui, FontPreferences::default());
+        .insert(FontRole::Interface, ThemeFontStyle::default());
     assert!(t.typography.css_custom_properties().is_empty());
     let json = tabard::portable::theme_json(&t).unwrap();
     assert_eq!(tabard::portable::parse_theme_json(&json).unwrap(), t);
     t.typography
-        .set(FontRole::Ui, FontPreferences::default())
+        .set(FontRole::Interface, ThemeFontStyle::default())
         .unwrap();
     assert!(t.typography.is_empty());
 }

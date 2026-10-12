@@ -162,7 +162,7 @@ mod tests {
 
     #[test]
     fn font_changes_remeasure_the_existing_source_and_reset_its_defaults() {
-        use tabard::{FontPreferences, FontRole, Typography};
+        use tabard::{FontRole, ThemeFontStyle, Typography};
         let mut reader = ReaderSpecimen::default();
         let source = reader.source_document();
         let name = reader.accessible_name().to_owned();
@@ -172,7 +172,7 @@ mod tests {
         fonts
             .set(
                 FontRole::Reading,
-                FontPreferences {
+                ThemeFontStyle {
                     family: Some("Georgia".into()),
                     size_px: Some(24.0),
                     line_height: Some(1.8),

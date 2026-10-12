@@ -24,9 +24,11 @@ pub mod library;
 pub mod portable;
 pub mod smolweb;
 pub mod theme;
+pub mod theme_styles;
 pub mod typography;
 pub mod workshop;
-pub use typography::{FontPreferences, FontRole, Typography};
+pub use theme_styles::{ThemeFontStyle, Typography};
+pub use typography::{FontFamily, FontPreferences, FontRole, ResolvedFontRole};
 
 pub use appearance::{
     ResolvedThemeChoice, ThemeChoiceDiagnostic, ThemePresentation, resolve_theme_choice,

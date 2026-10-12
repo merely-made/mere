@@ -324,7 +324,7 @@ fn applying_a_color_keeps_staged_font_input_until_its_own_action() {
     assert!(host.state().draft_theme().typography.is_empty());
     click(&mut host, &action("apply-fonts"));
     assert_eq!(
-        host.state().draft_theme().typography.0[&tabard::FontRole::Ui].size_px,
+        host.state().draft_theme().typography.0[&tabard::FontRole::Interface].size_px,
         Some(26.0)
     );
 }

@@ -1676,8 +1676,8 @@ mod tests {
         let mut fonts = tabard::Typography::default();
         fonts
             .set(
-                tabard::FontRole::Ui,
-                tabard::FontPreferences {
+                tabard::FontRole::Interface,
+                tabard::ThemeFontStyle {
                     family: Some("Georgia".into()),
                     size_px: Some(18.0),
                     line_height: Some(1.4),
