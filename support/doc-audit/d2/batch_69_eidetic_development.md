@@ -1,5 +1,18 @@
 # Batch 69: Eidetic development planning
 
+Onward amendment, 2026-10-12: four owned plan/index claims hold against Turnstone
+runtime source `97c139442cdc0600f1a5629eec1a40cb27f2a917` and published
+qualification `9412077`: selected local disclosure uses the existing SDK;
+unchanged envelopes/source facts survive independent-store copy and restart;
+private backing/unselected data and damaged/missing bytes have tested refusal
+or exclusion; broader schema/collection/browser/custody gates remain open.
+The default library run passes 794 tests with ten existing ignores, the final
+receiver/export suite passes ten tests, and nine native onward captures were
+reviewed. This is an implementing-agent judgment over those claims, without
+requalifying unrelated source work. The three-file documentation amendment is
+isolated from ten unpublished primary commits and concurrent packaging receipts
+on the published Mere base `c7a4b06b`.
+
 Audit date: 2026-10-11. This implementing-agent judgment covers the new plan,
 its owned coordination amendments and the June plan's archival. It is not an
 independent whole-document audit. Source findings were reviewed at Mere
