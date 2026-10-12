@@ -1287,3 +1287,30 @@ where
         }
     }
 }
+
+/// Host-local named families from the same Fontique collection used by layout.
+/// This inventory is transient: family availability does not promise coverage,
+/// a particular face, or remote/frozen fidelity. Register the same font ledger
+/// in `Init`; invalid supplied bytes contribute no family.
+pub fn available_font_families(fonts: &[HostFont]) -> Vec<String> {
+    let mut context = parley::FontContext::new();
+    for font in fonts {
+        context.collection.register_fonts(
+            parley::fontique::Blob::new(std::sync::Arc::new(font.bytes.clone())),
+            font.family
+                .as_deref()
+                .map(|family| parley::fontique::FontInfoOverride {
+                    family_name: Some(family),
+                    ..Default::default()
+                }),
+        );
+    }
+    let mut families: Vec<_> = context
+        .collection
+        .family_names()
+        .map(str::to_owned)
+        .collect();
+    families.sort_by_key(|name| name.to_lowercase());
+    families.dedup_by(|a, b| a.eq_ignore_ascii_case(b));
+    families
+}
