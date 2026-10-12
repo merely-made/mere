@@ -1,0 +1,27 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--offline",
+    "--config",
+    "/Users/markik/Code/output/vello-production-fixes-20261011/candidate-patches.toml",
+    "-p",
+    "cambium-genet-winit-host",
+    "--test",
+    "presented_capture",
+    "--test",
+    "async_capture",
+    "--test",
+    "lifecycle",
+    "-j2",
+    "--",
+    "--test-threads=1"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-vello-release-adoption",
+  "deadline_seconds": 600,
+  "elapsed_seconds": 39.956,
+  "exit_code": 0,
+  "timed_out": false,
+  "disk_refused": false,
+  "log": "/Users/markik/Code/output/vello-production-fixes-20261011/checks/shared-recovery-capture-lifecycle-controls.log"
+}

@@ -1,0 +1,5 @@
+{"launch_method": "LaunchServices temporary application bundle", "launcher_exit": 0, "timeout": false, "success": false, "elapsed_seconds": 15.816, "binary_sha256": "b4f413755dacece3a863b39e1b43fd6e39e3e0cf709cfd4148622de079f6d030", "scenario_sha256": "96f64dd4a425a0978ed366cb3c6823d1cc675f85fe46a82dfa130366409c27cf", "receipt": "scenario.done", "captures": 0}
+RESULT fail
+frames: 0 captured, 0 blank, 0 distinct digests
+presentation: 0 frames, 105 redraws, 105 unpresented redraws
+FAIL: native presentation stalled for 10000 ms (105 redraws, 0 presented frames)

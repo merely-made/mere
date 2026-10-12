@@ -1,0 +1,35 @@
+{
+  "provider": {
+    "head": "2eae6243881d5b24c984d5ee35dde509ca5db782",
+    "tracked_rust_content_sha256": "a7afa16459ed2d553fa72f5a9eb84fa3f4df0ea4c06d3260c47cdc711f88305a",
+    "tracked_rust_files": 311
+  },
+  "netrender": {
+    "head": "c74b7cb28090c28b1c6d80b08dcdea18aff48d3e",
+    "tracked_rust_content_sha256": "0d882823f3da5cb58b3769e282a3ad8d593a7dd3500b59685c3f7221faab43c6",
+    "tracked_rust_files": 134
+  },
+  "genet": {
+    "head": "2c7ef73bfa44c07744e0643e3c6f98be3cbd7947",
+    "tracked_rust_content_sha256": "8c8ddd5521d54ef05d3fb1a27ece9c75ee389fab48bfa34d70f745fbbbedea00",
+    "tracked_rust_files": 874
+  },
+  "mere": {
+    "head": "ef0994bae9a1742d682cc5342ed0f118fa51937a",
+    "tracked_rust_content_sha256": "64db4441e9c71c8a4c1ffa82882f47ee9857fbc17adc367130d87cb001267ce4",
+    "tracked_rust_files": 2338
+  },
+  "knot": {
+    "head": "3af93adda472af2913a5d298f14deb10e85daee2",
+    "tracked_rust_content_sha256": "4686404447bddbcf581680b889ad07b452d74f6532debeb0ea9d9a67399e4f90",
+    "tracked_rust_files": 137
+  },
+  "toolchain": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-apple-darwin\nrelease: 1.98.1\nLLVM version: 22.1.8\n",
+  "bounds": {
+    "cargo_jobs": 2,
+    "test_threads": 1,
+    "readback_seconds": 5,
+    "physical_driver_reset": false
+  },
+  "mere_uncommitted_scope": "Final consumer supplier pins/lockfiles and receipts/docs only; temporary native diagnostics removed byte-exact. Rust source is ef0994bae9a1742d682cc5342ed0f118fa51937a."
+}

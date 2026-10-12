@@ -1,0 +1,12 @@
+{
+  "revision": "398a52fbd814c6bd4b5029e044f024844fab380f",
+  "destination": "/Users/markik/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/398a52f",
+  "ownership": "created by Root final supplier metadata attempts; no Cargo completion marker; no builds used it",
+  "expected_tree": "f5a4cb7b0d535a19aae8edd155e33857d0b69fc3",
+  "before_free_bytes": 1665019904,
+  "repair": "retire own incomplete checkout and create a Git shared-object checkout of the same immutable published revision",
+  "after_free_bytes": 1182441472,
+  "verified_head": "398a52fbd814c6bd4b5029e044f024844fab380f",
+  "verified_tree": "f5a4cb7b0d535a19aae8edd155e33857d0b69fc3",
+  "completed": true
+}

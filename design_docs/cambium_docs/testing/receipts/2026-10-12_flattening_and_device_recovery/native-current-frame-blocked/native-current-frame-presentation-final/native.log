@@ -1,0 +1,4 @@
+[cambium-winit] accessibility Installed, 195 nodes projected
+tabard: FAIL: native presentation stalled for 10000 ms (106 redraws, 0 presented frames)
+tabard: RESULT fail (0 frames, 0 captures)
+tabard: The Tabard acceptance scenario failed or did not complete.

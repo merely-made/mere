@@ -1,6 +1,6 @@
 # ADR: One recovery owner for a shared render device
 
-**Status:** Accepted for implementation; qualification pending.
+**Status:** Implemented; native controlled-loss and current-frame qualification passed.
 **Date:** 2026-10-11
 **Deciders:** Renderer implementation owner under the user-authorized recovery work.
 
@@ -70,5 +70,4 @@ Device::destroy validation is distinct from a physical driver reset.
 - Native surface acquisition/recreation checks and web compilation of the callback ABI.
 - Source/pin identities and unchanged pixel acceptance thresholds in durable receipts.
 
-No successful runtime recovery is claimed by this decision record. Qualification
-results must be linked after execution.
+Executed qualification is recorded in the [production flattening and device recovery receipt](../testing/receipts/2026-10-12_flattening_and_device_recovery/README.md). The actual installed callback after controlled device destruction, one shared replacement, two registered reader pixel rehydrations, exact-once refusal and bounded later factory failure passed. Current native shader counters are observed before raster success, including an actual late round-cap limit refusal. Native presentation and the Wasm callback ABI are recorded separately. Browser async replacement, error scopes and current-frame counter completion remain open, as do physical driver reset and comprehensive producer-upload/composition loss scoping.
