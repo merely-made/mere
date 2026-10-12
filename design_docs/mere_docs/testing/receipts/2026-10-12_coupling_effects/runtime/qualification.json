@@ -1,0 +1,587 @@
+{
+  "base": "050e7d54284f22943fd7ffe8297a3b736691bf17",
+  "source_checkpoint": "bb2591c08032226506b986f19fd9ab1ec131b69e",
+  "target": "C:/t/cargo-targets/mere",
+  "jobs": 2,
+  "test_threads": 4,
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "cargo": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+  "source_sha256": {
+    "crates/canvas/pictograph/src/canvas/coupling_trace.rs": "b20313e778164ae6e764f757826afff5a4b66caedcd3565491e792ff18eba023",
+    "crates/canvas/pictograph/src/canvas/field_runtime_tests.rs": "292b42c6103c4b9afd06692b4e498a2e0d6332cea4a9a542f97c53ba2054af3d",
+    "crates/canvas/pictograph/src/canvas/input.rs": "fcfd7dec5a08c86c06c8b7c82ea84e43fa959e05e268ce6bf56ee978b491b4b9",
+    "crates/canvas/pictograph/src/canvas/lifecycle.rs": "52075640a82cc07b39892f9a96656158185a6872fe4d3621274e42442008b63f",
+    "crates/canvas/pictograph/src/canvas/seiche_bridge.rs": "8e48692985e249319e12c03d3c4f491dee6f1623f8f91bb453b3e806e9aaca33",
+    "crates/conatus/numen/src/field.rs": "c885c6b49cfcb39b0476d22aa6979806d41fc5753db5e56fa5b7dbaedaa97501",
+    "crates/conatus/seiche/examples/field_runtime.rs": "0284b6094c56cfed79cdc6ddd7193a887676ad36f793da34772bc700bf4c73ff",
+    "crates/conatus/seiche/src/coupling_force.rs": "8d402be40c6d27c5ef469ad326b9b28bd275a2c798f6a6610315318fcfb47a24",
+    "crates/conatus/seiche/src/coupling_force_tests.rs": "7756c7de5be53ccbdfb5a3034fc01dbf47f68640787501af9655cc2d7302389c",
+    "crates/conatus/seiche/src/coupling_membership.rs": "5e1c8df31c7c4ef1bc4777b572d29d0e524914b17a79baa8cdf4d180587ca2e2",
+    "crates/conatus/seiche/src/coupling_trace.rs": "db5c4d8c9603449fbff123bb3f347fcbcdef267388aeb711586683fc2a15ffd6",
+    "crates/conatus/seiche/src/field.rs": "0df80829a7aafa6d5f8b5291d11452dcbce894aa2355ac5f16231df127fd2c04",
+    "crates/conatus/seiche/src/field_clock.rs": "a8d3f307af2405c84dce7c708f33f3f2fe2c491734a1af2011e55d435228d4b2",
+    "crates/conatus/seiche/src/field_runtime_tests.rs": "5afc33adb4179cd9fb4c5f73d6dcaef5f10f48d25c0f2bd076ed1852d9d09d17",
+    "crates/conatus/seiche/src/grouped.rs": "e38ddeebc32e2bd7c7efdb35ee6198b830b3861f76771a7964263cbb67207586",
+    "crates/conatus/seiche/src/instruments.rs": "ada63162688759e39d86b3ea5d82ea1255f61d764cf9546a258e19f9abc12658",
+    "crates/conatus/seiche/src/lib.rs": "ef91a9bf1440435b4b95c6b070165f07873a8cfda4448f756ed2247191fd2ca4",
+    "crates/conatus/seiche/src/runtime.rs": "a73280fee4e0a1a095d16d34e47d5a78260cc226d96b17c29eafc4f16bb8b455",
+    "crates/conatus/seiche/src/runtime/actor.rs": "f6145e5fe9047baa1631a092fd51139497855061d4cbc01c1f94b6bce2e9bd7e",
+    "crates/conatus/seiche/src/runtime/coupling_trace_tests.rs": "cf5b5ae8b7fd632924028fa7a796bc8890db1785c7044acfacd574f78c934997",
+    "crates/conatus/seiche/src/runtime/elapsed/tests.rs": "00747924586906ec152e523ebf880b7eb5ed5c16e33c78d57aa1f791a659fcac",
+    "crates/conatus/seiche/src/runtime/field_runtime.rs": "0a7a361fff9d1d8c08187f9247dcc1a72f43a06bc3fda9d62143ad5927c945ef",
+    "crates/conatus/seiche/src/runtime/field_runtime_tests.rs": "b5305bff88d2c2537c49b699e2bd53a6ca9dc0b52c7d888c9e833a7142bf6c98",
+    "crates/conatus/seiche/src/runtime/membership_delivery.rs": "de791b01dffbfedff42769d3cd1e715d79ce33064ab38fcf23a27d8a99f41c0b",
+    "crates/conatus/seiche/src/runtime/pause_tests.rs": "d92d830c30c417f35d7f3d6ceb65eacb68035a35b884874db0eb383b882f1dcd"
+  },
+  "canonical_lf_source_sha256": {
+    "crates/canvas/pictograph/src/canvas/coupling_trace.rs": "88650a9c58d7b81d20c31d01b41e7300630a8f0c389d662607a8cb83256326fe",
+    "crates/canvas/pictograph/src/canvas/field_runtime_tests.rs": "20c381fdf7d06e4a70a1aeae968df2009f77fd790ba3824676ee0483be56cf60",
+    "crates/canvas/pictograph/src/canvas/input.rs": "597e8f04a646551ed5c7cf58846df22f98063bd12961abcbe6af52ded8e57640",
+    "crates/canvas/pictograph/src/canvas/lifecycle.rs": "1186d3499d86931150149d25d7edabcc74edd3691882a41a2afe04dbe6e3a1dc",
+    "crates/canvas/pictograph/src/canvas/seiche_bridge.rs": "ffa6c7cd697851d57301045960da77d785dbe3a2d05d4daaeef63541152df2ae",
+    "crates/conatus/numen/src/field.rs": "be38f7a9e6d42d6fdb6925ce5ca0f4710f9ae2c686c320ed489fbe66669aff78",
+    "crates/conatus/seiche/examples/field_runtime.rs": "9e7da35746271f1da8dbc7190e0223039b4ea89cc2a6906f1595826b60f79152",
+    "crates/conatus/seiche/src/coupling_force.rs": "66c99216937464280cde11b318a3ebbb18ab452ed357a9dbd6cb5ccc4d9b0050",
+    "crates/conatus/seiche/src/coupling_force_tests.rs": "7756c7de5be53ccbdfb5a3034fc01dbf47f68640787501af9655cc2d7302389c",
+    "crates/conatus/seiche/src/coupling_membership.rs": "5b8388e347817543276b7d71cbc6ac7958c4c26676edab0fdd25335b96ddb488",
+    "crates/conatus/seiche/src/coupling_trace.rs": "6215907ce4797e190c717f588dfc0842fc6daa07cd7824056c8dfc119676c41d",
+    "crates/conatus/seiche/src/field.rs": "e6eab0222c72520bbfd81cefb75f3031ca4f5b0b2bcdb335c679c3271cc6ebd0",
+    "crates/conatus/seiche/src/field_clock.rs": "8bc7095db4cd565df7ff4e31e4f635a5c97c4218547fcdba6b15632fdd2ec01b",
+    "crates/conatus/seiche/src/field_runtime_tests.rs": "58e71f9c8c195ae183ab0693e76e5f8a10569c2cda6f3f44f6e3fab5e2bf3f87",
+    "crates/conatus/seiche/src/grouped.rs": "b193b2210e9f057e5485d19a2fb86da4a60c0131dd3d7cf854e73afa6f388d2c",
+    "crates/conatus/seiche/src/instruments.rs": "1822b522e02eeb316e48ca90f4934b7d3e546a947002c822291df46fff09efc8",
+    "crates/conatus/seiche/src/lib.rs": "d038b299fd4d9b07a8e521322520321f73b49065f71b663b0e99b3c2e1cffff2",
+    "crates/conatus/seiche/src/runtime.rs": "9dbd795b20c783ff95dddebfc724689014c7ff9d9cfb5ae0d6ca1b09e9cba0e5",
+    "crates/conatus/seiche/src/runtime/actor.rs": "b7a4ec1a6ca5d1ab3b6ab2b389ffd157508f01a02fcf2cf8fdf7e78eef14c5f7",
+    "crates/conatus/seiche/src/runtime/coupling_trace_tests.rs": "b92becb741857a325dabe680b608081cd47f3bf72217e9ff5ac41c88d6be931a",
+    "crates/conatus/seiche/src/runtime/elapsed/tests.rs": "8f57b4964db1246ef7a965a19c26ef266ca0cbfc6e7efbc3e58f1594e2ee75a2",
+    "crates/conatus/seiche/src/runtime/field_runtime.rs": "ce12e85d0911b7c5055a5bf076bca476db5fb6296f2317b10dc58ba0b43edc22",
+    "crates/conatus/seiche/src/runtime/field_runtime_tests.rs": "eab34ba55e0c4bd5e8877acc659e9ac478157648b8166756aa84f0cef5bafbc6",
+    "crates/conatus/seiche/src/runtime/membership_delivery.rs": "9c34cb53fccde4efeab91823987d884508164202715ca633dfaf72e79c262642",
+    "crates/conatus/seiche/src/runtime/pause_tests.rs": "c1cc2a4953402d3e7301c4a7d3f853321c9123f48c8852984451e91d7787d9f6"
+  },
+  "test_results": {
+    "focused": [
+      "ok. 19 passed; 0 failed; 0 ignored; 0 measured; 192 filtered out; finished in 0.04s"
+    ],
+    "trajectory": [
+      "ok. 1 passed; 0 failed; 0 ignored; 0 measured; 210 filtered out; finished in 0.01s"
+    ],
+    "default": [
+      "ok. 201 passed; 0 failed; 10 ignored; 0 measured; 0 filtered out; finished in 1.35s",
+      "ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+    ],
+    "inline": [
+      "ok. 189 passed; 0 failed; 10 ignored; 0 measured; 0 filtered out; finished in 1.29s",
+      "ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+    ],
+    "serde": [
+      "ok. 208 passed; 0 failed; 10 ignored; 0 measured; 0 filtered out; finished in 1.40s",
+      "ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+    ],
+    "numen": [
+      "ok. 53 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+    ],
+    "host-field-runtime": [
+      "ok. 4 passed; 0 failed; 0 ignored; 0 measured; 435 filtered out; finished in 0.04s"
+    ],
+    "host-coupling": [
+      "ok. 14 passed; 0 failed; 0 ignored; 0 measured; 425 filtered out; finished in 0.04s"
+    ],
+    "host-live-physics": [
+      "ok. 10 passed; 0 failed; 0 ignored; 0 measured; 429 filtered out; finished in 0.26s"
+    ]
+  },
+  "gates": [
+    {
+      "name": "focused",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "seiche",
+        "--lib",
+        "field_runtime",
+        "--locked",
+        "--offline",
+        "-j",
+        "2",
+        "--",
+        "--test-threads=4",
+        "--nocapture"
+      ],
+      "checkpoint": "bb2591c08032226506b986f19fd9ab1ec131b69e",
+      "exit_code": 0,
+      "elapsed_seconds": 16.703
+    },
+    {
+      "name": "trajectory",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "seiche",
+        "--lib",
+        "execution_trajectory_receipt",
+        "--locked",
+        "--offline",
+        "-j",
+        "2",
+        "--",
+        "--nocapture"
+      ],
+      "checkpoint": "bb2591c08032226506b986f19fd9ab1ec131b69e",
+      "exit_code": 0,
+      "elapsed_seconds": 2.735
+    },
+    {
+      "name": "default",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "seiche",
+        "--locked",
+        "--offline",
+        "-j",
+        "2",
+        "--",
+        "--test-threads=4"
+      ],
+      "checkpoint": "bb2591c08032226506b986f19fd9ab1ec131b69e",
+      "exit_code": 0,
+      "elapsed_seconds": 36.922
+    },
+    {
+      "name": "inline",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "seiche",
+        "--no-default-features",
+        "--locked",
+        "--offline",
+        "-j",
+        "2",
+        "--",
+        "--test-threads=4"
+      ],
+      "checkpoint": "bb2591c08032226506b986f19fd9ab1ec131b69e",
+      "exit_code": 0,
+      "elapsed_seconds": 69.437
+    },
+    {
+      "name": "serde",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "seiche",
+        "--features",
+        "serde",
+        "--locked",
+        "--offline",
+        "-j",
+        "2",
+        "--",
+        "--test-threads=4"
+      ],
+      "checkpoint": "bb2591c08032226506b986f19fd9ab1ec131b69e",
+      "exit_code": 0,
+      "elapsed_seconds": 106.578
+    },
+    {
+      "name": "numen",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "numen",
+        "--locked",
+        "--offline",
+        "-j",
+        "2",
+        "--",
+        "--test-threads=4"
+      ],
+      "checkpoint": "bb2591c08032226506b986f19fd9ab1ec131b69e",
+      "exit_code": 0,
+      "elapsed_seconds": 10.39
+    },
+    {
+      "name": "wasm",
+      "command": [
+        "cargo",
+        "check",
+        "-p",
+        "seiche",
+        "--lib",
+        "--no-default-features",
+        "--target",
+        "wasm32-unknown-unknown",
+        "--locked",
+        "--offline",
+        "-j",
+        "2"
+      ],
+      "checkpoint": "bb2591c08032226506b986f19fd9ab1ec131b69e",
+      "exit_code": 0,
+      "elapsed_seconds": 5.906
+    },
+    {
+      "name": "example",
+      "command": [
+        "cargo",
+        "run",
+        "-p",
+        "seiche",
+        "--no-default-features",
+        "--example",
+        "field_runtime",
+        "--locked",
+        "--offline",
+        "-j",
+        "2"
+      ],
+      "checkpoint": "bb2591c08032226506b986f19fd9ab1ec131b69e",
+      "exit_code": 0,
+      "elapsed_seconds": 3.969
+    },
+    {
+      "name": "host-field-runtime",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "pictograph",
+        "--features",
+        "canvas",
+        "--lib",
+        "field_runtime",
+        "--locked",
+        "--offline",
+        "-j",
+        "2",
+        "--",
+        "--test-threads=4",
+        "--nocapture"
+      ],
+      "checkpoint": "bb2591c08032226506b986f19fd9ab1ec131b69e",
+      "exit_code": 0,
+      "elapsed_seconds": 66.719
+    },
+    {
+      "name": "host-coupling",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "pictograph",
+        "--features",
+        "canvas",
+        "--lib",
+        "coupling",
+        "--locked",
+        "--offline",
+        "-j",
+        "2",
+        "--",
+        "--test-threads=4",
+        "--nocapture"
+      ],
+      "checkpoint": "bb2591c08032226506b986f19fd9ab1ec131b69e",
+      "exit_code": 0,
+      "elapsed_seconds": 3.172
+    },
+    {
+      "name": "host-live-physics",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "pictograph",
+        "--features",
+        "canvas",
+        "--lib",
+        "live_physics",
+        "--locked",
+        "--offline",
+        "-j",
+        "2",
+        "--",
+        "--test-threads=4"
+      ],
+      "checkpoint": "bb2591c08032226506b986f19fd9ab1ec131b69e",
+      "exit_code": 0,
+      "elapsed_seconds": 3.172
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "-p",
+        "seiche",
+        "--all-targets",
+        "--locked",
+        "--offline",
+        "-j",
+        "2"
+      ],
+      "checkpoint": "bb2591c08032226506b986f19fd9ab1ec131b69e",
+      "exit_code": 0,
+      "elapsed_seconds": 7.281
+    }
+  ],
+  "final_gates": [
+    {
+      "name": "negative-zero-clock",
+      "source": "crates/conatus/seiche/src/coupling_force.rs",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "seiche",
+        "--no-default-features",
+        "--lib",
+        "field_runtime_clock_controls_real_motion_and_reset_does_not_rewind_solver_age",
+        "--locked",
+        "--offline",
+        "-j",
+        "2",
+        "--",
+        "--nocapture"
+      ],
+      "expected_test": "field_runtime_clock_controls_real_motion_and_reset_does_not_rewind_solver_age",
+      "exit_code": 101,
+      "restored": true,
+      "sha256_before": "8d402be40c6d27c5ef469ad326b9b28bd275a2c798f6a6610315318fcfb47a24",
+      "sha256_after": "8d402be40c6d27c5ef469ad326b9b28bd275a2c798f6a6610315318fcfb47a24"
+    },
+    {
+      "name": "negative-exclusive-boundary",
+      "source": "crates/conatus/numen/src/field.rs",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "seiche",
+        "--no-default-features",
+        "--lib",
+        "field_runtime_inclusive_reference_points_filter_actual_writes",
+        "--locked",
+        "--offline",
+        "-j",
+        "2",
+        "--",
+        "--nocapture"
+      ],
+      "expected_test": "field_runtime_inclusive_reference_points_filter_actual_writes",
+      "exit_code": 101,
+      "restored": true,
+      "sha256_before": "c885c6b49cfcb39b0476d22aa6979806d41fc5753db5e56fa5b7dbaedaa97501",
+      "sha256_after": "c885c6b49cfcb39b0476d22aa6979806d41fc5753db5e56fa5b7dbaedaa97501"
+    },
+    {
+      "name": "negative-initial-entry",
+      "source": "crates/conatus/seiche/src/coupling_membership.rs",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "seiche",
+        "--no-default-features",
+        "--lib",
+        "field_runtime_repeated_appearances_are_independent_and_initial_matches_do_not_act",
+        "--locked",
+        "--offline",
+        "-j",
+        "2",
+        "--",
+        "--nocapture"
+      ],
+      "expected_test": "field_runtime_repeated_appearances_are_independent_and_initial_matches_do_not_act",
+      "exit_code": 101,
+      "restored": true,
+      "sha256_before": "5e1c8df31c7c4ef1bc4777b572d29d0e524914b17a79baa8cdf4d180587ca2e2",
+      "sha256_after": "5e1c8df31c7c4ef1bc4777b572d29d0e524914b17a79baa8cdf4d180587ca2e2"
+    },
+    {
+      "name": "focused",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "seiche",
+        "--lib",
+        "field_runtime",
+        "--locked",
+        "--offline",
+        "-j",
+        "2",
+        "--",
+        "--test-threads=4",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.609
+    },
+    {
+      "name": "trajectory",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "seiche",
+        "--lib",
+        "execution_trajectory_receipt",
+        "--locked",
+        "--offline",
+        "-j",
+        "2",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.672
+    },
+    {
+      "name": "host-field-runtime",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "pictograph",
+        "--features",
+        "canvas",
+        "--lib",
+        "field_runtime",
+        "--locked",
+        "--offline",
+        "-j",
+        "2",
+        "--",
+        "--test-threads=4",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 15.765
+    }
+  ],
+  "trajectory_digests": [
+    [
+      "advect",
+      "54b5cd56e7b80b83"
+    ],
+    [
+      "align",
+      "bf3c47d11ff264bf"
+    ],
+    [
+      "attract",
+      "c717ab2701156915"
+    ],
+    [
+      "dampen",
+      "26b550ad4cdbd84f"
+    ],
+    [
+      "duplicate-advect",
+      "1798dfbd94938d15"
+    ],
+    [
+      "duplicate-attract",
+      "cac4854c803f022f"
+    ],
+    [
+      "duplicate-dampen",
+      "4ba4c04b15203996"
+    ],
+    [
+      "open",
+      "22f06774732f2065"
+    ],
+    [
+      "outside-dampen",
+      "22f06774732f2065"
+    ],
+    [
+      "repel",
+      "79743f9bd576ab4e"
+    ],
+    [
+      "wall",
+      "5978bb7ef06dc2bf"
+    ],
+    [
+      "wrong-scalar",
+      "22f06774732f2065"
+    ],
+    [
+      "wrong-vector",
+      "22f06774732f2065"
+    ]
+  ],
+  "rulings": [
+    "F203",
+    "F204",
+    "F205"
+  ],
+  "limits": [
+    "Membership is observed at actual coupling tick sample points, not swept crossings.",
+    "Owner callbacks are explicitly registered; app-specific script receivers and durable edits are owner integrations.",
+    "Attached extents remain unsupported until their owner supplies resolved geometry.",
+    "Reset covers node poses, field time and membership; backdrop/media/law-state resets remain separately owned.",
+    "Clock accumulation is f64; Numen consumes the actual f32 sample time recorded in the trace.",
+    "Physical membership/reporting covers the dedicated coupling slot; generic boxed couplings use the clock/scope but have no membership dispatcher.",
+    "External consumer pins, visible UI, Firefox, GPU and coordinator review are not qualified."
+  ],
+  "logs_sha256": {
+    "camera-no-new-tick-assumption-failure.log": "c71c37ad71b08b93aa3c0d5164cae8ab96e902b2ef9737056f98d0ac26302993",
+    "clippy.log": "5e71afaac99a8852bab25a024d0cf2c8e2b17df465fe56c73223b996a76db6ea",
+    "default.log": "bd0675b2b46d90de408d79e228d76a4e0665d1271188eb67a09c59513176dafd",
+    "example.log": "f4b0dc8de1bf2ecd4f82311fb0aca6caaf7cbd1b857a93b9ba21640aed87c527",
+    "focused.log": "dde5a1fe796f4c18f5e58af9cebd9ae131a58f0449d32e82946d9de13acdfc1e",
+    "gradient-exactness-assumption-failure.log": "0ef1cd4e78bca4980ff916ee27f472943562db6149414c618f86c79da1e3c038",
+    "headers.log": "8ae599e76c063f0249693ffe0442c51d533558908ae8f858970c19c61939d7ef",
+    "host-coupling.log": "ba3c6782343722a9caf942e209669b5748c9f90c0c938a4944c2cabc06d367d3",
+    "host-field-runtime.log": "5a06c21af8182f7cf41c4b41677852deae95da454fc106c9c2b9b455341d0223",
+    "host-live-physics.log": "a2b2d3058066dd463b6109b3cd67429799b04fdc7ad837491f3fd3b3a2761970",
+    "host-prototype.log": "6019dbb6a00c13272199014dea9ff5bbe6608ee61b509a448c4b491e9237050d",
+    "inline.log": "bc0db1df223c02ea839a4a7e8aaf1d62e4d65b309f59785cc37bfca6e5c28d9f",
+    "negative-exclusive-boundary.log": "09016d561e7da1edd14b6bd071e15fbab36a14d6384f93ad9a7c1de216bd1b25",
+    "negative-initial-entry.log": "6c59f9af1da32163db7db9a1146f0bb73432474563b73487c75ceb7dabe22b06",
+    "negative-zero-clock.log": "5a5124703a0f99454edcba8055648d4bbb228cbd3ccaf6529049786eb09f480c",
+    "numen.log": "dd2ed8d46ef18c1b70ae8706fe27fbe15267b4069164dd06a211c4366e3a3d76",
+    "prototype.log": "97d83192653505b4c6a7a793bdca1f180c55ebd987f761338851738df3e0682f",
+    "serde.log": "11fe212f3a73be86c8562c2d03623418dd3aa58d2030f5c283c2c8c989d3fc21",
+    "tick-demand-import-failure.log": "32aa72e54a1f05cb27ca508f25ae4023c0cbf47315127642a1f7cf1ad0f97b32",
+    "trajectory.log": "891bf1818529ea8ceb135aeaf086e3ffa3a41d924f36a33854e8b928842247c1",
+    "wasm.log": "d7b4f33a5d0e15ad4f8eb8aa5fda6c87f13f1b669d90028174fe8fa73a80d359",
+    "docs-comparison.log": "07651afa0671cd82438878dc9f3592708e9f65eb46a5b2e6cd2d5027c67bbc5f"
+  },
+  "metadata_canonical_lf_sha256": {
+    "final-gates.json": "42ec9bf935cfb984cbc8a6880c859e234087252b0fda72ef4e4e066994bea0f9",
+    "gates.json": "dc412a9ee09d7a0523aae3f90dd9988029802a2c42409a262ecdf04f14729da6",
+    "negative-controls.json": "d15dce8da6e3f2b78da1ca1953815651de1ab064a93ac509e720f4646af6f09a",
+    "source-format-headers.json": "d3f9fddfdb94c2f0239978b91427ace4c6089612c42b4a1031dbee1e3a6f4dd5",
+    "docs-comparison.json": "4824427ae08cf45ce6f06359b2ffaf3a192f154b4b15e5db381a4a4c7eb86960",
+    "docs-d2.json": "815fdb03a6891284c236801c7799f7474a15357926a25b0b3be62ed8a0d14428"
+  },
+  "harness_canonical_lf_sha256": {
+    "negative_controls.py": "2f3dfa3cc9286d10374f2e1f1e1995c043102eff013b0521c015ebcb39c272de",
+    "qualify.py": "7191a1ad86409a44c7e8b811cfb4770ca151e843f82c117ea0b34a79970b96b9",
+    "audit_docs.py": "de88808c87cbd6f9c35ac65b46c4a34c31daeb0eb9b9c5a363265599c487e617"
+  }
+}
