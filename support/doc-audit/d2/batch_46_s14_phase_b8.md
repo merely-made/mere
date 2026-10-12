@@ -410,3 +410,10 @@ from source edits and automatic representation/LOD changes. It names the actual
 hosted scenarios and hardware-browser gate before landing, with wider site
 retirement and one-tree phase 4 still open. No new runtime acceptance or whole
 document claim census is asserted by this addendum.
+
+The 2026-10-12 incremental continuation distinguishes the old-pin release
+measurements from the combined `f39f6ab0b` source gates: 67 focused CPU tests,
+viewer/product builds and main-page checking pass, while the final coherent
+supplier family and explicit renderer handoff still precede headed acceptance.
+The inherited R157 delivery gap remains separate from shared presenter
+integration. These updates do not close phase 4 or qualify live deployment.
