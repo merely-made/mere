@@ -4,6 +4,31 @@ on:
   pull_request:
   workflow_dispatch:
 jobs:
+  viewer-delivery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      CARGO_BUILD_JOBS: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install viewer toolchain
+        run: rustup toolchain install 1.98.1 --profile minimal --target wasm32-unknown-unknown,wasm32-wasip2
+      - name: Install matching Wasm packager
+        run: cargo +1.98.1 install wasm-bindgen-cli --version 0.2.129 --locked
+      - name: Exercise budget acceptance and refusal
+        run: python3 ports/graphshell/web/scripts/test_viewer_budget.py
+      - name: Build viewer and enforce interaction caps
+        run: python3 ports/graphshell/web/scripts/build-viewer.py --out-dir viewer-delivery/pkg
+      - name: Retain viewer delivery evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: graphshell-viewer-delivery
+          path: viewer-delivery/pkg
+          if-no-files-found: warn
   windows:
     runs-on: windows-latest
     env:
