@@ -974,6 +974,20 @@ where
         self.s.last_hover_hit = target;
         for (node, phase) in [(old, HoverPhase::Leave), (target, HoverPhase::Enter)] {
             if let Some(node) = node {
+                // A view replacement can retire the cached Leave target; its
+                // handler can also retire the prospective Enter target. Neither
+                // has geometry or an event route in the current document.
+                let live = self
+                    .s
+                    .runner
+                    .as_ref()
+                    .is_some_and(|runner| runner.dom().borrow().is_live(node));
+                if !live {
+                    if self.s.last_hover_hit == Some(node) {
+                        self.s.last_hover_hit = None;
+                    }
+                    continue;
+                }
                 let (local, size) = self.local_in(node);
                 if let Some(runner) = self.s.runner.as_mut() {
                     runner.dispatch_hover(node, HoverEvent::new(phase, local, size));
