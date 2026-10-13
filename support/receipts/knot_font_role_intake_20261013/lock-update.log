@@ -1,0 +1,31 @@
+    Updating crates.io index
+    Updating git repository `https://github.com/merely-made/netrender.git`
+    Updating git repository `https://github.com/merely-made/genet.git`
+    Updating git repository `https://github.com/merely-made/dramatis.git`
+    Updating git repository `https://github.com/merely-made/retinue.git`
+    Updating git repository `https://github.com/mark-ik/vello`
+    Updating git repository `https://github.com/merely-made/knot-editor.git`
+    Updating git repository `https://github.com/merely-made/mere.git`
+    Updating git repository `https://github.com/merely-made/retinue.git`
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+     Locking 6 packages to latest compatible versions
+    Removing knot-capture v0.0.1 (https://github.com/merely-made/knot-editor.git?rev=3af93adda472af2913a5d298f14deb10e85daee2#3af93add)
+      Adding knot-capture v0.0.1 (https://github.com/merely-made/knot-editor.git?rev=8ed49d43f049921d56ab5a0c091a2c37c0970ee7#8ed49d43)
+    Removing knot-composition v0.0.1 (https://github.com/merely-made/knot-editor.git?rev=3af93adda472af2913a5d298f14deb10e85daee2#3af93add)
+      Adding knot-composition v0.0.1 (https://github.com/merely-made/knot-editor.git?rev=8ed49d43f049921d56ab5a0c091a2c37c0970ee7#8ed49d43)
+    Removing knot-document v0.0.1 (https://github.com/merely-made/knot-editor.git?rev=3af93adda472af2913a5d298f14deb10e85daee2#3af93add)
+      Adding knot-document v0.0.1 (https://github.com/merely-made/knot-editor.git?rev=8ed49d43f049921d56ab5a0c091a2c37c0970ee7#8ed49d43)
+    Removing knot-editor v0.0.3 (https://github.com/merely-made/knot-editor.git?rev=3af93adda472af2913a5d298f14deb10e85daee2#3af93add)
+      Adding knot-editor v0.0.3 (https://github.com/merely-made/knot-editor.git?rev=8ed49d43f049921d56ab5a0c091a2c37c0970ee7#8ed49d43)
+    Removing knot-file-catalog v0.0.1 (https://github.com/merely-made/knot-editor.git?rev=3af93adda472af2913a5d298f14deb10e85daee2#3af93add)
+      Adding knot-file-catalog v0.0.1 (https://github.com/merely-made/knot-editor.git?rev=8ed49d43f049921d56ab5a0c091a2c37c0970ee7#8ed49d43)
+    Removing knot-site v0.0.1 (https://github.com/merely-made/knot-editor.git?rev=3af93adda472af2913a5d298f14deb10e85daee2#3af93add)
+      Adding knot-site v0.0.1 (https://github.com/merely-made/knot-editor.git?rev=8ed49d43f049921d56ab5a0c091a2c37c0970ee7#8ed49d43)
+note: pass `--verbose` to see 116 unchanged dependencies behind latest
