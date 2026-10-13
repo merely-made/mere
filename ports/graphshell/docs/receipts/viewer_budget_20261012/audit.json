@@ -1,0 +1,35 @@
+{
+  "indexed_header_check": "passed after new receipt files were staged",
+  "doc_audit": "Reports existing cross-repository/path drift; not claimed globally clean",
+  "doc_audit_counts": {
+    "index_orphans": 0,
+    "index_ghosts": 0,
+    "memory_directory_links": 0,
+    "statusless_plans": 0,
+    "broken_relative_links": 28,
+    "historical_broken_relative_links": 245,
+    "planned_broken_relative_links": 0,
+    "ambiguous_known_root_paths": 101,
+    "ignored_known_root_patterns": 23,
+    "reserved_identifier_paths": 24,
+    "missing_known_root_paths": 200,
+    "historical_missing_known_root_paths": 237,
+    "planned_missing_known_root_paths": 6,
+    "invalid_historical_annotations": 0,
+    "stale_historical_annotations": 0,
+    "unheaded_owned_sources": 0,
+    "exhibit_b_sources": 0
+  },
+  "d2_missing_active_records": [
+    "mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md",
+    "mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md",
+    "mere_docs/testing/receipts/2026-10-11_producer_gates/README.md"
+  ],
+  "raw_logs": "Frozen compiler logs retain tool whitespace; do not normalize their contents",
+  "d2_errors": [
+    "snapshot aggregate digest changed: 2046e1eec3018b7dd288e794326090f1b7f9a889043d53e45530271d0b32be1e != f0b64eef4cd5514157bb1b49d389b84db29a1e823d6f3e2cebf827337fe56abf",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_producer_gates/README.md"
+  ]
+}

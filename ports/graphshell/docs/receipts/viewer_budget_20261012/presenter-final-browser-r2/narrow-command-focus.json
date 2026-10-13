@@ -1,0 +1,559 @@
+{
+  "receipt": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        420,
+        465
+      ],
+      "canvas_physical_size": [
+        420,
+        465
+      ],
+      "log": [
+        "gpu timestamps: no"
+      ],
+      "result": "ok",
+      "saved_graph": null,
+      "timings": []
+    },
+    "captures": []
+  },
+  "host": {
+    "page": "tree",
+    "semanticTree": {
+      "role": "region",
+      "label": "Graphshell, one tree",
+      "children": [
+        {
+          "role": "main",
+          "children": [
+            {
+              "role": "heading",
+              "label": "Project graph",
+              "children": []
+            },
+            {
+              "role": "status",
+              "label": "3 visible of 18 disclosed · 1 selected",
+              "children": []
+            },
+            {
+              "children": [
+                {
+                  "role": "button",
+                  "label": "Graph commands",
+                  "expanded": false,
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Fit visible graph",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Graph tools",
+                  "expanded": false,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "role": "group",
+                      "label": "3 of 3 shown",
+                      "children": [
+                        {
+                          "role": "group",
+                          "label": "genet",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "mere",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "woodshed",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "region",
+                  "label": "Project inspector",
+                  "children": [
+                    {
+                      "role": "heading",
+                      "label": "Project inspector",
+                      "children": []
+                    },
+                    {
+                      "role": "status",
+                      "label": "1 selected · 3 visible / 18 disclosed",
+                      "children": []
+                    },
+                    {
+                      "role": "button",
+                      "label": "Hide project list",
+                      "expanded": true,
+                      "children": []
+                    },
+                    {
+                      "role": "paragraph",
+                      "children": []
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "paragraph",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Inspect genet",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Remove genet",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "role": "button",
+                      "label": "Clear project selection",
+                      "children": []
+                    },
+                    {
+                      "role": "heading",
+                      "label": "genet",
+                      "children": []
+                    },
+                    {
+                      "role": "paragraph",
+                      "children": []
+                    },
+                    {
+                      "role": "heading",
+                      "label": "Disclosed relationships (1)",
+                      "children": []
+                    },
+                    {
+                      "role": "paragraph",
+                      "children": []
+                    },
+                    {
+                      "role": "button",
+                      "label": "Inspect related genet workspace",
+                      "children": []
+                    },
+                    {
+                      "role": "button",
+                      "label": "Show source details",
+                      "expanded": false,
+                      "children": []
+                    },
+                    {
+                      "role": "button",
+                      "label": "Show Fold controls",
+                      "expanded": false,
+                      "children": []
+                    },
+                    {
+                      "role": "list",
+                      "label": "Disclosed projects",
+                      "children": [
+                        {
+                          "role": "listitem",
+                          "label": "Select genet-liverySelect genet-livery",
+                          "box": [
+                            28,
+                            933,
+                            380,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select genet-livery",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select genet-renderSelect genet-render",
+                          "box": [
+                            28,
+                            967,
+                            380,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select genet-render",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select taprootSelect taproot",
+                          "box": [
+                            28,
+                            1001,
+                            380,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select taproot",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select graphshellSelect graphshell",
+                          "box": [
+                            28,
+                            1035,
+                            380,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select graphshell",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select mere [crate:mere:mere]Select mere [crate:mere:mere]",
+                          "box": [
+                            28,
+                            1069,
+                            380,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select mere [crate:mere:mere]",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select pictographSelect pictograph",
+                          "box": [
+                            28,
+                            1103,
+                            380,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select pictograph",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select scenoSelect sceno",
+                          "box": [
+                            28,
+                            1137,
+                            380,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select sceno",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select scenographSelect scenograph",
+                          "box": [
+                            28,
+                            1171,
+                            380,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select scenograph",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select scenomiseSelect scenomise",
+                          "box": [
+                            28,
+                            1205,
+                            380,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select scenomise",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select woodshed-coreSelect woodshed-core",
+                          "box": [
+                            28,
+                            1239,
+                            380,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select woodshed-core",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select woodshed-genetSelect woodshed-genet",
+                          "box": [
+                            28,
+                            1273,
+                            380,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select woodshed-genet",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select woodsheddingSelect woodshedding",
+                          "box": [
+                            28,
+                            1307,
+                            380,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select woodshedding",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select genetSelect genet",
+                          "box": [
+                            28,
+                            1341,
+                            380,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select genet",
+                              "pressed": true,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select mere [repo:mere]Select mere [repo:mere]",
+                          "box": [
+                            28,
+                            1375,
+                            380,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select mere [repo:mere]",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select woodshedSelect woodshed",
+                          "box": [
+                            28,
+                            1409,
+                            380,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select woodshed",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select genet workspaceSelect genet workspace",
+                          "box": [
+                            28,
+                            1443,
+                            380,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select genet workspace",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select mere workspaceSelect mere workspace",
+                          "box": [
+                            28,
+                            1477,
+                            380,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select mere workspace",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select woodshed workspaceSelect woodshed workspace",
+                          "box": [
+                            28,
+                            1511,
+                            380,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select woodshed workspace",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "title": "Graphshell, one tree",
+    "visibility": "visible",
+    "viewport": {
+      "width": 420,
+      "height": 800
+    }
+  },
+  "hidden": false,
+  "errors": []
+}

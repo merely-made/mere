@@ -1,0 +1,566 @@
+{
+  "scenario": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        1140,
+        637
+      ],
+      "canvas_physical_size": [
+        1140,
+        637
+      ],
+      "log": [
+        "gpu timestamps: no"
+      ],
+      "result": "ok",
+      "saved_graph": null,
+      "timings": []
+    },
+    "captures": []
+  },
+  "host": {
+    "page": "tree",
+    "semanticTree": {
+      "role": "region",
+      "label": "Graphshell, one tree",
+      "children": [
+        {
+          "role": "main",
+          "children": [
+            {
+              "role": "heading",
+              "label": "Graphshell, one tree",
+              "children": []
+            },
+            {
+              "role": "status",
+              "label": "host dataset, revision manifest-sha256:fc6df1451cb8cb68b6faee4a8e318f696dfcdb12bd7b0c8110c38d8f1f2f32f1 · 4 nodes · picked: none",
+              "children": []
+            },
+            {
+              "role": "region",
+              "label": "Relations",
+              "children": [
+                {
+                  "role": "heading",
+                  "label": "Relations",
+                  "children": []
+                },
+                {
+                  "role": "list",
+                  "label": "Contains: mere to mere workspaceDeclares a dependency on: woodshed to genetDeclares a dependency on: woodshed to mere workspaceDeclares a dependency on: mere workspace to genet",
+                  "children": [
+                    {
+                      "role": "listitem",
+                      "label": "Contains: mere to mere workspaceContains: mere to mere workspace",
+                      "box": [
+                        40,
+                        72,
+                        1376,
+                        14
+                      ],
+                      "children": []
+                    },
+                    {
+                      "role": "listitem",
+                      "label": "Declares a dependency on: woodshed to genetDeclares a dependency on: woodshed to genet",
+                      "box": [
+                        40,
+                        86,
+                        1376,
+                        14
+                      ],
+                      "children": []
+                    },
+                    {
+                      "role": "listitem",
+                      "label": "Declares a dependency on: woodshed to mere workspaceDeclares a dependency on: woodshed to mere workspace",
+                      "box": [
+                        40,
+                        100,
+                        1376,
+                        14
+                      ],
+                      "children": []
+                    },
+                    {
+                      "role": "listitem",
+                      "label": "Declares a dependency on: mere workspace to genetDeclares a dependency on: mere workspace to genet",
+                      "box": [
+                        40,
+                        114,
+                        1376,
+                        14
+                      ],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "role": "region",
+              "label": "Folds",
+              "children": [
+                {
+                  "role": "heading",
+                  "label": "Folds",
+                  "children": []
+                },
+                {
+                  "role": "navigation",
+                  "label": "Graph location",
+                  "children": [
+                    {
+                      "role": "button",
+                      "label": "Whole graph",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "role": "status",
+                  "label": "4 visible of 18 disclosed occurrences; 0 external context items. Group changes pause physics and preserve coordinates.",
+                  "children": []
+                },
+                {
+                  "role": "list",
+                  "label": "genet · 1 members · 3 internal dependenciesExpand genetEnter genetmere · 1 members · 0 internal dependenciesCollapse mereEnter merewoodshed · 1 members · 3 internal dependenciesExpand woodshedEnter woodshedmere workspace · 6 members · 10 internal dependenciesExpand mere workspaceEnter mere workspace",
+                  "children": [
+                    {
+                      "role": "listitem",
+                      "label": "genet · 1 members · 3 internal dependenciesExpand genetEnter genetgenet · 1 members · 3 internal dependenciesExpand genetEnter genet",
+                      "box": [
+                        30,
+                        208,
+                        1398,
+                        30
+                      ],
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Expand genet",
+                          "expanded": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Enter genet",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "role": "listitem",
+                      "label": "mere · 1 members · 0 internal dependenciesCollapse mereEnter meremere · 1 members · 0 internal dependenciesCollapse mereEnter mere",
+                      "box": [
+                        30,
+                        238,
+                        1398,
+                        30
+                      ],
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Collapse mere",
+                          "expanded": true,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Enter mere",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "role": "listitem",
+                      "label": "woodshed · 1 members · 3 internal dependenciesExpand woodshedEnter woodshedwoodshed · 1 members · 3 internal dependenciesExpand woodshedEnter woodshed",
+                      "box": [
+                        30,
+                        268,
+                        1398,
+                        30
+                      ],
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Expand woodshed",
+                          "expanded": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Enter woodshed",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "role": "listitem",
+                      "label": "mere workspace · 6 members · 10 internal dependenciesExpand mere workspaceEnter mere workspacemere workspace · 6 members · 10 internal dependenciesExpand mere workspaceEnter mere workspace",
+                      "box": [
+                        30,
+                        298,
+                        1398,
+                        30
+                      ],
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Expand mere workspace",
+                          "expanded": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Enter mere workspace",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "button",
+                  "label": "Show relationship evidence",
+                  "expanded": false,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "role": "navigation",
+              "label": "Graph controls",
+              "children": [
+                {
+                  "role": "button",
+                  "label": "Pan left",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan right",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan up",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan down",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Zoom in",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Zoom out",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Fit visible graph",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Fit selection",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Restore arrangement",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Play physics",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Graph commands",
+                  "expanded": false,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "role": "group",
+                      "label": "2 of 4 shown",
+                      "children": [
+                        {
+                          "role": "group",
+                          "label": "mere",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "mere workspace",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Arrangement and physics",
+                              "expanded": true,
+                              "children": []
+                            },
+                            {
+                              "children": [
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Arrangement",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply arrangement",
+                                  "children": []
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Role",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply role",
+                                  "children": []
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Physics law",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "group",
+                                  "label": "Overlays",
+                                  "children": [
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Kinds",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Groups",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Mass",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Depth",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply physics",
+                                  "children": []
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Speed",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Profile",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply profile",
+                                  "children": []
+                                },
+                                {
+                                  "role": "status",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "title": "Graphshell, one tree",
+    "visibility": "visible",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    }
+  },
+  "hidden": false,
+  "errors": []
+}

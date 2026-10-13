@@ -1,0 +1,90 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling serde_core v1.0.229
+   Compiling syn v3.0.6
+   Compiling serde v1.0.229
+   Compiling libc v0.2.190
+   Compiling serde_derive v1.0.229
+   Compiling getrandom v0.4.3
+   Compiling slotmap v1.1.1
+   Compiling uuid v1.27.0
+   Compiling syn v2.0.119
+   Compiling hashbrown v0.17.1
+   Compiling indexmap v2.14.2
+   Compiling tracing-attributes v0.1.31
+   Compiling tracing v0.1.44
+   Compiling petgraph v0.8.3
+   Compiling accesskit v0.24.1
+   Compiling document-session-api v0.1.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling taffy v0.11.0-experimental-cache-fix.3
+   Compiling serde_json v1.0.151
+   Compiling inker v0.1.1 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/inker/inker)
+   Compiling mere-curation v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/forme/curation)
+   Compiling mere-forme v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/forme/forme)
+   Compiling uxtree v0.0.2 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/forme/uxtree)
+   Compiling platen v0.0.1 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/platen/platen)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 48.67s
+     Running unittests src/lib.rs (target/debug/deps/platen-377ba3107522ef3c)
+
+running 50 tests
+test projection_geometry::tests::axis_round_trips_through_split_axis ... ok
+test projection_geometry::tests::sanitize_clamps_active_and_renormalizes_fractions ... ok
+test accessibility::tests::empty_layout_emits_root_only ... ok
+test projection_geometry::tests::members_flattens_leaves_in_order ... ok
+test accessibility::tests::split_slots_project_a_group_and_tab_each ... ok
+test accessibility::tests::ids_are_deterministic ... ok
+test accessibility::tests::stacked_layout_marks_exactly_one_active_tab ... ok
+test tree_projection::tests::empty_plan_projects_to_no_tree ... ok
+test tree_projection::tests::empty_arrangement_projects_no_slots ... ok
+test tree_projection::tests::groups_and_root_are_not_leaf_tiles ... ok
+test tree_projection::tests::mix_of_split_and_tab ... ok
+test tree_projection::tests::multiple_slots_project_to_an_even_row_split ... ok
+test tree_projection::tests::single_slot_projects_to_a_bare_stack ... ok
+test tree_projection::tests::stacked_slot_projects_to_a_tabbed_stack ... ok
+test projection_geometry::tests::round_trips_through_json ... ok
+test tree_projection::tests::plan_round_trips_through_json ... ok
+test tree_projection::tests::stacked_tiles_collapse_into_one_tab_slot ... ok
+test tree_projection::tests::unstacked_tiles_become_split_slots_in_order ... ok
+test workbench::bridge::tests::arrangement_records_membership_and_stacking ... ok
+test workbench::bridge::tests::canonical_roundtrips_reports_the_invariant ... ok
+test workbench::bridge::tests::geometry_reconciles_a_dropped_member ... ok
+test workbench::bridge::tests::lone_stack_round_trips ... ok
+test workbench::bridge::tests::nested_split_with_tabs_round_trips ... ok
+test workbench::bridge::tests::no_geometry_falls_back_to_flat_projection ... ok
+test workbench::tests::activate_switches_the_visible_tab_in_a_stack ... ok
+test workbench::bridge::tests::row_split_round_trips ... ok
+test workbench::tests::close_tab_drops_it_and_removes_an_empty_slot ... ok
+test workbench::tests::ensure_tiled_switches_once ... ok
+test workbench::tests::move_to_slot_of_moves_across_and_reorders_within ... ok
+test workbench::tests::nested_split_fractions_addressed_by_path ... ok
+test workbench::tests::new_workbench_is_cartography_and_empty ... ok
+test workbench::tests::open_in_slot_of_stacks_a_new_tab_and_activates_it ... ok
+test workbench::tests::open_split_opens_each_as_its_own_slot_and_dedups ... ok
+test workbench::tests::open_stack_gathers_into_one_slot_and_rehomes_open_members ... ok
+test workbench::tests::open_tile_appends_single_slots_and_dedups ... ok
+test workbench::tests::split_beside_axis_makes_a_vertical_split ... ok
+test workbench::tests::split_beside_pulls_a_tab_into_its_own_slot ... ok
+test workbench::tests::split_out_pulls_a_tab_out_of_its_own_stack ... ok
+test workbench::tests::stack_all_then_split_all_separates ... ok
+test workbench::tests::to_tile_tree_empty_is_none ... ok
+test workbench::tests::to_tile_tree_single_slot_is_a_stack ... ok
+test workbench::tests::to_tile_tree_slots_become_a_weighted_row_split ... ok
+test workbench::tests::to_tile_tree_stacked_slot_keeps_active ... ok
+test workbench::tests::weights_are_fractions_default_equal_and_set_renormalizes ... ok
+test workbench::tree::tests::fractions_at_reads_and_sets_a_nested_split ... ok
+test workbench::tree::tests::remove_collapses_single_child_splits ... ok
+test workbench::tree::tests::split_beside_cross_axis_nests ... ok
+test workbench::tree::tests::split_beside_same_axis_extends_the_parent ... ok
+test workbench::tree::tests::stack_into_moves_across_and_reorders_within ... ok
+test workbench::bridge::tests::random_gesture_sequences_round_trip ... ok
+
+test result: ok. 50 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

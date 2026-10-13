@@ -1185,6 +1185,100 @@ native/touch qualification and complete one-tree phase 4 remain separate.
 The latest release measurement stays bound to `8ad44a5c7`; no new release size
 is inferred from these debug packages.
 
+### Viewer delivery budget (2026-10-13; published)
+
+Mark authorized reducing the viewer below R157's unchanged 3,407,872-byte
+(3.25 MiB) gzip limit so the site can replace its sandbox. Work starts on
+`codex/viewer-size-budget` from published `ea9239a3f`, preserving the accepted
+presenter, commands, Fold/history and explicit unsupported-product/remote routes.
+The first load remains frozen under the site's separate 64 KiB cap.
+
+**Target:** remove capabilities outside the read-only cone, select a reproducible
+shipping profile, enforce all asset caps, and qualify the exact candidate before
+site adoption. No cap increase, new source authority or fork of the site's data.
+Platen's document producer is now a default-on `document-layout` capability;
+its pane plans, geometry and structural accessibility build without it.
+Graphshell's native and product hosts keep document layout, while the viewer
+selects the portable model. This prevents an unused document producer from
+activating Parley's dictionary segmentation throughout the viewer cone. The
+text engine and dictionary data are not patched. Consumer feature inspection
+must retain the full document capability in the product build.
+
+**Exploratory evidence:** a fresh no-defaults baseline is 6,416,541 B gzip.
+Five ICU dictionary blobs are found byte-for-byte in its data segment; the
+feature path is Graphshell web → Platen → document-canvas → Parley complex
+scripts. Separating that producer reduces the same-profile package to
+3,910,153 B gzip, still 502,281 B over budget. Fifty portable Platen tests and
+54 default-feature tests pass, including document scene tests. `wasm-opt`
+`-Os`, `-Oz` and converged `-Oz` each worsen compressed size, with the failed
+measurements retained. A separate `viewer` profile inherits release, uses `z`
+and full LTO, and leaves the established full-page release profile unchanged;
+its first exploratory package is 3,383,277 B gzip9 and 3,398,093 B gzip6.
+Both fit narrowly. The normal shipping package at `cdba4c969` measures
+3,379,962 B gzip9 and 3,396,363 B gzip6, with 11,509 B spare at gzip6.
+Glue, mount and history also pass their individual caps. Portable/default
+Platen tests, the two size-gate controls and all four Wasm feature builds pass.
+
+That exact package passed 24 command cases, eleven presenter cases, all
+seventeen physics receipts, four browser pointer/keyboard assertions and three
+clean product/remote refusals on headed Chrome 152 with AMD gcn-5, with no page
+errors. The final 21-node synthetic diagnostic has 16.7–16.8 ms median display
+intervals across three windows; the last window includes an 82.6 ms maximum.
+This is a count-matched diagnostic, not the site's actual data or a broad
+performance guarantee. Existing missing Arabic/CJK/Thai glyphs occur in both
+baseline and reduced packages; disclosed strings agree, Latin/Greek remain
+readable, and mixed-script line breaks differ. No expanded font repertoire or
+identical complex-script segmentation is claimed.
+
+The original timeout/focus receipts are retained. Density needed 420 seconds
+for its 7,400-frame scenario; presenter checks wait for selected-state/link
+projection; the keyboard scenario needs twelve Tabs through the current panel
+(the old eleven-Tab recipe fails on both baseline and candidate). Assertions
+remain unchanged. Browser, server and inhibitor resources were explicitly
+closed at 07:19:09 UTC on 13 October. Receipts are under
+`ports/graphshell/docs/receipts/viewer_budget_20261012`.
+
+Subsequent main `0d1dc1927` adds retained Pelt content and Moot controls.
+Reconciliation preserves these capabilities in native defaults and web product
+builds through an explicit `retained-content` feature, keeping the read-only
+viewer free of their document producer. The standalone web workspace also
+restates the root p2panda compatibility patches, which Cargo does not inherit.
+The reconciled runtime (`3f57971e0`, packaged at comment-only successor
+`47199232d`) measures 3,303,044 B gzip6 and 3,289,510 B gzip9, leaving
+104,828 B at the stricter measured level. Raw Wasm is 9,474,800 B. Glue is
+19,147 B gzip6; mount 588 B and history 6,704 B. All four caps and all four
+Wasm configurations pass, with product complex-script support present and
+viewer support absent. The exact rebuilt package independently passes all 24 command, eleven
+presenter, seventeen physics and four browser pointer/keyboard checks, Unicode
+comparison and the three expected unsupported-product assertion failures with
+no page errors. The new complete 21-node live frame windows have 16.6–16.8 ms median,
+at most 18.1 ms p95 and 28.3 ms maximum intervals. The paused windows reach
+18.7 ms p95. These complete frame windows differ from the separate rolling
+120-sample interval arrays; this remains a bounded diagnostic. Chrome 152 uses AMD gcn-5. All four driver processes exit
+zero, and the browser/server/inhibitor are closed at 07:44:12 UTC on 13 October.
+The earlier package and failed controls remain independently preserved.
+Source/asset/driver/served/auxiliary hashes are frozen in the candidate ledger.
+Main publication is confirmed at `425b04ceb`. The publication commit changes
+only receipts and documentation relative to the frozen runtime. Live-site
+cutover remains separate.
+
+The builder enforces all four interaction caps at gzip6 and gzip9. The portable
+workflow invokes it in a separate Linux delivery job and retains package/report.
+GitHub's repository permission check reports Actions disabled on 13 October;
+remote CI execution is not claimed. The site's separate first-load cap and
+static/mobile/non-WebGPU/failure reading remain site-cutover gates.
+
+**Done when:** the normal shipping build and exact deployment recipe fit each
+R157 cap with source/profile/feature/package hashes and an automated regression
+gate; portable/default Platen, viewer/product/main-page compile and relevant
+shared tests pass; the exact optimized viewer receives a serialized hardware
+browser check for presenter, controls, accessibility, Fold/history, physics and
+clean product/remote refusals. Compare reading and text behavior on the actual
+site disclosure and representative Unicode inputs. Preserve static/mobile and
+non-WebGPU reading, first-interaction loading, source validation and failure
+fallbacks during site replacement. The final source is reconciled with upstream
+before publication; exploratory measurements do not transfer acceptance.
+
 ## 5. Stop rules
 
 - Nothing a screen reader reaches today is lost: a control moves only once

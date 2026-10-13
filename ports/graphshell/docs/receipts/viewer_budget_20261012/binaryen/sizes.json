@@ -1,0 +1,63 @@
+[
+  {
+    "tag": "Os",
+    "command": [
+      "/Users/markik/.cargo/bin/wasm-opt",
+      "/Users/markik/Code/output/graphshell-viewer-budget-20261012/portable-platen/pkg/graphshell_web_bg.wasm",
+      "-o",
+      "/Users/markik/Code/output/graphshell-viewer-budget-20261012/binaryen/Os.wasm",
+      "--enable-bulk-memory",
+      "--enable-multivalue",
+      "--enable-mutable-globals",
+      "--enable-reference-types",
+      "--enable-sign-ext",
+      "--enable-nontrapping-float-to-int",
+      "-Os"
+    ],
+    "exit_code": 0,
+    "raw": 10811481,
+    "gzip9": 4072507,
+    "sha256": "6621543a06192bf251be6e36ebf66e3ea9f54b5598234581d0c124004db27b2d"
+  },
+  {
+    "tag": "Oz",
+    "command": [
+      "/Users/markik/.cargo/bin/wasm-opt",
+      "/Users/markik/Code/output/graphshell-viewer-budget-20261012/portable-platen/pkg/graphshell_web_bg.wasm",
+      "-o",
+      "/Users/markik/Code/output/graphshell-viewer-budget-20261012/binaryen/Oz.wasm",
+      "--enable-bulk-memory",
+      "--enable-multivalue",
+      "--enable-mutable-globals",
+      "--enable-reference-types",
+      "--enable-sign-ext",
+      "--enable-nontrapping-float-to-int",
+      "-Oz"
+    ],
+    "exit_code": 0,
+    "raw": 10665671,
+    "gzip9": 4077563,
+    "sha256": "7c10ee8072aaface2a1e956eda27fc5c38228299c073b3fd15c4fe268fdd563b"
+  },
+  {
+    "tag": "Oz-converge",
+    "command": [
+      "/Users/markik/.cargo/bin/wasm-opt",
+      "/Users/markik/Code/output/graphshell-viewer-budget-20261012/portable-platen/pkg/graphshell_web_bg.wasm",
+      "-o",
+      "/Users/markik/Code/output/graphshell-viewer-budget-20261012/binaryen/Oz-converge.wasm",
+      "--enable-bulk-memory",
+      "--enable-multivalue",
+      "--enable-mutable-globals",
+      "--enable-reference-types",
+      "--enable-sign-ext",
+      "--enable-nontrapping-float-to-int",
+      "-Oz",
+      "--converge"
+    ],
+    "exit_code": 0,
+    "raw": 10657666,
+    "gzip9": 4069432,
+    "sha256": "89790941c21273ad27cb3b8be9dd35959d49404e88458e75748c0e0d7190aa4b"
+  }
+]

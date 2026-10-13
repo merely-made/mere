@@ -1,0 +1,67 @@
+[
+  {
+    "name": "viewer",
+    "source": "3a069a505e430ecdd4f1cf22ccf9836382a7d5a1",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+      "check",
+      "--locked",
+      "--offline",
+      "--target",
+      "wasm32-unknown-unknown",
+      "--no-default-features",
+      "-j1"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "product",
+    "source": "3a069a505e430ecdd4f1cf22ccf9836382a7d5a1",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+      "check",
+      "--locked",
+      "--offline",
+      "--target",
+      "wasm32-unknown-unknown",
+      "--no-default-features",
+      "--features",
+      "product,applets",
+      "-j1"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "main-page",
+    "source": "3a069a505e430ecdd4f1cf22ccf9836382a7d5a1",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+      "check",
+      "--locked",
+      "--offline",
+      "--target",
+      "wasm32-unknown-unknown",
+      "--no-default-features",
+      "--features",
+      "main-page,applets",
+      "-j1"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "default",
+    "source": "3a069a505e430ecdd4f1cf22ccf9836382a7d5a1",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+      "check",
+      "--locked",
+      "--offline",
+      "--target",
+      "wasm32-unknown-unknown",
+      "--features",
+      "applets",
+      "-j1"
+    ],
+    "exit_code": 0
+  }
+]
