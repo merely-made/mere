@@ -55,6 +55,7 @@ fn hover_motion_resolves_ancestor_coordinates_and_leaves_without_clicking() {
 #[derive(Default)]
 struct ReplacementState {
     replaced: bool,
+    replace_on_move: bool,
     events: Vec<(&'static str, HoverPhase)>,
 }
 type ReplacementChild = Box<dyn AnyView<ReplacementState, (), GenetCtx, GenetElement>>;
@@ -77,7 +78,11 @@ fn replacement_view(state: &ReplacementState) -> ReplacementChild {
             el("div", ()).attr("class", "zone"),
             |state: &mut ReplacementState, event: cambium::HoverEvent| {
                 state.events.push(("old", event.phase));
-                event.defer_rebuild();
+                if state.replace_on_move && event.phase == HoverPhase::Move {
+                    state.replaced = true;
+                } else {
+                    event.defer_rebuild();
+                }
             },
         ))
     }
@@ -203,4 +208,53 @@ fn a_leave_handler_can_retire_the_next_hover_target_without_an_enter() {
         host.s.runner.as_ref().unwrap().state().events,
         [("old", HoverPhase::Enter), ("old", HoverPhase::Leave),]
     );
+}
+
+#[test]
+fn a_move_handler_can_replace_its_own_hovered_subtree_before_the_next_event() {
+    let mut state = HostState::<ReplacementState, ReplacementLogic, ReplacementChild>::new();
+    state.shared.sheet =
+        ".zone { position:absolute;left:40px;top:30px;width:200px;height:100px; }".into();
+    state.runner = Some(GenetAppRunner::new(
+        Rc::new(RefCell::new(ScriptedDom::new())),
+        replacement_view as ReplacementLogic,
+        ReplacementState {
+            replace_on_move: true,
+            ..Default::default()
+        },
+    ));
+    let wake = HostWake::new(state.wake_pending.clone(), Arc::new(|| {}));
+    let mut host = Host::new(
+        HostOptions::default(),
+        None,
+        HostHooks::inert(),
+        state,
+        wake,
+    );
+    host.set_surface_size(400., 300.);
+    host.relayout(400., 300.);
+    host.pointer_moved(65., 40.);
+    let retired = host.s.last_hover_hit.unwrap();
+    host.pointer_moved(70., 45.);
+    assert!(
+        !host
+            .s
+            .runner
+            .as_ref()
+            .unwrap()
+            .dom()
+            .borrow()
+            .is_live(retired)
+    );
+    host.relayout(400., 300.);
+    host.pointer_moved(75., 50.);
+    assert_eq!(
+        host.s.runner.as_ref().unwrap().state().events,
+        [
+            ("old", HoverPhase::Enter),
+            ("old", HoverPhase::Move),
+            ("new", HoverPhase::Enter),
+        ]
+    );
+    assert_ne!(host.s.last_hover_hit, Some(retired));
 }
