@@ -1,0 +1,23 @@
+{
+  "frozen_source": "77374c788559eb9738185b4782585257664c33bd",
+  "runtime_package_sha256": "63a2c85c7327b698034eba8c72c5123e6eca6b2e6a3373c37ab43e164fe3e67c",
+  "non_name_sections_identical": true,
+  "symbols": {
+    "34267": "std[5a6270b673d0c64d]::panicking::panic_with_hook",
+    "43727": "<core[ed718c3d60ebd546]::cell::RefCell<cambium_rootstock[1a38903774ea3e8b]::host::Host<graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage, for<'a> fn(&'a graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage) -> alloc[508e33bd5656020b]::boxed::Box<dyn meristem[cdcf25f71cabc8c9]::views::any_view::AnyView<graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage, (), cambium[de73128f5d22307c]::context::GenetCtx, cambium[de73128f5d22307c]::pod::GenetElement>>, alloc[508e33bd5656020b]::boxed::Box<dyn meristem[cdcf25f71cabc8c9]::views::any_view::AnyView<graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage, (), cambium[de73128f5d22307c]::context::GenetCtx, cambium[de73128f5d22307c]::pod::GenetElement>>>>>::borrow",
+    "48885": "console_error_panic_hook[fdd264b5f6c663e1]::hook_impl",
+    "75224": "std[5a6270b673d0c64d]::panicking::panic_handler::{closure#0}",
+    "88348": "<core[ed718c3d60ebd546]::option::Option<&genet_scripted_dom[a4af6220dee1cd67]::Node>>::expect",
+    "125517": "<console_error_panic_hook[fdd264b5f6c663e1]::Error>::new",
+    "130423": "core[ed718c3d60ebd546]::panicking::panic_fmt",
+    "130424": "core[ed718c3d60ebd546]::option::expect_failed",
+    "154271": "core[ed718c3d60ebd546]::cell::panic_already_mutably_borrowed",
+    "154478": "<console_error_panic_hook[fdd264b5f6c663e1]::hook as core[ed718c3d60ebd546]::ops::function::Fn<(&std[5a6270b673d0c64d]::panic::PanicHookInfo,)>>::call",
+    "159511": "__rustc[100742bb89c490cb]::rust_begin_unwind",
+    "177729": "console_error_panic_hook[fdd264b5f6c663e1]::hook",
+    "195199": "<console_error_panic_hook[fdd264b5f6c663e1]::Error>::new::__wbg_new_227d7c05414eb861 externref shim",
+    "195736": "__rustc[100742bb89c490cb]::rust_panic",
+    "198752": "std[5a6270b673d0c64d]::sys::backtrace::__rust_end_short_backtrace::<std[5a6270b673d0c64d]::panicking::panic_handler::{closure#0}, !>",
+    "199401": "__rustc[100742bb89c490cb]::__rust_abort"
+  }
+}

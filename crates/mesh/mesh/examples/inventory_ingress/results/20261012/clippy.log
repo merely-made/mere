@@ -1,0 +1,71 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: bound is defined in more than one place
+   --> crates/stickleback/src/store.rs:283:24
+    |
+283 |     pub fn log_entries<L: LogId>(
+    |                        ^
+...
+293 |         L: Send + 'static,
+    |         ^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#multiple_bound_locations
+    = note: `#[warn(clippy::multiple_bound_locations)]` on by default
+
+warning: very complex type used. Consider factoring parts into `type` definitions
+   --> crates/stickleback/src/store.rs:289:10
+    |
+289 |     ) -> Result<BoxStream<'static, Result<LogEntry<Operation<E>, L>, StoreError>>, StoreError>
+    |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#type_complexity
+    = note: `#[warn(clippy::type_complexity)]` on by default
+
+warning: called `expect` on `self.sparse` after checking its variant with `is_some`
+   --> crates/intel/esp/src/embed/search.rs:127:13
+    |
+125 |           if self.sparse.is_some() {
+    |           ------------------------ help: try: `if let Some(<item>) = &mut self.sparse`
+126 |               let vector = self.embed_sparse(&[text])?.pop().ok_or_else(empty_batch)?;
+127 | /             self.sparse
+128 | |                 .as_mut()
+129 | |                 .expect("sparse store present")
+    | |_______________________________________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#unnecessary_unwrap
+    = note: `#[warn(clippy::unnecessary_unwrap)]` on by default
+
+warning: called `expect` on `self.sparse` after checking its variant with `is_some`
+   --> crates/intel/esp/src/embed/search.rs:146:26
+    |
+144 |         if self.sparse.is_some() {
+    |         ------------------------ help: try: `if let Some(<item>) = &mut self.sparse`
+145 |             let vectors = self.embed_sparse(&texts)?;
+146 |             let sparse = self.sparse.as_mut().expect("sparse store present");
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#unnecessary_unwrap
+
+warning: `stickleback` (lib) generated 2 warnings
+warning: `esp` (lib) generated 2 warnings
+warning: missing documentation for an associated function
+   --> crates/murm/transport/src/p2panda_transport.rs:637:5
+    |
+637 |     pub fn builder_from_seed_ref(signing_seed: &[u8; 32]) -> P2pandaTransportBuilder<'static> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+note: the lint level is defined here
+   --> crates/murm/transport/src/lib.rs:46:9
+    |
+ 46 | #![warn(missing_docs)]
+    |         ^^^^^^^^^^^^
+
+warning: `mere-transport` (lib) generated 1 warning
+    Checking mere-mesh v0.0.1 (<MERE>/crates/mesh/mesh)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.28s

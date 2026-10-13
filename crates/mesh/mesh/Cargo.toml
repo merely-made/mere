@@ -11,7 +11,13 @@ description = "The personal-space compute mesh: signed job operations over the L
 name = "mesh"
 path = "src/lib.rs"
 
+[features]
+admitted-ingress = ["dep:transport", "dep:notochord", "dep:serde_json", "tokio/io-util", "tokio/sync", "tokio/macros"]
+
 [dependencies]
+transport = { workspace = true, features = ["notochord"], optional = true }
+notochord = { workspace = true, features = ["tokio"], optional = true }
+serde_json = { version = "1", optional = true }
 insigne = { workspace = true, features = ["verify"] }
 # The operation/signing substrate the job ops ride (the same signed
 # Operation<Ext> wire as Standing and Murm posts; mirrors Gemot's pin).
@@ -63,6 +69,11 @@ esp = { workspace = true }
 # `test-identity`: tests and examples bind throwaway identities (vault lock
 # plan, ruling 96).
 transport = { workspace = true, features = ["test-identity"] }
-tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread", "time", "io-std", "io-util"] }
+tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread", "time", "io-std", "io-util", "process"] }
 tempfile = "3"
 serde_json = "1"
+
+[[example]]
+name = "inventory_ingress"
+path = "examples/inventory_ingress/main.rs"
+required-features = ["admitted-ingress"]

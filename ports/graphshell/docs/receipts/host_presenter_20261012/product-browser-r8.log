@@ -1,0 +1,15 @@
+PASS p4_tree_node_ladder.scn
+PASS p4_tree_node_ladder_reopen.scn
+AssertionError [ERR_ASSERTION]: {"state":"fail","errors":[],"gate_failures":[],"result":{"canvas_logical_size":[1140,865],"canvas_physical_size":[1140,865],"log":["FAIL: unknown checkpoint title-before-shortcut","gpu timestamps: no"],"result":"fail","saved_graph":{"address":"https://example.test/i2p-port","file":null,"reopened":false,"save_state":"idle","selected":"81b91a6b-52ef-5751-b497-15f711cf9c70","session":"aa6b3e30-cebc-4bec-8dcc-79079243a8b7","tags":"research, transport","title":"I2P port notes"},"timings":[]},"captures":[]}
+
+'fail' !== 'ok'
+
+    at scenario (/Users/markik/Code/output/graphshell-site-presenter-20261011/verify-product.cjs:21:480)
+    at async /Users/markik/Code/output/graphshell-site-presenter-20261011/verify-product.cjs:27:15 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 'fail',
+  expected: 'ok',
+  operator: 'strictEqual',
+  diff: 'simple'
+}

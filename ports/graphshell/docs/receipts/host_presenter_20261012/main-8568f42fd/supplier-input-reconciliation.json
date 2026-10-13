@@ -1,0 +1,12 @@
+{
+  "source": "abaed67c1a7ac39e3ef6a10c3435bb2154f87f2a",
+  "metadata_audit_basis": "8ad44a5c7cf2f8cc7a71c45ef0e42c324fe58266",
+  "changed_manifests_or_locks": [],
+  "byte_sha256": {
+    "Cargo.toml": "f303a24af6a2aa0082a217df6f84bfdaf77d241b41fb3f85c0184cf76241893c",
+    "Cargo.lock": "c135ccde9bc3a04b13bf75a857e356d290deb2d30bc1801b4d00408eca431a9c",
+    "ports/graphshell/web/Cargo.toml": "fd7c21e833b4c52434d15856f32926dc238f922943e653257249f9bdfe3fc26e",
+    "ports/graphshell/web/Cargo.lock": "952a71cadcae143a20c02277256cf1aecab0d84972e3f7e5fd43fbe0e17a3b53"
+  },
+  "qualification": "External supplier dependency inputs unchanged; this does not transfer browser acceptance"
+}
