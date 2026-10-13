@@ -1,0 +1,58 @@
+// Copyright 2026 Mark Alan Boykin
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// SPDX-License-Identifier: MPL-2.0
+const fs=require('fs'),path=require('path'),assert=require('node:assert/strict');
+const {chromium}=require('/Users/markik/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/../node_modules/playwright');
+const out=path.join(__dirname,'budget-browser-'+(process.env.RECEIPT_ROUND||'r1'));fs.mkdirSync(out,{recursive:true});
+const base='http://127.0.0.1:8847';
+(async()=>{
+ require('./assert-console-unlocked.cjs')();
+ const browser=await chromium.launch({channel:'chrome',headless:false,args:['--enable-unsafe-webgpu']});
+ const context=await browser.newContext({viewport:{width:1440,height:1000},deviceScaleFactor:1});
+ const page=await context.newPage();page.setDefaultTimeout(30000);const errors=[],runs=[];page.on('pageerror',e=>{errors.push(e.stack||e.message);fs.writeFileSync(path.join(out,'page-errors-live.json'),JSON.stringify(errors,null,2))});
+ async function mount(route,folder='web-combined'){
+  await page.goto(base+'/'+folder+route);await page.bringToFront();await page.waitForFunction(()=>document.querySelector('graphshell-tree')?.dataset.ready==='true',null,{timeout:120000});await page.waitForTimeout(250);
+ }
+ async function run(name,text,expected='ok'){
+  await page.evaluate(async text=>{const m=await import('./pkg/graphshell_web.js');m.run_scenario(text)},text);
+  await page.waitForFunction(()=>['ok','fail'].includes(document.body.dataset.scenario),null,{timeout:120000});
+  const r=await page.evaluate(()=>({receipt:window.graphshellScenario(),host:window.graphshellReceipt(),hidden:document.hidden}));
+  await page.screenshot({path:path.join(out,name+'.png')});fs.writeFileSync(path.join(out,name+'.json'),JSON.stringify({...r,errors:[...errors]},null,2));
+  assert.equal(r.receipt.result?.result,expected,JSON.stringify(r.receipt));assert.equal(r.receipt.gate_failures.length,0);assert.equal(r.hidden,false);assert.equal(errors.length,0,errors.join('\n'));runs.push(name);console.log('PASS',name);return r;
+ }
+ try {
+  // Same disclosed UTF-8 strings and exact source-details values on old/new packages.
+  const readings=[];
+  for(const folder of ['web-baseline','web-combined']){
+   await mount('/tree.html?dataset=fixtures/budget-unicode.json&presenter=inspector',folder);
+   await page.getByRole('button',{name:'Choose projects',exact:true}).press('Enter');
+   await page.getByRole('button',{name:'Select Café — naïve Δοκιμή',exact:true}).press('Enter');
+   await page.getByRole('button',{name:'Show source details',exact:true}).press('Enter');
+   const inspector=page.getByRole('region',{name:'Project inspector',exact:true});
+   const text=await inspector.textContent();
+   for(const part of ['Café','Δοκιμή','مرحبا','中文','ภาษาไทย','A\u0301'])assert.ok(text.includes(part),part);
+   await page.waitForTimeout(400);await page.screenshot({path:path.join(out,folder+'-unicode.png')});
+   readings.push({folder,text,semanticTree:await page.evaluate(()=>window.graphshellReceipt().semanticTree)});
+  }
+  assert.equal(readings[0].text,readings[1].text,'Disclosed Unicode reading and selection values must remain identical');
+  fs.writeFileSync(path.join(out,'unicode-reading-comparison.json'),JSON.stringify({readings,errors,glyphCoverage:'Compare rendered Latin/Greek and existing font repertoire; this does not claim new glyph coverage for every script.'},null,2));runs.push('unicode-reading-comparison');
+  // All eleven laws, plus roles, drag, keys, profiles and dynamic additions.
+  const physics=['springs','charge','flow','density','flock','orbit','energy','meaning','anneal','stress','still','profiles','drag','kinds','converted','keys','add'];
+  for(const law of physics){
+   await mount('/tree.html');const file='p4_tree_physics_'+law+'.scn';await run(file,fs.readFileSync(path.join(__dirname,'web-combined/scenarios',file),'utf8'));
+  }
+  await mount('/tree.html?nodes=21&seed=7&links=none&physics_speed=1&gpu=off');
+  await run('site-scale-frames',fs.readFileSync(path.join(__dirname,'site-frames.scn'),'utf8'));
+  for(const [name,query,file] of [
+   ['saved-route-refused','?app=local','p4_tree_item_role.scn'],
+   ['saved-edit-refused','?app=local','p4_tree_saved_edit.scn'],
+   ['remote-absent-refused','','p4_tree_remote_absent.scn']]){
+   await mount('/tree.html'+query);await run(name,fs.readFileSync(path.join(__dirname,'web-combined/scenarios',file),'utf8'),'fail');
+  }
+  const adapter=await page.evaluate(async()=>{const a=await navigator.gpu.requestAdapter();return a?{vendor:a.info.vendor,architecture:a.info.architecture,device:a.info.device,description:a.info.description}:null});
+  assert.ok(adapter&&adapter.vendor==='amd'&&!/swiftshader/i.test(JSON.stringify(adapter)));assert.equal(errors.length,0);
+  fs.writeFileSync(path.join(out,'summary.json'),JSON.stringify({runs,browser:browser.version(),adapter,errors,headed:true},null,2));console.log('DONE',runs.length);
+ }catch(e){fs.writeFileSync(path.join(out,'failure.json'),JSON.stringify({message:e.message,errors},null,2));await page.screenshot({path:path.join(out,'failure.png')});throw e;}finally{await browser.close()}
+})().catch(e=>{console.error(e);process.exitCode=1});
