@@ -99,7 +99,9 @@ impl MirrorHandle {
             .clone()
             .unwrap_or_else(|| self.root.clone());
         self.moving.set(true);
-        let _ = element.focus();
+        let options = web_sys::FocusOptions::new();
+        options.set_prevent_scroll(true);
+        let _ = element.focus_with_options(&options);
         self.moving.set(false);
     }
 }
@@ -145,9 +147,10 @@ impl DomAccessibility {
         let _ = root.set_attribute("tabindex", "-1");
         let _ = root.set_attribute("data-cambium-mirror", "");
         // Transparent and pointer-blind: the canvas draws and takes the
-        // pointer, the mirror is there for a reader.
+        // pointer, the mirror is there for a reader. Clip without a scrolling
+        // box: browser focus must not shift its controls away from the canvas.
         let _ = root.style().set_css_text(
-            "position:absolute;margin:0;padding:0;border:0;overflow:hidden;\
+            "position:absolute;margin:0;padding:0;border:0;overflow:clip;\
              pointer-events:none;opacity:0;",
         );
         let parent = canvas
@@ -365,8 +368,7 @@ impl Accessibility for DomAccessibility {
         // while still leaving genuinely external page focus alone.
         let active_before = self.document.active_element();
         let held_before = active_before.as_ref().is_some_and(|active| {
-            active.is_same_node(Some(self.canvas.as_ref()))
-                || root.contains(Some(active.as_ref()))
+            active.is_same_node(Some(self.canvas.as_ref())) || root.contains(Some(active.as_ref()))
         });
         let mut live = HashSet::new();
         self.write(&root, &plan, &mut live);

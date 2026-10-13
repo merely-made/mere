@@ -1,0 +1,327 @@
+{
+  "date": "2026-10-13",
+  "mere_base": "e08dc0d3f994e5fa617a32609005569204155092",
+  "published_integration": "0d1dc1927859ff1aa2a43dd88a04391bc1086fd8",
+  "turnstone_commit": "d5d4737",
+  "theme_draft": "7d62a5a06c202527300e032aa641ac27f304cfe3",
+  "supplier_closure": {
+    "platform": "x86_64-pc-windows-msvc",
+    "mere_sources": [
+      "git+https://www.github.com/merely-made/mere.git?rev=0d1dc1927859ff1aa2a43dd88a04391bc1086fd8#0d1dc1927859ff1aa2a43dd88a04391bc1086fd8"
+    ],
+    "genet_revisions": [
+      "2c7ef73bfa44c07744e0643e3c6f98be3cbd7947"
+    ],
+    "duplicate_genet_package_names": [],
+    "mere_packages": 75,
+    "genet_packages": 30,
+    "qualification": "Normal locked dependency resolution; no local-source overrides"
+  },
+  "source_files": {
+    "Cargo.lock": {
+      "bytes": 465900,
+      "sha256": "db6e66d045303ab7056c35ee87c7ac329d16bb7d3892730de68c28a33487d13f",
+      "staged_git_blob": "1859fb5fa179776b441838ab5877dd041907d500"
+    },
+    "crates/cambium/cambium-genet-web-host/Cargo.toml": {
+      "bytes": 2817,
+      "sha256": "6994a35c656a3ad9391622426b284f586d53fd42d0a853fe74ae9db26fed22a6",
+      "staged_git_blob": "1a2b5c4056c8cdbc3b88278b6c52b5d4649e8c29"
+    },
+    "crates/cambium/cambium-genet-web-host/src/a11y.rs": {
+      "bytes": 15923,
+      "sha256": "a67c93c240fa2ebc962b8ef72da9a5cedc5b50915108f767dc6c00d472ee0cbf",
+      "staged_git_blob": "7bd12d5082da1e78b732893e349bb0dd3cf2e928"
+    },
+    "crates/cambium/cambium-genet-web-host/src/mount.rs": {
+      "bytes": 16614,
+      "sha256": "78a762580bdcd1bd535733694eb8ec5f21cefa51a381249d74010978384697ad",
+      "staged_git_blob": "be5d25b67449a7bae98bcafd4cf4a63a6f1ff188"
+    },
+    "crates/inker/document-canvas/src/layout.rs": {
+      "bytes": 45457,
+      "sha256": "4a6b9e476889e6b39672ba13eac77d96b78e06eace294e1c2ce96520cab454bb",
+      "staged_git_blob": "fd37c9c890573dc55dda3c7c25a113cb86b5d7e4"
+    },
+    "crates/system/document-lanes/src/reader.rs": {
+      "bytes": 36417,
+      "sha256": "27255eef52e599d29779f9f43b2ecbabf03bc4505c4bb15952145bdef95f957b",
+      "staged_git_blob": "2c0612168e55a6273040daa5685b5b4b413ffd9b"
+    },
+    "crates/system/document-lanes/src/session.rs": {
+      "bytes": 12786,
+      "sha256": "d98bb0f3524af2843fc39ff07b366c2cc1a48f0aaaca8e8da37251694e689ad3",
+      "staged_git_blob": "9a6d21a3d3a9791f37031291a034be1e4b1c0e15"
+    },
+    "crates/system/document-lanes/src/smolweb.rs": {
+      "bytes": 59762,
+      "sha256": "ed005dcf0392dc035e26c51ee7a65afd095b3a38ddb6ec4651190c61b144353c",
+      "staged_git_blob": "24eefbc259938c6b2bb1ca401bd9d191f1a3cad0"
+    },
+    "design_docs/mere_docs/implementation_strategy/2026-09-25_graphshell_one_tree_plan.md": {
+      "bytes": 137316,
+      "sha256": "1e589c1d40f5067ce6c6f00b1ec44b58d73e7f16182f660c64ed854638e94495",
+      "staged_git_blob": "47ead68dab5dc0ff7fc484152319aa998d63c21b"
+    },
+    "ports/graphshell/src/moot_resources.rs": {
+      "bytes": 16826,
+      "sha256": "3b48fc2466703483ce02c6e2186ede1538835ddaf49774bc126d02dbe61b1b92",
+      "staged_git_blob": "8e23e57c5ed0629b08b02172534b2b0cc5208a28"
+    },
+    "ports/graphshell/src/retained_content.rs": {
+      "bytes": 15285,
+      "sha256": "38ff3e9abe7e1984dd1a919a6e355fb46a6274a9cc5bd0953da00631281af2d4",
+      "staged_git_blob": "d33fcc596e7fbaeb75749685d8f59764ea095893"
+    },
+    "ports/graphshell/src/retained_content/producer.rs": {
+      "bytes": 9661,
+      "sha256": "c0b74e44c1b447e5003ec4be25e44a6732da2b5776eadf9304ca0f0a8eeb0b0a",
+      "staged_git_blob": "f148f0676172b4a13e92fc7b87783bad54a993bf"
+    },
+    "ports/graphshell/src/retained_content/tests.rs": {
+      "bytes": 17484,
+      "sha256": "d7ae6490c0f046f24e8e6f6a3b0262d6a9c13c5dd3039adeeb7aac0df922246e",
+      "staged_git_blob": "3d26b1c0c2ba5d23112475d54f233ee4569d6643"
+    },
+    "ports/graphshell/src/retained_content/view.rs": {
+      "bytes": 7955,
+      "sha256": "834764417c4f55253d411b91cfa710bc978e9830162ba8ecc5cefa9c3ef785bf",
+      "staged_git_blob": "0d6e3ffbdc14de4e1e15b0ac0122175e66f17172"
+    },
+    "ports/graphshell/src/web_tree/forme.rs": {
+      "bytes": 36759,
+      "sha256": "793d840bca5202980e0eafba17e62a3f6b3ccf48610302e78bf5e321040943e4",
+      "staged_git_blob": "e9afff2a563f4b9fbd179b61b0f667751141c9e3"
+    },
+    "ports/graphshell/src/web_tree/lane.rs": {
+      "bytes": 66915,
+      "sha256": "1a895bf2ef72a3f24e11a53923a818580a3ebf7713d8f53d0c8f87b52964e4f9",
+      "staged_git_blob": "905e7869c349df770f9453b4d67c145394b51d79"
+    },
+    "ports/graphshell/src/web_tree/reading.rs": {
+      "bytes": 19644,
+      "sha256": "a31c0f56e5f0fd81112236e448a9d8a68c4506d89f704483b562a32c7789d58e",
+      "staged_git_blob": "47b61f3f0e264d76467eaa9ba7af97beac30a00f"
+    },
+    "ports/graphshell/web/Cargo.lock": {
+      "bytes": 287628,
+      "sha256": "08aab8ce7b66d3034c64111dc74b314ec62bac5a4a75d62ddc4b40c69e284238",
+      "staged_git_blob": "937b66884f021db0a0c1e86fb4f63a89458d1751"
+    },
+    "ports/graphshell/web/Cargo.toml": {
+      "bytes": 12804,
+      "sha256": "63f7d59af12f5858271684596074b9e43d71eacc7bdec63bd10eeb68d272165f",
+      "staged_git_blob": "b6128349652188c3ce0be50d86722fb7d2553d18"
+    },
+    "ports/graphshell/web/scenarios/p4_tree_retained_content.scn": {
+      "bytes": 1000,
+      "sha256": "3a2ff92f766117ac58044378146d96245794267068775e2b8976f869089e3c57",
+      "staged_git_blob": "90b8f708cf1e76adfe9af0381f3514cb1b4b7e92"
+    },
+    "ports/pelt/core/src/native.rs": {
+      "bytes": 8452,
+      "sha256": "36499952b3a4c8a5f39bd885e8d7b66288fba2421248746f9bc1c287ea328d05",
+      "staged_git_blob": "6ad76d810684183002a62672156cc096e89317d3"
+    }
+  },
+  "checks": {
+    "final-content-tests.log": {
+      "bytes": 29490,
+      "sha256": "2769ca35b05d3a8773e3895568cc8195d51786638a11a2074828d64a2c18fc8f"
+    },
+    "document-canvas-tests.log": {
+      "bytes": 11459,
+      "sha256": "0a7aeaf80f8a841b961d9f926f0ca8c4afe0c27a02a22451a8f02ebe26c76e9c"
+    },
+    "shared-clip-tests.log": {
+      "bytes": 6629,
+      "sha256": "90358b4df229556634dcaecdde399a56acc7ebfb93497824c87e1977fdbc2f35"
+    },
+    "merged-resource-tests.log": {
+      "bytes": 5378,
+      "sha256": "4c10ba6e0fd227d6cc64a19086826fa0a0515f2ed0404e3d320c90f2e74ca9cd"
+    },
+    "merged-moot-mount-tests.log": {
+      "bytes": 26848,
+      "sha256": "24e0c1cfc7b5dbbadca9b7c21941896731f977f608078285401e3a953ff2e7ab"
+    },
+    "shared-web-host-tests.log": {
+      "bytes": 8803,
+      "sha256": "265b9955b56193c36b006203ad63d15644f51c7793544a49d75af95a842e070f"
+    },
+    "final-web-build.log": {
+      "bytes": 16038,
+      "sha256": "4986ede6a69b8342c3ecfd8514a255feec1bf040f461efcfa1c4f74e50b21e21"
+    },
+    "turnstone-pinned-check.log": {
+      "bytes": 51382,
+      "sha256": "00d8e135f579bd31133c3771ed50fcd101eb57e1956563404ec1161ed7c230cb"
+    },
+    "turnstone-pinned-clip-tests.log": {
+      "bytes": 33646,
+      "sha256": "2c458950cbc96ed36195b833ddcec375dc4b6d58c5add29577136d725c139272"
+    },
+    "turnstone-pinned-store-tests.log": {
+      "bytes": 17238,
+      "sha256": "f569af4bf359ec0b0ce92c3ce002a8e881af11e619de08a63ed07bf40ffc3e96"
+    },
+    "final-port-boundaries.log": {
+      "bytes": 59,
+      "sha256": "ed4d418c7935ec6ab35610fbd1f8d9b7078ca2ad0684de25623968362a13de39"
+    },
+    "final-doc-audit.json": {
+      "bytes": 170857,
+      "sha256": "069b379ae73ac6c3e2d34e51b54953b3b77df663a6a6d79b9921bf57dfcaf5f0"
+    }
+  },
+  "browser": {
+    "p4_tree_retained_content": {
+      "state": "ok",
+      "errors": [],
+      "gate_failures": [],
+      "result": {
+        "canvas_logical_size": [
+          737,
+          329
+        ],
+        "canvas_physical_size": [
+          1474,
+          658
+        ],
+        "log": [
+          "waited 0 frames",
+          "captured pelt_native_held_html",
+          "waited 0 frames",
+          "captured pelt_fleece_selected_text",
+          "waited 0 frames",
+          "captured pelt_retained_voice_controls",
+          "gpu timestamps: no"
+        ],
+        "result": "ok",
+        "saved_graph": {
+          "address": "mere://clip/9cb36d1a9fc01a661d1d1941fad00fb10faf077829b229ea896c9e59e0262e29",
+          "file": null,
+          "reopened": true,
+          "save_state": "idle",
+          "selected": "1a98b4f1-f747-4ef0-8101-25110b23dce0",
+          "session": "92ac0dca-f653-4873-856d-f6bce4785e61",
+          "tags": "",
+          "title": "Redshank note"
+        },
+        "timings": []
+      },
+      "receipt_sha256": "7f5f524692191466b4468516937c15c05daf0a09818a08934a74d62b6a359d81"
+    },
+    "p4_tree_retained_content_reopen": {
+      "state": "ok",
+      "errors": [],
+      "gate_failures": [],
+      "result": {
+        "canvas_logical_size": [
+          737,
+          329
+        ],
+        "canvas_physical_size": [
+          1474,
+          658
+        ],
+        "log": [
+          "waited 0 frames",
+          "captured pelt_retained_sources_reopened",
+          "waited 0 frames",
+          "captured pelt_retained_voice_requires_gesture",
+          "waited 0 frames",
+          "captured pelt_retained_voice_stopped",
+          "gpu timestamps: no"
+        ],
+        "result": "ok",
+        "saved_graph": {
+          "address": "",
+          "file": null,
+          "reopened": true,
+          "save_state": "idle",
+          "selected": null,
+          "session": "92ac0dca-f653-4873-856d-f6bce4785e61",
+          "tags": "",
+          "title": ""
+        },
+        "timings": []
+      },
+      "receipt_sha256": "27d920ef38bb6a6623025ca25c18b9a61d0fe282b71196cf6be70c69c9909698"
+    }
+  },
+  "browser_package": {
+    "graphshell_web.d.ts": {
+      "bytes": 8208,
+      "sha256": "835e4f83665954af9c86b30f98f60814275e7407cd616c9d038dcc7f61c627ed"
+    },
+    "graphshell_web.js": {
+      "bytes": 159135,
+      "sha256": "66191fa55cbe193bd0dbe42110a91f2178d2de2f5606a2234d76f98e3436c10b"
+    },
+    "graphshell_web_bg.wasm": {
+      "bytes": 472013854,
+      "sha256": "be85473703ac2451c2f34d1c4af2d140d436d420cdc57dce1dea18a95dcf21dd"
+    },
+    "graphshell_web_bg.wasm.d.ts": {
+      "bytes": 6217,
+      "sha256": "b78adaae3a914e1864c2f1ef110355b3400f52ad7f926aee94b09847454e8cc3"
+    },
+    "MERE_BUILD_OWNER.json": {
+      "bytes": 105,
+      "sha256": "499471a06da1de9eae9a3a64fc8c4b8d77083fa49d3f6c4be189fe146e5e8a93"
+    }
+  },
+  "browser_package_owner": {
+    "owner": "Pelt Graphshell retained content acceptance",
+    "kind": "generated wasm-bindgen browser package"
+  },
+  "limits": [
+    "No physical audibility claim",
+    "No physical assistive technology or cross-platform headed claim",
+    "Protected custody and additional media adapters remain open",
+    "Graphshell clip export needs a host receiving adapter",
+    "Turnstone A4 inline bodies, floats, native theme/DPI/performance remain open"
+  ],
+  "cleanup": {
+    "package": "removed after recording hashes; five marker-identified generated files only",
+    "server": "stopped exact owned loopback qualification processes",
+    "isolated_worktree": null,
+    "isolated_target": null,
+    "isolated_cargo_home": null,
+    "stable_targets": [
+      "C:/t/cargo-targets/mere",
+      "C:/t/cargo-targets/turnstone"
+    ],
+    "old_browser_tab": "Earlier unattached tab 642333462 could not be closed through the browser API; final acceptance tab closed",
+    "stable_target_reason": "Ordinary reusable repository build caches; no isolated target created"
+  },
+  "gesture_observations": {
+    "voice-gesture-started.json": {
+      "method": "Browser locator press Tab on advertised Play action, then Enter on current focus",
+      "observed": "Show in Mere\nRetained document Redshank noteRetained audio playback started\nRetained content: Redshank note\nActivate\nActivate\nActivate\nRetained audio playback started",
+      "url": "http://127.0.0.1:8881/tree.html?app=local&fixture=retained-content&motion=normal&clip-max-bytes=1048576&scenario=scenarios/p4_tree_retained_content_reopen.scn&sink=/scenario-receipt",
+      "at": "2026-10-13T14:45:08.531Z"
+    },
+    "voice-pointer-started.json": {
+      "method": "Click advertised Play voice note Activate control with real browser pointer; observe settled frame",
+      "observed": "Show in Mere\nRetained document Redshank noteRetained audio playback started\nRetained content: Redshank note\nActivate\nActivate\nActivate\nRetained audio playback started",
+      "at": "2026-10-13T14:51:39.329Z"
+    },
+    "voice-pointer-stopped.json": {
+      "method": "Click advertised Stop voice note Activate control with real browser pointer; observe settled frame",
+      "observed": "Show in Mere\nRetained document Redshank noteRetained audio stopped\nRetained content: Redshank note\nActivate\nActivate\nActivate\nRetained audio stopped",
+      "at": "2026-10-13T14:52:33.656Z"
+    }
+  },
+  "final_browser_console_errors": [],
+  "rejected_attempts": [
+    "Earlier mutable-fill, blank paint-box, unregistered-producer, missing-font and cramped-pane captures",
+    "Scripted autoplay acceptance assertion: NotAllowedError; now explicitly tested as a refusal",
+    "Second keyboard activation is not Stop evidence",
+    "Incomplete ambient fallback replacement does not prove the private-file guard",
+    "Preliminary source patches are not the published consumer pin",
+    "Cancelled wrong-directory build/test attempts are not gates"
+  ],
+  "hash_scope": "SHA256 values name raw qualification bytes. Source staged_git_blob values name the normalized code committed by Git."
+}
