@@ -1,0 +1,56 @@
+{
+  "source": "cef122f25737a82c4621de49771c90fc357be348",
+  "profile": "viewer",
+  "features": "--no-default-features",
+  "command": [
+    "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+    "build",
+    "--locked",
+    "--profile",
+    "viewer",
+    "--target",
+    "wasm32-unknown-unknown",
+    "--no-default-features",
+    "--target-dir",
+    "/Users/markik/Code/worktrees/mere-nested-graph-view/ports/graphshell/web/target",
+    "-j1",
+    "--offline"
+  ],
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "manifest_sha256": "b28007804c7dba54099c87bc3e08cfacbcdcc8ac91dce909013aec196b18834e",
+  "sizes": {
+    "wasm": {
+      "raw_bytes": 10186157,
+      "sha256": "d139e4755a9df54a3090d3aa99af43130ae09de437558597c7db988c59b9f1ec",
+      "cap_bytes": 3407872,
+      "gzip6_bytes": 3396340,
+      "gzip9_bytes": 3379926,
+      "cap_pass": true
+    },
+    "glue": {
+      "raw_bytes": 119863,
+      "sha256": "f20ae4af8e448e314912f97233fb3036ba5186b7e50e1198308667d432a04613",
+      "cap_bytes": 20480,
+      "gzip6_bytes": 19144,
+      "gzip9_bytes": 18618,
+      "cap_pass": true
+    },
+    "mount": {
+      "raw_bytes": 998,
+      "sha256": "d36f0c879683b0f18e27d31b67162055fab268377ad04c2d0039f1aaf116419f",
+      "cap_bytes": 8192,
+      "gzip6_bytes": 588,
+      "gzip9_bytes": 588,
+      "cap_pass": true
+    },
+    "history": {
+      "raw_bytes": 271932,
+      "sha256": "aa3411e8b7eb9d4b145ed895c5330ef3be47c31746a5ac9b61f4f7fe1452289d",
+      "cap_bytes": 131072,
+      "gzip6_bytes": 6704,
+      "gzip9_bytes": 6254,
+      "cap_pass": true
+    }
+  },
+  "all_caps_pass": true
+}

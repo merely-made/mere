@@ -1,0 +1,15 @@
+{
+  "released_at": "2026-10-13T05:06:57Z",
+  "elapsed_seconds": 51.871,
+  "inhibitor_closed": true,
+  "runs": [
+    {
+      "label": "native-instrument-r3",
+      "exit": 0
+    },
+    {
+      "label": "native-usability-r2",
+      "exit": 0
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "method": "Browser locator press Tab on advertised Play action, then Enter on current focus",
+  "observed": "Show in Mere\nRetained document Redshank noteRetained audio playback started\nRetained content: Redshank note\nActivate\nActivate\nActivate\nRetained audio playback started",
+  "url": "http://127.0.0.1:8881/tree.html?app=local&fixture=retained-content&motion=normal&clip-max-bytes=1048576&scenario=scenarios/p4_tree_retained_content_reopen.scn&sink=/scenario-receipt",
+  "at": "2026-10-13T14:45:08.531Z"
+}

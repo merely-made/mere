@@ -1,0 +1,14 @@
+{
+  "status": "refused before launch",
+  "reason": "console locked",
+  "browser_started": false,
+  "server_started": false,
+  "inhibitor_started": false,
+  "remaining": [
+    "browser pointer/keyboard",
+    "21-node synthetic timing diagnostic",
+    "three saved-graph/remote refusals"
+  ],
+  "package_source": "cdba4c96909c05b4a2450d1e204979d0dc3c8d48",
+  "package_wasm_sha256": "fe76e9c01d7c1224df55720e32f61d06e355d1bb91290be2cea79ea0287e60b5"
+}

@@ -1,0 +1,121 @@
+{
+  "source": "33f4c01fe855e9e7e5f00088eaaf231267ee6268",
+  "compiler": "rustc 1.97.1",
+  "target": "/Users/markik/Code/targets/knot-tabard-apps",
+  "environment": {
+    "CARGO_TARGET_DIR": "/Users/markik/Code/targets/knot-tabard-apps",
+    "CARGO_BUILD_JOBS": "1",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0"
+  },
+  "checks": [
+    {
+      "label": "shared-header",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "cambium",
+        "--test",
+        "instrument",
+        "--locked",
+        "--offline",
+        "-q"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 7.957
+    },
+    {
+      "label": "workshop",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "tabard-workshop",
+        "--test",
+        "embedding_api",
+        "--test",
+        "shared_components",
+        "--test",
+        "surface",
+        "--test",
+        "usability",
+        "--test",
+        "instrument",
+        "--locked",
+        "--offline",
+        "-q"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 69.805
+    },
+    {
+      "label": "viewer",
+      "command": [
+        "cargo",
+        "check",
+        "--manifest-path",
+        "ports/graphshell/web/Cargo.toml",
+        "--locked",
+        "--offline",
+        "--target",
+        "wasm32-unknown-unknown",
+        "--no-default-features",
+        "-q"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 12.688
+    },
+    {
+      "label": "main-page",
+      "command": [
+        "cargo",
+        "check",
+        "--manifest-path",
+        "ports/graphshell/web/Cargo.toml",
+        "--locked",
+        "--offline",
+        "--target",
+        "wasm32-unknown-unknown",
+        "--no-default-features",
+        "-q",
+        "--features",
+        "main-page,applets"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 15.371
+    },
+    {
+      "label": "port-boundaries",
+      "command": [
+        "python3",
+        "scripts/check_port_boundaries.py"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 1.723
+    },
+    {
+      "label": "source-headers",
+      "command": [
+        "python3",
+        "scripts/relicense_headers.py",
+        "--check",
+        "--repo",
+        "."
+      ],
+      "exit": 0,
+      "elapsed_seconds": 0.201
+    },
+    {
+      "label": "whitespace",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 0.021
+    }
+  ]
+}

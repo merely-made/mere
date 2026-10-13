@@ -1,0 +1,9 @@
+{
+  "edited_timestamp_refused": true,
+  "expired_repository_refused": true,
+  "expiry_bypass_negative_control_accepted": true,
+  "expiry_error": "timestamp metadata is expired",
+  "old_root_at_next_version_refused": true,
+  "root_replay_error": "Found version 1 of root metadata when we had previously fetched version 1",
+  "rotated_root_version": 2
+}

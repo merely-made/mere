@@ -498,3 +498,65 @@ The shared-main publication is now confirmed at `007a4de6b`. The upstream
 source remains `a1cb156f8`, with identical recorded source/manifest/lock inputs.
 Exact remote refs are in the landing receipt. This publication record adds no
 new runtime, deployment or phase-completion claim.
+
+
+### Viewer delivery budget continuation, 2026-10-12
+
+Incremental review records Mark's size-reduction and site-cutover goal, the
+unchanged per-asset limits and the actual Platen/document feature leak. The
+source changes preserve default document layout and exclude its producer only
+for the portable viewer model. Measured baseline/portable and rejected Binaryen
+variants remain exploratory, separately bound to their feature/profile inputs.
+The new viewer compiler profile fits in exploratory measurements and in the
+normal shipping build at `cef122f25`: 3,379,926 B gzip9 and 3,396,340 B gzip6,
+under the unchanged 3,407,872 B cap. Hardware acceptance remains pending.
+Required final gates include exact-package browser and Unicode reading checks,
+source-bound asset enforcement and static/failure fallback preservation. No
+whole-document census, main landing or deployment is claimed for this target.
+
+The fresh indexed-source audit also corrects a prior eligibility gap: twelve
+tracked presenter receipt generators lacked Exhibit A when they first entered
+the index. Comment-only header repairs and before/after hashes are preserved in
+`ports/graphshell/docs/receipts/host_presenter_20261012/generator-header-correction.json`.
+No accepted runtime receipt or execution claim is rewritten. Header checks must
+run after new generators enter the index.
+
+
+The exact `cdba4c969` viewer now passes its source-bound browser qualification:
+24 command cases, eleven presenter cases, seventeen physics receipts, four
+browser pointer/keyboard assertions and three clean refusals, with zero page
+errors. The 21-node synthetic diagnostic retains its 82.6 ms outlier; Unicode
+comparison retains existing missing glyphs and changed mixed-script line breaks.
+All owned UI resources closed at 07:19:09 UTC on 13 October. New main
+`0d1dc1927` is reconciled at `3f57971e0`, with retained document dependencies
+kept in product/native capability and standalone compatibility patches restored.
+The fresh package and feature gates remain pending; no old runtime acceptance
+is transferred and no live deployment is claimed.
+
+
+The reconciled shipping build at `47199232d` now passes all four asset caps
+(3,303,044 B gzip6 / 3,289,510 B gzip9 Wasm) and all four Wasm configurations.
+The feature graph proves product document segmentation retained and viewer
+segmentation excluded. The incoming Djinn Exhibit A repairs preserve all
+non-comment bytes, with hashes recorded; the indexed header check passes.
+The source-bound browser renewal remains active. Whole-tree D3 still reports
+existing path drift, and D2 still has its four existing coverage/snapshot
+errors; this incremental continuation does not claim either whole-tree audit
+is clean.
+
+
+Final renewal of package `47199232d` passes commands 24, presenter 11,
+physics 17 and browser input 4, plus Unicode and three intentionally failing
+unsupported-product assertions without page errors. These are absence checks,
+not new typed refusal APIs. Complete 21-node live frame windows have median 16.6–16.8 ms,
+p95 at most 18.1 ms and maximum 28.3 ms; paused-window p95 reaches 18.7 ms.
+These full windows differ from the separate rolling 120-sample arrays; no
+sustained-performance claim follows.
+The immutable candidate ledger covers package, served files, drivers and
+auxiliary inputs. Owned runtime was explicitly closed at 07:44:12 UTC on
+13 October. Final source publication remains distinct from site deployment.
+
+Publication is confirmed at `425b04ceb`; the landing adds only receipts/docs
+to the qualified runtime. The frame summary was corrected to distinguish
+complete measured windows from rolling interval arrays. Original receipts
+remain byte-for-byte unchanged. Live-site deployment is not claimed.

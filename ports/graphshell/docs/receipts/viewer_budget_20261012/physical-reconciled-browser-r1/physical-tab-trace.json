@@ -1,0 +1,210 @@
+[
+  {
+    "tag": "BODY",
+    "role": null,
+    "name": null,
+    "text": "\n    \n    Graphshell, one treefixture · 11 nodes · picked: nonePan leftPan rightPan upPan downZoom i",
+    "attrs": {
+      "class": "full-page"
+    }
+  },
+  {
+    "tag": "DIV",
+    "role": "combobox",
+    "name": "Physics law",
+    "text": "Charge",
+    "attrs": {
+      "data-node": "2199023255611",
+      "role": "combobox",
+      "aria-label": "Physics law",
+      "aria-expanded": "true",
+      "tabindex": "-1",
+      "style": "position: absolute; margin: 0px; padding: 0px; left: 0px; top: 14px; width: 279px; height: 22px;"
+    }
+  },
+  {
+    "tag": "DIV",
+    "role": "combobox",
+    "name": "Physics law",
+    "text": "Charge",
+    "attrs": {
+      "data-node": "2199023255611",
+      "role": "combobox",
+      "aria-label": "Physics law",
+      "aria-expanded": "false",
+      "tabindex": "-1",
+      "style": "position: absolute; margin: 0px; padding: 0px; left: 0px; top: 14px; width: 279px; height: 22px;"
+    }
+  },
+  {
+    "tag": "DIV",
+    "role": "checkbox",
+    "name": null,
+    "text": "Group pull",
+    "attrs": {
+      "data-node": "2199023255621",
+      "role": "checkbox",
+      "aria-checked": "false",
+      "tabindex": "-1",
+      "style": "position: absolute; margin: 0px; padding: 0px; left: 0px; top: 0px; width: 10.8896px; height: 16px;"
+    }
+  },
+  {
+    "tag": "DIV",
+    "role": "checkbox",
+    "name": null,
+    "text": "Hub pull",
+    "attrs": {
+      "data-node": "2199023255626",
+      "role": "checkbox",
+      "aria-checked": "false",
+      "tabindex": "-1",
+      "style": "position: absolute; margin: 0px; padding: 0px; left: 0px; top: 0px; width: 10.8896px; height: 16px;"
+    }
+  },
+  {
+    "tag": "DIV",
+    "role": "checkbox",
+    "name": null,
+    "text": "Depth",
+    "attrs": {
+      "data-node": "2199023255631",
+      "role": "checkbox",
+      "aria-checked": "false",
+      "tabindex": "-1",
+      "style": "position: absolute; margin: 0px; padding: 0px; left: 0px; top: 0px; width: 10.8896px; height: 16px;"
+    }
+  },
+  {
+    "tag": "DIV",
+    "role": "checkbox",
+    "name": null,
+    "text": "Grid",
+    "attrs": {
+      "data-node": "2199023255636",
+      "role": "checkbox",
+      "aria-checked": "false",
+      "tabindex": "-1",
+      "style": "position: absolute; margin: 0px; padding: 0px; left: 0px; top: 0px; width: 10.8896px; height: 16px;"
+    }
+  },
+  {
+    "tag": "DIV",
+    "role": "checkbox",
+    "name": null,
+    "text": "Centre",
+    "attrs": {
+      "data-node": "2199023255641",
+      "role": "checkbox",
+      "aria-checked": "false",
+      "tabindex": "-1",
+      "style": "position: absolute; margin: 0px; padding: 0px; left: 0px; top: 0px; width: 10.8896px; height: 16px;"
+    }
+  },
+  {
+    "tag": "DIV",
+    "role": "checkbox",
+    "name": null,
+    "text": "Tide",
+    "attrs": {
+      "data-node": "2199023255646",
+      "role": "checkbox",
+      "aria-checked": "false",
+      "tabindex": "-1",
+      "style": "position: absolute; margin: 0px; padding: 0px; left: 0px; top: 0px; width: 10.8896px; height: 16px;"
+    }
+  },
+  {
+    "tag": "DIV",
+    "role": "checkbox",
+    "name": null,
+    "text": "Skeleton",
+    "attrs": {
+      "data-node": "2199023255651",
+      "role": "checkbox",
+      "aria-checked": "false",
+      "tabindex": "-1",
+      "style": "position: absolute; margin: 0px; padding: 0px; left: 0px; top: 0px; width: 10.8896px; height: 16px;"
+    }
+  },
+  {
+    "tag": "DIV",
+    "role": "combobox",
+    "name": "Kinds",
+    "text": "By site",
+    "attrs": {
+      "data-node": "2199023255658",
+      "role": "combobox",
+      "aria-label": "Kinds",
+      "aria-expanded": "false",
+      "tabindex": "-1",
+      "style": "position: absolute; margin: 0px; padding: 0px; left: 0px; top: 14px; width: 279px; height: 22px;"
+    }
+  },
+  {
+    "tag": "DIV",
+    "role": "combobox",
+    "name": "Groups",
+    "text": "By site",
+    "attrs": {
+      "data-node": "2199023255664",
+      "role": "combobox",
+      "aria-label": "Groups",
+      "aria-expanded": "false",
+      "tabindex": "-1",
+      "style": "position: absolute; margin: 0px; padding: 0px; left: 0px; top: 14px; width: 279px; height: 22px;"
+    }
+  },
+  {
+    "tag": "DIV",
+    "role": "combobox",
+    "name": "Mass",
+    "text": "By degree",
+    "attrs": {
+      "data-node": "2199023255670",
+      "role": "combobox",
+      "aria-label": "Mass",
+      "aria-expanded": "false",
+      "tabindex": "-1",
+      "style": "position: absolute; margin: 0px; padding: 0px; left: 0px; top: 14px; width: 279px; height: 22px;"
+    }
+  },
+  {
+    "tag": "DIV",
+    "role": "combobox",
+    "name": "Depth",
+    "text": "From roots",
+    "attrs": {
+      "data-node": "2199023255676",
+      "role": "combobox",
+      "aria-label": "Depth",
+      "aria-expanded": "false",
+      "tabindex": "-1",
+      "style": "position: absolute; margin: 0px; padding: 0px; left: 0px; top: 14px; width: 279px; height: 22px;"
+    }
+  },
+  {
+    "tag": "DIV",
+    "role": "button",
+    "name": null,
+    "text": "Apply physics",
+    "attrs": {
+      "data-node": "2199023255679",
+      "role": "button",
+      "tabindex": "-1",
+      "style": "position: absolute; margin: 0px; padding: 0px; left: 0px; top: 416px; width: 107.682px; height: 24px;"
+    }
+  },
+  {
+    "tag": "DIV",
+    "role": "button",
+    "name": null,
+    "text": "Apply physics",
+    "attrs": {
+      "data-node": "2199023255679",
+      "role": "button",
+      "tabindex": "-1",
+      "style": "position: absolute; margin: 0px; padding: 0px; left: 0px; top: 416px; width: 107.682px; height: 24px;"
+    }
+  }
+]

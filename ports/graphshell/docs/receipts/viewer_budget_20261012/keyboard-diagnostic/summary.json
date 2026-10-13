@@ -1,0 +1,48 @@
+{
+  "diagnosisOnly": true,
+  "originalAssertionsUnchanged": true,
+  "rows": [
+    {
+      "folder": "web-baseline",
+      "result": "fail",
+      "active": {
+        "tag": "BODY",
+        "role": null,
+        "label": null,
+        "text": "\n    \n    Graphshell, one treefixture · 11 nodes · picked: nonePan leftPan rightPan upPan downZoom inZoom outFit graphFit selectionRestore arrangement",
+        "class": "full-page",
+        "id": "",
+        "attrs": {
+          "class": "full-page",
+          "data-scenario": "fail"
+        }
+      },
+      "adapter": {
+        "vendor": "amd",
+        "architecture": "gcn-5"
+      },
+      "errors": []
+    },
+    {
+      "folder": "web-final",
+      "result": "fail",
+      "active": {
+        "tag": "BODY",
+        "role": null,
+        "label": null,
+        "text": "\n    \n    Graphshell, one treefixture · 11 nodes · picked: nonePan leftPan rightPan upPan downZoom inZoom outFit graphFit selectionRestore arrangement",
+        "class": "full-page",
+        "id": "",
+        "attrs": {
+          "class": "full-page",
+          "data-scenario": "fail"
+        }
+      },
+      "adapter": {
+        "vendor": "amd",
+        "architecture": "gcn-5"
+      },
+      "errors": []
+    }
+  ]
+}

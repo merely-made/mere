@@ -407,10 +407,10 @@ fn visible_chrome_and_syntax_font_roles_change_without_styling_the_editor() {
             "font styles must preserve Illume's local palette"
         );
         let save = taproot::matching(surface.dom, &action("save"))[0];
-        assert_eq!(
-            plane.computed_style(save, "font-family").as_deref(),
-            Some("sans-serif"),
-            "authoring UI stays neutral"
+        let family = plane.computed_style(save, "font-family").unwrap();
+        assert!(
+            family.split(',').all(|face| face.trim() == "sans-serif"),
+            "authoring UI stays neutral, including its host fallback: {family}"
         );
     });
 }

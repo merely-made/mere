@@ -65,24 +65,6 @@ in this view. The CPU receipt uses two encrypted replicas and signed Gemot
 delegation/revocation facts; it qualifies no network, browser UI, presence or
 media path. See the [Moot implementation plan](../../design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#moot-conversation-and-coop-continuation-2026-10-10).
 
-## Shared resources and coop draft
-
-`moot::resource_coop` is the portable interaction model for a disclosed shared
-collection beside a domain-owned activity. Each reading keeps independent exact
-resource and activity attention. Preparation returns an owner-routed intention;
-the owner must check current authority, revision, storage, audience and quotas.
-Offers and coop reports grant no rights. A collection fork preserves references
-and ancestry; content copying and content forking remain separate actions.
-
-The model distinguishes address-only/resolved content, hosting promises and
-observed retrievals, and owner acceptance/refusal. Acceptance feedback does not
-invent custody, availability or participation. Refreshes invalidate stale local
-completions; a new contribution does not retarget an exact selected revision.
-The first source harness qualifies these view contracts. Production owner
-bindings, Cambium controls, Graphshell rendering and actual peer activity retain
-their separate gates in the
-[Moot plan](../../design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#shared-resources-and-coop-interaction-draft-2026-10-11).
-
 ## Resource owner and Cambium controls
 
 `resource-owner` connects an admitted reader to current Gemot collections and
@@ -101,6 +83,72 @@ mounting, style, rendering and application-session routing. See the
 [owner and control continuation](../../design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#resource-owners-and-cambium-controls-2026-10-11)
 for acceptance boundaries.
 
+## Shared resource controls and coop
+
+`moot::resource_coop` is the portable interaction model for a disclosed shared
+collection beside a domain-owned activity. Each reading keeps independent exact
+resource and activity attention. Preparation returns an owner-routed intention;
+the owner must check current authority, revision, storage, audience and quotas.
+Offers and coop reports grant no rights. A collection fork preserves references
+and ancestry; content copying and content forking remain separate actions.
+
+The model distinguishes address-only/resolved content, hosting promises and
+observed retrievals, and owner acceptance/refusal. Acceptance feedback does not
+invent custody, availability or participation. Refreshes invalidate stale local
+completions; a new contribution does not retarget an exact selected revision.
+The optional `presentation` feature renders ordinary Cambium summaries and
+resource/activity inspection. Unknown, withheld and unsupported actions stay
+disabled with their owner's reason. `control::Controller` prepares intentions;
+`control::Owner` supplies fresh reads and dispatches through the application.
+Selection, refresh and close affect only that reading.
+
+The optional `resource-owners` feature maps Gemot's authorized fauna and selected
+collection's exact frontier/membership commitment. The caller supplies current
+content, hosting, offers and activity disclosures separately. A missing collection
+refuses rather than widening the read. The application must permit reader metadata
+access first; Gemot's fauna filter checks authors' write authority.
+`owners::local_content` verifies already
+permitted local/embedded bytes through Eidetic with a caller-selected byte budget;
+it performs no network fetch or custody write. Backend reads still materialize a
+stored value before the actual-size check.
+
+Graphshell's opt-in `moot-resources` feature mounts independent readings in its
+retained tree. Its host keeps private request bindings and transient opened text.
+The supplying application drains addressed commands, obtains a fresh owner read,
+calls `prepare_dispatch`, then routes the operation to its actual owner. Completion
+requires the same live reading and token. Refresh replaces owner facts; failures
+end the request with a refusal. Closing never means leaving an activity.
+
+The `moot_resource_owner` example is an explicit local acceptance fixture using
+scoped Gemot authority and real Eidetic verification. Its identities are synthetic
+and unsealed. Its first receipt covers Open; the handler continuation below adds
+retention and hosting. Live signed peer revocation, production activity adapters,
+and collection/content fork writes retain separate gates in the
+[Moot plan](../../design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#shared-resource-controls-and-owner-reads-2026-10-12).
+
+`resource-handlers` adds the native composition of those actual owners.
+`handlers::Owner` receives the existing Moot service, signing identity, encounter
+and custody backends, optional wallet sealer, and explicit configuration. Current
+Moot admission and configured read/copy powers are checked at dispatch. Retention
+uses Eidetic's atomic owner-scoped copy. Hosting additionally requires explicit
+content-owner approval for that exact public payload and Gemot's audience power;
+an unsigned privacy tag supplies neither. The current hosting adapter serves
+public-portable content only; private retention supports the wallet sealing seam.
+
+Disclosed action terms are bound to preparation, so changed settings require
+another request. Acceptance feedback changes no custody or hosting fact until a
+new owner read. A hosting command can fail after a copy succeeds; the owners use
+separate stores, so the copy remains and the host must refresh records before
+retrying. The supplying application serializes dispatch with authority/configuration
+ingestion. Automatic deletion and cancellation are not introduced.
+
+`moot_resource_handlers` exercises this composition with synthetic identities,
+real signed membership/contribution/Standing facts and durable Redb databases.
+Its rendered host qualifies retain, bounded public hosting, refresh and restart;
+the native serving API separately checks held bytes and current authority. Network
+serving, live peer revocation, full historical-cut validation and native Turnstone
+mounting remain separate gates. See the
+[handler continuation](../../design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#retention-and-hosting-handlers-2026-10-12).
 Graphshell's opt-in `moot-resources` host binds a mount to an existing verified
 projection session. It rechecks retained session authority and the actual
 resource owners before dispatch, refreshes current owner reads afterward, and

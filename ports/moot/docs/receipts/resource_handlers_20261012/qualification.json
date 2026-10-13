@@ -1,0 +1,162 @@
+{
+  "date": "2026-10-12",
+  "scope": "Explicit verified retention and bounded signed hosting through actual owner handlers",
+  "base_head": "4d6259530de034770408a807a76b1522edee4ddd",
+  "source_sha256": {
+    "Cargo.lock": "174d65bb2bc4c5f8006fbba8cbc1f719bd225b0be50c1c82469069870d9f6a45",
+    "crates/eidetic/eidetic-core/Cargo.toml": "4352d014f2bfec67b361d73475c4f8a07f9d22406cbb89a4fbee2721bf6f7271",
+    "crates/eidetic/eidetic-core/README.md": "0f950c359082c9cf242233357c706c7589ba186f00edfd232b8174c592b56bb2",
+    "crates/eidetic/eidetic-core/src/lib.rs": "88ea8b6e593f8181ff7d0de8a8c242a4c5c6c7591a0f6b493b0fd87ac5f4881e",
+    "crates/eidetic/eidetic-core/src/retention.rs": "f73a6d55697699d4da2be2e7cd0866175595cace6fcf2c2da57f921345b2a59e",
+    "crates/eidetic/eidetic-core/src/retention_tests.rs": "5b556c39492e715c3b21a03bc4b3f05fb9b0b9039de31ca489d3512c928af6ef",
+    "crates/moot/gemot/README.md": "bbb50847ffddb37cab7a54d56535cfde4b2139392ea79a9fdc8b993b9563c80e",
+    "crates/moot/gemot/src/moot/hosting.rs": "08791e8072ca6f8edb4f170d2d7f7a0272d41bbad38b34bc4a28df3f2760f476",
+    "crates/moot/gemot/src/moot/hosting_tests.rs": "a992f800d1d4120e598223cb7fabc85266c7481354727b502abe06be705434d2",
+    "crates/moot/gemot/src/moot/mod.rs": "636b4b78584b2a70ba022feb9ff7a5092c08ae4dcdfc7204db08499e895490f9",
+    "design_docs/DOC_README.md": "14f65f78ffca033a6b1216cb74d4b5317467915fe38718902b495bdeabd0c104",
+    "design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md": "dc1beb02c60ac579e51ee105bd16e5ad960d151d017e459d6d8d956df76b7dce",
+    "ports/graphshell/src/moot_resources.rs": "a5685012b2961158ab7ea949494b6580c8aba89cf0c92fa80f99e81378bce9d7",
+    "ports/graphshell/src/web_tree/lane.rs": "7b2469c37058786821282947225774e5125bc31ff861dc86b9495aa193af54af",
+    "ports/graphshell/src/web_tree/moot_resources.rs": "997362234a5e18c15afd10311da0a80b71fe81bd0a853e7279a2a1327e567344",
+    "ports/graphshell/web/scenario_qualification_server.py": "6475b04f58c7a1a0e6fc2f1529694062e60c624210fbcc7febe8fe5fbab05365",
+    "ports/graphshell/web/scenarios/p4_tree_moot_resource_handlers.scn": "da712e15131493f89a72a04063a0af22f164379410d392aa57357e990bcfb75e",
+    "ports/graphshell/web/scenarios/p4_tree_moot_resource_handlers_reopen.scn": "13b85d3b0544d5ba1e2c3e85ee6906c5f5a39ccc379bdfaf1fba425b47636f6a",
+    "ports/moot/Cargo.toml": "3d52f9438f25ab250a7fb7ea24932854d435d47ca979ccc8849731cdad45e252",
+    "ports/moot/README.md": "50fa667e33a640a294bea21e2d4fde4441b4a35cadd4045172cf56dc614fc077",
+    "ports/moot/examples/moot_resource_handlers.rs": "a195f6147394e814757bb380e2b88e8d68a02246cde48e298ebec32b75ac2547",
+    "ports/moot/examples/moot_resource_handlers/support.rs": "d99159e13635f2ce85e1af561c878c6514337a877a608e9406256e053436f893",
+    "ports/moot/examples/moot_resource_owner.rs": "13a5e32a7e9cb2e19eeb81752aca314b08e496e70aadb93a460a32b0aad30585",
+    "ports/moot/src/resource_coop.rs": "9fad5698bdfc9450e3f06897df6ed366d6fd77ebc2421a90492c3e67bee9a64f",
+    "ports/moot/src/resource_coop/control.rs": "c0fbf41add69751e20d05821244db2963385261dfba2a7a2cee8901e769cea6c",
+    "ports/moot/src/resource_coop/handlers.rs": "ab2743e1f6ac08d04070190c38df5773b90e0dc1b56b302121d54a54af72e76d",
+    "ports/moot/src/resource_coop/handlers_tests.rs": "769bb73fbffaf419a527fd8df27fcc0000e19ee6c8be61df4967be099accaad3",
+    "ports/moot/src/resource_coop/owners.rs": "5205fd771b8c74dacb28c43682a41f648eee7a27b2c006a07e4152399ef68166",
+    "ports/moot/src/resource_coop/tests.rs": "2276059ff09eec9b1c955b3dde2fad09646bb84267d31e5c9172abe339ea3f2e",
+    "ports/moot/src/resource_coop/view.rs": "2cf93a9204033b477b57a7740bfcab6e7daf433174c3acd15108d5bab6932438",
+    "support/doc-audit/d2/batch_45_s14_phase_b7.md": "621c33c5580be4954277a1f1a86e555160a1020c1ed3f4b841a30cc0214466b3"
+  },
+  "native": {
+    "retention_tests": 6,
+    "hosting_tests": 5,
+    "port_tests": 19,
+    "host_tests": 5,
+    "total_focused_tests": 35,
+    "logs": [
+      "retention-tests.log",
+      "hosting-tests.log",
+      "port-tests.log",
+      "host-tests.log"
+    ],
+    "private_negative_control": {
+      "log": "private-fallback-negative-control.log",
+      "result": "expected failure with deliberately restored keyless plaintext fallback; exact guarded source restored; all six retention tests passed again"
+    },
+    "durable_owner": "actual MootFile signed services and Redb copy storage; explicit synthetic identities",
+    "owner_exe_sha256": "407520e2e8c638e7ea4e55ebc6ac969b8b8fcec17bf08946204d7e4df2e807d5",
+    "owner_build": "owner-build.log",
+    "evidence": [
+      "native-initial-read.json",
+      "native-offline-reopen.json",
+      "native-serving.json",
+      "native-serving-refusal.json",
+      "native-owner-moot.drop",
+      "native-owner-moot-drop.json"
+    ]
+  },
+  "wasm": {
+    "features": [
+      "product",
+      "moot-resources"
+    ],
+    "locked": true,
+    "offline": true,
+    "log": "product-build.log",
+    "wasm_bindgen": "0.2.129",
+    "package_sha256": {
+      "graphshell_web.d.ts": "6c8a4abf1c78e4be24ad36c754e310281279258a7c8344b4bbc0984a8d85e823",
+      "graphshell_web.js": "4ea9cc40f8f10dd91672f225c073838371c6c518741a3aa02a50b2b75b4bfbdb",
+      "graphshell_web_bg.wasm": "8d069432484e408fc90dcf52eec8ad53c42e2658269c3de2386bda7756298e05",
+      "graphshell_web_bg.wasm.d.ts": "c1107cdfb0796d7f162b2a6813de4ecffaa49df3f3f93b279b6a2c7ff493bb0e",
+      "MERE_BUILD_OWNER.json": "e773a47a32554198f14807bb04ed5b3bc2c3e3685637e47d041eea305dddb663"
+    }
+  },
+  "browser": {
+    "engine": "Chrome 154",
+    "environment": "chrome/probe/environment.json",
+    "scenarios": {
+      "p4_tree_moot_resource_handlers": {
+        "status": "passed",
+        "receipt": "chrome/p4_tree_moot_resource_handlers/result.json",
+        "collected_at_utc": "2026-10-12T21:46:46.658457+00:00"
+      },
+      "p4_tree_moot_resource_handlers_reopen": {
+        "status": "passed",
+        "receipt": "chrome/p4_tree_moot_resource_handlers_reopen/result.json",
+        "collected_at_utc": "2026-10-12T22:08:03.327368+00:00"
+      }
+    },
+    "reviewed_captures": [
+      "chrome/p4_tree_moot_resource_handlers/moot_retained_owner_copy.png",
+      "chrome/p4_tree_moot_resource_handlers/moot_retained_content_open.png",
+      "chrome/p4_tree_moot_resource_handlers_reopen/moot_signed_promise_reopened.png",
+      "chrome/p4_tree_moot_resource_handlers_reopen/moot_retained_owner_reopened.png"
+    ],
+    "explicit_renewal": "The configured ten-minute promise expired during capture review. An explicit Offer hosting action signed a new promise; a subsequent owner refresh and fresh-page scenario passed. Original held-copy receipt/timestamp remained unchanged."
+  },
+  "historical_failures": [
+    {
+      "receipt": "chrome/initial-pending-quiescence-failure/result.json",
+      "reason": "Host quiescence omitted pending native owner requests; Host::in_flight now participates in busy tracking."
+    },
+    {
+      "receipt": "chrome/expired-promise-capture-attempt/result.json",
+      "reason": "Recapture after the actual configured promise expiry correctly reported expired; explicit renewal preceded the final passing run."
+    }
+  ],
+  "boundary_check": "scripts/check_port_boundaries.py passed",
+  "formatting": "rustfmt relevant edited/new Rust passed; git diff --check passed",
+  "open_gates": [
+    "Turnstone mounting and actual user wallet integration",
+    "live peer transport and a public protocol serving endpoint",
+    "protected hosting and device key distribution",
+    "full historical-authority cut validation",
+    "automatic heartbeat and Standing completion",
+    "collection/content forks and activity adapters"
+  ],
+  "limits": [
+    "No remote fetch in these handlers; content resolves from verified encounter or held copy.",
+    "Hosting requires explicit content-owner export approval independent of unsigned privacy metadata.",
+    "The host serializes configuration/authority ingestion with dispatch. Copy and Standing are separate transactions; refresh after uncertain hosting failures.",
+    "Retention quota counts payload storage including encryption overhead; metadata and unrelated namespaces remain outside it. Backend reads materialize values.",
+    "Redb and Memory support custody transactions. Current Fjall refuses without writing.",
+    "Current adapter hosts PublicPortable content only; private retention separately requires the wallet sealer."
+  ],
+  "cleanup": {
+    "package": "C:\\t\\cargo-targets\\mere\\moot-resource-browser",
+    "fixture_state": "C:\\t\\cargo-targets\\mere\\moot-resource-handler-state",
+    "owner_marker": "MERE_BUILD_OWNER.json",
+    "state_sha256_before_cleanup": {
+      "copies.redb": "d6dfb0a04f78734f32d0d7aa3ab4b08790637bf4d2f58ad1eb766e67b2f9add6",
+      "MERE_BUILD_OWNER.json": "8352f9ac3e5b039b08518ca0e77ce3173600bae0962f47b07281f0a60380950d",
+      "moot\\constitution.redb": "77430dba4b45ce7030d2601e7ce00dc4fbb473fbe224438349928a27848e2a15",
+      "moot\\delegations.redb": "3a5f9587af2fbcae5ae9dc8f7a9d413b1f8c2eaaf2917566dc8eb0146ad26919",
+      "moot\\flora.redb": "3a5f9587af2fbcae5ae9dc8f7a9d413b1f8c2eaaf2917566dc8eb0146ad26919",
+      "moot\\membership.redb": "b8a6415fc5d5fad8ecaaf4c846080f9ffffbb16269cd0c56b2808ff801369aaf",
+      "moot\\objects.redb": "069d4a8b67e67a357f39b7161ac8ba3612c005f7e5ebf0e173f8573377697a93",
+      "moot\\standing.redb": "9f7cc031f3d7aac73abca7b7702e22dad7bf97cf2909d13cc151989de6333079",
+      "moot\\tulpa.redb": "3a5f9587af2fbcae5ae9dc8f7a9d413b1f8c2eaaf2917566dc8eb0146ad26919"
+    },
+    "signed_evidence_preserved": "native-owner-moot.drop",
+    "status": "removed after tab closed, server stopped, ownership verified and signed evidence exported",
+    "target": "C:\\t\\cargo-targets\\mere",
+    "target_reason": "existing stable reusable Mere target; no isolated target, Cargo home or worktree created",
+    "remaining_isolated_outputs": [],
+    "method": "exact generated file allowlists and empty directories; nonrecursive Remove-Item",
+    "removed_at_utc": "2026-10-12T22:10:14.744016+00:00"
+  },
+  "documentation": {
+    "comparison": "documentation-checks.json",
+    "new_findings": 0,
+    "inherited_D2_gaps": 3
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "source": "cdba4c96909c05b4a2450d1e204979d0dc3c8d48",
+  "cutoff": "2026-10-13T05:48:03.000Z",
+  "started": "2026-10-13T05:18:33.442149+00:00",
+  "drivers": [
+    {
+      "driver": "verify-commands-final.cjs",
+      "exit": 0
+    },
+    {
+      "driver": "verify-presenter-final.cjs",
+      "exit": 1
+    }
+  ],
+  "closed": true,
+  "owned_pids": [
+    13076,
+    13077,
+    13078,
+    13145
+  ],
+  "failure": "verify-presenter-final.cjs failed; preserve run and release",
+  "released": "2026-10-13T05:19:42.067908+00:00"
+}

@@ -1,0 +1,71 @@
+[17:10:43] [INFO] --
+[17:10:43] [INFO] Starting Velopack Updater (1.2.161)
+[17:10:43] [INFO]     Location: "C:\\t\\cargo-targets\\mere\\luggage-comparison\\portable-replacement-failure\\Update.exe"
+[17:10:43] [INFO]     CWD: "C:\\t\\cargo-targets\\mere\\luggage-comparison\\portable-replacement-failure"
+[17:10:43] [INFO]     Verbose: false
+[17:10:43] [INFO]     Silent: true
+[17:10:43] [INFO]     Root Directory: Some("C:\\t\\cargo-targets\\mere\\luggage-comparison\\portable-replacement-failure")
+[17:10:43] [INFO]     Log File: "C:\\Users\\mark_\\AppData\\Local\\velopack\\velopack_Merely.ReleaseComparison.log"
+[17:10:43] [INFO]     Context: FromSpecifiedRootDir("C:\\t\\cargo-targets\\mere\\luggage-comparison\\portable-replacement-failure", None)
+[17:10:43] [INFO] Command: Apply
+[17:10:43] [INFO]     Restart: false
+[17:10:43] [INFO]     Wait: NoWait
+[17:10:43] [INFO]     Package: Some("C:\\t\\cargo-targets\\mere\\luggage-comparison\\feed\\Merely.ReleaseComparison-0.2.0-full.nupkg")
+[17:10:43] [INFO]     Exe Args: None
+[17:10:43] [INFO] Auto-locating app manifest...
+[17:10:43] [INFO] Root directory 'C:\t\cargo-targets\mere\luggage-comparison\portable-replacement-failure' writable: true
+[17:10:43] [INFO] Using root packages directory: C:\t\cargo-targets\mere\luggage-comparison\portable-replacement-failure\packages
+[17:10:43] [INFO] Getting ready to apply package to Merely.ReleaseComparison ver 0.1.0: "C:\\t\\cargo-targets\\mere\\luggage-comparison\\feed\\Merely.ReleaseComparison-0.2.0-full.nupkg"
+[17:10:43] [INFO] Attempting to acquire exclusive lock on packages directory (non-blocking)...
+[17:10:43] [INFO] Applying package 0.2.0 to current: 0.1.0
+[17:10:43] [INFO] Checking application pre-requisites...
+[17:10:43] [INFO] Extracting 9 app files to '"C:\\t\\cargo-targets\\mere\\luggage-comparison\\portable-replacement-failure\\packages\\VelopackTemp\\tmp_WVrY6uD2l1frALqw"'...
+[17:10:43] [INFO] Running --veloapp-obsolete hook...
+[17:10:43] [INFO] About to launch: 'WideString("C:\\t\\cargo-targets\\mere\\luggage-comparison\\portable-replacement-failure\\current\\merely-release-comparison.exe")' in dir 'Some(WideString("C:\\t\\cargo-targets\\mere\\luggage-comparison\\portable-replacement-failure\\current"))' with arguments: WideString("\"C:\\t\\cargo-targets\\mere\\luggage-comparison\\portable-replacement-failure\\current\\merely-release-comparison.exe\" --veloapp-obsolete 0.1.0\0")
+[17:10:43] [INFO] Environment block present: true, flags: PROCESS_CREATION_FLAGS(134218752)
+[17:10:44] [INFO] Waiting 15000ms for process handle to exit.
+[17:10:44] [INFO] Hook executed successfully (took 967.0369ms)
+[17:10:44] [INFO] Checking for running processes in: C:\t\cargo-targets\mere\luggage-comparison\portable-replacement-failure
+[17:10:44] [INFO] Inspected 485 running processes in 187ms, 1 matched directory
+[17:10:44] [WARN] Skipping killing self: C:\t\cargo-targets\mere\luggage-comparison\portable-replacement-failure\Update.exe (25464)
+[17:10:44] [INFO] Force-stop check complete.
+[17:10:44] [INFO] Checking for running processes in: C:\t\cargo-targets\mere\luggage-comparison\portable-replacement-failure
+[17:10:44] [INFO] Inspected 484 running processes in 193ms, 1 matched directory
+[17:10:44] [WARN] Skipping killing self: C:\t\cargo-targets\mere\luggage-comparison\portable-replacement-failure\Update.exe (25464)
+[17:10:44] [INFO] Force-stop check complete.
+[17:10:44] [INFO] Backing up current dir to "C:\\t\\cargo-targets\\mere\\luggage-comparison\\portable-replacement-failure\\packages\\VelopackTemp\\tmp_awuJbt90VJiAo4lk"
+[17:10:44] [INFO] Replacing current dir with "C:\\t\\cargo-targets\\mere\\luggage-comparison\\portable-replacement-failure\\packages\\VelopackTemp\\tmp_WVrY6uD2l1frALqw"
+[17:10:44] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:10:45] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:10:46] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:10:47] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:10:48] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:10:49] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:10:50] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:10:51] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:10:52] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:10:53] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:10:54] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:10:55] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:10:56] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:10:57] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:10:58] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:10:59] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:11:00] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:11:01] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:11:02] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:11:03] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:11:04] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:11:05] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:11:06] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:11:07] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:11:08] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:11:09] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:11:10] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:11:11] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:11:12] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:11:13] [WARN] Retrying operation in 1000ms... (error was: Some(Os { code: 32, kind: Uncategorized, message: "The process cannot access the file because it is being used by another process." }))
+[17:11:14] [WARN] Failed to remove temp dir "C:\\t\\cargo-targets\\mere\\luggage-comparison\\portable-replacement-failure\\packages\\VelopackTemp\\tmp_WVrY6uD2l1frALqw" after 2ms: The process cannot access the file because it is being used by another process. (os error 32)
+[17:11:14] [INFO] Removed temp dir "C:\\t\\cargo-targets\\mere\\luggage-comparison\\portable-replacement-failure\\packages\\VelopackTemp\\tmp_awuJbt90VJiAo4lk" in 11ms
+[17:11:14] [ERROR] Apply error: Error applying package: Unable to complete the update, and the app was left in a broken state. You may need to re-install or repair this application manually.
+[17:11:14] [ERROR] An error has occurred: Apply error: Error applying package: Unable to complete the update, and the app was left in a broken state. You may need to re-install or repair this application manually.

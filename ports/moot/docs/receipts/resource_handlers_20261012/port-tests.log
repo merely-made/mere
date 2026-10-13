@@ -1,0 +1,36 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling eidetic v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\eidetic-core)
+   Compiling mere-moot v0.0.1 (C:\Users\mark_\Code\repos\mere\ports\moot)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.65s
+     Running unittests src\lib.rs (C:\t\cargo-targets\mere\debug\deps\moot-9a3a654c3d708262.exe)
+
+running 19 tests
+test resource_coop::control::tests::a_changed_collection_version_refuses_before_dispatch ... ok
+test resource_coop::control::tests::withdrawal_before_dispatch_never_calls_owner_command ... ok
+test resource_coop::control::tests::independent_readings_and_owner_refusal_preserve_their_reads ... ok
+test resource_coop::tests::bad_reads_are_refused_without_replacing_the_current_snapshot ... ok
+test resource_coop::tests::a_collection_fork_offers_no_copy_or_content_fork_right ... ok
+test resource_coop::tests::duplicate_payloads_keep_contributions_and_new_revisions_do_not_retarget_attention ... ok
+test resource_coop::tests::membership_and_a_hosting_promise_never_supply_action_offers_or_live_presence ... ok
+test resource_coop::tests::independent_readings_keep_resource_and_activity_attention_and_completions_separate ... ok
+test resource_coop::tests::owner_acceptance_changes_feedback_only_and_cannot_invent_retained_bytes_or_hosting ... ok
+test resource_coop::tests::refreshed_authority_invalidates_the_old_request_and_preserves_exact_resource_attention ... ok
+test resource_coop::owners::tests::real_gemot_authority_withholds_expired_and_foreign_contributions ... ok
+test resource_coop::tests::requests_cannot_be_relabelled_to_attach_a_completion_to_another_resource ... ok
+test resource_coop::owners::tests::collection_selection_uses_effective_members_and_exact_owner_frontier ... ok
+test resource_coop::tests::withdrawal_clears_only_missing_attention_and_does_not_fabricate_content_for_activity_links ... ok
+test resource_coop::tests::view_json_round_trips_without_becoming_a_capability_and_future_reports_are_refused ... ok
+test resource_coop::owners::tests::local_reads_verify_content_budget_and_identity_without_writes_or_remote_fetch ... ok
+test resource_coop::handlers::tests::settings_and_real_grant_revocation_refuse_pending_writes ... ok
+test resource_coop::handlers::tests::foreign_reader_quota_and_private_export_refuse_without_writes ... ok
+test resource_coop::handlers::tests::actual_handlers_retain_sign_refresh_and_serve_after_source_disappears ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 3.75s
+

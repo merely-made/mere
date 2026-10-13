@@ -1,10 +1,13 @@
 # Eidetic development: content, encounters and computed memory
 
 **Date:** 2026-10-11
-**Status (2026-10-11):** active plan. The first Fleece portable-clip draft has
+**Status (2026-10-12):** active plan. The first Fleece portable-clip draft has
 native transfer tests and browser compilation. Turnstone now qualifies native
 selected text/WAV receiving, restart, local playback and onward copy; the broader phases
-and remaining host checkpoints stay open. The five gathering/intake dependency
+and remaining host checkpoints stay open. The first browser encounter slice
+now has native regression, fresh-process disk and browser compilation receipts;
+renewed headed browser intake and private custody remain open.
+The five gathering/intake dependency
 moves are already complete in the
 [Fleece and Eidetic checkpoint](../../archive_docs/2026-10-11_completed_plans/2026-10-11_fleece_eidetic_capability_plan.md).
 **Scope:** develop Eidetic's retained-content and memory capabilities together
@@ -488,6 +491,196 @@ mere's forget operation has tested scope. Browser persistence state, quota
 failure and backup/export are visible. Ordinary capture starts no crawl. Each
 receipt names its source, target, feature set and supported limits.
 
+#### Browser history into document relations, draft 2026-10-12
+
+Mark agrees to develop existing-browser history capture into relationships for
+the document graph. This is a design amendment for P1/P2/P5, with content
+observations supplied separately by P3. The encounter contract and adapters
+below were proposed in this draft. The first implemented subset and its limits
+are recorded under the qualification below; the remaining draft stays open.
+
+**Source refresh at Mere `28d43dd5`.** The extension's
+[live listener](../../../ports/graphshell/web/extension/background.js) selects
+only the latest visit for a URL and converts referring visit IDs to URLs. Its
+import limits candidates to 512 pages and retains a bounded tail of visits.
+[Capture normalization](../../../ports/graphshell/src/capture.rs) also drops
+same-URL observations inside a time window even when their visit IDs differ.
+Its transition mapping treats `generated` as tab spawning and subframe loads
+as redirects, while the
+[history projection](../../../crates/eidetic/eidetic-core/src/import/history.rs)
+uses a different vocabulary mapping. The
+[Firefox exporter](../../../scripts/firefox_history_export.py) drops
+`from_visit` identity and microsecond precision. These are repair targets, not
+properties of the proposed design.
+
+**Acquire existing records and enrich live records.** Start with the existing
+Chromium and Firefox extension adapters. History permission admits a selected
+import range or live remembering; additional navigation observation has its
+own control. Both browsers distinguish page-level history items from individual
+visits carrying a referring visit ID:
+[Chrome history](https://developer.chrome.com/docs/extensions/reference/api/history),
+[Firefox VisitItem](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/history/VisitItem).
+Read visits for each candidate address and retain source relationships before
+projecting them. History import issues zero page requests.
+
+For live intake, serialize reconciliation per address and collect all unseen
+visit IDs, with an overlapping reconciliation range after suspension. A
+latest-only result or timestamp watermark cannot prove delivery of every visit.
+Retry identifiers deduplicate delivery; distinct visit IDs survive proximity
+in time. When an adapter has no stable visit ID, retain that limitation rather
+than treating a URL/time guess as proven identity.
+
+Import completeness is a separate result. History search returns page items,
+not a paginated visit stream; in particular Firefox documents filtering by
+`lastVisitTime`:
+[history.search](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/history/search).
+A page revisited after an import's end may still have visits inside the selected
+range. Discover candidates without excluding such pages, then filter individual
+visit timestamps. A candidate cap, saturated time partition, queue overflow or
+source retention limit must report partial or unknown coverage. A successful
+batch acknowledgement does not imply a complete range. An explicit database
+export can provide another adapter, beginning with the existing Firefox script;
+it must retain original IDs, parent references and timestamp precision, report
+its database/schema assumptions and use an authorized consistent snapshot.
+
+**Proposed encounter contract.** Extend existing Eidetic intake/history types
+instead of creating a second browser history store. Retain:
+
+- Stable source scope: browser product, registered profile instance and history
+  generation. Import runs are delivery identity, not profile identity. File and
+  extension adapters need an explicit binding when they describe the same source.
+- Original visit ID and original parent visit reference, including unresolved
+  parents. Missing, source-reported root, outside-range and policy-withheld
+  parents have distinct states; a parent URL alone cannot identify an encounter.
+- Resource locator, source timestamp with original precision, raw transition
+  type/qualifiers and adapter version. Normalized transition is a projection.
+- Available tab/window/frame/document observations, scoped to their source
+  lifecycle. Historical titles may describe the latest page item, rather than
+  the page as seen during an old visit; preserve that qualification.
+- Acquisition time/device and known source locality separately. Chrome's
+  `isLocal` can distinguish local from synced visits; it does not identify the
+  original remote device or the persona who made that visit.
+- Source material/digest and conversion notices through existing
+  [Intake](../../../crates/eidetic/eidetic-core/src/import/intake.rs).
+  Conflicting facts for the same source identity remain inspectable and do not
+  silently replace an admitted encounter.
+
+**Relations retain their evidence.** The following names describe meanings,
+not newly selected enum variants or predicate IRIs:
+
+| Evidence | Encounter relationship | Document-graph projection |
+|---|---|---|
+| Source `referringVisitId` | Browser-reported predecessor/reference | Directed address relation citing both encounters; an observed link transition may refine it to followed navigation |
+| Observed new-tab navigation target | Opened from a source tab/document | Branch relation only when the originating encounter can be resolved |
+| Observed redirect transition/qualifiers | Redirect step or qualified redirect observation | Redirect relation; retain intermediate-address gaps rather than inventing a complete chain |
+| Reload or distinct repeat visit | Another encounter with the same resource | Additional visit/count and inspectable occurrence, including same-resource transitions |
+| Captured document contains a link | Link at a retained document version/anchor | Contains-link relation; it does not establish a visit or a click |
+| Explicit clip from a captured version | Clip derived from source and selection | Provenance relation citing the retained version, selector and originating encounter when known |
+| Temporal proximity or model output | Candidate association | Separately labelled derived suggestion; it does not establish navigation parentage |
+
+Live tab/document enrichment uses separately admitted observations such as
+[Chrome webNavigation](https://developer.chrome.com/docs/extensions/reference/api/webNavigation)
+and [Firefox navigation targets](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/webNavigation/onCreatedNavigationTarget).
+A new-tab event identifies source and target tabs, not automatically a history
+visit ID. Preserve the observation when correlation is ambiguous. A subframe
+parent document is containment context, not a referring visit. Same-document
+navigation can change an address without proving a new content version.
+
+**Admission and projection.** Eidetic retains source evidence; Pandect and the
+receiving host freeze the selected mere and attribution for the batch. Admit
+resolved visits through Chartulary/Stemma with a stable foreign-to-local identity
+mapping, then derive access records, recall traces and document relations from
+those admitted encounters. Every derived edge must expose its supporting source
+handles; aggregation over a pair of documents must retain the individual visits.
+URL identity does not prove captured-byte identity. Unvisited link targets may
+appear as clearly unvisited references without triggering acquisition.
+
+Stemma's current
+[visit_entry](../../../crates/eidetic/chartulary/src/stemma/mutations.rs)
+uses the owner's current visit as parent and moves that cursor. Import needs a
+reviewed explicit-parent admission seam, not replay of a chronological list
+through the live cursor. Keep unresolved/conflicting/non-tree relationship
+evidence in intake; do not rewrite historical parentage or a live cursor merely
+to make a branch fit. The existing
+[lineage projection](../../../crates/eidetic/eidetic-core/src/browsing/lineage.rs)
+is a starting point, but its URL-based TraceEvent projection must gain source
+references before it can support lossless encounter inspection.
+
+**Controls and custody.** Preview visits, supported relations, omitted facts,
+destination, range and exclusions before import. Live remembering, content
+capture and goal-directed crawl remain separate controls. Apply exclusions to
+relationship endpoints as well as destinations; withholding a parent must not
+leak its address through an edge, source envelope or notice. Acknowledge only
+durable admission, and refuse a late result for a changed destination. Queue
+limits and data loss are visible. Forget scope and re-import behavior are an
+explicit user choice; browser deletion does not silently dictate mere deletion.
+
+Private deployment requires custody of the entire path: extension staging,
+source evidence, encounter records, graph snapshots and indexes. The current
+queue uses ordinary extension storage, and capture calls the unsealed access
+writer even though a
+[sealed writer](../../../ports/graphshell/src/access.rs) exists. Sealing only
+that payload would not qualify the other copies. A locked/unavailable destination
+must visibly pause capture or use an explicitly supported bounded sealed inbox.
+Keep this gate separate from synthetic unsealed graph fixtures.
+
+**First implementation slice and done-conditions.** Repair the encounter
+contract and existing extension/import adapters, then qualify admission and
+graph projection with a synthetic branching history: A leads to B and C, B is
+revisited twice rapidly, and one child arrives before its parent. Re-import and
+cold reopen preserve the encounters and derived edges; another profile reusing
+the same visit IDs stays distinct. Include an outside-range parent, excluded
+parent, ambiguous tab correlation, same-resource transition, subframe/generated
+transitions, failed-write retry, full queue, tied search results and a page whose
+latest visit lies after the selected range. Prove zero destination fetches and
+no live-cursor movement. Expose a relation's exact supporting encounters in the
+graph. Renew Chromium and Firefox headed receipts separately when their runs
+are authorized; other browsers require their own adapter/evidence review.
+Content clipping, broader formats and sealed custody then exercise this same
+admission boundary, with their own consumer gates.
+
+#### First browser encounter qualification, 2026-10-12
+
+Implementation `8c490e23` adds the portable source scope, parent states and
+original-time fields in Eidetic, plus Chartulary's explicit-parent `admit_visit`
+seam. The source owner keeps no imported live cursor. Graphshell stores the
+Stemma snapshot and unresolved intake under the receiving graph's identity,
+using the existing Muniment batch alongside graph/access/trace writes.
+Resolved parentage produces actual document traversals and typed evidence
+facets; `MereHost::browser_relations` exposes exact source handles and distinguishes
+followed links, redirects, reloads and other browser-reported referrers.
+
+Native library regression passes 67 Chartulary, 132 Eidetic and 290 Graphshell
+tests, with five existing ignores and one explicit disk-receipt fixture ignored
+by the ordinary sweep. That fixture passes in separate seed/reopen processes
+over Redb: five source visits and three relations retain the same graph,
+encounter identities and evidence, and re-import adds none. Focused cases also
+cover rapid same-address visits, branching and late parents, profile ID reuse,
+outside-range/withheld parents, conflict/capacity/cycle refusal, failed batch
+retry, explicit forget and unchanged existing navigation cursors. Removing
+parentage makes the branch test fail, followed by byte-exact source restoration.
+
+The real extension model/background scripts pass Chromium and Firefox API
+simulations for stable worker scope, rapid revisits, per-visit range filtering,
+candidate saturation and visible queue loss. Their generated payload also
+passes through Rust deserialization and graph admission. The Firefox SQLite
+exporter preserves original parent IDs and microseconds with explicit registered
+scope inputs. The standalone Graphshell browser target compiles for wasm32.
+History intake calls browser history APIs and local storage, without requesting
+destination pages. A native-only test dependency enables Muniment's existing
+Redb backend; supplier pins and shared clip schemas are unchanged.
+
+See [machine-readable evidence](../../../support/browser-history-intake/qualification.json)
+and its adjacent raw logs and synthetic disk expectation. These qualify one
+receiving writer and synthetic custody, not concurrent independent writers or
+real private browsing. The portal's new awaiting-parent feedback has compilation
+and API evidence, not renewed headed UI acceptance. Actual Chromium/Firefox
+extension lifecycle and IndexedDB reopening, live tab/window/frame/document
+correlation, source replacement/reinstallation binding, full input envelopes,
+recall-trace source handles and sealed custody remain open. Native forgetting
+removes encounter and relationship evidence while preserving independently
+owned resource-registry identities; it is not a whole-mere identity purge.
+
 ### P6. Qualify storage, custody, retention and exchange
 
 Make selective replication of a portable collection a forcing consumer here,
@@ -656,3 +849,21 @@ The implementation proposals still need these concrete decisions:
   changed. This uses the existing bounded dependency closure and NoFetcher.
   The store stays unsealed. Browser/structured receiving, recording excerpts,
   signed/accepted tags, reviewed owner edits, peer delivery and P6 remain open.
+- **2026-10-12, browser-history relation design.** Refreshed the existing
+  extension, imported-history, access, Stemma and lineage source seams at
+  `28d43dd5`, and checked official Chromium/Firefox history and navigation APIs.
+  P5 now specifies source-scoped encounter identity, retained parent references,
+  raw transition evidence, visible import coverage and evidence-backed document
+  relations, plus an explicit-parent admission seam that preserves live cursors.
+  The forcing fixture includes rapid revisits, branches, out-of-order parents,
+  redacted/outside-range endpoints, source-ID collisions and partial imports.
+  This is a documentation-only design amendment; runtime, schema, custody and
+  renewed headed browser qualification remain open.
+- **2026-10-12, first browser encounter implementation.** Source `8c490e23`
+  connects source-scoped Eidetic intake and explicit-parent Stemma admission to
+  Graphshell's document graph. Native regression passes 489 tests, with six
+  ordinary-sweep ignores; the new disk fixture separately passes seed/reopen
+  processes and idempotent re-import. Production JS/Rust wire and simulated
+  Chromium/Firefox adapters pass, the browser target compiles, and a restored
+  parent-removal control demonstrates branch-test sensitivity. Qualified scope
+  and open custody, multi-writer and headed-browser gates are recorded under P5.

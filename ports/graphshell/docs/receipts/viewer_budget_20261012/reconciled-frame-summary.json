@@ -1,0 +1,988 @@
+{
+  "scope": "21 generated nodes, seed7, links none, CPU physics; count-matched diagnostic, not actual site data or sustained-performance guarantee",
+  "rolling_interval_windows": {
+    "budget-reconciled-browser-r1": [
+      {
+        "samples": 120,
+        "median_ms": 16.7,
+        "p95_ms": 17.6,
+        "max_ms": 18.0
+      },
+      {
+        "samples": 120,
+        "median_ms": 16.65,
+        "p95_ms": 17.8,
+        "max_ms": 18.4
+      },
+      {
+        "samples": 120,
+        "median_ms": 16.7,
+        "p95_ms": 17.6,
+        "max_ms": 18.6
+      }
+    ],
+    "physical-reconciled-browser-r1": [
+      {
+        "samples": 120,
+        "median_ms": 16.8,
+        "p95_ms": 17.7,
+        "max_ms": 18.5
+      },
+      {
+        "samples": 120,
+        "median_ms": 16.7,
+        "p95_ms": 18.1,
+        "max_ms": 18.5
+      },
+      {
+        "samples": 120,
+        "median_ms": 16.8,
+        "p95_ms": 17.8,
+        "max_ms": 18.5
+      }
+    ]
+  },
+  "rolling_interval_note": "These 120-sample rolling arrays differ from the complete measured frame windows. Use complete_frame_windows for the diagnostic p50/p95/max claims.",
+  "complete_frame_windows": {
+    "budget-reconciled-browser-r1": [
+      {
+        "counts": {
+          "paint_after_cull": {
+            "max": 89,
+            "min": 89
+          },
+          "paint_before_cull": {
+            "max": 89,
+            "min": 89
+          },
+          "physics_carried_us": {
+            "max": 0,
+            "min": 0
+          },
+          "physics_discarded_us": {
+            "max": 0,
+            "min": 0
+          },
+          "physics_steps": {
+            "max": 0,
+            "min": 0
+          },
+          "total_nodes": {
+            "max": 21,
+            "min": 21
+          },
+          "visible_nodes": {
+            "max": 21,
+            "min": 21
+          }
+        },
+        "cpu_ms": {
+          "max": 6.1,
+          "p50": 4.8,
+          "p95": 5.3
+        },
+        "frames": 62,
+        "gpu_ms": {
+          "max": 14.501,
+          "p50": 12.904,
+          "p95": 13.567
+        },
+        "hidden": false,
+        "interval_ms": {
+          "max": 18.5,
+          "p50": 16.7,
+          "p95": 18.4
+        },
+        "label": "site-paused",
+        "producer_render_us": {
+          "max": 1500,
+          "p50": 800,
+          "p95": 900
+        },
+        "producer_stage_us": {
+          "max": 200,
+          "p50": 0,
+          "p95": 200
+        },
+        "stages_ms": {
+          "cull": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0.1
+          },
+          "dom_frame": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0
+          },
+          "dom_mutate": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0.1
+          },
+          "dom_prepare": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0.1
+          },
+          "faces": {
+            "max": 0.2,
+            "p50": 0.1,
+            "p95": 0.2
+          },
+          "lower": {
+            "max": 0.2,
+            "p50": 0,
+            "p95": 0.1
+          },
+          "overlays": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0
+          },
+          "physics": {
+            "max": 0.3,
+            "p50": 0,
+            "p95": 0.1
+          },
+          "prepare": {
+            "max": 0.2,
+            "p50": 0.1,
+            "p95": 0.1
+          },
+          "rasterize": {
+            "max": 0.6,
+            "p50": 0.4,
+            "p95": 0.5
+          },
+          "underlay": {
+            "max": 0.2,
+            "p50": 0,
+            "p95": 0.1
+          }
+        }
+      },
+      {
+        "counts": {
+          "paint_after_cull": {
+            "max": 89,
+            "min": 89
+          },
+          "paint_before_cull": {
+            "max": 89,
+            "min": 89
+          },
+          "physics_carried_us": {
+            "max": 16666,
+            "min": 33
+          },
+          "physics_discarded_us": {
+            "max": 0,
+            "min": 0
+          },
+          "physics_steps": {
+            "max": 2,
+            "min": 0
+          },
+          "total_nodes": {
+            "max": 21,
+            "min": 21
+          },
+          "visible_nodes": {
+            "max": 21,
+            "min": 21
+          }
+        },
+        "cpu_ms": {
+          "max": 27.4,
+          "p50": 9.5,
+          "p95": 10.4
+        },
+        "frames": 122,
+        "gpu_ms": {
+          "max": 36.277,
+          "p50": 16.593,
+          "p95": 18.018
+        },
+        "hidden": false,
+        "interval_ms": {
+          "max": 28.3,
+          "p50": 16.7,
+          "p95": 17.7
+        },
+        "label": "site-live-1",
+        "producer_render_us": {
+          "max": 5500,
+          "p50": 5000,
+          "p95": 5400
+        },
+        "producer_stage_us": {
+          "max": 200,
+          "p50": 0,
+          "p95": 100
+        },
+        "stages_ms": {
+          "cull": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0.1
+          },
+          "dom_frame": {
+            "max": 1.5,
+            "p50": 1.4,
+            "p95": 1.5
+          },
+          "dom_mutate": {
+            "max": 3.2,
+            "p50": 2.8,
+            "p95": 3.1
+          },
+          "dom_prepare": {
+            "max": 0.2,
+            "p50": 0,
+            "p95": 0.1
+          },
+          "faces": {
+            "max": 0.2,
+            "p50": 0.1,
+            "p95": 0.2
+          },
+          "lower": {
+            "max": 0.2,
+            "p50": 0,
+            "p95": 0.1
+          },
+          "overlays": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0
+          },
+          "physics": {
+            "max": 0.2,
+            "p50": 0.1,
+            "p95": 0.2
+          },
+          "prepare": {
+            "max": 0.2,
+            "p50": 0.1,
+            "p95": 0.1
+          },
+          "rasterize": {
+            "max": 0.6,
+            "p50": 0.4,
+            "p95": 0.5
+          },
+          "underlay": {
+            "max": 0.2,
+            "p50": 0,
+            "p95": 0.1
+          }
+        }
+      },
+      {
+        "counts": {
+          "paint_after_cull": {
+            "max": 89,
+            "min": 89
+          },
+          "paint_before_cull": {
+            "max": 89,
+            "min": 89
+          },
+          "physics_carried_us": {
+            "max": 16633,
+            "min": 33
+          },
+          "physics_discarded_us": {
+            "max": 0,
+            "min": 0
+          },
+          "physics_steps": {
+            "max": 2,
+            "min": 0
+          },
+          "total_nodes": {
+            "max": 21,
+            "min": 21
+          },
+          "visible_nodes": {
+            "max": 21,
+            "min": 21
+          }
+        },
+        "cpu_ms": {
+          "max": 10.6,
+          "p50": 9.5,
+          "p95": 10.4
+        },
+        "frames": 122,
+        "gpu_ms": {
+          "max": 18.239,
+          "p50": 16.534,
+          "p95": 17.769
+        },
+        "hidden": false,
+        "interval_ms": {
+          "max": 23.3,
+          "p50": 16.6,
+          "p95": 17.7
+        },
+        "label": "site-live-2",
+        "producer_render_us": {
+          "max": 5600,
+          "p50": 5000,
+          "p95": 5300
+        },
+        "producer_stage_us": {
+          "max": 200,
+          "p50": 100,
+          "p95": 100
+        },
+        "stages_ms": {
+          "cull": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0
+          },
+          "dom_frame": {
+            "max": 1.7,
+            "p50": 1.4,
+            "p95": 1.5
+          },
+          "dom_mutate": {
+            "max": 3.2,
+            "p50": 2.8,
+            "p95": 3.2
+          },
+          "dom_prepare": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0.1
+          },
+          "faces": {
+            "max": 0.2,
+            "p50": 0.1,
+            "p95": 0.2
+          },
+          "lower": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0.1
+          },
+          "overlays": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0
+          },
+          "physics": {
+            "max": 0.2,
+            "p50": 0.1,
+            "p95": 0.2
+          },
+          "prepare": {
+            "max": 0.2,
+            "p50": 0.1,
+            "p95": 0.1
+          },
+          "rasterize": {
+            "max": 0.6,
+            "p50": 0.4,
+            "p95": 0.5
+          },
+          "underlay": {
+            "max": 0.2,
+            "p50": 0,
+            "p95": 0.1
+          }
+        }
+      },
+      {
+        "counts": {
+          "paint_after_cull": {
+            "max": 89,
+            "min": 89
+          },
+          "paint_before_cull": {
+            "max": 89,
+            "min": 89
+          },
+          "physics_carried_us": {
+            "max": 3066,
+            "min": 399
+          },
+          "physics_discarded_us": {
+            "max": 0,
+            "min": 0
+          },
+          "physics_steps": {
+            "max": 1,
+            "min": 1
+          },
+          "total_nodes": {
+            "max": 21,
+            "min": 21
+          },
+          "visible_nodes": {
+            "max": 21,
+            "min": 21
+          }
+        },
+        "cpu_ms": {
+          "max": 11.1,
+          "p50": 9.8,
+          "p95": 10.8
+        },
+        "frames": 122,
+        "gpu_ms": {
+          "max": 18.729,
+          "p50": 16.53,
+          "p95": 17.85
+        },
+        "hidden": false,
+        "interval_ms": {
+          "max": 20.9,
+          "p50": 16.7,
+          "p95": 18.1
+        },
+        "label": "site-live-3",
+        "producer_render_us": {
+          "max": 5800,
+          "p50": 5000,
+          "p95": 5400
+        },
+        "producer_stage_us": {
+          "max": 200,
+          "p50": 100,
+          "p95": 100
+        },
+        "stages_ms": {
+          "cull": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0
+          },
+          "dom_frame": {
+            "max": 1.6,
+            "p50": 1.4,
+            "p95": 1.5
+          },
+          "dom_mutate": {
+            "max": 3.3,
+            "p50": 2.8,
+            "p95": 3.1
+          },
+          "dom_prepare": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0.1
+          },
+          "faces": {
+            "max": 0.2,
+            "p50": 0.1,
+            "p95": 0.1
+          },
+          "lower": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0.1
+          },
+          "overlays": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0
+          },
+          "physics": {
+            "max": 0.2,
+            "p50": 0.1,
+            "p95": 0.2
+          },
+          "prepare": {
+            "max": 0.2,
+            "p50": 0.1,
+            "p95": 0.1
+          },
+          "rasterize": {
+            "max": 0.6,
+            "p50": 0.4,
+            "p95": 0.5
+          },
+          "underlay": {
+            "max": 0.2,
+            "p50": 0,
+            "p95": 0.1
+          }
+        }
+      }
+    ],
+    "physical-reconciled-browser-r1": [
+      {
+        "counts": {
+          "paint_after_cull": {
+            "max": 89,
+            "min": 89
+          },
+          "paint_before_cull": {
+            "max": 89,
+            "min": 89
+          },
+          "physics_carried_us": {
+            "max": 0,
+            "min": 0
+          },
+          "physics_discarded_us": {
+            "max": 0,
+            "min": 0
+          },
+          "physics_steps": {
+            "max": 0,
+            "min": 0
+          },
+          "total_nodes": {
+            "max": 21,
+            "min": 21
+          },
+          "visible_nodes": {
+            "max": 21,
+            "min": 21
+          }
+        },
+        "cpu_ms": {
+          "max": 5.9,
+          "p50": 5.2,
+          "p95": 5.8
+        },
+        "frames": 62,
+        "gpu_ms": {
+          "max": 14.088,
+          "p50": 13.313,
+          "p95": 13.817
+        },
+        "hidden": false,
+        "interval_ms": {
+          "max": 18.9,
+          "p50": 16.7,
+          "p95": 18.7
+        },
+        "label": "site-paused",
+        "producer_render_us": {
+          "max": 1400,
+          "p50": 900,
+          "p95": 1000
+        },
+        "producer_stage_us": {
+          "max": 200,
+          "p50": 100,
+          "p95": 200
+        },
+        "stages_ms": {
+          "cull": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0
+          },
+          "dom_frame": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0.1
+          },
+          "dom_mutate": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0.1
+          },
+          "dom_prepare": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0.1
+          },
+          "faces": {
+            "max": 0.2,
+            "p50": 0.1,
+            "p95": 0.2
+          },
+          "lower": {
+            "max": 0.2,
+            "p50": 0,
+            "p95": 0.1
+          },
+          "overlays": {
+            "max": 0,
+            "p50": 0,
+            "p95": 0
+          },
+          "physics": {
+            "max": 0.4,
+            "p50": 0,
+            "p95": 0.1
+          },
+          "prepare": {
+            "max": 0.2,
+            "p50": 0.1,
+            "p95": 0.2
+          },
+          "rasterize": {
+            "max": 0.7,
+            "p50": 0.5,
+            "p95": 0.6
+          },
+          "underlay": {
+            "max": 0.1,
+            "p50": 0.1,
+            "p95": 0.1
+          }
+        }
+      },
+      {
+        "counts": {
+          "paint_after_cull": {
+            "max": 89,
+            "min": 89
+          },
+          "paint_before_cull": {
+            "max": 89,
+            "min": 89
+          },
+          "physics_carried_us": {
+            "max": 16633,
+            "min": 33
+          },
+          "physics_discarded_us": {
+            "max": 0,
+            "min": 0
+          },
+          "physics_steps": {
+            "max": 2,
+            "min": 0
+          },
+          "total_nodes": {
+            "max": 21,
+            "min": 21
+          },
+          "visible_nodes": {
+            "max": 21,
+            "min": 21
+          }
+        },
+        "cpu_ms": {
+          "max": 12.4,
+          "p50": 10.2,
+          "p95": 11.2
+        },
+        "frames": 122,
+        "gpu_ms": {
+          "max": 18.963,
+          "p50": 16.734,
+          "p95": 18.191
+        },
+        "hidden": false,
+        "interval_ms": {
+          "max": 20.1,
+          "p50": 16.7,
+          "p95": 17.8
+        },
+        "label": "site-live-1",
+        "producer_render_us": {
+          "max": 6400,
+          "p50": 5500,
+          "p95": 6100
+        },
+        "producer_stage_us": {
+          "max": 200,
+          "p50": 100,
+          "p95": 100
+        },
+        "stages_ms": {
+          "cull": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0
+          },
+          "dom_frame": {
+            "max": 1.8,
+            "p50": 1.5,
+            "p95": 1.6
+          },
+          "dom_mutate": {
+            "max": 3.6,
+            "p50": 3.1,
+            "p95": 3.4
+          },
+          "dom_prepare": {
+            "max": 0.2,
+            "p50": 0,
+            "p95": 0.1
+          },
+          "faces": {
+            "max": 0.2,
+            "p50": 0.1,
+            "p95": 0.1
+          },
+          "lower": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0.1
+          },
+          "overlays": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0
+          },
+          "physics": {
+            "max": 0.2,
+            "p50": 0.1,
+            "p95": 0.2
+          },
+          "prepare": {
+            "max": 0.2,
+            "p50": 0.1,
+            "p95": 0.2
+          },
+          "rasterize": {
+            "max": 0.8,
+            "p50": 0.5,
+            "p95": 0.6
+          },
+          "underlay": {
+            "max": 0.2,
+            "p50": 0.1,
+            "p95": 0.1
+          }
+        }
+      },
+      {
+        "counts": {
+          "paint_after_cull": {
+            "max": 89,
+            "min": 89
+          },
+          "paint_before_cull": {
+            "max": 89,
+            "min": 89
+          },
+          "physics_carried_us": {
+            "max": 16666,
+            "min": 33
+          },
+          "physics_discarded_us": {
+            "max": 0,
+            "min": 0
+          },
+          "physics_steps": {
+            "max": 2,
+            "min": 0
+          },
+          "total_nodes": {
+            "max": 21,
+            "min": 21
+          },
+          "visible_nodes": {
+            "max": 21,
+            "min": 21
+          }
+        },
+        "cpu_ms": {
+          "max": 11.5,
+          "p50": 10,
+          "p95": 11.2
+        },
+        "frames": 122,
+        "gpu_ms": {
+          "max": 19.044,
+          "p50": 16.66,
+          "p95": 18.031
+        },
+        "hidden": false,
+        "interval_ms": {
+          "max": 18.7,
+          "p50": 16.8,
+          "p95": 18
+        },
+        "label": "site-live-2",
+        "producer_render_us": {
+          "max": 6200,
+          "p50": 5400,
+          "p95": 5900
+        },
+        "producer_stage_us": {
+          "max": 200,
+          "p50": 100,
+          "p95": 200
+        },
+        "stages_ms": {
+          "cull": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0
+          },
+          "dom_frame": {
+            "max": 1.8,
+            "p50": 1.5,
+            "p95": 1.6
+          },
+          "dom_mutate": {
+            "max": 3.5,
+            "p50": 3,
+            "p95": 3.4
+          },
+          "dom_prepare": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0.1
+          },
+          "faces": {
+            "max": 0.2,
+            "p50": 0.1,
+            "p95": 0.1
+          },
+          "lower": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0.1
+          },
+          "overlays": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0
+          },
+          "physics": {
+            "max": 0.2,
+            "p50": 0.1,
+            "p95": 0.2
+          },
+          "prepare": {
+            "max": 0.2,
+            "p50": 0.1,
+            "p95": 0.2
+          },
+          "rasterize": {
+            "max": 1,
+            "p50": 0.5,
+            "p95": 0.6
+          },
+          "underlay": {
+            "max": 0.2,
+            "p50": 0,
+            "p95": 0.1
+          }
+        }
+      },
+      {
+        "counts": {
+          "paint_after_cull": {
+            "max": 89,
+            "min": 89
+          },
+          "paint_before_cull": {
+            "max": 89,
+            "min": 89
+          },
+          "physics_carried_us": {
+            "max": 16666,
+            "min": 33
+          },
+          "physics_discarded_us": {
+            "max": 0,
+            "min": 0
+          },
+          "physics_steps": {
+            "max": 2,
+            "min": 0
+          },
+          "total_nodes": {
+            "max": 21,
+            "min": 21
+          },
+          "visible_nodes": {
+            "max": 21,
+            "min": 21
+          }
+        },
+        "cpu_ms": {
+          "max": 12.5,
+          "p50": 10.2,
+          "p95": 11.2
+        },
+        "frames": 122,
+        "gpu_ms": {
+          "max": 18.736,
+          "p50": 16.723,
+          "p95": 17.922
+        },
+        "hidden": false,
+        "interval_ms": {
+          "max": 19.3,
+          "p50": 16.8,
+          "p95": 17.8
+        },
+        "label": "site-live-3",
+        "producer_render_us": {
+          "max": 6900,
+          "p50": 5300,
+          "p95": 5800
+        },
+        "producer_stage_us": {
+          "max": 200,
+          "p50": 100,
+          "p95": 200
+        },
+        "stages_ms": {
+          "cull": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0
+          },
+          "dom_frame": {
+            "max": 1.8,
+            "p50": 1.5,
+            "p95": 1.6
+          },
+          "dom_mutate": {
+            "max": 3.6,
+            "p50": 3,
+            "p95": 3.3
+          },
+          "dom_prepare": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0.1
+          },
+          "faces": {
+            "max": 0.2,
+            "p50": 0.1,
+            "p95": 0.2
+          },
+          "lower": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0.1
+          },
+          "overlays": {
+            "max": 0.1,
+            "p50": 0,
+            "p95": 0
+          },
+          "physics": {
+            "max": 0.3,
+            "p50": 0.1,
+            "p95": 0.2
+          },
+          "prepare": {
+            "max": 0.2,
+            "p50": 0.1,
+            "p95": 0.1
+          },
+          "rasterize": {
+            "max": 1.1,
+            "p50": 0.5,
+            "p95": 0.6
+          },
+          "underlay": {
+            "max": 0.2,
+            "p50": 0,
+            "p95": 0.1
+          }
+        }
+      }
+    ]
+  }
+}

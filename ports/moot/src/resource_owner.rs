@@ -148,6 +148,8 @@ pub async fn snapshot<B: Backend + Clone>(
         resources.push(ResourceRead {
             reference,
             shared_by: Some(share.shared_by),
+            retention: crate::resource_coop::RetentionRead::Unknown,
+            terms: Default::default(),
             title: share.title.clone(),
             schema: share.schema_id.clone(),
             content,
@@ -284,7 +286,9 @@ pub async fn dispatch<B: Backend + Clone, P: IdentityProvider + ?Sized>(
         Target::Resource {
             reference,
             action: ResourceAction::Open,
+            observed_terms,
         } => {
+            if observed_terms.is_some() { return Err(Error::Refused("This owner did not disclose resource action terms".into())); }
             let fauna = moot.authorized_fauna(at_ms).await?;
             if reference.moot != moot.moot_id().0
                 || !fauna
@@ -364,6 +368,7 @@ pub async fn dispatch<B: Backend + Clone, P: IdentityProvider + ?Sized>(
                 operation: receipt.operation,
             })
         },
+        Target::Refresh { .. } => Err(Error::Unsupported("Refresh through this owner's read adapter".into())),
         Target::Resource { .. } => Err(Error::Unsupported(
             "This action needs a content grant or hosting owner".into(),
         )),

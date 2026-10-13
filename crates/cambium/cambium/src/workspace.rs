@@ -76,6 +76,10 @@ pub const WORKSPACE_CSS: &str = "\
     .workspace-floats { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; } \
     .workspace-float { overflow: hidden; pointer-events: auto; }";
 
+#[path = "workspace_chrome.rs"]
+mod chrome;
+pub use chrome::{INSTRUMENT_CSS, WorkspacePaneStatus, workspace_pane_header};
+
 /// What [`workspace_view`] draws: the workspace, which tile the host holds
 /// current, and whether the float layer is showing.
 ///

@@ -98,6 +98,14 @@ ports/graphshell/docs/receipts/node_ladder_20261011/checks/*.log -text whitespac
 ports/graphshell/docs/receipts/node_ladder_20261011/qualification.json text eol=lf
 ports/graphshell/docs/receipts/node_ladder_20261011/harness/** text eol=lf
 
+# Djinn deployment scripts and immutable peer-qualification evidence.
+ports/djinn/install-linux.sh text eol=lf
+ports/djinn/install-ssh-server-windows.ps1 text eol=lf
+scripts/djinn-ssh-control.py text eol=lf
+design_docs/mere_docs/testing/receipts/djinn-ssh-peers/*.json text eol=lf
+design_docs/mere_docs/testing/receipts/djinn-ssh-peers/*.log -text whitespace=-space-before-tab
+design_docs/mere_docs/testing/receipts/djinn-ssh-peers/*.patch -text whitespace=-blank-at-eol
+
 support/receipts/font_roles_20261012/*.log -text whitespace=-blank-at-eof,-space-before-tab
 
 # Preserve raw Cargo diagnostics and exact replay metadata for the inventory experiment.

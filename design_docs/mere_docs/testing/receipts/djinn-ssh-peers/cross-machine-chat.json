@@ -1,0 +1,21 @@
+{
+  "schema": "codex.cross-machine-chat/qualification-v1",
+  "date": "2026-10-13",
+  "source_thread": "01a12716-2a74-7ee0-9840-1b356432b10f",
+  "target_thread": "01a132b0-fcf6-7871-b0a2-b8d8f40c18e4",
+  "target_title": "Check stack status",
+  "target_host": "remote-ssh-discovered:s-pc",
+  "old_writer_lock_check": "fuser reported no owner before sending",
+  "first_message_turn": "01a13524-c5a3-7eb1-9959-ef2e3aa717b8",
+  "first_message_acknowledged": true,
+  "confirmation_turn": "01a13527-739a-71f1-9ab9-1ba2bd0baa01",
+  "confirmation_turn_status": "completed",
+  "confirmation_reply": "mesh-chat-ack-01a13524 S-PC send_message_to_thread is unavailable in this session, including in the discoverable tool registry.",
+  "qualified_route": "send_message_to_thread from O-PC, read the agent response through read_thread or wait_threads",
+  "target_direct_push": "unavailable: target session lacks send_message_to_thread",
+  "apps_restarted": false,
+  "chats_interrupted": false,
+  "writer_lock_deleted": false,
+  "source_edited_on_laptop": false,
+  "laptop_builds_started": false
+}

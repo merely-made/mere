@@ -1,0 +1,9 @@
+
+running 4 tests
+test identity_ui::tests::unavailable_ui_cannot_downgrade_to_browser_secret_input ... ok
+test identity_ui::windows_presence::tests::consent_parent_belongs_to_resident_and_closes_after_use ... ok
+test identity_ui::tests::encrypted_key_is_unlocked_and_imported_without_a_serialized_secret ... ok
+test identity_ui::tests::wrong_passphrase_imports_nothing_and_returns_a_bounded_reason ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 115 filtered out; finished in 1.54s
+

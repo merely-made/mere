@@ -1,0 +1,18 @@
+{
+  "source": "cdba4c96909c05b4a2450d1e204979d0dc3c8d48",
+  "cutoff": "2026-10-13T07:24:30Z",
+  "started": "2026-10-13T07:18:49.734407+00:00",
+  "drivers": [
+    {
+      "driver": "verify-physical-final.cjs",
+      "exit": 0
+    }
+  ],
+  "closed": true,
+  "owned_pids": [
+    21997,
+    21998,
+    21999
+  ],
+  "released": "2026-10-13T07:19:09.482804+00:00"
+}

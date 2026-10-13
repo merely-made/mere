@@ -42,6 +42,7 @@
 /// Document-canvas scene-input derivation. Wraps `document-canvas` for
 /// composition-time use. Hosts call this for any pane that holds a document
 /// tile (the output of a nematic engine).
+#[cfg(feature = "document-layout")]
 pub mod document_scene;
 
 /// AccessKit/uxtree projection of Platen-owned structure.
@@ -68,6 +69,7 @@ pub mod tree_projection;
 pub mod projection_geometry;
 
 pub use accessibility::project_tile_layout;
+#[cfg(feature = "document-layout")]
 pub use document_scene::build_document_scene;
 pub use projection_geometry::{Axis, TreeBranch, TreeGeometry};
 pub use tree_projection::{PlanSlot, ProjectionKind, TilePlan, WorkbenchPlan, project_tree};

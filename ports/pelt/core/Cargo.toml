@@ -12,7 +12,17 @@ repository.workspace = true
 description = "Window-neutral retained-session controller for the Pelt reference browser."
 readme = "README.md"
 
+[features]
+default = []
+genet = ["dep:genet-document-resources","dep:genet-documents", "dep:mere-document-lanes", "dep:netrender", "dep:serde_json"]
+image-decode = ["genet-documents?/image-decode"]
+
 [dependencies]
+genet-document-resources = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+genet-documents = { workspace = true, features = ["livery"], optional = true }
+mere-document-lanes = { workspace = true, features = ["retained-clips"], optional = true }
+netrender = { workspace = true, optional = true }
 genet-host-api = { workspace = true }
 workbench = { workspace = true }
 inker = { workspace = true }

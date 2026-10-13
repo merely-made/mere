@@ -13,12 +13,22 @@ categories = ["network-programming"]
 name = "moot"
 path = "src/lib.rs"
 
+[[example]]
+name = "moot_resource_owner"
+required-features = ["resource-owners"]
+[[example]]
+name = "moot_resource_handlers"
+required-features = ["resource-handlers"]
+
 [[test]]
 name = "resource_owner"
 required-features = ["resource-owner", "resource-view"]
 
 [features]
 default = []
+presentation = ["dep:cambium"]
+resource-owners = ["dep:gemot", "dep:servitor", "dep:eidetic"]
+resource-handlers = ["resource-owners", "dep:personae", "dep:muniment", "dep:mien", "dep:serde_json"]
 # Opt-in owner bridge. The ordinary portable view never imports governance or
 # storage. Private content needs its own access/key adapter; this first bridge
 # opens only locally held PublicPortable blobs.
@@ -38,7 +48,12 @@ captured-web = [
 ]
 
 [dependencies]
+serde_json = { workspace = true, optional = true }
+personae = { workspace = true, optional = true }
+mien = { workspace = true, optional = true }
 comms.workspace = true
+cambium = { workspace = true, optional = true }
+eidetic = { workspace = true, optional = true }
 commons-spine = { workspace = true, optional = true }
 muniment = { workspace = true, optional = true }
 gemot = { workspace = true, optional = true }
@@ -47,19 +62,15 @@ fleece = { workspace = true, optional = true, features = ["eidetic-bridge"] }
 eidetic-search = { workspace = true, optional = true }
 # The coop lifecycle contract is data plus a harness: serde only, never gated.
 serde = { workspace = true }
-eidetic = { workspace = true, optional = true }
-personae = { workspace = true, optional = true }
-cambium = { workspace = true, optional = true }
-mien = { workspace = true, optional = true }
 
 [dev-dependencies]
+proofs.workspace = true
 serde_json = { workspace = true }
 eidetic = { workspace = true }
 fleece = { workspace = true }
 genet-static-dom = { workspace = true }
 genet-scripted-dom.workspace = true
 layout_dom_api.workspace = true
-proofs.workspace = true
 
 # The Commons + Moot coop proof is a port consumer; shared Commons must not
 # depend back on a port, even to build this example.

@@ -96,32 +96,29 @@ work has separated:
 The old Graphshell receipts remain evidence for the resident and identity
 implementations. Their product ownership labels are superseded by this split.
 
-**Sharpened 2026-09-02 (Mark).** Graphshell is a *viewer and redirector*, not
-a surface that hosts content for interaction — with one exception, which is
-the point: the projection itself, of which Graphshell is the preeminent
-manipulator. Viewing is fully in scope: with Genet in the mix, Graphshell
-reads simple structured content through Workbench and Genet for free, and it
-would make no sense to exclude that. What it does not host is the browser
-proper — the engines and the taxonomy of a browser expressed through Mere,
-which are Turnstone's. It is fine to read your content in Graphshell. That is not nothing. Authenticated access to all the data of all
-the applications, used to customize projections to your own taste, is a
-**home-page graph of app graphs**; and that capability is meant to appear in
-every application that has its own app graph, not only in Graphshell. This is
-the family composition thesis's anti-shell test in its positive form: the
-manipulator is a platform capability whose receipt is a second host. One
-consequence it settles the same day: the Projection Editor, today a
-self-contained module in `ports/graphshell`, is **Scenograph** — the name the
-[boundary plan](archive_docs/2026-10-06_completed_plans/2026-09-02_platform_boundary_and_repository_topology_plan.md)
-§1 and P2 free by dissolving the generic `scenograph` facade into Cambium and
-reserve "for the scene/projection editor product, built with Cambium rather
-than naming the scene runtime itself." Scenograph is a Mere product crate,
-Graphshell is its preeminent host, and it appears in every application with
-its own graph. The published `scenograph 0.0.3` is the facade; the name is
-re-pointed by a real publish of the editor, never by reservation alone. And
-Graphshell may compose Workbench for reading without becoming Turnstone, which remains the
-meerkat successor shell with the browser engines proper. Knot can use
-Workbench too (Mark, same day); Workbench is a component any of them takes,
-not a mark of which one is the shell.
+**Revised 2026-10-13 (Mark).** Pelt with Genet is the native baseline. Graphshell
+composes that baseline to browse retained content supplied by application meres,
+including media and Fleece selections. Native content interaction, document
+input and retained links are in scope. Graphshell's job does not require all
+web-browser semantics. Turnstone composes Graphshell and the stack and adds its
+browser taxonomy, navigation, acquisition, authority and browser chrome.
+Loading Turnstone modules in Graphshell would provide only part of Turnstone's
+product composition; the apps remain distinct.
+
+External engines and producers are additions. The intended Turnstone builds
+can select the wgpu trio individually or load them together. This ruling does
+not claim those packaging or combined-runtime gates are complete. Shared
+Frisket/Workbench furniture, Forme arrangements and Scenograph projections are
+available to both applications. An app's Mere keeps its durable authority.
+
+The first implementation lives in `ports/pelt/core/src/native.rs`,
+`crates/system/document-lanes/src/retained_clip.rs` and
+`ports/graphshell/src/retained_content.rs`. It handles held HTML, normalized
+text, encoded images and selected text/WAV clips through retained Pelt sessions.
+Graphshell mounts the same portable input view and producer in its Workbench.
+An undeclared resource or absent retained-link destination stays unavailable;
+Turnstone supplies its own acquisition policy through the native engine factory.
+The old viewer-and-redirector restriction above is superseded by this ruling.
 
 ### Djinn is currently a stale reservation
 

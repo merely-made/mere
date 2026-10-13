@@ -1,0 +1,7 @@
+2026-10-13T11:48:19.466140Z  INFO djinn: Personae storage open storage=OS auto-unlock sealed records at C:/Users/mark_/AppData/Local/personae/vault (DPAPI-wrapped root), opened by a user act under the persisted lock
+2026-10-13T11:49:22.109788Z  INFO castellan::authority: vault locked holders=1
+2026-10-13T11:49:22.110192Z  INFO djinn: vault lock state changed event="locked"
+2026-10-13T11:49:22.585342Z DEBUG djinn::identity_ui: checking native presence availability
+2026-10-13T11:49:22.597646Z DEBUG djinn::identity_ui: native presence availability answered availability=Available
+2026-10-13T11:49:56.411782Z  INFO castellan::authority: vault unlocked holders=1
+2026-10-13T11:49:56.411801Z  INFO djinn: vault lock state changed event="unlocked"
