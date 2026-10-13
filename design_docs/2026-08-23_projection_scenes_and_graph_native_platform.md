@@ -1192,3 +1192,14 @@ Forme workbench, with Tabard application appearance. The original fixture,
 generated-graph and read-only presenter routes keep their current framing.
 This entry does not establish a new reservoir, identity resolver or live
 cross-app connection; those remain the admitted source/route integrations.
+
+**Bounded pilot qualification (2026-10-13):** the real AMD browser lane covers
+the local entry, unchanged Forme save/reopen scenarios, graph/tiled transitions,
+light and narrow presentation, and command-focus restoration. The native Tabard
+lane covers frame/specimen separation, real mode/edit/undo controls, authored CSS,
+Save/reopen and narrow access. Shared status, stable action focus and admitted
+font fallbacks have portable/CPU checks. Source matrices, captures, failed
+preconditions and explicit runtime releases are preserved in the
+[Instrument qualification](../support/receipts/instrument_workspace_20261012/qualification.json).
+This qualifies the shared frame and these two consumers; cross-app domain
+actions and additional entry bindings still require their own actual receipts.
