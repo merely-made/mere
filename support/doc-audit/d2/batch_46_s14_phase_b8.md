@@ -520,3 +520,15 @@ the index. Comment-only header repairs and before/after hashes are preserved in
 `ports/graphshell/docs/receipts/host_presenter_20261012/generator-header-correction.json`.
 No accepted runtime receipt or execution claim is rewritten. Header checks must
 run after new generators enter the index.
+
+
+The exact `cdba4c969` viewer now passes its source-bound browser qualification:
+24 command cases, eleven presenter cases, seventeen physics receipts, four
+browser pointer/keyboard assertions and three clean refusals, with zero page
+errors. The 21-node synthetic diagnostic retains its 82.6 ms outlier; Unicode
+comparison retains existing missing glyphs and changed mixed-script line breaks.
+All owned UI resources closed at 07:19:09 UTC on 13 October. New main
+`0d1dc1927` is reconciled at `3f57971e0`, with retained document dependencies
+kept in product/native capability and standalone compatibility patches restored.
+The fresh package and feature gates remain pending; no old runtime acceptance
+is transferred and no live deployment is claimed.

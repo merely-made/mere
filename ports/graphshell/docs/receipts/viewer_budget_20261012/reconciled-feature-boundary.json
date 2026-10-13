@@ -1,0 +1,12 @@
+[
+  {
+    "configuration": "viewer",
+    "exit": 0,
+    "complex_scripts": false
+  },
+  {
+    "configuration": "product",
+    "exit": 0,
+    "complex_scripts": true
+  }
+]
