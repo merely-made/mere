@@ -324,7 +324,7 @@ where
     });
     let cleanup_bridge = bridge.clone();
     lifetime.on_dispose(move || drop(cleanup_bridge));
-    bridge.attach(&host, &window);
+    bridge.attach(&host, &window, &lifetime);
     recovery::drain(&host, &window);
 
     let document = web_sys::window()

@@ -15,6 +15,7 @@ use cambium_rootstock::{Host, HostWindow, meristem_bounds::RootView};
 use genet_render_host::RecoveryStatus;
 use wasm_bindgen::{JsCast, closure::Closure};
 
+use crate::MountLifetime;
 use crate::surface::{WebSurface, WebWindow};
 
 thread_local! {
@@ -52,6 +53,7 @@ impl WakeBridge {
         &self,
         host: &Rc<RefCell<Host<State, Logic, V>>>,
         window: &WebWindow,
+        lifetime: &MountLifetime,
     ) where
         State: 'static,
         Logic: FnMut(&State) -> V + 'static,
@@ -59,15 +61,29 @@ impl WakeBridge {
     {
         let host = Rc::downgrade(host);
         let window = window.clone();
+        let lifetime = lifetime.clone();
         WAKES.with(|wakes| {
             wakes.borrow_mut().insert(
                 self.0,
                 Rc::new(move || {
+                    // Disposal revokes callback authority synchronously, even
+                    // before its cleanup microtask removes this bridge entry.
+                    // Use phase admission only: passive root liveness is an
+                    // acquisition checkpoint, not automatic wake disposal.
+                    if !lifetime.admitted() {
+                        return;
+                    }
                     if let Some(host) = host.upgrade() {
                         drain(&host, &window);
+                        if !lifetime.admitted() {
+                            return;
+                        }
                         // App wake hooks must never receive a detached/lost core.
                         // Process after the same detach authority as native wake.
                         host.borrow_mut().process_wake();
+                        if !lifetime.admitted() {
+                            return;
+                        }
                         drain(&host, &window);
                     }
                 }),

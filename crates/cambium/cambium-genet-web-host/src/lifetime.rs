@@ -411,6 +411,44 @@ mod tests {
     }
 
     #[test]
+    fn phase_only_wake_admission_stops_at_disposal_request_before_cleanup_completes() {
+        let live = Rc::new(Cell::new(true));
+        let lifetime = MountLifetime::with_liveness({
+            let live = live.clone();
+            move || live.get()
+        });
+        let drops = Rc::new(Cell::new(0));
+        let mut pending = Box::pin(lifetime.startup(Acquisition(drops.clone())));
+        let waker = Waker::from(Arc::new(WakeCount(AtomicUsize::new(0))));
+        let mut cx = Context::from_waker(&waker);
+        assert!(pending.as_mut().poll(&mut cx).is_pending());
+        assert!(lifetime.admitted());
+        live.set(false);
+        assert!(
+            lifetime.admitted(),
+            "passive root removal is not wake disposal"
+        );
+        assert!(lifetime.dispose());
+        assert_eq!(lifetime.status().phase, MountPhase::Disposing);
+        assert_eq!(
+            drops.get(),
+            0,
+            "pending acquisition has not yet handled cancellation"
+        );
+        assert!(
+            !lifetime.admitted(),
+            "queued wake authority ends before completed cleanup"
+        );
+        assert!(matches!(
+            pending.as_mut().poll(&mut cx),
+            Poll::Ready(Err(_))
+        ));
+        assert_eq!(drops.get(), 1);
+        assert_eq!(lifetime.status().phase, MountPhase::Disposed);
+        assert!(!lifetime.admitted());
+    }
+
+    #[test]
     fn cancellation_wakes_and_releases_actual_startup_future_before_disposed() {
         let lifetime = MountLifetime::new();
         let drops = Rc::new(Cell::new(0));
