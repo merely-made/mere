@@ -1347,8 +1347,8 @@ with `targets/murm-refresh-consumer-tests-20261013.log` and
 The owner authorized planning Murm as the communication and device-implementation
 family, using the Retinue repository as its foundation while preserving crate
 names and original history. The canonical migration specification is
-`retinue/design_docs/2026-10-13_murm_family_move_plan.md`. It separates radio and
-new native Cargo workspaces, selects Stickleback to remain in Mere as a neutral
+`retinue/design_docs/2026-10-13_murm_family_move_plan.md`. It proposes workspace separation for dependency/target isolation under the
+same stack-wide current Rust toolchain and minimum, selects Stickleback to remain in Mere as a neutral
 shared supplier, and retains Genet's Netfetcher Fetch/WebSocket policy while
 qualifying reusable wire implementations as a later Murm lane. Personae, host
 persistence, Gemot governance and Luggage update policy keep their existing
