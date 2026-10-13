@@ -52,9 +52,9 @@ use std::sync::{Arc, Mutex as StdMutex};
 use std::task::{Context, Poll};
 use std::time::Duration;
 
+use identity::DerivedKeypair;
 #[cfg(any(test, feature = "test-identity"))]
 use identity::Ed25519Keypair;
-use identity::DerivedKeypair;
 use iroh::EndpointAddr;
 use iroh::endpoint::{Connection, RecvStream, SendStream};
 use iroh::protocol::{AcceptError, ProtocolHandler};
@@ -78,6 +78,10 @@ use p2panda_net::{AddressBook, Discovery, MdnsDiscovery};
 use stickleback::MunimentAddressBook;
 use tokio::io::{AsyncRead, AsyncWrite, ReadBuf};
 use tokio::sync::{Mutex as TokioMutex, mpsc};
+
+mod bounded_accept;
+use bounded_accept::AcceptReceiver;
+pub use bounded_accept::{BoundedAcceptHandle, BoundedAcceptStats};
 use zeroize::{Zeroize, Zeroizing};
 
 mod open_connections;
@@ -86,7 +90,7 @@ use open_connections::OpenConnections;
 
 use crate::blobs::{BlobHash, BlobPeerAuthorizer, BlobReadAuthorizer, BlobScope, BlobStore};
 use crate::peer_route::{PeerPath, peer_addr};
-use crate::{AcceptedSession, Alpn, IngressContext, PeerID, Transport, TransportError};
+use crate::{AcceptedSession, Alpn, PeerID, Transport, TransportError};
 
 /// A bidirectional p2panda-net QUIC stream presented as `AsyncRead + AsyncWrite`.
 ///
@@ -182,6 +186,8 @@ impl AsyncWrite for P2pandaStream {
 struct QueuedStream {
     stream: P2pandaStream,
     peer: Option<PeerID>,
+    arrived_at: tokio::time::Instant,
+    _queue_permit: Option<tokio::sync::OwnedSemaphorePermit>,
 }
 
 /// Registered per ALPN on the p2panda-net endpoint; pushes each accepted
@@ -193,6 +199,7 @@ struct StreamQueueHandler {
 
 impl ProtocolHandler for StreamQueueHandler {
     async fn accept(&self, connection: Connection) -> Result<(), AcceptError> {
+        let arrived_at = tokio::time::Instant::now();
         // p2panda authenticates its connections, so the remote id is a
         // transport fact (plan D4) and may be reported as the peer.
         let peer = PeerID::from_bytes(connection.remote_id().as_bytes()).ok();
@@ -210,6 +217,8 @@ impl ProtocolHandler for StreamQueueHandler {
                 shutdown_complete: false,
             },
             peer,
+            arrived_at,
+            _queue_permit: None,
         });
         Ok(())
     }
@@ -359,8 +368,7 @@ impl ProtocolHandler for AuthorizedBlobsProtocol {
     }
 }
 
-type AlpnQueues =
-    Arc<StdMutex<HashMap<Alpn, Arc<TokioMutex<mpsc::UnboundedReceiver<QueuedStream>>>>>>;
+type AlpnQueues = Arc<StdMutex<HashMap<Alpn, Arc<TokioMutex<AcceptReceiver>>>>>;
 
 type AddressStore = MunimentAddressBook<MemoryBackend, JsonCodec>;
 
@@ -790,10 +798,10 @@ impl P2pandaTransport {
                 .accept(alpn.as_bytes(), StreamQueueHandler { tx })
                 .await
                 .map_err(|e| TransportError::Backend(format!("accept register: {e}")))?;
-            queues
-                .lock()
-                .unwrap()
-                .insert(alpn.clone(), Arc::new(TokioMutex::new(rx)));
+            queues.lock().unwrap().insert(
+                alpn.clone(),
+                Arc::new(TokioMutex::new(AcceptReceiver::Unbounded(rx))),
+            );
         }
 
         // One total match: each arm builds only the protocol it registers. The
@@ -1303,21 +1311,7 @@ impl Transport for P2pandaTransport {
     }
 
     async fn accept(&self, alpn: Alpn) -> Result<AcceptedSession<P2pandaStream>, TransportError> {
-        let rx = self
-            .queues
-            .lock()
-            .unwrap()
-            .get(&alpn)
-            .cloned()
-            .ok_or(TransportError::AlpnNotRegistered)?;
-        let mut rx = rx.lock().await;
-        let queued = rx.recv().await.ok_or(TransportError::Closed)?;
-        Ok(AcceptedSession::new(
-            queued.stream,
-            alpn,
-            queued.peer,
-            IngressContext::p2panda(),
-        ))
+        self.accept_observed(alpn).await.map(|(session, _)| session)
     }
 }
 
