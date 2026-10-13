@@ -3,7 +3,8 @@ name = "cambium-genet-web-host"
 version = "0.1.0"
 description = "The browser event source for a Cambium application host: DOM events and a canvas, grafted onto cambium-rootstock"
 edition.workspace = true
-rust-version = "1.92"
+
+rust-version = "1.97.1"
 license = "MPL-2.0"
 repository.workspace = true
 # Same posture as the winit event source: it rides Genet's retained

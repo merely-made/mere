@@ -6,7 +6,8 @@ license = "MPL-2.0"
 edition.workspace = true
 # Inline: genet's workspace supplied this and mere's does not. The value is
 # genet's 1.86.0, unchanged — the move is not an MSRV decision.
-rust-version = "1.86.0"
+
+rust-version = "1.97.1"
 repository.workspace = true
 description = "Reusable split-and-tab workspace organization for Genet hosts."
 keywords = ["genet", "workspace", "tabs", "split", "gui"]

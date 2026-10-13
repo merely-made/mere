@@ -1,4 +1,5 @@
 [package]
+rust-version = "1.97.1"
 name = "scenograph"
 version = "0.0.4"
 edition.workspace = true
