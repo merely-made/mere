@@ -1,0 +1,23 @@
+{
+  "status": "Normal delivery caps and CPU/feature gates passed; browser and final upstream renewal pending",
+  "source": "cef122f25737a82c4621de49771c90fc357be348",
+  "cap_gzip_bytes": 3407872,
+  "delivery": "shipping/pkg/viewer-delivery.json",
+  "cpu": {
+    "portable_platen": 50,
+    "default_platen": 54,
+    "size_guard": 2
+  },
+  "wasm_gates": "wasm-gates/gates.json",
+  "browser_executed": false,
+  "main_landed": false,
+  "live_site_deployed": false,
+  "removed_capability": "Unused Platen document producer in read-only viewer; default/native/product document capability retained",
+  "profile": "viewer inherits release, z, fullLTO, symbols, oneCGU",
+  "known_limits": [
+    "Narrow compressed-size margin; remeasure incoming Instrument wrapper change before final acceptance",
+    "No new glyph repertoire, native/touch or Cargo-scale claim",
+    "Site cutover must preserve static/mobile/failure first reading and use the qualified delivery recipe"
+  ],
+  "header_correction": "../host_presenter_20261012/generator-header-correction.json"
+}
