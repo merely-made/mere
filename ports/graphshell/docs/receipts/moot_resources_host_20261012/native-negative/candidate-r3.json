@@ -1,0 +1,32 @@
+{
+  "local_date": "2026-10-12",
+  "basis": "6855f751afe8c4f7e9dcf6244454fa702ba995f9",
+  "source_sha256": {
+    "Cargo.toml": "f303a24af6a2aa0082a217df6f84bfdaf77d241b41fb3f85c0184cf76241893c",
+    "Cargo.lock": "2ade9d9ad1788f9c5ba77313accae290419d262d9808517f3ccfb15f23c994ff",
+    "ports/graphshell/Cargo.toml": "158ab42a249fa5dd6afaeb18a7322feadb9bc4b7d41aa346958263f7740eea5e",
+    "ports/graphshell/src/lib.rs": "b30d3a74e5eecf89b8335f782e398dfd7e9a73e1d7292ceb7464aefa68a7da38",
+    "ports/graphshell/src/moot_resources.rs": "b3c987f3909ba49e5d6f0bce44d9495e380b07a7dad4e23dec33675b35e4acbb",
+    "ports/graphshell/src/bin/moot_resources_host.rs": "091e8e218f4544c02966dbb66ce591cd788d4bc4f7bc5e491026695b4db5df56",
+    "ports/graphshell/examples/support/moot_resources_fixture.rs": "e40c467e6a936a5d6c1f7dd0adce00c0b4de4b64fd5e645d85b620ff30f98eb9",
+    "ports/moot/src/resource_owner.rs": "cdb7542e00a6c70361c9fc91232de177e4fd1844e5325a1abd0d8ea1735289ab",
+    "ports/moot/src/resource_view.rs": "f13c2792afc3ad8ad4e4c4e8d2f285b09af050046fce45ab5e453bc8796f320b",
+    "crates/cambium/cambium/src/runner.rs": "55ea522284a82c5e46c309f15f268d01959f931c8b1447633129ff5362f36ec4",
+    "crates/cambium/cambium-genet-winit-host/src/lib.rs": "f438d2c04fc3e37096a8f050e79a96d4d41c522fba2d70a4868c7ea3fc910988",
+    "crates/cambium/cambium-rootstock/src/frame.rs": "3829e3238ab2ed20460e8a0e8fcc2fea3a3681a1fc9ed580c446685f4b7a4c85",
+    "crates/cambium/cambium-genet-winit-host/src/occlusion_tests.rs": "ed5783657078cc55bbb9983434658c5682424c007cebd94b6d244e2d909100a8"
+  },
+  "binary": "/Users/markik/Code/output/moot-resource-host-20261012/moot-resource-host-r3-frozen",
+  "binary_sha256": "717b4452f9ca3be756d673bddf69940cf527ed08c61a77eac9496afcda21953f",
+  "binary_bytes": 102924736,
+  "status": "Current-main source compiled; bounded proof-only250ms wake and35sec deadline; native acceptance awaiting explicit handoff",
+  "intended_runtime": "Two sequential fresh-process wide/compact runs;35s product deadline each,120s outer total; eight expected captures with real presentations; no automatic extension",
+  "limits": [
+    "Public memory fixtures, supplied carrier facts and verified sans-I/O admission",
+    "No live transport, persistent reopen, private content, physical input or app activity owner"
+  ],
+  "repo": "/Users/markik/Code/worktrees/mere-moot-capsule-proof",
+  "shared_trace_commit": "07d415c52ba6a83b46c0c40ef10f7c3b666c1034",
+  "published_main": "3b76b162b37654ab3981031b82a23c5d5740ed6d",
+  "wake_scope": "Receipt mode only; cancellable and joined250ms timer; real Occluded remains unavailable and only fresh presentations advance"
+}

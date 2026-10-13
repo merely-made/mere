@@ -1,11 +1,11 @@
 warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
   |
   = help: perhaps you meant one of the following:
-          	https://github.com/mark-ik/boa.git
+            https://github.com/mark-ik/boa.git
 warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
   |
   = help: perhaps you meant one of the following:
-          	https://github.com/mark-ik/boa.git
+            https://github.com/mark-ik/boa.git
     Checking serde_core v1.0.229
     Checking serde v1.0.229
     Checking cfg-if v1.0.5

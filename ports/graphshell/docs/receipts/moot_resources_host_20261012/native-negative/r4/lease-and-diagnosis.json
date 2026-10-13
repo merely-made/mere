@@ -1,0 +1,9 @@
+{
+  "scope": "One wide pixel diagnostic; compact forbidden",
+  "granted_max_seconds": 45,
+  "absolute_cutoff": "2026-10-13T04:18:22.000+00:00",
+  "native_launches": 1,
+  "preflight_parse_correction": "Equivalent +00:00 replaced ISO-Z before any subprocess launch on Python3.9",
+  "result": "5.75seconds, exit101, one negative PNG retained; no retry; exact owned resources explicitly released",
+  "diagnosis": "Direct main root lacked matching host palette/typography; opaque native clear is black. Explicit main palette is a product fix; no renderer/pin/predicate change."
+}
