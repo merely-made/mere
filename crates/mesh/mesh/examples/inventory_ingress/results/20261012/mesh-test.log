@@ -1,0 +1,158 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling stickleback v0.1.1 (<MERE>/crates/stickleback)
+   Compiling mere-transport v0.0.2 (<MERE>/crates/murm/transport)
+warning: missing documentation for an associated function
+   --> crates/murm/transport/src/p2panda_transport.rs:637:5
+    |
+637 |     pub fn builder_from_seed_ref(signing_seed: &[u8; 32]) -> P2pandaTransportBuilder<'static> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+note: the lint level is defined here
+   --> crates/murm/transport/src/lib.rs:46:9
+    |
+ 46 | #![warn(missing_docs)]
+    |         ^^^^^^^^^^^^
+
+warning: `mere-transport` (lib) generated 1 warning
+   Compiling mere-mesh v0.0.1 (<MERE>/crates/mesh/mesh)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.55s
+     Running unittests src/lib.rs (target/debug/deps/mesh-099a14fdbad06f17)
+
+running 124 tests
+test board::tests::a_non_winner_result_is_ignored ... ok
+test board::tests::a_malformed_spec_never_reaches_the_board ... ok
+test board::tests::foreign_mesh_ops_are_skipped ... ok
+test board::tests::an_m1_only_snapshot_still_hashes_to_its_pre_v2_bytes ... ok
+test board::tests::checkpoint_plus_tail_equals_full_replay ... ok
+test board::tests::a_v2_job_folds_posted_claimed_committed ... ok
+test board::tests::claim_race_resolves_identically_in_both_fold_orders ... ok
+test directory::tests::a_self_attestation_resolves_the_author_to_its_master ... ok
+test board::tests::a_result_from_the_other_generation_is_ignored ... ok
+test directory::tests::an_attestation_for_another_salt_does_not_count ... ok
+test directory::tests::a_device_may_only_attest_itself ... ok
+test board::tests::lifecycle_posted_claimed_done ... ok
+test ident::tests::a_decoded_id_is_revalidated ... ok
+test ident::tests::ids_order_and_hash_as_their_text ... ok
+test ident::tests::malformed_ids_are_refused ... ok
+test directory::tests::a_tampered_attestation_is_refused ... ok
+test ident::tests::real_ids_parse_and_round_trip ... ok
+test board::tests::a_result_that_breaks_the_signed_grant_is_not_a_result ... ok
+test lease::tests::a_grant_from_a_non_winner_is_refused ... ok
+test lease::tests::facts_from_the_wrong_author_or_outside_the_window_are_ignored ... ok
+test lease::tests::a_grant_wider_than_the_signed_envelope_is_refused ... ok
+test lease::tests::heartbeats_advance_last_seen_and_carry_progress ... ok
+test lease::tests::resolution_does_not_depend_on_gather_order ... ok
+test lease::tests::terms_bound_duration_heartbeat_and_misses ... ok
+test drop_export::tests::catch_up_keeps_current_checkpoint_and_tail_only ... ok
+test lease::tests::the_chain_accepts_one_grant_per_epoch_from_the_claim_winner ... ok
+test lease::tests::the_earliest_end_wins_and_a_completion_closes_the_job ... ok
+test lease::tests::the_next_epoch_may_not_start_before_the_previous_one_ended ... ok
+test policy::tests::a_host_without_a_supervisor_refuses_leased_work_only ... ok
+test policy::tests::a_low_battery_on_mains_is_not_a_reason_to_stop ... ok
+test namespace::tests::only_the_granted_output_slot_is_writable ... ok
+test namespace::tests::many_named_inputs_each_resolve_to_their_own_blob ... ok
+test namespace::tests::an_input_the_device_does_not_hold_is_missing_not_empty ... ok
+test namespace::tests::a_digest_mismatch_fails_before_the_adapter_sees_bytes ... ok
+test namespace::tests::a_granted_input_reads_and_an_ungranted_one_does_not ... ok
+test policy::tests::a_permissive_device_lends_under_any_conditions ... ok
+test namespace::tests::an_oversized_output_fails_without_committing_anything ... ok
+test policy::tests::being_full_stops_new_work_without_abandoning_running_work ... ok
+test policy::tests::each_configured_limit_names_the_reason_it_withholds ... ok
+test policy::tests::quiet_hours_wrap_midnight ... ok
+test policy::tests::allowed_resources_and_checkpoint_classes_gate_acceptance ... ok
+test projection::tests::a_future_dated_grant_is_not_live_yet ... ok
+test projection::tests::a_job_without_terms_is_never_leased ... ok
+test projection::tests::an_end_dated_ahead_of_the_observer_is_not_in_force_yet ... ok
+test projection::tests::an_ungranted_job_is_open_at_epoch_zero ... ok
+test projection::tests::ends_project_distinctly_and_reopen_the_next_epoch ... ok
+test projection::tests::silence_and_expiry_boundaries_are_exact ... ok
+test projection::tests::skew_widens_both_boundaries_in_the_holders_favour ... ok
+test projection::tests::the_same_facts_change_phase_only_with_the_observation_time ... ok
+test registry::tests::a_weaker_resource_may_not_answer_a_stronger_ask ... ok
+test registry::tests::a_test_resource_runs_end_to_end_without_touching_wire_or_fold ... ok
+test registry::tests::a_second_implementation_of_an_exact_resource_must_agree ... ok
+test registry::tests::an_unknown_resource_and_a_duplicate_registration_are_refused ... ok
+test registry::tests::a_cancelled_run_commits_nothing ... ok
+test registry::tests::host_capability_gates_selection ... ok
+test board::tests::mixed_generation_replicas_converge_in_every_fold_order ... ok
+test registry::tests::the_m1_kinds_run_through_the_v2_route ... ok
+test ingress::records::tests::fifth_original_evicts_only_availability_and_expiry_removes_exact_bytes ... ok
+test resource::tests::cancellation_is_visible_to_the_run_and_only_the_host_sets_it ... ok
+test resource::tests::dropping_the_handle_does_not_cancel_the_run ... ok
+test resource::tests::prepared_round_trips_its_own_type_and_refuses_another ... ok
+test resource::tests::signals_escalate_and_never_walk_back ... ok
+test resource::tests::the_run_reports_progress_the_host_can_heartbeat ... ok
+test resources::delayed::tests::a_cancel_after_a_checkpoint_request_still_throws_the_work_away ... ok
+test drop_export::tests::radio_mapping_drives_the_shared_exporter ... ok
+test resources::delayed::tests::a_checkpoint_request_stops_at_a_boundary_and_says_where ... ok
+test resources::legacy::tests::an_adapter_cannot_read_a_slot_the_job_did_not_grant ... ok
+test resources::legacy::tests::the_adapters_reproduce_the_m1_executors ... ok
+test resources::lexical::tests::lexical_determinism_receipt ... ok
+test resources::tests::every_builtin_registers_under_the_id_it_declares ... ok
+test resources::lexical::tests::a_batch_embeds_in_input_order_and_reruns_identically ... ok
+test resources::lexical::tests::a_non_canonical_input_is_refused_as_input_not_as_a_crash ... ok
+test retention::tests::rejects_false_proofs_foreign_space_stale_policy_and_wrong_authority ... ok
+test retention::tests::terminal_payload_erasure_keeps_compact_result ... ok
+test retention::tests::accepted_frontier_never_rewinds ... ok
+test spec::tests::an_invalid_resource_id_fails_the_whole_spec ... ok
+test spec::tests::a_well_formed_spec_validates_and_resolves_its_inputs ... ok
+test spec::tests::a_result_must_honour_the_grant_it_answers ... ok
+test spec::tests::duplicate_input_names_are_refused ... ok
+test spec::tests::malformed_names_and_counts_are_refused ... ok
+test spec::tests::oversized_and_empty_grants_are_refused ... ok
+test spec::tests::requirements_match_host_facts ... ok
+test spec::tests::verification_classes_order_from_exact_down_to_observed ... ok
+test remote::tests::tampering_and_unbounded_credentials_are_refused ... ok
+test remote::tests::a_device_answering_as_its_master_is_refused ... ok
+test store::tests::a_peers_checkpoint_that_would_strand_a_lease_is_refused ... ok
+test store::tests::a_malformed_v2_spec_or_result_is_refused_before_mutation ... ok
+test store::tests::a_live_lease_blocks_a_checkpoint_until_it_ends ... ok
+test remote::tests::another_ring_member_cannot_hijack_the_posters_lease ... ok
+test remote::tests::mesh_lease_epoch_resource_and_device_are_all_exact ... ok
+test remote::tests::authenticated_client_and_server_transport_identities_are_bound ... ok
+test remote::tests::a_poster_opens_the_exact_device_under_the_servers_live_lease ... ok
+test store::tests::two_in_memory_stores_do_not_share_state ... ok
+test store::tests::rejection_precedes_every_store_mutation ... ok
+test store::tests::insert_is_idempotent_and_feeds_the_board ... ok
+test store::tests::latest_walks_the_author_log ... ok
+test store::tests::unauthorized_or_false_checkpoint_leaves_store_unchanged ... ok
+test store::tests::checkpoint_atomically_erases_terminal_input_and_keeps_result ... ok
+test wire::tests::a_signed_operation_verifies ... ok
+test wire::tests::adding_v2_variants_left_legacy_bytes_untouched ... ok
+test wire::tests::default_prune_flag_preserves_legacy_mesh_header_identity ... ok
+test wire::tests::event_round_trips_through_an_operation ... ok
+test wire::tests::history_pruned_event_sets_the_upstream_flag ... ok
+test resources::delayed::tests::the_chain_is_deterministic_and_reports_progress ... ok
+test wire::tests::tampering_the_mesh_id_breaks_verification ... ok
+test wire::tests::the_per_author_log_validates_under_p2panda ... ok
+test store::tests::blobs_are_kept_until_an_accepted_checkpoint_says_the_job_is_done ... ok
+test wire::tests::v2_events_survive_cbor_and_signed_operation_round_trips ... ok
+test store::tests::checkpoint_survives_event_prefix_prune_and_replays_the_board ... ok
+test worker::tests::a_claim_loser_neither_grants_nor_executes ... ok
+test worker::tests::an_offline_device_offers_nothing_and_a_wired_one_offers_everything ... ok
+test worker::tests::a_lapsed_lease_reopens_the_job_for_another_device ... ok
+test worker::tests::heartbeat_progress_travels_from_the_control_handle ... ok
+test worker::tests::a_full_device_keeps_its_job_and_takes_no_more ... ok
+test worker::tests::owner_reclaim_outranks_heartbeats_and_new_work ... ok
+test worker::tests::an_unleased_job_still_follows_the_m2_path ... ok
+test worker::tests::the_owners_policy_gates_resources_and_checkpoint_classes ... ok
+test worker::tests::a_leased_job_is_claimed_granted_executed_and_kept_alive ... ok
+test worker::tests::work_this_host_cannot_run_is_left_for_a_device_that_can ... ok
+test store::tests::a_file_store_survives_reopen ... ok
+test sync::tests::a_late_joiner_catches_up_on_an_existing_log ... ok
+test sync::tests::a_blob_backed_lexical_job_crosses_two_peers_and_verifies ... ok
+test sync::tests::an_owner_reclaim_converges_and_the_other_peer_finishes_the_job ... ok
+test sync::tests::a_job_posted_on_one_peer_is_worked_by_the_other ... ok
+
+test result: ok. 124 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.80s
+

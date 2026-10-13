@@ -1,0 +1,121 @@
+{
+  "schema": "mere.exact-inventory-admitted-validation/v1",
+  "capture_base_revision": "ea9239a3fe23c9e88eb1e05b887b2671e082f6b9",
+  "source_dirty_at_capture": true,
+  "mere_sources_rehashed": 26,
+  "retinue_sources_rehashed": 42,
+  "retinue_implementation_revision": "73616a78b45837765b638b5f16bff0e8c6a7126a",
+  "retinue_receipt_revision": "2ee6f0ce7d37f7becc5a793efadc9dd9db4620a2",
+  "peer_artifact_matches_producer_validation": true,
+  "report_hashes_match": true,
+  "checks": [
+    {
+      "command": "cargo test --locked --offline -p mere-mesh --features admitted-ingress --lib",
+      "status": "pass",
+      "passed": 124
+    },
+    {
+      "command": "cargo test --locked --offline -p stickleback --lib",
+      "status": "pass",
+      "passed": 99
+    },
+    {
+      "command": "cargo test --locked --offline -p distillery --test record_ingress",
+      "status": "pass",
+      "passed": 1
+    },
+    {
+      "command": "cargo test --locked --offline -p mere-transport --lib",
+      "run": "first",
+      "status": "pass",
+      "passed": 56,
+      "ignored": 1
+    },
+    {
+      "command": "cargo test --locked --offline -p mere-transport --lib",
+      "run": "repeat on refreshed main",
+      "status": "fail",
+      "passed": 55,
+      "failed": 1,
+      "ignored": 1,
+      "failure": "existing simultaneous-dial gossip test: pair 5 link stopped delivering at 5.334750916s"
+    },
+    {
+      "command": "cargo test --locked --offline -p mere-transport --lib both_sides_dialling_at_once_stays_connected_while_the_link_delivers -- --exact p2panda_transport::tests::both_sides_dialling_at_once_stays_connected_while_the_link_delivers --nocapture",
+      "status": "pass",
+      "passed": 1
+    },
+    {
+      "command": "cargo clippy --locked --offline -p mere-mesh --features admitted-ingress --lib --example inventory_ingress",
+      "status": "pass",
+      "new_source_warnings": 0,
+      "existing_warnings_preserved": true
+    },
+    {
+      "command": "rustfmt --edition 2024 --config skip_children=true --check SCOPED_RUST_FILES",
+      "status": "pass"
+    },
+    {
+      "command": "python3 run.py RETINUE_PEER NEW_OUTPUT_DIRECTORY",
+      "status": "pass",
+      "independent_processes": 2,
+      "semantic_outcomes_equal": true,
+      "fresh_process_durable_reopen_per_campaign": true
+    },
+    {
+      "command": "cargo test --locked --offline -p distillery --test record_ingress",
+      "run": "post-rebase onto current main",
+      "status": "pass",
+      "passed": 1
+    }
+  ],
+  "documentation": {
+    "new_audit_findings": 0,
+    "baseline_counts": {
+      "active_docs": 268,
+      "indexed_active_docs": 267,
+      "index_orphans": 0,
+      "index_ghosts": 0,
+      "memory_directory_links": 0,
+      "statusless_plans": 0,
+      "broken_relative_links": 32,
+      "historical_broken_relative_links": 245,
+      "planned_broken_relative_links": 0,
+      "ambiguous_known_root_paths": 101,
+      "ignored_known_root_patterns": 23,
+      "reserved_identifier_paths": 24,
+      "missing_known_root_paths": 224,
+      "historical_missing_known_root_paths": 237,
+      "planned_missing_known_root_paths": 6,
+      "invalid_historical_annotations": 0,
+      "stale_historical_annotations": 0,
+      "unheaded_owned_sources": 12,
+      "exhibit_b_sources": 0
+    }
+  },
+  "scope": {
+    "ingress_composition_accepted": true,
+    "whole_transport_suite_consistently_green": false,
+    "actual_quic": true,
+    "actual_notochord": true,
+    "actual_raptorq": true,
+    "same_existing_mesh_owner": true,
+    "original_signed_bytes_preserved": true,
+    "radio_or_mcu": false,
+    "native_ui": false,
+    "worker_execution": false
+  },
+  "log_sha256": {
+    "mesh-test.log": "df25f19173847dc8ab524b019b1337f29594f0e1b37bc0a7f7a013c106359a8b",
+    "resident-test.log": "83763b46203e9460449d54d5fcd08aec4edad45f2f34310d676895f84ef0569d",
+    "stickleback-test.log": "4d20560f3c2568e69fc2d81b7a4a697c1ac56b698834c9e19075654876dafaab",
+    "transport-first.log": "34aa939250fce882518c3fce6b03f782954905994645198b37e39596121e2adc",
+    "transport-repeat.log": "44cff3c513bad1c50f4787cb26bf0d5eda46f461512f536135d3875d35dd4547",
+    "transport-retry.log": "41af7575cf1bae288ffb90b5e0f052de022662b7b0626b6ed407117e81362a24",
+    "clippy.log": "858c30042f862a7a33f2d1f473860fb7fae757002b4388639ded4e599ce48010",
+    "resident-post-rebase.log": "829d2f9559de924ac51944251918a4141f89442c661e0c18cabab12a9179fdd9"
+  },
+  "implementation_revision": "26eb8038dd076ce2a449d675a15036502bfebbb7",
+  "rebased_onto_revision": "07608969b3924218799ece6c07d14cab4c524077",
+  "captured_source_and_lock_inputs_unchanged_after_rebase": true
+}

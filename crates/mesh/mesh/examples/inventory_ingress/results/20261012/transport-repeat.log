@@ -1,0 +1,106 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling stickleback v0.1.1 (<MERE>/crates/stickleback)
+   Compiling mere-transport v0.0.2 (<MERE>/crates/murm/transport)
+warning: missing documentation for an associated function
+   --> crates/murm/transport/src/p2panda_transport.rs:637:5
+    |
+637 |     pub fn builder_from_seed_ref(signing_seed: &[u8; 32]) -> P2pandaTransportBuilder<'static> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+note: the lint level is defined here
+   --> crates/murm/transport/src/lib.rs:46:9
+    |
+ 46 | #![warn(missing_docs)]
+    |         ^^^^^^^^^^^^
+
+warning: `mere-transport` (lib test) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.79s
+     Running unittests src/lib.rs (target/debug/deps/transport-f09ef7f4ab9d063a)
+
+running 57 tests
+test accepted::tests::reticulum_context_carries_interface_and_link ... ok
+test accepted::tests::a_webrtc_session_reports_no_transport_authentication ... ok
+test accepted::tests::webrtc_context_carries_the_link_and_no_interface ... ok
+test blobs::tests::blob_hash_round_trips_through_bytes ... ok
+test accepted::tests::bare_contexts_have_no_bearer_detail ... ok
+test accepted::tests::authenticated_only_when_a_peer_is_present ... ok
+test blobs::tests::memory_store_is_not_persistent_but_still_flushes ... ok
+test blobs::tests::get_missing_blob_returns_not_found ... ok
+test blobs::tests::has_reports_presence ... ok
+test blobs::tests::put_is_deterministic_by_content ... ok
+test blobs::tests::different_content_yields_different_hash ... ok
+test blobs::tests::empty_blob_round_trips ... ok
+test blobs::tests::put_then_get_returns_same_bytes ... ok
+test blobs::tests::scoped_authority_requires_reader_and_custody_for_the_exact_hash ... ok
+test blobs::tests::read_range_walks_a_blob_without_rereading_it ... ok
+test memory::tests::bytes_round_trip_through_paired_streams ... ok
+test memory::tests::connect_then_accept_yields_paired_streams ... ok
+test memory::tests::connect_to_wrong_peer_is_refused ... ok
+test memory::tests::different_alpns_route_independently ... ok
+test blobs::tests::named_custody_releases_only_its_own_claim ... ok
+test blobs::tests::scoped_leases_share_bytes_and_survive_independent_release ... ok
+test blobs::tests::fetch_from_remote_peer_round_trips_blob ... ok
+test memory::tests::multiple_concurrent_connects_on_same_alpn_each_get_their_stream ... ok
+test memory::tests::pair_local_peer_ids_match_construction ... ok
+test blobs::tests::blob_protocol_refuses_a_transport_authenticated_unadmitted_peer ... ok
+test p2panda_transport::tests::binds_with_mdns_and_random_walk_together ... ok
+test p2panda_host::tests::shared_host_policy_does_not_share_node_identity ... ok
+test p2panda_transport::tests::a_peer_off_the_overlay_that_closes_reads_not_connected_within_a_second ... ok
+test blobs::tests::scoped_blob_serving_refuses_cross_scope_reads_and_live_revocation ... ok
+test p2panda_transport::tests::a_peer_tagged_before_its_address_is_joined_once_the_address_arrives ... ok
+test p2panda_transport::tests::binds_with_mdns_discovery ... ok
+test p2panda_transport::tests::binds_with_random_walk_discovery ... ok
+test p2panda_transport::tests::killed_peer_child ... ignored, a child process of the killed-peer tests
+test blobs::tests::disk_backed_collecting_store_reclaims_released_bytes ... ok
+test blobs::tests::disk_backed_blobs_survive_a_reopen ... ok
+test p2panda_transport::tests::raw_seed_constructor_preserves_peer_identity ... ok
+test blobs::tests::scoped_leases_reopen_with_their_custody_scope ... ok
+test p2panda_transport::tests::paired_p2panda_transports_round_trip_bytes ... ok
+test p2panda_transport::tests::shutdown_keeps_a_small_final_frame_alive_until_acknowledged ... ok
+test peer_route::tests::a_garbled_ticket_is_an_error_not_an_empty_route ... ok
+test peer_route::tests::a_ticket_round_trips_its_direct_and_relay_addresses ... ok
+test p2panda_transport::tests::gossip_propagates_ops_between_subscribed_peers ... ok
+test p2panda_transport::tests::unregistered_alpn_accept_returns_error ... ok
+test tests::alpn_equality_and_hashing ... ok
+test tests::alpn_from_str_round_trips ... ok
+test tests::empty_alpn_reports_empty ... ok
+test tests::peer_id_from_implements_from_pubkey ... ok
+test tests::peer_id_carries_public_key_equality ... ok
+test tests::peer_id_round_trips_through_bytes ... ok
+test tests::peer_id_works_as_hashmap_key ... ok
+test p2panda_transport::tests::ticket_round_trips_identity_and_registers_the_peer ... ok
+test p2panda_transport::tests::a_stopped_peer_reads_not_connected_once_its_neighbour_goes_down ... ok
+test p2panda_transport::tests::the_peer_directory_separates_a_known_address_from_a_live_path ... ok
+test p2panda_transport::tests::connections_the_transport_did_not_open_are_counted ... ok
+test p2panda_transport::tests::without_the_hook_the_killed_peer_scenario_fails ... ok
+test p2panda_transport::tests::both_sides_dialling_at_once_stays_connected_while_the_link_delivers ... FAILED
+test p2panda_transport::tests::a_killed_peer_off_the_overlay_reads_not_connected_when_its_connection_closes has been running for over 60 seconds
+test p2panda_transport::tests::a_killed_peer_off_the_overlay_reads_not_connected_when_its_connection_closes ... ok
+
+failures:
+
+---- p2panda_transport::tests::both_sides_dialling_at_once_stays_connected_while_the_link_delivers stdout ----
+pair 0: connected throughout 7s; control so far None
+pair 1: connected throughout 7s; control so far None
+pair 2: connected throughout 7s; control so far None
+pair 3: connected throughout 7s; control so far None
+pair 4: connected throughout 7s; control so far None
+
+thread 'p2panda_transport::tests::both_sides_dialling_at_once_stays_connected_while_the_link_delivers' (26699057) panicked at crates/murm/transport/src/p2panda_transport/tests.rs:694:13:
+pair 5: the link stopped delivering at 5.334750916s
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    p2panda_transport::tests::both_sides_dialling_at_once_stays_connected_while_the_link_delivers
+
+test result: FAILED. 55 passed; 1 failed; 1 ignored; 0 measured; 0 filtered out; finished in 152.46s
+
+error: test failed, to rerun pass `-p mere-transport --lib`
