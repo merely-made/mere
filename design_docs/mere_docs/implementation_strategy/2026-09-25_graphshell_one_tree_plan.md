@@ -1185,6 +1185,51 @@ native/touch qualification and complete one-tree phase 4 remain separate.
 The latest release measurement stays bound to `8ad44a5c7`; no new release size
 is inferred from these debug packages.
 
+### Viewer delivery budget (2026-10-12; implementation in progress)
+
+Mark authorized reducing the viewer below R157's unchanged 3,407,872-byte
+(3.25 MiB) gzip limit so the site can replace its sandbox. Work starts on
+`codex/viewer-size-budget` from published `ea9239a3f`, preserving the accepted
+presenter, commands, Fold/history and explicit unsupported-product/remote routes.
+The first load remains frozen under the site's separate 64 KiB cap.
+
+**Target:** remove capabilities outside the read-only cone, select a reproducible
+shipping profile, enforce all asset caps, and qualify the exact candidate before
+site adoption. No cap increase, new source authority or fork of the site's data.
+Platen's document producer is now a default-on `document-layout` capability;
+its pane plans, geometry and structural accessibility build without it.
+Graphshell's native and product hosts keep document layout, while the viewer
+selects the portable model. This prevents an unused document producer from
+activating Parley's dictionary segmentation throughout the viewer cone. The
+text engine and dictionary data are not patched. Consumer feature inspection
+must retain the full document capability in the product build.
+
+**Exploratory evidence:** a fresh no-defaults baseline is 6,416,541 B gzip.
+Five ICU dictionary blobs are found byte-for-byte in its data segment; the
+feature path is Graphshell web → Platen → document-canvas → Parley complex
+scripts. Separating that producer reduces the same-profile package to
+3,910,153 B gzip, still 502,281 B over budget. Fifty portable Platen tests and
+54 default-feature tests pass, including document scene tests. `wasm-opt`
+`-Os`, `-Oz` and converged `-Oz` each worsen compressed size, with the failed
+measurements retained. A separate `viewer` profile inherits release, uses `z`
+and full LTO, and leaves the established full-page release profile unchanged;
+its first exploratory package is 3,383,277 B gzip9 and 3,398,093 B gzip6.
+Both fit narrowly. Normal shipping compilation, upstream reconciliation and
+exact-package hardware acceptance remain pending. The build script enforces
+all four interaction caps at both gzip levels, with two regression controls
+covering compressible raw size and incompressible budget refusal.
+
+**Done when:** the normal shipping build and exact deployment recipe fit each
+R157 cap with source/profile/feature/package hashes and an automated regression
+gate; portable/default Platen, viewer/product/main-page compile and relevant
+shared tests pass; the exact optimized viewer receives a serialized hardware
+browser check for presenter, controls, accessibility, Fold/history, physics and
+clean product/remote refusals. Compare reading and text behavior on the actual
+site disclosure and representative Unicode inputs. Preserve static/mobile and
+non-WebGPU reading, first-interaction loading, source validation and failure
+fallbacks during site replacement. The final source is reconciled with upstream
+before publication; exploratory measurements do not transfer acceptance.
+
 ## 5. Stop rules
 
 - Nothing a screen reader reaches today is lost: a control moves only once
