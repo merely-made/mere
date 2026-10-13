@@ -6,6 +6,11 @@ The design-docs index for the [Mere](../README.md) workspace. All authoritative
 project documentation belongs under `design_docs/`. Entries are one line each;
 the deep rationale lives in the doc itself.
 
+Browser history (2026-10-12): [Eidetic P5](eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md#first-browser-encounter-qualification-2026-10-12)
+records the first source-scoped visit/parent intake and document-relation evidence,
+with native regression, separate-process disk reopening, API simulations and
+browser compilation. Renewed headed browser capture and sealed custody stay open.
+
 Knot adoption (2026-10-11): the [projection grammar adoption plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#knot-authored-scene-adoption-in-mere-2026-10-11) records Knot's published retained-placement qualification and Mere's coordinated editor/document/site repin. Embedded resolution, isolated host checks and publication are recorded separately from Knot's native synthetic-identity receipt. Knot's newer live-dynamics consumer, explicit Keep placement, preview-toolbar qualification and completion/refusal feedback are recorded in the [dynamics handoff](mere_docs/research/2026-10-09_scenograph_codex_handoff.md); personal custody and coordinated adoption of that newer milestone remain separate gates.
 
 Current bounded proofs (2026-09-05): the [projection grammar adoption plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md) records executable Graphshell authoring, the interactive practice workspace with retained rendering and measured compiler improvements, and the two-peer Woodshed comparison space with signed admission, authority filtering, and offline disk reopening; fixture scope and source-hashed receipts are explicit.
