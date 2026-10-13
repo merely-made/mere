@@ -1,0 +1,38 @@
+{
+  "status": "Diagnostic source passes exact-current-main production check and Moot production builds; runtime diagnosis pending",
+  "trace_commit": "07d415c52ba6a83b46c0c40ef10f7c3b666c1034",
+  "compiled_cherry_pick": "c4fee1cba",
+  "same_stable_patch_id": "ceeeb4fce6cbf3382e8ecb92646d509ae1f403cd",
+  "full_file_difference": "Root current-main file additionally contains already-published14-line retired-hover liveness guard; no combined runtime claim",
+  "production_builds": [
+    {
+      "label": "native-trace-build",
+      "exit": 0,
+      "seconds": 36.17
+    },
+    {
+      "label": "native-product-trace-build",
+      "exit": 0,
+      "seconds": 10.04
+    }
+  ],
+  "runtime": "No runtime result on r2 yet; original c57 failure remains incomplete; expired unchanged-binary preflight refused launch",
+  "acceptance_thresholds": "unchanged",
+  "renderer_pins": "unchanged",
+  "retry_policy": "unchanged",
+  "source_review": "Independent reviewer found no retained GPU resources/control-flow changes or premature presentation claim",
+  "remaining": "Moot fresh finite trace-only runtime under explicit handoff",
+  "current_main_check": {
+    "source_commit": "07d415c52ba6a83b46c0c40ef10f7c3b666c1034",
+    "frame_sha256": "3829e3238ab2ed20460e8a0e8fcc2fea3a3681a1fc9ed580c446685f4b7a4c85",
+    "exit": 0,
+    "seconds": 14.136,
+    "deadline_seconds": 100,
+    "jobs": 2,
+    "incremental": false,
+    "debug": false,
+    "gpu": false
+  },
+  "cache_release": "Explicitly returned mere-s2s3 to Moot immediately after single14.136sec check",
+  "documentation_audit": "Four inherited D2 errors, existing locator findings and12foreignheader findings remain separate; own modified frame header intact"
+}
