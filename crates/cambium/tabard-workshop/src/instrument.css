@@ -1,0 +1,43 @@
+/* Copyright 2026 Mark Alan Boykin
+ * This Source Code Form is subject to the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ * SPDX-License-Identifier: MPL-2.0 */
+
+.tabard-workshop.instrument-workspace { background: var(--workspace-canvas); }
+.tabard-workshop.instrument-workspace h1 { font-size: 18px; font-weight: 500; }
+.tabard-workshop.instrument-workspace h2 { font-size: 15px; font-weight: 500; }
+.tabard-workshop.instrument-workspace h3 { font-size: 13px; font-weight: 500; }
+.tabard-workshop.instrument-workspace .brand-title p, .tabard-workshop.instrument-workspace .save-state { color: var(--workspace-muted); }
+.tabard-workshop.instrument-workspace .tabard-mark { width: 26px; height: 30px; border-radius: 0; font-size: 20px; font-weight: 500; background: var(--workspace-accent); color: var(--workspace-accent-ink); }
+.tabard-workshop.instrument-workspace .theme-editor { width: 276px; padding: 0 14px 16px; background: var(--workspace-surface); border-color: var(--workspace-rule); }
+.tabard-workshop.instrument-workspace .theme-editor > .workspace-pane-header { padding-left: 0; padding-right: 0; margin-bottom: 16px; }
+.tabard-workshop.instrument-workspace .preview-area { padding: 0; background: var(--workspace-canvas); }
+.tabard-workshop.instrument-workspace .preview-area > .workspace-pane-header { margin-bottom: 12px; }
+.tabard-workshop.instrument-workspace .mode-picker { gap: 4px; }
+.tabard-workshop.instrument-workspace .specimen-grid { gap: 0; }
+.tabard-workshop.instrument-workspace .specimen-card { width: 50%; min-width: 245px; padding: 0 12px 12px; }
+.tabard-workshop.instrument-workspace .specimen-card > .workspace-pane-header { padding-left: 0; padding-right: 0; margin-bottom: 0; background: var(--workspace-canvas); }
+.tabard-workshop.instrument-workspace .specimen { border-radius: 0; border: 1px solid var(--workspace-rule); }
+.tabard-workshop.instrument-workspace .muted, .tabard-workshop.instrument-workspace .field-label, .tabard-workshop.instrument-workspace .channel-label, .tabard-workshop.instrument-workspace .control-note, .tabard-workshop.instrument-workspace .footer-note { color: var(--workspace-muted); font-size: 12px; }
+.tabard-workshop.instrument-workspace .channel-value, .tabard-workshop.instrument-workspace .hex-value { color: var(--workspace-ink); }
+.tabard-workshop.instrument-workspace .name-control { margin-bottom: 14px; }
+.tabard-workshop.instrument-workspace .control-group { margin-top: 14px; }
+.tabard-workshop.instrument-workspace .seed-button { padding: 6px 8px; }
+.tabard-workshop.instrument-workspace .seed-value { border-radius: 0; border-color: var(--workspace-rule); padding: 6px; }
+.tabard-workshop.instrument-workspace .large-swatch, .tabard-workshop.instrument-workspace .palette-swatch { border-radius: 0; border-color: var(--workspace-rule); }
+.tabard-workshop.instrument-workspace .tabard-text-input, .tabard-workshop.instrument-workspace .tabard-stylesheet-input { background: var(--workspace-control); color: var(--workspace-ink); border-color: var(--workspace-rule); border-radius: 0; font-family: var(--tabard-font-interface, sans-serif); }
+.tabard-workshop.instrument-workspace .tabard-stylesheet-input, .tabard-workshop.instrument-workspace .seed-value .tabard-text-input { font-family: var(--tabard-font-code, monospace); }
+.tabard-workshop.instrument-workspace .slider-track { background: var(--workspace-control); border-color: var(--workspace-rule); }
+.tabard-workshop.instrument-workspace .slider-thumb { background: var(--workspace-accent); border-color: var(--workspace-surface); }
+.tabard-workshop.instrument-workspace .application-canvas { border-radius: 0; border-color: var(--workspace-rule); }
+.tabard-workshop.instrument-workspace .stylesheet-panel, .tabard-workshop.instrument-workspace .palette-section { margin: 12px; padding-top: 12px; border-color: var(--workspace-rule); }
+.tabard-workshop.instrument-workspace .palette-section h3, .tabard-workshop.instrument-workspace .palette-item, .tabard-workshop.instrument-workspace .palette-hex { color: var(--workspace-muted); }
+.tabard-workshop.instrument-workspace .palette-hex { font-size: 11px; }
+.tabard-workshop.instrument-workspace .workshop-footer { padding: 8px 14px; color: var(--workspace-muted); background: var(--workspace-surface); border-color: var(--workspace-rule); }
+.tabard-workshop.instrument-workspace .typography-controls button[aria-pressed=true] { background: var(--workspace-selected); color: var(--workspace-selected-ink); }
+@media (max-width: 720px) {
+    .tabard-workshop.instrument-workspace .theme-editor { width: 100%; border-right: 0; border-bottom: 1px solid var(--workspace-rule); }
+    .tabard-workshop.instrument-workspace .specimen-card { width: 100%; }
+    .tabard-workshop.instrument-workspace .seed-button { flex-basis: 44%; }
+}
