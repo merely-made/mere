@@ -396,7 +396,7 @@ impl Canvas {
             self.paused_positions = Some(seeds.clone());
         }
         self.reset_frame_time();
-        self.physics.seed(seeds);
+        self.physics.reset_field_runtime(seeds);
         self.settle_physics(SETTLE_TICKS);
         true
     }

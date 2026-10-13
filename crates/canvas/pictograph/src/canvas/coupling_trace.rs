@@ -10,6 +10,18 @@ use std::num::NonZeroUsize;
 use super::Canvas;
 
 impl Canvas {
+    pub fn field_clock(&self) -> seiche::FieldClock {
+        self.physics.field_clock()
+    }
+    pub fn coupling_membership(&self) -> Option<&seiche::CouplingMembershipFrame> {
+        self.physics.coupling_membership()
+    }
+    /// Explicit owner handler, invoked on the physics thread. Reading reports
+    /// never invokes an action. The owner validates its own domain operation.
+    pub fn set_coupling_entry_handler(&mut self, handler: Option<seiche::CouplingEntryHandler>) {
+        self.physics.set_coupling_entry_handler(handler);
+    }
+
     /// Enable observations with an explicit row cap, or disable with `None`.
     /// This records no graph edits and does not request simulation ticks.
     pub fn set_coupling_trace_limit(&mut self, limit: Option<NonZeroUsize>) {
@@ -114,3 +126,7 @@ mod tests {
         assert_ne!(other.coupling_trace().unwrap().session, old.session);
     }
 }
+
+#[cfg(test)]
+#[path = "field_runtime_tests.rs"]
+mod field_runtime_tests;

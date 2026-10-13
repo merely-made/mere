@@ -112,7 +112,7 @@ impl Canvas {
             self.view.set_position(key, pos);
         }
         self.reset_frame_time();
-        self.physics.seed(positions);
+        self.physics.reset_field_runtime(positions);
         self.reset_frame_time();
         self.physics.halt();
         self.generation += 1;

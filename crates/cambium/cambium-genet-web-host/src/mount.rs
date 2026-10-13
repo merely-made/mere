@@ -67,7 +67,26 @@ where
 /// application's init against the frame it will present on, build the runner,
 /// attach accessibility, then draw once so the first frame exists before any
 /// event arrives.
-pub async fn mount<State, Logic, V>(
+#[inline(never)]
+pub fn mount<State, Logic, V>(
+    canvas: HtmlCanvasElement,
+    options: HostOptions,
+    init: impl FnOnce(
+        &dyn HostWindow,
+        &cambium_rootstock::WindowCommands,
+        &HostWake,
+    ) -> Init<State, Logic>,
+    hooks: HostHooks<State, Logic, V>,
+) -> std::pin::Pin<Box<impl std::future::Future<Output = Result<Mounted<State, Logic, V>, String>>>>
+where
+    State: 'static,
+    Logic: FnMut(&State) -> V + 'static,
+    V: RootView<State>,
+{
+    Box::pin(mount_inner(canvas, options, init, hooks))
+}
+
+async fn mount_inner<State, Logic, V>(
     canvas: HtmlCanvasElement,
     options: HostOptions,
     init: impl FnOnce(
