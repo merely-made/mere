@@ -1,0 +1,14 @@
+[
+  {
+    "path": "ports/djinn/install-ssh-server-windows.ps1",
+    "before_sha256": "4aec6fb3ca7fa6da70664f18d3ef3dbffc5e8d90aa15e27a7ec9a09e43c192a0",
+    "after_sha256": "7bb271b094a60d8551ea779e379ee027018cc21fcfc06b0258c4f70c06b3fc0b",
+    "change": "Exhibit A comment only; all other bytes identical"
+  },
+  {
+    "path": "scripts/djinn-ssh-control.py",
+    "before_sha256": "7c386fd8ad5b8fe7980bba750f580082511a0cc87f4881cb4397cdc0cd825cac",
+    "after_sha256": "3535132e251e1e1db4f7eeaca1877eb86f3abea191515837071cbcde2b49e3b0",
+    "change": "Exhibit A comment only; all other bytes identical"
+  }
+]

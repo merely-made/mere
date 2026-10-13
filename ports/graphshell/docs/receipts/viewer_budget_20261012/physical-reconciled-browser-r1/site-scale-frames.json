@@ -1,0 +1,1218 @@
+{
+  "receipt": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        1140,
+        905
+      ],
+      "canvas_physical_size": [
+        1140,
+        905
+      ],
+      "log": [
+        "Ruling 107 site-size frame diagnostic complete",
+        "timing site-paused frames=62 interval_ms p50=16.700 p95=18.700 max=18.900 cpu_ms p50=5.200 p95=5.800 max=5.900 gpu_ms p50=13.313 p95=13.817 max=14.088 producer_render_us p50=900.000 p95=1000.000 max=1400.000 producer_stage_us p50=100.000 p95=200.000 max=200.000 cull p50=0.000 p95=0.000 max=0.100 dom_frame p50=0.000 p95=0.100 max=0.100 dom_mutate p50=0.000 p95=0.100 max=0.100 dom_prepare p50=0.000 p95=0.100 max=0.100 faces p50=0.100 p95=0.200 max=0.200 lower p50=0.000 p95=0.100 max=0.200 overlays p50=0.000 p95=0.000 max=0.000 physics p50=0.000 p95=0.100 max=0.400 prepare p50=0.100 p95=0.200 max=0.200 rasterize p50=0.500 p95=0.600 max=0.700 underlay p50=0.100 p95=0.100 max=0.100",
+        "timing site-live-1 frames=122 interval_ms p50=16.700 p95=17.800 max=20.100 cpu_ms p50=10.200 p95=11.200 max=12.400 gpu_ms p50=16.734 p95=18.191 max=18.963 producer_render_us p50=5500.000 p95=6100.000 max=6400.000 producer_stage_us p50=100.000 p95=100.000 max=200.000 cull p50=0.000 p95=0.000 max=0.100 dom_frame p50=1.500 p95=1.600 max=1.800 dom_mutate p50=3.100 p95=3.400 max=3.600 dom_prepare p50=0.000 p95=0.100 max=0.200 faces p50=0.100 p95=0.100 max=0.200 lower p50=0.000 p95=0.100 max=0.100 overlays p50=0.000 p95=0.000 max=0.100 physics p50=0.100 p95=0.200 max=0.200 prepare p50=0.100 p95=0.200 max=0.200 rasterize p50=0.500 p95=0.600 max=0.800 underlay p50=0.100 p95=0.100 max=0.200",
+        "timing site-live-2 frames=122 interval_ms p50=16.800 p95=18.000 max=18.700 cpu_ms p50=10.000 p95=11.200 max=11.500 gpu_ms p50=16.660 p95=18.031 max=19.044 producer_render_us p50=5400.000 p95=5900.000 max=6200.000 producer_stage_us p50=100.000 p95=200.000 max=200.000 cull p50=0.000 p95=0.000 max=0.100 dom_frame p50=1.500 p95=1.600 max=1.800 dom_mutate p50=3.000 p95=3.400 max=3.500 dom_prepare p50=0.000 p95=0.100 max=0.100 faces p50=0.100 p95=0.100 max=0.200 lower p50=0.000 p95=0.100 max=0.100 overlays p50=0.000 p95=0.000 max=0.100 physics p50=0.100 p95=0.200 max=0.200 prepare p50=0.100 p95=0.200 max=0.200 rasterize p50=0.500 p95=0.600 max=1.000 underlay p50=0.000 p95=0.100 max=0.200",
+        "timing site-live-3 frames=122 interval_ms p50=16.800 p95=17.800 max=19.300 cpu_ms p50=10.200 p95=11.200 max=12.500 gpu_ms p50=16.723 p95=17.922 max=18.736 producer_render_us p50=5300.000 p95=5800.000 max=6900.000 producer_stage_us p50=100.000 p95=200.000 max=200.000 cull p50=0.000 p95=0.000 max=0.100 dom_frame p50=1.500 p95=1.600 max=1.800 dom_mutate p50=3.000 p95=3.300 max=3.600 dom_prepare p50=0.000 p95=0.100 max=0.100 faces p50=0.100 p95=0.200 max=0.200 lower p50=0.000 p95=0.100 max=0.100 overlays p50=0.000 p95=0.000 max=0.100 physics p50=0.100 p95=0.200 max=0.300 prepare p50=0.100 p95=0.100 max=0.200 rasterize p50=0.500 p95=0.600 max=1.100 underlay p50=0.000 p95=0.100 max=0.200",
+        "pace: speed 1 effective 0.972 bound false ticks 31 over 30 frames drawn-moved 28 stepped 26 compute-max 12200 us over-budget-max -9223372036854775808 us budget 8333 us (0.5 of a 16.67 ms display period, fallback at 0.25 from the worker; last frame 16.5 ms) margin 200 us; every window: worst none us, 0 frames past the grain",
+        "pace: speed 1 effective 0.998 bound false ticks 61 over 30 frames drawn-moved 30 stepped 28 compute-max 200 us over-budget-max -9223372036854775808 us budget 8333 us (0.5 of a 16.67 ms display period, fallback at 0.38 from the worker; last frame 17.7 ms) margin 200 us; every window: worst none us, 0 frames past the grain",
+        "pace: speed 1 effective 1.001 bound false ticks 91 over 30 frames drawn-moved 30 stepped 29 compute-max 200 us over-budget-max -9223372036854775808 us budget 8333 us (0.5 of a 16.67 ms display period, fallback at 0.30 from the worker; last frame 16.0 ms) margin 200 us; every window: worst none us, 0 frames past the grain",
+        "pace: speed 1 effective 1.001 bound false ticks 121 over 30 frames drawn-moved 30 stepped 27 compute-max 200 us over-budget-max -9223372036854775808 us budget 8333 us (0.5 of a 16.67 ms display period, fallback at 0.38 from the worker; last frame 17.2 ms) margin 200 us; every window: worst none us, 0 frames past the grain",
+        "pace: speed 1 effective 0.970 bound false ticks 151 over 30 frames drawn-moved 30 stepped 29 compute-max 200 us over-budget-max -9223372036854775808 us budget 8333 us (0.5 of a 16.67 ms display period, fallback at 0.38 from the worker; last frame 17.2 ms) margin 200 us; every window: worst none us, 0 frames past the grain",
+        "physics site-live-1: law spring.rapier nodes 21 energy 2956.4 spread 198 overlaps 0 device off device-steps 0 cpu-steps 0 submissions 0 answers 0 failures 0 waiting 0 stale 0 mismatched 0 last-age 0 layout-outside 0 layout-extent -250,-245,240,256 view-extent -575,-447,565,458 view-follow true",
+        "pace site-live-1: speed 1 effective 0.999 (marked none, ratio none) budget 8333 us margin 200 us display period 16.667 ms (fallback, fitting 0.38 of the recent intervals from the worker, a 100 us clock); every window: 0 frames the gate admitted ticks in, worst none us over budget (no frame), 0 past the grain; 0 floor-only frames past it; bar none",
+        "intervals site-live-1: 16.000 17.700 16.800 17.200 15.600 16.000 17.300 15.900 16.500 17.500 16.700 16.000 17.300 17.100 17.200 15.600 17.100 16.800 15.800 17.200 17.200 15.500 16.800 17.300 16.100 16.400 17.800 16.000 16.000 17.700 16.700 16.000 17.600 17.400 16.600 16.000 16.000 16.100 17.000 17.100 15.900 17.000 17.200 15.900 17.100 16.900 17.100 15.400 17.000 17.500 15.800 17.200 15.900 17.200 16.200 17.200 17.900 16.900 16.000 17.200 14.800 17.200 17.100 17.700 16.600 16.700 16.600 16.000 17.100 15.900 16.000 17.100 16.000 16.700 17.200 17.200 15.900 17.000 15.900 17.700 15.700 17.200 17.100 15.900 17.500 16.000 16.800 16.300 17.400 15.900 17.200 17.200 16.000 17.400 15.800 18.300 15.800 15.800 18.500 15.400 16.000 17.800 15.700 17.000 17.300 15.900 17.300 16.700 16.300 16.900 15.700 16.800 16.800 17.100 16.200 17.300 16.400 16.900 16.600 16.300",
+        "intervals-worker site-live-1: 14.700 17.200 17.000 16.000 17.400 16.000 17.700 16.900 17.200 15.500 16.000 17.300 15.900 16.600 17.400 16.700 16.000 17.300 17.100 17.100 15.700 17.200 16.700 15.900 17.100 17.200 15.500 16.800 17.400 15.900 16.400 17.900 16.000 16.000 17.800 16.600 16.000 17.600 17.400 16.700 16.000 15.900 16.000 17.100 17.100 15.900 17.000 17.200 15.900 17.000 17.000 17.200 15.300 17.100 17.400 15.800 17.300 15.800 17.100 16.300 17.200 17.900 16.900 16.000 17.200 14.800 17.300 17.000 17.700 16.600 16.700 16.700 15.900 17.200 15.800 16.000 17.200 15.900 16.600 17.300 17.300 15.800 17.100 15.900 17.700 15.600 17.200 17.200 15.900 17.500 16.000 16.700 16.400 17.400 15.900 17.100 17.100 16.000 17.500 15.800 18.300 15.800 15.800 18.500 15.500 15.900 17.700 15.900 16.900 17.300 16.000 17.200 16.800 16.200 16.900 15.800 16.700 16.800 17.100 16.200",
+        "pace: speed 1 effective 0.998 bound false ticks 181 over 30 frames drawn-moved 30 stepped 28 compute-max 200 us over-budget-max -9223372036854775808 us budget 8333 us (0.5 of a 16.67 ms display period, fallback at 0.38 from the worker; last frame 16.6 ms) margin 200 us; every window: worst none us, 0 frames past the grain",
+        "pace: speed 1 effective 1.027 bound false ticks 212 over 30 frames drawn-moved 30 stepped 24 compute-max 200 us over-budget-max -9223372036854775808 us budget 8333 us (0.5 of a 16.67 ms display period, fallback at 0.35 from the worker; last frame 18.1 ms) margin 200 us; every window: worst none us, 0 frames past the grain",
+        "pace: speed 1 effective 1.029 bound false ticks 242 over 30 frames drawn-moved 30 stepped 24 compute-max 200 us over-budget-max -9223372036854775808 us budget 8333 us (0.5 of a 16.67 ms display period, fallback at 0.35 from the worker; last frame 17.9 ms) margin 200 us; every window: worst none us, 0 frames past the grain",
+        "pace: speed 1 effective 1.027 bound false ticks 272 over 30 frames drawn-moved 30 stepped 22 compute-max 200 us over-budget-max -9223372036854775808 us budget 8333 us (0.5 of a 16.67 ms display period, fallback at 0.30 from the worker; last frame 16.8 ms) margin 200 us; every window: worst none us, 0 frames past the grain",
+        "pace: speed 1 effective 1.029 bound false ticks 302 over 30 frames drawn-moved 30 stepped 26 compute-max 200 us over-budget-max -9223372036854775808 us budget 8333 us (0.5 of a 16.67 ms display period, fallback at 0.40 from the worker; last frame 15.6 ms) margin 200 us; every window: worst none us, 0 frames past the grain",
+        "physics site-live-2: law spring.rapier nodes 21 energy 905.1 spread 226 overlaps 0 device off device-steps 0 cpu-steps 0 submissions 0 answers 0 failures 0 waiting 0 stale 0 mismatched 0 last-age 0 layout-outside 0 layout-extent -284,-279,275,291 view-extent -575,-446,565,459 view-follow true",
+        "pace site-live-2: speed 1 effective 1.029 (marked none, ratio none) budget 8333 us margin 200 us display period 16.667 ms (fallback, fitting 0.45 of the recent intervals from the worker, a 100 us clock); every window: 0 frames the gate admitted ticks in, worst none us over budget (no frame), 0 past the grain; 0 floor-only frames past it; bar none",
+        "intervals site-live-2: 16.000 16.800 17.000 15.800 16.800 16.900 17.100 17.300 15.600 18.200 16.200 17.300 15.500 17.400 15.500 16.200 18.100 17.300 15.800 16.900 15.300 17.100 17.600 16.600 15.500 17.900 15.900 17.100 17.000 17.200 15.500 17.700 17.000 15.300 17.000 16.200 16.900 16.500 17.300 15.900 16.900 17.200 17.000 15.700 16.200 16.600 17.900 16.400 16.100 17.900 15.900 15.900 17.100 17.300 16.700 16.700 15.900 16.900 17.300 15.400 16.800 18.100 16.300 15.600 17.500 15.900 16.900 17.400 16.000 17.100 16.900 17.100 15.000 17.900 15.600 18.500 16.800 16.600 16.700 16.700 14.500 18.200 17.200 16.600 14.700 17.700 15.900 16.400 18.100 15.400 17.100 18.200 16.700 16.600 15.700 17.400 16.400 17.300 16.600 16.700 16.600 16.700 16.700 16.600 16.700 16.700 15.600 17.700 14.700 17.700 17.400 15.100 17.600 16.300 15.900 18.400 15.500 16.100 17.700 15.900",
+        "intervals-worker site-live-2: 15.200 17.400 17.800 15.800 15.900 16.800 17.100 15.700 16.900 16.800 17.100 17.300 15.600 18.300 16.100 17.300 15.600 17.300 15.500 16.200 18.200 17.200 15.800 17.000 15.300 17.000 17.600 16.600 15.600 17.900 15.800 17.100 17.000 17.300 15.400 17.700 16.900 15.400 17.100 16.200 16.800 16.500 17.400 15.800 16.900 17.200 17.000 15.800 16.200 16.500 17.900 16.400 16.100 17.900 15.900 15.900 17.100 17.300 16.700 16.800 15.800 17.000 17.200 15.400 16.800 18.100 16.400 15.400 17.600 16.000 16.800 17.400 16.100 17.000 16.900 17.100 15.100 17.800 15.600 18.500 16.800 16.600 16.600 16.700 14.700 18.200 17.100 16.700 14.600 17.700 15.900 16.500 18.000 15.500 17.000 18.200 16.600 16.800 15.600 17.400 16.500 17.200 16.600 16.700 16.600 16.700 16.700 16.700 16.600 16.700 15.600 17.700 14.700 17.700 17.500 15.100 17.400 16.400 15.900 18.400",
+        "pace: speed 1 effective 1.002 bound false ticks 332 over 30 frames drawn-moved 30 stepped 22 compute-max 200 us over-budget-max -9223372036854775808 us budget 8333 us (0.5 of a 16.67 ms display period, fallback at 0.40 from the worker; last frame 16.8 ms) margin 200 us; every window: worst none us, 0 frames past the grain",
+        "pace: speed 1 effective 1.029 bound false ticks 362 over 30 frames drawn-moved 30 stepped 28 compute-max 300 us over-budget-max -9223372036854775808 us budget 8333 us (0.5 of a 16.67 ms display period, fallback at 0.42 from the worker; last frame 17.0 ms) margin 200 us; every window: worst none us, 0 frames past the grain",
+        "pace: speed 1 effective 0.997 bound false ticks 392 over 30 frames drawn-moved 30 stepped 30 compute-max 200 us over-budget-max -9223372036854775808 us budget 8333 us (0.5 of a 16.67 ms display period, fallback at 0.35 from the worker; last frame 17.3 ms) margin 200 us; every window: worst none us, 0 frames past the grain",
+        "pace: speed 1 effective 0.999 bound false ticks 422 over 30 frames drawn-moved 30 stepped 29 compute-max 200 us over-budget-max -9223372036854775808 us budget 8333 us (0.5 of a 16.67 ms display period, fallback at 0.33 from the worker; last frame 17.7 ms) margin 200 us; every window: worst none us, 0 frames past the grain",
+        "physics site-live-3: law spring.rapier nodes 21 energy 403.6 spread 243 overlaps 0 device off device-steps 0 cpu-steps 0 submissions 0 answers 0 failures 0 waiting 0 stale 0 mismatched 0 last-age 0 layout-outside 0 layout-extent -306,-300,298,313 view-extent -589,-458,581,471 view-follow true",
+        "pace site-live-3: speed 1 effective 0.997 (marked none, ratio none) budget 8333 us margin 200 us display period 16.667 ms (fallback, fitting 0.50 of the recent intervals from the worker, a 100 us clock); every window: 0 frames the gate admitted ticks in, worst none us over budget (no frame), 0 past the grain; 0 floor-only frames past it; bar none",
+        "intervals site-live-3: 17.100 16.800 17.500 17.200 16.700 15.700 15.700 17.500 17.700 15.500 17.900 16.600 14.900 18.500 16.600 15.400 18.000 16.700 15.400 16.700 17.900 16.600 15.700 16.600 17.000 16.800 16.200 16.400 17.100 16.200 16.900 17.000 15.700 17.400 17.300 17.000 15.900 16.800 16.100 17.100 16.800 16.100 17.500 16.100 17.500 16.000 16.900 17.300 14.900 17.600 16.200 16.200 17.800 16.300 16.200 18.200 16.200 17.200 15.400 16.800 17.000 17.300 16.000 16.100 17.600 15.300 17.300 16.400 17.100 16.000 17.300 16.100 17.400 17.600 16.600 14.600 17.400 17.000 17.500 16.900 16.700 16.700 15.200 17.600 16.900 16.100 16.300 17.100 17.000 16.300 16.000 17.700 16.900 16.900 14.600 17.800 17.500 15.400 17.300 16.800 16.900 16.100 17.100 17.100 16.100 15.800 17.600 17.300 16.600 16.800 16.600 16.700 16.600 16.600 16.700 16.700 14.800 18.000 17.300 16.600",
+        "intervals-worker site-live-3: 16.800 17.000 15.600 17.100 16.800 17.500 17.200 16.700 15.700 15.700 17.500 17.700 15.500 17.900 16.700 14.800 18.500 16.700 15.300 18.000 16.700 15.300 16.800 17.900 16.600 15.800 16.600 16.800 16.900 16.300 16.300 17.100 16.200 17.000 16.900 15.700 17.400 17.300 17.100 15.900 16.700 16.100 17.100 16.800 16.100 17.500 16.100 17.500 16.100 16.900 17.200 14.800 17.700 16.200 16.200 17.800 16.300 16.200 18.200 16.300 17.100 15.500 16.800 16.900 17.300 16.000 16.200 17.600 15.100 17.400 16.400 17.100 16.000 17.200 16.100 17.500 17.600 16.700 14.600 17.300 17.000 17.500 16.900 16.700 16.700 15.200 17.700 16.900 16.000 16.300 17.000 17.100 16.300 16.100 17.600 16.900 16.900 14.700 17.700 17.600 15.400 17.200 16.900 16.900 16.000 17.100 17.200 16.100 15.700 17.500 17.400 16.700 16.600 16.700 16.600 16.700 16.700 16.600 16.800 14.700",
+        "pace: speed 1 effective 0.998 bound false ticks 452 over 30 frames drawn-moved 30 stepped 30 compute-max 200 us over-budget-max -9223372036854775808 us budget 8333 us (0.5 of a 16.67 ms display period, fallback at 0.50 from the worker; last frame 16.6 ms) margin 200 us; every window: worst none us, 0 frames past the grain",
+        "gpu timestamps: yes"
+      ],
+      "result": "ok",
+      "saved_graph": null,
+      "timings": [
+        {
+          "counts": {
+            "paint_after_cull": {
+              "max": 89,
+              "min": 89
+            },
+            "paint_before_cull": {
+              "max": 89,
+              "min": 89
+            },
+            "physics_carried_us": {
+              "max": 0,
+              "min": 0
+            },
+            "physics_discarded_us": {
+              "max": 0,
+              "min": 0
+            },
+            "physics_steps": {
+              "max": 0,
+              "min": 0
+            },
+            "total_nodes": {
+              "max": 21,
+              "min": 21
+            },
+            "visible_nodes": {
+              "max": 21,
+              "min": 21
+            }
+          },
+          "cpu_ms": {
+            "max": 5.9,
+            "p50": 5.2,
+            "p95": 5.8
+          },
+          "frames": 62,
+          "gpu_ms": {
+            "max": 14.088,
+            "p50": 13.313,
+            "p95": 13.817
+          },
+          "hidden": false,
+          "interval_ms": {
+            "max": 18.9,
+            "p50": 16.7,
+            "p95": 18.7
+          },
+          "label": "site-paused",
+          "producer_render_us": {
+            "max": 1400,
+            "p50": 900,
+            "p95": 1000
+          },
+          "producer_stage_us": {
+            "max": 200,
+            "p50": 100,
+            "p95": 200
+          },
+          "stages_ms": {
+            "cull": {
+              "max": 0.1,
+              "p50": 0,
+              "p95": 0
+            },
+            "dom_frame": {
+              "max": 0.1,
+              "p50": 0,
+              "p95": 0.1
+            },
+            "dom_mutate": {
+              "max": 0.1,
+              "p50": 0,
+              "p95": 0.1
+            },
+            "dom_prepare": {
+              "max": 0.1,
+              "p50": 0,
+              "p95": 0.1
+            },
+            "faces": {
+              "max": 0.2,
+              "p50": 0.1,
+              "p95": 0.2
+            },
+            "lower": {
+              "max": 0.2,
+              "p50": 0,
+              "p95": 0.1
+            },
+            "overlays": {
+              "max": 0,
+              "p50": 0,
+              "p95": 0
+            },
+            "physics": {
+              "max": 0.4,
+              "p50": 0,
+              "p95": 0.1
+            },
+            "prepare": {
+              "max": 0.2,
+              "p50": 0.1,
+              "p95": 0.2
+            },
+            "rasterize": {
+              "max": 0.7,
+              "p50": 0.5,
+              "p95": 0.6
+            },
+            "underlay": {
+              "max": 0.1,
+              "p50": 0.1,
+              "p95": 0.1
+            }
+          }
+        },
+        {
+          "counts": {
+            "paint_after_cull": {
+              "max": 89,
+              "min": 89
+            },
+            "paint_before_cull": {
+              "max": 89,
+              "min": 89
+            },
+            "physics_carried_us": {
+              "max": 16633,
+              "min": 33
+            },
+            "physics_discarded_us": {
+              "max": 0,
+              "min": 0
+            },
+            "physics_steps": {
+              "max": 2,
+              "min": 0
+            },
+            "total_nodes": {
+              "max": 21,
+              "min": 21
+            },
+            "visible_nodes": {
+              "max": 21,
+              "min": 21
+            }
+          },
+          "cpu_ms": {
+            "max": 12.4,
+            "p50": 10.2,
+            "p95": 11.2
+          },
+          "frames": 122,
+          "gpu_ms": {
+            "max": 18.963,
+            "p50": 16.734,
+            "p95": 18.191
+          },
+          "hidden": false,
+          "interval_ms": {
+            "max": 20.1,
+            "p50": 16.7,
+            "p95": 17.8
+          },
+          "label": "site-live-1",
+          "producer_render_us": {
+            "max": 6400,
+            "p50": 5500,
+            "p95": 6100
+          },
+          "producer_stage_us": {
+            "max": 200,
+            "p50": 100,
+            "p95": 100
+          },
+          "stages_ms": {
+            "cull": {
+              "max": 0.1,
+              "p50": 0,
+              "p95": 0
+            },
+            "dom_frame": {
+              "max": 1.8,
+              "p50": 1.5,
+              "p95": 1.6
+            },
+            "dom_mutate": {
+              "max": 3.6,
+              "p50": 3.1,
+              "p95": 3.4
+            },
+            "dom_prepare": {
+              "max": 0.2,
+              "p50": 0,
+              "p95": 0.1
+            },
+            "faces": {
+              "max": 0.2,
+              "p50": 0.1,
+              "p95": 0.1
+            },
+            "lower": {
+              "max": 0.1,
+              "p50": 0,
+              "p95": 0.1
+            },
+            "overlays": {
+              "max": 0.1,
+              "p50": 0,
+              "p95": 0
+            },
+            "physics": {
+              "max": 0.2,
+              "p50": 0.1,
+              "p95": 0.2
+            },
+            "prepare": {
+              "max": 0.2,
+              "p50": 0.1,
+              "p95": 0.2
+            },
+            "rasterize": {
+              "max": 0.8,
+              "p50": 0.5,
+              "p95": 0.6
+            },
+            "underlay": {
+              "max": 0.2,
+              "p50": 0.1,
+              "p95": 0.1
+            }
+          }
+        },
+        {
+          "counts": {
+            "paint_after_cull": {
+              "max": 89,
+              "min": 89
+            },
+            "paint_before_cull": {
+              "max": 89,
+              "min": 89
+            },
+            "physics_carried_us": {
+              "max": 16666,
+              "min": 33
+            },
+            "physics_discarded_us": {
+              "max": 0,
+              "min": 0
+            },
+            "physics_steps": {
+              "max": 2,
+              "min": 0
+            },
+            "total_nodes": {
+              "max": 21,
+              "min": 21
+            },
+            "visible_nodes": {
+              "max": 21,
+              "min": 21
+            }
+          },
+          "cpu_ms": {
+            "max": 11.5,
+            "p50": 10,
+            "p95": 11.2
+          },
+          "frames": 122,
+          "gpu_ms": {
+            "max": 19.044,
+            "p50": 16.66,
+            "p95": 18.031
+          },
+          "hidden": false,
+          "interval_ms": {
+            "max": 18.7,
+            "p50": 16.8,
+            "p95": 18
+          },
+          "label": "site-live-2",
+          "producer_render_us": {
+            "max": 6200,
+            "p50": 5400,
+            "p95": 5900
+          },
+          "producer_stage_us": {
+            "max": 200,
+            "p50": 100,
+            "p95": 200
+          },
+          "stages_ms": {
+            "cull": {
+              "max": 0.1,
+              "p50": 0,
+              "p95": 0
+            },
+            "dom_frame": {
+              "max": 1.8,
+              "p50": 1.5,
+              "p95": 1.6
+            },
+            "dom_mutate": {
+              "max": 3.5,
+              "p50": 3,
+              "p95": 3.4
+            },
+            "dom_prepare": {
+              "max": 0.1,
+              "p50": 0,
+              "p95": 0.1
+            },
+            "faces": {
+              "max": 0.2,
+              "p50": 0.1,
+              "p95": 0.1
+            },
+            "lower": {
+              "max": 0.1,
+              "p50": 0,
+              "p95": 0.1
+            },
+            "overlays": {
+              "max": 0.1,
+              "p50": 0,
+              "p95": 0
+            },
+            "physics": {
+              "max": 0.2,
+              "p50": 0.1,
+              "p95": 0.2
+            },
+            "prepare": {
+              "max": 0.2,
+              "p50": 0.1,
+              "p95": 0.2
+            },
+            "rasterize": {
+              "max": 1,
+              "p50": 0.5,
+              "p95": 0.6
+            },
+            "underlay": {
+              "max": 0.2,
+              "p50": 0,
+              "p95": 0.1
+            }
+          }
+        },
+        {
+          "counts": {
+            "paint_after_cull": {
+              "max": 89,
+              "min": 89
+            },
+            "paint_before_cull": {
+              "max": 89,
+              "min": 89
+            },
+            "physics_carried_us": {
+              "max": 16666,
+              "min": 33
+            },
+            "physics_discarded_us": {
+              "max": 0,
+              "min": 0
+            },
+            "physics_steps": {
+              "max": 2,
+              "min": 0
+            },
+            "total_nodes": {
+              "max": 21,
+              "min": 21
+            },
+            "visible_nodes": {
+              "max": 21,
+              "min": 21
+            }
+          },
+          "cpu_ms": {
+            "max": 12.5,
+            "p50": 10.2,
+            "p95": 11.2
+          },
+          "frames": 122,
+          "gpu_ms": {
+            "max": 18.736,
+            "p50": 16.723,
+            "p95": 17.922
+          },
+          "hidden": false,
+          "interval_ms": {
+            "max": 19.3,
+            "p50": 16.8,
+            "p95": 17.8
+          },
+          "label": "site-live-3",
+          "producer_render_us": {
+            "max": 6900,
+            "p50": 5300,
+            "p95": 5800
+          },
+          "producer_stage_us": {
+            "max": 200,
+            "p50": 100,
+            "p95": 200
+          },
+          "stages_ms": {
+            "cull": {
+              "max": 0.1,
+              "p50": 0,
+              "p95": 0
+            },
+            "dom_frame": {
+              "max": 1.8,
+              "p50": 1.5,
+              "p95": 1.6
+            },
+            "dom_mutate": {
+              "max": 3.6,
+              "p50": 3,
+              "p95": 3.3
+            },
+            "dom_prepare": {
+              "max": 0.1,
+              "p50": 0,
+              "p95": 0.1
+            },
+            "faces": {
+              "max": 0.2,
+              "p50": 0.1,
+              "p95": 0.2
+            },
+            "lower": {
+              "max": 0.1,
+              "p50": 0,
+              "p95": 0.1
+            },
+            "overlays": {
+              "max": 0.1,
+              "p50": 0,
+              "p95": 0
+            },
+            "physics": {
+              "max": 0.3,
+              "p50": 0.1,
+              "p95": 0.2
+            },
+            "prepare": {
+              "max": 0.2,
+              "p50": 0.1,
+              "p95": 0.1
+            },
+            "rasterize": {
+              "max": 1.1,
+              "p50": 0.5,
+              "p95": 0.6
+            },
+            "underlay": {
+              "max": 0.2,
+              "p50": 0,
+              "p95": 0.1
+            }
+          }
+        }
+      ]
+    },
+    "captures": []
+  },
+  "host": {
+    "page": "tree",
+    "semanticTree": {
+      "role": "region",
+      "label": "Graphshell, one tree",
+      "children": [
+        {
+          "role": "main",
+          "children": [
+            {
+              "role": "heading",
+              "label": "Graphshell, one tree",
+              "children": []
+            },
+            {
+              "role": "status",
+              "label": "generated, seed 7 · 21 nodes · picked: none",
+              "children": []
+            },
+            {
+              "role": "navigation",
+              "label": "Graph controls",
+              "children": [
+                {
+                  "role": "button",
+                  "label": "Pan left",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan right",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan up",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan down",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Zoom in",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Zoom out",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Fit graph",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Fit selection",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Restore arrangement",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Play physics",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Graph commands",
+                  "expanded": false,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "role": "group",
+                      "label": "21 of 21 shown",
+                      "children": [
+                        {
+                          "role": "group",
+                          "label": "node-0.generated.test",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "node-1.generated.test",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "node-2.generated.test",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "node-3.generated.test",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "node-4.generated.test",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "node-5.generated.test",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "node-6.generated.test",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "node-7.generated.test",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "node-8.generated.test",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "node-9.generated.test",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "node-10.generated.test",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "node-11.generated.test",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "node-12.generated.test",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "node-13.generated.test",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "node-14.generated.test",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "node-15.generated.test",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "node-16.generated.test",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "node-17.generated.test",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "node-18.generated.test",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "node-19.generated.test",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "node-20.generated.test",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Arrangement and physics",
+                              "expanded": true,
+                              "children": []
+                            },
+                            {
+                              "children": [
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Arrangement",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply arrangement",
+                                  "children": []
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Role",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply role",
+                                  "children": []
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Physics law",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "group",
+                                  "label": "Overlays",
+                                  "children": [
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Kinds",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Groups",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Mass",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Depth",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply physics",
+                                  "children": []
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Speed",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Profile",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply profile",
+                                  "children": []
+                                },
+                                {
+                                  "role": "status",
+                                  "label": "Arrangement set to free: physics alone",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "title": "Graphshell, one tree",
+    "visibility": "visible",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    }
+  },
+  "hidden": false,
+  "errors": []
+}

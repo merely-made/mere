@@ -1,0 +1,44 @@
+genet-parley v0.10.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+├── genet-parley feature "default"
+│   └── genet-livery v0.0.4 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+│       ├── cambium-rootstock v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/cambium/cambium-rootstock)
+│       │   ├── cambium-genet-web-host v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/cambium/cambium-genet-web-host)
+│       │   │   └── graphshell-web v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/ports/graphshell/web)
+│       │   ├── graphshell v0.0.2 (/Users/markik/Code/worktrees/mere-nested-graph-view/ports/graphshell)
+│       │   │   └── graphshell feature "web"
+│       │   │       └── graphshell-web v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/ports/graphshell/web)
+│       │   ├── graphshell-web v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/ports/graphshell/web)
+│       │   └── mesquite v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/cambium/mesquite)
+│       │       ├── cambium-genet-web-host v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/cambium/cambium-genet-web-host) (*)
+│       │       └── graphshell-web v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/ports/graphshell/web)
+│       ├── genet-render v0.2.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+│       │   ├── genet-render feature "accesskit"
+│       │   │   ├── cambium-rootstock v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/cambium/cambium-rootstock) (*)
+│       │   │   └── graphshell-web v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/ports/graphshell/web)
+│       │   └── genet-render feature "livery"
+│       │       ├── cambium-rootstock v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/cambium/cambium-rootstock) (*)
+│       │       └── graphshell-web v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/ports/graphshell/web)
+│       ├── pictograph v0.2.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/canvas/pictograph)
+│       │   └── mere v0.0.2 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/mere)
+│       │       ├── mere feature "canvas"
+│       │       │   ├── graphshell v0.0.2 (/Users/markik/Code/worktrees/mere-nested-graph-view/ports/graphshell) (*)
+│       │       │   └── graphshell-web v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/ports/graphshell/web)
+│       │       ├── mere feature "graph"
+│       │       │   ├── graphshell v0.0.2 (/Users/markik/Code/worktrees/mere-nested-graph-view/ports/graphshell) (*)
+│       │       │   └── graphshell-web v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/ports/graphshell/web)
+│       │       │   └── mere feature "canvas" (*)
+│       │       └── mere feature "pictograph"
+│       │           └── mere feature "canvas" (*)
+│       │   ├── pictograph feature "canvas"
+│       │   │   └── mere feature "canvas" (*)
+│       │   ├── pictograph feature "seiche"
+│       │   │   └── pictograph feature "canvas" (*)
+│       │   └── pictograph feature "signals"
+│       │       └── pictograph feature "canvas" (*)
+│       └── taproot v0.1.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+│           ├── graphshell-web v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/ports/graphshell/web)
+│           └── mesquite v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/cambium/mesquite) (*)
+├── genet-parley feature "std"
+│   └── genet-parley feature "system"
+│       └── genet-parley feature "default" (*)
+└── genet-parley feature "system" (*)

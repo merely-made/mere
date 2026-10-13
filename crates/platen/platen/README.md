@@ -9,6 +9,13 @@ holding a document tile.
 Platen is geometry-free. Concrete rectangles come from the host's genet layout;
 platen emits structure and ratios.
 
+`document-layout` is enabled by default and supplies `document_scene` and
+`build_document_scene`. Consumers that need only pane plans, tree geometry and
+structural accessibility can use `default-features = false`. This excludes the
+document producer and its complex-script dictionary feature from their dependency
+cone; ordinary document hosts retain it. Graphshell's read-only browser viewer
+uses this portable core, while its native and product hosts keep document layout.
+
 ## Modules
 
 | Module | Contents |
@@ -51,7 +58,7 @@ the divider reads/writes `weights` / `set_weights` / `split_fractions` /
 | --- | --- |
 | `forme` | Owns the `Arrangement` platen projects. Platen never mutates it. |
 | `workbench` (git, immutable Genet revision) | `Tile`, `TileTree`, `TileBranch`, `SplitAxis`, `TileId`, and `ContentSource`, the reusable workspace contract Platen projects onto. |
-| `document-canvas` (git, genet `main`) | Document layout behind `build_document_scene`. |
+| `document-canvas` (Mere workspace, optional) | Document layout behind the default-on `document-layout` feature and `build_document_scene`. |
 | `inker` (git, genet `main`) | `EngineDocument`, the document scene input. |
 | `serde` / `serde_json` | Plans and persisted `(Arrangement, TreeGeometry)` pairs. |
 | `uuid` | `GraphMemberId`. |
