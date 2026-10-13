@@ -1,0 +1,5 @@
+D2 coverage: 265/268 active; 186 legacy + 231 supplemental (56 superseding legacy, 114 superseding earlier batches); 95 inactive legacy, 96 inactive supplemental
+error: snapshot aggregate digest changed: 2046e1eec3018b7dd288e794326090f1b7f9a889043d53e45530271d0b32be1e != f0b64eef4cd5514157bb1b49d389b84db29a1e823d6f3e2cebf827337fe56abf
+error: active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md
+error: active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md
+error: active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_producer_gates/README.md
