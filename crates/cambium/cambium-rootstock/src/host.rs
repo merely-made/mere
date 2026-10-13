@@ -1906,6 +1906,7 @@ where
 #[cfg(test)]
 mod disposal_controls {
     use super::*;
+    use crate::ScriptedDom;
     use cambium::{AnyView, GenetCtx, GenetElement, el, text};
     use std::{
         cell::{Cell, RefCell},
