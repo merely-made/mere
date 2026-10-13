@@ -1,4 +1,5 @@
 [package]
+rust-version = "1.97.1"
 name = "distillery-model-probe"
 version = "0.0.1"
 edition = "2024"
@@ -49,3 +50,6 @@ vello_encoding = { git = "https://github.com/mark-ik/vello", rev = "2eae6243881d
 vello_shaders = { git = "https://github.com/mark-ik/vello", rev = "2eae6243881d5b24c984d5ee35dde509ca5db782" }
 cubecl-runtime = { path = "../../../support/patches/cubecl-runtime" }
 cubek-reduce = { path = "../../../support/patches/cubek-reduce" }
+
+[workspace.package]
+rust-version = "1.97.1"

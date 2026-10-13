@@ -23,8 +23,8 @@
 //! - **Transport orchestration** — uses [`transport::Transport`] for
 //!   stream-level peer connections; Murm is generic over the transport
 //!   implementation
-//! - **Co-op session lifecycle** (Phase 2B) — host-led ephemeral sessions
-//!   over bilateral transport
+//! - **Conversation storage and causal reads** — durable signed operations,
+//!   observed frontiers, and owner-authorized retention checkpoints
 //!
 //! ## What Murm does NOT own
 //!
@@ -33,6 +33,11 @@
 //! - Alternate protocol adapters → the comms integration boundary
 //! - User-facing chat panel UI → graphshell-side Comms applet (separate)
 //! - Many-to-many federation → `gemot`
+//! - Shared activity lifecycle → the concrete activity's application owner
+//!
+//! Product surfaces call a conversation a *murmur*. The retained `Cabal*` API
+//! and `mere/cable/v1` ALPN name Mere's inherited conversation grammar; they do
+//! not establish interoperability with cabal-club Cable.
 //!
 //! ## Status
 //!
@@ -121,8 +126,8 @@ use std::sync::Arc;
 /// Phase 2B. [`open_cabal`](Murm::open_cabal) returns a working
 /// [`CabalHandle`] (send / history / subscribe); over a [`P2pandaTransport`],
 /// [`subscribe_cabal`](Murm::subscribe_cabal) returns a [`SyncedCabal`] that
-/// also runs the gossip + LogSync lanes. The host-led co-op session flows
-/// (`host_coop` / `join_coop`) are still ahead.
+/// also runs the gossip + LogSync lanes. Shared activity lifecycle belongs to
+/// the concrete application consuming the conversation and admission seams.
 pub struct Murm<T: Transport> {
     identity: Arc<dyn IdentityProvider>,
     transport: T,
@@ -149,10 +154,12 @@ impl<T: Transport> Murm<T> {
         }
     }
 
-    /// The local node's `PeerID`, derived from the identity provider's
-    /// master public key.
+    /// The local carrier's configured peer identity.
+    ///
+    /// A production carrier uses a scoped Personae-derived key, which can
+    /// differ from both the persona root and the conversation author key.
     pub fn local_peer_id(&self) -> PeerID {
-        PeerID::from_public_key(self.identity.master_public_key())
+        self.transport.local_peer_id()
     }
 
     /// Access the underlying identity provider.
@@ -177,8 +184,8 @@ impl<T: Transport> Murm<T> {
     /// Open or join a cabal in Mere's Cable-shaped dialect by its secret key.
     ///
     /// Derives the per-cabal Ed25519 keypair (Cable spec §2.2),
-    /// computes the public cabal id (BLAKE3 of the key), and creates an
-    /// in-memory store for the cabal. Idempotent: opening the same key
+    /// computes the public cabal id (BLAKE3 of the key), and opens the
+    /// host-selected store for the cabal. Idempotent: opening the same key
     /// twice returns equivalent handles backed by the same underlying
     /// session.
     ///
@@ -191,8 +198,7 @@ impl<T: Transport> Murm<T> {
 
     /// Compute the per-cabal keypair for a given cabal key.
     ///
-    /// Per Cable spec §2.2: `child = BLAKE3(master_seed || cabal_key)`,
-    /// `keypair = Ed25519::from_seed(child)`.
+    /// The identity provider derives the key with the cabal secret as scope.
     ///
     /// The returned keypair signs cabal posts authored by this user. The
     /// master secret never leaves the identity provider.
@@ -283,11 +289,41 @@ mod tests {
     #[test]
     fn local_peer_id_matches_transport_peer_id_when_consistent() {
         let murm = make_murm();
-        // The stub transport in this test is constructed with the same
-        // peer_id as the identity, so they match. (This invariant is
-        // enforced by transport-layer setup in production; here we just
-        // verify the wiring is correct.)
         assert_eq!(murm.local_peer_id(), murm.transport().local_peer_id());
+    }
+
+    #[tokio::test]
+    async fn scoped_carrier_identity_routes_without_replacing_the_conversation_author() {
+        let identity: Arc<dyn IdentityProvider> = Arc::new(InMemoryProvider::from_seed([0x61; 32]));
+        let carrier_key = identity.derived_keypair(b"murm-carrier").unwrap();
+        let carrier_peer = PeerID::from_public_key(carrier_key.public_key());
+        let root_peer = PeerID::from_public_key(identity.master_public_key());
+        assert_ne!(carrier_peer, root_peer);
+        let other_peer =
+            PeerID::from_public_key(InMemoryProvider::from_seed([0x62; 32]).master_public_key());
+        let (carrier, remote) = transport::memory::MemoryTransport::pair(carrier_peer, other_peer);
+        let murm = Murm::new(identity.clone(), carrier);
+        assert_eq!(murm.local_peer_id(), carrier_peer);
+        let protocol = Alpn::new("mere/cable/v1");
+        let (connected, accepted) = tokio::join!(
+            remote.connect(murm.local_peer_id(), protocol.clone()),
+            murm.transport().accept(protocol),
+        );
+        assert!(connected.is_ok());
+        assert_eq!(accepted.unwrap().peer, Some(other_peer));
+        let key = CabalKey::new([0x63; 32]);
+        let conversation = murm.open_cabal(&key).await.unwrap();
+        let post_id = conversation
+            .send_text_at("session", "scoped carrier", 1)
+            .await
+            .unwrap();
+        let post = conversation.get_post(&post_id).unwrap();
+        let author = identity
+            .derive_keypair(key.as_bytes())
+            .unwrap()
+            .public_key();
+        assert_eq!(post.author, author);
+        assert_ne!(post.author, carrier_key.public_key());
     }
 
     #[tokio::test]

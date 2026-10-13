@@ -3,7 +3,8 @@ name = "cambium-rootstock"
 version = "0.1.0"
 description = "The stock a Cambium application host is grafted onto: input vocabulary, routing, layout, paint, and accessibility, with no event source of its own"
 edition.workspace = true
-rust-version = "1.92"
+
+rust-version = "1.97.1"
 license = "MPL-2.0"
 repository.workspace = true
 # Same posture as cambium-genet-winit-host, which this was carved out of: it

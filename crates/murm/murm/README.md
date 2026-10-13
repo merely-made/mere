@@ -6,8 +6,8 @@ addressed by a 32-byte shared secret. Murm owns the post grammar, the signed
 per-author log, admission of received operations, per-cabal storage, and the
 sync lanes.
 
-Product surfaces call a conversation a *murmur*; `Cabal` is the protocol and
-code noun. `mere/cable/v1` names the inherited cabal/channel/post grammar and
+Product surfaces call a conversation a *murmur* or a *group conversation*;
+`Cabal` is the retained internal API noun. `mere/cable/v1` names the inherited cabal/channel/post grammar and
 the ALPN it claims. It does not assert wire compatibility with cabal-club
 Cable. Many-to-many federation lives in `gemot`, not here.
 
@@ -19,8 +19,8 @@ writes `murm::CabalHandle`. The `Source` column names the source file.
 | Source | Contents |
 | --- | --- |
 | `cabal` | `CabalKey`, `CabalId`, `CabalHandle`, `CabalMembership` |
-| `conversation_engine` | `ConversationEngine`, `ConversationRefresh`; the runtime behind every handle |
-| `conversation_store` | `ConversationStore<B>`, `ConversationStoreError`; the per-cabal store over stickleback |
+| `conversation_engine` | `ConversationEngine`, `ConversationRefresh`, `CabalHistory`; the runtime and causal read behind every handle |
+| `conversation_store` | `ConversationStore<B>`, `ConversationStoreError`, `CabalCheckpointAuthority`; the per-cabal store and owner-injected retention authority |
 | `conversation_backend` | `ConversationStorage`, `ConversationBackend` (memory or redb) |
 | `drop_export` | `ConversationDropSelector`, `ConversationDropProfile`, `ConversationDropPrivacy`, `ConversationDropPriorities`, `ConversationFrontier` |
 | `key_epoch` | `CabalKeyring`, `CabalKeyEpoch`, `CabalKeyringError`, `CABAL_DROP_SUITE` |
@@ -43,14 +43,15 @@ and `Alpn`, `PeerID`, `Transport` from transport.
 | `Murm::new(Arc<dyn IdentityProvider>, T)` | In-memory storage. |
 | `Murm::with_storage(identity, transport, ConversationStorage)` | `ConversationStorage::Memory` or `ConversationStorage::redb(dir)`, one redb file per cabal. |
 | `Murm::open_cabal(&CabalKey) -> Result<CabalHandle, MurmError>` | Opens or rejoins. A durable open rebuilds history and the local author head before returning. Idempotent per key. |
-| `Murm::derive_cabal_keypair(&CabalKey) -> Result<identity::Ed25519Keypair, MurmError>` | `child = BLAKE3(master_seed \|\| cabal_key)`; the master secret stays in the identity provider. |
-| `Murm::local_peer_id() -> PeerID` | Derived from the identity provider's master public key. |
+| `Murm::derive_cabal_keypair(&CabalKey) -> Result<identity::Ed25519Keypair, MurmError>` | The identity provider derives a conversation author key using the cabal key as scope; the master secret stays in the provider. |
+| `Murm::local_peer_id() -> PeerID` | The transport's configured local peer identity, including a scoped derived carrier key. |
 | `Murm::conversation_engine() -> &Arc<ConversationEngine>` | The runtime, for operations `CabalHandle` does not expose. |
 | `Murm::<P2pandaTransport>::subscribe_cabal(&CabalKey) -> Result<SyncedCabal, MurmError>` | Joins the cabal's gossip topic and its LogSync overlay topic. |
 
 `CabalHandle` authoring: `send_text`, `send_topic`, `send_join`, `send_leave`,
 `send_info`, `send_delete`, each with an `_at` variant taking an explicit
 timestamp. Reads: `id`, `author_public_key`, `get_post`, `history(channel)`,
+`causal_history(channel)` (async),
 `membership(channel) -> CabalMembership`, `subscribe() ->
 broadcast::Receiver<Post>`. Ingress: `ingest_post`, `import_plain_drop`,
 `import_protected_drop`, `refresh`. Keys: `keyring`, `install_key_epoch`.
@@ -97,8 +98,17 @@ in place. Two peers on the same cabal key converge over a `P2pandaTransport`
 (tested). The host wires a networked cabal into mere's Comms pane end to end
 (join ticket, connect-by-ticket, live post drain).
 
-Ahead: cross-author causal links, retention-aware pruning, and group key
-distribution. Coop lifecycle belongs to concrete shared activities over the
+Cross-author observed frontiers, causal reads and owner-authorized retention
+checkpoints are implemented. Legacy `history` sorts timestamps;
+`causal_history` follows signed dependencies and reports missing headers,
+unavailable bodies and retained checkpoints. Checkpoints remove only their
+authorized signer's earlier log prefix; they are not conversation snapshots.
+
+Ahead: live group-key distribution and persisted group-key history, with
+membership changes and history-access policy supplied by an explicit owner.
+The current live gossip and LogSync paths carry signed posts without composing
+Stickleback's group encryption sessions. QUIC carrier encryption and protected
+offline drops do not establish that group lifecycle. Coop lifecycle belongs to concrete shared activities over the
 existing admission, transport and Stickleback seams; the historical
 `host_coop` / `join_coop` suggestion is not a commitment to put application
 collaboration state in Murm. See the Gemot continuation in

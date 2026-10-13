@@ -1232,3 +1232,127 @@ only that executable allowed the complete gate to pass. Documentation comparison
 against current main introduces no new subjects; the same ten existing D2
 judgment errors remain. These automated receipts do not establish headed/native
 presentation, a rendered client, delivery or human-read acknowledgment.
+
+
+### 2026-10-13: supplier and family refresh
+
+The freshness audit starts from Mere main `49b3b15a2`. Its lock already resolves
+Iroh 1.3.0, iroh-blobs 0.103.1 and p2panda 0.7.1, matching their latest stable
+releases checked through the upstream release and registry APIs. A manifest
+floor such as `iroh = "1.0.3"` does not describe the resolved version. The
+October 11 p2panda compatibility snapshot nevertheless misses current upstream
+network fixes: network-id separation in mDNS and non-blocking sync retry
+scheduling. The October 13 compatible supplier incorporates upstream main
+`c99f5014`, while retaining net package identity 0.7.5 for the embedded Knot
+supplier and keeping all eight patched p2panda packages on one source.
+
+Murm's `local_peer_id` still returned the identity provider's master public key,
+although production transports accept Personae `DerivedKeypair`. It now reads
+the supplied transport's local peer identity. The regression uses a scoped
+carrier key distinct from the persona root, routes an in-process connection to
+Murm's reported peer, and verifies that the conversation post still uses its
+separate conversation author key. Carrier identity, author identity and persona
+root remain distinct. This changes no post identities, cabal derivation, ALPN
+or admission policy.
+
+The retained `Cabal*` API is an internal noun. Product copy uses *murmur* or
+*group conversation*. The inherited `mere/cable/v1` ALPN does not establish
+cabal-club Cable wire interoperability; any future ALPN change needs an explicit
+protocol/version migration. The library docs no longer promise generic
+`host_coop` / `join_coop` activity ownership. Causal reads and authorized
+retention are implemented, while live group-key agreement/distribution and
+persisted group-key history still need a Murm consumer. Protected native drops
+and QUIC encryption do not establish that group lifecycle. WebRTC C2-C4 are
+implemented in the Graphshell host above the shared carrier crate; public
+rendezvous and a browser Murm consumer retain separate gates.
+
+Family ownership is explicit in the current source. Personae is the identity
+supplier at Dramatis `0234e7e`; the five later Dramatis main commits inspected
+are documentation/publication receipts. Gemot's `MootAuthorizationProvider`
+intersects structural capabilities and Standing facts with constitution and
+membership policy. The old Tessera corpus has real `tessera.redb` and serialized
+field compatibility, while the current concept is Standing. Meadowcap is a
+possible structural-capability provider at that injected seam, not a linked
+Murm dependency or a replacement for reputation, group membership or keys.
+Distillery's `remote` feature composes Burn Remote 0.22.0 as the lease-bound
+`esp.remote.burn/v1` resource over `P2pandaTransport`; ESP itself remains a
+portable inference/embedding seam. Chat, governance and compute can share
+transport and identity infrastructure without sharing domain state or grants.
+
+Retinue main `973e317a0` supplies Sennet/Meshtastic and Tucket/MeshCore alongside
+Reticulum/LXMF. Signalman's existing Comms mapping projects its journal's
+actual delivery facts. Native-protocol adapters belong at the Comms consumer
+boundary, retaining protocol-specific identities, privacy and receipt semantics;
+Murm's post grammar does not become their wire format. `tinyssb-core` is an
+allocation-free verifier for pinned tinySSB v0 foreign signed feeds, not a full
+SSB chat adapter. See `retinue/design_docs/2026-08-25_compact_signed_feed_and_local_control_plan.md`.
+Mere's optional Reticulum source is still `773515f`, 159 commits behind inspected
+Retinue main; its carrier/interface and resource changes require a separate
+adapter refresh and acceptance, rather than a silent repin based on package
+version 0.3.0 alone.
+
+#### Next bounded conversation and diagnostics lanes
+
+1. Compose one private Murm conversation with the existing Stickleback group
+   sessions and an explicit membership/history-access owner. Acceptance covers
+   invite/join, remove/rekey, durable reopen, renewed admission and offline
+   catch-up. Choose durable data-epoch history versus the message scheme's
+   forward-secrecy policy explicitly: the current `GroupSession` composes
+   data-scheme DCGKA and a `Message` profile label alone does not implement
+   message encryption or its ratchets. Conversation authoring success, transport acknowledgment, remote
+   owner acceptance and human reading remain separate observations.
+2. Add protocol-faithful Comms consumers for Sennet/Tucket and the existing
+   Signalman owner; tinySSB enters through foreign-feed admission and its own
+   projection. Reuse each owner's retained store and report unsupported actions.
+3. Add a bounded transport diagnostic report from existing `peers_for_topic`,
+   `peer_paths`, open connections and sync counters. Include interface, address
+   source/age, attempted versus active direct/relay paths, last connection/sync
+   failures, and the observation time. Treat advertised records as claims.
+   DNS-SD browsing remains the Murm/Djinn lane in the reachability plan, separate
+   from p2panda peer discovery.
+4. Design diagnostic fields against mDNS/DNS-SD (RFC 6762/6763), QUIC (RFC 9000),
+   and, for WebRTC, ICE (RFC 8445). Measurements must name what they measure:
+   QUIC RTT is not application acceptance latency; synchronized-clock one-way
+   delay has the clock/error requirements of RFC 7679. A standards reference is
+   not a conformance receipt. Runtime collection and a consumer view remain
+   follow-on implementation.
+
+Validation and publication status for this refresh are recorded below once the
+finite gates finish. The October 12 source-bound networking receipt at
+`targets/moot-host-slice-20261012/p2panda-net-current.log` passed 50 tests with
+one ignored. Its net source matches the October 13 compatible supplier exactly.
+The current sandbox rerun cannot create Iroh's OS network monitor (`Operation
+not permitted`) and was terminated; it supplies no new network acceptance.
+
+
+The finite owner gate passes 289 tests: 95 Gemot, 25 Comms, 66 Murm, 99
+Stickleback, and four in-process Murm admission tests. Twelve live-network
+cases are explicitly excluded under the OS-monitor restriction; no GPU or
+headed client ran. The scoped-carrier regression passes against the refreshed
+consumer graph. Port/Graphshell web dependency boundaries, locked resolution,
+changed-package formatting and diff whitespace pass. Documentation comparison
+adds no actionable findings; the new `mere/cable/v1` occurrence is classified
+as a protocol identifier. The supplier's changed files pass formatting; its
+whole-tree formatter still reports the pre-existing gossip API wrapping.
+
+The immutable supplier tag `mere-p2panda-net-0.7.5-upstream-20261013` is published
+at `1f69c9bc`. Mere's coordinated manifest/lock and identity fix are retained
+on `codex/murm-family-refresh`; main integration is separate. Source hashes,
+version inventory and receipts live at `targets/murm-family-refresh-20261013.json`,
+with `targets/murm-refresh-consumer-tests-20261013.log` and
+`targets/murm-refresh-admission-tests-20261013.log` carrying the current gates.
+
+### 2026-10-13: broader Murm family move
+
+The owner authorized planning Murm as the communication and device-implementation
+family, using the Retinue repository as its foundation while preserving crate
+names and original history. The canonical migration specification is
+`retinue/design_docs/2026-10-13_murm_family_move_plan.md`. It proposes workspace separation for dependency/target isolation under the
+same stack-wide Rust 1.99.0 working toolchain and separate 1.97.1 shared MSRV,
+selects Stickleback to remain in Mere as a neutral
+shared supplier, and retains Genet's Netfetcher Fetch/WebSocket policy while
+qualifying reusable wire implementations as a later Murm lane. Personae, host
+persistence, Gemot governance and Luggage update policy keep their existing
+owners. This family scope does not give the conversation package ownership of
+every device or shared activity. The receiving workspace, source imports,
+consumer repins and repository rename remain planned and have not executed.

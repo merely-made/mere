@@ -62,6 +62,22 @@ every early instrument filtered for the wrong string, and `avahi-browse` never
 surfaces it, so observe with a raw multicast listener armed before the peer
 starts.
 
+**Supplier refresh, 2026-10-13:** upstream `490be93b`, incorporated in the
+October 13 compatibility snapshot, appends the first 32 hex characters of the
+BLAKE3 network-id digest to `p2pandav1`. The service name is now
+`_p2pandav1<network-digest>._udp.local`, so a diagnostic must derive the exact
+name from the configured public network id rather than filter for the former
+fixed label. Old and new advertisements do not discover each other; explicit
+endpoint tickets remain the mixed-version bootstrap. This separates discovery
+networks and grants no membership, conversation access or service admission.
+The resulting service string is 41 characters before the underscore. It fits
+a DNS label, but exceeds the fifteen-character DNS-SD service-name limit in
+[RFC 6763 §7](https://www.rfc-editor.org/rfc/rfc6763.html#section-7).
+Treat this as the upstream private peer-discovery naming scheme, not generic
+DNS-SD service conformance. F3's service browser needs a short service type and
+an explicit network selector in an appropriate domain, subtype or metadata
+contract, qualified separately from this interoperability-preserving refresh.
+
 **Where the policy lives.** `P2pandaHostPolicy` and `P2pandaOverlayHost` in
 `crates/murm/transport/src/p2panda_host.rs` (landed 2026-08-22, `0f0a8006`,
 device resident R5) own discovery mode, relays, route seeding, endpoint
