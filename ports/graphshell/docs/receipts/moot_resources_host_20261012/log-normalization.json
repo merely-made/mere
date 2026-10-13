@@ -1,0 +1,86 @@
+[
+  {
+    "file": "checks/graphshell-web-boundary-check.log",
+    "raw_sha256": "ea34d752cc4a2c92dd1adfca9a200f3845eea397fb98bb524a08f1cd1f039625",
+    "normalized_sha256": "428ca95a097dcb99c1bdb97e419880f0b52e2b0e2af1e79d0a0b8df430ffc036",
+    "normalization": "Trailing whitespace/EOF and literal tabs normalized; raw originals remain in external runtime/check output"
+  },
+  {
+    "file": "checks/host-tests-restored-final.log",
+    "raw_sha256": "32e9c4d9021761502eab4598fdd6439275305c113bdfe28a0cffaf70e7d5dd83",
+    "normalized_sha256": "05027780ecd3556fe0657f8a248385fc5d17073ff7ba2e2d68b1162f281ca6fc",
+    "normalization": "Trailing whitespace/EOF and literal tabs normalized; raw originals remain in external runtime/check output"
+  },
+  {
+    "file": "checks/host-library-clippy.log",
+    "raw_sha256": "085e7f978a6323ad47788f9713f1b20daeab2cfaf933f8c950a5ca848ffd3370",
+    "normalized_sha256": "fcf43ea7ba37036fd23d71eb96bc11fcf830f41a1dd36e66fa4991df047b5738",
+    "normalization": "Trailing whitespace/EOF and literal tabs normalized; raw originals remain in external runtime/check output"
+  },
+  {
+    "file": "native-negative/diagnostic-r2-wide.log",
+    "raw_sha256": "81e6a6c8e59fb8afd3ae4a9e88bab6ccda94a23549b5aa36ef5e491f6d76f942",
+    "normalized_sha256": "8d6f322a567b6f6c2c251d650dc40b14d972e24617abbecd62af107e573a723b",
+    "normalization": "Trailing whitespace/EOF and literal tabs normalized; raw originals remain in external runtime/check output"
+  },
+  {
+    "file": "checks/clippy-current-main.log",
+    "raw_sha256": "966cdc981b5cce69c49d27fdf815ec6b7f7efaa97db6f7db0215dab4c09398f9",
+    "normalized_sha256": "610b932b9b85953ae6762c0443efa263576f1bd95add1565e1d590337ad652d8",
+    "normalization": "Trailing whitespace/EOF and literal tabs normalized; raw originals remain in external runtime/check output"
+  },
+  {
+    "file": "checks/host-tests-current-main.log",
+    "raw_sha256": "b00979e64f0dd475ab751f7a69f5dfea2309652e2609880a15233c674cafdeaa",
+    "normalized_sha256": "807dc8b6ed0202cde81b0bd09875e22a93ea7169d8d27268c90f609cf12d20de",
+    "normalization": "Trailing whitespace/EOF and literal tabs normalized; raw originals remain in external runtime/check output"
+  },
+  {
+    "file": "checks/web-current-main.log",
+    "raw_sha256": "bc7cb2c06003dc32f56072828f87f88cce648d9e65e697321f10f6cc204748ad",
+    "normalized_sha256": "08b0515575073abe876d420af8fc7b547f02b5d7d706853f1a62f044acddfb6e",
+    "normalization": "Trailing whitespace/EOF and literal tabs normalized; raw originals remain in external runtime/check output"
+  },
+  {
+    "file": "native-negative/native-r3-wide.log",
+    "raw_sha256": "e9f445000adae5c1e3610e519c3d28e52b143fcfe6d69312955f8d4d0ff08be1",
+    "normalized_sha256": "6633a88768d3de335c62630a42f73e6271dc52856c1e65604d44cdc181862300",
+    "normalization": "Trailing whitespace/EOF and literal tabs normalized; raw originals remain in external runtime/check output"
+  },
+  {
+    "file": "checks/native-palette-build.log",
+    "raw_sha256": "d96841ecb8d0fe8909a39cd1f631093e8368c11bbe5fcf746210725bd92a8503",
+    "normalized_sha256": "0e89efa8b58a54740ead830f07f2b7aacaf66e2761a15508e6b85f1bbbe1c203",
+    "normalization": "Trailing whitespace/EOF and literal tabs normalized; raw originals remain in external runtime/check output"
+  },
+  {
+    "file": "native-r5/compact.log",
+    "raw_sha256": "fe3dbab6dfba34fef11534e73a8a22e86e51f8719a4ac2c7dd76d3a63e227a6c",
+    "normalized_sha256": "7ee23fb60910022ee786555c55d75b6b61ee0d3fd4bf9c57e320e32a99511923",
+    "normalization": "Trailing whitespace/EOF and literal tabs normalized; raw originals remain in external runtime/check output"
+  },
+  {
+    "file": "native-r5/wide.log",
+    "raw_sha256": "4a8b8e5e0d4e783891dfb1515851f19b4b4e41cc0f80c67a33c9a84b878c7753",
+    "normalized_sha256": "24fd18f4f148032c2cdecef63b1ca76c35c533472f16c19d3de2d2c37aa0b30a",
+    "normalization": "Trailing whitespace/EOF and literal tabs normalized; raw originals remain in external runtime/check output"
+  },
+  {
+    "file": "native-negative/r4/wide.log",
+    "raw_sha256": "05588e94e8404570e9eb30aeb725b514f262e6558b328d154e877e179bff9f50",
+    "normalized_sha256": "011b5bf9c80eea3b14b87ab8c2d7d56857ae5f07561ae7fdbd2513c9d4a06020",
+    "normalization": "Trailing whitespace/EOF and literal tabs normalized; raw originals remain in external runtime/check output"
+  },
+  {
+    "file": "checks/web-published-merge.log",
+    "raw_sha256": "e64d24058289ebdc4cad3b31debde96d8447957760033b255dde53c1489d1f6b",
+    "normalized_sha256": "6d6f1d217a0cb48bf78af6c1d77119badcb2bfa13f3d858040c6b95684fe3dc7",
+    "normalization": "Trailing whitespace/EOF and tabs normalized in stored copy; raw external log preserved"
+  },
+  {
+    "file": "checks/host-tests-published-merge.log",
+    "raw_sha256": "408293818c925d1e72b09084ec89a54b2e112912129e2b4f040bef110c0a4002",
+    "normalized_sha256": "d55db0673ebd259f24297681a40ef90854539fab5877cfee69105e70b7a2f54d",
+    "normalization": "Trailing whitespace/EOF and tabs normalized in stored copy; raw external log preserved"
+  }
+]

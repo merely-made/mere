@@ -1,0 +1,10 @@
+{
+  "mutation": "Removed only retained-session lapse check",
+  "command_exit": 1,
+  "expected_failures": {
+    "expired_session_clears_cached_disclosure_and_never_dispatches_queued_open": true,
+    "signed_session_revocation_clears_an_opened_projection_without_deleting_content": true
+  },
+  "original_sha256": "d18c763a306abe21fc455bd9152c571ebcdd8ab9a1d4b8dad4f0d9db5127d69a",
+  "source_restored": true
+}

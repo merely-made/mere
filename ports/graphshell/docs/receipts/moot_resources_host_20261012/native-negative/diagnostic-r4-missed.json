@@ -1,0 +1,6 @@
+{
+  "status": "not launched",
+  "reason": "03:53:30 UTC grant cutoff expired during context compaction before preflight",
+  "observed_at": "2026-10-13T03:54:53+00:00",
+  "binary_sha256": "a433397a943dce317987a925b2dbd622d9914cddcdaec2e14ebb9d92c7de389d"
+}
