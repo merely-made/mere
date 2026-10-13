@@ -1,0 +1,18 @@
+mere-moot v0.0.1 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/ports/moot)
+├── mere-comms v0.0.1 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/shell/comms)
+│   ├── async-trait v0.1.92 (proc-macro)
+│   │   ├── proc-macro2 v1.0.107
+│   │   │   └── unicode-ident v1.0.26
+│   │   ├── quote v1.0.47
+│   │   │   └── proc-macro2 v1.0.107 (*)
+│   │   └── syn v3.0.6
+│   │       ├── proc-macro2 v1.0.107 (*)
+│   │       ├── quote v1.0.47 (*)
+│   │       └── unicode-ident v1.0.26
+│   └── serde v1.0.229
+│       ├── serde_core v1.0.229
+│       └── serde_derive v1.0.229 (proc-macro)
+│           ├── proc-macro2 v1.0.107 (*)
+│           ├── quote v1.0.47 (*)
+│           └── syn v3.0.6 (*)
+└── serde v1.0.229 (*)

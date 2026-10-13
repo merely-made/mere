@@ -574,6 +574,160 @@ a forme draft must not author a message or discard an independent conversation
 edit. This continuation qualifies channel-local editing, not the pending forme
 gesture/undo implementation.
 
+### Shared resources and coop interaction draft (2026-10-11)
+
+Mark asked whether the next work should repin Knot to p2panda net 0.7.6 or
+reconcile current origins/plans and develop testable application drafts. He
+selected **shared resources and coop** as the first interaction. The fresh
+origin review found that Knot already adopts the immutable
+`mere-p2panda-net-0.7.5-upstream-20261011` source. That source differs from the
+fork's 0.7.6 tag only in the net package version. A version migration is
+dependency maintenance, not a prerequisite for this application draft.
+
+The draft is a shared collection beside a domain-owned activity. It preserves
+the exact signed contribution and manifest selected by this reading, even when
+another revision appears. Collection lineage, content copying/forking, hosting
+and activity participation are separate requested actions. A hosting promise is
+distinct from an observed retrieval; resolved content does not imply durable
+custody. Membership counts and lifecycle reports supply no live presence or
+action permission.
+
+The portable [resource/coop model](../../../ports/moot/src/resource_coop.rs)
+composes disclosed values with the existing `LifecycleReport`. It adds no
+publication/collection wire format, store or authority owner. Gemot supplies
+effective contributions and exact collection frontier/commitment; Eidetic
+supplies manifests and verified content; the existing application supplies the
+activity address and report. The first native adapter must map those actual
+reads, not manufacture an all-authorizing fixture authority. Existing
+`declare_collection_for_identity` and `set_collection_membership_for_identity`
+remain the collection mutation owners. A collection fork cannot stand in for
+a grant to copy or fork content.
+
+**Draft flow:** inspect a disclosed resource summary and its contribution/version
+evidence; inspect a related activity without changing resource selection;
+prepare an explicitly offered action; dispatch through its existing owner with
+current authority, key, revision, storage/audience and quota checks; show that
+owner's acceptance/refusal; then refresh from an owner read. Preparation and
+acceptance feedback never mark bytes retained, hosting available or a profile
+joined. Different readers and Moots require a fresh pane. A refresh or selection
+change invalidates local completion bindings without claiming cancellation of
+an already-dispatched domain command.
+
+The current S-PC [rule-editor and live binding](../../mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#exact-occurrence-previews-and-live-forme-guides-draft-2026-10-11)
+provide the presentation grammar. A future resource/activity occurrence adapter
+must disclose only available owner facts, keep unknown state distinct from false,
+and preserve per-view attention and prior matches. Summary-first inspection,
+optional exact evidence and host-composed controls follow the one-tree presenter
+review. Rules, Forme arrangement history, captures and resource authority remain
+separate: opening, arranging or restyling this surface cannot author a hosting,
+fork or join operation.
+
+**Validation targets:** equal payloads preserve independent contributions; a new
+revision does not retarget an exact selection; reference/collection fork offers
+do not grant content-copy rights; independent readings reject each other's
+completions; current refusal, withdrawal and refresh invalidate stale responses;
+membership and promises create no offers or presence; bad scopes and changed
+contribution bindings refuse before replacing the view. The small source harness
+imports the checked-in portable model and lifecycle sources. It qualifies these
+interaction contracts, not Gemot authorization, network transfer, application
+dispatch or rendered Graphshell acceptance.
+
+**Source qualification:** the [receipt](../../../ports/moot/docs/receipts/resource_coop_draft_20261011/qualification.json)
+records 20 passing harness tests (10 resource/coop contracts plus 10 existing
+lifecycle tests), strict harness Clippy, the actual default Moot Wasm check and
+the portable dependency cone. The Mere port and Graphshell web boundary checker
+also passes. Reproduce the contract tests with
+`cargo test --locked --offline --manifest-path ports/moot/docs/receipts/resource_coop_draft_20261011/harness/Cargo.toml --lib -j1`.
+No production owner adapter, rendered controls, live peer interaction, browser
+or GPU acceptance is claimed by this draft.
+
+**Next consumer gates:** bind production collection/capture and activity reads;
+add ordinary Cambium resource summaries, an adjacent inspector and owner-routed
+controls; qualify two independent readings and refused/stale actions; then
+exercise real signed Gemot revocation and collection/content fork distinctions
+across retained peers. GPU/browser acceptance stays under the current serialized
+handoff. The separate producer/presenter lanes are preserved.
+
+### Resource owners and Cambium controls (2026-10-11)
+
+The next slice connects the portable model to existing owners and supplies an
+ordinary host-neutral Cambium view. `resource-owner` opts into Gemot, Eidetic
+and their native storage/identity cone; `resource-view` opts into Cambium only.
+The ordinary portable Moot feature remains independent of those cones. No
+Graphshell presenter or renderer source is changed by this slice.
+
+The [owner bridge](../../../ports/moot/src/resource_owner.rs) requires current
+Moot membership for disclosure, resolves the collection through
+`authorized_collection`, and keeps every currently effective signed contribution
+separate. Exact manifest identity, current format, content hash and byte size
+are checked through Eidetic. The first local reader accepts only
+`PublicPortable` content up to 4 MiB, with `Local` or `Embedded` backing; it uses
+`NoFetcher` and neither acquires nor caches bytes. Private/sealed access needs
+its own capability and key adapter; larger content needs a streaming reader.
+Resolution is local-read evidence, not a retention or encrypted-custody claim.
+The signed sharing root is disclosed separately from content authorship.
+
+The host reviews a destination collection name and identity before offering a
+reference fork. That destination is part of the portable observed intention.
+The bridge checks current destination capability, membership, exact source
+frontier/commitment, effective membership and unused destination identity, then
+calls `declare_collection_for_identity`. Gemot repeats its current command gate.
+A changed destination, source version, current grant or membership refuses.
+Forking preserves contribution references and ancestry and writes no payload
+bytes. Content-copy, content-fork and hosting actions expose their missing
+production owners explicitly. Activity requests retain their exact application
+owner; the resource bridge refuses to dispatch them as collection operations.
+
+The [Cambium view](../../../ports/moot/src/resource_view.rs) supplies resource
+summaries, an adjacent inspector, optional exact references and separate coop
+activity inspection. Its geometry sheet leaves theme and typography to the
+host. Each host-mounted reading has a unique DOM scope, independent attention
+and its own prepared request. The host takes the intention, routes it to the
+actual owner, returns accepted/refused/unsupported feedback and refreshes owner
+reads. A refreshed or differently selected reading drops its stale local
+completion binding; this does not cancel an already-dispatched domain command.
+The view can compose through ordinary Cambium state/lens composition. It does
+not automatically mount itself into Graphshell or install an activity runtime.
+
+**Qualification scope:** the [owner harness](../../../ports/moot/docs/receipts/resource_owner_20261011/harness/Cargo.toml)
+imports the real port and its checked-in integration tests. Those tests use
+signed Gemot constitutions, independently attested Personae writers, p2panda
+membership/object accept boundaries and actual Eidetic/Cambium APIs. Content
+storage is explicitly unsealed and in memory. Two independent semantic DOMs
+exercise ordinary control dispatch; that is distinct from measured layout,
+paint, host focus/pointer routing and GPU/browser acceptance. The related coop
+record is disclosed fixture application data; no live application participation
+is qualified.
+
+**Source qualification (2026-10-12):** the [receipt](../../../ports/moot/docs/receipts/resource_owner_20261011/qualification.json)
+records **11 owner/control tests and 22 portable contract tests passed**, strict
+Clippy for the selected actual Moot library, and both default and `resource-view`
+Wasm checks. The view's normal Wasm cone contains no Gemot, P2Panda net, Iroh,
+Tokio, redb or Commons. Dependency boundaries pass. The initial broader Clippy
+attempt encountered two unchanged Stickleback lints; the selected-port gate uses
+`--no-deps`, and no whole-workspace Clippy pass is claimed. Initial CPU compilation
+stopped at the free-disk guard; retiring only stale task-owned incremental scratch
+preserved source, native proof binaries, dependency/build outputs and captures.
+The completed gates used one job, no debug/incremental output, and a private
+cache. The renderer's borrowed target and runtime reservation were preserved.
+
+The 4 MiB limit checks declared and accepted blob size. The generic Store API can
+materialize malformed backing before hash/size rejection; bounded backend and
+streaming memory acceptance remain separate. Current reads and dispatch repeat
+owner checks, with no new cross-lane transaction or historical authority cut.
+Replay the owner/control tests with
+`cargo test --locked --offline --manifest-path ports/moot/docs/receipts/resource_owner_20261011/harness/Cargo.toml --lib -j1`.
+The source/semantic-DOM receipt supplies no GPU, native-window or browser
+acceptance.
+
+**Remaining host gates:** install the view in an admitted Graphshell host with
+its real owner dispatch and refresh loop; bind actual application sessions;
+provide private access/key and content-retention/hosting owners; then qualify
+layout, themes, keyboard/focus, narrow widths, exact-read independence and source
+withdrawal across real peers under the serialized runtime handoff. The current
+S-PC occurrence/relationship inspector and presentation rules supply the read
+and presentation contracts without becoming new resource authorities.
+
 ### Capsule peer and standalone-browser reproduction
 
 The following commands execute the earlier capsule-library proof. Start at the
@@ -677,19 +831,19 @@ that authority before serving. The production publication and full hosting recor
 owners, authority-at-publication frontier, atomic cross-lane import, device adapter,
 and two-machine transport receipt remain open.
 
-Production ownership is now ruled. Eidetic owns the signed immutable publication
-revision as a typed artifact; the existing Gemot `Shared` event contributes its
-manifest without duplicating authorship. Gemot owns the full hosting promise as a
+Production ownership is ruled; the production implementation gate remains open.
+Eidetic will own the signed immutable publication revision as a typed artifact; the existing Gemot `Shared` event contributes its
+manifest without duplicating authorship. Gemot will own the full hosting promise as a
 Standing fact. Mesh's compute leases and Stickleback's carrier records remain
-unchanged. The production hosting command derives `moot/hosting/<audience>` from
-the requested audience itself, intersects community bounds with the device's
-local ceilings, and binds the observed authority frontier before signing. The
+unchanged. The production hosting command must derive `moot/hosting/<audience>` from
+the requested audience itself, intersect community bounds with the device's
+local ceilings, and bind the observed authority frontier before signing. The
 generic Standing command remains a lower-level primitive and does not choose
 hosting authority on the caller's behalf.
 
 Historical authority is a signed causal cut, not a wall-clock claim. Contribution
-and hosting records bind the constitution revision plus observed constitution,
-membership, and delegation heads. Resolution reports `proven`, `denied`,
+and hosting records must bind the constitution revision plus observed constitution,
+membership, and delegation heads. Resolution must report `proven`, `denied`,
 `pending missing evidence`, or `legacy unbound`; an incomplete imported prefix is
 never treated as denial. Current authority remains the moderation and serving
 view, so later revocation can hide or stop serving an historically valid record

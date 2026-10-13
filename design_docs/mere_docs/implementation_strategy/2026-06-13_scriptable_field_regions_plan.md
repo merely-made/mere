@@ -256,17 +256,23 @@ coordinates may compose through a parent transform; they are not automatically
 conflicting world-position writers. Projection-rule precedence belongs to the
 presentation-rule lane, with the field providing scope and match explanation.
 
-The following forks need concrete rulings before their runtime adapters:
+The following choices have partial rulings; remaining forks need resolution
+before their runtime adapters:
 
-1. **Spatial eligibility:** reference point, whole footprint or intersection?
-   Recommend a reference-point test as the initial explicit choice, with the
-   measured footprint available to a later mode. Keep boundary policy visible.
+1. **Spatial eligibility, ruled by F204:** each appearance's reference point,
+   including the boundary. The query selects candidates separately, and camera
+   motion leaves membership unchanged. The
+   [dynamics plan](2026-10-02_dynamics_grammar_plan.md) records the answer verbatim;
+   extent filtering and attached-extent resolution still need their adapter.
+   Footprint intersection/containment remain later explicit modes.
 2. **Conflicting placement:** refuse the incompatible edit, designate one owner,
    or supply an explicit priority? The refusal above is recommended, not ruled.
 3. **Membership events:** distinguish movement, field edits, query/source changes
-   and initial loading. Recommend reporting initial matches without running
-   entry actions; deliberate entry and automatic changes need separate policy.
-   Debouncing, jitter and re-entry belong in the dynamics lane's event contract.
+   and initial loading. F205 rules that initial matches are reported without
+   entry actions, which start on later transitions. The dynamics plan records
+   the answer verbatim. Debouncing, jitter, re-entry and executing the actions
+   still require the dynamics lane's event adapter. F203 supplies its animated
+   field clock default: simulation time, Pause freezes, Reset rewinds.
 4. **Field attachment and authored attributes:** a forme representation and a
    Numen force field have different owners today. Their association and arbitrary
    attributes need the existing graph-semantics/storage seam resolved before
@@ -283,8 +289,46 @@ dynamics-owned acceptance case. This pass adds design and source findings only.
 
 ### Field inspection adapter sequence (2026-10-10)
 
-**Status (2026-10-11):** steps 1–2 implemented as a read-only draft; step 3
-remains planned. The [implementation and host handoff](#field-inspection-draft-2026-10-11)
+**Strength continuation (2026-10-11):** step 3 now has an exact-coupling
+strength draft and an acknowledged host transaction. It does not open general
+field/selector/response edits. The draft carries its graph-session identity. The complete held coupling and
+field owner are re-resolved before apply; changed, missing or inactive owners
+refuse, as do equal coupling IDs belonging to another graph session. Text is
+limited to 128 bytes, strengths must be finite, and private draft history keeps
+64 steps. Preview describes the authored value without running forces. Changing
+selection or inspecting another field does not retarget the open strength draft.
+
+Pandect stages a graph/journal candidate with an independent capture buffer,
+validates it, then commits its pending writes in one `Backend::transact`.
+The append-only journal and change-log lengths and last retained entries are
+rechecked inside that transaction. This is concurrency protection under the
+existing append-only contract, not a corruption audit. Pending unsaved session
+work and nontransactional backends refuse; there is no fallback to separate
+read/write calls. The acknowledged graph/history installs only after commit.
+One coupling-specific author channel keeps saved undo/redo separate from other
+couplings and unrelated graph edits. Protected newer authored values retain the
+existing journal's keep-and-report semantics. Failed saves leave the draft and
+acknowledged graph/history intact.
+
+The retained host offers Edit, Preview, Apply, Discard, draft Undo/Redo and
+saved Undo/Redo. Acknowledged changes refresh that exact coupling through the
+Canvas's existing ingest/reconcile seam, while the portable local client is
+remounted from the acknowledged source. A projection-refresh error is reported
+as follow-through after a saved write, rather than relabeling it as a storage
+failure. Five native tests pass: exact save and
+undo/reopen with sibling/unrelated-edit preservation; failed writes and
+nontransactional refusal; competing durable saves; and invalid/withdrawn targets
+with private history; and equal-ID cross-graph refusal. Five native Forme renderer cases and product/viewer Wasm
+checks also pass. Three Chrome strength cases pass, including invalid input, private undo/discard,
+inspection changes without draft retargeting, exact save, sibling/geometry
+preservation, saved history/reopen and final readable captures. Inspector wide
+and narrow reading and the presentation editor/live-guide pages also pass in the
+[ten-page qualification](../../../ports/graphshell/docs/receipts/field_editor_presentation_browser_20261011/qualification.json).
+Large-session candidate-copy/log-list costs, physical force effects and general
+field controls remain open; the browser fixture's forces are neutral.
+
+**Status (2026-10-11):** steps 1–2 are implemented; the strength-only portion
+of step 3 is implemented as described above. The [implementation and host handoff](#field-inspection-draft-2026-10-11)
 record current source and qualification. The sequence was first source checked
 at published Mere `69f17908`; inspection leaves the unresolved spatial/event
 and storage decisions explicit.
@@ -319,6 +363,32 @@ and geometry owner, independently of the Numen field roster. This pass does not
 choose an association record, new attributes, event triggers or conflict policy.
 Read-only inspection can land first; the remaining controls follow their named
 write and composition gates.
+
+### Field composition walkthrough (2026-10-11; design continuation)
+
+The first composition study keeps three independently authored contributions:
+
+| Contribution | Owner and preview |
+|---|---|
+| Arrangement | The workbench/Forme pair owns member-local cells and outer bounds. Preview shows the existing holds and any explicit item pin that wins over them. |
+| Influence | A Numen field/coupling supplies an additive force contribution to its selector matches. Preview discloses each contribution and the sum, independently of whether a boundary is painted. |
+| Presentation scope | The field supplies a subject scope to the existing presentation resolver. Its decisions explain matched rules; footprint-changing representations precede measurement and placement. |
+
+For webpages A and B in a Forme, place a second field across A. Inspecting it
+must separately show its authored region hit, held selector matches and the
+consumer's evaluated influence. Today's Canvas converter uses the selector
+independently of extent, so a boundary over A does not currently establish that
+only A receives its force. Forme-local positions and explicit pins retain their
+current owners while compatible forces compose. Nested local coordinates may
+compose through a parent transform. Two incompatible exact placement writers
+still require the placement ruling above; inspection order is not precedence.
+
+The next design fixture should contain a repeated appearance, an explicit pin,
+two additive couplings and a limited/empty scope, then show which owner explains
+each result. Spatial eligibility, field association/attributes and entry/exit
+events retain their named decisions. The strength transaction does not choose
+those policies, run scripts or change membership. Event and visible-force work
+remain with the dynamics lane; representation precedence stays with scene rules.
 
 ### Field inspection draft (2026-10-11)
 

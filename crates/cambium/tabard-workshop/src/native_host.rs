@@ -110,6 +110,9 @@ pub fn sync_and_export(
     state: &mut WorkshopState,
     choose_export: &mut impl FnMut(&ExportArtifact) -> Option<PathBuf>,
 ) -> bool {
+    if state.fonts.installed.is_none() {
+        state.set_installed_font_families(cambium_genet_winit_host::installed_font_families());
+    }
     state.sync_controls();
     if let Some(artifact) = state.take_export() {
         let destination = choose_export(&artifact);
@@ -180,9 +183,10 @@ pub fn native_hooks(
 /// Initialize the shared workshop frame with the native host's caption
 /// controls. Window creation and render-core selection stay with the caller.
 pub fn native_init(
-    state: WorkshopState,
+    mut state: WorkshopState,
     commands: &cambium_genet_winit_host::WindowCommands,
 ) -> Init<WorkshopState, WorkshopLogic> {
+    state.set_installed_font_families(cambium_genet_winit_host::installed_font_families());
     let commands = commands.clone();
     Init {
         state,

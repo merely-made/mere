@@ -1,0 +1,16 @@
+{
+  "observed_date": "2026-10-12",
+  "upstream": "https://github.com/linebender/vello.git",
+  "refs": [
+    "f3000c8d9e7a9c7e6abb09b9587238bf8b4860ff\trefs/tags/glifo-v0.4.0",
+    "f3000c8d9e7a9c7e6abb09b9587238bf8b4860ff\trefs/tags/sparse-strips-v0.3.0",
+    "f3000c8d9e7a9c7e6abb09b9587238bf8b4860ff\trefs/tags/v0.11.0"
+  ],
+  "adopted": {
+    "classic": "0.11.0",
+    "cpu": "0.3.0",
+    "gpu": "0.3.0",
+    "common": "0.3.0",
+    "glifo": "0.4.0"
+  }
+}

@@ -99,7 +99,22 @@ pub(crate) fn coupling_force_from_graph(
             targets,
             field.definition.clone(),
         )
-        .with_registry(registry),
+        .with_registry(registry)
+        .with_provenance(
+            seiche::CouplingSource {
+                field: coupling.field,
+                coupling: coupling.id,
+                revision: Some(graph.revision()),
+            },
+            |_, key| {
+                graph
+                    .get_node(key)
+                    .map(|node| seiche::CouplingTargetIdentity {
+                        member: node.id.as_u128(),
+                        occurrence: None,
+                    })
+            },
+        ),
     )
 }
 

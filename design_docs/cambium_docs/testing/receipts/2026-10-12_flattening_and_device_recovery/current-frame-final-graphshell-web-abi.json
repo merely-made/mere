@@ -1,0 +1,24 @@
+{
+  "command": [
+    "cargo",
+    "check",
+    "--offline",
+    "--locked",
+    "-p",
+    "graphshell",
+    "--no-default-features",
+    "--features",
+    "web",
+    "--target",
+    "wasm32-unknown-unknown",
+    "--lib",
+    "-j2"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-vello-release-adoption",
+  "deadline_seconds": 240,
+  "elapsed_seconds": 20.089,
+  "exit_code": 0,
+  "timed_out": false,
+  "disk_refused": false,
+  "log": "/Users/markik/Code/output/vello-production-fixes-20261011/checks/current-frame-final-graphshell-web-abi.log"
+}

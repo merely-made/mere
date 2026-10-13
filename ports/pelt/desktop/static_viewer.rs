@@ -642,10 +642,11 @@ mod livery_route_tests {
             session.content_height(640, 480) > 480,
             "fixture is scrollable"
         );
+        let target = genet_host_api::navigation::resolve_href(&fixture, "#resource-target");
         let link = session
             .links()
             .into_iter()
-            .find(|link| link.url == "#resource-target")
+            .find(|link| link.url == target)
             .expect("fixture jump link");
         assert!(matches!(
             session.click_at(link.rect[0] + 2.0, link.rect[1] + 2.0),
@@ -1309,11 +1310,17 @@ impl windowed::ViewerContent for ControllerViewerContent {
     fn drive_product_receipt(&mut self, receipt: StaticProductReceipt) -> Result<String, String> {
         match receipt {
             StaticProductReceipt::Article => {
+                // Session links are resolved navigation destinations; compare
+                // through the engine's existing resolver rather than raw href.
+                let target = genet_host_api::navigation::resolve_href(
+                    self.controller.address(),
+                    "#resource-target",
+                );
                 let link = self
                     .controller
                     .links()
                     .into_iter()
-                    .find(|link| link.url == "#resource-target")
+                    .find(|link| link.url == target)
                     .ok_or_else(|| "article receipt could not find its jump link".to_owned())?;
                 let x = link.rect[0] + 2.0;
                 let y = link.rect[1] + 2.0;

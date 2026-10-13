@@ -1,0 +1,6 @@
+<!-- Copyright 2026 Mark Alan Boykin; SPDX-License-Identifier: MPL-2.0 -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title>Merely</title>
+  <rect width="64" height="64" rx="12" fill="#8b1511"/>
+  <text x="32" y="47" fill="#f0ebdd" font-family="Georgia, 'Times New Roman', serif" font-size="48" font-weight="700" text-anchor="middle">m</text>
+</svg>

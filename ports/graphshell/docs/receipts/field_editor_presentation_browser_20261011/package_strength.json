@@ -1,0 +1,14 @@
+{
+  "owner": "Field editor and presentation Chrome qualification",
+  "source_commit": "1e47059c3c8e4d4c3ed8eb2770df81fae026f0a2",
+  "artifacts": {
+    "graphshell_web_bg.wasm": {
+      "sha256": "840299ff6bf2e6ee4946a17fe08c1dd1fa2dd351023c9536352de386aca4bb27",
+      "bytes": 360262480
+    },
+    "graphshell_web.js": {
+      "sha256": "6c120ee44c4c035267e5a6b868428163a97a5f9cab77cbe6e54e05bb540958de",
+      "bytes": 138790
+    }
+  }
+}

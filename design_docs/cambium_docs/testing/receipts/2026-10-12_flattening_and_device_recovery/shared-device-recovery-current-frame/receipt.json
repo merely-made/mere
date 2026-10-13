@@ -1,0 +1,105 @@
+{
+  "actual_losses": [
+    {
+      "generation": 1,
+      "message": "",
+      "reason": "Destroyed"
+    },
+    {
+      "generation": 2,
+      "message": "",
+      "reason": "Destroyed"
+    }
+  ],
+  "adapter": {
+    "backend": "Metal",
+    "device": 0,
+    "device_type": "DiscreteGpu",
+    "driver": "",
+    "driver_info": "",
+    "name": "AMD Radeon Pro Vega 56",
+    "vendor": 0
+  },
+  "all_owned_old_core_references_released_before_boot": true,
+  "capture_refusals": [
+    [
+      "image",
+      1
+    ],
+    [
+      "stamped",
+      1
+    ],
+    [
+      "paint",
+      1
+    ]
+  ],
+  "factory_attempts": 2,
+  "frames": [
+    {
+      "byte_count": 76800,
+      "file": "first-before.rgba",
+      "fnv1a_digest": "5a96f667c510791d",
+      "height": 120,
+      "name": "first-before",
+      "width": 160
+    },
+    {
+      "byte_count": 76800,
+      "file": "second-before.rgba",
+      "fnv1a_digest": "9a478d0a877d29f2",
+      "height": 120,
+      "name": "second-before",
+      "width": 160
+    },
+    {
+      "byte_count": 76800,
+      "file": "first-after.rgba",
+      "fnv1a_digest": "5a96f667c510791d",
+      "height": 120,
+      "name": "first-after",
+      "width": 160
+    },
+    {
+      "byte_count": 76800,
+      "file": "second-after.rgba",
+      "fnv1a_digest": "9a478d0a877d29f2",
+      "height": 120,
+      "name": "second-after",
+      "width": 160
+    }
+  ],
+  "host_wakes": 2,
+  "inflight_old_generation_refused_once": true,
+  "initial_generation": 1,
+  "namespace_scope": "distinct host-local leaf keys 701/702; does not qualify identical full-Workshop reserved-key namespaces",
+  "no_late_old_pixels": true,
+  "pixel_equality": {
+    "first": true,
+    "second": true
+  },
+  "replacement_generation": 2,
+  "schema_version": 1,
+  "scope": "actual headless shared-device destroy/replacement and registered production-reader image rehydration; no swapchain presentation or physical driver reset",
+  "second_replacement_failure_sticky": true,
+  "source_authority": {
+    "first": {
+      "dirty": true,
+      "mode": "light",
+      "reader_rc_preserved": true
+    },
+    "second": {
+      "dirty": true,
+      "mode": "dark",
+      "reader_rc_preserved": true
+    }
+  },
+  "source_authority_preserved": true,
+  "source_reader_paper": {
+    "first": "#EEF5FF",
+    "second": "#131826"
+  },
+  "stale_notice_deduplicated": true,
+  "surface_drops": 4
+}

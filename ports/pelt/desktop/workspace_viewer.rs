@@ -1012,6 +1012,45 @@ fn tabard_preview_stylesheet() -> String {
     stylesheet
 }
 
+// Font policy stays with Tabard; Pelt maps it onto its ordinary chrome only.
+fn pelt_font_selector(role: tabard::FontRole) -> &'static str {
+    use tabard::FontRole;
+    match role {
+        FontRole::Interface => {
+            ".pelt-address,.pelt-engine,.pelt-engine-option,.pelt-chrome-button,.pelt-chrome-toggle,.pelt-appearance-option,.frisket-label"
+        },
+        FontRole::Heading => {
+            ".pelt-title,.pelt-inspector-heading,.pelt-appearance-heading,.pelt-diagnostic-heading,h1,h2,h3"
+        },
+        FontRole::Label => {
+            ".pelt-status,.pelt-route,.pelt-appearance-label,.pelt-appearance-note,label"
+        },
+        FontRole::Code => "pre,code",
+        FontRole::Reading => "",
+    }
+}
+fn pelt_application_font_css(fonts: &tabard::FontPreferences) -> String {
+    fonts
+        .0
+        .iter()
+        .filter(|(role, stack)| !stack.is_empty() && !pelt_font_selector(**role).is_empty())
+        .map(|(role, _)| {
+            format!(
+                "{}{{font-family:var(--tabard-font-{});}}\n",
+                pelt_font_selector(*role),
+                role.key()
+            )
+        })
+        .collect()
+}
+pub(crate) fn pelt_typography_css(fonts: &tabard::Typography) -> String {
+    tabard::FontRole::ALL
+        .into_iter()
+        .filter(|role| !pelt_font_selector(*role).is_empty())
+        .map(|role| fonts.role_css(role, pelt_font_selector(role)))
+        .collect()
+}
+
 // Product-role mapping shared by durable application choices and the receipt.
 const PELT_TABARD_ROLES: &str = "\
 .pelt-workspace, .pelt-workspace.pelt-theme-light { \
@@ -1658,14 +1697,17 @@ impl WorkspaceApp {
                 .or_else(|| self.theme_catalog.error.clone())
                 .or_else(|| {
                     self.applied_theme.as_ref().ok().and_then(|resolved| {
-                        (!resolved.diagnostics.is_empty()).then(|| {
-                            resolved
-                                .diagnostics
-                                .iter()
-                                .map(ToString::to_string)
-                                .collect::<Vec<_>>()
-                                .join(" ")
-                        })
+                        let mut notices = resolved
+                            .diagnostics
+                            .iter()
+                            .map(ToString::to_string)
+                            .collect::<Vec<_>>();
+                        notices.extend(self.theme_catalog.font_notices(&resolved.theme));
+                        notices.extend(
+                            self.theme_catalog
+                                .application_font_notices(&resolved.resolved.fonts),
+                        );
+                        (!notices.is_empty()).then(|| notices.join(" "))
                     })
                 });
         }
@@ -1733,9 +1775,17 @@ impl WorkspaceApp {
                 Ok(resolved) => {
                     let sheet = match &resolved.presentation {
                         tabard::ThemePresentation::Derived(palette) => {
-                            format!("{}\n{}", palette.css_custom_properties(), PELT_TABARD_ROLES)
+                            format!(
+                                "{}\n{}\n{}\n{}\n{}",
+                                palette.css_custom_properties(),
+                                PELT_TABARD_ROLES,
+                                pelt_typography_css(&resolved.theme.typography),
+                                self.theme_catalog
+                                    .application_font_css(&resolved.resolved.fonts),
+                                pelt_application_font_css(&resolved.resolved.fonts)
+                            )
                         },
-                        tabard::ThemePresentation::AuthoredStylesheet(rules) => {
+                        tabard::ThemePresentation::AuthoredStylesheet(_) => {
                             // Arbitrary CSS has no claimed derived palette. Supply
                             // Pelt's default variables for roles the author omits.
                             let fallback = tabard::resolve_theme_choice(
@@ -1748,10 +1798,25 @@ impl WorkspaceApp {
                                 unreachable!("built-in default is derived")
                             };
                             format!(
-                                "{}\n{}\n{}",
+                                "{}\n{}\n{}\n{}\n{}\n{}\n{}",
                                 palette.css_custom_properties(),
                                 PELT_TABARD_ROLES,
-                                rules.join("\n")
+                                resolved.theme.typography.css_custom_properties(),
+                                pelt_typography_css(&resolved.theme.typography),
+                                self.theme_catalog
+                                    .application_font_css(&resolved.resolved.fonts),
+                                pelt_application_font_css(&resolved.resolved.fonts),
+                                resolved
+                                    .theme
+                                    .mode_sheet(
+                                        resolved
+                                            .resolved
+                                            .theme_mode
+                                            .as_ref()
+                                            .expect("resolved mode")
+                                    )
+                                    .expect("authored mode")
+                                    .join("\n")
                             )
                         },
                     };
@@ -2171,7 +2236,8 @@ impl WorkspaceApp {
             return false;
         }
         let choice = self.appearance.store().choice();
-        let choice = if mode {
+        let application_fonts = choice.fonts.clone();
+        let mut choice = if mode {
             let Some(selected) = self.theme_catalog.modes(choice).get(index).cloned() else {
                 return false;
             };
@@ -2185,6 +2251,7 @@ impl WorkspaceApp {
                 Some(tabard::theme::seed::default_mode_for_def(theme)),
             )
         };
+        choice.fonts = application_fonts;
         match self
             .theme_catalog
             .apply_choice(self.appearance.store_mut().as_mut(), choice)

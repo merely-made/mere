@@ -1,0 +1,26 @@
+{
+  "base": "6a1962278ae6802b48029ac32171ca254ab092f8",
+  "files_replaced_with_unmodified_HEAD": [
+    "crates/inker/document-canvas/src/style_sheet.rs",
+    "crates/inker/document-canvas/src/text.rs"
+  ],
+  "command": [
+    "cargo",
+    "+1.97.1",
+    "test",
+    "-p",
+    "document-canvas",
+    "--features",
+    "netrender",
+    "-j",
+    "1",
+    "--locked",
+    "--offline",
+    "--lib",
+    "normal_width_table_wraps_unbroken_link_inside_its_cell",
+    "--",
+    "--exact",
+    "layout::tests::normal_width_table_wraps_unbroken_link_inside_its_cell"
+  ],
+  "exit_code": 101
+}

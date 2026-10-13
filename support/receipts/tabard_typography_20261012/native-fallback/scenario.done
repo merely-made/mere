@@ -1,0 +1,8 @@
+RESULT ok
+Pelt portable requested font remains intact with a visible device fallback
+captured unavailable_family_editor
+captured fallback_previews
+capture unavailable_family_editor 2360x1600 digest=81b47c212455f7fc file=/Users/markik/Code/tabard-app-receipts/2026-10-11/typography/native-fallback/unavailable_family_editor.png
+capture fallback_previews 2360x1600 digest=34ab3ff91072c690 file=/Users/markik/Code/tabard-app-receipts/2026-10-11/typography/native-fallback/fallback_previews.png
+frames: 2 captured, 0 blank, 2 distinct digests
+presentation: 21 frames, 23 redraws, 2 unpresented redraws

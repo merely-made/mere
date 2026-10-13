@@ -1,5 +1,18 @@
 # Batch 69: Eidetic development planning
 
+Onward amendment, 2026-10-12: four owned plan/index claims hold against Turnstone
+runtime source `97c139442cdc0600f1a5629eec1a40cb27f2a917` and published
+qualification `9412077`: selected local disclosure uses the existing SDK;
+unchanged envelopes/source facts survive independent-store copy and restart;
+private backing/unselected data and damaged/missing bytes have tested refusal
+or exclusion; broader schema/collection/browser/custody gates remain open.
+The default library run passes 794 tests with ten existing ignores, the final
+receiver/export suite passes ten tests, and nine native onward captures were
+reviewed. This is an implementing-agent judgment over those claims, without
+requalifying unrelated source work. The three-file documentation amendment is
+isolated from ten unpublished primary commits and concurrent packaging receipts
+on the published Mere base `c7a4b06b`.
+
 Audit date: 2026-10-11. This implementing-agent judgment covers the new plan,
 its owned coordination amendments and the June plan's archival. It is not an
 independent whole-document audit. Source findings were reviewed at Mere
@@ -8,6 +21,27 @@ independent whole-document audit. Source findings were reviewed at Mere
 advanced with concurrent Forme and semantic-core documentation work, preserved
 by this amendment. The first transfer draft amendment below adds bounded
 runtime evidence without closing the plan's broader host gates.
+
+Receiver amendment, 2026-10-11: this implementing-agent judgment checks six
+additional claims in the owned Eidetic plan/index amendment against Turnstone
+implementation `d2fb07c1ccb70edb3943986432905aa7f5247e46` and published receiver
+receipt `bb0993160d1a5699a078ecd9cbbe3b67bba6a0f2`, with all six holding.
+The source and receipt are inspected directly: selected text/WAV admission,
+real Inker/Redshank use, fresh-process reopening with unavailable packages,
+local missing-content refusal, exact source-family convergence, and the retained
+scope limits. The receiver has nine reviewed native captures, six final host
+tests and one offline-port test; its earlier broad library run has 789 passes
+and ten existing ignores. The store is explicitly unsealed. Browser/structured
+receiving, source-backed excerpts, tag acceptance, reviewed reconnect edits and
+P6 custody/retention remain open. This amendment changes three documentation
+files only, on the published Mere base `04a48c2d`; concurrent field-editor source
+and receipts in the primary checkout are preserved.
+Primary-tree mechanical baseline has zero failing findings. The isolated
+worktree's D2 run covers 261/264 active documents; its three missing records
+belong to the concurrent classic-browser receipt, outside this amendment.
+Worktree mechanical results also reflect absent machine-local sibling/probe
+paths, so they are not claimed as a green whole-tree gate. Owned amendments
+pass link/source inspection and `git diff --check`.
 
 Totals: 7 documents, 32 claims checked (32 holds, 0 stale, 0 unverifiable).
 Proposal sequencing and future done-conditions are not implementation claims.

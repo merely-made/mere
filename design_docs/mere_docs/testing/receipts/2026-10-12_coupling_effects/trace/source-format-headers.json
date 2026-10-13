@@ -1,0 +1,92 @@
+{
+  "crates/canvas/pictograph/src/canvas.rs": {
+    "headers": true,
+    "formatted": false,
+    "unchanged_format_debt": true,
+    "format_delta": "-pub use forme_region::{FormeCell, FormeRegion};\n+pub use forme_region::{FormeCell, FormeRegion};\n+mod dynamics_inspection;\n+mod node_presentation;\n-mod dynamics_inspection;\n-mod node_presentation;\n+pub mod dynamics_recipe;\n-pub mod dynamics_recipe;\n-pub mod projection_dynamics;\n-mod projection_backdrops;\n+mod projection_backdrops;\n+pub mod projection_dynamics;\n+mod framing;\n-mod framing;"
+  },
+  "crates/canvas/pictograph/src/canvas/coupling_trace.rs": {
+    "headers": true,
+    "formatted": true,
+    "unchanged_format_debt": true,
+    "format_delta": ""
+  },
+  "crates/canvas/pictograph/src/canvas/seiche_bridge.rs": {
+    "headers": true,
+    "formatted": true,
+    "unchanged_format_debt": true,
+    "format_delta": ""
+  },
+  "crates/conatus/seiche/examples/coupling_trace.rs": {
+    "headers": true,
+    "formatted": true,
+    "unchanged_format_debt": true,
+    "format_delta": ""
+  },
+  "crates/conatus/seiche/src/coupling_effect_tests.rs": {
+    "headers": true,
+    "formatted": true,
+    "unchanged_format_debt": true,
+    "format_delta": ""
+  },
+  "crates/conatus/seiche/src/coupling_force.rs": {
+    "headers": true,
+    "formatted": true,
+    "unchanged_format_debt": true,
+    "format_delta": ""
+  },
+  "crates/conatus/seiche/src/coupling_trace.rs": {
+    "headers": true,
+    "formatted": true,
+    "unchanged_format_debt": true,
+    "format_delta": ""
+  },
+  "crates/conatus/seiche/src/coupling_trace_tests.rs": {
+    "headers": true,
+    "formatted": true,
+    "unchanged_format_debt": true,
+    "format_delta": ""
+  },
+  "crates/conatus/seiche/src/lib.rs": {
+    "headers": true,
+    "formatted": false,
+    "unchanged_format_debt": true,
+    "format_delta": "+pub use node_body::{NodeCollider, NodeMaterial};\n-pub use node_body::{NodeCollider, NodeMaterial};"
+  },
+  "crates/conatus/seiche/src/runtime.rs": {
+    "headers": true,
+    "formatted": false,
+    "unchanged_format_debt": true,
+    "format_delta": "-                p.handle.command(PhysicsCommand::SetStaticObstacles(obstacles));\n+                p.handle\n+                    .command(PhysicsCommand::SetStaticObstacles(obstacles));"
+  },
+  "crates/conatus/seiche/src/runtime/actor.rs": {
+    "headers": true,
+    "formatted": true,
+    "unchanged_format_debt": true,
+    "format_delta": ""
+  },
+  "crates/conatus/seiche/src/runtime/coupling_trace_delivery.rs": {
+    "headers": true,
+    "formatted": true,
+    "unchanged_format_debt": true,
+    "format_delta": ""
+  },
+  "crates/conatus/seiche/src/runtime/coupling_trace_tests.rs": {
+    "headers": true,
+    "formatted": true,
+    "unchanged_format_debt": true,
+    "format_delta": ""
+  },
+  "crates/conatus/seiche/src/runtime/elapsed/tests.rs": {
+    "headers": true,
+    "formatted": true,
+    "unchanged_format_debt": true,
+    "format_delta": ""
+  },
+  "crates/conatus/seiche/src/runtime/pause_tests.rs": {
+    "headers": true,
+    "formatted": true,
+    "unchanged_format_debt": true,
+    "format_delta": ""
+  }
+}

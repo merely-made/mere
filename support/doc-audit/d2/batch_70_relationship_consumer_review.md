@@ -10,14 +10,18 @@ their separate Windows and native qualification. Existing historical progress an
 physics work remain outside this pass. The subsequent viewport continuation
 uses Mere `ec1e65ca` as its doc base and Knot `156626f` for its
 consumer proof. Mark's instruction parks Firefox while browser control is blocked.
+The completion/refusal follow-up uses Mere `f197cadf` as its documentation base
+and published Knot `e944fca` for the separate 84-test/18-capture consumer proof.
+The existing private Firefox window was identified on Mark's requested retry;
+inspection encountered the same URL-policy block, with no browser receipt.
 
 | doc | disposition | status accurate | claims | holds | stale | unverifiable |
 |---|---|---|---:|---:|---:|---:|
-| mere_docs/research/2026-10-09_scenograph_codex_handoff.md | current | yes | 10 | 10 | 0 | 0 |
-| mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md | current | yes | 12 | 12 | 0 | 0 |
+| mere_docs/research/2026-10-09_scenograph_codex_handoff.md | current | yes | 12 | 12 | 0 | 0 |
+| mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md | current | yes | 14 | 14 | 0 | 0 |
 | DOC_README.md | current | yes | 2 | 2 | 0 | 0 |
 
-Totals: 3 documents, 24 claims checked, 24 holds, zero stale or unverifiable
+Totals: 3 documents, 28 claims checked, 28 holds, zero stale or unverifiable
 claims in these amendments; zero remaining contradictions within this pass.
 The owned-document mechanical comparison introduces zero findings. Full-tree
 findings and the pre-existing producer-gates README's missing D2 record remain
@@ -31,7 +35,7 @@ amended documents retain their D2 coverage.
 
 - disposition: current
 - status line: "Dynamics consumer refresh (2026-10-11)" — accurate: yes
-- claims checked: 10 — holds: 10, stale: 0, unverifiable: 0
+- claims checked: 12 — holds: 12, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -58,12 +62,16 @@ placement ruling, exact-pose Keep/undo/redo/reopen qualification and remaining
 gate scope. The two executable phases and known visual defects are explicit.
 The newer toolbar/reveal qualification uses captured host-owned geometry and
 preserves source authority, ordinary scrolling and the parked Firefox scope.
+Checked controller-end feedback and guarded replay/refusal against the exact
+pinned API and published Knot source. The separate 84-test/18-capture receipt
+preserves last-valid poses, deliberate Keep and unchanged source. A private
+window did not resolve the browser-policy block; no Firefox pass is inferred.
 
 ## mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md
 
 - disposition: current
 - status line: "Relationship consumer qualification (2026-10-11)" — accurate: yes
-- claims checked: 12 — holds: 12, stale: 0, unverifiable: 0
+- claims checked: 14 — holds: 14, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -92,6 +100,9 @@ The viewport continuation has its own focused/native evidence and one-shot
 scroll-away guard. It does not inherit a new full-workspace pass from `63aa695`.
 The golden failure is reported rather than changed. This review is not the
 original physics coordinator's independent review.
+Completion/refusal feedback uses the existing shared end result; a finished
+120-tick schedule is not claimed to have rested. Runtime status stays outside
+retention. Its focused/native gates and private-Firefox refusal are explicit.
 
 ## DOC_README.md
 

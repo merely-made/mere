@@ -29,6 +29,8 @@ pub struct ReaderSpecimen {
     palette: SmolwebPalette,
     accessible_name: String,
     revision: u64,
+    typography: tabard::Typography,
+    baseline_style: document_canvas::DocumentStyleSheet,
 }
 
 impl Default for ReaderSpecimen {
@@ -61,7 +63,10 @@ impl ReaderSpecimen {
             source.clone(),
             SmolwebTheme::App(palette.clone()),
         );
+        let baseline_style = document.style_sheet().clone();
         Self {
+            baseline_style,
+            typography: Default::default(),
             source,
             document,
             palette,
@@ -95,12 +100,36 @@ impl ReaderSpecimen {
             self.source.clone(),
             SmolwebTheme::App(palette.clone()),
         );
+        self.baseline_style = self.document.style_sheet().clone();
+        self.apply_typography_style();
         self.palette = palette;
         self.revision = self
             .revision
             .checked_add(1)
             .expect("reader revision exhausted");
         true
+    }
+
+    pub fn set_typography(&mut self, typography: tabard::Typography) -> Result<bool, String> {
+        typography.validate()?;
+        if self.typography == typography {
+            return Ok(false);
+        }
+        self.typography = typography;
+        self.apply_typography_style();
+        self.revision = self
+            .revision
+            .checked_add(1)
+            .expect("reader revision exhausted");
+        Ok(true)
+    }
+    fn apply_typography_style(&mut self) {
+        let style = mere_document_lanes::document_style_with_typography(
+            &self.baseline_style,
+            &self.typography,
+        )
+        .expect("validated typography");
+        self.document.set_style_sheet(style);
     }
 
     pub fn source_document(&self) -> Arc<EngineDocument> {
@@ -130,6 +159,47 @@ impl ReaderSpecimen {
 mod tests {
     use super::*;
     use tabard::theme::registry::Mode;
+
+    #[test]
+    fn font_changes_remeasure_the_existing_source_and_reset_its_defaults() {
+        use tabard::{FontRole, ThemeFontStyle, Typography};
+        let mut reader = ReaderSpecimen::default();
+        let source = reader.source_document();
+        let name = reader.accessible_name().to_owned();
+        let baseline = reader.document.style_sheet().clone();
+        let original = reader.frame(350, 400);
+        let mut fonts = Typography::default();
+        fonts
+            .set(
+                FontRole::Reading,
+                ThemeFontStyle {
+                    family: Some("Georgia".into()),
+                    size_px: Some(24.0),
+                    line_height: Some(1.8),
+                },
+            )
+            .unwrap();
+        reader.set_typography(fonts).unwrap();
+        let changed = reader.frame(350, 400);
+        assert!(Arc::ptr_eq(&source, &reader.source_document()));
+        assert_eq!(reader.accessible_name(), name);
+        assert_eq!(
+            reader.document.style_sheet().roles.heading,
+            baseline.roles.heading
+        );
+        assert!(
+            changed
+                .ops
+                .iter()
+                .any(|op| matches!(op,netrender::SceneOp::GlyphRun(run) if run.font_size==24.0))
+        );
+        assert_ne!(
+            postcard::to_allocvec(&original).unwrap(),
+            postcard::to_allocvec(&changed).unwrap()
+        );
+        reader.set_typography(Typography::default()).unwrap();
+        assert_eq!(reader.document.style_sheet(), &baseline);
+    }
 
     #[test]
     fn specimen_is_extracted_and_uses_real_shaped_reader_output() {

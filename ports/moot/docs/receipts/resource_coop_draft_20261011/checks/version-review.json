@@ -1,0 +1,24 @@
+{
+  "compatibility_tag": "mere-p2panda-net-0.7.5-upstream-20261011",
+  "compatibility_commit": "d8acabc96ecc59016e40edf4a47ed5eaf5360285",
+  "release_tag": "mere-p2panda-net-0.7.6",
+  "release_commit": "64b4bcc8481638f0cfdbcf1e200b68efb65ff8cc",
+  "upstream_main": "3e84cac48bba05c6857cce2ec433862b97f8d53c",
+  "upstream_vs_fork_ahead_behind": [
+    "0",
+    "22"
+  ],
+  "compatibility_vs_release_diff": "diff --git a/p2panda-net/Cargo.toml b/p2panda-net/Cargo.toml\nindex ee0f8bc8..38f8c8f8 100644\n--- a/p2panda-net/Cargo.toml\n+++ b/p2panda-net/Cargo.toml\n@@ -1,6 +1,6 @@\n [package]\n name = \"mere-p2panda-net\"\n-version = \"0.7.5\"\n+version = \"0.7.6\"\n edition = \"2024\"\n authors = [\n   \"adz <x12@adz.garden>\",",
+  "knot_origin_reviewed": "156626fb97284db8032f02651bf4118ba52fbbd9",
+  "knot_manifest_p2panda_lines": [
+    "mere-p2panda-net = { git = \"https://github.com/mark-ik/p2panda.git\", tag = \"mere-p2panda-net-0.7.5-upstream-20261011\" }",
+    "p2panda-auth = { git = \"https://github.com/mark-ik/p2panda.git\", tag = \"mere-p2panda-net-0.7.5-upstream-20261011\" }",
+    "p2panda-core = { git = \"https://github.com/mark-ik/p2panda.git\", tag = \"mere-p2panda-net-0.7.5-upstream-20261011\" }",
+    "p2panda-discovery = { git = \"https://github.com/mark-ik/p2panda.git\", tag = \"mere-p2panda-net-0.7.5-upstream-20261011\" }",
+    "p2panda-encryption = { git = \"https://github.com/mark-ik/p2panda.git\", tag = \"mere-p2panda-net-0.7.5-upstream-20261011\" }",
+    "p2panda-store = { git = \"https://github.com/mark-ik/p2panda.git\", tag = \"mere-p2panda-net-0.7.5-upstream-20261011\" }",
+    "p2panda-stream = { git = \"https://github.com/mark-ik/p2panda.git\", tag = \"mere-p2panda-net-0.7.5-upstream-20261011\" }",
+    "p2panda-sync = { git = \"https://github.com/mark-ik/p2panda.git\", tag = \"mere-p2panda-net-0.7.5-upstream-20261011\" }"
+  ],
+  "interpretation": "The reviewed compatibility and 0.7.6 tags differ only in the net package version; repinning changes no implementation behavior."
+}

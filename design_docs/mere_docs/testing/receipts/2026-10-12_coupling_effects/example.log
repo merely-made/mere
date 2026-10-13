@@ -1,0 +1,23 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling seiche v0.0.6 (C:\Users\mark_\Code\worktrees\mere-coupling-effects\crates\conatus\seiche)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.29s
+     Running `C:\t\cargo-targets\mere\debug\examples\coupling_effects.exe`
+wall: configured sample time 0; proposed AddForce([20.666664, 0.0])
+wall: before position (10.333332, 4.833334), velocity Vec2(19.2, -9.6)
+wall: after 60 actual ticks position (25.996517, 1.1787405), velocity Vec2(16.703058, -0.8289845)
+damping: configured sample time 0; proposed ScaleVelocity(0.5)
+damping: before position (10.333332, 4.833334), velocity Vec2(19.2, -9.6)
+damping: after 60 actual ticks position (10.641026, 4.679487), velocity Vec2(1.4380589e-18, -7.1902944e-19)
+alignment: configured sample time 0; proposed SetVelocity([40.0, -20.0])
+alignment: before position (10.333332, 4.833334), velocity Vec2(19.2, -9.6)
+alignment: after 60 actual ticks position (50.33342, -15.166644), velocity Vec2(38.4, -19.2)
+advection: configured sample time 0; proposed Displace([0.6666667, -0.33333334])
+advection: before position (10.333332, 4.833334), velocity Vec2(19.2, -9.6)
+advection: after 60 actual ticks position (57.642544, -18.821259), velocity Vec2(1.657969, -0.8289845)

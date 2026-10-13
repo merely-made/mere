@@ -1,0 +1,107 @@
+{
+  "integration_base": "2aecdf9559b766951c66cb1b16c0b84ac7963d0e",
+  "citation_audit": {
+    "new_finding_categories": [],
+    "method": "Same worktree path; temporarily restored only the two owned edited Markdown files from integration-base HEAD, ran the complete audit, restored the draft, then compared finding source/subject identities. This preserves the worktree sibling-repository path conditions. New source headers are present and the primary baseline has the same existing unheaded source.",
+    "same_path_baseline_counts": {
+      "active_docs": 264,
+      "indexed_active_docs": 263,
+      "index_orphans": 0,
+      "index_ghosts": 0,
+      "memory_directory_links": 0,
+      "statusless_plans": 0,
+      "broken_relative_links": 28,
+      "historical_broken_relative_links": 245,
+      "planned_broken_relative_links": 0,
+      "ambiguous_known_root_paths": 101,
+      "ignored_known_root_patterns": 23,
+      "reserved_identifier_paths": 24,
+      "missing_known_root_paths": 200,
+      "historical_missing_known_root_paths": 237,
+      "planned_missing_known_root_paths": 6,
+      "invalid_historical_annotations": 0,
+      "stale_historical_annotations": 0,
+      "unheaded_owned_sources": 1,
+      "exhibit_b_sources": 0
+    },
+    "current_counts": {
+      "active_docs": 264,
+      "indexed_active_docs": 263,
+      "index_orphans": 0,
+      "index_ghosts": 0,
+      "memory_directory_links": 0,
+      "statusless_plans": 0,
+      "broken_relative_links": 28,
+      "historical_broken_relative_links": 245,
+      "planned_broken_relative_links": 0,
+      "ambiguous_known_root_paths": 101,
+      "ignored_known_root_patterns": 23,
+      "reserved_identifier_paths": 24,
+      "missing_known_root_paths": 200,
+      "historical_missing_known_root_paths": 237,
+      "planned_missing_known_root_paths": 6,
+      "invalid_historical_annotations": 0,
+      "stale_historical_annotations": 0,
+      "unheaded_owned_sources": 1,
+      "exhibit_b_sources": 0
+    },
+    "global_findings_remain": true
+  },
+  "d2_audit": {
+    "matches_baseline": true,
+    "errors": [
+      "snapshot aggregate digest changed: 2046e1eec3018b7dd288e794326090f1b7f9a889043d53e45530271d0b32be1e != f0b64eef4cd5514157bb1b49d389b84db29a1e823d6f3e2cebf827337fe56abf",
+      "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md",
+      "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md",
+      "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_producer_gates/README.md"
+    ],
+    "global_status": "four existing errors; no new errors"
+  },
+  "whitespace": "passed",
+  "raw_local_reports": [
+    "/Users/markik/Code/targets/moot-resource-coop-doc-baseline-20261011.json",
+    "/Users/markik/Code/targets/moot-resource-coop-doc-same-path-baseline-20261011.json",
+    "/Users/markik/Code/targets/moot-resource-coop-doc-current-20261011.json",
+    "/Users/markik/Code/targets/moot-resource-coop-judgment-baseline-20261011.json",
+    "/Users/markik/Code/targets/moot-resource-coop-judgment-current-20261011.json"
+  ],
+  "after_rebase": {
+    "parent": "6a1962278ae6802b48029ac32171ca254ab092f8",
+    "citation_new_categories": [],
+    "citation_counts": {
+      "active_docs": 264,
+      "indexed_active_docs": 263,
+      "index_orphans": 0,
+      "index_ghosts": 0,
+      "memory_directory_links": 0,
+      "statusless_plans": 0,
+      "broken_relative_links": 28,
+      "historical_broken_relative_links": 245,
+      "planned_broken_relative_links": 0,
+      "ambiguous_known_root_paths": 101,
+      "ignored_known_root_patterns": 23,
+      "reserved_identifier_paths": 24,
+      "missing_known_root_paths": 200,
+      "historical_missing_known_root_paths": 237,
+      "planned_missing_known_root_paths": 6,
+      "invalid_historical_annotations": 0,
+      "stale_historical_annotations": 0,
+      "unheaded_owned_sources": 1,
+      "exhibit_b_sources": 0
+    },
+    "d2_matches_parent": true,
+    "d2_errors": [
+      "snapshot aggregate digest changed: 2046e1eec3018b7dd288e794326090f1b7f9a889043d53e45530271d0b32be1e != f0b64eef4cd5514157bb1b49d389b84db29a1e823d6f3e2cebf827337fe56abf",
+      "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md",
+      "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md",
+      "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_producer_gates/README.md"
+    ],
+    "exit_codes": {
+      "citation_baseline": 0,
+      "citation_current": 0,
+      "d2_baseline": 1,
+      "d2_current": 1
+    },
+    "checked_source_hashes_unchanged": true
+  }
+}

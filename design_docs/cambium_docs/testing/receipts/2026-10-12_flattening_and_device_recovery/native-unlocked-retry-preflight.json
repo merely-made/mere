@@ -1,0 +1,13 @@
+{
+  "binary": "/Users/markik/Code/targets/mere-s2s3/debug/tabard-desktop",
+  "binary_sha256": "b4f413755dacece3a863b39e1b43fd6e39e3e0cf709cfd4148622de079f6d030",
+  "expected_frozen_binary_sha256": "b4f413755dacece3a863b39e1b43fd6e39e3e0cf709cfd4148622de079f6d030",
+  "binary_identity_matches": true,
+  "scenario_sha256": "96f64dd4a425a0978ed366cb3c6823d1cc675f85fe46a82dfa130366409c27cf",
+  "scenario_identity_matches": true,
+  "current_mere_head": "e0dae9c99423210b82bc24e0518739d2c9fefe34",
+  "rust_source_unchanged_since_frozen_source": true,
+  "source_manifest_lock_unchanged_since_published_qualification": true,
+  "owned_immutable_binary_copy": "/Users/markik/Code/output/vello-production-fixes-20261011/native-unlocked-frozen-tabard-b4f4137",
+  "binary_bytes": 111317016
+}

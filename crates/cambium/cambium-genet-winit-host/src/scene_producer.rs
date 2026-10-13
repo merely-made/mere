@@ -116,6 +116,15 @@ impl<T> TextureProducer for SceneProducer<T> {
     }
 
     fn render(&mut self, cx: &ProducerContext<'_>) -> Option<ProducedTexture> {
+        // Legacy direct callers keep their unit/Option contract. Rootstock
+        // uses render_checked so a refusal cannot retain a stale image.
+        self.render_checked(cx).ok().flatten()
+    }
+
+    fn render_checked(
+        &mut self,
+        cx: &ProducerContext<'_>,
+    ) -> Result<Option<ProducedTexture>, genet_render_host::RasterizeFailure> {
         let logical_size = (
             cx.frame.logical_size.0.round().max(1.0) as u32,
             cx.frame.logical_size.1.round().max(1.0) as u32,
@@ -127,18 +136,18 @@ impl<T> TextureProducer for SceneProducer<T> {
             && self.logical_size == logical_size
             && self.layout_scale == cx.frame.layout_scale
         {
-            return None;
+            return Ok(None);
         }
         let scene = self.scene(logical_size.0, logical_size.1);
         let [width, height] = cx.frame.physical_size;
-        let (texture, view) = cx.core.rasterize_scaled_for(
+        let (texture, view) = cx.core.try_rasterize_scaled_for(
             self.raster_key,
             &scene,
             width,
             height,
             ColorLoad::Clear(wgpu::Color::TRANSPARENT),
             cx.frame.layout_scale,
-        );
+        )?;
         self.texture = Some(texture);
         self.physical_size = cx.frame.physical_size;
         self.logical_size = logical_size;
@@ -148,12 +157,12 @@ impl<T> TextureProducer for SceneProducer<T> {
             .generation
             .checked_add(1)
             .expect("scene producer generation exhausted");
-        Some(ProducedTexture {
+        Ok(Some(ProducedTexture {
             view,
             generation: self.generation,
             alpha: SourceAlpha::Straight,
             encoding: SourceEncoding::Srgb,
-        })
+        }))
     }
 
     fn suspend(&mut self) {

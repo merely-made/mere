@@ -294,6 +294,7 @@ impl ThemeRegistry {
     /// validates the derived tokens (a malformed seed set is rejected, not
     /// registered).
     pub fn add_user_theme(&mut self, mut def: Theme) -> Result<(), String> {
+        def.typography.validate()?;
         def.source = ThemeSource::User;
         self.insert_def(def)
     }
@@ -354,6 +355,7 @@ impl ThemeRegistry {
             // A fork carries the source's per-mode custom sheets (they are
             // part of the theme's look; remove them by editing the fork).
             mode_sheets: src.mode_sheets,
+            typography: src.typography,
         };
         self.add_user_theme(def.clone()).ok()?;
         Some(def)

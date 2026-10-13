@@ -583,8 +583,13 @@ impl<P: Product> Lane<P> {
             let sink: PaintReadback = Rc::new(RefCell::new(None));
             let callback_sink = sink.clone();
             *ctx.capture_paint = Some(Box::new(move |envelope| {
-                *callback_sink.borrow_mut() =
-                    Some(postcard::to_allocvec(&envelope).map_err(|error| error.to_string()));
+                *callback_sink.borrow_mut() = Some(
+                    envelope
+                        .map_err(|error| error.to_string())
+                        .and_then(|envelope| {
+                            postcard::to_allocvec(&envelope).map_err(|error| error.to_string())
+                        }),
+                );
             }));
             sink
         });

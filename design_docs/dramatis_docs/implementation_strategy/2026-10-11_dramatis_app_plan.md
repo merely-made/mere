@@ -2,8 +2,9 @@
 
 **Status (2026-10-11):** first Windows app slice complete and qualified.
 Djinn owns custody and consent; concurrent main work is retained. Persona
-creation, contacts, credential fill, CXF export, distribution packaging and
-Linux/macOS host qualification remain open.
+creation, contacts, credential fill and CXF export remain open. The Windows
+debug packaging pipeline is qualified; optimized releases, OS install trust,
+publication and Linux/macOS host qualification remain open.
 
 ## Phases and done-conditions
 
@@ -112,3 +113,40 @@ audit baseline findings are recorded separately in that receipt.
 The focused lane integrates concurrent documentation changes without
 changing their source. Its temporary worktree and synthetic runtime roots
 are removed after integration. Builds reuse `C:/t/cargo-targets/mere`.
+
+## Packaging through Hocket/Luggage (2026-10-11)
+
+The app declares cargo-packager metadata and uses `ports/dramatis/package.py`
+to build with a single compiler job, package the explicit UI binary, sign its
+artifact and assemble/sign a Luggage feed. The shared target is reused without
+cleaning another lane's cache. `--version` and `--build-info` bind each binary
+to its package version, application source, workspace manifests and lockfile;
+the pre-packaging hook rejects stale inputs or a concurrent source/lock change.
+
+The package contains public release information, the Merely brand icon and
+license notices. Djinn remains a shared resident dependency; its quarantine
+routes require Mere `ec1e65ca` or a descendant with `cxf`. That source floor is
+declared in the package because the resident's package version spans both
+older and newer route sets. The installer/uninstaller owns the Dramatis UI,
+with no custody binary or vault-data removal hook.
+
+The Windows debug NSIS pipeline passes: pack/sign, extraction, the extracted
+binary's version/source identity and an absent-Djinn native GPU capture.
+Luggage verifies the actual artifact and signed manifest and restores durable
+staging. Unsigned or edited manifests, a different valid publisher key,
+bad artifact signatures and altered artifact/staged bytes are refused.
+Every feed byte is restored after controls. The gate passes one real-package
+test plus the four state and seven retained interaction tests; dependency
+bans and portable metadata also pass.
+
+Evidence: [packaging receipt](../../../support/receipts/dramatis-packaging/README.md).
+The artifact is debug-built and signed with a synthetic key, which is removed
+with the extraction after qualification. It proves the packaging and Luggage
+path, not an optimized, installed, OS-signed or published release. Automatic
+update controls and resident installation are separate work.
+
+Remote qualification is explicitly pending on Fedora/ThinkPad, Intel macOS
+and ARM macOS until those hosts are reachable. Resume one native host at a
+time, inspect existing build owners/free memory, reuse its approved target,
+and default to one compiler job. The Mac signing identity is a host setting;
+its option and the non-Windows formats remain unqualified on Windows.

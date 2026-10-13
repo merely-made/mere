@@ -1,0 +1,12 @@
+pelt host profile=livery url=/Users/markik/Code/worktrees/mere-tabard-typography/ports/pelt/examples/workspace/p6-appearance/index.html javascript=false webdriver=false devtools=false webgpu=false webxr=false
+[pelt] accessibility Installed, 22 retained workspace nodes projected
+[pelt] primary initial reveal visible=Some(true) focused=true activation_requested=true
+[cambium-winit] accessibility Installed, 222 nodes projected
+pelt-appearance: Pelt portable requested font remains intact with a visible device fallback
+pelt-appearance: captured unavailable_family_editor
+pelt-appearance: captured fallback_previews
+pelt-appearance: RESULT ok (21 frames, 2 captures)
+pelt-typography role=interface class=pelt-address family=Some("\"Tabard unavailable receipt face\", sans-serif") size=Some("15px") line-height=Some("1.2")
+pelt-typography fallback-notice=Interface: Tabard unavailable receipt face is not installed on this device; sans-serif is the fallback.
+pelt workspace first_url=/Users/markik/Code/worktrees/mere-tabard-typography/ports/pelt/examples/workspace/p6-appearance/index.html window=true redraws=28 size=1180x800 tiles=1 interaction_receipt=false capability_receipt=false tearout_receipt=false tearout_cancellation_receipt=false workspace_receipt=appearance routes=1=genet.livery:document
+pelt workspace product receipt=appearance assertion=shared workshop native controls saved a definition; ordinary Pelt appearance controls applied and persisted its exact mode while the held controller, history, focused tile and content aperture remained unchanged artifact=/Users/markik/Code/tabard-app-receipts/2026-10-11/typography/native-fallback/browser.png digest=975b663ba68313a2 verified_sizes=1180x800
