@@ -112,7 +112,8 @@ $ownedStatus = git -C $mereRoot status --porcelain -- `
     crates/intel/esp `
     crates/mesh/mesh `
     crates/mesh/host `
-    crates/murm/transport `
+    Cargo.toml `
+    Cargo.lock `
     support/patches/burn-remote
 $ownedPathsDirty = [bool]$ownedStatus
 

@@ -5093,7 +5093,7 @@ dependencies = [
 [[package]]
 name = "embedded-graphics"
 version = "0.8.2"
-source = "git+https://github.com/merely-made/retinue.git?rev=773515f21635093a319da1bd21f7354dfa430b5a#773515f21635093a319da1bd21f7354dfa430b5a"
+source = "git+https://github.com/merely-made/retinue.git?rev=b49df894635bac95823284efee6c445885eaf62a#b49df894635bac95823284efee6c445885eaf62a"
 dependencies = [
  "az",
  "byteorder",
@@ -5105,7 +5105,7 @@ dependencies = [
 [[package]]
 name = "embedded-graphics-core"
 version = "0.4.1"
-source = "git+https://github.com/merely-made/retinue.git?rev=773515f21635093a319da1bd21f7354dfa430b5a#773515f21635093a319da1bd21f7354dfa430b5a"
+source = "git+https://github.com/merely-made/retinue.git?rev=b49df894635bac95823284efee6c445885eaf62a#b49df894635bac95823284efee6c445885eaf62a"
 dependencies = [
  "az",
  "byteorder",
@@ -9779,13 +9779,12 @@ dependencies = [
 [[package]]
 name = "mere-transport"
 version = "0.0.2"
+source = "git+https://github.com/merely-made/retinue.git?rev=b49df894635bac95823284efee6c445885eaf62a#b49df894635bac95823284efee6c445885eaf62a"
 dependencies = [
  "bytes",
  "hkdf 0.13.0",
- "insigne",
  "iroh",
  "iroh-blobs",
- "iroh-mdns-address-lookup",
  "iroh-tickets",
  "mere-p2panda-net",
  "muniment",
@@ -9794,14 +9793,11 @@ dependencies = [
  "p2panda-core",
  "personae",
  "retinue 0.3.0",
- "serde_json",
  "sha2 0.11.0",
  "snow",
  "stickleback",
- "tempfile",
  "thiserror 1.0.69",
  "tokio",
- "tokio-stream",
  "tracing",
  "zeroize",
 ]
@@ -9827,6 +9823,7 @@ dependencies = [
 [[package]]
 name = "mere-webrtc-carrier"
 version = "0.0.1"
+source = "git+https://github.com/merely-made/retinue.git?rev=b49df894635bac95823284efee6c445885eaf62a#b49df894635bac95823284efee6c445885eaf62a"
 dependencies = [
  "blake3",
  "futures-channel",
@@ -9837,7 +9834,6 @@ dependencies = [
  "tokio",
  "wasm-bindgen",
  "wasm-bindgen-futures",
- "wasm-bindgen-test",
  "web-sys",
 ]
 
@@ -10167,22 +10163,20 @@ dependencies = [
 [[package]]
 name = "murm"
 version = "0.0.1"
+source = "git+https://github.com/merely-made/retinue.git?rev=b49df894635bac95823284efee6c445885eaf62a#b49df894635bac95823284efee6c445885eaf62a"
 dependencies = [
  "async-trait",
  "blake3",
  "hex",
- "insigne",
  "mere-proofs",
  "mere-transport",
  "muniment",
- "notochord",
  "p2panda-core",
  "p2panda-encryption",
  "personae",
  "serde",
  "serde_bytes",
  "stickleback",
- "tempfile",
  "thiserror 1.0.69",
  "tokio",
  "tokio-stream",
@@ -11897,13 +11891,14 @@ dependencies = [
 [[package]]
 name = "outrider"
 version = "0.3.0"
-source = "git+https://github.com/merely-made/retinue.git?rev=773515f21635093a319da1bd21f7354dfa430b5a#773515f21635093a319da1bd21f7354dfa430b5a"
+source = "git+https://github.com/merely-made/retinue.git?rev=b49df894635bac95823284efee6c445885eaf62a#b49df894635bac95823284efee6c445885eaf62a"
 dependencies = [
  "hkdf 0.13.0",
  "retinue 0.3.0",
  "rmpv",
  "sha2 0.11.0",
  "thiserror 2.0.21",
+ "tokio",
  "tulle",
 ]
 
@@ -13382,7 +13377,7 @@ dependencies = [
 [[package]]
 name = "postilion"
 version = "0.3.0"
-source = "git+https://github.com/merely-made/retinue.git?rev=773515f21635093a319da1bd21f7354dfa430b5a#773515f21635093a319da1bd21f7354dfa430b5a"
+source = "git+https://github.com/merely-made/retinue.git?rev=b49df894635bac95823284efee6c445885eaf62a#b49df894635bac95823284efee6c445885eaf62a"
 dependencies = [
  "getrandom 0.3.4",
  "heapless 0.9.3",
@@ -13857,7 +13852,7 @@ dependencies = [
 [[package]]
 name = "radio-face"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/retinue.git?rev=773515f21635093a319da1bd21f7354dfa430b5a#773515f21635093a319da1bd21f7354dfa430b5a"
+source = "git+https://github.com/merely-made/retinue.git?rev=b49df894635bac95823284efee6c445885eaf62a#b49df894635bac95823284efee6c445885eaf62a"
 dependencies = [
  "embedded-graphics",
 ]
@@ -13865,7 +13860,7 @@ dependencies = [
 [[package]]
 name = "radio-hand"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/retinue.git?rev=773515f21635093a319da1bd21f7354dfa430b5a#773515f21635093a319da1bd21f7354dfa430b5a"
+source = "git+https://github.com/merely-made/retinue.git?rev=b49df894635bac95823284efee6c445885eaf62a#b49df894635bac95823284efee6c445885eaf62a"
 dependencies = [
  "heapless 0.9.3",
  "hmac 0.13.0",
@@ -14543,7 +14538,7 @@ dependencies = [
 [[package]]
 name = "retinue"
 version = "0.3.0"
-source = "git+https://github.com/merely-made/retinue.git?rev=773515f21635093a319da1bd21f7354dfa430b5a#773515f21635093a319da1bd21f7354dfa430b5a"
+source = "git+https://github.com/merely-made/retinue.git?rev=b49df894635bac95823284efee6c445885eaf62a#b49df894635bac95823284efee6c445885eaf62a"
 dependencies = [
  "aes 0.9.3",
  "bzip2 0.6.1",
@@ -14554,6 +14549,7 @@ dependencies = [
  "hkdf 0.13.0",
  "hmac 0.13.0",
  "sha2 0.11.0",
+ "socket2",
  "tokio",
  "tulle",
  "x25519-dalek 3.0.0",
@@ -15337,7 +15333,7 @@ checksum = "2ab42ca02749e120097e328d91d415325bdf43b1c72c4c8badf37375fe40a813"
 [[package]]
 name = "selvage"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/retinue.git?rev=773515f21635093a319da1bd21f7354dfa430b5a#773515f21635093a319da1bd21f7354dfa430b5a"
+source = "git+https://github.com/merely-made/retinue.git?rev=b49df894635bac95823284efee6c445885eaf62a#b49df894635bac95823284efee6c445885eaf62a"
 
 [[package]]
 name = "semver"
@@ -15358,7 +15354,7 @@ checksum = "cd0b0ec5f1c1ca621c432a25813d8d60c88abe6d3e08a3eb9cf37d97a0fe3d73"
 [[package]]
 name = "seneschal"
 version = "0.2.0"
-source = "git+https://github.com/merely-made/retinue.git?rev=773515f21635093a319da1bd21f7354dfa430b5a#773515f21635093a319da1bd21f7354dfa430b5a"
+source = "git+https://github.com/merely-made/retinue.git?rev=b49df894635bac95823284efee6c445885eaf62a#b49df894635bac95823284efee6c445885eaf62a"
 dependencies = [
  "ed25519-dalek 3.0.0",
  "heapless 0.9.3",
@@ -17404,8 +17400,8 @@ checksum = "d2df906b07856748fa3f6e0ad0cbaa047052d4a7dd609e231c4f72cee8c36f31"
 
 [[package]]
 name = "tulle"
-version = "0.1.0"
-source = "git+https://github.com/merely-made/retinue.git?rev=773515f21635093a319da1bd21f7354dfa430b5a#773515f21635093a319da1bd21f7354dfa430b5a"
+version = "0.2.0"
+source = "git+https://github.com/merely-made/retinue.git?rev=b49df894635bac95823284efee6c445885eaf62a#b49df894635bac95823284efee6c445885eaf62a"
 dependencies = [
  "selvage",
  "serial2-tokio",

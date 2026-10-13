@@ -1450,7 +1450,10 @@ supplier adoption. An older compiler's passing receipt is not a new compiler's
 qualification. The Murm move plan carries this as MOVE1, before implementation
 imports and consumer cutover.
 
-**Current execution status:** defaults rollout in progress. Isolated checkouts
+**Current execution status:** defaults are published across the active Rust
+repository family; the first Murm supplier import is published and its primary
+Mere source cutover is qualified. Broader platform compiler qualification remains
+separate from declaration-policy checks. Isolated checkouts
 of all 21 active Rust repositories in the organization now carry the 1.99.0
 working pins, 1.97.1 owned-package declarations and separate intermediate build
 directories. Root metadata policy checks pass on both compiler versions (42

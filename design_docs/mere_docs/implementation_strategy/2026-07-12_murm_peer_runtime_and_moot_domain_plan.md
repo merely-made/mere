@@ -1356,3 +1356,31 @@ persistence, Gemot governance and Luggage update policy keep their existing
 owners. This family scope does not give the conversation package ownership of
 every device or shared activity. The receiving workspace, source imports,
 consumer repins and repository rename remain planned and have not executed.
+
+### 2026-10-13 first Murm implementation cutover
+
+`murm`, `mere-transport` and `mere-webrtc-carrier` now live in the continuing
+Retinue repository's native workspace, published at `b49df894635b`. Mere's
+workspace dependencies and source patches name that immutable Git source; the
+old three crate trees are removed after receiving qualification. The import
+preserves original Mere ancestry, source attribution, names, versions and MPL
+license boundaries. Stickleback and the host/governance owners remain here.
+
+The same source supplies the active Retinue 0.3 station family. Mere's full
+locked graph and the active Burn Remote fixture retain one selected transport,
+Personae, p2panda, Stickleback and Muniment source each. The pre-existing
+Retinue 0.2 dependency remains an independent historical-version consumer;
+it did not arise from this move. Commons test dependencies, fixture pins and
+transport source hashing now follow the imported supplier. Frozen receipt
+manifests remain tied to their original recorded source commits.
+
+Receiving checks pass on Rust 1.97.1 and 1.99.0: 114 in-process tests per
+compiler, all native feature/test compilation, browser adapter/test compilation,
+913 radio library tests per compiler, and T114 firmware cross-target checks.
+Mere's cutover passes Gemot 95, Stickleback 99 and Comms-with-Murm-adapter 25
+library tests, Signalman all-target compilation and the port/browser boundary
+gate. Burn Remote fixture metadata is locked and has the same selected supplier
+identities; no GPU/remote execution receipt is implied. Live-network, physical
+radio and headed browser receipts remain separate. The hosted native workflow
+was dispatched at https://github.com/merely-made/retinue/actions/runs/38468612945;
+its queued state does not establish runtime success.
