@@ -1,0 +1,76 @@
+OpenSSH_for_Windows_9.5p2, LibreSSL 3.8.2
+debug1: Reading configuration data C:\\Users\\mark_/.ssh/config
+debug1: C:\\Users\\mark_/.ssh/config line 20: Applying options for s-pc
+debug1: Connecting to 192.168.4.59 [192.168.4.59] port 22.
+debug1: fd 3 clearing O_NONBLOCK
+debug1: Connection established.
+debug1: Local version string SSH-2.0-OpenSSH_for_Windows_9.5
+debug1: Remote protocol version 2.0, remote software version OpenSSH_10.2p1 Ubuntu-2ubuntu3.7
+debug1: compat_banner: match: OpenSSH_10.2p1 Ubuntu-2ubuntu3.7 pat OpenSSH* compat 0x04000000
+debug1: Authenticating to 192.168.4.59:22 as 'markik'
+debug1: using hostkeyalias: s-pc
+debug1: load_hostkeys: fopen C:\\Users\\mark_/.ssh/known_hosts2: No such file or directory
+debug1: load_hostkeys: fopen __PROGRAMDATA__\\ssh/ssh_known_hosts: No such file or directory
+debug1: load_hostkeys: fopen __PROGRAMDATA__\\ssh/ssh_known_hosts2: No such file or directory
+debug1: SSH2_MSG_KEXINIT sent
+debug1: SSH2_MSG_KEXINIT received
+debug1: kex: algorithm: curve25519-sha256
+debug1: kex: host key algorithm: ssh-ed25519
+debug1: kex: server->client cipher: chacha20-poly1305@openssh.com MAC: <implicit> compression: none
+debug1: kex: client->server cipher: chacha20-poly1305@openssh.com MAC: <implicit> compression: none
+debug1: expecting SSH2_MSG_KEX_ECDH_REPLY
+debug1: SSH2_MSG_KEX_ECDH_REPLY received
+debug1: Server host key: ssh-ed25519 SHA256:zFaWyE+U5FQ+WwsovHCJdMbdnnd04cNiKxn3Gr1wnXY
+debug1: using hostkeyalias: s-pc
+debug1: load_hostkeys: fopen C:\\Users\\mark_/.ssh/known_hosts2: No such file or directory
+debug1: load_hostkeys: fopen __PROGRAMDATA__\\ssh/ssh_known_hosts: No such file or directory
+debug1: load_hostkeys: fopen __PROGRAMDATA__\\ssh/ssh_known_hosts2: No such file or directory
+debug1: Host 's-pc' is known and matches the ED25519 host key.
+debug1: Found key in C:\\Users\\mark_/.ssh/known_hosts:31
+debug1: ssh_packet_send2_wrapped: resetting send seqnr 3
+debug1: rekey out after 134217728 blocks
+debug1: SSH2_MSG_NEWKEYS sent
+debug1: expecting SSH2_MSG_NEWKEYS
+debug1: ssh_packet_read_poll2: resetting read seqnr 3
+debug1: SSH2_MSG_NEWKEYS received
+debug1: rekey in after 134217728 blocks
+debug1: get_agent_identities: bound agent to hostkey
+debug1: get_agent_identities: agent returned 2 keys
+debug1: Will attempt key: claude-code@mark-windows (personae certificate) ED25519-CERT SHA256:d3tQOqvSRA4QE1D7R1j2SJh31wLCXTTZofJxvQLfd0o agent
+debug1: Will attempt key: claude-code@mark-windows ED25519 SHA256:d3tQOqvSRA4QE1D7R1j2SJh31wLCXTTZofJxvQLfd0o agent
+debug1: SSH2_MSG_EXT_INFO received
+debug1: kex_input_ext_info: server-sig-algs=<ssh-ed25519,ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,sk-ssh-ed25519@openssh.com,sk-ecdsa-sha2-nistp256@openssh.com,rsa-sha2-512,rsa-sha2-256>
+debug1: kex_ext_info_check_ver: publickey-hostbound@openssh.com=<0>
+debug1: kex_ext_info_check_ver: ping@openssh.com=<0>
+debug1: SSH2_MSG_SERVICE_ACCEPT received
+debug1: Authentications that can continue: publickey,password
+debug1: Next authentication method: publickey
+debug1: Offering public key: claude-code@mark-windows (personae certificate) ED25519-CERT SHA256:d3tQOqvSRA4QE1D7R1j2SJh31wLCXTTZofJxvQLfd0o agent
+debug1: Authentications that can continue: publickey,password
+debug1: Offering public key: claude-code@mark-windows ED25519 SHA256:d3tQOqvSRA4QE1D7R1j2SJh31wLCXTTZofJxvQLfd0o agent
+debug1: Server accepts key: claude-code@mark-windows ED25519 SHA256:d3tQOqvSRA4QE1D7R1j2SJh31wLCXTTZofJxvQLfd0o agent
+Authenticated to 192.168.4.59 ([192.168.4.59]:22) using "publickey".
+debug1: channel 0: new session [client-session] (inactive timeout: 0)
+debug1: Requesting no-more-sessions@openssh.com
+debug1: Entering interactive session.
+debug1: pledge: filesystem
+debug1: client_input_global_request: rtype hostkeys-00@openssh.com want_reply 0
+debug1: using hostkeyalias: s-pc
+debug1: client_input_hostkeys: searching C:\\Users\\mark_/.ssh/known_hosts for s-pc / (none)
+debug1: client_input_hostkeys: searching C:\\Users\\mark_/.ssh/known_hosts2 for s-pc / (none)
+debug1: client_input_hostkeys: hostkeys file C:\\Users\\mark_/.ssh/known_hosts2 does not exist
+debug1: client_input_hostkeys: host key found matching a different name/address, skipping UserKnownHostsFile update
+debug1: Remote: /home/markik/.ssh/authorized_keys:1: key options: agent-forwarding port-forwarding pty user-rc x11-forwarding
+debug1: Remote: /home/markik/.ssh/authorized_keys:1: key options: agent-forwarding port-forwarding pty user-rc x11-forwarding
+debug1: Sending command: printf "DJINN_WINDOWS_IN_PROCESS_RECOVERY\\n"; id -un; hostname
+debug1: pledge: fork
+DJINN_WINDOWS_IN_PROCESS_RECOVERY
+markik
+debug1: client_input_channel_req: channel 0 rtype exit-status reply 0
+debug1: client_input_channel_req: channel 0 rtype eow@openssh.com reply 0
+S-PC
+debug1: channel 0: free: client-session, nchannels 1
+Transferred: sent 2768, received 2876 bytes, in 0.2 seconds
+Bytes per second: sent 13056.6, received 13566.0
+debug1: Exit status 0
+Exit: 0

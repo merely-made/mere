@@ -108,19 +108,22 @@ fingerprint is `SHA256:BMpl1R39VEjEGjtJye+6uNhEJIccvJVV9XYgIaxQpHI`.
 Agent-only Windows → Surface passed earlier; the isolated Windows agent
 subsequently Locked. Its native unlock request waited without presenting a
 dialog, confirmed by the owner. Only that hung request client was stopped;
-both residents remain preserved. The Windows proof is historical, and its
-post-lock recovery remains open. The cached binary's unknown source commit
-prevents attributing this failure to current main without a fresh build.
+both residents remained preserved. That cached-binary failure was followed
+by the fresh native-presence qualification below.
 
 **Windows native-presence follow-up (2026-10-13).** The desktop resident's
 unparented UWP Hello request was replaced with Castellan's desktop interop,
 using a visible HWND owned and pumped by Djinn. Four native identity UI tests
 passed, including window ownership and cleanup. A fresh production build
 completed and was installed only in the isolated qualification slot. It has
-displayed a Windows Security prompt under the existing persisted vault lock;
-owner confirmation and the post-lock SSH recovery check remain pending.
-The legacy Windows resident is still running. The previous qualifier binary
-is retained in that slot as a rollback copy until recovery is qualified.
+displayed a Windows Security prompt under the existing persisted vault lock.
+The owner confirmed it, and agent-only Windows → Surface SSH passed with
+`IdentityFile=none`. A deliberate live custody lock then denied login with
+exit 255. `djinn --unlock --native` displayed Windows Hello and returned
+success after the owner's confirmation; the same PID authenticated to the
+Surface again with exit 0. The persona public key and SSH key fingerprint
+stayed unchanged across the lock. The legacy Windows resident is still running.
+The temporary rollback binary was removed after the recovery proof.
 This is a shared working-tree build: concurrent Graphshell edits were present,
 and the receipt records hashes of this lane's exact native-presence sources.
 The Surface login was repeated successfully after native unlock, and the
