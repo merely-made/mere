@@ -1271,3 +1271,55 @@ not found crates or promote proposed APIs. The historical sidequests and §7
 implementation candidates enter owner-specific plans when their research
 and consumer gates are met; existing implementation plans retain authority
 over work already in progress.
+
+
+## Shared Rust toolchain and minimum version (2026-10-13)
+
+**Owner direction:** use the newest Rust across the stack, with build-directory
+support, and unify the declared minimum versions as well. Existing manifest or
+CI floors are observations of the tree, not evidence that the owner requested
+older-compiler compatibility. The initial Murm move plan's inference of a
+Rust 1.88 preservation requirement is withdrawn.
+
+**Selected rollout baseline:** current stable Rust 1.99.0, verified against the
+[official release announcement](https://blog.rust-lang.org/2026/10/01/Rust-1.99.0/).
+Pin the exact toolchain release in active owned build roots and declare
+`rust-version = "1.99"` consistently for owned packages. Upgrade the exact
+pin and minimum together in coordinated stack passes as newer stable releases
+are qualified. Published older versions keep their historical metadata; do not
+rewrite third-party/vendored suppliers' own minimums to manufacture agreement.
+
+This policy covers the active first-party repository family and its independent
+application, library, probe, browser and firmware workspaces, including the
+Murm/Retinue foundation, Mere, Genet, Dramatis, Turnstone, Woodshed and Knot.
+The execution inventory must resolve current active homes and source pins;
+archived standalone clones are not additional migration targets. A target that
+actually needs a compiler fork or nightly has a documented target realization
+whose compiler is checked against the common language/tool floor, rather than
+an assumed permanent older MSRV exception. Workspace separation is justified by
+dependency graphs, feature unification, target realizations and profiles; it
+must not introduce separate radio/native compiler policies.
+
+Use Cargo's supported `build.build-dir` for intermediate build artifacts and
+`build.target-dir` for delivered outputs. Build-dir support stabilized in
+Cargo 1.91; 1.99 satisfies that requirement. See the
+[Cargo build-dir documentation](https://doc.rust-lang.org/cargo/reference/config.html#buildbuild-dir)
+and [stabilization record](https://doc.rust-lang.org/cargo/reference/unstable.html#build-dir).
+Use workspace/platform/configuration isolation, and audit environment/CLI
+path overrides and cache keys. Packaging and test harnesses must discover
+actual Cargo artifact/executable paths rather than assume the intermediate
+layout is permanently `target/debug/deps`. A shared version does not require
+all configurations to write into one unqualified cache directory.
+
+The coordinated rollout inventories and changes toolchain pins, owned minimums,
+CI jobs and independent build roots, then qualifies native, browser/Wasm and
+embedded checks plus packaging/artifact discovery. It records compiler versions
+in receipts and updates consumers' source pins where compiler changes require
+supplier adoption. An older compiler's passing receipt is not a new compiler's
+qualification. The Murm move plan carries this as MOVE1, before implementation
+imports and consumer cutover.
+
+**Current execution status:** policy recorded; stack-wide manifest/toolchain/CI
+rollout remains unexecuted. This host's installed `stable` alias reports 1.97.1,
+and the current Mere worktree pins 1.98.1. Neither is proof of the newest stable
+release or evidence that the stack is already on 1.99.
