@@ -11,6 +11,9 @@ use crate::el;
 /// Optional Instrument presentation over the existing workspace, pane, split
 /// and title-bar contracts. Hosts provide Tabard color/font properties and
 /// opt in with `instrument-workspace`; this sheet owns no arrangement or data.
+/// A font-limited host sets `--workspace-font-interface` to its admitted default
+/// face. It is retained at the end of each family list even when an authored
+/// family is unavailable; the host's existing font engine chooses the face.
 pub const INSTRUMENT_CSS: &str = include_str!("instrument.css");
 
 /// Independent host-reported pane states. Selection is attention to material;

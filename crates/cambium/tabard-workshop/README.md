@@ -37,6 +37,9 @@ Tabard's existing palette derivation. An embedding host can instead use
 `workshop_stylesheet_with_frame(applied_appearance_stylesheet)` to supply its
 applied appearance. The frame is independent of the edited definition; this
 operation neither saves the draft nor applies it to the embedding app.
+Font-limited hosts supply `--workspace-font-interface` with their admitted
+default family. The shared skin retains it after authored family requests;
+it does not assume that a browser host has a system font collection.
 The workshop's `data-theme-definition` remains the actual portable theme ID
 through mode and layout changes.
 

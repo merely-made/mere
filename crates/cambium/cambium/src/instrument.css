@@ -19,7 +19,7 @@
     --workspace-padding: 12px;
     color: var(--workspace-ink);
     background: var(--workspace-canvas);
-    font-family: var(--tabard-font-interface, sans-serif);
+    font-family: var(--tabard-font-interface, var(--workspace-font-interface, sans-serif)), var(--workspace-font-interface, sans-serif);
     font-size: var(--tabard-font-interface-size, 14px);
     line-height: var(--tabard-font-interface-line-height, 1.4);
 }
@@ -39,7 +39,7 @@
     border-radius: 0;
     padding: 5px 9px;
     min-height: 30px;
-    font-family: var(--tabard-font-interface, sans-serif);
+    font-family: var(--tabard-font-interface, var(--workspace-font-interface, sans-serif)), var(--workspace-font-interface, sans-serif);
     font-size: var(--tabard-font-interface-size, 13px);
 }
 .instrument-workspace button:hover { border-color: var(--workspace-accent); }
@@ -74,7 +74,7 @@
 .instrument-workspace .workspace-pane-heading { flex: 1; min-width: 0; }
 .instrument-workspace .workspace-pane-title {
     margin: 0;
-    font-family: var(--tabard-font-label, var(--tabard-font-interface, sans-serif));
+    font-family: var(--tabard-font-label, var(--tabard-font-interface, var(--workspace-font-interface, sans-serif))), var(--workspace-font-interface, sans-serif);
     font-size: var(--tabard-font-label-size, 14px);
     line-height: var(--tabard-font-label-line-height, 1.3);
     font-weight: 500;
