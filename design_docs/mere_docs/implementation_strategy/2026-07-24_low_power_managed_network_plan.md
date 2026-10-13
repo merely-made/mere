@@ -421,10 +421,10 @@ link on which it arrived.
 **Repository:** Mere
 **Files:**
 
-- `crates/murm/transport/src/transport.rs`
-- `crates/murm/transport/src/memory.rs`
-- `crates/murm/transport/src/p2panda_transport.rs`
-- `crates/murm/transport/src/reticulum_transport.rs`
+- `retinue/native/crates/transport/src/transport.rs`
+- `retinue/native/crates/transport/src/memory.rs`
+- `retinue/native/crates/transport/src/p2panda_transport.rs`
+- `retinue/native/crates/transport/src/reticulum_transport.rs`
 - transport stubs and tests
 
 Introduce version-independent local context:
@@ -1004,7 +1004,7 @@ different Reticulum link is refused too, since the link is in the transcript.
 
 ### 2026-07-26 — V7 first half: the matrix over real transports
 
-`crates/murm/transport/tests/notochord.rs` runs the handshake through
+`retinue/native/crates/transport/tests/notochord.rs` runs the handshake through
 actual `Transport` implementations. The Memory arm admits and refuses by
 owner rule, and the **Reticulum/TCP arm passes**: acceptance there is
 best-effort (`peer: None`), so the session proof is the only thing that
