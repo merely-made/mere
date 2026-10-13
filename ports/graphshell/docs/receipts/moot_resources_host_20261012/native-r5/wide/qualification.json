@@ -1,0 +1,51 @@
+{
+  "activity_owner": false,
+  "captures": [
+    {
+      "height": 1840,
+      "path": "/Users/markik/Code/output/moot-resource-host-20261012/native-r5/wide/stage-0.png",
+      "presentation": "PresentedFrame { host: 1, sequence: 1, width: 2560, height: 1840, layout_scale: 2.0 }",
+      "stage": 0,
+      "unique_colors": 1393,
+      "width": 2560
+    },
+    {
+      "height": 1840,
+      "path": "/Users/markik/Code/output/moot-resource-host-20261012/native-r5/wide/stage-1.png",
+      "presentation": "PresentedFrame { host: 1, sequence: 5, width: 2560, height: 1840, layout_scale: 2.0 }",
+      "stage": 1,
+      "unique_colors": 1187,
+      "width": 2560
+    },
+    {
+      "height": 1840,
+      "path": "/Users/markik/Code/output/moot-resource-host-20261012/native-r5/wide/stage-2.png",
+      "presentation": "PresentedFrame { host: 1, sequence: 9, width: 2560, height: 1840, layout_scale: 2.0 }",
+      "stage": 2,
+      "unique_colors": 1189,
+      "width": 2560
+    },
+    {
+      "height": 1840,
+      "path": "/Users/markik/Code/output/moot-resource-host-20261012/native-r5/wide/stage-3.png",
+      "presentation": "PresentedFrame { host: 1, sequence: 13, width: 2560, height: 1840, layout_scale: 2.0 }",
+      "stage": 3,
+      "unique_colors": 1188,
+      "width": 2560
+    }
+  ],
+  "checks": [
+    "independent readings",
+    "local owner open",
+    "signed reference fork and refreshed offer",
+    "queued open refused on session expiry",
+    "Alice's opened bytes preserved"
+  ],
+  "frames": 17,
+  "input": "real Genet DOM callbacks invoked by finite host harness; no physical pointer/keyboard qualification",
+  "network": false,
+  "persistent_restart": false,
+  "private_content": false,
+  "source_profile": "actual Graphshell mount; signed memory owners; verified sans-I/O session",
+  "status": "passed"
+}

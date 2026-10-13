@@ -720,13 +720,74 @@ Replay the owner/control tests with
 The source/semantic-DOM receipt supplies no GPU, native-window or browser
 acceptance.
 
-**Remaining host gates:** install the view in an admitted Graphshell host with
-its real owner dispatch and refresh loop; bind actual application sessions;
-provide private access/key and content-retention/hosting owners; then qualify
-layout, themes, keyboard/focus, narrow widths, exact-read independence and source
-withdrawal across real peers under the serialized runtime handoff. The current
+**Host handoff:** the following continuation installs admitted Graphshell
+mounting with the real owner dispatch and refresh loop. Remaining gates bind
+actual application sessions and provide private access/key and content-retention/
+hosting owners, then qualify themes, keyboard/focus, exact-read independence and
+source withdrawal across real peers under the serialized runtime handoff. The current
 S-PC occurrence/relationship inspector and presentation rules supply the read
 and presentation contracts without becoming new resource authorities.
+
+### Admitted Graphshell resource mount (2026-10-12)
+
+The native opt-in [Graphshell mount](../../../ports/graphshell/src/moot_resources.rs)
+composes the existing resource owners and Cambium controls. The carrier supplies
+Notochord's verified `RetainedAuthority`; the embedding host supplies its current
+revocation ledger, clock, signer, Moot and content store. Mounting checks the
+Graphshell service action, binds the signer to the admitted subject and reads
+the current collection through Gemot. These local conclusions are not wire
+credentials, and display metadata grants no authority.
+
+Prepared controls dispatch through the actual owner, then refresh owner reads.
+Current session expiry/revocation, signer changes and Moot changes refuse
+dispatch; current domain grants and membership remain Gemot's separate gates.
+An explicit refresh invalidates a queued intention. Each reading retains its
+own selection, opened bytes and feedback. Lapsed or refused reads clear local
+disclosure, without deleting owner content or claiming to retract another
+retained copy. A successful owner command remains successful if its subsequent
+read fails. Dropping or restyling a mount writes no domain state.
+
+The embedding application schedules the asynchronous operation pump; idle
+pumps do not query content stores. The ordinary text projection accepts UTF-8
+and displays at most 8,192 characters with an explicit truncation notice, while
+the exact opened bytes remain available to an application reader. This is no
+document editor, applet executor or streaming/private-content adapter.
+
+The [actual-port CPU harness](../../../ports/graphshell/docs/receipts/moot_resources_host_20261012/harness/Cargo.toml)
+passes eight owner/mount tests. Disabling only retained-session lapse checking
+fails its expiry and signed-revocation controls; the exact source is restored
+and the positive suite passes again. Unused standalone patch rows were removed
+to close a Cargo locked-resolution refusal; active package identities and
+checksums remain unchanged. Production workspace patches remain intact.
+
+The [native proof entry](../../../ports/graphshell/src/bin/moot_resources_host.rs)
+mounts Alice's and Bob's independent readings on the shared Cambium host. Its
+fixtures use real signed Gemot and Personae operations, locally verified
+sans-I/O Graphshell admission, and public unsealed memory storage. Two fresh
+native processes passed the wide (1280×920) and compact (520×860) paint/layout
+proof in 26.37 seconds, with four presented, reviewed captures each: initial
+independent readings, Alice's opened notebook, Bob's signed reference fork,
+and Bob's expired session with Alice's content still available. Controls use
+semantic DOM callbacks, rather than physical input. The
+[qualification record](../../../ports/graphshell/docs/receipts/moot_resources_host_20261012/qualification.json)
+separates native evidence from the eight CPU controls. No live transport, persistent
+restart, private custody, physical input or actual coop session is qualified.
+
+The negative startup and pixel captures are retained. Early runs stalled on
+native occlusion; the first presented frames exposed black text on the opaque
+black clear because the proof styled `body` while mounting `main` directly.
+The host now supplies explicit palette and typography on its actual root.
+The original nonblank assertion remains unchanged. A cancellable, joined wake
+and a 35-second close apply only to receipt mode, not shared host scheduling.
+Inspector spacing and scroll gutters remain proof presentation; production
+themes, focus/input and application sessions have separate acceptance gates.
+
+Core checkouts were reconciled with published main before this continuation.
+The p2panda fork incorporates upstream through `128dfc44`, preserving its
+storage/transport fork work. Its native suite passes 50 tests with one existing
+ignore, including network-separated mDNS discovery and the nonblocking sync
+retry path; published fork `a5bfa901` is clean. This owner/host slice retains
+Mere's reviewed compatibility tag; consumer pin adoption remains separate.
 
 ### Capsule peer and standalone-browser reproduction
 

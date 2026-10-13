@@ -1,0 +1,5 @@
+{
+  "new_non_location_findings": [],
+  "external_resolution_note": "Owned worktree lacks sibling checkouts; inherited literal references already occur in published primary docs",
+  "inherited_judgment_errors": 4
+}
