@@ -1,0 +1,14 @@
+pelt host profile=livery url=/Users/markik/Code/worktrees/mere-tabard-typography/ports/pelt/examples/workspace/p6-appearance/index.html javascript=false webdriver=false devtools=false webgpu=false webxr=false
+[pelt] accessibility Installed, 22 retained workspace nodes projected
+[pelt] primary initial reveal visible=Some(true) focused=true activation_requested=true
+[cambium-winit] accessibility Installed, 229 nodes projected
+pelt-appearance: Pelt fresh process restores shared typography and app choice
+pelt-appearance: captured reopened_interface
+pelt-appearance: captured reopened_reading
+pelt-appearance: captured reopened_previews
+pelt-appearance: captured reset_previews
+pelt-appearance: captured discarded_previews
+pelt-appearance: RESULT ok (40 frames, 5 captures)
+pelt-typography role=interface class=pelt-address family=Some("serif") size=Some("15px") line-height=Some("1.2")
+pelt workspace first_url=/Users/markik/Code/worktrees/mere-tabard-typography/ports/pelt/examples/workspace/p6-appearance/index.html window=true redraws=47 size=1180x800 tiles=1 interaction_receipt=false capability_receipt=false tearout_receipt=false tearout_cancellation_receipt=false workspace_receipt=appearance routes=1=genet.livery:document
+pelt workspace product receipt=appearance assertion=shared workshop native controls saved a definition; ordinary Pelt appearance controls applied and persisted its exact mode while the held controller, history, focused tile and content aperture remained unchanged artifact=/Users/markik/Code/tabard-app-receipts/2026-10-11/typography/native-reopen/browser.png digest=6bf9b027b98789f0 verified_sizes=1180x800

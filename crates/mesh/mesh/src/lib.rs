@@ -139,3 +139,6 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// Lifecycle stage marker.
 pub const STAGE: &str = "pre-alpha";
+/// Opt-in admitted original-record ingress and exact retained inventory.
+#[cfg(feature = "admitted-ingress")]
+pub mod ingress;

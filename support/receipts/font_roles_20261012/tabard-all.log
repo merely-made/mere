@@ -1,0 +1,140 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling tabard v0.0.1 (/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin/crates/system/tabard)
+    Finished `test` profile [unoptimized] target(s) in 3.73s
+     Running unittests src/lib.rs (/Users/markik/Code/testing/font-roles-20261012/target/debug/deps/tabard-0e89934fccfdc130)
+
+running 40 tests
+test theme::choice::tests::in_memory_store_updates_live_value ... ok
+test smolweb::tests::default_is_site ... ok
+test smolweb::tests::app_passes_through_and_system_falls_back_to_light ... ok
+test smolweb::tests::site_hue_is_stable_and_host_scoped ... ok
+test theme::choice::tests::legacy_lines_and_json_both_read ... ok
+test theme::edge_style::tests::agent_decay_reduces_opacity ... ok
+test theme::choice::tests::file_store_surfaces_nonrecoverable_load_errors ... ok
+test theme::data::tests::saved_lens_themes_read_by_id_and_by_value ... ok
+test theme::data::tests::theme_lookup_falls_back_for_unknown_id ... ok
+test theme::edge_style::tests::family_styles_have_distinct_non_color_signatures ... ok
+test theme::data::tests::built_in_ids_resolve_to_their_token_sets ... ok
+test theme::edge_style::tests::grayscale_luminance_separates_semantic_from_arrangement ... ok
+test theme::edge_style::tests::monochrome_mode_preserves_pattern_identity ... ok
+test theme::mode_calc::tests::calculator_covers_every_role_and_transforms_apply ... ok
+test theme::edge_style::tests::theme_tokens_satisfy_default_contract ... ok
+test theme::mode_calc::tests::on_picks_readable_text_over_the_computed_fill ... ok
+test theme::mode_calc::tests::mode_file_json_roundtrips ... ok
+test theme::mode_calc::tests::partial_or_unknown_tables_are_rejected_by_name ... ok
+test theme::mode_calc::tests::template_is_complete_and_valid_for_all_flag_combos ... ok
+test theme::choice::tests::strict_load_preserves_malformed_and_non_utf8_preferences ... ok
+test theme::registry::tests::a_theme_file_saved_before_the_merge_still_reads ... ok
+test theme::registry::tests::mode_key_roundtrips ... ok
+test theme::registry::tests::builtin_themes_include_edge_tokens ... ok
+test theme::registry::tests::all_seed_derived_builtins_pass_wcag_validation ... ok
+test theme::registry::tests::default_mode_for_def_matches_legacy_builtins ... ok
+test theme::registry::tests::locked_harmony_rotates_accents_to_primary_plus_offset_and_validates ... ok
+test theme::choice::tests::strict_load_keeps_missing_and_legacy_choice_semantics ... ok
+test theme::choice::tests::an_existing_pelt_appearance_file_reads ... ok
+test theme::registry::tests::theme_def_round_trips_through_serde ... ok
+test theme::registry::tests::registry_lists_built_ins_in_order ... ok
+test theme::registry::tests::mode_tokens_derive_four_distinct_palettes_from_one_theme ... ok
+test theme::registry::tests::user_theme_edit_helpers_only_mutate_user_defs ... ok
+test typography::tests::names_cannot_escape_a_css_string_and_invalid_json_is_refused ... ok
+test typography::tests::requested_order_and_missing_names_survive_resolution_and_serialization ... ok
+test theme::registry::tests::mode_sheets_roundtrip_and_gate_on_non_empty ... ok
+test theme::registry::tests::theme_registry_resolves_builtin_themes_and_fallbacks ... ok
+test typography::tests::unavailable_request_uses_host_default_without_rewriting_intent ... ok
+test theme::registry::tests::user_theme_crud_fork_rename_remove_add ... ok
+test theme::choice::tests::file_store_defaults_missing_or_invalid_and_round_trips ... ok
+test theme::choice::font_store_tests::font_requests_round_trip_and_failed_write_retains_previous_choice ... ok
+
+test result: ok. 40 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/choice_resolution.rs (/Users/markik/Code/testing/font-roles-20261012/target/debug/deps/choice_resolution-a06610516e7d10f0)
+
+running 6 tests
+test font_requests_survive_theme_fallback_without_entering_the_definition ... ok
+test fallback_preserves_request_reports_both_missing_identity_and_mode_and_recovers ... ok
+test invalid_definitions_do_not_gain_authority_via_css_and_inert_builtins_still_validate ... ok
+test empty_sheets_derive_and_default_mode_respects_authored_contrast_flags ... ok
+test authored_sheets_are_authority_for_canonical_and_custom_modes_without_claimed_palette ... ok
+test canonical_choice_uses_exact_shared_mode_math_and_does_not_activate_registry ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/library.rs (/Users/markik/Code/testing/font-roles-20261012/target/debug/deps/library-94847eba0b1fc583)
+
+running 6 tests
+test corrupt_and_unsupported_libraries_are_visible_and_left_untouched ... ok
+test busy_lock_preserves_memory_and_disk_then_allows_retry ... ok
+test missing_library_loads_without_creating_files_and_saves_authored_shape ... ok
+test stale_writers_refuse_changes_deletions_and_newly_created_libraries ... ok
+test failed_filesystem_save_preserves_snapshot_and_allows_retry ... ok
+test inadmissible_definitions_are_rejected_on_both_load_and_save ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/mode_artifacts.rs (/Users/markik/Code/testing/font-roles-20261012/target/debug/deps/mode_artifacts-f7c73ee33cc0dfcf)
+
+running 6 tests
+test explicit_artifacts_reject_invalid_authored_definitions_before_exporting ... ok
+test strict_exports_refuse_selected_overrides_and_custom_modes ... ok
+test authored_body_overrides_are_preserved_but_syntax_is_contrast_gated_for_selected_mode ... ok
+test no_argument_exports_keep_legacy_raw_seed_behavior_and_document_shape ... ok
+test selected_mode_provenance_roundtrips_the_authored_definition_and_effective_inputs ... ok
+test canonical_artifacts_export_the_exact_harmonized_mode_and_all_roles ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/portable.rs (/Users/markik/Code/testing/font-roles-20261012/target/debug/deps/portable-d011e89b391d0ea4)
+
+running 9 tests
+test authored_default_mode_updates_both_flags_in_one_history_action ... ok
+test corrupt_or_inadmissible_payloads_return_visible_errors ... ok
+test portable_roundtrip_preserves_authored_fields_and_normalizes_identity ... ok
+test invalid_new_draft_edit_cannot_change_registry_or_save_point ... ok
+test builtin_artifacts_are_inert_until_explicitly_forked_to_user_identity ... ok
+test imported_draft_checks_commit_collisions_and_copy_preserves_unregistered_source ... ok
+test explicit_replacement_preserves_existing_permissions_and_refuses_symlink_clobber ... ok
+test blocked_and_failed_replacement_preserve_existing_artifact ... ok
+test exporting_a_draft_does_not_save_it_and_never_clobbers_by_default ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/theme.rs (/Users/markik/Code/testing/font-roles-20261012/target/debug/deps/theme-70cd772a7bc0e4c8)
+
+running 10 tests
+test exported_palette_keeps_tinct_contrast_roles ... ok
+test lagrange_palette_falls_back_for_non_semantic_status_hues ... ok
+test lagrange_palette_reports_collapsed_and_unrepresented_roles_per_mode ... ok
+test lagrange_palette_reports_rgb_alpha_loss ... ok
+test lagrange_palette_orders_neutrals_and_accent_variants_for_adversarial_seeds ... ok
+test lagrange_palette_matches_golden_documented_shape ... ok
+test dtcg_document_preserves_tabard_provenance ... ok
+test token_and_css_output_are_deterministic_and_map_every_base_role ... ok
+test tokens_and_stylesheet_carry_every_syntax_role ... ok
+test livery_resolves_the_emitted_custom_properties ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/workshop.rs (/Users/markik/Code/testing/font-roles-20261012/target/debug/deps/workshop-ff4fc8b19a19141b)
+
+running 5 tests
+test invalid_and_colliding_identities_never_change_registry ... ok
+test stylesheet_previews_never_pretend_to_be_derived_tokens ... ok
+test undo_redo_branching_and_discard_return_to_save_point ... ok
+test draft_preview_and_commit_preserve_builtin_and_active_appearance ... ok
+test commit_refuses_concurrent_edits_deletion_and_fork_collisions ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests tabard
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

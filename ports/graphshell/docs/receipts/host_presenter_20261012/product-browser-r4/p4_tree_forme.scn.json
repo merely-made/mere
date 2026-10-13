@@ -1,0 +1,78 @@
+{
+  "receipt": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        1140,
+        865
+      ],
+      "canvas_physical_size": [
+        1140,
+        865
+      ],
+      "log": [
+        "waited 0 frames",
+        "waited 1 frames",
+        "captured forme_reading_tiles",
+        "captured forme_hover_regions",
+        "waited 29 frames",
+        "waited 49 frames",
+        "waited 49 frames",
+        "waited 0 frames",
+        "waited 0 frames",
+        "captured forme_tab_stack",
+        "waited 0 frames",
+        "waited 1 frames",
+        "waited 0 frames",
+        "waited 0 frames",
+        "captured forme_saved_regions",
+        "forme open hover resize preview cancel commit and local dynamics receipt complete",
+        "gpu timestamps: no"
+      ],
+      "result": "ok",
+      "saved_graph": {
+        "address": "file:///Graphshell/reference-notes.md",
+        "file": null,
+        "reopened": false,
+        "save_state": "idle",
+        "selected": "392b7659-3952-57e9-8812-98c4d6205025",
+        "session": "08c33cc7-ce6d-4589-aa4f-4afe028fef86",
+        "tags": "local, reference",
+        "title": "Reference notes"
+      },
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "forme_reading_tiles",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 219658
+      },
+      {
+        "name": "forme_hover_regions",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 202106
+      },
+      {
+        "name": "forme_tab_stack",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 219658
+      },
+      {
+        "name": "forme_saved_regions",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 214242
+      }
+    ]
+  },
+  "errors": [
+    "RuntimeError: unreachable\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[199401]:0x25f9f88\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[199210]:0x25f9b72\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[195736]:0x25f0217\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[34267]:0x17bb6e0\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[75224]:0x1e895e3\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[198752]:0x25f8d73\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[159511]:0x24b5b1f\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[130423]:0x233fdd2\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[130424]:0x233fe0f\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[88348]:0x1ffc90a",
+    "RuntimeError: unreachable\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[199401]:0x25f9f88\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[199210]:0x25f9b72\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[195736]:0x25f0217\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[34267]:0x17bb6e0\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[75224]:0x1e895e3\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[198752]:0x25f8d73\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[159511]:0x24b5b1f\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[130423]:0x233fdd2\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[154271]:0x247aee9\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[43727]:0x19bc235"
+  ]
+}

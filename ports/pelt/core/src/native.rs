@@ -81,15 +81,29 @@ pub fn sessions_with_resources(resources: HeldResources) -> SessionRegistry<Scen
 pub fn sessions_with_fetcher<Fetch: ResourceFetcher + Send + Sync + 'static>(
     resources: Fetch,
 ) -> SessionRegistry<Scene> {
+    sessions_with_fetcher_and_fonts(resources, Vec::new())
+}
+/// Explicit host fonts are applied to each session, without ambient acquisition.
+pub fn sessions_with_fetcher_and_fonts<Fetch: ResourceFetcher + Send + Sync + 'static>(
+    resources: Fetch, fonts: Vec<Vec<u8>>,
+) -> SessionRegistry<Scene> {
+    sessions_with_presentation(resources, fonts, None)
+}
+/// A reading host may select its own display face. Canonical source bytes stay
+/// with the owner; this is an explicit presentation choice, not acquisition.
+pub fn sessions_with_presentation<Fetch: ResourceFetcher + Send + Sync + 'static>(
+    resources: Fetch, fonts: Vec<Vec<u8>>, family: Option<String>,
+) -> SessionRegistry<Scene> {
+    let sheets = family.as_ref().map(|family| format!("* {{font-family:{} !important;}}", serde_json::to_string(family).unwrap())).into_iter().collect::<Vec<_>>();
     let mut sessions = SessionRegistry::new();
-    sessions.register(Box::new(genet_documents::LiverySessionEngine::new(
-        resources,
-    )));
-    sessions.register(Box::new(ReaderSessionEngine::new(SmolwebTheme::System)));
-    sessions.register(Box::new(DocumentSessionEngine));
-    sessions.register(Box::new(
-        mere_document_lanes::retained_clip::ClipSessionEngine,
-    ));
+    let engines: Vec<Box<dyn SessionEngine<Scene>>> = vec![
+        Box::new(genet_documents::LiverySessionEngine::with_author_css(resources, sheets)),
+        Box::new(ReaderSessionEngine::new(SmolwebTheme::System)),
+        Box::new(DocumentSessionEngine),
+        Box::new(mere_document_lanes::retained_clip::ClipSessionEngine),
+    ];
+    for inner in engines { sessions.register(Box::new(FontEngine { inner, fonts: fonts.clone(), family: family.clone() })); }
+
     sessions
 }
 
@@ -137,4 +151,29 @@ pub fn registries(
     )
     .with_host_history()
     .with_host_loading()
+}
+
+struct FontEngine { inner: Box<dyn SessionEngine<Scene>>, fonts: Vec<Vec<u8>>, family: Option<String> }
+impl SessionEngine<Scene> for FontEngine {
+    fn engine_id(&self) -> &str { self.inner.engine_id() }
+    fn spawn(&self, request: &SessionSpawnRequest) -> Result<Box<dyn inker::DocumentSession<Scene>>, SessionError> {
+        let mut session = self.inner.spawn(request)?;
+        if self.fonts.is_empty() { return Ok(session); }
+        if let Some(doc) = session.as_any().downcast_mut::<mere_document_lanes::SmolwebDocumentSession>() {
+            doc.document_mut().set_fonts(self.fonts.clone());
+            if let Some(family) = &self.family { doc.document_mut().set_font_family(family); }
+        } else if let Some(doc) = session.as_any().downcast_mut::<mere_document_lanes::ReaderDocumentSession>() {
+            doc.set_fonts(self.fonts.clone());
+            if let Some(family) = &self.family { doc.set_font_family(family); }
+        } else if let Some(doc) = session.as_any().downcast_mut::<genet_documents::LiveryDocumentSession>() {
+            use genet_document_resources::{ResolvedResource, ResourceKind};
+            let mut held = doc.resource_set().clone();
+            for (index, bytes) in self.fonts.iter().enumerate() {
+                let address = format!("mere:pelt/host-font/{index}");
+                held.resources.push(ResolvedResource { kind: ResourceKind::Font, authored_url: address.clone(), resolved_url: address.clone(), final_url: address, content_type: Some("font/ttf".into()), bytes: bytes.clone() });
+            }
+            doc.replace_resource_bytes(held).map_err(SessionError::SpawnFailed)?;
+        }
+        Ok(session)
+    }
 }

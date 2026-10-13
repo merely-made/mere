@@ -157,8 +157,10 @@ impl<S: ThemeChoiceStore> SettingsProvider for AppearanceSettingsProvider<S> {
                 message: "expected one of dark, light".into(),
             });
         };
+        let mut choice = theme.choice();
+        choice.fonts = self.store.choice().fonts.clone();
         self.store
-            .set_choice(theme.choice())
+            .set_choice(choice)
             .map_err(|error| SettingsError::Storage(error.to_string()))
     }
 }
@@ -256,6 +258,25 @@ mod tests {
     }
 
     #[test]
+    fn theme_settings_keep_application_family_requests() {
+        let mut choice = ThemeChoice::default();
+        choice.fonts.0.insert(
+            tabard::FontRole::Interface,
+            vec![tabard::FontFamily::new("serif").unwrap()],
+        );
+        let fonts = choice.fonts.clone();
+        let mut provider = AppearanceSettingsProvider::new(InMemoryThemeChoiceStore::new(choice));
+        provider
+            .apply(
+                &reference(),
+                CHROME_THEME_SETTING,
+                SettingValue::Text("light".into()),
+            )
+            .unwrap();
+        assert_eq!(provider.store().choice().fonts, fonts);
+    }
+
+    #[test]
     fn stored_choices_present_as_dark_or_light() {
         let of = |id: &str, mode| AppearanceTheme::of(&ThemeChoice::new(id, mode));
         assert_eq!(of("theme:default", Some(Mode::Dark)), AppearanceTheme::Dark);
@@ -297,6 +318,7 @@ pub(crate) struct ThemeCatalog {
     pub path: Option<std::path::PathBuf>,
     pub registry: tabard::theme::registry::ThemeRegistry,
     pub error: Option<String>,
+    installed_families: std::cell::OnceCell<Vec<String>>,
 }
 
 #[cfg(feature = "livery")]
@@ -306,6 +328,7 @@ impl ThemeCatalog {
             path,
             registry: tabard::theme::registry::ThemeRegistry::default(),
             error: None,
+            installed_families: std::cell::OnceCell::new(),
         };
         catalog.reload();
         catalog
@@ -338,6 +361,87 @@ impl ThemeCatalog {
                 false
             },
         }
+    }
+
+    /// Only roles bound to ordinary Pelt chrome can report application font
+    /// fallback here. Reading remains owned by loaded document sessions.
+    pub fn application_font_css(&self, fonts: &tabard::FontPreferences) -> String {
+        if fonts.is_empty() {
+            return String::new();
+        }
+        let installed = self
+            .installed_families
+            .get_or_init(cambium_genet_winit_host::installed_font_families);
+        fonts.css_custom_properties(installed, &Self::font_defaults())
+    }
+    fn font_defaults() -> std::collections::BTreeMap<tabard::FontRole, tabard::FontFamily> {
+        use tabard::FontRole;
+        FontRole::ALL
+            .into_iter()
+            .map(|role| {
+                (
+                    role,
+                    tabard::FontFamily::new(match role {
+                        FontRole::Reading => "serif",
+                        FontRole::Code => "monospace",
+                        _ => "sans-serif",
+                    })
+                    .unwrap(),
+                )
+            })
+            .collect()
+    }
+    pub fn application_font_notices(&self, fonts: &tabard::FontPreferences) -> Vec<String> {
+        if fonts.is_empty() {
+            return Vec::new();
+        }
+        let installed = self
+            .installed_families
+            .get_or_init(cambium_genet_winit_host::installed_font_families);
+        fonts
+            .resolve(installed, &Self::font_defaults())
+            .into_iter()
+            .filter(|role| {
+                matches!(
+                    role.role,
+                    tabard::FontRole::Interface
+                        | tabard::FontRole::Heading
+                        | tabard::FontRole::Label
+                ) && role.used_default
+            })
+            .map(|role| {
+                format!(
+                    "{}: requested families are not installed; {} is the fallback.",
+                    role.role.label(),
+                    role.family.name()
+                )
+            })
+            .collect()
+    }
+
+    pub fn font_notices(&self, theme: &tabard::Theme) -> Vec<String> {
+        use tabard::{FontRole, Typography};
+        let fonts = Typography(
+            theme
+                .typography
+                .0
+                .iter()
+                .filter(|(role, _)| {
+                    matches!(
+                        role,
+                        FontRole::Interface | FontRole::Heading | FontRole::Label
+                    )
+                })
+                .map(|(role, p)| (*role, p.clone()))
+                .collect(),
+        );
+        if fonts.is_empty() {
+            return Vec::new();
+        }
+        let installed = self
+            .installed_families
+            .get_or_init(cambium_genet_winit_host::installed_font_families);
+        fonts.missing_families(installed)
     }
 
     pub fn user_themes(&self) -> Vec<&tabard::Theme> {
@@ -425,6 +529,39 @@ mod catalog_tests {
             vec![".pelt-toolbar { background: #713f92; }".into()],
         );
         theme
+    }
+
+    #[test]
+    fn unavailable_chrome_fonts_report_fallback_without_rewriting_the_definition_or_choice() {
+        let catalog = ThemeCatalog::new(None);
+        catalog.installed_families.set(Vec::new()).unwrap();
+        let mut theme = authored();
+        theme
+            .typography
+            .set(
+                tabard::FontRole::Interface,
+                tabard::ThemeFontStyle {
+                    family: Some("Portable interface face".into()),
+                    ..Default::default()
+                },
+            )
+            .unwrap();
+        theme
+            .typography
+            .set(
+                tabard::FontRole::Reading,
+                tabard::ThemeFontStyle {
+                    family: Some("Portable reader face".into()),
+                    ..Default::default()
+                },
+            )
+            .unwrap();
+        let before = theme.clone();
+        let notices = catalog.font_notices(&theme);
+        assert_eq!(notices.len(), 1);
+        assert!(notices[0].contains("Portable interface face"));
+        assert!(notices[0].contains("sans-serif is the fallback"));
+        assert_eq!(theme, before);
     }
 
     #[test]

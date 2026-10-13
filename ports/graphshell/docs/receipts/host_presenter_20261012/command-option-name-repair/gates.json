@@ -1,0 +1,57 @@
+[
+  {
+    "name": "viewer-build",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+      "build",
+      "--locked",
+      "--offline",
+      "--target",
+      "wasm32-unknown-unknown",
+      "--no-default-features",
+      "-j1"
+    ],
+    "cwd": "/Users/markik/Code/worktrees/mere-nested-graph-view/ports/graphshell/web",
+    "exit_code": 0,
+    "log": "/Users/markik/Code/output/graphshell-site-presenter-20261011/command-option-name-repair/viewer-build.log",
+    "tests": []
+  },
+  {
+    "name": "product-build",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+      "build",
+      "--locked",
+      "--offline",
+      "--target",
+      "wasm32-unknown-unknown",
+      "--no-default-features",
+      "--features",
+      "product,applets",
+      "-j1"
+    ],
+    "cwd": "/Users/markik/Code/worktrees/mere-nested-graph-view/ports/graphshell/web",
+    "exit_code": 0,
+    "log": "/Users/markik/Code/output/graphshell-site-presenter-20261011/command-option-name-repair/product-build.log",
+    "tests": []
+  },
+  {
+    "name": "main-check",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+      "check",
+      "--locked",
+      "--offline",
+      "--target",
+      "wasm32-unknown-unknown",
+      "--no-default-features",
+      "--features",
+      "main-page,applets",
+      "-j1"
+    ],
+    "cwd": "/Users/markik/Code/worktrees/mere-nested-graph-view/ports/graphshell/web",
+    "exit_code": 0,
+    "log": "/Users/markik/Code/output/graphshell-site-presenter-20261011/command-option-name-repair/main-check.log",
+    "tests": []
+  }
+]

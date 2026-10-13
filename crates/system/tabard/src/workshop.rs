@@ -18,6 +18,7 @@ use tinct::Seeds;
 #[derive(Clone, Debug)]
 pub enum Edit {
     Name(String),
+    Typography(crate::Typography),
     Seeds(Seeds),
     Harmony(Harmony),
     HighContrast(bool),
@@ -169,6 +170,7 @@ impl ThemeDraft {
         let mut next = self.draft.clone();
         match edit {
             Edit::Name(name) => next.name = name,
+            Edit::Typography(typography) => next.typography = typography,
             Edit::Seeds(seeds) => next.seeds = seeds,
             Edit::Harmony(harmony) => next.harmony = harmony,
             Edit::HighContrast(high_contrast) => next.high_contrast = high_contrast,
@@ -220,8 +222,18 @@ impl ThemeDraft {
     }
 
     pub fn preview(&self, mode: &Mode) -> Result<Preview, WorkshopError> {
+        self.draft
+            .typography
+            .validate()
+            .map_err(WorkshopError::InvalidTheme)?;
         if let Some(rules) = self.draft.mode_sheet(mode) {
-            return Ok(Preview::Stylesheet(rules.clone()));
+            let mut sheets = Vec::new();
+            let fonts = self.draft.typography.css_custom_properties();
+            if !fonts.is_empty() {
+                sheets.push(fonts);
+            }
+            sheets.extend(rules.clone());
+            return Ok(Preview::Stylesheet(sheets));
         }
         if matches!(mode, Mode::Custom(_)) {
             return Err(WorkshopError::CustomModeNeedsCalculator);

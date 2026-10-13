@@ -1,0 +1,21 @@
+{
+  "documentation_base": "631355a2fcbc6d5e88b1b1040d401a0e0b08bfab",
+  "new_records": "support/doc-audit/d2/batch_72_renderer_flattening_recovery_qualification.md",
+  "owned_missing_records_resolved": 3,
+  "index_entries_added": 2,
+  "d2_before_errors": 7,
+  "d2_after_errors": 4,
+  "d2_exit": 1,
+  "remaining_baseline_errors": [
+    "snapshot aggregate digest changed: 2046e1eec3018b7dd288e794326090f1b7f9a889043d53e45530271d0b32be1e != f0b64eef4cd5514157bb1b49d389b84db29a1e823d6f3e2cebf827337fe56abf",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_producer_gates/README.md"
+  ],
+  "legacy_snapshot_unchanged": true,
+  "structure_index_orphans_before": 2,
+  "structure_index_orphans_after": 0,
+  "structure_other_counts_unchanged": true,
+  "structure_strict_exit": 1,
+  "scope": "Documentation reconciliation only; no build/runtime or acceptance threshold changes. Full-tree strict audits still expose preserved baseline/context findings."
+}

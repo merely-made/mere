@@ -34,7 +34,7 @@ impl ExportFormat {
     pub fn label(self) -> &'static str {
         match self {
             Self::ThemeJson => "Theme JSON",
-            Self::Css => "CSS colors",
+            Self::Css => "CSS properties",
             Self::Dtcg => "DTCG tokens",
         }
     }

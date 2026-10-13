@@ -78,6 +78,25 @@ where
 }
 
 impl<Seq, State, Action> El<Seq, State, Action> {
+    /// Append inline declarations while preserving a component's local styles.
+    /// Later declarations retain ordinary CSS cascade precedence.
+    #[must_use]
+    pub fn append_style(mut self, declarations: impl AsRef<str>) -> Self {
+        let declarations = declarations.as_ref().trim();
+        if declarations.is_empty() {
+            return self;
+        }
+        if let Some((_, style)) = self.attrs.iter_mut().find(|(name, _)| name == "style") {
+            if !style.trim_end().ends_with(';') {
+                style.push(';');
+            }
+            style.push(' ');
+            style.push_str(declarations);
+        } else {
+            self.attrs.push(("style".into(), declarations.into()));
+        }
+        self
+    }
     /// Add (or override) an attribute. Builder-style; chainable.
     #[must_use]
     pub fn attr(mut self, name: impl Into<String>, value: impl Into<String>) -> Self {

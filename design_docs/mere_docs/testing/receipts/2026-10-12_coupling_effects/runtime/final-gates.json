@@ -1,0 +1,135 @@
+[
+  {
+    "name": "negative-zero-clock",
+    "source": "crates/conatus/seiche/src/coupling_force.rs",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "seiche",
+      "--no-default-features",
+      "--lib",
+      "field_runtime_clock_controls_real_motion_and_reset_does_not_rewind_solver_age",
+      "--locked",
+      "--offline",
+      "-j",
+      "2",
+      "--",
+      "--nocapture"
+    ],
+    "expected_test": "field_runtime_clock_controls_real_motion_and_reset_does_not_rewind_solver_age",
+    "exit_code": 101,
+    "restored": true,
+    "sha256_before": "8d402be40c6d27c5ef469ad326b9b28bd275a2c798f6a6610315318fcfb47a24",
+    "sha256_after": "8d402be40c6d27c5ef469ad326b9b28bd275a2c798f6a6610315318fcfb47a24"
+  },
+  {
+    "name": "negative-exclusive-boundary",
+    "source": "crates/conatus/numen/src/field.rs",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "seiche",
+      "--no-default-features",
+      "--lib",
+      "field_runtime_inclusive_reference_points_filter_actual_writes",
+      "--locked",
+      "--offline",
+      "-j",
+      "2",
+      "--",
+      "--nocapture"
+    ],
+    "expected_test": "field_runtime_inclusive_reference_points_filter_actual_writes",
+    "exit_code": 101,
+    "restored": true,
+    "sha256_before": "c885c6b49cfcb39b0476d22aa6979806d41fc5753db5e56fa5b7dbaedaa97501",
+    "sha256_after": "c885c6b49cfcb39b0476d22aa6979806d41fc5753db5e56fa5b7dbaedaa97501"
+  },
+  {
+    "name": "negative-initial-entry",
+    "source": "crates/conatus/seiche/src/coupling_membership.rs",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "seiche",
+      "--no-default-features",
+      "--lib",
+      "field_runtime_repeated_appearances_are_independent_and_initial_matches_do_not_act",
+      "--locked",
+      "--offline",
+      "-j",
+      "2",
+      "--",
+      "--nocapture"
+    ],
+    "expected_test": "field_runtime_repeated_appearances_are_independent_and_initial_matches_do_not_act",
+    "exit_code": 101,
+    "restored": true,
+    "sha256_before": "5e1c8df31c7c4ef1bc4777b572d29d0e524914b17a79baa8cdf4d180587ca2e2",
+    "sha256_after": "5e1c8df31c7c4ef1bc4777b572d29d0e524914b17a79baa8cdf4d180587ca2e2"
+  },
+  {
+    "name": "focused",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "seiche",
+      "--lib",
+      "field_runtime",
+      "--locked",
+      "--offline",
+      "-j",
+      "2",
+      "--",
+      "--test-threads=4",
+      "--nocapture"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 4.609
+  },
+  {
+    "name": "trajectory",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "seiche",
+      "--lib",
+      "execution_trajectory_receipt",
+      "--locked",
+      "--offline",
+      "-j",
+      "2",
+      "--",
+      "--nocapture"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 2.672
+  },
+  {
+    "name": "host-field-runtime",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "pictograph",
+      "--features",
+      "canvas",
+      "--lib",
+      "field_runtime",
+      "--locked",
+      "--offline",
+      "-j",
+      "2",
+      "--",
+      "--test-threads=4",
+      "--nocapture"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 15.765
+  }
+]

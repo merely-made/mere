@@ -1,0 +1,9 @@
+PASS fold-selection
+PASS checkpoint-selection
+PASS site-keyboard-selection
+PASS related-inspection-keeps-subject
+PASS keyboard-clear-focus
+PASS narrow-keyboard-selection
+PASS narrow-command-focus
+PASS selection-loss-control
+DONE 11

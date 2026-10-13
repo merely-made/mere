@@ -212,6 +212,7 @@ impl<B: Backend + Clone, P: IdentityProvider + ?Sized> Owner<'_, B, P> {
                     name: view.name,
                     heads: view.version.frontier,
                     membership_commitment: view.version.membership_commitment,
+                    fork_destination: None,
                     fork: Some(Offer::Unsupported {
                         reason: "Collection fork handler is not installed".into(),
                     }),
@@ -366,6 +367,7 @@ impl<B: Backend + Clone, P: IdentityProvider + ?Sized> Owner<'_, B, P> {
             .collect();
             resources.push(ResourceRead {
                 reference,
+                shared_by: Some(f.shared_by),
                 title: f.title,
                 schema: f.schema_id,
                 content,

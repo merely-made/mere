@@ -34,9 +34,100 @@ can choose installed fonts while retaining useful heading, size and text
 patterns. Firefox's [font preferences](https://support.mozilla.org/en-US/kb/change-fonts-and-colors-websites-use)
 are a checked precedent for serif/sans-serif/monospace choices, sizes and minimum
 size. Those generic families do not themselves define Mere's UI, reading,
-heading or label roles. The role schema, override precedence and remote/frozen
-fidelity remain open; measurements must stay coherent with realized fonts.
+heading or label roles. The bounded family-role schema and application preference precedence are now
+implemented below in the 2026-10-12 continuation. Size/minimum-size controls and
+remote/frozen face fidelity remain open; measurements must stay coherent with
+realized fonts.
 This note does not change adoption order or claim controls in every consumer.
+
+## Typography role authoring (2026-10-11)
+
+**Status:** shared authored typography and Pelt chrome adoption qualified on macOS Intel, 2026-10-12; native source and later merged-source checks are recorded separately below. Other application/platform rollout remains open.
+
+Tabard authored themes carry explicit Interface, Reading, Heading, Label and Code styles: requested font family, optional CSS-pixel size and optional unitless line height. Application-owned family requests remain separate on `ThemeChoice.fonts`. Absent preferences preserve each host's defaults, heading hierarchy and control geometry. Existing JSON libraries remain readable without rewrites. Theme drafts own undo/redo, Save, Discard and conflict handling. Author CSS remains exact and last; requested font names are retained when a receiving host lacks them, with a visible generic-fallback diagnostic.
+
+Genet's existing Parley/Fontique stack owns installed-font discovery, resolution and measurement. The native Cambium host exposes a small family catalogue; the workshop receives it without a platform font implementation or another shaping engine. Font bytes are neither embedded nor fetched by this slice. The editor's own readable neutral style stays isolated from authored typography.
+
+1. **Portable model and compatibility.** Validate family names and finite size/leading values, preserve old artifacts when preferences are absent, retain typography in fork/history/save/import/export, and keep authored CSS precedence. Done when focused model/library tests and shared boundary checks pass.
+2. **Shared controls and actual previews.** Add retained role/family/size/leading controls, installed-family suggestions, invalid-input feedback and per-role reset. Reuse native text hooks. Feed the isolated stylesheet and document-canvas previews through existing style/measurement seams. Done when actual control dispatch, resolved CSS, changed geometry, undo/discard and wide/narrow layout checks pass.
+3. **One production consumer and native acceptance.** Wire Pelt's app role mapping without changing its controller, loaded-document authority or choice persistence. Done when a finite native author/edit/Save/Apply/reopen scenario measures changed typography on the selected role, retains other role defaults and session state, and produces nonblank captures. Runtime/build lanes remain serialized by explicit handoff. Fetch current origin before publication.
+
+### Findings and progress — 2026-10-11 typography
+
+- Source started at `6a1962278` and was refreshed to origin `db26bb527`; the primary checkout and
+  earlier integration captures remain preserved. Font-bearing library and
+  portable exports use version 2; color-only writes retain their old shapes.
+  Mislabelled version 1 font data is refused rather than silently downgraded.
+- The shared native family catalogue uses Genet Parley/Fontique. Role controls
+  reuse existing controlled-text/focus hooks. The editor stays neutral; the
+  separate Livery specimen accepts role rules before exact author CSS.
+- `mere-document-lanes::document_style_with_typography` projects preferences
+  onto the existing canvas style sheet. Reading changes leave heading/code/
+  label defaults intact; heading size keeps its existing relative hierarchy.
+  Per-role leading is optional and old style-sheet data still round-trips.
+  Restyling retains the held source, folds, focus and scroll, and remeasures
+  through the existing canvas layout. A code role's explicit family now reaches
+  Parley's actual matcher instead of being forced back to generic monospace.
+- The scoped shared CPU gate passed **243 tests**, with one explicit real-GPU
+  test ignored and one existing table test excluded. The excluded
+  `normal_width_table_wraps_unbroken_link_inside_its_cell` also fails with
+  unmodified current-origin canvas source at `layout/tests.rs:1159`; preserved
+  baseline evidence is in the typography receipt directory. No table code was
+  changed in this slice. The port/Graphshell web dependency boundary passes.
+- Pelt's default CPU suite passes **73 tests**, including the new production
+  role styles, preserved content aperture and native scenario parsing. Two
+  pre-existing article receipts compared raw fragment hrefs despite Genet's
+  resolved-link contract; both now use Genet's existing navigation resolver.
+- Pelt maps Interface, Heading and Label preferences onto its ordinary chrome.
+  Its loaded document sessions and the Code role have no new application
+  binding here. Production native author/reopen scenarios are prepared; GPU/
+  native acceptance waits for the renderer owner's explicit finite-batch handoff.
+  The production Pelt build passed on the earlier published renderer set; its
+  frozen candidate has no native receipt. The renderer owner now requires a
+  coherent provider/Netrender/Genet/Mere/Fleece/Knot repin before typography GPU
+  acceptance, so rebuilding on that final published set is a required gate.
+
+### Coherent supplier rebuild — 2026-10-12
+
+Typography was rebased cleanly onto published Mere
+`631355a2fcbc6d5e88b1b1040d401a0e0b08bfab`, with Genet `2c7ef73b`,
+Netrender `c74b7cb2`, provider `2eae6243` and Knot `3af93add`. Locked/offline
+checks pass: **243 shared tests** (one real-GPU test ignored), **73 Pelt tests**,
+the ordinary production Pelt build and the port/Graphshell web boundary gate.
+The known table-wrapping test was also run separately on this supplier set and
+still fails at the unchanged `layout/tests.rs:1159` predicate.
+
+The current-supplier production binary and changed source files are frozen
+with hashes in the external typography receipt directory. The earlier-supplier
+candidate is retained separately and has no native acceptance claim. Three
+finite author/reopen/uninstalled-family scenarios remain queued behind the
+canonical presenter's explicitly owned runtime window. macOS console lock was
+confirmed read-only; the renderer owner already requested unlock. No typography
+adapter, native window, browser or server was started. GPU acceptance and push
+remain pending that unlocked-session handoff; predicates are unchanged.
+
+Open bounds: exact remote/frozen font fidelity, bundled/open-license font packaging, global minimum-reading-size policy, typed DTCG typography export and the remaining app rollout are separate follow-ups. Existing color token exports retain their scope; portable theme JSON and CSS preserve this slice's role preferences.
+
+### Font contract reconciliation — 2026-10-12
+
+Origin `829e91c7a` published application-owned ordered family requests and its
+reusable family editor while this authored preview slice was awaiting runtime.
+That publication is preserved. There is one shared `FontRole`/`FontFamily`
+contract and one native inventory owner. `ThemeChoice.fonts` remains the applied
+application request, including unavailable names and ordered fallback tails.
+Explicit authored theme controls use `ThemeFontStyle` in `theme_styles`; they
+are not a replacement application preference store. Consumers can preserve
+writer/measure/point-size authority when projecting these explicit style values.
+
+Both paths use the same family custom properties (`--tabard-font-interface`,
+reading/heading/label/code). Pelt's application families follow theme defaults;
+explicit authored CSS retains normal cascade authority. Theme/mode changes
+preserve application requests. The installed-only helper delegates to the shared
+system/bundled inventory API rather than adding another discovery implementation.
+Reconciled CPU gates pass **249 shared tests** and **74 Pelt tests**; the normal
+production binary builds. Native qualification still belongs to this merged
+source, not the earlier frozen candidate. The original application role contract
+and its Cleromancy/writer bounds below are unchanged.
 
 ## Application adoption (2026-10-09)
 
@@ -1055,3 +1146,249 @@ T4 and T5 ride settings passes; T5 last.
   section marked historical (genet-layout and Stylo retired in genet `55c05d11759`),
   `SmolwebTheme`'s move into `tabard::smolweb` (`d16f055f`) noted, and the Tabard scope's
   owning plan opened as a question.
+
+## Granular font roles — 2026-10-12
+
+**Status:** shared family contract, reusable preference editor and Cleromancy
+macOS adoption qualified and published. Shared authored typography and Pelt
+chrome qualification are recorded below. Knot and Woodshed adoption is in
+progress against the same published Mere `8568f42fd`; their consumer native,
+reopening and publication gates remain open.
+
+### Contract and done-conditions
+
+1. **Portable requests.** Tabard `typography` owns optional interface, reading,
+   heading, label and code family stacks. `ThemeChoice.fonts` defaults empty
+   and is omitted when empty, preserving legacy JSON/line behavior. Named
+   requests retain order and unavailable names across theme fallback and file
+   reopening. Definitions and color artifacts remain independent. Done when
+   malformed font preferences are refused by strict loading, safe CSS output
+   cannot inject declarations, and failed writes retain the applied choice.
+2. **Host realization and editing.** The native host exposes a transient
+   Fontique family inventory over the same system/bundled resource ledger as
+   layout. Tabard workshop exposes reusable controlled fields and an explicit
+   Apply request, leaving host persistence authoritative. Blank/Default removes
+   the override on Apply. Editing an unchanged first family preserves any saved
+   ordered fallback tail; replacing it starts a new preferred family. Done when
+   real input, availability, save failure and resize resource geometry pass.
+3. **Consumer adoption.** Cleromancy uses shared properties for its existing
+   interface, reading paragraphs, reading headings, labels and code. It supplies
+   unmodified OFL IBM Plex Mono and Source Serif 4 metadata faces. Done when
+   exact font advances, four theme modes, authored precedence, fresh-process
+   preference reopening and unchanged reading/reflection identities qualify.
+   Knot and Woodshed adoption remain separately owned subsequent slices.
+
+### Precedence and fidelity
+
+Unset roles preserve existing host declarations. A host provides role defaults;
+resolution emits available requested families in order, followed by a host
+fallback when no generic is requested. Named-family inventory is not per-glyph
+coverage or proof of an exact face. The engine owns glyph fallback and shaping;
+remote/frozen receipts need realized face identity and metrics, not only a
+family string. Unavailable requests stay saved and produce local diagnostics.
+
+Consumer styles consume `--tabard-font-interface`, `--tabard-font-reading`,
+`--tabard-font-heading`, `--tabard-font-label` and `--tabard-font-code`. Applied
+application preferences follow theme property definitions in the ordinary
+cascade. Explicit authored `font-family`, specificity and `!important` retain
+ordinary CSS authority. No font-size, minimum-size, weight, line-height,
+content or writer measure is silently rewritten. The application editor uses
+its isolated sheet, retaining the established theme-preview boundary.
+
+Knot's explicit writer `SourceFace` remains authoritative and code is not a
+writer alias. Reading can supply an optional preview default. Its label-card
+cache must invalidate on realized typography identity and reconcile hit targets
+and dependent dynamics before adoption. Arbitrary writer faces require a new
+resolved-face/size metric probe identity; the existing Plex shortcut remains
+specific to Plex. Woodshed's label role includes musical/fret/tempo labels;
+family availability does not close its recorded-loop glyph coverage gate.
+
+### Findings and progress
+
+- **2026-10-12:** Shared Tabard library passed 39 tests before the added file
+  round-trip regression; full Tabard and workshop gates are recorded with the
+  publication. Workshop's 16 library tests passed, including preserved fallback
+  stacks and explicit draft/Apply behavior. Actual Cleromancy geometry and
+  native acceptance remain the consumer gate, not inferred from these results.
+
+- **2026-10-12 publication gate:** all 82 Tabard tests, 16 workshop library
+  tests and the native inventory regression pass on macOS arm64. The inventory
+  regression proves a metadata override is discoverable and malformed bytes
+  cannot advertise an available face. Evidence is in
+  `support/receipts/font_roles_20261012/qualification.json`. Navigation audit
+  output is byte-identical to baseline. D2 retains its original digest mismatch
+  and three uncovered documents; the amended plan/index have scoped judgments.
+
+- **2026-10-12 picker follow-through:** the shared preference surface adds a
+  searchable host-local family list, limited to 30 matches per query, with the
+  same controlled text/IME slot seam as direct family entry. Picking stages a
+  draft; only Apply emits a host persistence request. All 17 workshop library
+  tests pass, including actual native input, filtering and staged selection.
+
+- **2026-10-12 native feedback:** Cleromancy's first headed font flow failed
+  because Mesquite split `input-text` into whitespace arguments and delegated
+  multiword font names as unknown product verbs. Its eight frames are rejected
+  evidence. The shared command now delivers the full remainder through the
+  existing controlled keyboard path. All 28 Mesquite library tests pass,
+  including actual retained text replacement with multiword family names,
+  authored CSS and double-space Unicode text. This repairs acceptance input;
+  it does not convert the failed native receipt into a pass.
+
+- **2026-10-12 downstream publication:** Cleromancy `6cf1e405` publishes the
+  bounded macOS arm64 font-role slice, with runtime `c1fb4ce7` pinned to Mere
+  `addccab32` and the current coherent supplier family. Its 101 root and 17
+  portable-core tests pass; two native processes pass nine reviewed captures
+  and 123 presentations. Shared font picker Apply, all four canonical modes,
+  authored restoration, compact Reading entry and fresh reopening are recorded
+  in `cleromancy/design_docs/receipts/tabard_20261011/font-roles/qualification.json`.
+  Exact font request/library bytes, card data, all three durable IDs and 1/3/1
+  counts survive reopening. The original eight-capture text-input attempt stays
+  rejected. Knot/Woodshed have the published contract, metric/cache/dynamics
+  prerequisites and serialized native-lane handoff; their adoption remains open.
+  Current role mappings preserve host default sizes and explicit authored CSS.
+  Family availability, scripted native receipts and mounted input do not certify
+  glyph coverage, remote/frozen faces, physical IME, formal OS accessibility or
+  general layout/contrast acceptance.
+
+### Typography native selector correction — 2026-10-12
+
+Current origin `fae241ddb` is merged, preserving the shared searchable application
+font editor, complete native scenario text payloads and published Cleromancy
+qualification. The first Pelt author process presented 82 frames with nine
+nonblank captures. Its subsequent fresh-process gate correctly refused a saved
+`sans-serif` value when the scenario expected `serif`: Taproot's attribute filter
+uses substring matching. Generic-family buttons now expose unique class tokens,
+and the scenario selects `.font-family-serif` and immediately asserts its exact
+value. Mounted-control regression and production chrome family-precedence tests
+pass; native family validation also compares complete stack entries. The failed
+batch is preserved externally under `initial-selector-failure`, without a
+qualification claim. Runtime was explicitly returned to the renderer recovery
+owner before rebuilding this candidate. A fresh three-process retry remains
+required.
+
+### Prominent typography preview correction — 2026-10-12
+
+The corrected three-process native author/reopen/fallback batch passed on frozen
+`f5fa2d91b`: 145 presentations, 16 scenario captures and zero blank frames. Exact
+Interface `serif`/15 px/1.2 chrome values, fresh process choice restoration,
+Reading reset/Discard and missing-family request preservation all passed.
+Visual review withheld final publication because the prominent seed-derived
+chrome sample still used baseline fonts, although the isolated stylesheet,
+reader and production Pelt chrome were wired.
+
+`73f7173e1` now maps the same shared declarations onto the visible chrome and
+syntax samples. Custom properties stay scoped to each specimen. Cambium's
+append-style seam preserves the Illume palette instead of replacing it. A real
+mounted-style test checks Interface/Heading/Label/Code and neutral authoring UI;
+all 252 scoped shared tests and 75 Pelt tests pass. The table exclusion and GPU
+ignore remain explicit. Final production build and dependency boundary pass.
+The finite script now also captures the isolated stylesheet, narrow font fields
+and narrow reader. Final native refresh remains queued after the explicitly
+owned Canonical browser batch. Earlier successful and failed batches are retained
+separately; they are not substituted for this source's final visual review.
+
+### Typography qualification — 2026-10-12
+
+The final frozen source `184c85450` passed three finite production Pelt processes:
+**162 presentations, 18 scenario captures, three application captures, zero
+blank scenario frames**. Ten selected images were reviewed, including the visible
+serif chrome sample, isolated stylesheet, authored/undone reading, narrow controls
+and reader, Discard restoration, actual Pelt chrome and visible fallback notice.
+Interface is `serif`, 15 CSS px, 1.2 leading; Reading is installed `Georgia`,
+24 CSS px, 1.7 leading. Fresh reopen/Discard keep library and application-choice
+bytes unchanged. An unavailable requested family remains intact in the private
+fallback copy and is explained by the ordinary Pelt Appearance notice. The held
+controller/session, history, focus, tile count and content aperture are preserved.
+
+Durable artifacts and exact frozen provenance are in
+[support/receipts/tabard_typography_20261012/qualification.json](../../../support/receipts/tabard_typography_20261012/qualification.json).
+The shared CPU gate passes 252 tests with the documented unchanged table failure
+excluded and one explicit GPU test ignored; Pelt passes 75 tests and the boundary
+and production build pass. Runtime was explicitly returned to Canonical after
+the processes, with no owned app/runner/inhibitor left active.
+
+Renderer publication `be9b97da0` arrived after these native processes and is now
+merged. Its standalone controls are gated by explicit recovery environment;
+outside them, production changes drop old GPU handles only on device-loss branches
+and expose copied producer identities. Typography styles/controls/mappings are
+unchanged. Combined-source CPU/build/boundary checks are recorded separately;
+this does not invent a native rerun of the merged binary. The renderer owner's
+controlled device-loss receipt retains its own source and acceptance bounds.
+
+
+### Knot and Woodshed adoption — 2026-10-12
+
+**Status:** in progress. Both owners agreed on Mere
+`8568f42fdf57f997274c74e63bd4ee045fe1a2b4`, Genet
+`2c7ef73bfa44c07744e0643e3c6f98be3cbd7947`, Netrender
+`c74b7cb28090c28b1c6d80b08dcdea18aff48d3e`, maintained Classic Vello
+`2eae6243881d5b24c984d5ee35dde509ca5db782` and Dramatis
+`0234e7eea6f2ddf2330a71b9425da01b06ae0391`. Knot starts from published
+`3af93adda472af2913a5d298f14deb10e85daee2`; Woodshed starts from published
+WAV-export baseline `c817e59d7227c94978d60994a81da560e7c1a773`.
+
+#### Phases and done-conditions
+
+1. **Consumer mapping and persistence.** Use the existing five shared roles,
+   `ThemeChoice.fonts`, native inventory and reusable controlled family editor.
+   Preserve ordered requests through theme/mode changes and workshop Apply.
+   Include valid bundled faces in inventory. Map optional authored
+   `Theme.typography` family/size/leading onto supported consumer surfaces;
+   omitted fields preserve host defaults. Done when staged selection, explicit
+   Apply/Default, missing requests, failed-save rollback and serialized reopening
+   pass, with authored declaration precedence tested. Knot's explicit writer
+   face/size/measure remains authoritative.
+2. **Measured presentation and dynamics.** Resolve typography before measuring
+   the actual consumer surfaces. Invalidate affected metric/geometry caches and
+   reconcile hit targets before dependent dynamics continue. Done when tests
+   prove painted labels and measurement probes use the same effective font,
+   geometry responds to role changes, and retained positions/content remain
+   unchanged. Unsupported canvas size/leading seams must be disclosed; the
+   workshop preview alone does not qualify downstream metrics.
+3. **Serialized native acceptance.** Knot owns the first native/GPU reservation;
+   Woodshed performs independent CPU/source work until explicit cleanup release.
+   Freeze source, supplier closure, binary hash and fixture before each finite
+   process. Done when the real shared picker, application/theme precedence,
+   missing/reset behavior, responsive presentation and fresh-process persistence
+   have reviewed captures and an exact committed-source receipt. Retain failed
+   attempts and known supplier exclusions separately. Woodshed's concurrently
+   authorized capture-compression work must reconcile its final source freeze;
+   a changed runtime requires its own native evidence.
+4. **Publication and Mere intake.** Each consumer owns its plan, receipt and
+   main push. Verify remote publication and distinguish qualified runtime from
+   later documentation commits. Mere's coordinator then updates the coherent
+   Knot editor/document/Djinn site revision and checks the embedded closure.
+   Done when immutable pins resolve and the bounded host checks pass, with the
+   shared plan/index recording actual consumer evidence and open gates.
+
+#### Findings and progress
+
+- **2026-10-12:** Current shared source exposes one `FontRole` enum for both
+  portable application family preferences and authored theme typography. Theme
+  values may provide family, size and leading; application preferences provide
+  family overrides. Emit application variables after theme variables while
+  preserving the ordinary authority of explicit authored declarations.
+- **2026-10-12:** The committed Pelt typography verifier passes: three processes,
+  162 presentations and 21 retained captures. This is read-only receipt
+  validation; it neither reruns Pelt nor qualifies either consumer.
+- **2026-10-12:** Knot's owner explicitly bounds this slice to family mapping.
+  Preview size/leading/measure and heading hierarchy keep their existing host
+  controls; occurrence labels keep host 13 px/600 and their existing line-box
+  pattern. Typed theme size/leading remain retained in the theme/workshop but
+  are not consumed by new Knot role controls. Exact authored CSS keeps ordinary
+  cascade authority. Label geometry fingerprints record advances/line boxes,
+  rather than resolved-face identity; equal geometry does not force a reset.
+- **2026-10-12:** Woodshed's owners agreed to qualify and publish font adoption
+  first; compression then rebases onto that family and freezes independently.
+- **2026-10-12:** Knot's implementation review identified theme-variable ordering
+  and an occurrence-button rule that could diverge painted fonts from metric
+  probes. Both remain pre-qualification corrections owned by Knot. Woodshed
+  preserves the accepted WAV export and independent port ownership while
+  coordinating its font and compression branches.
+
+The existing supplier table failure, GPU ignore and prior arrangement golden
+remain separately identified baseline debt. Family availability does not prove
+per-glyph coverage, exact remote face identity, physical IME or OS accessibility.
+Woodshed's recorded-loop glyph gate remains open without actual fallback/paint
+proof. Native acceptance, persistence, publication and embedded Mere intake are
+separate completion claims.

@@ -1,0 +1,17 @@
+from pathlib import Path
+import os,subprocess,json,shutil,re
+repo=Path('/Users/markik/Code/worktrees/mere-nested-graph-view');out=Path(__file__).parent
+compiler=Path('/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin')
+env={**os.environ,'RUSTC':str(compiler/'rustc'),'RUSTDOC':str(compiler/'rustdoc'),'DYLD_LIBRARY_PATH':str(compiler.parent/'lib')}
+commands=[(repo,'hover-motion',['test','--locked','--offline','-p','cambium-rootstock','--no-default-features','--test','hover_motion','-j1'])]
+records=[]
+for cwd,name,args in commands:
+ print('START',name,flush=True)
+ log=out/(name+'.log')
+ with log.open('w') as stream:r=subprocess.run([str(compiler/'cargo'),*args],cwd=cwd,env=env,stdout=stream,stderr=subprocess.STDOUT)
+ records.append({'name':name,'command':[str(compiler/'cargo'),*args],'cwd':str(cwd),'exit_code':r.returncode,'log':str(log),'tests':re.findall(r'test result: ([^\n]+)',log.read_text())})
+ (out/'gates.json').write_text(json.dumps(records,indent=2)+'\n')
+ print('DONE',name,r.returncode,flush=True)
+ if r.returncode:raise SystemExit(r.returncode)
+ if name in ['viewer-build','product-build']:
+  shutil.copy2(web/'target/wasm32-unknown-unknown/debug/graphshell_web.wasm',out/(name+'.wasm'))

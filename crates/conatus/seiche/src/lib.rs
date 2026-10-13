@@ -148,7 +148,19 @@ pub use barnes_hut::{BarnesHutConfig, BarnesHutRepulsion, repulsion_forces};
 /// The aether→seiche seam: a [`numen::Coupling`] compiled to a
 /// [`Force`] (the general, scriptable path the built-in forces specialize).
 pub mod coupling_force;
+pub mod coupling_membership;
+pub mod coupling_trace;
+pub mod field_clock;
 pub use coupling_force::{CouplingEffect, CouplingEvaluation, CouplingForce, CouplingInertReason};
+pub use coupling_membership::{
+    CouplingEligibility, CouplingEntryHandler, CouplingEntryOutcome, CouplingMembershipCause,
+    CouplingMembershipChange, CouplingMembershipFrame, CouplingMembershipReport,
+};
+pub use coupling_trace::{
+    CouplingAppliedEffect, CouplingBinding, CouplingBodyState, CouplingSource,
+    CouplingTargetIdentity, CouplingTrace, CouplingTraceRecord, CouplingTraceSession,
+};
+pub use field_clock::FieldClock;
 
 /// The pairwise **affinity** force: a weighted, attract-only spring over a
 /// `(a, b, weight)` signal that clusters structurally-similar nodes ("cluster by
@@ -445,6 +457,8 @@ pub struct ForceContext<'a> {
     /// How many ticks the simulation has taken before this one: the clock a
     /// lagged answer's age is measured on.
     pub step: u64,
+    /// Accepted field time before this tick; independent of lagged result age.
+    pub field_clock: FieldClock,
 }
 
 /// One rapier world + bookkeeping. The host owns one of these per
@@ -474,6 +488,14 @@ pub struct Simulation {
     /// [`set_coupling_forces`](Self::set_coupling_forces). (Field regions —
     /// rebuild-on-mutation.)
     coupling_forces: Vec<CouplingForce>,
+    coupling_trace_session: CouplingTraceSession,
+    coupling_trace_limit: Option<std::num::NonZeroUsize>,
+    coupling_trace: Option<CouplingTrace>,
+    coupling_binding_generation: u64,
+    field_clock: FieldClock,
+    coupling_membership: coupling_membership::MembershipRuntime,
+    coupling_membership_frame: Option<CouplingMembershipFrame>,
+    coupling_entry_handler: Option<CouplingEntryHandler>,
     /// The pairwise **affinity** force, if installed: a weighted attract-only spring that clusters
     /// structurally-similar nodes ("cluster by affinity"). Like the couplings it is a snapshot —
     /// the host rebuilds it wholesale via [`set_affinity_force`](Self::set_affinity_force) when the
@@ -567,6 +589,14 @@ impl Simulation {
             edges: Vec::new(),
             forces: Vec::new(),
             coupling_forces: Vec::new(),
+            coupling_trace_session: CouplingTraceSession::new(),
+            coupling_trace_limit: None,
+            coupling_trace: None,
+            coupling_binding_generation: 0,
+            field_clock: FieldClock::default(),
+            coupling_membership: Default::default(),
+            coupling_membership_frame: None,
+            coupling_entry_handler: None,
             affinity_force: None,
             anchor_force: None,
             repulsion: None,
@@ -669,7 +699,18 @@ impl Simulation {
     /// new-node rebuild. Position-preserving: forces never touch body state, so
     /// swapping them leaves the layout exactly where it is. (Field regions.)
     pub fn set_coupling_forces(&mut self, forces: Vec<CouplingForce>) {
+        self.coupling_binding_generation = self
+            .coupling_binding_generation
+            .checked_add(1)
+            .expect("coupling binding generation exhausted");
+        self.coupling_membership.retain_bindings(
+            forces
+                .iter()
+                .map(|force| std::sync::Arc::clone(&force.binding)),
+        );
         self.coupling_forces = forces;
+        self.coupling_membership_frame = None;
+        self.coupling_trace = None;
     }
 
     /// Number of field-coupling forces currently applied.
@@ -826,6 +867,23 @@ impl Simulation {
         if !dt.is_finite() || dt <= 0.0 {
             return;
         }
+        self.coupling_trace = self.coupling_trace_limit.map(|limit| CouplingTrace {
+            session: self.coupling_trace_session.clone(),
+            step: self.steps,
+            clock: self.field_clock,
+            dt,
+            binding_generation: self.coupling_binding_generation,
+            records: Vec::new(),
+            omitted: 0,
+            limit,
+        });
+        self.coupling_membership_frame = Some(CouplingMembershipFrame {
+            session: self.coupling_trace_session.clone(),
+            step: self.steps,
+            clock: self.field_clock,
+            binding_generation: self.coupling_binding_generation,
+            reports: Vec::new(),
+        });
         self.parameters.dt = dt;
 
         // Emitters spawn / reap scene bodies before the step, so fresh droplets are simulated this
@@ -853,13 +911,28 @@ impl Simulation {
                 edges: &self.edges,
                 repulsion: self.repulsion.as_mut(),
                 step: self.steps,
+                field_clock: self.field_clock,
             };
             for force in &self.forces {
                 force.apply(&mut ctx, dt);
             }
             // Field couplings apply after the built-ins, in the same reset window.
-            for force in &self.coupling_forces {
-                force.apply(&mut ctx, dt);
+            for (index, force) in self.coupling_forces.iter().enumerate() {
+                let samples = force.sample_points(&ctx);
+                if let Some(frame) = &mut self.coupling_membership_frame {
+                    self.coupling_membership.observe(
+                        &force.binding,
+                        &samples,
+                        ctx.bodies_by_node,
+                        frame,
+                        self.coupling_entry_handler.as_ref(),
+                    );
+                }
+                if let Some(trace) = &mut self.coupling_trace {
+                    force.apply_traced(&mut ctx, dt, index, trace, &samples);
+                } else {
+                    force.apply_samples(&mut ctx, dt, &samples);
+                }
             }
             // The affinity force (if installed) applies last, over the same context — a weighted
             // clustering pull on top of the topology springs. (Graph signals — P4.)
@@ -904,6 +977,10 @@ impl Simulation {
         // node bodies, and shoves the dynamic ones back. (Physics scenes P4c.)
         self.couple_fluid_to_bodies();
         self.steps += 1;
+        if !self.field_clock.paused {
+            self.field_clock.elapsed += f64::from(dt);
+        }
+        self.coupling_membership.finish_tick();
     }
 
     // `write_positions_to(&mut Graph)` — which copied each body's translation back
@@ -973,3 +1050,6 @@ mod lagged_tests;
 /// Integration tests for the scene / fluid / field / emitter tiers (split alongside them).
 #[cfg(test)]
 mod scene_tests;
+
+#[cfg(test)]
+mod field_runtime_tests;

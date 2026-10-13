@@ -1,0 +1,16 @@
+PASS commands-fixture
+PASS commands-grouped
+PASS fold-page-gestures
+PASS fold-history
+PASS external-page-focus
+PASS keyboard-zoom
+locator.waitFor: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for getByRole('option', { name: 'Wheel: scroll page', exact: true })[22m
+
+    at /Users/markik/Code/output/graphshell-site-presenter-20261011/verify-commands.cjs:49:73 {
+  log: [
+    "  - waiting for getByRole('option', { name: 'Wheel: scroll page', exact: true })"
+  ],
+  name: 'TimeoutError'
+}

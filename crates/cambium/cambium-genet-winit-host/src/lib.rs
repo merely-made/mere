@@ -215,6 +215,9 @@ mod geometry_tests {
     }
 }
 
+#[cfg(test)]
+mod occlusion_tests;
+
 /// The winit window, as the neutral seam sees it.
 ///
 /// A newtype for the same reason as [`WinitSurface`]: the trait is not local to
@@ -276,6 +279,9 @@ impl Surface for WinitSurface {
 
     fn acquire(&self) -> Option<wgpu::SurfaceTexture> {
         self.surface.acquire(&self.core)
+    }
+    fn acquire_status(&self) -> genet_render_host::SurfaceAcquire {
+        self.surface.acquire_status(&self.core)
     }
 }
 /// Convert a winit named key into the host's neutral vocabulary.
@@ -394,8 +400,8 @@ where
     /// Every window verb performed this run, for tests. The only way a
     /// windowless harness can prove the frame did what the gesture asked.
     pub(crate) performed: Vec<WindowCommand>,
-    /// How many render cores this host has booted: one for its whole life,
-    /// whatever suspends and resumes. The receipt for S2's one device.
+    /// Initial cores booted by this host. Surface suspension adds none;
+    /// replacement attempts belong to the shared recovery owner's factory.
     pub(crate) core_boots: u32,
     /// Under the multi-window entry, a redraw this window asked for, issued
     /// at the next idle turn with every other window's (see `windows.rs`).
@@ -450,12 +456,21 @@ where
     /// life. Booting from the options factory rather than a stashed value is
     /// why `HostOptions::netrender` is a closure.
     fn render_core(&mut self) -> Result<Arc<RenderCore>, String> {
+        if let Some(owner) = self.s.shared.render_recovery.clone() {
+            self.core.attach_shared_recovery(owner.clone());
+            return owner
+                .current()
+                .map_err(|status| format!("shared render core unavailable: {status:?}"));
+        }
         if let Some(core) = self.s.shared.render_core.as_ref() {
-            return Ok(core.clone());
+            let core = core.clone();
+            self.core.attach_shared_recovery(core.shared_recovery());
+            return Ok(core);
         }
         let core = Arc::new(RenderCore::boot((self.options.netrender)())?);
         self.core_boots += 1;
         self.s.shared.render_core = Some(core.clone());
+        self.core.attach_shared_recovery(core.shared_recovery());
         Ok(core)
     }
 
@@ -479,6 +494,26 @@ where
     /// Draw one frame, then project any application-owned native hit regions
     /// from that exact retained layout.
     fn redraw(&mut self) {
+        let status = self.core.poll_device_recovery();
+        let genet_render_host::RecoveryStatus::Ready { generation } = status else {
+            return;
+        };
+        if self.s.needs_recovery_surface {
+            let Some(window) = self.native_window.clone() else {
+                return;
+            };
+            let size = window.inner_size();
+            match self.boot_surface(window, size.width.max(1), size.height.max(1)) {
+                Ok(surface) => {
+                    self.s.surface = Some(Box::new(surface));
+                    self.s.needs_recovery_surface = false;
+                },
+                Err(error) => {
+                    self.core.refuse_recovery_surface(generation, error);
+                    return;
+                },
+            }
+        }
         self.core.redraw();
         #[cfg(target_os = "windows")]
         self.refresh_snap_layout_rect();
@@ -795,16 +830,31 @@ where
         let Some(window) = self.native_window.clone() else {
             return false;
         };
+        if !matches!(
+            self.core.poll_device_recovery(),
+            genet_render_host::RecoveryStatus::Ready { .. }
+        ) {
+            return true;
+        }
         if self.s.surface.is_none() {
             let size = window.inner_size();
             match self.boot_surface(window.clone(), size.width.max(1), size.height.max(1)) {
                 Ok(surface) => {
                     self.s.surface = Some(Box::new(surface));
+                    self.s.needs_recovery_surface = false;
                     // The surface is new, so nothing is cached in it: force
                     // a full repaint rather than an incremental one.
                     self.redraw();
                 },
-                Err(e) => eprintln!("[cambium-host] surface re-boot failed: {e}"),
+                Err(error) => {
+                    let generation = self
+                        .s
+                        .shared
+                        .render_core
+                        .as_ref()
+                        .map_or(0, |core| core.generation());
+                    self.core.refuse_recovery_surface(generation, error);
+                },
             }
         }
         true
@@ -1042,6 +1092,17 @@ where
     /// A worker woke the application: drain it, then run what the drain
     /// queued for the window.
     pub fn wake_turn(&mut self) {
+        // Multi-window workers may share a coalesced wake flag. Every window
+        // must still acknowledge loss, including hidden windows that receive
+        // no redraw, before the single shared replacement can proceed.
+        let recovery = self.core.poll_device_recovery();
+        if matches!(recovery, genet_render_host::RecoveryStatus::Ready { .. })
+            && self.s.needs_recovery_surface
+            && !self.s.hidden
+            && let Some(window) = self.s.window.as_ref()
+        {
+            window.request_redraw();
+        }
         self.process_wake();
         self.sync_app_frame_extents();
         self.run_window_commands();
@@ -1056,6 +1117,14 @@ where
                 self.request_close(CloseRequest::Native);
             },
             WindowEvent::Moved(_) => self.refresh_geometry(),
+            WindowEvent::Occluded(false) => {
+                // Acquisition can skip an occluded surface without scheduling
+                // another frame. Repaint on the platform's actual visibility
+                // transition, while application-hidden windows stay asleep.
+                if !self.s.hidden {
+                    self.note_resize();
+                }
+            },
             WindowEvent::Resized(size) => {
                 if let Some(surface) = self.s.surface.as_mut() {
                     surface.resize(size.width.max(1), size.height.max(1));
@@ -1228,4 +1297,36 @@ where
             event_loop.exit();
         }
     }
+}
+
+/// Host-local named families from the same Fontique collection used by layout.
+/// This inventory is transient: family availability does not promise coverage,
+/// a particular face, or remote/frozen fidelity. Register the same font ledger
+/// in `Init`; invalid supplied bytes contribute no family.
+pub fn available_font_families(fonts: &[HostFont]) -> Vec<String> {
+    let mut context = parley::FontContext::new();
+    for font in fonts {
+        context.collection.register_fonts(
+            parley::fontique::Blob::new(std::sync::Arc::new(font.bytes.clone())),
+            font.family
+                .as_deref()
+                .map(|family| parley::fontique::FontInfoOverride {
+                    family_name: Some(family),
+                    ..Default::default()
+                }),
+        );
+    }
+    let mut families: Vec<_> = context
+        .collection
+        .family_names()
+        .map(str::to_owned)
+        .collect();
+    families.sort_by_key(|name| name.to_lowercase());
+    families.dedup_by(|a, b| a.eq_ignore_ascii_case(b));
+    families
+}
+
+/// Installed-only catalogue, reusing the shared system/bundled inventory owner.
+pub fn installed_font_families() -> Vec<String> {
+    available_font_families(&[])
 }

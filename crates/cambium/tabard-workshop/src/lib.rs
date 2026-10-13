@@ -10,12 +10,14 @@
 #[cfg(all(feature = "native-host", not(target_arch = "wasm32")))]
 pub mod native_host;
 
+pub mod fonts;
 mod graph;
 mod interchange;
 mod reader;
 mod state;
 mod stylesheet;
 mod surface;
+mod typography;
 
 pub use interchange::{ExportArtifact, ExportFormat};
 pub use reader::{READER_LEAF_KEY, ReaderSpecimen};

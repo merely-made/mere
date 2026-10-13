@@ -56,7 +56,15 @@ impl CaptureBackend for NativeCapture {
     ) -> Result<StampedReadback, String> {
         let slot = Rc::new(RefCell::new(None));
         let sink = slot.clone();
-        *capture = Some(Box::new(move |surface, view, presentation| {
+        *capture = Some(Box::new(move |result| {
+            let frame = match result {
+                Ok(frame) => frame,
+                Err(refusal) => {
+                    *sink.borrow_mut() = Some(Err(refusal.to_string()));
+                    return;
+                },
+            };
+            let (surface, view, presentation) = (frame.surface, frame.view, frame.presentation);
             let armed = Instant::now();
             *sink.borrow_mut() = Some(
                 start_frame_readback(surface, view, presentation.width, presentation.height).map(
@@ -84,7 +92,16 @@ impl CaptureBackend for NativeCapture {
     fn arm(&mut self, capture: &mut Option<CaptureFn>) -> Readback {
         let slot = Rc::new(RefCell::new(None));
         let sink = slot.clone();
-        *capture = Some(Box::new(move |surface, view, width, height| {
+        *capture = Some(Box::new(move |result| {
+            let frame = match result {
+                Ok(frame) => frame,
+                Err(refusal) => {
+                    *sink.borrow_mut() = Some(Err(refusal.to_string()));
+                    return;
+                },
+            };
+            let (surface, view, width, height) =
+                (frame.surface, frame.view, frame.width, frame.height);
             let armed = Instant::now();
             *sink.borrow_mut() = Some(
                 start_frame_readback(surface, view, width, height)
@@ -109,7 +126,13 @@ impl CaptureBackend for NativeCapture {
 }
 
 fn native_readback(mut pending: PendingFrame, armed: Instant) -> Readback {
-    Box::new(move || poll_native(armed, Instant::now(), || pending.poll()))
+    Box::new(move || {
+        poll_native(armed, Instant::now(), || {
+            pending
+                .poll()
+                .map(|result| result.map_err(|error| error.to_string()))
+        })
+    })
 }
 
 // Freeze the identity beside the original queued copy, before any later redraw.

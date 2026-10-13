@@ -149,7 +149,12 @@ enum LayerKind {
 enum StepKind {
     /// A moving placement of the fragmentable leaf, its independent
     /// expansion, and the no-layer non-vacuity control, under `kind`.
-    Pair { kind: LayerKind, key: u64, dx: f32, dy: f32 },
+    Pair {
+        kind: LayerKind,
+        key: u64,
+        dx: f32,
+        dy: f32,
+    },
     /// The Path-B exclusion control.
     Control,
     /// Timing: the leaf under a clip layer, steady position.
@@ -167,20 +172,37 @@ struct Step {
 fn build_steps() -> Vec<Step> {
     let mut steps = Vec::new();
     let moves = [(4.0f32, 4.0f32), (7.0, 6.0), (10.0, 8.0), (13.0, 10.0)];
-    for (label, kind, key) in [("clip", LayerKind::Clip, 101u64), ("opacity", LayerKind::Opacity, 102u64)] {
+    for (label, kind, key) in [
+        ("clip", LayerKind::Clip, 101u64),
+        ("opacity", LayerKind::Opacity, 102u64),
+    ] {
         for (i, (dx, dy)) in moves.iter().enumerate() {
             steps.push(Step {
                 label: format!("{label}-frame{i}"),
-                kind: StepKind::Pair { kind, key, dx: *dx, dy: *dy },
+                kind: StepKind::Pair {
+                    kind,
+                    key,
+                    dx: *dx,
+                    dy: *dy,
+                },
             });
         }
     }
-    steps.push(Step { label: "control".into(), kind: StepKind::Control });
+    steps.push(Step {
+        label: "control".into(),
+        kind: StepKind::Control,
+    });
     for i in 0..10 {
-        steps.push(Step { label: format!("timing-clip-{i}"), kind: StepKind::TimingClip });
+        steps.push(Step {
+            label: format!("timing-clip-{i}"),
+            kind: StepKind::TimingClip,
+        });
     }
     for i in 0..10 {
-        steps.push(Step { label: format!("timing-bare-{i}"), kind: StepKind::TimingBare });
+        steps.push(Step {
+            label: format!("timing-bare-{i}"),
+            kind: StepKind::TimingBare,
+        });
     }
     steps
 }
@@ -193,9 +215,7 @@ struct St {
 }
 
 fn leaf_style(w: u32, h: u32, dx: f32, dy: f32) -> String {
-    format!(
-        "display:block;position:absolute;left:{dx}px;top:{dy}px;width:{w}px;height:{h}px;"
-    )
+    format!("display:block;position:absolute;left:{dx}px;top:{dy}px;width:{w}px;height:{h}px;")
 }
 
 fn plain_style(dx: f32, dy: f32, css: &str) -> String {
@@ -211,20 +231,29 @@ fn pair_view(kind: LayerKind, key: u64, dx: f32, dy: f32) -> Child {
         LayerKind::Opacity => (90u32, 70u32, "opacity:0.5;"),
     };
     let ancestor_style = |left: u32| {
-        format!("display:block;position:absolute;left:{left}px;top:16px;width:{aw}px;height:{ah}px;{extra}")
+        format!(
+            "display:block;position:absolute;left:{left}px;top:16px;width:{aw}px;height:{ah}px;{extra}"
+        )
     };
     let leaf_col = el(
         "div",
-        custom_leaf::<St, ()>(key, LEAF_W, LEAF_H).attr("style", leaf_style(LEAF_W, LEAF_H, dx, dy)),
+        custom_leaf::<St, ()>(key, LEAF_W, LEAF_H)
+            .attr("style", leaf_style(LEAF_W, LEAF_H, dx, dy)),
     )
     .attr("style", ancestor_style(16));
-    let reference_col = el("div", el("div", ()).attr("style", plain_style(dx, dy, &css)))
-        .attr("style", ancestor_style(316));
-    let bare_col = el("div", ()).attr("style", format!(
-        "display:block;position:absolute;left:{}px;top:16px;{}",
-        616,
-        plain_style(dx, dy, &css)
-    ));
+    let reference_col = el(
+        "div",
+        el("div", ()).attr("style", plain_style(dx, dy, &css)),
+    )
+    .attr("style", ancestor_style(316));
+    let bare_col = el("div", ()).attr(
+        "style",
+        format!(
+            "display:block;position:absolute;left:{}px;top:16px;{}",
+            616,
+            plain_style(dx, dy, &css)
+        ),
+    );
     Box::new(
         el("div", (leaf_col, reference_col, bare_col))
             .attr("style", "position:relative;width:900px;height:300px;"),
@@ -269,7 +298,8 @@ fn timing_bare_view() -> Child {
     Box::new(
         el(
             "div",
-            custom_leaf::<St, ()>(952, LEAF_W, LEAF_H).attr("style", leaf_style(LEAF_W, LEAF_H, 24.0, 22.0)),
+            custom_leaf::<St, ()>(952, LEAF_W, LEAF_H)
+                .attr("style", leaf_style(LEAF_W, LEAF_H, 24.0, 22.0)),
         )
         .attr("style", "position:relative;width:900px;height:300px;"),
     )
@@ -418,7 +448,10 @@ fn main() {
                             *key,
                             Box::new(SolidLeaf {
                                 color: colorf(LEAF_RGB.0, LEAF_RGB.1, LEAF_RGB.2),
-                                size: Size { width: LEAF_W as f32, height: LEAF_H as f32 },
+                                size: Size {
+                                    width: LEAF_W as f32,
+                                    height: LEAF_H as f32,
+                                },
                                 painted: false,
                             }),
                         );
@@ -426,7 +459,8 @@ fn main() {
                 },
                 StepKind::Control => {
                     if !ctx.leaves.contains(&900) {
-                        ctx.leaves.insert(900, Box::new(SceneLeaf { started: false }));
+                        ctx.leaves
+                            .insert(900, Box::new(SceneLeaf { started: false }));
                     }
                 },
                 StepKind::TimingClip => {
@@ -435,7 +469,10 @@ fn main() {
                             951,
                             Box::new(SolidLeaf {
                                 color: colorf(LEAF_RGB.0, LEAF_RGB.1, LEAF_RGB.2),
-                                size: Size { width: LEAF_W as f32, height: LEAF_H as f32 },
+                                size: Size {
+                                    width: LEAF_W as f32,
+                                    height: LEAF_H as f32,
+                                },
                                 painted: false,
                             }),
                         );
@@ -447,7 +484,10 @@ fn main() {
                             952,
                             Box::new(SolidLeaf {
                                 color: colorf(LEAF_RGB.0, LEAF_RGB.1, LEAF_RGB.2),
-                                size: Size { width: LEAF_W as f32, height: LEAF_H as f32 },
+                                size: Size {
+                                    width: LEAF_W as f32,
+                                    height: LEAF_H as f32,
+                                },
                                 painted: false,
                             }),
                         );
@@ -460,7 +500,10 @@ fn main() {
             let label = step.label.clone();
             let results_for_capture = results.clone();
             let dir_for_capture = receipt_dir.clone();
-            *ctx.capture = Some(Box::new(move |surface: &dyn Surface, view: &wgpu::TextureView, w: u32, h: u32| {
+            *ctx.capture = Some(Box::new(move |capture| {
+                let capture = capture.expect("retained fragment receipt capture refused");
+                let (surface, view, w, h) =
+                    (capture.surface, capture.view, capture.width, capture.height);
                 let lower = surface.renderer().fragment_lower_count();
                 if want_control_lower {
                     results_for_capture.borrow_mut().control_lower_after = lower;
@@ -507,10 +550,16 @@ fn main() {
             if let Some(profile) = ctx.frame_profile {
                 match step.kind {
                     StepKind::TimingClip => {
-                        results.borrow_mut().timing_clip.push((step.label.clone(), profile));
+                        results
+                            .borrow_mut()
+                            .timing_clip
+                            .push((step.label.clone(), profile));
                     },
                     StepKind::TimingBare => {
-                        results.borrow_mut().timing_bare.push((step.label.clone(), profile));
+                        results
+                            .borrow_mut()
+                            .timing_bare
+                            .push((step.label.clone(), profile));
                     },
                     _ => {},
                 }

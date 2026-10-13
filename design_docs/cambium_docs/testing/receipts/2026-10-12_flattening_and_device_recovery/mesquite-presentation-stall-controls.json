@@ -1,0 +1,23 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--offline",
+    "--config",
+    "/Users/markik/Code/output/vello-production-fixes-20261011/candidate-patches.toml",
+    "-p",
+    "mesquite",
+    "--lib",
+    "lane::presentation_tests",
+    "-j2",
+    "--",
+    "--test-threads=1"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-vello-release-adoption",
+  "deadline_seconds": 180,
+  "elapsed_seconds": 48.009,
+  "exit_code": 0,
+  "timed_out": false,
+  "disk_refused": false,
+  "log": "/Users/markik/Code/output/vello-production-fixes-20261011/checks/mesquite-presentation-stall-controls.log"
+}

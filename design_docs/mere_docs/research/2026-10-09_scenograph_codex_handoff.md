@@ -174,12 +174,42 @@ velocity scaling, velocity assignment and displacement are distinct; inert
 reasons disclose captured-target mismatch, field type, positive-region boundary,
 non-dynamic advection hold and unsupported physical responses. Sampling still
 uses time zero. This replaces the missing evaluation API, not the missing
-stable field/coupling/occurrence provenance or applied-effect trace.
+stable field/coupling/occurrence provenance or applied-effect trace at that
+foundation checkpoint; the tracing continuation below supplies the next adapter.
 The [engine draft receipt](../testing/receipts/2026-10-12_coupling_effects/README.md)
 records the original-executor trajectory comparison, the failing deduplication
 control, read-only query checks, runnable real integration and its qualification
 boundaries. Membership, clocks, event execution and conflicting writers remain
 open. The point probe invokes no applet and changes no graph assertion.
+
+**Exact binding and execution continuation (2026-10-12):** the authorized
+[next dynamics draft](../implementation_strategy/2026-10-02_dynamics_grammar_plan.md#exact-coupling-bindings-and-applied-effect-tracing-2026-10-12)
+now retains compiled inputs and graph-supplied field/coupling/member IDs, and
+observes actual writes with immediate body state. It keeps configured row caps,
+truncation counts, binding generations and distinct runtime owners; the actor
+holds one latest result and rejects pre-rebind evidence. The Canvas accessor is
+read-only and requests no ticks. Its graph bodies claim no occurrence identity.
+The current t=0 clock and selector-only target policy are preserved while the
+runtime adapters remain pending. Mark's answers are recorded verbatim as
+F203 to F205: simulation clock with Pause freezing and Reset rewinding;
+reference-point spatial membership including the boundary; initial matches
+reported without entry actions, which start on later transitions. The receipt distinguishes this backend qualification from
+visible UI explanation, external consumer adoption and coordinator review.
+
+**Field-runtime continuation (2026-10-12):** Mark authorized F203 to F205's
+runtime adapter. The
+[owning dynamics plan](../implementation_strategy/2026-10-02_dynamics_grammar_plan.md#field-clock-and-membership-runtime-2026-10-12)
+now records accepted simulation time, Pause freezing, Reset rewinding on a
+separate epoch, and inclusive per-body reference-point eligibility. Extent and
+selector join the exact compiled provenance. Initial matches run no entry
+callback; later known entries invoke an explicitly registered owner handler,
+with causes and refusals reported. Duplicate target slots still execute their
+physical writes without multiplying an appearance's entry action. Actor delivery
+is bounded, cached reports do not replay actions, and old clocks/frames are
+rejected on reset. The Canvas bridge applies these policies and routes existing
+reseed/graph-swap hooks to the clock reset. App-specific script receivers,
+visible UI, external consumer adoption and coordinator review remain separate.
+The prior t=0/selector-only notes describe their frozen tracing checkpoint.
 
 ## Ruled continuation, 2026-10-10
 
@@ -499,6 +529,11 @@ the browser package remain available for the open qualification gates.
 - The catalog's addition records: `mere_docs/research/2026-08-15_projection_grammar_catalog.md`, "Addition records". Each promoted primitive needs one.
 
 ## How this lane works (Mark's standing rules)
+
+**Dynamics ruling refresh (2026-10-12):** F203 to F205 are recorded verbatim
+in the dynamics grammar plan. F205 is the latest F ruling in this continuation;
+check the current owner plan before allocating the next number. This does not
+renumber or reopen the separate Scenograph SE lane.
 
 - **Forks go to Mark.** Any decision with more than one defensible answer becomes a question with evidence and options, recommendation first. Record his answer verbatim as the next unused numbered ruling in the owning plan and commit it the same turn. Check the current plan first: SE87 and F199 are the latest at this context refresh, so the next numbers are SE88 and F200. Mark anything beyond his words *Reading, not ruled*.
 - **Evidence before claims.** Check code, counts and paths before writing them down; when evidence contradicts a ruling, reopen it with Mark.

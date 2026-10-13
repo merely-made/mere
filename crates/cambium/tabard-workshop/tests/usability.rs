@@ -84,7 +84,14 @@ fn every_text_field_lays_out_at_its_authored_height() {
     let mut host = mount(WorkshopState::load(&directory.path().join("themes.json")).unwrap());
     click(&mut host, &action("toggle-stylesheet"));
     let mut collapsed = Vec::new();
-    for (field, min_height) in [("name", 34.0), ("seed-hex", 34.0), ("mode-sheet", 200.0)] {
+    for (field, min_height) in [
+        ("name", 34.0),
+        ("seed-hex", 34.0),
+        ("mode-sheet", 200.0),
+        ("font-family", 34.0),
+        ("font-size", 34.0),
+        ("font-line-height", 34.0),
+    ] {
         let selector = Selector::role("textbox").with_attr("data-field", field);
         let node = host.with_dom(|dom| {
             let nodes = taproot::matching(dom, &selector);
@@ -93,10 +100,15 @@ fn every_text_field_lays_out_at_its_authored_height() {
         });
         let (_, _, width, height) = host.painted_rect(node).expect("field paints");
         if !(width > 0.0 && height >= min_height - 0.5) {
-            collapsed.push(format!("{field} at {width}x{height}, wants height {min_height}"));
+            collapsed.push(format!(
+                "{field} at {width}x{height}, wants height {min_height}"
+            ));
         }
     }
-    assert!(collapsed.is_empty(), "fields lose their geometry: {collapsed:?}");
+    assert!(
+        collapsed.is_empty(),
+        "fields lose their geometry: {collapsed:?}"
+    );
 }
 
 #[test]
@@ -223,4 +235,182 @@ fn applied_css_is_isolated_and_save_reopen_keeps_exact_css_and_default_mode() {
     click(&mut host, &action("undo"));
     assert_eq!(host.state().draft_theme(), &authored);
     assert_eq!(host.state().text_field("mode-sheet").unwrap().text(), css);
+}
+
+#[test]
+fn font_controls_are_retained_guard_invalid_input_and_save_reopen() {
+    use tabard::FontRole;
+    let directory = tempfile::tempdir().unwrap();
+    let path = directory.path().join("themes.json");
+    let mut state = WorkshopState::load(&path).unwrap();
+    state.set_installed_font_families(vec!["Georgia".into(), "Menlo".into(), "georgia".into()]);
+    let mut host = mount(state);
+    click(
+        &mut host,
+        &Selector::role("button").with_attr("data-font-role", "reading"),
+    );
+    let before = host.state().draft_theme().clone();
+    let editor = editor_colors(&host);
+    replace_text(&mut host, "font-size", "NaN");
+    for selector in [
+        action("save"),
+        Selector::role("button").with_attr("data-font-role", "code"),
+        Selector::role("button").with_attr("data-mode", "dark"),
+    ] {
+        click(&mut host, &selector);
+        assert_eq!(host.state().draft_theme(), &before);
+        assert_eq!(host.state().font_role(), FontRole::Reading);
+        assert_eq!(host.state().text_field("font-size").unwrap().text(), "NaN");
+        assert!(!path.exists());
+    }
+    assert!(host.with_dom(|dom| {
+        !taproot::matching(
+            dom,
+            &Selector::role("textbox")
+                .with_attr("data-field", "font-size")
+                .with_attr("aria-invalid", "true"),
+        )
+        .is_empty()
+    }));
+    click(&mut host, &action("undo"));
+    assert!(!host.state().has_pending_fields());
+    replace_text(&mut host, "font-family", "Georgia");
+    click(
+        &mut host,
+        &Selector::role("button").with_attr("data-installed-font", "Georgia"),
+    );
+    replace_text(&mut host, "font-size", "24");
+    replace_text(&mut host, "font-line-height", "1.7");
+    click(&mut host, &action("apply-fonts"));
+    let authored = host.state().draft_theme().clone();
+    let reading = &authored.typography.0[&FontRole::Reading];
+    assert_eq!(reading.family.as_deref(), Some("Georgia"));
+    assert_eq!(reading.size_px, Some(24.0));
+    assert_eq!(reading.line_height, Some(1.7));
+    assert_eq!(editor_colors(&host), editor);
+    assert!(!path.exists());
+    assert_eq!(
+        host.state()
+            .stylesheet_preview()
+            .borrow()
+            .computed_style("preview-paragraph", "font-size")
+            .as_deref(),
+        Some("24px")
+    );
+    click(&mut host, &action("undo"));
+    assert_eq!(
+        host.state().draft_theme().typography.0[&FontRole::Reading].size_px,
+        None
+    );
+    click(&mut host, &action("redo"));
+    assert_eq!(host.state().draft_theme(), &authored);
+    click(&mut host, &action("save"));
+    assert!(!host.state().is_dirty());
+    let reopened = WorkshopState::load(&path).unwrap();
+    assert_eq!(reopened.draft_theme(), &authored);
+    click(&mut host, &action("reset-font-role"));
+    assert!(host.state().draft_theme().typography.is_empty());
+    click(&mut host, &action("discard"));
+    assert_eq!(host.state().draft_theme(), &authored);
+}
+
+#[test]
+fn applying_a_color_keeps_staged_font_input_until_its_own_action() {
+    let mut host = mount(WorkshopState::in_memory());
+    replace_text(&mut host, "font-size", "26");
+    replace_text(&mut host, "seed-hex", "#123456");
+    click(&mut host, &action("apply-hex"));
+    assert_eq!(host.state().text_field("font-size").unwrap().text(), "26");
+    assert!(host.state().draft_theme().typography.is_empty());
+    click(&mut host, &action("apply-fonts"));
+    assert_eq!(
+        host.state().draft_theme().typography.0[&tabard::FontRole::Interface].size_px,
+        Some(26.0)
+    );
+}
+
+#[test]
+fn generic_font_buttons_select_the_exact_family_despite_shared_name_substrings() {
+    let mut host = mount(WorkshopState::in_memory());
+    click(&mut host, &Selector::class("font-family-serif"));
+    assert_eq!(
+        host.state().text_field("font-family").unwrap().text(),
+        "serif"
+    );
+    assert_eq!(
+        host.state().draft_theme().typography.0[&tabard::FontRole::Interface]
+            .family
+            .as_deref(),
+        Some("serif")
+    );
+    click(&mut host, &Selector::class("font-family-sans-serif"));
+    assert_eq!(
+        host.state().draft_theme().typography.0[&tabard::FontRole::Interface]
+            .family
+            .as_deref(),
+        Some("sans-serif")
+    );
+}
+
+#[test]
+fn visible_chrome_and_syntax_font_roles_change_without_styling_the_editor() {
+    use tabard::FontRole;
+    let mut state = WorkshopState::in_memory();
+    for (role, family, size) in [
+        (FontRole::Interface, "serif", "18"),
+        (FontRole::Heading, "serif", "26"),
+        (FontRole::Label, "monospace", "13"),
+        (FontRole::Code, "sans-serif", "19"),
+    ] {
+        state.set_font_role(role);
+        *state.text_field_mut("font-family").unwrap() = cambium::TextInput::new(family);
+        *state.text_field_mut("font-size").unwrap() = cambium::TextInput::new(size);
+        assert!(state.apply_fonts());
+    }
+    let syntax_color = format!(
+        "rgb({}, {}, {})",
+        state.preview_syntax().surface.r,
+        state.preview_syntax().surface.g,
+        state.preview_syntax().surface.b
+    );
+    let host = mount(state);
+    host.with_surfaces(|surfaces| {
+        let surface = &surfaces[0];
+        let plane = resolve_styles(
+            surface.dom,
+            &StyleSet::cambium(&[surface.sheet]),
+            &Device::screen(surface.rect[2], surface.rect[3]),
+            &InteractionStates::default(),
+        );
+        for (class, family, size) in [
+            ("chrome-bar", "serif", "18px"),
+            ("specimen-action", "serif", "18px"),
+            ("specimen-title", "serif", "26px"),
+            ("address-field", "monospace", "13px"),
+            ("code-filename", "monospace", "13px"),
+            ("syntax-code", "sans-serif", "19px"),
+        ] {
+            let nodes = taproot::matching(surface.dom, &Selector::class(class));
+            assert_eq!(nodes.len(), 1, "{class}");
+            let actual = plane.computed_style(nodes[0], "font-family").unwrap();
+            assert_eq!(actual.split(',').next().unwrap().trim(), family, "{class}");
+            assert_eq!(
+                plane.computed_style(nodes[0], "font-size").as_deref(),
+                Some(size),
+                "{class}"
+            );
+        }
+        let syntax = taproot::matching(surface.dom, &Selector::class("syntax-code"))[0];
+        assert_eq!(
+            plane.computed_style(syntax, "background-color").as_deref(),
+            Some(syntax_color.as_str()),
+            "font styles must preserve Illume's local palette"
+        );
+        let save = taproot::matching(surface.dom, &action("save"))[0];
+        assert_eq!(
+            plane.computed_style(save, "font-family").as_deref(),
+            Some("sans-serif"),
+            "authoring UI stays neutral"
+        );
+    });
 }

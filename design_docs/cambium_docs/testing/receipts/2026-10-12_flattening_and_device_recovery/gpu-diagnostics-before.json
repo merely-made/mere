@@ -1,0 +1,52 @@
+[
+  {
+    "path": "/Library/Logs/DiagnosticReports/WindowServer_2026-10-09-230816_Q-PC.userspace_watchdog_timeout.spin",
+    "mtime_ns": 1791602523808145053,
+    "bytes": 3805351
+  },
+  {
+    "path": "/Library/Logs/DiagnosticReports/Kernel_2026-10-09-221840_Q-PC.gpuRestart",
+    "mtime_ns": 1791601064075717400,
+    "bytes": 62038
+  },
+  {
+    "path": "/Library/Logs/DiagnosticReports/WindowServer_2026-10-09-221910_Q-PC.userspace_watchdog_timeout.spin",
+    "mtime_ns": 1791601064076882407,
+    "bytes": 5192278
+  },
+  {
+    "path": "/Library/Logs/DiagnosticReports/WindowServer_2026-10-10-012342_Q-PC.userspace_watchdog_timeout.spin",
+    "mtime_ns": 1791696153138060136,
+    "bytes": 3407370
+  },
+  {
+    "path": "/Library/Logs/DiagnosticReports/Kernel_2026-10-09-230800_Q-PC.gpuRestart",
+    "mtime_ns": 1791602523836206745,
+    "bytes": 62218
+  },
+  {
+    "path": "/Library/Logs/DiagnosticReports/Kernel_2026-10-10-001733_Q-PC.gpuRestart",
+    "mtime_ns": 1791609661037744466,
+    "bytes": 63308
+  },
+  {
+    "path": "/Library/Logs/DiagnosticReports/WindowServer_2026-10-10-001752_Q-PC.userspace_watchdog_timeout.spin",
+    "mtime_ns": 1791609661039106704,
+    "bytes": 4835932
+  },
+  {
+    "path": "/Library/Logs/DiagnosticReports/Kernel_2026-10-10-012335_Q-PC.gpuRestart",
+    "mtime_ns": 1791696153138476999,
+    "bytes": 63438
+  },
+  {
+    "path": "/Library/Logs/DiagnosticReports/WindowServer_2026-10-10-014642_Q-PC.userspace_watchdog_timeout.spin",
+    "mtime_ns": 1791696227456589427,
+    "bytes": 3431536
+  },
+  {
+    "path": "/Library/Logs/DiagnosticReports/Kernel_2026-10-10-014641_Q-PC.gpuRestart",
+    "mtime_ns": 1791696227457423466,
+    "bytes": 63918
+  }
+]

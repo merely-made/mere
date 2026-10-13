@@ -1,0 +1,34 @@
+PASS p4_tree_forme.scn
+AssertionError [ERR_ASSERTION]: RuntimeError: unreachable
+    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[199401]:0x25f9f88
+    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[199210]:0x25f9b72
+    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[195736]:0x25f0217
+    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[34267]:0x17bb6e0
+    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[75224]:0x1e895e3
+    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[198752]:0x25f8d73
+    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[159511]:0x24b5b1f
+    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[130423]:0x233fdd2
+    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[130424]:0x233fe0f
+    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[88348]:0x1ffc90a
+RuntimeError: unreachable
+    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[199401]:0x25f9f88
+    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[199210]:0x25f9b72
+    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[195736]:0x25f0217
+    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[34267]:0x17bb6e0
+    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[75224]:0x1e895e3
+    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[198752]:0x25f8d73
+    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[159511]:0x24b5b1f
+    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[130423]:0x233fdd2
+    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[154271]:0x247aee9
+    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[43727]:0x19bc235
+
+2 !== 0
+
+    at /Users/markik/Code/output/graphshell-site-presenter-20261011/verify-product.cjs:26:12 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 2,
+  expected: 0,
+  operator: 'strictEqual',
+  diff: 'simple'
+}

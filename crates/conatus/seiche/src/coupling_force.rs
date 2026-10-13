@@ -39,16 +39,7 @@ use crate::{
 /// A [`numen::Coupling`] compiled to a [`Force`]: evaluate the field at each
 /// target node's position and apply the response.
 pub struct CouplingForce {
-    response: CouplingResponse,
-    strength: f32,
-    /// Nodes the coupling acts on, resolved from the selector at build time.
-    targets: Vec<NodeKey>,
-    /// The field to sample. Scalar responses (attract/repel/wall/dampen) need a
-    /// scalar; flow responses (align/advect) need a vector. A mismatch is inert.
-    field: FieldDefinition,
-    /// Registry for the field's `Sample` references. Empty by default — a
-    /// self-contained field needs none, and a missing sample evaluates to zero.
-    registry: FieldRegistry,
+    pub(crate) binding: std::sync::Arc<crate::CouplingBinding>,
 }
 
 /// One response's proposed write. This is not an aggregate force or proof that
@@ -72,6 +63,10 @@ pub enum CouplingInertReason {
     OutsidePositiveRegion,
     NonDynamicBody,
     UnsupportedResponse,
+    OutsideExtent,
+    UnsupportedExtent,
+    InvalidReferencePoint,
+    InvalidSampleTime,
 }
 
 /// A report-only point evaluation. `sample_time` is the executor's configured
@@ -85,7 +80,6 @@ pub struct CouplingEvaluation {
 
 // Preserve the current field execution contract. A real clock remains an
 // owner-policy checkpoint; exposing this value must not silently advance it.
-const SAMPLE_TIME: f32 = 0.0;
 
 impl CouplingForce {
     /// From an already-resolved field definition and target set. Needs no
@@ -97,19 +91,68 @@ impl CouplingForce {
         targets: impl IntoIterator<Item = NodeKey>,
         field: FieldDefinition,
     ) -> Self {
+        let targets: Vec<_> = targets.into_iter().collect();
+        let target_identities = vec![None; targets.len()];
         Self {
-            response,
-            strength,
-            targets: targets.into_iter().collect(),
-            field,
-            registry: FieldRegistry::new(),
+            binding: std::sync::Arc::new(crate::CouplingBinding {
+                response,
+                strength,
+                targets,
+                selector: None,
+                animated: crate::field_clock::animated(&field, &FieldRegistry::new()),
+                field,
+                extent: numen::FieldExtent::Global,
+                registry: FieldRegistry::new(),
+                source: None,
+                target_identities,
+            }),
         }
     }
 
     /// Supply a registry so the field's `Sample` references resolve.
     pub fn with_registry(mut self, registry: FieldRegistry) -> Self {
-        self.registry = registry;
+        let binding = std::sync::Arc::make_mut(&mut self.binding);
+        binding.animated = crate::field_clock::animated(&binding.field, &registry);
+        binding.registry = registry;
         self
+    }
+
+    /// Capture the owner's Numen selector when available. Candidate snapshots
+    /// still drive execution; this distinguishes selector edits with equal matches.
+    pub fn with_selector(mut self, selector: numen::NodeSelector) -> Self {
+        std::sync::Arc::make_mut(&mut self.binding).selector = Some(selector);
+        self
+    }
+
+    /// World-space scope for each body reference point. Attached extents are
+    /// explicitly unsupported until their owner supplies resolved geometry.
+    pub fn with_extent(mut self, extent: numen::FieldExtent) -> Self {
+        std::sync::Arc::make_mut(&mut self.binding).extent = extent;
+        self
+    }
+
+    /// Capture owner IDs and optional stable identities for each target slot.
+    /// The callback runs once per slot, retaining duplicate occurrence mappings.
+    /// Seiche records these supplied identities without asserting their authority.
+    pub fn with_provenance(
+        mut self,
+        source: crate::CouplingSource,
+        mut identify: impl FnMut(usize, NodeKey) -> Option<crate::CouplingTargetIdentity>,
+    ) -> Self {
+        let binding = std::sync::Arc::make_mut(&mut self.binding);
+        binding.source = Some(source);
+        binding.target_identities = binding
+            .targets
+            .iter()
+            .enumerate()
+            .map(|(slot, &node)| identify(slot, node))
+            .collect();
+        self
+    }
+
+    /// Immutable snapshot of the exact compiled inputs, including its registry.
+    pub fn binding(&self) -> &crate::CouplingBinding {
+        &self.binding
     }
 
     // `from_coupling(coupling, &Graph)` — which resolved a coupling's field and
@@ -120,18 +163,20 @@ impl CouplingForce {
 
     /// Number of nodes this force currently acts on.
     pub fn target_count(&self) -> usize {
-        self.targets.len()
+        self.binding.targets.len()
     }
 
     /// Evaluate one response at caller-supplied body inputs without mutating a
-    /// body, invoking an applet or advancing a controller. Target membership is
-    /// the captured selector result, not membership in the field's extent.
+    /// body, invoking an applet or advancing a controller. Candidates are the captured selector result; eligibility tests the body
+    /// reference point against the bound extent, including its boundary.
     ///
-    /// Field sampling remains at `0.0`. The result describes one application;
+    /// This convenience probe explicitly samples at `0.0`; use `evaluate_at_time`
+    /// with a runtime clock when inspecting a running field. It describes one application;
     /// it does not sum duplicate targets, other couplings, contacts or anchored
     /// returns. Missing `Sample` references retain numen's existing zero fallback.
     /// The caller owns body presence, provenance and input validity; this method
-    /// does not validate finite inputs or certify that the reported write ran.
+    /// checks finite reference points for scope, but is not a complete input
+    /// validator and does not certify that the reported write ran.
     pub fn evaluate_at(
         &self,
         node: NodeKey,
@@ -139,13 +184,26 @@ impl CouplingForce {
         is_dynamic: bool,
         dt: f32,
     ) -> CouplingEvaluation {
-        let effect = if self.targets.contains(&node) {
-            self.evaluate_target(position, is_dynamic, dt)
+        self.evaluate_at_time(node, position, is_dynamic, dt, 0.0)
+    }
+
+    /// Read-only probe at a caller-supplied clock, with reference-point scope.
+    /// It does not advance the runtime or certify body presence/owner authority.
+    pub fn evaluate_at_time(
+        &self,
+        node: NodeKey,
+        position: [f32; 2],
+        is_dynamic: bool,
+        dt: f32,
+        sample_time: f32,
+    ) -> CouplingEvaluation {
+        let effect = if self.binding.targets.contains(&node) {
+            self.evaluate_target(position, is_dynamic, dt, sample_time)
         } else {
             CouplingEffect::Inert(CouplingInertReason::NotInResolvedTargets)
         };
         CouplingEvaluation {
-            sample_time: SAMPLE_TIME,
+            sample_time,
             effect,
         }
     }
@@ -153,32 +211,54 @@ impl CouplingForce {
     // Execution has already resolved each target, so it avoids a membership
     // scan per body. Keeping the original snapshot point also preserves repeated
     // targets: advection offsets accumulate; damping repeatedly scales velocity.
-    fn evaluate_target(&self, [x, y]: [f32; 2], is_dynamic: bool, dt: f32) -> CouplingEffect {
+    pub(crate) fn evaluate_target(
+        &self,
+        [x, y]: [f32; 2],
+        is_dynamic: bool,
+        dt: f32,
+        sample_time: f32,
+    ) -> CouplingEffect {
         use CouplingEffect::{AddForce, Displace, Inert, ScaleVelocity, SetVelocity};
         use CouplingInertReason::{
             FieldTypeMismatch, NonDynamicBody, OutsidePositiveRegion, UnsupportedResponse,
         };
-        match &self.response {
+        if !sample_time.is_finite() {
+            return Inert(CouplingInertReason::InvalidSampleTime);
+        }
+        match crate::coupling_membership::eligibility(&self.binding, [x, y]) {
+            crate::CouplingEligibility::Inside => {},
+            crate::CouplingEligibility::Outside => {
+                return Inert(CouplingInertReason::OutsideExtent);
+            },
+            crate::CouplingEligibility::UnsupportedExtent => {
+                return Inert(CouplingInertReason::UnsupportedExtent);
+            },
+            _ => return Inert(CouplingInertReason::InvalidReferencePoint),
+        }
+        match &self.binding.response {
             CouplingResponse::AttractToMin | CouplingResponse::RepelFromMax => {
                 let Some(scalar) = self.scalar() else {
                     return Inert(FieldTypeMismatch);
                 };
-                let sign = if matches!(self.response, CouplingResponse::AttractToMin) {
+                let sign = if matches!(self.binding.response, CouplingResponse::AttractToMin) {
                     -1.0
                 } else {
                     1.0
                 };
-                let (gx, gy) = grad_scalar(scalar, &self.registry, x, y, SAMPLE_TIME);
-                AddForce([sign * gx * self.strength, sign * gy * self.strength])
+                let (gx, gy) = grad_scalar(scalar, &self.binding.registry, x, y, sample_time);
+                AddForce([
+                    sign * gx * self.binding.strength,
+                    sign * gy * self.binding.strength,
+                ])
             },
             CouplingResponse::ContainmentWall => {
                 let Some(scalar) = self.scalar() else {
                     return Inert(FieldTypeMismatch);
                 };
-                let depth = eval_scalar(scalar, &self.registry, x, y, SAMPLE_TIME);
+                let depth = eval_scalar(scalar, &self.binding.registry, x, y, sample_time);
                 if depth > 0.0 {
-                    let (gx, gy) = grad_scalar(scalar, &self.registry, x, y, SAMPLE_TIME);
-                    let force = Vector::new(gx, gy) * (self.strength * depth);
+                    let (gx, gy) = grad_scalar(scalar, &self.binding.registry, x, y, sample_time);
+                    let force = Vector::new(gx, gy) * (self.binding.strength * depth);
                     AddForce([force.x, force.y])
                 } else {
                     Inert(OutsidePositiveRegion)
@@ -188,7 +268,7 @@ impl CouplingForce {
                 let Some(scalar) = self.scalar() else {
                     return Inert(FieldTypeMismatch);
                 };
-                if eval_scalar(scalar, &self.registry, x, y, SAMPLE_TIME) > 0.0 {
+                if eval_scalar(scalar, &self.binding.registry, x, y, sample_time) > 0.0 {
                     // The existing response ignores coupling strength.
                     ScaleVelocity(*factor)
                 } else {
@@ -199,8 +279,8 @@ impl CouplingForce {
                 let Some(field) = self.vector() else {
                     return Inert(FieldTypeMismatch);
                 };
-                let (vx, vy) = eval_vector(field, &self.registry, x, y, SAMPLE_TIME);
-                SetVelocity([vx * self.strength, vy * self.strength])
+                let (vx, vy) = eval_vector(field, &self.binding.registry, x, y, sample_time);
+                SetVelocity([vx * self.binding.strength, vy * self.binding.strength])
             },
             CouplingResponse::FlowAdvect => {
                 let Some(field) = self.vector() else {
@@ -209,8 +289,8 @@ impl CouplingForce {
                 if !is_dynamic {
                     return Inert(NonDynamicBody);
                 }
-                let (vx, vy) = eval_vector(field, &self.registry, x, y, SAMPLE_TIME);
-                let offset = Vector::new(vx, vy) * (self.strength * dt);
+                let (vx, vy) = eval_vector(field, &self.binding.registry, x, y, sample_time);
+                let offset = Vector::new(vx, vy) * (self.binding.strength * dt);
                 Displace([offset.x, offset.y])
             },
             CouplingResponse::Open { .. } => Inert(UnsupportedResponse),
@@ -218,58 +298,106 @@ impl CouplingForce {
     }
 
     fn scalar(&self) -> Option<&ScalarField> {
-        match &self.field {
+        match &self.binding.field {
             FieldDefinition::Scalar(s) => Some(s),
             FieldDefinition::Vector(_) => None,
         }
     }
 
     fn vector(&self) -> Option<&VectorField> {
-        match &self.field {
+        match &self.binding.field {
             FieldDefinition::Vector(v) => Some(v),
             FieldDefinition::Scalar(_) => None,
         }
     }
 }
 
-impl Force for CouplingForce {
-    fn apply(&self, ctx: &mut ForceContext<'_>, dt: f32) {
-        // Snapshot field sample points before any writes, as the original
-        // executor did. Duplicate target applications stay in their input order.
-        let mut samples: Vec<(RigidBodyHandle, f32, f32)> = Vec::with_capacity(self.targets.len());
-        for &node in &self.targets {
-            if let Some(&handle) = ctx.bodies_by_node.get(&node) {
-                if let Some(body) = ctx.bodies.get(handle) {
-                    let t = body.translation();
-                    samples.push((handle, t.x, t.y));
-                }
-            }
-        }
-        for (handle, x, y) in samples {
-            if let Some(body) = ctx.bodies.get_mut(handle) {
-                match self.evaluate_target([x, y], body.is_dynamic(), dt) {
-                    CouplingEffect::AddForce([fx, fy]) => body.add_force(Vector::new(fx, fy), true),
-                    CouplingEffect::ScaleVelocity(factor) => {
-                        let velocity = body.linvel();
-                        body.set_linvel(velocity * factor, true);
-                    },
-                    CouplingEffect::SetVelocity([vx, vy]) => {
-                        body.set_linvel(Vector::new(vx, vy), true)
-                    },
-                    CouplingEffect::Displace([dx, dy]) => {
-                        let next = body.translation() + Vector::new(dx, dy);
-                        body.set_translation(next, true);
-                    },
-                    CouplingEffect::Inert(_) => {},
-                }
-            }
+impl CouplingForce {
+    pub(crate) fn write_effect(body: &mut RigidBody, effect: CouplingEffect) {
+        match effect {
+            CouplingEffect::AddForce([fx, fy]) => body.add_force(Vector::new(fx, fy), true),
+            CouplingEffect::ScaleVelocity(factor) => {
+                let velocity = body.linvel();
+                body.set_linvel(velocity * factor, true);
+            },
+            CouplingEffect::SetVelocity([vx, vy]) => body.set_linvel(Vector::new(vx, vy), true),
+            CouplingEffect::Displace([dx, dy]) => {
+                let next = body.translation() + Vector::new(dx, dy);
+                body.set_translation(next, true);
+            },
+            CouplingEffect::Inert(_) => {},
         }
     }
 }
 
-/// Gradient responses (attract, repel, the wall) are E over the field's
-/// potential; the damping, alignment and advection responses write state
-/// (K). The open tail applies nothing, so it declares nothing.
+impl CouplingForce {
+    pub(crate) fn sample_points(
+        &self,
+        ctx: &ForceContext<'_>,
+    ) -> Vec<(Option<RigidBodyHandle>, Option<[f32; 2]>)> {
+        self.binding
+            .targets
+            .iter()
+            .map(|node| {
+                ctx.bodies_by_node
+                    .get(node)
+                    .and_then(|&handle| {
+                        ctx.bodies.get(handle).map(|body| {
+                            let p = body.translation();
+                            (Some(handle), Some([p.x, p.y]))
+                        })
+                    })
+                    .unwrap_or((None, None))
+            })
+            .collect()
+    }
+
+    pub(crate) fn apply_samples(
+        &self,
+        ctx: &mut ForceContext<'_>,
+        dt: f32,
+        samples: &[(Option<RigidBodyHandle>, Option<[f32; 2]>)],
+    ) {
+        for &(handle, point) in samples {
+            if let (Some(handle), Some(point)) = (handle, point)
+                && let Some(body) = ctx.bodies.get_mut(handle)
+            {
+                let effect = self.evaluate_target(
+                    point,
+                    body.is_dynamic(),
+                    dt,
+                    ctx.field_clock.sample_time(),
+                );
+                Self::write_effect(body, effect);
+            }
+        }
+    }
+}
+impl Force for CouplingForce {
+    fn wants_tick(&self) -> bool {
+        let typed = match &self.binding.response {
+            CouplingResponse::AlignVelocity | CouplingResponse::FlowAdvect => {
+                self.vector().is_some()
+            },
+            CouplingResponse::Open { .. } => false,
+            _ => self.scalar().is_some(),
+        };
+        self.binding.animated
+            && typed
+            && !self.binding.targets.is_empty()
+            && !matches!(self.binding.extent, numen::FieldExtent::AttachedToNode(_))
+    }
+
+    fn apply(&self, ctx: &mut ForceContext<'_>, dt: f32) {
+        let samples = self.sample_points(ctx);
+        self.apply_samples(ctx, dt, &samples);
+    }
+}
+
+/// Global autonomous gradients are E over the field potential. Time-dependent
+/// or extent-clipped gradients conservatively declare N: the timeless energy
+/// interface cannot prove their global potential. State-writing responses stay
+/// K. The open tail applies no physical term.
 impl Declared for CouplingForce {
     fn terms(&self) -> Vec<Term> {
         let field = |class| {
@@ -281,10 +409,18 @@ impl Declared for CouplingForce {
                 Observable::Residual,
             )
         };
-        match &self.response {
+        match &self.binding.response {
             CouplingResponse::AttractToMin
             | CouplingResponse::RepelFromMax
-            | CouplingResponse::ContainmentWall => vec![field(Class::E)],
+            | CouplingResponse::ContainmentWall => vec![field(
+                if self.binding.animated
+                    || !matches!(self.binding.extent, numen::FieldExtent::Global)
+                {
+                    Class::N
+                } else {
+                    Class::E
+                },
+            )],
             CouplingResponse::DampenInside { .. } | CouplingResponse::AlignVelocity => {
                 vec![field(Class::K).moving(State::Velocity, Currency::Kinematic)]
             },
@@ -298,19 +434,20 @@ impl Declared for CouplingForce {
     /// `∓s·φ` for attract and repel, `−(s/2)·φ²` inside the wall.
     fn energy(&self, _term: usize, layout: &Layout<'_>) -> Option<f64> {
         let scalar = self.scalar()?;
-        let s = f64::from(self.strength);
+        let s = f64::from(self.binding.strength);
         let at = |i: usize| {
             let p = layout.nodes[i].1;
-            f64::from(eval_scalar(scalar, &self.registry, p.x, p.y, 0.0))
+            f64::from(eval_scalar(scalar, &self.binding.registry, p.x, p.y, 0.0))
         };
         let targets: Vec<usize> = {
             let index = layout.index();
-            self.targets
+            self.binding
+                .targets
                 .iter()
                 .filter_map(|k| index.get(k).copied())
                 .collect()
         };
-        let per_node: Box<dyn Fn(f64) -> f64> = match self.response {
+        let per_node: Box<dyn Fn(f64) -> f64> = match self.binding.response {
             CouplingResponse::AttractToMin => Box::new(move |phi| s * phi),
             CouplingResponse::RepelFromMax => Box::new(move |phi| -s * phi),
             CouplingResponse::ContainmentWall => {
@@ -332,148 +469,5 @@ impl Declared for CouplingForce {
 mod effect_tests;
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::{Boundary, NodeKey, Simulation};
-    use euclid::default::Point2D;
-
-    /// Kernel-free node-list builder (seiche drives physics from `(NodeKey,
-    /// position)` pairs).
-    #[derive(Default)]
-    struct Nodes {
-        list: Vec<(NodeKey, Point2D<f32>)>,
-    }
-
-    impl Nodes {
-        fn at(&mut self, x: f32, y: f32) -> NodeKey {
-            let key = NodeKey::new(self.list.len());
-            self.list.push((key, Point2D::new(x, y)));
-            key
-        }
-        fn sync(&self, sim: &mut Simulation) {
-            sim.sync_nodes(self.list.iter().copied());
-        }
-    }
-
-    fn radius(sim: &Simulation, k: NodeKey) -> f32 {
-        sim.position_of(k).unwrap().to_vector().length()
-    }
-
-    /// `½(x² + y²)` — gradient `(x, y)`, the potential whose `AttractToMin`
-    /// coupling reproduces `Boundary`.
-    pub(super) fn paraboloid() -> ScalarField {
-        ScalarField::Scale(
-            Box::new(ScalarField::Add(
-                Box::new(ScalarField::Mul(
-                    Box::new(ScalarField::CoordX),
-                    Box::new(ScalarField::CoordX),
-                )),
-                Box::new(ScalarField::Mul(
-                    Box::new(ScalarField::CoordY),
-                    Box::new(ScalarField::CoordY),
-                )),
-            )),
-            0.5,
-        )
-    }
-
-    #[test]
-    fn attract_to_min_centers_like_boundary() {
-        // Two sims, same seed: Boundary vs an AttractToMin coupling on the
-        // paraboloid. The paraboloid's gradient is (x, y), so the coupling force
-        // is -pos·strength — Boundary exactly, up to numen's finite-difference
-        // step. The bodies track each other across the whole settle (a ~580-unit
-        // journey leaves them within a couple of units).
-        let mut g = Nodes::default();
-        let a = g.at(500.0, -300.0);
-
-        let mut boundary_sim = Simulation::new();
-        g.sync(&mut boundary_sim);
-        boundary_sim.add_force(Boundary { strength: 1.5 });
-
-        let mut coupling_sim = Simulation::new();
-        g.sync(&mut coupling_sim);
-        coupling_sim.add_force(CouplingForce::new(
-            CouplingResponse::AttractToMin,
-            1.5,
-            [a],
-            FieldDefinition::Scalar(paraboloid()),
-        ));
-
-        for _ in 0..120 {
-            boundary_sim.tick(1.0 / 60.0);
-            coupling_sim.tick(1.0 / 60.0);
-        }
-
-        let pb = boundary_sim.position_of(a).unwrap();
-        let pc = coupling_sim.position_of(a).unwrap();
-        assert!(
-            radius(&coupling_sim, a) < 500.0,
-            "coupling should pull inward"
-        );
-        assert!(
-            (pb - pc).length() < 5.0,
-            "coupling diverged from Boundary: {pb:?} vs {pc:?}"
-        );
-    }
-
-    #[test]
-    fn open_response_applies_no_force() {
-        // An open-tail response (e.g. a visual coupling) is not a force: the
-        // integrator must leave the body where it is, even on a field whose
-        // AttractToMin response would otherwise pull it to the origin.
-        let mut g = Nodes::default();
-        let a = g.at(300.0, 0.0);
-
-        let mut sim = Simulation::new();
-        g.sync(&mut sim);
-        sim.add_force(CouplingForce::new(
-            CouplingResponse::open(
-                "https://mere.computer/ns/coupling#visual/highlight".to_string(),
-            ),
-            1.0,
-            [a],
-            FieldDefinition::Scalar(paraboloid()),
-        ));
-        let p0 = sim.position_of(a).unwrap();
-        for _ in 0..120 {
-            sim.tick(1.0 / 60.0);
-        }
-        assert!(
-            (sim.position_of(a).unwrap() - p0).length() < 1.0e-3,
-            "an open-tail response must apply no force"
-        );
-    }
-
-    #[test]
-    fn flow_advect_leaves_a_pinned_body_at_its_kinematic_target() {
-        // FlowAdvect writes positions; a pinned (kinematic) body belongs to
-        // the drag, so it stays on its target while a free one is advected.
-        let mut g = Nodes::default();
-        let pinned = g.at(0.0, 0.0);
-        let free = g.at(100.0, 0.0);
-        let mut sim = Simulation::new();
-        g.sync(&mut sim);
-        sim.add_force(CouplingForce::new(
-            CouplingResponse::FlowAdvect,
-            1.0,
-            [pinned, free],
-            FieldDefinition::Vector(VectorField::ConstVec { x: 120.0, y: 0.0 }),
-        ));
-        let target = Point2D::new(-200.0, 50.0);
-        sim.pin(pinned, target);
-        let free_start = sim.position_of(free).unwrap();
-        for _ in 0..60 {
-            sim.tick(1.0 / 60.0);
-        }
-        let held = sim.position_of(pinned).unwrap();
-        assert!(
-            (held - target).length() < 1e-3,
-            "the pinned body left its target: {held:?}"
-        );
-        assert!(
-            sim.position_of(free).unwrap().x > free_start.x + 10.0,
-            "the free body is still advected"
-        );
-    }
-}
+#[path = "coupling_force_tests.rs"]
+mod tests;

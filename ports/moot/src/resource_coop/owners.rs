@@ -48,6 +48,7 @@ pub fn snapshot(
         heads: view.version.frontier.clone(),
         membership_commitment: view.version.membership_commitment,
         fork: None,
+        fork_destination: None,
     });
     if let Some(collection) = &mut collection {
         collection.fork = disclosures.collection_fork(reader, collection);
@@ -71,6 +72,7 @@ pub fn snapshot(
             let facts = disclosures.resource(reader, reference);
             ResourceRead {
                 reference,
+                shared_by: Some(share.shared_by),
                 title: share.title.clone(),
                 schema: share.schema_id.clone(),
                 content: facts.content,
