@@ -1,0 +1,128 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling indexmap v2.14.2
+   Compiling gl_generator v0.14.0
+   Compiling windows v0.62.2
+   Compiling icu_properties v2.3.0
+   Compiling web_atoms v0.2.6
+   Compiling naga v30.0.1
+   Compiling generic-array v0.14.7
+   Compiling tokio v1.53.2
+   Compiling form_urlencoded v1.2.2
+   Compiling bytecheck v0.8.3
+   Compiling blake3 v1.8.7
+   Compiling futures-intrusive v0.5.0
+   Compiling av-scenechange v0.14.1
+   Compiling av1-grain v0.2.5
+   Compiling futures-channel v0.3.34
+   Compiling ppv-lite86 v0.2.21
+   Compiling rend v0.5.4
+   Compiling aho-corasick v1.1.5
+   Compiling muniment v0.1.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\muniment)
+   Compiling crypto-common v0.1.7
+   Compiling naga-types v30.0.1
+   Compiling petgraph v0.8.3
+   Compiling glutin_wgl_sys v0.6.1
+   Compiling block-buffer v0.10.4
+   Compiling wgpu-types v30.0.1
+   Compiling markup5ever v0.39.0
+   Compiling digest v0.10.7
+   Compiling rav1e v0.8.1
+   Compiling rand_chacha v0.9.0
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling sha2 v0.10.9
+   Compiling accesskit v0.24.1
+   Compiling fleece v0.5.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling regex-automata v0.4.18
+   Compiling serde_urlencoded v0.7.1
+   Compiling rand v0.9.5
+   Compiling html5ever v0.39.0
+   Compiling xml5ever v0.39.0
+   Compiling idna_adapter v1.2.2
+   Compiling parley_data v0.10.0
+   Compiling idna v1.1.0
+   Compiling inker v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\inker\inker)
+   Compiling assert-json-diff v2.0.2
+   Compiling colored v3.1.1
+   Compiling tempfile v3.27.0
+   Compiling tabard v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\system\tabard)
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling rkyv v0.8.18
+   Compiling url v2.5.8
+   Compiling regex v1.13.1
+   Compiling ravif v0.13.0
+   Compiling tokio-util v0.7.19
+   Compiling image v0.25.10
+   Compiling chartulary v0.2.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\chartulary)
+   Compiling vello_shaders v0.11.0 (https://github.com/mark-ik/vello?rev=5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a#5862bba2)
+   Compiling h2 v0.4.19
+   Compiling eidetic v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\eidetic-core)
+   Compiling wgpu-naga-bridge v30.0.1
+   Compiling hyper v1.11.1
+   Compiling hyper-util v0.1.20
+   Compiling mockito v1.7.2
+   Compiling mere-fleece v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\fleece)
+   Compiling gpu-allocator v0.28.0
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling wgpu-hal v30.0.1
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+   Compiling wgpu-core-deps-windows-linux-android v30.0.1
+   Compiling wgpu-core v30.0.1
+   Compiling wgpu v30.0.1
+   Compiling netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?rev=ef5412d760a978584c8c1801e8a765c51aecd403#ef5412d7)
+   Compiling netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a#5862bba2)
+   Compiling netrender v0.1.2 (https://github.com/merely-made/netrender.git?rev=ef5412d760a978584c8c1801e8a765c51aecd403#ef5412d7)
+   Compiling paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?rev=ef5412d760a978584c8c1801e8a765c51aecd403#ef5412d7)
+   Compiling document-canvas v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\inker\document-canvas)
+   Compiling mere-document-lanes v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\system\document-lanes)
+warning: unused import: `genet_host_api::ResourceFetcher`
+  --> crates\system\document-lanes\src\session.rs:13:5
+   |
+13 | use genet_host_api::ResourceFetcher;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `SessionEngine`, `SessionError`, and `SessionSpawnRequest`
+  --> crates\system\document-lanes\src\session.rs:15:86
+   |
+15 |     DocumentSession, SessionButtonState, SessionClick, SessionCursor, SessionEffect, SessionEngine,
+   |                                                                                      ^^^^^^^^^^^^^
+16 |     SessionError, SessionFocusDirection, SessionFormMethod, SessionFormSubmission, SessionKey,
+   |     ^^^^^^^^^^^^
+17 |     SessionLink, SessionModifiers, SessionScrollKey, SessionSpawnRequest,
+   |                                                      ^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `SmolwebInlineMediaPolicy` and `SmolwebTheme`
+  --> crates\system\document-lanes\src\session.rs:22:48
+   |
+22 | use crate::{InPageNavigation, SmolwebDocument, SmolwebInlineMediaPolicy, SmolwebTheme};
+   |                                                ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+
+warning: method `packet` is never used
+   --> crates\system\document-lanes\src\smolweb.rs:560:19
+    |
+134 | impl SmolwebDocument {
+    | -------------------- method in this implementation
+...
+560 |     pub(crate) fn packet(&self) -> Option<&DocumentRenderPacket> {
+    |                   ^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mere-document-lanes` (lib test) generated 4 warnings (run `cargo fix --lib -p mere-document-lanes --tests` to apply 3 suggestions)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 43.47s
+     Running unittests src\lib.rs (C:\t\cargo-targets\mere\debug\deps\mere_document_lanes-689766924e02aab3.exe)
+
+running 2 tests
+test retained_clip::tests::shared_voice_clip_keeps_exact_decoder_bytes_and_typed_controls ... ok
+test retained_clip::tests::shared_text_clip_has_original_evidence_and_a_real_pelt_session ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.07s
+

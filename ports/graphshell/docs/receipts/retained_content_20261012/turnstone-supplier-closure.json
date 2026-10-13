@@ -1,0 +1,13 @@
+{
+  "platform": "x86_64-pc-windows-msvc",
+  "mere_sources": [
+    "git+https://www.github.com/merely-made/mere.git?rev=0d1dc1927859ff1aa2a43dd88a04391bc1086fd8#0d1dc1927859ff1aa2a43dd88a04391bc1086fd8"
+  ],
+  "genet_revisions": [
+    "2c7ef73bfa44c07744e0643e3c6f98be3cbd7947"
+  ],
+  "duplicate_genet_package_names": [],
+  "mere_packages": 75,
+  "genet_packages": 30,
+  "qualification": "Normal locked dependency resolution; no local-source overrides"
+}

@@ -1945,8 +1945,9 @@ is inferred from these debug packages.
 
 ## Native retained-content continuation — 2026-10-13
 
-**Status:** implemented; native and headed source qualification recorded. The
-coherent published Turnstone consumer pin is being finalized.
+**Status:** implemented; native and browser qualification recorded. Turnstone
+`d5d4737` adopts the published Mere `0d1dc1927859ff1aa2a43dd88a04391bc1086fd8`
+baseline with normal locked dependency resolution and no source overrides.
 This continuation follows Mark's native-stack ruling in the
 [suite census](../../2026-08-22_turnstone_suite_composition_and_capability_census.md).
 
@@ -1985,8 +1986,23 @@ published dependency pin.
 The shared native factory, retained clip session, portable content host/input
 view/producer, browser store admission and Workbench mounting are implemented.
 Evidence is under `ports/graphshell/docs/receipts/retained_content_20261012/`.
+The Windows consumer check passes with one Mere source and one Genet revision;
+its clip (10) and pane-store (5) tests pass. Shared document-canvas tests (85),
+Graphshell retained-content tests (9), shared clip tests (2), merged Moot
+resource tests (42), and admitted native resource-mount tests (8) pass.
+Browser captures show actual retained HTML, selected UTF-8 text and voice-note
+controls; reopening reads the saved IndexedDB store without reimporting clips.
+Chrome accepts actual keyboard and pointer playback from the retained WAV;
+pointer Stop is observed after the host frame settles. The scripted gesture-free
+attempt is correctly refused. The shared accessibility mirror cannot scroll away
+from the canvas or recursively enter an FnMut focus trampoline. Retained body
+clicks also stop at the content boundary before an enclosing tile can replace
+the input target. Physical audibility is not claimed.
+The latest Turnstone draft `7d62a5a` supplies Tabard themes and Interface fonts
+to the shared pane frame. That adoption retains its existing acceptance scope.
 This bounded native content path does not close physical assistive-technology,
 protected personal custody, all media adapters or cross-platform acceptance.
+Graphshell's selected-clip export action still needs its host export adapter.
 Turnstone A4/S3 still requires in-house Component bodies in one composition,
 float joining, native input/theme/DPI/performance acceptance. Its shared frame
 and outer Workspace draft is the next composition owner, not a receipt for
