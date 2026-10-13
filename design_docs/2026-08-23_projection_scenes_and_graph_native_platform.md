@@ -1203,3 +1203,22 @@ preconditions and explicit runtime releases are preserved in the
 [Instrument qualification](../support/receipts/instrument_workspace_20261012/qualification.json).
 This qualifies the shared frame and these two consumers; cross-app domain
 actions and additional entry bindings still require their own actual receipts.
+
+### 9.18 Strata and organizing views draft (2026-10-13)
+
+Mark revisits §9.9's vocabulary: **links** could connect peers within a
+semantic stratum, while **edges** connect across strata, with resource/surface
+as the motivating example. He asks whether additional strata, such as tagging
+or indexing, are definable, and how SPARQL fits. He authorized a draft and an
+update to the terminology reference.
+
+The [graph semantics draft](mere_docs/implementation_strategy/2026-10-04_graph_semantics_plan.md#7-strata-and-query-driven-views-draft)
+owns the definitions, candidate admission questions and proposed first tagging
+view. The [terminology reference](TERMINOLOGY.md) distinguishes established
+definitions from this draft refinement. Tags remain resources under the
+existing rulings; saved queries can supply many organizing views. Additional
+strata are candidates requiring their own identity and ownership contracts.
+Scene planes, node types and attention remain independent of semantic strata.
+This develops the earlier explicit/derived and resource/content proposals;
+provenance remains an independent distinction and surfaces retain their
+established name.
