@@ -1,23 +1,35 @@
 {
   "schema": "codex.client-mesh/qualification-v1",
-  "observed_at": "2026-10-13T21:29:35Z",
-  "status": "registered; native client activation and Windows ThinkPad enrollment pending",
+  "observed_at": "2026-10-13T22:33:54Z",
+  "status": "SSH and stored-chat reads qualified among three peers; O-PC native connection display discrepancy pending",
   "clients": {
     "o-pc": {
-      "registered": ["s-pc", "thinkpad-l14-f", "imac-intel", "imac-m4"],
+      "registered": [
+        "s-pc",
+        "thinkpad-l14-f",
+        "imac-intel",
+        "imac-m4"
+      ],
       "auto_connect": true,
-      "codex_sidebar_grouping": "connection"
+      "codex_sidebar_grouping": "connection",
+      "native_display": "owner reports not connected; app tools read chats on both Linux peers and list both with unavailableHosts empty"
     },
     "s-pc": {
-      "registered": ["o-pc", "thinkpad-l14-f"],
-      "auto_connect": false,
-      "activation": "Connect buttons pending",
-      "identity_agent": "Djinn; native unlock pending"
+      "registered": [
+        "o-pc",
+        "thinkpad-l14-f"
+      ],
+      "auto_connect": true,
+      "activation": "owner reports connected; auto-connect enabled in live client state",
+      "identity_agent": "Djinn; native unlock completed; both reverse SSH routes passed"
     },
     "thinkpad-l14-f": {
-      "registered": ["s-pc", "o-pc"],
-      "auto_connect": false,
-      "activation": "Connect buttons pending",
+      "registered": [
+        "s-pc",
+        "o-pc"
+      ],
+      "auto_connect": true,
+      "activation": "owner reports connected; auto-connect enabled in live client state",
       "identity_agent": "existing GCR desktop agent; Djinn not installed"
     }
   },
@@ -34,16 +46,22 @@
     "startup_after_reboot": "not qualified"
   },
   "linux_daemons": {
-    "s-pc": {"status": "running", "version": "0.160.1"},
-    "thinkpad-l14-f": {"status": "running", "version": "0.162.0-alpha.17.2"}
+    "s-pc": {
+      "status": "running",
+      "version": "0.160.1"
+    },
+    "thinkpad-l14-f": {
+      "status": "running",
+      "version": "0.162.0-alpha.17.2"
+    }
   },
   "routes": {
-    "o-pc -> s-pc": "existing SSH and send/read-reply receipt; client registration preserved",
-    "s-pc -> o-pc": "SSH qualified earlier; repeat and native client activation await native Djinn unlock",
-    "o-pc -> thinkpad-l14-f": "SSH passed",
+    "o-pc -> s-pc": "SSH and app read_thread passed for 01a132b0-fcf6-7871-b0a2-b8d8f40c18e4; native display discrepancy reported",
+    "s-pc -> o-pc": "SSH hostname and app-server thread/read passed for 01a12716-2a74-7ee0-9840-1b356432b10f",
+    "o-pc -> thinkpad-l14-f": "SSH and app read_thread passed for 01a11e41-e5d7-7011-a39f-1205b16b15dc; native display discrepancy reported",
     "thinkpad-l14-f -> s-pc": "SSH hostname and app-server thread/read passed for 01a132b0-fcf6-7871-b0a2-b8d8f40c18e4",
-    "s-pc -> thinkpad-l14-f": "public key enrolled; repeat awaits native Djinn unlock",
-    "thinkpad-l14-f -> o-pc": "public key and peer-scoped Windows installer prepared; UAC canceled; grant not installed",
+    "s-pc -> thinkpad-l14-f": "Djinn SSH hostname passed after native unlock",
+    "thinkpad-l14-f -> o-pc": "SSH hostname and app-server thread/read passed for 01a12716-2a74-7ee0-9840-1b356432b10f",
     "imac-m4": "SSH refused; pending reachability",
     "imac-intel": "SSH through imac-m4 unavailable; pending reachability"
   },
@@ -51,11 +69,11 @@
     "script": "scripts/codex-peer-enroll-windows.ps1",
     "peer_address": "192.168.4.32",
     "peer_rule": "Djinn-SSH-LAN-thinkpad-l14-f",
-    "peer_rule_installed": false,
+    "peer_rule_installed": true,
     "public_key_fingerprint": "SHA256:/wpcbebhH6lJ9WjHQtJPrOiRrDg8JzRoMf0S7Il8Co8",
     "script_parse": "passed",
     "unelevated_negative_control": "refused before writes",
-    "native_elevation": "canceled; owner choice pending",
+    "native_elevation": "completed after reopening; peer rule address and authenticated login verified",
     "existing_surface_rule": "Djinn-SSH-LAN-Peer remains scoped to 192.168.4.59"
   },
   "preservation": {
@@ -69,10 +87,9 @@
     "worktrees_or_cargo_homes_created": false
   },
   "done_conditions": [
-    "Native clients activate each registered peer and show its existing chats",
-    "ThinkPad Windows enrollment completes under native administrator approval",
-    "Surface signs through Djinn after native unlock and both reverse routes pass",
+    "Resolve the discrepancy between O-PC native connection display and successful remote reads; verify visible existing chats in that client",
     "Reachable Macs are enrolled and qualified separately",
-    "Active chat writer guards remain intact"
+    "Active chat writer guards remain intact",
+    "Windows daemon reboot persistence is qualified separately"
   ]
 }
