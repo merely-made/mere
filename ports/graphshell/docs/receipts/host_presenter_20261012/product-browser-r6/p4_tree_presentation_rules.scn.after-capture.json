@@ -1,0 +1,45 @@
+{
+  "receipt": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        1140,
+        865
+      ],
+      "canvas_physical_size": [
+        1140,
+        865
+      ],
+      "log": [
+        "waited 3 frames",
+        "waited 3 frames",
+        "waited 3 frames",
+        "captured presentation_rule_decisions",
+        "gpu timestamps: no"
+      ],
+      "result": "ok",
+      "saved_graph": {
+        "address": "",
+        "file": null,
+        "reopened": false,
+        "save_state": "idle",
+        "selected": null,
+        "session": "96c7a9b0-86a8-47ce-b517-9147b46968a1",
+        "tags": "",
+        "title": ""
+      },
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "presentation_rule_decisions",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 248958
+      }
+    ]
+  },
+  "errors": []
+}

@@ -1,0 +1,44 @@
+{
+  "receipt": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        1140,
+        865
+      ],
+      "canvas_physical_size": [
+        1140,
+        865
+      ],
+      "log": [
+        "waited 22 frames",
+        "waited 3 frames",
+        "captured presentation_live_reopen",
+        "gpu timestamps: no"
+      ],
+      "result": "ok",
+      "saved_graph": {
+        "address": "",
+        "file": null,
+        "reopened": true,
+        "save_state": "idle",
+        "selected": null,
+        "session": "0126916a-9e4f-4dc1-9f84-2ab8c29eed0e",
+        "tags": "",
+        "title": ""
+      },
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "presentation_live_reopen",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 341442
+      }
+    ]
+  },
+  "errors": []
+}

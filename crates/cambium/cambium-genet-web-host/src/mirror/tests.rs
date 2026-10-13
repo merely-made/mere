@@ -423,6 +423,36 @@ fn boxes_are_relative_to_their_parent_and_hidden_nodes_are_left_out() {
 }
 
 #[test]
+fn an_option_keeps_its_name_without_duplicating_its_child_content() {
+    let mut dom = ScriptedDom::new();
+    let root = dom.document();
+    dom.set_inner_html(
+        root,
+        r#"<div role="listbox"><button id="fit" role="option" aria-label="Fit selection" aria-description="Select a visible node first" aria-disabled="true" style="display:block;width:320px;height:48px"><span>Fit selection</span><small>Select a visible node first</small></button></div>"#,
+    );
+    let option = element_with_id(&dom, root, "fit").expect("the option is declared");
+    let id = dom.opaque_id(option);
+    let children: Vec<_> = dom.dom_children(option).map(|n| dom.opaque_id(n)).collect();
+    let layout = cambium_rootstock::OwnedLayout::new(
+        &dom, &[""], 360.0, 180.0, &[], &Default::default(),
+    );
+    let projection = cambium_rootstock::document_projection(
+        &cambium_rootstock::WindowDom::document(&dom), &layout, None,
+    );
+    let mirror = plan(&projection, 1.0, |_, _| None);
+    let nodes = flat(&mirror);
+    let option = nodes.iter().find(|n| n.id == id).expect("the option is mirrored");
+    assert_eq!(attr(option, "role"), Some("option"));
+    assert_eq!(attr(option, "aria-label"), Some("Fit selection"));
+    assert_eq!(attr(option, "aria-description"), Some("Select a visible node first"));
+    assert_eq!(attr(option, "aria-disabled"), Some("true"));
+    assert_eq!(option.text, None, "the name must not duplicate child text");
+    assert_eq!(option.children.len(), 2, "declared child content remains present");
+    let source = element_with_id(&dom, root, "fit").unwrap();
+    assert_eq!(dom.dom_children(source).map(|n| dom.opaque_id(n)).collect::<Vec<_>>(), children);
+}
+
+#[test]
 fn a_description_lowers_to_aria_description_and_an_empty_one_is_left_out() {
     let mut described = blank(2, DocumentA11yRole::Button);
     described.name = Some("Append a card".into());

@@ -1,0 +1,135 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling smallvec v1.16.1
+   Compiling parking_lot_core v0.9.12
+   Compiling parking_lot v0.12.5
+   Compiling objc2-foundation v0.3.2
+   Compiling objc2-metal v0.3.2
+   Compiling objc2-core-graphics v0.3.2
+   Compiling serde_bytes v0.11.19
+   Compiling linebender_resource_handle v0.1.1
+   Compiling objc2-quartz-core v0.3.2
+   Compiling raw-window-metal v1.1.0
+   Compiling string_cache v0.9.0
+   Compiling wgpu-hal v30.0.1
+   Compiling kurbo v0.13.1
+   Compiling web_atoms v0.2.6
+   Compiling wgpu-core-deps-apple v30.0.1
+   Compiling color v0.3.3
+   Compiling peniko v0.6.1
+   Compiling markup5ever v0.39.0
+   Compiling wgpu-core v30.0.1
+   Compiling vello_shaders v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling icu_normalizer v2.3.0
+   Compiling vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling wgpu v30.0.1
+   Compiling semver v1.0.28
+   Compiling rustc_version v0.4.1
+   Compiling futures-intrusive v0.5.0
+   Compiling netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling heapless v0.7.17
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling byteorder v1.5.0
+   Compiling hash32 v0.2.1
+   Compiling idna_adapter v1.2.2
+   Compiling paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling idna v1.1.0
+   Compiling xml5ever v0.39.0
+   Compiling html5ever v0.39.0
+   Compiling objc2-core-text v0.3.2
+   Compiling encoding_rs v0.8.42
+   Compiling netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling cssparser v0.37.0
+   Compiling postcard v1.1.3
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling livery v0.0.5 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling url v2.5.8
+   Compiling engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling icu_segmenter v2.3.0
+   Compiling netrender v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling cadency v0.0.1 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling harfrust v0.8.4
+   Compiling genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling buckram v0.0.3 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling winit v0.30.13
+   Compiling genet-livery v0.0.4 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling sprigging v0.2.1 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/cambium/sprigging)
+   Compiling document-session-api v0.1.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling cambium v0.3.3 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/cambium/cambium)
+   Compiling paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling accesskit_consumer v0.38.0
+   Compiling cambium-winit v0.3.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/cambium/cambium-winit)
+   Compiling accesskit_macos v0.26.3
+   Compiling genet-render v0.2.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling cambium-rootstock v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/cambium/cambium-rootstock)
+   Compiling genet-winit-host v0.2.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling objc2-core-data v0.3.2
+   Compiling objc2-core-image v0.3.2
+   Compiling objc2-cloud-kit v0.3.2
+   Compiling objc2-core-video v0.3.2
+   Compiling objc2-app-kit v0.3.2
+   Compiling cambium-winit-a11y v0.3.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/cambium/cambium-winit-a11y)
+   Compiling taproot v0.1.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling cambium-genet-winit-host v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/cambium/cambium-genet-winit-host)
+warning: unused import: `NSWindow`
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:511:25
+    |
+511 |     use objc2_app_kit::{NSWindow, NSWindowButton};
+    |                         ^^^^^^^^
+    |
+    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unnecessary `unsafe` block
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:540:46
+    |
+540 |             view.convertRect_fromView(frame, unsafe { ns_window.contentView() }.as_deref());
+    |                                              ^^^^^^ unnecessary `unsafe` block
+    |
+    = note: `#[warn(unused_unsafe)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `window_control_node` is never used
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:113:4
+    |
+113 | fn window_control_node<D>(dom: &D, root: NodeId, accessible_label: &str) -> Option<NodeId>
+    |    ^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `window_control_rect` is never used
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:139:15
+    |
+139 | pub(crate) fn window_control_rect<D>(
+    |               ^^^^^^^^^^^^^^^^^^^
+
+warning: `cambium-genet-winit-host` (lib) generated 4 warnings (run `cargo fix --lib -p cambium-genet-winit-host` to apply 1 suggestion)
+   Compiling cambium-genet-web-host v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/cambium/cambium-genet-web-host)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3m 56s
+     Running unittests src/lib.rs (target/debug/deps/cambium_genet_web_host-ba1435474fd1491a)
+
+running 11 tests
+test mirror::tests::a_description_lowers_to_aria_description_and_an_empty_one_is_left_out ... ok
+test mirror::tests::names_go_where_aria_reads_them ... ok
+test mirror::tests::what_a_leaf_draws_lowers_to_named_boxes_under_it ... ok
+test mirror::tests::boxes_are_relative_to_their_parent_and_hidden_nodes_are_left_out ... ok
+test mirror::tests::a_leaf_describes_itself_and_an_author_name_wins ... ok
+test mirror::tests::states_lower_to_their_aria_attributes ... ok
+test mirror::tests::a_drawn_nodes_actions_lower_to_buttons_that_name_their_action ... ok
+test mirror::tests::an_option_keeps_its_name_without_duplicating_its_child_content ... ok
+test mirror::tests::app_textbox_marker_runs_through_the_browser_mirror_as_a_leaf ... ok
+test mirror::tests::each_control_on_the_page_lowers_to_its_aria_role_and_name ... ok
+test mirror::tests::a_box_sits_where_the_layout_painted_its_node ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 1.36s
+

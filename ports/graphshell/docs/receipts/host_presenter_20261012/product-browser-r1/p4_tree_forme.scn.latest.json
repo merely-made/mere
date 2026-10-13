@@ -1,0 +1,75 @@
+{
+  "receipt": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        1140,
+        865
+      ],
+      "canvas_physical_size": [
+        1140,
+        865
+      ],
+      "log": [
+        "waited 0 frames",
+        "waited 1 frames",
+        "captured forme_reading_tiles",
+        "captured forme_hover_regions",
+        "waited 28 frames",
+        "waited 49 frames",
+        "waited 51 frames",
+        "waited 0 frames",
+        "waited 0 frames",
+        "captured forme_tab_stack",
+        "waited 0 frames",
+        "waited 1 frames",
+        "waited 0 frames",
+        "waited 0 frames",
+        "captured forme_saved_regions",
+        "forme open hover resize preview cancel commit and local dynamics receipt complete",
+        "gpu timestamps: no"
+      ],
+      "result": "ok",
+      "saved_graph": {
+        "address": "file:///Graphshell/reference-notes.md",
+        "file": null,
+        "reopened": false,
+        "save_state": "idle",
+        "selected": "392b7659-3952-57e9-8812-98c4d6205025",
+        "session": "fd48ec8b-6630-4398-bcd3-3a33ebae8dd2",
+        "tags": "local, reference",
+        "title": "Reference notes"
+      },
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "forme_reading_tiles",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 219686
+      },
+      {
+        "name": "forme_hover_regions",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 202082
+      },
+      {
+        "name": "forme_tab_stack",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 219666
+      },
+      {
+        "name": "forme_saved_regions",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 214154
+      }
+    ]
+  },
+  "errors": []
+}

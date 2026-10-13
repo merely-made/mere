@@ -1,0 +1,9 @@
+locator.inputValue: Error: Node is not an <input>, <textarea> or <select> element
+Call log:
+[2m  - waiting for getByRole('textbox', { name: 'Title', exact: true })[22m
+
+    at /Users/markik/Code/output/graphshell-site-presenter-20261011/verify-product.cjs:26:83 {
+  log: [
+    "  - waiting for getByRole('textbox', { name: 'Title', exact: true })"
+  ]
+}
