@@ -1185,7 +1185,7 @@ native/touch qualification and complete one-tree phase 4 remain separate.
 The latest release measurement stays bound to `8ad44a5c7`; no new release size
 is inferred from these debug packages.
 
-### Viewer delivery budget (2026-10-12; implementation in progress)
+### Viewer delivery budget (2026-10-12; current-main reconciliation)
 
 Mark authorized reducing the viewer below R157's unchanged 3,407,872-byte
 (3.25 MiB) gzip limit so the site can replace its sandbox. Work starts on
@@ -1214,18 +1214,44 @@ scripts. Separating that producer reduces the same-profile package to
 measurements retained. A separate `viewer` profile inherits release, uses `z`
 and full LTO, and leaves the established full-page release profile unchanged;
 its first exploratory package is 3,383,277 B gzip9 and 3,398,093 B gzip6.
-Both fit narrowly. After reconciliation through `3b76b162b`, the normal shipping
-build at `cef122f25` measures 3,379,926 B gzip9 and 3,396,340 B gzip6; both fit,
-with only 11,532 B spare at gzip6. All four asset caps and the viewer, product,
-main-page and default Wasm compile gates pass. Exact-package hardware acceptance
-and reconciliation of subsequently published upstream code remain pending.
-The build script enforces
-all four interaction caps at both gzip levels, with two regression controls
-covering compressible raw size and incompressible budget refusal.
-The portable workflow now invokes that builder in a separate Linux delivery
-job and retains the package/report. GitHub's repository permission check reports
-Actions disabled on 2026-10-13, so remote CI execution is not claimed; the
-measured local package and upcoming exact-package browser run remain distinct.
+Both fit narrowly. The normal shipping package at `cdba4c969` measures
+3,379,962 B gzip9 and 3,396,363 B gzip6, with 11,509 B spare at gzip6.
+Glue, mount and history also pass their individual caps. Portable/default
+Platen tests, the two size-gate controls and all four Wasm feature builds pass.
+
+That exact package passed 24 command cases, eleven presenter cases, all
+seventeen physics receipts, four browser pointer/keyboard assertions and three
+clean product/remote refusals on headed Chrome 152 with AMD gcn-5, with no page
+errors. The final 21-node synthetic diagnostic has 16.7–16.8 ms median display
+intervals across three windows; the last window includes an 82.6 ms maximum.
+This is a count-matched diagnostic, not the site's actual data or a broad
+performance guarantee. Existing missing Arabic/CJK/Thai glyphs occur in both
+baseline and reduced packages; disclosed strings agree, Latin/Greek remain
+readable, and mixed-script line breaks differ. No expanded font repertoire or
+identical complex-script segmentation is claimed.
+
+The original timeout/focus receipts are retained. Density needed 420 seconds
+for its 7,400-frame scenario; presenter checks wait for selected-state/link
+projection; the keyboard scenario needs twelve Tabs through the current panel
+(the old eleven-Tab recipe fails on both baseline and candidate). Assertions
+remain unchanged. Browser, server and inhibitor resources were explicitly
+closed at 07:19:09 UTC on 13 October. Receipts are under
+`ports/graphshell/docs/receipts/viewer_budget_20261012`.
+
+Subsequent main `0d1dc1927` adds retained Pelt content and Moot controls.
+Reconciliation preserves these capabilities in native defaults and web product
+builds through an explicit `retained-content` feature, keeping the read-only
+viewer free of their document producer. The standalone web workspace also
+restates the root p2panda compatibility patches, which Cargo does not inherit.
+Its source `3f57971e0` is being rebuilt and requalified; prior package acceptance
+does not transfer automatically. Main publication and live-site cutover remain
+pending.
+
+The builder enforces all four interaction caps at gzip6 and gzip9. The portable
+workflow invokes it in a separate Linux delivery job and retains package/report.
+GitHub's repository permission check reports Actions disabled on 13 October;
+remote CI execution is not claimed. The site's separate first-load cap and
+static/mobile/non-WebGPU/failure reading remain site-cutover gates.
 
 **Done when:** the normal shipping build and exact deployment recipe fit each
 R157 cap with source/profile/feature/package hashes and an automated regression
