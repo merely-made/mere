@@ -1,0 +1,49 @@
+{
+  "receipt": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        615,
+        405
+      ],
+      "canvas_physical_size": [
+        615,
+        405
+      ],
+      "log": [
+        "captured dynamics_reopened_forme_owner",
+        "captured dynamics_reopened_placement_constraints",
+        "gpu timestamps: no"
+      ],
+      "result": "ok",
+      "saved_graph": {
+        "address": "https://example.test/i2p-port",
+        "file": null,
+        "reopened": true,
+        "save_state": "idle",
+        "selected": "81b91a6b-52ef-5751-b497-15f711cf9c70",
+        "session": "c0269613-fe44-4daf-b9d4-606133808d8c",
+        "tags": "research, transport",
+        "title": "I2P port notes"
+      },
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "dynamics_reopened_forme_owner",
+        "width": 615,
+        "height": 608,
+        "bytes": 83174
+      },
+      {
+        "name": "dynamics_reopened_placement_constraints",
+        "width": 615,
+        "height": 608,
+        "bytes": 87454
+      }
+    ]
+  },
+  "errors": []
+}

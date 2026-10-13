@@ -1,0 +1,21 @@
+{
+  "events": [
+    {
+      "key": "Shift",
+      "code": "ShiftLeft",
+      "shift": true,
+      "ctrl": false,
+      "meta": false,
+      "target": "<div data-node=\"2199023255630\" role=\"group\" aria-label=\"0 of 3 shown\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 0px; width: 1140px; height: 651px;\"></div>"
+    },
+    {
+      "key": "F10",
+      "code": "F10",
+      "shift": true,
+      "ctrl": false,
+      "meta": false,
+      "target": "<div data-node=\"2199023255630\" role=\"group\" aria-label=\"0 of 3 shown\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 0px; width: 1140px; height: 651px;\"></div>"
+    }
+  ],
+  "active": "<div data-node=\"2199023255872\" role=\"textbox\" aria-label=\"Search graph commands\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 16px; width: 340px; height: 28px;\"></div>"
+}

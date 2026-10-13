@@ -1,0 +1,16 @@
+{
+  "group": [
+    "p4_tree_node_ladder.scn",
+    "p4_tree_node_ladder_reopen.scn"
+  ],
+  "messages": [
+    {
+      "type": "warning",
+      "text": "Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    },
+    {
+      "type": "warning",
+      "text": "Compilation log for [ShaderModule \"vello.flatten\"]:\n\n1 warning(s) generated while compiling the shader:\n:385:5 warning: code is unreachable\n    return 0xffffffffu;\n    ^^^^^^\n"
+    }
+  ]
+}

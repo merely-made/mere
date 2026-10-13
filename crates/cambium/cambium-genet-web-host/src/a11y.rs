@@ -360,6 +360,14 @@ impl Accessibility for DomAccessibility {
 
         self.cover_canvas();
         let root = self.handle.root.clone();
+        // Removing a focused proxy (for example a dismissed search field)
+        // makes Chrome focus body. Remember ownership before that mutation,
+        // while still leaving genuinely external page focus alone.
+        let active_before = self.document.active_element();
+        let held_before = active_before.as_ref().is_some_and(|active| {
+            active.is_same_node(Some(self.canvas.as_ref()))
+                || root.contains(Some(active.as_ref()))
+        });
         let mut live = HashSet::new();
         self.write(&root, &plan, &mut live);
         self.elements.retain(|id, mirrored| {
@@ -386,7 +394,7 @@ impl Accessibility for DomAccessibility {
                 active.is_same_node(Some(self.canvas.as_ref()))
                     || self.handle.root.contains(Some(active.as_ref()))
             });
-            if holds {
+            if held_before || holds {
                 self.handle.take_focus();
             }
         }

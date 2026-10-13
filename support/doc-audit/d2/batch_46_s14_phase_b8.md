@@ -376,3 +376,125 @@ These symbols exist at base: OperationProcessor (stickleback/src/processor.rs), 
 - Genet* types: context.rs:71, pod.rs:29, runner.rs:1074. Deprecated Serval* aliases: cambium/src/lib.rs:226-239. Tab traversal tests: tests.rs:1230-1272.
 - Sampled genet stage commits exist (cc4b30a, ef4c026, e10a3211f82, 42d9d04c4e0, 1ea6ab4c153). pelt-live was retired in genet b108fb509ca; the status cites it only as history.
 - The cross-repo links use relative `../../../../genet/docs/` paths, which DOC_POLICY §5 discourages, but they resolve.
+
+### One-tree viewer controls continuation, 2026-10-11
+
+Incremental review of the command/gesture target in the one-tree plan: the
+implementation composes the existing command set and retained text/button
+components, keeps Fold membership and geometry ownership unchanged, and
+records CPU/Wasm evidence separately from pending headed acceptance. The
+original audit counts above remain historical. The toolbar is not retired
+before replacement access is demonstrated. SE31 session view persistence is
+explicitly retained as an open saved-product migration target; this read-only
+viewer does not create a second persistence mechanism.
+
+### One-tree presenter flow review, 2026-10-11
+
+Incremental review against published `ec1e65cae`, integrated at `2bb2e7d72`:
+the new product presentation binder/editor and live Forme-guides draft are
+acknowledged with their existing CPU/Wasm and pending headed boundaries.
+The host-dataset adapter, automatic footprint/LOD integration and complete
+comparison-selection restoration are recorded as gaps, with the actual
+source modules linked. The site flow, adjacent-inspector starting treatment
+and implementation gates are recommendations, not new user rulings or passed
+runtime checks. Existing authoring, context, typography, document-session and
+renderer ownership remain explicit. The original whole-document audit counts
+are unchanged; this addendum reviews only the new continuation.
+
+### First site presenter implementation, 2026-10-11
+
+Incremental review records Mark's explicit stable-face/adjacent-inspector/Fold
+selection scope. The implementation target preserves occurrence/source identity,
+keeps hidden subjects in mount-local selection, and separates inspector reading
+from source edits and automatic representation/LOD changes. It names the actual
+hosted scenarios and hardware-browser gate before landing, with wider site
+retirement and one-tree phase 4 still open. No new runtime acceptance or whole
+document claim census is asserted by this addendum.
+
+The 2026-10-12 incremental continuation distinguishes the old-pin release
+measurements from the combined `f39f6ab0b` source gates: 67 focused CPU tests,
+viewer/product builds and main-page checking pass, while the final coherent
+supplier family and explicit renderer handoff still precede headed acceptance.
+The inherited R157 delivery gap remains separate from shared presenter
+integration. These updates do not close phase 4 or qualify live deployment.
+
+The final-supplier continuation records compiled `91f46146d` on Mere
+`631355a2f`, renewed 67-test/three-cone gates and locked supplier metadata,
+with an explicitly accepted but unused finite browser window while the console
+is locked. The linked candidate receipt retains false runtime/visual/main
+flags. Its new release size is measured against the unchanged cap; the seven
+global D2 findings are identified as inherited coverage, rather than passed
+audit or presenter acceptance. No whole-document claim census is repeated.
+
+Renderer documentation followup `e0dae9c9` supplies the three missing records
+and reduces that seven-finding baseline to the four older findings. Integration
+leaves source/pin/lockfile bytes unchanged; it adds no runtime acceptance.
+
+
+### First site presenter hardware continuation, 2026-10-12
+
+Incremental review distinguishes the eleven passing headed AMD presenter cases
+at `4a090af1a` from incomplete later command/product acceptance. It records the
+current authority-export fixture without enriching historical disclosure,
+supported inspector semantics, details-before-roster correction and the three
+actual input/focus repairs. The final `8ad44a5c7` reconciliation with typography
+and native-recovery main `050e7d542` renews affected compilation; it does not
+inherit either the earlier presenter's browser qualification or the other
+owners' native receipts. The console-lock refusal and explicit runtime release
+are stated, with final browser/capture/main gates still open. This addendum
+neither repeats a whole-document census nor relaxes the live-site size cap.
+
+The combined source renews all 68 focused CPU tests, three Wasm gates and both
+locked supplier audits. Its release Wasm is measured at 6,398,022 B gzip;
+the unchanged 3,407,872 B live-site cap remains failed. Compiled/debug/release
+and earlier hardware bases are kept distinct in the updated qualification.
+
+
+### Presenter field-runtime reconciliation, 2026-10-12 evening
+
+The new continuation records Mark's push/merge authorization, clean integration
+of current main `8568f42fd` at `abaed67c1`, and the affected model/Canvas/Wasm
+renewal. It retains earlier browser and release measurements at their recorded
+sources; it does not waive the final hardware acceptance condition or claim a
+main landing while the console remains locked. Gate outcomes will be amended
+only after the prepared batch completes. No whole-document census is repeated.
+
+The renewal passes 72 CPU cases and all three Wasm gates. Both fresh packages
+are source-bound to `abaed67c1`. Console unlock is now observed, with an
+explicit fresh runtime handoff requested before launching the browser. This
+readiness does not replace the pending hardware qualification.
+
+
+### Presenter and command hardware renewal, 2026-10-12 evening
+
+The continuation records the actual listbox-name defect and its narrow shared
+mirror repair, eleven new/current mirror tests, renewed Wasm packages, and the
+separate unchanged-model 72-test basis. Same-package r10/r12 command and r9
+presenter evidence is explicitly attributed to compiled `77374c788` and AMD
+gcn-5. The quiescence/fixed-frame and outer/inner Fold harness corrections retain
+their failed receipts and original assertions. Capture review, zero page errors,
+expected planted control and early resource release are recorded. The nineteen
+saved-product scenarios remain a distinct queued gate; shared-main landing and
+live delivery are not conflated. This is an incremental review, not a new
+whole-document census or a complete phase-4 claim.
+
+
+### Final presenter lifecycle and browser qualification, 2026-10-12
+
+The incremental continuation records the primary retired-hover crash, its
+pre-fix CPU reproduction and narrow current-DOM guard, without weakening Genet
+lookup or classifying the subsequent borrow cascade as an independent fault.
+The current 89-case total is split across explicit model, mirror, host and
+test-only source bases. The final frozen runtime passes eleven presenter cases,
+24 command/setup/physical/embedding rows and the nineteen-row product matrix.
+Viewport, paused-seed and cross-run/native-input harness misses retain their
+failed receipts and unchanged original scenario assertions. Captures and the
+early explicit resource release are source-bound. Shared-main publication is
+qualified; live delivery, unchanged size cap, native/touch and full phase 4
+remain separate. This addendum does not repeat a whole-document claim census.
+
+The shared-main publication is now confirmed at `007a4de6b`. The upstream
+`abc8e5ad5` reconciliation changes only documentation; the runtime-qualified
+source remains `a1cb156f8`, with identical recorded source/manifest/lock inputs.
+Exact remote refs are in the landing receipt. This publication record adds no
+new runtime, deployment or phase-completion claim.

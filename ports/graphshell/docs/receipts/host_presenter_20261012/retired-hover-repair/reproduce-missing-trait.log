@@ -1,0 +1,64 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling num-traits v0.2.19
+   Compiling arrayvec v0.7.8
+   Compiling thiserror v2.0.21
+   Compiling naga-types v30.0.1
+   Compiling euclid v0.22.14
+   Compiling half v2.7.1
+   Compiling wgpu-types v30.0.1
+   Compiling naga v30.0.1
+   Compiling wgpu-naga-bridge v30.0.1
+   Compiling profiling v1.0.18
+   Compiling wgpu-hal v30.0.1
+   Compiling polycool v0.4.0
+   Compiling kurbo v0.13.1
+   Compiling wgpu-core-deps-apple v30.0.1
+   Compiling guillotiere v0.7.0
+   Compiling peniko v0.6.1
+   Compiling wgpu-core v30.0.1
+   Compiling vello_shaders v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling wgpu v30.0.1
+   Compiling netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling app_units v0.7.8
+   Compiling genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling cobs v0.3.0
+   Compiling netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling postcard v1.1.3
+   Compiling engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling netrender v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling buckram v0.0.3 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling sprigging v0.2.1 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/cambium/sprigging)
+   Compiling genet-livery v0.0.4 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling cambium v0.3.3 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/cambium/cambium)
+   Compiling paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling cambium-winit v0.3.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/cambium/cambium-winit)
+   Compiling genet-render v0.2.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+   Compiling cambium-rootstock v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/cambium/cambium-rootstock)
+error[E0599]: no method named `is_live` found for struct `Ref<'_, ScriptedDom>` in the current scope
+  --> crates/cambium/cambium-rootstock/tests/hover_motion.rs:99:61
+   |
+99 |     assert!(!host.s.runner.as_ref().unwrap().dom().borrow().is_live(retired));
+   |                                                             ^^^^^^^ method not found in `Ref<'_, ScriptedDom>`
+   |
+   = help: items from traits can only be used if the trait is in scope
+help: trait `LayoutDom` which provides `is_live` is implemented but not in scope; perhaps you want to import it
+   |
+ 8 + use layout_dom_api::LayoutDom;
+   |
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `cambium-rootstock` (test "hover_motion") due to 1 previous error

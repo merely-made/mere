@@ -1,0 +1,707 @@
+{
+  "active": "<div data-node=\"2199023255916\" role=\"button\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 0px; width: 108px; height: 28px;\">All commands</div>",
+  "options": [
+    {
+      "name": null,
+      "text": "Fit visible graphFit visible graph"
+    },
+    {
+      "name": null,
+      "text": "Fit selectionSelect a visible node firstFit selectionSelect a visible node first"
+    },
+    {
+      "name": null,
+      "text": "Restore arrangementRestore arrangement"
+    },
+    {
+      "name": null,
+      "text": "Play physicsPlay physics"
+    },
+    {
+      "name": null,
+      "text": "Zoom inZoom in"
+    },
+    {
+      "name": null,
+      "text": "Zoom outZoom out"
+    },
+    {
+      "name": null,
+      "text": "Pan leftPan left"
+    },
+    {
+      "name": null,
+      "text": "Pan rightPan right"
+    },
+    {
+      "name": null,
+      "text": "Pan upPan up"
+    },
+    {
+      "name": null,
+      "text": "Pan downPan down"
+    },
+    {
+      "name": null,
+      "text": "Graph toolsGraph tools"
+    },
+    {
+      "name": null,
+      "text": "Wheel: zoom graphWheel: zoom graph"
+    },
+    {
+      "name": null,
+      "text": "Wheel: pan graphWheel: pan graph"
+    },
+    {
+      "name": null,
+      "text": "Wheel: scroll pageWheel: scroll page"
+    },
+    {
+      "name": null,
+      "text": "Expand genetExpand genet"
+    },
+    {
+      "name": null,
+      "text": "Enter genetEnter genet"
+    },
+    {
+      "name": null,
+      "text": "Expand mereExpand mere"
+    },
+    {
+      "name": null,
+      "text": "Enter mereEnter mere"
+    },
+    {
+      "name": null,
+      "text": "Expand woodshedExpand woodshed"
+    },
+    {
+      "name": null,
+      "text": "Enter woodshedEnter woodshed"
+    },
+    {
+      "name": null,
+      "text": "Whole graphWhole graph"
+    },
+    {
+      "name": null,
+      "text": "Show relationship evidenceShow relationship evidence"
+    }
+  ],
+  "dialogs": [
+    "<div data-node=\"2199023255866\" role=\"dialog\" aria-label=\"Graph commands\" style=\"position: absolute; margin: 0px; padding: 0px; left: 12px; top: 80px; width: 360px; height: 460px;\"><div data-node=\"2199023255867\" role=\"heading\" aria-level=\"2\" style=\"position: absolute; margin: 0px; padding: 0px; left: 11px; top: 11px; width: 338px; height: 19px;\">Graph commands</div><div data-node=\"2199023255869\" style=\"position: absolute; margin: 0px; padding: 0px; left: 11px; top: 38px; width: 338px; height: 44px;\">Search commandsSearch graph commands<div data-node=\"2199023255870\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 0px; width: 116.758px; height: 16px;\">Search commands</div><div data-node=\"2199023255872\" role=\"textbox\" aria-label=\"Search graph commands\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 16px; width: 340px; height: 28px;\"></div></div><div data-node=\"2199023255873\" role=\"listbox\" aria-label=\"Graph commands\" style=\"position: absolute; margin: 0px; padding: 0px; left: 11px; top: 90px; width: 338px; height: 716px;\"><div data-node=\"2199023255874\" role=\"option\" aria-selected=\"false\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 0px; width: 338px; height: 30px;\">Fit visible graph<div data-node=\"2199023255875\" style=\"position: absolute; margin: 0px; padding: 0px; left: 9px; top: 7px; width: 97.6035px; height: 16px;\">Fit visible graph</div></div><div data-node=\"2199023255877\" role=\"option\" aria-selected=\"false\" aria-disabled=\"true\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 32px; width: 338px; height: 44px;\">Fit selectionSelect a visible node first<div data-node=\"2199023255878\" style=\"position: absolute; margin: 0px; padding: 0px; left: 9px; top: 7px; width: 75.6328px; height: 16px;\">Fit selection</div><div data-node=\"2199023255926\" style=\"position: absolute; margin: 0px; padding: 0px; left: 9px; top: 23px; width: 320px; height: 14px;\">Select a visible node first</div></div><div data-node=\"2199023255880\" role=\"option\" aria-selected=\"false\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 78px; width: 338px; height: 30px;\">Restore arrangement<div data-node=\"2199023255881\" style=\"position: absolute; margin: 0px; padding: 0px; left: 9px; top: 7px; width: 130.58px; height: 16px;\">Restore arrangement</div></div><div data-node=\"2199023255883\" role=\"option\" aria-selected=\"false\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 110px; width: 338px; height: 30px;\">Play physics<div data-node=\"2199023255884\" style=\"position: absolute; margin: 0px; padding: 0px; left: 9px; top: 7px; width: 77.1846px; height: 16px;\">Play physics</div></div><div data-node=\"2199023255886\" role=\"option\" aria-selected=\"false\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 142px; width: 338px; height: 30px;\">Zoom in<div data-node=\"2199023255887\" style=\"position: absolute; margin: 0px; padding: 0px; left: 9px; top: 7px; width: 51.0645px; height: 16px;\">Zoom in</div></div><div data-node=\"2199023255889\" role=\"option\" aria-selected=\"false\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 174px; width: 338px; height: 30px;\">Zoom out<div data-node=\"2199023255890\" style=\"position: absolute; margin: 0px; padding: 0px; left: 9px; top: 7px; width: 60.2178px; height: 16px;\">Zoom out</div></div><div data-node=\"2199023255892\" role=\"option\" aria-selected=\"false\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 206px; width: 338px; height: 30px;\">Pan left<div data-node=\"2199023255893\" style=\"position: absolute; margin: 0px; padding: 0px; left: 9px; top: 7px; width: 47.8105px; height: 16px;\">Pan left</div></div><div data-node=\"2199023255895\" role=\"option\" aria-selected=\"false\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 238px; width: 338px; height: 30px;\">Pan right<div data-node=\"2199023255896\" style=\"position: absolute; margin: 0px; padding: 0px; left: 9px; top: 7px; width: 55.8359px; height: 16px;\">Pan right</div></div><div data-node=\"2199023255898\" role=\"option\" aria-selected=\"false\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 270px; width: 338px; height: 30px;\">Pan up<div data-node=\"2199023255899\" style=\"position: absolute; margin: 0px; padding: 0px; left: 9px; top: 7px; width: 43.1348px; height: 16px;\">Pan up</div></div><div data-node=\"2199023255901\" role=\"option\" aria-selected=\"false\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 302px; width: 338px; height: 30px;\">Pan down<div data-node=\"2199023255902\" style=\"position: absolute; margin: 0px; padding: 0px; left: 9px; top: 7px; width: 61.6875px; height: 16px;\">Pan down</div></div><div data-node=\"2199023255904\" role=\"option\" aria-selected=\"false\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 334px; width: 338px; height: 30px;\">Graph tools<div data-node=\"2199023255905\" style=\"position: absolute; margin: 0px; padding: 0px; left: 9px; top: 7px; width: 71.668px; height: 16px;\">Graph tools</div></div><div data-node=\"2199023255907\" role=\"option\" aria-selected=\"false\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 366px; width: 338px; height: 30px;\">Wheel: zoom graph<div data-node=\"2199023255908\" style=\"position: absolute; margin: 0px; padding: 0px; left: 9px; top: 7px; width: 119.253px; height: 16px;\">Wheel: zoom graph</div></div><div data-node=\"2199023255910\" role=\"option\" aria-selected=\"false\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 398px; width: 338px; height: 30px;\">Wheel: pan graph<div data-node=\"2199023255911\" style=\"position: absolute; margin: 0px; padding: 0px; left: 9px; top: 7px; width: 107.379px; height: 16px;\">Wheel: pan graph</div></div><div data-node=\"2199023255928\" role=\"option\" aria-selected=\"false\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 430px; width: 338px; height: 30px;\">Wheel: scroll page<div data-node=\"2199023255929\" style=\"position: absolute; margin: 0px; padding: 0px; left: 9px; top: 7px; width: 113.354px; height: 16px;\">Wheel: scroll page</div></div><div data-node=\"2199023255931\" role=\"option\" aria-selected=\"false\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 462px; width: 338px; height: 30px;\">Expand genet<div data-node=\"2199023255932\" style=\"position: absolute; margin: 0px; padding: 0px; left: 9px; top: 7px; width: 84.4375px; height: 16px;\">Expand genet</div></div><div data-node=\"2199023255934\" role=\"option\" aria-selected=\"false\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 494px; width: 338px; height: 30px;\">Enter genet<div data-node=\"2199023255935\" style=\"position: absolute; margin: 0px; padding: 0px; left: 9px; top: 7px; width: 70.8613px; height: 16px;\">Enter genet</div></div><div data-node=\"2199023255937\" role=\"option\" aria-selected=\"false\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 526px; width: 338px; height: 30px;\">Expand mere<div data-node=\"2199023255938\" style=\"position: absolute; margin: 0px; padding: 0px; left: 9px; top: 7px; width: 81.1631px; height: 16px;\">Expand mere</div></div><div data-node=\"2199023255940\" role=\"option\" aria-selected=\"false\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 558px; width: 338px; height: 30px;\">Enter mere<div data-node=\"2199023255941\" style=\"position: absolute; margin: 0px; padding: 0px; left: 9px; top: 7px; width: 67.5869px; height: 16px;\">Enter mere</div></div><div data-node=\"2199023255943\" role=\"option\" aria-selected=\"false\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 590px; width: 338px; height: 30px;\">Expand woodshed<div data-node=\"2199023255944\" style=\"position: absolute; margin: 0px; padding: 0px; left: 9px; top: 7px; width: 114.078px; height: 16px;\">Expand woodshed</div></div><div data-node=\"2199023255946\" role=\"option\" aria-selected=\"false\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 622px; width: 338px; height: 30px;\">Enter woodshed<div data-node=\"2199023255947\" style=\"position: absolute; margin: 0px; padding: 0px; left: 9px; top: 7px; width: 100.502px; height: 16px;\">Enter woodshed</div></div><div data-node=\"2199023255949\" role=\"option\" aria-selected=\"false\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 654px; width: 338px; height: 30px;\">Whole graph<div data-node=\"2199023255950\" style=\"position: absolute; margin: 0px; padding: 0px; left: 9px; top: 7px; width: 77.8955px; height: 16px;\">Whole graph</div></div><div data-node=\"2199023255952\" role=\"option\" aria-selected=\"false\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 686px; width: 338px; height: 30px;\">Show relationship evidence<div data-node=\"2199023255953\" style=\"position: absolute; margin: 0px; padding: 0px; left: 9px; top: 7px; width: 169.641px; height: 16px;\">Show relationship evidence</div></div></div><div data-node=\"2199023255915\" style=\"position: absolute; margin: 0px; padding: 0px; left: 11px; top: 814px; width: 338px; height: 96px;\">All commandsRemove selected command from menuClose commands<div data-node=\"2199023255916\" role=\"button\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 0px; width: 108px; height: 28px;\">All commands</div><div data-node=\"2199023255918\" role=\"button\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 34px; width: 263px; height: 28px;\">Remove selected command from menu</div><div data-node=\"2199023255920\" role=\"button\" tabindex=\"-1\" style=\"position: absolute; margin: 0px; padding: 0px; left: 0px; top: 68px; width: 127px; height: 28px;\">Close commands</div></div><div data-node=\"2199023255922\" role=\"status\" style=\"position: absolute; margin: 0px; padding: 0px; left: 11px; top: 916px; width: 338px; height: 14px;\">Wheel: zoom · Zoom in</div><div data-node=\"2199023255924\" role=\"paragraph\" style=\"position: absolute; margin: 0px; padding: 0px; left: 11px; top: 936px; width: 338px; height: 14px;\">Menu choices apply while this viewer is open.</div></div>"
+  ],
+  "host": {
+    "page": "tree",
+    "semanticTree": {
+      "role": "region",
+      "label": "Graphshell, one tree",
+      "children": [
+        {
+          "role": "main",
+          "children": [
+            {
+              "role": "heading",
+              "label": "Graphshell, one tree",
+              "children": []
+            },
+            {
+              "role": "status",
+              "label": "host dataset, revision manifest-sha256:fc6df1451cb8cb68b6faee4a8e318f696dfcdb12bd7b0c8110c38d8f1f2f32f1 · 3 nodes · picked: none",
+              "children": []
+            },
+            {
+              "role": "region",
+              "label": "Relations",
+              "children": [
+                {
+                  "role": "heading",
+                  "label": "Relations",
+                  "children": []
+                },
+                {
+                  "role": "list",
+                  "label": "Declares a dependency on: mere to genetDeclares a dependency on: woodshed to genetDeclares a dependency on: woodshed to mere",
+                  "children": [
+                    {
+                      "role": "listitem",
+                      "label": "Declares a dependency on: mere to genetDeclares a dependency on: mere to genet",
+                      "box": [
+                        40,
+                        72,
+                        1376,
+                        14
+                      ],
+                      "children": []
+                    },
+                    {
+                      "role": "listitem",
+                      "label": "Declares a dependency on: woodshed to genetDeclares a dependency on: woodshed to genet",
+                      "box": [
+                        40,
+                        86,
+                        1376,
+                        14
+                      ],
+                      "children": []
+                    },
+                    {
+                      "role": "listitem",
+                      "label": "Declares a dependency on: woodshed to mereDeclares a dependency on: woodshed to mere",
+                      "box": [
+                        40,
+                        100,
+                        1376,
+                        14
+                      ],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "role": "region",
+              "label": "Folds",
+              "children": [
+                {
+                  "role": "heading",
+                  "label": "Folds",
+                  "children": []
+                },
+                {
+                  "role": "navigation",
+                  "label": "Graph location",
+                  "children": [
+                    {
+                      "role": "button",
+                      "label": "Whole graph",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "role": "status",
+                  "label": "3 visible of 18 disclosed occurrences; 0 external context items. Group changes pause physics and preserve coordinates.",
+                  "children": []
+                },
+                {
+                  "role": "list",
+                  "label": "genet · 1 members · 3 internal dependenciesExpand genetEnter genetmere · 1 members · 10 internal dependenciesExpand mereEnter merewoodshed · 1 members · 3 internal dependenciesExpand woodshedEnter woodshed",
+                  "children": [
+                    {
+                      "role": "listitem",
+                      "label": "genet · 1 members · 3 internal dependenciesExpand genetEnter genetgenet · 1 members · 3 internal dependenciesExpand genetEnter genet",
+                      "box": [
+                        30,
+                        194,
+                        1398,
+                        30
+                      ],
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Expand genet",
+                          "expanded": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Enter genet",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "role": "listitem",
+                      "label": "mere · 1 members · 10 internal dependenciesExpand mereEnter meremere · 1 members · 10 internal dependenciesExpand mereEnter mere",
+                      "box": [
+                        30,
+                        224,
+                        1398,
+                        30
+                      ],
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Expand mere",
+                          "expanded": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Enter mere",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "role": "listitem",
+                      "label": "woodshed · 1 members · 3 internal dependenciesExpand woodshedEnter woodshedwoodshed · 1 members · 3 internal dependenciesExpand woodshedEnter woodshed",
+                      "box": [
+                        30,
+                        254,
+                        1398,
+                        30
+                      ],
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Expand woodshed",
+                          "expanded": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Enter woodshed",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "button",
+                  "label": "Show relationship evidence",
+                  "expanded": false,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "role": "navigation",
+              "label": "Graph controls",
+              "children": [
+                {
+                  "role": "button",
+                  "label": "Pan left",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan right",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan up",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan down",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Zoom in",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Zoom out",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Fit visible graph",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Fit selection",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Restore arrangement",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Play physics",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Graph commands",
+                  "expanded": true,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "role": "group",
+                      "label": "0 of 3 shown",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Arrangement and physics",
+                              "expanded": true,
+                              "children": []
+                            },
+                            {
+                              "children": [
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Arrangement",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply arrangement",
+                                  "children": []
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Role",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply role",
+                                  "children": []
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Physics law",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "group",
+                                  "label": "Overlays",
+                                  "children": [
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Kinds",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Groups",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Mass",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Depth",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply physics",
+                                  "children": []
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Speed",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Profile",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply profile",
+                                  "children": []
+                                },
+                                {
+                                  "role": "status",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "role": "dialog",
+              "label": "Graph commands",
+              "children": [
+                {
+                  "role": "heading",
+                  "label": "Graph commands",
+                  "children": []
+                },
+                {
+                  "children": [
+                    {
+                      "role": "textbox",
+                      "label": "Search graph commands",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "role": "listbox",
+                  "label": "Graph commands",
+                  "children": [
+                    {
+                      "role": "option",
+                      "children": []
+                    },
+                    {
+                      "role": "option",
+                      "children": []
+                    },
+                    {
+                      "role": "option",
+                      "children": []
+                    },
+                    {
+                      "role": "option",
+                      "children": []
+                    },
+                    {
+                      "role": "option",
+                      "children": []
+                    },
+                    {
+                      "role": "option",
+                      "children": []
+                    },
+                    {
+                      "role": "option",
+                      "children": []
+                    },
+                    {
+                      "role": "option",
+                      "children": []
+                    },
+                    {
+                      "role": "option",
+                      "children": []
+                    },
+                    {
+                      "role": "option",
+                      "children": []
+                    },
+                    {
+                      "role": "option",
+                      "children": []
+                    },
+                    {
+                      "role": "option",
+                      "children": []
+                    },
+                    {
+                      "role": "option",
+                      "children": []
+                    },
+                    {
+                      "role": "option",
+                      "children": []
+                    },
+                    {
+                      "role": "option",
+                      "children": []
+                    },
+                    {
+                      "role": "option",
+                      "children": []
+                    },
+                    {
+                      "role": "option",
+                      "children": []
+                    },
+                    {
+                      "role": "option",
+                      "children": []
+                    },
+                    {
+                      "role": "option",
+                      "children": []
+                    },
+                    {
+                      "role": "option",
+                      "children": []
+                    },
+                    {
+                      "role": "option",
+                      "children": []
+                    },
+                    {
+                      "role": "option",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "children": [
+                    {
+                      "role": "button",
+                      "label": "All commands",
+                      "children": []
+                    },
+                    {
+                      "role": "button",
+                      "label": "Remove selected command from menu",
+                      "children": []
+                    },
+                    {
+                      "role": "button",
+                      "label": "Close commands",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "role": "status",
+                  "label": "Wheel: zoom · Zoom in",
+                  "children": []
+                },
+                {
+                  "role": "paragraph",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "title": "Graphshell, one tree",
+    "visibility": "visible",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    }
+  }
+}

@@ -1,0 +1,143 @@
+{
+  "status": "pass",
+  "source": "a1cb156f813164e48003d8e2d2dd015d619ec340",
+  "bundle_byte_sha256": {
+    "web-viewer/pkg/graphshell_web.d.ts": "3f967d57fb0a19dee4fc3b768ff87114a5fe90fd1ca101bc46d121072a6cfd7a",
+    "web-viewer/pkg/graphshell_web.js": "5adddf637a1773a80b10d64c04cefbe2bc75f58c7ebccd71bd4df20d9d2039fb",
+    "web-viewer/pkg/graphshell_web_bg.wasm": "c7202a38ff05f48a16c8ce5eeafc47cc89774249b97b7081e2f9fb21fec48b31",
+    "web-viewer/pkg/graphshell_web_bg.wasm.d.ts": "389ef6a95767a844f8cb68bdaf0610e70c29acc22c53ef72a4861e5bcb2d083d",
+    "web-product/pkg/graphshell_web.d.ts": "9d368837185eb865ad354084ef9bae2e3caf842924aeca2bdc659a0f44230aca",
+    "web-product/pkg/graphshell_web.js": "4fb2528c55e3df192fdac23a16f5bda2b068e13ae32f4d6acdc3dfdf5a2553da",
+    "web-product/pkg/graphshell_web_bg.wasm": "a902f9895e1d0a57fcdeaf6f207a478bf0ffb2ed8ecca0f86d66f9532191f5b2",
+    "web-product/pkg/graphshell_web_bg.wasm.d.ts": "31934f46ee7bb77c4f61a2273216db3d5613fb58c0789151dbe473a840194cf8"
+  },
+  "headed": true,
+  "cases": 19,
+  "rows": [
+    {
+      "name": "p4_tree_forme.scn",
+      "receipt": "product-browser-r6/p4_tree_forme.scn.json",
+      "page_errors": 0
+    },
+    {
+      "name": "p4_tree_forme_reopen.scn",
+      "receipt": "product-browser-r6/p4_tree_forme_reopen.scn.json",
+      "page_errors": 0
+    },
+    {
+      "name": "p4_tree_forme_draft.scn",
+      "receipt": "product-browser-r6/p4_tree_forme_draft.scn.json",
+      "page_errors": 0
+    },
+    {
+      "name": "p4_tree_forme_draft_reopen.scn",
+      "receipt": "product-browser-r6/p4_tree_forme_draft_reopen.scn.json",
+      "page_errors": 0
+    },
+    {
+      "name": "p4_tree_access_inspection.scn",
+      "receipt": "product-browser-r6/p4_tree_access_inspection.scn.json",
+      "page_errors": 0
+    },
+    {
+      "name": "p4_tree_link_inspection.scn",
+      "receipt": "product-browser-r6/p4_tree_link_inspection.scn.json",
+      "page_errors": 0
+    },
+    {
+      "name": "p4_tree_field_inspection.scn",
+      "receipt": "product-browser-r6/p4_tree_field_inspection.scn.json",
+      "page_errors": 0
+    },
+    {
+      "name": "p4_tree_field_inspection_reopen.scn",
+      "receipt": "product-browser-r6/p4_tree_field_inspection_reopen.scn.json",
+      "page_errors": 0
+    },
+    {
+      "name": "p4_tree_presentation_rules.scn",
+      "receipt": "product-browser-r6/p4_tree_presentation_rules.scn.json",
+      "page_errors": 0
+    },
+    {
+      "name": "p4_tree_presentation_rules_reopen.scn",
+      "receipt": "product-browser-r6/p4_tree_presentation_rules_reopen.scn.json",
+      "page_errors": 0
+    },
+    {
+      "name": "p4_tree_presentation_live.scn",
+      "receipt": "product-browser-r6/p4_tree_presentation_live.scn.json",
+      "page_errors": 0
+    },
+    {
+      "name": "p4_tree_presentation_live_reopen.scn",
+      "receipt": "product-browser-r6/p4_tree_presentation_live_reopen.scn.json",
+      "page_errors": 0
+    },
+    {
+      "name": "p4_tree_dynamics_inspection.scn",
+      "receipt": "product-browser-r7/p4_tree_dynamics_inspection.scn.json",
+      "page_errors": 0
+    },
+    {
+      "name": "p4_tree_dynamics_inspection_reopen.scn",
+      "receipt": "product-browser-r7/p4_tree_dynamics_inspection_reopen.scn.json",
+      "page_errors": 0
+    },
+    {
+      "name": "p4_tree_coupling_strength.scn",
+      "receipt": "product-browser-r7/p4_tree_coupling_strength.scn.json",
+      "page_errors": 0
+    },
+    {
+      "name": "p4_tree_coupling_strength_reopen.scn",
+      "receipt": "product-browser-r7/p4_tree_coupling_strength_reopen.scn.json",
+      "page_errors": 0
+    },
+    {
+      "name": "p4_tree_node_ladder.scn",
+      "receipt": "product-browser-r8/p4_tree_node_ladder.scn.json",
+      "page_errors": 0
+    },
+    {
+      "name": "p4_tree_node_ladder_reopen.scn",
+      "receipt": "product-browser-r8/p4_tree_node_ladder_reopen.scn.json",
+      "page_errors": 0
+    },
+    {
+      "name": "shortcuts",
+      "receipt": "product-browser-r10/shortcuts.json",
+      "page_errors": 0
+    }
+  ],
+  "page_errors": 0,
+  "fresh_profiles": "Each logical pair/group uses a fresh context. Forme four-row edit/draft/reopen group retains one origin/profile; the other reopen pairs retain their own origin/profile.",
+  "harness_corrections": [
+    {
+      "failed_round": "product-browser-r6",
+      "correction": "Dynamics viewport1440x1000 replaced by its earlier accepted615x608 collapsed-overlay context; all original assertions unchanged."
+    },
+    {
+      "failed_round": "product-browser-r7",
+      "correction": "Ladder860x720 original first Pause action requires running physics. Current analytic seed deliberately starts paused. Actual Play activation establishes that explicit precondition before original fresh/reopen scenarios."
+    },
+    {
+      "failed_round": "product-browser-r8",
+      "correction": "Custom shortcut checkpoint did not survive separate run_scenario calls. Compare the actual mirrored Title before/after physicalCtrlK/Escape instead."
+    },
+    {
+      "failed_round": "product-browser-r9",
+      "correction": "Mirror textbox is a retained accessibility proxy, not native input. Read Placement::Value text content, assert exact seeded title and unchanged before/after."
+    }
+  ],
+  "original_scenario_assertions_changed": false,
+  "shortcut_title_values": {
+    "titleBefore": "I2P port notes",
+    "titleAfter": "I2P port notes"
+  },
+  "runtime_release": {
+    "released_at_utc": "2026-10-13 02:37:55 UTC",
+    "deadline_utc": "2026-10-13 02:42:45 UTC",
+    "owned_browser_gpu_http_build_inhibitor": false
+  }
+}
