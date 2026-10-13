@@ -213,5 +213,22 @@
       "final-audits/final-doc-audit.json",
       "final-audits/final-d2-audit.json"
     ]
+  },
+  "publication_reconciliation": "publication-reconciliation.json",
+  "publication_upstream_basis": "abc8e5ad5d987a028ddb8a36ac5de449db59950d",
+  "post_merge_audits": {
+    "doc_audit_exit": 0,
+    "d2_audit_exit": 1,
+    "baseline_unchanged": true,
+    "d2_findings": [
+      "snapshot aggregate digest changed: 2046e1eec3018b7dd288e794326090f1b7f9a889043d53e45530271d0b32be1e != f0b64eef4cd5514157bb1b49d389b84db29a1e823d6f3e2cebf827337fe56abf",
+      "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md",
+      "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md",
+      "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_producer_gates/README.md"
+    ],
+    "records": [
+      "final-audits/post-merge-doc-audit.json",
+      "final-audits/post-merge-d2-audit.json"
+    ]
   }
 }
