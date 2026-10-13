@@ -471,7 +471,12 @@ fn adapter_identity(core: &RenderCore) -> Value {
         "source":"actual fixture RenderCore adapter; browser fields may be redacted"})
 }
 fn digest(frame: &Frame) -> String {
-    format!("{:x}", Sha256::digest(&frame.rgba))
+    use std::fmt::Write as _;
+    let mut hexadecimal = String::with_capacity(64);
+    for byte in Sha256::digest(&frame.rgba) {
+        write!(&mut hexadecimal, "{byte:02x}").expect("writing to String cannot fail");
+    }
+    hexadecimal
 }
 fn compare_pixels(before: &Frame, after: &Frame) -> Result<Value, String> {
     if before.width != after.width
