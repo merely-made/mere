@@ -1,5 +1,8 @@
 # Mere Documentation Index
 
+Murm first move (2026-10-13): `murm`, `mere-transport` and `mere-webrtc-carrier` are immutable Git suppliers from the continuing Retinue repository's native workspace; Mere's old copies are removed. The [runtime plan](mere_docs/implementation_strategy/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md#2026-10-13-first-murm-implementation-cutover) records compiler, owner and consumer checks. Canonical migration: `retinue/design_docs/2026-10-13_murm_family_move_plan.md`. Repository rename and remaining application adoption stay open.
+
+
 Rust policy (2026-10-13): the [family composition brief](2026-08-12_family_composition_thesis_brief.md#shared-rust-toolchain-and-minimum-version-2026-10-13) records the Rust 1.99.0 working toolchain, the separately selected Rust 1.97.1 shared MSRV, and build-directory rollout requirements. Manifest/CI defaults rollout is in progress; root policy checks pass on both compiler versions, with platform compilation qualified separately.
 
 Embedding draft and terminology refresh (2026-10-13): the [family composition continuation](2026-08-12_family_composition_thesis_brief.md#embedding-in-caller-owned-wgpu-contexts-draft) records resource leaves, Murm/Gemot exchange, foreign-platform intake and caller-owned wgpu hosting, with egui/Iced as proposed qualification hosts. The [terminology reference](TERMINOLOGY.md) now describes current platform engines, readers, surface producers, native Pelt/Genet ownership, Fleece and the scene family. Generic toolkit integration remains a draft target.
