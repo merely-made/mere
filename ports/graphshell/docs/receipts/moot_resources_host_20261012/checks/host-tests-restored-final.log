@@ -1,0 +1,25 @@
+   Compiling graphshell v0.0.2 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/ports/graphshell)
+warning: unused import: `personae::AttestationKeys`
+  --> /Users/markik/Code/worktrees/mere-moot-capsule-proof/ports/graphshell/src/webrtc_door.rs:78:5
+   |
+78 | use personae::AttestationKeys;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `graphshell` (lib) generated 1 warning
+   Compiling moot-resource-host-proof v0.0.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/ports/graphshell/docs/receipts/moot_resources_host_20261012/harness)
+    Finished `test` profile [unoptimized] target(s) in 5.87s
+     Running unittests src/lib.rs (/Users/markik/Code/targets/mere-s2s3/debug/deps/moot_resource_host_proof-401e8483129e675d)
+
+running 8 tests
+test actual_host_tests::other_service_admission_is_not_a_moot_host_mount ... ok
+test actual_host_tests::expired_session_clears_cached_disclosure_and_never_dispatches_queued_open ... ok
+test actual_host_tests::a_different_signer_cannot_reuse_the_mounted_session ... ok
+test actual_host_tests::current_moot_removal_refuses_a_queued_open_and_closes_the_owner_read ... ok
+test actual_host_tests::explicit_refresh_invalidates_queued_command_and_idle_pumps_do_not_write ... ok
+test actual_host_tests::signed_session_revocation_clears_an_opened_projection_without_deleting_content ... ok
+test actual_host_tests::current_constitution_revocation_refuses_queued_fork_and_refreshes_the_offer ... ok
+test actual_host_tests::mounted_clicks_open_and_fork_through_actual_owners_with_independent_readings ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.67s
