@@ -97,3 +97,11 @@ ports/graphshell/docs/receipts/relationship_dynamics_20261011/harness/** text eo
 ports/graphshell/docs/receipts/node_ladder_20261011/checks/*.log -text whitespace=-space-before-tab
 ports/graphshell/docs/receipts/node_ladder_20261011/qualification.json text eol=lf
 ports/graphshell/docs/receipts/node_ladder_20261011/harness/** text eol=lf
+
+# Djinn deployment scripts and immutable peer-qualification evidence.
+ports/djinn/install-linux.sh text eol=lf
+ports/djinn/install-ssh-server-windows.ps1 text eol=lf
+scripts/djinn-ssh-control.py text eol=lf
+design_docs/mere_docs/testing/receipts/djinn-ssh-peers/*.json text eol=lf
+design_docs/mere_docs/testing/receipts/djinn-ssh-peers/*.log -text whitespace=-space-before-tab
+design_docs/mere_docs/testing/receipts/djinn-ssh-peers/*.patch -text whitespace=-blank-at-eol
