@@ -1,0 +1,42 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling seiche v0.0.6 (C:\Users\mark_\Code\worktrees\mere-coupling-effects\crates\conatus\seiche)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 33.45s
+     Running unittests src\lib.rs (C:\t\cargo-targets\mere\debug\deps\seiche-26a0e793e179e9c4.exe)
+
+running 1 test
+coupling_trajectory advect 54b5cd56e7b80b83
+coupling_trajectory align bf3c47d11ff264bf
+coupling_trajectory attract c717ab2701156915
+coupling_trajectory dampen 26b550ad4cdbd84f
+coupling_trajectory duplicate-advect 54b5cd56e7b80b83
+coupling_trajectory duplicate-attract c717ab2701156915
+coupling_trajectory duplicate-dampen 26b550ad4cdbd84f
+coupling_trajectory open 22f06774732f2065
+coupling_trajectory outside-dampen 22f06774732f2065
+coupling_trajectory repel 79743f9bd576ab4e
+coupling_trajectory wall 5978bb7ef06dc2bf
+coupling_trajectory wrong-scalar 22f06774732f2065
+coupling_trajectory wrong-vector 22f06774732f2065
+
+thread 'coupling_force::effect_tests::execution_trajectory_receipt' (33420) panicked at crates\conatus\seiche\src\coupling_effect_tests.rs:105:5:
+assertion `left == right` failed
+  left: {"advect": 6104010643109055363, "align": 13779967923356591295, "attract": 14346123322022258965, "dampen": 2789224249474930767, "duplicate-advect": 6104010643109055363, "duplicate-attract": 14346123322022258965, "duplicate-dampen": 2789224249474930767, "open": 2517625941546442853, "outside-dampen": 2517625941546442853, "repel": 8751689914421521230, "wall": 6447109020454863551, "wrong-scalar": 2517625941546442853, "wrong-vector": 2517625941546442853}
+ right: {"advect": 6104010643109055363, "align": 13779967923356591295, "attract": 14346123322022258965, "dampen": 2789224249474930767, "duplicate-advect": 1700354864666873109, "duplicate-attract": 14610949654712353327, "duplicate-dampen": 5450692877734656406, "open": 2517625941546442853, "outside-dampen": 2517625941546442853, "repel": 8751689914421521230, "wall": 6447109020454863551, "wrong-scalar": 2517625941546442853, "wrong-vector": 2517625941546442853}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test coupling_force::effect_tests::execution_trajectory_receipt ... FAILED
+
+failures:
+
+failures:
+    coupling_force::effect_tests::execution_trajectory_receipt
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 177 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p seiche --lib`

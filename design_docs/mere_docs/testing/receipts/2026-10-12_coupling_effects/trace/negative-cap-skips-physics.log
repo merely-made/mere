@@ -1,0 +1,29 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling seiche v0.0.6 (C:\Users\mark_\Code\worktrees\mere-coupling-trace\crates\conatus\seiche)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 18.45s
+     Running unittests src\lib.rs (C:/t/cargo-targets/mere\debug\deps\seiche-8884e443fa3ea419.exe)
+
+running 1 test
+
+thread 'coupling_trace::tests::capped_latest_tick_does_not_skip_physics_or_accumulate_history' (28804) panicked at crates\conatus\seiche\src\coupling_trace_tests.rs:201:5:
+assertion `left == right` failed
+  left: 52.0
+ right: 56.0
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test coupling_trace::tests::capped_latest_tick_does_not_skip_physics_or_accumulate_history ... FAILED
+
+failures:
+
+failures:
+    coupling_trace::tests::capped_latest_tick_does_not_skip_physics_or_accumulate_history
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 182 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p seiche --lib`

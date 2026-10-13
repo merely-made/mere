@@ -52,7 +52,32 @@ pub type Runner<State, Logic, V> = GenetAppRunner<State, Logic, V, ()>;
 
 /// A capture armed by the application, run inside the next frame while the
 /// rasterized view is still alive (scenario screenshots).
-pub type CaptureFn = Box<dyn FnOnce(&dyn Surface, &wgpu::TextureView, u32, u32) + 'static>;
+#[derive(Clone, Debug)]
+pub enum CaptureRefusal {
+    DeviceLost(genet_render_host::DeviceLossNotice),
+    SurfaceUnavailable {
+        generation: u64,
+        error: String,
+    },
+    ProviderError {
+        generation: u64,
+        source_key: Option<u64>,
+        error: Arc<netrender::VelloError>,
+    },
+}
+impl std::fmt::Display for CaptureRefusal {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "capture refused: {self:?}")
+    }
+}
+impl std::error::Error for CaptureRefusal {}
+pub struct CaptureFrame<'a> {
+    pub surface: &'a dyn Surface,
+    pub view: &'a wgpu::TextureView,
+    pub width: u32,
+    pub height: u32,
+}
+pub type CaptureFn = Box<dyn FnOnce(Result<CaptureFrame<'_>, CaptureRefusal>) + 'static>;
 
 /// Identity of one successful queue presentation in this host/window lifetime.
 /// Host numbers are process-local; a receipt must also carry its product run.
@@ -67,8 +92,13 @@ pub struct PresentedFrame {
 }
 
 /// A readback of that exact rasterized source, branded at presentation.
+pub struct StampedCaptureFrame<'a> {
+    pub surface: &'a dyn Surface,
+    pub view: &'a wgpu::TextureView,
+    pub presentation: PresentedFrame,
+}
 pub type StampedCaptureFn =
-    Box<dyn FnOnce(&dyn Surface, &wgpu::TextureView, PresentedFrame) + 'static>;
+    Box<dyn FnOnce(Result<StampedCaptureFrame<'_>, CaptureRefusal>) + 'static>;
 
 /// One-shot read-only observation, before capture callbacks and pointer/AT input.
 pub type PresentationObserver<State, Logic, V, T = Runner<State, Logic, V>> =
@@ -86,7 +116,8 @@ fn next_host_identity() -> u64 {
 /// frame, before renderer translation. External GPU texture commands retain
 /// references only: this does not read back their pixels. The envelope's
 /// viewport is in layout coordinates, before device scale and UI zoom.
-pub type PaintCaptureFn = Box<dyn FnOnce(paint_list_api::PaintEnvelope) + 'static>;
+pub type PaintCaptureFn =
+    Box<dyn FnOnce(Result<paint_list_api::PaintEnvelope, CaptureRefusal>) + 'static>;
 
 /// Which layer draws the window frame.
 ///
@@ -949,6 +980,8 @@ pub struct AppShared {
     /// resume makes a new surface from this same core (stack seams S2). The
     /// event source sets it when it boots the core.
     pub render_core: Option<Arc<RenderCore>>,
+    /// The single replacement owner of the core shared by this application.
+    pub render_recovery: Option<Arc<genet_render_host::SharedRenderCore>>,
     /// The application's stylesheet.
     pub sheet: String,
     /// Host-supplied faces. Held here, not in the layout, so a rebuilt text
@@ -980,6 +1013,7 @@ impl Default for AppShared {
     fn default() -> Self {
         Self {
             render_core: None,
+            render_recovery: None,
             sheet: String::new(),
             fonts: Vec::new(),
             images: std::collections::HashMap::new(),
@@ -1012,6 +1046,11 @@ where
     /// The presentation surface behind the neutral seam. A browser event
     /// source supplies the same pair against a canvas.
     pub surface: Option<Box<dyn Surface>>,
+    pub recovery_status: Option<genet_render_host::RecoveryStatus>,
+    /// Current checked raster refusal; cleared at the next redraw admission.
+    pub last_raster_failure: Option<genet_render_host::RasterizeFailure>,
+    pub(crate) detached_generation: Option<u64>,
+    pub needs_recovery_surface: bool,
     /// The tree this window drives.
     pub runner: Option<T>,
     /// Retained Livery/Buckram session in logical coordinates.
@@ -1045,6 +1084,9 @@ where
     pub(crate) last_leaf_repaints: u64,
     /// What this window shares with the application's other windows.
     pub shared: AppShared,
+    /// Declared after shared GPU resources so a closing host releases them
+    /// before its subscription opens the remaining hosts' detach barrier.
+    pub(crate) recovery_subscription: Option<genet_render_host::RecoverySubscription>,
     /// The shared sheet's generation this window's layout was built against.
     pub(crate) layout_sheet_generation: u64,
     /// The custom-leaf keys this window's last layout held.
@@ -1136,6 +1178,11 @@ where
             titlebar_published: None,
             titlebar_sheet: String::new(),
             surface: None,
+            recovery_status: None,
+            last_raster_failure: None,
+            recovery_subscription: None,
+            detached_generation: None,
+            needs_recovery_surface: false,
             runner: None,
             layout: None,
             layout_size: (0.0, 0.0),

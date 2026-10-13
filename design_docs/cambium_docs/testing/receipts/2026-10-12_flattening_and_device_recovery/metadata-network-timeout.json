@@ -1,0 +1,11 @@
+{
+  "command": [
+    "cargo",
+    "metadata",
+    "--format-version",
+    "1"
+  ],
+  "deadline_seconds": 150,
+  "result": "network refresh timed out after immutable Git source fetch; no successful online metadata claim",
+  "followup": "all five full offline metadata roots passed exact supplier source and registry duplicate checks"
+}

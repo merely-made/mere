@@ -1,0 +1,26 @@
+{
+  "command": [
+    "python3",
+    "scripts/run_macos_scenario.py",
+    "--binary",
+    "/Users/markik/Code/targets/mere-s2s3/debug/tabard-desktop",
+    "--prefix",
+    "TABARD",
+    "--scenario",
+    "ports/tabard/desktop/scenarios/release_presentation.scn",
+    "--output",
+    "/Users/markik/Code/output/vello-production-fixes-20261011/native-presentation-final-git-only",
+    "--timeout",
+    "60",
+    "--",
+    "--library",
+    "/Users/markik/Code/output/vello-production-fixes-20261011/native-final-isolated-library/themes.json"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-vello-release-adoption",
+  "deadline_seconds": 90,
+  "elapsed_seconds": 15.881,
+  "exit_code": 0,
+  "timed_out": false,
+  "disk_refused": false,
+  "log": "/Users/markik/Code/output/vello-production-fixes-20261011/checks/native-presentation-final-git-only.log"
+}

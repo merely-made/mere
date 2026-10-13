@@ -1,0 +1,38 @@
+[
+  {
+    "path": "/Users/markik/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/398a52f",
+    "head": "398a52fbd814c6bd4b5029e044f024844fab380f",
+    "tree": "f5a4cb7b0d535a19aae8edd155e33857d0b69fc3",
+    "excluded": "tests/wpt",
+    "ownership": "new cache snapshot created by this renderer run",
+    "active_source_unchanged": true,
+    "git_objects_preserved": true,
+    "reversible_command": [
+      "git",
+      "-C",
+      "/Users/markik/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/398a52f",
+      "sparse-checkout",
+      "disable"
+    ],
+    "before_free_bytes": 1169981440,
+    "after_free_bytes": 2473709568
+  },
+  {
+    "path": "/Users/markik/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/5fc1836",
+    "head": "5fc1836936f2d7ce6d103b8081b537e8bd922c1d",
+    "tree": "5665ac11faa548f56ece27f9b7bd8c5cee99adc4",
+    "excluded": "tests/wpt",
+    "ownership": "new cache snapshot created by this renderer run",
+    "active_source_unchanged": true,
+    "git_objects_preserved": true,
+    "reversible_command": [
+      "git",
+      "-C",
+      "/Users/markik/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/5fc1836",
+      "sparse-checkout",
+      "disable"
+    ],
+    "before_free_bytes": 2473705472,
+    "after_free_bytes": 3785039872
+  }
+]

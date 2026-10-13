@@ -1,0 +1,165 @@
+{
+  "schema": "mere.coupling-effect-draft/v1",
+  "original_executor": "e6192a18",
+  "source_checkpoint": "5b2d67a27ad4a8376428966d7c853c75eadd3443",
+  "qualification_base": "3f26d1f35fec7b9b58d48cb4b068ff40416fdfd7",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "source_sha256": {
+    "Cargo.lock": "48acc764b398790e7ddd47026f16cc31da8a0f70e938ba862029900c0e420298",
+    "crates/conatus/seiche/Cargo.toml": "75b1b917ccd565935e9174d41fc1d1278a620aec0da5f5f559c00849ed24962f",
+    "crates/conatus/numen/Cargo.toml": "5917db2db67d896f9497eeceac66dcb7a7f30b0765f31d025927b58b7039f95b",
+    "crates/conatus/seiche/src/coupling_force.rs": "46fcf976bca6ba8f23a0ccfe5b35bc11d14584f65c007d2ab9242010baacb129",
+    "crates/conatus/seiche/src/coupling_effect_tests.rs": "2f39545f60fc17ab11b4fea969039a5af4dac7d21a6ac109d59a23db9e1bd23e",
+    "crates/conatus/seiche/src/lib.rs": "100d46ca477692899e69cb2a3a71d06bafd970ce7ebb242b2ac827a253f6073c",
+    "crates/conatus/seiche/examples/coupling_effects.rs": "e904982b341340e3b4c6cf4b64dcdfdcc6d8a6e741bc0ec62a76c8c4bc2431fa"
+  },
+  "canonical_lf_source_sha256": {
+    "Cargo.lock": "19c79f695aeb119433f3d895e1d979414a45b831e8d0931bf41905db2a2faaae",
+    "crates/conatus/seiche/Cargo.toml": "3ada72e327636502c4a6491e5f91e0438a9d0c426905919e2c5a510aabc3c7b9",
+    "crates/conatus/numen/Cargo.toml": "e3cc4b3b26487d8edb3714adec150bda3e3805d582ee55deb25b219d424c6a7e",
+    "crates/conatus/seiche/src/coupling_force.rs": "b8d6c033c9bc97088b502c56f660ebbab98102e1a257d887b117289f5ea8e203",
+    "crates/conatus/seiche/src/coupling_effect_tests.rs": "9a168e5f692fc67b4dc613cc06c34d22987bb2568e3e3a1b5e084697e1e846a9",
+    "crates/conatus/seiche/src/lib.rs": "aaa98ac990e88936abf822da462e1365aad13948515e52a02263723ca6b4f67a",
+    "crates/conatus/seiche/examples/coupling_effects.rs": "663fb2c9f16c2f4ef69591fb842029b05da7c4cc5ea30e11adf3387b095b513e"
+  },
+  "logs_sha256": {
+    "baseline-fixture-diagnostic.log": "75f58d63695bd4f7ed86957fa1e702a9f8993fbe872497589ebe7f7b9ba27e73",
+    "baseline-trajectory.log": "0cc7e8ea91d7f982eac6f88f523253d3fdfd89ff863fe4757759e05bda258445",
+    "clippy.log": "11edc45009b86bb59e2a8ff96333d6acf5d6af6da33068a015cf80e7c935c906",
+    "default.log": "8751f0f7b5108c6e117845d807e40e94a8c2d50fb77ff0d0539ef0e6c71e27a8",
+    "example.log": "0d091a65d0903b9c91878525a32749e6ce5763bfc6faa5e8efbb9f724d08238a",
+    "focused.log": "3968165973c2a592511ca144534b8bb57fb5ba182d2fcef063f13704fe35db87",
+    "headers.log": "8ae599e76c063f0249693ffe0442c51d533558908ae8f858970c19c61939d7ef",
+    "host-bridge.log": "dfc326d24de574957ba4a5dd5b946e21487a072367fdc310b3b81458166963c9",
+    "inline.log": "ced124d509309ffe211fbcedc95b8bf2647d1371910b1ed17e9adb6863f7f051",
+    "negative-dedup.log": "8c7638e4f57f12d8050ba6df5d335f4771a19885842a22f4f8447f7c35216c08",
+    "serde.log": "f01eaef8844f5b5dfc7fe9c6086b95f01bfdac49e5a44cc1e58e7942702fbb51",
+    "wasm.log": "5c7d22356eac918ce3a20b8aadfc2f9cfed7fd2387bbc3a1947932a13cd9c0b0"
+  },
+  "unchanged_trajectory_fixtures": {
+    "advect": "54b5cd56e7b80b83",
+    "align": "bf3c47d11ff264bf",
+    "attract": "c717ab2701156915",
+    "dampen": "26b550ad4cdbd84f",
+    "duplicate-advect": "1798dfbd94938d15",
+    "duplicate-attract": "cac4854c803f022f",
+    "duplicate-dampen": "4ba4c04b15203996",
+    "open": "22f06774732f2065",
+    "outside-dampen": "22f06774732f2065",
+    "repel": "79743f9bd576ab4e",
+    "wall": "5978bb7ef06dc2bf",
+    "wrong-scalar": "22f06774732f2065",
+    "wrong-vector": "22f06774732f2065"
+  },
+  "test_counts": {
+    "default.log": [
+      [
+        "168",
+        "10"
+      ],
+      [
+        "5",
+        "0"
+      ],
+      [
+        "0",
+        "0"
+      ],
+      [
+        "4",
+        "0"
+      ],
+      [
+        "0",
+        "0"
+      ]
+    ],
+    "inline.log": [
+      [
+        "162",
+        "10"
+      ],
+      [
+        "5",
+        "0"
+      ],
+      [
+        "0",
+        "0"
+      ],
+      [
+        "4",
+        "0"
+      ],
+      [
+        "0",
+        "0"
+      ]
+    ],
+    "serde.log": [
+      [
+        "175",
+        "10"
+      ],
+      [
+        "5",
+        "0"
+      ],
+      [
+        "0",
+        "0"
+      ],
+      [
+        "4",
+        "0"
+      ],
+      [
+        "0",
+        "0"
+      ]
+    ],
+    "host-bridge.log": [
+      [
+        "4",
+        "0"
+      ],
+      [
+        "0",
+        "0"
+      ],
+      [
+        "0",
+        "0"
+      ],
+      [
+        "0",
+        "0"
+      ],
+      [
+        "0",
+        "0"
+      ],
+      [
+        "0",
+        "0"
+      ]
+    ]
+  },
+  "negative_control": {
+    "control": "incorrect duplicate-target deduplication",
+    "expected_failure": true,
+    "exit_code": 101,
+    "restored_source_sha256": "b8d6c033c9bc97088b502c56f660ebbab98102e1a257d887b117289f5ea8e203"
+  },
+  "limits": [
+    "CPU native fixtures; wasm compile only",
+    "point evaluation is proposed, not applied",
+    "clock remains zero",
+    "host provenance and actual tracing remain open",
+    "no GPU/browser/full-workspace/adoption claim"
+  ],
+  "metadata_canonical_lf_sha256": {
+    "format-baseline.json": "7ba2501f322241b97a64957969c48bd02dddab96d5ea3496c1dd6da5d388869a",
+    "negative-control.json": "4878ee81a8e621a80d5d4bff2ca75899fe391d0bdfacecd2ca02fd4f064c3bb5"
+  }
+}

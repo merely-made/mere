@@ -1,0 +1,26 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--offline",
+    "--locked",
+    "-p",
+    "cambium-genet-winit-host",
+    "--test",
+    "presented_capture",
+    "--test",
+    "async_capture",
+    "--test",
+    "lifecycle",
+    "-j2",
+    "--",
+    "--test-threads=1"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-vello-release-adoption",
+  "deadline_seconds": 180,
+  "elapsed_seconds": 18.045,
+  "exit_code": 0,
+  "timed_out": false,
+  "disk_refused": false,
+  "log": "/Users/markik/Code/output/vello-production-fixes-20261011/checks/final-git-only-capture-lifecycle-controls.log"
+}

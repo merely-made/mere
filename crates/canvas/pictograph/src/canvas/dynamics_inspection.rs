@@ -32,6 +32,9 @@ pub struct MemberDynamics {
     pub forme_hold: bool,
     pub pointer_drag: bool,
     pub axis_locks: String,
+    pub face_treatment: String,
+    pub face_screen_size: Option<f64>,
+    pub rule_face: bool,
 }
 #[derive(Clone, Debug, PartialEq, Serialize)]
 pub struct DynamicsInspection {
@@ -91,6 +94,9 @@ impl Canvas {
                 forme_hold,
                 pointer_drag,
                 axis_locks: format!("{:?}", self.arrangement_axis_locks()),
+                face_treatment: self.node_representation_class(key).trim().to_owned(),
+                face_screen_size: self.node_presentation_screen_size(member),
+                rule_face: self.node_rule_representation(member).is_some(),
             });
         }
         let edges = self.controller_edges();

@@ -95,7 +95,7 @@ fn corrupt_and_unsupported_libraries_are_visible_and_left_untouched() {
     for bytes in [
         b"not json".as_slice(),
         b"".as_slice(),
-        br#"{"version":2,"themes":[]}"#.as_slice(),
+        br#"{"version":3,"themes":[]}"#.as_slice(),
         br#"{"version":1,"themes":[],"future_data":true}"#.as_slice(),
         br#"{"version":1,"themes":[{"id":"incomplete"}]}"#.as_slice(),
     ] {
@@ -236,4 +236,51 @@ fn failed_filesystem_save_preserves_snapshot_and_allows_retry() {
             .to_string_lossy()
             .ends_with(".tmp")
     }));
+}
+
+#[test]
+fn typography_library_is_versioned_round_trips_and_refuses_invalid_writes() {
+    use tabard::{FontRole, ThemeFontStyle};
+    let directory = TestDirectory::new();
+    let path = directory.library();
+    let mut store = ThemeLibraryStore::load(&path).unwrap();
+    let mut theme = authored("theme:fonts");
+    theme
+        .typography
+        .set(
+            FontRole::Reading,
+            ThemeFontStyle {
+                family: Some("Georgia".into()),
+                size_px: Some(22.0),
+                line_height: Some(1.6),
+            },
+        )
+        .unwrap();
+    store.save(&[theme.clone()]).unwrap();
+    let bytes = fs::read(&path).unwrap();
+    let document: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+    assert_eq!(document["version"], 2);
+    let mut mislabeled = document.clone();
+    mislabeled["version"] = serde_json::json!(1);
+    fs::write(&path, serde_json::to_vec(&mislabeled).unwrap()).unwrap();
+    assert_eq!(
+        ThemeLibraryStore::load(&path).unwrap_err().kind(),
+        ErrorKind::InvalidData
+    );
+    fs::write(&path, &bytes).unwrap();
+    assert_eq!(
+        ThemeLibraryStore::load(&path).unwrap().themes(),
+        &[theme.clone()]
+    );
+    theme
+        .typography
+        .0
+        .get_mut(&FontRole::Reading)
+        .unwrap()
+        .line_height = Some(f32::NAN);
+    assert_eq!(
+        store.save(&[theme]).unwrap_err().kind(),
+        ErrorKind::InvalidInput
+    );
+    assert_eq!(fs::read(&path).unwrap(), bytes);
 }

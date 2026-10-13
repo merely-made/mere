@@ -1,0 +1,2 @@
+# Preserve collected bytes, including native log and JSON line endings.
+* -text

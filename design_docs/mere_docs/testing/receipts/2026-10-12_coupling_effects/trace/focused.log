@@ -1,0 +1,53 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling seiche v0.0.6 (C:\Users\mark_\Code\worktrees\mere-coupling-trace\crates\conatus\seiche)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.48s
+     Running unittests src\lib.rs (C:/t/cargo-targets/mere\debug\deps\seiche-26a0e793e179e9c4.exe)
+
+running 24 tests
+test coupling_force::effect_tests::damping_reports_its_factor_without_inventing_strength_scaling ... ok
+test coupling_force::effect_tests::gradient_and_wall_reports_are_forces_not_position_exclusions ... ok
+test coupling_force::effect_tests::sampling_time_and_registry_fallback_match_the_existing_executor ... ok
+test coupling_force::effect_tests::unsupported_response_wrong_field_and_unmatched_target_stay_distinct ... ok
+test coupling_force::effect_tests::velocity_assignment_and_advection_have_distinct_hold_behavior ... ok
+test coupling_force::tests::flow_advect_leaves_a_pinned_body_at_its_kinematic_target ... ok
+test coupling_force::effect_tests::querying_an_installed_coupling_does_not_advance_or_mutate_the_simulation ... ok
+test coupling_force::tests::open_response_applies_no_force ... ok
+test coupling_trace::tests::anonymous_force_does_not_invent_owner_ids_or_capture_generic_force_slot ... ok
+test coupling_trace::tests::capped_latest_tick_does_not_skip_physics_or_accumulate_history ... ok
+test coupling_trace::tests::duplicate_slots_keep_sample_points_and_actual_accumulated_writes ... ok
+test coupling_trace::tests::equal_tick_numbers_from_separate_worlds_keep_distinct_runtime_owners ... ok
+test coupling_force::tests::attract_to_min_centers_like_boundary ... ok
+test coupling_trace::tests::equal_looking_couplings_keep_ids_and_sequential_velocity_effects ... ok
+test coupling_trace::tests::fixed_body_write_call_is_distinct_from_advection_guard ... ok
+test coupling_trace::tests::force_accumulation_is_observed_separately_from_velocity_and_integration ... ok
+test coupling_trace::tests::inline_runtime_exposes_and_clears_actual_trace_without_requesting_ticks ... ok
+test coupling_trace::tests::missing_body_and_inert_evaluation_remain_distinct ... ok
+test coupling_trace::tests::velocity_write_discloses_whether_it_actually_woke_the_body ... ok
+test coupling_trace::tests::rebound_ids_keep_old_registry_and_target_identity_in_retained_evidence ... ok
+test runtime::coupling_trace_delivery::tests::queued_packets_share_one_trace_and_superseded_evidence_is_unavailable ... ok
+test runtime::coupling_trace_tests::stale_actor_trace_cannot_reappear_after_configuration_barrier ... ok
+coupling_trajectory advect 54b5cd56e7b80b83
+coupling_trajectory align bf3c47d11ff264bf
+coupling_trajectory attract c717ab2701156915
+coupling_trajectory dampen 26b550ad4cdbd84f
+coupling_trajectory duplicate-advect 1798dfbd94938d15
+coupling_trajectory duplicate-attract cac4854c803f022f
+coupling_trajectory duplicate-dampen 4ba4c04b15203996
+coupling_trajectory open 22f06774732f2065
+coupling_trajectory outside-dampen 22f06774732f2065
+coupling_trajectory repel 79743f9bd576ab4e
+coupling_trajectory wall 5978bb7ef06dc2bf
+coupling_trajectory wrong-scalar 22f06774732f2065
+coupling_trajectory wrong-vector 22f06774732f2065
+test coupling_force::effect_tests::execution_trajectory_receipt ... ok
+test runtime::coupling_trace_tests::actor_commands_publish_actual_capped_trace_and_clear_on_rebind ... ok
+
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 168 filtered out; finished in 0.02s
+

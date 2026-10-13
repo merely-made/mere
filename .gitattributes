@@ -91,3 +91,21 @@ design_docs/mere_docs/testing/receipts/2026-10-11_producer_gates/device-rehydrat
 ports/graphshell/docs/receipts/relationship_dynamics_20261011/checks/*.log -text
 ports/graphshell/docs/receipts/relationship_dynamics_20261011/qualification.json text eol=lf
 ports/graphshell/docs/receipts/relationship_dynamics_20261011/harness/** text eol=lf
+
+# Node ladder proof logs and canonical text metadata across checkout platforms.
+# Keep Cargo diagnostic indentation verbatim in these evidence logs.
+ports/graphshell/docs/receipts/node_ladder_20261011/checks/*.log -text whitespace=-space-before-tab
+ports/graphshell/docs/receipts/node_ladder_20261011/qualification.json text eol=lf
+ports/graphshell/docs/receipts/node_ladder_20261011/harness/** text eol=lf
+
+support/receipts/font_roles_20261012/*.log -text whitespace=-blank-at-eof,-space-before-tab
+
+# Preserve raw Cargo diagnostics and exact replay metadata for the inventory experiment.
+crates/stickleback/examples/inventory_compare/results/**/*.log -text -whitespace
+crates/stickleback/examples/inventory_compare/results/**/*.json text eol=lf
+
+# Typography receipts retain exact native logs, proof JSON and capture bytes.
+support/receipts/tabard_typography_20261012/**/*.log -text -whitespace
+support/receipts/tabard_typography_20261012/**/*.json text eol=lf
+support/receipts/tabard_typography_20261012/**/scenario.done text eol=lf
+support/receipts/tabard_typography_20261012/**/*.png binary
