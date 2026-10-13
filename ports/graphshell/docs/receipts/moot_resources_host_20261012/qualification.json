@@ -1,0 +1,29 @@
+{
+  "local_date": "2026-10-12",
+  "status": "CPU owner/mount controls passed; native build and coordinated layout/paint acceptance pending",
+  "integration_base": "8568f42fdf57f997274c74e63bd4ee045fe1a2b4",
+  "cpu": {
+    "tests": 8,
+    "negative_control": "Retained session lapse removed: expiry and signed revocation fail; exact source restored"
+  },
+  "native": {
+    "executed": true,
+    "status": "Unaccepted: original and diagnostic wide attempts produced zero captures; compact not launched",
+    "classified_stage": "Scene emission and raster succeeded; repeated SurfaceAcquire::Unavailable(Occluded), then no fresh presentation",
+    "sample_correction": "r2 sample captured caffeinate inhibitor, not the app; no app stack inference",
+    "next": "Bounded proof-only wake/deadline and source main reconciliation before new frozen candidate"
+  },
+  "limits": [
+    "Public unsealed memory fixtures",
+    "Verified sans-I/O admission with supplied carrier facts; no live transport",
+    "No persistent reopen, private content or physical input qualification",
+    "Actual activity/session owner not installed"
+  ],
+  "supplier_fork": "a5bfa901b804b54c948c9500124da89124ad4ef6",
+  "metadata": {
+    "packages": 1614,
+    "shared_crate_to_port_edges": []
+  },
+  "graphshell_web_wasm": "passed",
+  "clippy": "selected actual port library completed with2 inherited warnings; no warning in new mount module"
+}
