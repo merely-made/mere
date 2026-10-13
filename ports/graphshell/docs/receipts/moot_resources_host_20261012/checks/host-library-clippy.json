@@ -1,0 +1,25 @@
+{
+  "command": [
+    "cargo",
+    "clippy",
+    "--locked",
+    "--offline",
+    "-p",
+    "graphshell",
+    "--no-default-features",
+    "--features",
+    "moot-resources",
+    "--lib",
+    "--no-deps",
+    "-j1"
+  ],
+  "repo": "/Users/markik/Code/worktrees/mere-moot-capsule-proof",
+  "target": "/Users/markik/Code/targets/mere-s2s3",
+  "exit_code": 0,
+  "seconds": 147.7,
+  "guard": null,
+  "min_free_bytes": 45505052672,
+  "cargo_jobs": 1,
+  "gpu_executed": false,
+  "headed_executed": false
+}

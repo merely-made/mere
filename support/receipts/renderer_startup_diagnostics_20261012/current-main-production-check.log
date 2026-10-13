@@ -1,0 +1,12 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+    Checking cambium v0.3.3 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium)
+    Checking cambium-winit v0.3.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium-winit)
+    Checking cambium-rootstock v0.1.0 (/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium-rootstock)
+    Finished `dev` profile [unoptimized] target(s) in 13.80s

@@ -1,0 +1,9 @@
+{
+  "publication_candidate": "74c44bfcf5e468b6f75376bbb51e420d964e85b3",
+  "upstream_basis": "abc8e5ad5d987a028ddb8a36ac5de449db59950d",
+  "runtime_qualified_source": "a1cb156f813164e48003d8e2d2dd015d619ec340",
+  "runtime_input_sha256_identical": true,
+  "upstream_change_kind": "Documentation only: index, theme plan and D2 font-adoption record",
+  "source_changes_after_runtime_basis": "Only the separately qualified hover lifecycle test-only descendant; all other changes are docs/receipts.",
+  "additional_runtime_launch": false
+}

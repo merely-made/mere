@@ -101,6 +101,14 @@ mounting, style, rendering and application-session routing. See the
 [owner and control continuation](../../design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#resource-owners-and-cambium-controls-2026-10-11)
 for acceptance boundaries.
 
+Graphshell's opt-in `moot-resources` host binds a mount to an existing verified
+projection session. It rechecks retained session authority and the actual
+resource owners before dispatch, refreshes current owner reads afterward, and
+keeps opened bytes and feedback local to each reading. The separate
+`moot-resource-proof` binary exercises two mounts on the native Cambium host
+using signed, public in-memory fixtures. It installs no activity owner. See
+the [host continuation](../../design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#admitted-graphshell-resource-mount-2026-10-12).
+
 ## License
 
 MPL-2.0

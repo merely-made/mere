@@ -1,0 +1,25 @@
+{
+  "kind": "native acceptance",
+  "runs": [
+    {
+      "case": "wide",
+      "command": [
+        "caffeinate",
+        "-di",
+        "/Users/markik/Code/output/moot-resource-host-20261012/moot-resource-host-r3-frozen",
+        "--receipt",
+        "/Users/markik/Code/output/moot-resource-host-20261012/native-r3/wide",
+        "--size",
+        "1280x920"
+      ],
+      "exit_code": 101,
+      "guard": null,
+      "sampled": false,
+      "captures": 0
+    }
+  ],
+  "seconds": 5.16,
+  "stopped_at": "2026-10-13T03:40:14.992643+00:00",
+  "binary_sha256": "717b4452f9ca3be756d673bddf69940cf527ed08c61a77eac9496afcda21953f",
+  "resources": "Owned process groups stopped; no server created"
+}

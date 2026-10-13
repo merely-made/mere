@@ -1,0 +1,63 @@
+{
+  "receipt": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        1140,
+        865
+      ],
+      "canvas_physical_size": [
+        1140,
+        865
+      ],
+      "log": [
+        "waited 0 frames",
+        "waited 0 frames",
+        "waited 2 frames",
+        "captured presentation_saved_forme_guides_hidden",
+        "captured presentation_numen_unsupported_effect",
+        "waited 3 frames",
+        "waited 3 frames",
+        "waited 0 frames",
+        "waited 0 frames",
+        "captured presentation_guides_base_restored",
+        "gpu timestamps: no"
+      ],
+      "result": "ok",
+      "saved_graph": {
+        "address": "file:///Graphshell/reference-notes.md",
+        "file": null,
+        "reopened": false,
+        "save_state": "idle",
+        "selected": "392b7659-3952-57e9-8812-98c4d6205025",
+        "session": "0126916a-9e4f-4dc1-9f84-2ab8c29eed0e",
+        "tags": "local, reference",
+        "title": "Reference notes"
+      },
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "presentation_saved_forme_guides_hidden",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 436946
+      },
+      {
+        "name": "presentation_numen_unsupported_effect",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 434818
+      },
+      {
+        "name": "presentation_guides_base_restored",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 431266
+      }
+    ]
+  },
+  "errors": []
+}

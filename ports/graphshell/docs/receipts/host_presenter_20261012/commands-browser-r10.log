@@ -1,0 +1,21 @@
+PASS commands-fixture
+PASS commands-grouped
+PASS fold-page-gestures
+PASS fold-history
+PASS external-page-focus
+PASS keyboard-zoom
+PASS keyboard-footer
+PASS right-drag
+AssertionError [ERR_ASSERTION]: {"state":"fail","errors":[],"gate_failures":[],"result":{"canvas_logical_size":[1140,651],"canvas_physical_size":[1140,651],"log":["waited 0 frames","FAIL: differs physical-pan camera: (519.90137, 198.98508) -> (519.90137, 198.98508)","gpu timestamps: no"],"result":"fail","saved_graph":null,"timings":[]},"captures":[]}
+
+'fail' !== 'ok'
+
+    at finish (/Users/markik/Code/output/graphshell-site-presenter-20261011/verify-commands.cjs:18:10)
+    at async /Users/markik/Code/output/graphshell-site-presenter-20261011/verify-commands.cjs:62:167 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 'fail',
+  expected: 'ok',
+  operator: 'strictEqual',
+  diff: 'simple'
+}

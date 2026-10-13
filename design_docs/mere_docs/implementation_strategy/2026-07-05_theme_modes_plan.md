@@ -1150,10 +1150,10 @@ T4 and T5 ride settings passes; T5 last.
 ## Granular font roles — 2026-10-12
 
 **Status:** shared family contract, reusable preference editor and Cleromancy
-macOS adoption qualified and published. Coordinated with
-Knot and Woodshed against Mere `22c0dbc5d`; neither consumer is repinned or
-qualified by this shared publication. No exposed chat identifies the q-pc
-owner, so its remote/unpublished work has not been reconciled.
+macOS adoption qualified and published. Shared authored typography and Pelt
+chrome qualification are recorded below. Knot and Woodshed have qualified and
+published their bounded consumer adoption against the same Mere `8568f42fd`
+family. Mere's coordinated Knot intake is recorded below.
 
 ### Contract and done-conditions
 
@@ -1176,7 +1176,7 @@ owner, so its remote/unpublished work has not been reconciled.
    unmodified OFL IBM Plex Mono and Source Serif 4 metadata faces. Done when
    exact font advances, four theme modes, authored precedence, fresh-process
    preference reopening and unchanged reading/reflection identities qualify.
-   Knot and Woodshed adoption remain separately owned subsequent slices.
+   Knot and Woodshed retain separately owned consumer receipts below.
 
 ### Precedence and fidelity
 
@@ -1314,3 +1314,197 @@ and expose copied producer identities. Typography styles/controls/mappings are
 unchanged. Combined-source CPU/build/boundary checks are recorded separately;
 this does not invent a native rerun of the merged binary. The renderer owner's
 controlled device-loss receipt retains its own source and acceptance bounds.
+
+
+### Knot and Woodshed adoption — 2026-10-12
+
+**Status (2026-10-13):** both consumers qualified and published; coordinated
+Mere intake is qualified. Both owners agreed on Mere
+`8568f42fdf57f997274c74e63bd4ee045fe1a2b4`, Genet
+`2c7ef73bfa44c07744e0643e3c6f98be3cbd7947`, Netrender
+`c74b7cb28090c28b1c6d80b08dcdea18aff48d3e`, maintained Classic Vello
+`2eae6243881d5b24c984d5ee35dde509ca5db782` and Dramatis
+`0234e7eea6f2ddf2330a71b9425da01b06ae0391`. Knot starts from published
+`3af93adda472af2913a5d298f14deb10e85daee2`; Woodshed starts from published
+WAV-export baseline `c817e59d7227c94978d60994a81da560e7c1a773`.
+
+#### Phases and done-conditions
+
+1. **Consumer mapping and persistence.** Use the existing five shared roles,
+   `ThemeChoice.fonts`, native inventory and reusable controlled family editor.
+   Preserve ordered requests through theme/mode changes and workshop Apply.
+   Include valid bundled faces in inventory. Map optional authored
+   `Theme.typography` family/size/leading onto supported consumer surfaces;
+   omitted fields preserve host defaults. Done when staged selection, explicit
+   Apply/Default, missing requests, failed-save rollback and serialized reopening
+   pass, with authored declaration precedence tested. Knot's explicit writer
+   face/size/measure remains authoritative.
+2. **Measured presentation and dynamics.** Resolve typography before measuring
+   the actual consumer surfaces. Invalidate affected metric/geometry caches and
+   reconcile hit targets before dependent dynamics continue. Done when tests
+   prove painted labels and measurement probes use the same effective font,
+   geometry responds to role changes, and retained positions/content remain
+   unchanged. Unsupported canvas size/leading seams must be disclosed; the
+   workshop preview alone does not qualify downstream metrics.
+3. **Serialized native acceptance.** Knot owns the first native/GPU reservation;
+   Woodshed performs independent CPU/source work until explicit cleanup release.
+   Freeze source, supplier closure, binary hash and fixture before each finite
+   process. Done when the real shared picker, application/theme precedence,
+   missing/reset behavior, responsive presentation and fresh-process persistence
+   have reviewed captures and an exact committed-source receipt. Retain failed
+   attempts and known supplier exclusions separately. Woodshed's concurrently
+   authorized capture-compression work must reconcile its final source freeze;
+   a changed runtime requires its own native evidence.
+4. **Publication and Mere intake.** Each consumer owns its plan, receipt and
+   main push. Verify remote publication and distinguish qualified runtime from
+   later documentation commits. Mere's coordinator then updates the coherent
+   Knot editor/document/Djinn site revision and checks the embedded closure.
+   Done when immutable pins resolve and the bounded host checks pass, with the
+   shared plan/index recording actual consumer evidence and open gates.
+
+#### Findings and progress
+
+- **2026-10-12:** Current shared source exposes one `FontRole` enum for both
+  portable application family preferences and authored theme typography. Theme
+  values may provide family, size and leading; application preferences provide
+  family overrides. Emit application variables after theme variables while
+  preserving the ordinary authority of explicit authored declarations.
+- **2026-10-12:** The committed Pelt typography verifier passes: three processes,
+  162 presentations and 21 retained captures. This is read-only receipt
+  validation; it neither reruns Pelt nor qualifies either consumer.
+- **2026-10-12:** Knot's owner explicitly bounds this slice to family mapping.
+  Preview size/leading/measure and heading hierarchy keep their existing host
+  controls; occurrence labels keep host 13 px/600 and their existing line-box
+  pattern. Typed theme size/leading remain retained in the theme/workshop but
+  are not consumed by new Knot role controls. Exact authored CSS keeps ordinary
+  cascade authority. Label geometry fingerprints record advances/line boxes,
+  rather than resolved-face identity; equal geometry does not force a reset.
+  Label maps occurrence controls/cards; shared GraphCanvas 10 px annotations
+  and their fixed label estimator remain outside this qualification.
+- **2026-10-12 initial publication order:** Woodshed's owners agreed to qualify
+  and publish font adoption first, then rebase compression. The later
+  reconciliation below supersedes that order.
+- **2026-10-12:** Knot's implementation review identified theme-variable ordering
+  and an occurrence-button rule that could diverge painted fonts from metric
+  probes. Both remain pre-qualification corrections owned by Knot. Woodshed
+  preserves the accepted WAV export and independent port ownership while
+  coordinating its font and compression branches.
+
+The existing supplier table failure, GPU ignore and prior arrangement golden
+remain separately identified baseline debt. Family availability does not prove
+per-glyph coverage, exact remote face identity, physical IME or OS accessibility.
+Woodshed's recorded-loop glyph gate remains open without actual fallback/paint
+proof. Native acceptance, persistence, publication and embedded Mere intake are
+separate completion claims.
+
+- **2026-10-12 review follow-through:** Both owners corrected Font Apply to
+  retain the currently applied theme snapshot when a same-ID definition has
+  been saved, leaving theme changes behind explicit Theme Apply. Woodshed
+  places Appearance defaults before role mappings and exact authored CSS.
+  Knot implementation is locally frozen at `4fae1d8`; its final CPU/native
+  gates remain pending. Consumer publication is not inferred from that commit.
+
+- **2026-10-12 qualification boundary:** Knot's committed source passes 681
+  workspace tests with zero failures and four existing ignores, plus locked
+  check/build and 45/61 standalone document tests. The default 10-second native
+  startup attempts and the unchanged published baseline produced zero
+  presentations. Traces identify unavailable backbuffer acquisition after
+  successful rasterization. Targeted native keyboard activation restores an
+  ordinary diagnostic window, which is positive control rather than acceptance.
+  Knot is adding an explicitly opted-in, marked-fixture-only initial activation
+  grace capped at 60 seconds. The same lane restores its default 10-second stall
+  guard immediately on its first successful presentation. Default startup and
+  unattended presentation remain unqualified; all feature assertions remain.
+- **2026-10-12 source freeze:** Woodshed `41b9d9e` passes 161 view and 145 host
+  tests and the locked production build. The coordinator independently checked
+  165 committed/working source hashes and both frozen binary hashes. Positioned
+  graph/fret labels use the label family while preserving fixed geometry;
+  ordinary mapped controls consume authored size/leading. Its original raw
+  fixture is preserved and copied for the native retention gate.
+- **2026-10-12 later reconciliation:** The compression owner will publish its
+  CPU-qualified source first, with native acceptance explicitly open. Woodshed's
+  font owner then rebases onto that actual main, repeats combined checks/build
+  and records a new freeze before native execution. The pre-compression font
+  freeze is retained separately. Knot has cleaned up and explicitly released
+  the native/GPU lane to Woodshed while its startup policy work remains CPU-only.
+- **2026-10-12 fixture helper:** The coordinator's locked `dr-c-receipt-host`
+  build uses Mere `abc8e5ad5` (documentation only atop runtime `8568f42fd`) and
+  the same supplier family. Its immutable binary hash is
+  `9c93b7928aa8cd734a1b49bc4b9c87f52902779ca35d24664e4bafefce5c76da`.
+  This is helper-build evidence only; Woodshed owns synthetic broker/native use.
+
+- **2026-10-12 Woodshed publication:** Main `39d5e7b5a8d08912bd0f37ef5a17d0bbed27f49a`
+  publishes font adoption and the separately recorded compression continuation.
+  Qualified script source is `751858f0461b71fe7fa03392b13d65363b9e7ff6`;
+  compiled runtime is `a9e1e87556c62bfcd503e429708af68ce62826ba`, with only two
+  external scenario text changes before qualification. Combined gates pass
+  236 core, 161 views and 159 host cases (556 total) and the locked build.
+  Three font processes pass 19 full captures and 230 presentations, including
+  wide and compact fresh reopen; two separate normal-output storage processes
+  pass three captures and 54 presentations. The coordinator reviewed all 22
+  full images and ran the committed verifier with local source, binary, capture
+  and blob checks. Publication changes no compiled source after qualification.
+  Canonical evidence is `woodshed/validation/font-roles_20261012/receipt.json`
+  and `woodshed/validation/compressed-captures_font-family_20261012/receipt.json`.
+  Saved Reading/Heading Source Serif 4 and Label IBM Plex Mono, theme ID and
+  high-contrast light mode survive. Retained Set/Card data, clocks and capture
+  contents remain exact; navigation leaves Settings active and visiting Mere
+  materializes ten graph positions, both explicitly verified view-state changes.
+  Full exported WAV bytes and decoded capture float bits remain exact on the
+  copied compression fixture. The original raw files remain unchanged.
+  Compact Code and Apply are visibly reachable. Rehearsal filmstrip text is
+  baseline Interface, rather than evidence for Set-tray label mapping. Fixed
+  graph/fret geometry, the recorded-loop missing glyph, physical input, OS
+  accessibility and default 10-second startup retain their separate bounds.
+  All owned native apps, synthetic Keeper and sleep-prevention processes stopped;
+  the native/GPU lane is explicitly returned to Knot.
+
+- **2026-10-12 Knot publication:** Main `8ed49d43f049921d56ab5a0c091a2c37c0970ee7`
+  publishes the bounded family-only adoption. Runtime
+  `a2128e7d8d7929f5f0df168e2ae033e22f7b38ce` passes 687 workspace cases with
+  zero failures and four existing ignores; final fixture/compact focused checks,
+  45/61 standalone document configurations and locked check/build pass. Three
+  native processes pass 13 nonblank full captures and 259 presentations.
+  The coordinator reviewed every accepted image, ran the archived verifier and
+  checked all 152 runtime file hashes. Source (41 bytes), preference/library
+  bytes, authored positions and retained material survive fresh reopen; transient
+  dynamics reopen cold and typography changes reset/remeasure without resuming.
+  Compact Code/Apply are visible. The search field is captured, while the
+  off-viewport results are not a full visual or accessibility qualification.
+  Canonical evidence is `knot-editor/docs/receipts/2026-10-12_font_roles/README.md`.
+  The version-1 typography fixture and compact missing-Menu failures remain
+  rejected evidence; corrected v2 loading and real 420 px menu routing have
+  focused regressions. Initial activation grace is explicit and synthetic-only;
+  all accepted processes log restoration of the normal 10-second guard on first
+  presentation. Default startup, personal custody and broader glyph/platform
+  fidelity remain outside this receipt. All owned apps stopped and the lane
+  was explicitly released.
+
+### Coordinated Mere Knot intake — 2026-10-13
+
+**Status:** coordinated pins, closure and embedded checks qualified.
+Reconciled Mere origin `3b76b162b37654ab3981031b82a23c5d5740ed6d` before intake,
+including published viewer/ingress and native unocclusion work. The consumers'
+qualified `8568f42fd` source remains frozen; this reconciliation does not invent
+consumer adoption or a native rerun of those later changes.
+
+Workspace `knot-editor`, workspace `knot-document` and Djinn `knot-site` now
+move together to published `8ed49d43`. The lock changes only six Knot source
+rows, without registry version changes. Djinn's resolved closure contains all
+six Knot packages at this one revision, no second Mere Git source, and exactly
+one source each for the agreed Genet, Netrender, Classic and Dramatis family.
+Shared scene, typography, host and storage contracts resolve locally through
+the existing workspace patch table. No Woodshed or independent port pin is
+changed by this Mere intake.
+
+The locked isolated `djinn --all-targets` check and all 21 pinned composition
+recipe tests pass. Documentation audits retain their pre-intake baseline debt. The
+coordinator's native evidence remains the two consumers' receipts; this intake
+makes an embedded source/type compatibility claim, with no additional Mere
+native or personal-custody claim.
+
+
+The durable [intake qualification](../../../support/receipts/knot_font_role_intake_20261013/qualification.json)
+records all three manifest/lock hashes, resolved closure, exact check logs and
+consumer receipt boundaries. These are compatibility and publication gates;
+no new Mere native presentation is claimed.

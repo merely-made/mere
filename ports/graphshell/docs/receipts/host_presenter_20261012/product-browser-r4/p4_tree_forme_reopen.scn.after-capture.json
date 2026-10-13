@@ -1,0 +1,54 @@
+{
+  "receipt": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        1140,
+        865
+      ],
+      "canvas_physical_size": [
+        1140,
+        865
+      ],
+      "log": [
+        "captured forme_reopened_graph",
+        "captured forme_reopened_tiles",
+        "waited 0 frames",
+        "reopening and focusing an existing access preserve the forme",
+        "gpu timestamps: no"
+      ],
+      "result": "ok",
+      "saved_graph": {
+        "address": "https://example.test/i2p-port",
+        "file": null,
+        "reopened": true,
+        "save_state": "idle",
+        "selected": "81b91a6b-52ef-5751-b497-15f711cf9c70",
+        "session": "08c33cc7-ce6d-4589-aa4f-4afe028fef86",
+        "tags": "research, transport",
+        "title": "I2P port notes"
+      },
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "forme_reopened_graph",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 193098
+      },
+      {
+        "name": "forme_reopened_tiles",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 216846
+      }
+    ]
+  },
+  "errors": [
+    "RuntimeError: unreachable\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[199401]:0x25f9f88\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[199210]:0x25f9b72\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[195736]:0x25f0217\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[34267]:0x17bb6e0\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[75224]:0x1e895e3\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[198752]:0x25f8d73\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[159511]:0x24b5b1f\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[130423]:0x233fdd2\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[130424]:0x233fe0f\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[88348]:0x1ffc90a",
+    "RuntimeError: unreachable\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[199401]:0x25f9f88\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[199210]:0x25f9b72\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[195736]:0x25f0217\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[34267]:0x17bb6e0\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[75224]:0x1e895e3\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[198752]:0x25f8d73\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[159511]:0x24b5b1f\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[130423]:0x233fdd2\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[154271]:0x247aee9\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[43727]:0x19bc235"
+  ]
+}

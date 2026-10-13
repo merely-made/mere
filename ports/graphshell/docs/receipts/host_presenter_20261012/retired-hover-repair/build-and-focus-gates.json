@@ -1,0 +1,82 @@
+{
+  "source": "a1cb156f813164e48003d8e2d2dd015d619ec340",
+  "records": [
+    {
+      "name": "accessibility-focus",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "cambium-rootstock",
+        "--no-default-features",
+        "--lib",
+        "accessibility_tests",
+        "-j1"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-nested-graph-view",
+      "exit_code": 0,
+      "log": "accessibility-focus.log",
+      "tests": [
+        "ok. 2 passed; 0 failed; 0 ignored; 0 measured; 80 filtered out; finished in 1.18s"
+      ]
+    },
+    {
+      "name": "viewer-build",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+        "build",
+        "--locked",
+        "--offline",
+        "--target",
+        "wasm32-unknown-unknown",
+        "--no-default-features",
+        "-j1"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-nested-graph-view/ports/graphshell/web",
+      "exit_code": 0,
+      "log": "viewer-build.log",
+      "tests": []
+    },
+    {
+      "name": "product-build",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+        "build",
+        "--locked",
+        "--offline",
+        "--target",
+        "wasm32-unknown-unknown",
+        "--no-default-features",
+        "--features",
+        "product,applets",
+        "-j1"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-nested-graph-view/ports/graphshell/web",
+      "exit_code": 0,
+      "log": "product-build.log",
+      "tests": []
+    },
+    {
+      "name": "main-check",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+        "check",
+        "--locked",
+        "--offline",
+        "--target",
+        "wasm32-unknown-unknown",
+        "--no-default-features",
+        "--features",
+        "main-page,applets",
+        "-j1"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-nested-graph-view/ports/graphshell/web",
+      "exit_code": 0,
+      "log": "main-check.log",
+      "tests": []
+    }
+  ],
+  "provenance": "Reconstructed from preserved gates.py, gates-runner.log and completed individual logs; later hover-only renewal overwrote the original combined gates.json. No build rerun is claimed."
+}

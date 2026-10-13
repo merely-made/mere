@@ -1,0 +1,15 @@
+{
+  "status": "landed",
+  "implementation_and_qualification_commit": "007a4de6b2889bb09b5c34e52ce363b7cace4d20",
+  "confirmed_remote_heads": {
+    "refs/heads/codex/nested-graph-view": "007a4de6b2889bb09b5c34e52ce363b7cace4d20",
+    "refs/heads/main": "007a4de6b2889bb09b5c34e52ce363b7cace4d20"
+  },
+  "confirmed_at_utc": "2026-10-13 02:45:39 UTC",
+  "runtime_qualified_source": "a1cb156f813164e48003d8e2d2dd015d619ec340",
+  "publication_upstream_basis": "abc8e5ad5d987a028ddb8a36ac5de449db59950d",
+  "publication_reconciliation": "publication-reconciliation.json",
+  "live_site_deployed": false,
+  "full_one_tree_phase4_complete": false,
+  "new_runtime_after_release": false
+}

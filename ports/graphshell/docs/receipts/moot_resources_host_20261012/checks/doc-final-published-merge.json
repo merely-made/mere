@@ -1,0 +1,34 @@
+{
+  "new_finding_identities": {
+    "index_orphans": [],
+    "memory_directory_links": [],
+    "statusless_plans": [],
+    "broken_relative_links": [],
+    "missing_known_root_paths": [],
+    "unheaded_owned_sources": [],
+    "exhibit_b_sources": []
+  },
+  "new_judgment_errors": [],
+  "inherited_counts": {
+    "active_docs": 268,
+    "indexed_active_docs": 267,
+    "index_orphans": 0,
+    "index_ghosts": 0,
+    "memory_directory_links": 0,
+    "statusless_plans": 0,
+    "broken_relative_links": 28,
+    "historical_broken_relative_links": 245,
+    "planned_broken_relative_links": 0,
+    "ambiguous_known_root_paths": 101,
+    "ignored_known_root_patterns": 23,
+    "reserved_identifier_paths": 24,
+    "missing_known_root_paths": 200,
+    "historical_missing_known_root_paths": 237,
+    "planned_missing_known_root_paths": 6,
+    "invalid_historical_annotations": 0,
+    "stale_historical_annotations": 0,
+    "unheaded_owned_sources": 12,
+    "exhibit_b_sources": 0
+  },
+  "baseline": "3b76b162b"
+}

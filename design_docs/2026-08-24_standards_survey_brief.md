@@ -1441,3 +1441,37 @@ not sockets, signed operation admission, RaptorQ, RF, physical time or MCU
 resources. The earlier MemoryLAN experiment remains a separate pinned baseline,
 not a paired result with this new workload. Publication uses direct commits and
 pushes with local checks; no workflows or PRs are added.
+
+**2026-10-12 exact live composition continuation:** The
+[admitted inventory/ingress service and local campaign](../crates/mesh/mesh/examples/inventory_ingress/README.md)
+now implement that bounded host slice. Distillery mounts it on its existing
+endpoint and mesh store. Notochord admits separate `inventory` and `submit`
+actions; both share two active calls, four pending/queued reservations acquired
+before first-stream waiting, and one arrival-to-response-FIN deadline. The
+16 KiB object, 2 KiB result and 1 KiB exact-control limits are enforced alongside
+whole-call actual-I/O ceilings. Original record bytes are freshly decoded and
+authenticated before the existing `MeshStore::accept_outcome`; only that owner
+changes durable domain state.
+
+Retinue's live four-object/64 KiB producer supplies exact metadata and actual
+repair-only RaptorQ decoder output. With one record already available at the
+receiver, its admitted exact snapshot selects exactly the other three. The
+[captured composition](../crates/mesh/mesh/examples/inventory_ingress/results/20261012/composition.json)
+and [provenance](../crates/mesh/mesh/examples/inventory_ingress/results/20261012/metadata.json)
+record four original/header/body preservation checks, unchanged operation IDs,
+one durable effect per original, and a separate-process store reopen. Two
+independent campaigns agree on delivery/admission semantics. Action mismatches,
+invalid records and incomplete/oversized/trailing framing are refused; six
+stalled calls fill the shared active/queue ceilings, a seventh is refused,
+deadlines drain the work, and a healthy duplicate succeeds afterward.
+
+The producer refuses a fifth live generation without eviction. The receiver's
+volatile four-original availability window FIFO-evicts on a fifth accepted
+original and expires bytes with its exact metadata, without deleting durable
+operations. Resident mount/expiry/stalled-shutdown checks cover that ownership
+boundary; restart begins with empty availability metadata. Producer logical
+slots and receiver milliseconds are independent, and digest membership conveys
+no cross-clock expiry or custody claim. Actual coded-frame delivery remains
+host loopback before recovered originals cross real QUIC; physical radio, MCU,
+worker execution and native UI are outside this receipt. The earlier finite
+loss/partition/restart experiment remains separate evidence.

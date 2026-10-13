@@ -1,0 +1,143 @@
+{
+  "kind": "native acceptance",
+  "runs": [
+    {
+      "case": "wide",
+      "command": [
+        "caffeinate",
+        "-di",
+        "/Users/markik/Code/output/moot-resource-host-20261012/moot-resource-host-r5-frozen",
+        "--receipt",
+        "/Users/markik/Code/output/moot-resource-host-20261012/native-r5/wide",
+        "--size",
+        "1280x920"
+      ],
+      "exit_code": 0,
+      "guard": null,
+      "sampled": false,
+      "captures": 4,
+      "qualification": {
+        "activity_owner": false,
+        "captures": [
+          {
+            "height": 1840,
+            "path": "/Users/markik/Code/output/moot-resource-host-20261012/native-r5/wide/stage-0.png",
+            "presentation": "PresentedFrame { host: 1, sequence: 1, width: 2560, height: 1840, layout_scale: 2.0 }",
+            "stage": 0,
+            "unique_colors": 1393,
+            "width": 2560
+          },
+          {
+            "height": 1840,
+            "path": "/Users/markik/Code/output/moot-resource-host-20261012/native-r5/wide/stage-1.png",
+            "presentation": "PresentedFrame { host: 1, sequence: 5, width: 2560, height: 1840, layout_scale: 2.0 }",
+            "stage": 1,
+            "unique_colors": 1187,
+            "width": 2560
+          },
+          {
+            "height": 1840,
+            "path": "/Users/markik/Code/output/moot-resource-host-20261012/native-r5/wide/stage-2.png",
+            "presentation": "PresentedFrame { host: 1, sequence: 9, width: 2560, height: 1840, layout_scale: 2.0 }",
+            "stage": 2,
+            "unique_colors": 1189,
+            "width": 2560
+          },
+          {
+            "height": 1840,
+            "path": "/Users/markik/Code/output/moot-resource-host-20261012/native-r5/wide/stage-3.png",
+            "presentation": "PresentedFrame { host: 1, sequence: 13, width: 2560, height: 1840, layout_scale: 2.0 }",
+            "stage": 3,
+            "unique_colors": 1188,
+            "width": 2560
+          }
+        ],
+        "checks": [
+          "independent readings",
+          "local owner open",
+          "signed reference fork and refreshed offer",
+          "queued open refused on session expiry",
+          "Alice's opened bytes preserved"
+        ],
+        "frames": 17,
+        "input": "real Genet DOM callbacks invoked by finite host harness; no physical pointer/keyboard qualification",
+        "network": false,
+        "persistent_restart": false,
+        "private_content": false,
+        "source_profile": "actual Graphshell mount; signed memory owners; verified sans-I/O session",
+        "status": "passed"
+      }
+    },
+    {
+      "case": "compact",
+      "command": [
+        "caffeinate",
+        "-di",
+        "/Users/markik/Code/output/moot-resource-host-20261012/moot-resource-host-r5-frozen",
+        "--receipt",
+        "/Users/markik/Code/output/moot-resource-host-20261012/native-r5/compact",
+        "--size",
+        "520x860"
+      ],
+      "exit_code": 0,
+      "guard": null,
+      "sampled": false,
+      "captures": 4,
+      "qualification": {
+        "activity_owner": false,
+        "captures": [
+          {
+            "height": 1720,
+            "path": "/Users/markik/Code/output/moot-resource-host-20261012/native-r5/compact/stage-0.png",
+            "presentation": "PresentedFrame { host: 1, sequence: 1, width: 1040, height: 1720, layout_scale: 2.0 }",
+            "stage": 0,
+            "unique_colors": 1393,
+            "width": 1040
+          },
+          {
+            "height": 1720,
+            "path": "/Users/markik/Code/output/moot-resource-host-20261012/native-r5/compact/stage-1.png",
+            "presentation": "PresentedFrame { host: 1, sequence: 5, width: 1040, height: 1720, layout_scale: 2.0 }",
+            "stage": 1,
+            "unique_colors": 1154,
+            "width": 1040
+          },
+          {
+            "height": 1720,
+            "path": "/Users/markik/Code/output/moot-resource-host-20261012/native-r5/compact/stage-2.png",
+            "presentation": "PresentedFrame { host: 1, sequence: 9, width: 1040, height: 1720, layout_scale: 2.0 }",
+            "stage": 2,
+            "unique_colors": 1137,
+            "width": 1040
+          },
+          {
+            "height": 1720,
+            "path": "/Users/markik/Code/output/moot-resource-host-20261012/native-r5/compact/stage-3.png",
+            "presentation": "PresentedFrame { host: 1, sequence: 13, width: 1040, height: 1720, layout_scale: 2.0 }",
+            "stage": 3,
+            "unique_colors": 1155,
+            "width": 1040
+          }
+        ],
+        "checks": [
+          "independent readings",
+          "local owner open",
+          "signed reference fork and refreshed offer",
+          "queued open refused on session expiry",
+          "Alice's opened bytes preserved"
+        ],
+        "frames": 16,
+        "input": "real Genet DOM callbacks invoked by finite host harness; no physical pointer/keyboard qualification",
+        "network": false,
+        "persistent_restart": false,
+        "private_content": false,
+        "source_profile": "actual Graphshell mount; signed memory owners; verified sans-I/O session",
+        "status": "passed"
+      }
+    }
+  ],
+  "seconds": 26.37,
+  "stopped_at": "2026-10-13T04:29:31.209673+00:00",
+  "binary_sha256": "54111c7bd659fa301ea91bc10db48f8ade603e1ab2a6c857af19e4b6f06f6069",
+  "resources": "Owned process groups stopped; no server created"
+}

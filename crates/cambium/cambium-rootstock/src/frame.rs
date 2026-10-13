@@ -31,6 +31,46 @@ fn elapsed_us(elapsed: crate::Duration) -> u64 {
     elapsed.as_micros().min(u64::MAX as u128) as u64
 }
 
+/// Opt-in startup attribution, including attempts that never present. Stores
+/// only CPU timing and host identity; it does not retain render resources.
+struct FrameTrace {
+    started: crate::Instant,
+    host: u64,
+    last_presented: u64,
+}
+
+impl FrameTrace {
+    fn new(host: u64, last_presented: u64) -> Option<Self> {
+        static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+        let enabled = ENABLED.get_or_init(|| {
+            std::env::var_os("CAMBIUM_HOST_FRAME_TRACE").is_some_and(|value| value != "0")
+        });
+        enabled.then(|| Self {
+            started: crate::Instant::now(),
+            host,
+            last_presented,
+        })
+    }
+
+    fn mark(&self, phase: &str, detail: std::fmt::Arguments<'_>) {
+        eprintln!(
+            "[cambium-frame] host={} last-presented={} elapsed={}us phase={phase} {detail}",
+            self.host,
+            self.last_presented,
+            elapsed_us(self.started.elapsed()),
+        );
+    }
+}
+
+impl Drop for FrameTrace {
+    fn drop(&mut self) {
+        self.mark(
+            "return",
+            format_args!("unwinding={}", std::thread::panicking()),
+        );
+    }
+}
+
 struct SpriggingSource<'a> {
     rendered: &'a sprigging::RenderedLeaves,
     producers: &'a crate::ProducerRegistry,
@@ -540,12 +580,22 @@ where
     }
 
     pub fn redraw(&mut self) {
+        let trace = FrameTrace::new(self.s.presentation_host, self.s.presentation_sequence);
+        macro_rules! trace {
+            ($phase:expr, $($args:tt)*) => {
+                if let Some(trace) = &trace {
+                    trace.mark($phase, format_args!($($args)*));
+                }
+            };
+        }
+        trace!("begin", "");
         self.s.last_redraw_presentation = None;
         self.s.last_raster_failure = None;
         if !matches!(
             self.poll_device_recovery(),
             genet_render_host::RecoveryStatus::Ready { .. }
         ) {
+            trace!("recovery-not-ready", "");
             return;
         }
         if self
@@ -554,16 +604,21 @@ where
             .as_ref()
             .is_some_and(|surface| surface.core().device_failure().is_some())
         {
+            trace!("surface-device-lost", "");
             self.poll_device_recovery();
             return;
         }
+        trace!("files-begin", "");
         self.deliver_files();
+        trace!("files-end", "");
         let frame_started = crate::Instant::now();
         let mut profile = FrameProfile::default();
         // The application's frame hook first: animation drives, leaf syncs,
         // backend polls. Its return keeps frames coming.
         let phase = crate::Instant::now();
+        trace!("frame-hook-begin", "");
         let animating = self.prepare_frame();
+        trace!("frame-hook-end", "animating={animating}");
         profile.frame_hook_us = elapsed_us(phase.elapsed());
         // One scale for the whole frame: device times zoom. Layout runs at
         // `physical / layout_scale` and the rasterizer composes that scene
@@ -576,6 +631,7 @@ where
             (size.0.max(1), size.1.max(1), layout_scale)
         });
         let (Some((pw, ph, scale)), true) = (target_size, self.s.surface.is_some()) else {
+            trace!("no-window-or-surface", "");
             // No window, or suspended with the surface taken away: there is
             // nothing to present. The layout still advances, so a resume
             // repaints current state rather than a stale one.
@@ -591,7 +647,9 @@ where
         let (lw, lh) = (pw as f32 / scale, ph as f32 / scale);
 
         let phase = crate::Instant::now();
+        trace!("layout-begin", "physical={pw}x{ph} scale={scale}");
         let anim_active = self.relayout(lw, lh);
+        trace!("layout-end", "");
         profile.relayout_us = elapsed_us(phase.elapsed());
         profile.layout_update_us = self.s.last_layout_update_us;
         profile.layout_tick_us = self.s.last_layout_tick_us;
@@ -605,25 +663,33 @@ where
         profile.leaf_boxes_us = self.s.last_leaf_boxes_us;
         profile.leaf_render_us = self.s.last_leaf_render_us;
         profile.leaf_repaints = self.s.last_leaf_repaints;
+        trace!("producers-begin", "");
         profile.producers = self.prepare_producers(scale);
+        trace!("producers-end", "");
         if let Some(refusal) = self.s.shared.producers.render_failure().cloned() {
+            trace!("producer-refused", "{}", refusal.failure);
             self.refuse_rasterization(refusal.failure, Some(refusal.source_key));
             return;
         }
         let phase = crate::Instant::now();
+        trace!("leaf-fragments-begin", "");
         self.sync_leaf_fragments();
+        trace!("leaf-fragments-end", "");
         profile.leaf_fragments_us = elapsed_us(phase.elapsed());
         let phase = crate::Instant::now();
         self.sync_ime_area();
         profile.ime_us = elapsed_us(phase.elapsed());
         let phase = crate::Instant::now();
+        trace!("scene-begin", "");
         let Some((translated, paint_capture)) = self.emit_scene(lw, lh) else {
+            trace!("scene-missing", "");
             profile.emit_scene_us = elapsed_us(phase.elapsed());
             profile.total_us = elapsed_us(frame_started.elapsed());
             self.s.last_frame_profile = Some(profile);
             return;
         };
         profile.emit_scene_us = elapsed_us(phase.elapsed());
+        trace!("scene-emitted", "");
 
         let Some(surface) = self.s.surface.as_ref() else {
             profile.total_us = elapsed_us(frame_started.elapsed());
@@ -635,6 +701,7 @@ where
         // image keys unresolved, which makes every blurred CSS box-shadow
         // disappear in this host even though the paint list is correct.
         let phase = crate::Instant::now();
+        trace!("shadows-begin", "");
         for mask in &translated.box_shadow_masks {
             surface.renderer().build_box_shadow_mask(
                 mask.key,
@@ -646,6 +713,7 @@ where
             );
         }
         profile.shadows_us = elapsed_us(phase.elapsed());
+        trace!("shadows-end", "");
         let scene = &translated.scene;
         let clear = if self.options.app_frame_is_transparent() {
             wgpu::Color::TRANSPARENT
@@ -655,6 +723,7 @@ where
         let phase = crate::Instant::now();
         // Keyed by this host: several windows rasterize through one core, and
         // an unkeyed raster diffs against whichever surface drew last (F17).
+        trace!("raster-begin", "");
         let raster = surface.core().try_rasterize_scaled_for(
             self.s.presentation_host,
             scene,
@@ -666,10 +735,12 @@ where
         let (_tex, view) = match raster {
             Ok(output) => output,
             Err(failure) => {
+                trace!("raster-refused", "{failure}");
                 self.refuse_rasterization(failure, None);
                 return;
             },
         };
+        trace!("raster-end", "");
         profile.raster_us = elapsed_us(phase.elapsed());
         if let Some(timings) = surface.renderer().last_frame_timings() {
             let span = |name: &str| timings.span(name).map(elapsed_us).unwrap_or_default();
@@ -684,9 +755,11 @@ where
             .vello_last_dirty_count()
             .unwrap_or_default() as u64;
         let phase = crate::Instant::now();
+        trace!("acquire-begin", "");
         let frame = match surface.acquire_status() {
             genet_render_host::SurfaceAcquire::Frame(frame) => frame,
             genet_render_host::SurfaceAcquire::DeviceLost(_) => {
+                trace!("acquire-device-lost", "");
                 // Release this frame's old-device resources before the host
                 // acknowledges detachment and can open the replacement factory.
                 drop(view);
@@ -695,6 +768,7 @@ where
                 return;
             },
             genet_render_host::SurfaceAcquire::SurfaceLost => {
+                trace!("acquire-surface-lost", "");
                 self.s.surface = None;
                 self.s.needs_recovery_surface = true;
                 if let Some(window) = &self.s.window {
@@ -702,13 +776,15 @@ where
                 }
                 return;
             },
-            genet_render_host::SurfaceAcquire::Unavailable { .. } => {
+            genet_render_host::SurfaceAcquire::Unavailable { reason } => {
+                trace!("acquire-unavailable", "{reason}");
                 profile.acquire_us = elapsed_us(phase.elapsed());
                 profile.total_us = elapsed_us(frame_started.elapsed());
                 self.s.last_frame_profile = Some(profile);
                 return;
             },
         };
+        trace!("acquire-end", "");
         profile.acquire_us = elapsed_us(phase.elapsed());
         let target = frame
             .texture
@@ -752,8 +828,10 @@ where
             ph,
             ExternalTexturePlacement::new([0.0, 0.0, pw as f32, ph as f32]),
         );
+        trace!("compose-end", "");
         profile.compose_us = elapsed_us(phase.elapsed());
         if surface.core().device_failure().is_some() {
+            trace!("compose-device-lost", "");
             drop(frame);
             drop(target);
             drop(view);
@@ -763,7 +841,9 @@ where
         }
         // wgpu 30 moved presentation from SurfaceTexture to Queue.
         let phase = crate::Instant::now();
+        trace!("present-begin", "");
         surface.queue().present(frame);
+        trace!("present-end", "");
         profile.present_us = elapsed_us(phase.elapsed());
         let Some(sequence) = self.s.presentation_sequence.checked_add(1) else {
             eprintln!("[cambium-host] presentation sequence exhausted");
@@ -778,6 +858,7 @@ where
             layout_scale: scale,
         };
         self.s.last_redraw_presentation = Some(presented);
+        trace!("presentation-recorded", "sequence={sequence}");
         // Freeze product state before any capture callback, queued pointer
         // dispatch or platform accessibility action can change the product.
         self.observe_presentation(presented);
@@ -974,6 +1055,20 @@ where
         self.s.last_hover_hit = target;
         for (node, phase) in [(old, HoverPhase::Leave), (target, HoverPhase::Enter)] {
             if let Some(node) = node {
+                // A view replacement can retire the cached Leave target; its
+                // handler can also retire the prospective Enter target. Neither
+                // has geometry or an event route in the current document.
+                let live = self
+                    .s
+                    .runner
+                    .as_ref()
+                    .is_some_and(|runner| runner.dom().borrow().is_live(node));
+                if !live {
+                    if self.s.last_hover_hit == Some(node) {
+                        self.s.last_hover_hit = None;
+                    }
+                    continue;
+                }
                 let (local, size) = self.local_in(node);
                 if let Some(runner) = self.s.runner.as_mut() {
                     runner.dispatch_hover(node, HoverEvent::new(phase, local, size));
