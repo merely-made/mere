@@ -4357,6 +4357,18 @@ Freezing records the chosen Resource identities, query spec and source
 revision in a nested graph, as ruled by the existing saved-query lane. Neither
 operation transfers the sender's temporary selection, camera or appearances.
 
+### Resource leaves and embedding
+
+The [family composition draft](../../2026-08-12_family_composition_thesis_brief.md#embedding-in-caller-owned-wgpu-contexts-draft)
+develops Mark's resource-as-leaf idea and the Murm/Gemot, foreign-platform and
+wgpu-host composition questions. A resource leaf is a meaningful unit of
+identity/sharing at the chosen granularity, with independently addressed parts
+when needed. Each access and projected appearance keeps its own identity.
+An authored arrangement may also be shared; resources are not the only
+shareable facts. This is a design reading, not an additional stratum or a
+universal decomposition rule. Rendering leaves and resource leaves are
+distinct senses of the word.
+
 ### Candidates for additional strata
 
 These candidates test the boundary; they do not add new strata:
