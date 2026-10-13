@@ -137,6 +137,15 @@ fn frame_controls_do_not_skin_the_graphs_semantic_hit_targets() {
             &device,
             &states,
         );
+        let save = taproot::matching(
+            surface.dom,
+            &taproot::Selector::role("button").with_attr("data-action", "save"),
+        )[0];
+        assert_eq!(
+            after.computed_style(save, "background-color").as_deref(),
+            Some("rgb(51, 102, 200)"),
+            "primary Save action must retain the neutral frame's Tabard accent"
+        );
         let nodes = surface
             .dom
             .all_with_class(surface.dom.document(), "graph-canvas-swatch-node");

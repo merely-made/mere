@@ -53,7 +53,7 @@
     border-color: var(--workspace-accent);
 }
 .instrument-workspace .workspace-controls button[disabled], .instrument-workspace .cambium-title-bar button[disabled], .instrument-workspace .workspace-pane-actions button[disabled], .instrument-workspace .workspace-controls button[aria-disabled=true], .instrument-workspace .cambium-title-bar button[aria-disabled=true], .instrument-workspace .workspace-pane-actions button[aria-disabled=true] { opacity: .55; }
-.instrument-workspace .primary-button {
+.instrument-workspace button.primary-button {
     color: var(--workspace-accent-ink);
     background: var(--workspace-accent);
     border-color: var(--workspace-accent);
