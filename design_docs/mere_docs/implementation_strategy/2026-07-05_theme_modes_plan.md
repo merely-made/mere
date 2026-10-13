@@ -1150,10 +1150,10 @@ T4 and T5 ride settings passes; T5 last.
 ## Granular font roles — 2026-10-12
 
 **Status:** shared family contract, reusable preference editor and Cleromancy
-macOS adoption qualified and published. Coordinated with
-Knot and Woodshed against Mere `22c0dbc5d`; neither consumer is repinned or
-qualified by this shared publication. No exposed chat identifies the q-pc
-owner, so its remote/unpublished work has not been reconciled.
+macOS adoption qualified and published. Shared authored typography and Pelt
+chrome qualification are recorded below. Knot and Woodshed adoption is in
+progress against the same published Mere `8568f42fd`; their consumer native,
+reopening and publication gates remain open.
 
 ### Contract and done-conditions
 
@@ -1314,3 +1314,81 @@ and expose copied producer identities. Typography styles/controls/mappings are
 unchanged. Combined-source CPU/build/boundary checks are recorded separately;
 this does not invent a native rerun of the merged binary. The renderer owner's
 controlled device-loss receipt retains its own source and acceptance bounds.
+
+
+### Knot and Woodshed adoption — 2026-10-12
+
+**Status:** in progress. Both owners agreed on Mere
+`8568f42fdf57f997274c74e63bd4ee045fe1a2b4`, Genet
+`2c7ef73bfa44c07744e0643e3c6f98be3cbd7947`, Netrender
+`c74b7cb28090c28b1c6d80b08dcdea18aff48d3e`, maintained Classic Vello
+`2eae6243881d5b24c984d5ee35dde509ca5db782` and Dramatis
+`0234e7eea6f2ddf2330a71b9425da01b06ae0391`. Knot starts from published
+`3af93adda472af2913a5d298f14deb10e85daee2`; Woodshed starts from published
+WAV-export baseline `c817e59d7227c94978d60994a81da560e7c1a773`.
+
+#### Phases and done-conditions
+
+1. **Consumer mapping and persistence.** Use the existing five shared roles,
+   `ThemeChoice.fonts`, native inventory and reusable controlled family editor.
+   Preserve ordered requests through theme/mode changes and workshop Apply.
+   Include valid bundled faces in inventory. Map optional authored
+   `Theme.typography` family/size/leading onto supported consumer surfaces;
+   omitted fields preserve host defaults. Done when staged selection, explicit
+   Apply/Default, missing requests, failed-save rollback and serialized reopening
+   pass, with authored declaration precedence tested. Knot's explicit writer
+   face/size/measure remains authoritative.
+2. **Measured presentation and dynamics.** Resolve typography before measuring
+   the actual consumer surfaces. Invalidate affected metric/geometry caches and
+   reconcile hit targets before dependent dynamics continue. Done when tests
+   prove painted labels and measurement probes use the same effective font,
+   geometry responds to role changes, and retained positions/content remain
+   unchanged. Unsupported canvas size/leading seams must be disclosed; the
+   workshop preview alone does not qualify downstream metrics.
+3. **Serialized native acceptance.** Knot owns the first native/GPU reservation;
+   Woodshed performs independent CPU/source work until explicit cleanup release.
+   Freeze source, supplier closure, binary hash and fixture before each finite
+   process. Done when the real shared picker, application/theme precedence,
+   missing/reset behavior, responsive presentation and fresh-process persistence
+   have reviewed captures and an exact committed-source receipt. Retain failed
+   attempts and known supplier exclusions separately. Woodshed's concurrently
+   authorized capture-compression work must reconcile its final source freeze;
+   a changed runtime requires its own native evidence.
+4. **Publication and Mere intake.** Each consumer owns its plan, receipt and
+   main push. Verify remote publication and distinguish qualified runtime from
+   later documentation commits. Mere's coordinator then updates the coherent
+   Knot editor/document/Djinn site revision and checks the embedded closure.
+   Done when immutable pins resolve and the bounded host checks pass, with the
+   shared plan/index recording actual consumer evidence and open gates.
+
+#### Findings and progress
+
+- **2026-10-12:** Current shared source exposes one `FontRole` enum for both
+  portable application family preferences and authored theme typography. Theme
+  values may provide family, size and leading; application preferences provide
+  family overrides. Emit application variables after theme variables while
+  preserving the ordinary authority of explicit authored declarations.
+- **2026-10-12:** The committed Pelt typography verifier passes: three processes,
+  162 presentations and 21 retained captures. This is read-only receipt
+  validation; it neither reruns Pelt nor qualifies either consumer.
+- **2026-10-12:** Knot's owner explicitly bounds this slice to family mapping.
+  Preview size/leading/measure and heading hierarchy keep their existing host
+  controls; occurrence labels keep host 13 px/600 and their existing line-box
+  pattern. Typed theme size/leading remain retained in the theme/workshop but
+  are not consumed by new Knot role controls. Exact authored CSS keeps ordinary
+  cascade authority. Label geometry fingerprints record advances/line boxes,
+  rather than resolved-face identity; equal geometry does not force a reset.
+- **2026-10-12:** Woodshed's owners agreed to qualify and publish font adoption
+  first; compression then rebases onto that family and freezes independently.
+- **2026-10-12:** Knot's implementation review identified theme-variable ordering
+  and an occurrence-button rule that could diverge painted fonts from metric
+  probes. Both remain pre-qualification corrections owned by Knot. Woodshed
+  preserves the accepted WAV export and independent port ownership while
+  coordinating its font and compression branches.
+
+The existing supplier table failure, GPU ignore and prior arrangement golden
+remain separately identified baseline debt. Family availability does not prove
+per-glyph coverage, exact remote face identity, physical IME or OS accessibility.
+Woodshed's recorded-loop glyph gate remains open without actual fallback/paint
+proof. Native acceptance, persistence, publication and embedded Mere intake are
+separate completion claims.
