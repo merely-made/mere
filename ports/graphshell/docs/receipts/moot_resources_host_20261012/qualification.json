@@ -8,7 +8,9 @@
     "current_main_tests": 8,
     "clippy_current_main": "passed with inherited warnings; selected actual port library",
     "default_web_wasm_current_main": "passed --locked --offline in10.07 seconds",
-    "doc_delta": "No new source/subject finding identities compared with published3b76; inherited audit findings retained"
+    "doc_delta": "No new source/subject finding identities compared with published3b76; inherited audit findings retained",
+    "post_published_merge_tests": 8,
+    "post_published_merge_default_web_wasm": "passed --locked --offline in2.02sec"
   },
   "native": {
     "executed": true,
@@ -77,5 +79,6 @@
     "shared_crate_to_port_edges": []
   },
   "graphshell_web_wasm": "passed",
-  "clippy": "selected actual port library completed with2 inherited warnings; no warning in new mount module"
+  "clippy": "selected actual port library completed with2 inherited warnings; no warning in new mount module",
+  "post_published_merge": "4cafaf77d includes published39bbbeb2a; Knot-only supplier pins outside selected native proof; no runtime host/owner path change"
 }

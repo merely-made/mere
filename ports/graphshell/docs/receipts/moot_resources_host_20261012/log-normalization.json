@@ -70,5 +70,17 @@
     "raw_sha256": "05588e94e8404570e9eb30aeb725b514f262e6558b328d154e877e179bff9f50",
     "normalized_sha256": "011b5bf9c80eea3b14b87ab8c2d7d56857ae5f07561ae7fdbd2513c9d4a06020",
     "normalization": "Trailing whitespace/EOF and literal tabs normalized; raw originals remain in external runtime/check output"
+  },
+  {
+    "file": "checks/web-published-merge.log",
+    "raw_sha256": "e64d24058289ebdc4cad3b31debde96d8447957760033b255dde53c1489d1f6b",
+    "normalized_sha256": "6d6f1d217a0cb48bf78af6c1d77119badcb2bfa13f3d858040c6b95684fe3dc7",
+    "normalization": "Trailing whitespace/EOF and tabs normalized in stored copy; raw external log preserved"
+  },
+  {
+    "file": "checks/host-tests-published-merge.log",
+    "raw_sha256": "408293818c925d1e72b09084ec89a54b2e112912129e2b4f040bef110c0a4002",
+    "normalized_sha256": "d55db0673ebd259f24297681a40ef90854539fab5877cfee69105e70b7a2f54d",
+    "normalization": "Trailing whitespace/EOF and tabs normalized in stored copy; raw external log preserved"
   }
 ]

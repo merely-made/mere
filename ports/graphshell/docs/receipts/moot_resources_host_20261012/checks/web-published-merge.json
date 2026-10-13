@@ -1,0 +1,26 @@
+{
+  "command": [
+    "cargo",
+    "check",
+    "--locked",
+    "--offline",
+    "-p",
+    "graphshell",
+    "--no-default-features",
+    "--features",
+    "web",
+    "--target",
+    "wasm32-unknown-unknown",
+    "--lib",
+    "-j1"
+  ],
+  "repo": "/Users/markik/Code/worktrees/mere-moot-capsule-proof",
+  "target": "/Users/markik/Code/targets/mere-s2s3",
+  "exit_code": 0,
+  "seconds": 2.02,
+  "guard": null,
+  "min_free_bytes": 43763707904,
+  "cargo_jobs": 1,
+  "gpu_executed": false,
+  "headed_executed": false
+}
