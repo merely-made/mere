@@ -106,7 +106,53 @@ fn authored_font_lists_retain_the_hosts_admitted_interface_fallback() {
                 let family = plane.computed_style(node, "font-family").unwrap();
                 let faces: Vec<_> = family.split(',').map(str::trim).collect();
                 assert_eq!(faces.first().copied(), Some(authored));
-                assert!(faces.contains(&"Roboto"), "admitted fallback lost: {family}");
+                assert!(
+                    faces.contains(&"Roboto"),
+                    "admitted fallback lost: {family}"
+                );
+            }
+        }
+    });
+}
+
+#[test]
+fn frame_controls_do_not_skin_the_graphs_semantic_hit_targets() {
+    use genet_livery::{Device, InteractionStates, StyleSet, resolve_styles};
+    let mut host = host();
+    host.layout_at(1280., 1000.);
+    host.with_surfaces(|surfaces| {
+        let surface = &surfaces[0];
+        let domain_only = surface.sheet.replace(cambium::INSTRUMENT_CSS, "");
+        let device = Device::screen(surface.rect[2], surface.rect[3]);
+        let states = InteractionStates::default();
+        let before = resolve_styles(
+            surface.dom,
+            &StyleSet::cambium(&[&domain_only]),
+            &device,
+            &states,
+        );
+        let after = resolve_styles(
+            surface.dom,
+            &StyleSet::cambium(&[surface.sheet]),
+            &device,
+            &states,
+        );
+        let nodes = surface
+            .dom
+            .all_with_class(surface.dom.document(), "graph-canvas-swatch-node");
+        assert_eq!(nodes.len(), 3, "real production graph targets");
+        for node in nodes {
+            for property in [
+                "background-color",
+                "border-radius",
+                "padding-top",
+                "min-height",
+            ] {
+                assert_eq!(
+                    after.computed_style(node, property),
+                    before.computed_style(node, property),
+                    "frame style must leave graph target {property} to the graph"
+                );
             }
         }
     });
