@@ -1,5 +1,7 @@
 # Mere Documentation Index
 
+Embedding draft and terminology refresh (2026-10-13): the [family composition continuation](2026-08-12_family_composition_thesis_brief.md#embedding-in-caller-owned-wgpu-contexts-draft) records resource leaves, Murm/Gemot exchange, foreign-platform intake and caller-owned wgpu hosting, with egui/Iced as proposed qualification hosts. The [terminology reference](TERMINOLOGY.md) now describes current platform engines, readers, surface producers, native Pelt/Genet ownership, Fleece and the scene family. Generic toolkit integration remains a draft target.
+
 Graph vocabulary draft (2026-10-13): the [graph semantics continuation](mere_docs/implementation_strategy/2026-10-04_graph_semantics_plan.md#7-strata-and-query-driven-views-draft) and [terminology reference](TERMINOLOGY.md) develop links within strata, edges across strata, saved tagging views and admission criteria for additional strata. Resource/Surface remains the implemented pair; tags retain Resource identity. The first read-only tagging/query view is a proposed implementation target.
 
 Native retained content (2026-10-13): the [one-tree plan](mere_docs/implementation_strategy/2026-09-25_graphshell_one_tree_plan.md#native-retained-content-continuation--2026-10-13) records Pelt/Genet mounting, shared selected-clip presentation and Turnstone adoption. The [suite census](2026-08-22_turnstone_suite_composition_and_capability_census.md) records Mark's revised native-stack composition ruling.
@@ -807,6 +809,8 @@ is historical evidence, not the current path or ownership inventory. For the wor
 [`2026-05-24_external_deps_topology_brief.md`](2026-05-24_external_deps_topology_brief.md).
 
 ## Working principles
+
+- **Embedding qualification (2026-10-13):** qualify caller-owned Device/Queue, render targets and submission together with input, focus, IME, accessibility and lifecycle. Windowing-neutral presentation and a wgpu backend supply useful seams; general toolkit embedding needs a consumer proof through the host's public hooks. See the [embedding draft](2026-08-12_family_composition_thesis_brief.md#embedding-in-caller-owned-wgpu-contexts-draft).
 
 - **Eidetic development (2026-10-11):** preserve individual encounters and source-scoped parent references while deduplicating resources; keep observed, captured and computed relationship evidence distinct. Selectively replicate portable collections with their required material and meaningful relationships, qualified in receiving meres with source apps stopped. Review Chartulary/Stemma, Pandect, Inker, Fleece and ESP together through their actual consumers. Dependency capabilities, feature costs and target support are part of each phase, with migrations kept in their existing owner plans. See the [development plan](eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md).
 
