@@ -716,6 +716,25 @@ where
         on_key(host, window)
     );
 
+    // A Tab tap must leave held-Tab spatial navigation. Own these listeners
+    // in the same phase-admitted lifetime as keydown, including the mirror
+    // that receives keyboard focus after accessibility routing.
+    let key_targets: [&web_sys::EventTarget; 2] = [canvas.as_ref(), root.as_ref()];
+    for target in key_targets {
+        let h = host.clone();
+        let release_lifetime = lifetime.clone();
+        let release =
+            Closure::<dyn FnMut(web_sys::KeyboardEvent)>::new(move |e: web_sys::KeyboardEvent| {
+                if !release_lifetime.admitted() {
+                    return;
+                }
+                let key = key_press_from_dom(&e).key;
+                h.borrow_mut().key_released(&key);
+            });
+        let callback = release.as_ref().clone();
+        lifetime.listen(target, "keyup", &callback, move || drop(release))?;
+    }
+
     let targets: [&web_sys::EventTarget; 2] = [canvas.as_ref(), root.as_ref()];
     for target in targets {
         for (name, kind) in [

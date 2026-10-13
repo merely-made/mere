@@ -280,12 +280,123 @@ fn focus_attribute(host: &mut Application, attribute: &str, value: &str) -> Resu
                 return Ok(());
             }
         }
-        host.key(&KeyPress::named(NamedKey::Tab));
+        let tab = KeyPress::named(NamedKey::Tab);
+        host.key(&tab);
+        host.key_released(&tab.key);
     }
     Err(format!(
         "production focus target {attribute}={value} not reached"
     ))
 }
+/// Synthetic DOM adapter control: actual owned canvas/mirror listeners receive
+/// keyup, with no claim to physical OS keyboard or assistive-technology input.
+fn tab_release_controls(
+    mount: &Mounted<WorkshopState, Logic, WorkshopView>,
+) -> Result<Value, String> {
+    let canvas = mount.window().canvas();
+    // The mirror belongs to this canvas: never use a page-global first match
+    // when two independent hosts have otherwise identical mirror attributes.
+    let mut sibling = canvas.next_sibling();
+    let mut mirror = None;
+    while let Some(node) = sibling {
+        if node.dyn_ref::<HtmlCanvasElement>().is_some() {
+            break;
+        }
+        if let Some(element) = node.dyn_ref::<web_sys::Element>() {
+            if element.has_attribute("data-cambium-mirror") {
+                mirror = Some(element.clone());
+                break;
+            }
+        }
+        sibling = node.next_sibling();
+    }
+    let mirror = mirror.ok_or("own canvas accessibility mirror unavailable")?;
+    let targets: [(&str, &web_sys::EventTarget); 2] =
+        [("canvas", canvas.as_ref()), ("mirror", mirror.as_ref())];
+    let constructor = js_sys::Reflect::get(&js_sys::global(), &JsValue::from_str("KeyboardEvent"))
+        .map_err(|e| format!("KeyboardEvent constructor: {e:?}"))?
+        .dyn_into::<js_sys::Function>()
+        .map_err(|_| "KeyboardEvent constructor unavailable")?;
+    let mut controls = Vec::new();
+    for (name, target) in targets {
+        let (prior_focus, authority) = {
+            let mut host = mount.host().borrow_mut();
+            let prior_focus = host.s.runner.as_ref().ok_or("runner")?.focus();
+            let authority = host
+                .s
+                .runner
+                .as_ref()
+                .ok_or("runner")?
+                .state()
+                .draft_theme()
+                .clone();
+            host.key(&KeyPress::named(NamedKey::Tab));
+            if !host.s.tab_held {
+                return Err("real Tab press failed to engage held navigation".into());
+            }
+            (prior_focus, authority)
+        };
+        let pressed_focus = mount
+            .host()
+            .borrow()
+            .s
+            .runner
+            .as_ref()
+            .ok_or("runner")?
+            .focus();
+        let init = js_sys::Object::new();
+        for (key, value) in [
+            ("key", JsValue::from_str("Tab")),
+            ("bubbles", JsValue::TRUE),
+            ("cancelable", JsValue::TRUE),
+        ] {
+            js_sys::Reflect::set(&init, &JsValue::from_str(key), &value)
+                .map_err(|e| format!("KeyboardEvent init: {e:?}"))?;
+        }
+        let args = js_sys::Array::new();
+        args.push(&JsValue::from_str("keyup"));
+        args.push(&init);
+        let event = js_sys::Reflect::construct(&constructor, &args)
+            .map_err(|e| format!("KeyboardEvent construction: {e:?}"))?
+            .dyn_into::<web_sys::KeyboardEvent>()
+            .map_err(|_| "constructed keyup event has wrong type")?;
+        if event.key() != "Tab" {
+            return Err("synthetic keyup lost its actual Tab key".into());
+        }
+        target
+            .dispatch_event(&event)
+            .map_err(|e| format!("owned {name} keyup dispatch: {e:?}"))?;
+        {
+            let mut host = mount.host().borrow_mut();
+            let runner = host.s.runner.as_ref().ok_or("runner")?;
+            if host.s.tab_held
+                || runner.focus() != pressed_focus
+                || runner.state().draft_theme() != &authority
+            {
+                return Err(format!(
+                    "owned {name} keyup failed to release Tab or changed focus/application authority"
+                ));
+            }
+            // Return through real reverse traversal, without setting focus.
+            let reverse =
+                KeyPress::named(NamedKey::Tab).with_modifiers(cambium_rootstock::Modifiers {
+                    shift: true,
+                    ..cambium_rootstock::Modifiers::NONE
+                });
+            host.key(&reverse);
+            host.key_released(&reverse.key);
+            if host.s.runner.as_ref().ok_or("runner")?.focus() != prior_focus {
+                return Err("synthetic keyup control failed to preserve original focus".into());
+            }
+        }
+        controls.push(json!({"target":name,"event":"synthetic DOM keyup Tab","tab_release_verified":true,
+            "focus_unchanged_by_release":true,"original_focus_restored_by_reverse_tab":true,"application_authority_preserved":true}));
+    }
+    Ok(
+        json!({"scope":"synthetic DOM adapter control; not OS keyboard or OS assistive technology","controls":controls}),
+    )
+}
+
 fn presentation(p: PresentedFrame) -> Value {
     json!({"host":p.host,"sequence":p.sequence,"width":p.width,"height":p.height,"layout_scale":p.layout_scale})
 }
@@ -931,6 +1042,7 @@ async fn execute(first_id: &str, second_id: &str, run: &str) -> Result<Value, St
         .collect();
     let full_producers = full_producers?;
     phase(run, "continued_input_resize");
+    let tab_release = tab_release_controls(&mounts[0])?;
     let before_input = mounts[0]
         .host()
         .borrow()
@@ -948,21 +1060,32 @@ async fn execute(first_id: &str, second_id: &str, run: &str) -> Result<Value, St
         host.key(&KeyPress::named(NamedKey::ArrowRight));
     }
     let after_input = capture(&mounts[0]).await?;
-    if mounts[0]
-        .host()
-        .borrow()
-        .s
-        .runner
-        .as_ref()
-        .ok_or("runner")?
-        .state()
-        .draft_theme()
-        .seeds
-        .primary
-        == before_input
-        || digest(&after_input.frame) == digest(&first_after.frame)
-    {
-        return Err("post-recovery input did not change real Workshop state/pixels".into());
+    let (after_primary, tab_held, focused) = {
+        let host = mounts[0].host().borrow();
+        let runner = host.s.runner.as_ref().ok_or("runner")?;
+        let focus = runner.focus();
+        let dom = runner.dom();
+        let dom = dom.borrow();
+        let attr = |name: &str| {
+            focus
+                .and_then(|node| dom.attribute(node, &Namespace::from(""), &LocalName::from(name)))
+                .map(|value| value.chars().take(128).collect::<String>())
+        };
+        (
+            runner.state().draft_theme().seeds.primary,
+            host.s.tab_held,
+            json!({"node":format!("{focus:?}"),"role":attr("role"),"label":attr("aria-label")}),
+        )
+    };
+    let before_pixel_hash = digest(&first_after.frame);
+    let after_pixel_hash = digest(&after_input.frame);
+    let input_diagnostic = json!({"tab_held":tab_held,"focus":focused,
+        "before_primary":before_input,"after_primary":after_primary,
+        "before_full_pixel_sha256":before_pixel_hash,"after_full_pixel_sha256":after_pixel_hash});
+    if after_primary == before_input || after_pixel_hash == before_pixel_hash {
+        return Err(format!(
+            "post-recovery input did not change real Workshop state/pixels; diagnostics={input_diagnostic}"
+        ));
     }
     size(mounts[0].window().canvas(), 960, 780)?;
     let resized = capture(&mounts[0]).await?;
@@ -975,7 +1098,7 @@ async fn execute(first_id: &str, second_id: &str, run: &str) -> Result<Value, St
         return Err("loss callback refusal was replayed after recovery".into());
     }
     let receipt = json!({"status":"pass","run":run,"elapsed_ms":now()?-started,
-        "cancellation_controls":cancellation,
+        "cancellation_controls":cancellation,"tab_release_controls":tab_release,
         "scope":"two actual full Workshop mounts, identical local keys, hidden second host, controlled owned Device.destroy; same-canvas queue presentation and complete presented/source RGBA under unchanged limits; compositor visibility requires separate browser review",
         "current_frame_async_quality_qualified":false,"current_frame_async_error_scopes_qualified":false,
         "physical_driver_reset":false,"os_accessibility_actions":false,"factory_count_inferred":false,
