@@ -71,6 +71,14 @@ preserves the persona master. The live agent signed and verified a challenge;
 an absent agent refused it with exit 2. No plaintext user SSH private-key
 file was created on the Surface.
 
+At the later checkpoint the Surface was Locked. Its still-running agent
+refused a signing challenge with exit 1, and the generation command returned
+`identity pending: the identity is locked` with exit 2. No manual lock was
+introduced for this check. The resident remains Locked pending the owner's
+next native unlock; memory while Locked was about 37 MiB. This qualifies the
+signing and generation boundaries, while a Locked SSH login against Windows
+still awaits that server's startup.
+
 Windows → Surface executed `id -un` and `hostname` through a side-by-side
 Djinn agent, with `IdentityFile=none`. It authenticated using an agent-held
 public key. The Windows receipt resident uses isolated settings, data and
