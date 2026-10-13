@@ -1,7 +1,7 @@
 # Graphshell on one Cambium tree
 
 **Date:** 2026-09-25
-**Status (2026-10-10):** in progress. The combined viewer qualified at `8b8bd92b1`
+**Status (2026-10-12):** in progress. The combined viewer qualified at `8b8bd92b1`
 integrates published Mere `0a3203f05`, Genet `7422e906`, maintained Vello
 `10f01d6d`, and the committed site cutover `bf626abd2`. Phases 1–2 are landed; phase 3 has its recorded headed producer
 receipts and Mark's approval to proceed. Phase 4 remains unfinished: canvas
@@ -38,6 +38,11 @@ renewed. Renderer and directly recorded hosted-viewer inputs are unchanged;
 the headed receipts retain their exact `8b8bd92b1` source and tested bundle.
 The post-Dramatis bundle is compile-checked, with no new GPU run after slot
 release.
+**First site presenter (2026-10-12):** the stable-face adjacent inspector,
+Fold-preserved selection and direct graph commands/gestures are hardware-qualified
+at `a1cb156f8`, with all nineteen combined product rows passing. Shared-main
+publication is authorized and pending the final evidence commit; live-site
+delivery and complete phase 4 remain open. The detailed source bases are below.
 **Scope:** Graphshell's browser page becomes one retained Cambium tree. Its
 HTML controls become Cambium components, its display-only Cambium chrome
 joins them, pictograph's canvas renders into the tree as a texture producer,
@@ -1082,6 +1087,102 @@ gate separately from shared presenter landing. The browser slot is released
 while the console remains locked; no owned browser, server, build or inhibitor
 is left running. The feature branch is reviewable; main integration awaits
 the remaining hardware checks.
+
+
+**Field-runtime main reconciliation (2026-10-12 evening):** Mark authorized
+push/merge after the state overview. Published Mere `8568f42fd` adds F203–F205
+field clocks, extent/selector membership and actor delivery. It merges cleanly
+at `abaed67c1`, preserving the presenter, Fold, wheel and accessibility repairs.
+The renewed batch covers the 68 focused Graphshell cases plus four actual
+Canvas field-runtime integration cases, then viewer/product debug builds and
+main-page checking. All 72 CPU cases and three Wasm gates pass on this combined source; both
+fresh debug packages are ready. The earlier source-bound runtime results remain
+unchanged. The console is now unlocked and the lane has requested a fresh
+serialized browser window; final physical browser checks remain unexecuted. Main landing keeps the requested
+browser acceptance condition. The last release-size measurement remains bound
+to `8ad44a5c7`; it is not transferred to the new field-runtime source.
+
+
+**Renewed presenter and command acceptance (2026-10-12 evening):** the finite
+hardware window ran on compiled `77374c788`, with current main `8568f42fd`
+and the coordinated supplier family unchanged. The command footer exposed a
+real browser-mirror naming defect: options supplied their names as parent text
+beside the same child text. `1fc5f9bc1` names the option and its disabled reason;
+`77374c788` lowers `ListBoxOption` names through `aria-label`. A real retained-DOM
+regression verifies exact name, description/disabled state, no duplicated parent
+text and preserved child/source structure. Eleven mirror CPU tests and all
+three Wasm gates pass. The earlier 72 model/Canvas tests retain their
+`abaed67c1` basis; their directly covered source is unchanged by these two
+accessibility-only repairs (83 CPU cases across the recorded inputs).
+
+Same-bundle `commands-browser-r10` passes fixture/grouped commands and Fold
+page/history checks. `commands-browser-r12` completes the physical/embedding
+batch on AMD `gcn-5`, with zero page errors: actual Ctrl+K/Shift+F10 and footer
+keys; external page focus preservation; right click/right-box selection;
+background pan; pointer-anchored wheel zoom; node drag; precise workspace Fold
+commands; kept-command and narrow-popup access; real zoom/page/outside scrolling;
+Chrome's exact option name, disabled reason and state; unknown-wheel refusal;
+and the expected planted wheel-control failure. Earlier failures are retained.
+The harness used quiescence `wait` where it needed a fixed physical observation
+window; `settle 180` corrects that timing. Its shortened Enter query selected the
+outer mere Fold; the restored exact inner workspace target keeps the original
+nine-node assertion. Neither correction lowers an assertion or changes source.
+
+`presenter-browser-r9` renews all eleven presenter cases on the same frozen
+source/package, with zero page errors. Reviewed final captures cover the plain
+22-project page, wide/narrow inspector, independent related inspection and
+wide/narrow command menus. The window was released before its 01:29:35 UTC
+limit with no owned browser/GPU/server/build/inhibitor left active. The remaining
+hardware gate is the nineteen-scenario saved-product/fresh-profile same-origin
+matrix, queued for a separate explicitly coordinated window. Main landing
+remains pending that gate. R157's unchanged delivery cap independently blocks
+live-site cutover; the latest recorded release measurement remains tied to
+`8ad44a5c7`, rather than being transferred to this source. The runtime coordinator
+confirmed this shared-main versus live-delivery distinction.
+
+**Final presenter qualification and retired-hover repair (2026-10-12):**
+compiled `a1cb156f8` combines current main `8568f42fd` with the shared browser
+name/focus repairs and a narrow Rootstock lifecycle correction. The product
+run exposed a cached hover target retired by a Forme subtree replacement.
+The complete primary stack is pointer movement → hover dispatch → local
+coordinates → Genet lookup of the retired node; subsequent frame borrow
+errors are a cascade after the Wasm abort. This is reproduced by the CPU
+regression before the fix. Leave/Enter dispatch now rejects retired targets
+before coordinate lookup, including a target retired by the preceding Leave
+handler. Genet's strict lookup remains unchanged. Four lifecycle cases pass,
+including Move replacing its own subtree; the test-only descendant is
+`a4f09a372`. Two host accessibility/focus tests and all three Wasm gates pass
+on the repaired runtime. Together with the earlier unchanged model/Canvas and
+mirror bases, 89 CPU cases pass across the explicitly recorded sources; this
+is not one newly executed full suite on HEAD.
+
+The final frozen viewer passes all eleven `presenter-browser-r10` cases and
+all 24 command/scenario/setup/physical/embedding rows in
+`commands-browser-r13`, including the expected planted faults. Both run headed
+Chrome 152 on AMD `gcn-5`, with zero page errors. The original nineteen-row
+product matrix also passes, recorded by `product-matrix.json`: twelve rows in
+r6, dynamics and coupling pairs in r7, the ladder pair in r8, and the actual
+Title-focus Ctrl+K/Escape case in r10. Each logical pair uses a fresh profile;
+the Forme four-row sequence and each reopen pair retain their own origin.
+All accepted runs have zero page errors. Original scenario assertions remain
+unchanged. Failed setup receipts are kept: the dynamics overlay requires its
+accepted 615×608 viewport; the ladder requires actual Play activation before
+its original Pause step on the intentionally paused seed; and the custom
+shortcut check now compares the real mirrored Title values across physical
+keys, rather than an unavailable cross-run scenario checkpoint or native-input
+API. Exact source/package/driver hashes bind each continuation.
+
+Reviewed captures show the plain 22-project page, wide/narrow inspector,
+independent related inspection, menus and product reading/editing controls.
+The existing small graph glyphs stay stable; this bounded presenter does not
+claim final overview typography, automatic LOD or large-graph performance.
+The source-bound receipt now qualifies shared-main publication. All owned
+Chrome, HTTP and inhibitor resources were closed and explicitly released at
+02:37:55 UTC, before the agreed 02:42:45 UTC cutoff. Current main publication
+is recorded after the push. Live-site deployment, R157's unchanged size cap,
+native/touch qualification and complete one-tree phase 4 remain separate.
+The latest release measurement stays bound to `8ad44a5c7`; no new release size
+is inferred from these debug packages.
 
 ## 5. Stop rules
 

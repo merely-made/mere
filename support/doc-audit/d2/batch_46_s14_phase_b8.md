@@ -448,3 +448,47 @@ The combined source renews all 68 focused CPU tests, three Wasm gates and both
 locked supplier audits. Its release Wasm is measured at 6,398,022 B gzip;
 the unchanged 3,407,872 B live-site cap remains failed. Compiled/debug/release
 and earlier hardware bases are kept distinct in the updated qualification.
+
+
+### Presenter field-runtime reconciliation, 2026-10-12 evening
+
+The new continuation records Mark's push/merge authorization, clean integration
+of current main `8568f42fd` at `abaed67c1`, and the affected model/Canvas/Wasm
+renewal. It retains earlier browser and release measurements at their recorded
+sources; it does not waive the final hardware acceptance condition or claim a
+main landing while the console remains locked. Gate outcomes will be amended
+only after the prepared batch completes. No whole-document census is repeated.
+
+The renewal passes 72 CPU cases and all three Wasm gates. Both fresh packages
+are source-bound to `abaed67c1`. Console unlock is now observed, with an
+explicit fresh runtime handoff requested before launching the browser. This
+readiness does not replace the pending hardware qualification.
+
+
+### Presenter and command hardware renewal, 2026-10-12 evening
+
+The continuation records the actual listbox-name defect and its narrow shared
+mirror repair, eleven new/current mirror tests, renewed Wasm packages, and the
+separate unchanged-model 72-test basis. Same-package r10/r12 command and r9
+presenter evidence is explicitly attributed to compiled `77374c788` and AMD
+gcn-5. The quiescence/fixed-frame and outer/inner Fold harness corrections retain
+their failed receipts and original assertions. Capture review, zero page errors,
+expected planted control and early resource release are recorded. The nineteen
+saved-product scenarios remain a distinct queued gate; shared-main landing and
+live delivery are not conflated. This is an incremental review, not a new
+whole-document census or a complete phase-4 claim.
+
+
+### Final presenter lifecycle and browser qualification, 2026-10-12
+
+The incremental continuation records the primary retired-hover crash, its
+pre-fix CPU reproduction and narrow current-DOM guard, without weakening Genet
+lookup or classifying the subsequent borrow cascade as an independent fault.
+The current 89-case total is split across explicit model, mirror, host and
+test-only source bases. The final frozen runtime passes eleven presenter cases,
+24 command/setup/physical/embedding rows and the nineteen-row product matrix.
+Viewport, paused-seed and cross-run/native-input harness misses retain their
+failed receipts and unchanged original scenario assertions. Captures and the
+early explicit resource release are source-bound. Shared-main publication is
+qualified; live delivery, unchanged size cap, native/touch and full phase 4
+remain separate. This addendum does not repeat a whole-document claim census.
