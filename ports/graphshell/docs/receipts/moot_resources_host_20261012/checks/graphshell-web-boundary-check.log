@@ -1,0 +1,556 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+    Checking serde_core v1.0.229
+    Checking serde v1.0.229
+    Checking cfg-if v1.0.5
+    Checking once_cell v1.21.4
+    Checking unicode-ident v1.0.26
+    Checking wasm-bindgen-shared v0.2.129
+    Checking wasm-bindgen v0.2.129
+    Checking smallvec v1.16.1
+    Checking rand_core v0.10.1
+    Checking getrandom v0.4.3
+    Checking libm v0.2.16
+    Checking arrayvec v0.7.8
+    Checking num-traits v0.2.19
+    Checking foldhash v0.2.0
+    Checking stable_deref_trait v1.2.1
+    Checking bytemuck v1.25.2
+    Checking itoa v1.0.18
+    Checking hashbrown v0.17.1
+    Checking equivalent v1.0.2
+    Checking pin-project-lite v0.2.17
+    Checking zerofrom v0.1.8
+    Checking yoke v0.8.3
+    Checking typenum v1.20.1
+    Checking memchr v2.8.3
+    Checking zerovec v0.11.8
+    Checking zmij v1.0.23
+    Checking indexmap v2.14.2
+    Checking serde_json v1.0.151
+    Checking writeable v0.6.4
+    Checking log v0.4.34
+    Checking uuid-rng-internal v1.27.0
+    Checking slab v0.4.12
+    Checking scopeguard v1.2.0
+    Checking sha1_smol v1.0.1
+    Checking uuid v1.27.0
+    Checking tinystr v0.8.4
+    Checking euclid v0.22.14
+    Checking litemap v0.8.3
+    Checking icu_locale_core v2.3.0
+    Checking parking_lot_core v0.9.12
+    Checking lock_api v0.4.14
+    Checking potential_utf v0.1.6
+    Checking zerotrie v0.2.5
+    Checking hybrid-array v0.4.15
+    Checking futures-core v0.3.34
+    Checking icu_provider v2.3.1
+    Checking parking_lot v0.12.5
+    Checking futures-task v0.3.34
+    Checking bitflags v2.13.2
+    Checking utf8_iter v1.0.4
+    Checking icu_collections v2.3.0
+    Checking futures-util v0.3.34
+   Compiling icu_properties_data v2.3.0
+    Checking js-sys v0.3.106
+    Checking thiserror v2.0.21
+    Checking crypto-common v0.2.2
+   Compiling icu_normalizer_data v2.3.0
+    Checking siphasher v1.0.3
+    Checking phf_shared v0.13.1
+    Checking icu_properties v2.3.0
+    Checking tracing-core v0.1.36
+    Checking serde_bytes v0.11.19
+    Checking linebender_resource_handle v0.1.1
+    Checking icu_normalizer v2.3.0
+    Checking block-buffer v0.12.1
+    Checking tracing v0.1.44
+    Checking phf v0.13.1
+    Checking new_debug_unreachable v1.0.6
+    Checking byteorder v1.5.0
+    Checking constant_time_eq v0.4.2
+    Checking precomputed-hash v0.1.1
+    Checking static_assertions v1.1.0
+    Checking const-oid v0.10.2
+    Checking simd-adler32 v0.3.10
+    Checking digest v0.11.3
+    Checking string_cache v0.9.0
+    Checking blake3 v1.8.7
+    Checking profiling v1.0.18
+    Checking accesskit v0.24.1
+    Checking web-sys v0.3.106
+    Checking font-types v0.12.5
+    Checking polycool v0.4.0
+    Checking foldhash v0.1.5
+    Checking adler2 v2.0.1
+    Checking rustc-hash v1.1.0
+    Checking raw-window-handle v0.6.2
+    Checking naga-types v30.0.1
+    Checking hashbrown v0.15.5
+    Checking kurbo v0.13.1
+    Checking read-fonts v0.41.0
+    Checking web_atoms v0.2.6
+    Checking tendril v0.5.1
+    Checking idna_adapter v1.2.2
+    Checking wasm-bindgen-futures v0.4.79
+    Checking web-time v1.1.0
+    Checking color v0.3.3
+    Checking svg_fmt v0.4.5
+    Checking percent-encoding v2.3.2
+    Checking fixedbitset v0.5.7
+    Checking petgraph v0.8.3
+    Checking form_urlencoded v1.2.2
+    Checking guillotiere v0.7.0
+    Checking peniko v0.6.1
+    Checking idna v1.1.0
+    Checking markup5ever v0.39.0
+    Checking skrifa v0.44.0
+    Checking crc32fast v1.5.2
+    Checking wgpu-types v30.0.1
+    Checking miniz_oxide v0.9.1
+    Checking sha2 v0.11.0
+    Checking allocator-api2 v0.2.21
+    Checking hashbrown v0.16.1
+    Checking ptr_meta v0.3.2
+    Checking flate2 v1.1.10
+   Compiling vello_shaders v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+    Checking wgpu v30.0.1
+    Checking vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+    Checking url v2.5.8
+    Checking miniz_oxide v0.8.9
+    Checking fdeflate v0.3.7
+    Checking sceno v0.0.4 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/cambium/scenes/sceno)
+    Checking font-types v0.11.3
+   Compiling icu_locale_fallback_data v2.3.0
+    Checking read-fonts v0.39.2
+    Checking png v0.18.1
+    Checking slotmap v1.1.1
+    Checking rancor v0.1.3
+    Checking hash32 v0.2.1
+    Checking futures-intrusive v0.5.0
+    Checking paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+    Checking simdutf8 v0.1.5
+   Compiling icu_segmenter_data v2.3.0
+    Checking bytecheck v0.8.3
+    Checking netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+    Checking heapless v0.7.17
+    Checking layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+    Checking cobs v0.3.0
+    Checking mere-curation v0.1.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/forme/curation)
+    Checking munge v0.4.7
+    Checking postcard v1.1.3
+    Checking icu_locale_fallback v2.3.0
+    Checking rend v0.5.4
+    Checking app_units v0.7.8
+    Checking approx v0.5.1
+    Checking command-menu v0.1.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/cambium/command-menu)
+    Checking dtoa v1.0.11
+    Checking grid v1.0.1
+    Checking parlance v0.1.0
+    Checking memmap2 v0.9.11
+    Checking genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+    Checking taffy v0.11.0-experimental-cache-fix.3
+    Checking dtoa-short v0.3.5
+    Checking rkyv v0.8.18
+    Checking muniment v0.1.2 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/eidetic/muniment)
+    Checking zeroize v1.9.1
+    Checking genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+    Checking icu_segmenter v2.3.0
+    Checking strum v0.28.0
+    Checking skrifa v0.42.1
+    Checking harfrust v0.8.4
+    Checking html5ever v0.39.0
+    Checking xml5ever v0.39.0
+    Checking parley_data v0.10.0
+    Checking wide v1.7.1
+    Checking num-integer v0.1.47
+    Checking num-complex v0.4.6
+    Checking rawpointer v0.2.1
+    Checking fnv v1.0.7
+    Checking cfb v0.7.3
+    Checking encoding_rs v0.8.42
+    Checking matrixmultiply v0.3.11
+    Checking cssparser v0.37.0
+    Checking simba v0.10.2
+    Checking num-rational v0.4.2
+    Checking genet-parley v0.10.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+    Checking genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+    Checking numen v0.2.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/conatus/numen)
+    Checking psm v0.1.32
+    Checking engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+    Checking chartulary v0.2.2 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/eidetic/chartulary)
+    Checking crossbeam-utils v0.8.23
+    Checking mere-forme v0.1.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/forme/forme)
+    Checking libc v0.2.190
+    Checking glam v0.33.8
+    Checking netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+    Checking regress v0.11.1 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+    Checking inout v0.2.2
+    Checking document-session-api v0.1.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+    Checking unicase v2.9.0
+    Checking num-conv v0.2.2
+    Checking deranged v0.5.8
+    Checking powerfmt v0.2.0
+    Checking mime v0.3.17
+    Checking time-core v0.1.9
+    Checking cmov v0.5.4
+    Checking ctutils v0.4.2
+    Checking time v0.3.55
+    Checking mime_guess v2.0.5
+    Checking nalgebra v0.35.0
+    Checking genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+    Checking netrender v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+    Checking stacker v0.1.25
+    Checking crossbeam-channel v0.5.17
+   Compiling livery v0.0.5 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+    Checking cadency v0.0.1 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+    Checking infer v0.19.0
+    Checking genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+    Checking robust v1.2.0
+    Checking subtle v2.6.1
+    Checking signature v3.0.0
+    Checking genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+    Checking genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+    Checking ed25519 v3.0.0
+    Checking curve25519-dalek v5.0.0
+    Checking spade v2.15.1
+    Checking buckram v0.0.3 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+    Checking mere-kernel v0.0.2 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/graph/graph-kernel)
+warning: unused imports: `astar`, `dijkstra`, `has_path_connecting`, and `kosaraju_scc`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:21:22
+   |
+21 | use petgraph::algo::{astar, dijkstra, has_path_connecting, kosaraju_scc};
+   |                      ^^^^^  ^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `Archived`, `Place`, and `Resolver`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:25:21
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                     ^^^^^^^^               ^^^^^  ^^^^^^^^
+
+warning: unused import: `HashSet`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:26:43
+   |
+26 | use std::collections::{BTreeMap, HashMap, HashSet};
+   |                                           ^^^^^^^
+
+warning: unused imports: `GraphSnapshot`, `PersistedAddress`, `PersistedArrangementEdgeData`, `PersistedArrangementSubKind`, `PersistedContainmentEdgeData`, `PersistedContainmentSubKind`, `PersistedEdgeFamily`, `PersistedEdge`, `PersistedImportedEdgeData`, `PersistedImportedSubKind`, `PersistedNavigationTrigger`, `PersistedNodeSessionState`, `PersistedNode`, `PersistedProvenanceEdgeData`, `PersistedProvenanceSubKind`, `PersistedSemanticEdgeData`, `PersistedSemanticSubKind`, `PersistedTraversalEdgeData`, `PersistedTraversalMetrics`, and `PersistedTraversalRecord`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:35:5
+   |
+35 |     GraphSnapshot, PersistedAddress, PersistedArrangementEdgeData, PersistedArrangementSubKind,
+   |     ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+36 |     PersistedContainmentEdgeData, PersistedContainmentSubKind, PersistedEdge, PersistedEdgeFamily,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+37 |     PersistedImportedEdgeData, PersistedImportedSubKind, PersistedNavigationTrigger, PersistedNode,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+38 |     PersistedNodeSessionState, PersistedProvenanceEdgeData, PersistedProvenanceSubKind,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+39 |     PersistedSemanticEdgeData, PersistedSemanticSubKind, PersistedTraversalEdgeData,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+40 |     PersistedTraversalMetrics, PersistedTraversalRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `address_from_url`
+  --> crates/graph/graph-kernel/src/graph/node.rs:26:31
+   |
+26 | use crate::address::{Address, address_from_url};
+   |                               ^^^^^^^^^^^^^^^^
+
+warning: unused import: `NodeTagPresentationState`
+  --> crates/graph/graph-kernel/src/graph/node_facets.rs:17:54
+   |
+17 | use crate::types::{NodeClassification, NodeProperty, NodeTagPresentationState};
+   |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `EdgeRef`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:24:23
+   |
+24 | use petgraph::visit::{EdgeRef, IntoEdgeReferences};
+   |                       ^^^^^^^
+
+warning: unused import: `rancor::Fallible`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:25:72
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                                                                        ^^^^^^^^^^^^^^^^
+
+warning: methods `navigate_node`, `branch_history`, `node_history_back`, and `node_history_forward` are never used
+   --> crates/graph/graph-kernel/src/graph/mod.rs:707:19
+    |
+404 | impl Graph {
+    | ---------- methods in this implementation
+...
+707 |     pub(crate) fn navigate_node(&mut self, key: NodeKey, url: &str) {
+    |                   ^^^^^^^^^^^^^
+...
+721 |     pub(crate) fn branch_history(&mut self, child: NodeKey, parent: NodeKey) {
+    |                   ^^^^^^^^^^^^^^
+...
+733 |     pub(crate) fn node_history_back(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+743 |     pub(crate) fn node_history_forward(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `assert_semantic_predicate`, `assert_semantic_relation_in_scope`, and `assert_semantic_predicate_in_scope` are never used
+   --> crates/graph/graph-kernel/src/graph/edge_payload.rs:258:19
+    |
+ 45 | impl EdgePayload {
+    | ---------------- methods in this implementation
+...
+258 |     pub(crate) fn assert_semantic_predicate(&mut self, predicate: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+262 |     pub(crate) fn assert_semantic_relation_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+271 |     pub(crate) fn assert_semantic_predicate_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `LogIdAsString` is never constructed
+   --> crates/graph/graph-kernel/src/graph/identity.rs:160:19
+    |
+160 | pub(crate) struct LogIdAsString;
+    |                   ^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> crates/graph/graph-kernel/src/graph/resource_content.rs:86:19
+    |
+ 85 | impl Graph {
+    | ---------- methods in this implementation
+ 86 |     pub(crate) fn insert_node_tag(&mut self, key: NodeKey, tag: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 89 |     pub(crate) fn remove_node_tag(&mut self, key: NodeKey, tag: &str) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 92 |     pub(crate) fn append_node_property(&mut self, key: NodeKey, property: NodeProperty) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+ 95 |     pub(crate) fn add_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub(crate) fn remove_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+116 |     pub(crate) fn set_node_classification_status(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+131 |     pub(crate) fn set_node_primary_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> crates/graph/graph-kernel/src/graph/edge_ops.rs:177:19
+    |
+ 32 | impl Graph {
+    | ---------- methods in this implementation
+...
+177 |     pub(crate) fn assert_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+244 |     pub(crate) fn replay_assert_relation_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+261 |     pub(crate) fn replay_set_edge_semantic_predicate_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+279 |     pub(crate) fn replay_assert_semantic_predicate_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+307 |     pub(crate) fn dissolve_remove_node_collect_traversals(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+418 |     pub(crate) fn assert_surface_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+601 |     pub(crate) fn set_edge_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `get_node_mut` is never used
+   --> crates/graph/graph-kernel/src/graph/query.rs:227:19
+    |
+220 | impl Graph {
+    | ---------- method in this implementation
+...
+227 |     pub(crate) fn get_node_mut(&mut self, key: NodeKey) -> Option<&mut Node> {
+    |                   ^^^^^^^^^^^^
+
+warning: `mere-kernel` (lib) generated 14 warnings (run `cargo fix --lib -p mere-kernel` to apply 6 suggestions)
+    Checking glamx v0.3.1
+    Checking universal-hash v0.6.1
+    Checking cipher v0.5.2
+    Checking scenotime v0.0.4 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/cambium/scenes/scenotime)
+    Checking ena v0.14.4
+    Checking ordered-float v5.5.0
+    Checking either v1.18.0
+    Checking data-url v0.3.2
+    Checking base64 v0.22.1
+    Checking workbench v0.1.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/cambium/workbench)
+    Checking regex-syntax v0.8.11
+    Checking downcast-rs v2.0.2
+    Checking parry2d v0.31.1
+    Checking regex-automata v0.4.18
+    Checking chirograph v0.0.2 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/chirograph)
+    Checking genet-livery v0.0.4 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+    Checking zerocopy v0.8.57
+    Checking chacha20 v0.10.2
+    Checking poly1305 v0.9.1
+    Checking ed25519-dalek v3.0.0
+    Checking paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+    Checking inker v0.1.1 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/inker/inker)
+    Checking aead v0.6.1
+    Checking scenograph v0.0.4 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/cambium/scenes/scenograph)
+    Checking tinct v0.1.2 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/cambium/tinct)
+    Checking lazy_static v1.5.0
+    Checking anymore v1.0.0
+    Checking unicode-segmentation v1.13.3
+    Checking genet-text v0.1.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+    Checking meristem v0.2.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/cambium/meristem)
+    Checking sharded-slab v0.1.7
+    Checking pin-project v1.1.13
+    Checking thiserror v1.0.69
+    Checking scenomise v0.0.4 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/cambium/scenes/scenomise)
+    Checking chacha20poly1305 v0.11.0
+    Checking insigne v0.0.2 (https://github.com/merely-made/dramatis.git?rev=0234e7eea6f2ddf2330a71b9425da01b06ae0391#0234e7ee)
+    Checking half v2.7.1
+    Checking getrandom v0.3.4
+    Checking matchers v0.2.0
+    Checking rapier2d v0.36.0
+    Checking mere-surface-api v0.1.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/system/surface-api)
+    Checking sprigging v0.2.1 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/cambium/sprigging)
+    Checking armillary v0.1.1 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/armillary)
+    Checking tracing-log v0.2.0
+    Checking serde_path_to_error v0.1.20
+    Checking thread_local v1.1.10
+    Checking smol_str v0.2.2
+    Checking ciborium-io v0.2.2
+    Checking edit-history v0.1.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/cambium/edit-history)
+    Checking nu-ansi-term v0.50.3
+    Checking dpi v0.1.2
+    Checking cursor-icon v1.2.0
+    Checking option-ext v0.2.0
+    Checking dirs-sys v0.4.1
+    Checking winit v0.30.13
+    Checking tracing-subscriber v0.3.23
+    Checking cambium v0.3.3 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/cambium/cambium)
+    Checking ciborium-ll v0.2.2
+    Checking seiche v0.0.6 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/conatus/seiche)
+    Checking personae v0.3.0 (https://github.com/merely-made/dramatis.git?rev=0234e7eea6f2ddf2330a71b9425da01b06ae0391#0234e7ee)
+    Checking mere-cartography v0.0.2 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/canvas/cartography)
+    Checking tabard v0.0.1 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/system/tabard)
+    Checking uxtree v0.0.2 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/forme/uxtree)
+    Checking esp v0.1.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/intel/esp)
+    Checking emblem v0.2.0
+    Checking pictograph v0.2.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/canvas/pictograph)
+warning: function `build_affinity_spring` is never used
+  --> crates/canvas/pictograph/src/canvas.rs:66:4
+   |
+66 | fn build_affinity_spring(scores: &crate::signals::AffinityScores) -> AffinitySpring {
+   |    ^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `pictograph` (lib) generated 1 warning
+    Checking notochord v0.1.1 (https://github.com/merely-made/dramatis.git?rev=0234e7eea6f2ddf2330a71b9425da01b06ae0391#0234e7ee)
+    Checking ciborium v0.2.2
+    Checking cambium-winit v0.3.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/cambium/cambium-winit)
+    Checking dirs v5.0.1
+    Checking document-canvas v0.1.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/inker/document-canvas)
+    Checking genet-render v0.2.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+    Checking mere-alembic v0.0.1 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/distillery/alembic)
+    Checking genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73b)
+    Checking eidetic v0.0.2 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/eidetic/eidetic-core)
+    Checking incipit v0.2.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/incipit)
+    Checking hex v0.4.3
+    Checking pandect v0.1.1 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/system/pandect)
+warning: unused import: `std::io`
+  --> crates/system/pandect/src/wallet_grant/pairing.rs:10:5
+   |
+10 | use std::io;
+   |     ^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `std::io`
+  --> crates/system/pandect/src/wallet_grant/records.rs:10:5
+   |
+10 | use std::io;
+   |     ^^^^^^^
+
+warning: unused import: `std::path::Path`
+  --> crates/system/pandect/src/wallet_grant/records.rs:11:5
+   |
+11 | use std::path::Path;
+   |     ^^^^^^^^^^^^^^^
+
+warning: unused imports: `Ed25519Keypair`, `IdentityProvider`, `InMemoryProvider`, and `PersonaId`
+  --> crates/system/pandect/src/wallet_grant/records.rs:13:16
+   |
+13 | use identity::{Ed25519Keypair, IdentityProvider, InMemoryProvider, PersonaId};
+   |                ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^
+
+warning: unused import: `Ed25519Signature`
+  --> crates/system/pandect/src/wallet_grant/types.rs:14:16
+   |
+14 | use identity::{Ed25519Signature, PersonaId};
+   |                ^^^^^^^^^^^^^^^^
+
+warning: unused imports: `DEVICE_GRANT_SCHEMA_VERSION` and `DeviceGrantError`
+  --> crates/system/pandect/src/wallet_grant/types.rs:19:5
+   |
+19 |     DEVICE_GRANT_SCHEMA_VERSION, DeviceExposure, DeviceGrantError, DeviceId, DevicePublicKey,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^                  ^^^^^^^^^^^^^^^^
+
+warning: method `into_graph` is never used
+   --> crates/system/pandect/src/graph_codicil.rs:149:19
+    |
+148 | impl GraphCodicil {
+    | ----------------- method in this implementation
+149 |     pub(crate) fn into_graph(self) -> Result<Graph> {
+    |                   ^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `pandect` (lib) generated 7 warnings (run `cargo fix --lib -p pandect` to apply 6 suggestions)
+    Checking cambium-rootstock v0.1.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/cambium/cambium-rootstock)
+    Checking platen v0.0.1 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/platen/platen)
+    Checking mere v0.0.2 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/mere)
+    Checking graphshell-client v0.0.2 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/graphshell/graphshell-client)
+    Checking graphshell-endpoint v0.0.2 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/graphshell/graphshell-endpoint)
+    Checking graphshell v0.0.2 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/ports/graphshell)
+warning: method `begin_session` is never used
+   --> ports/graphshell/src/mere_host.rs:386:19
+    |
+225 | impl<B: Backend + Clone> MereHost<B> {
+    | ------------------------------------ method in this implementation
+...
+386 |     pub(crate) fn begin_session(&mut self, graph: Graph) {
+    |                   ^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `codicil_graph` is never used
+    --> ports/graphshell/src/product.rs:1102:4
+     |
+1102 | fn codicil_graph(snapshot: GraphSnapshot, facets: NodeFacetStore) -> Result<Graph, ProductError> {
+     |    ^^^^^^^^^^^^^
+
+warning: function `decode_codicil` is never used
+    --> ports/graphshell/src/product.rs:1504:15
+     |
+1504 | pub(crate) fn decode_codicil(bytes: &[u8]) -> Result<ProductCodicilV3, ProductError> {
+     |               ^^^^^^^^^^^^^^
+
+warning: `graphshell` (lib) generated 3 warnings
+    Finished `dev` profile [unoptimized] target(s) in 4m 45s
