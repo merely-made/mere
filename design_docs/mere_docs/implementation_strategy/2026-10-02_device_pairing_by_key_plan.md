@@ -179,6 +179,20 @@ pending. The Macs remain unreachable. No laptop build, app restart or writer
 lock removal was used. Concrete client states and remaining done-conditions
 are in [`client-mesh.json`](../testing/receipts/djinn-ssh-peers/client-mesh.json).
 
+**2026-10-13: client follow-up.** Native Windows elevation completed after
+reopening UAC; ThinkPad's separate rule is installed at `192.168.4.32` and its
+SSH login to O-PC passed. The Surface native unlock completed, and Surface →
+O-PC and Surface → ThinkPad passed. Both Linux clients now enable automatic
+connection, and the owner reports them connected. Each Linux peer read the
+existing O-PC chat through its managed daemon without resuming it.
+
+The owner reports O-PC is not connecting. Its SSH commands and app
+`read_thread` calls succeed for both Linux peers; its app chat listing includes
+both with no unavailable hosts. This establishes transport and stored-chat
+access, while the native connection display discrepancy remains unresolved
+pending the exact UI error. No app restart or connection replacement was used.
+The same receipt now records these follow-up results.
+
 **Related**:
 
 - [reachability rungs and privacy lanes plan](2026-08-03_reachability_rungs_and_privacy_lanes_plan.md):
