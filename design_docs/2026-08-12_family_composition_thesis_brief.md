@@ -1402,6 +1402,164 @@ their separate backend and packaging gates. Extend existing render/session
 owners before promoting a facade; source, producer and application semantics
 remain with their respective owners.
 
+### Browser WebGL2 presentation tenants design (2026-10-13)
+
+**Status:** written design for owner review. The owner approved tenancy as the
+ownership model and authorized this design. Written-design review precedes
+implementation planning. This continues the embedding draft above; native
+egui/Iced integration keeps its separate gates.
+
+#### Purpose and first consumer
+
+Graphshell's viewer must present the same disclosed graph and Cambium controls
+with WebGL2 available and WebGPU unavailable. The browser host owns the graphics
+context, frame schedule and presentation. Vello GPU is a renderer tenant;
+graph and document producers are content tenants. Native presentation retains
+its single host-owned wgpu device and queue.
+
+First acceptance covers the viewer cone, its Inspector and ordinary controls.
+Full product, remote and applet feature combinations require their own gates.
+Genet's page-facing WebGL API and WebGL2 conformance are independent work.
+
+#### Verified starting point
+
+Source inspection used Mere `0b9b7a9b2`. Rootstock's `Surface` in
+`crates/cambium/cambium-rootstock/src/lib.rs` exposes `RenderCore`,
+`TextureFormat` and `SurfaceTexture`. `ProducerContext` and `ProducedTexture`
+in `src/producer.rs` also expose wgpu handles. Cambium's web host `surface.rs`
+and Graphshell's `src/web_gpu.rs` boot that core. The browser manifest enables
+wgpu's `webgpu` feature. Direct WebGL2 needs a shared-host boundary change.
+
+Conatus `tenant/src/device.rs` supplies `HostDevice` and `DeviceNeeds` for its
+lit-body renderer. That crate retains its domain and wgpu contract. Presentation
+belongs to Rootstock/platform hosts; scene lowering belongs to Netrender and
+its providers. This design founds no generic tenant crate.
+
+On October 13 the ThinkPad's Chrome 155 produced exact pixels through WebGL2
+before resize, after resize and after forced context loss/restoration. The
+hardware run identified AMD Radeon Graphics and peaked at about 313 MiB under
+a 1 GiB kernel cap; SwiftShader passed separately. The fixture shadowed
+`navigator.gpu` on its own page. This proves browser lifecycle feasibility,
+not Vello or Graphshell acceptance. Raw source/result hashes are in
+`Code/testing/genet/webgl-viewer-20261013/receipt.json`.
+
+#### Ownership and frame boundary
+
+Rootstock owns retained DOM, layout, input, focus and accessibility. Shared
+frame preparation produces paint/scene descriptions and logical resource
+identities. Presentation consumes that output, viewport, physical scale,
+clipping and clear/composition policy; it reports presented, deferred,
+context-lost or failed outcomes. These describe a proposed contract, not
+compile-ready Rust signatures.
+
+The host owns context creation, resize, wake delivery, loss listeners and
+disposal. The wgpu adapter owns acquisition and submission. The WebGL2 adapter
+owns its drawing-buffer/framebuffer target and one Vello GPU renderer on that
+context. Device-specific handles stay within their adapter. Optional same-device
+wgpu services remain available to native/WebGPU tenants; their absence on
+direct WebGL2 is explicit.
+
+Reuse neutral Genet paint commands and Netrender lowering. Retained geometry,
+glyphs, images, transforms and placements preserve logical identity, while
+each adapter makes its own resource/cache representation. Device-bound textures
+and encoded renderer fragments cannot become interchangeable common handles.
+Where the WebGL provider cannot transform an encoded fragment, re-emit retained
+source commands and measure the cost. Keep one graph/layout implementation.
+
+Vello GPU's direct WebGL2 route uses no compute shaders. It must be reachable
+through Rootstock's shared redraw/semantics lifecycle, rather than a second
+Graphshell render loop. Refactor the presentation portion of the host; retain
+session authority and platform input with their current owners.
+
+#### Content tenants and resources
+
+Each image registration carries owner/appearance identity, content revision,
+dimensions, pixel/alpha convention and context generation. Revision and
+generation are separate. Scope registrations to the owning host/context;
+refuse retired registrations, stale generations and incompatible resources
+before composition.
+
+The wgpu adapter supplies same-device texture views. A WebGL2 content adapter
+supplies same-context textures or imports CPU pixels/browser image sources
+through an advertised upload route. Native wgpu textures and external WebGL
+contexts require an explicit transfer path; they cannot pass as host resources.
+For the first viewer, use retained graph scene commands where representable,
+preserving its model, picking and accessibility without an unavailable GPU
+texture producer.
+
+The importing adapter handles alpha conversion once. Qualify transparent
+pixels, source-over order, clipping and scaled placement. Image caches update
+on content revision and retire with their owning appearance. Import failures
+name their owner and reason; content is never silently dropped.
+
+Reserve ordered WebGL renderer/producer phases. Every phase establishes the
+state it relies on: Vello can change GL bindings and active texture units.
+Restoration of prior caller state is not assumed. Arbitrary third-party sharing
+of the context is outside first acceptance.
+
+#### Selection, capability and recovery
+
+Expose a host-configurable presentation choice: `auto`, `webgpu`, `webgl2`.
+An explicit choice boots that backend or reports a capability failure. `auto`
+tries WebGPU and then direct WebGL2 after an attributed boot refusal. Use a
+fresh presentation canvas if the first context choice prevents reuse, moving
+listeners/semantics bindings while retaining application state. An ordinary
+draw failure never silently changes backend.
+
+Report supported scene/import operations and compute availability. Direct
+WebGL2 uses the viewer's existing CPU dynamics route. Explicit requests for
+unavailable GPU compute report that outcome. Required unsupported paint fails
+with backend and operation identified; inventory the real viewer's operations
+before advertising support.
+
+On `webglcontextlost`, prevent default restoration cancellation, suspend GPU
+work and report unavailable presentation. Preserve CPU model/retained source
+state; invalidate GPU resources and outstanding captures. Input may continue
+updating the model. Restoration advances context generation, rebuilds renderer
+and producer resources, requests fresh producer frames and draws the latest
+state. Reject old handles and completion callbacks. Hidden/zero-size surfaces
+defer presentation; resumption requests a frame. Disposal releases owned
+listeners/resources without releasing another appearance's state.
+
+#### Acceptance and done-conditions
+
+1. Freeze supplier revisions, features, locks, bundle hashes, browser versions
+   and actual adapter identities. Qualify a Vello GPU WebGL2 scene first.
+2. With WebGPU unavailable, mount the real Graphshell viewer through the shared
+   Cambium host. Verify backend disclosure and graph/text/image/control pixels,
+   clipping, opacity, scale and resize. Compare equivalent WebGPU/WebGL2 scenes
+   with declared pixel tolerances.
+3. Update graph and producer-image content in place, observing revisions and
+   changed pixels. Remove/recreate an appearance and reject its stale resource
+   registration. Include a stale-generation negative control.
+4. Force loss/restoration on the viewer's actual context. Mutate its model
+   while lost, then show the latest state. Verify resize, capture completion or
+   refusal, and orderly disposal.
+5. Exercise pointer picking, keyboard focus/actions and the existing DOM
+   accessibility mirror with equivalent semantic targets on both backends.
+   Automated mirror/action results remain distinct from human AT acceptance.
+6. Preserve native/WebGPU host, same-device producer and viewer guards. Record
+   unsupported operations and refusal controls. Measure retained update cost
+   without inventing a performance threshold.
+
+First acceptance requires a physical-GPU viewer receipt on an available host
+and a functional receipt from a second browser implementation. Label software
+rendering separately. Builds/browser tests use the common machine admission
+lock and verified memory caps; choose ThinkPad or O-PC using fresh resource
+readings. Existing owner permission covers those tests.
+
+#### Alternatives and scope
+
+A viewer-only loop could demonstrate rendering sooner but fork the shared
+host lifecycle. WebGL hidden behind wgpu would not provide the selected direct
+Vello GPU route or resolve the compute renderer's requirements. The selected
+approach gives the shared host two presentation adapters over prepared content.
+
+After written-design review, owner-specific dated plans sequence the interface,
+Netrender lowering, browser adapter and viewer gates. This does not qualify
+egui/Iced embedding, page WebGL2, media, or arbitrary foreign-context sharing.
+Those retain separate contracts and acceptance.
+
 ## What this brief deliberately does not do
 
 This brief records the composition thesis and its research lanes. It does

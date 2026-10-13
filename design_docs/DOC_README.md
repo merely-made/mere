@@ -1,5 +1,7 @@
 # Mere Documentation Index
 
+Browser presentation tenant design (2026-10-13): the [family composition continuation](2026-08-12_family_composition_thesis_brief.md#browser-webgl2-presentation-tenants-design-2026-10-13) specifies host-owned WebGPU/WebGL2 contexts, renderer/content tenants, resource generations and recovery, with Graphshell's viewer as the first consumer. Written-design review and implementation planning remain pending; the recorded AMD browser probe is lifecycle feasibility only.
+
 Radio-to-Comms integration (2026-10-13): `murm/design_docs/2026-10-13_murm_family_move_plan.md` section R1 owns the Signalman LXMF path. The portable Comms seam names LXMF, Meshtastic and MeshCore and exposes delivery observations without making carrier acceptance a recipient or read receipt. Application journals and station authority keep their existing owners.
 
 Reusable wire adoption (2026-10-14): the [Fetch receiving note](mere_docs/implementation_strategy/2026-09-20_ranged_fetch_plan.md#2026-10-14--reusable-wire-supplier-adoption) records Netfetcher's Murm engine supplier and Mere's explicit crawler pool. Browser policy remains in Genet; the duplicate crawler exchange engine is removed. Canonical migration: `murm/design_docs/2026-10-13_murm_family_move_plan.md`, MOVE5.
