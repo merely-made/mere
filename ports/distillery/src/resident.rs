@@ -12,8 +12,9 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use crate::lifecycle::{CloseAction, CloseFuture, close_all};
-use mesh::JobBoard;
 use crate::mesh_host::{MeshHost, Step, TransportBlobSpace};
+use mesh::JobBoard;
+use mesh::ingress::{IngressConfig, IngressHandle, IngressStats, RecordIngress};
 use muniment::Backend;
 use tokio::time::{Instant, MissedTickBehavior, interval, interval_at};
 use transport::{BlobError, BlobStore, P2pandaTransport};
@@ -155,6 +156,9 @@ pub enum ResidentReceipt {
 /// A resident Distillery failure.
 #[derive(Debug, thiserror::Error)]
 pub enum ResidentError {
+    /// The owner-selected admitted service could not mount.
+    #[error("resident ingress: {0}")]
+    InvalidIngress(String),
     /// An owner setting cannot form a safe timer.
     #[error("resident settings: {0}")]
     InvalidSettings(&'static str),
@@ -196,6 +200,7 @@ pub struct ResidentAuthority<B: Backend + Clone + Send + Sync + 'static> {
     transport: Arc<P2pandaTransport>,
     storage: ResidentStorage,
     settings: ResidentSettings,
+    ingress: Option<IngressHandle<B>>,
 }
 
 impl<B: Backend + Clone + Send + Sync + 'static> ResidentAuthority<B> {
@@ -219,6 +224,7 @@ impl<B: Backend + Clone + Send + Sync + 'static> ResidentAuthority<B> {
             transport,
             storage,
             settings,
+            ingress: None,
         })
     }
 
@@ -240,6 +246,36 @@ impl<B: Backend + Clone + Send + Sync + 'static> ResidentAuthority<B> {
     /// The live transport, for pairing and reachability projection.
     pub fn transport(&self) -> &Arc<P2pandaTransport> {
         &self.transport
+    }
+
+    /// Opt in to admitted signed-record submission and separately authorized exact
+    /// inventory on this resident's endpoint and existing mesh store. One queue and
+    /// active-call budget serve both actions. Mounting never binds another endpoint.
+    pub async fn enable_record_ingress(
+        &mut self,
+        config: IngressConfig,
+    ) -> Result<(), ResidentError> {
+        if self.ingress.is_some() {
+            return Err(ResidentError::InvalidSettings(
+                "record ingress already mounted",
+            ));
+        }
+        let store = self.authority.host().synced().store().clone();
+        let mesh = self.authority.host().synced().mesh_id();
+        let service = RecordIngress::new(store, mesh, config)
+            .map_err(|e| ResidentError::InvalidIngress(e.to_string()))?;
+        self.ingress = Some(
+            service
+                .mount(self.transport.clone())
+                .await
+                .map_err(|e| ResidentError::InvalidIngress(e.to_string()))?,
+        );
+        Ok(())
+    }
+
+    /// Read the optional ingress service's own observations.
+    pub fn record_ingress_stats(&self) -> Option<IngressStats> {
+        self.ingress.as_ref().map(|h| h.service().stats())
     }
 
     /// The persistent custody surface.
@@ -344,15 +380,24 @@ impl<B: Backend + Clone + Send + Sync + 'static> ResidentAuthority<B> {
             authority,
             transport,
             storage,
+            ingress,
             ..
         } = self;
         let report = close_all(vec![
             (
                 "transport",
                 Box::new(move || {
-                    Box::pin(
-                        async move { transport.close().await.map_err(|error| error.to_string()) },
-                    ) as CloseFuture<'static>
+                    Box::pin(async move {
+                        let ingress_error = match ingress {
+                            Some(handle) => handle.shutdown().await.err().map(|e| e.to_string()),
+                            None => None,
+                        };
+                        let transport_error = transport.close().await.err().map(|e| e.to_string());
+                        match (ingress_error, transport_error) {
+                            (None, None) => Ok(()),
+                            (a, b) => Err(format!("ingress: {a:?}; transport: {b:?}")),
+                        }
+                    }) as CloseFuture<'static>
                 }) as CloseAction<'static>,
             ),
             (

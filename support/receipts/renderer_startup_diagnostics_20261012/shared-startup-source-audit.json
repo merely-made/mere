@@ -1,0 +1,106 @@
+{
+  "status": "r2 runtime classified: successful raster, correct surface Occluded, returned reveal, missing event-driven retry after unavailable",
+  "candidate_basis": "8568f42fdf57f997274c74e63bd4ee045fe1a2b4",
+  "candidate_binary_sha256": "c57ed12294ed353db99d685a22aa8117ee0310dcd7f5af0a18145ae312237021",
+  "source_rows": [
+    {
+      "stage": "first_frame",
+      "repo": "/Users/markik/Code/worktrees/mere-moot-capsule-proof",
+      "path": "crates/cambium/cambium-genet-winit-host/src/lib.rs",
+      "revision": "8568f42fdf57f997274c74e63bd4ee045fe1a2b4",
+      "sha256": "0edc98b2bacbc9800e69c6177eb41eaef54e57c0bf1fa759c2319937e2a303f2",
+      "local_matches_recorded_revision": true
+    },
+    {
+      "stage": "redraw",
+      "repo": "/Users/markik/Code/worktrees/mere-moot-capsule-proof",
+      "path": "crates/cambium/cambium-rootstock/src/frame.rs",
+      "revision": "8568f42fdf57f997274c74e63bd4ee045fe1a2b4",
+      "sha256": "8bd2af82c8a7dbc95bf351aecc44da7eb84b4a4d1cf6d727627000339b34044d",
+      "local_matches_recorded_revision": true
+    },
+    {
+      "stage": "reveal",
+      "repo": "/Users/markik/Code/worktrees/mere-moot-capsule-proof",
+      "path": "crates/cambium/cambium-winit-a11y/src/lib.rs",
+      "revision": "8568f42fdf57f997274c74e63bd4ee045fe1a2b4",
+      "sha256": "9fbe0929025f1d2c0889dafdb1f2d2cd6f93ba68e1b5658bacc886eb9a2de055",
+      "local_matches_recorded_revision": true
+    },
+    {
+      "stage": "idle",
+      "repo": "/Users/markik/Code/worktrees/mere-moot-capsule-proof",
+      "path": "crates/cambium/cambium-rootstock/src/host.rs",
+      "revision": "8568f42fdf57f997274c74e63bd4ee045fe1a2b4",
+      "sha256": "239d4bf54a368a90a962949052d82d02e5a09a47ca56eca8217adcf957abd918",
+      "local_matches_recorded_revision": true
+    },
+    {
+      "stage": "acquire",
+      "repo": "/Users/markik/Code/worktrees/genet-vello-release-adoption",
+      "path": "components/genet-render-host/src/lib.rs",
+      "revision": "2c7ef73bfa44c07744e0643e3c6f98be3cbd7947",
+      "sha256": "0ee4a3f1c6a6a5379a796fb0b63f8fe6816a5a4536d1ce1563c866960623bed2",
+      "local_matches_recorded_revision": true
+    }
+  ],
+  "observations": [
+    {
+      "claim": "Only log is accessibility Installed47nodes; no capture/presentation receipt",
+      "evidence": "/Users/markik/Code/output/moot-resource-host-20261012/wide.log"
+    },
+    {
+      "claim": "First redraw returned sufficiently for layout/a11y projection before this log; log precedes window.set_visible(true)",
+      "evidence": "cambium-winit-a11y/src/lib.rs:134-144 + cambium-genet-winit-host/src/lib.rs:1051-1063"
+    },
+    {
+      "claim": "Surface Outdated reconfigures same device and returns Unavailable; Timeout/Occluded etc also Unavailable",
+      "evidence": "Genet2c7 genet-render-host/src/lib.rs:1201-1233"
+    },
+    {
+      "claim": "Unavailable skips redraw scheduling at successful tail; finite frame hook true alone does not provide timed wake; idle may Wait",
+      "evidence": "rootstock/frame.rs:705-710,809-812 + host.rs:1791-1803"
+    },
+    {
+      "claim": "Provider refusal is retained in last_raster_failure and capture failure; no successful presentation inferred",
+      "evidence": "rootstock/recovery.rs:34-73"
+    }
+  ],
+  "hypotheses": [
+    "window reveal/activation did not return",
+    "post-reveal redraw stalled in app/CPU/GPU work",
+    "post-reveal redraw silently returned at provider refusal or unavailable acquisition then became idle"
+  ],
+  "next_discriminator": [
+    "existing CAMBIUM_HOST_FRAME_TRACE=1 initial-reveal/occlusion markers",
+    "existing CAMBIUM_HOST_PERF_TRACE=1 phase timings",
+    "Moot product-only frame/after_frame/elapsed telemetry and bounded guard",
+    "exact typed refusal/acquire reason if existing logs do not discriminate"
+  ],
+  "ownership": "Moot owns product telemetry/build/cache; Root shared boundary source review; runtime requires explicit serialized handoff",
+  "mutations": {
+    "supplier_source": false,
+    "pins": false,
+    "acceptance_thresholds": false,
+    "build": false,
+    "runtime": false
+  },
+  "diagnostic_patch": {
+    "commit": "07d415c52ba6a83b46c0c40ef10f7c3b666c1034",
+    "publication": "Publishedmain07608969b3924218799ece6c07d14cab4c524077",
+    "path": "crates/cambium/cambium-rootstock/src/frame.rs",
+    "enabled_by": "CAMBIUM_HOST_FRAME_TRACE=1",
+    "changes": "phase timings, typed raster/acquire outcome, CPU-only return marker",
+    "independent_source_review": "No substantive defect; no GPU-resource retention/control-flow/threshold/pin changes; correctly ordered presentation markers",
+    "compile": "PASS exactcurrentmain cargo check14.136sec; two Moot productionbuilds36.17/10.04sec",
+    "runtime": "Moot trace-only r2 three Occluded acquisitions, zero presentations/captures, finite45.22sec release; not accepted"
+  },
+  "sample_correction": "Sampletarget was inhibitor not app; no appthreadstack conclusion",
+  "later_source_changes": {
+    "trace_publication": "07608969b3924218799ece6c07d14cab4c524077",
+    "unocclusion_fix": "f91443388f3f78f39e2395e070f2a675c130380b",
+    "cpu_routing": "PASS 1 actual event routing test, 15.319 seconds, no GPU",
+    "independent_review": "No substantive defect",
+    "pins_or_acceptance_limits_changed": false
+  }
+}
