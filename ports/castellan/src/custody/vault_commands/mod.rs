@@ -48,6 +48,7 @@ pub(crate) fn execute(
         "list" => cmd_list(out, storage, profile, description),
         "show" => cmd_show(out, storage, profile, rest),
         "add-ssh" => cmd_add_ssh(out, storage, profile, rest),
+        "generate-ssh" => cmd_generate_ssh(out, storage, profile, rest),
         "pub" => cmd_pub(out, storage, profile, rest),
         "remove" => cmd_remove(out, storage, profile, rest),
         "ca" => cmd_ca(out, &load(storage, profile)?, rest),
@@ -209,6 +210,37 @@ fn cmd_show(
     Ok(())
 }
 
+/// Generate inside custody, returning only a public key. Unlike importing a
+/// temporary file, no private key crosses the client/resident boundary.
+fn cmd_generate_ssh(
+    out: &mut dyn Write,
+    storage: &dyn IdentityStorage,
+    id: &ProfileId,
+    rest: &[String],
+) -> Result<(), String> {
+    let [comment] = rest else {
+        return Err("generate-ssh needs one key comment".into());
+    };
+    if comment.is_empty() || comment.chars().count() > 256 || comment.chars().any(char::is_control)
+    {
+        return Err("key comment must have 1–256 characters and no control characters".into());
+    }
+    load(storage, id)?;
+    let mut private = PrivateKey::random(&mut rand_core::OsRng, ssh_key::Algorithm::Ed25519)
+        .map_err(|err| format!("generate SSH key: {err}"))?;
+    private.set_comment(comment);
+    add_ssh_key(storage, id, &private, UnlockTier::Session)?;
+    writeln!(
+        out,
+        "{}",
+        private
+            .public_key()
+            .to_openssh()
+            .map_err(|err| err.to_string())?
+    )
+    .map_err(|err| err.to_string())
+}
+
 fn cmd_add_ssh(
     out: &mut dyn Write,
     storage: &dyn IdentityStorage,
@@ -226,7 +258,7 @@ fn cmd_add_ssh(
     }
     let path = path.ok_or("add-ssh needs a private-key file")?;
     let bytes = zeroize::Zeroizing::new(
-        std::fs::read(&path).map_err(|err| format!("read {}: {err}", path.display()))?
+        std::fs::read(&path).map_err(|err| format!("read {}: {err}", path.display()))?,
     );
     let private = PrivateKey::from_openssh(&bytes)
         .map_err(|err| format!("parse {} as an OpenSSH private key: {err}", path.display()))?;

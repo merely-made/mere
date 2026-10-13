@@ -1,0 +1,24 @@
+{
+  "artifact_and_digest_tamper": {
+    "accepted": true,
+    "version": "0.2.0"
+  },
+  "artifact_only_tamper_refused": true,
+  "edited_manifest_refused": true,
+  "fresh_process_stage": {
+    "accepted": true,
+    "version": "0.2.0"
+  },
+  "highest_observed": "0.5.0",
+  "old_publication_date_accepted": true,
+  "older_signed_offer_after_higher_seen": "0.3.0",
+  "partial_record_ignored": true,
+  "signed_download": true,
+  "unsigned_manifest_refused": true,
+  "unsigned_record_tamper_accepted": {
+    "destination_changed": true,
+    "format": "Wix",
+    "verified_bytes": true,
+    "version": "99.0.0"
+  }
+}

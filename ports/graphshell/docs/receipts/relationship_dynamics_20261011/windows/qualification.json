@@ -107,7 +107,8 @@
     "temporary_package": {
       "path": "C:/t/cargo-targets/mere/relationship-dynamics-browser",
       "owner": "relationship dynamics browser qualification",
-      "retained_reason": "Automatic approval review rejected recursive removal as blocked by policy; owner marker verified and no live process remains."
+      "status": "removed 2026-10-12 after verifying marker and no live owner; the five exact generated files and empty directory were deleted without recursive removal",
+      "earlier_attempt": "Recursive removal was rejected by automatic review on 2026-10-11."
     },
     "server": "stopped",
     "browser_tabs": "closed"

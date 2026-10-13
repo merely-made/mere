@@ -1,7 +1,8 @@
 # Device Pairing by Key Plan
 
 **Date**: 2026-10-02
-**Status (2026-10-06)**: in progress, paused before D2. Rulings 1 to 74.
+**Status (2026-10-13)**: in progress, D2 resumed for s-pc and Windows SSH.
+Rulings 1 to 74; fleet-wide D2 and D3–D6 remain open.
 - D1 landed (`4963b489`).
 - D1b's mere fix (M1) landed (`177b927c`); its fork fix (F1) shipped in the
   0.7.5 repin, pushed 2026-10-04 (fork `1bec457e`, Knot `92367ec`, mere
@@ -12,13 +13,113 @@
   until its next release (rulings 64 to 72).
 
 The pause of ruling 73 (for chatelaine P4a) has lapsed: P4a landed as
-`007fbe7c`. The identity work then moved to the vault lock plan. D2 has
-not been put back to Mark, and its restart waits on his word (see §7,
-2026-10-06).
+`007fbe7c`. The identity work then moved to the vault lock plan. On
+2026-10-12 Mark explicitly resumed D2: install Djinn on s-pc, install the
+Windows SSH server, and prove authenticated control both ways while
+preserving concurrent work and the laptop's resources. This does not close
+the fleet rollout or master approval of machine CAs (see §7).
 **Scope**: Mark's machines find, reach and trust each other by device
 identity, not by address: the stack's own peers already do on one network;
 SSH, the path Mark uses daily, does not. Pairing a device becomes one
 ceremony. A self-hosted relay covers the second network.
+
+**2026-10-12: peer transport comparison.** The owner asked whether bilateral
+control can present every computer as a peer. It can: each resident initiates
+and accepts connections, while SSH remains the internal execution service.
+No alternative overlay is installed in this slice.
+
+- **Djinn/Iroh (D3)** matches this stack's custody and pairing boundary: the
+  resident dials an approved device id and forwards to local `sshd`, with
+  admission and unpairing enforced before forwarding. The external
+  [iroh-ssh implementation](https://github.com/rustonbsd/iroh-ssh) demonstrates
+  the transport shape, including Windows, but still requires a local SSH
+  server. Its separate transport key and node-id reachability are not a
+  substitute for Dramatis authority or pairing approval.
+- **[SSH over Tailscale](https://tailscale.com/docs/reference/ssh-over-tailscale)**
+  preserves ordinary OpenSSH and Djinn signing over a private peer network.
+  [Headscale](https://github.com/juanfont/headscale) can self-host its control
+  plane. This adds a second device enrollment and network identity system.
+  Tailscale's separate [built-in SSH server](https://tailscale.com/docs/features/tailscale-ssh)
+  currently accepts connections on
+  Linux and CLI-managed macOS, so it is not the Windows server path here.
+- **[Nebula](https://nebula.defined.net/docs/)** provides a mutually
+  authenticated peer network with per-host CA-signed certificates and
+  lighthouse discovery. It is another self-hostable transport basis, with
+  its own certificate enrollment and network policy to integrate.
+
+D3 remains the natural next stack-owned transport slice. The present LAN
+receipt deliberately keeps transport qualification distinct from D4's master
+approval and D5's pairing ceremony; it proves neither of those unfinished
+authorities.
+
+**2026-10-13: D2 qualification checkpoint.**
+The Kubuntu Surface (`s-pc`) now has a prebuilt Djinn resident in a systemd
+user unit, enabled for login. Its passphrase vault was created in native
+dialogs and unlocked again after a resident restart. This is a restart
+receipt; a fresh graphical login or reboot is not yet qualified. The desktop's
+existing empty `ssh-agent` was preserved. Djinn uses its own runtime socket,
+a configurable 768 MiB memory ceiling and 50% CPU quota; measured memory was
+about 141 MiB, peak about 143 MiB.
+
+The build reused the ThinkPad's warm cache with one Cargo job, based on clean
+Mere `19b00c8d` plus this lane's custody-generation patch. The bounded patch
+was reversed afterward, leaving that checkout clean and its ref unchanged.
+The patched production binaries compiled; the two new generation tests passed
+with `castellan/keeper`, and the custody residue harness passed. The command
+generates an Ed25519 key entirely inside Djinn, returns its public half, and
+preserves the persona master. The live agent signed and verified a challenge;
+an absent agent refused it with exit 2. No plaintext user SSH private-key
+file was created on the Surface.
+
+At the later checkpoint the Surface was Locked. Its still-running agent
+refused a signing challenge with exit 1, and the generation command returned
+`identity pending: the identity is locked` with exit 2. No manual lock was
+introduced for that challenge check; memory while Locked was about 37 MiB.
+After Windows enrollment, a separate deliberate lock over Djinn's supported
+SSH-agent protocol also denied the real Windows login with exit 255. An
+unavailable agent denied the same login with exit 255. Both checks used the
+public-only identity file, so there was no private-file fallback. The older
+Linux binary does not understand the newer custody `lock_vault` call; the
+qualification therefore used the supported agent lock, then requested the
+owner's native unlock to restore service. The owner completed it and the
+same Windows login passed again with exit 0. Current memory afterward was
+about 194 MiB, peak about 199 MiB, with zero service restarts.
+
+Windows → Surface executed `id -un` and `hostname` through a side-by-side
+Djinn agent, with `IdentityFile=none`. It authenticated using an agent-held
+public key. The Windows receipt resident uses isolated settings, data and
+pipes, and an installed copy of the binary so it does not hold the shared
+Cargo executable open. The legacy resident and its standard agent remain
+untouched. Its cached native binary is identified by hash; its source commit
+was not established.
+
+Windows' inbox SSH Server component is installed, with public-key-only
+configuration for the owner account and a firewall rule scoped to the
+Surface's LAN address. Native elevation completed public-key enrollment and
+host-key creation. The first service start exposed host keys owned by the
+interactive administrator; the installer now sets SYSTEM ownership and an
+exclusive SYSTEM/Administrators ACL before validation. The corrected run
+started `sshd`, configured Automatic. No host keys were regenerated by the
+repair. Windows' public Ed25519 host key was read locally and pinned on the
+Surface before connecting; strict host-key checking stayed enabled.
+**Surface → Windows passed**, executing `whoami` and `hostname` with the
+Djinn-held key selected through its public-only identity file. The host
+fingerprint is `SHA256:BMpl1R39VEjEGjtJye+6uNhEJIccvJVV9XYgIaxQpHI`.
+Agent-only Windows → Surface passed earlier; the isolated Windows agent
+subsequently Locked. Its native unlock request waited without presenting a
+dialog, confirmed by the owner. Only that hung request client was stopped;
+both residents remain preserved. The Windows proof is historical, and its
+post-lock recovery remains open. The cached binary's unknown source commit
+prevents attributing this failure to current main without a fresh build.
+
+The Linux installer was also checked against the active resident: it refused
+replacement and left the PID unchanged. The Windows installer refused an
+unelevated caller before changing configuration. Current evidence and build
+provenance are retained in
+[`qualification.json`](../testing/receipts/djinn-ssh-peers/qualification.json),
+[`castellan-generate-ssh.log`](../testing/receipts/djinn-ssh-peers/castellan-generate-ssh.log),
+and the bounded custody patch alongside them. D2 is partial; D3–D6 and the
+other machines' rollout remain open.
 
 **Related**:
 

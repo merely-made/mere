@@ -15,7 +15,8 @@ writes exactly what serde would deserialize back into
 
 Two files come out:
 
-* `--out` — the visit array. `referring_url` is resolved through `from_visit`,
+* `--out` — the visit array. Original `from_visit` identity and microsecond
+  timestamps survive alongside `referring_url`, resolved through `from_visit`,
   `visit_count_hint` from `moz_places.visit_count`, and `view_time_ms` from
   `moz_places_metadata.total_view_time` (Firefox's own interaction timer, which
   the Rust side takes as `TraceEvent::dwell_ms`).
@@ -31,7 +32,12 @@ matched one-to-one to the nearest visit of the same place inside
 Run:
 
     python scripts/firefox_history_export.py PLACES_COPY.sqlite \\
+        --profile-id REGISTERED_PROFILE --history-generation GENERATION \\
         --out visits.json --frecency-out frecency.json
+
+Use the same registered profile/generation for repeated exports of one source.
+A replacement history database needs an explicit generation change. File paths,
+export-run IDs and changing file hashes do not establish profile identity.
 
 The database is opened read-only. This script prints counts and never prints a
 URL, title, or query.
@@ -123,9 +129,9 @@ def visit_view_times(connection, tolerance_ms: int) -> dict[int, int]:
     return view_times
 
 
-def export_visits(connection, view_times: dict[int, int]) -> list[dict]:
+def export_visits(connection, view_times: dict[int, int], source_scope=None) -> list[dict]:
     rows = connection.execute(
-        "select v.id, v.visit_date, v.visit_type, p.url, p.title, p.visit_count,"
+        "select v.id, v.visit_date, v.visit_type, p.url, p.title, p.visit_count, v.from_visit,"
         "       (select rp.url from moz_historyvisits rv"
         "          join moz_places rp on rp.id = rv.place_id"
         "         where rv.id = v.from_visit)"
@@ -134,7 +140,7 @@ def export_visits(connection, view_times: dict[int, int]) -> list[dict]:
         " order by v.visit_date, v.id"
     )
     items = []
-    for visit_id, visit_date, visit_type, url, title, visit_count, referrer in rows:
+    for visit_id, visit_date, visit_type, url, title, visit_count, parent_id, referrer in rows:
         title = (title or "").strip() or None
         transition = TRANSITIONS.get(visit_type, {"Other": f"firefox_{visit_type}"})
         items.append(
@@ -150,6 +156,9 @@ def export_visits(connection, view_times: dict[int, int]) -> list[dict]:
                     "favicon_url": None,
                 },
                 "visit_id": str(visit_id),
+                "source_scope": source_scope,
+                "parent": {"kind": "visit", "visit_id": str(parent_id)} if parent_id else {"kind": "unknown"},
+                "visited_at_unix_micros": visit_date,
                 "visited_at_unix_secs": visit_date // 1_000_000,
                 "visit_count_hint": visit_count if visit_count is not None else None,
                 "transition": transition,
@@ -182,13 +191,16 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--frecency-out", type=Path, required=True)
     parser.add_argument("--digest", choices=("blake3", "sha256"), default="blake3")
     parser.add_argument("--metadata-tolerance-ms", type=int, default=120_000)
+    parser.add_argument("--profile-id", required=True, help="stable registered source profile identity")
+    parser.add_argument("--history-generation", required=True, help="registered history database generation")
     args = parser.parse_args(argv)
 
     digest = digest_fn(args.digest)
     connection = sqlite3.connect(f"file:{args.places.as_posix()}?mode=ro", uri=True)
     try:
         view_times = visit_view_times(connection, args.metadata_tolerance_ms)
-        items = export_visits(connection, view_times)
+        scope = {"product": "firefox", "profile": args.profile_id, "generation": args.history_generation}
+        items = export_visits(connection, view_times, scope)
         frecency, scored = export_frecency(connection, digest)
         metadata_rows = connection.execute(
             "select count(*) from moz_places_metadata where total_view_time > 0"

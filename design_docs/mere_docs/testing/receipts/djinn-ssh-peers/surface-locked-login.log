@@ -1,0 +1,6 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+Load key "/home/markik/.ssh/djinn-o-pc.pub": error in libcrypto
+mark_@192.168.4.36: Permission denied (publickey).
+Exit: 255

@@ -1,0 +1,32 @@
+{
+  "relocated_portable_check": {
+    "pending": false,
+    "portable": true,
+    "version": "0.2.0"
+  },
+  "download": {
+    "pending": true,
+    "portable": true,
+    "version": "0.2.0"
+  },
+  "offline_fresh_process_apply": {
+    "build_version": "0.2.0"
+  },
+  "outside_current_state_preserved": true,
+  "artifacts": {
+    "Merely.ReleaseComparison-0.1.0-full.nupkg": 22196499,
+    "Merely.ReleaseComparison-0.2.0-delta.nupkg": 4173,
+    "Merely.ReleaseComparison-0.2.0-full.nupkg": 22196517
+  },
+  "tampered_stage_apply_version": {
+    "build_version": "0.2.0"
+  },
+  "tampered_stage_asset_accepted": true,
+  "replacement_failure": {
+    "directory_handle_injection": true,
+    "backup_seen": true,
+    "exit": 1,
+    "current_binary_survived": false,
+    "backup_binary_survived": false
+  }
+}

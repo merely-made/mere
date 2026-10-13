@@ -100,6 +100,56 @@ fn empty_vault() -> (crate::custody::InMemoryStorage, ProfileId) {
     (storage, id)
 }
 
+#[test]
+fn generate_ssh_returns_only_the_public_half_and_preserves_the_master() {
+    let (storage, id) = empty_vault();
+    let before = load(&storage, &id).unwrap().master.public_key();
+    let mut out = Vec::new();
+    execute(
+        &storage,
+        &id,
+        "InMemory",
+        "generate-ssh",
+        &["surface-to-windows".into()],
+        &mut out,
+    )
+    .unwrap();
+    let profile = load(&storage, &id).unwrap();
+    assert_eq!(profile.master.public_key(), before);
+    let slots = ssh_slot::ssh_slots(&profile);
+    assert_eq!(slots.len(), 1);
+    assert_eq!(slots[0].tier, UnlockTier::Session);
+    let text = String::from_utf8(out).unwrap();
+    assert_eq!(text.trim(), slots[0].public().to_openssh().unwrap());
+    assert!(!text.contains("PRIVATE KEY"));
+    assert_eq!(slots[0].private.comment(), "surface-to-windows");
+}
+
+#[test]
+fn generate_ssh_refuses_bad_comments_without_mutating_the_vault() {
+    let (storage, id) = empty_vault();
+    for args in [
+        vec![],
+        vec!["".into()],
+        vec!["bad\ncomment".into()],
+        vec!["x".repeat(257)],
+        vec!["first".into(), "second".into()],
+    ] {
+        assert!(
+            execute(
+                &storage,
+                &id,
+                "InMemory",
+                "generate-ssh",
+                &args,
+                &mut Vec::new()
+            )
+            .is_err()
+        );
+    }
+    assert!(load(&storage, &id).unwrap().slots.is_empty());
+}
+
 fn slot_parts(
     storage: &dyn IdentityStorage,
     id: &ProfileId,

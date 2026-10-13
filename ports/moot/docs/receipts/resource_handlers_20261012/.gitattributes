@@ -1,0 +1,4 @@
+*.png binary
+*.drop binary
+*.json text eol=lf
+*.log -text -diff
