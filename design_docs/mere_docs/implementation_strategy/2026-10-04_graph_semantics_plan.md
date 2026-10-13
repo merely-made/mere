@@ -40,6 +40,13 @@ accesses, and records selection, activity and presentation as distinct UI
 concerns. Link/edge wording remains an open design choice there; this plan's
 relationship semantics and implementation status are unchanged.
 
+**2026-10-13 design draft:** [§7](#7-strata-and-query-driven-views-draft)
+develops Mark's distinction between links within strata and edges across
+strata, and his question about additional strata, tagging and SPARQL. The
+[terminology reference](../../TERMINOLOGY.md) carries the proposed vocabulary
+beside the established definitions. This continuation is separate from the
+completed P1–P5 implementation.
+
 ## 1. The questions
 
 1. **What does a link record?** "A cites B" could mean the page says so, the
@@ -4263,3 +4270,134 @@ preserves all qualified source bytes and does not introduce another merge
 variant. The final 3088-file frozen map still matches; the documentation audit
 adds no findings. The bounded P1–P5 lane is complete. Consumer repinning and the
 separately deferred vocabulary/oracle work remain outside this lane.
+
+## 7. Strata and query driven views draft
+
+**Status (2026-10-13):** Design draft. Mark authorized drafting this direction
+and updating terminology. The runtime retains its two implemented strata;
+additional strata and adoption of the proposed link/edge distinction remain
+design choices.
+
+A mere can offer many organizing graphs over the same material. Tags,
+vocabularies and saved queries can expose different connections without
+changing the identity of the things they organize. Additional strata would
+describe distinct semantic roles with their own identity and ownership rules.
+The resource/surface pair is the current implementation, rather than a limit
+inherent in the word *stratum*.
+
+### What each distinction controls
+
+| Concept | What it controls | Example |
+|---|---|---|
+| Stratum | An entity's semantic role, identity and owned facts | A resource and two independent surfaces showing it |
+| Type | What kind of entity occupies a role | An image resource, document resource or tag concept |
+| Named graph | The scope of RDF statements | Claims recorded in a particular source or user scope |
+| Saved query | Which members meet a selector | Resources tagged with a chosen concept |
+| Index | Efficient lookup of the source records | A lookup from a tag to resources carrying that tag |
+| Projection | How members and relations appear | A vocabulary tree, force-directed scene or Forme arrangement |
+
+Named graphs and SPARQL belong to the RDF dataset/query model; neither assigns
+Mere's entity strata by itself. SPARQL matches graph patterns and can return
+rows or RDF graphs ([W3C query specification](https://www.w3.org/TR/sparql11-query/)).
+Mere's current query adapter returns SELECT rows or ASK results. Its saved
+membership adapter accepts a SELECT member column containing Resource IRIs;
+CONSTRUCT/DESCRIBE graph results are unsupported in this cut
+(`crates/graph/linked-data/src/query.rs`, `sparql` and
+`sparql_resource_members`). Queries see the declared RDF projection and its
+coverage, rather than automatically exposing every UI or runtime record.
+
+### Links within strata and edges across strata
+
+The proposed design vocabulary uses **relation** as the umbrella, **link** for
+a relation within a semantic stratum, and **edge** for a relation across
+strata. The source relation's semantic roles determine the word. A different
+media type, RDF type, foreground/background state or drawn plane does not
+change it. Explicit, computed and inferred describe provenance independently.
+
+Consider surfaces A and B showing resource R, another resource D, and tag
+concept G. R citing D and R being tagged with G are resource links. A and B
+being grouped together is a surface link. Each surface showing R is a
+cross-stratum edge in this vocabulary. Both surfaces remain independent
+accesses even though they share R and its content claims.
+
+If the canvas lifts R's citation onto visible surfaces, the drawn connection
+still represents the original resource link. Inspection keeps its source
+stratum, predicate, assertion identity and provenance. A lifted link does not
+become a surface assertion merely because its visible endpoints are surfaces.
+
+The existing surface/resource association is a **shown binding**, rather than
+an ordinary stored statement edge. It costs zero hops in mixed walks;
+relations within either stratum cost one. The proposed wording preserves that
+behavior. Internal `EdgeKey`, `ResourceEdgeKey`, `RelationKey`, petgraph terms
+and persisted identifiers retain their current meanings. A general registry
+of arbitrary cross-stratum relation records would require a separate contract.
+
+### Tags and indexing views
+
+Tags already have a settled home: a tag is a resource representing a vocabulary
+concept, and tagging is an attributed statement to that resource (rulings 15
+and 20). Labels, broader/narrower concepts and shared concept references can
+form a vocabulary graph. An image resource and a tag resource occupy the same
+stratum despite their different types.
+
+A tagging view can show that vocabulary, the resources classified by it, or
+both. A saved query supplies the relevant Resource membership; the projection
+chooses the appearances and arrangement. Membership alone does not select one
+of several surfaces showing a resource or create an access to it. That choice
+belongs to the view's explicit appearance/opening policy.
+
+An index accelerates lookup and can be rebuilt from its source records. Index
+configuration or an authored catalog may itself have a resource identity;
+the generated lookup entries do not thereby acquire a new identity stratum.
+Keep source revision and coverage with results so that incomplete material is
+not presented as a complete empty answer.
+
+Sharing a saved query sends its spec for evaluation over the receiver's data.
+Freezing records the chosen Resource identities, query spec and source
+revision in a nested graph, as ruled by the existing saved-query lane. Neither
+operation transfers the sender's temporary selection, camera or appearances.
+
+### Candidates for additional strata
+
+These candidates test the boundary; they do not add new strata:
+
+| Candidate | Reason to consider a stratum | Existing home to examine first |
+|---|---|---|
+| Assertions | Claims themselves may need stable relationships, evidence and independent review | Attributed statement records, scopes and RDF reifiers already preserve exact claims |
+| Occurrences or events | A particular reading, capture, execution or change has temporal identity apart from the thing involved | Surface traversal/history, retained captures and domain event records |
+| Composition | Scenes, fields and workbench structures may need identities independent of any appearance | Authored projection documents, field/coupling records and Forme authority |
+
+A candidate needs four answers before extending the model:
+
+1. What makes two entities the same entity, and when is a new identity minted?
+2. Which facts belong to it, and what are its creation, update and removal rules?
+3. How does it connect to other strata, and what do those joins mean for queries,
+   traversal and projection?
+4. Who may edit it, and how do persistence, replay, sharing and partial residency
+   preserve that identity and ownership?
+
+Defining a new type, filter or visual layer does not by itself answer these
+questions. Additional strata are appropriate when these contracts establish a
+distinct role. A future extensible registry would also need stable stratum
+identifiers, decoder behavior and migration rules; the present
+`GraphStratum::{Resource, Surface}` enum is not such a registry
+(`crates/graph/graph-kernel/src/graph/predicate_registry.rs`).
+
+### First implementation target
+
+The next bounded candidate is a read-only tagging/query view over the existing
+strata. Reuse the saved SELECT Resource-membership adapter, coverage notes and
+source revision; make the view's Resource-to-appearance policy explicit. Its
+inspector should distinguish a lifted resource link, a surface link and a
+surface/resource binding without changing graph ownership or traversal cost.
+
+Acceptance should cover two surfaces showing one resource, an undrawn resource,
+distinct owners' equal tag labels, parallel attributed assertions, navigation
+to a different resource, exact empty membership and incomplete coverage.
+Read-only view creation must preserve existing surface identities and Forme
+placement. Sharing the spec and freezing a selection retain their established
+separate behavior.
+
+Before implementing this target, resolve where the view is authored and whether
+cross-stratum *edge* appears in ordinary product copy or only detailed
+inspection. Admission of an additional stratum is a later model decision.
