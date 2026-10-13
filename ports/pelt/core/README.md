@@ -70,3 +70,14 @@ history:
 Turnstone's history is its graph: a link opens or mints a node.
 `PeltContent::open` does the same in either lane. A web surface keeps its own
 engine history in both modes.
+
+## Native stack engines
+
+The opt-in `genet` feature provides `native::sessions`, `native::route_policy`
+and `native::registries`: Genet Livery, Reader, normalized Inker documents and
+Fleece retained clips. `image-decode` enables the existing image decoder.
+`HeldResources` resolves declared byte inventory and embedded data URLs only.
+An application with acquisition authority can use `sessions_with_fetcher` and
+extend the registry with its own engines. These factories acquire neither a
+store nor a window or wgpu device. Graphshell's retained-content host and
+Turnstone's native engine registration consume this factory.
