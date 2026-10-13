@@ -209,7 +209,7 @@ Turnstone owns service lifecycle and product interaction:
 
 | Current item | Target | Reason |
 |---|---|---|
-| `crates/murm/transport` | Murm peer-transport crate | Already the shared endpoint and carrier layer |
+| `retinue/native/crates/transport` | Murm peer-transport crate | Already the shared endpoint and carrier layer |
 | `transport::SyncedSpace` | `murm-replication` | It is replicated-space processing, not byte transport |
 | `mooting::MunimentStore` | `murm-replication` | Generic persistence used outside Moot |
 | new retention/checkpoint/drop machinery | `murm-replication` | Shared mechanism for every replicated domain |
