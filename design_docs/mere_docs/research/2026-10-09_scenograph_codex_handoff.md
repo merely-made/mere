@@ -196,6 +196,21 @@ reference-point spatial membership including the boundary; initial matches
 reported without entry actions, which start on later transitions. The receipt distinguishes this backend qualification from
 visible UI explanation, external consumer adoption and coordinator review.
 
+**Field-runtime continuation (2026-10-12):** Mark authorized F203 to F205's
+runtime adapter. The
+[owning dynamics plan](../implementation_strategy/2026-10-02_dynamics_grammar_plan.md#field-clock-and-membership-runtime-2026-10-12)
+now records accepted simulation time, Pause freezing, Reset rewinding on a
+separate epoch, and inclusive per-body reference-point eligibility. Extent and
+selector join the exact compiled provenance. Initial matches run no entry
+callback; later known entries invoke an explicitly registered owner handler,
+with causes and refusals reported. Duplicate target slots still execute their
+physical writes without multiplying an appearance's entry action. Actor delivery
+is bounded, cached reports do not replay actions, and old clocks/frames are
+rejected on reset. The Canvas bridge applies these policies and routes existing
+reseed/graph-swap hooks to the clock reset. App-specific script receivers,
+visible UI, external consumer adoption and coordinator review remain separate.
+The prior t=0/selector-only notes describe their frozen tracing checkpoint.
+
 ## Ruled continuation, 2026-10-10
 
 F200 to F202 are recorded verbatim in the dynamics grammar plan, committed

@@ -1,0 +1,28 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling numen v0.2.0 (C:\Users\mark_\Code\worktrees\mere-field-runtime\crates\conatus\numen)
+   Compiling seiche v0.0.6 (C:\Users\mark_\Code\worktrees\mere-field-runtime\crates\conatus\seiche)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 23.44s
+     Running unittests src\lib.rs (C:/t/cargo-targets/mere\debug\deps\seiche-8884e443fa3ea419.exe)
+
+running 1 test
+
+thread 'field_runtime_tests::field_runtime_inclusive_reference_points_filter_actual_writes' (1648) panicked at crates\conatus\seiche\src\field_runtime_tests.rs:295:9:
+assertion failed: matches!(row.applied, CouplingAppliedEffect::Write { .. })
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test field_runtime_tests::field_runtime_inclusive_reference_points_filter_actual_writes ... FAILED
+
+failures:
+
+failures:
+    field_runtime_tests::field_runtime_inclusive_reference_points_filter_actual_writes
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 198 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p seiche --lib`
