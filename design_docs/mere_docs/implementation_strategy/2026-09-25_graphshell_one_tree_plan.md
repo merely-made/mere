@@ -1185,7 +1185,7 @@ native/touch qualification and complete one-tree phase 4 remain separate.
 The latest release measurement stays bound to `8ad44a5c7`; no new release size
 is inferred from these debug packages.
 
-### Viewer delivery budget (2026-10-12; current-main reconciliation)
+### Viewer delivery budget (2026-10-13; qualified for publication)
 
 Mark authorized reducing the viewer below R157's unchanged 3,407,872-byte
 (3.25 MiB) gzip limit so the site can replace its sandbox. Work starts on
@@ -1243,9 +1243,22 @@ Reconciliation preserves these capabilities in native defaults and web product
 builds through an explicit `retained-content` feature, keeping the read-only
 viewer free of their document producer. The standalone web workspace also
 restates the root p2panda compatibility patches, which Cargo does not inherit.
-Its source `3f57971e0` is being rebuilt and requalified; prior package acceptance
-does not transfer automatically. Main publication and live-site cutover remain
-pending.
+The reconciled runtime (`3f57971e0`, packaged at comment-only successor
+`47199232d`) measures 3,303,044 B gzip6 and 3,289,510 B gzip9, leaving
+104,828 B at the stricter measured level. Raw Wasm is 9,474,800 B. Glue is
+19,147 B gzip6; mount 588 B and history 6,704 B. All four caps and all four
+Wasm configurations pass, with product complex-script support present and
+viewer support absent. The exact rebuilt package independently passes all 24 command, eleven
+presenter, seventeen physics and four browser pointer/keyboard checks, Unicode
+comparison and the three expected unsupported-product assertion failures with
+no page errors. The new 21-node synthetic windows have 16.65–16.8 ms median,
+at most 18.1 ms p95 and 18.6 ms maximum display intervals; this remains a
+bounded diagnostic. Chrome 152 uses AMD gcn-5. All four driver processes exit
+zero, and the browser/server/inhibitor are closed at 07:44:12 UTC on 13 October.
+The earlier package and failed controls remain independently preserved.
+Source/asset/driver/served/auxiliary hashes are frozen in the candidate ledger.
+Main publication is the remaining delivery step; live-site cutover remains
+separate.
 
 The builder enforces all four interaction caps at gzip6 and gzip9. The portable
 workflow invokes it in a separate Linux delivery job and retains package/report.
