@@ -22,6 +22,8 @@ use wasm_bindgen::JsCast;
 use wasm_bindgen::prelude::Closure;
 use web_sys::{HtmlCanvasElement, HtmlInputElement};
 
+use crate::MountLifetime;
+
 /// Opens files through a file input kept beside the canvas.
 pub struct WebFileChooser {
     input: HtmlInputElement,
@@ -31,6 +33,18 @@ pub struct WebFileChooser {
 impl WebFileChooser {
     /// Put the chooser's input in the page beside `canvas`.
     pub fn new(canvas: &HtmlCanvasElement) -> Result<Self, String> {
+        Self::new_inner(canvas, None)
+    }
+    pub(crate) fn new_with_lifetime(
+        canvas: &HtmlCanvasElement,
+        lifetime: &MountLifetime,
+    ) -> Result<Self, String> {
+        Self::new_inner(canvas, Some(lifetime))
+    }
+    fn new_inner(
+        canvas: &HtmlCanvasElement,
+        lifetime: Option<&MountLifetime>,
+    ) -> Result<Self, String> {
         let document = canvas
             .owner_document()
             .ok_or("the canvas has no document")?;
@@ -53,10 +67,25 @@ impl WebFileChooser {
             .map_err(|_| "could not place the file input")?;
 
         let pending: Rc<RefCell<Option<FileAnswer>>> = Rc::default();
+        if let Some(lifetime) = lifetime {
+            let input = input.clone();
+            let pending = pending.clone();
+            lifetime.on_dispose(move || {
+                input.remove();
+                let answer = pending.borrow_mut().take();
+                if let Some(answer) = answer {
+                    answer.send(FileEvent::default());
+                }
+            });
+        }
         let chosen = {
             let input = input.clone();
             let pending = pending.clone();
+            let lifetime = lifetime.cloned();
             Closure::<dyn FnMut(web_sys::Event)>::new(move |_: web_sys::Event| {
+                if lifetime.as_ref().is_some_and(|life| !life.admitted()) {
+                    return;
+                }
                 let Some(answer) = pending.borrow_mut().take() else {
                     return;
                 };
@@ -66,6 +95,7 @@ impl WebFileChooser {
                     .unwrap_or_default();
                 // Choosing the same file again must fire `change` again.
                 input.set_value("");
+                let read_lifetime = lifetime.clone();
                 wasm_bindgen_futures::spawn_local(async move {
                     let mut opened = Vec::with_capacity(files.len());
                     for file in files {
@@ -73,26 +103,42 @@ impl WebFileChooser {
                             opened.push(file);
                         }
                     }
-                    answer.send(FileEvent { files: opened });
+                    if read_lifetime.as_ref().is_none_or(|life| life.admitted()) {
+                        answer.send(FileEvent { files: opened });
+                    }
                 });
             })
         };
-        input
-            .add_event_listener_with_callback("change", chosen.as_ref().unchecked_ref())
-            .map_err(|_| "could not listen for a chosen file")?;
-        chosen.forget();
+        if let Some(lifetime) = lifetime {
+            let callback = chosen.as_ref().clone();
+            lifetime.listen(input.as_ref(), "change", &callback, move || drop(chosen))?;
+        } else {
+            input
+                .add_event_listener_with_callback("change", chosen.as_ref().unchecked_ref())
+                .map_err(|_| "could not listen for a chosen file")?;
+            chosen.forget();
+        }
         let cancelled = {
             let pending = pending.clone();
+            let lifetime = lifetime.cloned();
             Closure::<dyn FnMut(web_sys::Event)>::new(move |_: web_sys::Event| {
+                if lifetime.as_ref().is_some_and(|life| !life.admitted()) {
+                    return;
+                }
                 if let Some(answer) = pending.borrow_mut().take() {
                     answer.send(FileEvent::default());
                 }
             })
         };
-        input
-            .add_event_listener_with_callback("cancel", cancelled.as_ref().unchecked_ref())
-            .map_err(|_| "could not listen for a cancelled choice")?;
-        cancelled.forget();
+        if let Some(lifetime) = lifetime {
+            let callback = cancelled.as_ref().clone();
+            lifetime.listen(input.as_ref(), "cancel", &callback, move || drop(cancelled))?;
+        } else {
+            input
+                .add_event_listener_with_callback("cancel", cancelled.as_ref().unchecked_ref())
+                .map_err(|_| "could not listen for a cancelled choice")?;
+            cancelled.forget();
+        }
         Ok(Self { input, pending })
     }
 }
