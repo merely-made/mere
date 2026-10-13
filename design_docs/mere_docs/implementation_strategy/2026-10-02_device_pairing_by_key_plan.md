@@ -130,9 +130,18 @@ The Surface login was repeated successfully after native unlock, and the
 Locked Windows qualifier denied login with exit 255 before replacement.
 
 Codex's remote chat read also reached `Check stack status` on s-pc. Sending
-was rejected because that chat has an active writer held by the Surface's
-ChatGPT app-server. No message was delivered or writer interrupted; two-way
-app chat remains unqualified independently of the successful SSH receipts.
+initially failed because that chat had an active writer held by the Surface's
+ChatGPT app-server. On 2026-10-13, after its earlier turn completed and the
+old writer released the lock, the existing remote connection accepted two
+messages. The agent acknowledged the first and returned the requested
+`mesh-chat-ack-01a13524 S-PC` confirmation on the second. Send-message/read-reply
+is qualified; neither app nor another chat was stopped or restarted. The
+writer guard remains intact, so a chat held by another server must release
+its writer before this connection can resume it. The s-pc session currently
+has no `send_message_to_thread` tool, including in its discoverable registry:
+an unsolicited push into the O-PC chat is not qualified. This is an app
+communication receipt, separate from SSH custody and the future Iroh proxy.
+See [`cross-machine-chat.json`](../testing/receipts/djinn-ssh-peers/cross-machine-chat.json).
 
 The Linux installer was also checked against the active resident: it refused
 replacement and left the PID unchanged. The Windows installer refused an
