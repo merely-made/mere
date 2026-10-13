@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: MPL-2.0
 
 [package]
+rust-version = "1.97.1"
 name = "wing-three-paths"
 version = "0.0.1"
 edition = "2024"

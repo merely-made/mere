@@ -3,7 +3,8 @@ name = "mesquite"
 version = "0.1.0"
 description = "The scenario lane for a Cambium document host: ticks a taproot scenario per presented frame, arms captures, writes PNGs and one JSON receipt, checks pixels, accounts cost, and sets the exit code, behind a Product trait each app implements"
 edition.workspace = true
-rust-version = "1.92"
+
+rust-version = "1.97.1"
 license = "MPL-2.0"
 repository.workspace = true
 # Publishes with the rest of the family once taproot can (a stale buckram
