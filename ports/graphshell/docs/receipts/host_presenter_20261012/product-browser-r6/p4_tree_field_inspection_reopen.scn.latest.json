@@ -1,0 +1,43 @@
+{
+  "receipt": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        1140,
+        865
+      ],
+      "canvas_physical_size": [
+        1140,
+        865
+      ],
+      "log": [
+        "captured reopened_field_records",
+        "exact field and coupling source identities retained across page reopen",
+        "gpu timestamps: no"
+      ],
+      "result": "ok",
+      "saved_graph": {
+        "address": "",
+        "file": null,
+        "reopened": true,
+        "save_state": "idle",
+        "selected": null,
+        "session": "bca38d1a-1599-4977-9383-6b0ac2e0508e",
+        "tags": "",
+        "title": ""
+      },
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "reopened_field_records",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 349006
+      }
+    ]
+  },
+  "errors": []
+}

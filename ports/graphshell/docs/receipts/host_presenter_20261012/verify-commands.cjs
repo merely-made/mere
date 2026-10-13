@@ -24,12 +24,12 @@ const base='http://127.0.0.1:8845';
  async function palette(){await trigger().press('Enter');await search().waitFor();}
  async function command(query){await palette();await search().pressSequentially(query);await search().press('Enter');await page.waitForTimeout(150);}
  try{
-  for(const [name,url,file] of [
+  for(const [name,url,file] of (process.env.ONLY_PHYSICAL?[]:[
    ['commands-fixture','/tree.html','viewer_commands.scn'],
    ['commands-grouped','/grouped-dataset.html','viewer_commands.scn'],
    ['fold-page-gestures','/grouped-dataset.html?wheel=page','hosted_fold_gestures.scn'],
    ['fold-history','/tree.html?dataset=fixtures/grouped-host-history.json&grouping=contains','hosted_folds_history.scn'],
-  ]){await mount(url);await scenario(name,fs.readFileSync(path.join(__dirname,'web-viewer/scenarios',file),'utf8'));}
+  ])){await mount(url);await scenario(name,fs.readFileSync(path.join(__dirname,'web-viewer/scenarios',file),'utf8'));}
   await mount('/grouped-dataset.html');
   // External host-page focus is not stolen when a retained popup disappears.
   await palette();
@@ -44,6 +44,8 @@ const base='http://127.0.0.1:8845';
   await scenario('keyboard-zoom','assert snap command-last == Zoom in\nassert snap focus-kind == graph\n');
   await page.evaluate(()=>{window.__commandKeys=[];window.addEventListener('keydown',e=>window.__commandKeys.push({key:e.key,code:e.code,shift:e.shiftKey,ctrl:e.ctrlKey,meta:e.metaKey,target:e.target.outerHTML?.slice(0,500)}),true)});await page.keyboard.press('Shift+F10');await page.waitForTimeout(250);fs.writeFileSync(path.join(out,'shift-f10-debug.json'),JSON.stringify(await page.evaluate(()=>({events:window.__commandKeys,active:document.activeElement?.outerHTML?.slice(0,1000)})),null,2));await search().waitFor();
   await page.getByRole('button',{name:'All commands',exact:true}).press('Enter');
+  await page.waitForTimeout(350);
+  fs.writeFileSync(path.join(out,'all-commands-debug.json'),JSON.stringify(await page.evaluate(()=>({active:document.activeElement?.outerHTML,options:[...document.querySelectorAll('[role=option]')].map(e=>({name:e.getAttribute('aria-label'),text:e.textContent})),dialogs:[...document.querySelectorAll('[role=dialog]')].map(e=>e.outerHTML),host:window.graphshellReceipt?.()})),null,2));
   await page.getByRole('option',{name:'Wheel: scroll page',exact:true}).waitFor({state:'attached'});
   await page.getByRole('button',{name:'Close commands',exact:true}).press('Enter');
   await scenario('keyboard-footer','assert snap commands-open == false\nassert snap focus-kind == graph\n');
@@ -56,7 +58,7 @@ const base='http://127.0.0.1:8845';
   await trigger().focus();await page.mouse.move(at.x-160,at.y-160);await page.mouse.down({button:'right'});await page.mouse.move(at.x-60,at.y-60,{steps:5});await page.mouse.up({button:'right'});
   await scenario('right-drag','assert snap commands-open == false\nassert snap dragging == false\nassert snap focus-kind == graph\n');
   // Physical background drag is a camera action, without changing geometry.
-  await start('remember physical-pan\nwait 180\ndiffers physical-pan camera\nsame physical-pan geometry\n');
+  await start('remember physical-pan\nsettle 180\ndiffers physical-pan camera\nsame physical-pan geometry\n');
   await page.waitForTimeout(200);await page.mouse.move(at.x-5,at.y-5);await page.mouse.down();await page.mouse.move(at.x-100,at.y-60,{steps:8});await page.mouse.up();await finish('physical-background-pan');
   // Context Fold commands use the existing hierarchy/projection owner.
   await command('Expand mere');await scenario('command-fold-expand','assert snap commands-open == false\nassert snap command-last == Expand mere\n');
@@ -68,10 +70,10 @@ const base='http://127.0.0.1:8845';
   await page.mouse.move(leaf.x+leaf.width/2-24,leaf.y+leaf.height/2-24);await page.mouse.down({button:'right'});await page.mouse.move(leaf.x+leaf.width/2+24,leaf.y+leaf.height/2+24,{steps:5});await page.mouse.up({button:'right'});
   await scenario('right-box-selection','assert snap selection-fit-available == true\nassert snap commands-open == false\nassert snap focus-kind == graph\n');
   await scenario('prepare-selected-zoom','click-node urn:host-dataset:crate:mere:sceno\nsettle 3\n');
-  await start('remember physical-zoom\nwait 180\ndiffers physical-zoom zoom\nsame physical-zoom geometry picked\nassert snap selection-center-distance <= 2\n');
+  await start('remember physical-zoom\nsettle 180\ndiffers physical-zoom zoom\nsame physical-zoom geometry picked\nassert snap selection-center-distance <= 2\n');
   await page.waitForTimeout(200);await page.mouse.move(leaf.x+leaf.width/2,leaf.y+leaf.height/2);await page.mouse.wheel(0,-180);await finish('physical-pointer-zoom');
   await scenario('prepare-node-drag','set-zoom 1\ncenter-node urn:host-dataset:crate:mere:sceno\nsettle 3\n');
-  await start('remember physical-node\nwait 180\ndiffers physical-node geometry\nsame physical-node camera zoom\nassert snap dragging == false\n');
+  await start('remember physical-node\nsettle 180\ndiffers physical-node geometry\nsame physical-node camera zoom\nassert snap dragging == false\n');
   await page.waitForTimeout(200);await page.mouse.move(leaf.x+leaf.width/2,leaf.y+leaf.height/2);await page.mouse.down();await page.mouse.move(leaf.x+leaf.width/2+70,leaf.y+leaf.height/2+15,{steps:8});await page.mouse.up();await finish('physical-node-drag');
   await command('Whole graph');await scenario('command-fold-leave','assert snap commands-open == false\n');
   await palette();await search().pressSequentially('Pan left');await search().press('ArrowDown');
@@ -98,7 +100,7 @@ const base='http://127.0.0.1:8845';
   await palette();await search().pressSequentially('Fit selection');await search().press('ArrowDown');
   const cdp=await context.newCDPSession(page);const ax=await cdp.send('Accessibility.getFullAXTree');
   assert.ok(ax.nodes.some(n=>n.role?.value==='textbox'&&n.name?.value==='Search graph commands'));
-  assert.ok(ax.nodes.some(n=>n.role?.value==='option'&&n.name?.value.includes('Fit selection')));
+  assert.ok(ax.nodes.some(n=>n.role?.value==='option'&&n.name?.value==='Fit selection'&&n.description?.value==='Select a visible node first'&&n.properties?.some(p=>p.name==='disabled'&&p.value?.value===true)));
   await search().press('Escape');
   fs.writeFileSync(path.join(out,'chrome-accessibility.json'),JSON.stringify(ax,null,2));
   // Refuse an unknown wheel preference before mounting a misleading fallback.
@@ -112,5 +114,5 @@ const base='http://127.0.0.1:8845';
   const adapter=await page.evaluate(async()=>{const a=await navigator.gpu.requestAdapter();return a?{vendor:a.info.vendor,architecture:a.info.architecture,device:a.info.device,description:a.info.description}:null});
   assert.ok(adapter&&!/swiftshader/i.test(JSON.stringify(adapter)));assert.equal(errors.length,0,errors.join('\n'));
   fs.writeFileSync(path.join(out,'summary.json'),JSON.stringify({runs,headed:true,browser:browser.version(),adapter,errors},null,2));console.log('DONE',JSON.stringify({runs,adapter}));
- }finally{await browser.close();}
+ }catch(e){fs.writeFileSync(path.join(out,'failure.json'),JSON.stringify({message:e.message,errors,active:await page.evaluate(()=>document.activeElement?.outerHTML)},null,2));await page.screenshot({path:path.join(out,'failure.png')});throw e;}finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1});

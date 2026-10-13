@@ -1,0 +1,31 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling cambium-rootstock v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/cambium/cambium-rootstock)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.61s
+     Running tests/hover_motion.rs (target/debug/deps/hover_motion-ef3e174965866830)
+
+running 2 tests
+test hover_motion_resolves_ancestor_coordinates_and_leaves_without_clicking ... ok
+test replacing_a_hovered_subtree_does_not_deliver_leave_to_its_retired_node ... FAILED
+
+failures:
+
+---- replacing_a_hovered_subtree_does_not_deliver_leave_to_its_retired_node stdout ----
+
+thread 'replacing_a_hovered_subtree_does_not_deliver_leave_to_its_retired_node' (25821269) panicked at /Users/markik/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/2c7ef73/components/genet-scripted-dom/lib.rs:1111:14:
+NodeId is not stored in this document (foreign or retired)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    replacing_a_hovered_subtree_does_not_deliver_leave_to_its_retired_node
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.30s
+
+error: test failed, to rerun pass `-p cambium-rootstock --test hover_motion`

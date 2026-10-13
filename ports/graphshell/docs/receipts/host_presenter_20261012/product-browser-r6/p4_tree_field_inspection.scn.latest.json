@@ -1,0 +1,66 @@
+{
+  "receipt": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        1140,
+        865
+      ],
+      "canvas_physical_size": [
+        1140,
+        865
+      ],
+      "log": [
+        "waited 0 frames",
+        "waited 0 frames",
+        "captured exact_scalar_coupling",
+        "captured overlapping_field_candidates",
+        "captured retired_field_record",
+        "captured forme_arrangement_owner",
+        "field inspection and overlap discovery preserve selection and Forme ownership",
+        "gpu timestamps: no"
+      ],
+      "result": "ok",
+      "saved_graph": {
+        "address": "file:///Graphshell/reference-notes.md",
+        "file": null,
+        "reopened": false,
+        "save_state": "idle",
+        "selected": "392b7659-3952-57e9-8812-98c4d6205025",
+        "session": "bca38d1a-1599-4977-9383-6b0ac2e0508e",
+        "tags": "local, reference",
+        "title": "Reference notes"
+      },
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "exact_scalar_coupling",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 443590
+      },
+      {
+        "name": "overlapping_field_candidates",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 388970
+      },
+      {
+        "name": "retired_field_record",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 371470
+      },
+      {
+        "name": "forme_arrangement_owner",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 461862
+      }
+    ]
+  },
+  "errors": []
+}

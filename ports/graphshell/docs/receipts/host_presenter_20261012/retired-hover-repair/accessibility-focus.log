@@ -1,0 +1,18 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling cambium-rootstock v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/cambium/cambium-rootstock)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 17.62s
+     Running unittests src/lib.rs (target/debug/deps/cambium_rootstock-f9760f729ee45d08)
+
+running 2 tests
+test accessibility_tests::accessibility_sync_tracks_focus_changes_and_clear_without_hover ... ok
+test accessibility_tests::accessibility_bounds_follow_nested_and_document_scroll ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 80 filtered out; finished in 1.18s
+
