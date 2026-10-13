@@ -34,14 +34,16 @@
     "surface_repeat_login_exit": 0,
     "windows_desktop_hello_prompt": "owner confirmed Windows Hello at persisted-lock startup and in-process native unlock",
     "cross_machine_chat_read": "passed: Check stack status on remote-ssh-discovered:s-pc",
-    "cross_machine_chat_send": "rejected: target chat has an active writer owned by the Surface ChatGPT app-server; no message delivered",
+    "cross_machine_chat_send": "passed: two messages accepted after completed target turn released its old writer; agent replies read through the existing remote connection",
     "windows_persisted_lock_recovery_login_exit": 0,
     "windows_fresh_locked_login_exit": 255,
     "windows_in_process_native_unlock_exit": 0,
     "windows_in_process_recovery_login_exit": 0,
     "windows_ssh_key_fingerprint": "SHA256:d3tQOqvSRA4QE1D7R1j2SJh31wLCXTTZofJxvQLfd0o",
     "windows_persona_public_key_preserved_across_lock": true,
-    "windows_rollback_binary_removed": true
+    "windows_rollback_binary_removed": true,
+    "cross_machine_chat_confirmation": "mesh-chat-ack-01a13524 S-PC",
+    "cross_machine_chat_direct_push": "unavailable: s-pc session has no send_message_to_thread tool, including in discovery"
   },
   "laptop": {
     "memory_current_bytes": 104124416,
@@ -65,7 +67,7 @@
     "master approval of device CAs",
     "fleet-wide pairing",
     "graphical desktop control",
-    "cross-machine Codex message delivery: target writer belongs to the Surface ChatGPT app"
+    "unsolicited s-pc-to-O-PC chat push: sending tool unavailable in target session; request/reply route is qualified"
   ],
   "updated": "2026-10-13",
   "windows_native_source_hashes": {
