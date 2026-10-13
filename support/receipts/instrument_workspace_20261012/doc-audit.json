@@ -1,5 +1,5 @@
 {
-  "baseline_head": "ea9239a3fe23c9e88eb1e05b887b2671e082f6b9",
+  "baseline_head": "a454842ff8a507facaf80f8fdc8cc8e639e0ca9f",
   "changed_docs": [
     "design_docs/2026-08-23_projection_scenes_and_graph_native_platform.md"
   ],
@@ -20,7 +20,7 @@
     "planned_missing_known_root_paths": 6,
     "invalid_historical_annotations": 0,
     "stale_historical_annotations": 0,
-    "unheaded_owned_sources": 12,
+    "unheaded_owned_sources": 0,
     "exhibit_b_sources": 0
   },
   "current_counts": {
@@ -39,7 +39,7 @@
     "planned_missing_known_root_paths": 6,
     "invalid_historical_annotations": 0,
     "stale_historical_annotations": 0,
-    "unheaded_owned_sources": 12,
+    "unheaded_owned_sources": 0,
     "exhibit_b_sources": 0
   }
 }

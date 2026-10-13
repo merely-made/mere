@@ -29,8 +29,10 @@ The frame uses Cambium's opt-in `INSTRUMENT_CSS` and
 `workspace_pane_header`: continuous pane edges, compact utility controls,
 source/context captions, and separate active, selected, unsaved and loading
 states. The existing split/tab and title-bar components keep their geometry,
-input and window-policy ownership. Theme specimens retain their own draft
-colors and typography.
+input and window-policy ownership. Hosts mark utility-control regions with `workspace-controls`; title-bar and pane
+actions are already admitted regions. Content buttons, including graph semantic
+hit targets, keep their own presentation and geometry. Theme specimens retain
+their own draft colors and typography.
 
 `workshop_stylesheet()` supplies a neutral built-in light frame through
 Tabard's existing palette derivation. An embedding host can instead use

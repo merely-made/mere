@@ -26,7 +26,7 @@ assert not any(s.get('CGSSessionScreenIsLocked', False) for s in console.get('IO
 profile = base / 'profile'
 profile.mkdir(exist_ok=True)
 commands = []
-for label, scenario in [('native-instrument-r2', 'instrument'), ('native-usability', 'usability')]:
+for label, scenario in [('native-instrument-r4', 'instrument'), ('native-usability-r3', 'usability')]:
     library = profile / (label + '.json')
     assert not library.exists(), 'Fresh authored library required'
     commands.append({'label': label, 'command': [

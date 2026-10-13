@@ -1,0 +1,22 @@
+{
+  "source": "33f4c01fe855e9e7e5f00088eaaf231267ee6268",
+  "runs": [
+    "wide-entry",
+    "forme-original",
+    "forme-reopen",
+    "open-reading",
+    "light-workbench",
+    "narrow-workbench",
+    "narrow-graph",
+    "commands-focus"
+  ],
+  "adapter": {
+    "vendor": "amd",
+    "architecture": "gcn-5",
+    "device": ""
+  },
+  "browser": "152.0.7977.83",
+  "headed": true,
+  "page_errors": 0,
+  "session": "d26382c9-932f-4c75-9b2b-ec0d4a1d6de2"
+}
