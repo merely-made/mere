@@ -8,7 +8,9 @@
 use cambium_genet_winit_host::Harness;
 use layout_dom_api::LayoutDom;
 use tabard::theme::registry::Mode;
-use tabard_workshop::{WorkshopState, WorkshopView, workshop_stylesheet, workshop_view};
+use tabard_workshop::{
+    WorkshopState, WorkshopView, workshop_stylesheet, workshop_stylesheet_with_frame, workshop_view,
+};
 
 type Host = Harness<WorkshopState, fn(&WorkshopState) -> WorkshopView, WorkshopView>;
 
@@ -73,4 +75,38 @@ fn instrument_frame_does_not_apply_or_commit_the_draft() {
     host.update(WorkshopState::discard);
     assert_eq!(host.state().draft_theme().name, original);
     assert_eq!(host.state().registry().active_theme(), before);
+}
+
+#[test]
+fn authored_font_lists_retain_the_hosts_admitted_interface_fallback() {
+    use genet_style::{Device, InteractionStates, StyleSet, resolve_styles};
+    let sheet = workshop_stylesheet_with_frame(
+        ".instrument-workspace { --workspace-font-interface: Roboto,sans-serif; \
+         --tabard-font-interface: UnavailableInterface; --tabard-font-label: UnavailableLabel; }",
+    );
+    let host = Harness::new(
+        sheet,
+        WorkshopState::in_memory(),
+        workshop_view as fn(&WorkshopState) -> WorkshopView,
+    );
+    host.with_surfaces(|surfaces| {
+        let surface = &surfaces[0];
+        let plane = resolve_styles(
+            surface.dom,
+            &StyleSet::cambium(&[surface.sheet]),
+            &Device::screen(surface.rect[2], surface.rect[3]),
+            &InteractionStates::default(),
+        );
+        for (class, authored) in [
+            ("instrument-workspace", "UnavailableInterface"),
+            ("workspace-pane-title", "UnavailableLabel"),
+        ] {
+            for node in surface.dom.all_with_class(surface.dom.document(), class) {
+                let family = plane.computed_style(node, "font-family").unwrap();
+                let faces: Vec<_> = family.split(',').map(str::trim).collect();
+                assert_eq!(faces.first().copied(), Some(authored));
+                assert!(faces.contains(&"Roboto"), "admitted fallback lost: {family}");
+            }
+        }
+    });
 }
