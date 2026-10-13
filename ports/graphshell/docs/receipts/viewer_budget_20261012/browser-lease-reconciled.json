@@ -1,0 +1,33 @@
+{
+  "source": "47199232d205576e84c802a84eb0cda401f926e1",
+  "cutoff": "2026-10-13T07:51:50.827778+00:00",
+  "started": "2026-10-13T07:36:51.038842+00:00",
+  "drivers": [
+    {
+      "driver": "verify-reconciled-commands-final.cjs",
+      "exit": 0
+    },
+    {
+      "driver": "verify-reconciled-presenter-final-sync.cjs",
+      "exit": 0
+    },
+    {
+      "driver": "verify-reconciled-budget-final.cjs",
+      "exit": 0
+    },
+    {
+      "driver": "verify-reconciled-physical-final.cjs",
+      "exit": 0
+    }
+  ],
+  "closed": true,
+  "owned_pids": [
+    24372,
+    24373,
+    24374,
+    24485,
+    24522,
+    24924
+  ],
+  "released": "2026-10-13T07:44:12.571672+00:00"
+}

@@ -1,0 +1,45 @@
+{
+  "scope": "21 generated nodes, seed7, links none, CPU physics; count-matched diagnostic, not actual site data or sustained-performance guarantee",
+  "windows": {
+    "budget-reconciled-browser-r1": [
+      {
+        "samples": 120,
+        "median_ms": 16.7,
+        "p95_ms": 17.6,
+        "max_ms": 18.0
+      },
+      {
+        "samples": 120,
+        "median_ms": 16.65,
+        "p95_ms": 17.8,
+        "max_ms": 18.4
+      },
+      {
+        "samples": 120,
+        "median_ms": 16.7,
+        "p95_ms": 17.6,
+        "max_ms": 18.6
+      }
+    ],
+    "physical-reconciled-browser-r1": [
+      {
+        "samples": 120,
+        "median_ms": 16.8,
+        "p95_ms": 17.7,
+        "max_ms": 18.5
+      },
+      {
+        "samples": 120,
+        "median_ms": 16.7,
+        "p95_ms": 18.1,
+        "max_ms": 18.5
+      },
+      {
+        "samples": 120,
+        "median_ms": 16.8,
+        "p95_ms": 17.8,
+        "max_ms": 18.5
+      }
+    ]
+  }
+}

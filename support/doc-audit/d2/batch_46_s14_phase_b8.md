@@ -532,3 +532,24 @@ All owned UI resources closed at 07:19:09 UTC on 13 October. New main
 kept in product/native capability and standalone compatibility patches restored.
 The fresh package and feature gates remain pending; no old runtime acceptance
 is transferred and no live deployment is claimed.
+
+
+The reconciled shipping build at `47199232d` now passes all four asset caps
+(3,303,044 B gzip6 / 3,289,510 B gzip9 Wasm) and all four Wasm configurations.
+The feature graph proves product document segmentation retained and viewer
+segmentation excluded. The incoming Djinn Exhibit A repairs preserve all
+non-comment bytes, with hashes recorded; the indexed header check passes.
+The source-bound browser renewal remains active. Whole-tree D3 still reports
+existing path drift, and D2 still has its four existing coverage/snapshot
+errors; this incremental continuation does not claim either whole-tree audit
+is clean.
+
+
+Final renewal of package `47199232d` passes commands 24, presenter 11,
+physics 17 and browser input 4, plus Unicode and three intentionally failing
+unsupported-product assertions without page errors. These are absence checks,
+not new typed refusal APIs. Fresh 21-node diagnostics have median 16.65–16.8 ms,
+p95 at most 18.1 ms and maximum 18.6 ms; no sustained-performance claim follows.
+The immutable candidate ledger covers package, served files, drivers and
+auxiliary inputs. Owned runtime was explicitly closed at 07:44:12 UTC on
+13 October. Final source publication remains distinct from site deployment.
