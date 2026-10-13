@@ -1185,7 +1185,7 @@ native/touch qualification and complete one-tree phase 4 remain separate.
 The latest release measurement stays bound to `8ad44a5c7`; no new release size
 is inferred from these debug packages.
 
-### Viewer delivery budget (2026-10-13; qualified for publication)
+### Viewer delivery budget (2026-10-13; published)
 
 Mark authorized reducing the viewer below R157's unchanged 3,407,872-byte
 (3.25 MiB) gzip limit so the site can replace its sandbox. Work starts on
@@ -1251,14 +1251,16 @@ Wasm configurations pass, with product complex-script support present and
 viewer support absent. The exact rebuilt package independently passes all 24 command, eleven
 presenter, seventeen physics and four browser pointer/keyboard checks, Unicode
 comparison and the three expected unsupported-product assertion failures with
-no page errors. The new 21-node synthetic windows have 16.65–16.8 ms median,
-at most 18.1 ms p95 and 18.6 ms maximum display intervals; this remains a
-bounded diagnostic. Chrome 152 uses AMD gcn-5. All four driver processes exit
+no page errors. The new complete 21-node live frame windows have 16.6–16.8 ms median,
+at most 18.1 ms p95 and 28.3 ms maximum intervals. The paused windows reach
+18.7 ms p95. These complete frame windows differ from the separate rolling
+120-sample interval arrays; this remains a bounded diagnostic. Chrome 152 uses AMD gcn-5. All four driver processes exit
 zero, and the browser/server/inhibitor are closed at 07:44:12 UTC on 13 October.
 The earlier package and failed controls remain independently preserved.
 Source/asset/driver/served/auxiliary hashes are frozen in the candidate ledger.
-Main publication is the remaining delivery step; live-site cutover remains
-separate.
+Main publication is confirmed at `425b04ceb`. The publication commit changes
+only receipts and documentation relative to the frozen runtime. Live-site
+cutover remains separate.
 
 The builder enforces all four interaction caps at gzip6 and gzip9. The portable
 workflow invokes it in a separate Linux delivery job and retains package/report.
