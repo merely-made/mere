@@ -1,5 +1,5 @@
 {
-  "status": "source diagnosis; original runtime cause unclassified",
+  "status": "r2 runtime classified: successful raster, correct surface Occluded, returned reveal, missing event-driven retry after unavailable",
   "candidate_basis": "8568f42fdf57f997274c74e63bd4ee045fe1a2b4",
   "candidate_binary_sha256": "c57ed12294ed353db99d685a22aa8117ee0310dcd7f5af0a18145ae312237021",
   "source_rows": [
@@ -87,12 +87,20 @@
   },
   "diagnostic_patch": {
     "commit": "07d415c52ba6a83b46c0c40ef10f7c3b666c1034",
-    "publication": "Prepared for main publication after checks",
+    "publication": "Publishedmain07608969b3924218799ece6c07d14cab4c524077",
     "path": "crates/cambium/cambium-rootstock/src/frame.rs",
     "enabled_by": "CAMBIUM_HOST_FRAME_TRACE=1",
     "changes": "phase timings, typed raster/acquire outcome, CPU-only return marker",
     "independent_source_review": "No substantive defect; no GPU-resource retention/control-flow/threshold/pin changes; correctly ordered presentation markers",
     "compile": "PASS exactcurrentmain cargo check14.136sec; two Moot productionbuilds36.17/10.04sec",
-    "runtime": "No runtime on patched source; original unchanged-binary trace request held/replaced before launch"
+    "runtime": "Moot trace-only r2 three Occluded acquisitions, zero presentations/captures, finite45.22sec release; not accepted"
+  },
+  "sample_correction": "Sampletarget was inhibitor not app; no appthreadstack conclusion",
+  "later_source_changes": {
+    "trace_publication": "07608969b3924218799ece6c07d14cab4c524077",
+    "unocclusion_fix": "f91443388f3f78f39e2395e070f2a675c130380b",
+    "cpu_routing": "PASS 1 actual event routing test, 15.319 seconds, no GPU",
+    "independent_review": "No substantive defect",
+    "pins_or_acceptance_limits_changed": false
   }
 }
