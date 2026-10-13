@@ -87,6 +87,9 @@ pub(crate) fn coupling_force_from_graph(
     graph: &Graph,
 ) -> Option<CouplingForce> {
     let field = graph.field(coupling.field)?;
+    if !field.is_active() {
+        return None;
+    }
     let targets: Vec<NodeKey> = graph.nodes_matching(&coupling.selector).collect();
     let mut registry = FieldRegistry::new();
     for f in graph.fields() {
@@ -100,6 +103,8 @@ pub(crate) fn coupling_force_from_graph(
             field.definition.clone(),
         )
         .with_registry(registry)
+        .with_extent(field.extent.clone())
+        .with_selector(coupling.selector.clone())
         .with_provenance(
             seiche::CouplingSource {
                 field: coupling.field,

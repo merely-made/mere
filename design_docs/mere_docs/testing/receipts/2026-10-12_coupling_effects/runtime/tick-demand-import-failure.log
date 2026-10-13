@@ -1,0 +1,25 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+    Blocking waiting for file lock on build directory
+   Compiling numen v0.2.0 (C:\Users\mark_\Code\worktrees\mere-field-runtime\crates\conatus\numen)
+   Compiling seiche v0.0.6 (C:\Users\mark_\Code\worktrees\mere-field-runtime\crates\conatus\seiche)
+error[E0599]: no method named `wants_tick` found for reference `&coupling_force::CouplingForce` in the current scope
+  --> crates\conatus\seiche\src\field.rs:32:91
+   |
+32 |             || (!self.field_clock.paused && self.coupling_forces.iter().any(|force| force.wants_tick()))
+   |                                                                                           ^^^^^^^^^^ method not found in `&coupling_force::CouplingForce`
+   |
+   = help: items from traits can only be used if the trait is in scope
+help: trait `Force` which provides `wants_tick` is implemented but not in scope; perhaps you want to import it
+   |
+12 + use crate::Force;
+   |
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `seiche` (lib test) due to 1 previous error

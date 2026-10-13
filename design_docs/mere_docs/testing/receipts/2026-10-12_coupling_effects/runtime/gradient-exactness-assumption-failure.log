@@ -1,0 +1,39 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling seiche v0.0.6 (C:\Users\mark_\Code\worktrees\mere-field-runtime\crates\conatus\seiche)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 33.82s
+     Running unittests src\lib.rs (C:\t\cargo-targets\mere\debug\deps\seiche-26a0e793e179e9c4.exe)
+
+running 11 tests
+
+thread 'field_runtime_tests::field_runtime_animated_registry_references_request_ticks_without_timeless_energy_claims' (44748) panicked at crates\conatus\seiche\src\field_runtime_tests.rs:459:5:
+assertion `left == right` failed
+  left: AddForce([0.24986266, 0.0])
+ right: AddForce([0.25, 0.0])
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test field_runtime_tests::field_runtime_field_and_query_changes_preserve_known_members_and_exact_backing ... ok
+test field_runtime_tests::field_runtime_inclusive_reference_points_filter_actual_writes ... ok
+test field_runtime_tests::field_runtime_clock_controls_real_motion_and_reset_does_not_rewind_solver_age ... ok
+test field_runtime_tests::field_runtime_animated_registry_references_request_ticks_without_timeless_energy_claims ... FAILED
+test field_runtime_tests::field_runtime_invalid_ticks_preserve_clock_and_observation_state ... ok
+test field_runtime_tests::field_runtime_new_candidates_and_reused_body_keys_start_initial_reporting ... ok
+test field_runtime_tests::field_runtime_pause_freezes_time_even_when_a_drag_requests_body_steps ... ok
+test field_runtime_tests::field_runtime_repeated_appearances_are_independent_and_initial_matches_do_not_act ... ok
+test field_runtime_tests::field_runtime_speed_and_elapsed_caps_count_only_accepted_fixed_ticks ... ok
+test field_runtime_tests::field_runtime_trace_caps_do_not_suppress_entry_callbacks_or_physics ... ok
+test field_runtime_tests::field_runtime_unresolved_extent_and_unregistered_or_refused_actions_are_explicit ... ok
+
+failures:
+
+failures:
+    field_runtime_tests::field_runtime_animated_registry_references_request_ticks_without_timeless_energy_claims
+
+test result: FAILED. 10 passed; 1 failed; 0 ignored; 0 measured; 192 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p seiche --lib`

@@ -1,0 +1,242 @@
+[
+  {
+    "name": "focused",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "seiche",
+      "--lib",
+      "field_runtime",
+      "--locked",
+      "--offline",
+      "-j",
+      "2",
+      "--",
+      "--test-threads=4",
+      "--nocapture"
+    ],
+    "checkpoint": "bb2591c08032226506b986f19fd9ab1ec131b69e",
+    "exit_code": 0,
+    "elapsed_seconds": 16.703
+  },
+  {
+    "name": "trajectory",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "seiche",
+      "--lib",
+      "execution_trajectory_receipt",
+      "--locked",
+      "--offline",
+      "-j",
+      "2",
+      "--",
+      "--nocapture"
+    ],
+    "checkpoint": "bb2591c08032226506b986f19fd9ab1ec131b69e",
+    "exit_code": 0,
+    "elapsed_seconds": 2.735
+  },
+  {
+    "name": "default",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "seiche",
+      "--locked",
+      "--offline",
+      "-j",
+      "2",
+      "--",
+      "--test-threads=4"
+    ],
+    "checkpoint": "bb2591c08032226506b986f19fd9ab1ec131b69e",
+    "exit_code": 0,
+    "elapsed_seconds": 36.922
+  },
+  {
+    "name": "inline",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "seiche",
+      "--no-default-features",
+      "--locked",
+      "--offline",
+      "-j",
+      "2",
+      "--",
+      "--test-threads=4"
+    ],
+    "checkpoint": "bb2591c08032226506b986f19fd9ab1ec131b69e",
+    "exit_code": 0,
+    "elapsed_seconds": 69.437
+  },
+  {
+    "name": "serde",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "seiche",
+      "--features",
+      "serde",
+      "--locked",
+      "--offline",
+      "-j",
+      "2",
+      "--",
+      "--test-threads=4"
+    ],
+    "checkpoint": "bb2591c08032226506b986f19fd9ab1ec131b69e",
+    "exit_code": 0,
+    "elapsed_seconds": 106.578
+  },
+  {
+    "name": "numen",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "numen",
+      "--locked",
+      "--offline",
+      "-j",
+      "2",
+      "--",
+      "--test-threads=4"
+    ],
+    "checkpoint": "bb2591c08032226506b986f19fd9ab1ec131b69e",
+    "exit_code": 0,
+    "elapsed_seconds": 10.39
+  },
+  {
+    "name": "wasm",
+    "command": [
+      "cargo",
+      "check",
+      "-p",
+      "seiche",
+      "--lib",
+      "--no-default-features",
+      "--target",
+      "wasm32-unknown-unknown",
+      "--locked",
+      "--offline",
+      "-j",
+      "2"
+    ],
+    "checkpoint": "bb2591c08032226506b986f19fd9ab1ec131b69e",
+    "exit_code": 0,
+    "elapsed_seconds": 5.906
+  },
+  {
+    "name": "example",
+    "command": [
+      "cargo",
+      "run",
+      "-p",
+      "seiche",
+      "--no-default-features",
+      "--example",
+      "field_runtime",
+      "--locked",
+      "--offline",
+      "-j",
+      "2"
+    ],
+    "checkpoint": "bb2591c08032226506b986f19fd9ab1ec131b69e",
+    "exit_code": 0,
+    "elapsed_seconds": 3.969
+  },
+  {
+    "name": "host-field-runtime",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "pictograph",
+      "--features",
+      "canvas",
+      "--lib",
+      "field_runtime",
+      "--locked",
+      "--offline",
+      "-j",
+      "2",
+      "--",
+      "--test-threads=4",
+      "--nocapture"
+    ],
+    "checkpoint": "bb2591c08032226506b986f19fd9ab1ec131b69e",
+    "exit_code": 0,
+    "elapsed_seconds": 66.719
+  },
+  {
+    "name": "host-coupling",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "pictograph",
+      "--features",
+      "canvas",
+      "--lib",
+      "coupling",
+      "--locked",
+      "--offline",
+      "-j",
+      "2",
+      "--",
+      "--test-threads=4",
+      "--nocapture"
+    ],
+    "checkpoint": "bb2591c08032226506b986f19fd9ab1ec131b69e",
+    "exit_code": 0,
+    "elapsed_seconds": 3.172
+  },
+  {
+    "name": "host-live-physics",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "pictograph",
+      "--features",
+      "canvas",
+      "--lib",
+      "live_physics",
+      "--locked",
+      "--offline",
+      "-j",
+      "2",
+      "--",
+      "--test-threads=4"
+    ],
+    "checkpoint": "bb2591c08032226506b986f19fd9ab1ec131b69e",
+    "exit_code": 0,
+    "elapsed_seconds": 3.172
+  },
+  {
+    "name": "clippy",
+    "command": [
+      "cargo",
+      "clippy",
+      "-p",
+      "seiche",
+      "--all-targets",
+      "--locked",
+      "--offline",
+      "-j",
+      "2"
+    ],
+    "checkpoint": "bb2591c08032226506b986f19fd9ab1ec131b69e",
+    "exit_code": 0,
+    "elapsed_seconds": 7.281
+  }
+]

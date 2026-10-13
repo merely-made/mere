@@ -1,0 +1,305 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+    Checking numen v0.2.0 (C:\Users\mark_\Code\worktrees\mere-field-runtime\crates\conatus\numen)
+    Checking armillary v0.1.1 (C:\Users\mark_\Code\worktrees\mere-field-runtime\crates\armillary)
+warning: you should consider adding a `Default` implementation for `FieldId`
+  --> crates\conatus\numen\src\field.rs:38:5
+   |
+38 | /     pub fn new() -> Self {
+39 | |         Self(Uuid::new_v4())
+40 | |     }
+   | |_____^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#new_without_default
+   = note: `#[warn(clippy::new_without_default)]` on by default
+help: try adding this
+   |
+33 + #[cfg(not(target_arch = "wasm32"))]
+34 + impl Default for FieldId {
+35 +     fn default() -> Self {
+36 +         Self::new()
+37 +     }
+38 + }
+   |
+
+warning: you should consider adding a `Default` implementation for `CouplingId`
+  --> crates\conatus\numen\src\field.rs:57:5
+   |
+57 | /     pub fn new() -> Self {
+58 | |         Self(Uuid::new_v4())
+59 | |     }
+   | |_____^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#new_without_default
+help: try adding this
+   |
+55 + #[cfg(not(target_arch = "wasm32"))]
+56 + impl Default for CouplingId {
+57 +     fn default() -> Self {
+58 +         Self::new()
+59 +     }
+60 + }
+   |
+
+warning: `numen` (lib) generated 2 warnings (run `cargo clippy --fix --lib -p numen -- ` to apply 1 suggestion)
+    Checking seiche v0.0.6 (C:\Users\mark_\Code\worktrees\mere-field-runtime\crates\conatus\seiche)
+warning: large size difference between variants
+   --> crates\conatus\seiche\src\runtime.rs:253:1
+    |
+253 | / pub enum Physics {
+254 | |     Inline(InlinePhysics),
+    | |     --------------------- the largest variant contains at least 7936 bytes
+255 | |     #[cfg(feature = "actor")]
+256 | |     Actor(ActorPhysics),
+    | |     ------------------- the second-largest variant contains at least 336 bytes
+257 | | }
+    | |_^ the entire enum is at least 7936 bytes
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#large_enum_variant
+    = note: `#[warn(clippy::large_enum_variant)]` on by default
+help: consider boxing the large fields or introducing indirection in some other way to reduce the total size of the enum
+    |
+254 -     Inline(InlinePhysics),
+254 +     Inline(Box<InlinePhysics>),
+    |
+
+warning: replacing a value of type `T` with `T::default()`
+   --> crates\conatus\seiche\src\runtime.rs:283:19
+    |
+283 |         let sim = std::mem::replace(&mut inline.sim, Simulation::new());
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: consider using `std::mem::take` instead: `std::mem::take(&mut inline.sim)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#mem_replace_with_default
+    = note: `#[warn(clippy::mem_replace_with_default)]` on by default
+
+warning: the loop variable `j` is used to index `nodes`
+   --> crates\conatus\seiche\src\forces.rs:142:22
+    |
+142 |             for j in 0..nodes.len() {
+    |                      ^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_range_loop
+    = note: `#[warn(clippy::needless_range_loop)]` on by default
+help: consider using an iterator and enumerate()
+    |
+142 -             for j in 0..nodes.len() {
+142 +             for (j, <item>) in nodes.iter().enumerate() {
+    |
+
+warning: this `if` statement can be collapsed
+   --> crates\conatus\seiche\src\laws\anneal.rs:141:13
+    |
+141 | /             if let (Some(&i), Some(&j)) = (index.get(&a), index.get(&b)) {
+142 | |                 if i != j {
+143 | |                     neighbours[i].push(j);
+144 | |                     neighbours[j].push(i);
+145 | |                 }
+146 | |             }
+    | |_____________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#collapsible_if
+    = note: `#[warn(clippy::collapsible_if)]` on by default
+help: collapse nested if block
+    |
+141 ~             if let (Some(&i), Some(&j)) = (index.get(&a), index.get(&b))
+142 ~                 && i != j {
+143 |                     neighbours[i].push(j);
+144 |                     neighbours[j].push(i);
+145 ~                 }
+    |
+
+warning: this `if` statement can be collapsed
+  --> crates\conatus\seiche\src\laws\boids.rs:79:13
+   |
+79 | /             if let (Some(&i), Some(&j)) = (index.get(&a), index.get(&b)) {
+80 | |                 if i != j {
+81 | |                     mates[i].push(j);
+82 | |                     mates[j].push(i);
+83 | |                 }
+84 | |             }
+   | |_____________^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#collapsible_if
+help: collapse nested if block
+   |
+79 ~             if let (Some(&i), Some(&j)) = (index.get(&a), index.get(&b))
+80 ~                 && i != j {
+81 |                     mates[i].push(j);
+82 |                     mates[j].push(i);
+83 ~                 }
+   |
+
+warning: usage of `contains_key` followed by `insert` on a `HashMap`
+   --> crates\conatus\seiche\src\laws\stress.rs:185:17
+    |
+185 | /                 if !seen.contains_key(&next) {
+186 | |                     seen.insert(next, hops + 1);
+187 | |                     queue.push_back(next);
+188 | |                 }
+    | |_________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#map_entry
+    = note: `#[warn(clippy::map_entry)]` on by default
+help: try
+    |
+185 ~                 if let std::collections::hash_map::Entry::Vacant(e) = seen.entry(next) {
+186 +                     e.insert(hops + 1);
+187 +                     queue.push_back(next);
+188 +                 }
+    |
+
+warning: the loop variable `i` is used to index `deltas`
+   --> crates\conatus\seiche\src\fluid.rs:255:22
+    |
+255 |             for i in 0..n {
+    |                      ^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_range_loop
+help: consider using an iterator and enumerate()
+    |
+255 -             for i in 0..n {
+255 +             for (i, <item>) in deltas.iter_mut().enumerate().take(n) {
+    |
+
+warning: the loop variable `i` is used to index `deltas`
+   --> crates\conatus\seiche\src\fluid.rs:267:22
+    |
+267 |             for i in 0..n {
+    |                      ^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_range_loop
+help: consider using an iterator and enumerate()
+    |
+267 -             for i in 0..n {
+267 +             for (i, <item>) in deltas.iter().enumerate().take(n) {
+    |
+
+warning: the loop variable `i` is used to index `dv`
+   --> crates\conatus\seiche\src\fluid.rs:282:22
+    |
+282 |             for i in 0..n {
+    |                      ^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_range_loop
+help: consider using an iterator and enumerate()
+    |
+282 -             for i in 0..n {
+282 +             for (i, <item>) in dv.iter_mut().enumerate().take(n) {
+    |
+
+warning: the loop variable `i` is used to index `dv`
+   --> crates\conatus\seiche\src\fluid.rs:291:22
+    |
+291 |             for i in 0..n {
+    |                      ^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_range_loop
+help: consider using an iterator and enumerate()
+    |
+291 -             for i in 0..n {
+291 +             for (i, <item>) in dv.iter().enumerate().take(n) {
+    |
+
+warning: this `if` statement can be collapsed
+   --> crates\conatus\seiche\src\fluid_coupling.rs:97:13
+    |
+ 97 | /             if let Some(body) = self.bodies.get_mut(*handle) {
+ 98 | |                 if body.is_dynamic() {
+ 99 | |                     body.apply_impulse(Vector::new(reaction.x, reaction.y) * FLUID_REACTION, true);
+100 | |                 }
+101 | |             }
+    | |_____________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+ 97 ~             if let Some(body) = self.bodies.get_mut(*handle)
+ 98 ~                 && body.is_dynamic() {
+ 99 |                     body.apply_impulse(Vector::new(reaction.x, reaction.y) * FLUID_REACTION, true);
+100 ~                 }
+    |
+
+warning: this `map_or` can be simplified
+  --> crates\conatus\seiche\src\query.rs:50:34
+   |
+50 |             if d <= tolerance && best.map_or(true, |(_, bd)| d < bd) {
+   |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#unnecessary_map_or
+   = note: `#[warn(clippy::unnecessary_map_or)]` on by default
+help: use `is_none_or` instead
+   |
+50 -             if d <= tolerance && best.map_or(true, |(_, bd)| d < bd) {
+50 +             if d <= tolerance && best.is_none_or(|(_, bd)| d < bd) {
+   |
+
+warning: this `map_or` can be simplified
+   --> crates\conatus\seiche\src\view.rs:244:31
+    |
+244 |             if d2 <= r * r && best.map_or(true, |(_, bd)| d2 < bd) {
+    |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#unnecessary_map_or
+help: use `is_none_or` instead
+    |
+244 -             if d2 <= r * r && best.map_or(true, |(_, bd)| d2 < bd) {
+244 +             if d2 <= r * r && best.is_none_or(|(_, bd)| d2 < bd) {
+    |
+
+warning: this `map_or` can be simplified
+   --> crates\conatus\seiche\src\view.rs:285:34
+    |
+285 |             if d <= tolerance && best.map_or(true, |(_, bd)| d < bd) {
+    |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#unnecessary_map_or
+help: use `is_none_or` instead
+    |
+285 -             if d <= tolerance && best.map_or(true, |(_, bd)| d < bd) {
+285 +             if d <= tolerance && best.is_none_or(|(_, bd)| d < bd) {
+    |
+
+warning: field assignment outside of initializer for an instance created with Default::default()
+   --> crates\conatus\seiche\src\lib.rs:570:9
+    |
+570 |         parameters.dt = 1.0 / 60.0;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+note: consider initializing the variable with `rapier2d::dynamics::IntegrationParameters { dt: 1.0 / 60.0, ..Default::default() }` and removing relevant reassignments
+   --> crates\conatus\seiche\src\lib.rs:566:9
+    |
+566 |         let mut parameters = IntegrationParameters::default();
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#field_reassign_with_default
+    = note: `#[warn(clippy::field_reassign_with_default)]` on by default
+
+warning: `seiche` (lib) generated 15 warnings (run `cargo clippy --fix --lib -p seiche -- ` to apply 8 suggestions)
+warning: manual implementation of `.is_multiple_of()`
+   --> crates\conatus\seiche\src\runtime\speed\tests.rs:349:21
+    |
+349 |         let us = if tick % self.every == 0 {
+    |                     ^^^^^^^^^^^^^^^^^^^^^^ help: replace with: `tick.is_multiple_of(self.every)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#manual_is_multiple_of
+    = note: `#[warn(clippy::manual_is_multiple_of)]` on by default
+
+warning: items after a test module
+  --> crates\conatus\seiche\src\obstacles.rs:21:1
+   |
+21 | mod tests {
+   | ^^^^^^^^^
+...
+81 | impl Simulation {
+   | ^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#items_after_test_module
+   = note: `#[warn(clippy::items_after_test_module)]` on by default
+
+warning: `seiche` (lib test) generated 17 warnings (15 duplicates) (run `cargo clippy --fix --lib -p seiche --tests -- ` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 7.04s
