@@ -1,0 +1,664 @@
+{
+  "readings": [
+    {
+      "folder": "web-baseline",
+      "text": "Project inspector1 selected · 4 visible / 4 disclosedHide project listSelected projectsCafé — naïve ΔοκιμήInspect Café — naïve ΔοκιμήRemove Café — naïve ΔοκιμήCafé — naïve ΔοκιμήInspect Café — naïve ΔοκιμήRemove Café — naïve ΔοκιμήClear project selectionCafé — naïve ΔοκιμήReading: café, naïve, Δοκιμή, مرحبا, 中文, ภาษาไทย, Á. Long wrapping text with a nonbreaking space and a joiner‍. Long wrapping text with a nonbreaking space and a joiner‍. Long wrapping text with a nonbreaking space and a joiner‍.Disclosed relationships (2)Depends on: مرحبا · العربية → Café — naïve Δοκιμή. The grammar manifest names kernel as a dependency.Depends on: ภาษาไทย · Á → Café — naïve Δοκιμή. The viewer manifest names kernel as a dependency.Inspect related مرحبا · العربيةInspect related ภาษาไทย · ÁShow source detailsSelect Café — naïve ΔοκιμήSelect Café — naïve ΔοκιμήSelect مرحبا · العربيةSelect مرحبا · العربيةSelect 中文 · 日本語Select 中文 · 日本語Select ภาษาไทย · ÁSelect ภาษาไทย · Á",
+      "semanticTree": {
+        "role": "region",
+        "label": "Graphshell, one tree",
+        "children": [
+          {
+            "role": "main",
+            "children": [
+              {
+                "role": "heading",
+                "label": "Project graph",
+                "children": []
+              },
+              {
+                "role": "status",
+                "label": "4 visible of 4 disclosed · 1 selected",
+                "children": []
+              },
+              {
+                "children": [
+                  {
+                    "role": "button",
+                    "label": "Graph commands",
+                    "expanded": false,
+                    "children": []
+                  },
+                  {
+                    "role": "button",
+                    "label": "Fit visible graph",
+                    "children": []
+                  },
+                  {
+                    "role": "button",
+                    "label": "Graph tools",
+                    "expanded": false,
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "role": "group",
+                        "label": "4 of 4 shown",
+                        "children": [
+                          {
+                            "role": "group",
+                            "label": "مرحبا · العربية",
+                            "children": [
+                              {
+                                "role": "button",
+                                "label": "Drag",
+                                "description": "Drag this item; nothing returns it.",
+                                "children": []
+                              },
+                              {
+                                "role": "button",
+                                "label": "Pin",
+                                "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "role": "group",
+                            "label": "Café — naïve Δοκιμή",
+                            "children": [
+                              {
+                                "role": "button",
+                                "label": "Drag",
+                                "description": "Drag this item; nothing returns it.",
+                                "children": []
+                              },
+                              {
+                                "role": "button",
+                                "label": "Pin",
+                                "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "role": "group",
+                            "label": "中文 · 日本語",
+                            "children": [
+                              {
+                                "role": "button",
+                                "label": "Drag",
+                                "description": "Drag this item; nothing returns it.",
+                                "children": []
+                              },
+                              {
+                                "role": "button",
+                                "label": "Pin",
+                                "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "role": "group",
+                            "label": "ภาษาไทย · Á",
+                            "children": [
+                              {
+                                "role": "button",
+                                "label": "Drag",
+                                "description": "Drag this item; nothing returns it.",
+                                "children": []
+                              },
+                              {
+                                "role": "button",
+                                "label": "Pin",
+                                "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "role": "region",
+                    "label": "Project inspector",
+                    "children": [
+                      {
+                        "role": "heading",
+                        "label": "Project inspector",
+                        "children": []
+                      },
+                      {
+                        "role": "status",
+                        "label": "1 selected · 4 visible / 4 disclosed",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Hide project list",
+                        "expanded": true,
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      },
+                      {
+                        "children": [
+                          {
+                            "role": "paragraph",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Inspect Café — naïve Δοκιμή",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Remove Café — naïve Δοκιμή",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "role": "button",
+                        "label": "Clear project selection",
+                        "children": []
+                      },
+                      {
+                        "role": "heading",
+                        "label": "Café — naïve Δοκιμή",
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      },
+                      {
+                        "role": "heading",
+                        "label": "Disclosed relationships (2)",
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Inspect related مرحبا · العربية",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Inspect related ภาษาไทย · Á",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Hide source details",
+                        "expanded": true,
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      },
+                      {
+                        "role": "list",
+                        "label": "Disclosed projects",
+                        "children": [
+                          {
+                            "role": "listitem",
+                            "label": "Select Café — naïve ΔοκιμήSelect Café — naïve Δοκιμή",
+                            "box": [
+                              1165,
+                              1080,
+                              263,
+                              30
+                            ],
+                            "children": [
+                              {
+                                "role": "button",
+                                "label": "Select Café — naïve Δοκιμή",
+                                "pressed": true,
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "role": "listitem",
+                            "label": "Select مرحبا · العربيةSelect مرحبا · العربية",
+                            "box": [
+                              1165,
+                              1114,
+                              263,
+                              30
+                            ],
+                            "children": [
+                              {
+                                "role": "button",
+                                "label": "Select مرحبا · العربية",
+                                "pressed": false,
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "role": "listitem",
+                            "label": "Select 中文 · 日本語Select 中文 · 日本語",
+                            "box": [
+                              1165,
+                              1148,
+                              263,
+                              30
+                            ],
+                            "children": [
+                              {
+                                "role": "button",
+                                "label": "Select 中文 · 日本語",
+                                "pressed": false,
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "role": "listitem",
+                            "label": "Select ภาษาไทย · ÁSelect ภาษาไทย · Á",
+                            "box": [
+                              1165,
+                              1182,
+                              263,
+                              30
+                            ],
+                            "children": [
+                              {
+                                "role": "button",
+                                "label": "Select ภาษาไทย · Á",
+                                "pressed": false,
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "folder": "web-combined",
+      "text": "Project inspector1 selected · 4 visible / 4 disclosedHide project listSelected projectsCafé — naïve ΔοκιμήInspect Café — naïve ΔοκιμήRemove Café — naïve ΔοκιμήCafé — naïve ΔοκιμήInspect Café — naïve ΔοκιμήRemove Café — naïve ΔοκιμήClear project selectionCafé — naïve ΔοκιμήReading: café, naïve, Δοκιμή, مرحبا, 中文, ภาษาไทย, Á. Long wrapping text with a nonbreaking space and a joiner‍. Long wrapping text with a nonbreaking space and a joiner‍. Long wrapping text with a nonbreaking space and a joiner‍.Disclosed relationships (2)Depends on: مرحبا · العربية → Café — naïve Δοκιμή. The grammar manifest names kernel as a dependency.Depends on: ภาษาไทย · Á → Café — naïve Δοκιμή. The viewer manifest names kernel as a dependency.Inspect related مرحبا · العربيةInspect related ภาษาไทย · ÁShow source detailsSelect Café — naïve ΔοκιμήSelect Café — naïve ΔοκιμήSelect مرحبا · العربيةSelect مرحبا · العربيةSelect 中文 · 日本語Select 中文 · 日本語Select ภาษาไทย · ÁSelect ภาษาไทย · Á",
+      "semanticTree": {
+        "role": "region",
+        "label": "Graphshell, one tree",
+        "children": [
+          {
+            "role": "main",
+            "children": [
+              {
+                "role": "heading",
+                "label": "Project graph",
+                "children": []
+              },
+              {
+                "role": "status",
+                "label": "4 visible of 4 disclosed · 1 selected",
+                "children": []
+              },
+              {
+                "children": [
+                  {
+                    "role": "button",
+                    "label": "Graph commands",
+                    "expanded": false,
+                    "children": []
+                  },
+                  {
+                    "role": "button",
+                    "label": "Fit visible graph",
+                    "children": []
+                  },
+                  {
+                    "role": "button",
+                    "label": "Graph tools",
+                    "expanded": false,
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "role": "group",
+                        "label": "4 of 4 shown",
+                        "children": [
+                          {
+                            "role": "group",
+                            "label": "مرحبا · العربية",
+                            "children": [
+                              {
+                                "role": "button",
+                                "label": "Drag",
+                                "description": "Drag this item; nothing returns it.",
+                                "children": []
+                              },
+                              {
+                                "role": "button",
+                                "label": "Pin",
+                                "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "role": "group",
+                            "label": "Café — naïve Δοκιμή",
+                            "children": [
+                              {
+                                "role": "button",
+                                "label": "Drag",
+                                "description": "Drag this item; nothing returns it.",
+                                "children": []
+                              },
+                              {
+                                "role": "button",
+                                "label": "Pin",
+                                "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "role": "group",
+                            "label": "中文 · 日本語",
+                            "children": [
+                              {
+                                "role": "button",
+                                "label": "Drag",
+                                "description": "Drag this item; nothing returns it.",
+                                "children": []
+                              },
+                              {
+                                "role": "button",
+                                "label": "Pin",
+                                "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "role": "group",
+                            "label": "ภาษาไทย · Á",
+                            "children": [
+                              {
+                                "role": "button",
+                                "label": "Drag",
+                                "description": "Drag this item; nothing returns it.",
+                                "children": []
+                              },
+                              {
+                                "role": "button",
+                                "label": "Pin",
+                                "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "role": "region",
+                    "label": "Project inspector",
+                    "children": [
+                      {
+                        "role": "heading",
+                        "label": "Project inspector",
+                        "children": []
+                      },
+                      {
+                        "role": "status",
+                        "label": "1 selected · 4 visible / 4 disclosed",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Hide project list",
+                        "expanded": true,
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      },
+                      {
+                        "children": [
+                          {
+                            "role": "paragraph",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Inspect Café — naïve Δοκιμή",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Remove Café — naïve Δοκιμή",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "role": "button",
+                        "label": "Clear project selection",
+                        "children": []
+                      },
+                      {
+                        "role": "heading",
+                        "label": "Café — naïve Δοκιμή",
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      },
+                      {
+                        "role": "heading",
+                        "label": "Disclosed relationships (2)",
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Inspect related مرحبا · العربية",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Inspect related ภาษาไทย · Á",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Hide source details",
+                        "expanded": true,
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      },
+                      {
+                        "role": "list",
+                        "label": "Disclosed projects",
+                        "children": [
+                          {
+                            "role": "listitem",
+                            "label": "Select Café — naïve ΔοκιμήSelect Café — naïve Δοκιμή",
+                            "box": [
+                              1165,
+                              1080,
+                              263,
+                              30
+                            ],
+                            "children": [
+                              {
+                                "role": "button",
+                                "label": "Select Café — naïve Δοκιμή",
+                                "pressed": true,
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "role": "listitem",
+                            "label": "Select مرحبا · العربيةSelect مرحبا · العربية",
+                            "box": [
+                              1165,
+                              1114,
+                              263,
+                              30
+                            ],
+                            "children": [
+                              {
+                                "role": "button",
+                                "label": "Select مرحبا · العربية",
+                                "pressed": false,
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "role": "listitem",
+                            "label": "Select 中文 · 日本語Select 中文 · 日本語",
+                            "box": [
+                              1165,
+                              1148,
+                              263,
+                              30
+                            ],
+                            "children": [
+                              {
+                                "role": "button",
+                                "label": "Select 中文 · 日本語",
+                                "pressed": false,
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "role": "listitem",
+                            "label": "Select ภาษาไทย · ÁSelect ภาษาไทย · Á",
+                            "box": [
+                              1165,
+                              1182,
+                              263,
+                              30
+                            ],
+                            "children": [
+                              {
+                                "role": "button",
+                                "label": "Select ภาษาไทย · Á",
+                                "pressed": false,
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "glyphCoverage": "Compare rendered Latin/Greek and existing font repertoire; this does not claim new glyph coverage for every script."
+}

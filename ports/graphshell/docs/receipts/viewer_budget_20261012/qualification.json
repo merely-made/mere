@@ -33,5 +33,23 @@
     "prepared_execution_root": "/Users/markik/Code/output/graphshell-viewer-budget-20261012",
     "web_files": "Copy ports/graphshell/web to web-viewer and add exact shipping/pkg as web-viewer/pkg; baseline is separately preserved",
     "status": "Prepared only; no runtime executed yet"
+  },
+  "combined_source": "7cf093684c50643217038240ecfff375d75636d1",
+  "combined_delivery": "shipping-combined/pkg/viewer-delivery.json",
+  "browser": {
+    "executed": true,
+    "commands": 24,
+    "presenter": 11,
+    "adapter": "amd gcn-5",
+    "accepted_page_errors": 0,
+    "budget_batch": "incomplete at density driver120s wait; original scenario7400 frames requires over123s even60fps",
+    "remaining": "Renew actual incoming utility-class markers, then finish420s budget scope on source-bound package",
+    "all_resources_closed": true
+  },
+  "unicode_review": {
+    "disclosed_strings": "identical",
+    "rendered_latin_greek": "readable in both",
+    "missing_glyphs": "Arabic/CJK/Thai missing repertoire visible in both original and reduced package",
+    "mixed_script_line_breaks": "differ; no claim of identical complex-script line segmentation or expanded font repertoire"
   }
 }
