@@ -263,16 +263,21 @@ before their runtime adapters:
    including the boundary. The query selects candidates separately, and camera
    motion leaves membership unchanged. The
    [dynamics plan](2026-10-02_dynamics_grammar_plan.md) records the answer verbatim;
-   extent filtering and attached-extent resolution still need their adapter.
-   Footprint intersection/containment remain later explicit modes.
+   the field-runtime continuation now applies extent filtering in the live
+   force bridge and reports candidate versus spatial eligibility separately.
+   Attached-extent resolution still needs its owner adapter. Footprint
+   intersection/containment remain later explicit modes.
 2. **Conflicting placement:** refuse the incompatible edit, designate one owner,
    or supply an explicit priority? The refusal above is recommended, not ruled.
 3. **Membership events:** distinguish movement, field edits, query/source changes
    and initial loading. F205 rules that initial matches are reported without
    entry actions, which start on later transitions. The dynamics plan records
-   the answer verbatim. Debouncing, jitter, re-entry and executing the actions
-   still require the dynamics lane's event adapter. F203 supplies its animated
-   field clock default: simulation time, Pause freezes, Reset rewinds.
+   the answer verbatim. The dynamics runtime now retains known appearances,
+   reports separate input-change causes and invokes explicitly registered owner
+   callbacks only on later entries; reading reports cannot replay them. Source
+   scripts/domain receivers, debounce/hysteresis and action-authoring controls
+   remain separate. F203's clock is implemented: accepted simulation time,
+   Pause freezes, Reset rewinds without resetting lagged solver age.
 4. **Field attachment and authored attributes:** a forme representation and a
    Numen force field have different owners today. Their association and arbitrary
    attributes need the existing graph-semantics/storage seam resolved before

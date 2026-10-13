@@ -38,7 +38,7 @@ impl<P: Product> Automatable for Probe<'_, '_, P> {
             .ctx
             .a11y_projection()
             .map_or_else(Vec::new, |projection| {
-                taproot::matching_with_projection(
+                taproot::matching_prefer_exact_with_projection(
                     &self.ctx.runner.dom().borrow(),
                     selector,
                     &projection,
