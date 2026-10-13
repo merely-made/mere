@@ -71,7 +71,9 @@ pub use crate::blobs::{
 };
 pub use crate::error::TransportError;
 pub use crate::p2panda_host::{P2pandaHostPolicy, P2pandaOverlayHost, RejectedPeerHint};
-pub use crate::p2panda_transport::{P2pandaStream, P2pandaTransport, sync_overlay_topic};
+pub use crate::p2panda_transport::{
+    BoundedAcceptHandle, BoundedAcceptStats, P2pandaStream, P2pandaTransport, sync_overlay_topic,
+};
 // The gossip handle returned by `P2pandaTransport::subscribe` (space live-sync):
 // `publish(bytes)` to broadcast, `subscribe()` for the received-bytes stream.
 #[cfg(feature = "notochord")]
