@@ -1,0 +1,19 @@
+{
+  "source": "cdba4c96909c05b4a2450d1e204979d0dc3c8d48",
+  "cutoff": "2026-10-13T06:06:46.000Z",
+  "started": "2026-10-13T05:57:17.154654+00:00",
+  "drivers": [
+    {
+      "driver": "verify-remaining.cjs",
+      "exit": 1
+    }
+  ],
+  "closed": true,
+  "owned_pids": [
+    16257,
+    16258,
+    16260
+  ],
+  "failure": "verify-remaining.cjs failed; preserve run and release",
+  "released": "2026-10-13T05:58:55.180879+00:00"
+}

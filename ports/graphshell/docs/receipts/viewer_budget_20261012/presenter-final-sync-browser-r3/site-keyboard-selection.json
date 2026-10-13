@@ -1,0 +1,1028 @@
+{
+  "receipt": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        1136,
+        905
+      ],
+      "canvas_physical_size": [
+        1136,
+        905
+      ],
+      "log": [
+        "gpu timestamps: no"
+      ],
+      "result": "ok",
+      "saved_graph": null,
+      "timings": []
+    },
+    "captures": []
+  },
+  "host": {
+    "page": "tree",
+    "semanticTree": {
+      "role": "region",
+      "label": "Graphshell, one tree",
+      "children": [
+        {
+          "role": "main",
+          "children": [
+            {
+              "role": "heading",
+              "label": "Project graph",
+              "children": []
+            },
+            {
+              "role": "status",
+              "label": "21 visible of 21 disclosed · 1 selected",
+              "children": []
+            },
+            {
+              "children": [
+                {
+                  "role": "button",
+                  "label": "Graph commands",
+                  "expanded": false,
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Fit visible graph",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Graph tools",
+                  "expanded": false,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "role": "group",
+                      "label": "21 of 21 shown",
+                      "children": [
+                        {
+                          "role": "group",
+                          "label": "Cleromancy",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Emblem",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Genet",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Isocosm",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Knot Editor",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Mer3ly",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Mere",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Mora",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Netrender",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Merely organization profile",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Pipit",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Retinue",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Smolweb",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Turnstone",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Turquet",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Vano",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Wavicle",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "wgpu-graft",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "wgpu-scry",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "wgpu-weld",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Woodshed",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "region",
+                  "label": "Project inspector",
+                  "children": [
+                    {
+                      "role": "heading",
+                      "label": "Project inspector",
+                      "children": []
+                    },
+                    {
+                      "role": "status",
+                      "label": "1 selected · 21 visible / 21 disclosed",
+                      "children": []
+                    },
+                    {
+                      "role": "button",
+                      "label": "Hide project list",
+                      "expanded": true,
+                      "children": []
+                    },
+                    {
+                      "role": "paragraph",
+                      "children": []
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "paragraph",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Inspect Mere",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Remove Mere",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "role": "button",
+                      "label": "Clear project selection",
+                      "children": []
+                    },
+                    {
+                      "role": "heading",
+                      "label": "Mere",
+                      "children": []
+                    },
+                    {
+                      "role": "paragraph",
+                      "children": []
+                    },
+                    {
+                      "role": "paragraph",
+                      "children": []
+                    },
+                    {
+                      "role": "heading",
+                      "label": "Disclosed relationships (13)",
+                      "children": []
+                    },
+                    {
+                      "role": "paragraph",
+                      "children": []
+                    },
+                    {
+                      "role": "paragraph",
+                      "children": []
+                    },
+                    {
+                      "role": "paragraph",
+                      "children": []
+                    },
+                    {
+                      "role": "paragraph",
+                      "children": []
+                    },
+                    {
+                      "role": "paragraph",
+                      "children": []
+                    },
+                    {
+                      "role": "paragraph",
+                      "children": []
+                    },
+                    {
+                      "role": "paragraph",
+                      "children": []
+                    },
+                    {
+                      "role": "paragraph",
+                      "children": []
+                    },
+                    {
+                      "role": "paragraph",
+                      "children": []
+                    },
+                    {
+                      "role": "paragraph",
+                      "children": []
+                    },
+                    {
+                      "role": "paragraph",
+                      "children": []
+                    },
+                    {
+                      "role": "paragraph",
+                      "children": []
+                    },
+                    {
+                      "role": "paragraph",
+                      "children": []
+                    },
+                    {
+                      "role": "button",
+                      "label": "Inspect related Cleromancy",
+                      "children": []
+                    },
+                    {
+                      "role": "button",
+                      "label": "Inspect related Emblem",
+                      "children": []
+                    },
+                    {
+                      "role": "button",
+                      "label": "Inspect related Genet",
+                      "children": []
+                    },
+                    {
+                      "role": "button",
+                      "label": "Inspect related Isocosm",
+                      "children": []
+                    },
+                    {
+                      "role": "button",
+                      "label": "Inspect related Knot Editor",
+                      "children": []
+                    },
+                    {
+                      "role": "button",
+                      "label": "Inspect related Mora",
+                      "children": []
+                    },
+                    {
+                      "role": "button",
+                      "label": "Inspect related Netrender",
+                      "children": []
+                    },
+                    {
+                      "role": "button",
+                      "label": "Inspect related Retinue",
+                      "children": []
+                    },
+                    {
+                      "role": "button",
+                      "label": "Inspect related Turnstone",
+                      "children": []
+                    },
+                    {
+                      "role": "button",
+                      "label": "Inspect related Woodshed",
+                      "children": []
+                    },
+                    {
+                      "role": "button",
+                      "label": "Show source details",
+                      "expanded": false,
+                      "children": []
+                    },
+                    {
+                      "role": "list",
+                      "label": "Disclosed projects",
+                      "children": [
+                        {
+                          "role": "listitem",
+                          "label": "Select CleromancySelect Cleromancy",
+                          "box": [
+                            1165,
+                            2098,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select Cleromancy",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select EmblemSelect Emblem",
+                          "box": [
+                            1165,
+                            2132,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select Emblem",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select GenetSelect Genet",
+                          "box": [
+                            1165,
+                            2166,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select Genet",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select IsocosmSelect Isocosm",
+                          "box": [
+                            1165,
+                            2200,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select Isocosm",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select Knot EditorSelect Knot Editor",
+                          "box": [
+                            1165,
+                            2234,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select Knot Editor",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select Mer3lySelect Mer3ly",
+                          "box": [
+                            1165,
+                            2268,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select Mer3ly",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select MereSelect Mere",
+                          "box": [
+                            1165,
+                            2302,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select Mere",
+                              "pressed": true,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select MoraSelect Mora",
+                          "box": [
+                            1165,
+                            2336,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select Mora",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select NetrenderSelect Netrender",
+                          "box": [
+                            1165,
+                            2370,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select Netrender",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select Merely organization profileSelect Merely organization profile",
+                          "box": [
+                            1165,
+                            2404,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select Merely organization profile",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select PipitSelect Pipit",
+                          "box": [
+                            1165,
+                            2438,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select Pipit",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select RetinueSelect Retinue",
+                          "box": [
+                            1165,
+                            2472,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select Retinue",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select SmolwebSelect Smolweb",
+                          "box": [
+                            1165,
+                            2506,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select Smolweb",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select TurnstoneSelect Turnstone",
+                          "box": [
+                            1165,
+                            2540,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select Turnstone",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select TurquetSelect Turquet",
+                          "box": [
+                            1165,
+                            2574,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select Turquet",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select VanoSelect Vano",
+                          "box": [
+                            1165,
+                            2608,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select Vano",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select WavicleSelect Wavicle",
+                          "box": [
+                            1165,
+                            2642,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select Wavicle",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select wgpu-graftSelect wgpu-graft",
+                          "box": [
+                            1165,
+                            2676,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select wgpu-graft",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select wgpu-scrySelect wgpu-scry",
+                          "box": [
+                            1165,
+                            2710,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select wgpu-scry",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select wgpu-weldSelect wgpu-weld",
+                          "box": [
+                            1165,
+                            2744,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select wgpu-weld",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select WoodshedSelect Woodshed",
+                          "box": [
+                            1165,
+                            2778,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select Woodshed",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "title": "Graphshell, one tree",
+    "visibility": "visible",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    }
+  },
+  "hidden": false,
+  "errors": []
+}

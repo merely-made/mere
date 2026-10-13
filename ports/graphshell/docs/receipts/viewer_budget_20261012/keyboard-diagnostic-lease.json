@@ -1,0 +1,18 @@
+{
+  "source": "cdba4c96909c05b4a2450d1e204979d0dc3c8d48",
+  "cutoff": "2026-10-13T05:47:04.000Z",
+  "started": "2026-10-13T05:42:35.393615+00:00",
+  "drivers": [
+    {
+      "driver": "verify-keyboard-diagnostic.cjs",
+      "exit": 0
+    }
+  ],
+  "closed": true,
+  "owned_pids": [
+    15144,
+    15145,
+    15146
+  ],
+  "released": "2026-10-13T05:42:40.752735+00:00"
+}
