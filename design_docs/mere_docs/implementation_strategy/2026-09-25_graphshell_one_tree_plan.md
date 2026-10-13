@@ -1222,6 +1222,10 @@ and reconciliation of subsequently published upstream code remain pending.
 The build script enforces
 all four interaction caps at both gzip levels, with two regression controls
 covering compressible raw size and incompressible budget refusal.
+The portable workflow now invokes that builder in a separate Linux delivery
+job and retains the package/report. GitHub's repository permission check reports
+Actions disabled on 2026-10-13, so remote CI execution is not claimed; the
+measured local package and upcoming exact-package browser run remain distinct.
 
 **Done when:** the normal shipping build and exact deployment recipe fit each
 R157 cap with source/profile/feature/package hashes and an automated regression
