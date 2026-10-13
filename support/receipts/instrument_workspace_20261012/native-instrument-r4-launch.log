@@ -1,0 +1,19 @@
+{"launch_method": "LaunchServices temporary application bundle", "launcher_exit": 0, "timeout": false, "success": true, "elapsed_seconds": 21.976, "binary_sha256": "8c760cd79e1065c5732cb058d589c81de37681ca303bcb7ff22ef4390f9a0182", "scenario_sha256": "fa37605fc6c21babc3819b5b0d2e998b9ef0ff99586060e34bc9582625656988", "receipt": "scenario.done", "captures": 7}
+RESULT ok
+Instrument workspace frame and domain specimens
+captured instrument_light
+captured instrument_dark
+captured instrument_dirty
+captured instrument_undone
+captured instrument_narrow_editor
+captured instrument_narrow_reader
+captured instrument_narrow_graph
+capture instrument_light 2560x1800 digest=1ad94a1ca793f4f0 file=/Users/markik/Code/output/instrument-workspace-20261012/native-instrument-r4/instrument_light.png
+capture instrument_dark 2560x1800 digest=722a862bcbb96b0e file=/Users/markik/Code/output/instrument-workspace-20261012/native-instrument-r4/instrument_dark.png
+capture instrument_dirty 2560x1800 digest=616e03ef16163a66 file=/Users/markik/Code/output/instrument-workspace-20261012/native-instrument-r4/instrument_dirty.png
+capture instrument_undone 2560x1800 digest=452e7ec537e174ea file=/Users/markik/Code/output/instrument-workspace-20261012/native-instrument-r4/instrument_undone.png
+capture instrument_narrow_editor 1040x1720 digest=7a1df47a961a12f4 file=/Users/markik/Code/output/instrument-workspace-20261012/native-instrument-r4/instrument_narrow_editor.png
+capture instrument_narrow_reader 1040x1720 digest=ab3748fcf4f8d7a4 file=/Users/markik/Code/output/instrument-workspace-20261012/native-instrument-r4/instrument_narrow_reader.png
+capture instrument_narrow_graph 1040x1720 digest=b737603a7785daec file=/Users/markik/Code/output/instrument-workspace-20261012/native-instrument-r4/instrument_narrow_graph.png
+frames: 7 captured, 0 blank, 7 distinct digests
+presentation: 69 frames, 72 redraws, 3 unpresented redraws

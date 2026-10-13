@@ -1,0 +1,14 @@
+RESULT ok
+Usable authoring: hex, authored default, exact CSS, save and reopen
+captured usable_initial
+captured authored_stylesheet
+captured usable_reopened
+captured derived_restored
+captured usable_narrow
+capture usable_initial 2560x1800 digest=823713a8c25600b4 file=/Users/markik/Code/output/instrument-workspace-20261012/native-usability/usable_initial.png
+capture authored_stylesheet 2560x1800 digest=7784be2f378ad38e file=/Users/markik/Code/output/instrument-workspace-20261012/native-usability/authored_stylesheet.png
+capture usable_reopened 2560x1800 digest=39a000283e149d56 file=/Users/markik/Code/output/instrument-workspace-20261012/native-usability/usable_reopened.png
+capture derived_restored 2560x1800 digest=7d2db7c9fe2a303f file=/Users/markik/Code/output/instrument-workspace-20261012/native-usability/derived_restored.png
+capture usable_narrow 1280x1560 digest=357d59d5a6b20aff file=/Users/markik/Code/output/instrument-workspace-20261012/native-usability/usable_narrow.png
+frames: 5 captured, 0 blank, 5 distinct digests
+presentation: 97 frames, 100 redraws, 3 unpresented redraws

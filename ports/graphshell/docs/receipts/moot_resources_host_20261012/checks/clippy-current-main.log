@@ -1,0 +1,52 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+            https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+            https://github.com/mark-ik/boa.git
+    Blocking waiting for file lock on package cache
+    Checking stickleback v0.1.1 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/stickleback)
+    Checking mien v0.0.1 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/moot/mien)
+    Checking gemot v0.1.1 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/moot/gemot)
+    Checking mere-moot v0.0.1 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/ports/moot)
+    Checking graphshell v0.0.2 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/ports/graphshell)
+warning: unused import: `personae::AttestationKeys`
+  --> ports/graphshell/src/webrtc_door.rs:78:5
+   |
+78 | use personae::AttestationKeys;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: large size difference between variants
+  --> ports/graphshell/src/webrtc_join.rs:85:1
+   |
+85 | /   pub(crate) enum ToPeer {
+86 | |       /// The host's half of the transcript, and its signature over the whole.
+87 | | /     Challenge {
+88 | | |         server_nonce: [u8; 32],
+89 | | |         signature: HostChallengeSignature,
+90 | | |     },
+   | | |_____- the second-largest variant contains at least 152 bytes
+91 | |       /// The redeemed delegation. The next two frames are binary: hello, reply.
+92 | | /     Grant {
+93 | | |         delegation: SignedDelegationCertificate,
+94 | | |     },
+   | | |_____- the largest variant contains at least 384 bytes
+...  |
+97 | |       Refused { reason: String },
+98 | |   }
+   | |___^ the entire enum is at least 384 bytes
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#large_enum_variant
+   = note: `#[warn(clippy::large_enum_variant)]` on by default
+help: consider boxing the large fields or introducing indirection in some other way to reduce the total size of the enum
+   |
+93 -         delegation: SignedDelegationCertificate,
+93 +         delegation: Box<SignedDelegationCertificate>,
+   |
+
+warning: `graphshell` (lib) generated 2 warnings
+    Finished `dev` profile [unoptimized] target(s) in 24.20s

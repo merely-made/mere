@@ -1,0 +1,22 @@
+{
+  "default_web_cone": "native target-only optional Moot owner edges; checked on wasm32-unknown-unknown",
+  "production_workspace_patch_change": false,
+  "harness_lock": "committed explicitly despite ignore; only unused standalone patch rows pruned; active package identities unchanged",
+  "native_visual_acceptance": "pending; immutable candidate/runs recorded independently",
+  "basis_commit": "add2f408a0d6a632a809717d55fae6a45a627664",
+  "selected_source_and_lock_inputs": {
+    "ports/graphshell/Cargo.toml": "158ab42a249fa5dd6afaeb18a7322feadb9bc4b7d41aa346958263f7740eea5e",
+    "ports/graphshell/src/lib.rs": "b30d3a74e5eecf89b8335f782e398dfd7e9a73e1d7292ceb7464aefa68a7da38",
+    "ports/graphshell/src/moot_resources.rs": "b3c987f3909ba49e5d6f0bce44d9495e380b07a7dad4e23dec33675b35e4acbb",
+    "ports/graphshell/src/bin/moot_resources_host.rs": "2510329f3d238342932347a97bb50bf380b757d97aea276fc3a482c9a943d4a5",
+    "ports/graphshell/tests/moot_resources.rs": "a5449a14567ff1e1732c6bf815a4690af6bbdee4263d72646fca68fc7b082f7f",
+    "ports/graphshell/examples/support/moot_resources_fixture.rs": "e40c467e6a936a5d6c1f7dd0adce00c0b4de4b64fd5e645d85b620ff30f98eb9",
+    "ports/graphshell/docs/receipts/moot_resources_host_20261012/harness/Cargo.toml": "9f1e4b36a264da2c63c418c84684fd6d369bab38bb252121948aa5a5fe0f13e2",
+    "ports/graphshell/docs/receipts/moot_resources_host_20261012/harness/Cargo.lock": "7069effc7f36bd851175fbd7f4b3a041be98cfb6ad98a472e43b2c75a8563cde",
+    "ports/moot/src/resource_owner.rs": "cdb7542e00a6c70361c9fc91232de177e4fd1844e5325a1abd0d8ea1735289ab",
+    "ports/moot/src/resource_view.rs": "f13c2792afc3ad8ad4e4c4e8d2f285b09af050046fce45ab5e453bc8796f320b",
+    "Cargo.toml": "f303a24af6a2aa0082a217df6f84bfdaf77d241b41fb3f85c0184cf76241893c",
+    "Cargo.lock": "2ade9d9ad1788f9c5ba77313accae290419d262d9808517f3ccfb15f23c994ff"
+  },
+  "basis_note": "Runtime source checkpoint includes explicit main palette/typography and negative-pixel persistence. Candidate manifests independently bind native binaries to all selected input hashes."
+}

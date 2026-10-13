@@ -1,0 +1,80 @@
+{
+  "basis": "Published ea9239a3f fresh-checkout audit; earlier audit ran before the new generator sources were indexed",
+  "files": [
+    {
+      "path": "ports/graphshell/docs/receipts/host_presenter_20261012/command-option-name-repair/gates.py",
+      "before_sha256": "083901e8a7c4450cfa73c5d28ada3857454985d01dad24d0bd8ca4ef863f49ed",
+      "after_sha256": "6433e6e38dfec7d5667ff27c8ae0cc9a1a2dd3fa882b1bfbcf5196d97f413fec",
+      "change": "Exhibit A comment header only"
+    },
+    {
+      "path": "ports/graphshell/docs/receipts/host_presenter_20261012/command-option-name-repair/package.py",
+      "before_sha256": "f4e0e0f1c569e54663108cc8b8922fc024bb211f6998a7839314812ba8b294dc",
+      "after_sha256": "928e532ab3e06e0ca186319e245ec27e13433a3ba353ae64cdf8c76aed89481b",
+      "change": "Exhibit A comment header only"
+    },
+    {
+      "path": "ports/graphshell/docs/receipts/host_presenter_20261012/main-050e7d542/gates.py",
+      "before_sha256": "e998bca3ab5bc3a073d43dd4eb6ab6a95a46a68724ff1fcec15913edad8bf696",
+      "after_sha256": "392c5a31d282c41a289c07437df907f81eb56aa78df2f89bd68676fbfe42dfe1",
+      "change": "Exhibit A comment header only"
+    },
+    {
+      "path": "ports/graphshell/docs/receipts/host_presenter_20261012/main-050e7d542/package.py",
+      "before_sha256": "aaf3df7970b5aec478ea730552d8162588e9e47c9df8b9b38925e837d05abee5",
+      "after_sha256": "ea7db53770789cd94e4060206c369d60eeabc0e11a7dda6f6ee14dd951961309",
+      "change": "Exhibit A comment header only"
+    },
+    {
+      "path": "ports/graphshell/docs/receipts/host_presenter_20261012/main-050e7d542/release.py",
+      "before_sha256": "ec64e3f58c23d1b984b6440e117da2a0c1aad7841d8ccd164f9dff0d772b50f3",
+      "after_sha256": "4b668e5c8997283537b5c955286b7b4dfb801c6855237f73ae2aff9188c98643",
+      "change": "Exhibit A comment header only"
+    },
+    {
+      "path": "ports/graphshell/docs/receipts/host_presenter_20261012/main-8568f42fd/gates.py",
+      "before_sha256": "664bdbc13c5dda2bf666e462e68aa039d448bfbd6d9f9b7fcd9adb11fdec73a6",
+      "after_sha256": "d5f11c30264c31e6d91211c9b372f12b28aab31cced6a5ebd548af7182360865",
+      "change": "Exhibit A comment header only"
+    },
+    {
+      "path": "ports/graphshell/docs/receipts/host_presenter_20261012/main-8568f42fd/package.py",
+      "before_sha256": "550b64756cbbcdd04c8a5051e2bb37c619808e839f9f6b731692736bbdbb208e",
+      "after_sha256": "f70b3bca1ccdc8daf235d14804899c99ead2dc8a630b0e4e837ba19316c56c20",
+      "change": "Exhibit A comment header only"
+    },
+    {
+      "path": "ports/graphshell/docs/receipts/host_presenter_20261012/option-mirror-repair/gates.py",
+      "before_sha256": "cffff972d4e760f1a7edebc7f94ea7ed1e7239d566dc8d6e01816ab38a401d4a",
+      "after_sha256": "9fe59dc0f1636c8de27e035c6c2811946ad1647cbf34008d6e1046b1035206f5",
+      "change": "Exhibit A comment header only"
+    },
+    {
+      "path": "ports/graphshell/docs/receipts/host_presenter_20261012/option-mirror-repair/package.py",
+      "before_sha256": "93b2f33ea82441bdeff1444a1ada2dc89163735a69aed18385ad3afe655491e6",
+      "after_sha256": "ec5608858c3b91d526bbb86f48383a2858c6b316a490a67371111988c4d6e63f",
+      "change": "Exhibit A comment header only"
+    },
+    {
+      "path": "ports/graphshell/docs/receipts/host_presenter_20261012/retired-hover-repair/gates.py",
+      "before_sha256": "58378ad4afd267536021399c17bab6e83beb1d1f0dffcb5aa1322daabce32d54",
+      "after_sha256": "00177cec5fef86fba4811529875c4c04b51c510d3ecfb7d60d1cdfba843e1cce",
+      "change": "Exhibit A comment header only"
+    },
+    {
+      "path": "ports/graphshell/docs/receipts/host_presenter_20261012/retired-hover-repair/package.py",
+      "before_sha256": "80c91181b7936f18b2b0b8d92306f937d1bb0c36a32ae22a782ad6527ce429f3",
+      "after_sha256": "370b06bf1c6e7787e0e804ded52ed0d37f5cd8c049b1e5c43e81de1df625eb24",
+      "change": "Exhibit A comment header only"
+    },
+    {
+      "path": "ports/graphshell/docs/receipts/host_presenter_20261012/retired-hover-repair/reproduce.py",
+      "before_sha256": "e4082eccb36620989f18b2cb0d985b0fe91e6aa67d736a4a6a691f03ef1dc994",
+      "after_sha256": "1f93f0a982263e758295578c1f6d64956d9cbc86eba9253a5976dc42e78f0d6a",
+      "change": "Exhibit A comment header only"
+    }
+  ],
+  "runtime_inputs_changed": false,
+  "accepted_receipts_rewritten": false,
+  "new_execution_claimed": false
+}
