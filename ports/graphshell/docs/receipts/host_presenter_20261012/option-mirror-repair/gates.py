@@ -1,3 +1,9 @@
+# Copyright 2026 Mark Alan Boykin
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# SPDX-License-Identifier: MPL-2.0
+
 from pathlib import Path
 import os,subprocess,json,shutil,re
 repo=Path('/Users/markik/Code/worktrees/mere-nested-graph-view');out=Path(__file__).parent
