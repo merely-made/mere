@@ -1,0 +1,12 @@
+ports/graphshell/docs/receipts/viewer_budget_20261012/cpu/platen-default.log:4: space before tab in indent.
++          	https://github.com/mark-ik/boa.git
+ports/graphshell/docs/receipts/viewer_budget_20261012/cpu/platen-default.log:8: space before tab in indent.
++          	https://github.com/mark-ik/boa.git
+ports/graphshell/docs/receipts/viewer_budget_20261012/cpu/platen-default.log:119: new blank line at EOF.
+ports/graphshell/docs/receipts/viewer_budget_20261012/cpu/platen-portable.log:4: space before tab in indent.
++          	https://github.com/mark-ik/boa.git
+ports/graphshell/docs/receipts/viewer_budget_20261012/cpu/platen-portable.log:8: space before tab in indent.
++          	https://github.com/mark-ik/boa.git
+ports/graphshell/docs/receipts/viewer_budget_20261012/cpu/platen-portable.log:90: new blank line at EOF.
+ports/graphshell/docs/receipts/viewer_budget_20261012/shipping-combined-r1-dyld.log:449: trailing whitespace.
++          
