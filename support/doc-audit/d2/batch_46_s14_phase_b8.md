@@ -498,3 +498,16 @@ The shared-main publication is now confirmed at `007a4de6b`. The upstream
 source remains `a1cb156f8`, with identical recorded source/manifest/lock inputs.
 Exact remote refs are in the landing receipt. This publication record adds no
 new runtime, deployment or phase-completion claim.
+
+
+### Viewer delivery budget continuation, 2026-10-12
+
+Incremental review records Mark's size-reduction and site-cutover goal, the
+unchanged per-asset limits and the actual Platen/document feature leak. The
+source changes preserve default document layout and exclude its producer only
+for the portable viewer model. Measured baseline/portable and rejected Binaryen
+variants remain exploratory, separately bound to their feature/profile inputs.
+The new viewer compiler profile is not yet measured or hardware-qualified.
+Required final gates include exact-package browser and Unicode reading checks,
+source-bound asset enforcement and static/failure fallback preservation. No
+whole-document census, main landing or deployment is claimed for this target.

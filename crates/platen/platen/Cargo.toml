@@ -13,9 +13,16 @@ categories = ["gui"]
 [lib]
 path = "src/lib.rs"
 
+[features]
+default = ["document-layout"]
+# Pane plans and geometry are portable independently of a document producer.
+# Keep document rendering in ordinary hosts; graph-only viewers need only
+# the tiling model and must not activate its text-engine feature choices.
+document-layout = ["dep:document-canvas"]
+
 [dependencies]
 accesskit.workspace = true
-document-canvas.workspace = true
+document-canvas = { workspace = true, optional = true }
 inker.workspace = true
 # Genet's Workbench tile-tree contract: platen projects a forme arrangement's
 # WorkbenchPlan onto it (`tree_projection::tile_tree_from_plan`), so a host
