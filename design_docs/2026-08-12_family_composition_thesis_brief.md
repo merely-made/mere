@@ -1287,25 +1287,30 @@ Pin this exact release in active owned build roots for development, formatting,
 linting and current-compiler qualification. Advance the working toolchain as
 new stable releases are qualified.
 
-**Shared MSRV:** a separate decision, **not yet selected**. The owner's examples
-of 1.91 and 1.96 are candidates, not a selected support promise. The earlier
-interpretation requiring `rust-version = "1.99"` and simultaneous pin/minimum
-upgrades is withdrawn. Choose the common owned-package minimum from actual
-language requirements and the supported dependency/feature/target graphs,
-then test on that compiler. Upgrade this minimum only when those requirements
-or an explicit support decision call for it. Published older versions keep
-their historical metadata; do not rewrite third-party/vendored suppliers'
-minimums to manufacture agreement.
+**Selected shared MSRV: Rust 1.97.1**, independently of the working toolchain.
+The owner accepted this floor provided no requirement pins a newer minimum.
+The earlier interpretation requiring `rust-version = "1.99"` and simultaneous
+pin/minimum upgrades is withdrawn. Align owned packages to
+`rust-version = "1.97.1"` during the qualified rollout; advance the minimum only
+when language use, supported dependencies or an explicit support decision
+require it. Published older versions keep their historical metadata; do not
+rewrite third-party/vendored suppliers' minimums to manufacture agreement.
 
-The locked Mere metadata on 2026-10-13 declares Iroh 1.3.0 at Rust 1.91 and the
-refreshed p2panda supplier at 1.96. Selected Murm/transport normal and build
-dependency closures have no declared floor above 1.96, so 1.96 is a plausible
-Murm candidate. The wider resolved graph contains Knot packages at 1.97 and
-WESL/WGSL packages at 1.97.1. Resolve which paths are supported and qualify or
-adjust their suppliers before promising 1.96 stack-wide. Metadata includes a
-workspace feature union and multiple targets, and some packages declare no
-floor; it is inventory evidence, not a successful MSRV build or a complete
-stack audit.
+The locked Mere metadata on 2026-10-13 contains 1,614 resolved packages and no
+declared floor above 1.97.1. Iroh 1.3.0 declares 1.91, the refreshed p2panda
+supplier declares 1.96, Knot packages declare 1.97, and WESL/WGSL packages
+have the highest declaration at 1.97.1. Fetched owner manifests across eleven
+active repositories likewise contain no declared floor above 1.97.1. Several
+repositories pin 1.98.1 for development; that pin alone is not an MSRV.
+
+A further scan of 71 tracked lockfiles inspected 2,491 cached registry package
+manifests, again without a declaration above 1.97.1. There are 277 uncached
+registry package versions, independent Git suppliers outside Mere are not
+exhaustively resolved, and some packages declare no floor. These inventories
+support selecting 1.97.1 for rollout; they do not prove every supported build
+works on it. Qualify supported feature/target configurations on that compiler
+and resolve any newly discovered higher requirement before claiming shared
+support. Evidence: `Code/targets/murm-shared-msrv-selection-20261013.json`.
 
 CI must exercise both policies: current-toolchain development checks and a
 separate selected-MSRV build/test lane for supported configurations. Passing
@@ -1336,16 +1341,17 @@ layout is permanently `target/debug/deps`. A shared version does not require
 all configurations to write into one unqualified cache directory.
 
 The coordinated rollout inventories toolchain pins, owned minimums, CI jobs
-and independent build roots, qualifies the new working toolchain, and chooses
-and independently qualifies the shared MSRV. It checks native, browser/Wasm
+and independent build roots, qualifies the new working toolchain, and
+independently qualifies the selected 1.97.1 MSRV. It checks native, browser/Wasm
 and embedded paths plus packaging/artifact discovery. It records compiler
 versions in receipts and updates consumers' source pins where compiler changes require
 supplier adoption. An older compiler's passing receipt is not a new compiler's
 qualification. The Murm move plan carries this as MOVE1, before implementation
 imports and consumer cutover.
 
-**Current execution status:** working-toolchain direction recorded; the common
-MSRV is undecided and no MSRV compiler runs were performed in this correction.
+**Current execution status:** Rust 1.99.0 working toolchain and Rust 1.97.1
+shared MSRV selected. No new MSRV compiler runs were performed in this
+selection pass.
 The stack-wide manifest/toolchain/CI rollout remains unexecuted. This host's
 installed `stable` alias reports 1.97.1, and the current Mere worktree pins 1.98.1. Neither is proof of the newest stable
 release or evidence that the stack is already on 1.99.
