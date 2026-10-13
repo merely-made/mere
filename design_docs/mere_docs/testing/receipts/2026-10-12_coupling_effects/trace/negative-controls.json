@@ -1,0 +1,49 @@
+[
+  {
+    "name": "negative-cap-skips-physics",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "seiche",
+      "--no-default-features",
+      "--lib",
+      "coupling_trace::tests::capped_latest_tick",
+      "--locked",
+      "--offline",
+      "-j",
+      "2",
+      "--",
+      "--nocapture"
+    ],
+    "expected_test": "capped_latest_tick_does_not_skip_physics_or_accumulate_history",
+    "exit_code": 101,
+    "restored": true,
+    "sha256_before": "fdf7a9c789eccf33abb6506abe0c97f759470f52c5739811a4ff76f48811a7d1",
+    "sha256_after": "fdf7a9c789eccf33abb6506abe0c97f759470f52c5739811a4ff76f48811a7d1"
+  },
+  {
+    "name": "negative-local-index-identity",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "pictograph",
+      "--features",
+      "canvas",
+      "--lib",
+      "canvas::coupling_trace::tests::",
+      "--locked",
+      "--offline",
+      "-j",
+      "2",
+      "--",
+      "--nocapture"
+    ],
+    "expected_test": "canvas_live_rebuild_keeps_exact_owners_and_clears_retired_binding_trace",
+    "exit_code": 101,
+    "restored": true,
+    "sha256_before": "c6d920b3e091549e5666f1f9e7630c0bfe88cbd2ac22523db8e470fc4eadc821",
+    "sha256_after": "c6d920b3e091549e5666f1f9e7630c0bfe88cbd2ac22523db8e470fc4eadc821"
+  }
+]

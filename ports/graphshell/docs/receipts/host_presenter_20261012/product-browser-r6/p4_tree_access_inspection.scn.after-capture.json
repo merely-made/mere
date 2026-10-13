@@ -1,0 +1,50 @@
+{
+  "receipt": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        1140,
+        865
+      ],
+      "canvas_physical_size": [
+        1140,
+        865
+      ],
+      "log": [
+        "captured access_resource_inspector",
+        "captured independent_access_inspection",
+        "access Resource inspection is independent of selection and workbench opening",
+        "gpu timestamps: no"
+      ],
+      "result": "ok",
+      "saved_graph": {
+        "address": "https://example.test/i2p-port",
+        "file": null,
+        "reopened": false,
+        "save_state": "idle",
+        "selected": "81b91a6b-52ef-5751-b497-15f711cf9c70",
+        "session": "4fb7f4e6-0ea9-41f3-907e-946f3205a1f2",
+        "tags": "research, transport",
+        "title": "I2P port notes"
+      },
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "access_resource_inspector",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 204754
+      },
+      {
+        "name": "independent_access_inspection",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 202102
+      }
+    ]
+  },
+  "errors": []
+}

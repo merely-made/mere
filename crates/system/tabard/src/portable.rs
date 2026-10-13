@@ -28,12 +28,39 @@ pub enum WriteMode {
 /// markers are preserved; callers must fork these to user identities before
 /// editing or inserting them into an authored library.
 pub fn parse_theme_json(contents: &str) -> io::Result<Theme> {
-    let mut theme: Theme = serde_json::from_str(contents).map_err(|error| {
+    let value: serde_json::Value = serde_json::from_str(contents)
+        .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
+    let versioned = value.get("version").is_some();
+    let value = if versioned {
+        if value.get("version").and_then(|v| v.as_u64()) != Some(2)
+            || value.as_object().is_none_or(|o| o.len() != 2)
+        {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                "Unsupported portable theme version.",
+            ));
+        }
+        value.get("theme").cloned().ok_or_else(|| {
+            io::Error::new(
+                io::ErrorKind::InvalidData,
+                "Missing portable theme definition.",
+            )
+        })?
+    } else {
+        value
+    };
+    let mut theme: Theme = serde_json::from_value(value).map_err(|error| {
         io::Error::new(
             io::ErrorKind::InvalidData,
             format!("invalid theme JSON: {error}"),
         )
     })?;
+    if !versioned && !theme.typography.is_empty() {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "Font preferences require portable theme version 2.",
+        ));
+    }
     theme.id = theme.id.trim().to_ascii_lowercase();
     validate_definition(&theme)
         .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
@@ -45,7 +72,12 @@ pub fn parse_theme_json(contents: &str) -> io::Result<Theme> {
 pub fn theme_json(theme: &Theme) -> io::Result<String> {
     validate_definition(theme)
         .map_err(|error| io::Error::new(io::ErrorKind::InvalidInput, error))?;
-    let mut json = serde_json::to_string_pretty(theme).map_err(io::Error::other)?;
+    let mut json = if theme.typography.is_empty() {
+        serde_json::to_string_pretty(theme)
+    } else {
+        serde_json::to_string_pretty(&serde_json::json!({"version":2,"theme":theme}))
+    }
+    .map_err(io::Error::other)?;
     json.push('\n');
     Ok(json)
 }

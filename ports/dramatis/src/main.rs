@@ -97,7 +97,10 @@ fn main() {
             armed.set(true);
             let destination = path.clone();
             let signal = signal.clone();
-            *ctx.capture = Some(Box::new(move |surface, view, w, h| {
+            *ctx.capture = Some(Box::new(move |capture| {
+                let capture = capture.expect("presented frame capture refused");
+                let (surface, view, w, h) =
+                    (capture.surface, capture.view, capture.width, capture.height);
                 let frame = cambium_genet_winit_host::read_frame(surface, view, w, h)
                     .expect("presented frame readback");
                 image::save_buffer(

@@ -1025,8 +1025,8 @@ impl FrisketSurface {
         self.rect_for_attr(ATTR_CHROME_ACTION, action)
     }
 
-    #[cfg(any(feature = "tabard-preview", test))]
-    /// Read a resolved style from a named shell class for a focused receipt.
+    /// Read a resolved style from a named shell class for diagnostics and
+    /// production acceptance receipts.
     /// It avoids exposing the transient DOM node identifiers which become
     /// invalid every time the retained Chrome document is rebuilt.
     pub fn chrome_computed_style(&self, class: &str, property: &str) -> Option<String> {
@@ -1643,6 +1643,97 @@ mod tests {
                 .chrome_computed_style("pelt-chrome", "background-color")
                 .as_deref(),
             Some(baseline_color.as_str())
+        );
+    }
+
+    #[test]
+    fn tabard_typography_reaches_real_chrome_controls_and_keeps_the_content_aperture() {
+        let chrome = WorkspaceChrome {
+            title: "Focused document".into(),
+            address: "gemini://example.test/".into(),
+            route: "Automatic".into(),
+            status: "Ready".into(),
+            theme: AppearanceTheme::Dark,
+            address_focused: false,
+            can_go_back: false,
+            can_go_forward: false,
+            engine_label: "Auto".into(),
+            engine_menu_open: false,
+            engine_selected: Some(ChromeEngineChoice::Automatic),
+            engine_choices: vec![ChromeEngineChoice::Automatic],
+            inspector: None,
+            appearance: None,
+            diagnostic: None,
+            window_controls: false,
+            maximized: false,
+        };
+        let mut surface = FrisketSurface::new(&nested_tree());
+        surface.set_chrome(Some(chrome));
+        let baseline = surface.frame(800, 600).unwrap();
+        let original_status = surface.chrome_computed_style("pelt-status", "font-size");
+        let original_title = surface.chrome_computed_style("pelt-title", "font-family");
+        let original_status_family = surface.chrome_computed_style("pelt-status", "font-family");
+        let mut fonts = tabard::Typography::default();
+        fonts
+            .set(
+                tabard::FontRole::Interface,
+                tabard::ThemeFontStyle {
+                    family: Some("Georgia".into()),
+                    size_px: Some(18.0),
+                    line_height: Some(1.4),
+                },
+            )
+            .unwrap();
+        surface.set_chrome_stylesheet(Some(format!(
+            "{}{}",
+            fonts.css_custom_properties(),
+            crate::workspace_viewer::pelt_typography_css(&fonts)
+        )));
+        let themed = surface.frame(800, 600).unwrap();
+        assert_eq!(
+            surface
+                .chrome_computed_style("pelt-address", "font-size")
+                .as_deref(),
+            Some("18px")
+        );
+        assert!(
+            surface
+                .chrome_computed_style("pelt-address", "font-family")
+                .unwrap()
+                .contains("Georgia")
+        );
+        assert_eq!(
+            surface.chrome_computed_style("pelt-status", "font-size"),
+            original_status
+        );
+        assert_eq!(baseline.content_rects, themed.content_rects);
+        assert_eq!(
+            surface.chrome_computed_style("pelt-title", "font-family"),
+            original_title
+        );
+        assert_eq!(
+            surface.chrome_computed_style("pelt-status", "font-family"),
+            original_status_family
+        );
+        surface.set_chrome_stylesheet(Some(format!(
+            "{}{} .pelt-address {{font-size:16px;font-family:monospace;}}",
+            fonts.css_custom_properties(),
+            crate::workspace_viewer::pelt_typography_css(&fonts)
+        )));
+        surface.frame(800, 600).unwrap();
+        assert_eq!(
+            surface
+                .chrome_computed_style("pelt-address", "font-size")
+                .as_deref(),
+            Some("16px")
+        );
+        surface.set_chrome_stylesheet(None);
+        surface.frame(800, 600).unwrap();
+        assert_ne!(
+            surface
+                .chrome_computed_style("pelt-address", "font-size")
+                .as_deref(),
+            Some("18px")
         );
     }
 

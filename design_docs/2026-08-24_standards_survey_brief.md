@@ -1391,3 +1391,87 @@ not failures of the reported synthetic corpus. The source declares
 `MIT OR Apache-2.0`; license and observed/evidence revisions are recorded in the
 prior-art catalog. No maintainer contact or generated upstream submission is
 part of this work.
+
+**2026-10-12 inventory-policy continuation:** Stickleback now has an IO-free
+[`inventory` leaf](../crates/stickleback/src/inventory/mod.rs) and a
+[finite comparison harness](../crates/stickleback/examples/inventory_compare/README.md).
+The retained owner announces whole-record digests, lengths and expiry; it keeps
+payload storage and eviction. The policy has 64-entry/1 MiB/16 KiB ceilings,
+eight aged peer slots, a 1 KiB control ceiling and eight bounded offers per
+decision. Immutable snapshots support atomic exact pagination. Versioned
+domain-separated BLAKE3 defines Cuckoo bucket/fingerprint hashing; summaries are
+rebuilt, and saturation selects exact fallback instead of dropping fingerprints.
+Offers rotate across decisions. Read permission, authenticated peer context,
+payload retrieval and operation admission remain with the existing owners.
+
+The [selected report](../crates/stickleback/examples/inventory_compare/results/20261012/comparison.json)
+contains 105 finite host runs with byte-identical independent-process replay;
+[source/toolchain provenance](../crates/stickleback/examples/inventory_compare/results/20261012/metadata.json)
+and the [grouped summary](../crates/stickleback/examples/inventory_compare/results/20261012/summary.json)
+retain exact assumptions and raw outcomes. Eager push is compared with eager
+plus exact repair and eager plus Cuckoo/periodic exact fallback. The two shared
+receiver opportunities per round, positive repair reservation, control framing,
+continuation requests, payload attempts and reserved result replies are counted.
+Fitting 32-object and eight-object recovery cases reach every peer in both repair
+modes. A surviving retained source restores all 32 objects after global volatile
+restart; without a source every final cache remains empty. Historical receipt
+does not imply retention or post-restart recovery.
+
+For the 256-object combined-fault churn, mean historical remote receipt is
+47.61%/53.92%/55.18% for eager/exact/Cuckoo, at approximately
+0.98/2.98/2.91 million modeled attempted frame bytes. In clean overload, the
+repair reservation reduces receipt from eager's 73.44% to 59.54%/59.82%; Cuckoo
+uses about half exact repair's modeled bytes in that case. The fitting case
+recovers fully with either inventory mode, with exact using fewer modeled bytes.
+The first live producer's four-object/64 KiB profile should begin with exact
+inventory; choose Cuckoo against a concrete workload and budget. These are
+scheduling/policy observations, not universal delivery guarantees or a pure
+filter comparison independent of scheduling.
+
+The shared resident-ingress proposal was coordinated with the Reticulum lane:
+four queued sessions per ALPN, two active submissions across peers, 16 KiB
+objects and 2 KiB result payloads, with host-owned complete-call deadlines.
+That resident service/admission API remains a proposal. Inventory peer metadata
+and pending object IDs are not session slots; live dispatch must reserve the
+owning service's capacity. Inventory-read and submission permissions are
+distinct. The future admitted service needs its own ALPN/handshake and an
+explicit authorized inventory path. The existing bounded object-stream helper
+is available today. This slice exercises synthetic digest-verified reception,
+not sockets, signed operation admission, RaptorQ, RF, physical time or MCU
+resources. The earlier MemoryLAN experiment remains a separate pinned baseline,
+not a paired result with this new workload. Publication uses direct commits and
+pushes with local checks; no workflows or PRs are added.
+
+**2026-10-12 exact live composition continuation:** The
+[admitted inventory/ingress service and local campaign](../crates/mesh/mesh/examples/inventory_ingress/README.md)
+now implement that bounded host slice. Distillery mounts it on its existing
+endpoint and mesh store. Notochord admits separate `inventory` and `submit`
+actions; both share two active calls, four pending/queued reservations acquired
+before first-stream waiting, and one arrival-to-response-FIN deadline. The
+16 KiB object, 2 KiB result and 1 KiB exact-control limits are enforced alongside
+whole-call actual-I/O ceilings. Original record bytes are freshly decoded and
+authenticated before the existing `MeshStore::accept_outcome`; only that owner
+changes durable domain state.
+
+Retinue's live four-object/64 KiB producer supplies exact metadata and actual
+repair-only RaptorQ decoder output. With one record already available at the
+receiver, its admitted exact snapshot selects exactly the other three. The
+[captured composition](../crates/mesh/mesh/examples/inventory_ingress/results/20261012/composition.json)
+and [provenance](../crates/mesh/mesh/examples/inventory_ingress/results/20261012/metadata.json)
+record four original/header/body preservation checks, unchanged operation IDs,
+one durable effect per original, and a separate-process store reopen. Two
+independent campaigns agree on delivery/admission semantics. Action mismatches,
+invalid records and incomplete/oversized/trailing framing are refused; six
+stalled calls fill the shared active/queue ceilings, a seventh is refused,
+deadlines drain the work, and a healthy duplicate succeeds afterward.
+
+The producer refuses a fifth live generation without eviction. The receiver's
+volatile four-original availability window FIFO-evicts on a fifth accepted
+original and expires bytes with its exact metadata, without deleting durable
+operations. Resident mount/expiry/stalled-shutdown checks cover that ownership
+boundary; restart begins with empty availability metadata. Producer logical
+slots and receiver milliseconds are independent, and digest membership conveys
+no cross-clock expiry or custody claim. Actual coded-frame delivery remains
+host loopback before recovered originals cross real QUIC; physical radio, MCU,
+worker execution and native UI are outside this receipt. The earlier finite
+loss/partition/restart experiment remains separate evidence.

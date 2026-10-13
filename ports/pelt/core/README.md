@@ -81,3 +81,9 @@ An application with acquisition authority can use `sessions_with_fetcher` and
 extend the registry with its own engines. These factories acquire neither a
 store nor a window or wgpu device. Graphshell's retained-content host and
 Turnstone's native engine registration consume this factory.
+
+`sessions_with_fetcher_and_fonts` supplies exact host-held font bytes.
+`sessions_with_presentation` additionally takes an optional reading display
+family; the caller chooses whether authored font choices or its reading face
+wins. These choices affect presentation only. Browser hosts must supply fonts
+because they have no system-face access.

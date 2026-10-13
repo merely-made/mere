@@ -1,0 +1,9 @@
+{
+  "path": "/Users/markik/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/2c7ef73",
+  "head": "2c7ef73bfa44c07744e0643e3c6f98be3cbd7947",
+  "tree": "95bd45d3c6a2f8dd580dc14d9080baecf8fc765d",
+  "shared_git_objects": true,
+  "excluded_only": "tests/wpt",
+  "source": "exact published commit from owned Genet repository; authoritative Git URL/revision pins unchanged",
+  "active_tree_verified": true
+}

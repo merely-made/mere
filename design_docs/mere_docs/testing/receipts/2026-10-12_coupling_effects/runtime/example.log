@@ -1,0 +1,16 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling seiche v0.0.6 (C:\Users\mark_\Code\worktrees\mere-field-runtime\crates\conatus\seiche)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.73s
+     Running `C:/t/cargo-targets/mere\debug\examples\field_runtime.exe`
+initial: step=0 epoch=0 sample_time=0 clock_after=0.25 x=50 eligibility=Inside change=Initial cause=CouplingMembershipCause { field_edit: false, query_change: false, source_change: false, movement: false, reset: false } entry=NotRequested effect=Displace([0.0, 0.0])
+outside: step=1 epoch=0 sample_time=0.25 clock_after=0.5 x=1000 eligibility=Outside change=Exited cause=CouplingMembershipCause { field_edit: false, query_change: false, source_change: false, movement: true, reset: false } entry=NotRequested effect=Inert(OutsideExtent)
+field edit: step=2 epoch=0 sample_time=0.5 clock_after=0.75 x=1001 eligibility=Inside change=Entered cause=CouplingMembershipCause { field_edit: true, query_change: false, source_change: false, movement: false, reset: false } entry=Completed effect=Displace([1.0, 0.0])
+reset: step=4 epoch=1 sample_time=0 clock_after=0.25 x=50 eligibility=Inside change=Initial cause=CouplingMembershipCause { field_edit: false, query_change: false, source_change: false, movement: false, reset: true } entry=NotRequested effect=Displace([0.0, 0.0])
+owner_entry_calls=1

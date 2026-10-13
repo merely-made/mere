@@ -256,17 +256,28 @@ coordinates may compose through a parent transform; they are not automatically
 conflicting world-position writers. Projection-rule precedence belongs to the
 presentation-rule lane, with the field providing scope and match explanation.
 
-The following forks need concrete rulings before their runtime adapters:
+The following choices have partial rulings; remaining forks need resolution
+before their runtime adapters:
 
-1. **Spatial eligibility:** reference point, whole footprint or intersection?
-   Recommend a reference-point test as the initial explicit choice, with the
-   measured footprint available to a later mode. Keep boundary policy visible.
+1. **Spatial eligibility, ruled by F204:** each appearance's reference point,
+   including the boundary. The query selects candidates separately, and camera
+   motion leaves membership unchanged. The
+   [dynamics plan](2026-10-02_dynamics_grammar_plan.md) records the answer verbatim;
+   the field-runtime continuation now applies extent filtering in the live
+   force bridge and reports candidate versus spatial eligibility separately.
+   Attached-extent resolution still needs its owner adapter. Footprint
+   intersection/containment remain later explicit modes.
 2. **Conflicting placement:** refuse the incompatible edit, designate one owner,
    or supply an explicit priority? The refusal above is recommended, not ruled.
 3. **Membership events:** distinguish movement, field edits, query/source changes
-   and initial loading. Recommend reporting initial matches without running
-   entry actions; deliberate entry and automatic changes need separate policy.
-   Debouncing, jitter and re-entry belong in the dynamics lane's event contract.
+   and initial loading. F205 rules that initial matches are reported without
+   entry actions, which start on later transitions. The dynamics plan records
+   the answer verbatim. The dynamics runtime now retains known appearances,
+   reports separate input-change causes and invokes explicitly registered owner
+   callbacks only on later entries; reading reports cannot replay them. Source
+   scripts/domain receivers, debounce/hysteresis and action-authoring controls
+   remain separate. F203's clock is implemented: accepted simulation time,
+   Pause freezes, Reset rewinds without resetting lagged solver age.
 4. **Field attachment and authored attributes:** a forme representation and a
    Numen force field have different owners today. Their association and arbitrary
    attributes need the existing graph-semantics/storage seam resolved before

@@ -1,0 +1,2094 @@
+{
+  "active_dial_path_observation": [
+    {
+      "active": false,
+      "addr": "direct 127.0.0.1:56731"
+    },
+    {
+      "active": true,
+      "addr": "direct [::1]:55782"
+    }
+  ],
+  "candidate_count": 3,
+  "compiled_lock_blake3": "c8e445675b16387b7320e53df4eab9d8966a3a6b05a4f0666722b80818280cac",
+  "deliveries": [
+    {
+      "generation": 1,
+      "owner_result": {
+        "operation_id": "84a0051d768e03e6c48018beb1184e142c6f6351937c67e17175d3ca72c0088c",
+        "outcome": "inserted",
+        "reason": null,
+        "record_digest": "f99941c7c9aa4b3adc7b27d8d4d9b46873d32031a26dad81e3fae2ccfdebe151",
+        "schema": "mere.admitted-record-result/v1"
+      },
+      "recovery": {
+        "application_admission": false,
+        "collector_inventory_before": [],
+        "collector_stats_before": {
+          "completed_objects": 0,
+          "decode_work": 0,
+          "decoder_allocations": 0,
+          "expired_objects": 0
+        },
+        "decoder_input_provenance": "new_object_state_from_authenticated_manifest_and_repair_frames",
+        "delivered_manifest_frames": 1,
+        "delivered_repair_frames": 9,
+        "dropped_fresh_frames": 9,
+        "end_slot": 4,
+        "expiry_during_recovery": [],
+        "physical_rf": false,
+        "preexisting_selected_object": false,
+        "recovered": {
+          "actual_decoder_output": true,
+          "application_admission": false,
+          "metadata": {
+            "digest_hex": "f99941c7c9aa4b3adc7b27d8d4d9b46873d32031a26dad81e3fae2ccfdebe151",
+            "expires_at": 2048,
+            "generation": 1,
+            "object_octets": 1029,
+            "publish_at": 0
+          },
+          "original_bytes_hex": "a1694f7065726174696f6ea26668656164657298d71887011858182018591850182a1822188118d7188218a718631830184a18f818e7181e189a187a188d1843181b18c31869185118350018f0186707181d1830184a18220a1858184018420618da18691826184018d618a8183018dd18e9188318ff18ef185c186a1883188e131842182b18f4184c18a1182a185c18d511081879182e183c18a41825188718df18aa189518701853182418ea18e1182318e0189718f018c2189b187e0818491827186f187118d618be1854183f18eb185118bd18dd0c18190118251858182018f718ca07181a18901888184218a21832184b11187401182e189818e818881858188e18e518c518b8183b18ab18fd18fc18bd184c182d1841187a18e90018a11867186d186518731868185f18691864189818201818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d6b696e6c696e655f626f647999012518a1186b184a186f18621850186f18731874186518641856183218a31864187318701865186318a618661869186e1870187518741873188118a218641862186c186f186218a2186618641869186718651873187418a218631861186c186718661842186c1861186b18651833186518621879187418651873189818201818182d1818183a181818de181818df181818f11818181b18181861181818f11818184c181818881818186e18181835181818af181818a018181836181818731818186d181818cd18181887181818a71818184d18181827181818b5181818c1181818510218181825181818d0181818f518181892181818e21318681862187918741865185f186c1865186e011864186e1861186d18651867187018611879186c186f186118641866186f1875187418701875187418a21864186e1861186d186518661872186518731875186c18741869186d18611878185f18621879187418651873181904001868187218651873186f1875187218631865186c186d186518731868182e186518631868186f182f18761831186a1863186818651863186b1870186f1869186e187418671852186518731874186118721874186b18641865187418651872186d1869186e18691873186d186518451878186118631874186c1872186518711875186918721865186d1865186e1874187318a218671863186f186d18701875187418651863184318701875186a186d1865186d186f18721879185f186d1869186200186518611874185f186d187318190318e81865186e186f186e1863186500"
+        },
+        "recovery_kind": "repair_only_delivery_loopback",
+        "settled_frames": 19,
+        "start_slot": 0
+      }
+    },
+    {
+      "candidate_digest": "acdaf6fcfcc398b37306c94ab40e9b2f9ba8ed610cef3aae975e953a49ead346",
+      "generation": 2,
+      "owner_result": {
+        "operation_id": "024a5595fe56637e2a58432d706e0e818c8d557801b456e1fcfda0a826d1d7e2",
+        "outcome": "inserted",
+        "reason": null,
+        "record_digest": "acdaf6fcfcc398b37306c94ab40e9b2f9ba8ed610cef3aae975e953a49ead346",
+        "schema": "mere.admitted-record-result/v1"
+      },
+      "recovery": {
+        "application_admission": false,
+        "collector_inventory_before": [
+          {
+            "digest_hex": "f99941c7c9aa4b3adc7b27d8d4d9b46873d32031a26dad81e3fae2ccfdebe151",
+            "expires_at": 2048,
+            "generation": 1,
+            "object_octets": 1029,
+            "publish_at": 0
+          }
+        ],
+        "collector_stats_before": {
+          "completed_objects": 1,
+          "decode_work": 9,
+          "decoder_allocations": 1,
+          "expired_objects": 0
+        },
+        "decoder_input_provenance": "new_object_state_from_authenticated_manifest_and_repair_frames",
+        "delivered_manifest_frames": 2,
+        "delivered_repair_frames": 9,
+        "dropped_fresh_frames": 9,
+        "end_slot": 11,
+        "expiry_during_recovery": [],
+        "physical_rf": false,
+        "preexisting_selected_object": false,
+        "recovered": {
+          "actual_decoder_output": true,
+          "application_admission": false,
+          "metadata": {
+            "digest_hex": "acdaf6fcfcc398b37306c94ab40e9b2f9ba8ed610cef3aae975e953a49ead346",
+            "expires_at": 2048,
+            "generation": 2,
+            "object_octets": 1094,
+            "publish_at": 5
+          },
+          "original_bytes_hex": "a1694f7065726174696f6ea26668656164657298f91888011858182018591850182a1822188118d7188218a718631830184a18f818e7181e189a187a188d1843181b18c31869185118350018f0186707181d1830184a18220a185818401823187f187b183d186b18a218a818fe184518c1186018a9188918ad18fd0e18fc18c5188f1898185918c5187c185f186418540118a818a4184d184f183d189818da18c91821186f1218e41882189b1820187d18d318db188c18d6188c182e1893182618b51854184b182318c30118fd1865184718c714170818190118251858182018e018cb185d186518a318c7186818df182d18e70d183c18a918c518d3189418f71885188b18a018a7188118211865183e18b618b818771867187a183918900118581820188418a005181d1876188e0318e618c41880181818be18b11818184e14182c186f186318511893187c186718e11871187518d318ca187218c008188c18a11867186d186518731868185f18691864189818201818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d6b696e6c696e655f626f647999012518a1186b184a186f18621850186f18731874186518641856183218a31864187318701865186318a618661869186e1870187518741873188118a218641862186c186f186218a2186618641869186718651873187418a218631861186c186718661842186c1861186b186518331865186218791874186518731898182018181848181818fc181818721818181f181818bb181818c118181872181818e0181818921818185f181818a21818187a181818f1181818671818181d181818e218181825181818ba181818921818187118181834181818801818182918181898181818b10a1518181868181818a118181888181818651818182b18681862187918741865185f186c1865186e011864186e1861186d18651867187018611879186c186f186118641866186f1875187418701875187418a21864186e1861186d186518661872186518731875186c18741869186d18611878185f18621879187418651873181904001868187218651873186f1875187218631865186c186d186518731868182e186518631868186f182f18761831186a1863186818651863186b1870186f1869186e187418671852186518731874186118721874186b18641865187418651872186d1869186e18691873186d186518451878186118631874186c1872186518711875186918721865186d1865186e1874187318a218671863186f186d18701875187418651863184318701875186a186d1865186d186f18721879185f186d1869186200186518611874185f186d187318190318e91865186e186f186e1863186501"
+        },
+        "recovery_kind": "repair_only_delivery_loopback",
+        "settled_frames": 20,
+        "start_slot": 7
+      }
+    },
+    {
+      "candidate_digest": "5a162f5606de53006652dbe38c5055793de5bab92b1bfd40e0f96ea81036d1a7",
+      "generation": 3,
+      "owner_result": {
+        "operation_id": "d254758409c6e85835668d0a8548bf9fdbbd7729a1de95093e8662adf754c4f3",
+        "outcome": "inserted",
+        "reason": null,
+        "record_digest": "5a162f5606de53006652dbe38c5055793de5bab92b1bfd40e0f96ea81036d1a7",
+        "schema": "mere.admitted-record-result/v1"
+      },
+      "recovery": {
+        "application_admission": false,
+        "collector_inventory_before": [
+          {
+            "digest_hex": "f99941c7c9aa4b3adc7b27d8d4d9b46873d32031a26dad81e3fae2ccfdebe151",
+            "expires_at": 2048,
+            "generation": 1,
+            "object_octets": 1029,
+            "publish_at": 0
+          },
+          {
+            "digest_hex": "acdaf6fcfcc398b37306c94ab40e9b2f9ba8ed610cef3aae975e953a49ead346",
+            "expires_at": 2048,
+            "generation": 2,
+            "object_octets": 1094,
+            "publish_at": 5
+          }
+        ],
+        "collector_stats_before": {
+          "completed_objects": 2,
+          "decode_work": 18,
+          "decoder_allocations": 2,
+          "expired_objects": 0
+        },
+        "decoder_input_provenance": "new_object_state_from_authenticated_manifest_and_repair_frames",
+        "delivered_manifest_frames": 2,
+        "delivered_repair_frames": 9,
+        "dropped_fresh_frames": 9,
+        "end_slot": 16,
+        "expiry_during_recovery": [],
+        "physical_rf": false,
+        "preexisting_selected_object": false,
+        "recovered": {
+          "actual_decoder_output": true,
+          "application_admission": false,
+          "metadata": {
+            "digest_hex": "5a162f5606de53006652dbe38c5055793de5bab92b1bfd40e0f96ea81036d1a7",
+            "expires_at": 2048,
+            "generation": 3,
+            "object_octets": 1088,
+            "publish_at": 6
+          },
+          "original_bytes_hex": "a1694f7065726174696f6ea26668656164657298f91888011858182018591850182a1822188118d7188218a718631830184a18f818e7181e189a187a188d1843181b18c31869185118350018f0186707181d1830184a18220a1858184009186b1862188f181a184a0e11187818ec18e2189b18ba182b18e7187018bd18501839184318ab18a0189a0f18bd187c185518d118e11822188818d41871183418a418bc18311819182818e118b0189c1834187418a218c6186218eb18ee18aa0a1218d618c718a1182818d018a1182718c01894187318a4091819011824185818200e1855186318fb183e18b4183018fe1848182e18a4182617184318d31857011848184c1853182a0c0a187b18e418a018f5182d18f918ea18371869021858182002184a1855189518fe18561863187e182a18581843182d1870186e0e1881188c188d185518780118b4185618e118fc18fd18a018a8182618d118d718e218a11867186d186518731868185f18691864189818201818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d6b696e6c696e655f626f647999012418a1186b184a186f18621850186f18731874186518641856183218a31864187318701865186318a618661869186e1870187518741873188118a218641862186c186f186218a2186618641869186718651873187418a218631861186c186718661842186c1861186b1865183318651862187918741865187318981820181818ab13181818be181818df18181842181818e81818184b181818ae0f1818187c18181862181818c7181818dd1818186a1818188a181818da181818571818181e1818188818181829181818be181818d6181818ea181818551818188217181818f0181818361818181b1818185e18181825181818d018681862187918741865185f186c1865186e011864186e1861186d18651867187018611879186c186f186118641866186f1875187418701875187418a21864186e1861186d186518661872186518731875186c18741869186d18611878185f18621879187418651873181904001868187218651873186f1875187218631865186c186d186518731868182e186518631868186f182f18761831186a1863186818651863186b1870186f1869186e187418671852186518731874186118721874186b18641865187418651872186d1869186e18691873186d186518451878186118631874186c1872186518711875186918721865186d1865186e1874187318a218671863186f186d18701875187418651863184318701875186a186d1865186d186f18721879185f186d1869186200186518611874185f186d187318190318ea1865186e186f186e1863186502"
+        },
+        "recovery_kind": "repair_only_delivery_loopback",
+        "settled_frames": 20,
+        "start_slot": 11
+      }
+    },
+    {
+      "candidate_digest": "6e55a89ed94762222e6ccba4a8d56e47f36c0f695ee465c3bb29fab3779b74e5",
+      "generation": 4,
+      "owner_result": {
+        "operation_id": "d276b62f44621f78e10667ded612e6f9852b6ba0755d00393c41e9804df5661a",
+        "outcome": "inserted",
+        "reason": null,
+        "record_digest": "6e55a89ed94762222e6ccba4a8d56e47f36c0f695ee465c3bb29fab3779b74e5",
+        "schema": "mere.admitted-record-result/v1"
+      },
+      "recovery": {
+        "application_admission": false,
+        "collector_inventory_before": [
+          {
+            "digest_hex": "f99941c7c9aa4b3adc7b27d8d4d9b46873d32031a26dad81e3fae2ccfdebe151",
+            "expires_at": 2048,
+            "generation": 1,
+            "object_octets": 1029,
+            "publish_at": 0
+          },
+          {
+            "digest_hex": "acdaf6fcfcc398b37306c94ab40e9b2f9ba8ed610cef3aae975e953a49ead346",
+            "expires_at": 2048,
+            "generation": 2,
+            "object_octets": 1094,
+            "publish_at": 5
+          },
+          {
+            "digest_hex": "5a162f5606de53006652dbe38c5055793de5bab92b1bfd40e0f96ea81036d1a7",
+            "expires_at": 2048,
+            "generation": 3,
+            "object_octets": 1088,
+            "publish_at": 6
+          }
+        ],
+        "collector_stats_before": {
+          "completed_objects": 3,
+          "decode_work": 27,
+          "decoder_allocations": 3,
+          "expired_objects": 0
+        },
+        "decoder_input_provenance": "new_object_state_from_authenticated_manifest_and_repair_frames",
+        "delivered_manifest_frames": 2,
+        "delivered_repair_frames": 9,
+        "dropped_fresh_frames": 9,
+        "end_slot": 21,
+        "expiry_during_recovery": [],
+        "physical_rf": false,
+        "preexisting_selected_object": false,
+        "recovered": {
+          "actual_decoder_output": true,
+          "application_admission": false,
+          "metadata": {
+            "digest_hex": "6e55a89ed94762222e6ccba4a8d56e47f36c0f695ee465c3bb29fab3779b74e5",
+            "expires_at": 2048,
+            "generation": 4,
+            "object_octets": 1087,
+            "publish_at": 7
+          },
+          "original_bytes_hex": "a1694f7065726174696f6ea26668656164657298f91888011858182018591850182a1822188118d7188218a718631830184a18f818e7181e189a187a188d1843181b18c31869185118350018f0186707181d1830184a18220a185818400718ef181e1838188a184b18cd18bf18d6189318e818f41878183518ff182318cf18ff189e18eb18760d1891183f18dd18550f18a9187318fa187c184c186018e5184218c718fb185101185b183718b318bc184e186e1899183d188718dd183e1882182918cf18c018c21874186518da18c718de18b81838182f0818190118221858182018ca18a018d218361877189318fd18dd1875186318c41829188e1827189b18b618f318c11853184e1218b218ea18f9184318f70b18a3185f183318ed18b2031858182018d21854187518840918c618e8185818351866188d0a1885184818bf189f18db18bd1877182918a118de189509183e1886186218ad18f7185418c418f318a11867186d186518731868185f18691864189818201818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d6b696e6c696e655f626f647999012218a1186b184a186f18621850186f18731874186518641856183218a31864187318701865186318a618661869186e1870187518741873188118a218641862186c186f186218a2186618641869186718651873187418a218631861186c186718661842186c1861186b1865183318651862187918741865187318981820181818e1181818e0181818e81818181d1818186e181818a31818189b0c181818f8181818b81818186f181818fd181818440918181821011818181f18181857181818400c181818bc1818183f18181876181818a8181818a118181871181818901818186a1818189b1818188d181818750518681862187918741865185f186c1865186e011864186e1861186d18651867187018611879186c186f186118641866186f1875187418701875187418a21864186e1861186d186518661872186518731875186c18741869186d18611878185f18621879187418651873181904001868187218651873186f1875187218631865186c186d186518731868182e186518631868186f182f18761831186a1863186818651863186b1870186f1869186e187418671852186518731874186118721874186b18641865187418651872186d1869186e18691873186d186518451878186118631874186c1872186518711875186918721865186d1865186e1874187318a218671863186f186d18701875187418651863184318701875186a186d1865186d186f18721879185f186d1869186200186518611874185f186d187318190318eb1865186e186f186e1863186503"
+        },
+        "recovery_kind": "repair_only_delivery_loopback",
+        "settled_frames": 20,
+        "start_slot": 16
+      }
+    }
+  ],
+  "duplicate": {
+    "operation_id": "84a0051d768e03e6c48018beb1184e142c6f6351937c67e17175d3ca72c0088c",
+    "outcome": "duplicate",
+    "reason": null,
+    "record_digest": "f99941c7c9aa4b3adc7b27d8d4d9b46873d32031a26dad81e3fae2ccfdebe151",
+    "schema": "mere.admitted-record-result/v1"
+  },
+  "endpoints_closed": true,
+  "following_stalls": {
+    "operation_id": "84a0051d768e03e6c48018beb1184e142c6f6351937c67e17175d3ca72c0088c",
+    "outcome": "duplicate",
+    "reason": null,
+    "record_digest": "f99941c7c9aa4b3adc7b27d8d4d9b46873d32031a26dad81e3fae2ccfdebe151",
+    "schema": "mere.admitted-record-result/v1"
+  },
+  "framing_refusals": [
+    {
+      "case": "oversized declaration",
+      "owner_called": false,
+      "owner_receipt": false
+    },
+    {
+      "case": "truncated record",
+      "owner_called": false,
+      "owner_receipt": false
+    },
+    {
+      "case": "trailing byte",
+      "owner_called": false,
+      "owner_receipt": false
+    }
+  ],
+  "invalid_records": [
+    {
+      "case": "damaged body",
+      "owner_unchanged": true,
+      "result": {
+        "operation_id": "84a0051d768e03e6c48018beb1184e142c6f6351937c67e17175d3ca72c0088c",
+        "outcome": "refused",
+        "reason": "invalid operation: payload hash and size do not match given body",
+        "record_digest": "11a1758f11fa642c44d24f62724b7e44365819bfe7e86fb3f42a891b41780474",
+        "schema": "mere.admitted-record-result/v1"
+      }
+    },
+    {
+      "case": "damaged signature",
+      "owner_unchanged": true,
+      "result": {
+        "operation_id": null,
+        "outcome": "refused",
+        "reason": "drop operation codec: invalid signature",
+        "record_digest": "303ccbf9d7aa603c7ed027b25e77090a31c7d6f3a246fdf43417b2ca9d646da9",
+        "schema": "mere.admitted-record-result/v1"
+      }
+    },
+    {
+      "case": "wrong mesh",
+      "owner_unchanged": true,
+      "result": {
+        "operation_id": "e3e1f16ab8aca54aeffe584d200f3f3cbae6d1564c079ff7c7feb14f960b014e",
+        "outcome": "refused",
+        "reason": "operation rejected: wrong-mesh: operation addresses a different compute mesh",
+        "record_digest": "4210c5c351d6efbb02ef1f0dd651b3b4020dee7f8da9af23bfc6356a4c9353ee",
+        "schema": "mere.admitted-record-result/v1"
+      }
+    }
+  ],
+  "mere_source_blake3": "9a5312045ac626ba2d46bde68a19227959caa9d881407390cfb6ec546964b482",
+  "owner": {
+    "durable_reopen": "closed_handles_then_independent_process",
+    "operations": 4,
+    "posted_jobs": 4,
+    "same_existing_mesh_admission_owner": true,
+    "signed_bytes_preserved": true
+  },
+  "peer_executable_blake3": "7e0a096f324601bdf36a94e505625f1e5ab5ff6d9c97522a8f9c398042cf8fb1",
+  "permission_refusals": [
+    {
+      "case": "submit-only cannot read inventory",
+      "error": "session not admitted: action not covered by the presented authority"
+    },
+    {
+      "case": "inventory-only cannot submit",
+      "error": "session not admitted: action not covered by the presented authority"
+    }
+  ],
+  "preservation": [
+    {
+      "body_bytes_equal": true,
+      "generation": 1,
+      "header_bytes_equal": true,
+      "operation_id": "84a0051d768e03e6c48018beb1184e142c6f6351937c67e17175d3ca72c0088c",
+      "record_blake3": "f99941c7c9aa4b3adc7b27d8d4d9b46873d32031a26dad81e3fae2ccfdebe151",
+      "record_bytes_equal": true
+    },
+    {
+      "body_bytes_equal": true,
+      "generation": 2,
+      "header_bytes_equal": true,
+      "operation_id": "024a5595fe56637e2a58432d706e0e818c8d557801b456e1fcfda0a826d1d7e2",
+      "record_blake3": "acdaf6fcfcc398b37306c94ab40e9b2f9ba8ed610cef3aae975e953a49ead346",
+      "record_bytes_equal": true
+    },
+    {
+      "body_bytes_equal": true,
+      "generation": 3,
+      "header_bytes_equal": true,
+      "operation_id": "d254758409c6e85835668d0a8548bf9fdbbd7729a1de95093e8662adf754c4f3",
+      "record_blake3": "5a162f5606de53006652dbe38c5055793de5bab92b1bfd40e0f96ea81036d1a7",
+      "record_bytes_equal": true
+    },
+    {
+      "body_bytes_equal": true,
+      "generation": 4,
+      "header_bytes_equal": true,
+      "operation_id": "d276b62f44621f78e10667ded612e6f9852b6ba0755d00393c41e9804df5661a",
+      "record_blake3": "6e55a89ed94762222e6ccba4a8d56e47f36c0f695ee465c3bb29fab3779b74e5",
+      "record_bytes_equal": true
+    }
+  ],
+  "queue": {
+    "at_capacity_pending": 4,
+    "peak_pending": 4,
+    "refused": 1
+  },
+  "receiver_inventory_after_hex": "4d495631004d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d0400000000000000b7eee049609f7bd579542de4d3aeea9a0a1b79a624281744fcd4bdc815265eb104000000045a162f5606de53006652dbe38c5055793de5bab92b1bfd40e0f96ea81036d1a76e55a89ed94762222e6ccba4a8d56e47f36c0f695ee465c3bb29fab3779b74e5acdaf6fcfcc398b37306c94ab40e9b2f9ba8ed610cef3aae975e953a49ead346f99941c7c9aa4b3adc7b27d8d4d9b46873d32031a26dad81e3fae2ccfdebe151",
+  "receiver_inventory_before_hex": "4d495631004d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d01000000000000004a24208db89086e51e16c470cce9edd610b392ed3dbfcd78a6fc0c13a1543b900100000001f99941c7c9aa4b3adc7b27d8d4d9b46873d32031a26dad81e3fae2ccfdebe151",
+  "schema": "mere.exact-inventory-admitted-composition/v1",
+  "scope": {
+    "actual_raptorq_decoder": true,
+    "native_resident_ui": false,
+    "physical_radio": false,
+    "real_notochord_admission": true,
+    "real_quic": true,
+    "retained_frame_delivery": "host repair-only loopback before real opaque QUIC handoff",
+    "worker_execution": false
+  },
+  "service_stats": {
+    "active": 0,
+    "completed": 22,
+    "denied_sessions": 2,
+    "duplicates": 2,
+    "inserted": 4,
+    "owner_calls": 8,
+    "peak_active": 2,
+    "refused_records": 3,
+    "reply_frame_bytes": 3363,
+    "request_frame_bytes": 23335,
+    "timeouts": 6
+  },
+  "source": {
+    "exchanges": [
+      {
+        "request": {
+          "command": {
+            "authority_seed_hex": "1818181818181818181818181818181818181818181818181818181818181818",
+            "channels": 4,
+            "manifest_interval": 5,
+            "namespace_hex": "4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d",
+            "op": "init",
+            "public_fixture": true,
+            "repair_floor": 1
+          },
+          "now_slot": 0,
+          "request_id": 1,
+          "schema": "retinue.retained-peer/v1"
+        },
+        "response": {
+          "collector_stats": {
+            "completed_objects": 0,
+            "decode_work": 0,
+            "decoder_allocations": 0,
+            "expired_objects": 0
+          },
+          "expiry": null,
+          "implementation": {
+            "application_operation_ids": false,
+            "executable": {
+              "blake3": "7e0a096f324601bdf36a94e505625f1e5ab5ff6d9c97522a8f9c398042cf8fb1",
+              "octets": 11923064,
+              "path": "/Users/markik/Code/testing/iroh-control-20261011/retinue/testing/transport-conformance/target/debug/transport-conformance"
+            },
+            "identity_scope": "Compiled source and lockfile fingerprint plus the executing file digest. Repository revision and dirty status are runtime observations of the compile-time source directory, not a claim that those current Git bytes produced this executable.",
+            "public_fixture_authority_only": true,
+            "suite": {
+              "corpus_manifest_sha256": "ff95dc345ea741cde01770b4d313df5efe8522c768b04371e30042d1c1c9d20d",
+              "dependency_versions": {
+                "blake3": "1.8.7",
+                "ed25519-dalek": "3.0.0",
+                "raptorq": "2.0.1"
+              },
+              "repository_revision": "2ee6f0ce7d37f7becc5a793efadc9dd9db4620a2",
+              "repository_worktree_dirty": false,
+              "runner": "transport-conformance 0.1.0",
+              "suite_source_blake3": "c453db8e90ba61fe13ce80036d119adc76e39e6deec201f785d57b14897036a9",
+              "target_arch": "aarch64",
+              "target_os": "macos"
+            }
+          },
+          "kind": "response",
+          "now_slot": 0,
+          "pending_token": null,
+          "producer_stats": {
+            "deferrals": 0,
+            "encoder_allocations": 0,
+            "expired_objects": 0,
+            "queued_frames": 0,
+            "queued_fresh": 0,
+            "queued_manifests": 0,
+            "queued_repairs": 0,
+            "queued_wire_octets": 0
+          },
+          "request_id": 1,
+          "requested_now_slot": 0,
+          "result": {
+            "authority_key_hex": "53470962558a6e0839022ae65c6b2723b32772e5c0c5f4776cb8e6a3e10ba2f3",
+            "channels": 4,
+            "inventory": [],
+            "manifest_interval": 5,
+            "namespace_hex": "4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d",
+            "oti_profile": {
+              "alignment": 4,
+              "source_blocks": 1,
+              "sub_blocks": 1,
+              "symbol_octets": 128
+            },
+            "public_fixture": true,
+            "repair_floor": 1
+          },
+          "schema": "retinue.retained-peer/v1",
+          "status": "ok"
+        }
+      },
+      {
+        "request": {
+          "command": {
+            "expires_at": 2048,
+            "generation": 1,
+            "op": "publish",
+            "original_bytes_hex": "a1694f7065726174696f6ea26668656164657298d71887011858182018591850182a1822188118d7188218a718631830184a18f818e7181e189a187a188d1843181b18c31869185118350018f0186707181d1830184a18220a1858184018420618da18691826184018d618a8183018dd18e9188318ff18ef185c186a1883188e131842182b18f4184c18a1182a185c18d511081879182e183c18a41825188718df18aa189518701853182418ea18e1182318e0189718f018c2189b187e0818491827186f187118d618be1854183f18eb185118bd18dd0c18190118251858182018f718ca07181a18901888184218a21832184b11187401182e189818e818881858188e18e518c518b8183b18ab18fd18fc18bd184c182d1841187a18e90018a11867186d186518731868185f18691864189818201818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d6b696e6c696e655f626f647999012518a1186b184a186f18621850186f18731874186518641856183218a31864187318701865186318a618661869186e1870187518741873188118a218641862186c186f186218a2186618641869186718651873187418a218631861186c186718661842186c1861186b18651833186518621879187418651873189818201818182d1818183a181818de181818df181818f11818181b18181861181818f11818184c181818881818186e18181835181818af181818a018181836181818731818186d181818cd18181887181818a71818184d18181827181818b5181818c1181818510218181825181818d0181818f518181892181818e21318681862187918741865185f186c1865186e011864186e1861186d18651867187018611879186c186f186118641866186f1875187418701875187418a21864186e1861186d186518661872186518731875186c18741869186d18611878185f18621879187418651873181904001868187218651873186f1875187218631865186c186d186518731868182e186518631868186f182f18761831186a1863186818651863186b1870186f1869186e187418671852186518731874186118721874186b18641865187418651872186d1869186e18691873186d186518451878186118631874186c1872186518711875186918721865186d1865186e1874187318a218671863186f186d18701875187418651863184318701875186a186d1865186d186f18721879185f186d1869186200186518611874185f186d187318190318e81865186e186f186e1863186500"
+          },
+          "now_slot": 0,
+          "request_id": 2,
+          "schema": "retinue.retained-peer/v1"
+        },
+        "response": {
+          "collector_stats": {
+            "completed_objects": 0,
+            "decode_work": 0,
+            "decoder_allocations": 0,
+            "expired_objects": 0
+          },
+          "expiry": {
+            "collector": {
+              "invalidated_token": null,
+              "objects": []
+            },
+            "during_command": [],
+            "producer": {
+              "invalidated_token": null,
+              "objects": []
+            }
+          },
+          "implementation": {
+            "application_operation_ids": false,
+            "executable": {
+              "blake3": "7e0a096f324601bdf36a94e505625f1e5ab5ff6d9c97522a8f9c398042cf8fb1",
+              "octets": 11923064,
+              "path": "/Users/markik/Code/testing/iroh-control-20261011/retinue/testing/transport-conformance/target/debug/transport-conformance"
+            },
+            "identity_scope": "Compiled source and lockfile fingerprint plus the executing file digest. Repository revision and dirty status are runtime observations of the compile-time source directory, not a claim that those current Git bytes produced this executable.",
+            "public_fixture_authority_only": true,
+            "suite": {
+              "corpus_manifest_sha256": "ff95dc345ea741cde01770b4d313df5efe8522c768b04371e30042d1c1c9d20d",
+              "dependency_versions": {
+                "blake3": "1.8.7",
+                "ed25519-dalek": "3.0.0",
+                "raptorq": "2.0.1"
+              },
+              "repository_revision": "2ee6f0ce7d37f7becc5a793efadc9dd9db4620a2",
+              "repository_worktree_dirty": false,
+              "runner": "transport-conformance 0.1.0",
+              "suite_source_blake3": "c453db8e90ba61fe13ce80036d119adc76e39e6deec201f785d57b14897036a9",
+              "target_arch": "aarch64",
+              "target_os": "macos"
+            }
+          },
+          "kind": "response",
+          "now_slot": 0,
+          "pending_token": null,
+          "producer_stats": {
+            "deferrals": 0,
+            "encoder_allocations": 1,
+            "expired_objects": 0,
+            "queued_frames": 0,
+            "queued_fresh": 0,
+            "queued_manifests": 0,
+            "queued_repairs": 0,
+            "queued_wire_octets": 0
+          },
+          "request_id": 2,
+          "requested_now_slot": 0,
+          "result": {
+            "metadata": {
+              "digest_hex": "f99941c7c9aa4b3adc7b27d8d4d9b46873d32031a26dad81e3fae2ccfdebe151",
+              "expires_at": 2048,
+              "generation": 1,
+              "object_octets": 1029,
+              "publish_at": 0
+            },
+            "outcome": "inserted"
+          },
+          "schema": "retinue.retained-peer/v1",
+          "status": "ok"
+        }
+      },
+      {
+        "request": {
+          "command": {
+            "op": "snapshot"
+          },
+          "now_slot": 0,
+          "request_id": 3,
+          "schema": "retinue.retained-peer/v1"
+        },
+        "response": {
+          "collector_stats": {
+            "completed_objects": 0,
+            "decode_work": 0,
+            "decoder_allocations": 0,
+            "expired_objects": 0
+          },
+          "expiry": {
+            "collector": {
+              "invalidated_token": null,
+              "objects": []
+            },
+            "during_command": [],
+            "producer": {
+              "invalidated_token": null,
+              "objects": []
+            }
+          },
+          "implementation": {
+            "application_operation_ids": false,
+            "executable": {
+              "blake3": "7e0a096f324601bdf36a94e505625f1e5ab5ff6d9c97522a8f9c398042cf8fb1",
+              "octets": 11923064,
+              "path": "/Users/markik/Code/testing/iroh-control-20261011/retinue/testing/transport-conformance/target/debug/transport-conformance"
+            },
+            "identity_scope": "Compiled source and lockfile fingerprint plus the executing file digest. Repository revision and dirty status are runtime observations of the compile-time source directory, not a claim that those current Git bytes produced this executable.",
+            "public_fixture_authority_only": true,
+            "suite": {
+              "corpus_manifest_sha256": "ff95dc345ea741cde01770b4d313df5efe8522c768b04371e30042d1c1c9d20d",
+              "dependency_versions": {
+                "blake3": "1.8.7",
+                "ed25519-dalek": "3.0.0",
+                "raptorq": "2.0.1"
+              },
+              "repository_revision": "2ee6f0ce7d37f7becc5a793efadc9dd9db4620a2",
+              "repository_worktree_dirty": false,
+              "runner": "transport-conformance 0.1.0",
+              "suite_source_blake3": "c453db8e90ba61fe13ce80036d119adc76e39e6deec201f785d57b14897036a9",
+              "target_arch": "aarch64",
+              "target_os": "macos"
+            }
+          },
+          "kind": "response",
+          "now_slot": 0,
+          "pending_token": null,
+          "producer_stats": {
+            "deferrals": 0,
+            "encoder_allocations": 1,
+            "expired_objects": 0,
+            "queued_frames": 0,
+            "queued_fresh": 0,
+            "queued_manifests": 0,
+            "queued_repairs": 0,
+            "queued_wire_octets": 0
+          },
+          "request_id": 3,
+          "requested_now_slot": 0,
+          "result": {
+            "collector_inventory": [],
+            "inventory": [
+              {
+                "digest_hex": "f99941c7c9aa4b3adc7b27d8d4d9b46873d32031a26dad81e3fae2ccfdebe151",
+                "expires_at": 2048,
+                "generation": 1,
+                "object_octets": 1029,
+                "publish_at": 0
+              }
+            ],
+            "pending": null,
+            "retained_original_octets": 1029
+          },
+          "schema": "retinue.retained-peer/v1",
+          "status": "ok"
+        }
+      },
+      {
+        "request": {
+          "command": {
+            "generation": 1,
+            "op": "lookup_metadata"
+          },
+          "now_slot": 0,
+          "request_id": 4,
+          "schema": "retinue.retained-peer/v1"
+        },
+        "response": {
+          "collector_stats": {
+            "completed_objects": 0,
+            "decode_work": 0,
+            "decoder_allocations": 0,
+            "expired_objects": 0
+          },
+          "expiry": {
+            "collector": {
+              "invalidated_token": null,
+              "objects": []
+            },
+            "during_command": [],
+            "producer": {
+              "invalidated_token": null,
+              "objects": []
+            }
+          },
+          "implementation": {
+            "application_operation_ids": false,
+            "executable": {
+              "blake3": "7e0a096f324601bdf36a94e505625f1e5ab5ff6d9c97522a8f9c398042cf8fb1",
+              "octets": 11923064,
+              "path": "/Users/markik/Code/testing/iroh-control-20261011/retinue/testing/transport-conformance/target/debug/transport-conformance"
+            },
+            "identity_scope": "Compiled source and lockfile fingerprint plus the executing file digest. Repository revision and dirty status are runtime observations of the compile-time source directory, not a claim that those current Git bytes produced this executable.",
+            "public_fixture_authority_only": true,
+            "suite": {
+              "corpus_manifest_sha256": "ff95dc345ea741cde01770b4d313df5efe8522c768b04371e30042d1c1c9d20d",
+              "dependency_versions": {
+                "blake3": "1.8.7",
+                "ed25519-dalek": "3.0.0",
+                "raptorq": "2.0.1"
+              },
+              "repository_revision": "2ee6f0ce7d37f7becc5a793efadc9dd9db4620a2",
+              "repository_worktree_dirty": false,
+              "runner": "transport-conformance 0.1.0",
+              "suite_source_blake3": "c453db8e90ba61fe13ce80036d119adc76e39e6deec201f785d57b14897036a9",
+              "target_arch": "aarch64",
+              "target_os": "macos"
+            }
+          },
+          "kind": "response",
+          "now_slot": 0,
+          "pending_token": null,
+          "producer_stats": {
+            "deferrals": 0,
+            "encoder_allocations": 1,
+            "expired_objects": 0,
+            "queued_frames": 0,
+            "queued_fresh": 0,
+            "queued_manifests": 0,
+            "queued_repairs": 0,
+            "queued_wire_octets": 0
+          },
+          "request_id": 4,
+          "requested_now_slot": 0,
+          "result": {
+            "metadata": {
+              "digest_hex": "f99941c7c9aa4b3adc7b27d8d4d9b46873d32031a26dad81e3fae2ccfdebe151",
+              "expires_at": 2048,
+              "generation": 1,
+              "object_octets": 1029,
+              "publish_at": 0
+            }
+          },
+          "schema": "retinue.retained-peer/v1",
+          "status": "ok"
+        }
+      },
+      {
+        "request": {
+          "command": {
+            "generation": 1,
+            "op": "recover"
+          },
+          "now_slot": 0,
+          "request_id": 5,
+          "schema": "retinue.retained-peer/v1"
+        },
+        "response": {
+          "collector_stats": {
+            "completed_objects": 1,
+            "decode_work": 9,
+            "decoder_allocations": 1,
+            "expired_objects": 0
+          },
+          "expiry": {
+            "collector": {
+              "invalidated_token": null,
+              "objects": []
+            },
+            "during_command": [],
+            "producer": {
+              "invalidated_token": null,
+              "objects": []
+            }
+          },
+          "implementation": {
+            "application_operation_ids": false,
+            "executable": {
+              "blake3": "7e0a096f324601bdf36a94e505625f1e5ab5ff6d9c97522a8f9c398042cf8fb1",
+              "octets": 11923064,
+              "path": "/Users/markik/Code/testing/iroh-control-20261011/retinue/testing/transport-conformance/target/debug/transport-conformance"
+            },
+            "identity_scope": "Compiled source and lockfile fingerprint plus the executing file digest. Repository revision and dirty status are runtime observations of the compile-time source directory, not a claim that those current Git bytes produced this executable.",
+            "public_fixture_authority_only": true,
+            "suite": {
+              "corpus_manifest_sha256": "ff95dc345ea741cde01770b4d313df5efe8522c768b04371e30042d1c1c9d20d",
+              "dependency_versions": {
+                "blake3": "1.8.7",
+                "ed25519-dalek": "3.0.0",
+                "raptorq": "2.0.1"
+              },
+              "repository_revision": "2ee6f0ce7d37f7becc5a793efadc9dd9db4620a2",
+              "repository_worktree_dirty": false,
+              "runner": "transport-conformance 0.1.0",
+              "suite_source_blake3": "c453db8e90ba61fe13ce80036d119adc76e39e6deec201f785d57b14897036a9",
+              "target_arch": "aarch64",
+              "target_os": "macos"
+            }
+          },
+          "kind": "response",
+          "now_slot": 4,
+          "pending_token": null,
+          "producer_stats": {
+            "deferrals": 0,
+            "encoder_allocations": 1,
+            "expired_objects": 0,
+            "queued_frames": 19,
+            "queued_fresh": 9,
+            "queued_manifests": 1,
+            "queued_repairs": 9,
+            "queued_wire_octets": 5111
+          },
+          "request_id": 5,
+          "requested_now_slot": 0,
+          "result": {
+            "application_admission": false,
+            "collector_inventory_before": [],
+            "collector_stats_before": {
+              "completed_objects": 0,
+              "decode_work": 0,
+              "decoder_allocations": 0,
+              "expired_objects": 0
+            },
+            "decoder_input_provenance": "new_object_state_from_authenticated_manifest_and_repair_frames",
+            "delivered_manifest_frames": 1,
+            "delivered_repair_frames": 9,
+            "dropped_fresh_frames": 9,
+            "end_slot": 4,
+            "expiry_during_recovery": [],
+            "physical_rf": false,
+            "preexisting_selected_object": false,
+            "recovered": {
+              "actual_decoder_output": true,
+              "application_admission": false,
+              "metadata": {
+                "digest_hex": "f99941c7c9aa4b3adc7b27d8d4d9b46873d32031a26dad81e3fae2ccfdebe151",
+                "expires_at": 2048,
+                "generation": 1,
+                "object_octets": 1029,
+                "publish_at": 0
+              },
+              "original_bytes_hex": "a1694f7065726174696f6ea26668656164657298d71887011858182018591850182a1822188118d7188218a718631830184a18f818e7181e189a187a188d1843181b18c31869185118350018f0186707181d1830184a18220a1858184018420618da18691826184018d618a8183018dd18e9188318ff18ef185c186a1883188e131842182b18f4184c18a1182a185c18d511081879182e183c18a41825188718df18aa189518701853182418ea18e1182318e0189718f018c2189b187e0818491827186f187118d618be1854183f18eb185118bd18dd0c18190118251858182018f718ca07181a18901888184218a21832184b11187401182e189818e818881858188e18e518c518b8183b18ab18fd18fc18bd184c182d1841187a18e90018a11867186d186518731868185f18691864189818201818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d6b696e6c696e655f626f647999012518a1186b184a186f18621850186f18731874186518641856183218a31864187318701865186318a618661869186e1870187518741873188118a218641862186c186f186218a2186618641869186718651873187418a218631861186c186718661842186c1861186b18651833186518621879187418651873189818201818182d1818183a181818de181818df181818f11818181b18181861181818f11818184c181818881818186e18181835181818af181818a018181836181818731818186d181818cd18181887181818a71818184d18181827181818b5181818c1181818510218181825181818d0181818f518181892181818e21318681862187918741865185f186c1865186e011864186e1861186d18651867187018611879186c186f186118641866186f1875187418701875187418a21864186e1861186d186518661872186518731875186c18741869186d18611878185f18621879187418651873181904001868187218651873186f1875187218631865186c186d186518731868182e186518631868186f182f18761831186a1863186818651863186b1870186f1869186e187418671852186518731874186118721874186b18641865187418651872186d1869186e18691873186d186518451878186118631874186c1872186518711875186918721865186d1865186e1874187318a218671863186f186d18701875187418651863184318701875186a186d1865186d186f18721879185f186d1869186200186518611874185f186d187318190318e81865186e186f186e1863186500"
+            },
+            "recovery_kind": "repair_only_delivery_loopback",
+            "settled_frames": 19,
+            "start_slot": 0
+          },
+          "schema": "retinue.retained-peer/v1",
+          "status": "ok"
+        }
+      },
+      {
+        "request": {
+          "command": {
+            "expires_at": 2048,
+            "generation": 2,
+            "op": "publish",
+            "original_bytes_hex": "a1694f7065726174696f6ea26668656164657298f91888011858182018591850182a1822188118d7188218a718631830184a18f818e7181e189a187a188d1843181b18c31869185118350018f0186707181d1830184a18220a185818401823187f187b183d186b18a218a818fe184518c1186018a9188918ad18fd0e18fc18c5188f1898185918c5187c185f186418540118a818a4184d184f183d189818da18c91821186f1218e41882189b1820187d18d318db188c18d6188c182e1893182618b51854184b182318c30118fd1865184718c714170818190118251858182018e018cb185d186518a318c7186818df182d18e70d183c18a918c518d3189418f71885188b18a018a7188118211865183e18b618b818771867187a183918900118581820188418a005181d1876188e0318e618c41880181818be18b11818184e14182c186f186318511893187c186718e11871187518d318ca187218c008188c18a11867186d186518731868185f18691864189818201818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d6b696e6c696e655f626f647999012518a1186b184a186f18621850186f18731874186518641856183218a31864187318701865186318a618661869186e1870187518741873188118a218641862186c186f186218a2186618641869186718651873187418a218631861186c186718661842186c1861186b186518331865186218791874186518731898182018181848181818fc181818721818181f181818bb181818c118181872181818e0181818921818185f181818a21818187a181818f1181818671818181d181818e218181825181818ba181818921818187118181834181818801818182918181898181818b10a1518181868181818a118181888181818651818182b18681862187918741865185f186c1865186e011864186e1861186d18651867187018611879186c186f186118641866186f1875187418701875187418a21864186e1861186d186518661872186518731875186c18741869186d18611878185f18621879187418651873181904001868187218651873186f1875187218631865186c186d186518731868182e186518631868186f182f18761831186a1863186818651863186b1870186f1869186e187418671852186518731874186118721874186b18641865187418651872186d1869186e18691873186d186518451878186118631874186c1872186518711875186918721865186d1865186e1874187318a218671863186f186d18701875187418651863184318701875186a186d1865186d186f18721879185f186d1869186200186518611874185f186d187318190318e91865186e186f186e1863186501"
+          },
+          "now_slot": 5,
+          "request_id": 6,
+          "schema": "retinue.retained-peer/v1"
+        },
+        "response": {
+          "collector_stats": {
+            "completed_objects": 1,
+            "decode_work": 9,
+            "decoder_allocations": 1,
+            "expired_objects": 0
+          },
+          "expiry": {
+            "collector": {
+              "invalidated_token": null,
+              "objects": []
+            },
+            "during_command": [],
+            "producer": {
+              "invalidated_token": null,
+              "objects": []
+            }
+          },
+          "implementation": {
+            "application_operation_ids": false,
+            "executable": {
+              "blake3": "7e0a096f324601bdf36a94e505625f1e5ab5ff6d9c97522a8f9c398042cf8fb1",
+              "octets": 11923064,
+              "path": "/Users/markik/Code/testing/iroh-control-20261011/retinue/testing/transport-conformance/target/debug/transport-conformance"
+            },
+            "identity_scope": "Compiled source and lockfile fingerprint plus the executing file digest. Repository revision and dirty status are runtime observations of the compile-time source directory, not a claim that those current Git bytes produced this executable.",
+            "public_fixture_authority_only": true,
+            "suite": {
+              "corpus_manifest_sha256": "ff95dc345ea741cde01770b4d313df5efe8522c768b04371e30042d1c1c9d20d",
+              "dependency_versions": {
+                "blake3": "1.8.7",
+                "ed25519-dalek": "3.0.0",
+                "raptorq": "2.0.1"
+              },
+              "repository_revision": "2ee6f0ce7d37f7becc5a793efadc9dd9db4620a2",
+              "repository_worktree_dirty": false,
+              "runner": "transport-conformance 0.1.0",
+              "suite_source_blake3": "c453db8e90ba61fe13ce80036d119adc76e39e6deec201f785d57b14897036a9",
+              "target_arch": "aarch64",
+              "target_os": "macos"
+            }
+          },
+          "kind": "response",
+          "now_slot": 5,
+          "pending_token": null,
+          "producer_stats": {
+            "deferrals": 0,
+            "encoder_allocations": 2,
+            "expired_objects": 0,
+            "queued_frames": 19,
+            "queued_fresh": 9,
+            "queued_manifests": 1,
+            "queued_repairs": 9,
+            "queued_wire_octets": 5111
+          },
+          "request_id": 6,
+          "requested_now_slot": 5,
+          "result": {
+            "metadata": {
+              "digest_hex": "acdaf6fcfcc398b37306c94ab40e9b2f9ba8ed610cef3aae975e953a49ead346",
+              "expires_at": 2048,
+              "generation": 2,
+              "object_octets": 1094,
+              "publish_at": 5
+            },
+            "outcome": "inserted"
+          },
+          "schema": "retinue.retained-peer/v1",
+          "status": "ok"
+        }
+      },
+      {
+        "request": {
+          "command": {
+            "expires_at": 2048,
+            "generation": 3,
+            "op": "publish",
+            "original_bytes_hex": "a1694f7065726174696f6ea26668656164657298f91888011858182018591850182a1822188118d7188218a718631830184a18f818e7181e189a187a188d1843181b18c31869185118350018f0186707181d1830184a18220a1858184009186b1862188f181a184a0e11187818ec18e2189b18ba182b18e7187018bd18501839184318ab18a0189a0f18bd187c185518d118e11822188818d41871183418a418bc18311819182818e118b0189c1834187418a218c6186218eb18ee18aa0a1218d618c718a1182818d018a1182718c01894187318a4091819011824185818200e1855186318fb183e18b4183018fe1848182e18a4182617184318d31857011848184c1853182a0c0a187b18e418a018f5182d18f918ea18371869021858182002184a1855189518fe18561863187e182a18581843182d1870186e0e1881188c188d185518780118b4185618e118fc18fd18a018a8182618d118d718e218a11867186d186518731868185f18691864189818201818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d6b696e6c696e655f626f647999012418a1186b184a186f18621850186f18731874186518641856183218a31864187318701865186318a618661869186e1870187518741873188118a218641862186c186f186218a2186618641869186718651873187418a218631861186c186718661842186c1861186b1865183318651862187918741865187318981820181818ab13181818be181818df18181842181818e81818184b181818ae0f1818187c18181862181818c7181818dd1818186a1818188a181818da181818571818181e1818188818181829181818be181818d6181818ea181818551818188217181818f0181818361818181b1818185e18181825181818d018681862187918741865185f186c1865186e011864186e1861186d18651867187018611879186c186f186118641866186f1875187418701875187418a21864186e1861186d186518661872186518731875186c18741869186d18611878185f18621879187418651873181904001868187218651873186f1875187218631865186c186d186518731868182e186518631868186f182f18761831186a1863186818651863186b1870186f1869186e187418671852186518731874186118721874186b18641865187418651872186d1869186e18691873186d186518451878186118631874186c1872186518711875186918721865186d1865186e1874187318a218671863186f186d18701875187418651863184318701875186a186d1865186d186f18721879185f186d1869186200186518611874185f186d187318190318ea1865186e186f186e1863186502"
+          },
+          "now_slot": 6,
+          "request_id": 7,
+          "schema": "retinue.retained-peer/v1"
+        },
+        "response": {
+          "collector_stats": {
+            "completed_objects": 1,
+            "decode_work": 9,
+            "decoder_allocations": 1,
+            "expired_objects": 0
+          },
+          "expiry": {
+            "collector": {
+              "invalidated_token": null,
+              "objects": []
+            },
+            "during_command": [],
+            "producer": {
+              "invalidated_token": null,
+              "objects": []
+            }
+          },
+          "implementation": {
+            "application_operation_ids": false,
+            "executable": {
+              "blake3": "7e0a096f324601bdf36a94e505625f1e5ab5ff6d9c97522a8f9c398042cf8fb1",
+              "octets": 11923064,
+              "path": "/Users/markik/Code/testing/iroh-control-20261011/retinue/testing/transport-conformance/target/debug/transport-conformance"
+            },
+            "identity_scope": "Compiled source and lockfile fingerprint plus the executing file digest. Repository revision and dirty status are runtime observations of the compile-time source directory, not a claim that those current Git bytes produced this executable.",
+            "public_fixture_authority_only": true,
+            "suite": {
+              "corpus_manifest_sha256": "ff95dc345ea741cde01770b4d313df5efe8522c768b04371e30042d1c1c9d20d",
+              "dependency_versions": {
+                "blake3": "1.8.7",
+                "ed25519-dalek": "3.0.0",
+                "raptorq": "2.0.1"
+              },
+              "repository_revision": "2ee6f0ce7d37f7becc5a793efadc9dd9db4620a2",
+              "repository_worktree_dirty": false,
+              "runner": "transport-conformance 0.1.0",
+              "suite_source_blake3": "c453db8e90ba61fe13ce80036d119adc76e39e6deec201f785d57b14897036a9",
+              "target_arch": "aarch64",
+              "target_os": "macos"
+            }
+          },
+          "kind": "response",
+          "now_slot": 6,
+          "pending_token": null,
+          "producer_stats": {
+            "deferrals": 0,
+            "encoder_allocations": 3,
+            "expired_objects": 0,
+            "queued_frames": 19,
+            "queued_fresh": 9,
+            "queued_manifests": 1,
+            "queued_repairs": 9,
+            "queued_wire_octets": 5111
+          },
+          "request_id": 7,
+          "requested_now_slot": 6,
+          "result": {
+            "metadata": {
+              "digest_hex": "5a162f5606de53006652dbe38c5055793de5bab92b1bfd40e0f96ea81036d1a7",
+              "expires_at": 2048,
+              "generation": 3,
+              "object_octets": 1088,
+              "publish_at": 6
+            },
+            "outcome": "inserted"
+          },
+          "schema": "retinue.retained-peer/v1",
+          "status": "ok"
+        }
+      },
+      {
+        "request": {
+          "command": {
+            "expires_at": 2048,
+            "generation": 4,
+            "op": "publish",
+            "original_bytes_hex": "a1694f7065726174696f6ea26668656164657298f91888011858182018591850182a1822188118d7188218a718631830184a18f818e7181e189a187a188d1843181b18c31869185118350018f0186707181d1830184a18220a185818400718ef181e1838188a184b18cd18bf18d6189318e818f41878183518ff182318cf18ff189e18eb18760d1891183f18dd18550f18a9187318fa187c184c186018e5184218c718fb185101185b183718b318bc184e186e1899183d188718dd183e1882182918cf18c018c21874186518da18c718de18b81838182f0818190118221858182018ca18a018d218361877189318fd18dd1875186318c41829188e1827189b18b618f318c11853184e1218b218ea18f9184318f70b18a3185f183318ed18b2031858182018d21854187518840918c618e8185818351866188d0a1885184818bf189f18db18bd1877182918a118de189509183e1886186218ad18f7185418c418f318a11867186d186518731868185f18691864189818201818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d6b696e6c696e655f626f647999012218a1186b184a186f18621850186f18731874186518641856183218a31864187318701865186318a618661869186e1870187518741873188118a218641862186c186f186218a2186618641869186718651873187418a218631861186c186718661842186c1861186b1865183318651862187918741865187318981820181818e1181818e0181818e81818181d1818186e181818a31818189b0c181818f8181818b81818186f181818fd181818440918181821011818181f18181857181818400c181818bc1818183f18181876181818a8181818a118181871181818901818186a1818189b1818188d181818750518681862187918741865185f186c1865186e011864186e1861186d18651867187018611879186c186f186118641866186f1875187418701875187418a21864186e1861186d186518661872186518731875186c18741869186d18611878185f18621879187418651873181904001868187218651873186f1875187218631865186c186d186518731868182e186518631868186f182f18761831186a1863186818651863186b1870186f1869186e187418671852186518731874186118721874186b18641865187418651872186d1869186e18691873186d186518451878186118631874186c1872186518711875186918721865186d1865186e1874187318a218671863186f186d18701875187418651863184318701875186a186d1865186d186f18721879185f186d1869186200186518611874185f186d187318190318eb1865186e186f186e1863186503"
+          },
+          "now_slot": 7,
+          "request_id": 8,
+          "schema": "retinue.retained-peer/v1"
+        },
+        "response": {
+          "collector_stats": {
+            "completed_objects": 1,
+            "decode_work": 9,
+            "decoder_allocations": 1,
+            "expired_objects": 0
+          },
+          "expiry": {
+            "collector": {
+              "invalidated_token": null,
+              "objects": []
+            },
+            "during_command": [],
+            "producer": {
+              "invalidated_token": null,
+              "objects": []
+            }
+          },
+          "implementation": {
+            "application_operation_ids": false,
+            "executable": {
+              "blake3": "7e0a096f324601bdf36a94e505625f1e5ab5ff6d9c97522a8f9c398042cf8fb1",
+              "octets": 11923064,
+              "path": "/Users/markik/Code/testing/iroh-control-20261011/retinue/testing/transport-conformance/target/debug/transport-conformance"
+            },
+            "identity_scope": "Compiled source and lockfile fingerprint plus the executing file digest. Repository revision and dirty status are runtime observations of the compile-time source directory, not a claim that those current Git bytes produced this executable.",
+            "public_fixture_authority_only": true,
+            "suite": {
+              "corpus_manifest_sha256": "ff95dc345ea741cde01770b4d313df5efe8522c768b04371e30042d1c1c9d20d",
+              "dependency_versions": {
+                "blake3": "1.8.7",
+                "ed25519-dalek": "3.0.0",
+                "raptorq": "2.0.1"
+              },
+              "repository_revision": "2ee6f0ce7d37f7becc5a793efadc9dd9db4620a2",
+              "repository_worktree_dirty": false,
+              "runner": "transport-conformance 0.1.0",
+              "suite_source_blake3": "c453db8e90ba61fe13ce80036d119adc76e39e6deec201f785d57b14897036a9",
+              "target_arch": "aarch64",
+              "target_os": "macos"
+            }
+          },
+          "kind": "response",
+          "now_slot": 7,
+          "pending_token": null,
+          "producer_stats": {
+            "deferrals": 0,
+            "encoder_allocations": 4,
+            "expired_objects": 0,
+            "queued_frames": 19,
+            "queued_fresh": 9,
+            "queued_manifests": 1,
+            "queued_repairs": 9,
+            "queued_wire_octets": 5111
+          },
+          "request_id": 8,
+          "requested_now_slot": 7,
+          "result": {
+            "metadata": {
+              "digest_hex": "6e55a89ed94762222e6ccba4a8d56e47f36c0f695ee465c3bb29fab3779b74e5",
+              "expires_at": 2048,
+              "generation": 4,
+              "object_octets": 1087,
+              "publish_at": 7
+            },
+            "outcome": "inserted"
+          },
+          "schema": "retinue.retained-peer/v1",
+          "status": "ok"
+        }
+      },
+      {
+        "request": {
+          "command": {
+            "op": "snapshot"
+          },
+          "now_slot": 7,
+          "request_id": 9,
+          "schema": "retinue.retained-peer/v1"
+        },
+        "response": {
+          "collector_stats": {
+            "completed_objects": 1,
+            "decode_work": 9,
+            "decoder_allocations": 1,
+            "expired_objects": 0
+          },
+          "expiry": {
+            "collector": {
+              "invalidated_token": null,
+              "objects": []
+            },
+            "during_command": [],
+            "producer": {
+              "invalidated_token": null,
+              "objects": []
+            }
+          },
+          "implementation": {
+            "application_operation_ids": false,
+            "executable": {
+              "blake3": "7e0a096f324601bdf36a94e505625f1e5ab5ff6d9c97522a8f9c398042cf8fb1",
+              "octets": 11923064,
+              "path": "/Users/markik/Code/testing/iroh-control-20261011/retinue/testing/transport-conformance/target/debug/transport-conformance"
+            },
+            "identity_scope": "Compiled source and lockfile fingerprint plus the executing file digest. Repository revision and dirty status are runtime observations of the compile-time source directory, not a claim that those current Git bytes produced this executable.",
+            "public_fixture_authority_only": true,
+            "suite": {
+              "corpus_manifest_sha256": "ff95dc345ea741cde01770b4d313df5efe8522c768b04371e30042d1c1c9d20d",
+              "dependency_versions": {
+                "blake3": "1.8.7",
+                "ed25519-dalek": "3.0.0",
+                "raptorq": "2.0.1"
+              },
+              "repository_revision": "2ee6f0ce7d37f7becc5a793efadc9dd9db4620a2",
+              "repository_worktree_dirty": false,
+              "runner": "transport-conformance 0.1.0",
+              "suite_source_blake3": "c453db8e90ba61fe13ce80036d119adc76e39e6deec201f785d57b14897036a9",
+              "target_arch": "aarch64",
+              "target_os": "macos"
+            }
+          },
+          "kind": "response",
+          "now_slot": 7,
+          "pending_token": null,
+          "producer_stats": {
+            "deferrals": 0,
+            "encoder_allocations": 4,
+            "expired_objects": 0,
+            "queued_frames": 19,
+            "queued_fresh": 9,
+            "queued_manifests": 1,
+            "queued_repairs": 9,
+            "queued_wire_octets": 5111
+          },
+          "request_id": 9,
+          "requested_now_slot": 7,
+          "result": {
+            "collector_inventory": [
+              {
+                "digest_hex": "f99941c7c9aa4b3adc7b27d8d4d9b46873d32031a26dad81e3fae2ccfdebe151",
+                "expires_at": 2048,
+                "generation": 1,
+                "object_octets": 1029,
+                "publish_at": 0
+              }
+            ],
+            "inventory": [
+              {
+                "digest_hex": "f99941c7c9aa4b3adc7b27d8d4d9b46873d32031a26dad81e3fae2ccfdebe151",
+                "expires_at": 2048,
+                "generation": 1,
+                "object_octets": 1029,
+                "publish_at": 0
+              },
+              {
+                "digest_hex": "acdaf6fcfcc398b37306c94ab40e9b2f9ba8ed610cef3aae975e953a49ead346",
+                "expires_at": 2048,
+                "generation": 2,
+                "object_octets": 1094,
+                "publish_at": 5
+              },
+              {
+                "digest_hex": "5a162f5606de53006652dbe38c5055793de5bab92b1bfd40e0f96ea81036d1a7",
+                "expires_at": 2048,
+                "generation": 3,
+                "object_octets": 1088,
+                "publish_at": 6
+              },
+              {
+                "digest_hex": "6e55a89ed94762222e6ccba4a8d56e47f36c0f695ee465c3bb29fab3779b74e5",
+                "expires_at": 2048,
+                "generation": 4,
+                "object_octets": 1087,
+                "publish_at": 7
+              }
+            ],
+            "pending": null,
+            "retained_original_octets": 4298
+          },
+          "schema": "retinue.retained-peer/v1",
+          "status": "ok"
+        }
+      },
+      {
+        "request": {
+          "command": {
+            "expires_at": 2048,
+            "generation": 5,
+            "op": "publish",
+            "original_bytes_hex": "a1694f7065726174696f6ea26668656164657298d71887011858182018591850182a1822188118d7188218a718631830184a18f818e7181e189a187a188d1843181b18c31869185118350018f0186707181d1830184a18220a1858184018420618da18691826184018d618a8183018dd18e9188318ff18ef185c186a1883188e131842182b18f4184c18a1182a185c18d511081879182e183c18a41825188718df18aa189518701853182418ea18e1182318e0189718f018c2189b187e0818491827186f187118d618be1854183f18eb185118bd18dd0c18190118251858182018f718ca07181a18901888184218a21832184b11187401182e189818e818881858188e18e518c518b8183b18ab18fd18fc18bd184c182d1841187a18e90018a11867186d186518731868185f18691864189818201818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d6b696e6c696e655f626f647999012518a1186b184a186f18621850186f18731874186518641856183218a31864187318701865186318a618661869186e1870187518741873188118a218641862186c186f186218a2186618641869186718651873187418a218631861186c186718661842186c1861186b18651833186518621879187418651873189818201818182d1818183a181818de181818df181818f11818181b18181861181818f11818184c181818881818186e18181835181818af181818a018181836181818731818186d181818cd18181887181818a71818184d18181827181818b5181818c1181818510218181825181818d0181818f518181892181818e21318681862187918741865185f186c1865186e011864186e1861186d18651867187018611879186c186f186118641866186f1875187418701875187418a21864186e1861186d186518661872186518731875186c18741869186d18611878185f18621879187418651873181904001868187218651873186f1875187218631865186c186d186518731868182e186518631868186f182f18761831186a1863186818651863186b1870186f1869186e187418671852186518731874186118721874186b18641865187418651872186d1869186e18691873186d186518451878186118631874186c1872186518711875186918721865186d1865186e1874187318a218671863186f186d18701875187418651863184318701875186a186d1865186d186f18721879185f186d1869186200186518611874185f186d187318190318e81865186e186f186e1863186500"
+          },
+          "now_slot": 7,
+          "request_id": 10,
+          "schema": "retinue.retained-peer/v1"
+        },
+        "response": {
+          "collector_stats": {
+            "completed_objects": 1,
+            "decode_work": 9,
+            "decoder_allocations": 1,
+            "expired_objects": 0
+          },
+          "expiry": {
+            "collector": {
+              "invalidated_token": null,
+              "objects": []
+            },
+            "during_command": [],
+            "producer": {
+              "invalidated_token": null,
+              "objects": []
+            }
+          },
+          "implementation": {
+            "application_operation_ids": false,
+            "executable": {
+              "blake3": "7e0a096f324601bdf36a94e505625f1e5ab5ff6d9c97522a8f9c398042cf8fb1",
+              "octets": 11923064,
+              "path": "/Users/markik/Code/testing/iroh-control-20261011/retinue/testing/transport-conformance/target/debug/transport-conformance"
+            },
+            "identity_scope": "Compiled source and lockfile fingerprint plus the executing file digest. Repository revision and dirty status are runtime observations of the compile-time source directory, not a claim that those current Git bytes produced this executable.",
+            "public_fixture_authority_only": true,
+            "suite": {
+              "corpus_manifest_sha256": "ff95dc345ea741cde01770b4d313df5efe8522c768b04371e30042d1c1c9d20d",
+              "dependency_versions": {
+                "blake3": "1.8.7",
+                "ed25519-dalek": "3.0.0",
+                "raptorq": "2.0.1"
+              },
+              "repository_revision": "2ee6f0ce7d37f7becc5a793efadc9dd9db4620a2",
+              "repository_worktree_dirty": false,
+              "runner": "transport-conformance 0.1.0",
+              "suite_source_blake3": "c453db8e90ba61fe13ce80036d119adc76e39e6deec201f785d57b14897036a9",
+              "target_arch": "aarch64",
+              "target_os": "macos"
+            }
+          },
+          "kind": "response",
+          "now_slot": 7,
+          "pending_token": null,
+          "producer_stats": {
+            "deferrals": 0,
+            "encoder_allocations": 4,
+            "expired_objects": 0,
+            "queued_frames": 19,
+            "queued_fresh": 9,
+            "queued_manifests": 1,
+            "queued_repairs": 9,
+            "queued_wire_octets": 5111
+          },
+          "refusal": {
+            "code": "full",
+            "detail": "retained repair: Full { next_expiry: Some(2048) }",
+            "retry_at_slot": 2048
+          },
+          "request_id": 10,
+          "requested_now_slot": 7,
+          "schema": "retinue.retained-peer/v1",
+          "status": "refused"
+        }
+      },
+      {
+        "request": {
+          "command": {
+            "op": "snapshot"
+          },
+          "now_slot": 7,
+          "request_id": 11,
+          "schema": "retinue.retained-peer/v1"
+        },
+        "response": {
+          "collector_stats": {
+            "completed_objects": 1,
+            "decode_work": 9,
+            "decoder_allocations": 1,
+            "expired_objects": 0
+          },
+          "expiry": {
+            "collector": {
+              "invalidated_token": null,
+              "objects": []
+            },
+            "during_command": [],
+            "producer": {
+              "invalidated_token": null,
+              "objects": []
+            }
+          },
+          "implementation": {
+            "application_operation_ids": false,
+            "executable": {
+              "blake3": "7e0a096f324601bdf36a94e505625f1e5ab5ff6d9c97522a8f9c398042cf8fb1",
+              "octets": 11923064,
+              "path": "/Users/markik/Code/testing/iroh-control-20261011/retinue/testing/transport-conformance/target/debug/transport-conformance"
+            },
+            "identity_scope": "Compiled source and lockfile fingerprint plus the executing file digest. Repository revision and dirty status are runtime observations of the compile-time source directory, not a claim that those current Git bytes produced this executable.",
+            "public_fixture_authority_only": true,
+            "suite": {
+              "corpus_manifest_sha256": "ff95dc345ea741cde01770b4d313df5efe8522c768b04371e30042d1c1c9d20d",
+              "dependency_versions": {
+                "blake3": "1.8.7",
+                "ed25519-dalek": "3.0.0",
+                "raptorq": "2.0.1"
+              },
+              "repository_revision": "2ee6f0ce7d37f7becc5a793efadc9dd9db4620a2",
+              "repository_worktree_dirty": false,
+              "runner": "transport-conformance 0.1.0",
+              "suite_source_blake3": "c453db8e90ba61fe13ce80036d119adc76e39e6deec201f785d57b14897036a9",
+              "target_arch": "aarch64",
+              "target_os": "macos"
+            }
+          },
+          "kind": "response",
+          "now_slot": 7,
+          "pending_token": null,
+          "producer_stats": {
+            "deferrals": 0,
+            "encoder_allocations": 4,
+            "expired_objects": 0,
+            "queued_frames": 19,
+            "queued_fresh": 9,
+            "queued_manifests": 1,
+            "queued_repairs": 9,
+            "queued_wire_octets": 5111
+          },
+          "request_id": 11,
+          "requested_now_slot": 7,
+          "result": {
+            "collector_inventory": [
+              {
+                "digest_hex": "f99941c7c9aa4b3adc7b27d8d4d9b46873d32031a26dad81e3fae2ccfdebe151",
+                "expires_at": 2048,
+                "generation": 1,
+                "object_octets": 1029,
+                "publish_at": 0
+              }
+            ],
+            "inventory": [
+              {
+                "digest_hex": "f99941c7c9aa4b3adc7b27d8d4d9b46873d32031a26dad81e3fae2ccfdebe151",
+                "expires_at": 2048,
+                "generation": 1,
+                "object_octets": 1029,
+                "publish_at": 0
+              },
+              {
+                "digest_hex": "acdaf6fcfcc398b37306c94ab40e9b2f9ba8ed610cef3aae975e953a49ead346",
+                "expires_at": 2048,
+                "generation": 2,
+                "object_octets": 1094,
+                "publish_at": 5
+              },
+              {
+                "digest_hex": "5a162f5606de53006652dbe38c5055793de5bab92b1bfd40e0f96ea81036d1a7",
+                "expires_at": 2048,
+                "generation": 3,
+                "object_octets": 1088,
+                "publish_at": 6
+              },
+              {
+                "digest_hex": "6e55a89ed94762222e6ccba4a8d56e47f36c0f695ee465c3bb29fab3779b74e5",
+                "expires_at": 2048,
+                "generation": 4,
+                "object_octets": 1087,
+                "publish_at": 7
+              }
+            ],
+            "pending": null,
+            "retained_original_octets": 4298
+          },
+          "schema": "retinue.retained-peer/v1",
+          "status": "ok"
+        }
+      },
+      {
+        "request": {
+          "command": {
+            "generation": 2,
+            "op": "lookup_metadata"
+          },
+          "now_slot": 7,
+          "request_id": 12,
+          "schema": "retinue.retained-peer/v1"
+        },
+        "response": {
+          "collector_stats": {
+            "completed_objects": 1,
+            "decode_work": 9,
+            "decoder_allocations": 1,
+            "expired_objects": 0
+          },
+          "expiry": {
+            "collector": {
+              "invalidated_token": null,
+              "objects": []
+            },
+            "during_command": [],
+            "producer": {
+              "invalidated_token": null,
+              "objects": []
+            }
+          },
+          "implementation": {
+            "application_operation_ids": false,
+            "executable": {
+              "blake3": "7e0a096f324601bdf36a94e505625f1e5ab5ff6d9c97522a8f9c398042cf8fb1",
+              "octets": 11923064,
+              "path": "/Users/markik/Code/testing/iroh-control-20261011/retinue/testing/transport-conformance/target/debug/transport-conformance"
+            },
+            "identity_scope": "Compiled source and lockfile fingerprint plus the executing file digest. Repository revision and dirty status are runtime observations of the compile-time source directory, not a claim that those current Git bytes produced this executable.",
+            "public_fixture_authority_only": true,
+            "suite": {
+              "corpus_manifest_sha256": "ff95dc345ea741cde01770b4d313df5efe8522c768b04371e30042d1c1c9d20d",
+              "dependency_versions": {
+                "blake3": "1.8.7",
+                "ed25519-dalek": "3.0.0",
+                "raptorq": "2.0.1"
+              },
+              "repository_revision": "2ee6f0ce7d37f7becc5a793efadc9dd9db4620a2",
+              "repository_worktree_dirty": false,
+              "runner": "transport-conformance 0.1.0",
+              "suite_source_blake3": "c453db8e90ba61fe13ce80036d119adc76e39e6deec201f785d57b14897036a9",
+              "target_arch": "aarch64",
+              "target_os": "macos"
+            }
+          },
+          "kind": "response",
+          "now_slot": 7,
+          "pending_token": null,
+          "producer_stats": {
+            "deferrals": 0,
+            "encoder_allocations": 4,
+            "expired_objects": 0,
+            "queued_frames": 19,
+            "queued_fresh": 9,
+            "queued_manifests": 1,
+            "queued_repairs": 9,
+            "queued_wire_octets": 5111
+          },
+          "request_id": 12,
+          "requested_now_slot": 7,
+          "result": {
+            "metadata": {
+              "digest_hex": "acdaf6fcfcc398b37306c94ab40e9b2f9ba8ed610cef3aae975e953a49ead346",
+              "expires_at": 2048,
+              "generation": 2,
+              "object_octets": 1094,
+              "publish_at": 5
+            }
+          },
+          "schema": "retinue.retained-peer/v1",
+          "status": "ok"
+        }
+      },
+      {
+        "request": {
+          "command": {
+            "generation": 2,
+            "op": "recover"
+          },
+          "now_slot": 7,
+          "request_id": 13,
+          "schema": "retinue.retained-peer/v1"
+        },
+        "response": {
+          "collector_stats": {
+            "completed_objects": 2,
+            "decode_work": 18,
+            "decoder_allocations": 2,
+            "expired_objects": 0
+          },
+          "expiry": {
+            "collector": {
+              "invalidated_token": null,
+              "objects": []
+            },
+            "during_command": [],
+            "producer": {
+              "invalidated_token": null,
+              "objects": []
+            }
+          },
+          "implementation": {
+            "application_operation_ids": false,
+            "executable": {
+              "blake3": "7e0a096f324601bdf36a94e505625f1e5ab5ff6d9c97522a8f9c398042cf8fb1",
+              "octets": 11923064,
+              "path": "/Users/markik/Code/testing/iroh-control-20261011/retinue/testing/transport-conformance/target/debug/transport-conformance"
+            },
+            "identity_scope": "Compiled source and lockfile fingerprint plus the executing file digest. Repository revision and dirty status are runtime observations of the compile-time source directory, not a claim that those current Git bytes produced this executable.",
+            "public_fixture_authority_only": true,
+            "suite": {
+              "corpus_manifest_sha256": "ff95dc345ea741cde01770b4d313df5efe8522c768b04371e30042d1c1c9d20d",
+              "dependency_versions": {
+                "blake3": "1.8.7",
+                "ed25519-dalek": "3.0.0",
+                "raptorq": "2.0.1"
+              },
+              "repository_revision": "2ee6f0ce7d37f7becc5a793efadc9dd9db4620a2",
+              "repository_worktree_dirty": false,
+              "runner": "transport-conformance 0.1.0",
+              "suite_source_blake3": "c453db8e90ba61fe13ce80036d119adc76e39e6deec201f785d57b14897036a9",
+              "target_arch": "aarch64",
+              "target_os": "macos"
+            }
+          },
+          "kind": "response",
+          "now_slot": 11,
+          "pending_token": null,
+          "producer_stats": {
+            "deferrals": 0,
+            "encoder_allocations": 4,
+            "expired_objects": 0,
+            "queued_frames": 39,
+            "queued_fresh": 18,
+            "queued_manifests": 3,
+            "queued_repairs": 18,
+            "queued_wire_octets": 10383
+          },
+          "request_id": 13,
+          "requested_now_slot": 7,
+          "result": {
+            "application_admission": false,
+            "collector_inventory_before": [
+              {
+                "digest_hex": "f99941c7c9aa4b3adc7b27d8d4d9b46873d32031a26dad81e3fae2ccfdebe151",
+                "expires_at": 2048,
+                "generation": 1,
+                "object_octets": 1029,
+                "publish_at": 0
+              }
+            ],
+            "collector_stats_before": {
+              "completed_objects": 1,
+              "decode_work": 9,
+              "decoder_allocations": 1,
+              "expired_objects": 0
+            },
+            "decoder_input_provenance": "new_object_state_from_authenticated_manifest_and_repair_frames",
+            "delivered_manifest_frames": 2,
+            "delivered_repair_frames": 9,
+            "dropped_fresh_frames": 9,
+            "end_slot": 11,
+            "expiry_during_recovery": [],
+            "physical_rf": false,
+            "preexisting_selected_object": false,
+            "recovered": {
+              "actual_decoder_output": true,
+              "application_admission": false,
+              "metadata": {
+                "digest_hex": "acdaf6fcfcc398b37306c94ab40e9b2f9ba8ed610cef3aae975e953a49ead346",
+                "expires_at": 2048,
+                "generation": 2,
+                "object_octets": 1094,
+                "publish_at": 5
+              },
+              "original_bytes_hex": "a1694f7065726174696f6ea26668656164657298f91888011858182018591850182a1822188118d7188218a718631830184a18f818e7181e189a187a188d1843181b18c31869185118350018f0186707181d1830184a18220a185818401823187f187b183d186b18a218a818fe184518c1186018a9188918ad18fd0e18fc18c5188f1898185918c5187c185f186418540118a818a4184d184f183d189818da18c91821186f1218e41882189b1820187d18d318db188c18d6188c182e1893182618b51854184b182318c30118fd1865184718c714170818190118251858182018e018cb185d186518a318c7186818df182d18e70d183c18a918c518d3189418f71885188b18a018a7188118211865183e18b618b818771867187a183918900118581820188418a005181d1876188e0318e618c41880181818be18b11818184e14182c186f186318511893187c186718e11871187518d318ca187218c008188c18a11867186d186518731868185f18691864189818201818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d6b696e6c696e655f626f647999012518a1186b184a186f18621850186f18731874186518641856183218a31864187318701865186318a618661869186e1870187518741873188118a218641862186c186f186218a2186618641869186718651873187418a218631861186c186718661842186c1861186b186518331865186218791874186518731898182018181848181818fc181818721818181f181818bb181818c118181872181818e0181818921818185f181818a21818187a181818f1181818671818181d181818e218181825181818ba181818921818187118181834181818801818182918181898181818b10a1518181868181818a118181888181818651818182b18681862187918741865185f186c1865186e011864186e1861186d18651867187018611879186c186f186118641866186f1875187418701875187418a21864186e1861186d186518661872186518731875186c18741869186d18611878185f18621879187418651873181904001868187218651873186f1875187218631865186c186d186518731868182e186518631868186f182f18761831186a1863186818651863186b1870186f1869186e187418671852186518731874186118721874186b18641865187418651872186d1869186e18691873186d186518451878186118631874186c1872186518711875186918721865186d1865186e1874187318a218671863186f186d18701875187418651863184318701875186a186d1865186d186f18721879185f186d1869186200186518611874185f186d187318190318e91865186e186f186e1863186501"
+            },
+            "recovery_kind": "repair_only_delivery_loopback",
+            "settled_frames": 20,
+            "start_slot": 7
+          },
+          "schema": "retinue.retained-peer/v1",
+          "status": "ok"
+        }
+      },
+      {
+        "request": {
+          "command": {
+            "generation": 3,
+            "op": "lookup_metadata"
+          },
+          "now_slot": 11,
+          "request_id": 14,
+          "schema": "retinue.retained-peer/v1"
+        },
+        "response": {
+          "collector_stats": {
+            "completed_objects": 2,
+            "decode_work": 18,
+            "decoder_allocations": 2,
+            "expired_objects": 0
+          },
+          "expiry": {
+            "collector": {
+              "invalidated_token": null,
+              "objects": []
+            },
+            "during_command": [],
+            "producer": {
+              "invalidated_token": null,
+              "objects": []
+            }
+          },
+          "implementation": {
+            "application_operation_ids": false,
+            "executable": {
+              "blake3": "7e0a096f324601bdf36a94e505625f1e5ab5ff6d9c97522a8f9c398042cf8fb1",
+              "octets": 11923064,
+              "path": "/Users/markik/Code/testing/iroh-control-20261011/retinue/testing/transport-conformance/target/debug/transport-conformance"
+            },
+            "identity_scope": "Compiled source and lockfile fingerprint plus the executing file digest. Repository revision and dirty status are runtime observations of the compile-time source directory, not a claim that those current Git bytes produced this executable.",
+            "public_fixture_authority_only": true,
+            "suite": {
+              "corpus_manifest_sha256": "ff95dc345ea741cde01770b4d313df5efe8522c768b04371e30042d1c1c9d20d",
+              "dependency_versions": {
+                "blake3": "1.8.7",
+                "ed25519-dalek": "3.0.0",
+                "raptorq": "2.0.1"
+              },
+              "repository_revision": "2ee6f0ce7d37f7becc5a793efadc9dd9db4620a2",
+              "repository_worktree_dirty": false,
+              "runner": "transport-conformance 0.1.0",
+              "suite_source_blake3": "c453db8e90ba61fe13ce80036d119adc76e39e6deec201f785d57b14897036a9",
+              "target_arch": "aarch64",
+              "target_os": "macos"
+            }
+          },
+          "kind": "response",
+          "now_slot": 11,
+          "pending_token": null,
+          "producer_stats": {
+            "deferrals": 0,
+            "encoder_allocations": 4,
+            "expired_objects": 0,
+            "queued_frames": 39,
+            "queued_fresh": 18,
+            "queued_manifests": 3,
+            "queued_repairs": 18,
+            "queued_wire_octets": 10383
+          },
+          "request_id": 14,
+          "requested_now_slot": 11,
+          "result": {
+            "metadata": {
+              "digest_hex": "5a162f5606de53006652dbe38c5055793de5bab92b1bfd40e0f96ea81036d1a7",
+              "expires_at": 2048,
+              "generation": 3,
+              "object_octets": 1088,
+              "publish_at": 6
+            }
+          },
+          "schema": "retinue.retained-peer/v1",
+          "status": "ok"
+        }
+      },
+      {
+        "request": {
+          "command": {
+            "generation": 3,
+            "op": "recover"
+          },
+          "now_slot": 11,
+          "request_id": 15,
+          "schema": "retinue.retained-peer/v1"
+        },
+        "response": {
+          "collector_stats": {
+            "completed_objects": 3,
+            "decode_work": 27,
+            "decoder_allocations": 3,
+            "expired_objects": 0
+          },
+          "expiry": {
+            "collector": {
+              "invalidated_token": null,
+              "objects": []
+            },
+            "during_command": [],
+            "producer": {
+              "invalidated_token": null,
+              "objects": []
+            }
+          },
+          "implementation": {
+            "application_operation_ids": false,
+            "executable": {
+              "blake3": "7e0a096f324601bdf36a94e505625f1e5ab5ff6d9c97522a8f9c398042cf8fb1",
+              "octets": 11923064,
+              "path": "/Users/markik/Code/testing/iroh-control-20261011/retinue/testing/transport-conformance/target/debug/transport-conformance"
+            },
+            "identity_scope": "Compiled source and lockfile fingerprint plus the executing file digest. Repository revision and dirty status are runtime observations of the compile-time source directory, not a claim that those current Git bytes produced this executable.",
+            "public_fixture_authority_only": true,
+            "suite": {
+              "corpus_manifest_sha256": "ff95dc345ea741cde01770b4d313df5efe8522c768b04371e30042d1c1c9d20d",
+              "dependency_versions": {
+                "blake3": "1.8.7",
+                "ed25519-dalek": "3.0.0",
+                "raptorq": "2.0.1"
+              },
+              "repository_revision": "2ee6f0ce7d37f7becc5a793efadc9dd9db4620a2",
+              "repository_worktree_dirty": false,
+              "runner": "transport-conformance 0.1.0",
+              "suite_source_blake3": "c453db8e90ba61fe13ce80036d119adc76e39e6deec201f785d57b14897036a9",
+              "target_arch": "aarch64",
+              "target_os": "macos"
+            }
+          },
+          "kind": "response",
+          "now_slot": 16,
+          "pending_token": null,
+          "producer_stats": {
+            "deferrals": 0,
+            "encoder_allocations": 4,
+            "expired_objects": 0,
+            "queued_frames": 59,
+            "queued_fresh": 27,
+            "queued_manifests": 5,
+            "queued_repairs": 27,
+            "queued_wire_octets": 15655
+          },
+          "request_id": 15,
+          "requested_now_slot": 11,
+          "result": {
+            "application_admission": false,
+            "collector_inventory_before": [
+              {
+                "digest_hex": "f99941c7c9aa4b3adc7b27d8d4d9b46873d32031a26dad81e3fae2ccfdebe151",
+                "expires_at": 2048,
+                "generation": 1,
+                "object_octets": 1029,
+                "publish_at": 0
+              },
+              {
+                "digest_hex": "acdaf6fcfcc398b37306c94ab40e9b2f9ba8ed610cef3aae975e953a49ead346",
+                "expires_at": 2048,
+                "generation": 2,
+                "object_octets": 1094,
+                "publish_at": 5
+              }
+            ],
+            "collector_stats_before": {
+              "completed_objects": 2,
+              "decode_work": 18,
+              "decoder_allocations": 2,
+              "expired_objects": 0
+            },
+            "decoder_input_provenance": "new_object_state_from_authenticated_manifest_and_repair_frames",
+            "delivered_manifest_frames": 2,
+            "delivered_repair_frames": 9,
+            "dropped_fresh_frames": 9,
+            "end_slot": 16,
+            "expiry_during_recovery": [],
+            "physical_rf": false,
+            "preexisting_selected_object": false,
+            "recovered": {
+              "actual_decoder_output": true,
+              "application_admission": false,
+              "metadata": {
+                "digest_hex": "5a162f5606de53006652dbe38c5055793de5bab92b1bfd40e0f96ea81036d1a7",
+                "expires_at": 2048,
+                "generation": 3,
+                "object_octets": 1088,
+                "publish_at": 6
+              },
+              "original_bytes_hex": "a1694f7065726174696f6ea26668656164657298f91888011858182018591850182a1822188118d7188218a718631830184a18f818e7181e189a187a188d1843181b18c31869185118350018f0186707181d1830184a18220a1858184009186b1862188f181a184a0e11187818ec18e2189b18ba182b18e7187018bd18501839184318ab18a0189a0f18bd187c185518d118e11822188818d41871183418a418bc18311819182818e118b0189c1834187418a218c6186218eb18ee18aa0a1218d618c718a1182818d018a1182718c01894187318a4091819011824185818200e1855186318fb183e18b4183018fe1848182e18a4182617184318d31857011848184c1853182a0c0a187b18e418a018f5182d18f918ea18371869021858182002184a1855189518fe18561863187e182a18581843182d1870186e0e1881188c188d185518780118b4185618e118fc18fd18a018a8182618d118d718e218a11867186d186518731868185f18691864189818201818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d6b696e6c696e655f626f647999012418a1186b184a186f18621850186f18731874186518641856183218a31864187318701865186318a618661869186e1870187518741873188118a218641862186c186f186218a2186618641869186718651873187418a218631861186c186718661842186c1861186b1865183318651862187918741865187318981820181818ab13181818be181818df18181842181818e81818184b181818ae0f1818187c18181862181818c7181818dd1818186a1818188a181818da181818571818181e1818188818181829181818be181818d6181818ea181818551818188217181818f0181818361818181b1818185e18181825181818d018681862187918741865185f186c1865186e011864186e1861186d18651867187018611879186c186f186118641866186f1875187418701875187418a21864186e1861186d186518661872186518731875186c18741869186d18611878185f18621879187418651873181904001868187218651873186f1875187218631865186c186d186518731868182e186518631868186f182f18761831186a1863186818651863186b1870186f1869186e187418671852186518731874186118721874186b18641865187418651872186d1869186e18691873186d186518451878186118631874186c1872186518711875186918721865186d1865186e1874187318a218671863186f186d18701875187418651863184318701875186a186d1865186d186f18721879185f186d1869186200186518611874185f186d187318190318ea1865186e186f186e1863186502"
+            },
+            "recovery_kind": "repair_only_delivery_loopback",
+            "settled_frames": 20,
+            "start_slot": 11
+          },
+          "schema": "retinue.retained-peer/v1",
+          "status": "ok"
+        }
+      },
+      {
+        "request": {
+          "command": {
+            "generation": 4,
+            "op": "lookup_metadata"
+          },
+          "now_slot": 16,
+          "request_id": 16,
+          "schema": "retinue.retained-peer/v1"
+        },
+        "response": {
+          "collector_stats": {
+            "completed_objects": 3,
+            "decode_work": 27,
+            "decoder_allocations": 3,
+            "expired_objects": 0
+          },
+          "expiry": {
+            "collector": {
+              "invalidated_token": null,
+              "objects": []
+            },
+            "during_command": [],
+            "producer": {
+              "invalidated_token": null,
+              "objects": []
+            }
+          },
+          "implementation": {
+            "application_operation_ids": false,
+            "executable": {
+              "blake3": "7e0a096f324601bdf36a94e505625f1e5ab5ff6d9c97522a8f9c398042cf8fb1",
+              "octets": 11923064,
+              "path": "/Users/markik/Code/testing/iroh-control-20261011/retinue/testing/transport-conformance/target/debug/transport-conformance"
+            },
+            "identity_scope": "Compiled source and lockfile fingerprint plus the executing file digest. Repository revision and dirty status are runtime observations of the compile-time source directory, not a claim that those current Git bytes produced this executable.",
+            "public_fixture_authority_only": true,
+            "suite": {
+              "corpus_manifest_sha256": "ff95dc345ea741cde01770b4d313df5efe8522c768b04371e30042d1c1c9d20d",
+              "dependency_versions": {
+                "blake3": "1.8.7",
+                "ed25519-dalek": "3.0.0",
+                "raptorq": "2.0.1"
+              },
+              "repository_revision": "2ee6f0ce7d37f7becc5a793efadc9dd9db4620a2",
+              "repository_worktree_dirty": false,
+              "runner": "transport-conformance 0.1.0",
+              "suite_source_blake3": "c453db8e90ba61fe13ce80036d119adc76e39e6deec201f785d57b14897036a9",
+              "target_arch": "aarch64",
+              "target_os": "macos"
+            }
+          },
+          "kind": "response",
+          "now_slot": 16,
+          "pending_token": null,
+          "producer_stats": {
+            "deferrals": 0,
+            "encoder_allocations": 4,
+            "expired_objects": 0,
+            "queued_frames": 59,
+            "queued_fresh": 27,
+            "queued_manifests": 5,
+            "queued_repairs": 27,
+            "queued_wire_octets": 15655
+          },
+          "request_id": 16,
+          "requested_now_slot": 16,
+          "result": {
+            "metadata": {
+              "digest_hex": "6e55a89ed94762222e6ccba4a8d56e47f36c0f695ee465c3bb29fab3779b74e5",
+              "expires_at": 2048,
+              "generation": 4,
+              "object_octets": 1087,
+              "publish_at": 7
+            }
+          },
+          "schema": "retinue.retained-peer/v1",
+          "status": "ok"
+        }
+      },
+      {
+        "request": {
+          "command": {
+            "generation": 4,
+            "op": "recover"
+          },
+          "now_slot": 16,
+          "request_id": 17,
+          "schema": "retinue.retained-peer/v1"
+        },
+        "response": {
+          "collector_stats": {
+            "completed_objects": 4,
+            "decode_work": 36,
+            "decoder_allocations": 4,
+            "expired_objects": 0
+          },
+          "expiry": {
+            "collector": {
+              "invalidated_token": null,
+              "objects": []
+            },
+            "during_command": [],
+            "producer": {
+              "invalidated_token": null,
+              "objects": []
+            }
+          },
+          "implementation": {
+            "application_operation_ids": false,
+            "executable": {
+              "blake3": "7e0a096f324601bdf36a94e505625f1e5ab5ff6d9c97522a8f9c398042cf8fb1",
+              "octets": 11923064,
+              "path": "/Users/markik/Code/testing/iroh-control-20261011/retinue/testing/transport-conformance/target/debug/transport-conformance"
+            },
+            "identity_scope": "Compiled source and lockfile fingerprint plus the executing file digest. Repository revision and dirty status are runtime observations of the compile-time source directory, not a claim that those current Git bytes produced this executable.",
+            "public_fixture_authority_only": true,
+            "suite": {
+              "corpus_manifest_sha256": "ff95dc345ea741cde01770b4d313df5efe8522c768b04371e30042d1c1c9d20d",
+              "dependency_versions": {
+                "blake3": "1.8.7",
+                "ed25519-dalek": "3.0.0",
+                "raptorq": "2.0.1"
+              },
+              "repository_revision": "2ee6f0ce7d37f7becc5a793efadc9dd9db4620a2",
+              "repository_worktree_dirty": false,
+              "runner": "transport-conformance 0.1.0",
+              "suite_source_blake3": "c453db8e90ba61fe13ce80036d119adc76e39e6deec201f785d57b14897036a9",
+              "target_arch": "aarch64",
+              "target_os": "macos"
+            }
+          },
+          "kind": "response",
+          "now_slot": 21,
+          "pending_token": null,
+          "producer_stats": {
+            "deferrals": 0,
+            "encoder_allocations": 4,
+            "expired_objects": 0,
+            "queued_frames": 79,
+            "queued_fresh": 36,
+            "queued_manifests": 7,
+            "queued_repairs": 36,
+            "queued_wire_octets": 20927
+          },
+          "request_id": 17,
+          "requested_now_slot": 16,
+          "result": {
+            "application_admission": false,
+            "collector_inventory_before": [
+              {
+                "digest_hex": "f99941c7c9aa4b3adc7b27d8d4d9b46873d32031a26dad81e3fae2ccfdebe151",
+                "expires_at": 2048,
+                "generation": 1,
+                "object_octets": 1029,
+                "publish_at": 0
+              },
+              {
+                "digest_hex": "acdaf6fcfcc398b37306c94ab40e9b2f9ba8ed610cef3aae975e953a49ead346",
+                "expires_at": 2048,
+                "generation": 2,
+                "object_octets": 1094,
+                "publish_at": 5
+              },
+              {
+                "digest_hex": "5a162f5606de53006652dbe38c5055793de5bab92b1bfd40e0f96ea81036d1a7",
+                "expires_at": 2048,
+                "generation": 3,
+                "object_octets": 1088,
+                "publish_at": 6
+              }
+            ],
+            "collector_stats_before": {
+              "completed_objects": 3,
+              "decode_work": 27,
+              "decoder_allocations": 3,
+              "expired_objects": 0
+            },
+            "decoder_input_provenance": "new_object_state_from_authenticated_manifest_and_repair_frames",
+            "delivered_manifest_frames": 2,
+            "delivered_repair_frames": 9,
+            "dropped_fresh_frames": 9,
+            "end_slot": 21,
+            "expiry_during_recovery": [],
+            "physical_rf": false,
+            "preexisting_selected_object": false,
+            "recovered": {
+              "actual_decoder_output": true,
+              "application_admission": false,
+              "metadata": {
+                "digest_hex": "6e55a89ed94762222e6ccba4a8d56e47f36c0f695ee465c3bb29fab3779b74e5",
+                "expires_at": 2048,
+                "generation": 4,
+                "object_octets": 1087,
+                "publish_at": 7
+              },
+              "original_bytes_hex": "a1694f7065726174696f6ea26668656164657298f91888011858182018591850182a1822188118d7188218a718631830184a18f818e7181e189a187a188d1843181b18c31869185118350018f0186707181d1830184a18220a185818400718ef181e1838188a184b18cd18bf18d6189318e818f41878183518ff182318cf18ff189e18eb18760d1891183f18dd18550f18a9187318fa187c184c186018e5184218c718fb185101185b183718b318bc184e186e1899183d188718dd183e1882182918cf18c018c21874186518da18c718de18b81838182f0818190118221858182018ca18a018d218361877189318fd18dd1875186318c41829188e1827189b18b618f318c11853184e1218b218ea18f9184318f70b18a3185f183318ed18b2031858182018d21854187518840918c618e8185818351866188d0a1885184818bf189f18db18bd1877182918a118de189509183e1886186218ad18f7185418c418f318a11867186d186518731868185f18691864189818201818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d1818184d6b696e6c696e655f626f647999012218a1186b184a186f18621850186f18731874186518641856183218a31864187318701865186318a618661869186e1870187518741873188118a218641862186c186f186218a2186618641869186718651873187418a218631861186c186718661842186c1861186b1865183318651862187918741865187318981820181818e1181818e0181818e81818181d1818186e181818a31818189b0c181818f8181818b81818186f181818fd181818440918181821011818181f18181857181818400c181818bc1818183f18181876181818a8181818a118181871181818901818186a1818189b1818188d181818750518681862187918741865185f186c1865186e011864186e1861186d18651867187018611879186c186f186118641866186f1875187418701875187418a21864186e1861186d186518661872186518731875186c18741869186d18611878185f18621879187418651873181904001868187218651873186f1875187218631865186c186d186518731868182e186518631868186f182f18761831186a1863186818651863186b1870186f1869186e187418671852186518731874186118721874186b18641865187418651872186d1869186e18691873186d186518451878186118631874186c1872186518711875186918721865186d1865186e1874187318a218671863186f186d18701875187418651863184318701875186a186d1865186d186f18721879185f186d1869186200186518611874185f186d187318190318eb1865186e186f186e1863186503"
+            },
+            "recovery_kind": "repair_only_delivery_loopback",
+            "settled_frames": 20,
+            "start_slot": 16
+          },
+          "schema": "retinue.retained-peer/v1",
+          "status": "ok"
+        }
+      }
+    ],
+    "exited_successfully": true,
+    "final_now_slot": 21,
+    "hello": {
+      "implementation": {
+        "application_operation_ids": false,
+        "executable": {
+          "blake3": "7e0a096f324601bdf36a94e505625f1e5ab5ff6d9c97522a8f9c398042cf8fb1",
+          "octets": 11923064,
+          "path": "/Users/markik/Code/testing/iroh-control-20261011/retinue/testing/transport-conformance/target/debug/transport-conformance"
+        },
+        "identity_scope": "Compiled source and lockfile fingerprint plus the executing file digest. Repository revision and dirty status are runtime observations of the compile-time source directory, not a claim that those current Git bytes produced this executable.",
+        "public_fixture_authority_only": true,
+        "suite": {
+          "corpus_manifest_sha256": "ff95dc345ea741cde01770b4d313df5efe8522c768b04371e30042d1c1c9d20d",
+          "dependency_versions": {
+            "blake3": "1.8.7",
+            "ed25519-dalek": "3.0.0",
+            "raptorq": "2.0.1"
+          },
+          "repository_revision": "2ee6f0ce7d37f7becc5a793efadc9dd9db4620a2",
+          "repository_worktree_dirty": false,
+          "runner": "transport-conformance 0.1.0",
+          "suite_source_blake3": "c453db8e90ba61fe13ce80036d119adc76e39e6deec201f785d57b14897036a9",
+          "target_arch": "aarch64",
+          "target_os": "macos"
+        }
+      },
+      "kind": "hello",
+      "limits": {
+        "encoded_line_octets": 65536,
+        "epoch_slot": 8192,
+        "idle_seconds": 5,
+        "input_octets": 4194304,
+        "lifetime_seconds": 60,
+        "original_octets": 16384,
+        "output_octets": 4194304,
+        "recovery_frames": 1024,
+        "request_seconds": 10,
+        "requests": 4096,
+        "retained_objects": 4,
+        "retained_original_octets": 65536
+      },
+      "schema": "retinue.retained-peer/v1",
+      "scope": {
+        "actual_raptorq": true,
+        "application_admission": false,
+        "fixture_authority_only": true,
+        "persistent_process": true,
+        "physical_rf": false
+      },
+      "time": "Caller-supplied monotonic logical slots; idle wall time does not advance expiry. The process has independent finite wall-clock deadlines."
+    },
+    "request_octets": 12929,
+    "requests": 17,
+    "response_octets": 45373,
+    "stderr": ""
+  },
+  "source_capacity_refusal": {
+    "collector_stats": {
+      "completed_objects": 1,
+      "decode_work": 9,
+      "decoder_allocations": 1,
+      "expired_objects": 0
+    },
+    "expiry": {
+      "collector": {
+        "invalidated_token": null,
+        "objects": []
+      },
+      "during_command": [],
+      "producer": {
+        "invalidated_token": null,
+        "objects": []
+      }
+    },
+    "implementation": {
+      "application_operation_ids": false,
+      "executable": {
+        "blake3": "7e0a096f324601bdf36a94e505625f1e5ab5ff6d9c97522a8f9c398042cf8fb1",
+        "octets": 11923064,
+        "path": "/Users/markik/Code/testing/iroh-control-20261011/retinue/testing/transport-conformance/target/debug/transport-conformance"
+      },
+      "identity_scope": "Compiled source and lockfile fingerprint plus the executing file digest. Repository revision and dirty status are runtime observations of the compile-time source directory, not a claim that those current Git bytes produced this executable.",
+      "public_fixture_authority_only": true,
+      "suite": {
+        "corpus_manifest_sha256": "ff95dc345ea741cde01770b4d313df5efe8522c768b04371e30042d1c1c9d20d",
+        "dependency_versions": {
+          "blake3": "1.8.7",
+          "ed25519-dalek": "3.0.0",
+          "raptorq": "2.0.1"
+        },
+        "repository_revision": "2ee6f0ce7d37f7becc5a793efadc9dd9db4620a2",
+        "repository_worktree_dirty": false,
+        "runner": "transport-conformance 0.1.0",
+        "suite_source_blake3": "c453db8e90ba61fe13ce80036d119adc76e39e6deec201f785d57b14897036a9",
+        "target_arch": "aarch64",
+        "target_os": "macos"
+      }
+    },
+    "kind": "response",
+    "now_slot": 7,
+    "pending_token": null,
+    "producer_stats": {
+      "deferrals": 0,
+      "encoder_allocations": 4,
+      "expired_objects": 0,
+      "queued_frames": 19,
+      "queued_fresh": 9,
+      "queued_manifests": 1,
+      "queued_repairs": 9,
+      "queued_wire_octets": 5111
+    },
+    "refusal": {
+      "code": "full",
+      "detail": "retained repair: Full { next_expiry: Some(2048) }",
+      "retry_at_slot": 2048
+    },
+    "request_id": 10,
+    "requested_now_slot": 7,
+    "schema": "retinue.retained-peer/v1",
+    "status": "refused"
+  },
+  "source_live_objects": 4
+}

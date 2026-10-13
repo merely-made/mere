@@ -428,6 +428,7 @@ pub fn builtin_defs() -> Vec<Theme> {
             high_contrast: false,
             harmony: Harmony::Custom,
             mode_sheets: Default::default(),
+            typography: Default::default(),
         },
         Theme {
             id: THEME_ID_DARK.to_string(),
@@ -447,6 +448,7 @@ pub fn builtin_defs() -> Vec<Theme> {
             high_contrast: false,
             harmony: Harmony::Custom,
             mode_sheets: Default::default(),
+            typography: Default::default(),
         },
         Theme {
             id: THEME_ID_LIGHT.to_string(),
@@ -466,6 +468,7 @@ pub fn builtin_defs() -> Vec<Theme> {
             high_contrast: false,
             harmony: Harmony::Custom,
             mode_sheets: Default::default(),
+            typography: Default::default(),
         },
         Theme {
             id: THEME_ID_HIGH_CONTRAST.to_string(),
@@ -485,6 +488,7 @@ pub fn builtin_defs() -> Vec<Theme> {
             high_contrast: true,
             harmony: Harmony::Custom,
             mode_sheets: Default::default(),
+            typography: Default::default(),
         },
     ]
 }

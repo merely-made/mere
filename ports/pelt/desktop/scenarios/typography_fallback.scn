@@ -1,0 +1,12 @@
+log Pelt portable requested font remains intact with a visible device fallback
+settle 4
+assert snap dirty == false
+assert snap saved == true
+assert snap font_catalog == ready
+assert snap font_family == Tabard unavailable receipt face
+assert snap font_size == 15
+assert snap font_diagnostics == fallback
+capture unavailable_family_editor
+click .chrome-specimen
+settle 4
+capture fallback_previews

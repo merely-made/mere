@@ -1,0 +1,38 @@
+{
+  "group": [
+    "p4_tree_forme.scn",
+    "p4_tree_forme_reopen.scn",
+    "p4_tree_forme_draft.scn",
+    "p4_tree_forme_draft_reopen.scn"
+  ],
+  "messages": [
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (File not found)"
+    },
+    {
+      "type": "warning",
+      "text": "Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    },
+    {
+      "type": "warning",
+      "text": "Compilation log for [ShaderModule \"vello.flatten\"]:\n\n1 warning(s) generated while compiling the shader:\n:385:5 warning: code is unreachable\n    return 0xffffffffu;\n    ^^^^^^\n"
+    },
+    {
+      "type": "error",
+      "text": "panicked at /Users/markik/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/2c7ef73/components/genet-scripted-dom/lib.rs:1111:14:\nNodeId is not stored in this document (foreign or retired)\n\nStack:\n\nError\n    at __wbg_new_227d7c05414eb861 (http://127.0.0.1:8846/pkg/graphshell_web.js:1216:25)\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[195199]:0x25ee179\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[125517]:0x22f3b17\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[48885]:0x1aab586\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[177729]:0x256a223\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[154478]:0x247d498\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[34267]:0x17bb66d\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[75224]:0x1e895e3\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[198752]:0x25f8d73\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[159511]:0x24b5b1f\n\n"
+    },
+    {
+      "type": "error",
+      "text": "panicked at /Users/markik/Code/worktrees/mere-nested-graph-view/crates/cambium/cambium-genet-web-host/src/mount.rs:193:18:\nRefCell already mutably borrowed\n\nStack:\n\nError\n    at __wbg_new_227d7c05414eb861 (http://127.0.0.1:8846/pkg/graphshell_web.js:1216:25)\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[195199]:0x25ee179\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[125517]:0x22f3b17\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[48885]:0x1aab586\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[177729]:0x256a223\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[154478]:0x247d498\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[34267]:0x17bb66d\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[75224]:0x1e895e3\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[198752]:0x25f8d73\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[159511]:0x24b5b1f\n\n"
+    },
+    {
+      "type": "warning",
+      "text": "Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    },
+    {
+      "type": "warning",
+      "text": "Compilation log for [ShaderModule \"vello.flatten\"]:\n\n1 warning(s) generated while compiling the shader:\n:385:5 warning: code is unreachable\n    return 0xffffffffu;\n    ^^^^^^\n"
+    }
+  ]
+}

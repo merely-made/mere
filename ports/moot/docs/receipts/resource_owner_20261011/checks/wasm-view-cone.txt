@@ -1,0 +1,234 @@
+mere-moot v0.0.1 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/ports/moot)
+cambium v0.3.3 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/cambium/cambium)
+command-menu v0.1.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/cambium/command-menu)
+serde v1.0.229
+serde_core v1.0.229
+serde_derive v1.0.229 (proc-macro)
+proc-macro2 v1.0.107
+unicode-ident v1.0.26
+quote v1.0.47
+proc-macro2 v1.0.107 (*)
+syn v3.0.6
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+unicode-ident v1.0.26
+edit-history v0.1.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/cambium/edit-history)
+genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+encoding_rs v0.8.42
+cfg-if v1.0.5
+multiversion_no_op v1.0.0 (proc-macro)
+scopeguard v1.2.0
+serde v1.0.229 (*)
+engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+app_units v0.7.8
+num-traits v0.2.19
+serde v1.0.229 (*)
+euclid v0.22.14
+num-traits v0.2.19
+serde v1.0.229 (*)
+serde v1.0.229 (*)
+serde v1.0.229 (*)
+genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+html5ever v0.39.0
+log v0.4.34
+markup5ever v0.39.0
+log v0.4.34
+tendril v0.5.1
+new_debug_unreachable v1.0.6
+web_atoms v0.2.6
+phf v0.13.1
+phf_shared v0.13.1
+siphasher v1.0.3
+string_cache v0.9.0
+new_debug_unreachable v1.0.6
+parking_lot v0.12.5
+lock_api v0.4.14
+scopeguard v1.2.0
+parking_lot_core v0.9.12
+cfg-if v1.0.5
+smallvec v1.16.1
+phf_shared v0.13.1 (*)
+precomputed-hash v0.1.1
+layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+markup5ever v0.39.0 (*)
+serde v1.0.229 (*)
+xml5ever v0.39.0
+log v0.4.34
+markup5ever v0.39.0 (*)
+html5ever v0.39.0 (*)
+layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583) (*)
+markup5ever v0.39.0 (*)
+regress v0.11.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+hashbrown v0.16.1
+allocator-api2 v0.2.21
+equivalent v1.0.2
+foldhash v0.2.0
+memchr v2.8.3
+serde v1.0.229 (*)
+url v2.5.8
+form_urlencoded v1.2.2
+percent-encoding v2.3.2
+idna v1.1.0
+idna_adapter v1.2.2
+icu_normalizer v2.3.0
+icu_collections v2.3.0
+displaydoc v0.2.7 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v3.0.6 (*)
+potential_utf v0.1.6
+zerovec v0.11.8
+yoke v0.8.3
+stable_deref_trait v1.2.1
+yoke-derive v0.8.3 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v3.0.6 (*)
+synstructure v0.14.0
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v3.0.6 (*)
+zerofrom v0.1.8
+zerofrom-derive v0.1.8 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v3.0.6 (*)
+synstructure v0.14.0 (*)
+zerofrom v0.1.8 (*)
+zerovec-derive v0.11.6 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v3.0.6 (*)
+utf8_iter v1.0.4
+yoke v0.8.3 (*)
+zerofrom v0.1.8 (*)
+zerovec v0.11.8 (*)
+icu_normalizer_data v2.3.0
+icu_provider v2.3.1
+displaydoc v0.2.7 (proc-macro) (*)
+icu_locale_core v2.3.0
+displaydoc v0.2.7 (proc-macro) (*)
+litemap v0.8.3
+tinystr v0.8.4
+displaydoc v0.2.7 (proc-macro) (*)
+zerovec v0.11.8 (*)
+writeable v0.6.4
+zerovec v0.11.8 (*)
+writeable v0.6.4
+yoke v0.8.3 (*)
+zerofrom v0.1.8 (*)
+zerotrie v0.2.5
+displaydoc v0.2.7 (proc-macro) (*)
+yoke v0.8.3 (*)
+zerofrom v0.1.8 (*)
+zerovec v0.11.8 (*)
+smallvec v1.16.1
+zerovec v0.11.8 (*)
+icu_properties v2.3.0
+displaydoc v0.2.7 (proc-macro) (*)
+icu_collections v2.3.0 (*)
+icu_locale_core v2.3.0 (*)
+icu_properties_data v2.3.0
+icu_provider v2.3.1 (*)
+zerotrie v0.2.5 (*)
+zerovec v0.11.8 (*)
+smallvec v1.16.1
+utf8_iter v1.0.4
+percent-encoding v2.3.2
+genet-text v0.1.0 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583)
+unicode-segmentation v1.13.3
+layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=4bc75583865c2fb862b7acd7fe16dc28eb591042#4bc75583) (*)
+mere-surface-api v0.1.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/system/surface-api)
+workbench v0.1.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/cambium/workbench)
+meristem v0.2.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/cambium/meristem)
+anymore v1.0.0
+tracing v0.1.44
+pin-project-lite v0.2.17
+tracing-attributes v0.1.31 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v2.0.119
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+unicode-ident v1.0.26
+tracing-core v0.1.36
+once_cell v1.21.4
+sceno v0.0.4 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/cambium/scenes/sceno)
+serde v1.0.229 (*)
+serde_json v1.0.151
+itoa v1.0.18
+memchr v2.8.3
+serde_core v1.0.229
+zmij v1.0.23
+sprigging v0.2.1 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/cambium/sprigging)
+accesskit v0.24.1
+enumn v0.1.14 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v2.0.119 (*)
+serde v1.0.229 (*)
+uuid v1.27.0
+serde_core v1.0.229
+netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a#5862bba2)
+bytemuck v1.25.2
+bytemuck_derive v1.12.1 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v3.0.6 (*)
+log v0.4.34
+peniko v0.6.1
+color v0.3.3
+kurbo v0.13.1
+arrayvec v0.7.8
+polycool v0.4.0
+arrayvec v0.7.8
+smallvec v1.16.1
+linebender_resource_handle v0.1.1
+smallvec v1.16.1
+png v0.18.1
+bitflags v2.13.2
+crc32fast v1.5.2
+cfg-if v1.0.5
+fdeflate v0.3.7
+simd-adler32 v0.3.10
+flate2 v1.1.10
+crc32fast v1.5.2 (*)
+miniz_oxide v0.9.1
+adler2 v2.0.1
+simd-adler32 v0.3.10
+miniz_oxide v0.8.9
+adler2 v2.0.1
+simd-adler32 v0.3.10
+skrifa v0.44.0
+bytemuck v1.25.2 (*)
+read-fonts v0.41.0
+bytemuck v1.25.2 (*)
+font-types v0.12.5
+bytemuck v1.25.2 (*)
+once_cell v1.21.4
+static_assertions v1.1.0
+thiserror v2.0.21
+thiserror-impl v2.0.21 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v3.0.6 (*)
+vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=5862bba26c8a9f56f6a5fdc8ea6966b360a5d63a#5862bba2)
+bytemuck v1.25.2 (*)
+guillotiere v0.7.0
+euclid v0.22.14 (*)
+svg_fmt v0.4.5
+peniko v0.6.1 (*)
+skrifa v0.44.0 (*)
+smallvec v1.16.1
+paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?rev=ef5412d760a978584c8c1801e8a765c51aecd403#ef5412d7)
+euclid v0.22.14 (*)
+serde v1.0.229 (*)
+workbench v0.1.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/cambium/workbench)
+mere-comms v0.0.1 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/shell/comms)
+async-trait v0.1.92 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v3.0.6 (*)
+serde v1.0.229 (*)
+serde v1.0.229 (*)

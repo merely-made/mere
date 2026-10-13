@@ -97,6 +97,7 @@ mod tests {
             collection: None,
             activities: vec![],
             resources: vec![ResourceRead {
+                shared_by: None,
                 reference: ResourceRef {
                     moot: [1; 32],
                     contribution: [3; 32],
@@ -177,6 +178,7 @@ mod tests {
     fn a_changed_collection_version_refuses_before_dispatch() {
         let mut read = snapshot();
         read.collection = Some(CollectionRead {
+            fork_destination: Some(ForkDestination { id: [19;32], name: "Reviewed fixture copy".into() }),
             id: [5; 32],
             name: "Notes".into(),
             heads: vec![[6; 32]],

@@ -1,0 +1,29 @@
+{
+  "local_date": "2026-10-12",
+  "basis": "c4fee1cba",
+  "source_sha256": {
+    "Cargo.toml": "f303a24af6a2aa0082a217df6f84bfdaf77d241b41fb3f85c0184cf76241893c",
+    "Cargo.lock": "ac015ad0ea594811fd1f73d655c4d164eeb0831f5247c4311136565b5b6e7d05",
+    "ports/graphshell/Cargo.toml": "943a87ce82d20df8fc493f6be7b1f9d448a50d60eabe4ff5964f30210a1aa629",
+    "ports/graphshell/src/lib.rs": "6e934a2e77e4de919364b263529ee254fc6a8c4874577ce273ec1d29c74ca98b",
+    "ports/graphshell/src/moot_resources.rs": "b3c987f3909ba49e5d6f0bce44d9495e380b07a7dad4e23dec33675b35e4acbb",
+    "ports/graphshell/src/bin/moot_resources_host.rs": "66861152b0f4143f46d023781a4e68ac1592156d3ab21bcd21500940b4aeddd0",
+    "ports/graphshell/examples/support/moot_resources_fixture.rs": "e40c467e6a936a5d6c1f7dd0adce00c0b4de4b64fd5e645d85b620ff30f98eb9",
+    "ports/moot/src/resource_owner.rs": "cdb7542e00a6c70361c9fc91232de177e4fd1844e5325a1abd0d8ea1735289ab",
+    "ports/moot/src/resource_view.rs": "f13c2792afc3ad8ad4e4c4e8d2f285b09af050046fce45ab5e453bc8796f320b",
+    "crates/cambium/cambium/src/runner.rs": "55ea522284a82c5e46c309f15f268d01959f931c8b1447633129ff5362f36ec4",
+    "crates/cambium/cambium-genet-winit-host/src/lib.rs": "0edc98b2bacbc9800e69c6177eb41eaef54e57c0bf1fa759c2319937e2a303f2",
+    "crates/cambium/cambium-rootstock/src/frame.rs": "7840453a14f0a6af9752a5ffdb6a3c5378e1e0aaf4e59311b3330a6e3e3a8d0e"
+  },
+  "binary": "/Users/markik/Code/output/moot-resource-host-20261012/moot-resource-host-r2-frozen",
+  "binary_sha256": "7f8d580995e28972017e82a4080aff6ee842b1c7af51e08431adb74dcaaf27d9",
+  "binary_bytes": 102893536,
+  "status": "Combined opt-in shared/product tracing compiled; native diagnostic awaiting explicit handoff",
+  "intended_runtime": "Two fresh-process finite native runs at wide 1280x920 and compact 520x860; four captured owner/authority stages each; at most five minutes total",
+  "limits": [
+    "Public memory fixtures, supplied carrier facts and verified sans-I/O admission",
+    "No live transport, persistent reopen, private content, physical input or app activity owner"
+  ],
+  "repo": "/Users/markik/Code/worktrees/mere-moot-capsule-proof",
+  "shared_trace_commit": "07d415c52ba6a83b46c0c40ef10f7c3b666c1034"
+}

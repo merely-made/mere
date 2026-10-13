@@ -1,0 +1,16 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling seiche v0.0.6 (C:\Users\mark_\Code\worktrees\mere-coupling-trace\crates\conatus\seiche)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.49s
+     Running `C:/t/cargo-targets/mere\debug\examples\coupling_trace.exe`
+step=0 dt=0.25 generation=1 recorded=3 omitted=1
+coupling=CouplingId(00000000-0000-0000-0000-000000000001) target_slot=0 identity=Some(CouplingTargetIdentity { member: 42, occurrence: Some(1) }) sample=Some([50.0, 20.0]) evaluation=Some(CouplingEvaluation { sample_time: 0.0, effect: Displace([2.0, 0.0]) }) applied=Write { before: CouplingBodyState { position: [50.0, 20.0], velocity: [0.0, 0.0], force: [0.0, 0.0], dynamic: true, sleeping: false }, after: CouplingBodyState { position: [52.0, 20.0], velocity: [0.0, 0.0], force: [0.0, 0.0], dynamic: true, sleeping: false } }
+coupling=CouplingId(00000000-0000-0000-0000-000000000001) target_slot=1 identity=Some(CouplingTargetIdentity { member: 42, occurrence: Some(2) }) sample=Some([50.0, 20.0]) evaluation=Some(CouplingEvaluation { sample_time: 0.0, effect: Displace([2.0, 0.0]) }) applied=Write { before: CouplingBodyState { position: [52.0, 20.0], velocity: [0.0, 0.0], force: [0.0, 0.0], dynamic: true, sleeping: false }, after: CouplingBodyState { position: [54.0, 20.0], velocity: [0.0, 0.0], force: [0.0, 0.0], dynamic: true, sleeping: false } }
+coupling=CouplingId(00000000-0000-0000-0000-000000000002) target_slot=0 identity=Some(CouplingTargetIdentity { member: 42, occurrence: Some(1) }) sample=Some([54.0, 20.0]) evaluation=Some(CouplingEvaluation { sample_time: 0.0, effect: Displace([2.0, 0.0]) }) applied=Write { before: CouplingBodyState { position: [54.0, 20.0], velocity: [0.0, 0.0], force: [0.0, 0.0], dynamic: true, sleeping: false }, after: CouplingBodyState { position: [56.0, 20.0], velocity: [0.0, 0.0], force: [0.0, 0.0], dynamic: true, sleeping: false } }
+integrated_position=(58, 20)

@@ -469,6 +469,38 @@ Mark's words are quoted as the physics catalog plan records them (§3, P7, and �
 **F201, refusing both dynamics alternatives (2026-10-10).** Question: should a variant naming both a preset and a full dynamics spec be refused, as the draft's tagged choice does? Mark: **"Refuse both (Recommended)"**. *Follows:* F194's earlier reading is now ruled: a variant carries one alternative; binding resolves a preset through the host catalog and refuses unknown ids by path.
 
 **F202, configurable preview step limit (2026-10-10).** Question: should the configurable preview limit default to 60 ticks, with capped cells labeled "Step limit reached"? Mark: **"60 ticks (Recommended)"**. *Follows:* the host installs 60 as its editable default; a capped snapshot does not claim rest. F195's three-occurrence, twelve-preset probe supplied the choice. The corrected source-hashed receipt measured about 0.96 seconds per wasm run at 60 ticks versus 14.79 seconds at 4,000, including startup and concurrent workspace load; it supersedes the initial 0.30/13.84-second estimate in the question. This is a fixture measurement, not a large-scene performance claim. F199's broader pause remains in effect.
+
+**F203, animated-field clock default (2026-10-12).** Question: should the default
+field clock advance by simulation ticks, freeze on Pause and rewind when Reset
+restores the scene? Mark: **"Simulation clock; Pause freezes, Reset rewinds (Recommended)"**.
+*Follows:* the default follows accepted simulation time, with Pause preserving
+time and Reset rewinding it. At the ruling checkpoint the sampler still used
+t=0; the field-runtime continuation below implements this policy. *Reading, not ruled:* keep its
+clock distinct from the monotonic step counter that ages lagged solver results;
+field-local phase offsets and external timeline binding need their own contracts.
+
+**F204, spatial membership reference point (2026-10-12).** Question: should each
+appearance qualify when its reference point is inside the field, including the
+boundary, with a query selecting candidates first and camera movement leaving
+membership unchanged? Mark: **"Reference point, including boundary (Recommended)"**.
+*Follows:* the initial spatial eligibility mode uses each appearance's reference
+point with an inclusive boundary in the field's space. It does not substitute
+one resource/node result for all appearances. Query candidacy and a response's
+own scalar guard remain separate. Extent filtering was pending at the ruling
+checkpoint and is implemented by the continuation below. Attached extents still
+need their owner resolver and are reported as unsupported.
+
+**F205, initial membership and entry actions (2026-10-12).** Question: should
+initially discovered matches at scene load or field rebuild be reported without
+entry actions, with later movement, field edits and query changes distinguished
+by cause? Mark: **"Report initial matches; entry actions start on later transitions (Recommended)"**.
+*Follows:* initial matches establish reported membership without firing entry
+actions; entry actions begin on later transitions. The event adapter must retain
+causes. This does not approve executing an unknown response/applet or settle
+jitter, debouncing, re-entry and conflicting state writers. The preceding
+`22c0dbc5` tracing draft ran no membership actions; the continuation below adds
+explicit owner callbacks. F199's unrelated coordinator pause stands.
+
 **F40, G7 (2026-10-03).** Question: approve G7, arrangement roles (§2, proposed at `784ce5b5`), which carries out F18 to F30, and place it. Options: approve, with G7 before G3; approve, after G2; amend first. Mark: **"Approve; G7 before G3"**. *Follows:* G7 starts now beside G2's open work, and G3 follows it, since G3's schedules use captures with a role (F27).
 
 **F41, the README's text (2026-10-03).** Question: the design-vocabulary section F13 placed in the README, its projection half in Mark's words and its dynamics half drafted from the rulings, placed after Status. Options: use the text as shown; the projection half only; edit the wording. Mark: **"Use this text"**. *Follows:* the section is committed as shown.
@@ -1616,3 +1648,157 @@ record of the write's execution, with stable provenance and evaluation order.
 Extent eligibility, field clocks, membership events, conflicting state writers
 and applet execution retain their existing policy checkpoints. No new F ruling,
 force-composition policy, dependency pin or UI acceptance is inferred.
+
+
+## Exact coupling bindings and applied-effect tracing (2026-10-12)
+
+**Status:** implemented bounded engine and Canvas adapter draft; qualification
+is recorded in the tracing continuation of the
+[coupling receipt](../testing/receipts/2026-10-12_coupling_effects/README.md#exact-bindings-and-applied-effect-tracing-2026-10-12).
+Mark explicitly authorized exact provenance and applied-effect tracing, with
+concrete clock and membership choices returned for his ruling. This continues
+the preceding point-evaluation foundation within the dynamics lane.
+
+`CouplingBinding` retains the exact compiled response, strength, definition,
+registry and ordered target slots. The graph bridge supplies `FieldId`,
+`CouplingId` and captured stable member identities. Its structural revision is
+only a hint: field changes need not advance it. Retaining the actual inputs
+prevents an old trace from being explained using today's definition or registry.
+Graph-node bodies carry no invented occurrence identity; an occurrence adapter
+can explicitly supply that identity per target slot. This is caller-provided
+provenance, not a new authority validator, persistent schema or transport type.
+
+The opt-in trace records execution order, simulation owner, binding generation,
+step, integration interval, sample point and configured sample time. It captures
+actual calls and immediate before/after position, velocity, accumulated user
+force, dynamic state and sleeping state. A Rapier write can be ignored: identical
+velocity assignment leaves a sleeping body asleep, while changing its velocity
+wakes it. Inert evaluations and missing bodies have different records. These
+observations occur before integration; other forces, contacts and the final
+pose must not be presented as an isolated contribution from one coupling.
+
+The caller supplies a positive row cap. The report discloses omitted rows while
+all physical applications continue. Only the latest valid tick is retained;
+actor delivery shares one replaceable result slot, so an unread layout queue
+does not retain trace history. Superseded evidence is unavailable, not an empty
+effect. Replacing bindings or configuring observation clears old evidence, and
+actor barriers reject delayed packets from the prior configuration. Runtime
+owner tokens distinguish worlds with equal step and generation numbers.
+The Canvas adapter exposes this observation without requesting ticks or edits.
+
+**Done-conditions:** preserve all thirteen original trajectory digests with
+tracing off and on; keep repeated target slots and sample points; demonstrate
+sequential force and velocity writes, ignored fixed-body writes and sleeping
+state; bound slow-host delivery; retain immutable backing after rebinding;
+qualify the actual graph bridge and inline/actor runtime paths. The runnable
+example demonstrates capped recording without skipping displacement. Visible
+host explanation, external consumer adoption and coordinator review remain
+separate acceptance work. F199's unrelated T2/G4b2 pause remains in effect.
+
+**Policy defaults ruled by F203 to F205; adapter pending at this tracing checkpoint:**
+
+- Field clock (F203): accumulated simulation time, with Pause freezing and
+  Reset rewinding. Alternatives are scene elapsed time with the same pause/reset
+  behavior, or an explicitly caller-supplied clock. Simulation time follows
+  accepted ticks and the speed control; scene elapsed time can advance through
+  elapsed intervals discarded by the physics budget. A caller clock can follow
+  an external media timeline. Today execution samples time zero. The field clock must be separate from the simulation step counter
+  used for lagged-result freshness; resetting that counter would corrupt age.
+- Spatial eligibility (F204): each appearance's reference point, including
+  the boundary, in the field's coordinate space. Alternatives are footprint
+  intersection or complete containment. A query selects candidates before the
+  spatial test, and camera movement must not change membership. Eligibility
+  and a response's own strictly-positive scalar guard remain separate: a boundary
+  member may still receive no response. Current force conversion still ignores
+  extent; attached extents require their own resolver.
+- Initial membership (F205): report initial matches without entry actions.
+  The alternative fires entry actions at initial load/rebuild too. Later movement,
+  field edits and query changes need distinct causes, with jitter/re-entry policy
+  and action execution still requiring their event adapter.
+
+The answers above are recorded verbatim as F203 to F205. This tracing slice
+does not implement their clocks, extent filtering or event actions. The field-runtime continuation below supplies the next adapter and tests
+pause/resume/reset timing, repeated appearances,
+inclusive boundaries, camera independence and initial matches without actions.
+Conflicting writer policy, scripts and saved-state changes remain separate.
+
+
+## Field clock and membership runtime (2026-10-12)
+
+**Status:** implemented bounded F203 to F205 runtime and Canvas adapter;
+qualification lives in the
+[field-runtime continuation receipt](../testing/receipts/2026-10-12_coupling_effects/README.md#field-clock-and-membership-runtime-2026-10-12).
+Mark explicitly authorized implementing/testing these three rulings while
+keeping exact provenance and applied-effect tracing intact. This is separate
+from coordinator-owned T2/G4b2, general field-script authoring and consumer repins.
+
+**Clock (F203):** `FieldClock` sums accepted integration intervals in f64, with
+Numen's actual f32 sample value retained by the trace. Tick contexts carry this
+clock, including grouped forces; it is independent of the monotonic solver step
+counter. Halt/Pause freezes field time even if a pointer drag requests body
+steps. Positive settle/Play resumes it. `reset_field_runtime` restores supplied
+node poses, rewinds time and increments the clock epoch, clears old evidence and
+starts membership reporting afresh. Ordinary seeding and binding rebuilds keep
+time. Canvas reseed and graph replacement use the reset hook; broader backdrop,
+media, law-state and document resets remain with their owners. Clocks are local
+runtime state, not graph truth, sync timestamps or a persisted scene schema.
+
+A captured Time dependency through the registry requests continued ticks for
+recognized physical responses with candidates and a supported extent. Open
+responses have no automatic physical execution or animation claim. Time-dependent
+or extent-clipped gradient terms conservatively declare nonautonomous N and
+expose no timeless global energy; the global autonomous path retains E. This
+prevents the existing energy interface from certifying a potential inconsistent
+with the new runtime force. It does not reopen the broad raw-term queue.
+
+**Membership (F204):** a query chooses candidates, then each body's reference
+point is tested against the bound world-space extent, including region edges and
+polygon segments/vertices. Camera transforms, face footprints, tangibility and
+pin/anchor roles do not substitute for this point. The scalar response's own
+positive-region test remains separate. Field extent and an available Numen
+selector join the immutable binding snapshot, so changing a selector with the
+same matches remains visible. Graph bodies carry stable owner member IDs without
+invented occurrence IDs; other adapters can supply distinct body keys and explicit
+occurrence identities for repeated appearances. Attached extents remain
+unsupported until the owner supplies resolved geometry. Invalid points/sample
+times and missing bodies remain distinguishable from a resolved outside point.
+
+**Entry behavior (F205):** first observations and recovery from unavailable body
+inputs report initial membership without entry actions. Known appearances retain
+membership across binding changes; field edits, candidate/selector changes,
+source revision/identity changes, actual reference-point movement and Reset are
+reported separately, including coincident causes. Query removal/restoration of
+an existing appearance is a later transition. Body generations and identity
+changes prevent reused local indices from inheriting another appearance's
+membership. Repeated physical target slots retain their force multiplicity but
+do not multiply one appearance's membership action.
+
+An owner can explicitly register a callback returning success or a refusal.
+Only a known outside/non-candidate to inside transition invokes it. Callbacks
+run on the simulation thread; owner-thread work, domain admission and durable
+edits remain the callback owner's responsibility. Its completion is not proof of
+a graph transaction or a Rapier write. Duplicate named coupling bindings retain
+separate compiled histories and refuse entry callbacks with ambiguous identity;
+physical writes remain separately traced. Unknown serialized applets are not
+executed by this adapter. Observation is at tick sample points, with no swept
+crossing inference, debounce or hysteresis. Changes between observations can be
+coincident; the flags describe observed inputs rather than guessed UI gestures.
+
+Membership frames and applied-effect traces retain the exact input binding,
+world identity, step, clock/epoch, target slot and bound revision hint. They are
+latest diagnostics; callbacks execute once independently of report delivery.
+Actor mailboxes retain one latest frame and reject superseded or pre-reset
+packets. Reading or dropping reports never replays callbacks. The caller's trace
+row cap still discloses omitted rows without suppressing physical writes or
+membership actions. Membership history follows live bodies/appearance mappings
+and active coupling owners; explicit reset drops it.
+
+**Done-conditions:** real Time-driven motion, freeze/resume and rewind without
+solver-age reset; accepted-time speed/catch-up accounting; inclusive world points,
+repeated appearances and camera independence; initial suppression plus actual
+later owner callback execution/refusal; query/field/source causes; bounded actor
+delivery and stale-packet rejection; all original static trajectory digests with
+tracing off/on; and scoped/timed declarations that do not overclaim energy.
+Feature/wasm/Numen/Canvas gates and three restored negative controls are recorded
+in the receipt. Visible authoring and an application-specific script receiver
+remain separate owner acceptance, not inferred from these source/API tests.

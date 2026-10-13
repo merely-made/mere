@@ -1,0 +1,45 @@
+{
+  "receipt": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        1140,
+        865
+      ],
+      "canvas_physical_size": [
+        1140,
+        865
+      ],
+      "log": [
+        "waited 51 frames",
+        "captured forme_saved_redo_reopened",
+        "waited 55 frames",
+        "saved Forme history survives browser reopen with stable identity",
+        "gpu timestamps: no"
+      ],
+      "result": "ok",
+      "saved_graph": {
+        "address": "",
+        "file": null,
+        "reopened": true,
+        "save_state": "idle",
+        "selected": null,
+        "session": "c8130f75-7022-45f7-94a5-cbbf1bb74f98",
+        "tags": "",
+        "title": ""
+      },
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "forme_saved_redo_reopened",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 191642
+      }
+    ]
+  },
+  "errors": []
+}

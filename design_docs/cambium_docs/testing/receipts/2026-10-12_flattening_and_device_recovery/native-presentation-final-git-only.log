@@ -1,0 +1,17 @@
+{"launch_method": "LaunchServices temporary application bundle", "launcher_exit": 0, "timeout": false, "success": true, "elapsed_seconds": 15.644, "binary_sha256": "1db44878668964b931ff6b6c32d43addda76255d1438d5f75c0be08c775cfaf7", "scenario_sha256": "96f64dd4a425a0978ed366cb3c6823d1cc675f85fe46a82dfa130366409c27cf", "receipt": "scenario.done", "captures": 6}
+RESULT ok
+Upgraded production host presentation preserves draft and selected graph
+captured initial
+captured seed_edited
+captured dark
+captured named
+captured resized
+captured restored_size
+capture initial 2360x1600 digest=84be64b205f2b741 file=/Users/markik/Code/output/vello-production-fixes-20261011/native-presentation-final-git-only/initial.png
+capture seed_edited 2360x1600 digest=3c306e7c3f235d7c file=/Users/markik/Code/output/vello-production-fixes-20261011/native-presentation-final-git-only/seed_edited.png
+capture dark 2360x1600 digest=14403684ffac710d file=/Users/markik/Code/output/vello-production-fixes-20261011/native-presentation-final-git-only/dark.png
+capture named 2360x1600 digest=65cc74cf3058a236 file=/Users/markik/Code/output/vello-production-fixes-20261011/native-presentation-final-git-only/named.png
+capture resized 1920x1560 digest=a4e526490d12c7bd file=/Users/markik/Code/output/vello-production-fixes-20261011/native-presentation-final-git-only/resized.png
+capture restored_size 2560x2200 digest=472288087646c790 file=/Users/markik/Code/output/vello-production-fixes-20261011/native-presentation-final-git-only/restored_size.png
+frames: 6 captured, 0 blank, 6 distinct digests
+presentation: 60 frames, 64 redraws, 4 unpresented redraws

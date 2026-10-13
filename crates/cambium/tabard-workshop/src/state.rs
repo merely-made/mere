@@ -74,6 +74,7 @@ pub struct WorkshopState {
     pub(crate) mode: Mode,
     seed: SeedRole,
     pub(crate) name: TextInput,
+    pub(crate) fonts: crate::typography::FontControls,
     pub(crate) seed_hex: TextInput,
     pub(crate) sheet_text: TextInput,
     pub(crate) hex_error: Option<String>,
@@ -150,6 +151,7 @@ impl WorkshopState {
             mode,
             seed: SeedRole::Primary,
             name: TextInput::new(""),
+            fonts: Default::default(),
             seed_hex: TextInput::new(""),
             sheet_text: TextInput::new(""),
             hex_error: None,
@@ -275,6 +277,9 @@ impl WorkshopState {
             "name" => Some(&self.name),
             "seed-hex" => Some(&self.seed_hex),
             "mode-sheet" => Some(&self.sheet_text),
+            "font-family" => Some(&self.fonts.family),
+            "font-size" => Some(&self.fonts.size),
+            "font-line-height" => Some(&self.fonts.height),
             _ => None,
         }
     }
@@ -283,6 +288,9 @@ impl WorkshopState {
             "name" => Some(&mut self.name),
             "seed-hex" => Some(&mut self.seed_hex),
             "mode-sheet" => Some(&mut self.sheet_text),
+            "font-family" => Some(&mut self.fonts.family),
+            "font-size" => Some(&mut self.fonts.size),
+            "font-line-height" => Some(&mut self.fonts.height),
             _ => None,
         }
     }
@@ -297,6 +305,8 @@ impl WorkshopState {
         self.seed_hex = TextInput::new(tinct::color_to_hex(self.seed.color(self.draft_theme())));
         self.sheet_text = TextInput::new(self.authored_sheet());
         self.hex_error = None;
+        self.fonts
+            .refresh(self.draft.theme().typography.0.get(&self.fonts.role));
         let (h, s, l) = tinct::color_to_hsl(self.seed.color(self.draft_theme()));
         self.channels = [
             Slider::new((h / 360.0) as f32)
@@ -551,7 +561,9 @@ impl WorkshopState {
             && *harmony == source.harmony
             && *cached_mode == mode
         {
-            return appearance.clone();
+            let mut appearance = appearance.clone();
+            appearance.typography = self.draft_theme().typography.clone();
+            return appearance;
         }
         let mut theme = source.clone();
         theme.mode_sheets.clear();
@@ -559,9 +571,10 @@ impl WorkshopState {
         if theme.name.trim().is_empty() {
             theme.name = "Theme preview".into();
         }
-        let appearance = theme
+        let mut appearance = theme
             .palette_for_mode(&mode)
             .expect("the draft's seed definition is validated");
+        appearance.typography = self.draft_theme().typography.clone();
         *self.appearance.borrow_mut() =
             Some((source.seeds, source.harmony, mode, appearance.clone()));
         appearance
@@ -575,11 +588,13 @@ impl WorkshopState {
     }
 
     pub fn has_pending_fields(&self) -> bool {
-        !self
-            .seed_hex
-            .text()
-            .trim()
-            .eq_ignore_ascii_case(&tinct::color_to_hex(self.seed.color(self.draft_theme())))
+        self.fonts
+            .pending(self.draft_theme().typography.0.get(&self.fonts.role))
+            || !self
+                .seed_hex
+                .text()
+                .trim()
+                .eq_ignore_ascii_case(&tinct::color_to_hex(self.seed.color(self.draft_theme())))
             || self.sheet_text.text() != self.authored_sheet()
     }
 
@@ -587,7 +602,7 @@ impl WorkshopState {
     /// RGB input stays visible and cannot silently disappear into a saved file.
     pub(crate) fn prepare_edits(&mut self) -> bool {
         self.sync_name();
-        if !self.apply_hex() {
+        if !self.apply_fonts() || !self.apply_hex() {
             return false;
         }
         self.apply_stylesheet();
@@ -608,8 +623,20 @@ impl WorkshopState {
         if changed {
             // Refresh only seed controls; keep staged CSS and native name text.
             let sheet = self.sheet_text.clone();
+            let font_fields = (
+                self.fonts.family.clone(),
+                self.fonts.size.clone(),
+                self.fonts.height.clone(),
+                self.fonts.error.clone(),
+            );
             self.refresh_controls();
             self.sheet_text = sheet;
+            (
+                self.fonts.family,
+                self.fonts.size,
+                self.fonts.height,
+                self.fonts.error,
+            ) = font_fields;
             self.status = "Seed color updated".into();
         } else if !self
             .seed_hex
@@ -726,6 +753,10 @@ impl WorkshopState {
         self.stylesheet
             .borrow_mut()
             .set_appearance(&self.mode, &rules);
+        self.stylesheet
+            .borrow_mut()
+            .set_typography(&self.draft_theme().typography)
+            .expect("validated draft typography");
         self.stylesheet.clone()
     }
 
@@ -734,6 +765,10 @@ impl WorkshopState {
         self.reader
             .borrow_mut()
             .set_palette(ReaderSpecimen::palette_for_state(self));
+        self.reader
+            .borrow_mut()
+            .set_typography(self.draft_theme().typography.clone())
+            .expect("validated draft typography");
         self.reader.clone()
     }
 

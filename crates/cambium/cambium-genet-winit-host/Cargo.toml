@@ -18,6 +18,7 @@ default = ["image-decode"]
 image-decode = ["taproot/image-decode", "cambium-rootstock/image-decode", "cambium-winit-a11y/image-decode"]
 
 [dependencies]
+parley.workspace = true
 # The accessibility tree type the host projects into and hands the adapter;
 # named here so the `Harness` can return one for a test to assert against.
 accesskit = "0.24"

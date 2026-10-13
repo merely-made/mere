@@ -157,6 +157,7 @@ mod area_share;
 /// they are canvas glue (numen fields over placed nodes) that had been parked
 /// in the intel tier, where nothing consumed them.
 pub mod canvas_search;
+mod coupling_trace;
 mod edge_cells;
 pub mod field_bridge;
 mod fields;

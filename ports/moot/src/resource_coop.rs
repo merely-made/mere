@@ -122,6 +122,10 @@ pub enum ActivityAction {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ResourceRead {
     pub reference: ResourceRef,
+    /// Stable root of the signed sharing act, when its owner disclosed it.
+    /// This does not assert authorship of the underlying content.
+    #[serde(default)]
+    pub shared_by: Option<[u8; 32]>,
     pub title: String,
     pub schema: String,
     pub content: ContentRead,
@@ -142,6 +146,16 @@ pub struct CollectionRead {
     pub heads: Vec<[u8; 32]>,
     pub membership_commitment: [u8; 32],
     pub fork: Option<Offer>,
+    /// The reviewed destination is view data and part of the exact intention.
+    /// It is neither a new collection wire record nor authority to author it.
+    #[serde(default)]
+    pub fork_destination: Option<ForkDestination>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ForkDestination {
+    pub id: [u8; 32],
+    pub name: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -167,7 +181,7 @@ pub struct Snapshot {
 }
 
 impl Snapshot {
-    fn check(&self) -> Result<(), Refusal> {
+    pub(crate) fn check(&self) -> Result<(), Refusal> {
         let mut contributions = BTreeSet::new();
         for resource in &self.resources {
             if resource.reference.moot != self.moot {
@@ -227,12 +241,44 @@ pub enum Refusal {
     NoResourceSelected,
     NoActivitySelected,
     UnknownOffer,
+    InvalidForkDestination,
     OwnerOffer(Offer),
 }
 
 impl std::fmt::Display for Refusal {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(formatter, "{self:?}")
+        let message = match self {
+            Self::ChangedCollection => "The reviewed collection changed",
+            Self::ChangedOfferTerms => "The reviewed resource offer terms changed",
+            Self::ForeignMoot => "This read belongs to another Moot",
+            Self::DifferentReader => "This read belongs to another reader",
+            Self::DuplicateContribution => "The read repeats a contribution identity",
+            Self::ChangedContribution => {
+                "The exact contribution changed its content or sharing root"
+            },
+            Self::DuplicateActivity => "The read repeats an activity identity",
+            Self::MissingActivityOwner => "The activity needs an owner and an exact address",
+            Self::InvalidLifecycle(reason) => {
+                return write!(formatter, "The activity report is invalid: {reason}");
+            },
+            Self::UnknownResource => "The resource is absent from the current read",
+            Self::UnknownActivity => "The activity is absent from the current read",
+            Self::NoCollection => "There is no collection in this read",
+            Self::NoResourceSelected => "Choose a resource first",
+            Self::NoActivitySelected => "Choose an activity first",
+            Self::UnknownOffer => "The owner has not disclosed this action",
+            Self::InvalidForkDestination => {
+                "Review a named, different destination collection first"
+            },
+            Self::OwnerOffer(Offer::Withheld { reason }) => {
+                return write!(formatter, "The owner withheld this action: {reason}");
+            },
+            Self::OwnerOffer(Offer::Unsupported { reason }) => {
+                return write!(formatter, "This action is unavailable: {reason}");
+            },
+            Self::OwnerOffer(Offer::Offered) => "The action needs a current owner check",
+        };
+        formatter.write_str(message)
     }
 }
 
@@ -387,7 +433,11 @@ impl Pane {
         for resource in &snapshot.resources {
             if self.snapshot.resources.iter().any(|old| {
                 old.reference.contribution == resource.reference.contribution
-                    && old.reference.manifest != resource.reference.manifest
+                    && (old.reference.manifest != resource.reference.manifest
+                        || old
+                            .shared_by
+                            .zip(resource.shared_by)
+                            .is_some_and(|(old, new)| old != new))
             }) {
                 return Err(Refusal::ChangedContribution);
             }
@@ -439,6 +489,15 @@ impl Pane {
             .as_ref()
             .ok_or(Refusal::NoCollection)?;
         require_offer(observed.fork.as_ref())?;
+        if !observed
+            .fork_destination
+            .as_ref()
+            .is_some_and(|destination| {
+                destination.id != observed.id && !destination.name.trim().is_empty()
+            })
+        {
+            return Err(Refusal::InvalidForkDestination);
+        }
         Ok(self.prepare(Target::CollectionFork {
             moot: self.snapshot.moot,
             observed: observed.clone(),

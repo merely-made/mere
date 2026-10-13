@@ -1,0 +1,50 @@
+{
+  "d2_exit": 1,
+  "inherited_d2_errors": [
+    "snapshot aggregate digest changed: 2046e1eec3018b7dd288e794326090f1b7f9a889043d53e45530271d0b32be1e != f0b64eef4cd5514157bb1b49d389b84db29a1e823d6f3e2cebf827337fe56abf",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_producer_gates/README.md"
+  ],
+  "structural_strict_exit": 1,
+  "structural_counts": {
+    "active_docs": 268,
+    "indexed_active_docs": 267,
+    "index_orphans": 0,
+    "index_ghosts": 0,
+    "memory_directory_links": 0,
+    "statusless_plans": 0,
+    "broken_relative_links": 28,
+    "historical_broken_relative_links": 245,
+    "planned_broken_relative_links": 0,
+    "ambiguous_known_root_paths": 101,
+    "ignored_known_root_patterns": 23,
+    "reserved_identifier_paths": 24,
+    "missing_known_root_paths": 200,
+    "historical_missing_known_root_paths": 237,
+    "planned_missing_known_root_paths": 6,
+    "invalid_historical_annotations": 0,
+    "stale_historical_annotations": 0,
+    "unheaded_owned_sources": 3,
+    "exhibit_b_sources": 0
+  },
+  "root_recovery_source_headers_missing": 0,
+  "imported_font_lane_headers_pending": [
+    {
+      "source": "crates/cambium/cambium-genet-winit-host/tests/font_inventory.rs",
+      "subject": "Exhibit A",
+      "detail": "owned source lacks the MPL-2.0 header; see scripts/relicense_headers.py"
+    },
+    {
+      "source": "crates/cambium/tabard-workshop/src/fonts.rs",
+      "subject": "Exhibit A",
+      "detail": "owned source lacks the MPL-2.0 header; see scripts/relicense_headers.py"
+    },
+    {
+      "source": "crates/system/tabard/src/typography.rs",
+      "subject": "Exhibit A",
+      "detail": "owned source lacks the MPL-2.0 header; see scripts/relicense_headers.py"
+    }
+  ],
+  "scope": "Own new source/index/D2 covered; foreign typography notices are already corrected in its queued lane; external locator baseline remains distinct"
+}

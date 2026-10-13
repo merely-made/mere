@@ -217,6 +217,86 @@ impl WorkspaceApp {
                 {
                     return Err("appearance activation changed Pelt's held controller, history, focus or content aperture".into());
                 }
+                let resolved = tabard::resolve_theme_choice(
+                    &self.theme_catalog.registry,
+                    self.appearance.store().choice(),
+                )
+                .map_err(|error| error.to_string())?;
+                // These are production chrome computed values, independent of
+                // the editor's specimen and of loaded document/session content.
+                for (role, class) in [
+                    (tabard::FontRole::Interface, "pelt-address"),
+                    (tabard::FontRole::Heading, "pelt-title"),
+                    (tabard::FontRole::Label, "pelt-status"),
+                ] {
+                    if let Some(fonts) = resolved.theme.typography.0.get(&role) {
+                        if let Some(size) = fonts.size_px {
+                            let actual = self.frisket.chrome_computed_style(class, "font-size");
+                            let expected = format!("{size}px");
+                            if actual.as_deref() != Some(expected.as_str()) {
+                                return Err(format!(
+                                    "{class} font size expected {expected}, got {actual:?}"
+                                ));
+                            }
+                        }
+                        if let Some(family) = &fonts.family {
+                            let actual = self
+                                .frisket
+                                .chrome_computed_style(class, "font-family")
+                                .unwrap_or_default();
+                            if !actual.split(',').any(|candidate| {
+                                candidate
+                                    .trim()
+                                    .trim_matches(['\"', '\''])
+                                    .eq_ignore_ascii_case(family)
+                            }) {
+                                return Err(format!(
+                                    "{class} lost requested font {family}: {actual}"
+                                ));
+                            }
+                        }
+                        if let Some(ratio) = fonts.line_height {
+                            let actual = self
+                                .frisket
+                                .chrome_computed_style(class, "line-height")
+                                .unwrap_or_default();
+                            let size = self
+                                .frisket
+                                .chrome_computed_style(class, "font-size")
+                                .and_then(|v| v.trim_end_matches("px").parse::<f32>().ok())
+                                .ok_or("missing computed font size")?;
+                            let value =
+                                actual.trim_end_matches("px").parse::<f32>().map_err(|_| {
+                                    format!("{class} invalid computed line height {actual}")
+                                })?;
+                            let expected = if actual.ends_with("px") {
+                                size * ratio
+                            } else {
+                                ratio
+                            };
+                            if (value - expected).abs() > 0.01 {
+                                return Err(format!(
+                                    "{class} line height expected {expected}, got {actual}"
+                                ));
+                            }
+                        }
+                        eprintln!(
+                            "pelt-typography role={} class={class} family={:?} size={:?} line-height={:?}",
+                            role.key(),
+                            self.frisket.chrome_computed_style(class, "font-family"),
+                            self.frisket.chrome_computed_style(class, "font-size"),
+                            self.frisket.chrome_computed_style(class, "line-height")
+                        );
+                    }
+                }
+                let font_notices = self.theme_catalog.font_notices(&resolved.theme);
+                if !font_notices.is_empty() {
+                    let notice = self.chrome_appearance().notice.unwrap_or_default();
+                    if font_notices.iter().any(|text| !notice.contains(text)) {
+                        return Err("Pelt did not expose the installed-font fallback notice".into());
+                    }
+                    eprintln!("pelt-typography fallback-notice={notice}");
+                }
                 self.config.workspace_receipt = Some(WorkspaceReceipt::Appearance);
                 self.config.artifact = Some(proof.artifact.clone());
                 self.pending_workspace_assertion = Some("shared workshop native controls saved a definition; ordinary Pelt appearance controls applied and persisted its exact mode while the held controller, history, focused tile and content aperture remained unchanged".into());

@@ -1,0 +1,8 @@
+START mirror-tests
+DONE mirror-tests 0
+START viewer-build
+DONE viewer-build 0
+START product-build
+DONE product-build 0
+START main-check
+DONE main-check 0
