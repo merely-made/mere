@@ -1,7 +1,7 @@
 {
   "schema": "codex.client-mesh/qualification-v1",
   "observed_at": "2026-10-13T22:33:54Z",
-  "status": "SSH and stored-chat reads qualified among three peers; O-PC native connection display discrepancy pending",
+  "status": "Three-peer SSH and stored-chat access qualified; owner confirms native connections look good",
   "clients": {
     "o-pc": {
       "registered": [
@@ -12,7 +12,7 @@
       ],
       "auto_connect": true,
       "codex_sidebar_grouping": "connection",
-      "native_display": "owner reports not connected; app tools read chats on both Linux peers and list both with unavailableHosts empty"
+      "native_display": "owner confirmed s-pc connected in O-PC settings and subsequently reported connections look good"
     },
     "s-pc": {
       "registered": [
@@ -87,9 +87,12 @@
     "worktrees_or_cargo_homes_created": false
   },
   "done_conditions": [
-    "Resolve the discrepancy between O-PC native connection display and successful remote reads; verify visible existing chats in that client",
     "Reachable Macs are enrolled and qualified separately",
     "Active chat writer guards remain intact",
     "Windows daemon reboot persistence is qualified separately"
-  ]
+  ],
+  "follow_up": {
+    "owner_confirmation": "looks good",
+    "surface_wifi": "owner suspects chipset instability; not diagnosed in this qualification"
+  }
 }

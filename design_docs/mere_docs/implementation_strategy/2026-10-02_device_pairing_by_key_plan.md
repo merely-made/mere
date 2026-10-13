@@ -191,7 +191,11 @@ The owner reports O-PC is not connecting. Its SSH commands and app
 both with no unavailable hosts. This establishes transport and stored-chat
 access, while the native connection display discrepancy remains unresolved
 pending the exact UI error. No app restart or connection replacement was used.
-The same receipt now records these follow-up results.
+The same receipt now records these follow-up results. The owner subsequently
+confirmed s-pc connected in O-PC and ThinkPad settings and reported that the
+connections look good. The three-peer SSH and stored-chat access slice is
+qualified. Surface Wi-Fi instability is an owner hypothesis, not a diagnosed
+cause. Mac enrollment and Windows daemon reboot persistence remain open.
 
 **Related**:
 
