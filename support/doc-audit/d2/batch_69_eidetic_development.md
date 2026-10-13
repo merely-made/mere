@@ -1,5 +1,22 @@
 # Batch 69: Eidetic development planning
 
+First browser encounter implementation, 2026-10-12: nine further scoped claims
+hold against source `8c490e23` and the archived qualification artifacts:
+source-scoped/pending Eidetic encounters; explicit-parent cursor-preserving
+Stemma admission; per-graph atomic capture storage; actual document traversal
+and exact evidence projection; native/negative-control checks; separate-process
+Redb reopen and replay; production JS/Rust wire plus Chromium/Firefox API
+simulation; Firefox parent/precision/scope export; and browser-target compilation
+with native-only backend test activation and unchanged supplier/clip pins.
+The 489 ordinary native passes include six ignores, of which the new explicit
+disk fixture separately passes both phases. The parent-removal negative control
+fails its branch assertion before exact restoration. These are synthetic,
+single-writer and unsealed receipts. Actual headed extension/IndexedDB behavior,
+tab/document correlation, complete source envelopes, recall source handles,
+source-generation binding, concurrent writers and private custody stay open.
+Browser forget removes its own evidence rather than erasing resource-registry
+identity. Existing unrelated Djinn source work is preserved.
+
 Browser-history relation amendment, 2026-10-12: seven additional scoped claims
 hold against Mere `28d43dd5` and the official Chromium/Firefox API references:
 page history items differ from visit/referring-visit records; the extension
@@ -87,7 +104,7 @@ Current full-tree audit gaps are recorded separately below.
 
 - disposition: current
 - status line: "**Status (2026-10-12):** active plan" - accurate: yes
-- claims checked: 21 - holds: 21, stale: 0, unverifiable: 0
+- claims checked: 30 - holds: 30, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -96,7 +113,7 @@ Tantivy dependency. Those older proposals remain in the archived June plan.
 
 ### Contradictions
 
-No contradictions in the fourteen prior and seven refreshed source findings. The plan distinguishes
+No contradictions in the prior findings and nine scoped implementation claims. The plan distinguishes
 accepted direction, proposed ownership, current source and pending consumer
 receipts; it does not requalify earlier execution against the review baseline.
 

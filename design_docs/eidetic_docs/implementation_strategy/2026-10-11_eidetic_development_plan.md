@@ -4,7 +4,10 @@
 **Status (2026-10-12):** active plan. The first Fleece portable-clip draft has
 native transfer tests and browser compilation. Turnstone now qualifies native
 selected text/WAV receiving, restart, local playback and onward copy; the broader phases
-and remaining host checkpoints stay open. The five gathering/intake dependency
+and remaining host checkpoints stay open. The first browser encounter slice
+now has native regression, fresh-process disk and browser compilation receipts;
+renewed headed browser intake and private custody remain open.
+The five gathering/intake dependency
 moves are already complete in the
 [Fleece and Eidetic checkpoint](../../archive_docs/2026-10-11_completed_plans/2026-10-11_fleece_eidetic_capability_plan.md).
 **Scope:** develop Eidetic's retained-content and memory capabilities together
@@ -493,7 +496,8 @@ receipt names its source, target, feature set and supported limits.
 Mark agrees to develop existing-browser history capture into relationships for
 the document graph. This is a design amendment for P1/P2/P5, with content
 observations supplied separately by P3. The encounter contract and adapters
-below are proposed work; this amendment changes no runtime or wire schema.
+below were proposed in this draft. The first implemented subset and its limits
+are recorded under the qualification below; the remaining draft stays open.
 
 **Source refresh at Mere `28d43dd5`.** The extension's
 [live listener](../../../ports/graphshell/web/extension/background.js) selects
@@ -634,6 +638,48 @@ graph. Renew Chromium and Firefox headed receipts separately when their runs
 are authorized; other browsers require their own adapter/evidence review.
 Content clipping, broader formats and sealed custody then exercise this same
 admission boundary, with their own consumer gates.
+
+#### First browser encounter qualification, 2026-10-12
+
+Implementation `8c490e23` adds the portable source scope, parent states and
+original-time fields in Eidetic, plus Chartulary's explicit-parent `admit_visit`
+seam. The source owner keeps no imported live cursor. Graphshell stores the
+Stemma snapshot and unresolved intake under the receiving graph's identity,
+using the existing Muniment batch alongside graph/access/trace writes.
+Resolved parentage produces actual document traversals and typed evidence
+facets; `MereHost::browser_relations` exposes exact source handles and distinguishes
+followed links, redirects, reloads and other browser-reported referrers.
+
+Native library regression passes 67 Chartulary, 132 Eidetic and 290 Graphshell
+tests, with five existing ignores and one explicit disk-receipt fixture ignored
+by the ordinary sweep. That fixture passes in separate seed/reopen processes
+over Redb: five source visits and three relations retain the same graph,
+encounter identities and evidence, and re-import adds none. Focused cases also
+cover rapid same-address visits, branching and late parents, profile ID reuse,
+outside-range/withheld parents, conflict/capacity/cycle refusal, failed batch
+retry, explicit forget and unchanged existing navigation cursors. Removing
+parentage makes the branch test fail, followed by byte-exact source restoration.
+
+The real extension model/background scripts pass Chromium and Firefox API
+simulations for stable worker scope, rapid revisits, per-visit range filtering,
+candidate saturation and visible queue loss. Their generated payload also
+passes through Rust deserialization and graph admission. The Firefox SQLite
+exporter preserves original parent IDs and microseconds with explicit registered
+scope inputs. The standalone Graphshell browser target compiles for wasm32.
+History intake calls browser history APIs and local storage, without requesting
+destination pages. A native-only test dependency enables Muniment's existing
+Redb backend; supplier pins and shared clip schemas are unchanged.
+
+See [machine-readable evidence](../../../support/browser-history-intake/qualification.json)
+and its adjacent raw logs and synthetic disk expectation. These qualify one
+receiving writer and synthetic custody, not concurrent independent writers or
+real private browsing. The portal's new awaiting-parent feedback has compilation
+and API evidence, not renewed headed UI acceptance. Actual Chromium/Firefox
+extension lifecycle and IndexedDB reopening, live tab/window/frame/document
+correlation, source replacement/reinstallation binding, full input envelopes,
+recall-trace source handles and sealed custody remain open. Native forgetting
+removes encounter and relationship evidence while preserving independently
+owned resource-registry identities; it is not a whole-mere identity purge.
 
 ### P6. Qualify storage, custody, retention and exchange
 
@@ -813,3 +859,11 @@ The implementation proposals still need these concrete decisions:
   redacted/outside-range endpoints, source-ID collisions and partial imports.
   This is a documentation-only design amendment; runtime, schema, custody and
   renewed headed browser qualification remain open.
+- **2026-10-12, first browser encounter implementation.** Source `8c490e23`
+  connects source-scoped Eidetic intake and explicit-parent Stemma admission to
+  Graphshell's document graph. Native regression passes 489 tests, with six
+  ordinary-sweep ignores; the new disk fixture separately passes seed/reopen
+  processes and idempotent re-import. Production JS/Rust wire and simulated
+  Chromium/Firefox adapters pass, the browser target compiles, and a restored
+  parent-removal control demonstrates branch-test sensitivity. Qualified scope
+  and open custody, multi-writer and headed-browser gates are recorded under P5.
