@@ -622,7 +622,7 @@ fn editor(state: &WorkshopState) -> WorkshopView {
     controls.push(export_controls(state));
     Box::new(
         el("aside", controls)
-            .attr("class", "theme-editor")
+            .attr("class", "theme-editor workspace-controls")
             .attr("aria-label", "Theme editor"),
     )
 }
@@ -650,7 +650,7 @@ fn previews(state: &WorkshopState) -> WorkshopView {
         WorkspacePaneStatus::default(),
         Box::new(
             el("div", mode_buttons)
-                .attr("class", "mode-picker")
+                .attr("class", "mode-picker workspace-controls")
                 .attr("role", "group")
                 .attr("aria-label", "Preview mode"),
         ),

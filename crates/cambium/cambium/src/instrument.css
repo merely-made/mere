@@ -32,7 +32,7 @@
     color: var(--workspace-ink);
     border-bottom: 3px solid var(--workspace-accent);
 }
-.instrument-workspace button {
+.instrument-workspace .workspace-controls button, .instrument-workspace .cambium-title-bar button, .instrument-workspace .workspace-pane-actions button {
     color: var(--workspace-ink);
     background: var(--workspace-control);
     border: 1px solid var(--workspace-rule);
@@ -42,17 +42,17 @@
     font-family: var(--tabard-font-interface, var(--workspace-font-interface, sans-serif)), var(--workspace-font-interface, sans-serif);
     font-size: var(--tabard-font-interface-size, 13px);
 }
-.instrument-workspace button:hover { border-color: var(--workspace-accent); }
-.instrument-workspace button:focus-visible, .instrument-workspace [role=textbox]:focus-visible, .instrument-workspace .frisket-tab:focus-visible {
+.instrument-workspace .workspace-controls button:hover, .instrument-workspace .cambium-title-bar button:hover, .instrument-workspace .workspace-pane-actions button:hover { border-color: var(--workspace-accent); }
+.instrument-workspace .workspace-controls button:focus-visible, .instrument-workspace .cambium-title-bar button:focus-visible, .instrument-workspace .workspace-pane-actions button:focus-visible, .instrument-workspace [role=textbox]:focus-visible, .instrument-workspace .frisket-tab:focus-visible {
     outline: 2px solid var(--workspace-focus);
     outline-offset: 2px;
 }
-.instrument-workspace button[aria-pressed=true] {
+.instrument-workspace .workspace-controls button[aria-pressed=true], .instrument-workspace .cambium-title-bar button[aria-pressed=true], .instrument-workspace .workspace-pane-actions button[aria-pressed=true] {
     background: var(--workspace-selected);
     color: var(--workspace-selected-ink);
     border-color: var(--workspace-accent);
 }
-.instrument-workspace button[disabled], .instrument-workspace button[aria-disabled=true] { opacity: .55; }
+.instrument-workspace .workspace-controls button[disabled], .instrument-workspace .cambium-title-bar button[disabled], .instrument-workspace .workspace-pane-actions button[disabled], .instrument-workspace .workspace-controls button[aria-disabled=true], .instrument-workspace .cambium-title-bar button[aria-disabled=true], .instrument-workspace .workspace-pane-actions button[aria-disabled=true] { opacity: .55; }
 .instrument-workspace .primary-button {
     color: var(--workspace-accent-ink);
     background: var(--workspace-accent);
@@ -100,4 +100,4 @@
     .instrument-workspace .cambium-title-bar { flex-wrap: wrap; }
     .instrument-workspace .title-bar-actions { flex-wrap: wrap; }
 }
-@media (pointer: coarse) { .instrument-workspace button { min-height: 44px; } }
+@media (pointer: coarse) { .instrument-workspace .workspace-controls button, .instrument-workspace .cambium-title-bar button, .instrument-workspace .workspace-pane-actions button { min-height: 44px; } }

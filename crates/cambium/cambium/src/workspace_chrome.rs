@@ -11,6 +11,9 @@ use crate::el;
 /// Optional Instrument presentation over the existing workspace, pane, split
 /// and title-bar contracts. Hosts provide Tabard color/font properties and
 /// opt in with `instrument-workspace`; this sheet owns no arrangement or data.
+/// Mark utility-control regions with `workspace-controls`. Title-bar and pane
+/// actions are already admitted regions. Content buttons, including transparent
+/// graph node/relation targets, keep their domain's presentation and geometry.
 /// A font-limited host sets `--workspace-font-interface` to its admitted default
 /// face. It is retained at the end of each family list even when an authored
 /// family is unavailable; the host's existing font engine chooses the face.
