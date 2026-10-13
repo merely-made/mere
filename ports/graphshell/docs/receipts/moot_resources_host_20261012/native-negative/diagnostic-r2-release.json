@@ -1,0 +1,31 @@
+{
+  "kind": "diagnostic",
+  "runs": [
+    {
+      "case": "wide",
+      "command": [
+        "caffeinate",
+        "-di",
+        "/Users/markik/Code/output/moot-resource-host-20261012/moot-resource-host-r2-frozen",
+        "--receipt",
+        "/Users/markik/Code/output/moot-resource-host-20261012/diagnostic-r2/wide",
+        "--size",
+        "1280x920"
+      ],
+      "exit_code": -15,
+      "guard": "finite lease deadline",
+      "sampled": true,
+      "captures": 0
+    }
+  ],
+  "seconds": 45.22,
+  "stopped_at": "2026-10-13T03:18:00.526351+00:00",
+  "binary_sha256": "7f8d580995e28972017e82a4080aff6ee842b1c7af51e08431adb74dcaaf27d9",
+  "resources": "Owned process groups stopped; no server created",
+  "sample_provenance_correction": {
+    "sampled_process": "caffeinate inhibitor PID95686",
+    "owner_app_process": "moot-resource-host-r2-frozen PID95685",
+    "app_stack_captured": false,
+    "scope": "No application-thread state inferred from this sample; runtime phase telemetry remains valid"
+  }
+}

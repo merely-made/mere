@@ -1,0 +1,43 @@
+{
+  "png_sha256": "5c788ec10c02ca1b136a10b2d78c2134eeb27b2cc4f8bc86acc87c9825999b3e",
+  "rgba_sha256": "fd60d90e241565b3d1e8ae6f4b980e754462b32f6761d0073a5ba0f6250bb8c4",
+  "width": 2560,
+  "height": 1840,
+  "rgba_colors": [
+    {
+      "rgba": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "pixels": 4691696
+    },
+    {
+      "rgba": [
+        153,
+        153,
+        153,
+        255
+      ],
+      "pixels": 18704
+    }
+  ],
+  "alpha_counts": {
+    "255": 4710400
+  },
+  "binary_sha256": "a433397a943dce317987a925b2dbd622d9914cddcdaec2e14ebb9d92c7de389d",
+  "pixel_context": {
+    "first_pixel": [
+      0,
+      0,
+      0,
+      255
+    ],
+    "height": 1840,
+    "presentation": "PresentedFrame { host: 1, sequence: 1, width: 2560, height: 1840, layout_scale: 2.0 }",
+    "stage": 0,
+    "unique_colors": 2,
+    "width": 2560
+  }
+}

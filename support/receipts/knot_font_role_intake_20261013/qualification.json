@@ -1,0 +1,105 @@
+{
+  "schema": "mere.knot-font-role-intake/v1",
+  "status": "qualified embedded source and type compatibility",
+  "date": "2026-10-13",
+  "mere_pre_intake": "022b9c18b673bd81e012bcfa23d554807070fca1",
+  "reconciled_mere_origin": "3b76b162b37654ab3981031b82a23c5d5740ed6d",
+  "qualified_consumer_mere": "8568f42fdf57f997274c74e63bd4ee045fe1a2b4",
+  "knot_publication": "8ed49d43f049921d56ab5a0c091a2c37c0970ee7",
+  "woodshed_publication": "39d5e7b5a8d08912bd0f37ef5a17d0bbed27f49a",
+  "source_sha256": {
+    "Cargo.toml": "55ec3ca1cf18611aabb92fe0f185cb369ebc11d43b8e43749e8c2d7f5bda78a2",
+    "Cargo.lock": "1f9130faaa964e8288cda9405b360ccace0067a4c0439f92134a4d14ac0770aa",
+    "ports/djinn/Cargo.toml": "b18627c414fc3c764019b32d49e76f9ccdb41fc82bb869a44418d57505c43f86"
+  },
+  "closure": "closure.json",
+  "checks": {
+    "metadata": {
+      "command": "cargo metadata --locked --offline --format-version 1",
+      "status": "passed",
+      "knot_packages": 6,
+      "external_mere_git_packages": 0,
+      "single_source_per_supplier": true
+    },
+    "djinn": {
+      "command": "TMPDIR=/tmp CARGO_TARGET_DIR=<isolated intake target> cargo check --locked -p djinn --all-targets -j 2",
+      "status": "passed",
+      "log": "djinn-all-targets.log"
+    },
+    "composition": {
+      "command": "TMPDIR=/tmp CARGO_TARGET_DIR=<isolated intake target> cargo test --locked -p knot-composition --test recipes -j 2",
+      "status": "passed",
+      "passed": 21,
+      "failed": 0,
+      "ignored": 0,
+      "log": "composition-recipes.log"
+    }
+  },
+  "consumer_receipts": {
+    "knot": {
+      "canonical": "knot-editor/docs/receipts/2026-10-12_font_roles/README.md",
+      "runtime": "a2128e7d8d7929f5f0df168e2ae033e22f7b38ce",
+      "binary_sha256": "6ab81ede6eaf88f27c2c0b6ba40f0c00ce2faa1cba93d8b9e0e3dfa5eefb5a26",
+      "workspace_tests": 687,
+      "workspace_ignored": 4,
+      "native_processes": 3,
+      "reviewed_captures": 13,
+      "presentations": 259,
+      "runtime_files_checked": 152,
+      "read_only_verifier": "passed",
+      "source_preferences_library_unchanged_on_reopen": true,
+      "transient_dynamics_reopened_cold": true
+    },
+    "woodshed": {
+      "canonical": "woodshed/validation/font-roles_20261012/receipt.json",
+      "compiled_runtime": "a9e1e87556c62bfcd503e429708af68ce62826ba",
+      "scenario_source": "751858f0461b71fe7fa03392b13d65363b9e7ff6",
+      "binary_sha256": "621acbb78f6d97aac1124784a8ec7a55fab10c6562c99477c9c47ae613d93ca3",
+      "cpu_cases": 556,
+      "font_processes": 3,
+      "font_reviewed_captures": 19,
+      "font_presentations": 230,
+      "independent_compression_receipt": "woodshed/validation/compressed-captures_font-family_20261012/receipt.json",
+      "compression_processes": 2,
+      "compression_reviewed_captures": 3,
+      "compression_presentations": 54,
+      "runtime_files_checked": 168,
+      "local_verifier": "passed",
+      "preserved_domain": "Set/Card retained data, clocks, captured PCM and full exported WAV bytes",
+      "view_state_exceptions": [
+        "Settings active after navigation",
+        "ten Mere positions materialized while browsing"
+      ]
+    }
+  },
+  "coordinator_visual_review": {
+    "knot_full_images": 13,
+    "woodshed_full_images": 22
+  },
+  "limits": [
+    "No Mere native process was launched for this embedded intake",
+    "Consumer native source8568 stays distinct from later Mere native unocclusion/viewer/ingress changes",
+    "Knot is family-only; writer face/size/leading/measure remain explicit",
+    "Marked Knot initial activation60 seconds restores normal10 on first presentation; default startup remains unqualified",
+    "Fixed graph/fret geometry, exact face and glyph coverage, physical input, OS accessibility and personal custody retain separate gates",
+    "Inherited supplier golden/table and documentation audit defects are not repaired by this intake"
+  ],
+  "log_sha256": {
+    "djinn-all-targets.log": "3c1b3d489a69e524c71219efec838d0c969034938d6406f29e863dbb136ad4b2",
+    "composition-recipes.log": "03ea801cbd050950d6a5c3d21685566d4c373a699f9de0a0c5d2af13faf7547d",
+    "lock-update.log": "3c4585e41f11cd1ddeb3acd2fbea4c54435f20f7075b6938405a87f9ca63313f",
+    "doc-audit.log": "930a9fd52af0ea0bd45e22f4b4c021cace1db634a6889d8bc55b87648609c2aa",
+    "d2-audit.log": "251d0071b277877c22d843287ab6f625787b37d0eb006feb5a8eac550f0bc8c0"
+  },
+  "documentation": {
+    "navigation_matches_pre_intake_baseline": true,
+    "d2_matches_pre_intake_baseline": true,
+    "known_baseline_errors": [
+      "snapshot aggregate digest mismatch",
+      "three already uncovered producer/classic receipt documents"
+    ],
+    "navigation_log": "doc-audit.log",
+    "d2_log": "d2-audit.log",
+    "scoped_judgment": "support/doc-audit/d2/batch_77_knot_woodshed_font_adoption.md"
+  }
+}

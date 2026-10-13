@@ -1,5 +1,5 @@
 {
-  "status": "r2 runtime classified: successful raster, correct surface Occluded, returned reveal, missing event-driven retry after unavailable",
+  "status": "Bounded startup/native nonblank proof passed in both sizes after typed occlusion diagnosis and explicit root contrast correction",
   "candidate_basis": "8568f42fdf57f997274c74e63bd4ee045fe1a2b4",
   "candidate_binary_sha256": "c57ed12294ed353db99d685a22aa8117ee0310dcd7f5af0a18145ae312237021",
   "source_rows": [
@@ -102,5 +102,12 @@
     "cpu_routing": "PASS 1 actual event routing test, 15.319 seconds, no GPU",
     "independent_review": "No substantive defect",
     "pins_or_acceptance_limits_changed": false
+  },
+  "followup_native_r5": {
+    "source_basis": "add2f408a0d6a632a809717d55fae6a45a627664",
+    "eight_captures_visually_and_numerically_reviewed": true,
+    "presentations_each": 14,
+    "seconds": 26.37,
+    "scope": "Bounded public-memory host proof; not physicalinput/network/persistence/private/activityowner/UIpolish"
   }
 }
