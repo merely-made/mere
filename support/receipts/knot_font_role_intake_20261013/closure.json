@@ -1,0 +1,120 @@
+{
+  "closure": "djinn",
+  "packages": 1498,
+  "knots": [
+    {
+      "name": "knot-capture",
+      "source": "git+https://github.com/merely-made/knot-editor.git?rev=8ed49d43f049921d56ab5a0c091a2c37c0970ee7#8ed49d43f049921d56ab5a0c091a2c37c0970ee7"
+    },
+    {
+      "name": "knot-composition",
+      "source": "git+https://github.com/merely-made/knot-editor.git?rev=8ed49d43f049921d56ab5a0c091a2c37c0970ee7#8ed49d43f049921d56ab5a0c091a2c37c0970ee7"
+    },
+    {
+      "name": "knot-document",
+      "source": "git+https://github.com/merely-made/knot-editor.git?rev=8ed49d43f049921d56ab5a0c091a2c37c0970ee7#8ed49d43f049921d56ab5a0c091a2c37c0970ee7"
+    },
+    {
+      "name": "knot-editor",
+      "source": "git+https://github.com/merely-made/knot-editor.git?rev=8ed49d43f049921d56ab5a0c091a2c37c0970ee7#8ed49d43f049921d56ab5a0c091a2c37c0970ee7"
+    },
+    {
+      "name": "knot-file-catalog",
+      "source": "git+https://github.com/merely-made/knot-editor.git?rev=8ed49d43f049921d56ab5a0c091a2c37c0970ee7#8ed49d43f049921d56ab5a0c091a2c37c0970ee7"
+    },
+    {
+      "name": "knot-site",
+      "source": "git+https://github.com/merely-made/knot-editor.git?rev=8ed49d43f049921d56ab5a0c091a2c37c0970ee7#8ed49d43f049921d56ab5a0c091a2c37c0970ee7"
+    }
+  ],
+  "external_mere": [],
+  "supplier_sources": {
+    "genet": [
+      "git+https://github.com/merely-made/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73bfa44c07744e0643e3c6f98be3cbd7947"
+    ],
+    "netrender": [
+      "git+https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb28090c28b1c6d80b08dcdea18aff48d3e"
+    ],
+    "classic": [
+      "git+https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243881d5b24c984d5ee35dde509ca5db782"
+    ],
+    "dramatis": [
+      "git+https://github.com/merely-made/dramatis.git?rev=0234e7eea6f2ddf2330a71b9425da01b06ae0391#0234e7eea6f2ddf2330a71b9425da01b06ae0391"
+    ]
+  },
+  "shared": {
+    "cambium": [
+      {
+        "source": null,
+        "version": "0.3.3"
+      }
+    ],
+    "cambium-rootstock": [
+      {
+        "source": null,
+        "version": "0.1.0"
+      }
+    ],
+    "cambium-genet-winit-host": [
+      {
+        "source": null,
+        "version": "0.1.0"
+      }
+    ],
+    "knot-editor-host": [
+      {
+        "source": null,
+        "version": "0.1.1"
+      }
+    ],
+    "tabard": [
+      {
+        "source": null,
+        "version": "0.0.1"
+      }
+    ],
+    "tabard-workshop": [],
+    "sceno": [
+      {
+        "source": null,
+        "version": "0.0.4"
+      }
+    ],
+    "scenograph": [
+      {
+        "source": null,
+        "version": "0.0.4"
+      }
+    ],
+    "scenomise": [
+      {
+        "source": null,
+        "version": "0.0.4"
+      }
+    ],
+    "scenotime": [
+      {
+        "source": null,
+        "version": "0.0.4"
+      }
+    ],
+    "graphshell": [
+      {
+        "source": null,
+        "version": "0.0.2"
+      }
+    ],
+    "pandect": [
+      {
+        "source": null,
+        "version": "0.1.1"
+      }
+    ],
+    "muniment": [
+      {
+        "source": null,
+        "version": "0.1.2"
+      }
+    ]
+  }
+}
