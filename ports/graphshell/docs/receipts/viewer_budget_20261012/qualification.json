@@ -1,5 +1,5 @@
 {
-  "status": "All four delivery caps, CPU/feature gates and exact-package browser qualification pass; publication pending",
+  "status": "Published: all four delivery caps, CPU/feature gates and exact-package browser qualification pass",
   "source": "47199232d205576e84c802a84eb0cda401f926e1",
   "runtime_change": "3f57971e010db7bfba65dcaaffccefbc566cbdb2",
   "upstream": "0d1dc1927859ff1aa2a43dd88a04391bc1086fd8",
@@ -15,7 +15,7 @@
   "wasm_gates": "wasm-gates-reconciled/gates.json",
   "feature_boundary": "reconciled-feature-boundary.json",
   "browser_executed": true,
-  "main_landed": false,
+  "main_landed": true,
   "live_site_deployed": false,
   "accepted_browser": {
     "commands": 24,
@@ -36,7 +36,8 @@
     "page_errors": 0,
     "candidate": "browser-candidate-reconciled.json",
     "timings": "reconciled-frame-summary.json",
-    "resource_release": "browser-lease-reconciled.json"
+    "resource_release": "browser-lease-reconciled.json",
+    "timing_note": "Complete live frame windows median16.6\u201316.8ms, p95<=18.1ms, max28.3ms; paused p95<=18.7ms. Rolling arrays are distinct."
   },
   "prior_qualification": {
     "source": "cdba4c96909c05b4a2450d1e204979d0dc3c8d48",
@@ -92,5 +93,6 @@
     "whole_tree_d3": "existing path drift; see reconciled-doc-audit.json",
     "whole_tree_d2": "four existing coverage/snapshot errors; see reconciled-doc-judgment.json"
   },
-  "all_owned_resources_closed": true
+  "all_owned_resources_closed": true,
+  "publication_commit": "425b04ceb"
 }

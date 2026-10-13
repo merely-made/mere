@@ -548,8 +548,15 @@ is clean.
 Final renewal of package `47199232d` passes commands 24, presenter 11,
 physics 17 and browser input 4, plus Unicode and three intentionally failing
 unsupported-product assertions without page errors. These are absence checks,
-not new typed refusal APIs. Fresh 21-node diagnostics have median 16.65–16.8 ms,
-p95 at most 18.1 ms and maximum 18.6 ms; no sustained-performance claim follows.
+not new typed refusal APIs. Complete 21-node live frame windows have median 16.6–16.8 ms,
+p95 at most 18.1 ms and maximum 28.3 ms; paused-window p95 reaches 18.7 ms.
+These full windows differ from the separate rolling 120-sample arrays; no
+sustained-performance claim follows.
 The immutable candidate ledger covers package, served files, drivers and
 auxiliary inputs. Owned runtime was explicitly closed at 07:44:12 UTC on
 13 October. Final source publication remains distinct from site deployment.
+
+Publication is confirmed at `425b04ceb`; the landing adds only receipts/docs
+to the qualified runtime. The frame summary was corrected to distinguish
+complete measured windows from rolling interval arrays. Original receipts
+remain byte-for-byte unchanged. Live-site deployment is not claimed.
