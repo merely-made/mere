@@ -45,6 +45,9 @@ impl WebSurface {
         // Device acquisition cannot be cancelled by removing a DOM node. A
         // late result must be dropped before it can create a detached surface.
         if !canvas.is_connected() {
+            // This freshly acquired core has not been published to any host.
+            // WebGPU handles do not destroy the device merely when dropped.
+            core.device().destroy();
             return Err("the canvas was removed during graphics acquisition".into());
         }
         // The one browser-specific line in the whole presentation path.

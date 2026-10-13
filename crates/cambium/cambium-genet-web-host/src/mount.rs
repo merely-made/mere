@@ -97,6 +97,7 @@ where
     // listeners and the self-retaining frame loop. Dropping Mounted later is
     // deliberately not a disposal API.
     if !canvas.is_connected() {
+        surface.shared_core().device().destroy();
         return Err("the canvas was removed while mounting".into());
     }
     let label = options.title.clone();

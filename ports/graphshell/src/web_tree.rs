@@ -1020,6 +1020,7 @@ pub fn mount_tree(root: Element) -> Result<(), JsValue> {
             // web host drops late graphics acquisition before installing any
             // retained host. Removal is cancellation, not a page error.
             if !root.is_connected() {
+                let _ = root.set_attribute("data-mount-state", "cancelled");
                 return;
             }
             web_sys::console::error_1(&error.clone().into());
