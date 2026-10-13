@@ -1148,3 +1148,58 @@ declared source and occurrence contracts, preserving unsupported-capability
 refusals. This direction adds no universal document representation, renderer
 or script authority. Genet's document behavior, the existing field/editor
 checkpoints and the B1/S2 consumer gates retain their owners and scope.
+
+### 9.17 Instrument workspaces and an app's mere (2026-10-12)
+
+**Mark's direction:** use Instrument as the lead visual study, refine it in
+the real Graphshell/Tabard workspace, and carry useful framing, state and
+typography patterns into the shared stack.
+
+**Entry-scene clarification:** an app opens onto its mere: the retained things
+remain available there. The scene contains data, rather than applications.
+It can be particular to an app or useful across several apps. A document
+graph or force-directed graph is one realization; other scenes must still
+present the retained material they stand for. The entry is a working scene,
+not an additional welcome-screen collection or a new store per application.
+
+Mark's example crosses domains: find a tab in Turnstone, use it in Woodshed,
+combine a Woodshed progression with Knot lyrics, then publish source to a
+Gemini capsule. Identity, retained source and portable domain material make
+those domains strengthen each other. A view change does not duplicate the
+source or grant another application's operations. Existing admitted owner
+offers, live-entity/clip distinctions and opt-in cross-mere ambiance still
+apply; see §9.16 and the [family composition brief §8](2026-08-12_family_composition_thesis_brief.md#8-primary-data-model-clips-and-live-entities-2026-10-11).
+
+Instrument supplies continuous workspace edges, compact utility regions,
+stable pane captions and separate active/selected/unsaved/loading cues.
+Reading and domain content retain their own typography and presentation.
+Tabard supplies configurable appearance; Cambium supplies the presentation
+components; Forme/Frisket retains arrangement; Mere's source/session authority
+retains the material. Shared pane furniture must not become a second data
+model. The existing [mere-view](../crates/cambium/mere-view/src/lib.rs) and
+[Graphshell route adapter](../ports/graphshell/src/mere_route.rs) already expose
+host-fed retained sessions and source keys without owning another store.
+
+The first implementation refines the current Graphshell local-mere view and
+Tabard authoring surface using shared Instrument pane chrome. Cross-domain
+live actions and app-entry bindings require their actual owner/consumer paths;
+the Turnstone/Woodshed/Knot/capsule example is direction, not an executed
+interop receipt. Visual and input qualification remain source-bound.
+
+`ports/graphshell/web/workspace.html` is the local retained-data reference
+entry: it mounts the existing `app=local` graph/session store and existing
+Forme workbench, with Tabard application appearance. The original fixture,
+generated-graph and read-only presenter routes keep their current framing.
+This entry does not establish a new reservoir, identity resolver or live
+cross-app connection; those remain the admitted source/route integrations.
+
+**Bounded pilot qualification (2026-10-13):** the real AMD browser lane covers
+the local entry, unchanged Forme save/reopen scenarios, graph/tiled transitions,
+light and narrow presentation, and command-focus restoration. The native Tabard
+lane covers frame/specimen separation, real mode/edit/undo controls, authored CSS,
+Save/reopen and narrow access. Shared status, stable action focus and admitted
+font fallbacks have portable/CPU checks. Source matrices, captures, failed
+preconditions and explicit runtime releases are preserved in the
+[Instrument qualification](../support/receipts/instrument_workspace_20261012/qualification.json).
+This qualifies the shared frame and these two consumers; cross-app domain
+actions and additional entry bindings still require their own actual receipts.

@@ -149,6 +149,13 @@ the native serving API separately checks held bytes and current authority. Netwo
 serving, live peer revocation, full historical-cut validation and native Turnstone
 mounting remain separate gates. See the
 [handler continuation](../../design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#retention-and-hosting-handlers-2026-10-12).
+Graphshell's opt-in `moot-resources` host binds a mount to an existing verified
+projection session. It rechecks retained session authority and the actual
+resource owners before dispatch, refreshes current owner reads afterward, and
+keeps opened bytes and feedback local to each reading. The separate
+`moot-resource-proof` binary exercises two mounts on the native Cambium host
+using signed, public in-memory fixtures. It installs no activity owner. See
+the [host continuation](../../design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#admitted-graphshell-resource-mount-2026-10-12).
 
 ## License
 

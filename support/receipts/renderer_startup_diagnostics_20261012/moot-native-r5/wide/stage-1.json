@@ -1,0 +1,13 @@
+{
+  "first_pixel": [
+    246,
+    247,
+    248,
+    255
+  ],
+  "height": 1840,
+  "presentation": "PresentedFrame { host: 1, sequence: 5, width: 2560, height: 1840, layout_scale: 2.0 }",
+  "stage": 1,
+  "unique_colors": 1187,
+  "width": 2560
+}

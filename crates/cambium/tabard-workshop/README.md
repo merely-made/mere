@@ -25,6 +25,26 @@ Create `WorkshopState::in_memory()` for a session-only library, or
 Mount `workshop_view` with `workshop_stylesheet()`. The stylesheet composes
 Cambium's shared title-bar, syntax and graph rules with the workshop frame.
 
+The frame uses Cambium's opt-in `INSTRUMENT_CSS` and
+`workspace_pane_header`: continuous pane edges, compact utility controls,
+source/context captions, and separate active, selected, unsaved and loading
+states. The existing split/tab and title-bar components keep their geometry,
+input and window-policy ownership. Hosts mark utility-control regions with `workspace-controls`; title-bar and pane
+actions are already admitted regions. Content buttons, including graph semantic
+hit targets, keep their own presentation and geometry. Theme specimens retain
+their own draft colors and typography.
+
+`workshop_stylesheet()` supplies a neutral built-in light frame through
+Tabard's existing palette derivation. An embedding host can instead use
+`workshop_stylesheet_with_frame(applied_appearance_stylesheet)` to supply its
+applied appearance. The frame is independent of the edited definition; this
+operation neither saves the draft nor applies it to the embedding app.
+Font-limited hosts supply `--workspace-font-interface` with their admitted
+default family. The shared skin retains it after authored family requests;
+it does not assume that a browser host has a system font collection.
+The workshop's `data-theme-definition` remains the actual portable theme ID
+through mode and layout changes.
+
 For a desktop window, `workshop_view_with_captions(state, captions)` accepts
 host-supplied window controls. The default `workshop_view` supplies an empty
 caption slot for embedded panels. The header uses Cambium's `title_bar` and

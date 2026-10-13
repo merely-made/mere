@@ -1,0 +1,7 @@
+{
+  "packages": 1614,
+  "shared_crate_to_port_edges": [],
+  "includes": "Dev and target-specific resolution edges",
+  "command": "cargo metadata --format-version1 --locked --offline",
+  "source_checkpoint": "4cafaf77de1f58f2385e70edd8013574cefcc3ac"
+}

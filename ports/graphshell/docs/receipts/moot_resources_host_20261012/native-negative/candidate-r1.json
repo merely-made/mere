@@ -1,0 +1,26 @@
+{
+  "local_date": "2026-10-12",
+  "basis": "8568f42fdf57f997274c74e63bd4ee045fe1a2b4",
+  "source_sha256": {
+    "Cargo.toml": "f303a24af6a2aa0082a217df6f84bfdaf77d241b41fb3f85c0184cf76241893c",
+    "Cargo.lock": "ac015ad0ea594811fd1f73d655c4d164eeb0831f5247c4311136565b5b6e7d05",
+    "ports/graphshell/Cargo.toml": "943a87ce82d20df8fc493f6be7b1f9d448a50d60eabe4ff5964f30210a1aa629",
+    "ports/graphshell/src/lib.rs": "6e934a2e77e4de919364b263529ee254fc6a8c4874577ce273ec1d29c74ca98b",
+    "ports/graphshell/src/moot_resources.rs": "b3c987f3909ba49e5d6f0bce44d9495e380b07a7dad4e23dec33675b35e4acbb",
+    "ports/graphshell/src/bin/moot_resources_host.rs": "96a6e94d2060b9730c48a19dfc5a28b97d652232277e19c0aded5c2cb8783471",
+    "ports/graphshell/examples/support/moot_resources_fixture.rs": "e40c467e6a936a5d6c1f7dd0adce00c0b4de4b64fd5e645d85b620ff30f98eb9",
+    "ports/moot/src/resource_owner.rs": "cdb7542e00a6c70361c9fc91232de177e4fd1844e5325a1abd0d8ea1735289ab",
+    "ports/moot/src/resource_view.rs": "f13c2792afc3ad8ad4e4c4e8d2f285b09af050046fce45ab5e453bc8796f320b",
+    "crates/cambium/cambium/src/runner.rs": "55ea522284a82c5e46c309f15f268d01959f931c8b1447633129ff5362f36ec4",
+    "crates/cambium/cambium-genet-winit-host/src/lib.rs": "0edc98b2bacbc9800e69c6177eb41eaef54e57c0bf1fa759c2319937e2a303f2"
+  },
+  "binary": "/Users/markik/Code/output/moot-resource-host-20261012/moot-resource-host-frozen",
+  "binary_sha256": "c57ed12294ed353db99d685a22aa8117ee0310dcd7f5af0a18145ae312237021",
+  "binary_bytes": 102871968,
+  "status": "Native wide attempt stopped at lease deadline before any capture; compact not launched; CPU evidence retained",
+  "intended_runtime": "Two fresh-process finite native runs at wide 1280x920 and compact 520x860; four captured owner/authority stages each; at most five minutes total",
+  "limits": [
+    "Public memory fixtures, supplied carrier facts and verified sans-I/O admission",
+    "No live transport, persistent reopen, private content, physical input or app activity owner"
+  ]
+}
