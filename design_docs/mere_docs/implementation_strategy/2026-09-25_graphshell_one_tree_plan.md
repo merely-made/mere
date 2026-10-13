@@ -1,7 +1,7 @@
 # Graphshell on one Cambium tree
 
 **Date:** 2026-09-25
-**Status (2026-10-10):** in progress. The combined viewer qualified at `8b8bd92b1`
+**Status (2026-10-12):** in progress. The combined viewer qualified at `8b8bd92b1`
 integrates published Mere `0a3203f05`, Genet `7422e906`, maintained Vello
 `10f01d6d`, and the committed site cutover `bf626abd2`. Phases 1–2 are landed; phase 3 has its recorded headed producer
 receipts and Mark's approval to proceed. Phase 4 remains unfinished: canvas
@@ -39,7 +39,7 @@ the headed receipts retain their exact `8b8bd92b1` source and tested bundle.
 The post-Dramatis bundle is compile-checked, with no new GPU run after slot
 release.
 
-**Coordinated retained cutover (2026-10-10):** the local five-page tree
+**Historical coordinated retained checkpoint (2026-10-10):** the local five-page tree
 cutover is being reconciled with exact upstream `b726955ed`. Shared Fold,
 history, gestures and Forme remain part of the combined page. Existing upstream
 receipts below qualify their recorded sources, not this merge. The frozen local
@@ -53,6 +53,17 @@ scenarios: 139 source scripts, provisionally 137 live and two historical present
 comparisons. New dynamics and Forme DOM syntax is mapped to retained controls
 with original source hashes and per-line custody. These counts and translations
 are preparation, not a fresh parser, build or headed qualification result.
+
+**First site presenter (2026-10-12):** the stable-face adjacent inspector,
+Fold-preserved selection and direct graph commands/gestures are hardware-qualified
+at `a1cb156f8`, with all nineteen combined product rows passing. Shared-main
+publication landed at `007a4de6b`; live-site delivery and complete phase 4
+remain open. The detailed source bases are below.
+
+**Current reconciliation (2026-10-13):** both recorded source histories are
+preserved in the merge of the local retained-owner work with `a454842ff`.
+The counts and receipts above describe their original checkpoints. Fresh
+current-source build and headed qualification remain pending for this union.
 **Scope:** Graphshell's browser page becomes one retained Cambium tree. Its
 HTML controls become Cambium components, its display-only Cambium chrome
 joins them, pictograph's canvas renders into the tree as a texture producer,
@@ -709,7 +720,7 @@ and keyboard activation and a 420px viewport reach the new controls.
 Tab skips the disabled action, reaches it after selection, and graph input
 transfers DOM focus into the graph before traversal returns to the controls.
 
-### Graph gestures and contextual commands (2026-10-10, planned)
+### Graph gestures and contextual commands (2026-10-10; implementation started 2026-10-11)
 
 After reviewing the combined viewer captures, Mark asked for most controls to
 be integrated into graph interaction: drag the background to pan, use the
@@ -718,7 +729,7 @@ central to detail, context and rendering in this view; document-style wheel
 panning is not its useful default. Other actions can be graph affordances or
 commands through the context menu with the palette's search field.
 
-**Current findings:** background left-drag already pans in Pictograph
+**Baseline findings (before this continuation):** background left-drag already pans in Pictograph
 (`crates/canvas/pictograph/src/canvas/input.rs`, SE23–24 in the
 [Scenograph editor plan](2026-10-07_scenograph_editor_plan.md#13-the-canvas-and-command-rulings-2026-10-07)).
 The viewer's `canvas_gestures.rs` and `web_tree/gestures.rs` deliberately pass
@@ -758,6 +769,443 @@ narrow captures show readable graph content. Remove redundant always-visible
 navigation buttons only after those routes provide equivalent access; the
 existing toolbar remains until this target passes.
 
+**Implementation scope (2026-10-11):** Mark authorized continuing after an
+upstream refresh. Work starts from published `f8d8c1a79`, preserving the new
+Forme draft and access/link inspection adapters. This slice carries the
+viewer-supported camera, wheel preference and fold/evidence commands through
+Cambium's command model and retained text/button components. It does not
+implement new lens providers, field editors or scene materialization. CPU and
+Wasm checks precede a coordinated GPU/browser handoff; redundant toolbar
+navigation is removed only after command/gesture parity is demonstrated.
+The continuation subsequently integrates published main through `e99add004`,
+including Fleece/Eidetic, the current Dramatis lockstep and the exact field
+inspector. The inspector's pointer and Escape handlers remain in their owner
+module; this command slice does not replace its inspection contract.
+The capture bridge also reconciles a completed rectangle selection with the
+retained selection/detail state. Ordinary header space passes wheel events to
+the embedding page; actual tools, relation lists and the command menu keep
+their own scrolling.
+
+**Validation at `685d33567` (before the presenter review sync):** the focused command, gesture, canvas-control and host
+dataset CPU suites pass (32 tests); the locked/offline viewer build and the
+main-page/applets Wasm check pass. The source-bound browser candidate is
+prepared under `Code/output/graphshell-viewer-commands-20261011/`. No new
+headed, GPU or visual acceptance is claimed. Toolbar navigation remains
+present while the serialized browser handoff is pending. The read-only viewer
+keeps menu choices only for its mounted lifetime; saved-product command-view
+persistence remains a migration target under SE31, not a new storage lane.
+
+### Presenter flow review (2026-10-11)
+
+**Status:** source-backed review authorized by Mark after the command candidate.
+Review basis: published `ec1e65cae`, combined with that candidate at `2bb2e7d72`.
+The flow and first-consumer recommendation below are proposals for implementation,
+not additional design rulings or a runtime receipt. The shared
+[design language](../../2026-08-23_projection_scenes_and_graph_native_platform.md#9-configurable-visual-and-interaction-language-2026-10-09)
+owns the established selection, retention and presentation semantics. The
+[editor plan](2026-10-07_scenograph_editor_plan.md#r1--presentation-rules-and-the-first-aesthetic-study-2026-10-09)
+owns R1 and its authoring/runtime qualification; the
+[ambiance proposal](../design/2026-09-23_ambiance_design.md#10-proposal-focus-driven-relation-lenses-2026-10-07)
+owns the context-lens continuation. This review connects those contracts to
+the site consumer without reallocating their owners.
+
+**Findings.** Upstream has advanced beyond the earlier study-only assessment.
+The [presentation editor](../../../ports/graphshell/src/presentation_editor.rs)
+now has saved rule drafts and history. Its
+[exact-occurrence binder](../../../ports/graphshell/src/presentation_binding.rs)
+reads held access, assertion, Numen and Forme owners; changing selection does
+not silently retarget an explicitly bound preview. The retained
+[product adapter](../../../ports/graphshell/src/web_tree/presentation.rs)
+can opt into acknowledged saved rules and apply `RegionGuides` to one exact
+Forme before canvas composition. Unsupported winning effects remain explained
+decisions; a private draft does not affect the canvas. These are implemented
+drafts with their own CPU/Wasm evidence and pending headed/native gates, not
+complete production presentation or site adoption.
+
+Four concrete gaps shape the next consumer:
+
+- The read-only hosted viewer does not mount that product-only adapter. Its
+  facts come from `HostDatasetV1`; it needs a disclosure adapter, not a product
+  store or synthetic held assertions. Keep source binding, disclosed occurrence
+  ID, relationship witnesses and revision together; Canvas node keys and the
+  generated `urn:host-dataset:` address are transport handles, not new authority.
+- The Canvas [representation branch](../../../crates/canvas/pictograph/src/canvas/frame.rs)
+  currently changes face classes within the same measured footprint. `LivePane`
+  there is a framed face request, not embedded interactive document content.
+  R1's `Representation` and `Details` effects precede measurement; automatic
+  representation/footprint adaptation is still an integration target.
+- The product preview measures the smaller dimension of `node_body_rect`, an
+  actual hit-test body that can shrink under occlusion. Bound previews start
+  with an empty prior-match set. That is disclosed preview input, not a stable
+  automatic LOD contract or per-occurrence live hysteresis implementation.
+- [Fold application](../../../ports/graphshell/src/host_dataset_view.rs) remembers
+  positions and the viewport, pauses physics, replaces the visible graph, and
+  restores one focused URL. It does not preserve the complete selected comparison
+  set across the swap. Hidden comparison subjects therefore need explicit
+  occurrence-based view state and a policy separate from current Canvas focus.
+
+**Ownership and composition.** Keep the one-tree architecture. The host supplies
+disclosed data, capability grants, lifetime and source/view persistence. Scene
+compilation and R1 resolve occurrence presentation; measurement/placement and
+Pictograph supply geometry, dynamics, picking and the graph scene. Cambium owns
+retained controls, focus, input routing and accessibility; its host and
+Genet/Netrender composite and present the content. One retained tree can contain
+several render surfaces. A future live document face keeps its engine/session
+owner and needs explicit nested focus, clipping, input, suspension and capture
+contracts. Opening a live access, rendering a captured clip and showing a face
+remain separate capabilities. This review adds no universal presenter crate or
+second workbench/session owner.
+
+The host also needs a caption, viewport and chrome-composition contract: the
+reference page's fixture heading/status and full tool inventory should not
+become mandatory site chrome. Keep the command entry discoverable, with
+contextual inspection and deeper tools reachable on demand. A recorded
+[product inspector capture](../../../ports/graphshell/docs/receipts/forme_feedback_field_browser_20261011/chrome/final/p4_tree_field_inspection/exact_scalar_coupling.png)
+was visually reviewed here: its useful exact-owner evidence is dominated by
+raw UUID/JSON rows and navigation controls. This is existing upstream evidence
+at its receipt's source, not a capture of the combined command candidate.
+The proposed site inspector should lead with project name, summary and
+relationship/coverage explanation, then expose exact IDs and source witnesses
+through a reachable detail surface. Preserve that evidence while improving
+the reading hierarchy; no automatic inspector should obscure the initial view.
+
+**Candidate site flow.** Use a real disclosed repository/member-crate scene.
+Labels, coverage and relationship evidence remain reachable in a list or table.
+Keep mouse, keyboard, command and accessible routes equivalent.
+
+| Transition | Presentation result to implement | Invariants / current gap |
+| --- | --- | --- |
+| Frozen view → interaction | Load the bounded viewer on use; retain the frozen reading on refusal or unsupported WebGPU. | Site R157's first-load and asset caps remain. No eager product cone or promised live document face. |
+| Select project A | Mark A and show supported attributes/actions in an adjacent inspector. Enabled lenses disclose context with subject and source reasons. | Selection, inspection and opening are separate. Lens discovery is not yet implemented by this command candidate. |
+| Add project B | Present the union once per disclosed semantic identity, retaining both reasons; offer explained shared/different readings only within known coverage. | Retain an occurrence-based comparison set independently of the single inspector and keyboard focus. Equal names do not merge packages or independent accesses. |
+| Inspect a contextual item or edge | Explain the exact occurrence or contributing relationship without changing comparison roots. | Explore from here is explicit. Unsupported/absent evidence remains visible as such. |
+| Zoom | Change camera scale and a supported face's detail, preserving subjects, lens scope, source identity and placement. | Decide a stable logical-pixel reference measurement and hold prior rule matches per view/occurrence; zoom does not silently fetch a wider graph. |
+| Expand / enter / return | Use portable Folds and keep the viewport and surviving coordinates. | Preserve the comparison set through hidden/visible occurrences; move or return inspector focus deliberately if its target disappears. |
+| Deselect A | Remove A's active lens reasons; previously interacted-with A recedes into retained background until dismissed. | Retain context still justified by B or explicit view retention. Do not erase authored edits or equate view retention with durable keeping. |
+| Open | Invoke the host's disclosed operation, such as opening the project's article. | Do not create a second document session or infer permission from a representation rule. |
+
+The adjacent inspector is the recommended first site treatment, keeping the
+selected graph face's footprint stable while the richer measurement adapter is
+developed. It is a bounded starting treatment, not a restriction on R1's cards,
+thumbnails, nested scenes or live panes. Theme/typography values remain with
+Tabard; source data remains with the site exporter.
+
+**Options assessed.** Finishing gestures alone improves navigation but leaves
+selection/context/representation transitions unspecified. A new universal
+presenter would overlap the existing scene, UI and document owners before a
+forcing consumer proves its API. The recommended path is a bounded host-dataset
+adapter to the existing rule model, with explicit supported effects and a
+single end-to-end flow. Its costs are occurrence-state reconciliation, geometry
+invalidation and additional acceptance; its advantage is exercising the shared
+model within the viewer's delivery boundary.
+
+**Feature targets and acceptance.** Complete the review before toolbar removal;
+then qualify independently useful command/gesture work on its actual source.
+For the next presentation implementation:
+
+1. **Disclosed occurrence state:** bind real host-dataset facts, distinguish
+   unavailable from known false, reconcile selection/inspection through Fold
+   and checkpoint changes, and reject stale results from an old binding/revision.
+   Test two selected projects, one hidden subject, one departed occurrence and
+   two distinct accesses to one Resource. Record the state lifetime/save policy;
+   no second storage path is implied by this review.
+2. **Supported presentation:** apply the existing resolver before measurement;
+   expose matched/overridden rules and unsupported winning effects. Test a
+   supported paint-only effect separately from footprint changes. Establish a
+   stable reference-size input whose own representation change cannot oscillate
+   the condition; exercise enter/hold/exit thresholds, missing measurements,
+   occlusion and independent matches for two occurrences of the same source.
+3. **Coherent realization:** painting, picking, command targets and accessible
+   boxes use the same occurrence geometry and update generation. Preserve authored
+   placement, pins, viewport, source facts and document sessions; disclose
+   incompatible constraints. Keep camera fit, restore arrangement, reset,
+   foreground retention, position pins and layout locks distinct actions.
+4. **Host and delivery proof:** review wide/narrow and reduced-motion captures,
+   keyboard/search/focus return, the equivalent list and frozen fallback. Before
+   performance acceptance, name the actual graph, motion state, source and
+   supplier revisions, logical/physical dimensions, DPR, adapter and machine
+   load. Measure composition/raster, measurement, physics and frame pacing
+   separately; a small fixture or old debug median does not qualify Cargo scale.
+
+Headed/GPU/native checks require the coordinated validation slot. The existing
+command bundle's hashes and earlier receipts keep their original basis after
+this upstream sync; fresh CPU/Wasm integration checks do not renew their visual
+qualification. Scene-rule adoption, the site's live cutover and full phase 4
+remain separately open.
+
+**Review integration checks:** at `2bb2e7d72`, the 32 command/gesture/control/host
+tests and 16 presentation-binding/editor tests pass (48 total). Locked/offline
+Wasm checks pass for viewer, product/applets and main-page/applets. The merge
+retains Forme drop feedback, exact inspector handlers and all three text-focus
+routes (commands, presentation editor and product). These are compile/model
+checks, not a new bundle or headed acceptance. The review and browser inventory
+are recorded under `Code/output/graphshell-presenter-review-20261011/`; the
+complete citation audit is unchanged, and D2 retains its two pre-existing
+baseline errors. No fresh GPU/browser/native-host run was performed.
+
+### First site presenter (2026-10-11)
+
+**Status:** implementation in progress, authorized by Mark: "stable project
+faces, an adjacent inspector, and selection preserved through folds. Coordinate
+the browser checks, then land it when those pass." The review's broader
+automatic LOD, live content and context-lens targets remain later work. This
+slice is a read-only host-dataset viewer treatment, not the complete live-site
+sandbox retirement or phase-4 page migration.
+
+The `inspector` presentation profile is selected by `data-presenter` or the
+`presenter` query option. A host supplies its caption, summary field and link
+field roles. The plain `viewer.html` consumes the actual current exported site dataset
+with that profile and links to a separately retained historical capture. The reference fixture/product routes retain their existing
+chrome and owners. In this profile the graph keeps its faces and footprint;
+Cambium mounts the inspector beside it, or stacks a scrollable inspector under
+the graph at narrow widths. Commands, fit and deeper tools remain reachable;
+Fold controls and the equivalent project list are disclosed in the inspector.
+The initial view has no selected project or automatic detail popup.
+
+The [host presenter model](../../../ports/graphshell/src/host_presenter.rs)
+reads validated disclosure occurrences, scalar values and relationship witnesses.
+Its selection is keyed by occurrence ID within one source binding, independent
+of visible Canvas members. A Fold projection changes that visible subset;
+hidden selected subjects remain named and removable in the inspector, and regain
+their Canvas selection on return. Inspecting another subject does not replace
+the comparison set. Explicit clear removes the complete view selection. A
+checkpoint preserves surviving IDs; a departed occurrence is removed from this
+view with a notice. A different authority is refused before model mutation.
+These choices last for the mount only; there is no new storage mechanism or
+claim that a view selection performs durable keeping.
+
+The first R1 adapter supplies exact scalar facts and known Selected/Inspected
+state to an adjacent-details rule. It introduces no automatic screen-size,
+foreground-pin or representation change. Unsupported navigation remains text;
+only disclosed HTTP(S) addresses without credentials become navigation actions.
+The inspector leads with the label, summary and disclosed relationship scope;
+exact IDs, scalar fields and full witness provenance remain under source details.
+Equal labels or shared sources do not merge occurrences; duplicate labels are
+disambiguated in selection controls. The existing Fold adapter also preserves
+every surviving visible selected member instead of just one focused URL.
+
+**Done when:** CPU tests cover hidden/returning subjects, multiple visible
+selections through the real Fold adapter, shared-source occurrences, explicit
+departure/authority refusal, source immutability and navigation refusal. The
+locked viewer and product gates pass. On the assigned hardware browser, run
+`hosted_presenter.scn`, `hosted_presenter_history.scn` and the command/gesture
+regressions, including real pointer and keyboard input, accessible selection
+and inspector controls, wide/narrow captures, page/inspector scrolling and a
+planted selection-loss control. Check the actual site disclosure, a fresh
+mount's empty selection, link activation and clean unknown-profile refusal.
+Keep source/bundle hashes and update the final acceptance before direct main
+integration. The source owner coordinates the finite browser slot with the
+renderer lane; no concurrent headed/GPU launch is implied by this plan.
+
+**Candidate checks:** 54 focused CPU tests pass, including five new presenter
+cases and the real Fold multi-selection regression. Locked/offline viewer and
+product/applets debug builds and the main-page/applets Wasm check pass. Related
+inspection preserves comparison subjects; removing a selection returns focus
+through the retained graph route. The two packages and prepared browser drivers
+live under `Code/output/graphshell-site-presenter-20261011/`. They are candidates,
+not headed acceptance. The citation audit passes; existing D2 digest/receipt
+coverage gaps are retained separately. Main landing waits for the source-bound
+browser run and capture review.
+
+**Qualification continuation (2026-10-12):** the candidate at `41a064ea0`
+remains old-pin/unqualified. The renderer coordinator requires the final
+coherent Genet/Netrender/provider/Fleece/Knot/Mere family before browser
+acceptance; interim supplier heads are not that basis. Merge its published
+Mere revision, renew the affected gates and packages, and take only its explicit
+finite runtime release. At that old-pin qualification stage no headed/GPU launch had occurred.
+The dev package's function-name custom section was removed with
+`wasm-bindgen --remove-name-section`; all other Wasm sections are byte-identical,
+reducing viewer transfer from 344.7 MB to 43.6 MB for the dev checks.
+
+The old-pin release size gate also exposes an inherited delivery gap. With
+P0's `s`/thin-LTO/symbol-strip/one-codegen-unit settings, published `04a48c2d6`
+is 6,186,727 B gzip and this presenter/command continuation is 6,271,451 B
+(+84,724 B). Both exceed R157's 3.25 MiB viewer cap. Glue, mount and history
+fit their individual caps. These are source-bound measurements in
+`baseline-size-comparison.json` and `release-size.json` under the candidate
+output, not current-coherent-family or live-site delivery qualification. Keep
+the cap unchanged: shared presenter integration after browser acceptance does
+not authorize deploying an oversized viewer or retiring the site's fallback.
+
+**Published-source reconciliation (2026-10-12):** `f39f6ab0b` combines this
+presenter with published Mere `d46b0f5ca`, preserving the coupling editor,
+node-presentation ladder and their inspector/text-input focus owners. All 67
+focused CPU tests pass (the previous 54 plus eight node-presentation and five
+coupling-edit cases); locked/offline viewer and product/applets debug builds
+and the main-page/applets Wasm check pass on this combined source. The finite
+browser batch also includes both new owners' saved-state reopen scenarios in
+fresh, separate profiles. This remains an old-pin build candidate awaiting the
+renderer coordinator's coherent family and explicit runtime release; no headed
+acceptance or main landing is implied. The combined-source records are
+`merged-source-cpu/gates.json`, `merged-source-wasm/gates.json` and the updated
+`candidate.json` in the existing output directory. The earlier release-size
+measurements remain bound to their recorded source commits.
+
+**Final supplier rebuild (2026-10-12):** published Mere `631355a2f` is
+integrated at compiled source `91f46146d`, with Genet `2c7ef73b`, Netrender
+`c74b7cb2`, provider `2eae6243` and Knot `3af93add`. All 67 focused CPU tests,
+viewer/product debug builds and main-page checking pass again; locked metadata
+in both consumer roots contains only the expected supplier revisions. The
+[source-bound candidate receipt](../../../ports/graphshell/docs/receipts/host_presenter_20261012/qualification.json)
+records that source/package basis with false browser/GPU/visual/main flags;
+those historical flags do not describe the later partial runs below.
+The renderer explicitly offered and this lane accepted a finite Chrome window
+of up to 30 minutes after rebuilding and confirming an unlocked console.
+At that rebuild checkpoint `CGSSessionScreenIsLocked` reported true, so the
+browser window remained unused and Tabard typography remained queued. Each prepared driver
+checks console unlock before Chromium launch; main integration still requires
+the browser checks and capture review. No toolbar/parity acceptance is inferred
+from compilation.
+
+The release viewer on this final family measures 6,378,552 B gzip against
+R157's unchanged 3,407,872 B cap. Glue (18,730 B), mount (588 B) and history
+(6,254 B) fit their respective gzip limits. Live-site delivery remains gated
+independently. The citation/source audit passes. D2 initially had seven
+findings; the renderer owner reconciled its three new document records at
+`e0dae9c9`, a documentation-only descendant integrated here with all recorded
+source and lockfile byte hashes unchanged. Four older D2 findings remain, and
+this plan's incremental record remains present.
+
+
+**Hardware continuation and current disclosure (2026-10-12):** the first
+complete presenter batch, `presenter-browser-r8`, ran headed Chrome on the
+AMD `gcn-5` adapter with compiled source `4a090af1a`. All eleven cases passed:
+Fold and checkpoint selection, keyboard and narrow inspector access, independent
+related inspection, clear/focus return, the planted selection-loss control,
+unknown-profile refusal, omission of undisclosed historical links, and actual
+Enter activation of a current disclosed project URL. Wide and plain-page
+captures were inspected. This is earlier-source presenter proof, not final
+combined command/product acceptance or main landing.
+
+The exact public site's current `scenomise.host-dataset/v1` export is now a
+separate 66,623-byte fixture, SHA-256 `69b322357acaa034c47887cbce560815f089a63304582fd8fd803c5145cb3380`,
+with 22 repositories and authority-authored summaries, relationship scope and
+project/GitHub URLs. The old thin history stays unchanged and exposes no
+invented links. The inspector's supported named region and placement of subject
+details before the expanded roster were corrected during browser review.
+
+The physical command batch found three real input seams: DOM wheel direction
+needed translation into the native canvas convention; DOM F10 needed its named
+key mapping; and removing a focused accessibility proxy needed to retain page
+focus ownership before mutation. These repairs are `659274653`, `aae20fb9f`
+and `7cd9a985e`. The last headed attempt confirmed that physical Shift+F10
+reaches the graph and opens command search after dismissal; the full batch
+still awaited completion after fixing an asynchronous harness wait. A later
+console lock stopped the guard before Chrome launch. That finite runtime slot
+was released, with no owned browser/GPU/server left running.
+
+Current source `8ad44a5c7` integrates main `050e7d542`, including the typography
+and native-recovery owners' publications. All 68 focused CPU tests, viewer/product debug builds and main-page checking
+pass on that combined source. Its renewed packages and release measurement
+remain separate from browser acceptance while the human unlock is pending.
+The final command/gesture and fresh-profile saved-product matrix, a renewed
+presenter batch on the final combined package, and visual review remain the
+main-landing gates. Earlier-source browser records retain their own hashes;
+no acceptance is transferred from the other owners' native receipts. The release measurement on `8ad44a5c7` is 6,398,022 B gzip against the
+unchanged 3,407,872 B cap. Glue (18,728 B), mount (588 B) and history
+(6,254 B) pass their individual caps. This records the existing live-delivery
+gate separately from shared presenter landing. The browser slot is released
+while the console remains locked; no owned browser, server, build or inhibitor
+is left running. The feature branch is reviewable; main integration awaits
+the remaining hardware checks.
+
+
+**Field-runtime main reconciliation (2026-10-12 evening):** Mark authorized
+push/merge after the state overview. Published Mere `8568f42fd` adds F203–F205
+field clocks, extent/selector membership and actor delivery. It merges cleanly
+at `abaed67c1`, preserving the presenter, Fold, wheel and accessibility repairs.
+The renewed batch covers the 68 focused Graphshell cases plus four actual
+Canvas field-runtime integration cases, then viewer/product debug builds and
+main-page checking. All 72 CPU cases and three Wasm gates pass on this combined source; both
+fresh debug packages are ready. The earlier source-bound runtime results remain
+unchanged. The console is now unlocked and the lane has requested a fresh
+serialized browser window; final physical browser checks remain unexecuted. Main landing keeps the requested
+browser acceptance condition. The last release-size measurement remains bound
+to `8ad44a5c7`; it is not transferred to the new field-runtime source.
+
+
+**Renewed presenter and command acceptance (2026-10-12 evening):** the finite
+hardware window ran on compiled `77374c788`, with current main `8568f42fd`
+and the coordinated supplier family unchanged. The command footer exposed a
+real browser-mirror naming defect: options supplied their names as parent text
+beside the same child text. `1fc5f9bc1` names the option and its disabled reason;
+`77374c788` lowers `ListBoxOption` names through `aria-label`. A real retained-DOM
+regression verifies exact name, description/disabled state, no duplicated parent
+text and preserved child/source structure. Eleven mirror CPU tests and all
+three Wasm gates pass. The earlier 72 model/Canvas tests retain their
+`abaed67c1` basis; their directly covered source is unchanged by these two
+accessibility-only repairs (83 CPU cases across the recorded inputs).
+
+Same-bundle `commands-browser-r10` passes fixture/grouped commands and Fold
+page/history checks. `commands-browser-r12` completes the physical/embedding
+batch on AMD `gcn-5`, with zero page errors: actual Ctrl+K/Shift+F10 and footer
+keys; external page focus preservation; right click/right-box selection;
+background pan; pointer-anchored wheel zoom; node drag; precise workspace Fold
+commands; kept-command and narrow-popup access; real zoom/page/outside scrolling;
+Chrome's exact option name, disabled reason and state; unknown-wheel refusal;
+and the expected planted wheel-control failure. Earlier failures are retained.
+The harness used quiescence `wait` where it needed a fixed physical observation
+window; `settle 180` corrects that timing. Its shortened Enter query selected the
+outer mere Fold; the restored exact inner workspace target keeps the original
+nine-node assertion. Neither correction lowers an assertion or changes source.
+
+`presenter-browser-r9` renews all eleven presenter cases on the same frozen
+source/package, with zero page errors. Reviewed final captures cover the plain
+22-project page, wide/narrow inspector, independent related inspection and
+wide/narrow command menus. The window was released before its 01:29:35 UTC
+limit with no owned browser/GPU/server/build/inhibitor left active. The remaining
+hardware gate is the nineteen-scenario saved-product/fresh-profile same-origin
+matrix, queued for a separate explicitly coordinated window. Main landing
+remains pending that gate. R157's unchanged delivery cap independently blocks
+live-site cutover; the latest recorded release measurement remains tied to
+`8ad44a5c7`, rather than being transferred to this source. The runtime coordinator
+confirmed this shared-main versus live-delivery distinction.
+
+**Final presenter qualification and retired-hover repair (2026-10-12):**
+compiled `a1cb156f8` combines current main `8568f42fd` with the shared browser
+name/focus repairs and a narrow Rootstock lifecycle correction. The product
+run exposed a cached hover target retired by a Forme subtree replacement.
+The complete primary stack is pointer movement → hover dispatch → local
+coordinates → Genet lookup of the retired node; subsequent frame borrow
+errors are a cascade after the Wasm abort. This is reproduced by the CPU
+regression before the fix. Leave/Enter dispatch now rejects retired targets
+before coordinate lookup, including a target retired by the preceding Leave
+handler. Genet's strict lookup remains unchanged. Four lifecycle cases pass,
+including Move replacing its own subtree; the test-only descendant is
+`a4f09a372`. Two host accessibility/focus tests and all three Wasm gates pass
+on the repaired runtime. Together with the earlier unchanged model/Canvas and
+mirror bases, 89 CPU cases pass across the explicitly recorded sources; this
+is not one newly executed full suite on HEAD.
+
+The final frozen viewer passes all eleven `presenter-browser-r10` cases and
+all 24 command/scenario/setup/physical/embedding rows in
+`commands-browser-r13`, including the expected planted faults. Both run headed
+Chrome 152 on AMD `gcn-5`, with zero page errors. The original nineteen-row
+product matrix also passes, recorded by `product-matrix.json`: twelve rows in
+r6, dynamics and coupling pairs in r7, the ladder pair in r8, and the actual
+Title-focus Ctrl+K/Escape case in r10. Each logical pair uses a fresh profile;
+the Forme four-row sequence and each reopen pair retain their own origin.
+All accepted runs have zero page errors. Original scenario assertions remain
+unchanged. Failed setup receipts are kept: the dynamics overlay requires its
+accepted 615×608 viewport; the ladder requires actual Play activation before
+its original Pause step on the intentionally paused seed; and the custom
+shortcut check now compares the real mirrored Title values across physical
+keys, rather than an unavailable cross-run scenario checkpoint or native-input
+API. Exact source/package/driver hashes bind each continuation.
+
+Reviewed captures show the plain 22-project page, wide/narrow inspector,
+independent related inspection, menus and product reading/editing controls.
+The existing small graph glyphs stay stable; this bounded presenter does not
+claim final overview typography, automatic LOD or large-graph performance.
+The source-bound receipt now qualifies shared-main publication. All owned
+Chrome, HTTP and inhibitor resources were closed and explicitly released at
+02:37:55 UTC, before the agreed 02:42:45 UTC cutoff. Shared main publication is confirmed at `007a4de6b`. The final merge of
+upstream `abc8e5ad5` changes only documentation; all recorded runtime source,
+manifest and lockfile byte hashes remain identical to the qualified basis. Live-site deployment, R157's unchanged size cap,
+native/touch qualification and complete one-tree phase 4 remain separate.
+The latest release measurement stays bound to `8ad44a5c7`; no new release size
+is inferred from these debug packages.
+
 ## 5. Stop rules
 
 - Nothing a screen reader reaches today is lost: a control moves only once
@@ -767,6 +1215,17 @@ existing toolbar remains until this target passes.
 - No Graphshell-only UI pieces. What Cambium lacks is added to Cambium.
 
 ## 6. Progress
+
+- **2026-10-12 — first site presenter and direct controls landed:** shared main
+  and `codex/nested-graph-view` both confirm `007a4de6b`, containing the final
+  presenter, command/accessibility/input repairs, retired-hover fix and full
+  qualification evidence. Runtime acceptance is source-bound to `a1cb156f8`;
+  the later test-only and documentation descendants change no runtime inputs.
+  All nineteen product rows, eleven presenter cases and the full command pass
+  are accepted, with preserved failed setups and expected planted controls.
+  The [landing receipt](../../../ports/graphshell/docs/receipts/host_presenter_20261012/landing.json)
+  records exact remote refs. No live-site deployment, full phase 4 completion
+  or release-size improvement is claimed.
 
 - **2026-10-10 — concurrent Dramatis publication combined before main push:**
   the qualified branch push succeeded, while main correctly rejected a stale

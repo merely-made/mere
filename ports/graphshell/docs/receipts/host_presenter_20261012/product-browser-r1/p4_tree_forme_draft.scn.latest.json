@@ -1,0 +1,88 @@
+{
+  "receipt": {
+    "state": "fail",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        1140,
+        865
+      ],
+      "canvas_physical_size": [
+        1140,
+        865
+      ],
+      "log": [
+        "FAIL: assert snap forme-accesses Eq '2': got '0'",
+        "FAIL: target has no active tile region",
+        "FAIL: assert snap forme-preview Eq 'true': got 'false'",
+        "FAIL: assert snap forme-drop-effect Eq 'Stack as tabs': got 'none'",
+        "captured forme_handle_preview",
+        "FAIL: target has no active tile region",
+        "FAIL: assert snap forme-drop-effect Eq 'Stack as tabs': got 'none'",
+        "FAIL: target has no active tile region",
+        "FAIL: target has no active tile region",
+        "FAIL: assert snap forme-cells Eq '1': got '0'",
+        "FAIL: assert snap forme-dirty Eq 'true': got 'false'",
+        "FAIL: assert snap forme-cells Eq '1': got '0'",
+        "FAIL: target has no active tile region",
+        "FAIL: assert snap forme-preview Eq 'true': got 'false'",
+        "FAIL: assert snap forme-drop-effect Eq 'Split below': got 'none'",
+        "FAIL: assert snap forme-accesses Eq '3': got '0'",
+        "captured forme_split_preview",
+        "FAIL: assert snap forme-dirty Eq 'true': got 'false'",
+        "FAIL: assert snap forme-accesses Eq '3': got '0'",
+        "FAIL: assert snap forme-accesses Eq '2': got '0'",
+        "FAIL: target has no active tile region",
+        "waited 55 frames",
+        "FAIL: assert snap forme-cells Eq '1': got '0'",
+        "captured forme_draft_applied",
+        "waited 0 frames",
+        "FAIL: assert snap forme-can-redo Eq 'true': got 'false'",
+        "waited 0 frames",
+        "FAIL: assert snap forme-cells Eq '1': got '0'",
+        "waited 0 frames",
+        "Forme handle preview draft undo redo discard membership and saved undo complete",
+        "release-step spring.rapier NaN px after 3 steps (NaN px from the press point, zoom 1.00)",
+        "release-step spring.rapier 0.0 px after 3 steps (NaN px from the press point, zoom 1.00)",
+        "release-step spring.rapier 0.0 px after 3 steps (NaN px from the press point, zoom 1.00)",
+        "release-step spring.rapier 0.0 px after 3 steps (NaN px from the press point, zoom 1.00)",
+        "release-step spring.rapier 0.0 px after 2 steps (NaN px from the press point, zoom 1.00)",
+        "gpu timestamps: no"
+      ],
+      "result": "fail",
+      "saved_graph": {
+        "address": "file:///Graphshell/reference-notes.md",
+        "file": null,
+        "reopened": false,
+        "save_state": "idle",
+        "selected": "392b7659-3952-57e9-8812-98c4d6205025",
+        "session": "4dd440bc-9756-4f0f-892f-3b5db5255d40",
+        "tags": "local, reference",
+        "title": "Reference notes"
+      },
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "forme_handle_preview",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 193446
+      },
+      {
+        "name": "forme_split_preview",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 196326
+      },
+      {
+        "name": "forme_draft_applied",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 194138
+      }
+    ]
+  },
+  "errors": []
+}

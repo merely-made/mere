@@ -944,7 +944,9 @@ async fn killed_peer_child() {
     let child = P2pandaTransport::bind(&keypair, vec![Alpn::new(KILLED_PEER_ALPN)])
         .await
         .expect("bind the child");
-    println!("CHILD_TICKET {}", child.ticket().await.expect("ticket"));
+    // Serial libtest prints its label without a newline before this fixture.
+    // Keep the strict ticket protocol on its own line in either harness mode.
+    println!("\nCHILD_TICKET {}", child.ticket().await.expect("ticket"));
     use std::io::Write as _;
     std::io::stdout().flush().expect("flush");
     loop {

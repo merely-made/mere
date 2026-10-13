@@ -1,0 +1,61 @@
+{
+  "receipt": {
+    "state": "fail",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        860,
+        551
+      ],
+      "canvas_physical_size": [
+        860,
+        551
+      ],
+      "log": [
+        "waited 1 frames",
+        "waited 21 frames",
+        "captured node_ladder_selected_attributes",
+        "captured node_ladder_independent_inspector",
+        "waited 3 frames",
+        "captured node_ladder_unsupported_snapshot",
+        "waited 3 frames",
+        "FAIL: no current DOM target for Selector { surface: None, matcher: Role(\"button\"), text: Some(\"Pause physics\"), attr: None }",
+        "gpu timestamps: no"
+      ],
+      "result": "fail",
+      "saved_graph": {
+        "address": "https://example.test/i2p-port",
+        "file": null,
+        "reopened": false,
+        "save_state": "idle",
+        "selected": "81b91a6b-52ef-5751-b497-15f711cf9c70",
+        "session": "e9efe51a-3bdd-4fc2-b90f-02fb553f47c1",
+        "tags": "research, transport",
+        "title": "I2P port notes"
+      },
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "node_ladder_selected_attributes",
+        "width": 860,
+        "height": 720,
+        "bytes": 171094
+      },
+      {
+        "name": "node_ladder_independent_inspector",
+        "width": 860,
+        "height": 720,
+        "bytes": 122262
+      },
+      {
+        "name": "node_ladder_unsupported_snapshot",
+        "width": 860,
+        "height": 720,
+        "bytes": 172314
+      }
+    ]
+  },
+  "errors": []
+}

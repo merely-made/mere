@@ -1,0 +1,150 @@
+{
+  "status": "Startup diagnosis closed for bounded public-memory native proof: corrected root contrast, published unocclusion event path and finite proof wake produced readable presented captures",
+  "trace_commit": "07d415c52ba6a83b46c0c40ef10f7c3b666c1034",
+  "compiled_cherry_pick": "c4fee1cba",
+  "same_stable_patch_id": "ceeeb4fce6cbf3382e8ecb92646d509ae1f403cd",
+  "full_file_difference": "Root current-main file additionally contains already-published14-line retired-hover liveness guard; no combined runtime claim",
+  "production_builds": [
+    {
+      "label": "native-trace-build",
+      "exit": 0,
+      "seconds": 36.17
+    },
+    {
+      "label": "native-product-trace-build",
+      "exit": 0,
+      "seconds": 10.04
+    }
+  ],
+  "runtime": {
+    "candidate": "moot-candidate-r2.json",
+    "captures": 0,
+    "raster_successes": 3,
+    "acquire_outcomes": [
+      "Occluded",
+      "Occluded",
+      "Occluded"
+    ],
+    "after_frame_calls": 2,
+    "presentation": null,
+    "initial_reveal_returned": true,
+    "app_active": true,
+    "window_shown": true,
+    "window_key": false,
+    "ns_occlusion_raw": 8192,
+    "public_visible_mask": 2,
+    "public_visible_bit_present": false,
+    "seconds": 45.22,
+    "stopped_at": "2026-10-13T03:18:00.526351+00:00",
+    "scope": "trace-only; incomplete, not accepted",
+    "sample": "caffeinate inhibitor PID95686, parent appPID95685; no application-stack claim"
+  },
+  "acceptance_thresholds": "unchanged",
+  "renderer_pins": "unchanged",
+  "retry_policy": "unchanged",
+  "source_review": "Independent reviewer found no retained GPU resources/control-flow changes or premature presentation claim",
+  "remaining": "Moot source/documentation publication owned by its lane; broader renderer/platform and product-polish gates remain separate",
+  "current_main_check": {
+    "source_commit": "07d415c52ba6a83b46c0c40ef10f7c3b666c1034",
+    "frame_sha256": "3829e3238ab2ed20460e8a0e8fcc2fea3a3681a1fc9ed580c446685f4b7a4c85",
+    "exit": 0,
+    "seconds": 14.136,
+    "deadline_seconds": 100,
+    "jobs": 2,
+    "incremental": false,
+    "debug": false,
+    "gpu": false
+  },
+  "cache_release": "Explicitly returned mere-s2s3 to Moot immediately after single14.136sec check",
+  "documentation_audit": "Four inherited D2 errors, existing locator findings and12foreignheader findings remain separate; own modified frame header intact",
+  "supplier_bit_review": {
+    "result": "No mismatch; suspected wrongconstant withdrawn before any source/pin change",
+    "SDK": "NSWindowOcclusionStateVisible=1UL<<1",
+    "local_wgpu_hal": "30.0.1 same1<<1",
+    "qualified_native_recovery_hal": "30.0.1 same as Moot",
+    "source": "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AppKit.framework/Headers/NSWindow.h:189",
+    "official_semantics": "https://developer.apple.com/documentation/appkit/nswindow/occlusionstate-swift.property?language=objc"
+  },
+  "unocclusion_fix": {
+    "source_commit": "f91443388f3f78f39e2395e070f2a675c130380b",
+    "behavior": "OS Occluded(false) requestsredraw unlessapplicationhidden; no polling/reveal/activation/devicechanges",
+    "cpu_test": "Actual WindowEventrouting: trueidle, falseoneRedraw, hiddenidle, noadapter/core/surface/presentation",
+    "passed": 1,
+    "filtered_out": 19,
+    "elapsed_seconds": 15.319,
+    "gpu": false,
+    "native_runtime": "Not executed on correctedsource; originalr2 diagnostic preserves negative scope",
+    "independent_review": "No substantive defect: one event-driven redraw, respects application-hidden state, no timer/busy loop/device boot/presentation claim"
+  },
+  "subsequent_native_evidence": {
+    "r3": {
+      "binary_sha256": "717b4452f9ca3be756d673bddf69940cf527ed08c61a77eac9496afcda21953f",
+      "presentations": 2,
+      "seconds": 5.16,
+      "exit": 101,
+      "captures_saved": 0,
+      "failure": "unchanged >=8 uniqueRGBA predicate failed before saving",
+      "attribution": "Combined shared unocclusion+proof wake reached present; effects not separately measured"
+    },
+    "r4": {
+      "binary_sha256": "a433397a943dce317987a925b2dbd622d9914cddcdaec2e14ebb9d92c7de389d",
+      "presentations": "at least host1 sequence1 bound to saved negative",
+      "seconds": 5.75,
+      "exit": 101,
+      "captures_saved": 1,
+      "unique_rgba": 2,
+      "black_pixels": 4691696,
+      "gray153_pixels": 18704,
+      "width": 2560,
+      "height": 1840,
+      "all_opaque": true,
+      "png_sha256": "5c788ec10c02ca1b136a10b2d78c2134eeb27b2cc4f8bc86acc87c9825999b3e",
+      "rgba_sha256": "fd60d90e241565b3d1e8ae6f4b980e754462b32f6761d0073a5ba0f6250bb8c4",
+      "visual_review": "Only gray reading-panel borders on black; no visible text",
+      "failure": "Same >=8 uniqueRGBA predicate remains failed; negative saved before assertion",
+      "product_source": "Actual root main; original sheet targets nonexistent body; no text/background palette supplied; opaque native clearBLACK",
+      "scope": "Product contrast correction required; no renderer pin/algorithm/threshold change indicated; actual text rendering after correction unverified"
+    }
+  },
+  "native_r5": {
+    "source_basis": "add2f408a0d6a632a809717d55fae6a45a627664",
+    "binary_sha256": "54111c7bd659fa301ea91bc10db48f8ade603e1ab2a6c857af19e4b6f06f6069",
+    "actual_binary_hash_verified": true,
+    "cases": [
+      "wide1280x920",
+      "compact520x860"
+    ],
+    "presentations_each": 14,
+    "captures_each": 4,
+    "capture_sequences_each": [
+      1,
+      5,
+      9,
+      13
+    ],
+    "minimum_unique_rgba": 1137,
+    "actual_png_dimensions_and_color_counts_verified": true,
+    "all8_captures_visually_reviewed": true,
+    "owner_assertions": [
+      "independent readings",
+      "Alice local open",
+      "Bob signed reference fork and refreshed offer",
+      "Bob queued open refused on expiry",
+      "Alice bytes preserved"
+    ],
+    "elapsed_seconds": 26.37,
+    "exit_codes": [
+      0,
+      0
+    ],
+    "runtime_resources": "Explicitly released, no owned process group/server remains",
+    "attribution": "Shared unocclusion event and proof wake combined; contributions not isolated",
+    "limitations": [
+      "Public in-memory owners and supplied carrier facts only",
+      "Real DOM callbacks driven by harness; physical pointer/keyboard not qualified",
+      "No live network, persistent restart, private content or activity owner",
+      "Inspection term/value spacing and black scrolled canvas margins remain product polish follow-ups"
+    ],
+    "renderer_pins_or_acceptance_limits_changed": false
+  }
+}

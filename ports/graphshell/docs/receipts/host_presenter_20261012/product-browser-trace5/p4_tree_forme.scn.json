@@ -1,0 +1,78 @@
+{
+  "receipt": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        1140,
+        865
+      ],
+      "canvas_physical_size": [
+        1140,
+        865
+      ],
+      "log": [
+        "waited 0 frames",
+        "waited 1 frames",
+        "captured forme_reading_tiles",
+        "captured forme_hover_regions",
+        "waited 27 frames",
+        "waited 48 frames",
+        "waited 50 frames",
+        "waited 0 frames",
+        "waited 0 frames",
+        "captured forme_tab_stack",
+        "waited 0 frames",
+        "waited 0 frames",
+        "waited 0 frames",
+        "waited 0 frames",
+        "captured forme_saved_regions",
+        "forme open hover resize preview cancel commit and local dynamics receipt complete",
+        "gpu timestamps: no"
+      ],
+      "result": "ok",
+      "saved_graph": {
+        "address": "file:///Graphshell/reference-notes.md",
+        "file": null,
+        "reopened": false,
+        "save_state": "idle",
+        "selected": "392b7659-3952-57e9-8812-98c4d6205025",
+        "session": "37dcd5cd-9851-4209-9e92-2536f2412289",
+        "tags": "local, reference",
+        "title": "Reference notes"
+      },
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "forme_reading_tiles",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 219654
+      },
+      {
+        "name": "forme_hover_regions",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 202074
+      },
+      {
+        "name": "forme_tab_stack",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 219678
+      },
+      {
+        "name": "forme_saved_regions",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 214274
+      }
+    ]
+  },
+  "errors": [
+    "RuntimeError: unreachable\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[199401]:0x25f9f88\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[199210]:0x25f9b72\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[195736]:0x25f0217\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[34267]:0x17bb6e0\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[75224]:0x1e895e3\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[198752]:0x25f8d73\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[159511]:0x24b5b1f\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[130423]:0x233fdd2\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[130424]:0x233fe0f\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[88348]:0x1ffc90a\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[107398]:0x21b2e28\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[112856]:0x221be75\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[109912]:0x21e42e8\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[9328]:0xe7d5d1\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[111374]:0x2200229\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[9971]:0xee819b\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[36696]:0x184ae57\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[69336]:0x1dc8334\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[49687]:0x1ace5ec\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[6183]:0xc092cd\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[74024]:0x1e6351d\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[37608]:0x187e64b\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[185589]:0x25b106f\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[144023]:0x23fd492\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[151053]:0x245519d\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[50897]:0x1b0326d\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[194912]:0x25ecb60\n    at wasm_bindgen_e1760538e619ad3d___convert__closures_____invoke___web_sys_cbfe650ae274fda2___features__gen_PointerEvent__PointerEvent______true_ (http://127.0.0.1:8846/pkg/graphshell_web.js:2740:10)\n    at HTMLCanvasElement.real (http://127.0.0.1:8846/pkg/graphshell_web.js:3047:20)",
+    "RuntimeError: unreachable\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[199401]:0x25f9f88\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[199210]:0x25f9b72\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[195736]:0x25f0217\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[34267]:0x17bb6e0\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[75224]:0x1e895e3\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[198752]:0x25f8d73\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[159511]:0x24b5b1f\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[130423]:0x233fdd2\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[154271]:0x247aee9\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[43727]:0x19bc235\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[6335]:0xc2be19\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[185369]:0x25af327\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[143448]:0x23f5b09\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[150157]:0x244a9b8\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[50800]:0x1aff0a4\n    at wasm_bindgen_e1760538e619ad3d___convert__closures_____invoke___f64______true_ (http://127.0.0.1:8846/pkg/graphshell_web.js:2791:10)\n    at real (http://127.0.0.1:8846/pkg/graphshell_web.js:3047:20)"
+  ]
+}

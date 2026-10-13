@@ -1,0 +1,263 @@
+[
+  {
+    "name": "viewer_commands",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "graphshell",
+      "--no-default-features",
+      "--features",
+      "web",
+      "viewer_commands",
+      "--lib",
+      "-j1"
+    ],
+    "cwd": "/Users/markik/Code/worktrees/mere-nested-graph-view",
+    "exit_code": 0,
+    "log": "/Users/markik/Code/output/graphshell-site-presenter-20261011/main-8568f42fd/viewer_commands.log",
+    "tests": [
+      "ok. 3 passed; 0 failed; 0 ignored; 0 measured; 296 filtered out; finished in 0.00s"
+    ]
+  },
+  {
+    "name": "canvas_gestures",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "graphshell",
+      "--no-default-features",
+      "--features",
+      "web",
+      "canvas_gestures",
+      "--lib",
+      "-j1"
+    ],
+    "cwd": "/Users/markik/Code/worktrees/mere-nested-graph-view",
+    "exit_code": 0,
+    "log": "/Users/markik/Code/output/graphshell-site-presenter-20261011/main-8568f42fd/canvas_gestures.log",
+    "tests": [
+      "ok. 6 passed; 0 failed; 0 ignored; 0 measured; 293 filtered out; finished in 1.06s"
+    ]
+  },
+  {
+    "name": "canvas_controls",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "graphshell",
+      "--no-default-features",
+      "--features",
+      "web",
+      "canvas_controls",
+      "--lib",
+      "-j1"
+    ],
+    "cwd": "/Users/markik/Code/worktrees/mere-nested-graph-view",
+    "exit_code": 0,
+    "log": "/Users/markik/Code/output/graphshell-site-presenter-20261011/main-8568f42fd/canvas_controls.log",
+    "tests": [
+      "ok. 1 passed; 0 failed; 0 ignored; 0 measured; 298 filtered out; finished in 0.99s"
+    ]
+  },
+  {
+    "name": "host_",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "graphshell",
+      "--no-default-features",
+      "--features",
+      "web",
+      "host_",
+      "--lib",
+      "-j1"
+    ],
+    "cwd": "/Users/markik/Code/worktrees/mere-nested-graph-view",
+    "exit_code": 0,
+    "log": "/Users/markik/Code/output/graphshell-site-presenter-20261011/main-8568f42fd/host_.log",
+    "tests": [
+      "ok. 29 passed; 0 failed; 0 ignored; 0 measured; 270 filtered out; finished in 1.45s"
+    ]
+  },
+  {
+    "name": "presentation_binding",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "graphshell",
+      "--no-default-features",
+      "--features",
+      "web",
+      "presentation_binding",
+      "--lib",
+      "-j1"
+    ],
+    "cwd": "/Users/markik/Code/worktrees/mere-nested-graph-view",
+    "exit_code": 0,
+    "log": "/Users/markik/Code/output/graphshell-site-presenter-20261011/main-8568f42fd/presentation_binding.log",
+    "tests": [
+      "ok. 7 passed; 0 failed; 0 ignored; 0 measured; 292 filtered out; finished in 0.00s"
+    ]
+  },
+  {
+    "name": "presentation_editor",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "graphshell",
+      "--no-default-features",
+      "--features",
+      "web",
+      "presentation_editor",
+      "--lib",
+      "-j1"
+    ],
+    "cwd": "/Users/markik/Code/worktrees/mere-nested-graph-view",
+    "exit_code": 0,
+    "log": "/Users/markik/Code/output/graphshell-site-presenter-20261011/main-8568f42fd/presentation_editor.log",
+    "tests": [
+      "ok. 9 passed; 0 failed; 0 ignored; 0 measured; 290 filtered out; finished in 0.03s"
+    ]
+  },
+  {
+    "name": "node_presentation",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "graphshell",
+      "--no-default-features",
+      "--features",
+      "web",
+      "node_presentation",
+      "--lib",
+      "-j1"
+    ],
+    "cwd": "/Users/markik/Code/worktrees/mere-nested-graph-view",
+    "exit_code": 0,
+    "log": "/Users/markik/Code/output/graphshell-site-presenter-20261011/main-8568f42fd/node_presentation.log",
+    "tests": [
+      "ok. 8 passed; 0 failed; 0 ignored; 0 measured; 291 filtered out; finished in 0.02s"
+    ]
+  },
+  {
+    "name": "coupling_edit",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "graphshell",
+      "--no-default-features",
+      "--features",
+      "web",
+      "coupling_edit",
+      "--lib",
+      "-j1"
+    ],
+    "cwd": "/Users/markik/Code/worktrees/mere-nested-graph-view",
+    "exit_code": 0,
+    "log": "/Users/markik/Code/output/graphshell-site-presenter-20261011/main-8568f42fd/coupling_edit.log",
+    "tests": [
+      "ok. 5 passed; 0 failed; 0 ignored; 0 measured; 294 filtered out; finished in 0.09s"
+    ]
+  },
+  {
+    "name": "canvas_field_runtime",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "pictograph",
+      "--features",
+      "canvas",
+      "--lib",
+      "field_runtime",
+      "-j1"
+    ],
+    "cwd": "/Users/markik/Code/worktrees/mere-nested-graph-view",
+    "exit_code": 0,
+    "log": "/Users/markik/Code/output/graphshell-site-presenter-20261011/main-8568f42fd/canvas_field_runtime.log",
+    "tests": [
+      "ok. 4 passed; 0 failed; 0 ignored; 0 measured; 435 filtered out; finished in 1.35s"
+    ]
+  },
+  {
+    "name": "viewer-build",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+      "build",
+      "--locked",
+      "--offline",
+      "--target",
+      "wasm32-unknown-unknown",
+      "--no-default-features",
+      "-j1"
+    ],
+    "cwd": "/Users/markik/Code/worktrees/mere-nested-graph-view/ports/graphshell/web",
+    "exit_code": 0,
+    "log": "/Users/markik/Code/output/graphshell-site-presenter-20261011/main-8568f42fd/viewer-build.log",
+    "tests": []
+  },
+  {
+    "name": "product-build",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+      "build",
+      "--locked",
+      "--offline",
+      "--target",
+      "wasm32-unknown-unknown",
+      "--no-default-features",
+      "--features",
+      "product,applets",
+      "-j1"
+    ],
+    "cwd": "/Users/markik/Code/worktrees/mere-nested-graph-view/ports/graphshell/web",
+    "exit_code": 0,
+    "log": "/Users/markik/Code/output/graphshell-site-presenter-20261011/main-8568f42fd/product-build.log",
+    "tests": []
+  },
+  {
+    "name": "main-check",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+      "check",
+      "--locked",
+      "--offline",
+      "--target",
+      "wasm32-unknown-unknown",
+      "--no-default-features",
+      "--features",
+      "main-page,applets",
+      "-j1"
+    ],
+    "cwd": "/Users/markik/Code/worktrees/mere-nested-graph-view/ports/graphshell/web",
+    "exit_code": 0,
+    "log": "/Users/markik/Code/output/graphshell-site-presenter-20261011/main-8568f42fd/main-check.log",
+    "tests": []
+  }
+]

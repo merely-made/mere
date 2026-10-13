@@ -1,0 +1,66 @@
+{
+  "receipt": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        1140,
+        865
+      ],
+      "canvas_physical_size": [
+        1140,
+        865
+      ],
+      "log": [
+        "captured forme_handle_preview",
+        "captured forme_split_preview",
+        "waited 46 frames",
+        "captured forme_draft_applied",
+        "waited 57 frames",
+        "waited 59 frames",
+        "waited 58 frames",
+        "Forme handle preview draft undo redo discard membership and saved undo complete",
+        "release-step spring.rapier NaN px after 1 steps (NaN px from the press point, zoom 1.00)",
+        "release-step spring.rapier NaN px after 3 steps (NaN px from the press point, zoom 1.00)",
+        "release-step spring.rapier NaN px after 2 steps (NaN px from the press point, zoom 1.00)",
+        "release-step spring.rapier NaN px after 3 steps (NaN px from the press point, zoom 1.00)",
+        "release-step spring.rapier 142.3 px after 2 steps (NaN px from the press point, zoom 1.00)",
+        "gpu timestamps: no"
+      ],
+      "result": "ok",
+      "saved_graph": {
+        "address": "i2p://reference/service",
+        "file": null,
+        "reopened": true,
+        "save_state": "idle",
+        "selected": "0d2e5119-7a04-51f0-9340-40eedfdadce3",
+        "session": "c8130f75-7022-45f7-94a5-cbbf1bb74f98",
+        "tags": "address, transport",
+        "title": "I2P service"
+      },
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "forme_handle_preview",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 201366
+      },
+      {
+        "name": "forme_split_preview",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 201294
+      },
+      {
+        "name": "forme_draft_applied",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 193750
+      }
+    ]
+  },
+  "errors": []
+}
