@@ -5,9 +5,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use cambium::{
-    AnyView, FileEvent, FileFilter, GenetCtx, GenetElement, PointerClick, button, custom_leaf, el,
-    highlighted_code, lens, map_message_result, open_file, slider, text_field_typed,
-    textarea_typed, title_bar,
+    AnyView, FileEvent, FileFilter, GenetCtx, GenetElement, PointerClick, WorkspacePaneStatus,
+    button, custom_leaf, el, highlighted_code, lens, map_message_result, open_file, slider,
+    text_field_typed, textarea_typed, title_bar, workspace_pane_header,
 };
 use tabard::theme::registry::Harmony;
 use tabard::theme::seed::{derive_from_def_for_mode, harmonized_seeds};
@@ -42,8 +42,9 @@ pub fn workshop_view_with_captions(state: &WorkshopState, captions: WorkshopView
                 footer(state),
             ],
         )
-        .attr("class", "tabard-workshop")
-        .attr("data-surface", "tabard.workshop.v1"),
+        .attr("class", "tabard-workshop instrument-workspace")
+        .attr("data-surface", "tabard.workshop.v1")
+        .attr("data-theme-definition", state.draft_theme().id.clone()),
     )
 }
 
@@ -363,15 +364,14 @@ fn editor(state: &WorkshopState) -> WorkshopView {
         })
         .collect();
     let mut controls: Vec<WorkshopView> = vec![
-        Box::new(
-            el(
-                "div",
-                (
-                    el("h2", "Your theme"),
-                    el("p", "A few seeds. A whole visual language.").attr("class", "muted"),
-                ),
-            )
-            .attr("class", "editor-intro"),
+        workspace_pane_header(
+            "Your theme",
+            state.draft_theme().name.clone(),
+            WorkspacePaneStatus {
+                dirty: state.has_changes(),
+                ..Default::default()
+            },
+            Box::new(el("div", ())),
         ),
         Box::new(
             el(
@@ -644,24 +644,16 @@ fn previews(state: &WorkshopState) -> WorkshopView {
             ) as WorkshopView
         })
         .collect();
-    let mut panels: Vec<WorkshopView> = vec![Box::new(
-        el(
-            "div",
-            (
-                el(
-                    "div",
-                    (
-                        el("h2", "See it in context"),
-                        el("p", "One theme, across the things you use.").attr("class", "muted"),
-                    ),
-                ),
-                el("div", mode_buttons)
-                    .attr("class", "mode-picker")
-                    .attr("role", "group")
-                    .attr("aria-label", "Preview mode"),
-            ),
-        )
-        .attr("class", "preview-heading"),
+    let mut panels: Vec<WorkshopView> = vec![workspace_pane_header(
+        "See it in context",
+        format!("{} / {}", state.draft_theme().name, state.mode().label()),
+        WorkspacePaneStatus::default(),
+        Box::new(
+            el("div", mode_buttons)
+                .attr("class", "mode-picker")
+                .attr("role", "group")
+                .attr("aria-label", "Preview mode"),
+        ),
     )];
     if state.draft_theme().mode_sheet(state.mode()).is_some() {
         panels.push(Box::new(el("p", "The application stylesheet preview renders this mode's authored CSS. Reader, syntax and graph specimens show the seed-derived appearance.").attr("class", "preview-notice").attr("role", "status")));
@@ -846,14 +838,12 @@ fn card(number: &str, title: &str, content: WorkshopView) -> WorkshopView {
         el(
             "section",
             (
-                el(
-                    "div",
-                    (
-                        el("span", number.to_owned()).attr("class", "specimen-number"),
-                        el("h3", title.to_owned()),
-                    ),
-                )
-                .attr("class", "specimen-label"),
+                workspace_pane_header(
+                    title,
+                    format!("Specimen {number}"),
+                    WorkspacePaneStatus::default(),
+                    Box::new(el("div", ())),
+                ),
                 content,
             ),
         )
