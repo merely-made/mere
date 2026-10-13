@@ -112,6 +112,25 @@ both residents remain preserved. The Windows proof is historical, and its
 post-lock recovery remains open. The cached binary's unknown source commit
 prevents attributing this failure to current main without a fresh build.
 
+**Windows native-presence follow-up (2026-10-13).** The desktop resident's
+unparented UWP Hello request was replaced with Castellan's desktop interop,
+using a visible HWND owned and pumped by Djinn. Four native identity UI tests
+passed, including window ownership and cleanup. A fresh production build
+completed and was installed only in the isolated qualification slot. It has
+displayed a Windows Security prompt under the existing persisted vault lock;
+owner confirmation and the post-lock SSH recovery check remain pending.
+The legacy Windows resident is still running. The previous qualifier binary
+is retained in that slot as a rollback copy until recovery is qualified.
+This is a shared working-tree build: concurrent Graphshell edits were present,
+and the receipt records hashes of this lane's exact native-presence sources.
+The Surface login was repeated successfully after native unlock, and the
+Locked Windows qualifier denied login with exit 255 before replacement.
+
+Codex's remote chat read also reached `Check stack status` on s-pc. Sending
+was rejected because that chat has an active writer held by the Surface's
+ChatGPT app-server. No message was delivered or writer interrupted; two-way
+app chat remains unqualified independently of the successful SSH receipts.
+
 The Linux installer was also checked against the active resident: it refused
 replacement and left the PID unchanged. The Windows installer refused an
 unelevated caller before changing configuration. Current evidence and build

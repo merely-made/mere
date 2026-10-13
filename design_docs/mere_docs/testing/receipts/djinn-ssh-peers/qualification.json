@@ -5,8 +5,8 @@
   "linux_custody_patch_sha256": "e2769c6b3bb9564a6eca0afac66c2100a8ba6c7a1e4f863a24a217bdf5a08492",
   "linux_djinn_sha256": "7af5653345daf9f6db5576574198993af43680665d78c910bd6e832b58a78ef2",
   "linux_client_sha256": "ef36a983bc4877a57a5b029047b8b6517962f615c6a64434b82ca3c741ae5871",
-  "windows_djinn_sha256": "9d6321dd1ea5a94352745aaf1d1c2aaff11e6bc49b2a82f478eb5f738a650f1a",
-  "windows_build_provenance": "cached native binary; source commit not established",
+  "windows_djinn_sha256": "c3defd5ccd78c46de91ed55cbf9d4b9f7cd48a2da521c5709e61bd523088fdeb",
+  "windows_build_provenance": "Mere base 0d1dc192 plus this lane native-presence patch; shared Graphshell edits were present during compilation, so this is a working-tree build",
   "checks": {
     "surface_to_windows": "passed: Djinn-held key, public-only identity file, locally pinned Windows host key",
     "surface_absent_agent_signature_exit": 2,
@@ -27,7 +27,14 @@
     "surface_deliberate_lock_method": "SSH agent protocol lock with empty discarded password; newer custody lock call unsupported by installed baseline",
     "surface_unlock_login_recovery_exit": 0,
     "windows_host_private_key_acl": "SYSTEM owner; SYSTEM and Administrators FullControl only; verified through authenticated return SSH",
-    "windows_repeat_after_idle_lock": "pending: cached qualifier native unlock request waited without displaying a dialog; only request client stopped"
+    "windows_repeat_after_idle_lock": "awaiting owner confirmation on fresh desktop-parented qualifier, then post-lock recovery proof",
+    "windows_native_identity_ui_tests_passed": 4,
+    "windows_production_harness_passphrase_flag": "absent from production --help",
+    "windows_repeat_locked_login_exit": 255,
+    "surface_repeat_login_exit": 0,
+    "windows_desktop_hello_prompt": "visible Windows Security window; awaiting owner confirmation",
+    "cross_machine_chat_read": "passed: Check stack status on remote-ssh-discovered:s-pc",
+    "cross_machine_chat_send": "rejected: target chat has an active writer owned by the Surface ChatGPT app-server; no message delivered"
   },
   "laptop": {
     "memory_current_bytes": 203595776,
@@ -51,7 +58,12 @@
     "master approval of device CAs",
     "fleet-wide pairing",
     "graphical desktop control",
-    "Windows cached qualifier native unlock dialog not displayed; earlier Windows-to-Surface proof remains historical"
+    "Windows native presence confirmation and post-lock SSH recovery",
+    "cross-machine Codex message delivery: target writer belongs to the Surface ChatGPT app"
   ],
-  "updated": "2026-10-13"
+  "updated": "2026-10-13",
+  "windows_native_source_hashes": {
+    "windows_presence_rs": "c142fa640d6fe86b6b7f2e8c38e80fbb3eaa1e0fe684c0c20aa76918bf2b93f1",
+    "identity_ui_rs": "a7eeb476399f69b9f0f948162bea428b0dd8b1b8b5a4bb1b9e5b17ac0a0d5369"
+  }
 }
