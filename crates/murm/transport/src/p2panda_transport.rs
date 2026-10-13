@@ -621,9 +621,6 @@ impl P2pandaTransport {
         builder
     }
 
-    /// Start a builder from borrowed Ed25519 seed material: the borrowing
-    /// path (ruling 51). The seed is copied once into the builder's held
-    /// seed, and no future frame ever holds it by value.
     /// Start a transport from a key personae derived. The production
     /// constructor: a master cannot be passed here (vault lock plan, ruling
     /// 96), and the keypair builder is for tests only.
@@ -634,6 +631,10 @@ impl P2pandaTransport {
         builder
     }
 
+    /// Start a builder from borrowed Ed25519 seed material: the borrowing
+    /// path (ruling 51). The seed is copied once into the builder's held
+    /// seed, and no future frame ever holds it by value. External providers
+    /// own the seed's identity scope.
     pub fn builder_from_seed_ref(signing_seed: &[u8; 32]) -> P2pandaTransportBuilder<'static> {
         P2pandaTransportBuilder {
             signing_seed: hold(signing_seed),
