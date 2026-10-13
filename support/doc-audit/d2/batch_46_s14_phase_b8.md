@@ -492,3 +492,9 @@ failed receipts and unchanged original scenario assertions. Captures and the
 early explicit resource release are source-bound. Shared-main publication is
 qualified; live delivery, unchanged size cap, native/touch and full phase 4
 remain separate. This addendum does not repeat a whole-document claim census.
+
+The shared-main publication is now confirmed at `007a4de6b`. The upstream
+`abc8e5ad5` reconciliation changes only documentation; the runtime-qualified
+source remains `a1cb156f8`, with identical recorded source/manifest/lock inputs.
+Exact remote refs are in the landing receipt. This publication record adds no
+new runtime, deployment or phase-completion claim.

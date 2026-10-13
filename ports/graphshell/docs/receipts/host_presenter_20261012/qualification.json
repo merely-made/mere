@@ -1,5 +1,5 @@
 {
-  "status": "Current source passes required presenter, commands and nineteen-row saved-product acceptance; ready for direct main integration",
+  "status": "Landed on shared main after all required presenter, commands and product gates passed",
   "source": "a1cb156f813164e48003d8e2d2dd015d619ec340",
   "upstream_basis": "8568f42fdf57f997274c74e63bd4ee045fe1a2b4",
   "cpu_tests": 89,
@@ -11,7 +11,7 @@
     "retired-hover-repair/build-and-focus-gates.json"
   ],
   "current_source_browser_acceptance": true,
-  "main_landed": false,
+  "main_landed": true,
   "live_site_deployed": false,
   "earlier_presenter": {
     "compiled_source": "4a090af1a0e7c0bef0ac4607632416e8e9b40062",
@@ -47,9 +47,7 @@
     "currently_locked": false,
     "final_handoff_requested": false
   },
-  "remaining": [
-    "Direct main integration and remote confirmation"
-  ],
+  "remaining": [],
   "unchanged_delivery_cap_gzip_bytes": 3407872,
   "earlier_release_source": "91f46146d5c9d3cb492f8e868c00ca12a0b793eb",
   "earlier_release_gzip_bytes": 6378552,
@@ -198,7 +196,7 @@
   "current_product_receipt": "product-matrix.json",
   "visual_review_scope": "Functional placement/readability, selection/inspection separation, confined site inspector scrolling, narrow stacking and command bounds. Existing small graph glyphs remain; this is not final overview typography, native/touch or large-graph performance qualification.",
   "cpu_count_basis": "89 passing cases across the explicit source bases in source_basis_notes",
-  "main_publication_status": "Evidence commit precedes authorized fast-forward publication; exact remote landing recorded after push.",
+  "main_publication_status": "Confirmed direct atomic publication of implementation and evidence at007a4de6b",
   "final_audits": {
     "doc_audit_exit": 0,
     "d2_audit_exit": 1,
@@ -229,6 +227,22 @@
     "records": [
       "final-audits/post-merge-doc-audit.json",
       "final-audits/post-merge-d2-audit.json"
+    ]
+  },
+  "main_landing_receipt": "landing.json",
+  "landing_doc_audits": {
+    "doc_audit_exit": 0,
+    "d2_audit_exit": 1,
+    "baseline_unchanged": true,
+    "d2_findings": [
+      "snapshot aggregate digest changed: 2046e1eec3018b7dd288e794326090f1b7f9a889043d53e45530271d0b32be1e != f0b64eef4cd5514157bb1b49d389b84db29a1e823d6f3e2cebf827337fe56abf",
+      "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md",
+      "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md",
+      "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_producer_gates/README.md"
+    ],
+    "records": [
+      "final-audits/landing-doc-audit.json",
+      "final-audits/landing-d2-audit.json"
     ]
   }
 }

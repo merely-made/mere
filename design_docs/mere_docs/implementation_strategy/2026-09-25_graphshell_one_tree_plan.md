@@ -41,8 +41,8 @@ release.
 **First site presenter (2026-10-12):** the stable-face adjacent inspector,
 Fold-preserved selection and direct graph commands/gestures are hardware-qualified
 at `a1cb156f8`, with all nineteen combined product rows passing. Shared-main
-publication is authorized and pending the final evidence commit; live-site
-delivery and complete phase 4 remain open. The detailed source bases are below.
+publication landed at `007a4de6b`; live-site delivery and complete phase 4
+remain open. The detailed source bases are below.
 **Scope:** Graphshell's browser page becomes one retained Cambium tree. Its
 HTML controls become Cambium components, its display-only Cambium chrome
 joins them, pictograph's canvas renders into the tree as a texture producer,
@@ -1178,8 +1178,9 @@ The existing small graph glyphs stay stable; this bounded presenter does not
 claim final overview typography, automatic LOD or large-graph performance.
 The source-bound receipt now qualifies shared-main publication. All owned
 Chrome, HTTP and inhibitor resources were closed and explicitly released at
-02:37:55 UTC, before the agreed 02:42:45 UTC cutoff. Current main publication
-is recorded after the push. Live-site deployment, R157's unchanged size cap,
+02:37:55 UTC, before the agreed 02:42:45 UTC cutoff. Shared main publication is confirmed at `007a4de6b`. The final merge of
+upstream `abc8e5ad5` changes only documentation; all recorded runtime source,
+manifest and lockfile byte hashes remain identical to the qualified basis. Live-site deployment, R157's unchanged size cap,
 native/touch qualification and complete one-tree phase 4 remain separate.
 The latest release measurement stays bound to `8ad44a5c7`; no new release size
 is inferred from these debug packages.
@@ -1193,6 +1194,17 @@ is inferred from these debug packages.
 - No Graphshell-only UI pieces. What Cambium lacks is added to Cambium.
 
 ## 6. Progress
+
+- **2026-10-12 — first site presenter and direct controls landed:** shared main
+  and `codex/nested-graph-view` both confirm `007a4de6b`, containing the final
+  presenter, command/accessibility/input repairs, retired-hover fix and full
+  qualification evidence. Runtime acceptance is source-bound to `a1cb156f8`;
+  the later test-only and documentation descendants change no runtime inputs.
+  All nineteen product rows, eleven presenter cases and the full command pass
+  are accepted, with preserved failed setups and expected planted controls.
+  The [landing receipt](../../../ports/graphshell/docs/receipts/host_presenter_20261012/landing.json)
+  records exact remote refs. No live-site deployment, full phase 4 completion
+  or release-size improvement is claimed.
 
 - **2026-10-10 — concurrent Dramatis publication combined before main push:**
   the qualified branch push succeeded, while main correctly rejected a stale
