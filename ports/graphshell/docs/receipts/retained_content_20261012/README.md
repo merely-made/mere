@@ -37,6 +37,14 @@ uses its stable `C:\t\cargo-targets\turnstone` target.
 | `final-port-boundaries.log` | Port and browser dependency boundaries pass |
 | `final-doc-audit.json` | Active index/status/link/path checks pass; inherited header findings remain recorded |
 
+After merging the upstream viewer lane at `bf07a5a6`, the default application
+wasm build and all 9 retained-content tests pass again. The root test command
+now selects `--no-default-features --features retained-content,image-decode`.
+`post-integration-*` logs record those gates and refreshed dependency/doc audits.
+The retained runtime, reading view and browser-host repair source is unchanged
+by this merge. The earlier browser captures retain their exact source/artifact
+qualification; they are not relabeled as a fresh browser run of the merge.
+
 The browser receipts exercise actual rendered glyphs and registered producers,
 then reopening, advertised actions, autoplay refusal and Stop. Browser gesture
 observations are separate JSON/image evidence. A resolved `play()` promise proves

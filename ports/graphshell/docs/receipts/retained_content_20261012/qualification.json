@@ -323,5 +323,30 @@
     "Preliminary source patches are not the published consumer pin",
     "Cancelled wrong-directory build/test attempts are not gates"
   ],
-  "hash_scope": "SHA256 values name raw qualification bytes. Source staged_git_blob values name the normalized code committed by Git."
+  "hash_scope": "SHA256 values name raw qualification bytes. Source staged_git_blob values name the normalized code committed by Git.",
+  "post_integration": {
+    "commit": "bf07a5a6592afcf8722a9d57380faf19452bcd63",
+    "upstream": "5b3442dd",
+    "runtime_source_unchanged_from_browser_qualification": true,
+    "root_test_features": "retained-content,image-decode",
+    "checks": {
+      "post-integration-web-build.log": {
+        "bytes": 16120,
+        "sha256": "ab436a5e79a88d991df0d2044ab30268fca1ecb02bbc1684b0a14a54a79b9caa"
+      },
+      "post-integration-content-tests.log": {
+        "bytes": 29572,
+        "sha256": "0a88c0831a199e8ac0e9f57a50042889c5e746d3f5c76f9151a39bbb9264bfef"
+      },
+      "post-integration-boundaries.log": {
+        "bytes": 59,
+        "sha256": "ed4d418c7935ec6ab35610fbd1f8d9b7078ca2ad0684de25623968362a13de39"
+      },
+      "post-integration-doc-audit.json": {
+        "bytes": 170471,
+        "sha256": "343878feaed8f97129786de3a895d4d955b838ed035ca01a56c8c488abeb0898"
+      }
+    },
+    "browser": "Earlier exact-source captures retained; no fresh browser run claimed for this merge"
+  }
 }
