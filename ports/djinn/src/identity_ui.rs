@@ -34,6 +34,9 @@ use graphshell::browser_carrier::{
 const MAX_SSH_PRIVATE_KEY_BYTES: u64 = 1024 * 1024;
 const PICKER_START_ENV: &str = "GRAPHSHELL_NATIVE_PICKER_START";
 
+#[cfg(windows)]
+mod windows_presence;
+
 /// Secret-bearing desktop interactions required by native identity actions.
 ///
 /// Implementations own the selected path and passphrase. Neither appears in
@@ -163,10 +166,17 @@ impl NativeIdentityUi for SystemNativeIdentityUi {
 
     /// Windows Hello through personae's gate, which alone mints the proof.
     fn verify_presence(&self) -> Result<Option<OsPresence>, NativeIdentityFailure> {
-        if !castellan::custody::unlock::presence_availability().is_available() {
+        tracing::debug!("checking native presence availability");
+        let availability = castellan::custody::unlock::presence_availability();
+        tracing::debug!(?availability, "native presence availability answered");
+        if !availability.is_available() {
             return Ok(None);
         }
-        match castellan::custody::unlock::verify_presence("Unlock your identity vault") {
+        #[cfg(windows)]
+        let verified = windows_presence::verify();
+        #[cfg(not(windows))]
+        let verified = castellan::custody::unlock::verify_presence("Unlock your identity vault");
+        match verified {
             Ok(proof) => Ok(Some(proof)),
             Err(error) => {
                 tracing::info!(%error, "presence not verified; asking for the passphrase");

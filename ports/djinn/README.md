@@ -71,6 +71,12 @@ administrator key file and applies the Windows-required ACL. The script is
 for an administrator login, as used by this lane. Inspect its public host-key
 fingerprints locally before pinning the host at the peer.
 
+Windows' native identity unlock uses desktop Windows Hello with a visible
+parent window owned by Djinn. Its UI thread keeps that window responsive
+while Castellan verifies presence; the parent closes when verification ends.
+The SSH agent cannot unlock the vault over its wire. After a lock, use the
+resident's native unlock action before retrying SSH.
+
 These scripts establish SSH execution and custody. The Iroh SSH proxy,
 cross-device CA approval, and fleet pairing ceremony remain work in the
 device-pairing plan. Installing an SSH server does not establish those grants.
