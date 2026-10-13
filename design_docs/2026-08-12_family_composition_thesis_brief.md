@@ -1281,13 +1281,36 @@ CI floors are observations of the tree, not evidence that the owner requested
 older-compiler compatibility. The initial Murm move plan's inference of a
 Rust 1.88 preservation requirement is withdrawn.
 
-**Selected rollout baseline:** current stable Rust 1.99.0, verified against the
+**Working toolchain:** current stable Rust 1.99.0, verified against the
 [official release announcement](https://blog.rust-lang.org/2026/10/01/Rust-1.99.0/).
-Pin the exact toolchain release in active owned build roots and declare
-`rust-version = "1.99"` consistently for owned packages. Upgrade the exact
-pin and minimum together in coordinated stack passes as newer stable releases
-are qualified. Published older versions keep their historical metadata; do not
-rewrite third-party/vendored suppliers' own minimums to manufacture agreement.
+Pin this exact release in active owned build roots for development, formatting,
+linting and current-compiler qualification. Advance the working toolchain as
+new stable releases are qualified.
+
+**Shared MSRV:** a separate decision, **not yet selected**. The owner's examples
+of 1.91 and 1.96 are candidates, not a selected support promise. The earlier
+interpretation requiring `rust-version = "1.99"` and simultaneous pin/minimum
+upgrades is withdrawn. Choose the common owned-package minimum from actual
+language requirements and the supported dependency/feature/target graphs,
+then test on that compiler. Upgrade this minimum only when those requirements
+or an explicit support decision call for it. Published older versions keep
+their historical metadata; do not rewrite third-party/vendored suppliers'
+minimums to manufacture agreement.
+
+The locked Mere metadata on 2026-10-13 declares Iroh 1.3.0 at Rust 1.91 and the
+refreshed p2panda supplier at 1.96. Selected Murm/transport normal and build
+dependency closures have no declared floor above 1.96, so 1.96 is a plausible
+Murm candidate. The wider resolved graph contains Knot packages at 1.97 and
+WESL/WGSL packages at 1.97.1. Resolve which paths are supported and qualify or
+adjust their suppliers before promising 1.96 stack-wide. Metadata includes a
+workspace feature union and multiple targets, and some packages declare no
+floor; it is inventory evidence, not a successful MSRV build or a complete
+stack audit.
+
+CI must exercise both policies: current-toolchain development checks and a
+separate selected-MSRV build/test lane for supported configurations. Passing
+on 1.99 alone does not establish compatibility with the MSRV. A newer working
+pin does not change the support promise automatically.
 
 This policy covers the active first-party repository family and its independent
 application, library, probe, browser and firmware workspaces, including the
@@ -1295,14 +1318,15 @@ Murm/Retinue foundation, Mere, Genet, Dramatis, Turnstone, Woodshed and Knot.
 The execution inventory must resolve current active homes and source pins;
 archived standalone clones are not additional migration targets. A target that
 actually needs a compiler fork or nightly has a documented target realization
-whose compiler is checked against the common language/tool floor, rather than
-an assumed permanent older MSRV exception. Workspace separation is justified by
+whose compiler is checked against the separately selected support floor, rather
+than an assumed permanent older MSRV exception. Workspace separation is justified by
 dependency graphs, feature unification, target realizations and profiles; it
-must not introduce separate radio/native compiler policies.
+must not choose radio/native MSRVs merely from repository placement.
 
 Use Cargo's supported `build.build-dir` for intermediate build artifacts and
 `build.target-dir` for delivered outputs. Build-dir support stabilized in
-Cargo 1.91; 1.99 satisfies that requirement. See the
+Cargo 1.91; the 1.99 working toolchain satisfies that requirement without
+requiring a 1.99 library MSRV. See the
 [Cargo build-dir documentation](https://doc.rust-lang.org/cargo/reference/config.html#buildbuild-dir)
 and [stabilization record](https://doc.rust-lang.org/cargo/reference/unstable.html#build-dir).
 Use workspace/platform/configuration isolation, and audit environment/CLI
@@ -1311,15 +1335,17 @@ actual Cargo artifact/executable paths rather than assume the intermediate
 layout is permanently `target/debug/deps`. A shared version does not require
 all configurations to write into one unqualified cache directory.
 
-The coordinated rollout inventories and changes toolchain pins, owned minimums,
-CI jobs and independent build roots, then qualifies native, browser/Wasm and
-embedded checks plus packaging/artifact discovery. It records compiler versions
-in receipts and updates consumers' source pins where compiler changes require
+The coordinated rollout inventories toolchain pins, owned minimums, CI jobs
+and independent build roots, qualifies the new working toolchain, and chooses
+and independently qualifies the shared MSRV. It checks native, browser/Wasm
+and embedded paths plus packaging/artifact discovery. It records compiler
+versions in receipts and updates consumers' source pins where compiler changes require
 supplier adoption. An older compiler's passing receipt is not a new compiler's
 qualification. The Murm move plan carries this as MOVE1, before implementation
 imports and consumer cutover.
 
-**Current execution status:** policy recorded; stack-wide manifest/toolchain/CI
-rollout remains unexecuted. This host's installed `stable` alias reports 1.97.1,
-and the current Mere worktree pins 1.98.1. Neither is proof of the newest stable
+**Current execution status:** working-toolchain direction recorded; the common
+MSRV is undecided and no MSRV compiler runs were performed in this correction.
+The stack-wide manifest/toolchain/CI rollout remains unexecuted. This host's
+installed `stable` alias reports 1.97.1, and the current Mere worktree pins 1.98.1. Neither is proof of the newest stable
 release or evidence that the stack is already on 1.99.

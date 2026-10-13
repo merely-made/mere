@@ -1,6 +1,6 @@
 # Mere Documentation Index
 
-Rust policy (2026-10-13): the [family composition brief](2026-08-12_family_composition_thesis_brief.md#shared-rust-toolchain-and-minimum-version-2026-10-13) records the owner’s current-stable toolchain and unified minimum direction, selected Rust 1.99 baseline and build-directory rollout requirements. Manifest/CI rollout remains pending.
+Rust policy (2026-10-13): the [family composition brief](2026-08-12_family_composition_thesis_brief.md#shared-rust-toolchain-and-minimum-version-2026-10-13) records the Rust 1.99.0 working toolchain, a separately chosen shared MSRV (still undecided), and build-directory rollout requirements. Manifest/CI rollout remains pending.
 
 Native retained content (2026-10-13): the [one-tree plan](mere_docs/implementation_strategy/2026-09-25_graphshell_one_tree_plan.md#native-retained-content-continuation--2026-10-13) records Pelt/Genet mounting, shared selected-clip presentation and Turnstone adoption. The [suite census](2026-08-22_turnstone_suite_composition_and_capability_census.md) records Mark's revised native-stack composition ruling.
 
