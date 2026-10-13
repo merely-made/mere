@@ -1,0 +1,128 @@
+{
+  "source": "7cd9a985e1b24a39c61b1c971daf6352581c1340",
+  "upstream_basis": "fae241ddb",
+  "source_byte_sha256": {
+    "ports/graphshell/Cargo.toml": "45e5f5e55cb8ba28e526e848fa70ba5ee02ee08e13555b873818538ad7969a04",
+    "ports/graphshell/src/canvas_gestures.rs": "2b91de6a5b88a34fdf8ed24a02d732066e6427f21dfeae54029cd0a6519de1a4",
+    "ports/graphshell/src/host_dataset_view.rs": "4fbe544cfde4927dbe35f6db84fe7316f41cbac5a3a8b404e48f640371c2c7b9",
+    "ports/graphshell/src/host_presenter.rs": "6a61f1583a722861ef3ae42a83116c4456ad0d7d9b8dcb08d3cc2a7beaaff103",
+    "ports/graphshell/src/lib.rs": "216b7746e5b669f3d77dcb614cabd4b6dde8907856ad4b80e8f9bcebe2646eb1",
+    "ports/graphshell/src/viewer_commands.rs": "833cd4da9b2e570f8220541ed1cdff7aa7595f8cdd9099c0ce96a27704d97b49",
+    "ports/graphshell/src/web_tree.rs": "733b74e6e32d81aa53a8f704e4292f80484016e7450488b826a3f9c8c84e1e9b",
+    "ports/graphshell/src/web_tree/commands.rs": "1af280387f2e3aef55d98c21b178475cab4401324da0c409262edf1d0d6b93c0",
+    "ports/graphshell/src/web_tree/controls.rs": "3820a54684a43cd96d752c19cf9cb23431ecb6e75bd253ef6639e6b0f3019739",
+    "ports/graphshell/src/web_tree/gestures.rs": "4d0f11c874d15af4a25ce9877f341af7a58f62078cef4ff8cb5f4476ccf3088c",
+    "ports/graphshell/src/web_tree/grouping.rs": "04705de0e8f29c3030fccc4ee176a52c3eff5e222e3441540a2f94355891c800",
+    "ports/graphshell/src/web_tree/history.rs": "850cd68efb2d6a36c643ca6ba1510b7bde1770919838d513fb8a5e4a4d5eace4",
+    "ports/graphshell/src/web_tree/lane.rs": "36582b7dba53897f3eccb706865b4626c83f4118119b30d680851c3c63ccaefa",
+    "ports/graphshell/src/web_tree/presenter.rs": "13d0928df2077cf5f557236d91d7203c1694654b433def428dfb227f32ce110d",
+    "ports/graphshell/web/Cargo.lock": "952a71cadcae143a20c02277256cf1aecab0d84972e3f7e5fd43fbe0e17a3b53",
+    "ports/graphshell/web/scenarios/hosted_fold_gestures.scn": "123cd132994208304e76a5b62cdbcaf1ce01dac08d7f6cefdf5ae9e72d1499a9",
+    "ports/graphshell/web/scenarios/hosted_presenter.scn": "297140df8e17337e15183bedecf52cbdd917e0190aab07116030babe3cf1366b",
+    "ports/graphshell/web/scenarios/hosted_presenter_history.scn": "2a11c0d2baaa3ef442e9040e6b05a55f5554c7779a96f4828f9e14720549df77",
+    "ports/graphshell/web/scenarios/viewer_commands.scn": "8b65d92a1c1faa089243c364ab3965155a9942c71c810f4251501e735d8a2847",
+    "ports/graphshell/web/viewer.html": "a1c4d9dae8ef6a97b585e772d9710845707c269db24af2b73d54405d795b3526",
+    "Cargo.lock": "59a0bdcb0dbf56c28f8d5d249e6954420cddf529f1abd03ec9d7dd7c8b9e038a",
+    "ports/graphshell/src/web_tree/coupling.rs": "db42cbf47dbfb0dcb6c6bf7cd5d2acdc27e524bbb2cf3633425e0f04ee038202",
+    "ports/graphshell/src/web_tree/node_presentation.rs": "baa3e0fb543218ab7af4267c69ffbf8f11574c3b341b963066273051b0aef03e",
+    "Cargo.toml": "f303a24af6a2aa0082a217df6f84bfdaf77d241b41fb3f85c0184cf76241893c",
+    "ports/graphshell/web/Cargo.toml": "fd7c21e833b4c52434d15856f32926dc238f922943e653257249f9bdfe3fc26e",
+    "crates/canvas/pictograph/src/canvas/coupling_trace.rs": "1538d619df5bc3cbafe9f2560803e044bb864792c67d7f07f838c2ebe2437943",
+    "crates/canvas/pictograph/src/canvas/seiche_bridge.rs": "c6d920b3e091549e5666f1f9e7630c0bfe88cbd2ac22523db8e470fc4eadc821",
+    "crates/conatus/seiche/src/coupling_trace.rs": "fdf7a9c789eccf33abb6506abe0c97f759470f52c5739811a4ff76f48811a7d1",
+    "crates/conatus/seiche/src/coupling_force.rs": "f262e726b741ba3d63ec8beae64728cf900b169dfbaf686950076e69a943399e",
+    "crates/conatus/seiche/src/runtime/coupling_trace_delivery.rs": "570d962218f7da2cf79acf36729e34d665fd043b9cb8ec3f2a12efb01c12d023",
+    "ports/graphshell/web/fixtures/site-presenter-host-dataset.json": "69b322357acaa034c47887cbce560815f089a63304582fd8fd803c5145cb3380",
+    "crates/cambium/cambium-genet-web-host/src/input.rs": "0d0e5414e75799f8e0c2c3a0126153de62bf1deea8e9fee1b01371c6df469be4",
+    "crates/cambium/cambium-genet-web-host/src/a11y.rs": "cfb4b23dcef4e4675a5367e38edd7b8ba7ad7fab872163d248d45dda4ea981f3"
+  },
+  "bundle_byte_sha256": {
+    "web-viewer/pkg/graphshell_web.d.ts": "3f967d57fb0a19dee4fc3b768ff87114a5fe90fd1ca101bc46d121072a6cfd7a",
+    "web-viewer/pkg/graphshell_web.js": "19eb9235d70393cb631de0d122b20adaa945a101e4924aee57ffa0f44b345e61",
+    "web-viewer/pkg/graphshell_web_bg.wasm": "4cd124779797f2d082bb42c6d923730aa810d8a34a491b00904c710126afa15a",
+    "web-viewer/pkg/graphshell_web_bg.wasm.d.ts": "389ef6a95767a844f8cb68bdaf0610e70c29acc22c53ef72a4861e5bcb2d083d",
+    "web-product/pkg/graphshell_web.d.ts": "9d368837185eb865ad354084ef9bae2e3caf842924aeca2bdc659a0f44230aca",
+    "web-product/pkg/graphshell_web.js": "197d1d97790b78b434f7eb3afe71c0c0810a5f47aff229d6052aa8866e561401",
+    "web-product/pkg/graphshell_web_bg.wasm": "a53a8510a5807ea1774050dce2cd867500f9a5127717ffeb214d8a0c7cc9cd40",
+    "web-product/pkg/graphshell_web_bg.wasm.d.ts": "31934f46ee7bb77c4f61a2273216db3d5613fb58c0789151dbe473a840194cf8"
+  },
+  "gates": [
+    "wheel-direction-repair/gates.json",
+    "focus-proxy-repair/gates.json"
+  ],
+  "cpu_tests": 68,
+  "browser_executed": true,
+  "gpu_executed": true,
+  "native_host_executed": false,
+  "captures_reviewed": false,
+  "main_landed": false,
+  "browser_drivers": [
+    "verify-commands.cjs",
+    "verify-presenter.cjs",
+    "verify-product.cjs"
+  ],
+  "private_ports": [
+    8845,
+    8846
+  ],
+  "packaging": "wasm-bindgen 0.2.129 --remove-name-section; compiled combined source",
+  "acceptance_status": "68-test current-source candidate with DOM wheel-direction repair; final command/product browser checks queued",
+  "release_size_gate": "final-suppliers-631355a2f/release-size.json bound to 91f; current-upstream remeasurement queued",
+  "coordination_hold": {
+    "reported_by": "01a126c3-a147-7ac2-8c40-98e5dd24eaff",
+    "date": "2026-10-12",
+    "supplier_sources": {
+      "provider": "2eae6243881d5b24c984d5ee35dde509ca5db782",
+      "netrender": "c74b7cb28090c28b1c6d80b08dcdea18aff48d3e",
+      "genet": "2c7ef73bfa44c07744e0643e3c6f98be3cbd7947",
+      "knot": "3af93adda472af2913a5d298f14deb10e85daee2"
+    },
+    "final_mere_publication": "631355a2fcbc6d5e88b1b1040d401a0e0b08bfab",
+    "native_presentation": "Root passed 53 presented frames/six captures and explicitly returned runtime",
+    "runtime_release": true,
+    "shared_cpu_target_release": false,
+    "presenter_packages_rebuilt_on_final_suppliers": true,
+    "runtime_window_accepted": true,
+    "runtime_window_start": "after coherent rebuild and console unlock; no browser started",
+    "runtime_window_limit_minutes": 30,
+    "shared_cpu_target_owner": "Moot; our builds use only isolated worktree targets",
+    "merged_working_source": "91f46146d",
+    "final_family_cpu_tests_passed": 67,
+    "supplier_metadata": "final-suppliers-631355a2f/supplier-metadata.json"
+  },
+  "supplier_metadata": "final-suppliers-631355a2f/supplier-metadata.json",
+  "browser_driver_sha256": {
+    "verify-commands.cjs": "d4ee79cffc990794e18207837589cf338abad34de6602e4b7dac3005e1b3b1f6",
+    "verify-presenter.cjs": "28b7213c942f1c283ea18c7c2cc368fc85869775437f33c7fcfb97f3d93f6b34",
+    "verify-product.cjs": "32b0a36711456a201114fc730bfbd3c0624e3dd00e0a89ebbd750852b4fb637b",
+    "assert-console-unlocked.cjs": "3995acca0b942c19628d192f5ea316881f28d4a963f083e771f218d32acbad23"
+  },
+  "release_wasm_gzip_bytes": 6378552,
+  "live_site_delivery_cap_pass": false,
+  "browser_acceptance_status": "partial earlier-source receipts preserved; current-source final checks queued",
+  "doc_audit": "passes",
+  "d2_audit_baseline_findings": 4,
+  "documentation_followup": "Renderer D2 coverage reconciled on e0dae9c99423210b82bc24e0518739d2c9fefe34; source/pin/lockfile byte hashes unchanged",
+  "audit_baseline": "citation/source audit passes; four inherited D2 findings remain",
+  "supplier_basis": "631355a2fcbc6d5e88b1b1040d401a0e0b08bfab",
+  "runtime_window": {
+    "start_utc": "2026-10-12 16:55:09 UTC",
+    "deadline_utc": "2026-10-12 17:25:09 UTC",
+    "owner": "presenter lane",
+    "maximum_minutes": 30
+  },
+  "failed_attempts": [
+    "presenter-browser-r1 interrupted before receipt",
+    "presenter-browser-r2 label-substring selectors picked hidden member crates",
+    "presenter-browser-r3 unsupported complementary role; fixed to named region"
+  ],
+  "browser_receipts": [
+    "presenter-browser-r2",
+    "presenter-browser-r3",
+    "presenter-browser-r4",
+    "presenter-browser-r5",
+    "presenter-browser-r6"
+  ],
+  "runtime_window_released": true,
+  "current_site_disclosure": "ports/graphshell/docs/receipts/host_presenter_20261012/site-export-provenance.json"
+}

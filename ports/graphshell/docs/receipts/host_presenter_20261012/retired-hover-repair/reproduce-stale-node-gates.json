@@ -1,0 +1,23 @@
+[
+  {
+    "name": "hover-motion",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "cambium-rootstock",
+      "--no-default-features",
+      "--test",
+      "hover_motion",
+      "-j1"
+    ],
+    "cwd": "/Users/markik/Code/worktrees/mere-nested-graph-view",
+    "exit_code": 101,
+    "log": "/Users/markik/Code/output/graphshell-site-presenter-20261011/retired-hover-repair/hover-motion.log",
+    "tests": [
+      "FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.30s"
+    ]
+  }
+]

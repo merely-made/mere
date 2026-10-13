@@ -1,0 +1,774 @@
+{
+  "receipt": {
+    "state": "fail",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        1136,
+        905
+      ],
+      "canvas_physical_size": [
+        1136,
+        905
+      ],
+      "log": [
+        "FAIL: assert snap presenter-selected Eq 'crate:mere:graphshell,repo:genet,repo:woodshed': got ''",
+        "FAIL: assert snap presenter-hidden Eq 'crate:mere:graphshell': got ''",
+        "FAIL: assert snap presenter-inspected Eq 'crate:mere:graphshell': got ''",
+        "FAIL: assert snap canvas-selection-count Eq '2': got '0'",
+        "captured selected-hidden-by-fold",
+        "FAIL: assert snap presenter-selected Eq 'crate:mere:graphshell,repo:genet,repo:woodshed': got ''",
+        "FAIL: assert snap canvas-selection-count Eq '3': got '0'",
+        "FAIL: assert snap presenter-selected Eq 'crate:mere:graphshell,repo:genet,repo:woodshed': got ''",
+        "FAIL: assert snap presenter-inspected Eq 'repo:genet': got ''",
+        "FAIL: assert snap presenter-selected Eq 'crate:mere:graphshell,repo:genet,repo:woodshed': got ''",
+        "FAIL: assert snap presenter-selected Eq 'crate:mere:graphshell,repo:genet,repo:woodshed': got ''",
+        "captured selected-restored-after-fold",
+        "FAIL: reveal role:button Clear project selection: nothing matches",
+        "FAIL: no current DOM target for Selector { surface: None, matcher: Class(\"presenter-inspect\"), text: None, attr: Some((\"data-occurrence-id\", \"repo:genet\")) }",
+        "FAIL: no current DOM target for Selector { surface: None, matcher: Role(\"button\"), text: Some(\"Clear project selection\"), attr: None }",
+        "gpu timestamps: no"
+      ],
+      "result": "fail",
+      "saved_graph": null,
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "selected-hidden-by-fold",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 249198
+      },
+      {
+        "name": "selected-restored-after-fold",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 379046
+      }
+    ]
+  },
+  "host": {
+    "page": "tree",
+    "semanticTree": {
+      "role": "region",
+      "label": "Graphshell, one tree",
+      "children": [
+        {
+          "role": "main",
+          "children": [
+            {
+              "role": "heading",
+              "label": "Project graph",
+              "children": []
+            },
+            {
+              "role": "status",
+              "label": "10 visible of 18 disclosed · 0 selected",
+              "children": []
+            },
+            {
+              "children": [
+                {
+                  "role": "button",
+                  "label": "Graph commands",
+                  "expanded": false,
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Fit visible graph",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Graph tools",
+                  "expanded": false,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "role": "group",
+                      "label": "9 of 10 shown",
+                      "children": [
+                        {
+                          "role": "group",
+                          "label": "graphshell",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "mere",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "pictograph",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "sceno",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "scenomise",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "genet",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "mere",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "woodshed",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "mere workspace",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "region",
+                  "label": "Project inspector",
+                  "children": [
+                    {
+                      "role": "heading",
+                      "label": "Project inspector",
+                      "children": []
+                    },
+                    {
+                      "role": "status",
+                      "label": "0 selected · 10 visible / 18 disclosed",
+                      "children": []
+                    },
+                    {
+                      "role": "button",
+                      "label": "Hide project list",
+                      "expanded": true,
+                      "children": []
+                    },
+                    {
+                      "role": "paragraph",
+                      "children": []
+                    },
+                    {
+                      "role": "button",
+                      "label": "Hide Fold controls",
+                      "expanded": true,
+                      "children": []
+                    },
+                    {
+                      "role": "region",
+                      "label": "Folds",
+                      "children": [
+                        {
+                          "role": "heading",
+                          "label": "Folds",
+                          "children": []
+                        },
+                        {
+                          "role": "navigation",
+                          "label": "Graph location",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Whole graph",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "status",
+                          "label": "10 visible of 18 disclosed occurrences; 0 external context items. Group changes pause physics and preserve coordinates.",
+                          "children": []
+                        },
+                        {
+                          "role": "list",
+                          "label": "genet · 1 members · 3 internal dependenciesExpand genetEnter genetmere · 1 members · 0 internal dependenciesCollapse mereEnter merewoodshed · 1 members · 3 internal dependenciesExpand woodshedEnter woodshedmere workspace · 6 members · 0 internal dependenciesCollapse mere workspaceEnter mere workspace",
+                          "children": [
+                            {
+                              "role": "listitem",
+                              "label": "genet · 1 members · 3 internal dependenciesExpand genetEnter genetgenet · 1 members · 3 internal dependenciesExpand genetEnter genet",
+                              "box": [
+                                1177,
+                                267,
+                                239,
+                                76
+                              ],
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Expand genet",
+                                  "expanded": false,
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Enter genet",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "role": "listitem",
+                              "label": "mere · 1 members · 0 internal dependenciesCollapse mereEnter meremere · 1 members · 0 internal dependenciesCollapse mereEnter mere",
+                              "box": [
+                                1177,
+                                347,
+                                239,
+                                76
+                              ],
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Collapse mere",
+                                  "expanded": true,
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Enter mere",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "role": "listitem",
+                              "label": "woodshed · 1 members · 3 internal dependenciesExpand woodshedEnter woodshedwoodshed · 1 members · 3 internal dependenciesExpand woodshedEnter woodshed",
+                              "box": [
+                                1177,
+                                426,
+                                239,
+                                75
+                              ],
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Expand woodshed",
+                                  "expanded": false,
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Enter woodshed",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "role": "listitem",
+                              "label": "mere workspace · 6 members · 0 internal dependenciesCollapse mere workspaceEnter mere workspacemere workspace · 6 members · 0 internal dependenciesCollapse mere workspaceEnter mere workspace",
+                              "box": [
+                                1177,
+                                506,
+                                239,
+                                92
+                              ],
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Collapse mere workspace",
+                                  "expanded": true,
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Enter mere workspace",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "role": "button",
+                          "label": "Show relationship evidence",
+                          "expanded": false,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "role": "list",
+                      "label": "Disclosed projects",
+                      "children": [
+                        {
+                          "role": "listitem",
+                          "label": "Select genet-liverySelect genet-livery",
+                          "box": [
+                            1165,
+                            380,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select genet-livery",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select genet-renderSelect genet-render",
+                          "box": [
+                            1165,
+                            414,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select genet-render",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select taprootSelect taproot",
+                          "box": [
+                            1165,
+                            448,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select taproot",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select graphshellSelect graphshell",
+                          "box": [
+                            1165,
+                            482,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select graphshell",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select mere [crate:mere:mere]Select mere [crate:mere:mere]",
+                          "box": [
+                            1165,
+                            516,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select mere [crate:mere:mere]",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select pictographSelect pictograph",
+                          "box": [
+                            1165,
+                            550,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select pictograph",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select scenoSelect sceno",
+                          "box": [
+                            1165,
+                            584,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select sceno",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select scenographSelect scenograph",
+                          "box": [
+                            1165,
+                            618,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select scenograph",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select scenomiseSelect scenomise",
+                          "box": [
+                            1165,
+                            652,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select scenomise",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select woodshed-coreSelect woodshed-core",
+                          "box": [
+                            1165,
+                            686,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select woodshed-core",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select woodshed-genetSelect woodshed-genet",
+                          "box": [
+                            1165,
+                            720,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select woodshed-genet",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select woodsheddingSelect woodshedding",
+                          "box": [
+                            1165,
+                            754,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select woodshedding",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select genetSelect genet",
+                          "box": [
+                            1165,
+                            788,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select genet",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select mere [repo:mere]Select mere [repo:mere]",
+                          "box": [
+                            1165,
+                            822,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select mere [repo:mere]",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select woodshedSelect woodshed",
+                          "box": [
+                            1165,
+                            856,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select woodshed",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select genet workspaceSelect genet workspace",
+                          "box": [
+                            1165,
+                            890,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select genet workspace",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select mere workspaceSelect mere workspace",
+                          "box": [
+                            1165,
+                            924,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select mere workspace",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "listitem",
+                          "label": "Select woodshed workspaceSelect woodshed workspace",
+                          "box": [
+                            1165,
+                            958,
+                            263,
+                            30
+                          ],
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Select woodshed workspace",
+                              "pressed": false,
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "title": "Graphshell, one tree",
+    "visibility": "visible",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    }
+  },
+  "hidden": false,
+  "errors": []
+}

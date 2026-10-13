@@ -1,0 +1,151 @@
+{
+  "group": [
+    "p4_tree_forme.scn",
+    "p4_tree_forme_reopen.scn"
+  ],
+  "messages": [
+    {
+      "at": 1791856333849,
+      "url": "http://127.0.0.1:8846/tree.html?app=local&motion=normal",
+      "location": {
+        "url": "",
+        "line": 1,
+        "column": 46,
+        "lineNumber": 1,
+        "columnNumber": 46
+      },
+      "type": "log",
+      "text": "diagnostic document start 1791856333845 http://127.0.0.1:8846/tree.html?app=local&motion=normal"
+    },
+    {
+      "at": 1791856333944,
+      "url": "http://127.0.0.1:8846/tree.html?app=local&motion=normal",
+      "location": {
+        "url": "http://127.0.0.1:8846/favicon.ico",
+        "line": 0,
+        "column": 0,
+        "lineNumber": 0,
+        "columnNumber": 0
+      },
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (File not found)"
+    },
+    {
+      "at": 1791856334395,
+      "url": "http://127.0.0.1:8846/tree.html?app=local&motion=normal",
+      "location": {
+        "url": "",
+        "line": 1,
+        "column": 46,
+        "lineNumber": 1,
+        "columnNumber": 46
+      },
+      "type": "log",
+      "text": "diagnostic document start 1791856334394 about:blank"
+    },
+    {
+      "at": 1791856334404,
+      "url": "http://127.0.0.1:8846/tree.html?app=local&motion=normal",
+      "location": {
+        "url": "http://127.0.0.1:8846/pkg/graphshell_web.js",
+        "line": 734,
+        "column": 0,
+        "lineNumber": 734,
+        "columnNumber": 0
+      },
+      "type": "warning",
+      "text": "Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    },
+    {
+      "at": 1791856335424,
+      "url": "http://127.0.0.1:8846/tree.html?app=local&motion=normal",
+      "location": {
+        "url": "http://127.0.0.1:8846/tree.html?app=local&motion=normal",
+        "line": 0,
+        "column": 0,
+        "lineNumber": 0,
+        "columnNumber": 0
+      },
+      "type": "warning",
+      "text": "Compilation log for [ShaderModule \"vello.flatten\"]:\n\n1 warning(s) generated while compiling the shader:\n:385:5 warning: code is unreachable\n    return 0xffffffffu;\n    ^^^^^^\n"
+    },
+    {
+      "at": 1791856369095,
+      "url": "http://127.0.0.1:8846/tree.html?app=local&motion=normal",
+      "location": {
+        "url": "http://127.0.0.1:8846/loader.js",
+        "line": 28,
+        "column": 2,
+        "lineNumber": 28,
+        "columnNumber": 2
+      },
+      "type": "error",
+      "text": "panicked at /Users/markik/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/2c7ef73/components/genet-scripted-dom/lib.rs:1111:14:\nNodeId is not stored in this document (foreign or retired)\n\nStack:\n\nError\n    at __wbg_new_227d7c05414eb861 (http://127.0.0.1:8846/pkg/graphshell_web.js:1216:25)\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[195199]:0x25ee179\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[125517]:0x22f3b17\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[48885]:0x1aab586\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[177729]:0x256a223\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[154478]:0x247d498\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[34267]:0x17bb66d\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[75224]:0x1e895e3\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[198752]:0x25f8d73\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[159511]:0x24b5b1f\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[130423]:0x233fdd2\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[130424]:0x233fe0f\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[88348]:0x1ffc90a\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[107398]:0x21b2e28\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[112856]:0x221be75\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[109912]:0x21e42e8\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[9328]:0xe7d5d1\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[111374]:0x2200229\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[9971]:0xee819b\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[36696]:0x184ae57\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[69336]:0x1dc8334\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[49687]:0x1ace5ec\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[6183]:0xc092cd\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[74024]:0x1e6351d\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[37608]:0x187e64b\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[185589]:0x25b106f\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[144023]:0x23fd492\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[151053]:0x245519d\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[50897]:0x1b0326d\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[194912]:0x25ecb60\n    at wasm_bindgen_e1760538e619ad3d___convert__closures_____invoke___web_sys_cbfe650ae274fda2___features__gen_PointerEvent__PointerEvent______true_ (http://127.0.0.1:8846/pkg/graphshell_web.js:2740:10)\n    at HTMLCanvasElement.real (http://127.0.0.1:8846/pkg/graphshell_web.js:3047:20)\n\n"
+    },
+    {
+      "at": 1791856369099,
+      "url": "http://127.0.0.1:8846/tree.html?app=local&motion=normal",
+      "location": {
+        "url": "http://127.0.0.1:8846/loader.js",
+        "line": 28,
+        "column": 2,
+        "lineNumber": 28,
+        "columnNumber": 2
+      },
+      "type": "error",
+      "text": "panicked at /Users/markik/Code/worktrees/mere-nested-graph-view/crates/cambium/cambium-genet-web-host/src/mount.rs:193:18:\nRefCell already mutably borrowed\n\nStack:\n\nError\n    at __wbg_new_227d7c05414eb861 (http://127.0.0.1:8846/pkg/graphshell_web.js:1216:25)\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[195199]:0x25ee179\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[125517]:0x22f3b17\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[48885]:0x1aab586\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[177729]:0x256a223\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[154478]:0x247d498\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[34267]:0x17bb66d\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[75224]:0x1e895e3\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[198752]:0x25f8d73\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[159511]:0x24b5b1f\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[130423]:0x233fdd2\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[154271]:0x247aee9\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[43727]:0x19bc235\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[6335]:0xc2be19\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[185369]:0x25af327\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[143448]:0x23f5b09\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[150157]:0x244a9b8\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[50800]:0x1aff0a4\n    at wasm_bindgen_e1760538e619ad3d___convert__closures_____invoke___f64______true_ (http://127.0.0.1:8846/pkg/graphshell_web.js:2791:10)\n    at real (http://127.0.0.1:8846/pkg/graphshell_web.js:3047:20)\n\n"
+    },
+    {
+      "at": 1791856369186,
+      "url": "http://127.0.0.1:8846/tree.html?app=local&motion=normal",
+      "location": {
+        "url": "",
+        "line": 1,
+        "column": 46,
+        "lineNumber": 1,
+        "columnNumber": 46
+      },
+      "type": "log",
+      "text": "diagnostic document start 1791856369182 http://127.0.0.1:8846/tree.html?app=local&motion=normal"
+    },
+    {
+      "at": 1791856369475,
+      "url": "http://127.0.0.1:8846/tree.html?app=local&motion=normal",
+      "location": {
+        "url": "",
+        "line": 1,
+        "column": 46,
+        "lineNumber": 1,
+        "columnNumber": 46
+      },
+      "type": "log",
+      "text": "diagnostic document start 1791856369474 about:blank"
+    },
+    {
+      "at": 1791856369478,
+      "url": "http://127.0.0.1:8846/tree.html?app=local&motion=normal",
+      "location": {
+        "url": "http://127.0.0.1:8846/pkg/graphshell_web.js",
+        "line": 734,
+        "column": 0,
+        "lineNumber": 734,
+        "columnNumber": 0
+      },
+      "type": "warning",
+      "text": "Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    },
+    {
+      "at": 1791856369875,
+      "url": "http://127.0.0.1:8846/tree.html?app=local&motion=normal",
+      "location": {
+        "url": "http://127.0.0.1:8846/tree.html?app=local&motion=normal",
+        "line": 0,
+        "column": 0,
+        "lineNumber": 0,
+        "columnNumber": 0
+      },
+      "type": "warning",
+      "text": "Compilation log for [ShaderModule \"vello.flatten\"]:\n\n1 warning(s) generated while compiling the shader:\n:385:5 warning: code is unreachable\n    return 0xffffffffu;\n    ^^^^^^\n"
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "source": "77374c788",
+  "primary": {
+    "at": 1791856369095,
+    "url": "http://127.0.0.1:8846/tree.html?app=local&motion=normal",
+    "location": {
+      "url": "http://127.0.0.1:8846/loader.js",
+      "line": 28,
+      "column": 2,
+      "lineNumber": 28,
+      "columnNumber": 2
+    },
+    "type": "error",
+    "text": "panicked at /Users/markik/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/2c7ef73/components/genet-scripted-dom/lib.rs:1111:14:\nNodeId is not stored in this document (foreign or retired)\n\nStack:\n\nError\n    at __wbg_new_227d7c05414eb861 (http://127.0.0.1:8846/pkg/graphshell_web.js:1216:25)\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[195199]:0x25ee179\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[125517]:0x22f3b17\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[48885]:0x1aab586\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[177729]:0x256a223\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[154478]:0x247d498\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[34267]:0x17bb66d\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[75224]:0x1e895e3\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[198752]:0x25f8d73\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[159511]:0x24b5b1f\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[130423]:0x233fdd2\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[130424]:0x233fe0f\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[88348]:0x1ffc90a\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[107398]:0x21b2e28\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[112856]:0x221be75\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[109912]:0x21e42e8\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[9328]:0xe7d5d1\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[111374]:0x2200229\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[9971]:0xee819b\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[36696]:0x184ae57\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[69336]:0x1dc8334\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[49687]:0x1ace5ec\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[6183]:0xc092cd\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[74024]:0x1e6351d\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[37608]:0x187e64b\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[185589]:0x25b106f\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[144023]:0x23fd492\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[151053]:0x245519d\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[50897]:0x1b0326d\n    at http://127.0.0.1:8846/pkg/graphshell_web_bg.wasm:wasm-function[194912]:0x25ecb60\n    at wasm_bindgen_e1760538e619ad3d___convert__closures_____invoke___web_sys_cbfe650ae274fda2___features__gen_PointerEvent__PointerEvent______true_ (http://127.0.0.1:8846/pkg/graphshell_web.js:2740:10)\n    at HTMLCanvasElement.real (http://127.0.0.1:8846/pkg/graphshell_web.js:3047:20)\n\n"
+  },
+  "frames": [
+    {
+      "index": 195199,
+      "name": "<console_error_panic_hook[fdd264b5f6c663e1]::Error>::new::__wbg_new_227d7c05414eb861 externref shim"
+    },
+    {
+      "index": 125517,
+      "name": "<console_error_panic_hook[fdd264b5f6c663e1]::Error>::new"
+    },
+    {
+      "index": 48885,
+      "name": "console_error_panic_hook[fdd264b5f6c663e1]::hook_impl"
+    },
+    {
+      "index": 177729,
+      "name": "console_error_panic_hook[fdd264b5f6c663e1]::hook"
+    },
+    {
+      "index": 154478,
+      "name": "<console_error_panic_hook[fdd264b5f6c663e1]::hook as core[ed718c3d60ebd546]::ops::function::Fn<(&std[5a6270b673d0c64d]::panic::PanicHookInfo,)>>::call"
+    },
+    {
+      "index": 34267,
+      "name": "std[5a6270b673d0c64d]::panicking::panic_with_hook"
+    },
+    {
+      "index": 75224,
+      "name": "std[5a6270b673d0c64d]::panicking::panic_handler::{closure#0}"
+    },
+    {
+      "index": 198752,
+      "name": "std[5a6270b673d0c64d]::sys::backtrace::__rust_end_short_backtrace::<std[5a6270b673d0c64d]::panicking::panic_handler::{closure#0}, !>"
+    },
+    {
+      "index": 159511,
+      "name": "__rustc[100742bb89c490cb]::rust_begin_unwind"
+    },
+    {
+      "index": 130423,
+      "name": "core[ed718c3d60ebd546]::panicking::panic_fmt"
+    },
+    {
+      "index": 130424,
+      "name": "core[ed718c3d60ebd546]::option::expect_failed"
+    },
+    {
+      "index": 88348,
+      "name": "<core[ed718c3d60ebd546]::option::Option<&genet_scripted_dom[a4af6220dee1cd67]::Node>>::expect"
+    },
+    {
+      "index": 107398,
+      "name": "<genet_scripted_dom[a4af6220dee1cd67]::ScriptedDom>::node"
+    },
+    {
+      "index": 112856,
+      "name": "<genet_scripted_dom[a4af6220dee1cd67]::ScriptedDom as layout_dom_api[9fe2e130444b9e54]::LayoutDom>::parent"
+    },
+    {
+      "index": 109912,
+      "name": "<cambium_rootstock[1a38903774ea3e8b]::window_dom::WindowDom as layout_dom_api[9fe2e130444b9e54]::LayoutDom>::parent"
+    },
+    {
+      "index": 9328,
+      "name": "genet_livery[121e958599104e99]::placement::element_geometry::<cambium_rootstock[1a38903774ea3e8b]::window_dom::WindowDom>"
+    },
+    {
+      "index": 111374,
+      "name": "<cambium_rootstock[1a38903774ea3e8b]::owned_layout::OwnedLayout>::element_geometry::<cambium_rootstock[1a38903774ea3e8b]::window_dom::WindowDom>"
+    },
+    {
+      "index": 9971,
+      "name": "<cambium_rootstock[1a38903774ea3e8b]::owned_layout::OwnedLayout>::local_coordinates::<cambium_rootstock[1a38903774ea3e8b]::window_dom::WindowDom>"
+    },
+    {
+      "index": 36696,
+      "name": "<cambium_rootstock[1a38903774ea3e8b]::host::Host<graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage, for<'a> fn(&'a graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage) -> alloc[508e33bd5656020b]::boxed::Box<dyn meristem[cdcf25f71cabc8c9]::views::any_view::AnyView<graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage, (), cambium[de73128f5d22307c]::context::GenetCtx, cambium[de73128f5d22307c]::pod::GenetElement>>, alloc[508e33bd5656020b]::boxed::Box<dyn meristem[cdcf25f71cabc8c9]::views::any_view::AnyView<graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage, (), cambium[de73128f5d22307c]::context::GenetCtx, cambium[de73128f5d22307c]::pod::GenetElement>>>>::local_in::{closure#0}"
+    },
+    {
+      "index": 69336,
+      "name": "<core[ed718c3d60ebd546]::option::Option<(&cambium[de73128f5d22307c]::runner::GenetAppRunner<graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage, for<'a> fn(&'a graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage) -> alloc[508e33bd5656020b]::boxed::Box<dyn meristem[cdcf25f71cabc8c9]::views::any_view::AnyView<graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage, (), cambium[de73128f5d22307c]::context::GenetCtx, cambium[de73128f5d22307c]::pod::GenetElement>>, alloc[508e33bd5656020b]::boxed::Box<dyn meristem[cdcf25f71cabc8c9]::views::any_view::AnyView<graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage, (), cambium[de73128f5d22307c]::context::GenetCtx, cambium[de73128f5d22307c]::pod::GenetElement>>>, &cambium_rootstock[1a38903774ea3e8b]::owned_layout::OwnedLayout)>>::and_then::<((f32, f32), (f32, f32)), <cambium_rootstock[1a38903774ea3e8b]::host::Host<graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage, for<'a> fn(&'a graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage) -> alloc[508e33bd5656020b]::boxed::Box<dyn meristem[cdcf25f71cabc8c9]::views::any_view::AnyView<graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage, (), cambium[de73128f5d22307c]::context::GenetCtx, cambium[de73128f5d22307c]::pod::GenetElement>>, alloc[508e33bd5656020b]::boxed::Box<dyn meristem[cdcf25f71cabc8c9]::views::any_view::AnyView<graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage, (), cambium[de73128f5d22307c]::context::GenetCtx, cambium[de73128f5d22307c]::pod::GenetElement>>>>::local_in::{closure#0}>"
+    },
+    {
+      "index": 49687,
+      "name": "<cambium_rootstock[1a38903774ea3e8b]::host::Host<graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage, for<'a> fn(&'a graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage) -> alloc[508e33bd5656020b]::boxed::Box<dyn meristem[cdcf25f71cabc8c9]::views::any_view::AnyView<graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage, (), cambium[de73128f5d22307c]::context::GenetCtx, cambium[de73128f5d22307c]::pod::GenetElement>>, alloc[508e33bd5656020b]::boxed::Box<dyn meristem[cdcf25f71cabc8c9]::views::any_view::AnyView<graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage, (), cambium[de73128f5d22307c]::context::GenetCtx, cambium[de73128f5d22307c]::pod::GenetElement>>>>::local_in"
+    },
+    {
+      "index": 6183,
+      "name": "<cambium_rootstock[1a38903774ea3e8b]::host::Host<graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage, for<'a> fn(&'a graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage) -> alloc[508e33bd5656020b]::boxed::Box<dyn meristem[cdcf25f71cabc8c9]::views::any_view::AnyView<graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage, (), cambium[de73128f5d22307c]::context::GenetCtx, cambium[de73128f5d22307c]::pod::GenetElement>>, alloc[508e33bd5656020b]::boxed::Box<dyn meristem[cdcf25f71cabc8c9]::views::any_view::AnyView<graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage, (), cambium[de73128f5d22307c]::context::GenetCtx, cambium[de73128f5d22307c]::pod::GenetElement>>>>::hover_dispatch"
+    },
+    {
+      "index": 74024,
+      "name": "<cambium_rootstock[1a38903774ea3e8b]::host::Host<graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage, for<'a> fn(&'a graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage) -> alloc[508e33bd5656020b]::boxed::Box<dyn meristem[cdcf25f71cabc8c9]::views::any_view::AnyView<graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage, (), cambium[de73128f5d22307c]::context::GenetCtx, cambium[de73128f5d22307c]::pod::GenetElement>>, alloc[508e33bd5656020b]::boxed::Box<dyn meristem[cdcf25f71cabc8c9]::views::any_view::AnyView<graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage, (), cambium[de73128f5d22307c]::context::GenetCtx, cambium[de73128f5d22307c]::pod::GenetElement>>>>::pointer_moved"
+    },
+    {
+      "index": 37608,
+      "name": "cambium_genet_web_host[32e297827f83ae40]::mount::install_listeners::<graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage, for<'a> fn(&'a graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage) -> alloc[508e33bd5656020b]::boxed::Box<dyn meristem[cdcf25f71cabc8c9]::views::any_view::AnyView<graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage, (), cambium[de73128f5d22307c]::context::GenetCtx, cambium[de73128f5d22307c]::pod::GenetElement>>, alloc[508e33bd5656020b]::boxed::Box<dyn meristem[cdcf25f71cabc8c9]::views::any_view::AnyView<graphshell_web[5ad9ec0d4b82d984]::web_tree::TreePage, (), cambium[de73128f5d22307c]::context::GenetCtx, cambium[de73128f5d22307c]::pod::GenetElement>>>::{closure#4}"
+    },
+    {
+      "index": 185589,
+      "name": "wasm_bindgen[e1760538e619ad3d]::convert::closures::_::invoke::<web_sys[cbfe650ae274fda2]::features::gen_PointerEvent::PointerEvent, (), true>::{closure#0}"
+    },
+    {
+      "index": 144023,
+      "name": "<core[ed718c3d60ebd546]::panic::unwind_safe::AssertUnwindSafe<wasm_bindgen[e1760538e619ad3d]::convert::closures::_::invoke<web_sys[cbfe650ae274fda2]::features::gen_PointerEvent::PointerEvent, (), true>::{closure#0}> as core[ed718c3d60ebd546]::ops::function::FnOnce<()>>::call_once"
+    },
+    {
+      "index": 151053,
+      "name": "wasm_bindgen[e1760538e619ad3d]::__rt::maybe_catch_unwind::<core[ed718c3d60ebd546]::panic::unwind_safe::AssertUnwindSafe<wasm_bindgen[e1760538e619ad3d]::convert::closures::_::invoke<web_sys[cbfe650ae274fda2]::features::gen_PointerEvent::PointerEvent, (), true>::{closure#0}>, ()>"
+    },
+    {
+      "index": 50897,
+      "name": "wasm_bindgen[e1760538e619ad3d]::convert::closures::_::invoke::<web_sys[cbfe650ae274fda2]::features::gen_PointerEvent::PointerEvent, (), true>"
+    },
+    {
+      "index": 194912,
+      "name": "wasm_bindgen[e1760538e619ad3d]::convert::closures::_::invoke::<web_sys[cbfe650ae274fda2]::features::gen_PointerEvent::PointerEvent, (), true> externref shim"
+    }
+  ]
+}

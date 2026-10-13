@@ -35,6 +35,7 @@ fn named_from_dom(key: &str) -> Option<NamedKey> {
         "End" => NamedKey::End,
         "PageUp" => NamedKey::PageUp,
         "PageDown" => NamedKey::PageDown,
+        "F10" => NamedKey::F10,
         _ => return None,
     })
 }

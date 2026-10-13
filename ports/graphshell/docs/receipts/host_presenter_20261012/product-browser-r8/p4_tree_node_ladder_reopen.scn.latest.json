@@ -1,0 +1,42 @@
+{
+  "receipt": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        860,
+        551
+      ],
+      "canvas_physical_size": [
+        860,
+        551
+      ],
+      "log": [
+        "captured node_ladder_reopened_rules",
+        "gpu timestamps: no"
+      ],
+      "result": "ok",
+      "saved_graph": {
+        "address": "file:///Graphshell/reference-notes.md",
+        "file": null,
+        "reopened": true,
+        "save_state": "idle",
+        "selected": "392b7659-3952-57e9-8812-98c4d6205025",
+        "session": "26bca518-e5e2-49ea-be86-f4bee6537474",
+        "tags": "local, reference",
+        "title": "Reference notes"
+      },
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "node_ladder_reopened_rules",
+        "width": 860,
+        "height": 720,
+        "bytes": 141050
+      }
+    ]
+  },
+  "errors": []
+}

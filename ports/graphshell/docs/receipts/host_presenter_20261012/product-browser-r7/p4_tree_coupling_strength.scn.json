@@ -1,0 +1,54 @@
+{
+  "receipt": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        1140,
+        865
+      ],
+      "canvas_physical_size": [
+        1140,
+        865
+      ],
+      "log": [
+        "waited 1 frames",
+        "waited 0 frames",
+        "captured exact_strength_preview",
+        "waited 3 frames",
+        "waited 3 frames",
+        "waited 3 frames",
+        "captured exact_strength_saved",
+        "gpu timestamps: no"
+      ],
+      "result": "ok",
+      "saved_graph": {
+        "address": "https://example.test/i2p-port",
+        "file": null,
+        "reopened": false,
+        "save_state": "saved",
+        "selected": "81b91a6b-52ef-5751-b497-15f711cf9c70",
+        "session": "0f6a5aa3-2dbc-4d62-8835-208ef4399e33",
+        "tags": "research, transport",
+        "title": "I2P port notes"
+      },
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "exact_strength_preview",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 356598
+      },
+      {
+        "name": "exact_strength_saved",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 390158
+      }
+    ]
+  },
+  "errors": []
+}

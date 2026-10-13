@@ -1,0 +1,44 @@
+{
+  "receipt": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        1140,
+        865
+      ],
+      "canvas_physical_size": [
+        1140,
+        865
+      ],
+      "log": [
+        "waited 26 frames",
+        "waited 3 frames",
+        "captured reopened_strength_history",
+        "gpu timestamps: no"
+      ],
+      "result": "ok",
+      "saved_graph": {
+        "address": "",
+        "file": null,
+        "reopened": true,
+        "save_state": "saved",
+        "selected": null,
+        "session": "0f6a5aa3-2dbc-4d62-8835-208ef4399e33",
+        "tags": "",
+        "title": ""
+      },
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "reopened_strength_history",
+        "width": 1440,
+        "height": 1000,
+        "bytes": 382870
+      }
+    ]
+  },
+  "errors": []
+}
