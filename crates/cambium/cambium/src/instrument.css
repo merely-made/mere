@@ -1,0 +1,103 @@
+/* Copyright 2026 Mark Alan Boykin
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ * SPDX-License-Identifier: MPL-2.0 */
+
+.instrument-workspace {
+    --workspace-canvas: var(--tabard-color-bg);
+    --workspace-surface: var(--tabard-color-surface);
+    --workspace-control: var(--tabard-color-surface-2);
+    --workspace-ink: var(--tabard-color-text);
+    --workspace-muted: var(--tabard-color-text-dim);
+    --workspace-rule: var(--tabard-color-surface-2);
+    --workspace-accent: var(--tabard-color-primary);
+    --workspace-accent-ink: var(--tabard-color-on-primary);
+    --workspace-selected: var(--tabard-color-tertiary);
+    --workspace-selected-ink: var(--tabard-color-on-tertiary);
+    --workspace-focus: var(--tabard-color-secondary);
+    --workspace-padding: 12px;
+    color: var(--workspace-ink);
+    background: var(--workspace-canvas);
+    font-family: var(--tabard-font-interface, var(--workspace-font-interface, sans-serif)), var(--workspace-font-interface, sans-serif);
+    font-size: var(--tabard-font-interface-size, 14px);
+    line-height: var(--tabard-font-interface-line-height, 1.4);
+}
+.instrument-workspace .cambium-title-bar {
+    --titlebar-padding: 14px;
+    --titlebar-action-gap: 6px;
+    padding-top: 9px;
+    padding-bottom: 9px;
+    background: var(--workspace-surface);
+    color: var(--workspace-ink);
+    border-bottom: 3px solid var(--workspace-accent);
+}
+.instrument-workspace button {
+    color: var(--workspace-ink);
+    background: var(--workspace-control);
+    border: 1px solid var(--workspace-rule);
+    border-radius: 0;
+    padding: 5px 9px;
+    min-height: 30px;
+    font-family: var(--tabard-font-interface, var(--workspace-font-interface, sans-serif)), var(--workspace-font-interface, sans-serif);
+    font-size: var(--tabard-font-interface-size, 13px);
+}
+.instrument-workspace button:hover { border-color: var(--workspace-accent); }
+.instrument-workspace button:focus-visible, .instrument-workspace [role=textbox]:focus-visible, .instrument-workspace .frisket-tab:focus-visible {
+    outline: 2px solid var(--workspace-focus);
+    outline-offset: 2px;
+}
+.instrument-workspace button[aria-pressed=true] {
+    background: var(--workspace-selected);
+    color: var(--workspace-selected-ink);
+    border-color: var(--workspace-accent);
+}
+.instrument-workspace button[disabled], .instrument-workspace button[aria-disabled=true] { opacity: .55; }
+.instrument-workspace .primary-button {
+    color: var(--workspace-accent-ink);
+    background: var(--workspace-accent);
+    border-color: var(--workspace-accent);
+}
+.instrument-workspace .workspace-pane-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 9px var(--workspace-padding);
+    background: var(--workspace-surface);
+    color: var(--workspace-ink);
+    border-bottom: 1px solid var(--workspace-rule);
+    flex-shrink: 0;
+}
+.instrument-workspace .workspace-pane-header[data-active=true] { border-bottom: 2px solid var(--workspace-accent); }
+.instrument-workspace .workspace-pane-header[data-selected=true] .workspace-pane-title { color: var(--workspace-accent); }
+.instrument-workspace .workspace-pane-heading { flex: 1; min-width: 0; }
+.instrument-workspace .workspace-pane-title {
+    margin: 0;
+    font-family: var(--tabard-font-label, var(--tabard-font-interface, var(--workspace-font-interface, sans-serif))), var(--workspace-font-interface, sans-serif);
+    font-size: var(--tabard-font-label-size, 14px);
+    line-height: var(--tabard-font-label-line-height, 1.3);
+    font-weight: 500;
+}
+.instrument-workspace .workspace-pane-context {
+    margin: 3px 0 0;
+    color: var(--workspace-muted);
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+.instrument-workspace .workspace-pane-actions, .instrument-workspace .workspace-pane-states { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.instrument-workspace .workspace-pane-state { font-size: 12px; color: var(--workspace-muted); }
+.instrument-workspace .workspace-pane-state[data-state=dirty] { color: var(--tabard-color-danger); }
+.instrument-workspace .workspace-pane-state[data-state=selected] { color: var(--workspace-accent); }
+.instrument-workspace .frisket-tabbar { background: var(--workspace-surface); border-bottom: 1px solid var(--workspace-rule); }
+.instrument-workspace .frisket-tab { border-radius: 0; color: var(--workspace-ink); background: var(--workspace-surface); }
+.instrument-workspace .frisket-tab.active { color: var(--workspace-selected-ink); background: var(--workspace-selected); }
+.instrument-workspace .frisket-content { color: var(--workspace-ink); background: var(--workspace-surface); }
+.instrument-workspace .frisket-divider, .instrument-workspace .split-divider { background: var(--workspace-rule); }
+.instrument-workspace .workspace-pane-header button { --app-region: no-drag; }
+@media (max-width: 600px) {
+    .instrument-workspace .workspace-pane-actions { flex-basis: 100%; }
+    .instrument-workspace .cambium-title-bar { flex-wrap: wrap; }
+    .instrument-workspace .title-bar-actions { flex-wrap: wrap; }
+}
+@media (pointer: coarse) { .instrument-workspace button { min-height: 44px; } }

@@ -222,7 +222,8 @@ pub use title_bar::{TITLE_BAR_CSS, TitleBarSlot, title_bar};
 pub use value::{OnValue, OnValueState, ValueEvent, on_value};
 pub use wheel::{OnWheel, WheelEvent, on_wheel};
 pub use workspace::{
-    WORKSPACE_CSS, WorkspaceModel, composited_slots, workspace_view, workspace_view_with_marks,
+    INSTRUMENT_CSS, WORKSPACE_CSS, WorkspaceModel, WorkspacePaneStatus, composited_slots,
+    workspace_pane_header, workspace_view, workspace_view_with_marks,
     workspace_view_presented_with_marks,
 };
 
