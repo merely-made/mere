@@ -1,0 +1,18 @@
+RESULT ok
+Instrument workspace frame and domain specimens
+captured instrument_light
+captured instrument_dark
+captured instrument_dirty
+captured instrument_undone
+captured instrument_narrow_editor
+captured instrument_narrow_reader
+captured instrument_narrow_graph
+capture instrument_light 2560x1800 digest=abe1c6a32a6dc87a file=/Users/markik/Code/output/instrument-workspace-20261012/native-instrument-r3/instrument_light.png
+capture instrument_dark 2560x1800 digest=1e976525f4e51c78 file=/Users/markik/Code/output/instrument-workspace-20261012/native-instrument-r3/instrument_dark.png
+capture instrument_dirty 2560x1800 digest=7641a4bd67744bf5 file=/Users/markik/Code/output/instrument-workspace-20261012/native-instrument-r3/instrument_dirty.png
+capture instrument_undone 2560x1800 digest=d3393aeac1360ee3 file=/Users/markik/Code/output/instrument-workspace-20261012/native-instrument-r3/instrument_undone.png
+capture instrument_narrow_editor 1040x1720 digest=2e8e7c479b803086 file=/Users/markik/Code/output/instrument-workspace-20261012/native-instrument-r3/instrument_narrow_editor.png
+capture instrument_narrow_reader 1040x1720 digest=3eb14266d9249a19 file=/Users/markik/Code/output/instrument-workspace-20261012/native-instrument-r3/instrument_narrow_reader.png
+capture instrument_narrow_graph 1040x1720 digest=ea65560c637f5d8c file=/Users/markik/Code/output/instrument-workspace-20261012/native-instrument-r3/instrument_narrow_graph.png
+frames: 7 captured, 0 blank, 7 distinct digests
+presentation: 69 frames, 72 redraws, 3 unpresented redraws

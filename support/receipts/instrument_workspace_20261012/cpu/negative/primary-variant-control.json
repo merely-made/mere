@@ -1,0 +1,19 @@
+{
+  "restored_weak_primary_selector": true,
+  "exit": 101,
+  "expected_failure": true,
+  "command": [
+    "cargo",
+    "+1.97.1",
+    "test",
+    "-p",
+    "tabard-workshop",
+    "--test",
+    "instrument",
+    "frame_controls_do_not_skin_the_graphs_semantic_hit_targets",
+    "--locked",
+    "--offline",
+    "-q"
+  ],
+  "runtime_executed": false
+}

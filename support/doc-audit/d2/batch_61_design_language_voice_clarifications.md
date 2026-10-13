@@ -1,5 +1,32 @@
 # Batch 61: design-language voice clarifications
 
+**Instrument and retained-data entry continuation (2026-10-13):** Mark chose
+Instrument and clarified that each app's mere presents retained material, useful
+within or across domains and keyed to identity. Canonical §9.17 records that
+intent, the Turnstone/Woodshed/Knot/Gemini example and existing source/owner
+boundaries. Cambium supplies optional frame/pane presentation; Graphshell's
+reference entry reuses its existing local mere/session store and Forme view;
+Tabard retains its authored-draft and host-applied-appearance separation.
+
+The actual Graphshell browser candidate at `33f4c01fe` passed eight cases on
+AMD gcn-5 with no page errors and retained session identity. Native Tabard's
+frozen binary `8c760cd79e10` passed two cases at source `33f4c01fe`:
+twelve nonblank captures and 166 real presented frames. Runtime inputs belong
+to build `33f4c01fe`; later source changes are helpers and documentation.
+All twenty accepted image records are checked; representative domain, wide/narrow
+and authoring captures are inspected. Negative
+driver, font fallback, overlapping-control, graph-target/primary-variant and fresh-unsaved-draft receipts
+remain distinct from the accepted candidates. Twenty-nine focused CPU tests,
+viewer/main-page Wasm configurations, headers and complete 1614-package metadata
+boundaries pass at `33f4c01fe`. The [source-bound qualification](../../receipts/instrument_workspace_20261012/qualification.json)
+preserves the matrices and explicit browser/native releases.
+
+No full cross-app identity/domain flow, durable local storage, read-only-viewer
+runtime adoption, physical-input traversal or other app-entry adoption is
+claimed. The doc audit introduces no new findings; D2 retains 265/268 coverage
+and its three existing missing classic/producer receipt records, without new
+active Markdown or parser-shaped judgments.
+
 **Field/editor design continuation (2026-10-10):** following Mark's instruction
 to proceed, source was refreshed at published Mere `86f2a3b8`: Numen field and
 coupling data, graph mutations and strength accessors, Canvas picking and force
