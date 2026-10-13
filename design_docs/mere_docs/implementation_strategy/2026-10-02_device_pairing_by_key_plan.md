@@ -152,6 +152,33 @@ provenance are retained in
 and the bounded custody patch alongside them. D2 is partial; D3–D6 and the
 other machines' rollout remain open.
 
+**2026-10-13: bilateral client visibility, partial.** O-PC already registered
+the Surface, ThinkPad and both Macs; its Codex sidebar now groups by connection.
+The Surface client now registers O-PC and ThinkPad, and the ThinkPad client
+registers the Surface and O-PC. Registration used the supported SSH deep link;
+it leaves automatic connection disabled, so the Linux clients' Connect buttons
+remain a native user step. Sidebar visibility in those clients is not yet
+qualified. See [OpenAI's remote connections guide](https://learn.chatgpt.com/docs/remote-connections)
+and [deep-link reference](https://learn.chatgpt.com/docs/app/commands).
+
+Windows' bundled CLI lacked a complete package for daemon bootstrap. The
+matching packaged CLI (`0.162.0-alpha.17.2`) is now installed through npm and
+its managed daemon is running with the PID backend. A WebSocket handshake,
+initialization and read of an existing O-PC chat passed through its local
+control socket without resuming the chat. Reboot persistence is unqualified.
+Existing desktop app servers were preserved.
+
+The two Linux peers exchanged public-key grants and pinned host keys read
+through existing trusted connections. ThinkPad → Surface passed both SSH
+execution and a read of `Check stack status` through the Surface app-server.
+ThinkPad uses its existing GCR agent, not Djinn. Surface reverse checks await
+its native Djinn unlock. The additive Windows enrollment script preserves the
+Surface grant and scopes a separate rule to ThinkPad's address; parsing and
+unelevated refusal passed. Its UAC prompt was canceled, so that grant remains
+pending. The Macs remain unreachable. No laptop build, app restart or writer
+lock removal was used. Concrete client states and remaining done-conditions
+are in [`client-mesh.json`](../testing/receipts/djinn-ssh-peers/client-mesh.json).
+
 **Related**:
 
 - [reachability rungs and privacy lanes plan](2026-08-03_reachability_rungs_and_privacy_lanes_plan.md):
