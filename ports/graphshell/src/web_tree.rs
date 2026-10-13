@@ -1005,6 +1005,9 @@ fn main_page_mounted() -> bool {
 /// Mount the one-tree page into `root`.
 #[wasm_bindgen]
 pub fn mount_tree(root: Element) -> Result<(), JsValue> {
+    if !root.is_connected() {
+        return Err(JsValue::from_str("the mount root is not connected"));
+    }
     if mounted() || main_page_mounted() {
         return Err(JsValue::from_str(
             "Graphshell is already mounted on this page",
@@ -1012,7 +1015,13 @@ pub fn mount_tree(root: Element) -> Result<(), JsValue> {
     }
     let owns_title = root.has_attribute("data-owns-title");
     wasm_bindgen_futures::spawn_local(async move {
-        if let Err(error) = boot(root).await {
+        if let Err(error) = boot(root.clone()).await {
+            // The embedding host may remove a pending root on timeout. The
+            // web host drops late graphics acquisition before installing any
+            // retained host. Removal is cancellation, not a page error.
+            if !root.is_connected() {
+                return;
+            }
             web_sys::console::error_1(&error.clone().into());
             if let Some(document) = web_sys::window()
                 .and_then(|window| window.document())

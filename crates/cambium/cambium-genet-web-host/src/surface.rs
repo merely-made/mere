@@ -38,7 +38,15 @@ impl WebSurface {
         height: u32,
         options: NetrenderOptions,
     ) -> Result<Self, String> {
+        if !canvas.is_connected() {
+            return Err("the canvas was removed before graphics acquisition".into());
+        }
         let core = Arc::new(RenderCore::boot_async(options).await?);
+        // Device acquisition cannot be cancelled by removing a DOM node. A
+        // late result must be dropped before it can create a detached surface.
+        if !canvas.is_connected() {
+            return Err("the canvas was removed during graphics acquisition".into());
+        }
         // The one browser-specific line in the whole presentation path.
         let surface = core.create_surface(wgpu::SurfaceTarget::Canvas(canvas), width, height)?;
         Ok(Self { core, surface })

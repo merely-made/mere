@@ -82,6 +82,9 @@ where
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
 {
+    if !canvas.is_connected() {
+        return Err("the canvas was removed before mounting".into());
+    }
     let window = WebWindow::new(canvas.clone());
     let (width, height) = window.physical_size();
     // The backing store is sized in physical pixels so a fragment lands on a
@@ -90,6 +93,12 @@ where
     canvas.set_height(height);
 
     let surface = WebSurface::boot(canvas.clone(), width, height, (options.netrender)()).await?;
+    // Keep cancellation ahead of init, the accessibility mirror, retained
+    // listeners and the self-retaining frame loop. Dropping Mounted later is
+    // deliberately not a disposal API.
+    if !canvas.is_connected() {
+        return Err("the canvas was removed while mounting".into());
+    }
     let label = options.title.clone();
     // The wake flag the host reads, and the signal that gets a frame drawn.
     // Both are atomics: the host's wake handle is `Send + Sync` because a
