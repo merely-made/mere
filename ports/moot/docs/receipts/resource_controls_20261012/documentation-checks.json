@@ -1,0 +1,55 @@
+{
+  "document_counts_before": {
+    "active_docs": 265,
+    "indexed_active_docs": 264,
+    "index_orphans": 0,
+    "index_ghosts": 0,
+    "memory_directory_links": 0,
+    "statusless_plans": 0,
+    "broken_relative_links": 0,
+    "historical_broken_relative_links": 245,
+    "planned_broken_relative_links": 0,
+    "ambiguous_known_root_paths": 101,
+    "ignored_known_root_patterns": 23,
+    "reserved_identifier_paths": 24,
+    "missing_known_root_paths": 0,
+    "historical_missing_known_root_paths": 237,
+    "planned_missing_known_root_paths": 6,
+    "invalid_historical_annotations": 0,
+    "stale_historical_annotations": 0,
+    "unheaded_owned_sources": 0,
+    "exhibit_b_sources": 0
+  },
+  "document_counts_after": {
+    "active_docs": 265,
+    "indexed_active_docs": 264,
+    "index_orphans": 0,
+    "index_ghosts": 0,
+    "memory_directory_links": 0,
+    "statusless_plans": 0,
+    "broken_relative_links": 0,
+    "historical_broken_relative_links": 245,
+    "planned_broken_relative_links": 0,
+    "ambiguous_known_root_paths": 101,
+    "ignored_known_root_patterns": 23,
+    "reserved_identifier_paths": 24,
+    "missing_known_root_paths": 0,
+    "historical_missing_known_root_paths": 237,
+    "planned_missing_known_root_paths": 6,
+    "invalid_historical_annotations": 0,
+    "stale_historical_annotations": 0,
+    "unheaded_owned_sources": 0,
+    "exhibit_b_sources": 0
+  },
+  "judgment_errors_before": [
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_producer_gates/README.md"
+  ],
+  "judgment_errors_after": [
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_producer_gates/README.md"
+  ],
+  "document_new_findings": {}
+}

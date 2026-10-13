@@ -1,0 +1,8 @@
+PASS wide-entry
+PASS forme-original
+PASS forme-reopen
+PASS open-reading
+PASS light-workbench
+PASS narrow-workbench
+PASS narrow-graph
+PASS commands-focus

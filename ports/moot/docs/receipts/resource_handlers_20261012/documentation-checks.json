@@ -1,0 +1,58 @@
+{
+  "general_before_counts": {
+    "active_docs": 265,
+    "indexed_active_docs": 264,
+    "index_orphans": 0,
+    "index_ghosts": 0,
+    "memory_directory_links": 0,
+    "statusless_plans": 0,
+    "broken_relative_links": 0,
+    "historical_broken_relative_links": 245,
+    "planned_broken_relative_links": 0,
+    "ambiguous_known_root_paths": 101,
+    "ignored_known_root_patterns": 23,
+    "reserved_identifier_paths": 24,
+    "missing_known_root_paths": 0,
+    "historical_missing_known_root_paths": 237,
+    "planned_missing_known_root_paths": 6,
+    "invalid_historical_annotations": 0,
+    "stale_historical_annotations": 0,
+    "unheaded_owned_sources": 0,
+    "exhibit_b_sources": 0
+  },
+  "general_after_counts": {
+    "active_docs": 265,
+    "indexed_active_docs": 264,
+    "index_orphans": 0,
+    "index_ghosts": 0,
+    "memory_directory_links": 0,
+    "statusless_plans": 0,
+    "broken_relative_links": 0,
+    "historical_broken_relative_links": 245,
+    "planned_broken_relative_links": 0,
+    "ambiguous_known_root_paths": 101,
+    "ignored_known_root_patterns": 23,
+    "reserved_identifier_paths": 24,
+    "missing_known_root_paths": 0,
+    "historical_missing_known_root_paths": 237,
+    "planned_missing_known_root_paths": 6,
+    "invalid_historical_annotations": 0,
+    "stale_historical_annotations": 0,
+    "unheaded_owned_sources": 0,
+    "exhibit_b_sources": 0
+  },
+  "new_general_findings": {},
+  "D2_before_errors": [
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_producer_gates/README.md"
+  ],
+  "D2_after_errors": [
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_producer_gates/README.md"
+  ],
+  "new_D2_errors": [],
+  "inherited_D2_gaps": 3,
+  "conclusion": "No new documentation findings; three inherited D2 coverage gaps outside this handler scope remain."
+}

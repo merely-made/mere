@@ -1,0 +1,50 @@
+[
+  {
+    "label": "native-instrument-r2",
+    "command": [
+      "/Library/Developer/CommandLineTools/usr/bin/python3",
+      "/Users/markik/Code/worktrees/mere-tabard-typography/scripts/run_macos_scenario.py",
+      "--binary",
+      "/Users/markik/Code/output/instrument-workspace-20261012/frozen/tabard-desktop",
+      "--prefix",
+      "TABARD",
+      "--scenario",
+      "/Users/markik/Code/worktrees/mere-tabard-typography/ports/tabard/desktop/scenarios/instrument.scn",
+      "--output",
+      "/Users/markik/Code/output/instrument-workspace-20261012/native-instrument-r2",
+      "--timeout",
+      "120",
+      "--env",
+      "TABARD_WIDTH=1280",
+      "--env",
+      "TABARD_HEIGHT=900",
+      "--",
+      "--library",
+      "/Users/markik/Code/output/instrument-workspace-20261012/profile/native-instrument-r2.json"
+    ]
+  },
+  {
+    "label": "native-usability",
+    "command": [
+      "/Library/Developer/CommandLineTools/usr/bin/python3",
+      "/Users/markik/Code/worktrees/mere-tabard-typography/scripts/run_macos_scenario.py",
+      "--binary",
+      "/Users/markik/Code/output/instrument-workspace-20261012/frozen/tabard-desktop",
+      "--prefix",
+      "TABARD",
+      "--scenario",
+      "/Users/markik/Code/worktrees/mere-tabard-typography/ports/tabard/desktop/scenarios/usability.scn",
+      "--output",
+      "/Users/markik/Code/output/instrument-workspace-20261012/native-usability",
+      "--timeout",
+      "120",
+      "--env",
+      "TABARD_WIDTH=1280",
+      "--env",
+      "TABARD_HEIGHT=900",
+      "--",
+      "--library",
+      "/Users/markik/Code/output/instrument-workspace-20261012/profile/native-usability.json"
+    ]
+  }
+]

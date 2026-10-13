@@ -1,0 +1,17 @@
+document-canvas v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/inker/document-canvas)
+└── document-canvas feature "default"
+    └── platen v0.0.1 (/Users/markik/Code/worktrees/mere-nested-graph-view/crates/platen/platen)
+        └── graphshell v0.0.2 (/Users/markik/Code/worktrees/mere-nested-graph-view/ports/graphshell)
+            ├── graphshell feature "applets"
+            │   └── graphshell-web feature "applets" (command-line)
+            ├── graphshell feature "document-layout"
+            │   └── graphshell-web feature "product" (command-line)
+            ├── graphshell feature "eidetic"
+            │   └── graphshell feature "applets" (*)
+            └── graphshell feature "web"
+                └── graphshell-web v0.1.0 (/Users/markik/Code/worktrees/mere-nested-graph-view/ports/graphshell/web)
+                    ├── graphshell-web feature "applets" (command-line)
+                    └── graphshell-web feature "product" (command-line)
+                └── graphshell feature "applets" (*)
+        └── platen feature "document-layout"
+            └── graphshell feature "document-layout" (*)

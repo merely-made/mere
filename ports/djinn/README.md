@@ -32,6 +32,55 @@ The default configuration continues to read the existing Graphshell
 application directory. That is a compatibility bridge for selected profiles,
 pairing records, and content-store migrations, not an additional resident.
 
+## Installation and SSH
+
+On Linux, `install-linux.sh` takes prebuilt Djinn and `personae-vault`
+binaries. It installs a systemd user unit, enabled at login, without building
+on the target or replacing its existing `ssh-agent`. The optional last two
+arguments set the resident's memory ceiling and CPU quota:
+
+```sh
+bash ports/djinn/install-linux.sh /path/to/djinn /path/to/personae-vault 768M 50%
+systemctl --user start --no-block djinn.service
+```
+
+The native desktop dialog creates or unlocks the vault. Passphrases are not
+stored in the unit, environment, or installer. Start from the desktop user's
+session so the systemd user manager has its display and session bus environment.
+The dedicated agent is `$XDG_RUNTIME_DIR/djinn/agent.sock`; name that socket in
+each peer's SSH `IdentityAgent` setting. The desktop's existing agent remains
+available to other clients. An active resident or another owner's unit is
+preserved; a stopped unit's stale socket is removed only after checking its
+type, owner, inode and absence of a listener.
+
+`personae-vault generate-ssh <comment>` creates an Ed25519 SSH key inside
+Djinn and prints only its public half. The existing persona master remains
+unchanged. The key uses session unlock, is held in the encrypted vault, and
+becomes available to the live agent immediately. Register the public half on
+the intended peer. `scripts/djinn-ssh-control.py` is a small owner-local custody
+client for generation, public inspection and explicit lock checks; it handles
+neither private keys nor passphrases.
+
+On Windows, `install-ssh-server-windows.ps1` runs elevated to install the inbox
+OpenSSH Server, initialize missing host keys, and enable `sshd` automatically.
+It permits public-key authentication for one named local account and restricts
+the firewall rule to one peer IPv4 address. Existing SSH configuration owned
+elsewhere is refused for review. For an administrator account, pass the peer's
+public Ed25519 key as `-AuthorizedKeyFile`; enrollment appends it to the
+administrator key file and applies the Windows-required ACL. The script is
+for an administrator login, as used by this lane. Inspect its public host-key
+fingerprints locally before pinning the host at the peer.
+
+Windows' native identity unlock uses desktop Windows Hello with a visible
+parent window owned by Djinn. Its UI thread keeps that window responsive
+while Castellan verifies presence; the parent closes when verification ends.
+The SSH agent cannot unlock the vault over its wire. After a lock, use the
+resident's native unlock action before retrying SSH.
+
+These scripts establish SSH execution and custody. The Iroh SSH proxy,
+cross-device CA approval, and fleet pairing ceremony remain work in the
+device-pairing plan. Installing an SSH server does not establish those grants.
+
 ## Saved Gemini sites
 
 `djinn-site` submits an ordinary saved Knot site to the running resident through

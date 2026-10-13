@@ -1,0 +1,52 @@
+{
+  "source": "ea9239a3fe23c9e88eb1e05b887b2671e082f6b9",
+  "working_tree_diff": " crates/platen/platen/Cargo.toml |  9 ++++++++-\n crates/platen/platen/README.md  |  9 ++++++++-\n crates/platen/platen/src/lib.rs |  2 ++\n ports/graphshell/Cargo.toml     |  7 +++++--\n ports/graphshell/web/Cargo.toml | 11 ++++++++++-\n 5 files changed, 33 insertions(+), 5 deletions(-)\n",
+  "command": [
+    "/Users/markik/.rustup/toolchains/1.98.1-x86_64-apple-darwin/bin/cargo",
+    "rustc",
+    "--locked",
+    "--offline",
+    "--profile",
+    "viewer",
+    "--target",
+    "wasm32-unknown-unknown",
+    "--no-default-features",
+    "-j1",
+    "--",
+    "-C",
+    "strip=none"
+  ],
+  "named_attribution_only": true,
+  "profile": "viewer; named attribution overrides final crate strip only",
+  "manifest_sha256": "b28007804c7dba54099c87bc3e08cfacbcdcc8ac91dce909013aec196b18834e",
+  "sizes": {
+    "wasm": {
+      "raw": 10196332,
+      "gzip9": 3383277,
+      "cap": 3407872,
+      "sha256": "b598248d344b07a07ecc7c1ad8cec23e2a0926ee28eaee079088454806d2f6ec",
+      "pass": true
+    },
+    "glue": {
+      "raw": 115872,
+      "gzip9": 18382,
+      "cap": 20480,
+      "sha256": "85291b52a669d97117ff7ecdedb745ccfd912aa86544c772b0e479576c79926d",
+      "pass": true
+    },
+    "mount": {
+      "raw": 998,
+      "gzip9": 588,
+      "cap": 8192,
+      "sha256": "d36f0c879683b0f18e27d31b67162055fab268377ad04c2d0039f1aaf116419f",
+      "pass": true
+    },
+    "history": {
+      "raw": 271932,
+      "gzip9": 6254,
+      "cap": 131072,
+      "sha256": "aa3411e8b7eb9d4b145ed895c5330ef3be47c31746a5ac9b61f4f7fe1452289d",
+      "pass": true
+    }
+  }
+}

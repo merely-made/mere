@@ -1,0 +1,29 @@
+{
+  "source": "7cf093684c50643217038240ecfff375d75636d1",
+  "cutoff": "2026-10-13T05:25:55Z",
+  "started": "2026-10-13T04:56:25.759687+00:00",
+  "drivers": [
+    {
+      "driver": "verify-commands-combined.cjs",
+      "exit": 0
+    },
+    {
+      "driver": "verify-presenter-combined.cjs",
+      "exit": 0
+    },
+    {
+      "driver": "verify-budget-combined.cjs",
+      "exit": 1
+    }
+  ],
+  "closed": true,
+  "owned_pids": [
+    10525,
+    10526,
+    10527,
+    10614,
+    10641
+  ],
+  "failure": "verify-budget-combined.cjs failed; preserve run and release",
+  "released": "2026-10-13T05:00:02.695626+00:00"
+}

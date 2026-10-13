@@ -4,6 +4,9 @@
 
 //! Window-neutral Pelt host controller.
 
+#[cfg(feature = "genet")]
+pub mod native;
+
 mod content;
 mod input;
 mod pool;

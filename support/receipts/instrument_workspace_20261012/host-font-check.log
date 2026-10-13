@@ -1,0 +1,10 @@
+error: failed to get `knot-editor` as a dependency of package `djinn v0.0.2 (/Users/markik/Code/worktrees/mere-tabard-typography/ports/djinn)`
+
+Caused by:
+  failed to load source for dependency `knot-editor`
+
+Caused by:
+  unable to update https://github.com/merely-made/knot-editor.git?rev=8ed49d43f049921d56ab5a0c091a2c37c0970ee7#8ed49d43
+
+Caused by:
+  can't checkout from 'https://github.com/merely-made/knot-editor.git': you are in the offline mode (--offline)

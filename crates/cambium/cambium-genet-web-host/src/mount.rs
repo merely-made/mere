@@ -520,11 +520,11 @@ where
     );
     let h = host.clone();
     let m = mirror.clone();
-    listen!(
-        root,
-        "focusin",
-        web_sys::FocusEvent,
-        move |e: web_sys::FocusEvent| {
+    // Following host focus can synchronously emit another focusin. The guard
+    // below answers that nested event; an FnMut trampoline refuses it before
+    // the guard can run.
+    let focus_listener =
+        Closure::<dyn Fn(web_sys::FocusEvent)>::new(move |e: web_sys::FocusEvent| {
             // The mirror moving focus to follow the tree is not a reader asking.
             if m.moving.get() {
                 return;
@@ -533,8 +533,10 @@ where
                 let action = A11yAction::Focus;
                 reader_act(&h, A11yRequest { action, target });
             }
-        }
-    );
+        });
+    root.add_event_listener_with_callback("focusin", focus_listener.as_ref().unchecked_ref())
+        .map_err(|_| "could not attach focusin".to_string())?;
+    focus_listener.forget();
 
     // The canvas takes focus from Tab or a press, and hands it to the mirror,
     // where a reader hears what has it.

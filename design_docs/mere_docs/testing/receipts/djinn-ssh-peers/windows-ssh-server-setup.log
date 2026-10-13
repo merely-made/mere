@@ -1,0 +1,94 @@
+**********************
+PowerShell transcript start
+Start time: 20261012234024
+Username: O-PC\mark_
+RunAs User: O-PC\mark_
+Configuration Name: 
+Machine: O-PC (Microsoft Windows NT 10.0.26220.0)
+Host Application: C:\Program Files\PowerShell\7\pwsh.dll -NoProfile -File C:/Users/mark_/Code/repos/mere/ports/djinn/install-ssh-server-windows.ps1 -PeerAddress 192.168.4.59 -LoginUser mark_
+Process ID: 30392
+PSVersion: 7.6.6
+PSEdition: Core
+GitCommitId: 7.6.6
+OS: Microsoft Windows 10.0.26220
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+PS>TerminatingError(): "The existing Djinn SSH rule has a different peer; preserve it and review the change."
+The existing Djinn SSH rule has a different peer; preserve it and review the change.
+Exception: C:\Users\mark_\Code\repos\mere\ports\djinn\install-ssh-server-windows.ps1:58
+Line |
+  58 |          throw 'The existing Djinn SSH rule has a different peer; pres …
+     |          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | The existing Djinn SSH rule has a different peer; preserve it and review the change.
+
+**********************
+PowerShell transcript end
+End time: 20261012234034
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261013012133
+Username: O-PC\mark_
+RunAs User: O-PC\mark_
+Configuration Name: 
+Machine: O-PC (Microsoft Windows NT 10.0.26220.0)
+Host Application: C:\Program Files\PowerShell\7\pwsh.dll -NoProfile -File C:\Users\mark_\Code\repos\mere\ports\djinn\install-ssh-server-windows.ps1 -PeerAddress 192.168.4.59 -LoginUser mark_ -AuthorizedKeyFile C:\Users\mark_\AppData\Local\Djinn\s-pc-authorized.pub
+Process ID: 41512
+PSVersion: 7.6.6
+PSEdition: Core
+GitCommitId: 7.6.6
+OS: Microsoft Windows 10.0.26220
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+ssh-keygen: generating new host keys: RSA ECDSA ED25519
+
+PS>TerminatingError(Restart-Service): "The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: Failed to start service 'OpenSSH SSH Server (sshd)'."
+>> TerminatingError(Restart-Service): "The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: Failed to start service 'OpenSSH SSH Server (sshd)'."
+The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: Failed to start service 'OpenSSH SSH Server (sshd)'.
+Restart-Service: C:\Users\mark_\Code\repos\mere\ports\djinn\install-ssh-server-windows.ps1:99
+Line |
+  99 |  Restart-Service -Name sshd
+     |  ~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | Failed to start service 'OpenSSH SSH Server (sshd)'.
+
+**********************
+PowerShell transcript end
+End time: 20261013012146
+**********************
+**********************
+PowerShell transcript start
+Start time: 20261013012330
+Username: O-PC\mark_
+RunAs User: O-PC\mark_
+Configuration Name: 
+Machine: O-PC (Microsoft Windows NT 10.0.26220.0)
+Host Application: C:\Program Files\PowerShell\7\pwsh.dll -NoProfile -File C:\Users\mark_\Code\repos\mere\ports\djinn\install-ssh-server-windows.ps1 -PeerAddress 192.168.4.59 -LoginUser mark_ -AuthorizedKeyFile C:\Users\mark_\AppData\Local\Djinn\s-pc-authorized.pub
+Process ID: 23148
+PSVersion: 7.6.6
+PSEdition: Core
+GitCommitId: 7.6.6
+OS: Microsoft Windows 10.0.26220
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+
+
+
+256 SHA256:O9jeD3tZDgbYO8dIKZHv5H9hURnt9QF4jmYV2qcFVr0 mark_@O-PC (ECDSA)
+256 SHA256:BMpl1R39VEjEGjtJye+6uNhEJIccvJVV9XYgIaxQpHI mark_@O-PC (ED25519)
+3072 SHA256:JE2WDXsLKfL593F3W+rndbpI1QF82SHsPUX71EtRfhA mark_@O-PC (RSA)
+**********************
+PowerShell transcript end
+End time: 20261013012335
+**********************

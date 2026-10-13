@@ -1,0 +1,263 @@
+{
+  "scope": "Instrument shared presentation and actual Graphshell local-mere / Tabard workshop pilot",
+  "compiler": "rustc 1.97.1",
+  "build_source": "33f4c01fe855e9e7e5f00088eaaf231267ee6268",
+  "browser": {
+    "source": "33f4c01fe855e9e7e5f00088eaaf231267ee6268",
+    "runs": [
+      "wide-entry",
+      "forme-original",
+      "forme-reopen",
+      "open-reading",
+      "light-workbench",
+      "narrow-workbench",
+      "narrow-graph",
+      "commands-focus"
+    ],
+    "adapter": {
+      "vendor": "amd",
+      "architecture": "gcn-5",
+      "device": ""
+    },
+    "browser": "152.0.7977.83",
+    "headed": true,
+    "page_errors": 0,
+    "session": "d26382c9-932f-4c75-9b2b-ec0d4a1d6de2"
+  },
+  "native_source": "33f4c01fe855e9e7e5f00088eaaf231267ee6268",
+  "native_binary_sha256": "8c760cd79e1065c5732cb058d589c81de37681ca303bcb7ff22ef4390f9a0182",
+  "native": [
+    {
+      "label": "native-instrument-r4",
+      "process": {
+        "launch_method": "LaunchServices temporary application bundle",
+        "launcher_exit": 0,
+        "timeout": false,
+        "success": true,
+        "elapsed_seconds": 21.976,
+        "binary_sha256": "8c760cd79e1065c5732cb058d589c81de37681ca303bcb7ff22ef4390f9a0182",
+        "scenario_sha256": "fa37605fc6c21babc3819b5b0d2e998b9ef0ff99586060e34bc9582625656988",
+        "receipt": "scenario.done",
+        "captures": 7
+      },
+      "captured": 7,
+      "blank": 0,
+      "presented": 69,
+      "redraws": 72,
+      "unpresented_redraws": 3
+    },
+    {
+      "label": "native-usability-r3",
+      "process": {
+        "launch_method": "LaunchServices temporary application bundle",
+        "launcher_exit": 0,
+        "timeout": false,
+        "success": true,
+        "elapsed_seconds": 29.204,
+        "binary_sha256": "8c760cd79e1065c5732cb058d589c81de37681ca303bcb7ff22ef4390f9a0182",
+        "scenario_sha256": "f287873a7d6972bcd8b3cfe1a41ebee9d501e3d8c3fddec1300fb73030d66ae1",
+        "receipt": "scenario.done",
+        "captures": 5
+      },
+      "captured": 5,
+      "blank": 0,
+      "presented": 97,
+      "redraws": 100,
+      "unpresented_redraws": 3
+    }
+  ],
+  "runtime_input_binding": "Browser and native source hashes unchanged after the final capture",
+  "post_capture_native_source_changes": [],
+  "current_source": "33f4c01fe855e9e7e5f00088eaaf231267ee6268",
+  "frame_independence_pixels": {
+    "coordinate": [
+      20,
+      20
+    ],
+    "light_and_dark_frame": [
+      238,
+      245,
+      255,
+      255
+    ],
+    "reader_coordinate": [
+      1700,
+      500
+    ],
+    "reader_light": [
+      28,
+      33,
+      47,
+      255
+    ],
+    "reader_dark": [
+      229,
+      236,
+      253,
+      255
+    ]
+  },
+  "artifacts": {
+    "browser-r6/commands-focus.png": {
+      "sha256": "24358a2d6e43efdf014697667d84abf3a9511d50f667d17b8cc1f0f0e4142080",
+      "width": 520,
+      "height": 860,
+      "unique_rgb": 1987
+    },
+    "browser-r6/forme-original.png": {
+      "sha256": "e1e5e38632e5adb5da977c203102c2fd7309bd2da606c51fc57c8d55f2830d75",
+      "width": 1280,
+      "height": 900,
+      "unique_rgb": 2561
+    },
+    "browser-r6/forme-reopen.png": {
+      "sha256": "b320457e4c669131e9656e3dd8c2757e18201cb7829df9f3dc711956063c4e01",
+      "width": 1280,
+      "height": 900,
+      "unique_rgb": 1528
+    },
+    "browser-r6/light-workbench.png": {
+      "sha256": "2945201d9fd1836240ae6876f9cbfd48bf2e26304e2c25f640ab635233efb3b6",
+      "width": 1280,
+      "height": 900,
+      "unique_rgb": 2138
+    },
+    "browser-r6/narrow-graph.png": {
+      "sha256": "10f57029ab398ad93fcda89329a81a1c5a226bbd154e19f9ec34015b237aaa29",
+      "width": 520,
+      "height": 860,
+      "unique_rgb": 1987
+    },
+    "browser-r6/narrow-workbench.png": {
+      "sha256": "8d9f768469008d8c9db916ba7b4e9158e147d1b77200e8aa91da2afe3a8044bc",
+      "width": 520,
+      "height": 860,
+      "unique_rgb": 1819
+    },
+    "browser-r6/open-reading.png": {
+      "sha256": "30d8c55b5a842d75b34c5b0c64e8fc2795531516c41367bd00da7a8d6e5f214c",
+      "width": 1280,
+      "height": 900,
+      "unique_rgb": 1528
+    },
+    "browser-r6/wide-entry.png": {
+      "sha256": "7ac09f18f0cf9f660a0b43ab3efd40e132f88da952a6817a6098dd731dfdbcee",
+      "width": 1280,
+      "height": 900,
+      "unique_rgb": 1706
+    },
+    "native-instrument-r4/instrument_dark.png": {
+      "sha256": "7f2216a19549e597d33288203cd6972026160980b609be99421e3b27c9f61e2c",
+      "width": 2560,
+      "height": 1800,
+      "unique_rgb": 4072
+    },
+    "native-instrument-r4/instrument_dirty.png": {
+      "sha256": "6f8b0c2947e0e3ee07728a5d5bfc90c28c0a41a2a4d10385d8402ed40dbf507c",
+      "width": 2560,
+      "height": 1800,
+      "unique_rgb": 4473
+    },
+    "native-instrument-r4/instrument_light.png": {
+      "sha256": "797ac3f6c9373a61cdeb0234230c96ef11fea369a0c4624b825e2add56a57602",
+      "width": 2560,
+      "height": 1800,
+      "unique_rgb": 4093
+    },
+    "native-instrument-r4/instrument_narrow_editor.png": {
+      "sha256": "4ccd4f1b850a3064f6310de0437a8354e1f30348d27bb5d40cee0557973be7cb",
+      "width": 1040,
+      "height": 1720,
+      "unique_rgb": 1921
+    },
+    "native-instrument-r4/instrument_narrow_graph.png": {
+      "sha256": "cc8c5d9e20fc4a8ac82cad2444005ebd7c96cf0266a91b83e50fd26734917356",
+      "width": 1040,
+      "height": 1720,
+      "unique_rgb": 3160
+    },
+    "native-instrument-r4/instrument_narrow_reader.png": {
+      "sha256": "0402b77e0aaf40c8c2d365270a45a92a34c44507b80473ef565f674706b687bb",
+      "width": 1040,
+      "height": 1720,
+      "unique_rgb": 2624
+    },
+    "native-instrument-r4/instrument_undone.png": {
+      "sha256": "7816f0e97a77a44a76967c6f4f57f58ef6155a1ce0f145b961f682db503f8081",
+      "width": 2560,
+      "height": 1800,
+      "unique_rgb": 4072
+    },
+    "native-usability-r3/authored_stylesheet.png": {
+      "sha256": "cb2a03f4b2895fbdb68a8b0160d94286365d57953e6ae6f7834d295f8749dc87",
+      "width": 2560,
+      "height": 1800,
+      "unique_rgb": 6225
+    },
+    "native-usability-r3/derived_restored.png": {
+      "sha256": "2162031e58a944143c7fe5a4c92f52b9dba937efee887834978f9efca62119a8",
+      "width": 2560,
+      "height": 1800,
+      "unique_rgb": 4794
+    },
+    "native-usability-r3/usable_initial.png": {
+      "sha256": "f5fb159de03778a1423cde02126ea083b49dcc3f1b41e917b4849bad7b4022b1",
+      "width": 2560,
+      "height": 1800,
+      "unique_rgb": 4093
+    },
+    "native-usability-r3/usable_narrow.png": {
+      "sha256": "f823c6bcfcfc55247ea6f4c708f9f1e076824641643834381e05582ae14ccc65",
+      "width": 1280,
+      "height": 1560,
+      "unique_rgb": 4897
+    },
+    "native-usability-r3/usable_reopened.png": {
+      "sha256": "9c796119a991a91acc0768ea64cef413283ad7566ac7095032fbb1c9d17342aa",
+      "width": 2560,
+      "height": 1800,
+      "unique_rgb": 6923
+    }
+  },
+  "negative_receipts": {
+    "browser-r1": "Driver awaited visibility of inert semantic heading; closed without product acceptance",
+    "browser-r2": "Driver tried opening an already-open workbench; capture revealed missing host fallback font and was rejected",
+    "browser-r3": "Eight cases passed, but visual review found legacy floating controls covering the scene caption; layout renewed in r4",
+    "native-instrument-r2 / native-usability": "Scenarios passed but final baseline comparison rejected neutral rectangles over transparent graph targets. Revised utility-region control styling, CPU negative control, fresh builds and captures required",
+    "native-instrument-r3 / native-usability-r2": "Domain graph targets restored but primary Save accent lost to utility selector specificity; primary variant precedence renewed with a negative CPU control and final capture",
+    "native-instrument": "Fresh theme is unsaved; initial clean-state assertion was incorrect. Seven nonblank captures, no native acceptance. Corrected via real Save in r2",
+    "cpu/negative/neutral-font-list.log": "Neutral computed family gained an equivalent fallback; exact serialized-string expectation renewed as an all-neutral-family invariant",
+    "cpu/negative/graph-hit-target-control.log": "Restoring generic frame button rules fails the production graph target background alpha invariant; original corrected rules restored before successful builds",
+    "cpu/negative/primary-variant-control.log": "Restoring weak primary variant selector fails the exact Tabard accent assertion; corrected original restored before successful builds",
+    "cpu/negative/test-import.log": "New regression test imported wrong module name; corrected to the existing Genet Livery API"
+  },
+  "limits": [
+    "Cross-app identity/source/domain action flow is recorded direction, not executed interop",
+    "Browser reference entry uses current local IndexedDB storage; durable reservoir and identity resolver are separate admitted work",
+    "Graph overview glyphs, domain node presentation, live carrier and app-wide entry adoption are outside this frame qualification",
+    "Scripted production input and actual rendered captures; no new physical pointer or screen-reader traversal receipt",
+    "Other consumer apps and read-only viewer runtime acceptance are not transferred from this pilot"
+  ],
+  "browser_executed": true,
+  "native_executed": true,
+  "cpu_receipt": "cpu/gates.json",
+  "full_metadata_receipt": "cpu/full-metadata-boundaries.json",
+  "visual_review": {
+    "reviewer": "Instrument lane",
+    "inspected": [
+      "browser-r6/wide-entry.png",
+      "browser-r6/open-reading.png",
+      "browser-r6/narrow-graph.png",
+      "native-instrument-r4/instrument_light.png",
+      "native-instrument-r4/instrument_dirty.png",
+      "native-instrument-r4/instrument_narrow_graph.png",
+      "native-usability-r3/authored_stylesheet.png",
+      "native-usability-r3/usable_reopened.png",
+      "native-usability-r3/usable_narrow.png"
+    ],
+    "scope": "Real captions, readable frame/content, preserved domain graph nodes/selection rings and primary Save accent, authored CSS/reopen/narrow production captures"
+  },
+  "browser_release": "browser-r6/release.json",
+  "native_release": "native-release.json",
+  "publication_scope": "Actual local product and native workshop pilot, shared presentation patterns. Concurrent read-only release-viewer qualification stays separately owned and source-bound; no transferred acceptance."
+}
