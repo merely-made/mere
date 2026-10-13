@@ -9,7 +9,6 @@
   "windows_build_provenance": "cached native binary; source commit not established",
   "checks": {
     "surface_to_windows": "pending native Windows elevation",
-    "surface_locked_signature": "pending",
     "surface_absent_agent_signature_exit": 2,
     "custody_generation_tests_passed": 2,
     "surface_unlocked_agent_signature": "passed",
@@ -17,7 +16,9 @@
     "test_features": "castellan/keeper",
     "linux_build": "cargo build --locked -p djinn --bin djinn -p graphshell --bin personae-vault, CARGO_BUILD_JOBS=1",
     "linux_installer_preserves_active_resident": true,
-    "windows_installer_refuses_unelevated_before_writes": true
+    "windows_installer_refuses_unelevated_before_writes": true,
+    "surface_locked_signature_exit": 1,
+    "surface_locked_generation_exit": 2
   },
   "laptop": {
     "memory_current_bytes": 147927040,
@@ -26,7 +27,9 @@
     "service": "systemd --user djinn.service",
     "vault_protection": "passphrase",
     "cpu_quota": "50%",
-    "plaintext_user_ssh_private_key_files_created": 0
+    "plaintext_user_ssh_private_key_files_created": 0,
+    "current_vault_state": "Locked",
+    "memory_while_locked_bytes": 38518784
   },
   "preserved": [
     "Windows legacy resident and standard agent",
