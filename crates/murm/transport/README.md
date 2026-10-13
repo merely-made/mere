@@ -62,7 +62,7 @@ distinction; `into_stream()` discards the context.
 
 | Item | Role |
 | --- | --- |
-| `P2pandaTransport::builder(&Ed25519Keypair)` | Builder over an identity keypair. `builder_from_seed([u8; 32])` takes a raw signing seed from an external provider. |
+| `P2pandaTransport::builder_for(&DerivedKeypair)` | Production builder over a scoped Personae-derived key. `builder(&Ed25519Keypair)` requires `test-identity` outside this crate's tests; `builder_from_seed_ref(&[u8; 32])` accepts borrowed external seed material. |
 | `P2pandaTransportBuilder` | `alpns`, `blobs`, `relay_url`, `mdns`, `discovery`, `discovery_config`, `gossip`, then `bind()`. |
 | `P2pandaTransport::bind` / `bind_seed` / `bind_with_blobs` | Shorthands for the common builds. `bind_with_blobs` makes the router serve iroh-blobs. |
 | `endpoint_addr`, `ticket`, `add_peer`, `add_peer_ticket`, `peer_ticket` | Explicit bootstrap: serialize this node's `EndpointAddr` to a pasteable ticket and dial back from one. |
@@ -91,10 +91,10 @@ so a bare `cargo test -p mere-transport` skips it.
 
 | Crate | Why |
 | --- | --- |
-| `identity` (`personae`) | `Ed25519Keypair` / `Ed25519PublicKey` behind `PeerID`. External providers can pass a raw 32-byte seed instead. |
-| `iroh` 1.0.3 (floor) | QUIC. 1.0.2 exact-pinned a dalek prerelease; 1.0.3 relaxed it to a range. |
+| `identity` (`personae`) | Scoped `DerivedKeypair` for production transport construction; `Ed25519PublicKey` behind `PeerID`. External providers can lend raw seed material. |
+| `iroh` 1.0.3 (manifest floor), 1.3.0 (current lock) | QUIC. The shared p2panda supplier requires Iroh 1.3.0. |
 | `iroh-blobs`, `iroh-tickets` | Content-addressed storage; pasteable `EndpointAddr` tickets. |
-| `p2panda-net` | The endpoint authority behind `P2pandaTransport`: discovery, relay and hole-punching, gossip, LogSync. Pins iroh 1.0. |
+| `p2panda-net` | The endpoint authority behind `P2pandaTransport`: discovery, relay and hole-punching, gossip, LogSync. The `mere-p2panda-net` fork preserves Mere's protocol routing and address-book seams. |
 | `p2panda-core` | Operation types on the sync path. |
 | `tokio` | Stream I/O, the accept plumbing, `endpoint_addr`'s discovery wait. |
 | `retinue`, `snow`, `hkdf`, `sha2`, `notochord` | Optional, per the features above. |

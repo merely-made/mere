@@ -247,8 +247,12 @@ byte slices, and the workspace does not otherwise carry that crate.
 ## Status
 
 Pre-1.0 (`STAGE = "pre-alpha"`). C0 (the core and its vectors) and C1 (the
-`native` and `browser` runtime adapters) are here. `InviteV1` and the
-redemption proof (C2), and forced-relay reconnect (C3), are not.
+`native` and `browser` runtime adapters) are here. Invitation redemption and
+Notochord admission (C2), forced-relay reconnect (C3), and the real browser
+Graphshell consumer (C4) are implemented above this crate and recorded in the
+[carrier plan](../../../design_docs/mere_docs/implementation_strategy/2026-08-25_browser_webrtc_carrier_plan.md).
+Public rendezvous (C5) remains next. Those Graphshell receipts do not qualify a
+browser Murm conversation consumer.
 
 ## License
 
