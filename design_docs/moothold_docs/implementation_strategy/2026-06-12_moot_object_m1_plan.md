@@ -720,11 +720,11 @@ Replay the owner/control tests with
 The source/semantic-DOM receipt supplies no GPU, native-window or browser
 acceptance.
 
-**Remaining host gates:** install the view in an admitted Graphshell host with
-its real owner dispatch and refresh loop; bind actual application sessions;
-provide private access/key and content-retention/hosting owners; then qualify
-layout, themes, keyboard/focus, narrow widths, exact-read independence and source
-withdrawal across real peers under the serialized runtime handoff. The current
+**Host handoff:** the following continuation installs admitted Graphshell
+mounting with the real owner dispatch and refresh loop. Remaining gates bind
+actual application sessions and provide private access/key and content-retention/
+hosting owners, then qualify themes, keyboard/focus, exact-read independence and
+source withdrawal across real peers under the serialized runtime handoff. The current
 S-PC occurrence/relationship inspector and presentation rules supply the read
 and presentation contracts without becoming new resource authorities.
 
@@ -763,11 +763,24 @@ checksums remain unchanged. Production workspace patches remain intact.
 The [native proof entry](../../../ports/graphshell/src/bin/moot_resources_host.rs)
 mounts Alice's and Bob's independent readings on the shared Cambium host. Its
 fixtures use real signed Gemot and Personae operations, locally verified
-sans-I/O Graphshell admission, and public unsealed memory storage. Native
-layout/paint and captures remain pending until a coordinated finite run; the
+sans-I/O Graphshell admission, and public unsealed memory storage. Two fresh
+native processes passed the wide (1280×920) and compact (520×860) paint/layout
+proof in 26.37 seconds, with four presented, reviewed captures each: initial
+independent readings, Alice's opened notebook, Bob's signed reference fork,
+and Bob's expired session with Alice's content still available. Controls use
+semantic DOM callbacks, rather than physical input. The
 [qualification record](../../../ports/graphshell/docs/receipts/moot_resources_host_20261012/qualification.json)
-must distinguish that result from CPU evidence. No live transport, persistent
+separates native evidence from the eight CPU controls. No live transport, persistent
 restart, private custody, physical input or actual coop session is qualified.
+
+The negative startup and pixel captures are retained. Early runs stalled on
+native occlusion; the first presented frames exposed black text on the opaque
+black clear because the proof styled `body` while mounting `main` directly.
+The host now supplies explicit palette and typography on its actual root.
+The original nonblank assertion remains unchanged. A cancellable, joined wake
+and a 35-second close apply only to receipt mode, not shared host scheduling.
+Inspector spacing and scroll gutters remain proof presentation; production
+themes, focus/input and application sessions have separate acceptance gates.
 
 Core checkouts were reconciled with published main before this continuation.
 The p2panda fork incorporates upstream through `128dfc44`, preserving its

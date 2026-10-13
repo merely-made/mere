@@ -23,4 +23,3 @@ test actual_host_tests::current_constitution_revocation_refuses_queued_fork_and_
 test actual_host_tests::mounted_clicks_open_and_fork_through_actual_owners_with_independent_readings ... ok
 
 test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.67s
-

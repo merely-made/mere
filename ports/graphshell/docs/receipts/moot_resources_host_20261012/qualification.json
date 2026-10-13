@@ -1,17 +1,69 @@
 {
   "local_date": "2026-10-12",
-  "status": "CPU owner/mount controls passed; native build and coordinated layout/paint acceptance pending",
-  "integration_base": "8568f42fdf57f997274c74e63bd4ee045fe1a2b4",
+  "status": "Qualified admitted owner mount: eight CPU controls, default-web boundary and two native paint/layout cases passed",
+  "integration_base": "3b76b162b37654ab3981031b82a23c5d5740ed6d",
   "cpu": {
     "tests": 8,
-    "negative_control": "Retained session lapse removed: expiry and signed revocation fail; exact source restored"
+    "negative_control": "Retained session lapse removed: expiry and signed revocation fail; exact source restored",
+    "current_main_tests": 8,
+    "clippy_current_main": "passed with inherited warnings; selected actual port library",
+    "default_web_wasm_current_main": "passed --locked --offline in10.07 seconds",
+    "doc_delta": "No new source/subject finding identities compared with published3b76; inherited audit findings retained"
   },
   "native": {
     "executed": true,
-    "status": "Unaccepted: original and diagnostic wide attempts produced zero captures; compact not launched",
-    "classified_stage": "Scene emission and raster succeeded; repeated SurfaceAcquire::Unavailable(Occluded), then no fresh presentation",
-    "sample_correction": "r2 sample captured caffeinate inhibitor, not the app; no app stack inference",
-    "next": "Bounded proof-only wake/deadline and source main reconciliation before new frozen candidate"
+    "status": "Passed both fresh wide/compact cases with eight reviewed captures and completed owner assertions",
+    "r3": {
+      "presentations": 2,
+      "exit_code": 101,
+      "captures_retained": 0,
+      "elapsed_seconds": 5.16,
+      "stopped_at": "2026-10-13T03:40:14.992643+00:00"
+    },
+    "scope": "Actual shared winit host; capture reads the raster view after real presentation; no physical-input claim",
+    "r4": {
+      "status": "Negative pixels saved; unchanged nonblank predicate failed",
+      "captures": 1,
+      "unique_colors": 2,
+      "width": 2560,
+      "height": 1840,
+      "opaque_pixels": 4710400,
+      "exit_code": 101,
+      "seconds": 5.75,
+      "stopped_at": "2026-10-13T04:12:40.769453+00:00",
+      "diagnosis": "No body in mounted main composition; no root foreground/background supplied; opaque raster clears BLACK",
+      "next_candidate": "add2f408a explicit host main palette/typography, renderer and threshold unchanged"
+    },
+    "r1_r2_classified_stage": "Scene emission and raster succeeded; repeated SurfaceAcquire::Unavailable(Occluded), then no fresh presentation",
+    "r2_sample_correction": "r2 sample captured caffeinate inhibitor, not the app; no app stack inference",
+    "r5": {
+      "source_checkpoint": "add2f408a0d6a632a809717d55fae6a45a627664",
+      "binary_sha256": "54111c7bd659fa301ea91bc10db48f8ade603e1ab2a6c857af19e4b6f06f6069",
+      "captures": 8,
+      "seconds": 26.37,
+      "stopped_at": "2026-10-13T04:29:31.209673+00:00",
+      "cases": [
+        {
+          "logical_size": "1280x920",
+          "physical_size": "2560x1840",
+          "exit_code": 0
+        },
+        {
+          "logical_size": "520x860",
+          "physical_size": "1040x1720",
+          "exit_code": 0
+        }
+      ],
+      "visual_review": "native-r5/visual-review.json",
+      "presentation_polish": "Inspector spacing and scroll gutters remain proof presentation, not production-theme acceptance"
+    },
+    "lease": {
+      "max_seconds": 90,
+      "absolute_cutoff": "2026-10-13T04:33:00+00:00",
+      "self_close_seconds_each": 35,
+      "resources": "Exact owned groups stopped; no server; no retry",
+      "timer": "Proof-only cancellable joined250ms wake; no shared host scheduling change"
+    }
   },
   "limits": [
     "Public unsealed memory fixtures",
