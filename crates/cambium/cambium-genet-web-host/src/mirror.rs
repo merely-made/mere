@@ -358,6 +358,7 @@ fn placement(role: DocumentA11yRole, aria: Option<&str>) -> Placement {
         | R::Dialog
         | R::List
         | R::ListBox
+        | R::ListBoxOption
         | R::Table
         | R::Row
         | R::TabList
