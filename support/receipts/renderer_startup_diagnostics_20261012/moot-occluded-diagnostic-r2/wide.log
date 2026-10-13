@@ -1,0 +1,80 @@
+[moot-proof] main entered
+[moot-proof] signed memory fixture ready
+[moot-proof] both admitted mounts ready
+[cambium-winit] window-frame backend=macos policy=Host decorated=true transparent=false
+[cambium-frame] host=1 last-presented=0 elapsed=0us phase=begin 
+[cambium-frame] host=1 last-presented=0 elapsed=99us phase=files-begin 
+[cambium-frame] host=1 last-presented=0 elapsed=155us phase=files-end 
+[cambium-frame] host=1 last-presented=0 elapsed=203us phase=frame-hook-begin 
+[moot-proof] frame-hook begin count=1
+[moot-proof] frame-hook end count=1 changed=false
+[cambium-frame] host=1 last-presented=0 elapsed=364us phase=frame-hook-end animating=true
+[cambium-frame] host=1 last-presented=0 elapsed=448us phase=layout-begin physical=2560x1840 scale=2
+[cambium-frame] host=1 last-presented=0 elapsed=257572us phase=layout-end 
+[cambium-frame] host=1 last-presented=0 elapsed=257674us phase=producers-begin 
+[cambium-frame] host=1 last-presented=0 elapsed=257735us phase=producers-end 
+[cambium-frame] host=1 last-presented=0 elapsed=257783us phase=leaf-fragments-begin 
+[cambium-frame] host=1 last-presented=0 elapsed=257835us phase=leaf-fragments-end 
+[cambium-frame] host=1 last-presented=0 elapsed=257882us phase=scene-begin 
+[cambium-frame] host=1 last-presented=0 elapsed=259986us phase=scene-emitted 
+[cambium-frame] host=1 last-presented=0 elapsed=260058us phase=shadows-begin 
+[cambium-frame] host=1 last-presented=0 elapsed=260102us phase=shadows-end 
+[cambium-frame] host=1 last-presented=0 elapsed=260147us phase=raster-begin 
+[cambium-frame] host=1 last-presented=0 elapsed=320067us phase=raster-end 
+[cambium-frame] host=1 last-presented=0 elapsed=320168us phase=acquire-begin 
+[cambium-frame] host=1 last-presented=0 elapsed=320277us phase=acquire-unavailable surface acquire skipped: Occluded
+[cambium-frame] host=1 last-presented=0 elapsed=320427us phase=return unwinding=false
+[cambium-winit] accessibility Installed, 47 nodes projected
+[cambium-host] initial reveal macos app_active=true app_hidden=false policy=NSApplicationActivationPolicy(0) launched=true window_visible=true key=false can_key=true active_space=true occlusion=NSWindowOcclusionState(8192) frame=CGRect { origin: CGPoint { x: 640.0, y: 260.0 }, size: CGSize { width: 1280.0, height: 948.0 } }
+[cambium-frame] host=1 last-presented=0 elapsed=0us phase=begin 
+[cambium-frame] host=1 last-presented=0 elapsed=78us phase=files-begin 
+[cambium-frame] host=1 last-presented=0 elapsed=131us phase=files-end 
+[cambium-frame] host=1 last-presented=0 elapsed=181us phase=frame-hook-begin 
+[moot-proof] frame-hook begin count=2
+[moot-proof] frame-hook end count=2 changed=false
+[cambium-frame] host=1 last-presented=0 elapsed=373us phase=frame-hook-end animating=true
+[cambium-frame] host=1 last-presented=0 elapsed=457us phase=layout-begin physical=2560x1840 scale=2
+[cambium-frame] host=1 last-presented=0 elapsed=709us phase=layout-end 
+[cambium-frame] host=1 last-presented=0 elapsed=765us phase=producers-begin 
+[cambium-frame] host=1 last-presented=0 elapsed=822us phase=producers-end 
+[cambium-frame] host=1 last-presented=0 elapsed=873us phase=leaf-fragments-begin 
+[cambium-frame] host=1 last-presented=0 elapsed=926us phase=leaf-fragments-end 
+[cambium-frame] host=1 last-presented=0 elapsed=983us phase=scene-begin 
+[cambium-frame] host=1 last-presented=0 elapsed=3639us phase=scene-emitted 
+[cambium-frame] host=1 last-presented=0 elapsed=3719us phase=shadows-begin 
+[cambium-frame] host=1 last-presented=0 elapsed=3769us phase=shadows-end 
+[cambium-frame] host=1 last-presented=0 elapsed=3817us phase=raster-begin 
+[cambium-frame] host=1 last-presented=0 elapsed=54306us phase=raster-end 
+[cambium-frame] host=1 last-presented=0 elapsed=54422us phase=acquire-begin 
+[cambium-frame] host=1 last-presented=0 elapsed=54539us phase=acquire-unavailable surface acquire skipped: Occluded
+[cambium-frame] host=1 last-presented=0 elapsed=54683us phase=return unwinding=false
+[cambium-host] frame total=57889us hook=250us relayout=308us layout-update=113us tick=0us apply=0us layout-rebuild=0us style-resolve=0us layout-text=0us content-extent=0us mutations=0 layout-rebuilt=false leaf-boxes=56us leaf-render=0us leaf-repaints=0 fragments=110us emit=2654us raster=50595us acquire=173us clear=0us compose=0us capture=0us present=0us a11y=3475us raster-inner=8010us invalidate=184us rebuild=1us master=48us vello=7751us dirty-tiles=0 producer=0us staging=0us producer-calls=0 stages=0
+[cambium-host] unpresented redraw macos app_active=true app_hidden=false policy=NSApplicationActivationPolicy(0) launched=true window_visible=true key=false can_key=true active_space=true occlusion=NSWindowOcclusionState(8192) frame=CGRect { origin: CGPoint { x: 640.0, y: 260.0 }, size: CGSize { width: 1280.0, height: 948.0 } }
+[cambium-host] unpresented redraw visible=Some(true) focused=false minimized=Some(false)
+[moot-proof] after-frame count=1 stage=0 presentation=None profile=Some(FrameProfile { producers: ProducerFrameStats { render_us: 0, stage_us: 0, render_calls: 0, stages: 0, suspensions: 0, retirements: 0, invalid_frames: 0 }, total_us: 57889, frame_hook_us: 250, relayout_us: 308, layout_update_us: 113, layout_tick_us: 0, layout_apply_us: 0, layout_rebuild_us: 0, style_resolve_us: 0, layout_with_text_us: 0, content_extent_us: 0, layout_mutations: 0, layout_rebuilt: false, leaf_boxes_us: 56, leaf_render_us: 0, leaf_repaints: 0, leaf_fragments_us: 110, ime_us: 0, emit_scene_us: 2654, shadows_us: 49, raster_us: 50595, acquire_us: 173, clear_us: 0, compose_us: 0, present_us: 0, capture_us: 0, pointer_us: 0, a11y_us: 3475, raster_total_us: 8010, tile_invalidate_us: 184, dirty_tile_rebuild_us: 1, master_compose_us: 48, vello_render_us: 7751, dirty_tiles: 0 })
+[cambium-frame] host=1 last-presented=0 elapsed=0us phase=begin 
+[cambium-frame] host=1 last-presented=0 elapsed=88us phase=files-begin 
+[cambium-frame] host=1 last-presented=0 elapsed=129us phase=files-end 
+[cambium-frame] host=1 last-presented=0 elapsed=169us phase=frame-hook-begin 
+[moot-proof] frame-hook begin count=3
+[moot-proof] frame-hook end count=3 changed=false
+[cambium-frame] host=1 last-presented=0 elapsed=328us phase=frame-hook-end animating=true
+[cambium-frame] host=1 last-presented=0 elapsed=410us phase=layout-begin physical=2560x1840 scale=2
+[cambium-frame] host=1 last-presented=0 elapsed=699us phase=layout-end 
+[cambium-frame] host=1 last-presented=0 elapsed=746us phase=producers-begin 
+[cambium-frame] host=1 last-presented=0 elapsed=792us phase=producers-end 
+[cambium-frame] host=1 last-presented=0 elapsed=834us phase=leaf-fragments-begin 
+[cambium-frame] host=1 last-presented=0 elapsed=878us phase=leaf-fragments-end 
+[cambium-frame] host=1 last-presented=0 elapsed=918us phase=scene-begin 
+[cambium-frame] host=1 last-presented=0 elapsed=4156us phase=scene-emitted 
+[cambium-frame] host=1 last-presented=0 elapsed=4237us phase=shadows-begin 
+[cambium-frame] host=1 last-presented=0 elapsed=4276us phase=shadows-end 
+[cambium-frame] host=1 last-presented=0 elapsed=4316us phase=raster-begin 
+[cambium-frame] host=1 last-presented=0 elapsed=49646us phase=raster-end 
+[cambium-frame] host=1 last-presented=0 elapsed=49719us phase=acquire-begin 
+[cambium-frame] host=1 last-presented=0 elapsed=49801us phase=acquire-unavailable surface acquire skipped: Occluded
+[cambium-frame] host=1 last-presented=0 elapsed=49905us phase=return unwinding=false
+[cambium-host] frame total=53003us hook=207us relayout=335us layout-update=143us tick=0us apply=0us layout-rebuild=0us style-resolve=0us layout-text=0us content-extent=0us mutations=0 layout-rebuilt=false leaf-boxes=76us leaf-render=1us leaf-repaints=0 fragments=83us emit=3237us raster=45394us acquire=114us clear=0us compose=0us capture=0us present=0us a11y=3338us raster-inner=7166us invalidate=300us rebuild=2us master=66us vello=6774us dirty-tiles=0 producer=0us staging=0us producer-calls=0 stages=0
+[cambium-host] unpresented redraw macos app_active=true app_hidden=false policy=NSApplicationActivationPolicy(0) launched=true window_visible=true key=false can_key=true active_space=true occlusion=NSWindowOcclusionState(8192) frame=CGRect { origin: CGPoint { x: 640.0, y: 260.0 }, size: CGSize { width: 1280.0, height: 948.0 } }
+[cambium-host] unpresented redraw visible=Some(true) focused=false minimized=Some(false)
+[moot-proof] after-frame count=2 stage=0 presentation=None profile=Some(FrameProfile { producers: ProducerFrameStats { render_us: 0, stage_us: 0, render_calls: 0, stages: 0, suspensions: 0, retirements: 0, invalid_frames: 0 }, total_us: 53003, frame_hook_us: 207, relayout_us: 335, layout_update_us: 143, layout_tick_us: 0, layout_apply_us: 0, layout_rebuild_us: 0, style_resolve_us: 0, layout_with_text_us: 0, content_extent_us: 0, layout_mutations: 0, layout_rebuilt: false, leaf_boxes_us: 76, leaf_render_us: 1, leaf_repaints: 0, leaf_fragments_us: 83, ime_us: 0, emit_scene_us: 3237, shadows_us: 39, raster_us: 45394, acquire_us: 114, clear_us: 0, compose_us: 0, present_us: 0, capture_us: 0, pointer_us: 0, a11y_us: 3338, raster_total_us: 7166, tile_invalidate_us: 300, dirty_tile_rebuild_us: 2, master_compose_us: 66, vello_render_us: 6774, dirty_tiles: 0 })
