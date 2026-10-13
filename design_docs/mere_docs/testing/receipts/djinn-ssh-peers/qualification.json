@@ -1,0 +1,57 @@
+{
+  "schema": "djinn.ssh-peers/qualification-v1",
+  "date": "2026-10-12",
+  "linux_source_base": "19b00c8d82350806758c14627f2a83d6d10d9fa3",
+  "linux_custody_patch_sha256": "e2769c6b3bb9564a6eca0afac66c2100a8ba6c7a1e4f863a24a217bdf5a08492",
+  "linux_djinn_sha256": "7af5653345daf9f6db5576574198993af43680665d78c910bd6e832b58a78ef2",
+  "linux_client_sha256": "ef36a983bc4877a57a5b029047b8b6517962f615c6a64434b82ca3c741ae5871",
+  "windows_djinn_sha256": "9d6321dd1ea5a94352745aaf1d1c2aaff11e6bc49b2a82f478eb5f738a650f1a",
+  "windows_build_provenance": "cached native binary; source commit not established",
+  "checks": {
+    "surface_to_windows": "passed: Djinn-held key, public-only identity file, locally pinned Windows host key",
+    "surface_absent_agent_signature_exit": 2,
+    "custody_generation_tests_passed": 2,
+    "surface_unlocked_agent_signature": "passed",
+    "windows_to_surface_agent_only": "passed",
+    "test_features": "castellan/keeper",
+    "linux_build": "cargo build --locked -p djinn --bin djinn -p graphshell --bin personae-vault, CARGO_BUILD_JOBS=1",
+    "linux_installer_preserves_active_resident": true,
+    "windows_installer_refuses_unelevated_before_writes": true,
+    "surface_locked_signature_exit": 1,
+    "surface_locked_generation_exit": 2,
+    "surface_absent_agent_login_exit": 255,
+    "surface_locked_login_exit": 255,
+    "windows_sshd": "Running, Automatic; native enrollment completed after host-key ACL repair",
+    "windows_host_key_fingerprint": "SHA256:BMpl1R39VEjEGjtJye+6uNhEJIccvJVV9XYgIaxQpHI",
+    "windows_firewall_remote_address": "192.168.4.59",
+    "surface_deliberate_lock_method": "SSH agent protocol lock with empty discarded password; newer custody lock call unsupported by installed baseline",
+    "surface_unlock_login_recovery_exit": 0,
+    "windows_host_private_key_acl": "SYSTEM owner; SYSTEM and Administrators FullControl only; verified through authenticated return SSH",
+    "windows_repeat_after_idle_lock": "pending: cached qualifier native unlock request waited without displaying a dialog; only request client stopped"
+  },
+  "laptop": {
+    "memory_current_bytes": 203595776,
+    "memory_max_bytes": 805306368,
+    "memory_peak_bytes": 208236544,
+    "service": "systemd --user djinn.service",
+    "vault_protection": "passphrase",
+    "cpu_quota": "50%",
+    "plaintext_user_ssh_private_key_files_created": 0,
+    "current_vault_state": "Unlocked after native recovery",
+    "memory_while_locked_bytes": 38518784
+  },
+  "preserved": [
+    "Windows legacy resident and standard agent",
+    "s-pc desktop ssh-agent",
+    "shared source edits",
+    "ThinkPad baseline source restored after bounded build patch"
+  ],
+  "open": [
+    "Iroh SSH transport",
+    "master approval of device CAs",
+    "fleet-wide pairing",
+    "graphical desktop control",
+    "Windows cached qualifier native unlock dialog not displayed; earlier Windows-to-Surface proof remains historical"
+  ],
+  "updated": "2026-10-13"
+}

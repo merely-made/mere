@@ -1,0 +1,106 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: missing documentation for an associated function
+   --> crates\murm\transport\src\p2panda_transport.rs:629:5
+    |
+629 |     pub fn builder_from_seed_ref(signing_seed: &[u8; 32]) -> P2pandaTransportBuilder<'static> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+note: the lint level is defined here
+   --> crates\murm\transport\src\lib.rs:46:9
+    |
+ 46 | #![warn(missing_docs)]
+    |         ^^^^^^^^^^^^
+
+warning: `mere-transport` (lib) generated 1 warning
+   Compiling eidetic v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\eidetic-core)
+warning: unused import: `async_trait::async_trait`
+ --> crates\eidetic\eidetic-core\src\browsing\tests.rs:9:5
+  |
+9 | use async_trait::async_trait;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `std::collections::HashMap`
+  --> crates\eidetic\eidetic-core\src\browsing\tests.rs:10:5
+   |
+10 | use std::collections::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `async_trait::async_trait`
+   --> crates\eidetic\eidetic-core\src\bundle.rs:189:9
+    |
+189 |     use async_trait::async_trait;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::collections::HashMap`
+   --> crates\eidetic\eidetic-core\src\bundle.rs:190:9
+    |
+190 |     use std::collections::HashMap;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `async_trait::async_trait`
+   --> crates\eidetic\eidetic-core\src\deleted.rs:149:9
+    |
+149 |     use async_trait::async_trait;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::collections::HashMap`
+   --> crates\eidetic\eidetic-core\src\deleted.rs:150:9
+    |
+150 |     use std::collections::HashMap;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `async_trait::async_trait`
+  --> crates\eidetic\eidetic-core\src\schema_def\tests.rs:10:5
+   |
+10 | use async_trait::async_trait;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::collections::HashMap`
+  --> crates\eidetic\eidetic-core\src\schema_def\tests.rs:11:5
+   |
+11 | use std::collections::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `async_trait::async_trait`
+   --> crates\eidetic\eidetic-core\src\typed.rs:213:9
+    |
+213 |     use async_trait::async_trait;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::collections::HashMap`
+   --> crates\eidetic\eidetic-core\src\typed.rs:215:9
+    |
+215 |     use std::collections::HashMap;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `eidetic` (lib test) generated 10 warnings (run `cargo fix --lib -p eidetic --tests` to apply 10 suggestions)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.41s
+     Running unittests src\lib.rs (C:\t\cargo-targets\mere\debug\deps\eidetic-675be9a79c90a749.exe)
+
+running 1 test
+test retention::tests::integrity_quota_and_keyless_private_refusals_write_nothing ... FAILED
+
+failures:
+
+---- retention::tests::integrity_quota_and_keyless_private_refusals_write_nothing stdout ----
+
+thread 'retention::tests::integrity_quota_and_keyless_private_refusals_write_nothing' (7404) panicked at crates\eidetic\eidetic-core\src\retention_tests.rs:269:6:
+called `Result::unwrap_err()` on an `Ok` value: RetainedCopy { version: 1, owner: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], manifest: ManifestId(Hash { func: Blake3, digest: [247, 188, 88, 69, 137, 166, 133, 18, 97, 49, 15, 124, 208, 196, 65, 51, 146, 192, 170, 117, 119, 253, 64, 241, 40, 182, 44, 138, 180, 251, 186, 126] }), policy_revision: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2], retained_at_ms: 10, payload_bytes: 5, stored_bytes: 5, stored_hash: Hash { func: Blake3, digest: [247, 188, 88, 69, 137, 166, 133, 18, 97, 49, 15, 124, 208, 196, 65, 51, 146, 192, 170, 117, 119, 253, 64, 241, 40, 182, 44, 138, 180, 251, 186, 126] } }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    retention::tests::integrity_quota_and_keyless_private_refusals_write_nothing
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 133 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p eidetic --lib`

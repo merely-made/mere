@@ -1,5 +1,40 @@
 # Batch 69: Eidetic development planning
 
+First browser encounter implementation, 2026-10-12: nine further scoped claims
+hold against source `8c490e23` and the archived qualification artifacts:
+source-scoped/pending Eidetic encounters; explicit-parent cursor-preserving
+Stemma admission; per-graph atomic capture storage; actual document traversal
+and exact evidence projection; native/negative-control checks; separate-process
+Redb reopen and replay; production JS/Rust wire plus Chromium/Firefox API
+simulation; Firefox parent/precision/scope export; and browser-target compilation
+with native-only backend test activation and unchanged supplier/clip pins.
+The 489 ordinary native passes include six ignores, of which the new explicit
+disk fixture separately passes both phases. The parent-removal negative control
+fails its branch assertion before exact restoration. These are synthetic,
+single-writer and unsealed receipts. Actual headed extension/IndexedDB behavior,
+tab/document correlation, complete source envelopes, recall source handles,
+source-generation binding, concurrent writers and private custody stay open.
+Browser forget removes its own evidence rather than erasing resource-registry
+identity. Existing unrelated Djinn source work is preserved.
+
+Browser-history relation amendment, 2026-10-12: seven additional scoped claims
+hold against Mere `28d43dd5` and the official Chromium/Firefox API references:
+page history items differ from visit/referring-visit records; the extension
+selects the latest live visit and caps import candidates; host normalization can
+drop distinct nearby visits; generated/subframe transition mappings diverge from
+source meanings; the Firefox exporter loses parent identity and timestamp
+precision; Stemma visit_entry parents through and moves its owner cursor; and
+capture still uses an unsealed writer while a sealed access helper is available.
+The P5 contract, relation vocabulary, adapter repairs and forcing fixtures are
+design proposals. Existing H5b headed receipts establish the earlier bounded
+capture path, not the proposed lossless encounter and relationship behavior.
+This amendment changes the existing plan and this judgment record only. It
+creates no runtime code, schema, dependency, browser profile or build output.
+Owned diff/links pass, and the mechanical audit has zero failing findings.
+Whole-tree D2 coverage is 262/265: the three missing records are the separate
+classic-browser receipt README/browser-preparation and producer-gates README.
+Those receipts and concurrent retention/Moot work are outside this amendment.
+
 Onward amendment, 2026-10-12: four owned plan/index claims hold against Turnstone
 runtime source `97c139442cdc0600f1a5629eec1a40cb27f2a917` and published
 qualification `9412077`: selected local disclosure uses the existing SDK;
@@ -43,7 +78,7 @@ Worktree mechanical results also reflect absent machine-local sibling/probe
 paths, so they are not claimed as a green whole-tree gate. Owned amendments
 pass link/source inspection and `git diff --check`.
 
-Totals: 7 documents, 32 claims checked (32 holds, 0 stale, 0 unverifiable).
+Initial planning totals: 7 documents, 32 claims checked (32 holds, 0 stale, 0 unverifiable).
 Proposal sequencing and future done-conditions are not implementation claims.
 The archived June body and measurements remain historical; incoming historical
 links are repaired without requalifying their claims. Existing D2 records and
@@ -68,8 +103,8 @@ Current full-tree audit gaps are recorded separately below.
 ## eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md
 
 - disposition: current
-- status line: "**Status (2026-10-11):** active plan" - accurate: yes
-- claims checked: 14 - holds: 14, stale: 0, unverifiable: 0
+- status line: "**Status (2026-10-12):** active plan" - accurate: yes
+- claims checked: 30 - holds: 30, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -78,7 +113,7 @@ Tantivy dependency. Those older proposals remain in the archived June plan.
 
 ### Contradictions
 
-No contradictions in the fourteen current source findings. The plan distinguishes
+No contradictions in the prior findings and nine scoped implementation claims. The plan distinguishes
 accepted direction, proposed ownership, current source and pending consumer
 receipts; it does not requalify earlier execution against the review baseline.
 

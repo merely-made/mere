@@ -1,0 +1,26 @@
+[17:10:32 INF] Velopack CLI 1.2.161, for distributing applications.
+[17:10:32 INF] Beginning to package Velopack release 0.2.0.
+[17:10:32 INF] Releases Directory: C:\t\cargo-targets\mere\luggage-comparison\feed
+[17:10:32 INF] Starting: Pre-process steps
+[17:10:33 INF] Shortcuts: Desktop,StartMenuRoot
+[17:10:33 WRN] No architecture specified with --runtime, defaulting to x86. If this was not intended please specify via the --runtime parameter
+[17:10:33 WRN] No architecture specified with --runtime, defaulting to x86. If this was not intended please specify via the --runtime parameter
+[17:10:33 INF] Complete: Pre-process steps
+[17:10:33 INF] Starting: Code-sign application
+[17:10:33 WRN] No signing parameters provided, 3 file(s) will not be signed.
+[17:10:33 INF] Complete: Code-sign application
+[17:10:33 INF] Starting: Building portable package
+[17:10:33 INF] Starting: Building release 0.2.0
+[17:10:34 INF] Complete: Building portable package
+[17:10:34 INF] Complete: Building release 0.2.0
+[17:10:34 INF] Starting: Building setup package
+[17:10:34 INF] Starting: Building delta 0.1.0 -> 0.2.0
+[17:10:34 INF] Creating delta for 0.1.0 -> 0.2.0 with 8 parallel threads.
+[17:10:34 INF] Setup bundle created 'Merely.ReleaseComparison-win-Setup.exe'.
+[17:10:34 WRN] No signing parameters provided, 1 file(s) will not be signed.
+[17:10:34 INF] Complete: Building setup package
+[17:10:35 INF] Delta processed 0006 files. 0003 patched, 0003 unchanged, 0000 new, 0000 removed
+[17:10:35 INF] Complete: Building delta 0.1.0 -> 0.2.0
+[17:10:35 INF] Starting: Post-process steps
+[17:10:35 INF] Complete: Post-process steps
+[17:10:35 INF] Finished in 00:00:02.7293888.

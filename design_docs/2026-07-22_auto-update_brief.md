@@ -1,5 +1,11 @@
 # Auto-Update Brief
 
+**Current qualification (2026-10-12):** the
+[pre-adoption comparison](#2026-10-12-pre-adoption-comparison) reviews TUF trust,
+portable updates and recovery with disposable fixtures. Wider Luggage adoption
+is held pending that evidence. Earlier verdicts below describe their dated
+pressure tests; successful update cycles do not establish interrupted recovery.
+
 **2026-07-22.** Cross-cutting research: a configurable auto-update capability
 for every deployment surface in the family (desktop apps, radio firmware,
 web/wasm, eventually mobile). Requirement from Mark: this is figured out
@@ -289,3 +295,155 @@ peer distribution remains chosen later rather than drifted into.
 - [tough (TUF client)](https://crates.io/crates/tough), [rust-tuf](https://github.com/theupdateframework/rust-tuf)
 - [embassy-boot](https://docs.embassy.dev/embassy-boot), [embassy-boot-nrf](https://crates.io/crates/embassy-boot-nrf), [Drogue firmware-updates writeup](https://blog.drogue.io/firmware-updates-part-1/)
 - [Meshtastic nRF52 OTA](https://meshtastic.org/docs/getting-started/flashing-firmware/nrf52/ota/), [UF2 drag-and-drop](https://meshtastic.org/docs/getting-started/flashing-firmware/nrf52/drag-n-drop/)
+
+## 2026-10-12 pre-adoption comparison
+
+**Status:** bounded comparison complete; Windows Luggage/Velopack and TUF
+library probes recorded. App adoption, publishing and remote
+qualification remain unchanged. User request: compare trust and portable
+recovery before extending Luggage across the family, preserving concurrent work.
+
+### Scope and reproducibility
+
+Measured Luggage 0.1.0 from Mere `28d43dd5` (the Luggage sources remained
+unchanged through concurrent Mere commits), cargo-packager-updater's current
+published base 0.2.3, Velopack SDK/helper/packer 1.2.161, and tough 0.24.0.
+Hocket still pins Velopack 1.2.0; the new fixture uses current matching tools
+without changing Hocket. Upstream release and source evidence was checked on
+2026-10-12; a recently pushed repository is not proof of updater maintenance.
+
+The [independent fixture](../support/luggage-comparison/README.md) has its own
+lock and uses the approved shared Cargo target, one compiler job, no product
+runtime edits, no resident installation and no real vault. Its public TUF
+inputs carry pinned source and SHA-256 provenance. Durable evidence lives in
+[comparison receipts](../support/receipts/luggage-comparison/README.md).
+
+### Trust: TUF versus the current signed feed
+
+The current signed manifest successfully refuses an unsigned or edited feed,
+and download authenticates its artifact. The probe nevertheless accepted a
+signed 0.3 offer after observing 0.5 while the installed version remained 0.1.
+A publication date from 2000 was also accepted: a date is not enforced expiry.
+The comparator checks the installed version, not durable previously accepted
+metadata. These observations do not imply a signer can be replaced remotely.
+
+tough 0.24.0 refused the expired upstream repository with a timestamp-expiry
+error, refused an edited timestamp, accepted valid root rotation from 1 to 2,
+and refused an old signed root placed at the next root URL. Deliberately
+setting expiration to `Unsafe` made the expired repository load: the negative
+control succeeded. This is native library evidence using local upstream
+fixtures. Product delegation, cross-boot metadata rollback and Merely's
+artifact/apply integration remain unqualified.
+
+| Property | Current Luggage | TUF candidate |
+| --- | --- | --- |
+| Authenticated bytes | Minisign manifest and artifact; optional BLAKE3, required for staging | Signed metadata authenticates target hashes and lengths |
+| Freshness | Publication date has no expiry policy | Expiring timestamp/snapshot/targets metadata |
+| Metadata rollback | No persistent observation history | Version history, requiring a persistent client datastore |
+| Key rotation | One configured publisher key; no rotation protocol | Sequential roots approved by old and new root thresholds |
+| Product scope | Product-qualified feeds are deployment convention | Delegated target paths can restrict product signing authority |
+| Installation recovery | Application responsibility | Application responsibility |
+
+These are separate jobs. TUF protects repository metadata and target delivery;
+it does not choose the correct Djinn compatibility floor, migrate app data or
+restore an interrupted installation. Metadata rollback protection also does
+not replace app-version/channel policy: an authorized publisher can describe
+an older application in newly signed metadata. Sources:
+[TUF specification](https://theupdateframework.github.io/specification/latest/),
+[tough datastore and expiry API](https://docs.rs/tough/0.24.0/tough/struct.RepositoryLoader.html).
+
+Operational costs are real: provision a trusted root, separate root/targets
+from frequently renewed timestamp metadata, retain rotation history, manage
+expiry and protect the client's persistent trust state. Expired metadata
+should stop an update check, not prevent an already installed local-first app
+from opening. Offline distribution needs timely signed metadata; globally
+disabling expiry would remove freeze protection. tough 0.24.0 also brings
+AWS-LC native crypto compilation, so a Rust API does not mean a pure-Rust
+dependency graph. Its
+[past root-version advisory](https://github.com/awslabs/tough/security/advisories/GHSA-5vmp-m5v2-hx47)
+was fixed in 0.20.0; maintained dependencies and conformance remain necessary.
+
+**Assessment:** TUF is a better candidate foundation for evolving repository
+trust than growing a home-made expiry/rotation/rollback protocol. Keep
+Luggage's product release semantics and exact release reference above it.
+Initially, an existing signed `luggage.json` can be an opaque TUF target;
+this costs two signing systems but avoids silently redefining existing
+release identity. A later envelope/key-identity change needs an explicit
+versioned design. This assessment does not authorize adoption.
+
+### Portable apply and recovery
+
+| Windows probe | Current Luggage | Velopack 1.2.161 |
+| --- | --- | --- |
+| Portable folder moved to a path containing a space | No Windows portable format/backend | Live check/download/apply passed |
+| New process applies downloaded update with feed absent | Stage bytes reload, but apply still needs an `Update` object | Live local pending-package apply passed |
+| User file outside replaceable app directory | Not exercised in this comparison | Preserved through update |
+| Stage bytes edited alone | Digest refusal passed | Not measured separately |
+| Stage edited together with unsigned validation metadata | Fresh-process `take_verified` accepted changed bytes and digest | A harmless asset edited inside a valid pending ZIP was applied |
+| Apply failure after backing up the old executable | NSIS/MSI owns installation; no new failure qualification | Injected failure removed both current binary and old backup |
+| Delta package | No implemented delta backend | Produced 4,173-byte delta for a 22,196,517-byte full toy package |
+
+The Velopack delta result is a format capability check. A largely unchanged
+16 MiB random fixture payload makes it unsuitable as a prediction of Genet's
+real update savings. Its first portable update lacked a cached base package,
+so that apply does not qualify delta reconstruction. Neither fixture has OS
+production signing; the staged-asset result is not a claimed Authenticode
+bypass. It establishes that this tested pending-package handoff reopens a
+locally changed archive without rejecting that asset change.
+
+The Luggage probe changed the stage's version to 99.0, format to WiX and
+destination to another fixture path. The stage reader accepted all three
+while reporting verified bytes. No installer was executed. A reconstructed
+signed offer and destination binding remain necessary before fresh-process
+apply can be called authenticated. Both byte-only refusal and joint record
+tamper were exercised with the default signed-manifest requirement enabled.
+
+The Velopack replacement failure held the new extraction directory open
+without delete-sharing. Extraction succeeded, the old `current` directory was
+backed up, the replacement rename retried and failed, then the helper exited
+1 after deleting the old backup. Both binary-presence checks were false.
+The source confirms cleanup of both temporary paths before propagating the
+apply error:
+[Windows apply source, pinned release](https://github.com/velopack/velopack/blob/1.2.161/src/bins/src/commands/apply_windows_impl.rs).
+This was an ordinary apply-error injection, not a power-cut simulation.
+
+Luggage's Linux source renames the old AppImage away and writes the new bytes
+at the live path, restoring only on a returned write error. Its macOS source
+moves the old bundle aside and lacks a matching restoration path if the new
+rename fails. Those are source-review findings, not executed remote failures.
+Velopack's current macOS source prefers an atomic exchange and restores the
+old bundle on ordinary fallback rename failure; its elevated path and Linux
+replacement still need their own native failure receipts. See
+[Velopack macOS](https://github.com/velopack/velopack/blob/1.2.161/src/bins/src/commands/apply_osx_impl.rs)
+and [Linux](https://github.com/velopack/velopack/blob/1.2.161/src/bins/src/commands/apply_linux_impl.rs).
+
+### Recommendation and gates before spreading
+
+Keep Luggage as the family-facing release API. Keep cargo-packager for the
+already qualified packaging slice. Velopack is presently the stronger
+Windows portable candidate, but its tested recovery failure prevents a
+general reliability recommendation. The Rust-only preference is one cost
+criterion; it does not substitute for these apply guarantees.
+
+Before adopting either apply backend more widely:
+
+1. Reverify a self-sufficient signed offer in the applying process, bound to
+   product, target, expected version/channel and permitted install root.
+2. Recover the old runnable version after failed replacement; retain durable
+   recovery information for termination between backup and replacement.
+3. Repeat portable relocation, offline restart, staged tamper, concurrent
+   apply and interruption probes against the selected backend and real
+   application data. Package rollback and schema rollback are separate gates.
+4. Qualify a bounded TUF repository with persistent rollback state, root
+   rotation, expiry, product delegation and verified artifact retrieval before
+   making it the production trust provider. Browser/Wasm verifier suitability
+   requires a separate proof; the native tough probe does not establish it.
+5. Keep Djinn custody/consent and shared-resident compatibility explicit;
+   neither an app installer nor a successful TUF fetch owns those decisions.
+
+Native Fedora/macOS failure and relocation qualification stays pending until
+the machines are reachable. No remote work was dispatched by this comparison.
+Successful historical H4 cycles and basic T2 stage persistence remain useful
+evidence, but do not close these gates. The Hocket plan's statement that T3
+landed cannot establish P2P/delta delivery; that same plan says its P2P lane
+is unbuilt. The current Luggage code has no such backend.
