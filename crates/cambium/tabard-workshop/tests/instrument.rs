@@ -79,16 +79,17 @@ fn instrument_frame_does_not_apply_or_commit_the_draft() {
 
 #[test]
 fn authored_font_lists_retain_the_hosts_admitted_interface_fallback() {
-    use genet_style::{Device, InteractionStates, StyleSet, resolve_styles};
+    use genet_livery::{Device, InteractionStates, StyleSet, resolve_styles};
     let sheet = workshop_stylesheet_with_frame(
         ".instrument-workspace { --workspace-font-interface: Roboto,sans-serif; \
          --tabard-font-interface: UnavailableInterface; --tabard-font-label: UnavailableLabel; }",
     );
-    let host = Harness::new(
+    let mut host = Harness::new(
         sheet,
         WorkshopState::in_memory(),
         workshop_view as fn(&WorkshopState) -> WorkshopView,
     );
+    host.layout_at(1280., 1000.);
     host.with_surfaces(|surfaces| {
         let surface = &surfaces[0];
         let plane = resolve_styles(
