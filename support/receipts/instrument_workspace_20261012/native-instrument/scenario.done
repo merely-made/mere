@@ -1,0 +1,21 @@
+RESULT fail
+Instrument workspace frame and domain specimens
+FAIL: assert snap dirty Eq 'false': got 'true'
+captured instrument_light
+FAIL: assert snap dirty Eq 'false': got 'true'
+captured instrument_dark
+captured instrument_dirty
+FAIL: assert snap dirty Eq 'false': got 'true'
+captured instrument_undone
+captured instrument_narrow_editor
+captured instrument_narrow_reader
+captured instrument_narrow_graph
+capture instrument_light 2560x1800 digest=a5063a2c7f548a14 file=/Users/markik/Code/output/instrument-workspace-20261012/native-instrument/instrument_light.png
+capture instrument_dark 2560x1800 digest=763d7f130bb8db33 file=/Users/markik/Code/output/instrument-workspace-20261012/native-instrument/instrument_dark.png
+capture instrument_dirty 2560x1800 digest=c1d9e6102226c531 file=/Users/markik/Code/output/instrument-workspace-20261012/native-instrument/instrument_dirty.png
+capture instrument_undone 2560x1800 digest=4dd458c692c3e745 file=/Users/markik/Code/output/instrument-workspace-20261012/native-instrument/instrument_undone.png
+capture instrument_narrow_editor 1040x1720 digest=227b05d1cb5710ff file=/Users/markik/Code/output/instrument-workspace-20261012/native-instrument/instrument_narrow_editor.png
+capture instrument_narrow_reader 1040x1720 digest=6f6a5055de483f35 file=/Users/markik/Code/output/instrument-workspace-20261012/native-instrument/instrument_narrow_reader.png
+capture instrument_narrow_graph 1040x1720 digest=bf5b245cdebbe79d file=/Users/markik/Code/output/instrument-workspace-20261012/native-instrument/instrument_narrow_graph.png
+frames: 7 captured, 0 blank, 7 distinct digests
+presentation: 64 frames, 67 redraws, 3 unpresented redraws

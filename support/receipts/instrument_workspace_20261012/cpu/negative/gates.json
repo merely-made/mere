@@ -1,0 +1,54 @@
+{
+  "source": "ed9de2f459d87687cbec49b60459ef9e58dbfe60",
+  "compiler": "rustc 1.97.1",
+  "target": "/Users/markik/Code/targets/knot-tabard-apps",
+  "environment": {
+    "CARGO_TARGET_DIR": "/Users/markik/Code/targets/knot-tabard-apps",
+    "CARGO_BUILD_JOBS": "1",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0"
+  },
+  "checks": [
+    {
+      "label": "shared-header",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "cambium",
+        "--test",
+        "instrument",
+        "--locked",
+        "--offline",
+        "-q"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 10.163
+    },
+    {
+      "label": "workshop",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "tabard-workshop",
+        "--test",
+        "embedding_api",
+        "--test",
+        "shared_components",
+        "--test",
+        "surface",
+        "--test",
+        "usability",
+        "--test",
+        "instrument",
+        "--locked",
+        "--offline",
+        "-q"
+      ],
+      "exit": 101,
+      "elapsed_seconds": 48.625
+    }
+  ]
+}

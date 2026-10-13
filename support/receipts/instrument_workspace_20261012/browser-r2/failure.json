@@ -1,0 +1,9 @@
+{
+  "message": "AssertionError [ERR_ASSERTION]: {\"state\":\"fail\",\"errors\":[],\"gate_failures\":[],\"result\":{\"canvas_logical_size\":[980,743],\"canvas_physical_size\":[980,743],\"log\":[\"captured instrument_reading\",\"FAIL: no current DOM target for Selector { surface: None, matcher: Role(\\\"button\\\"), text: Some(\\\"Show workbench\\\"), attr: None }\",\"gpu timestamps: no\"],\"result\":\"fail\",\"saved_graph\":{\"address\":\"https://example.test/i2p-port\",\"file\":null,\"reopened\":true,\"save_state\":\"idle\",\"selected\":\"81b91a6b-52ef-5751-b497-15f711cf9c70\",\"session\":\"315eb186-a6c9-4ff2-819b-caa4443c6850\",\"tags\":\"research, transport\",\"title\":\"I2P port notes\"},\"timings\":[]},\"captures\":[{\"name\":\"forme_reopened_graph\",\"width\":1280,\"height\":900,\"bytes\":43830},{\"name\":\"forme_reopened_tiles\",\"width\":1280,\"height\":900,\"bytes\":37034},{\"name\":\"instrument_reading\",\"width\":1280,\"height\":900,\"bytes\":36966}]}\n\n'fail' !== 'ok'\n\n    at run (/Users/markik/Code/worktrees/mere-tabard-typography/support/receipts/instrument_workspace_20261012/verify-browser.cjs:33:12)\n    at async main (/Users/markik/Code/worktrees/mere-tabard-typography/support/receipts/instrument_workspace_20261012/verify-browser.cjs:45:3)",
+  "runs": [
+    "wide-entry",
+    "forme-original",
+    "forme-reopen"
+  ],
+  "errors": []
+}
