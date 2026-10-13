@@ -58,6 +58,16 @@ The D1 proof reopens both the redb mesh store and collecting blob store after a
 real resident run. The job remains terminal and released content stays
 released across that restart boundary.
 
+`ResidentAuthority::enable_record_ingress(config)` now opts into separately
+Notochord-admitted exact inventory and original signed-record submission on that
+same endpoint and mesh store. Both actions share two active calls, four pending
+sessions and an arrival-to-result-FIN deadline. The owner supplies authority,
+clock and availability lifetime; `MeshStore::accept_outcome` remains the domain
+admission path. Volatile retained originals expire or FIFO-evict independently
+of durable operations. The [local composition and receipt](../../crates/mesh/mesh/examples/inventory_ingress/README.md)
+cover actual RaptorQ recovery, QUIC handoff, preserved signed bytes, action
+separation, shared-budget refusal and fresh-process durable reopening.
+
 `probe/` is D2's standalone headed-browser evidence surface. Its first MiniLM
 row localized and recovered two Burn/CubeCL browser defects. The configured
 D2c embedding matrix now passes BGE Micro, MiniLM, E5-small, and E5-base in
