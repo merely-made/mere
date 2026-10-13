@@ -20,11 +20,16 @@
     "unheaded_owned_sources": 0,
     "exhibit_b_sources": 0
   },
-  "d2_findings": null,
   "d2_missing_active_records": [
     "mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md",
     "mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md",
     "mere_docs/testing/receipts/2026-10-11_producer_gates/README.md"
   ],
-  "raw_logs": "Frozen compiler logs retain tool whitespace; do not normalize their contents"
+  "raw_logs": "Frozen compiler logs retain tool whitespace; do not normalize their contents",
+  "d2_errors": [
+    "snapshot aggregate digest changed: 2046e1eec3018b7dd288e794326090f1b7f9a889043d53e45530271d0b32be1e != f0b64eef4cd5514157bb1b49d389b84db29a1e823d6f3e2cebf827337fe56abf",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_producer_gates/README.md"
+  ]
 }
