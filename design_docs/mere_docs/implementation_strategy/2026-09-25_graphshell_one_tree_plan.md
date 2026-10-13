@@ -1214,8 +1214,12 @@ scripts. Separating that producer reduces the same-profile package to
 measurements retained. A separate `viewer` profile inherits release, uses `z`
 and full LTO, and leaves the established full-page release profile unchanged;
 its first exploratory package is 3,383,277 B gzip9 and 3,398,093 B gzip6.
-Both fit narrowly. Normal shipping compilation, upstream reconciliation and
-exact-package hardware acceptance remain pending. The build script enforces
+Both fit narrowly. After reconciliation through `3b76b162b`, the normal shipping
+build at `cef122f25` measures 3,379,926 B gzip9 and 3,396,340 B gzip6; both fit,
+with only 11,532 B spare at gzip6. All four asset caps and the viewer, product,
+main-page and default Wasm compile gates pass. Exact-package hardware acceptance
+and reconciliation of subsequently published upstream code remain pending.
+The build script enforces
 all four interaction caps at both gzip levels, with two regression controls
 covering compressible raw size and incompressible budget refusal.
 

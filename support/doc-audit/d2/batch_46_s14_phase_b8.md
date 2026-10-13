@@ -507,7 +507,16 @@ unchanged per-asset limits and the actual Platen/document feature leak. The
 source changes preserve default document layout and exclude its producer only
 for the portable viewer model. Measured baseline/portable and rejected Binaryen
 variants remain exploratory, separately bound to their feature/profile inputs.
-The new viewer compiler profile is not yet measured or hardware-qualified.
+The new viewer compiler profile fits in exploratory measurements and in the
+normal shipping build at `cef122f25`: 3,379,926 B gzip9 and 3,396,340 B gzip6,
+under the unchanged 3,407,872 B cap. Hardware acceptance remains pending.
 Required final gates include exact-package browser and Unicode reading checks,
 source-bound asset enforcement and static/failure fallback preservation. No
 whole-document census, main landing or deployment is claimed for this target.
+
+The fresh indexed-source audit also corrects a prior eligibility gap: twelve
+tracked presenter receipt generators lacked Exhibit A when they first entered
+the index. Comment-only header repairs and before/after hashes are preserved in
+`ports/graphshell/docs/receipts/host_presenter_20261012/generator-header-correction.json`.
+No accepted runtime receipt or execution claim is rewritten. Header checks must
+run after new generators enter the index.
