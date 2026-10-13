@@ -8,7 +8,7 @@
   "windows_djinn_sha256": "9d6321dd1ea5a94352745aaf1d1c2aaff11e6bc49b2a82f478eb5f738a650f1a",
   "windows_build_provenance": "cached native binary; source commit not established",
   "checks": {
-    "surface_to_windows": "pending native Windows elevation",
+    "surface_to_windows": "passed: Djinn-held key, public-only identity file, locally pinned Windows host key",
     "surface_absent_agent_signature_exit": 2,
     "custody_generation_tests_passed": 2,
     "surface_unlocked_agent_signature": "passed",
@@ -18,17 +18,26 @@
     "linux_installer_preserves_active_resident": true,
     "windows_installer_refuses_unelevated_before_writes": true,
     "surface_locked_signature_exit": 1,
-    "surface_locked_generation_exit": 2
+    "surface_locked_generation_exit": 2,
+    "surface_absent_agent_login_exit": 255,
+    "surface_locked_login_exit": 255,
+    "windows_sshd": "Running, Automatic; native enrollment completed after host-key ACL repair",
+    "windows_host_key_fingerprint": "SHA256:BMpl1R39VEjEGjtJye+6uNhEJIccvJVV9XYgIaxQpHI",
+    "windows_firewall_remote_address": "192.168.4.59",
+    "surface_deliberate_lock_method": "SSH agent protocol lock with empty discarded password; newer custody lock call unsupported by installed baseline",
+    "surface_unlock_login_recovery_exit": 0,
+    "windows_host_private_key_acl": "SYSTEM owner; SYSTEM and Administrators FullControl only; verified through authenticated return SSH",
+    "windows_repeat_after_idle_lock": "pending: cached qualifier native unlock request waited without displaying a dialog; only request client stopped"
   },
   "laptop": {
-    "memory_current_bytes": 147927040,
+    "memory_current_bytes": 203595776,
     "memory_max_bytes": 805306368,
-    "memory_peak_bytes": 150462464,
+    "memory_peak_bytes": 208236544,
     "service": "systemd --user djinn.service",
     "vault_protection": "passphrase",
     "cpu_quota": "50%",
     "plaintext_user_ssh_private_key_files_created": 0,
-    "current_vault_state": "Locked",
+    "current_vault_state": "Unlocked after native recovery",
     "memory_while_locked_bytes": 38518784
   },
   "preserved": [
@@ -38,11 +47,11 @@
     "ThinkPad baseline source restored after bounded build patch"
   ],
   "open": [
-    "Windows sshd start and return enrollment require native UAC",
     "Iroh SSH transport",
     "master approval of device CAs",
     "fleet-wide pairing",
-    "graphical desktop control"
+    "graphical desktop control",
+    "Windows cached qualifier native unlock dialog not displayed; earlier Windows-to-Surface proof remains historical"
   ],
   "updated": "2026-10-13"
 }
