@@ -259,8 +259,8 @@ graphshell-endpoint = { version = "0.0.2", path = "crates/graphshell/graphshell-
 # embedded contracts resolve locally through the complete patch table below.
 # The receipt records supplier graph and compile qualification. Djinn's `knot-site`
 # row moves with these two pins so all Knot packages share one source.
-knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "3af93adda472af2913a5d298f14deb10e85daee2" }
-knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "3af93adda472af2913a5d298f14deb10e85daee2" }
+knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "8ed49d43f049921d56ab5a0c091a2c37c0970ee7" }
+knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "8ed49d43f049921d56ab5a0c091a2c37c0970ee7" }
 # The credential-keeper port (dramatis plan D4). No longer a reservation:
 # C1/C2 landed the OTP core, sealed OTP items, the release gate, and the
 # `keeper` identity surface graphshell re-exports.

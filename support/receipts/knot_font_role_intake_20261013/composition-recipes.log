@@ -1,0 +1,70 @@
+warning: patch `boa_engine v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+warning: patch `boa_gc v1.0.0-dev (https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/mark-ik/boa.git
+   Compiling bytemuck_derive v1.12.1
+   Compiling matrixmultiply v0.3.11
+   Compiling bytemuck v1.25.2
+   Compiling wide v1.7.1
+   Compiling num-complex v0.4.6
+   Compiling glam v0.33.8
+   Compiling simba v0.10.2
+   Compiling hashbrown v0.17.1
+   Compiling nalgebra-macros v0.3.0
+   Compiling indexmap v2.14.2
+   Compiling spade v2.15.1
+   Compiling nalgebra v0.35.0
+   Compiling strum_macros v0.28.0
+   Compiling tracing-core v0.1.36
+   Compiling profiling-procmacros v1.0.18
+   Compiling tracing-attributes v0.1.31
+   Compiling num-derive v0.5.1
+   Compiling downcast-rs v2.0.2
+   Compiling either v1.18.0
+   Compiling tracing v0.1.44
+   Compiling hashbrown v0.15.5
+   Compiling profiling v1.0.18
+   Compiling strum v0.28.0
+   Compiling petgraph v0.8.3
+   Compiling glamx v0.3.1
+   Compiling parry2d v0.31.1
+   Compiling knot-file-catalog v0.0.1 (https://github.com/merely-made/knot-editor.git?rev=8ed49d43f049921d56ab5a0c091a2c37c0970ee7#8ed49d43)
+   Compiling numen v0.2.0 (/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin/crates/conatus/numen)
+   Compiling armillary v0.1.1 (/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin/crates/armillary)
+   Compiling euclid v0.22.14
+   Compiling knot-capture v0.0.1 (https://github.com/merely-made/knot-editor.git?rev=8ed49d43f049921d56ab5a0c091a2c37c0970ee7#8ed49d43)
+   Compiling rapier2d v0.36.0
+   Compiling seiche v0.0.6 (/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin/crates/conatus/seiche)
+   Compiling knot-composition v0.0.1 (https://github.com/merely-made/knot-editor.git?rev=8ed49d43f049921d56ab5a0c091a2c37c0970ee7#8ed49d43)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 45.87s
+     Running tests/recipes.rs (/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin-target/debug/deps/recipes-7c602d9f6368ba03)
+
+running 21 tests
+test motion_roles_reject_unknown_ids_invalid_versions_and_empty_v4 ... ok
+test legacy_recipe_without_scene_presentation_remains_valid_and_omitted ... ok
+test authored_occurrences_keep_distinct_positions_when_they_share_a_source ... ok
+test placement_trace_refuses_shared_scene_edits_outside_occurrence_translation ... ok
+test motion_roles_roundtrip_by_disclosed_occurrence_and_keep_repeated_sources_distinct ... ok
+test authored_positions_survive_recipe_edits_but_refuse_rebound_source_anchors ... ok
+test presentation_v1_without_background_categories_remains_byte_identical ... ok
+test presentation_v1_refuses_nonempty_background_categories ... ok
+test presentation_v2_allows_an_empty_background_category_set ... ok
+test presentation_v2_bytes_stay_identical_without_placement_trace ... ok
+test presentation_rejects_invalid_background_categories ... ok
+test presentation_v2_roundtrips_exact_disclosed_background_categories ... ok
+test authored_positions_roundtrip_in_shared_trace_and_keep_zero_as_an_override ... ok
+test scene_presentation_roundtrips_with_disclosed_occurrences ... ok
+test a_complete_preview_pose_keeps_hidden_occurrences_and_preserves_roles_and_source ... ok
+test validation_outcome_does_not_depend_on_card_size ... ok
+test scene_placement_refusal_preserves_exact_material ... ok
+test scene_presentation_rejects_unknown_fields_versions_and_invalid_view_values ... ok
+test placement_trace_refuses_nonfinite_items_annotations_and_excess_steps ... ok
+test typed_recipe_roundtrips_and_rejects_invalid_associations_and_anchors ... ok
+test a_preview_pose_is_atomic_for_missing_foreign_nonfinite_and_exhausted_trace_input ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.95s
+

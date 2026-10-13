@@ -1,0 +1,25 @@
+{
+  "kind": "diagnostic",
+  "runs": [
+    {
+      "case": "wide",
+      "command": [
+        "caffeinate",
+        "-di",
+        "/Users/markik/Code/output/moot-resource-host-20261012/moot-resource-host-r4-frozen",
+        "--receipt",
+        "/Users/markik/Code/output/moot-resource-host-20261012/diagnostic-r4/wide",
+        "--size",
+        "1280x920"
+      ],
+      "exit_code": 101,
+      "guard": null,
+      "sampled": false,
+      "captures": 1
+    }
+  ],
+  "seconds": 5.75,
+  "stopped_at": "2026-10-13T04:12:40.769453+00:00",
+  "binary_sha256": "a433397a943dce317987a925b2dbd622d9914cddcdaec2e14ebb9d92c7de389d",
+  "resources": "Owned process groups stopped; no server created"
+}
