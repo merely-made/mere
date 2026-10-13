@@ -463,6 +463,13 @@ async fn sources(mount: &BrowserMount, index: usize) -> Result<Vec<Capture>, Str
     }
     Ok(captures)
 }
+fn adapter_identity(core: &RenderCore) -> Value {
+    let info = core.renderer().wgpu_device.core.adapter.get_info();
+    json!({"name":info.name,"backend":format!("{:?}",info.backend),
+        "device_type":format!("{:?}",info.device_type),"vendor":info.vendor,"device":info.device,
+        "driver":info.driver,"driver_info":info.driver_info,
+        "source":"actual fixture RenderCore adapter; browser fields may be redacted"})
+}
 fn digest(frame: &Frame) -> String {
     format!("{:x}", Sha256::digest(&frame.rgba))
 }
@@ -705,6 +712,7 @@ async fn execute(first_id: &str, second_id: &str, run: &str) -> Result<Value, St
     phase(run, "boot_shared_core");
     let core = Arc::new(RenderCore::boot_async((options().netrender)()).await?);
     let generation = core.generation();
+    let initial_adapter = adapter_identity(&core);
     let old = Arc::downgrade(&core);
     let owner = core.shared_recovery();
     let mut mounts = Vec::new();
@@ -966,6 +974,7 @@ async fn execute(first_id: &str, second_id: &str, run: &str) -> Result<Value, St
         "scope":"two actual full Workshop mounts, identical local keys, hidden second host, controlled owned Device.destroy; same-canvas queue presentation and complete presented/source RGBA under unchanged limits; compositor visibility requires separate browser review",
         "current_frame_async_quality_qualified":false,"current_frame_async_error_scopes_qualified":false,
         "physical_driver_reset":false,"os_accessibility_actions":false,"factory_count_inferred":false,
+        "initial_adapter":initial_adapter,"replacement_adapter":adapter_identity(&replacement),
         "lost_generation":generation,"replacement_generation":replacement.generation(),"loss_reason":format!("{:?}",loss.reason),
         "exactly_once_capture_refusals":failures.borrow().len(),"queued_readback_loss_then_already_collected":true,"old_core_released":true,"shared_replacement_arc":true,
         "first":first,"second":second,"complete_registered_producers":full_producers,"input_route":"logical Host::key dispatch; real DOM gestures remain separate","post_input":{"seal":after_input.seal,"sha256":digest(&after_input.frame)},
