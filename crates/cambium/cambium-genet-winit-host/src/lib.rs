@@ -215,6 +215,9 @@ mod geometry_tests {
     }
 }
 
+#[cfg(test)]
+mod occlusion_tests;
+
 /// The winit window, as the neutral seam sees it.
 ///
 /// A newtype for the same reason as [`WinitSurface`]: the trait is not local to
@@ -1114,6 +1117,14 @@ where
                 self.request_close(CloseRequest::Native);
             },
             WindowEvent::Moved(_) => self.refresh_geometry(),
+            WindowEvent::Occluded(false) => {
+                // Acquisition can skip an occluded surface without scheduling
+                // another frame. Repaint on the platform's actual visibility
+                // transition, while application-hidden windows stay asleep.
+                if !self.s.hidden {
+                    self.note_resize();
+                }
+            },
             WindowEvent::Resized(size) => {
                 if let Some(surface) = self.s.surface.as_mut() {
                     surface.resize(size.width.max(1), size.height.max(1));
