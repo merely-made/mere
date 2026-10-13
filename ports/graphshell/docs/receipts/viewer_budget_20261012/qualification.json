@@ -1,15 +1,15 @@
 {
-  "status": "Normal delivery caps and CPU/feature gates passed; browser and final upstream renewal pending",
-  "source": "cef122f25737a82c4621de49771c90fc357be348",
+  "status": "All asset caps, CPU/feature gates and17physics pass; final browser scopes pending lockedconsole",
+  "source": "cdba4c96909c05b4a2450d1e204979d0dc3c8d48",
   "cap_gzip_bytes": 3407872,
-  "delivery": "shipping/pkg/viewer-delivery.json",
+  "delivery": "shipping-closure/pkg/viewer-delivery.json",
   "cpu": {
     "portable_platen": 50,
     "default_platen": 54,
     "size_guard": 2
   },
-  "wasm_gates": "wasm-gates/gates.json",
-  "browser_executed": false,
+  "wasm_gates": "wasm-gates-closure/gates.json",
+  "browser_executed": true,
   "main_landed": false,
   "live_site_deployed": false,
   "removed_capability": "Unused Platen document producer in read-only viewer; default/native/product document capability retained",
@@ -51,5 +51,31 @@
     "rendered_latin_greek": "readable in both",
     "missing_glyphs": "Arabic/CJK/Thai missing repertoire visible in both original and reduced package",
     "mixed_script_line_breaks": "differ; no claim of identical complex-script line segmentation or expanded font repertoire"
-  }
+  },
+  "initial_source": "cef122f25737a82c4621de49771c90fc357be348",
+  "accepted_browser": {
+    "commands": 24,
+    "commands_receipt": "commands-final-browser-r2/summary.json",
+    "presenter": 11,
+    "presenter_receipt": "presenter-final-sync-browser-r3/summary.json",
+    "physics": 17,
+    "physics_receipts": [
+      "budget-final-browser-r3",
+      "remaining-browser-r4"
+    ],
+    "unicode": "same disclosedstrings; existingfontrepertoirelimit andmixedscriptlinebreakdifference retained",
+    "device": "AMDgcn-5",
+    "page_errors": 0,
+    "pending": [
+      "browserpointer/keyboardcounterpart",
+      "21-node synthetic timing",
+      "3saved/remote refusals"
+    ]
+  },
+  "test_only_corrections": [
+    "Density420-second driver wait for7400frames, oldtimeoutpreserved",
+    "Presenter waitforselectedstate/requiredlink, immediate0\u2192settled1 proved",
+    "Keyboard12thTab; original11Tab failsidentically onbaseline/current; assertions unchanged"
+  ],
+  "all_owned_resources_closed": true
 }
