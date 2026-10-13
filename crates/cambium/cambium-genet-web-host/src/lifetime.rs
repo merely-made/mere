@@ -42,6 +42,7 @@ struct Inner {
     status: Cell<MountStatus>,
     startup_waker: RefCell<Option<Waker>>,
     cleanup: RefCell<Vec<Box<dyn FnOnce()>>>,
+    liveness: Option<Box<dyn Fn() -> bool>>,
 }
 
 /// Create before any startup await. Clones name the same one-use mount.
@@ -56,6 +57,18 @@ impl Default for MountLifetime {
 }
 impl MountLifetime {
     pub fn new() -> Self {
+        Self::create(None)
+    }
+    /// Opt in to a root-bound startup admission predicate. It is checked at
+    /// mount checkpoints, not observed continuously: removal alone does not
+    /// wake or cancel an acquisition promise. This lets an in-flight private
+    /// acquisition finish and be explicitly destroyed when late admission is
+    /// refused. Call dispose to cancel the Rust startup task, or to tear down
+    /// an already activated mount. Default lifetimes impose no DOM requirement.
+    pub fn with_liveness(predicate: impl Fn() -> bool + 'static) -> Self {
+        Self::create(Some(Box::new(predicate)))
+    }
+    fn create(liveness: Option<Box<dyn Fn() -> bool>>) -> Self {
         Self(Rc::new(Inner {
             status: Cell::new(MountStatus {
                 phase: MountPhase::New,
@@ -67,6 +80,7 @@ impl MountLifetime {
             }),
             startup_waker: RefCell::new(None),
             cleanup: RefCell::new(Vec::new()),
+            liveness,
         }))
     }
     pub fn status(&self) -> MountStatus {
@@ -83,12 +97,30 @@ impl MountLifetime {
             MountPhase::Starting | MountPhase::Active
         )
     }
+    fn is_live(&self) -> bool {
+        self.0.liveness.as_ref().is_none_or(|predicate| predicate())
+    }
     pub(crate) fn check(&self) -> Result<(), String> {
-        self.admitted()
-            .then_some(())
-            .ok_or_else(|| "mount disposed".into())
+        if !self.admitted() {
+            return Err("mount disposed".into());
+        }
+        if !self.is_live() {
+            return Err("mount root is no longer live".into());
+        }
+        // A caller predicate is application code; do not let a reentrant
+        // disposal request be overwritten by admission or activation.
+        if !self.admitted() {
+            return Err("mount disposed".into());
+        }
+        Ok(())
     }
     pub(crate) fn begin(&self) -> Result<(), String> {
+        if self.status().phase != MountPhase::New {
+            return Err("mount lifetime already used or disposed".into());
+        }
+        if !self.is_live() {
+            return Err("mount root is no longer live".into());
+        }
         if self.status().phase != MountPhase::New {
             return Err("mount lifetime already used or disposed".into());
         }
@@ -174,7 +206,16 @@ impl MountLifetime {
         self.finish_disposal();
     }
     pub(crate) async fn startup<F: Future>(&self, future: F) -> Result<F::Output, String> {
-        self.begin()?;
+        if let Err(error) = self.begin() {
+            // Even a not-yet-polled caller future may own an actual candidate.
+            // Release it before disposal can report completed cleanup. Reuse
+            // refusal must not dispose an already-active lifetime.
+            drop(future);
+            if self.status().phase == MountPhase::New {
+                self.dispose();
+            }
+            return Err(error);
+        }
         Startup {
             future: Some(Box::pin(future)),
             lifetime: self.clone(),
@@ -297,6 +338,78 @@ mod tests {
             self.0.set(self.0.get() + 1);
         }
     }
+    #[test]
+    fn false_root_liveness_refuses_before_polling_acquisition_and_releases_its_state() {
+        let live = Rc::new(Cell::new(false));
+        let lifetime = MountLifetime::with_liveness({
+            let live = live.clone();
+            move || live.get()
+        });
+        let drops = Rc::new(Cell::new(0));
+        let mut pending = Box::pin(lifetime.startup(Acquisition(drops.clone())));
+        let waker = Waker::from(Arc::new(WakeCount(AtomicUsize::new(0))));
+        let mut cx = Context::from_waker(&waker);
+        assert!(
+            matches!(pending.as_mut().poll(&mut cx), Poll::Ready(Err(error)) if error == "mount root is no longer live")
+        );
+        assert_eq!(drops.get(), 1);
+        assert_eq!(lifetime.status().phase, MountPhase::Disposed);
+        assert!(!lifetime.status().startup_pending);
+    }
+    struct ReadyAfterRemoval {
+        live: Rc<Cell<bool>>,
+        polls: Rc<Cell<usize>>,
+        output: Option<Acquisition>,
+    }
+    impl Future for ReadyAfterRemoval {
+        type Output = Acquisition;
+        fn poll(self: Pin<&mut Self>, _: &mut Context<'_>) -> Poll<Self::Output> {
+            let this = self.get_mut();
+            this.polls.set(this.polls.get() + 1);
+            this.live.set(false);
+            Poll::Ready(this.output.take().unwrap())
+        }
+    }
+    #[test]
+    fn root_removal_keeps_pending_poll_admitted_but_refuses_ready_output_at_checkpoint() {
+        let live = Rc::new(Cell::new(true));
+        let lifetime = MountLifetime::with_liveness({
+            let live = live.clone();
+            move || live.get()
+        });
+        let polls = Rc::new(Cell::new(0));
+        let drops = Rc::new(Cell::new(0));
+        let checkpoint = lifetime.clone();
+        let acquisition = ReadyAfterRemoval {
+            live: live.clone(),
+            polls: polls.clone(),
+            output: Some(Acquisition(drops.clone())),
+        };
+        // This is the production startup wrapper with a CPU-owned future and
+        // output. It proves admission semantics, not GPU/device destruction.
+        let mut pending = Box::pin(lifetime.startup(async move {
+            checkpoint.check()?;
+            let acquired = acquisition.await;
+            assert!(
+                checkpoint.admitted(),
+                "root removal alone must not cancel the startup poll"
+            );
+            let result = checkpoint.check();
+            drop(acquired);
+            result
+        }));
+        let waker = Waker::from(Arc::new(WakeCount(AtomicUsize::new(0))));
+        let mut cx = Context::from_waker(&waker);
+        assert!(
+            matches!(pending.as_mut().poll(&mut cx), Poll::Ready(Ok(Err(error))) if error == "mount root is no longer live")
+        );
+        assert_eq!(polls.get(), 1);
+        assert_eq!(drops.get(), 1);
+        assert_eq!(lifetime.status().phase, MountPhase::Disposed);
+        assert_eq!(lifetime.status().listeners, 0);
+        assert!(!lifetime.status().raf_pending);
+    }
+
     #[test]
     fn cancellation_wakes_and_releases_actual_startup_future_before_disposed() {
         let lifetime = MountLifetime::new();
