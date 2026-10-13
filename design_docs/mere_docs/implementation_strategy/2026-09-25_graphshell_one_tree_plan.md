@@ -1489,3 +1489,44 @@ existing toolbar remains until this target passes.
   Graphshell web build is claimed. Genet's wider gate retains three failures
   reproduced on its untouched base (two float cases and one table-glyph case);
   consumer checks do not establish a wholly green upstream suite.
+
+## Native retained-content continuation — 2026-10-13
+
+**Status:** implemented; final source and headed qualification are being recorded.
+This continuation follows Mark's native-stack ruling in the
+[suite census](../../2026-08-22_turnstone_suite_composition_and_capability_census.md).
+
+### Target and done-conditions
+
+Compose Pelt/Genet in Graphshell's existing Frisket Workbench; lift selected-clip
+presentation into shared document lanes and adopt that factory in Turnstone.
+Done means retained source bytes reach real document sessions and the host's
+existing device, selected clips survive store reopening, hidden/retired views
+refuse input, and browser captures show actual content after an asynchronous
+source read. Consumer qualification must distinguish source overrides from a
+published dependency pin.
+
+### Findings
+
+- Shared source identity and clip verification belong in document lanes;
+  admission, custody, arrangements and link decisions stay with the application.
+- Frisket rebuilds the previous fill callback. A callback that reads mutable
+  present state can reconstruct the previous view with the wrong concrete type.
+  The Workbench now captures immutable appearance snapshots before building it.
+- A custom leaf must preserve `display:block` when replacing its inline style;
+  otherwise the retained source exists but its paint box is empty.
+- The core source inventory refuses ambient file/network acquisition. A restored
+  file fallback is retained as a failing negative control in the receipt.
+
+### Progress and remaining gates
+
+The shared native factory, retained clip session, portable content host/input
+view/producer, browser store admission and Workbench mounting are implemented.
+Evidence is under `ports/graphshell/docs/receipts/retained_content_20261012/`.
+This bounded native content path does not close physical assistive-technology,
+protected personal custody, all media adapters or cross-platform acceptance.
+Turnstone A4/S3 still requires in-house Component bodies in one composition,
+float joining, native input/theme/DPI/performance acceptance. Its shared frame
+and outer Workspace draft is the next composition owner, not a receipt for
+those remaining gates. External engine builds and simultaneous engine loading
+remain separately qualified consumers.
