@@ -1450,9 +1450,11 @@ supplier adoption. An older compiler's passing receipt is not a new compiler's
 qualification. The Murm move plan carries this as MOVE1, before implementation
 imports and consumer cutover.
 
-**Current execution status:** Rust 1.99.0 working toolchain and Rust 1.97.1
-shared MSRV selected. No new MSRV compiler runs were performed in this
-selection pass.
-The stack-wide manifest/toolchain/CI rollout remains unexecuted. This host's
-installed `stable` alias reports 1.97.1, and the current Mere worktree pins 1.98.1. Neither is proof of the newest stable
-release or evidence that the stack is already on 1.99.
+**Current execution status:** defaults rollout in progress. Isolated checkouts
+of all 21 active Rust repositories in the organization now carry the 1.99.0
+working pins, 1.97.1 owned-package declarations and separate intermediate build
+directories. Root metadata policy checks pass on both compiler versions (42
+checks). Vendored/patch suppliers and frozen historical receipts are preserved.
+The shared wgpu CI support-floor default is aligned too. Compiler qualification,
+publication and the first Murm imports are recorded in the canonical Murm move
+plan. Metadata checks alone do not establish all-platform MSRV compatibility.

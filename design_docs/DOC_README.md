@@ -1,6 +1,6 @@
 # Mere Documentation Index
 
-Rust policy (2026-10-13): the [family composition brief](2026-08-12_family_composition_thesis_brief.md#shared-rust-toolchain-and-minimum-version-2026-10-13) records the Rust 1.99.0 working toolchain, the separately selected Rust 1.97.1 shared MSRV, and build-directory rollout requirements. Manifest/CI rollout remains pending.
+Rust policy (2026-10-13): the [family composition brief](2026-08-12_family_composition_thesis_brief.md#shared-rust-toolchain-and-minimum-version-2026-10-13) records the Rust 1.99.0 working toolchain, the separately selected Rust 1.97.1 shared MSRV, and build-directory rollout requirements. Manifest/CI defaults rollout is in progress; root policy checks pass on both compiler versions, with platform compilation qualified separately.
 
 Embedding draft and terminology refresh (2026-10-13): the [family composition continuation](2026-08-12_family_composition_thesis_brief.md#embedding-in-caller-owned-wgpu-contexts-draft) records resource leaves, Murm/Gemot exchange, foreign-platform intake and caller-owned wgpu hosting, with egui/Iced as proposed qualification hosts. The [terminology reference](TERMINOLOGY.md) now describes current platform engines, readers, surface producers, native Pelt/Genet ownership, Fleece and the scene family. Generic toolkit integration remains a draft target.
 

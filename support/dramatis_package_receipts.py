@@ -93,10 +93,10 @@ def main():
             assert (scratch / ".dramatis-generated").read_text() == "synthetic Dramatis installer extraction"
             shutil.rmtree(scratch)
         gate_env = dict(os.environ, DRAMATIS_PACKAGE_FEED=str(feed), DRAMATIS_PACKAGE_PUBLIC_KEY_FILE=str(public), DRAMATIS_PACKAGE_OTHER_PUBLIC_KEY_FILE=str(public_other))
-        command = ["cargo", "+1.98.1", "test", "--locked", "--offline", "-p", "dramatis-app", "--test", "package_feed", "--target-dir", str(TARGET), "-j1", "--", "--ignored", "--exact", "real_signed_package_and_tamper_controls", "--nocapture"]
+        command = ["cargo", "+1.99.0", "test", "--locked", "--offline", "-p", "dramatis-app", "--test", "package_feed", "--target-dir", str(TARGET), "-j1", "--", "--ignored", "--exact", "real_signed_package_and_tamper_controls", "--nocapture"]
         run("signed-feed", command, gate_env)
         assert all(digest(feed / name) == sha for name, sha in before.items()), "tamper controls must restore every feed byte"
-        run("app-controls", ["cargo", "+1.98.1", "test", "--locked", "--offline", "-p", "dramatis-app", "--test", "state", "--test", "interaction", "--target-dir", str(TARGET), "-j1"])
+        run("app-controls", ["cargo", "+1.99.0", "test", "--locked", "--offline", "-p", "dramatis-app", "--test", "state", "--test", "interaction", "--target-dir", str(TARGET), "-j1"])
         receipt = {"platform": "windows-x86_64", "profile": "dev", "synthetic_signing_only": True,
                    "native_host_qualification": {"Windows": "debug package pipeline passed; release/installed trust pending", "Fedora": "pending; wait until reachable", "macOS Intel": "pending; wait until reachable", "macOS ARM": "pending; wait until reachable"},
                    "source_revision": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),

@@ -12,7 +12,7 @@ import argparse, hashlib, json, os, shutil, subprocess, time
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "support/receipts/dramatis-app"
 TARGET = Path("C:/t/cargo-targets/mere")
-CARGO = ["cargo", "+1.98.1"]
+CARGO = ["cargo", "+1.99.0"]
 records = []
 JOBS = 1
 def run(name, args, env=None, expected=0):

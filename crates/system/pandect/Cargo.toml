@@ -6,7 +6,8 @@ license.workspace = true
 edition = "2024"
 # Publishable from 2026-08-14 as `pandect`.
 publish = true
-rust-version = "1.92.0"
+
+rust-version = "1.97.1"
 readme = "README.md"
 keywords = ["session", "state", "manifest", "wallet", "mere"]
 categories = ["data-structures"]

@@ -6,6 +6,7 @@
 # LAN-pair run over real interfaces is the remaining headed step.
 # Standalone (crates/probes is excluded from the mere workspace).
 [package]
+rust-version = "1.97.1"
 name = "pack-distribution"
 version = "0.0.1"
 edition = "2024"
