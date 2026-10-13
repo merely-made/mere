@@ -1341,3 +1341,17 @@ on `codex/murm-family-refresh`; main integration is separate. Source hashes,
 version inventory and receipts live at `targets/murm-family-refresh-20261013.json`,
 with `targets/murm-refresh-consumer-tests-20261013.log` and
 `targets/murm-refresh-admission-tests-20261013.log` carrying the current gates.
+
+### 2026-10-13: broader Murm family move
+
+The owner authorized planning Murm as the communication and device-implementation
+family, using the Retinue repository as its foundation while preserving crate
+names and original history. The canonical migration specification is
+`retinue/design_docs/2026-10-13_murm_family_move_plan.md`. It separates radio and
+new native Cargo workspaces, selects Stickleback to remain in Mere as a neutral
+shared supplier, and retains Genet's Netfetcher Fetch/WebSocket policy while
+qualifying reusable wire implementations as a later Murm lane. Personae, host
+persistence, Gemot governance and Luggage update policy keep their existing
+owners. This family scope does not give the conversation package ownership of
+every device or shared activity. The receiving workspace, source imports,
+consumer repins and repository rename remain planned and have not executed.
