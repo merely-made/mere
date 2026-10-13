@@ -1,6 +1,8 @@
 # Mere Documentation Index
 
-Browser presentation tenant design (2026-10-13): the [family composition continuation](2026-08-12_family_composition_thesis_brief.md#browser-webgl2-presentation-tenants-design-2026-10-13) specifies host-owned WebGPU/WebGL2 contexts, renderer/content tenants, resource generations and recovery, with Graphshell's viewer as the first consumer. Written-design review and implementation planning remain pending; the recorded AMD browser probe is lifecycle feasibility only.
+Browser presentation implementation (2026-10-13): the [tenant presentation plan](mere_docs/implementation_strategy/2026-10-13_browser_presentation_tenants_plan.md) sequences shared frame preparation, portable producer scenes, Netrender's direct WebGL2 realization, recovery/capture and Graphshell viewer acceptance in an owned worktree. Written design is approved; plan review and execution-method selection are pending.
+
+Browser presentation tenant design (2026-10-13): the [family composition continuation](2026-08-12_family_composition_thesis_brief.md#browser-webgl2-presentation-tenants-design-2026-10-13) specifies host-owned WebGPU/WebGL2 contexts, renderer/content tenants, resource generations and recovery, with Graphshell's viewer as the first consumer. The owner approved the written design; implementation-plan review remains pending. The recorded AMD browser probe is lifecycle feasibility only.
 
 Murm first move (2026-10-13): `murm`, `mere-transport` and `mere-webrtc-carrier` are immutable Git suppliers from the continuing Retinue repository's native workspace; Mere's old copies are removed. The [runtime plan](mere_docs/implementation_strategy/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md#2026-10-13-first-murm-implementation-cutover) records compiler, owner and consumer checks. Canonical migration: `retinue/design_docs/2026-10-13_murm_family_move_plan.md`. Repository rename and remaining application adoption stay open.
 
