@@ -84,6 +84,21 @@ $sshd = Join-Path $env:WINDIR 'System32\OpenSSH\sshd.exe'
 # Generate missing keys before validating; -A leaves existing host keys intact.
 & (Join-Path $env:WINDIR 'System32\OpenSSH\ssh-keygen.exe') -A
 if ($LASTEXITCODE -ne 0) { throw 'Could not initialize SSH host keys.' }
+# Keys generated in an administrator's session otherwise retain that user's
+# ownership. The LocalSystem service requires SYSTEM/Administrators ownership
+# and exclusive access, even when an elevated sshd -t accepts those keys.
+Get-ChildItem (Split-Path -Parent $config) -Filter 'ssh_host_*_key' | ForEach-Object {
+    $hostAcl = [Security.AccessControl.FileSecurity]::new()
+    $hostAcl.SetOwner([Security.Principal.SecurityIdentifier]::new('S-1-5-18'))
+    $hostAcl.SetAccessRuleProtection($true, $false)
+    foreach ($hostSid in @('S-1-5-18', 'S-1-5-32-544')) {
+        $hostAcl.AddAccessRule([Security.AccessControl.FileSystemAccessRule]::new(
+            [Security.Principal.SecurityIdentifier]::new($hostSid),
+            [Security.AccessControl.FileSystemRights]::FullControl,
+            [Security.AccessControl.AccessControlType]::Allow))
+    }
+    Set-Acl -LiteralPath $_.FullName -AclObject $hostAcl
+}
 & $sshd -t
 if ($LASTEXITCODE -ne 0) { throw 'sshd configuration validation failed.' }
 if ($key) {
