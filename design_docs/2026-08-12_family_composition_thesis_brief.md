@@ -1387,6 +1387,11 @@ checks are not passing receipts. The executed headless bench produced sixteen
 byte-identical egui/Iced image pairs, with outside-clip, scale and independent
 access checks. Rehydration changes caller generation on the same Device/Queue
 after suspension; it does not demonstrate an actual device replacement or loss.
+The final combined Genet b6/Netrender 6a bench retains all sixteen identical
+pairs. Its `final/` receipt records the RTX 4060 Laptop Vulkan adapter, one
+caller Device/Queue shared by both hosts, source hashes, PNG hashes and the
+same-handle generation 1-to-2 transition. The later scheduling observer has its
+own pool/consumer controls; those changes do not relabel the measured GPU basis.
 The locked GPU shader supplier still forces
 WESL/WGSL 0.4.0 with an older-compiler comment. That dependency currency question
 remains with its supplier; this adapter does not rewrite the selected compiler

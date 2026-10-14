@@ -4440,3 +4440,12 @@ Sharing exposes the definition for a receiver to evaluate over its own graph.
 Freezing reuses the existing immutable nested-selection Resource. Neither
 operation changes the other. Native model, owner persistence and headed browser
 receipts are required before this slice is reported as qualified.
+
+The bounded slice is qualified on the combined Genet b6/Netrender 6a basis:
+ten shared query cases, one actual owner-journal save/freeze/undo/reopen case,
+and three fresh browser scenarios pass. Browser acceptance covers independent
+freezing, configured strokes, exact empty membership, IndexedDB reopening and
+inspection of lifted Resource links, Surface links and zero-hop shown bindings.
+The source-stable final Wasm and nine actual captures are recorded under
+`ports/graphshell/docs/receipts/query_views_20261013/browser-qualified-8884/`.
+Additional strata and wider consumer acceptance remain separate.

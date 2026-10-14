@@ -1,0 +1,99 @@
+{
+  "rust": "1.99.0",
+  "source_head": "eeb59b303fd32611fdab1aea7a52a0f29b004fa0",
+  "genet": "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084",
+  "wasm_bindgen": "wasm-bindgen 0.2.129",
+  "target": "C:/t/cargo-targets/mere",
+  "command": "cargo +1.99.0 build --target wasm32-unknown-unknown --locked --offline -j1",
+  "cwd": "ports/graphshell/web",
+  "consumer_sources": [
+    {
+      "path": "crates/system/document-lanes/src/retained_clip.rs",
+      "sha256": "0049ee3161b93b65c08c067057f4685774361d643685be19e2509d2e6c082727"
+    },
+    {
+      "path": "crates/system/document-lanes/src/retained_clip/tests.rs",
+      "sha256": "c52174c112549ec959477ad833ff6c17523181223623889b3d5f73c373117eaf"
+    },
+    {
+      "path": "ports/graphshell/docs/receipts/retained_content_20261012/turnstone-source-patches.toml",
+      "sha256": "47e2d832d20b370ed7a17944812a8cab9a65e3bb45fec9618684e52215fdd560"
+    },
+    {
+      "path": "ports/graphshell/examples/retained_content_fixture.rs",
+      "sha256": "29264ec5145970f3d331fecfc178b3e8675253e1ae85421124a83a9ac688c664"
+    },
+    {
+      "path": "ports/graphshell/src/retained_content.rs",
+      "sha256": "9d78567e536519a06133b6397f390558b45b885d7eba196153e58db6dc3012af"
+    },
+    {
+      "path": "ports/graphshell/src/retained_content/export.rs",
+      "sha256": "68e8a1b46b884179e250e0f6df4ac72d3647e0b590b80d4d8e1c06413cdc7e49"
+    },
+    {
+      "path": "ports/graphshell/src/retained_content/fixture.rs",
+      "sha256": "db75193300500baf2298891b1ecdb00bd345b3af28749597788334b2628717ba"
+    },
+    {
+      "path": "ports/graphshell/src/retained_content/producer.rs",
+      "sha256": "c0b74e44c1b447e5003ec4be25e44a6732da2b5776eadf9304ca0f0a8eeb0b0a"
+    },
+    {
+      "path": "ports/graphshell/src/retained_content/tests.rs",
+      "sha256": "bf60fb4646c0532f3ecc62bd3f3f09d88965d987d432adc3605824c758e3ce2c"
+    },
+    {
+      "path": "ports/graphshell/src/retained_content/view.rs",
+      "sha256": "4549fd1c2a1cba991d22d9f2215ef875db0c1d3dceb1de5c0c613f00254a403d"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree.rs",
+      "sha256": "6b087fe4be7feede3472b07f95049e0a798cbafa9cb331ae32c5f651c969c720"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/forme.rs",
+      "sha256": "05727b128288dff072e0ab315866dd77ab86127376ec70f81f1360a280e74384"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/product.rs",
+      "sha256": "bd265e6f06cbe3ee152fac919b8da9db67d95a6667f2646a878b111797aefd3a"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/reading.rs",
+      "sha256": "a8e3751b5d0efd4c760e933452bc2a9f2bb217c6204e5fa6f876d1b41affec5f"
+    }
+  ],
+  "netrender": "6a24ae08f55129b474282b8e4911564f875ce5fd",
+  "build_dir": "C:/t/cargo-targets/mere/build",
+  "files": [
+    {
+      "sha256": "5943978c46c576dd54cdd06c00681e0d537c88343babd62a9d0e2d00604791d1",
+      "path": "C:\\t\\cargo-targets\\mere\\retained-content-browser\\graphshell_web_bg.wasm",
+      "bytes": 491525632
+    },
+    {
+      "sha256": "5980557725486549d551dd590ed72243b78338f947dc06fb7d49ef34f9c139e9",
+      "path": "C:\\t\\cargo-targets\\mere\\retained-content-browser\\graphshell_web.js",
+      "bytes": 161697
+    },
+    {
+      "sha256": "1d34b8cebf80812ed8511c8b9079309d040cc7ff9590252c717ad5bd45b1d40b",
+      "path": "C:\\t\\cargo-targets\\mere\\retained-content-browser\\graphshell_web.d.ts",
+      "bytes": 8433
+    },
+    {
+      "sha256": "bbeb4b2f5109aa86b1b3c290e810a05619356c242900a2e3332395a0a813b983",
+      "path": "C:\\t\\cargo-targets\\mere\\retained-content-browser\\graphshell_web_bg.wasm.d.ts",
+      "bytes": 6293
+    }
+  ],
+  "full_source_manifest": {
+    "path": "ports/graphshell/docs/receipts/query_views_20261013/final-browser-artifact.json",
+    "sha256": "458b869cda42b6f6df19e9980966c085a18cae6b38a092a4c40d216cd96d52f6",
+    "consumer_source_count": 2711
+  },
+  "origin": "http://127.0.0.1:8885",
+  "fixture": "retained-content-query",
+  "scenario": "scenarios/clip_export_ready.scn"
+}

@@ -2143,12 +2143,23 @@ path remains unobserved. See the source-bound continuation in
 
 Turnstone A4/S3 now implements in-house Component bodies in the shared retained
 forest and stages native producer images at their exact appearance apertures.
-Source-first withdrawal parks the actual runner until remount; four shared tests
-cover eager removal, GC, focus/state continuity, owner teardown and foreign-DOM
-refusal. Native headed composition qualification is in progress. Physical
+Source-first withdrawal parks the actual runner until remount. Eleven shared
+controls cover eager removal, GC, focus/state continuity, owner teardown,
+foreign-DOM refusal and explicit stock-tab focus requests. The focused Genet
+19947 receipt remains distinct from final supplier qualification. Native headed
+composition qualification is in progress. Physical
 input/accessibility, monitor DPI transitions and performance remain separate
 gates. External engine builds and simultaneous engine loading remain separately
 qualified consumers.
+
+The final b6/6a shared model gates pass on the published Genet and Netrender
+suppliers. The Pelt scheduling continuation observes actual pending work and
+session identities while preserving prepared input/a11y routes; all 25 pool
+tests pass. Future timer completion is independent of the script-visible settled
+handshake. Hosts retain deadline/wake authority and admit redraws through the
+current visible placement. Turnstone's actual headed acceptance and final Mere
+pin remain distinct from these shared controls.
+
 ### Shared browsing presenter candidate (2026-10-13)
 
 At Mark's request, `data-presenter="browse"` opts into a quieter shared viewer

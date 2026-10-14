@@ -1,6 +1,39 @@
 # Selected clip browser qualification
 
-The final scoped build was also qualified on fresh origin
+The current final browser qualification is `qualified-8885/` on fresh origin
+`http://127.0.0.1:8885`, using the actual `workspace.html` entry point,
+`retained-content-query` fixture and `clip_export_ready.scn`. Wasm SHA256:
+`5943978c46c576dd54cdd06c00681e0d537c88343babd62a9d0e2d00604791d1`
+(491525632 bytes). `qualified-8885/artifact-source.json` preserves the exact
+build metadata and focused source hashes, and identifies the full 2711-file
+source manifest by its SHA256. This pass made no source or build changes.
+The server-collected preparation scenario also finished `ok`, with empty
+errors and gate failures, in
+`../../query_views_20261013/browser-qualified-8885/scenarios_2Fclip_export_ready/result.json`.
+
+At the normal 1037 by 639 viewport the reader body was 705 by 127 pixels.
+One natural downward wheel gesture reached the visible Export control at
+y=505. A second downward wheel gesture at the reader's end left Export,
+the reader and the outer heading at the same positions. The outer DOM scroll
+remained zero. The former boundary-chain behavior is repaired in this artifact;
+no outer-scroll recovery or viewport override was needed.
+`before-wheel.json`, `after-wheel.json` and `at-boundary.json` record the exact
+geometry, and `at-boundary.jpg` shows the visible result.
+
+A trusted browser mouse click on the visible Export action produced
+`Selected clip download handed to the browser`, preserved in
+`qualified-8885/trusted-handoff.jpg` and its DOM snapshot. The pointer-blind
+accessibility mirror requires `force:true` for a browser pointer click so that
+the actual canvas receives the input. This is a browser gesture, not a scenario
+mirror action or a private app-hook invocation. No console warnings or errors
+were returned. The owned QA tab 642333490 was closed after evidence collection.
+
+The six-second download-event observation returned no path. Disk delivery and
+actual downloaded-file BLAKE3 remain open. The completed long searches and
+blocked internal-browser URL action were not repeated. The package MIME and
+filename remain the expected values recorded in `ui-confirmation.json`.
+
+An earlier scoped build was also qualified on fresh origin
 `http://127.0.0.1:8883`; see `final/artifact-source.json`,
 `final/ui-confirmation.json`, `final/trusted-handoff.jpg` and
 `final/trusted-handoff.txt`. Wasm SHA256:

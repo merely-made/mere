@@ -1,0 +1,102 @@
+{
+  "origin": "http://127.0.0.1:8885",
+  "url": "http://127.0.0.1:8885/workspace.html?fixture=retained-content-query&scenario=scenarios%2Fclip_export_ready.scn&sink=%2Fscenario-receipt&app=local",
+  "tab": "642333490",
+  "wasm_sha256": "5943978c46c576dd54cdd06c00681e0d537c88343babd62a9d0e2d00604791d1",
+  "wasm_bytes": 491525632,
+  "viewport": {
+    "height": 639,
+    "width": 1037
+  },
+  "pelt_body": {
+    "height": 127,
+    "width": 705,
+    "x": 16,
+    "y": 438
+  },
+  "initial": {
+    "body": {
+      "height": 127,
+      "width": 705,
+      "x": 16,
+      "y": 438
+    },
+    "export": {
+      "height": 24,
+      "width": 150.4375,
+      "x": 48,
+      "y": 654
+    },
+    "heading": {
+      "height": 24,
+      "width": 160,
+      "x": 56,
+      "y": 9
+    },
+    "reader": {
+      "height": 250,
+      "width": 737,
+      "x": 0,
+      "y": 389
+    },
+    "scrollX": 0,
+    "scrollY": 0,
+    "viewport": {
+      "height": 639,
+      "width": 1037
+    }
+  },
+  "after_wheel": {
+    "export": {
+      "height": 24,
+      "width": 150.4375,
+      "x": 48,
+      "y": 505
+    },
+    "heading": {
+      "height": 24,
+      "width": 160,
+      "x": 56,
+      "y": 9
+    },
+    "reader": {
+      "height": 250,
+      "width": 737,
+      "x": 0,
+      "y": 389
+    },
+    "scrollY": 0
+  },
+  "at_boundary": {
+    "export": {
+      "height": 24,
+      "width": 150.4375,
+      "x": 48,
+      "y": 505
+    },
+    "heading": {
+      "height": 24,
+      "width": 160,
+      "x": 56,
+      "y": 9
+    },
+    "reader": {
+      "height": 250,
+      "width": 737,
+      "x": 0,
+      "y": 389
+    },
+    "scrollY": 0
+  },
+  "wheel_containment_verified": true,
+  "outer_scroll_unchanged": true,
+  "trusted_activation": "Browser mouse click on visible Export Activate mirror target with force:true; pointer-blind mirror allows real canvas to receive input",
+  "handoff_status": "Selected clip download handed to the browser",
+  "download_event_observation_ms": 6000,
+  "actual_download_path": null,
+  "disk_completion_verified": false,
+  "expected_filename": "selected-clip-b40c579d5234ed1f14d7512474a18c958c5e07f1a16f27afc42d337eeabd07ba.mereclip",
+  "expected_media_type": "application/vnd.mere.clip-package+json",
+  "console_warnings_and_errors": [],
+  "source_changes": false
+}

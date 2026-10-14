@@ -1,0 +1,21 @@
+{
+  "export": {
+    "height": 24,
+    "width": 150.4375,
+    "x": 48,
+    "y": 505
+  },
+  "heading": {
+    "height": 24,
+    "width": 160,
+    "x": 56,
+    "y": 9
+  },
+  "reader": {
+    "height": 250,
+    "width": 737,
+    "x": 0,
+    "y": 389
+  },
+  "scrollY": 0
+}
