@@ -54,6 +54,10 @@ pub type Runner<State, Logic, V> = GenetAppRunner<State, Logic, V, ()>;
 /// rasterized view is still alive (scenario screenshots).
 #[derive(Clone, Debug)]
 pub enum CaptureRefusal {
+    ContextLost {
+        backend: crate::PresentationBackend,
+        generation: crate::ContextGeneration,
+    },
     DeviceLost(genet_render_host::DeviceLossNotice),
     SurfaceUnavailable {
         generation: u64,
@@ -84,6 +88,8 @@ pub type CaptureFn = Box<dyn FnOnce(Result<CaptureFrame<'_>, CaptureRefusal>) + 
 /// This certifies submission of the rasterized source, not compositor visibility.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct PresentedFrame {
+    /// Graphics lifetime that produced these pixels, scoped to `host`.
+    pub context_generation: crate::ContextGeneration,
     pub host: u64,
     pub sequence: u64,
     pub width: u32,
@@ -202,6 +208,8 @@ impl AppFrameInsets {
 
 /// Window and pipeline configuration.
 pub struct HostOptions {
+    /// Browser presentation preference. Native hosts retain their wgpu route.
+    pub presentation_choice: crate::PresentationChoice,
     /// The window title.
     pub title: String,
     /// The layer responsible for the window frame.
@@ -275,6 +283,7 @@ pub struct HostOptions {
 impl Default for HostOptions {
     fn default() -> Self {
         Self {
+            presentation_choice: crate::PresentationChoice::Auto,
             title: String::new(),
             window_frame: WindowFrame::Host,
             decorations: true,

@@ -851,6 +851,7 @@ where
         };
         self.s.presentation_sequence = sequence;
         let presented = crate::PresentedFrame {
+            context_generation: crate::ContextGeneration(surface.core().generation()),
             host: self.s.presentation_host,
             sequence,
             width: pw,
