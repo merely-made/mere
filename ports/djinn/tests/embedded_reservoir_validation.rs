@@ -565,3 +565,324 @@ async fn child_serves_the_registered_domain() {
         calls.load(Ordering::SeqCst)
     );
 }
+
+mod published_replay_regression {
+    use super::*;
+    use cleromancy_domain::{CleromancyHost, Consultation, ContextDraft, SelectionMode};
+    use graphshell::session_item::{self, SessionGraphV1};
+    use muniment::MemoryBackend;
+    use serde_json::Value;
+    use std::sync::Mutex;
+
+    struct PublicEntropy(u64);
+    impl cleromancy_domain::moirai::clotho::EntropySource for PublicEntropy {
+        fn next_u64(&mut self) -> Result<u64, cleromancy_domain::ReadingError> {
+            self.0 += 1;
+            Ok(self.0)
+        }
+    }
+
+    // The historical published package exposes graph() but not graph_mut().
+    // Use the existing thread-local observer only around this synchronous,
+    // memory-only product fixture. RAII clears it before any owner I/O or replay.
+    // This uses public APIs supported by both 2851 and the later portable C.
+    struct ClearCapture;
+    impl Drop for ClearCapture {
+        fn drop(&mut self) {
+            kernel::graph::set_captured_delta_hook(None);
+        }
+    }
+
+    fn product_fixture() -> (Vec<CapturedDelta>, Value, cleromancy_domain::Reading) {
+        let captured = Arc::new(Mutex::new(Vec::new()));
+        let observed = captured.clone();
+        kernel::graph::set_captured_delta_hook(Some(Arc::new(move |delta| {
+            observed.lock().unwrap().push(delta.clone());
+        })));
+        let clear = ClearCapture;
+        let (graph, reading) = pollster::block_on(async {
+            // Historical 2851 persists only to this transient MemoryBackend.
+            // No snapshot is installed in the resident: only captured edits cross its door.
+            let mut consultation = Consultation::new(CleromancyHost::empty(MemoryBackend::new()));
+            let field = consultation.install_builtin_tarot_at(1).await.unwrap();
+            let context = consultation
+                .save_context_at(
+                    ContextDraft::new(
+                        "Published owner replay",
+                        "Which boundary must survive a new owner?",
+                        "ownership",
+                    ),
+                    2,
+                )
+                .await
+                .unwrap();
+            let detail = consultation
+                .read_at_with_entropy(
+                    &context,
+                    &field,
+                    SelectionMode::Calculated,
+                    3_000,
+                    3,
+                    &mut PublicEntropy(0xc1),
+                )
+                .await
+                .unwrap();
+            assert_eq!(detail.readings.len(), 1);
+            assert_eq!(detail.readings[0].receipt.mode, SelectionMode::Calculated);
+            (
+                consultation.host().graph().clone(),
+                detail.readings[0].clone(),
+            )
+        });
+        drop(clear);
+        let edits = std::mem::take(&mut *captured.lock().unwrap());
+        assert!(!edits.is_empty(), "the real product emitted captured edits");
+        let replay = kernel::graph::replay_captured_deltas(edits.clone());
+        assert_eq!(replay.node_count(), graph.node_count());
+        assert_eq!(
+            serde_json::to_value(replay.facets()).unwrap(),
+            serde_json::to_value(graph.facets()).unwrap(),
+            "the captured batch retains every product facet"
+        );
+        // A control for the fixture, not the owner assertion: the real admitted
+        // transaction below independently invokes this same published supplier.
+        cleromancy_domain::host::validate_divination_graph(&replay).unwrap();
+        (
+            edits,
+            serde_json::to_value(graph.facets()).unwrap(),
+            reading,
+        )
+    }
+
+    async fn disclosed(
+        client: &mut AppBrokerClient,
+        snapshot: &ProjectionSnapshot,
+    ) -> SessionGraphV1 {
+        let offer = &snapshot.presentation.offers_for(InstanceId(0)).unwrap()[0];
+        let bytes = client
+            .resource(snapshot.session.clone(), offer.resource)
+            .await
+            .unwrap();
+        assert_eq!(chirograph::ContentHash::of(&bytes), offer.resource);
+        let card: chirograph::PortableCardV1 = serde_json::from_slice(&bytes).unwrap();
+        assert_eq!(
+            card.media.len(),
+            1,
+            "session card advertises its complete graph"
+        );
+        let media = card.media[0];
+        let bytes = client
+            .resource(snapshot.session.clone(), media)
+            .await
+            .unwrap();
+        assert_eq!(chirograph::ContentHash::of(&bytes), media);
+        let envelope: SessionGraphV1 = serde_json::from_slice(&bytes).unwrap();
+        assert_eq!(envelope.schema, session_item::SESSION_GRAPH_SCHEMA);
+        assert_eq!(envelope.application, "validator-fixture");
+        assert_eq!(envelope.epoch, snapshot.scene.epoch);
+        assert_eq!(envelope.revision, snapshot.scene.revision);
+        assert!(!envelope.read_only);
+        envelope
+    }
+
+    async fn apply_checked(
+        client: &mut AppBrokerClient,
+        snapshot: &ProjectionSnapshot,
+        edits: Vec<CapturedDelta>,
+    ) -> IntentResult {
+        let response = client
+            .request_body(CarrierRequestBody::Intent(IntentInvocation {
+                session: snapshot.session.clone(),
+                target: InstanceId(0),
+                observed_epoch: snapshot.scene.epoch,
+                observed_revision: snapshot.scene.revision,
+                intent: APPLY_EDITS_INTENT.into(),
+                payload: serde_json::to_vec(&ApplyEditsV1::checked(snapshot.scene.revision, edits))
+                    .unwrap(),
+            }))
+            .await
+            .unwrap();
+        let CarrierResponseBody::Intent(result) = response else {
+            panic!("unexpected owner response: {response:?}");
+        };
+        result
+    }
+
+    fn journal_and_history(files: &BTreeMap<PathBuf, Vec<u8>>) -> BTreeMap<PathBuf, Vec<u8>> {
+        let logs: BTreeMap<_, _> = files
+            .iter()
+            .filter(|(path, _)| {
+                matches!(
+                    path.file_name().and_then(|name| name.to_str()),
+                    Some("journal.jsonl" | "changes.jsonl")
+                )
+            })
+            .map(|(path, bytes)| (path.clone(), bytes.clone()))
+            .collect();
+        for name in ["journal.jsonl", "changes.jsonl"] {
+            assert!(
+                logs.iter().any(
+                    |(path, bytes)| path.file_name().and_then(|name| name.to_str()) == Some(name)
+                        && !bytes.is_empty()
+                ),
+                "accepted product batch must retain nonempty {name}"
+            );
+        }
+        logs
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn published_reading_replay_and_same_schema_tamper_survive_three_real_owners() {
+        let root = tempfile::tempdir().unwrap();
+        let unusable = root.path().join("no-attached-client-store");
+        std::fs::write(
+            &unusable,
+            b"the live client cannot open local custody or storage",
+        )
+        .unwrap();
+        let (edits, expected_facets, reading) = product_fixture();
+        let reading_url = format!("cleromancy://reading/{}", reading.id);
+        let reading_id = kernel::graph::Graph::node_namespace_id(&reading_url);
+        let mut retained_session = None;
+        let mut retained_graph = None;
+        let mut retained_logs = None;
+        for (phase, mode) in ["embedded", "daemon", "embedded"].into_iter().enumerate() {
+            let address = endpoint();
+            let process = Process::start_mode(root.path(), &address, mode, true);
+            assert_ne!(process.child.id(), std::process::id());
+            let mut attached = ReservoirAttachment::open_application(
+                ApplicationReservoirOptions {
+                    endpoint: address,
+                    application: AppId::new("validator-fixture"),
+                    domain: DomainId::new("divination").unwrap(),
+                    shared_root: unusable.clone(),
+                    vault_dir: unusable.clone(),
+                    profile: None,
+                    persona: Some(persona()),
+                    session_duration: Duration::from_secs(60),
+                },
+                &mut NoLocalPrompt,
+                |_| async {
+                    panic!("an attached client must not compose local authority");
+                    #[allow(unreachable_code)]
+                    Ok::<MereRoutes, String>(unreachable!())
+                },
+            )
+            .await
+            .unwrap();
+            assert!(!attached.is_embedded());
+            let initial = snapshots(attached.client_mut()).await;
+            if phase == 0 {
+                let empty = disclosed(attached.client_mut(), &initial[1])
+                    .await
+                    .into_graph()
+                    .unwrap();
+                assert_eq!(
+                    empty.node_count(),
+                    0,
+                    "the owner has no fixture-seeded graph"
+                );
+                assert_eq!(
+                    apply_checked(attached.client_mut(), &initial[1], edits.clone()).await,
+                    IntentResult::Accepted,
+                    "real published replay authority accepts the complete product batch"
+                );
+            }
+            let before = snapshots(attached.client_mut()).await;
+            let envelope = disclosed(attached.client_mut(), &before[1]).await;
+            let session = envelope.session;
+            let graph = envelope.clone().into_graph().unwrap();
+            assert_eq!(
+                serde_json::to_value(graph.facets()).unwrap(),
+                expected_facets
+            );
+            let stored = graph
+                .facets()
+                .get(
+                    &reading_id,
+                    &pandect::facet_store::FacetId::new(cleromancy_domain::host::READING_FACET),
+                )
+                .unwrap();
+            assert_eq!(
+                serde_json::from_value::<cleromancy_domain::Reading>(stored.clone()).unwrap(),
+                reading
+            );
+            let graph_state = serde_json::to_value(graph.to_snapshot_at(0)).unwrap();
+            let durable = durable_files_for(root.path(), "divination");
+            let logs = journal_and_history(&durable);
+            if let Some(id) = retained_session {
+                assert_eq!(session, id, "the same owner-held session reopens");
+                assert_eq!(retained_graph.as_ref().unwrap(), &graph_state);
+                assert_eq!(retained_logs.as_ref().unwrap(), &logs);
+            } else {
+                retained_session = Some(session);
+                retained_graph = Some(graph_state.clone());
+                retained_logs = Some(logs.clone());
+            }
+            for (case, label) in ["candidate_id", "receipt_total_weight"]
+                .into_iter()
+                .enumerate()
+            {
+                let mut tampered = stored.clone();
+                if case == 0 {
+                    tampered["candidate_id"] = serde_json::json!("invented-c1-candidate");
+                } else {
+                    tampered["receipt"]["total_weight"] =
+                        serde_json::json!(reading.receipt.total_weight + 1);
+                }
+                let typed: cleromancy_domain::Reading =
+                    serde_json::from_value(tampered.clone()).unwrap();
+                assert_eq!(typed.schema, reading.schema);
+                assert_eq!(typed.receipt.schema, reading.receipt.schema);
+                assert_eq!(typed.id, reading.id);
+                assert!(typed.schema.ends_with("/v1"));
+                assert!(typed.receipt.schema.ends_with("/v1"));
+                let result = apply_checked(
+                    attached.client_mut(),
+                    &before[1],
+                    vec![
+                        node(0xc100 + phase as u128 * 2 + case as u128),
+                        CapturedDelta::ReplaySetNodeFacetById {
+                            node_id: reading_id.to_string(),
+                            facet: cleromancy_domain::host::READING_FACET.into(),
+                            value_json: tampered.to_string(),
+                        },
+                    ],
+                )
+                .await;
+                let IntentResult::Rejected { reason } = result else {
+                    panic!("owner must refuse supported-schema {label} tamper: {result:?}");
+                };
+                assert!(
+                    reason.contains("receipt"),
+                    "expected replay mismatch, got {reason}"
+                );
+                assert!(
+                    !reason.contains("unsupported domain facet"),
+                    "schema rejection is not this proof"
+                );
+                let after = snapshots(attached.client_mut()).await;
+                assert_eq!(
+                    serde_json::to_value(&after).unwrap(),
+                    serde_json::to_value(&before).unwrap()
+                );
+                let after_envelope = disclosed(attached.client_mut(), &after[1]).await;
+                assert_eq!(
+                    serde_json::to_value(after_envelope).unwrap(),
+                    serde_json::to_value(&envelope).unwrap()
+                );
+                let after_bytes = durable_files_for(root.path(), "divination");
+                assert_eq!(journal_and_history(&after_bytes), logs);
+                assert_eq!(
+                    after_bytes, durable,
+                    "rejected whole batch changes no durable session state"
+                );
+                println!(
+                    "RECEIPT REPLAY mode={mode} phase={phase} case={label} same-v1-schema=true replay-refused=true projection-revision-and-journal-history-and-durable-bytes-unchanged=true"
+                );
+            }
+            attached.close().await.unwrap();
+            process.stop();
+        }
+    }
+}
