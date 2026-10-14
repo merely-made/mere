@@ -250,6 +250,19 @@ See [`q-pc-djinn-build.json`](../testing/receipts/djinn-ssh-peers/q-pc-djinn-bui
 [`q-pc-djinn-build.log`](../testing/receipts/djinn-ssh-peers/q-pc-djinn-build.log),
 and [`q-pc-djinn-install.json`](../testing/receipts/djinn-ssh-peers/q-pc-djinn-install.json).
 
+**2026-10-14: q-pc native unlock accepted; legacy sync startup isolated.**
+The first resident accepted the owner's native passphrase, then stopped while
+opening a legacy personal-sync operation store (`incompatible CBOR type Array`
+under p2panda 0.7.1). The SSH installation inherited the existing Graphshell
+sync configuration. Its task-owned launchd unit now uses dedicated service
+settings with sync absent and reservoir disabled, and explicitly retains the
+same vault, agent/app/browser endpoints and original data root. The existing
+sync settings are unchanged; the legacy graph was not migrated or replaced.
+The original launchd unit is preserved beside the installation manifest.
+Djinn restarted as PID `54928` and is waiting at its native unlock dialog.
+Key generation and outbound qualification remain pending. This establishes
+service configuration isolation, not recovery of the old sync store.
+
 The owner also reported ThinkPad's O-PC client error. Raw SSH still passes;
 the native client authenticates, then its POSIX shell probe loses its quoting
 through the Scoop Git launcher under Windows' default `cmd`. A local probe
