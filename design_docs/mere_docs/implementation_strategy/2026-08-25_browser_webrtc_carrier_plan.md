@@ -664,7 +664,7 @@ the refused and admitted intents through the existing action surface, and
 reads the admitted change back by diff off the bell — the C4a receipt's rows,
 now rendered.
 
-**C4b.1 landed 2026-09-02.** `ports/graphshell/src/web_remote.rs` is the
+**C4b.1 landed 2026-09-02.** [web_remote.rs at the pre-cutover revision](https://github.com/merely-made/mere/blob/e84cfbd95b1660046d646580a8707af020a06e4b/ports/graphshell/src/web_remote.rs) is the
 link: `RemoteLink::{Fixture, WebRtc}`, one accessor
 (`BrowserHost::remote_client`) answering which `ClientState` holds the
 remote scene, and the eleven synchronous sites rewritten over it. The

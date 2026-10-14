@@ -15,6 +15,11 @@ pub struct MereViewModel {
     pub sessions: Vec<SessionEntry>,
     /// Whether the host offers minting a session.
     pub can_mint: bool,
+    /// Hide the duplicate graph when the host's editing canvas shows it.
+    /// Session and archive controls still mount in this same component.
+    pub hide_graph: bool,
+    /// Archive readings and operations advertised by the host, if available.
+    pub archive: Option<ArchiveModel>,
     pub graph: GraphModel,
     /// The layout in use: one of cartography's graph-only strategy ids.
     pub layout: String,
@@ -24,6 +29,23 @@ pub struct MereViewModel {
     pub actions: Vec<HostAction>,
     /// The reason the host gave for the last request it declined.
     pub notice: Option<String>,
+}
+
+/// An immutable archive catalog. These are readings, never a second store.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct ArchiveModel {
+    pub entries: Vec<ArchiveEntry>,
+    pub save_sessions: Vec<SessionId>,
+    pub can_compose: bool,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct ArchiveEntry {
+    /// Stable archive identifier, supplied by the owner.
+    pub key: String,
+    pub name: String,
+    pub detail: String,
+    pub can_open: bool,
 }
 
 /// Whether there is a graph to show, and if not, why not.

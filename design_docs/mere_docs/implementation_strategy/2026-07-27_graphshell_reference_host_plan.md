@@ -1923,7 +1923,7 @@ browser, two-device network, and real RF are different claims.
    **Corrected 2026-10-06 (S14 pass):** closed by the current tree on the
    thin-adapter side: `genet_render_host::RenderCore` boots wgpu and
    configures the surface, and Graphshell keeps only its content-over-chrome
-   composition (`ports/graphshell/src/web_gpu.rs`). H2 itself only made
+   composition ([web_gpu.rs at the pre-cutover revision](https://github.com/merely-made/mere/blob/e84cfbd95b1660046d646580a8707af020a06e4b/ports/graphshell/src/web_gpu.rs)). H2 itself only made
    `graphshell-web` a separate package.
 4. The provisional AccessRecord schema fields beyond the minimum above.
    Freeze them through Graphshell plus Turnstone evidence, not conversation

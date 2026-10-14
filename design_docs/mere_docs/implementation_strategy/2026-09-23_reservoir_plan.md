@@ -133,7 +133,7 @@ step 5 and the consumer/domain/native gates retain their order.
 | V3: archive | Session archive payload in graph codicil v2; reservoir save/open/fork/compose intents and archive projection; per-mere `archive.redb` | Resident contract qualified by route and real-process fixtures. Consumer UI must expose these actions; installed/product acceptance remains separate. |
 | V4: access and ambient crossing | Durable per-mere/per-app denial and independent ambient choice; explicit and read-only ambient routes; live endpoint rechecks | Route enforcement is qualified. Trusted owner controls and actual opted-in material in a product's ambient tier remain consumer work. |
 | V5: standalone ownership | `djinn::embedded_reservoir::ReservoirAttachment` attaches first and embeds the existing resident source only on endpoint absence | Library process fixtures qualify ownership, attachment and refusal. Each consumer must supply the same domain registration in daemon and embedded composition and qualify its actual startup. |
-| Cleromancy C1 | Pure `validate_divination_graph` in Cleromancy; shared `GraphValidator`, checked session/archive APIs and `MereRoutes::with_domain_validator` in Mere | Register Cleromancy's validator in both resident compositions, admit its application, repin/adapt the consumer and retire private snapshot persistence. V2b and Cleromancy's native shared-view/reopen gates still precede full C1 acceptance. |
+| Cleromancy C1 | Pure `validate_divination_graph` in Cleromancy; shared `GraphValidator`, checked session/archive APIs and `MereRoutes::with_domain_validator` in Mere | The C1 working source registers the product-owned validator in daemon and embedded compositions, admits Cleromancy/Graphshell and retires the ordinary consumer's private persistence. Shared/consumer development gates pass; immutable pins, actual startup/lifecycle/reopen witnesses and V2b's complete browser cutover/panel wall remain open. |
 
 **How the work reached this point.** V1–V2 and V2b's first three steps landed
 on 2026-09-24/25. The ruled "one tree first" decision made Graphshell's cutover
@@ -167,8 +167,9 @@ exposes no policy-edit action, and `via` is provenance. Explicit denial wins
 over default and ambient grants, even for an attached endpoint. Ambient routes
 offer graph reads only and do not mint a session in an empty mere. Embedded
 selection preserves admission, policy, persona, lock and protocol refusals;
-only endpoint absence permits ownership. The installed Djinn application's
-allowlist and product-domain registrations still need consumer adaptation.
+only endpoint absence permits ownership. Working stock Djinn and embedded source
+now admit Cleromancy and Graphshell and register the same divination validator;
+their actual consumer and immutable publication receipts remain separate gates.
 
 Cleromancy's plan still requires V1–V5 for full C1 acceptance. Its named
 dependency map separates source-backed preparation of narration, typed data
@@ -1689,3 +1690,25 @@ ruling 84).
   tokio's named-pipe documentation advises. Both fixtures pass on Windows
   (3 and 1, each with its child entrypoint ignored); on the same commit
   without the fix, both fail.
+
+### Cleromancy C1 coordinated consumer cutover (2026-10-13; in progress)
+
+Mark authorized C1 in lockstep with Graphshell and reservoir work through
+qualification and push. The working integration adds the product-owned portable
+divination validator to stock and embedded resident compositions, refuses an
+unregistered divination authority, and admits Cleromancy and Graphshell as
+first-party applications. Explicit sessions disclose a complete graph/facet
+resource and only the admitted application's view state; ambient routes do not
+disclose that full resource. Revision-checked product edits and view changes
+use staged Pandect transactions, preserving graph, logs and revision on failure.
+
+Cleromancy's ordinary worker attaches first and embeds on genuine endpoint
+absence only, using Djinn's existing selected identity capsule. It owns no
+private snapshot store or second authority. Historical receipts are explicitly
+nondefault harnesses. The common view supplies lifecycle/archive controls, and
+a separate Graphshell client must witness the same resident graph. Browser
+V2b panel and full one-tree qualification remain distinct from native proofs.
+Native startup, mounted controls, cross-app rejection, fresh process/disk
+reopening, immutable supplier closure and publication are still pending; the
+Cleromancy plan owns C1's final consumer verdict. Card ambient presentation
+remains its later C4 phase. Development path overrides are not publication.

@@ -45,6 +45,7 @@ use crate::keeper::Keeper;
 /// tools that do (Distillery's installed configuration, Signalman's station
 /// commissioning, D17).
 pub const CUSTODY_APPS: &[&str] = &[
+    "cleromancy",
     "turnstone",
     "knot-editor",
     "graphshell",

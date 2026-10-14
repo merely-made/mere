@@ -2683,6 +2683,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "cleromancy-core-acceptance"
+version = "0.1.0"
+source = "git+https://github.com/merely-made/cleromancy.git?rev=2851e6b0e3dda4b5b558c515579dede9daf1ec2d#2851e6b0e3dda4b5b558c515579dede9daf1ec2d"
+dependencies = [
+ "blake3",
+ "chartulary",
+ "chirograph",
+ "graphshell-client",
+ "mere",
+ "muniment",
+ "rand_core 0.6.4",
+ "sceno",
+ "scenotime",
+ "serde",
+ "serde_json",
+ "servitor",
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "cmake"
 version = "0.1.58"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4635,6 +4655,7 @@ dependencies = [
  "chatelaine",
  "chirograph",
  "chrono",
+ "cleromancy-core-acceptance",
  "distillery",
  "djinn",
  "djinn-testkit",
@@ -6790,6 +6811,7 @@ dependencies = [
  "mere-transport",
  "mere-view",
  "mere-webrtc-carrier",
+ "mesquite",
  "mien",
  "muniment",
  "netrender",
@@ -6811,10 +6833,12 @@ dependencies = [
  "servitor",
  "sha2 0.11.0",
  "signature 2.2.0",
+ "sprigging",
  "ssh-agent-lib",
  "ssh-key",
  "stickleback",
  "tabard",
+ "taproot",
  "tempfile",
  "thiserror 1.0.69",
  "tokio",

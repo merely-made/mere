@@ -7,7 +7,8 @@ integrates published Mere `0a3203f05`, Genet `7422e906`, maintained Vello
 receipts and Mark's approval to proceed. Phase 4 remains unfinished: canvas
 controls, elapsed-time physics, saved-graph editing and remote-session slices
 have landed, but the complete page/control migration and acceptance wall have
-not closed. The legacy `web_gpu.rs` and `component.html` remain. The reservoir's
+not closed. The current working cutover retires the legacy presenter and component markup;
+fresh complete acceptance remains pending. The reservoir's
 mere panel is its V2b step 5, after this cutover. §2's current handoff names
 the remaining gates; linked plans own later editor and dynamics status. The
 reservoir's V3–V5 resident implementation has advanced independently; its
@@ -428,15 +429,15 @@ completed application migration.
 ## 2. Findings (verified 2026-09-25)
 
 - **The page has three layers.**
-  - `ports/graphshell/src/web_gpu.rs` (300 lines): `GpuPresenter` composites
+  - [web_gpu.rs at the pre-cutover revision](https://github.com/merely-made/mere/blob/e84cfbd95b1660046d646580a8707af020a06e4b/ports/graphshell/src/web_gpu.rs) (300 lines): `GpuPresenter` composites
     two netrender scenes onto the page's WebGPU canvas each frame, the graph
     content and the chrome.
   - Pictograph's canvas draws the graph, with physics, lenses and
     arrangements, as the content scene (`ports/graphshell/src/web.rs`).
-  - `ports/graphshell/src/web_view.rs` (353 lines) builds the chrome as a
+  - [web_view.rs at the pre-cutover revision](https://github.com/merely-made/mere/blob/e84cfbd95b1660046d646580a8707af020a06e4b/ports/graphshell/src/web_view.rs) (353 lines) builds the chrome as a
     retained Cambium view in a `ScriptedDom` that Genet paints. It is rebuilt
     from a `ChromeModel` on each change and takes no input.
-  - The interactive UI is HTML. `ports/graphshell/web/component.html` (337
+  - The interactive UI is HTML. [component.html at the pre-cutover revision](https://github.com/merely-made/mere/blob/e84cfbd95b1660046d646580a8707af020a06e4b/ports/graphshell/web/component.html) (337
     lines) holds 89 form controls and a link, driven by `web.rs` (2,248 lines):
     - a mounted-sessions header;
     - a graph-controls bar (select, edit, pan, zoom);
@@ -561,10 +562,11 @@ gates. They do not replace the complete phase-4 scenario or performance wall.
   wrapped toolbar, and current text-field sizing is checked at both widths.
   Their scope and limits remain in the linked receipts and the
   [migration inventory](2026-09-27_graphshell_tree_migration_inventory.md).
-- **Still required for phase 4:** complete the remaining product controls;
-  make every required page mount the single tree; retire the old presenter
-  and component page; rerun the live scenario inventory with full-frame capture
-  review and accessibility checks under the done-conditions in §4. Performance
+- **Still required for phase 4:** the C1 working source mounts all five public
+  pages through the single tree and retires the old presenter/component page.
+  Fresh product/viewer builds, every live and retained prior scenario, full-frame
+  capture review and accessibility checks must qualify that source under §4's
+  done-conditions. Source retirement alone does not accept the cutover. Performance
   results must name their revision, graph, motion state, dimensions and machine
   load; old debug medians are not a current responsiveness verdict.
 - **Reservoir boundary:** this is V2b step 4. The common mere view and route
@@ -2139,3 +2141,24 @@ float joining, native input/theme/DPI/performance acceptance. Its shared frame
 and outer Workspace draft is the next composition owner, not a receipt for
 those remaining gates. External engine builds and simultaneous engine loading
 remain separately qualified consumers.
+
+### C1 reservoir panel and final presenter retirement (2026-10-13; in progress)
+
+The fresh source audit finds that loader.js already mounts all five public
+pages through the retained tree. The remaining unused BrowserHost presenter,
+its GpuPresenter, component markup, independent scenario pump and isolated
+adapters are now removed in the working source. Public mount, remote and
+scenario exports use the retained host, with the same practice state/control
+model separated from obsolete rendering helpers. Historical source citations
+link to the exact pre-cutover revision; the static legacy-markup label test
+retires with its source. Current retained command/control behavior still needs
+its actual browser and accessibility evidence.
+
+The shared common mere view gains archive/lifecycle composition. A native
+Graphshell client is a separate same-domain witness for Cleromancy C1. The
+browser panel must additionally mount the sessions, graph and archive
+projections from the same admitted resident route, synchronize its canvas and
+perform advertised owner intents. A new native witness or retiring dead source
+does not establish the browser V2b panel, five-page scenario wall or pacing
+verdict. Current source checks, browser build, headed captures and persistence
+remain pending. The reservoir and Cleromancy plans retain their final gates.
