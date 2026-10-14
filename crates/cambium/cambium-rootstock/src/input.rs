@@ -204,7 +204,9 @@ where
             if let Some(runner) = self.s.runner.as_mut() {
                 runner.dispatch_pointer_down(
                     node,
-                    PointerEvent::new(PointerPhase::Down, local, size),
+                    PointerEvent::new(PointerPhase::Down, local, size)
+                        .with_pointer_id(self.s.pointer_id)
+                        .with_modifiers(self.s.modifiers.into()),
                 );
                 prevented |= runner.default_prevented();
             }
@@ -241,6 +243,11 @@ where
     /// stale value from an earlier one — which is what the window frame's
     /// system-menu default is gated on.
     pub fn secondary_press(&mut self) {
+        self.pointer_press(PointerButton::Secondary);
+    }
+
+    /// Non-primary native button press, preserving button and pointer identity.
+    pub fn pointer_press(&mut self, button: PointerButton) {
         let Some(node) = self.hit_at_cursor() else {
             return;
         };
@@ -260,7 +267,9 @@ where
             runner.dispatch_pointer_down(
                 node,
                 PointerEvent::new(PointerPhase::Down, local, size)
-                    .with_button(PointerButton::Secondary),
+                    .with_button(button)
+                    .with_pointer_id(self.s.pointer_id)
+                    .with_modifiers(self.s.modifiers.into()),
             );
         }
         self.after_dispatch();
@@ -309,13 +318,25 @@ where
         };
         let (local, size) = self.local_in(target);
         if let Some(runner) = self.s.runner.as_mut() {
-            runner.dispatch_pointer_move(PointerEvent::new(PointerPhase::Move, local, size));
+            let button = runner
+                .pointer_capture_owner()
+                .map_or(PointerButton::Primary, |(_, button)| button);
+            runner.dispatch_pointer_move(
+                PointerEvent::new(PointerPhase::Move, local, size)
+                    .with_button(button)
+                    .with_pointer_id(self.s.pointer_id)
+                    .with_modifiers(self.s.modifiers.into()),
+            );
         }
         self.after_dispatch();
     }
 
     /// A left-button release: end any captured drag, then the text-drag anchor.
     pub fn release(&mut self) {
+        self.release_button(PointerButton::Primary);
+    }
+
+    pub fn release_button(&mut self, button: PointerButton) {
         let capture = self
             .s
             .runner
@@ -324,7 +345,34 @@ where
         if let Some(target) = capture {
             let (local, size) = self.local_in(target);
             if let Some(runner) = self.s.runner.as_mut() {
-                runner.dispatch_pointer_up(PointerEvent::new(PointerPhase::Up, local, size));
+                runner.dispatch_pointer_up(
+                    PointerEvent::new(PointerPhase::Up, local, size)
+                        .with_button(button)
+                        .with_pointer_id(self.s.pointer_id)
+                        .with_modifiers(self.s.modifiers.into()),
+                );
+            }
+            self.after_dispatch();
+        }
+        self.s.text_drag = None;
+    }
+
+    /// Cancel capture without delivering an activating release.
+    pub fn cancel_pointer(&mut self) {
+        let capture = self
+            .s
+            .runner
+            .as_ref()
+            .and_then(|r| r.pointer_capture().zip(r.pointer_capture_owner()));
+        if let Some((target, (pointer_id, button))) = capture {
+            let (local, size) = self.local_in(target);
+            if let Some(runner) = self.s.runner.as_mut() {
+                runner.dispatch_pointer_cancel(
+                    PointerEvent::new(PointerPhase::Cancel, local, size)
+                        .with_button(button)
+                        .with_pointer_id(pointer_id)
+                        .with_modifiers(self.s.modifiers.into()),
+                );
             }
             self.after_dispatch();
         }
@@ -609,7 +657,11 @@ where
             if let Some(target) = target {
                 let (local, size) = self.local_in(target);
                 if let Some(runner) = self.s.runner.as_mut() {
-                    runner.dispatch_wheel(node, WheelEvent::new((dx, dy), local, size));
+                    runner.dispatch_wheel(
+                        node,
+                        WheelEvent::new((dx, dy), local, size)
+                            .with_modifiers(self.s.modifiers.into()),
+                    );
                     prevented = runner.default_prevented();
                 }
                 self.after_dispatch();

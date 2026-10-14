@@ -893,13 +893,13 @@ documents the same day as dated corrections.
    `device_sync`; it now lives in djinn (`ports/djinn/src/settings.rs:468`).
 3. **Reachability plan, R2.** It says announces already bind authenticated
    app data; the code sends none, deliberately, so an announce fits a
-   255-byte LoRa frame (`crates/murm/transport/src/reticulum_transport/announce.rs:38-51`),
+   255-byte LoRa frame (`murm/native/crates/transport/src/reticulum_transport/announce.rs:38-51`),
    which also constrains R2's proposed `EndpointAddr` payload.
 
 Lane-reported and not re-checked here (code comments, recorded for the
 phases that touch them): `ports/djinn/src/pairing.rs:46-48` says the host
 never writes the settings file back, while `personal_sync.rs` writes hints;
-`crates/murm/transport/src/peer_id.rs:11-14` says a `PeerID` derives from the
+`murm/native/crates/transport/src/peer_id.rs:11-14` says a `PeerID` derives from the
 master, while hosts pass per-graph seeds; `djinn --pairing-facts` computes
 the group pre-key and omits it from its output (`ports/djinn/src/bin/djinn.rs:405-439`).
 
@@ -1057,7 +1057,7 @@ Findings from D1, for D1b and D2:
 
 **2026-10-02: D1b's cause, found and checked.** A paired device id is tagged
 onto the gossip overlay (`P2pandaOverlayHost::seed_peers`,
-`crates/murm/transport/src/p2panda_host.rs:103-125`) before the address book
+`murm/native/crates/transport/src/p2panda_host.rs:103-125`) before the address book
 holds any record for it; topic membership means "has a record and the topic"
 (stickleback's store and upstream's SQLite store alike), so gossip's one-time
 bootstrap query returns nobody and joins with nobody. When mDNS later writes

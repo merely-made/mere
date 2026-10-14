@@ -8,7 +8,8 @@ edition = "2024"
 # crates.io and this is in its dependency closure. Bare `kernel` belongs to
 # a stranger (Abstract Reactive Streams), hence the mere- prefix.
 publish = true
-rust-version = "1.92.0"
+
+rust-version = "1.97.1"
 description = "Portable identity, authority, and mutation kernel for the Mere browser. Renamed from graphshell-core."
 
 [features]

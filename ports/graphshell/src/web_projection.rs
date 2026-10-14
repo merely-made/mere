@@ -13,26 +13,26 @@ use std::{cell::RefCell, rc::Rc};
 use cambium::{AnyView, GenetAppRunner, GenetCtx, GenetElement, el, text};
 use genet_render::TextSystem;
 use genet_scripted_dom::ScriptedDom;
-use graphshell::projection_compile::{
-    CompiledProjection, ProjectionDataset, ProjectionSnapshot, ProjectionValue,
-    default_definition, practice_compiler,
-};
 use graphshell::product::{PROJECTION_EDITOR_VIA, kept_summary};
 use graphshell::projection_compare::{
     Comparison, FACET_CELL_ADAPTER, FacetLayout, compare_arrangements,
 };
+use graphshell::projection_compile::{
+    CompiledProjection, ProjectionDataset, ProjectionSnapshot, ProjectionValue, default_definition,
+    practice_compiler,
+};
+use graphshell::projection_dynamics_compare::{
+    DynamicsComparison, compare_arrangements_dynamics, compare_dynamics,
+};
 use graphshell::projection_editor::{EditorAction, ProjectionEditor, ProjectionPanel, with_kind};
-use graphshell::projection_dynamics_compare::{DynamicsComparison, compare_dynamics, compare_arrangements_dynamics};
-use mere::canvas::projection_dynamics::ProjectionDynamics;
-use mere::canvas::dynamics_recipe::preset_slot;
 use mere::canvas::PhysicsLaw;
+use mere::canvas::dynamics_recipe::preset_slot;
+use mere::canvas::projection_dynamics::ProjectionDynamics;
 use netrender::Scene;
 use sceno::InstanceId;
 
 use super::web_session::SessionStore;
-use super::{
-    BrowserHost, document, draft_from_definition, element, now_ms, root, set_text,
-};
+use super::{BrowserHost, document, draft_from_definition, element, now_ms, root, set_text};
 
 const PRACTICE_DATA: &str = include_str!("../web/fixtures/woodshed-stage.json");
 
@@ -104,16 +104,26 @@ impl BrowserHost {
                         return;
                     },
                 };
-                let dynamics = match definition.dynamics.as_ref().map(|slot| ProjectionDynamics::new(&definition, &compiled, slot)).transpose() {
+                let dynamics = match definition
+                    .dynamics
+                    .as_ref()
+                    .map(|slot| ProjectionDynamics::new(&definition, &compiled, slot))
+                    .transpose()
+                {
                     Ok(dynamics) => dynamics,
-                    Err(error) => { self.projection_editor_status = format!("Dynamics load failed: {error}"); return; },
+                    Err(error) => {
+                        self.projection_editor_status = format!("Dynamics load failed: {error}");
+                        return;
+                    },
                 };
                 if let Ok(container) = element("projection-live") {
                     let _ = container.remove_attribute("data-target-count");
                 }
                 self.projection_editor = ProjectionEditor::new(draft_from_definition(&definition));
-                self.projection_editor
-                    .reduce(EditorAction::SelectPanel(ProjectionPanel::Preview), now_ms());
+                self.projection_editor.reduce(
+                    EditorAction::SelectPanel(ProjectionPanel::Preview),
+                    now_ms(),
+                );
                 self.live_projection = Some(LiveProjection {
                     dataset,
                     compiled: Some(compiled),
@@ -171,52 +181,47 @@ impl BrowserHost {
             channel_name(&draft.encoding.x),
             channel_name(&draft.encoding.y),
         ];
-        let result = self
-            .projection_editor
-            .draft()
-            .to_definition()
-            .map_err(|issues| {
+        let result = graphshell::local_projection::compile_editor(
+            &self.projection_editor,
+            &live.dataset,
+            live.compiled.as_ref(),
+            live.selected.as_deref(),
+        )
+        .and_then(|compiled| {
+            let definition = draft.to_definition().map_err(|issues| {
                 issues
                     .iter()
-                    .map(|i| format!("{}: {}", i.field, i.message))
+                    .map(|issue| format!("{}: {}", issue.field, issue.message))
                     .collect::<Vec<_>>()
                     .join("; ")
-            })
-            .and_then(|definition| {
-                let compiled = match &live.compiled {
-                    Some(previous) => practice_compiler().refresh(previous, &definition, &live.dataset),
-                    None => practice_compiler().compile(&definition, &live.dataset),
-                };
-                let compiled = compiled.map_err(|issues| {
-                    issues
-                        .iter()
-                        .map(|i| format!("{}: {}", i.field, i.message))
-                        .collect::<Vec<_>>()
-                        .join("; ")
-                })?;
-                let dynamics = definition.dynamics.as_ref().map(|slot| {
-                    ProjectionDynamics::new(&definition, &compiled, slot).map_err(|e| e.to_string())
-                }).transpose()?;
-                Ok((compiled, dynamics))
-            });
+            })?;
+            let dynamics = definition
+                .dynamics
+                .as_ref()
+                .map(|slot| {
+                    ProjectionDynamics::new(&definition, &compiled, slot)
+                        .map_err(|error| error.to_string())
+                })
+                .transpose()?;
+            Ok((compiled, dynamics))
+        });
         match result {
-            Ok((mut compiled, dynamics)) => {
+            Ok((compiled, dynamics)) => {
                 if compiled.placement_reused {
                     live.placement_reuses += 1;
                 } else {
                     live.solves += 1;
                 }
-                compiled.selected = live
-                    .selected
-                    .as_ref()
-                    .and_then(|id| compiled.instance_by_occurrence.get(id))
-                    .copied();
                 let keep_dynamics = compiled.placement_reused
                     && draft.dynamics.as_ref().is_some_and(|slot| {
-                        live.dynamics.as_mut().is_some_and(|preview| preview.refresh_display(slot, &compiled.scene))
+                        live.dynamics
+                            .as_mut()
+                            .is_some_and(|preview| preview.refresh_display(slot, &compiled.scene))
                     });
                 live.compiled = Some(compiled);
-                if !keep_dynamics { live.dynamics = dynamics; }
+                if !keep_dynamics {
+                    live.dynamics = dynamics;
+                }
                 live.error.clear();
             },
             Err(error) => {
@@ -248,7 +253,9 @@ impl BrowserHost {
     }
 
     pub(super) fn toggle_projection_dynamics_compare(&mut self) {
-        let Some(live) = &mut self.live_projection else { return; };
+        let Some(live) = &mut self.live_projection else {
+            return;
+        };
         live.comparing = !live.comparing || !live.compare_dynamics;
         live.compare_dynamics = true;
         live.dirty = true;
@@ -258,11 +265,15 @@ impl BrowserHost {
     }
 
     pub(super) fn projection_settle_bound(&self) -> Option<u32> {
-        self.live_projection.as_ref().and_then(|live| live.settle_bound)
+        self.live_projection
+            .as_ref()
+            .and_then(|live| live.settle_bound)
     }
 
     pub(super) fn set_projection_settle_bound(&mut self, bound: Option<u32>) {
-        if let Some(live) = &mut self.live_projection { live.settle_bound = bound; }
+        if let Some(live) = &mut self.live_projection {
+            live.settle_bound = bound;
+        }
         self.refresh_projection_comparison();
         self.chrome_dirty = true;
     }
@@ -278,10 +289,18 @@ impl BrowserHost {
     pub(super) fn move_projection_comparison(&mut self, columns: isize, rows: isize) {
         if let Some(live) = &mut self.live_projection {
             if let Some(comparison) = &live.comparison {
-                live.compare_column = live.compare_column.saturating_add_signed(columns)
+                live.compare_column = live
+                    .compare_column
+                    .saturating_add_signed(columns)
                     .min(comparison.facet.columns.labels.len().saturating_sub(1));
-                live.compare_row = live.compare_row.saturating_add_signed(rows)
-                    .min(comparison.facet.rows.as_ref().map_or(1, |axis| axis.labels.len()).saturating_sub(1));
+                live.compare_row = live.compare_row.saturating_add_signed(rows).min(
+                    comparison
+                        .facet
+                        .rows
+                        .as_ref()
+                        .map_or(1, |axis| axis.labels.len())
+                        .saturating_sub(1),
+                );
                 live.dirty = true;
             }
         }
@@ -311,37 +330,66 @@ impl BrowserHost {
                 live.dirty = true;
                 return;
             };
-            let choices: Vec<_> = PhysicsLaw::ALL.iter().map(|law| {
-                preset_slot(law.id()).map(|slot| (law.label().to_string(), slot))
-            }).collect::<Result<_, _>>().expect("the host catalog's presets bind");
-            match compare_dynamics(&draft, &live.dataset, live.selected.as_deref(), &choices, bound, &layout) {
+            let choices: Vec<_> = PhysicsLaw::ALL
+                .iter()
+                .map(|law| preset_slot(law.id()).map(|slot| (law.label().to_string(), slot)))
+                .collect::<Result<_, _>>()
+                .expect("the host catalog's presets bind");
+            match compare_dynamics(
+                &draft,
+                &live.dataset,
+                live.selected.as_deref(),
+                &choices,
+                bound,
+                &layout,
+            ) {
                 Ok(comparison) => {
                     live.comparison = Some(comparison.comparison.clone());
                     live.dynamics_comparison = Some(comparison);
                     live.error.clear();
                 },
-                Err(error) => { live.comparison = None; live.dynamics_comparison = None; live.error = error; },
+                Err(error) => {
+                    live.comparison = None;
+                    live.dynamics_comparison = None;
+                    live.error = error;
+                },
             }
             live.dirty = true;
             return;
         }
         live.dynamics_comparison = None;
         if draft.dynamics.is_some() {
-            let result = live.settle_bound.ok_or_else(|| "Choose a preview step limit to compare dynamics".to_string())
-                .and_then(|bound| compare_arrangements_dynamics(&draft, &live.dataset, live.selected.as_deref(), bound, &layout));
+            let result = live
+                .settle_bound
+                .ok_or_else(|| "Choose a preview step limit to compare dynamics".to_string())
+                .and_then(|bound| {
+                    compare_arrangements_dynamics(
+                        &draft,
+                        &live.dataset,
+                        live.selected.as_deref(),
+                        bound,
+                        &layout,
+                    )
+                });
             match result {
                 Ok(comparison) => {
                     live.comparison = Some(comparison.comparison.clone());
                     live.dynamics_comparison = Some(comparison);
                     live.error.clear();
                 },
-                Err(error) => { live.comparison = None; live.error = error; },
+                Err(error) => {
+                    live.comparison = None;
+                    live.error = error;
+                },
             }
             live.dirty = true;
             return;
         }
         match compare_arrangements(&draft, &live.dataset, live.selected.as_deref(), &layout) {
-            Ok(comparison) => { live.comparison = Some(comparison); live.error.clear(); },
+            Ok(comparison) => {
+                live.comparison = Some(comparison);
+                live.error.clear();
+            },
             Err(error) => {
                 live.comparison = None;
                 live.error = error;
@@ -373,7 +421,13 @@ impl BrowserHost {
             practice_compiler().registry(),
         );
         self.projection_editor.break_run();
-        self.projection_editor.reduce(EditorAction::ApplyComparison { arrangement, dynamics: cell.dynamics }, now_ms());
+        self.projection_editor.reduce(
+            EditorAction::ApplyComparison {
+                arrangement,
+                dynamics: cell.dynamics,
+            },
+            now_ms(),
+        );
         self.projection_editor.break_run();
         if let Some(live) = &mut self.live_projection {
             live.compare_column = 0;
@@ -419,16 +473,11 @@ impl BrowserHost {
             if live.compiled.is_none() {
                 return Err(live.error.clone());
             }
-            let definition = self
-                .projection_editor
-                .draft()
-                .to_definition()
-                .map_err(|_| "Invalid draft")?;
-            let snapshot = ProjectionSnapshot {
-                definition,
-                selected_occurrence: live.selected.clone(),
-            };
-            Ok(snapshot)
+            graphshell::local_projection::snapshot_editor(
+                &self.projection_editor,
+                &live.dataset,
+                live.selected.as_deref(),
+            )
         })()
         .and_then(|snapshot| {
             self.app
@@ -460,15 +509,18 @@ impl BrowserHost {
                 .saved_projection(&self.projection_editor.draft().id)
                 .map_err(|error| error.to_string())?
                 .ok_or("No saved executable projection")?;
-            let compiled = practice_compiler().compile_snapshot(&saved, &live.dataset).map_err(|issues| {
-                issues
-                    .iter()
-                    .map(|i| format!("{}: {}", i.field, i.message))
-                    .collect::<Vec<_>>()
-                    .join("; ")
-            })?;
+            let compiled = practice_compiler()
+                .compile_snapshot(&saved, &live.dataset)
+                .map_err(|issues| {
+                    issues
+                        .iter()
+                        .map(|i| format!("{}: {}", i.field, i.message))
+                        .collect::<Vec<_>>()
+                        .join("; ")
+                })?;
             if let Some(slot) = &saved.definition.dynamics {
-                ProjectionDynamics::new(&saved.definition, &compiled, slot).map_err(|e| e.to_string())?;
+                ProjectionDynamics::new(&saved.definition, &compiled, slot)
+                    .map_err(|e| e.to_string())?;
             }
             Ok(saved)
         })();
@@ -476,8 +528,10 @@ impl BrowserHost {
             Ok(saved) => {
                 self.projection_editor =
                     ProjectionEditor::new(draft_from_definition(&saved.definition));
-                self.projection_editor
-                    .reduce(EditorAction::SelectPanel(ProjectionPanel::Preview), now_ms());
+                self.projection_editor.reduce(
+                    EditorAction::SelectPanel(ProjectionPanel::Preview),
+                    now_ms(),
+                );
                 self.live_projection.as_mut().unwrap().selected = saved.selected_occurrence;
                 self.recompile_projection();
                 self.projection_editor_status =
@@ -554,7 +608,12 @@ impl LiveProjection {
             .unwrap_or_else(|| "Choose a practice card".into());
         model.detail_address = self.dataset.source.resource.clone();
         model.arrangement = self.axes.clone();
-        model.physics_law = if self.dynamics.is_some() { "recipe dynamics" } else { "fixed placement" }.into();
+        model.physics_law = if self.dynamics.is_some() {
+            "recipe dynamics"
+        } else {
+            "fixed placement"
+        }
+        .into();
         model.physics_paused = self.dynamics.is_none() || self.motion_paused;
         model.product_status = format!("Projection source · {}", self.dataset.source.resource);
         model.action_status = if self.error.is_empty() {
@@ -619,7 +678,10 @@ impl LiveProjection {
         if let (true, Some(comparison)) = (self.comparing, &self.comparison) {
             self.compare_targets(comparison.clone(), left, available, height as f32);
         } else if let Some(compiled) = &self.compiled {
-            let projected_scene = self.dynamics.as_ref().map_or(&compiled.scene, |d| d.scene());
+            let projected_scene = self
+                .dynamics
+                .as_ref()
+                .map_or(&compiled.scene, |d| d.scene());
             let bounds = projected_scene.bounds;
             let scale = ((spatial_w - 24.0) / bounds.size.w.max(1.0))
                 .min((spatial_h - 24.0) / bounds.size.h.max(1.0))
@@ -699,9 +761,17 @@ impl LiveProjection {
         let status = if !self.error.is_empty() {
             format!("Cannot execute: {}", self.error)
         } else if self.comparing {
-            format!("Preview step limit: {}", self.settle_bound.map_or_else(|| "unset".into(), |bound| bound.to_string()))
+            format!(
+                "Preview step limit: {}",
+                self.settle_bound
+                    .map_or_else(|| "unset".into(), |bound| bound.to_string())
+            )
         } else {
-            format!("{} · {} occurrences", self.axes, self.dataset.occurrences.len())
+            format!(
+                "{} · {} occurrences",
+                self.axes,
+                self.dataset.occurrences.len()
+            )
         };
         self.scene = paint(
             &self.targets,
@@ -722,52 +792,101 @@ impl LiveProjection {
     fn compare_targets(&mut self, comparison: Comparison, left: f32, available: f32, height: f32) {
         let scene = &comparison.scene;
         let columns = comparison.facet.columns.labels.len();
-        let rows = comparison.facet.rows.as_ref().map_or(1, |axis| axis.labels.len());
+        let rows = comparison
+            .facet
+            .rows
+            .as_ref()
+            .map_or(1, |axis| axis.labels.len());
         self.compare_column = self.compare_column.min(columns.saturating_sub(1));
         self.compare_row = self.compare_row.min(rows.saturating_sub(1));
-        let shown_columns = ((available / 220.0) as usize).max(1)
+        let shown_columns = ((available / 220.0) as usize)
+            .max(1)
             .min(columns.saturating_sub(self.compare_column).max(1));
         let gap = 12.0;
-        let card_w = ((available - gap * (shown_columns - 1) as f32) / shown_columns as f32).min(280.0);
+        let card_w =
+            ((available - gap * (shown_columns - 1) as f32) / shown_columns as f32).min(280.0);
         let bottom = if self.extent.0 < 720 { 260.0 } else { 112.0 };
         let room = (height - bottom - 174.0).max(120.0);
         let card_h = room.min(190.0);
         let shown_rows = ((room + gap) / (card_h + gap)) as usize;
-        let shown_rows = shown_rows.max(1).min(rows.saturating_sub(self.compare_row).max(1));
+        let shown_rows = shown_rows
+            .max(1)
+            .min(rows.saturating_sub(self.compare_row).max(1));
         self.targets.push(Target {
-            occurrence: "page".into(), view: "compare-heading",
-            label: format!("Arrangements {}-{} / {}  ·  rows {}-{} / {}",
-                self.compare_column + 1, self.compare_column + shown_columns, columns,
-                self.compare_row + 1, self.compare_row + shown_rows, rows),
-            detail: String::new(), rect: [left, 146.0, available, 24.0], selected: false,
+            occurrence: "page".into(),
+            view: "compare-heading",
+            label: format!(
+                "Arrangements {}-{} / {}  ·  rows {}-{} / {}",
+                self.compare_column + 1,
+                self.compare_column + shown_columns,
+                columns,
+                self.compare_row + 1,
+                self.compare_row + shown_rows,
+                rows
+            ),
+            detail: String::new(),
+            rect: [left, 146.0, available, 24.0],
+            selected: false,
         });
         for cell in &comparison.cells {
-            if cell.column < self.compare_column || cell.column >= self.compare_column + shown_columns
-                || cell.row < self.compare_row || cell.row >= self.compare_row + shown_rows { continue; }
+            if cell.column < self.compare_column
+                || cell.column >= self.compare_column + shown_columns
+                || cell.row < self.compare_row
+                || cell.row >= self.compare_row + shown_rows
+            {
+                continue;
+            }
             let x = left + (cell.column - self.compare_column) as f32 * (card_w + gap);
             let y = 174.0 + (cell.row - self.compare_row) as f32 * (card_h + gap);
-            let row = comparison.facet.rows.as_ref().and_then(|axis| axis.labels.get(cell.row));
-            let label = format!("{}{}{}", cell.family,
+            let row = comparison
+                .facet
+                .rows
+                .as_ref()
+                .and_then(|axis| axis.labels.get(cell.row));
+            let label = format!(
+                "{}{}{}",
+                cell.family,
                 if cell.working { " (working)" } else { "" },
-                row.map_or(String::new(), |row| format!("  ·  {row}")));
-            let mut detail = self.dynamics_comparison.as_ref()
+                row.map_or(String::new(), |row| format!("  ·  {row}"))
+            );
+            let mut detail = self
+                .dynamics_comparison
+                .as_ref()
                 .and_then(|d| d.stops.iter().find(|(id, _)| id == &cell.swatch_id))
                 .map(|(_, stop)| stop.clone())
-                .unwrap_or_else(|| if cell.working { "Your draft".into() } else { "Pick to apply".into() });
+                .unwrap_or_else(|| {
+                    if cell.working {
+                        "Your draft".into()
+                    } else {
+                        "Pick to apply".into()
+                    }
+                });
             if cell.working {
-                if let Some(current) = self.dynamics_comparison.as_ref()
-                    .and_then(|d| d.working_detail(self.motion_paused)) {
+                if let Some(current) = self
+                    .dynamics_comparison
+                    .as_ref()
+                    .and_then(|d| d.working_detail(self.motion_paused))
+                {
                     detail = current;
                 }
             }
-            self.targets.push(Target { occurrence: cell.swatch_id.clone(), view: "compare",
-                label, detail, rect: [x, y, card_w, card_h], selected: cell.working });
+            self.targets.push(Target {
+                occurrence: cell.swatch_id.clone(),
+                view: "compare",
+                label,
+                detail,
+                rect: [x, y, card_w, card_h],
+                selected: cell.working,
+            });
             let Some(frame) = scene.items.iter().find(|item| {
                 let source = &scene.sources[item.source.0 as usize];
                 source.adapter == FACET_CELL_ADAPTER && source.id == cell.swatch_id
-            }) else { continue; };
+            }) else {
+                continue;
+            };
             let frame_size = frame.footprint.bounds().unwrap().size;
-            let factor = ((card_w - 12.0) / frame_size.w).min((card_h - 76.0).max(1.0) / frame_size.h);
+            let factor =
+                ((card_w - 12.0) / frame_size.w).min((card_h - 76.0).max(1.0) / frame_size.h);
             let origin_x = x + (card_w - frame_size.w * factor) / 2.0;
             let origin_y = y + 34.0;
             let frame_x = frame.transform.translate.x - frame_size.w / 2.0;
@@ -776,39 +895,88 @@ impl LiveProjection {
                 let mut space = Some(item.space);
                 let mut belongs = false;
                 while let Some(id) = space {
-                    let Some(s) = scene.spaces.get(id.0 as usize) else { break; };
-                    if s.name.as_deref() == Some(&format!("cell: {}", cell.swatch_id)) { belongs = true; break; }
+                    let Some(s) = scene.spaces.get(id.0 as usize) else {
+                        break;
+                    };
+                    if s.name.as_deref() == Some(&format!("cell: {}", cell.swatch_id)) {
+                        belongs = true;
+                        break;
+                    }
                     space = s.parent;
                 }
-                if !belongs { continue; }
-                let Some(footprint) = item.footprint.bounds() else { continue; };
-                let world = scene.to_world(item.space).unwrap_or(sceno::Transform2::IDENTITY).then(&item.transform);
-                let rect = [origin_x + (world.translate.x + footprint.origin.x * world.scale - frame_x) * factor,
-                    origin_y + (world.translate.y + footprint.origin.y * world.scale - frame_y) * factor,
-                    footprint.size.w * world.scale * factor, footprint.size.h * world.scale * factor];
+                if !belongs {
+                    continue;
+                }
+                let Some(footprint) = item.footprint.bounds() else {
+                    continue;
+                };
+                let world = scene
+                    .to_world(item.space)
+                    .unwrap_or(sceno::Transform2::IDENTITY)
+                    .then(&item.transform);
+                let rect = [
+                    origin_x
+                        + (world.translate.x + footprint.origin.x * world.scale - frame_x) * factor,
+                    origin_y
+                        + (world.translate.y + footprint.origin.y * world.scale - frame_y) * factor,
+                    footprint.size.w * world.scale * factor,
+                    footprint.size.h * world.scale * factor,
+                ];
                 // A focused live body may leave its frozen comparison frame.
                 // Keep its paint inside the body area, away from the labels.
-                if rect[0] < x || rect[1] < y + 32.0 || rect[0] + rect[2] > x + card_w
-                    || rect[1] + rect[3] > y + card_h - 40.0 { continue; }
+                if rect[0] < x
+                    || rect[1] < y + 32.0
+                    || rect[0] + rect[2] > x + card_w
+                    || rect[1] + rect[3] > y + card_h - 40.0
+                {
+                    continue;
+                }
                 let source = &scene.sources[item.source.0 as usize];
-                self.targets.push(Target { occurrence: format!("{}:{}", source.adapter, source.id),
-                    view: "compare-item", label: String::new(), detail: String::new(), rect, selected: false });
+                self.targets.push(Target {
+                    occurrence: format!("{}:{}", source.adapter, source.id),
+                    view: "compare-item",
+                    label: String::new(),
+                    detail: String::new(),
+                    rect,
+                    selected: false,
+                });
             }
         }
         // Refused cells occupy their actual matrix coordinates and explain why.
         for row in self.compare_row..self.compare_row + shown_rows {
             for column in self.compare_column..self.compare_column + shown_columns {
-                if comparison.cells.iter().any(|cell| cell.row == row && cell.column == column) { continue; }
+                if comparison
+                    .cells
+                    .iter()
+                    .any(|cell| cell.row == row && cell.column == column)
+                {
+                    continue;
+                }
                 let family = &comparison.facet.columns.labels[column];
-                let row_label = comparison.facet.rows.as_ref().and_then(|axis| axis.labels.get(row));
+                let row_label = comparison
+                    .facet
+                    .rows
+                    .as_ref()
+                    .and_then(|axis| axis.labels.get(row));
                 let key = row_label.map_or(family.clone(), |label| format!("{family} / {label}"));
-                let reason = comparison.refused.iter().find(|(id, _)| id == &key || id == family)
+                let reason = comparison
+                    .refused
+                    .iter()
+                    .find(|(id, _)| id == &key || id == family)
                     .map_or("Unavailable for this input", |(_, reason)| reason.as_str());
-                self.targets.push(Target { occurrence: format!("refused:{column}:{row}"), view: "compare-refused",
+                self.targets.push(Target {
+                    occurrence: format!("refused:{column}:{row}"),
+                    view: "compare-refused",
                     label: row_label.map_or(family.clone(), |label| format!("{family} / {label}")),
                     detail: format!("Refused: {reason}"),
-                    rect: [left + (column - self.compare_column) as f32 * (card_w + gap),
-                        174.0 + (row - self.compare_row) as f32 * (card_h + gap), card_w, card_h], selected: false });
+                    rect: [
+                        left + (column - self.compare_column) as f32 * (card_w + gap),
+                        174.0 + (row - self.compare_row) as f32 * (card_h + gap),
+                        card_w,
+                        card_h,
+                    ],
+                    selected: false,
+                });
             }
         }
     }
@@ -841,7 +1009,11 @@ impl LiveProjection {
                 let button = document
                     .create_element("button")
                     .map_err(|_| "Could not create preview target")?;
-                if target.view == "compare-refused" { button.set_attribute("disabled", "").map_err(|_| "Refusal state")?; }
+                if target.view == "compare-refused" {
+                    button
+                        .set_attribute("disabled", "")
+                        .map_err(|_| "Refusal state")?;
+                }
                 button
                     .set_attribute("type", "button")
                     .map_err(|_| "Target type")?;
@@ -875,7 +1047,9 @@ impl LiveProjection {
                     "aria-label",
                     &format!(
                         "{} view: {} · occurrence {}",
-                        target.view, format!("{} · {}", target.label, target.detail), target.occurrence
+                        target.view,
+                        format!("{} · {}", target.label, target.detail),
+                        target.occurrence
                     ),
                 )
                 .map_err(|_| "Target label")?;
@@ -934,11 +1108,35 @@ impl LiveProjection {
                     .to_string(),
             ),
             ("data-projection-arrangement", self.arrangement.clone()),
-            ("data-projection-dynamics", if self.dynamics.is_some() { "on" } else { "off" }.into()),
-            ("data-projection-motion-paused", self.motion_paused.to_string()),
-            ("data-projection-dynamics-ticks", self.dynamics.as_ref().map_or(0, |preview| preview.ticks()).to_string()),
-            ("data-projection-compare-axis", if self.compare_dynamics { "dynamics" } else { "scope" }.into()),
-            ("data-projection-step-limit", self.settle_bound.map_or_else(String::new, |bound| bound.to_string())),
+            (
+                "data-projection-dynamics",
+                if self.dynamics.is_some() { "on" } else { "off" }.into(),
+            ),
+            (
+                "data-projection-motion-paused",
+                self.motion_paused.to_string(),
+            ),
+            (
+                "data-projection-dynamics-ticks",
+                self.dynamics
+                    .as_ref()
+                    .map_or(0, |preview| preview.ticks())
+                    .to_string(),
+            ),
+            (
+                "data-projection-compare-axis",
+                if self.compare_dynamics {
+                    "dynamics"
+                } else {
+                    "scope"
+                }
+                .into(),
+            ),
+            (
+                "data-projection-step-limit",
+                self.settle_bound
+                    .map_or_else(String::new, |bound| bound.to_string()),
+            ),
         ] {
             body.set_attribute(name, &value)
                 .map_err(|_| "Preview state")?;

@@ -38,7 +38,7 @@ impl<P: Product> Automatable for Probe<'_, '_, P> {
             .ctx
             .a11y_projection()
             .map_or_else(Vec::new, |projection| {
-                taproot::matching_with_projection(
+                taproot::matching_prefer_exact_with_projection(
                     &self.ctx.runner.dom().borrow(),
                     selector,
                     &projection,
@@ -137,15 +137,10 @@ impl<P: Product> Driveable for Probe<'_, '_, P> {
         {
             return files.answer(argument.trim());
         }
-        // Text payload is the remainder, not whitespace-separated arguments:
-        // font names, prose and authored CSS may all contain spaces.
-        if let Some(value) = line.strip_prefix("input-text ") {
-            let mut select = cambium::KeyEvent::new(cambium::Key::Character("a".into()));
-            select.mods.ctrl = true;
-            self.ctx.runner.dispatch_key(select);
-            self.ctx.runner.dispatch_key(cambium::KeyEvent::new(
-                cambium::Key::Character(value.into()),
-            ));
+        if let Some(events) = input_text_events(line) {
+            for event in events {
+                self.ctx.runner.dispatch_key(event);
+            }
             return Ok(());
         }
         let words: Vec<_> = line.split_whitespace().collect();
@@ -265,6 +260,43 @@ impl<P: Product> Driveable for Probe<'_, '_, P> {
             },
         }
         Ok(())
+    }
+}
+
+/// Consume one command delimiter; the remaining text is the payload, including
+/// spaces and JSON punctuation. The same events feed the retained host runner.
+fn input_text_events(line: &str) -> Option<[cambium::KeyEvent; 2]> {
+    let mut rest = line.strip_prefix("input-text")?.chars();
+    if !rest.next()?.is_whitespace() {
+        return None;
+    }
+    let mut select = cambium::KeyEvent::new(cambium::Key::Character("a".into()));
+    select.mods.ctrl = true;
+    Some([
+        select,
+        cambium::KeyEvent::new(cambium::Key::Character(rest.as_str().into())),
+    ])
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn input_text_preserves_multiword_titles_and_json_payloads() {
+        use cambium::Key;
+        for value in [
+            "A graph title",
+            r#"{"title": "two words", "notes": "a  b"}"#,
+            "trailing  ",
+        ] {
+            let line = format!("input-text {value}");
+            let [select, text] = super::input_text_events(&line).expect("shared input verb");
+            assert!(matches!(select.key, Key::Character(ref text) if text == "a"));
+            assert!(select.mods.ctrl);
+            assert!(matches!(text.key, Key::Character(ref text) if text == value));
+            assert_eq!(text.mods, cambium::Modifiers::default());
+        }
+        assert!(super::input_text_events("input-textual title").is_none());
+        assert!(super::input_text_events("key Enter").is_none());
     }
 }
 

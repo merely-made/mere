@@ -25,6 +25,8 @@
 // modes and the remote board are additive features, all on by default.
 mod web_appearance;
 mod web_dataset;
+#[cfg(feature = "product")]
+mod web_capture;
 #[cfg(feature = "main-page")]
 mod web_events;
 mod web_gpu;
@@ -41,6 +43,8 @@ mod web_remote;
 #[cfg(feature = "remote")]
 mod web_rtc_link;
 mod web_scenario;
+#[cfg(feature = "product")]
+mod web_command_catalog;
 #[cfg(feature = "main-page")]
 mod web_commands;
 #[cfg(feature = "main-page")]
@@ -155,6 +159,13 @@ pub fn run_scenario(text: &str) -> Result<(), JsValue> {
     web_tree::run(text).map_err(|error| JsValue::from_str(&error))
 }
 
-// The H5 reference host and its `mount` export, verbatim in their own file.
+// Legacy reference-host implementation remains available until parity closes.
+// Its public `mount` export delegates to the retained tree.
 #[cfg(feature = "main-page")]
 include!("web_main.rs");
+
+/// Preflight the same parser used by the retained lane without running the scenario.
+#[wasm_bindgen]
+pub fn validate_scenario(text: &str) -> Result<(), JsValue> {
+    taproot::Scenario::parse(text).map(|_| ()).map_err(|error| JsValue::from_str(&error.to_string()))
+}

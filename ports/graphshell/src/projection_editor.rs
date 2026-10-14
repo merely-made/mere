@@ -25,10 +25,10 @@ use edit_history::History;
 pub use scenograph::options::{OptionDefault, OptionKind, OptionSpec};
 pub use scenograph::{
     Appearance, Arrangement, AuthoredDefinitionError, AuthoredProjectionDefinition, Channel,
-    DynamicsSlot, Encoding, Interaction, PROJECTION_DEFINITION_VERSION, ProjectionDefinition, ProjectionDraft,
-    ProjectionInputBinding, ProjectionVariant, Provenance, PublicSourceRevision, Reading,
-    RevisionEvidence, RuntimeProjectionBinding, RuntimeSourceBinding, SelectionMode, SourceBinding,
-    ValidationIssue, ValidationSeverity,
+    DynamicsSlot, Encoding, Interaction, PROJECTION_DEFINITION_VERSION, ProjectionDefinition,
+    ProjectionDraft, ProjectionInputBinding, ProjectionVariant, Provenance, PublicSourceRevision,
+    Reading, RevisionEvidence, RuntimeProjectionBinding, RuntimeSourceBinding, SelectionMode,
+    SourceBinding, ValidationIssue, ValidationSeverity,
 };
 use scenomise::catalog::{Family, Measure};
 use scenomise::registry::SolverRegistry;
@@ -208,7 +208,10 @@ pub enum EditorAction {
     SetEncoding(Encoding),
     SetArrangement(Arrangement),
     SetDynamics(Option<DynamicsSlot>),
-    ApplyComparison { arrangement: Arrangement, dynamics: Option<DynamicsSlot> },
+    ApplyComparison {
+        arrangement: Arrangement,
+        dynamics: Option<DynamicsSlot>,
+    },
     SetInteraction(Interaction),
     SetAppearance(Appearance),
     SetProvenance(Provenance),
@@ -381,7 +384,10 @@ impl ProjectionEditor {
                 self.draft.dynamics = value;
                 ReduceResult::Changed
             },
-            EditorAction::ApplyComparison { arrangement, dynamics } => {
+            EditorAction::ApplyComparison {
+                arrangement,
+                dynamics,
+            } => {
                 self.draft.arrangement = arrangement;
                 self.draft.dynamics = dynamics;
                 ReduceResult::Changed
@@ -553,7 +559,8 @@ mod tests {
         impl ProjectionDefinitionSink for Sink {
             type Error = String;
             fn save(&mut self, definition: &ProjectionDefinition) -> Result<(), String> {
-                self.0 = Some(definition.clone()); Ok(())
+                self.0 = Some(definition.clone());
+                Ok(())
             }
         }
         let mut sink = Sink(None);
@@ -564,7 +571,7 @@ mod tests {
     fn valid_draft() -> ProjectionDraft {
         ProjectionDraft {
             dynamics: None,
-        version: PROJECTION_DEFINITION_VERSION,
+            version: PROJECTION_DEFINITION_VERSION,
             id: "notes-by-topic".into(),
             label: "Notes by topic".into(),
             source: SourceBinding {
@@ -1012,7 +1019,7 @@ mod tests {
         );
         let variant = ProjectionVariant {
             dynamics: None,
-        definition_id: "other.recipe".to_owned(),
+            definition_id: "other.recipe".to_owned(),
             id: "era-bands-off".to_owned(),
             arrangement_options: BTreeMap::new(),
         };
@@ -1022,5 +1029,203 @@ mod tests {
                 "other.recipe".to_owned()
             ))
         );
+    }
+}
+
+pub fn initial_projection_draft() -> ProjectionDraft {
+    ProjectionDraft {
+        dynamics: None,
+        version: PROJECTION_DEFINITION_VERSION,
+        id: "graphshell-reference".to_string(),
+        label: "Graphshell reference projection".to_string(),
+        source: SourceBinding {
+            authority: "graphshell-reference-host".to_string(),
+            domain: "mere.graph".to_string(),
+            resource: "fixture.graphshell/reference".to_string(),
+        },
+        reading: Reading {
+            kind: "nodes".to_string(),
+            key: "title".to_string(),
+            value: None,
+        },
+        encoding: Encoding {
+            x: Channel::Field("x".to_string()),
+            y: Channel::Field("y".to_string()),
+            color: Some(Channel::Field("kind".to_string())),
+            label: Some(Channel::Field("title".to_string())),
+        },
+        arrangement: Arrangement {
+            kind: "phyllotaxis.default".to_string(),
+            direction: "horizontal".to_string(),
+            spacing: 16,
+            options: Default::default(),
+        },
+        interaction: Interaction {
+            selection: SelectionMode::Single,
+            pan: true,
+            zoom: true,
+        },
+        appearance: Appearance {
+            realization: "canvas".to_string(),
+            title: "Graphshell reference projection".to_string(),
+            theme: "dark".to_string(),
+        },
+        provenance: Provenance {
+            author: "Graphshell reference host".to_string(),
+            source_revision: Some("fixture-v1".into()),
+            revision_evidence: RevisionEvidence::PublicGeneration,
+            note: "Host-owned editor fixture".to_string(),
+        },
+    }
+}
+
+impl ProjectionEditor {
+    /// Host-neutral conversion of a field edit to a reducer action.
+    pub fn edit_field(&mut self, field: &str, value: &str, now_ms: u64) -> Result<(), String> {
+        let mut draft = self.draft().clone();
+        let action = match field {
+            "dynamics.spec" => EditorAction::SetDynamics(if value.trim().is_empty() {
+                None
+            } else {
+                Some(
+                    DynamicsSlot::from_json(1, value).unwrap_or_else(|_| DynamicsSlot {
+                        version: 1,
+                        spec: value.to_string(),
+                    }),
+                )
+            }),
+            "source.authority" => {
+                draft.source.authority = value.to_string();
+                EditorAction::SetSource(draft.source)
+            },
+            "source.domain" => {
+                draft.source.domain = value.to_string();
+                EditorAction::SetSource(draft.source)
+            },
+            "source.resource" => {
+                draft.source.resource = value.to_string();
+                EditorAction::SetSource(draft.source)
+            },
+            "reading.key" => {
+                draft.reading.key = value.to_string();
+                EditorAction::SetReading(draft.reading)
+            },
+            "encoding.x" => {
+                draft.encoding.x = Channel::Field(value.to_string());
+                EditorAction::SetEncoding(draft.encoding)
+            },
+            "encoding.y" => {
+                draft.encoding.y = Channel::Field(value.to_string());
+                EditorAction::SetEncoding(draft.encoding)
+            },
+            "encoding.label" => {
+                draft.encoding.label = Some(Channel::Field(value.to_string()));
+                EditorAction::SetEncoding(draft.encoding)
+            },
+            "arrangement.kind" => {
+                EditorAction::SetArrangement(crate::projection_editor::with_kind(
+                    &draft.arrangement,
+                    value,
+                    crate::projection_compile::practice_compiler().registry(),
+                ))
+            },
+            "arrangement.direction" => {
+                draft.arrangement.direction = value.to_string();
+                EditorAction::SetArrangement(draft.arrangement)
+            },
+            "arrangement.spacing" => {
+                draft.arrangement.spacing = value.parse().unwrap_or(0);
+                EditorAction::SetArrangement(draft.arrangement)
+            },
+            "appearance.realization" => {
+                draft.appearance.realization = value.to_string();
+                EditorAction::SetAppearance(draft.appearance)
+            },
+            "appearance.title" => {
+                draft.appearance.title = value.to_string();
+                EditorAction::SetAppearance(draft.appearance)
+            },
+            "provenance.author" => {
+                draft.provenance.author = value.to_string();
+                EditorAction::SetProvenance(draft.provenance)
+            },
+            "provenance.source_revision" => {
+                draft.provenance.source_revision = Some(value.into());
+                draft.provenance.revision_evidence = RevisionEvidence::PublicGeneration;
+                EditorAction::SetProvenance(draft.provenance)
+            },
+            "provenance.note" => {
+                draft.provenance.note = value.to_string();
+                EditorAction::SetProvenance(draft.provenance)
+            },
+            _ => return Err(format!("Unknown projection field: {field}")),
+        };
+        self.reduce(action, now_ms);
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod field_adapter_tests {
+    use super::*;
+
+    #[test]
+    fn field_edit_uses_the_draft_history_and_rejects_unknown_fields_atomically() {
+        let mut editor = ProjectionEditor::new(initial_projection_draft());
+        let original = editor.draft().clone();
+        editor
+            .edit_field("appearance.title", "Retained title", 1)
+            .unwrap();
+        assert_eq!(editor.draft().appearance.title, "Retained title");
+        assert!(editor.undo());
+        assert_eq!(editor.draft(), &original);
+        let before = editor.draft().clone();
+        assert!(
+            editor
+                .edit_field("appearance.unknown", "ignored", 2)
+                .is_err()
+        );
+        assert_eq!(editor.draft(), &before);
+    }
+
+    #[test]
+    fn dynamics_field_preserves_slot_history_and_refuses_invalid_json() {
+        let mut editor = ProjectionEditor::new(initial_projection_draft());
+        let json = r#"{"root":{"preset":"spring.rapier"}}"#;
+        editor.edit_field("dynamics.spec", json, 1).unwrap();
+        let slot = editor.draft().dynamics.clone();
+        assert_eq!(slot, Some(DynamicsSlot::from_json(1, json).unwrap()));
+        assert!(editor.undo());
+        assert_eq!(editor.draft().dynamics, None);
+        assert!(editor.redo());
+        assert_eq!(editor.draft().dynamics, slot);
+        editor.break_run();
+        editor
+            .edit_field("dynamics.spec", "not JSON", 1000)
+            .unwrap();
+        assert_eq!(editor.draft().dynamics.as_ref().unwrap().spec, "not JSON");
+        assert!(editor.draft().to_definition().is_err());
+        editor.break_run();
+        editor.edit_field("dynamics.spec", "", 2000).unwrap();
+        assert_eq!(editor.draft().dynamics, None);
+        assert!(editor.undo());
+        assert!(editor.draft().to_definition().is_err());
+    }
+
+    #[test]
+    fn arrangement_field_switch_uses_declared_options_and_invalid_input_stays_refused() {
+        let mut editor = ProjectionEditor::new(initial_projection_draft());
+        editor.reduce(
+            EditorAction::SetArrangement(with_option(&editor.draft().arrangement, "columns", "3")),
+            1,
+        );
+        editor
+            .edit_field("arrangement.kind", "spiral", 1000)
+            .unwrap();
+        assert!(!editor.draft().arrangement.options.contains_key("columns"));
+        editor
+            .edit_field("arrangement.spacing", "not a number", 2000)
+            .unwrap();
+        assert!(editor.draft().to_definition().is_err());
     }
 }

@@ -89,7 +89,13 @@ impl FormeWorkspace {
     }
     pub fn tile_tree(&self, graph: &Graph) -> Option<TileTree> {
         // Saved opaque keys survive closing/reopening other tabs and never name a Resource.
-        self.layout().to_tile_tree(|member| Tile {
+        let mut layout = self.layout();
+        for member in layout.open_members() {
+            if graph.get_node_by_id(member).is_none() {
+                layout.close_tile(member);
+            }
+        }
+        layout.to_tile_tree(|member| Tile {
             id: TileId(self.tile_ids[&member]),
             title: graph
                 .get_node_by_id(member)
@@ -109,6 +115,20 @@ impl FormeWorkspace {
         members.dedup();
         members
     }
+    /// Project this owner's accesses without deleting missing members from the
+    /// saved or draft layout. Graph redo can make those same accesses visible.
+    pub fn project_region(
+        &self,
+        owner: Uuid,
+        graph: &Graph,
+    ) -> Result<Option<FormeRegion>, String> {
+        self.validate(owner)?;
+        let mut region = self.region();
+        region
+            .cells
+            .retain(|cell| graph.get_node_by_id(cell.member).is_some());
+        Ok((!region.cells.is_empty()).then_some(region))
+    }
     pub fn member_for_tile(&self, tile: TileId) -> Option<Uuid> {
         self.tile_ids
             .iter()
@@ -120,13 +140,28 @@ impl FormeWorkspace {
         self.tile_ids.get(&member).copied().map(TileId)
     }
     pub fn event(&mut self, event: TileEvent, graph: &Graph) -> Result<(), String> {
+        // Projected split paths may differ while missing accesses are masked.
+        // Keep those stored identities; reject path-based edits until restored.
+        if matches!(&event, TileEvent::DividerMoved { .. })
+            && self
+                .members()
+                .iter()
+                .any(|m| graph.get_node_by_id(*m).is_none())
+        {
+            return Err("Restore missing accesses before editing split dividers".into());
+        }
+        let admitted = |tile| {
+            self.member_for_tile(tile)
+                .filter(|m| graph.get_node_by_id(*m).is_some())
+                .ok_or("the access is no longer present")
+        };
         let mut layout = self.layout();
         match event {
             TileEvent::Activated(tile) => {
-                layout.activate(self.member_for_tile(tile).ok_or("unknown tile")?);
+                layout.activate(admitted(tile)?);
             },
             TileEvent::Closed(tile) => {
-                layout.close_tile(self.member_for_tile(tile).ok_or("unknown tile")?);
+                layout.close_tile(admitted(tile)?);
             },
             TileEvent::DividerMoved { split, fractions } => {
                 if self.locked {
@@ -147,7 +182,7 @@ impl FormeWorkspace {
                 if self.locked {
                     return Err("Unlock the forme to change its arrangement".into());
                 }
-                let member = self.member_for_tile(tile).ok_or("unknown tile")?;
+                let member = admitted(tile)?;
                 let tree = self.tile_tree(graph).ok_or("empty forme")?;
                 let target = match &to {
                     DropTarget::Stack { stack, .. } => match tree_at(&tree, &stack.0) {
@@ -163,6 +198,7 @@ impl FormeWorkspace {
                     _ => return Err("This host keeps tiles in its workbench".into()),
                 }
                 .and_then(|t| self.member_for_tile(t))
+                .filter(|member| graph.get_node_by_id(*member).is_some())
                 .ok_or("unknown drop region")?;
                 match to {
                     DropTarget::Stack { index, .. } => {

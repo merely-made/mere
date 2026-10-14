@@ -49,6 +49,7 @@ impl WorkspaceApp {
                 }
                 let theme = a11y_node(&tree, "Toggle Pelt appearance settings", Role::Button)?;
                 if !self.apply_accessibility_request(A11yActionRequest {
+                    target_tree: accesskit::TreeId::ROOT,
                     action: Action::Focus,
                     target_node: theme,
                     data: None,
@@ -65,6 +66,7 @@ impl WorkspaceApp {
                 let tree = self.prepare_accessibility_tree()?;
                 let theme = a11y_node(&tree, "Toggle Pelt appearance settings", Role::Button)?;
                 if !self.apply_accessibility_request(A11yActionRequest {
+                    target_tree: accesskit::TreeId::ROOT,
                     action: Action::Click,
                     target_node: theme,
                     data: None,
@@ -80,6 +82,7 @@ impl WorkspaceApp {
                 let tree = self.prepare_accessibility_tree()?;
                 let light = a11y_node(&tree, "Light", Role::RadioButton)?;
                 if !self.apply_accessibility_request(A11yActionRequest {
+                    target_tree: accesskit::TreeId::ROOT,
                     action: Action::Focus,
                     target_node: light,
                     data: None,
@@ -96,6 +99,7 @@ impl WorkspaceApp {
                 let tree = self.prepare_accessibility_tree()?;
                 let light = a11y_node(&tree, "Light", Role::RadioButton)?;
                 if !self.apply_accessibility_request(A11yActionRequest {
+                    target_tree: accesskit::TreeId::ROOT,
                     action: Action::Click,
                     target_node: light,
                     data: None,
@@ -161,6 +165,7 @@ impl WorkspaceApp {
                 if !node.supports_action(Action::SetValue)
                     || node.value().is_none()
                     || !self.apply_accessibility_request(A11yActionRequest {
+                        target_tree: accesskit::TreeId::ROOT,
                         action: Action::SetValue,
                         target_node: address,
                         data: Some(ActionData::Value(
@@ -256,6 +261,7 @@ impl WorkspaceApp {
                     .to_string_lossy()
                     .into_owned();
                 if !self.apply_accessibility_request(A11yActionRequest {
+                    target_tree: accesskit::TreeId::ROOT,
                     action: Action::SetValue,
                     target_node: address,
                     data: Some(ActionData::Value(missing.into())),
@@ -381,6 +387,7 @@ impl WorkspaceApp {
                     .address()
                     .to_owned();
                 if !self.apply_accessibility_request(A11yActionRequest {
+                    target_tree: accesskit::TreeId::ROOT,
                     action: Action::Focus,
                     target_node: link,
                     data: None,
@@ -397,6 +404,7 @@ impl WorkspaceApp {
                 let tree = self.prepare_accessibility_tree()?;
                 let link = a11y_node(&tree, "Open child destination", Role::Link)?;
                 if !self.apply_accessibility_request(A11yActionRequest {
+                    target_tree: accesskit::TreeId::ROOT,
                     action: Action::Click,
                     target_node: link,
                     data: None,
@@ -493,6 +501,7 @@ impl WorkspaceApp {
                     return Err("nested link advertised the wrong post-scroll actions".to_owned());
                 }
                 if !self.apply_accessibility_request(A11yActionRequest {
+                    target_tree: accesskit::TreeId::ROOT,
                     action: Action::ScrollIntoView,
                     target_node: link,
                     data: None,
@@ -565,6 +574,7 @@ impl WorkspaceApp {
                     );
                 }
                 if !self.apply_accessibility_request(A11yActionRequest {
+                    target_tree: accesskit::TreeId::ROOT,
                     action: Action::ScrollIntoView,
                     target_node: link,
                     data: None,
@@ -605,6 +615,7 @@ impl WorkspaceApp {
                     );
                 }
                 if !self.apply_accessibility_request(A11yActionRequest {
+                    target_tree: accesskit::TreeId::ROOT,
                     action: Action::Click,
                     target_node: link,
                     data: None,
@@ -614,6 +625,7 @@ impl WorkspaceApp {
                     );
                 }
                 if self.apply_accessibility_request(A11yActionRequest {
+                    target_tree: accesskit::TreeId::ROOT,
                     action: Action::Click,
                     target_node: link,
                     data: None,
@@ -715,6 +727,7 @@ impl WorkspaceApp {
                     );
                 }
                 if self.apply_accessibility_request(A11yActionRequest {
+                    target_tree: accesskit::TreeId::ROOT,
                     action: Action::SetValue,
                     target_node: note,
                     data: Some(ActionData::Value("wrong path".into())),
@@ -973,6 +986,7 @@ impl WorkspaceApp {
                         .find(|(id, _)| *id == protected)
                         .is_some_and(|(_, node)| node.supports_action(Action::SetValue))
                         || self.apply_accessibility_request(A11yActionRequest {
+                            target_tree: accesskit::TreeId::ROOT,
                             action: Action::SetValue,
                             target_node: protected,
                             data: Some(ActionData::Value("not writable".into())),
@@ -984,14 +998,17 @@ impl WorkspaceApp {
                     }
                 }
                 if self.apply_accessibility_request(A11yActionRequest {
+                    target_tree: accesskit::TreeId::ROOT,
                     action: Action::SetValue,
                     target_node: note,
                     data: Some(ActionData::NumericValue(4.0)),
                 }) || self.apply_accessibility_request(A11yActionRequest {
+                    target_tree: accesskit::TreeId::ROOT,
                     action: Action::SetValue,
                     target_node: note,
                     data: None,
                 }) || !self.apply_accessibility_request(A11yActionRequest {
+                    target_tree: accesskit::TreeId::ROOT,
                     action: Action::SetValue,
                     target_node: note,
                     data: Some(ActionData::Value("birch".into())),
@@ -1072,6 +1089,7 @@ impl WorkspaceApp {
                 )?;
                 let submit_action = self.accessibility.action_for(submit);
                 if !self.apply_accessibility_request(A11yActionRequest {
+                    target_tree: accesskit::TreeId::ROOT,
                     action: Action::Click,
                     target_node: submit,
                     data: None,

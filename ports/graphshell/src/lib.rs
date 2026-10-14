@@ -95,6 +95,10 @@ pub mod live_endpoint;
 pub mod local_edit;
 #[cfg(feature = "web")]
 pub mod local_intake;
+#[cfg(any(feature = "native", feature = "web"))]
+pub mod local_projection;
+#[cfg(feature = "web")]
+pub mod local_scene;
 #[cfg(feature = "web")]
 pub mod mere_host;
 #[cfg(feature = "web")]
@@ -115,6 +119,8 @@ pub mod product;
 pub mod profile;
 #[cfg(feature = "web")]
 pub mod remote_board;
+#[cfg(feature = "web")]
+pub mod retained_policy;
 #[cfg(feature = "web")]
 pub mod session_item;
 #[cfg(feature = "web")]

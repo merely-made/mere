@@ -7,7 +7,7 @@ model outside mere itself: retinue's civic-deployment **scopes** (the
 policy groups a radio node may defer to: a county, a trail-stewards
 community, a radio club) are moots. The radio-tier counterpart carrying the
 deployment design is retinue's
-[civic deployment doc](../../../../retinue/design_docs/2026-08-11_civic_deployment_prescribed_paths.md).
+[civic deployment doc](../../../../murm/design_docs/2026-08-11_civic_deployment_prescribed_paths.md).
 
 ## The split
 
@@ -78,7 +78,7 @@ wrong crate.
 
 Three findings from the same audit reshape this list. They are rulings for
 Mark to write, not streams to code, and they are **post-deadline** per
-retinue's [program sequencing](../../../../retinue/design_docs/2026-08-12_program_sequencing_and_deadline_order.md).
+retinue's [program sequencing](../../../../murm/design_docs/2026-08-12_program_sequencing_and_deadline_order.md).
 
 - **The partition merge rule is unreachable, not undecided.**
   `ConstitutionStore::accept` returns `StaleRevision` *before* the operation

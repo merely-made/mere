@@ -37,8 +37,11 @@ impl Clicks {
         let Some(projection) = ctx.a11y_projection() else {
             return false;
         };
-        let nodes =
-            taproot::matching_with_projection(&ctx.runner.dom().borrow(), selector, &projection);
+        let nodes = taproot::matching_prefer_exact_with_projection(
+            &ctx.runner.dom().borrow(),
+            selector,
+            &projection,
+        );
         let Some((node, rect)) = nodes.into_iter().find_map(|node| {
             ctx.painted_rect(node)
                 .filter(|r| r.2 > 0.0 && r.3 > 0.0)
@@ -91,7 +94,7 @@ impl Clicks {
         };
         if matches!(selector.matcher, taproot::Match::Role(_)) {
             let still_matches = ctx.a11y_projection().is_some_and(|projection| {
-                taproot::matching_with_projection(
+                taproot::matching_prefer_exact_with_projection(
                     &ctx.runner.dom().borrow(),
                     &selector,
                     &projection,

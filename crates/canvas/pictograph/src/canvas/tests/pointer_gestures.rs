@@ -31,6 +31,52 @@ fn one_node() -> (Canvas, NodeKey, (f32, f32)) {
 }
 
 #[test]
+fn pointer_cancel_ends_gestures_without_activating_a_click() {
+    let (mut canvas, key, node) = one_node();
+    canvas.pointer_down(PointerButton::Left, node.0, node.1);
+    assert!(canvas.pointer_cancel());
+    canvas.pointer_up(PointerButton::Left, node.0, node.1);
+    assert!(!canvas.selected.contains(&key));
+    canvas.selected.insert(key);
+    canvas.pointer_down(PointerButton::Left, node.0 + 400.0, node.1 + 300.0);
+    canvas.pointer_cancel();
+    assert!(
+        canvas.selected.contains(&key),
+        "cancel is not an empty click"
+    );
+    canvas.pointer_down(PointerButton::Right, node.0, node.1);
+    canvas.pointer_cancel();
+    canvas.pointer_up(PointerButton::Right, node.0, node.1);
+    assert!(canvas.take_context_request().is_none());
+    canvas.pointer_down(PointerButton::Middle, node.0, node.1);
+    canvas.cursor_moved(node.0 + 80.0, node.1 + 40.0);
+    canvas.pointer_cancel();
+    let camera = canvas.camera();
+    canvas.cursor_moved(node.0 + 180.0, node.1 + 140.0);
+    canvas.frame(1024, 768);
+    assert_eq!(
+        canvas.camera(),
+        camera,
+        "cancel stops captured pan and its momentum"
+    );
+    assert!(!canvas.pointer_cancel(), "a second cancellation is inert");
+}
+
+#[test]
+fn pointer_cancel_releases_a_moved_node_without_changing_selection() {
+    let (mut canvas, key, node) = one_node();
+    canvas.pointer_down(PointerButton::Left, node.0, node.1);
+    canvas.cursor_moved(node.0 + 80.0, node.1 + 40.0);
+    assert!(canvas.dragging_node().is_some());
+    canvas.pointer_cancel();
+    assert!(canvas.dragging_node().is_none());
+    assert!(canvas.selected_members().is_empty());
+    let position = canvas.view.position_of(key).unwrap();
+    canvas.cursor_moved(node.0 + 180.0, node.1 + 140.0);
+    assert_eq!(canvas.view.position_of(key).unwrap(), position);
+}
+
+#[test]
 fn a_left_drag_on_empty_canvas_pans_and_glides() {
     let (mut canvas, _, node) = one_node();
     let empty = (node.0 + 400.0, node.1 + 300.0);

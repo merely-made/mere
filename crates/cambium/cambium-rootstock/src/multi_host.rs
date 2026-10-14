@@ -165,6 +165,10 @@ where
         self.runner.default_prevented(self.window)
     }
 
+    fn pointer_capture_owner(&self) -> Option<(i32, cambium::PointerButton)> {
+        self.runner.pointer_capture_owner(self.window)
+    }
+
     fn pointer_capture(&self) -> Option<NodeId> {
         self.runner.pointer_capture(self.window)
     }

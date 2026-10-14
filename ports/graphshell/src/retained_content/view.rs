@@ -42,13 +42,14 @@ pub fn content_view<State: 'static, Action: 'static>(
                         },
                     ),
                     move |_: &mut State, event| {
-                        let button = match event.button {
-                            cambium::PointerButton::Primary => SessionPointerButton::Primary,
-                            cambium::PointerButton::Secondary => SessionPointerButton::Secondary,
-                            _ => return,
-                        };
                         let input = match event.phase {
+                            cambium::PointerPhase::Cancel => SessionInput::Cancel,
                             cambium::PointerPhase::Down | cambium::PointerPhase::Up => {
+                                let button = match event.button {
+                                    cambium::PointerButton::Primary => SessionPointerButton::Primary,
+                                    cambium::PointerButton::Secondary => SessionPointerButton::Secondary,
+                                    _ => return,
+                                };
                                 SessionInput::PointerButton {
                                     x: event.local.0,
                                     y: event.local.1,

@@ -71,6 +71,9 @@ pub(super) struct TreeRemote {
 }
 
 impl TreeRemote {
+    pub(super) fn card_labels(&self) -> Vec<String> {
+        Vec::new()
+    }
     pub(super) fn new() -> Self {
         Self {
             live: None,
@@ -158,4 +161,8 @@ pub(super) fn active_line(page: &TreePage) -> String {
 
 pub(super) fn section(_page: &TreePage) -> Child {
     Box::new(cambium::el("div", ()))
+}
+
+pub(super) fn run_command(_: &mut TreePage, _: &str) -> bool {
+    false
 }

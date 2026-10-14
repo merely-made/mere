@@ -8,7 +8,9 @@
 use super::*;
 use cambium::{Slot, button, frisket_with};
 use graphshell::{
-    forme_session::{DropEffect, FormeSession, PreparedSave, SaveKind},
+    forme_session::{
+        DropEffect, FormeLoadGate, FormeLoadTicket, FormeSession, FormeWriteFence, PreparedSave, SaveKind,
+    },
     forme_workspace::FormeWorkspace,
 };
 use muniment::IndexedDbBackend;
@@ -34,7 +36,10 @@ impl Pane {
     pub(super) async fn open(product: &product::SavedProduct) -> Result<Self, String> {
         let (backend, session) = product.forme_source().ok_or("workspace store is busy")?;
         let session = FormeSession::load(backend.clone(), session, &product.graph()).await?;
-        Ok(Self {
+        Ok(Self::from_session(backend, session))
+    }
+    fn from_session(backend: IndexedDbBackend, session: FormeSession) -> Self {
+        Self {
             session,
             backend,
             completed: Rc::new(RefCell::new(None)),
@@ -48,7 +53,7 @@ impl Pane {
             feedback: None,
             drag: None,
             cancelled_drag: false,
-        })
+        }
     }
     pub(super) fn projected_model(&self) -> &FormeWorkspace {
         self.candidate.as_ref().unwrap_or_else(|| self.model())
@@ -60,9 +65,11 @@ impl Pane {
         self.candidate.as_ref().unwrap_or_else(|| self.model())
     }
     pub(super) fn install(&self, canvas: &mut Canvas) -> Result<(), String> {
-        canvas.set_forme_region(
-            (!self.current().members().is_empty()).then(|| self.current().region()),
-        )
+        self.project(canvas, self.model().document.graph_id)
+    }
+    fn project(&self, canvas: &mut Canvas, owner: Uuid) -> Result<(), String> {
+        let region = self.current().project_region(owner, canvas.graph())?;
+        canvas.set_forme_region(region)
     }
     fn save(&mut self, kind: SaveKind) {
         if self.saving {
@@ -110,6 +117,212 @@ impl Pane {
         }
     }
 }
+
+struct RetiredWrite {
+    ticket: u64,
+    completed: Rc<RefCell<Option<Result<(), String>>>>,
+}
+struct Loading {
+    ticket: FormeLoadTicket,
+    completed: Rc<RefCell<Option<Result<FormeSession, String>>>>,
+}
+#[derive(Default)]
+pub(super) struct OwnerLifecycle {
+    gate: FormeLoadGate,
+    loading: Option<Loading>,
+    writes: FormeWriteFence,
+    retired: Vec<RetiredWrite>,
+}
+pub(super) fn graph_change_ready(page: &TreePage) -> bool {
+    page.product
+        .as_ref()
+        .is_some_and(|p| p.forme_new_session.is_some() || p.forme_reconcile_session.is_some())
+}
+pub(super) fn owner_ready(page: &TreePage) -> bool {
+    if graph_change_ready(page)
+        || page
+            .forme_owner
+            .retired
+            .iter()
+            .any(|w| w.completed.borrow().is_some())
+    {
+        return true;
+    }
+    let Some(ticket) = page.forme_owner.gate.active() else {
+        return false;
+    };
+    let Some((_, owner)) = page.product.as_ref().and_then(|p| p.forme_source()) else {
+        return false;
+    };
+    if owner != ticket.owner {
+        return true;
+    }
+    match &page.forme_owner.loading {
+        None => !page.forme_owner.writes.blocks(owner),
+        Some(load) => load.completed.borrow().is_some(),
+    }
+}
+pub(super) fn owner_busy(page: &TreePage) -> bool {
+    page.forme_owner.gate.active().is_some()
+}
+fn retire_owner(page: &mut TreePage, owner: Uuid) {
+    // Dropping the pane/loading cell prevents old acknowledgements from being
+    // installed here. An already admitted old-slot write may finish there.
+    if let Some(pane) = page.forme.take() {
+        if pane.saving {
+            let ticket = page
+                .forme_owner
+                .writes
+                .retire(pane.model().document.graph_id);
+            page.forme_owner.retired.push(RetiredWrite {
+                ticket,
+                completed: pane.completed,
+            });
+        }
+    }
+    page.forme_error = None;
+    page.forme_owner.loading = None;
+    page.forme_owner.gate.request(owner);
+    let _ = page.shared.canvas.borrow_mut().set_forme_region(None);
+    page.shared.dirty.set(true);
+}
+pub(super) fn after_graph_change(page: &mut TreePage) {
+    let (new_owner, same_owner) = page.product.as_mut().map_or((None, None), |p| {
+        (p.forme_new_session.take(), p.forme_reconcile_session.take())
+    });
+    if let Some(owner) = new_owner {
+        retire_owner(page, owner);
+        return;
+    }
+    if let Some(owner) = same_owner {
+        if let Some(pane) = &mut page.forme {
+            if pane.model().document.graph_id != owner {
+                retire_owner(page, owner);
+            } else {
+                let mut canvas = page.shared.canvas.borrow_mut();
+                let missing_drag = pane
+                    .drag
+                    .as_ref()
+                    .is_some_and(|(member, _, _)| canvas.graph().get_node_by_id(*member).is_none());
+                let missing_move = pane
+                    .moving
+                    .is_some_and(|member| canvas.graph().get_node_by_id(member).is_none());
+                // A same-owner edit can remove a target while the moving
+                // member survives. Retire its transient proposal and cue;
+                // keep committed/draft layout and re-resolve the next gesture.
+                pane.candidate = None;
+                pane.feedback = None;
+                if missing_drag || missing_move {
+                    pane.drag = None;
+                    pane.moving = None;
+                    pane.cancelled_drag = missing_drag;
+                    pane.session.break_gesture();
+                }
+                if let Err(error) = pane.project(&mut canvas, owner) {
+                    pane.status = error;
+                }
+            }
+        } else if page.forme_owner.gate.active().is_some() {
+            // A graph changed while loading: use a fresh snapshot/request.
+            retire_owner(page, owner);
+        }
+        page.shared.dirty.set(true);
+    }
+}
+pub(super) fn poll_owner(page: &mut TreePage) {
+    after_graph_change(page);
+    page.forme_owner.retired.retain(|write| {
+        if write.completed.borrow_mut().take().is_some() {
+            page.forme_owner.writes.finish(write.ticket);
+            false
+        } else {
+            true
+        }
+    });
+    // No actual App while a save owns it means unknown, not a new owner.
+    let Some((backend, owner)) = page.product.as_ref().and_then(|p| p.forme_source()) else {
+        return;
+    };
+    let wrong_pane = page
+        .forme
+        .as_ref()
+        .is_some_and(|p| p.model().document.graph_id != owner);
+    let wrong_request = page
+        .forme_owner
+        .gate
+        .active()
+        .is_some_and(|t| t.owner != owner);
+    if wrong_pane || wrong_request {
+        retire_owner(page, owner);
+    }
+    let Some(ticket) = page.forme_owner.gate.active() else {
+        return;
+    };
+    if page.forme_owner.writes.blocks(owner) {
+        return;
+    }
+    if page.forme_owner.loading.is_none() {
+        let graph = page.product.as_ref().expect("actual Product owner").graph();
+        let completed = Rc::new(RefCell::new(None));
+        let returned = completed.clone();
+        let load_backend = backend.clone();
+        let fence = page.forme_owner.writes.clone();
+        page.forme_owner.loading = Some(Loading { ticket, completed });
+        wasm_bindgen_futures::spawn_local(async move {
+            *returned.borrow_mut() =
+                Some(match fence.load(load_backend, ticket.owner, &graph).await {
+                    Ok(Some(session)) => Ok(session),
+                    Ok(None) => Err("Workbench owner still has an earlier pending write".into()),
+                    Err(error) => Err(error),
+                });
+        });
+    }
+    let finished = page.forme_owner.loading.as_ref().and_then(|loading| {
+        loading
+            .completed
+            .borrow_mut()
+            .take()
+            .map(|result| (loading.ticket, result))
+    });
+    let Some((ticket, result)) = finished else {
+        return;
+    };
+    if !page.forme_owner.gate.accepts(ticket, Some(owner)) {
+        return;
+    }
+    match result {
+        Ok(session) => {
+            if !page
+                .forme_owner
+                .gate
+                .finish_loaded(ticket, Some(owner), &session)
+            {
+                page.forme_error = Some("Workbench load belongs to another graph session".into());
+                page.forme_owner.gate.finish_error(ticket, Some(owner));
+            } else {
+                let pane = Pane::from_session(backend, session);
+                match pane.project(&mut page.shared.canvas.borrow_mut(), owner) {
+                    Ok(()) => {
+                        page.forme = Some(pane);
+                        page.forme_error = None;
+                    },
+                    Err(error) => {
+                        page.forme_error = Some(error);
+                    },
+                }
+            }
+        },
+        Err(error) => {
+            page.forme_owner.gate.finish_error(ticket, Some(owner));
+            page.forme_error = Some(format!(
+                "Workbench could not be restored: {error}. Saved record retained."
+            ));
+        },
+    }
+    page.forme_owner.loading = None;
+    page.shared.dirty.set(true);
+}
+
 fn now() -> u64 {
     js_sys::Date::now() as u64
 }
@@ -266,36 +479,17 @@ fn begin_move(page: &mut TreePage, member: Uuid) {
     page.shared.dirty.set(true);
 }
 fn preview(page: &mut TreePage, target: Uuid, edge: workbench::Edge) {
-    let Some(pane) = &mut page.forme else {
+    let Some((_, owner)) = page.product.as_ref().and_then(|p| p.forme_source()) else {
         return;
     };
-    if pane.saving || !pane.session.editing() {
-        return;
-    }
-    let Some(moving) = pane.moving else {
-        return;
-    };
-    let mut candidate = pane.model().clone();
-    let (Some(tile), Some(to)) = (
-        candidate.tile_for_member(moving),
-        candidate.tile_for_member(target),
-    ) else {
-        return;
-    };
-    let result = candidate.event(
-        TileEvent::Dragged {
-            tile,
-            to: workbench::DropTarget::Edge { tile: to, edge },
-        },
-        page.shared.canvas.borrow().graph(),
+    let Some(pane) = &mut page.forme else { return; };
+    if pane.saving || !pane.session.editing() { return; }
+    let Some(moving) = pane.moving else { return; };
+    let result = pane.session.install_edge_preview(
+        owner, moving, target, edge, &mut page.shared.canvas.borrow_mut(),
     );
-    match result.and_then(|()| {
-        page.shared
-            .canvas
-            .borrow_mut()
-            .set_forme_region(Some(candidate.region()))
-    }) {
-        Ok(()) => {
+    match result {
+        Ok(candidate) => {
             let region = pane.model().region();
             pane.feedback = region
                 .cells
@@ -305,7 +499,7 @@ fn preview(page: &mut TreePage, target: Uuid, edge: workbench::Edge) {
             pane.candidate = Some(candidate);
             pane.status = "Preview ready · Apply move or cancel".into();
         },
-        Err(error) => pane.status = error,
+        Err(error) => { pane.status = error; },
     }
     page.shared.dirty.set(true);
 }
@@ -417,6 +611,20 @@ pub(super) fn pointer(page: &mut TreePage, event: &cambium::PointerEvent) -> boo
     let Some(pane) = &mut page.forme else {
         return false;
     };
+    if event.phase == cambium::PointerPhase::Cancel {
+        if pane.drag.is_none() && !pane.cancelled_drag {
+            return false;
+        }
+        pane.drag = None;
+        pane.candidate = None;
+        pane.feedback = None;
+        pane.moving = None;
+        pane.cancelled_drag = false;
+        pane.session.break_gesture();
+        let _ = pane.install(&mut page.shared.canvas.borrow_mut());
+        page.shared.dirty.set(true);
+        return true;
+    }
     if pane.cancelled_drag && event.phase != cambium::PointerPhase::Down {
         if event.phase == cambium::PointerPhase::Up {
             pane.cancelled_drag = false;
@@ -511,6 +719,9 @@ pub(super) fn pointer(page: &mut TreePage, event: &cambium::PointerEvent) -> boo
                 drop(canvas);
                 selection_changed(page);
             }
+        },
+        cambium::PointerPhase::Cancel => {
+            unreachable!("cancellation handled before draft admission")
         },
     }
     page.shared.dirty.set(true);
@@ -958,6 +1169,10 @@ pub(super) fn workbench(page: &TreePage) -> Option<Child> {
                             begin_move(p, member);
                         })
                         .attr("data-forme-move", "true")
+                        .attr(
+                            "data-forme-control",
+                            json!([node.url(), "move"]).to_string(),
+                        )
                         .attr("aria-label", format!("Move tile: {title}")),
                     ));
                     if moving.is_some_and(|m| m != member) {
@@ -970,6 +1185,11 @@ pub(super) fn workbench(page: &TreePage) -> Option<Child> {
                             controls.push(Box::new(
                                 button(label, move |p: &mut TreePage, _| preview(p, member, edge))
                                     .attr("data-forme-preview", format!("{edge:?}").to_lowercase())
+                                    .attr(
+                                        "data-forme-control",
+                                        json!([node.url(), format!("{edge:?}").to_lowercase()])
+                                            .to_string(),
+                                    )
                                     .attr("aria-label", format!("{label}: {title}")),
                             ));
                         }

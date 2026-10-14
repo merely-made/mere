@@ -41,6 +41,7 @@ const ON_WHEEL_ID: ViewId = ViewId::new(0x5748_4C45);
 #[derive(Clone, Debug)]
 pub struct WheelEvent {
     pub delta: (f32, f32),
+    pub modifiers: crate::Modifiers,
     pub local: (f32, f32),
     pub size: (f32, f32),
     /// Clone-through cancellation state. A wheel handler calls
@@ -53,10 +54,16 @@ impl WheelEvent {
     pub fn new(delta: (f32, f32), local: (f32, f32), size: (f32, f32)) -> Self {
         Self {
             delta,
+            modifiers: crate::Modifiers::default(),
             local,
             size,
             prop: Propagation::new(),
         }
+    }
+
+    pub fn with_modifiers(mut self, modifiers: crate::Modifiers) -> Self {
+        self.modifiers = modifiers;
+        self
     }
 
     pub fn prevent_default(&self) {

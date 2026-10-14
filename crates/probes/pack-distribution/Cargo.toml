@@ -6,6 +6,7 @@
 # LAN-pair run over real interfaces is the remaining headed step.
 # Standalone (crates/probes is excluded from the mere workspace).
 [package]
+rust-version = "1.97.1"
 name = "pack-distribution"
 version = "0.0.1"
 edition = "2024"
@@ -14,7 +15,7 @@ publish = false
 
 [dependencies]
 eidetic = { path = "../../eidetic/eidetic-core" }
-identity = { package = "personae", git = "https://github.com/merely-made/dramatis.git", rev = "c1d620764315b4c750fcffea30b8c898b8bb73bc" }
+identity = { package = "personae", git = "https://github.com/merely-made/dramatis.git", rev = "0234e7eea6f2ddf2330a71b9425da01b06ae0391" }
 # The radio family merged into one workspace on 2026-07-23; both crates now live
 # under retinue/crates/. Probes stay on local paths by design (they are excluded
 # from the mere workspace and never published) and adapt to upstream layout.

@@ -8,6 +8,7 @@
 # Standalone (crates/probes is excluded from the mere workspace) and carries its
 # own Cargo.lock. Run with `run.ps1`.
 [package]
+rust-version = "1.97.1"
 name = "mesh-lexical-wasm"
 version = "0.0.1"
 edition = "2024"

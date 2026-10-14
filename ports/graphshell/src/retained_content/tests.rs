@@ -469,3 +469,127 @@ fn verified_voice_controls_emit_host_play_and_stop_requests() {
         }
     });
 }
+
+#[test]
+fn content_view_cancel_with_auxiliary_button_retires_actual_genet_press_before_release() {
+    use cambium::{AnyView, GenetAppRunner, GenetCtx, GenetElement};
+    use cambium_rootstock::{
+        Host, HostHooks, HostOptions, HostState, HostTree as _, HostWake, ScriptedDom, WindowDom,
+    };
+    use std::sync::Arc;
+    struct State(Rc<RefCell<ContentSlot>>, Rc<Cell<u32>>);
+    type Child = Box<dyn AnyView<State, (), GenetCtx, GenetElement>>;
+    type Logic = fn(&State) -> Child;
+    fn view(state: &State) -> Child {
+        let clicks = state.1.clone();
+        Box::new(cambium::on_click(
+            cambium::el(
+                "div",
+                content_view::<State, ()>(73, state.0.clone(), 400, 217),
+            ),
+            move |_: &mut State, _| clicks.set(clicks.get() + 1),
+        ))
+    }
+    let mut content = ContentHost::default();
+    let member = Uuid::new_v4();
+    let slot = content
+        .open(
+            member,
+            HeldContent {
+                address: "https://held.example/layout".into(),
+                title: "Layout".into(),
+                media_type: "text/html".into(),
+                bytes: b"<a href='/target'>Target</a>".to_vec(),
+                engine: None,
+                media: None,
+            },
+        )
+        .unwrap();
+    content.show_only(&[member]);
+    let mut state = HostState::<State, Logic, Child>::new();
+    let parent_clicks = Rc::new(Cell::new(0));
+    state.runner = Some(GenetAppRunner::new(
+        Rc::new(RefCell::new(ScriptedDom::new())),
+        view as Logic,
+        State(slot.clone(), parent_clicks.clone()),
+    ));
+    let wake = HostWake::new(state.wake_pending.clone(), Arc::new(|| {}));
+    let mut host = Host::new(
+        HostOptions::default(),
+        None,
+        HostHooks::inert(),
+        state,
+        wake,
+    );
+    host.set_surface_size(400., 300.);
+    host.relayout(400., 300.);
+    let bounds = {
+        let runner = host.s.runner.as_ref().unwrap();
+        let dom = runner.dom();
+        let dom = dom.borrow();
+        let dom = WindowDom::new(&dom, runner.mount());
+        let projection =
+            cambium_rootstock::document_projection(&dom, host.s.layout.as_ref().unwrap(), None);
+        let node = projection
+            .nodes()
+            .iter()
+            .find(|node| node.name.as_deref() == Some("Retained document Layout"))
+            .unwrap();
+        node.bounds.unwrap()
+    };
+    assert_eq!((bounds.width, bounds.height), (400., 217.));
+    slot.borrow_mut().frame(400., 217., 1.).unwrap();
+    let point = {
+        let slot = slot.borrow();
+        let document = slot.content.document().unwrap();
+        let projection = document.accessibility_projection().unwrap();
+        let target = projection
+            .nodes()
+            .iter()
+            .find(|node| node.actions.contains(&inker::DocumentA11yAction::Click))
+            .unwrap();
+        document
+            .accessibility_click_target(target.id)
+            .unwrap()
+            .point
+    };
+    host.pointer_moved(bounds.x + point.x, bounds.y + point.y);
+    host.click();
+    assert!(host.s.runner.as_ref().unwrap().pointer_capture().is_some());
+    assert!(slot.borrow_mut().take_effects().iter().all(|effect| effect.navigation.is_none()));
+    {
+        let runner = host.s.runner.as_mut().unwrap();
+        runner.dispatch_pointer_cancel(
+            cambium::PointerEvent::new(
+                cambium::PointerPhase::Cancel,
+                (point.x, point.y),
+                (400., 217.),
+            )
+            .with_button(cambium::PointerButton::Auxiliary),
+        );
+        assert!(runner.pointer_capture().is_none());
+    }
+    host.release();
+    // A late document-level release must also find the actual Genet press
+    // retired. Runner capture retirement alone cannot establish this fence.
+    slot.borrow_mut().input(SessionInput::PointerButton {
+        x: point.x,
+        y: point.y,
+        button: SessionPointerButton::Primary,
+        state: SessionButtonState::Released,
+        modifiers: SessionModifiers::default(),
+    });
+    assert!(slot.borrow_mut().take_effects().iter().all(|effect| effect.navigation.is_none()),
+        "cancelled content must not emit navigation on a later release");
+    assert_eq!(parent_clicks.get(), 0, "content cancellation does not activate its parent");
+    host.pointer_moved(bounds.x + point.x, bounds.y + point.y);
+    host.click();
+    host.release();
+    assert_eq!(parent_clicks.get(), 0, "content owns the tile-body click");
+    assert!(slot.borrow_mut().take_effects().iter().any(|effect| {
+        effect
+            .navigation
+            .as_ref()
+            .is_some_and(|navigation| navigation.request.address == "https://held.example/target")
+    }));
+}

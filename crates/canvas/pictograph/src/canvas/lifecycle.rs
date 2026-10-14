@@ -633,6 +633,33 @@ impl Canvas {
         true
     }
 
+    /// Install returned owner data when its physical topology is unchanged.
+    /// Refuse additions, removals or changed projected relations before mutation;
+    /// the caller uses structural ingest for those. Like recorded metadata
+    /// refresh, this rebuilds derived data without restarting the settled layout.
+    pub fn refresh_same_topology_graph(&mut self, source: &Graph) -> Result<(), String> {
+        if self.graph.node_count() != source.node_count()
+            || self.graph.nodes().any(|(key, node)| {
+                source.get_node(key).is_none_or(|next| next.id != node.id)
+            })
+        {
+            return Err("owner metadata changes the canvas node topology".into());
+        }
+        let relations = |graph: &Graph| {
+            let mut counts = std::collections::HashMap::new();
+            for (key, relation) in graph.projected_relations() {
+                *counts.entry((key, relation)).or_insert(0usize) += 1;
+            }
+            counts
+        };
+        if relations(&self.graph) != relations(source) {
+            return Err("owner metadata changes the canvas relation topology".into());
+        }
+        self.graph = source.clone();
+        self.reconcile_derived();
+        Ok(())
+    }
+
     /// Refresh runtime cache and known coverage independently of geometry.
     pub fn refresh_semantic_context(&mut self, source: &Graph) {
         self.graph.copy_semantic_context_from(source);

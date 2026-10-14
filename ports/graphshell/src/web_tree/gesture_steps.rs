@@ -29,7 +29,7 @@ const SECOND_FINGER: i32 = 802;
 fn canvas() -> Option<Element> {
     web_sys::window()?
         .document()?
-        .get_element_by_id("graphshell-canvas")
+        .get_element_by_id("gs-graphshell-canvas")
 }
 
 /// A graph-local point in client px.

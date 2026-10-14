@@ -38,11 +38,32 @@ renewed. Renderer and directly recorded hosted-viewer inputs are unchanged;
 the headed receipts retain their exact `8b8bd92b1` source and tested bundle.
 The post-Dramatis bundle is compile-checked, with no new GPU run after slot
 release.
+
+**Historical coordinated retained checkpoint (2026-10-10):** the local five-page tree
+cutover is being reconciled with exact upstream `b726955ed`. Shared Fold,
+history, gestures and Forme remain part of the combined page. Existing upstream
+receipts below qualify their recorded sources, not this merge. The frozen local
+attempt-3 bundle passed Find, Detail, Projection, Practice and History controls;
+Scene remains an actual behavioral failure, and its passive diagnostic stopped
+at setup before owner status was captured. Complete current-source live scenario
+parity and legacy retirement remain open. The user authorized finishing this
+cutover alongside the Turnstone accessibility and Pelt pool/input lanes.
+The merged inventory retains the original 132 records and adds seven upstream
+scenarios: 139 source scripts, provisionally 137 live and two historical presenter
+comparisons. New dynamics and Forme DOM syntax is mapped to retained controls
+with original source hashes and per-line custody. These counts and translations
+are preparation, not a fresh parser, build or headed qualification result.
+
 **First site presenter (2026-10-12):** the stable-face adjacent inspector,
 Fold-preserved selection and direct graph commands/gestures are hardware-qualified
 at `a1cb156f8`, with all nineteen combined product rows passing. Shared-main
 publication landed at `007a4de6b`; live-site delivery and complete phase 4
 remain open. The detailed source bases are below.
+
+**Current reconciliation (2026-10-13):** both recorded source histories are
+preserved in the merge of the local retained-owner work with `a454842ff`.
+The counts and receipts above describe their original checkpoints. Fresh
+current-source build and headed qualification remain pending for this union.
 **Scope:** Graphshell's browser page becomes one retained Cambium tree. Its
 HTML controls become Cambium components, its display-only Cambium chrome
 joins them, pictograph's canvas renders into the tree as a texture producer,
@@ -2036,6 +2057,22 @@ before publication; exploratory measurements do not transfer acceptance.
   Graphshell web build is claimed. Genet's wider gate retains three failures
   reproduced on its untouched base (two float cases and one table-glyph case);
   consumer checks do not establish a wholly green upstream suite.
+
+- 2026-10-09: full cutover resumed with explicit parallel source ownership and
+  one low-priority build queue in the existing cache. The current scenario
+  inventory reconciles 119 original scripts and 16 archived names to four
+  byte-identical imported scripts, with two historical presenter-only scripts
+  separated from live acceptance. New tests cover the remaining retained
+  detail, find, projection, scene and practice controls. Reopen scenarios keep
+  their same-origin persistence prerequisites rather than using empty profiles.
+  Initial detail-action RED exposes only its missing typed owner API; the
+  implemented owner passes eight native tests, including saved facet/relation
+  reopening and refused-write retry. Corrected canvas-cancel RED reaches six
+  missing-method references, and saved-scene RED reaches its missing owner
+  module. Their implementations still await GREEN. These bounded tests do not
+  close the Wasm, five-page, live-inventory or performance gates.
+
+- 2026-10-09 continued: canvas cancellation passes its two native regressions. Projection-owner RED reaches only the missing module; scene GREEN awaits a corrected typed diagnostic formatter and repeat. The standalone full web development graph resolves 683 packages with no selected Mere/Genet git duplicates. The live inventory is 126 scripts plus two historical comparisons; intentional negative diagnostics retain explicit source-bound expected predicates rather than being silently removed or counted as acceptance passes. Fresh Wasm, all five public pages and the complete live receipt wall remain open.
 
 ## Native retained-content continuation — 2026-10-13
 

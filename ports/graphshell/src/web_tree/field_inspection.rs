@@ -119,6 +119,10 @@ pub(super) fn pointer(page: &mut TreePage, event: &PointerEvent) -> bool {
         return false;
     }
     match event.phase {
+        PointerPhase::Cancel => {
+            pane.pressed = false;
+            pane.picking = false;
+        },
         PointerPhase::Down if pane.picking => {
             pane.pressed = true;
             let (x, y) = page.shared.canvas.borrow().world_point_at(event.local);

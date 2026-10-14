@@ -123,6 +123,14 @@ fn catalog(page: &TreePage) -> CommandSet {
 }
 
 pub(super) fn open(page: &mut TreePage, request: Request) {
+    // A local Product owns its pending operation and its command menu.
+    if page
+        .product
+        .as_ref()
+        .is_some_and(|product| product.selection_locked())
+    {
+        return;
+    }
     if (page.shared.selection_locked.get() || page.shared.remote_shown.get())
         && matches!(
             &request,
@@ -135,6 +143,7 @@ pub(super) fn open(page: &mut TreePage, request: Request) {
         let canvas = page.shared.canvas.borrow();
         page.picked = canvas.focused_url().map(str::to_owned);
         if let Some(product) = &mut page.product {
+            product.close_menu();
             product.select(canvas.selected_members().first().copied());
         }
         page.commands.open = None;
@@ -142,6 +151,18 @@ pub(super) fn open(page: &mut TreePage, request: Request) {
         page.shared.dirty.set(true);
         return;
     };
+    if let Some(product) = &mut page.product {
+        // DOM secondary capture and keyboard invocation use the same persisted
+        // local command owner as retained HostPointer delivery.
+        page.commands.open = None;
+        let mut canvas = page.shared.canvas.borrow_mut();
+        product.open_menu(mere::canvas::ContextRequest { at, node }, &mut canvas);
+        page.picked = canvas.focused_url().map(str::to_owned);
+        product.select(canvas.selected_members().first().copied());
+        page.commands.focus_graph = false;
+        page.shared.dirty.set(true);
+        return;
+    }
     if let Some(node) = node {
         let mut canvas = page.shared.canvas.borrow_mut();
         // Opening on an already-selected member retains a multi-selection.
@@ -178,6 +199,9 @@ pub(super) fn open_keyboard(page: &mut TreePage) {
 }
 
 pub(super) fn close(page: &mut TreePage) {
+    if let Some(product) = &mut page.product {
+        product.close_menu();
+    }
     page.commands.open = None;
     page.commands.focus_graph = true;
     page.shared.dirty.set(true);

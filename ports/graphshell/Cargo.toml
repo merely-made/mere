@@ -1,4 +1,5 @@
 [package]
+rust-version = "1.97.1"
 name = "graphshell"
 version = "0.0.2"
 edition.workspace = true
@@ -17,6 +18,10 @@ required-features = ["web"]
 
 [[test]]
 name = "moot_resources"
+required-features = ["moot-resources"]
+
+[[test]]
+name = "moot_resources_reopen"
 required-features = ["moot-resources"]
 
 [features]
