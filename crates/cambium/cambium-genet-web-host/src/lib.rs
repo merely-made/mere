@@ -40,6 +40,8 @@
 //! ```
 
 pub mod mirror;
+#[cfg(feature = "webgl")]
+pub mod portable;
 
 /// DOM delta modes are pixels (0), lines (1) and pages (2). Preserve the
 /// DOM sign while resolving units into the host's logical scroll pixels.
