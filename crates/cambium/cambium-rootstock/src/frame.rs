@@ -20,12 +20,11 @@ use cambium::PointerClick;
 use genet_render::VisualCaret;
 use genet_scripted_dom::NodeId;
 use layout_dom_api::{DomMutation, LayoutDom as _};
-use netrender::{ColorLoad, ExternalTexturePlacement};
-use paint_list_api::{DeviceIntSize, PaintEnvelope, PaintList as _};
+use paint_list_api::{DeviceIntSize, PaintEnvelope};
 
 use crate::input::to_visual_caret;
 use crate::meristem_bounds::RootView;
-use crate::{AppCtx, FrameProfile, Host};
+use crate::{AppCtx, Host};
 
 fn elapsed_us(elapsed: crate::Duration) -> u64 {
     elapsed.as_micros().min(u64::MAX as u128) as u64
@@ -33,7 +32,7 @@ fn elapsed_us(elapsed: crate::Duration) -> u64 {
 
 /// Opt-in startup attribution, including attempts that never present. Stores
 /// only CPU timing and host identity; it does not retain render resources.
-struct FrameTrace {
+pub(crate) struct FrameTrace {
     started: crate::Instant,
     host: u64,
     last_presented: u64,
@@ -52,7 +51,7 @@ impl FrameTrace {
         })
     }
 
-    fn mark(&self, phase: &str, detail: std::fmt::Arguments<'_>) {
+    pub(crate) fn mark(&self, phase: &str, detail: std::fmt::Arguments<'_>) {
         eprintln!(
             "[cambium-frame] host={} last-presented={} elapsed={}us phase={phase} {detail}",
             self.host,
@@ -94,11 +93,6 @@ impl SpriggingSource<'_> {
 /// The focused text field's paint inputs for this frame: which node, where the
 /// caret is, and the selection byte range when one should be drawn.
 type FocusedOverlay = (NodeId, VisualCaret, Option<(usize, usize)>);
-
-type EmittedScene = (
-    paint_list_render::TranslatedDisplayList,
-    Option<PaintEnvelope>,
-);
 
 impl<State, Logic, V, T> Host<State, Logic, V, T>
 where
@@ -339,7 +333,7 @@ where
     /// carrying `DrawExternalTexture` or `DrawShadow` keeps the inline path,
     /// because composite textures and blurred shadow masks are rebuilt per
     /// frame by the host painter and cannot be retained in a lowering.
-    fn sync_leaf_fragments(&mut self) {
+    pub(crate) fn sync_leaf_fragments(&mut self) {
         use paint_list_api::PaintCmd;
 
         let Some(surface) = self.s.surface.as_ref() else {
@@ -451,7 +445,7 @@ where
 
     /// Tell the platform IME where the caret is, so a candidate window opens
     /// beside the text rather than at the window origin.
-    fn sync_ime_area(&self) {
+    pub(crate) fn sync_ime_area(&self) {
         let (Some(window), Some(layout), Some(runner)) = (
             self.s.window.as_ref(),
             self.s.layout.as_ref(),
@@ -486,7 +480,7 @@ where
     /// Emit this frame's paint list with selection and caret inside the text
     /// field's CSS paint context, then any active overlay scrollbars, and
     /// lower it to a netrender scene plus the GPU resources that scene names.
-    fn emit_paint_list(
+    pub(crate) fn emit_paint_list(
         &mut self,
         lw: f32,
         lh: f32,
@@ -529,6 +523,13 @@ where
     pub fn capture_portable(
         &mut self,
     ) -> Result<crate::PortablePaintCapture, crate::PortableCaptureError> {
+        self.capture_portable_for(crate::ProducerFramePurpose::Export)
+    }
+
+    pub(crate) fn capture_portable_for(
+        &mut self,
+        purpose: crate::ProducerFramePurpose,
+    ) -> Result<crate::PortablePaintCapture, crate::PortableCaptureError> {
         use crate::PortableCaptureError;
         let scale = self.layout_scale() as f32;
         let plan = {
@@ -547,11 +548,13 @@ where
             let view = crate::WindowDom::new(&dom, runner.mount());
             let shared = &mut self.s.shared;
             let held = &shared.held_elsewhere;
-            shared
-                .producers
-                .plan_portable(layout, &view, scale, &|key, owner| {
-                    held.contains(&key) || owner.is_some_and(|node| view.elsewhere(node))
-                })?
+            shared.producers.plan_portable_for(
+                layout,
+                &view,
+                scale,
+                &|key, owner| held.contains(&key) || owner.is_some_and(|node| view.elsewhere(node)),
+                purpose,
+            )?
         };
         let (width, height) = self.s.layout_size;
         let list = self
@@ -561,22 +564,6 @@ where
             .shared
             .producers
             .admit_portable(plan, PaintEnvelope::from_list(&list))
-    }
-
-    fn emit_scene(&mut self, lw: f32, lh: f32) -> Option<EmittedScene> {
-        let list = self.emit_paint_list(lw, lh, None)?;
-        let paint_capture = self
-            .s
-            .pending_paint_capture
-            .as_ref()
-            .map(|_| PaintEnvelope::from_list(&list));
-        let translated = paint_list_render::translate_paint_cmd_stream(
-            list.viewport(),
-            list.commands(),
-            list.fonts(),
-            list.images(),
-        );
-        Some((translated, paint_capture))
     }
 
     pub fn redraw(&mut self) {
@@ -589,275 +576,47 @@ where
             };
         }
         trace!("begin", "");
-        self.s.last_redraw_presentation = None;
-        self.s.last_raster_failure = None;
-        if !matches!(
-            self.poll_device_recovery(),
-            genet_render_host::RecoveryStatus::Ready { .. }
-        ) {
-            trace!("recovery-not-ready", "");
-            return;
-        }
-        if self
-            .s
-            .surface
-            .as_ref()
-            .is_some_and(|surface| surface.core().device_failure().is_some())
-        {
-            trace!("surface-device-lost", "");
-            self.poll_device_recovery();
-            return;
-        }
-        trace!("files-begin", "");
-        self.deliver_files();
-        trace!("files-end", "");
-        let frame_started = crate::Instant::now();
-        let mut profile = FrameProfile::default();
-        // The application's frame hook first: animation drives, leaf syncs,
-        // backend polls. Its return keeps frames coming.
-        let phase = crate::Instant::now();
-        trace!("frame-hook-begin", "");
-        let animating = self.prepare_frame();
-        trace!("frame-hook-end", "animating={animating}");
-        profile.frame_hook_us = elapsed_us(phase.elapsed());
-        // One scale for the whole frame: device times zoom. Layout runs at
-        // `physical / layout_scale` and the rasterizer composes that scene
-        // under the same factor, so a zoomed frame is laid out at its new size
-        // and drawn from outlines at full device resolution — not a smaller
-        // frame resampled upward.
-        let layout_scale = self.layout_scale() as f32;
-        let target_size = self.s.window.as_ref().map(|window| {
-            let size = window.inner_size();
-            (size.0.max(1), size.1.max(1), layout_scale)
-        });
-        let (Some((pw, ph, scale)), true) = (target_size, self.s.surface.is_some()) else {
-            trace!("no-window-or-surface", "");
-            // No window, or suspended with the surface taken away: there is
-            // nothing to present. The layout still advances, so a resume
-            // repaints current state rather than a stale one.
-            let (lw, lh) = self.logical_size();
-            self.suspend_producers();
-            let phase = crate::Instant::now();
-            self.relayout(lw, lh);
-            profile.relayout_us = elapsed_us(phase.elapsed());
-            profile.total_us = elapsed_us(frame_started.elapsed());
-            self.s.last_frame_profile = Some(profile);
-            return;
-        };
-        let (lw, lh) = (pw as f32 / scale, ph as f32 / scale);
-
-        let phase = crate::Instant::now();
-        trace!("layout-begin", "physical={pw}x{ph} scale={scale}");
-        let anim_active = self.relayout(lw, lh);
-        trace!("layout-end", "");
-        profile.relayout_us = elapsed_us(phase.elapsed());
-        profile.layout_update_us = self.s.last_layout_update_us;
-        profile.layout_tick_us = self.s.last_layout_tick_us;
-        profile.layout_apply_us = self.s.last_layout_apply_us;
-        profile.layout_rebuild_us = self.s.last_layout_rebuild_us;
-        profile.style_resolve_us = self.s.last_style_resolve_us;
-        profile.layout_with_text_us = self.s.last_layout_with_text_us;
-        profile.content_extent_us = self.s.last_content_extent_us;
-        profile.layout_mutations = self.s.last_layout_mutations;
-        profile.layout_rebuilt = self.s.last_layout_rebuilt;
-        profile.leaf_boxes_us = self.s.last_leaf_boxes_us;
-        profile.leaf_render_us = self.s.last_leaf_render_us;
-        profile.leaf_repaints = self.s.last_leaf_repaints;
-        trace!("producers-begin", "");
-        profile.producers = self.prepare_producers(scale);
-        trace!("producers-end", "");
-        if let Some(refusal) = self.s.shared.producers.render_failure().cloned() {
-            trace!("producer-refused", "{}", refusal.failure);
-            self.refuse_rasterization(refusal.failure, Some(refusal.source_key));
-            return;
-        }
-        let phase = crate::Instant::now();
-        trace!("leaf-fragments-begin", "");
-        self.sync_leaf_fragments();
-        trace!("leaf-fragments-end", "");
-        profile.leaf_fragments_us = elapsed_us(phase.elapsed());
-        let phase = crate::Instant::now();
-        self.sync_ime_area();
-        profile.ime_us = elapsed_us(phase.elapsed());
-        let phase = crate::Instant::now();
-        trace!("scene-begin", "");
-        let Some((translated, paint_capture)) = self.emit_scene(lw, lh) else {
-            trace!("scene-missing", "");
-            profile.emit_scene_us = elapsed_us(phase.elapsed());
-            profile.total_us = elapsed_us(frame_started.elapsed());
-            self.s.last_frame_profile = Some(profile);
-            return;
-        };
-        profile.emit_scene_us = elapsed_us(phase.elapsed());
-        trace!("scene-emitted", "");
-
-        let Some(surface) = self.s.surface.as_ref() else {
-            profile.total_us = elapsed_us(frame_started.elapsed());
-            self.s.last_frame_profile = Some(profile);
-            return;
-        };
-        // Blurred shadows lower to image ops backed by per-frame GPU masks.
-        // Keeping only `translated.scene` drops those masks and leaves the
-        // image keys unresolved, which makes every blurred CSS box-shadow
-        // disappear in this host even though the paint list is correct.
-        let phase = crate::Instant::now();
-        trace!("shadows-begin", "");
-        for mask in &translated.box_shadow_masks {
-            surface.renderer().build_box_shadow_mask(
-                mask.key,
-                mask.dim,
-                mask.bounds,
-                mask.corner_radius,
-                mask.blur_radius_px,
-                mask.invert,
-            );
-        }
-        profile.shadows_us = elapsed_us(phase.elapsed());
-        trace!("shadows-end", "");
-        let scene = &translated.scene;
-        let clear = if self.options.app_frame_is_transparent() {
-            wgpu::Color::TRANSPARENT
-        } else {
-            wgpu::Color::BLACK
-        };
-        let phase = crate::Instant::now();
-        // Keyed by this host: several windows rasterize through one core, and
-        // an unkeyed raster diffs against whichever surface drew last (F17).
-        trace!("raster-begin", "");
-        let raster = surface.core().try_rasterize_scaled_for(
-            self.s.presentation_host,
-            scene,
-            pw,
-            ph,
-            ColorLoad::Clear(clear),
-            scale,
-        );
-        let (_tex, view) = match raster {
-            Ok(output) => output,
+        let prepared = match self.prepare_presentation_frame() {
+            Ok(Some(frame)) => frame,
+            Ok(None) => return,
             Err(failure) => {
-                trace!("raster-refused", "{failure}");
-                self.refuse_rasterization(failure, None);
+                self.refuse_presentation(failure);
                 return;
             },
         };
-        trace!("raster-end", "");
-        profile.raster_us = elapsed_us(phase.elapsed());
-        if let Some(timings) = surface.renderer().last_frame_timings() {
-            let span = |name: &str| timings.span(name).map(elapsed_us).unwrap_or_default();
-            profile.raster_total_us = elapsed_us(timings.total);
-            profile.tile_invalidate_us = span("tile_invalidate");
-            profile.dirty_tile_rebuild_us = span("dirty_tile_rebuild");
-            profile.master_compose_us = span("master_compose");
-            profile.vello_render_us = span("vello_render");
-        }
-        profile.dirty_tiles = surface
-            .renderer()
-            .vello_last_dirty_count()
-            .unwrap_or_default() as u64;
-        let phase = crate::Instant::now();
-        trace!("acquire-begin", "");
-        let frame = match surface.acquire_status() {
-            genet_render_host::SurfaceAcquire::Frame(frame) => frame,
-            genet_render_host::SurfaceAcquire::DeviceLost(_) => {
-                trace!("acquire-device-lost", "");
-                // Release this frame's old-device resources before the host
-                // acknowledges detachment and can open the replacement factory.
-                drop(view);
-                drop(_tex);
-                self.poll_device_recovery();
-                return;
-            },
-            genet_render_host::SurfaceAcquire::SurfaceLost => {
-                trace!("acquire-surface-lost", "");
-                self.s.surface = None;
-                self.s.needs_recovery_surface = true;
-                if let Some(window) = &self.s.window {
-                    window.request_redraw();
-                }
-                return;
-            },
-            genet_render_host::SurfaceAcquire::Unavailable { reason } => {
-                trace!("acquire-unavailable", "{reason}");
-                profile.acquire_us = elapsed_us(phase.elapsed());
+        let frame_started = prepared.started;
+        let mut profile = prepared.profile;
+        let (pw, ph) = (prepared.width, prepared.height);
+        let Some(surface) = self.s.surface.as_deref() else {
+            return;
+        };
+        let output = crate::presentation::wgpu::WgpuPresentation::new(surface).present(
+            &prepared,
+            &mut profile,
+            trace.as_ref(),
+        );
+        let output = match output {
+            Ok(Some(output)) => output,
+            Ok(None) => {
                 profile.total_us = elapsed_us(frame_started.elapsed());
                 self.s.last_frame_profile = Some(profile);
                 return;
             },
+            Err(failure) => {
+                self.refuse_presentation(failure);
+                return;
+            },
         };
-        trace!("acquire-end", "");
-        profile.acquire_us = elapsed_us(phase.elapsed());
-        let target = frame
-            .texture
-            .create_view(&wgpu::TextureViewDescriptor::default());
-        // The composition pass blends and therefore loads its target. Clear a
-        // fresh swapchain texture first so transparent app-frame margins do
-        // not preserve undefined pixels from the compositor-owned image.
-        let phase = crate::Instant::now();
-        let mut encoder =
-            surface
-                .device()
-                .create_command_encoder(&wgpu::CommandEncoderDescriptor {
-                    label: Some("cambium surface clear"),
-                });
-        {
-            let _pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-                label: Some("cambium surface clear pass"),
-                color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-                    view: &target,
-                    depth_slice: None,
-                    resolve_target: None,
-                    ops: wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(clear),
-                        store: wgpu::StoreOp::Store,
-                    },
-                })],
-                depth_stencil_attachment: None,
-                timestamp_writes: None,
-                occlusion_query_set: None,
-                multiview_mask: None,
-            });
-        }
-        surface.queue().submit([encoder.finish()]);
-        profile.clear_us = elapsed_us(phase.elapsed());
-        let phase = crate::Instant::now();
-        surface.renderer().compose_external_texture(
-            &view,
-            &target,
-            surface.format(),
-            pw,
-            ph,
-            ExternalTexturePlacement::new([0.0, 0.0, pw as f32, ph as f32]),
-        );
-        trace!("compose-end", "");
-        profile.compose_us = elapsed_us(phase.elapsed());
-        if surface.core().device_failure().is_some() {
-            trace!("compose-device-lost", "");
-            drop(frame);
-            drop(target);
-            drop(view);
-            drop(_tex);
-            self.poll_device_recovery();
-            return;
-        }
-        // wgpu 30 moved presentation from SurfaceTexture to Queue.
-        let phase = crate::Instant::now();
-        trace!("present-begin", "");
-        surface.queue().present(frame);
-        trace!("present-end", "");
-        profile.present_us = elapsed_us(phase.elapsed());
-        let Some(sequence) = self.s.presentation_sequence.checked_add(1) else {
-            eprintln!("[cambium-host] presentation sequence exhausted");
-            return;
+        let crate::presentation::wgpu::WgpuOutput { _texture, view } = output;
+        let paint_capture = match &prepared.paint {
+            crate::PreparedPaint::Native(envelope) if self.s.pending_paint_capture.is_some() => {
+                Some(envelope.clone())
+            },
+            _ => None,
         };
-        self.s.presentation_sequence = sequence;
-        let presented = crate::PresentedFrame {
-            context_generation: crate::ContextGeneration(surface.core().generation()),
-            host: self.s.presentation_host,
-            sequence,
-            width: pw,
-            height: ph,
-            layout_scale: scale,
-        };
+        let presented = prepared.presentation_stamp();
+        self.s.presentation_sequence = presented.sequence;
+        let sequence = presented.sequence;
         self.s.last_redraw_presentation = Some(presented);
         trace!("presentation-recorded", "sequence={sequence}");
         // Freeze product state before any capture callback, queued pointer
@@ -888,7 +647,7 @@ where
             }));
         }
         profile.capture_us = elapsed_us(phase.elapsed());
-        if (animating || anim_active)
+        if prepared.animating
             && let Some(window) = self.s.window.as_ref()
         {
             window.request_redraw();
