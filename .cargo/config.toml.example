@@ -124,7 +124,7 @@ layout-dom-api = { path = "../genet/components/shared/layout-dom" }
 # Every entry below is live: signalman consumes this whole family from the
 # neighbouring Retinue checkout. They read as unused in any ordinary workspace
 # build because signalman sits outside the workspace.
-[patch."https://github.com/merely-made/retinue.git"]
+[patch."https://github.com/merely-made/murm.git"]
 retinue = { path = "../retinue/crates/retinue" }
 postilion = { path = "../retinue/crates/postilion" }
 outrider = { path = "../retinue/crates/outrider" }

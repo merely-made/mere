@@ -6,7 +6,7 @@ Findings from a design session, filed 2026-08-09. How the moot layer composes
 with a high-latency, multi-transport substrate. Vocabulary follows
 [`TERMINOLOGY.md`](../../TERMINOLOGY.md). The transport-tier counterpart is
 retinue's
-[mesh scaling and asymmetric routing](../../../../retinue/design_docs/2026-08-09_mesh_scaling_and_asymmetric_routing.md);
+[mesh scaling and asymmetric routing](../../../../murm/design_docs/2026-08-09_mesh_scaling_and_asymmetric_routing.md);
 the two docs came from the same session and share the cost-metered-refusal
 pattern (Section 6 here, metering there). The
 [radio-scopes-as-moots note](2026-08-12_radio_scopes_as_moots.md) (ratified

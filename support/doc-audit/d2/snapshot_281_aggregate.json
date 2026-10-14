@@ -323,7 +323,7 @@
       "contradictions": [],
       "action": [],
       "notes": [
-        "The manifest's flagged path `apps/signalman-desktop` is a **false positive from resolving against mere**: it exists at `C:\\Users\\mark_\\Code\\repos\\retinue\\apps\\signalman-desktop`, exactly as the doc says (\"Signalman is retinue's application\"), alongside `apps/signalman` and `apps/linkboy`. The cited founding doc `repos/retinue/design_docs/2026-08-06_signalman_founding.md` also exists.",
+        "The manifest's flagged path `apps/signalman-desktop` is a **false positive from resolving against mere**: it exists at `C:\\Users\\mark_\\Code\\repos\\retinue\\apps\\signalman-desktop`, exactly as the doc says (\"Signalman is retinue's application\"), alongside `apps/signalman` and `apps/linkboy`. The cited founding doc `repos/murm/design_docs/2026-08-06_signalman_founding.md` also exists.",
         "All seven `mere_docs/` links resolve. The vocabulary the brief aligns to (personae, insigne, gaz, stickleback, source truth) all have live homes under `crates/dramatis/` and `crates/stickleback/`."
       ],
       "batch": 1
@@ -878,7 +878,7 @@
         "\"personae 0.1.0 is published\" (twice, \u00a7naming collapse and \u00a72) \u2014 evidence: root `Cargo.toml` `personae = { version = \"0.2.1\", path = \"crates/dramatis/personae\" }`; `crates/dramatis/personae/Cargo.toml:3` `version = \"0.2.1\"`.",
         "\"`persona/identity`\" as the donor path (\u00a72, \u00a75) \u2014 no such directory; the identity core is `crates/dramatis/personae/src/`.",
         "\"`session-runtime::wallet_store` (manifests, roster, grants)\" \u2014 now `crates/system/pandect/src/wallet_store/` and `wallet_grant/`.",
-        "\"`retinue` already scaffolded; own Reticulum impl, trigger-gated\" \u2014 retinue is a published, git-rev-pinned dependency in the root manifest (`retinue = { version = \"0.1.1\", git = \"https://github.com/merely-made/retinue.git\", rev = \"8cea8f9a\u2026\" }`) with its own multi-crate workspace; the \"scaffolded\" framing is two months out of date.",
+        "\"`retinue` already scaffolded; own Reticulum impl, trigger-gated\" \u2014 retinue is a published, git-rev-pinned dependency in the root manifest (`retinue = { version = \"0.1.1\", git = \"https://github.com/merely-made/murm.git\", rev = \"8cea8f9a\u2026\" }`) with its own multi-crate workspace; the \"scaffolded\" framing is two months out of date.",
         "S5 done-condition \"meerkat runs on the trust plane with no behavior change\" \u2014 unmeetable; meerkat was decomposed. This is the identical defect the substrate plan's own 2026-08-08 audit named for G5, and it was never propagated here.",
         "S0 (\"personae skeleton \u2026 carry manifests, device roster, grant vocabulary, epoch-history types\") is listed as pending; `crates/dramatis/personae/src/carry/` ships all four (`carry/mod.rs` holds `DeviceRoster`, `CarriagePolicy`, `is_persona_scoped_action`; `carry/grant/` holds the certificate).",
         "S1 (\"the seal joint\") is listed as pending; `PayloadSealer` is exported from `crates/eidetic/eidetic-core/src/lib.rs:103` and implemented by personae (`carry/mod.rs:15`) and `pandect::engram_seal`."
@@ -1074,7 +1074,7 @@
         "`LeasedEpochRecord` (the proposed wrapper) never shipped under that name \u2014 evidence: `grep -rl \"LeasedEpochRecord\"` \u2192 no matches. The landed shape is `CarriageExt` (header extension) + `HeldLease`.",
         "\"`src/bin/h7_sync_peer.rs` is a **411-line** serve/connect binary\" \u2014 `wc -l ports/graphshell/src/bin/h7_sync_peer.rs` \u2192 **417**. (The path itself is real; the mechanical pass flagged it only because it is crate-relative.)",
         "\u00a7\"Done conditions\" is unannotated while the lane-grammar doc records each one demonstrated against a named test.",
-        "Style: `../../../../retinue/design_docs/2026-08-10_listener_executive_and_protocol_leases.md` is a cross-repo relative link (it resolves \u2014 the file exists in `Code/repos/retinue` \u2014 but DOC_POLICY \u00a75 asks for a qualified path)."
+        "Style: `../../../../murm/design_docs/2026-08-10_listener_executive_and_protocol_leases.md` is a cross-repo relative link (it resolves \u2014 the file exists in `Code/repos/retinue` \u2014 but DOC_POLICY \u00a75 asks for a qualified path)."
       ],
       "contradictions": [],
       "action": [
@@ -3066,7 +3066,7 @@
       "unverifiable": 2,
       "stale_claims": [
         "**The Goal.** \"using the Beechat Rust port [`reticulum`](https://crates.io/crates/reticulum) v0.1.0\" \u2014 superseded at the pin: `crates/murm/transport/Cargo.toml:17` reads `reticulum = [\"dep:retinue\", \"dep:hkdf\", \"dep:sha2\"]`, with the comment at `:15-16` \"Backed by `retinue`, Mark's own RNS implementation\".",
-        "\"`reticulum = \"0.1\"` added to workspace root `[workspace.dependencies]`\" (2026-06-29 Progress) \u2014 gone; the root now carries `Cargo.toml:427` `retinue = { version = \"0.1.1\", git = \"https://github.com/merely-made/retinue.git\", rev = \"8cea8f9a12469947ac8d2756c1c32ec24fbb6dea\" }`, prefaced by \"it replaces the stale Beechat `reticulum` 0.1 crate, which could not parse ratcheted announces from real RNS\".",
+        "\"`reticulum = \"0.1\"` added to workspace root `[workspace.dependencies]`\" (2026-06-29 Progress) \u2014 gone; the root now carries `Cargo.toml:427` `retinue = { version = \"0.1.1\", git = \"https://github.com/merely-made/murm.git\", rev = \"8cea8f9a12469947ac8d2756c1c32ec24fbb6dea\" }`, prefaced by \"it replaces the stale Beechat `reticulum` 0.1 crate, which could not parse ratcheted announces from real RNS\".",
         "The whole \"### From source reading (`reticulum` v0.1.0)\" Findings block, and the 2026-07-01 \"API corrections vs the Findings above (real v0.1.0)\" list (`PrivateIdentity::new_from_hex_string`, `Transport::new` is sync, `send_to_out_links`/`send_to_in_links`, `as_name_hash_slice()`) \u2014 these describe a dependency the tree no longer uses.",
         "\"**protoc is genuinely required.** `reticulum`'s `build.rs` unconditionally runs `tonic-build` on the Kaonic gRPC proto\" and the matching Risks row \u2014 no `protoc` requirement survives; `crates/murm/transport/Cargo.toml` mentions none, and the root note at `Cargo.toml:429-431` says retinue \"owns the X25519/RNG work, so the probe no longer needs x25519-dalek or a separate rand source\".",
         "\"**`send_announce_now` fixed** by precomputing each ALPN's signed `app_data` once at bind\" \u2014 `git grep -n send_announce_now -- crates` \u2192 no match.",
@@ -3077,7 +3077,7 @@
         "Phase 3's first done-condition (\"`crates/murm/transport/README.md` documents the optional backend, the ALPN mapping, announce discovery, authenticated binding, and sync limitations\") is **already met** \u2014 `crates/murm/transport/README.md:35,57,83,108,116` do exactly that \u2014 but Phase 3 is still written as open."
       ],
       "action": [
-        "update-status (add the missing Status line: the Beechat probe was replaced by retinue; P0\u2013P2 landed; Phase 3's README half is done) + supersede-pointer (\u2192 `repos/retinue/design_docs/2026-07-06_retinue_v0_plan.md`, which the doc itself names).",
+        "update-status (add the missing Status line: the Beechat probe was replaced by retinue; P0\u2013P2 landed; Phase 3's README half is done) + supersede-pointer (\u2192 `repos/murm/design_docs/2026-07-06_retinue_v0_plan.md`, which the doc itself names).",
         "\"A new `ReticulumTransport` module implementing `Transport`\" and `ReticulumStream` \u2014 `crates/murm/transport/Cargo.toml`, `crates/murm/transport/README.md:35` lists `ReticulumTransport`, `ReticulumTransportBuilder`, `ReticulumInterface`, `ReticulumStream`.",
         "\"Split into a module dir (`reticulum_transport/{keys,announce,stream}.rs` + mod root)\" \u2014 exactly that: `crates/murm/transport/src/reticulum_transport.rs` plus `reticulum_transport/{announce,keys,stream,tests}.rs`.",
         "`derive_identity`, `destination_name_for_alpn`, `announce_listener`, `announce_sender`, `build_app_data` \u2014 all in `crates/murm/transport/src/reticulum_transport.rs`.",
@@ -3085,7 +3085,7 @@
         "\"Optional feature-gating so the dependency is default-off\" \u2014 `crates/murm/transport/Cargo.toml:17`, off by default.",
         "ALPN mapping `mere/cable/v1` / `mere/coop/v1` \u2014 `crates/murm/transport/README.md:13`; `mere/cable/v1` used at `crates/murm/murm/src/lib.rs:731,825`.",
         "\"HKDF-SHA256 with a Mere-specific context string\" \u2014 `hkdf = \"0.13\"` / `sha2 = \"0.11\"` at root `Cargo.toml:433-434` with that exact rationale in the comment.",
-        "\"**Named (Mark, 2026-07-06): `retinue`** \u2026 repo at `repos/retinue`, v0 plan at `repos/retinue/design_docs/2026-07-06_retinue_v0_plan.md`\" \u2014 both exist.",
+        "\"**Named (Mark, 2026-07-06): `retinue`** \u2026 repo at `repos/retinue`, v0 plan at `repos/murm/design_docs/2026-07-06_retinue_v0_plan.md`\" \u2014 both exist.",
         "The LXMF research brief link resolves: `design_docs/mere_docs/research/2026-07-06_lxmf_key_addressed_mail_research.md`."
       ],
       "notes": [

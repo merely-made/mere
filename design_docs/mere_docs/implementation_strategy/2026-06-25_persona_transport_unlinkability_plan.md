@@ -13,7 +13,7 @@ story; Nym and the metadata ceiling are a named research track.
 This doc owns the persona-transport privacy model: how a persona's network presence is
 (or is not) linkable to you and to your other personas, what modes we offer, and how a
 persona's transport choice couples to its tessera standing. It sits between the identity
-crate (`crates/persona/identity` *(historical citation)* <!-- doc-audit: historical-path -->), the transport (`retinue/native/crates/transport`), and the
+crate (`crates/persona/identity` *(historical citation)* <!-- doc-audit: historical-path -->), the transport (`murm/native/crates/transport`), and the
 standing layer (`crates/moot/gemot/src/tessera` *(historical citation)* <!-- doc-audit: historical-path -->).
 **Corrected 2026-10-06 (S14 pass):** the identity crate is `repos/dramatis/crates/personae`, and
 the standing files live in mien: `crates/moot/mien/src/persona_chain.rs` and
@@ -62,14 +62,14 @@ The leaks cost wildly different amounts to close, which is why this is tiered.
   `derive_keypair(BLAKE3('persona' || persona_id))`. Crypto is free; the binding to master
   is convention.
 - **Discovery is optional.** mDNS and random-walk are both opt-in builder calls
-  ([`p2panda_transport.rs`](https://github.com/merely-made/retinue/blob/b49df894635bac95823284efee6c445885eaf62a/native/crates/transport/src/p2panda_transport.rs)); a
+  ([`p2panda_transport.rs`](https://github.com/merely-made/murm/blob/b49df894635bac95823284efee6c445885eaf62a/native/crates/transport/src/p2panda_transport.rs)); a
   quiet persona turns them off and connects via **iroh-tickets** (an out-of-band
   `NodeAddr` invite). Discovery-free is supported today.
 - **Relays are automatic NAT fallback, not deliberate routing.** iroh-relay rides under
   p2panda-net and kicks in only when holepunch fails; iroh 0.98 does not expose
   deliberate "relay through this chosen node" as a public API.
   **Corrected 2026-10-06 (S14 pass):** the transport now pins `iroh = "1.0.3"`
-  (`retinue/native/crates/transport/Cargo.toml:51`); whether 1.0.3 exposes deliberate
+  (`murm/native/crates/transport/Cargo.toml:51`); whether 1.0.3 exposes deliberate
   relay-through-node has not been checked, so this and the later 0.98 mentions are
   unverified for the current pin.
 - **Multi-device sync is proven, multi-device routing is not.** Mesh M1 (2026-06-12) does
