@@ -2139,3 +2139,22 @@ float joining, native input/theme/DPI/performance acceptance. Its shared frame
 and outer Workspace draft is the next composition owner, not a receipt for
 those remaining gates. External engine builds and simultaneous engine loading
 remain separately qualified consumers.
+
+
+### Shared browsing presenter candidate (2026-10-13)
+
+At Mark's request, `data-presenter="browse"` opts into a quieter shared viewer
+presentation. The existing inspector profile is unchanged. Browsing keeps one
+44-pixel Graph menu trigger backed by the same command catalogue as right-click,
+Ctrl/Command+K and Shift+F10. Project details precede disclosed selection
+management; history starts closed, with a command to reveal it and a separate
+raw checkpoint-source disclosure. These choices change presentation only:
+source authority, selection identity through folds and graph gestures stay shared.
+
+The candidate compiles for the no-default-features Wasm viewer. It is not yet
+browser-qualified or adopted by the site. Required acceptance includes physical
+context-menu and keyboard input, focus restoration, touch input at a compact
+viewport, optional history, and native no-script site disclosures. Measure the
+new package against the existing delivery caps and coordinate a fresh bounded
+runtime lease before headed acceptance; existing package evidence does not
+qualify this runtime. Keep the deployed row until those checks pass.
