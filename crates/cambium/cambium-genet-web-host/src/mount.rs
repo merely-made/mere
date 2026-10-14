@@ -369,6 +369,7 @@ where
     );
 
     let h = host.clone();
+    let c = canvas.clone();
     let w = window.clone();
     listen!(
         canvas,
@@ -378,8 +379,11 @@ where
             // The page must not scroll underneath an application that handles the
             // notch itself.
             e.prevent_default();
+            let mut host = h.borrow_mut();
+            let (x, y) = local(&c, e.client_x(), e.client_y(), host.ui_zoom());
+            host.pointer_moved(x, y);
             let (dx, dy) = wheel_delta_from_dom(&e, WHEEL_LINE_PX, WHEEL_PAGE_PX);
-            h.borrow_mut().wheel(dx, dy);
+            host.wheel(dx, dy);
             w.request_redraw();
         }
     );

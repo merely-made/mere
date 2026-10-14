@@ -149,3 +149,6 @@ pub mod webrtc_session;
 pub use chirograph as protocol;
 pub use graphshell_client as client;
 pub use graphshell_endpoint as endpoint;
+
+#[cfg(all(feature = "web", target_arch = "wasm32"))]
+pub mod web_resident;

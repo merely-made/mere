@@ -580,7 +580,7 @@ pub struct GraphSession<B> {
     retained_pending_links_revision: u64,
 }
 
-impl<B: Backend + Clone> GraphSession<B> {
+impl<B: Backend> GraphSession<B> {
     /// Preflight observed stable-ID commands against this complete writer, then
     /// apply their live deltas as one validated, journaled session change.
     pub fn edit_live_now(
@@ -595,8 +595,11 @@ impl<B: Backend + Clone> GraphSession<B> {
                 "live edits require qualified recorded placement".into(),
             )));
         }
+        // Preparation is synchronous and performs no backend reads or writes.
+        // A scratch backend keeps this checked in-memory edit available to all
+        // Backend implementations, without cloning or exposing the writer store.
         let source = crate::addressable_graph::AddressableGraphStore::new(
-            self.slots.backend().clone(),
+            muniment::MemoryBackend::new(),
             *self.manifest.root_graph_id.as_uuid(),
         )
         .prepare_recorded_graph(&self.graph)
@@ -2070,6 +2073,121 @@ mod tests {
 
     use euclid::default::Point2D;
     use muniment::{DirectoryBackend, MemoryBackend};
+
+    // Deliberately has no Clone implementation: synchronous live editing must
+    // neither duplicate a writer handle nor access its persistence backend.
+    struct NoIoBackend;
+
+    #[cfg_attr(not(target_arch = "wasm32"), async_trait::async_trait)]
+    #[cfg_attr(target_arch = "wasm32", async_trait::async_trait(?Send))]
+    impl Backend for NoIoBackend {
+        async fn get(&self, _: &str) -> Result<Option<Vec<u8>>, StoreError> {
+            panic!("live edit attempted backend get")
+        }
+        async fn put(&self, _: &str, _: &[u8]) -> Result<(), StoreError> {
+            panic!("live edit attempted backend put")
+        }
+        async fn delete(&self, _: &str) -> Result<(), StoreError> {
+            panic!("live edit attempted backend delete")
+        }
+        async fn list(&self, _: &str) -> Result<Vec<String>, StoreError> {
+            panic!("live edit attempted backend list")
+        }
+        async fn scan(&self, _: &str, _: &str) -> Result<Vec<String>, StoreError> {
+            panic!("live edit attempted backend scan")
+        }
+        async fn apply(&self, _: &[WriteOp]) -> Result<(), StoreError> {
+            panic!("live edit attempted backend apply")
+        }
+        async fn transact(&self, _: muniment::TransactFn) -> Result<(), StoreError> {
+            panic!("live edit attempted backend transact")
+        }
+    }
+
+    #[test]
+    fn recorded_live_edit_supports_non_clone_backend_without_io() {
+        use crate::addressable_graph::{AddressableGraphStore, GraphAddress};
+        use crate::live_graph::{LiveCheck, LiveCommand, LiveEditError, ObservedCommand};
+
+        let root = GraphId::new();
+        let author = Author::person("live-editor").via("recorded-host");
+        let mut session = GraphSession::new_recorded(
+            NoIoBackend,
+            GraphSessionManifest::new(SessionId::new(), root),
+            None,
+            author.clone(),
+            ChangeKind::Minted,
+        );
+        let id = Uuid::from_u128(7001);
+        let created = session
+            .edit_live_now(
+                author.clone(),
+                vec![ObservedCommand {
+                    command: LiveCommand::CreateAddress {
+                        id,
+                        address: "https://non-clone.test/".into(),
+                        title: "Recorded live edit".into(),
+                    },
+                    checks: vec![LiveCheck::Absent(GraphAddress::Surface(id))],
+                }],
+            )
+            .unwrap();
+        assert_eq!(created.created, vec![id]);
+        assert!(created.applied.end > created.applied.first);
+
+        let before = FrozenGraph::of(session.graph());
+        let cursor = session.journal().live_cursor();
+        let revision = session.revision();
+        let changes = session.changes().to_vec();
+        let command = LiveCommand::SetPinned {
+            surface: id,
+            pinned: true,
+        };
+        assert!(matches!(
+            session.edit_live_now(
+                author.clone(),
+                vec![ObservedCommand {
+                    command: command.clone(),
+                    checks: vec![],
+                }],
+            ),
+            Err(LiveEditError::MissingObservation(GraphAddress::Surface(value))) if value == id
+        ));
+        assert_eq!(FrozenGraph::of(session.graph()), before);
+        assert_eq!(session.journal().live_cursor(), cursor);
+        assert_eq!(session.revision(), revision);
+        assert_eq!(session.changes(), changes);
+
+        let source = AddressableGraphStore::new(MemoryBackend::new(), *root.as_uuid())
+            .prepare_recorded_graph(session.graph())
+            .unwrap();
+        let address = GraphAddress::Surface(id);
+        let pinned = session
+            .edit_live_now(
+                author.clone(),
+                vec![ObservedCommand {
+                    command,
+                    checks: vec![LiveCheck::RecordUnchanged {
+                        address,
+                        digest: source.record_digest(address).unwrap().into(),
+                    }],
+                }],
+            )
+            .unwrap();
+        assert_eq!(pinned.applied.first, cursor);
+        assert!(pinned.applied.end > cursor);
+        let key = session.graph().get_node_key_by_id(id).unwrap();
+        assert_eq!(session.graph().node_is_pinned(key), Some(true));
+        assert_eq!(session.changes().len(), changes.len() + 1);
+        assert_eq!(session.changes().last().unwrap().author, author);
+        assert!(
+            session
+                .journal()
+                .entries()
+                .iter()
+                .all(|entry| entry.author == author)
+        );
+    }
 
     async fn legacy_receipt_fixture() -> (MemoryBackend, SessionId, Seq) {
         legacy_receipt_fixture_with_addresses(false).await

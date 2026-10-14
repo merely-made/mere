@@ -20,6 +20,14 @@ available for review. Earlier Windows/Linux receipts below are historical.
 Rulings 1–46 remain authoritative; C5/C6 are settled. Consumer repinning and
 vocabulary/oracle cleanup remain separate under §4.
 
+The approved [resident-host follow-on](2026-10-09_resident_host_implementation_plan.md)
+is in progress separately. Tasks1–6 and their integration with current main
+are qualified locally at `af44edc80`; Task7's edit and storage core checks pass,
+while its browser routes, visible controls, endpoint actions and remaining
+lifetime cases are still being implemented. Task8's running host/client,
+headed browser and whole-process memory qualification remains pending.
+These local results do not constitute publication of the follow-on.
+
 Four questions were put to Mark from outside the project: what a link records,
 what makes two things the same thing, what a saved query can become, and how
 much of the graph must be present to use it. Each was grounded against the

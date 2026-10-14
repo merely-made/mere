@@ -31,18 +31,20 @@
         <button id="gs-session-redo" data-command="session:redo" aria-label="Redo Graphshell's last undone change">Redo change</button>
       </header>
 
-      <nav aria-label="Graph controls">
-        <button data-command="select-web">Select research object</button>
-        <button data-command="node:edit">Edit selected node</button>
-        <button data-command="pan-left" aria-label="Pan left">Pan left</button>
-        <button data-command="pan-right" aria-label="Pan right">Pan right</button>
-        <button data-command="pan-up" aria-label="Pan up">Pan up</button>
-        <button data-command="pan-down" aria-label="Pan down">Pan down</button>
-        <button data-command="view:zoom_in" aria-label="Zoom in">Zoom in</button>
-        <button data-command="view:zoom_out" aria-label="Zoom out">Zoom out</button>
-      </nav>
-
       <aside id="gs-product-panel" aria-label="Graph tools">
+        <section aria-label="Graph navigation">
+          <h2>Graph controls</h2>
+          <nav aria-label="Graph controls">
+            <button data-command="select-web">Select research object</button>
+            <button data-command="node:edit">Edit selected node</button>
+            <button data-command="pan-left" aria-label="Pan left">Pan left</button>
+            <button data-command="pan-right" aria-label="Pan right">Pan right</button>
+            <button data-command="pan-up" aria-label="Pan up">Pan up</button>
+            <button data-command="pan-down" aria-label="Pan down">Pan down</button>
+            <button data-command="view:zoom_in" aria-label="Zoom in">Zoom in</button>
+            <button data-command="view:zoom_out" aria-label="Zoom out">Zoom out</button>
+          </nav>
+        </section>
         <section id="gs-capture-panel" hidden>
           <h2>Browser history</h2>
           <p id="gs-capture-status" role="status">Checking capture permission…</p>
@@ -316,8 +318,27 @@
           aria-hidden="true"
           hidden
         ></section>
+        <fieldset class="resident-controls" aria-label="Graph residency">
+          <legend>Graph residency</legend>
+          <label>Display <select id="gs-resident-policy"><option value="full">Full</option><option value="neighborhood">Neighborhood</option></select></label>
+          <label>Authored projection <select id="gs-resident-projection"><option value="">Choose a projection</option></select></label>
+          <label>Exact roster (comma-separated UUIDs) <input id="gs-resident-roster" placeholder="Empty means an empty roster"></label>
+          <label>Hops <input id="gs-resident-hops" type="number" min="0" max="65535" value="0"></label>
+          <label>Refresh <select id="gs-resident-refresh"><option value="manual">Manual</option><option value="host">Host-driven</option></select></label>
+          <label>Minimum check interval (ms) <input id="gs-resident-minimum" type="number" min="1" value="1000"></label>
+          <label>Publication batch interval (ms) <input id="gs-resident-batch" type="number" min="0" value="0"></label>
+          <button data-command="resident-settings">Apply graph settings</button>
+          <button data-command="resident-pin">Toggle selected pin</button><button data-command="resident-save">Save</button>
+          <button data-command="resident-refresh">Refresh</button>
+          <p id="gs-resident-status" role="status">Stored</p>
+          <pre id="gs-resident-coverage"></pre>
+          <label>Inspect <select id="gs-resident-stratum"><option value="surface">Surface</option><option value="resource">Resource</option></select></label>
+          <label>Stable ID <input id="gs-resident-demand" placeholder="UUID"></label>
+          <button data-command="resident-demand">Inspect / Demand</button>
+        </fieldset>
         <label for="gs-edit-title">Title</label>
         <input id="gs-edit-title">
+        <p class="resident-note">Tags in a partial view may be Not loaded. Inspect the related Resource or choose Full before replacing hidden tags.</p>
         <label for="gs-edit-tags">Tags</label>
         <input id="gs-edit-tags" placeholder="comma, separated">
         <label for="gs-facet-id">Facet id and JSON</label>

@@ -101,7 +101,18 @@ pub struct PreparedSave {
 }
 impl PreparedSave {
     pub async fn save<B: Backend>(&self, backend: B) -> Result<(), String> {
-        self.next.validate(self.next.workspace.document.graph_id)?;
+        self.save_for_session(backend, self.next.workspace.document.graph_id)
+            .await
+    }
+    pub(crate) async fn save_for_session<B: Backend>(
+        &self,
+        backend: B,
+        session: Uuid,
+    ) -> Result<(), String> {
+        if self.next.workspace.document.graph_id != session {
+            return Err("workbench belongs to another session".into());
+        }
+        self.next.validate(session)?;
         let bytes = serde_json::to_vec(&self.next).map_err(|e| e.to_string())?;
         if bytes.len() > RECORD_LIMIT {
             return Err("Forme history exceeds 4 MiB".into());
@@ -368,6 +379,14 @@ impl FormeSession {
         graph_id: Uuid,
         graph: &Graph,
     ) -> Result<Self, String> {
+        let members = graph.nodes().map(|(_, node)| node.id).collect();
+        Self::load_for_members(backend, graph_id, &members).await
+    }
+    pub(crate) async fn load_for_members<B: Backend>(
+        backend: B,
+        graph_id: Uuid,
+        members: &std::collections::HashSet<Uuid>,
+    ) -> Result<Self, String> {
         let bytes = backend
             .get(&slot(graph_id))
             .await
@@ -386,7 +405,7 @@ impl FormeSession {
         let reconcile = |workspace: &mut FormeWorkspace| {
             let mut layout = workspace.layout();
             for member in layout.open_members() {
-                if graph.get_node_by_id(member).is_none() {
+                if !members.contains(&member) {
                     layout.close_tile(member);
                 }
             }
@@ -829,6 +848,110 @@ mod tests {
                     .is_err()
             );
             assert_eq!(backend.get(&slot(graph_id)).await.unwrap().unwrap(), bytes);
+        });
+    }
+    #[test]
+    fn owned_membership_retains_unloaded_forme_history_but_removes_deleted_members() {
+        pollster::block_on(async {
+            let (mut complete, mut session, [a, b, c]) = fixture();
+            let backend = MemoryBackend::new();
+            let graph_id = session.view().document.graph_id;
+            session.unlock().unwrap();
+            session.edit(None, 0, |w| w.open(c, &complete)).unwrap();
+            save(&mut session, backend.clone(), SaveKind::Apply).await;
+            session.unlock().unwrap();
+            session
+                .edit(None, 1, |w| {
+                    w.bounds[0] -= 50.;
+                    Ok(())
+                })
+                .unwrap();
+            save(&mut session, backend.clone(), SaveKind::Apply).await;
+            save(&mut session, backend.clone(), SaveKind::Undo).await;
+            assert!(session.can_undo() && session.can_redo());
+            let mut partial = complete.clone();
+            for member in [b, c] {
+                let key = partial.get_node_key_by_id(member).unwrap();
+                apply_graph_delta(&mut partial, GraphDelta::RemoveNode { key });
+            }
+            assert!(partial.get_node_by_id(a).is_some());
+            assert!(partial.get_node_by_id(b).is_none());
+            assert!(complete.get_node_by_id(b).is_some());
+            let stored = backend.get(&slot(graph_id)).await.unwrap();
+            let members = complete.nodes().map(|(_, node)| node.id).collect();
+            let mut reopened = FormeSession::load_for_members(backend.clone(), graph_id, &members)
+                .await
+                .unwrap();
+            assert!(
+                reopened.view().members().contains(&b),
+                "unloaded member must survive owned Forme load"
+            );
+            assert!(reopened.view().members().contains(&c));
+            assert_eq!(
+                backend.get(&slot(graph_id)).await.unwrap(),
+                stored,
+                "load does not rewrite history"
+            );
+            save(&mut reopened, backend.clone(), SaveKind::Undo).await;
+            assert!(reopened.view().members().contains(&b));
+            save(&mut reopened, backend.clone(), SaveKind::Redo).await;
+            assert!(reopened.view().members().contains(&b));
+            assert!(reopened.view().members().contains(&c));
+            let key = complete.get_node_key_by_id(c).unwrap();
+            apply_graph_delta(&mut complete, GraphDelta::RemoveNode { key });
+            let members = complete.nodes().map(|(_, node)| node.id).collect();
+            let mut deleted = FormeSession::load_for_members(backend.clone(), graph_id, &members)
+                .await
+                .unwrap();
+            assert!(!deleted.view().members().contains(&c));
+            for kind in [SaveKind::Undo, SaveKind::Redo] {
+                save(&mut deleted, backend.clone(), kind).await;
+                assert!(deleted.view().members().contains(&b));
+                assert!(
+                    !deleted.view().members().contains(&c),
+                    "saved history must not resurrect a genuinely deleted member"
+                );
+            }
+            assert_eq!(
+                partial.nodes().count(),
+                1,
+                "internal validation must not hydrate the displayed reader"
+            );
+        });
+    }
+
+    #[test]
+    fn prepared_forme_save_refuses_another_owned_session_without_advancing_history() {
+        pollster::block_on(async {
+            let (graph, mut session, [_, _, c]) = fixture();
+            let backend = MemoryBackend::new();
+            let graph_id = session.view().document.graph_id;
+            let other = Uuid::from_u128(99);
+            backend
+                .put(&slot(other), b"other session unchanged")
+                .await
+                .unwrap();
+            session.unlock().unwrap();
+            session.edit(None, 0, |w| w.open(c, &graph)).unwrap();
+            let proposal = session.prepare_save(SaveKind::Apply, 1).unwrap();
+            let error = proposal.save_for_session(backend.clone(), other).await;
+            assert_eq!(
+                error,
+                Err("workbench belongs to another session".to_owned())
+            );
+            assert!(session.finish_save(proposal, error).is_err());
+            assert!(session.editing() && session.dirty() && session.can_undo());
+            assert!(backend.get(&slot(graph_id)).await.unwrap().is_none());
+            assert_eq!(
+                backend.get(&slot(other)).await.unwrap(),
+                Some(b"other session unchanged".to_vec())
+            );
+            let proposal = session.prepare_save(SaveKind::Apply, 2).unwrap();
+            let result = proposal.save_for_session(backend.clone(), graph_id).await;
+            session.finish_save(proposal, result).unwrap();
+            let reopened = FormeSession::load(backend, graph_id, &graph).await.unwrap();
+            assert!(reopened.view().members().contains(&c));
+            assert!(reopened.can_undo());
         });
     }
 }

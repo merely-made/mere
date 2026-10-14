@@ -79,8 +79,7 @@ body.full-page graphshell-tree {
   color: #dce5e8;
 }
 
-#gs-semantic-host header button,
-#gs-semantic-host nav button {
+#gs-semantic-host header button {
   position: absolute;
   z-index: 4;
   pointer-events: auto;
@@ -124,33 +123,6 @@ body.full-page graphshell-tree {
   width: 116px;
   height: 43px;
 }
-
-nav button:nth-child(1) {
-  left: 24px;
-  top: 128px;
-  width: 188px;
-  height: 32px;
-}
-
-nav button:nth-child(2) {
-  left: 24px;
-  top: 164px;
-  width: 188px;
-  height: 32px;
-}
-
-nav button:nth-child(n + 3) {
-  width: 42px;
-  height: 36px;
-  bottom: 48px;
-}
-
-nav button:nth-child(3) { left: 24px; }
-nav button:nth-child(4) { left: 70px; }
-nav button:nth-child(5) { left: 116px; }
-nav button:nth-child(6) { left: 162px; }
-nav button:nth-child(7) { left: 208px; }
-nav button:nth-child(8) { left: 254px; }
 
 #gs-detail-surface {
   position: absolute;
@@ -198,6 +170,16 @@ nav button:nth-child(8) { left: 254px; }
   border: 1px solid #29404a;
   border-radius: 12px;
   box-shadow: 0 14px 40px rgba(0, 0, 0, 0.3);
+}
+
+#gs-product-panel nav {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+#gs-product-panel nav button {
+  margin-top: 0;
 }
 
 #gs-product-panel section + section {
@@ -441,24 +423,6 @@ nav button:nth-child(8) { left: 254px; }
     top: 53px;
   }
 
-  nav button:nth-child(1) {
-    left: 24px;
-    top: auto;
-    bottom: 82px;
-    width: 148px;
-  }
-
-  nav button:nth-child(2) {
-    left: 180px;
-    top: auto;
-    bottom: 82px;
-    width: 148px;
-  }
-
-  nav button:nth-child(n + 3) {
-    bottom: 38px;
-  }
-
   #gs-detail-surface {
     left: 10px;
     right: auto;
@@ -676,3 +640,8 @@ graphshell-view #gs-semantic-host :focus-visible { outline-color:var(--gs-app-pr
   border:0; border-radius:4px; cursor:pointer; font:inherit;
 }
 .graphshell-appearance p { margin:8px 0 0; max-width:300px; overflow-wrap:anywhere; }
+
+.resident-controls { display: grid; gap: .5rem; margin-block: 1rem; }
+.resident-controls label { display: grid; gap: .25rem; }
+.resident-controls pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 12rem; overflow: auto; }
+.resident-note { max-width: 65ch; line-height: 1.45; }

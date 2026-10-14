@@ -176,6 +176,7 @@ pub struct MereHost<B> {
     pub(crate) resident_refresh: crate::resident_host::HostRefresh,
     pub(crate) resident_roots: crate::resident_host::HostRoots,
     resident_busy: bool,
+    pub(crate) product_sequence_depth: u32,
     resident_staged: Option<crate::resident_host::ResidentStaged>,
     sessions: MereSessions<B>,
     slots: JsonSlots<B>,
@@ -265,6 +266,7 @@ impl<B: Backend + Clone> MereHost<B> {
             resident_refresh: Default::default(),
             resident_roots: Default::default(),
             resident_busy: false,
+            product_sequence_depth: 0,
             resident_staged: None,
             sessions: MereSessions::new(backend.clone()),
             slots: JsonSlots::new(backend),
@@ -303,8 +305,25 @@ impl<B: Backend + Clone> MereHost<B> {
         handlers: HandlerRegistry,
         access_context: AccessContext,
     ) -> Self {
-        let graph_session = MereSessions::new(backend.clone())
-            .begin(author_of(&selected_persona, GRAPHSHELL), None);
+        Self::empty_with_recording(backend, selected_persona, handlers, access_context, false)
+    }
+
+    /// Choose the initial session's recording profile before any session exists
+    /// to retire. Starting a fixture is not a switch from an empty live session.
+    pub(crate) fn empty_with_recording(
+        backend: B,
+        selected_persona: SelectedPersonaRef,
+        handlers: HandlerRegistry,
+        access_context: AccessContext,
+        recorded: bool,
+    ) -> Self {
+        let sessions = MereSessions::new(backend.clone());
+        let author = author_of(&selected_persona, GRAPHSHELL);
+        let graph_session = if recorded {
+            sessions.begin_recorded(author, None)
+        } else {
+            sessions.begin(author, None)
+        };
         Self::assemble(
             backend,
             graph_session,
@@ -498,21 +517,10 @@ impl<B: Backend + Clone> MereHost<B> {
         via: &str,
         commands: Vec<pandect::live_graph::ObservedCommand>,
     ) -> Result<pandect::Applied, crate::resident_host::ResidentHostError> {
-        use crate::resident_host::ResidentHostError;
-        if !self.resident_admitted {
-            return Err(ResidentHostError::OwnershipUnproven);
-        }
-        if self.resident_busy {
-            return Err(ResidentHostError::Busy);
-        }
-        let applied = self
-            .graph_session
-            .edit_live_now(author_of(&self.selected_persona, via), commands)
-            .map_err(ResidentHostError::Live)?
-            .applied;
-        self.projection_revision = self.projection_revision.wrapping_add(1);
-        self.resident_busy = true;
-        Ok(applied)
+        self.through(via.to_owned(), |host| {
+            host.apply_observed_commands(commands)
+        })
+        .map(|result| result.applied)
     }
     /// Prepare the existing admitted writer, retaining all bytes until install.
     /// Generic hosts have no admission; composition factories grant it privately.
@@ -877,9 +885,33 @@ impl<B: Backend> MereHost<B> {
     /// Run `edit` on the graph as one journaled change by the selected
     /// persona, via the current channel.
     fn edit_graph<R>(&mut self, edit: impl FnOnce(&mut Graph) -> R) -> Result<R, MereHostError> {
+        self.ensure_complete_operation()?;
         self.ensure_resident_idle()?;
         let author = self.author();
         Ok(self.graph_session.edit_now(author, edit)?.0)
+    }
+
+    /// Apply observed stable-ID commands as the selected persona and current
+    /// host channel. Payloads cannot choose provenance or certify ownership.
+    pub fn apply_observed_commands(
+        &mut self,
+        commands: Vec<pandect::live_graph::ObservedCommand>,
+    ) -> Result<pandect::live_graph::LiveApplied, crate::resident_host::ResidentHostError> {
+        use crate::resident_host::ResidentHostError;
+        if !self.resident_admitted {
+            return Err(ResidentHostError::OwnershipUnproven);
+        }
+        if self.resident_busy && self.product_sequence_depth == 0 {
+            return Err(ResidentHostError::Busy);
+        }
+        let author = self.author();
+        let applied = self
+            .graph_session
+            .edit_live_now(author, commands)
+            .map_err(ResidentHostError::Live)?;
+        self.projection_revision = self.projection_revision.wrapping_add(1);
+        self.resident_busy = true;
+        Ok(applied)
     }
 
     /// Run `work` with its edits coming through `via`, such as a browser
@@ -929,6 +961,7 @@ impl<B: Backend> MereHost<B> {
     /// Apply edits in stable-id form as one change, such as an import's or an
     /// attached application's.
     pub fn apply_edits(&mut self, edits: Vec<CapturedDelta>) -> Result<(), MereHostError> {
+        self.ensure_complete_operation()?;
         self.ensure_resident_idle()?;
         let author = self.author();
         self.graph_session.apply_now(author, edits)?;
@@ -2413,6 +2446,8 @@ mod tests {
         assert_eq!(
             intents,
             [
+                session_item::OBSERVED_EDIT_INTENT,
+                session_item::RESIDENT_SETTINGS_INTENT,
                 session_item::APPLY_EDITS_INTENT,
                 session_item::UNDO_INTENT,
                 session_item::REDO_INTENT,

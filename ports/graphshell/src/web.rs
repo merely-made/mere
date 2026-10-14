@@ -11,24 +11,25 @@
 //! of which exists off wasm. The crate-level `cfg` below makes it compile to
 //! nothing on a native host, so `cargo check --workspace` — the gate that
 //! covers every other member — is not permanently red for a target this
-//! crate was never meant to build for. It stays a workspace member rather
-//! than an `exclude`d one so it keeps sharing the workspace lock and the
-//! root `[patch]` table; excluding it would mean maintaining a second copy
-//! of both.
+//! crate was never meant to build for. The presenter is a standalone workspace
+//! under `ports/graphshell/web`, with its own lock and patch table.
 //!
-//! Check it for the target it is for:
-//! `cargo check -p graphshell-web --target wasm32-unknown-unknown`.
+//! Check from that directory with `cargo check --locked --target wasm32-unknown-unknown`.
 #![cfg(target_arch = "wasm32")]
 
 // The viewer cone (mer3ly site canvas plan, Rulings 109-110, 118): the tree page
 // and what it reads are always compiled; the H5 reference host, the product
 // modes and the remote board are additive features, all on by default.
 mod web_appearance;
+#[cfg(feature = "main-page")]
+mod web_commands;
 mod web_dataset;
 #[cfg(feature = "main-page")]
 mod web_events;
 mod web_gpu;
 mod web_graphs;
+#[cfg(feature = "main-page")]
+mod web_options;
 mod web_period_worker;
 #[cfg(feature = "main-page")]
 mod web_practice;
@@ -42,11 +43,7 @@ mod web_remote;
 mod web_rtc_link;
 mod web_scenario;
 #[cfg(feature = "main-page")]
-mod web_commands;
-#[cfg(feature = "main-page")]
 mod web_session;
-#[cfg(feature = "main-page")]
-mod web_options;
 mod web_speed;
 mod web_timing;
 mod web_tree;
@@ -59,6 +56,29 @@ use wasm_bindgen::prelude::*;
 #[cfg(feature = "product")]
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{Document, Window};
+
+/// A blocked legacy open remains supervised until the old connection closes.
+/// Show refusal while that drain is pending, before either presenter mounts.
+fn opening_notice(root: &web_sys::Element) -> Result<web_sys::Element, String> {
+    use wasm_bindgen::JsCast;
+    let document = root.owner_document().ok_or("missing document")?;
+    let notice = document.create_element("p").map_err(|_| "opening status")?;
+    notice
+        .set_attribute("role", "status")
+        .map_err(|_| "opening status role")?;
+    notice.set_text_content(Some("Opening local graph…"));
+    root.append_child(&notice)
+        .map_err(|_| "opening status mount")?;
+    let status = notice.clone();
+    let blocked = Closure::<dyn FnMut(web_sys::Event)>::new(move |_| {
+        status.set_text_content(Some("This graph is open in an older page. Close that page; this opening attempt is refused and draining. Reopen afterward."));
+    });
+    window()?
+        .add_event_listener_with_callback("muniment-open-blocked", blocked.as_ref().unchecked_ref())
+        .map_err(|_| "opening status listener")?;
+    blocked.forget();
+    Ok(notice)
+}
 
 /// Ask the browser whether this origin's storage is kept, requesting it when
 /// it is not.
@@ -123,13 +143,15 @@ pub fn start() {
 #[cfg(feature = "dynamics-receipt")]
 #[wasm_bindgen]
 pub fn projection_dynamics_receipt(bound: u32) -> Result<String, JsValue> {
-    graphshell::projection_dynamics_receipt::catalog_receipt(bound).map_err(|e| JsValue::from_str(&e))
+    graphshell::projection_dynamics_receipt::catalog_receipt(bound)
+        .map_err(|e| JsValue::from_str(&e))
 }
 
 #[cfg(feature = "dynamics-receipt")]
 #[wasm_bindgen]
 pub fn projection_coordinates_receipt(bound: u32) -> Result<String, JsValue> {
-    graphshell::projection_dynamics_receipt::catalog_receipt_for(bound, "geographic").map_err(|e| JsValue::from_str(&e))
+    graphshell::projection_dynamics_receipt::catalog_receipt_for(bound, "geographic")
+        .map_err(|e| JsValue::from_str(&e))
 }
 
 /// Join a host over WebRTC as the tree's remote session; `loader.js` calls this

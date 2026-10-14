@@ -22,15 +22,13 @@ use serde::Deserialize;
 use wasm_bindgen::JsCast;
 use web_sys::{Element, HtmlCanvasElement, HtmlInputElement, HtmlTextAreaElement};
 
-use graphshell::access::{AccessRecord, AccessRecordFilter, query_access_records};
-use graphshell::app::GraphshellApp;
+use graphshell::access::{AccessRecord, AccessRecordFilter};
 use graphshell::canary::FixtureEndpoint;
 use graphshell::capture::{
-    BROWSER_HISTORY_HANDLER_PREFIX, BrowserHistoryCapture, BrowserVisit, CaptureOutcome,
-    ForgetMode, HistoryCapturePolicy,
+    BROWSER_HISTORY_HANDLER_PREFIX, BrowserVisit, CaptureOutcome, ForgetMode, HistoryCapturePolicy,
 };
 use graphshell::mere_host::{
-    FIXTURE_DEVICE_TWO_ADDRESS, FIXTURE_PERSONA_ADDRESS, FIXTURE_WEB_ADDRESS, GRAPHSHELL, MereHost,
+    FIXTURE_DEVICE_TWO_ADDRESS, FIXTURE_PERSONA_ADDRESS, FIXTURE_WEB_ADDRESS, GRAPHSHELL,
     SelectedPersonaRef,
 };
 use graphshell::product::{RelationFamilyFilter, SavedSceneV3, kept_summary};
@@ -41,8 +39,8 @@ use graphshell::projection_editor::{
     PublicSourceRevision, Reading, RevisionEvidence, SelectionMode, SourceBinding,
 };
 use graphshell::remote_board::RemoteBoard;
+use graphshell::web_resident::{WebResidentApp, WebResidentHost};
 use graphshell_client::frozen::Satisfaction;
-use muniment::IndexedDbBackend;
 use uuid::Uuid;
 use web_events::{install_events, schedule_frames};
 use web_gpu::{GpuPresenter, PendingCapture};
@@ -110,7 +108,7 @@ enum ActiveSession {
 struct BrowserHost {
     host_appearance: crate::web_appearance::Handle,
     appearance_revision: u64,
-    app: GraphshellApp<IndexedDbBackend>,
+    app: WebResidentApp,
     /// Where the remote projection lives (`web_remote`).
     remote: RemoteLink,
     /// The remote board's physics: the mounted scene's items as bodies, the
@@ -187,6 +185,7 @@ struct BrowserHost {
     /// The arrangement the option rows were drawn for (E5).
     option_rows_kind: Option<String>,
     session_store_error: String,
+    publication_read_error: Option<(Rc<()>, String)>,
     /// The scenario lane (`web_scenario`): a script in flight, the semantic
     /// events it asserts against, and a capture armed or landing.
     scenario: Option<ScenarioRun>,
@@ -212,7 +211,7 @@ struct BrowserHost {
 /// Saves a definition into the mere session (SE14): a node at its
 /// projection address, through the editor's own channel.
 struct SessionProjectionSink<'a> {
-    host: &'a mut MereHost<IndexedDbBackend>,
+    host: &'a mut WebResidentHost,
 }
 
 impl ProjectionDefinitionSink for SessionProjectionSink<'_> {
@@ -301,7 +300,7 @@ impl BrowserHost {
         let (selection, detail_address) = match self.active {
             ActiveSession::Local => self
                 .current_primary_member()
-                .and_then(|id| self.app.host.graph().get_node_by_id(id))
+                .and_then(|id| self.app.host.presentation_graph().get_node_by_id(id))
                 .map(|(_, node)| {
                     let title = if node.title.trim().is_empty() {
                         node.url().to_string()
@@ -334,7 +333,7 @@ impl BrowserHost {
             active_session: match self.active {
                 ActiveSession::Local => format!(
                     "Local Mere · {} objects",
-                    self.app.host.graph().node_count()
+                    self.app.host.presentation_graph().node_count()
                 ),
                 ActiveSession::Remote => self.remote_label(),
             },
@@ -404,15 +403,30 @@ impl BrowserHost {
             }
         }
         if let Some(practice) = &mut self.practice {
-            let frame = practice.frame(self.width, self.height, host_ms, &mut self.chrome_text, &self.gpu)?;
+            let frame = practice.frame(
+                self.width,
+                self.height,
+                host_ms,
+                &mut self.chrome_text,
+                &self.gpu,
+            )?;
             let changed = frame.is_some();
-            if let Some(scene) = frame { self.practice_scene = scene; }
+            if let Some(scene) = frame {
+                self.practice_scene = scene;
+            }
             let chrome = Scene::new(self.width, self.height);
             if let Some(name) = self.capture_request.take() {
-                self.capture_pending = Some((name, self.gpu.capture(&self.practice_scene, &chrome, self.width, self.height)));
+                self.capture_pending = Some((
+                    name,
+                    self.gpu
+                        .capture(&self.practice_scene, &chrome, self.width, self.height),
+                ));
             }
             self.chrome_dirty = false;
-            if changed { self.gpu.present(&self.practice_scene, &chrome, self.width, self.height)?; }
+            if changed {
+                self.gpu
+                    .present(&self.practice_scene, &chrome, self.width, self.height)?;
+            }
             return Ok(());
         }
         self.advance_arrangement_transition(host_ms);
@@ -436,7 +450,9 @@ impl BrowserHost {
         }
         let content = if let Some(live) = &mut self.live_projection {
             live.frame(
-                self.width, self.height, &mut self.chrome_text,
+                self.width,
+                self.height,
+                &mut self.chrome_text,
                 self.host_appearance.borrow().sheet(),
             )?
         } else {
@@ -618,10 +634,16 @@ impl BrowserHost {
         }
         let mut draft = self.projection_editor.draft().clone();
         let action = match field {
-            "dynamics.spec" => EditorAction::SetDynamics(if value.trim().is_empty() { None } else {
-                Some(graphshell::projection_editor::DynamicsSlot::from_json(1, value).unwrap_or_else(|_| {
-                    graphshell::projection_editor::DynamicsSlot { version: 1, spec: value.to_string() }
-                }))
+            "dynamics.spec" => EditorAction::SetDynamics(if value.trim().is_empty() {
+                None
+            } else {
+                Some(
+                    graphshell::projection_editor::DynamicsSlot::from_json(1, value)
+                        .unwrap_or_else(|_| graphshell::projection_editor::DynamicsSlot {
+                            version: 1,
+                            spec: value.to_string(),
+                        }),
+                )
             }),
             "source.authority" => {
                 draft.source.authority = value.to_string();
@@ -651,13 +673,13 @@ impl BrowserHost {
                 draft.encoding.label = Some(Channel::Field(value.to_string()));
                 EditorAction::SetEncoding(draft.encoding)
             },
-            "arrangement.kind" => EditorAction::SetArrangement(
-                graphshell::projection_editor::with_kind(
+            "arrangement.kind" => {
+                EditorAction::SetArrangement(graphshell::projection_editor::with_kind(
                     &draft.arrangement,
                     value,
                     graphshell::projection_compile::practice_compiler().registry(),
-                ),
-            ),
+                ))
+            },
             "arrangement.direction" => {
                 draft.arrangement.direction = value.to_string();
                 EditorAction::SetArrangement(draft.arrangement)
@@ -871,7 +893,7 @@ impl BrowserHost {
             web_product::selected_handler().unwrap_or_else(|_| self.handler_id.clone());
         let address = self
             .current_primary_member()
-            .and_then(|id| self.app.host.graph().get_node_by_id(id))
+            .and_then(|id| self.app.host.presentation_graph().get_node_by_id(id))
             .map(|(_, node)| node.url().to_string())
             .unwrap_or_else(|| FIXTURE_WEB_ADDRESS.to_string());
         let result = self
@@ -892,9 +914,9 @@ impl BrowserHost {
                         .open_with_url_and_target(&address, "_blank")
                         .map_err(|_| "host-browser open failed".to_string())
                 }) {
-                    Ok(Some(_)) => format!(
-                        "Accepted · opened in host browser · {count} invocation(s)"
-                    ),
+                    Ok(Some(_)) => {
+                        format!("Accepted · opened in host browser · {count} invocation(s)")
+                    },
                     Ok(None) => "Failed · host browser blocked the external open".to_string(),
                     Err(error) => format!("Failed · {error}"),
                 }
@@ -1323,8 +1345,16 @@ fn update_projection_editor_semantics(host: &BrowserHost) -> Result<(), String> 
         },
     )?;
     set_projection_input_value("projection-arrangement-kind", &draft.arrangement.kind)?;
-    set_projection_input_value("projection-dynamics-spec", draft.dynamics.as_ref().map_or("", |slot| &slot.spec))?;
-    set_projection_input_value("projection-dynamics-bound", &host.projection_settle_bound().map_or(String::new(), |bound| bound.to_string()))?;
+    set_projection_input_value(
+        "projection-dynamics-spec",
+        draft.dynamics.as_ref().map_or("", |slot| &slot.spec),
+    )?;
+    set_projection_input_value(
+        "projection-dynamics-bound",
+        &host
+            .projection_settle_bound()
+            .map_or(String::new(), |bound| bound.to_string()),
+    )?;
     set_projection_input_value(
         "projection-arrangement-direction",
         &draft.arrangement.direction,
@@ -1481,8 +1511,7 @@ fn initial_capture_input(
 }
 
 async fn apply_initial_capture(
-    app: &mut GraphshellApp<IndexedDbBackend>,
-    store: &mut IndexedDbBackend,
+    app: &mut WebResidentApp,
     input: Option<(HistoryCapturePolicy, Vec<BrowserVisit>)>,
     persona: &str,
     now_secs: u64,
@@ -1490,28 +1519,18 @@ async fn apply_initial_capture(
     let Some((policy, visits)) = input else {
         return Ok(InitialCaptureSummary::default());
     };
-    let mut capture = BrowserHistoryCapture::load(store, policy)
-        .await
-        .map_err(|error| error.to_string())?;
-    if visits.is_empty() {
-        return Ok(InitialCaptureSummary {
-            active: capture.policy().enabled,
-            ..InitialCaptureSummary::default()
-        });
-    }
-    let outcomes = capture
-        .ingest_batch(
-            &mut app.host,
-            store,
+    let active = policy.enabled;
+    let outcomes = app
+        .capture_startup(
+            policy,
             visits,
             persona,
             FIXTURE_DEVICE_TWO_ADDRESS,
             now_secs,
         )
-        .await
-        .map_err(|error| error.to_string())?;
+        .await?;
     Ok(InitialCaptureSummary {
-        active: capture.policy().enabled,
+        active,
         accepted: outcomes
             .iter()
             .filter(|outcome| matches!(outcome, CaptureOutcome::Accepted { .. }))
@@ -1541,8 +1560,7 @@ fn history_control_input(
 }
 
 async fn apply_history_controls(
-    app: &mut GraphshellApp<IndexedDbBackend>,
-    store: &mut IndexedDbBackend,
+    app: &mut WebResidentApp,
     policy: HistoryCapturePolicy,
     now_secs: u64,
 ) -> HistoryControlSummary {
@@ -1580,20 +1598,16 @@ async fn apply_history_controls(
         } else {
             ForgetMode::HistoryOnly
         };
-        let result = async {
-            let mut capture = BrowserHistoryCapture::load(store, policy).await?;
-            capture
-                .forget_url(&mut app.host, store, &forget.url, mode, now_secs)
-                .await
-        }
-        .await;
+        let result = app
+            .forget_startup(policy, &forget.url, mode, now_secs)
+            .await;
         match result {
             Ok(forgotten) => summary.forgotten = forgotten,
             Err(error) => summary.error = Some(error.to_string()),
         }
     }
     if summary.error.is_none() {
-        match query_access_records(store, &filter).await {
+        match app.access_records(&filter).await {
             Ok(records) => {
                 summary.records = records
                     .into_iter()
@@ -1681,11 +1695,15 @@ fn publish_history_controls(
 fn update_semantics(host: &mut BrowserHost) -> Result<(), String> {
     host.pump_remote();
     if host.practice.is_some() {
-        let body=root()?;
-        if body.get_attribute("data-ready").as_deref()!=Some("true") {
-            body.set_attribute("data-ready","true").map_err(|_|"Workspace ready state")?;
-            body.set_attribute("data-session","local").map_err(|_|"Workspace session")?;
-            if owns_title() { document()?.set_title("GRAPHSHELL H3 READY"); }
+        let body = root()?;
+        if body.get_attribute("data-ready").as_deref() != Some("true") {
+            body.set_attribute("data-ready", "true")
+                .map_err(|_| "Workspace ready state")?;
+            body.set_attribute("data-session", "local")
+                .map_err(|_| "Workspace session")?;
+            if owns_title() {
+                document()?.set_title("GRAPHSHELL H3 READY");
+            }
         }
         return Ok(());
     }
@@ -1784,12 +1802,16 @@ fn update_semantics(host: &mut BrowserHost) -> Result<(), String> {
         "data-session-store",
         host.session_store.token(host.app.host.has_unstored()),
     )
-        .map_err(|_| "could not expose session store state")?;
+    .map_err(|_| "could not expose session store state")?;
     body.set_attribute("data-session-store-error", &host.session_store_error)
         .map_err(|_| "could not expose session store error")?;
     body.set_attribute(
         "data-command-menu",
-        if host.command_menu_open() { "open" } else { "closed" },
+        if host.command_menu_open() {
+            "open"
+        } else {
+            "closed"
+        },
     )
     .map_err(|_| "could not expose the command menu state")?;
     body.set_attribute("data-storage", &host.storage_status)
@@ -1830,16 +1852,13 @@ async fn run(root_element: Element) -> Result<(), String> {
     canvas.set_width(width);
     canvas.set_height(height);
 
-    let backend = IndexedDbBackend::open("graphshell-reference-host-h5", "muniment")
-        .await
-        .map_err(|error| error.to_string())?;
-    let mut capture_store = backend.clone();
     let selected_persona = SelectedPersonaRef {
         persona: FIXTURE_PERSONA_ADDRESS.to_string(),
         profile: "profile:graphshell-h3".to_string(),
     };
     let capture_persona = selected_persona.persona.clone();
-    let mut app = GraphshellApp::open_or_fixture(backend, selected_persona)
+    let opening = opening_notice(&root()?)?;
+    let mut app = WebResidentApp::open(selected_persona)
         .await
         .map_err(|error| error.to_string())?;
     let store_state = if app.host.was_reopened() {
@@ -1858,22 +1877,11 @@ async fn run(root_element: Element) -> Result<(), String> {
         .as_ref()
         .map(|(policy, _)| policy.clone())
         .unwrap_or_else(HistoryCapturePolicy::disabled);
-    let capture_summary = apply_initial_capture(
-        &mut app,
-        &mut capture_store,
-        capture_input,
-        &capture_persona,
-        now_secs,
-    )
-    .await?;
-    if capture_summary.accepted == 0 {
-        app.host
-            .persist(now_secs)
-            .await
-            .map_err(|error| error.to_string())?;
-    }
-    let history_summary =
-        apply_history_controls(&mut app, &mut capture_store, capture_policy, now_secs).await;
+    let capture_summary =
+        apply_initial_capture(&mut app, capture_input, &capture_persona, now_secs).await?;
+    let history_summary = apply_history_controls(&mut app, capture_policy, now_secs).await;
+    app.finish_startup(now_secs).await?;
+    opening.remove();
     app.mount_local().map_err(|error| error.to_string())?;
     let mut remote = FixtureEndpoint::new();
     let remote_snapshot = remote
@@ -1888,7 +1896,7 @@ async fn run(root_element: Element) -> Result<(), String> {
     // side (the one-tree plan's phase 3).
     let canvas_graph = match web_graphs::requested() {
         Some((nodes, seed)) => web_graphs::generated(nodes, seed, web_graphs::links()),
-        None => app.host.graph().clone(),
+        None => app.host.presentation_graph().clone(),
     };
     let mut graph_canvas = web_graphs::prepared_canvas(canvas_graph, width, height);
     let speed_options = web_speed::options()?;
@@ -1902,7 +1910,7 @@ async fn run(root_element: Element) -> Result<(), String> {
         .get_node_by_url(FIXTURE_WEB_ADDRESS)
         .map(|(key, _)| graph_canvas.node_face(key).as_code().to_string())
         .unwrap_or_else(|| "derived".to_string());
-    let node_count = app.host.graph().node_count();
+    let node_count = app.host.presentation_graph().node_count();
     let product_status = if capture_summary.active {
         format!(
             "Daily graph operations ready · {storage_status} · {} captured",
@@ -1940,12 +1948,17 @@ async fn run(root_element: Element) -> Result<(), String> {
     chrome_text.register_font_bytes(include_bytes!("../web/GraphshellSans.ttf").to_vec());
     let appearance_root = root()?;
     let host_appearance = crate::web_appearance::mount(
-        appearance_root.clone(), appearance_root.has_attribute("data-appearance-application"),
+        appearance_root.clone(),
+        appearance_root.has_attribute("data-appearance-application"),
     )?;
     host_appearance.borrow().apply_canvas(&mut graph_canvas);
     let appearance_revision = host_appearance.borrow().revision;
     let chrome_scene = build_chrome_scene(
-        initial_model, width, height, &mut chrome_text, host_appearance.borrow().sheet(),
+        initial_model,
+        width,
+        height,
+        &mut chrome_text,
+        host_appearance.borrow().sheet(),
     )?;
     let command_choices = web_commands::stored_choices(&app.host);
     let state = Rc::new(RefCell::new(BrowserHost {
@@ -1998,8 +2011,12 @@ async fn run(root_element: Element) -> Result<(), String> {
         projection_editor: ProjectionEditor::new(initial_projection_draft()),
         live_projection: None,
         practice: if root()?.has_attribute("data-practice-workspace") {
-            Some(web_practice::PracticeHost::new(web_dataset::supplied(&root()?))?)
-        } else { None },
+            Some(web_practice::PracticeHost::new(web_dataset::supplied(
+                &root()?,
+            ))?)
+        } else {
+            None
+        },
         practice_scene: Scene::new(width, height),
         projection_editor_open: false,
         projection_editor_status: "Draft ready · unsaved".to_string(),
@@ -2011,6 +2028,7 @@ async fn run(root_element: Element) -> Result<(), String> {
         camera_mark: None,
         option_rows_kind: None,
         session_store_error: String::new(),
+        publication_read_error: None,
         scenario: None,
         scenario_frames: 0,
         probe_events: Vec::new(),

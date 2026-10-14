@@ -33,10 +33,10 @@
 pub mod backend;
 pub mod blob;
 pub mod codec;
-#[cfg(feature = "directory")]
-pub mod directory_backend;
 #[cfg(test)]
 mod custody_transact_tests;
+#[cfg(feature = "directory")]
+pub mod directory_backend;
 pub mod error;
 #[cfg(all(feature = "indexeddb", target_arch = "wasm32"))]
 pub mod indexeddb_backend;
@@ -57,7 +57,7 @@ pub use journal::{CausalError, Journal, LogId, Provenance, Seq};
 pub use slot::SlotStore;
 
 #[cfg(all(feature = "indexeddb", target_arch = "wasm32"))]
-pub use indexeddb_backend::IndexedDbBackend;
+pub use indexeddb_backend::{IndexedDbBackend, IndexedDbOpenAttempt};
 
 #[cfg(feature = "redb")]
 pub use redb_backend::RedbBackend;

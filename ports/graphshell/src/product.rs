@@ -698,6 +698,8 @@ pub struct ImportReceipt {
 
 #[derive(Debug)]
 pub enum ProductError {
+    /// Earlier phases remain in the same writer and require persistence/recovery.
+    AppliedButUnstored(Box<ProductError>),
     Host(MereHostError),
     UnknownNode(Uuid),
     UnknownAddress(String),
@@ -713,6 +715,7 @@ pub enum ProductError {
 impl std::fmt::Display for ProductError {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::AppliedButUnstored(error) => write!(formatter, "applied but unstored: {error}"),
             Self::Host(error) => write!(formatter, "{error}"),
             Self::UnknownNode(id) => write!(formatter, "unknown graph object {id}"),
             Self::UnknownAddress(address) => write!(formatter, "unknown address {address}"),
@@ -735,12 +738,221 @@ impl From<MereHostError> for ProductError {
     }
 }
 
+pub(crate) fn matching_members_in_graph(
+    graph: &Graph,
+    query: &str,
+    family: RelationFamilyFilter,
+) -> Vec<Uuid> {
+    let query = query.trim().to_lowercase();
+    let related: HashSet<_> = graph
+        .projected_relations()
+        .filter(|(_, relation)| family.accepts(family_of(relation.kind)))
+        .flat_map(|(_, relation)| [relation.from, relation.to])
+        .collect();
+    graph
+        .nodes()
+        .filter(|(key, _)| family == RelationFamilyFilter::All || related.contains(key))
+        .filter(|(key, node)| {
+            if query.is_empty() {
+                return true;
+            }
+            node.title.to_lowercase().contains(&query)
+                || node.url().to_lowercase().contains(&query)
+                || graph
+                    .node_content_tags(*key)
+                    .is_some_and(|tags| tags.iter().any(|tag| tag.to_lowercase().contains(&query)))
+                || graph.facets().facets_of(&node.id).is_some_and(|facets| {
+                    facets.iter().any(|(id, value)| {
+                        id.as_str().to_lowercase().contains(&query)
+                            || value.to_string().to_lowercase().contains(&query)
+                    })
+                })
+        })
+        .map(|(_, node)| node.id)
+        .collect()
+}
+
 impl<B: Backend> MereHost<B> {
+    /// Closure/global operations require an explicit Full setting on this same
+    /// writer. A partial view never creates a second complete writer.
+    pub(crate) fn ensure_complete_operation(&self) -> Result<(), MereHostError> {
+        if matches!(
+            self.resident_settings.policy,
+            pandect::addressable_graph::ResidencyPolicy::Neighborhood { .. }
+        ) {
+            return Err(crate::resident_host::ResidentHostError::Live(
+                pandect::live_graph::LiveEditError::NeedsCompleteOperation,
+            )
+            .into());
+        }
+        Ok(())
+    }
+
+    fn product_checks(
+        &self,
+        id: Uuid,
+        content: bool,
+    ) -> Result<Vec<pandect::live_graph::LiveCheck>, ProductError> {
+        use pandect::{
+            addressable_graph::GraphAddress,
+            live_graph::{LiveCheck, LiveEditError},
+        };
+        let address = GraphAddress::Surface(id);
+        // A private multi-phase file operation may observe its own preceding
+        // changes. External operations use the last coherent published reader.
+        let local = if self.product_sequence_depth > 0 {
+            Some(
+                pandect::addressable_graph::AddressableGraphStore::new(
+                    muniment::MemoryBackend::new(),
+                    Uuid::nil(),
+                )
+                .prepare_recorded_graph(self.graph())
+                .map_err(|error| ProductError::Host(MereHostError::from(error)))?,
+            )
+        } else {
+            None
+        };
+        let digest = |address| {
+            local
+                .as_ref()
+                .and_then(|v| v.record_digest(address))
+                .or_else(|| {
+                    self.resident_reader
+                        .as_ref()
+                        .and_then(|v| v.record_digest(address))
+                })
+                .map(str::to_owned)
+                .ok_or_else(|| {
+                    ProductError::Host(
+                        crate::resident_host::ResidentHostError::Live(
+                            LiveEditError::MissingObservation(address),
+                        )
+                        .into(),
+                    )
+                })
+        };
+        let mut checks = vec![LiveCheck::RecordUnchanged {
+            address,
+            digest: digest(address)?,
+        }];
+        if content {
+            let resource = match &local {
+                Some(source) => source.shown_resource(id),
+                None => self
+                    .resident_reader
+                    .as_ref()
+                    .and_then(|reader| reader.shown_resource(id)),
+            }
+            .ok_or_else(|| {
+                ProductError::Host(
+                    crate::resident_host::ResidentHostError::Live(
+                        LiveEditError::NeedsCompleteOperation,
+                    )
+                    .into(),
+                )
+            })?;
+            checks.push(LiveCheck::ShownUnchanged {
+                surface: id,
+                resource,
+            });
+            checks.push(LiveCheck::RecordUnchanged {
+                address: GraphAddress::Resource(resource),
+                digest: digest(GraphAddress::Resource(resource))?,
+            });
+        }
+        Ok(checks)
+    }
+
+    // Tag replacement observes the displayed content set. Resource relations
+    // need shown bindings and records, but do not depend on tag hydration.
+    fn product_tag_checks(
+        &self,
+        id: Uuid,
+    ) -> Result<Vec<pandect::live_graph::LiveCheck>, ProductError> {
+        use pandect::{
+            addressable_graph::GraphAddress,
+            live_graph::{LiveCheck, LiveEditError},
+        };
+        let mut checks = self.product_checks(id, true)?;
+        let missing = || {
+            ProductError::Host(
+                crate::resident_host::ResidentHostError::Live(LiveEditError::MissingObservation(
+                    GraphAddress::Surface(id),
+                ))
+                .into(),
+            )
+        };
+        let observed = if self.product_sequence_depth > 0 {
+            self.graph()
+        } else {
+            self.resident_reader.as_ref().ok_or_else(missing)?.graph()
+        };
+        // A catalog-known but unloaded Surface lacks a content observation;
+        // its absent reader-local key does not mean the target is missing.
+        let key = observed.get_node_key_by_id(id).ok_or_else(missing)?;
+        let tags = observed.node_content_tags(key).ok_or_else(missing)?;
+        checks.push(LiveCheck::ContentTagsUnchanged {
+            surface: id,
+            tags: tags
+                .into_iter()
+                .map(|tag| tag.trim().to_owned())
+                .filter(|tag| !tag.is_empty())
+                .collect(),
+        });
+        Ok(checks)
+    }
+
+    fn product_command(
+        &mut self,
+        command: pandect::live_graph::LiveCommand,
+        checks: Vec<pandect::live_graph::LiveCheck>,
+    ) -> Result<(), ProductError> {
+        self.apply_observed_commands(vec![pandect::live_graph::ObservedCommand {
+            command,
+            checks,
+        }])
+        .map(|_| ())
+        .map_err(|error| ProductError::Host(error.into()))
+    }
+
+    pub fn set_product_pinned(&mut self, id: Uuid, pinned: bool) -> Result<(), ProductError> {
+        if self.resident_admitted {
+            let checks = self.product_checks(id, false)?;
+            return self.product_command(
+                pandect::live_graph::LiveCommand::SetPinned {
+                    surface: id,
+                    pinned,
+                },
+                checks,
+            );
+        }
+        self.apply_edits(vec![
+            mere::kernel::graph::CapturedDelta::ReplaySetNodePinnedById {
+                node_id: id.to_string(),
+                is_pinned: pinned,
+            },
+        ])?;
+        Ok(())
+    }
+
     pub fn create_address(&mut self, address: &str, title: &str) -> Result<Uuid, ProductError> {
         if let Some((_, node)) = self.graph().get_node_by_url(address) {
             return Ok(node.id);
         }
         let id = Uuid::new_v4();
+        if self.resident_admitted {
+            self.product_command(
+                pandect::live_graph::LiveCommand::CreateAddress {
+                    id,
+                    address: address.to_owned(),
+                    title: title.to_owned(),
+                },
+                vec![pandect::live_graph::LiveCheck::Absent(
+                    pandect::addressable_graph::GraphAddress::Surface(id),
+                )],
+            )?;
+            return Ok(id);
+        }
         self.mutate_product_graph(|graph| {
             let key = add_node(
                 graph,
@@ -768,6 +980,38 @@ impl<B: Backend> MereHost<B> {
         let portable_id = Sha256NamedInformation::from_hex(&metadata.content_hash)
             .map_err(|error| ProductError::InvalidContentReference(error.to_string()))?;
         let address = portable_id.to_string();
+        if self.resident_admitted {
+            self.ensure_resident_idle()?;
+            let before = self.graph_session().journal().live_cursor();
+            self.product_sequence_depth += 1;
+            let result = (|| {
+                let id = self.create_address(&address, &metadata.name)?;
+                let checks = self.product_checks(id, false)?;
+                self.product_command(
+                    pandect::live_graph::LiveCommand::SetMimeHint {
+                        surface: id,
+                        mime_hint: (!metadata.media_type.is_empty())
+                            .then_some(metadata.media_type.clone()),
+                    },
+                    checks,
+                )?;
+                self.set_product_facet(id, CONTENT_FACET, &serde_json::json!({
+                    "portable_id": portable_id, "byte_len": metadata.byte_len, "media_type": metadata.media_type,
+                }).to_string())?;
+                self.set_product_facet(id, LOCAL_FILE_FACET, &serde_json::json!({
+                    "name": metadata.name, "last_modified_ms": metadata.last_modified_ms, "source": "browser-file-picker",
+                }).to_string())?;
+                Ok(id)
+            })();
+            self.product_sequence_depth -= 1;
+            return result.map_err(|error| {
+                if self.graph_session().journal().live_cursor() != before {
+                    ProductError::AppliedButUnstored(Box::new(error))
+                } else {
+                    error
+                }
+            });
+        }
         let id = self.create_address(&address, &metadata.name)?;
         let key = self
             .graph()
@@ -819,6 +1063,17 @@ impl<B: Backend> MereHost<B> {
             .map(|tag| tag.trim().to_string())
             .filter(|tag| !tag.is_empty())
             .collect();
+        if self.resident_admitted {
+            let checks = self.product_tag_checks(id)?;
+            return self.product_command(
+                pandect::live_graph::LiveCommand::EditNode {
+                    surface: id,
+                    title: title.to_owned(),
+                    tags: wanted,
+                },
+                checks,
+            );
+        }
         let current: BTreeSet<_> = self
             .graph()
             .node_content_tags(key)
@@ -855,6 +1110,45 @@ impl<B: Backend> MereHost<B> {
         Ok(())
     }
 
+    /// One external editor submission, validated before any field is applied.
+    pub fn edit_product_metadata(
+        &mut self,
+        id: Uuid,
+        title: &str,
+        tags: Vec<String>,
+        facet: Option<(String, serde_json::Value)>,
+    ) -> Result<(), ProductError> {
+        if !self.resident_admitted {
+            self.edit_node(id, title, tags)?;
+            if let Some((name, value)) = facet {
+                self.set_product_facet(id, &name, &value.to_string())?;
+            }
+            return Ok(());
+        }
+        use pandect::live_graph::{LiveCommand, ObservedCommand};
+        let mut commands = vec![ObservedCommand {
+            command: LiveCommand::EditNode {
+                surface: id,
+                title: title.to_owned(),
+                tags: tags.into_iter().collect(),
+            },
+            checks: self.product_tag_checks(id)?,
+        }];
+        if let Some((name, value)) = facet {
+            commands.push(ObservedCommand {
+                command: LiveCommand::SetFacet {
+                    surface: id,
+                    facet: name.trim().to_owned(),
+                    value,
+                },
+                checks: self.product_checks(id, false)?,
+            });
+        }
+        self.apply_observed_commands(commands)
+            .map(|_| ())
+            .map_err(|e| ProductError::Host(e.into()))
+    }
+
     pub fn set_product_facet(
         &mut self,
         id: Uuid,
@@ -867,6 +1161,17 @@ impl<B: Backend> MereHost<B> {
             .ok_or(ProductError::UnknownNode(id))?;
         let value = serde_json::from_str(json_value)
             .map_err(|error| ProductError::InvalidFacetJson(error.to_string()))?;
+        if self.resident_admitted {
+            let checks = self.product_checks(id, false)?;
+            return self.product_command(
+                pandect::live_graph::LiveCommand::SetFacet {
+                    surface: id,
+                    facet: facet.trim().to_owned(),
+                    value,
+                },
+                checks,
+            );
+        }
         self.set_facet(key, facet.trim(), value)?;
         Ok(())
     }
@@ -877,6 +1182,19 @@ impl<B: Backend> MereHost<B> {
         to: Uuid,
         relation: EditableRelation,
     ) -> Result<(), ProductError> {
+        if self.resident_admitted {
+            let content = !matches!(relation, EditableRelation::UserGrouped);
+            let mut checks = self.product_checks(from, content)?;
+            checks.extend(self.product_checks(to, content)?);
+            return self.product_command(
+                pandect::live_graph::LiveCommand::AssertRelation {
+                    from,
+                    to,
+                    assertion: relation.assertion(),
+                },
+                checks,
+            );
+        }
         let from = self
             .graph()
             .get_node_key_by_id(from)
@@ -892,38 +1210,7 @@ impl<B: Backend> MereHost<B> {
     }
 
     pub fn matching_members(&self, query: &str, family: RelationFamilyFilter) -> Vec<Uuid> {
-        let query = query.trim().to_lowercase();
-        let related: HashSet<_> = self
-            .graph()
-            .projected_relations()
-            .filter(|(_, relation)| family.accepts(family_of(relation.kind)))
-            .flat_map(|(_, relation)| [relation.from, relation.to])
-            .collect();
-        self.graph()
-            .nodes()
-            .filter(|(key, _)| family == RelationFamilyFilter::All || related.contains(key))
-            .filter(|(key, node)| {
-                if query.is_empty() {
-                    return true;
-                }
-                node.title.to_lowercase().contains(&query)
-                    || node.url().to_lowercase().contains(&query)
-                    || self.graph().node_content_tags(*key).is_some_and(|tags| {
-                        tags.iter().any(|tag| tag.to_lowercase().contains(&query))
-                    })
-                    || self
-                        .graph()
-                        .facets()
-                        .facets_of(&node.id)
-                        .is_some_and(|facets| {
-                            facets.iter().any(|(id, value)| {
-                                id.as_str().to_lowercase().contains(&query)
-                                    || value.to_string().to_lowercase().contains(&query)
-                            })
-                        })
-            })
-            .map(|(_, node)| node.id)
-            .collect()
+        matching_members_in_graph(self.graph(), query, family)
     }
 
     /// Save `scene` at `address` under [`SAVED_SCENE_FACET`] (F142: every
@@ -933,12 +1220,39 @@ impl<B: Backend> MereHost<B> {
         address: &str,
         scene: &SavedSceneV3,
     ) -> Result<Uuid, ProductError> {
-        let id = self.create_address(address, &scene.name)?;
+        self.ensure_complete_operation()?;
+        let value =
+            serde_json::to_value(scene).map_err(|e| ProductError::InvalidScene(e.to_string()))?;
+        // Complete scene saving keeps its existing address/title and facet
+        // changes separate, within this synchronous host operation.
+        let id = if let Some((_, node)) = self.graph().get_node_by_url(address) {
+            node.id
+        } else {
+            let id = Uuid::new_v4();
+            self.mutate_product_graph(|graph| {
+                let key = add_node(
+                    graph,
+                    Some(id),
+                    address.to_owned(),
+                    PortablePoint::new(0.0, 0.0),
+                );
+                if !scene.name.trim().is_empty() {
+                    apply_graph_delta(
+                        graph,
+                        GraphDelta::SetNodeTitle {
+                            key,
+                            title: scene.name.trim().to_owned(),
+                        },
+                    );
+                }
+            })?;
+            id
+        };
         let key = self
             .graph()
             .get_node_key_by_id(id)
             .ok_or(ProductError::UnknownNode(id))?;
-        self.set_facet(key, SAVED_SCENE_FACET, serde_json::to_value(scene).unwrap())?;
+        self.set_facet(key, SAVED_SCENE_FACET, value)?;
         Ok(id)
     }
 
@@ -1048,6 +1362,7 @@ impl<B: Backend> MereHost<B> {
     /// arrive whole, its relations join the graph's, and its facets overwrite
     /// (reservoir plan §7 item 27).
     pub fn import_product_codicil(&mut self, bytes: &[u8]) -> Result<ImportReceipt, ProductError> {
+        self.ensure_complete_operation()?;
         let input = decode_profiled_codicil(bytes)?;
         let codicil = input.product;
         let mut known: HashSet<String> = self
@@ -1079,6 +1394,7 @@ impl<B: Backend + Clone> MereHost<B> {
         &mut self,
         bytes: &[u8],
     ) -> Result<(ImportReceipt, Option<SavedSceneV3>), ProductError> {
+        self.ensure_complete_operation()?;
         let input = decode_profiled_codicil(bytes)?;
         let codicil = input.product;
         if let Some(scene) = &codicil.scene {
@@ -1645,6 +1961,568 @@ mod tests {
         let staged = host.prepare_store(1_800_000_000).expect("prepare");
         staged.write(&host.store()).await.expect("write");
         host.staged(staged);
+    }
+
+    async fn observed_product_owner() -> (MereHost<MemoryBackend>, Uuid) {
+        let backend = MemoryBackend::new();
+        let mut host = open_on(&backend).await;
+        host.begin_profiled_session(Graph::new(), Some(PlacementProfile::RecordedStrataV1))
+            .expect("recorded placement is required");
+        let id = host
+            .create_address("https://product.test/observed", "Original")
+            .expect("seed complete product path");
+        // Explicit test-only admission; no backend or raw host factory is exported.
+        host.admit_resident();
+        host.persist_owned(1).await.expect("publish initial reader");
+        assert!(!host.resident_busy());
+        assert!(host.resident_reader().is_some());
+        assert!(!host.has_unstored());
+        (host, id)
+    }
+
+    fn observed_pin_command(
+        host: &MereHost<MemoryBackend>,
+        id: Uuid,
+    ) -> pandect::live_graph::ObservedCommand {
+        use pandect::addressable_graph::GraphAddress;
+        use pandect::live_graph::{LiveCheck, LiveCommand, ObservedCommand};
+        let address = GraphAddress::Surface(id);
+        let digest = host
+            .resident_reader()
+            .expect("published reader")
+            .record_digest(address)
+            .expect("complete Surface observation")
+            .to_owned();
+        ObservedCommand {
+            command: LiveCommand::SetPinned {
+                surface: id,
+                pinned: true,
+            },
+            checks: vec![LiveCheck::RecordUnchanged { address, digest }],
+        }
+    }
+
+    const OBSERVED_TAG_VIA: &str = "task7.tag-observation";
+
+    fn observed_tag_concept() -> Uuid {
+        mere::kernel::graph::ResourceNode::for_term(
+            &mere::kernel::graph::resource_tags::tag_concept_iri(
+                &Author::person(FIXTURE_PERSONA_ADDRESS)
+                    .via(OBSERVED_TAG_VIA)
+                    .asserter_iri(),
+                "tagged",
+            ),
+        )
+        .id()
+    }
+
+    async fn observed_product_partial_tag_owner() -> (MereHost<MemoryBackend>, Uuid) {
+        use crate::resident_host::{PaneRoots, ResidentSettings};
+        use pandect::addressable_graph::{GraphAddress, ResidencyPolicy, ResidencyStatus};
+        let (mut host, id) = observed_product_owner().await;
+        host.save_projection(&projection("Tag observation", None))
+            .unwrap();
+        host.persist_owned(2).await.unwrap();
+        host.through(OBSERVED_TAG_VIA.into(), |host| {
+            host.edit_node(id, "Tagged original", ["tagged".into()])
+        })
+        .unwrap();
+        host.persist_owned(3).await.unwrap();
+        host.set_resident_pane(
+            pandect::ViewKey::new("graphshell", "notes-by-topic").unwrap(),
+            PaneRoots {
+                roster: BTreeSet::from([id]),
+                focus: None,
+            },
+        );
+        host.set_resident_settings(ResidentSettings {
+            policy: ResidencyPolicy::Neighborhood { hops: 0 },
+            projection: Some("notes-by-topic".into()),
+            ..Default::default()
+        })
+        .unwrap();
+        host.persist_owned(4).await.unwrap();
+        let reader = host.resident_reader().unwrap();
+        let key = reader.graph().get_node_key_by_id(id).unwrap();
+        assert_eq!(
+            reader.status(GraphAddress::Surface(id)),
+            ResidencyStatus::Loaded
+        );
+        assert_eq!(
+            reader.status(GraphAddress::Resource(observed_tag_concept())),
+            ResidencyStatus::NotLoaded
+        );
+        assert!(reader.graph().node_content_tags(key).unwrap().is_empty());
+        assert_eq!(reader.graph().node_count(), 1);
+        let writer_key = host.graph().get_node_key_by_id(id).unwrap();
+        assert_eq!(
+            host.graph().node_content_tags(writer_key).unwrap(),
+            HashSet::from(["tagged".into()])
+        );
+        assert!(!host.resident_busy());
+        assert!(!host.has_unstored());
+        assert!(host.retained_resident_work().is_none());
+        (host, id)
+    }
+
+    fn observed_tag_state(host: &MereHost<MemoryBackend>) -> serde_json::Value {
+        let reader = host.resident_reader().unwrap();
+        serde_json::json!({
+            "writer": host.graph().to_snapshot_at(0),
+            "facets": host.graph().facets(),
+            "cursor": host.graph_session().journal().live_cursor(),
+            "history": host.graph_session().journal().entries(),
+            "changes": host.graph_session().changes(),
+            "revision": host.graph_session().revision(),
+            "reader": reader.graph().to_snapshot_at(0),
+            "reader_facets": reader.graph().facets(),
+            "generation": reader.generation(),
+            "busy": host.resident_busy(),
+            "unstored": host.has_unstored(),
+            "settings_pending": host.resident_settings_pending(),
+            "retained_work": host.retained_resident_work().is_some(),
+        })
+    }
+
+    async fn observed_tag_stored_bytes(
+        host: &MereHost<MemoryBackend>,
+    ) -> std::collections::BTreeMap<String, Vec<u8>> {
+        let backend = host.store();
+        let mut bytes = std::collections::BTreeMap::new();
+        for key in backend.list("").await.unwrap() {
+            bytes.insert(key.clone(), backend.get(&key).await.unwrap().unwrap());
+        }
+        bytes
+    }
+
+    #[test]
+    fn observed_product_unloaded_tag_replacement_refuses_without_mutation() {
+        use crate::resident_host::ResidentHostError;
+        use pandect::addressable_graph::GraphAddress;
+        use pandect::live_graph::LiveEditError;
+        pollster::block_on(async {
+            let (mut host, id) = observed_product_partial_tag_owner().await;
+            let before = observed_tag_state(&host);
+            let stored_before = observed_tag_stored_bytes(&host).await;
+            let projection_revision = host.projection_revision();
+            let result = host.through(OBSERVED_TAG_VIA.into(), |host| {
+                host.edit_node(id, "Replacement title", Vec::<String>::new())
+            });
+            assert!(
+                matches!(
+                    &result,
+                    Err(ProductError::Host(MereHostError::Resident(error)))
+                        if matches!(error.as_ref(), ResidentHostError::Live(LiveEditError::Stale(address))
+                            if *address == GraphAddress::Surface(id))
+                ),
+                "unloaded tag replacement must refuse as stale observed content: {result:?}"
+            );
+            assert_eq!(observed_tag_state(&host), before);
+            assert_eq!(host.projection_revision(), projection_revision);
+            assert_eq!(observed_tag_stored_bytes(&host).await, stored_before);
+        });
+    }
+
+    #[test]
+    fn observed_product_unloaded_tag_replacement_accepts_after_focus_hydration() {
+        use crate::resident_host::PaneRoots;
+        use pandect::addressable_graph::{GraphAddress, ResidencyPolicy, ResidencyStatus};
+        pollster::block_on(async {
+            let (mut host, id) = observed_product_partial_tag_owner().await;
+            host.set_resident_pane(
+                pandect::ViewKey::new("graphshell", "notes-by-topic").unwrap(),
+                PaneRoots {
+                    roster: BTreeSet::from([id]),
+                    focus: Some(GraphAddress::Resource(observed_tag_concept())),
+                },
+            );
+            host.refresh_resident_reader().await.unwrap();
+            assert_eq!(
+                host.resident_settings().policy,
+                ResidencyPolicy::Neighborhood { hops: 0 }
+            );
+            let reader = host.resident_reader().unwrap();
+            let key = reader.graph().get_node_key_by_id(id).unwrap();
+            assert_eq!(
+                reader.status(GraphAddress::Resource(observed_tag_concept())),
+                ResidencyStatus::Loaded
+            );
+            assert_eq!(reader.graph().node_count(), 1);
+            assert_eq!(
+                reader.graph().node_content_tags(key).unwrap(),
+                HashSet::from(["tagged".into()])
+            );
+            let reader_before = serde_json::to_value(reader.graph().to_snapshot_at(0)).unwrap();
+            let generation_before = reader.generation().to_owned();
+            let cursor = host.graph_session().journal().live_cursor();
+            let changes = host.graph_session().changes().len();
+            host.through(OBSERVED_TAG_VIA.into(), |host| {
+                host.edit_node(id, "Replacement title", Vec::<String>::new())
+            })
+            .expect("hydrated observed replacement must succeed");
+            let key = host.graph().get_node_key_by_id(id).unwrap();
+            assert_eq!(host.graph().node_display_label(key), "Replacement title");
+            assert!(host.graph().node_content_tags(key).unwrap().is_empty());
+            assert_eq!(host.graph_session().changes().len(), changes + 1);
+            assert_eq!(
+                host.graph_session().changes().last().unwrap().author,
+                Author::person(FIXTURE_PERSONA_ADDRESS).via(OBSERVED_TAG_VIA)
+            );
+            assert!(host.graph_session().journal().live_cursor() > cursor);
+            assert!(host.resident_busy());
+            assert!(host.has_unstored());
+            assert_eq!(
+                serde_json::to_value(host.resident_reader().unwrap().graph().to_snapshot_at(0))
+                    .unwrap(),
+                reader_before
+            );
+            assert_eq!(
+                host.resident_reader().unwrap().generation(),
+                generation_before
+            );
+            host.persist_owned(5).await.unwrap();
+            assert!(!host.resident_busy());
+            assert!(!host.has_unstored());
+            let reader = host.resident_reader().unwrap();
+            let key = reader.graph().get_node_key_by_id(id).unwrap();
+            assert_ne!(reader.generation(), generation_before);
+            assert_eq!(reader.graph().node_display_label(key), "Replacement title");
+            assert!(reader.graph().node_content_tags(key).unwrap().is_empty());
+        });
+    }
+
+    #[test]
+    fn observed_product_unloaded_tag_allows_cites_without_tag_hydration() {
+        use pandect::addressable_graph::{GraphAddress, ResidencyStatus};
+        pollster::block_on(async {
+            let (mut host, id) = observed_product_partial_tag_owner().await;
+            let reader = host.resident_reader().unwrap();
+            let resource = reader.shown_resource(id).unwrap();
+            let reader_before = serde_json::to_value(reader.graph().to_snapshot_at(0)).unwrap();
+            let generation = reader.generation().to_owned();
+            let cursor = host.graph_session().journal().live_cursor();
+            let changes = host.graph_session().changes().len();
+            // A real Resource self-statement requires no other Surface roster.
+            host.through(OBSERVED_TAG_VIA.into(), |host| {
+                host.assert_product_relation(id, id, EditableRelation::Cites)
+            })
+            .expect("Cites needs published Resource records, not loaded tag concepts");
+            let statements = |graph: &Graph| {
+                graph
+                    .resource_relations()
+                    .filter(|(_, from, to, _)| *from == resource && *to == resource)
+                    .flat_map(|(_, _, _, bucket)| bucket.semantic_statements())
+                    .filter(|statement| {
+                        statement.predicate
+                            == mere::kernel::graph::predicate_iri(SemanticSubKind::Cites)
+                    })
+                    .cloned()
+                    .collect::<Vec<_>>()
+            };
+            let authored = statements(host.graph());
+            assert_eq!(authored.len(), 1);
+            assert_eq!(
+                authored[0].provenance_iri.as_deref(),
+                Some(
+                    Author::person(FIXTURE_PERSONA_ADDRESS)
+                        .via(OBSERVED_TAG_VIA)
+                        .asserter_iri()
+                        .as_str()
+                )
+            );
+            assert_eq!(host.graph_session().changes().len(), changes + 1);
+            assert_eq!(
+                host.graph_session().changes().last().unwrap().author,
+                Author::person(FIXTURE_PERSONA_ADDRESS).via(OBSERVED_TAG_VIA)
+            );
+            assert!(host.graph_session().journal().live_cursor() > cursor);
+            let key = host.graph().get_node_key_by_id(id).unwrap();
+            assert_eq!(
+                host.graph().node_content_tags(key).unwrap(),
+                HashSet::from(["tagged".into()])
+            );
+            assert_eq!(
+                serde_json::to_value(host.resident_reader().unwrap().graph().to_snapshot_at(0))
+                    .unwrap(),
+                reader_before
+            );
+            assert_eq!(host.resident_reader().unwrap().generation(), generation);
+            host.persist_owned(5).await.unwrap();
+            let reader = host.resident_reader().unwrap();
+            assert_eq!(
+                reader.status(GraphAddress::Resource(observed_tag_concept())),
+                ResidencyStatus::NotLoaded
+            );
+            assert_eq!(reader.graph().node_count(), 1);
+            assert_eq!(statements(reader.graph()), authored);
+            assert_ne!(reader.generation(), generation);
+            assert!(!host.resident_busy());
+            assert!(!host.has_unstored());
+        });
+    }
+
+    #[test]
+    fn observed_product_scene_requires_full_and_preserves_two_existing_changes() {
+        pollster::block_on(async {
+            let scene = SavedSceneV3 {
+                name: "Saved view".into(),
+                selected: Vec::new(),
+                physics_paused: true,
+                dynamics: SavedDynamics(serde_json::json!({"opaque":"unchanged"})),
+                camera_offset: (0.0, 0.0),
+                camera_zoom: 1.0,
+                default_handler: "system.default".into(),
+                cartography: Default::default(),
+            };
+            let (mut partial, _) = observed_product_partial_tag_owner().await;
+            let before = partial.graph_session().journal().live_cursor();
+            assert!(
+                matches!(partial.save_product_scene("mere://scene/task7", &scene),
+                Err(ProductError::Host(MereHostError::Resident(error)))
+                    if matches!(*error, crate::resident_host::ResidentHostError::Live(pandect::live_graph::LiveEditError::NeedsCompleteOperation)))
+            );
+            assert_eq!(partial.graph_session().journal().live_cursor(), before);
+            let (mut full, _) = observed_product_owner().await;
+            let changes = full.graph_session().changes().len();
+            let reader = serde_json::to_vec(&full.presentation_graph().to_snapshot_at(0)).unwrap();
+            let id = full
+                .save_product_scene("mere://scene/task7", &scene)
+                .unwrap();
+            assert_eq!(full.graph_session().changes().len(), changes + 2);
+            assert_eq!(
+                serde_json::to_vec(&full.presentation_graph().to_snapshot_at(0)).unwrap(),
+                reader
+            );
+            full.persist_owned(3).await.unwrap();
+            assert_eq!(
+                full.presentation_graph()
+                    .facets()
+                    .get(&id, &chartulary::FacetId::new(SAVED_SCENE_FACET)),
+                Some(&serde_json::to_value(&scene).unwrap())
+            );
+            assert_eq!(
+                full.save_product_scene("mere://scene/task7", &scene)
+                    .unwrap(),
+                id
+            );
+        });
+    }
+
+    #[test]
+    fn observed_product_metadata_editor_applies_title_tags_and_facet_as_one_submission() {
+        pollster::block_on(async {
+            let (mut host, id) = observed_product_owner().await;
+            let changes = host.graph_session().changes().len();
+            let before = serde_json::to_vec(&host.presentation_graph().to_snapshot_at(0)).unwrap();
+            host.edit_product_metadata(
+                id,
+                " Edited ",
+                vec![" tagged ".into(), "".into()],
+                Some(("note".into(), serde_json::json!({"text":"same submission"}))),
+            )
+            .unwrap();
+            assert_eq!(host.graph_session().changes().len(), changes + 1);
+            assert_eq!(
+                serde_json::to_vec(&host.presentation_graph().to_snapshot_at(0)).unwrap(),
+                before
+            );
+            host.persist_owned(3).await.unwrap();
+            let key = host.presentation_graph().get_node_key_by_id(id).unwrap();
+            assert_eq!(
+                host.presentation_graph().get_node(key).unwrap().title,
+                "Edited"
+            );
+            assert_eq!(
+                host.presentation_graph().node_content_tags(key).unwrap(),
+                HashSet::from(["tagged".to_owned()])
+            );
+            assert_eq!(
+                host.presentation_graph()
+                    .facets()
+                    .get(&id, &chartulary::FacetId::new("note")),
+                Some(&serde_json::json!({"text":"same submission"}))
+            );
+        });
+    }
+
+    #[test]
+    fn observed_product_fixture_accepts_complete_observation() {
+        pollster::block_on(async {
+            let (mut host, id) = observed_product_owner().await;
+            let command = observed_pin_command(&host, id);
+            let cursor = host.graph_session().journal().live_cursor();
+            host.edit_resident("task7.fixture-control", vec![command])
+                .expect("existing admitted edit must accept this observation");
+            assert!(host.graph_session().journal().live_cursor() > cursor);
+            let key = host.graph().get_node_key_by_id(id).unwrap();
+            assert_eq!(host.graph().node_is_pinned(key), Some(true));
+            host.persist_owned(2)
+                .await
+                .expect("persist fixture control");
+            let reader = host.resident_reader().unwrap();
+            let key = reader.graph().get_node_key_by_id(id).unwrap();
+            assert_eq!(reader.graph().node_is_pinned(key), Some(true));
+        });
+    }
+
+    #[test]
+    fn observed_product_edit_requires_the_observed_record() {
+        pollster::block_on(async {
+            use crate::resident_host::ResidentHostError;
+            use pandect::addressable_graph::GraphAddress;
+            use pandect::live_graph::{LiveCheck, LiveCommand, LiveEditError, ObservedCommand};
+            let (mut host, id) = observed_product_owner().await;
+            let before = serde_json::to_vec(&host.graph().to_snapshot_at(0)).unwrap();
+            let reader_before =
+                serde_json::to_vec(&host.resident_reader().unwrap().graph().to_snapshot_at(0))
+                    .unwrap();
+            let cursor = host.graph_session().journal().live_cursor();
+            let changes = host.graph_session().changes().to_vec();
+            let result = host.apply_observed_commands(vec![ObservedCommand {
+                command: LiveCommand::SetPinned {
+                    surface: id,
+                    pinned: true,
+                },
+                checks: vec![LiveCheck::Exists(GraphAddress::Surface(id))],
+            }]);
+            assert!(matches!(
+                result,
+                Err(ResidentHostError::Live(LiveEditError::MissingObservation(address)))
+                    if address == GraphAddress::Surface(id)
+            ));
+            assert_eq!(
+                serde_json::to_vec(&host.graph().to_snapshot_at(0)).unwrap(),
+                before
+            );
+            assert_eq!(host.graph_session().journal().live_cursor(), cursor);
+            assert_eq!(host.graph_session().changes(), changes.as_slice());
+            assert_eq!(
+                serde_json::to_vec(&host.resident_reader().unwrap().graph().to_snapshot_at(0),)
+                    .unwrap(),
+                reader_before
+            );
+            assert!(!host.resident_busy());
+            assert!(!host.has_unstored());
+        });
+    }
+
+    #[test]
+    fn observed_product_edit_accepts_the_observed_record_with_host_author() {
+        pollster::block_on(async {
+            let (mut host, id) = observed_product_owner().await;
+            let command = observed_pin_command(&host, id);
+            let reader_before =
+                serde_json::to_vec(&host.resident_reader().unwrap().graph().to_snapshot_at(0))
+                    .unwrap();
+            let cursor = host.graph_session().journal().live_cursor();
+            let changes = host.graph_session().changes().len();
+            let applied: pandect::live_graph::LiveApplied = host
+                .through("task7.observed".into(), |host| {
+                    host.apply_observed_commands(vec![command])
+                })
+                .expect("fully observed admitted edit must succeed");
+            assert!(applied.created.is_empty());
+            assert_eq!(applied.applied.first, cursor);
+            assert_eq!(
+                applied.applied.end,
+                host.graph_session().journal().live_cursor()
+            );
+            assert!(applied.applied.end > cursor);
+            assert_eq!(host.graph_session().changes().len(), changes + 1);
+            assert_eq!(
+                host.graph_session().changes().last().unwrap().author,
+                pandect::Author::person(FIXTURE_PERSONA_ADDRESS).via("task7.observed"),
+            );
+            let key = host.graph().get_node_key_by_id(id).unwrap();
+            assert_eq!(host.graph().node_is_pinned(key), Some(true));
+            assert!(host.has_unstored());
+            assert_eq!(
+                serde_json::to_vec(&host.resident_reader().unwrap().graph().to_snapshot_at(0),)
+                    .unwrap(),
+                reader_before
+            );
+            host.persist_owned(2)
+                .await
+                .expect("store the accepted edit");
+            assert!(!host.has_unstored());
+            let reader = host.resident_reader().unwrap();
+            let key = reader.graph().get_node_key_by_id(id).unwrap();
+            assert_eq!(reader.graph().node_is_pinned(key), Some(true));
+        });
+    }
+
+    #[test]
+    fn observed_file_metadata_keeps_four_changes_and_one_reader_cut() {
+        pollster::block_on(async {
+            let (mut host, _) = observed_product_owner().await;
+            let reader =
+                serde_json::to_value(host.resident_reader().unwrap().graph().to_snapshot_at(0))
+                    .unwrap();
+            let count = host.graph_session().changes().len();
+            let id = host
+                .create_file_metadata(LocalFileMetadata {
+                    content_hash: "0".repeat(64),
+                    name: "observed.txt".into(),
+                    media_type: "text/plain".into(),
+                    byte_len: 23,
+                    last_modified_ms: 12,
+                })
+                .unwrap();
+            assert_eq!(host.graph_session().changes().len(), count + 4);
+            assert!(host.resident_busy());
+            assert_eq!(
+                serde_json::to_value(host.resident_reader().unwrap().graph().to_snapshot_at(0))
+                    .unwrap(),
+                reader
+            );
+            let key = host.graph().get_node_key_by_id(id).unwrap();
+            assert_eq!(host.graph().get_node(key).unwrap().title, "observed.txt");
+            assert!(
+                host.graph()
+                    .facets()
+                    .get(&id, &chartulary::FacetId::new(CONTENT_FACET))
+                    .is_some()
+            );
+            assert!(
+                host.graph()
+                    .facets()
+                    .get(&id, &chartulary::FacetId::new(LOCAL_FILE_FACET))
+                    .is_some()
+            );
+            host.persist_owned(2).await.unwrap();
+            assert!(
+                host.resident_reader()
+                    .unwrap()
+                    .graph()
+                    .get_node_key_by_id(id)
+                    .is_some()
+            );
+        });
+    }
+
+    #[test]
+    fn observed_file_invalid_reference_refuses_before_any_phase() {
+        pollster::block_on(async {
+            let (mut host, _) = observed_product_owner().await;
+            let before = serde_json::to_value(host.graph().to_snapshot_at(0)).unwrap();
+            let cursor = host.graph_session().journal().live_cursor();
+            assert!(matches!(
+                host.create_file_metadata(LocalFileMetadata {
+                    content_hash: "invalid".into(),
+                    name: "observed.txt".into(),
+                    media_type: "text/plain".into(),
+                    byte_len: 23,
+                    last_modified_ms: 12,
+                }),
+                Err(ProductError::InvalidContentReference(_))
+            ));
+            assert_eq!(host.graph_session().journal().live_cursor(), cursor);
+            assert_eq!(
+                serde_json::to_value(host.graph().to_snapshot_at(0)).unwrap(),
+                before
+            );
+            assert!(!host.resident_busy());
+        });
     }
 
     #[test]

@@ -11,6 +11,18 @@ use std::fmt;
 /// A storage failure.
 #[derive(Debug, Clone, PartialEq)]
 pub enum StoreError {
+    /// Another revised writer retains the database lifetime lock.
+    OwnershipBusy,
+    /// The platform cannot establish mandatory exclusive admission.
+    OwnershipUnavailable(String),
+    /// A legacy connection blocked cutover; the refused request has drained.
+    UpgradeBlocked,
+    /// Cancellation completed. A committed version upgrade is reported honestly.
+    OpenCanceled { schema_upgraded: bool },
+    /// An existing database cannot satisfy this store's schema without alteration.
+    InvalidSchema(String),
+    /// The admitted connection was invalidated; fresh authoritative reopen is required.
+    OwnershipLost(String),
     /// The host backend (filesystem, OPFS, redb, fjall, ...) failed. The string
     /// is the backend's own error, stringified so the seam stays backend-agnostic.
     Backend(String),
@@ -28,6 +40,20 @@ pub enum StoreError {
 impl fmt::Display for StoreError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Self::OwnershipBusy => write!(f, "another page owns this database"),
+            Self::OwnershipUnavailable(reason) => {
+                write!(f, "exclusive ownership unavailable: {reason}")
+            },
+            Self::UpgradeBlocked => write!(
+                f,
+                "legacy database connection blocked cutover; request drained"
+            ),
+            Self::OpenCanceled { schema_upgraded } => write!(
+                f,
+                "open canceled; schema upgrade committed: {schema_upgraded}"
+            ),
+            Self::InvalidSchema(reason) => write!(f, "database schema: {reason}"),
+            Self::OwnershipLost(reason) => write!(f, "database owner lost: {reason}"),
             StoreError::Backend(msg) => write!(f, "backend: {msg}"),
             StoreError::Codec(msg) => write!(f, "codec: {msg}"),
             StoreError::NotTransactional => {

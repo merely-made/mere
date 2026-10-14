@@ -37,7 +37,25 @@ impl<B: Backend + Clone> MereHost<B> {
         selected_persona: SelectedPersonaRef,
         handlers: HandlerRegistry,
     ) -> Result<Self, MereHostError> {
-        let mut host = Self::empty(
+        Self::fixture_with_profile(backend, selected_persona, handlers, false)
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    pub(crate) fn fixture_recorded(
+        backend: B,
+        selected_persona: SelectedPersonaRef,
+        handlers: HandlerRegistry,
+    ) -> Result<Self, MereHostError> {
+        Self::fixture_with_profile(backend, selected_persona, handlers, true)
+    }
+
+    fn fixture_with_profile(
+        backend: B,
+        selected_persona: SelectedPersonaRef,
+        handlers: HandlerRegistry,
+        recorded: bool,
+    ) -> Result<Self, MereHostError> {
+        let mut host = Self::empty_with_recording(
             backend,
             selected_persona.clone(),
             handlers,
@@ -46,6 +64,7 @@ impl<B: Backend + Clone> MereHost<B> {
                 device: FIXTURE_DEVICE_TWO_ADDRESS.to_string(),
                 at_ms: 3_000,
             },
+            recorded,
         );
 
         let [
@@ -381,4 +400,90 @@ fn add_fixture_node(
         },
     );
     key
+}
+
+#[cfg(all(test, not(target_arch = "wasm32")))]
+mod tests {
+    use super::*;
+    use crate::mere_host::fixture_handlers;
+    use muniment::MemoryBackend;
+    use pandect::{MereSessions, graph_placement::PlacementProfile};
+
+    #[test]
+    fn recorded_fixture_persists_one_live_session_and_reopens_its_identity() {
+        pollster::block_on(async {
+            let backend = MemoryBackend::new();
+            let persona = SelectedPersonaRef {
+                persona: "personae://persona/alice".into(),
+                profile: "default".into(),
+            };
+            let mut host = MereHost::fixture_with_profile(
+                backend.clone(),
+                persona.clone(),
+                fixture_handlers(),
+                true,
+            )
+            .unwrap();
+            let session = host.graph_session().id();
+            let root = host.graph_session().manifest().root_graph_id;
+            assert_eq!(host.graph().node_count(), 11);
+            assert!(host.graph().get_node_by_url(FIXTURE_WEB_ADDRESS).is_some());
+            assert_eq!(
+                host.snapshot_placement(),
+                Some(PlacementProfile::RecordedStrataV1)
+            );
+
+            host.persist(3_000).await.unwrap();
+            let sessions = MereSessions::new(backend.clone());
+            let live = sessions
+                .list()
+                .await
+                .unwrap()
+                .into_iter()
+                .filter(|manifest| manifest.trashed.is_none())
+                .collect::<Vec<_>>();
+            assert_eq!(
+                live.len(),
+                1,
+                "initial recorded fixture must not persist an empty placeholder session"
+            );
+            assert_eq!(live[0].session_id, session);
+            assert_eq!(live[0].root_graph_id, root);
+            let durable = sessions.open(session).await.unwrap();
+            assert_eq!(durable.graph().node_count(), 11);
+            assert!(
+                durable
+                    .graph()
+                    .get_node_by_url(FIXTURE_WEB_ADDRESS)
+                    .is_some()
+            );
+            drop(host);
+
+            let reopened = MereHost::open(
+                backend,
+                persona.clone(),
+                fixture_handlers(),
+                AccessContext {
+                    persona: persona.persona,
+                    device: FIXTURE_DEVICE_TWO_ADDRESS.into(),
+                    at_ms: 3_000,
+                },
+            )
+            .await
+            .unwrap();
+            assert_eq!(reopened.graph_session().id(), session);
+            assert_eq!(reopened.graph_session().manifest().root_graph_id, root);
+            assert_eq!(reopened.graph().node_count(), 11);
+            assert!(
+                reopened
+                    .graph()
+                    .get_node_by_url(FIXTURE_WEB_ADDRESS)
+                    .is_some()
+            );
+            assert_eq!(
+                reopened.snapshot_placement(),
+                Some(PlacementProfile::RecordedStrataV1)
+            );
+        });
+    }
 }
