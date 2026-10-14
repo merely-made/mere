@@ -141,7 +141,7 @@
     "worktrees_or_cargo_homes_created": false
   },
   "done_conditions": [
-    "Enroll q-pc public key on Windows and qualify Windows SSH and stored-chat reads",
+    "Enroll q-pc public key on Windows, complete its native unlock after idle lock, and qualify Windows SSH and stored-chat reads",
     "Resolve M4 desktop/SSH account choice before recovering its outgoing agent access",
     "Apply prepared Windows SSH-shell correction with native elevation and verify native clients connect",
     "Complete pending M4 Windows enrollment if still needed",
@@ -227,11 +227,11 @@
     "launchd_low_priority_io": true,
     "run_at_login": true,
     "restart_policy": "KeepAlive false for initial qualification",
-    "vault_status": "native unlock accepted and resident ready; no credential supplied through tooling",
+    "vault_status": "native unlock accepted; subsequently idle-Locked in the same ready resident; no credential supplied through tooling",
     "observed_rss_kib": 42792,
     "service_settings": "dedicated SSH resident settings; existing legacy sync settings unchanged",
     "agent_disabled_negative_control": "exit 255; public-only identity cannot authenticate without Djinn",
-    "locked_login_check": "not newly qualified on q-pc",
+    "locked_login_check": "passed after natural idle lock; new SSH authentication denied with exit 255",
     "new_plaintext_private_key_file": false
   },
   "windows_ssh_shell": {
