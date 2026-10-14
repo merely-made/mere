@@ -347,6 +347,13 @@ neither checkouts nor worktrees. Native Code SSH sessions are the feature
 being registered, not a merger of ordinary Chat/Cowork history.
 Reference: [Claude Desktop SSH configuration](https://code.claude.com/docs/en/desktop#pre-configure-ssh-connections-for-your-team).
 
+The owner confirms all four peer entries are visible in O-PC's Claude Desktop
+Code-tab environment menu. For the first native connection check, ThinkPad's
+`/home/markik/Code` exists and is not a Git worktree, so browsing that folder
+does not require a new checkout. Home has 395,261,849,600 free bytes and no
+preexisting Claude remote-helper cache. Native connection remains pending;
+the owner was asked to select ThinkPad without sending a model task.
+
 The owner also reported ThinkPad's O-PC client error. Raw SSH still passes;
 the native client authenticates, then its POSIX shell probe loses its quoting
 through the Scoop Git launcher under Windows' default `cmd`. A local probe
