@@ -68,7 +68,7 @@ is `enum Face { Favicon, Derived, Sprite, Bare }`, with `Bare` "(Formerly `Shape
 seiche `node_body.rs:77`), and `.with_materials` / `.with_faces` persist materials and faces
 (`cartography.rs:48,55`). Turnstone imports sprites with a hull
 (`turnstone/src/app/node_arms.rs:1732-1743`); Graphshell has a face picker (`web_product.rs:475-484`,
-the "Representation" select at lines 312-313 of `ports/graphshell/web/component.html`).
+the "Representation" select at lines 312-313 of [component.html at the pre-cutover revision](https://github.com/merely-made/mere/blob/e84cfbd95b1660046d646580a8707af020a06e4b/ports/graphshell/web/component.html)).
 
 ## The model: Body × Face, with tile/shape as body presets
 

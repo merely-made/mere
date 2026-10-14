@@ -114,7 +114,7 @@ with existing Pending forced-checkpoint writes. The prepared object carries sour
 cursor/revision and generation. Pause further writer edits for this first staged
 commit; await without holding the browser host borrow, acknowledge only confirmed
 storage, then refresh the resident display. Source/session changes reject stale
-acknowledgments. `ports/graphshell/src/web_session.rs` supplies the existing
+acknowledgments. [web_session.rs at the pre-cutover revision](https://github.com/merely-made/mere/blob/e84cfbd95b1660046d646580a8707af020a06e4b/ports/graphshell/src/web_session.rs) supplies the existing
 prepare/write/install pattern; planned helpers extend it without another journal.
 
 Keep outcomes distinct: Rejected changes nothing; AppliedButUnstored means the

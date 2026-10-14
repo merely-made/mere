@@ -7,7 +7,8 @@ integrates published Mere `0a3203f05`, Genet `7422e906`, maintained Vello
 receipts and Mark's approval to proceed. Phase 4 remains unfinished: canvas
 controls, elapsed-time physics, saved-graph editing and remote-session slices
 have landed, but the complete page/control migration and acceptance wall have
-not closed. The legacy `web_gpu.rs` and `component.html` remain. The reservoir's
+not closed. The current working cutover retires the legacy presenter and component markup;
+fresh complete acceptance remains pending. The reservoir's
 mere panel is its V2b step 5, after this cutover. §2's current handoff names
 the remaining gates; linked plans own later editor and dynamics status. The
 reservoir's V3–V5 resident implementation has advanced independently; its
@@ -428,15 +429,15 @@ completed application migration.
 ## 2. Findings (verified 2026-09-25)
 
 - **The page has three layers.**
-  - `ports/graphshell/src/web_gpu.rs` (300 lines): `GpuPresenter` composites
+  - [web_gpu.rs at the pre-cutover revision](https://github.com/merely-made/mere/blob/e84cfbd95b1660046d646580a8707af020a06e4b/ports/graphshell/src/web_gpu.rs) (300 lines): `GpuPresenter` composites
     two netrender scenes onto the page's WebGPU canvas each frame, the graph
     content and the chrome.
   - Pictograph's canvas draws the graph, with physics, lenses and
     arrangements, as the content scene (`ports/graphshell/src/web.rs`).
-  - `ports/graphshell/src/web_view.rs` (353 lines) builds the chrome as a
+  - [web_view.rs at the pre-cutover revision](https://github.com/merely-made/mere/blob/e84cfbd95b1660046d646580a8707af020a06e4b/ports/graphshell/src/web_view.rs) (353 lines) builds the chrome as a
     retained Cambium view in a `ScriptedDom` that Genet paints. It is rebuilt
     from a `ChromeModel` on each change and takes no input.
-  - The interactive UI is HTML. `ports/graphshell/web/component.html` (337
+  - The interactive UI is HTML. [component.html at the pre-cutover revision](https://github.com/merely-made/mere/blob/e84cfbd95b1660046d646580a8707af020a06e4b/ports/graphshell/web/component.html) (337
     lines) holds 89 form controls and a link, driven by `web.rs` (2,248 lines):
     - a mounted-sessions header;
     - a graph-controls bar (select, edit, pan, zoom);
@@ -561,10 +562,11 @@ gates. They do not replace the complete phase-4 scenario or performance wall.
   wrapped toolbar, and current text-field sizing is checked at both widths.
   Their scope and limits remain in the linked receipts and the
   [migration inventory](2026-09-27_graphshell_tree_migration_inventory.md).
-- **Still required for phase 4:** complete the remaining product controls;
-  make every required page mount the single tree; retire the old presenter
-  and component page; rerun the live scenario inventory with full-frame capture
-  review and accessibility checks under the done-conditions in §4. Performance
+- **Still required for phase 4:** the C1 working source mounts all five public
+  pages through the single tree and retires the old presenter/component page.
+  Fresh product/viewer builds, every live and retained prior scenario, full-frame
+  capture review and accessibility checks must qualify that source under §4's
+  done-conditions. Source retirement alone does not accept the cutover. Performance
   results must name their revision, graph, motion state, dimensions and machine
   load; old debug medians are not a current responsiveness verdict.
 - **Reservoir boundary:** this is V2b step 4. The common mere view and route
@@ -2223,3 +2225,133 @@ phones, performance or another renderer. The earlier R3/R4 failures remain
 failed runs, with touch Fit distinguished from the later off-clip tools tap.
 Publication is separate from this acceptance; a rebuilt later source needs its
 own package qualification. Fitted project faces remain a visual limitation.
+### C1 reservoir panel and final presenter retirement (2026-10-13; in progress)
+
+The fresh source audit finds that loader.js already mounts all five public
+pages through the retained tree. The remaining unused BrowserHost presenter,
+its GpuPresenter, component markup, independent scenario pump and isolated
+adapters are now removed in the working source. Public mount, remote and
+scenario exports use the retained host, with the same practice state/control
+model separated from obsolete rendering helpers. Historical source citations
+link to the exact pre-cutover revision; the static legacy-markup label test
+retires with its source. Current retained command/control behavior still needs
+its actual browser and accessibility evidence.
+
+The shared common mere view gains archive/lifecycle composition. A native
+Graphshell client is a separate same-domain witness for Cleromancy C1. The
+browser panel must additionally mount the sessions, graph and archive
+projections from the same admitted resident route, synchronize its canvas and
+perform advertised owner intents. A new native witness or retiring dead source
+does not establish the browser V2b panel, five-page scenario wall or pacing
+verdict. At that initial checkpoint, source checks, browser build, headed captures
+and persistence remained pending; the current H checkpoint below records progress. The reservoir and Cleromancy plans retain their final gates.
+
+### Historical F/A3 C1 qualification checkpoint (2026-10-14)
+
+The [C1 supplier receipt](../testing/receipts/2026-10-14_c1_resident_divination/README.md)
+records immutable Mere C51 and Cleromancy portable A3, Genet B6, actual owner
+replay/refusal and coherent native/Wasm families. Four final shipping packages
+are sealed; CPU Viewer gzip caps pass without raising the budget. Native
+Cleromancy seed, fresh reopening, numerical compact control bounds and ordinary
+terminal unlock/embedded ownership have separate reviewed receipts. Bounded
+B590 Graphshell native/browser witnesses retain their original source identity;
+C51 changes only a stock unit-test body and its native Graphshell/C4/shipping
+bytes are identical. That provenance permits explicitly scoped reuse, not
+renewed execution or full-wall acceptance.
+
+The packet's strict execution batches preserve all 164 canonical scenes,
+140 physical profiles, 18 persisted chains and 19 internal fresh-process
+boundaries. Source preparation is rebound to the G browser frontend and F
+native runtime, whose separate provenance is recorded below. Strict execution
+and mandatory parameter/external/AX/renderer supplements remain pending. The
+final connected C51 C1 browser live/archive proofs pass within their bounded
+scopes; they do not replace the complete cutover wall. The intentionally
+failing physics diagnostic keeps its named diagnostic verdict. Retirement of
+the unused presenter and green unit tests do not close phase 4 or reservoir
+V2b.
+
+### Historical F wall probe and G snapshot repair (2026-10-14)
+
+The final C51 same-owner browser/native witness, fresh reopening, acknowledged
+Grid→Spiral update on the retained browser connection, and transient read-only
+archive controls pass with independent original capture and every-byte guards.
+The first canonical wall attempt finds two distinct limits: the unselected
+product snapshot reports no face despite actual derived canvas faces, and
+ordinary native window geometry drifts after activation. Four diagnostic rows
+are preserved as zero canonical acceptance, including three semantic passes.
+
+Committed `4a5099820` repairs only the wasm snapshot observation using actual
+node faces; selected Bare remains the original contract. Minimum-compiler and
+four shipping gates pass. The strict rerun preserves all 140 physical profiles,
+18 chains and 19 internal fresh-process boundaries, with actual Desktop
+emulation and a per-capture geometry rejection check. Its native owner runtime
+remains explicitly bound to C51. No phase-4 completion or browser full-wall
+qualification follows from this repair/build checkpoint.
+
+The unchanged original D3 and detail-actions cases now independently pass on
+G: the unselected canvas reports its actual Derived face and explicitly
+selected Bare remains Bare. Original captures, geometry, source and package
+bindings are recorded in the supplier machine receipt. These targeted repair
+proofs do not certify the remaining canonical wall or mandatory supplements.
+
+### Current H exact replay and consumer qualification (2026-10-14; in progress)
+
+The [current C1 supplier receipt](../testing/receipts/2026-10-14_c1_resident_divination/README.md)
+binds H `a1309431f`, portable validator `f7ec0db` and native N `04bd240`, all
+published source checkpoints with exact remote verification. Historical F/G
+artifacts retain their original scope; their passes do not count as H execution.
+
+G's controls batch preserves 20 semantic passes and one original Scene
+Save/Reopen failure across 21 runs/43 captures. Actual Save-only diagnosis found
+facet coordinates changing by one and two ULPs during JSON replay. H enables
+`serde_json/float_roundtrip` at graph-kernel; the production exact replay guard
+is unchanged and the temporary diagnostic removed. Exact live/replay/flushed
+reopen and typed fractional scene persistence regressions pass.
+
+H shared/stock suites pass 877/505 tests. Seven native runtimes and four sealed
+browser packages rebuild, with unchanged CPU Viewer delivery caps. The unchanged
+original headed Scene Save/Reopen passes on its fresh H profile at origin19421,
+with both facet assertions, original 2800×1800 capture review and clean Chrome
+Quit. This is same-process Scene reopening; the accepted profile is preserved.
+
+The exact consumer closure passes portable 18/19/20 and native 87/125 gates,
+both native all-target checks and build, 145 compiled-input Git-blob matches,
+and 24 stock/24 embedded owner capsule tests plus a three-owner replay parent.
+Five fresh H Cleromancy processes have 19 independently reviewed originals.
+Ordinary terminal unlock uses an explicit child PATH restriction, real encrypted
+authentication and no credential environment variable or stub. The first real
+graphical-dialog attempt remains failed and graphical handling unqualified.
+
+H native Graphshell witness/fresh reopening pass with six original reviews,
+acknowledged be49 Reading-session/Grid restoration, unchanged Cleromancy Fool
+map and domain records. Fresh reopening preserves all36 shared files plus the
+sentinel. The H mounted browser witness passes with five original reviews;
+only scoped Graphshell view history appends, with other35 files/sentinel intact.
+Lower detail IDs clip in pixels; exact parity is separate actual Chrome
+accessibility/semantic evidence. Actual fresh Chrome reopening passes with one original review and all36
+shared files plus sentinel unchanged. Retained live update also passes: native Spiral acknowledgment reaches actual
+browser generation7 before its companion click, with no Refresh/Switch/rejoin.
+The staged archive proof passes nine original reviews. Exact Save/Open add one
+codicil and read-only thaw; transient controls and original return preserve
+all45 shared files plus sentinel, epochs included, with complete saved app
+views/domain IDs unchanged. Lower archive-control clipping and Spiral edge
+overlap remain scoped limits.
+
+H execution preserves 140 physical profiles,164 canonical scenes,18 persisted
+chains,19 internal boundaries and16 external mappings. The complete wall and
+mandatory parameter/external/AX/renderer/negative supplements remain open.
+Prepared rows do not count as accepted rows. The impossible physics diagnostic
+keeps its intended failing verdict. Source retirement, builds and bounded C1
+proofs do not complete phase4 or reservoir V2b. Final documentation publication
+remains pending; no main integration or final phase acceptance is claimed.
+
+The H controls batch now closes 21 of 164 original canonical cases, with
+43 independently reviewed originals: 20 fresh profiles plus the retained Scene
+profile. The other 143 cases and mandatory supplements remain open. A final
+clean same-disk H resident restart preserves both complete application views
+and all domain IDs, with five sessions/two archives. Separate warm original
+and thaw guards preserve all45 shared files plus sentinel, epochs included.
+Release/startup database changes and the first cold original epoch8→10 byte
+failure remain recorded separately; the warm passes do not erase them.
+The documentation audits retain exactly the pre-edit F mechanical findings
+and D2 errors, with no new findings; inherited debt remains unresolved.
