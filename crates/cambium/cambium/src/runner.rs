@@ -1188,6 +1188,17 @@ where
         Self { state, logic, tree }
     }
 
+    /// Build beneath a caller-owned live mount in the same document.
+    ///
+    /// The mount may move between window subtrees without rebuilding this
+    /// runner. Its state, widget tree, focus and pointer capture stay owned by
+    /// this runner; the receiving host must withdraw stale window input first.
+    pub fn new_at(dom: DomHandle, mount: NodeId, mut logic: Logic, mut state: State) -> Self {
+        assert!(dom.borrow().is_live(mount), "runner mount must be live");
+        let tree = RunnerTree::build_at(dom, mount, &mut logic, &mut state);
+        Self { state, logic, tree }
+    }
+
     /// Apply a state update, then rebuild the view tree against the new state.
     ///
     /// `f` is the externally-driven "message": it mutates the owned state. The

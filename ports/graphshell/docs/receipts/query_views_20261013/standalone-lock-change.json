@@ -1,0 +1,114 @@
+{
+  "baseline_head": "e4304db3ce91e778ba62d20b407365239088aad6",
+  "baseline_blob": "8e5f063786ca8f62faf9ccbcbee3010f18efdb56",
+  "baseline_sha256": "3e2bd5303a250f9ea0d60cc7313ffe1154ec1e1ef2d14faf51ce63d45b6763e3",
+  "new_sha256": "cb509396a873d58f118537b3e2edc269a55f7f1fdc657631253b9e6f7d4b6889",
+  "removed": [
+    [
+      "mere-webrtc-carrier",
+      "0.0.1",
+      ""
+    ]
+  ],
+  "added": [
+    [
+      "json-event-parser",
+      "0.2.3",
+      "registry+https://github.com/rust-lang/crates.io-index"
+    ],
+    [
+      "md-5",
+      "0.11.0",
+      "registry+https://github.com/rust-lang/crates.io-index"
+    ],
+    [
+      "mere-linked-data",
+      "0.0.1",
+      ""
+    ],
+    [
+      "mere-webrtc-carrier",
+      "0.0.1",
+      "git+https://github.com/merely-made/murm.git?rev=b49df894635bac95823284efee6c445885eaf62a#b49df894635bac95823284efee6c445885eaf62a"
+    ],
+    [
+      "oxilangtag",
+      "0.1.6",
+      "registry+https://github.com/rust-lang/crates.io-index"
+    ],
+    [
+      "oxiri",
+      "0.2.11",
+      "registry+https://github.com/rust-lang/crates.io-index"
+    ],
+    [
+      "oxjsonld",
+      "0.2.6",
+      "registry+https://github.com/rust-lang/crates.io-index"
+    ],
+    [
+      "oxrdf",
+      "0.3.4",
+      "registry+https://github.com/rust-lang/crates.io-index"
+    ],
+    [
+      "oxsdatatypes",
+      "0.2.3",
+      "registry+https://github.com/rust-lang/crates.io-index"
+    ],
+    [
+      "oxttl",
+      "0.2.4",
+      "registry+https://github.com/rust-lang/crates.io-index"
+    ],
+    [
+      "peg",
+      "0.8.6",
+      "registry+https://github.com/rust-lang/crates.io-index"
+    ],
+    [
+      "peg-macros",
+      "0.8.6",
+      "registry+https://github.com/rust-lang/crates.io-index"
+    ],
+    [
+      "peg-runtime",
+      "0.8.6",
+      "registry+https://github.com/rust-lang/crates.io-index"
+    ],
+    [
+      "quick-xml",
+      "0.37.5",
+      "registry+https://github.com/rust-lang/crates.io-index"
+    ],
+    [
+      "ryu-js",
+      "1.0.3",
+      "registry+https://github.com/rust-lang/crates.io-index"
+    ],
+    [
+      "sparesults",
+      "0.3.4",
+      "registry+https://github.com/rust-lang/crates.io-index"
+    ],
+    [
+      "spareval",
+      "0.2.7",
+      "registry+https://github.com/rust-lang/crates.io-index"
+    ],
+    [
+      "spargebra",
+      "0.4.7",
+      "registry+https://github.com/rust-lang/crates.io-index"
+    ],
+    [
+      "sparopt",
+      "0.3.7",
+      "registry+https://github.com/rust-lang/crates.io-index"
+    ]
+  ],
+  "removed_git_sources": [],
+  "added_git_sources": [
+    "git+https://github.com/merely-made/murm.git?rev=b49df894635bac95823284efee6c445885eaf62a#b49df894635bac95823284efee6c445885eaf62a"
+  ]
+}
