@@ -14,6 +14,8 @@ publish = false
 
 [features]
 default = ["image-decode"]
+# Direct WebGL2 presentation, independently of optional WebGPU compute.
+webgl = ["netrender/vello-webgl"]
 # Forwards genet-livery's image decoding (mer3ly Ruling 111); on by default.
 image-decode = ["cambium-rootstock/image-decode", "mesquite/image-decode"]
 
@@ -24,6 +26,8 @@ cambium = { version = "0.3.3", path = "../cambium" }
 genet-render-host = { workspace = true }
 genet-scripted-dom = { workspace = true }
 netrender = { workspace = true }
+paint_list_render = { workspace = true, features = ["resource-bundle"] }
+paint_list_api = { workspace = true }
 wgpu = { workspace = true }
 # The accessibility mirror: genet's neutral projection, lowered to ARIA, and
 # AccessKit only to read what a leaf says of itself.
@@ -69,6 +73,7 @@ web-sys = { version = "0.3", features = [
 # The mirror's tests lay the example page out without a window.
 [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
 cambium-genet-winit-host = { version = "0.1.0", path = "../cambium-genet-winit-host" }
+netrender = { workspace = true, features = ["vello-cpu"] }
 
 # The accessibility page, mounted in a browser.
 [target.'cfg(target_arch = "wasm32")'.dev-dependencies]
