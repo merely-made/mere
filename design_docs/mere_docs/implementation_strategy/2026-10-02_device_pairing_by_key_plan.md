@@ -197,6 +197,34 @@ connections look good. The three-peer SSH and stored-chat access slice is
 qualified. Surface Wi-Fi instability is an owner hypothesis, not a diagnosed
 cause. Mac enrollment and Windows daemon reboot persistence remain open.
 
+**2026-10-13: Mac expansion, in progress.** The owner resumed the same client
+mesh setup on both Macs. The M4's configured address was stale; the owner
+provided `markik@m4-imac`. `m4-imac.local` reached it at `192.168.4.42` with
+the previously trusted host key. Windows name lookup then failed intermittently,
+so only that alias's address now uses the verified IPv4 address. Its existing
+HostKeyAlias is preserved. The Intel's saved address still times out from M4;
+its current SSH address is pending from the owner.
+
+M4 already bundles a complete matching Codex CLI (`0.162.0-alpha.17.2`). A
+user-local command link and owned PATH block expose it to login shells, and
+managed-daemon bootstrap passed with the PID backend. Its existing ChatGPT
+PID `69566` and personae-agent PID `1248` remain running. The latter holds M4's
+existing SSH identity; this slice does not migrate its custody to Djinn.
+No Mac source build or new private key file was used. Daemon RSS was 43,376 KiB.
+
+The M4, Surface and ThinkPad received additive public-key grants and pinned
+host trust. M4 registers O-PC, Surface and ThinkPad; live client state now
+enables automatic connection for them. O-PC's native client logged M4 Connected
+and read `Assess REDox for the stack`. M4 → Surface passed SSH execution and
+read `Check stack status`. Surface → M4 denied login while Djinn exposed no
+identities; its native unlock remains pending. M4's Windows UAC request was
+canceled, leaving its peer-scoped rule and reverse login pending. ThinkPad
+command sessions are slow: bounded M4/ThinkPad probes timed out, and ThinkPad
+client registration needs verification before retrying. Existing chats, agents
+and grants were preserved. These partial results are added to the existing
+[`client-mesh.json`](../testing/receipts/djinn-ssh-peers/client-mesh.json) receipt;
+neither Mac rollout nor daemon reboot persistence is closed.
+
 **Related**:
 
 - [reachability rungs and privacy lanes plan](2026-08-03_reachability_rungs_and_privacy_lanes_plan.md):
