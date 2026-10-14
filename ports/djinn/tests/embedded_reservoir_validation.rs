@@ -24,7 +24,9 @@ use castellan::custody::{IdentityVault, InMemoryStorage, Profile};
 use chirograph::{
     CarrierRequestBody, CarrierResponseBody, IntentInvocation, IntentResult, ProjectionSnapshot,
 };
-use djinn::embedded_reservoir::{ReservoirAttachment, ReservoirAttachmentOptions};
+use djinn::embedded_reservoir::{
+    ApplicationReservoirOptions, ReservoirAttachment, ReservoirAttachmentOptions,
+};
 use djinn::resident_mere::MereRoutes;
 use djinn::resident_reservoir::ResidentReservoir;
 use graphshell::identity::VaultProtectionView;
@@ -44,7 +46,18 @@ const DOMAIN: &str = "validated-fixture";
 const ROOT: &str = "DJINN_V35_ROOT";
 const ENDPOINT: &str = "DJINN_V35_ENDPOINT";
 const MODE: &str = "DJINN_V35_MODE";
+const PRODUCT: &str = "DJINN_V35_PRODUCT";
 const PATIENCE: Duration = Duration::from_secs(30);
+
+struct NoLocalPrompt;
+impl djinn::startup_vault::Prompt for NoLocalPrompt {
+    fn ask(
+        &mut self,
+        _: &djinn::startup_vault::Ask,
+    ) -> Result<djinn::startup_vault::Answer, String> {
+        panic!("live resident attachment must not prompt for local custody");
+    }
+}
 
 fn persona() -> PersonaId {
     PersonaId::from_uuid(Uuid::from_u128(0x5633_5635))
@@ -115,6 +128,9 @@ struct Process {
 }
 impl Process {
     fn start(root: &Path, address: &str, mode: &str) -> Self {
+        Self::start_mode(root, address, mode, false)
+    }
+    fn start_mode(root: &Path, address: &str, mode: &str, product: bool) -> Self {
         let mut child = Command::new(std::env::current_exe().unwrap())
             .args([
                 "--exact",
@@ -127,6 +143,7 @@ impl Process {
             .env(ROOT, root)
             .env(ENDPOINT, address)
             .env(MODE, mode)
+            .env(PRODUCT, if product { "divination" } else { "fixture" })
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::inherit())
@@ -213,6 +230,9 @@ async fn apply(
     result
 }
 fn durable_files(root: &Path) -> BTreeMap<PathBuf, Vec<u8>> {
+    durable_files_for(root, DOMAIN)
+}
+fn durable_files_for(root: &Path, domain: &str) -> BTreeMap<PathBuf, Vec<u8>> {
     fn collect(base: &Path, at: &Path, files: &mut BTreeMap<PathBuf, Vec<u8>>) {
         for entry in std::fs::read_dir(at).unwrap() {
             let path = entry.unwrap().path();
@@ -226,11 +246,71 @@ fn durable_files(root: &Path) -> BTreeMap<PathBuf, Vec<u8>> {
             }
         }
     }
-    let domain = DomainId::new(DOMAIN).unwrap();
+    let domain = DomainId::new(domain).unwrap();
     let sessions = mere_dir(root, persona(), MereId::derive(persona(), &domain)).join("sessions");
     let mut files = BTreeMap::new();
     collect(&sessions, &sessions, &mut files);
     files
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn published_divination_authority_survives_three_real_resident_owner_processes() {
+    let root = tempfile::tempdir().unwrap();
+    let unusable = root.path().join("no-client-store");
+    std::fs::write(&unusable, b"client cannot open a private store").unwrap();
+    for (phase, mode) in ["embedded", "daemon", "embedded"].into_iter().enumerate() {
+        let address = endpoint();
+        let process = Process::start_mode(root.path(), &address, mode, true);
+        let mut attached = ReservoirAttachment::open_application(
+            ApplicationReservoirOptions {
+                endpoint: address,
+                application: AppId::new("validator-fixture"),
+                domain: DomainId::new("divination").unwrap(),
+                shared_root: unusable.clone(),
+                vault_dir: unusable.clone(),
+                profile: None,
+                persona: Some(persona()),
+                session_duration: Duration::from_secs(60),
+            },
+            &mut NoLocalPrompt,
+            |_| async {
+                panic!("client must not compose local authority");
+                #[allow(unreachable_code)]
+                Ok::<MereRoutes, String>(unreachable!())
+            },
+        )
+        .await
+        .unwrap();
+        let initial = snapshots(attached.client_mut()).await;
+        if phase == 0 {
+            assert_eq!(
+                apply(attached.client_mut(), &initial[1], vec![node(1)]).await,
+                IntentResult::Accepted
+            );
+        }
+        let before = snapshots(attached.client_mut()).await;
+        let bytes = durable_files_for(root.path(), "divination");
+        let invalid = CapturedDelta::ReplaySetNodeFacetById {
+            node_id: Uuid::from_u128(1).to_string(),
+            facet: "cleromancy.reading/v999".into(),
+            value_json: "{}".into(),
+        };
+        assert!(
+            matches!(apply(attached.client_mut(), &before[1], vec![node(2), invalid]).await, IntentResult::Rejected { reason } if reason.contains("unsupported domain facet"))
+        );
+        let after = snapshots(attached.client_mut()).await;
+        assert_eq!(
+            serde_json::to_value(&after).unwrap(),
+            serde_json::to_value(&before).unwrap()
+        );
+        assert_eq!(durable_files_for(root.path(), "divination"), bytes);
+        assert_eq!(after[1].scene.active_items_in_order().len(), 2);
+        attached.close().await.unwrap();
+        println!(
+            "RECEIPT DIVINATION mode={mode} phase={phase} published-product-validator=true complete-batch-refused=true projection-and-durable-bytes-unchanged=true"
+        );
+        process.stop();
+    }
 }
 
 #[tokio::test(flavor = "multi_thread")]
@@ -248,6 +328,29 @@ async fn registered_domain_validator_survives_ownership_and_refuses_complete_bat
         let address = endpoint();
         let process = Process::start(root.path(), &address, mode);
         assert_ne!(process.child.id(), std::process::id());
+        let mut capsule = ReservoirAttachment::open_application(
+            ApplicationReservoirOptions {
+                endpoint: address.clone(),
+                application: AppId::new("validator-fixture"),
+                domain: DomainId::new(DOMAIN).unwrap(),
+                shared_root: unusable.clone(),
+                vault_dir: unusable.clone(),
+                profile: None,
+                persona: None,
+                session_duration: Duration::from_secs(60),
+            },
+            &mut NoLocalPrompt,
+            |_| async {
+                panic!("client capsule must not compose local routes");
+                #[allow(unreachable_code)]
+                Ok::<MereRoutes, String>(unreachable!())
+            },
+        )
+        .await
+        .unwrap();
+        assert!(!capsule.is_embedded());
+        snapshots(capsule.client_mut()).await;
+        capsule.close().await.unwrap();
         let mut attached =
             ReservoirAttachment::open(options(&unusable, &address), forbidden_identity)
                 .await
@@ -342,7 +445,11 @@ async fn child_serves_the_registered_domain() {
     ) else {
         return;
     };
-    let config = options(Path::new(&root), &address);
+    let product = std::env::var(PRODUCT).as_deref() == Ok("divination");
+    let mut config = options(Path::new(&root), &address);
+    if product {
+        config.domain = DomainId::new("divination").unwrap();
+    }
     let calls = Arc::new(AtomicUsize::new(0));
     let registered = Arc::new(AtomicBool::new(false));
     let mut daemon = None;
@@ -353,7 +460,11 @@ async fn child_serves_the_registered_domain() {
             || async { Ok(identity()) },
             move |routes| async move {
                 registered.store(true, Ordering::SeqCst);
-                Ok(routes.with_domain_validator(DOMAIN, validator(calls)))
+                Ok(if product {
+                    routes.with_divination_authority()
+                } else {
+                    routes.with_domain_validator(DOMAIN, validator(calls))
+                })
             },
         )
         .await
@@ -373,8 +484,12 @@ async fn child_serves_the_registered_domain() {
             catalog.clone(),
             grants.clone(),
             config.applications.clone(),
-        )
-        .with_domain_validator(DOMAIN, validator(calls.clone()));
+        );
+        let routes = if product {
+            routes.with_divination_authority()
+        } else {
+            routes.with_domain_validator(DOMAIN, validator(calls.clone()))
+        };
         registered.store(true, Ordering::SeqCst);
         routes.load_access(&reservoir).await.unwrap();
         for mere in reservoir.meres().await {
@@ -421,7 +536,7 @@ async fn child_serves_the_registered_domain() {
     snapshots(attached.client_mut()).await;
     assert!(registered.load(Ordering::SeqCst));
     assert!(
-        calls.load(Ordering::SeqCst) > 0,
+        product || calls.load(Ordering::SeqCst) > 0,
         "validator installed before first graph served"
     );
     println!(

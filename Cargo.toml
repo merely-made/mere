@@ -695,6 +695,84 @@ tinct = { path = "crates/cambium/tinct" }
 uxtree = { path = "crates/forme/uxtree" }
 workbench = { path = "crates/cambium/workbench" }
 
+# Canonical-www consumer pins must share the same workspace contracts as
+# the portable Cleromancy domain validator composed into Djinn.
+[patch."https://www.github.com/merely-made/mere.git"]
+murm = { git = "https://github.com/merely-made/murm.git", rev = "b49df894635bac95823284efee6c445885eaf62a" }
+cambium = { path = "crates/cambium/cambium" }
+cambium-genet-winit-host = { path = "crates/cambium/cambium-genet-winit-host" }
+chartulary = { path = "crates/eidetic/chartulary" }
+chirograph = { path = "crates/chirograph" }
+eidetic = { path = "crates/eidetic/eidetic-core" }
+esp = { path = "crates/intel/esp" }
+mere-fetch = { path = "crates/system/fetch" }
+gemot = { path = "crates/moot/gemot" }
+graphshell = { path = "ports/graphshell" }
+graphshell-endpoint = { path = "crates/graphshell/graphshell-endpoint" }
+illume = { path = "crates/nematic/illume" }
+inker = { path = "crates/inker/inker" }
+insigne = { git = "https://github.com/merely-made/dramatis.git", rev = "0234e7eea6f2ddf2330a71b9425da01b06ae0391" }
+knot-editor-host = { path = "crates/inker/knot-editor-host" }
+mere-proofs = { path = "crates/system/proofs" }
+mere-surface-api = { path = "crates/system/surface-api" }
+mere-transport = { git = "https://github.com/merely-made/murm.git", rev = "b49df894635bac95823284efee6c445885eaf62a" }
+mora-cmudict = { path = "crates/intel/mora-cmudict" }
+reference-data = { path = "crates/intel/reference-data" }
+muniment = { path = "crates/eidetic/muniment" }
+nematic = { path = "crates/nematic/nematic" }
+notochord = { git = "https://github.com/merely-made/dramatis.git", rev = "0234e7eea6f2ddf2330a71b9425da01b06ae0391" }
+pandect = { path = "crates/system/pandect" }
+personae = { git = "https://github.com/merely-made/dramatis.git", rev = "0234e7eea6f2ddf2330a71b9425da01b06ae0391" }
+sceno = { path = "crates/cambium/scenes/sceno" }
+# Knot has named these two since its `5516606`; they arrived with the
+# `c966e31` pin (wing ruling 586, "With djinn's Knot repin (Recommended)").
+scenograph = { path = "crates/cambium/scenes/scenograph" }
+scenomise = { path = "crates/cambium/scenes/scenomise" }
+scenotime = { path = "crates/cambium/scenes/scenotime" }
+script-rhai = { path = "crates/script/rhai" }
+servitor = { path = "crates/servitor" }
+stickleback = { path = "crates/stickleback" }
+
+# Complete the selected Knot contract closure so transitive Mere packages
+# use this workspace source rather than a second immutable Mere checkout.
+armillary = { path = "crates/armillary" }
+cambium-rootstock = { path = "crates/cambium/cambium-rootstock" }
+cambium-winit = { path = "crates/cambium/cambium-winit" }
+cambium-winit-a11y = { path = "crates/cambium/cambium-winit-a11y" }
+command-menu = { path = "crates/cambium/command-menu" }
+document-canvas = { path = "crates/inker/document-canvas" }
+edit-history = { path = "crates/cambium/edit-history" }
+errand = { path = "crates/system/errand" }
+graphshell-client = { path = "crates/graphshell/graphshell-client" }
+incipit = { path = "crates/incipit" }
+luggage = { path = "crates/system/luggage" }
+mere = { path = "crates/mere" }
+mere-alembic = { path = "crates/distillery/alembic" }
+mere-apparatus = { path = "crates/domain/apparatus" }
+mere-cartography = { path = "crates/canvas/cartography" }
+mere-curation = { path = "crates/forme/curation" }
+mere-document-lanes = { path = "crates/system/document-lanes" }
+mere-fleece = { path = "crates/fleece" }
+mere-forme = { path = "crates/forme/forme" }
+mere-kernel = { path = "crates/graph/graph-kernel" }
+mere-page-load = { path = "crates/system/page-load" }
+mere-view = { path = "crates/cambium/mere-view" }
+mere-webrtc-carrier = { git = "https://github.com/merely-made/murm.git", rev = "b49df894635bac95823284efee6c445885eaf62a" }
+meristem = { path = "crates/cambium/meristem" }
+mesquite = { path = "crates/cambium/mesquite" }
+mien = { path = "crates/moot/mien" }
+mooting = { path = "crates/moot/mooting" }
+numen = { path = "crates/conatus/numen" }
+pictograph = { path = "crates/canvas/pictograph" }
+seiche = { path = "crates/conatus/seiche" }
+sprigging = { path = "crates/cambium/sprigging" }
+tabard = { path = "crates/system/tabard" }
+tabard-workshop = { path = "crates/cambium/tabard-workshop" }
+tinct = { path = "crates/cambium/tinct" }
+uxtree = { path = "crates/forme/uxtree" }
+workbench = { path = "crates/cambium/workbench" }
+
+
 # ─── Cross-repo render-stack alignment (Mere → Genet) ───────────────────────
 # Livery/Buckram consume Genet's Taffy fork directly. The retired Stylo layout
 # cone has no root patch in this workspace.

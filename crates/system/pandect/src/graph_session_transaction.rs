@@ -47,6 +47,20 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         .await
     }
 
+    /// Stage the application's view and its parallel history together.
+    pub async fn transact_view(
+        &mut self,
+        author: Author,
+        key: ViewKey,
+        state: ViewIntent,
+        at: SystemTime,
+    ) -> Result<(), SessionError> {
+        self.transact_change(at, move |candidate| {
+            candidate.set_view_now(author, key, state)
+        })
+        .await
+    }
+
     async fn transact_change<R>(
         &mut self,
         at: SystemTime,
@@ -78,6 +92,19 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         }
         let mut candidate = self.detached_candidate();
         let result = change(&mut candidate)?;
+        // A view has its own log, so a graph head alone cannot detect a
+        // competing view append. Include existing and newly requested keys.
+        let mut view_heads = Vec::new();
+        for (key, view) in &candidate.views {
+            let log = self.keys.view_log(key);
+            view_heads.push((log.clone(), view.saved));
+            if let Some(held) = self.views.get(key).filter(|held| held.saved.0 > 0) {
+                tails.extend(
+                    held.log
+                        .entry_writes::<JsonCodec>(&log, Seq(held.saved.0 - 1))?,
+                );
+            }
+        }
         let pending = candidate.pending(at)?;
         let ops = pending.ops().to_vec();
         let rejection = Arc::new(Mutex::new(None));
@@ -96,6 +123,16 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
                         != expected_changes.0
                 {
                     return Err("Session changed before commit; draft retained".into());
+                }
+                for (log, expected) in view_heads {
+                    if reader
+                        .list(&format!("{log}/"))
+                        .map_err(|e| e.to_string())?
+                        .len() as u64
+                        != expected.0
+                    {
+                        return Err("Session view changed before commit; draft retained".into());
+                    }
                 }
                 for op in tails {
                     if let WriteOp::Put { key, value } = op {

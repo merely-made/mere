@@ -146,7 +146,8 @@ async fn two_processes_edit_one_session_through_djinn_and_hear_each_other() {
         catalog.clone(),
         grants.clone(),
         vec![AppId::new("turnstone"), AppId::new("knot-editor")],
-    );
+    )
+    .with_divination_authority();
     catalog
         .update(|catalog| reservoir.register(catalog, Some(routes)))
         .await

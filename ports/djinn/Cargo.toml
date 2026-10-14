@@ -19,7 +19,7 @@ personal-sync = []
 # it on through the dev-dependency on this package below; release builds keep
 # the prompt only.
 passphrase-fd = []
-custody-receipt-host = []
+custody-receipt-host = ["graphshell/mere-route"]
 # The Distillery trainer resource, composed into the works lane
 # (`src/resident_distillery.rs`). Gated because it pulls the burn stack into
 # the desktop resident: a default build must stay light, and a lane whose
@@ -50,6 +50,11 @@ distillery-chronicle-receipt-host = [
     "dep:webrtc-carrier",
 ]
 
+[[bin]]
+name = "c1-receipt-host"
+path = "src/bin/c1_receipt_host.rs"
+required-features = ["custody-receipt-host"]
+
 [dependencies]
 blake3.workspace = true
 chatelaine.workspace = true
@@ -58,6 +63,9 @@ chatelaine.workspace = true
 # (vault lock ruling 47); it moved from personae with custody (DR-B).
 castellan = { workspace = true, features = ["keeper", "os-presence"] }
 chirograph.workspace = true
+# Divination replay authority is supplied by the product's portable package;
+# the native Cleromancy executable may itself embed Djinn without a crate cycle.
+cleromancy-domain = { package = "cleromancy-core-acceptance", git = "https://github.com/merely-made/cleromancy.git", rev = "2851e6b0e3dda4b5b558c515579dede9daf1ec2d" }
 # The identity tier's plain types: views, intents, the roster (DR-A, DR-C).
 dramatis.workspace = true
 incipit.workspace = true

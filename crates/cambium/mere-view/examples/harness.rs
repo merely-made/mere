@@ -173,6 +173,7 @@ impl Harness {
         let what = match &request {
             MereViewRequest::Activate(key) => format!("open {key}"),
             MereViewRequest::Mint => "mint a session".to_string(),
+            MereViewRequest::Archive(request) => format!("archive {request:?}"),
             MereViewRequest::Session(id, step) => format!("{} {}", step.token(), self.name_of(*id)),
             MereViewRequest::Host(key) => format!("run {key}"),
             MereViewRequest::Layout(id) => format!("lay out by {id}"),
@@ -223,6 +224,7 @@ impl Harness {
                 }
             },
             MereViewRequest::Layout(id) => self.model.layout = id,
+            MereViewRequest::Archive(_) => self.decline("The fixture offers no archive.".into()),
         }
         for session in &mut self.model.sessions {
             session.steps = steps_for(session.attached, session.trashed);
@@ -370,6 +372,7 @@ fn catalog() -> MereViewModel {
             HostAction::new("recent", "Recent"),
         ],
         notice: None,
+        ..MereViewModel::default()
     }
 }
 

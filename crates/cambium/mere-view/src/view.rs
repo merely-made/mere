@@ -56,6 +56,11 @@ pub const MERE_VIEW_CSS: &str = "\
     .mere-view-sessions { list-style: none; margin: 0; padding: 0; overflow: auto; flex-shrink: 0; box-sizing: border-box; } \
     .mere-view-session { display: flex; flex-direction: column; } \
     .mere-view-session-steps { display: flex; flex-wrap: wrap; } \
+    .mere-view-archive { display:flex; flex-direction:column; } \
+    .mere-view-archive-steps { display:flex; flex-wrap:wrap; } \
+    .mere-view[data-graph=\"hidden\"] .mere-view-body { flex-direction:column; flex:1; } \
+    .mere-view[data-graph=\"hidden\"] .mere-view-sessions { width:100%; flex:1; min-height:0; max-height:none; } \
+    .mere-view[data-graph=\"hidden\"] .mere-view-main { width:100%; height:32px; } \
     .mere-view-graph { position: relative; } \
     .mere-view .graph-canvas-swatch { border: 0; border-radius: 0; }";
 
@@ -66,10 +71,20 @@ pub enum MereViewRequest {
     Activate(String),
     Mint,
     Session(SessionId, SessionStep),
+    Archive(ArchiveRequest),
     /// One of the host's actions, by its key.
     Host(String),
     /// Lay the graph out by this strategy id.
     Layout(String),
+}
+
+/// Explicit requests to the archive owner. Opening creates a read-only thaw;
+/// composing leaves its immutable sources untouched.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum ArchiveRequest {
+    Save(SessionId),
+    Open(String),
+    Compose(Vec<String>),
 }
 
 /// Presentation state the view reports and the host stores for it.
@@ -77,6 +92,7 @@ pub enum MereViewRequest {
 pub enum MereViewEvent {
     Hover(Option<String>),
     Focus(Option<String>),
+    SelectArchive(String),
 }
 
 /// The view's own state: hover, focus and the last layout. The host stores
@@ -86,6 +102,8 @@ pub enum MereViewEvent {
 pub struct MereViewState {
     pub hovered: Option<String>,
     pub focused: Option<String>,
+    /// Presentation-only selection for an explicit Compose request.
+    pub selected_archives: Vec<String>,
     laid: Laid,
 }
 
@@ -103,6 +121,13 @@ impl MereViewState {
         match event {
             MereViewEvent::Hover(key) => self.hovered = key,
             MereViewEvent::Focus(key) => self.focused = key,
+            MereViewEvent::SelectArchive(key) => {
+                if self.selected_archives.contains(&key) {
+                    self.selected_archives.retain(|selected| selected != &key);
+                } else {
+                    self.selected_archives.push(key);
+                }
+            },
         }
     }
 
@@ -110,6 +135,17 @@ impl MereViewState {
     /// nodes, its relations, the layout and the size are the ones last laid
     /// out. Call it before rendering whenever any of them may have changed.
     pub fn lay_out(&mut self, model: &MereViewModel, width: u32, height: u32) {
+        // A refresh removes vanished archive selections before a later Compose.
+        self.selected_archives.retain(|key| {
+            model
+                .archive
+                .as_ref()
+                .is_some_and(|archive| archive.entries.iter().any(|entry| &entry.key == key))
+        });
+        if model.hide_graph {
+            // The host's editing surface owns the geometry in panel mode.
+            return;
+        }
         let size = graph_size(width, height, has_session_content(model));
         let nodes: Vec<String> = model.graph.nodes.iter().map(|n| n.key.clone()).collect();
         let relations: Vec<(String, String)> = model
@@ -157,7 +193,7 @@ fn body_height(width: u32, height: u32) -> u32 {
 }
 
 fn has_session_content(model: &MereViewModel) -> bool {
-    model.can_mint || !model.sessions.is_empty()
+    model.can_mint || !model.sessions.is_empty() || model.archive.is_some()
 }
 
 /// The graph's area, in pixels, inside a tile of `width` by `height`.
@@ -198,11 +234,7 @@ pub struct MereView<'a> {
 impl MereView<'_> {
     /// The graph's area, in pixels.
     pub fn graph_size(&self) -> (u32, u32) {
-        graph_size(
-            self.width,
-            self.height,
-            has_session_content(self.model),
-        )
+        graph_size(self.width, self.height, has_session_content(self.model))
     }
 
     /// The layout in force: the host's, or the default when it names none.
@@ -313,17 +345,34 @@ where
         .attr("role", "status")
         .attr("aria-live", "polite");
     let content = match model.status.note() {
-        None => graph(&view, on_change, on_request.clone()),
+        None if model.hide_graph => {
+            Box::new(el::<_, State, Action>("div", ())) as MereViewElement<State, Action>
+        },
+        None => graph(&view, on_change.clone(), on_request.clone()),
         Some(note) => status_panel(model.status.token(), note, on_request.clone()),
     };
     // The notice rides over the top of the graph's area, where it covers no
     // control and needs no room of its own.
-    let (width, height) = view.graph_size();
+    let (width, height) = if model.hide_graph {
+        (
+            view.width,
+            if model.status.note().is_some() {
+                128
+            } else {
+                32
+            },
+        )
+    } else {
+        view.graph_size()
+    };
     let main = el::<_, State, Action>("div", (notice, content))
         .attr("class", "mere-view-main")
         .attr("style", format!("width:{width}px;height:{height}px"));
-    let body = el::<_, State, Action>("div", (sessions(&view, on_request.clone()), main))
-        .attr("class", "mere-view-body");
+    let body = el::<_, State, Action>(
+        "div",
+        (sessions(&view, on_change, on_request.clone()), main),
+    )
+    .attr("class", "mere-view-body");
     Box::new(
         el::<_, State, Action>("section", (bar(&view, on_request), body))
             .attr("class", "mere-view")
@@ -337,7 +386,11 @@ where
                 "data-width",
                 if wide(view.width) { "wide" } else { "narrow" },
             )
-            .attr("data-status", model.status.token()),
+            .attr("data-status", model.status.token())
+            .attr(
+                "data-graph",
+                if model.hide_graph { "hidden" } else { "shown" },
+            ),
     )
 }
 
@@ -414,13 +467,15 @@ where
     )
 }
 
-fn sessions<State, Action, Request>(
+fn sessions<State, Action, Change, Request>(
     view: &MereView<'_>,
+    on_change: Change,
     on_request: Request,
 ) -> MereViewElement<State, Action>
 where
     State: 'static,
     Action: 'static,
+    Change: Fn(&mut State, MereViewEvent) + Clone + 'static,
     Request: Fn(&mut State, MereViewRequest) + Clone + 'static,
 {
     // Minting heads the list, beside the other lifecycle steps.
@@ -440,15 +495,22 @@ where
     });
     let items: Vec<MereViewElement<State, Action>> = mint
         .into_iter()
-        .chain(
-            view.model
-                .sessions
-                .iter()
-                .map(|session| session_item(session, on_request.clone())),
-        )
+        .chain(view.model.sessions.iter().map(|session| {
+            session_item(
+                session,
+                view.model
+                    .archive
+                    .as_ref()
+                    .is_some_and(|archive| archive.save_sessions.contains(&session.id)),
+                on_request.clone(),
+            )
+        }))
+        .chain(archive_items(view, on_change, on_request.clone()))
         .collect();
     let size = if !has_session_content(view.model) {
         "display:none".to_string()
+    } else if view.model.hide_graph {
+        "width:100%;flex:1;min-height:0;max-height:none".to_string()
     } else if wide(view.width) {
         format!("width:{SESSIONS_WIDTH}px")
     } else {
@@ -466,6 +528,7 @@ where
 
 fn session_item<State, Action, Request>(
     session: &SessionEntry,
+    can_save: bool,
     on_request: Request,
 ) -> MereViewElement<State, Action>
 where
@@ -487,7 +550,7 @@ where
         .attr("class", "mere-view-session-name");
     let state =
         el::<_, State, Action>("span", words.join(", ")).attr("class", "mere-view-session-state");
-    let steps: Vec<MereViewElement<State, Action>> = session
+    let mut steps: Vec<MereViewElement<State, Action>> = session
         .steps
         .iter()
         .map(|&step| {
@@ -502,6 +565,18 @@ where
             )
         })
         .collect();
+    if can_save {
+        steps.push(request_button(
+            "Save to archive",
+            MereViewRequest::Archive(ArchiveRequest::Save(session.id)),
+            on_request,
+            vec![
+                ("data-step", "save-archive".into()),
+                ("data-attached", session.attached.to_string()),
+                ("aria-label", format!("Save {} to archive", session.name)),
+            ],
+        ));
+    }
     let steps = el::<_, State, Action>("div", steps).attr("class", "mere-view-session-steps");
     Box::new(
         el::<_, State, Action>("li", (name, state, steps))
@@ -510,6 +585,95 @@ where
             .attr("data-attached", session.attached.to_string())
             .attr("data-trashed", session.trashed.to_string()),
     )
+}
+
+fn archive_items<State, Action, Change, Request>(
+    view: &MereView<'_>,
+    on_change: Change,
+    on_request: Request,
+) -> Vec<MereViewElement<State, Action>>
+where
+    State: 'static,
+    Action: 'static,
+    Change: Fn(&mut State, MereViewEvent) + Clone + 'static,
+    Request: Fn(&mut State, MereViewRequest) + Clone + 'static,
+{
+    let Some(archive) = &view.model.archive else {
+        return Vec::new();
+    };
+    let mut result = vec![Box::new(
+        el::<_, State, Action>("li", "Archive").attr("class", "mere-view-archive-heading"),
+    ) as MereViewElement<State, Action>];
+    if archive.can_compose {
+        let selected = view.state.selected_archives.clone();
+        let on_request = on_request.clone();
+        let mut compose = button("Compose selected archives", move |state: &mut State, _| {
+            if selected.len() >= 2 {
+                on_request(
+                    state,
+                    MereViewRequest::Archive(ArchiveRequest::Compose(selected.clone())),
+                )
+            }
+        })
+        .attr(
+            "aria-disabled",
+            (view.state.selected_archives.len() < 2).to_string(),
+        )
+        .attr("data-request", "compose-archives");
+        if view.state.selected_archives.len() < 2 {
+            compose = compose.attr("disabled", "");
+        }
+        result.push(Box::new(el::<_, State, Action>("li", compose)));
+    }
+    for entry in &archive.entries {
+        let mut actions = Vec::new();
+        if entry.can_open {
+            actions.push(request_button(
+                "Open as session",
+                MereViewRequest::Archive(ArchiveRequest::Open(entry.key.clone())),
+                on_request.clone(),
+                vec![
+                    ("data-step", "open-archive".into()),
+                    ("data-archive", entry.key.clone()),
+                    ("aria-label", format!("Open {} as session", entry.name)),
+                ],
+            ));
+        }
+        if archive.can_compose {
+            let key = entry.key.clone();
+            let change = on_change.clone();
+            actions.push(Box::new(
+                button("Select for composition", move |state: &mut State, _| {
+                    change(state, MereViewEvent::SelectArchive(key.clone()))
+                })
+                .attr("data-step", "select-archive")
+                .attr(
+                    "aria-label",
+                    format!("Select {} for composition", entry.name),
+                )
+                .attr(
+                    "aria-pressed",
+                    view.state
+                        .selected_archives
+                        .contains(&entry.key)
+                        .to_string(),
+                ),
+            ));
+        }
+        result.push(Box::new(
+            el::<_, State, Action>(
+                "li",
+                (
+                    el::<_, State, Action>("span", entry.name.clone()),
+                    el::<_, State, Action>("span", entry.detail.clone()),
+                    el::<_, State, Action>("div", actions).attr("class", "mere-view-archive-steps"),
+                ),
+            )
+            .attr("class", "mere-view-archive")
+            .attr("data-archive", entry.key.clone()),
+        ));
+    }
+    result
 }
 
 fn graph<State, Action, Change, Request>(

@@ -21,7 +21,7 @@
 //! revision bell. The application an edit comes through is the one the door
 //! admitted, never the client's claim.
 
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
@@ -32,9 +32,9 @@ use chirograph::{
     AdvertisedAction, BoundsRelationship, CachePolicy, CardValueV1, CarrierNotice, ContentHash,
     EndpointDescriptor, IntentEffect, IntentInvocation, IntentReference, IntentResult,
     PortableCardV1, PresentationBinding, PresentationCapability, PresentationCodec,
-    PresentationKey, PresentationManifest, PresentationOffer, PresentationSemantics,
+    PresentationKey, PresentationManifest, PresentationOffer, PresentationSemantics, ProjectionAck,
     ProjectionOffer, ProjectionRequest, ProjectionSession, ProjectionSnapshot, ProtocolVersion,
-    ResourceRequest, ResourceResponse, SemanticRole,
+    ResourceRequest, ResourceResponse, ResumeReply, ResumeRequest, SemanticRole,
 };
 use graphshell::access::AccessContext;
 use graphshell::handlers::HandlerRegistry;
@@ -51,6 +51,7 @@ use graphshell::session_item::{
 };
 use graphshell_endpoint::{
     IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource, ProjectionSource,
+    ResumableProjectionSource,
 };
 use muniment::{DirectoryBackend, RedbBackend};
 use pandect::{
@@ -112,6 +113,18 @@ struct Routes {
 }
 
 impl MereRoutes {
+    /// Compose Cleromancy's portable product authority in either resident mode.
+    /// The supplier owns the record/replay semantics; Djinn owns installation
+    /// and durability, so applications cannot select a weaker callback.
+    pub fn with_divination_authority(self) -> Self {
+        self.with_domain_validator(
+            "divination",
+            Arc::new(|graph| {
+                cleromancy_domain::host::validate_divination_graph(graph)
+                    .map_err(|error| error.to_string())
+            }),
+        )
+    }
     /// Routes for `persona`'s meres, registered in `catalog` and granted to
     /// `apps` as each is served.
     pub fn new(
@@ -242,6 +255,11 @@ impl MereRoutes {
             return Err("mere does not belong to this reservoir persona/domain".into());
         }
         let domain = mere.domain.to_string();
+        // Product records must never be writable under generic graph authority.
+        // Both daemon and embedded composition install the same product callback.
+        if domain == "divination" && !self.inner.validators.contains_key(&domain) {
+            return Err("divination domain authority is not composed into this resident".into());
+        }
         let route = ResidentEndpointRoute::new(mere_route_id(&domain), MERE_NOTICE_POLL)
             .map_err(|error| error.to_string())?;
         let mut served = self.inner.served.lock().await;
@@ -275,7 +293,7 @@ impl MereRoutes {
         self.inner
             .catalog
             .update(|catalog| {
-                catalog.register_notifying(
+                catalog.register_resumable_notifying(
                     route.id(),
                     format!("Mere: {domain}"),
                     move |context| {
@@ -288,7 +306,7 @@ impl MereRoutes {
                         )
                     },
                 )?;
-                catalog.register_notifying(
+                catalog.register_resumable_notifying(
                     ambient.id(),
                     format!("Ambient mere: {domain}"),
                     move |context| {
@@ -326,6 +344,8 @@ struct AccessEndpoint {
     grants: AppRouteGrants,
     request: AppRequest,
     ambient: bool,
+    ambient_resources: BTreeMap<ContentHash, Vec<u8>>,
+    ambient_disclosed: BTreeSet<ContentHash>,
 }
 
 impl AccessEndpoint {
@@ -352,6 +372,8 @@ impl AccessEndpoint {
             grants,
             request,
             ambient,
+            ambient_resources: BTreeMap::new(),
+            ambient_disclosed: BTreeSet::new(),
         })
     }
     fn check(&self) -> Result<(), String> {
@@ -382,10 +404,48 @@ impl ProjectionSource for AccessEndpoint {
             return Err("ambient routes expose graph material only".into());
         }
         let mut snapshot = self.endpoint.snapshot(request)?;
+        if self.endpoint.shared.domain == "divination" && snapshot.session.0 == MERE_GRAPH {
+            for binding in &snapshot.presentation.bindings {
+                if binding.instance != InstanceId(0) {
+                    if let Some(offers) = snapshot.presentation.offers.get_mut(&binding.key) {
+                        for offer in offers {
+                            offer.semantics.actions.clear();
+                        }
+                    }
+                }
+            }
+        }
         if self.ambient {
-            for offers in snapshot.presentation.offers.values_mut() {
+            self.ambient_resources.clear();
+            self.ambient_disclosed.clear();
+            let session_key = snapshot
+                .presentation
+                .bindings
+                .iter()
+                .find(|binding| binding.instance == InstanceId(0))
+                .map(|binding| binding.key.clone());
+            for (key, offers) in &mut snapshot.presentation.offers {
                 for offer in offers {
                     offer.semantics.actions.clear();
+                    let response = self.endpoint.resource(ResourceRequest {
+                        session: snapshot.session.clone(),
+                        resource: offer.resource,
+                    })?;
+                    if let Ok(mut card) = serde_json::from_slice::<PortableCardV1>(&response.bytes)
+                    {
+                        if session_key.as_ref() == Some(key) {
+                            // An ambient graph card is not authority to read the
+                            // complete facet-bearing domain graph.
+                            card.media.clear();
+                            let bytes = serde_json::to_vec(&card).map_err(|e| e.to_string())?;
+                            offer.resource = ContentHash::of(&bytes);
+                            offer.byte_size = bytes.len() as u64;
+                            self.ambient_resources.insert(offer.resource, bytes);
+                        } else {
+                            self.ambient_disclosed.extend(card.media);
+                        }
+                    }
+                    self.ambient_disclosed.insert(offer.resource);
                 }
             }
         }
@@ -399,7 +459,32 @@ impl PresentationSource for AccessEndpoint {
         if self.ambient && request.session.0 != MERE_GRAPH {
             return Err("ambient routes expose graph material only".into());
         }
-        self.endpoint.resource(request)
+        if self.ambient {
+            if !self.ambient_disclosed.contains(&request.resource) {
+                return Err("resource was not disclosed by this ambient projection".into());
+            }
+            if let Some(bytes) = self.ambient_resources.get(&request.resource) {
+                return Ok(ResourceResponse {
+                    session: request.session,
+                    resource: request.resource,
+                    bytes: bytes.clone(),
+                });
+            }
+        }
+        let response = self.endpoint.resource(request)?;
+        if let Ok(graph) = serde_json::from_slice::<session_item::SessionGraphV1>(&response.bytes) {
+            if self.ambient {
+                return Err(
+                    "ambient material excludes complete session graph and view state".into(),
+                );
+            }
+            if graph.application != self.request.app.as_str() {
+                return Err(
+                    "session graph view state belongs to another admitted application".into(),
+                );
+            }
+        }
+        Ok(response)
     }
 }
 impl IntentSink for AccessEndpoint {
@@ -421,6 +506,30 @@ impl ProjectionNoticeSource for AccessEndpoint {
         self.check()?;
         let notice = self.endpoint.poll_notice()?;
         Ok(notice.filter(|notice| !self.ambient || notice.session.0 == MERE_GRAPH))
+    }
+}
+
+impl ResumableProjectionSource for AccessEndpoint {
+    type Error = String;
+    fn resume(&mut self, request: ResumeRequest) -> Result<ResumeReply, String> {
+        self.check()?;
+        let projection = self
+            .describe()
+            .projections
+            .into_iter()
+            .find(|offer| offer.request.session == request.session)
+            .ok_or("resume names a projection not disclosed by this admitted route")?
+            .request;
+        let snapshot = self.snapshot(projection)?;
+        if snapshot.scene.epoch == request.epoch && snapshot.scene.revision == request.revision {
+            Ok(ResumeReply::Current(ProjectionAck {
+                session: snapshot.session,
+                epoch: snapshot.scene.epoch,
+                revision: snapshot.scene.revision,
+            }))
+        } else {
+            Ok(ResumeReply::Snapshot(Box::new(snapshot)))
+        }
     }
 }
 
@@ -1041,6 +1150,11 @@ impl MereEndpoint {
     }
 
     fn invoke_graph(&mut self, intent: IntentInvocation) -> Result<IntentResult, String> {
+        if self.shared.domain == "divination" && intent.target != InstanceId(0) {
+            return Ok(IntentResult::Rejected {
+                reason: "divination writes require a complete journaled session candidate".into(),
+            });
+        }
         // Stage the first edit and its fork together. A refused candidate leaves
         // the thaw, session set and store byte-for-byte unchanged.
         let read_only = run(async {
@@ -1082,6 +1196,15 @@ impl MereEndpoint {
                             || payload.edits.is_empty()
                         {
                             return Err("invalid or empty archive edit".into());
+                        }
+                        if payload
+                            .expected_revision
+                            .is_some_and(|expected| expected != parent.projection_revision())
+                        {
+                            return Ok(Err(IntentResult::Stale {
+                                current_epoch: parent.projection_epoch(),
+                                current_revision: parent.projection_revision(),
+                            }));
                         }
                         fork.apply_now(author, payload.edits)
                             .map_err(|e| e.to_string())?;
@@ -1156,12 +1279,22 @@ impl MereEndpoint {
                 session_item::APPLY_EDITS_INTENT => {
                     match serde_json::from_slice::<ApplyEditsV1>(&intent.payload) {
                         Ok(payload) if payload.schema == session_item::APPLY_EDITS_SCHEMA => {
-                            match host.through(app.clone(), |host| host.apply_edits(payload.edits))
+                            if payload
+                                .expected_revision
+                                .is_some_and(|expected| expected != revision)
                             {
-                                Ok(()) => host.persist(now_secs()).await.map(|()| true),
-                                Err(error) => Err(error),
+                                return (
+                                    Ok(IntentResult::Stale {
+                                        current_epoch: epoch,
+                                        current_revision: revision,
+                                    }),
+                                    None,
+                                );
                             }
-                            .map_err(|error| error.to_string())
+                            host.transact_edits(&app, payload.edits)
+                                .await
+                                .map(|()| true)
+                                .map_err(|error| error.to_string())
                         },
                         Ok(payload) => Err(format!("unknown apply schema {:?}", payload.schema)),
                         Err(error) => Err(format!("invalid apply payload: {error}")),
@@ -1170,11 +1303,9 @@ impl MereEndpoint {
                 session_item::UNDO_INTENT | session_item::REDO_INTENT => {
                     match serde_json::from_slice::<StepV1>(&intent.payload) {
                         Ok(payload) if payload.schema == session_item::STEP_SCHEMA => {
-                            let step = if intent.intent == session_item::UNDO_INTENT {
-                                host.undo(&app).await
-                            } else {
-                                host.redo(&app).await
-                            };
+                            let step = host
+                                .transact_history(&app, intent.intent == session_item::REDO_INTENT)
+                                .await;
                             step.map(|reverted| reverted.is_some())
                                 .map_err(|error| error.to_string())
                         },
@@ -1185,7 +1316,7 @@ impl MereEndpoint {
                 session_item::SET_VIEW_INTENT => {
                     match serde_json::from_slice::<SetViewV1>(&intent.payload) {
                         Ok(payload) if payload.schema == session_item::SET_VIEW_SCHEMA => host
-                            .set_view(&app, &payload.view, payload.state)
+                            .transact_view(&app, &payload.view, payload.state)
                             .await
                             .map(|()| true)
                             .map_err(|error| error.to_string()),
@@ -1252,9 +1383,11 @@ impl ProjectionSource for MereEndpoint {
             },
             MERE_GRAPH => {
                 let host = Arc::clone(&self.host);
+                let app = self.app.clone();
                 let snapshot = run(async move {
                     let mut host = host.lock().await;
-                    host.snapshot(request).map_err(|error| error.to_string())
+                    host.through(app, |host| host.snapshot(request))
+                        .map_err(|error| error.to_string())
                 })?;
                 self.seen_graph = (snapshot.scene.epoch, snapshot.scene.revision);
                 Ok(snapshot)
@@ -1430,7 +1563,7 @@ mod tests {
         let routes = if let Some(validator) = validator {
             routes.with_domain_validator(domain, validator)
         } else {
-            routes
+            routes.with_divination_authority()
         };
         catalog
             .update(|catalog| reservoir.register(catalog, Some(routes.clone())))
@@ -1659,6 +1792,1060 @@ mod tests {
             intent: intent.into(),
             payload: serde_json::to_vec(&payload).unwrap(),
         }
+    }
+
+    fn disclosed_graph(
+        session: &mut impl PresentationSource<Error = String>,
+        snapshot: &ProjectionSnapshot,
+    ) -> session_item::SessionGraphV1 {
+        let offer = &snapshot
+            .presentation
+            .offers_for(session_item_of(snapshot))
+            .unwrap()[0];
+        let card = session
+            .resource(ResourceRequest {
+                session: snapshot.session.clone(),
+                resource: offer.resource,
+            })
+            .unwrap();
+        assert!(card.has_valid_address());
+        let card: PortableCardV1 = serde_json::from_slice(&card.bytes).unwrap();
+        let graph = session
+            .resource(ResourceRequest {
+                session: snapshot.session.clone(),
+                resource: card.media[0],
+            })
+            .unwrap();
+        assert!(graph.has_valid_address());
+        serde_json::from_slice(&graph.bytes).unwrap()
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn checked_candidate_refuses_cross_application_race_without_installing_any_delta() {
+        let fixture = fixture(29, "divination").await;
+        let mut product = fixture.attach("turnstone").await;
+        let mut other = fixture.attach("knot-editor").await;
+        let original = graph(&mut product);
+        let envelope = disclosed_graph(&mut product, &original);
+        assert_eq!(envelope.epoch, original.scene.epoch);
+        assert_eq!(envelope.revision, original.scene.revision);
+        assert_eq!(envelope.into_graph().unwrap().node_count(), 0);
+        let other_snapshot = graph(&mut other);
+        assert_eq!(
+            other
+                .invoke(apply(
+                    &other_snapshot,
+                    vec![
+                        node(1),
+                        pandect::CapturedDelta::ReplaySetNodeFacetById {
+                            node_id: Uuid::from_u128(1).to_string(),
+                            facet: "fixture.unrelated/v1".into(),
+                            value_json: serde_json::json!({"retained":"exact"}).to_string(),
+                        }
+                    ]
+                ))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        let current = graph(&mut product);
+        let hydrated = disclosed_graph(&mut product, &current)
+            .into_graph()
+            .unwrap();
+        assert_eq!(
+            hydrated.facets().get(
+                &Uuid::from_u128(1),
+                &pandect::facet_store::FacetId::new("fixture.unrelated/v1")
+            ),
+            Some(&serde_json::json!({"retained":"exact"}))
+        );
+        let before = serde_json::to_value(disclosed_graph(&mut product, &current)).unwrap();
+        let checked = on_item(
+            &original,
+            session_item::APPLY_EDITS_INTENT,
+            serde_json::to_vec(&ApplyEditsV1::checked(
+                original.scene.revision,
+                vec![node(2)],
+            ))
+            .unwrap(),
+        );
+        assert!(matches!(
+            product.invoke(checked).unwrap(),
+            IntentResult::Stale { .. }
+        ));
+        let after = graph(&mut product);
+        assert_eq!(
+            serde_json::to_value(disclosed_graph(&mut product, &after)).unwrap(),
+            before
+        );
+        assert_eq!(nodes(&after), 1);
+        assert!(
+            after
+                .presentation
+                .offers_for(InstanceId(1))
+                .unwrap()
+                .iter()
+                .all(|offer| offer.semantics.actions.is_empty())
+        );
+        let mut forged = apply(&after, vec![node(3)]);
+        forged.target = InstanceId(1);
+        assert!(
+            matches!(product.invoke(forged).unwrap(), IntentResult::Rejected { reason } if reason.contains("complete journaled session candidate"))
+        );
+        assert_eq!(nodes(&graph(&mut product)), 1);
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn common_archive_adapter_preserves_resident_authority_on_divination() {
+        use mere_view::{ArchiveRequest, MereViewRequest};
+        let fixture = fixture(31, "divination").await;
+        fixture.grants.grant(
+            AppId::new("graphshell"),
+            ResidentEndpointRoute::new("identity", MERE_NOTICE_POLL).unwrap(),
+        );
+        let mut app = fixture.attach("graphshell").await;
+        let initial = graph(&mut app);
+        assert_eq!(
+            app.invoke(apply(&initial, vec![node(1)])).unwrap(),
+            IntentResult::Accepted
+        );
+        let list = projection(&mut app, 0);
+        let id = session_ids(&list)[0];
+        let archive = projection(&mut app, 2);
+        let save = graphshell::mere_route::archive_intent(
+            &MereViewRequest::Archive(ArchiveRequest::Save(id)),
+            &list,
+            &archive,
+        )
+        .unwrap();
+        assert_eq!(app.invoke(save).unwrap(), IntentResult::Accepted);
+        let archive = projection(&mut app, 2);
+        let codicil = archive_ids(&archive)[0].clone();
+        let open = graphshell::mere_route::archive_intent(
+            &MereViewRequest::Archive(ArchiveRequest::Open(codicil)),
+            &list,
+            &archive,
+        )
+        .unwrap();
+        assert_eq!(app.invoke(open).unwrap(), IntentResult::Accepted);
+        let thaw = graph(&mut app);
+        assert_eq!(nodes(&thaw), 1);
+        let material = disclosed_graph(&mut app, &thaw);
+        assert!(material.read_only);
+        assert_eq!(material.into_graph().unwrap().node_count(), 1);
+        assert!(
+            graphshell::mere_route::archive_intent(
+                &MereViewRequest::Archive(ArchiveRequest::Compose(vec![
+                    "unknown".into(),
+                    "unknown".into()
+                ])),
+                &list,
+                &archive
+            )
+            .is_none()
+        );
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn view_media_and_writes_are_scoped_to_the_admitted_application() {
+        let fixture = fixture(32, "divination").await;
+        let mut first = fixture.attach("turnstone").await;
+        let mut second = fixture.attach("knot-editor").await;
+        let state = pandect::ViewIntent {
+            strategy: Some("phyllotaxis.default".into()),
+            ..Default::default()
+        };
+        let original = graph(&mut first);
+        assert_eq!(
+            first
+                .invoke(on_item(
+                    &original,
+                    session_item::SET_VIEW_INTENT,
+                    serde_json::to_vec(&SetViewV1::new("reading", state.clone())).unwrap()
+                ))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        let saved = graph(&mut first);
+        let first_card = first
+            .resource(ResourceRequest {
+                session: saved.session.clone(),
+                resource: saved
+                    .presentation
+                    .offers_for(session_item_of(&saved))
+                    .unwrap()[0]
+                    .resource,
+            })
+            .unwrap();
+        let first_card: PortableCardV1 = serde_json::from_slice(&first_card.bytes).unwrap();
+        assert!(
+            second
+                .resource(ResourceRequest {
+                    session: saved.session.clone(),
+                    resource: first_card.media[0]
+                })
+                .unwrap_err()
+                .contains("another admitted application")
+        );
+        let first_data = disclosed_graph(&mut first, &saved);
+        assert_eq!(first_data.application, "turnstone");
+        assert_eq!(first_data.views["reading"], state);
+        let other = graph(&mut second);
+        let second_data = disclosed_graph(&mut second, &other);
+        assert_eq!(second_data.application, "knot-editor");
+        assert!(second_data.views.is_empty());
+        let forged = serde_json::json!({"schema":session_item::SET_VIEW_SCHEMA,"view":"reading","state":{},"application":"turnstone"});
+        assert!(matches!(
+            second
+                .invoke(on_item(
+                    &other,
+                    session_item::SET_VIEW_INTENT,
+                    serde_json::to_vec(&forged).unwrap()
+                ))
+                .unwrap(),
+            IntentResult::Rejected { .. }
+        ));
+        assert_eq!(
+            second
+                .invoke(on_item(
+                    &other,
+                    session_item::SET_VIEW_INTENT,
+                    serde_json::to_vec(&SetViewV1::new("reading", pandect::ViewIntent::default()))
+                        .unwrap()
+                ))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        let first_again = graph(&mut first);
+        assert_eq!(
+            disclosed_graph(&mut first, &first_again).views["reading"],
+            state
+        );
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn resident_proxy_forwards_one_graph_and_resume_then_refuses_revoked_grants() {
+        use castellan::{
+            authority::PersonaeHost,
+            custody::{IdentityVault, InMemoryStorage, Profile},
+        };
+        use graphshell::native::{
+            app_broker::serve_app_broker, resident_mere_proxy::ResidentMereProxy,
+            tasks::ResidentTasks,
+        };
+        use personae::{Ed25519Keypair, ProfileId};
+        let fixture = fixture(33, "divination").await;
+        fixture
+            .grants
+            .grant(AppId::new("graphshell"), ResidentReservoir::route());
+        let host = Arc::new(PersonaeHost::new(
+            IdentityVault::with_profile(
+                InMemoryStorage::new(),
+                Profile::new(
+                    ProfileId("c1-proxy".into()),
+                    "Public C1 proxy fixture",
+                    Ed25519Keypair::from_seed([0xc1; 32]),
+                ),
+            ),
+            None,
+            graphshell::identity::VaultProtectionView::Ephemeral,
+        ));
+        #[cfg(not(windows))]
+        let address = format!("/tmp/c1px-{}.sock", Uuid::new_v4());
+        #[cfg(windows)]
+        let address = format!(r"\\.\pipe\c1px-{}", Uuid::new_v4());
+        let tasks = ResidentTasks::new();
+        let (scope, door, grants, socket) = (
+            tasks.clone(),
+            fixture.catalog.clone(),
+            fixture.grants.clone(),
+            address.clone(),
+        );
+        let server = tokio::spawn(async move {
+            scope
+                .scope(serve_app_broker(
+                    &socket,
+                    Arc::new(crate::keeper::Keeper::new(host)),
+                    grants,
+                    60_000,
+                    None,
+                    door,
+                ))
+                .await
+        });
+        for _ in 0..100 {
+            if graphshell::native::local_endpoint::connect_local(&address)
+                .await
+                .is_ok()
+            {
+                break;
+            }
+            assert!(!server.is_finished());
+            tokio::time::sleep(Duration::from_millis(10)).await;
+        }
+        let mut proxy = ResidentMereProxy::divination(&address).unwrap();
+        let request = proxy
+            .describe()
+            .projections
+            .into_iter()
+            .find(|offer| offer.request.session.0 == MERE_GRAPH)
+            .unwrap()
+            .request;
+        let initial = proxy.snapshot(request.clone()).unwrap();
+        let resumed = ResumeRequest {
+            session: initial.session.clone(),
+            epoch: initial.scene.epoch,
+            revision: initial.scene.revision,
+        };
+        assert!(matches!(
+            proxy.resume(resumed.clone()).unwrap(),
+            ResumeReply::Current(_)
+        ));
+        let material = disclosed_graph(&mut proxy, &initial);
+        assert_eq!(material.application, "graphshell");
+        let card_offer = &initial.presentation.offers_for(InstanceId(0)).unwrap()[0];
+        let whole = proxy
+            .resource(ResourceRequest {
+                session: initial.session.clone(),
+                resource: card_offer.resource,
+            })
+            .unwrap();
+        assert!(whole.has_valid_address());
+        let chunk = proxy
+            .resource_chunk(chirograph::ResourceChunkRequest {
+                session: initial.session.clone(),
+                resource: card_offer.resource,
+                offset: 0,
+                length: 16,
+            })
+            .unwrap();
+        // The wire payload is padded base64 (24 characters for 16 raw
+        // bytes). decode() verifies the independent chunk hash as well.
+        let decoded = chunk
+            .decode()
+            .expect("chunk must decode and match its own address");
+        assert_eq!(chunk.session, initial.session);
+        assert_eq!(chunk.resource, card_offer.resource);
+        assert_eq!(chunk.offset, 0);
+        assert_eq!(chunk.total_len, whole.bytes.len() as u64);
+        assert_eq!(decoded.as_slice(), &whole.bytes[..16]);
+        assert_eq!(
+            proxy.invoke(apply(&initial, vec![node(1)])).unwrap(),
+            IntentResult::Accepted
+        );
+        let mut other = fixture.attach("turnstone").await;
+        let current = graph(&mut other);
+        assert_eq!(nodes(&current), 1);
+        assert_eq!(
+            other.invoke(apply(&current, vec![node(2)])).unwrap(),
+            IntentResult::Accepted
+        );
+        let changed = graph(&mut other);
+        let deadline = tokio::time::Instant::now() + Duration::from_secs(2);
+        let observed = loop {
+            if let Some(notice) = proxy.poll_notice().unwrap() {
+                if notice.session == changed.session
+                    && notice.epoch == changed.scene.epoch
+                    && notice.revision == changed.scene.revision
+                {
+                    break notice;
+                }
+            }
+            assert!(
+                tokio::time::Instant::now() < deadline,
+                "idle proxy must receive the actual acknowledged external-edit notice"
+            );
+            tokio::time::sleep(MERE_NOTICE_POLL).await;
+        };
+        assert_eq!(observed.revision, changed.scene.revision);
+        let ResumeReply::Snapshot(fresh) = proxy.resume(resumed).unwrap() else {
+            panic!("changed graph must resume with a fresh snapshot");
+        };
+        assert_eq!(nodes(&fresh), 2);
+        let exact = ResumeRequest {
+            session: fresh.session.clone(),
+            epoch: fresh.scene.epoch,
+            revision: fresh.scene.revision,
+        };
+        assert!(matches!(
+            proxy.resume(exact.clone()).unwrap(),
+            ResumeReply::Current(_)
+        ));
+        let mere = fixture.reservoir.meres().await.remove(0);
+        fixture
+            .routes
+            .set_access(
+                &fixture.reservoir,
+                mere.id,
+                AppId::new("graphshell"),
+                true,
+                false,
+                AppId::new("turnstone"),
+            )
+            .await
+            .unwrap();
+        // Revocation must also terminate idle intake. Do not send a
+        // snapshot/resume command merely to make the broker read its stream.
+        let deadline = tokio::time::Instant::now() + Duration::from_secs(2);
+        loop {
+            if proxy.poll_notice().is_err() {
+                break;
+            }
+            assert!(
+                tokio::time::Instant::now() < deadline,
+                "idle revoked proxy must be refused without a user command"
+            );
+            tokio::time::sleep(MERE_NOTICE_POLL).await;
+        }
+        assert!(proxy.resume(exact).is_err());
+        assert!(proxy.snapshot(request).is_err());
+        drop(proxy);
+        server.abort();
+        let _ = server.await;
+        tasks.cancel_and_join().await;
+    }
+
+    fn drive_common_panel(
+        panel: &mut graphshell::mere_route_session::MereRouteSession,
+        endpoint: &mut ResidentEndpointSession,
+        wrong_role: bool,
+    ) {
+        for _ in 0..256 {
+            let outgoing = panel.take_outgoing();
+            if outgoing.is_empty() {
+                assert!(!panel.in_flight());
+                return;
+            }
+            for line in outgoing {
+                let request: chirograph::CarrierRequest = serde_json::from_str(&line).unwrap();
+                let mut response = graphshell_endpoint::dispatch_common(
+                    endpoint,
+                    request,
+                    &mut |endpoint, request| endpoint.resume(request),
+                )
+                .unwrap();
+                if wrong_role {
+                    if let Ok(chirograph::CarrierResponseBody::Snapshot(snapshot)) =
+                        &mut response.body
+                    {
+                        if snapshot.session.0 == MERE_GRAPH {
+                            let key = snapshot
+                                .presentation
+                                .bindings
+                                .iter()
+                                .find(|binding| binding.instance == InstanceId(0))
+                                .unwrap()
+                                .key
+                                .clone();
+                            let offer = &mut snapshot.presentation.offers.get_mut(&key).unwrap()[0];
+                            let card = endpoint
+                                .resource(ResourceRequest {
+                                    session: snapshot.session.clone(),
+                                    resource: offer.resource,
+                                })
+                                .unwrap();
+                            let card: PortableCardV1 = serde_json::from_slice(&card.bytes).unwrap();
+                            let bytes = endpoint
+                                .resource(ResourceRequest {
+                                    session: snapshot.session.clone(),
+                                    resource: card.media[0],
+                                })
+                                .unwrap();
+                            offer.resource = bytes.resource;
+                            offer.byte_size = bytes.bytes.len() as u64;
+                            // The hash is genuine, but a complete graph envelope
+                            // cannot stand in for a portable-card representation.
+                        }
+                    }
+                }
+                panel.on_line(&serde_json::to_string(&response).unwrap());
+            }
+        }
+        panic!("common panel failed to settle its admitted carrier requests");
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn common_panel_controller_runs_lifecycle_then_purges_on_denial_and_rejoins() {
+        use graphshell::mere_route_session::MereRouteSession;
+        let fixture = fixture(34, "divination").await;
+        fixture
+            .grants
+            .grant(AppId::new("graphshell"), ResidentReservoir::route());
+        let mut endpoint = fixture.attach("graphshell").await;
+        let mut panel = MereRouteSession::from_descriptor(
+            endpoint.describe(),
+            chirograph::CapabilityProfile::new([PresentationCapability::PortableCard]),
+        )
+        .unwrap();
+        drive_common_panel(&mut panel, &mut endpoint, false);
+        assert_eq!(panel.model().sessions.len(), 1);
+        assert!(
+            panel
+                .primary()
+                .unwrap()
+                .scene
+                .active_items_in_order()
+                .is_empty(),
+            "synthetic session item never becomes a domain graph node"
+        );
+        panel.request(MereViewRequest::Mint).unwrap();
+        drive_common_panel(&mut panel, &mut endpoint, false);
+        assert_eq!(panel.model().sessions.len(), 2);
+        let before_fork: BTreeSet<_> = panel
+            .model()
+            .sessions
+            .iter()
+            .map(|session| *session.id.as_uuid())
+            .collect();
+        let original = panel
+            .model()
+            .sessions
+            .iter()
+            .find(|session| session.attached)
+            .unwrap()
+            .id;
+        panel
+            .request(MereViewRequest::Session(original, SessionStep::Fork))
+            .unwrap();
+        drive_common_panel(&mut panel, &mut endpoint, false);
+        assert_eq!(panel.model().sessions.len(), 3);
+        let fork = panel
+            .model()
+            .sessions
+            .iter()
+            .find(|session| !before_fork.contains(session.id.as_uuid()))
+            .unwrap()
+            .id;
+        panel
+            .request(MereViewRequest::Session(fork, SessionStep::Switch))
+            .unwrap();
+        drive_common_panel(&mut panel, &mut endpoint, false);
+        assert!(
+            panel
+                .model()
+                .sessions
+                .iter()
+                .any(|session| session.id == fork && session.attached)
+        );
+        panel
+            .request(MereViewRequest::Session(original, SessionStep::Trash))
+            .unwrap();
+        drive_common_panel(&mut panel, &mut endpoint, false);
+        assert!(
+            panel
+                .model()
+                .sessions
+                .iter()
+                .any(|session| session.id == original && session.trashed)
+        );
+        panel
+            .request(MereViewRequest::Session(original, SessionStep::Restore))
+            .unwrap();
+        drive_common_panel(&mut panel, &mut endpoint, false);
+        assert!(
+            panel
+                .model()
+                .sessions
+                .iter()
+                .any(|session| session.id == original && !session.trashed)
+        );
+        let mere = fixture.reservoir.meres().await.remove(0);
+        fixture
+            .routes
+            .set_access(
+                &fixture.reservoir,
+                mere.id,
+                AppId::new("graphshell"),
+                true,
+                false,
+                AppId::new("turnstone"),
+            )
+            .await
+            .unwrap();
+        panel
+            .request(MereViewRequest::Host("refresh".into()))
+            .unwrap();
+        drive_common_panel(&mut panel, &mut endpoint, false);
+        assert_eq!(panel.status(), "unavailable");
+        assert!(panel.model().sessions.is_empty());
+        assert!(panel.primary().is_none());
+        assert!(panel.request(MereViewRequest::Mint).is_err());
+        fixture
+            .routes
+            .set_access(
+                &fixture.reservoir,
+                mere.id,
+                AppId::new("graphshell"),
+                false,
+                false,
+                AppId::new("turnstone"),
+            )
+            .await
+            .unwrap();
+        let mut endpoint = fixture.attach("graphshell").await;
+        let mut rejoined = MereRouteSession::from_descriptor(
+            endpoint.describe(),
+            chirograph::CapabilityProfile::new([PresentationCapability::PortableCard]),
+        )
+        .unwrap();
+        drive_common_panel(&mut rejoined, &mut endpoint, false);
+        assert_eq!(rejoined.model().sessions.len(), 3);
+        assert_eq!(rejoined.status(), "open");
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn common_panel_refuses_a_hash_valid_resource_in_the_wrong_presentation_role() {
+        let fixture = fixture(35, "divination").await;
+        fixture
+            .grants
+            .grant(AppId::new("graphshell"), ResidentReservoir::route());
+        let mut endpoint = fixture.attach("graphshell").await;
+        let mut panel = graphshell::mere_route_session::MereRouteSession::from_descriptor(
+            endpoint.describe(),
+            chirograph::CapabilityProfile::new([PresentationCapability::PortableCard]),
+        )
+        .unwrap();
+        drive_common_panel(&mut panel, &mut endpoint, true);
+        assert_eq!(panel.status(), "unavailable");
+        assert!(panel.primary().is_none());
+        assert!(panel.model().sessions.is_empty());
+    }
+
+    /// Read only the fixture's durable session tree. Comparing all bytes also
+    /// catches implicit forks, view appends and manifest rewrites.
+    fn session_tree_bytes(path: &std::path::Path) -> BTreeMap<std::path::PathBuf, Vec<u8>> {
+        fn visit(
+            root: &std::path::Path,
+            path: &std::path::Path,
+            files: &mut BTreeMap<std::path::PathBuf, Vec<u8>>,
+        ) {
+            for entry in std::fs::read_dir(path).unwrap() {
+                let path = entry.unwrap().path();
+                if path.is_dir() {
+                    visit(root, &path, files);
+                } else {
+                    files.insert(
+                        path.strip_prefix(root).unwrap().to_path_buf(),
+                        std::fs::read(path).unwrap(),
+                    );
+                }
+            }
+        }
+        let mut files = BTreeMap::new();
+        visit(path, path, &mut files);
+        files
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn common_panel_saves_own_view_and_reopens_archive_without_implicit_writes() {
+        use graphshell::mere_route_session::MereRouteSession;
+        use mere_view::ArchiveRequest;
+        let fixture = fixture(36, "divination").await;
+        fixture
+            .grants
+            .grant(AppId::new("graphshell"), ResidentReservoir::route());
+        let mut endpoint = fixture.attach("graphshell").await;
+        let initial = graph(&mut endpoint);
+        assert_eq!(
+            endpoint.invoke(apply(&initial, vec![node(1)])).unwrap(),
+            IntentResult::Accepted
+        );
+        let profile = || chirograph::CapabilityProfile::new([PresentationCapability::PortableCard]);
+        let mut panel = MereRouteSession::from_descriptor(endpoint.describe(), profile()).unwrap();
+        drive_common_panel(&mut panel, &mut endpoint, false);
+        let key = Uuid::from_u128(1).to_string();
+        assert!(panel.records().contains_key(&key));
+        panel
+            .request(MereViewRequest::Activate(key.clone()))
+            .unwrap();
+        drive_common_panel(&mut panel, &mut endpoint, false);
+        panel
+            .request(MereViewRequest::Layout("grid.default".into()))
+            .unwrap();
+        drive_common_panel(&mut panel, &mut endpoint, false);
+        assert!(panel.view_saved());
+        assert_eq!(panel.saved_view().focus.as_deref(), Some("https://1.test/"));
+        assert_eq!(panel.saved_view().strategy.as_deref(), Some("grid.default"));
+        let saved = panel.saved_view().clone();
+        let current = graph(&mut endpoint);
+        assert_eq!(
+            disclosed_graph(&mut endpoint, &current).views["graphshell.mere"],
+            saved
+        );
+
+        // A new admitted reader reconstructs the acknowledged view from the
+        // owner's material rather than this controller's transient fields.
+        drop(panel);
+        drop(endpoint);
+        let mut endpoint = fixture.attach("graphshell").await;
+        let mut panel = MereRouteSession::from_descriptor(endpoint.describe(), profile()).unwrap();
+        drive_common_panel(&mut panel, &mut endpoint, false);
+        assert_eq!(panel.saved_view(), &saved);
+        assert_eq!(panel.focus_key().as_deref(), Some(key.as_str()));
+        assert_eq!(panel.model().layout, "grid.default");
+        assert!(panel.view_saved());
+        let mut other = fixture.attach("knot-editor").await;
+        let other_graph = graph(&mut other);
+        assert!(
+            !disclosed_graph(&mut other, &other_graph)
+                .views
+                .contains_key("graphshell.mere")
+        );
+        assert_eq!(
+            other
+                .invoke(on_item(
+                    &other_graph,
+                    session_item::SET_VIEW_INTENT,
+                    serde_json::to_vec(&SetViewV1::new(
+                        "graphshell.mere",
+                        pandect::ViewIntent::default()
+                    ))
+                    .unwrap()
+                ))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        let current = graph(&mut endpoint);
+        assert_eq!(
+            disclosed_graph(&mut endpoint, &current).views["graphshell.mere"],
+            saved
+        );
+        panel
+            .request(MereViewRequest::Host("refresh".into()))
+            .unwrap();
+        drive_common_panel(&mut panel, &mut endpoint, false);
+        let live = panel
+            .model()
+            .sessions
+            .iter()
+            .find(|session| session.attached)
+            .unwrap()
+            .id;
+        panel
+            .request(MereViewRequest::Archive(ArchiveRequest::Save(live)))
+            .unwrap();
+        drive_common_panel(&mut panel, &mut endpoint, false);
+        let archive = panel
+            .model()
+            .archive
+            .as_ref()
+            .unwrap()
+            .entries
+            .iter()
+            .find(|entry| entry.can_open)
+            .unwrap()
+            .key
+            .clone();
+        panel
+            .request(MereViewRequest::Archive(ArchiveRequest::Open(archive)))
+            .unwrap();
+        drive_common_panel(&mut panel, &mut endpoint, false);
+        assert!(panel.read_only());
+        assert!(panel.records().contains_key(&key));
+        let thaw = panel
+            .model()
+            .sessions
+            .iter()
+            .find(|session| session.attached)
+            .unwrap()
+            .id;
+        let before_ids: Vec<_> = panel
+            .model()
+            .sessions
+            .iter()
+            .map(|session| session.id)
+            .collect();
+        let before_graph = graph(&mut endpoint);
+        let before_material =
+            serde_json::to_value(disclosed_graph(&mut endpoint, &before_graph)).unwrap();
+        let mere = fixture.reservoir.meres().await.remove(0);
+        let sessions = mere_dir(fixture._root.path(), persona(36), mere.id).join("sessions");
+        let before_bytes = session_tree_bytes(&sessions);
+        panel
+            .request(MereViewRequest::Activate(key.clone()))
+            .unwrap();
+        assert!(
+            panel.take_outgoing().is_empty(),
+            "archive activation emits no resident request"
+        );
+        panel
+            .request(MereViewRequest::Layout("phyllotaxis.default".into()))
+            .unwrap();
+        assert!(
+            panel.take_outgoing().is_empty(),
+            "archive layout emits no resident request"
+        );
+        assert_eq!(panel.focus_key().as_deref(), Some(key.as_str()));
+        assert_eq!(panel.model().layout, "phyllotaxis.default");
+        assert_eq!(
+            panel
+                .model()
+                .sessions
+                .iter()
+                .map(|session| session.id)
+                .collect::<Vec<_>>(),
+            before_ids
+        );
+        assert_eq!(session_tree_bytes(&sessions), before_bytes);
+        let after_graph = graph(&mut endpoint);
+        assert_eq!(
+            serde_json::to_value(disclosed_graph(&mut endpoint, &after_graph)).unwrap(),
+            before_material
+        );
+        drop(panel);
+        drop(endpoint);
+        let mut endpoint = fixture.attach("graphshell").await;
+        let mut reopened =
+            MereRouteSession::from_descriptor(endpoint.describe(), profile()).unwrap();
+        drive_common_panel(&mut reopened, &mut endpoint, false);
+        // A fresh route chooses latest_live, which can already be this
+        // thaw. Switch only if its actual card advertises attachment.
+        let selected = reopened
+            .model()
+            .sessions
+            .iter()
+            .find(|session| session.id == thaw)
+            .unwrap();
+        if !selected.attached {
+            assert!(selected.steps.contains(&SessionStep::Switch));
+            reopened
+                .request(MereViewRequest::Session(thaw, SessionStep::Switch))
+                .unwrap();
+            drive_common_panel(&mut reopened, &mut endpoint, false);
+        } else {
+            assert!(!selected.steps.contains(&SessionStep::Switch));
+        }
+        assert!(
+            reopened
+                .model()
+                .sessions
+                .iter()
+                .any(|session| session.id == thaw && session.attached)
+        );
+        assert!(reopened.read_only());
+        reopened.request(MereViewRequest::Activate(key)).unwrap();
+        assert!(
+            reopened.take_outgoing().is_empty(),
+            "reopened readonly selection emits no request"
+        );
+        assert_eq!(
+            reopened
+                .model()
+                .sessions
+                .iter()
+                .map(|session| session.id)
+                .collect::<Vec<_>>(),
+            before_ids
+        );
+        assert_eq!(session_tree_bytes(&sessions), before_bytes);
+    }
+
+    #[derive(Clone, Copy, Debug)]
+    enum MediaFault {
+        Schema,
+        Application,
+        AttachedSession,
+        Epoch,
+        Revision,
+        ProjectionNamespace,
+        RequestedHash,
+        Address,
+    }
+
+    /// Corrupt only the in-flight transport, retaining the actual admitted
+    /// fixture as authority. Envelope faults rebind both content addresses so
+    /// they test role/binding checks after successful hash verification.
+    fn drive_common_panel_media_fault(
+        panel: &mut graphshell::mere_route_session::MereRouteSession,
+        endpoint: &mut ResidentEndpointSession,
+        fault: MediaFault,
+    ) {
+        let mut replaced: HashMap<ContentHash, ResourceResponse> = HashMap::new();
+        let mut media_hash = None;
+        let mut applied = false;
+        for _ in 0..256 {
+            let outgoing = panel.take_outgoing();
+            if outgoing.is_empty() {
+                assert!(!panel.in_flight());
+                assert!(applied, "fault {fault:?} must reach the media boundary");
+                return;
+            }
+            for line in outgoing {
+                let request: chirograph::CarrierRequest = serde_json::from_str(&line).unwrap();
+                let forged = match &request.body {
+                    chirograph::CarrierRequestBody::Resource(resource) => {
+                        replaced.get(&resource.resource).cloned()
+                    },
+                    _ => None,
+                };
+                let mut response = if let Some(mut resource) = forged {
+                    if Some(resource.resource) == media_hash {
+                        applied = true;
+                        match fault {
+                            MediaFault::ProjectionNamespace => {
+                                resource.session = ProjectionSession(MERE_ARCHIVE.into())
+                            },
+                            MediaFault::RequestedHash => {
+                                // A valid address belonging to a different resource.
+                                resource = ResourceResponse::new(resource.session, b"{}".to_vec());
+                            },
+                            MediaFault::Address => resource.bytes.push(b' '),
+                            _ => {},
+                        }
+                    }
+                    chirograph::CarrierResponse {
+                        id: request.id,
+                        body: Ok(chirograph::CarrierResponseBody::Resource(resource)),
+                    }
+                } else {
+                    graphshell_endpoint::dispatch_common(
+                        endpoint,
+                        request,
+                        &mut |endpoint, request| endpoint.resume(request),
+                    )
+                    .unwrap()
+                };
+                if let Ok(chirograph::CarrierResponseBody::Snapshot(snapshot)) = &mut response.body
+                {
+                    if snapshot.session.0 == MERE_GRAPH {
+                        let key = snapshot
+                            .presentation
+                            .bindings
+                            .iter()
+                            .find(|binding| binding.instance == session_item_of(snapshot))
+                            .unwrap()
+                            .key
+                            .clone();
+                        let offer = &mut snapshot.presentation.offers.get_mut(&key).unwrap()[0];
+                        let original_card = endpoint
+                            .resource(ResourceRequest {
+                                session: snapshot.session.clone(),
+                                resource: offer.resource,
+                            })
+                            .unwrap();
+                        let mut card: PortableCardV1 =
+                            serde_json::from_slice(&original_card.bytes).unwrap();
+                        let original_media = endpoint
+                            .resource(ResourceRequest {
+                                session: snapshot.session.clone(),
+                                resource: card.media[0],
+                            })
+                            .unwrap();
+                        let mut material: session_item::SessionGraphV1 =
+                            serde_json::from_slice(&original_media.bytes).unwrap();
+                        match fault {
+                            MediaFault::Schema => {
+                                material.schema = "mere.session.graph/v999".into()
+                            },
+                            MediaFault::Application => material.application = "cleromancy".into(),
+                            MediaFault::AttachedSession => {
+                                material.session = SessionId::from_uuid(Uuid::from_u128(0xffff))
+                            },
+                            MediaFault::Epoch => material.epoch = SceneEpoch(material.epoch.0 + 1),
+                            MediaFault::Revision => {
+                                material.revision = Revision(material.revision.0 + 1)
+                            },
+                            _ => {},
+                        }
+                        let media = ResourceResponse::new(
+                            snapshot.session.clone(),
+                            serde_json::to_vec(&material).unwrap(),
+                        );
+                        media_hash = Some(media.resource);
+                        card.media[0] = media.resource;
+                        let card = ResourceResponse::new(
+                            snapshot.session.clone(),
+                            serde_json::to_vec(&card).unwrap(),
+                        );
+                        offer.resource = card.resource;
+                        offer.byte_size = card.bytes.len() as u64;
+                        replaced.insert(media.resource, media);
+                        replaced.insert(card.resource, card);
+                    }
+                }
+                panel.on_line(&serde_json::to_string(&response).unwrap());
+            }
+        }
+        panic!("media fault {fault:?} did not settle");
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn common_panel_refuses_media_with_wrong_namespace_application_session_or_hash() {
+        use graphshell::mere_route_session::MereRouteSession;
+        let fixture = fixture(37, "divination").await;
+        fixture
+            .grants
+            .grant(AppId::new("graphshell"), ResidentReservoir::route());
+        for fault in [
+            MediaFault::Schema,
+            MediaFault::Application,
+            MediaFault::AttachedSession,
+            MediaFault::Epoch,
+            MediaFault::Revision,
+            MediaFault::ProjectionNamespace,
+            MediaFault::RequestedHash,
+            MediaFault::Address,
+        ] {
+            let mut endpoint = fixture.attach("graphshell").await;
+            let mut panel = MereRouteSession::from_descriptor(
+                endpoint.describe(),
+                chirograph::CapabilityProfile::new([PresentationCapability::PortableCard]),
+            )
+            .unwrap();
+            drive_common_panel_media_fault(&mut panel, &mut endpoint, fault);
+            assert_eq!(panel.status(), "unavailable", "{fault:?}");
+            assert!(panel.primary().is_none(), "{fault:?}");
+            assert!(panel.model().sessions.is_empty(), "{fault:?}");
+            assert!(panel.records().is_empty(), "{fault:?}");
+            assert_eq!(
+                panel.saved_view(),
+                &pandect::ViewIntent::default(),
+                "{fault:?}"
+            );
+            assert!(panel.request(MereViewRequest::Mint).is_err(), "{fault:?}");
+        }
+        // Refusals leave the owner intact; an explicitly constructed fresh
+        // admitted session can join the same graph again.
+        let mut endpoint = fixture.attach("graphshell").await;
+        let mut panel = MereRouteSession::from_descriptor(
+            endpoint.describe(),
+            chirograph::CapabilityProfile::new([PresentationCapability::PortableCard]),
+        )
+        .unwrap();
+        drive_common_panel(&mut panel, &mut endpoint, false);
+        assert_eq!(panel.status(), "open");
+        assert_eq!(panel.model().sessions.len(), 1);
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn divination_requires_product_authority_and_refuses_unknown_domain_facets() {
+        let fixture = fixture(30, "divination").await;
+        let record = fixture.reservoir.meres().await.remove(0);
+        let missing = MereRoutes::new(
+            fixture._root.path().to_path_buf(),
+            record.persona,
+            AppEndpointCatalog::default(),
+            AppRouteGrants::default(),
+            vec![AppId::new("cleromancy")],
+        );
+        missing.load_access(&fixture.reservoir).await.unwrap();
+        assert!(
+            missing
+                .serve(&record)
+                .await
+                .unwrap_err()
+                .contains("domain authority")
+        );
+        let mut app = fixture.attach("turnstone").await;
+        let initial = graph(&mut app);
+        let facet = pandect::CapturedDelta::ReplaySetNodeFacetById {
+            node_id: Uuid::from_u128(1).to_string(),
+            facet: "cleromancy.unknown/v999".into(),
+            value_json: serde_json::json!({"tampered": true}).to_string(),
+        };
+        assert!(
+            matches!(app.invoke(apply(&initial, vec![node(1), facet])).unwrap(), IntentResult::Rejected { reason } if reason.contains("unsupported domain facet"))
+        );
+        assert_eq!(nodes(&graph(&mut app)), 0);
     }
 
     #[tokio::test(flavor = "multi_thread")]
@@ -2324,6 +3511,42 @@ mod tests {
             .unwrap();
         assert_eq!(ambient.describe().projections.len(), 1);
         let read = projection(&mut ambient, 0);
+        let explicit_offer = &before
+            .presentation
+            .offers_for(session_item_of(&before))
+            .unwrap()[0];
+        let explicit_card = explicit
+            .resource(ResourceRequest {
+                session: before.session.clone(),
+                resource: explicit_offer.resource,
+            })
+            .unwrap();
+        let explicit_card: PortableCardV1 = serde_json::from_slice(&explicit_card.bytes).unwrap();
+        let full_graph = explicit_card.media[0];
+        let ambient_offer = &read
+            .presentation
+            .offers_for(session_item_of(&read))
+            .unwrap()[0];
+        let ambient_card = ambient
+            .resource(ResourceRequest {
+                session: read.session.clone(),
+                resource: ambient_offer.resource,
+            })
+            .unwrap();
+        let ambient_card: PortableCardV1 = serde_json::from_slice(&ambient_card.bytes).unwrap();
+        assert!(
+            ambient_card.media.is_empty(),
+            "ambient card never advertises complete domain material"
+        );
+        assert!(
+            ambient
+                .resource(ResourceRequest {
+                    session: read.session.clone(),
+                    resource: full_graph
+                })
+                .is_err(),
+            "knowing an explicit hash does not grant its complete graph through ambient access"
+        );
         assert!(
             read.presentation
                 .offers
