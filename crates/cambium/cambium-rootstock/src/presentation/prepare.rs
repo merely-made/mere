@@ -21,7 +21,11 @@ where
     ) -> Result<Option<PreparedFrame>, PresentationFailure> {
         self.s.last_redraw_presentation = None;
         self.s.last_raster_failure = None;
-        let (backend, generation, mode) = match &self.s.presentation_driver {
+        if self.s.capture_owner.is_disposed() {
+            self.suspend_producers();
+            return Ok(None);
+        }
+        let (backend, mut generation, mode) = match &self.s.presentation_driver {
             Some(driver) => (driver.backend(), driver.generation(), driver.content_mode()),
             None => (
                 PresentationBackend::Wgpu,
@@ -42,6 +46,25 @@ where
         {
             return Ok(None);
         }
+        if backend == PresentationBackend::Wgpu
+            && let Some(driver) = self.s.presentation_driver.as_mut()
+        {
+            driver.restore()?;
+            generation = driver.generation();
+        }
+        if self
+            .s
+            .presentation_driver
+            .as_ref()
+            .is_some_and(|driver| driver.state() != PresentationState::Ready)
+        {
+            self.suspend_producers();
+            self.refuse_pending_captures(crate::CaptureRefusal::ContextLost {
+                backend,
+                generation,
+            });
+            return Ok(None);
+        }
         if self
             .s
             .surface
@@ -56,6 +79,10 @@ where
         let mut profile = FrameProfile::default();
         let phase = crate::Instant::now();
         let animating = self.prepare_frame();
+        if self.s.capture_owner.is_disposed() {
+            self.suspend_producers();
+            return Ok(None);
+        }
         profile.frame_hook_us = micros(phase.elapsed());
         let scale = self.layout_scale() as f32;
         let extent = self.s.window.as_ref().map(|window| window.inner_size());

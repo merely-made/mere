@@ -49,6 +49,20 @@ impl WebSurface {
     pub fn shared_core(&self) -> Arc<RenderCore> {
         self.core.clone()
     }
+    /// Recreate only the surface after the shared owner supplies a ready core.
+    pub fn from_core(
+        core: Arc<RenderCore>,
+        canvas: HtmlCanvasElement,
+        width: u32,
+        height: u32,
+    ) -> Result<Self, String> {
+        let surface = core.create_surface(
+            wgpu::SurfaceTarget::Canvas(canvas),
+            width.max(1),
+            height.max(1),
+        )?;
+        Ok(Self { core, surface })
+    }
 }
 
 impl Surface for WebSurface {
@@ -118,8 +132,7 @@ impl WebWindow {
 
     /// The size to configure the surface at, in physical pixels.
     pub fn physical_size(&self) -> (u32, u32) {
-        let (w, h) = self.inner_size();
-        (w.max(1), h.max(1))
+        self.inner_size()
     }
 }
 
@@ -135,8 +148,8 @@ impl HostWindow for WebWindow {
         let rect = self.canvas.get_bounding_client_rect();
         let scale = self.scale_factor();
         (
-            (rect.width() * scale).round().max(1.0) as u32,
-            (rect.height() * scale).round().max(1.0) as u32,
+            (rect.width() * scale).round().max(0.0) as u32,
+            (rect.height() * scale).round().max(0.0) as u32,
         )
     }
 

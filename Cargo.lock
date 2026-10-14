@@ -10542,7 +10542,7 @@ dependencies = [
 [[package]]
 name = "netrender"
 version = "0.1.2"
-source = "git+https://www.github.com/merely-made/netrender.git?rev=b6dfa3eb71e55d48251bd8709b4a8eb5a340940c#b6dfa3eb71e55d48251bd8709b4a8eb5a340940c"
+source = "git+https://www.github.com/merely-made/netrender.git?rev=b40f40628529e9ce58c419233fe3a758914be10a#b40f40628529e9ce58c419233fe3a758914be10a"
 dependencies = [
  "glifo",
  "log",
@@ -10584,7 +10584,7 @@ dependencies = [
 [[package]]
 name = "netrender_device"
 version = "0.1.2"
-source = "git+https://www.github.com/merely-made/netrender.git?rev=b6dfa3eb71e55d48251bd8709b4a8eb5a340940c#b6dfa3eb71e55d48251bd8709b4a8eb5a340940c"
+source = "git+https://www.github.com/merely-made/netrender.git?rev=b40f40628529e9ce58c419233fe3a758914be10a#b40f40628529e9ce58c419233fe3a758914be10a"
 dependencies = [
  "log",
  "pollster 1.0.1",
@@ -12302,7 +12302,7 @@ dependencies = [
 [[package]]
 name = "paint_list_api"
 version = "0.1.2"
-source = "git+https://www.github.com/merely-made/netrender.git?rev=b6dfa3eb71e55d48251bd8709b4a8eb5a340940c#b6dfa3eb71e55d48251bd8709b4a8eb5a340940c"
+source = "git+https://www.github.com/merely-made/netrender.git?rev=b40f40628529e9ce58c419233fe3a758914be10a#b40f40628529e9ce58c419233fe3a758914be10a"
 dependencies = [
  "euclid",
  "serde",
@@ -12311,7 +12311,7 @@ dependencies = [
 [[package]]
 name = "paint_list_render"
 version = "0.1.2"
-source = "git+https://www.github.com/merely-made/netrender.git?rev=b6dfa3eb71e55d48251bd8709b4a8eb5a340940c#b6dfa3eb71e55d48251bd8709b4a8eb5a340940c"
+source = "git+https://www.github.com/merely-made/netrender.git?rev=b40f40628529e9ce58c419233fe3a758914be10a#b40f40628529e9ce58c419233fe3a758914be10a"
 dependencies = [
  "log",
  "netrender",
@@ -20276,7 +20276,7 @@ dependencies = [
 [[patch.unused]]
 name = "netrender_text"
 version = "0.1.1"
-source = "git+https://www.github.com/merely-made/netrender.git?rev=b6dfa3eb71e55d48251bd8709b4a8eb5a340940c#b6dfa3eb71e55d48251bd8709b4a8eb5a340940c"
+source = "git+https://www.github.com/merely-made/netrender.git?rev=b40f40628529e9ce58c419233fe3a758914be10a#b40f40628529e9ce58c419233fe3a758914be10a"
 
 [[patch.unused]]
 name = "layout-dom-api"

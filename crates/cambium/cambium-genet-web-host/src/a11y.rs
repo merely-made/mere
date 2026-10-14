@@ -130,6 +130,11 @@ pub struct DomAccessibility {
     /// The focus id the last sync saw, to move DOM focus only on a change.
     focus: Option<u64>,
 }
+impl Drop for DomAccessibility {
+    fn drop(&mut self) {
+        self.handle.root.remove();
+    }
+}
 
 impl DomAccessibility {
     /// Attach to the canvas the application presents onto. `label` names the

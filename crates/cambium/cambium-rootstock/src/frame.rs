@@ -336,7 +336,12 @@ where
     pub(crate) fn sync_leaf_fragments(&mut self) {
         use paint_list_api::PaintCmd;
 
-        let Some(surface) = self.s.surface.as_ref() else {
+        let Some(surface) = self.s.surface.as_deref().or_else(|| {
+            self.s
+                .presentation_driver
+                .as_ref()
+                .and_then(|driver| driver.wgpu_surface())
+        }) else {
             // No surface this turn (suspended, or not yet booted). The
             // renderer lives in the render core, which outlives the surface,
             // so fragments registered before a suspend are still valid after
@@ -590,7 +595,6 @@ where
         }
         let frame_started = prepared.started;
         let mut profile = prepared.profile;
-        let (pw, ph) = (prepared.width, prepared.height);
         let Some(surface) = self.s.surface.as_deref() else {
             return;
         };
@@ -625,6 +629,10 @@ where
         trace!("presentation-recorded", "sequence={sequence}");
         // Freeze product state before any capture callback, queued pointer
         // dispatch or platform accessibility action can change the product.
+        let _ = self.s.capture_owner.resume(
+            crate::PresentationBackend::Wgpu,
+            presented.context_generation,
+        );
         self.observe_presentation(presented);
         let surface = self.s.surface.as_ref().expect("presented surface exists");
         // A capture armed by the application: run it while the rasterized
@@ -636,19 +644,18 @@ where
             capture(Ok(envelope));
         }
         if let Some(capture) = self.s.pending_capture.take() {
-            capture(Ok(crate::CaptureFrame {
-                surface: &**surface,
-                view: &view,
-                width: pw,
-                height: ph,
-            }));
+            capture(self.s.capture_owner.begin(
+                crate::PresentationBackend::Wgpu,
+                presented,
+                || crate::capture::start_presentation_readback(&**surface, &view, presented),
+            ));
         }
         if let Some(capture) = self.s.pending_stamped_capture.take() {
-            capture(Ok(crate::StampedCaptureFrame {
-                surface: &**surface,
-                view: &view,
-                presentation: presented,
-            }));
+            capture(self.s.capture_owner.begin(
+                crate::PresentationBackend::Wgpu,
+                presented,
+                || crate::capture::start_presentation_readback(&**surface, &view, presented),
+            ));
         }
         profile.capture_us = elapsed_us(phase.elapsed());
         if prepared.animating

@@ -44,7 +44,8 @@ mod presentation;
 pub use presentation::{
     ContextGeneration, FrameContentMode, NativePresentationFailure, PendingPresentationCapture,
     PreparedFrame, PreparedPaint, PresentationBackend, PresentationChoice, PresentationDriver,
-    PresentationFailure, PresentationLifetime, PresentationState, backend_attempts,
+    PresentationFailure, PresentationLifetime, PresentationState, WgpuDriver, WgpuSurfaceFactory,
+    backend_attempts,
 };
 mod owned_layout;
 pub use owned_layout::{OwnedLayout, ScrollAlign, ScrollTarget};
@@ -1129,7 +1130,10 @@ pub mod meristem_bounds {
     }
 }
 
-pub use capture::{Frame, PendingFrame, read_frame, start_frame_readback};
+pub use capture::{
+    CaptureOwner, CaptureScope, Frame, PendingFrame, read_frame, start_frame_readback,
+    start_presentation_readback,
+};
 pub use host::{
     AppCtx, AppFrameInsets, AppHook, AppShared, CaptureFn, CaptureFrame, CaptureRefusal,
     CloseDisposition, CloseRequest, CloseRequestHook, FocusedTextHook, FocusedTextSlot, FrameHook,

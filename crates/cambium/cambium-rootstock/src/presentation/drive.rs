@@ -22,6 +22,12 @@ where
             .as_mut()
             .expect("installed driver")
             .present(&prepared);
+        let driver_profile = self
+            .s
+            .presentation_driver
+            .as_mut()
+            .expect("installed driver")
+            .take_profile();
         let presented = match result {
             Ok(Some(stamp)) if stamp == expected => stamp,
             Ok(Some(_)) => {
@@ -52,6 +58,16 @@ where
         };
         self.s.presentation_sequence = presented.sequence;
         self.s.last_redraw_presentation = Some(presented);
+        let backend = self
+            .s
+            .presentation_driver
+            .as_ref()
+            .expect("installed driver")
+            .backend();
+        let _ = self
+            .s
+            .capture_owner
+            .resume(backend, presented.context_generation);
         self.observe_presentation(presented);
         let phase = crate::Instant::now();
         if let Some(capture) = self.s.pending_paint_capture.take() {
@@ -61,22 +77,22 @@ where
             };
             capture(Ok(envelope));
         }
-        // Borrowed native capture hooks cannot represent another backend.
-        // The owned capture migration replaces this explicit refusal.
-        if self.s.pending_capture.is_some() || self.s.pending_stamped_capture.is_some() {
+        for callback in [
+            self.s.pending_capture.take(),
+            self.s.pending_stamped_capture.take(),
+        ]
+        .into_iter()
+        .flatten()
+        {
+            let owner = &self.s.capture_owner;
             let driver = self
                 .s
                 .presentation_driver
-                .as_ref()
+                .as_mut()
                 .expect("installed driver");
-            self.refuse_pending_captures(crate::CaptureRefusal::PresentationError {
-                backend: driver.backend(),
-                generation: presented.context_generation,
-                source_key: None,
-                error: "borrowed native capture is unavailable on this driver".into(),
-            });
+            callback(owner.begin(backend, presented, || driver.begin_capture(presented)));
         }
-        let mut profile = prepared.profile;
+        let mut profile = driver_profile.unwrap_or(prepared.profile);
         profile.capture_us = micros(phase.elapsed());
         if prepared.animating
             && let Some(window) = self.s.window.as_ref()

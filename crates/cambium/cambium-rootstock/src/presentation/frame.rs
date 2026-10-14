@@ -76,8 +76,14 @@ pub trait PendingPresentationCapture {
 }
 
 pub trait PresentationDriver {
+    fn take_profile(&mut self) -> Option<crate::FrameProfile> {
+        None
+    }
     fn backend(&self) -> PresentationBackend;
     fn generation(&self) -> ContextGeneration;
+    fn state(&self) -> super::PresentationState {
+        super::PresentationState::Ready
+    }
     fn content_mode(&self) -> FrameContentMode;
     fn wgpu_surface(&self) -> Option<&dyn crate::Surface>;
     fn resize(&mut self, width: u32, height: u32) -> Result<(), PresentationFailure>;

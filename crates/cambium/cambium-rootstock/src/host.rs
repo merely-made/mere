@@ -81,13 +81,8 @@ impl std::fmt::Display for CaptureRefusal {
     }
 }
 impl std::error::Error for CaptureRefusal {}
-pub struct CaptureFrame<'a> {
-    pub surface: &'a dyn Surface,
-    pub view: &'a wgpu::TextureView,
-    pub width: u32,
-    pub height: u32,
-}
-pub type CaptureFn = Box<dyn FnOnce(Result<CaptureFrame<'_>, CaptureRefusal>) + 'static>;
+pub type CaptureFrame = Box<dyn crate::PendingPresentationCapture>;
+pub type CaptureFn = Box<dyn FnOnce(Result<CaptureFrame, CaptureRefusal>) + 'static>;
 
 /// Identity of one successful queue presentation in this host/window lifetime.
 /// Host numbers are process-local; a receipt must also carry its product run.
@@ -104,13 +99,8 @@ pub struct PresentedFrame {
 }
 
 /// A readback of that exact rasterized source, branded at presentation.
-pub struct StampedCaptureFrame<'a> {
-    pub surface: &'a dyn Surface,
-    pub view: &'a wgpu::TextureView,
-    pub presentation: PresentedFrame,
-}
-pub type StampedCaptureFn =
-    Box<dyn FnOnce(Result<StampedCaptureFrame<'_>, CaptureRefusal>) + 'static>;
+pub type StampedCaptureFrame = CaptureFrame;
+pub type StampedCaptureFn = Box<dyn FnOnce(Result<StampedCaptureFrame, CaptureRefusal>) + 'static>;
 
 /// One-shot read-only observation, before capture callbacks and pointer/AT input.
 pub type PresentationObserver<State, Logic, V, T = Runner<State, Logic, V>> =
@@ -1158,6 +1148,7 @@ where
     /// the same deferral `pending_sheet` gets, and for the same reason.
     pub pending_ui_zoom: Option<f32>,
     pub pending_capture: Option<CaptureFn>,
+    pub capture_owner: crate::CaptureOwner,
     pub pending_presentation_observer: Option<PresentationObserver<State, Logic, V, T>>,
     pub pending_stamped_capture: Option<StampedCaptureFn>,
     pub presentation_host: u64,
@@ -1244,6 +1235,7 @@ where
             pending_sheet: None,
             pending_ui_zoom: None,
             pending_capture: None,
+            capture_owner: crate::CaptureOwner::default(),
             pending_presentation_observer: None,
             pending_stamped_capture: None,
             presentation_host: next_host_identity(),

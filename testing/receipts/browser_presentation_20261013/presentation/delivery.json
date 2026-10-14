@@ -1,0 +1,69 @@
+{
+  "source": "46f9fd1d286593c5dedb63e5d6d6fd3936c28c3e",
+  "profile": "viewer",
+  "features": "--no-default-features",
+  "command": [
+    "cargo",
+    "build",
+    "--locked",
+    "--profile",
+    "viewer",
+    "--target",
+    "wasm32-unknown-unknown",
+    "--no-default-features",
+    "--target-dir",
+    "/home/markik/Code/worktrees/mere-webgl-presentation/target",
+    "-j1",
+    "--offline"
+  ],
+  "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+  "manifest_sha256": "cf480951f815cfda80044e579af5ef3d63c8084094ed7f25b3c89ba373b2ad70",
+  "minifier": {
+    "command": [
+      "/home/markik/Code/testing/genet/webgl-viewer-20261013/tools/node_modules/terser/bin/terser",
+      "/home/markik/Code/testing/genet/webgl-viewer-20261013/viewer-package-5/graphshell_web.js",
+      "--module",
+      "--compress",
+      "--mangle",
+      "--output",
+      "/home/markik/Code/testing/genet/webgl-viewer-20261013/viewer-package-5/graphshell_web.min.js"
+    ],
+    "input_sha256": "ad2fe3a83f6f055e19153292d3787af769c5e34f58dae928aa5d232ec54ffc09",
+    "version": "terser 5.51.2"
+  },
+  "sizes": {
+    "wasm": {
+      "raw_bytes": 9921185,
+      "sha256": "fe1fcec8405fa42a441824367d86fe22699cb07998728f3699c2e6c7646841cf",
+      "cap_bytes": 3407872,
+      "gzip6_bytes": 3517194,
+      "gzip9_bytes": 3472039,
+      "cap_pass": false
+    },
+    "glue": {
+      "raw_bytes": 68454,
+      "sha256": "19b2ca722d7d476a52506931f40bf98915ab103980c37f9fe34feb1aaafda539",
+      "cap_bytes": 20480,
+      "gzip6_bytes": 18401,
+      "gzip9_bytes": 18775,
+      "cap_pass": true
+    },
+    "mount": {
+      "raw_bytes": 998,
+      "sha256": "d36f0c879683b0f18e27d31b67162055fab268377ad04c2d0039f1aaf116419f",
+      "cap_bytes": 8192,
+      "gzip6_bytes": 592,
+      "gzip9_bytes": 590,
+      "cap_pass": true
+    },
+    "history": {
+      "raw_bytes": 271932,
+      "sha256": "aa3411e8b7eb9d4b145ed895c5330ef3be47c31746a5ac9b61f4f7fe1452289d",
+      "cap_bytes": 131072,
+      "gzip6_bytes": 6490,
+      "gzip9_bytes": 6292,
+      "cap_pass": true
+    }
+  },
+  "all_caps_pass": false
+}

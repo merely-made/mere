@@ -196,11 +196,38 @@ impl PresentationDriver for ObservedDriver {
     }
     fn begin_capture(
         &mut self,
-        _: PresentedFrame,
+        stamp: PresentedFrame,
     ) -> Result<Box<dyn PendingPresentationCapture>, CaptureRefusal> {
-        unreachable!()
+        Ok(Box::new(DelayedCapture {
+            stamp,
+            waiting: true,
+        }))
     }
     fn dispose(&mut self) {}
+}
+
+struct DelayedCapture {
+    stamp: PresentedFrame,
+    waiting: bool,
+}
+impl PendingPresentationCapture for DelayedCapture {
+    fn poll(&mut self) -> Option<Result<(PresentedFrame, Frame), CaptureRefusal>> {
+        if self.waiting {
+            self.waiting = false;
+            return None;
+        }
+        Some(Ok((
+            self.stamp,
+            Frame {
+                width: self.stamp.width,
+                height: self.stamp.height,
+                rgba: vec![
+                    self.stamp.sequence as u8;
+                    (self.stamp.width * self.stamp.height * 4) as usize
+                ],
+            },
+        )))
+    }
 }
 
 #[test]
@@ -299,4 +326,48 @@ fn driver_cannot_commit_a_stamp_from_another_context() {
     assert!(!observed.get());
     assert!(host.s.last_redraw_presentation.is_none());
     assert_eq!(host.s.presentation_sequence, 0);
+}
+
+#[test]
+fn owned_capture_keeps_the_original_presentation_after_another_draw() {
+    let mut state = HostState::<(), Logic, Child>::new();
+    state.runner = Some(GenetAppRunner::new(
+        Rc::new(RefCell::new(ScriptedDom::new())),
+        view as Logic,
+        (),
+    ));
+    state.window = Some(Box::new(Window(Rc::new(Cell::new((320, 240))))));
+    state.presentation_driver = Some(Box::new(ObservedDriver {
+        calls: Rc::new(Cell::new(0)),
+        outcome: Rc::new(Cell::new(0)),
+    }));
+    let slot = Rc::new(RefCell::new(None));
+    let sink = slot.clone();
+    state.pending_stamped_capture = Some(Box::new(move |result| {
+        *sink.borrow_mut() = Some(result.expect("owned driver capture"));
+    }));
+    let wake = HostWake::new(state.wake_pending.clone(), Arc::new(|| {}));
+    let mut host = Host::new(
+        HostOptions::default(),
+        None,
+        HostHooks::inert(),
+        state,
+        wake,
+    );
+    host.redraw();
+    let first = host.s.last_redraw_presentation.unwrap();
+    host.redraw();
+    assert_eq!(
+        host.s.last_redraw_presentation.unwrap().sequence,
+        first.sequence + 1
+    );
+    let mut pending = slot.borrow_mut().take().expect("capture callback");
+    assert!(
+        pending.poll().is_none(),
+        "completion must remain nonblocking"
+    );
+    let (stamp, pixels) = pending.poll().unwrap().unwrap();
+    assert_eq!(stamp, first);
+    assert_eq!((pixels.width, pixels.height), (first.width, first.height));
+    assert_eq!(pixels.rgba[0], first.sequence as u8);
 }
