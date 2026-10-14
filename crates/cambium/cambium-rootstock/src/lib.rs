@@ -43,6 +43,8 @@ pub use files::{FileAnswer, FileChooser};
 mod owned_layout;
 pub use owned_layout::{OwnedLayout, ScrollAlign, ScrollTarget};
 pub mod producer;
+#[cfg(feature = "embedding")]
+pub mod embedding;
 pub use producer::{
     PortableCaptureError, PortablePaintCapture, PortableProducerError, ProducedAction,
     ProducedScene, ProducedTexture, ProducerAction, ProducerContext, ProducerError,

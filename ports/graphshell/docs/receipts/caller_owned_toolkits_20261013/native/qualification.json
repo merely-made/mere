@@ -1,0 +1,53 @@
+{
+  "backend": "Netrender sparse GPU",
+  "caller_submission": true,
+  "kind": "native-headless-toolkit-callbacks",
+  "media_bytes_verified": 8044,
+  "open": [
+    "Classic encoder",
+    "physical window IME and accessibility",
+    "actual device loss",
+    "audio output"
+  ],
+  "views": [
+    {
+      "appearance": 1,
+      "operations": 8,
+      "revision": 1,
+      "source": 1
+    },
+    {
+      "appearance": 2,
+      "operations": 9,
+      "revision": 0,
+      "source": 2
+    },
+    {
+      "appearance": 3,
+      "operations": 4,
+      "revision": 0,
+      "source": 3
+    },
+    {
+      "appearance": 4,
+      "operations": 1,
+      "revision": 0,
+      "source": 4
+    },
+    {
+      "appearance": 6,
+      "operations": 8,
+      "revision": 0,
+      "source": 5
+    },
+    {
+      "appearance": 5,
+      "graph_nodes": 14,
+      "graph_session": "eca26573-84e9-4298-88ab-b2a5ab21da9c",
+      "operations": 63,
+      "revision": 5,
+      "source_instance": 123579094007813
+    }
+  ],
+  "wgpu": "30"
+}

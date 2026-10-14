@@ -1,0 +1,32 @@
+warning: patch `layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/genet.git
+   Compiling cambium-rootstock v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock)
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> crates\cambium\cambium-rootstock\src\host.rs:109:10
+    |
+109 |     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |          ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+109 -     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+109 +     NEXT.try_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |
+
+warning: `cambium-rootstock` (lib test) generated 1 warning (run `cargo fix --lib -p cambium-rootstock --tests` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 29.41s
+     Running unittests src\lib.rs (C:/t/cargo-targets/mere/build\debug\deps\cambium_rootstock-333af7d984c09bff.exe)
+
+running 6 tests
+test embedding::tests::invalid_geometry_is_refused_without_rebinding ... ok
+test embedding::tests::independent_focus_capture_clip_and_coordinates ... ok
+test embedding::tests::iced_ime_bytes_and_caller_wheel_units_survive_translation ... ok
+test embedding::tests::caller_clock_wakes_are_bounded_by_visibility_and_disposal ... ok
+test embedding::tests::egui_ime_character_ranges_are_lowered_to_unicode_byte_ranges ... ok
+test embedding::tests::source_facts_survive_scale_resize_suspend_and_dispose ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 84 filtered out; finished in 0.00s
+

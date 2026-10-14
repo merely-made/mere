@@ -74,7 +74,8 @@ purity rule and host-composition target are retired.
 
 The live dependency graph has already crossed the former purity boundary:
 
-- `transport` sits under `crates/murm` but is consumed by mesh, Moot tests,
+- `transport` is now consumed from the canonical Murm repository (formerly
+  `crates/murm` *(historical citation)* <!-- doc-audit: historical-path -->) by mesh, Moot tests,
   eidetic Iroh fetching, and the old host.
 - `mooting::MunimentStore` sits under `crates/moot` but is deliberately generic
   and is consumed by mesh.
