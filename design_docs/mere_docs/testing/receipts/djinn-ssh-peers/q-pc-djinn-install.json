@@ -21,8 +21,29 @@
     "sync_enabled_in_isolated_settings": false,
     "backup_launchagent": "/Users/markik/Library/Application Support/djinn/launchagent-before-service-isolation.plist",
     "restarted_pid": 54928,
-    "status": "waiting-for-native-unlock",
-    "outbound_qualification": "pending"
+    "status": "ready-after-native-unlock",
+    "outbound_qualification": "s-pc, ThinkPad and M4 thread reads passed; Windows enrollment pending native elevation"
+  },
+  "ssh_public_key_fingerprint": "SHA256:qIU8gMb7+oxRleIqA2oM1EW3FcU8OwFXdlds6sHL3YA",
+  "ssh_public_key_file": "/Users/markik/.ssh/djinn-mesh.pub",
+  "qualification": {
+    "resident_pid": 54928,
+    "ready": true,
+    "observed_rss_kib": 42792,
+    "custody_key_generation": "passed; exactly one Ed25519 public key returned; secret stays in Djinn",
+    "public_key_enrolled_on": ["s-pc", "thinkpad-l14-f", "imac-m4"],
+    "outgoing_thread_reads": {
+      "s-pc": "01a132b0-fcf6-7871-b0a2-b8d8f40c18e4",
+      "thinkpad-l14-f": "01a11e41-e5d7-7011-a39f-1205b16b15dc",
+      "imac-m4": "01a135a7-bed2-7180-920b-b8d601eb6855"
+    },
+    "agent_disabled_negative_control_exit": 255,
+    "negative_control_reason": "without agent, public-only identity cannot authenticate",
+    "locked_login_check": "not newly qualified on q-pc",
+    "native_client_display": "not newly confirmed",
+    "windows_enrollment": "prepared; UAC canceled; reopen choice pending",
+    "m4_current_address": "192.168.4.58",
+    "m4_return_route": "pending; markik agent endpoint refuses connection while desktop is signed in as mayolaboykin"
   },
   "agent_endpoint": "/Users/markik/Library/Application Support/djinn/agent.sock",
   "app_endpoint": "/Users/markik/.local/share/personae/vault/graphshell-app.sock",
