@@ -59,7 +59,8 @@ petgraph = { version = "0.8.3", features = ["serde-1"] }
 # no RNG, unlike v4 (native-only, below). Node ids derive from the URL via v5.
 uuid = { version = "1", features = ["serde", "v5"] }
 euclid = { version = "0.22", features = ["serde"] }
-serde_json = "1.0"
+# Captured facets are decimal JSON and must replay to the same floating-point bits.
+serde_json = { version = "1.0", features = ["float_roundtrip"] }
 accesskit = { workspace = true, features = ["serde"] }
 # Enum derives (FromRepr / EnumIter) for the relation taxonomy's recognized
 # core — replaces the hand-written ordinal mirror tables in edge_taxonomy.rs.
