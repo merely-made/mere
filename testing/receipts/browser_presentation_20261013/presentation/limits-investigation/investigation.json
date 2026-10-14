@@ -1,0 +1,246 @@
+{
+  "source": "b2500f40eb1497c02a8a96714a3c76967bb9752f",
+  "original_gzip6": 3674899,
+  "original_cap": 3407872,
+  "merge_probe": {
+    "raw": 9437104,
+    "gzip6": 3685348,
+    "gzip9": 3641107,
+    "sha256": "aea1a9555864be54087177f133546b4a8941bdb963be59905d00329f841d21ea",
+    "cap": 3407872,
+    "pass": false
+  },
+  "size_profile_probe": {
+    "effective_opt_level": "s",
+    "helper_sha256": "8ba34557ae3885b10997c924578eb818a7388f2f2348dfaef2cfb3b41e3384cd",
+    "delivery": {
+      "source": "b2500f40eb1497c02a8a96714a3c76967bb9752f",
+      "profile": "viewer",
+      "features": "--no-default-features",
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--profile",
+        "viewer",
+        "--target",
+        "wasm32-unknown-unknown",
+        "--no-default-features",
+        "--target-dir",
+        "/home/markik/Code/worktrees/mere-presentation-limits/target",
+        "-j1",
+        "--offline"
+      ],
+      "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+      "manifest_sha256": "38f5cf61d16ded8365f6a873df03810a7994247b962b3933d14ab28f6ee159e2",
+      "minifier": {
+        "command": [
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/tools/node_modules/terser/bin/terser",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/limits-investigation/size-profile-package/graphshell_web.js",
+          "--module",
+          "--compress",
+          "--mangle",
+          "--output",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/limits-investigation/size-profile-package/graphshell_web.min.js"
+        ],
+        "input_sha256": "2bd5c47afded48dad06462671975d952f3a51602e482f54b3da51e2e342f285a",
+        "version": "terser 5.51.2"
+      },
+      "sizes": {
+        "wasm": {
+          "raw_bytes": 11746644,
+          "sha256": "73851ec7c40a7da583f43cba181609f339e05516e4ee03e534eeb52508954adc",
+          "cap_bytes": 3407872,
+          "gzip6_bytes": 4132314,
+          "gzip9_bytes": 4084563,
+          "cap_pass": false
+        },
+        "glue": {
+          "raw_bytes": 68454,
+          "sha256": "6568549ae3529fc851cffc9ba6f92ec62abf5b9a20a8e2be01cc88875b915cb6",
+          "cap_bytes": 20480,
+          "gzip6_bytes": 18398,
+          "gzip9_bytes": 18775,
+          "cap_pass": true
+        },
+        "mount": {
+          "raw_bytes": 998,
+          "sha256": "d36f0c879683b0f18e27d31b67162055fab268377ad04c2d0039f1aaf116419f",
+          "cap_bytes": 8192,
+          "gzip6_bytes": 592,
+          "gzip9_bytes": 590,
+          "cap_pass": true
+        },
+        "history": {
+          "raw_bytes": 271932,
+          "sha256": "aa3411e8b7eb9d4b145ed895c5330ef3be47c31746a5ac9b61f4f7fe1452289d",
+          "cap_bytes": 131072,
+          "gzip6_bytes": 6490,
+          "gzip9_bytes": 6292,
+          "cap_pass": true
+        }
+      },
+      "all_caps_pass": false
+    }
+  },
+  "sampling_hypothesis": {
+    "scope": "analysis-only resampling hypothesis, no modified captures or accepted baseline",
+    "rows": [
+      {
+        "model": "unmodified",
+        "rms": 1.264493295977685
+      },
+      {
+        "model": "graph-only blur hypothesis",
+        "radius": 0.2,
+        "rms": 1.154717459824739
+      },
+      {
+        "model": "graph-only blur hypothesis",
+        "radius": 0.3,
+        "rms": 1.0106259541084566
+      },
+      {
+        "model": "graph-only blur hypothesis",
+        "radius": 0.4,
+        "rms": 0.8448467617531019
+      },
+      {
+        "model": "graph-only blur hypothesis",
+        "radius": 0.5,
+        "rms": 0.6982271964470422
+      },
+      {
+        "model": "graph-only blur hypothesis",
+        "radius": 0.6,
+        "rms": 0.6393022739451522
+      }
+    ]
+  },
+  "resource_cases": [
+    {
+      "label": "limits-disassemble-7-1",
+      "receipt": {
+        "command": [
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/tools/node_modules/binaryen/bin/wasm-dis",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/viewer-package-7/graphshell_web_bg.wasm",
+          "-o",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/limits-investigation/viewer-7.wat"
+        ],
+        "resource": "complete",
+        "payload_exit": 127,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/testing/genet/webgl-viewer-20261013/limits-investigation/limits-disassemble-7-1/cgroup/resource.json"
+      },
+      "memory_peak_bytes": "7626752",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 1073741824,
+      "memory_swap_max_bytes": 0,
+      "seconds": 0.344,
+      "released_service": "ActiveState=inactive\nMainPID=0"
+    },
+    {
+      "label": "limits-disassemble-7-2",
+      "receipt": {
+        "command": [
+          "/home/markik/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/tools/node_modules/binaryen/bin/wasm-dis",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/viewer-package-7/graphshell_web_bg.wasm",
+          "-o",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/limits-investigation/viewer-7.wat"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/testing/genet/webgl-viewer-20261013/limits-investigation/limits-disassemble-7-2/cgroup/resource.json"
+      },
+      "memory_peak_bytes": "413925376",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 1073741824,
+      "memory_swap_max_bytes": 0,
+      "seconds": 9.924,
+      "released_service": "ActiveState=inactive\nMainPID=0"
+    },
+    {
+      "label": "limits-function-merge-1",
+      "receipt": {
+        "command": [
+          "/usr/bin/env",
+          "BINARYEN_CORES=1",
+          "/home/markik/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/tools/node_modules/binaryen/bin/wasm-opt",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/viewer-package-7/graphshell_web_bg.wasm",
+          "--all-features",
+          "--merge-similar-functions",
+          "--duplicate-function-elimination",
+          "--strip-debug",
+          "-o",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/limits-investigation/function-merge.wasm"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/testing/genet/webgl-viewer-20261013/limits-investigation/limits-function-merge-1/cgroup/resource.json"
+      },
+      "memory_peak_bytes": "324296704",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 2147483648,
+      "memory_swap_max_bytes": 0,
+      "seconds": 8.341,
+      "released_service": "ActiveState=inactive\nMainPID=0"
+    },
+    {
+      "label": "limits-size-profile-s-1",
+      "receipt": {
+        "command": [
+          "python3",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/limits-investigation/build-size-profile.py"
+        ],
+        "resource": "complete",
+        "payload_exit": 1,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/testing/genet/webgl-viewer-20261013/limits-investigation/limits-size-profile-s-1/cgroup/resource.json"
+      },
+      "memory_peak_bytes": "4474671104",
+      "memory_events": {
+        "low": "0",
+        "high": "3703",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 5368709120,
+      "memory_swap_max_bytes": 0,
+      "seconds": 657.187,
+      "released_service": "ActiveState=inactive\nMainPID=0"
+    }
+  ],
+  "production_changes": false,
+  "limits_changed": false
+}
