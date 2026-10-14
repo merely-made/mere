@@ -371,3 +371,31 @@ fn owned_capture_keeps_the_original_presentation_after_another_draw() {
     assert_eq!((pixels.width, pixels.height), (first.width, first.height));
     assert_eq!(pixels.rgba[0], first.sequence as u8);
 }
+
+#[test]
+fn ordinary_presentation_failure_is_observable_without_capture() {
+    let state = HostState::<(), Logic, Child>::new();
+    let wake = HostWake::new(state.wake_pending.clone(), Arc::new(|| {}));
+    let mut host = Host::new(
+        HostOptions::default(),
+        None,
+        HostHooks::inert(),
+        state,
+        wake,
+    );
+    host.refuse_presentation(PresentationFailure {
+        backend: PresentationBackend::WebGl2,
+        generation: ContextGeneration(17),
+        producer_key: Some(91),
+        message: "unsupported producer paint".into(),
+        native: None,
+    });
+    let failure = host
+        .s
+        .last_presentation_failure
+        .as_ref()
+        .expect("ordinary failure is retained");
+    assert_eq!(failure.producer_key, Some(91));
+    assert_eq!(failure.message, "unsupported producer paint");
+    assert!(host.s.last_redraw_presentation.is_none());
+}

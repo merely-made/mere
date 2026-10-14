@@ -1055,6 +1055,8 @@ where
     pub presentation_driver: Option<Box<dyn crate::PresentationDriver>>,
     pub recovery_status: Option<genet_render_host::RecoveryStatus>,
     /// Current checked raster refusal; cleared at the next redraw admission.
+    /// Most recent refused presentation, including portable backend failures.
+    pub last_presentation_failure: Option<crate::PresentationFailure>,
     pub last_raster_failure: Option<genet_render_host::RasterizeFailure>,
     pub(crate) detached_generation: Option<u64>,
     pub needs_recovery_surface: bool,
@@ -1188,6 +1190,7 @@ where
             surface: None,
             presentation_driver: None,
             recovery_status: None,
+            last_presentation_failure: None,
             last_raster_failure: None,
             recovery_subscription: None,
             detached_generation: None,

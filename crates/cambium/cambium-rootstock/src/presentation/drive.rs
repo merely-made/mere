@@ -56,6 +56,7 @@ where
                 return;
             },
         };
+        self.s.last_presentation_failure = None;
         self.s.presentation_sequence = presented.sequence;
         self.s.last_redraw_presentation = Some(presented);
         let backend = self

@@ -1,0 +1,1501 @@
+{
+  "review_base": "17f71d6fbe59fca8dd5357c657aa2d17a9e00d14",
+  "reviewed_checkpoint": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+  "supplier": "cbdbf1e6dd3c86c37871eb8f98dbc6121f501601",
+  "compiled_modified_files": {
+    "Cargo.lock": "5d608be6cb4efe69d7facf6388d4c65400c9701e025146d8a2f25498df6a9e8c",
+    "Cargo.toml": "a20febf18d42f896eba4e0301ec451adf4cece938efe51b1002aef1ebc44ef0c",
+    "crates/cambium/cambium-genet-web-host/examples/presentation_page/main.rs": "e7ea2a195c1c08d494ba4b34f972130f4f8efa522d4d1d5aba93f190dcda6508",
+    "crates/cambium/cambium-genet-web-host/src/mount.rs": "e8a9bc68e345f5c6226fd9458b2a5b35b29f28b86ad1ac81817b9c7a7e72c55c",
+    "crates/cambium/cambium-genet-web-host/src/presentation/webgl.rs": "3ae10388d659220ad2112fd63ed6fb1cb3408a8065f96d14487898cdec4b0e3d",
+    "crates/cambium/cambium-rootstock/src/host.rs": "a054a3dd0fcee44c79eab2d78c4cb8fb91e593e6db850a115be51caeed04651a",
+    "crates/cambium/cambium-rootstock/src/presentation/drive.rs": "7f1fe48195d302f57df4e401d570870d7ce7a4467518131e17ebedf0cc29f5cd",
+    "crates/cambium/cambium-rootstock/src/recovery.rs": "65a16d6ba7568c64fe4bde99cf16f2d73bedee4eecdee9b1467b5308227a2f2b",
+    "crates/cambium/cambium-rootstock/tests/prepared_frame.rs": "92db7ba8abb443eacaad5deb075273926061698365247b2633a63225d73b5220",
+    "ports/graphshell/src/web_tree.rs": "e5d5c6ce215246c2ffd441be013dc49c5ba0d63d691f05d6515ad3ad62593a69",
+    "ports/graphshell/web/Cargo.lock": "d4f1f651abfdd5cbf2e07e77acef34f8dc74c5a64589cb326a8f86abe0c90904",
+    "ports/graphshell/web/Cargo.toml": "38f5cf61d16ded8365f6a873df03810a7994247b962b3933d14ab28f6ee159e2"
+  },
+  "cases": [
+    {
+      "label": "review-boot-start-green-1",
+      "receipt": {
+        "command": [
+          "/usr/bin/python3",
+          "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/run-host-fixture-live.py",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-boot-start-run-green",
+          "--root",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-boot-start-fixture-green"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-boot-start-green-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "6139c5a021a4f66bf133cdb00771e3857545fac1dddd3175278aa7d530307835",
+        "untracked": {
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/blue.png": "44df8a96d3682c596fa3c5a16e708b0b15bf8eef9540413c75e6243e340ebde8",
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/red.png": "5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f"
+        }
+      },
+      "memory_peak_bytes": "718299136",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 1073741824,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10564681728,
+      "streams": {
+        "stdout": "52ddfec78b6217b940ad44ebc8b281e3b369eaf9f7c3684c733fbce7687386b3",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "review-boot-start-red-1",
+      "receipt": {
+        "command": [
+          "python3",
+          ".superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/run-host-fixture-live.py",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-boot-start-run-red",
+          "--root",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-boot-start-fixture-red"
+        ],
+        "resource": "complete",
+        "payload_exit": 1,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-boot-start-red-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "fe1cda563ece454f0da41f7020dc48fc162c012a682ded12a986e4624ca7ea3f",
+        "untracked": {}
+      },
+      "memory_peak_bytes": "467488768",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 1073741824,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10537238528,
+      "streams": {
+        "stdout": "5b1da0bdd36eed27ac6e307c83bb9961ddf7b5212d9f7bc267d7417c77de19b3",
+        "stderr": "4705686c14d26dc05d39901e6ae10048a8d10a731419896865ff1c64775f0249"
+      }
+    },
+    {
+      "label": "review-constructor-red-1",
+      "receipt": {
+        "command": [
+          "python3",
+          ".superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/run-host-fixture-live.py",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-constructor-run-red",
+          "--root",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-viewer-constructor-fixture-red"
+        ],
+        "resource": "complete",
+        "payload_exit": 1,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-constructor-red-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "fe1cda563ece454f0da41f7020dc48fc162c012a682ded12a986e4624ca7ea3f",
+        "untracked": {}
+      },
+      "memory_peak_bytes": "401670144",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 1073741824,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10454695936,
+      "streams": {
+        "stdout": "7cb8da31e8dbcef6dbdb61117464d92d4febc72bda098c7896b1a2a4b7e6a316",
+        "stderr": "685e183895790622cb58c9a5625f8d596b10c539c8c1b9dce475864e47744225"
+      }
+    },
+    {
+      "label": "review-gl-fractional-1",
+      "receipt": {
+        "command": [
+          "/usr/bin/python3",
+          "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/run-review-fractional.py",
+          "--web",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-gl-fractional-fixture",
+          "--out",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-gl-fractional-run",
+          "--backend",
+          "webgl2",
+          "--force-context-loss"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-gl-fractional-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "4e9c8816daae000163f7969a57ca4f640b9b5f711b91e28f04352dcde7854b8d",
+        "untracked": {
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/blue.png": "44df8a96d3682c596fa3c5a16e708b0b15bf8eef9540413c75e6243e340ebde8",
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/red.png": "5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f"
+        }
+      },
+      "memory_peak_bytes": "426008576",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 1073741824,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10323116032,
+      "streams": {
+        "stdout": "67f98faf7ee3acc7de6d1fbce1b860461e6a7fce5be415e1a4283d5dd926fdf2",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "review-gl-normal-1",
+      "receipt": {
+        "command": [
+          "/usr/bin/python3",
+          "ports/graphshell/web/tests/run-presentation-webgl.py",
+          "--web",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-gl-normal-fixture",
+          "--out",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-gl-normal-run",
+          "--backend",
+          "webgl2",
+          "--force-context-loss"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-gl-normal-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "4e9c8816daae000163f7969a57ca4f640b9b5f711b91e28f04352dcde7854b8d",
+        "untracked": {
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/blue.png": "44df8a96d3682c596fa3c5a16e708b0b15bf8eef9540413c75e6243e340ebde8",
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/red.png": "5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f"
+        }
+      },
+      "memory_peak_bytes": "411590656",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 1073741824,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10304516096,
+      "streams": {
+        "stdout": "67f98faf7ee3acc7de6d1fbce1b860461e6a7fce5be415e1a4283d5dd926fdf2",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "review-host-build-green-1",
+      "receipt": {
+        "command": [
+          "/usr/bin/python3",
+          "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/build-host-fixture.py"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-host-build-green-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "3b509e17aa83a84f668f0c6d2f663a6cd44b2903362b6b4ceb51fcbd9667062e",
+        "untracked": {
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/blue.png": "44df8a96d3682c596fa3c5a16e708b0b15bf8eef9540413c75e6243e340ebde8",
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/red.png": "5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f"
+        }
+      },
+      "memory_peak_bytes": "1296601088",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 5368709120,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10074685440,
+      "streams": {
+        "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": "cbc0dfc1d66830124218b3c2e16512000b5c5f9f6822bdb923173eb0a8902731"
+      }
+    },
+    {
+      "label": "review-host-build-green-2",
+      "receipt": {
+        "command": [
+          "/usr/bin/python3",
+          "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/build-host-fixture.py"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-host-build-green-2/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "6139c5a021a4f66bf133cdb00771e3857545fac1dddd3175278aa7d530307835",
+        "untracked": {
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/blue.png": "44df8a96d3682c596fa3c5a16e708b0b15bf8eef9540413c75e6243e340ebde8",
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/red.png": "5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f"
+        }
+      },
+      "memory_peak_bytes": "1371033600",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 5368709120,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10308009984,
+      "streams": {
+        "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": "05519326e852f5b3b6206f3292856d4c589e9a8ae3f3bcb023aca33b3c968115"
+      }
+    },
+    {
+      "label": "review-host-package-green-1",
+      "receipt": {
+        "command": [
+          "/home/markik/Code/testing/mere/graphshell-three-lanes/tools/wasm-bindgen-0.2.129/wasm-bindgen",
+          "--target",
+          "web",
+          "--out-name",
+          "presentation_page",
+          "--out-dir",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-host-package/pkg",
+          "/home/markik/Code/worktrees/mere-webgl-presentation/target/wasm32-unknown-unknown/release/examples/presentation_page.wasm"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-host-package-green-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "6139c5a021a4f66bf133cdb00771e3857545fac1dddd3175278aa7d530307835",
+        "untracked": {
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/blue.png": "44df8a96d3682c596fa3c5a16e708b0b15bf8eef9540413c75e6243e340ebde8",
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/red.png": "5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f"
+        }
+      },
+      "memory_peak_bytes": "659263488",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 1073741824,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10234081280,
+      "streams": {
+        "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "review-host-positive-1",
+      "receipt": {
+        "command": [
+          "python3",
+          ".superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/run-host-fixture-live.py",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-host-positive-run",
+          "--root",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-host-positive-fixture"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-host-positive-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "4e9c8816daae000163f7969a57ca4f640b9b5f711b91e28f04352dcde7854b8d",
+        "untracked": {
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/blue.png": "44df8a96d3682c596fa3c5a16e708b0b15bf8eef9540413c75e6243e340ebde8",
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/red.png": "5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f"
+        }
+      },
+      "memory_peak_bytes": "339517440",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 1073741824,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10552688640,
+      "streams": {
+        "stdout": "7fc3c2642673926e102ce7215ae3769f2eda0549917d23dd98aee3078f9d7d8b",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "review-image-consumer-green-1",
+      "receipt": {
+        "command": [
+          "/usr/bin/python3",
+          "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/run-host-fixture-live.py",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-image-run",
+          "--root",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-image-fixture"
+        ],
+        "resource": "complete",
+        "payload_exit": 1,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-image-consumer-green-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "6139c5a021a4f66bf133cdb00771e3857545fac1dddd3175278aa7d530307835",
+        "untracked": {
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/blue.png": "44df8a96d3682c596fa3c5a16e708b0b15bf8eef9540413c75e6243e340ebde8",
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/red.png": "5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f"
+        }
+      },
+      "memory_peak_bytes": "341749760",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 1073741824,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10583433216,
+      "streams": {
+        "stdout": "7a18e812cd81c3b4c98b1f256d5c0545827bc0cc8fec2b15a99b81e994fd1058",
+        "stderr": "8fb410a85b641b372067b60fedbc2c5e0ee8bff9751b560d913c82ee414d2d2b"
+      }
+    },
+    {
+      "label": "review-image-consumer-green-2",
+      "receipt": {
+        "command": [
+          "python3",
+          ".superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/run-host-fixture-live.py",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-image-run-2",
+          "--root",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-image-fixture-2"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-image-consumer-green-2/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "4e9c8816daae000163f7969a57ca4f640b9b5f711b91e28f04352dcde7854b8d",
+        "untracked": {
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/blue.png": "44df8a96d3682c596fa3c5a16e708b0b15bf8eef9540413c75e6243e340ebde8",
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/red.png": "5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f"
+        }
+      },
+      "memory_peak_bytes": "341372928",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 1073741824,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10535956480,
+      "streams": {
+        "stdout": "bc9509b403a41bba882d99b7c0875d1bbe6da9f8cd723cb801495d4956a54477",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "review-native-suite-green-1",
+      "receipt": {
+        "command": [
+          "cargo",
+          "+1.99.0",
+          "test",
+          "--offline",
+          "--locked",
+          "-p",
+          "cambium-rootstock",
+          "-p",
+          "mesquite",
+          "-p",
+          "cambium-genet-winit-host",
+          "-j1",
+          "--",
+          "--test-threads=1"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-native-suite-green-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "6139c5a021a4f66bf133cdb00771e3857545fac1dddd3175278aa7d530307835",
+        "untracked": {
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/blue.png": "44df8a96d3682c596fa3c5a16e708b0b15bf8eef9540413c75e6243e340ebde8",
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/red.png": "5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f"
+        }
+      },
+      "memory_peak_bytes": "3505700864",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 5368709120,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 9846558720,
+      "streams": {
+        "stdout": "f89a96a683cd80af50ec982f10bd7057246c073f27ac14554f4e1046432ba99d",
+        "stderr": "560098a190dd581f47361e7f914de0d00aaec4b5b9f1ad1494e2f5a70cdff7af"
+      }
+    },
+    {
+      "label": "review-observation-browser-1",
+      "receipt": {
+        "command": [
+          "/usr/bin/python3",
+          "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/run-host-fixture-live.py",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-observation-run",
+          "--root",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-observation-fixture"
+        ],
+        "resource": "complete",
+        "payload_exit": 1,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-observation-browser-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "4e9c8816daae000163f7969a57ca4f640b9b5f711b91e28f04352dcde7854b8d",
+        "untracked": {
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/blue.png": "44df8a96d3682c596fa3c5a16e708b0b15bf8eef9540413c75e6243e340ebde8",
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/red.png": "5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f"
+        }
+      },
+      "memory_peak_bytes": "388931584",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 1073741824,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10557464576,
+      "streams": {
+        "stdout": "e17dcf82ea96b3cb189f46cb215403b773e12bf22a83c2faf1a1ae0c3e2795b2",
+        "stderr": "1bb0799f1057f555bbb95e4ff19136d85fe9a54651787e3f6fddf5c616a2e208"
+      }
+    },
+    {
+      "label": "review-observation-browser-2",
+      "receipt": {
+        "command": [
+          "/usr/bin/python3",
+          "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/run-host-fixture-live.py",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-observation-run-2",
+          "--root",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-observation-fixture"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-observation-browser-2/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "4e9c8816daae000163f7969a57ca4f640b9b5f711b91e28f04352dcde7854b8d",
+        "untracked": {
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/blue.png": "44df8a96d3682c596fa3c5a16e708b0b15bf8eef9540413c75e6243e340ebde8",
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/red.png": "5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f"
+        }
+      },
+      "memory_peak_bytes": "331612160",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 1073741824,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10583920640,
+      "streams": {
+        "stdout": "e7266f5c4de502c66843b0b98a850d599455df5fe0aaff7c69a05f5dd0a31f57",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "review-observation-green-1",
+      "receipt": {
+        "command": [
+          "cargo",
+          "+1.99.0",
+          "test",
+          "--offline",
+          "--locked",
+          "-p",
+          "cambium-rootstock",
+          "--test",
+          "prepared_frame",
+          "ordinary_presentation_failure",
+          "-j1",
+          "--",
+          "--test-threads=1"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-observation-green-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "9f1a136581d1649ac0cae6f245d51e6e6de90e56270d4a5b49382165424cff20",
+        "untracked": {}
+      },
+      "memory_peak_bytes": "870694912",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 5368709120,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10055340032,
+      "streams": {
+        "stdout": "cfbb7fa29f53680a12ea0f41fe074a0edd40d014724447381af0b046cc09692f",
+        "stderr": "a486eb22596cb299199d957db0eb50b27d9b58c599f8079c37a7c05058ef58eb"
+      }
+    },
+    {
+      "label": "review-observation-red-1",
+      "receipt": {
+        "command": [
+          "cargo",
+          "+1.99.0",
+          "test",
+          "--offline",
+          "--locked",
+          "-p",
+          "cambium-rootstock",
+          "--test",
+          "prepared_frame",
+          "ordinary_presentation_failure",
+          "-j1",
+          "--",
+          "--test-threads=1"
+        ],
+        "resource": "complete",
+        "payload_exit": 101,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-observation-red-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "fe1cda563ece454f0da41f7020dc48fc162c012a682ded12a986e4624ca7ea3f",
+        "untracked": {}
+      },
+      "memory_peak_bytes": "797581312",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 5368709120,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10440536064,
+      "streams": {
+        "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": "c4ba8b43c435ba62270b4d2edcf677f7288326bfe725b6e0fd2dcfe257f22412"
+      }
+    },
+    {
+      "label": "review-pending-fallback-green-1",
+      "receipt": {
+        "command": [
+          "/usr/bin/python3",
+          "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/run-host-fixture-live.py",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-pending-fallback-run-green",
+          "--root",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-pending-fallback-fixture-green"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-pending-fallback-green-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "6139c5a021a4f66bf133cdb00771e3857545fac1dddd3175278aa7d530307835",
+        "untracked": {
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/blue.png": "44df8a96d3682c596fa3c5a16e708b0b15bf8eef9540413c75e6243e340ebde8",
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/red.png": "5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f"
+        }
+      },
+      "memory_peak_bytes": "336863232",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 1073741824,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10544033792,
+      "streams": {
+        "stdout": "075b9456915db5e1e99ebe6c62a8b1a250adbd7b7d672b29970565b8b4809f7e",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "review-pending-red-1",
+      "receipt": {
+        "command": [
+          "python3",
+          ".superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/run-host-fixture-live.py",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-pending-run-red",
+          "--root",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-pending-fallback-fixture-red"
+        ],
+        "resource": "complete",
+        "payload_exit": 1,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-pending-red-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "fe1cda563ece454f0da41f7020dc48fc162c012a682ded12a986e4624ca7ea3f",
+        "untracked": {}
+      },
+      "memory_peak_bytes": "314675200",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 1073741824,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10516807680,
+      "streams": {
+        "stdout": "bfc3dbae919bb147060f49ee4d9d00dfde66686c2edc78753300e15af2b45361",
+        "stderr": "297a79fe62438ddb2daf2ee73111851a548200b9acc7548f050d903eef379939"
+      }
+    },
+    {
+      "label": "review-repin-1",
+      "receipt": {
+        "command": [
+          "python3",
+          ".superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/resolve-consumer.py"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": false,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-repin-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "7fb568a90e9fed65cf18264f4a8506b7627a7009f7090166f8bdf75540e90ad3",
+        "untracked": {
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/blue.png": "44df8a96d3682c596fa3c5a16e708b0b15bf8eef9540413c75e6243e340ebde8",
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/red.png": "5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f"
+        }
+      },
+      "memory_peak_bytes": "406794240",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 5368709120,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10240589824,
+      "streams": {
+        "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": "0a395cffa5645fbb4b9814590cbd40196b7fa3f5de24d0bd219c6a9d582a8bdd"
+      }
+    },
+    {
+      "label": "review-supplier-build-green-1",
+      "receipt": {
+        "command": [
+          "cargo",
+          "+1.99.0",
+          "build",
+          "--offline",
+          "--locked",
+          "-p",
+          "netrender",
+          "--example",
+          "webgl_scene",
+          "--target",
+          "wasm32-unknown-unknown",
+          "--no-default-features",
+          "--features",
+          "vello-webgl",
+          "--release",
+          "-j1"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-supplier-build-green-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "b40f40628529e9ce58c419233fe3a758914be10a",
+        "diff_sha256": "12baf4035d2f4eb9cff0ee1b4d4202399899274667145118ba3dc26164cf7298",
+        "untracked": {}
+      },
+      "memory_peak_bytes": "1057583104",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 5368709120,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10377945088,
+      "streams": {
+        "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": "02604306a82aefa7931df5d79ed0ab97623e3065e96113091e6674b3a618d0e7"
+      }
+    },
+    {
+      "label": "review-supplier-package-green-1",
+      "receipt": {
+        "command": [
+          "/home/markik/Code/testing/mere/graphshell-three-lanes/tools/wasm-bindgen-0.2.129/wasm-bindgen",
+          "--target",
+          "web",
+          "--out-dir",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-upload-fixture-green/pkg",
+          "target/wasm32-unknown-unknown/release/examples/webgl_scene.wasm"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-supplier-package-green-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "b7e7f9570d242a2247324e1cca9850d760de4e547d6a00478d07c464bb388126",
+        "untracked": {}
+      },
+      "memory_peak_bytes": "290578432",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 1073741824,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10515136512,
+      "streams": {
+        "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "review-supplier-positive-1",
+      "receipt": {
+        "command": [
+          "python3",
+          ".superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/run-host-fixture-live.py",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-supplier-positive-run",
+          "--root",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-supplier-positive-fixture"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-supplier-positive-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "b7e7f9570d242a2247324e1cca9850d760de4e547d6a00478d07c464bb388126",
+        "untracked": {}
+      },
+      "memory_peak_bytes": "256045056",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 1073741824,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10490454016,
+      "streams": {
+        "stdout": "d8eab2cc9dc6388492404f4713018550e79de45607decf51fee799bcc9a5b522",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "review-upload-green-1",
+      "receipt": {
+        "command": [
+          "python3",
+          ".superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/run-host-fixture-live.py",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-upload-run-green",
+          "--root",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-upload-fixture-green"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-upload-green-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "b7e7f9570d242a2247324e1cca9850d760de4e547d6a00478d07c464bb388126",
+        "untracked": {}
+      },
+      "memory_peak_bytes": "252067840",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 1073741824,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10457071616,
+      "streams": {
+        "stdout": "8fe01f6b1a57c178771391d897ac1ee82806dbc73968a0e9237d551ea328fd3f",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "review-upload-red-1",
+      "receipt": {
+        "command": [
+          "python3",
+          ".superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/run-host-fixture-live.py",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-upload-run-red",
+          "--root",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-upload-fixture-red"
+        ],
+        "resource": "complete",
+        "payload_exit": 1,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-upload-red-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "fe1cda563ece454f0da41f7020dc48fc162c012a682ded12a986e4624ca7ea3f",
+        "untracked": {}
+      },
+      "memory_peak_bytes": "254545920",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 1073741824,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10553888768,
+      "streams": {
+        "stdout": "1e8e975aff16313f3352f8ba63df6dd80a0cda37171c426d52f98a071ece27ab",
+        "stderr": "994c2511d4a4f0aaeedf08746b996c4f7f1d3512681df3907aa0ad126130b265"
+      }
+    },
+    {
+      "label": "review-upload-throw-green-1",
+      "receipt": {
+        "command": [
+          "/usr/bin/python3",
+          "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/run-host-fixture-live.py",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-upload-throw-run",
+          "--root",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-upload-throw-fixture"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-upload-throw-green-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "4e9c8816daae000163f7969a57ca4f640b9b5f711b91e28f04352dcde7854b8d",
+        "untracked": {
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/blue.png": "44df8a96d3682c596fa3c5a16e708b0b15bf8eef9540413c75e6243e340ebde8",
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/red.png": "5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f"
+        }
+      },
+      "memory_peak_bytes": "252456960",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 1073741824,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10675773440,
+      "streams": {
+        "stdout": "1c4a1ec0ad818efc784a8da398bdfb753e45fdd74e37321069f75f40fb6d0b57",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "review-viewer-auto-1",
+      "receipt": {
+        "command": [
+          "/usr/bin/python3",
+          "/home/markik/Code/worktrees/mere-webgl-presentation/ports/graphshell/web/tests/run-presentation-webgl.py",
+          "--out",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-viewer-auto-run",
+          "--web",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-viewer-final-fixture",
+          "--backend",
+          "auto",
+          "--disable-webgpu",
+          "--force-context-loss"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-viewer-auto-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "4e9c8816daae000163f7969a57ca4f640b9b5f711b91e28f04352dcde7854b8d",
+        "untracked": {
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/blue.png": "44df8a96d3682c596fa3c5a16e708b0b15bf8eef9540413c75e6243e340ebde8",
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/red.png": "5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f"
+        }
+      },
+      "memory_peak_bytes": "401489920",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 1073741824,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10465398784,
+      "streams": {
+        "stdout": "67f98faf7ee3acc7de6d1fbce1b860461e6a7fce5be415e1a4283d5dd926fdf2",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "review-viewer-constructor-green-1",
+      "receipt": {
+        "command": [
+          "/usr/bin/python3",
+          "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/run-host-fixture-live.py",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-viewer-constructor-run-green",
+          "--root",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-viewer-constructor-fixture-green"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-viewer-constructor-green-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "6139c5a021a4f66bf133cdb00771e3857545fac1dddd3175278aa7d530307835",
+        "untracked": {
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/blue.png": "44df8a96d3682c596fa3c5a16e708b0b15bf8eef9540413c75e6243e340ebde8",
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/red.png": "5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f"
+        }
+      },
+      "memory_peak_bytes": "338022400",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 1073741824,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10564005888,
+      "streams": {
+        "stdout": "018518bf22a87102fd470b777d4eb9b6bb906114c0d5f7f508dc4adce43273c8",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "review-viewer-firefox-1",
+      "receipt": {
+        "command": [
+          "/usr/bin/python3",
+          "/home/markik/Code/worktrees/mere-webgl-presentation/ports/graphshell/web/tests/run-presentation-webgl.py",
+          "--out",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-viewer-firefox-run",
+          "--web",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-viewer-final-fixture",
+          "--browser",
+          "firefox",
+          "--headed",
+          "--backend",
+          "webgl2",
+          "--force-context-loss"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-viewer-firefox-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "4e9c8816daae000163f7969a57ca4f640b9b5f711b91e28f04352dcde7854b8d",
+        "untracked": {
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/blue.png": "44df8a96d3682c596fa3c5a16e708b0b15bf8eef9540413c75e6243e340ebde8",
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/red.png": "5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f"
+        }
+      },
+      "memory_peak_bytes": "897183744",
+      "memory_events": {
+        "low": "0",
+        "high": "3002",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "913"
+      },
+      "memory_max_bytes": 1073741824,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 9912958976,
+      "streams": {
+        "stdout": "cd02ca79cfc51b09e986205ecb3efd111c2d0e240b0c97d7ce4ea99842ff145a",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "review-viewer-gl-1",
+      "receipt": {
+        "command": [
+          "/usr/bin/python3",
+          "/home/markik/Code/worktrees/mere-webgl-presentation/ports/graphshell/web/tests/run-presentation-webgl.py",
+          "--out",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-viewer-gl-run",
+          "--web",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-viewer-final-fixture",
+          "--backend",
+          "webgl2",
+          "--force-context-loss"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-viewer-gl-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "4e9c8816daae000163f7969a57ca4f640b9b5f711b91e28f04352dcde7854b8d",
+        "untracked": {
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/blue.png": "44df8a96d3682c596fa3c5a16e708b0b15bf8eef9540413c75e6243e340ebde8",
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/red.png": "5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f"
+        }
+      },
+      "memory_peak_bytes": "421400576",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 1073741824,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10489724928,
+      "streams": {
+        "stdout": "67f98faf7ee3acc7de6d1fbce1b860461e6a7fce5be415e1a4283d5dd926fdf2",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "review-viewer-package-6",
+      "receipt": {
+        "command": [
+          "/usr/bin/python3",
+          "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/build-current-viewer-6.py"
+        ],
+        "resource": "complete",
+        "payload_exit": 1,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-viewer-package-6/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "6139c5a021a4f66bf133cdb00771e3857545fac1dddd3175278aa7d530307835",
+        "untracked": {
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/blue.png": "44df8a96d3682c596fa3c5a16e708b0b15bf8eef9540413c75e6243e340ebde8",
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/red.png": "5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f"
+        }
+      },
+      "memory_peak_bytes": "4474183680",
+      "memory_events": {
+        "low": "0",
+        "high": "533",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 5368709120,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 7183691776,
+      "streams": {
+        "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": "92aba644dd9881be7bdfde37d88881cf413c5a68f7d77205be77a9925f750347"
+      }
+    },
+    {
+      "label": "review-viewer-package-7",
+      "receipt": {
+        "command": [
+          "python3",
+          ".superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/build-current-viewer-7.py"
+        ],
+        "resource": "complete",
+        "payload_exit": 1,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-viewer-package-7/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "4e9c8816daae000163f7969a57ca4f640b9b5f711b91e28f04352dcde7854b8d",
+        "untracked": {
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/blue.png": "44df8a96d3682c596fa3c5a16e708b0b15bf8eef9540413c75e6243e340ebde8",
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/red.png": "5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f"
+        }
+      },
+      "memory_peak_bytes": "3924320256",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 5368709120,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 7257497600,
+      "streams": {
+        "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": "af1fc3a87a5578093e785ab7c172efaa3ba7e6660c2531afc8a11bddb867c2f4"
+      }
+    },
+    {
+      "label": "review-viewer-software-1",
+      "receipt": {
+        "command": [
+          "/usr/bin/python3",
+          "/home/markik/Code/worktrees/mere-webgl-presentation/ports/graphshell/web/tests/run-presentation-webgl.py",
+          "--out",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-viewer-software-run",
+          "--web",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-viewer-final-fixture",
+          "--backend",
+          "webgl2",
+          "--angle",
+          "swiftshader",
+          "--force-context-loss"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-viewer-software-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "4e9c8816daae000163f7969a57ca4f640b9b5f711b91e28f04352dcde7854b8d",
+        "untracked": {
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/blue.png": "44df8a96d3682c596fa3c5a16e708b0b15bf8eef9540413c75e6243e340ebde8",
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/red.png": "5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f"
+        }
+      },
+      "memory_peak_bytes": "472559616",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 1073741824,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10193219584,
+      "streams": {
+        "stdout": "fddb805bbe4414fab73358d204337c6107e3e4d7d53684ca0e7a447b2e8bf55a",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "review-viewer-webgpu-1",
+      "receipt": {
+        "command": [
+          "/usr/bin/python3",
+          "/home/markik/Code/worktrees/mere-webgl-presentation/ports/graphshell/web/tests/run-presentation-webgl.py",
+          "--out",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-viewer-webgpu-run",
+          "--web",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-viewer-final-fixture",
+          "--backend",
+          "webgpu"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-viewer-webgpu-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "4e9c8816daae000163f7969a57ca4f640b9b5f711b91e28f04352dcde7854b8d",
+        "untracked": {
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/blue.png": "44df8a96d3682c596fa3c5a16e708b0b15bf8eef9540413c75e6243e340ebde8",
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/red.png": "5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f"
+        }
+      },
+      "memory_peak_bytes": "384425984",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 2147483648,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10101460992,
+      "streams": {
+        "stdout": "3bd9a48849ac3e360cbe044665032d12e7369b8a14f386890dd4713a192226cc",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "review-wg-fractional-1",
+      "receipt": {
+        "command": [
+          "/usr/bin/python3",
+          "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/run-review-fractional.py",
+          "--web",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-wg-fractional-fixture",
+          "--out",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-wg-fractional-run",
+          "--backend",
+          "webgpu"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-wg-fractional-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "4e9c8816daae000163f7969a57ca4f640b9b5f711b91e28f04352dcde7854b8d",
+        "untracked": {
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/blue.png": "44df8a96d3682c596fa3c5a16e708b0b15bf8eef9540413c75e6243e340ebde8",
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/red.png": "5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f"
+        }
+      },
+      "memory_peak_bytes": "373817344",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 2147483648,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 9879048192,
+      "streams": {
+        "stdout": "3bd9a48849ac3e360cbe044665032d12e7369b8a14f386890dd4713a192226cc",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "review-wg-normal-1",
+      "receipt": {
+        "command": [
+          "/usr/bin/python3",
+          "ports/graphshell/web/tests/run-presentation-webgl.py",
+          "--web",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-wg-normal-fixture",
+          "--out",
+          "/home/markik/Code/testing/genet/webgl-viewer-20261013/review-wg-normal-run",
+          "--backend",
+          "webgpu"
+        ],
+        "resource": "complete",
+        "payload_exit": 0,
+        "source_unchanged": true,
+        "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/review-wg-normal-1/cgroup/resource.json"
+      },
+      "source_before": {
+        "head": "463aea83b22eda55d1acaaa4323bf1b7d328addd",
+        "diff_sha256": "4e9c8816daae000163f7969a57ca4f640b9b5f711b91e28f04352dcde7854b8d",
+        "untracked": {
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/blue.png": "44df8a96d3682c596fa3c5a16e708b0b15bf8eef9540413c75e6243e340ebde8",
+          "crates/cambium/cambium-genet-web-host/examples/presentation_page/red.png": "5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f"
+        }
+      },
+      "memory_peak_bytes": "374988800",
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "memory_max_bytes": 2147483648,
+      "memory_swap_max_bytes": 0,
+      "minimum_available_ram_bytes": 10078564352,
+      "streams": {
+        "stdout": "3bd9a48849ac3e360cbe044665032d12e7369b8a14f386890dd4713a192226cc",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "native_summary": {
+    "passed": 309,
+    "failed": 0,
+    "existing_ignored": 11
+  },
+  "acceptance_open": [
+    "unchanged 3.25 MiB delivery cap",
+    "fractional RGB RMS1 refusal",
+    "human AT manual gate",
+    "shared main integration"
+  ]
+}

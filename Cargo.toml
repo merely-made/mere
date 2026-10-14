@@ -436,9 +436,9 @@ livery = { version = "0.0.5", git = "https://github.com/merely-made/genet.git", 
 # neither may be patched: tinct is a workspace member as of 2026-09-03.
 tinct = { version = "=0.1.2", path = "crates/cambium/tinct" }
 
-netrender = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "b40f40628529e9ce58c419233fe3a758914be10a" }
-paint_list_api = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "b40f40628529e9ce58c419233fe3a758914be10a" }
-paint_list_render = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "b40f40628529e9ce58c419233fe3a758914be10a" }
+netrender = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "cbdbf1e6dd3c86c37871eb8f98dbc6121f501601" }
+paint_list_api = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "cbdbf1e6dd3c86c37871eb8f98dbc6121f501601" }
+paint_list_render = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "cbdbf1e6dd3c86c37871eb8f98dbc6121f501601" }
 
 # Published as `mere-forme`: the crates.io name `forme` is owned by someone else
 # (an HTML template engine). The `package =` alias keeps every `use forme::...`
@@ -700,7 +700,7 @@ workbench = { path = "crates/cambium/workbench" }
 # cone has no root patch in this workspace.
 [patch.crates-io]
 # Pictograph's published dev dependency shares the renderer's device source.
-netrender_device = { git = "https://www.github.com/merely-made/netrender.git", rev = "b40f40628529e9ce58c419233fe3a758914be10a" }
+netrender_device = { git = "https://www.github.com/merely-made/netrender.git", rev = "cbdbf1e6dd3c86c37871eb8f98dbc6121f501601" }
 # gaz (dramatis) takes muniment from crates.io so dramatis never pins mere;
 # this swaps in mere's own, so the graph holds one muniment and castellan's
 # stores and gaz's agree on its types.
@@ -828,8 +828,8 @@ layout-dom-api = { version = "=0.1.1", git = "https://www.github.com/merely-made
 # Forward Genet and older consumers to the same immutable renderer contracts.
 # The HTTPS alias avoids Cargo's same-source patch restriction.
 [patch."https://github.com/merely-made/netrender.git"]
-netrender = { git = "https://www.github.com/merely-made/netrender.git", rev = "b40f40628529e9ce58c419233fe3a758914be10a" }
-netrender_device = { git = "https://www.github.com/merely-made/netrender.git", rev = "b40f40628529e9ce58c419233fe3a758914be10a" }
-netrender_text = { git = "https://www.github.com/merely-made/netrender.git", rev = "b40f40628529e9ce58c419233fe3a758914be10a" }
-paint_list_api = { git = "https://www.github.com/merely-made/netrender.git", rev = "b40f40628529e9ce58c419233fe3a758914be10a" }
-paint_list_render = { git = "https://www.github.com/merely-made/netrender.git", rev = "b40f40628529e9ce58c419233fe3a758914be10a" }
+netrender = { git = "https://www.github.com/merely-made/netrender.git", rev = "cbdbf1e6dd3c86c37871eb8f98dbc6121f501601" }
+netrender_device = { git = "https://www.github.com/merely-made/netrender.git", rev = "cbdbf1e6dd3c86c37871eb8f98dbc6121f501601" }
+netrender_text = { git = "https://www.github.com/merely-made/netrender.git", rev = "cbdbf1e6dd3c86c37871eb8f98dbc6121f501601" }
+paint_list_api = { git = "https://www.github.com/merely-made/netrender.git", rev = "cbdbf1e6dd3c86c37871eb8f98dbc6121f501601" }
+paint_list_render = { git = "https://www.github.com/merely-made/netrender.git", rev = "cbdbf1e6dd3c86c37871eb8f98dbc6121f501601" }

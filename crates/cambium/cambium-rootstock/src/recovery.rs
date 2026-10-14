@@ -77,6 +77,8 @@ where
         self.s.files = None;
     }
     pub fn refuse_presentation(&mut self, failure: crate::PresentationFailure) {
+        self.s.last_redraw_presentation = None;
+        self.s.last_presentation_failure = Some(failure.clone());
         match failure.native {
             Some(crate::NativePresentationFailure::Rasterize(cause)) => {
                 self.refuse_rasterization(cause, failure.producer_key)

@@ -27,6 +27,7 @@ impl WebGlPresentation {
         canvas: HtmlCanvasElement,
         limits: SparseResourceLimits,
     ) -> Result<Self, String> {
+        let mut ownership = InitialContext(Some(canvas.clone()));
         let mut init = WebGlSession::start(&canvas, limits).map_err(|e| e.to_string())?;
         let gl = canvas
             .get_context("webgl2")
@@ -34,15 +35,15 @@ impl WebGlPresentation {
             .ok_or("initializer has no context")?
             .dyn_into::<web_sys::WebGl2RenderingContext>()
             .map_err(|_| "initializer context has the wrong type")?;
-        let mut ownership = InitialContext(Some(gl));
         loop {
             if !canvas.is_connected() {
                 return Err("appearance boot cancelled".into());
             }
             if let Some(session) = init.try_finish().map_err(|e| e.to_string())? {
+                ownership.0.take();
                 return Ok(Self {
                     canvas,
-                    gl: ownership.0.take().expect("initializer owns its context"),
+                    gl,
                     session: Some(session),
                     rebuilding: None,
                     lifetime: PresentationLifetime::new(ContextGeneration(1)),
@@ -274,11 +275,16 @@ impl Drop for WebGlPresentation {
 }
 
 /// Own the exclusive context before a driver exists, including rejected rAFs.
-struct InitialContext(Option<web_sys::WebGl2RenderingContext>);
+struct InitialContext(Option<HtmlCanvasElement>);
 impl Drop for InitialContext {
     fn drop(&mut self) {
-        if let Some(gl) = &self.0 {
-            release_context(gl);
+        // Let the provider bind first so its context attributes remain authoritative.
+        if let Some(canvas) = &self.0 {
+            if let Ok(Some(context)) = canvas.get_context("webgl2") {
+                if let Ok(gl) = context.dyn_into::<web_sys::WebGl2RenderingContext>() {
+                    release_context(&gl);
+                }
+            }
         }
     }
 }
