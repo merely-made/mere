@@ -1,0 +1,99 @@
+{
+  "base": "8736911aaab06e14f2a7d0680a163ea1d44bb0e2",
+  "metadata": {
+    "root": {
+      "genet-render-host": {
+        "version": "0.2.0",
+        "source": "git+https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8cb499f2d3b91083c2f7e38236599f98dc"
+      },
+      "layout-dom-api": {
+        "version": "0.1.1",
+        "source": "git+https://www.github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8cb499f2d3b91083c2f7e38236599f98dc"
+      },
+      "netrender": {
+        "version": "0.1.2",
+        "source": "git+https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb28090c28b1c6d80b08dcdea18aff48d3e"
+      },
+      "paint_list_render": {
+        "version": "0.1.2",
+        "source": "git+https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb28090c28b1c6d80b08dcdea18aff48d3e"
+      },
+      "vello_common": {
+        "version": "0.3.0",
+        "source": "git+https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243881d5b24c984d5ee35dde509ca5db782"
+      },
+      "wasm-bindgen": {
+        "version": "0.2.129",
+        "source": "registry+https://github.com/rust-lang/crates.io-index"
+      },
+      "wgpu": {
+        "version": "30.0.1",
+        "source": "registry+https://github.com/rust-lang/crates.io-index"
+      }
+    },
+    "viewer": {
+      "genet-render-host": {
+        "version": "0.2.0",
+        "source": "git+https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8cb499f2d3b91083c2f7e38236599f98dc"
+      },
+      "layout-dom-api": {
+        "version": "0.1.1",
+        "source": "git+https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8cb499f2d3b91083c2f7e38236599f98dc"
+      },
+      "netrender": {
+        "version": "0.1.2",
+        "source": "git+https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb28090c28b1c6d80b08dcdea18aff48d3e"
+      },
+      "paint_list_render": {
+        "version": "0.1.2",
+        "source": "git+https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb28090c28b1c6d80b08dcdea18aff48d3e"
+      },
+      "wasm-bindgen": {
+        "version": "0.2.129",
+        "source": "registry+https://github.com/rust-lang/crates.io-index"
+      },
+      "wgpu": {
+        "version": "30.0.1",
+        "source": "registry+https://github.com/rust-lang/crates.io-index"
+      }
+    }
+  },
+  "metadata_sha256": {
+    "root-metadata-retry.json": "7c1530091b06417c2adb761cdd52a4bcac01f058fb25196960e5bb9144e26aab",
+    "viewer-refreshed-metadata.json": "2ec18be6ded5a6e173153126d0d9e47cdcefd1ecd8844acdb83687a074d8404e"
+  },
+  "lock_sha256": {
+    "Cargo.lock": "21ac7fec218583429e3ca8bc2c14a922432648435d7b4622e7d456570e435c7a",
+    "ports/graphshell/web/Cargo.lock": "71b6884f7cfcb6cc9617959b9369fbe7176089543269f9e14dfda6a85ffc1f60"
+  },
+  "viewer_lock_correction": {
+    "added": [
+      [
+        "luggage",
+        "0.1.0",
+        "git+https://github.com/merely-made/mere.git?rev=fabfd10ef7f8a34058907f9a9c2b1e1a311be82f#fabfd10ef7f8a34058907f9a9c2b1e1a311be82f"
+      ],
+      [
+        "mere-webrtc-carrier",
+        "0.0.1",
+        "git+https://github.com/merely-made/retinue.git?rev=b49df894635bac95823284efee6c445885eaf62a#b49df894635bac95823284efee6c445885eaf62a"
+      ]
+    ],
+    "removed": [
+      [
+        "luggage",
+        "0.1.0",
+        "path"
+      ],
+      [
+        "mere-webrtc-carrier",
+        "0.0.1",
+        "path"
+      ]
+    ],
+    "changed": []
+  },
+  "qualified_baseline": false,
+  "task": "Baseline preparation only; tests and paint inventory pending",
+  "wasm_bindgen_cli_version": "0.2.129"
+}
