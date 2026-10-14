@@ -31,6 +31,7 @@
 use core::marker::PhantomData;
 
 use genet_scripted_dom::NodeId;
+use layout_dom_api::LayoutDom;
 use meristem::{MessageCtx, MessageResult, Mut, View, ViewId, ViewMarker, ViewPathTracker};
 
 use crate::pod::GenetElement;
@@ -400,9 +401,16 @@ where
                 // collapses `()`/`A`/`Option<A>` to `Option<A>` — `Some(a)`
                 // bubbles as `MessageResult::Action(a)`, `None` (incl. every unit
                 // handler) is a `Nop`.
-                Some(event) => match (self.handler)(app_state, *event).action() {
-                    Some(a) => MessageResult::Action(a),
-                    None => MessageResult::Nop,
+                Some(event) => {
+                    let propagation = event.prop.clone();
+                    let group = element.dom.borrow().parent(view_state.node);
+                    propagation.set_key_target(group.map(|group| (view_state.node, group)));
+                    let action = (self.handler)(app_state, *event).action();
+                    propagation.set_key_target(None);
+                    match action {
+                        Some(a) => MessageResult::Action(a),
+                        None => MessageResult::Nop,
+                    }
                 },
                 // Wrong message type routed to this path: be robust.
                 None => MessageResult::Stale,

@@ -14,6 +14,8 @@ use uuid::Uuid;
 
 mod projection;
 pub use projection::*;
+mod stroke;
+pub use stroke::{StrokePart, stroke_parts};
 #[cfg(test)]
 mod tests;
 
@@ -125,7 +127,7 @@ impl QueryViewSpec {
             || self.max_appearances == 0
             || self.max_relations == 0
         {
-            return Err("A query view needs a title and positive member budget".into());
+            return Err("A query view needs a title and positive budgets".into());
         }
         let SubgraphKind::Sparql {
             query,

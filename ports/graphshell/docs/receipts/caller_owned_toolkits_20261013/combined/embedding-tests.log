@@ -1,0 +1,122 @@
+warning: patch `layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/genet.git
+   Compiling num-traits v0.2.19
+   Compiling half v2.7.1
+   Compiling euclid v0.22.14
+   Compiling kurbo v0.13.1
+   Compiling profiling v1.0.18
+   Compiling guillotiere v0.7.0
+   Compiling peniko v0.6.1
+   Compiling naga v30.0.1
+   Compiling wgpu-naga-bridge v30.0.1
+   Compiling ordered-float v5.5.0
+   Compiling wgpu-hal v30.0.1
+   Compiling wgpu-core-deps-windows-linux-android v30.0.1
+   Compiling itertools v0.14.0
+   Compiling wgpu-core v30.0.1
+   Compiling wgpu v30.0.1
+   Compiling lalrpop v0.22.2
+   Compiling wgsl-parse v0.4.0
+   Compiling wgsl-types v0.4.0
+   Compiling vello_shaders v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling wesl-macros v0.4.0
+   Compiling vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling wesl v0.4.0
+   Compiling netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling vello_gpu_shaders v0.3.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling layout-dom-api v0.1.1 (https://www.github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling vello_common v0.3.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling app_units v0.7.8
+   Compiling genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling glifo v0.4.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling iced_core v0.15.0-dev (https://github.com/iced-rs/iced?rev=ab336f6d6403d7206d82c7c2caa46143efde8284#ab336f6d)
+   Compiling vello_common v0.1.0
+   Compiling netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling livery v0.0.5 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling vello_gpu v0.3.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling regress v0.11.1 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling iced_futures v0.15.0-dev (https://github.com/iced-rs/iced?rev=ab336f6d6403d7206d82c7c2caa46143efde8284#ab336f6d)
+   Compiling netrender v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling cadency v0.0.1 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling vello_cpu v0.1.0
+   Compiling genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling epaint v0.36.2
+   Compiling genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling buckram v0.0.3 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling sprigging v0.2.1 (C:\Users\mark_\Code\repos\mere\crates\cambium\sprigging)
+   Compiling genet-text v0.1.0 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling etagere v0.3.0
+   Compiling cryoglyph v0.1.0 (https://github.com/iced-rs/cryoglyph.git?rev=cf38ed5ea0cfe95270b31ced2910560a7fcc5003#cf38ed5e)
+   Compiling cambium v0.3.3 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium)
+   Compiling genet-livery v0.0.4 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling iced_debug v0.15.0-dev (https://github.com/iced-rs/iced?rev=ab336f6d6403d7206d82c7c2caa46143efde8284#ab336f6d)
+   Compiling iced_graphics v0.15.0-dev (https://github.com/iced-rs/iced?rev=ab336f6d6403d7206d82c7c2caa46143efde8284#ab336f6d)
+   Compiling document-session-api v0.1.0 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling genet-render v0.2.0 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling egui v0.36.2
+   Compiling egui-wgpu v0.36.2
+   Compiling iced_wgpu v0.15.0-dev (https://github.com/iced-rs/iced?rev=ab336f6d6403d7206d82c7c2caa46143efde8284#ab336f6d)
+   Compiling cambium-winit v0.3.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-winit)
+   Compiling genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling cambium-rootstock v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> crates\cambium\cambium-rootstock\src\producer\registry.rs:36:10
+   |
+36 |     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |          ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+36 -     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+36 +     next.try_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> crates\cambium\cambium-rootstock\src\scene_producer.rs:25:10
+   |
+25 |         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |          ^^^^^^^^^^^^
+   |
+help: replace the use of the deprecated method
+   |
+25 -         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+25 +         .try_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> crates\cambium\cambium-rootstock\src\host.rs:114:10
+    |
+114 |     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |          ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+114 -     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+114 +     NEXT.try_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |
+
+warning: `cambium-rootstock` (lib test) generated 3 warnings (run `cargo fix --lib -p cambium-rootstock --tests` to apply 3 suggestions)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5m 36s
+     Running unittests src\lib.rs (C:/t/cargo-targets/mere/build\debug\deps\cambium_rootstock-3d15eefeed08a171.exe)
+
+running 6 tests
+test embedding::tests::independent_focus_capture_clip_and_coordinates ... ok
+test embedding::tests::iced_ime_bytes_and_caller_wheel_units_survive_translation ... ok
+test embedding::tests::invalid_geometry_is_refused_without_rebinding ... ok
+test embedding::tests::caller_clock_wakes_are_bounded_by_visibility_and_disposal ... ok
+test embedding::tests::egui_ime_character_ranges_are_lowered_to_unicode_byte_ranges ... ok
+test embedding::tests::source_facts_survive_scale_resize_suspend_and_dispose ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 96 filtered out; finished in 0.00s
+

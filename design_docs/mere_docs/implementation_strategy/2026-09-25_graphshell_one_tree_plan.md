@@ -2133,9 +2133,19 @@ The latest Turnstone draft `7d62a5a` supplies Tabard themes and Interface fonts
 to the shared pane frame. That adoption retains its existing acceptance scope.
 This bounded native content path does not close physical assistive-technology,
 protected personal custody, all media adapters or cross-platform acceptance.
-Graphshell's selected-clip export action still needs its host export adapter.
-Turnstone A4/S3 still requires in-house Component bodies in one composition,
-float joining, native input/theme/DPI/performance acceptance. Its shared frame
-and outer Workspace draft is the next composition owner, not a receipt for
-those remaining gates. External engine builds and simultaneous engine loading
-remain separately qualified consumers.
+Graphshell's selected-clip export adapter now serializes the verified selected
+body as a PortableClip package and hands it to the browser with the package MIME
+and content-derived filename. Thirteen native retained-content/export tests pass,
+including exact owner/session/source guards and usable short-panel allocation.
+A trusted browser click reaches the handoff status; a completed browser download
+path remains unobserved. See the source-bound continuation in
+`ports/graphshell/docs/receipts/retained_content_20261012/clip-export-browser/`.
+
+Turnstone A4/S3 now implements in-house Component bodies in the shared retained
+forest and stages native producer images at their exact appearance apertures.
+Source-first withdrawal parks the actual runner until remount; four shared tests
+cover eager removal, GC, focus/state continuity, owner teardown and foreign-DOM
+refusal. Native headed composition qualification is in progress. Physical
+input/accessibility, monitor DPI transitions and performance remain separate
+gates. External engine builds and simultaneous engine loading remain separately
+qualified consumers.

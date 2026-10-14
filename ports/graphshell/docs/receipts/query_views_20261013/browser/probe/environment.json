@@ -1,0 +1,50 @@
+{
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+  "platform": "Win32",
+  "viewport": [
+    1037,
+    639
+  ],
+  "devicePixelRatio": 2,
+  "secureContext": true,
+  "databases": [
+    {
+      "name": "graphshell-retained-content-acceptance",
+      "version": 1
+    },
+    {
+      "name": "graphshell-retained-content-query-acceptance",
+      "version": 1
+    }
+  ],
+  "webgpu": true,
+  "adapter": {
+    "vendor": "nvidia",
+    "architecture": "lovelace",
+    "device": "",
+    "description": "",
+    "features": [
+      "depth32float-stencil8",
+      "rg11b10ufloat-renderable",
+      "texture-formats-tier1",
+      "bgra8unorm-storage",
+      "texture-compression-bc",
+      "dual-source-blending",
+      "core-features-and-limits",
+      "float32-filterable",
+      "indirect-first-instance",
+      "float32-blendable",
+      "subgroup-size-control",
+      "depth-clip-control",
+      "texture-compression-bc-sliced-3d",
+      "timestamp-query",
+      "texture-formats-tier2",
+      "shader-f16",
+      "clip-distances",
+      "primitive-index",
+      "texture-component-swizzle",
+      "subgroups"
+    ]
+  },
+  "collected_at_utc": "2026-10-14T05:06:22.572428+00:00"
+}

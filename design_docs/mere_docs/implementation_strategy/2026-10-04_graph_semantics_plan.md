@@ -4277,11 +4277,17 @@ separately deferred vocabulary/oracle work remain outside this lane.
 
 ## 7. Strata and query driven views draft
 
-**Status (2026-10-13):** First implementation in progress. Mark chose shared
+**Status (2026-10-14):** The bounded first implementation is present; final
+supplier qualification and publication remain in progress. Mark chose shared
 Mere Resources authored in Graphshell Workbench, and ruled that links and
 cross-stratum edges should differ fundamentally in their visible styling.
 The runtime retains Resource and Surface strata; additional strata remain
-a later model decision. Source implementation is not yet a qualification receipt.
+a later model decision. Ten model tests and the actual owner journal control
+pass. IndexedDB save/reopen and relation inspection pass in the browser;
+native capture verifies distinct stroke geometry. Later card stacking, reader
+wheel containment and supplier repairs require their fresh final bundle.
+The [implementation receipt](../../../ports/graphshell/docs/receipts/query_views_20261013/README.md)
+keeps source and artifact bases separate.
 
 A mere can offer many organizing graphs over the same material. Tags,
 vocabularies and saved queries can expose different connections without

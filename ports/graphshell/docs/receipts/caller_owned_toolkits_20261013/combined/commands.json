@@ -1,0 +1,19 @@
+{
+  "iced": "ab336f6d6403d7206d82c7c2caa46143efde8284",
+  "commands": [
+    "cargo +1.99.0 test -p cambium-rootstock --no-default-features --features embedding-egui,embedding-iced --lib embedding::tests --locked --offline -j1",
+    "cargo +1.99.0 run -p graphshell --no-default-features --features caller-owned-toolkit-bench,image-decode --example caller_owned_toolkits --locked --offline -j1 -- C:/Users/mark_/Code/repos/mere/ports/graphshell/docs/receipts/caller_owned_toolkits_20261013/combined/native",
+    "cargo +1.99.0 test -p graphshell --no-default-features --features query-views,retained-content,image-decode --lib query_views::tests --locked --offline -j1",
+    "cargo +1.99.0 test -p graphshell --no-default-features --features query-views,retained-content,image-decode --lib retained_content::tests --locked --offline -j1",
+    "cargo +1.99.0 test -p graphshell --no-default-features --features query-views,retained-content,image-decode --lib retained_content:: --locked --offline -j1",
+    "cargo +1.99.0 test -p mere --no-default-features --features query --lib query_view --locked --offline -j1"
+  ],
+  "netrender": "c74b7cb28090c28b1c6d80b08dcdea18aff48d3e",
+  "egui": "0.36.2",
+  "environment": {
+    "CARGO_TARGET_DIR": "C:/t/cargo-targets/mere",
+    "CARGO_BUILD_BUILD_DIR": "C:/t/cargo-targets/mere/build"
+  },
+  "genet": "5618326d287e7f7ef0c1cc3545587d64cedb22a7",
+  "commit": "f7e0a09788ad2304254bb4afaf4e77cc9a94ae21"
+}
