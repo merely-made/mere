@@ -1,7 +1,7 @@
 {
   "schema": "codex.client-mesh/qualification-v1",
-  "observed_at": "2026-10-14T01:33:20Z",
-  "status": "Three-peer mesh qualified; M4 expansion partly qualified; Intel current SSH address pending",
+  "observed_at": "2026-10-14T02:21:12Z",
+  "status": "q-pc incoming chat access qualified; outbound Djinn vault creation and Windows SSH-shell repair pending native owner steps",
   "clients": {
     "o-pc": {
       "registered": [
@@ -31,7 +31,8 @@
       ],
       "auto_connect": true,
       "activation": "owner reports connected; auto-connect enabled in live client state",
-      "identity_agent": "existing GCR desktop agent; Djinn not installed"
+      "identity_agent": "existing GCR desktop agent; Djinn not installed",
+      "q_pc_connection": "imac-intel registered and owner confirms Connected; SSH and thread/read passed"
     },
     "imac-m4": {
       "ssh_alias": "imac-m4",
@@ -47,6 +48,26 @@
       "identity_file": "public-only ~/.ssh/id_ed25519.pub",
       "activation": "peer aliases registered through native deep links; auto-connect now enabled in live state",
       "desktop_app_pid_preserved": 69566
+    },
+    "imac-intel": {
+      "hostname": "Q-PC.local",
+      "ssh_alias": "imac-intel",
+      "address": "192.168.4.68",
+      "hardware_model": "iMacPro1,1",
+      "macos": "15.8.1",
+      "same_host_identity_as_old_intel": true,
+      "registered": [
+        "o-pc",
+        "s-pc",
+        "thinkpad-l14-f",
+        "imac-m4"
+      ],
+      "auto_connect": true,
+      "identity_agent": "new Djinn agent endpoint configured; native vault creation waiting",
+      "agent_endpoint": "/Users/markik/Library/Application Support/djinn/agent.sock",
+      "identity_file": "public-only ~/.ssh/djinn-mesh.pub, to be written after custody generation",
+      "existing_chatgpt_pid_preserved": 44604,
+      "existing_openssh_agent_pid_preserved": 95140
     }
   },
   "windows_daemon": {
@@ -77,15 +98,20 @@
     "o-pc -> thinkpad-l14-f": "SSH and app read_thread passed for 01a11e41-e5d7-7011-a39f-1205b16b15dc; native display discrepancy reported",
     "thinkpad-l14-f -> s-pc": "SSH hostname and app-server thread/read passed for 01a132b0-fcf6-7871-b0a2-b8d8f40c18e4",
     "s-pc -> thinkpad-l14-f": "Djinn SSH hostname passed after native unlock",
-    "thinkpad-l14-f -> o-pc": "SSH hostname and app-server thread/read passed for 01a12716-2a74-7ee0-9840-1b356432b10f",
+    "thinkpad-l14-f -> o-pc": "SSH hostname still passed; native client bootstrap fails at POSIX shell probe under Windows cmd default; repair prepared",
     "imac-m4": "reachable at updated LAN address; partial mesh qualification as above",
-    "imac-intel": "192.168.1.64 timed out from M4; current SSH name/address requested from owner",
+    "imac-intel": "reachable; same trusted Ed25519 host identity as prior imac-intel at 192.168.4.105",
     "o-pc -> imac-m4": "SSH and native app read_thread passed for Assess REDox for the stack; client logs report Connected",
     "imac-m4 -> s-pc": "agent-held SSH hostname and app-server thread/read passed for 01a132b0-fcf6-7871-b0a2-b8d8f40c18e4",
-    "s-pc -> imac-m4": "public key and host trust enrolled; Locked Djinn exposed no identities and login denied; native unlock pending",
+    "s-pc -> imac-m4": "agent-held SSH hostname passed after owner completed native unlock; subsequent idle lock still denies signing",
     "imac-m4 -> o-pc": "public key installer prepared; Windows UAC canceled; peer grant pending",
-    "imac-m4 -> thinkpad-l14-f": "peer key and strict host trust enrolled; bounded SSH execution probe timed out",
-    "thinkpad-l14-f -> imac-m4": "peer key and strict host trust enrolled; native deep-link registration timed out and requires state verification"
+    "imac-m4 -> thinkpad-l14-f": "agent-held SSH hostname passed after ThinkPad responsiveness returned",
+    "thinkpad-l14-f -> imac-m4": "agent-held SSH hostname passed; live native auto-connect enabled",
+    "o-pc -> imac-intel": "SSH and native app read_thread passed for 01a1365b-291b-70a0-8819-5c05ebf5277c, Review Murm P2P Integrations",
+    "imac-m4 -> imac-intel": "agent-held SSH hostname and app-server thread/read passed for same existing q-pc chat",
+    "thinkpad-l14-f -> imac-intel": "SSH hostname and app-server thread/read passed; native client Connected confirmed by owner",
+    "s-pc -> imac-intel": "public key enrolled and client registered; login denied while Surface Djinn has no identities after idle lock",
+    "imac-intel -> peers": "pending native first vault creation, custody key generation and peer public-key enrollment"
   },
   "windows_thinkpad_enrollment": {
     "script": "scripts/codex-peer-enroll-windows.ps1",
@@ -109,12 +135,13 @@
     "worktrees_or_cargo_homes_created": false
   },
   "done_conditions": [
-    "Complete M4 Windows enrollment under native elevation and verify reverse stored-chat access",
-    "Native Surface unlock restores its agent and Surface -> M4 passes",
-    "Verify both M4/ThinkPad routes and ThinkPad native registration when command sessions respond",
-    "Enroll and qualify Intel using its current SSH address",
-    "Keep existing app processes and writer guards intact",
-    "Windows and M4 daemon reboot persistence remain separate qualification"
+    "q-pc owner completes native vault creation; generate its SSH identity through Djinn",
+    "Enroll q-pc public key on its peers and qualify return SSH and stored-chat reads",
+    "Apply prepared Windows SSH-shell correction with native elevation and verify native clients connect",
+    "Complete pending M4 Windows enrollment if still needed",
+    "Verify Surface outgoing peers after native unlock and retain Locked denial",
+    "Keep existing app processes, source state and writer guards intact",
+    "Daemon reboot persistence remains separate qualification"
   ],
   "follow_up": {
     "owner_confirmation": "looks good",
@@ -134,6 +161,18 @@
       "observed_rss_kib": 43376,
       "local_websocket_initialize_and_thread_list": "passed",
       "restart_or_reboot": "not qualified"
+    },
+    "imac-intel": {
+      "version": "0.162.0-alpha.17.2",
+      "source": "complete matching package already bundled with ChatGPT 26.1007.30912",
+      "cli_link": "~/.local/bin/codex -> /Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex",
+      "path_addition": "owned ~/.zprofile block",
+      "bootstrap": "passed",
+      "backend": "pid",
+      "auto_update_enabled": false,
+      "remote_control_gateway_enabled": false,
+      "stored_chat_listing": "passed",
+      "restart_or_reboot": "not qualified"
     }
   },
   "mac_enrollment": {
@@ -151,6 +190,50 @@
       "source_builds": false,
       "new_private_key_files": false,
       "djinn_installed_or_legacy_agent_replaced": false
+    },
+    "imac-intel": {
+      "host_key_fingerprint": "SHA256:AJkWyCQFEkeFUhg3sDU+5/2hxcr8QFGx9DQRFB7hUWk",
+      "host_trust": "existing q-pc.local, current IP and old Intel HostKeyAlias all agree; strict checking preserved",
+      "old_proxy_jump_removed": true,
+      "incoming_grants": "Surface, ThinkPad and M4 public keys appended; existing Windows grant preserved",
+      "outbound_public_key": "pending native vault creation and Djinn custody generation"
     }
+  },
+  "q_pc_djinn": {
+    "source_head": "9f3361be457f2ee7a5fc111439a5b45673fc14b9",
+    "source_clean_before_and_after": true,
+    "build_jobs": 1,
+    "build_rss_cap_bytes": 4294967296,
+    "build_peak_owned_rss_bytes": 1477734400,
+    "build_guard_failure": null,
+    "other_cargo_owners": "two processes in mere-shared-browsing-mode worktree, preserved",
+    "build_target": "/Users/markik/Code/targets/mere",
+    "build_target_owner": "q-pc Djinn setup; retained pending native qualification and possible repair",
+    "production_binary_build": "passed; no workspace test-suite receipt claimed",
+    "initial_build_selection": "personae-vault package absent from Mere workspace; corrected to Djinn-only; initial failure retained in build log",
+    "installed_manifest": "q-pc-djinn-install.json",
+    "build_log": "q-pc-djinn-build.log",
+    "build_result": "q-pc-djinn-build.json",
+    "resident_pid": 17224,
+    "launchd_unit": "/Users/markik/Library/LaunchAgents/org.merely.djinn.plist",
+    "launchd_nice": 10,
+    "launchd_low_priority_io": true,
+    "run_at_login": true,
+    "restart_policy": "KeepAlive false for initial qualification",
+    "vault_status": "first-run native dialog waiting; no credential supplied through tooling",
+    "new_plaintext_private_key_file": false
+  },
+  "windows_ssh_shell": {
+    "current_default_shell": "unset; OpenSSH uses cmd",
+    "failure": "native app authenticates, then Scoop Git sh launcher loses POSIX single-quote probe under cmd",
+    "script": "scripts/codex-ssh-shell-windows.ps1",
+    "prepared_shell": "C:/Program Files/Git/usr/bin/bash.exe",
+    "local_posix_shell_probe_and_daemon_lookup": "passed",
+    "script_parse": "passed",
+    "unelevated_negative_control": "refused before writes",
+    "registry_change_applied": false,
+    "snapshot_and_restore": "prepared; protects original registry value kinds and rejects concurrent changes",
+    "sshd_restart_required": false,
+    "pending_step": "native administrator elevation, then native-client connection retry"
   }
 }
