@@ -1,0 +1,16 @@
+{
+  "owner": "root final browser qualification",
+  "qaTabsClosed": true,
+  "removedGeneratedFiles": [
+    "C:\\t\\cargo-targets\\mere\\retained-content-browser\\graphshell_web_bg.wasm",
+    "C:\\t\\cargo-targets\\mere\\retained-content-browser\\graphshell_web.js",
+    "C:\\t\\cargo-targets\\mere\\retained-content-browser\\graphshell_web.d.ts",
+    "C:\\t\\cargo-targets\\mere\\retained-content-browser\\graphshell_web_bg.wasm.d.ts"
+  ],
+  "retained": "Stable Mere/Turnstone Cargo targets and source caches; receipt bytes and fixture IndexedDB remain. No isolated worktree or Cargo home.",
+  "cleanedUtc": "2026-10-14T09:49:42.5551755Z",
+  "serversStopped": [
+    8884,
+    8885
+  ]
+}

@@ -72,3 +72,45 @@ canonical and two-package alias bridge. Fresh consumer gates remain pending.
 Initial metadata attempts were interrupted while Cargo was materializing the
 new 187,754-file Git checkout, before dependency resolution. They are not
 failed compilation or resolver receipts.
+
+The incoming Fetch continuation is reconciled at Mere `eeb59b30`. The final
+consumer graph uses Genet `b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084`, which retains
+the scoped Taproot repair, and published Netrender
+`6a24ae08f55129b474282b8e4911564f875ce5fd`. Netrender's empty tile-layer repair
+and shadow-mask lifecycle repair have distinct supplier receipts. The consumer
+bridge sends all four renderer packages to one immutable published source;
+it supplies no local path override. Normal native and standalone browser
+metadata pass with one renderer family. `netrender-bridge-source-closure.json`
+records the declarations, actual graph and source-only lock delta. Compiled
+and headed acceptance of this combined basis are recorded separately.
+
+`final-native-gates.json` records the completed b6/6a consumer gates: 50
+native model cases and 16 actual caller-owned egui/Iced GPU pairs. The toolkit
+receipt records the physical adapter, shared Device/Queue, artifacts and exact
+source hashes. Its generation change uses the same device handles; physical
+device-loss recovery is a separate gate.
+
+The later document-work observer exposes existing engine scheduling state
+without advancing a session or invalidating prepared geometry, semantic routes
+or pump deduplication. All 25 Pelt pool tests pass on that source. Turnstone
+anchors timer deadlines at actual document turns and admits redraws through
+the current receiver and visible window placement. The earlier native and GPU
+receipt hashes remain their measured basis. The browser package in
+`pre-observer-browser-artifact.json` compiled successfully before this observer;
+its filename distinguishes that successful build from the final browser run.
+
+The final browser continuation is complete. The source-stability guard records
+2,711 tracked consumer source files; the final Wasm SHA256 is
+`5943978c46c576dd54cdd06c00681e0d537c88343babd62a9d0e2d00604791d1`.
+Three fresh Chrome 154/Windows BrowserWebGPU scenarios pass with zero errors and
+nine actual captures: save/freeze/strokes/empty/restore, IndexedDB reopening,
+and exact relation inspection. Dotted bindings paint visibly and card text
+remains readable. `final-browser-qualification.json` binds the results and PNGs
+to the package and source hashes. The final clip run at a separate fresh origin
+also passes natural wheel containment at the reader boundary and a trusted
+visible export handoff. Its completed download file remains unobserved.
+
+The two exact server process trees and QA tabs are closed. The four generated
+package files were verified against their recorded hashes and removed from the
+marker-owned directory. Stable Cargo targets/source caches, fixture IndexedDB
+and receipt bytes remain; this task retains no isolated worktree or Cargo home.
