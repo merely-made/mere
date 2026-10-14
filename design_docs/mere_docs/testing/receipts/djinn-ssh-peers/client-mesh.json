@@ -269,7 +269,14 @@
     "thinkpad_cli_version": "2.1.248",
     "thinkpad_code": "existing shell SSH access passed to all four peers; no new Desktop installation or permission change",
     "windows_sftp_prerequisites": "passed to all four peers using ordinary aliases",
-    "native_desktop_menu": "pending owner check",
+    "native_desktop_menu": "owner confirms all four SSH entries visible in O-PC Claude Desktop Code tab",
+    "thinkpad_first_connection_preflight": {
+      "folder": "/home/markik/Code",
+      "folder_exists": true,
+      "folder_is_git_worktree": false,
+      "home_free_bytes": 395261849600,
+      "remote_helper_cache_preexisting": false
+    },
     "native_desktop_first_connection": "not yet qualified; OpenSSH/SFTP prerequisites are distinct",
     "permissions_changed": false,
     "active_claude_sessions_interrupted": false,
