@@ -1,0 +1,24 @@
+{
+  "status": "shared Pelt observer source frozen; all25 pooltests passed",
+  "genet": "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084",
+  "netrender": "6a24ae08f55129b474282b8e4911564f875ce5fd",
+  "paths": [
+    {
+      "path": "ports/pelt/core/src/lib.rs",
+      "sha256": "ae0d735337f91f60324999e7634870d05eb01439091c96df523e3a266b25b782"
+    },
+    {
+      "path": "ports/pelt/core/src/content.rs",
+      "sha256": "db16c0ea1c4dd5f63ef0b7f4de232b4ac51b42bb0b3fcccf01d9d428ebc6a368"
+    },
+    {
+      "path": "ports/pelt/core/src/pool.rs",
+      "sha256": "e379a27cfd074fe182c5e19c85f52cdd955e213cea7f2b458e298e95b13a9c44"
+    },
+    {
+      "path": "ports/pelt/core/tests/pool.rs",
+      "sha256": "1636b2c88407ed5ea8a914fccfd87340c9a6e85a1e43e72fb03e5abb4a6ffd7c"
+    }
+  ],
+  "log": "pelt-b6-scheduled-work-pool-tests.log"
+}

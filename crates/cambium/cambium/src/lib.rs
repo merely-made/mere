@@ -163,6 +163,8 @@ pub use overlay_surface::{OverlayDismiss, OverlayRole, OverlaySurface, overlay_s
 pub use pod::{GenetElement, GenetElementMut};
 pub use pointer::{OnPointer, PointerButton, PointerEvent, PointerPhase, on_pointer};
 pub use portable::{PortableKeyed, PortableKeyedState};
+mod retained_mount;
+pub use retained_mount::{RetainedMount, RetainedMountView};
 pub use propagation::Propagation;
 pub use radio::{RadioGroup, radio_group};
 pub use range_scrubber::{RangeScrubber, RangeScrubberEvent, RangeScrubberPin, range_scrubber};

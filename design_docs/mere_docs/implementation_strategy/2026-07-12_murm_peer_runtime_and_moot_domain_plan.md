@@ -74,7 +74,8 @@ purity rule and host-composition target are retired.
 
 The live dependency graph has already crossed the former purity boundary:
 
-- `transport` sits under `crates/murm` but is consumed by mesh, Moot tests,
+- `transport` is now consumed from the canonical Murm repository (formerly
+  `crates/murm` *(historical citation)* <!-- doc-audit: historical-path -->) by mesh, Moot tests,
   eidetic Iroh fetching, and the old host.
 - `mooting::MunimentStore` sits under `crates/moot` but is deliberately generic
   and is consumed by mesh.
@@ -209,7 +210,7 @@ Turnstone owns service lifecycle and product interaction:
 
 | Current item | Target | Reason |
 |---|---|---|
-| `retinue/native/crates/transport` | Murm peer-transport crate | Already the shared endpoint and carrier layer |
+| `murm/native/crates/transport` | Murm peer-transport crate | Already the shared endpoint and carrier layer |
 | `transport::SyncedSpace` | `murm-replication` | It is replicated-space processing, not byte transport |
 | `mooting::MunimentStore` | `murm-replication` | Generic persistence used outside Moot |
 | new retention/checkpoint/drop machinery | `murm-replication` | Shared mechanism for every replicated domain |
@@ -1285,7 +1286,7 @@ actual delivery facts. Native-protocol adapters belong at the Comms consumer
 boundary, retaining protocol-specific identities, privacy and receipt semantics;
 Murm's post grammar does not become their wire format. `tinyssb-core` is an
 allocation-free verifier for pinned tinySSB v0 foreign signed feeds, not a full
-SSB chat adapter. See `retinue/design_docs/2026-08-25_compact_signed_feed_and_local_control_plan.md`.
+SSB chat adapter. See `murm/design_docs/2026-08-25_compact_signed_feed_and_local_control_plan.md`.
 Mere's optional Reticulum source is still `773515f`, 159 commits behind inspected
 Retinue main; its carrier/interface and resource changes require a separate
 adapter refresh and acceptance, rather than a silent repin based on package
@@ -1347,7 +1348,7 @@ with `targets/murm-refresh-consumer-tests-20261013.log` and
 The owner authorized planning Murm as the communication and device-implementation
 family, using the Retinue repository as its foundation while preserving crate
 names and original history. The canonical migration specification is
-`retinue/design_docs/2026-10-13_murm_family_move_plan.md`. It proposes workspace separation for dependency/target isolation under the
+`murm/design_docs/2026-10-13_murm_family_move_plan.md`. It proposes workspace separation for dependency/target isolation under the
 same stack-wide Rust 1.99.0 working toolchain and separate 1.97.1 shared MSRV,
 selects Stickleback to remain in Mere as a neutral
 shared supplier, and retains Genet's Netfetcher Fetch/WebSocket policy while
@@ -1382,5 +1383,5 @@ library tests, Signalman all-target compilation and the port/browser boundary
 gate. Burn Remote fixture metadata is locked and has the same selected supplier
 identities; no GPU/remote execution receipt is implied. Live-network, physical
 radio and headed browser receipts remain separate. The hosted native workflow
-was dispatched at https://github.com/merely-made/retinue/actions/runs/38468612945;
+was dispatched at https://github.com/merely-made/murm/actions/runs/38468612945;
 its queued state does not establish runtime success.

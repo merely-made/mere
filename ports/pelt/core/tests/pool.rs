@@ -30,6 +30,7 @@ struct Probe {
     ime: Vec<inker::SessionIme>,
     points: Vec<(f32, f32)>,
     wheels: Vec<(f32, f32, f32, f32)>,
+    timer_ms: Option<u64>,
 }
 
 struct FakeEngine(Arc<Mutex<Probe>>);
@@ -85,6 +86,19 @@ impl DocumentSession<String> for FakeSession {
             .copied()
             .unwrap_or(0)
             >= 3
+    }
+
+    fn pending_work(&mut self) -> inker::session_engine::SessionPendingWork {
+        self.probe
+            .lock()
+            .unwrap()
+            .timer_ms
+            .map(|milliseconds| {
+                inker::session_engine::SessionPendingWork::timer(std::time::Duration::from_millis(
+                    milliseconds,
+                ))
+            })
+            .unwrap_or_default()
     }
 
     fn frame(&mut self, width: u32, height: u32) -> String {
@@ -769,6 +783,10 @@ fn pending_observation_is_read_only_and_redraw_is_scoped_to_visible_windows() {
         vec![1]
     );
     assert!(pool.window_needs_frame(7));
+    assert!(
+        !pool.window_has_surface(7),
+        "a retained document is not a native mailbox producer"
+    );
     assert!(!pool.window_needs_frame(8));
     assert!(!pool.window_needs_frame(9));
     assert_eq!(probe.lock().unwrap().frames, frames);
@@ -786,6 +804,60 @@ fn pending_observation_is_read_only_and_redraw_is_scoped_to_visible_windows() {
         1,
         "hidden work remains scheduled"
     );
+}
+
+#[test]
+fn scheduled_document_work_preserves_prepared_routes_and_current_receiver_custody() {
+    let probe = Arc::new(Mutex::new(Probe::default()));
+    let mut pool = layout_pool(probe.clone());
+    let mut hidden = placement(8, 400.0);
+    hidden.visible = false;
+    pool.set_placements([(10, placement(7, 200.0)), (11, hidden)]);
+    pool.frame(&10);
+    assert!(pool.pump_at(1.0));
+    assert!(pool.pump_at(2.0));
+    assert!(
+        !pool.pump_at(3.0),
+        "completion can settle before a future timer"
+    );
+    pool.frame(&10);
+    probe.lock().unwrap().timer_ms = Some(1000);
+    let frames = probe.lock().unwrap().frames;
+    let pumps = probe.lock().unwrap().pumps.clone();
+    let work = pool.document_work().collect::<Vec<_>>();
+    assert_eq!(work.len(), 1);
+    assert_eq!(work[0].work.timer, Some(std::time::Duration::from_secs(1)));
+    assert!(pool.window_has_document_work(7, &work[0]));
+    assert!(!pool.window_has_document_work(8, &work[0]));
+    assert!(!pool.window_has_document_work(9, &work[0]));
+    assert!(!pool.pump_at(3.0));
+    assert_eq!(
+        probe.lock().unwrap().pumps,
+        pumps,
+        "observation keeps pump deduplication"
+    );
+    pool.input(&10, press(50.0, 50.0).into());
+    assert_eq!(
+        probe.lock().unwrap().frames,
+        frames,
+        "observation keeps prepared input geometry"
+    );
+    pool.set_placements([(10, placement(9, 200.0))]);
+    assert!(!pool.window_has_document_work(7, &work[0]));
+    assert!(pool.window_has_document_work(9, &work[0]));
+    let replacement = layout_pool(Arc::new(Mutex::new(Probe::default())))
+        .remove_content(&1)
+        .unwrap();
+    pool.insert(1, replacement);
+    assert!(
+        !pool.window_has_document_work(9, &work[0]),
+        "same key never admits a replaced receiver's timer"
+    );
+    let current = pool.document_work().next().unwrap();
+    assert_ne!(current.identity, work[0].identity);
+    assert!(pool.window_has_document_work(9, &current));
+    pool.remove_content(&1);
+    assert!(!pool.window_has_document_work(9, &current));
 }
 
 #[test]

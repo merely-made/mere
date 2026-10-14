@@ -209,7 +209,7 @@ selects no audio device or codec dependency; that remains A2's measured probe.
 
 **Seams:**
 
-- `retinue/native/crates/transport/src/accepted.rs`
+- `murm/native/crates/transport/src/accepted.rs`
 - `repos/dramatis/crates/notochord/src/io.rs`
 - `turnstone/src/call.rs`, beside Turnstone's place port
 

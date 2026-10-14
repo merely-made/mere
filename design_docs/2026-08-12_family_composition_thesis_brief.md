@@ -183,7 +183,7 @@ standing alone is a feature of the plan rather than a delay.
   covered by **source truth** (the authority) and **a mere / datalake** (the
   dataspace). Three senses on one noun would be a lexicon regression.
 - Signalman is retinue's application (`apps/signalman-desktop` *(historical citation)* <!-- doc-audit: historical-path -->, founded
-  [2026-08-06](https://github.com/merely-made/retinue/blob/main/design_docs/2026-08-06_signalman_founding.md)),
+  [2026-08-06](https://github.com/merely-made/murm/blob/main/design_docs/2026-08-06_signalman_founding.md)),
   whose founding already states this brief's authority split from its side:
   graphshell surfaces meres rather than owning radios. Its postilion base
   (station logic with no UI) is what would make an embedded cross-application
@@ -1266,8 +1266,9 @@ above now govern the profile design; broader lifecycle checkpoints remain open.
 
 ### Embedding in caller owned wgpu contexts draft
 
-**Status (2026-10-13):** Design direction from Mark; contract and toolkit
-adapters proposed. Mark wants Mere, Genet, the stack and application components
+**Status (2026-10-13):** Bounded native readback qualified: six contract/input
+tests pass, and real egui/Iced callbacks render retained content and a Mere graph.
+Window input, physical accessibility and wider renderer paths remain open. Mark wants Mere, Genet, the stack and application components
 to embed into wgpu contexts with less integration work and more flexibility
 than the external browser trio. This is a consumer target, not a claim of a
 qualified universal GUI adapter.
@@ -1359,6 +1360,42 @@ rendering, resize/scale changes, independent focus, keyboard/IME behavior,
 accessibility action routing, wake/suspend/dispose and device recovery. The
 same source shown twice must preserve separate access/appearance state, and
 closing one appearance must release only its unnecessary resources.
+
+The first source implementation extends existing Cambium Rootstock owners rather
+than adding a second runtime. The opt-in adapters select egui 0.36.2 and exact
+Iced source `ab336f6d6403d7206d82c7c2caa46143efde8284`, both using the stack's
+wgpu 30 API. Released Iced 0.14 uses wgpu 27 and is not that qualified supplier.
+The caller owns Device, Queue, command encoder, submission and device generation.
+The adapter imports immutable native scenes from actual retained owners.
+
+The bounded encoder path uses pinned NetRender's SparseHybridSession. It supports
+native outline text and CPU-supplied images, using NetRender's atlas-cache-disabled
+owned text path, and explicitly refuses unsupported fragments/filters. The
+separate GPU glyph-atlas path can submit internally and needs supplier ownership
+work before it is admitted. The
+current default Classic Vello path submits internally; full encoder ownership
+requires a separate supplier change that also protects deferred GPU resource
+recycling and readback. Sparse admission does not prove Classic parity.
+
+The Graphshell consumer bench must render actual held HTML, selected Fleece
+text/WAV packets, image content and an actual Mere Canvas in both toolkit
+callbacks, including clipping, repeated appearance state, source identity and
+host generation replacement. Input conversion tests and GPU readbacks are
+separate evidence from physical toolkit-window IME/AT acceptance. Receipts live
+in `ports/graphshell/docs/receipts/caller_owned_toolkits_20261013/`; pending
+checks are not passing receipts. The executed headless bench produced sixteen
+byte-identical egui/Iced image pairs, with outside-clip, scale and independent
+access checks. Rehydration changes caller generation on the same Device/Queue
+after suspension; it does not demonstrate an actual device replacement or loss.
+The final combined Genet b6/Netrender 6a bench retains all sixteen identical
+pairs. Its `final/` receipt records the RTX 4060 Laptop Vulkan adapter, one
+caller Device/Queue shared by both hosts, source hashes, PNG hashes and the
+same-handle generation 1-to-2 transition. The later scheduling observer has its
+own pool/consumer controls; those changes do not relabel the measured GPU basis.
+The locked GPU shader supplier still forces
+WESL/WGSL 0.4.0 with an older-compiler comment. That dependency currency question
+remains with its supplier; this adapter does not rewrite the selected compiler
+or existing Genet, Murm or Vello pins.
 
 Qualify the native lane first. Optional Scrying/Graft/Weld providers retain
 their separate backend and packaging gates. Extend existing render/session

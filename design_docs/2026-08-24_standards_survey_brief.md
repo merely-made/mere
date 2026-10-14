@@ -797,7 +797,7 @@ recorded in §1, §3.3, §5, §6 and §8.
 | PULL | ActivityPub (with Activity Streams 2.0) | W3C ActivityPub; W3C Activity Streams 2.0 | ports/gazette (already classifies ActivityPub actor links out of WebFinger JRDs); ports/moot as a future publish target |
 | PULL | HTTP Message Signatures | RFC 9421 | Only if gazette or moot ever writes to the fediverse. No current consumer. |
 | WATCH | AT Protocol (atproto) | draft-newbold-at-architecture, draft-holmgren-at-repository, and the IETF ATP working group charter | AMENDED 2026-09-23 (§5 prose wins): WATCH stands for the repository and sync layers only. The identity layer (did:plc, handle resolution) is ADOPT for crates/dramatis/gaz and ports/gazette, checked against live PLC data. |
-| ADOPT | Messaging Layer Security (MLS) | RFC 9420 | CORRECTED 2026-08-24: not ports/moot, which is a 43-line reservation. Prospective home is retinue/native/crates/transport (reserves ALPN mere/mls/v1); crates/moot/commons ships encrypted group chat today via p2panda, not MLS |
+| ADOPT | Messaging Layer Security (MLS) | RFC 9420 | CORRECTED 2026-08-24: not ports/moot, which is a 43-line reservation. Prospective home is murm/native/crates/transport (reserves ALPN mere/mls/v1); crates/moot/commons ships encrypted group chat today via p2panda, not MLS |
 | WATCH | More Instant Messaging Interoperability (MIMI) | draft-ietf-mimi-protocol, draft-ietf-mimi-content, draft-ietf-mimi-arch, draft-ietf-mimi-room-policy | ports/moot (murmur) — speculative only |
 | SKIP | Matrix | Matrix Specification v1.16 (client-server, server-server, and the Olm/Megolm ratchets) | None. moot/murmur is unimplemented and its README scopes it to Mere's own governed spaces. |
 | PULL | Signal protocol: Double Ratchet, X3DH, PQXDH, SPQR | Signal specifications (Double Ratchet; X3DH; PQXDH; Sparse Post-Quantum Ratchet) | crates/murm — the bilateral lane (design_docs/murm_docs/technical_architecture/MURM_AS_BILATERAL.md) |
@@ -886,7 +886,7 @@ disagree.
 
 **Basis.** Each row's own consumer text, which §7's table truncates in places.
 Where a grade turned on a fact, the fact was checked on 2026-09-23: which
-crates depend on a UAX #29 segmenter, whether `retinue/native/crates/webrtc-carrier`
+crates depend on a UAX #29 segmenter, whether `murm/native/crates/webrtc-carrier`
 exists, whether genet's design docs mention WebAuthn (they do not), and what
 `repos/emblem` implements. The design-for notes name where room is reserved;
 none of them is built by this re-read.
@@ -929,7 +929,7 @@ because they are already built, ten move to SKIP, and three split.
 | 31 | ActivityPub / Activity Streams 2.0 | gaz's `EndpointKind::ActivityPub` exists; gazette's article model maps AS2 objects; moot's publish path is the named future | PULL |
 | 32 | HTTP Message Signatures | moot's outbound publish path (row 31) signs requests with a persona key through castellan's gate | PULL |
 | 33 | Signal: Double Ratchet, X3DH, PQXDH | murm's bilateral session store reserves per-peer ratchet state | PULL |
-| 34 | WebRTC (and SIP) | WebRTC is already built as `retinue/native/crates/webrtc-carrier`. SIP has no consumer; calls ride WebRTC | WebRTC ADOPT; SIP SKIP, reopened by a telephony bridge |
+| 34 | WebRTC (and SIP) | WebRTC is already built as `murm/native/crates/webrtc-carrier`. SIP has no consumer; calls ride WebRTC | WebRTC ADOPT; SIP SKIP, reopened by a telephony bridge |
 | 35 | Reticulum and LXMF | already built: signalman runs on retinue/postilion, and insigne's `TypedKey::Reticulum` holds an identity as the reference implementation defines it (§5) | ADOPT |
 | 36 | AX.25, KISS, APRS | KISS is already built (`retinue/crates/selvage/src/kiss.rs`). AX.25 and APRS are amateur-service protocols, and the house radio posture is unlicensed ISM because amateur service bars encryption (§5) | KISS ADOPT; AX.25 and APRS SKIP, reopened by a plain-text amateur lane |
 | 37 | GGUF | distillery's model source reserves a GGUF loader beside esp's safetensors, for weights and tokenizer metadata both | PULL |
@@ -1133,7 +1133,7 @@ later integration and qualification open. Mark prefers published standards for c
 for orchestration, the useful specification scope, prior art and a WPT-like
 testing set. This section is the canonical cross-repository research record.
 Implementation sequencing lives in
-`retinue/design_docs/2026-10-11_transport_conformance_plan.md`.
+`murm/design_docs/2026-10-11_transport_conformance_plan.md`.
 
 **Execution posture, owner clarification:** prototype the composed stack toward
 its final shape using code and canonical documents as the execution frontier.
@@ -1301,7 +1301,7 @@ zero/one-floor scheduling and sustained overload. The model counts actual
 authored frame/signature bytes and uses ideal simultaneous transmitter lanes,
 preconfigured channel/manifest cadence and a common slot clock. Findings and
 the historical source-fingerprinted report live once in
-`retinue/design_docs/2026-10-11_retained_repair_simulation_profile.md` and
+`murm/design_docs/2026-10-11_retained_repair_simulation_profile.md` and
 `retinue/testing/transport-conformance/results/retained-repair-exploration-20261011.json`.
 The owner-local receive continuation below now exercises application admission;
 the model does not establish live carrier integration or physical Mbps.
