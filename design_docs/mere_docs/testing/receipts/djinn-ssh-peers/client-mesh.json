@@ -1,7 +1,7 @@
 {
   "schema": "codex.client-mesh/qualification-v1",
-  "observed_at": "2026-10-14T17:10:02Z",
-  "status": "q-pc Djinn ready; outgoing chat reads passed on Surface, ThinkPad and M4; Windows elevation and M4 account choice pending",
+  "observed_at": "2026-10-14T18:26:52Z",
+  "status": "Windows enrollment and login-shell repair qualified; ThinkPad native recovery confirmed; Claude Desktop SSH entries added on four clients, native menu check pending",
   "clients": {
     "o-pc": {
       "registered": [
@@ -44,13 +44,13 @@
         "thinkpad-l14-f"
       ],
       "auto_connect": true,
-      "identity_agent": "legacy personae-agent endpoint now refuses connection; no process was restarted",
+      "identity_agent": "legacy personae-agent PID 6669 recovered when owner switched to markik; no tool restart",
       "identity_file": "public-only ~/.ssh/id_ed25519.pub",
       "activation": "peer aliases registered through native deep links; auto-connect now enabled in live state",
       "previous_desktop_app_pid_preserved": 69566,
       "ssh_user_uid": 502,
-      "current_desktop_account": "mayolaboykin",
-      "account_choice": "pending; keep markik or use current desktop account"
+      "current_desktop_account": "markik",
+      "account_choice": "owner chose markik and switched back; return chat reads passed"
     },
     "imac-intel": {
       "hostname": "Q-PC.local",
@@ -83,7 +83,9 @@
     "initialize": "passed",
     "thread_read": "01a12716-2a74-7ee0-9840-1b356432b10f",
     "thread_read_result": "passed without resuming or acquiring writer",
-    "startup_after_reboot": "not qualified"
+    "startup_after_reboot": "not qualified",
+    "restored_managed_daemon_pid": 10856,
+    "native_app_processes_preserved": [18972, 28248]
   },
   "linux_daemons": {
     "s-pc": {
@@ -101,23 +103,23 @@
     "o-pc -> thinkpad-l14-f": "SSH and app read_thread passed for 01a11e41-e5d7-7011-a39f-1205b16b15dc; native display discrepancy reported",
     "thinkpad-l14-f -> s-pc": "SSH hostname and app-server thread/read passed for 01a132b0-fcf6-7871-b0a2-b8d8f40c18e4",
     "s-pc -> thinkpad-l14-f": "Djinn SSH hostname passed after native unlock",
-    "thinkpad-l14-f -> o-pc": "SSH hostname still passed; native client bootstrap fails at POSIX shell probe under Windows cmd default; repair prepared",
+    "thinkpad-l14-f -> o-pc": "ordinary SSH/WebSocket thread/read passed after login-shell repair; owner reports desktop looks good now",
     "imac-m4": "reachable at updated LAN address; partial mesh qualification as above",
     "imac-intel": "reachable; same trusted Ed25519 host identity as prior imac-intel at 192.168.4.105",
     "o-pc -> imac-m4": "previous SSH/native app read qualified; current strict-trust SSH login passed after updating address to .58",
     "imac-m4 -> s-pc": "agent-held SSH hostname and app-server thread/read passed for 01a132b0-fcf6-7871-b0a2-b8d8f40c18e4",
     "s-pc -> imac-m4": "agent-held SSH hostname passed after owner completed native unlock; subsequent idle lock still denies signing",
-    "imac-m4 -> o-pc": "public key installer prepared; Windows UAC canceled; peer grant pending",
+    "imac-m4 -> o-pc": "public key and scoped firewall installed; ordinary SSH/WebSocket thread/read passed after login-shell repair",
     "imac-m4 -> thinkpad-l14-f": "agent-held SSH hostname passed after ThinkPad responsiveness returned",
     "thinkpad-l14-f -> imac-m4": "agent-held SSH hostname passed; live native auto-connect enabled",
     "o-pc -> imac-intel": "SSH and native app read_thread passed for 01a1365b-291b-70a0-8819-5c05ebf5277c, Review Murm P2P Integrations",
-    "imac-m4 -> imac-intel": "previously passed; current attempt denied because markik's configured legacy agent endpoint is unavailable",
+    "imac-m4 -> imac-intel": "SSH/WebSocket thread/read passed after owner switched desktop back to markik and legacy agent recovered",
     "thinkpad-l14-f -> imac-intel": "SSH hostname and app-server thread/read passed; native client Connected confirmed by owner",
     "s-pc -> imac-intel": "public key enrolled and client registered; login denied while Surface Djinn has no identities after idle lock",
     "imac-intel -> s-pc": "Djinn-held key authenticated; WebSocket thread/read passed for Check stack status",
     "imac-intel -> thinkpad-l14-f": "Djinn-held key authenticated; WebSocket thread/read passed for Turnstone after transient reachability failure",
     "imac-intel -> imac-m4": "Djinn-held key authenticated at .58 under existing pinned trust; WebSocket thread/read passed for Assess REDox for the stack",
-    "imac-intel -> o-pc": "public key and scoped firewall installer prepared; native UAC canceled; enrollment pending"
+    "imac-intel -> o-pc": "Djinn-held key authenticated; ordinary SSH/WebSocket thread/read passed after native unlock and Windows login-shell repair"
   },
   "windows_thinkpad_enrollment": {
     "script": "scripts/codex-peer-enroll-windows.ps1",
@@ -141,10 +143,7 @@
     "worktrees_or_cargo_homes_created": false
   },
   "done_conditions": [
-    "Enroll q-pc public key on Windows, complete its native unlock after idle lock, and qualify Windows SSH and stored-chat reads",
-    "Resolve M4 desktop/SSH account choice before recovering its outgoing agent access",
-    "Apply prepared Windows SSH-shell correction with native elevation and verify native clients connect",
-    "Complete pending M4 Windows enrollment if still needed",
+    "Qualify Claude Desktop's own SSH connection after checking its native environment menu",
     "Verify Surface outgoing peers after native unlock and retain Locked denial",
     "Keep existing app processes, source state and writer guards intact",
     "Daemon reboot persistence remains separate qualification"
@@ -189,8 +188,8 @@
       "windows_input": "%LOCALAPPDATA%/Djinn/imac-m4-authorized.pub",
       "windows_rule": "Djinn-SSH-LAN-imac-m4",
       "windows_rule_address": "192.168.4.58",
-      "windows_rule_installed": false,
-      "windows_uac": "canceled; reopen choice pending",
+      "windows_rule_installed": true,
+      "windows_uac": "completed; first shell option -c corrected to -lc after native approval",
       "linux_authorized_key_grants": "appended on Surface and ThinkPad; existing grants preserved",
       "windows_name_lookup": "m4-imac.local intermittently failed; existing SSH alias now uses verified IPv4 address",
       "source_builds": false,
@@ -203,7 +202,7 @@
       "old_proxy_jump_removed": true,
       "incoming_grants": "Surface, ThinkPad and M4 public keys appended; existing Windows grant preserved",
       "outbound_public_key": "custody-generated SHA256:qIU8gMb7+oxRleIqA2oM1EW3FcU8OwFXdlds6sHL3YA",
-      "outbound_grants": "Surface, ThinkPad and M4 complete; Windows pending native elevation"
+      "outbound_grants": "Surface, ThinkPad, M4 and Windows complete"
     }
   },
   "q_pc_djinn": {
@@ -215,7 +214,8 @@
     "build_guard_failure": null,
     "other_cargo_owners": "two processes in mere-shared-browsing-mode worktree, preserved",
     "build_target": "/Users/markik/Code/targets/mere",
-    "build_target_owner": "q-pc Djinn setup; retained pending native qualification and possible repair",
+    "build_target_owner": "q-pc Djinn setup; generated cache removed after checking marker and no live target owner",
+    "build_evidence_directory": "/Users/markik/Library/Application Support/djinn/qualification",
     "production_binary_build": "passed; no workspace test-suite receipt claimed",
     "initial_build_selection": "personae-vault package absent from Mere workspace; corrected to Djinn-only; initial failure retained in build log",
     "installed_manifest": "q-pc-djinn-install.json",
@@ -235,19 +235,46 @@
     "new_plaintext_private_key_file": false
   },
   "windows_ssh_shell": {
-    "current_default_shell": "unset; OpenSSH uses cmd",
+    "current_default_shell": "Git Bash with -lc login initialization",
     "failure": "native app authenticates, then Scoop Git sh launcher loses POSIX single-quote probe under cmd",
     "script": "scripts/codex-ssh-shell-windows.ps1",
     "prepared_shell": "C:/Program Files/Git/usr/bin/bash.exe",
     "local_posix_shell_probe_and_daemon_lookup": "passed",
     "script_parse": "passed",
     "unelevated_negative_control": "refused before writes",
-    "registry_change_applied": false,
+    "registry_change_applied": true,
     "snapshot_and_restore": "prepared; protects original registry value kinds and rejects concurrent changes",
     "sshd_restart_required": false,
-    "pending_step": "combined installer UAC canceled; reopen choice pending, then native-client connection retry",
+    "pending_step": null,
     "combined_installer": "%LOCALAPPDATA%/Djinn/q-pc-mesh-enroll-windows.ps1",
     "combined_installer_parse": "passed",
-    "combined_installer_unelevated_control": "refused before writes"
+    "combined_installer_unelevated_control": "refused before writes",
+    "initial_native_install_at": "2026-10-14T17:58:24.6161276Z",
+    "login_shell_correction_at": "2026-10-14T18:12:33.4728106Z",
+    "live_failure_caught": "-c omitted Git Unix tools, breaking the npm Codex wrapper; -lc restores their path",
+    "ordinary_remote_chat_reads": ["imac-intel", "thinkpad-l14-f", "imac-m4"],
+    "thinkpad_native_confirmation": "owner says it looks good now"
+  },
+  "claude_setup": {
+    "official_reference": "https://code.claude.com/docs/en/desktop#pre-configure-ssh-connections-for-your-team",
+    "desktop_version": "2.37337.1",
+    "configuration": "additive sshConfigs in each owner's ~/.claude/settings.json; SSH key field omitted to reuse existing config/agents",
+    "desktop_clients": {
+      "o-pc": ["s-pc", "thinkpad-l14-f", "imac-m4", "imac-intel"],
+      "s-pc": ["o-pc", "thinkpad-l14-f", "imac-m4", "imac-intel"],
+      "imac-m4": ["o-pc", "s-pc", "thinkpad-l14-f", "imac-intel"],
+      "imac-intel": ["o-pc", "s-pc", "thinkpad-l14-f", "imac-m4"]
+    },
+    "standalone_windows_cli_version": "2.1.261",
+    "thinkpad_cli_version": "2.1.248",
+    "thinkpad_code": "existing shell SSH access passed to all four peers; no new Desktop installation or permission change",
+    "windows_sftp_prerequisites": "passed to all four peers using ordinary aliases",
+    "native_desktop_menu": "pending owner check",
+    "native_desktop_first_connection": "not yet qualified; OpenSSH/SFTP prerequisites are distinct",
+    "permissions_changed": false,
+    "active_claude_sessions_interrupted": false,
+    "model_sessions_started": false,
+    "private_keys_exported": false,
+    "worktrees_created": false
   }
 }
