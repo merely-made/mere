@@ -105,7 +105,7 @@ constructors. Add `CaptureRefusal::ContextLost { backend: PresentationBackend,
 generation: ContextGeneration }` rather than inventing a wgpu device-loss notice
 for WebGL. These changes brand shared captures and observations on either route.
 
-- [ ] Add failing state/policy tests. Require duplicate loss notifications to be idempotent, restore generation to advance once, overflow to refuse restoration, disposal to be terminal, and forced backend attempts to contain only the requested route.
+- [x] Add failing state/policy tests. Require duplicate loss notifications to be idempotent, restore generation to advance once, overflow to refuse restoration, disposal to be terminal, and forced backend attempts to contain only the requested route.
 
 ```rust
 #[test]
@@ -122,8 +122,8 @@ fn restored_context_refuses_old_completions() {
 }
 ```
 
-- [ ] Run the presentation tests to observe their missing-contract failure. Implement the state machine and export it. Put backend choice in host options with `Auto` as the documented configurable default; native hosts keep their current route.
-- [ ] Run presentation tests and existing Rootstock recovery tests through the admitted runner. Commit. Done when policy and lifecycle tests pass without creating a second device or mutating application state.
+- [x] Run the presentation tests to observe their missing-contract failure. Implement the state machine and export it. Put backend choice in host options with `Auto` as the documented configurable default; native hosts keep their current route.
+- [x] Run presentation tests and existing Rootstock recovery tests through the admitted runner. Commit. Done when policy and lifecycle tests pass without creating a second device or mutating application state.
 
 ### Task 3: Extract shared frame preparation and portable graph production
 
@@ -267,3 +267,5 @@ presentation stamp contains the generation added in Task 2.
 
 - 2026-10-13: Native Rootstock baseline passed 87 tests with two existing ignores, no failures and zero memory pressure/OOM events on frozen source 230a41cd0. The policy test first failed on its missing exports, then all seven tests passed against the new implementation. Presentation stamps now carry context generation, and host options expose the browser policy. Broader host/capture regressions remain pending; Task 2 is not complete. Compact evidence is in `testing/receipts/browser_presentation_20261013/policy/red-green.json`.
 - 2026-10-13: Execution rulings: keep the baseline in a private snapshot; finish measured portable producer inventory after the concrete viewer export exists; use Vello's public canvas initialization rather than an invented context-taking constructor; include owned listener/rAF teardown in browser disposal; prevent a portable export from stepping presentation dynamics twice.
+
+- 2026-10-13: Task 2 complete: policy/lifetime red-to-green and combined Rootstock/Mesquite/native-host regression gate passed 294 tests, zero failures and 11 existing ignores, with unchanged source, zero memory-limit events and verified service cleanup. Task 1 Wasm/browser baseline remains separate; Task 3 shared frame preparation begins.
