@@ -1,0 +1,1310 @@
+{
+  "schema": "git-only-consumer-integration-qualification-v1",
+  "status": "PASS",
+  "recorded_at_utc": "2026-10-14T03:17:52.456830+00:00",
+  "executed_source": {
+    "mere_head": "0fd8adf82725546789c9cc0553a1c2f5f551cbe2",
+    "integration_merge_base": "a21f978905a530184a641227f2624c2b194bedbe",
+    "preserved_upstream_ancestor": "9f3361be4",
+    "qualified_rendering_source_ancestor": "4682ba99040c234c6410d73125e5dc9b1f91cc03",
+    "genet_supplier": "5618326d287e7f7ef0c1cc3545587d64cedb22a7",
+    "netrender_supplier": "c74b7cb28090c28b1c6d80b08dcdea18aff48d3e",
+    "provider_supplier": "2eae6243881d5b24c984d5ee35dde509ca5db782",
+    "publication_head_not_yet_recorded": true,
+    "manifest_repin_lines": 47,
+    "production_rust_changes_after_integration_merge": false,
+    "detached_current_frame_qc_patches_applied": false
+  },
+  "preparation": {
+    "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/offline-r3-preparation.json",
+    "sha256": "3fc4c7d6b6351e4378f60f96bf158ffed879be1c6ce627048f20ffde14efef7a",
+    "bytes": 12498
+  },
+  "admission": {
+    "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/admission-r3.json",
+    "sha256": "8b2215579dde53f5380cc573dd06842867b350fbe07cf734e2786eed5972755d",
+    "bytes": 3158
+  },
+  "completion": {
+    "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/completion-r3.json",
+    "sha256": "5324a6eaad6e2546d7248bd7ae0ae8e0098b8d8735b9fab60cdcde786804bdde",
+    "bytes": 21931
+  },
+  "driver": {
+    "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/run_cpu_offline_r3.py",
+    "sha256": "e7b3fd40d558fc047930a23428c5c2243934073a20a921e3284d110332054fce",
+    "bytes": 5355
+  },
+  "ownership_helper": {
+    "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/owned_compiler_utc.py",
+    "sha256": "728c0d1857d350e58d4988e7fb32e0542f79a00b48bee75c82ed73d5ed969fe0",
+    "bytes": 14737
+  },
+  "final_manifests": {
+    "/Users/markik/Code/worktrees/mere-vello-font-integration/Cargo.toml": "0c2dc5815fa5e5a84ddd30b7de585becebc2e60a8a691bcd1392bc81a318b41b",
+    "/Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/examples/genet_web_smoke/Cargo.toml": "7e719ed9c8fd6b63ec659a783c79efdbaba5ee6e8a6d5e72bb9acb7ea24e9114",
+    "/Users/markik/Code/worktrees/mere-vello-font-integration/ports/distillery/probe/Cargo.toml": "cbaaed471d094c08f0b917db59d12a2b5f7fe14778ce9e48dffa14896fdda096",
+    "/Users/markik/Code/worktrees/mere-vello-font-integration/ports/graphshell/web/Cargo.toml": "b426a6a32bc4fd22ec35b152dde650fcf39e5c34055d0362ac54babdb5d3d0e2"
+  },
+  "final_locks": [
+    {
+      "root": "mere",
+      "path": "/Users/markik/Code/worktrees/mere-vello-font-integration/Cargo.lock",
+      "bytes": 465704,
+      "sha256": "09557f6c6c6383fded51607074a50cec5a1d677d7b0b8499bde3bfda9d0f6e62"
+    },
+    {
+      "root": "graphshell-web",
+      "path": "/Users/markik/Code/worktrees/mere-vello-font-integration/ports/graphshell/web/Cargo.lock",
+      "bytes": 287929,
+      "sha256": "90d6076f8be2bbdd147d37066c70a7b6b52f3dcb905de6b5108111bbe4ada7e7"
+    },
+    {
+      "root": "distillery-probe",
+      "path": "/Users/markik/Code/worktrees/mere-vello-font-integration/ports/distillery/probe/Cargo.lock",
+      "bytes": 205532,
+      "sha256": "5972673f5c2ac55609ddc146015631af6283b0126631e6d64f1b777814137094"
+    },
+    {
+      "root": "genet-web-smoke",
+      "path": "/Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/examples/genet_web_smoke/Cargo.lock",
+      "bytes": 82453,
+      "sha256": "5e723c3822e80777f86849827f5cbed32f2b51bf5795c3b8791a97063e392022"
+    }
+  ],
+  "smoke_lock_gitignored_not_publication_input": true,
+  "commands": [
+    {
+      "label": "mere-metadata-admit-r3",
+      "kind": "metadata",
+      "result": "PASS",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.0-x86_64-apple-darwin/bin/cargo",
+        "metadata",
+        "--offline",
+        "--format-version",
+        "1"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-vello-font-integration",
+      "elapsed_seconds": 69.08594794000001,
+      "exit_code": 0,
+      "within_deadline": true,
+      "owned_group_closed": true,
+      "local_receipt": "mere-metadata-admit-r3.json",
+      "receipt": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/mere-metadata-admit-r3.json",
+        "sha256": "ea64d50640a66ce2c70c05805962c350874a79036b1e715b98ab75219d3c5338",
+        "bytes": 5099
+      },
+      "stdout": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/mere-metadata-admit-r3.stdout",
+        "sha256": "415cd1aa804ff8e1271512ad88973cba63e0d0e147d15d063a8d99db925afc13",
+        "bytes": 8571182
+      },
+      "stderr": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/mere-metadata-admit-r3.log",
+        "sha256": "263e7f5e315873005727cced2afb8464dbd9f2ec3c1075aa5a32782594ea9afd",
+        "bytes": 4835
+      },
+      "owned_process_birth_inventory": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/mere-metadata-admit-r3.owned.json",
+        "sha256": "c604986c63d9dd6a0b415caff28dc7ce2f2dfd9747202d8eb1fe0e1ce00c4b54",
+        "bytes": 593
+      }
+    },
+    {
+      "label": "mere-metadata-wasm-r3",
+      "kind": "metadata",
+      "result": "PASS",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.0-x86_64-apple-darwin/bin/cargo",
+        "metadata",
+        "--locked",
+        "--offline",
+        "--format-version",
+        "1",
+        "--filter-platform",
+        "wasm32-unknown-unknown"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-vello-font-integration",
+      "elapsed_seconds": 4.69500745,
+      "exit_code": 0,
+      "within_deadline": true,
+      "owned_group_closed": true,
+      "local_receipt": "mere-metadata-wasm-r3.json",
+      "receipt": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/mere-metadata-wasm-r3.json",
+        "sha256": "427e0bf358af52625dd130861d53460e2218d2e0fbfdb19b1fe7aeb0375e40c5",
+        "bytes": 5195
+      },
+      "stdout": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/mere-metadata-wasm-r3.stdout",
+        "sha256": "26daaeabf19b91b9d067a6b2c7e01a108ae972785a3a0dd8edc28dd4f05f9974",
+        "bytes": 6592967
+      },
+      "stderr": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/mere-metadata-wasm-r3.log",
+        "sha256": "3191b6129f8eacf0945951f0cc28ba27ea35744d2b920df5b35a02a99f936893",
+        "bytes": 278
+      },
+      "owned_process_birth_inventory": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/mere-metadata-wasm-r3.owned.json",
+        "sha256": "a8f21debb8b6771988f410998297d8f3c91698a1b6c378d1f74edcd38805b6e1",
+        "bytes": 670
+      }
+    },
+    {
+      "label": "graphshell-web-metadata-admit-r3",
+      "kind": "metadata",
+      "result": "PASS",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.0-x86_64-apple-darwin/bin/cargo",
+        "metadata",
+        "--offline",
+        "--format-version",
+        "1"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-vello-font-integration/ports/graphshell/web",
+      "elapsed_seconds": 2.199013357,
+      "exit_code": 0,
+      "within_deadline": true,
+      "owned_group_closed": true,
+      "local_receipt": "graphshell-web-metadata-admit-r3.json",
+      "receipt": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/graphshell-web-metadata-admit-r3.json",
+        "sha256": "23ccfc8a6a6322ffb00bf2590f5a65d0b969d2160cb64fda669c7a3b4e97a980",
+        "bytes": 5124
+      },
+      "stdout": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/graphshell-web-metadata-admit-r3.stdout",
+        "sha256": "d0e01805118e74bb8c415aad8bb85f81bcf05be19db8f3fbf7e64e822f1849cc",
+        "bytes": 4487797
+      },
+      "stderr": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/graphshell-web-metadata-admit-r3.log",
+        "sha256": "020e4854a62fe451134137c3c1c3e6a49ebd8df9e73f917707609ad440201283",
+        "bytes": 3848
+      },
+      "owned_process_birth_inventory": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/graphshell-web-metadata-admit-r3.owned.json",
+        "sha256": "851b7a4b983ffe2b17b62a3a6c5f09d160beff39fd7536d435fa9bcc8b061d64",
+        "bytes": 593
+      }
+    },
+    {
+      "label": "graphshell-web-metadata-wasm-r3",
+      "kind": "metadata",
+      "result": "PASS",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.0-x86_64-apple-darwin/bin/cargo",
+        "metadata",
+        "--locked",
+        "--offline",
+        "--format-version",
+        "1",
+        "--filter-platform",
+        "wasm32-unknown-unknown"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-vello-font-integration/ports/graphshell/web",
+      "elapsed_seconds": 1.972287479,
+      "exit_code": 0,
+      "within_deadline": true,
+      "owned_group_closed": true,
+      "local_receipt": "graphshell-web-metadata-wasm-r3.json",
+      "receipt": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/graphshell-web-metadata-wasm-r3.json",
+        "sha256": "6a60b6093eefd5c9288f57e15ea9cb3fac4156afd04c5af87ecb81a0b622c048",
+        "bytes": 5227
+      },
+      "stdout": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/graphshell-web-metadata-wasm-r3.stdout",
+        "sha256": "6727573148fcca6dbb15acdc21eabaef0cf4291b8f66515d37b5f7806650bd80",
+        "bytes": 3442474
+      },
+      "stderr": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/graphshell-web-metadata-wasm-r3.log",
+        "sha256": "de2f630da465eeb286adb412ae7acfb50fa7a86fdb06e6fe37336db637da24f1",
+        "bytes": 494
+      },
+      "owned_process_birth_inventory": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/graphshell-web-metadata-wasm-r3.owned.json",
+        "sha256": "c73b724d9050aa7c758554104007a1b3f1f255eee13d8791c1985e6f24a6d6c9",
+        "bytes": 670
+      }
+    },
+    {
+      "label": "distillery-probe-metadata-admit-r3",
+      "kind": "metadata",
+      "result": "PASS",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.0-x86_64-apple-darwin/bin/cargo",
+        "metadata",
+        "--offline",
+        "--format-version",
+        "1"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-vello-font-integration/ports/distillery/probe",
+      "elapsed_seconds": 1.762021426,
+      "exit_code": 0,
+      "within_deadline": true,
+      "owned_group_closed": true,
+      "local_receipt": "distillery-probe-metadata-admit-r3.json",
+      "receipt": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/distillery-probe-metadata-admit-r3.json",
+        "sha256": "69cd439d065953e400da0b53601489593e3fd5a768c17f4646c1cdc685afa448",
+        "bytes": 5128
+      },
+      "stdout": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/distillery-probe-metadata-admit-r3.stdout",
+        "sha256": "78cf704d77501a2eaa31675cdef97ae377de359357d2276215a62fa700e5eae9",
+        "bytes": 3842545
+      },
+      "stderr": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/distillery-probe-metadata-admit-r3.log",
+        "sha256": "efe6f7cc795bc9426a9ad729736fa57d6581ffb2daa28d7820df8589564b8f1f",
+        "bytes": 2699
+      },
+      "owned_process_birth_inventory": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/distillery-probe-metadata-admit-r3.owned.json",
+        "sha256": "a1b2597ef082be613c5590689db5dc4dc0f06dda98a79cb7745844f4a0f2ac25",
+        "bytes": 593
+      }
+    },
+    {
+      "label": "distillery-probe-metadata-wasm-r3",
+      "kind": "metadata",
+      "result": "PASS",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.0-x86_64-apple-darwin/bin/cargo",
+        "metadata",
+        "--locked",
+        "--offline",
+        "--format-version",
+        "1",
+        "--filter-platform",
+        "wasm32-unknown-unknown"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-vello-font-integration/ports/distillery/probe",
+      "elapsed_seconds": 1.7438345359999998,
+      "exit_code": 0,
+      "within_deadline": true,
+      "owned_group_closed": true,
+      "local_receipt": "distillery-probe-metadata-wasm-r3.json",
+      "receipt": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/distillery-probe-metadata-wasm-r3.json",
+        "sha256": "ed025b1677d043dd58dc7cd60553f9130a6b071630799822771a0da8d8a5f470",
+        "bytes": 5238
+      },
+      "stdout": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/distillery-probe-metadata-wasm-r3.stdout",
+        "sha256": "cca6fb8acd3038b7054b2d84d429569b70bf67aa460c1bac529bc287c11457c0",
+        "bytes": 2851168
+      },
+      "stderr": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/distillery-probe-metadata-wasm-r3.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "owned_process_birth_inventory": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/distillery-probe-metadata-wasm-r3.owned.json",
+        "sha256": "690b2824a3555603079358dd61e14e2f01953f28243485b1060f592d6f944a10",
+        "bytes": 670
+      }
+    },
+    {
+      "label": "genet-web-smoke-metadata-admit-r3",
+      "kind": "metadata",
+      "result": "PASS",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.0-x86_64-apple-darwin/bin/cargo",
+        "metadata",
+        "--offline",
+        "--format-version",
+        "1"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/examples/genet_web_smoke",
+      "elapsed_seconds": 1.9677945239999999,
+      "exit_code": 0,
+      "within_deadline": true,
+      "owned_group_closed": true,
+      "local_receipt": "genet-web-smoke-metadata-admit-r3.json",
+      "receipt": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/genet-web-smoke-metadata-admit-r3.json",
+        "sha256": "20cbfbaea545f2f3420c2d5d6d3639e5b3fc878e7be154fd9bc8e4d4e6bd5d7a",
+        "bytes": 5151
+      },
+      "stdout": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/genet-web-smoke-metadata-admit-r3.stdout",
+        "sha256": "7eb29cc6755e9cf0dee5bc780e71b544d9963f1c264188124fbef49d19f7f904",
+        "bytes": 1568627
+      },
+      "stderr": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/genet-web-smoke-metadata-admit-r3.log",
+        "sha256": "8a626554b3654a2bbf821296ce518de164761861a6728db3d417335a5f0fcd04",
+        "bytes": 547
+      },
+      "owned_process_birth_inventory": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/genet-web-smoke-metadata-admit-r3.owned.json",
+        "sha256": "7ede74753389f1f66a87d689782821efb36115bf486859b9dfb390449be6318f",
+        "bytes": 593
+      }
+    },
+    {
+      "label": "genet-web-smoke-metadata-wasm-r3",
+      "kind": "metadata",
+      "result": "PASS",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.0-x86_64-apple-darwin/bin/cargo",
+        "metadata",
+        "--locked",
+        "--offline",
+        "--format-version",
+        "1",
+        "--filter-platform",
+        "wasm32-unknown-unknown"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/examples/genet_web_smoke",
+      "elapsed_seconds": 1.316276808,
+      "exit_code": 0,
+      "within_deadline": true,
+      "owned_group_closed": true,
+      "local_receipt": "genet-web-smoke-metadata-wasm-r3.json",
+      "receipt": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/genet-web-smoke-metadata-wasm-r3.json",
+        "sha256": "ea25d61d9262f1b0375922eba3fb79f80364c636e302b33a87c75d869b13ab13",
+        "bytes": 5247
+      },
+      "stdout": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/genet-web-smoke-metadata-wasm-r3.stdout",
+        "sha256": "88a3fdcd03421101f34bf0d0def861f0bb091419c8ce63c18e0211f3e17bab8b",
+        "bytes": 1219642
+      },
+      "stderr": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/genet-web-smoke-metadata-wasm-r3.log",
+        "sha256": "810374874a2472f0cd8a7c8f493e71e5b9d04366532d0a98521035b70374f0c3",
+        "bytes": 490
+      },
+      "owned_process_birth_inventory": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/genet-web-smoke-metadata-wasm-r3.owned.json",
+        "sha256": "49f7c4325c08969552a1a869f2585ab6c01d0af3324350cd00d863376bea29c6",
+        "bytes": 670
+      }
+    },
+    {
+      "label": "cambium-rootstock-host_generic_faces_reach_actual_paint_and_refuse_invalid_font_bytes-r3",
+      "kind": "cpu_test",
+      "result": "PASS",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.0-x86_64-apple-darwin/bin/cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "cambium-rootstock",
+        "--lib",
+        "host_generic_faces_reach_actual_paint_and_refuse_invalid_font_bytes",
+        "-j",
+        "2",
+        "--",
+        "--nocapture",
+        "--test-threads",
+        "1"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-vello-font-integration",
+      "elapsed_seconds": 44.119739833,
+      "exit_code": 0,
+      "within_deadline": true,
+      "owned_group_closed": true,
+      "local_receipt": "cambium-rootstock-host_generic_faces_reach_actual_paint_and_refuse_invalid_font_bytes-r3.json",
+      "receipt": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/cambium-rootstock-host_generic_faces_reach_actual_paint_and_refuse_invalid_font_bytes-r3.json",
+        "sha256": "a4c6f953a42f294a55e6c263bb5a99a49aaf617ba04152b7da714a5528dc1fcf",
+        "bytes": 5341
+      },
+      "stdout": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/cambium-rootstock-host_generic_faces_reach_actual_paint_and_refuse_invalid_font_bytes-r3.stdout",
+        "sha256": "5379358e11e521824e6f9b5c384e85f036ee67b8e05c987704b5ca18d1d56d22",
+        "bytes": 214
+      },
+      "stderr": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/cambium-rootstock-host_generic_faces_reach_actual_paint_and_refuse_invalid_font_bytes-r3.log",
+        "sha256": "e5f3895e40aea7947cc56565c3bfb5700ab8b69e3a67fca41a41303e519ce1ed",
+        "bytes": 5859
+      },
+      "owned_process_birth_inventory": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/cambium-rootstock-host_generic_faces_reach_actual_paint_and_refuse_invalid_font_bytes-r3.owned.json",
+        "sha256": "9b5265827a4d029e8e702abf77dd472dee222bce61428c81d100659808ab2a15",
+        "bytes": 792
+      },
+      "intended_test": "host_generic_faces_reach_actual_paint_and_refuse_invalid_font_bytes",
+      "executed_tests": 1,
+      "passed_tests": 1,
+      "failed_tests": 0,
+      "ignored_tests": 0,
+      "local_stdout": "cambium-rootstock-host_generic_faces_reach_actual_paint_and_refuse_invalid_font_bytes-r3.stdout"
+    },
+    {
+      "label": "document-canvas-generic_font_batch_refuses_before_mutating_existing_context-r3",
+      "kind": "cpu_test",
+      "result": "PASS",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.0-x86_64-apple-darwin/bin/cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "document-canvas",
+        "--lib",
+        "generic_font_batch_refuses_before_mutating_existing_context",
+        "-j",
+        "2",
+        "--",
+        "--nocapture",
+        "--test-threads",
+        "1"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-vello-font-integration",
+      "elapsed_seconds": 13.980241141,
+      "exit_code": 0,
+      "within_deadline": true,
+      "owned_group_closed": true,
+      "local_receipt": "document-canvas-generic_font_batch_refuses_before_mutating_existing_context-r3.json",
+      "receipt": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/document-canvas-generic_font_batch_refuses_before_mutating_existing_context-r3.json",
+        "sha256": "4be4b9cea363be6669db19222e3b15182628f1ba25062457b948b9c3d8105c34",
+        "bytes": 5321
+      },
+      "stdout": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/document-canvas-generic_font_batch_refuses_before_mutating_existing_context-r3.stdout",
+        "sha256": "2dc2745ebe0ec70604f0b19e0fd63422758111d00e5abb6cc981d46cf3dfbd7a",
+        "bytes": 198
+      },
+      "stderr": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/document-canvas-generic_font_batch_refuses_before_mutating_existing_context-r3.log",
+        "sha256": "4939093d57066168cee4ecd789daba4b96d96193ab594dd207a1852a8a636f6d",
+        "bytes": 1988
+      },
+      "owned_process_birth_inventory": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/document-canvas-generic_font_batch_refuses_before_mutating_existing_context-r3.owned.json",
+        "sha256": "d2595211be718c7790736642d2ac8cf9cdac8df13af8398f847f277f50d93e88",
+        "bytes": 782
+      },
+      "intended_test": "generic_font_batch_refuses_before_mutating_existing_context",
+      "executed_tests": 1,
+      "passed_tests": 1,
+      "failed_tests": 0,
+      "ignored_tests": 0,
+      "local_stdout": "document-canvas-generic_font_batch_refuses_before_mutating_existing_context-r3.stdout"
+    },
+    {
+      "label": "tabard-workshop-explicit_generic_resources_survive_actual_reader_and_stylesheet_reconstruction-r3",
+      "kind": "cpu_test",
+      "result": "PASS",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.0-x86_64-apple-darwin/bin/cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "tabard-workshop",
+        "--test",
+        "generic_fonts",
+        "explicit_generic_resources_survive_actual_reader_and_stylesheet_reconstruction",
+        "-j",
+        "2",
+        "--",
+        "--nocapture",
+        "--test-threads",
+        "1"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-vello-font-integration",
+      "elapsed_seconds": 41.554333179,
+      "exit_code": 0,
+      "within_deadline": true,
+      "owned_group_closed": true,
+      "local_receipt": "tabard-workshop-explicit_generic_resources_survive_actual_reader_and_stylesheet_reconstruction-r3.json",
+      "receipt": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/tabard-workshop-explicit_generic_resources_survive_actual_reader_and_stylesheet_reconstruction-r3.json",
+        "sha256": "891e3d80929e3173fec0b125f83a3797d379667d65ce4c5426cffa286f2ec7f5",
+        "bytes": 5381
+      },
+      "stdout": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/tabard-workshop-explicit_generic_resources_survive_actual_reader_and_stylesheet_reconstruction-r3.stdout",
+        "sha256": "b8c29ae885a2bc3055746448431118784b7f7faef952f46bb389a19cc9d96d69",
+        "bytes": 203
+      },
+      "stderr": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/tabard-workshop-explicit_generic_resources_survive_actual_reader_and_stylesheet_reconstruction-r3.log",
+        "sha256": "aadb229de1316afc80cb144b6a5b03aa38814d08ed0013ebda15f7862c9b272b",
+        "bytes": 6502
+      },
+      "owned_process_birth_inventory": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/tabard-workshop-explicit_generic_resources_survive_actual_reader_and_stylesheet_reconstruction-r3.owned.json",
+        "sha256": "17b8ca90f11c1febf5d4f9313a1db829bcf95dd90bff41cfd0db030e92dccfbc",
+        "bytes": 825
+      },
+      "intended_test": "explicit_generic_resources_survive_actual_reader_and_stylesheet_reconstruction",
+      "executed_tests": 1,
+      "passed_tests": 1,
+      "failed_tests": 0,
+      "ignored_tests": 0,
+      "local_stdout": "tabard-workshop-explicit_generic_resources_survive_actual_reader_and_stylesheet_reconstruction-r3.stdout"
+    },
+    {
+      "label": "tabard-workshop-held_tab_arrow_steers_focus_but_released_tab_arrow_edits_actual_workshop_slider-r3",
+      "kind": "cpu_test",
+      "result": "PASS",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.0-x86_64-apple-darwin/bin/cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "tabard-workshop",
+        "--test",
+        "key_release",
+        "held_tab_arrow_steers_focus_but_released_tab_arrow_edits_actual_workshop_slider",
+        "-j",
+        "2",
+        "--",
+        "--nocapture",
+        "--test-threads",
+        "1"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-vello-font-integration",
+      "elapsed_seconds": 10.607266329,
+      "exit_code": 0,
+      "within_deadline": true,
+      "owned_group_closed": true,
+      "local_receipt": "tabard-workshop-held_tab_arrow_steers_focus_but_released_tab_arrow_edits_actual_workshop_slider-r3.json",
+      "receipt": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/tabard-workshop-held_tab_arrow_steers_focus_but_released_tab_arrow_edits_actual_workshop_slider-r3.json",
+        "sha256": "19e92d273285cb5700929e6c73afc73b39f8e1c8992a6c38668a816ed42751cc",
+        "bytes": 5381
+      },
+      "stdout": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/tabard-workshop-held_tab_arrow_steers_focus_but_released_tab_arrow_edits_actual_workshop_slider-r3.stdout",
+        "sha256": "90cab3c2650497a272ac57edf8be7609d449f3952e4e74480cf1c0596b0a9425",
+        "bytes": 204
+      },
+      "stderr": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/tabard-workshop-held_tab_arrow_steers_focus_but_released_tab_arrow_edits_actual_workshop_slider-r3.log",
+        "sha256": "ef34bc8e463e170586ceb80d9326f9c0a3e53070f80123bf5b58da78318f9178",
+        "bytes": 3655
+      },
+      "owned_process_birth_inventory": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/tabard-workshop-held_tab_arrow_steers_focus_but_released_tab_arrow_edits_actual_workshop_slider-r3.owned.json",
+        "sha256": "4bd42a7a6fbdc17f5017cec8465229ba338df2aa64117f584e549fe92824cd53",
+        "bytes": 824
+      },
+      "intended_test": "held_tab_arrow_steers_focus_but_released_tab_arrow_edits_actual_workshop_slider",
+      "executed_tests": 1,
+      "passed_tests": 1,
+      "failed_tests": 0,
+      "ignored_tests": 0,
+      "local_stdout": "tabard-workshop-held_tab_arrow_steers_focus_but_released_tab_arrow_edits_actual_workshop_slider-r3.stdout"
+    },
+    {
+      "label": "shared-recovery-git561-wasm-check-r3",
+      "kind": "wasm_compile_check",
+      "result": "PASS",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.0-x86_64-apple-darwin/bin/cargo",
+        "check",
+        "--locked",
+        "--offline",
+        "-p",
+        "cambium-genet-web-host",
+        "--example",
+        "shared_recovery",
+        "--target",
+        "wasm32-unknown-unknown",
+        "-j",
+        "2"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-vello-font-integration",
+      "elapsed_seconds": 89.78910920899999,
+      "exit_code": 0,
+      "within_deadline": true,
+      "owned_group_closed": true,
+      "local_receipt": "shared-recovery-git561-wasm-check-r3.json",
+      "receipt": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/shared-recovery-git561-wasm-check-r3.json",
+        "sha256": "ed7aed185bcbaa3c7a117025b36f8fa63a715bb4e0f5243eec73c52d1cde3daa",
+        "bytes": 5271
+      },
+      "stdout": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/shared-recovery-git561-wasm-check-r3.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/shared-recovery-git561-wasm-check-r3.log",
+        "sha256": "6e6cfba25e0b47ecd12f176bb8e61b3c7d5f8e3f90a1cd972c7c182aa9f6be6d",
+        "bytes": 19972
+      },
+      "owned_process_birth_inventory": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/shared-recovery-git561-wasm-check-r3.owned.json",
+        "sha256": "55ebad61b3b0d2fa4404b2bc70ed82c71fa35c44b91b7d3f19dafd0b2a5616c6",
+        "bytes": 732
+      }
+    }
+  ],
+  "independent_cone_audits": [
+    {
+      "auditor": "producer_bundle_audit",
+      "result": "PASS",
+      "full_audit": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/type-cone-audit-r3.json",
+        "sha256": "4026b57491bf3c79c6bc2182c3cc4e189da8ff92aae74c938fbdcc00e53925fe",
+        "bytes": 192531
+      },
+      "scope": "Selected four consumer root groups plus all Mere workspace/default-member connected cones including Knot; native/all-platform conservative superset and Cargo wasm-filtered closures"
+    },
+    {
+      "auditor": "acceptance_audit",
+      "result": "PASS",
+      "full_audit": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/independent-imported-cone-audit-r3.json",
+        "sha256": "92e39d26f62ff322ef5bd347b74ae259a0f527c6250594f72505720bcf71210e",
+        "bytes": 370015
+      },
+      "root_selection": "Each actual workspace member individually; Mere workspace/default members both101. Every root includes its normal/build/dev edges; imported transitive packages include only normal/build. No package-inventory-only qualification."
+    }
+  ],
+  "metadata_projection_summary": [
+    {
+      "metadata": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/mere-metadata-admit-r3.stdout",
+        "sha256": "415cd1aa804ff8e1271512ad88973cba63e0d0e147d15d063a8d99db925afc13",
+        "bytes": 8571182
+      },
+      "root_ids": [
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/mere#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/domain/apparatus#mere-apparatus@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/forme/uxtree#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/inker/inker#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/nematic/nematic#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/errand#0.4.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/fleece#mere-fleece@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/eidetic/eidetic-core#eidetic@0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/eidetic/chartulary#0.2.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/eidetic/muniment#0.1.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/incipit#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/graph/linked-data#mere-linked-data@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/graph/graph-kernel#mere-kernel@0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/command-menu#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/forme/forme#mere-forme@0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/forme/curation#mere-curation@0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/conatus/numen#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/armillary#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/fetch#mere-fetch@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/page-load#mere-page-load@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/pandect#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/distillery/alembic#mere-alembic@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/tabard#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/tinct#0.1.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/servitor#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/canvas/pictograph#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/canvas/cartography#mere-cartography@0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/scenes/sceno#0.0.4",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/scenes/scenomise#0.0.4",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/scenes/scenograph#0.0.4",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/scenes/scenotime#0.0.4",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/edit-history#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/chirograph#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/intel/esp#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/intel/eidetic-search#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/conatus/seiche#0.0.6",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/conatus/conatus#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/conatus/nisus#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/platen/platen#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/inker/document-canvas#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/workbench#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/shell/chrome#mere-chrome@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/shell/comms#mere-comms@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/luggage#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/framing#mere-framing@0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/state-witness#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/content-contract#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/proofs#mere-proofs@0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/shell-state#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/ux-events#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/registry#mere-registry@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/intel/mora-cmudict#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/intel/reference-data#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/stickleback#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/dramatis/persona-picker#mere-persona-picker@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/cambium#0.3.3",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/nematic/illume#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/surface-api#mere-surface-api@0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/meristem#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/sprigging#0.2.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/moot/commons#commons-spine@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/moot/gemot#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/moot/mien#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/moot/mooting#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/script/app-host#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/moot/moothold#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/mesh/mesh#mere-mesh@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/script/rhai#script-rhai@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/script/document-host#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/eidetic/hagiograph#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/conatus/modulus#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/conatus/tenant#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/graphshell/graphshell-client#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/graphshell/graphshell-endpoint#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/graphshell#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/cambium-rootstock#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/cambium-winit#0.3.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/distillery#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/document-lanes#mere-document-lanes@0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/mere-view#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/cambium-genet-winit-host#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/cambium-winit-a11y#0.3.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/mesquite#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/pelt/core#pelt-core@0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/moot#mere-moot@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/djinn#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/castellan#0.0.3",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/gazette#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/djinn-testkit#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/dramatis#dramatis-app@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/distillery/athanor#mere-athanor@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/signalman#mere-signalman@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/tabard/desktop#tabard-desktop@0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/tabard-workshop#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/pelt#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/pelt/desktop#pelt-desktop@0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/inker/engines/scrying-engine#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/inker/knot-editor-host#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/cambium-genet-web-host#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/inker/engines/graft-engine#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/inker/engines/weld-engine#0.2.0"
+      ],
+      "default_root_ids": [
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/mere#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/domain/apparatus#mere-apparatus@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/forme/uxtree#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/inker/inker#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/nematic/nematic#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/errand#0.4.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/fleece#mere-fleece@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/eidetic/eidetic-core#eidetic@0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/eidetic/chartulary#0.2.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/eidetic/muniment#0.1.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/incipit#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/graph/linked-data#mere-linked-data@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/graph/graph-kernel#mere-kernel@0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/command-menu#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/forme/forme#mere-forme@0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/forme/curation#mere-curation@0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/conatus/numen#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/armillary#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/fetch#mere-fetch@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/page-load#mere-page-load@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/pandect#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/distillery/alembic#mere-alembic@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/tabard#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/tinct#0.1.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/servitor#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/canvas/pictograph#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/canvas/cartography#mere-cartography@0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/scenes/sceno#0.0.4",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/scenes/scenomise#0.0.4",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/scenes/scenograph#0.0.4",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/scenes/scenotime#0.0.4",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/edit-history#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/chirograph#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/intel/esp#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/intel/eidetic-search#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/conatus/seiche#0.0.6",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/conatus/conatus#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/conatus/nisus#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/platen/platen#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/inker/document-canvas#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/workbench#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/shell/chrome#mere-chrome@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/shell/comms#mere-comms@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/luggage#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/framing#mere-framing@0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/state-witness#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/content-contract#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/proofs#mere-proofs@0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/shell-state#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/ux-events#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/registry#mere-registry@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/intel/mora-cmudict#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/intel/reference-data#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/stickleback#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/dramatis/persona-picker#mere-persona-picker@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/cambium#0.3.3",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/nematic/illume#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/surface-api#mere-surface-api@0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/meristem#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/sprigging#0.2.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/moot/commons#commons-spine@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/moot/gemot#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/moot/mien#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/moot/mooting#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/script/app-host#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/moot/moothold#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/mesh/mesh#mere-mesh@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/script/rhai#script-rhai@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/script/document-host#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/eidetic/hagiograph#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/conatus/modulus#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/conatus/tenant#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/graphshell/graphshell-client#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/graphshell/graphshell-endpoint#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/graphshell#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/cambium-rootstock#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/cambium-winit#0.3.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/distillery#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/document-lanes#mere-document-lanes@0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/mere-view#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/cambium-genet-winit-host#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/cambium-winit-a11y#0.3.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/mesquite#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/pelt/core#pelt-core@0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/moot#mere-moot@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/djinn#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/castellan#0.0.3",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/gazette#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/djinn-testkit#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/dramatis#dramatis-app@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/distillery/athanor#mere-athanor@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/signalman#mere-signalman@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/tabard/desktop#tabard-desktop@0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/tabard-workshop#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/pelt#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/pelt/desktop#pelt-desktop@0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/inker/engines/scrying-engine#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/inker/knot-editor-host#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/cambium-genet-web-host#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/inker/engines/graft-engine#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/inker/engines/weld-engine#0.2.0"
+      ],
+      "root_count": 101,
+      "reachable_union": 1613,
+      "inventory_count": 1613,
+      "unused_inventory_count": 0,
+      "all_root_results_pass": true,
+      "platform": "unfiltered all-target conservative superset"
+    },
+    {
+      "metadata": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/mere-metadata-wasm-r3.stdout",
+        "sha256": "26daaeabf19b91b9d067a6b2c7e01a108ae972785a3a0dd8edc28dd4f05f9974",
+        "bytes": 6592967
+      },
+      "root_ids": [
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/mere#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/domain/apparatus#mere-apparatus@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/forme/uxtree#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/inker/inker#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/nematic/nematic#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/errand#0.4.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/fleece#mere-fleece@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/eidetic/eidetic-core#eidetic@0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/eidetic/chartulary#0.2.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/eidetic/muniment#0.1.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/incipit#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/graph/linked-data#mere-linked-data@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/graph/graph-kernel#mere-kernel@0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/command-menu#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/forme/forme#mere-forme@0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/forme/curation#mere-curation@0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/conatus/numen#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/armillary#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/fetch#mere-fetch@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/page-load#mere-page-load@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/pandect#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/distillery/alembic#mere-alembic@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/tabard#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/tinct#0.1.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/servitor#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/canvas/pictograph#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/canvas/cartography#mere-cartography@0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/scenes/sceno#0.0.4",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/scenes/scenomise#0.0.4",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/scenes/scenograph#0.0.4",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/scenes/scenotime#0.0.4",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/edit-history#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/chirograph#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/intel/esp#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/intel/eidetic-search#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/conatus/seiche#0.0.6",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/conatus/conatus#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/conatus/nisus#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/platen/platen#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/inker/document-canvas#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/workbench#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/shell/chrome#mere-chrome@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/shell/comms#mere-comms@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/luggage#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/framing#mere-framing@0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/state-witness#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/content-contract#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/proofs#mere-proofs@0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/shell-state#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/ux-events#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/registry#mere-registry@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/intel/mora-cmudict#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/intel/reference-data#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/stickleback#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/dramatis/persona-picker#mere-persona-picker@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/cambium#0.3.3",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/nematic/illume#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/surface-api#mere-surface-api@0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/meristem#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/sprigging#0.2.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/moot/commons#commons-spine@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/moot/gemot#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/moot/mien#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/moot/mooting#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/script/app-host#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/moot/moothold#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/mesh/mesh#mere-mesh@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/script/rhai#script-rhai@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/script/document-host#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/eidetic/hagiograph#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/conatus/modulus#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/conatus/tenant#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/graphshell/graphshell-client#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/graphshell/graphshell-endpoint#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/graphshell#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/cambium-rootstock#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/cambium-winit#0.3.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/distillery#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/document-lanes#mere-document-lanes@0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/mere-view#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/cambium-genet-winit-host#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/cambium-winit-a11y#0.3.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/mesquite#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/pelt/core#pelt-core@0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/moot#mere-moot@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/djinn#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/castellan#0.0.3",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/gazette#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/djinn-testkit#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/dramatis#dramatis-app@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/distillery/athanor#mere-athanor@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/signalman#mere-signalman@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/tabard/desktop#tabard-desktop@0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/tabard-workshop#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/pelt#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/pelt/desktop#pelt-desktop@0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/inker/engines/scrying-engine#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/inker/knot-editor-host#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/cambium-genet-web-host#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/inker/engines/graft-engine#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/inker/engines/weld-engine#0.2.0"
+      ],
+      "default_root_ids": [
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/mere#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/domain/apparatus#mere-apparatus@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/forme/uxtree#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/inker/inker#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/nematic/nematic#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/errand#0.4.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/fleece#mere-fleece@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/eidetic/eidetic-core#eidetic@0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/eidetic/chartulary#0.2.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/eidetic/muniment#0.1.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/incipit#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/graph/linked-data#mere-linked-data@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/graph/graph-kernel#mere-kernel@0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/command-menu#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/forme/forme#mere-forme@0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/forme/curation#mere-curation@0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/conatus/numen#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/armillary#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/fetch#mere-fetch@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/page-load#mere-page-load@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/pandect#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/distillery/alembic#mere-alembic@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/tabard#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/tinct#0.1.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/servitor#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/canvas/pictograph#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/canvas/cartography#mere-cartography@0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/scenes/sceno#0.0.4",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/scenes/scenomise#0.0.4",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/scenes/scenograph#0.0.4",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/scenes/scenotime#0.0.4",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/edit-history#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/chirograph#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/intel/esp#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/intel/eidetic-search#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/conatus/seiche#0.0.6",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/conatus/conatus#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/conatus/nisus#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/platen/platen#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/inker/document-canvas#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/workbench#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/shell/chrome#mere-chrome@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/shell/comms#mere-comms@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/luggage#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/framing#mere-framing@0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/state-witness#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/content-contract#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/proofs#mere-proofs@0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/shell-state#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/ux-events#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/registry#mere-registry@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/intel/mora-cmudict#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/intel/reference-data#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/stickleback#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/dramatis/persona-picker#mere-persona-picker@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/cambium#0.3.3",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/nematic/illume#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/surface-api#mere-surface-api@0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/meristem#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/sprigging#0.2.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/moot/commons#commons-spine@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/moot/gemot#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/moot/mien#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/moot/mooting#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/script/app-host#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/moot/moothold#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/mesh/mesh#mere-mesh@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/script/rhai#script-rhai@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/script/document-host#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/eidetic/hagiograph#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/conatus/modulus#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/conatus/tenant#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/graphshell/graphshell-client#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/graphshell/graphshell-endpoint#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/graphshell#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/cambium-rootstock#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/cambium-winit#0.3.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/distillery#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/document-lanes#mere-document-lanes@0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/mere-view#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/cambium-genet-winit-host#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/cambium-winit-a11y#0.3.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/mesquite#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/pelt/core#pelt-core@0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/moot#mere-moot@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/djinn#0.0.2",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/castellan#0.0.3",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/gazette#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/system/djinn-testkit#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/dramatis#dramatis-app@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/distillery/athanor#mere-athanor@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/signalman#mere-signalman@0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/tabard/desktop#tabard-desktop@0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/tabard-workshop#0.0.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/pelt#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/pelt/desktop#pelt-desktop@0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/inker/engines/scrying-engine#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/inker/knot-editor-host#0.1.1",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/cambium-genet-web-host#0.1.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/inker/engines/graft-engine#0.2.0",
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/inker/engines/weld-engine#0.2.0"
+      ],
+      "root_count": 101,
+      "reachable_union": 1264,
+      "inventory_count": 1264,
+      "unused_inventory_count": 0,
+      "all_root_results_pass": true,
+      "platform": "wasm32-unknown-unknown"
+    },
+    {
+      "metadata": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/graphshell-web-metadata-admit-r3.stdout",
+        "sha256": "d0e01805118e74bb8c415aad8bb85f81bcf05be19db8f3fbf7e64e822f1849cc",
+        "bytes": 4487797
+      },
+      "root_ids": [
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/graphshell/web#graphshell-web@0.1.0"
+      ],
+      "default_root_ids": [
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/graphshell/web#graphshell-web@0.1.0"
+      ],
+      "root_count": 1,
+      "reachable_union": 902,
+      "inventory_count": 902,
+      "unused_inventory_count": 0,
+      "all_root_results_pass": true,
+      "platform": "unfiltered all-target conservative superset"
+    },
+    {
+      "metadata": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/graphshell-web-metadata-wasm-r3.stdout",
+        "sha256": "6727573148fcca6dbb15acdc21eabaef0cf4291b8f66515d37b5f7806650bd80",
+        "bytes": 3442474
+      },
+      "root_ids": [
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/graphshell/web#graphshell-web@0.1.0"
+      ],
+      "default_root_ids": [
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/graphshell/web#graphshell-web@0.1.0"
+      ],
+      "root_count": 1,
+      "reachable_union": 687,
+      "inventory_count": 687,
+      "unused_inventory_count": 0,
+      "all_root_results_pass": true,
+      "platform": "wasm32-unknown-unknown"
+    },
+    {
+      "metadata": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/distillery-probe-metadata-admit-r3.stdout",
+        "sha256": "78cf704d77501a2eaa31675cdef97ae377de359357d2276215a62fa700e5eae9",
+        "bytes": 3842545
+      },
+      "root_ids": [
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/distillery/probe#distillery-model-probe@0.0.1"
+      ],
+      "default_root_ids": [
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/distillery/probe#distillery-model-probe@0.0.1"
+      ],
+      "root_count": 1,
+      "reachable_union": 803,
+      "inventory_count": 803,
+      "unused_inventory_count": 0,
+      "all_root_results_pass": true,
+      "platform": "unfiltered all-target conservative superset"
+    },
+    {
+      "metadata": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/distillery-probe-metadata-wasm-r3.stdout",
+        "sha256": "cca6fb8acd3038b7054b2d84d429569b70bf67aa460c1bac529bc287c11457c0",
+        "bytes": 2851168
+      },
+      "root_ids": [
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/distillery/probe#distillery-model-probe@0.0.1"
+      ],
+      "default_root_ids": [
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/ports/distillery/probe#distillery-model-probe@0.0.1"
+      ],
+      "root_count": 1,
+      "reachable_union": 613,
+      "inventory_count": 613,
+      "unused_inventory_count": 0,
+      "all_root_results_pass": true,
+      "platform": "wasm32-unknown-unknown"
+    },
+    {
+      "metadata": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/genet-web-smoke-metadata-admit-r3.stdout",
+        "sha256": "7eb29cc6755e9cf0dee5bc780e71b544d9963f1c264188124fbef49d19f7f904",
+        "bytes": 1568627
+      },
+      "root_ids": [
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/examples/genet_web_smoke#genet-web-smoke@0.1.0"
+      ],
+      "default_root_ids": [
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/examples/genet_web_smoke#genet-web-smoke@0.1.0"
+      ],
+      "root_count": 1,
+      "reachable_union": 341,
+      "inventory_count": 341,
+      "unused_inventory_count": 0,
+      "all_root_results_pass": true,
+      "platform": "unfiltered all-target conservative superset"
+    },
+    {
+      "metadata": {
+        "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/genet-web-smoke-metadata-wasm-r3.stdout",
+        "sha256": "88a3fdcd03421101f34bf0d0def861f0bb091419c8ce63c18e0211f3e17bab8b",
+        "bytes": 1219642
+      },
+      "root_ids": [
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/examples/genet_web_smoke#genet-web-smoke@0.1.0"
+      ],
+      "default_root_ids": [
+        "path+file:///Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/examples/genet_web_smoke#genet-web-smoke@0.1.0"
+      ],
+      "root_count": 1,
+      "reachable_union": 272,
+      "inventory_count": 272,
+      "unused_inventory_count": 0,
+      "all_root_results_pass": true,
+      "platform": "wasm32-unknown-unknown"
+    }
+  ],
+  "supplier_identity_conclusions": {
+    "critical_types_unique_in_each_connected_imported_cone": true,
+    "all_selected_genet_git_sources_at561": true,
+    "no_private_path_supplier_override": true,
+    "root_mere_www_bridge_packages": [
+      "fleece",
+      "layout-dom-api"
+    ],
+    "www_bridge_commit": "5618326d287e7f7ef0c1cc3545587d64cedb22a7",
+    "embedded_knot_revision": "8ed49d43f049921d56ab5a0c091a2c37c0970ee7",
+    "embedded_knot_normal_fleece_edge_resolved_at561": true,
+    "standalone_knot_dev_tests_qualified": false,
+    "registry_taffy": "Graphshell mere-forme only; actual Livery/Buckram select genet-taffy0.14 at561"
+  },
+  "resource_closure": {
+    "all13_direct_children_zero_exit_reaped": true,
+    "all_owned_groups_gone": true,
+    "fresh_ps_matching_pid_or_pgid_rows": [],
+    "cache_locks": [
+      {
+        "path": "/Users/markik/.cargo/.package-cache",
+        "exists": true,
+        "free": true
+      },
+      {
+        "path": "/Users/markik/.cargo/.package-cache-mutate",
+        "exists": true,
+        "free": true
+      },
+      {
+        "path": "/Users/markik/Code/targets/mere-s2s3/debug/.cargo-lock",
+        "exists": true,
+        "free": true
+      },
+      {
+        "path": "/Users/markik/Code/targets/mere-s2s3/release/.cargo-lock",
+        "exists": true,
+        "free": true
+      },
+      {
+        "path": "/Users/markik/Code/targets/mere-s2s3/wasm32-unknown-unknown/debug/.cargo-lock",
+        "exists": true,
+        "free": true
+      },
+      {
+        "path": "/Users/markik/Code/targets/mere-s2s3/build/.cargo-lock",
+        "exists": false
+      }
+    ],
+    "free_disk_bytes": 47063015424,
+    "lease_return_notification_to_root": true,
+    "journal_mutation_by_agent": false,
+    "scope": "normal successful CPU command closure; no general interruption or historical descendant completeness claim"
+  },
+  "preserved_historical_negative": {
+    "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/completion.json",
+    "sha256": "b6316dee892e5572d1241787c2635be4a98799285700354e0a7cc074d94faaac",
+    "bytes": 1601
+  },
+  "claims": {
+    "all_eight_metadata_commands_passed": true,
+    "four_named_cpu_tests_one_each_passed": true,
+    "shared_recovery_wasm_compile_check_passed": true,
+    "all_workspace_compiled": false,
+    "new_gpu_runtime": false,
+    "new_browser_runtime": false,
+    "new_native_presentation": false,
+    "browser_current_frame_async_quality_qualified": false,
+    "browser_current_frame_async_error_scopes_qualified": false,
+    "final_visible_canvas_scopes_qualified": false,
+    "physical_driver_reset_qualified": false,
+    "os_assistive_technology_qualified": false,
+    "normal_successful_cpu_resource_closure_only": true
+  },
+  "historical_runtime_receipts": {
+    "browser_r6": "../browser-r6/qualification.json",
+    "browser_r6_exact_source_scope": "G561/M4682/Nc74/P2eae with candidate-local supplier mapping; current Git-only check is CPU/compile evidence only",
+    "native_shared_r2": "../native-shared-r2/qualification.json",
+    "native_shared_r2_exact_source_scope": "Mcc65 binary, candidate0570, G09b/Nc74/P2eae; does not qualify G561/M4682 font changes",
+    "fixture_font_scope": "Roboto4generic-role byte delivery/retention only; not production role/style/script fidelity"
+  }
+}
