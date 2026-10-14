@@ -560,6 +560,10 @@ where
                 on_request.clone(),
                 vec![
                     ("data-step", step.token().into()),
+                    (
+                        "data-session-step",
+                        format!("{}:{}", step.token(), session.id.as_uuid()),
+                    ),
                     ("aria-label", format!("{} {}", step.label(), session.name)),
                 ],
             )
