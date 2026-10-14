@@ -51,8 +51,8 @@ pub mod producer;
 pub use producer::{
     PortableCaptureError, PortablePaintCapture, PortableProducerError, ProducedAction,
     ProducedScene, ProducedTexture, ProducerAction, ProducerContext, ProducerError,
-    ProducerFrameInfo, ProducerFrameStats, ProducerImageIdentity, ProducerNode,
-    ProducerRegistrationError, ProducerRegistry, ProducerRenderFailure, ProducerRole,
+    ProducerFrameInfo, ProducerFramePurpose, ProducerFrameStats, ProducerImageIdentity,
+    ProducerNode, ProducerRegistrationError, ProducerRegistry, ProducerRenderFailure, ProducerRole,
     ProducerSemantics, ProducerSource, ResolvedAppearance, SourceAlpha, SourceEncoding,
     TextureProducer,
 };

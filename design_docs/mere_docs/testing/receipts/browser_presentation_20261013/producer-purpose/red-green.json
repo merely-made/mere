@@ -1,0 +1,73 @@
+{
+  "scope": "Producer invocation purpose; shared preparation and viewer qualification pending",
+  "runs": [
+    {
+      "label": "producer-purpose-red-1",
+      "command": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "cambium-rootstock",
+        "-j1",
+        "portable_presentation_advances_once",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 101,
+      "source_unchanged": true,
+      "resource_status": "complete",
+      "kernel_memory_peak_bytes": 1375240192,
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e1540f67978133737c441089c6acdbe9f2ed34ea6ce11e66b938b737c10e62f8",
+      "summaries": []
+    },
+    {
+      "label": "producer-purpose-green-1",
+      "command": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "cambium-rootstock",
+        "-j1",
+        "portable_presentation_advances_once",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "source_unchanged": true,
+      "resource_status": "complete",
+      "kernel_memory_peak_bytes": 876265472,
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "stdout_sha256": "e92904ccf22e5db4a5c947f37a74641cfd85df9fdb983f4638f4c688f708967d",
+      "stderr_sha256": "f58c02a0868dca3a129abbdc45b45d333a24f400979d033ce780c21da806bd92",
+      "summaries": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 84 filtered out; finished in 0.04s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.00s"
+      ]
+    }
+  ]
+}

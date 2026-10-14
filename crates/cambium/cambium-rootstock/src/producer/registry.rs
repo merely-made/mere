@@ -351,6 +351,7 @@ impl ProducerRegistry {
             entry.active = true;
             entry.logical_size = logical_size;
             let frame = ProducerFrameInfo {
+                purpose: ProducerFramePurpose::Presentation,
                 logical_size,
                 timestamp: self.timestamp,
                 physical_size: size,
@@ -557,6 +558,7 @@ mod checked_refusal_tests {
         let portable = entry
             .producer
             .portable_scene(&ProducerFrameInfo {
+                purpose: ProducerFramePurpose::Export,
                 logical_size: (12.0, 9.0),
                 physical_size: [12, 9],
                 layout_scale: 1.0,
