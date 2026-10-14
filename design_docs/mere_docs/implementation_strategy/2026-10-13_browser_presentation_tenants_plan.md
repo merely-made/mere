@@ -2,7 +2,7 @@
 
 > **For agentic workers:** Use superpowers:executing-plans for inline execution or superpowers:subagent-driven-development if the owner selects delegation. Complete each task's checks before moving to the next.
 
-**Status:** plan for owner review, 2026-10-13. The written design is approved. Product implementation has not started.
+**Status:** in progress, 2026-10-13. The owner approved the written design and selected inline execution. Task 1 baseline qualification is active; product implementation has not started.
 
 **Goal:** Run Graphshell's viewer through the shared Cambium host on direct WebGL2 when WebGPU is unavailable, including content updates, resize, recovery, capture, input and accessibility.
 
@@ -262,3 +262,5 @@ presentation stamp contains the generation added in Task 2.
 ## Progress
 
 - 2026-10-13: Design approved; owned Mere worktree created. Implementation plan drafted for owner review. No product edits or heavy builds launched. Worktree remains needed for the next execution stage; cleanup is required at integration/retirement.
+
+- 2026-10-13: Root locked offline metadata resolves. Standalone viewer lock required two source-identity additions after the supplier move: luggage at Mere fabfd10ef and mere-webrtc-carrier at Retinue b49df894; versions and transitive edges unchanged. Original refusal and delta are preserved in baseline-preparation receipts. Baseline compiler/browser gates await the shared heavy slot.
