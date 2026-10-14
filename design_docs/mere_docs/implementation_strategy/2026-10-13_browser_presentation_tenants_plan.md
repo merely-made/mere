@@ -2,7 +2,7 @@
 
 > **For agentic workers:** Use superpowers:executing-plans for inline execution or superpowers:subagent-driven-development if the owner selects delegation. Complete each task's checks before moving to the next.
 
-**Status:** in progress, 2026-10-13. The owner approved the written design and selected inline execution. Task 1 baseline qualification is active; product implementation has not started.
+**Status:** in progress, 2026-10-13. The owner approved the written design and selected inline execution. Shared preparation and presentation policy are implemented; supplier WebGL runtime qualification and browser host integration are active.
 
 **Goal:** Run Graphshell's viewer through the shared Cambium host on direct WebGL2 when WebGPU is unavailable, including content updates, resize, recovery, capture, input and accessibility.
 
@@ -274,3 +274,5 @@ presentation stamp contains the generation added in Task 2.
 
 - 2026-10-13: Shared preparation and the concrete graph producer extraction pass 299 native host/recovery/capture tests (zero failures, 11 existing ignores) and the standalone viewer's locked Wasm check. Portable ownership, alpha/encoding, rebind, retirement, suspension and no-double-step fixtures use real registry callbacks. WgpuPresentation keeps the existing typed raster/acquire causes; the host commits prepared identity only after presentation. Evidence: `testing/receipts/browser_presentation_20261013/frame-preparation/red-green.json`.
 - 2026-10-13: Frozen viewer Wasm build and matching bindgen packaging pass. The current Chrome/ANGLE Vulkan receipt cannot mount because WebGPU supplies no adapter; it times out without a successful frame. Its source-bound refusal is retained. The legacy Flatpak harness does not keep Chrome in the parent cgroup, so its RAM result is excluded; future tests will run the installed binary directly. Baseline gzip6 Wasm is 3,400,367 bytes against 3,407,872, leaving 7,505 bytes. Actual portable operation inventory and render comparisons move to the real adapter entry, with these qualification boundaries intact.
+
+- 2026-10-13: Installed-driver redraw forwarding passes its two new whole-host fixtures and 301 combined native tests, with zero failures. Rootstock rejects a driver stamp from another context and retains sequence across deferred/refused frames. The legacy surface path remains covered; concrete browser driver, owned capture and disposal work are still pending. Supplier standalone GL fixtures now pass Chrome AMD and Firefox, plus 28 CPU/Hybrid sparse regressions.

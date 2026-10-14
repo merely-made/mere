@@ -1,0 +1,161 @@
+{
+  "runs": [
+    {
+      "label": "presentation-driver-red-1",
+      "command": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "cambium-rootstock",
+        "--test",
+        "prepared_frame",
+        "-j1",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 101,
+      "source_unchanged": true,
+      "resource_status": "complete",
+      "kernel_memory_peak_bytes": 1746460672,
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "unit": "turnstone-overlap-2e81c424fef3457d95da6d5dd61fded8.service",
+      "stdout_sha256": "581d44a3f311325f207d4ce656f1ff6958f40fa74d8a10d05fd7043744ceda33",
+      "stderr_sha256": "9c765ff8cf232471910c5c05fab13a6f934702a4cda2827c109c1b26767d5825",
+      "summaries": [
+        "test result: FAILED. 2 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s"
+      ],
+      "unit_cleanup": [
+        "ActiveState=inactive",
+        "MainPID=0"
+      ]
+    },
+    {
+      "label": "presentation-driver-green-1",
+      "command": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "cambium-rootstock",
+        "--test",
+        "prepared_frame",
+        "-j1",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "source_unchanged": true,
+      "resource_status": "complete",
+      "kernel_memory_peak_bytes": 839974912,
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "unit": "turnstone-overlap-b94e6f61a46e490bbdc2dc0efac6e87a.service",
+      "stdout_sha256": "02058449b40ab4473c9639e3a66be1f535f7c9ddc5ad1fefbea4f6b9b94f75e7",
+      "stderr_sha256": "8a0b7533b42e271237a60648d56d3442a06e5cb4c8370e5a621afe943f0ab145",
+      "summaries": [
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s"
+      ],
+      "unit_cleanup": [
+        "ActiveState=inactive",
+        "MainPID=0"
+      ]
+    },
+    {
+      "label": "presentation-driver-regressions-1",
+      "command": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "cambium-rootstock",
+        "-p",
+        "mesquite",
+        "-p",
+        "cambium-genet-winit-host",
+        "-j1",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "source_unchanged": true,
+      "resource_status": "complete",
+      "kernel_memory_peak_bytes": 3593490432,
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "unit": "turnstone-overlap-fe0c373e79fc4ad4b192f243d62b09da.service",
+      "stdout_sha256": "bee1f418f371ad4df7a260ef7b38971a1d9567027e3940e0ccc0ae54d248377b",
+      "stderr_sha256": "d1bd5e5fc6db0fc2f9372c1f5801716d5759b84acf4025c7633554a44e348b0a",
+      "summaries": [
+        "test result: ok. 22 passed; 0 failed; 4 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.27s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s",
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s",
+        "test result: ok. 0 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.42s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s",
+        "test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.56s",
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s",
+        "test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.01s",
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.50s",
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.85s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s",
+        "test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.83s",
+        "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.42s",
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.46s",
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s",
+        "test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.49s",
+        "test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.77s",
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.50s",
+        "test result: ok. 86 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 6.57s",
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s",
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s",
+        "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 29 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s",
+        "test result: ok. 0 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ],
+      "unit_cleanup": [
+        "ActiveState=inactive",
+        "MainPID=0"
+      ]
+    }
+  ]
+}

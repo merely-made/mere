@@ -147,3 +147,156 @@ fn unsupported_leaf_refuses_with_its_key_and_does_not_repeat_a_stamp() {
     assert_eq!(host.s.presentation_sequence, 9);
     assert!(host.s.shared.producers.contains(7));
 }
+
+struct ObservedDriver {
+    calls: Rc<Cell<usize>>,
+    outcome: Rc<Cell<u8>>,
+}
+impl PresentationDriver for ObservedDriver {
+    fn backend(&self) -> PresentationBackend {
+        PresentationBackend::WebGl2
+    }
+    fn generation(&self) -> ContextGeneration {
+        ContextGeneration(17)
+    }
+    fn content_mode(&self) -> FrameContentMode {
+        FrameContentMode::PortableScene
+    }
+    fn wgpu_surface(&self) -> Option<&dyn Surface> {
+        None
+    }
+    fn resize(&mut self, _: u32, _: u32) -> Result<(), PresentationFailure> {
+        Ok(())
+    }
+    fn present(
+        &mut self,
+        frame: &PreparedFrame,
+    ) -> Result<Option<PresentedFrame>, PresentationFailure> {
+        self.calls.set(self.calls.get() + 1);
+        match self.outcome.get() {
+            0 => Ok(Some(frame.presentation_stamp())),
+            1 => Ok(None),
+            3 => {
+                let mut stamp = frame.presentation_stamp();
+                stamp.context_generation = ContextGeneration(16);
+                Ok(Some(stamp))
+            },
+            _ => Err(PresentationFailure {
+                backend: self.backend(),
+                generation: self.generation(),
+                producer_key: None,
+                message: "healthy provider refusal".into(),
+                native: None,
+            }),
+        }
+    }
+    fn lose(&mut self) {}
+    fn restore(&mut self) -> Result<bool, PresentationFailure> {
+        Ok(true)
+    }
+    fn begin_capture(
+        &mut self,
+        _: PresentedFrame,
+    ) -> Result<Box<dyn PendingPresentationCapture>, CaptureRefusal> {
+        unreachable!()
+    }
+    fn dispose(&mut self) {}
+}
+
+#[test]
+fn shared_redraw_observes_only_successful_driver_frames_and_refuses_failed_capture() {
+    let mut state = HostState::<(), Logic, Child>::new();
+    state.runner = Some(GenetAppRunner::new(
+        Rc::new(RefCell::new(ScriptedDom::new())),
+        view as Logic,
+        (),
+    ));
+    state.window = Some(Box::new(Window(Rc::new(Cell::new((320, 240))))));
+    let calls = Rc::new(Cell::new(0));
+    let outcome = Rc::new(Cell::new(0));
+    state.presentation_driver = Some(Box::new(ObservedDriver {
+        calls: calls.clone(),
+        outcome: outcome.clone(),
+    }));
+    let observed = Rc::new(Cell::new(0));
+    let counts = observed.clone();
+    state.pending_presentation_observer = Some(Box::new(move |_, stamp| {
+        assert_eq!(stamp.sequence, 1);
+        counts.set(counts.get() + 1);
+    }));
+    let wake = HostWake::new(state.wake_pending.clone(), Arc::new(|| {}));
+    let mut host = Host::new(
+        HostOptions::default(),
+        None,
+        HostHooks::inert(),
+        state,
+        wake,
+    );
+    host.redraw();
+    assert_eq!(calls.get(), 1);
+    assert_eq!(observed.get(), 1);
+    assert_eq!(host.s.last_redraw_presentation.unwrap().sequence, 1);
+    outcome.set(1);
+    host.redraw();
+    assert_eq!(calls.get(), 2);
+    assert!(host.s.last_redraw_presentation.is_none());
+    assert_eq!(host.s.presentation_sequence, 1);
+    let capture_refused = Rc::new(Cell::new(false));
+    let refusal = capture_refused.clone();
+    host.s.pending_paint_capture = Some(Box::new(move |result| {
+        assert!(matches!(
+            result,
+            Err(CaptureRefusal::PresentationError {
+                backend: PresentationBackend::WebGl2,
+                ..
+            })
+        ));
+        refusal.set(true);
+    }));
+    outcome.set(2);
+    host.redraw();
+    assert_eq!(calls.get(), 3);
+    assert!(capture_refused.get());
+    assert!(host.s.last_redraw_presentation.is_none());
+    assert_eq!(host.s.presentation_sequence, 1);
+    outcome.set(0);
+    host.redraw();
+    assert_eq!(host.s.last_redraw_presentation.unwrap().sequence, 2);
+    assert_eq!(
+        calls.get(),
+        4,
+        "ordinary provider errors retain the installed route"
+    );
+}
+
+#[test]
+fn driver_cannot_commit_a_stamp_from_another_context() {
+    let mut state = HostState::<(), Logic, Child>::new();
+    state.runner = Some(GenetAppRunner::new(
+        Rc::new(RefCell::new(ScriptedDom::new())),
+        view as Logic,
+        (),
+    ));
+    state.window = Some(Box::new(Window(Rc::new(Cell::new((320, 240))))));
+    let calls = Rc::new(Cell::new(0));
+    state.presentation_driver = Some(Box::new(ObservedDriver {
+        calls: calls.clone(),
+        outcome: Rc::new(Cell::new(3)),
+    }));
+    let observed = Rc::new(Cell::new(false));
+    let observation = observed.clone();
+    state.pending_presentation_observer = Some(Box::new(move |_, _| observation.set(true)));
+    let wake = HostWake::new(state.wake_pending.clone(), Arc::new(|| {}));
+    let mut host = Host::new(
+        HostOptions::default(),
+        None,
+        HostHooks::inert(),
+        state,
+        wake,
+    );
+    host.redraw();
+    assert_eq!(calls.get(), 1);
+    assert!(!observed.get());
+    assert!(host.s.last_redraw_presentation.is_none());
+    assert_eq!(host.s.presentation_sequence, 0);
+}
