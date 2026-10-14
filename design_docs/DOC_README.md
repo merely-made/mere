@@ -1,5 +1,7 @@
 # Mere Documentation Index
 
+Lane handoff (2026-10-14): the [branch reconciliation and handoff](2026-10-14_mere_lane_handoff.md) records what landed (three-lanes spec and Graphshell repairs, C1 resident divination), the archive tags, and two open continuations: WebGL presentation integration on the ThinkPad and the resident-host port on O-PC, with its session prompt.
+
 Browser presentation tenant design (2026-10-13): the [family composition continuation](2026-08-12_family_composition_thesis_brief.md#browser-webgl2-presentation-tenants-design-2026-10-13) specifies host-owned WebGPU/WebGL2 contexts, renderer/content tenants, resource generations and recovery, with Graphshell's viewer as the first consumer. Written-design review and implementation planning remain pending; the recorded AMD browser probe is lifecycle feasibility only.
 
 Radio-to-Comms integration (2026-10-13): `murm/design_docs/2026-10-13_murm_family_move_plan.md` section R1 owns the Signalman LXMF path. The portable Comms seam names LXMF, Meshtastic and MeshCore and exposes delivery observations without making carrier acceptance a recipient or read receipt. Application journals and station authority keep their existing owners.
