@@ -289,6 +289,13 @@ rules scoped to `.68`/`.58`, and the existing reversible shell correction.
 Parsing and unelevated refusal passed. Native UAC was canceled; neither new
 peer rule is installed, and reopening is pending owner choice.
 
+q-pc subsequently reached its normal idle lock in the same resident PID.
+With its normal configured agent (not the agent-disabled control), a new SSH
+login to Surface was denied with exit 255. Its public-only file could not
+supply a fallback private key. This qualifies idle-Locked denial following
+the successful unlocked reads. Custody is left Locked while native Windows
+enrollment is pending; the later Windows probe will require native unlock.
+
 The owner also reported ThinkPad's O-PC client error. Raw SSH still passes;
 the native client authenticates, then its POSIX shell probe loses its quoting
 through the Scoop Git launcher under Windows' default `cmd`. A local probe
