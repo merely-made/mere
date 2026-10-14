@@ -17,7 +17,7 @@ where
     V: RootView<State>,
     T: HostTree<State>,
 {
-    fn refuse_pending_captures(&mut self, refusal: CaptureRefusal) {
+    pub(crate) fn refuse_pending_captures(&mut self, refusal: CaptureRefusal) {
         if let Some(capture) = self.s.pending_capture.take() {
             capture(Err(refusal.clone()));
         }
@@ -28,6 +28,29 @@ where
             capture(Err(refusal));
         }
         self.s.pending_presentation_observer = None;
+    }
+    pub(crate) fn refuse_presentation(&mut self, failure: crate::PresentationFailure) {
+        match failure.native {
+            Some(crate::NativePresentationFailure::Rasterize(cause)) => {
+                self.refuse_rasterization(cause, failure.producer_key)
+            },
+            Some(crate::NativePresentationFailure::DeviceLost(_)) => {
+                self.poll_device_recovery();
+            },
+            Some(crate::NativePresentationFailure::SurfaceLost) => {
+                self.s.surface = None;
+                self.s.needs_recovery_surface = true;
+                if let Some(window) = &self.s.window {
+                    window.request_redraw();
+                }
+            },
+            None => self.refuse_pending_captures(CaptureRefusal::PresentationError {
+                backend: failure.backend,
+                generation: failure.generation,
+                source_key: failure.producer_key,
+                error: failure.message,
+            }),
+        }
     }
     /// Refuse the current frame explicitly. Only an actual installed loss
     /// notice enters recovery; healthy provider refusal preserves this core.

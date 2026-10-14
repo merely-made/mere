@@ -54,6 +54,12 @@ pub type Runner<State, Logic, V> = GenetAppRunner<State, Logic, V, ()>;
 /// rasterized view is still alive (scenario screenshots).
 #[derive(Clone, Debug)]
 pub enum CaptureRefusal {
+    PresentationError {
+        backend: crate::PresentationBackend,
+        generation: crate::ContextGeneration,
+        source_key: Option<u64>,
+        error: String,
+    },
     ContextLost {
         backend: crate::PresentationBackend,
         generation: crate::ContextGeneration,
@@ -1055,6 +1061,8 @@ where
     /// The presentation surface behind the neutral seam. A browser event
     /// source supplies the same pair against a canvas.
     pub surface: Option<Box<dyn Surface>>,
+    /// A browser presenter with optional same-device services.
+    pub presentation_driver: Option<Box<dyn crate::PresentationDriver>>,
     pub recovery_status: Option<genet_render_host::RecoveryStatus>,
     /// Current checked raster refusal; cleared at the next redraw admission.
     pub last_raster_failure: Option<genet_render_host::RasterizeFailure>,
@@ -1187,6 +1195,7 @@ where
             titlebar_published: None,
             titlebar_sheet: String::new(),
             surface: None,
+            presentation_driver: None,
             recovery_status: None,
             last_raster_failure: None,
             recovery_subscription: None,

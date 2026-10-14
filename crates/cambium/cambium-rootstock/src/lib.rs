@@ -42,8 +42,9 @@ mod files;
 pub use files::{FileAnswer, FileChooser};
 mod presentation;
 pub use presentation::{
-    ContextGeneration, PresentationBackend, PresentationChoice, PresentationLifetime,
-    PresentationState, backend_attempts,
+    ContextGeneration, FrameContentMode, NativePresentationFailure, PendingPresentationCapture,
+    PreparedFrame, PreparedPaint, PresentationBackend, PresentationChoice, PresentationDriver,
+    PresentationFailure, PresentationLifetime, PresentationState, backend_attempts,
 };
 mod owned_layout;
 pub use owned_layout::{OwnedLayout, ScrollAlign, ScrollTarget};

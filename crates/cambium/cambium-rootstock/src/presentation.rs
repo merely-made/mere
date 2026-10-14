@@ -101,3 +101,8 @@ pub const fn backend_attempts(choice: PresentationChoice) -> &'static [Presentat
         PresentationChoice::WebGl2 => &[PresentationBackend::WebGl2],
     }
 }
+
+mod frame;
+pub use frame::*;
+mod prepare;
+pub(crate) mod wgpu;
