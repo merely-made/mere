@@ -225,6 +225,41 @@ and grants were preserved. These partial results are added to the existing
 [`client-mesh.json`](../testing/receipts/djinn-ssh-peers/client-mesh.json) receipt;
 neither Mac rollout nor daemon reboot persistence is closed.
 
+**2026-10-13: q-pc identified and incoming access qualified.** q-pc is the
+saved Intel host: its Ed25519 key matches the old `192.168.4.105` trust entry,
+while its current address is `192.168.4.68` (`Q-PC.local`, iMacPro1,1, macOS
+15.8.1). The existing `imac-intel` alias now uses that address directly; its
+obsolete M4 jump was removed. Matching bundled Codex CLI exposure and managed
+daemon bootstrap passed. O-PC, M4 and ThinkPad each read q-pc's existing
+`Review Murm P2P Integrations` chat without resuming it. The owner confirmed
+ThinkPad's newly registered `imac-intel` entry Connected. M4/ThinkPad SSH
+execution now passes in both directions. Surface's M4 login passed after
+native unlock, then its agent became idle-locked again and denied q-pc login.
+
+q-pc had no outbound SSH identity. Djinn compiled from its clean primary Mere
+`9f3361be`, unchanged before and after, with one job and a 4 GiB owned-process
+RSS guard; peak was 1,477,734,400 bytes, with no guard failure. Two existing
+Cargo processes in another worktree were preserved. The initial selection of
+the external `personae-vault` package was corrected to Djinn-only; its failure
+is retained in the log. The installed, stripped binary and launchd unit have
+recorded hashes. Its native first-vault dialog is waiting for the owner; key
+generation and outbound qualification remain pending. Existing ChatGPT PID
+`44604` and empty OpenSSH agent PID `95140` are preserved. The task-owned stable
+target is retained while native qualification and possible repairs remain.
+See [`q-pc-djinn-build.json`](../testing/receipts/djinn-ssh-peers/q-pc-djinn-build.json),
+[`q-pc-djinn-build.log`](../testing/receipts/djinn-ssh-peers/q-pc-djinn-build.log),
+and [`q-pc-djinn-install.json`](../testing/receipts/djinn-ssh-peers/q-pc-djinn-install.json).
+
+The owner also reported ThinkPad's O-PC client error. Raw SSH still passes;
+the native client authenticates, then its POSIX shell probe loses its quoting
+through the Scoop Git launcher under Windows' default `cmd`. A local probe
+using the real Git Bash executable passes and locates the running Codex daemon.
+The prepared SSH-shell script saves original registry values and kinds,
+supports restoration, refuses concurrent changes, and needs no sshd restart.
+Parsing and unelevated refusal passed. Its native administrator step and
+actual native-client reconnection are still pending. This distinction is
+recorded in the existing client mesh receipt.
+
 **Related**:
 
 - [reachability rungs and privacy lanes plan](2026-08-03_reachability_rungs_and_privacy_lanes_plan.md):
