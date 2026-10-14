@@ -20,10 +20,10 @@ use paint_list_api::{
     ColorF, CommonPlacement, DeviceIntSize, LayoutPoint, LayoutRect, LayoutSize, PaintCmd, RectItem,
 };
 
-mod interaction;
-mod producer;
 #[cfg(test)]
 mod hidden_panel_tests;
+mod interaction;
+mod producer;
 #[cfg(test)]
 mod tests;
 #[cfg(test)]
@@ -65,6 +65,7 @@ pub struct OwnedLayout {
     styles: StylePlane<NodeId>,
     fragments: LiveryLayout<NodeId>,
     text: TextSystem,
+    font_registration_errors: Vec<genet_livery::GenericFontError>,
     viewport: (f32, f32),
     viewport_scroll: (f32, f32),
     element_scroll: HashMap<NodeId, (f32, f32)>,
@@ -103,7 +104,7 @@ impl OwnedLayout {
         let resolved_styles = resolve_styles(dom, &style_set, &device, &interactions);
         let style_resolve_us = elapsed_us(phase.elapsed());
         let mut text = TextSystem::new();
-        register_fonts(&mut text, fonts);
+        let font_registration_errors = register_fonts(&mut text, fonts);
         let phase = crate::Instant::now();
         let (styles, fragments) = layout_with_text_system(
             dom,
@@ -130,6 +131,7 @@ impl OwnedLayout {
             styles,
             fragments,
             text,
+            font_registration_errors,
             viewport: (width, height),
             viewport_scroll: (0.0, 0.0),
             element_scroll: HashMap::new(),
@@ -216,6 +218,11 @@ impl OwnedLayout {
     /// observable end of the host font seam.
     pub fn retained_font_count(&self) -> usize {
         self.text.retained_font_count()
+    }
+
+    /// Typed refusals from explicit generic resource registration.
+    pub fn font_registration_errors(&self) -> &[genet_livery::GenericFontError] {
+        &self.font_registration_errors
     }
 
     pub(crate) fn has_active_animations(&self) -> bool {
@@ -1163,9 +1170,23 @@ fn clip_text_rect(
 /// Register the host's faces into a freshly built text system. Every
 /// construction site calls this, so a face survives any relayout that rebuilds
 /// the session.
-fn register_fonts(text: &mut TextSystem, fonts: &[crate::HostFont]) {
+fn register_fonts(
+    text: &mut TextSystem,
+    fonts: &[crate::HostFont],
+) -> Vec<genet_livery::GenericFontError> {
+    let mut errors = Vec::new();
     for font in fonts {
         match font.family.as_deref() {
+            Some(generic @ ("sans-serif" | "serif" | "monospace" | "system-ui")) => {
+                match text.register_generic_font_bytes(font.bytes.clone(), generic) {
+                    Ok(_) => {
+                        // Preserve the prior quoted named-family alias as well.
+                        let normal = "normal".parse().expect("`normal` font-feature-settings");
+                        text.register_font_face_bytes(font.bytes.clone(), generic, &normal);
+                    },
+                    Err(error) => errors.push(error),
+                }
+            },
             // `@font-face` semantics: the sheet's family name wins over the one
             // the face's own name table declares. The feature-settings value
             // comes through its parser because its CSS type lives in `livery`,
@@ -1177,6 +1198,7 @@ fn register_fonts(text: &mut TextSystem, fonts: &[crate::HostFont]) {
             None => text.register_font_bytes(font.bytes.clone()),
         }
     }
+    errors
 }
 
 fn text_rect_command(rect: genet_livery::TextRect, color: ColorF) -> PaintCmd {

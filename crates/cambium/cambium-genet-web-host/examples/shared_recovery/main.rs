@@ -231,12 +231,32 @@ fn valid(frame: &Frame) -> Result<(), String> {
     }
     Ok(())
 }
+fn generic_fonts() -> Vec<(String, Vec<u8>)> {
+    // Fixture-owned explicit bindings, never a global/system fallback. The
+    // bundled face is intentionally selected for all four requested roles;
+    // this gate does not claim serif or fixed-width typography fidelity.
+    let bytes = include_bytes!("../../../examples/genet_web_smoke/assets/Roboto-Regular.ttf");
+    ["sans-serif", "system-ui", "serif", "monospace"]
+        .into_iter()
+        .map(|name| (name.into(), bytes.to_vec()))
+        .collect()
+}
 fn state(name: &str, mode: Mode) -> Result<WorkshopState, String> {
     let mut state = WorkshopState::in_memory();
     let mut theme = state.draft_theme().clone();
     theme.name = name.into();
     theme.seeds.primary.r = 94;
     state.edit_definition(&theme, Some(mode))?;
+    state
+        .reader_preview()
+        .borrow_mut()
+        .set_generic_fonts(generic_fonts())
+        .map_err(|e| format!("reader font ledger: {e:?}"))?;
+    state
+        .stylesheet_preview()
+        .borrow_mut()
+        .set_generic_fonts(generic_fonts())
+        .map_err(|e| format!("stylesheet font ledger: {e:?}"))?;
     Ok(state)
 }
 fn hooks() -> HostHooks<WorkshopState, Logic, WorkshopView> {
@@ -403,8 +423,27 @@ fn presentation(p: PresentedFrame) -> Value {
 fn image_json(key: u64, image: ProducerImageIdentity) -> Value {
     json!({"local_key":key.to_string(),"renderer_key":image.renderer_key.to_string(),"generation":image.generation,"stamp":image.stamp,"size":image.size})
 }
+fn font_scene_receipt(scene: &Scene) -> Result<Value, String> {
+    let glyphs: usize = scene
+        .ops
+        .iter()
+        .filter_map(|op| match op {
+            netrender::SceneOp::GlyphRun(run) => Some(run.glyphs.len()),
+            _ => None,
+        })
+        .sum();
+    let fonts: Vec<_> = scene.fonts.iter().filter(|font| !font.data.as_ref().is_empty())
+        .map(|font| json!({"bytes":font.data.as_ref().len(),"sha256":format!("{:x}",Sha256::digest(font.data.as_ref()))})).collect();
+    if glyphs == 0 || fonts.is_empty() {
+        return Err("actual retained producer contains no shaped glyphs/font resources".into());
+    }
+    Ok(json!({"glyphs":glyphs,"fonts":fonts}))
+}
 fn seal(ctx: &Context<'_>, p: PresentedFrame) -> Result<Value, String> {
     let state = ctx.runner.state();
+    if ctx.retained_font_count() == 0 || ctx.font_registration_error_count() != 0 {
+        return Err("actual outer Workshop font registration/shaping missing or refused".into());
+    }
     let mut images = Vec::new();
     for key in KEYS {
         if ctx.producers.error(key).is_some() {
@@ -417,8 +456,31 @@ fn seal(ctx: &Context<'_>, p: PresentedFrame) -> Result<Value, String> {
                 .ok_or("both full Workshop previews must be staged")?,
         ));
     }
+    let reader_size = ctx
+        .producers
+        .image_identity(READER_LEAF_KEY)
+        .ok_or("reader font extent")?
+        .size;
+    let stylesheet_size = ctx
+        .producers
+        .image_identity(STYLESHEET_LEAF_KEY)
+        .ok_or("stylesheet font extent")?
+        .size;
+    let reader_fonts = font_scene_receipt(
+        &state
+            .reader_preview()
+            .borrow_mut()
+            .frame(reader_size[0], reader_size[1]),
+    )?;
+    let stylesheet_fonts = font_scene_receipt(
+        &state
+            .stylesheet_preview()
+            .borrow_mut()
+            .frame(stylesheet_size[0], stylesheet_size[1]),
+    )?;
     Ok(
-        json!({"authority":{"theme":state.draft_theme(),"mode":state.mode_key(),"dirty":state.is_dirty(),"status":state.status(),
+        json!({"font_resources":{"outer_materialized_fonts":ctx.retained_font_count(),"outer_registration_errors":ctx.font_registration_error_count(),"reader":reader_fonts,"stylesheet":stylesheet_fonts},
+        "authority":{"theme":state.draft_theme(),"mode":state.mode_key(),"dirty":state.is_dirty(),"status":state.status(),
         "focus":format!("{:?}",ctx.runner.focus()),"zoom":ctx.ui_zoom,"graph_selected":state.selected_graph_node(),
         "name_text":state.text_field("name").map(|f|f.text()),"name_selection":format!("{:?}",state.text_field("name").map(|f|f.caret_selection()))},
         "runner":format!("{:p}",ctx.runner),"reader_source":format!("{:p}",Rc::as_ptr(&state.reader_preview())),
@@ -845,13 +907,13 @@ async fn execute(first_id: &str, second_id: &str, run: &str) -> Result<Value, St
                 state,
                 logic: Box::new(workshop_view) as Logic,
                 sheet: workshop_stylesheet(),
-                fonts: vec![HostFont {
-                    family: Some("sans-serif".into()),
-                    bytes: include_bytes!(
-                        "../../../examples/genet_web_smoke/assets/Roboto-Regular.ttf"
-                    )
-                    .to_vec(),
-                }],
+                fonts: generic_fonts()
+                    .into_iter()
+                    .map(|(family, bytes)| HostFont {
+                        family: Some(family),
+                        bytes,
+                    })
+                    .collect(),
                 images: Vec::new(),
             },
             hooks(),

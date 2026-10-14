@@ -780,6 +780,16 @@ where
     Logic: FnMut(&State) -> V,
     V: RootView<State>,
 {
+    /// Materialized font instances and explicit generic registration refusals
+    /// from the actual retained host layout, suitable for source-bound receipts.
+    pub fn retained_font_count(&self) -> usize {
+        self.layout.map_or(0, |layout| layout.retained_font_count())
+    }
+    pub fn font_registration_error_count(&self) -> usize {
+        self.layout
+            .map_or(0, |layout| layout.font_registration_errors().len())
+    }
+
     /// Where a retained DOM node actually paints, in the logical coordinate
     /// space used by [`HostPointer`]: `(x, y, width, height)`.
     ///
@@ -948,6 +958,9 @@ pub struct Init<State, Logic> {
 /// `family` pins the face to a CSS family name, the way `@font-face` does, so
 /// a sheet can name `'IBM Plex Sans'` without the face declaring it. `None`
 /// registers the face under whatever family its own name table carries.
+/// `sans-serif`, `serif`, `monospace`, and `system-ui` explicitly bind the
+/// corresponding CSS generic to this face in addition to retaining the quoted
+/// named-family alias. No global/system fallback is installed.
 #[derive(Clone, Debug)]
 pub struct HostFont {
     pub family: Option<String>,
