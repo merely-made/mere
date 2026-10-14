@@ -375,7 +375,11 @@ where
                         .set_attribute("data-redraw-attempts", &attempts.to_string());
                     let _ = window.canvas().set_attribute(
                         "data-last-presentation-failure",
-                        &format!("{:?}", host.s.last_raster_failure),
+                        &host
+                            .s
+                            .last_presentation_failure
+                            .as_ref()
+                            .map_or_else(|| "None".to_owned(), ToString::to_string),
                     );
                     let _ = window.canvas().set_attribute(
                         "data-last-producer-profile",

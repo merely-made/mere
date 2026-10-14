@@ -8,7 +8,7 @@ use cambium_genet_web_host::{
     Mounted, mount, mount_with_webgpu_factory, run_static_constructors_once,
 };
 use cambium_rootstock::{
-    HostFont, HostHooks, HostOptions, Init, PresentationBackend, PresentationChoice,
+    HostFont, HostHooks, HostImage, HostOptions, Init, PresentationBackend, PresentationChoice,
 };
 use page::{Child, Page};
 use std::{
@@ -17,6 +17,47 @@ use std::{
 };
 use wasm_bindgen::prelude::*;
 type Logic = fn(&Page) -> Child;
+thread_local! { static IMAGE_VISIBLE: Cell<bool> = const { Cell::new(false) }; }
+fn fixture_page(state: &Page) -> Child {
+    if IMAGE_VISIBLE.with(Cell::get) {
+        Box::new(cambium::el(
+            "div",
+            (
+                page::page(state),
+                cambium::el("img", ())
+                    .attr("src", "fixture://owned-image")
+                    .attr("style", "width:32px;height:16px;"),
+            ),
+        ))
+    } else {
+        page::page(state)
+    }
+}
+#[wasm_bindgen]
+pub async fn mount_image_page(canvas_id: String) -> Result<u32, JsValue> {
+    IMAGE_VISIBLE.with(|visible| visible.set(true));
+    mount_page(canvas_id, "webgl2".into()).await
+}
+#[wasm_bindgen]
+pub fn update_image(id: u32, phase: u32) {
+    IMAGE_VISIBLE.with(|visible| visible.set(phase != 2));
+    MOUNTS.with(|mounts| {
+        let mounts = mounts.borrow();
+        let mounted = &mounts[id as usize];
+        let mut host = mounted.host().borrow_mut();
+        if phase == 2 {
+            host.s.shared.images.remove("fixture://owned-image");
+        } else {
+            host.s.shared.images.insert(
+                "fixture://owned-image".into(),
+                include_bytes!("blue.png").to_vec(),
+            );
+        }
+        host.s.layout = None;
+        cambium_rootstock::HostWindow::request_redraw(mounted.window());
+    });
+}
+
 thread_local! { static MOUNTS: RefCell<Vec<Mounted<Page,Logic,Child>>> = const { RefCell::new(Vec::new()) }; }
 #[wasm_bindgen(start)]
 pub fn start() {
@@ -49,7 +90,7 @@ pub async fn mount_page(canvas_id: String, choice: String) -> Result<u32, JsValu
         count.set(count.get() + 1);
         Init {
             state: Page::default(),
-            logic: page::page as Logic,
+            logic: fixture_page as Logic,
             sheet: page::SHEET.into(),
             fonts: vec![HostFont {
                 family: None,
@@ -58,7 +99,14 @@ pub async fn mount_page(canvas_id: String, choice: String) -> Result<u32, JsValu
                 )
                 .to_vec(),
             }],
-            images: vec![],
+            images: if IMAGE_VISIBLE.with(Cell::get) {
+                vec![HostImage {
+                    url: "fixture://owned-image".into(),
+                    bytes: include_bytes!("red.png").to_vec(),
+                }]
+            } else {
+                vec![]
+            },
         }
     };
     let mounted = if choice.ends_with("-reject") {
