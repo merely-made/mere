@@ -234,6 +234,7 @@ eidetic.workspace = true
 graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync", "mere-route"] }
 graphshell-endpoint.workspace = true
 kernel.workspace = true
+pollster = "0.4"
 mere-view.workspace = true
 p2panda-core = "0.7.0"
 # The Knot residue test's baselines (iroh alone, p2panda-net alone), built as
