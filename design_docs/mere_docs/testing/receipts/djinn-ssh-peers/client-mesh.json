@@ -1,7 +1,7 @@
 {
   "schema": "codex.client-mesh/qualification-v1",
-  "observed_at": "2026-10-14T02:21:12Z",
-  "status": "q-pc incoming chat access qualified; outbound Djinn vault creation and Windows SSH-shell repair pending native owner steps",
+  "observed_at": "2026-10-14T17:10:02Z",
+  "status": "q-pc Djinn ready; outgoing chat reads passed on Surface, ThinkPad and M4; Windows elevation and M4 account choice pending",
   "clients": {
     "o-pc": {
       "registered": [
@@ -37,17 +37,20 @@
     "imac-m4": {
       "ssh_alias": "imac-m4",
       "local_hostname": "m4-imac.local",
-      "address": "192.168.4.42",
+      "address": "192.168.4.58",
       "registered": [
         "o-pc",
         "s-pc",
         "thinkpad-l14-f"
       ],
       "auto_connect": true,
-      "identity_agent": "existing personae-agent at /Users/markik/.local/share/personae/vault/agent.sock; PID 1248 preserved",
+      "identity_agent": "legacy personae-agent endpoint now refuses connection; no process was restarted",
       "identity_file": "public-only ~/.ssh/id_ed25519.pub",
       "activation": "peer aliases registered through native deep links; auto-connect now enabled in live state",
-      "desktop_app_pid_preserved": 69566
+      "previous_desktop_app_pid_preserved": 69566,
+      "ssh_user_uid": 502,
+      "current_desktop_account": "mayolaboykin",
+      "account_choice": "pending; keep markik or use current desktop account"
     },
     "imac-intel": {
       "hostname": "Q-PC.local",
@@ -63,9 +66,9 @@
         "imac-m4"
       ],
       "auto_connect": true,
-      "identity_agent": "new Djinn agent endpoint configured; native vault creation waiting",
+      "identity_agent": "Djinn PID 54928 ready after native unlock; custody-generated Ed25519 identity",
       "agent_endpoint": "/Users/markik/Library/Application Support/djinn/agent.sock",
-      "identity_file": "public-only ~/.ssh/djinn-mesh.pub, to be written after custody generation",
+      "identity_file": "public-only ~/.ssh/djinn-mesh.pub",
       "existing_chatgpt_pid_preserved": 44604,
       "existing_openssh_agent_pid_preserved": 95140
     }
@@ -101,17 +104,20 @@
     "thinkpad-l14-f -> o-pc": "SSH hostname still passed; native client bootstrap fails at POSIX shell probe under Windows cmd default; repair prepared",
     "imac-m4": "reachable at updated LAN address; partial mesh qualification as above",
     "imac-intel": "reachable; same trusted Ed25519 host identity as prior imac-intel at 192.168.4.105",
-    "o-pc -> imac-m4": "SSH and native app read_thread passed for Assess REDox for the stack; client logs report Connected",
+    "o-pc -> imac-m4": "previous SSH/native app read qualified; current strict-trust SSH login passed after updating address to .58",
     "imac-m4 -> s-pc": "agent-held SSH hostname and app-server thread/read passed for 01a132b0-fcf6-7871-b0a2-b8d8f40c18e4",
     "s-pc -> imac-m4": "agent-held SSH hostname passed after owner completed native unlock; subsequent idle lock still denies signing",
     "imac-m4 -> o-pc": "public key installer prepared; Windows UAC canceled; peer grant pending",
     "imac-m4 -> thinkpad-l14-f": "agent-held SSH hostname passed after ThinkPad responsiveness returned",
     "thinkpad-l14-f -> imac-m4": "agent-held SSH hostname passed; live native auto-connect enabled",
     "o-pc -> imac-intel": "SSH and native app read_thread passed for 01a1365b-291b-70a0-8819-5c05ebf5277c, Review Murm P2P Integrations",
-    "imac-m4 -> imac-intel": "agent-held SSH hostname and app-server thread/read passed for same existing q-pc chat",
+    "imac-m4 -> imac-intel": "previously passed; current attempt denied because markik's configured legacy agent endpoint is unavailable",
     "thinkpad-l14-f -> imac-intel": "SSH hostname and app-server thread/read passed; native client Connected confirmed by owner",
     "s-pc -> imac-intel": "public key enrolled and client registered; login denied while Surface Djinn has no identities after idle lock",
-    "imac-intel -> peers": "pending native first vault creation, custody key generation and peer public-key enrollment"
+    "imac-intel -> s-pc": "Djinn-held key authenticated; WebSocket thread/read passed for Check stack status",
+    "imac-intel -> thinkpad-l14-f": "Djinn-held key authenticated; WebSocket thread/read passed for Turnstone after transient reachability failure",
+    "imac-intel -> imac-m4": "Djinn-held key authenticated at .58 under existing pinned trust; WebSocket thread/read passed for Assess REDox for the stack",
+    "imac-intel -> o-pc": "public key and scoped firewall installer prepared; native UAC canceled; enrollment pending"
   },
   "windows_thinkpad_enrollment": {
     "script": "scripts/codex-peer-enroll-windows.ps1",
@@ -135,8 +141,8 @@
     "worktrees_or_cargo_homes_created": false
   },
   "done_conditions": [
-    "q-pc owner completes native vault creation; generate its SSH identity through Djinn",
-    "Enroll q-pc public key on its peers and qualify return SSH and stored-chat reads",
+    "Enroll q-pc public key on Windows and qualify Windows SSH and stored-chat reads",
+    "Resolve M4 desktop/SSH account choice before recovering its outgoing agent access",
     "Apply prepared Windows SSH-shell correction with native elevation and verify native clients connect",
     "Complete pending M4 Windows enrollment if still needed",
     "Verify Surface outgoing peers after native unlock and retain Locked denial",
@@ -182,7 +188,7 @@
       "host_trust": "existing Windows HostKeyAlias 192.168.4.57 verified unchanged; public host keys pinned on peers",
       "windows_input": "%LOCALAPPDATA%/Djinn/imac-m4-authorized.pub",
       "windows_rule": "Djinn-SSH-LAN-imac-m4",
-      "windows_rule_address": "192.168.4.42",
+      "windows_rule_address": "192.168.4.58",
       "windows_rule_installed": false,
       "windows_uac": "canceled; reopen choice pending",
       "linux_authorized_key_grants": "appended on Surface and ThinkPad; existing grants preserved",
@@ -196,7 +202,8 @@
       "host_trust": "existing q-pc.local, current IP and old Intel HostKeyAlias all agree; strict checking preserved",
       "old_proxy_jump_removed": true,
       "incoming_grants": "Surface, ThinkPad and M4 public keys appended; existing Windows grant preserved",
-      "outbound_public_key": "pending native vault creation and Djinn custody generation"
+      "outbound_public_key": "custody-generated SHA256:qIU8gMb7+oxRleIqA2oM1EW3FcU8OwFXdlds6sHL3YA",
+      "outbound_grants": "Surface, ThinkPad and M4 complete; Windows pending native elevation"
     }
   },
   "q_pc_djinn": {
@@ -214,13 +221,17 @@
     "installed_manifest": "q-pc-djinn-install.json",
     "build_log": "q-pc-djinn-build.log",
     "build_result": "q-pc-djinn-build.json",
-    "resident_pid": 17224,
+    "resident_pid": 54928,
     "launchd_unit": "/Users/markik/Library/LaunchAgents/org.merely.djinn.plist",
     "launchd_nice": 10,
     "launchd_low_priority_io": true,
     "run_at_login": true,
     "restart_policy": "KeepAlive false for initial qualification",
-    "vault_status": "first-run native dialog waiting; no credential supplied through tooling",
+    "vault_status": "native unlock accepted and resident ready; no credential supplied through tooling",
+    "observed_rss_kib": 42792,
+    "service_settings": "dedicated SSH resident settings; existing legacy sync settings unchanged",
+    "agent_disabled_negative_control": "exit 255; public-only identity cannot authenticate without Djinn",
+    "locked_login_check": "not newly qualified on q-pc",
     "new_plaintext_private_key_file": false
   },
   "windows_ssh_shell": {
@@ -234,6 +245,9 @@
     "registry_change_applied": false,
     "snapshot_and_restore": "prepared; protects original registry value kinds and rejects concurrent changes",
     "sshd_restart_required": false,
-    "pending_step": "native administrator elevation, then native-client connection retry"
+    "pending_step": "combined installer UAC canceled; reopen choice pending, then native-client connection retry",
+    "combined_installer": "%LOCALAPPDATA%/Djinn/q-pc-mesh-enroll-windows.ps1",
+    "combined_installer_parse": "passed",
+    "combined_installer_unelevated_control": "refused before writes"
   }
 }

@@ -263,6 +263,32 @@ Djinn restarted as PID `54928` and is waiting at its native unlock dialog.
 Key generation and outbound qualification remain pending. This establishes
 service configuration isolation, not recovery of the old sync store.
 
+The subsequent native unlock succeeded in the same PID; the resident reported
+`ready`. Djinn generated q-pc's Ed25519 identity internally and returned only
+its public key (`SHA256:qIU8gMb7+oxRleIqA2oM1EW3FcU8OwFXdlds6sHL3YA`).
+Additive grants on Surface, ThinkPad and M4 preserve their existing keys.
+q-pc read existing chats on all three peers over SSH/WebSocket without
+resuming them. Disabling its agent caused SSH to fail with exit 255; this is
+an agent-dependency control, not a new q-pc Locked-login receipt. Resident
+RSS was 42,792 KiB, and the existing q-pc ChatGPT and OpenSSH agent processes
+remain running. Native client display and reboot persistence are not newly
+qualified.
+
+M4 now answers at `192.168.4.58` under its previously trusted host key.
+Windows and q-pc's explicit peer addresses were updated; Surface and ThinkPad
+already use `m4-imac.local`. The Windows edit briefly produced an invalid
+replacement line, which was corrected and checked with `ssh -G` and a
+successful strict-trust login. M4's return route is currently unavailable:
+its SSH account `markik` is UID 502, the console belongs to `mayolaboykin`,
+and the saved per-user agent socket refuses connection. The other desktop
+session and legacy launch agent were left untouched; account choice is
+pending with the owner.
+
+The prepared Windows installer combines q-pc/M4 public-key grants, firewall
+rules scoped to `.68`/`.58`, and the existing reversible shell correction.
+Parsing and unelevated refusal passed. Native UAC was canceled; neither new
+peer rule is installed, and reopening is pending owner choice.
+
 The owner also reported ThinkPad's O-PC client error. Raw SSH still passes;
 the native client authenticates, then its POSIX shell probe loses its quoting
 through the Scoop Git launcher under Windows' default `cmd`. A local probe
