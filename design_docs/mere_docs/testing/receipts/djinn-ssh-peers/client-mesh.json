@@ -1,7 +1,7 @@
 {
   "schema": "codex.client-mesh/qualification-v1",
-  "observed_at": "2026-10-13T22:33:54Z",
-  "status": "Three-peer SSH and stored-chat access qualified; owner confirms native connections look good",
+  "observed_at": "2026-10-14T01:33:20Z",
+  "status": "Three-peer mesh qualified; M4 expansion partly qualified; Intel current SSH address pending",
   "clients": {
     "o-pc": {
       "registered": [
@@ -12,7 +12,8 @@
       ],
       "auto_connect": true,
       "codex_sidebar_grouping": "connection",
-      "native_display": "owner confirmed s-pc connected in O-PC settings and subsequently reported connections look good"
+      "native_display": "owner confirmed s-pc connected in O-PC settings and subsequently reported connections look good",
+      "m4_connection": "native app logged state=connected; read_thread passed for 01a135a7-bed2-7180-920b-b8d601eb6855"
     },
     "s-pc": {
       "registered": [
@@ -31,6 +32,21 @@
       "auto_connect": true,
       "activation": "owner reports connected; auto-connect enabled in live client state",
       "identity_agent": "existing GCR desktop agent; Djinn not installed"
+    },
+    "imac-m4": {
+      "ssh_alias": "imac-m4",
+      "local_hostname": "m4-imac.local",
+      "address": "192.168.4.42",
+      "registered": [
+        "o-pc",
+        "s-pc",
+        "thinkpad-l14-f"
+      ],
+      "auto_connect": true,
+      "identity_agent": "existing personae-agent at /Users/markik/.local/share/personae/vault/agent.sock; PID 1248 preserved",
+      "identity_file": "public-only ~/.ssh/id_ed25519.pub",
+      "activation": "peer aliases registered through native deep links; auto-connect now enabled in live state",
+      "desktop_app_pid_preserved": 69566
     }
   },
   "windows_daemon": {
@@ -62,8 +78,14 @@
     "thinkpad-l14-f -> s-pc": "SSH hostname and app-server thread/read passed for 01a132b0-fcf6-7871-b0a2-b8d8f40c18e4",
     "s-pc -> thinkpad-l14-f": "Djinn SSH hostname passed after native unlock",
     "thinkpad-l14-f -> o-pc": "SSH hostname and app-server thread/read passed for 01a12716-2a74-7ee0-9840-1b356432b10f",
-    "imac-m4": "SSH refused; pending reachability",
-    "imac-intel": "SSH through imac-m4 unavailable; pending reachability"
+    "imac-m4": "reachable at updated LAN address; partial mesh qualification as above",
+    "imac-intel": "192.168.1.64 timed out from M4; current SSH name/address requested from owner",
+    "o-pc -> imac-m4": "SSH and native app read_thread passed for Assess REDox for the stack; client logs report Connected",
+    "imac-m4 -> s-pc": "agent-held SSH hostname and app-server thread/read passed for 01a132b0-fcf6-7871-b0a2-b8d8f40c18e4",
+    "s-pc -> imac-m4": "public key and host trust enrolled; Locked Djinn exposed no identities and login denied; native unlock pending",
+    "imac-m4 -> o-pc": "public key installer prepared; Windows UAC canceled; peer grant pending",
+    "imac-m4 -> thinkpad-l14-f": "peer key and strict host trust enrolled; bounded SSH execution probe timed out",
+    "thinkpad-l14-f -> imac-m4": "peer key and strict host trust enrolled; native deep-link registration timed out and requires state verification"
   },
   "windows_thinkpad_enrollment": {
     "script": "scripts/codex-peer-enroll-windows.ps1",
@@ -87,12 +109,48 @@
     "worktrees_or_cargo_homes_created": false
   },
   "done_conditions": [
-    "Reachable Macs are enrolled and qualified separately",
-    "Active chat writer guards remain intact",
-    "Windows daemon reboot persistence is qualified separately"
+    "Complete M4 Windows enrollment under native elevation and verify reverse stored-chat access",
+    "Native Surface unlock restores its agent and Surface -> M4 passes",
+    "Verify both M4/ThinkPad routes and ThinkPad native registration when command sessions respond",
+    "Enroll and qualify Intel using its current SSH address",
+    "Keep existing app processes and writer guards intact",
+    "Windows and M4 daemon reboot persistence remain separate qualification"
   ],
   "follow_up": {
     "owner_confirmation": "looks good",
     "surface_wifi": "owner suspects chipset instability; not diagnosed in this qualification"
+  },
+  "mac_daemons": {
+    "imac-m4": {
+      "version": "0.162.0-alpha.17.2",
+      "source": "complete packaged CLI already bundled with ChatGPT 26.1007.30912",
+      "cli_link": "~/.local/bin/codex -> /Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex",
+      "path_addition": "owned ~/.zprofile block",
+      "bootstrap": "passed",
+      "backend": "pid",
+      "auto_update_enabled": false,
+      "remote_control_gateway_enabled": false,
+      "pid": 3007,
+      "observed_rss_kib": 43376,
+      "local_websocket_initialize_and_thread_list": "passed",
+      "restart_or_reboot": "not qualified"
+    }
+  },
+  "mac_enrollment": {
+    "imac-m4": {
+      "user_key_fingerprint": "SHA256:LuTRGuyGMxyGcwu4ZMFeak2rHD6mkMY0TRfKW7CawCQ",
+      "host_key_fingerprint": "SHA256:0sT34z10ELgEyR8+LJFVDvOov3iGNuPz8gOx4QU48vo",
+      "host_trust": "existing Windows HostKeyAlias 192.168.4.57 verified unchanged; public host keys pinned on peers",
+      "windows_input": "%LOCALAPPDATA%/Djinn/imac-m4-authorized.pub",
+      "windows_rule": "Djinn-SSH-LAN-imac-m4",
+      "windows_rule_address": "192.168.4.42",
+      "windows_rule_installed": false,
+      "windows_uac": "canceled; reopen choice pending",
+      "linux_authorized_key_grants": "appended on Surface and ThinkPad; existing grants preserved",
+      "windows_name_lookup": "m4-imac.local intermittently failed; existing SSH alias now uses verified IPv4 address",
+      "source_builds": false,
+      "new_private_key_files": false,
+      "djinn_installed_or_legacy_agent_replaced": false
+    }
   }
 }
