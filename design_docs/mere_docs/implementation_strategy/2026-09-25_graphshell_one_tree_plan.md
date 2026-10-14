@@ -2142,6 +2142,56 @@ and outer Workspace draft is the next composition owner, not a receipt for
 those remaining gates. External engine builds and simultaneous engine loading
 remain separately qualified consumers.
 
+
+### Shared browsing presenter candidate (2026-10-13)
+
+At Mark's request, `data-presenter="browse"` opts into a quieter shared viewer
+presentation. The existing inspector profile is unchanged. Browsing keeps one
+44-pixel Graph menu trigger backed by the same command catalogue as right-click,
+Ctrl/Command+K and Shift+F10. Project details precede disclosed selection
+management; history starts closed, with a command to reveal it and a separate
+raw checkpoint-source disclosure. These choices change presentation only:
+source authority, selection identity through folds and graph gestures stay shared.
+
+The candidate compiles for the no-default-features Wasm viewer. It is not yet
+browser-qualified or adopted by the site. Required acceptance includes physical
+context-menu and keyboard input, focus restoration, touch input at a compact
+viewport, optional history, and native no-script site disclosures. Measure the
+new package against the existing delivery caps and coordinate a fresh bounded
+runtime lease before headed acceptance; existing package evidence does not
+qualify this runtime. Keep the deployed row until those checks pass.
+
+The first complete desktop browsing case and native no-script/mobile/tablet
+reading cases passed locally. Touch Fit also passed, including geometry and
+focus restoration. The subsequent Graph tools tap failed: the test used the
+accessibility mirror's full item bounds without intersecting the painted menu
+clip. The item was below that clip, so this does not establish a shared-host
+pointer dispatch failure. R3/R4 failed receipts remain preserved; neither is
+full qualification.
+
+The browsing menu continuation uses bounded two-command pages, with Previous
+and Next commands, Close before the list, and the existing shared search and
+keyboard selection controlling the same page. It does not introduce app-specific
+event dispatch or change the browser host. The next touch gate must page through
+the real visible controls, activate Graph tools, dismiss by touch, and restore
+focus; every tap target must be inside both the browser viewport and painted
+menu clip. A rebuilt package and fresh size/browser checks are required. The
+small project faces at the fitted scale remain a separate visual limitation.
+
+R5 on provider `56859e30292405e682f28f3841b76e4f141acf73` (including main's
+Genet 561 font/recovery integration) passes the full headed site suite and all
+13 viewer cases: context/keyboard commands, page navigation, emulated-touch
+Fit/Next/Previous/tools/Close with focus return and clipped visible targets,
+no-script/static reading and startup/failure fallbacks. Five command tests and
+39 site library tests pass; rebuilt Wasm gzip6 is 3,280,020 bytes against
+3,407,872. The source-bound seal is
+`6114468a012717f72ab13f652bd43a085ece8f98498bc81b4afec7e06a6c9e61`.
+The site records package/capture/closure evidence under
+`docs/receipts/site_browsing_20261013/`. Emulated touch does not qualify physical
+phones, performance or another renderer. The earlier R3/R4 failures remain
+failed runs, with touch Fit distinguished from the later off-clip tools tap.
+Publication is separate from this acceptance; a rebuilt later source needs its
+own package qualification. Fitted project faces remain a visual limitation.
 ### C1 reservoir panel and final presenter retirement (2026-10-13; in progress)
 
 The fresh source audit finds that loader.js already mounts all five public
