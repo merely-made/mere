@@ -1,0 +1,2220 @@
+{
+  "status": "PASS",
+  "scope": "private Chrome group closed before private Node group; killing Node closes its loopback server; no shader/device acceptance inferred from forced process closure",
+  "processes": {
+    "node": {
+      "schema": "owned-browser-process-v2",
+      "pid": 16619,
+      "pgid": 16619,
+      "uid": 501,
+      "parent_pid": 16612,
+      "executable": "/Users/markik/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+      "launch_epoch_seconds": 1791944128.83249,
+      "known": {
+        "16619": {
+          "start": "Tue Oct 13 22:15:28 2026",
+          "birth": [
+            1791944128,
+            832731
+          ],
+          "executable": "/Users/markik/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+          "uid": 501,
+          "parent_at_birth": 16612,
+          "zombie": false
+        }
+      },
+      "leader_reaped": true
+    },
+    "chrome": {
+      "schema": "owned-browser-process-v2",
+      "pid": 16722,
+      "pgid": 16722,
+      "uid": 501,
+      "parent_pid": 16619,
+      "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      "profile": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/owned-chrome-profile-2613d1",
+      "launch_epoch_seconds": 1791944144.333,
+      "known": {
+        "16722": {
+          "start": "Tue Oct 13 22:15:44 2026",
+          "birth": [
+            1791944144,
+            334112
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+          "uid": 501,
+          "parent_at_birth": 16619,
+          "zombie": false
+        },
+        "16810": {
+          "start": "Tue Oct 13 22:15:49 2026",
+          "birth": [
+            1791944149,
+            954205
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        },
+        "16811": {
+          "start": "Tue Oct 13 22:15:49 2026",
+          "birth": [
+            1791944149,
+            975009
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        },
+        "16812": {
+          "start": "Tue Oct 13 22:15:50 2026",
+          "birth": [
+            1791944150,
+            33078
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        },
+        "16821": {
+          "start": "Tue Oct 13 22:15:50 2026",
+          "birth": [
+            1791944150,
+            235568
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        },
+        "16823": {
+          "start": "Tue Oct 13 22:15:50 2026",
+          "birth": [
+            1791944150,
+            275147
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        },
+        "16832": {
+          "start": "Tue Oct 13 22:15:50 2026",
+          "birth": [
+            1791944150,
+            865784
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        },
+        "16837": {
+          "start": "Tue Oct 13 22:15:51 2026",
+          "birth": [
+            1791944151,
+            171294
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        },
+        "16838": {
+          "start": "Tue Oct 13 22:15:51 2026",
+          "birth": [
+            1791944151,
+            195259
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        },
+        "16840": {
+          "start": "Tue Oct 13 22:15:51 2026",
+          "birth": [
+            1791944151,
+            226175
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        },
+        "16874": {
+          "start": "Tue Oct 13 22:15:52 2026",
+          "birth": [
+            1791944152,
+            932707
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        },
+        "16882": {
+          "start": "Tue Oct 13 22:15:53 2026",
+          "birth": [
+            1791944153,
+            64631
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        },
+        "16885": {
+          "start": "Tue Oct 13 22:15:53 2026",
+          "birth": [
+            1791944153,
+            301198
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        }
+      },
+      "leader_reaped": false
+    }
+  },
+  "disk_observations": [
+    {
+      "at": 1791944128.832473,
+      "free_bytes": 54739116032
+    },
+    {
+      "at": 1791944128.982643,
+      "free_bytes": 54739111936
+    },
+    {
+      "at": 1791944129.089762,
+      "free_bytes": 54739111936
+    },
+    {
+      "at": 1791944129.190665,
+      "free_bytes": 54739111936
+    },
+    {
+      "at": 1791944129.300915,
+      "free_bytes": 54739111936
+    },
+    {
+      "at": 1791944129.403299,
+      "free_bytes": 54739111936
+    },
+    {
+      "at": 1791944129.513611,
+      "free_bytes": 54739111936
+    },
+    {
+      "at": 1791944129.620818,
+      "free_bytes": 54739111936
+    },
+    {
+      "at": 1791944129.731147,
+      "free_bytes": 54739111936
+    },
+    {
+      "at": 1791944129.837564,
+      "free_bytes": 54739111936
+    },
+    {
+      "at": 1791944129.94154,
+      "free_bytes": 54739111936
+    },
+    {
+      "at": 1791944130.046019,
+      "free_bytes": 54739111936
+    },
+    {
+      "at": 1791944130.153076,
+      "free_bytes": 54739111936
+    },
+    {
+      "at": 1791944130.2576241,
+      "free_bytes": 54739111936
+    },
+    {
+      "at": 1791944130.3583841,
+      "free_bytes": 54739111936
+    },
+    {
+      "at": 1791944130.46649,
+      "free_bytes": 54739111936
+    },
+    {
+      "at": 1791944130.567426,
+      "free_bytes": 54739111936
+    },
+    {
+      "at": 1791944130.6682491,
+      "free_bytes": 54739111936
+    },
+    {
+      "at": 1791944130.776052,
+      "free_bytes": 54739111936
+    },
+    {
+      "at": 1791944130.883863,
+      "free_bytes": 54739111936
+    },
+    {
+      "at": 1791944130.988367,
+      "free_bytes": 54739111936
+    },
+    {
+      "at": 1791944131.089505,
+      "free_bytes": 54739111936
+    },
+    {
+      "at": 1791944131.1947808,
+      "free_bytes": 54739111936
+    },
+    {
+      "at": 1791944131.295093,
+      "free_bytes": 54739111936
+    },
+    {
+      "at": 1791944131.396826,
+      "free_bytes": 54739111936
+    },
+    {
+      "at": 1791944131.503249,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944131.607967,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944131.717095,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944131.82064,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944131.920966,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944132.021259,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944132.131464,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944132.237012,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944132.347287,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944132.454852,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944132.557348,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944132.6675541,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944132.771092,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944132.876529,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944132.983391,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944133.0859451,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944133.187606,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944133.288109,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944133.391326,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944133.4985092,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944133.606533,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944133.709915,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944133.811456,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944133.9116411,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944134.018091,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944134.125798,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944134.2360718,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944134.3401542,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944134.446912,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944134.5549781,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944134.656064,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944134.7562811,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944134.857085,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944134.95766,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944135.063433,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944135.168525,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944135.268775,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944135.373924,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944135.474187,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944135.5843,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944135.6894279,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944135.795712,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944135.897704,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944136.00581,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944136.106761,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944136.210992,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944136.318922,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944136.42332,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944136.526967,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944136.627559,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944136.7280278,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944136.834105,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944136.935912,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944137.0383308,
+      "free_bytes": 54739107840
+    },
+    {
+      "at": 1791944137.143904,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944137.254176,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944137.3638122,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944137.46402,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944137.569328,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944137.671006,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944137.773355,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944137.8792572,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944137.9844842,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944138.0910232,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944138.192906,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944138.294533,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944138.3965728,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944138.502024,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944138.602366,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944138.7026298,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944138.806928,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944138.9141161,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944139.021298,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944139.12653,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944139.236777,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944139.340479,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944139.445747,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944139.555986,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944139.657706,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944139.75791,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944139.862634,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944139.967841,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944140.074671,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944140.176859,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944140.280538,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944140.381948,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944140.482941,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944140.5912828,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944140.697408,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944140.797648,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944140.902483,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944141.010165,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944141.115252,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944141.2254379,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944141.3309262,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944141.4363909,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944141.541617,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944141.647038,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944141.7572749,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944141.8644109,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944141.9719071,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944142.0772638,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944142.182477,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944142.292672,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944142.394057,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944142.554256,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944142.6582332,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944142.758782,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944142.8607411,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944142.965754,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944143.06603,
+      "free_bytes": 54738845696
+    },
+    {
+      "at": 1791944143.166285,
+      "free_bytes": 54738853888
+    },
+    {
+      "at": 1791944143.2713358,
+      "free_bytes": 54738853888
+    },
+    {
+      "at": 1791944143.3772109,
+      "free_bytes": 54738853888
+    },
+    {
+      "at": 1791944143.485806,
+      "free_bytes": 54738857984
+    },
+    {
+      "at": 1791944143.5910778,
+      "free_bytes": 54738857984
+    },
+    {
+      "at": 1791944143.69264,
+      "free_bytes": 54738857984
+    },
+    {
+      "at": 1791944143.842626,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944143.942965,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944144.045177,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944144.145958,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944144.2540958,
+      "free_bytes": 54738849792
+    },
+    {
+      "at": 1791944144.358886,
+      "free_bytes": 54738833408
+    },
+    {
+      "at": 1791944144.4627998,
+      "free_bytes": 54738825216
+    },
+    {
+      "at": 1791944144.760109,
+      "free_bytes": 54738825216
+    },
+    {
+      "at": 1791944145.0095942,
+      "free_bytes": 54738825216
+    },
+    {
+      "at": 1791944145.254903,
+      "free_bytes": 54738825216
+    },
+    {
+      "at": 1791944145.5032792,
+      "free_bytes": 54738825216
+    },
+    {
+      "at": 1791944145.743222,
+      "free_bytes": 54738825216
+    },
+    {
+      "at": 1791944145.994567,
+      "free_bytes": 54738825216
+    },
+    {
+      "at": 1791944146.239549,
+      "free_bytes": 54738825216
+    },
+    {
+      "at": 1791944146.482337,
+      "free_bytes": 54738825216
+    },
+    {
+      "at": 1791944146.7282078,
+      "free_bytes": 54738825216
+    },
+    {
+      "at": 1791944146.971502,
+      "free_bytes": 54738825216
+    },
+    {
+      "at": 1791944147.2124422,
+      "free_bytes": 54738825216
+    },
+    {
+      "at": 1791944147.4603038,
+      "free_bytes": 54738825216
+    },
+    {
+      "at": 1791944147.70717,
+      "free_bytes": 54738825216
+    },
+    {
+      "at": 1791944147.951573,
+      "free_bytes": 54738825216
+    },
+    {
+      "at": 1791944148.19967,
+      "free_bytes": 54738825216
+    },
+    {
+      "at": 1791944148.4456818,
+      "free_bytes": 54738825216
+    },
+    {
+      "at": 1791944148.695064,
+      "free_bytes": 54738825216
+    },
+    {
+      "at": 1791944148.945504,
+      "free_bytes": 54738825216
+    },
+    {
+      "at": 1791944149.198338,
+      "free_bytes": 54738825216
+    },
+    {
+      "at": 1791944149.4393432,
+      "free_bytes": 54738825216
+    },
+    {
+      "at": 1791944149.684919,
+      "free_bytes": 54734630912
+    },
+    {
+      "at": 1791944150.047681,
+      "free_bytes": 54734008320
+    },
+    {
+      "at": 1791944150.3466828,
+      "free_bytes": 54733201408
+    },
+    {
+      "at": 1791944150.618043,
+      "free_bytes": 54733205504
+    },
+    {
+      "at": 1791944150.876073,
+      "free_bytes": 54732836864
+    },
+    {
+      "at": 1791944151.279594,
+      "free_bytes": 54732222464
+    },
+    {
+      "at": 1791944151.647604,
+      "free_bytes": 54732136448
+    },
+    {
+      "at": 1791944152.012158,
+      "free_bytes": 54731964416
+    },
+    {
+      "at": 1791944152.275427,
+      "free_bytes": 54731722752
+    },
+    {
+      "at": 1791944152.542995,
+      "free_bytes": 54735163392
+    },
+    {
+      "at": 1791944152.9067242,
+      "free_bytes": 54732578816
+    },
+    {
+      "at": 1791944153.27217,
+      "free_bytes": 54732562432
+    },
+    {
+      "at": 1791944153.649268,
+      "free_bytes": 54732509184
+    },
+    {
+      "at": 1791944153.906759,
+      "free_bytes": 54732509184
+    },
+    {
+      "at": 1791944154.164039,
+      "free_bytes": 54732509184
+    },
+    {
+      "at": 1791944154.430034,
+      "free_bytes": 54732509184
+    },
+    {
+      "at": 1791944154.687666,
+      "free_bytes": 54732509184
+    },
+    {
+      "at": 1791944154.947277,
+      "free_bytes": 54732509184
+    },
+    {
+      "at": 1791944155.206081,
+      "free_bytes": 54732484608
+    },
+    {
+      "at": 1791944155.4732192,
+      "free_bytes": 54732451840
+    },
+    {
+      "at": 1791944155.736209,
+      "free_bytes": 54732464128
+    },
+    {
+      "at": 1791944155.9905422,
+      "free_bytes": 54732464128
+    },
+    {
+      "at": 1791944156.253516,
+      "free_bytes": 54732464128
+    },
+    {
+      "at": 1791944156.513067,
+      "free_bytes": 54732464128
+    },
+    {
+      "at": 1791944156.770731,
+      "free_bytes": 54732468224
+    },
+    {
+      "at": 1791944157.023792,
+      "free_bytes": 54732468224
+    },
+    {
+      "at": 1791944157.277268,
+      "free_bytes": 54732468224
+    },
+    {
+      "at": 1791944157.535746,
+      "free_bytes": 54732468224
+    },
+    {
+      "at": 1791944157.790026,
+      "free_bytes": 54732468224
+    },
+    {
+      "at": 1791944158.0441148,
+      "free_bytes": 54732468224
+    },
+    {
+      "at": 1791944158.305483,
+      "free_bytes": 54732468224
+    },
+    {
+      "at": 1791944158.56186,
+      "free_bytes": 54732468224
+    },
+    {
+      "at": 1791944158.819784,
+      "free_bytes": 54732468224
+    },
+    {
+      "at": 1791944159.0769112,
+      "free_bytes": 54732468224
+    },
+    {
+      "at": 1791944159.338603,
+      "free_bytes": 54732468224
+    },
+    {
+      "at": 1791944159.6021109,
+      "free_bytes": 54732451840
+    },
+    {
+      "at": 1791944159.859421,
+      "free_bytes": 54732423168
+    },
+    {
+      "at": 1791944160.1168199,
+      "free_bytes": 54726557696
+    },
+    {
+      "at": 1791944160.378995,
+      "free_bytes": 54725849088
+    },
+    {
+      "at": 1791944160.636472,
+      "free_bytes": 54720020480
+    },
+    {
+      "at": 1791944160.887606,
+      "free_bytes": 54720008192
+    },
+    {
+      "at": 1791944161.147757,
+      "free_bytes": 54714109952
+    },
+    {
+      "at": 1791944161.401549,
+      "free_bytes": 54714109952
+    },
+    {
+      "at": 1791944161.6625018,
+      "free_bytes": 54707425280
+    },
+    {
+      "at": 1791944161.922732,
+      "free_bytes": 54705205248
+    },
+    {
+      "at": 1791944162.1844218,
+      "free_bytes": 54701285376
+    },
+    {
+      "at": 1791944162.437237,
+      "free_bytes": 54701252608
+    },
+    {
+      "at": 1791944162.722683,
+      "free_bytes": 54699581440
+    },
+    {
+      "at": 1791944162.994729,
+      "free_bytes": 54699565056
+    },
+    {
+      "at": 1791944163.261562,
+      "free_bytes": 54691307520
+    },
+    {
+      "at": 1791944163.623874,
+      "free_bytes": 54682550272
+    },
+    {
+      "at": 1791944164.005465,
+      "free_bytes": 54673571840
+    },
+    {
+      "at": 1791944164.285175,
+      "free_bytes": 54665244672
+    },
+    {
+      "at": 1791944164.549315,
+      "free_bytes": 54655954944
+    },
+    {
+      "at": 1791944164.91417,
+      "free_bytes": 54643208192
+    },
+    {
+      "at": 1791944165.0911202,
+      "free_bytes": 54643204096
+    },
+    {
+      "at": 1791944165.273493,
+      "free_bytes": 54701879296
+    },
+    {
+      "at": 1791944165.445437,
+      "free_bytes": 54711705600
+    },
+    {
+      "at": 1791944165.6163352,
+      "free_bytes": 54711701504
+    },
+    {
+      "at": 1791944165.784853,
+      "free_bytes": 54711701504
+    },
+    {
+      "at": 1791944165.95638,
+      "free_bytes": 54711701504
+    },
+    {
+      "at": 1791944166.1330051,
+      "free_bytes": 54711705600
+    },
+    {
+      "at": 1791944166.3044128,
+      "free_bytes": 54711705600
+    },
+    {
+      "at": 1791944166.4732668,
+      "free_bytes": 54711705600
+    },
+    {
+      "at": 1791944166.644605,
+      "free_bytes": 54711701504
+    },
+    {
+      "at": 1791944166.819038,
+      "free_bytes": 54711701504
+    },
+    {
+      "at": 1791944166.993812,
+      "free_bytes": 54711701504
+    },
+    {
+      "at": 1791944167.172775,
+      "free_bytes": 54711341056
+    },
+    {
+      "at": 1791944167.352362,
+      "free_bytes": 54711341056
+    },
+    {
+      "at": 1791944167.522104,
+      "free_bytes": 54711341056
+    },
+    {
+      "at": 1791944167.6977,
+      "free_bytes": 54711341056
+    },
+    {
+      "at": 1791944167.8665469,
+      "free_bytes": 54711341056
+    },
+    {
+      "at": 1791944168.053616,
+      "free_bytes": 54711345152
+    },
+    {
+      "at": 1791944168.2292,
+      "free_bytes": 54711345152
+    },
+    {
+      "at": 1791944168.404341,
+      "free_bytes": 54711345152
+    },
+    {
+      "at": 1791944168.5778759,
+      "free_bytes": 54711345152
+    },
+    {
+      "at": 1791944168.753192,
+      "free_bytes": 54711345152
+    },
+    {
+      "at": 1791944168.924261,
+      "free_bytes": 54711345152
+    },
+    {
+      "at": 1791944169.0953238,
+      "free_bytes": 54711345152
+    },
+    {
+      "at": 1791944169.272768,
+      "free_bytes": 54711345152
+    },
+    {
+      "at": 1791944169.448638,
+      "free_bytes": 54711345152
+    },
+    {
+      "at": 1791944169.622288,
+      "free_bytes": 54711345152
+    },
+    {
+      "at": 1791944169.7988648,
+      "free_bytes": 54721773568
+    },
+    {
+      "at": 1791944169.973017,
+      "free_bytes": 54721777664
+    },
+    {
+      "at": 1791944170.1442409,
+      "free_bytes": 54721777664
+    },
+    {
+      "at": 1791944170.312711,
+      "free_bytes": 54721777664
+    },
+    {
+      "at": 1791944170.486774,
+      "free_bytes": 54721777664
+    },
+    {
+      "at": 1791944170.66492,
+      "free_bytes": 54721777664
+    },
+    {
+      "at": 1791944170.8419142,
+      "free_bytes": 54721777664
+    },
+    {
+      "at": 1791944171.022793,
+      "free_bytes": 54721777664
+    },
+    {
+      "at": 1791944171.19756,
+      "free_bytes": 54721777664
+    },
+    {
+      "at": 1791944171.378382,
+      "free_bytes": 54721777664
+    },
+    {
+      "at": 1791944171.553321,
+      "free_bytes": 54721777664
+    },
+    {
+      "at": 1791944171.731117,
+      "free_bytes": 54721777664
+    },
+    {
+      "at": 1791944171.905637,
+      "free_bytes": 54721769472
+    },
+    {
+      "at": 1791944172.080506,
+      "free_bytes": 54721769472
+    },
+    {
+      "at": 1791944172.259191,
+      "free_bytes": 54721769472
+    },
+    {
+      "at": 1791944172.433033,
+      "free_bytes": 54641426432
+    },
+    {
+      "at": 1791944172.608903,
+      "free_bytes": 54453886976
+    },
+    {
+      "at": 1791944172.79171,
+      "free_bytes": 54453886976
+    },
+    {
+      "at": 1791944172.972808,
+      "free_bytes": 54453886976
+    },
+    {
+      "at": 1791944173.147729,
+      "free_bytes": 54212456448
+    },
+    {
+      "at": 1791944173.326535,
+      "free_bytes": 54480326656
+    },
+    {
+      "at": 1791944173.498636,
+      "free_bytes": 54480322560
+    },
+    {
+      "at": 1791944173.680798,
+      "free_bytes": 54480322560
+    },
+    {
+      "at": 1791944173.8504372,
+      "free_bytes": 54480318464
+    },
+    {
+      "at": 1791944174.029232,
+      "free_bytes": 54480318464
+    },
+    {
+      "at": 1791944174.20437,
+      "free_bytes": 54480318464
+    },
+    {
+      "at": 1791944174.3833458,
+      "free_bytes": 54480318464
+    },
+    {
+      "at": 1791944174.558847,
+      "free_bytes": 54480318464
+    },
+    {
+      "at": 1791944174.737222,
+      "free_bytes": 54480318464
+    },
+    {
+      "at": 1791944174.917286,
+      "free_bytes": 54480318464
+    },
+    {
+      "at": 1791944175.0952058,
+      "free_bytes": 54480318464
+    },
+    {
+      "at": 1791944175.269116,
+      "free_bytes": 54480318464
+    },
+    {
+      "at": 1791944175.443465,
+      "free_bytes": 54480318464
+    },
+    {
+      "at": 1791944175.622753,
+      "free_bytes": 54480318464
+    },
+    {
+      "at": 1791944175.791771,
+      "free_bytes": 54480318464
+    },
+    {
+      "at": 1791944175.960298,
+      "free_bytes": 54480318464
+    },
+    {
+      "at": 1791944176.1365252,
+      "free_bytes": 54480318464
+    },
+    {
+      "at": 1791944176.3060338,
+      "free_bytes": 54480322560
+    },
+    {
+      "at": 1791944176.477834,
+      "free_bytes": 54480322560
+    },
+    {
+      "at": 1791944176.651233,
+      "free_bytes": 54480322560
+    },
+    {
+      "at": 1791944176.82274,
+      "free_bytes": 54480322560
+    },
+    {
+      "at": 1791944176.998299,
+      "free_bytes": 54480318464
+    },
+    {
+      "at": 1791944177.172735,
+      "free_bytes": 54480318464
+    },
+    {
+      "at": 1791944177.344633,
+      "free_bytes": 54480318464
+    },
+    {
+      "at": 1791944177.521895,
+      "free_bytes": 54482313216
+    },
+    {
+      "at": 1791944177.6982772,
+      "free_bytes": 54481969152
+    },
+    {
+      "at": 1791944177.878137,
+      "free_bytes": 54481965056
+    },
+    {
+      "at": 1791944178.057538,
+      "free_bytes": 54481965056
+    },
+    {
+      "at": 1791944178.2316868,
+      "free_bytes": 54477766656
+    },
+    {
+      "at": 1791944178.406674,
+      "free_bytes": 54477553664
+    }
+  ],
+  "node_exit_code": 0,
+  "cleanup": {
+    "chrome": {
+      "closed": true,
+      "quiesced": false,
+      "final": {
+        "state": "gone",
+        "members": [],
+        "reason": null,
+        "retries": [],
+        "owner": {
+          "schema": "owned-browser-process-v2",
+          "pid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "parent_pid": 16619,
+          "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+          "profile": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/owned-chrome-profile-2613d1",
+          "launch_epoch_seconds": 1791944144.333,
+          "known": {
+            "16722": {
+              "start": "Tue Oct 13 22:15:44 2026",
+              "birth": [
+                1791944144,
+                334112
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+              "uid": 501,
+              "parent_at_birth": 16619,
+              "zombie": false
+            },
+            "16810": {
+              "start": "Tue Oct 13 22:15:49 2026",
+              "birth": [
+                1791944149,
+                954205
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "16811": {
+              "start": "Tue Oct 13 22:15:49 2026",
+              "birth": [
+                1791944149,
+                975009
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "16812": {
+              "start": "Tue Oct 13 22:15:50 2026",
+              "birth": [
+                1791944150,
+                33078
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "16821": {
+              "start": "Tue Oct 13 22:15:50 2026",
+              "birth": [
+                1791944150,
+                235568
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "16823": {
+              "start": "Tue Oct 13 22:15:50 2026",
+              "birth": [
+                1791944150,
+                275147
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "16832": {
+              "start": "Tue Oct 13 22:15:50 2026",
+              "birth": [
+                1791944150,
+                865784
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "16837": {
+              "start": "Tue Oct 13 22:15:51 2026",
+              "birth": [
+                1791944151,
+                171294
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "16838": {
+              "start": "Tue Oct 13 22:15:51 2026",
+              "birth": [
+                1791944151,
+                195259
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "16840": {
+              "start": "Tue Oct 13 22:15:51 2026",
+              "birth": [
+                1791944151,
+                226175
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "16874": {
+              "start": "Tue Oct 13 22:15:52 2026",
+              "birth": [
+                1791944152,
+                932707
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "16882": {
+              "start": "Tue Oct 13 22:15:53 2026",
+              "birth": [
+                1791944153,
+                64631
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "16885": {
+              "start": "Tue Oct 13 22:15:53 2026",
+              "birth": [
+                1791944153,
+                301198
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "17083": {
+              "start": "Tue Oct 13 22:16:04 2026",
+              "birth": [
+                1791944164,
+                552207
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "17084": {
+              "start": "Tue Oct 13 22:16:04 2026",
+              "birth": [
+                1791944164,
+                584271
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            }
+          },
+          "leader_reaped": true,
+          "exit_code": 0,
+          "exit_signal": null
+        }
+      },
+      "steps": [
+        {
+          "state": "gone",
+          "members": [],
+          "reason": null,
+          "retries": [],
+          "owner": {
+            "schema": "owned-browser-process-v2",
+            "pid": 16722,
+            "pgid": 16722,
+            "uid": 501,
+            "parent_pid": 16619,
+            "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+            "profile": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/owned-chrome-profile-2613d1",
+            "launch_epoch_seconds": 1791944144.333,
+            "known": {
+              "16722": {
+                "start": "Tue Oct 13 22:15:44 2026",
+                "birth": [
+                  1791944144,
+                  334112
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+                "uid": 501,
+                "parent_at_birth": 16619,
+                "zombie": false
+              },
+              "16810": {
+                "start": "Tue Oct 13 22:15:49 2026",
+                "birth": [
+                  1791944149,
+                  954205
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "16811": {
+                "start": "Tue Oct 13 22:15:49 2026",
+                "birth": [
+                  1791944149,
+                  975009
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "16812": {
+                "start": "Tue Oct 13 22:15:50 2026",
+                "birth": [
+                  1791944150,
+                  33078
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "16821": {
+                "start": "Tue Oct 13 22:15:50 2026",
+                "birth": [
+                  1791944150,
+                  235568
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "16823": {
+                "start": "Tue Oct 13 22:15:50 2026",
+                "birth": [
+                  1791944150,
+                  275147
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "16832": {
+                "start": "Tue Oct 13 22:15:50 2026",
+                "birth": [
+                  1791944150,
+                  865784
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "16837": {
+                "start": "Tue Oct 13 22:15:51 2026",
+                "birth": [
+                  1791944151,
+                  171294
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "16838": {
+                "start": "Tue Oct 13 22:15:51 2026",
+                "birth": [
+                  1791944151,
+                  195259
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "16840": {
+                "start": "Tue Oct 13 22:15:51 2026",
+                "birth": [
+                  1791944151,
+                  226175
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "16874": {
+                "start": "Tue Oct 13 22:15:52 2026",
+                "birth": [
+                  1791944152,
+                  932707
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "16882": {
+                "start": "Tue Oct 13 22:15:53 2026",
+                "birth": [
+                  1791944153,
+                  64631
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "16885": {
+                "start": "Tue Oct 13 22:15:53 2026",
+                "birth": [
+                  1791944153,
+                  301198
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "17083": {
+                "start": "Tue Oct 13 22:16:04 2026",
+                "birth": [
+                  1791944164,
+                  552207
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "17084": {
+                "start": "Tue Oct 13 22:16:04 2026",
+                "birth": [
+                  1791944164,
+                  584271
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              }
+            },
+            "leader_reaped": true,
+            "exit_code": 0,
+            "exit_signal": null
+          }
+        }
+      ]
+    },
+    "node": {
+      "closed": true,
+      "quiesced": false,
+      "final": {
+        "state": "gone",
+        "members": [],
+        "reason": null,
+        "retries": [],
+        "owner": {
+          "schema": "owned-browser-process-v2",
+          "pid": 16619,
+          "pgid": 16619,
+          "uid": 501,
+          "parent_pid": 16612,
+          "executable": "/Users/markik/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+          "launch_epoch_seconds": 1791944128.83249,
+          "known": {
+            "16619": {
+              "start": "Tue Oct 13 22:15:28 2026",
+              "birth": [
+                1791944128,
+                832731
+              ],
+              "executable": "/Users/markik/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+              "uid": 501,
+              "parent_at_birth": 16612,
+              "zombie": false
+            }
+          },
+          "leader_reaped": true
+        }
+      },
+      "steps": [
+        {
+          "state": "gone",
+          "members": [],
+          "reason": null,
+          "retries": [],
+          "owner": {
+            "schema": "owned-browser-process-v2",
+            "pid": 16619,
+            "pgid": 16619,
+            "uid": 501,
+            "parent_pid": 16612,
+            "executable": "/Users/markik/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+            "launch_epoch_seconds": 1791944128.83249,
+            "known": {
+              "16619": {
+                "start": "Tue Oct 13 22:15:28 2026",
+                "birth": [
+                  1791944128,
+                  832731
+                ],
+                "executable": "/Users/markik/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+                "uid": 501,
+                "parent_at_birth": 16612,
+                "zombie": false
+              }
+            },
+            "leader_reaped": true
+          }
+        }
+      ]
+    },
+    "chrome_after_node_reap": {
+      "closed": true,
+      "quiesced": false,
+      "final": {
+        "state": "gone",
+        "members": [],
+        "reason": null,
+        "retries": [],
+        "owner": {
+          "schema": "owned-browser-process-v2",
+          "pid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "parent_pid": 16619,
+          "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+          "profile": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/owned-chrome-profile-2613d1",
+          "launch_epoch_seconds": 1791944144.333,
+          "known": {
+            "16722": {
+              "start": "Tue Oct 13 22:15:44 2026",
+              "birth": [
+                1791944144,
+                334112
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+              "uid": 501,
+              "parent_at_birth": 16619,
+              "zombie": false
+            },
+            "16810": {
+              "start": "Tue Oct 13 22:15:49 2026",
+              "birth": [
+                1791944149,
+                954205
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "16811": {
+              "start": "Tue Oct 13 22:15:49 2026",
+              "birth": [
+                1791944149,
+                975009
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "16812": {
+              "start": "Tue Oct 13 22:15:50 2026",
+              "birth": [
+                1791944150,
+                33078
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "16821": {
+              "start": "Tue Oct 13 22:15:50 2026",
+              "birth": [
+                1791944150,
+                235568
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "16823": {
+              "start": "Tue Oct 13 22:15:50 2026",
+              "birth": [
+                1791944150,
+                275147
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "16832": {
+              "start": "Tue Oct 13 22:15:50 2026",
+              "birth": [
+                1791944150,
+                865784
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "16837": {
+              "start": "Tue Oct 13 22:15:51 2026",
+              "birth": [
+                1791944151,
+                171294
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "16838": {
+              "start": "Tue Oct 13 22:15:51 2026",
+              "birth": [
+                1791944151,
+                195259
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "16840": {
+              "start": "Tue Oct 13 22:15:51 2026",
+              "birth": [
+                1791944151,
+                226175
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "16874": {
+              "start": "Tue Oct 13 22:15:52 2026",
+              "birth": [
+                1791944152,
+                932707
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "16882": {
+              "start": "Tue Oct 13 22:15:53 2026",
+              "birth": [
+                1791944153,
+                64631
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "16885": {
+              "start": "Tue Oct 13 22:15:53 2026",
+              "birth": [
+                1791944153,
+                301198
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "17083": {
+              "start": "Tue Oct 13 22:16:04 2026",
+              "birth": [
+                1791944164,
+                552207
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            },
+            "17084": {
+              "start": "Tue Oct 13 22:16:04 2026",
+              "birth": [
+                1791944164,
+                584271
+              ],
+              "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+              "uid": 501,
+              "parent_at_birth": 16722,
+              "zombie": false
+            }
+          },
+          "leader_reaped": true,
+          "exit_code": 0,
+          "exit_signal": null,
+          "parent_closure_authorized": true
+        }
+      },
+      "steps": [
+        {
+          "state": "gone",
+          "members": [],
+          "reason": null,
+          "retries": [],
+          "owner": {
+            "schema": "owned-browser-process-v2",
+            "pid": 16722,
+            "pgid": 16722,
+            "uid": 501,
+            "parent_pid": 16619,
+            "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+            "profile": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/owned-chrome-profile-2613d1",
+            "launch_epoch_seconds": 1791944144.333,
+            "known": {
+              "16722": {
+                "start": "Tue Oct 13 22:15:44 2026",
+                "birth": [
+                  1791944144,
+                  334112
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+                "uid": 501,
+                "parent_at_birth": 16619,
+                "zombie": false
+              },
+              "16810": {
+                "start": "Tue Oct 13 22:15:49 2026",
+                "birth": [
+                  1791944149,
+                  954205
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "16811": {
+                "start": "Tue Oct 13 22:15:49 2026",
+                "birth": [
+                  1791944149,
+                  975009
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "16812": {
+                "start": "Tue Oct 13 22:15:50 2026",
+                "birth": [
+                  1791944150,
+                  33078
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "16821": {
+                "start": "Tue Oct 13 22:15:50 2026",
+                "birth": [
+                  1791944150,
+                  235568
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "16823": {
+                "start": "Tue Oct 13 22:15:50 2026",
+                "birth": [
+                  1791944150,
+                  275147
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "16832": {
+                "start": "Tue Oct 13 22:15:50 2026",
+                "birth": [
+                  1791944150,
+                  865784
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "16837": {
+                "start": "Tue Oct 13 22:15:51 2026",
+                "birth": [
+                  1791944151,
+                  171294
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "16838": {
+                "start": "Tue Oct 13 22:15:51 2026",
+                "birth": [
+                  1791944151,
+                  195259
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "16840": {
+                "start": "Tue Oct 13 22:15:51 2026",
+                "birth": [
+                  1791944151,
+                  226175
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "16874": {
+                "start": "Tue Oct 13 22:15:52 2026",
+                "birth": [
+                  1791944152,
+                  932707
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "16882": {
+                "start": "Tue Oct 13 22:15:53 2026",
+                "birth": [
+                  1791944153,
+                  64631
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "16885": {
+                "start": "Tue Oct 13 22:15:53 2026",
+                "birth": [
+                  1791944153,
+                  301198
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "17083": {
+                "start": "Tue Oct 13 22:16:04 2026",
+                "birth": [
+                  1791944164,
+                  552207
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              },
+              "17084": {
+                "start": "Tue Oct 13 22:16:04 2026",
+                "birth": [
+                  1791944164,
+                  584271
+                ],
+                "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+                "uid": 501,
+                "parent_at_birth": 16722,
+                "zombie": false
+              }
+            },
+            "leader_reaped": true,
+            "exit_code": 0,
+            "exit_signal": null,
+            "parent_closure_authorized": true
+          }
+        }
+      ]
+    }
+  },
+  "owned_processes_closed": true,
+  "within_absolute_outer_deadline": true,
+  "elapsed_seconds": 50.38809433,
+  "interrupts": []
+}
