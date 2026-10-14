@@ -2175,3 +2175,18 @@ the real visible controls, activate Graph tools, dismiss by touch, and restore
 focus; every tap target must be inside both the browser viewport and painted
 menu clip. A rebuilt package and fresh size/browser checks are required. The
 small project faces at the fitted scale remain a separate visual limitation.
+
+R5 on provider `56859e30292405e682f28f3841b76e4f141acf73` (including main's
+Genet 561 font/recovery integration) passes the full headed site suite and all
+13 viewer cases: context/keyboard commands, page navigation, emulated-touch
+Fit/Next/Previous/tools/Close with focus return and clipped visible targets,
+no-script/static reading and startup/failure fallbacks. Five command tests and
+39 site library tests pass; rebuilt Wasm gzip6 is 3,280,020 bytes against
+3,407,872. The source-bound seal is
+`6114468a012717f72ab13f652bd43a085ece8f98498bc81b4afec7e06a6c9e61`.
+The site records package/capture/closure evidence under
+`docs/receipts/site_browsing_20261013/`. Emulated touch does not qualify physical
+phones, performance or another renderer. The earlier R3/R4 failures remain
+failed runs, with touch Fit distinguished from the later off-clip tools tap.
+Publication is separate from this acceptance; a rebuilt later source needs its
+own package qualification. Fitted project faces remain a visual limitation.
