@@ -1,6 +1,7 @@
 # Shared browser Workshop recovery fixture
 
-Prepared source only until the coordinator records actual build/browser receipts.
+Execution status is source- and gate-specific: use the coordinator's sealed
+build, fixture, driver, raw-pixel and resource-closure receipts together.
 It mounts two independent full production Workshop states and preview bindings
 on two canvases sharing one actual `RenderCore::boot_async` core. The local
 reserved Reader/Stylesheet keys are identical; the production registry's physical
@@ -34,6 +35,23 @@ interior RGB 3 / alpha 2 / mean RGBA 1 limits uniformly, without edge allowances
 Subsequent logical `Host::key` dispatch must change state and pixels, and CSS
 resize must change the presented extent. Actual DOM keyboard gestures and OS
 input delivery remain separate acceptance lanes.
+
+The fixture explicitly provisions the outer Host and both retained production
+preview documents with the checked-in Roboto face mapped to `sans-serif`,
+`system-ui`, `serif` and `monospace`. This is a delivery fixture only, not serif,
+fixed-width or production script-coverage fidelity. Production consumers select
+appropriate actual faces for each role. Appearance/typography reconstruction and
+viewport changes must retain the admitted ledgers. Each presentation seal
+requires `font_resources.outer_materialized_fonts > 0`, zero outer registration
+errors, and positive Reader/Stylesheet glyph counts with actual font byte hashes.
+The external driver independently retains the thirteen-color nonblank gate for
+every complete raw image and the six full before/after pixel comparisons.
+
+Actual canvas and accessibility-mirror synthetic DOM `keyup Tab` controls check
+the owned listeners and preserve focus/draft authority. `Host::key_released`
+ends held-Tab spatial navigation; complete Tab taps precede continued slider
+input. These controls are labeled synthetic DOM adapter proof, not OS keyboard
+or assistive-technology actions.
 
 Startup controls use the actual public mount acquisition/lifetime seam. A
 previously disposed lifetime must never poll acquisition or call init. A second
@@ -69,7 +87,9 @@ production recovery adapter also owns its five-second async acquisition deadline
 **Current-frame asynchronous GPU error scopes and Classic shader-counter
 qualification remain open.** Both success and failure receipts say so. Pending
 counters are diagnostic; pixels and synchronous Wasm raster do not close those
-gates. All fixture source is unexecuted until the coordinator records receipts.
+gates. A fixture JSON success or matching raw pixels alone does not accept the
+whole browser driver: console errors, bounded owned-process cleanup, lock and
+artifact closure still have to pass their independent receipts.
 
 Coordinator-only commands under the serialized Cargo lease:
 
@@ -77,7 +97,8 @@ Coordinator-only commands under the serialized Cargo lease:
 RUSTFLAGS='--cfg getrandom_backend="wasm_js"' cargo build --locked \
   -p cambium-genet-web-host --example shared_recovery \
   --target wasm32-unknown-unknown -j2
-wasm-bindgen --target web --no-typescript --out-dir <owned-output>/pkg \
+wasm-bindgen --target web --no-typescript --out-name shared_recovery \
+  --out-dir <owned-output>/pkg \
   <leased-target>/wasm32-unknown-unknown/debug/examples/shared_recovery.wasm
 ```
 
@@ -87,3 +108,24 @@ handoff with a finite outer deadline (60 seconds). Record exact source/pin/binar
 hashes, the JSON seal, all raw artifacts and visual review. Final disposal may
 remove accessibility mirror nodes; use the retained raw artifacts for review.
 No server, adapter, build, test or browser was launched while authoring the fixture.
+
+## Accepted R6 evidence
+
+The [compact browser R6 receipt](../../../../../design_docs/cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/browser-r6/README.md)
+records actual Genet `5618326d` / Mere `4682ba99` / Netrender `c74b7cb` /
+provider `2eae624` code, reused compiled R4 Wasm/glue and unchanged R5 package,
+with a separately sealed R6 ownership driver. All twelve complete raw/PNG images,
+six full recovery comparisons, five CPU font-resource controls and independent
+numeric/visual reviews pass. Maximum RGB difference is 1, alpha 0 and mean
+1.9501730778606602e-5 under unchanged RGB 3 / alpha 2 / mean 1 limits. The actual
+async owner and hidden-host lifecycle succeed; actual private devices and
+mount/Chrome/Node/server resources close within their finite recorded bounds.
+
+This is explicit font delivery/retention with the fixture's one Roboto face
+mapped to four requested generics. The earlier native R2 proof uses G09b/Mcc65,
+not these later retained font-source changes. R6 records pending quality
+Some((3, 96)); current-frame async quality/error-scope and final canvas handoff
+qualification remain open, together with physical driver reset and OS input/AT.
+The detached current-frame control patches are not applied, compiled or executed.
+No runtime was rerun for this documentation. Later merged immutable-pin source
+requires its own coherent supplier/lock checks.
