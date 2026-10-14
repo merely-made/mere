@@ -86,6 +86,7 @@ where
     /// cleared by [`dispatch_pointer_up`](Self::dispatch_pointer_up). So a drag
     /// keeps reaching the element it started on even if the cursor leaves it.
     pointer_capture: Option<NodeId>,
+    pointer_owner: Option<(i32, PointerButton)>,
     /// Whether the most recent dispatch had its default action prevented (a
     /// handler called `prevent_default` on the shared [`Propagation`](crate::Propagation)
     /// cell). Read via `default_prevented` after dispatch to gate the host's
@@ -154,6 +155,7 @@ where
             mount,
             focus,
             pointer_capture: None,
+            pointer_owner: None,
             last_default_prevented: false,
             focus_exits: false,
             focus_exit: None,
@@ -290,6 +292,7 @@ where
         }
         if self.pointer_capture.is_some_and(|node| !dom.is_live(node)) {
             self.pointer_capture = None;
+            self.pointer_owner = None;
         }
     }
 
@@ -756,7 +759,7 @@ where
     }
 
     /// A button went down on `target`. Primary begins a drag capture;
-    /// secondary routes one `Down` and captures nothing. See
+    /// secondary routes one `Down` and may explicitly request capture. See
     /// [`GenetAppRunner::dispatch_pointer_down`].
     pub(crate) fn dispatch_pointer_down(
         &mut self,
@@ -784,15 +787,36 @@ where
             }
             found
         };
-        // Capture belongs to the primary button. A secondary press routes to
-        // the same element but starts no gesture, so an existing drag is left
-        // alone and no later release can deliver an `Up` for a capture that
-        // never began. See [`PointerButton`](crate::PointerButton).
-        if event.button == PointerButton::Primary {
+        // Primary and auxiliary gestures capture before routing. Secondary
+        // capture is opt-in after routing and cannot steal an existing gesture.
+        if matches!(
+            event.button,
+            PointerButton::Primary | PointerButton::Auxiliary
+        ) {
+            if self
+                .pointer_owner
+                .is_some_and(|owner| owner != (event.pointer_id, event.button))
+            {
+                return Vec::new();
+            }
             self.pointer_capture = captured;
+            self.pointer_owner = captured.map(|_| (event.pointer_id, event.button));
         }
         match captured {
-            Some(node) => self.route_pointer(logic, state, node, event),
+            Some(node) => {
+                let request = event.clone();
+                let actions = self.route_pointer(logic, state, node, event);
+                if request.button == PointerButton::Secondary
+                    && request.capture_requested()
+                    && self.pointer_capture.is_none()
+                    && self.node_is_live(node)
+                    && self.pointer_target(node) == Some(node)
+                {
+                    self.pointer_capture = Some(node);
+                    self.pointer_owner = Some((request.pointer_id, request.button));
+                }
+                actions
+            },
             None => Vec::new(),
         }
     }
@@ -806,6 +830,12 @@ where
     ) -> Vec<Action> {
         self.last_default_prevented = false;
         self.scrub_dead_interaction_handles();
+        if self
+            .pointer_owner
+            .is_some_and(|(id, _)| id != event.pointer_id)
+        {
+            return Vec::new();
+        }
         match self.pointer_capture {
             Some(node) => self.route_pointer(logic, state, node, event),
             None => Vec::new(),
@@ -821,10 +851,21 @@ where
     ) -> Vec<Action> {
         self.last_default_prevented = false;
         self.scrub_dead_interaction_handles();
+        if self.pointer_owner.is_some_and(|(id, button)| {
+            id != event.pointer_id
+                || (event.phase != crate::PointerPhase::Cancel && button != event.button)
+        }) {
+            return Vec::new();
+        }
+        self.pointer_owner = None;
         match self.pointer_capture.take() {
             Some(node) => self.route_pointer(logic, state, node, event),
             None => Vec::new(),
         }
+    }
+
+    pub(crate) fn pointer_capture_owner(&self) -> Option<(i32, PointerButton)> {
+        self.pointer_owner
     }
 
     pub(crate) fn pointer_capture(&self) -> Option<NodeId> {
@@ -1329,6 +1370,15 @@ where
     /// The element currently capturing a pointer drag, if any. The host reads
     /// this between [`dispatch_pointer_down`](Self::dispatch_pointer_down) and
     /// `up` to know which element's rect to measure for the move's local coords.
+    pub fn pointer_capture_owner(&self) -> Option<(i32, PointerButton)> {
+        self.tree.pointer_owner
+    }
+    pub fn dispatch_pointer_cancel(&mut self, mut event: PointerEvent) -> Vec<Action> {
+        event.phase = crate::PointerPhase::Cancel;
+        self.tree
+            .dispatch_pointer_up(&mut self.logic, &mut self.state, event)
+    }
+
     pub fn pointer_capture(&self) -> Option<NodeId> {
         self.tree.pointer_capture()
     }

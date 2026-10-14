@@ -44,6 +44,7 @@ use winit::application::ApplicationHandler;
 use winit::event::{ElementState, MouseButton, WindowEvent};
 use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
 use winit::keyboard::{Key, NamedKey};
+use winit::platform::scancode::PhysicalKeyExtScancode;
 use winit::window::{Window, WindowId};
 use workbench::{
     ContentSource, DocumentRef, DropTarget, Edge, SettingsRef, SplitAxis, Tile, TileBranch,
@@ -2428,7 +2429,7 @@ impl WorkspaceApp {
                     .scroll_appearance_at(self.cursor.0, self.cursor.1, dx, dy)
         } else {
             self.workspace
-                .scroll_at(self.cursor.0, self.cursor.1, dx, dy)
+                .wheel_at(self.cursor.0, self.cursor.1, dx, dy, self.modifiers)
         }
     }
 
@@ -4276,19 +4277,26 @@ impl TearoutWindow {
     }
 
     fn document_action_is_current(
-        &self,
+        &mut self,
         target: DocumentA11yActionTarget,
         action: DocumentA11yAction,
     ) -> bool {
-        let Some(controller) = self.workspace.controller(target.tile) else {
-            return false;
-        };
         if self.workspace.document_session_identity(target.tile) != Some(target.session_identity)
             || self.workspace.content_rect(target.tile) != Some(target.content_rect)
+            || !self
+                .workspace
+                .pool()
+                .admits(&target.tile, target.placement_generation)
             || !target.supports(action)
         {
             return false;
         }
+        if self.workspace.pool_mut().prepare(&target.tile).is_err() {
+            return false;
+        }
+        let Some(controller) = self.workspace.controller(target.tile) else {
+            return false;
+        };
         let Some(projection) = controller.accessibility_projection() else {
             return false;
         };
@@ -4299,7 +4307,7 @@ impl TearoutWindow {
     }
 
     fn apply_accessibility_request(&mut self, request: A11yActionRequest) -> bool {
-        let Some(target) = self.accessibility.action_for(request.target_node) else {
+        let Some(target) = self.accessibility.action_for_request(&request) else {
             return false;
         };
         match (request.action, target) {
@@ -4598,12 +4606,11 @@ impl TearoutWindow {
                     redraw: self.apply_effect(effect),
                 }
             },
-            WindowEvent::MouseInput {
-                state,
-                button: MouseButton::Left,
-                ..
-            } => {
-                if state == ElementState::Pressed {
+            WindowEvent::MouseInput { state, button, .. } => {
+                let Some(session_button) = session_mouse_button(button) else {
+                    return TearoutEvent::Keep { redraw: false };
+                };
+                if state == ElementState::Pressed && button == MouseButton::Left {
                     match self.frisket.hit(self.cursor.0, self.cursor.1) {
                         Some(FrisketHit::Tab(tile)) => {
                             let changed = self.workspace.apply(&TileEvent::Activated(tile));
@@ -4627,7 +4634,7 @@ impl TearoutWindow {
                 let effect = self.workspace.input(SessionInput::PointerButton {
                     x: self.cursor.0,
                     y: self.cursor.1,
-                    button: SessionPointerButton::Primary,
+                    button: session_button,
                     state: button_state(state),
                     modifiers: self.modifiers,
                 });
@@ -4638,11 +4645,12 @@ impl TearoutWindow {
             WindowEvent::MouseWheel { delta, .. } => {
                 let (dx, dy) = wheel_delta_from_winit(delta);
                 TearoutEvent::Keep {
-                    redraw: self.workspace.scroll_at(
+                    redraw: self.workspace.wheel_at(
                         self.cursor.0,
                         self.cursor.1,
                         dx / self.scale_factor,
                         dy / self.scale_factor,
+                        self.modifiers,
                     ),
                 }
             },
@@ -4655,12 +4663,21 @@ impl TearoutWindow {
                         redraw: self.apply_effect(effect),
                     };
                 }
-                let effect = self.workspace.input(SessionInput::Key {
-                    key: session_key(&event.logical_key),
-                    state: button_state(event.state),
-                    modifiers: self.modifiers,
-                    repeat: event.repeat,
-                });
+                let surface = self
+                    .workspace
+                    .focused_tile()
+                    .and_then(|tile| self.workspace.content(tile))
+                    .is_some_and(|content| content.lane() == pelt_core::PeltLane::Surface);
+                let input = native_keyboard_input(
+                    surface,
+                    &event.logical_key,
+                    event.physical_key.to_scancode().unwrap_or(0),
+                    event.text.as_deref(),
+                    event.state,
+                    self.modifiers,
+                    event.repeat,
+                );
+                let effect = self.workspace.input_event(input);
                 let handled = effect.handled;
                 let editable = effect.editable;
                 let mut redraw = self.apply_effect(effect);
@@ -5468,6 +5485,27 @@ impl ApplicationHandler for WorkspaceApp {
                         f64::from(self.cursor.0),
                         f64::from(self.cursor.1),
                     ));
+                } else {
+                    let effect = self.workspace.input(SessionInput::PointerButton {
+                        x: self.cursor.0,
+                        y: self.cursor.1,
+                        button: SessionPointerButton::Secondary,
+                        state: SessionButtonState::Pressed,
+                        modifiers: self.modifiers,
+                    });
+                    self.apply_effect(effect);
+                }
+            },
+            WindowEvent::MouseInput { state, button, .. } => {
+                if let Some(button) = session_mouse_button(button) {
+                    let effect = self.workspace.input(SessionInput::PointerButton {
+                        x: self.cursor.0,
+                        y: self.cursor.1,
+                        button,
+                        state: button_state(state),
+                        modifiers: self.modifiers,
+                    });
+                    self.apply_effect(effect);
                 }
             },
             WindowEvent::MouseWheel { delta, .. } => {
@@ -5488,12 +5526,21 @@ impl ApplicationHandler for WorkspaceApp {
                     self.apply_effect(effect);
                     return;
                 }
-                let effect = self.workspace.input(SessionInput::Key {
-                    key: session_key(&event.logical_key),
-                    state: button_state(event.state),
-                    modifiers: self.modifiers,
-                    repeat: event.repeat,
-                });
+                let surface = self
+                    .workspace
+                    .focused_tile()
+                    .and_then(|tile| self.workspace.content(tile))
+                    .is_some_and(|content| content.lane() == pelt_core::PeltLane::Surface);
+                let input = native_keyboard_input(
+                    surface,
+                    &event.logical_key,
+                    event.physical_key.to_scancode().unwrap_or(0),
+                    event.text.as_deref(),
+                    event.state,
+                    self.modifiers,
+                    event.repeat,
+                );
+                let effect = self.workspace.input_event(input);
                 let handled = effect.handled;
                 let editable = effect.editable;
                 self.apply_effect(effect);
@@ -5603,6 +5650,147 @@ fn button_state(state: ElementState) -> SessionButtonState {
     }
 }
 
+fn native_keyboard_input(
+    surface: bool,
+    logical: &Key,
+    scan_code: u32,
+    text: Option<&str>,
+    state: ElementState,
+    modifiers: SessionModifiers,
+    repeat: bool,
+) -> pelt_core::PeltInput {
+    if !surface {
+        return SessionInput::Key {
+            key: session_key(logical),
+            state: button_state(state),
+            modifiers,
+            repeat,
+        }
+        .into();
+    }
+    pelt_core::PeltInput::Keyboard(inker::KeyboardEvent {
+        key_code: native_virtual_key(logical),
+        scan_code,
+        modifiers: inker::KeyboardModifiers {
+            shift: modifiers.shift,
+            ctrl: modifiers.control,
+            alt: modifiers.alt,
+            meta: modifiers.meta,
+        },
+        pressed: state == ElementState::Pressed,
+        text: text.map(str::to_owned),
+    })
+}
+
+fn native_virtual_key(key: &Key) -> u32 {
+    match key {
+        Key::Named(named) => {
+            let function_keys = [
+                NamedKey::F1,
+                NamedKey::F2,
+                NamedKey::F3,
+                NamedKey::F4,
+                NamedKey::F5,
+                NamedKey::F6,
+                NamedKey::F7,
+                NamedKey::F8,
+                NamedKey::F9,
+                NamedKey::F10,
+                NamedKey::F11,
+                NamedKey::F12,
+                NamedKey::F13,
+                NamedKey::F14,
+                NamedKey::F15,
+                NamedKey::F16,
+                NamedKey::F17,
+                NamedKey::F18,
+                NamedKey::F19,
+                NamedKey::F20,
+                NamedKey::F21,
+                NamedKey::F22,
+                NamedKey::F23,
+                NamedKey::F24,
+            ];
+            if let Some(index) = function_keys
+                .iter()
+                .position(|candidate| candidate == named)
+            {
+                return 0x70 + index as u32;
+            }
+            match named {
+                NamedKey::Backspace => 8,
+                NamedKey::Tab => 9,
+                NamedKey::Clear => 12,
+                NamedKey::Enter => 13,
+                NamedKey::Shift => 16,
+                NamedKey::Control => 17,
+                NamedKey::Alt => 18,
+                NamedKey::Pause => 19,
+                NamedKey::CapsLock => 20,
+                NamedKey::Escape => 27,
+                NamedKey::Space => 32,
+                NamedKey::PageUp => 33,
+                NamedKey::PageDown => 34,
+                NamedKey::End => 35,
+                NamedKey::Home => 36,
+                NamedKey::ArrowLeft => 37,
+                NamedKey::ArrowUp => 38,
+                NamedKey::ArrowRight => 39,
+                NamedKey::ArrowDown => 40,
+                NamedKey::PrintScreen => 44,
+                NamedKey::Insert => 45,
+                NamedKey::Delete => 46,
+                NamedKey::Help => 47,
+                NamedKey::Meta => 91,
+                NamedKey::ContextMenu => 93,
+                NamedKey::NumLock => 144,
+                NamedKey::ScrollLock => 145,
+                NamedKey::BrowserBack => 166,
+                NamedKey::BrowserForward => 167,
+                NamedKey::BrowserRefresh => 168,
+                NamedKey::BrowserStop => 169,
+                NamedKey::BrowserSearch => 170,
+                NamedKey::BrowserFavorites => 171,
+                NamedKey::BrowserHome => 172,
+                NamedKey::AudioVolumeMute => 173,
+                NamedKey::AudioVolumeDown => 174,
+                NamedKey::AudioVolumeUp => 175,
+                NamedKey::MediaTrackNext => 176,
+                NamedKey::MediaTrackPrevious => 177,
+                NamedKey::MediaStop => 178,
+                NamedKey::MediaPlayPause => 179,
+                _ => 0,
+            }
+        },
+        Key::Character(text) => {
+            let mut chars = text.chars();
+            let Some(first) = chars.next() else {
+                return 0;
+            };
+            if chars.next().is_some() {
+                return 0;
+            }
+            match first {
+                ';' | ':' => 186,
+                '=' | '+' => 187,
+                ',' | '<' => 188,
+                '-' | '_' => 189,
+                '.' | '>' => 190,
+                '/' | '?' => 191,
+                '`' | '~' => 192,
+                '[' | '{' => 219,
+                '\\' | '|' => 220,
+                ']' | '}' => 221,
+                '\'' | '"' => 222,
+                c if c.is_ascii_alphanumeric() => c.to_ascii_uppercase() as u32,
+                ' ' => 32,
+                _ => 0,
+            }
+        },
+        _ => 0,
+    }
+}
+
 fn session_key(key: &Key) -> SessionKey {
     match key {
         Key::Character(text) => SessionKey::Character(text.to_string()),
@@ -5671,5 +5859,14 @@ fn session_ime(ime: winit::event::Ime) -> SessionIme {
         winit::event::Ime::Preedit(text, selection) => SessionIme::Preedit { text, selection },
         winit::event::Ime::Commit(text) => SessionIme::Commit(text),
         winit::event::Ime::Disabled => SessionIme::Disabled,
+    }
+}
+
+fn session_mouse_button(button: MouseButton) -> Option<SessionPointerButton> {
+    match button {
+        MouseButton::Left => Some(SessionPointerButton::Primary),
+        MouseButton::Right => Some(SessionPointerButton::Secondary),
+        MouseButton::Middle => Some(SessionPointerButton::Auxiliary),
+        _ => None,
     }
 }

@@ -39,7 +39,7 @@ files, or other store-and-forward paths.
   owns per-predicate lifecycle and GC.
 - [`2026-06-29_reticulum_transport_plan.md`](../../archive_docs/2026-10-06_completed_plans/2026-06-29_reticulum_transport_plan.md)
   keeps Reticulum bilateral while sync and blobs remain Iroh-only.
-- [`../../../../retinue/design_docs/2026-07-06_retinue_v0_plan.md`](../../../../retinue/design_docs/2026-07-06_retinue_v0_plan.md)
+- [`../../../../murm/design_docs/2026-07-06_retinue_v0_plan.md`](../../../../murm/design_docs/2026-07-06_retinue_v0_plan.md)
   owns Reticulum packet, link, and resource transfer.
 - [p2panda `PruneFlag`](https://docs.rs/p2panda-core/0.6.1/p2panda_core/prune/struct.PruneFlag.html)
   and [p2panda-stream `LogPrune`](https://docs.rs/p2panda-stream/0.6.1/p2panda_stream/log_prune/struct.LogPrune.html)

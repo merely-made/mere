@@ -112,7 +112,7 @@ const treeReceipt = () => ({
   visibility: document.visibilityState,
   viewport: { width: window.innerWidth, height: window.innerHeight },
 });
-window.graphshellReceipt = () => document.querySelector("graphshell-tree") ? treeReceipt() : ({
+window.graphshellReceipt = () => graphshellRoot()?.dataset.presenter === "tree" ? treeReceipt() : ({
   practice: graphshellRoot()?.hasAttribute('data-practice-workspace') ? {
     view: graphshellRoot().dataset.practiceView,
     selection: graphshellRoot().dataset.practiceSelection,
@@ -411,12 +411,10 @@ try {
   // practice proof read one input, the root's `data-dataset`.
   await loadHostDataset(graphshellRoot());
   // Two ways in, one component. `mountGraphshell(element)` is the plain
-  // entry; `<graphshell-view>` is the same entry as a custom element, and the
-  // one-tree page (tree.html, the one-tree plan's phase 3) mounts the same
-  // bundle's Cambium tree as `<graphshell-tree>` (`mount.js`); the scenario
-  // lane below serves both.
-  window.mountGraphshell = (element) => module.mount(element);
-  defineElements(module);
+  // entry; both custom elements use the retained tree. The shared mount
+  // setup fetches a supplied dataset before mounting either element.
+  window.mountGraphshell = (element) => module.mount_tree(element);
+  defineElements({ ...module, mount: module.mount_tree });
   // The remote link: `?signal=<url>` joins a host over WebRTC through its
   // signaling server (`GET /invite` unless `?invite=` is given, `POST
   // /offer`). Without it the in-process fixture stays mounted.

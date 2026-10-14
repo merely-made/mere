@@ -648,10 +648,12 @@ pub enum HostPointer {
     Release(f32, f32),
     /// Press the right button at this point.
     ///
-    /// A secondary press begins no pointer capture, and the native host does
-    /// not route a matching right-button release. The press is therefore the
-    /// complete context-menu gesture, just as it is in the winit event arm.
+    /// Secondary capture is opt-in through the retained pointer handler.
     SecondaryPress(f32, f32),
+    /// Release the right button through the host's qualified capture route.
+    SecondaryRelease(f32, f32),
+    /// Cancel the current capture without delivering an activating release.
+    Cancel,
 }
 
 /// A request to bring one retained DOM node into view, queued by
@@ -794,6 +796,26 @@ where
         let dom = dom.borrow();
         let view = crate::WindowDom::new(&dom, self.runner.mount());
         layout.visible_rect(&view, node)
+    }
+
+    /// A computed value from the retained layout's own style set. No layout
+    /// or absent property is unavailable, rather than a synthesized default.
+    /// This observes an existing layout and never triggers style or layout work.
+    pub fn painted_style_value(&self, node: NodeId, property: &str) -> Option<String> {
+        self.layout?.computed_value(node, property)
+    }
+
+    /// The same retained hit test used by this host's input routing, in logical
+    /// pointer coordinates. This does not dispatch input or change focus/capture.
+    pub fn painted_hit(&self, x: f32, y: f32) -> Option<NodeId> {
+        if !x.is_finite() || !y.is_finite() {
+            return None;
+        }
+        let layout = self.layout?;
+        let dom = self.runner.dom();
+        let dom = dom.borrow();
+        let view = crate::WindowDom::new(&dom, self.runner.mount());
+        layout.hit_test(&view, x, y)
     }
 
     /// Names and roles from the same retained document projection the host
@@ -1071,6 +1093,8 @@ where
     pub(crate) leaf_keys: Vec<u64>,
     /// Cursor position in logical coordinates.
     pub cursor: (f32, f32),
+    /// Current native pointer identity (mouse defaults to zero).
+    pub pointer_id: i32,
     /// Live modifier state, in the neutral vocabulary. Winit's own state is
     /// converted once, where it arrives, so nothing downstream reads it.
     pub modifiers: Modifiers,
@@ -1182,6 +1206,7 @@ where
             layout_sheet_generation: 0,
             leaf_keys: Vec::new(),
             cursor: (0.0, 0.0),
+            pointer_id: 0,
             modifiers: Modifiers::NONE,
             text_drag: None,
             last_hover: None,
@@ -1693,6 +1718,11 @@ where
                     self.s.cursor = (x, y);
                     self.secondary_press();
                 },
+                HostPointer::SecondaryRelease(x, y) => {
+                    self.s.cursor = (x, y);
+                    self.release_button(cambium::PointerButton::Secondary);
+                },
+                HostPointer::Cancel => self.cancel_pointer(),
             }
         }
     }

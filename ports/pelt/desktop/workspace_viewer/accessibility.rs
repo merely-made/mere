@@ -32,19 +32,26 @@ pub(super) enum WorkspaceA11yFocus {
 
 impl WorkspaceApp {
     fn document_action_is_current(
-        &self,
+        &mut self,
         target: DocumentA11yActionTarget,
         action: DocumentA11yAction,
     ) -> bool {
-        let Some(controller) = self.workspace.controller(target.tile) else {
-            return false;
-        };
         if self.workspace.document_session_identity(target.tile) != Some(target.session_identity)
             || self.workspace.content_rect(target.tile) != Some(target.content_rect)
+            || !self
+                .workspace
+                .pool()
+                .admits(&target.tile, target.placement_generation)
             || !target.supports(action)
         {
             return false;
         }
+        if self.workspace.pool_mut().prepare(&target.tile).is_err() {
+            return false;
+        }
+        let Some(controller) = self.workspace.controller(target.tile) else {
+            return false;
+        };
         let Some(projection) = controller.accessibility_projection() else {
             return false;
         };
@@ -54,7 +61,10 @@ impl WorkspaceApp {
             })
     }
 
-    fn current_document_click_point(&self, target: DocumentA11yActionTarget) -> Option<(f32, f32)> {
+    fn current_document_click_point(
+        &mut self,
+        target: DocumentA11yActionTarget,
+    ) -> Option<(f32, f32)> {
         if !self.document_action_is_current(target, DocumentA11yAction::Click) {
             return None;
         }
@@ -97,7 +107,7 @@ impl WorkspaceApp {
         &mut self,
         request: A11yActionRequest,
     ) -> bool {
-        let Some(target) = self.accessibility.action_for(request.target_node) else {
+        let Some(target) = self.accessibility.action_for_request(&request) else {
             return false;
         };
         match (request.action, target) {
@@ -219,6 +229,7 @@ pub(super) struct DocumentA11yActionTarget {
     pub(super) tile: TileId,
     pub(super) session_identity: PeltSessionIdentity,
     pub(super) revision: u64,
+    pub(super) placement_generation: u64,
     pub(super) local_node: DocumentA11yNodeId,
     pub(super) content_rect: WorkspaceRect,
     pub(super) actions: u8,
@@ -297,6 +308,7 @@ pub(super) struct DocumentA11yChild {
     pub(super) aperture: AccessNodeId,
     pub(super) projection: DocumentA11yProjection,
     pub(super) content_rect: WorkspaceRect,
+    pub(super) placement_generation: u64,
 }
 
 /// Per-window platform bridge and retained composite action map.
@@ -393,6 +405,16 @@ impl WorkspaceAccessibility {
         }
         self.bridge.update(tree);
         self.bridge.drain_actions()
+    }
+
+    pub(super) fn action_for_request(
+        &self,
+        request: &A11yActionRequest,
+    ) -> Option<WorkspaceA11yActionTarget> {
+        if request.target_tree != accesskit::TreeId::ROOT {
+            return None;
+        }
+        self.action_for(request.target_node)
     }
 
     pub(super) fn action_for(&self, id: AccessNodeId) -> Option<WorkspaceA11yActionTarget> {
@@ -520,6 +542,7 @@ fn append_document_child(
         aperture,
         projection,
         content_rect,
+        placement_generation,
     } = child;
     let local_ids = projection
         .nodes()
@@ -647,6 +670,7 @@ fn append_document_child(
                     tile,
                     session_identity,
                     revision: projection.revision(),
+                    placement_generation,
                     local_node: semantic.id,
                     content_rect,
                     actions: action_bits,
@@ -717,6 +741,7 @@ pub(super) fn secondary_accessibility_projection(
             DocumentA11yChild {
                 tile,
                 session_identity: controller.session_identity(),
+                placement_generation: workspace.pool().placement_generation(&tile).unwrap_or(0),
                 aperture,
                 projection,
                 content_rect,
@@ -846,6 +871,7 @@ impl WorkspaceApp {
                 Some(DocumentA11yChild {
                     tile,
                     session_identity: controller.session_identity(),
+                    placement_generation: self.workspace.pool().placement_generation(&tile)?,
                     aperture,
                     projection,
                     content_rect,
@@ -962,6 +988,7 @@ impl WorkspaceApp {
                 aperture,
                 projection,
                 content_rect,
+                placement_generation,
             } = child;
             let local_ids = projection
                 .nodes()
@@ -1095,6 +1122,7 @@ impl WorkspaceApp {
                             tile,
                             session_identity,
                             revision: projection.revision(),
+                            placement_generation,
                             local_node: semantic.id,
                             content_rect,
                             actions: action_bits,

@@ -147,7 +147,7 @@ fn resize_handle_body(
                         local.height = height;
                         Some(ResizeHandleEvent::Resize { width, height })
                     },
-                    PointerPhase::Up => {
+                    PointerPhase::Up | PointerPhase::Cancel => {
                         local.grab = None;
                         Some(ResizeHandleEvent::ResizeEnd {
                             width: local.width,

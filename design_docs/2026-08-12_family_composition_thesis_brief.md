@@ -183,7 +183,7 @@ standing alone is a feature of the plan rather than a delay.
   covered by **source truth** (the authority) and **a mere / datalake** (the
   dataspace). Three senses on one noun would be a lexicon regression.
 - Signalman is retinue's application (`apps/signalman-desktop` *(historical citation)* <!-- doc-audit: historical-path -->, founded
-  [2026-08-06](https://github.com/merely-made/retinue/blob/main/design_docs/2026-08-06_signalman_founding.md)),
+  [2026-08-06](https://github.com/merely-made/murm/blob/main/design_docs/2026-08-06_signalman_founding.md)),
   whose founding already states this brief's authority split from its side:
   graphshell surfaces meres rather than owning radios. Its postilion base
   (station logic with no UI) is what would make an embedded cross-application
@@ -1264,6 +1264,107 @@ whether the stack needs foundational graph, bundle or action machinery. This
 review adds no crate and opens no paused lane. The four later policy rulings
 above now govern the profile design; broader lifecycle checkpoints remain open.
 
+### Embedding in caller owned wgpu contexts draft
+
+**Status (2026-10-13):** Design direction from Mark; contract and toolkit
+adapters proposed. Mark wants Mere, Genet, the stack and application components
+to embed into wgpu contexts with less integration work and more flexibility
+than the external browser trio. This is a consumer target, not a claim of a
+qualified universal GUI adapter.
+
+The containing application supplies its GPU context and keeps its window,
+event loop and composition. It can embed a capability without UI, one app
+pane, a graph projection, a workbench, or a larger application surface. The
+embedded component retains its domain/session authority and exposes supported
+operations through the existing owner interfaces. Rendering and resource
+intake are separate capabilities: an embedded graph may show remote references,
+retained clips or host-supplied live entities.
+
+#### Resource leaves and sharing
+
+The working *resource as leaf* idea makes a resource a meaningful unit of
+identity and sharing. Granularity follows the domain or an explicit selection:
+a document can be a leaf in one view and a composition of addressed parts in
+another. Promoting a part to an independently retained/shared clip creates its
+own identity and lineage; a selector alone does not mint a graph entity.
+Resource, access and appearance identities remain distinct.
+
+Murm can exchange disclosed material and references; Gemot governs community
+contributions and collections that refer to that material. Contributions keep
+their own identity and context, as in the
+[Moot ownership model](moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#shared-model-and-ownership).
+Sharing material preserves independent encounters. Authored arrangements and
+application-defined coop operations can also be shared under their own scope.
+
+Foreign platforms can supply references, captured selections or declared live
+operations through different adapters. A browser extension can acquire
+accessible page content with its granted permissions; a PWA can accept imports
+and shares; an embedded component can receive objects and capabilities from a
+cooperating host. These adapters feed the portable content/profile work above.
+Retained material carries source and capture evidence; operating on its live
+origin still uses an actual supported owner interface.
+
+#### Existing seams and the remaining host boundary
+
+| Existing seam | What it already separates | Remaining embedding question |
+|---|---|---|
+| Sprigging paint commands and Vello scene leaves | Custom paint production from its retained host | How another toolkit presents that output and forwards its semantics/input |
+| Conatus `HostDevice` and `DeviceNeeds` | A tenant's needs from host-owned GPU handles | How the whole native document/UI lane accepts a caller-owned context |
+| Cambium Rootstock `Surface` and host lifecycle | Platform events from shared document/UI behavior | Its current surface still exposes a `RenderCore` and acquires a `SurfaceTexture`; arbitrary target views need an explicit boundary |
+| Inker `SurfaceProducer` | Producer commands/events from raw native frames, format, synchronization and allocation epoch | Preserve native interop and backend/thread requirements while fitting another host's render schedule |
+| Mere view model and requests | Presentation from session/storage authority | Adapt toolkit input, focus and accessibility while retaining the same owner requests |
+
+Source homes are `crates/cambium/sprigging/src/lib.rs`,
+`crates/conatus/tenant/src/device.rs`,
+`crates/cambium/cambium-rootstock/src/lib.rs`,
+`crates/inker/inker/src/surface_engine.rs` and
+`crates/cambium/mere-view/src/lib.rs`.
+The external trio is Scrying, Graft and Weld, with opt-in Inker adapters;
+native Pelt/Genet remains the baseline under the
+[suite composition ruling](2026-08-22_turnstone_suite_composition_and_capability_census.md).
+
+#### Proposed host contract
+
+| Boundary | Required contract |
+|---|---|
+| GPU context | Accept compatible host Device/Queue handles; declare features and limits before allocation. Track device generation and rebuild device-bound state after loss. |
+| Frame composition | Accept target view or an owned intermediate texture, dimensions, scale, clipping, pixel/alpha format and sample count. Specify command ordering, submission ownership and when returned resources may be released. |
+| Input and semantics | Map pointer/keyboard/focus, capture, IME and caret geometry, clipboard, cursor and accessibility updates/actions. Keep host and embedded coordinate systems explicit. |
+| Scheduling and lifecycle | Report invalidation and wake requests; honor resize, visibility, suspension and disposal. The caller owns its event loop, with producer thread requirements disclosed. |
+| Data and operations | Supply retained content or admitted source interfaces. Preserve identity, source revision, provenance, capability outcomes and storage authority independently of the drawing target. |
+
+Native Genet presentation should render using the supplied context. External
+browser producers retain their existing native-frame import path, including
+format, synchronization and resource lifetime. Paint/scene outputs may offer
+another composition path where their resources and semantics are representable.
+These are distinct render capabilities under one host-facing lifecycle;
+adapters advertise the paths they actually support.
+
+A wgpu backend provides a promising integration point when its toolkit exposes
+these hooks. Matching the wgpu API version, device, target format and required
+features is part of each adapter's compatibility matrix. A toolkit's use of
+wgpu internally does not establish public access to those hooks.
+[egui-wgpu's callback](https://docs.rs/egui-wgpu/0.36.2/egui_wgpu/trait.CallbackTrait.html)
+exposes prepare/paint stages and GPU handles;
+[Iced's primitive interface](https://docs.rs/iced_wgpu/0.14.0/iced_wgpu/primitive/trait.Primitive.html)
+exposes prepare, render-pass drawing or encoder/target rendering. These are
+candidate adapter seams, not tested stack integrations.
+
+#### First qualification target
+
+Embed the same retained text/media view and Mere graph pane in two independent
+toolkit hosts, initially egui and Iced, using compatible dependency versions.
+Both callers should retain their event loop and GPU submission. Verify clipped
+rendering, resize/scale changes, independent focus, keyboard/IME behavior,
+accessibility action routing, wake/suspend/dispose and device recovery. The
+same source shown twice must preserve separate access/appearance state, and
+closing one appearance must release only its unnecessary resources.
+
+Qualify the native lane first. Optional Scrying/Graft/Weld providers retain
+their separate backend and packaging gates. Extend existing render/session
+owners before promoting a facade; source, producer and application semantics
+remain with their respective owners.
+
 ## What this brief deliberately does not do
 
 This brief records the composition thesis and its research lanes. It does
@@ -1271,3 +1372,92 @@ not found crates or promote proposed APIs. The historical sidequests and §7
 implementation candidates enter owner-specific plans when their research
 and consumer gates are met; existing implementation plans retain authority
 over work already in progress.
+
+
+## Shared Rust toolchain and minimum version (2026-10-13)
+
+**Owner direction:** use the newest Rust across the stack, with build-directory
+support, and unify the declared minimum versions as well. Existing manifest or
+CI floors are observations of the tree, not evidence that the owner requested
+older-compiler compatibility. The initial Murm move plan's inference of a
+Rust 1.88 preservation requirement is withdrawn.
+
+**Working toolchain:** current stable Rust 1.99.0, verified against the
+[official release announcement](https://blog.rust-lang.org/2026/10/01/Rust-1.99.0/).
+Pin this exact release in active owned build roots for development, formatting,
+linting and current-compiler qualification. Advance the working toolchain as
+new stable releases are qualified.
+
+**Selected shared MSRV: Rust 1.97.1**, independently of the working toolchain.
+The owner accepted this floor provided no requirement pins a newer minimum.
+The earlier interpretation requiring `rust-version = "1.99"` and simultaneous
+pin/minimum upgrades is withdrawn. Align owned packages to
+`rust-version = "1.97.1"` during the qualified rollout; advance the minimum only
+when language use, supported dependencies or an explicit support decision
+require it. Published older versions keep their historical metadata; do not
+rewrite third-party/vendored suppliers' minimums to manufacture agreement.
+
+The locked Mere metadata on 2026-10-13 contains 1,614 resolved packages and no
+declared floor above 1.97.1. Iroh 1.3.0 declares 1.91, the refreshed p2panda
+supplier declares 1.96, Knot packages declare 1.97, and WESL/WGSL packages
+have the highest declaration at 1.97.1. Fetched owner manifests across eleven
+active repositories likewise contain no declared floor above 1.97.1. Several
+repositories pin 1.98.1 for development; that pin alone is not an MSRV.
+
+A further scan of 71 tracked lockfiles inspected 2,491 cached registry package
+manifests, again without a declaration above 1.97.1. There are 277 uncached
+registry package versions, independent Git suppliers outside Mere are not
+exhaustively resolved, and some packages declare no floor. These inventories
+support selecting 1.97.1 for rollout; they do not prove every supported build
+works on it. Qualify supported feature/target configurations on that compiler
+and resolve any newly discovered higher requirement before claiming shared
+support. Evidence: `Code/targets/murm-shared-msrv-selection-20261013.json`.
+
+CI must exercise both policies: current-toolchain development checks and a
+separate selected-MSRV build/test lane for supported configurations. Passing
+on 1.99 alone does not establish compatibility with the MSRV. A newer working
+pin does not change the support promise automatically.
+
+This policy covers the active first-party repository family and its independent
+application, library, probe, browser and firmware workspaces, including the
+Murm/Retinue foundation, Mere, Genet, Dramatis, Turnstone, Woodshed and Knot.
+The execution inventory must resolve current active homes and source pins;
+archived standalone clones are not additional migration targets. A target that
+actually needs a compiler fork or nightly has a documented target realization
+whose compiler is checked against the separately selected support floor, rather
+than an assumed permanent older MSRV exception. Workspace separation is justified by
+dependency graphs, feature unification, target realizations and profiles; it
+must not choose radio/native MSRVs merely from repository placement.
+
+Use Cargo's supported `build.build-dir` for intermediate build artifacts and
+`build.target-dir` for delivered outputs. Build-dir support stabilized in
+Cargo 1.91; the 1.99 working toolchain satisfies that requirement without
+requiring a 1.99 library MSRV. See the
+[Cargo build-dir documentation](https://doc.rust-lang.org/cargo/reference/config.html#buildbuild-dir)
+and [stabilization record](https://doc.rust-lang.org/cargo/reference/unstable.html#build-dir).
+Use workspace/platform/configuration isolation, and audit environment/CLI
+path overrides and cache keys. Packaging and test harnesses must discover
+actual Cargo artifact/executable paths rather than assume the intermediate
+layout is permanently `target/debug/deps`. A shared version does not require
+all configurations to write into one unqualified cache directory.
+
+The coordinated rollout inventories toolchain pins, owned minimums, CI jobs
+and independent build roots, qualifies the new working toolchain, and
+independently qualifies the selected 1.97.1 MSRV. It checks native, browser/Wasm
+and embedded paths plus packaging/artifact discovery. It records compiler
+versions in receipts and updates consumers' source pins where compiler changes require
+supplier adoption. An older compiler's passing receipt is not a new compiler's
+qualification. The Murm move plan carries this as MOVE1, before implementation
+imports and consumer cutover.
+
+**Current execution status:** defaults are published across the active Rust
+repository family; the first Murm supplier import is published and its primary
+Mere source cutover is qualified. Broader platform compiler qualification remains
+separate from declaration-policy checks. Isolated checkouts
+of all 21 active Rust repositories in the organization now carry the 1.99.0
+working pins, 1.97.1 owned-package declarations and separate intermediate build
+directories. Root metadata policy checks pass on both compiler versions (42
+checks). Vendored/patch suppliers and frozen historical receipts are preserved.
+The shared wgpu CI support-floor default is aligned too. Compiler qualification,
+publication and the first Murm imports are recorded in the canonical Murm move
+plan. Metadata checks alone do not establish all-platform MSRV compatibility.

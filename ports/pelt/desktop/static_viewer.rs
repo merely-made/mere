@@ -717,7 +717,7 @@ mod livery_route_tests {
             content
                 .drive_product_receipt(StaticProductReceipt::Controls)
                 .as_deref(),
-            Ok("nested wheel stayed local and keyboard edit reached retained structure")
+            Ok("nested wheel stayed local and keyboard edit reached retained control value")
         );
     }
 
@@ -1410,6 +1410,25 @@ impl windowed::ViewerContent for ControllerViewerContent {
                 if !note.handled || !note.editable {
                     return Err("controls receipt did not focus the retained textarea".to_owned());
                 }
+                // Focus changes CSS state and invalidates retained layout.
+                // Prepare the receipt viewport before capturing its AX identity.
+                let _focused = self.controller.frame(960, 640);
+                let note_id = self
+                    .controller
+                    .accessibility_projection()
+                    .and_then(|projection| {
+                        projection
+                            .nodes()
+                            .iter()
+                            .find(|node| {
+                                node.role == inker::DocumentA11yRole::TextField
+                                    && node.state.focused
+                            })
+                            .map(|node| node.id)
+                    })
+                    .ok_or_else(|| {
+                        "controls receipt focused textarea was not projected".to_owned()
+                    })?;
                 let end = self.controller.input(inker::SessionInput::Key {
                     key: inker::SessionKey::End,
                     state: inker::SessionButtonState::Pressed,
@@ -1431,29 +1450,27 @@ impl windowed::ViewerContent for ControllerViewerContent {
                 // its semantic projection. The native render then frames at
                 // the actual host size for the final artifact.
                 let edited_glyphs = glyph_count(&self.controller.frame(960, 640));
-                // Edited form values belong to Genet's retained control state;
-                // source textarea text remains its HTML default value. Read the
-                // live semantic value and retain the source-structure assertion.
-                let retained = self
-                    .controller
-                    .accessibility_projection()
-                    .is_some_and(|report| {
-                        report
-                            .nodes()
-                            .iter()
-                            .any(|entry| entry.value.as_deref() == Some("cedar and ash"))
-                    });
-                let source_preserved = self.controller.inspect().is_some_and(|report| {
+                // Editing changes the live control value while preserving the
+                // authored textarea text reported by structural inspection.
+                let retained =
+                    self.controller
+                        .accessibility_projection()
+                        .is_some_and(|projection| {
+                            projection
+                                .node(note_id)
+                                .is_some_and(|node| node.value.as_deref() == Some("cedar and ash"))
+                        });
+                let authored = self.controller.inspect().is_some_and(|report| {
                     report
                         .outline
                         .iter()
                         .any(|entry| entry.role == "textbox" && entry.name == "cedar")
                 });
-                if !retained || !source_preserved || edited_glyphs <= initial_glyphs {
+                if !retained || !authored || edited_glyphs <= initial_glyphs {
                     return Err("controls receipt keyboard edit did not reach paint and retained value while preserving its HTML default".to_owned());
                 }
                 Ok(
-                    "nested wheel stayed local and keyboard edit reached retained structure"
+                    "nested wheel stayed local and keyboard edit reached retained control value"
                         .to_owned(),
                 )
             },

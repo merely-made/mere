@@ -67,7 +67,26 @@ where
 /// application's init against the frame it will present on, build the runner,
 /// attach accessibility, then draw once so the first frame exists before any
 /// event arrives.
-pub async fn mount<State, Logic, V>(
+#[inline(never)]
+pub fn mount<State, Logic, V>(
+    canvas: HtmlCanvasElement,
+    options: HostOptions,
+    init: impl FnOnce(
+        &dyn HostWindow,
+        &cambium_rootstock::WindowCommands,
+        &HostWake,
+    ) -> Init<State, Logic>,
+    hooks: HostHooks<State, Logic, V>,
+) -> std::pin::Pin<Box<impl std::future::Future<Output = Result<Mounted<State, Logic, V>, String>>>>
+where
+    State: 'static,
+    Logic: FnMut(&State) -> V + 'static,
+    V: RootView<State>,
+{
+    Box::pin(mount_inner(canvas, options, init, hooks))
+}
+
+async fn mount_inner<State, Logic, V>(
     canvas: HtmlCanvasElement,
     options: HostOptions,
     init: impl FnOnce(
@@ -330,9 +349,22 @@ where
         web_sys::PointerEvent,
         move |e: web_sys::PointerEvent| {
             let mut host = h.borrow_mut();
+            host.s.pointer_id = e.pointer_id();
+            host.s.modifiers = cambium_rootstock::Modifiers {
+                shift: e.shift_key(),
+                ctrl: e.ctrl_key(),
+                alt: e.alt_key(),
+                meta: e.meta_key(),
+            };
             let (x, y) = local(&c, e.client_x(), e.client_y(), host.ui_zoom());
             host.pointer_moved(x, y);
-            host.click();
+            match e.button() {
+                0 => host.click(),
+                1 => host.pointer_press(cambium::PointerButton::Auxiliary),
+                2 => host.secondary_press(),
+                _ => return,
+            }
+            let _ = c.set_pointer_capture(e.pointer_id());
             w.request_redraw();
         }
     );
@@ -346,6 +378,13 @@ where
         web_sys::PointerEvent,
         move |e: web_sys::PointerEvent| {
             let mut host = h.borrow_mut();
+            host.s.pointer_id = e.pointer_id();
+            host.s.modifiers = cambium_rootstock::Modifiers {
+                shift: e.shift_key(),
+                ctrl: e.ctrl_key(),
+                alt: e.alt_key(),
+                meta: e.meta_key(),
+            };
             let (x, y) = local(&c, e.client_x(), e.client_y(), host.ui_zoom());
             host.pointer_moved(x, y);
             w.request_redraw();
@@ -361,10 +400,44 @@ where
         web_sys::PointerEvent,
         move |e: web_sys::PointerEvent| {
             let mut host = h.borrow_mut();
+            host.s.pointer_id = e.pointer_id();
+            host.s.modifiers = cambium_rootstock::Modifiers {
+                shift: e.shift_key(),
+                ctrl: e.ctrl_key(),
+                alt: e.alt_key(),
+                meta: e.meta_key(),
+            };
             let (x, y) = local(&c, e.client_x(), e.client_y(), host.ui_zoom());
             host.pointer_moved(x, y);
-            host.release();
+            match e.button() {
+                0 => host.release(),
+                1 => host.release_button(cambium::PointerButton::Auxiliary),
+                2 => host.release_button(cambium::PointerButton::Secondary),
+                _ => return,
+            }
+            let _ = c.release_pointer_capture(e.pointer_id());
             w.request_redraw();
+        }
+    );
+
+    let h = host.clone();
+    let w = window.clone();
+    listen!(
+        canvas,
+        "pointercancel",
+        web_sys::PointerEvent,
+        move |e: web_sys::PointerEvent| {
+            let mut host = h.borrow_mut();
+            if host
+                .s
+                .runner
+                .as_ref()
+                .and_then(|r| r.pointer_capture_owner())
+                .is_some_and(|(id, _)| id == e.pointer_id())
+            {
+                host.cancel_pointer();
+                w.request_redraw();
+            }
         }
     );
 
@@ -379,7 +452,14 @@ where
             // notch itself.
             e.prevent_default();
             let (dx, dy) = wheel_delta_from_dom(&e, WHEEL_LINE_PX, WHEEL_PAGE_PX);
-            h.borrow_mut().wheel(dx, dy);
+            let mut host = h.borrow_mut();
+            host.s.modifiers = cambium_rootstock::Modifiers {
+                shift: e.shift_key(),
+                ctrl: e.ctrl_key(),
+                alt: e.alt_key(),
+                meta: e.meta_key(),
+            };
+            host.wheel(dx, dy);
             w.request_redraw();
         }
     );

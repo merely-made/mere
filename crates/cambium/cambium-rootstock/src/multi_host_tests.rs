@@ -32,6 +32,7 @@ struct App {
     clicks: u32,
     a_note: String,
     b_note: String,
+    pointer_phases: Vec<cambium::PointerPhase>,
 }
 
 type Child = Box<dyn AnyView<App, (), GenetCtx, GenetElement>>;
@@ -628,4 +629,158 @@ fn a_sheet_one_window_swaps_from_a_hook_reaches_the_other() {
     layout_at(&mut multi, b, 300.0, 600.0);
     assert_eq!(width(&mut multi), 200.0, "B lays out under A's new sheet");
     assert!(!multi.behind_on_sheet().contains(&b));
+}
+
+#[test]
+fn native_interaction_option_and_custom_validity_reach_only_their_window() {
+    use layout_dom_api::{FormControlInteractionState, SelectOptionState};
+    let (mut multi, a, b) = multi();
+    let dom = multi.dom();
+    let (input, option, button) = {
+        let mut d = dom.borrow_mut();
+        let input = d.create_element(html_qual("input"));
+        d.set_attribute(input, attr_qual("required"), "");
+        d.append_child(multi.window_root(a).unwrap(), input);
+        let select = d.create_element(html_qual("select"));
+        let option = d.create_element(html_qual("option"));
+        d.append_child(select, option);
+        d.append_child(multi.window_root(a).unwrap(), select);
+        // Buttons use the new independent custom-validity state; text inputs
+        // retain the older FormControlStateChanged compatibility mutation.
+        let button = d.create_element(html_qual("button"));
+        d.append_child(multi.window_root(b).unwrap(), button);
+        (input, option, button)
+    };
+    for _ in 0..2 {
+        layout_at(&mut multi, a, 400.0, 300.0);
+        layout_at(&mut multi, b, 300.0, 600.0);
+    }
+    assert!(multi.touched_windows().is_empty());
+    for (kind, owner) in [(0, a), (1, a), (2, b)] {
+        let changed = match kind {
+            0 => dom.borrow_mut().set_form_control_interaction_state(
+                input,
+                FormControlInteractionState {
+                    user_validity: true,
+                    last_change_by_user: true,
+                    ..Default::default()
+                },
+            ),
+            1 => dom.borrow_mut().set_option_selected_state(
+                option,
+                SelectOptionState {
+                    selected: true,
+                    dirty: true,
+                },
+            ),
+            _ => dom
+                .borrow_mut()
+                .set_custom_validity(button, "Confirm this choice"),
+        };
+        assert!(changed, "fixture emits native form mutation {kind}");
+        assert_eq!(
+            multi.touched_windows(),
+            HashSet::from([owner]),
+            "form mutation {kind} stays in its window"
+        );
+        layout_at(&mut multi, a, 400.0, 300.0);
+        layout_at(&mut multi, b, 300.0, 600.0);
+        let other = if owner == a { b } else { a };
+        assert!(
+            !multi
+                .with_window(other, |h| h.s.last_layout_rebuilt)
+                .unwrap(),
+            "unrelated window does not rebuild for form mutation {kind}"
+        );
+        assert!(
+            multi.touched_windows().is_empty(),
+            "owner consumed mutation {kind}"
+        );
+    }
+}
+
+#[test]
+fn queued_secondary_release_and_cancel_follow_host_capture_routing() {
+    use crate::HostPointer;
+    use cambium::{PointerEvent, PointerPhase, on_pointer};
+    let mut shared = AppShared::default();
+    shared.sheet = SHEET.into();
+    let mut multi: Multi = MultiHost::new(App::default(), shared, HostHooks::inert());
+    let logic: Logic = Box::new(|_: &App| {
+        Box::new(on_pointer(
+            el("button", text("drag target")),
+            |app: &mut App, event: PointerEvent| {
+                if event.phase == PointerPhase::Down {
+                    event.capture_pointer();
+                }
+                app.pointer_phases.push(event.phase);
+            },
+        ))
+    });
+    let state = HostState::new();
+    let wake = HostWake::new(state.wake_pending.clone(), Arc::new(|| {}));
+    let window = multi.open(
+        logic,
+        Host::new(
+            HostOptions::default(),
+            None,
+            HostHooks::inert(),
+            state,
+            wake,
+        ),
+    );
+    layout_at(&mut multi, window, 400.0, 300.0);
+    let dom = multi.dom();
+    let node = find(
+        &dom.borrow(),
+        multi.window_root(window).unwrap(),
+        "drag target",
+    )
+    .unwrap();
+    let (x, y, w, h) = painted(&mut multi, window, node).unwrap();
+    let (x, y) = (x + w / 2.0, y + h / 2.0);
+    multi
+        .with_window(window, |host| {
+            host.s.pending_pointer.extend([
+                HostPointer::SecondaryPress(x, y),
+                HostPointer::Moved(x + 2.0, y),
+                HostPointer::Release(x + 2.0, y),
+            ]);
+            host.drain_pointer();
+            assert!(
+                host.s.runner.as_ref().unwrap().pointer_capture().is_some(),
+                "unrelated primary release preserves secondary capture"
+            );
+            host.s
+                .pending_pointer
+                .push(HostPointer::SecondaryRelease(x + 2.0, y));
+            host.drain_pointer();
+            assert!(host.s.runner.as_ref().unwrap().pointer_capture().is_none());
+        })
+        .unwrap();
+    assert_eq!(
+        multi.state().pointer_phases,
+        [PointerPhase::Down, PointerPhase::Move, PointerPhase::Up]
+    );
+    multi
+        .with_window(window, |host| {
+            host.s.pending_pointer.extend([
+                HostPointer::SecondaryPress(x, y),
+                HostPointer::Cancel,
+                HostPointer::SecondaryRelease(x, y),
+            ]);
+            host.drain_pointer();
+            assert!(host.s.runner.as_ref().unwrap().pointer_capture().is_none());
+        })
+        .unwrap();
+    assert_eq!(
+        multi.state().pointer_phases,
+        [
+            PointerPhase::Down,
+            PointerPhase::Move,
+            PointerPhase::Up,
+            PointerPhase::Down,
+            PointerPhase::Cancel
+        ]
+    );
 }

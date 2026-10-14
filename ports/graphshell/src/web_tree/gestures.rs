@@ -27,7 +27,7 @@ use web_sys::{AddEventListenerOptions, PointerEvent, TouchEvent, TouchList};
 use super::*;
 
 /// A page-px rectangle: left, top, width, height.
-pub(super) type Rect = (f32, f32, f32, f32);
+pub(super) type Rect = graphshell::retained_policy::Rect;
 
 /// A host can set `data-wheel-mode`; the page's `?wheel=` overrides it.
 pub(super) fn requested_wheel(root: &Element) -> Result<WheelMode, String> {
@@ -48,8 +48,7 @@ pub(super) struct Gestures {
     right: Option<i32>,
     /// The graph leaf's painted rect, from the last frame.
     pub(super) graph: Option<Rect>,
-    /// What sits over the leaf and keeps the host's input: the tools
-    /// overlay, the product panel.
+    /// Painted panels over the leaf which keep their host input.
     pub(super) overlays: Vec<Rect>,
     /// Touch pointers down on the graph.
     touches: Vec<i32>,
@@ -112,21 +111,15 @@ pub(super) fn layout_rects(ctx: &AppCtx<'_, TreePage, Logic, Child>) -> (Option<
             .next()
     };
     let graph = first("tree-canvas").and_then(|leaf| ctx.painted_rect(leaf));
-    let overlays = [
-        "tools-overlay",
-        "tree-tools",
-        "tree-product",
-        "tree-command-menu",
-        "tree-relations",
-    ]
-    .into_iter()
-    .filter_map(|class| first(class).and_then(|node| ctx.painted_rect(node)))
-    .collect();
+    let overlays = graphshell::retained_policy::painted_overlays(|class| {
+        let dom = ctx.runner.dom();
+        let dom = dom.borrow();
+        taproot::matching(&dom, &Selector::class(class))
+            .into_iter()
+            .filter_map(|node| ctx.painted_rect(node))
+            .collect::<Vec<_>>()
+    });
     (graph, overlays)
-}
-
-fn inside((left, top, width, height): Rect, (x, y): (f32, f32)) -> bool {
-    x >= left && y >= top && x < left + width && y < top + height
 }
 
 struct Listeners {
@@ -146,11 +139,7 @@ impl Listeners {
             (client_y as f64 - rect.y()) as f32 / zoom,
         );
         let gestures = self.shared.gestures.borrow();
-        let graph = gestures.graph?;
-        if !inside(graph, at) || gestures.overlays.iter().any(|rect| inside(*rect, at)) {
-            return None;
-        }
-        Some((at.0 - graph.0, at.1 - graph.1))
+        graphshell::retained_policy::graph_point(gestures.graph, &gestures.overlays, at)
     }
 
     fn redraw(&self) {
@@ -184,7 +173,11 @@ impl Listeners {
                 (event.client_y() as f64 - rect.y()) as f32 / zoom,
             );
             let gestures = self.shared.gestures.borrow();
-            if gestures.graph.is_some() && !gestures.overlays.iter().any(|rect| inside(*rect, at)) {
+            if gestures.graph.is_some()
+                && !gestures.overlays.iter().any(|rect| {
+                    graphshell::retained_policy::contains_point(*rect, at)
+                })
+            {
                 // The web host claims every notch. Keep ordinary chrome from
                 // trapping page scroll, while its actual scroll panes still work.
                 event.stop_propagation();
@@ -228,11 +221,15 @@ impl Listeners {
                 if self.shared.selection_locked.get() || self.shared.remote_shown.get() {
                     return;
                 }
-                self.shared.canvas.borrow_mut().pointer_down(
-                    mere::canvas::PointerButton::Right,
-                    at.0,
-                    at.1,
-                );
+                let mut canvas = self.shared.canvas.borrow_mut();
+                canvas.set_ctrl(event.ctrl_key());
+                canvas.set_shift(event.shift_key());
+                canvas.set_alt(event.alt_key());
+                canvas.pointer_down(mere::canvas::PointerButton::Right, at.0, at.1);
+                canvas.set_ctrl(false);
+                canvas.set_shift(false);
+                canvas.set_alt(false);
+                drop(canvas);
                 self.shared.gestures.borrow_mut().right = Some(event.pointer_id());
                 self.canvas.set_pointer_capture(event.pointer_id()).ok();
                 self.redraw();
@@ -262,12 +259,22 @@ impl Listeners {
             event.prevent_default();
             let rect = self.canvas.get_bounding_client_rect();
             let zoom = (self.host.ui_zoom)();
-            if let Some(graph) = self.shared.gestures.borrow().graph {
+            let graph = self.shared.gestures.borrow().graph;
+            let cancelled = event.type_() == "pointercancel"
+                || self.shared.selection_locked.get()
+                || self.shared.remote_shown.get();
+            if cancelled || (ends && graph.is_none()) {
+                // Cancellation never becomes a release, selection or menu.
+                self.shared.canvas.borrow_mut().pointer_cancel();
+            } else if let Some(graph) = graph {
                 let at = (
                     (event.client_x() as f64 - rect.x()) as f32 / zoom - graph.0,
                     (event.client_y() as f64 - rect.y()) as f32 / zoom - graph.1,
                 );
                 let mut canvas = self.shared.canvas.borrow_mut();
+                canvas.set_ctrl(event.ctrl_key());
+                canvas.set_shift(event.shift_key());
+                canvas.set_alt(event.alt_key());
                 if ends {
                     canvas.pointer_up(mere::canvas::PointerButton::Right, at.0, at.1);
                     let request = canvas.take_context_request();
@@ -282,8 +289,11 @@ impl Listeners {
                 } else {
                     canvas.cursor_moved(at.0, at.1);
                 }
+                canvas.set_ctrl(false);
+                canvas.set_shift(false);
+                canvas.set_alt(false);
             }
-            if ends {
+            if ends || cancelled {
                 self.shared.gestures.borrow_mut().right = None;
                 self.canvas.release_pointer_capture(id).ok();
             }
@@ -393,8 +403,10 @@ pub(super) fn install(
         ($name:literal, $ty:ty, $handler:expr) => {{
             let listeners = listeners.clone();
             let handler: fn(&Listeners, $ty) = $handler;
-            let closure =
-                Closure::<dyn FnMut($ty)>::new(move |event: $ty| handler(&listeners, event));
+            let closure = Closure::<dyn FnMut($ty)>::new(move |event: $ty| {
+                super::lane::overlay_observation::before_event(&listeners.shared, event.as_ref());
+                handler(&listeners, event);
+            });
             root.add_event_listener_with_callback_and_add_event_listener_options(
                 $name,
                 closure.as_ref().unchecked_ref(),

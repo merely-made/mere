@@ -10,7 +10,7 @@ a review of this doc against machinery that already exists. The central choice
 survives the review unchanged; three surrounding claims did not.
 
 Related: the
-[listener-executive lease doctrine](../../../../retinue/design_docs/2026-08-10_listener_executive_and_protocol_leases.md),
+[listener-executive lease doctrine](../../../../murm/design_docs/2026-08-10_listener_executive_and_protocol_leases.md),
 the [sited device identity brief](../research/2026-08-10_sited_device_identity_brief.md),
 `pandect::wallet_grant` (named `session_runtime` when this was written),
 `muniment::SlotStore`, `stickleback::epoch_retention`,

@@ -437,6 +437,11 @@ where
                             event.prop.prevent_default();
                             None
                         },
+                        PointerPhase::Cancel => {
+                            state.cancel();
+                            event.prop.prevent_default();
+                            None
+                        },
                         PointerPhase::Up => {
                             if let Some(drag) = state.drag.as_ref().filter(|drag| {
                                 drag.id == pointer_item.id && drag.input == DragInput::Pointer

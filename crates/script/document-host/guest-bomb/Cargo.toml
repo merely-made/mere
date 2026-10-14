@@ -4,6 +4,7 @@
 [workspace]
 
 [package]
+rust-version = "1.97.1"
 name = "document-core-guest-bomb"
 version = "0.0.1"
 edition = "2021"
@@ -19,3 +20,6 @@ wit-bindgen = "0.58"
 [profile.release]
 opt-level = "s"
 strip = true
+
+[workspace.package]
+rust-version = "1.97.1"

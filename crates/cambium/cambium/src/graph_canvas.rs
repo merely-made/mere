@@ -1740,7 +1740,7 @@ where
                                 delta: (delta.0 / width, delta.1 / height),
                             })
                         },
-                        PointerPhase::Up => {
+                        PointerPhase::Up | PointerPhase::Cancel => {
                             local.pan_anchor = None;
                             None
                         },
@@ -1878,6 +1878,7 @@ where
                     }
                     PointerPhase::Move => {}
                     PointerPhase::Up => {}
+                    PointerPhase::Cancel => { local.captured = None; local.down = None; return None; }
                 }
                 let Some(id) = local.captured.clone() else { return None; };
                 let Some(position) = position else { return None; };
@@ -2739,7 +2740,9 @@ mod tests {
         let field = find_attr(&dom.borrow(), runner.root(), "aria-label", "Tower field")
             .expect("semantic geographic field button");
         runner.set_focus(Some(field));
-        runner.dispatch_key(crate::KeyEvent::new(crate::Key::Named(crate::NamedKey::Enter)));
+        runner.dispatch_key(crate::KeyEvent::new(crate::Key::Named(
+            crate::NamedKey::Enter,
+        )));
         assert_eq!(
             runner.state().events,
             [

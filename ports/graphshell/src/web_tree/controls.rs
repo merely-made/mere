@@ -84,6 +84,9 @@ pub(super) fn toolbar(page: &TreePage) -> Child {
             if !enabled {
                 control = control.attr("disabled", "").attr("aria-disabled", "true");
             }
+            if matches!(command, CanvasCommand::TogglePhysics) {
+                control = control.attr("data-command", "physics:toggle");
+            }
             Box::new(control) as Child
         })
         .collect();
@@ -94,7 +97,9 @@ pub(super) fn toolbar(page: &TreePage) -> Child {
         .attr("aria-haspopup", "dialog")
         .attr(
             "aria-expanded",
-            if page.commands.open.is_some() {
+            if page.commands.open.is_some()
+                || page.product.as_ref().is_some_and(|product| product.menu_open())
+            {
                 "true"
             } else {
                 "false"
@@ -123,6 +128,18 @@ pub(super) fn toolbar(page: &TreePage) -> Child {
 
 impl TreePage {
     pub(super) fn pointer(&mut self, event: PointerEvent) {
+        // A cancellation always releases the gesture, including while a save
+        // temporarily locks selection.
+        if event.phase == PointerPhase::Cancel {
+            #[cfg(feature = "product")]
+            {
+                forme::pointer(self, &event);
+                field_inspection::pointer(self, &event);
+            }
+            self.shared.canvas.borrow_mut().pointer_cancel();
+            self.shared.dirty.set(true);
+            return;
+        }
         #[cfg(feature = "product")]
         if field_inspection::pointer(self, &event) {
             event.prop.prevent_default();
@@ -135,33 +152,63 @@ impl TreePage {
         {
             return;
         }
-        if event.button != PointerButton::Primary {
-            return;
-        }
-        if event.phase == PointerPhase::Down && self.commands.open.is_some() {
+        if event.button == PointerButton::Primary
+            && event.phase == PointerPhase::Down
+            && (self.commands.open.is_some()
+                || self.product.as_ref().is_some_and(|product| product.menu_open()))
+        {
             commands::close(self);
         }
         #[cfg(feature = "product")]
-        if forme::pointer(self, &event) {
+        if event.button == PointerButton::Primary && forme::pointer(self, &event) {
             event.prop.prevent_default();
             return;
         }
+        let button = match event.button {
+            PointerButton::Primary => mere::canvas::PointerButton::Left,
+            PointerButton::Secondary => mere::canvas::PointerButton::Right,
+            PointerButton::Auxiliary => mere::canvas::PointerButton::Middle,
+        };
         let (x, y) = event.local;
         let mut canvas = self.shared.canvas.borrow_mut();
+        canvas.set_ctrl(event.modifiers.ctrl);
+        canvas.set_shift(event.modifiers.shift);
+        canvas.set_alt(event.modifiers.alt);
+        let mut context = None;
         match event.phase {
             PointerPhase::Down => {
-                canvas.pointer_down(mere::canvas::PointerButton::Left, x, y);
+                // Canvas right-drag is a marquee; shared menu handlers retain
+                // their default one-shot secondary press behavior.
+                if event.button == PointerButton::Secondary {
+                    event.capture_pointer();
+                }
+                canvas.pointer_down(button, x, y);
             },
             PointerPhase::Move => {
                 canvas.cursor_moved(x, y);
             },
             PointerPhase::Up => {
-                canvas.pointer_up(mere::canvas::PointerButton::Left, x, y);
+                canvas.pointer_up(button, x, y);
+                context = canvas.take_context_request();
                 self.picked = canvas.focused_url().map(str::to_owned);
                 if let Some(product) = &mut self.product {
                     product.select(canvas.selected_members().first().copied());
                 }
             },
+            PointerPhase::Cancel => unreachable!("cancellation handled before selection lock"),
+        }
+        // Modifier state belongs to this event, not later toolbar commands.
+        canvas.set_ctrl(false);
+        canvas.set_shift(false);
+        canvas.set_alt(false);
+        drop(canvas);
+        if let Some(request) = context {
+            commands::open(
+                self,
+                commands::Request::Context { at: request.at, node: request.node },
+            );
+        } else if event.phase == PointerPhase::Up && event.button == PointerButton::Secondary {
+            commands::open(self, commands::Request::Selection);
         }
         self.shared.dirty.set(true);
     }
@@ -268,4 +315,30 @@ pub(super) fn physics_config() -> Result<mere::canvas::ElapsedStepConfig, String
         );
     }
     Ok(config)
+}
+
+pub(super) fn named_command(id: &str) -> Option<CanvasCommand> {
+    match id {
+        "view:zoom_in" => Some(CanvasCommand::Zoom { delta: ZOOM_STEP }),
+        "view:zoom_out" => Some(CanvasCommand::Zoom { delta: -ZOOM_STEP }),
+        "view:fit" => Some(CanvasCommand::Fit),
+        "pan-left" => Some(CanvasCommand::Pan {
+            dx: -PAN_STEP,
+            dy: 0.0,
+        }),
+        "pan-right" => Some(CanvasCommand::Pan {
+            dx: PAN_STEP,
+            dy: 0.0,
+        }),
+        "pan-up" => Some(CanvasCommand::Pan {
+            dx: 0.0,
+            dy: -PAN_STEP,
+        }),
+        "pan-down" => Some(CanvasCommand::Pan {
+            dx: 0.0,
+            dy: PAN_STEP,
+        }),
+        "physics:toggle" => Some(CanvasCommand::TogglePhysics),
+        _ => None,
+    }
 }

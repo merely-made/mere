@@ -220,6 +220,7 @@ impl WorkspaceApp {
                     }
                 }
                 if !self.apply_accessibility_request(A11yActionRequest {
+                    target_tree: accesskit::TreeId::ROOT,
                     action: Action::Focus,
                     target_node: first_link,
                     data: None,

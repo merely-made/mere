@@ -133,6 +133,7 @@ pub enum SaveKind {
 pub struct PreparedSave {
     next: SavedRecord,
     kind: SaveKind,
+    token: Uuid,
 }
 impl PreparedSave {
     pub async fn save<B: Backend>(&self, backend: B) -> Result<(), String> {
@@ -151,6 +152,7 @@ pub struct FormeSession {
     saved: SavedRecord,
     draft: Option<Draft>,
     busy: bool,
+    pending: Option<Uuid>,
 }
 impl FormeSession {
     pub fn new(workspace: FormeWorkspace) -> Self {
@@ -158,6 +160,7 @@ impl FormeSession {
             saved: SavedRecord::new(workspace),
             draft: None,
             busy: false,
+            pending: None,
         }
     }
     pub fn view(&self) -> &FormeWorkspace {
@@ -261,6 +264,35 @@ impl FormeSession {
             d.history.break_run();
         }
     }
+    /// The retained button-preview path, including actual owner/target
+    /// admission and the same graph-masked Canvas installation as drag input.
+    pub fn install_edge_preview(
+        &self,
+        owner: Uuid,
+        moving: Uuid,
+        target: Uuid,
+        edge: workbench::Edge,
+        canvas: &mut mere::canvas::Canvas,
+    ) -> Result<FormeWorkspace, String> {
+        self.idle()?;
+        if !self.editing() {
+            return Err("Unlock the forme to preview a move".into());
+        }
+        self.view().validate(owner)?;
+        let mut candidate = self.view().clone();
+        let tile = candidate.tile_for_member(moving).ok_or("unknown moving access")?;
+        let to = candidate.tile_for_member(target).ok_or("unknown target access")?;
+        candidate.event(
+            workbench::TileEvent::Dragged {
+                tile,
+                to: workbench::DropTarget::Edge { tile: to, edge },
+            },
+            canvas.graph(),
+        )?;
+        let region = candidate.project_region(owner, canvas.graph())?;
+        canvas.set_forme_region(region)?;
+        Ok(candidate)
+    }
     /// Resolve a handle's world-space drop against the draft's original cells,
     /// not against its changing preview. Central drops tab; edge drops split.
     pub fn drop_preview(
@@ -297,7 +329,12 @@ impl FormeSession {
         let mut effect = DropEffect::Add;
         let target = region.cells.iter().find(|cell| {
             let [x, y, r, b] = region.cell_world_bounds(cell);
-            cell.member != member && point.0 >= x && point.0 <= r && point.1 >= y && point.1 <= b
+            graph.get_node_by_id(cell.member).is_some()
+                && cell.member != member
+                && point.0 >= x
+                && point.0 <= r
+                && point.1 >= y
+                && point.1 <= b
         });
         if let Some(cell) = target {
             let [x, y, r, b] = region.cell_world_bounds(cell);
@@ -396,7 +433,9 @@ impl FormeSession {
         next.workspace.document.updated_at_ms = now_ms;
         next.validate(next.workspace.document.graph_id)?;
         self.busy = true;
-        Ok(PreparedSave { next, kind })
+        let token = Uuid::new_v4();
+        self.pending = Some(token);
+        Ok(PreparedSave { next, kind, token })
     }
     /// A failed write leaves the complete draft and its history available.
     /// Saved undo/redo also advances only after acknowledgement.
@@ -405,6 +444,10 @@ impl FormeSession {
         proposal: PreparedSave,
         result: Result<(), String>,
     ) -> Result<(), String> {
+        if self.pending != Some(proposal.token) {
+            return Err("Forme save belongs to another or completed request".into());
+        }
+        self.pending = None;
         self.busy = false;
         result?;
         if proposal.kind == SaveKind::Visibility {
@@ -459,7 +502,91 @@ impl FormeSession {
             saved,
             draft: None,
             busy: false,
+            pending: None,
         })
+    }
+}
+
+#[derive(Clone, Default)]
+pub struct FormeWriteFence {
+    next: u64,
+    pending: std::collections::BTreeMap<u64, Uuid>,
+}
+impl FormeWriteFence {
+    pub fn retire(&mut self, owner: Uuid) -> u64 {
+        self.next = self
+            .next
+            .checked_add(1)
+            .expect("Forme write fence exhausted");
+        self.pending.insert(self.next, owner);
+        self.next
+    }
+    pub fn finish(&mut self, ticket: u64) {
+        self.pending.remove(&ticket);
+    }
+    pub fn blocks(&self, owner: Uuid) -> bool {
+        self.pending.values().any(|o| *o == owner)
+    }
+    pub async fn load<B: Backend>(
+        &self,
+        backend: B,
+        owner: Uuid,
+        graph: &Graph,
+    ) -> Result<Option<FormeSession>, String> {
+        if self.blocks(owner) {
+            return Ok(None);
+        }
+        FormeSession::load(backend, owner, graph).await.map(Some)
+    }
+}
+
+/// An async load is admitted only by its current request and actual App owner.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct FormeLoadTicket {
+    pub owner: Uuid,
+    epoch: u64,
+}
+#[derive(Default)]
+pub struct FormeLoadGate {
+    epoch: u64,
+    active: Option<FormeLoadTicket>,
+}
+impl FormeLoadGate {
+    pub fn request(&mut self, owner: Uuid) -> FormeLoadTicket {
+        self.epoch = self
+            .epoch
+            .checked_add(1)
+            .expect("Forme load epoch exhausted");
+        let ticket = FormeLoadTicket {
+            owner,
+            epoch: self.epoch,
+        };
+        self.active = Some(ticket);
+        ticket
+    }
+    pub fn active(&self) -> Option<FormeLoadTicket> {
+        self.active
+    }
+    pub fn accepts(&self, ticket: FormeLoadTicket, actual: Option<Uuid>) -> bool {
+        self.active == Some(ticket) && actual == Some(ticket.owner)
+    }
+    pub fn finish_loaded(
+        &mut self,
+        ticket: FormeLoadTicket,
+        actual: Option<Uuid>,
+        loaded: &FormeSession,
+    ) -> bool {
+        if loaded.committed().document.graph_id != ticket.owner {
+            return false;
+        }
+        self.finish_error(ticket, actual)
+    }
+    pub fn finish_error(&mut self, ticket: FormeLoadTicket, actual: Option<Uuid>) -> bool {
+        if !self.accepts(ticket, actual) {
+            return false;
+        }
+        self.active = None;
+        true
     }
 }
 fn stack_path(geometry: &TreeGeometry, member: Uuid) -> Option<Vec<usize>> {
@@ -945,3 +1072,7 @@ mod tests {
         });
     }
 }
+
+#[cfg(test)]
+#[path = "forme_session_lifecycle_tests.rs"]
+mod lifecycle_tests;
