@@ -237,3 +237,36 @@ so that it can answer a range from a stored body. The page-side media element.
   support/doc-audit/d2/batch_35_s14_phase_a1.md; the status records F, R,
   T1, M1 and T3 landed and pushed, Turnstone's take of M1 in `ab6ff4e`, and
   T2 open and unblocked.
+
+
+### 2026-10-14 — reusable wire supplier adoption
+
+The host keeps its existing ranged/whole-body, cookie/store, cancellation and
+admission contracts. Netfetcher still owns web-observable Fetch and WebSocket
+policy in Genet; its raw HTTP/1-2-3 and WebSocket connector now come from Murm's
+independent `wire` workspace. Canonical move authority:
+`murm/design_docs/2026-10-13_murm_family_move_plan.md`, MOVE5.
+
+Mere adopts Genet `b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084` as one coherent
+Genet cohort. That supplier selects `murm-wire` at
+`80d9959000fcd913634fd223538dfdbbec1f5e4f`, whose ancestry retains the unfiltered
+original Genet source commit. `crates/system/fetch/src/crawler.rs` now adapts
+an explicit `HttpTransport::webpki(false)` through `netfetcher::WireTransport`;
+its duplicate hyper request/exchange implementation and direct wire-library
+dependencies are removed. The crawler retains a separate Mozilla-rooted pool,
+independent of the default transport's insecure test switch, with canceled
+request retries disabled. It makes the same admitted single hop and retains
+its byte-budget and redirect observations. Host-selected cookie/store and pool
+partitioning remain separate authority; this does not change T2's status.
+
+The pre-publication host run passed 16 real Fetch/crawler cases through the
+extracted engine, including no hidden cookie carriage, redirect identity,
+stream caps/partial failures, ranged reads and scoped session cookies. Final
+immutable Git checks and source metadata are recorded in the receiving receipt
+under `mere_docs/testing/receipts/2026-10-14_murm_wire_adoption`.
+
+Final immutable Git validation passes all 16 Fetch/crawler cases on Rust 1.99.0
+and MSRV 1.97.1, plus strict Clippy. Metadata selects one Netfetcher, wire engine,
+LayoutDom API and Genet cohort with no foreign worktree Git manifest. The
+source-bound receipt is
+`mere_docs/testing/receipts/2026-10-14_murm_wire_adoption/qualification.json`.

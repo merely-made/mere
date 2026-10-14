@@ -150,20 +150,19 @@ pub async fn fetch_crawler_capped_with_transport(
             bytes: Vec::new(),
         });
     }
-    if let Some(encoding) = header(&response.headers, "content-encoding") {
-        if !encoding.trim().eq_ignore_ascii_case("identity") {
-            return Err(CrawlerFetchError::UnsupportedEncoding(encoding.to_string()));
-        }
+    if let Some(encoding) = header(&response.headers, "content-encoding")
+        && !encoding.trim().eq_ignore_ascii_case("identity")
+    {
+        return Err(CrawlerFetchError::UnsupportedEncoding(encoding.to_string()));
     }
     if let Some(length) =
         header(&response.headers, "content-length").and_then(|length| length.parse::<u64>().ok())
+        && length > max_bytes as u64
     {
-        if length > max_bytes as u64 {
-            return Err(CrawlerFetchError::ResponseLimit {
-                max_bytes,
-                received_bytes: 0,
-            });
-        }
+        return Err(CrawlerFetchError::ResponseLimit {
+            max_bytes,
+            received_bytes: 0,
+        });
     }
     let mut bytes = Vec::new();
     let mut received_bytes = 0usize;
@@ -198,25 +197,13 @@ fn header<'a>(headers: &'a [(String, String)], name: &str) -> Option<&'a str> {
 
 #[cfg(not(target_arch = "wasm32"))]
 mod native_transport {
-    use bytes::Bytes;
-    use futures_util::TryStreamExt;
-    use http_body_util::{BodyExt, Full};
-    use hyper_rustls::HttpsConnector;
-    use hyper_util::client::legacy::Client;
-    use hyper_util::client::legacy::connect::HttpConnector;
-    use hyper_util::rt::TokioExecutor;
-    use netfetcher::{RawResponse, Transport, TransportFuture, WireRequest};
-    use std::sync::OnceLock;
-
     use super::CrawlerFetchError;
-
-    /// A separate pool with canceled-request retries explicitly disabled.
-    /// TLS uses an explicit ring provider and Mozilla roots, independent of
-    /// Netfetcher's global test-only insecure-certificate switch.
+    use netfetcher::{Transport, TransportFuture, WireRequest};
+    use std::sync::{Arc, OnceLock};
+    /// Host-owned crawler pool: explicit roots and canceled-request retries off.
     pub(super) struct CrawlerTransport {
-        client: Client<HttpsConnector<HttpConnector>, Full<Bytes>>,
+        wire: netfetcher::WireTransport,
     }
-
     impl CrawlerTransport {
         pub(super) fn shared() -> Result<&'static Self, CrawlerFetchError> {
             static TRANSPORT: OnceLock<Result<CrawlerTransport, String>> = OnceLock::new();
@@ -228,60 +215,17 @@ mod native_transport {
                     received_bytes: 0,
                 })
         }
-
         fn new() -> Result<Self, String> {
-            let connector = hyper_rustls::HttpsConnectorBuilder::new()
-                .with_provider_and_webpki_roots(rustls::crypto::ring::default_provider())
-                .map_err(|error| format!("crawler TLS configuration: {error}"))?
-                .https_or_http()
-                .enable_http1()
-                .enable_http2()
-                .build();
-            let client = Client::builder(TokioExecutor::new())
-                // Hyper's default retries an unstarted request canceled while
-                // reusing a pooled connection. Every crawler attempt has its
-                // own admission, so retries must return to the caller instead.
-                .retry_canceled_requests(false)
-                .build(connector);
-            Ok(Self { client })
+            let engine = netfetcher::wire::hyper::HttpTransport::webpki(false)
+                .map_err(|error| format!("crawler TLS configuration: {error}"))?;
+            Ok(Self {
+                wire: netfetcher::WireTransport::new(Arc::new(engine)),
+            })
         }
     }
-
     impl Transport for CrawlerTransport {
         fn send(&self, request: WireRequest) -> TransportFuture<'_> {
-            Box::pin(async move {
-                let uri = http::Uri::try_from(request.url.as_str()).ok()?;
-                let mut builder = http::Request::builder()
-                    .method(request.method.as_str())
-                    .uri(uri);
-                for (name, value) in request.headers {
-                    builder = builder.header(name, value);
-                }
-                let request = builder
-                    .body(Full::new(request.body.unwrap_or_default()))
-                    .ok()?;
-                let response = self.client.request(request).await.ok()?;
-                let status = response.status().as_u16();
-                let headers = response
-                    .headers()
-                    .iter()
-                    .filter_map(|(name, value)| {
-                        value
-                            .to_str()
-                            .ok()
-                            .map(|value| (name.as_str().to_string(), value.to_string()))
-                    })
-                    .collect();
-                let body = response
-                    .into_body()
-                    .into_data_stream()
-                    .map_err(std::io::Error::other);
-                Some(RawResponse {
-                    status,
-                    headers,
-                    body: Box::pin(body),
-                })
-            })
+            self.wire.send(request)
         }
     }
 }
