@@ -87,12 +87,32 @@ pub(super) fn page_commands() -> CommandSet {
         ),
         ("projection-grid", "Projection: grid", "projection"),
         ("compare-projection", "Compare arrangements", "projection"),
-        ("compare-projection-dynamics", "Compare dynamics", "projection"),
+        (
+            "compare-projection-dynamics",
+            "Compare dynamics",
+            "projection",
+        ),
         ("projection-motion", "Pause or resume preview", "projection"),
-        ("projection-compare-left", "Earlier arrangements", "projection"),
-        ("projection-compare-right", "Later arrangements", "projection"),
-        ("projection-compare-up", "Earlier comparison rows", "projection"),
-        ("projection-compare-down", "Later comparison rows", "projection"),
+        (
+            "projection-compare-left",
+            "Earlier arrangements",
+            "projection",
+        ),
+        (
+            "projection-compare-right",
+            "Later arrangements",
+            "projection",
+        ),
+        (
+            "projection-compare-up",
+            "Earlier comparison rows",
+            "projection",
+        ),
+        (
+            "projection-compare-down",
+            "Later comparison rows",
+            "projection",
+        ),
         (
             "projection-scatter",
             "Projection: order by tempo",
@@ -116,9 +136,7 @@ pub(super) struct OpenMenu {
 }
 
 /// The person's choices as the session keeps them.
-pub(super) fn stored_choices(
-    host: &graphshell::mere_host::MereHost<muniment::IndexedDbBackend>,
-) -> CommandChoices {
+pub(super) fn stored_choices(host: &graphshell::web_resident::WebResidentHost) -> CommandChoices {
     host.view(GRAPHSHELL, COMMANDS_VIEW)
         .and_then(|view| view.commands.clone())
         .unwrap_or_default()

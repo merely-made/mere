@@ -18,7 +18,8 @@ use kernel::graph::{
 use std::collections::BTreeSet;
 use uuid::Uuid;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum LiveCommand {
     CreateAddress {
         id: Uuid,
@@ -49,7 +50,8 @@ pub enum LiveCommand {
         assertion: EdgeAssertion,
     },
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum LiveCheck {
     Exists(GraphAddress),
     Absent(GraphAddress),
@@ -66,7 +68,8 @@ pub enum LiveCheck {
         tags: BTreeSet<String>,
     },
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ObservedCommand {
     pub command: LiveCommand,
     pub checks: Vec<LiveCheck>,

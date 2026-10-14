@@ -87,10 +87,11 @@ webrtc-join = [
 # The browser reference-host cone. H0 proves the dependency boundary; H1 adds
 # the local Mere host adapter on top of this selected graph + canvas surface.
 #
-# Holds no browser API of its own. The wasm presenter that consumes this cone
-# is the separate `graphshell-web` crate (`web/Cargo.toml`, whose `[lib] path`
-# is `src/web.rs`), and it names its own JS bindings; the IndexedDB backend it
-# stores through belongs to muniment, beside the redb and zip realizations.
+# On wasm, the private browser facade owns IndexedDB admission and bound I/O.
+# Native builds retain the compatible local-host surface. The separate wasm
+# presenter is `graphshell-web` (`web/Cargo.toml`, with `../src/web.rs` as its
+# library path); the IndexedDB backend itself belongs to muniment, beside the
+# redb and zip realizations.
 # The web host's canvas and remote board stage repulsion on the page's GPU
 # (physics catalog plan, P5c; mere `canvas-gpu`, ruled 2026-10-02).
 canvas-gpu = ["web", "mere/canvas-gpu"]
@@ -104,6 +105,7 @@ web = [
     "dep:eidetic",
     "dep:mere",
     "dep:muniment",
+    "muniment/indexeddb",
     "dep:pandect",
     "dep:platen",
     "dep:serde",

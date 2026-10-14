@@ -264,6 +264,19 @@ impl<B: Backend + Clone> CachedResidentSession<B> {
         }
         self.status(SessionStore::Pending, true, None);
     }
+    pub fn apply_observed_commands_as(
+        &mut self,
+        via: &str,
+        commands: Vec<pandect::live_graph::ObservedCommand>,
+    ) -> Result<(), MereHostError> {
+        self.idle()?;
+        let first = self.graph_session().journal().live_cursor();
+        self.host.through(via.to_owned(), |host| {
+            host.apply_observed_commands(commands)
+        })?;
+        self.applied(first);
+        Ok(())
+    }
     pub fn apply_edits_as(
         &mut self,
         via: &str,
@@ -358,47 +371,53 @@ impl<B: Backend + Clone> CachedResidentSession<B> {
                 && self.host.resident_reader().is_some()
                 && self.applied.is_none()
             {
-                self.status(SessionStore::Stored, false, None);
-                return Ok(ResidentPersistence::Durable {
-                    generation: self
-                        .host
-                        .resident_reader()
-                        .unwrap()
-                        .generation()
-                        .to_string(),
-                });
-            }
-            if self.host.resident_settings_need_validation() {
-                let request = self
+                let generation = self
                     .host
-                    .prepare_resident_settings_validation()?
-                    .ok_or(ResidentHostError::Busy)?;
-                self.host.install_resident_refresh(request.load().await)?;
-            }
-            let io = self.host.prepare_resident_io(
-                SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(at_secs),
-            )?;
-            let write = io.write().await;
-            let generation = self.host.install_resident_io(&io)?;
-            let Some(generation) = generation else {
-                let reason = write.err().unwrap_or(ResidentHostError::Busy);
-                self.status(SessionStore::Failed, true, Some(reason.to_string()));
-                if matches!(reason, ResidentHostError::MixedCommit) {
-                    return Err(reason);
+                    .resident_reader()
+                    .unwrap()
+                    .generation()
+                    .to_string();
+                if !self.host.resident_needs_check() {
+                    self.status(SessionStore::Stored, false, None);
+                    return Ok(ResidentPersistence::Durable { generation });
                 }
-                let first = self
-                    .applied
-                    .as_ref()
-                    .map(|a| a.first.0)
-                    .unwrap_or(self.graph_session().journal().live_cursor().0);
-                return Ok(ResidentPersistence::AppliedButUnstored {
-                    first,
-                    end: self.graph_session().journal().live_cursor().0,
-                    revision: self.graph_session().revision(),
-                });
-            };
-            self.applied = None;
-            self.publication = Some(generation);
+                // Pane roots can change without a graph/settings write. Retain
+                // the durable generation and use the same publication recovery
+                // path; never prepare or replay a checkpoint for this notice.
+                self.publication = Some(generation);
+            } else {
+                if self.host.resident_settings_need_validation() {
+                    let request = self
+                        .host
+                        .prepare_resident_settings_validation()?
+                        .ok_or(ResidentHostError::Busy)?;
+                    self.host.install_resident_refresh(request.load().await)?;
+                }
+                let io = self.host.prepare_resident_io(
+                    SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(at_secs),
+                )?;
+                let write = io.write().await;
+                let generation = self.host.install_resident_io(&io)?;
+                let Some(generation) = generation else {
+                    let reason = write.err().unwrap_or(ResidentHostError::Busy);
+                    self.status(SessionStore::Failed, true, Some(reason.to_string()));
+                    if matches!(reason, ResidentHostError::MixedCommit) {
+                        return Err(reason);
+                    }
+                    let first = self
+                        .applied
+                        .as_ref()
+                        .map(|a| a.first.0)
+                        .unwrap_or(self.graph_session().journal().live_cursor().0);
+                    return Ok(ResidentPersistence::AppliedButUnstored {
+                        first,
+                        end: self.graph_session().journal().live_cursor().0,
+                        revision: self.graph_session().revision(),
+                    });
+                };
+                self.applied = None;
+                self.publication = Some(generation);
+            }
         }
         let generation = self.publication.clone().unwrap();
         if let Err(error) = self.host.refresh_resident_reader().await {
@@ -667,5 +686,223 @@ mod completion_tests {
     #[test]
     fn cached_refresh_wrong_attempt_completion_cannot_retire_active_slot() {
         pollster::block_on(reject_unrelated_completion(2));
+    }
+}
+
+#[cfg(all(test, feature = "resident-test-support"))]
+mod queued_root_tests {
+    use super::*;
+    use crate::projection_editor::{Channel, ProjectionDraft, Reading, SourceBinding};
+    use crate::resident_host::test_support::{DirectoryFault, DirectoryFixture};
+    use pandect::addressable_graph::ResidencyStatus;
+    use uuid::Uuid;
+
+    async fn roots_only_persistence(focus_only: bool) {
+        let directory = tempfile::tempdir().unwrap();
+        let (cache, faults) = DirectoryFixture::open(directory.path())
+            .unwrap()
+            .into_parts();
+        let id = cache.mint(Author::user(), None).await.unwrap().session_id;
+        let owner = cache
+            .host_checked(
+                id,
+                SelectedPersonaRef {
+                    persona: "queued-roots".into(),
+                    profile: "test".into(),
+                },
+                HandlerRegistry::default(),
+                AccessContext {
+                    persona: "queued-roots".into(),
+                    device: "test".into(),
+                    at_ms: 0,
+                },
+                None,
+                ProjectionSession("v1:queued-roots".into()),
+            )
+            .await
+            .unwrap();
+        let mut host = owner.lock().await;
+        let a = Uuid::from_u128(7751);
+        let b = Uuid::from_u128(7752);
+        host.apply_edits_as(
+            "test",
+            [a, b]
+                .into_iter()
+                .map(|id| CapturedDelta::ReplayAddNodeWithIdIfMissing {
+                    id: id.to_string(),
+                    url: format!("https://{id}.test/"),
+                    position: [0.0, 0.0],
+                })
+                .collect(),
+        )
+        .unwrap();
+        assert!(matches!(
+            host.persist_owned(0).await.unwrap(),
+            ResidentPersistence::Durable { .. }
+        ));
+        let mut draft = ProjectionDraft::new();
+        draft.id = "queued-roots".into();
+        draft.label = "Queued roots".into();
+        draft.source = SourceBinding {
+            authority: "local".into(),
+            domain: "notes".into(),
+            resource: "graph:notes".into(),
+        };
+        draft.reading = Reading {
+            kind: "nodes".into(),
+            key: "id".into(),
+            value: None,
+        };
+        draft.encoding.x = Channel::Field("x".into());
+        draft.encoding.y = Channel::Field("y".into());
+        draft.appearance.title = "Queued roots".into();
+        draft.appearance.realization = "canvas".into();
+        draft.provenance.author = "queued-roots".into();
+        draft.provenance.source_revision = Some("1".into());
+        host.save_projection(&crate::projection_compile::ProjectionSnapshot {
+            definition: draft.to_definition().unwrap(),
+            selected_occurrence: None,
+        })
+        .unwrap();
+        host.persist_owned(0).await.unwrap();
+        let pane = pandect::ViewKey::new("test", "roots").unwrap();
+        let settings = ResidentSettings {
+            policy: ResidencyPolicy::Neighborhood { hops: 0 },
+            projection: Some("queued-roots".into()),
+            ..Default::default()
+        };
+        host.set_resident_pane(
+            pane.clone(),
+            PaneRoots {
+                roster: if focus_only {
+                    BTreeSet::new()
+                } else {
+                    BTreeSet::from([a])
+                },
+                focus: focus_only.then_some(GraphAddress::Surface(a)),
+            },
+        );
+        host.set_resident_settings(settings.clone()).unwrap();
+        assert!(matches!(
+            host.persist_owned(0).await.unwrap(),
+            ResidentPersistence::Durable { .. }
+        ));
+        assert_eq!(
+            host.resident_reader()
+                .unwrap()
+                .status(GraphAddress::Surface(a)),
+            ResidencyStatus::Loaded
+        );
+        assert_eq!(
+            host.resident_reader()
+                .unwrap()
+                .status(GraphAddress::Surface(b)),
+            ResidencyStatus::NotLoaded
+        );
+        let generation = host.resident_reader().unwrap().generation().to_owned();
+        let old_reader = serde_json::to_value(host.presentation_graph().to_snapshot_at(0)).unwrap();
+        let writer = serde_json::json!({"graph":host.graph().to_snapshot_at(0),"facets":host.graph().facets()});
+        let revision = host.graph_session().revision();
+        let cursor = host.graph_session().journal().live_cursor();
+        let history = host.graph_session().changes().to_vec();
+        let stored = cache.all_stored_bytes().await.unwrap();
+        faults.clear_batches();
+        host.set_resident_pane(
+            pane,
+            PaneRoots {
+                roster: BTreeSet::new(),
+                focus: focus_only.then_some(GraphAddress::Surface(b)),
+            },
+        );
+        host.set_resident_settings(settings.clone()).unwrap();
+        assert_eq!(host.host.resident_settings(), &settings);
+        assert!(!host.has_unstored());
+        assert!(!host.recovery_pending());
+        assert!(host.host.resident_needs_check());
+        assert_eq!(
+            serde_json::to_value(host.presentation_graph().to_snapshot_at(0)).unwrap(),
+            old_reader,
+            "changing requested roots cannot mutate the published reader"
+        );
+        if focus_only {
+            faults.fault(DirectoryFault::ReadRecords);
+            assert!(
+                matches!(
+                    host.persist_owned(0).await.unwrap(),
+                    ResidentPersistence::PendingPublication { .. }
+                ),
+                "a failed focus-only load must retain publication recovery, not report stale Durable"
+            );
+            assert!(!faults.intercepted_reads().is_empty());
+            assert!(host.recovery_pending());
+            assert!(!host.has_unstored());
+            assert!(
+                faults.batches().is_empty(),
+                "root-only failure must not submit a durable batch"
+            );
+            assert_eq!(
+                serde_json::to_value(host.presentation_graph().to_snapshot_at(0)).unwrap(),
+                old_reader,
+                "failed candidate load preserves the old reader"
+            );
+            faults.fault(DirectoryFault::None);
+        }
+        assert!(
+            matches!(host.persist_owned(0).await.unwrap(), ResidentPersistence::Durable { generation: actual } if actual == generation)
+        );
+        assert_eq!(host.resident_reader().unwrap().generation(), generation);
+        assert_eq!(
+            host.resident_reader()
+                .unwrap()
+                .status(GraphAddress::Surface(a)),
+            ResidencyStatus::NotLoaded,
+            "same-settings root change must retire the old loaded Surface"
+        );
+        if focus_only {
+            assert_eq!(
+                host.resident_reader()
+                    .unwrap()
+                    .status(GraphAddress::Surface(b)),
+                ResidencyStatus::Loaded
+            );
+        } else {
+            assert_eq!(
+                host.presentation_graph().node_count(),
+                0,
+                "empty zero-hop roots must publish an empty Surface roster"
+            );
+        }
+        assert!(!host.recovery_pending());
+        assert!(!host.has_unstored());
+        assert!(!host.host.resident_needs_check());
+        assert_eq!(
+            serde_json::json!({"graph":host.graph().to_snapshot_at(0),"facets":host.graph().facets()}),
+            writer
+        );
+        assert_eq!(host.graph_session().revision(), revision);
+        assert_eq!(host.graph_session().journal().live_cursor(), cursor);
+        assert_eq!(host.graph_session().changes(), history);
+        assert!(
+            faults.batches().is_empty(),
+            "root-only publication and recovery must never apply a batch"
+        );
+        assert_eq!(cache.all_stored_bytes().await.unwrap(), stored);
+        // A repeated clean save without a notice retains the cheap Durable path.
+        assert!(matches!(
+            host.persist_owned(0).await.unwrap(),
+            ResidentPersistence::Durable { .. }
+        ));
+        assert!(faults.batches().is_empty());
+        assert_eq!(cache.all_stored_bytes().await.unwrap(), stored);
+    }
+
+    #[test]
+    fn cached_same_settings_empty_roster_publishes_without_write() {
+        pollster::block_on(roots_only_persistence(false));
+    }
+
+    #[test]
+    fn cached_same_settings_focus_only_failure_recovers_without_write() {
+        pollster::block_on(roots_only_persistence(true));
     }
 }

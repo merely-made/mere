@@ -108,6 +108,28 @@ pub const SET_VIEW_INTENT: &str = "mere.session.view";
 /// Schema of [`SetViewV1`].
 pub const SET_VIEW_SCHEMA: &str = "mere.session.view/v1";
 
+/// Interactive observed commands are distinct from imported replay records.
+pub const OBSERVED_EDIT_INTENT: &str = "mere.session.edit-observed";
+pub const OBSERVED_EDIT_SCHEMA: &str = "mere.session.edit-observed/v1";
+pub const RESIDENT_SETTINGS_INTENT: &str = "mere.session.resident-settings";
+pub const RESIDENT_SETTINGS_SCHEMA: &str = "mere.session.resident-settings/v1";
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ObservedEditV1 {
+    pub schema: String,
+    pub commands: Vec<pandect::live_graph::ObservedCommand>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ResidentSettingsV1 {
+    pub schema: String,
+    pub settings: crate::resident_host::ResidentSettings,
+    pub roster: std::collections::BTreeSet<uuid::Uuid>,
+    pub focus: Option<pandect::addressable_graph::GraphAddress>,
+}
+
 /// Payload of [`APPLY_EDITS_INTENT`].
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -212,6 +234,20 @@ fn action(
 /// What the session item offers.
 pub fn actions() -> Vec<AdvertisedAction> {
     vec![
+        action(
+            OBSERVED_EDIT_INTENT,
+            "Edit observed objects",
+            "Apply checked live commands under the admitted application's author.",
+            OBSERVED_EDIT_SCHEMA,
+            IntentEffect::DomainTruth,
+        ),
+        action(
+            RESIDENT_SETTINGS_INTENT,
+            "Set graph residency",
+            "Save graph policy and this pane's stable member roots.",
+            RESIDENT_SETTINGS_SCHEMA,
+            IntentEffect::DomainTruth,
+        ),
         action(
             APPLY_EDITS_INTENT,
             "Apply edits",

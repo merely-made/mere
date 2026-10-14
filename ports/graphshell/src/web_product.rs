@@ -51,6 +51,7 @@ pub(super) fn install_product_events(
                     .host
                     .create_file_metadata(metadata)
                     .map_err(|error| error.to_string())?;
+                host.session_store = super::web_session::SessionStore::Pending;
                 host.sync_canvas(&[id], true)?;
                 host.product_status = "File metadata added · content hash is portable".to_string();
                 host.chrome_dirty = true;
@@ -74,8 +75,38 @@ pub(super) fn install_product_events(
 impl BrowserHost {
     pub(super) fn run_product_command(&mut self, command: &str) -> bool {
         let result = match command {
+            "resident-settings" => self.apply_resident_settings(),
+            "resident-save" => {
+                self.session_store = super::web_session::SessionStore::Pending;
+                Ok("Saving retained changes".into())
+            },
+            "resident-refresh" => {
+                self.app.host.notice_resident_refresh();
+                Ok("Refresh requested".into())
+            },
             "node:new" => self.add_address(),
             "save-metadata" => self.save_metadata(),
+            "resident-pin" => (|| {
+                let id = self.focused_member()?;
+                let key = self
+                    .app
+                    .host
+                    .presentation_graph()
+                    .get_node_key_by_id(id)
+                    .ok_or("focused Surface is not loaded")?;
+                let pinned = self
+                    .app
+                    .host
+                    .presentation_graph()
+                    .node_is_pinned(key)
+                    .unwrap_or(false);
+                self.app
+                    .host
+                    .set_product_pinned(id, !pinned)
+                    .map_err(|e| e.to_string())?;
+                self.session_store = super::web_session::SessionStore::Pending;
+                Ok("Pin change applied but unstored".into())
+            })(),
             "add-relation" => self.add_relation(),
             "select-pair" => self.select_pair(),
             "apply-filter" => self.apply_filter(),
@@ -102,6 +133,66 @@ impl BrowserHost {
         true
     }
 
+    fn apply_resident_settings(&mut self) -> Result<String, String> {
+        use graphshell::resident_host::{PaneRoots, ResidentRefreshMode, ResidentSettings};
+        use graphshell::web_resident::ResidencyPolicy;
+        if self.app.host.resident_busy() {
+            return Err("Save or refresh the retained operation first".into());
+        }
+        let projection = select_value("resident-projection")?;
+        let neighborhood = select_value("resident-policy")? == "neighborhood";
+        let hops = input_value("resident-hops")?
+            .parse::<u16>()
+            .map_err(|_| "invalid hop count")?;
+        let minimum = input_value("resident-minimum")?
+            .parse::<u64>()
+            .map_err(|_| "invalid minimum check interval")?;
+        let batch = input_value("resident-batch")?
+            .parse::<u64>()
+            .map_err(|_| "invalid publication interval")?;
+        let roster = if neighborhood {
+            input_value("resident-roster")?
+                .split(',')
+                .filter(|value| !value.trim().is_empty())
+                .map(|value| {
+                    Uuid::parse_str(value.trim()).map_err(|e| format!("invalid roster ID: {e}"))
+                })
+                .collect::<Result<Vec<_>, _>>()?
+        } else {
+            Vec::new()
+        };
+        let pane = graphshell::web_resident::ViewKey::new("graphshell", "browser-controls")
+            .map_err(|e| e.to_string())?;
+        self.app.host.set_resident_pane(
+            pane,
+            PaneRoots {
+                roster: roster.into_iter().collect(),
+                focus: None,
+            },
+        );
+        self.app
+            .host
+            .set_resident_settings(ResidentSettings {
+                policy: if neighborhood {
+                    ResidencyPolicy::Neighborhood { hops }
+                } else {
+                    ResidencyPolicy::Full
+                },
+                projection: (!projection.is_empty()).then_some(projection),
+                refresh: if select_value("resident-refresh")? == "host" {
+                    ResidentRefreshMode::HostDriven {
+                        minimum_check_ms: minimum,
+                    }
+                } else {
+                    ResidentRefreshMode::Manual
+                },
+                publication_batch_ms: batch,
+            })
+            .map_err(|e| format!("Pane context updated; settings refused: {e}"))?;
+        self.session_store = super::web_session::SessionStore::Pending;
+        Ok("Settings staged; published reader remains unchanged until Save".into())
+    }
+
     /// The chrome's product line: status, the arrangement id, the physics
     /// law's label, and whether physics is paused.
     pub(super) fn product_chrome(&self) -> (String, String, String, bool) {
@@ -118,7 +209,8 @@ impl BrowserHost {
         let camera = self.canvas.camera();
         let previous_score = self.canvas.projection_score().cloned();
         let old = self.canvas.cartography_geometry();
-        self.canvas.set_graph(self.app.host.graph().clone());
+        self.canvas
+            .set_graph(self.app.host.presentation_graph().clone());
         self.canvas
             .apply_cartography_importance_metric(old.importance_metric());
         self.canvas.apply_cartography_sizing(
@@ -197,7 +289,8 @@ impl BrowserHost {
         }
         self.physics_paused = scene.physics_paused;
         self.handler_id = scene.default_handler.clone();
-        self.canvas.set_graph(self.app.host.graph().clone());
+        self.canvas
+            .set_graph(self.app.host.presentation_graph().clone());
         self.canvas.set_layout_strategy(self.strategy_choice());
         let positions: Vec<_> = scene
             .cartography
@@ -260,6 +353,7 @@ impl BrowserHost {
             .host
             .create_address(address.trim(), title.trim())
             .map_err(|error| error.to_string())?;
+        self.session_store = super::web_session::SessionStore::Pending;
         self.sync_canvas(&[id], true)?;
         self.detail_open = true;
         Ok("Address added to the local Mere graph".to_string())
@@ -274,52 +368,59 @@ impl BrowserHost {
             .filter(|tag| !tag.is_empty())
             .map(str::to_string)
             .collect::<Vec<_>>();
-        self.app
-            .host
-            .edit_node(id, &title, tags)
-            .map_err(|error| error.to_string())?;
         let facet = input_value("facet-id")?;
         let value = textarea_value("facet-json")?;
-        if !facet.trim().is_empty() && !value.trim().is_empty() {
-            self.app
-                .host
-                .set_product_facet(id, &facet, &value)
-                .map_err(|error| error.to_string())?;
-        }
+        let facet = if !facet.trim().is_empty() && !value.trim().is_empty() {
+            Some((
+                facet,
+                serde_json::from_str(&value).map_err(|e| format!("invalid facet JSON: {e}"))?,
+            ))
+        } else {
+            None
+        };
+        self.app
+            .host
+            .edit_metadata(id, &title, tags, facet)
+            .map_err(|e| e.to_string())?;
+        self.session_store = super::web_session::SessionStore::Pending;
         self.sync_canvas(&[id], false)?;
-        Ok("Title, tags, and facet saved".to_string())
+        Ok("Metadata changes applied".to_string())
     }
 
     fn add_relation(&mut self) -> Result<String, String> {
         let from = self.focused_member()?;
         let target = input_value("relation-target")?;
-        let to = self
-            .app
-            .host
-            .graph()
-            .get_node_by_url(target.trim())
-            .map(|(_, node)| node.id)
-            .ok_or_else(|| format!("unknown relation target {}", target.trim()))?;
+        let to = self.relation_target(target.trim())?;
         let relation = EditableRelation::from_code(&select_value("relation-kind")?)
             .ok_or("unknown editable relation")?;
         self.app
             .host
             .assert_product_relation(from, to, relation)
             .map_err(|error| error.to_string())?;
+        self.session_store = super::web_session::SessionStore::Pending;
         self.sync_canvas(&[from, to], false)?;
         Ok("Relation added and pair selected".to_string())
+    }
+
+    fn relation_target(&self, target: &str) -> Result<Uuid, String> {
+        if let Ok(id) = Uuid::parse_str(target) {
+            return Ok(id);
+        }
+        if !target.contains(':') {
+            return Err("invalid relation target ID; enter a UUID or known address".into());
+        }
+        self.app
+            .host
+            .presentation_graph()
+            .get_node_by_url(target)
+            .map(|(_, node)| node.id)
+            .ok_or_else(|| format!("unknown relation target {target}; inspect it first"))
     }
 
     fn select_pair(&mut self) -> Result<String, String> {
         let from = self.focused_member()?;
         let target = input_value("relation-target")?;
-        let to = self
-            .app
-            .host
-            .graph()
-            .get_node_by_url(target.trim())
-            .map(|(_, node)| node.id)
-            .ok_or_else(|| format!("unknown relation target {}", target.trim()))?;
+        let to = self.relation_target(target.trim())?;
         self.canvas.set_selected_members(&[from, to]);
         self.primary_member = Some(from);
         Ok("Relation pair selected".to_string())
@@ -335,7 +436,7 @@ impl BrowserHost {
         if query.trim().is_empty() && family == RelationFamilyFilter::All {
             self.canvas.clear_scope();
         } else {
-            self.canvas.scope_to_members(matches.iter().copied());
+            self.canvas.scope_to_exact_members(matches.iter().copied());
         }
         Ok(format!("{} graph object(s) match", matches.len()))
     }
@@ -344,7 +445,7 @@ impl BrowserHost {
         set_input_value("search-input", "")?;
         set_select_value("relation-filter", "all")?;
         self.canvas.clear_scope();
-        self.filter_count = self.app.host.graph().node_count();
+        self.filter_count = self.app.host.presentation_graph().node_count();
         self.relation_family = RelationFamilyFilter::All;
         Ok("Showing the whole graph".to_string())
     }
@@ -622,7 +723,7 @@ pub(super) fn update_product_semantics(
     let member = host.current_primary_member();
     if member != host.last_detail_member {
         if let Some(id) = member
-            && let Some((key, node)) = host.app.host.graph().get_node_by_id(id)
+            && let Some((key, node)) = host.app.host.presentation_graph().get_node_by_id(id)
         {
             set_input_value("edit-title", &node.title)?;
             let mut tags = host
@@ -649,6 +750,72 @@ pub(super) fn update_product_semantics(
     }
     if let Ok(element) = element("product-status") {
         element.set_text_content(Some(&host.product_status));
+    }
+    if let Ok(status) = element("resident-status") {
+        status.set_text_content(Some(&format!(
+            "{} {}",
+            host.app.host.persistence_label(),
+            host.session_store_error
+        )));
+    }
+    if let Ok(coverage) = element("resident-coverage") {
+        coverage.set_text_content(Some(&host.app.host.coverage_text()));
+    }
+    if let Ok(select) = element("resident-projection") {
+        if select.child_element_count() <= 1 {
+            for (id, label) in host.app.host.projection_choices() {
+                let option = super::document()?
+                    .create_element("option")
+                    .map_err(|_| "projection option")?;
+                option
+                    .set_attribute("value", &id)
+                    .map_err(|_| "projection value")?;
+                option.set_text_content(Some(&label));
+                select
+                    .append_child(&option)
+                    .map_err(|_| "projection choice")?;
+            }
+        }
+    }
+    if let Ok(control) = element("resident-policy") {
+        if control.get_attribute("data-initialized").is_none() {
+            use graphshell::resident_host::ResidentRefreshMode;
+            use graphshell::web_resident::ResidencyPolicy;
+            let settings = host.app.host.resident_settings();
+            let (policy, hops) = match settings.policy {
+                ResidencyPolicy::Full => ("full", 0),
+                ResidencyPolicy::Neighborhood { hops } => ("neighborhood", hops),
+            };
+            set_select_value("resident-policy", policy)?;
+            set_select_value(
+                "resident-projection",
+                settings.projection.as_deref().unwrap_or(""),
+            )?;
+            set_input_value("resident-hops", &hops.to_string())?;
+            let (mode, minimum) = match settings.refresh {
+                ResidentRefreshMode::Manual => ("manual", 1000),
+                ResidentRefreshMode::HostDriven { minimum_check_ms } => ("host", minimum_check_ms),
+            };
+            set_select_value("resident-refresh", mode)?;
+            set_input_value("resident-minimum", &minimum.to_string())?;
+            set_input_value("resident-batch", &settings.publication_batch_ms.to_string())?;
+            let _ = control.set_attribute("data-initialized", "true");
+        }
+    }
+    for selector in [
+        "[data-command='resident-pin']",
+        "[data-command='save-metadata']",
+        "[data-command='node:new']",
+        "[data-command='add-relation']",
+        "[data-command='resident-settings']",
+    ] {
+        if let Ok(Some(control)) = root()?.query_selector(selector) {
+            if host.app.host.resident_busy() {
+                let _ = control.set_attribute("disabled", "");
+            } else {
+                let _ = control.remove_attribute("disabled");
+            }
+        }
     }
     ensure_physics_controls(host)?;
     sync_speed_note(host)?;
@@ -812,7 +979,7 @@ pub(super) fn update_product_semantics(
         ),
         (
             "data-node-count",
-            host.app.host.graph().node_count().to_string(),
+            host.app.host.presentation_graph().node_count().to_string(),
         ),
         ("data-filter-count", host.filter_count.to_string()),
         ("data-layout", host.layout_id.clone()),

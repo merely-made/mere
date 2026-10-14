@@ -21,22 +21,51 @@ use web_sys::Event;
 
 use super::{BrowserHost, root};
 
-enum PreparedStore {
-    Ordinary(graphshell::mere_host::Staged),
-    Resident(graphshell::resident_host::ResidentIo<muniment::IndexedDbBackend>),
-}
-
 pub(super) use graphshell::resident_host::SessionStore;
 
 /// Start a write if changes are pending and none is in flight. Called by the
 /// frame pump once it has let go of the host.
 pub(super) fn store_pending(state: &Rc<RefCell<BrowserHost>>, elapsed_ms: f64) {
-    let attempt = {
+    store(state, elapsed_ms, false);
+}
+pub(super) fn save_now(state: &Rc<RefCell<BrowserHost>>) {
+    {
         let mut host = state.borrow_mut();
-        if host.session_store != SessionStore::Pending || super::web_timing::page_hidden() {
+        if host.session_store == SessionStore::Writing {
             return;
         }
-        if !host.app.host.resident_publication_due(elapsed_ms, false) {
+        host.session_store = SessionStore::Pending;
+        host.app.host.suspend_resident_refresh(false);
+    }
+    store(state, 0.0, true);
+}
+pub(super) fn flush_pending(state: &Rc<RefCell<BrowserHost>>) {
+    {
+        let mut host = state.borrow_mut();
+        if host.app.host.has_unstored() && host.session_store != SessionStore::Writing {
+            host.session_store = SessionStore::Pending;
+        }
+        if host.session_store == SessionStore::Pending
+            || host.session_store == SessionStore::Writing
+        {
+            // Settings validation is part of the retained save. Suspend only
+            // after its terminal acknowledgement, even if frames stop.
+            host.app.host.suspend_resident_refresh(false);
+        } else {
+            host.app.host.detach_resident_refresh();
+        }
+    }
+    store(state, 0.0, true);
+}
+fn store(state: &Rc<RefCell<BrowserHost>>, elapsed_ms: f64, flush: bool) {
+    let attempt = {
+        let mut host = state.borrow_mut();
+        if host.session_store != SessionStore::Pending
+            || (!flush && super::web_timing::page_hidden())
+        {
+            return;
+        }
+        if !host.app.host.resident_publication_due(elapsed_ms, flush) {
             return;
         }
         host.session_store = SessionStore::Writing;
@@ -60,6 +89,7 @@ pub(super) fn store_pending(state: &Rc<RefCell<BrowserHost>>, elapsed_ms: f64) {
                 // This load owns its inputs. The RefCell borrow above has ended.
                 let completion = request.load().await;
                 let mut host = state.borrow_mut();
+                let current_attempt = host.app.host.session_store_attempt_is_current(&attempt);
                 let BrowserHost {
                     app,
                     session_store,
@@ -72,6 +102,9 @@ pub(super) fn store_pending(state: &Rc<RefCell<BrowserHost>>, elapsed_ms: f64) {
                     session_store,
                     session_store_error,
                 ) {
+                    if current_attempt && host.session_store == SessionStore::Failed {
+                        host.publication_read_error = None;
+                    }
                     host.chrome_dirty = true;
                     drop(host);
                     wake();
@@ -81,6 +114,7 @@ pub(super) fn store_pending(state: &Rc<RefCell<BrowserHost>>, elapsed_ms: f64) {
             Err(error) => {
                 let mut host = state.borrow_mut();
                 host.session_store = SessionStore::Failed;
+                host.publication_read_error = None;
                 host.session_store_error = error.to_string();
                 drop(host);
                 wake();
@@ -96,35 +130,22 @@ pub(super) fn store_pending(state: &Rc<RefCell<BrowserHost>>, elapsed_ms: f64) {
                 }
             },
         }
-        let (staged, store) = {
+        let staged = {
             let mut host = state.borrow_mut();
+            if host.app.host.pending_publication() {
+                host.app.host.notice_resident_refresh();
+                host.session_store = SessionStore::Stored;
+                host.chrome_dirty = true;
+                drop(host);
+                wake();
+                return;
+            }
             let now_secs = (js_sys::Date::now() / 1_000.0) as u64;
-            // Resident preparation retains its batch in the existing host. This
-            // branch never creates another writer or grants backend admission.
-            let prepared =
-                if host.app.host.resident_busy() || host.app.host.resident_settings_pending() {
-                    host.app
-                        .host
-                        .prepare_resident_io(
-                            std::time::SystemTime::UNIX_EPOCH
-                                + std::time::Duration::from_secs(now_secs),
-                        )
-                        .map(PreparedStore::Resident)
-                        .map_err(|error| error.to_string())
-                } else {
-                    host.app
-                        .host
-                        .prepare_store(now_secs)
-                        .map(PreparedStore::Ordinary)
-                        .map_err(|error| error.to_string())
-                };
-            match prepared {
-                Ok(staged) => {
-                    host.session_store = SessionStore::Writing;
-                    (staged, host.app.host.store())
-                },
+            match host.app.host.prepare_owned_store(now_secs) {
+                Ok(staged) => staged,
                 Err(error) => {
                     host.session_store = SessionStore::Failed;
+                    host.publication_read_error = None;
                     host.session_store_error = error.to_string();
                     drop(host);
                     wake();
@@ -132,15 +153,7 @@ pub(super) fn store_pending(state: &Rc<RefCell<BrowserHost>>, elapsed_ms: f64) {
                 },
             }
         };
-        let written = match &staged {
-            PreparedStore::Ordinary(staged) => staged
-                .write(&store)
-                .await
-                .map_err(|error| error.to_string()),
-            PreparedStore::Resident(staged) => {
-                staged.write().await.map_err(|error| error.to_string())
-            },
-        };
+        let written = staged.write().await;
         {
             let mut host = state.borrow_mut();
             if !host.app.host.session_store_attempt_is_current(&attempt) {
@@ -150,35 +163,31 @@ pub(super) fn store_pending(state: &Rc<RefCell<BrowserHost>>, elapsed_ms: f64) {
                 wake();
                 return;
             }
-            match written {
-                Ok(()) => {
-                    match staged {
-                        PreparedStore::Ordinary(staged) => host.app.host.staged(staged),
-                        PreparedStore::Resident(staged) => {
-                            if let Err(error) = host.app.host.install_resident_io(&staged) {
-                                host.session_store = SessionStore::Failed;
-                                host.session_store_error = error.to_string();
-                                host.chrome_dirty = true;
-                                drop(host);
-                                wake();
-                                return;
-                            }
-                        },
-                    }
-                    // A change made during the write is still pending.
+            match host.app.host.install_owned_store(staged) {
+                Ok(true) => {
                     host.session_store = if host.app.host.has_unstored() {
                         SessionStore::Pending
                     } else {
                         SessionStore::Stored
                     };
+                    host.publication_read_error = None;
+                    host.session_store_error.clear();
+                },
+                Ok(false) => {
+                    host.session_store = SessionStore::Failed;
+                    host.publication_read_error = None;
+                    host.session_store_error = written
+                        .err()
+                        .unwrap_or_else(|| "Applied but unstored; retry Save".into());
                 },
                 Err(error) => {
-                    if let PreparedStore::Resident(staged) = &staged {
-                        let _ = host.app.host.install_resident_io(staged);
-                    }
                     host.session_store = SessionStore::Failed;
+                    host.publication_read_error = None;
                     host.session_store_error = error.to_string();
                 },
+            }
+            if super::web_timing::page_hidden() {
+                host.app.host.detach_resident_refresh();
             }
             host.chrome_dirty = true;
         }
@@ -195,15 +204,67 @@ fn wake() {
     }
 }
 
+/// A retry may finish through the frame pump or the public Demand control.
+/// Both capture the error identity before yielding and retire only that error.
+fn publication_recovery(host: &BrowserHost) -> Option<(Rc<()>, String)> {
+    host.app
+        .host
+        .pending_publication()
+        .then(|| host.publication_read_error.clone())
+        .flatten()
+}
+
+fn publish_reference_reader(
+    host: &mut BrowserHost,
+    recovering_error: Option<&(Rc<()>, String)>,
+) -> Result<(), String> {
+    let selected = host.canvas.selected_members();
+    let synced = match host.sync_canvas(&selected, false) {
+        Ok(()) => true,
+        Err(error) => {
+            host.publication_read_error = None;
+            host.session_store_error = error;
+            false
+        },
+    };
+    let mounted = match host.app.mount_local() {
+        Ok(_) => true,
+        Err(error) => {
+            host.publication_read_error = None;
+            host.session_store_error = error.to_string();
+            false
+        },
+    };
+    if synced
+        && mounted
+        && !host.app.host.pending_publication()
+        && recovering_error.is_some_and(|(identity, message)| {
+            host.publication_read_error
+                .as_ref()
+                .is_some_and(|(current, _)| Rc::ptr_eq(identity, current))
+                && host.session_store_error == *message
+        })
+    {
+        host.session_store_error.clear();
+        host.publication_read_error = None;
+    }
+    if synced && mounted {
+        Ok(())
+    } else {
+        Err(host.session_store_error.clone())
+    }
+}
+
 /// Drive the same owned request seam from the existing frame pump.
 pub(super) fn refresh_pending(state: &Rc<RefCell<BrowserHost>>, elapsed_ms: f64) {
-    let request = {
+    let (request, recovering_error) = {
         let mut host = state.borrow_mut();
-        host.app
-            .host
-            .suspend_resident_refresh(super::web_timing::page_hidden());
+        let suspend =
+            super::web_timing::page_hidden() && host.session_store != SessionStore::Writing;
+        host.app.host.suspend_resident_refresh(suspend);
         host.app.host.tick_resident_refresh(elapsed_ms);
-        host.app.host.prepare_resident_refresh()
+        let recovering_error = publication_recovery(&host);
+        (host.app.host.prepare_resident_refresh(), recovering_error)
     };
     let Ok(Some(request)) = request else {
         return;
@@ -214,11 +275,77 @@ pub(super) fn refresh_pending(state: &Rc<RefCell<BrowserHost>>, elapsed_ms: f64)
         {
             let mut host = state.borrow_mut();
             match host.app.host.install_resident_refresh(completion) {
-                Ok(_) | Err(graphshell::resident_host::ResidentHostError::StaleCompletion) => {},
-                Err(error) => host.session_store_error = error.to_string(),
+                Ok(_) => {
+                    let _ = publish_reference_reader(&mut host, recovering_error.as_ref());
+                },
+                Err(graphshell::resident_host::ResidentHostError::StaleCompletion) => {},
+                Err(error) => {
+                    let message = error.to_string();
+                    host.publication_read_error = host
+                        .app
+                        .host
+                        .pending_publication()
+                        .then(|| (Rc::new(()), message.clone()));
+                    host.session_store_error = message;
+                },
             }
             host.chrome_dirty = true;
         }
+        if super::web_timing::page_hidden() {
+            flush_pending(&state);
+        }
         wake();
     });
+}
+
+pub(super) fn demand_from_form(state: &Rc<RefCell<BrowserHost>>) {
+    use wasm_bindgen::JsCast;
+    let result = (|| {
+        let input: web_sys::HtmlInputElement = super::element("resident-demand")?
+            .dyn_into()
+            .map_err(|_| "demand input")?;
+        let id = uuid::Uuid::parse_str(input.value().trim())
+            .map_err(|e| format!("invalid stable ID: {e}"))?;
+        let stratum: web_sys::HtmlSelectElement = super::element("resident-stratum")?
+            .dyn_into()
+            .map_err(|_| "demand stratum")?;
+        let address = if stratum.value() == "resource" {
+            graphshell::web_resident::GraphAddress::Resource(id)
+        } else {
+            graphshell::web_resident::GraphAddress::Surface(id)
+        };
+        let mut host = state.borrow_mut();
+        let recovering_error = publication_recovery(&host);
+        host.app
+            .host
+            .prepare_resident_demand(address)
+            .map_err(|e| e.to_string())?
+            .ok_or_else(|| "presentation refresh is busy; save dirty settings first".to_string())
+            .map(|request| (request, address, recovering_error))
+    })();
+    match result {
+        Err(error) => {
+            let mut host = state.borrow_mut();
+            host.product_status = error;
+            host.chrome_dirty = true;
+            wake();
+        },
+        Ok((request, address, recovering_error)) => {
+            let state = state.clone();
+            spawn_local(async move {
+                let completion = request.load().await;
+                let mut host = state.borrow_mut();
+                host.product_status = match host.app.host.install_resident_refresh(completion) {
+                    Ok(_) => match publish_reference_reader(&mut host, recovering_error.as_ref()) {
+                        Ok(()) => host.app.host.observation_text(address),
+                        Err(error) => error,
+                    },
+                    Err(error) => error.to_string(),
+                };
+                host.chrome_dirty = true;
+                drop(host);
+                wake();
+            });
+        },
+    }
 }

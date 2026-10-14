@@ -589,3 +589,245 @@ mod tests {
         );
     }
 }
+
+/// Coverage is an observation boundary, not proof that omitted content is absent.
+pub fn resident_coverage_text(graph: &mere::kernel::graph::Graph) -> String {
+    use mere::kernel::graph::CoverageLayer;
+
+    let coverage = graph.coverage_note();
+    if coverage.limits.is_empty() {
+        return "Coverage: No known limits within this supplied graph.".into();
+    }
+    let mut lines = Vec::new();
+    for limit in &coverage.limits {
+        let (layer, state) = match limit.layer {
+            CoverageLayer::Possession => ("Possession", "Possession"),
+            CoverageLayer::Residency => ("Residency", "Not loaded"),
+            CoverageLayer::Disclosure => ("Disclosure", "Disclosure"),
+            CoverageLayer::Synchronization => ("Synchronization", "Synchronization"),
+            CoverageLayer::Projection => ("Projection", "Missing from authored roster"),
+        };
+        let count = limit
+            .count
+            .map(|count| count.to_string())
+            .unwrap_or_else(|| "unknown".into());
+        lines.push(format!("{layer}: {}; count: {count}", limit.reason));
+        for id in &limit.surfaces {
+            lines.push(format!("{state}: Surface {id}"));
+        }
+        for id in &limit.resources {
+            lines.push(format!("{state}: Resource {id}"));
+        }
+        if limit.surfaces.is_empty() && limit.resources.is_empty() {
+            lines.push(format!("{state}: supplied graph"));
+        }
+    }
+    lines.join("\n")
+}
+
+#[cfg(test)]
+mod resident_coverage_formatter_tests {
+    use super::resident_coverage_text;
+    use mere::kernel::graph::{
+        CoverageLayer, CoverageLimit, CoverageNote, Graph, PendingLink, PendingLinkState,
+        SemanticStatementSpec,
+    };
+    use uuid::Uuid;
+
+    fn render_without_mutation(graph: &Graph) -> String {
+        let truth = serde_json::to_value(graph.to_snapshot_at(0)).unwrap();
+        let revision = graph.revision();
+        let observation = graph.semantic_observation_revision();
+        let known = graph.known_coverage().clone();
+        let pending = graph.pending_link_state().clone();
+        let rendered = resident_coverage_text(graph);
+        assert_eq!(
+            serde_json::to_value(graph.to_snapshot_at(0)).unwrap(),
+            truth
+        );
+        assert_eq!(graph.revision(), revision);
+        assert_eq!(graph.semantic_observation_revision(), observation);
+        assert_eq!(graph.known_coverage(), &known);
+        assert_eq!(graph.pending_link_state(), &pending);
+        rendered
+    }
+
+    fn has_count(text: &str, count: usize) -> bool {
+        text.split(|c: char| !c.is_ascii_alphanumeric())
+            .any(|token| token == count.to_string())
+    }
+
+    fn supplied_layer(layer: CoverageLayer, boundary: &str, reason: &str) {
+        // The same UUID in different strata must keep both typed identities.
+        let id = Uuid::from_u128(0xab);
+        let limit = CoverageLimit {
+            layer,
+            reason: reason.into(),
+            surfaces: vec![id],
+            resources: vec![id],
+            count: Some(3),
+        };
+        let mut graph = Graph::new();
+        graph.set_known_coverage(CoverageNote {
+            limits: vec![limit.clone()],
+        });
+        assert_eq!(graph.coverage_note().limits, vec![limit]);
+        let text = render_without_mutation(&graph);
+        assert!(
+            text.contains(boundary),
+            "reported {layer:?} boundary must remain identified: {text}"
+        );
+        assert!(
+            text.contains(reason),
+            "exact supplied reason must remain visible: {text}"
+        );
+        assert!(
+            has_count(&text, 3),
+            "known count must remain visible separately from UUIDs: {text}"
+        );
+        assert!(
+            text.contains(&format!("Surface {id}")),
+            "Surface scope lost: {text}"
+        );
+        assert!(
+            text.contains(&format!("Resource {id}")),
+            "Resource scope lost: {text}"
+        );
+        assert!(
+            !text.to_lowercase().contains("unreported"),
+            "a supplied boundary is reported: {text}"
+        );
+    }
+
+    #[test]
+    fn resident_coverage_supplied_empty_means_no_known_limit() {
+        let mut graph = Graph::new();
+        graph.set_known_coverage(CoverageNote::default());
+        assert!(graph.coverage_note().limits.is_empty());
+        let text = render_without_mutation(&graph).to_lowercase();
+        assert!(
+            text.contains("no known limit"),
+            "empty supplied note is not an absent report: {text}"
+        );
+        assert!(
+            text.contains("supplied graph"),
+            "scope must stay the supplied graph: {text}"
+        );
+        assert!(!text.contains("unreported"));
+    }
+
+    #[test]
+    fn resident_coverage_possession_preserves_reported_scope_reason_count() {
+        supplied_layer(
+            CoverageLayer::Possession,
+            "Possession",
+            "records unavailable from this owner",
+        );
+    }
+
+    #[test]
+    fn resident_coverage_residency_preserves_reported_scope_reason_count() {
+        supplied_layer(
+            CoverageLayer::Residency,
+            "Not loaded",
+            "outside the loaded neighborhood",
+        );
+    }
+
+    #[test]
+    fn resident_coverage_disclosure_preserves_reported_scope_reason_count() {
+        supplied_layer(
+            CoverageLayer::Disclosure,
+            "Disclosure",
+            "private material withheld",
+        );
+    }
+
+    #[test]
+    fn resident_coverage_synchronization_preserves_reported_scope_reason_count() {
+        supplied_layer(
+            CoverageLayer::Synchronization,
+            "Synchronization",
+            "awaiting peer",
+        );
+    }
+
+    #[test]
+    fn resident_coverage_projection_preserves_reported_scope_reason_count() {
+        supplied_layer(
+            CoverageLayer::Projection,
+            "Missing from authored roster",
+            "omitted by the authored roster",
+        );
+    }
+
+    #[test]
+    fn resident_coverage_whole_graph_distinguishes_known_and_unknown_count() {
+        for count in [Some(3), None] {
+            let mut limit = CoverageLimit::new(CoverageLayer::Synchronization, "awaiting peer");
+            limit.count = count;
+            let mut graph = Graph::new();
+            graph.set_known_coverage(CoverageNote {
+                limits: vec![limit],
+            });
+            let text = render_without_mutation(&graph);
+            assert!(
+                text.contains("Synchronization") && text.contains("awaiting peer"),
+                "reported whole-graph boundary lost: {text}"
+            );
+            assert!(
+                text.to_lowercase().contains("graph"),
+                "empty ID lists scope the supplied graph: {text}"
+            );
+            assert!(!text.contains("Surface ") && !text.contains("Resource "));
+            if let Some(count) = count {
+                assert!(has_count(&text, count), "known count lost: {text}");
+            } else {
+                assert!(
+                    text.to_lowercase().contains("unknown"),
+                    "unknown count must not become zero or disappear: {text}"
+                );
+                assert!(!has_count(&text, 0));
+            }
+        }
+    }
+
+    #[test]
+    fn resident_coverage_includes_composed_pending_possession_without_target_leak() {
+        let mut graph = Graph::new();
+        let target = "https://private-target.test/unavailable";
+        graph.restore_pending_link_state(PendingLinkState {
+            entries: vec![PendingLink {
+                source_resource: Uuid::from_u128(0xcd),
+                source_surface: None,
+                target_iri: target.into(),
+                statement: SemanticStatementSpec {
+                    predicate: "https://example.test/cites".into(),
+                    ..Default::default()
+                },
+            }],
+            ..Default::default()
+        });
+        assert!(graph.known_coverage().limits.is_empty());
+        let composed = graph.coverage_note();
+        assert_eq!(composed.limits.len(), 1);
+        let limit = &composed.limits[0];
+        assert_eq!(limit.layer, CoverageLayer::Possession);
+        assert_eq!(
+            limit.reason,
+            "pending source claims have unavailable endpoints"
+        );
+        assert_eq!(limit.count, Some(1));
+        assert!(limit.resources.is_empty() && limit.surfaces.is_empty());
+        let text = render_without_mutation(&graph);
+        assert!(
+            text.contains("Possession") && text.contains(&limit.reason),
+            "derived Pending boundary must be composed into visible coverage: {text}"
+        );
+        assert!(has_count(&text, 1));
+        assert!(
+            !text.contains(target),
+            "aggregate Pending coverage must not expose target IRI"
+        );
+    }
+}

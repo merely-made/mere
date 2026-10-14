@@ -12,8 +12,8 @@ use std::rc::Rc;
 use wasm_bindgen::JsCast;
 use wasm_bindgen::prelude::Closure;
 use web_sys::{
-    Element, Event, HtmlInputElement, HtmlSelectElement, HtmlTextAreaElement, KeyboardEvent,
-    MouseEvent, PointerEvent, WheelEvent,
+    Element, Event, HtmlElement, HtmlInputElement, HtmlSelectElement, HtmlTextAreaElement,
+    KeyboardEvent, MouseEvent, PointerEvent, WheelEvent,
 };
 
 use super::{
@@ -192,6 +192,14 @@ pub(super) fn install_events(state: &Rc<RefCell<BrowserHost>>) -> Result<(), Str
         let Some(command) = target.get_attribute("data-command") else {
             return;
         };
+        if command == "resident-save" {
+            super::web_session::save_now(&click_state);
+            return;
+        }
+        if command == "resident-demand" {
+            super::web_session::demand_from_form(&click_state);
+            return;
+        }
         let mut host = click_state.borrow_mut();
         host.run_command(&command);
         let _ = update_semantics(&mut host);
@@ -306,18 +314,30 @@ pub(super) fn install_events(state: &Rc<RefCell<BrowserHost>>) -> Result<(), Str
                 _ => return,
             }
         }
-        if event
-            .target()
-            .and_then(|target| target.dyn_into::<Element>().ok())
-            .is_some_and(|target| {
-                target.has_attribute("data-action-draft-field")
-                    || target.has_attribute("data-action-draft-submit")
-                    || target.has_attribute("data-projection-field")
-                    || target.has_attribute("data-projection-occurrence")
-                    || target.has_attribute("data-projection-compare-cell")
-                    || target.has_attribute("data-practice-command")
-                    || target.has_attribute("data-projection-option")
-            })
+        // Native controls and editing hosts own their keyboard input. Canvas
+        // shortcuts must not consume punctuation, caret movement, or activation.
+        // Keep the command menu's explicit Escape/Enter handling above this guard.
+        if event.default_prevented()
+            || event.is_composing()
+            || event
+                .target()
+                .and_then(|target| target.dyn_into::<Element>().ok())
+                .is_some_and(|target| {
+                    target
+                        .dyn_ref::<HtmlElement>()
+                        .is_some_and(HtmlElement::is_content_editable)
+                        || target
+                            .closest(
+                                "input, textarea, select, button, a[href], summary, \
+                                 [data-action-draft-field], [data-action-draft-submit], \
+                                 [data-projection-field], [data-projection-occurrence], \
+                                 [data-projection-compare-cell], [data-practice-command], \
+                                 [data-projection-option]",
+                            )
+                            .ok()
+                            .flatten()
+                            .is_some()
+                })
         {
             return;
         }
@@ -446,12 +466,16 @@ pub(super) fn schedule_frames(state: Rc<RefCell<BrowserHost>>) -> Result<(), Str
     // Visibility transitions invalidate requests even when hidden tabs stop
     // producing frames. Resume wakes the existing frame pump immediately.
     let visibility_state = state.clone();
-    let visibility = Closure::<dyn FnMut(Event)>::new(move |_| {
-        visibility_state
-            .borrow_mut()
-            .app
-            .host
-            .suspend_resident_refresh(super::web_timing::page_hidden());
+    let visibility = Closure::<dyn FnMut(Event)>::new(move |event: Event| {
+        if super::web_timing::page_hidden() || event.type_() == "pagehide" {
+            super::web_session::flush_pending(&visibility_state);
+        }
+        {
+            let mut host = visibility_state.borrow_mut();
+            let suspend = super::web_timing::page_hidden()
+                && host.session_store != super::web_session::SessionStore::Writing;
+            host.app.host.suspend_resident_refresh(suspend);
+        }
         if !super::web_timing::page_hidden() {
             if let Ok(root) = root() {
                 if let Ok(event) = Event::new("graphshell-wake") {
@@ -463,6 +487,9 @@ pub(super) fn schedule_frames(state: Rc<RefCell<BrowserHost>>) -> Result<(), Str
     document()?
         .add_event_listener_with_callback("visibilitychange", visibility.as_ref().unchecked_ref())
         .map_err(|_| "could not attach resident visibility")?;
+    window()?
+        .add_event_listener_with_callback("pagehide", visibility.as_ref().unchecked_ref())
+        .map_err(|_| "could not attach resident detach")?;
     visibility.forget();
     state.borrow_mut().app.host.attach_resident_refresh();
     pending.set(true);

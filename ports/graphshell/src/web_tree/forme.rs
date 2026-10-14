@@ -10,14 +10,14 @@ use cambium::{Slot, button, frisket_with};
 use graphshell::{
     forme_session::{FormeSession, PreparedSave, SaveKind},
     forme_workspace::FormeWorkspace,
+    web_resident::WebWorkbench,
 };
-use muniment::IndexedDbBackend;
 use uuid::Uuid;
 use workbench::{ContentSource, SplitAxis, Tile, TileEvent};
 
 pub(super) struct Pane {
     pub(super) session: FormeSession,
-    backend: IndexedDbBackend,
+    backend: WebWorkbench,
     completed: Rc<RefCell<Option<Result<(), String>>>>,
     pending: Option<PreparedSave>,
     retry: Option<SaveKind>,
@@ -31,8 +31,8 @@ pub(super) struct Pane {
 }
 impl Pane {
     pub(super) async fn open(product: &product::SavedProduct) -> Result<Self, String> {
-        let (backend, session) = product.forme_source().ok_or("workspace store is busy")?;
-        let session = FormeSession::load(backend.clone(), session, &product.graph()).await?;
+        let backend = product.workbench().ok_or("workspace store is busy")?;
+        let session = backend.load().await?;
         Ok(Self {
             session,
             backend,
@@ -55,9 +55,7 @@ impl Pane {
         self.candidate.as_ref().unwrap_or_else(|| self.model())
     }
     pub(super) fn install(&self, canvas: &mut Canvas) -> Result<(), String> {
-        canvas.set_forme_region(
-            (!self.current().members().is_empty()).then(|| self.current().region()),
-        )
+        install_region(self.current(), canvas)
     }
     fn save(&mut self, kind: SaveKind) {
         if self.saving {
@@ -77,7 +75,7 @@ impl Pane {
         let backend = self.backend.clone();
         let completed = self.completed.clone();
         wasm_bindgen_futures::spawn_local(async move {
-            *completed.borrow_mut() = Some(proposal.save(backend).await);
+            *completed.borrow_mut() = Some(backend.save(&proposal).await);
         });
     }
     pub(super) fn previewing(&self) -> bool {
@@ -101,6 +99,15 @@ impl Pane {
             };
         }
     }
+}
+// The canvas contains only the published roster. Keep hidden Forme members
+// in canonical state/history, but constrain only the cells this view can draw.
+fn install_region(model: &FormeWorkspace, canvas: &mut Canvas) -> Result<(), String> {
+    let mut region = model.region();
+    region
+        .cells
+        .retain(|cell| canvas.graph().get_node_by_id(cell.member).is_some());
+    canvas.set_forme_region((!region.cells.is_empty()).then_some(region))
 }
 fn now() -> u64 {
     js_sys::Date::now() as u64
@@ -271,12 +278,7 @@ fn preview(page: &mut TreePage, target: Uuid, edge: workbench::Edge) {
         },
         page.shared.canvas.borrow().graph(),
     );
-    match result.and_then(|()| {
-        page.shared
-            .canvas
-            .borrow_mut()
-            .set_forme_region(Some(candidate.region()))
-    }) {
+    match result.and_then(|()| install_region(&candidate, &mut page.shared.canvas.borrow_mut())) {
         Ok(()) => {
             pane.candidate = Some(candidate);
             pane.status = "Preview ready · Apply move or cancel".into();
@@ -805,7 +807,10 @@ pub(super) fn workbench(page: &TreePage) -> Option<Child> {
                     .ok()
                     .and_then(|id| graph.get_node_by_id(id).map(|(_, n)| n));
                 let Some(node) = node else {
-                    return Slot::View(Box::new(el("p", "This access is no longer present")));
+                    return Slot::View(Box::new(el(
+                        "p",
+                        "This access is not loaded in this published view",
+                    )));
                 };
                 let member = node.id;
                 let title = node.title.clone();

@@ -35,6 +35,66 @@ pub(crate) struct OwnedPersistenceStatus {
     pub error: Option<String>,
 }
 
+/// Persistence facts exposed while one browser future owns its App.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum BrowserPersistencePhase {
+    AppliedButUnstored,
+    PublicationPending,
+    Stored,
+}
+impl BrowserPersistencePhase {
+    pub fn label(self) -> &'static str {
+        match self {
+            Self::AppliedButUnstored => "Applied but unstored",
+            Self::PublicationPending => "Stored; presentation pending",
+            Self::Stored => "Stored",
+        }
+    }
+}
+
+/// A value snapshot, not a storage/host capability. Each owned operation gets
+/// its own observation cell; old observers cannot update a later operation.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct BrowserPersistenceSnapshot {
+    pub revision: u64,
+    pub phase: BrowserPersistencePhase,
+    pub save_requested: bool,
+}
+impl BrowserPersistenceSnapshot {
+    pub(crate) fn new(phase: BrowserPersistencePhase) -> Self {
+        Self {
+            revision: 0,
+            phase,
+            save_requested: false,
+        }
+    }
+    pub(crate) fn observe(&mut self, phase: BrowserPersistencePhase) {
+        if self.phase != phase {
+            self.phase = phase;
+            // Successful publication satisfies any Save accepted during its
+            // flight. A different phase cannot inherit that request.
+            self.save_requested = false;
+            self.revision = self
+                .revision
+                .checked_add(1)
+                .expect("browser progress exhausted");
+        }
+    }
+    pub(crate) fn request_save(&mut self) -> bool {
+        if self.phase != BrowserPersistencePhase::PublicationPending {
+            return false;
+        }
+        if !self.save_requested {
+            self.save_requested = true;
+            self.revision = self
+                .revision
+                .checked_add(1)
+                .expect("browser progress exhausted");
+        }
+        true
+    }
+}
+
 /// Read-only presentation observation actions on an admitted endpoint's session item.
 pub const DEMAND_INTENT: &str = "mere.resident.demand";
 pub const REFRESH_INTENT: &str = "mere.resident.refresh";
@@ -274,6 +334,13 @@ impl HostRoots {
             self.revision = self.revision.wrapping_add(1);
         }
     }
+    pub(crate) fn set_focus(&mut self, pane: pandect::ViewKey, focus: Option<GraphAddress>) {
+        if self.panes.get(&pane).and_then(|roots| roots.focus) == focus {
+            return;
+        }
+        self.panes.entry(pane).or_default().focus = focus;
+        self.revision = self.revision.wrapping_add(1);
+    }
     pub fn close_pane(&mut self, pane: &pandect::ViewKey) {
         if self.panes.remove(pane).is_some() {
             self.revision = self.revision.wrapping_add(1);
@@ -432,6 +499,17 @@ impl<B: Backend + Clone> MereHost<B> {
     pub fn set_resident_pane(&mut self, pane: pandect::ViewKey, roots: PaneRoots) {
         let revision = self.resident_roots.revision();
         self.resident_roots.set_pane(pane, roots);
+        if revision != self.resident_roots.revision() {
+            self.resident_refresh.notice();
+        }
+    }
+    pub(crate) fn set_resident_pane_focus(
+        &mut self,
+        pane: pandect::ViewKey,
+        focus: Option<GraphAddress>,
+    ) {
+        let revision = self.resident_roots.revision();
+        self.resident_roots.set_focus(pane, focus);
         if revision != self.resident_roots.revision() {
             self.resident_refresh.notice();
         }
@@ -1078,12 +1156,23 @@ impl<B: Backend + Clone> ResidentHost<B> {
         commands: Vec<ObservedCommand>,
         at: SystemTime,
     ) -> Result<ResidentPersistence, ResidentHostError> {
+        self.apply_observed_commands(via, commands, at)
+    }
+    /// Named product admission through this concrete owner's private writer.
+    pub fn apply_observed_commands(
+        &mut self,
+        via: &str,
+        commands: Vec<ObservedCommand>,
+        at: SystemTime,
+    ) -> Result<ResidentPersistence, ResidentHostError> {
         if self.is_busy() {
             return Err(ResidentHostError::Busy);
         }
         let host = self.host.as_mut().ok_or(ResidentHostError::Busy)?;
-        let applied = host.edit_resident(via, commands)?;
-        self.applied = Some(applied);
+        let applied = host.through(via.to_owned(), |host| {
+            host.apply_observed_commands(commands)
+        })?;
+        self.applied = Some(applied.applied);
         // Preparation failure retains the already-applied identity and Busy.
         let _ = host.prepare_resident_store(at);
         Ok(self.unstored())
@@ -1320,6 +1409,208 @@ mod tests {
         assert_eq!(roots.union().projection_surfaces, BTreeSet::from([a, b]));
         assert_eq!(roots.union().transient, BTreeSet::from([focus]));
         assert_eq!(roots.union().pinned, BTreeSet::from([pin]));
+    }
+
+    #[test]
+    fn pane_focus_preserves_rosters_other_focus_pins_and_noop_revision() {
+        let pane = ViewKey::new("graphshell", "tree-controls").unwrap();
+        let other = ViewKey::new("graphshell", "other").unwrap();
+        let a = Uuid::from_u128(5100);
+        let b = Uuid::from_u128(5101);
+        let focus = GraphAddress::Surface(Uuid::from_u128(5102));
+        let other_focus = GraphAddress::Resource(Uuid::from_u128(5103));
+        let pin = GraphAddress::Surface(Uuid::from_u128(5104));
+        let mut roots = HostRoots::default();
+        roots.set_focus(pane.clone(), None);
+        assert_eq!(roots.revision(), 0);
+        assert!(roots.panes.is_empty());
+        roots.set_pane(
+            pane.clone(),
+            PaneRoots {
+                roster: BTreeSet::from([a]),
+                focus: None,
+            },
+        );
+        roots.set_pane(
+            other.clone(),
+            PaneRoots {
+                roster: BTreeSet::from([b]),
+                focus: Some(other_focus),
+            },
+        );
+        roots.set_pins(BTreeSet::from([pin]));
+        let before = roots.revision();
+        roots.set_focus(pane.clone(), Some(focus));
+        assert_eq!(roots.revision(), before + 1);
+        roots.set_focus(pane.clone(), Some(focus));
+        assert_eq!(roots.revision(), before + 1);
+        assert_eq!(roots.union().projection_surfaces, BTreeSet::from([a, b]));
+        assert_eq!(
+            roots.union().transient,
+            BTreeSet::from([focus, other_focus])
+        );
+        assert_eq!(roots.union().pinned, BTreeSet::from([pin]));
+        roots.set_focus(pane.clone(), None);
+        assert_eq!(roots.revision(), before + 2);
+        roots.set_focus(pane.clone(), None);
+        assert_eq!(roots.revision(), before + 2);
+        assert_eq!(roots.panes[&pane].roster, BTreeSet::from([a]));
+        assert_eq!(roots.panes[&other].focus, Some(other_focus));
+        assert_eq!(roots.union().projection_surfaces, BTreeSet::from([a, b]));
+        assert_eq!(roots.union().transient, BTreeSet::from([other_focus]));
+        assert_eq!(roots.union().pinned, BTreeSet::from([pin]));
+    }
+
+    #[test]
+    fn pane_focus_refresh_preserves_other_roots_demand_writer_and_storage() {
+        pollster::block_on(async {
+            use pandect::addressable_graph::ResidencyStatus;
+            async fn stored(backend: &Fault) -> Vec<(String, Vec<u8>)> {
+                let mut keys = backend.list("").await.unwrap();
+                keys.sort();
+                let mut values = Vec::new();
+                for key in keys {
+                    let value = backend.get(&key).await.unwrap().unwrap();
+                    values.push((key, value));
+                }
+                values
+            }
+            let (mut owner, backend) = owner().await;
+            for id in 5100..5106 {
+                owner
+                    .edit("test", command(id), SystemTime::UNIX_EPOCH)
+                    .unwrap();
+                owner.persist(SystemTime::UNIX_EPOCH).await.unwrap();
+            }
+            let pane = ViewKey::new("graphshell", "tree-controls").unwrap();
+            let other = ViewKey::new("graphshell", "other").unwrap();
+            let address = |id| GraphAddress::Surface(Uuid::from_u128(id));
+            let host = owner.host.as_mut().unwrap();
+            host.save_projection(&authored_projection()).unwrap();
+            host.set_resident_pane(
+                pane.clone(),
+                PaneRoots {
+                    roster: BTreeSet::from([Uuid::from_u128(5100)]),
+                    focus: Some(address(5104)),
+                },
+            );
+            host.set_resident_pane(
+                other.clone(),
+                PaneRoots {
+                    roster: BTreeSet::from([Uuid::from_u128(5101)]),
+                    focus: None,
+                },
+            );
+            host.set_resident_pins(BTreeSet::from([address(5102)]));
+            owner
+                .set_settings(ResidentSettings {
+                    policy: ResidencyPolicy::Neighborhood { hops: 0 },
+                    projection: Some("resident-test".into()),
+                    ..Default::default()
+                })
+                .unwrap();
+            owner.persist(SystemTime::UNIX_EPOCH).await.unwrap();
+            let host = owner.host.as_mut().unwrap();
+            let request = host
+                .prepare_resident_demand(address(5103))
+                .unwrap()
+                .unwrap();
+            host.install_resident_refresh(request.load().await).unwrap();
+            let generation = host.resident_reader().unwrap().generation().to_owned();
+            let writer = serde_json::to_value(host.graph().to_snapshot_at(0)).unwrap();
+            let cursor = host.graph_session().journal().live_cursor();
+            let bytes = stored(&backend).await;
+            backend.calls.lock().unwrap().clear();
+            assert_eq!(
+                host.resident_reader().unwrap().status(address(5104)),
+                ResidencyStatus::Loaded
+            );
+            assert_eq!(
+                host.resident_reader().unwrap().status(address(5105)),
+                ResidencyStatus::NotLoaded
+            );
+
+            host.notice_resident_refresh();
+            let stale = host.prepare_resident_refresh().unwrap().unwrap();
+            host.set_resident_pane_focus(pane.clone(), Some(address(5105)));
+            assert_eq!(
+                host.resident_reader().unwrap().status(address(5104)),
+                ResidencyStatus::Loaded
+            );
+            assert_eq!(
+                host.resident_reader().unwrap().status(address(5105)),
+                ResidencyStatus::NotLoaded
+            );
+            assert!(matches!(
+                host.install_resident_refresh(stale.load().await),
+                Err(ResidentHostError::StaleCompletion)
+            ));
+            host.refresh_resident_reader().await.unwrap();
+            assert_eq!(
+                host.resident_reader().unwrap().status(address(5104)),
+                ResidencyStatus::NotLoaded
+            );
+            assert_eq!(
+                host.resident_reader().unwrap().status(address(5105)),
+                ResidencyStatus::Loaded
+            );
+            for id in 5100..5104 {
+                assert_eq!(
+                    host.resident_reader().unwrap().status(address(id)),
+                    ResidencyStatus::Loaded
+                );
+            }
+            assert_eq!(
+                host.resident_roots().union().projection_surfaces,
+                BTreeSet::from([Uuid::from_u128(5100), Uuid::from_u128(5101)])
+            );
+            assert_eq!(
+                host.resident_roots().union().pinned,
+                BTreeSet::from([address(5102)])
+            );
+
+            // An unrelated pane replacement cannot retire foreground focus.
+            host.set_resident_pane(other, PaneRoots::default());
+            host.refresh_resident_reader().await.unwrap();
+            assert_eq!(
+                host.resident_reader().unwrap().status(address(5101)),
+                ResidencyStatus::NotLoaded
+            );
+            assert_eq!(
+                host.resident_reader().unwrap().status(address(5105)),
+                ResidencyStatus::Loaded
+            );
+            host.set_resident_pane_focus(pane, None);
+            assert_eq!(
+                host.resident_reader().unwrap().status(address(5105)),
+                ResidencyStatus::Loaded
+            );
+            host.refresh_resident_reader().await.unwrap();
+            for id in [5100, 5102, 5103] {
+                assert_eq!(
+                    host.resident_reader().unwrap().status(address(id)),
+                    ResidencyStatus::Loaded
+                );
+            }
+            for id in [5101, 5104, 5105] {
+                assert_eq!(
+                    host.resident_reader().unwrap().status(address(id)),
+                    ResidencyStatus::NotLoaded
+                );
+            }
+            assert_eq!(host.resident_reader().unwrap().generation(), generation);
+            assert_eq!(
+                serde_json::to_value(host.graph().to_snapshot_at(0)).unwrap(),
+                writer
+            );
+            assert_eq!(host.graph_session().journal().live_cursor(), cursor);
+            assert!(!host.has_unstored());
+            assert!(
+                backend.calls.lock().unwrap().is_empty(),
+                "focus refresh must not apply writes"
+            );
+            assert_eq!(stored(&backend).await, bytes);
+        });
     }
 
     #[derive(Clone, Default)]
@@ -2881,5 +3172,55 @@ mod tests {
             assert!(!host.resident_needs_check());
             assert!(host.resident_publication_due(1000.0, false));
         });
+    }
+}
+
+#[cfg(test)]
+mod browser_publication_progress_tests {
+    use super::{BrowserPersistencePhase as Phase, BrowserPersistenceSnapshot as Progress};
+
+    #[test]
+    fn busy_save_requires_acknowledged_publication_and_coalesces_until_published() {
+        let mut progress = Progress::new(Phase::AppliedButUnstored);
+        assert!(!progress.request_save());
+        assert_eq!(progress.revision, 0);
+        progress.observe(Phase::PublicationPending);
+        assert_eq!(progress.phase.label(), "Stored; presentation pending");
+        assert!(progress.request_save());
+        let requested = progress;
+        for _ in 0..100 {
+            assert!(progress.request_save());
+        }
+        assert_eq!(progress, requested, "busy Save notices must coalesce");
+        progress.observe(Phase::Stored);
+        assert!(!progress.save_requested);
+        assert_eq!(progress.revision, requested.revision + 1);
+        assert!(
+            !progress.request_save(),
+            "completed work cannot queue another write"
+        );
+    }
+
+    #[test]
+    fn pending_failure_preserves_phase_and_each_operation_has_its_own_observation() {
+        let mut failed = Progress::new(Phase::PublicationPending);
+        assert!(failed.request_save());
+        // An error cannot supply a new durable/publication fact.
+        failed.observe(Phase::PublicationPending);
+        assert!(failed.save_requested);
+        assert_eq!(failed.phase, Phase::PublicationPending);
+        // Existing RefreshGate::fail permits the visible frame pump to retry
+        // automatically, including Manual mode. This cell owns no scheduling.
+        let retry = Progress::new(Phase::PublicationPending);
+        assert!(
+            !retry.save_requested,
+            "the next operation starts with a fresh observation cell"
+        );
+        failed.observe(Phase::Stored);
+        assert_eq!(
+            retry.phase,
+            Phase::PublicationPending,
+            "old completion cannot publish retry"
+        );
     }
 }

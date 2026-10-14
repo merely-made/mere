@@ -1219,6 +1219,7 @@ impl<B: Backend + Clone + Send + Sync + 'static> MereEndpoint<B> {
         }
         let host = Arc::clone(&self.host);
         let app = self.app.clone();
+        let pane = self.pane.clone();
         let (result, seen) = run(async move {
             let mut host = host.lock().await;
             if Some(intent.target) != host.session_instance() {
@@ -1248,6 +1249,52 @@ impl<B: Backend + Clone + Send + Sync + 'static> MereEndpoint<B> {
                 return (Ok(stale), None);
             }
             let outcome = match intent.intent.as_str() {
+                session_item::OBSERVED_EDIT_INTENT => {
+                    match serde_json::from_slice::<session_item::ObservedEditV1>(&intent.payload) {
+                        Ok(payload) if payload.schema == session_item::OBSERVED_EDIT_SCHEMA => {
+                            match host.apply_observed_commands_as(&app, payload.commands) {
+                                Ok(()) => {
+                                    let _outcome = host.persist_owned(now_secs()).await;
+                                    Ok(true)
+                                },
+                                Err(error) => Err(error.to_string()),
+                            }
+                        },
+                        Ok(_) => Err("unknown observed edit schema".into()),
+                        Err(error) => Err(format!("invalid observed edit payload: {error}")),
+                    }
+                },
+                session_item::RESIDENT_SETTINGS_INTENT => {
+                    match serde_json::from_slice::<session_item::ResidentSettingsV1>(
+                        &intent.payload,
+                    ) {
+                        Ok(payload) if payload.schema == session_item::RESIDENT_SETTINGS_SCHEMA => {
+                            match host.ensure_metadata_idle() {
+                                Err(error) => Err(error.to_string()),
+                                Ok(()) => {
+                                    host.set_resident_pane(
+                                        pane.clone(),
+                                        graphshell::resident_host::PaneRoots {
+                                            roster: payload.roster,
+                                            focus: payload.focus,
+                                        },
+                                    );
+                                    match host.set_resident_settings(payload.settings) {
+                                        Ok(()) => {
+                                            let _outcome = host.persist_owned(now_secs()).await;
+                                            Ok(true)
+                                        },
+                                        Err(error) => Err(format!(
+                                            "pane context updated; settings refused: {error}"
+                                        )),
+                                    }
+                                },
+                            }
+                        },
+                        Ok(_) => Err("unknown resident settings schema".into()),
+                        Err(error) => Err(format!("invalid resident settings payload: {error}")),
+                    }
+                },
                 session_item::APPLY_EDITS_INTENT => {
                     match serde_json::from_slice::<ApplyEditsV1>(&intent.payload) {
                         Ok(payload) if payload.schema == session_item::APPLY_EDITS_SCHEMA => {
@@ -2362,6 +2409,577 @@ mod tests {
         assert_eq!(nodes(&graph(&mut first)), truth + 1);
     }
 
+    // Root-run candidate: real broker bytes over a private local socket, using
+    // the production Directory facade. Owner seams only seed projection/context.
+    #[tokio::test(flavor = "multi_thread")]
+    async fn broker_resident_controls_preserve_peer_roots_and_context_only_client_cache() {
+        use castellan::authority::PersonaeHost;
+        use castellan::custody::{IdentityVault, InMemoryStorage, Profile};
+        use chirograph::{CarrierRequestBody, CarrierResponseBody};
+        use graphshell::client::{ClientState, PresentationResolution};
+        use graphshell::identity::VaultProtectionView;
+        use graphshell::native::app_broker::serve_app_broker;
+        use graphshell::native::app_client::AppBrokerClient;
+        use graphshell::projection_editor::{Channel, ProjectionDraft, Reading, SourceBinding};
+        use graphshell::resident_host::{
+            DEMAND_INTENT, OBSERVATION_SCHEMA, ObservationRequestV1, REFRESH_INTENT,
+            ResidentSettings,
+        };
+        use graphshell::session_item::{ObservedEditV1, ResidentSettingsV1};
+        use kernel::graph::{CoverageLayer, CoverageLimit, CoverageNote, PendingLinkRetention};
+        use pandect::addressable_graph::{GraphAddress, ResidencyPolicy, ResidencyStatus};
+        use pandect::live_graph::{LiveCheck, LiveCommand, ObservedCommand};
+        use personae::{Ed25519Keypair, ProfileId};
+        use std::collections::BTreeSet;
+
+        async fn invoke(client: &mut AppBrokerClient, intent: IntentInvocation) -> IntentResult {
+            match client
+                .request_body(CarrierRequestBody::Intent(intent))
+                .await
+                .unwrap()
+            {
+                CarrierResponseBody::Intent(result) => result,
+                other => panic!("expected an intent response, received {other:?}"),
+            }
+        }
+        async fn resume(
+            client: &mut AppBrokerClient,
+            state: &mut ClientState,
+            session: &ProjectionSession,
+        ) {
+            let request = state.resume_request(session).unwrap();
+            match client
+                .request_body(CarrierRequestBody::Resume(request))
+                .await
+                .unwrap()
+            {
+                CarrierResponseBody::Resume(reply) => state.apply_resume(session, reply).unwrap(),
+                other => panic!("expected a resume response, received {other:?}"),
+            };
+        }
+        async fn hear(
+            client: &mut AppBrokerClient,
+            session: &ProjectionSession,
+            revision: Revision,
+        ) {
+            // Earlier sessions/archive/graph notices are legal; require this
+            // exact new context revision, never accept an old queued bell.
+            println!(
+                "ENDPOINT CONTROL waiting-context session={} revision={}",
+                session.0, revision.0
+            );
+            tokio::time::timeout(Duration::from_secs(5), async {
+                loop {
+                    let notice = client.wait_for_notice().await.unwrap();
+                    if notice.session == *session && notice.revision == revision {
+                        break;
+                    }
+                }
+            })
+            .await
+            .expect("required context-only broker notice did not arrive");
+        }
+        fn surface_ids(snapshot: &ProjectionSnapshot) -> BTreeSet<Uuid> {
+            snapshot.scene.active_items_in_order().into_iter().filter_map(|(_, item)| {
+                let source = snapshot.scene.tables.sources[item.source.0 as usize].as_ref().unwrap();
+                (source.adapter == "mere.graph").then(|| source.id.parse().expect("portable Surface UUID"))
+            }).collect()
+        }
+        struct AbortBroker(tokio::task::AbortHandle);
+        impl Drop for AbortBroker {
+            fn drop(&mut self) {
+                self.0.abort();
+            }
+        }
+        tokio::time::timeout(Duration::from_secs(30), async {
+                let root = tempfile::tempdir().unwrap();
+                let shared = plain_directory_shared(root.path(), None).await;
+                assert!(shared.fixture_owner.is_none(), "actual production Directory owner");
+                let id = shared.latest("turnstone").await.unwrap();
+                let owned = shared.host(id).await.unwrap();
+                let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());
+                let grants = AppRouteGrants::new(AllowedAppRoutes::none());
+                let route = ResidentEndpointRoute::new(mere_route_id("plain-owner"), MERE_NOTICE_POLL).unwrap();
+                for app in ["turnstone", "knot-editor"] { grants.grant(AppId::new(app), route.clone()); }
+                let ambient_route = ResidentEndpointRoute::new(ambient_mere_route_id("plain-owner"), MERE_NOTICE_POLL).unwrap();
+                grants.grant(AppId::new("knot-editor"), ambient_route.clone());
+                let ambient_shared = shared.clone();
+                let ambient_grants = grants.clone();
+                let ambient_id = ambient_route.id().to_owned();
+                catalog.update(|catalog| catalog.register_resumable_notifying(
+                    ambient_route.id(), "Ambient endpoint residency control", move |context| {
+                        AccessEndpoint::open(ambient_shared.clone(), context, ambient_grants.clone(), &ambient_id, true)
+                    },
+                )).await.unwrap();
+                let opened = shared.clone();
+                let admitted = grants.clone();
+                let route_id = route.id().to_owned();
+                catalog.update(|catalog| catalog.register_resumable_notifying(
+                    route.id(), "Endpoint residency control", move |context| {
+                        AccessEndpoint::open(opened.clone(), context, admitted.clone(), &route_id, false)
+                    },
+                )).await.unwrap();
+                let identity = Arc::new(PersonaeHost::new(
+                    IdentityVault::with_profile(InMemoryStorage::new(), Profile::new(
+                        ProfileId("endpoint-controls".into()), "Isolated endpoint controls",
+                        Ed25519Keypair::from_seed([0x79; 32]),
+                    )), None, VaultProtectionView::Ephemeral,
+                ));
+                #[cfg(windows)]
+                let address = format!(r"\\.\pipe\mere-controls-{}", Uuid::new_v4());
+                #[cfg(not(windows))]
+                let address = root.path().join("broker.sock").display().to_string();
+                let broker_address = address.clone();
+                let broker_grants = grants.clone();
+                let broker_catalog = catalog.clone();
+                let tasks = graphshell::native::tasks::ResidentTasks::new();
+                let scoped = tasks.clone();
+                let server = tokio::spawn(async move {
+                    scoped.scope(serve_app_broker(&broker_address, Arc::new(crate::keeper::Keeper::new(identity)),
+                        broker_grants, 60_000, None, broker_catalog)).await
+                });
+                let abort = AbortBroker(server.abort_handle());
+                let mut first = loop {
+                    if let Ok(client) = AppBrokerClient::open_route_at(
+                        &address, AppId::new("turnstone"), AppRouteId::new(route.id()).unwrap(),
+                    ).await { break client; }
+                    assert!(!server.is_finished(), "broker startup failed");
+                    tokio::time::sleep(Duration::from_millis(10)).await;
+                };
+                let mut second = AppBrokerClient::open_route_at(
+                    &address, AppId::new("knot-editor"), AppRouteId::new(route.id()).unwrap(),
+                ).await.unwrap();
+                let request = first.open_session().await.unwrap().descriptor.projections
+                    .into_iter().find(|offer| offer.request.session.0 == MERE_GRAPH).unwrap().request;
+                let peer_request = second.open_session().await.unwrap().descriptor.projections
+                    .into_iter().find(|offer| offer.request.session.0 == MERE_GRAPH).unwrap().request;
+                let initial = first.snapshot(request.clone()).await.unwrap();
+                assert_eq!(initial.scene.epoch, second.snapshot(peer_request.clone()).await.unwrap().scene.epoch);
+                assert_eq!(invoke(&mut first, apply(&initial, vec![node(9701), node(9702), node(9703)])).await, IntentResult::Accepted);
+                let (a, b, c) = (Uuid::from_u128(9701), Uuid::from_u128(9702), Uuid::from_u128(9703));
+                let saved_projection = {
+                    let mut host = owned.lock().await;
+                    let mut draft = ProjectionDraft::new();
+                    draft.id = "broker-scope".into(); draft.label = "Broker scope".into();
+                    draft.source = SourceBinding { authority: "local".into(), domain: "notes".into(), resource: "graph:notes".into() };
+                    draft.reading = Reading { kind: "nodes".into(), key: "id".into(), value: None };
+                    draft.encoding.x = Channel::Field("x".into()); draft.encoding.y = Channel::Field("y".into());
+                    draft.appearance.title = "Broker scope".into(); draft.appearance.realization = "canvas".into();
+                    draft.provenance.author = "fixture-owner".into(); draft.provenance.source_revision = Some("1".into());
+                    let snapshot = graphshell::projection_compile::ProjectionSnapshot {
+                        definition: draft.to_definition().unwrap(), selected_occurrence: None,
+                    };
+                    let saved = host.save_projection(&snapshot).unwrap();
+                    host.persist_owned(0).await.unwrap();
+                    let (_, node) = host.graph().get_node_by_id(saved).unwrap();
+                    assert_eq!(node.url(), graphshell::product::projection_address("broker-scope"));
+                    assert_eq!(node.title, "Broker scope");
+                    let facets = host.graph().facets().facets_of(&saved).unwrap();
+                    let definition = facets.iter().find(|(facet, _)| facet.as_str() == graphshell::product::PROJECTION_DEFINITION_FACET).map(|(_, value)| value).unwrap();
+                    assert_eq!(definition, &serde_json::to_value(&snapshot).unwrap(), "saved definition Surface carries the exact authored projection");
+                    assert_eq!(host.graph().nodes().map(|(_, node)| node.id).collect::<BTreeSet<_>>(), BTreeSet::from([a, b, c, saved]), "fixture complete writer contains only three seeded Surfaces and saved definition Surface");
+                    println!("FULL FIXTURE saved_projection_surface={} address={} title={} complete_writer_ids={:?}", saved, node.url(), node.title, BTreeSet::from([a, b, c, saved]));
+                    saved
+                };
+                let complete_surfaces = BTreeSet::from([a, b, c, saved_projection]);
+                assert_eq!(complete_surfaces.len(), 4, "saved definition has a distinct Surface identity");
+                let settings = ResidentSettings { policy: ResidencyPolicy::Neighborhood { hops: 0 }, projection: Some("broker-scope".into()), ..Default::default() };
+                for (client, id) in [(&mut first, a), (&mut second, b)] {
+                    let snapshot = client.snapshot(request.clone()).await.unwrap();
+                    let payload = ResidentSettingsV1 { schema: session_item::RESIDENT_SETTINGS_SCHEMA.into(), settings: settings.clone(), roster: BTreeSet::from([id]), focus: Some(GraphAddress::Surface(id)) };
+                    assert_eq!(invoke(client, on_item(&snapshot, session_item::RESIDENT_SETTINGS_INTENT, serde_json::to_vec(&payload).unwrap())).await, IntentResult::Accepted);
+                }
+                {
+                    let host = owned.lock().await;
+                    assert_eq!(host.resident_roots().union().projection_surfaces, BTreeSet::from([a, b]));
+                    assert_eq!(host.resident_roots().union().transient, BTreeSet::from([GraphAddress::Surface(a), GraphAddress::Surface(b)]));
+                    assert_eq!(host.resident_reader().unwrap().status(GraphAddress::Surface(c)), ResidencyStatus::NotLoaded);
+                }
+                // The ambient connection cannot execute the new partial settings action.
+                let mut ambient = AppBrokerClient::open_route_at(
+                    &address, AppId::new("knot-editor"), AppRouteId::new(ambient_route.id()).unwrap(),
+                ).await.unwrap();
+                let ambient_request = ambient.open_session().await.unwrap().descriptor.projections
+                    .into_iter().find(|offer| offer.request.session.0 == MERE_GRAPH).unwrap().request;
+                let ambient_snapshot = ambient.snapshot(ambient_request).await.unwrap();
+                assert!(ambient_snapshot.presentation.offers.values().flatten().all(|offer| offer.semantics.actions.is_empty()));
+                let bytes_before = shared.cache.all_stored_bytes().await.unwrap();
+                let ambient_payload = ResidentSettingsV1 { schema: session_item::RESIDENT_SETTINGS_SCHEMA.into(), settings: ResidentSettings::default(), roster: BTreeSet::new(), focus: None };
+                assert!(matches!(invoke(&mut ambient, on_item(&ambient_snapshot, session_item::RESIDENT_SETTINGS_INTENT, serde_json::to_vec(&ambient_payload).unwrap())).await,
+                    IntentResult::Rejected { reason } if reason.contains("read-only")));
+                assert_eq!(shared.cache.all_stored_bytes().await.unwrap(), bytes_before);
+                ambient.close().await.unwrap();
+                assert_eq!(shared.cache.cached_sessions().await, 1);
+                assert!(muniment::DirectoryBackend::open(shared.cache.root()).is_err());
+                for (client, app, pinned) in [(&mut first, "turnstone", true), (&mut second, "knot-editor", false)] {
+                    let snapshot = client.snapshot(request.clone()).await.unwrap();
+                    let (digest, count) = {
+                        let host = owned.lock().await;
+                        (host.resident_reader().unwrap().record_digest(GraphAddress::Surface(b)).unwrap().to_owned(), host.graph_session().changes().len())
+                    };
+                    let payload = ObservedEditV1 { schema: session_item::OBSERVED_EDIT_SCHEMA.into(), commands: vec![ObservedCommand {
+                        command: LiveCommand::SetPinned { surface: b, pinned },
+                        checks: vec![LiveCheck::RecordUnchanged { address: GraphAddress::Surface(b), digest }],
+                    }] };
+                    assert_eq!(invoke(client, on_item(&snapshot, session_item::OBSERVED_EDIT_INTENT, serde_json::to_vec(&payload).unwrap())).await, IntentResult::Accepted);
+                    let host = owned.lock().await;
+                    assert_eq!(host.graph_session().changes().len(), count + 1);
+                    assert_eq!(host.graph_session().changes().last().unwrap().author, shared.author(app));
+                    assert!(!host.has_unstored());
+                }
+                // Close is a carrier request. The broker must drop only that pane.
+                first.close().await.unwrap();
+                loop {
+                    let host = owned.lock().await;
+                    let roots = host.resident_roots().union();
+                    if roots.projection_surfaces == BTreeSet::from([b]) {
+                        assert_eq!(roots.transient, BTreeSet::from([GraphAddress::Surface(b)]));
+                        assert_eq!(host.resident_reader().unwrap().status(GraphAddress::Surface(a)), ResidencyStatus::NotLoaded);
+                        break;
+                    }
+                    drop(host); tokio::time::sleep(Duration::from_millis(10)).await;
+                }
+                let peer = second.snapshot(peer_request.clone()).await.unwrap();
+                assert_eq!(surface_ids(&peer), BTreeSet::from([b]), "only the remaining pane Surface is presented before any demand");
+                assert_eq!(nodes(&peer), 1);
+                let mut state = ClientState::default(); state.apply_snapshot(peer.clone()).unwrap();
+                let binding = peer.presentation.bindings.iter().find(|binding| peer.presentation.offers[&binding.key]
+                    .iter().any(|offer| offer.codec == PresentationCodec::PortableCardV1)).unwrap();
+                let instance = binding.instance;
+                let resource = peer.presentation.offers[&binding.key].iter().find(|offer| offer.codec == PresentationCodec::PortableCardV1).unwrap().resource;
+                match second.request_body(CarrierRequestBody::Resource(ResourceRequest { session: peer.session.clone(), resource })).await.unwrap() {
+                    CarrierResponseBody::Resource(response) => state.apply_resource(response).unwrap(),
+                    other => panic!("expected resource bytes, received {other:?}"),
+                }
+                let before = state.mounted(&peer.session).unwrap().clone();
+                let (truth, cursor, writer, new_revision) = {
+                    let mut host = owned.lock().await;
+                    let truth = host.presentation_graph().revision();
+                    let cursor = host.graph_session().journal().live_cursor();
+                    let writer = host.graph_session().revision();
+                    let mut limit = CoverageLimit::new(CoverageLayer::Disclosure, "broker context control"); limit.resources.push(c);
+                    host.set_resident_host_coverage(CoverageNote { limits: vec![limit] }).unwrap();
+                    host.sync_projection_context();
+                    assert_eq!(host.presentation_graph().revision(), truth);
+                    (truth, cursor, writer, host.projection_revision())
+                };
+                assert!(new_revision > peer.scene.revision, "context advances delivery revision");
+                hear(&mut second, &peer.session, new_revision).await;
+                state.mark_stale(&peer.session); resume(&mut second, &mut state, &peer.session).await;
+                let mounted = state.mounted(&peer.session).unwrap();
+                assert_eq!(mounted.scene.tables, before.scene.tables); assert_eq!(mounted.presentation, before.presentation);
+                assert_eq!(mounted.status, chirograph::SessionStatus::Live);
+                assert!(mounted.coverage.as_ref().unwrap().limits.iter().any(|limit| limit.layer == chirograph::PortableCoverageLayerV1::Disclosure));
+                assert!(matches!(state.resolve(&peer.session, instance, &chirograph::CapabilityProfile::new([PresentationCapability::PortableCard])).unwrap(), PresentationResolution::Ready(_)));
+                let previous = state.mounted(&peer.session).unwrap().clone();
+                {
+                    let host = owned.lock().await;
+                    host.publish_pending_retention_for_test(PendingLinkRetention::UntilPurged).await.unwrap();
+                }
+                let current = second.snapshot(peer_request.clone()).await.unwrap();
+                let refresh = ObservationRequestV1 { schema: OBSERVATION_SCHEMA.into(), address: None };
+                assert_eq!(invoke(&mut second, on_item(&current, REFRESH_INTENT, serde_json::to_vec(&refresh).unwrap())).await, IntentResult::Accepted);
+                let pending_revision = owned.lock().await.projection_revision();
+                assert!(pending_revision > new_revision, "equal-coverage Pending context advances delivery revision");
+                hear(&mut second, &peer.session, pending_revision).await;
+                resume(&mut second, &mut state, &peer.session).await;
+                assert_eq!(state.mounted(&peer.session).unwrap().scene.tables, previous.scene.tables);
+                assert_eq!(state.mounted(&peer.session).unwrap().coverage, previous.coverage);
+                {
+                    let host = owned.lock().await;
+                    assert_eq!(host.presentation_graph().revision(), truth);
+                    assert_eq!(host.graph_session().journal().live_cursor(), cursor);
+                    assert_eq!(host.graph_session().revision(), writer);
+                    assert_eq!(host.presentation_graph().pending_link_state().retention, PendingLinkRetention::UntilPurged);
+                }
+                // Exact empty roster stays empty; Full clears computed Residency limits.
+            for (configuration, expected_nodes) in [(settings.clone(), 0), (ResidentSettings::default(), complete_surfaces.len())] {
+                let snapshot = second.snapshot(peer_request.clone()).await.unwrap();
+                let payload = ResidentSettingsV1 { schema: session_item::RESIDENT_SETTINGS_SCHEMA.into(), settings: configuration, roster: BTreeSet::new(), focus: None };
+                let encoded = serde_json::to_vec(&payload).unwrap();
+                let decoded: ResidentSettingsV1 = serde_json::from_slice(&encoded).unwrap();
+                assert!(decoded.roster.is_empty(), "empty roster survives public payload serialization");
+                assert_eq!(decoded.focus, None, "None is a replacement focus, not retain-old-focus");
+                let empty_bytes_before = if expected_nodes == 0 { Some(shared.cache.all_stored_bytes().await.unwrap()) } else { None };
+                let empty_before = if expected_nodes == 0 {
+                    let host = owned.lock().await;
+                    assert_eq!(decoded.settings, settings, "empty control sends the same public policy/projection settings");
+                    assert_eq!(host.resident_reader().unwrap().status(GraphAddress::Surface(b)), ResidencyStatus::Loaded, "old reader b is the pre-control witness");
+                    assert!(!host.has_unstored());
+                    assert!(!host.recovery_pending());
+                    println!("EMPTY SCOPE before roots_revision={} roots={:?} generation={} policy={:?} b_status={:?} unstored={} recovery={}",
+                        host.resident_roots().revision(), host.resident_roots().union(), host.resident_reader().unwrap().generation(), host.resident_reader().unwrap().policy(),
+                        host.resident_reader().unwrap().status(GraphAddress::Surface(b)), host.has_unstored(), host.recovery_pending());
+                    Some((host.resident_roots().revision(), host.graph().revision(), host.graph_session().journal().live_cursor(), host.graph_session().revision(), host.resident_reader().unwrap().generation().to_string()))
+                } else { None };
+                assert_eq!(invoke(&mut second, on_item(&snapshot, session_item::RESIDENT_SETTINGS_INTENT, encoded)).await, IntentResult::Accepted);
+                if expected_nodes == 0 {
+                    let host = owned.lock().await;
+                    let roots = host.resident_roots().union();
+                    assert!(roots.projection_surfaces.is_empty(), "public setting replaced authored roster");
+                    assert!(roots.transient.is_empty(), "public focus None cleared pane focus");
+                    assert!(roots.pinned.is_empty(), "no independent host pins");
+                    assert_eq!(roots.focused, None, "no separate host focus");
+                    let key = host.graph().get_node_key_by_id(b).unwrap();
+                    assert_eq!(host.graph().node_is_pinned(key), Some(false), "second observed unpin cleared the complete graph pin");
+                    assert!(!host.has_unstored(), "root-only settings did not stage writer edits");
+                    assert!(!host.recovery_pending(), "no held storage or publication recovery");
+                    let before = empty_before.as_ref().unwrap();
+                    assert!(host.resident_roots().revision() > before.0, "accepted empty roots advance the pane roots revision");
+                    assert_eq!(host.graph().revision(), before.1, "empty control does not mutate writer graph");
+                    assert_eq!(host.graph_session().journal().live_cursor(), before.2, "empty control does not append a writer command");
+                    assert_eq!(host.graph_session().revision(), before.3, "empty control does not advance writer revision");
+                    let reader = host.resident_reader().unwrap();
+                    assert_eq!(reader.generation().to_string(), before.4, "empty control keeps the stored graph generation");
+                    assert_eq!(reader.policy(), ResidencyPolicy::Neighborhood { hops: 0 });
+                    let reader_pin = reader.graph().get_node_key_by_id(b).and_then(|key| reader.graph().node_is_pinned(key));
+                    println!("EMPTY SCOPE after roots_revision={} roots={:?} generation={} policy={:?} a_status={:?} b_status={:?} c_status={:?} writer_pin=false reader_pin={:?}",
+                        host.resident_roots().revision(), roots, reader.generation(), reader.policy(), reader.status(GraphAddress::Surface(a)),
+                        reader.status(GraphAddress::Surface(b)), reader.status(GraphAddress::Surface(c)), reader_pin);
+                }
+                if let Some(before) = empty_bytes_before { assert_eq!(shared.cache.all_stored_bytes().await.unwrap(), before, "root-only empty settings write no graph/settings bytes"); }
+                let changed = second.snapshot(peer_request.clone()).await.unwrap();
+                assert_eq!(surface_ids(&changed), if expected_nodes == 0 { BTreeSet::new() } else { complete_surfaces.clone() });
+                assert_eq!(nodes(&changed), expected_nodes);
+                if expected_nodes == complete_surfaces.len() {
+                    let host = owned.lock().await;
+                    assert_eq!(host.graph().nodes().map(|(_, node)| node.id).collect::<BTreeSet<_>>(), complete_surfaces, "Full renders the exact known complete writer Surface set");
+                    assert_eq!(host.resident_reader().unwrap().status(GraphAddress::Surface(saved_projection)), ResidencyStatus::Loaded, "Full includes persisted definition Surface");
+                    assert!(changed.coverage.as_ref().unwrap().limits.iter().all(|limit| limit.layer != chirograph::PortableCoverageLayerV1::Residency));
+                }
+            }
+            // Demand retention is reader-wide and survives ordinary refresh.
+            // Exercise it after the strict pane-close and empty-roster controls,
+            // so their fixture contains no independent demand root.
+            let snapshot = second.snapshot(peer_request.clone()).await.unwrap();
+            let payload = ResidentSettingsV1 { schema: session_item::RESIDENT_SETTINGS_SCHEMA.into(), settings: settings.clone(), roster: BTreeSet::from([a, b]), focus: Some(GraphAddress::Surface(b)) };
+            assert_eq!(invoke(&mut second, on_item(&snapshot, session_item::RESIDENT_SETTINGS_INTENT, serde_json::to_vec(&payload).unwrap())).await, IntentResult::Accepted);
+            assert_eq!(owned.lock().await.resident_reader().unwrap().status(GraphAddress::Surface(c)), ResidencyStatus::NotLoaded);
+            let mut demand_peer = AppBrokerClient::open_route_at(
+                &address, AppId::new("turnstone"), AppRouteId::new(route.id()).unwrap(),
+            ).await.unwrap();
+            let demand_peer_request = demand_peer.open_session().await.unwrap().descriptor.projections
+                .into_iter().find(|offer| offer.request.session.0 == MERE_GRAPH).unwrap().request;
+            assert_eq!(surface_ids(&demand_peer.snapshot(demand_peer_request.clone()).await.unwrap()), BTreeSet::from([a, b]), "authored roster explicitly restored before the separate demand control");
+            let scoped = second.snapshot(peer_request.clone()).await.unwrap();
+            let demand = ObservationRequestV1 { schema: OBSERVATION_SCHEMA.into(), address: Some(GraphAddress::Surface(c)) };
+            assert_eq!(invoke(&mut second, on_item(&scoped, DEMAND_INTENT, serde_json::to_vec(&demand).unwrap())).await, IntentResult::Accepted);
+            let demand_revision = { let mut host = owned.lock().await; host.sync_projection_context(); host.projection_revision() };
+            hear(&mut demand_peer, &scoped.session, demand_revision).await;
+            let demanded = demand_peer.snapshot(demand_peer_request).await.unwrap();
+            assert_eq!(surface_ids(&demanded), BTreeSet::from([a, b, c]), "peer sees exactly restored authored roster plus explicitly demanded Surface c");
+            assert_eq!(nodes(&demanded), 3);
+            {
+                let host = owned.lock().await;
+                assert_eq!(host.resident_roots().union().projection_surfaces, BTreeSet::from([a, b]));
+                assert_eq!(host.resident_roots().union().transient, BTreeSet::from([GraphAddress::Surface(b)]));
+                assert_eq!(host.resident_reader().unwrap().status(GraphAddress::Surface(c)), ResidencyStatus::Loaded);
+            }
+            demand_peer.close().await.unwrap();
+            second.close().await.unwrap();
+                loop {
+                    let host = owned.lock().await;
+                    if host.resident_roots().union().projection_surfaces.is_empty() {
+                        assert!(host.resident_roots().union().transient.is_empty()); break;
+                    }
+                    drop(host); tokio::time::sleep(Duration::from_millis(10)).await;
+                }
+                // Resident shutdown must release a still-live endpoint, not only
+                // an already closed one. Use the same tracked task scope as Djinn.
+                let mut shutdown_client = AppBrokerClient::open_route_at(
+                    &address, AppId::new("turnstone"), AppRouteId::new(route.id()).unwrap(),
+                ).await.unwrap();
+                let shutdown_request = shutdown_client.open_session().await.unwrap().descriptor.projections
+                    .into_iter().find(|offer| offer.request.session.0 == MERE_GRAPH).unwrap().request;
+                let snapshot = shutdown_client.snapshot(shutdown_request).await.unwrap();
+                let payload = ResidentSettingsV1 { schema: session_item::RESIDENT_SETTINGS_SCHEMA.into(), settings, roster: BTreeSet::from([a]), focus: Some(GraphAddress::Surface(a)) };
+                assert_eq!(invoke(&mut shutdown_client, on_item(&snapshot, session_item::RESIDENT_SETTINGS_INTENT, serde_json::to_vec(&payload).unwrap())).await, IntentResult::Accepted);
+                let shutdown_cursor = {
+                    let host = owned.lock().await;
+                    assert_eq!(host.resident_roots().union().projection_surfaces, BTreeSet::from([a]));
+                    host.graph_session().journal().live_cursor()
+                };
+                server.abort(); let _ = server.await;
+                assert!(tasks.cancel_and_join().await > 0, "live broker connection was tracked");
+                {
+                    let host = owned.lock().await;
+                    assert!(host.resident_roots().union().projection_surfaces.is_empty(), "shutdown released live pane roster");
+                    assert!(host.resident_roots().union().transient.is_empty(), "shutdown released live pane focus");
+                    assert_eq!(host.graph_session().journal().live_cursor(), shutdown_cursor);
+                }
+                drop(shutdown_client); drop(abort);
+            }).await.expect("socket control completes within its explicit deadline");
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn admitted_observed_edits_and_settings_share_writer_and_preserve_peer_roots() {
+        use graphshell::resident_host::ResidentSettings;
+        use graphshell::session_item::{ObservedEditV1, ResidentSettingsV1};
+        use pandect::addressable_graph::GraphAddress;
+        use pandect::live_graph::{LiveCheck, LiveCommand, ObservedCommand};
+        use std::collections::BTreeSet;
+        let fixture = fixture(76, "observed-product-route").await;
+        let mut first = fixture.attach("turnstone").await;
+        let mut second = fixture.attach("knot-editor").await;
+        let initial = graph(&mut first);
+        assert_eq!(
+            first
+                .invoke(apply(&initial, vec![node(7601), node(7602)]))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        let shared = fixture
+            .routes
+            .inner
+            .served
+            .lock()
+            .await
+            .values()
+            .next()
+            .unwrap()
+            .clone();
+        let owner = MereEndpoint::open_mode(shared.clone(), &context("turnstone"), false).unwrap();
+        let owned = owner.host.clone();
+        let a = Uuid::from_u128(7601);
+        let b = Uuid::from_u128(7602);
+        for (endpoint, id) in [(&mut first, a), (&mut second, b)] {
+            let before = graph(endpoint);
+            let payload = ResidentSettingsV1 {
+                schema: session_item::RESIDENT_SETTINGS_SCHEMA.into(),
+                settings: ResidentSettings::default(),
+                roster: BTreeSet::from([id]),
+                focus: None,
+            };
+            assert_eq!(
+                endpoint
+                    .invoke(on_item(
+                        &before,
+                        session_item::RESIDENT_SETTINGS_INTENT,
+                        serde_json::to_vec(&payload).unwrap()
+                    ))
+                    .unwrap(),
+                IntentResult::Accepted
+            );
+        }
+        {
+            let host = owned.lock().await;
+            assert_eq!(
+                host.resident_roots().union().projection_surfaces,
+                BTreeSet::from([a, b])
+            );
+        }
+        assert_eq!(shared.cache.cached_sessions().await, 1);
+        let before = graph(&mut first);
+        let (digest, cursor, changes) = {
+            let host = owned.lock().await;
+            (
+                host.resident_reader()
+                    .unwrap()
+                    .record_digest(GraphAddress::Surface(a))
+                    .unwrap()
+                    .to_owned(),
+                host.graph_session().journal().live_cursor(),
+                host.graph_session().changes().len(),
+            )
+        };
+        let payload = ObservedEditV1 {
+            schema: session_item::OBSERVED_EDIT_SCHEMA.into(),
+            commands: vec![ObservedCommand {
+                command: LiveCommand::SetPinned {
+                    surface: a,
+                    pinned: true,
+                },
+                checks: vec![LiveCheck::RecordUnchanged {
+                    address: GraphAddress::Surface(a),
+                    digest,
+                }],
+            }],
+        };
+        let mut invalid = serde_json::to_value(&payload).unwrap();
+        invalid["commands"][0]["command"]["SetPinned"]["surface"] = serde_json::json!("not-a-uuid");
+        assert!(matches!(
+            first
+                .invoke(on_item(
+                    &before,
+                    session_item::OBSERVED_EDIT_INTENT,
+                    serde_json::to_vec(&invalid).unwrap()
+                ))
+                .unwrap(),
+            IntentResult::Rejected { .. }
+        ));
+        let mut forged = serde_json::to_value(&payload).unwrap();
+        forged["author"] = serde_json::json!("someone-else");
+        assert!(matches!(
+            first
+                .invoke(on_item(
+                    &before,
+                    session_item::OBSERVED_EDIT_INTENT,
+                    serde_json::to_vec(&forged).unwrap()
+                ))
+                .unwrap(),
+            IntentResult::Rejected { .. }
+        ));
+        assert_eq!(
+            owned.lock().await.graph_session().journal().live_cursor(),
+            cursor
+        );
+        assert_eq!(
+            first
+                .invoke(on_item(
+                    &before,
+                    session_item::OBSERVED_EDIT_INTENT,
+                    serde_json::to_vec(&payload).unwrap()
+                ))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        {
+            let host = owned.lock().await;
+            assert_eq!(host.graph_session().changes().len(), changes + 1);
+            assert_eq!(
+                host.graph_session()
+                    .changes()
+                    .last()
+                    .unwrap()
+                    .author
+                    .via
+                    .as_deref(),
+                Some("turnstone")
+            );
+            assert!(!host.has_unstored());
+            let key = host.presentation_graph().get_node_key_by_id(a).unwrap();
+            assert_eq!(host.presentation_graph().node_is_pinned(key), Some(true));
+        }
+        assert!(second.poll_notice().unwrap().is_some());
+        let stale = graph(&mut first);
+        assert!(matches!(
+            first
+                .invoke(on_item(
+                    &stale,
+                    session_item::OBSERVED_EDIT_INTENT,
+                    serde_json::to_vec(&payload).unwrap()
+                ))
+                .unwrap(),
+            IntentResult::Rejected { .. }
+        ));
+        assert_eq!(
+            owned.lock().await.graph_session().changes().len(),
+            changes + 1
+        );
+        // Closing one real routed endpoint releases only that endpoint's roots.
+        drop(first);
+        assert_eq!(
+            owned
+                .lock()
+                .await
+                .resident_roots()
+                .union()
+                .projection_surfaces,
+            BTreeSet::from([b])
+        );
+        drop(second);
+    }
+
     #[tokio::test(flavor = "multi_thread")]
     async fn scoped_endpoint_coverage_demand_and_context_resume_retain_client_resources() {
         use graphshell::client::ClientState;
@@ -3450,6 +4068,8 @@ mod tests {
             TRASH_SESSION_INTENT,
             session_item::SET_VIEW_INTENT,
             session_item::APPLY_EDITS_INTENT,
+            session_item::OBSERVED_EDIT_INTENT,
+            session_item::RESIDENT_SETTINGS_INTENT,
         ] {
             let mut invocation = apply(&read, vec![node(31)]);
             invocation.intent = intent.into();

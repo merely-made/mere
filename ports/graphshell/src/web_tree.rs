@@ -1069,6 +1069,22 @@ async fn boot(root: Element) -> Result<(), String> {
         hooks(shared.clone()),
     )
     .await?;
+    let resident_host = mounted.host().clone();
+    let resident_visibility = Closure::<dyn FnMut(Event)>::new(move |_| {
+        resident_host
+            .borrow_mut()
+            .with_ctx(cambium_rootstock::Hook::AfterWake);
+    });
+    document
+        .add_event_listener_with_callback(
+            "visibilitychange",
+            resident_visibility.as_ref().unchecked_ref(),
+        )
+        .map_err(|_| "could not attach resident visibility")?;
+    super::window()?
+        .add_event_listener_with_callback("pagehide", resident_visibility.as_ref().unchecked_ref())
+        .map_err(|_| "could not attach resident detach")?;
+    resident_visibility.forget();
     let zoom_host = mounted.host().clone();
     let release_host = mounted.host().clone();
     gestures::install(
@@ -1146,7 +1162,7 @@ fn hooks(shared: Rc<Shared>) -> HostHooks<TreePage, Logic, Child> {
                 .state()
                 .product
                 .as_ref()
-                .is_some_and(|product| product.ready())
+                .is_some_and(|product| product.needs_poll())
             {
                 ctx.runner.update(|page| {
                     if let Some(product) = &mut page.product {
@@ -1154,6 +1170,14 @@ fn hooks(shared: Rc<Shared>) -> HostHooks<TreePage, Logic, Child> {
                         if product.poll(&mut canvas) {
                             page.nodes = canvas.graph().nodes().count();
                             page.picked = canvas.focused_url().map(str::to_owned);
+                            // Graph replacement clears canvas Forme constraints.
+                            // Reinstall the current draft/preview against this reader.
+                            #[cfg(feature = "product")]
+                            if let Some(pane) = &mut page.forme {
+                                if let Err(error) = pane.install(&mut canvas) {
+                                    pane.status = error;
+                                }
+                            }
                         }
                     }
                 });
@@ -1265,7 +1289,13 @@ fn hooks(shared: Rc<Shared>) -> HostHooks<TreePage, Logic, Child> {
                 }
             });
         }),
-        after_wake: Box::new(|_ctx| {}),
+        after_wake: Box::new(|ctx| {
+            ctx.runner.update(|page| {
+                if let Some(product) = &mut page.product {
+                    product.visibility(super::web_timing::page_hidden());
+                }
+            });
+        }),
         close_request: Box::new(|_ctx, _request| CloseDisposition::KeepVisible),
         focused_text: Box::new(product::focused_text),
         key_intercept: Box::new(|_runner, _press| false),
