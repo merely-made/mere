@@ -296,6 +296,57 @@ supply a fallback private key. This qualifies idle-Locked denial following
 the successful unlocked reads. Custody is left Locked while native Windows
 enrollment is pending; the later Windows probe will require native unlock.
 
+**2026-10-14: Windows return access and M4 account recovery qualified.**
+Native elevation installed q-pc/M4's public keys and firewall rules restricted
+to `192.168.4.68`/`.58`. The first shell install used `-c`; a live remote
+probe caught missing `sed`, `dirname` and `uname`, which broke the npm Codex
+wrapper. The corrected helper uses `-lc` to initialize Git's Unix tool path,
+and admits the previous owned `-c` value only with its protected original
+snapshot and exact Git Bash shell still present. Parsing and unelevated
+refusal passed; the owner approved the correction. Original registry value
+kinds and presence remain available to `-Restore`. No sshd restart was made.
+
+The managed Windows chat daemon had stopped separately. Bootstrap restored
+it as PID `10856` at the matching `0.162.0-alpha.17.2` version, preserving
+the running native app processes. With ordinary remote commands and no path
+override, q-pc, ThinkPad and M4 each read the existing O-PC chat without
+resuming it. The owner reports ThinkPad's client looks good again. q-pc's
+in-process native unlock passed in the same resident PID, and O-PC's native
+remote read of its existing q-pc chat also passed. Normal idle locking remains
+enabled; q-pc has subsequently returned to Locked.
+
+The owner chose `markik` for M4 and switched the desktop back to that account.
+Its existing legacy agent recovered as PID `6669` through its own launch
+agent, without a tool restart, and M4's return read of q-pc passed. The task
+did not sign out or alter the other desktop account. M4's Djinn migration
+and daemon reboot persistence remain separate work.
+
+q-pc's marker-owned Cargo cache was removed after verifying the exact approved
+path and no live target owner. Its build log, result and owner marker were
+moved intact to the installed Djinn's `qualification/` directory; their hashes
+are recorded in `q-pc-djinn-install.json`. The installed binary and existing
+shared/source-tree caches are preserved. No task-owned Cargo target, Cargo
+home or worktree remains.
+
+**2026-10-14: Claude harness registration.** The owner requested Claude
+Desktop on O-PC, Surface and both Macs, with terminal Claude Code on Fedora's
+ThinkPad. All four desktops have `2.37337.1`. Supported, additive `sshConfigs`
+entries in each owner's `~/.claude/settings.json` name the existing peer
+aliases and omit private-key fields, reusing the existing SSH configuration
+and agents. Other settings and permission modes remain unchanged; active
+Claude sessions were not restarted. ThinkPad's existing `2.1.248` CLI can
+use its shell SSH access, verified against all four peers, without a Desktop
+installation or new permission grants.
+
+Ordinary Windows SSH/SFTP prerequisite checks passed for all four peers.
+Claude Desktop's own menu and first connection remain distinct, pending
+native qualification. No model task, remote helper installation or worktree
+was started. A future coding session must follow the workspace's main-first
+and approved-worktree-location rules; connection registration itself creates
+neither checkouts nor worktrees. Native Code SSH sessions are the feature
+being registered, not a merger of ordinary Chat/Cowork history.
+Reference: [Claude Desktop SSH configuration](https://code.claude.com/docs/en/desktop#pre-configure-ssh-connections-for-your-team).
+
 The owner also reported ThinkPad's O-PC client error. Raw SSH still passes;
 the native client authenticates, then its POSIX shell probe loses its quoting
 through the Scoop Git launcher under Windows' default `cmd`. A local probe

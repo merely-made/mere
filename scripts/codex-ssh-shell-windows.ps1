@@ -17,7 +17,9 @@ if (-not (Test-Path -LiteralPath $shell -PathType Leaf)) { throw 'The tested Git
 $registryPath = 'HKLM:\SOFTWARE\OpenSSH'
 $snapshotPath = Join-Path $env:ProgramData 'ssh\codex-default-shell.json'
 $names = @('DefaultShell','DefaultShellCommandOption')
-$desired = @{ DefaultShell = $shell; DefaultShellCommandOption = '-c' }
+# Login initialization supplies Git's Unix tools ahead of Windows shims.
+# Without it the npm Codex wrapper cannot find sed, dirname or uname.
+$desired = @{ DefaultShell = $shell; DefaultShellCommandOption = '-lc' }
 $registry = Get-Item -LiteralPath $registryPath
 $current = @{}
 foreach ($name in $names) {
@@ -47,7 +49,12 @@ foreach ($name in $names) {
     $original = $snapshot.original[$name]
     $matchesOriginal = $current[$name].exists -eq $original.exists -and $current[$name].value -eq $original.value -and $current[$name].kind -eq $original.kind
     $matchesDesired = $current[$name].exists -and $current[$name].value -eq $desired[$name]
-    if (-not ($matchesOriginal -or $matchesDesired)) { throw "Concurrent $name change detected; preserve it." }
+    # The initial owned installation used -c. Admit that one upgrade only
+    # with the protected snapshot and the exact Git Bash shell still in place.
+    $matchesPreviousOwnedOption = $name -eq 'DefaultShellCommandOption' -and
+        $current[$name].exists -and $current[$name].value -eq '-c' -and
+        $current.DefaultShell.exists -and $current.DefaultShell.value -eq $shell
+    if (-not ($matchesOriginal -or $matchesDesired -or $matchesPreviousOwnedOption)) { throw "Concurrent $name change detected; preserve it." }
 }
 foreach ($name in $names) {
     if ($Restore) {
