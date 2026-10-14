@@ -2146,11 +2146,21 @@ forest and stages native producer images at their exact appearance apertures.
 Source-first withdrawal parks the actual runner until remount. Eleven shared
 controls cover eager removal, GC, focus/state continuity, owner teardown,
 foreign-DOM refusal and explicit stock-tab focus requests. The focused Genet
-19947 receipt remains distinct from final supplier qualification. Native headed
-composition qualification is in progress. Physical
+19947 receipt remains distinct from final supplier qualification. The ordinary
+published consumer uses Mere `77fd235f`, Genet `b6bfbeb5` and Netrender
+`6a24ae08`: eight affected test groups, the native build and fourteen headed
+cases pass. Actual captures cover shared pane bodies, native composition,
+float/lens movement, authored opacity/shadows and full-window backdrop through
+resize, saved stations, keyboard/accessibility routes and font application,
+reset, missing-family fallback and reopening. Physical
 input/accessibility, monitor DPI transitions and performance remain separate
 gates. External engine builds and simultaneous engine loading remain separately
 qualified consumers.
+
+Turnstone's implementation is published at `1aa66634`, with exact raw receipt
+bytes preserved by `c7a828eb`. The ordinary consumer pin remains Mere
+`77fd235f`; these later publication/status updates do not change that supplier
+code or relabel the qualified binary.
 
 The final b6/6a shared model gates pass on the published Genet and Netrender
 suppliers. The Pelt scheduling continuation observes actual pending work and
@@ -2158,7 +2168,11 @@ session identities while preserving prepared input/a11y routes; all 25 pool
 tests pass. Future timer completion is independent of the script-visible settled
 handshake. Hosts retain deadline/wake authority and admit redraws through the
 current visible placement. Turnstone's actual headed acceptance and final Mere
-pin remain distinct from these shared controls.
+pin are recorded separately from these shared controls. The final native
+receipt binds the ordinary published binary to the normal manifest/lock and
+actual PNGs. Lens wheel delivery and scoped redraw continuation pass; early
+scrollbar-fade pixels remain timing-limited because capture arrived after the
+existing fade interval. No fade-clock policy was changed for the fixture.
 
 ### Shared browsing presenter candidate (2026-10-13)
 
