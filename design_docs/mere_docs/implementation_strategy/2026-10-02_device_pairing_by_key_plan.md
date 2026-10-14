@@ -354,6 +354,12 @@ does not require a new checkout. Home has 395,261,849,600 free bytes and no
 preexisting Claude remote-helper cache. Native connection remains pending;
 the owner was asked to select ThinkPad without sending a model task.
 
+The owner subsequently confirms O-PC's Claude Desktop connection to ThinkPad
+worked. This qualifies the native client connection in addition to the
+OpenSSH/SFTP preflight, using the existing agent-backed access. Other peer
+entries remain registered, with their own native connection checks separate.
+The tools did not send a model task or restart an existing Claude session.
+
 The owner also reported ThinkPad's O-PC client error. Raw SSH still passes;
 the native client authenticates, then its POSIX shell probe loses its quoting
 through the Scoop Git launcher under Windows' default `cmd`. A local probe

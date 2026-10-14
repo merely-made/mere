@@ -1,7 +1,7 @@
 {
   "schema": "codex.client-mesh/qualification-v1",
   "observed_at": "2026-10-14T18:26:52Z",
-  "status": "Windows enrollment and login-shell repair qualified; ThinkPad native recovery confirmed; Claude Desktop SSH entries added on four clients, native menu check pending",
+  "status": "Windows enrollment and login-shell repair qualified; ThinkPad native recovery confirmed; Claude Desktop peer menu and O-PC-to-ThinkPad native connection confirmed",
   "clients": {
     "o-pc": {
       "registered": [
@@ -143,7 +143,7 @@
     "worktrees_or_cargo_homes_created": false
   },
   "done_conditions": [
-    "Qualify Claude Desktop's own SSH connection after checking its native environment menu",
+    "Other Claude Desktop peer routes remain registered with SSH/SFTP prerequisites; native connection receipt covers O-PC to ThinkPad",
     "Verify Surface outgoing peers after native unlock and retain Locked denial",
     "Keep existing app processes, source state and writer guards intact",
     "Daemon reboot persistence remains separate qualification"
@@ -277,10 +277,11 @@
       "home_free_bytes": 395261849600,
       "remote_helper_cache_preexisting": false
     },
-    "native_desktop_first_connection": "not yet qualified; OpenSSH/SFTP prerequisites are distinct",
+    "native_desktop_first_connection": "owner reports O-PC Claude Desktop to ThinkPad worked using /home/markik/Code",
+    "other_native_desktop_routes": "registered; not individually qualified in Claude Desktop",
     "permissions_changed": false,
     "active_claude_sessions_interrupted": false,
-    "model_sessions_started": false,
+    "model_sessions_started_by_tools": false,
     "private_keys_exported": false,
     "worktrees_created": false
   }
