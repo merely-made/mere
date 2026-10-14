@@ -3576,7 +3576,13 @@ mod tests {
                 .admit(&request("cleromancy", &ambient_mere_route_id("notes")))
                 .is_err()
         );
-        let sessions = MereEndpoint::sessions_request();
+        let sessions = explicit
+            .describe()
+            .projections
+            .into_iter()
+            .find(|offer| offer.request.session == ProjectionSession(MERE_SESSIONS.into()))
+            .expect("the explicit owner advertises its sessions projection")
+            .request;
         assert!(ambient.snapshot(sessions).is_err());
 
         fixture
