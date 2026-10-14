@@ -51,6 +51,7 @@ pub struct StylesheetSpecimen {
     revision: u64,
     typography: tabard::Typography,
     last_error: Option<String>,
+    generic_fonts: Vec<(String, Vec<u8>)>,
 }
 
 impl Default for StylesheetSpecimen {
@@ -78,6 +79,7 @@ impl StylesheetSpecimen {
             revision: 1,
             typography: Default::default(),
             last_error: None,
+            generic_fonts: Vec::new(),
         }
     }
 
@@ -89,6 +91,9 @@ impl StylesheetSpecimen {
             return false;
         }
         self.document = make_document(mode, rules, &self.typography);
+        self.document
+            .replace_generic_font_resources(self.generic_fonts.clone())
+            .expect("admitted stylesheet font ledger");
         self.mode = mode.clone();
         self.rules = rules.to_vec();
         self.last_error = None;
@@ -106,7 +111,29 @@ impl StylesheetSpecimen {
         }
         self.typography = typography.clone();
         self.document = make_document(&self.mode, &self.rules, &self.typography);
+        self.document
+            .replace_generic_font_resources(self.generic_fonts.clone())
+            .expect("admitted stylesheet font ledger");
         self.last_error = None;
+        self.revision = self
+            .revision
+            .checked_add(1)
+            .expect("stylesheet revision exhausted");
+        Ok(true)
+    }
+
+    /// Retain explicit host generic resources across CSS/typography rebuilds.
+    /// Invalid input leaves the prior source ledger and revision intact.
+    pub fn set_generic_fonts(
+        &mut self,
+        fonts: Vec<(String, Vec<u8>)>,
+    ) -> Result<bool, genet_livery::GenericFontError> {
+        if self.generic_fonts == fonts {
+            return Ok(false);
+        }
+        self.document
+            .replace_generic_font_resources(fonts.clone())?;
+        self.generic_fonts = fonts;
         self.revision = self
             .revision
             .checked_add(1)
