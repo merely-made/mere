@@ -198,6 +198,7 @@ mod tests {
             request: 7,
         };
         let presentation = PresentedFrame {
+            context_generation: cambium_rootstock::ContextGeneration(1),
             host: 3,
             sequence: 11,
             width: 1,
@@ -222,6 +223,7 @@ mod tests {
         );
         // A different window/frame can present before the original map lands.
         let later_presentation = PresentedFrame {
+            context_generation: cambium_rootstock::ContextGeneration(1),
             host: 9,
             sequence: 22,
             ..presentation
