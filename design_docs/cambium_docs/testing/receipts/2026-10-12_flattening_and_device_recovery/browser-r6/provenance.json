@@ -1,0 +1,323 @@
+{
+  "schema": "browser-r6-compact-receipt-provenance-v1",
+  "status": "COPIED_ACCEPTED_EVIDENCE_NO_RERUN",
+  "source_commits": {
+    "genet": "5618326d287e7f7ef0c1cc3545587d64cedb22a7",
+    "mere": "4682ba99040c234c6410d73125e5dc9b1f91cc03",
+    "netrender": "c74b7cb28090c28b1c6d80b08dcdea18aff48d3e",
+    "provider": "2eae6243881d5b24c984d5ee35dde509ca5db782"
+  },
+  "copied_files": [
+    {
+      "local": "qualification.json",
+      "original": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/qualification.json",
+        "bytes": 129917,
+        "sha256": "58f15fc1b6e3cb68846aadfce8a11bf5b409163c8c3db6e2532d6cf7d186e1f7"
+      }
+    },
+    {
+      "local": "inner-runtime-release.json",
+      "original": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/runtime-release.json",
+        "bytes": 75738,
+        "sha256": "fabe3fb35f66a288d75a467d32f49c49b7cd0f310ba6350ca13d0e5b6a2e71af"
+      }
+    },
+    {
+      "local": "outer-runtime-release.json",
+      "original": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6-watchdog/runtime-release.json",
+        "bytes": 65601,
+        "sha256": "47455c18945823fd340af8ec950d64741350a0e28bec6e04e8f8bc1123e8b14c"
+      }
+    },
+    {
+      "local": "independent-verification-r6.json",
+      "original": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/independent-verification-r6.json",
+        "bytes": 26702,
+        "sha256": "7fc0bdbf788c8ded0fccf7e3b3bbd6d5556fcff8822e010270d8c1f820dadbb0"
+      }
+    },
+    {
+      "local": "root-visual-review-r6.json",
+      "original": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/root-visual-review-r6.json",
+        "bytes": 3419,
+        "sha256": "ba2d7d312fc44069af571736740ada9318e7e627f8fecf5aaf3d63afdc7d5123"
+      }
+    },
+    {
+      "local": "coordinator-pixel-review.json",
+      "original": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/coordinator-pixel-review.json",
+        "bytes": 1605,
+        "sha256": "0343a7e4b067e51ff07f2ab2194b2b192490fee2705040dd6050a53c1b0eb9a6"
+      }
+    },
+    {
+      "local": "coordinator-visual-review.json",
+      "original": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/coordinator-visual-review.json",
+        "bytes": 896,
+        "sha256": "48b264faad4dfdd5a731956aff610e6e0fce436686543d473548d39d53dd219b"
+      }
+    },
+    {
+      "local": "fixture-receipt.json",
+      "original": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/fixture-receipt.json",
+        "bytes": 29814,
+        "sha256": "dd187643ec27e287fa246a7bdb742d86448b34d05516ade0c75a7157462be467"
+      }
+    },
+    {
+      "local": "font-cpu-qualification-r4.json",
+      "original": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/font-cpu-qualification-r4.json",
+        "bytes": 6190,
+        "sha256": "f608aec7c1477475cdf9609385d71a3c0c752dbb63a3e0b79dd12bdea8b01db6"
+      }
+    },
+    {
+      "local": "first_before.png",
+      "original": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/first_before.png",
+        "bytes": 172693,
+        "sha256": "27fc28bdd70f62550cafb2fb0da95028c6d3becaaeb91153318ab875e9699148"
+      }
+    },
+    {
+      "local": "first_after.png",
+      "original": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/first_after.png",
+        "bytes": 172679,
+        "sha256": "7befed6e7a8e0a3709f07fdd230b896a21f9fdc8eb4badf1f023ad00bd9f5301"
+      }
+    },
+    {
+      "local": "second_before.png",
+      "original": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/second_before.png",
+        "bytes": 174490,
+        "sha256": "fbb7bd5697b1ba2371403d7b0b64fac13feb24006e5c7e62b45f4f7f906f2d6f"
+      }
+    },
+    {
+      "local": "second_after.png",
+      "original": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/second_after.png",
+        "bytes": 174486,
+        "sha256": "f65102bfb8fb215d0aaa3f04eea3089e3bdb99e354cee81a6e779496be063e52"
+      }
+    },
+    {
+      "local": "first_reader_before.png",
+      "original": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/first_reader_before.png",
+        "bytes": 27133,
+        "sha256": "0ab649bc92c030ee6f4c315a4dddc730a9f2efa3636ea723cebb543af891c35f"
+      }
+    },
+    {
+      "local": "first_reader_after.png",
+      "original": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/first_reader_after.png",
+        "bytes": 27132,
+        "sha256": "8bcd8c71f49cab2d619c656bc90ff60580b806276d734b573503d24bf194591c"
+      }
+    },
+    {
+      "local": "second_reader_before.png",
+      "original": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/second_reader_before.png",
+        "bytes": 27201,
+        "sha256": "a3f298837213932e94e093398078bc51d953f006aaef7cd8236d5e06854ec8cc"
+      }
+    },
+    {
+      "local": "second_reader_after.png",
+      "original": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/second_reader_after.png",
+        "bytes": 27200,
+        "sha256": "583d726b453ad448576e8b7a9f82ab5f458c4b7785d343dd944c7ea45426acf5"
+      }
+    },
+    {
+      "local": "first_stylesheet_before.png",
+      "original": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/first_stylesheet_before.png",
+        "bytes": 19200,
+        "sha256": "ddbf02401102a654b1a41211e8400e8242d3783c46b9a36ce1ee4a4bc9c8cd78"
+      }
+    },
+    {
+      "local": "first_stylesheet_after.png",
+      "original": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/first_stylesheet_after.png",
+        "bytes": 19205,
+        "sha256": "91c98dc3965ce8b1c82c4e5a2fa695e623d55dcac9714814c6778f4f4d35753f"
+      }
+    },
+    {
+      "local": "second_stylesheet_before.png",
+      "original": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/second_stylesheet_before.png",
+        "bytes": 19173,
+        "sha256": "56f792dd7655d6008424e959afaaf1a6855e4ca5c149f98e5f3f9f459bc933fa"
+      }
+    },
+    {
+      "local": "second_stylesheet_after.png",
+      "original": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/second_stylesheet_after.png",
+        "bytes": 19169,
+        "sha256": "0451841404b1fcf22bfbcf25a8c01b790d958feac2cfc4afc2b8624747f00585"
+      }
+    }
+  ],
+  "external_raw_artifacts": [
+    {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/first_before.rgba",
+      "bytes": 5651056,
+      "sha256": "153fc086849970d2a6d28e1d6def63985a87693a288dbd8e85d69ca52a95fe61",
+      "width": 1282,
+      "height": 1102,
+      "sha256_authority": "unchanged accepted qualification and independent numeric verification; raw bytes not copied into repository"
+    },
+    {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/first_after.rgba",
+      "bytes": 5651056,
+      "sha256": "265c0828b20313285c1d725a9c541166016196bcf0af210e0ea78b984ec178f1",
+      "width": 1282,
+      "height": 1102,
+      "sha256_authority": "unchanged accepted qualification and independent numeric verification; raw bytes not copied into repository"
+    },
+    {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/second_before.rgba",
+      "bytes": 5651056,
+      "sha256": "762407b4921d862d97e9d5e371eb09fc3a16188fb77f9ecb0516770b466f9628",
+      "width": 1282,
+      "height": 1102,
+      "sha256_authority": "unchanged accepted qualification and independent numeric verification; raw bytes not copied into repository"
+    },
+    {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/second_after.rgba",
+      "bytes": 5651056,
+      "sha256": "61c27b28d59b04e8affcd07f047746ce53761142e995d5c00c7a2ea215635ccb",
+      "width": 1282,
+      "height": 1102,
+      "sha256_authority": "unchanged accepted qualification and independent numeric verification; raw bytes not copied into repository"
+    },
+    {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/first_reader_before.rgba",
+      "bytes": 410220,
+      "sha256": "953af487adb2543b06b5e9ff0d58cfcbb71ad2e59e514e3480ea75293dd72bd0",
+      "width": 477,
+      "height": 215,
+      "sha256_authority": "unchanged accepted qualification and independent numeric verification; raw bytes not copied into repository"
+    },
+    {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/first_reader_after.rgba",
+      "bytes": 410220,
+      "sha256": "c144778078dc455759dfc465cbf7869646d9d613e809a29322f1fe927db0b584",
+      "width": 477,
+      "height": 215,
+      "sha256_authority": "unchanged accepted qualification and independent numeric verification; raw bytes not copied into repository"
+    },
+    {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/second_reader_before.rgba",
+      "bytes": 410220,
+      "sha256": "3f69d507a72a6d555af96b4365452ecea5790865be5b8396674d9e07d0968f3f",
+      "width": 477,
+      "height": 215,
+      "sha256_authority": "unchanged accepted qualification and independent numeric verification; raw bytes not copied into repository"
+    },
+    {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/second_reader_after.rgba",
+      "bytes": 410220,
+      "sha256": "5cd712cfe9c951e30ced13338ae946aa301c3f09bbd71540a69dc3576b360860",
+      "width": 477,
+      "height": 215,
+      "sha256_authority": "unchanged accepted qualification and independent numeric verification; raw bytes not copied into repository"
+    },
+    {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/first_stylesheet_before.rgba",
+      "bytes": 1285760,
+      "sha256": "9430b3ed377e6f6a317d70d9d022f726fd3227e31f38484f8fa09e3fa1d96b3e",
+      "width": 980,
+      "height": 328,
+      "sha256_authority": "unchanged accepted qualification and independent numeric verification; raw bytes not copied into repository"
+    },
+    {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/first_stylesheet_after.rgba",
+      "bytes": 1285760,
+      "sha256": "273b659afaaeb147ef5fc887ef378317506f080f4a0a87259ca6dbaf95311276",
+      "width": 980,
+      "height": 328,
+      "sha256_authority": "unchanged accepted qualification and independent numeric verification; raw bytes not copied into repository"
+    },
+    {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/second_stylesheet_before.rgba",
+      "bytes": 1285760,
+      "sha256": "b3fec79fbb7f432fcceb6d7a9ebd50992d65afc8f7e043cc99701bed35eb9875",
+      "width": 980,
+      "height": 328,
+      "sha256_authority": "unchanged accepted qualification and independent numeric verification; raw bytes not copied into repository"
+    },
+    {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/second_stylesheet_after.rgba",
+      "bytes": 1285760,
+      "sha256": "821365f64c255ef635cc4d4e999c5a374ac13486ab6e7df645aec2b364dc8da3",
+      "width": 980,
+      "height": 328,
+      "sha256_authority": "unchanged accepted qualification and independent numeric verification; raw bytes not copied into repository"
+    }
+  ],
+  "external_identity_and_build_records": [
+    {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/identity-r5.json",
+      "bytes": 6841021,
+      "sha256": "f2a8e544ac37df76cd6ea2f42cdde4be0253c1a97e94437a9b115e2aebf9ddff"
+    },
+    {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/runtime-identity-r6.json",
+      "bytes": 6462,
+      "sha256": "af588ec1f352fac8e8c3da5dc47440f72c83a45374a5d59ae3e3d620648cb5c1"
+    },
+    {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/compile-reuse-confirmation-r5.json",
+      "bytes": 1090,
+      "sha256": "44ff32238bc393d81449dba7277156815c5b3f2a3557d59b901ca7940b7e87f7"
+    },
+    {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/build-input-r5.json",
+      "bytes": 7541,
+      "sha256": "aaeab0ccaf7b088b0e8f061bfc318a0bfbec5575ea992f27ceb5a71e08ac388f"
+    }
+  ],
+  "raw_total_bytes_not_copied": 29388144,
+  "large_package_and_identity_files_not_copied": true,
+  "fixture_font_roles": [
+    "sans-serif",
+    "system-ui",
+    "serif",
+    "monospace"
+  ],
+  "fixture_face": {
+    "name": "checked-in Roboto",
+    "bytes": 168260,
+    "sha256": "319cff6e7a31f0f2a41c475dca42890aa5d19fe16017e2290f8c1d4e14f76481",
+    "qualification_scope": "delivery/retention only; not serif, monospace, script or icon fidelity"
+  },
+  "claims_excluded": {
+    "current_frame_async_quality_qualified": false,
+    "current_frame_async_error_scopes_qualified": false,
+    "final_canvas_handoff_scopes_qualified": false,
+    "physical_driver_reset": false,
+    "os_accessibility_actions": false,
+    "same_font_source_native_requalification": false
+  },
+  "publication_limit": "R6 qualifies the recorded compiler cone and local Genet override; later immutable pin/merge integration requires its own coherence checks, never a copied evidence claim."
+}

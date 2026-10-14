@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-14T02:18:15.222896+00:00",
+  "status": "bounded_visual_review_pass",
+  "images_viewed": [
+    "first_before.png",
+    "first_reader_after.png",
+    "first_stylesheet_after.png",
+    "second_after.png",
+    "second_reader_before.png",
+    "second_stylesheet_before.png"
+  ],
+  "findings": [
+    "actual Reader and Stylesheet text visible in light and dark",
+    "composed Workshop displays chrome, syntax, graph and palette",
+    "producer and lower-workspace viewport clipping preserved"
+  ],
+  "limits": [
+    "representative complete captures inspected; all twelve hashes and six full byte comparisons verified separately",
+    "fixture binds Roboto to four generics, does not qualify serif/monospace fidelity or exhaustive glyph coverage",
+    "no exhaustive UX/contrast, OS input/accessibility, physical driver reset, throughput or current-frame async quality claim"
+  ]
+}
