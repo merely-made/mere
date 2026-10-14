@@ -106,5 +106,7 @@ mod frame;
 pub use frame::*;
 mod prepare;
 pub(crate) mod wgpu;
+mod wgpu_driver;
+pub use wgpu_driver::{WgpuDriver, WgpuSurfaceFactory};
 
 mod drive;

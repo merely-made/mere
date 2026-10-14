@@ -29,7 +29,54 @@ where
         }
         self.s.pending_presentation_observer = None;
     }
-    pub(crate) fn refuse_presentation(&mut self, failure: crate::PresentationFailure) {
+    /// Browser context loss invalidates the current frame and captures before
+    /// producers or presentation can run again. The retained runner survives.
+    pub fn lose_presentation_context(&mut self) {
+        let Some(driver) = self.s.presentation_driver.as_mut() else {
+            return;
+        };
+        driver.lose();
+        let refusal = CaptureRefusal::ContextLost {
+            backend: driver.backend(),
+            generation: driver.generation(),
+        };
+        self.s.capture_owner.scope().invalidate(refusal.clone());
+        self.s.last_redraw_presentation = None;
+        self.suspend_producers();
+        self.refuse_pending_captures(refusal);
+    }
+    /// Terminal cleanup of this host's presentation services; retained CPU
+    /// application state can remain owned by the caller.
+    pub fn dispose_presentation(&mut self) {
+        self.s.capture_owner.scope().dispose();
+        let (backend, generation) = self.s.presentation_driver.as_ref().map_or(
+            (
+                crate::PresentationBackend::Wgpu,
+                crate::ContextGeneration(0),
+            ),
+            |driver| (driver.backend(), driver.generation()),
+        );
+        self.refuse_pending_captures(CaptureRefusal::PresentationError {
+            backend,
+            generation,
+            source_key: None,
+            error: "appearance disposed".into(),
+        });
+        self.suspend_producers();
+        self.s.shared.leaf_fragments.clear();
+        if let Some(driver) = self.s.presentation_driver.as_mut() {
+            driver.dispose();
+        }
+        self.s.surface = None;
+        self.s.shared.render_core = None;
+        self.s.shared.render_recovery = None;
+        self.s.recovery_subscription = None;
+        self.s.last_redraw_presentation = None;
+        self.s.window = None;
+        self.s.a11y = None;
+        self.s.files = None;
+    }
+    pub fn refuse_presentation(&mut self, failure: crate::PresentationFailure) {
         match failure.native {
             Some(crate::NativePresentationFailure::Rasterize(cause)) => {
                 self.refuse_rasterization(cause, failure.producer_key)
@@ -38,11 +85,26 @@ where
                 self.poll_device_recovery();
             },
             Some(crate::NativePresentationFailure::SurfaceLost) => {
+                self.suspend_producers();
+                if let Some(driver) = self.s.presentation_driver.as_mut() {
+                    driver.lose();
+                }
                 self.s.surface = None;
                 self.s.needs_recovery_surface = true;
                 if let Some(window) = &self.s.window {
                     window.request_redraw();
                 }
+            },
+            None if self
+                .s
+                .presentation_driver
+                .as_ref()
+                .is_some_and(|driver| driver.state() != crate::PresentationState::Ready) =>
+            {
+                self.refuse_pending_captures(CaptureRefusal::ContextLost {
+                    backend: failure.backend,
+                    generation: failure.generation,
+                });
             },
             None => self.refuse_pending_captures(CaptureRefusal::PresentationError {
                 backend: failure.backend,
@@ -135,12 +197,19 @@ where
         }
         let status = owner.status();
         if let Some(loss) = status.loss() {
+            self.s
+                .capture_owner
+                .scope()
+                .invalidate(CaptureRefusal::DeviceLost(loss.clone()));
             if self.s.detached_generation != Some(loss.generation) {
                 self.s.last_redraw_presentation = None;
                 // Clear every producer in this shared core, including leaves
                 // held by another window. Per-window suspension is insufficient.
                 self.s.shared.producers.suspend_all(None);
                 self.s.shared.leaf_fragments.clear();
+                if let Some(driver) = self.s.presentation_driver.as_mut() {
+                    driver.lose();
+                }
                 self.s.surface = None;
                 self.s.shared.render_core = None;
                 self.s.needs_recovery_surface = true;

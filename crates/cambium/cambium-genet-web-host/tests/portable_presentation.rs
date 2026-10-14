@@ -112,3 +112,34 @@ fn producer_ledger_order_does_not_change_private_resource_identity() {
         scene_digest(&second).unwrap()
     );
 }
+
+#[test]
+fn fractional_root_extent_covers_the_last_physical_pixel() {
+    let capture = PortablePaintCapture {
+        envelope: PaintEnvelope {
+            engine: EngineId::GENET,
+            viewport: DeviceIntSize::new(4, 4),
+            generation: 1,
+            commands: vec![PaintCmd::DrawRect(RectItem {
+                placement: CommonPlacement::new(LayoutRect::new(
+                    LayoutPoint::new(0., 0.),
+                    LayoutPoint::new(4.4, 4.4),
+                )),
+                color: ColorF {
+                    r: 1.,
+                    g: 0.,
+                    b: 0.,
+                    a: 1.,
+                },
+            })],
+            fonts: vec![],
+            images: vec![],
+        },
+        producers: vec![],
+    };
+    let scene = materialize(&capture, 11, 11, 2.5, SparseResourceLimits::default()).unwrap();
+    let mut cpu = CpuSession::new(SparseResourceLimits::default());
+    let frame = cpu.render(&scene).unwrap();
+    let bytes = frame.data_as_u8_slice();
+    assert_eq!(&bytes[(10 * 11 + 10) * 4..][..4], &[255, 0, 0, 255]);
+}

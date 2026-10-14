@@ -1,0 +1,67 @@
+<!doctype html><meta charset="utf-8"><title>Presentation fixture</title>
+<style>section{position:relative;width:420px;height:480px}canvas{width:100%;height:100%}</style>
+<section><canvas id="a"></canvas></section><section><canvas id="b"></canvas></section><section><canvas id="c" class="preserved" data-fixture="fallback" tabindex="0"></canvas></section><pre id="result">pending</pre>
+<script type="module">
+import init,* as module from './pkg/presentation_page.js';
+const assert=(ok,message)=>{if(!ok)throw new Error(message)};
+const turn=()=>new Promise(resolve=>requestAnimationFrame(resolve));
+async function until(predicate,message){const deadline=performance.now()+10000;while(!predicate()){assert(performance.now()<deadline,message);await turn();}}
+const generation=id=>Number(module.stamp(id).match(/ContextGeneration\((\d+)\)/)?.[1]);
+try {
+ await init();const id=await module.mount_page('a','webgl2');
+ assert(module.selected(id)==='webgl2','forced WebGL2 choice was ignored');
+ const actual=document.querySelector('canvas');assert(actual.getContext('webgl2'),'actual canvas lacks WebGL2 context');
+ assert(actual.dataset.fixtureInitCount==='1','application initialized more than once');
+ assert(!module.stamp(id).includes('None'),'no successful presentation');
+ const mirror=document.querySelector('[data-cambium-mirror]');assert(mirror,'accessibility mirror missing');
+ const press=Array.from(mirror.querySelectorAll('[role="button"]')).find(node=>(node.getAttribute('aria-label')||node.textContent).trim()==='Press');assert(press,'Press mirror missing');press.click();
+ assert(module.presses(id)===1,'mirror action did not reach retained state');
+ actual.style.width='0px';await until(()=>module.stamp(id).includes('None'),'zero CSS width did not suspend presentation');
+ actual.style.width='100%';await until(()=>!module.stamp(id).includes('None'),'CSS resume did not present');
+ const gl=actual.getContext('webgl2'),loss=gl.getExtension('WEBGL_lose_context');assert(loss,'loss fixture extension missing');
+ const old=generation(id);loss.loseContext();await until(()=>module.stamp(id).includes('None'),'loss retained a successful frame');
+ press.click();assert(module.presses(id)===2,'context loss erased retained controls');
+ assert(module.stamp(id).includes('None'),'lost context published a frame');
+ await turn();loss.restoreContext();await until(()=>generation(id)===old+1,'restoration failed to advance generation');
+ assert(module.presses(id)===2,'restoration erased retained state');
+ const other=await module.mount_page('b','webgl2');
+ const second=document.querySelector('#b');assert(second.getContext('webgl2')!==gl,'appearances share a context');
+ const secondPress=Array.from(second.parentElement.querySelector('[data-cambium-mirror]').querySelectorAll('[role="button"]')).find(node=>(node.getAttribute('aria-label')||node.textContent).trim()==='Press');
+ const secondGeneration=generation(other);loss.loseContext();await until(()=>module.stamp(id).includes('None'),'second loss did not suspend');
+ secondPress.click();assert(module.presses(other)===1,'one context loss disabled another appearance');
+ assert(generation(other)===secondGeneration,'one context loss replaced another context');
+ await turn();loss.restoreContext();await until(()=>generation(id)===old+2,'second restoration failed');
+ const capture=module.request_capture(id);await turn();const queuedStamp=module.stamp(id);press.click();
+ await until(()=>module.poll_capture(capture).ready,'owned capture did not complete');
+ const pixels=module.poll_capture(capture);assert(!pixels.error,'owned capture refused: '+pixels.error);
+ assert(pixels.stamp===pixels.expected,'readback used a later presentation stamp');
+ assert(pixels.rgba.length===pixels.width*pixels.height*4,'readback has wrong row layout');
+ assert(new Set(pixels.rgba).size>3,'readback is blank');
+ const cancelled=module.request_capture(id);await turn();loss.loseContext();
+ await until(()=>module.stamp(id).includes('None'),'capture loss did not invalidate presentation');
+ await until(()=>module.poll_capture(cancelled).ready,'lost capture did not terminate');
+ assert(module.poll_capture(cancelled).error,'lost capture returned pixels');
+ await turn();loss.restoreContext();await until(()=>generation(id)===old+3,'capture restoration failed');
+ module.replace_chooser(other);secondPress.click();assert(module.presses(other)===2,'replacing file chooser stopped the appearance');
+ const beforeClose=module.presses(id);module.dispose_with_loan(id);module.dispose_mount(id);
+ assert(!actual.parentElement.querySelector('[data-cambium-mirror]'),'disposed mirror remains');
+ assert(!actual.parentElement.querySelector('input[type="file"]'),'disposed chooser remains');
+ press.click();assert(module.presses(id)===beforeClose,'disposed listener changed state');
+ await until(()=>gl.isContextLost(),'disposed graphics context remains live');
+ secondPress.click();assert(module.presses(other)===3,'disposing one appearance disabled another');
+ module.dispose_mount(other);
+ const original=document.querySelector('#c');original.focus();
+ const fallback=await module.mount_page('c','auto-reject');const replacement=document.querySelector('#c');
+ assert(replacement!==original,'fallback reused the bound canvas');
+ assert(replacement.className==='preserved'&&replacement.dataset.fixture==='fallback','fallback lost canvas attributes');
+ assert(replacement.dataset.fixtureInitCount==='1','fallback initialized app twice');
+ assert(module.selected(fallback)==='webgl2','failed WebGPU boot did not select GL');
+ assert(document.activeElement===replacement||replacement.parentElement.querySelector('[data-cambium-mirror]').contains(document.activeElement),'fallback lost focus');
+ module.dispose_mount(fallback);
+ let refused=false;try{await module.mount_page('c','webgpu-reject');}catch(error){refused=String(error).includes('injected device refusal');}
+ assert(refused,'forced WebGPU silently changed route');
+
+ document.querySelector('#result').textContent=JSON.stringify({result:'pass',backend:module.selected(id),stamp:module.stamp(id)});
+} catch(error) {document.querySelector('#result').textContent=JSON.stringify({result:'fail',error:String(error),stack:error.stack});}
+await fetch('/result',{method:'POST',body:document.querySelector('#result').textContent});
+</script>

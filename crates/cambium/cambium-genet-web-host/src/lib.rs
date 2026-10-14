@@ -79,13 +79,19 @@ mod a11y;
 #[cfg(target_arch = "wasm32")]
 mod capture;
 #[cfg(target_arch = "wasm32")]
+mod events;
+#[cfg(target_arch = "wasm32")]
 mod files;
 #[cfg(target_arch = "wasm32")]
 mod input;
 #[cfg(target_arch = "wasm32")]
 mod lane;
 #[cfg(target_arch = "wasm32")]
+mod lifetime;
+#[cfg(target_arch = "wasm32")]
 mod mount;
+#[cfg(target_arch = "wasm32")]
+pub mod presentation;
 #[cfg(target_arch = "wasm32")]
 mod start;
 #[cfg(target_arch = "wasm32")]
@@ -105,7 +111,7 @@ pub use input::{
 #[cfg(target_arch = "wasm32")]
 pub use lane::WebCapture;
 #[cfg(target_arch = "wasm32")]
-pub use mount::{Mounted, mount};
+pub use mount::{Mounted, mount, mount_with_webgpu_factory};
 #[cfg(target_arch = "wasm32")]
 pub use start::run_static_constructors_once;
 #[cfg(target_arch = "wasm32")]
