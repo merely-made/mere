@@ -33,11 +33,11 @@ boundary. The radio, Reticulum, and queue work lands in the Retinue workspace.
 ## Related work
 
 - **Embedding continuation, 2026-10-10:** Retinue's
-  `retinue/design_docs/2026-09-07_radio_hand_hardware_family_plan.md` owns the
+  `murm/design_docs/2026-09-07_radio_hand_hardware_family_plan.md` owns the
   full-iroh/LAN-direct-noq/radio-device profile assessment;
-  `retinue/design_docs/2026-08-30_wall_node_management_plan.md` owns the proposed
+  `murm/design_docs/2026-08-30_wall_node_management_plan.md` owns the proposed
   iroh carrier for the existing signed control exchange; and
-  `retinue/design_docs/2026-08-25_compact_signed_feed_and_local_control_plan.md`
+  `murm/design_docs/2026-08-25_compact_signed_feed_and_local_control_plan.md`
   owns the canonical device-operation probe across LoRa and IP. These are
   source-reviewed proposals, not new firmware or physical results. V9-V11 and
   this plan's existing power/session completion conditions retain their status.
@@ -47,11 +47,11 @@ boundary. The radio, Reticulum, and queue work lands in the Retinue workspace.
   admitted-session boundary. Its two-consumer gate passed and `notochord` is
   now the authoritative package name.
 - Retinue's existing direct-PHY Resource receipt:
-  [`2026-07-23_direct_phy_resource_acceptance.md`](https://github.com/merely-made/retinue/blob/main/design_docs/2026-07-23_direct_phy_resource_acceptance.md)
+  [`2026-07-23_direct_phy_resource_acceptance.md`](https://github.com/merely-made/murm/blob/main/design_docs/2026-07-23_direct_phy_resource_acceptance.md)
 - Tulle/RNode headed receipt:
-  [`2026-07-22_tulle_headed_acceptance.md`](https://github.com/merely-made/retinue/blob/main/design_docs/2026-07-22_tulle_headed_acceptance.md)
+  [`2026-07-22_tulle_headed_acceptance.md`](https://github.com/merely-made/murm/blob/main/design_docs/2026-07-22_tulle_headed_acceptance.md)
 - Retinue reliable-link RF findings:
-  [`2026-07-21_first_reliable_link_over_rf.md`](https://github.com/merely-made/retinue/blob/main/design_docs/2026-07-21_first_reliable_link_over_rf.md)
+  [`2026-07-21_first_reliable_link_over_rf.md`](https://github.com/merely-made/murm/blob/main/design_docs/2026-07-21_first_reliable_link_over_rf.md)
 - Mere's current Reticulum adoption boundary:
   [`MURM_AS_BILATERAL.md`](../../murm_docs/technical_architecture/MURM_AS_BILATERAL.md)
 - Personae's shared delegation grammar:
@@ -421,10 +421,10 @@ link on which it arrived.
 **Repository:** Mere
 **Files:**
 
-- `retinue/native/crates/transport/src/transport.rs`
-- `retinue/native/crates/transport/src/memory.rs`
-- `retinue/native/crates/transport/src/p2panda_transport.rs`
-- `retinue/native/crates/transport/src/reticulum_transport.rs`
+- `murm/native/crates/transport/src/transport.rs`
+- `murm/native/crates/transport/src/memory.rs`
+- `murm/native/crates/transport/src/p2panda_transport.rs`
+- `murm/native/crates/transport/src/reticulum_transport.rs`
 - transport stubs and tests
 
 Introduce version-independent local context:
@@ -925,12 +925,12 @@ personality and guarded Light-sleep are implemented and compile-verified on
 both firmware targets, with the wake protocol host-tested. Every power and
 wake claim remains UNPROVEN pending the V0 bench; the receipt-shaped record
 of what is and is not established is
-`retinue/design_docs/2026-07-24_low_power_uart_personality.md`. Blocker 1
+`murm/design_docs/2026-07-24_low_power_uart_personality.md`. Blocker 1
 (the bench session) still stands and is now the head of the lane.
 
 **Corrected 2026-10-06 (S14 pass):** not every wake claim is unproven any
 more. Retinue's
-`retinue/design_docs/2026-07-29_v4_light_sleep_rf_wake_acceptance.md` is
+`murm/design_docs/2026-07-29_v4_light_sleep_rf_wake_acceptance.md` is
 "partially accepted on hardware": Light-sleep resumes without reset, the
 SX1262 stays usable across repeated timer wakes, and one direct RF wake was
 proved end to end. Repeated RF-triggered sleep continuity, current and energy
@@ -1004,7 +1004,7 @@ different Reticulum link is refused too, since the link is in the transcript.
 
 ### 2026-07-26 — V7 first half: the matrix over real transports
 
-`retinue/native/crates/transport/tests/notochord.rs` runs the handshake through
+`murm/native/crates/transport/tests/notochord.rs` runs the handshake through
 actual `Transport` implementations. The Memory arm admits and refuses by
 owner rule, and the **Reticulum/TCP arm passes**: acceptance there is
 best-effort (`peer: None`), so the session proof is the only thing that

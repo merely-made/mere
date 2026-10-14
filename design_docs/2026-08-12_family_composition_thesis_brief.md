@@ -183,7 +183,7 @@ standing alone is a feature of the plan rather than a delay.
   covered by **source truth** (the authority) and **a mere / datalake** (the
   dataspace). Three senses on one noun would be a lexicon regression.
 - Signalman is retinue's application (`apps/signalman-desktop` *(historical citation)* <!-- doc-audit: historical-path -->, founded
-  [2026-08-06](https://github.com/merely-made/retinue/blob/main/design_docs/2026-08-06_signalman_founding.md)),
+  [2026-08-06](https://github.com/merely-made/murm/blob/main/design_docs/2026-08-06_signalman_founding.md)),
   whose founding already states this brief's authority split from its side:
   graphshell surfaces meres rather than owning radios. Its postilion base
   (station logic with no UI) is what would make an embedded cross-application

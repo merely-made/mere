@@ -125,7 +125,7 @@ slots contacts under the
 
 File transfer is content- or capability-addressed, not person-addressed. Mere
 already has it: [eidetic's `iroh-fetcher`](../../../crates/system/fetch/src/iroh_blob.rs)
-and [`murm/transport`](https://github.com/merely-made/retinue/blob/b49df894635bac95823284efee6c445885eaf62a/native/crates/transport/src/blobs.rs) move blobs over
+and [`murm/transport`](https://github.com/merely-made/murm/blob/b49df894635bac95823284efee6c445885eaf62a/native/crates/transport/src/blobs.rs) move blobs over
 iroh tickets (content hash plus node address); the wider field is the same shape
 (Magic Wormhole's PAKE code, IPFS CIDs, Willow/Earthstar capabilities). You address
 the blob or a one-time channel, not the person. Persona and contact enter only for

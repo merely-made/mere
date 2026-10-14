@@ -625,7 +625,7 @@ plan 13.46 holds djinn's next Knot pin move for that head.* Options:
 Mark: **"After their head (Recommended)"**.
 
 **Ruling 51** *(mere's transport).* *mere's own transport
-(`retinue/native/crates/transport`: `builder_from_seed`, `bind_seed`) also takes the
+(`murm/native/crates/transport`: `builder_from_seed`, `bind_seed`) also takes the
 seed by value, and Knot calls it, so Knot's fix takes effect only once the
 transport is fixed. iroh alone leaves 2 freed blocks per bind and close;
 p2panda-net's share cannot be measured until the transport is fixed.*

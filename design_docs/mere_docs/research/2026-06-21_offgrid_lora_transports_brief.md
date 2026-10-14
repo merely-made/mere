@@ -19,8 +19,8 @@ Mere's existing transport seam. Pairs with, and sits beside, the broader p2p sur
   — the honest discovery/bootstrap gap in the live host (gossip + mDNS + tickets).
 - [`2026-06-15_contact_identity_model_brief.md`](2026-06-15_contact_identity_model_brief.md)
   — key-rooted identity (petname → stable key → endpoints), which all three stacks align with.
-- Code: [`transport/src/transport.rs`](https://github.com/merely-made/retinue/blob/b49df894635bac95823284efee6c445885eaf62a/native/crates/transport/src/transport.rs) (the
-  `Transport` trait), [`transport/src/p2panda_transport.rs`](https://github.com/merely-made/retinue/blob/b49df894635bac95823284efee6c445885eaf62a/native/crates/transport/src/p2panda_transport.rs)
+- Code: [`transport/src/transport.rs`](https://github.com/merely-made/murm/blob/b49df894635bac95823284efee6c445885eaf62a/native/crates/transport/src/transport.rs) (the
+  `Transport` trait), [`transport/src/p2panda_transport.rs`](https://github.com/merely-made/murm/blob/b49df894635bac95823284efee6c445885eaf62a/native/crates/transport/src/p2panda_transport.rs)
   (the iroh-concrete `sync_parts()` bypass).
 
 ---
@@ -48,14 +48,14 @@ the two is the main error to avoid.
 Two facts about the live `transport` crate set the ceiling for any of this.
 
 1. **The bilateral lane is already transport-agnostic.**
-   [`transport.rs:46-83`](https://github.com/merely-made/retinue/blob/b49df894635bac95823284efee6c445885eaf62a/native/crates/transport/src/transport.rs#L46-L83) defines
+   [`transport.rs:46-83`](https://github.com/merely-made/murm/blob/b49df894635bac95823284efee6c445885eaf62a/native/crates/transport/src/transport.rs#L46-L83) defines
    `Transport` as `connect(peer, alpn) -> Stream` / `accept(alpn) -> Stream`, where
    `Stream` is just `AsyncRead + AsyncWrite`, plus `local_peer_id() -> PeerID`. There is
    already a non-iroh impl in the tree (`MemoryTransport`). This is the seam a transport
    adapter targets. (Confidence: high; read in source.)
 2. **The sync lane bypasses the trait.** `SyncedMoot` / `SyncedCabal` / LogSync do not
    consume `Transport`. They take raw iroh types via
-   [`sync_parts() -> Option<(Endpoint, Gossip)>`](https://github.com/merely-made/retinue/blob/b49df894635bac95823284efee6c445885eaf62a/native/crates/transport/src/p2panda_transport.rs#L464):
+   [`sync_parts() -> Option<(Endpoint, Gossip)>`](https://github.com/merely-made/murm/blob/b49df894635bac95823284efee6c445885eaf62a/native/crates/transport/src/p2panda_transport.rs#L464):
    iroh-gossip flood-fill plus RBSR set reconciliation. That is iroh-concrete and there
    is nothing transport-neutral to hand a different stack. (Confidence: high; read in source.)
 

@@ -3,7 +3,7 @@
 **Status (2026-07-06):** research complete; recommendation below. The front-loaded G6 of
 the [comms gating plan](../../archive_docs/2026-09-02_retired_plans/2026-07-06_comms_gating_and_key_addressing_plan.md),
 pulled ahead of G5 because the answer shapes the key-addressed misfin lane. Web-grounded
-2026-07-06; local grounding is `retinue/native/crates/transport/src/reticulum_transport.rs`.
+2026-07-06; local grounding is `murm/native/crates/transport/src/reticulum_transport.rs`.
 
 ## What LXMF is (verified against spec/README)
 
