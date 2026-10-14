@@ -2158,3 +2158,20 @@ viewport, optional history, and native no-script site disclosures. Measure the
 new package against the existing delivery caps and coordinate a fresh bounded
 runtime lease before headed acceptance; existing package evidence does not
 qualify this runtime. Keep the deployed row until those checks pass.
+
+The first complete desktop browsing case and native no-script/mobile/tablet
+reading cases passed locally. Touch Fit also passed, including geometry and
+focus restoration. The subsequent Graph tools tap failed: the test used the
+accessibility mirror's full item bounds without intersecting the painted menu
+clip. The item was below that clip, so this does not establish a shared-host
+pointer dispatch failure. R3/R4 failed receipts remain preserved; neither is
+full qualification.
+
+The browsing menu continuation uses bounded two-command pages, with Previous
+and Next commands, Close before the list, and the existing shared search and
+keyboard selection controlling the same page. It does not introduce app-specific
+event dispatch or change the browser host. The next touch gate must page through
+the real visible controls, activate Graph tools, dismiss by touch, and restore
+focus; every tap target must be inside both the browser viewport and painted
+menu clip. A rebuilt package and fresh size/browser checks are required. The
+small project faces at the fitted scale remain a separate visual limitation.
