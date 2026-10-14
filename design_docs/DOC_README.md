@@ -1,6 +1,6 @@
 # Mere Documentation Index
 
-Radio-to-Comms integration (2026-10-13): `murm/design_docs/2026-10-13_murm_family_move_plan.md` section R1 owns the Signalman LXMF path. The portable Comms seam names LXMF and exposes delivery observations without making carrier acceptance a recipient or read receipt. Application journals and station authority keep their existing owners.
+Radio-to-Comms integration (2026-10-13): `murm/design_docs/2026-10-13_murm_family_move_plan.md` section R1 owns the Signalman LXMF path. The portable Comms seam names LXMF, Meshtastic and MeshCore and exposes delivery observations without making carrier acceptance a recipient or read receipt. Application journals and station authority keep their existing owners.
 
 Murm first move (2026-10-13): `murm`, `mere-transport` and `mere-webrtc-carrier` are immutable Git suppliers from Murm's native workspace; Mere's old copies are removed. The [runtime plan](mere_docs/implementation_strategy/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md#2026-10-13-first-murm-implementation-cutover) records compiler, owner and consumer checks. Canonical migration: `murm/design_docs/2026-10-13_murm_family_move_plan.md`. The continuing Retinue repository is now `merely-made/murm`; named application adoption is published, with canonical URL validation passed. Supplemental Isocosm source adoption is published; its reproduced gameplay compiler failures remain separate.
 
