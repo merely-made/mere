@@ -1,0 +1,20 @@
+{
+  "schema": "C1.H-bounded-doc-audit-comparison/v1",
+  "baseline_commit": "c51e1913cc52cc161815b97939a46452495747e0",
+  "candidate_source": "a1309431f935427607da35844376a7511656fea4 plus canonical H bounded qualification docs",
+  "mechanical_candidate_exact_prior_candidate_sha256": "b9cd289864f5cf20c93a9b2835ecce05a5b713da858c0a609c2d0711ead5c457",
+  "mechanical_new_findings": 0,
+  "mechanical_same_inherited_findings": true,
+  "judgment_errors_unchanged": true,
+  "judgment_missing_active_records_unchanged": true,
+  "judgment_baseline_covered": 265,
+  "judgment_candidate_covered": 266,
+  "judgment_candidate_sha256": "6352354b5b726292ab2e9f6780de15ac16a80cdb01a6d6be3d421b5cd2230cc3",
+  "audit_exit_codes": [
+    1,
+    1
+  ],
+  "scope": "Inherited audit findings remain failures/debt, not a clean global audit; no new findings in current amended/indexed receipt passages.",
+  "mechanical_identical_canonical_report_body": "doc-audit-candidate-c51.json",
+  "new_invocation_and_raw_H_output": "Code/testing/cleromancy/c1-20261013/doc-audit-H-bounded-checkpoint-20261014/"
+}

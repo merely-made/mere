@@ -2043,6 +2043,52 @@ mod tests {
     use euclid::default::Point2D;
     use muniment::{DirectoryBackend, MemoryBackend};
 
+    #[test]
+    fn facet_floats_replay_and_reopen_without_changing_bits() {
+        pollster::block_on(async {
+            let mere = MereSessions::new(MemoryBackend::new());
+            let manifest = mere.mint(person(), None).await.unwrap();
+            let mut session = mere.open(manifest.session_id).await.unwrap();
+            session.apply(person(), vec![add(7)]).await.unwrap();
+            let node = Uuid::from_u128(7);
+            let key = session.graph().get_node_key_by_id(node).unwrap();
+            let facet = chartulary::FacetId::new("graphshell.saved-scene/v4");
+            // Exact coordinates observed in the headed scene Save refusal.
+            let coordinates = [21.345783233642578_f64, -26.827743530273438_f64];
+            let value = serde_json::json!({ "cartography": { "positions": coordinates } });
+            session
+                .edit_now(person(), |graph| {
+                    kernel::graph::apply::apply_graph_delta(
+                        graph,
+                        GraphDelta::SetNodeFacet {
+                            key,
+                            facet: facet.as_str().to_owned(),
+                            value: value.clone(),
+                        },
+                    );
+                })
+                .expect("a captured facet must reproduce its exact floating-point values");
+            let check = |graph: &Graph| {
+                let actual = graph.facets().get(&node, &facet).unwrap();
+                assert_eq!(actual, &value);
+                for (index, expected) in coordinates.iter().enumerate() {
+                    assert_eq!(
+                        actual["cartography"]["positions"][index]
+                            .as_f64()
+                            .unwrap()
+                            .to_bits(),
+                        expected.to_bits(),
+                    );
+                }
+            };
+            check(session.graph());
+            check(&session.graph_at(session.journal().live_cursor()).unwrap());
+            session.flush(wall_clock_now()).await.unwrap();
+            drop(session);
+            check(mere.open(manifest.session_id).await.unwrap().graph());
+        });
+    }
+
     async fn legacy_receipt_fixture() -> (MemoryBackend, SessionId, Seq) {
         legacy_receipt_fixture_with_addresses(false).await
     }
