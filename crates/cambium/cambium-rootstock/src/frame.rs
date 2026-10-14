@@ -584,6 +584,10 @@ where
                 return;
             },
         };
+        if self.s.presentation_driver.is_some() {
+            self.present_with_driver(prepared);
+            return;
+        }
         let frame_started = prepared.started;
         let mut profile = prepared.profile;
         let (pw, ph) = (prepared.width, prepared.height);
