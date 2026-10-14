@@ -493,7 +493,6 @@ where
     // their rect is the host's business — which is what lets one frame serve a
     // document, an external texture, or an app's own surface.
     let active_tile = stack.tabs.get(stack.active);
-    let active = active_tile.map(|tile| tile.id.0).unwrap_or(0);
     let kind = match active_tile.map(fill) {
         Some(Slot::View(_)) => SlotKind::View,
         Some(Slot::Surface) => SlotKind::Surface,
@@ -505,10 +504,14 @@ where
         },
         _ => PortableKeyed::new(Vec::new()),
     };
-    let content = el::<_, State, AppAction>("div", children)
+    let mut content = el::<_, State, AppAction>("div", children)
         .attr("class", "frisket-content")
-        .attr(FRISKET_TILE_ATTR, active.to_string())
         .attr(ATTR_SLOT, kind.attr_value());
+    // An empty stack is an inert hole, not an appearance of tile zero.
+    // Only the actual active tile can publish content/input custody.
+    if let Some(tile) = active_tile {
+        content = content.attr(FRISKET_TILE_ATTR, tile.id.0.to_string());
+    }
 
     Box::new(
         el::<_, State, AppAction>("div", (bar, content))

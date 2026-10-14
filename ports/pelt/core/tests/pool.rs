@@ -769,6 +769,10 @@ fn pending_observation_is_read_only_and_redraw_is_scoped_to_visible_windows() {
         vec![1]
     );
     assert!(pool.window_needs_frame(7));
+    assert!(
+        !pool.window_has_surface(7),
+        "a retained document is not a native mailbox producer"
+    );
     assert!(!pool.window_needs_frame(8));
     assert!(!pool.window_needs_frame(9));
     assert_eq!(probe.lock().unwrap().frames, frames);

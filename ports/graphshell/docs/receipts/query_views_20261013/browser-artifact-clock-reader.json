@@ -1,0 +1,66 @@
+{
+  "source_head": "f7e0a09788ad2304254bb4afaf4e77cc9a94ae21",
+  "rust": "1.99.0",
+  "command": "cargo +1.99.0 build --target wasm32-unknown-unknown --locked --offline -j1",
+  "cwd": "ports/graphshell/web",
+  "target": "C:/t/cargo-targets/mere",
+  "build_dir": "C:/t/cargo-targets/mere/build",
+  "wasm_bindgen": "0.2.129",
+  "repairs": [
+    "shared evaluator browser clock and entropy",
+    "reading body receives remaining panel height",
+    "explicit query callback String errors"
+  ],
+  "files": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\retained-content-browser\\graphshell_web_bg.wasm",
+      "bytes": 490583667,
+      "sha256": "4e934145b217ad4edf638b6c66c743427c2eed00814c91c299e42425cb726a8e"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\retained-content-browser\\graphshell_web.js",
+      "bytes": 161697,
+      "sha256": "85d28d21ddbf8f205975f3a61fdb42b621e1ab147e4504b5cc0e670c73740179"
+    },
+    {
+      "path": "ports\\graphshell\\web\\Cargo.lock",
+      "bytes": 292638,
+      "sha256": "b5798d953af1efb44da6a7b98922e9eaef312b019c2e965cb75241d2cef39207"
+    },
+    {
+      "path": "ports\\graphshell\\web\\Cargo.toml",
+      "bytes": 13891,
+      "sha256": "69c751b135a31e72ac868e75a57452e98d5509f1f67294cfb2b7fe8d8539e8c6"
+    },
+    {
+      "path": "crates\\graph\\linked-data\\Cargo.toml",
+      "bytes": 2875,
+      "sha256": "3e88d9d189c353de68686a5ced77cd34f3b36f1ba4d0909a9db623dd3d77fe94"
+    },
+    {
+      "path": "ports\\graphshell\\src\\web_tree\\query_view.rs",
+      "bytes": 29215,
+      "sha256": "2f51256bad6d237552b715f5a52ce27b1e2a05422661f235300442cf3115fa83"
+    },
+    {
+      "path": "ports\\graphshell\\src\\retained_content\\view.rs",
+      "bytes": 8952,
+      "sha256": "465700f89fcf3db9d84bafa6d3ac30bde016506a8e1db1e5460a24a5eae01569"
+    },
+    {
+      "path": "ports\\graphshell\\src\\web_tree\\forme.rs",
+      "bytes": 46027,
+      "sha256": "f33e63c835d3a13c67ce2ba5d639f245998fd0a4b9cf505ab8eb89bcc098d6e5"
+    },
+    {
+      "path": "ports\\graphshell\\src\\web_tree\\reading.rs",
+      "bytes": 29866,
+      "sha256": "a8e3751b5d0efd4c760e933452bc2a9f2bb217c6204e5fa6f876d1b41affec5f"
+    },
+    {
+      "path": "ports\\graphshell\\web\\loader.js",
+      "bytes": 25655,
+      "sha256": "6d1ebe2e1087b5ba8982e3f7033b241fe5985469c904a1ddd5d9a684636ec7ca"
+    }
+  ]
+}

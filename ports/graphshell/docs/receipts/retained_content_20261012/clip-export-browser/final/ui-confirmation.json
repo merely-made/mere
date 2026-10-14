@@ -1,0 +1,19 @@
+{
+  "origin": "http://127.0.0.1:8883",
+  "wasm_sha256": "e59e423f0dea91432d01650e29833f281c40e5cae43cb6fd2048ddb6ee4b71f7",
+  "tab": "642333482",
+  "viewport": {
+    "width": 1037,
+    "height": 639
+  },
+  "pelt_body_height": 127,
+  "export_reachable": true,
+  "trusted_activation": "Playwright force click at restored visible Export mirror target; underlying canvas receives browser mouse input",
+  "status": "Selected clip download handed to the browser",
+  "actual_download_path": null,
+  "disk_completion_verified": false,
+  "download_event_window_ms": 6000,
+  "native_retained_tests_reported_by_coordinator": 13,
+  "wheel_limit": "Page-sized wheel reaches reader end, then chains outer layout; outer upward scroll restored geometry before trusted activation",
+  "source_changes": false
+}

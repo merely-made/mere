@@ -432,6 +432,20 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
         })
     }
 
+    /// Whether this window presents an admitted native surface producer.
+    /// Hosts without producer wake callbacks poll only these windows; a
+    /// retained document or component does not need that surface mailbox clock.
+    pub fn window_has_surface(&self, window: u64) -> bool {
+        self.placements.values().any(|placement| {
+            placement.value.window == window
+                && placement.value.admits()
+                && self
+                    .contents
+                    .get(&placement.value.content)
+                    .is_some_and(|content| content.lane() == PeltLane::Surface)
+        })
+    }
+
     /// Share a host's clock epoch across windows, avoiding duplicate logical
     /// ticks. The pool never creates clocks or substitutes wall-clock time.
     pub fn pump_at(&mut self, epoch_ms: f64) -> bool {
