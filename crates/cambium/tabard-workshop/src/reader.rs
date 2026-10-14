@@ -31,6 +31,7 @@ pub struct ReaderSpecimen {
     revision: u64,
     typography: tabard::Typography,
     baseline_style: document_canvas::DocumentStyleSheet,
+    generic_fonts: Vec<(String, Vec<u8>)>,
 }
 
 impl Default for ReaderSpecimen {
@@ -66,6 +67,7 @@ impl ReaderSpecimen {
         let baseline_style = document.style_sheet().clone();
         Self {
             baseline_style,
+            generic_fonts: Vec::new(),
             typography: Default::default(),
             source,
             document,
@@ -100,6 +102,9 @@ impl ReaderSpecimen {
             self.source.clone(),
             SmolwebTheme::App(palette.clone()),
         );
+        self.document
+            .set_generic_fonts(self.generic_fonts.clone())
+            .expect("admitted reader font ledger");
         self.baseline_style = self.document.style_sheet().clone();
         self.apply_typography_style();
         self.palette = palette;
@@ -130,6 +135,24 @@ impl ReaderSpecimen {
         )
         .expect("validated typography");
         self.document.set_style_sheet(style);
+    }
+
+    /// Supply the host's explicit generic ledger without replacing the article
+    /// source or changing the author's typography. Survives palette rebuilds.
+    pub fn set_generic_fonts(
+        &mut self,
+        fonts: Vec<(String, Vec<u8>)>,
+    ) -> Result<bool, document_canvas::text::GenericFontError> {
+        if self.generic_fonts == fonts {
+            return Ok(false);
+        }
+        self.document.set_generic_fonts(fonts.clone())?;
+        self.generic_fonts = fonts;
+        self.revision = self
+            .revision
+            .checked_add(1)
+            .expect("reader revision exhausted");
+        Ok(true)
     }
 
     pub fn source_document(&self) -> Arc<EngineDocument> {
