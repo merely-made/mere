@@ -269,3 +269,5 @@ presentation stamp contains the generation added in Task 2.
 - 2026-10-13: Execution rulings: keep the baseline in a private snapshot; finish measured portable producer inventory after the concrete viewer export exists; use Vello's public canvas initialization rather than an invented context-taking constructor; include owned listener/rAF teardown in browser disposal; prevent a portable export from stepping presentation dynamics twice.
 
 - 2026-10-13: Task 2 complete: policy/lifetime red-to-green and combined Rootstock/Mesquite/native-host regression gate passed 294 tests, zero failures and 11 existing ignores, with unchanged source, zero memory-limit events and verified service cleanup. Task 1 Wasm/browser baseline remains separate; Task 3 shared frame preparation begins.
+
+- 2026-10-13: Task 3 producer invocation contract passed its registry red-to-green fixture: presentation advances once; explicit export observes the same revision and content stamp. Kernel memory peak 876265472 bytes, zero pressure/OOM events, source unchanged, service inactive/MainPID 0. Shared frame preparation and concrete viewer extraction remain unqualified.

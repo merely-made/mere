@@ -129,6 +129,64 @@ mod tests {
     }
 
     #[test]
+    fn portable_presentation_advances_once_and_export_only_observes() {
+        use std::{cell::Cell, rc::Rc};
+        struct CountingSource(Rc<Cell<u64>>);
+        impl TextureProducer for CountingSource {
+            fn render(&mut self, _: &ProducerContext<'_>) -> Option<ProducedTexture> {
+                None
+            }
+            fn portable_scene(
+                &mut self,
+                frame: &ProducerFrameInfo,
+            ) -> Result<ProducedScene, PortableProducerError> {
+                if frame.purpose == ProducerFramePurpose::Presentation {
+                    self.0.set(self.0.get() + 1);
+                }
+                Ok(ProducedScene {
+                    scene: netrender::Scene::new(8, 6),
+                    source_identity: 7,
+                    source_revision: self.0.get(),
+                    alpha: SourceAlpha::Straight,
+                    encoding: SourceEncoding::Srgb,
+                })
+            }
+        }
+        let (dom, layout) = fixture();
+        let steps = Rc::new(Cell::new(0));
+        let mut registry = ProducerRegistry::new();
+        registry
+            .register(7, CountingSource(steps.clone()), &[])
+            .unwrap();
+        let plan = registry
+            .plan_portable_for(
+                &layout,
+                &dom,
+                1.0,
+                &|_, _| false,
+                ProducerFramePurpose::Presentation,
+            )
+            .unwrap();
+        let env = envelope(&plan);
+        let presented = registry.admit_portable(plan, env).unwrap();
+        assert_eq!(steps.get(), 1);
+        let plan = registry
+            .plan_portable(&layout, &dom, 1.0, &|_, _| false)
+            .unwrap();
+        let env = envelope(&plan);
+        let exported = registry.admit_portable(plan, env).unwrap();
+        assert_eq!(steps.get(), 1, "capture must not advance dynamics");
+        assert_eq!(
+            presented.producers[0].source_revision,
+            exported.producers[0].source_revision
+        );
+        assert_eq!(
+            presented.producers[0].content_generation,
+            exported.producers[0].content_generation
+        );
+    }
+
+    #[test]
     fn default_gpu_only_source_refuses_without_registry_mutation() {
         let (dom, layout) = fixture();
         let mut registry = ProducerRegistry::new();
@@ -482,6 +540,17 @@ impl ProducerRegistry {
         scale: f32,
         elsewhere: Elsewhere<'_>,
     ) -> Result<PortablePlan, PortableCaptureError> {
+        self.plan_portable_for(layout, dom, scale, elsewhere, ProducerFramePurpose::Export)
+    }
+
+    pub(crate) fn plan_portable_for<D: LayoutDom<NodeId = NodeId>>(
+        &mut self,
+        layout: &OwnedLayout,
+        dom: &D,
+        scale: f32,
+        elsewhere: Elsewhere<'_>,
+        purpose: ProducerFramePurpose,
+    ) -> Result<PortablePlan, PortableCaptureError> {
         let mut nodes = BTreeMap::new();
         for (key, node) in layout.custom_leaf_nodes(dom) {
             if nodes.insert(key, node).is_some() && self.entries.contains_key(&key) {
@@ -552,6 +621,7 @@ impl ProducerRegistry {
                 .filter(|slot| slot.owner == owner)
                 .and_then(|slot| slot.source.as_ref());
             let frame = ProducerFrameInfo {
+                purpose,
                 logical_size: logical,
                 physical_size: size,
                 layout_scale: scale,
