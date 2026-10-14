@@ -174,6 +174,18 @@ impl<F: 'static> PeltContent<F> {
         }
     }
 
+    /// A read-only scheduling observation of the retained document receiver.
+    /// Native surfaces keep their own producer wake/mailbox contract.
+    pub fn document_pending_work(
+        &mut self,
+    ) -> Option<(
+        PeltSessionIdentity,
+        inker::session_engine::SessionPendingWork,
+    )> {
+        let controller = self.document_mut()?;
+        Some((controller.session_identity(), controller.pending_work()))
+    }
+
     /// The held request a routed content reconstructs from.
     pub fn held_request(&self) -> Option<&PeltTileRequest> {
         self.routed.as_ref().map(|routed| &routed.request)

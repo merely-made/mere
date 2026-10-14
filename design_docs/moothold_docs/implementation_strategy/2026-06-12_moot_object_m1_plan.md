@@ -1,7 +1,7 @@
 # Moot Object M1 — a moot you can declare, join, and share into
 
 **Date**: 2026-06-12
-**Status (2026-10-12)**: Historical M1 landed as recorded below. The active
+**Status (2026-10-13)**: Historical M1 landed as recorded below. The active
 continuation is [Community collections and author-offline publishing](#community-collections-and-author-offline-publishing-2026-09-04). Its same-machine live-peer process proof passed with stable-Persona binding and current Gemot command authority. P3b (contribution withdrawal, `b99e532a`) and P3d (collection lineage, `6f1f73bf`) landed in Gemot on 2026-09-09. Turnstone has landed P3a's source capture (`b4e69ce`), the P3c collection consumer (`6b77e34`) and collection-scoped search (`aa515bd`) on 2026-09-09 and 2026-09-10; its page capture plan (`turnstone/design_docs/2026-08-28_page_capture_plan.md`) calls P3a in progress. Bounded copy retention and signed hosting commands are now qualified in the 2026-10-12 continuation below. Production publication lineage, network/protected serving, historical authority proof, the Persona-to-device adapter, and a two-machine receipt remain open.
 The original M1 body preserves its dated vocabulary and ownership. Current owners
 are Gemot for community authority and recognition, Commons for shared graph
@@ -939,6 +939,44 @@ storage/transport fork work. Its native suite passes 50 tests with one existing
 ignore, including network-separated mDNS discovery and the nonblocking sync
 retry path; published fork `a5bfa901` is clean. This owner/host slice retains
 Mere's reviewed compatibility tag; consumer pin adoption remains separate.
+
+### Durable Graphshell resource readings (2026-10-13)
+
+The admitted native mount now exposes explicit `Mount::save` and `Mount::reopen`
+operations over a host-selected Muniment slot. A versioned record contains only
+its Moot, reader, collection, selected exact contribution/manifest reference,
+and whether that resource was open. It contains no session authority, grants,
+owner snapshot, payload, fork destination, completion or queued command. The
+host owns the backend, per-reading slot, retention and privacy policy. Rendering
+and dropping a mount do not persist anything.
+
+Reopening takes a newly supplied admitted session and the current owner clock,
+revocation ledger, signer, Moot and expected collection. It rejects absent,
+malformed, unsupported-version and mismatched records. Current signed Gemot
+membership and contribution authority are read again; a saved selection that
+has been withdrawn is cleared. A previously opened resource prepares a fresh
+Open intention and uses the ordinary owner dispatch, including current public
+classification, local availability and content-hash checks. A freshly reviewed
+fork destination must be supplied by the host; queued writes never resume.
+A current owner read that no longer resolves an opened resource also clears
+that mount's transient disclosure without deleting retained owner bytes.
+
+The actual-port durable harness uses Gemot's signed redb domain stores, an
+Eidetic content store and separate host reading slots. Its bounded process
+proof exits the writer before starting the reader, rejects the old expired
+session, then reopens Alice's exact content with a new admission. Bob's separate
+saved reading neither opens Alice's view nor replays his pending collection
+fork. Other controls cover current grant revocation and membership removal,
+withdrawal with retained bytes, changed/missing content, public-to-private
+classification, signed session revocation, signer/reader mismatch, and invalid
+saved state. Results and source identities are recorded in the
+[durable qualification](../../../ports/graphshell/docs/receipts/moot_resources_reopen_20261013/qualification.json).
+
+This is an opt-in native host persistence boundary with CPU semantic-DOM
+qualification. The fixture supplies verified sans-I/O carrier facts and public
+unsealed local storage. It adds no live transport, browser storage acceptance,
+private custody, physical-input or paint qualification, or coop activity owner.
+The earlier native captures remain bound to their original source checkpoints.
 
 ### Capsule peer and standalone-browser reproduction
 

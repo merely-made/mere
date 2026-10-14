@@ -1,0 +1,16 @@
+{
+  "toolkit_pairs": 16,
+  "previous_pngs": 32,
+  "all_32_previous_pngs_equal": true,
+  "all_32_previous_rgba_equal": true,
+  "adapter": {
+    "backend": "Vulkan",
+    "device": 10464,
+    "device_type": "DiscreteGpu",
+    "driver": "NVIDIA",
+    "driver_info": "610.88",
+    "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "vendor": 4318
+  },
+  "source_qualification_sha256": "d78d7beb6f14e1e35c09d98c319834bc6e1ed0341a6e29d6296d1c67de5943b1"
+}

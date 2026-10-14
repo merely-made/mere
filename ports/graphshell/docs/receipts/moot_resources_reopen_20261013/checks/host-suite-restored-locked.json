@@ -1,0 +1,25 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--offline",
+    "--manifest-path",
+    "ports/graphshell/docs/receipts/moot_resources_reopen_20261013/harness/Cargo.toml",
+    "--lib",
+    "-j2",
+    "--",
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-moot-capsule-proof",
+  "deadline_seconds": 180,
+  "elapsed_seconds": 68.53,
+  "exit_code": 0,
+  "timed_out": false,
+  "disk_refused": false,
+  "log": "/Users/markik/Code/output/moot-resources-reopen-20261013/checks/host-suite-restored-locked.log",
+  "owned_group_survivors": [],
+  "owned_group_closed": true,
+  "gpu_executed": false
+}

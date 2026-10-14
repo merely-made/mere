@@ -1,0 +1,19 @@
+{
+  "server": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\graphshell\\web\\scenario_qualification_server.py",
+  "package": "C:/t/cargo-targets/mere/retained-content-browser",
+  "port": 8885,
+  "owner": "final query and clip browser acceptance",
+  "executable": "C:\\Users\\mark_\\AppData\\Local\\hermes\\hermes-agent\\venv\\Scripts\\python.exe",
+  "output": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\graphshell\\docs\\receipts\\query_views_20261013\\browser-qualified-8885",
+  "pid": 47400,
+  "startedUtc": "2026-10-14T09:43:40.9935143Z",
+  "childProcesses": [
+    {
+      "ProcessId": 54520,
+      "ParentProcessId": 47400,
+      "CommandLine": "\"C:\\Users\\mark_\\AppData\\Roaming\\uv\\python\\cpython-3.11.14-windows-x86_64-none\\python.exe\" C:\\Users\\mark_\\Code\\repos\\mere\\ports\\graphshell\\web\\scenario_qualification_server.py --package C:/t/cargo-targets/mere/retained-content-browser --output C:\\Users\\mark_\\Code\\repos\\mere\\ports\\graphshell\\docs\\receipts\\query_views_20261013\\browser-qualified-8885 --port 8885"
+    }
+  ],
+  "listenerObservation": "Get-NetTCPConnection returned owningProcess0; exact command/parent custody recorded instead",
+  "stoppedUtc": "2026-10-14T09:49:41.8454195Z"
+}

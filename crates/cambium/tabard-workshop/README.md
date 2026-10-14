@@ -60,7 +60,7 @@ use the same implementations as the standalone product.
 Register `graph_leaf()` under `GRAPH_LEAF_KEY`. `reader_preview()` and
 `stylesheet_preview()` return retained scene handles implementing `PreviewScene`
 (`frame`, `revision` and `accessible_name`). Their host texture producers use
-`READER_LEAF_KEY` and `STYLESHEET_LEAF_KEY`. The native host's shared
+`READER_LEAF_KEY` and `STYLESHEET_LEAF_KEY`. Rootstock's shared
 `SceneProducer::new(source, raster_key, frame, revision, semantics)` adapts these
 callbacks to its existing `TextureProducer` lifecycle. Give independent scenes
 distinct raster keys, increment revisions when visible content changes, and
@@ -86,7 +86,7 @@ Route close requests through `request_close()` and honor `exit_requested()`.
 The workshop keeps staged or unsaved work available when validation or saving
 fails. Native window and application-close policy belongs to the host.
 
-## Shared native binding
+## Shared preview and native binding
 
 Enable the optional `native-host` feature to use `native_host::WorkshopHost`,
 `native_init` and `native_hooks` for a workshop window. Pass the application's
@@ -95,13 +95,14 @@ window's events from the application's event loop. The binding supplies
 preview registration, native caption controls, controlled text, explicit
 export effects and the shared dirty-close decision.
 
-For an embedded workshop within another application state, retain one
+Enable `host-previews` to use the same `PreviewBindings` on native or browser
+hosts. For an embedded workshop within another application state, retain one
 `PreviewBindings` value and call `register` with the current workshop and the
 parent's leaf/producer registries. Call `sync_and_export` after dispatch and
 use `focused_field` to project the parent's controlled-text slot. Independent
 bindings allocate distinct retained raster identities on the same core.
 Application selection, persistence, window routing and final exit policy stay
-with the parent. The feature and its native dependencies are excluded on Wasm.
+with the parent. Only the `native-host` adapter and its native dependencies are excluded on Wasm.
 
 The native binding's complete CPU gate is:
 
@@ -153,3 +154,33 @@ reach sample toolbar/actions, Heading reaches the sample title, Label reaches
 address/filename text, and Code reaches the Illume-highlighted runs. Font variables
 stay within each sample; Cambium appends font declarations while retaining the
 local syntax palette. The authoring controls keep their neutral font styles.
+
+## Retained host font resources
+
+Supply the outer Host's admitted faces through `Init::fonts`. `HostFont` with
+`sans-serif`, `serif`, `monospace` or `system-ui` binds the actual CSS generic
+and retains the prior quoted named-family alias. The sheet and authored theme
+keep their family requests; resource registration does not rewrite them.
+Font selection remains host policy. Choose actual covering faces appropriate to
+the role, rather than assuming a browser has a native system font collection.
+
+The Reader and Stylesheet previews each own an independent retained document.
+Outer Host fonts do not automatically reach those text systems. Before their
+first frame, supply the same appropriate explicit resources through
+`ReaderSpecimen::set_generic_fonts` and
+`StylesheetSpecimen::set_generic_fonts`. Each accepts `(generic, bytes)` entries,
+returns a typed refusal on invalid input, and changes its source revision only
+when an admitted ledger changes. A failed replacement preserves the old ledger
+and revision. Palette, author stylesheet and typography reconstruction retain
+those bindings; viewport reflow uses the same resources. Reopening may replace
+the source handle, so the embedding application supplies resources to that new
+source and lets its existing `PreviewBindings` rebind it.
+
+The production source and document layout still own glyph shaping, scene
+commands and semantic text. The application owns draft, library, selection and
+appearance application. No separate preview DOM or second application model is
+needed. The [retained font control](tests/generic_fonts.rs) checks selected face
+bytes through actual Reader/Stylesheet frames after profile, typography and
+viewport changes, including failed replacement. The browser delivery fixture's
+Roboto-to-four-generics choice qualifies transport only; it does not qualify
+serif, fixed-width or locale coverage for production consumers.

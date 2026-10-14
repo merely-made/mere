@@ -294,6 +294,17 @@ impl Graph {
             .flat_map(|edge| relation_rows(edge.source(), edge.target(), edge.weight()))
     }
 
+    /// Held Surface buckets without expanding statements or lifting Resource
+    /// relations. Each handle names its exact bucket, including parallel pairs.
+    pub fn surface_relation_buckets(
+        &self,
+    ) -> impl Iterator<Item = (EdgeKey, NodeKey, NodeKey, &EdgePayload)> + '_ {
+        self.inner
+            .inner()
+            .edge_references()
+            .map(|edge| (edge.id(), edge.source(), edge.target(), edge.weight()))
+    }
+
     /// Surface relations followed by content relations lifted to every pair of
     /// surfaces showing their endpoints. The handle retains its owning store;
     /// projection does not copy resource assertions into the surface graph.

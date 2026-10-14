@@ -1,0 +1,20 @@
+{
+  "command": [
+    "cargo",
+    "metadata",
+    "--locked",
+    "--offline",
+    "--format-version",
+    "1"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-moot-capsule-proof",
+  "deadline_seconds": 60,
+  "elapsed_seconds": 4.282,
+  "exit_code": 0,
+  "timed_out": false,
+  "disk_refused": false,
+  "log": "/Users/markik/Code/output/moot-resources-reopen-20261013/checks/cargo-metadata.log",
+  "owned_group_survivors": [],
+  "owned_group_closed": true,
+  "gpu_executed": false
+}

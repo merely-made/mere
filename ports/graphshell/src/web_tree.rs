@@ -26,7 +26,7 @@ use std::rc::Rc;
 use cambium::{
     AnyView, GenetCtx, GenetElement, Key, NamedKey, custom_leaf, el, on_key, on_pointer,
 };
-use cambium_genet_web_host::{WebCapture, WebWindow, mount};
+use cambium_genet_web_host::{MountLifetime, WebCapture, WebWindow, mount_with_lifetime};
 use cambium_rootstock::{
     AppCtx, CloseDisposition, Frame, HostFont, HostHooks, HostOptions, HostPointer, HostWindow,
     Init, ProducedTexture, ProducerContext, SourceAlpha, SourceEncoding, TextureProducer,
@@ -95,6 +95,7 @@ const SHEET: &str = "\
     .tree-rules [data-cambium-text-value] { display:block; width:260px; min-height:26px; color:inherit; background:#263640; border:1px solid #637581; } \
     .tree-rules pre, .tree-dynamics pre, .moot-opened-content { white-space:pre-wrap; overflow-wrap:anywhere; font-size:12px; } \
     .tree-coupling [data-cambium-text-value] { display:block; width:260px; min-height:26px; color:inherit; background:#263640; border:1px solid #637581; } \
+    .tree-query [data-cambium-text-value] { display:block; width:260px; min-height:26px; color:inherit; background:#263640; border:1px solid #637581; } \
     .tree-inspection { overflow-wrap:anywhere; } \
     .tree-inspection p, .tree-inspection li { font-size:12px; } \
     .tree-tools .detail-section-title { font-weight:bold; margin:6px 0 4px; } \
@@ -546,6 +547,8 @@ pub(crate) struct TreePage {
     #[cfg(feature = "product")]
     presentation: presentation::Pane,
     #[cfg(feature = "product")]
+    query_views: query_view::Pane,
+    #[cfg(feature = "product")]
     dynamics_inspector: dynamics_inspection::Pane,
     #[cfg(feature = "product")]
     node_presentation: node_presentation::Pane,
@@ -855,7 +858,9 @@ fn view(page: &TreePage) -> Child {
                     } else {
                         ""
                     },
-                    if page.presenter.is_some() {
+                    if presenter::browsing(page) {
+                        "tree-presenter tree-browsing"
+                    } else if page.presenter.is_some() {
                         "tree-presenter"
                     } else {
                         ""
@@ -923,6 +928,8 @@ fn tools_region(page: &TreePage) -> Child {
     children.push(field_inspection::section(page));
     #[cfg(feature = "product")]
     children.push(presentation::section(page));
+    #[cfg(feature = "product")]
+    children.push(query_view::section(page));
     #[cfg(feature = "product")]
     children.push(node_presentation::section(page));
     #[cfg(feature = "product")]
@@ -1097,6 +1104,9 @@ fn main_page_mounted() -> bool {
 /// Mount the one-tree page into `root`.
 #[wasm_bindgen]
 pub fn mount_tree(root: Element) -> Result<(), JsValue> {
+    if !root.is_connected() {
+        return Err(JsValue::from_str("the mount root is not connected"));
+    }
     if mounted() || main_page_mounted() {
         return Err(JsValue::from_str(
             "Graphshell is already mounted on this page",
@@ -1104,7 +1114,11 @@ pub fn mount_tree(root: Element) -> Result<(), JsValue> {
     }
     let owns_title = root.has_attribute("data-owns-title");
     wasm_bindgen_futures::spawn_local(async move {
-        if let Err(error) = boot(root).await {
+        if let Err(error) = boot(root.clone()).await {
+            if !root.is_connected() {
+                let _ = root.set_attribute("data-mount-state", "cancelled");
+                return;
+            }
             web_sys::console::error_1(&error.clone().into());
             if let Some(document) = web_sys::window()
                 .and_then(|window| window.document())
@@ -1125,6 +1139,11 @@ fn boot(
 }
 
 async fn boot_inner(root: Element) -> Result<(), String> {
+    // The embedding root owns startup admission. Keep the checkpoint passive:
+    // a late private acquisition reaches the host's post-boot destruction
+    // path; default mounts retain their off-document canvas contract.
+    let live_root = root.clone();
+    let lifetime = MountLifetime::with_liveness(move || live_root.is_connected());
     #[cfg(feature = "product")]
     owner_waypoint::configure(&root);
     let document = root.owner_document().ok_or("the root has no document")?;
@@ -1233,6 +1252,9 @@ async fn boot_inner(root: Element) -> Result<(), String> {
                 roster_open: false,
                 evidence_open: false,
                 folds_open: false,
+                history_open: false,
+                checkpoint_source_open: false,
+                selection_open: false,
             })
         },
         None => None,
@@ -1317,7 +1339,7 @@ async fn boot_inner(root: Element) -> Result<(), String> {
         shared.speed,
         &shared.frame_budget.borrow(),
     );
-    visibility::install(&shared, &document)?;
+    visibility::install(&shared, &document, &lifetime)?;
     let options = HostOptions {
         title: "Graphshell, one tree".into(),
         netrender: Box::new(|| NetrenderOptions {
@@ -1331,9 +1353,10 @@ async fn boot_inner(root: Element) -> Result<(), String> {
     let page_shared = shared.clone();
     let page_root = root.clone();
     let physics = physics::PhysicsPanel::new(&shared.canvas.borrow(), web_graphs::LAYOUT);
-    let mounted = mount(
+    let mounted = mount_with_lifetime(
         canvas.clone(),
         options,
+        lifetime,
         move |_window, _commands, _wake| Init {
             state: TreePage {
                 #[cfg(feature = "moot-resources")]
@@ -1356,6 +1379,8 @@ async fn boot_inner(root: Element) -> Result<(), String> {
                 field_inspector: field_inspection::Pane::default(),
                 #[cfg(feature = "product")]
                 presentation,
+                #[cfg(feature = "product")]
+                query_views: query_view::Pane::default(),
                 #[cfg(feature = "product")]
                 dynamics_inspector: dynamics_inspection::Pane::default(),
                 #[cfg(feature = "product")]
@@ -1558,6 +1583,10 @@ fn hooks(shared: Rc<Shared>) -> HostHooks<TreePage, Logic, Child> {
             #[cfg(feature = "product")]
             coupling::poll(ctx);
             #[cfg(feature = "product")]
+            if query_view::ready(ctx.runner.state()) {
+                ctx.runner.update(query_view::poll);
+            }
+            #[cfg(feature = "product")]
             field_inspection::reveal(ctx);
             #[cfg(feature = "product")]
             coupling::reveal(ctx);
@@ -1651,16 +1680,16 @@ fn hooks(shared: Rc<Shared>) -> HostHooks<TreePage, Logic, Child> {
                 }
                 let requests = frame_shared.reading.borrow_mut().take_requests();
                 for (source, address) in requests {
-                    if matches!(
-                        mere_document_lanes::retained_clip::request(&address),
-                        Ok(Some(
-                            mere_document_lanes::retained_clip::ClipRequest::Export(_)
-                        ))
-                    ) {
-                        frame_shared.reading.borrow_mut().set_status(
-                            source,
-                            "Selected clip export needs a receiving host export adapter".into(),
-                        );
+                    if let Ok(Some(mere_document_lanes::retained_clip::ClipRequest::Export(clip))) =
+                        mere_document_lanes::retained_clip::request(&address)
+                    {
+                        let product = ctx.runner.state().product.as_ref();
+                        let owner = product.and_then(|p| p.retained_scope());
+                        let store = product.and_then(|p| p.retained_store());
+                        frame_shared
+                            .reading
+                            .borrow_mut()
+                            .export_clip(source, clip, owner, store);
                         ctx.runner.update(|_| {});
                         continue;
                     }
@@ -1783,6 +1812,10 @@ fn hooks(shared: Rc<Shared>) -> HostHooks<TreePage, Logic, Child> {
             }
             #[cfg(feature = "product")]
             if let Some(slot) = presentation::focused_text(runner) {
+                return Some(slot);
+            }
+            #[cfg(feature = "product")]
+            if let Some(slot) = query_view::focused_text(runner) {
                 return Some(slot);
             }
             appearance::focused_text(runner)
@@ -1909,22 +1942,12 @@ mod dynamics_inspection;
 #[cfg(feature = "product")]
 mod field_inspection;
 #[cfg(feature = "product")]
-mod node_presentation;
-#[cfg(feature = "product")]
 mod forme;
-#[cfg(feature = "product")]
-mod owner_waypoint;
 mod gesture_steps;
 mod gestures;
 mod grouping;
 mod history;
 mod host_boundary;
-mod observe;
-#[cfg(feature = "main-page")]
-mod practice;
-#[cfg(not(feature = "main-page"))]
-#[path = "web_tree/practice_off.rs"]
-mod practice;
 #[cfg(feature = "product")]
 mod inspection;
 #[cfg(feature = "product")]
@@ -1934,7 +1957,17 @@ mod lane;
 mod link_inspection;
 #[cfg(feature = "moot-resources")]
 mod moot_resources;
+#[cfg(feature = "product")]
+mod node_presentation;
+mod observe;
+#[cfg(feature = "product")]
+mod owner_waypoint;
 mod physics;
+#[cfg(feature = "main-page")]
+mod practice;
+#[cfg(not(feature = "main-page"))]
+#[path = "web_tree/practice_off.rs"]
+mod practice;
 #[cfg(feature = "product")]
 mod presentation;
 mod presenter;
@@ -1943,6 +1976,8 @@ mod product;
 #[cfg(not(feature = "product"))]
 #[path = "web_tree/product_off.rs"]
 mod product;
+#[cfg(feature = "product")]
+mod query_view;
 #[cfg(feature = "product")]
 mod reading;
 #[cfg(feature = "remote")]

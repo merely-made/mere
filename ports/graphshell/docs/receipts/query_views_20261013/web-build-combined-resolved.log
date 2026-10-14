@@ -1,0 +1,802 @@
+    Blocking waiting for file lock on package cache
+warning: patch `p2panda-stream v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261011#d8acabc9)` was not used in the crate graph
+help: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+    Blocking waiting for file lock on package cache
+     Locking 1 package to highest Rust 1.97.1 compatible version
+      Adding luggage v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\system\luggage)
+    Blocking waiting for file lock on package cache
+warning: unused import: `cubecl_environment::config::RuntimeConfig`
+  --> C:\Users\mark_\Code\repos\mere\support\patches\cubecl-runtime\src\tune\tuner.rs:22:5
+   |
+22 | use cubecl_environment::config::RuntimeConfig;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `batch_success`
+   --> C:\Users\mark_\Code\repos\mere\support\patches\cubecl-runtime\src\tune\tuner.rs:435:13
+    |
+435 |         let batch_success = false;
+    |             ^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_batch_success`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `warmup_once` is never used
+  --> C:\Users\mark_\Code\repos\mere\support\patches\cubecl-runtime\src\tune\tune_benchmark.rs:48:19
+   |
+43 | impl<F: TuneInputs, Out: AutotuneOutput> TuneFn<F, Out> {
+   | ------------------------------------------------------- method in this implementation
+...
+48 |     pub(crate) fn warmup_once<'a>(
+   |                   ^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `cubecl-runtime` (lib) generated 3 warnings (run `cargo fix --lib -p cubecl-runtime` to apply 1 suggestion)
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling document-session-api v0.1.0 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling livery v0.0.5 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling regress v0.11.1 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling getrandom v0.2.17
+   Compiling genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling matrixmultiply v0.3.11
+   Compiling rand_core v0.6.4
+   Compiling burn-cubecl v0.22.0
+   Compiling genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling stacker v0.1.25
+   Compiling chartulary v0.2.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\chartulary)
+   Compiling cadency v0.0.1 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling image v0.25.10
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling ppv-lite86 v0.2.21
+   Compiling genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling mere-curation v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\forme\curation)
+   Compiling heck v0.5.0
+   Compiling rawpointer v0.2.1
+   Compiling unicode-segmentation v1.13.3
+   Compiling burn-dispatch v0.22.0
+   Compiling strum_macros v0.28.0
+   Compiling buckram v0.0.3 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling rand_chacha v0.3.1
+   Compiling digest v0.10.7
+   Compiling genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling simba v0.10.2
+   Compiling glam v0.33.8
+   Compiling nalgebra-macros v0.3.0
+   Compiling burn-backend-extension v0.22.0
+   Compiling grid v1.0.1
+   Compiling burn-einsum v0.22.0
+   Compiling data-url v0.3.2
+   Compiling time-core v0.1.9
+   Compiling deranged v0.5.8
+   Compiling powerfmt v0.2.0
+   Compiling num-conv v0.2.2
+   Compiling time v0.3.55
+   Compiling genet-livery v0.0.4 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling mime_guess v2.0.5
+   Compiling burn-derive v0.22.0
+   Compiling taffy v0.11.0-experimental-cache-fix.3
+   Compiling nalgebra v0.35.0
+   Compiling rand v0.8.8
+   Compiling strum v0.28.0
+   Compiling oxsdatatypes v0.2.3
+   Compiling colored v3.1.1
+   Compiling heapless v0.8.0
+   Compiling oxiri v0.2.11
+   Compiling fnv v1.0.7
+   Compiling oxilangtag v0.1.6
+   Compiling oxrdf v0.3.4
+   Compiling cfb v0.7.3
+   Compiling burn-tensor v0.22.0
+   Compiling numen v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\conatus\numen)
+   Compiling glamx v0.3.1
+   Compiling mere-forme v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\forme\forme)
+   Compiling sha2 v0.10.9
+   Compiling burn-wgpu v0.22.0
+   Compiling burn-pack v0.22.0
+   Compiling hash32 v0.3.1
+   Compiling ena v0.14.4
+   Compiling ordered-float v5.5.0
+   Compiling num-derive v0.5.1
+   Compiling unicase v2.9.0
+   Compiling mime v0.3.17
+   Compiling workbench v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\workbench)
+   Compiling burn-core v0.22.0
+   Compiling infer v0.19.0
+   Compiling genet-text v0.1.0 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling inker v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\inker\inker)
+   Compiling curve25519-dalek v5.0.0
+   Compiling crossbeam-channel v0.5.17
+   Compiling cmov v0.5.4
+   Compiling getrandom v0.3.4
+   Compiling peg-runtime v0.8.6
+   Compiling peg-macros v0.8.6
+   Compiling ctutils v0.4.2
+   Compiling mere-kernel v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel)
+warning: unused imports: `astar`, `dijkstra`, `has_path_connecting`, and `kosaraju_scc`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\mod.rs:21:22
+   |
+21 | use petgraph::algo::{astar, dijkstra, has_path_connecting, kosaraju_scc};
+   |                      ^^^^^  ^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `Archived`, `Place`, and `Resolver`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\mod.rs:25:21
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                     ^^^^^^^^               ^^^^^  ^^^^^^^^
+
+warning: unused import: `HashSet`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\mod.rs:26:43
+   |
+26 | use std::collections::{BTreeMap, HashMap, HashSet};
+   |                                           ^^^^^^^
+
+warning: unused imports: `GraphSnapshot`, `PersistedAddress`, `PersistedArrangementEdgeData`, `PersistedArrangementSubKind`, `PersistedContainmentEdgeData`, `PersistedContainmentSubKind`, `PersistedEdgeFamily`, `PersistedEdge`, `PersistedImportedEdgeData`, `PersistedImportedSubKind`, `PersistedNavigationTrigger`, `PersistedNodeSessionState`, `PersistedNode`, `PersistedProvenanceEdgeData`, `PersistedProvenanceSubKind`, `PersistedSemanticEdgeData`, `PersistedSemanticSubKind`, `PersistedTraversalEdgeData`, `PersistedTraversalMetrics`, and `PersistedTraversalRecord`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\mod.rs:35:5
+   |
+35 |     GraphSnapshot, PersistedAddress, PersistedArrangementEdgeData, PersistedArrangementSubKind,
+   |     ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+36 |     PersistedContainmentEdgeData, PersistedContainmentSubKind, PersistedEdge, PersistedEdgeFamily,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+37 |     PersistedImportedEdgeData, PersistedImportedSubKind, PersistedNavigationTrigger, PersistedNode,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+38 |     PersistedNodeSessionState, PersistedProvenanceEdgeData, PersistedProvenanceSubKind,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+39 |     PersistedSemanticEdgeData, PersistedSemanticSubKind, PersistedTraversalEdgeData,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+40 |     PersistedTraversalMetrics, PersistedTraversalRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `address_from_url`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\node.rs:26:31
+   |
+26 | use crate::address::{Address, address_from_url};
+   |                               ^^^^^^^^^^^^^^^^
+
+warning: unused import: `NodeTagPresentationState`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\node_facets.rs:17:54
+   |
+17 | use crate::types::{NodeClassification, NodeProperty, NodeTagPresentationState};
+   |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `EdgeRef`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\mod.rs:24:23
+   |
+24 | use petgraph::visit::{EdgeRef, IntoEdgeReferences};
+   |                       ^^^^^^^
+
+warning: unused import: `rancor::Fallible`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\mod.rs:25:72
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                                                                        ^^^^^^^^^^^^^^^^
+
+warning: methods `navigate_node`, `branch_history`, `node_history_back`, and `node_history_forward` are never used
+   --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\mod.rs:707:19
+    |
+404 | impl Graph {
+    | ---------- methods in this implementation
+...
+707 |     pub(crate) fn navigate_node(&mut self, key: NodeKey, url: &str) {
+    |                   ^^^^^^^^^^^^^
+...
+721 |     pub(crate) fn branch_history(&mut self, child: NodeKey, parent: NodeKey) {
+    |                   ^^^^^^^^^^^^^^
+...
+733 |     pub(crate) fn node_history_back(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+743 |     pub(crate) fn node_history_forward(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `assert_semantic_predicate`, `assert_semantic_relation_in_scope`, and `assert_semantic_predicate_in_scope` are never used
+   --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\edge_payload.rs:268:19
+    |
+ 55 | impl EdgePayload {
+    | ---------------- methods in this implementation
+...
+268 |     pub(crate) fn assert_semantic_predicate(&mut self, predicate: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+272 |     pub(crate) fn assert_semantic_relation_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+281 |     pub(crate) fn assert_semantic_predicate_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `LogIdAsString` is never constructed
+   --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\identity.rs:160:19
+    |
+160 | pub(crate) struct LogIdAsString;
+    |                   ^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\resource_content.rs:86:19
+    |
+ 85 | impl Graph {
+    | ---------- methods in this implementation
+ 86 |     pub(crate) fn insert_node_tag(&mut self, key: NodeKey, tag: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 89 |     pub(crate) fn remove_node_tag(&mut self, key: NodeKey, tag: &str) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 92 |     pub(crate) fn append_node_property(&mut self, key: NodeKey, property: NodeProperty) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+ 95 |     pub(crate) fn add_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub(crate) fn remove_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+116 |     pub(crate) fn set_node_classification_status(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+131 |     pub(crate) fn set_node_primary_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\edge_ops.rs:177:19
+    |
+ 32 | impl Graph {
+    | ---------- methods in this implementation
+...
+177 |     pub(crate) fn assert_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+244 |     pub(crate) fn replay_assert_relation_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+261 |     pub(crate) fn replay_set_edge_semantic_predicate_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+279 |     pub(crate) fn replay_assert_semantic_predicate_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+307 |     pub(crate) fn dissolve_remove_node_collect_traversals(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+418 |     pub(crate) fn assert_surface_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+601 |     pub(crate) fn set_edge_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `get_node_mut` is never used
+   --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\query.rs:227:19
+    |
+220 | impl Graph {
+    | ---------- method in this implementation
+...
+227 |     pub(crate) fn get_node_mut(&mut self, key: NodeKey) -> Option<&mut Node> {
+    |                   ^^^^^^^^^^^^
+
+warning: `mere-kernel` (lib) generated 14 warnings (run `cargo fix --lib -p mere-kernel` to apply 6 suggestions)
+   Compiling burn-linalg v0.22.0
+   Compiling rstar v0.13.0
+   Compiling winit v0.30.13
+   Compiling tinct v0.1.2 (C:\Users\mark_\Code\repos\mere\crates\cambium\tinct)
+   Compiling pin-project-internal v1.1.13
+   Compiling anymore v1.0.0
+   Compiling subtle v2.6.1
+   Compiling robust v1.2.0
+   Compiling signature v3.0.0
+   Compiling peg v0.8.6
+   Compiling ed25519 v3.0.0
+   Compiling spade v2.15.1
+   Compiling meristem v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\meristem)
+   Compiling pin-project v1.1.13
+   Compiling parry3d v0.31.1
+   Compiling burn-nn v0.22.0
+   Compiling universal-hash v0.6.1
+   Compiling mere-surface-api v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\system\surface-api)
+   Compiling genet-render v0.2.0 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling scenotime v0.0.4 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\scenotime)
+   Compiling sprigging v0.2.1 (C:\Users\mark_\Code\repos\mere\crates\cambium\sprigging)
+   Compiling base64 v0.22.1
+   Compiling edit-history v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\edit-history)
+   Compiling smol_str v0.2.2
+   Compiling dpi v0.1.2
+   Compiling cursor-icon v1.2.0
+   Compiling unicode-bidi v0.3.18
+   Compiling json-event-parser v0.2.3
+   Compiling fleece v0.5.0 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling cambium v0.3.3 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium)
+   Compiling chirograph v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\chirograph)
+   Compiling poly1305 v0.9.1
+   Compiling burn v0.22.0
+   Compiling rapier3d v0.36.0
+   Compiling ed25519-dalek v3.0.0
+   Compiling parry2d v0.31.1
+   Compiling spargebra v0.4.7
+   Compiling tabard v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\system\tabard)
+   Compiling scenograph v0.0.4 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\scenograph)
+   Compiling eidetic v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\eidetic-core)
+   Compiling aead v0.6.1
+   Compiling quick-xml v0.37.5
+   Compiling nisus v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\conatus\nisus)
+   Compiling lazy_static v1.5.0
+   Compiling hex v0.4.3
+   Compiling sharded-slab v0.1.7
+   Compiling conatus v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\conatus\conatus)
+   Compiling sparesults v0.3.4
+   Compiling chacha20poly1305 v0.11.0
+   Compiling scenomise v0.0.4 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\scenomise)
+   Compiling sparopt v0.3.7
+   Compiling rapier2d v0.36.0
+   Compiling insigne v0.0.2 (https://github.com/merely-made/dramatis.git?rev=0234e7eea6f2ddf2330a71b9425da01b06ae0391#0234e7ee)
+   Compiling cambium-winit v0.3.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-winit)
+   Compiling document-canvas v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\inker\document-canvas)
+   Compiling sha1 v0.10.7
+   Compiling genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?rev=5618326d287e7f7ef0c1cc3545587d64cedb22a7#5618326d)
+   Compiling armillary v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\armillary)
+   Compiling md-5 v0.11.0
+   Compiling tracing-log v0.2.0
+   Compiling matchers v0.2.0
+   Compiling serde_path_to_error v0.1.20
+   Compiling thread_local v1.1.10
+   Compiling option-ext v0.2.0
+   Compiling ryu-js v1.0.3
+   Compiling nu-ansi-term v0.50.3
+   Compiling tracing-subscriber v0.3.23
+   Compiling oxjsonld v0.2.6
+   Compiling dirs-sys v0.4.1
+   Compiling seiche v0.0.6 (C:\Users\mark_\Code\repos\mere\crates\conatus\seiche)
+   Compiling spareval v0.2.7
+error[E0277]: the trait bound `CoreWrapper<Sha1Core>: md5::Digest` is not satisfied
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\spareval-0.2.7\src\expression.rs:1145:68
+     |
+1145 |             Function::Sha1 => build_hash_expression_evaluator::<_, Sha1>(parameters, context)?,
+     |                                                                    ^^^^ the trait `md5::digest::FixedOutput` is not implemented for `CoreWrapper<Sha1Core>`
+     |
+note: there are multiple different versions of crate `digest` in the dependency graph
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\lib.rs:96:1
+     |
+  96 | pub trait FixedOutput: Update + OutputSizeUser + Sized {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this is the expected trait
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.10.7\src\lib.rs:93:1
+     |
+  93 | pub trait FixedOutput: Update + OutputSizeUser + Sized {
+     | ------------------------------------------------------ this is the found trait
+     = help: you can use `cargo tree` to explore your dependency tree
+help: the following other types implement trait `md5::digest::FixedOutput`
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\buffer_macros\fixed.rs:220:9
+     |
+ 220 |           impl$(< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $crate::FixedOutput for $name$(< $( $lt ),+ >)? {
+     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `md5::Md5`
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\xof_fixed.rs:94:1
+     |
+  94 |   impl<T: ExtendableOutput + Update, S: ArraySize> FixedOutput for XofFixedWrapper<T, S> {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `XofFixedWrapper<T, S>`
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\md-5-0.11.0\src\lib.rs:17:1
+     |
+  17 | / digest::buffer_fixed!(
+  18 | |     /// MD5 hasher state.
+  19 | |     pub struct Md5(block_api::Md5Core);
+  20 | |     oid: "1.2.840.113549.2.5";
+  21 | |     impl: FixedHashTraits;
+  22 | | );
+     | |_- in this macro invocation
+     = note: there are multiple different versions of crate `digest` in the dependency graph
+     = help: you can use `cargo tree` to explore your dependency tree
+     = note: required for `CoreWrapper<Sha1Core>` to implement `md5::Digest`
+note: required by a bound in `build_hash_expression_evaluator`
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\spareval-0.2.7\src\expression.rs:1662:78
+     |
+1662 | fn build_hash_expression_evaluator<'a, C: ExpressionEvaluatorContext<'a>, H: Digest>(
+     |                                                                              ^^^^^^ required by this bound in `build_hash_expression_evaluator`
+     = note: this error originates in the macro `$crate::buffer_fixed` which comes from the expansion of the macro `digest::buffer_fixed` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the trait bound `CoreWrapper<Sha1Core>: md5::Digest` is not satisfied
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\spareval-0.2.7\src\expression.rs:1145:68
+     |
+1145 |             Function::Sha1 => build_hash_expression_evaluator::<_, Sha1>(parameters, context)?,
+     |                                                                    ^^^^ the trait `md5::digest::HashMarker` is not implemented for `CoreWrapper<Sha1Core>`
+     |
+note: there are multiple different versions of crate `digest` in the dependency graph
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\digest.rs:10:1
+     |
+  10 | pub trait HashMarker {}
+     | ^^^^^^^^^^^^^^^^^^^^ this is the expected trait
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.10.7\src\digest.rs:8:1
+     |
+   8 | pub trait HashMarker {}
+     | -------------------- this is the found trait
+     = help: you can use `cargo tree` to explore your dependency tree
+help: the following other types implement trait `md5::digest::HashMarker`
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\block_api\ct_variable.rs:39:1
+     |
+  39 | / impl<T, OutSize> HashMarker for CtOutWrapper<T, OutSize>
+  40 | | where
+  41 | |     T: VariableOutputCore + HashMarker,
+  42 | |     OutSize: ArraySize + IsLessOrEqual<T::OutputSize, Output = True>,
+     | |_____________________________________________________________________^ `CtOutWrapper<T, OutSize>`
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\md-5-0.11.0\src\block_api.rs:25:1
+     |
+  25 |   impl HashMarker for Md5Core {}
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^ `Md5Core`
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\xof_fixed.rs:46:1
+     |
+  46 |   impl<T: ExtendableOutput + HashMarker, S: ArraySize> HashMarker for XofFixedWrapper<T, S> {}
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `XofFixedWrapper<T, S>`
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\buffer_macros\fixed.rs:298:9
+     |
+ 298 |           impl$(< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $crate::HashMarker for $name$(< $( $lt ),+ >)? {}
+     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `md5::Md5`
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\md-5-0.11.0\src\lib.rs:17:1
+     |
+  17 | / digest::buffer_fixed!(
+  18 | |     /// MD5 hasher state.
+  19 | |     pub struct Md5(block_api::Md5Core);
+  20 | |     oid: "1.2.840.113549.2.5";
+  21 | |     impl: FixedHashTraits;
+  22 | | );
+     | |_- in this macro invocation
+     = note: there are multiple different versions of crate `digest` in the dependency graph
+     = help: you can use `cargo tree` to explore your dependency tree
+     = note: required for `CoreWrapper<Sha1Core>` to implement `md5::Digest`
+note: required by a bound in `build_hash_expression_evaluator`
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\spareval-0.2.7\src\expression.rs:1662:78
+     |
+1662 | fn build_hash_expression_evaluator<'a, C: ExpressionEvaluatorContext<'a>, H: Digest>(
+     |                                                                              ^^^^^^ required by this bound in `build_hash_expression_evaluator`
+     = note: this error originates in the macro `$crate::buffer_fixed` which comes from the expansion of the macro `digest::buffer_fixed` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the trait bound `CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, _, _>>: Digest` is not satisfied
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\spareval-0.2.7\src\expression.rs:1146:70
+     |
+1146 |             Function::Sha256 => build_hash_expression_evaluator::<_, Sha256>(parameters, context)?,
+     |                                                                      ^^^^^^ the trait `md5::digest::FixedOutput` is not implemented for `CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, UInt<_, B0>, _>>`
+     |
+note: there are multiple different versions of crate `digest` in the dependency graph
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\lib.rs:96:1
+     |
+  96 | pub trait FixedOutput: Update + OutputSizeUser + Sized {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this is the expected trait
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.10.7\src\lib.rs:93:1
+     |
+  93 | pub trait FixedOutput: Update + OutputSizeUser + Sized {
+     | ------------------------------------------------------ this is the found trait
+     = help: you can use `cargo tree` to explore your dependency tree
+help: the following other types implement trait `md5::digest::FixedOutput`
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\buffer_macros\fixed.rs:220:9
+     |
+ 220 |           impl$(< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $crate::FixedOutput for $name$(< $( $lt ),+ >)? {
+     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `md5::Md5`
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\xof_fixed.rs:94:1
+     |
+  94 |   impl<T: ExtendableOutput + Update, S: ArraySize> FixedOutput for XofFixedWrapper<T, S> {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `XofFixedWrapper<T, S>`
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\md-5-0.11.0\src\lib.rs:17:1
+     |
+  17 | / digest::buffer_fixed!(
+  18 | |     /// MD5 hasher state.
+  19 | |     pub struct Md5(block_api::Md5Core);
+  20 | |     oid: "1.2.840.113549.2.5";
+  21 | |     impl: FixedHashTraits;
+  22 | | );
+     | |_- in this macro invocation
+     = note: there are multiple different versions of crate `digest` in the dependency graph
+     = help: you can use `cargo tree` to explore your dependency tree
+     = note: required for `CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, UInt<_, B0>, _>>` to implement `md5::Digest`
+note: required by a bound in `build_hash_expression_evaluator`
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\spareval-0.2.7\src\expression.rs:1662:78
+     |
+1662 | fn build_hash_expression_evaluator<'a, C: ExpressionEvaluatorContext<'a>, H: Digest>(
+     |                                                                              ^^^^^^ required by this bound in `build_hash_expression_evaluator`
+     = note: the full name for the type has been written to 'C:/t/cargo-targets/mere/build\wasm32-unknown-unknown\debug\deps\spareval-5b240760ebdf18f5.long-type-3096482233804934039.txt'
+     = note: consider using `--verbose` to print the full type name to the console
+     = note: this error originates in the macro `$crate::buffer_fixed` which comes from the expansion of the macro `digest::buffer_fixed` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the trait bound `CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, _, _>>: Digest` is not satisfied
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\spareval-0.2.7\src\expression.rs:1146:70
+     |
+1146 |             Function::Sha256 => build_hash_expression_evaluator::<_, Sha256>(parameters, context)?,
+     |                                                                      ^^^^^^ the trait `md5::digest::HashMarker` is not implemented for `CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, UInt<_, B0>, _>>`
+     |
+note: there are multiple different versions of crate `digest` in the dependency graph
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\digest.rs:10:1
+     |
+  10 | pub trait HashMarker {}
+     | ^^^^^^^^^^^^^^^^^^^^ this is the expected trait
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.10.7\src\digest.rs:8:1
+     |
+   8 | pub trait HashMarker {}
+     | -------------------- this is the found trait
+     = help: you can use `cargo tree` to explore your dependency tree
+help: the following other types implement trait `md5::digest::HashMarker`
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\block_api\ct_variable.rs:39:1
+     |
+  39 | / impl<T, OutSize> HashMarker for CtOutWrapper<T, OutSize>
+  40 | | where
+  41 | |     T: VariableOutputCore + HashMarker,
+  42 | |     OutSize: ArraySize + IsLessOrEqual<T::OutputSize, Output = True>,
+     | |_____________________________________________________________________^ `CtOutWrapper<T, OutSize>`
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\md-5-0.11.0\src\block_api.rs:25:1
+     |
+  25 |   impl HashMarker for Md5Core {}
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^ `Md5Core`
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\xof_fixed.rs:46:1
+     |
+  46 |   impl<T: ExtendableOutput + HashMarker, S: ArraySize> HashMarker for XofFixedWrapper<T, S> {}
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `XofFixedWrapper<T, S>`
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\buffer_macros\fixed.rs:298:9
+     |
+ 298 |           impl$(< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $crate::HashMarker for $name$(< $( $lt ),+ >)? {}
+     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `md5::Md5`
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\md-5-0.11.0\src\lib.rs:17:1
+     |
+  17 | / digest::buffer_fixed!(
+  18 | |     /// MD5 hasher state.
+  19 | |     pub struct Md5(block_api::Md5Core);
+  20 | |     oid: "1.2.840.113549.2.5";
+  21 | |     impl: FixedHashTraits;
+  22 | | );
+     | |_- in this macro invocation
+     = note: there are multiple different versions of crate `digest` in the dependency graph
+     = help: you can use `cargo tree` to explore your dependency tree
+     = note: required for `CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, UInt<_, B0>, _>>` to implement `md5::Digest`
+note: required by a bound in `build_hash_expression_evaluator`
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\spareval-0.2.7\src\expression.rs:1662:78
+     |
+1662 | fn build_hash_expression_evaluator<'a, C: ExpressionEvaluatorContext<'a>, H: Digest>(
+     |                                                                              ^^^^^^ required by this bound in `build_hash_expression_evaluator`
+     = note: the full name for the type has been written to 'C:/t/cargo-targets/mere/build\wasm32-unknown-unknown\debug\deps\spareval-5b240760ebdf18f5.long-type-3096482233804934039.txt'
+     = note: consider using `--verbose` to print the full type name to the console
+     = note: this error originates in the macro `$crate::buffer_fixed` which comes from the expansion of the macro `digest::buffer_fixed` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the trait bound `CoreWrapper<CtVariableCoreWrapper<Sha512VarCore, _, _>>: Digest` is not satisfied
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\spareval-0.2.7\src\expression.rs:1147:70
+     |
+1147 |             Function::Sha384 => build_hash_expression_evaluator::<_, Sha384>(parameters, context)?,
+     |                                                                      ^^^^^^ the trait `md5::digest::FixedOutput` is not implemented for `CoreWrapper<CtVariableCoreWrapper<Sha512VarCore, UInt<_, B0>, _>>`
+     |
+note: there are multiple different versions of crate `digest` in the dependency graph
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\lib.rs:96:1
+     |
+  96 | pub trait FixedOutput: Update + OutputSizeUser + Sized {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this is the expected trait
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.10.7\src\lib.rs:93:1
+     |
+  93 | pub trait FixedOutput: Update + OutputSizeUser + Sized {
+     | ------------------------------------------------------ this is the found trait
+     = help: you can use `cargo tree` to explore your dependency tree
+help: the following other types implement trait `md5::digest::FixedOutput`
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\buffer_macros\fixed.rs:220:9
+     |
+ 220 |           impl$(< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $crate::FixedOutput for $name$(< $( $lt ),+ >)? {
+     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `md5::Md5`
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\xof_fixed.rs:94:1
+     |
+  94 |   impl<T: ExtendableOutput + Update, S: ArraySize> FixedOutput for XofFixedWrapper<T, S> {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `XofFixedWrapper<T, S>`
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\md-5-0.11.0\src\lib.rs:17:1
+     |
+  17 | / digest::buffer_fixed!(
+  18 | |     /// MD5 hasher state.
+  19 | |     pub struct Md5(block_api::Md5Core);
+  20 | |     oid: "1.2.840.113549.2.5";
+  21 | |     impl: FixedHashTraits;
+  22 | | );
+     | |_- in this macro invocation
+     = note: there are multiple different versions of crate `digest` in the dependency graph
+     = help: you can use `cargo tree` to explore your dependency tree
+     = note: required for `CoreWrapper<CtVariableCoreWrapper<Sha512VarCore, UInt<_, B0>, _>>` to implement `md5::Digest`
+note: required by a bound in `build_hash_expression_evaluator`
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\spareval-0.2.7\src\expression.rs:1662:78
+     |
+1662 | fn build_hash_expression_evaluator<'a, C: ExpressionEvaluatorContext<'a>, H: Digest>(
+     |                                                                              ^^^^^^ required by this bound in `build_hash_expression_evaluator`
+     = note: the full name for the type has been written to 'C:/t/cargo-targets/mere/build\wasm32-unknown-unknown\debug\deps\spareval-5b240760ebdf18f5.long-type-2709494373248680898.txt'
+     = note: consider using `--verbose` to print the full type name to the console
+     = note: this error originates in the macro `$crate::buffer_fixed` which comes from the expansion of the macro `digest::buffer_fixed` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the trait bound `CoreWrapper<CtVariableCoreWrapper<Sha512VarCore, _, _>>: Digest` is not satisfied
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\spareval-0.2.7\src\expression.rs:1147:70
+     |
+1147 |             Function::Sha384 => build_hash_expression_evaluator::<_, Sha384>(parameters, context)?,
+     |                                                                      ^^^^^^ the trait `md5::digest::HashMarker` is not implemented for `CoreWrapper<CtVariableCoreWrapper<Sha512VarCore, UInt<_, B0>, _>>`
+     |
+note: there are multiple different versions of crate `digest` in the dependency graph
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\digest.rs:10:1
+     |
+  10 | pub trait HashMarker {}
+     | ^^^^^^^^^^^^^^^^^^^^ this is the expected trait
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.10.7\src\digest.rs:8:1
+     |
+   8 | pub trait HashMarker {}
+     | -------------------- this is the found trait
+     = help: you can use `cargo tree` to explore your dependency tree
+help: the following other types implement trait `md5::digest::HashMarker`
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\block_api\ct_variable.rs:39:1
+     |
+  39 | / impl<T, OutSize> HashMarker for CtOutWrapper<T, OutSize>
+  40 | | where
+  41 | |     T: VariableOutputCore + HashMarker,
+  42 | |     OutSize: ArraySize + IsLessOrEqual<T::OutputSize, Output = True>,
+     | |_____________________________________________________________________^ `CtOutWrapper<T, OutSize>`
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\md-5-0.11.0\src\block_api.rs:25:1
+     |
+  25 |   impl HashMarker for Md5Core {}
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^ `Md5Core`
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\xof_fixed.rs:46:1
+     |
+  46 |   impl<T: ExtendableOutput + HashMarker, S: ArraySize> HashMarker for XofFixedWrapper<T, S> {}
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `XofFixedWrapper<T, S>`
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\buffer_macros\fixed.rs:298:9
+     |
+ 298 |           impl$(< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $crate::HashMarker for $name$(< $( $lt ),+ >)? {}
+     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `md5::Md5`
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\md-5-0.11.0\src\lib.rs:17:1
+     |
+  17 | / digest::buffer_fixed!(
+  18 | |     /// MD5 hasher state.
+  19 | |     pub struct Md5(block_api::Md5Core);
+  20 | |     oid: "1.2.840.113549.2.5";
+  21 | |     impl: FixedHashTraits;
+  22 | | );
+     | |_- in this macro invocation
+     = note: there are multiple different versions of crate `digest` in the dependency graph
+     = help: you can use `cargo tree` to explore your dependency tree
+     = note: required for `CoreWrapper<CtVariableCoreWrapper<Sha512VarCore, UInt<_, B0>, _>>` to implement `md5::Digest`
+note: required by a bound in `build_hash_expression_evaluator`
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\spareval-0.2.7\src\expression.rs:1662:78
+     |
+1662 | fn build_hash_expression_evaluator<'a, C: ExpressionEvaluatorContext<'a>, H: Digest>(
+     |                                                                              ^^^^^^ required by this bound in `build_hash_expression_evaluator`
+     = note: the full name for the type has been written to 'C:/t/cargo-targets/mere/build\wasm32-unknown-unknown\debug\deps\spareval-5b240760ebdf18f5.long-type-2709494373248680898.txt'
+     = note: consider using `--verbose` to print the full type name to the console
+     = note: this error originates in the macro `$crate::buffer_fixed` which comes from the expansion of the macro `digest::buffer_fixed` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the trait bound `CoreWrapper<CtVariableCoreWrapper<Sha512VarCore, _, _>>: Digest` is not satisfied
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\spareval-0.2.7\src\expression.rs:1148:70
+     |
+1148 |             Function::Sha512 => build_hash_expression_evaluator::<_, Sha512>(parameters, context)?,
+     |                                                                      ^^^^^^ the trait `md5::digest::FixedOutput` is not implemented for `CoreWrapper<CtVariableCoreWrapper<Sha512VarCore, UInt<_, B0>, _>>`
+     |
+note: there are multiple different versions of crate `digest` in the dependency graph
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\lib.rs:96:1
+     |
+  96 | pub trait FixedOutput: Update + OutputSizeUser + Sized {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this is the expected trait
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.10.7\src\lib.rs:93:1
+     |
+  93 | pub trait FixedOutput: Update + OutputSizeUser + Sized {
+     | ------------------------------------------------------ this is the found trait
+     = help: you can use `cargo tree` to explore your dependency tree
+help: the following other types implement trait `md5::digest::FixedOutput`
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\buffer_macros\fixed.rs:220:9
+     |
+ 220 |           impl$(< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $crate::FixedOutput for $name$(< $( $lt ),+ >)? {
+     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `md5::Md5`
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\xof_fixed.rs:94:1
+     |
+  94 |   impl<T: ExtendableOutput + Update, S: ArraySize> FixedOutput for XofFixedWrapper<T, S> {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `XofFixedWrapper<T, S>`
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\md-5-0.11.0\src\lib.rs:17:1
+     |
+  17 | / digest::buffer_fixed!(
+  18 | |     /// MD5 hasher state.
+  19 | |     pub struct Md5(block_api::Md5Core);
+  20 | |     oid: "1.2.840.113549.2.5";
+  21 | |     impl: FixedHashTraits;
+  22 | | );
+     | |_- in this macro invocation
+     = note: there are multiple different versions of crate `digest` in the dependency graph
+     = help: you can use `cargo tree` to explore your dependency tree
+     = note: required for `CoreWrapper<CtVariableCoreWrapper<Sha512VarCore, UInt<_, B0>, _>>` to implement `md5::Digest`
+note: required by a bound in `build_hash_expression_evaluator`
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\spareval-0.2.7\src\expression.rs:1662:78
+     |
+1662 | fn build_hash_expression_evaluator<'a, C: ExpressionEvaluatorContext<'a>, H: Digest>(
+     |                                                                              ^^^^^^ required by this bound in `build_hash_expression_evaluator`
+     = note: the full name for the type has been written to 'C:/t/cargo-targets/mere/build\wasm32-unknown-unknown\debug\deps\spareval-5b240760ebdf18f5.long-type-14064766136362213618.txt'
+     = note: consider using `--verbose` to print the full type name to the console
+     = note: this error originates in the macro `$crate::buffer_fixed` which comes from the expansion of the macro `digest::buffer_fixed` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the trait bound `CoreWrapper<CtVariableCoreWrapper<Sha512VarCore, _, _>>: Digest` is not satisfied
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\spareval-0.2.7\src\expression.rs:1148:70
+     |
+1148 |             Function::Sha512 => build_hash_expression_evaluator::<_, Sha512>(parameters, context)?,
+     |                                                                      ^^^^^^ the trait `md5::digest::HashMarker` is not implemented for `CoreWrapper<CtVariableCoreWrapper<Sha512VarCore, UInt<_, B0>, _>>`
+     |
+note: there are multiple different versions of crate `digest` in the dependency graph
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\digest.rs:10:1
+     |
+  10 | pub trait HashMarker {}
+     | ^^^^^^^^^^^^^^^^^^^^ this is the expected trait
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.10.7\src\digest.rs:8:1
+     |
+   8 | pub trait HashMarker {}
+     | -------------------- this is the found trait
+     = help: you can use `cargo tree` to explore your dependency tree
+help: the following other types implement trait `md5::digest::HashMarker`
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\block_api\ct_variable.rs:39:1
+     |
+  39 | / impl<T, OutSize> HashMarker for CtOutWrapper<T, OutSize>
+  40 | | where
+  41 | |     T: VariableOutputCore + HashMarker,
+  42 | |     OutSize: ArraySize + IsLessOrEqual<T::OutputSize, Output = True>,
+     | |_____________________________________________________________________^ `CtOutWrapper<T, OutSize>`
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\md-5-0.11.0\src\block_api.rs:25:1
+     |
+  25 |   impl HashMarker for Md5Core {}
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^ `Md5Core`
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\xof_fixed.rs:46:1
+     |
+  46 |   impl<T: ExtendableOutput + HashMarker, S: ArraySize> HashMarker for XofFixedWrapper<T, S> {}
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `XofFixedWrapper<T, S>`
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\digest-0.11.3\src\buffer_macros\fixed.rs:298:9
+     |
+ 298 |           impl$(< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $crate::HashMarker for $name$(< $( $lt ),+ >)? {}
+     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `md5::Md5`
+     |
+    ::: C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\md-5-0.11.0\src\lib.rs:17:1
+     |
+  17 | / digest::buffer_fixed!(
+  18 | |     /// MD5 hasher state.
+  19 | |     pub struct Md5(block_api::Md5Core);
+  20 | |     oid: "1.2.840.113549.2.5";
+  21 | |     impl: FixedHashTraits;
+  22 | | );
+     | |_- in this macro invocation
+     = note: there are multiple different versions of crate `digest` in the dependency graph
+     = help: you can use `cargo tree` to explore your dependency tree
+     = note: required for `CoreWrapper<CtVariableCoreWrapper<Sha512VarCore, UInt<_, B0>, _>>` to implement `md5::Digest`
+note: required by a bound in `build_hash_expression_evaluator`
+    --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\spareval-0.2.7\src\expression.rs:1662:78
+     |
+1662 | fn build_hash_expression_evaluator<'a, C: ExpressionEvaluatorContext<'a>, H: Digest>(
+     |                                                                              ^^^^^^ required by this bound in `build_hash_expression_evaluator`
+     = note: the full name for the type has been written to 'C:/t/cargo-targets/mere/build\wasm32-unknown-unknown\debug\deps\spareval-5b240760ebdf18f5.long-type-14064766136362213618.txt'
+     = note: consider using `--verbose` to print the full type name to the console
+     = note: this error originates in the macro `$crate::buffer_fixed` which comes from the expansion of the macro `digest::buffer_fixed` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `spareval` (lib) due to 8 previous errors

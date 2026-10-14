@@ -1,0 +1,273 @@
+warning: patch `layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/genet.git
+   Compiling syn v3.0.6
+   Compiling syn v2.0.119
+   Compiling serde_derive v1.0.229
+   Compiling serde v1.0.229
+   Compiling smallvec v1.16.1
+   Compiling thiserror-impl v2.0.21
+   Compiling thiserror v2.0.21
+   Compiling bytemuck_derive v1.12.1
+   Compiling bytemuck v1.25.2
+   Compiling log v0.4.34
+   Compiling zerocopy-derive v0.8.57
+   Compiling zerocopy v0.8.57
+   Compiling foldhash v0.2.0
+   Compiling parking_lot_core v0.9.12
+   Compiling parking_lot v0.12.5
+   Compiling hashbrown v0.17.1
+   Compiling euclid v0.22.14
+   Compiling serde_bytes v0.11.19
+   Compiling linebender_resource_handle v0.1.1
+   Compiling windows-interface v0.59.3
+   Compiling windows-implement v0.60.2
+   Compiling windows-core v0.62.2
+   Compiling synstructure v0.14.0
+   Compiling profiling-procmacros v1.0.18
+   Compiling memchr v2.8.3
+   Compiling profiling v1.0.18
+   Compiling indexmap v2.14.2
+   Compiling zerofrom-derive v0.1.8
+   Compiling font-types v0.12.5
+   Compiling windows-future v0.3.2
+   Compiling read-fonts v0.41.0
+   Compiling zerofrom v0.1.8
+   Compiling yoke-derive v0.8.3
+   Compiling windows-collections v0.3.2
+   Compiling windows-numerics v0.3.1
+   Compiling windows v0.62.2
+   Compiling yoke v0.8.3
+   Compiling hashbrown v0.16.1
+   Compiling naga-types v30.0.1
+   Compiling num-traits v0.2.19
+   Compiling skrifa v0.44.0
+   Compiling half v2.7.1
+   Compiling zerovec-derive v0.11.6
+   Compiling zerovec v0.11.8
+   Compiling kurbo v0.13.1
+   Compiling color v0.3.3
+   Compiling displaydoc v0.2.7
+   Compiling wgpu-types v30.0.1
+   Compiling guillotiere v0.7.0
+   Compiling peniko v0.6.1
+   Compiling naga v30.0.1
+   Compiling windows-sys v0.61.2
+   Compiling gpu-allocator v0.28.0
+   Compiling glutin_wgl_sys v0.6.1
+   Compiling wgpu-naga-bridge v30.0.1
+   Compiling getrandom v0.4.3
+   Compiling wgpu-hal v30.0.1
+   Compiling jobserver v0.1.35
+   Compiling tinystr v0.8.4
+   Compiling phf_macros v0.13.1
+   Compiling futures-core v0.3.34
+   Compiling icu_locale_core v2.3.0
+   Compiling cc v1.6.0
+   Compiling phf v0.13.1
+   Compiling wgpu-core-deps-windows-linux-android v30.0.1
+   Compiling potential_utf v0.1.6
+   Compiling winapi-util v0.1.11
+   Compiling zerotrie v0.2.5
+   Compiling icu_provider v2.3.1
+   Compiling same-file v1.0.6
+   Compiling wgpu-core v30.0.1
+   Compiling term v1.2.1
+   Compiling phf_shared v0.11.3
+   Compiling icu_collections v2.3.0
+   Compiling petgraph v0.7.1
+   Compiling string_cache v0.8.9
+   Compiling ascii-canvas v4.0.0
+   Compiling wgpu v30.0.1
+   Compiling walkdir v2.5.0
+   Compiling logos-codegen v0.16.1
+   Compiling lalrpop v0.22.2
+   Compiling string_cache v0.9.0
+   Compiling convert_case v0.10.0
+   Compiling derive_more-impl v2.1.1
+   Compiling web_atoms v0.2.6
+   Compiling wgsl-parse v0.4.0
+   Compiling logos-derive v0.16.1
+   Compiling annotate-snippets v0.12.16
+   Compiling markup5ever v0.39.0
+   Compiling logos v0.16.1
+   Compiling icu_properties v2.3.0
+   Compiling derive_more v2.1.1
+   Compiling vello_shaders v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling wgsl-types v0.4.0
+   Compiling equator-macro v0.4.2
+   Compiling equator v0.4.2
+   Compiling icu_normalizer v2.3.0
+   Compiling vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling wesl-macros v0.4.0
+   Compiling tracing-attributes v0.1.31
+   Compiling rustc-hash v2.1.3
+   Compiling tracing v0.1.44
+   Compiling wesl v0.4.0
+   Compiling aligned-vec v0.6.4
+   Compiling futures-intrusive v0.5.0
+   Compiling web-time v1.1.0
+   Compiling netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling serde_json v1.0.151
+   Compiling v_frame v0.3.9
+   Compiling vello_gpu_shaders v0.3.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling layout-dom-api v0.1.1 (https://www.github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling harfrust v0.12.0
+   Compiling font-types v0.11.3
+   Compiling fearless_simd v0.7.0
+   Compiling typenum v1.20.1
+   Compiling futures-sink v0.3.34
+   Compiling self_cell v1.3.0
+   Compiling smol_str v0.3.6
+   Compiling byteorder v1.5.0
+   Compiling hash32 v0.2.1
+   Compiling libz-sys v1.1.29
+   Compiling futures-channel v0.3.34
+   Compiling hybrid-array v0.4.15
+   Compiling vello_common v0.3.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling read-fonts v0.39.2
+   Compiling psm v0.1.32
+   Compiling idna_adapter v1.2.2
+   Compiling no_std_io2 v0.9.4
+   Compiling nom v8.0.0
+   Compiling paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling spin v0.9.9
+   Compiling app_units v0.7.8
+   Compiling arg_enum_proc_macro v0.3.4
+   Compiling enumn v0.1.14
+   Compiling futures-macro v0.3.34
+   Compiling slab v0.4.12
+   Compiling futures-task v0.3.34
+   Compiling dtoa v1.0.11
+   Compiling alloc-no-stdlib v2.0.4
+   Compiling futures-io v0.3.34
+   Compiling av-scenechange v0.14.1
+   Compiling futures-util v0.3.34
+   Compiling brotli-decompressor v5.0.3
+   Compiling dtoa-short v0.3.5
+   Compiling accesskit v0.24.1
+   Compiling genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling heapless v0.7.17
+   Compiling av1-grain v0.2.5
+   Compiling bitstream-io v4.10.0
+   Compiling idna v1.1.0
+   Compiling slotmap v1.1.1
+   Compiling glifo v0.4.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling lilt v0.8.2
+   Compiling html5ever v0.39.0
+   Compiling xml5ever v0.39.0
+   Compiling stacker v0.1.25
+   Compiling cobs v0.3.0
+   Compiling cssparser-macros v0.7.1
+   Compiling num-derive v0.4.2
+   Compiling zeno v0.3.3
+   Compiling glam v0.33.8
+   Compiling tinyvec v1.13.3
+   Compiling yazi v0.2.1
+   Compiling fearless_simd v0.4.1
+   Compiling netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling fontsan v0.7.0
+   Compiling vello_common v0.1.0
+   Compiling swash v0.2.10
+   Compiling fontdb v0.24.0
+   Compiling encoding_rs v0.8.42
+   Compiling iced_core v0.15.0-dev (https://github.com/iced-rs/iced?rev=ab336f6d6403d7206d82c7c2caa46143efde8284#ab336f6d)
+   Compiling rav1e v0.8.1
+   Compiling cssparser v0.37.0
+   Compiling postcard v1.1.3
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling vello_gpu v0.3.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling icu_locale_fallback v2.3.0
+   Compiling livery v0.0.5 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling url v2.5.8
+   Compiling engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling wuff v0.2.9
+   Compiling futures v0.3.34
+   Compiling windows_x86_64_msvc v0.52.6
+   Compiling block-buffer v0.12.1
+   Compiling crypto-common v0.2.2
+   Compiling regress v0.11.1 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling emath v0.36.2
+   Compiling const-oid v0.10.2
+   Compiling unicode-linebreak v0.1.5
+   Compiling unicode-bidi v0.3.18
+   Compiling rangemap v1.8.0
+   Compiling unicode-script v0.5.8
+   Compiling sys-locale v0.3.2
+   Compiling cosmic-text v0.19.0 (https://github.com/hecrj/cosmic-text.git?rev=6adc2364289fd241daed751948a03d0aea5a31ca#6adc2364)
+   Compiling ravif v0.13.0
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling digest v0.11.3
+   Compiling ecolor v0.36.2
+   Compiling genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling windows-targets v0.52.6
+   Compiling iced_futures v0.15.0-dev (https://github.com/iced-rs/iced?rev=ab336f6d6403d7206d82c7c2caa46143efde8284#ab336f6d)
+   Compiling wuff-capi v0.2.0
+   Compiling icu_segmenter v2.3.0
+   Compiling netrender v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling ahash v0.8.12
+   Compiling cadency v0.0.1 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling unicode-general-category v1.1.0
+   Compiling vello_cpu v0.1.0
+   Compiling harfrust v0.8.4
+   Compiling skrifa v0.42.1
+   Compiling parley_data v0.10.0
+   Compiling genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling nohash-hasher v0.2.0
+   Compiling genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling sha2 v0.11.0
+   Compiling meristem v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\meristem)
+   Compiling epaint v0.36.2
+   Compiling buckram v0.0.3 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling windows-sys v0.52.0
+   Compiling image v0.25.10
+   Compiling sprigging v0.2.1 (C:\Users\mark_\Code\repos\mere\crates\cambium\sprigging)
+   Compiling sceno v0.0.4 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\sceno)
+   Compiling etagere v0.3.0
+   Compiling command-menu v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\command-menu)
+   Compiling lru v0.18.4
+   Compiling dpi v0.1.2
+   Compiling data-url v0.3.2
+   Compiling cursor-icon v1.2.0
+   Compiling smol_str v0.2.2
+   Compiling winit v0.30.13
+   Compiling genet-livery v0.0.4 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling cambium v0.3.3 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium)
+   Compiling cryoglyph v0.1.0 (https://github.com/iced-rs/cryoglyph.git?rev=cf38ed5ea0cfe95270b31ced2910560a7fcc5003#cf38ed5e)
+   Compiling paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling iced_graphics v0.15.0-dev (https://github.com/iced-rs/iced?rev=ab336f6d6403d7206d82c7c2caa46143efde8284#ab336f6d)
+   Compiling iced_debug v0.15.0-dev (https://github.com/iced-rs/iced?rev=ab336f6d6403d7206d82c7c2caa46143efde8284#ab336f6d)
+   Compiling type-map v0.5.1
+   Compiling itertools v0.15.0
+   Compiling document-session-api v0.1.0 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling genet-render v0.2.0 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling egui v0.36.2
+   Compiling egui-wgpu v0.36.2
+   Compiling iced_wgpu v0.15.0-dev (https://github.com/iced-rs/iced?rev=ab336f6d6403d7206d82c7c2caa46143efde8284#ab336f6d)
+   Compiling cambium-winit v0.3.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-winit)
+   Compiling genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling cambium-rootstock v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock)
+error[E0600]: cannot apply unary operator `!` to type `&mut bool`
+   --> crates\cambium\cambium-rootstock\src\embedding.rs:226:20
+    |
+226 |                 if !focus {
+    |                    ^^^^^^ cannot apply unary operator `!`
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> crates\cambium\cambium-rootstock\src\host.rs:109:10
+    |
+109 |     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |          ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+109 -     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+109 +     NEXT.try_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |
+
+For more information about this error, try `rustc --explain E0600`.
+warning: `cambium-rootstock` (lib test) generated 1 warning
+error: could not compile `cambium-rootstock` (lib test) due to 1 previous error; 1 warning emitted

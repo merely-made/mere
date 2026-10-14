@@ -23,7 +23,7 @@ serde_json = "1"
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "time"] }
 # A probe binary with throwaway identities, so it uses the test-only
 # keypair builder (vault lock plan, ruling 96).
-transport = { package = "mere-transport", git = "https://github.com/merely-made/retinue.git", rev = "b49df894635bac95823284efee6c445885eaf62a", features = ["test-identity"] }
+transport = { package = "mere-transport", git = "https://github.com/merely-made/murm.git", rev = "b49df894635bac95823284efee6c445885eaf62a", features = ["test-identity"] }
 
 [features]
 default = []

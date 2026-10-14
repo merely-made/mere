@@ -1,0 +1,51 @@
+warning: patch `layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb5)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/genet.git
+   Compiling pelt-core v0.2.0 (C:\Users\mark_\Code\repos\mere\ports\pelt\core)
+error[E0425]: cannot find type `SessionPendingWork` in crate `inker`
+   --> ports\pelt\core\src\content.rs:181:46
+    |
+181 |     ) -> Option<(PeltSessionIdentity, inker::SessionPendingWork)> {
+    |                                              ^^^^^^^^^^^^^^^^^^ not found in `inker`
+
+error[E0425]: cannot find type `SessionPendingWork` in crate `inker`
+  --> ports\pelt\core\src\pool.rs:21:22
+   |
+21 |     pub work: inker::SessionPendingWork,
+   |                      ^^^^^^^^^^^^^^^^^^ not found in `inker`
+
+error[E0425]: cannot find type `SessionPendingWork` in crate `inker`
+   --> ports\pelt\core\src\lib.rs:711:46
+    |
+711 |     pub fn pending_work(&mut self) -> inker::SessionPendingWork {
+    |                                              ^^^^^^^^^^^^^^^^^^ not found in `inker`
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> ports\pelt\core\src\pool_a11y.rs:65:18
+   |
+65 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |                  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+65 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+65 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> ports\pelt\core\src\lib.rs:206:10
+    |
+206 |         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+    |          ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+206 -         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+206 +         .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+    |
+
+For more information about this error, try `rustc --explain E0425`.
+warning: `pelt-core` (lib) generated 2 warnings
+error: could not compile `pelt-core` (lib) due to 3 previous errors; 2 warnings emitted

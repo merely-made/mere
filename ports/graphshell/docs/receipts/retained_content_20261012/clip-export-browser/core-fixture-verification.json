@@ -1,0 +1,10 @@
+{
+  "type": "existing_fleece_core_fixture_verification",
+  "actual_browser_download": false,
+  "retained_record_blake3": "b40c579d5234ed1f14d7512474a18c958c5e07f1a16f27afc42d337eeabd07ba",
+  "body_blake3": "e4e52b2a0ab9d8584bf4b913af316d96865f92f305b17a0d50b6677bd9ec71c0",
+  "body_bytes": 5,
+  "anchor_verified": true,
+  "source_tag_evidence_verified": true,
+  "private_backing_in_payloads": false
+}

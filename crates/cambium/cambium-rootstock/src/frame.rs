@@ -31,6 +31,123 @@ fn elapsed_us(elapsed: crate::Duration) -> u64 {
     elapsed.as_micros().min(u64::MAX as u128) as u64
 }
 
+#[cfg(test)]
+mod gpu_binding_controls {
+    use super::*;
+    use crate::{CaptureRefusal, HostHooks, HostOptions, HostState, HostWake, Runner, ScriptedDom};
+    use cambium::{AnyView, GenetCtx, GenetElement, custom_leaf};
+    use paint_list_api::{
+        CommonPlacement, LayoutPoint, LayoutRect, PaintCmd, items::ExternalTextureItem,
+    };
+    use std::{cell::RefCell, rc::Rc, sync::Arc};
+
+    struct App {
+        draft: String,
+    }
+    type Child = Box<dyn AnyView<App, (), GenetCtx, GenetElement>>;
+    type Logic = fn(&App) -> Child;
+    fn root(_: &App) -> Child {
+        Box::new(custom_leaf::<App, ()>(7, 8, 6))
+    }
+    struct UnresolvedLeaf;
+    impl sprigging::Leaf for UnresolvedLeaf {
+        fn measure(&mut self, _: sprigging::SizeHint, _: sprigging::SizeHint) -> sprigging::Size {
+            sprigging::Size {
+                width: 8.0,
+                height: 6.0,
+            }
+        }
+        fn paint(&mut self, cx: &mut sprigging::PaintCx<'_>) {
+            cx.emit(PaintCmd::DrawExternalTexture(ExternalTextureItem {
+                placement: CommonPlacement::new(LayoutRect::new(
+                    LayoutPoint::new(0.0, 0.0),
+                    LayoutPoint::new(8.0, 6.0),
+                )),
+                texture_key: 7,
+                content_generation: Some(1),
+                opacity: 0.73,
+            }));
+        }
+        fn paint_dirty(&self) -> bool {
+            false
+        }
+    }
+
+    #[test]
+    fn actual_host_missing_gpu_binding_refuses_all_capture_forms_once_and_keeps_authority() {
+        let mut state: HostState<App, Logic, Child> = HostState::new();
+        state.shared.sheet = "custom-leaf { display:block;width:8px;height:6px; }".into();
+        state.shared.leaves.insert(7, Box::new(UnresolvedLeaf));
+        state.runner = Some(Runner::new(
+            Rc::new(RefCell::new(ScriptedDom::new())),
+            root as Logic,
+            App {
+                draft: "application-owned draft".into(),
+            },
+        ));
+        let wake = HostWake::new(state.wake_pending.clone(), Arc::new(|| {}));
+        let mut host: Host<App, Logic, Child> = Host::new(
+            HostOptions::default(),
+            None,
+            HostHooks::inert(),
+            state,
+            wake,
+        );
+        host.relayout(8.0, 6.0);
+        let list = host.emit_paint_list(8.0, 6.0, None).unwrap();
+        assert!(list.commands().iter().any(|command| matches!(command,
+            PaintCmd::DrawExternalTexture(item) if item.texture_key == 7 && item.content_generation == Some(1))));
+        let refusals = Rc::new(RefCell::new(Vec::new()));
+        fn record(
+            result: CaptureRefusal,
+            name: &'static str,
+            out: &Rc<RefCell<Vec<&'static str>>>,
+        ) {
+            assert!(matches!(
+                result,
+                CaptureRefusal::ProducerResource {
+                    generation: 0,
+                    error: crate::ProducerGpuRemapError::MissingProducer { local_key: 7 }
+                }
+            ));
+            out.borrow_mut().push(name);
+        }
+        let out = refusals.clone();
+        host.s.pending_capture = Some(Box::new(move |result| {
+            record(result.err().unwrap(), "image", &out)
+        }));
+        let out = refusals.clone();
+        host.s.pending_stamped_capture = Some(Box::new(move |result| {
+            record(result.err().unwrap(), "stamped", &out)
+        }));
+        let out = refusals.clone();
+        host.s.pending_paint_capture = Some(Box::new(move |result| {
+            record(result.err().unwrap(), "paint", &out)
+        }));
+        host.s.pending_presentation_observer = Some(Box::new(|_, _| {
+            panic!("refused frame must never be presented")
+        }));
+        assert!(host.emit_scene(8.0, 6.0).is_none());
+        assert!(host.emit_scene(8.0, 6.0).is_none());
+        assert_eq!(*refusals.borrow(), ["image", "stamped", "paint"]);
+        assert!(host.s.pending_presentation_observer.is_none());
+        assert!(host.s.last_redraw_presentation.is_none());
+        assert_eq!(
+            host.s.runner.as_ref().unwrap().state().draft,
+            "application-owned draft"
+        );
+        assert_eq!(
+            host.s.shared.producers.gpu_remap_failure(),
+            Some(crate::ProducerGpuRemapError::MissingProducer { local_key: 7 })
+        );
+        let after = host.emit_paint_list(8.0, 6.0, None).unwrap();
+        assert_eq!(
+            format!("{:?}", after.commands()),
+            format!("{:?}", list.commands())
+        );
+    }
+}
+
 /// Opt-in startup attribution, including attempts that never present. Stores
 /// only CPU timing and host identity; it does not retain render resources.
 struct FrameTrace {
@@ -570,13 +687,46 @@ where
             .pending_paint_capture
             .as_ref()
             .map(|_| PaintEnvelope::from_list(&list));
-        let translated = paint_list_render::translate_paint_cmd_stream(
+        let mut translated = paint_list_render::translate_paint_cmd_stream(
             list.viewport(),
             list.commands(),
             list.fonts(),
             list.images(),
         );
+        if let Err(error) = self
+            .s
+            .shared
+            .producers
+            .remap_gpu_display_list(&mut translated)
+        {
+            self.refuse_producer_resource(error);
+            return None;
+        }
         Some((translated, paint_capture))
+    }
+
+    fn refuse_producer_resource(&mut self, error: crate::ProducerGpuRemapError) {
+        self.s.shared.producers.record_gpu_remap_failure(error);
+        let refusal = crate::CaptureRefusal::ProducerResource {
+            generation: self
+                .s
+                .shared
+                .render_core
+                .as_ref()
+                .map_or(0, |core| core.generation()),
+            error,
+        };
+        self.s.last_redraw_presentation = None;
+        if let Some(capture) = self.s.pending_capture.take() {
+            capture(Err(refusal.clone()));
+        }
+        if let Some(capture) = self.s.pending_stamped_capture.take() {
+            capture(Err(refusal.clone()));
+        }
+        if let Some(capture) = self.s.pending_paint_capture.take() {
+            capture(Err(refusal));
+        }
+        self.s.pending_presentation_observer = None;
     }
 
     pub fn redraw(&mut self) {
@@ -665,6 +815,10 @@ where
         profile.leaf_repaints = self.s.last_leaf_repaints;
         trace!("producers-begin", "");
         profile.producers = self.prepare_producers(scale);
+        if let Some(error) = self.s.shared.producers.gpu_remap_failure() {
+            self.refuse_producer_resource(error);
+            return;
+        }
         trace!("producers-end", "");
         if let Some(refusal) = self.s.shared.producers.render_failure().cloned() {
             trace!("producer-refused", "{}", refusal.failure);

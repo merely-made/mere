@@ -1,0 +1,13 @@
+error: failed to get `iced_wgpu` as a dependency of package `cambium-rootstock v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock)`
+
+Caused by:
+  failed to load source for dependency `iced_wgpu`
+
+Caused by:
+  unable to update https://github.com/iced-rs/iced?rev=ab336f6d6403d7206d82c7c2caa46143efde8284
+
+Caused by:
+  failed to lookup reference in preexisting repository, and can't check for updates in offline mode (--offline)
+
+Caused by:
+  revspec 'ab336f6d6403d7206d82c7c2caa46143efde8284' not found; class=Reference (4); code=NotFound (-3)

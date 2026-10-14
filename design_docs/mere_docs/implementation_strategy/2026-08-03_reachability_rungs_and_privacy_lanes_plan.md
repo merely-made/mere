@@ -1,7 +1,7 @@
 # Reachability Rungs and Privacy Lanes
 
 **Date:** 2026-08-03
-**Status (2026-10-06):** R0 landed, recorded 2026-09-01, with one fork pin left since `a5543904` (2026-10-03); R1 landed 2026-08-03 (Graphshell) and 2026-08-06 (Knot), the genuinely remote receipt still open; R2 scoped, its premise of authenticated announce app data overtaken (the announce now sends none); R3's Noise in-stream plane landed 2026-08-06 (`retinue/native/crates/transport/src/noise.rs`), while its emissary and Arti lanes remain scoped, emissary gated on entering the tree. Veilid retired 2026-09-01.
+**Status (2026-10-06):** R0 landed, recorded 2026-09-01, with one fork pin left since `a5543904` (2026-10-03); R1 landed 2026-08-03 (Graphshell) and 2026-08-06 (Knot), the genuinely remote receipt still open; R2 scoped, its premise of authenticated announce app data overtaken (the announce now sends none); R3's Noise in-stream plane landed 2026-08-06 (`murm/native/crates/transport/src/noise.rs`), while its emissary and Arti lanes remain scoped, emissary gated on entering the tree. Veilid retired 2026-09-01.
 **Depends on:** the S1 findings recorded in the
 [reference host plan](2026-07-27_graphshell_reference_host_plan.md) H6 addendum;
 the retinue lane in `mere-transport` (feature-gated, trusted-mesh only until
@@ -79,7 +79,7 @@ an explicit network selector in an appropriate domain, subtype or metadata
 contract, qualified separately from this interoperability-preserving refresh.
 
 **Where the policy lives.** `P2pandaHostPolicy` and `P2pandaOverlayHost` in
-`retinue/native/crates/transport/src/p2panda_host.rs` (landed 2026-08-22, `0f0a8006`,
+`murm/native/crates/transport/src/p2panda_host.rs` (landed 2026-08-22, `0f0a8006`,
 device resident R5) own discovery mode, relays, route seeding, endpoint
 reporting and shutdown once; product hosts keep identity, admission, stores and
 protocol handlers. Default policy is `Active` mDNS and no relay. A new host

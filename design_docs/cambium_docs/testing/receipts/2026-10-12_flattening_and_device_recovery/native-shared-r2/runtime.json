@@ -1,0 +1,224 @@
+{
+  "result": "PASS",
+  "started_at": "2026-10-13T22:32:26.262908+00:00",
+  "scope": "native_shared_recovery",
+  "timeout_seconds": 90,
+  "work_seconds": 80,
+  "cleanup_reserve_seconds": 10,
+  "owned_processes_closed": true,
+  "candidate_sha256": "2d9aedfccef2bcb4aa5be86f0e2e849e6410c848f9c26afd60cd6b7d04aaea1b",
+  "grant": {
+    "scope": "native_shared_recovery",
+    "candidate_sha256": "2d9aedfccef2bcb4aa5be86f0e2e849e6410c848f9c26afd60cd6b7d04aaea1b",
+    "run_id": "native-cc65bf4a8-r2-20261013T222926Z",
+    "deadline": "2026-10-13T22:36:00+00:00",
+    "coordinator_thread": "01a1195d-a29f-7d50-92dc-6864b439c1ac",
+    "source_binary_scope": "same native cc65 build basis; fresh ownership driver and reconciled current0570 source"
+  },
+  "absolute_deadline": "2026-10-13T22:33:56.262908+00:00",
+  "command": [
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/native-shared-recovery-frozen",
+    "--output",
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts",
+    "--run-id",
+    "native-cc65bf4a8-r2-20261013T222926Z",
+    "--allow-device-destroy"
+  ],
+  "artifact_sha256": {
+    "baseline-A-complete.rgba": "618090f52b5a6811a26ef5b9d4b9c22c7b01ba0590e58f89499b3fd924e42812",
+    "baseline-A-reader.rgba": "02b0dfbdadf11fc0061d619852237217bce9c0b3753611ba1f510a9d30d57d03",
+    "baseline-A-stylesheet.rgba": "51a05098ceaa43c9988fb5d085e6b16311447dd3215380669058ef5e15b05079",
+    "baseline-B-complete.rgba": "575feaac1e464007d524da21aa0a63e966a2ebb4051840aee45f921ca4f3817d",
+    "baseline-B-reader.rgba": "9be442d0f6a69d0f0b3a0bde2f90fd23ca0131e99edfbcebf1c710c2b6d819fd",
+    "baseline-B-stylesheet.rgba": "cedb097db58e0a0db351d89fcf09fb85e70d163bd673463ea6aec8597ba4440c",
+    "after-loss-A-complete.rgba": "9e2737a2aa5d0db744d795f4e10606f6310a4b3c73115c0c8a055b4019faeb64",
+    "after-loss-A-reader.rgba": "02b0dfbdadf11fc0061d619852237217bce9c0b3753611ba1f510a9d30d57d03",
+    "after-loss-A-stylesheet.rgba": "51a05098ceaa43c9988fb5d085e6b16311447dd3215380669058ef5e15b05079",
+    "after-loss-B-complete.rgba": "f4da75d1624371bf0e1b035e6af76bec090444102cebdf23a17387213ec88e86",
+    "after-loss-B-reader.rgba": "29cfdaa1ca452d97e446054180df99b2861f5ac3a91c41d26b72e270c5aeb72a",
+    "after-loss-B-stylesheet.rgba": "cedb097db58e0a0db351d89fcf09fb85e70d163bd673463ea6aec8597ba4440c",
+    "after-input-A-complete.rgba": "731e97a8ebb91660f2900e207ae10f2a0c6f5272237324f19da9618808f942e5",
+    "after-input-A-reader.rgba": "02b0dfbdadf11fc0061d619852237217bce9c0b3753611ba1f510a9d30d57d03",
+    "after-input-A-stylesheet.rgba": "51a05098ceaa43c9988fb5d085e6b16311447dd3215380669058ef5e15b05079",
+    "after-input-B-complete.rgba": "cd94a666d392ea04a8f1c5635bc06145ac38222c2f04fb4404f80617d6559acd",
+    "after-input-B-reader.rgba": "29cfdaa1ca452d97e446054180df99b2861f5ac3a91c41d26b72e270c5aeb72a",
+    "after-input-B-stylesheet.rgba": "cedb097db58e0a0db351d89fcf09fb85e70d163bd673463ea6aec8597ba4440c",
+    "after-resize-A-complete.rgba": "8b3494db0edb6a50a49979d1d81465ec637eaeef634fed4bfaa449a74862bc06",
+    "after-resize-A-reader.rgba": "1434bbca21d72deb5838efca9af480014c5522558018cb7835d04e4968f26e3e",
+    "after-resize-A-stylesheet.rgba": "d8c9fe6ca1cda8a95bd456463e12e342755b2ad20e6011a070c7288e673cb8c9",
+    "after-resize-B-complete.rgba": "220d66aa7ca95e596e327f854d97b18111fd06f5d05e2176acdd09cca01350e5",
+    "after-resize-B-reader.rgba": "d050c5b24fc7274875dc44840f930e0136ef8a5d3f2e209dfd208fc78c52c889",
+    "after-resize-B-stylesheet.rgba": "02ee07a31be85b885b87c959c155ee19f46b6f46909370a70d4dd7353954a38f"
+  },
+  "independent_full_comparisons": [
+    {
+      "window": 0,
+      "kind": "complete",
+      "max_rgba": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "mean_rgba": 3.3103813559322036e-07,
+      "whole_bytes": 15104000
+    },
+    {
+      "window": 0,
+      "kind": "reader",
+      "max_rgba": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "mean_rgba": 0.0,
+      "whole_bytes": 1465440
+    },
+    {
+      "window": 0,
+      "kind": "stylesheet",
+      "max_rgba": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "mean_rgba": 0.0,
+      "whole_bytes": 4607744
+    },
+    {
+      "window": 1,
+      "kind": "complete",
+      "max_rgba": [
+        1,
+        0,
+        1,
+        0
+      ],
+      "mean_rgba": 7.282838983050848e-07,
+      "whole_bytes": 15104000
+    },
+    {
+      "window": 1,
+      "kind": "reader",
+      "max_rgba": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "mean_rgba": 6.823889070859264e-07,
+      "whole_bytes": 1465440
+    },
+    {
+      "window": 1,
+      "kind": "stylesheet",
+      "max_rgba": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "mean_rgba": 0.0,
+      "whole_bytes": 4607744
+    }
+  ],
+  "proof_sha256": "7e3f615d3fd3b458c2723f2a71a571633fcd518fea1c8e5303d1d8df7454e2e7",
+  "cleanup": {
+    "native": {
+      "closed": true,
+      "final": {
+        "state": "gone",
+        "members": [],
+        "exit_code": 0
+      },
+      "steps": [
+        {
+          "at": "2026-10-13T22:32:56.633615+00:00",
+          "observation": {
+            "state": "gone",
+            "members": [],
+            "exit_code": 0
+          }
+        },
+        {
+          "at": "2026-10-13T22:32:56.695276+00:00",
+          "observation": {
+            "state": "gone",
+            "members": [],
+            "exit_code": 0
+          }
+        }
+      ],
+      "exit_code": 0
+    },
+    "inhibitor": {
+      "closed": true,
+      "final": {
+        "state": "gone",
+        "members": [],
+        "exit_code": -15
+      },
+      "steps": [
+        {
+          "at": "2026-10-13T22:32:56.758818+00:00",
+          "observation": {
+            "state": "owned",
+            "members": [
+              {
+                "pid": 30552,
+                "ppid": 30546,
+                "pgid": 30552,
+                "uid": 501,
+                "start": "Tue Oct 13 18:32:26 2026",
+                "executable": "/usr/bin/caffeinate"
+              }
+            ]
+          }
+        },
+        {
+          "at": "2026-10-13T22:32:56.820369+00:00",
+          "observation": {
+            "state": "owned",
+            "members": [
+              {
+                "pid": 30552,
+                "ppid": 30546,
+                "pgid": 30552,
+                "uid": 501,
+                "start": "Tue Oct 13 18:32:26 2026",
+                "executable": "/usr/bin/caffeinate"
+              }
+            ]
+          }
+        },
+        {
+          "signal": 15,
+          "ownership_verified": true
+        },
+        {
+          "at": "2026-10-13T22:32:56.944093+00:00",
+          "observation": {
+            "state": "gone",
+            "members": [],
+            "exit_code": -15
+          }
+        },
+        {
+          "at": "2026-10-13T22:32:57.005710+00:00",
+          "observation": {
+            "state": "gone",
+            "members": [],
+            "exit_code": -15
+          }
+        }
+      ],
+      "exit_code": -15
+    }
+  },
+  "within_absolute_and_duration_deadline": true,
+  "exit_code": 0,
+  "ended_at": "2026-10-13T22:32:57.007034+00:00",
+  "elapsed_seconds": 30.745
+}

@@ -37,15 +37,19 @@ the [ambiance design](../design/2026-09-23_ambiance_design.md) and the
 **2026-10-09 design continuation:** the [cross-app design language record](../../2026-08-23_projection_scenes_and_graph_native_platform.md#9-configurable-visual-and-interaction-language-2026-10-09)
 inherits this plan's resource/surface identity boundary for independent content
 accesses, and records selection, activity and presentation as distinct UI
-concerns. Link/edge wording remains an open design choice there; this plan's
-relationship semantics and implementation status are unchanged.
+concerns. Mark resolved the link/edge styling distinction on 2026-10-13 in §7:
+shared query views use distinct configurable stroke cues and retain source
+classification when lifting links. The completed P1–P5 relationship semantics
+remain unchanged.
 
 **2026-10-13 design draft:** [§7](#7-strata-and-query-driven-views-draft)
 develops Mark's distinction between links within strata and edges across
 strata, and his question about additional strata, tagging and SPARQL. The
 [terminology reference](../../TERMINOLOGY.md) carries the proposed vocabulary
-beside the established definitions. This continuation is separate from the
-completed P1–P5 implementation.
+beside the established definitions. Shared Mere query Resources, Graphshell
+authoring and distinct configurable stroke cues now have a bounded implementation
+under qualification. Additional strata remain a draft. This continuation is
+separate from the completed P1–P5 implementation.
 
 ## 1. The questions
 
@@ -4273,10 +4277,17 @@ separately deferred vocabulary/oracle work remain outside this lane.
 
 ## 7. Strata and query driven views draft
 
-**Status (2026-10-13):** Design draft. Mark authorized drafting this direction
-and updating terminology. The runtime retains its two implemented strata;
-additional strata and adoption of the proposed link/edge distinction remain
-design choices.
+**Status (2026-10-14):** The bounded first implementation is present; final
+supplier qualification and publication remain in progress. Mark chose shared
+Mere Resources authored in Graphshell Workbench, and ruled that links and
+cross-stratum edges should differ fundamentally in their visible styling.
+The runtime retains Resource and Surface strata; additional strata remain
+a later model decision. Ten model tests and the actual owner journal control
+pass. IndexedDB save/reopen and relation inspection pass in the browser;
+native capture verifies distinct stroke geometry. Later card stacking, reader
+wheel containment and supplier repairs require their fresh final bundle.
+The [implementation receipt](../../../ports/graphshell/docs/receipts/query_views_20261013/README.md)
+keeps source and artifact bases separate.
 
 A mere can offer many organizing graphs over the same material. Tags,
 vocabularies and saved queries can expose different connections without
@@ -4410,6 +4421,31 @@ Read-only view creation must preserve existing surface identities and Forme
 placement. Sharing the spec and freezing a selection retain their established
 separate behavior.
 
-Before implementing this target, resolve where the view is authored and whether
-cross-stratum *edge* appears in ordinary product copy or only detailed
-inspection. Admission of an additional stratum is a later model decision.
+Mark resolved authoring and styling on 2026-10-13: definitions are shared Mere
+Resources, editable in Graphshell Workbench. Links and cross-stratum edges
+have distinct configurable stroke cues, independent of theme colors; product
+legend and detailed inspection identify their source strata. A lifted Resource
+link remains a Resource link. Additional strata require a later model decision.
+
+The bounded implementation uses `graph.query-view/v1` Resources and the
+existing SELECT membership evaluator. Separate member, appearance and relation
+budgets refuse overflow explicitly. Projection never mints a source appearance;
+an explicit authoring save can create the saved view's own access. Every held
+access remains an independent Surface, including multiple accesses to one
+Resource. Exact source assertion payloads and zero-hop shown bindings survive
+visual lowering. Existing owner journals persist edits; stale spec, owner,
+persona, source revision and shown bindings refuse mutation or activation.
+
+Sharing exposes the definition for a receiver to evaluate over its own graph.
+Freezing reuses the existing immutable nested-selection Resource. Neither
+operation changes the other. Native model, owner persistence and headed browser
+receipts are required before this slice is reported as qualified.
+
+The bounded slice is qualified on the combined Genet b6/Netrender 6a basis:
+ten shared query cases, one actual owner-journal save/freeze/undo/reopen case,
+and three fresh browser scenarios pass. Browser acceptance covers independent
+freezing, configured strokes, exact empty membership, IndexedDB reopening and
+inspection of lifted Resource links, Surface links and zero-hop shown bindings.
+The source-stable final Wasm and nine actual captures are recorded under
+`ports/graphshell/docs/receipts/query_views_20261013/browser-qualified-8884/`.
+Additional strata and wider consumer acceptance remain separate.

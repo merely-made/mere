@@ -1,0 +1,479 @@
+     Locking 252 packages to highest Rust 1.99.0 compatible versions
+      Adding ab_glyph v0.2.32
+      Adding ab_glyph_rasterizer v0.1.10
+      Adding ahash v0.8.12
+      Adding alloc-no-stdlib v2.0.4
+      Adding android-activity v0.6.1
+      Adding android-properties v0.2.2
+      Adding approx v0.5.1
+      Adding ar_archive_writer v0.5.3
+      Adding armillary v0.1.1 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/armillary)
+      Adding arrayref v0.3.9
+      Adding as-raw-xcb-connection v1.0.1
+      Adding ash v0.38.0+1.3.281
+      Adding bit-set v0.10.0
+      Adding bit-vec v0.9.1
+      Adding bitflags v1.3.2
+      Adding block2 v0.5.1
+      Adding brotli-decompressor v5.0.3
+      Adding buckram v0.0.3 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+      Adding cadency v0.0.1 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+      Adding calloop v0.13.0
+      Adding calloop-wayland-source v0.3.0
+      Adding cambium-rootstock v0.1.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/cambium/cambium-rootstock)
+      Adding cambium-winit v0.3.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/cambium/cambium-winit)
+      Adding cfb v0.7.3
+      Adding ciborium v0.2.2
+      Adding ciborium-io v0.2.2
+      Adding ciborium-ll v0.2.2
+      Adding codespan-reporting v0.13.1
+      Adding concurrent-queue v2.5.0
+      Adding core-foundation v0.9.4
+      Adding core-graphics v0.23.2
+      Adding core-graphics-types v0.1.3
+      Adding crossbeam-channel v0.5.17
+      Adding crunchy v0.2.4
+      Adding cssparser v0.37.0
+      Adding cssparser-macros v0.7.1
+      Adding cursor-icon v1.2.0
+      Adding data-url v0.3.2
+      Adding dirs v5.0.1
+      Adding dirs-sys v0.4.1
+      Adding dispatch v0.2.0
+      Adding dlib v0.5.3
+      Adding document-features v0.2.12
+      Adding document-session-api v0.1.0 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+      Adding downcast-rs v1.2.1
+      Adding downcast-rs v2.0.2
+      Adding dpi v0.1.2
+      Adding dtoa v1.0.11
+      Adding dtoa-short v0.3.5
+      Adding emblem v0.2.0
+      Adding ena v0.14.4
+      Adding engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+      Adding esp v0.1.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/intel/esp)
+      Adding fnv v1.0.7
+      Adding font-types v0.11.3
+      Adding fontsan v0.7.0
+      Adding foreign-types v0.5.0
+      Adding foreign-types-macros v0.2.4
+      Adding foreign-types-shared v0.3.1
+      Adding futures-intrusive v0.5.0
+      Adding genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+      Adding genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+      Adding genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+      Adding genet-livery v0.0.4 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+      Adding genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+      Adding genet-parley v0.10.0 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+      Adding genet-render v0.2.0 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+      Adding genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+      Adding genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+      Adding genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+      Adding genet-taffy v0.14.0
+      Adding genet-text v0.1.0 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+      Adding gethostname v1.1.0
+      Adding gl_generator v0.14.0
+      Adding glam v0.30.10
+      Adding glam v0.31.1
+      Adding glam v0.32.1
+      Adding glam v0.33.12
+      Adding glamx v0.3.1
+      Adding glow v0.17.0
+      Adding glutin_wgl_sys v0.6.1
+      Adding gpu-allocator v0.28.0
+      Adding grid v1.0.1
+      Adding half v2.7.1
+      Adding harfrust v0.8.4
+      Adding hermit-abi v0.5.3
+      Adding icu_locale_fallback v2.3.0
+      Adding icu_locale_fallback_data v2.3.0
+      Adding icu_segmenter v2.3.0
+      Adding icu_segmenter_data v2.3.0
+      Adding incipit v0.2.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/incipit)
+      Adding infer v0.19.0
+      Adding inker v0.1.1 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/inker/inker)
+      Adding jobserver v0.1.35
+      Adding khronos-egl v6.0.0
+      Adding khronos_api v3.1.0
+      Adding layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+      Adding libm v0.2.16
+      Adding libredox v0.1.25
+      Adding libz-sys v1.1.29
+      Adding linux-raw-sys v0.4.15
+      Adding linux-raw-sys v0.12.1
+      Adding litrs v1.0.0
+      Adding livery v0.0.5 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+      Adding matrixmultiply v0.3.11
+      Adding memmap2 v0.9.11
+      Adding mere v0.0.2 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/mere)
+      Adding mere-alembic v0.0.1 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/distillery/alembic)
+      Adding mere-cartography v0.0.2 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/canvas/cartography)
+      Adding mere-forme v0.1.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/forme/forme)
+      Adding mere-kernel v0.0.2 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/graph/graph-kernel)
+      Adding mere-webrtc-carrier v0.0.1 (https://github.com/merely-made/murm.git?rev=b49df894635bac95823284efee6c445885eaf62a#b49df894)
+      Adding mime v0.3.17
+      Adding mime_guess v2.0.5
+      Adding naga v30.0.1
+      Adding naga-types v30.0.1
+      Adding nalgebra v0.35.0
+      Adding nalgebra-macros v0.3.0
+      Adding ndk v0.9.0
+      Adding ndk-sys v0.6.0+11769913
+      Adding netrender v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+      Adding netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+      Adding num-complex v0.4.6
+      Adding num-derive v0.5.1
+      Adding num-rational v0.4.2
+      Adding numen v0.2.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/conatus/numen)
+      Adding objc-sys v0.3.5
+      Adding objc2 v0.5.3
+      Adding objc2-app-kit v0.2.2
+      Adding objc2-cloud-kit v0.2.2
+      Adding objc2-contacts v0.2.2
+      Adding objc2-core-data v0.2.2
+      Adding objc2-core-graphics v0.3.2
+      Adding objc2-core-image v0.2.2
+      Adding objc2-core-location v0.2.2
+      Adding objc2-core-text v0.3.2
+      Adding objc2-foundation v0.2.2
+      Adding objc2-io-surface v0.3.2
+      Adding objc2-link-presentation v0.2.2
+      Adding objc2-metal v0.2.2
+      Adding objc2-metal v0.3.2
+      Adding objc2-quartz-core v0.2.2
+      Adding objc2-quartz-core v0.3.2
+      Adding objc2-symbols v0.2.2
+      Adding objc2-ui-kit v0.2.2
+      Adding objc2-uniform-type-identifiers v0.2.2
+      Adding objc2-user-notifications v0.2.2
+      Adding object v0.39.1
+      Adding option-ext v0.2.0
+      Adding orbclient v0.3.55
+      Adding ordered-float v5.5.0
+      Adding owned_ttf_parser v0.25.1
+      Adding paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+      Adding pandect v0.1.1 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/system/pandect)
+      Adding parlance v0.1.1
+      Adding parley_data v0.10.0
+      Adding parry2d v0.31.1
+      Adding phf_macros v0.13.1
+      Adding pictograph v0.2.0 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/canvas/pictograph)
+      Adding plain v0.2.3
+      Adding platen v0.0.1 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/platen/platen)
+      Adding polling v3.11.0
+      Adding pollster v1.0.1
+      Adding portable-atomic-util v0.2.8
+      Adding presser v0.3.1
+      Adding profiling v1.0.18
+      Adding profiling-procmacros v1.0.18
+      Adding psm v0.1.32
+      Adding quick-xml v0.41.0
+      Adding range-alloc v0.1.5
+      Adding rapier2d v0.36.1
+      Adding raw-window-handle v0.6.2
+      Adding raw-window-metal v1.1.0
+      Adding rawpointer v0.2.1
+      Adding read-fonts v0.39.2
+      Adding redox_syscall v0.4.1
+      Adding redox_syscall v0.9.4
+      Adding redox_users v0.4.6
+      Adding regress v0.11.1 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+      Adding renderdoc-sys v1.1.0
+      Adding robust v1.2.0
+      Adding roxmltree v0.21.1
+      Adding rustc-hash v1.1.0
+      Adding rustix v0.38.44
+      Adding rustix v1.1.5
+      Adding safe_arch v1.2.0
+      Adding sctk-adwaita v0.10.1
+      Adding seiche v0.0.6 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/conatus/seiche)
+      Adding serde_path_to_error v0.1.20
+      Adding serde_spanned v1.1.2
+      Adding simba v0.10.2
+      Adding skrifa v0.42.1
+      Adding smithay-client-toolkit v0.19.2
+      Adding smol_str v0.2.2
+      Adding spade v2.15.1
+      Adding spirv v0.4.0+sdk-1.4.341.0
+      Adding stacker v0.1.25
+      Adding strict-num v0.1.1
+      Adding tabard v0.0.1 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/system/tabard)
+      Adding taffy v0.11.0-experimental-cache-fix.3
+      Adding tempfile v3.27.0
+      Adding termcolor v1.4.1
+      Adding tinct v0.1.2 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/cambium/tinct)
+      Adding tiny-skia v0.11.4
+      Adding tiny-skia-path v0.11.4
+      Adding toml v1.1.6+spec-1.1.0 (available: v1.1.8+spec-1.1.0)
+      Adding toml_writer v1.1.3+spec-1.1.0
+      Adding ttf-parser v0.25.1
+      Adding unicase v2.10.0
+      Adding unicode-width v0.2.2
+      Adding uuid-rng-internal v1.28.0
+      Adding uxtree v0.0.2 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/forme/uxtree)
+      Adding vcpkg v0.2.15
+      Adding vello_shaders v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+      Adding wayland-backend v0.3.17
+      Adding wayland-client v0.31.15
+      Adding wayland-csd-frame v0.3.0
+      Adding wayland-cursor v0.31.14
+      Adding wayland-protocols v0.32.13
+      Adding wayland-protocols-plasma v0.3.12
+      Adding wayland-protocols-wlr v0.3.12
+      Adding wayland-scanner v0.31.11
+      Adding wayland-sys v0.31.11
+      Adding wgpu v30.0.1
+      Adding wgpu-core v30.0.1
+      Adding wgpu-core-deps-apple v30.0.1
+      Adding wgpu-core-deps-emscripten v30.0.1
+      Adding wgpu-core-deps-windows-linux-android v30.0.1
+      Adding wgpu-hal v30.0.1
+      Adding wgpu-naga-bridge v30.0.1
+      Adding wgpu-types v30.0.1
+      Adding wide v1.7.1
+      Adding windows-sys v0.48.0
+      Adding windows-targets v0.48.5
+      Adding windows_aarch64_gnullvm v0.48.5
+      Adding windows_aarch64_msvc v0.48.5
+      Adding windows_i686_gnu v0.48.5
+      Adding windows_i686_msvc v0.48.5
+      Adding windows_x86_64_gnu v0.48.5
+      Adding windows_x86_64_gnullvm v0.48.5
+      Adding windows_x86_64_msvc v0.48.5
+      Adding winit v0.30.13
+      Adding wuff v0.2.9
+      Adding wuff-capi v0.2.0
+      Adding x11-dl v2.21.0
+      Adding x11rb v0.13.2
+      Adding x11rb-protocol v0.13.2
+      Adding xcursor v0.3.11
+      Adding xkbcommon-dl v0.4.2
+      Adding xkeysym v0.2.1
+      Adding xml-rs v0.8.29
+      Adding yeslogic-fontconfig-sys v6.0.1
+   Compiling syn v2.0.119
+   Compiling serde v1.0.229
+   Compiling smallvec v1.16.1
+   Compiling rand_core v0.10.1
+   Compiling getrandom v0.4.3
+   Compiling log v0.4.34
+   Compiling portable-atomic v1.15.0
+   Compiling critical-section v1.2.0
+   Compiling once_cell v1.21.4
+   Compiling arrayvec v0.7.8
+   Compiling subtle v2.6.1
+   Compiling futures-core v0.3.34
+   Compiling crypto-common v0.2.2
+   Compiling zeroize_derive v1.5.0
+   Compiling hashbrown v0.17.1
+   Compiling zeroize v1.9.1
+   Compiling zerofrom v0.1.8
+   Compiling thiserror v2.0.21
+   Compiling yoke v0.8.3
+   Compiling bytes v1.12.1
+   Compiling zerovec v0.11.8
+   Compiling indexmap v2.14.2
+   Compiling zerocopy-derive v0.8.57
+   Compiling tracing-core v0.1.36
+   Compiling tracing-attributes v0.1.31
+   Compiling zerocopy v0.8.57
+   Compiling tracing v0.1.44
+   Compiling tinystr v0.8.4
+   Compiling cmov v0.5.4
+   Compiling ctutils v0.4.2
+   Compiling icu_locale_core v2.3.0
+   Compiling potential_utf v0.1.6
+   Compiling zerotrie v0.2.5
+   Compiling icu_provider v2.3.1
+   Compiling parking_lot_core v0.9.12
+   Compiling getrandom v0.2.17
+   Compiling slab v0.4.12
+   Compiling icu_collections v2.3.0
+   Compiling generic-array v0.14.7
+   Compiling bytemuck v1.25.2
+   Compiling futures-io v0.3.34
+   Compiling futures-sink v0.3.34
+   Compiling futures-channel v0.3.34
+   Compiling dispatch2 v0.3.1
+   Compiling parking_lot v0.12.5
+   Compiling digest v0.11.3
+   Compiling objc2-core-foundation v0.3.2
+   Compiling icu_properties v2.3.0
+   Compiling futures-macro v0.3.34
+   Compiling sha1_smol v1.0.1
+   Compiling futures-task v0.3.34
+   Compiling icu_normalizer v2.3.0
+   Compiling futures-util v0.3.34
+   Compiling blake3 v1.8.7
+   Compiling tokio-macros v2.7.2
+   Compiling constant_time_eq v0.4.2
+   Compiling tokio v1.53.2
+   Compiling serde_bytes v0.11.19
+   Compiling idna_adapter v1.2.2
+   Compiling sha2 v0.11.0
+   Compiling crypto-common v0.1.7
+   Compiling inout v0.2.2
+   Compiling idna v1.1.0
+   Compiling url v2.5.8
+   Compiling cipher v0.5.2
+   Compiling chacha20 v0.10.2
+   Compiling uuid v1.27.0
+   Compiling curve25519-dalek-derive v0.1.1
+   Compiling base64ct v1.8.3
+   Compiling simdutf8 v0.1.5
+   Compiling pem-rfc7468 v1.0.0
+   Compiling euclid v0.22.14
+   Compiling der v0.8.2
+   Compiling curve25519-dalek v5.0.0
+   Compiling spki v0.8.0
+   Compiling byteorder v1.5.0
+   Compiling base16ct v1.0.0
+   Compiling pkcs8 v0.11.0
+   Compiling serdect v0.4.3
+   Compiling signature v3.0.0
+   Compiling ed25519 v3.0.0
+   Compiling rand v0.10.3
+   Compiling rand_core v0.6.4
+   Compiling core-foundation-sys v0.8.7
+   Compiling ed25519-dalek v3.0.0
+   Compiling phf_macros v0.13.1
+   Compiling objc2-foundation v0.3.2
+   Compiling ring v0.17.14
+   Compiling winnow v1.0.4
+   Compiling heck v0.5.0
+   Compiling toml_parser v1.1.3+spec-1.1.0
+   Compiling phf v0.13.1
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling half v2.7.1
+   Compiling rustls-pki-types v1.15.1
+   Compiling strum_macros v0.28.0
+   Compiling convert_case v0.10.0
+   Compiling naga-types v30.0.1
+   Compiling hash32 v0.2.1
+   Compiling tokio-util v0.7.19
+   Compiling profiling-procmacros v1.0.18
+   Compiling unicode-xid v0.2.6
+   Compiling derive_more-impl v2.1.1
+   Compiling string_cache v0.9.0
+   Compiling time v0.3.55
+   Compiling rustls v0.23.45
+   Compiling profiling v1.0.18
+   Compiling heapless v0.7.17
+   Compiling rustls-webpki v0.103.15
+   Compiling strum v0.28.0
+   Compiling objc2-metal v0.3.2
+   Compiling objc2-core-graphics v0.3.2
+   Compiling inout v0.1.4
+   Compiling http v1.5.0
+   Compiling cobs v0.3.0
+   Compiling postcard-derive v0.2.2
+   Compiling postcard v1.1.3
+   Compiling cipher v0.4.4
+   Compiling web_atoms v0.2.6
+   Compiling objc2-quartz-core v0.3.2
+   Compiling derive_more v2.1.1
+   Compiling naga v30.0.1
+   Compiling wgpu-types v30.0.1
+   Compiling universal-hash v0.5.1
+   Compiling linebender_resource_handle v0.1.1
+   Compiling httparse v1.10.1
+   Compiling opaque-debug v0.3.1
+   Compiling ipnet v2.12.2
+   Compiling markup5ever v0.39.0
+   Compiling wgpu-naga-bridge v30.0.1
+   Compiling raw-window-metal v1.1.0
+   Compiling http-body v1.1.0
+   Compiling ppv-lite86 v0.2.21
+   Compiling pin-project-internal v1.1.13
+   Compiling spez v0.1.2
+   Compiling n0-error-macros v1.0.1
+   Compiling parking v2.2.1
+   Compiling futures-lite v2.6.1
+   Compiling n0-error v1.0.1
+   Compiling wgpu-hal v30.0.1
+   Compiling pin-project v1.1.13
+   Compiling petgraph v0.8.3
+   Compiling font-types v0.12.5
+   Compiling slotmap v1.1.1
+   Compiling enumn v0.1.14
+   Compiling sync_wrapper v1.0.2
+   Compiling polycool v0.4.0
+   Compiling n0-future v0.3.2
+   Compiling ptr_meta_derive v0.3.2
+   Compiling try-lock v0.2.5
+   Compiling atomic-waker v1.1.2
+   Compiling diatomic-waker v0.2.3
+   Compiling tower-service v0.3.3
+   Compiling spin v0.10.1
+   Compiling cordyceps v0.3.5
+   Compiling redb v2.6.3
+   Compiling futures-buffered v0.2.13
+   Compiling ptr_meta v0.3.2
+   Compiling want v0.3.1
+   Compiling kurbo v0.13.1
+   Compiling accesskit v0.24.1
+   Compiling read-fonts v0.41.0
+   Compiling wgpu-core-deps-apple v30.0.1
+   Compiling polyval v0.6.2
+   Compiling core-foundation v0.10.1
+   Compiling aead v0.5.2
+   Compiling block-buffer v0.10.4
+   Compiling color v0.3.3
+   Compiling async-trait v0.1.92
+   Compiling base64 v0.23.1
+   Compiling httpdate v1.0.3
+   Compiling hyper v1.11.1
+   Compiling guillotiere v0.7.0
+   Compiling skrifa v0.44.0
+   Compiling peniko v0.6.1
+   Compiling digest v0.10.7
+   Compiling ghash v0.5.1
+   Compiling wgpu-core v30.0.1
+   Compiling vello_shaders v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling rancor v0.1.3
+   Compiling tokio-rustls v0.26.6
+   Compiling aes v0.8.4
+   Compiling ctr v0.9.2
+   Compiling security-framework-sys v2.17.0
+   Compiling hex v0.4.3
+   Compiling bytecheck_derive v0.8.3
+   Compiling system-configuration-sys v0.6.0
+   Compiling tower-layer v0.3.3
+   Compiling data-encoding v2.11.1
+   Compiling thiserror v1.0.69
+   Compiling tower v0.5.3
+   Compiling bytecheck v0.8.3
+   Compiling security-framework v3.7.0
+   Compiling aes-gcm v0.10.3
+   Compiling muniment v0.1.2 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/eidetic/muniment)
+   Compiling wgpu v30.0.1
+   Compiling vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling hyper-util v0.1.20
+   Compiling rand_chacha v0.3.1
+   Compiling sceno v0.0.4 (/Users/markik/Code/worktrees/mere-moot-capsule-proof/crates/cambium/scenes/sceno)
+   Compiling app_units v0.7.8
+   Compiling thiserror-impl v1.0.69
+   Compiling munge_macro v0.4.7
+   Compiling noq-udp v1.3.0
+   Compiling tinyvec v1.13.3
+   Compiling const-oid v0.9.6
+   Compiling getrandom v0.3.4
+   Compiling rustc-hash v2.1.3
+   Compiling der v0.7.10
+   Compiling data-encoding-macro-internal v0.1.19
+   Compiling munge v0.4.7
+   Compiling hyper-rustls v0.27.9
+   Compiling rand v0.8.8
+   Compiling rustls-platform-verifier v0.7.0
+   Compiling rend v0.5.4
+   Compiling tower-http v0.6.11
+   Compiling hmac v0.12.1
+   Compiling http-body-util v0.1.5
+   Compiling toml_edit v0.25.15+spec-1.1.0
+   Compiling ff v0.13.1
+   Compiling futures-intrusive v0.5.0
+   Compiling cbor-core v0.10.1
+   Compiling rkyv_derive v0.8.18
+   Compiling base16ct v0.2.0
+   Compiling n0-dns-resolver v0.1.0
+   Compiling hax-lib v0.3.7

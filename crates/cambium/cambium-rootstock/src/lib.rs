@@ -43,14 +43,18 @@ pub use files::{FileAnswer, FileChooser};
 mod owned_layout;
 pub use owned_layout::{OwnedLayout, ScrollAlign, ScrollTarget};
 pub mod producer;
+#[cfg(feature = "embedding")]
+pub mod embedding;
+mod scene_producer;
 pub use producer::{
     PortableCaptureError, PortablePaintCapture, PortableProducerError, ProducedAction,
     ProducedScene, ProducedTexture, ProducerAction, ProducerContext, ProducerError,
-    ProducerFrameInfo, ProducerFrameStats, ProducerImageIdentity, ProducerNode,
-    ProducerRegistrationError, ProducerRegistry, ProducerRenderFailure, ProducerRole,
+    ProducerFrameInfo, ProducerFrameStats, ProducerGpuRemapError, ProducerImageIdentity,
+    ProducerNode, ProducerRegistrationError, ProducerRegistry, ProducerRenderFailure, ProducerRole,
     ProducerSemantics, ProducerSource, ResolvedAppearance, SourceAlpha, SourceEncoding,
     TextureProducer,
 };
+pub use scene_producer::SceneProducer;
 
 /// The host's clock.
 ///
@@ -1127,10 +1131,11 @@ pub use capture::{Frame, PendingFrame, read_frame, start_frame_readback};
 pub use host::{
     AppCtx, AppFrameInsets, AppHook, AppShared, CaptureFn, CaptureFrame, CaptureRefusal,
     CloseDisposition, CloseRequest, CloseRequestHook, FocusedTextHook, FocusedTextSlot, FrameHook,
-    FrameProfile, Hook, Host, HostFont, HostHooks, HostImage, HostOptions, HostPointer, HostState,
-    IdlePolicy, Init, KeyInterceptHook, PaintCaptureFn, PresentationObserver, PresentedFrame,
-    RelayoutProfile, Runner, ScrollIntoView, StampedCaptureFn, StampedCaptureFrame, WindowFrame,
-    ZOOM_LADDER, env_size, fit_zoom, ladder_step,
+    FrameProfile, Hook, Host, HostDisposal, HostFont, HostHooks, HostImage, HostOptions,
+    HostPointer, HostState, IdlePolicy, Init, KeyInterceptHook, PaintCaptureFn,
+    PresentationObserver, PresentedFrame, RelayoutProfile, Runner, ScrollIntoView,
+    StampedCaptureFn, StampedCaptureFrame, WindowFrame, ZOOM_LADDER, env_size, fit_zoom,
+    ladder_step,
 };
 pub use multi_host::{MultiHost, MultiRunner, WindowRequests, WindowSlot, WindowTree};
 pub use tree::HostTree;

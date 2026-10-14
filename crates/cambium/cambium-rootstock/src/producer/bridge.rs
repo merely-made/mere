@@ -104,6 +104,9 @@ where
 
     pub(crate) fn prepare_producers(&mut self, scale: f32) -> ProducerFrameStats {
         self.s.shared.producers.clear_render_failure();
+        if let Some(core) = self.s.shared.render_core.as_ref() {
+            self.s.shared.producers.bind_core(core);
+        }
         let (Some(surface), Some(layout), Some(runner)) = (
             self.s.surface.as_deref(),
             self.s.layout.as_ref(),

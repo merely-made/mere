@@ -1,6 +1,6 @@
 # ADR: One recovery owner for a shared render device
 
-**Status:** Implemented; native controlled-loss and current-frame qualification passed.
+**Status:** Implemented; native controlled-loss/current-frame and browser controlled shared replacement R6 passed. Browser current-frame scopes/counters remain open.
 **Date:** 2026-10-11
 **Deciders:** Renderer implementation owner under the user-authorized recovery work.
 
@@ -54,11 +54,15 @@ Capture callback contracts gain typed Result/refusal outcomes, requiring narrow
 consumer ports. Hosts sharing a core must participate in the same lifecycle.
 GPU-only producers can restore only according to their existing source-owner
 contract; the recovery owner does not invent missing portable resources.
-Existing renderer-global producer-key namespace constraints remain explicit.
+Independent host registries remap local producer keys to distinct stable physical
+renderer identities. Shared-forest lifecycle/disposal remains a separate contract.
 
-Native blocking replacement uses the retained boot recipe. Browser acquisition
-is asynchronous, so any browser-specific factory limitation must be recorded as
-a typed refusal rather than treated as a successful replacement. Controlled
+Native blocking replacement uses the retained boot recipe. Browser replacement
+uses the stored asynchronous recipe and one owner/generation/attempt-branded
+claim after the same detach barrier. The adapter launches its local non-Send
+future outside host borrows. A monotonic deadline prevents late Ready admission,
+including delayed JS timers; expiry/drop/failure is sticky for that transition.
+Synchronous polling leaves asynchronous replacement pending. Controlled
 Device::destroy validation is distinct from a physical driver reset.
 
 ## Validation gates
@@ -70,4 +74,4 @@ Device::destroy validation is distinct from a physical driver reset.
 - Native surface acquisition/recreation checks and web compilation of the callback ABI.
 - Source/pin identities and unchanged pixel acceptance thresholds in durable receipts.
 
-Executed qualification is recorded in the [production flattening and device recovery receipt](../testing/receipts/2026-10-12_flattening_and_device_recovery/README.md). The actual installed callback after controlled device destruction, one shared replacement, two registered reader pixel rehydrations, exact-once refusal and bounded later factory failure passed. Current native shader counters are observed before raster success, including an actual late round-cap limit refusal. Healthy native presentation through that completion fence passed the unchanged scenario after console unlock: 53 presented frames and six nonblank, distinct captures. A separate production one-window control now qualifies new-surface queue presentation after actual owned-device destruction: 56 presented frames and four nonblank captures, preserved authority/source identities and fresh preview generations. Pixels pass unchanged existing limits (max RGB 1, alpha 0); this is not physical driver reset, multiple native windows or a complete hidden-producer pixel comparison. The Wasm callback ABI is recorded separately. Browser async replacement, error scopes and current-frame counter completion remain open, as do physical driver reset and comprehensive producer-upload/composition loss scoping.
+Executed qualification is recorded in the [production flattening and device recovery receipt](../testing/receipts/2026-10-12_flattening_and_device_recovery/README.md). The actual installed callback after controlled device destruction, one shared replacement, two registered reader pixel rehydrations, exact-once refusal and bounded later factory failure passed. Current native shader counters are observed before raster success, including an actual late round-cap limit refusal. Healthy native presentation through that completion fence passed the unchanged scenario after console unlock: 53 presented frames and six nonblank, distinct captures. A separate production one-window control now qualifies new-surface queue presentation after actual owned-device destruction: 56 presented frames and four nonblank captures, preserved authority/source identities and fresh preview generations. Pixels pass unchanged existing limits (max RGB 1, alpha 0); this is not physical driver reset, multiple native windows or a complete hidden-producer pixel comparison. The Wasm callback ABI is recorded separately. The later [browser R6 record](../testing/receipts/2026-10-12_flattening_and_device_recovery/browser-r6/README.md) qualifies the actual asynchronous owner with two full Workshop mounts, one application-hidden host, same-canvas new generation and all complete registered producer images. All twelve PNGs and six whole-image comparisons pass unchanged RGB 3 / alpha 2 / mean 1 limits, with maximum observed RGB 1 and alpha 0. Explicit outer/producer font ledgers use the fixture's Roboto-to-four-generics delivery choice; production typography fidelity is separate. The [two-window native R2 record](../testing/receipts/2026-10-12_flattening_and_device_recovery/native-shared-r2/README.md) retains its earlier G09b/Mcc65 source bounds and does not requalify the later font changes. Browser current-frame error scopes/counters and final canvas clear/blit remain open, as do physical driver reset, OS AT and comprehensive producer-upload/composition loss scoping.

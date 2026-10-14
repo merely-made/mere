@@ -1,0 +1,14 @@
+{
+  "source_head": "9f3361be457f2ee7a5fc111439a5b45673fc14b9",
+  "source_binary_sha256": "4abee2a734f62cd514c98d5a4bc19c9bac57a3656feed4b94cb9498a5f1b505c",
+  "installed_binary_sha256": "ccb67418891be9708504c6c3af4346b0a118629de7c243aa7e869f2fcc26683c",
+  "installed_binary": "/Users/markik/Library/Application Support/djinn/bin/djinn",
+  "unit": "/Users/markik/Library/LaunchAgents/org.merely.djinn.plist",
+  "unit_sha256": "ca4d01c8351d9d6d53cd0c6e81d7d21ed020315a031aa6891a6fb9a4c06acd93",
+  "agent_endpoint": "/Users/markik/Library/Application Support/djinn/agent.sock",
+  "app_endpoint": "/Users/markik/.local/share/personae/vault/graphshell-app.sock",
+  "source_build_peak_owned_rss_bytes": 1477734400,
+  "existing_chatgpt_pid": 44604,
+  "existing_openssh_agent_pid": 95140,
+  "new_plaintext_private_key_file": false
+}

@@ -1216,12 +1216,7 @@ where
                 // Releases matter for exactly one thing: letting go of Tab
                 // leaves spatial focus navigation.
                 ElementState::Released => {
-                    if matches!(
-                        event.logical_key,
-                        winit::keyboard::Key::Named(winit::keyboard::NamedKey::Tab)
-                    ) {
-                        self.s.tab_held = false;
-                    }
+                    self.core.key_released(&key_from_winit(&event.logical_key));
                 },
             },
             WindowEvent::RedrawRequested => {

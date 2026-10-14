@@ -82,6 +82,16 @@ extend the registry with its own engines. These factories acquire neither a
 store nor a window or wgpu device. Graphshell's retained-content host and
 Turnstone's native engine registration consume this factory.
 
+`PeltControllerPool::document_work` observes each retained document's existing
+engine work and exact session identity. Observation preserves prepared input
+geometry, accessibility routes and pump deduplication. Script-visible completion
+can coexist with a future timer; hosts anchor relative deadlines at actual
+document turns rather than repeatedly postponing them on unrelated events.
+Hidden receivers remain observable. `window_has_document_work` admits a redraw
+only through the same current receiver and a visible placement in that window.
+The host owns the clock, wake policy and runnable-work cadence. Native surfaces
+retain their producer mailbox contract.
+
 `sessions_with_fetcher_and_fonts` supplies exact host-held font bytes.
 `sessions_with_presentation` additionally takes an optional reading display
 family; the caller chooses whether authored font choices or its reading face

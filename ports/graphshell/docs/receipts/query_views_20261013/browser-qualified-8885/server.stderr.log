@@ -1,0 +1,14 @@
+127.0.0.1 - - [14/Oct/2026 05:44:16] "GET /workspace.html?fixture=retained-content-query&scenario=scenarios/clip_export_ready.scn&sink=/scenario-receipt HTTP/1.1" 200 -
+127.0.0.1 - - [14/Oct/2026 05:44:16] "GET /styles.css?h3=1 HTTP/1.1" 200 -
+127.0.0.1 - - [14/Oct/2026 05:44:16] "GET /loader.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/Oct/2026 05:44:16] "GET /mount.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/Oct/2026 05:44:16] "GET /pkg/graphshell_web.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/Oct/2026 05:44:16] "GET /pkg/graphshell_web_bg.wasm HTTP/1.1" 200 -
+127.0.0.1 - - [14/Oct/2026 05:44:16] code 404, message File not found
+127.0.0.1 - - [14/Oct/2026 05:44:16] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [14/Oct/2026 05:44:17] "GET /scenarios/clip_export_ready.scn HTTP/1.1" 200 -
+127.0.0.1 - - [14/Oct/2026 05:44:21] "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - - [14/Oct/2026 05:44:23] "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - - [14/Oct/2026 05:44:25] "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - - [14/Oct/2026 05:44:27] "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - - [14/Oct/2026 05:44:28] "POST /scenario-receipt HTTP/1.1" 204 -

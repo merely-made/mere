@@ -672,6 +672,37 @@ mod tests {
     }
 
     #[test]
+    fn an_empty_stack_does_not_alias_the_actual_floating_tile_zero() {
+        let mut workspace = Workspace::new(TileTree::single(tile(0, "Real zero")));
+        workspace.apply(
+            &FloatEvent::Float {
+                tile: TileId(0),
+                rect: rect(0.1, 0.1, 0.5, 0.5),
+            }
+            .into(),
+        );
+        let (dom, runner) = harness(State {
+            workspace,
+            current: Some(TileId(0)),
+            layer_visible: true,
+            events: Vec::new(),
+        });
+        let dom = dom.borrow();
+        let contents = all_with_class(&dom, runner.root(), "frisket-content");
+        assert_eq!(contents.len(), 2, "empty stack and real float both render");
+        assert_eq!(
+            content_target(&*dom, contents[0]),
+            None,
+            "an empty stack has no owner"
+        );
+        assert_eq!(content_target(&*dom, contents[1]), Some(TileId(0)));
+        let slots = composited_slots(&*dom, runner.root());
+        assert_eq!(slots.len(), 1);
+        assert_eq!(slots[0].0, TileId(0));
+        assert_eq!(slots[0].2, contents[1]);
+    }
+
+    #[test]
     fn the_current_tile_marks_its_stack_and_its_float() {
         // A tile in the tree: its stack's bar is current, the other is not.
         let mut state = sample_state();

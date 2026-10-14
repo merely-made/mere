@@ -73,6 +73,10 @@ cambium-genet-winit-host = { version = "0.1.0", path = "../cambium-genet-winit-h
 # The accessibility page, mounted in a browser.
 [target.'cfg(target_arch = "wasm32")'.dev-dependencies]
 console_error_panic_hook = "0.1"
+tabard-workshop = { workspace = true, features = ["host-previews"] }
+tabard.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
 
 [[example]]
 name = "a11y_page"
@@ -84,4 +88,10 @@ crate-type = ["cdylib"]
 [[example]]
 name = "ctor_once"
 path = "examples/ctor_once/main.rs"
+crate-type = ["cdylib"]
+
+# Controlled shared-device replacement through actual full Workshop mounts.
+[[example]]
+name = "shared_recovery"
+path = "examples/shared_recovery/main.rs"
 crate-type = ["cdylib"]

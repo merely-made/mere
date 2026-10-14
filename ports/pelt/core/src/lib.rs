@@ -12,7 +12,7 @@ mod input;
 mod pool;
 mod pool_a11y;
 pub use input::{PeltInput, mouse_pointer};
-pub use pool::{PeltControllerPool, PeltPlacement};
+pub use pool::{PeltControllerPool, PeltDocumentWork, PeltPlacement};
 pub use pool_a11y::PeltPlacementA11y;
 mod surface_policy;
 mod workspace;
@@ -703,6 +703,13 @@ impl<F: 'static> PeltController<F> {
         self.framed = None;
         self.session.pump(self.clock.now_ms());
         !self.session.settled()
+    }
+
+    /// Observe scheduled work without advancing time or retiring prepared
+    /// geometry and semantic publications. Future timers are independent of
+    /// the session's script-visible completion handshake.
+    pub fn pending_work(&mut self) -> inker::session_engine::SessionPendingWork {
+        self.session.pending_work()
     }
 
     pub fn frame(&mut self, width: u32, height: u32) -> F {

@@ -1,0 +1,95 @@
+{
+  "local_date": "2026-10-13",
+  "status": "Qualified CPU durable reopening for the admitted Moot resource mount",
+  "source": {
+    "base": "e84cfbd95b1660046d646580a8707af020a06e4b",
+    "files": {
+      "Cargo.toml": "3c07bdd85839c7a89a4f1718afdbfacafd74a8394b19c42631605f7953edb432",
+      "Cargo.lock": "ee6d5cbfa03fdaa6cc181ec69dab9a4fed36f0653ae32870ad1a273cf0b95824",
+      "ports/graphshell/Cargo.toml": "f7cc17a7c013b10bd7d8befa0fae47ad30db9cc6c60b2337638831b78e8dcd9d",
+      "ports/graphshell/src/moot_resources.rs": "6f8093f025d4858c677b2e2e19779167271ba17a478256752859244037ff138c",
+      "ports/graphshell/src/moot_resources/owner.rs": "3c56c4a5b86cf4d7d2f53ec7407c4202d5e1bc9c4b0b35159b9c16e09695bb96",
+      "ports/moot/src/resource_view.rs": "f868ca8e9b05622a37be47da3617ffffa91e30d69e6f715ad05a0ba6703ea650",
+      "ports/graphshell/examples/support/moot_resources_fixture.rs": "b624b5e7dbeecf6135f7aa06920240a3a763d07b0590079f84e4741ddab9928a",
+      "ports/graphshell/tests/moot_resources.rs": "a5449a14567ff1e1732c6bf815a4690af6bbdee4263d72646fca68fc7b082f7f",
+      "ports/graphshell/tests/moot_resources_reopen.rs": "bad7497eb5ce387ce985b5130b5ac6796e22043d4ae0096e18fc9545a62c413a",
+      "ports/graphshell/docs/receipts/moot_resources_reopen_20261013/harness/Cargo.toml": "be498341e2487baf4a4fbd61c36816ca613df69d94d4c5de0f05da0671682a16",
+      "ports/graphshell/docs/receipts/moot_resources_reopen_20261013/harness/Cargo.lock": "f611e3b34abcbb1d9ffa8b11d7d363b2deb19e39f03e95a8e016db1c24ec3d26",
+      "ports/graphshell/docs/receipts/moot_resources_reopen_20261013/harness/src/lib.rs": "6ff66a9ef6cf343c5d7f531fab7f7179f4fa87a5d76ff223b0071255ed6f3500"
+    },
+    "scope": "Final standalone actual-port integration targets; CPU source identity before qualification"
+  },
+  "tests": {
+    "passed": 14,
+    "failed": 0,
+    "ignored_child_entry": 1,
+    "child_entry_executed_by_parent_twice": true,
+    "command_receipt": "checks/final-integration-targets.json",
+    "process_reports": [
+      {
+        "carrier": "verified sans-I/O fixture",
+        "pid": 2684,
+        "runtime": "CPU semantic DOM; no GPU",
+        "signed_redb_owners": true,
+        "stage": "seed"
+      },
+      {
+        "carrier": "verified sans-I/O fixture",
+        "pid": 2741,
+        "runtime": "CPU semantic DOM; no GPU",
+        "signed_redb_owners": true,
+        "stage": "reopen"
+      }
+    ],
+    "scope": "Writer exits before fresh process reopens actual signed Gemot redb owners, content and reading slots"
+  },
+  "negative_control": {
+    "scope": "Saved-reader binding only removed; reader mismatch test fails; exact source restored",
+    "receipt": "reader-binding-negative-restoration.json"
+  },
+  "limits": [
+    "CPU semantic-DOM proof; no new paint or physical-input acceptance",
+    "Verified sans-I/O supplied carrier facts; no live transport",
+    "Public unsealed local fixture; no private custody",
+    "No coop activity owner installed"
+  ],
+  "toolchain": "rustc 1.99.0 (b940084d7 2026-09-28)",
+  "checks": {
+    "strict_proof_clippy": "passed with -D warnings",
+    "actual_graphshell_clippy": "passed; five inherited warnings, including existing private-module CSS constant",
+    "port_and_graphshell_web_dependency_boundaries": "passed",
+    "metadata": {
+      "packages": 1613,
+      "shared_package_dependency_records_inspected": 776,
+      "shared_crate_to_port_edges": [],
+      "kinds": "all resolved dependency kinds, including dev and target-specific records",
+      "metadata_sha256": "a43c30cce6598723a3e516351ff849345bc85fb62365fbec926a597872de646c"
+    },
+    "format_and_diff_whitespace": "passed",
+    "documentation_delta": "No new finding identities or judgment error strings; inherited findings retained"
+  },
+  "negative_history": [
+    "Stopped first copied-harness compile after finding its old Genet source pin; original transient child-survivor report and later observed closure both retained",
+    "Saved-reader-binding mutant fails exactly the intended test; source restored byte-for-byte",
+    "Initial strict harness lint rejects duplicate fixture modules; corrected by using separate actual integration targets, without lint exemptions"
+  ],
+  "runtime_guards": {
+    "gpu_executed": false,
+    "headed_executed": false,
+    "final_command_seconds": 61.051,
+    "max_child_process_seconds": 40,
+    "owned_groups_closed": true
+  },
+  "frozen_artifacts": {
+    "moot_resources": {
+      "path": "/Users/markik/Code/output/moot-resources-reopen-20261013/moot_resources-tests-frozen",
+      "sha256": "8c0dcf4a14ef1c3b874cb9fc6d36a1ab6d6e4da0871b413602f49134c13a60be",
+      "bytes": 16617248
+    },
+    "moot_resources_reopen": {
+      "path": "/Users/markik/Code/output/moot-resources-reopen-20261013/moot_resources_reopen-tests-frozen",
+      "sha256": "f0bb7f53ddf785aadbae0a271a9161186bdbf376ec81f64ea3ca0396e3eb2eba",
+      "bytes": 19467056
+    }
+  }
+}

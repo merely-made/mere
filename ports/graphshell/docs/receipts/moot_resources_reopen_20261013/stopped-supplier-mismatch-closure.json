@@ -1,0 +1,10 @@
+{
+  "group": 92280,
+  "matching_processes": [],
+  "locks_free": [
+    "/Users/markik/Code/targets/mere-s2s3/wasm32-unknown-unknown/debug/.cargo-lock",
+    "/Users/markik/Code/targets/mere-s2s3/release/.cargo-lock",
+    "/Users/markik/Code/targets/mere-s2s3/debug/.cargo-lock"
+  ],
+  "closure": "Observed after original interrupted-command receipt; original transient child-survivor report preserved"
+}

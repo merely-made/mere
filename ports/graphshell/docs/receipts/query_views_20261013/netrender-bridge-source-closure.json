@@ -1,0 +1,172 @@
+{
+  "qualified_utc": "2026-10-14T08:34:19.768126+00:00",
+  "mere_checkpoint": "eeb59b303fd32611fdab1aea7a52a0f29b004fa0",
+  "genet_revision": "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084",
+  "netrender_revision": "6a24ae08f55129b474282b8e4911564f875ce5fd",
+  "adoption": "Published canonical Netrender source bridge to distinct WWW Git SourceID at all five resolver roots; direct and crates.io rows target the same source. No local path override.",
+  "genet_declared_netrender_revision": "c74b7cb28090c28b1c6d80b08dcdea18aff48d3e",
+  "bridge_retirement": "Remove after coordinated Genet supplier adoption unifies the published family.",
+  "manifest_census": {
+    "mere_genet_rows": 47,
+    "turnstone_genet_rows": 32,
+    "resolver_roots": 5,
+    "netrender_bridge_packages": [
+      "netrender",
+      "netrender_device",
+      "paint_list_api",
+      "paint_list_render"
+    ]
+  },
+  "manifests": [
+    {
+      "repo": "mere",
+      "path": "Cargo.toml",
+      "sha256": "c71dcb22f97d72b6e418f8b4fd726ef21afe6ec24b481de5cfb9d1bc2bacf6f2"
+    },
+    {
+      "repo": "mere",
+      "path": "ports/graphshell/web/Cargo.toml",
+      "sha256": "3d5480e9b4ab2eb28f741633949d6e9b7b81935645f17aaa7c7276224ddf1813"
+    },
+    {
+      "repo": "mere",
+      "path": "crates/cambium/examples/genet_web_smoke/Cargo.toml",
+      "sha256": "7a7ad5b982301fffcd55b0bb5309a89e1c50572f89df1e1fdb0d642f8f5ebfa1"
+    },
+    {
+      "repo": "mere",
+      "path": "ports/distillery/probe/Cargo.toml",
+      "sha256": "e16a98c3740d7047418ceb1e707a2dd532827065e36870f5c95a235f7d20f3b1"
+    },
+    {
+      "repo": "turnstone",
+      "path": "Cargo.toml",
+      "sha256": "4a59e2c1cf5e5d809ca53b2a5dba5a10e19a9da62455662e4344cd78b606fb82"
+    }
+  ],
+  "graphs": [
+    {
+      "root": "root",
+      "command": "cargo +1.99.0 metadata --manifest-path C:\\Users\\mark_\\Code\\repos\\mere\\Cargo.toml --format-version 1",
+      "exit_code": 0,
+      "package_count": 1608,
+      "metadata_file": "netrender-bridge-root-metadata.json",
+      "metadata_sha256": "470386fe1d1643c06485294810fefccb1fd2f584790bce232b137ef3d0bb9eaa",
+      "log_file": "netrender-bridge-root-metadata.log",
+      "log_sha256": "f7c77ecacc89e71f5121c5fb3a073bedc5d100e62f2c9ffd8beeaa607c20ada3",
+      "renderer_family": [
+        {
+          "name": "netrender",
+          "version": "0.1.2",
+          "id": "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#netrender@0.1.2",
+          "source": "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#6a24ae08f55129b474282b8e4911564f875ce5fd"
+        },
+        {
+          "name": "netrender_device",
+          "version": "0.1.2",
+          "id": "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#netrender_device@0.1.2",
+          "source": "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#6a24ae08f55129b474282b8e4911564f875ce5fd"
+        },
+        {
+          "name": "paint_list_api",
+          "version": "0.1.2",
+          "id": "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#paint_list_api@0.1.2",
+          "source": "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#6a24ae08f55129b474282b8e4911564f875ce5fd"
+        },
+        {
+          "name": "paint_list_render",
+          "version": "0.1.2",
+          "id": "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#paint_list_render@0.1.2",
+          "source": "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#6a24ae08f55129b474282b8e4911564f875ce5fd"
+        }
+      ],
+      "genet_sources": [
+        "git+https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084",
+        "git+https://www.github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084"
+      ],
+      "vello_sources": [
+        "git+https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243881d5b24c984d5ee35dde509ca5db782"
+      ]
+    },
+    {
+      "root": "web",
+      "command": "cargo +1.99.0 metadata --manifest-path C:\\Users\\mark_\\Code\\repos\\mere\\ports\\graphshell\\web\\Cargo.toml --format-version 1",
+      "exit_code": 0,
+      "package_count": 921,
+      "metadata_file": "netrender-bridge-web-metadata.json",
+      "metadata_sha256": "718400bc3483953e1a1fd03b85a0605880cd37080791e8272c09bd708934dc97",
+      "log_file": "netrender-bridge-web-metadata.log",
+      "log_sha256": "ea47becf27d6b8b65291342d7b6f3219a8c790045740ff5c7cc3e30187c02592",
+      "renderer_family": [
+        {
+          "name": "netrender",
+          "version": "0.1.2",
+          "id": "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#netrender@0.1.2",
+          "source": "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#6a24ae08f55129b474282b8e4911564f875ce5fd"
+        },
+        {
+          "name": "netrender_device",
+          "version": "0.1.2",
+          "id": "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#netrender_device@0.1.2",
+          "source": "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#6a24ae08f55129b474282b8e4911564f875ce5fd"
+        },
+        {
+          "name": "paint_list_api",
+          "version": "0.1.2",
+          "id": "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#paint_list_api@0.1.2",
+          "source": "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#6a24ae08f55129b474282b8e4911564f875ce5fd"
+        },
+        {
+          "name": "paint_list_render",
+          "version": "0.1.2",
+          "id": "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#paint_list_render@0.1.2",
+          "source": "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#6a24ae08f55129b474282b8e4911564f875ce5fd"
+        }
+      ],
+      "genet_sources": [
+        "git+https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084"
+      ],
+      "vello_sources": [
+        "git+https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243881d5b24c984d5ee35dde509ca5db782"
+      ]
+    }
+  ],
+  "locks": [
+    {
+      "path": "Cargo.lock",
+      "before_sha256": "851b488f6f10bfb27e62bc4d981fbcf5ac4fae519c63312797ab3ab78ecfdc64",
+      "after_sha256": "77ee8deb58748694b466d3265bc829bab8e3c992326396bf9019f9792d907b89",
+      "package_count": 1760,
+      "source_rows_replaced": 4,
+      "unrelated_package_version_source_checksum_changes": 0,
+      "non_source_diff_lines": 0
+    },
+    {
+      "path": "ports/graphshell/web/Cargo.lock",
+      "before_sha256": "d652724ce18a084a8208a412c5ca6bba37dcdc802d4d145c16fe6d445385181b",
+      "after_sha256": "5bbe25d3bb0fb41fbd8f76b007fa3e7913c83aa3825711b98355892a4cb1c89b",
+      "package_count": 1128,
+      "source_rows_replaced": 27,
+      "unrelated_package_version_source_checksum_changes": 0,
+      "non_source_diff_lines": 0
+    }
+  ],
+  "turnstone_primary_lock_sha256_at_release": "432883312ec370221f2a383e98ffb1e3a2bf735a235ab35c32621cc9901a2fb3",
+  "turnstone_lock_modified_by_this_lane": false,
+  "turnstone_current_lock_custody": "A4 agent owns its temporary local-path integration lock after manifest/cache release.",
+  "environment": {
+    "toolchain": "1.99.0",
+    "cargo_target_dir": "C:\\t\\cargo-targets\\mere",
+    "cargo_build_build_dir": "C:\\t\\cargo-targets\\mere\\build",
+    "execution": "Mere root then standalone web metadata, serialized; no builds."
+  },
+  "existing_warning": "Root canonical layout-dom-api patch is unused; active layout-dom-api uses established WWW Genet b6 bridge. No renderer family duplicate.",
+  "qualification_boundary": "Actual normal root and standalone web resolver closure only. Native, Wasm, GPU and physical integration gates remain with their owners.",
+  "cache": {
+    "canonical_genet_b6_complete": true,
+    "www_genet_b6_complete": true,
+    "isolated_cargo_home_created": false,
+    "worktree_created": false,
+    "cargo_owner_released": true
+  }
+}

@@ -23,12 +23,12 @@ two peers may never be online together.
 - [`../implementation_strategy/2026-07-12_deletion_retention_and_native_drop_plan.md`](../implementation_strategy/2026-07-12_deletion_retention_and_native_drop_plan.md)
   decision 6, "the drop is a carrier, not a second sync engine," and its seam
   table row "no delay-tolerant application bundle," both bind here.
-- `retinue/design_docs/2026-08-25_compact_signed_feed_and_local_control_plan.md`
+- `murm/design_docs/2026-08-25_compact_signed_feed_and_local_control_plan.md`
   owns the MC family (compact carriage of p2panda operations) and the MC0
   control case the spike in §7 reuses. Its warning against a second
   replication authority beneath stickleback is honoured by ruling 3.
 - Code: [`crates/stickleback/src/joined_space.rs`](../../../crates/stickleback/src/joined_space.rs)
-  (the iroh-bound sync driver), [`retinue/native/crates/transport/src/reticulum_transport.rs`](https://github.com/merely-made/retinue/blob/b49df894635bac95823284efee6c445885eaf62a/native/crates/transport/src/reticulum_transport.rs)
+  (the iroh-bound sync driver), [`murm/native/crates/transport/src/reticulum_transport.rs`](https://github.com/merely-made/murm/blob/b49df894635bac95823284efee6c445885eaf62a/native/crates/transport/src/reticulum_transport.rs)
    (the carrier), `crates/p2panda` *(historical citation)* <!-- doc-audit: historical-path --> under `Code/crates` (the fork surveyed).
 
 ---
@@ -53,7 +53,7 @@ vocabulary with a different driver," not a new protocol. Three session shapes
 | Ingest and ordering | p2panda-stream has no networking dependency; its causal orderer keeps the pending queue in the store, so late and out-of-order arrival is the designed case. Stickleback's processor adds retained-frontier continuity and prune-aware backlink checks. | `p2panda-stream/src/lib.rs`, `crates/stickleback/src/processor.rs` |
 | Bundle | Native drop: manifest, self-delimiting records, staged resume by `DropId`, `DropReceipt` as the one anti-retransmission primitive. Limits are desktop-shaped (64 MiB protected, 16 MiB per record); `CausalLimits` carries a source comment saying it is "not a radio budget." | `crates/stickleback/src/{drop,drop_io,receipt,causal}.rs` |
 | Courier store | Outrider propagation node: opaque `(destination, ciphertext)` by transient id, proof-of-work admission, capacity eviction, age expiry, two-stage offer / want-handled / serve fetch. Never decrypts. Defaults: 240 bytes per message, one per fetch. | `retinue/crates/outrider/src/propagation.rs` |
-| Reconciliation | None a non-iroh carrier can use. `JoinedSpace::join` takes `p2panda_net::{Endpoint, Gossip}` and builds LogSync over iroh QUIC plus an iroh-gossip overlay. The direct session trigger upstream is `#[cfg(test)]`. The only bilateral operation lane, murm's session lane, is a one-way push with no frontier, want-list, ack or resume. | `joined_space.rs:133-172`; `p2panda-net/src/sync/handle.rs:76-86`; `retinue/native/crates/murm/src/session_lane.rs` |
+| Reconciliation | None a non-iroh carrier can use. `JoinedSpace::join` takes `p2panda_net::{Endpoint, Gossip}` and builds LogSync over iroh QUIC plus an iroh-gossip overlay. The direct session trigger upstream is `#[cfg(test)]`. The only bilateral operation lane, murm's session lane, is a one-way push with no frontier, want-list, ack or resume. | `joined_space.rs:133-172`; `p2panda-net/src/sync/handle.rs:76-86`; `murm/native/crates/murm/src/session_lane.rs` |
 
 **Strongest receipt.** The archived Commons direct-PHY RF receipt of
 2026-07-27: one 1,177-byte signed, group-encrypted Commons operation crossed

@@ -1,0 +1,121 @@
+{
+  "status": "PASS",
+  "label": "mere-metadata-admit-r3",
+  "command": [
+    "/Users/markik/.rustup/toolchains/1.99.0-x86_64-apple-darwin/bin/cargo",
+    "metadata",
+    "--offline",
+    "--format-version",
+    "1"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-vello-font-integration",
+  "lease": {
+    "status": "leased",
+    "thread_id": "01a126c3-a147-7ac2-8c40-98e5dd24eaff",
+    "coordinator_thread_id": "01a1195d-a29f-7d50-92dc-6864b439c1ac",
+    "operation_id": "GENET561_GIT_ONLY_CONSUMER_INTEGRATION_CPU",
+    "started_at": "2026-10-14T03:02:50.148647+00:00",
+    "deadline": "2026-10-14T03:17:50.148647+00:00",
+    "worktree": "/Users/markik/Code/worktrees/mere-vello-font-integration",
+    "scope": "Exact thirteen offline Cargo commands and resolved native/Wasm cone audit from offline-r3-preparation; first unresolved issue stops batch; only named CPU font/key tests and shared-recovery Wasmcheck after coherence",
+    "preparation": {
+      "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/offline-r3-preparation.json",
+      "sha256": "3fc4c7d6b6351e4378f60f96bf158ffed879be1c6ce627048f20ffde14efef7a"
+    },
+    "driver": {
+      "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/run_cpu_offline_r3.py",
+      "sha256": "e7b3fd40d558fc047930a23428c5c2243934073a20a921e3284d110332054fce"
+    },
+    "helper": {
+      "path": "/Users/markik/Code/output/vello-font-git-only-integration-20261014/owned_compiler_utc.py",
+      "sha256": "728c0d1857d350e58d4988e7fb32e0542f79a00b48bee75c82ed73d5ed969fe0"
+    },
+    "source_head": "0fd8adf82725546789c9cc0553a1c2f5f551cbe2",
+    "prepared_manifest_sha256": {
+      "/Users/markik/Code/worktrees/mere-vello-font-integration/Cargo.toml": "0c2dc5815fa5e5a84ddd30b7de585becebc2e60a8a691bcd1392bc81a318b41b",
+      "/Users/markik/Code/worktrees/mere-vello-font-integration/crates/cambium/examples/genet_web_smoke/Cargo.toml": "7e719ed9c8fd6b63ec659a783c79efdbaba5ee6e8a6d5e72bb9acb7ea24e9114",
+      "/Users/markik/Code/worktrees/mere-vello-font-integration/ports/distillery/probe/Cargo.toml": "cbaaed471d094c08f0b917db59d12a2b5f7fe14778ce9e48dffa14896fdda096",
+      "/Users/markik/Code/worktrees/mere-vello-font-integration/ports/graphshell/web/Cargo.toml": "b426a6a32bc4fd22ec35b152dde650fcf39e5c34055d0362ac54babdb5d3d0e2"
+    },
+    "build_paths": {
+      "CARGO_TARGET_DIR": "/Users/markik/Code/targets/mere-s2s3",
+      "CARGO_BUILD_BUILD_DIR": "/Users/markik/Code/targets/mere-s2s3/build"
+    },
+    "jobs": 2,
+    "debug": 0,
+    "incremental": 0,
+    "test_threads": 1,
+    "min_start_free_bytes": 2147483648,
+    "min_live_free_bytes": 1342177280,
+    "command_work_seconds": 180,
+    "command_cleanup_seconds": 10,
+    "free_bytes_at_grant": 50280157184,
+    "idle_evidence": {
+      "locks_free": [
+        "debug/.cargo-lock",
+        "release/.cargo-lock",
+        "wasm32-unknown-unknown/debug/.cargo-lock"
+      ],
+      "build_lock_absent": true,
+      "matching_processes": []
+    },
+    "excluded": [
+      "network retry",
+      "GPU/native window/browser/measurement",
+      "cache cleanup",
+      "local path supplier override",
+      "new URL alias",
+      "automatic extension or retry"
+    ],
+    "preservation": "Preserve frozen R6/site inputs, all private configs, borrowed Git checkouts, existing pack garbage and prior receipts; archive four pre-admission locks before Cargo metadata writes",
+    "release": "Explicit one completion/return with exact receipts, normal child reap and present group/lock absence; no implied runtime acceptance"
+  },
+  "lease_sha256": "47ffaf4dbffeeef3b562f91efd1c038f65976b36a67a59c1afbc56b29db7a890",
+  "helper_sha256": "728c0d1857d350e58d4988e7fb32e0542f79a00b48bee75c82ed73d5ed969fe0",
+  "started_at": "2026-10-14T03:04:17.300908+00:00",
+  "work_budget_seconds": 180,
+  "cleanup_seconds": 10,
+  "environment": {
+    "CARGO_TARGET_DIR": "/Users/markik/Code/targets/mere-s2s3",
+    "CARGO_BUILD_BUILD_DIR": "/Users/markik/Code/targets/mere-s2s3/build",
+    "CARGO_BUILD_JOBS": "2",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "RUSTC": "/Users/markik/.rustup/toolchains/1.99.0-x86_64-apple-darwin/bin/rustc",
+    "RUSTFLAGS": null
+  },
+  "exit_code": 0,
+  "cleanup": {
+    "cargo": {
+      "closed": true,
+      "final": {
+        "state": "gone",
+        "members": [],
+        "exit_code": 0,
+        "retries": []
+      },
+      "steps": [
+        {
+          "at": "2026-10-14T03:05:26.386354+00:00",
+          "observation": {
+            "state": "gone",
+            "members": [],
+            "exit_code": 0,
+            "retries": []
+          }
+        }
+      ],
+      "exit_code": 0
+    }
+  },
+  "owned_groups_closed": true,
+  "interrupts": [],
+  "ended_at": "2026-10-14T03:05:26.387242+00:00",
+  "elapsed_seconds": 69.08594794000001,
+  "within_deadline": true,
+  "output_sha256": {
+    "stdout": "415cd1aa804ff8e1271512ad88973cba63e0d0e147d15d063a8d99db925afc13",
+    "stderr": "263e7f5e315873005727cced2afb8464dbd9f2ec3c1075aa5a32782594ea9afd"
+  }
+}

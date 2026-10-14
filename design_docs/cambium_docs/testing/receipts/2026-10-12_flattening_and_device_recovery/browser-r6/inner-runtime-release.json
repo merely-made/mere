@@ -1,0 +1,1823 @@
+{
+  "started_at": "2026-10-14T02:16:02.272Z",
+  "finished_at": "2026-10-14T02:16:05.276Z",
+  "within_absolute_lease": true,
+  "within_cleanup_budget": true,
+  "owned_chrome_pid": 16722,
+  "ownership_steps": [
+    {
+      "state": "retry",
+      "members": [],
+      "reason": "bounded ps observer expired: TimeoutExpired(['/bin/ps', '-axo', 'pid=,ppid=,pgid=,uid=,stat=,lstart=,comm='], 0.01)",
+      "retries": [
+        "group changed during complete observation"
+      ],
+      "owner": {
+        "schema": "owned-browser-process-v2",
+        "pid": 16722,
+        "pgid": 16722,
+        "uid": 501,
+        "parent_pid": 16619,
+        "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        "profile": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/owned-chrome-profile-2613d1",
+        "launch_epoch_seconds": 1791944144.333,
+        "known": {
+          "16722": {
+            "start": "Tue Oct 13 22:15:44 2026",
+            "birth": [
+              1791944144,
+              334112
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+            "uid": 501,
+            "parent_at_birth": 16619,
+            "zombie": false
+          },
+          "16810": {
+            "start": "Tue Oct 13 22:15:49 2026",
+            "birth": [
+              1791944149,
+              954205
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16811": {
+            "start": "Tue Oct 13 22:15:49 2026",
+            "birth": [
+              1791944149,
+              975009
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16812": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              33078
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16821": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              235568
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16823": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              275147
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16832": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              865784
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16837": {
+            "start": "Tue Oct 13 22:15:51 2026",
+            "birth": [
+              1791944151,
+              171294
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16838": {
+            "start": "Tue Oct 13 22:15:51 2026",
+            "birth": [
+              1791944151,
+              195259
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16840": {
+            "start": "Tue Oct 13 22:15:51 2026",
+            "birth": [
+              1791944151,
+              226175
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16874": {
+            "start": "Tue Oct 13 22:15:52 2026",
+            "birth": [
+              1791944152,
+              932707
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16882": {
+            "start": "Tue Oct 13 22:15:53 2026",
+            "birth": [
+              1791944153,
+              64631
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16885": {
+            "start": "Tue Oct 13 22:15:53 2026",
+            "birth": [
+              1791944153,
+              301198
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          }
+        },
+        "leader_reaped": false
+      }
+    },
+    {
+      "state": "owned",
+      "members": [
+        {
+          "pid": 16722,
+          "ppid": 16619,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "Ss",
+          "start": "Tue Oct 13 22:15:44 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        },
+        {
+          "pid": 16810,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:49 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 16811,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:49 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 16812,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:50 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 16821,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:50 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 16823,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:50 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 16832,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:50 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 16837,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:51 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 16874,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:52 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 16882,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:53 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        }
+      ],
+      "reason": null,
+      "retries": [],
+      "owner": {
+        "schema": "owned-browser-process-v2",
+        "pid": 16722,
+        "pgid": 16722,
+        "uid": 501,
+        "parent_pid": 16619,
+        "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        "profile": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/owned-chrome-profile-2613d1",
+        "launch_epoch_seconds": 1791944144.333,
+        "known": {
+          "16722": {
+            "start": "Tue Oct 13 22:15:44 2026",
+            "birth": [
+              1791944144,
+              334112
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+            "uid": 501,
+            "parent_at_birth": 16619,
+            "zombie": false
+          },
+          "16810": {
+            "start": "Tue Oct 13 22:15:49 2026",
+            "birth": [
+              1791944149,
+              954205
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16811": {
+            "start": "Tue Oct 13 22:15:49 2026",
+            "birth": [
+              1791944149,
+              975009
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16812": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              33078
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16821": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              235568
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16823": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              275147
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16832": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              865784
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16837": {
+            "start": "Tue Oct 13 22:15:51 2026",
+            "birth": [
+              1791944151,
+              171294
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16838": {
+            "start": "Tue Oct 13 22:15:51 2026",
+            "birth": [
+              1791944151,
+              195259
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16840": {
+            "start": "Tue Oct 13 22:15:51 2026",
+            "birth": [
+              1791944151,
+              226175
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16874": {
+            "start": "Tue Oct 13 22:15:52 2026",
+            "birth": [
+              1791944152,
+              932707
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16882": {
+            "start": "Tue Oct 13 22:15:53 2026",
+            "birth": [
+              1791944153,
+              64631
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16885": {
+            "start": "Tue Oct 13 22:15:53 2026",
+            "birth": [
+              1791944153,
+              301198
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          }
+        },
+        "leader_reaped": false
+      }
+    },
+    {
+      "state": "retry",
+      "members": [],
+      "reason": "bounded ps observer expired: TimeoutExpired(['/bin/ps', '-axo', 'pid=,ppid=,pgid=,uid=,stat=,lstart=,comm='], 0.155665211)",
+      "retries": [],
+      "owner": {
+        "schema": "owned-browser-process-v2",
+        "pid": 16722,
+        "pgid": 16722,
+        "uid": 501,
+        "parent_pid": 16619,
+        "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        "profile": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/owned-chrome-profile-2613d1",
+        "launch_epoch_seconds": 1791944144.333,
+        "known": {
+          "16722": {
+            "start": "Tue Oct 13 22:15:44 2026",
+            "birth": [
+              1791944144,
+              334112
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+            "uid": 501,
+            "parent_at_birth": 16619,
+            "zombie": false
+          },
+          "16810": {
+            "start": "Tue Oct 13 22:15:49 2026",
+            "birth": [
+              1791944149,
+              954205
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16811": {
+            "start": "Tue Oct 13 22:15:49 2026",
+            "birth": [
+              1791944149,
+              975009
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16812": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              33078
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16821": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              235568
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16823": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              275147
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16832": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              865784
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16837": {
+            "start": "Tue Oct 13 22:15:51 2026",
+            "birth": [
+              1791944151,
+              171294
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16838": {
+            "start": "Tue Oct 13 22:15:51 2026",
+            "birth": [
+              1791944151,
+              195259
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16840": {
+            "start": "Tue Oct 13 22:15:51 2026",
+            "birth": [
+              1791944151,
+              226175
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16874": {
+            "start": "Tue Oct 13 22:15:52 2026",
+            "birth": [
+              1791944152,
+              932707
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16882": {
+            "start": "Tue Oct 13 22:15:53 2026",
+            "birth": [
+              1791944153,
+              64631
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16885": {
+            "start": "Tue Oct 13 22:15:53 2026",
+            "birth": [
+              1791944153,
+              301198
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          }
+        },
+        "leader_reaped": false
+      },
+      "signal_sent": false
+    },
+    {
+      "state": "retry",
+      "members": [],
+      "reason": "bounded ps observer expired: TimeoutExpired(['/bin/ps', '-axo', 'pid=,ppid=,pgid=,uid=,stat=,lstart=,comm='], 0.01)",
+      "retries": [
+        "group changed during complete observation"
+      ],
+      "owner": {
+        "schema": "owned-browser-process-v2",
+        "pid": 16722,
+        "pgid": 16722,
+        "uid": 501,
+        "parent_pid": 16619,
+        "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        "profile": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/owned-chrome-profile-2613d1",
+        "launch_epoch_seconds": 1791944144.333,
+        "known": {
+          "16722": {
+            "start": "Tue Oct 13 22:15:44 2026",
+            "birth": [
+              1791944144,
+              334112
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+            "uid": 501,
+            "parent_at_birth": 16619,
+            "zombie": false
+          },
+          "16810": {
+            "start": "Tue Oct 13 22:15:49 2026",
+            "birth": [
+              1791944149,
+              954205
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16811": {
+            "start": "Tue Oct 13 22:15:49 2026",
+            "birth": [
+              1791944149,
+              975009
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16812": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              33078
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16821": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              235568
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16823": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              275147
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16832": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              865784
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16837": {
+            "start": "Tue Oct 13 22:15:51 2026",
+            "birth": [
+              1791944151,
+              171294
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16838": {
+            "start": "Tue Oct 13 22:15:51 2026",
+            "birth": [
+              1791944151,
+              195259
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16840": {
+            "start": "Tue Oct 13 22:15:51 2026",
+            "birth": [
+              1791944151,
+              226175
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16874": {
+            "start": "Tue Oct 13 22:15:52 2026",
+            "birth": [
+              1791944152,
+              932707
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16882": {
+            "start": "Tue Oct 13 22:15:53 2026",
+            "birth": [
+              1791944153,
+              64631
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16885": {
+            "start": "Tue Oct 13 22:15:53 2026",
+            "birth": [
+              1791944153,
+              301198
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          }
+        },
+        "leader_reaped": false
+      }
+    },
+    {
+      "state": "owned",
+      "members": [
+        {
+          "pid": 16722,
+          "ppid": 16619,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "Ss",
+          "start": "Tue Oct 13 22:15:44 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        },
+        {
+          "pid": 16810,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:49 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 16811,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "R",
+          "start": "Tue Oct 13 22:15:49 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 16812,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:50 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 16821,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:50 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 16823,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:50 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 16832,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:50 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 16837,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:51 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 16874,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:52 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 16882,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:53 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        }
+      ],
+      "reason": null,
+      "retries": [],
+      "owner": {
+        "schema": "owned-browser-process-v2",
+        "pid": 16722,
+        "pgid": 16722,
+        "uid": 501,
+        "parent_pid": 16619,
+        "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        "profile": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/owned-chrome-profile-2613d1",
+        "launch_epoch_seconds": 1791944144.333,
+        "known": {
+          "16722": {
+            "start": "Tue Oct 13 22:15:44 2026",
+            "birth": [
+              1791944144,
+              334112
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+            "uid": 501,
+            "parent_at_birth": 16619,
+            "zombie": false
+          },
+          "16810": {
+            "start": "Tue Oct 13 22:15:49 2026",
+            "birth": [
+              1791944149,
+              954205
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16811": {
+            "start": "Tue Oct 13 22:15:49 2026",
+            "birth": [
+              1791944149,
+              975009
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16812": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              33078
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16821": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              235568
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16823": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              275147
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16832": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              865784
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16837": {
+            "start": "Tue Oct 13 22:15:51 2026",
+            "birth": [
+              1791944151,
+              171294
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16838": {
+            "start": "Tue Oct 13 22:15:51 2026",
+            "birth": [
+              1791944151,
+              195259
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16840": {
+            "start": "Tue Oct 13 22:15:51 2026",
+            "birth": [
+              1791944151,
+              226175
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16874": {
+            "start": "Tue Oct 13 22:15:52 2026",
+            "birth": [
+              1791944152,
+              932707
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16882": {
+            "start": "Tue Oct 13 22:15:53 2026",
+            "birth": [
+              1791944153,
+              64631
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16885": {
+            "start": "Tue Oct 13 22:15:53 2026",
+            "birth": [
+              1791944153,
+              301198
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          }
+        },
+        "leader_reaped": false
+      }
+    },
+    {
+      "state": "owned",
+      "members": [
+        {
+          "pid": 16722,
+          "ppid": 16619,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "Ss",
+          "start": "Tue Oct 13 22:15:44 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        },
+        {
+          "pid": 16810,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:49 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 16811,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:49 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 16812,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:50 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 16821,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:50 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 16823,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:50 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 16832,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:50 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 16837,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:51 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 16874,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:52 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 16882,
+          "ppid": 16722,
+          "pgid": 16722,
+          "uid": 501,
+          "stat": "S",
+          "start": "Tue Oct 13 22:15:53 2026",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        }
+      ],
+      "reason": null,
+      "retries": [],
+      "owner": {
+        "schema": "owned-browser-process-v2",
+        "pid": 16722,
+        "pgid": 16722,
+        "uid": 501,
+        "parent_pid": 16619,
+        "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        "profile": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/owned-chrome-profile-2613d1",
+        "launch_epoch_seconds": 1791944144.333,
+        "known": {
+          "16722": {
+            "start": "Tue Oct 13 22:15:44 2026",
+            "birth": [
+              1791944144,
+              334112
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+            "uid": 501,
+            "parent_at_birth": 16619,
+            "zombie": false
+          },
+          "16810": {
+            "start": "Tue Oct 13 22:15:49 2026",
+            "birth": [
+              1791944149,
+              954205
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16811": {
+            "start": "Tue Oct 13 22:15:49 2026",
+            "birth": [
+              1791944149,
+              975009
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16812": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              33078
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16821": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              235568
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16823": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              275147
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16832": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              865784
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16837": {
+            "start": "Tue Oct 13 22:15:51 2026",
+            "birth": [
+              1791944151,
+              171294
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16838": {
+            "start": "Tue Oct 13 22:15:51 2026",
+            "birth": [
+              1791944151,
+              195259
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16840": {
+            "start": "Tue Oct 13 22:15:51 2026",
+            "birth": [
+              1791944151,
+              226175
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16874": {
+            "start": "Tue Oct 13 22:15:52 2026",
+            "birth": [
+              1791944152,
+              932707
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16882": {
+            "start": "Tue Oct 13 22:15:53 2026",
+            "birth": [
+              1791944153,
+              64631
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16885": {
+            "start": "Tue Oct 13 22:15:53 2026",
+            "birth": [
+              1791944153,
+              301198
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          }
+        },
+        "leader_reaped": false
+      },
+      "signal_sent": true,
+      "signal": 15
+    },
+    {
+      "state": "unknown",
+      "members": [],
+      "reason": "RuntimeError('LIVE exact identity unavailable for PID17085')",
+      "retries": [],
+      "owner": {
+        "schema": "owned-browser-process-v2",
+        "pid": 16722,
+        "pgid": 16722,
+        "uid": 501,
+        "parent_pid": 16619,
+        "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        "profile": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/owned-chrome-profile-2613d1",
+        "launch_epoch_seconds": 1791944144.333,
+        "known": {
+          "16722": {
+            "start": "Tue Oct 13 22:15:44 2026",
+            "birth": [
+              1791944144,
+              334112
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+            "uid": 501,
+            "parent_at_birth": 16619,
+            "zombie": false
+          },
+          "16810": {
+            "start": "Tue Oct 13 22:15:49 2026",
+            "birth": [
+              1791944149,
+              954205
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16811": {
+            "start": "Tue Oct 13 22:15:49 2026",
+            "birth": [
+              1791944149,
+              975009
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16812": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              33078
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16821": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              235568
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16823": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              275147
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16832": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              865784
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16837": {
+            "start": "Tue Oct 13 22:15:51 2026",
+            "birth": [
+              1791944151,
+              171294
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16838": {
+            "start": "Tue Oct 13 22:15:51 2026",
+            "birth": [
+              1791944151,
+              195259
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16840": {
+            "start": "Tue Oct 13 22:15:51 2026",
+            "birth": [
+              1791944151,
+              226175
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16874": {
+            "start": "Tue Oct 13 22:15:52 2026",
+            "birth": [
+              1791944152,
+              932707
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16882": {
+            "start": "Tue Oct 13 22:15:53 2026",
+            "birth": [
+              1791944153,
+              64631
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16885": {
+            "start": "Tue Oct 13 22:15:53 2026",
+            "birth": [
+              1791944153,
+              301198
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "17083": {
+            "start": "Tue Oct 13 22:16:04 2026",
+            "birth": [
+              1791944164,
+              552207
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "17084": {
+            "start": "Tue Oct 13 22:16:04 2026",
+            "birth": [
+              1791944164,
+              584271
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          }
+        },
+        "leader_reaped": true,
+        "exit_code": 0,
+        "exit_signal": null
+      }
+    },
+    {
+      "state": "gone",
+      "members": [],
+      "reason": null,
+      "retries": [],
+      "owner": {
+        "schema": "owned-browser-process-v2",
+        "pid": 16722,
+        "pgid": 16722,
+        "uid": 501,
+        "parent_pid": 16619,
+        "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        "profile": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/owned-chrome-profile-2613d1",
+        "launch_epoch_seconds": 1791944144.333,
+        "known": {
+          "16722": {
+            "start": "Tue Oct 13 22:15:44 2026",
+            "birth": [
+              1791944144,
+              334112
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+            "uid": 501,
+            "parent_at_birth": 16619,
+            "zombie": false
+          },
+          "16810": {
+            "start": "Tue Oct 13 22:15:49 2026",
+            "birth": [
+              1791944149,
+              954205
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16811": {
+            "start": "Tue Oct 13 22:15:49 2026",
+            "birth": [
+              1791944149,
+              975009
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16812": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              33078
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16821": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              235568
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16823": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              275147
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16832": {
+            "start": "Tue Oct 13 22:15:50 2026",
+            "birth": [
+              1791944150,
+              865784
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16837": {
+            "start": "Tue Oct 13 22:15:51 2026",
+            "birth": [
+              1791944151,
+              171294
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16838": {
+            "start": "Tue Oct 13 22:15:51 2026",
+            "birth": [
+              1791944151,
+              195259
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16840": {
+            "start": "Tue Oct 13 22:15:51 2026",
+            "birth": [
+              1791944151,
+              226175
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16874": {
+            "start": "Tue Oct 13 22:15:52 2026",
+            "birth": [
+              1791944152,
+              932707
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16882": {
+            "start": "Tue Oct 13 22:15:53 2026",
+            "birth": [
+              1791944153,
+              64631
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "16885": {
+            "start": "Tue Oct 13 22:15:53 2026",
+            "birth": [
+              1791944153,
+              301198
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "17083": {
+            "start": "Tue Oct 13 22:16:04 2026",
+            "birth": [
+              1791944164,
+              552207
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          },
+          "17084": {
+            "start": "Tue Oct 13 22:16:04 2026",
+            "birth": [
+              1791944164,
+              584271
+            ],
+            "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "uid": 501,
+            "parent_at_birth": 16722,
+            "zombie": false
+          }
+        },
+        "leader_reaped": true,
+        "exit_code": 0,
+        "exit_signal": null
+      }
+    }
+  ],
+  "final_ownership": {
+    "state": "gone",
+    "members": [],
+    "reason": null,
+    "retries": [],
+    "owner": {
+      "schema": "owned-browser-process-v2",
+      "pid": 16722,
+      "pgid": 16722,
+      "uid": 501,
+      "parent_pid": 16619,
+      "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      "profile": "/Users/markik/Code/output/vello-next-gates-20261013/browser/run-r6/owned-chrome-profile-2613d1",
+      "launch_epoch_seconds": 1791944144.333,
+      "known": {
+        "16722": {
+          "start": "Tue Oct 13 22:15:44 2026",
+          "birth": [
+            1791944144,
+            334112
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+          "uid": 501,
+          "parent_at_birth": 16619,
+          "zombie": false
+        },
+        "16810": {
+          "start": "Tue Oct 13 22:15:49 2026",
+          "birth": [
+            1791944149,
+            954205
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        },
+        "16811": {
+          "start": "Tue Oct 13 22:15:49 2026",
+          "birth": [
+            1791944149,
+            975009
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        },
+        "16812": {
+          "start": "Tue Oct 13 22:15:50 2026",
+          "birth": [
+            1791944150,
+            33078
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        },
+        "16821": {
+          "start": "Tue Oct 13 22:15:50 2026",
+          "birth": [
+            1791944150,
+            235568
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        },
+        "16823": {
+          "start": "Tue Oct 13 22:15:50 2026",
+          "birth": [
+            1791944150,
+            275147
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        },
+        "16832": {
+          "start": "Tue Oct 13 22:15:50 2026",
+          "birth": [
+            1791944150,
+            865784
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        },
+        "16837": {
+          "start": "Tue Oct 13 22:15:51 2026",
+          "birth": [
+            1791944151,
+            171294
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        },
+        "16838": {
+          "start": "Tue Oct 13 22:15:51 2026",
+          "birth": [
+            1791944151,
+            195259
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        },
+        "16840": {
+          "start": "Tue Oct 13 22:15:51 2026",
+          "birth": [
+            1791944151,
+            226175
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        },
+        "16874": {
+          "start": "Tue Oct 13 22:15:52 2026",
+          "birth": [
+            1791944152,
+            932707
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        },
+        "16882": {
+          "start": "Tue Oct 13 22:15:53 2026",
+          "birth": [
+            1791944153,
+            64631
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        },
+        "16885": {
+          "start": "Tue Oct 13 22:15:53 2026",
+          "birth": [
+            1791944153,
+            301198
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        },
+        "17083": {
+          "start": "Tue Oct 13 22:16:04 2026",
+          "birth": [
+            1791944164,
+            552207
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        },
+        "17084": {
+          "start": "Tue Oct 13 22:16:04 2026",
+          "birth": [
+            1791944164,
+            584271
+          ],
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.83/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+          "uid": 501,
+          "parent_at_birth": 16722,
+          "zombie": false
+        }
+      },
+      "leader_reaped": true,
+      "exit_code": 0,
+      "exit_signal": null
+    }
+  },
+  "process_group_gone": true,
+  "owned_server_closed": true,
+  "errors": [],
+  "scope": "only this freshly spawned Chrome process group, private profile, context, and loopback server; no user browser/profile or external server"
+}

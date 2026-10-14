@@ -1,0 +1,33 @@
+{
+  "build_dir": "C:/t/cargo-targets/mere/build",
+  "cwd": "ports/graphshell/web",
+  "command": "cargo +1.99.0 build --target wasm32-unknown-unknown --locked --offline -j1",
+  "source_head": "eeb59b303fd32611fdab1aea7a52a0f29b004fa0",
+  "genet": "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084",
+  "netrender": "6a24ae08f55129b474282b8e4911564f875ce5fd",
+  "wasm_bindgen": "wasm-bindgen 0.2.129",
+  "target": "C:/t/cargo-targets/mere",
+  "rust": "1.99.0",
+  "files": [
+    {
+      "sha256": "f9e851ea578772de7b79194e9fbba0f5e695bfc52690a7df9be4b7cfb7a53650",
+      "bytes": 491525632,
+      "path": "C:\\t\\cargo-targets\\mere\\retained-content-browser\\graphshell_web_bg.wasm"
+    },
+    {
+      "sha256": "5980557725486549d551dd590ed72243b78338f947dc06fb7d49ef34f9c139e9",
+      "bytes": 161697,
+      "path": "C:\\t\\cargo-targets\\mere\\retained-content-browser\\graphshell_web.js"
+    },
+    {
+      "sha256": "1d34b8cebf80812ed8511c8b9079309d040cc7ff9590252c717ad5bd45b1d40b",
+      "bytes": 8433,
+      "path": "C:\\t\\cargo-targets\\mere\\retained-content-browser\\graphshell_web.d.ts"
+    },
+    {
+      "sha256": "bbeb4b2f5109aa86b1b3c290e810a05619356c242900a2e3332395a0a813b983",
+      "bytes": 6293,
+      "path": "C:\\t\\cargo-targets\\mere\\retained-content-browser\\graphshell_web_bg.wasm.d.ts"
+    }
+  ]
+}

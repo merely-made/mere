@@ -1,0 +1,1056 @@
+{
+  "scenario": {
+    "state": "running",
+    "errors": [
+      "panicked at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library/std/src/sys/time/unsupported.rs:35:9:\ntime not implemented on this platform\n\nStack:\n\nError\n    at __wbg_new_227d7c05414eb861 (http://127.0.0.1:8882/pkg/graphshell_web.js:1249:25)\n    at graphshell_web.wasm.<console_error_panic_hook[f13602e5b17a8d60]::Error>::new::__wbg_new_227d7c05414eb861 externref shim (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[375846]:0x4673fa7)\n    at graphshell_web.wasm.<console_error_panic_hook[f13602e5b17a8d60]::Error>::new (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[231556]:0x403ac7d)\n    at graphshell_web.wasm.console_error_panic_hook[f13602e5b17a8d60]::hook_impl (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[87127]:0x30a1d54)\n    at graphshell_web.wasm.console_error_panic_hook[f13602e5b17a8d60]::hook (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[335771]:0x4535f33)\n    at graphshell_web.wasm.<console_error_panic_hook[f13602e5b17a8d60]::hook as core[608f92abc48d28da]::ops::function::Fn<(&std[359a46decee746ed]::panic::PanicHookInfo,)>>::call (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[290005]:0x436028c)\n    at graphshell_web.wasm.std[359a46decee746ed]::panicking::panic_with_hook (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[61355]:0x2b6b726)\n    at graphshell_web.wasm.std[359a46decee746ed]::panicking::panic_handler::{closure#0} (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[135304]:0x37b62a1)\n    at graphshell_web.wasm.std[359a46decee746ed]::sys::backtrace::__rust_end_short_backtrace::<std[359a46decee746ed]::panicking::panic_handler::{closure#0}, !> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[382076]:0x4686c30)\n    at graphshell_web.wasm.__rustc[9d087a5ab36ea756]::rust_begin_unwind (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[300417]:0x43d4b63)\n    at graphshell_web.wasm.core[608f92abc48d28da]::panicking::panic_fmt (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[244530]:0x4106a42)\n    at graphshell_web.wasm.<std[359a46decee746ed]::time::SystemTime>::now (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[376877]:0x4677b54)\n    at graphshell_web.wasm.oxsdatatypes[3772cf2e99a831d2]::date_time::since_unix_epoch (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[137955]:0x38077bf)\n    at graphshell_web.wasm.<oxsdatatypes[3772cf2e99a831d2]::date_time::Timestamp>::now[1] (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[54070]:0x299158d)\n    at graphshell_web.wasm.<oxsdatatypes[3772cf2e99a831d2]::date_time::DateTime>::now[1] (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[241306]:0x40d55f7)\n    at graphshell_web.wasm.<spareval[8f3f03b1ab4919c8]::eval::Timer>::now (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[241307]:0x40d5636)\n    at graphshell_web.wasm.<spareval[8f3f03b1ab4919c8]::PreparedQuery>::explain::<linked_data[b890df07538a28c5]::query::dataset::GraphDataset> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[1487]:0x70f092)\n    at graphshell_web.wasm.<spareval[8f3f03b1ab4919c8]::PreparedQuery>::execute::<linked_data[b890df07538a28c5]::query::dataset::GraphDataset> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[81096]:0x2f8e305)\n    at graphshell_web.wasm.linked_data[b890df07538a28c5]::query::sparql_resource_members (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[2479]:0xa0c005)\n    at graphshell_web.wasm.mere[db52252a7e47fc75]::subgraph::try_derive_members (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[6751]:0x11b170a)\n    at graphshell_web.wasm.<mere[db52252a7e47fc75]::query_view::QueryViewSpec>::members (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[15656]:0x19d0ec9)\n    at graphshell_web.wasm.mere[db52252a7e47fc75]::query_view::save_spec (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[2761]:0xab8d86)\n    at graphshell_web.wasm.graphshell[4a6e970211e88c1b]::query_views::save::<muniment[667119025d274331]::indexeddb_backend::IndexedDbBackend> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[15207]:0x197f427)\n    at graphshell_web.wasm.<graphshell_web[a5493bc95ef8807f]::web_tree::product::SavedProduct>::save_query (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[6482]:0x1156864)\n    at graphshell_web.wasm.graphshell_web[a5493bc95ef8807f]::web_tree::query_view::save::{closure#0} (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[18629]:0x1bc21d4)\n    at graphshell_web.wasm.graphshell_web[a5493bc95ef8807f]::web_tree::query_view::save (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[16071]:0x1a1a903)\n    at graphshell_web.wasm.graphshell_web[a5493bc95ef8807f]::web_tree::query_view::section::{closure#10} (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[281857]:0x4300668)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::event::OnClick<cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::string::String, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), graphshell_web[a5493bc95ef8807f]::web_tree::query_view::section::{closure#10}> as meristem[a9550bc49814af15]::view::View<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx>>::message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[20568]:0x1ce1ce7)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::focusable::Focusable<cambium[382aaffe8235ad03]::event::OnClick<cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::string::String, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), graphshell_web[a5493bc95ef8807f]::web_tree::query_view::section::{closure#10}>> as meristem[a9550bc49814af15]::view::View<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx>>::message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[75065]:0x2e68a8f)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::focusable::Focusable<cambium[382aaffe8235ad03]::event::OnClick<cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::string::String, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), graphshell_web[a5493bc95ef8807f]::web_tree::query_view::section::{closure#10}>> as meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::dyn_message::{closure#0} (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[164668]:0x3af2416)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::pod::GenetElement as meristem[a9550bc49814af15]::element::SuperElement<cambium[382aaffe8235ad03]::pod::GenetElement, cambium[382aaffe8235ad03]::context::GenetCtx>>::with_downcast_val::<meristem[a9550bc49814af15]::message::MessageResult<()>, <cambium[382aaffe8235ad03]::focusable::Focusable<cambium[382aaffe8235ad03]::event::OnClick<cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::string::String, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), graphshell_web[a5493bc95ef8807f]::web_tree::query_view::section::{closure#10}>> as meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::dyn_message::{closure#0}> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[98436]:0x3284dfc)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::focusable::Focusable<cambium[382aaffe8235ad03]::event::OnClick<cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::string::String, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), graphshell_web[a5493bc95ef8807f]::web_tree::query_view::section::{closure#10}>> as meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::dyn_message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[45962]:0x273ad6b)\n    at graphshell_web.wasm.<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement> as meristem[a9550bc49814af15]::view::View<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx>>::message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[141535]:0x3873170)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view::View<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx>>::message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[135385]:0x37b8974)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message::<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice>::{closure#0}::{closure#0} (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[164345]:0x3aea0a4)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::pod::GenetElement as meristem[a9550bc49814af15]::element::SuperElement<cambium[382aaffe8235ad03]::pod::GenetElement, cambium[382aaffe8235ad03]::context::GenetCtx>>::with_downcast_val::<meristem[a9550bc49814af15]::message::MessageResult<()>, <alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice>::{closure#0}::{closure#0}> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[98329]:0x328046c)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message::<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice>::{closure#0} (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[112637]:0x34b044a)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice as meristem[a9550bc49814af15]::element_splice::ElementSplice<cambium[382aaffe8235ad03]::pod::GenetElement>>::mutate::<meristem[a9550bc49814af15]::message::MessageResult<()>, <alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice>::{closure#0}> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[67648]:0x2cdd2d4)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message::<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[164149]:0x3ae51dd)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::vec::Vec<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message::<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[58081]:0x2a9ba5b)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::vec::Vec<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()> as meristem[a9550bc49814af15]::view::View<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx>>::message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[87073]:0x309f71a)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::vec::Vec<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()> as meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::dyn_message::{closure#0} (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[164613]:0x3af0df5)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::pod::GenetElement as meristem[a9550bc49814af15]::element::SuperElement<cambium[382aaffe8235ad03]::pod::GenetElement, cambium[382aaffe8235ad03]::context::GenetCtx>>::with_downcast_val::<meristem[a9550bc49814af15]::message::MessageResult<()>, <cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::vec::Vec<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()> as meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::dyn_message::{closure#0}> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[98381]:0x328282c)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::vec::Vec<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()> as meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::dyn_message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[46074]:0x274419c)\n    at graphshell_web.wasm.<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement> as meristem[a9550bc49814af15]::view::View<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx>>::message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[141535]:0x3873170)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view::View<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx>>::message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[135385]:0x37b8974)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message::<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice>::{closure#0}::{closure#0} (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[164345]:0x3aea0a4)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::pod::GenetElement as meristem[a9550bc49814af15]::element::SuperElement<cambium[382aaffe8235ad03]::pod::GenetElement, cambium[382aaffe8235ad03]::context::GenetCtx>>::with_downcast_val::<meristem[a9550bc49814af15]::message::MessageResult<()>, <alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice>::{closure#0}::{closure#0}> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[98329]:0x328046c)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message::<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice>::{closure#0} (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[112637]:0x34b044a)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice as meristem[a9550bc49814af15]::element_splice::ElementSplice<cambium[382aaffe8235ad03]::pod::GenetElement>>::mutate::<meristem[a9550bc49814af15]::message::MessageResult<()>, <alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice>::{closure#0}> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[67648]:0x2cdd2d4)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message::<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[164149]:0x3ae51dd)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::vec::Vec<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message::<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[58081]:0x2a9ba5b)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::vec::Vec<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()> as meristem[a9550bc49814af15]::view::View<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx>>::message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[87073]:0x309f71a)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::vec::Vec<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()> as meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::dyn_message::{closure#0} (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[164613]:0x3af0df5)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::pod::GenetElement as meristem[a9550bc49814af15]::element::SuperElement<cambium[382aaffe8235ad03]::pod::GenetElement, cambium[382aaffe8235ad03]::context::GenetCtx>>::with_downcast_val::<meristem[a9550bc49814af15]::message::MessageResult<()>, <cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::vec::Vec<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()> as meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::dyn_message::{closure#0}> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[98381]:0x328282c)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::vec::Vec<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()> as meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::dyn_message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[46074]:0x274419c)\n    at graphshell_web.wasm.<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement> as meristem[a9550bc49814af15]::view::View<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx>>::message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[141535]:0x3873170)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view::View<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx>>::message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[135385]:0x37b8974)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message::<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice>::{closure#0}::{closure#0} (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[164345]:0x3aea0a4)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::pod::GenetElement as meristem[a9550bc49814af15]::element::SuperElement<cambium[382aaffe8235ad03]::pod::GenetElement, cambium[382aaffe8235ad03]::context::GenetCtx>>::with_downcast_val::<meristem[a9550bc49814af15]::message::MessageResult<()>, <alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice>::{closure#0}::{closure#0}> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[98329]:0x328046c)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message::<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice>::{closure#0} (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[112637]:0x34b044a)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice as meristem[a9550bc49814af15]::element_splice::ElementSplice<cambium[382aaffe8235ad03]::pod::GenetElement>>::mutate::<meristem[a9550bc49814af15]::message::MessageResult<()>, <alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice>::{closure#0}> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[67648]:0x2cdd2d4)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message::<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[164149]:0x3ae51dd)\n    at graphshell_web.wasm.<core[608f92abc48d28da]::option::Option<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message::<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[32614]:0x2283784)\n\n",
+      "Uncaught RuntimeError: unreachable"
+    ],
+    "gate_failures": [
+      "panic: panicked at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library/std/src/sys/time/unsupported.rs:35:9:\ntime not implemented on this platform\n\nStack:\n\nError\n    at __wbg_new_227d7c05414eb861 (http://127.0.0.1:8882/pkg/graphshell_web.js:1249:25)\n    at graphshell_web.wasm.<console_error_panic_hook[f13602e5b17a8d60]::Error>::new::__wbg_new_227d7c05414eb861 externref shim (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[375846]:0x4673fa7)\n    at graphshell_web.wasm.<console_error_panic_hook[f13602e5b17a8d60]::Error>::new (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[231556]:0x403ac7d)\n    at graphshell_web.wasm.console_error_panic_hook[f13602e5b17a8d60]::hook_impl (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[87127]:0x30a1d54)\n    at graphshell_web.wasm.console_error_panic_hook[f13602e5b17a8d60]::hook (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[335771]:0x4535f33)\n    at graphshell_web.wasm.<console_error_panic_hook[f13602e5b17a8d60]::hook as core[608f92abc48d28da]::ops::function::Fn<(&std[359a46decee746ed]::panic::PanicHookInfo,)>>::call (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[290005]:0x436028c)\n    at graphshell_web.wasm.std[359a46decee746ed]::panicking::panic_with_hook (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[61355]:0x2b6b726)\n    at graphshell_web.wasm.std[359a46decee746ed]::panicking::panic_handler::{closure#0} (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[135304]:0x37b62a1)\n    at graphshell_web.wasm.std[359a46decee746ed]::sys::backtrace::__rust_end_short_backtrace::<std[359a46decee746ed]::panicking::panic_handler::{closure#0}, !> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[382076]:0x4686c30)\n    at graphshell_web.wasm.__rustc[9d087a5ab36ea756]::rust_begin_unwind (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[300417]:0x43d4b63)\n    at graphshell_web.wasm.core[608f92abc48d28da]::panicking::panic_fmt (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[244530]:0x4106a42)\n    at graphshell_web.wasm.<std[359a46decee746ed]::time::SystemTime>::now (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[376877]:0x4677b54)\n    at graphshell_web.wasm.oxsdatatypes[3772cf2e99a831d2]::date_time::since_unix_epoch (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[137955]:0x38077bf)\n    at graphshell_web.wasm.<oxsdatatypes[3772cf2e99a831d2]::date_time::Timestamp>::now[1] (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[54070]:0x299158d)\n    at graphshell_web.wasm.<oxsdatatypes[3772cf2e99a831d2]::date_time::DateTime>::now[1] (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[241306]:0x40d55f7)\n    at graphshell_web.wasm.<spareval[8f3f03b1ab4919c8]::eval::Timer>::now (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[241307]:0x40d5636)\n    at graphshell_web.wasm.<spareval[8f3f03b1ab4919c8]::PreparedQuery>::explain::<linked_data[b890df07538a28c5]::query::dataset::GraphDataset> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[1487]:0x70f092)\n    at graphshell_web.wasm.<spareval[8f3f03b1ab4919c8]::PreparedQuery>::execute::<linked_data[b890df07538a28c5]::query::dataset::GraphDataset> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[81096]:0x2f8e305)\n    at graphshell_web.wasm.linked_data[b890df07538a28c5]::query::sparql_resource_members (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[2479]:0xa0c005)\n    at graphshell_web.wasm.mere[db52252a7e47fc75]::subgraph::try_derive_members (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[6751]:0x11b170a)\n    at graphshell_web.wasm.<mere[db52252a7e47fc75]::query_view::QueryViewSpec>::members (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[15656]:0x19d0ec9)\n    at graphshell_web.wasm.mere[db52252a7e47fc75]::query_view::save_spec (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[2761]:0xab8d86)\n    at graphshell_web.wasm.graphshell[4a6e970211e88c1b]::query_views::save::<muniment[667119025d274331]::indexeddb_backend::IndexedDbBackend> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[15207]:0x197f427)\n    at graphshell_web.wasm.<graphshell_web[a5493bc95ef8807f]::web_tree::product::SavedProduct>::save_query (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[6482]:0x1156864)\n    at graphshell_web.wasm.graphshell_web[a5493bc95ef8807f]::web_tree::query_view::save::{closure#0} (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[18629]:0x1bc21d4)\n    at graphshell_web.wasm.graphshell_web[a5493bc95ef8807f]::web_tree::query_view::save (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[16071]:0x1a1a903)\n    at graphshell_web.wasm.graphshell_web[a5493bc95ef8807f]::web_tree::query_view::section::{closure#10} (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[281857]:0x4300668)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::event::OnClick<cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::string::String, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), graphshell_web[a5493bc95ef8807f]::web_tree::query_view::section::{closure#10}> as meristem[a9550bc49814af15]::view::View<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx>>::message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[20568]:0x1ce1ce7)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::focusable::Focusable<cambium[382aaffe8235ad03]::event::OnClick<cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::string::String, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), graphshell_web[a5493bc95ef8807f]::web_tree::query_view::section::{closure#10}>> as meristem[a9550bc49814af15]::view::View<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx>>::message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[75065]:0x2e68a8f)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::focusable::Focusable<cambium[382aaffe8235ad03]::event::OnClick<cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::string::String, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), graphshell_web[a5493bc95ef8807f]::web_tree::query_view::section::{closure#10}>> as meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::dyn_message::{closure#0} (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[164668]:0x3af2416)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::pod::GenetElement as meristem[a9550bc49814af15]::element::SuperElement<cambium[382aaffe8235ad03]::pod::GenetElement, cambium[382aaffe8235ad03]::context::GenetCtx>>::with_downcast_val::<meristem[a9550bc49814af15]::message::MessageResult<()>, <cambium[382aaffe8235ad03]::focusable::Focusable<cambium[382aaffe8235ad03]::event::OnClick<cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::string::String, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), graphshell_web[a5493bc95ef8807f]::web_tree::query_view::section::{closure#10}>> as meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::dyn_message::{closure#0}> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[98436]:0x3284dfc)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::focusable::Focusable<cambium[382aaffe8235ad03]::event::OnClick<cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::string::String, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), graphshell_web[a5493bc95ef8807f]::web_tree::query_view::section::{closure#10}>> as meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::dyn_message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[45962]:0x273ad6b)\n    at graphshell_web.wasm.<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement> as meristem[a9550bc49814af15]::view::View<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx>>::message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[141535]:0x3873170)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view::View<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx>>::message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[135385]:0x37b8974)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message::<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice>::{closure#0}::{closure#0} (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[164345]:0x3aea0a4)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::pod::GenetElement as meristem[a9550bc49814af15]::element::SuperElement<cambium[382aaffe8235ad03]::pod::GenetElement, cambium[382aaffe8235ad03]::context::GenetCtx>>::with_downcast_val::<meristem[a9550bc49814af15]::message::MessageResult<()>, <alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice>::{closure#0}::{closure#0}> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[98329]:0x328046c)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message::<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice>::{closure#0} (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[112637]:0x34b044a)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice as meristem[a9550bc49814af15]::element_splice::ElementSplice<cambium[382aaffe8235ad03]::pod::GenetElement>>::mutate::<meristem[a9550bc49814af15]::message::MessageResult<()>, <alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice>::{closure#0}> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[67648]:0x2cdd2d4)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message::<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[164149]:0x3ae51dd)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::vec::Vec<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message::<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[58081]:0x2a9ba5b)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::vec::Vec<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()> as meristem[a9550bc49814af15]::view::View<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx>>::message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[87073]:0x309f71a)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::vec::Vec<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()> as meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::dyn_message::{closure#0} (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[164613]:0x3af0df5)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::pod::GenetElement as meristem[a9550bc49814af15]::element::SuperElement<cambium[382aaffe8235ad03]::pod::GenetElement, cambium[382aaffe8235ad03]::context::GenetCtx>>::with_downcast_val::<meristem[a9550bc49814af15]::message::MessageResult<()>, <cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::vec::Vec<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()> as meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::dyn_message::{closure#0}> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[98381]:0x328282c)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::vec::Vec<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()> as meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::dyn_message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[46074]:0x274419c)\n    at graphshell_web.wasm.<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement> as meristem[a9550bc49814af15]::view::View<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx>>::message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[141535]:0x3873170)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view::View<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx>>::message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[135385]:0x37b8974)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message::<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice>::{closure#0}::{closure#0} (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[164345]:0x3aea0a4)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::pod::GenetElement as meristem[a9550bc49814af15]::element::SuperElement<cambium[382aaffe8235ad03]::pod::GenetElement, cambium[382aaffe8235ad03]::context::GenetCtx>>::with_downcast_val::<meristem[a9550bc49814af15]::message::MessageResult<()>, <alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice>::{closure#0}::{closure#0}> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[98329]:0x328046c)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message::<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice>::{closure#0} (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[112637]:0x34b044a)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice as meristem[a9550bc49814af15]::element_splice::ElementSplice<cambium[382aaffe8235ad03]::pod::GenetElement>>::mutate::<meristem[a9550bc49814af15]::message::MessageResult<()>, <alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice>::{closure#0}> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[67648]:0x2cdd2d4)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message::<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[164149]:0x3ae51dd)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::vec::Vec<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message::<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[58081]:0x2a9ba5b)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::vec::Vec<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()> as meristem[a9550bc49814af15]::view::View<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx>>::message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[87073]:0x309f71a)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::vec::Vec<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()> as meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::dyn_message::{closure#0} (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[164613]:0x3af0df5)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::pod::GenetElement as meristem[a9550bc49814af15]::element::SuperElement<cambium[382aaffe8235ad03]::pod::GenetElement, cambium[382aaffe8235ad03]::context::GenetCtx>>::with_downcast_val::<meristem[a9550bc49814af15]::message::MessageResult<()>, <cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::vec::Vec<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()> as meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::dyn_message::{closure#0}> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[98381]:0x328282c)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::element::El<alloc[cb2b8d99256f33df]::vec::Vec<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>>, graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, ()> as meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::dyn_message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[46074]:0x274419c)\n    at graphshell_web.wasm.<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement> as meristem[a9550bc49814af15]::view::View<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx>>::message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[141535]:0x3873170)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view::View<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx>>::message (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[135385]:0x37b8974)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message::<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice>::{closure#0}::{closure#0} (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[164345]:0x3aea0a4)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::pod::GenetElement as meristem[a9550bc49814af15]::element::SuperElement<cambium[382aaffe8235ad03]::pod::GenetElement, cambium[382aaffe8235ad03]::context::GenetCtx>>::with_downcast_val::<meristem[a9550bc49814af15]::message::MessageResult<()>, <alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice>::{closure#0}::{closure#0}> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[98329]:0x328046c)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message::<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice>::{closure#0} (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[112637]:0x34b044a)\n    at graphshell_web.wasm.<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice as meristem[a9550bc49814af15]::element_splice::ElementSplice<cambium[382aaffe8235ad03]::pod::GenetElement>>::mutate::<meristem[a9550bc49814af15]::message::MessageResult<()>, <alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice>::{closure#0}> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[67648]:0x2cdd2d4)\n    at graphshell_web.wasm.<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message::<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[164149]:0x3ae51dd)\n    at graphshell_web.wasm.<core[608f92abc48d28da]::option::Option<alloc[cb2b8d99256f33df]::boxed::Box<dyn meristem[a9550bc49814af15]::views::any_view::AnyView<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>> as meristem[a9550bc49814af15]::view_sequence::ViewSequence<graphshell_web[a5493bc95ef8807f]::web_tree::TreePage, (), cambium[382aaffe8235ad03]::context::GenetCtx, cambium[382aaffe8235ad03]::pod::GenetElement>>::seq_message::<cambium[382aaffe8235ad03]::splice::GenetChildrenSplice> (http://127.0.0.1:8882/pkg/graphshell_web_bg.wasm:wasm-function[32614]:0x2283784)\n\n",
+      "uncaught: Uncaught RuntimeError: unreachable"
+    ],
+    "result": null,
+    "captures": []
+  },
+  "title": "GRAPHSHELL H3 FAIL: Uncaught RuntimeError: unreachable",
+  "hidden": false,
+  "semantic": {
+    "role": "region",
+    "label": "Graphshell, one tree",
+    "children": [
+      {
+        "role": "main",
+        "children": [
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "role": "heading",
+                        "label": "Graphshell",
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "role": "status",
+            "label": "saved graph \u00b7 17 nodes \u00b7 selected: 0 \u00b7 primary: none",
+            "children": []
+          },
+          {
+            "role": "navigation",
+            "label": "Graph controls",
+            "children": [
+              {
+                "role": "button",
+                "label": "Pan left",
+                "children": []
+              },
+              {
+                "role": "button",
+                "label": "Pan right",
+                "children": []
+              },
+              {
+                "role": "button",
+                "label": "Pan up",
+                "children": []
+              },
+              {
+                "role": "button",
+                "label": "Pan down",
+                "children": []
+              },
+              {
+                "role": "button",
+                "label": "Zoom in",
+                "children": []
+              },
+              {
+                "role": "button",
+                "label": "Zoom out",
+                "children": []
+              },
+              {
+                "role": "button",
+                "label": "Fit graph",
+                "children": []
+              },
+              {
+                "role": "button",
+                "label": "Fit selection",
+                "children": []
+              },
+              {
+                "role": "button",
+                "label": "Restore arrangement",
+                "children": []
+              },
+              {
+                "role": "button",
+                "label": "Play physics",
+                "children": []
+              },
+              {
+                "role": "button",
+                "label": "Graph commands",
+                "expanded": false,
+                "children": []
+              }
+            ]
+          },
+          {
+            "children": [
+              {
+                "role": "button",
+                "label": "Open selected in workbench",
+                "children": []
+              },
+              {
+                "role": "button",
+                "label": "Show workbench",
+                "children": []
+              }
+            ]
+          },
+          {
+            "children": [
+              {
+                "role": "button",
+                "label": "Undo session",
+                "children": []
+              },
+              {
+                "role": "button",
+                "label": "Redo session",
+                "children": []
+              },
+              {
+                "children": [
+                  {
+                    "role": "button",
+                    "label": "Add an object",
+                    "expanded": false,
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "role": "button",
+                "label": "Inspect selected access",
+                "children": []
+              },
+              {
+                "role": "button",
+                "label": "Inspect fields",
+                "children": []
+              },
+              {
+                "role": "button",
+                "label": "Open details",
+                "children": []
+              }
+            ]
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "role": "heading",
+                            "label": "Dataspace",
+                            "children": []
+                          },
+                          {
+                            "role": "paragraph",
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "role": "group",
+                    "label": "17 of 17 shown",
+                    "children": [
+                      {
+                        "role": "group",
+                        "label": "I2P port notes",
+                        "children": [
+                          {
+                            "role": "button",
+                            "label": "Drag",
+                            "description": "Drag this item; nothing returns it.",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Pin",
+                            "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "role": "group",
+                        "label": "I2P service",
+                        "children": [
+                          {
+                            "role": "button",
+                            "label": "Drag",
+                            "description": "Drag this item; nothing returns it.",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Pin",
+                            "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "role": "group",
+                        "label": "Reference notes",
+                        "children": [
+                          {
+                            "role": "button",
+                            "label": "Drag",
+                            "description": "Drag this item; nothing returns it.",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Pin",
+                            "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "role": "group",
+                        "label": "Reference-host scene",
+                        "children": [
+                          {
+                            "role": "button",
+                            "label": "Drag",
+                            "description": "Drag this item; nothing returns it.",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Pin",
+                            "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "role": "group",
+                        "label": "Mounted remote projection",
+                        "children": [
+                          {
+                            "role": "button",
+                            "label": "Drag",
+                            "description": "Drag this item; nothing returns it.",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Pin",
+                            "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "role": "group",
+                        "label": "Alice",
+                        "children": [
+                          {
+                            "role": "button",
+                            "label": "Drag",
+                            "description": "Drag this item; nothing returns it.",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Pin",
+                            "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "role": "group",
+                        "label": "Alice's laptop",
+                        "children": [
+                          {
+                            "role": "button",
+                            "label": "Drag",
+                            "description": "Drag this item; nothing returns it.",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Pin",
+                            "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "role": "group",
+                        "label": "Alice's phone",
+                        "children": [
+                          {
+                            "role": "button",
+                            "label": "Drag",
+                            "description": "Drag this item; nothing returns it.",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Pin",
+                            "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "role": "group",
+                        "label": "SSH signing key reference",
+                        "children": [
+                          {
+                            "role": "button",
+                            "label": "Drag",
+                            "description": "Drag this item; nothing returns it.",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Pin",
+                            "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "role": "group",
+                        "label": "Open-address grant",
+                        "children": [
+                          {
+                            "role": "button",
+                            "label": "Drag",
+                            "description": "Drag this item; nothing returns it.",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Pin",
+                            "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "role": "group",
+                        "label": "Synthetic signing receipt",
+                        "children": [
+                          {
+                            "role": "button",
+                            "label": "Drag",
+                            "description": "Drag this item; nothing returns it.",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Pin",
+                            "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "role": "group",
+                        "label": "Coffee",
+                        "children": [
+                          {
+                            "role": "button",
+                            "label": "Drag",
+                            "description": "Drag this item; nothing returns it.",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Pin",
+                            "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "role": "group",
+                        "label": "Redshank note",
+                        "children": [
+                          {
+                            "role": "button",
+                            "label": "Drag",
+                            "description": "Drag this item; nothing returns it.",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Pin",
+                            "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "role": "group",
+                        "label": "Native held HTML",
+                        "children": [
+                          {
+                            "role": "button",
+                            "label": "Drag",
+                            "description": "Drag this item; nothing returns it.",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Pin",
+                            "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "role": "group",
+                        "label": "Query source",
+                        "children": [
+                          {
+                            "role": "button",
+                            "label": "Drag",
+                            "description": "Drag this item; nothing returns it.",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Pin",
+                            "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "role": "group",
+                        "label": "Independent source access",
+                        "children": [
+                          {
+                            "role": "button",
+                            "label": "Drag",
+                            "description": "Drag this item; nothing returns it.",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Pin",
+                            "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "role": "group",
+                        "label": "Query target",
+                        "children": [
+                          {
+                            "role": "button",
+                            "label": "Drag",
+                            "description": "Drag this item; nothing returns it.",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Pin",
+                            "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "role": "button",
+                        "label": "Appearance",
+                        "expanded": false,
+                        "children": []
+                      },
+                      {
+                        "role": "status",
+                        "label": "Appearance status",
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "role": "heading",
+                            "label": "Inspector",
+                            "children": []
+                          },
+                          {
+                            "role": "paragraph",
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "role": "status",
+                    "label": "Storage: IndexedDB reopened \u00b7 persistent",
+                    "children": []
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "role": "button",
+                            "label": "Arrangement and physics",
+                            "expanded": true,
+                            "children": []
+                          },
+                          {
+                            "children": [
+                              {
+                                "children": [
+                                  {
+                                    "role": "combobox",
+                                    "label": "Arrangement",
+                                    "expanded": false,
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "role": "button",
+                                "label": "Apply arrangement",
+                                "children": []
+                              },
+                              {
+                                "children": [
+                                  {
+                                    "role": "combobox",
+                                    "label": "Role",
+                                    "expanded": false,
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "role": "button",
+                                "label": "Apply role",
+                                "children": []
+                              },
+                              {
+                                "children": [
+                                  {
+                                    "role": "combobox",
+                                    "label": "Physics law",
+                                    "expanded": false,
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "role": "group",
+                                "label": "Overlays",
+                                "children": [
+                                  {
+                                    "children": [
+                                      {
+                                        "role": "checkbox",
+                                        "children": []
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "children": [
+                                      {
+                                        "role": "checkbox",
+                                        "children": []
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "children": [
+                                      {
+                                        "role": "checkbox",
+                                        "children": []
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "children": [
+                                      {
+                                        "role": "checkbox",
+                                        "children": []
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "children": [
+                                      {
+                                        "role": "checkbox",
+                                        "children": []
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "children": [
+                                      {
+                                        "role": "checkbox",
+                                        "children": []
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "children": [
+                                      {
+                                        "role": "checkbox",
+                                        "children": []
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "children": [
+                                      {
+                                        "role": "checkbox",
+                                        "children": []
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "children": [
+                                  {
+                                    "role": "combobox",
+                                    "label": "Kinds",
+                                    "expanded": false,
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "children": [
+                                  {
+                                    "role": "combobox",
+                                    "label": "Groups",
+                                    "expanded": false,
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "children": [
+                                  {
+                                    "role": "combobox",
+                                    "label": "Mass",
+                                    "expanded": false,
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "children": [
+                                  {
+                                    "role": "combobox",
+                                    "label": "Depth",
+                                    "expanded": false,
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "role": "button",
+                                "label": "Apply physics",
+                                "children": []
+                              },
+                              {
+                                "children": [
+                                  {
+                                    "role": "combobox",
+                                    "label": "Speed",
+                                    "expanded": false,
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "role": "status",
+                                "label": "Speed status",
+                                "children": []
+                              },
+                              {
+                                "children": [
+                                  {
+                                    "role": "combobox",
+                                    "label": "Profile",
+                                    "expanded": false,
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "role": "button",
+                                "label": "Apply profile",
+                                "children": []
+                              },
+                              {
+                                "role": "status",
+                                "label": "Physics status",
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "children": [
+                      {
+                        "role": "button",
+                        "label": "Find and filter",
+                        "expanded": false,
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "children": [
+                      {
+                        "role": "button",
+                        "label": "Scenes and transfers",
+                        "expanded": false,
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "children": [
+                      {
+                        "role": "button",
+                        "label": "Projection editor",
+                        "expanded": false,
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "children": [
+                      {
+                        "role": "button",
+                        "label": "History",
+                        "expanded": false,
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "children": [
+                      {
+                        "role": "button",
+                        "label": "Explain selected dynamics",
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "children": [
+                      {
+                        "role": "button",
+                        "label": "Presentation rules",
+                        "expanded": false,
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "children": [
+                      {
+                        "role": "heading",
+                        "label": "Saved query views",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "New query view",
+                        "children": []
+                      },
+                      {
+                        "children": [
+                          {
+                            "role": "textbox",
+                            "label": "Query view title",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "children": [
+                          {
+                            "role": "textbox",
+                            "label": "SELECT query",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "children": [
+                          {
+                            "role": "textbox",
+                            "label": "Query member budget",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "children": [
+                          {
+                            "role": "textbox",
+                            "label": "Query appearance budget",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "children": [
+                          {
+                            "role": "textbox",
+                            "label": "Query relation budget",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "role": "button",
+                        "label": "Use tag: research (personae://persona/alice)",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Use tag: transport (personae://persona/alice)",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Use tag: address (personae://persona/alice)",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Use tag: local (personae://persona/alice)",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Use tag: reference (personae://persona/alice)",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Use tag: scene (personae://persona/alice)",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Use tag: remote (personae://persona/alice)",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Use tag: projection (personae://persona/alice)",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Use tag: identity (personae://persona/alice)",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Use tag: public (personae://persona/alice)",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Use tag: device (personae://persona/alice)",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Use tag: key-reference (personae://persona/alice)",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Use tag: grant (personae://persona/alice)",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Use tag: receipt (personae://persona/alice)",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Use tag: synthetic (personae://persona/alice)",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Use tag: Music (urn:author:alice)",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Use tag: Music (urn:author:bob)",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Show Resources and held appearances",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Tag context: true",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Resource link stroke: solid",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Surface link stroke: solid",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Cross-stratum edge stroke: dashed",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Save query view",
+                        "children": []
+                      },
+                      {
+                        "role": "status",
+                        "label": "Query draft opened",
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "children": [
+                      {
+                        "role": "heading",
+                        "label": "Fields",
+                        "children": []
+                      },
+                      {
+                        "children": [
+                          {
+                            "role": "paragraph",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Unlock forme",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Undo saved forme change",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Redo saved forme change",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Hide forme boundary",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Select forme members",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Retry workbench save",
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "role": "button",
+                            "label": "Remote session",
+                            "expanded": false,
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "log": "",
+  "collected_at_utc": "2026-10-14T05:05:41.156962+00:00"
+}

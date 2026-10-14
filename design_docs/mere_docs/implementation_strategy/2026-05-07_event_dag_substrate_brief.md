@@ -213,7 +213,7 @@ Each candidate evaluated as: "can it carry MereEvents, and at what cost?"
 > emissary/I2P destinations) are the control and rendezvous plane; arti stays
 > consumer-posture for a later clearnet browse toggle. No
 > `mere-transport[veilid]` feature was ever built, `TransportKind` in
-> `retinue/native/crates/transport/src/accepted.rs` carries no Veilid variant, and no
+> `murm/native/crates/transport/src/accepted.rs` carries no Veilid variant, and no
 > plan since 2026-08-03 names it. Veilid replaces transport rather than sync,
 > and "nothing moves blobs off iroh" leaves it no plane to occupy. The text
 > below stays as the record of the *pattern* — a moot constitution declaring
@@ -598,7 +598,7 @@ This is substantial enough to warrant its own design brief. See [`2026-05-10_gra
 
 ### 2026-09-01 — Veilid retired; privacy lanes own the role
 
-The 2026-05-07 §6 decision (Veilid as an optional per-moot transport policy) and the 2026-08-03 reachability rungs plan disagreed: the newer plan assigns the privacy role to emissary (I2P, in-network rendezvous), retinue (identity-routed mesh), Noise (in-stream), and arti (clearnet browse, consumer posture), and never mentions Veilid. Verified against code: `TransportKind` has five variants (Memory, P2panda, Reticulum, Noise, WebRtc) and no `veilid` feature exists anywhere under `retinue/native/crates/transport`. §6 is banner-retired above; the reachability plan's "Not in scope" list now names Veilid so the two docs point at each other.
+The 2026-05-07 §6 decision (Veilid as an optional per-moot transport policy) and the 2026-08-03 reachability rungs plan disagreed: the newer plan assigns the privacy role to emissary (I2P, in-network rendezvous), retinue (identity-routed mesh), Noise (in-stream), and arti (clearnet browse, consumer posture), and never mentions Veilid. Verified against code: `TransportKind` has five variants (Memory, P2panda, Reticulum, Noise, WebRtc) and no `veilid` feature exists anywhere under `murm/native/crates/transport`. §6 is banner-retired above; the reachability plan's "Not in scope" list now names Veilid so the two docs point at each other.
 
 ### 2026-05-07 — substrate decisions consolidated
 

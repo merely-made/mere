@@ -27,7 +27,7 @@ bundled-contexts = []
 # pull the evaluator. Tests retain a materialized spareval dataset as the
 # parity oracle for the borrowed adapter.
 # Preserve directional JSON-LD terms previously enabled through Oxigraph.
-query = ["dep:spareval", "dep:spargebra", "oxjsonld/rdf-12"]
+query = ["dep:spareval", "dep:spargebra", "dep:oxsdatatypes", "dep:getrandom02", "oxjsonld/rdf-12"]
 
 [dependencies]
 # The statement vocabulary (`LinkStatement`) produced by inker's pure
@@ -48,6 +48,11 @@ time = { version = "0.3", features = ["formatting", "parsing"] }
 # oxrdf's random blank-node support reaches getrandom 0.3. Browser builds also
 # pass `--cfg getrandom_backend="wasm_js"`, following Mere's existing web lanes.
 getrandom = { version = "0.3", features = ["wasm_js"] }
+# Every prepared SPARQL query initializes NOW and its planning timer, even
+# without an explicit NOW expression. Use the evaluator's browser clock.
+oxsdatatypes = { version = "0.2", features = ["js"], optional = true }
+# The evaluator's rand 0.8 has its own entropy backend, distinct from oxrdf.
+getrandom02 = { package = "getrandom", version = "0.2", features = ["js"], optional = true }
 
 [dev-dependencies]
 kernel = { workspace = true, features = ["fixtures"] }

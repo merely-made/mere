@@ -1,0 +1,32 @@
+{
+  "body": {
+    "height": 127,
+    "width": 705,
+    "x": 16,
+    "y": 438
+  },
+  "export": {
+    "height": 24,
+    "width": 150.4375,
+    "x": 48,
+    "y": 654
+  },
+  "heading": {
+    "height": 24,
+    "width": 160,
+    "x": 56,
+    "y": 9
+  },
+  "reader": {
+    "height": 250,
+    "width": 737,
+    "x": 0,
+    "y": 389
+  },
+  "scrollX": 0,
+  "scrollY": 0,
+  "viewport": {
+    "height": 639,
+    "width": 1037
+  }
+}

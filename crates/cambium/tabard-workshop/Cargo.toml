@@ -11,7 +11,8 @@ readme = "README.md"
 
 [features]
 default = []
-native-host = ["dep:cambium-genet-winit-host", "dep:cambium-rootstock"]
+host-previews = ["dep:cambium-rootstock"]
+native-host = ["dep:cambium-genet-winit-host", "host-previews"]
 
 [dependencies]
 tabard.workspace = true
@@ -27,10 +28,10 @@ genet-scripted-dom.workspace = true
 layout-dom-api.workspace = true
 paint_list_render.workspace = true
 livery.workspace = true
+cambium-rootstock = { workspace = true, optional = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 cambium-genet-winit-host = { workspace = true, optional = true }
-cambium-rootstock = { workspace = true, optional = true }
 
 [dev-dependencies]
 netrender = { workspace = true, features = ["vello-cpu"] }

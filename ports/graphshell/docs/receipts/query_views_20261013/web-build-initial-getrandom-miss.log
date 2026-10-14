@@ -1,0 +1,457 @@
+warning: patch `p2panda-stream v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261011#d8acabc9)` was not used in the crate graph
+help: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+     Locking 20 packages to highest Rust 1.97.1 compatible versions
+      Adding json-event-parser v0.2.3
+      Adding luggage v0.1.0 (https://github.com/merely-made/mere.git?rev=fabfd10ef7f8a34058907f9a9c2b1e1a311be82f#fabfd10e)
+      Adding md-5 v0.11.0
+      Adding mere-linked-data v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\graph\linked-data)
+      Adding mere-webrtc-carrier v0.0.1 (https://github.com/merely-made/murm.git?rev=b49df894635bac95823284efee6c445885eaf62a#b49df894)
+      Adding oxilangtag v0.1.6
+      Adding oxiri v0.2.11
+      Adding oxjsonld v0.2.6
+      Adding oxrdf v0.3.4
+      Adding oxsdatatypes v0.2.3
+      Adding oxttl v0.2.4
+      Adding peg v0.8.6
+      Adding peg-macros v0.8.6
+      Adding peg-runtime v0.8.6
+      Adding quick-xml v0.37.5
+      Adding ryu-js v1.0.3
+      Adding sparesults v0.3.4
+      Adding spareval v0.2.7
+      Adding spargebra v0.4.7
+      Adding sparopt v0.3.7
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling syn v3.0.6
+   Compiling serde_core v1.0.229
+   Compiling syn v2.0.119
+   Compiling cfg-if v1.0.5
+   Compiling serde_derive v1.0.229
+   Compiling serde v1.0.229
+   Compiling once_cell v1.21.4
+   Compiling rustversion v1.0.23
+   Compiling wasm-bindgen-shared v0.2.129
+   Compiling unicode-ident v1.0.26
+   Compiling bumpalo v3.20.3
+   Compiling wasm-bindgen-macro-support v0.2.129
+   Compiling wasm-bindgen v0.2.129
+   Compiling wasm-bindgen-macro v0.2.129
+   Compiling autocfg v1.5.1
+   Compiling libm v0.2.16
+   Compiling smallvec v1.16.1
+   Compiling memchr v2.8.3
+   Compiling num-traits v0.2.19
+   Compiling arrayvec v0.7.8
+   Compiling getrandom v0.4.3
+   Compiling rand_core v0.10.1
+   Compiling bytemuck_derive v1.12.1
+   Compiling typenum v1.20.1
+   Compiling bytemuck v1.25.2
+   Compiling equivalent v1.0.2
+   Compiling allocator-api2 v0.2.21
+   Compiling foldhash v0.2.0
+   Compiling pin-project-lite v0.2.17
+   Compiling zerocopy v0.8.57
+   Compiling log v0.4.34
+   Compiling itoa v1.0.18
+   Compiling zerocopy-derive v0.8.57
+   Compiling hashbrown v0.17.1
+   Compiling cfg_aliases v0.2.2
+   Compiling thiserror-impl v2.0.21
+   Compiling zmij v1.0.23
+   Compiling futures-core v0.3.34
+   Compiling slab v0.4.12
+   Compiling serde_json v1.0.151
+   Compiling scopeguard v1.2.0
+   Compiling lock_api v0.4.14
+   Compiling hybrid-array v0.4.15
+   Compiling futures-macro v0.3.34
+   Compiling parking_lot_core v0.9.12
+   Compiling futures-task v0.3.34
+   Compiling thiserror v2.0.21
+   Compiling futures-util v0.3.34
+   Compiling js-sys v0.3.106
+   Compiling parking_lot v0.12.5
+   Compiling crypto-common v0.2.2
+   Compiling indexmap v2.14.2
+   Compiling version_check v0.9.5
+   Compiling block-buffer v0.12.1
+   Compiling bitflags v2.13.2
+   Compiling crossbeam-utils v0.8.23
+   Compiling simd-adler32 v0.3.10
+   Compiling adler2 v2.0.1
+   Compiling serde_bytes v0.11.19
+   Compiling miniz_oxide v0.8.9
+   Compiling stable_deref_trait v1.2.1
+   Compiling wasm-bindgen-futures v0.4.79
+   Compiling web-time v1.1.0
+   Compiling web-sys v0.3.106
+   Compiling num-integer v0.1.47
+   Compiling either v1.18.0
+   Compiling libc v0.2.190
+   Compiling profiling-procmacros v1.0.18
+   Compiling profiling v1.0.18
+   Compiling nom v8.0.0
+   Compiling foldhash v0.1.5
+   Compiling hashbrown v0.15.5
+   Compiling slotmap v1.1.1
+   Compiling zeroize_derive v1.5.0
+   Compiling zeroize v1.9.1
+   Compiling static_assertions v1.1.0
+   Compiling inout v0.2.2
+   Compiling const_fn v0.4.12
+   Compiling uuid-rng-internal v1.27.0
+   Compiling raw-window-handle v0.6.2
+   Compiling sha1_smol v1.0.1
+   Compiling rustc-hash v1.1.0
+   Compiling naga-types v30.0.1
+   Compiling uuid v1.27.0
+   Compiling cipher v0.5.2
+   Compiling wgpu v30.0.1
+   Compiling litrs v1.0.0
+   Compiling document-features v0.2.12
+   Compiling chacha20 v0.10.2
+   Compiling wgpu-types v30.0.1
+   Compiling synstructure v0.14.0
+   Compiling ident_case v1.0.1
+   Compiling paste v1.0.15
+   Compiling wide v1.7.1
+   Compiling bytes v1.12.1
+   Compiling zerofrom-derive v0.1.8
+   Compiling half v2.7.1
+   Compiling aho-corasick v1.1.5
+   Compiling regex-syntax v0.8.11
+   Compiling portable-atomic v1.15.0
+   Compiling regex-automata v0.4.18
+   Compiling zerofrom v0.1.8
+   Compiling yoke-derive v0.8.3
+   Compiling convert_case v0.10.0
+   Compiling ahash v0.8.12
+   Compiling num-complex v0.4.6
+   Compiling ciborium-io v0.2.2
+   Compiling unicode-xid v0.2.6
+   Compiling object v0.37.3
+   Compiling derive_more-impl v2.1.1
+   Compiling ciborium-ll v0.2.2
+   Compiling yoke v0.8.3
+   Compiling awint_internals v0.19.0
+   Compiling event-listener v5.4.2
+   Compiling derive-new v0.7.0
+   Compiling winnow v1.0.4
+   Compiling gimli v0.32.3
+   Compiling addr2line v0.25.1
+   Compiling toml_parser v1.1.3+spec-1.1.0
+   Compiling event-listener-strategy v0.5.4
+   Compiling awint_core v0.19.0
+   Compiling spin v0.12.3
+   Compiling ciborium v0.2.2
+   Compiling rand v0.10.3
+   Compiling concurrent-queue v2.5.0
+   Compiling cubecl-environment v0.11.0
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling serde_spanned v1.1.1
+   Compiling zerovec-derive v0.11.6
+   Compiling rustc-demangle v0.1.28
+   Compiling downcast-rs v2.0.2
+   Compiling strsim v0.11.1
+   Compiling futures-io v0.3.34
+   Compiling recasting v0.2.3
+   Compiling parking v2.2.1
+   Compiling fastrand v2.5.0
+   Compiling toml_writer v1.1.2+spec-1.1.0
+   Compiling toml v1.1.6+spec-1.1.0
+   Compiling futures-lite v2.6.1
+   Compiling triple_arena v0.15.1
+   Compiling darling_core v0.24.1
+   Compiling backtrace v0.3.76
+   Compiling zerovec v0.11.8
+   Compiling async-channel v2.5.0
+   Compiling awint_ext v0.19.0
+   Compiling regex v1.13.1
+   Compiling cubecl-common v0.11.0
+   Compiling displaydoc v0.2.7
+   Compiling embassy-futures v0.1.2
+   Compiling oneshot v0.2.1
+   Compiling awint_macro_internals v0.19.0
+   Compiling darling_macro v0.24.1
+   Compiling derive_more v2.1.1
+   Compiling float8 v0.7.0
+   Compiling tynm v0.2.0
+   Compiling float4 v0.2.0
+   Compiling writeable v0.6.4
+   Compiling xxhash-rust v0.8.18
+   Compiling rustc-hash v2.1.3
+   Compiling find-msvc-tools v0.1.14
+   Compiling rustc_apfloat v0.2.3+llvm-462a31f5a5ab
+   Compiling shlex v2.0.1
+   Compiling cc v1.6.0
+   Compiling combine v4.6.8
+   Compiling darling v0.24.1
+   Compiling awint_macros v0.19.0
+   Compiling hashbrown v0.13.2
+   Compiling convert_case v0.11.0
+   Compiling byteorder v1.5.0
+   Compiling mutants v0.0.3
+   Compiling inflections v1.1.1
+   Compiling unsynn v0.3.0
+   Compiling pliron-derive v0.19.0
+   Compiling awint v0.19.0
+   Compiling tinystr v0.8.4
+   Compiling hi_sparse_bitset v0.9.0
+   Compiling utf8-chars v3.0.7
+   Compiling inventory v0.3.25
+   Compiling dyn-clone v1.0.20
+   Compiling litemap v0.8.3
+   Compiling once_vec v0.4.0
+   Compiling pliron v0.19.0
+   Compiling icu_locale_core v2.3.0
+   Compiling variadics_please v2.0.0
+   Compiling cubecl-macros-internal v0.11.0
+   Compiling potential_utf v0.1.6
+   Compiling zerotrie v0.2.5
+   Compiling cubecl-zspace v0.11.0
+   Compiling internment v0.8.6
+   Compiling itertools v0.15.0
+   Compiling cubecl-monitoring v0.11.0
+   Compiling float-ord v0.3.2
+   Compiling utf8_iter v1.0.4
+   Compiling prettyplease v0.3.0
+   Compiling icu_collections v2.2.0
+   Compiling cubecl-ir v0.11.0
+   Compiling icu_provider v2.3.1
+   Compiling cubecl-runtime v0.11.0 (C:\Users\mark_\Code\repos\mere\support\patches\cubecl-runtime)
+   Compiling buildid v1.0.5
+   Compiling euclid v0.22.14
+   Compiling cubecl-macros v0.11.0
+   Compiling icu_properties_data v2.2.0
+   Compiling phf_generator v0.13.1
+warning: unused import: `cubecl_environment::config::RuntimeConfig`
+  --> C:\Users\mark_\Code\repos\mere\support\patches\cubecl-runtime\src\tune\tuner.rs:22:5
+   |
+22 | use cubecl_environment::config::RuntimeConfig;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `batch_success`
+   --> C:\Users\mark_\Code\repos\mere\support\patches\cubecl-runtime\src\tune\tuner.rs:435:13
+    |
+435 |         let batch_success = false;
+    |             ^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_batch_success`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `warmup_once` is never used
+  --> C:\Users\mark_\Code\repos\mere\support\patches\cubecl-runtime\src\tune\tune_benchmark.rs:48:19
+   |
+43 | impl<F: TuneInputs, Out: AutotuneOutput> TuneFn<F, Out> {
+   | ------------------------------------------------------- method in this implementation
+...
+48 |     pub(crate) fn warmup_once<'a>(
+   |                   ^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `cubecl-runtime` (lib) generated 3 warnings (run `cargo fix --lib -p cubecl-runtime` to apply 1 suggestion)
+   Compiling icu_normalizer_data v2.2.0
+   Compiling icu_properties v2.2.0
+   Compiling cubecl-core v0.11.0
+   Compiling hashbrown v0.16.1
+   Compiling icu_normalizer v2.2.0
+   Compiling cubecl-server v0.11.0
+   Compiling cubecl-cpp v0.11.0
+   Compiling siphasher v1.0.3
+   Compiling phf_shared v0.13.1
+   Compiling cubecl-opt v0.11.0
+   Compiling sanitize-filename v0.6.0
+   Compiling cubecl-wgpu v0.11.0
+   Compiling new_debug_unreachable v1.0.6
+   Compiling phf_macros v0.13.1
+   Compiling cubecl v0.11.0
+   Compiling rustc_version v0.4.1
+   Compiling phf v0.13.1
+   Compiling cubecl-std v0.11.0
+   Compiling tracing-core v0.1.36
+   Compiling crc32fast v1.5.2
+   Compiling const-oid v0.10.2
+   Compiling digest v0.11.3
+   Compiling phf_codegen v0.13.1
+   Compiling string_cache_codegen v0.6.1
+   Compiling num-bigint v0.4.8
+   Compiling linebender_resource_handle v0.1.1
+   Compiling tracing-attributes v0.1.31
+   Compiling tracing v0.1.44
+   Compiling num-rational v0.4.2
+   Compiling web_atoms v0.2.6
+   Compiling idna_adapter v1.2.2
+   Compiling miniz_oxide v0.9.1
+   Compiling precomputed-hash v0.1.1
+   Compiling percent-encoding v2.3.2
+   Compiling form_urlencoded v1.2.2
+   Compiling string_cache v0.9.0
+   Compiling flate2 v1.1.10
+   Compiling idna v1.1.0
+   Compiling fdeflate v0.3.7
+   Compiling naga v30.0.1
+   Compiling url v2.5.8
+   Compiling tendril v0.5.1
+   Compiling blake3 v1.8.7
+   Compiling font-types v0.12.5
+   Compiling polycool v0.4.0
+   Compiling enumn v0.1.14
+   Compiling accesskit v0.24.1
+   Compiling kurbo v0.13.1
+   Compiling read-fonts v0.41.0
+   Compiling markup5ever v0.39.0
+   Compiling png v0.18.1
+   Compiling cubek-tile v0.3.0
+   Compiling color v0.3.3
+   Compiling constant_time_eq v0.4.2
+   Compiling svg_fmt v0.4.5
+   Compiling crossbeam-epoch v0.9.21
+   Compiling guillotiere v0.7.0
+   Compiling peniko v0.6.1
+   Compiling skrifa v0.44.0
+   Compiling vello_shaders v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling sha2 v0.11.0
+   Compiling crossbeam-deque v0.8.8
+   Compiling vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling heapless v0.7.17
+   Compiling equator-macro v0.4.2
+   Compiling rayon-core v1.13.0
+   Compiling darling_core v0.21.3
+   Compiling equator v0.4.2
+   Compiling cubek-std v0.3.0
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling hash32 v0.2.1
+   Compiling futures-intrusive v0.5.0
+   Compiling font-types v0.11.3
+   Compiling icu_locale_data v2.2.0
+   Compiling anyhow v1.0.104
+   Compiling fixedbitset v0.5.7
+   Compiling object v0.39.1
+   Compiling petgraph v0.8.3
+   Compiling read-fonts v0.39.2
+   Compiling netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+   Compiling aligned-vec v0.6.4
+   Compiling darling_macro v0.21.3
+   Compiling paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling cobs v0.3.0
+   Compiling ptr_meta_derive v0.3.2
+   Compiling thiserror v1.0.69
+   Compiling icu_segmenter_data v2.2.0
+   Compiling ptr_meta v0.3.2
+   Compiling postcard v1.1.3
+   Compiling darling v0.21.3
+   Compiling v_frame v0.3.9
+   Compiling rayon v1.12.0
+   Compiling rand_distr v0.6.0
+   Compiling as-slice v0.2.1
+   Compiling thiserror-impl v1.0.69
+   Compiling av-scenechange v0.14.1
+   Compiling data-encoding v2.11.1
+   Compiling built v0.8.1
+   Compiling rav1e v0.8.1
+   Compiling burn-std v0.22.0
+   Compiling aligned v0.4.3
+   Compiling ar_archive_writer v0.5.3
+   Compiling icu_locale v2.2.0
+   Compiling enumset_derive v0.15.0
+   Compiling rancor v0.1.3
+   Compiling cubek-matmul v0.3.0
+   Compiling generic-array v0.14.7
+   Compiling no_std_io2 v0.9.4
+   Compiling arg_enum_proc_macro v0.3.4
+   Compiling bytecheck_derive v0.8.3
+   Compiling parlance v0.1.0
+   Compiling simdutf8 v0.1.5
+   Compiling memmap2 v0.9.11
+   Compiling y4m v0.8.0
+   Compiling pastey v0.1.1
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling bytecheck v0.8.3
+   Compiling bitstream-io v4.10.0
+   Compiling icu_segmenter v2.2.0
+   Compiling enumset v1.1.14
+   Compiling psm v0.1.32
+   Compiling av1-grain v0.2.5
+   Compiling maybe-rayon v0.1.1
+   Compiling harfrust v0.8.4
+   Compiling skrifa v0.42.1
+   Compiling xml5ever v0.39.0
+   Compiling html5ever v0.39.0
+   Compiling parley_data v0.10.0
+   Compiling netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling itertools v0.14.0
+   Compiling sceno v0.0.4 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\sceno)
+   Compiling futures-channel v0.3.34
+   Compiling app_units v0.7.8
+   Compiling encoding_rs v0.8.42
+   Compiling document-session-api v0.1.0 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling munge_macro v0.4.7
+   Compiling num-derive v0.4.2
+   Compiling simd_helpers v0.1.0
+   Compiling dtoa v1.0.11
+   Compiling noop_proc_macro v0.3.0
+   Compiling quick-error v2.0.1
+   Compiling imgref v1.12.3
+   Compiling loop9 v0.1.5
+   Compiling dtoa-short v0.3.5
+   Compiling munge v0.4.7
+   Compiling genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling netrender v0.1.2 (https://github.com/merely-made/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb2)
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling burn-backend v0.22.0
+   Compiling rend v0.5.4
+   Compiling cubek-attention v0.3.0
+   Compiling cubek-convolution v0.3.0
+   Compiling cubek-random v0.3.0
+   Compiling cubek-reduce v0.3.0
+   Compiling cubek-quant v0.3.0
+   Compiling cubek-interpolate v0.3.0
+   Compiling cubek-pool v0.3.0
+   Compiling stacker v0.1.25
+   Compiling avif-serialize v0.8.9
+   Compiling async-trait v0.1.92
+   Compiling cssparser-macros v0.7.1
+   Compiling rkyv_derive v0.8.18
+   Compiling multiversion_no_op v1.0.0
+   Compiling rgb v0.8.53
+   Compiling color_quant v1.1.0
+   Compiling weezl v0.1.12
+   Compiling zune-core v0.5.3
+   Compiling byteorder-lite v0.1.0
+   Compiling pxfm v0.1.30
+   Compiling moxcms v0.8.1
+   Compiling image-webp v0.2.4
+   Compiling zune-jpeg v0.5.15
+   Compiling gif v0.14.2
+   Compiling ravif v0.13.0
+   Compiling rkyv v0.8.18
+   Compiling cssparser v0.37.0
+   Compiling muniment v0.1.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\muniment)
+   Compiling cubek v0.3.0
+   Compiling livery v0.0.5 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling burn-ir v0.22.0
+   Compiling engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling regress v0.11.1 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)
+   Compiling text_placeholder v0.5.1
+   Compiling approx v0.5.1
+   Compiling matrixmultiply v0.3.11
+   Compiling command-menu v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\command-menu)
+   Compiling getrandom v0.2.17
+error: the wasm*-unknown-unknown targets are not supported by default, you may need to enable the "js" feature. For more information see: https://docs.rs/getrandom/#webassembly-support
+   --> C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\getrandom-0.2.17\src\lib.rs:346:9
+    |
+346 | /         compile_error!("the wasm*-unknown-unknown targets are not supported by \
+347 | |                         default, you may need to enable the \"js\" feature. \
+348 | |                         For more information see: \
+349 | |                         https://docs.rs/getrandom/#webassembly-support");
+    | |________________________________________________________________________^
+
+error: could not compile `getrandom` (lib) due to 1 previous error

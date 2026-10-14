@@ -21,7 +21,7 @@ use genet_render_host::{
     DeviceLossNotice, PendingRgbaReadback, ReadbackFailure, RecoveryStatus, RenderCore, RgbaFrame,
     SharedRenderCore,
 };
-use netrender::{ColorLoad, NO_CLIP, NetrenderOptions, Scene, external_image_key};
+use netrender::{ColorLoad, NO_CLIP, NetrenderOptions, Scene};
 use std::{
     cell::RefCell,
     rc::Rc,
@@ -216,7 +216,12 @@ fn producer_readback(host: &mut WindowHost, key: u64) -> PendingRgbaReadback {
         HEIGHT as f32,
         [0.0, 0.0, 1.0, 1.0],
         [1.0; 4],
-        external_image_key(key),
+        host.s
+            .shared
+            .producers
+            .image_identity(key)
+            .unwrap()
+            .renderer_key,
         0,
         NO_CLIP,
     );

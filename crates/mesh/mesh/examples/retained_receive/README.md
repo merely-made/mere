@@ -170,7 +170,7 @@ runs a worker.
 
 Cross-repository findings live once in Mere's
 `design_docs/2026-08-24_standards_survey_brief.md` §10. Retinue's
-`retinue/design_docs/2026-10-11_transport_conformance_plan.md` owns implementation
+`murm/design_docs/2026-10-11_transport_conformance_plan.md` owns implementation
 sequencing and later stable-contract evaluation. Publication uses direct
 commits/pushes to `main`; local checks support prototyping. No workflows or PRs
 are part of this work.

@@ -1,0 +1,7 @@
+{
+  "packages": 1613,
+  "shared_package_dependency_records_inspected": 776,
+  "shared_crate_to_port_edges": [],
+  "kinds": "all resolved dependency kinds, including dev and target-specific records",
+  "metadata_sha256": "a43c30cce6598723a3e516351ff849345bc85fb62365fbec926a597872de646c"
+}

@@ -1090,11 +1090,11 @@ relay, and reconnect receipts.
   `ingress.link` slot Reticulum uses, and the derived
   `SessionFacts::proof_binding()` is equal to
   `transport::initiator_link_binding(&alpn, link)` — asserted in
-  `retinue/native/crates/transport/src/notochord.rs`
+  `murm/native/crates/transport/src/notochord.rs`
   (`a_webrtc_binding_pins_the_link_and_names_no_peer`). C2 therefore redeems
   into the existing Personae delegation grammar rather than adding one.
 - **2026-08-26:** the carrier vocabulary has exactly one mapping site.
-  `carrier_of` in `retinue/native/crates/transport/src/notochord.rs` is the only match on
+  `carrier_of` in `murm/native/crates/transport/src/notochord.rs` is the only match on
   `TransportKind` in the workspace; `notochord/src/facts.rs:19` mirrors the
   enum in prose only. Adding a carrier is a one-file change, and the
   exhaustiveness guarantee is real rather than assumed.
@@ -1279,7 +1279,7 @@ relay, and reconnect receipts.
   headed browser/native ping passed; donor benchmark mismatch identified;
   Notochord/Personae external Wasm compile passed; architecture and gates
   recorded. Production code remains untouched.
-- **2026-08-26: C0 landed.** New Wasm-clean `retinue/native/crates/webrtc-carrier`
+- **2026-08-26: C0 landed.** New Wasm-clean `murm/native/crates/webrtc-carrier`
   (bounded frames, `InviteId`, role-tagged DTLS fingerprints, the link-challenge
   transcript, `shared_link` derivation); `TransportKind::WebRtc` +
   `IngressContext::webrtc` mapped honestly to `CarrierKind::Other`;

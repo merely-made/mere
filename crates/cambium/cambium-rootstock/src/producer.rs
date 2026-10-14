@@ -9,7 +9,8 @@
 //! The application owns scene state, rendering and picking. Rootstock owns
 //! the image's document lifetime and stages changed output before rasterizing
 //! the ordinary document scene. Producer keys share Sprigging's namespace;
-//! register a key in only one registry.
+//! local keys belong to their registry. Rootstock assigns independent physical
+//! renderer identities so separate registries may use the same local keys.
 
 use std::{cell::RefCell, collections::BTreeMap, rc::Rc};
 
@@ -19,7 +20,7 @@ mod bridge;
 pub(crate) mod registry;
 pub use paint_list_render::bundle::{PortablePaintCapture, ProducerSource};
 pub use registry::PortableCaptureError;
-pub use registry::{ProducerImageIdentity, ProducerRegistry};
+pub use registry::{ProducerGpuRemapError, ProducerImageIdentity, ProducerRegistry};
 
 /// Application-owned portable scene; its viewport is the same rounded logical
 /// extent used by the producer's GPU callback. Identity changes on source rebind.
@@ -276,6 +277,8 @@ impl<P: TextureProducer> TextureProducer for Rc<RefCell<P>> {
 pub enum ProducerRegistrationError {
     KeyOutOfRange,
     AlreadyRegistered,
+    /// The nonreused physical producer identity range has been exhausted.
+    IdentityExhausted,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

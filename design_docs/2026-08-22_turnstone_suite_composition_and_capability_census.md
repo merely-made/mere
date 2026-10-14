@@ -617,7 +617,7 @@ already supported.
 
 | Lane | Owner and evidence | Done condition |
 |---|---|---|
-| R1: reference parity and resident cost | Retinue; `retinue/design_docs/2026-08-25_permissive_radio_protocol_compatibility_survey.md` is the parity ledger; controller MC4c receipts remain physical authority | Each promoted behavior has a reference version or an explicit missing pin, implementation location, embedded scope, independent evidence, and remaining gap. Self-peer success is separate from reference interoperability. |
+| R1: reference parity and resident cost | Retinue; `murm/design_docs/2026-08-25_permissive_radio_protocol_compatibility_survey.md` is the parity ledger; controller MC4c receipts remain physical authority | Each promoted behavior has a reference version or an explicit missing pin, implementation location, embedded scope, independent evidence, and remaining gap. Self-peer success is separate from reference interoperability. |
 | R2: conversation and activity composition | Mere Comms, Retinue Signalman, Turnstone place sessions, and existing Woodshed peer proof | Identify current durable owners and actual consumers before extracting shared presentation or lifecycle. Reuse existing history and session stores. |
 
 R1 keeps Retinue as the preferred radio foundation while Sennet and Tucket earn
@@ -687,7 +687,7 @@ Protocol identity routing, capability/privacy presentation and additional native
 Murm/LXMF/Sennet/Tucket adapters remain I2 follow-ons. No additional protocol is
 registered by this slice. Signalman's full desktop library check also passes;
 headed acceptance remains distinct from these compile/model checks. See
-`retinue/design_docs/2026-08-09_signalman_cambium_desktop_scope.md` for consumer
+`murm/design_docs/2026-08-09_signalman_cambium_desktop_scope.md` for consumer
 validation details.
 
 ### I3a execution receipt, 2026-09-13

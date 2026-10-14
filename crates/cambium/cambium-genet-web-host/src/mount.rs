@@ -28,8 +28,9 @@ use crate::files::WebFileChooser;
 use crate::input::{
     CompositionKind, composition_from_dom, key_press_from_dom, wheel_delta_from_dom,
 };
+use crate::recovery::{self, WakeBridge};
 use crate::surface::{WebSurface, WebWindow};
-use crate::{WHEEL_LINE_PX, WHEEL_PAGE_PX};
+use crate::{MountLifetime, WHEEL_LINE_PX, WHEEL_PAGE_PX};
 
 /// A mounted application, kept alive by the closures it installed.
 ///
@@ -42,6 +43,7 @@ where
 {
     host: Rc<RefCell<Host<State, Logic, V>>>,
     window: WebWindow,
+    lifetime: MountLifetime,
 }
 
 impl<State, Logic, V> Mounted<State, Logic, V>
@@ -53,6 +55,15 @@ where
     /// The host, for a caller that wants to drive it directly.
     pub fn host(&self) -> &Rc<RefCell<Host<State, Logic, V>>> {
         &self.host
+    }
+
+    /// Explicit lifetime authority. Dropping Mounted still leaves it running.
+    pub fn lifetime(&self) -> &MountLifetime {
+        &self.lifetime
+    }
+    /// Request idempotent disposal. Observe lifetime.status() for completion.
+    pub fn dispose(&self) -> bool {
+        self.lifetime.dispose()
     }
 
     /// The canvas frame.
@@ -83,24 +94,155 @@ where
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
 {
-    Box::pin(mount_inner(canvas, options, init, hooks))
+    mount_with_lifetime(canvas, options, MountLifetime::new(), init, hooks)
 }
 
-async fn mount_inner<State, Logic, V>(
+/// Mount an independent application onto another canvas on the same device.
+/// Application, DOM, resources and producer registry remain per mount; the
+/// existing core's recovery owner controls replacement for all its mounts.
+pub fn mount_with_render_core<State, Logic, V>(
     canvas: HtmlCanvasElement,
     options: HostOptions,
+    core: std::sync::Arc<genet_render_host::RenderCore>,
     init: impl FnOnce(
         &dyn HostWindow,
         &cambium_rootstock::WindowCommands,
         &HostWake,
     ) -> Init<State, Logic>,
     hooks: HostHooks<State, Logic, V>,
+) -> std::pin::Pin<Box<impl std::future::Future<Output = Result<Mounted<State, Logic, V>, String>>>>
+where
+    State: 'static,
+    Logic: FnMut(&State) -> V + 'static,
+    V: RootView<State>,
+{
+    mount_with_render_core_and_lifetime(canvas, options, core, MountLifetime::new(), init, hooks)
+}
+
+/// Mount with explicit startup cancellation and active disposal ownership.
+/// Create the lifetime before launching this future. Cancellation drops Rust
+/// acquisition state; JavaScript GPU requests themselves cannot be cancelled.
+pub fn mount_with_lifetime<State, Logic, V>(
+    canvas: HtmlCanvasElement,
+    options: HostOptions,
+    lifetime: MountLifetime,
+    init: impl FnOnce(
+        &dyn HostWindow,
+        &cambium_rootstock::WindowCommands,
+        &HostWake,
+    ) -> Init<State, Logic>,
+    hooks: HostHooks<State, Logic, V>,
+) -> std::pin::Pin<Box<impl std::future::Future<Output = Result<Mounted<State, Logic, V>, String>>>>
+where
+    State: 'static,
+    Logic: FnMut(&State) -> V + 'static,
+    V: RootView<State>,
+{
+    Box::pin(async move {
+        lifetime
+            .startup(mount_inner(
+                canvas,
+                options,
+                None,
+                init,
+                hooks,
+                lifetime.clone(),
+            ))
+            .await?
+    })
+}
+
+/// Explicit lifetime for an independent mount on an existing shared core.
+pub fn mount_with_render_core_and_lifetime<State, Logic, V>(
+    canvas: HtmlCanvasElement,
+    options: HostOptions,
+    core: std::sync::Arc<genet_render_host::RenderCore>,
+    lifetime: MountLifetime,
+    init: impl FnOnce(
+        &dyn HostWindow,
+        &cambium_rootstock::WindowCommands,
+        &HostWake,
+    ) -> Init<State, Logic>,
+    hooks: HostHooks<State, Logic, V>,
+) -> std::pin::Pin<Box<impl std::future::Future<Output = Result<Mounted<State, Logic, V>, String>>>>
+where
+    State: 'static,
+    Logic: FnMut(&State) -> V + 'static,
+    V: RootView<State>,
+{
+    mount_with_core_future_and_lifetime(
+        canvas,
+        options,
+        lifetime,
+        async move { Ok(core) },
+        init,
+        hooks,
+    )
+}
+
+/// Supply an actual core acquisition future through the same admission and
+/// activation path as ordinary mounting. A caller may impose its own finite
+/// acquisition deadline or hold a real candidate for lifecycle qualification.
+/// Disposal drops this future before init, listeners or drawing can activate.
+pub fn mount_with_core_future_and_lifetime<State, Logic, V>(
+    canvas: HtmlCanvasElement,
+    options: HostOptions,
+    lifetime: MountLifetime,
+    acquire: impl std::future::Future<
+        Output = Result<std::sync::Arc<genet_render_host::RenderCore>, String>,
+    > + 'static,
+    init: impl FnOnce(
+        &dyn HostWindow,
+        &cambium_rootstock::WindowCommands,
+        &HostWake,
+    ) -> Init<State, Logic>,
+    hooks: HostHooks<State, Logic, V>,
+) -> std::pin::Pin<Box<impl std::future::Future<Output = Result<Mounted<State, Logic, V>, String>>>>
+where
+    State: 'static,
+    Logic: FnMut(&State) -> V + 'static,
+    V: RootView<State>,
+{
+    Box::pin(async move {
+        lifetime
+            .startup(mount_inner(
+                canvas,
+                options,
+                Some(Box::pin(acquire)),
+                init,
+                hooks,
+                lifetime.clone(),
+            ))
+            .await?
+    })
+}
+
+async fn mount_inner<State, Logic, V>(
+    canvas: HtmlCanvasElement,
+    options: HostOptions,
+    acquire: Option<
+        std::pin::Pin<
+            Box<
+                dyn std::future::Future<
+                        Output = Result<std::sync::Arc<genet_render_host::RenderCore>, String>,
+                    >,
+            >,
+        >,
+    >,
+    init: impl FnOnce(
+        &dyn HostWindow,
+        &cambium_rootstock::WindowCommands,
+        &HostWake,
+    ) -> Init<State, Logic>,
+    hooks: HostHooks<State, Logic, V>,
+    lifetime: MountLifetime,
 ) -> Result<Mounted<State, Logic, V>, String>
 where
     State: 'static,
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
 {
+    lifetime.check()?;
     let window = WebWindow::new(canvas.clone());
     let (width, height) = window.physical_size();
     // The backing store is sized in physical pixels so a fragment lands on a
@@ -108,17 +250,33 @@ where
     canvas.set_width(width);
     canvas.set_height(height);
 
-    let surface = WebSurface::boot(canvas.clone(), width, height, (options.netrender)()).await?;
+    let private_acquisition = acquire.is_none();
+    let core = match acquire {
+        Some(acquire) => acquire.await?,
+        None => std::sync::Arc::new(
+            genet_render_host::RenderCore::boot_async((options.netrender)()).await?,
+        ),
+    };
+    // A default acquisition is a fresh private device, not yet lent to a
+    // host. Only that ownership permits explicit destruction. Caller-provided
+    // futures/cores can share a device and must never be destroyed here.
+    if let Err(error) = lifetime.check() {
+        if private_acquisition {
+            core.renderer().wgpu_device.core.device.destroy();
+        }
+        drop(core);
+        return Err(error);
+    }
+    let surface = WebSurface::from_core(canvas.clone(), core, width, height)?;
+    lifetime.check()?;
     let label = options.title.clone();
     // The wake flag the host reads, and the signal that gets a frame drawn.
     // Both are atomics: the host's wake handle is `Send + Sync` because a
     // desktop worker thread may wake the UI, and that bound holds regardless
     // of how many threads a browser has.
     let wake_pending = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
-    let wake = HostWake::new(wake_pending.clone(), {
-        let pending = window.pending_frame_flag();
-        std::sync::Arc::new(move || pending.store(true, std::sync::atomic::Ordering::Relaxed))
-    });
+    let bridge = WakeBridge::new();
+    let wake = HostWake::new(wake_pending.clone(), bridge.signal());
 
     let mut s = HostState::new();
     s.wake_pending = wake_pending;
@@ -129,6 +287,7 @@ where
         fonts,
         images,
     } = init(&window, &s.commands.clone(), &wake);
+    lifetime.check()?;
     let dom = Rc::new(RefCell::new(ScriptedDom::new()));
 
     s.shared.sheet = sheet;
@@ -136,13 +295,37 @@ where
     s.runner = Some(Runner::new(dom, logic, state));
     let a11y = DomAccessibility::new(canvas.clone(), label)?;
     let mirror = a11y.handle();
+    let cleanup_mirror = mirror.root.clone();
+    lifetime.on_dispose(move || cleanup_mirror.remove());
     s.a11y = Some(Box::new(a11y));
-    s.files = Some(Box::new(WebFileChooser::new(&canvas)?));
+    s.files = Some(Box::new(WebFileChooser::new_with_lifetime(
+        &canvas, &lifetime,
+    )?));
     s.window = Some(Box::new(window.clone()));
     s.shared.render_core = Some(surface.shared_core());
     s.surface = Some(Box::new(surface));
 
     let host = Rc::new(RefCell::new(Host::new(options, None, hooks, s, wake)));
+    let cleanup_host = host.clone();
+    let cleanup_mirror = mirror.root.clone();
+    lifetime.on_dispose(move || {
+        let (guard, a11y, files, window) = {
+            let mut host = cleanup_host.borrow_mut();
+            (
+                host.take_disposal(),
+                host.s.a11y.take(),
+                host.s.files.take(),
+                host.s.window.take(),
+            )
+        };
+        drop(guard); // producer retirement + capture refusals outside RefMut
+        cleanup_mirror.remove();
+        drop((a11y, files, window));
+    });
+    let cleanup_bridge = bridge.clone();
+    lifetime.on_dispose(move || drop(cleanup_bridge));
+    bridge.attach(&host, &window, &lifetime);
+    recovery::drain(&host, &window);
 
     let document = web_sys::window()
         .and_then(|w| w.document())
@@ -150,24 +333,42 @@ where
     host.borrow_mut().set_hidden(document.hidden());
     let visibility_host = host.clone();
     let visibility_document = document.clone();
+    let visibility_window = window.clone();
+    let visibility_bridge = bridge.clone();
+    let visibility_lifetime = lifetime.clone();
     let visibility = Closure::<dyn FnMut(web_sys::Event)>::new(move |_| {
+        if !visibility_lifetime.admitted() {
+            return;
+        }
+        let _keep_bridge = &visibility_bridge;
         visibility_host
             .borrow_mut()
             .set_hidden(visibility_document.hidden());
+        recovery::drain(&visibility_host, &visibility_window);
     });
-    document
-        .add_event_listener_with_callback("visibilitychange", visibility.as_ref().unchecked_ref())
-        .map_err(|_| "could not attach visibilitychange")?;
-    visibility.forget();
+    let callback = visibility.as_ref().clone();
+    lifetime.listen(
+        document.as_ref(),
+        "visibilitychange",
+        &callback,
+        move || drop(visibility),
+    )?;
 
     // Visible mounts paint immediately. Hidden mounts still lay out and publish
     // their accessibility mirror, without advancing texture producers.
+    lifetime.check()?;
     draw(&mut host.borrow_mut());
+    lifetime.check()?;
 
-    install_listeners(&canvas, &mirror, &host, &window)?;
-    schedule_frames(&host, &window)?;
+    install_listeners(&canvas, &mirror, &host, &window, &lifetime)?;
+    schedule_frames(&host, &window, bridge, &lifetime)?;
+    lifetime.activate()?;
 
-    Ok(Mounted { host, window })
+    Ok(Mounted {
+        host,
+        window,
+        lifetime,
+    })
 }
 
 /// The frame loop.
@@ -179,6 +380,8 @@ where
 fn schedule_frames<State, Logic, V>(
     host: &Rc<RefCell<Host<State, Logic, V>>>,
     window: &WebWindow,
+    bridge: Rc<WakeBridge>,
+    lifetime: &MountLifetime,
 ) -> Result<(), String>
 where
     State: 'static,
@@ -188,11 +391,34 @@ where
     let browser = web_sys::window().ok_or("no window")?;
     let frame: Rc<RefCell<Option<Closure<dyn FnMut(f64)>>>> = Rc::new(RefCell::new(None));
     let next = frame.clone();
+    let request = Rc::new(std::cell::Cell::new(None::<i32>));
+    let cleanup_request = request.clone();
+    let cleanup_frame = frame.clone();
+    let cleanup_browser = browser.clone();
+    let cleanup_lifetime = lifetime.clone();
+    lifetime.on_dispose(move || {
+        if let Some(id) = cleanup_request.take() {
+            let _ = cleanup_browser.cancel_animation_frame(id);
+        }
+        cleanup_lifetime.raf_pending(false);
+        drop(cleanup_frame.borrow_mut().take());
+    });
+    let initial_request = request.clone();
+    let frame_lifetime = lifetime.clone();
     let host = host.clone();
     let window = window.clone();
     let mut last_size = window.physical_size();
 
     *next.borrow_mut() = Some(Closure::new(move |timestamp_ms: f64| {
+        request.set(None);
+        frame_lifetime.raf_pending(false);
+        if !frame_lifetime.admitted() {
+            return;
+        }
+        // Keep the wake bridge alive for the same listener/RAF lifetime as
+        // the mounted application, even after Mounted itself is dropped.
+        let _keep_bridge = &bridge;
+        recovery::drain(&host, &window);
         // A CSS-driven resize has no event of its own that also covers zoom
         // and device-pixel-ratio changes, so the frame loop watches the one
         // number that captures all three.
@@ -215,15 +441,22 @@ where
         if let Some(browser) = web_sys::window()
             && let Some(callback) = frame.borrow().as_ref()
         {
-            let _ = browser.request_animation_frame(callback.as_ref().unchecked_ref());
+            if frame_lifetime.admitted() {
+                if let Ok(id) = browser.request_animation_frame(callback.as_ref().unchecked_ref()) {
+                    request.set(Some(id));
+                    frame_lifetime.raf_pending(true);
+                }
+            }
         }
     }));
 
     let callback = next.borrow();
     let callback = callback.as_ref().ok_or("frame closure")?;
-    browser
+    let id = browser
         .request_animation_frame(callback.as_ref().unchecked_ref())
         .map_err(|_| "could not schedule frames".to_string())?;
+    initial_request.set(Some(id));
+    lifetime.raf_pending(true);
     Ok(())
 }
 
@@ -307,6 +540,7 @@ fn install_listeners<State, Logic, V>(
     mirror: &MirrorHandle,
     host: &Rc<RefCell<Host<State, Logic, V>>>,
     window: &WebWindow,
+    lifetime: &MountLifetime,
 ) -> Result<(), String>
 where
     State: 'static,
@@ -330,13 +564,15 @@ where
 
     macro_rules! listen {
         ($target:expr, $name:literal, $ty:ty, $handler:expr) => {{
-            let closure = Closure::<dyn FnMut($ty)>::new($handler);
-            $target
-                .add_event_listener_with_callback($name, closure.as_ref().unchecked_ref())
-                .map_err(|_| concat!("could not attach ", $name).to_string())?;
-            // Deliberately leaked: the listener must outlive this call, and a
-            // mounted application lives as long as its page.
-            closure.forget();
+            let listener_lifetime = lifetime.clone();
+            let mut handler = $handler;
+            let closure = Closure::<dyn FnMut($ty)>::new(move |event| {
+                if listener_lifetime.admitted() {
+                    handler(event);
+                }
+            });
+            let callback = closure.as_ref().clone();
+            lifetime.listen($target.as_ref(), $name, &callback, move || drop(closure))?;
         }};
     }
 
@@ -480,6 +716,25 @@ where
         on_key(host, window)
     );
 
+    // A Tab tap must leave held-Tab spatial navigation. Own these listeners
+    // in the same phase-admitted lifetime as keydown, including the mirror
+    // that receives keyboard focus after accessibility routing.
+    let key_targets: [&web_sys::EventTarget; 2] = [canvas.as_ref(), root.as_ref()];
+    for target in key_targets {
+        let h = host.clone();
+        let release_lifetime = lifetime.clone();
+        let release =
+            Closure::<dyn FnMut(web_sys::KeyboardEvent)>::new(move |e: web_sys::KeyboardEvent| {
+                if !release_lifetime.admitted() {
+                    return;
+                }
+                let key = key_press_from_dom(&e).key;
+                h.borrow_mut().key_released(&key);
+            });
+        let callback = release.as_ref().clone();
+        lifetime.listen(target, "keyup", &callback, move || drop(release))?;
+    }
+
     let targets: [&web_sys::EventTarget; 2] = [canvas.as_ref(), root.as_ref()];
     for target in targets {
         for (name, kind) in [
@@ -489,17 +744,19 @@ where
         ] {
             let h = host.clone();
             let w = window.clone();
+            let listener_lifetime = lifetime.clone();
             let closure = Closure::<dyn FnMut(web_sys::CompositionEvent)>::new(
                 move |e: web_sys::CompositionEvent| {
+                    if !listener_lifetime.admitted() {
+                        return;
+                    }
                     h.borrow_mut()
                         .ime(composition_from_dom(kind, e.data().unwrap_or_default()));
                     w.request_redraw();
                 },
             );
-            target
-                .add_event_listener_with_callback(name, closure.as_ref().unchecked_ref())
-                .map_err(|_| format!("could not attach {name}"))?;
-            closure.forget();
+            let callback = closure.as_ref().clone();
+            lifetime.listen(target, name, &callback, move || drop(closure))?;
         }
     }
 
@@ -523,8 +780,12 @@ where
     // Following host focus can synchronously emit another focusin. The guard
     // below answers that nested event; an FnMut trampoline refuses it before
     // the guard can run.
+    let focus_lifetime = lifetime.clone();
     let focus_listener =
         Closure::<dyn Fn(web_sys::FocusEvent)>::new(move |e: web_sys::FocusEvent| {
+            if !focus_lifetime.admitted() {
+                return;
+            }
             // The mirror moving focus to follow the tree is not a reader asking.
             if m.moving.get() {
                 return;
@@ -534,9 +795,10 @@ where
                 reader_act(&h, A11yRequest { action, target });
             }
         });
-    root.add_event_listener_with_callback("focusin", focus_listener.as_ref().unchecked_ref())
-        .map_err(|_| "could not attach focusin".to_string())?;
-    focus_listener.forget();
+    let callback = focus_listener.as_ref().clone();
+    lifetime.listen(root.as_ref(), "focusin", &callback, move || {
+        drop(focus_listener)
+    })?;
 
     // The canvas takes focus from Tab or a press, and hands it to the mirror,
     // where a reader hears what has it.

@@ -19,7 +19,18 @@ use super::edge_taxonomy::{
 };
 
 /// A temporal traversal event recorded on an edge.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Archive, Serialize, Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Archive,
+    Serialize,
+    Deserialize,
+    serde::Serialize,
+    serde::Deserialize,
+)]
 pub struct Traversal {
     pub timestamp_ms: u64,
     pub trigger: NavigationTrigger,
@@ -36,7 +47,18 @@ impl Traversal {
 }
 
 /// Durable traversal aggregates retained even when rolling-window records are evicted.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Archive, Serialize, Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Archive,
+    Serialize,
+    Deserialize,
+    serde::Serialize,
+    serde::Deserialize,
+)]
 pub struct EdgeMetrics {
     pub total_navigations: u64,
     pub forward_navigations: u64,
@@ -74,7 +96,17 @@ impl Default for EdgeMetrics {
 /// Attribution for stored assertions whose original asserter is unknown.
 pub const UNKNOWN_LEGACY_ASSERTER_IRI: &str = "https://mere.computer/ns/agent#unknown-legacy";
 
-#[derive(Debug, Clone, PartialEq, Eq, Archive, Serialize, Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Archive,
+    Serialize,
+    Deserialize,
+    serde::Serialize,
+    serde::Deserialize,
+)]
 pub struct SemanticStatement {
     pub statement_id: String,
     pub predicate: String,
@@ -115,7 +147,18 @@ impl SemanticStatement {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Archive, Serialize, Deserialize, Default)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Archive,
+    Serialize,
+    Deserialize,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+)]
 pub struct SemanticData {
     /// Compatibility aggregate: kept during the bucket migration so existing
     /// readers can keep asking the pair-local edge what semantic kinds it
@@ -420,7 +463,18 @@ pub fn all_semantic_sub_kinds() -> impl Iterator<Item = SemanticSubKind> {
     SemanticSubKind::iter()
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Archive, Serialize, Deserialize, Default)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Archive,
+    Serialize,
+    Deserialize,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+)]
 pub struct TraversalData {
     pub traversals: Vec<Traversal>,
     pub metrics: EdgeMetrics,
@@ -433,22 +487,66 @@ impl TraversalData {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Archive, Serialize, Deserialize, Default)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Archive,
+    Serialize,
+    Deserialize,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+)]
 pub struct ArrangementData {
     pub sub_kinds: BTreeSet<ArrangementSubKind>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Archive, Serialize, Deserialize, Default)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Archive,
+    Serialize,
+    Deserialize,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+)]
 pub struct ContainmentData {
     pub sub_kinds: BTreeSet<ContainmentSubKind>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Archive, Serialize, Deserialize, Default)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Archive,
+    Serialize,
+    Deserialize,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+)]
 pub struct ImportedData {
     pub sub_kinds: BTreeSet<ImportedSubKind>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Archive, Serialize, Deserialize, Default)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Archive,
+    Serialize,
+    Deserialize,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+)]
 pub struct ProvenanceData {
     pub sub_kinds: BTreeSet<ProvenanceSubKind>,
 }

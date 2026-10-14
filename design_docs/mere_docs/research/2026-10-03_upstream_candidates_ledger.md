@@ -211,7 +211,7 @@ So, for each item:
   key material left after a lock. These copies are freed, not live, but
   their contents survive until reused.
 - **What we carry:** nothing; we measure against an iroh-only baseline
-  (`retinue/native/crates/transport/tests/seed_residue.rs`).
+  (`murm/native/crates/transport/tests/seed_residue.rs`).
 - **Last checked:** iroh 1.3.0, iroh-gossip 0.101.0, portmapper 0.19.3.
 
 ### 11. p2panda-net: the signing key moves through actor futures

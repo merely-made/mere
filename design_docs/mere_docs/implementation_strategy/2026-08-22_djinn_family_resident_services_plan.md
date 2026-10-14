@@ -238,7 +238,7 @@ Done conditions:
 **Corrected 2026-10-06 (S14 pass):** A4 is partly built, which this section
 did not record. `ReleaseRefV1` exists at `crates/system/luggage/src/release.rs`
 (line 62), landed in `d10e04da` (2026-09-01), and
-`retinue/native/crates/webrtc-carrier/src/invite.rs` uses it. `ReleaseOfferV1` and the
+`murm/native/crates/webrtc-carrier/src/invite.rs` uses it. `ReleaseOfferV1` and the
 versioned manifest are absent.
 
 **Open, raised by the S14 pass (2026-10-06):** `ReleaseRefV1` landed for the
@@ -426,7 +426,7 @@ authorization and does not replace owner-selected relays outside the LAN.
 
 The peer-discovery substrate this advertises beside is recorded as R0 of the
 [reachability rungs plan](2026-08-03_reachability_rungs_and_privacy_lanes_plan.md)
-(2026-09-01); `P2pandaHostPolicy` in `retinue/native/crates/transport/src/p2panda_host.rs`
+(2026-09-01); `P2pandaHostPolicy` in `murm/native/crates/transport/src/p2panda_host.rs`
 is where an advertisement toggle plugs in.
 
 Done conditions for Phase F:

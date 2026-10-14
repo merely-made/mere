@@ -1,0 +1,22 @@
+{
+  "attempts": [
+    {
+      "exit_code": 101,
+      "source_before": "9f3361be457f2ee7a5fc111439a5b45673fc14b9",
+      "source_after": "9f3361be457f2ee7a5fc111439a5b45673fc14b9",
+      "source_status_after": "",
+      "peak_owned_rss_bytes": 54542336,
+      "guard_failure": null,
+      "log": "/Users/markik/Code/targets/mere/djinn-build.log"
+    },
+    {
+      "exit_code": 0,
+      "source_before": "9f3361be457f2ee7a5fc111439a5b45673fc14b9",
+      "source_after": "9f3361be457f2ee7a5fc111439a5b45673fc14b9",
+      "source_status_after": "",
+      "peak_owned_rss_bytes": 1477734400,
+      "guard_failure": null,
+      "log": "/Users/markik/Code/targets/mere/djinn-build.log"
+    }
+  ]
+}

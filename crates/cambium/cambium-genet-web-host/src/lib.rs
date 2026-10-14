@@ -41,6 +41,11 @@
 
 pub mod mirror;
 
+#[cfg(any(target_arch = "wasm32", test))]
+mod lifetime;
+#[cfg(target_arch = "wasm32")]
+pub use lifetime::{MountLifetime, MountPhase, MountStatus};
+
 /// DOM delta modes are pixels (0), lines (1) and pages (2). Preserve the
 /// DOM sign while resolving units into the host's logical scroll pixels.
 #[cfg(any(target_arch = "wasm32", test))]
@@ -85,6 +90,8 @@ mod lane;
 #[cfg(target_arch = "wasm32")]
 mod mount;
 #[cfg(target_arch = "wasm32")]
+mod recovery;
+#[cfg(target_arch = "wasm32")]
 mod start;
 #[cfg(target_arch = "wasm32")]
 mod surface;
@@ -103,7 +110,10 @@ pub use input::{
 #[cfg(target_arch = "wasm32")]
 pub use lane::WebCapture;
 #[cfg(target_arch = "wasm32")]
-pub use mount::{Mounted, mount};
+pub use mount::{
+    Mounted, mount, mount_with_core_future_and_lifetime, mount_with_lifetime,
+    mount_with_render_core, mount_with_render_core_and_lifetime,
+};
 #[cfg(target_arch = "wasm32")]
 pub use start::run_static_constructors_once;
 #[cfg(target_arch = "wasm32")]

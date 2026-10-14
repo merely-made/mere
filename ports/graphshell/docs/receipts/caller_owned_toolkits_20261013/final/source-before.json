@@ -1,0 +1,113 @@
+{
+  "git_head": "eeb59b303fd32611fdab1aea7a52a0f29b004fa0",
+  "files": [
+    {
+      "sha256": "77ee8deb58748694b466d3265bc829bab8e3c992326396bf9019f9792d907b89",
+      "path": "Cargo.lock"
+    },
+    {
+      "sha256": "c71dcb22f97d72b6e418f8b4fd726ef21afe6ec24b481de5cfb9d1bc2bacf6f2",
+      "path": "Cargo.toml"
+    },
+    {
+      "sha256": "64a618ba970fe98b5f5bbd7e47b2eac169ef54171f955f0295114c51ebc1a8c4",
+      "path": "crates/cambium/cambium-rootstock/src/embedding.rs"
+    },
+    {
+      "sha256": "f17db3957b7b33d7f55ce3c648eff20137a185a4b87176ecd5e0a6bc1a403c48",
+      "path": "crates/cambium/cambium/src/retained_mount.rs"
+    },
+    {
+      "sha256": "6c10277119dd1394e551de96495f520342671f6cb7190fafb8ff631b3d224ef6",
+      "path": "crates/cambium/cambium/src/workspace.rs"
+    },
+    {
+      "sha256": "54da421cb0ae921aff5bc4e29c11a44814761ab149b4afff0691b8a6bdf33a09",
+      "path": "crates/mere/src/query_view.rs"
+    },
+    {
+      "sha256": "fe607323cd484d6a7f910876e1b1b96b6f71952ee94ee8ef698eeaaf9cdacd32",
+      "path": "crates/cambium/cambium-rootstock/src/embedding/egui_input.rs"
+    },
+    {
+      "sha256": "3602674c9830df82b3d1eb10ffddc339e5989f2123728e926ee14e23bbd6e81c",
+      "path": "crates/cambium/cambium-rootstock/src/embedding/egui.rs"
+    },
+    {
+      "sha256": "7ced5db6a2f1cc35573bd32c1fcc114be9e4a3745a1141473d2a6aa01d6b2e5c",
+      "path": "crates/cambium/cambium-rootstock/src/embedding/gpu.rs"
+    },
+    {
+      "sha256": "53407ad4cff2aa559d7fab8dc14d0f92528f2859fb54fd857d83f263b7903acd",
+      "path": "crates/cambium/cambium-rootstock/src/embedding/iced_input.rs"
+    },
+    {
+      "sha256": "c37545bc7d56308eedffb0d948f205620a3222dc7391efbd749d2c04b32d8368",
+      "path": "crates/cambium/cambium-rootstock/src/embedding/iced.rs"
+    },
+    {
+      "sha256": "c09d4ab58b3a68cf1a53d97200cef2710114ad2f4abd93de825ba93952a7b060",
+      "path": "crates/cambium/cambium-rootstock/src/embedding/input.rs"
+    },
+    {
+      "sha256": "70668c698f14b647bee7eed6add6a7e0524055ca2dfefeb6b3d438be29e842fa",
+      "path": "crates/cambium/cambium-rootstock/src/embedding/tests.rs"
+    },
+    {
+      "sha256": "880c28ffe4ca590d3efc950a89b0b1397491265575eefc5426e1d92deef36225",
+      "path": "crates/mere/src/query_view/projection.rs"
+    },
+    {
+      "sha256": "07f76ba16fb72808921b61b6af6c14fa366ef4a30b27ee3c072cc61483673b93",
+      "path": "crates/mere/src/query_view/stroke.rs"
+    },
+    {
+      "sha256": "8daee79a3d0d4ec1095fa3dbe594e8137067ab84120122a94ceb64c792d3900a",
+      "path": "crates/mere/src/query_view/tests.rs"
+    },
+    {
+      "sha256": "3ad9338a662de893a9867d3add1a7e5a046b074c35e492a0787858eb92776c61",
+      "path": "ports/graphshell/docs/receipts/co_op_member.png"
+    },
+    {
+      "sha256": "0c98caf46f3053662a4080affaae3ab20ca5a3f5557df410eb7e3abe6575becf",
+      "path": "ports/graphshell/docs/receipts/query_views_20261013/final_native_gates.ps1"
+    },
+    {
+      "sha256": "961166b90310949c563bbe39784987177de010e847901e540c36cee7b6902e88",
+      "path": "ports/graphshell/examples/caller_owned_toolkits.rs"
+    },
+    {
+      "sha256": "f83f5c9cc461ee30804456c519b989af0793ef142519260174a952e7fec420be",
+      "path": "ports/graphshell/src/query_views.rs"
+    },
+    {
+      "sha256": "9d78567e536519a06133b6397f390558b45b885d7eba196153e58db6dc3012af",
+      "path": "ports/graphshell/src/retained_content.rs"
+    },
+    {
+      "sha256": "319cff6e7a31f0f2a41c475dca42890aa5d19fe16017e2290f8c1d4e14f76481",
+      "path": "ports/graphshell/web/GraphshellSans.ttf"
+    },
+    {
+      "sha256": "68e8a1b46b884179e250e0f6df4ac72d3647e0b590b80d4d8e1c06413cdc7e49",
+      "path": "ports/graphshell/src/retained_content/export.rs"
+    },
+    {
+      "sha256": "db75193300500baf2298891b1ecdb00bd345b3af28749597788334b2628717ba",
+      "path": "ports/graphshell/src/retained_content/fixture.rs"
+    },
+    {
+      "sha256": "c0b74e44c1b447e5003ec4be25e44a6732da2b5776eadf9304ca0f0a8eeb0b0a",
+      "path": "ports/graphshell/src/retained_content/producer.rs"
+    },
+    {
+      "sha256": "bf60fb4646c0532f3ecc62bd3f3f09d88965d987d432adc3605824c758e3ce2c",
+      "path": "ports/graphshell/src/retained_content/tests.rs"
+    },
+    {
+      "sha256": "4549fd1c2a1cba991d22d9f2215ef875db0c1d3dceb1de5c0c613f00254a403d",
+      "path": "ports/graphshell/src/retained_content/view.rs"
+    }
+  ]
+}

@@ -1,0 +1,790 @@
+{
+  "schema": "native-shared-recovery-qualification/v1",
+  "status": "PASS",
+  "run_id": "native-cc65bf4a8-r2-20261013T222926Z",
+  "scope": "Normal-run native presentation and controlled shared Device::destroy recovery for two independent full Workshop hosts with identical local producer keys.",
+  "references": {
+    "candidate": {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/candidate-r2-qualified.json",
+      "sha256": "2d9aedfccef2bcb4aa5be86f0e2e849e6410c848f9c26afd60cd6b7d04aaea1b",
+      "bytes": 193733
+    },
+    "driver": {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run_native-r2.py",
+      "sha256": "5789a6fd901d225f1c4a439e641213c0345771c8f80817d2b5a1745550f496ff",
+      "bytes": 18059
+    },
+    "runtime": {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/runtime.json",
+      "sha256": "99b6ef1ea5d0445cc5c1a8f8f2c6b2c9e8c7a4f1e2b2aaff28d16529618fb55f",
+      "bytes": 7161
+    },
+    "proof": {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts/proof.json",
+      "sha256": "7e3f615d3fd3b458c2723f2a71a571633fcd518fea1c8e5303d1d8df7454e2e7",
+      "bytes": 33450
+    },
+    "manifest": {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/manifest.json",
+      "sha256": "8fea8ee15fda60362a98d2f278634bb60a70626ab848394ebc422cc59548930a",
+      "bytes": 15789
+    },
+    "ownership": {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/owned-process.json",
+      "sha256": "f787fb8dd51d4512f4f2a9c2ab6b9a07dbf4bc3307c3a60a83eb0a036c318749",
+      "bytes": 2004
+    },
+    "grant": {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/grant-r2.json",
+      "sha256": "c7a2da00b68e58180bdecc3ceb41b34c027d2cff1fbf62c68eba37715e78c725",
+      "bytes": 404
+    },
+    "binary": {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/native-shared-recovery-frozen",
+      "sha256": "89f1304fee7e1a50f8d66d5e5dc0ff692a9b4ec54da1b4f1992cc3d95b1f2cbc",
+      "bytes": 111959680
+    },
+    "build_receipt": {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/checks/native-shared-build-rust199-r1.json",
+      "sha256": "da648571773ee66cfa38ca19ebce3723e33e202ab6e509458be7887580bd7b3b",
+      "bytes": 557
+    }
+  },
+  "source_basis": {
+    "native_binary_build_heads": {
+      "/Users/markik/Code/worktrees/mere-vello-release-adoption": "cc65bf4a8f71867217f10041e9cfd34d1e2d0de2",
+      "/Users/markik/Code/worktrees/genet-vello-release-adoption": "09b16a559237aaa8163589763dbe2370264097cc",
+      "/Users/markik/Code/worktrees/netrender-cambium-resource-bridge": "c74b7cb28090c28b1c6d80b08dcdea18aff48d3e",
+      "/Users/markik/Code/worktrees/vello-release-adoption": "2eae6243881d5b24c984d5ee35dde509ca5db782"
+    },
+    "qualified_candidate_heads": {
+      "/Users/markik/Code/worktrees/mere-vello-release-adoption": "0570f098e2e99e787e7bfcc78495f3c1a06af0d2",
+      "/Users/markik/Code/worktrees/genet-vello-release-adoption": "09b16a559237aaa8163589763dbe2370264097cc",
+      "/Users/markik/Code/worktrees/netrender-cambium-resource-bridge": "c74b7cb28090c28b1c6d80b08dcdea18aff48d3e",
+      "/Users/markik/Code/worktrees/vello-release-adoption": "2eae6243881d5b24c984d5ee35dde509ca5db782"
+    },
+    "mere_native_binary_source": "cc65bf4a8f71867217f10041e9cfd34d1e2d0de2",
+    "mere_qualified_source": "0570f098e2e99e787e7bfcc78495f3c1a06af0d2",
+    "reconciled_changed_paths": [
+      "crates/cambium/cambium-genet-web-host/examples/shared_recovery/main.rs"
+    ],
+    "reconciliation": [
+      {
+        "path": "/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium-genet-web-host/examples/shared_recovery/main.rs",
+        "before_sha256": "ccaa7a66a43d0941fb57915397f40ae664d28345e3193c3db66d66b21f7af793",
+        "after_sha256": "c34b8b2e8d91f95c1a9cce43e411ba1b22f7230e8cf4ff5224beb6d687409520",
+        "scope": "browser-only explicit byte-to-hex compiler repair; not used by frozen native example"
+      }
+    ],
+    "scope": "The native executable was built at cc65bf4a8; current qualified 0570f098 differs only in the unused browser fixture. No native rebuild equivalence is inferred beyond that exact source-only reconciliation.",
+    "embedded_source_manifest": {
+      "desktop_manifest_fnv1a": "c9f222a53603ebca",
+      "example_fnv1a": "5d1346f7342269db",
+      "hash_kind": "FNV-1a; runtime owner separately seals source/lock/executable SHA256",
+      "workspace_lock_fnv1a": "9862a409a736e6e4",
+      "workspace_manifest_fnv1a": "c3b09e0cce7ce0b6"
+    }
+  },
+  "normal_run_ownership": {
+    "closed": true,
+    "processes": {
+      "native": {
+        "identity": {
+          "pid": 30554,
+          "pgid": 30554,
+          "uid": 501,
+          "executable": "/Users/markik/Code/output/vello-next-gates-20261013/native/native-shared-recovery-frozen",
+          "command": [
+            "/Users/markik/Code/output/vello-next-gates-20261013/native/native-shared-recovery-frozen",
+            "--output",
+            "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts",
+            "--run-id",
+            "native-cc65bf4a8-r2-20261013T222926Z",
+            "--allow-device-destroy"
+          ],
+          "launch_requested_at": "2026-10-13T22:32:26.798723+00:00",
+          "parent_pid": 30546,
+          "new_session_requested": true,
+          "observed_start": "Tue Oct 13 18:32:26 2026",
+          "birth_verified": true,
+          "first_observation": {
+            "state": "owned",
+            "members": [
+              {
+                "pid": 30554,
+                "ppid": 30546,
+                "pgid": 30554,
+                "uid": 501,
+                "start": "Tue Oct 13 18:32:26 2026",
+                "executable": "/Users/markik/Code/output/vello-next-gates-20261013/native/native-shared-recovery-frozen"
+              }
+            ]
+          }
+        },
+        "final": {
+          "state": "gone",
+          "members": [],
+          "exit_code": 0
+        },
+        "exit_code": 0,
+        "closed": true
+      },
+      "inhibitor": {
+        "identity": {
+          "pid": 30552,
+          "pgid": 30552,
+          "uid": 501,
+          "executable": "/usr/bin/caffeinate",
+          "command": [
+            "/usr/bin/caffeinate",
+            "-dimsu",
+            "-t",
+            "90"
+          ],
+          "launch_requested_at": "2026-10-13T22:32:26.727599+00:00",
+          "parent_pid": 30546,
+          "new_session_requested": true,
+          "observed_start": "Tue Oct 13 18:32:26 2026",
+          "birth_verified": true,
+          "first_observation": {
+            "state": "owned",
+            "members": [
+              {
+                "pid": 30552,
+                "ppid": 30546,
+                "pgid": 30552,
+                "uid": 501,
+                "start": "Tue Oct 13 18:32:26 2026",
+                "executable": "/usr/bin/caffeinate"
+              }
+            ]
+          }
+        },
+        "final": {
+          "state": "gone",
+          "members": [],
+          "exit_code": -15
+        },
+        "exit_code": -15,
+        "closed": true
+      }
+    },
+    "driver_pid": 30546,
+    "uid": 501,
+    "interruption_observed": false,
+    "interruption_resilience_qualified": false,
+    "scope": "Both direct child identities were observed and both groups were observed gone on normal-run cleanup. This run does not qualify the subsequent interrupted-launch repair."
+  },
+  "timing": {
+    "started_at": "2026-10-13T22:32:26.262908+00:00",
+    "ended_at": "2026-10-13T22:32:57.007034+00:00",
+    "elapsed_seconds": 30.745,
+    "fixture_elapsed_seconds": 10.214796338,
+    "absolute_deadline": "2026-10-13T22:33:56.262908+00:00",
+    "grant_deadline": "2026-10-13T22:36:00+00:00",
+    "work_seconds": 80,
+    "cleanup_reserve_seconds": 10,
+    "maximum_seconds": 90,
+    "within_absolute_and_duration_deadline": true
+  },
+  "recovery": {
+    "adapter": {
+      "backend": "Metal",
+      "driver": "",
+      "driver_info": "",
+      "name": "AMD Radeon Pro Vega 56"
+    },
+    "initial_generation": 1,
+    "replacement_generation": 2,
+    "loss": {
+      "generation": 1,
+      "message": "",
+      "reason": "Destroyed"
+    },
+    "factory_attempts": 1,
+    "old_core_released": true,
+    "hidden_host_acknowledged_loss": true,
+    "same_owner_and_core_verified": true,
+    "same_local_keys_distinct_physical_images_verified": true,
+    "application_authority_preserved": true,
+    "native_hide_show_and_resize_verified": true,
+    "input_scope": "Logical focused-text/IME event routed through the actual Winit host; not physical OS input automation or OS assistive technology.",
+    "producer_bindings": [
+      {
+        "window": 0,
+        "kind": "reader",
+        "renderer_key": 16140901064495857664,
+        "initial_generation": 1,
+        "replacement_generation": 2,
+        "initial_stamp": 2,
+        "replacement_stamp": 4,
+        "size": [
+          852,
+          430
+        ],
+        "owner": "Some(NodeId(2199023255790))"
+      },
+      {
+        "window": 0,
+        "kind": "stylesheet",
+        "renderer_key": 16140901064495857665,
+        "initial_generation": 1,
+        "replacement_generation": 2,
+        "initial_stamp": 1,
+        "replacement_stamp": 3,
+        "size": [
+          1756,
+          656
+        ],
+        "owner": "Some(NodeId(2199023255928))"
+      },
+      {
+        "window": 1,
+        "kind": "reader",
+        "renderer_key": 16140901064495857666,
+        "initial_generation": 1,
+        "replacement_generation": 2,
+        "initial_stamp": 2,
+        "replacement_stamp": 4,
+        "size": [
+          852,
+          430
+        ],
+        "owner": "Some(NodeId(5497558139118))"
+      },
+      {
+        "window": 1,
+        "kind": "stylesheet",
+        "renderer_key": 16140901064495857667,
+        "initial_generation": 1,
+        "replacement_generation": 2,
+        "initial_stamp": 1,
+        "replacement_stamp": 3,
+        "size": [
+          1756,
+          656
+        ],
+        "owner": "Some(NodeId(5497558139256))"
+      }
+    ],
+    "metadata_authority_and_stable_bindings_independently_crosschecked": true,
+    "source_rc_and_runner_identity_preserved_across_all_four_phases": true
+  },
+  "artifacts": {
+    "raw_count": 24,
+    "capture_count": 8,
+    "phases": [
+      "baseline",
+      "after-loss",
+      "after-input",
+      "after-resize"
+    ],
+    "kinds": [
+      "complete",
+      "reader",
+      "stylesheet"
+    ],
+    "all_raw_hashes_and_extents_verified": true,
+    "manifest_raw_and_png_hashes_verified": true,
+    "files": [
+      {
+        "phase": "baseline",
+        "window": 0,
+        "kind": "complete",
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts/baseline-A-complete.rgba",
+        "sha256": "618090f52b5a6811a26ef5b9d4b9c22c7b01ba0590e58f89499b3fd924e42812",
+        "bytes": 15104000,
+        "width": 2360,
+        "height": 1600,
+        "whole_extent": true,
+        "matte": false,
+        "png_path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/baseline-A-complete.png",
+        "png_sha256": "3185efe74d6a08d97a1c132456612aa7ca6f0a8b6b2b991958c2a02ff143cdf8"
+      },
+      {
+        "phase": "baseline",
+        "window": 0,
+        "kind": "reader",
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts/baseline-A-reader.rgba",
+        "sha256": "02b0dfbdadf11fc0061d619852237217bce9c0b3753611ba1f510a9d30d57d03",
+        "bytes": 1465440,
+        "width": 852,
+        "height": 430,
+        "whole_extent": true,
+        "matte": false,
+        "png_path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/baseline-A-reader.png",
+        "png_sha256": "cfd9c9b73e0a5892cb14a5fe7fdd84f461dedb278afa43af3852e462c667a9e7"
+      },
+      {
+        "phase": "baseline",
+        "window": 0,
+        "kind": "stylesheet",
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts/baseline-A-stylesheet.rgba",
+        "sha256": "51a05098ceaa43c9988fb5d085e6b16311447dd3215380669058ef5e15b05079",
+        "bytes": 4607744,
+        "width": 1756,
+        "height": 656,
+        "whole_extent": true,
+        "matte": false,
+        "png_path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/baseline-A-stylesheet.png",
+        "png_sha256": "4e06131dd0f339f6c10574028548b623a6532103a93c720097ad202e1c5b9600"
+      },
+      {
+        "phase": "baseline",
+        "window": 1,
+        "kind": "complete",
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts/baseline-B-complete.rgba",
+        "sha256": "575feaac1e464007d524da21aa0a63e966a2ebb4051840aee45f921ca4f3817d",
+        "bytes": 15104000,
+        "width": 2360,
+        "height": 1600,
+        "whole_extent": true,
+        "matte": false,
+        "png_path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/baseline-B-complete.png",
+        "png_sha256": "13dc1a180167bd18d506a9171cc0af5065376fd865825d61f9b7613150b40863"
+      },
+      {
+        "phase": "baseline",
+        "window": 1,
+        "kind": "reader",
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts/baseline-B-reader.rgba",
+        "sha256": "9be442d0f6a69d0f0b3a0bde2f90fd23ca0131e99edfbcebf1c710c2b6d819fd",
+        "bytes": 1465440,
+        "width": 852,
+        "height": 430,
+        "whole_extent": true,
+        "matte": false,
+        "png_path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/baseline-B-reader.png",
+        "png_sha256": "bec9fe0447272f5ed78e509f53bc514b1b154301c2eb2b85160c2f901e87a0ea"
+      },
+      {
+        "phase": "baseline",
+        "window": 1,
+        "kind": "stylesheet",
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts/baseline-B-stylesheet.rgba",
+        "sha256": "cedb097db58e0a0db351d89fcf09fb85e70d163bd673463ea6aec8597ba4440c",
+        "bytes": 4607744,
+        "width": 1756,
+        "height": 656,
+        "whole_extent": true,
+        "matte": false,
+        "png_path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/baseline-B-stylesheet.png",
+        "png_sha256": "c789f2cb3e9f21aa14c69e8b502e21efa58d1daf4f01abb823e0325b1b3b1a63"
+      },
+      {
+        "phase": "after-loss",
+        "window": 0,
+        "kind": "complete",
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts/after-loss-A-complete.rgba",
+        "sha256": "9e2737a2aa5d0db744d795f4e10606f6310a4b3c73115c0c8a055b4019faeb64",
+        "bytes": 15104000,
+        "width": 2360,
+        "height": 1600,
+        "whole_extent": true,
+        "matte": false,
+        "png_path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-loss-A-complete.png",
+        "png_sha256": "8d03d981f5e2e43ed75e77a76fc3f853633645f0bc30a108c8b167c67996d4d1"
+      },
+      {
+        "phase": "after-loss",
+        "window": 0,
+        "kind": "reader",
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts/after-loss-A-reader.rgba",
+        "sha256": "02b0dfbdadf11fc0061d619852237217bce9c0b3753611ba1f510a9d30d57d03",
+        "bytes": 1465440,
+        "width": 852,
+        "height": 430,
+        "whole_extent": true,
+        "matte": false,
+        "png_path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-loss-A-reader.png",
+        "png_sha256": "cfd9c9b73e0a5892cb14a5fe7fdd84f461dedb278afa43af3852e462c667a9e7"
+      },
+      {
+        "phase": "after-loss",
+        "window": 0,
+        "kind": "stylesheet",
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts/after-loss-A-stylesheet.rgba",
+        "sha256": "51a05098ceaa43c9988fb5d085e6b16311447dd3215380669058ef5e15b05079",
+        "bytes": 4607744,
+        "width": 1756,
+        "height": 656,
+        "whole_extent": true,
+        "matte": false,
+        "png_path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-loss-A-stylesheet.png",
+        "png_sha256": "4e06131dd0f339f6c10574028548b623a6532103a93c720097ad202e1c5b9600"
+      },
+      {
+        "phase": "after-loss",
+        "window": 1,
+        "kind": "complete",
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts/after-loss-B-complete.rgba",
+        "sha256": "f4da75d1624371bf0e1b035e6af76bec090444102cebdf23a17387213ec88e86",
+        "bytes": 15104000,
+        "width": 2360,
+        "height": 1600,
+        "whole_extent": true,
+        "matte": false,
+        "png_path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-loss-B-complete.png",
+        "png_sha256": "0dbabb637696ec4fc2e6498ddb7f35f68e661f2b3cda468edd335aabca87ec50"
+      },
+      {
+        "phase": "after-loss",
+        "window": 1,
+        "kind": "reader",
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts/after-loss-B-reader.rgba",
+        "sha256": "29cfdaa1ca452d97e446054180df99b2861f5ac3a91c41d26b72e270c5aeb72a",
+        "bytes": 1465440,
+        "width": 852,
+        "height": 430,
+        "whole_extent": true,
+        "matte": false,
+        "png_path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-loss-B-reader.png",
+        "png_sha256": "ddb395243c4e4142acce84c1ce3da042bd065c5c11f170eb031327a12e4c76c4"
+      },
+      {
+        "phase": "after-loss",
+        "window": 1,
+        "kind": "stylesheet",
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts/after-loss-B-stylesheet.rgba",
+        "sha256": "cedb097db58e0a0db351d89fcf09fb85e70d163bd673463ea6aec8597ba4440c",
+        "bytes": 4607744,
+        "width": 1756,
+        "height": 656,
+        "whole_extent": true,
+        "matte": false,
+        "png_path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-loss-B-stylesheet.png",
+        "png_sha256": "c789f2cb3e9f21aa14c69e8b502e21efa58d1daf4f01abb823e0325b1b3b1a63"
+      },
+      {
+        "phase": "after-input",
+        "window": 0,
+        "kind": "complete",
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts/after-input-A-complete.rgba",
+        "sha256": "731e97a8ebb91660f2900e207ae10f2a0c6f5272237324f19da9618808f942e5",
+        "bytes": 15104000,
+        "width": 2360,
+        "height": 1600,
+        "whole_extent": true,
+        "matte": false,
+        "png_path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-input-A-complete.png",
+        "png_sha256": "ac2a6cfae5bae3b0dd50a4e067230c969c25a922be5f1a1bf3c56d1103867bfc"
+      },
+      {
+        "phase": "after-input",
+        "window": 0,
+        "kind": "reader",
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts/after-input-A-reader.rgba",
+        "sha256": "02b0dfbdadf11fc0061d619852237217bce9c0b3753611ba1f510a9d30d57d03",
+        "bytes": 1465440,
+        "width": 852,
+        "height": 430,
+        "whole_extent": true,
+        "matte": false,
+        "png_path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-input-A-reader.png",
+        "png_sha256": "cfd9c9b73e0a5892cb14a5fe7fdd84f461dedb278afa43af3852e462c667a9e7"
+      },
+      {
+        "phase": "after-input",
+        "window": 0,
+        "kind": "stylesheet",
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts/after-input-A-stylesheet.rgba",
+        "sha256": "51a05098ceaa43c9988fb5d085e6b16311447dd3215380669058ef5e15b05079",
+        "bytes": 4607744,
+        "width": 1756,
+        "height": 656,
+        "whole_extent": true,
+        "matte": false,
+        "png_path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-input-A-stylesheet.png",
+        "png_sha256": "4e06131dd0f339f6c10574028548b623a6532103a93c720097ad202e1c5b9600"
+      },
+      {
+        "phase": "after-input",
+        "window": 1,
+        "kind": "complete",
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts/after-input-B-complete.rgba",
+        "sha256": "cd94a666d392ea04a8f1c5635bc06145ac38222c2f04fb4404f80617d6559acd",
+        "bytes": 15104000,
+        "width": 2360,
+        "height": 1600,
+        "whole_extent": true,
+        "matte": false,
+        "png_path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-input-B-complete.png",
+        "png_sha256": "a5e4db3bf32249e99175e5367294c8df526a688f681ced60a83fa6f698764776"
+      },
+      {
+        "phase": "after-input",
+        "window": 1,
+        "kind": "reader",
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts/after-input-B-reader.rgba",
+        "sha256": "29cfdaa1ca452d97e446054180df99b2861f5ac3a91c41d26b72e270c5aeb72a",
+        "bytes": 1465440,
+        "width": 852,
+        "height": 430,
+        "whole_extent": true,
+        "matte": false,
+        "png_path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-input-B-reader.png",
+        "png_sha256": "ddb395243c4e4142acce84c1ce3da042bd065c5c11f170eb031327a12e4c76c4"
+      },
+      {
+        "phase": "after-input",
+        "window": 1,
+        "kind": "stylesheet",
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts/after-input-B-stylesheet.rgba",
+        "sha256": "cedb097db58e0a0db351d89fcf09fb85e70d163bd673463ea6aec8597ba4440c",
+        "bytes": 4607744,
+        "width": 1756,
+        "height": 656,
+        "whole_extent": true,
+        "matte": false,
+        "png_path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-input-B-stylesheet.png",
+        "png_sha256": "c789f2cb3e9f21aa14c69e8b502e21efa58d1daf4f01abb823e0325b1b3b1a63"
+      },
+      {
+        "phase": "after-resize",
+        "window": 0,
+        "kind": "complete",
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts/after-resize-A-complete.rgba",
+        "sha256": "8b3494db0edb6a50a49979d1d81465ec637eaeef634fed4bfaa449a74862bc06",
+        "bytes": 12646400,
+        "width": 2080,
+        "height": 1520,
+        "whole_extent": true,
+        "matte": false,
+        "png_path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-resize-A-complete.png",
+        "png_sha256": "838597a178e8001ebdd8099cdbdee8dad0b27565b0e6986fedbfb53d26255490"
+      },
+      {
+        "phase": "after-resize",
+        "window": 0,
+        "kind": "reader",
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts/after-resize-A-reader.rgba",
+        "sha256": "1434bbca21d72deb5838efca9af480014c5522558018cb7835d04e4968f26e3e",
+        "bytes": 1224640,
+        "width": 712,
+        "height": 430,
+        "whole_extent": true,
+        "matte": false,
+        "png_path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-resize-A-reader.png",
+        "png_sha256": "75e935c1f25ee6db71f47a31f4fd4f6862efed154a5a06cebb26fcc8e0827cbc"
+      },
+      {
+        "phase": "after-resize",
+        "window": 0,
+        "kind": "stylesheet",
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts/after-resize-A-stylesheet.rgba",
+        "sha256": "d8c9fe6ca1cda8a95bd456463e12e342755b2ad20e6011a070c7288e673cb8c9",
+        "bytes": 3873024,
+        "width": 1476,
+        "height": 656,
+        "whole_extent": true,
+        "matte": false,
+        "png_path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-resize-A-stylesheet.png",
+        "png_sha256": "3b4aa8b85f9bc5a97c615adf2ae6baeab2b7e34030fe0f5e0d3c4b70c089820a"
+      },
+      {
+        "phase": "after-resize",
+        "window": 1,
+        "kind": "complete",
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts/after-resize-B-complete.rgba",
+        "sha256": "220d66aa7ca95e596e327f854d97b18111fd06f5d05e2176acdd09cca01350e5",
+        "bytes": 12646400,
+        "width": 2080,
+        "height": 1520,
+        "whole_extent": true,
+        "matte": false,
+        "png_path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-resize-B-complete.png",
+        "png_sha256": "dac13c4cbb22976b590372daa133a1a7865de877b50387852d9577296a44593c"
+      },
+      {
+        "phase": "after-resize",
+        "window": 1,
+        "kind": "reader",
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts/after-resize-B-reader.rgba",
+        "sha256": "d050c5b24fc7274875dc44840f930e0136ef8a5d3f2e209dfd208fc78c52c889",
+        "bytes": 1224640,
+        "width": 712,
+        "height": 430,
+        "whole_extent": true,
+        "matte": false,
+        "png_path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-resize-B-reader.png",
+        "png_sha256": "f2248d68877d29c045acc85e344b7901b1a0334ec8bba8c024613160fa587c16"
+      },
+      {
+        "phase": "after-resize",
+        "window": 1,
+        "kind": "stylesheet",
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts/after-resize-B-stylesheet.rgba",
+        "sha256": "02ee07a31be85b885b87c959c155ee19f46b6f46909370a70d4dd7353954a38f",
+        "bytes": 3873024,
+        "width": 1476,
+        "height": 656,
+        "whole_extent": true,
+        "matte": false,
+        "png_path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-resize-B-stylesheet.png",
+        "png_sha256": "d07e26a9234926c5d2b2573856de7cf95d1c152ac93242f3e0380c0d16940d0a"
+      }
+    ]
+  },
+  "recovery_comparisons": [
+    {
+      "window": 0,
+      "kind": "complete",
+      "max_rgba_channels": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "max_rgba": 1,
+      "max_alpha": 0,
+      "sum_absolute_rgba_difference": 5,
+      "mean_rgba": 3.3103813559322036e-07,
+      "whole_bytes": 15104000,
+      "limits": {
+        "rgba": 3,
+        "alpha": 2,
+        "mean": 1.0
+      },
+      "crop": false,
+      "matte": false,
+      "recomputed_from_raw": true
+    },
+    {
+      "window": 0,
+      "kind": "reader",
+      "max_rgba_channels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "max_rgba": 0,
+      "max_alpha": 0,
+      "sum_absolute_rgba_difference": 0,
+      "mean_rgba": 0.0,
+      "whole_bytes": 1465440,
+      "limits": {
+        "rgba": 3,
+        "alpha": 2,
+        "mean": 1.0
+      },
+      "crop": false,
+      "matte": false,
+      "recomputed_from_raw": true
+    },
+    {
+      "window": 0,
+      "kind": "stylesheet",
+      "max_rgba_channels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "max_rgba": 0,
+      "max_alpha": 0,
+      "sum_absolute_rgba_difference": 0,
+      "mean_rgba": 0.0,
+      "whole_bytes": 4607744,
+      "limits": {
+        "rgba": 3,
+        "alpha": 2,
+        "mean": 1.0
+      },
+      "crop": false,
+      "matte": false,
+      "recomputed_from_raw": true
+    },
+    {
+      "window": 1,
+      "kind": "complete",
+      "max_rgba_channels": [
+        1,
+        0,
+        1,
+        0
+      ],
+      "max_rgba": 1,
+      "max_alpha": 0,
+      "sum_absolute_rgba_difference": 11,
+      "mean_rgba": 7.282838983050848e-07,
+      "whole_bytes": 15104000,
+      "limits": {
+        "rgba": 3,
+        "alpha": 2,
+        "mean": 1.0
+      },
+      "crop": false,
+      "matte": false,
+      "recomputed_from_raw": true
+    },
+    {
+      "window": 1,
+      "kind": "reader",
+      "max_rgba_channels": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "max_rgba": 1,
+      "max_alpha": 0,
+      "sum_absolute_rgba_difference": 1,
+      "mean_rgba": 6.823889070859264e-07,
+      "whole_bytes": 1465440,
+      "limits": {
+        "rgba": 3,
+        "alpha": 2,
+        "mean": 1.0
+      },
+      "crop": false,
+      "matte": false,
+      "recomputed_from_raw": true
+    },
+    {
+      "window": 1,
+      "kind": "stylesheet",
+      "max_rgba_channels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "max_rgba": 0,
+      "max_alpha": 0,
+      "sum_absolute_rgba_difference": 0,
+      "mean_rgba": 0.0,
+      "whole_bytes": 4607744,
+      "limits": {
+        "rgba": 3,
+        "alpha": 2,
+        "mean": 1.0
+      },
+      "crop": false,
+      "matte": false,
+      "recomputed_from_raw": true
+    }
+  ],
+  "maximum_observed_recovery_rgba": 1,
+  "maximum_observed_recovery_alpha": 0,
+  "maximum_observed_recovery_mean": 7.282838983050848e-07,
+  "visual_review": {
+    "status": "SEPARATE",
+    "expected_receipt": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual-review.json",
+    "scope": "This receipt verifies byte identities and numeric comparisons; it does not assert visual review completion."
+  },
+  "not_qualified": [
+    "Spontaneous physical driver reset",
+    "Shared-forest run_windows disposal or resource isolation",
+    "Physical OS input and OS assistive technology",
+    "Browser device recovery or browser mount disposal",
+    "Current-frame asynchronous renderer quality completion",
+    "Interrupt-resilient launch/cleanup: no interrupted R2 run occurred",
+    "Sustained frame-rate or GPU timestamp performance"
+  ],
+  "consolidation": {
+    "method": "Read-only receipt/identity validation plus chunked CPU recomputation from existing raw artifacts; no GPU, native/browser launch, compiler, build or cache operation.",
+    "original_receipts_modified": false,
+    "discrepancies": []
+  }
+}

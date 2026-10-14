@@ -79,6 +79,8 @@ where
     /// it to `None` when the click lands outside any focusable element.
     /// [`dispatch_key`](Self::dispatch_key) walks from here.
     focus: Option<NodeId>,
+    /// Explicit view focus requests outrank a stock tab's deferred arrow request.
+    focus_request_serial: u64,
     /// The element capturing the current pointer drag, if any. Set by
     /// [`dispatch_pointer_down`](Self::dispatch_pointer_down) to the nearest
     /// pointer-handler ancestor of the press, consulted by
@@ -154,6 +156,7 @@ where
             root,
             mount,
             focus,
+            focus_request_serial: 0,
             pointer_capture: None,
             pointer_owner: None,
             last_default_prevented: false,
@@ -222,6 +225,7 @@ where
         // the next dispatch target or captured-element rect.
         self.scrub_dead_interaction_handles();
         if let Some(request) = self.ctx.take_focus_request() {
+            self.focus_request_serial = self.focus_request_serial.wrapping_add(1);
             match request {
                 FocusRequest::Focus(node) if self.node_is_live(node) => self.focus = Some(node),
                 FocusRequest::Blur(node) if self.focus == Some(node) => self.focus = None,
@@ -643,7 +647,10 @@ where
         // A fresh pass: the routing tail records the real cancellation value; a
         // pass that routes nothing leaves it false.
         self.last_default_prevented = false;
+        event.prop.take_tab_focus();
+        event.prop.set_key_target(None);
         self.scrub_dead_interaction_handles();
+        let focus_request_serial = self.focus_request_serial;
 
         // With nothing focused, the only key carrying a runner default is Tab,
         // which enters the focusable set (no element to route to). Everything else
@@ -753,6 +760,49 @@ where
         //    fired, nothing changed, so the rebuild is skipped.
         if routed {
             self.rebuild(logic, state);
+            let request = event.prop.take_tab_focus();
+            if self.focus == Some(focus) && self.focus_request_serial == focus_request_serial {
+                let next = request.and_then(|(origin, group, index)| {
+                    let dom = self.dom.borrow();
+                    let owned = |node| {
+                        let mut current = Some(node);
+                        while let Some(node) = current {
+                            if !dom.is_live(node) {
+                                return false;
+                            }
+                            if node == self.root.node {
+                                return true;
+                            }
+                            current = dom.parent(node);
+                        }
+                        false
+                    };
+                    // The group was captured by the actual handler before diff.
+                    // A nested runner or foreign host cannot contribute a seat.
+                    if origin != focus
+                        || !chain.contains(&origin)
+                        || !owned(origin)
+                        || !owned(group)
+                        || dom.parent(origin) != Some(group)
+                        || self.ctx.key_handlers_at(origin).is_empty()
+                        || attr(&dom, origin, "role") != Some("tab")
+                        || attr(&dom, group, "role") != Some("tablist")
+                    {
+                        return None;
+                    }
+                    let candidate = dom.dom_children(group).into_iter().nth(index)?;
+                    (owned(candidate)
+                        && self.ctx.is_focusable(candidate)
+                        && !self.ctx.key_handlers_at(candidate).is_empty()
+                        && attr(&dom, candidate, "role") == Some("tab")
+                        && attr(&dom, candidate, "aria-selected") == Some("true")
+                        && attr(&dom, candidate, "tabindex") == Some("0"))
+                    .then_some(candidate)
+                });
+                if let Some(next) = next {
+                    actions.extend(self.set_focus(logic, state, Some(next)));
+                }
+            }
         }
 
         actions
@@ -1185,6 +1235,17 @@ where
     /// `insert_before(document, root, None)` to append it under the document.
     pub fn new(dom: DomHandle, mut logic: Logic, mut state: State) -> Self {
         let tree = RunnerTree::build(dom, &mut logic, &mut state);
+        Self { state, logic, tree }
+    }
+
+    /// Build beneath a caller-owned live mount in the same document.
+    ///
+    /// The mount may move between window subtrees without rebuilding this
+    /// runner. Its state, widget tree, focus and pointer capture stay owned by
+    /// this runner; the receiving host must withdraw stale window input first.
+    pub fn new_at(dom: DomHandle, mount: NodeId, mut logic: Logic, mut state: State) -> Self {
+        assert!(dom.borrow().is_live(mount), "runner mount must be live");
+        let tree = RunnerTree::build_at(dom, mount, &mut logic, &mut state);
         Self { state, logic, tree }
     }
 

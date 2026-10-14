@@ -1,0 +1,14 @@
+    Updating git repository `https://github.com/merely-made/genet.git`
+    Updating git repository `https://www.github.com/merely-made/netrender.git`
+    Updating git repository `https://www.github.com/merely-made/genet.git`
+    Updating crates.io index
+    Updating git repository `https://github.com/merely-made/murm.git`
+warning: patch `layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb5)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/genet.git
+     Locking 4 packages to highest compatible versions
+      Adding netrender v0.1.2 (https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#6a24ae08)
+      Adding netrender_device v0.1.2 (https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#6a24ae08)
+      Adding paint_list_api v0.1.2 (https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#6a24ae08)
+      Adding paint_list_render v0.1.2 (https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#6a24ae08)

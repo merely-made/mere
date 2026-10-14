@@ -93,8 +93,13 @@ the staged image. CSS visibility changes preserve registration. Removing a bound
 DOM owner or the registration retires it; recreating an absent owner requires a
 new registration. Native surface suspension clears staged images before dropping
 the renderer. Invalid output and duplicate DOM keys produce an empty slot with a
-queryable error, rather than presenting the previous frame. Producer keys share
-Sprigging's namespace and must be registered in only one registry.
+queryable error, rather than presenting the previous frame. Leaf keys are local
+within one host's Sprigging/producer registry. Independent host registries always
+remap them to stable, nonreused physical renderer keys, including numerically
+high local keys. `ProducerImageIdentity::renderer_key` is already the complete
+renderer identity: use it directly for sampling and retirement. Independent
+registry teardown retires only its own physical resources. Duplicate keys within
+one shared forest/LeafRegistry remain a separate unsupported contract.
 Retained GPU resources are bound to their device: after suspension, a producer
 must compare the supplied device with its cached renderer or recreate that
 renderer from retained application data.
@@ -327,6 +332,55 @@ host's 88 across ten suites, cambium's 216, mere-document-lanes with `smolweb` 3
 web host checked natively and for wasm32, the format check on the three host crates,
 and the workspace check.
 
+
+## Retained resources and qualification boundaries (2026-10-13)
+
+The resource owner retains the admitted ledger through appearance and viewport
+reconstruction. Rootstock's outer text system, a Reader `SmolwebDocument`, and
+an isolated Stylesheet `LiveryDocument` are three separate owners; registering
+outer faces alone does not provision the producer documents. Host-selected CSS
+generic mappings preserve authored family requests and quoted aliases. See the
+[Workshop host resource seam](../../../crates/cambium/tabard-workshop/README.md#retained-host-font-resources)
+and `genet/components/genet-livery/README.md` for the owned APIs. Invalid resource
+replacement is typed and batch-atomic; it must not advance accepted source
+revision or image authority. GPU/session execution refusals have their own
+boundary and must not be relabeled as successful resource admission.
+
+Qualify complete actual registered producer images as well as the composed
+workspace. A nonblank graph or neutral control frame can mask a text producer
+containing only its surface color. Read the full image through its copied
+physical identity, retain exact dimensions/generation/stamp, and require source
+font/glyph observations plus the original nonblank and full-pixel thresholds.
+Do not crop, matte, strip external/shadow commands, rebuild preview DOM, or lower
+thresholds to turn a missing resource into a pass. Application sources, draft,
+applied appearance, persisted library and session selection remain with their
+existing owners.
+
+Keep these proof classes separate:
+
+- Resource admission and font delivery: complete ledgers, typed refusals and
+  actual shaped face bytes surviving source reconstruction.
+- Input: actual press/release routing, focus and application state/pixel change.
+  Logical Host input and synthetic DOM controls do not establish OS keyboard or
+  assistive-technology acceptance.
+- Recovery and presentation: actual loss notice, all-host detachment barrier,
+  fresh shared generation, same-host/canvas presentation and complete producer
+  rehydration under unchanged pixel limits.
+- Capture/device closure: each pending capture/readback resolves once, owned
+  mount bindings and listeners retire, and an exclusively owned test device is
+  explicitly destroyed and its matching notice observed. Disposing one mount
+  does not destroy another subscriber's shared device or arbitrary app GPU data.
+- Outer resource closure: independently verify owned process birth/parent/group
+  identities, finite cleanup, locks and artifacts. Fixture success alone is not
+  a passing browser harness or process-closure receipt.
+
+Controlled `Device::destroy` is not a physical driver reset. Native completion
+or copied browser pixels do not qualify browser current-frame asynchronous GPU
+error scopes or shader counters. Keep `physical_driver_reset`,
+`os_accessibility_actions`, `current_frame_async_quality_qualified`, and
+`current_frame_async_error_scopes_qualified` false unless their separate gates
+have accepted source-bound evidence. Preserve negative attempts and original
+source/package/driver hashes while repairing the next bounded lane.
 
 ## Consumer automation and semantic parity follow-up (2026-09-27)
 

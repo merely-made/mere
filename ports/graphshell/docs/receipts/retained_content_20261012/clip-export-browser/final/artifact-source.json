@@ -1,0 +1,94 @@
+{
+  "source_head": "f7e0a09788ad2304254bb4afaf4e77cc9a94ae21",
+  "rust": "1.99.0",
+  "command": "cargo +1.99.0 build --target wasm32-unknown-unknown --locked --offline -j1",
+  "cwd": "ports/graphshell/web",
+  "target": "C:/t/cargo-targets/mere",
+  "build_dir": "C:/t/cargo-targets/mere/build",
+  "wasm_bindgen": "0.2.129",
+  "origin": "http://127.0.0.1:8883",
+  "repairs": [
+    "shared evaluator browser clock and entropy",
+    "retained reader bounded actual remaining body height",
+    "other reading panes retain scrolling",
+    "actual native stroke segments at most32 perrelation",
+    "shared source-first mounted owner parking"
+  ],
+  "files": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\retained-content-browser\\graphshell_web_bg.wasm",
+      "bytes": 490717065,
+      "sha256": "e59e423f0dea91432d01650e29833f281c40e5cae43cb6fd2048ddb6ee4b71f7"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\retained-content-browser\\graphshell_web.js",
+      "bytes": 161692,
+      "sha256": "47e02085373ac39ae6489a275d0c946b1b20fcfe7b337a47c5ccd3c00fbc5e2f"
+    },
+    {
+      "path": "Cargo.lock",
+      "bytes": 474685,
+      "sha256": "aef3fb4f411db714226ffc946eb4e5ed58c39fd28bbf33108de2fb062a811b87"
+    },
+    {
+      "path": "ports\\graphshell\\web\\Cargo.lock",
+      "bytes": 292638,
+      "sha256": "b5798d953af1efb44da6a7b98922e9eaef312b019c2e965cb75241d2cef39207"
+    },
+    {
+      "path": "ports\\graphshell\\web\\Cargo.toml",
+      "bytes": 13891,
+      "sha256": "69c751b135a31e72ac868e75a57452e98d5509f1f67294cfb2b7fe8d8539e8c6"
+    },
+    {
+      "path": "crates\\graph\\linked-data\\Cargo.toml",
+      "bytes": 2875,
+      "sha256": "3e88d9d189c353de68686a5ced77cd34f3b36f1ba4d0909a9db623dd3d77fe94"
+    },
+    {
+      "path": "crates\\cambium\\cambium\\src\\retained_mount.rs",
+      "bytes": 14069,
+      "sha256": "608403c9a4569dd6e116c0f59517fbaaf374599ba6ba4bd7f6dee924503e5e2a"
+    },
+    {
+      "path": "crates\\mere\\src\\query_view.rs",
+      "bytes": 9645,
+      "sha256": "54da421cb0ae921aff5bc4e29c11a44814761ab149b4afff0691b8a6bdf33a09"
+    },
+    {
+      "path": "crates\\mere\\src\\query_view\\projection.rs",
+      "bytes": 10277,
+      "sha256": "880c28ffe4ca590d3efc950a89b0b1397491265575eefc5426e1d92deef36225"
+    },
+    {
+      "path": "crates\\mere\\src\\query_view\\stroke.rs",
+      "bytes": 3117,
+      "sha256": "07f76ba16fb72808921b61b6af6c14fa366ef4a30b27ee3c072cc61483673b93"
+    },
+    {
+      "path": "ports\\graphshell\\src\\web_tree\\query_view.rs",
+      "bytes": 31381,
+      "sha256": "f7c6b1029be29b8063f411d55906446d33f3628f5f6941929b7f03ba55dc0cc2"
+    },
+    {
+      "path": "ports\\graphshell\\src\\retained_content\\view.rs",
+      "bytes": 8952,
+      "sha256": "465700f89fcf3db9d84bafa6d3ac30bde016506a8e1db1e5460a24a5eae01569"
+    },
+    {
+      "path": "ports\\graphshell\\src\\web_tree\\forme.rs",
+      "bytes": 46289,
+      "sha256": "05727b128288dff072e0ab315866dd77ab86127376ec70f81f1360a280e74384"
+    },
+    {
+      "path": "ports\\graphshell\\src\\web_tree\\reading.rs",
+      "bytes": 29866,
+      "sha256": "a8e3751b5d0efd4c760e933452bc2a9f2bb217c6204e5fa6f876d1b41affec5f"
+    },
+    {
+      "path": "ports\\graphshell\\web\\loader.js",
+      "bytes": 25655,
+      "sha256": "6d1ebe2e1087b5ba8982e3f7033b241fe5985469c904a1ddd5d9a684636ec7ca"
+    }
+  ]
+}

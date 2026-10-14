@@ -32,7 +32,17 @@ use super::edge_taxonomy::{
 };
 
 /// Edge semantics payload: structural assertions + temporal traversal events.
-#[derive(Debug, Clone, PartialEq, Eq, Archive, Serialize, Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Archive,
+    Serialize,
+    Deserialize,
+    serde::Serialize,
+    serde::Deserialize,
+)]
 pub struct EdgePayload {
     pub semantic: Option<SemanticData>,
     pub traversal: Option<TraversalData>,

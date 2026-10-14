@@ -41,9 +41,9 @@ web-sys = { version = "=0.3.106", features = [
 [patch.crates-io]
 # cambium-genet-web-host rides Genet; [patch] is not inherited, so these rows
 # restate graphshell-web's, at the same immutable Genet revision.
-taffy = { package = "genet-taffy", version = "=0.14.0", git = "https://github.com/merely-made/genet.git", rev = "7a8c5b8cb499f2d3b91083c2f7e38236599f98dc" }
-layout-dom-api = { git = "https://github.com/merely-made/genet.git", rev = "7a8c5b8cb499f2d3b91083c2f7e38236599f98dc", version = "=0.1.1" }
-genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", rev = "7a8c5b8cb499f2d3b91083c2f7e38236599f98dc", version = "=0.1.2" }
+taffy = { package = "genet-taffy", version = "=0.14.0", git = "https://github.com/merely-made/genet.git", rev = "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084" }
+layout-dom-api = { git = "https://github.com/merely-made/genet.git", rev = "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084", version = "=0.1.1" }
+genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", rev = "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084", version = "=0.1.2" }
 # Classic 0.11 and its owned repairs, coherent with Mere's root Scene aliases.
 netrender-vello = { git = "https://github.com/mark-ik/vello", rev = "2eae6243881d5b24c984d5ee35dde509ca5db782" }
 vello_encoding = { git = "https://github.com/mark-ik/vello", rev = "2eae6243881d5b24c984d5ee35dde509ca5db782" }
@@ -53,3 +53,13 @@ cubek-reduce = { path = "../../../support/patches/cubek-reduce" }
 
 [workspace.package]
 rust-version = "1.97.1"
+
+# Published shadow-resource repair across Genet and host renderer contracts.
+# Genet retains its qualified source pin; this root redirects the complete
+# runtime family to one immutable Git source identity. Standalone roots must
+# repeat this bridge. Retire after coordinated Genet supplier adoption.
+[patch."https://github.com/merely-made/netrender.git"]
+netrender = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "6a24ae08f55129b474282b8e4911564f875ce5fd" }
+netrender_device = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "6a24ae08f55129b474282b8e4911564f875ce5fd" }
+paint_list_api = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "6a24ae08f55129b474282b8e4911564f875ce5fd" }
+paint_list_render = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "6a24ae08f55129b474282b8e4911564f875ce5fd" }

@@ -449,8 +449,8 @@ to a follow-up pass; not done in this brief):
   — Pattern A reframed as "thin client routing"; Pattern B reframed as
   "outbound bridge."
  - **Crate READMEs** — `crates/meerkat` *(historical citation)* <!-- doc-audit: historical-path -->, `crates/moot/moothold`,
-   `crates/moot/mooting`, `crates/persona/identity` *(historical citation)* <!-- doc-audit: historical-path -->, `retinue/native/crates/transport`,
-   `retinue/native/crates/murm`, `crates/murm/murmuring` *(historical citation)* <!-- doc-audit: historical-path --> — touch up *coalition* and
+   `crates/moot/mooting`, `crates/persona/identity` *(historical citation)* <!-- doc-audit: historical-path -->, `murm/native/crates/transport`,
+   `murm/native/crates/murm`, `crates/murm/murmuring` *(historical citation)* <!-- doc-audit: historical-path --> — touch up *coalition* and
   *moothold* references and the moot-as-graph-view framing.
 - **Memory** (`project_naming_state.md`, `memory/MEMORY.md` index) —
   update lexicon entries to match.

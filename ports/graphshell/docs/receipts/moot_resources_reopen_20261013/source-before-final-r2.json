@@ -1,0 +1,18 @@
+{
+  "base": "e84cfbd95b1660046d646580a8707af020a06e4b",
+  "files": {
+    "Cargo.toml": "3c07bdd85839c7a89a4f1718afdbfacafd74a8394b19c42631605f7953edb432",
+    "Cargo.lock": "ee6d5cbfa03fdaa6cc181ec69dab9a4fed36f0653ae32870ad1a273cf0b95824",
+    "ports/graphshell/Cargo.toml": "f7cc17a7c013b10bd7d8befa0fae47ad30db9cc6c60b2337638831b78e8dcd9d",
+    "ports/graphshell/src/moot_resources.rs": "6f8093f025d4858c677b2e2e19779167271ba17a478256752859244037ff138c",
+    "ports/graphshell/src/moot_resources/owner.rs": "3c56c4a5b86cf4d7d2f53ec7407c4202d5e1bc9c4b0b35159b9c16e09695bb96",
+    "ports/moot/src/resource_view.rs": "f868ca8e9b05622a37be47da3617ffffa91e30d69e6f715ad05a0ba6703ea650",
+    "ports/graphshell/examples/support/moot_resources_fixture.rs": "b624b5e7dbeecf6135f7aa06920240a3a763d07b0590079f84e4741ddab9928a",
+    "ports/graphshell/tests/moot_resources.rs": "a5449a14567ff1e1732c6bf815a4690af6bbdee4263d72646fca68fc7b082f7f",
+    "ports/graphshell/tests/moot_resources_reopen.rs": "bad7497eb5ce387ce985b5130b5ac6796e22043d4ae0096e18fc9545a62c413a",
+    "ports/graphshell/docs/receipts/moot_resources_reopen_20261013/harness/Cargo.toml": "be498341e2487baf4a4fbd61c36816ca613df69d94d4c5de0f05da0671682a16",
+    "ports/graphshell/docs/receipts/moot_resources_reopen_20261013/harness/Cargo.lock": "f611e3b34abcbb1d9ffa8b11d7d363b2deb19e39f03e95a8e016db1c24ec3d26",
+    "ports/graphshell/docs/receipts/moot_resources_reopen_20261013/harness/src/lib.rs": "6ff66a9ef6cf343c5d7f531fab7f7179f4fa87a5d76ff223b0071255ed6f3500"
+  },
+  "scope": "Final standalone actual-port integration targets; CPU source identity before qualification"
+}

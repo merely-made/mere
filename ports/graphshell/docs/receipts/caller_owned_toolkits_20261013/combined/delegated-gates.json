@@ -1,0 +1,73 @@
+{
+  "commands_sha256": "bf96b7a2c7c106df42d51d363ae8b286e8a59da80921955a3a32cbebfa35387e",
+  "sources": [
+    {
+      "sha256": "54da421cb0ae921aff5bc4e29c11a44814761ab149b4afff0691b8a6bdf33a09",
+      "path": "crates/mere/src/query_view.rs"
+    },
+    {
+      "sha256": "880c28ffe4ca590d3efc950a89b0b1397491265575eefc5426e1d92deef36225",
+      "path": "crates/mere/src/query_view/projection.rs"
+    },
+    {
+      "sha256": "8daee79a3d0d4ec1095fa3dbe594e8137067ab84120122a94ceb64c792d3900a",
+      "path": "crates/mere/src/query_view/tests.rs"
+    },
+    {
+      "sha256": "07f76ba16fb72808921b61b6af6c14fa366ef4a30b27ee3c072cc61483673b93",
+      "path": "crates/mere/src/query_view/stroke.rs"
+    },
+    {
+      "sha256": "ed141eacd941b50b34c7c1113962546cd9b34918906eae3a837f5affcc11fef3",
+      "path": "crates/graph/graph-kernel/src/graph/query.rs"
+    },
+    {
+      "sha256": "f83f5c9cc461ee30804456c519b989af0793ef142519260174a952e7fec420be",
+      "path": "ports/graphshell/src/query_views.rs"
+    },
+    {
+      "sha256": "b5082c97dec36645992613b277c6afb14e793bb13adc16bb3e2d3e15cdb67c57",
+      "path": "ports/graphshell/src/retained_content/tests.rs"
+    },
+    {
+      "sha256": "68e8a1b46b884179e250e0f6df4ac72d3647e0b590b80d4d8e1c06413cdc7e49",
+      "path": "ports/graphshell/src/retained_content/export.rs"
+    }
+  ],
+  "logs": [
+    {
+      "sha256": "c5c584124538a765367e8dedd28e7d44a0ac75ac1637dda29288e8534b173ee4",
+      "path": "ports/graphshell/docs/receipts/caller_owned_toolkits_20261013/combined/embedding-tests.log"
+    },
+    {
+      "sha256": "64cd9ae77b8083869c6ed63613760a65e42df1f9626f93756fcfcd322b6e2b1e",
+      "path": "ports/graphshell/docs/receipts/caller_owned_toolkits_20261013/combined/toolkit-bench.log"
+    },
+    {
+      "sha256": "f043cb93f4b1bc03373085faf58b8d89b5aea63bec8fadcd3d81d8bfe1d62a8d",
+      "path": "ports/graphshell/docs/receipts/query_views_20261013/combined-owner-query-tests.log"
+    },
+    {
+      "sha256": "e5a848ec630de47cefe655c35a4e315c3c83a9c4f41efda5797bad9f2777a43c",
+      "path": "ports/graphshell/docs/receipts/query_views_20261013/combined-host-clip-core-tests.log"
+    },
+    {
+      "sha256": "6f12bb325e72f840364171edb4c74f2475d0d6a47a40ab2d981be07d4076512a",
+      "path": "ports/graphshell/docs/receipts/query_views_20261013/combined-host-clip-tests.log"
+    },
+    {
+      "sha256": "d910a3c44176bd5da96658701a5c386f218b319e2117c2f91188df15eb485f6a",
+      "path": "ports/graphshell/docs/receipts/query_views_20261013/combined-shared-query-tests-final.log"
+    }
+  ],
+  "counts": {
+    "owner_journal": 1,
+    "retained_content_core": 11,
+    "embedding": 6,
+    "retained_content_with_export": 13,
+    "shared_query_view": 10
+  },
+  "all_gates_exit": 0,
+  "qualification_sha256": "929bc67fc4a140011f63443d475c4664605200cf5dc7313985ca13334071620d",
+  "note": "The aggregate retained_content:: filter includes two export custody tests omitted by retained_content::tests. Retained forest mount and native headed acceptance are separately owned and are not qualified by this record."
+}

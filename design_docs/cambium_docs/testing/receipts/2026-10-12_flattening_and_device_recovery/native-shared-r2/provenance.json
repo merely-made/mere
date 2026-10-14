@@ -1,0 +1,72 @@
+{
+  "schema": "native-r2-compact-receipt-provenance-v1",
+  "status": "COPIED_ACCEPTED_EVIDENCE_NO_RERUN",
+  "copied_files": [
+    {
+      "local": "qualification.json",
+      "original": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/qualification.json",
+        "bytes": 30034,
+        "sha256": "47c7ba75d8ed6ff6b507afd9ece6e3672b5b6b8bbe8268d92bc4a087844d4aa8"
+      }
+    },
+    {
+      "local": "runtime.json",
+      "original": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/runtime.json",
+        "bytes": 7161,
+        "sha256": "99b6ef1ea5d0445cc5c1a8f8f2c6b2c9e8c7a4f1e2b2aaff28d16529618fb55f"
+      }
+    },
+    {
+      "local": "visual-review.json",
+      "original": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual-review.json",
+        "bytes": 4087,
+        "sha256": "8e259ff5cd63db0654ef67f7ebf58dbd2371aa7279594f942047081eab979e78"
+      }
+    }
+  ],
+  "external_candidate": {
+    "path": "/Users/markik/Code/output/vello-next-gates-20261013/native/candidate-r2-qualified.json",
+    "bytes": 193733,
+    "sha256": "2d9aedfccef2bcb4aa5be86f0e2e849e6410c848f9c26afd60cd6b7d04aaea1b"
+  },
+  "source_basis": {
+    "native_binary_build_heads": {
+      "/Users/markik/Code/worktrees/mere-vello-release-adoption": "cc65bf4a8f71867217f10041e9cfd34d1e2d0de2",
+      "/Users/markik/Code/worktrees/genet-vello-release-adoption": "09b16a559237aaa8163589763dbe2370264097cc",
+      "/Users/markik/Code/worktrees/netrender-cambium-resource-bridge": "c74b7cb28090c28b1c6d80b08dcdea18aff48d3e",
+      "/Users/markik/Code/worktrees/vello-release-adoption": "2eae6243881d5b24c984d5ee35dde509ca5db782"
+    },
+    "qualified_candidate_heads": {
+      "/Users/markik/Code/worktrees/mere-vello-release-adoption": "0570f098e2e99e787e7bfcc78495f3c1a06af0d2",
+      "/Users/markik/Code/worktrees/genet-vello-release-adoption": "09b16a559237aaa8163589763dbe2370264097cc",
+      "/Users/markik/Code/worktrees/netrender-cambium-resource-bridge": "c74b7cb28090c28b1c6d80b08dcdea18aff48d3e",
+      "/Users/markik/Code/worktrees/vello-release-adoption": "2eae6243881d5b24c984d5ee35dde509ca5db782"
+    },
+    "mere_native_binary_source": "cc65bf4a8f71867217f10041e9cfd34d1e2d0de2",
+    "mere_qualified_source": "0570f098e2e99e787e7bfcc78495f3c1a06af0d2",
+    "reconciled_changed_paths": [
+      "crates/cambium/cambium-genet-web-host/examples/shared_recovery/main.rs"
+    ],
+    "reconciliation": [
+      {
+        "path": "/Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium-genet-web-host/examples/shared_recovery/main.rs",
+        "before_sha256": "ccaa7a66a43d0941fb57915397f40ae664d28345e3193c3db66d66b21f7af793",
+        "after_sha256": "c34b8b2e8d91f95c1a9cce43e411ba1b22f7230e8cf4ff5224beb6d687409520",
+        "scope": "browser-only explicit byte-to-hex compiler repair; not used by frozen native example"
+      }
+    ],
+    "scope": "The native executable was built at cc65bf4a8; current qualified 0570f098 differs only in the unused browser fixture. No native rebuild equivalence is inferred beyond that exact source-only reconciliation.",
+    "embedded_source_manifest": {
+      "desktop_manifest_fnv1a": "c9f222a53603ebca",
+      "example_fnv1a": "5d1346f7342269db",
+      "hash_kind": "FNV-1a; runtime owner separately seals source/lock/executable SHA256",
+      "workspace_lock_fnv1a": "9862a409a736e6e4",
+      "workspace_manifest_fnv1a": "c3b09e0cce7ce0b6"
+    }
+  },
+  "raw_png_artifacts_remain_external": "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/artifacts",
+  "limits": "normal-run two-host controlled destroy/recovery at old G09b/Mcc65 native build; does not requalify later G561/M4682 font-source fixture or interrupted cleanup"
+}

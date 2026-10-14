@@ -1,0 +1,175 @@
+- button
+- region "Graphshell, one tree":
+  - main:
+    - text: mereGraphshellLocal mere / retained material
+    - text: mere
+    - generic: mere
+    - text: GraphshellLocal mere / retained material
+    - text: GraphshellLocal mere / retained material
+    - heading "Graphshell" [level=1]
+    - paragraph: Local mere / retained material
+    - status: "saved graph · 14 nodes · selected: 1 · primary: mere://clip/b40c579d5234ed1f14d7512474a18c958c5e07f1a16f27afc42d337eeabd07ba"
+    - navigation "Graph controls":
+      - button "Pan left"
+      - button "Pan right"
+      - button "Pan up"
+      - button "Pan down"
+      - button "Zoom in"
+      - button "Zoom out"
+      - button "Fit graph"
+      - button "Fit selection"
+      - button "Restore arrangement"
+      - button "Play physics"
+      - button "Graph commands"
+    - text: Open selected in workbenchReturn to Mere
+    - button "Open selected in workbench"
+    - button "Return to Mere"
+    - text: Saved graph
+    - button "Undo session"
+    - button "Redo session"
+    - text: Add an object
+    - button "Add an object"
+    - button "Inspect selected access"
+    - button "Inspect fields"
+    - button "Open details"
+    - text: Workbench14 items / Tiled presentationCoffeeReading access CoffeeGraph tools
+    - text: Workbench14 items / Tiled presentationCoffeeReading access Coffee
+    - text: Workbench14 items / Tiled presentation
+    - text: Workbench14 items / Tiled presentation
+    - heading "Workbench" [level=2]
+    - paragraph: 14 items / Tiled presentation
+    - text: CoffeeReading access Coffee
+    - text: CoffeeReading access Coffee
+    - text: CoffeeReading access Coffee
+    - tablist "Coffee":
+      - tab "Coffee Coffee Close Coffee" [selected]:
+        - text: Coffee
+        - generic: Coffee
+        - button "Close Coffee"
+    - text: Reading access Coffee
+    - article "Reading access Coffee":
+      - button "Show in Mere"
+      - text: Retained document CoffeeSelected clip download handed to the browser
+      - text: "Retained content: Coffee"
+      - group "Coffee"
+      - group "Coffee"
+      - group "café"
+      - 'group "Source anchor (utf8-bytes): mere://knot/document/coffee"'
+      - 'group "Original selection: café"'
+      - 'group "Source tags (author unknown): coffee"'
+      - group "Export selected clip":
+        - button "Activate"
+      - status: Selected clip download handed to the browser
+    - text: Graph tools
+    - text: Application appearance
+    - button "Appearance"
+    - status: Appearance status
+    - text: InspectorSelection, scene and presentationSelected material
+    - text: InspectorSelection, scene and presentation
+    - heading "Inspector" [level=2]
+    - paragraph: Selection, scene and presentation
+    - text: Selected material
+    - generic: Selected material
+    - status: "Storage: IndexedDB reopened · persistent"
+    - text: Arrangement and physics
+    - text: Arrangement and physicsArrangement and physics
+    - button "Arrangement and physics" [expanded]
+    - text: Arrangement and physics
+    - text: ArrangementArrangement
+    - generic: Arrangement
+    - combobox "Arrangement":
+      - generic: Spiral
+    - button "Apply arrangement"
+    - text: RoleRole
+    - generic: Role
+    - combobox "Role":
+      - generic: Seeded
+    - button "Apply role"
+    - text: Physics lawPhysics law
+    - generic: Physics law
+    - combobox "Physics law":
+      - generic: Springs
+    - group "Overlays":
+      - text: Hub roomHub room
+      - checkbox "Hub room"
+      - generic: Hub room
+      - text: Group pullGroup pull
+      - checkbox "Group pull"
+      - generic: Group pull
+      - text: Hub pullHub pull
+      - checkbox "Hub pull"
+      - generic: Hub pull
+      - text: DepthDepth
+      - checkbox "Depth"
+      - generic: Depth
+      - text: GridGrid
+      - checkbox "Grid"
+      - generic: Grid
+      - text: CentreCentre
+      - checkbox "Centre"
+      - generic: Centre
+      - text: TideTide
+      - checkbox "Tide"
+      - generic: Tide
+      - text: SkeletonSkeleton
+      - checkbox "Skeleton"
+      - generic: Skeleton
+    - text: KindsKinds
+    - generic: Kinds
+    - combobox "Kinds":
+      - generic: By site
+    - text: GroupsGroups
+    - generic: Groups
+    - combobox "Groups":
+      - generic: By site
+    - text: MassMass
+    - generic: Mass
+    - combobox "Mass":
+      - generic: By degree
+    - text: DepthDepth
+    - generic: Depth
+    - combobox "Depth":
+      - generic: From roots
+    - button "Apply physics"
+    - text: SpeedSpeed
+    - generic: Speed
+    - combobox "Speed":
+      - generic: 1x
+    - status: Speed status
+    - text: ProfileProfile
+    - generic: Profile
+    - combobox "Profile":
+      - generic: Springs
+    - button "Apply profile"
+    - status: Physics status
+    - text: Find and filter
+    - button "Find and filter"
+    - text: Scenes and transfers
+    - button "Scenes and transfers"
+    - text: Projection editor
+    - button "Projection editor"
+    - text: History
+    - button "History"
+    - text: Dynamics inspector
+    - button "Explain selected dynamics"
+    - text: Presentation rules
+    - button "Presentation rules"
+    - text: Saved query views
+    - heading "Saved query views" [level=3]
+    - button "New query view"
+    - status
+    - text: Fields
+    - heading "Fields" [level=2]
+    - text: Forme controls
+    - paragraph: Workbench · 1 accesses · 1 regions
+    - button "Unlock forme"
+    - button "Undo saved forme change"
+    - button "Redo saved forme change" [disabled]
+    - button "Hide forme boundary"
+    - button "Select forme members"
+    - button "Retry workbench save"
+    - status: Workbench saved
+    - text: Remote session
+    - text: Remote session
+    - button "Remote session"
+- iframe

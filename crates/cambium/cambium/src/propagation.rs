@@ -28,6 +28,12 @@ struct Flags {
     stop: bool,
     stop_immediate: bool,
     default_prevented: bool,
+    key_target: Option<(genet_scripted_dom::NodeId, genet_scripted_dom::NodeId)>,
+    tab_focus: Option<(
+        genet_scripted_dom::NodeId,
+        genet_scripted_dom::NodeId,
+        usize,
+    )>,
 }
 
 /// Shared, clone-through cancellation state for one dispatched event.
@@ -51,6 +57,38 @@ impl Default for Propagation {
 }
 
 impl Propagation {
+    // A stock-tab request belongs to one actual key-handler invocation. It is
+    // separate from cancellation: custom/manual tabs can prevent arrows freely.
+    pub(crate) fn set_key_target(
+        &self,
+        target: Option<(genet_scripted_dom::NodeId, genet_scripted_dom::NodeId)>,
+    ) {
+        let mut flags = self.flags.get();
+        flags.key_target = target;
+        self.flags.set(flags);
+    }
+
+    pub(crate) fn request_tab_focus(&self, index: usize) {
+        let mut flags = self.flags.get();
+        if let Some((origin, group)) = flags.key_target {
+            flags.tab_focus = Some((origin, group, index));
+        }
+        self.flags.set(flags);
+    }
+
+    pub(crate) fn take_tab_focus(
+        &self,
+    ) -> Option<(
+        genet_scripted_dom::NodeId,
+        genet_scripted_dom::NodeId,
+        usize,
+    )> {
+        let mut flags = self.flags.get();
+        let request = flags.tab_focus.take();
+        self.flags.set(flags);
+        request
+    }
+
     /// A fresh propagation state (nothing stopped or prevented). One per
     /// dispatch; the event's clones share it.
     pub fn new() -> Self {

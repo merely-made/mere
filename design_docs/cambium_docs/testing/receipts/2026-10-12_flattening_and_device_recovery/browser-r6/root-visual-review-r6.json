@@ -1,0 +1,82 @@
+{
+  "status": "PASS",
+  "scope": "visual inspection of all12 actual full Workshop/Reader/Stylesheet light/dark raw-derived PNGs before/after controlled shared-device recovery",
+  "reviewed_at": "2026-10-14T02:19:34.492920+00:00",
+  "qualification_sha256": "58f15fc1b6e3cb68846aadfce8a11bf5b409163c8c3db6e2532d6cf7d186e1f7",
+  "source_identity_sha256": "f2a8e544ac37df76cd6ea2f42cdde4be0253c1a97e94437a9b115e2aebf9ddff",
+  "artifacts": [
+    {
+      "name": "first_before",
+      "png": "first_before.png",
+      "png_sha256": "27fc28bdd70f62550cafb2fb0da95028c6d3becaaeb91153318ab875e9699148"
+    },
+    {
+      "name": "first_after",
+      "png": "first_after.png",
+      "png_sha256": "7befed6e7a8e0a3709f07fdd230b896a21f9fdc8eb4badf1f023ad00bd9f5301"
+    },
+    {
+      "name": "second_before",
+      "png": "second_before.png",
+      "png_sha256": "fbb7bd5697b1ba2371403d7b0b64fac13feb24006e5c7e62b45f4f7f906f2d6f"
+    },
+    {
+      "name": "second_after",
+      "png": "second_after.png",
+      "png_sha256": "f65102bfb8fb215d0aaa3f04eea3089e3bdb99e354cee81a6e779496be063e52"
+    },
+    {
+      "name": "first_reader_before",
+      "png": "first_reader_before.png",
+      "png_sha256": "0ab649bc92c030ee6f4c315a4dddc730a9f2efa3636ea723cebb543af891c35f"
+    },
+    {
+      "name": "first_reader_after",
+      "png": "first_reader_after.png",
+      "png_sha256": "8bcd8c71f49cab2d619c656bc90ff60580b806276d734b573503d24bf194591c"
+    },
+    {
+      "name": "second_reader_before",
+      "png": "second_reader_before.png",
+      "png_sha256": "a3f298837213932e94e093398078bc51d953f006aaef7cd8236d5e06854ec8cc"
+    },
+    {
+      "name": "second_reader_after",
+      "png": "second_reader_after.png",
+      "png_sha256": "583d726b453ad448576e8b7a9f82ab5f458c4b7785d343dd944c7ea45426acf5"
+    },
+    {
+      "name": "first_stylesheet_before",
+      "png": "first_stylesheet_before.png",
+      "png_sha256": "ddbf02401102a654b1a41211e8400e8242d3783c46b9a36ce1ee4a4bc9c8cd78"
+    },
+    {
+      "name": "first_stylesheet_after",
+      "png": "first_stylesheet_after.png",
+      "png_sha256": "91c98dc3965ce8b1c82c4e5a2fa695e623d55dcac9714814c6778f4f4d35753f"
+    },
+    {
+      "name": "second_stylesheet_before",
+      "png": "second_stylesheet_before.png",
+      "png_sha256": "56f792dd7655d6008424e959afaaf1a6855e4ca5c149f98e5f3f9f459bc933fa"
+    },
+    {
+      "name": "second_stylesheet_after",
+      "png": "second_stylesheet_after.png",
+      "png_sha256": "0451841404b1fcf22bfbcf25a8c01b790d958feac2cfc4afc2b8624747f00585"
+    }
+  ],
+  "observations": [
+    "Actual readable outer Workshop, Reader and retained stylesheet text is visible in both authored light/dark hosts.",
+    "Before/after captures retain visible composition, typography, chosen colors, independent draft labels and producer placement.",
+    "Reader and lower workshop content retain their bounded viewport clipping; this is a recovery/rendering comparison."
+  ],
+  "claims_excluded": [
+    "OS compositor screenshots or OS input/assistive technology",
+    "General serif/monospace/script/icon font fidelity from the four-role Roboto fixture",
+    "Current-frame async GPU quality/error scopes or final canvas handoff",
+    "Physical driver reset or sustained performance"
+  ],
+  "numeric_verification": "independent12-artifact hash/decodedRGBA/6-fullcomparison verification in separate receipt",
+  "original_qualification_modified": false
+}
