@@ -930,3 +930,5 @@ staged transactions. The
 [one-tree plan](mere_docs/implementation_strategy/2026-09-25_graphshell_one_tree_plan.md)
 records final legacy presenter retirement and the actual shared reservoir panel
 gate. Native, browser, fresh reopen and publication receipts remain separate.
+
+- [C1 resident divination qualification](mere_docs/testing/receipts/2026-10-14_c1_resident_divination/README.md): published H exact-float replay repair and portable f7ec intake, exact stock/embedded owner gates, seven rebuilt native binaries, four sealed browser packages and 19 independently reviewed fresh H Cleromancy native originals. The unchanged original Scene Save/Reopen passes. F/A3/D and G proofs retain their separate scope. H native cross-application and browser witness/freshChrome/live/archive proofs pass with separate independent original reviews and owner guards; full 164-scene wall/supplements and final documentation publication remain pending. H, f7ec and N source checkpoints are published.
